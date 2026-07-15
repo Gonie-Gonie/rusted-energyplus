@@ -317,6 +317,12 @@
                          "help":  "Gate paired exact EPW fixed-date daylight-saving RunPeriod enable/disable state."
                      },
                      {
+                         "name":  "compare-calendar-dst-epw-idf-precedence-exact",
+                         "path":  "compare\\compare-calendar-dst-epw-idf-precedence-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact fixed-date input-file daylight-saving precedence over a declared but RunPeriod-disabled EPW period."
+                     },
+                     {
                          "name":  "compare-calendar-epw-dst-weekday-rules-exact",
                          "path":  "compare\\compare-calendar-epw-dst-weekday-rules-exact.ps1",
                          "group":  "compare",

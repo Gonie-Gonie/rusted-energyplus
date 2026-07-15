@@ -668,45 +668,7 @@ fn render_markdown(context: &TimeWeatherScheduleContext<'_>) -> String {
             "start_year_weather_effective_leap: {}\n",
             calendar.start_year_is_weather_effective_leap_year
         ));
-        report.push_str(&format!(
-            "weather_file_daylight_saving_period_declared: {}\n",
-            context
-                .time_axis
-                .daylight_saving
-                .weather_file_period_declared
-        ));
-        report.push_str(&format!(
-            "run_period_uses_weather_file_daylight_saving_period: {}\n",
-            context
-                .time_axis
-                .daylight_saving
-                .run_period_uses_weather_file_period
-        ));
-        report.push_str(&format!(
-            "daylight_saving_active: {}\n",
-            context.time_axis.daylight_saving.active
-        ));
-        if let Some(period) = context.time_axis.daylight_saving.resolved_period {
-            report.push_str(&format!(
-                "daylight_saving_resolved_period: {}/{} through {}/{} (wraps_year={})\n",
-                period.start.month,
-                period.start.day_of_month,
-                period.end.month,
-                period.end.day_of_month,
-                period.wraps_year
-            ));
-        } else {
-            report.push_str("daylight_saving_resolved_period: none\n");
-        }
-        report.push_str(&format!(
-            "daylight_saving_hourly_samples: {}\n",
-            context
-                .time_axis
-                .points
-                .iter()
-                .filter(|point| point.dst)
-                .count()
-        ));
+        append_daylight_saving_markdown(&mut report, &context.time_axis);
     } else {
         report.push_str("weather_calendar_policy_applied: false\n");
     }
@@ -805,6 +767,46 @@ fn render_markdown(context: &TimeWeatherScheduleContext<'_>) -> String {
         }
     }
     report
+}
+
+fn append_daylight_saving_markdown(report: &mut String, time_axis: &TimeAxis) {
+    let daylight_saving = &time_axis.daylight_saving;
+    report.push_str(&format!(
+        "weather_file_daylight_saving_period_declared: {}\n",
+        daylight_saving.weather_file_period_declared
+    ));
+    report.push_str(&format!(
+        "run_period_uses_weather_file_daylight_saving_period: {}\n",
+        daylight_saving.run_period_uses_weather_file_period
+    ));
+    report.push_str(&format!(
+        "input_file_daylight_saving_period_declared: {}\n",
+        daylight_saving.input_file_period_declared
+    ));
+    report.push_str(&format!(
+        "daylight_saving_active: {}\n",
+        daylight_saving.active
+    ));
+    report.push_str(&format!(
+        "daylight_saving_effective_source: {}\n",
+        daylight_saving.effective_source.as_str()
+    ));
+    if let Some(period) = daylight_saving.resolved_period {
+        report.push_str(&format!(
+            "daylight_saving_resolved_period: {}/{} through {}/{} (wraps_year={})\n",
+            period.start.month,
+            period.start.day_of_month,
+            period.end.month,
+            period.end.day_of_month,
+            period.wraps_year
+        ));
+    } else {
+        report.push_str("daylight_saving_resolved_period: none\n");
+    }
+    report.push_str(&format!(
+        "daylight_saving_hourly_samples: {}\n",
+        time_axis.points.iter().filter(|point| point.dst).count()
+    ));
 }
 
 fn render_json(context: &TimeWeatherScheduleContext<'_>) -> String {
@@ -1057,7 +1059,7 @@ fn weather_calendar_json(time_axis: &TimeAxis) -> String {
             )
         });
     format!(
-        "{{\"policy_applied\": true, \"weather_file_allows_leap_years\": {}, \"gregorian_calendar_days\": {}, \"weather_effective_calendar_days\": {}, \"leap_days_skipped\": {}, \"start_year_gregorian_leap\": {}, \"start_year_weather_effective_leap\": {}, \"daylight_saving\": {{\"weather_file_period_declared\": {}, \"run_period_uses_weather_file_period\": {}, \"active\": {}, \"resolved_period\": {}}}, \"daylight_saving_hourly_samples\": {}}}",
+        "{{\"policy_applied\": true, \"weather_file_allows_leap_years\": {}, \"gregorian_calendar_days\": {}, \"weather_effective_calendar_days\": {}, \"leap_days_skipped\": {}, \"start_year_gregorian_leap\": {}, \"start_year_weather_effective_leap\": {}, \"daylight_saving\": {{\"weather_file_period_declared\": {}, \"run_period_uses_weather_file_period\": {}, \"input_file_period_declared\": {}, \"active\": {}, \"effective_source\": {}, \"resolved_period\": {}}}, \"daylight_saving_hourly_samples\": {}}}",
         calendar.weather_file_allows_leap_years,
         calendar.gregorian.total_days,
         calendar.total_days,
@@ -1068,7 +1070,9 @@ fn weather_calendar_json(time_axis: &TimeAxis) -> String {
         time_axis
             .daylight_saving
             .run_period_uses_weather_file_period,
+        time_axis.daylight_saving.input_file_period_declared,
         time_axis.daylight_saving.active,
+        json_string(time_axis.daylight_saving.effective_source.as_str()),
         daylight_saving_period,
         time_axis.points.iter().filter(|point| point.dst).count(),
     )

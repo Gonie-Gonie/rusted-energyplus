@@ -30,6 +30,18 @@ pub enum CalendarDateRule {
     },
 }
 
+/// The unique input-file daylight-saving period applied to weather run periods.
+///
+/// EnergyPlus `RunPeriodControl:DaylightSavingTime` takes precedence over a
+/// daylight-saving period declared by the weather file.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct RunPeriodDaylightSavingTime {
+    /// Calendar rule used to resolve the first daylight-saving day.
+    pub start_date: CalendarDateRule,
+    /// Calendar rule used to resolve the final daylight-saving day.
+    pub end_date: CalendarDateRule,
+}
+
 /// Schedule day type selected by `RunPeriodControl:SpecialDays`.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub enum SpecialDayType {

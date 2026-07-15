@@ -2,8 +2,8 @@
 
 use crate::weather::EpwCalendarMetadata;
 use ep_model::{
-    DayOfWeek, FirstHourInterpolationStartingValues, NormalizedName, RunPeriod, RunPeriodId,
-    RunPeriodSpecialDay, TypedModel,
+    DayOfWeek, FirstHourInterpolationStartingValues, NormalizedName, RunPeriod,
+    RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, TypedModel,
 };
 
 mod calendar_rules;
@@ -14,7 +14,8 @@ mod special_days;
 mod weather_calendar;
 pub use day_type::DayType;
 pub use daylight_saving::{
-    DaylightSavingAxisState, ResolvedDaylightSavingDate, ResolvedDaylightSavingPeriod,
+    DaylightSavingAxisState, DaylightSavingPeriodSource, ResolvedDaylightSavingDate,
+    ResolvedDaylightSavingPeriod,
 };
 use daylight_saving::{daylight_saving_is_active, resolve_daylight_saving_axis_state};
 pub use error::TimeAxisError;
@@ -135,7 +136,7 @@ pub struct EnvironmentTimePoint {
     pub day_of_week: DayOfWeek,
     /// Effective schedule day type after special-day overrides.
     pub day_type: DayType,
-    /// Daylight-saving state resolved from the active weather-file period.
+    /// Daylight-saving state resolved from the selected weather- or input-file period.
     pub dst: bool,
     /// Special schedule day type when one overrides the weekday.
     pub special_day_type: Option<DayType>,
@@ -181,7 +182,7 @@ pub struct EnvironmentTimeAxis {
     pub calendar: ResolvedRunPeriodCalendar,
     /// EPW policy applied to this axis, or `None` for a Gregorian-only projection.
     pub weather_calendar: Option<ResolvedWeatherEnvironmentCalendar>,
-    /// Weather-file daylight-saving declaration, use flag, and resolved range.
+    /// Daylight-saving declarations, source selection, and resolved range.
     pub daylight_saving: DaylightSavingAxisState,
     /// Input-file special-day declarations and resolved ordinal lookup state.
     pub special_days: SpecialDayAxisState,
@@ -237,7 +238,7 @@ pub struct TimePoint {
     pub day_of_week: DayOfWeek,
     /// Effective schedule day type after special-day overrides.
     pub day_type: DayType,
-    /// Daylight-saving state resolved from the active weather-file period.
+    /// Daylight-saving state resolved from the selected weather- or input-file period.
     pub dst: bool,
     /// Special schedule day type when one overrides the weekday.
     pub special_day_type: Option<DayType>,
@@ -298,7 +299,7 @@ pub struct TimeAxis {
     pub run_period_name: String,
     /// EPW policy applied to this axis, or `None` for a Gregorian-only projection.
     pub weather_calendar: Option<ResolvedWeatherEnvironmentCalendar>,
-    /// Weather-file daylight-saving declaration, use flag, and resolved range.
+    /// Daylight-saving declarations, source selection, and resolved range.
     pub daylight_saving: DaylightSavingAxisState,
     /// Input-file special-day declarations and resolved ordinal lookup state.
     pub special_days: SpecialDayAxisState,
@@ -454,6 +455,7 @@ pub fn build_environment_time_axes(
         return build_environment_time_axis_for_run_period_internal(
             &default_run_period(),
             None,
+            model.run_period_daylight_saving_time.as_ref(),
             &model.run_period_special_days,
             1,
             zone_timesteps_per_hour,
@@ -469,6 +471,7 @@ pub fn build_environment_time_axes(
             build_environment_time_axis_for_run_period_internal(
                 run_period,
                 None,
+                model.run_period_daylight_saving_time.as_ref(),
                 &model.run_period_special_days,
                 index + 1,
                 zone_timesteps_per_hour,
@@ -487,6 +490,7 @@ pub fn build_environment_time_axes_with_weather_metadata(
         return build_environment_time_axis_for_run_period_internal(
             &default_run_period(),
             Some(metadata),
+            model.run_period_daylight_saving_time.as_ref(),
             &model.run_period_special_days,
             1,
             zone_timesteps_per_hour,
@@ -502,6 +506,7 @@ pub fn build_environment_time_axes_with_weather_metadata(
             build_environment_time_axis_for_run_period_internal(
                 run_period,
                 Some(metadata),
+                model.run_period_daylight_saving_time.as_ref(),
                 &model.run_period_special_days,
                 index + 1,
                 zone_timesteps_per_hour,
@@ -526,6 +531,7 @@ pub fn build_environment_time_axis_for_run_period_with_zone_timesteps(
     build_environment_time_axis_for_run_period_internal(
         run_period,
         None,
+        None,
         &[],
         environment_index,
         zone_timesteps_per_hour,
@@ -542,6 +548,7 @@ pub fn build_environment_time_axis_for_run_period_with_weather_metadata_and_zone
     build_environment_time_axis_for_run_period_internal(
         run_period,
         Some(metadata),
+        None,
         &[],
         environment_index,
         zone_timesteps_per_hour,
@@ -551,6 +558,7 @@ pub fn build_environment_time_axis_for_run_period_with_weather_metadata_and_zone
 fn build_environment_time_axis_for_run_period_internal(
     run_period: &RunPeriod,
     metadata: Option<&EpwCalendarMetadata>,
+    input_file_daylight_saving_time: Option<&RunPeriodDaylightSavingTime>,
     special_day_inputs: &[RunPeriodSpecialDay],
     environment_index: usize,
     zone_timesteps_per_hour: u32,
@@ -567,6 +575,7 @@ fn build_environment_time_axis_for_run_period_internal(
         &calendar,
         weather_calendar.as_ref(),
         metadata,
+        input_file_daylight_saving_time,
     )?;
     let special_days = resolve_special_day_axis_state(
         run_period,
@@ -666,6 +675,7 @@ pub fn build_hourly_time_axis(model: &TypedModel) -> Result<TimeAxis, TimeAxisEr
     build_hourly_time_axis_for_run_period_internal(
         run_period,
         None,
+        model.run_period_daylight_saving_time.as_ref(),
         &model.run_period_special_days,
         model.timestep.number_of_timesteps_per_hour.max(1),
     )
@@ -687,6 +697,7 @@ pub fn build_hourly_time_axis_with_weather_metadata(
     build_hourly_time_axis_for_run_period_internal(
         run_period,
         Some(metadata),
+        model.run_period_daylight_saving_time.as_ref(),
         &model.run_period_special_days,
         model.timestep.number_of_timesteps_per_hour.max(1),
     )
@@ -725,7 +736,13 @@ pub fn build_hourly_time_axis_for_run_period_with_zone_timesteps(
     run_period: &RunPeriod,
     zone_timesteps_per_hour: u32,
 ) -> Result<TimeAxis, TimeAxisError> {
-    build_hourly_time_axis_for_run_period_internal(run_period, None, &[], zone_timesteps_per_hour)
+    build_hourly_time_axis_for_run_period_internal(
+        run_period,
+        None,
+        None,
+        &[],
+        zone_timesteps_per_hour,
+    )
 }
 
 /// Builds an hourly time axis after applying EPW calendar metadata.
@@ -747,6 +764,7 @@ pub fn build_hourly_time_axis_for_run_period_with_weather_metadata_and_zone_time
     build_hourly_time_axis_for_run_period_internal(
         run_period,
         Some(metadata),
+        None,
         &[],
         zone_timesteps_per_hour,
     )
@@ -755,6 +773,7 @@ pub fn build_hourly_time_axis_for_run_period_with_weather_metadata_and_zone_time
 fn build_hourly_time_axis_for_run_period_internal(
     run_period: &RunPeriod,
     metadata: Option<&EpwCalendarMetadata>,
+    input_file_daylight_saving_time: Option<&RunPeriodDaylightSavingTime>,
     special_day_inputs: &[RunPeriodSpecialDay],
     zone_timesteps_per_hour: u32,
 ) -> Result<TimeAxis, TimeAxisError> {
@@ -770,6 +789,7 @@ fn build_hourly_time_axis_for_run_period_internal(
         &calendar,
         weather_calendar.as_ref(),
         metadata,
+        input_file_daylight_saving_time,
     )?;
     let special_days = resolve_special_day_axis_state(
         run_period,

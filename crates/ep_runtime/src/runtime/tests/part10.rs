@@ -96,7 +96,12 @@ fn weather_file_fixed_date_daylight_saving_is_inclusive_on_both_time_axes()
             .daylight_saving
             .run_period_uses_weather_file_period
     );
+    assert!(!hourly_axis.daylight_saving.input_file_period_declared);
     assert!(hourly_axis.daylight_saving.active);
+    assert_eq!(
+        hourly_axis.daylight_saving.effective_source,
+        crate::DaylightSavingPeriodSource::WeatherFile
+    );
     let resolved = hourly_axis
         .daylight_saving
         .resolved_period
@@ -347,9 +352,110 @@ fn run_period_can_disable_the_declared_weather_file_daylight_saving_period()
 
     assert!(axis.daylight_saving.weather_file_period_declared);
     assert!(!axis.daylight_saving.run_period_uses_weather_file_period);
+    assert!(!axis.daylight_saving.input_file_period_declared);
     assert!(!axis.daylight_saving.active);
+    assert_eq!(
+        axis.daylight_saving.effective_source,
+        crate::DaylightSavingPeriodSource::None
+    );
     assert_eq!(axis.daylight_saving.resolved_period, None);
     assert!(axis.points.iter().all(|point| !point.dst));
+
+    Ok(())
+}
+
+#[test]
+fn input_file_daylight_saving_overrides_weather_file_period_and_run_period_policy()
+-> Result<(), Box<dyn std::error::Error>> {
+    let mut run_period = test_run_period("IDF DST PRECEDENCE", 2, 28, 3, 1);
+    run_period.begin_year = Some(2016);
+    run_period.end_year = Some(2016);
+    run_period.use_weather_file_daylight_saving_period = false;
+    let metadata = EpwCalendarMetadata {
+        leap_year_observed: true,
+        daylight_saving_period: Some(EpwDaylightSavingPeriod {
+            start: EpwCalendarDateRule::MonthDay {
+                month: 2,
+                day_of_month: 29,
+            },
+            end: EpwCalendarDateRule::MonthDay {
+                month: 3,
+                day_of_month: 1,
+            },
+        }),
+        holidays: Vec::new(),
+    };
+    let model = TypedModel {
+        timestep: TimestepConfig {
+            number_of_timesteps_per_hour: 1,
+        },
+        run_periods: vec![run_period],
+        run_period_daylight_saving_time: Some(ep_model::RunPeriodDaylightSavingTime {
+            start_date: ep_model::CalendarDateRule::MonthDay {
+                month: 2,
+                day_of_month: 28,
+            },
+            end_date: ep_model::CalendarDateRule::MonthDay {
+                month: 2,
+                day_of_month: 29,
+            },
+        }),
+        ..TypedModel::default()
+    };
+
+    let hourly_axis = crate::build_hourly_time_axis_with_weather_metadata(&model, &metadata)?;
+    assert!(hourly_axis.daylight_saving.weather_file_period_declared);
+    assert!(
+        !hourly_axis
+            .daylight_saving
+            .run_period_uses_weather_file_period
+    );
+    assert!(hourly_axis.daylight_saving.input_file_period_declared);
+    assert!(hourly_axis.daylight_saving.active);
+    assert_eq!(
+        hourly_axis.daylight_saving.effective_source,
+        crate::DaylightSavingPeriodSource::InputFile
+    );
+    let resolved = hourly_axis
+        .daylight_saving
+        .resolved_period
+        .expect("active input-file DST has a resolved period");
+    assert_eq!(
+        (
+            resolved.start.month,
+            resolved.start.day_of_month,
+            resolved.start.day_of_year,
+        ),
+        (2, 28, 59)
+    );
+    assert_eq!(
+        (
+            resolved.end.month,
+            resolved.end.day_of_month,
+            resolved.end.day_of_year,
+        ),
+        (2, 29, 60)
+    );
+    assert!(!resolved.wraps_year);
+    assert_eq!(hourly_axis.points.len(), 72);
+    assert_eq!(
+        hourly_axis.points.iter().filter(|point| point.dst).count(),
+        48
+    );
+    assert_hourly_day_dst(&hourly_axis, 2, 28, true);
+    assert_hourly_day_dst(&hourly_axis, 2, 29, true);
+    assert_hourly_day_dst(&hourly_axis, 3, 1, false);
+
+    let environment_axes =
+        build_environment_time_axes_with_weather_metadata(&model, &metadata)?;
+    assert_eq!(environment_axes.len(), 1);
+    assert_eq!(
+        environment_axes[0].daylight_saving,
+        hourly_axis.daylight_saving
+    );
+    assert_environment_day_dst(&environment_axes[0], 2, 28, true);
+    assert_environment_day_dst(&environment_axes[0], 2, 29, true);
+    assert_environment_day_dst(&environment_axes[0], 3, 1, false);
 
     Ok(())
 }

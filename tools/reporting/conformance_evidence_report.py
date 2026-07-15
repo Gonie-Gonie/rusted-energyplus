@@ -74,10 +74,25 @@ CLAIM_BOUNDARY = (
     "rows; the disabled daylight-saving row is Environment:Daylight Saving,No,RunPeriod Object. "
     "The Rust summary retains the weather-file declaration while reporting active=false and "
     "resolved_period=null. Those Rust fields are summary diagnostics, not additional EIO output. "
-    "Both cases are zero-tolerance gated. Other periods, years, date rules, "
-    "policy combinations or precedence, IDF daylight-saving input, schedule/civil-clock effects, "
-    "actual-weather execution, raw Rust ESO serialization, and broad WeatherManager behavior "
-    "remain unclaimed. The separate weekday-boundary case proves only the literal "
+    "Both cases are zero-tolerance gated. Other periods, years, date rules, policy combinations "
+    "beyond the separate exact precedence case, schedule/civil-clock effects, actual-weather "
+    "execution, raw Rust ESO serialization, and broad WeatherManager behavior remain unclaimed. "
+    "The separate fixed-date EPW-versus-IDF precedence case uses the exact 2016-02-28 through "
+    "2016-03-01 RunPeriod with its weather-file DST flag No, the same EPW 2/29 through 3/1 "
+    "declaration, and exactly one input-file 2/28 through 2/29 daylight-saving object. The "
+    "input-file object wins: 72 ordered, exact, unique, zero-delta EnergyPlus ESO values and "
+    "timestamp fields follow daily status 1/1/0 with exactly 48 active hours. The gate locks "
+    "Environment,DST FIXED DATE RUN PERIOD,WeatherFileRunPeriod,02/28/2016,03/01/2016,Sunday,3,"
+    "Use RunPeriod Specified Day,No,No,No,No,No,Clark and Allen and Environment:Daylight "
+    "Saving,Yes,InputFile,02/28,02/29 plus clean 0 Warning/0 Severe completion. Rust's typed "
+    "RunPeriodDaylightSavingTime and JSON input_file_period_declared/effective_source fields, "
+    "together with the Markdown input_file_daylight_saving_period_declared and "
+    "daylight_saving_effective_source fields, are summary diagnostics rather than additional EIO "
+    "output. Other fixed, Nth/last, or wrap rules; missing, malformed, or duplicate error parity "
+    "beyond typed diagnostics; other years, multiple RunPeriods, and policy combinations; "
+    "schedule-shift, hour-24, tomorrow, or civil-clock effects; actual, cross-year, or DesignDay "
+    "execution; Rust raw ESO serialization; and broad WeatherManager behavior remain unclaimed. "
+    "The separate weekday-boundary case proves only the literal "
     "EPW pair `4th Monday in February` through `Last Wednesday in February` on the explicit "
     "2032-02-22 through 2032-02-26 Sunday-start RunPeriod with policies No/Yes/No/No/No/No. The "
     "boundaries resolve to days of year 54 through 56 without wrap; 120 ordered, unique, exact "
@@ -100,13 +115,14 @@ CLAIM_BOUNDARY = (
     "expected values, not EIO-emitted fields. This start-side case does not add full-year or cross-"
     "year traversal evidence, and the March end boundary remains the separate end-side case. "
     "Broader years, months, and date rules, generic southern/wrap behavior, RunPeriod disabling "
-    "beyond the paired fixed-date Yes/No case, EPW-versus-IDF precedence, DST clock effects, "
+    "beyond the paired fixed-date Yes/No case, EPW-versus-IDF precedence beyond the exact fixed-"
+    "date case, DST clock effects, "
     "actual-weather execution, and broad WeatherManager behavior remain unclaimed. Other "
     "Nth/last-weekday forms, additional RunPeriod policy branches beyond that fixed-date pair, "
     "malformed headers, and policy precedence "
-    "remain unit/source evidence or unclaimed. The IDF RunPeriodControl:DaylightSavingTime object, "
-    "DST-shifted schedule lookup, hour-24 rollover, and Rust raw ESO serialization remain outside "
-    "this checkpoint. "
+    "remain unit/source evidence or unclaimed. RunPeriodControl:DaylightSavingTime behavior beyond "
+    "the exact fixed-date precedence case, DST-shifted schedule lookup, hour-24 rollover, and Rust "
+    "raw ESO serialization remain outside this checkpoint. "
     "The fixed-date input-file special-day case separately proves one February 29 Holiday: 72 "
     "ordered, unique Site Day Type Index samples and normalized timestamps match exactly as "
     "24 Sunday values, 24 Holiday values, and 24 Tuesday values. The three fixed-Sunday "
@@ -216,6 +232,7 @@ CASE_LABELS = {
     "calendar_schedule_weather_leap_policy_no_001": "Weather calendar no-leap",
     "calendar_dst_fixed_date_hourly_exact_001": "Calendar DST fixed enabled",
     "calendar_dst_fixed_date_disabled_hourly_exact_001": "Calendar DST fixed disabled",
+    "calendar_dst_epw_idf_precedence_hourly_exact_001": "IDF DST precedence",
     "calendar_epw_dst_weekday_rules_hourly_exact_001": "EPW DST weekday pair",
     "calendar_epw_dst_southern_wrap_hourly_exact_001": "EPW DST southern wrap",
     "calendar_epw_dst_southern_wrap_start_hourly_exact_001": "EPW DST southern start",
@@ -356,6 +373,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_fixed_date_disabled_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_fixed_date_disabled_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_fixed_date_disabled_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="IDF DST precedence",
+        command="compare-calendar-dst-epw-idf-precedence-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_epw_idf_precedence_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_epw_idf_precedence_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_epw_idf_precedence_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="EPW DST weekday pair",

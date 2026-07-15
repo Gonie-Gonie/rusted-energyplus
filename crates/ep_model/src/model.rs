@@ -7,9 +7,9 @@ use crate::{
     IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId, LoopId, Material, MaterialId,
     NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName, OtherEquipment, People,
     PlantBranch, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
-    PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodId, RunPeriodSpecialDay,
-    RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant, ScheduleId, ScheduleTypeLimitId,
-    ScheduleTypeLimits, SetpointManagerComponent, SiteLocation, Surface,
+    PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId,
+    RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant, ScheduleId,
+    ScheduleTypeLimitId, ScheduleTypeLimits, SetpointManagerComponent, SiteLocation, Surface,
     SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
     TimestepConfig, Version, Zone, ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId,
     ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
@@ -35,6 +35,8 @@ pub struct TypedModel {
     pub run_period_special_days: Vec<RunPeriodSpecialDay>,
     /// Run-period special-day names.
     pub run_period_special_day_names: NameMap<RunPeriodSpecialDayId>,
+    /// Unique input-file daylight-saving period, when declared.
+    pub run_period_daylight_saving_time: Option<RunPeriodDaylightSavingTime>,
     /// Site location.
     pub site: Option<SiteLocation>,
     /// Materials.
@@ -170,6 +172,7 @@ impl Default for TypedModel {
             run_period_names: NameMap::default(),
             run_period_special_days: Vec::new(),
             run_period_special_day_names: NameMap::default(),
+            run_period_daylight_saving_time: None,
             site: None,
             materials: Vec::new(),
             material_names: NameMap::default(),
@@ -246,6 +249,7 @@ impl TypedModel {
             + usize::from(self.surface_convection_algorithms.outside.is_some())
             + self.run_periods.len()
             + self.run_period_special_days.len()
+            + usize::from(self.run_period_daylight_saving_time.is_some())
             + self.materials.len()
             + self.constructions.len()
             + self.schedule_type_limits.len()

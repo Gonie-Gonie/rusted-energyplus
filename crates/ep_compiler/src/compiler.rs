@@ -14,15 +14,16 @@ use ep_model::{
     OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutsideBoundaryCondition,
     OutsideSurfaceConvectionAlgorithm, People, PeopleNumberCalculationMethod, PlantBranch,
     PlantBranchComponent, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
-    PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod, RunPeriodId,
-    RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleCompactSegment,
-    ScheduleConstant, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
-    SetpointManagerComponent, SiteLocation, SolarDistribution, SpecialDayType, SunExposure,
-    Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
-    ThermostatSetpointId, TimestepConfig, TypedModel, Version, WindExposure, Zone,
-    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
-    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
-    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
+    PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod,
+    RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
+    ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId, ScheduleTypeLimitId,
+    ScheduleTypeLimits, SetpointManagerComponent, SiteLocation, SolarDistribution, SpecialDayType,
+    SunExposure, Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType,
+    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, TypedModel, Version,
+    WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
+    ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat,
+    ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
+    parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 
@@ -201,6 +202,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "SurfaceConvectionAlgorithm:Outside",
     "RunPeriod",
     "RunPeriodControl:SpecialDays",
+    "RunPeriodControl:DaylightSavingTime",
     "Site:Location",
     "Material",
     "Material:NoMass",
@@ -270,6 +272,7 @@ impl<'a> Compiler<'a> {
         self.parse_surface_convection_algorithms(&mut model);
         self.parse_run_periods(&mut model);
         self.parse_run_period_special_days(&mut model);
+        self.parse_run_period_daylight_saving_time(&mut model);
         self.parse_site_location(&mut model);
         self.parse_materials(&mut model);
         self.parse_constructions(&mut model);
@@ -625,6 +628,25 @@ impl<'a> Compiler<'a> {
                 special_day_type,
             });
         }
+    }
+
+    fn parse_run_period_daylight_saving_time(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "RunPeriodControl:DaylightSavingTime";
+        let Some((name, object)) = self.single_object(OBJECT_TYPE) else {
+            return;
+        };
+
+        let start_date =
+            self.required_calendar_date_rule(OBJECT_TYPE, &name, &object, "start_date");
+        let end_date = self.required_calendar_date_rule(OBJECT_TYPE, &name, &object, "end_date");
+        let (Some(start_date), Some(end_date)) = (start_date, end_date) else {
+            return;
+        };
+
+        model.run_period_daylight_saving_time = Some(RunPeriodDaylightSavingTime {
+            start_date,
+            end_date,
+        });
     }
 
     fn parse_site_location(&mut self, model: &mut TypedModel) {
@@ -3652,6 +3674,31 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn required_calendar_date_rule(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<ep_model::CalendarDateRule> {
+        let value = self.required_string(object_type, object_name, object, field)?;
+        match parse_calendar_date_rule(&value) {
+            Some(rule) => Some(rule),
+            None => {
+                self.error(
+                    "InvalidCalendarDateRule",
+                    object_type,
+                    Some(object_name),
+                    Some(field),
+                    format!(
+                        "{object_type}/{object_name} field {field} has unsupported date rule '{value}'"
+                    ),
+                );
+                None
+            }
+        }
+    }
+
     fn optional_string(
         &mut self,
         object_type: &str,
@@ -5221,6 +5268,124 @@ mod tests {
                     && diagnostic.field.as_deref() == Some(field)
             }));
         }
+
+        Ok(())
+    }
+
+    #[test]
+    fn parses_typed_run_period_daylight_saving_time_and_coverage()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "RunPeriodControl:DaylightSavingTime": {
+                    "Daylight Saving Time 1": {
+                        "start_date": "2/28",
+                        "end_date": "Last Sunday in October"
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        assert_eq!(result.report.typed_object_count, 2);
+        let coverage = result
+            .report
+            .coverage
+            .iter()
+            .find(|entry| entry.object_type == "RunPeriodControl:DaylightSavingTime")
+            .ok_or_else(|| std::io::Error::other("missing daylight-saving coverage"))?;
+        assert_eq!(coverage.object_count, 1);
+        assert_eq!(coverage.status, ObjectCoverageStatus::Typed);
+
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        assert_eq!(model.object_count(), 2);
+        let daylight_saving = model
+            .run_period_daylight_saving_time
+            .ok_or_else(|| std::io::Error::other("missing typed daylight-saving period"))?;
+        assert_eq!(
+            daylight_saving.start_date,
+            CalendarDateRule::MonthDay {
+                month: 2,
+                day_of_month: 28
+            }
+        );
+        assert_eq!(
+            daylight_saving.end_date,
+            CalendarDateRule::LastWeekdayInMonth {
+                weekday: DayOfWeek::Sunday,
+                month: 10
+            }
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn diagnoses_each_invalid_run_period_daylight_saving_time_field()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "RunPeriodControl:DaylightSavingTime": {
+                    "Bad Daylight Saving Time": {
+                        "start_date": "not a calendar date"
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        assert!(result.model.is_none());
+        for (code, field) in [
+            ("InvalidCalendarDateRule", "start_date"),
+            ("MissingRequiredField", "end_date"),
+        ] {
+            assert!(result.report.diagnostics.iter().any(|diagnostic| {
+                diagnostic.severity == DiagnosticSeverity::Error
+                    && diagnostic.code == code
+                    && diagnostic.object_type == "RunPeriodControl:DaylightSavingTime"
+                    && diagnostic.object_name.as_deref() == Some("Bad Daylight Saving Time")
+                    && diagnostic.field.as_deref() == Some(field)
+            }));
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_duplicate_run_period_daylight_saving_time_objects()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "RunPeriodControl:DaylightSavingTime": {
+                    "Daylight Saving Time 1": {
+                        "start_date": "2/28",
+                        "end_date": "2/29"
+                    },
+                    "Daylight Saving Time 2": {
+                        "start_date": "3/1",
+                        "end_date": "3/2"
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        assert!(result.model.is_none());
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.severity == DiagnosticSeverity::Error
+                && diagnostic.code == "TooManyObjects"
+                && diagnostic.object_type == "RunPeriodControl:DaylightSavingTime"
+                && diagnostic.object_name.is_none()
+                && diagnostic.field.is_none()
+        }));
 
         Ok(())
     }

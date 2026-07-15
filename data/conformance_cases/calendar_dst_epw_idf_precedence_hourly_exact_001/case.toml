@@ -1,0 +1,61 @@
+id = "calendar_dst_epw_idf_precedence_hourly_exact_001"
+title = "EPW versus input-file daylight-saving precedence exact"
+milestone = "full-source-order-calendar-dst-epw-idf-precedence"
+purpose = "Block on the exact EnergyPlus precedence of one input-file fixed-date daylight-saving object over a declared but RunPeriod-disabled EPW period."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "This case reuses the disabled fixed-date policy IDF and its leap-observed EPW; the only IDF addition is one RunPeriodControl:DaylightSavingTime object declaring 2/28 through 2/29.",
+  "The EPW declares 2/29 through 3/1 while the RunPeriod explicitly sets Use Weather File Daylight Saving Period to No. The input-file object takes precedence independently of that flag, proving daily states 1, 1, and 0 with exactly 48 active hours.",
+  "External evidence is limited to 72 ordered, unique raw EnergyPlus ESO values and timestamp fields, the exact EnergyPlus 26.1 Environment and Environment:Daylight Saving rows, and clean 0 Warning and 0 Severe completion for this one fixed-date precedence fixture.",
+  "The Rust weather-file declaration, RunPeriod-use, input-file declaration, active-state, effective-source, resolved-period, and active-sample fields are locked summary diagnostics; they are not additional fields emitted by the EnergyPlus EIO rows.",
+  "Blank, omitted, defaulted, duplicate, or invalid input-file objects; other fixed dates or date rules; southern or year-wrapping ranges; weather-file enablement with an input-file object; no-EPW execution; and multiple RunPeriods remain outside this claim.",
+  "Actual-weather and cross-year execution; DST-shifted schedule lookup; hour-24, tomorrow-state, or civil-clock transitions; holidays and weekend observation; Rust raw ESO serialization; broad WeatherManager compatibility; and other output variables remain outside this claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_dst_epw_idf_precedence_hourly_exact_001/calendar_dst_epw_idf_precedence_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_dst_epw_idf_precedence_hourly_exact_001/calendar_dst_epw_idf_precedence_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_dst_fixed_date_hourly_exact_001/calendar_dst_fixed_date_hourly_exact.epw"
+
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Daylight Saving Time Status"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_dst_epw_idf_precedence_hourly_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-dst-epw-idf-precedence-exact"
+blocking = true
