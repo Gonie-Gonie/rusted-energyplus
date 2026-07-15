@@ -1572,8 +1572,11 @@ The immutable cache is owned by these Rust targets:
 | the legacy `precompute_schedule_value_series*` functions | materialize `Vec` traces from the cache so existing callers retain their public return types and numerical behavior |
 | `ep_cli` schedule-report consumers | own the cache across report generation and resolve each requested schedule once by typed ID rather than scanning legacy traces |
 | `ep_run::PreparedRuntimeInputs` | owns and prepares the cache, then reports its structural profile without claiming numerical heat-balance or IdealLoads consumption |
+| `precompute_hour_only_internal_gain_schedule_cache` | validates only `OtherEquipment` references, then builds one referenced-only 24-sample cache for the existing hour-only Constant, inactive ExternalInterface/FMU, and calendar-invariant Compact subset |
+| Rust heat-balance `OtherEquipment` consumers | reuse the same referenced-only cache through initialization, warmup, and run-period timesteps; the public one-step API intentionally retains live-model fallback lookup |
 
-Cache construction preserves the established family and source order:
+The full-axis hourly and environment cache builders preserve the established
+family and source order:
 
 ```text
 Schedule:File:Shading generated columns
@@ -1586,12 +1589,16 @@ Schedule:File:Shading generated columns
   -> ExternalInterface:FunctionalMockupUnitExport:To:Schedule
 ```
 
-Sparse, out-of-order, high, and duplicate public `ScheduleId` values do not
-size an array by the maximum ID. Identity-ordered IDs use direct slot lookup;
-all other shapes use a bounded sorted-pair index. Duplicate lookup remains
-compatible with the former source-order scan: the first source-order entry
-wins, while every entry remains present during source-order iteration and the
-profile records the number of distinct ambiguous IDs.
+Within those full-axis builders, sparse, out-of-order, high, and duplicate
+public `ScheduleId` values do not size an array by the maximum ID.
+Identity-ordered IDs use direct slot lookup; all other shapes use a bounded
+sorted-pair index. Duplicate lookup remains compatible with the former
+source-order scan: the first source-order entry wins, while every entry remains
+present during source-order iteration and the profile records the number of
+distinct ambiguous IDs. The specialized internal-gain builder instead
+deduplicates IDs by first `OtherEquipment` declaration reference, then resolves
+each selected ID in Constant, ExternalInterface, FMU import, FMU export, and
+Compact family order with first-in-family lookup.
 
 `Schedule:Constant`, inactive `ExternalInterface:Schedule`, inactive FMU import
 To Schedule, and inactive FMU export To Schedule each store one scalar plus the
@@ -1606,12 +1613,21 @@ exact `f64` bits and existing fail-closed NaN positions remain NaN. The legacy
 adapters deliberately rematerialize scalar arrays, so their allocation behavior
 is not performance evidence.
 
-`ScheduleCacheProfile` is deterministic representation evidence only. It is not
-a wall-clock benchmark and does not prove that heat-balance or IdealLoads
-numerical calculations consume schedule-cache values. This checkpoint also
-does not claim a weather-cache redesign, cache sharing across environments or
-repeated runs, live EMS/current-value mutation, live ExternalInterface/FMU
-exchange, or any new ScheduleManager routine completion.
+Rust unit and structure tests now prove that the validated hour-only
+`OtherEquipment` heat-balance path consumes one immutable referenced-only cache
+through initialization, warmup, and run-period timesteps. Cached lookup preserves
+fallback bits, family priority, first-wins duplicates, fail-closed NaN, hour
+clamping, substep reuse, and daily reuse; repeated gain lookup no longer scans
+schedule families or reparses Compact segments. A separate public one-step test
+keeps the live-model fallback boundary explicit.
+
+`ScheduleCacheProfile` remains deterministic representation evidence only. This
+checkpoint is not a wall-clock benchmark and adds no EnergyPlus numerical
+heat-balance conformance. It also does not claim Schedule:File,
+Schedule:File:Shading, Schedule:Year, or calendar-aware downstream consumption;
+IdealLoads consumption; a weather-cache redesign; cache sharing across
+environments or repeated runs; live EMS/current-value mutation; live
+ExternalInterface/FMU exchange; or any new ScheduleManager routine completion.
 
 ## Current Rust Boundary
 

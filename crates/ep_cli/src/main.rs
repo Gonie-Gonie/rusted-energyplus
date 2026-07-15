@@ -5547,7 +5547,7 @@ fn build_heat_balance_conformance_diagnostic(
         "runtime_heat_balance_execution",
         "ep_runtime",
         elapsed_seconds_since(runtime_start),
-        "execute heat-balance compatibility runtime using precomputed weather inputs; the schedule cache is prepared and profiled but is not yet consumed by heat-balance calculations",
+        "execute heat-balance compatibility runtime using precomputed weather inputs; ep_runtime consumes a separately prepared referenced-only 24-hour cache for validated hour-only OtherEquipment gains, while this full-axis schedule cache remains profile-only",
     );
     append_surface_incident_solar_radiation_series(
         &mut simulation.results,

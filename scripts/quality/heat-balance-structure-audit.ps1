@@ -176,6 +176,7 @@ $zoneAirCorrection = "crates\ep_runtime\src\heat_balance\zone_air_correction.rs"
 $ctf = "crates\ep_runtime\src\heat_balance\ctf.rs"
 $insideConvection = "crates\ep_runtime\src\heat_balance\inside_convection.rs"
 $initialization = "crates\ep_runtime\src\heat_balance\initialization.rs"
+$initializationScheduleCache = "crates\ep_runtime\src\heat_balance\initialization\schedule_cache.rs"
 $convection = "crates\ep_runtime\src\heat_balance\convection.rs"
 $longwave = "crates\ep_runtime\src\heat_balance\longwave.rs"
 $radiation = "crates\ep_runtime\src\heat_balance\radiation.rs"
@@ -215,6 +216,7 @@ $specialDays = "crates\ep_runtime\src\time_axis\special_days.rs"
 $scheduleModel = "crates\ep_model\src\objects\schedules.rs"
 $schedules = "crates\ep_runtime\src\schedules.rs"
 $scheduleCache = "crates\ep_runtime\src\schedules\cache.rs"
+$internalGainScheduleCache = "crates\ep_runtime\src\schedules\internal_gain_cache.rs"
 $scheduleConstant = "crates\ep_runtime\src\schedules\constant.rs"
 $timeWeatherSchedule = "crates\ep_cli\src\time_weather_schedule.rs"
 $timeWeatherScheduleSpecialDays = "crates\ep_cli\src\time_weather_schedule_special_days.rs"
@@ -245,6 +247,7 @@ $runtimeTestRadiation = "crates\ep_runtime\src\runtime\tests\part04.rs"
 $runtimeTestCalendar = "crates\ep_runtime\src\runtime\tests\part10.rs"
 $runtimeTestSpecialDays = "crates\ep_runtime\src\runtime\tests\part11.rs"
 $runtimeTestEpwHolidays = "crates\ep_runtime\src\runtime\tests\part12.rs"
+$runtimeTestScheduleCache = "crates\ep_runtime\src\runtime\tests\part13.rs"
 
 foreach ($entry in @(
         @($heatBalanceMod, "heat-balance module facade"),
@@ -261,6 +264,7 @@ foreach ($entry in @(
         @($ctf, "CTF ownership module"),
         @($insideConvection, "inside convection ownership module"),
         @($initialization, "heat-balance initialization ownership module"),
+        @($initializationScheduleCache, "heat-balance initialization schedule-cache adapter"),
         @($convection, "convection ownership module"),
         @($longwave, "exterior longwave ownership module"),
         @($radiation, "radiation ownership module"),
@@ -298,6 +302,7 @@ foreach ($entry in @(
         @($daylightSaving, "runtime daylight-saving resolver"),
         @($specialDays, "runtime special-day resolver"),
         @($schedules, "runtime schedules module"),
+        @($internalGainScheduleCache, "referenced-only internal-gain schedule cache module"),
         @($timeWeatherSchedule, "time/weather/schedule report module"),
         @($timeWeatherScheduleSpecialDays, "time/weather/schedule special-day report module"),
         @($algorithmLedger, "algorithm source-order ledger"),
@@ -318,7 +323,8 @@ foreach ($entry in @(
         @($runtimeTestRadiation, "runtime heat-balance radiation tests"),
         @($runtimeTestCalendar, "runtime calendar and DST tests"),
         @($runtimeTestSpecialDays, "runtime special-day tests"),
-        @($runtimeTestEpwHolidays, "runtime EPW holiday tests")
+        @($runtimeTestEpwHolidays, "runtime EPW holiday tests"),
+        @($runtimeTestScheduleCache, "runtime schedule-cache consumer tests")
     )) {
     Assert-FileExists -Path $entry[0] -Description $entry[1]
 }
@@ -926,6 +932,15 @@ Assert-Contains -Path $runtime -Pattern 'precompute_weather_timestep_series' -De
 Assert-Contains -Path $scheduleCache -Pattern 'pub enum ScheduleSampleStorage\s*\{[\s\S]*Scalar\s*\{[\s\S]*Dense\(Box<\[f64\]>\)' -Description "immutable scalar-or-dense schedule sample storage"
 Assert-Contains -Path $scheduleCache -Pattern 'pub struct ScheduleSeriesCache\s*\{[\s\S]*series: Box<\[CachedScheduleSeries\]>[\s\S]*profile: ScheduleCacheProfile' -Description "immutable indexed schedule cache and structural profile"
 Assert-Contains -Path $scheduleCache -Pattern 'pub fn get\(&self, schedule_id: ScheduleId\)[\s\S]*pub fn profile\(&self\) -> ScheduleCacheProfile' -Description "typed-ID cache lookup and deterministic profile API"
+Assert-Contains -Path $internalGainScheduleCache -Pattern 'pub\(crate\) fn precompute_hour_only_internal_gain_schedule_cache\s*\([\s\S]*validate_hour_only_internal_gain_schedules\(model\)[\s\S]*for equipment in &model\.other_equipment[\s\S]*referenced_schedule_ids\.insert\(schedule_id\)' -Description "referenced-only OtherEquipment schedule cache validates before source-order collection"
+Assert-Contains -Path $internalGainScheduleCache -Pattern 'constant_cached_schedule_series[\s\S]*external_interface_cached_schedule_series_iter[\s\S]*compact_schedule_value\(segments, hour_ending \* 60\)\.unwrap_or\(f64::NAN\)' -Description "hour-only cache preserves Constant, External/FMU, Compact priority and raw fallback values"
+Assert-Contains -Path $internalGainScheduleCache -Pattern 'hour_ending\.clamp\(1, 24\) - 1[\s\S]*schedule_cache\s*\.value\(schedule_id, sample_index\)[\s\S]*unwrap_or\(f64::NAN\)' -Description "cached hour lookup clamps and fails closed"
+Assert-Contains -Path $initialization -Pattern 'initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache[\s\S]*convective_internal_gain_w_from_cache[\s\S]*update_surface_radiant_internal_gain_source_terms_from_cache' -Description "heat-balance initialization consumes the internal-gain schedule cache"
+Assert-Contains -Path $initializationScheduleCache -Pattern 'precompute_hour_only_internal_gain_schedule_cache[\s\S]*initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache[\s\S]*initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache' -Description "public initialization prepares a referenced-only cache while runtime may supply the owned cache"
+Assert-Contains -Path $runtime -Pattern 'let \(mut state, internal_gain_schedule_cache\)[\s\S]*precompute_hour_only_internal_gain_schedule_cache[\s\S]*run_heat_balance_run_period_warmup[\s\S]*&internal_gain_schedule_cache[\s\S]*sample_heat_balance_run_period\([\s\S]*&internal_gain_schedule_cache' -Description "one referenced-only cache instance spans initialization, warmup, and run period"
+Assert-Contains -Path $timestep -Pattern 'advance_heat_balance_state_one_timestep_internal_with_optional_schedule_cache\([\s\S]*None[\s\S]*advance_heat_balance_state_one_timestep_internal_with_schedule_cache[\s\S]*Some\(schedule_cache\)[\s\S]*convective_internal_gain_w_from_cache[\s\S]*update_surface_radiant_internal_gain_source_terms_from_cache' -Description "cached timestep path and live-model fallback remain separate"
+Assert-Contains -Path $runPeriod -Pattern 'sample_heat_balance_run_period\s*\([\s\S]*schedule_cache: &ScheduleSeriesCache[\s\S]*advance_heat_balance_state_one_timestep_internal_with_schedule_cache' -Description "run-period sampler uses the prepared internal-gain cache"
+Assert-Contains -Path $runtimeTestScheduleCache -Pattern 'cached_heat_balance_step_keeps_precomputed_schedule_while_public_step_reads_live_model[\s\S]*inside_radiant_internal_gain_w_per_m2[\s\S]*heat_balance_cache_reuses_hour_samples_across_substeps_warmup_and_two_days[\s\S]*heat_balance_cache_ignores_unreferenced_invalid_compact_schedule' -Description "cache immutability, radiant consumption, warmup/substep/day reuse, and referenced-only boundary tests"
 Assert-Contains -Path $precompute -Pattern 'pub struct RuntimePrecomputedData' -Description "runtime precomputed data bundle"
 Assert-Contains -Path $precompute -Pattern 'output_registry: RuntimeOutputRegistry' -Description "run cached output registry"
 Assert-Contains -Path $precompute -Pattern 'build_execution_plan_with_output_registry' -Description "execution plan uses cached output registry"
@@ -948,7 +963,7 @@ Assert-Contains -Path $pipeline -Pattern ($executeRustRuntimeScope + 'runtime_in
 Assert-NotContains -Path $pipeline -Pattern ($executeRustRuntimeScope + 'schedule_cache\.(?:get|value)\s*\(') -Description "ep_run numerical schedule-cache lookup inside runtime execution"
 Assert-Contains -Path $pipeline -Pattern 'fn schedule_cache_json\s*\([\s\S]*scalar_series_count[\s\S]*allocated_dense_sample_count[\s\S]*index_kind[\s\S]*"schedule_cache": schedule_cache_json' -Description "ep_run run summary exports deterministic cache profile metadata"
 Assert-NotContains -Path $pipeline -Pattern 'schedule_series:\s*Vec<ScheduleValueSeries>|precompute_schedule_value_series_for_time_axis' -Description "legacy materialized schedule series in ep_run prepared inputs"
-Assert-Contains -Path $cli -Pattern 'execute heat-balance compatibility runtime using precomputed weather inputs; the schedule cache is prepared and profiled but is not yet consumed by heat-balance calculations' -Description "heat-balance runtime phase states the schedule-cache numerical nonclaim"
+Assert-Contains -Path $cli -Pattern 'ep_runtime consumes a separately prepared referenced-only 24-hour cache for validated hour-only OtherEquipment gains, while this full-axis schedule cache remains profile-only' -Description "runtime phase distinguishes specialized heat-balance consumption from full-axis profile-only cache"
 Assert-Contains -Path $timeWeatherSchedule -Pattern 'schedule_cache: Option<&ScheduleSeriesCache>[\s\S]*schedule_cache\s*\.\s*get\(schedule_id\)[\s\S]*trace\.values\(\)' -Description "schedule report holds the cache and resolves requested values by typed ID"
 Assert-Contains -Path $timeWeatherSchedule -Pattern 'precompute_schedule_cache_for_environment_time_axis[\s\S]*precompute_schedule_cache_for_time_axis' -Description "schedule report selects the cache builder for its time axis"
 Assert-NotContains -Path $timeWeatherSchedule -Pattern 'ScheduleValueSeries|precompute_schedule_value_series' -Description "legacy materialized schedule series in schedule report consumers"
