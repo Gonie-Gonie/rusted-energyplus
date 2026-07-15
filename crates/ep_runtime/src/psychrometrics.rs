@@ -21,6 +21,26 @@ fn energyplus_humidity_ratio_floor(humidity_ratio: f64) -> f64 {
     }
 }
 
+#[inline]
+fn energyplus_psy_rho_air_fn_pb_tdb_w_raw(
+    atmospheric_pressure_pa: f64,
+    dry_bulb_c: f64,
+    humidity_ratio: f64,
+) -> f64 {
+    atmospheric_pressure_pa
+        / (287.0 * (dry_bulb_c + KELVIN_OFFSET) * (1.0 + 1.607_768_7 * humidity_ratio))
+}
+
+#[inline]
+fn energyplus_psy_h_fn_tdb_w_raw(dry_bulb_c: f64, humidity_ratio: f64) -> f64 {
+    1.004_84e3 * dry_bulb_c + humidity_ratio * (2.500_94e6 + 1.858_95e3 * dry_bulb_c)
+}
+
+#[inline]
+fn energyplus_psy_cp_air_fn_w_raw(humidity_ratio: f64) -> f64 {
+    1.004_84e3 + humidity_ratio * 1.858_95e3
+}
+
 pub(crate) fn energyplus_outdoor_wet_bulb_c(
     dry_bulb_c: f64,
     relative_humidity_percent: f64,
@@ -156,10 +176,66 @@ pub fn energyplus_psy_rho_air_fn_pb_tdb_w(
     dry_bulb_c: f64,
     humidity_ratio: f64,
 ) -> f64 {
-    atmospheric_pressure_pa
-        / (287.0
-            * (dry_bulb_c + KELVIN_OFFSET)
-            * (1.0 + 1.607_768_7 * energyplus_humidity_ratio_floor(humidity_ratio)))
+    energyplus_psy_rho_air_fn_pb_tdb_w_raw(
+        atmospheric_pressure_pa,
+        dry_bulb_c,
+        energyplus_humidity_ratio_floor(humidity_ratio),
+    )
+}
+
+/// Canonical EnergyPlus 26.1 `PsyRhoAirFnPbTdbW_fast` numerical path.
+///
+/// The caller must provide `humidity_ratio >= 1.0e-5`. EnergyPlus uses a
+/// debug-only assertion for that precondition; its optional negative-density
+/// diagnostic and fatal-error path remains a separate, deferred state boundary.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_rho_air_fn_pb_tdb_w_fast(
+    atmospheric_pressure_pa: f64,
+    dry_bulb_c: f64,
+    humidity_ratio: f64,
+) -> f64 {
+    debug_assert!(humidity_ratio >= ENERGYPLUS_MIN_HUMIDITY_RATIO);
+    energyplus_psy_rho_air_fn_pb_tdb_w_raw(atmospheric_pressure_pa, dry_bulb_c, humidity_ratio)
+}
+
+/// Canonical EnergyPlus 26.1 `PsyHfgAirFnWTdb` heat of vaporization in J/kg.
+///
+/// The humidity-ratio argument is intentionally unused by the source routine.
+/// The two enthalpy terms remain separate to preserve the source evaluation
+/// order and its IEEE-754 behavior at extreme temperatures.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_hfg_air_fn_w_tdb(_humidity_ratio: f64, dry_bulb_c: f64) -> f64 {
+    let temperature_c = if dry_bulb_c < 0.0 { 0.0 } else { dry_bulb_c };
+    (2_500_940.0 + 1_858.95 * temperature_c) - (4_180.0 * temperature_c)
+}
+
+/// Canonical EnergyPlus 26.1 `PsyHgAirFnWTdb` water-vapor gas enthalpy in J/kg.
+///
+/// The humidity-ratio argument is intentionally unused by the source routine.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_hg_air_fn_w_tdb(_humidity_ratio: f64, dry_bulb_c: f64) -> f64 {
+    2_500_940.0 + 1_858.95 * dry_bulb_c
+}
+
+/// Canonical EnergyPlus 26.1 `PsyHFnTdbW` moist-air enthalpy in J/kg.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_h_fn_tdb_w(dry_bulb_c: f64, humidity_ratio: f64) -> f64 {
+    energyplus_psy_h_fn_tdb_w_raw(dry_bulb_c, energyplus_humidity_ratio_floor(humidity_ratio))
+}
+
+/// Canonical EnergyPlus 26.1 `PsyHFnTdbW_fast` numerical path.
+///
+/// The caller must provide `humidity_ratio >= 1.0e-5`. As in the C++ source,
+/// the precondition is checked only when debug assertions are enabled.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_h_fn_tdb_w_fast(dry_bulb_c: f64, humidity_ratio: f64) -> f64 {
+    debug_assert!(humidity_ratio >= ENERGYPLUS_MIN_HUMIDITY_RATIO);
+    energyplus_psy_h_fn_tdb_w_raw(dry_bulb_c, humidity_ratio)
 }
 
 /// Canonical, stateless EnergyPlus 26.1 `PsyCpAirFnW` calculation.
@@ -171,7 +247,22 @@ pub fn energyplus_psy_rho_air_fn_pb_tdb_w(
 #[must_use]
 #[inline]
 pub fn energyplus_psy_cp_air_fn_w(humidity_ratio: f64) -> f64 {
-    1.004_84e3 + energyplus_humidity_ratio_floor(humidity_ratio) * 1.858_95e3
+    energyplus_psy_cp_air_fn_w_raw(energyplus_humidity_ratio_floor(humidity_ratio))
+}
+
+/// Canonical EnergyPlus 26.1 `PsyCpAirFnW_fast` numerical path.
+///
+/// The caller must provide `humidity_ratio >= 1.0e-5`; debug builds assert the
+/// precondition before evaluating the pure numerical path.
+///
+/// EnergyPlus wraps this expression in a function-local last-call cache. This
+/// pure function preserves the output-neutral valid-domain calculation while
+/// deferring cache identity, hit/miss history, sentinel, and concurrency policy.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_cp_air_fn_w_fast(humidity_ratio: f64) -> f64 {
+    debug_assert!(humidity_ratio >= ENERGYPLUS_MIN_HUMIDITY_RATIO);
+    energyplus_psy_cp_air_fn_w_raw(humidity_ratio)
 }
 
 /// Returns guarded EnergyPlus-style moist-air density in kg/m3.
@@ -216,7 +307,7 @@ pub fn energyplus_moist_air_specific_heat_j_per_kg_k(humidity_ratio: f64) -> f64
 /// Returns EnergyPlus `PsyHgAirFnWTdb` water-vapor gas enthalpy in J/kg.
 #[must_use]
 pub fn energyplus_water_vapor_gas_enthalpy_j_per_kg(dry_bulb_c: f64) -> f64 {
-    2_500_940.0 + 1_858.95 * dry_bulb_c
+    energyplus_psy_hg_air_fn_w_tdb(0.0, dry_bulb_c)
 }
 
 /// Returns EnergyPlus `PsyWFnTdbRhPb`-style humidity ratio from dry-bulb,

@@ -135,7 +135,10 @@ pub(crate) use crate::psychrometrics::energyplus_outdoor_wet_bulb_c;
 pub use crate::psychrometrics::{
     ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA, energyplus_moist_air_density_kg_per_m3,
     energyplus_moist_air_specific_heat_j_per_kg_k, energyplus_psy_cp_air_fn_w,
-    energyplus_psy_rho_air_fn_pb_tdb_w, energyplus_psychrometric_humidity_ratio_from_rh,
+    energyplus_psy_cp_air_fn_w_fast, energyplus_psy_h_fn_tdb_w, energyplus_psy_h_fn_tdb_w_fast,
+    energyplus_psy_hfg_air_fn_w_tdb, energyplus_psy_hg_air_fn_w_tdb,
+    energyplus_psy_rho_air_fn_pb_tdb_w, energyplus_psy_rho_air_fn_pb_tdb_w_fast,
+    energyplus_psychrometric_humidity_ratio_from_rh,
     energyplus_standard_zone_air_heat_capacity_j_per_k,
     energyplus_water_vapor_gas_enthalpy_j_per_kg, energyplus_zone_air_heat_capacity_j_per_k,
 };
