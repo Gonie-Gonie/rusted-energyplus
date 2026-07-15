@@ -40,3 +40,17 @@ if ($SelfTest) {
 if ($LASTEXITCODE -ne 0) {
     throw "Algorithm ledger check failed with exit code $LASTEXITCODE"
 }
+
+$psychrometricInventoryScript = Join-Path $RepoRoot "tools\docs\validate_psychrometric_inventory.py"
+if (-not (Test-Path -LiteralPath $psychrometricInventoryScript -PathType Leaf)) {
+    throw "Missing psychrometric routine inventory validator: $psychrometricInventoryScript"
+}
+
+$psychrometricInventoryArguments = @($psychrometricInventoryScript, "--repo-root", $RepoRoot)
+if ($SelfTest) {
+    $psychrometricInventoryArguments += "--self-test"
+}
+& $python @psychrometricInventoryArguments
+if ($LASTEXITCODE -ne 0) {
+    throw "Psychrometric routine inventory check failed with exit code $LASTEXITCODE"
+}

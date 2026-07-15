@@ -1414,3 +1414,341 @@ routine.manage_plant_loops.source_routine = "ManagePlantLoops"
 routine.manage_plant_loops.source_map = "docs/src/porting-map/plant-source-map.md"
 routine.manage_plant_loops.completion_status = "source_mapped"
 routine.manage_plant_loops.required_for_full_domain = true
+
+[[algorithm]]
+id = "psychrometric_routine_inventory"
+domain = "psychrometrics"
+source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+energyplus_source = [
+  "src/EnergyPlus/Psychrometrics.hh",
+  "src/EnergyPlus/Psychrometrics.cc",
+]
+rust_target = [
+  "crates/ep_runtime/src/psychrometrics.rs",
+]
+status = "scaffold"
+first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
+proof_variables = [
+  "Site Outdoor Air Wetbulb Temperature",
+  "Zone Mean Air Humidity Ratio",
+]
+claim_level = "none"
+support_boundary = "Source-order scaffold for the 53 logical namespace-level EnergyPlus 26.1 Psychrometrics free-function identifiers. This inventory does not add implementation completion, numerical equivalence, conformance evidence, a psychrometrics domain claim, or any project-contract required routine."
+
+routine.initialize_psych_routines.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.initialize_psych_routines.source_routine = "InitializePsychRoutines"
+routine.initialize_psych_routines.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.initialize_psych_routines.completion_status = "source_mapped"
+routine.initialize_psych_routines.required_for_full_domain = false
+
+routine.show_psychrometric_summary.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.show_psychrometric_summary.source_routine = "ShowPsychrometricSummary"
+routine.show_psychrometric_summary.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.show_psychrometric_summary.completion_status = "source_mapped"
+routine.show_psychrometric_summary.required_for_full_domain = false
+
+routine.psy_rho_air_fn_pb_tdb_w_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_rho_air_fn_pb_tdb_w_error.source_routine = "PsyRhoAirFnPbTdbW_error"
+routine.psy_rho_air_fn_pb_tdb_w_error.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rho_air_fn_pb_tdb_w_error.completion_status = "source_mapped"
+routine.psy_rho_air_fn_pb_tdb_w_error.required_for_full_domain = false
+
+routine.psy_rho_air_fn_pb_tdb_w.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_rho_air_fn_pb_tdb_w.source_routine = "PsyRhoAirFnPbTdbW"
+routine.psy_rho_air_fn_pb_tdb_w.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rho_air_fn_pb_tdb_w.completion_status = "source_mapped"
+routine.psy_rho_air_fn_pb_tdb_w.required_for_full_domain = false
+
+routine.psy_rho_air_fn_pb_tdb_w_fast.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_rho_air_fn_pb_tdb_w_fast.source_routine = "PsyRhoAirFnPbTdbW_fast"
+routine.psy_rho_air_fn_pb_tdb_w_fast.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rho_air_fn_pb_tdb_w_fast.completion_status = "source_mapped"
+routine.psy_rho_air_fn_pb_tdb_w_fast.required_for_full_domain = false
+
+routine.psy_hfg_air_fn_w_tdb.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_hfg_air_fn_w_tdb.source_routine = "PsyHfgAirFnWTdb"
+routine.psy_hfg_air_fn_w_tdb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_hfg_air_fn_w_tdb.completion_status = "source_mapped"
+routine.psy_hfg_air_fn_w_tdb.required_for_full_domain = false
+
+routine.psy_hg_air_fn_w_tdb.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_hg_air_fn_w_tdb.source_routine = "PsyHgAirFnWTdb"
+routine.psy_hg_air_fn_w_tdb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_hg_air_fn_w_tdb.completion_status = "source_mapped"
+routine.psy_hg_air_fn_w_tdb.required_for_full_domain = false
+
+routine.psy_h_fn_tdb_w.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_h_fn_tdb_w.source_routine = "PsyHFnTdbW"
+routine.psy_h_fn_tdb_w.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_h_fn_tdb_w.completion_status = "source_mapped"
+routine.psy_h_fn_tdb_w.required_for_full_domain = false
+
+routine.psy_h_fn_tdb_w_fast.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_h_fn_tdb_w_fast.source_routine = "PsyHFnTdbW_fast"
+routine.psy_h_fn_tdb_w_fast.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_h_fn_tdb_w_fast.completion_status = "source_mapped"
+routine.psy_h_fn_tdb_w_fast.required_for_full_domain = false
+
+routine.psy_cp_air_fn_w.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_cp_air_fn_w.source_routine = "PsyCpAirFnW"
+routine.psy_cp_air_fn_w.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_cp_air_fn_w.completion_status = "source_mapped"
+routine.psy_cp_air_fn_w.required_for_full_domain = false
+
+routine.psy_cp_air_fn_w_fast.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_cp_air_fn_w_fast.source_routine = "PsyCpAirFnW_fast"
+routine.psy_cp_air_fn_w_fast.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_cp_air_fn_w_fast.completion_status = "source_mapped"
+routine.psy_cp_air_fn_w_fast.required_for_full_domain = false
+
+routine.psy_tdb_fn_h_w.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_tdb_fn_h_w.source_routine = "PsyTdbFnHW"
+routine.psy_tdb_fn_h_w.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_tdb_fn_h_w.completion_status = "source_mapped"
+routine.psy_tdb_fn_h_w.required_for_full_domain = false
+
+routine.psy_rhov_fn_tdb_rh_lbnd0c.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_rhov_fn_tdb_rh_lbnd0c.source_routine = "PsyRhovFnTdbRhLBnd0C"
+routine.psy_rhov_fn_tdb_rh_lbnd0c.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rhov_fn_tdb_rh_lbnd0c.completion_status = "source_mapped"
+routine.psy_rhov_fn_tdb_rh_lbnd0c.required_for_full_domain = false
+
+routine.psy_rhov_fn_tdb_w_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_rhov_fn_tdb_w_pb.source_routine = "PsyRhovFnTdbWPb"
+routine.psy_rhov_fn_tdb_w_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rhov_fn_tdb_w_pb.completion_status = "source_mapped"
+routine.psy_rhov_fn_tdb_w_pb.required_for_full_domain = false
+
+routine.psy_rhov_fn_tdb_w_pb_fast.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_rhov_fn_tdb_w_pb_fast.source_routine = "PsyRhovFnTdbWPb_fast"
+routine.psy_rhov_fn_tdb_w_pb_fast.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rhov_fn_tdb_w_pb_fast.completion_status = "source_mapped"
+routine.psy_rhov_fn_tdb_w_pb_fast.required_for_full_domain = false
+
+routine.psy_rh_fn_tdb_rhov_lbnd0c_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_rh_fn_tdb_rhov_lbnd0c_error.source_routine = "PsyRhFnTdbRhovLBnd0C_error"
+routine.psy_rh_fn_tdb_rhov_lbnd0c_error.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rh_fn_tdb_rhov_lbnd0c_error.completion_status = "source_mapped"
+routine.psy_rh_fn_tdb_rhov_lbnd0c_error.required_for_full_domain = false
+
+routine.psy_rh_fn_tdb_rhov_lbnd0c.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_rh_fn_tdb_rhov_lbnd0c.source_routine = "PsyRhFnTdbRhovLBnd0C"
+routine.psy_rh_fn_tdb_rhov_lbnd0c.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rh_fn_tdb_rhov_lbnd0c.completion_status = "source_mapped"
+routine.psy_rh_fn_tdb_rhov_lbnd0c.required_for_full_domain = false
+
+routine.psy_twb_fn_tdb_w_pb.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_twb_fn_tdb_w_pb.source_routine = "PsyTwbFnTdbWPb"
+routine.psy_twb_fn_tdb_w_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_twb_fn_tdb_w_pb.completion_status = "source_mapped"
+routine.psy_twb_fn_tdb_w_pb.required_for_full_domain = false
+
+routine.psy_twb_fn_tdb_w_pb_raw.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_twb_fn_tdb_w_pb_raw.source_routine = "PsyTwbFnTdbWPb_raw"
+routine.psy_twb_fn_tdb_w_pb_raw.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_twb_fn_tdb_w_pb_raw.completion_status = "source_mapped"
+routine.psy_twb_fn_tdb_w_pb_raw.required_for_full_domain = false
+
+routine.psy_v_fn_tdb_w_pb_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_v_fn_tdb_w_pb_error.source_routine = "PsyVFnTdbWPb_error"
+routine.psy_v_fn_tdb_w_pb_error.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_v_fn_tdb_w_pb_error.completion_status = "source_mapped"
+routine.psy_v_fn_tdb_w_pb_error.required_for_full_domain = false
+
+routine.psy_v_fn_tdb_w_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_v_fn_tdb_w_pb.source_routine = "PsyVFnTdbWPb"
+routine.psy_v_fn_tdb_w_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_v_fn_tdb_w_pb.completion_status = "source_mapped"
+routine.psy_v_fn_tdb_w_pb.required_for_full_domain = false
+
+routine.psy_w_fn_tdb_h_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_w_fn_tdb_h_error.source_routine = "PsyWFnTdbH_error"
+routine.psy_w_fn_tdb_h_error.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_w_fn_tdb_h_error.completion_status = "source_mapped"
+routine.psy_w_fn_tdb_h_error.required_for_full_domain = false
+
+routine.psy_w_fn_tdb_h.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_w_fn_tdb_h.source_routine = "PsyWFnTdbH"
+routine.psy_w_fn_tdb_h.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_w_fn_tdb_h.completion_status = "source_mapped"
+routine.psy_w_fn_tdb_h.required_for_full_domain = false
+
+routine.psy_psat_fn_temp_raw.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_psat_fn_temp_raw.source_routine = "PsyPsatFnTemp_raw"
+routine.psy_psat_fn_temp_raw.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_psat_fn_temp_raw.completion_status = "source_mapped"
+routine.psy_psat_fn_temp_raw.required_for_full_domain = false
+
+routine.psy_psat_fn_temp.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_psat_fn_temp.source_routine = "PsyPsatFnTemp"
+routine.psy_psat_fn_temp.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_psat_fn_temp.completion_status = "source_mapped"
+routine.psy_psat_fn_temp.required_for_full_domain = false
+
+routine.psy_tsat_fn_h_pb_raw.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_tsat_fn_h_pb_raw.source_routine = "PsyTsatFnHPb_raw"
+routine.psy_tsat_fn_h_pb_raw.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_tsat_fn_h_pb_raw.completion_status = "source_mapped"
+routine.psy_tsat_fn_h_pb_raw.required_for_full_domain = false
+
+routine.psy_tsat_fn_h_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_tsat_fn_h_pb.source_routine = "PsyTsatFnHPb"
+routine.psy_tsat_fn_h_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_tsat_fn_h_pb.completion_status = "source_mapped"
+routine.psy_tsat_fn_h_pb.required_for_full_domain = false
+
+routine.psy_rhov_fn_tdb_rh.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_rhov_fn_tdb_rh.source_routine = "PsyRhovFnTdbRh"
+routine.psy_rhov_fn_tdb_rh.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rhov_fn_tdb_rh.completion_status = "source_mapped"
+routine.psy_rhov_fn_tdb_rh.required_for_full_domain = false
+
+routine.psy_rh_fn_tdb_rhov_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_rh_fn_tdb_rhov_error.source_routine = "PsyRhFnTdbRhov_error"
+routine.psy_rh_fn_tdb_rhov_error.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rh_fn_tdb_rhov_error.completion_status = "source_mapped"
+routine.psy_rh_fn_tdb_rhov_error.required_for_full_domain = false
+
+routine.psy_rh_fn_tdb_rhov.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_rh_fn_tdb_rhov.source_routine = "PsyRhFnTdbRhov"
+routine.psy_rh_fn_tdb_rhov.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rh_fn_tdb_rhov.completion_status = "source_mapped"
+routine.psy_rh_fn_tdb_rhov.required_for_full_domain = false
+
+routine.psy_rh_fn_tdb_w_pb_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_rh_fn_tdb_w_pb_error.source_routine = "PsyRhFnTdbWPb_error"
+routine.psy_rh_fn_tdb_w_pb_error.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rh_fn_tdb_w_pb_error.completion_status = "source_mapped"
+routine.psy_rh_fn_tdb_w_pb_error.required_for_full_domain = false
+
+routine.psy_rh_fn_tdb_w_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_rh_fn_tdb_w_pb.source_routine = "PsyRhFnTdbWPb"
+routine.psy_rh_fn_tdb_w_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rh_fn_tdb_w_pb.completion_status = "source_mapped"
+routine.psy_rh_fn_tdb_w_pb.required_for_full_domain = false
+
+routine.psy_w_fn_tdp_pb_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_w_fn_tdp_pb_error.source_routine = "PsyWFnTdpPb_error"
+routine.psy_w_fn_tdp_pb_error.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_w_fn_tdp_pb_error.completion_status = "source_mapped"
+routine.psy_w_fn_tdp_pb_error.required_for_full_domain = false
+
+routine.psy_w_fn_tdp_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_w_fn_tdp_pb.source_routine = "PsyWFnTdpPb"
+routine.psy_w_fn_tdp_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_w_fn_tdp_pb.completion_status = "source_mapped"
+routine.psy_w_fn_tdp_pb.required_for_full_domain = false
+
+routine.psy_w_fn_tdb_rh_pb_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_w_fn_tdb_rh_pb_error.source_routine = "PsyWFnTdbRhPb_error"
+routine.psy_w_fn_tdb_rh_pb_error.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_w_fn_tdb_rh_pb_error.completion_status = "source_mapped"
+routine.psy_w_fn_tdb_rh_pb_error.required_for_full_domain = false
+
+routine.psy_w_fn_tdb_rh_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_w_fn_tdb_rh_pb.source_routine = "PsyWFnTdbRhPb"
+routine.psy_w_fn_tdb_rh_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_w_fn_tdb_rh_pb.completion_status = "source_mapped"
+routine.psy_w_fn_tdb_rh_pb.required_for_full_domain = false
+
+routine.psy_w_fn_tdb_twb_pb_temperature_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_w_fn_tdb_twb_pb_temperature_error.source_routine = "PsyWFnTdbTwbPb_temperature_error"
+routine.psy_w_fn_tdb_twb_pb_temperature_error.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_w_fn_tdb_twb_pb_temperature_error.completion_status = "source_mapped"
+routine.psy_w_fn_tdb_twb_pb_temperature_error.required_for_full_domain = false
+
+routine.psy_w_fn_tdb_twb_pb_humidity_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_w_fn_tdb_twb_pb_humidity_error.source_routine = "PsyWFnTdbTwbPb_humidity_error"
+routine.psy_w_fn_tdb_twb_pb_humidity_error.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_w_fn_tdb_twb_pb_humidity_error.completion_status = "source_mapped"
+routine.psy_w_fn_tdb_twb_pb_humidity_error.required_for_full_domain = false
+
+routine.psy_w_fn_tdb_twb_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_w_fn_tdb_twb_pb.source_routine = "PsyWFnTdbTwbPb"
+routine.psy_w_fn_tdb_twb_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_w_fn_tdb_twb_pb.completion_status = "source_mapped"
+routine.psy_w_fn_tdb_twb_pb.required_for_full_domain = false
+
+routine.psy_h_fn_tdb_rh_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_h_fn_tdb_rh_pb.source_routine = "PsyHFnTdbRhPb"
+routine.psy_h_fn_tdb_rh_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_h_fn_tdb_rh_pb.completion_status = "source_mapped"
+routine.psy_h_fn_tdb_rh_pb.required_for_full_domain = false
+
+routine.psy_tsat_fn_pb_raw.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_tsat_fn_pb_raw.source_routine = "PsyTsatFnPb_raw"
+routine.psy_tsat_fn_pb_raw.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_tsat_fn_pb_raw.completion_status = "source_mapped"
+routine.psy_tsat_fn_pb_raw.required_for_full_domain = false
+
+routine.psy_tsat_fn_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_tsat_fn_pb.source_routine = "PsyTsatFnPb"
+routine.psy_tsat_fn_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_tsat_fn_pb.completion_status = "source_mapped"
+routine.psy_tsat_fn_pb.required_for_full_domain = false
+
+routine.psy_tdp_fn_w_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_tdp_fn_w_pb.source_routine = "PsyTdpFnWPb"
+routine.psy_tdp_fn_w_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_tdp_fn_w_pb.completion_status = "source_mapped"
+routine.psy_tdp_fn_w_pb.required_for_full_domain = false
+
+routine.psy_tdp_fn_tdb_twb_pb_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.psy_tdp_fn_tdb_twb_pb_error.source_routine = "PsyTdpFnTdbTwbPb_error"
+routine.psy_tdp_fn_tdb_twb_pb_error.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_tdp_fn_tdb_twb_pb_error.completion_status = "source_mapped"
+routine.psy_tdp_fn_tdb_twb_pb_error.required_for_full_domain = false
+
+routine.psy_tdp_fn_tdb_twb_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_tdp_fn_tdb_twb_pb.source_routine = "PsyTdpFnTdbTwbPb"
+routine.psy_tdp_fn_tdb_twb_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_tdp_fn_tdb_twb_pb.completion_status = "source_mapped"
+routine.psy_tdp_fn_tdb_twb_pb.required_for_full_domain = false
+
+routine.f6.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.f6.source_routine = "F6"
+routine.f6.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.f6.completion_status = "source_mapped"
+routine.f6.required_for_full_domain = false
+
+routine.f7.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.f7.source_routine = "F7"
+routine.f7.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.f7.completion_status = "source_mapped"
+routine.f7.required_for_full_domain = false
+
+routine.cpcw.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.cpcw.source_routine = "CPCW"
+routine.cpcw.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.cpcw.completion_status = "source_mapped"
+routine.cpcw.required_for_full_domain = false
+
+routine.cphw.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.cphw.source_routine = "CPHW"
+routine.cphw.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.cphw.completion_status = "source_mapped"
+routine.cphw.required_for_full_domain = false
+
+routine.rho_h2o.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.rho_h2o.source_routine = "RhoH2O"
+routine.rho_h2o.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.rho_h2o.completion_status = "source_mapped"
+routine.rho_h2o.required_for_full_domain = false
+
+routine.psy_delta_h_sen_fn_tdb2_tdb1_w.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_delta_h_sen_fn_tdb2_tdb1_w.source_routine = "PsyDeltaHSenFnTdb2Tdb1W"
+routine.psy_delta_h_sen_fn_tdb2_tdb1_w.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_delta_h_sen_fn_tdb2_tdb1_w.completion_status = "source_mapped"
+routine.psy_delta_h_sen_fn_tdb2_tdb1_w.required_for_full_domain = false
+
+routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.source_file = "src/EnergyPlus/Psychrometrics.hh"
+routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.source_routine = "PsyDeltaHSenFnTdb2W2Tdb1W1"
+routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.completion_status = "source_mapped"
+routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.required_for_full_domain = false
+
+routine.c_splineint.source_file = "src/EnergyPlus/Psychrometrics.cc"
+routine.c_splineint.source_routine = "CSplineint"
+routine.c_splineint.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.c_splineint.completion_status = "source_mapped"
+routine.c_splineint.required_for_full_domain = false
