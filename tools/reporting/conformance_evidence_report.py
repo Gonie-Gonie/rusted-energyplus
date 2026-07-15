@@ -84,7 +84,16 @@ CLAIM_BOUNDARY = (
     "values 305 and 88 and wraps_year=true field are locked against source-mapped expected values "
     "and are not fields emitted by EIO. Cross-year RunPeriod or weather-record traversal, full-year "
     "range execution, execution around the October start boundary, generic southern-hemisphere or "
-    "year-wrap behavior, and other date-rule pairs are not proved. Other "
+    "year-wrap behavior, and other date-rule pairs are not proved. The separate southern-wrap "
+    "start-side case uses the same literal EPW pair and EnergyPlus EIO dates but executes only "
+    "the same-year October 30 through November 1 window. Its 72 EnergyPlus ESO values and timestamp "
+    "fields match daily status 0/1/1 with 48 active and 24 inactive hours at zero tolerance. The "
+    "Rust summary again locks day-of-year 305 and 88 plus wraps_year=true only against source-mapped "
+    "expected values, not EIO-emitted fields. This start-side case does not add full-year or cross-"
+    "year traversal evidence, and the March end boundary remains the separate end-side case. "
+    "Broader years, months, and date rules, generic southern/wrap behavior, RunPeriod disabling, "
+    "EPW-versus-IDF precedence, DST clock effects, actual-weather execution, and broad "
+    "WeatherManager behavior remain unclaimed. Other "
     "Nth/last-weekday forms, RunPeriod disabling, malformed headers, and policy precedence "
     "remain unit/source evidence or unclaimed. The IDF RunPeriodControl:DaylightSavingTime object, "
     "DST-shifted schedule lookup, hour-24 rollover, and Rust raw ESO serialization remain outside "
@@ -199,6 +208,7 @@ CASE_LABELS = {
     "calendar_dst_fixed_date_hourly_exact_001": "Calendar DST fixed",
     "calendar_epw_dst_weekday_rules_hourly_exact_001": "EPW DST weekday pair",
     "calendar_epw_dst_southern_wrap_hourly_exact_001": "EPW DST southern wrap",
+    "calendar_epw_dst_southern_wrap_start_hourly_exact_001": "EPW DST southern start",
     "calendar_special_day_fixed_date_hourly_exact_001": "Calendar special day",
     "calendar_special_day_nth_weekday_hourly_exact_001": "IDF fourth Sunday",
     "calendar_special_day_last_weekday_hourly_exact_001": "IDF last Sunday",
@@ -343,6 +353,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_southern_wrap_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_southern_wrap_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_southern_wrap_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="EPW DST southern start",
+        command="compare-calendar-epw-dst-southern-wrap-start-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_southern_wrap_start_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_southern_wrap_start_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_southern_wrap_start_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="Calendar special day",
