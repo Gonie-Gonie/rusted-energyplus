@@ -76,6 +76,17 @@ EXPECTED_ROUTINES: tuple[tuple[str, str], ...] = (
     (SOURCE_CC, "CSplineint"),
 )
 
+STATE_MAPPED_ROUTINES = frozenset({"PsyRhoAirFnPbTdbW", "PsyCpAirFnW"})
+EXPECTED_STATUS_COUNTS = {"source_mapped": 51, "state_mapped": 2}
+
+
+def expected_completion_status(source_routine: str) -> str:
+    return (
+        "state_mapped"
+        if source_routine in STATE_MAPPED_ROUTINES
+        else "source_mapped"
+    )
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -217,15 +228,30 @@ def validate_psychrometric_inventory(
                 f"{INVENTORY_ID}: {expected_routine} source_file must be "
                 f"{expected_file!r}; found {row.get('source_file')!r}"
             )
-        if row.get("completion_status") != "source_mapped":
+        expected_status = expected_completion_status(expected_routine)
+        if row.get("completion_status") != expected_status:
             errors.append(
                 f"{INVENTORY_ID}: {expected_routine} completion_status must be exactly "
-                f"'source_mapped'; found {row.get('completion_status')!r}"
+                f"{expected_status!r}; found {row.get('completion_status')!r}"
             )
         if row.get("required_for_full_domain") is not False:
             errors.append(
                 f"{INVENTORY_ID}: {expected_routine} required_for_full_domain must be false"
             )
+
+    actual_status_counts = {
+        status: sum(
+            1
+            for _, row in actual
+            if isinstance(row, dict) and row.get("completion_status") == status
+        )
+        for status in EXPECTED_STATUS_COUNTS
+    }
+    if actual_status_counts != EXPECTED_STATUS_COUNTS:
+        errors.append(
+            f"{INVENTORY_ID}: completion_status counts must be exactly "
+            f"{EXPECTED_STATUS_COUNTS!r}; found {actual_status_counts!r}"
+        )
 
     return errors
 
@@ -236,7 +262,7 @@ def happy_path_spec() -> dict[str, Any]:
         routines[f"routine_{index:02d}"] = {
             "source_file": source_file,
             "source_routine": source_routine,
-            "completion_status": "source_mapped",
+            "completion_status": expected_completion_status(source_routine),
             "required_for_full_domain": False,
         }
     return {
@@ -311,6 +337,35 @@ def self_test_inventory() -> int:
     expect_invalid("wrong_completion_status", candidate, "completion_status must be exactly")
 
     candidate = copy.deepcopy(baseline)
+    routines(candidate)[find_key(candidate, "PsyRhoAirFnPbTdbW")][
+        "completion_status"
+    ] = "source_mapped"
+    expect_invalid(
+        "state_mapped_routine_downgrade",
+        candidate,
+        "PsyRhoAirFnPbTdbW completion_status must be exactly 'state_mapped'",
+    )
+
+    candidate = copy.deepcopy(baseline)
+    routines(candidate)[find_key(candidate, "F7")]["completion_status"] = "state_mapped"
+    expect_invalid(
+        "source_mapped_routine_promotion",
+        candidate,
+        "F7 completion_status must be exactly 'source_mapped'",
+    )
+
+    candidate = copy.deepcopy(baseline)
+    routines(candidate)[find_key(candidate, "PsyCpAirFnW")][
+        "completion_status"
+    ] = "source_mapped"
+    routines(candidate)[find_key(candidate, "F7")]["completion_status"] = "state_mapped"
+    expect_invalid(
+        "status_swap_preserves_counts",
+        candidate,
+        "PsyCpAirFnW completion_status must be exactly 'state_mapped'",
+    )
+
+    candidate = copy.deepcopy(baseline)
     routines(candidate)[find_key(candidate, "F7")]["required_for_full_domain"] = True
     expect_invalid("required_for_full_domain_true", candidate, "required_for_full_domain must be false")
 
@@ -373,7 +428,7 @@ def main() -> int:
     print("Psychrometric routine inventory check")
     print(f"  routines: {len(EXPECTED_ROUTINES)}")
     print("  source_order: exact EnergyPlus 26.1 interface order")
-    print("  completion_status: source_mapped")
+    print("  completion_status: source_mapped=51, state_mapped=2")
     print("  required_for_full_domain: false")
     print("  status: valid")
     return 0

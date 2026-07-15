@@ -41,13 +41,13 @@ that the EnergyPlus routine has been ported.
 | 1 | `InitializePsychRoutines` | cache lifecycle | `Psychrometrics.hh:498`; `Psychrometrics.cc:110` | always declared; initializes each cache enabled by its `EP_cache_*` macro | intended `ep_runtime::psychrometrics` cache owner; unassigned | prove fresh-state initialization and independent initialization of all four cache families |
 | 2 | `ShowPsychrometricSummary` | statistics/reporting | `Psychrometrics.hh:500`; `Psychrometrics.cc:136` | always present; summary body is active only with `EP_psych_stats` | intended diagnostics owner; unassigned | prove stats-enabled totals/hit counts and stats-disabled no-op behavior |
 | 3 | `PsyRhoAirFnPbTdbW_error` | diagnostics | `Psychrometrics.hh:503`; `Psychrometrics.cc:198` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | prove the exact negative-density trigger and immediate severe/continue/timestamp/fatal message flow, including caller versus unknown context |
-| 4 | `PsyRhoAirFnPbTdbW` | moist-air density | `Psychrometrics.hh:513,549` (inline implementations) | two always-present stateful/stateless overloads; one logical ticket | partial analogue: `ep_runtime::psychrometrics::energyplus_moist_air_density_kg_per_m3` | compare both overloads over source vectors, humidity floor behavior, diagnostics path, and mutual equivalence where domains overlap |
+| 4 | `PsyRhoAirFnPbTdbW` | moist-air density | `Psychrometrics.hh:513,549` (inline implementations) | two always-present stateful/stateless overloads; one logical ticket | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rho_air_fn_pb_tdb_w`; guarded legacy wrapper: `energyplus_moist_air_density_kg_per_m3` | compare both overloads over source vectors, humidity floor behavior, diagnostics path, and mutual equivalence where domains overlap |
 | 5 | `PsyRhoAirFnPbTdbW_fast` | moist-air density fast path | `Psychrometrics.hh:576` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | compare with the ordinary density routine and lock the fast-path input-domain preconditions |
 | 6 | `PsyHfgAirFnWTdb` | latent enthalpy | `Psychrometrics.hh:593` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | coefficient-vector and temperature/humidity boundary parity |
 | 7 | `PsyHgAirFnWTdb` | water-vapor gas enthalpy | `Psychrometrics.hh:623` (inline) | always present | partial analogue: `ep_runtime::psychrometrics::energyplus_water_vapor_gas_enthalpy_j_per_kg` | source-vector parity including ignored-`W` semantics and temperature limits |
 | 8 | `PsyHFnTdbW` | moist-air enthalpy | `Psychrometrics.hh:648` (inline) | always present | partial analogue: `ep_runtime::ideal_loads::calc::psychrometrics::moist_air_enthalpy_j_per_kg` | coefficient-vector parity, humidity floor/domain behavior, and inverse round trips |
 | 9 | `PsyHFnTdbW_fast` | moist-air enthalpy fast path | `Psychrometrics.hh:668` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | ordinary/fast equivalence across the documented valid domain |
-| 10 | `PsyCpAirFnW` | moist-air specific heat | `Psychrometrics.hh:679` (inline) | always present; owns a function-local last-input cache | partial analogue: `ep_runtime::psychrometrics::energyplus_moist_air_specific_heat_j_per_kg_k` | source-vector parity plus repeated, alternating, and multistate cache-isolation probes |
+| 10 | `PsyCpAirFnW` | moist-air specific heat | `Psychrometrics.hh:679` (inline) | always present; owns a function-local last-input cache | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_cp_air_fn_w`; guarded legacy wrapper: `energyplus_moist_air_specific_heat_j_per_kg_k` | source-vector parity plus repeated, alternating, and multistate cache-isolation probes |
 | 11 | `PsyCpAirFnW_fast` | specific-heat fast path | `Psychrometrics.hh:718` (inline) | always present; owns a function-local last-input cache | intended `ep_runtime::psychrometrics`; unassigned | ordinary/fast equivalence and cache-hit/miss independence |
 | 12 | `PsyTdbFnHW` | dry-bulb inversion | `Psychrometrics.hh:743` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | enthalpy round trips, denominator edge cases, and source-vector parity |
 | 13 | `PsyRhovFnTdbRhLBnd0C` | vapor density | `Psychrometrics.hh:764` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | lower-bound-at-0-C branch, RH limits, and pressure-independent source vectors |
@@ -91,6 +91,96 @@ that the EnergyPlus routine has been ported.
 | 51 | `PsyDeltaHSenFnTdb2Tdb1W` | sensible enthalpy delta | `Psychrometrics.hh:1654` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | sign convention, 1e-5 humidity floor, zero delta, and equality with the stated enthalpy subtraction |
 | 52 | `PsyDeltaHSenFnTdb2W2Tdb1W1` | sensible enthalpy delta | `Psychrometrics.hh:1679` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | minimum-humidity selection, direction/sign, and delegation equality with routine 51 |
 | 53 | `CSplineint` | spline interpolation | `Psychrometrics.hh:1698`; `Psychrometrics.cc:1450` | always present | intended `ep_runtime::psychrometrics`; unassigned | pinned table knots, between-knot interpolation, endpoint/range behavior, and sample-count handling |
+
+## CP56-2 Numerical Scaffold: Density And Specific Heat
+
+This section promotes only the source/state understanding for a selected
+direct-formula pair. It does not promote either routine to `implemented`,
+does not claim that an existing Rust analogue has EnergyPlus-equivalent edge
+or diagnostic behavior, and does not add external evidence, family gating,
+conformance, or a project-contract obligation. Both tickets remain under the
+parent algorithm's `status = "scaffold"` and `claim_level = "none"` boundary.
+The current pure numerical helpers and local bit-pattern, floor, IEEE-edge,
+legacy-wrapper, and call-stability tests are in
+`crates/ep_runtime/src/psychrometrics.rs` and
+`crates/ep_runtime/src/psychrometrics_tests.rs`. Those Rust-only checks are
+scaffold evidence, not an external EnergyPlus parity oracle.
+
+### `PsyRhoAirFnPbTdbW` (`psy_rho_air_fn_pb_tdb_w`)
+
+The ordinary source formula is in `Psychrometrics.hh:513-546`; the stateless
+overload repeats it at `Psychrometrics.hh:549-574`. Both calculate
+`pb / (287.0 * (tdb + Constant::Kelvin) * (1.0 + 1.6077687 * max(dw,
+1.0e-5)))`. The numerical result has no cache or history. The overload that
+accepts `EnergyPlusData &state` differs only when `EP_psych_errors` is enabled
+and the calculated density is negative: it delegates to
+`PsyRhoAirFnPbTdbW_error` (`Psychrometrics.cc:198-218`), which emits a severe
+message, an input continuation, a caller-or-`Unknown` timestamp, and then a
+fatal error. That stateful diagnostic branch remains deferred.
+
+<!-- routine-state-contract:v1 begin psy_rho_air_fn_pb_tdb_w -->
+PsyRhoAirFnPbTdbW
+
+read_state:
+- arguments `pb`, `tdb`, and `dw`; `CalledFrom` and `EnergyPlusData &state` are read only by the enabled negative-density diagnostics path
+
+write_state:
+- ordinary formula and stateless overload write no state; enabled negative-density diagnostics mutate the EnergyPlus error stream and terminate through the fatal-error path
+
+history_state_ownership:
+- no cross-call history or cache; density output is a pure function of `pb`, `tdb`, `max(dw, 1.0e-5)`, and `Constant::Kelvin` before optional diagnostics
+
+unsupported_state:
+- `EP_psych_errors` severe/continue/timestamp/fatal diagnostic state delegated to `PsyRhoAirFnPbTdbW_error`
+
+inactive_branches:
+- when `EP_psych_errors` is disabled, the state argument and `CalledFrom` are unused and the negative-density diagnostic branch is compiled out
+
+unsupported_active_branches:
+- stateful overload negative-density branch with severe, input-context continuation, caller-or-Unknown timestamp, and fatal termination when `EP_psych_errors` is enabled
+
+not_claimed_branches:
+- numerical density parity, humidity-floor and nonphysical-input edges, overload parity, and all diagnostic side effects
+<!-- routine-state-contract:v1 end psy_rho_air_fn_pb_tdb_w -->
+
+### `PsyCpAirFnW` (`psy_cp_air_fn_w`)
+
+The source at `Psychrometrics.hh:679-715` reads `dw` plus two function-local
+static values, `dwSave` and `cpaSave`, both initialized to `-100.0`. An exact
+`dwSave == dw` hit returns `cpaSave`; otherwise the routine computes
+`1.00484e3 + max(dw, 1.0e-5) * 1.85895e3` and replaces both saved values. For
+physical humidity-ratio inputs the cache changes work, not the returned
+formula. The initialization sentinel is nevertheless observable: the first
+process call with `dw == -100.0` returns the initial `cpaSave == -100.0`
+instead of evaluating the formula. The static locals are process/function
+history rather than `EnergyPlusData`-owned state. Rust currently has no mutable
+cache for this routine, so cache history, sentinel behavior, cross-simulation
+sharing, and thread/isolation policy remain deferred.
+
+<!-- routine-state-contract:v1 begin psy_cp_air_fn_w -->
+PsyCpAirFnW
+
+read_state:
+- argument `dw` and function-local static `dwSave`/`cpaSave`, both initialized to `-100.0`, are read before the cache-hit comparison
+
+write_state:
+- cache miss writes `dwSave = dw` and `cpaSave = 1.00484e3 + max(dw, 1.0e-5) * 1.85895e3`; cache hit writes no state
+
+history_state_ownership:
+- EnergyPlus owns one function-local static last-call cache shared across calls and simulation states; Rust currently owns no mutable cache for this routine
+
+unsupported_state:
+- the function-local `dwSave`/`cpaSave` cache, including first-call `dw == -100.0` sentinel collision that returns `-100.0`
+
+inactive_branches:
+- none; the last-call cache is unconditional in the pinned EnergyPlus 26.1.0 source
+
+unsupported_active_branches:
+- cache hit/miss history behavior, cross-simulation/process sharing, and sentinel-collision behavior; the cache is output-neutral for physical humidity-ratio inputs
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, C++ last-call-cache work/history parity under repeated or alternating calls, sentinel collision, and state/thread-isolation behavior
+<!-- routine-state-contract:v1 end psy_cp_air_fn_w -->
 
 ## Compile-Time Variant Boundary
 
@@ -138,9 +228,10 @@ functions.
 
 ## Promotion Boundary
 
-Every ledger routine remains `source_mapped` with
-`required_for_full_domain = false`. Before any ticket is promoted, its Rust
-target, state ownership, source-vector tests, compile-variant obligations,
-diagnostic behavior where applicable, and external evidence boundary must be
-recorded. This map adds no routine to the project-contract required set and
-does not establish psychrometrics implementation or conformance completion.
+The `PsyRhoAirFnPbTdbW` and `PsyCpAirFnW` tickets are `state_mapped`; the other
+51 ledger routines remain `source_mapped`. All 53 retain
+`required_for_full_domain = false`. Before any ticket is promoted further, its
+Rust target, source-vector tests, compile-variant obligations, diagnostic
+behavior where applicable, and external evidence boundary must be recorded.
+This map adds no routine to the project-contract required set and does not
+establish psychrometrics implementation or conformance completion.

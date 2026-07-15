@@ -9,7 +9,7 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 
 | Check | Result |
 |---|---|
-| docs files | 82 |
+| docs files | 83 |
 | SUMMARY links | 19 |
 | README h2 sections | 5 |
 | README h2 section limit | pass |
@@ -25,7 +25,7 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 | Non-core SUMMARY sections | 0 |
 | SUMMARY section scope violations | 0 |
 | Release notes in Current nav | 0 |
-| Non-generated docs not in SUMMARY | 62 |
+| Non-generated docs not in SUMMARY | 63 |
 
 ## Current Navigation Check
 
@@ -143,6 +143,7 @@ none
 | docs/src/porting-map/overview.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-05 |
 | docs/src/porting-map/plant-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
 | docs/src/porting-map/plant.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
+| docs/src/porting-map/psychrometrics-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-15 |
 | docs/src/porting-map/surface-balance-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-20 |
 | docs/src/porting-map/time-weather-schedule.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-15 |
 | docs/src/porting-map/warmup-semantics-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-12 |

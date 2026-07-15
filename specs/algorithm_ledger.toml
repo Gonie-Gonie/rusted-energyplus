@@ -1456,8 +1456,28 @@ routine.psy_rho_air_fn_pb_tdb_w_error.required_for_full_domain = false
 routine.psy_rho_air_fn_pb_tdb_w.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_rho_air_fn_pb_tdb_w.source_routine = "PsyRhoAirFnPbTdbW"
 routine.psy_rho_air_fn_pb_tdb_w.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_rho_air_fn_pb_tdb_w.completion_status = "source_mapped"
+routine.psy_rho_air_fn_pb_tdb_w.completion_status = "state_mapped"
 routine.psy_rho_air_fn_pb_tdb_w.required_for_full_domain = false
+routine.psy_rho_air_fn_pb_tdb_w.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rho_air_fn_pb_tdb_w.read_state = [
+  "arguments `pb`, `tdb`, and `dw`; `CalledFrom` and `EnergyPlusData &state` are read only by the enabled negative-density diagnostics path",
+]
+routine.psy_rho_air_fn_pb_tdb_w.write_state = [
+  "ordinary formula and stateless overload write no state; enabled negative-density diagnostics mutate the EnergyPlus error stream and terminate through the fatal-error path",
+]
+routine.psy_rho_air_fn_pb_tdb_w.history_state_ownership = "no cross-call history or cache; density output is a pure function of `pb`, `tdb`, `max(dw, 1.0e-5)`, and `Constant::Kelvin` before optional diagnostics"
+routine.psy_rho_air_fn_pb_tdb_w.unsupported_state = [
+  "`EP_psych_errors` severe/continue/timestamp/fatal diagnostic state delegated to `PsyRhoAirFnPbTdbW_error`",
+]
+routine.psy_rho_air_fn_pb_tdb_w.inactive_branches = [
+  "when `EP_psych_errors` is disabled, the state argument and `CalledFrom` are unused and the negative-density diagnostic branch is compiled out",
+]
+routine.psy_rho_air_fn_pb_tdb_w.unsupported_active_branches = [
+  "stateful overload negative-density branch with severe, input-context continuation, caller-or-Unknown timestamp, and fatal termination when `EP_psych_errors` is enabled",
+]
+routine.psy_rho_air_fn_pb_tdb_w.not_claimed_branches = [
+  "numerical density parity, humidity-floor and nonphysical-input edges, overload parity, and all diagnostic side effects",
+]
 
 routine.psy_rho_air_fn_pb_tdb_w_fast.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_rho_air_fn_pb_tdb_w_fast.source_routine = "PsyRhoAirFnPbTdbW_fast"
@@ -1492,8 +1512,28 @@ routine.psy_h_fn_tdb_w_fast.required_for_full_domain = false
 routine.psy_cp_air_fn_w.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_cp_air_fn_w.source_routine = "PsyCpAirFnW"
 routine.psy_cp_air_fn_w.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_cp_air_fn_w.completion_status = "source_mapped"
+routine.psy_cp_air_fn_w.completion_status = "state_mapped"
 routine.psy_cp_air_fn_w.required_for_full_domain = false
+routine.psy_cp_air_fn_w.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_cp_air_fn_w.read_state = [
+  "argument `dw` and function-local static `dwSave`/`cpaSave`, both initialized to `-100.0`, are read before the cache-hit comparison",
+]
+routine.psy_cp_air_fn_w.write_state = [
+  "cache miss writes `dwSave = dw` and `cpaSave = 1.00484e3 + max(dw, 1.0e-5) * 1.85895e3`; cache hit writes no state",
+]
+routine.psy_cp_air_fn_w.history_state_ownership = "EnergyPlus owns one function-local static last-call cache shared across calls and simulation states; Rust currently owns no mutable cache for this routine"
+routine.psy_cp_air_fn_w.unsupported_state = [
+  "the function-local `dwSave`/`cpaSave` cache, including first-call `dw == -100.0` sentinel collision that returns `-100.0`",
+]
+routine.psy_cp_air_fn_w.inactive_branches = [
+  "none; the last-call cache is unconditional in the pinned EnergyPlus 26.1.0 source",
+]
+routine.psy_cp_air_fn_w.unsupported_active_branches = [
+  "cache hit/miss history behavior, cross-simulation/process sharing, and sentinel-collision behavior; the cache is output-neutral for physical humidity-ratio inputs",
+]
+routine.psy_cp_air_fn_w.not_claimed_branches = [
+  "external EnergyPlus numerical parity, C++ last-call-cache work/history parity under repeated or alternating calls, sentinel collision, and state/thread-isolation behavior",
+]
 
 routine.psy_cp_air_fn_w_fast.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_cp_air_fn_w_fast.source_routine = "PsyCpAirFnW_fast"
