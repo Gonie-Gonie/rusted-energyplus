@@ -362,6 +362,7 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
             + model.typed.file_schedules.len()
             + file_shading_generated_schedules
             + model.typed.year_schedules.len()
+            + model.typed.external_interface_schedules.len()
     );
     println!("  constant_schedules: {}", model.typed.schedules.len());
     println!(
@@ -405,6 +406,10 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
         model.typed.week_compact_schedules.len()
     );
     println!("  year_schedules: {}", model.typed.year_schedules.len());
+    println!(
+        "  external_interface_schedules: {}",
+        model.typed.external_interface_schedules.len()
+    );
     println!("  other_equipment: {}", model.typed.other_equipment.len());
     println!(
         "  thermostat_dual_setpoints: {}",
@@ -9507,6 +9512,13 @@ fn schedule_name_for_id(model: &TypedModel, schedule_id: Option<ScheduleId>) -> 
                 .find(|schedule| schedule.id == schedule_id)
                 .map(|schedule| schedule.name.0.clone())
         })
+        .or_else(|| {
+            model
+                .external_interface_schedules
+                .iter()
+                .find(|schedule| schedule.id == schedule_id)
+                .map(|schedule| schedule.name.0.clone())
+        })
         .unwrap_or_else(|| "MISSING SCHEDULE".to_string())
 }
 
@@ -17096,6 +17108,7 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
             + model.file_schedules.len()
             + file_shading_generated_schedules
             + model.year_schedules.len()
+            + model.external_interface_schedules.len()
     );
     println!("  constant_schedules: {}", model.schedules.len());
     println!("  compact_schedules: {}", model.compact_schedules.len());
@@ -17127,6 +17140,10 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
         model.week_compact_schedules.len()
     );
     println!("  year_schedules: {}", model.year_schedules.len());
+    println!(
+        "  external_interface_schedules: {}",
+        model.external_interface_schedules.len()
+    );
     println!("  other_equipment: {}", model.other_equipment.len());
     println!(
         "  thermostat_dual_setpoints: {}",

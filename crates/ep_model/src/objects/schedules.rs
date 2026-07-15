@@ -117,6 +117,19 @@ pub struct ScheduleYear {
     pub week_schedules: [WeekScheduleId; 366],
 }
 
+/// Schedule initialized locally for an inactive EnergyPlus external interface.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ExternalInterfaceSchedule {
+    /// Typed ID shared with all other top-level schedule families.
+    pub id: ScheduleId,
+    /// Schedule name.
+    pub name: NormalizedName,
+    /// Optional type limits.
+    pub schedule_type_limits: Option<ScheduleTypeLimitId>,
+    /// Value held while live external-interface exchange is inactive.
+    pub initial_value: f64,
+}
+
 /// Delimiter used by one flat `Schedule:File` input.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub enum ScheduleFileColumnSeparator {

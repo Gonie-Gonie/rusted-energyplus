@@ -335,6 +335,12 @@
                          "help":  "Gate exact Schedule:File:Shading 35,040-row CSV intake, generated schedule names, and two quarter-hour column vectors."
                      },
                      {
+                         "name":  "compare-calendar-schedule-external-interface-initial-value-exact",
+                         "path":  "compare\\compare-calendar-schedule-external-interface-initial-value-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact inactive ExternalInterface:Schedule initial-value population and its one missing-activation warning."
+                     },
+                     {
                          "name":  "compare-calendar-schedule-day-hourly-week-daily-year-leap-exact",
                          "path":  "compare\\compare-calendar-schedule-day-hourly-week-daily-year-leap-exact.ps1",
                          "group":  "compare",

@@ -5,12 +5,13 @@ use ep_model::{
     BranchId, BranchListId, Building, ChillerElectricEir, CoilComponent, CoilComponentKind,
     ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId, DayScheduleId,
     DehumidificationControlType, DemandControlledVentilationType, DesignSpecificationOutdoorAir,
-    DesignSpecificationOutdoorAirId, DesignSpecificationOutdoorAirMethod, FanComponent,
-    FanComponentKind, FirstHourInterpolationStartingValues, HeatRecoveryType,
-    HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
-    IdealLoadsLimit, InsideSurfaceConvectionAlgorithm, InternalGainId, LoadDistributionScheme,
-    LoopId, Material, MaterialId, MaterialKind, MaterialSurfaceRoughness, NameMap, Node, NodeId,
-    NodeList, NodeListId, NormalizedName, NumericType, OtherEquipment,
+    DesignSpecificationOutdoorAirId, DesignSpecificationOutdoorAirMethod,
+    ExternalInterfaceSchedule, FanComponent, FanComponentKind,
+    FirstHourInterpolationStartingValues, HeatRecoveryType, HumidificationControlType,
+    IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
+    InsideSurfaceConvectionAlgorithm, InternalGainId, LoadDistributionScheme, LoopId, Material,
+    MaterialId, MaterialKind, MaterialSurfaceRoughness, NameMap, Node, NodeId, NodeList,
+    NodeListId, NormalizedName, NumericType, OtherEquipment,
     OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutsideBoundaryCondition,
     OutsideSurfaceConvectionAlgorithm, People, PeopleNumberCalculationMethod, PlantBranch,
     PlantBranchComponent, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
@@ -240,6 +241,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Schedule:Week:Daily",
     "Schedule:Week:Compact",
     "Schedule:Year",
+    "ExternalInterface:Schedule",
     "OtherEquipment",
     "People",
     "ThermostatSetpoint:DualSetpoint",
@@ -330,6 +332,7 @@ impl<'a> Compiler<'a> {
         self.parse_week_daily_schedules(&mut model);
         self.parse_week_compact_schedules(&mut model);
         self.parse_year_schedules(&mut model);
+        self.parse_external_interface_schedules(&mut model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
@@ -2068,6 +2071,112 @@ impl<'a> Compiler<'a> {
                 schedule_type_limits,
                 week_schedules,
             });
+        }
+    }
+
+    fn parse_external_interface_schedules(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "ExternalInterface:Schedule";
+        const TYPE_LIMITS_FIELD: &str = "schedule_type_limits_name";
+        let objects = self.objects(OBJECT_TYPE);
+        if objects.is_empty() {
+            return;
+        }
+
+        let live_exchange_active =
+            self.objects("ExternalInterface")
+                .iter()
+                .any(|(_name, object)| {
+                    matches!(
+                        field_value(object, "name_of_external_interface"),
+                        Some(RawValue::String(value)) if value.eq_ignore_ascii_case("PtolemyServer")
+                    )
+                });
+        if !live_exchange_active {
+            self.warning(
+                "InactiveExternalInterfaceScheduleHeldAtInitialValue",
+                OBJECT_TYPE,
+                None,
+                None,
+                format!(
+                    "{OBJECT_TYPE} BCVTB exchange is inactive; all schedules are held at their initial values"
+                ),
+            );
+        } else {
+            self.error(
+                "UnsupportedExternalInterfaceLiveExchange",
+                OBJECT_TYPE,
+                None,
+                None,
+                format!(
+                    "{OBJECT_TYPE} with ExternalInterface=PtolemyServer requires live BCVTB updates, which are not yet ported; compilation fails closed"
+                ),
+            );
+        }
+
+        for (name, object) in objects {
+            let schedule_type_limits = match self.optional_string(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                TYPE_LIMITS_FIELD,
+            ) {
+                Some(type_limits_name) => self.resolve_name(
+                    &model.schedule_type_limit_names,
+                    OBJECT_TYPE,
+                    &name,
+                    TYPE_LIMITS_FIELD,
+                    &type_limits_name,
+                    "ScheduleTypeLimits",
+                ),
+                None => {
+                    let type_limits_missing = match field_value(&object, TYPE_LIMITS_FIELD) {
+                        None => true,
+                        Some(RawValue::String(value)) => value.trim().is_empty(),
+                        Some(_) => false,
+                    };
+                    if type_limits_missing {
+                        self.warning(
+                            "MissingExternalInterfaceScheduleTypeLimits",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some(TYPE_LIMITS_FIELD),
+                            format!(
+                                "{OBJECT_TYPE}/{name} has no Schedule Type Limits Name; Schedule will not be validated."
+                            ),
+                        );
+                    }
+                    None
+                }
+            };
+            let Some(initial_value) =
+                self.required_number(OBJECT_TYPE, &name, &object, "initial_value")
+            else {
+                continue;
+            };
+
+            let schedule_index = file_shading_schedule_column_count(model)
+                + model.schedules.len()
+                + model.compact_schedules.len()
+                + model.file_schedules.len()
+                + model.year_schedules.len()
+                + model.external_interface_schedules.len();
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, schedule_index) else {
+                continue;
+            };
+            let id = ScheduleId(id_value);
+            if model.schedule_names.insert(&name, id).is_some() {
+                self.duplicate_name(OBJECT_TYPE, &name);
+                continue;
+            }
+
+            model
+                .external_interface_schedules
+                .push(ExternalInterfaceSchedule {
+                    id,
+                    name: NormalizedName::new(&name),
+                    schedule_type_limits,
+                    initial_value,
+                });
         }
     }
 
@@ -7049,6 +7158,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 mod tests {
     mod schedule_day_interval;
     mod schedule_day_list;
+    mod schedule_external_interface;
     mod schedule_file;
     mod schedule_file_shading;
     mod schedule_week_compact;

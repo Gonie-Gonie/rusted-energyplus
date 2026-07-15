@@ -13,6 +13,7 @@ use ep_model::{
 use std::collections::BTreeSet;
 
 mod day_table;
+mod external_interface;
 mod file_shading;
 
 #[cfg(test)]
@@ -21,6 +22,7 @@ use day_table::{
     precompile_day_schedule_table, year_schedule_series_for_environment_time_axis,
     year_schedule_series_for_time_axis,
 };
+use external_interface::external_interface_schedule_series;
 use file_shading::{
     file_shading_series_for_environment_time_axis, file_shading_series_for_time_axis,
 };
@@ -124,6 +126,9 @@ pub(crate) fn validate_hour_only_internal_gain_schedules(
             .iter()
             .any(|schedule| schedule.id == schedule_id)
         {
+            continue;
+        }
+        if external_interface::external_interface_schedule_value(model, schedule_id).is_some() {
             continue;
         }
 
@@ -275,6 +280,9 @@ pub(crate) fn schedule_value(
     {
         return Some(schedule.hourly_value);
     }
+    if let Some(value) = external_interface::external_interface_schedule_value(model, schedule_id) {
+        return Some(value);
+    }
 
     let minute_of_day = hour_ending.clamp(1, 24) * 60;
     model
@@ -318,6 +326,11 @@ pub enum ScheduleSeriesKind {
     /// Schedule:Constant scalar fast path.
     ConstantScalar {
         /// Constant value reused for every timestep.
+        value: f64,
+    },
+    /// Immutable initial value of an `ExternalInterface:Schedule`.
+    ExternalInterfaceInitialValue {
+        /// Initial value reused until an external interface update is ported.
         value: f64,
     },
     /// Schedule:Compact intervals precompiled from Until segments.
@@ -482,6 +495,11 @@ pub fn precompute_schedule_value_series_for_time_axis(
         .chain(model.year_schedules.iter().map(|schedule| {
             year_schedule_series_for_time_axis(model, schedule, time_axis, &day_schedule_table)
         }))
+        .chain(
+            model.external_interface_schedules.iter().map(|schedule| {
+                external_interface_schedule_series(schedule, time_axis.points.len())
+            }),
+        )
         .collect()
 }
 
@@ -525,6 +543,11 @@ pub fn precompute_schedule_value_series_for_environment_time_axis(
                 &day_schedule_table,
             )
         }))
+        .chain(
+            model.external_interface_schedules.iter().map(|schedule| {
+                external_interface_schedule_series(schedule, time_axis.points.len())
+            }),
+        )
         .collect()
 }
 
@@ -560,7 +583,16 @@ fn precompute_schedule_value_series_for_hours(
         .iter()
         .map(|schedule| compact_schedule_series_for_hours(schedule, hours.clone()))
         .collect::<Result<Vec<_>, _>>()?;
-    Ok(constants.into_iter().chain(compact).collect())
+    let sample_count = hours.into_iter().count();
+    let external = model
+        .external_interface_schedules
+        .iter()
+        .map(|schedule| external_interface_schedule_series(schedule, sample_count));
+    Ok(constants
+        .into_iter()
+        .chain(compact)
+        .chain(external)
+        .collect())
 }
 
 fn constant_schedule_series(

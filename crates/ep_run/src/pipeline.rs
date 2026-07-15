@@ -1115,6 +1115,10 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
         ("compact_schedules", model.compact_schedules.len()),
         ("file_schedules", model.file_schedules.len()),
         (
+            "external_interface_schedules",
+            model.external_interface_schedules.len(),
+        ),
+        (
             "file_shading_schedule_objects",
             usize::from(model.file_shading_schedule.is_some()),
         ),
@@ -1128,7 +1132,8 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
                 + model.compact_schedules.len()
                 + model.file_schedules.len()
                 + file_shading_generated_schedules
-                + model.year_schedules.len(),
+                + model.year_schedules.len()
+                + model.external_interface_schedules.len(),
         ),
         (
             "day_schedules",
@@ -1239,7 +1244,8 @@ fn write_graph_and_plan(
                     .file_shading_schedule
                     .as_ref()
                     .map_or(0, |schedule| schedule.columns.len())
-                + model.typed.year_schedules.len(),
+                + model.typed.year_schedules.len()
+                + model.typed.external_interface_schedules.len(),
             "weather_series_indices": 1,
             "output_handles": precomputed.output_registry.len(),
         },
@@ -1926,7 +1932,8 @@ mod tests {
     };
     use ep_compiler::compile_raw_model;
     use ep_model::{
-        NormalizedName, ScheduleFileShading, ScheduleFileShadingColumn, ScheduleId, TypedModel,
+        ExternalInterfaceSchedule, NormalizedName, ScheduleFileShading, ScheduleFileShadingColumn,
+        ScheduleId, TypedModel,
     };
     use ep_raw_model::parse_epjson_str_with_idf_order;
     use ep_runtime::{
@@ -2248,5 +2255,22 @@ mod tests {
         assert_eq!(counts["file_shading_schedule_objects"], 1);
         assert_eq!(counts["file_shading_generated_schedules"], 2);
         assert_eq!(counts["schedules"], 2);
+    }
+
+    #[test]
+    fn typed_counts_include_external_interface_schedules() {
+        let model = TypedModel {
+            external_interface_schedules: vec![ExternalInterfaceSchedule {
+                id: ScheduleId(0),
+                name: NormalizedName::new("External"),
+                schedule_type_limits: None,
+                initial_value: 0.375,
+            }],
+            ..TypedModel::default()
+        };
+
+        let counts = typed_counts(&model);
+        assert_eq!(counts["external_interface_schedules"], 1);
+        assert_eq!(counts["schedules"], 1);
     }
 }

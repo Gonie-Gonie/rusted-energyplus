@@ -1,0 +1,47 @@
+Version,26.1;
+
+Building,
+  External Interface Schedule Initial Value Exact Fixture,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+Timestep,4;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+RunPeriod,
+  External Interface Schedule Initial Value Run Period,
+  1,
+  1,
+  2032,
+  1,
+  1,
+  2032,
+  Thursday,
+  No,
+  No,
+  No,
+  No,
+  No,
+  No;
+
+ScheduleTypeLimits,
+  Any Number;
+
+ExternalInterface:Schedule,
+  External Initial Value,
+  Any Number,
+  0.375;
+
+Output:Variable,
+  EXTERNAL INITIAL VALUE,
+  Schedule Value,
+  Timestep;
