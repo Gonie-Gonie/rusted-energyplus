@@ -1554,6 +1554,65 @@ count, repetition, or diagnostics parity; schedule lookup, tomorrow state, raw
 ESO serialization, actual-weather execution, and cross-year traversal or
 reprojection remain outside the claim.
 
+## Immutable Schedule Cache Infrastructure Checkpoint
+
+This checkpoint changes Rust representation and consumer wiring only. It adds
+no EnergyPlus oracle case, algorithm promotion, object promotion, or variable
+promotion. The existing schedule evidence and tolerances remain the numerical
+authority.
+
+The immutable cache is owned by these Rust targets:
+
+| Rust target | Infrastructure responsibility |
+|---|---|
+| `ep_runtime::schedules::ScheduleSeriesCache` | owns one source-ordered set of schedule entries for one time axis and provides typed-ID lookup |
+| `ep_runtime::schedules::ScheduleSampleStorage` | represents an immutable repeated scalar without a dense sample array, or a varying series as a boxed dense array |
+| `ep_runtime::schedules::ScheduleCacheProfile` | reports deterministic scalar/dense series counts, logical and dense-allocated sample counts, index kind, and distinct ambiguous-ID count |
+| `precompute_schedule_cache_for_time_axis` and `precompute_schedule_cache_for_environment_time_axis` | compile the existing supported schedule families against the shared hourly or environment time axis |
+| the legacy `precompute_schedule_value_series*` functions | materialize `Vec` traces from the cache so existing callers retain their public return types and numerical behavior |
+| `ep_cli` schedule-report consumers | own the cache across report generation and resolve each requested schedule once by typed ID rather than scanning legacy traces |
+| `ep_run::PreparedRuntimeInputs` | owns and prepares the cache, then reports its structural profile without claiming numerical heat-balance or IdealLoads consumption |
+
+Cache construction preserves the established family and source order:
+
+```text
+Schedule:File:Shading generated columns
+  -> Schedule:Constant
+  -> Schedule:Compact
+  -> Schedule:File
+  -> Schedule:Year
+  -> ExternalInterface:Schedule
+  -> ExternalInterface:FunctionalMockupUnitImport:To:Schedule
+  -> ExternalInterface:FunctionalMockupUnitExport:To:Schedule
+```
+
+Sparse, out-of-order, high, and duplicate public `ScheduleId` values do not
+size an array by the maximum ID. Identity-ordered IDs use direct slot lookup;
+all other shapes use a bounded sorted-pair index. Duplicate lookup remains
+compatible with the former source-order scan: the first source-order entry
+wins, while every entry remains present during source-order iteration and the
+profile records the number of distinct ambiguous IDs.
+
+`Schedule:Constant`, inactive `ExternalInterface:Schedule`, inactive FMU import
+To Schedule, and inactive FMU export To Schedule each store one scalar plus the
+logical sample count. The structural tests require four such families to report
+zero dense allocated samples. Varying Compact, File, File:Shading, and Year
+series remain dense.
+
+The compatibility invariant is the legacy numerical result, not a new
+EnergyPlus behavior claim. Cache tests compare legacy and cache entry identity,
+name, kind, length, source order, and every value; finite values retain their
+exact `f64` bits and existing fail-closed NaN positions remain NaN. The legacy
+adapters deliberately rematerialize scalar arrays, so their allocation behavior
+is not performance evidence.
+
+`ScheduleCacheProfile` is deterministic representation evidence only. It is not
+a wall-clock benchmark and does not prove that heat-balance or IdealLoads
+numerical calculations consume schedule-cache values. This checkpoint also
+does not claim a weather-cache redesign, cache sharing across environments or
+repeated runs, live EMS/current-value mutation, live ExternalInterface/FMU
+exchange, or any new ScheduleManager routine completion.
+
 ## Current Rust Boundary
 
 | Boundary | Current Rust status | Missing source behavior |
