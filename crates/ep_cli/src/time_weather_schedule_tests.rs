@@ -3,10 +3,13 @@ use std::collections::BTreeSet;
 use ep_conformance::{
     OutputFrequency, OutputRequest, SourceArtifact, TimestampContract, VariableClass,
 };
-use ep_model::{NormalizedName, ScheduleCompact, ScheduleCompactSegment, ScheduleId, TypedModel};
+use ep_model::{
+    DayOfWeek, FirstHourInterpolationStartingValues, NormalizedName, RunPeriod, RunPeriodId,
+    ScheduleCompact, ScheduleCompactSegment, ScheduleId, TimestepConfig, TypedModel,
+};
 use ep_runtime::{
-    DayType, DaylightSavingPeriodSource, EpwCalendarMetadata, EpwRecord,
-    ResolvedDaylightSavingDate, ResolvedDaylightSavingPeriod,
+    DayType, DaylightSavingPeriodSource, EpwCalendarDateRule, EpwCalendarMetadata,
+    EpwDaylightSavingPeriod, EpwRecord, ResolvedDaylightSavingDate, ResolvedDaylightSavingPeriod,
     build_hourly_time_axis_with_weather_metadata,
 };
 
@@ -175,6 +178,85 @@ fn daylight_saving_reports_distinguish_input_file_precedence()
         "\"resolved_period\": {\"start_month\": 2, \"start_day\": 28, \"start_day_of_year\": 59, \"end_month\": 2, \"end_day\": 29, \"end_day_of_year\": 60, \"wraps_year\": false}"
     ));
     assert!(json.contains("\"daylight_saving_hourly_samples\": 1"));
+    Ok(())
+}
+
+#[test]
+fn daylight_saving_reports_cross_year_start_year_projection()
+-> Result<(), Box<dyn std::error::Error>> {
+    let run_period = RunPeriod {
+        id: RunPeriodId(0),
+        name: NormalizedName::new("Cross Year DST"),
+        begin_month: 12,
+        begin_day_of_month: 30,
+        begin_year: Some(2031),
+        end_month: 1,
+        end_day_of_month: 2,
+        end_year: Some(2032),
+        day_of_week_for_start_day: Some(DayOfWeek::Tuesday),
+        first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues::Hour24,
+        use_weather_file_holidays_and_special_days: false,
+        use_weather_file_daylight_saving_period: true,
+        apply_weekend_holiday_rule: false,
+        use_weather_file_rain_indicators: false,
+        use_weather_file_snow_indicators: false,
+        treat_weather_as_actual: false,
+    };
+    let model = TypedModel {
+        timestep: TimestepConfig {
+            number_of_timesteps_per_hour: 1,
+        },
+        run_periods: vec![run_period],
+        ..TypedModel::default()
+    };
+    let metadata = EpwCalendarMetadata {
+        leap_year_observed: true,
+        daylight_saving_period: Some(EpwDaylightSavingPeriod {
+            start: EpwCalendarDateRule::NthWeekdayInMonth {
+                nth: 1,
+                weekday: DayOfWeek::Thursday,
+                month: 1,
+            },
+            end: EpwCalendarDateRule::NthWeekdayInMonth {
+                nth: 1,
+                weekday: DayOfWeek::Friday,
+                month: 1,
+            },
+        }),
+        holidays: Vec::new(),
+    };
+    let time_axis = build_hourly_time_axis_with_weather_metadata(&model, &metadata)
+        .map_err(std::io::Error::other)?;
+
+    let mut markdown = String::new();
+    append_daylight_saving_markdown(&mut markdown, &time_axis);
+    assert!(markdown.contains("weather_file_daylight_saving_period_declared: true\n"));
+    assert!(markdown.contains("run_period_uses_weather_file_daylight_saving_period: true\n"));
+    assert!(markdown.contains("input_file_daylight_saving_period_declared: false\n"));
+    assert!(markdown.contains("daylight_saving_active: true\n"));
+    assert!(markdown.contains("daylight_saving_effective_source: weather-file\n"));
+    assert!(
+        markdown.contains("daylight_saving_resolved_period: 1/2 through 1/3 (wraps_year=false)\n")
+    );
+    assert!(markdown.contains("daylight_saving_hourly_samples: 24\n"));
+
+    let json = weather_calendar_json(&time_axis);
+    assert!(json.contains("\"start_year\": 2031"));
+    assert!(json.contains("\"end_year\": 2032"));
+    assert!(json.contains("\"start_year_gregorian_leap\": false"));
+    assert!(json.contains("\"start_year_weather_effective_leap\": false"));
+    assert!(json.contains("\"end_year_gregorian_leap\": true"));
+    assert!(json.contains("\"end_year_weather_effective_leap\": true"));
+    assert!(json.contains("\"weather_file_period_declared\": true"));
+    assert!(json.contains("\"run_period_uses_weather_file_period\": true"));
+    assert!(json.contains("\"input_file_period_declared\": false"));
+    assert!(json.contains("\"active\": true"));
+    assert!(json.contains("\"effective_source\": \"weather-file\""));
+    assert!(json.contains(
+        "\"resolved_period\": {\"start_month\": 1, \"start_day\": 2, \"start_day_of_year\": 2, \"end_month\": 1, \"end_day\": 3, \"end_day_of_year\": 3, \"wraps_year\": false}"
+    ));
+    assert!(json.contains("\"daylight_saving_hourly_samples\": 24"));
+
     Ok(())
 }
 

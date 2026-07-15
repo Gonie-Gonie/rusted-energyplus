@@ -347,6 +347,12 @@
                          "help":  "Gate exact cross-year input-file special-day start-year annual-table projection and ordered hourly day types."
                      },
                      {
+                         "name":  "compare-calendar-epw-dst-cross-year-start-year-projection-exact",
+                         "path":  "compare\\compare-calendar-epw-dst-cross-year-start-year-projection-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact cross-year EPW daylight-saving start-year annual-table projection and ordered hourly state."
+                     },
+                     {
                          "name":  "compare-calendar-special-day-fixed-date-exact",
                          "path":  "compare\\compare-calendar-special-day-fixed-date-exact.ps1",
                          "group":  "compare",

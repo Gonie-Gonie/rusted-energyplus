@@ -123,6 +123,20 @@ CLAIM_BOUNDARY = (
     "remain unit/source evidence or unclaimed. RunPeriodControl:DaylightSavingTime behavior beyond "
     "the exact fixed-date precedence case, DST-shifted schedule lookup, hour-24 rollover, and Rust "
     "raw ESO serialization remain outside this checkpoint. "
+    "The cross-year start-year DST case separately proves only one non-actual, single-DATA-PERIOD, "
+    "one-record-per-hour transition from 2031-12-30 through 2032-01-02. Its EPW declares "
+    "`1st Thursday in January` through `1st Friday in January`; EnergyPlus 26.1 resolves that "
+    "pair against the 2031 environment-start annual table as January 2 through January 3. The gate "
+    "locks 96 ordered, exact, unique, zero-tolerance Site Daylight Saving Time Status values and "
+    "timestamps in daily order 0/0/0/1, with exactly 24 active and 72 inactive hours, all 96 raw "
+    "EnergyPlus ESO values and timestamp rows, Environment,CROSS YEAR DST START YEAR RUN PERIOD,"
+    "WeatherFileRunPeriod,12/30/2031,01/02/2032,Tuesday,4,Use RunPeriod Specified Day,Yes,No,No,"
+    "No,No,Clark and Allen, and Environment:Daylight Saving,Yes,WeatherFile,01/02,01/03, plus clean "
+    "0 Warning/0 Severe completion. EnergyPlus 26.1 source separately maps the January 2 result "
+    "to prefetch before the January 1 annual-table reset; that internal buffer order is not an "
+    "ESO/EIO-emitted field. January 3 and later annual reset or "
+    "reprojection, multiple year boundaries or DATA PERIODS, actual weather, and DST schedule-clock "
+    "or tomorrow semantics remain unclaimed. "
     "The cross-year start-year special-day case separately proves only one non-actual, single-DATA-"
     "PERIOD, one-record-per-hour transition from 2031-12-30 through 2032-01-02. Its explicit "
     "Tuesday-start RunPeriod and single input-file `1st Thursday in January` Holiday are resolved "
@@ -256,6 +270,7 @@ CASE_LABELS = {
     "calendar_epw_dst_weekday_rules_hourly_exact_001": "EPW DST weekday pair",
     "calendar_epw_dst_southern_wrap_hourly_exact_001": "EPW DST southern wrap",
     "calendar_epw_dst_southern_wrap_start_hourly_exact_001": "EPW DST southern start",
+    "calendar_epw_dst_cross_year_start_year_projection_hourly_exact_001": "Cross-year start-year DST",
     "calendar_special_day_fixed_date_hourly_exact_001": "Calendar special day",
     "calendar_special_day_cross_year_start_year_projection_hourly_exact_001": "Cross-year start-year holiday",
     "calendar_special_day_nth_weekday_hourly_exact_001": "IDF fourth Sunday",
@@ -422,6 +437,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_southern_wrap_start_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_southern_wrap_start_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_southern_wrap_start_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Cross-year start-year DST",
+        command="compare-calendar-epw-dst-cross-year-start-year-projection-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_cross_year_start_year_projection_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_cross_year_start_year_projection_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_cross_year_start_year_projection_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="Calendar special day",

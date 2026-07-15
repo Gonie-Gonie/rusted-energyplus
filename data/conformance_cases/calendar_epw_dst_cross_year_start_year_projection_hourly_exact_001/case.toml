@@ -1,0 +1,59 @@
+id = "calendar_epw_dst_cross_year_start_year_projection_hourly_exact_001"
+title = "Cross-year EPW daylight-saving start-year annual-table projection"
+milestone = "full-source-order-calendar-epw-dst-cross-year-start-year-projection"
+purpose = "Block on exact ordered hourly daylight-saving state when a non-actual RunPeriod crosses one year boundary, and separately source-map the January 2 result to the environment start-year Nth-weekday table retained through the already-prefetched final day."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The explicit RunPeriod spans only 2031-12-30 through 2032-01-02 and declares Tuesday as its start weekday. EnergyPlus 26.1 resolves the EPW 1st Thursday in January through 1st Friday in January daylight-saving period against the 2031 environment-start annual table as January 2 through January 3.",
+  "The zero-tolerance external claim is exactly 96 ordered, unique Site Daylight Saving Time Status samples and timestamps in daily order 0, 0, 0, 1, with exactly 24 active and 72 inactive hours. EnergyPlus 26.1 source separately maps January 2 retention to ReadEPlusWeatherForDay prefetch before the later January 1 annual-table reset; that internal buffer order is not an ESO/EIO-emitted field.",
+  "The EPW has one wrapping DATA PERIOD, one record per hour, four source days, Leap Year Observed=Yes, the exact Nth-weekday daylight-saving range, no holidays, and deliberately non-semantic row years because Treat Weather as Actual is No.",
+  "This case proves only one non-actual December-to-January transition, environment-start-year Nth-weekday DST projection through the already-prefetched January 2, ordered source-day traversal, and clean completion. January 3 and later annual resets or reprojection, multiple year boundaries, February 29 traversal, actual weather, input-file daylight saving, DST-shifted schedule lookup, warmup lifecycle parity, records per hour greater than one, multiple data periods, broad WeatherManager behavior, and broad schedule behavior remain outside the claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_epw_dst_cross_year_start_year_projection_hourly_exact_001/calendar_epw_dst_cross_year_start_year_projection_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_epw_dst_cross_year_start_year_projection_hourly_exact_001/calendar_epw_dst_cross_year_start_year_projection_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_epw_dst_cross_year_start_year_projection_hourly_exact_001/calendar_epw_dst_cross_year_start_year_projection_hourly_exact.epw"
+
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Daylight Saving Time Status"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_epw_dst_cross_year_start_year_projection_hourly_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-epw-dst-cross-year-start-year-projection-exact"
+blocking = true

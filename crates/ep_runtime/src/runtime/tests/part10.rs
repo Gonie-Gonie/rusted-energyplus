@@ -334,6 +334,110 @@ fn weather_file_daylight_saving_range_wraps_across_the_weather_year()
 }
 
 #[test]
+fn cross_year_daylight_saving_reuses_the_source_start_year_annual_table()
+-> Result<(), Box<dyn std::error::Error>> {
+    let mut run_period = test_run_period("Cross Year DST", 12, 30, 1, 2);
+    run_period.begin_year = Some(2031);
+    run_period.end_year = Some(2032);
+    run_period.day_of_week_for_start_day = Some(DayOfWeek::Tuesday);
+    let metadata = EpwCalendarMetadata {
+        leap_year_observed: true,
+        daylight_saving_period: Some(EpwDaylightSavingPeriod {
+            start: EpwCalendarDateRule::NthWeekdayInMonth {
+                nth: 1,
+                weekday: DayOfWeek::Thursday,
+                month: 1,
+            },
+            end: EpwCalendarDateRule::NthWeekdayInMonth {
+                nth: 1,
+                weekday: DayOfWeek::Friday,
+                month: 1,
+            },
+        }),
+        holidays: Vec::new(),
+    };
+    let hourly_axis =
+        build_hourly_time_axis_for_run_period_with_weather_metadata(&run_period, &metadata)?;
+    let weather_calendar = hourly_axis
+        .weather_calendar
+        .as_ref()
+        .expect("cross-year axis has a weather calendar");
+    assert_eq!(weather_calendar.gregorian.start_year, 2031);
+    assert_eq!(weather_calendar.gregorian.end_year, 2032);
+    assert!(!weather_calendar.start_year_is_weather_effective_leap_year);
+    assert!(weather_calendar.end_year_is_weather_effective_leap_year);
+    assert!(hourly_axis.daylight_saving.weather_file_period_declared);
+    assert!(
+        hourly_axis
+            .daylight_saving
+            .run_period_uses_weather_file_period
+    );
+    assert!(!hourly_axis.daylight_saving.input_file_period_declared);
+    assert_eq!(
+        hourly_axis.daylight_saving.effective_source,
+        crate::DaylightSavingPeriodSource::WeatherFile
+    );
+    let resolved = hourly_axis
+        .daylight_saving
+        .resolved_period
+        .expect("active cross-year DST has a resolved period");
+
+    assert_eq!(
+        (
+            resolved.start.month,
+            resolved.start.day_of_month,
+            resolved.start.day_of_year,
+        ),
+        (1, 2, 2)
+    );
+    assert_eq!(
+        (
+            resolved.end.month,
+            resolved.end.day_of_month,
+            resolved.end.day_of_year,
+        ),
+        (1, 3, 3)
+    );
+    assert!(!resolved.wraps_year);
+    assert_eq!(hourly_axis.sample_count(), 96);
+    assert_eq!(
+        hourly_axis.points.iter().filter(|point| point.dst).count(),
+        24
+    );
+    assert_hourly_day_dst(&hourly_axis, 12, 30, false);
+    assert_hourly_day_dst(&hourly_axis, 12, 31, false);
+    assert_hourly_day_dst(&hourly_axis, 1, 1, false);
+    assert_hourly_day_dst(&hourly_axis, 1, 2, true);
+
+    let model = TypedModel {
+        timestep: TimestepConfig {
+            number_of_timesteps_per_hour: 1,
+        },
+        run_periods: vec![run_period],
+        ..TypedModel::default()
+    };
+    let environment_axes = build_environment_time_axes_with_weather_metadata(&model, &metadata)?;
+    assert_eq!(environment_axes.len(), 1);
+    let environment_axis = &environment_axes[0];
+    assert_eq!(environment_axis.sample_count(), 96);
+    assert_eq!(environment_axis.daylight_saving, hourly_axis.daylight_saving);
+    assert_eq!(
+        environment_axis
+            .points
+            .iter()
+            .filter(|point| point.dst)
+            .count(),
+        24
+    );
+    assert_environment_day_dst(environment_axis, 12, 30, false);
+    assert_environment_day_dst(environment_axis, 12, 31, false);
+    assert_environment_day_dst(environment_axis, 1, 1, false);
+    assert_environment_day_dst(environment_axis, 1, 2, true);
+
+    Ok(())
+}
+
+#[test]
 fn run_period_can_disable_the_declared_weather_file_daylight_saving_period()
 -> Result<(), Box<dyn std::error::Error>> {
     let mut run_period = full_year_2017_run_period("Disabled DST");
