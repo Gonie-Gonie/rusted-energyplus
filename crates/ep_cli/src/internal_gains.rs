@@ -140,7 +140,13 @@ pub(crate) fn run_compare_internal_convective_gain(args: &[String]) -> i32 {
         .map(|(_id, _name, values)| values.len())
         .max()
         .unwrap_or(0);
-    let traces = simulate_zone_internal_convective_gains(model, sample_count);
+    let traces = match simulate_zone_internal_convective_gains(model, sample_count) {
+        Ok(traces) => traces,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
     let mut passed = true;
 
     println!("Internal Convective Gain Comparison");
@@ -393,11 +399,13 @@ fn observed_samples(
         .eq_ignore_ascii_case(ZONE_TOTAL_INTERNAL_CONVECTIVE_HEATING_RATE_VARIABLE)
     {
         simulate_zone_internal_convective_gains(model, time_axis.sample_count())
+            .map_err(|error| error.to_string())?
     } else if output
         .variable
         .eq_ignore_ascii_case(ZONE_TOTAL_INTERNAL_RADIANT_HEATING_RATE_VARIABLE)
     {
         simulate_zone_internal_radiant_gains(model, time_axis.sample_count())
+            .map_err(|error| error.to_string())?
     } else {
         return Err(format!(
             "unsupported internal gain output variable: {}",

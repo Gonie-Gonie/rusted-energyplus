@@ -6,7 +6,7 @@ use crate::heat_balance::{
     surface_thermal_properties,
 };
 use crate::psychrometrics::energyplus_standard_zone_air_heat_capacity_j_per_k;
-use crate::schedules::internal_gain_w;
+use crate::schedules::{internal_gain_w, validate_hour_only_internal_gain_schedules};
 use crate::{OutputSeries, ResultStore, RuntimeError, SimulationMode, SimulationState, ZoneState};
 use ep_model::{
     OutputHandle, OutsideBoundaryCondition, SimulationModel, SurfaceId, SurfaceType, Zone, ZoneId,
@@ -86,6 +86,7 @@ pub fn simulate_first_zone_uncontrolled(
     }
 
     let zone = model.typed.zones.first().ok_or(RuntimeError::NoZones)?;
+    validate_hour_only_internal_gain_schedules(&model.typed)?;
     let characteristics = derive_first_zone_characteristics(
         model,
         zone,

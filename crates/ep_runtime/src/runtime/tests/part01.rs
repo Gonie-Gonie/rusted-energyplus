@@ -115,7 +115,7 @@
         meter_rate_to_energy_j, meter_value_is_zero_near_j,
     };
     use ep_model::{
-        AutoOrNumber, AutosizeOrNumber, Construction, ConstructionId, DayOfWeek,
+        AutoOrNumber, AutosizeOrNumber, CalendarDateRule, Construction, ConstructionId, DayOfWeek,
         DehumidificationControlType, DemandControlledVentilationType,
         FirstHourInterpolationStartingValues, HeatRecoveryType, HumidificationControlType,
         IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
@@ -124,14 +124,105 @@
         OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutputHandle,
         OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
         PeopleNumberCalculationMethod, Point3, RunPeriod, RunPeriodId, ScheduleCompact,
-        ScheduleCompactSegment, ScheduleConstant, ScheduleId, SimulationModel, SiteLocation,
-        SunExposure, Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType,
-        ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, TypedModel, WindExposure, Zone,
+        ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant,
+        ScheduleDayType, ScheduleId, SimulationModel, SiteLocation, SunExposure, Surface, SurfaceId,
+        SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
+        ThermostatSetpointId, TimestepConfig, TypedModel, WindExposure, Zone,
         ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
         ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId, ZoneThermostat,
         ZoneThermostatControl, ZoneThermostatId,
     };
     use std::collections::BTreeMap;
+
+    fn all_schedule_day_types() -> Vec<ScheduleDayType> {
+        vec![
+            ScheduleDayType::Sunday,
+            ScheduleDayType::Monday,
+            ScheduleDayType::Tuesday,
+            ScheduleDayType::Wednesday,
+            ScheduleDayType::Thursday,
+            ScheduleDayType::Friday,
+            ScheduleDayType::Saturday,
+            ScheduleDayType::Holiday,
+            ScheduleDayType::SummerDesignDay,
+            ScheduleDayType::WinterDesignDay,
+            ScheduleDayType::CustomDay1,
+            ScheduleDayType::CustomDay2,
+        ]
+    }
+
+    fn compact_day_profile(
+        day_types: Vec<ScheduleDayType>,
+        value: f64,
+    ) -> ScheduleCompactDayProfile {
+        ScheduleCompactDayProfile {
+            day_types,
+            segments: vec![ScheduleCompactSegment {
+                until_minute_of_day: 24 * 60,
+                value,
+            }],
+        }
+    }
+
+    fn cross_year_day_type_compact_schedule(id: ScheduleId) -> ScheduleCompact {
+        let period_one_other_days = all_schedule_day_types()
+            .into_iter()
+            .filter(|day_type| *day_type != ScheduleDayType::Thursday)
+            .collect();
+        let period_two_other_days = all_schedule_day_types()
+            .into_iter()
+            .filter(|day_type| {
+                !matches!(
+                    day_type,
+                    ScheduleDayType::Tuesday
+                        | ScheduleDayType::Wednesday
+                        | ScheduleDayType::Holiday
+                )
+            })
+            .collect();
+        ScheduleCompact {
+            id,
+            name: NormalizedName::new("Cross Year Day Type"),
+            schedule_type_limits: None,
+            periods: vec![
+                ScheduleCompactPeriod {
+                    through_schedule_day_of_year: 1,
+                    day_profiles: vec![
+                        compact_day_profile(vec![ScheduleDayType::Thursday], 105.0),
+                        compact_day_profile(period_one_other_days, 199.0),
+                    ],
+                },
+                ScheduleCompactPeriod {
+                    through_schedule_day_of_year: 366,
+                    day_profiles: vec![
+                        compact_day_profile(vec![ScheduleDayType::Tuesday], 103.0),
+                        compact_day_profile(vec![ScheduleDayType::Wednesday], 104.0),
+                        compact_day_profile(vec![ScheduleDayType::Holiday], 108.0),
+                        compact_day_profile(period_two_other_days, 199.0),
+                    ],
+                },
+            ],
+        }
+    }
+
+    fn day_type_varying_annual_compact_schedule(id: ScheduleId) -> ScheduleCompact {
+        let other_days = all_schedule_day_types()
+            .into_iter()
+            .filter(|day_type| *day_type != ScheduleDayType::Tuesday)
+            .collect();
+        ScheduleCompact {
+            id,
+            name: NormalizedName::new("Day Type Varying"),
+            schedule_type_limits: None,
+            periods: vec![ScheduleCompactPeriod {
+                through_schedule_day_of_year: 366,
+                day_profiles: vec![
+                    compact_day_profile(vec![ScheduleDayType::Tuesday], 1.0),
+                    compact_day_profile(other_days, 2.0),
+                ],
+            }],
+        }
+    }
 
     fn two_day_solar_weather_records() -> Vec<EpwRecord> {
         (0..48)
@@ -645,23 +736,29 @@
             id: ScheduleId(0),
             name: NormalizedName::new("Office Occupancy"),
             schedule_type_limits: None,
-            segments: vec![
-                ScheduleCompactSegment {
-                    until_minute_of_day: 8 * 60,
-                    value: 0.0,
-                },
-                ScheduleCompactSegment {
-                    until_minute_of_day: 18 * 60,
-                    value: 1.0,
-                },
-                ScheduleCompactSegment {
-                    until_minute_of_day: 24 * 60,
-                    value: 0.0,
-                },
-            ],
+            periods: vec![ScheduleCompactPeriod {
+                through_schedule_day_of_year: 366,
+                day_profiles: vec![ScheduleCompactDayProfile {
+                    day_types: all_schedule_day_types(),
+                    segments: vec![
+                        ScheduleCompactSegment {
+                            until_minute_of_day: 8 * 60,
+                            value: 0.0,
+                        },
+                        ScheduleCompactSegment {
+                            until_minute_of_day: 18 * 60,
+                            value: 1.0,
+                        },
+                        ScheduleCompactSegment {
+                            until_minute_of_day: 24 * 60,
+                            value: 0.0,
+                        },
+                    ],
+                }],
+            }],
         });
 
-        let traces = simulate_schedule_values(&model, 24);
+        let traces = simulate_schedule_values(&model, 24)?;
 
         assert_eq!(traces.len(), 1);
         assert_eq!(traces[0].values[7], 0.0);
@@ -688,7 +785,8 @@
     }
 
     #[test]
-    fn schedule_value_series_precomputes_supported_schedules() {
+    fn schedule_value_series_precomputes_supported_schedules()
+    -> Result<(), Box<dyn std::error::Error>> {
         let mut model = TypedModel::default();
         model.schedules.push(ScheduleConstant {
             id: ScheduleId(0),
@@ -697,11 +795,12 @@
             hourly_value: 0.75,
         });
 
-        let series = precompute_schedule_value_series(&model, 4);
+        let series = precompute_schedule_value_series(&model, 4)?;
 
         assert_eq!(series.len(), 1);
         assert_eq!(series[0].schedule_name, "ALWAYSON");
         assert_eq!(series[0].values, vec![0.75, 0.75, 0.75, 0.75]);
+        Ok(())
     }
 
     #[test]
@@ -759,25 +858,251 @@
     }
 
     #[test]
-    fn zone_internal_convective_gain_trace_excludes_radiant_fraction() {
+    fn compact_schedule_time_axis_consumes_cross_year_period_day_type_and_hour()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let schedule_id = ScheduleId(41);
+        let model = TypedModel {
+            timestep: TimestepConfig {
+                number_of_timesteps_per_hour: 1,
+            },
+            run_periods: vec![RunPeriod {
+                id: RunPeriodId(0),
+                name: NormalizedName::new("Cross Year Schedule"),
+                begin_month: 12,
+                begin_day_of_month: 30,
+                begin_year: Some(2031),
+                end_month: 1,
+                end_day_of_month: 3,
+                end_year: Some(2032),
+                day_of_week_for_start_day: Some(DayOfWeek::Tuesday),
+                first_hour_interpolation_starting_values:
+                    FirstHourInterpolationStartingValues::Hour24,
+                use_weather_file_holidays_and_special_days: false,
+                use_weather_file_daylight_saving_period: false,
+                apply_weekend_holiday_rule: false,
+                use_weather_file_rain_indicators: false,
+                use_weather_file_snow_indicators: false,
+                treat_weather_as_actual: false,
+            }],
+            run_period_special_days: vec![RunPeriodSpecialDay {
+                id: RunPeriodSpecialDayId(0),
+                name: NormalizedName::new("January Second Holiday"),
+                start_date: CalendarDateRule::MonthDay {
+                    month: 1,
+                    day_of_month: 2,
+                },
+                duration_days: 1,
+                special_day_type: SpecialDayType::Holiday,
+            }],
+            compact_schedules: vec![cross_year_day_type_compact_schedule(schedule_id)],
+            ..TypedModel::default()
+        };
+
+        let axis = build_hourly_time_axis(&model)?;
+        assert_eq!(axis.sample_count(), 120);
+        assert_eq!(
+            axis.points
+                .chunks_exact(24)
+                .map(|day| day[0].schedule_day_of_year)
+                .collect::<Vec<_>>(),
+            vec![365, 366, 1, 2, 3]
+        );
+        assert_eq!(
+            axis.points
+                .chunks_exact(24)
+                .map(|day| day[0].day_type)
+                .collect::<Vec<_>>(),
+            vec![
+                crate::DayType::Tuesday,
+                crate::DayType::Wednesday,
+                crate::DayType::Thursday,
+                crate::DayType::Holiday,
+                crate::DayType::Saturday,
+            ]
+        );
+
+        let series = precompute_schedule_value_series_for_time_axis(&model, &axis);
+        assert_eq!(series.len(), 1);
+        assert_eq!(series[0].schedule_id, schedule_id);
+        assert_eq!(series[0].values.len(), 120);
+        assert_eq!(
+            series[0]
+                .values
+                .chunks_exact(24)
+                .map(|day| day[0])
+                .collect::<Vec<_>>(),
+            vec![103.0, 104.0, 105.0, 108.0, 199.0]
+        );
+        assert!(
+            series[0]
+                .values
+                .chunks_exact(24)
+                .all(|day| day.iter().all(|value| *value == day[0]))
+        );
+        match &series[0].kind {
+            ScheduleSeriesKind::CompactCalendarProfiles { periods } => {
+                assert_eq!(periods.len(), 2);
+                assert_eq!(periods[0].through_schedule_day_of_year, 1);
+                assert_eq!(periods[1].through_schedule_day_of_year, 366);
+            }
+            other => {
+                return Err(std::io::Error::other(format!(
+                    "expected compact calendar profiles, got {other:?}"
+                ))
+                .into());
+            }
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn compact_schedule_time_axis_selects_until_segment_by_hour()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let schedule_id = ScheduleId(44);
+        let model = TypedModel {
+            compact_schedules: vec![ScheduleCompact {
+                id: schedule_id,
+                name: NormalizedName::new("Calendar Aware Until"),
+                schedule_type_limits: None,
+                periods: vec![ScheduleCompactPeriod {
+                    through_schedule_day_of_year: 366,
+                    day_profiles: vec![ScheduleCompactDayProfile {
+                        day_types: all_schedule_day_types(),
+                        segments: vec![
+                            ScheduleCompactSegment {
+                                until_minute_of_day: 8 * 60,
+                                value: 1.0,
+                            },
+                            ScheduleCompactSegment {
+                                until_minute_of_day: 24 * 60,
+                                value: 2.0,
+                            },
+                        ],
+                    }],
+                }],
+            }],
+            ..TypedModel::default()
+        };
+        let axis = build_hourly_time_axis(&model)?;
+        let series = precompute_schedule_value_series_for_time_axis(&model, &axis);
+
+        assert_eq!(series.len(), 1);
+        assert_eq!(series[0].values[..8], [1.0; 8]);
+        assert_eq!(series[0].values[8..], [2.0; 16]);
+        Ok(())
+    }
+
+    #[test]
+    fn hour_only_schedule_consumers_reject_calendar_variation_and_missing_ids()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let schedule_id = ScheduleId(42);
+        let schedule = day_type_varying_annual_compact_schedule(schedule_id);
+        let model = TypedModel {
+            compact_schedules: vec![schedule.clone()],
+            ..TypedModel::default()
+        };
+        let error = match precompute_schedule_value_series(&model, 24) {
+            Ok(_) => {
+                return Err(std::io::Error::other(
+                    "hour-only schedule series accepted calendar variation",
+                )
+                .into());
+            }
+            Err(error) => error,
+        };
+        assert!(error.contains("varies by day type"));
+
+        let multi_period_model = TypedModel {
+            compact_schedules: vec![cross_year_day_type_compact_schedule(ScheduleId(43))],
+            ..TypedModel::default()
+        };
+        let multi_period_error = match precompute_schedule_value_series(&multi_period_model, 24) {
+            Ok(_) => {
+                return Err(std::io::Error::other(
+                    "hour-only schedule series accepted multiple Through periods",
+                )
+                .into());
+            }
+            Err(error) => error,
+        };
+        assert!(multi_period_error.contains("hour-only consumers require one"));
+
+        let mut gain_model = cube_model();
+        gain_model.other_equipment[0].schedule = Some(schedule_id);
+        gain_model.compact_schedules.push(schedule);
+        let gain_error = simulate_zone_internal_convective_gains(&gain_model, 2)
+            .expect_err("calendar-varying internal-gain schedule must be rejected");
+        assert!(matches!(
+            gain_error,
+            RuntimeError::InvalidInternalGainSchedule {
+                schedule_id: 42,
+                ..
+            }
+        ));
+
+        let simulation_model = SimulationModel::from_typed(gain_model);
+        assert!(matches!(
+            initialize_heat_balance_state(&simulation_model, 20.0),
+            Err(RuntimeError::InvalidInternalGainSchedule {
+                schedule_id: 42,
+                ..
+            })
+        ));
+        assert!(matches!(
+            simulate_first_zone_uncontrolled(
+                &simulation_model,
+                &[10.0],
+                FirstZoneSimulationOptions::hourly_samples(1),
+            ),
+            Err(RuntimeError::InvalidInternalGainSchedule {
+                schedule_id: 42,
+                ..
+            })
+        ));
+
+        let mut missing_schedule_model = cube_model();
+        missing_schedule_model.other_equipment[0].schedule = Some(ScheduleId(999));
+        let missing_convective = simulate_zone_internal_convective_gains(&missing_schedule_model, 2)
+            .expect_err("missing convective schedule must be rejected");
+        let missing_radiant = simulate_zone_internal_radiant_gains(&missing_schedule_model, 2)
+            .expect_err("missing radiant schedule must be rejected");
+        for error in [missing_convective, missing_radiant] {
+            assert!(matches!(
+                error,
+                RuntimeError::InvalidInternalGainSchedule {
+                    schedule_id: 999,
+                    ..
+                }
+            ));
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn zone_internal_convective_gain_trace_excludes_radiant_fraction()
+    -> Result<(), Box<dyn std::error::Error>> {
         let mut model = cube_model();
         model.other_equipment[0].fraction_radiant = 0.25;
 
-        let traces = simulate_zone_internal_convective_gains(&model, 2);
+        let traces = simulate_zone_internal_convective_gains(&model, 2)?;
 
         assert_eq!(traces.len(), 1);
         assert_eq!(traces[0].zone_name, "ZONE ONE");
         assert_eq!(traces[0].values_w, vec![9.0, 9.0]);
 
-        let radiant_traces = simulate_zone_internal_radiant_gains(&model, 2);
+        let radiant_traces = simulate_zone_internal_radiant_gains(&model, 2)?;
 
         assert_eq!(radiant_traces.len(), 1);
         assert_eq!(radiant_traces[0].zone_name, "ZONE ONE");
         assert_eq!(radiant_traces[0].values_w, vec![3.0, 3.0]);
+        Ok(())
     }
 
     #[test]
-    fn other_equipment_design_level_methods_drive_internal_gains() {
+    fn other_equipment_design_level_methods_drive_internal_gains()
+    -> Result<(), Box<dyn std::error::Error>> {
         let mut area_model = cube_model();
         area_model.other_equipment[0].design_level_calculation_method =
             OtherEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea;
@@ -787,8 +1112,8 @@
         area_model.other_equipment[0].fraction_radiant = 0.2;
         area_model.other_equipment[0].fraction_lost = 0.3;
 
-        let area_trace = simulate_zone_internal_convective_gains(&area_model, 1);
-        let area_radiant_trace = simulate_zone_internal_radiant_gains(&area_model, 1);
+        let area_trace = simulate_zone_internal_convective_gains(&area_model, 1)?;
+        let area_radiant_trace = simulate_zone_internal_radiant_gains(&area_model, 1)?;
 
         assert!((area_trace[0].values_w[0] - 8.0).abs() < 1.0e-12);
         assert!((area_radiant_trace[0].values_w[0] - 4.0).abs() < 1.0e-12);
@@ -810,9 +1135,10 @@
             floor_area_per_person: 0.0,
         });
 
-        let people_trace = simulate_zone_internal_convective_gains(&people_model, 1);
+        let people_trace = simulate_zone_internal_convective_gains(&people_model, 1)?;
 
         assert!((people_trace[0].values_w[0] - 40.5).abs() < 1.0e-12);
+        Ok(())
     }
 
     #[test]

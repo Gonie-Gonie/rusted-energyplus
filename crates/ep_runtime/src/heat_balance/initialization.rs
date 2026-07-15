@@ -20,6 +20,7 @@ use crate::heat_balance::zone_predictor_corrector::energyplus_zone_air_temperatu
 use crate::psychrometrics::energyplus_standard_zone_air_heat_capacity_j_per_k;
 use crate::schedules::{
     convective_internal_gain_w, update_surface_radiant_internal_gain_source_terms,
+    validate_hour_only_internal_gain_schedules,
 };
 use ep_model::SimulationModel;
 
@@ -43,6 +44,7 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
     initial_zone_air_temperature_c: f64,
     ctf_coefficients: &[ConstructionCtfCoefficientOverride],
 ) -> Result<HeatBalanceState, RuntimeError> {
+    validate_hour_only_internal_gain_schedules(&model.typed)?;
     let ctf_coefficients_by_construction = construction_ctf_coefficients_by_name(ctf_coefficients);
     let mut zones = Vec::with_capacity(model.typed.zones.len());
     for zone in &model.typed.zones {

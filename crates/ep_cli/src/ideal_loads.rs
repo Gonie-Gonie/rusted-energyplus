@@ -39,6 +39,7 @@ use ep_model::{
     OutdoorAirEconomizerType, OutputHandle, PeopleNumberCalculationMethod, ScheduleId,
     SimulationModel, SurfaceType, TypedModel, Zone,
 };
+use ep_runtime::schedules::hour_only_single_period_compact_schedule_segments;
 use ep_runtime::{
     EpwRecord, IDEAL_LOADS_ENERGY_OUTPUT_LEVEL_POLICY, IDEAL_LOADS_ENERGY_OUTPUT_TIMESTEP_SOURCE,
     IDEAL_LOADS_FUEL_ENERGY_OUTPUT_LEVEL_POLICY, IDEAL_LOADS_METER_AGGREGATION_SOURCE,
@@ -2319,7 +2320,14 @@ fn ideal_loads_optional_schedule_values(
         .find(|schedule| schedule.id == schedule_id)
         .ok_or_else(|| {
             format!(
-                "IdealLoads {label} supports blank, Schedule:Constant, or all-days Schedule:Compact schedules"
+                "IdealLoads {label} supports blank, Schedule:Constant, or calendar-invariant Schedule:Compact schedules"
+            )
+        })?;
+    let segments =
+        hour_only_single_period_compact_schedule_segments(schedule).map_err(|reason| {
+            format!(
+                "IdealLoads {label} rejects calendar-varying Schedule:Compact {}: {reason}",
+                schedule.name.0
             )
         })?;
     let mut values = Vec::with_capacity(sample_count);
@@ -2332,7 +2340,7 @@ fn ideal_loads_optional_schedule_values(
                 "IdealLoads {label} Schedule:Compact requires timestamped detailed sample {index}"
             )
         })?;
-        let value = compact_schedule_value(&schedule.segments, minute_of_day).ok_or_else(|| {
+        let value = compact_schedule_value(segments, minute_of_day).ok_or_else(|| {
             format!(
                 "IdealLoads {label} schedule {} has no value for minute {}",
                 schedule.name.0, minute_of_day
@@ -4263,9 +4271,15 @@ fn ideal_loads_fuel_efficiency_values(
         .find(|schedule| schedule.id == schedule_id)
         .ok_or_else(|| {
             format!(
-                "IdealLoads {label} fuel energy diagnostic supports blank, Schedule:Constant, or all-days Schedule:Compact fuel efficiency schedules"
+                "IdealLoads {label} fuel energy diagnostic supports blank, Schedule:Constant, or calendar-invariant Schedule:Compact fuel efficiency schedules"
             )
         })?;
+    let segments = hour_only_single_period_compact_schedule_segments(schedule).map_err(|reason| {
+        format!(
+            "IdealLoads {label} fuel energy diagnostic rejects calendar-varying Schedule:Compact {}: {reason}",
+            schedule.name.0
+        )
+    })?;
     let mut values = Vec::with_capacity(sample_count);
     for index in 0..sample_count {
         let timestamp = timestamps
@@ -4276,7 +4290,7 @@ fn ideal_loads_fuel_efficiency_values(
                 "IdealLoads {label} Schedule:Compact fuel efficiency requires timestamped detailed sample {index}"
             )
         })?;
-        let value = compact_schedule_value(&schedule.segments, minute_of_day).ok_or_else(|| {
+        let value = compact_schedule_value(segments, minute_of_day).ok_or_else(|| {
             format!(
                 "IdealLoads {label} fuel efficiency schedule {} has no value for minute {}",
                 schedule.name.0, minute_of_day
@@ -8076,4 +8090,108 @@ fn unsupported_features_label(features: &[IdealLoadsUnsupportedFeature]) -> Stri
         })
         .collect::<Vec<_>>()
         .join(",")
+}
+
+#[cfg(test)]
+mod schedule_boundary_tests {
+    use super::*;
+    use ep_model::{
+        ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
+        ScheduleDayType,
+    };
+
+    fn all_schedule_day_types() -> Vec<ScheduleDayType> {
+        vec![
+            ScheduleDayType::Sunday,
+            ScheduleDayType::Monday,
+            ScheduleDayType::Tuesday,
+            ScheduleDayType::Wednesday,
+            ScheduleDayType::Thursday,
+            ScheduleDayType::Friday,
+            ScheduleDayType::Saturday,
+            ScheduleDayType::Holiday,
+            ScheduleDayType::SummerDesignDay,
+            ScheduleDayType::WinterDesignDay,
+            ScheduleDayType::CustomDay1,
+            ScheduleDayType::CustomDay2,
+        ]
+    }
+
+    fn calendar_varying_schedule(id: ScheduleId) -> ScheduleCompact {
+        let other_days = all_schedule_day_types()
+            .into_iter()
+            .filter(|day_type| *day_type != ScheduleDayType::Tuesday)
+            .collect();
+        ScheduleCompact {
+            id,
+            name: NormalizedName::new("Calendar Varying"),
+            schedule_type_limits: None,
+            periods: vec![ScheduleCompactPeriod {
+                through_schedule_day_of_year: 366,
+                day_profiles: vec![
+                    ScheduleCompactDayProfile {
+                        day_types: vec![ScheduleDayType::Tuesday],
+                        segments: vec![ScheduleCompactSegment {
+                            until_minute_of_day: 24 * 60,
+                            value: 1.0,
+                        }],
+                    },
+                    ScheduleCompactDayProfile {
+                        day_types: other_days,
+                        segments: vec![ScheduleCompactSegment {
+                            until_minute_of_day: 24 * 60,
+                            value: 2.0,
+                        }],
+                    },
+                ],
+            }],
+        }
+    }
+
+    #[test]
+    fn ideal_loads_hour_only_paths_reject_calendar_varying_compact_schedules()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let schedule_id = ScheduleId(41);
+        let model = SimulationModel::from_typed(TypedModel {
+            compact_schedules: vec![calendar_varying_schedule(schedule_id)],
+            ..TypedModel::default()
+        });
+        let timestamps = vec![Some("hour=1;end=60".to_string())];
+
+        let optional_error = match ideal_loads_optional_schedule_values(
+            &model,
+            Some(schedule_id),
+            "availability",
+            1,
+            &timestamps,
+        ) {
+            Ok(_) => {
+                return Err(std::io::Error::other(
+                    "IdealLoads optional schedule accepted calendar variation",
+                )
+                .into());
+            }
+            Err(error) => error,
+        };
+        assert!(optional_error.contains("rejects calendar-varying Schedule:Compact"));
+
+        let fuel_error = match ideal_loads_fuel_efficiency_values(
+            &model,
+            Some(schedule_id),
+            "heating",
+            1,
+            &timestamps,
+        ) {
+            Ok(_) => {
+                return Err(std::io::Error::other(
+                    "IdealLoads fuel schedule accepted calendar variation",
+                )
+                .into());
+            }
+            Err(error) => error,
+        };
+        assert!(fuel_error.contains("rejects calendar-varying Schedule:Compact"));
+
+        Ok(())
+    }
 }

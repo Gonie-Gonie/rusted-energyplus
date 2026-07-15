@@ -1,0 +1,71 @@
+Version,26.1;
+
+Building,
+  Calendar Schedule Compact Through For Day Type Exact Fixture,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+Timestep,4;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+RunPeriod,
+  Through For Day Type Run Period,
+  12,
+  30,
+  2031,
+  1,
+  3,
+  2032,
+  Tuesday,
+  No,   !- Use Weather File Holidays and Special Days
+  No,   !- Use Weather File Daylight Saving Period
+  No,   !- Apply Weekend Holiday Rule
+  No,   !- Use Weather File Rain Indicators
+  No,   !- Use Weather File Snow Indicators
+  No;   !- Treat Weather as Actual
+
+RunPeriodControl:SpecialDays,
+  Cross Year New Year Holiday,
+  1st Thursday in January,
+  1,
+  Holiday;
+
+ScheduleTypeLimits,
+  Any Number;
+
+Schedule:Compact,
+  Through For Day Type Schedule,
+  Any Number,
+  Through: 1/1,
+  For: Thursday,
+  Until: 24:00, 105,
+  For: AllOtherDays,
+  Until: 24:00, 199,
+  Through: 12/31,
+  For: Tuesday,
+  Until: 24:00, 103,
+  For: Wednesday,
+  Until: 24:00, 104,
+  For: Holiday,
+  Until: 24:00, 108,
+  For: AllOtherDays,
+  Until: 24:00, 199;
+
+Output:Variable,
+  Through For Day Type Schedule,
+  Schedule Value,
+  Hourly;
+
+Output:Variable,
+  Environment,
+  Site Day Type Index,
+  Hourly;

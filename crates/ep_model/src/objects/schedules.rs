@@ -46,7 +46,54 @@ pub struct ScheduleCompactSegment {
     pub value: f64,
 }
 
-/// Compact schedule subset using all-days daily `Until` segments.
+/// EnergyPlus schedule day type consumed by `Schedule:Compact` `For` rules.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ScheduleDayType {
+    /// Sunday.
+    Sunday,
+    /// Monday.
+    Monday,
+    /// Tuesday.
+    Tuesday,
+    /// Wednesday.
+    Wednesday,
+    /// Thursday.
+    Thursday,
+    /// Friday.
+    Friday,
+    /// Saturday.
+    Saturday,
+    /// Holiday schedule day.
+    Holiday,
+    /// Summer design-day schedule day.
+    SummerDesignDay,
+    /// Winter design-day schedule day.
+    WinterDesignDay,
+    /// First custom schedule day.
+    CustomDay1,
+    /// Second custom schedule day.
+    CustomDay2,
+}
+
+/// One source-ordered day profile within a compact-schedule period.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ScheduleCompactDayProfile {
+    /// Day types assigned by this `For` rule, after group expansion.
+    pub day_types: Vec<ScheduleDayType>,
+    /// Source-ordered daily `Until` value segments.
+    pub segments: Vec<ScheduleCompactSegment>,
+}
+
+/// One source-ordered `Through` period in a compact schedule.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ScheduleCompactPeriod {
+    /// Leap-shaped schedule ordinal selected by the `Through` date, 1 through 366.
+    pub through_schedule_day_of_year: u16,
+    /// Source-ordered `For` day profiles in this period.
+    pub day_profiles: Vec<ScheduleCompactDayProfile>,
+}
+
+/// Compact schedule using source-ordered `Through`, `For`, and `Until` rules.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ScheduleCompact {
     /// Typed ID.
@@ -55,6 +102,6 @@ pub struct ScheduleCompact {
     pub name: NormalizedName,
     /// Optional type limits.
     pub schedule_type_limits: Option<ScheduleTypeLimitId>,
-    /// Daily all-days value segments.
-    pub segments: Vec<ScheduleCompactSegment>,
+    /// Source-ordered annual `Through` periods.
+    pub periods: Vec<ScheduleCompactPeriod>,
 }

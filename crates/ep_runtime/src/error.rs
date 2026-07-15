@@ -20,6 +20,15 @@ pub enum RuntimeError {
         /// Available weather samples.
         available: usize,
     },
+    /// An internal-gain object references a schedule that an hour-only consumer cannot evaluate.
+    InvalidInternalGainSchedule {
+        /// EnergyPlus-normalized OtherEquipment name.
+        equipment_name: String,
+        /// Typed schedule identifier referenced by the object.
+        schedule_id: u32,
+        /// Missing-schedule or calendar-variation detail.
+        reason: String,
+    },
     /// Zone volume could not be derived from inputs.
     MissingZoneVolume {
         /// Zone name.
@@ -78,6 +87,14 @@ impl Display for RuntimeError {
             } => write!(
                 formatter,
                 "requested {requested} weather samples but only {available} are available"
+            ),
+            Self::InvalidInternalGainSchedule {
+                equipment_name,
+                schedule_id,
+                reason,
+            } => write!(
+                formatter,
+                "OtherEquipment {equipment_name} schedule {schedule_id} is invalid for hour-only internal-gain consumption: {reason}"
             ),
             Self::MissingZoneVolume { zone_name } => write!(
                 formatter,

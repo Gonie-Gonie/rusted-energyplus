@@ -16,14 +16,14 @@ use ep_model::{
     PlantBranchComponent, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
     PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod,
     RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
-    ScheduleCompact, ScheduleCompactSegment, ScheduleConstant, ScheduleId, ScheduleTypeLimitId,
-    ScheduleTypeLimits, SetpointManagerComponent, SiteLocation, SolarDistribution, SpecialDayType,
-    SunExposure, Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType,
-    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, TypedModel, Version,
-    WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
-    ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat,
-    ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
-    parse_calendar_date_rule,
+    ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
+    ScheduleConstant, ScheduleDayType, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
+    SetpointManagerComponent, SiteLocation, SolarDistribution, SpecialDayType, SunExposure,
+    Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
+    ThermostatSetpointId, TimestepConfig, TypedModel, Version, WindExposure, Zone,
+    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
+    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 
@@ -250,6 +250,16 @@ struct Compiler<'a> {
     raw_model: &'a RawModel,
     diagnostics: Vec<ModelDiagnostic>,
     defaults_applied: Vec<DefaultApplication>,
+}
+
+struct CompactSchedulePeriodBuilder {
+    period: ScheduleCompactPeriod,
+    assigned_day_types: [bool; 12],
+}
+
+struct CompactScheduleProfileBuilder {
+    profile: ScheduleCompactDayProfile,
+    pending_until_minute_of_day: Option<u32>,
 }
 
 impl<'a> Compiler<'a> {
@@ -898,7 +908,7 @@ impl<'a> Compiler<'a> {
                 self.duplicate_name("Schedule:Compact", &name);
                 continue;
             }
-            let Some(segments) = self.compact_schedule_segments(&name, &object) else {
+            let Some(periods) = self.compact_schedule_periods(&name, &object) else {
                 continue;
             };
 
@@ -906,7 +916,7 @@ impl<'a> Compiler<'a> {
                 id,
                 name: NormalizedName::new(&name),
                 schedule_type_limits,
-                segments,
+                periods,
             });
         }
     }
@@ -4142,11 +4152,11 @@ impl<'a> Compiler<'a> {
         Some(vertices)
     }
 
-    fn compact_schedule_segments(
+    fn compact_schedule_periods(
         &mut self,
         object_name: &str,
         object: &RawObject,
-    ) -> Option<Vec<ScheduleCompactSegment>> {
+    ) -> Option<Vec<ScheduleCompactPeriod>> {
         let Some(value) = field_value(object, "data") else {
             self.error(
                 "MissingRequiredField",
@@ -4162,9 +4172,9 @@ impl<'a> Compiler<'a> {
             return None;
         };
 
-        let mut segments = Vec::new();
-        let mut pending_until = None;
-        let mut saw_for_all_days = false;
+        let mut periods = Vec::new();
+        let mut current_period: Option<CompactSchedulePeriodBuilder> = None;
+        let mut current_profile: Option<CompactScheduleProfileBuilder> = None;
         for (index, value) in values.iter().enumerate() {
             let Some(field_value) = compact_data_field(value) else {
                 self.error(
@@ -4177,24 +4187,108 @@ impl<'a> Compiler<'a> {
                 continue;
             };
             match field_value {
-                RawValue::String(text) if compact_directive(text, "For") => {
-                    if !text.to_ascii_lowercase().contains("alldays") {
+                RawValue::String(text) if compact_directive(text, "Through") => {
+                    self.finish_compact_schedule_profile(
+                        object_name,
+                        current_period.as_mut(),
+                        &mut current_profile,
+                    );
+                    if let Some(period) = current_period.take() {
+                        self.finish_compact_schedule_period(object_name, period, &mut periods);
+                    }
+
+                    let Some(through_schedule_day_of_year) = parse_compact_through_ordinal(text)
+                    else {
                         self.error(
-                            "UnsupportedScheduleCompact",
+                            "InvalidScheduleCompactThrough",
                             "Schedule:Compact",
                             Some(object_name),
                             Some("data"),
                             format!(
-                                "Schedule:Compact/{object_name} supports only For: AllDays in the current subset"
+                                "Schedule:Compact/{object_name} has invalid fixed-date Through directive '{text}'"
+                            ),
+                        );
+                        continue;
+                    };
+                    if periods.last().is_some_and(|period| {
+                        through_schedule_day_of_year <= period.through_schedule_day_of_year
+                    }) {
+                        self.error(
+                            "InvalidScheduleCompactThroughOrder",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!(
+                                "Schedule:Compact/{object_name} Through dates must be strictly increasing; '{text}' is not later than the prior Through date"
                             ),
                         );
                     }
-                    saw_for_all_days = true;
+
+                    current_period = Some(CompactSchedulePeriodBuilder {
+                        period: ScheduleCompactPeriod {
+                            through_schedule_day_of_year,
+                            day_profiles: Vec::new(),
+                        },
+                        assigned_day_types: [false; 12],
+                    });
                 }
-                RawValue::String(text) if compact_directive(text, "Through") => {}
+                RawValue::String(text) if compact_directive(text, "For") => {
+                    self.finish_compact_schedule_profile(
+                        object_name,
+                        current_period.as_mut(),
+                        &mut current_profile,
+                    );
+                    let Some(period) = current_period.as_mut() else {
+                        self.error(
+                            "InvalidScheduleCompactOrder",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!(
+                                "Schedule:Compact/{object_name} For directive appears before a Through directive"
+                            ),
+                        );
+                        continue;
+                    };
+                    let day_types = self.compact_schedule_day_types(
+                        object_name,
+                        text,
+                        &mut period.assigned_day_types,
+                    );
+                    current_profile = Some(CompactScheduleProfileBuilder {
+                        profile: ScheduleCompactDayProfile {
+                            day_types,
+                            segments: Vec::new(),
+                        },
+                        pending_until_minute_of_day: None,
+                    });
+                }
                 RawValue::String(text) if compact_directive(text, "Until") => {
-                    pending_until = parse_until_minute(text);
-                    if pending_until.is_none() {
+                    let Some(profile) = current_profile.as_mut() else {
+                        self.error(
+                            "InvalidScheduleCompactOrder",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!(
+                                "Schedule:Compact/{object_name} Until directive appears before a For directive"
+                            ),
+                        );
+                        continue;
+                    };
+                    if let Some(unconsumed_until) = profile.pending_until_minute_of_day.take() {
+                        self.error(
+                            "MissingScheduleCompactValue",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!(
+                                "Schedule:Compact/{object_name} Until {unconsumed_until} minutes has no following numeric value"
+                            ),
+                        );
+                    }
+
+                    let Some(until_minute_of_day) = parse_until_minute(text) else {
                         self.error(
                             "InvalidScheduleCompactUntil",
                             "Schedule:Compact",
@@ -4204,10 +4298,42 @@ impl<'a> Compiler<'a> {
                                 "Schedule:Compact/{object_name} has invalid Until directive '{text}'"
                             ),
                         );
+                        continue;
+                    };
+                    if profile
+                        .profile
+                        .segments
+                        .last()
+                        .is_some_and(|segment| until_minute_of_day <= segment.until_minute_of_day)
+                    {
+                        self.error(
+                            "InvalidScheduleCompactUntilOrder",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!(
+                                "Schedule:Compact/{object_name} Until times must be strictly increasing; '{text}' is not later than the prior Until time"
+                            ),
+                        );
+                        continue;
                     }
+                    profile.pending_until_minute_of_day = Some(until_minute_of_day);
                 }
                 RawValue::Number(_text) => {
-                    let Some(until_minute_of_day) = pending_until.take() else {
+                    let Some(profile) = current_profile.as_mut() else {
+                        self.error(
+                            "InvalidScheduleCompactOrder",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!(
+                                "Schedule:Compact/{object_name} numeric value appears before a For directive"
+                            ),
+                        );
+                        continue;
+                    };
+                    let Some(until_minute_of_day) = profile.pending_until_minute_of_day.take()
+                    else {
                         self.error(
                             "InvalidScheduleCompactValue",
                             "Schedule:Compact",
@@ -4224,14 +4350,25 @@ impl<'a> Compiler<'a> {
                     else {
                         continue;
                     };
-                    segments.push(ScheduleCompactSegment {
+                    profile.profile.segments.push(ScheduleCompactSegment {
                         until_minute_of_day,
                         value,
                     });
                 }
+                RawValue::String(text) if compact_directive(text, "Interpolate") => {
+                    self.error(
+                        "UnsupportedScheduleCompactInterpolation",
+                        "Schedule:Compact",
+                        Some(object_name),
+                        Some("data"),
+                        format!(
+                            "Schedule:Compact/{object_name} does not support Interpolate directives"
+                        ),
+                    );
+                }
                 RawValue::String(text) => {
                     self.error(
-                        "UnsupportedScheduleCompact",
+                        "UnsupportedScheduleCompactDirective",
                         "Schedule:Compact",
                         Some(object_name),
                         Some("data"),
@@ -4249,29 +4386,194 @@ impl<'a> Compiler<'a> {
             }
         }
 
-        if !saw_for_all_days {
+        self.finish_compact_schedule_profile(
+            object_name,
+            current_period.as_mut(),
+            &mut current_profile,
+        );
+        if let Some(period) = current_period.take() {
+            self.finish_compact_schedule_period(object_name, period, &mut periods);
+        }
+
+        if periods.is_empty() {
             self.error(
-                "UnsupportedScheduleCompact",
+                "MissingScheduleCompactThrough",
                 "Schedule:Compact",
                 Some(object_name),
                 Some("data"),
                 format!(
-                    "Schedule:Compact/{object_name} requires For: AllDays in the current subset"
+                    "Schedule:Compact/{object_name} requires at least one valid Through period"
                 ),
-            );
-        }
-        if segments.is_empty() {
-            self.error(
-                "UnsupportedScheduleCompact",
-                "Schedule:Compact",
-                Some(object_name),
-                Some("data"),
-                format!("Schedule:Compact/{object_name} has no supported Until/value segments"),
             );
             return None;
         }
+        if periods
+            .last()
+            .is_some_and(|period| period.through_schedule_day_of_year != 366)
+        {
+            self.error(
+                "MissingScheduleCompactFinalThrough",
+                "Schedule:Compact",
+                Some(object_name),
+                Some("data"),
+                format!("Schedule:Compact/{object_name} final Through date must be 12/31"),
+            );
+        }
 
-        Some(segments)
+        Some(periods)
+    }
+
+    fn compact_schedule_day_types(
+        &mut self,
+        object_name: &str,
+        directive: &str,
+        assigned_day_types: &mut [bool; 12],
+    ) -> Vec<ScheduleDayType> {
+        let Some((_prefix, body)) = directive.split_once(':') else {
+            return Vec::new();
+        };
+        let tokens = body
+            .split(|character: char| character.is_whitespace() || character == ',')
+            .filter(|token| !token.is_empty())
+            .collect::<Vec<_>>();
+        if tokens.is_empty() {
+            self.error(
+                "InvalidScheduleCompactFor",
+                "Schedule:Compact",
+                Some(object_name),
+                Some("data"),
+                format!("Schedule:Compact/{object_name} For directive has no day types"),
+            );
+        }
+
+        let mut selected_day_types = Vec::new();
+        let mut include_all_other_days = false;
+        for token in tokens {
+            if token.eq_ignore_ascii_case("AllOtherDays") {
+                include_all_other_days = true;
+                continue;
+            }
+
+            let Some(expanded_day_types) = expand_compact_day_type_token(token) else {
+                self.error(
+                    "UnsupportedScheduleCompactDayType",
+                    "Schedule:Compact",
+                    Some(object_name),
+                    Some("data"),
+                    format!(
+                        "Schedule:Compact/{object_name} has unsupported For day type '{token}'"
+                    ),
+                );
+                continue;
+            };
+            for day_type in expanded_day_types {
+                let day_type_index = schedule_day_type_index(day_type);
+                if assigned_day_types[day_type_index] {
+                    self.error(
+                        "DuplicateScheduleCompactDayType",
+                        "Schedule:Compact",
+                        Some(object_name),
+                        Some("data"),
+                        format!(
+                            "Schedule:Compact/{object_name} assigns {} more than once in one Through period",
+                            schedule_day_type_name(day_type)
+                        ),
+                    );
+                    continue;
+                }
+                assigned_day_types[day_type_index] = true;
+                selected_day_types.push(day_type);
+            }
+        }
+
+        if include_all_other_days {
+            for day_type in ALL_SCHEDULE_DAY_TYPES {
+                let day_type_index = schedule_day_type_index(day_type);
+                if !assigned_day_types[day_type_index] {
+                    assigned_day_types[day_type_index] = true;
+                    selected_day_types.push(day_type);
+                }
+            }
+        }
+
+        selected_day_types
+    }
+
+    fn finish_compact_schedule_profile(
+        &mut self,
+        object_name: &str,
+        period: Option<&mut CompactSchedulePeriodBuilder>,
+        current_profile: &mut Option<CompactScheduleProfileBuilder>,
+    ) {
+        let Some(profile) = current_profile.take() else {
+            return;
+        };
+        if let Some(until_minute_of_day) = profile.pending_until_minute_of_day {
+            self.error(
+                "MissingScheduleCompactValue",
+                "Schedule:Compact",
+                Some(object_name),
+                Some("data"),
+                format!(
+                    "Schedule:Compact/{object_name} Until {until_minute_of_day} minutes has no following numeric value"
+                ),
+            );
+        }
+        match profile.profile.segments.last() {
+            None => self.error(
+                "MissingScheduleCompactSegments",
+                "Schedule:Compact",
+                Some(object_name),
+                Some("data"),
+                format!(
+                    "Schedule:Compact/{object_name} For profile requires at least one Until/value segment"
+                ),
+            ),
+            Some(segment) if segment.until_minute_of_day != 1440 => self.error(
+                "IncompleteScheduleCompactDayProfile",
+                "Schedule:Compact",
+                Some(object_name),
+                Some("data"),
+                format!(
+                    "Schedule:Compact/{object_name} For profile must end with Until: 24:00"
+                ),
+            ),
+            Some(_) => {}
+        }
+        if let Some(period) = period {
+            period.period.day_profiles.push(profile.profile);
+        }
+    }
+
+    fn finish_compact_schedule_period(
+        &mut self,
+        object_name: &str,
+        period: CompactSchedulePeriodBuilder,
+        periods: &mut Vec<ScheduleCompactPeriod>,
+    ) {
+        if period.period.day_profiles.is_empty() {
+            self.error(
+                "MissingScheduleCompactFor",
+                "Schedule:Compact",
+                Some(object_name),
+                Some("data"),
+                format!(
+                    "Schedule:Compact/{object_name} Through period requires at least one For profile"
+                ),
+            );
+        }
+        if period.assigned_day_types.iter().any(|assigned| !assigned) {
+            self.error(
+                "IncompleteScheduleCompactDayTypes",
+                "Schedule:Compact",
+                Some(object_name),
+                Some("data"),
+                format!(
+                    "Schedule:Compact/{object_name} must assign all 12 schedule day types in each Through period"
+                ),
+            );
+        }
+        periods.push(period.period);
     }
 
     fn vertex_coordinate(
@@ -4388,11 +4690,103 @@ fn compact_data_field(value: &RawValue) -> Option<&RawValue> {
 }
 
 fn compact_directive(value: &str, directive: &str) -> bool {
+    let value = value.trim_start();
     value
-        .trim_start()
         .get(..directive.len())
         .is_some_and(|prefix| prefix.eq_ignore_ascii_case(directive))
         && value[directive.len()..].trim_start().starts_with(':')
+}
+
+const ALL_SCHEDULE_DAY_TYPES: [ScheduleDayType; 12] = [
+    ScheduleDayType::Sunday,
+    ScheduleDayType::Monday,
+    ScheduleDayType::Tuesday,
+    ScheduleDayType::Wednesday,
+    ScheduleDayType::Thursday,
+    ScheduleDayType::Friday,
+    ScheduleDayType::Saturday,
+    ScheduleDayType::Holiday,
+    ScheduleDayType::SummerDesignDay,
+    ScheduleDayType::WinterDesignDay,
+    ScheduleDayType::CustomDay1,
+    ScheduleDayType::CustomDay2,
+];
+
+fn expand_compact_day_type_token(token: &str) -> Option<Vec<ScheduleDayType>> {
+    match token.to_ascii_lowercase().as_str() {
+        "alldays" => Some(ALL_SCHEDULE_DAY_TYPES.to_vec()),
+        "weekdays" => Some(vec![
+            ScheduleDayType::Monday,
+            ScheduleDayType::Tuesday,
+            ScheduleDayType::Wednesday,
+            ScheduleDayType::Thursday,
+            ScheduleDayType::Friday,
+        ]),
+        "weekends" => Some(vec![ScheduleDayType::Saturday, ScheduleDayType::Sunday]),
+        "sunday" => Some(vec![ScheduleDayType::Sunday]),
+        "monday" => Some(vec![ScheduleDayType::Monday]),
+        "tuesday" => Some(vec![ScheduleDayType::Tuesday]),
+        "wednesday" => Some(vec![ScheduleDayType::Wednesday]),
+        "thursday" => Some(vec![ScheduleDayType::Thursday]),
+        "friday" => Some(vec![ScheduleDayType::Friday]),
+        "saturday" => Some(vec![ScheduleDayType::Saturday]),
+        "holiday" => Some(vec![ScheduleDayType::Holiday]),
+        "summerdesignday" => Some(vec![ScheduleDayType::SummerDesignDay]),
+        "winterdesignday" => Some(vec![ScheduleDayType::WinterDesignDay]),
+        "customday1" => Some(vec![ScheduleDayType::CustomDay1]),
+        "customday2" => Some(vec![ScheduleDayType::CustomDay2]),
+        _ => None,
+    }
+}
+
+fn schedule_day_type_index(day_type: ScheduleDayType) -> usize {
+    match day_type {
+        ScheduleDayType::Sunday => 0,
+        ScheduleDayType::Monday => 1,
+        ScheduleDayType::Tuesday => 2,
+        ScheduleDayType::Wednesday => 3,
+        ScheduleDayType::Thursday => 4,
+        ScheduleDayType::Friday => 5,
+        ScheduleDayType::Saturday => 6,
+        ScheduleDayType::Holiday => 7,
+        ScheduleDayType::SummerDesignDay => 8,
+        ScheduleDayType::WinterDesignDay => 9,
+        ScheduleDayType::CustomDay1 => 10,
+        ScheduleDayType::CustomDay2 => 11,
+    }
+}
+
+fn schedule_day_type_name(day_type: ScheduleDayType) -> &'static str {
+    match day_type {
+        ScheduleDayType::Sunday => "Sunday",
+        ScheduleDayType::Monday => "Monday",
+        ScheduleDayType::Tuesday => "Tuesday",
+        ScheduleDayType::Wednesday => "Wednesday",
+        ScheduleDayType::Thursday => "Thursday",
+        ScheduleDayType::Friday => "Friday",
+        ScheduleDayType::Saturday => "Saturday",
+        ScheduleDayType::Holiday => "Holiday",
+        ScheduleDayType::SummerDesignDay => "SummerDesignDay",
+        ScheduleDayType::WinterDesignDay => "WinterDesignDay",
+        ScheduleDayType::CustomDay1 => "CustomDay1",
+        ScheduleDayType::CustomDay2 => "CustomDay2",
+    }
+}
+
+fn parse_compact_through_ordinal(value: &str) -> Option<u16> {
+    let (_directive, date) = value.split_once(':')?;
+    let ep_model::CalendarDateRule::MonthDay {
+        month,
+        day_of_month,
+    } = parse_calendar_date_rule(date.trim())?
+    else {
+        return None;
+    };
+    let days_before_month = [0_u16, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
+    let month_index = usize::try_from(month.checked_sub(1)?).ok()?;
+    days_before_month
+        .get(month_index)?
+        .checked_add(u16::try_from(day_of_month).ok()?)
 }
 
 fn parse_until_minute(value: &str) -> Option<u32> {
@@ -4841,7 +5235,10 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 
 #[cfg(test)]
 mod tests {
-    use super::{CompileStage, DiagnosticSeverity, ObjectCoverageStatus, compile_raw_model};
+    use super::{
+        ALL_SCHEDULE_DAY_TYPES, CompileStage, DiagnosticSeverity, ObjectCoverageStatus,
+        compile_raw_model,
+    };
     use ep_model::{
         AutosizeOrNumber, CalendarDateRule, DayOfWeek, DehumidificationControlType,
         DesignSpecificationOutdoorAirMethod, FirstHourInterpolationStartingValues,
@@ -4849,7 +5246,7 @@ mod tests {
         LoadDistributionScheme, MaterialSurfaceRoughness, ModelGraph,
         OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType,
         OutsideSurfaceConvectionAlgorithm, PeopleNumberCalculationMethod, PlantConnectorKind,
-        SpecialDayType,
+        ScheduleDayType, SpecialDayType,
     };
     use ep_raw_model::{parse_epjson_str, parse_epjson_str_with_idf_order};
 
@@ -5706,12 +6103,420 @@ mod tests {
                 .map(|id| id.0),
             Some(0)
         );
-        assert_eq!(model.compact_schedules[0].segments.len(), 3);
+        assert_eq!(model.compact_schedules[0].periods.len(), 1);
         assert_eq!(
-            model.compact_schedules[0].segments[0].until_minute_of_day,
-            8 * 60
+            model.compact_schedules[0].periods[0].through_schedule_day_of_year,
+            366
         );
-        assert_eq!(model.compact_schedules[0].segments[1].value, 1.0);
+        assert_eq!(
+            model.compact_schedules[0].periods[0].day_profiles[0]
+                .day_types
+                .len(),
+            12
+        );
+        let segments = &model.compact_schedules[0].periods[0].day_profiles[0].segments;
+        assert_eq!(segments.len(), 3);
+        assert_eq!(segments[0].until_minute_of_day, 8 * 60);
+        assert_eq!(segments[1].value, 1.0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn parses_schedule_compact_periods_and_source_ordered_all_other_days()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Schedule:Compact": {
+                    "Calendar Lookup": {
+                        "data": [
+                            {"field": "Through: 1/1"},
+                            {"field": "For: Thursday"},
+                            {"field": "Until: 24:00"}, {"field": 105},
+                            {"field": "For: AllOtherDays"},
+                            {"field": "Until: 24:00"}, {"field": 199},
+                            {"field": "Through: 12/31"},
+                            {"field": "For: Tuesday"},
+                            {"field": "Until: 24:00"}, {"field": 103},
+                            {"field": "For: Wednesday"},
+                            {"field": "Until: 24:00"}, {"field": 104},
+                            {"field": "For: Holiday"},
+                            {"field": "Until: 24:00"}, {"field": 108},
+                            {"field": "For: AllOtherDays"},
+                            {"field": "Until: 24:00"}, {"field": 199}
+                        ]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        let periods = &model.compact_schedules[0].periods;
+        assert_eq!(
+            periods
+                .iter()
+                .map(|period| period.through_schedule_day_of_year)
+                .collect::<Vec<_>>(),
+            vec![1, 366]
+        );
+        assert_eq!(periods[0].day_profiles.len(), 2);
+        assert_eq!(
+            periods[0].day_profiles[0].day_types,
+            vec![ScheduleDayType::Thursday]
+        );
+        assert_eq!(periods[0].day_profiles[0].segments[0].value, 105.0);
+        assert_eq!(periods[0].day_profiles[1].day_types.len(), 11);
+        assert!(
+            !periods[0].day_profiles[1]
+                .day_types
+                .contains(&ScheduleDayType::Thursday)
+        );
+        assert_eq!(periods[1].day_profiles.len(), 4);
+        assert_eq!(
+            periods[1].day_profiles[0].day_types,
+            vec![ScheduleDayType::Tuesday]
+        );
+        assert_eq!(
+            periods[1].day_profiles[1].day_types,
+            vec![ScheduleDayType::Wednesday]
+        );
+        assert_eq!(
+            periods[1].day_profiles[2].day_types,
+            vec![ScheduleDayType::Holiday]
+        );
+        assert_eq!(
+            periods[1].day_profiles[3].day_types,
+            vec![
+                ScheduleDayType::Sunday,
+                ScheduleDayType::Monday,
+                ScheduleDayType::Thursday,
+                ScheduleDayType::Friday,
+                ScheduleDayType::Saturday,
+                ScheduleDayType::SummerDesignDay,
+                ScheduleDayType::WinterDesignDay,
+                ScheduleDayType::CustomDay1,
+                ScheduleDayType::CustomDay2,
+            ]
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_schedule_compact_duplicate_group_and_all_other_assignments()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Schedule:Compact": {
+                    "Group Explicit Duplicate": {
+                        "data": [
+                            {"field": "Through: 12/31"},
+                            {"field": "For: Weekdays Monday AllOtherDays"},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    },
+                    "All Other Then Explicit": {
+                        "data": [
+                            {"field": "Through: 12/31"},
+                            {"field": "For: AllOtherDays"},
+                            {"field": "Until: 24:00"}, {"field": 1},
+                            {"field": "For: Sunday"},
+                            {"field": "Until: 24:00"}, {"field": 2}
+                        ]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        for object_name in ["Group Explicit Duplicate", "All Other Then Explicit"] {
+            assert!(result.report.diagnostics.iter().any(|diagnostic| {
+                diagnostic.code == "DuplicateScheduleCompactDayType"
+                    && diagnostic.object_name.as_deref() == Some(object_name)
+            }));
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn schedule_compact_all_other_days_is_applied_after_same_field_selectors()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Schedule:Compact": {
+                    "All Other Before Explicit": {
+                        "data": [
+                            {"field": "Through: 12/31"},
+                            {"field": "For: AllOtherDays Monday AllOtherDays"},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        let day_types = &model.compact_schedules[0].periods[0].day_profiles[0].day_types;
+        assert_eq!(day_types.len(), 12);
+        assert_eq!(day_types[0], ScheduleDayType::Monday);
+        for day_type in ALL_SCHEDULE_DAY_TYPES {
+            assert!(day_types.contains(&day_type));
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn expands_schedule_compact_weekday_weekend_and_special_day_tokens()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Schedule:Compact": {
+                    "Every Token": {
+                        "data": [
+                            {"field": "Through: 12/31"},
+                            {"field": "For: Weekends"},
+                            {"field": "Until: 24:00"}, {"field": 1},
+                            {"field": "For: Weekdays"},
+                            {"field": "Until: 24:00"}, {"field": 2},
+                            {"field": "For: Holiday SummerDesignDay WinterDesignDay CustomDay1 CustomDay2"},
+                            {"field": "Until: 24:00"}, {"field": 3}
+                        ]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        let profiles = &model.compact_schedules[0].periods[0].day_profiles;
+        assert_eq!(
+            profiles[0].day_types,
+            vec![ScheduleDayType::Saturday, ScheduleDayType::Sunday]
+        );
+        assert_eq!(
+            profiles[1].day_types,
+            vec![
+                ScheduleDayType::Monday,
+                ScheduleDayType::Tuesday,
+                ScheduleDayType::Wednesday,
+                ScheduleDayType::Thursday,
+                ScheduleDayType::Friday,
+            ]
+        );
+        assert_eq!(
+            profiles[2].day_types,
+            vec![
+                ScheduleDayType::Holiday,
+                ScheduleDayType::SummerDesignDay,
+                ScheduleDayType::WinterDesignDay,
+                ScheduleDayType::CustomDay1,
+                ScheduleDayType::CustomDay2,
+            ]
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_schedule_compact_through_order_and_missing_final_date()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Schedule:Compact": {
+                    "Duplicate Through": {
+                        "data": [
+                            {"field": "Through: 6/30"}, {"field": "For: AllDays"},
+                            {"field": "Until: 24:00"}, {"field": 1},
+                            {"field": "Through: 6/30"}, {"field": "For: AllDays"},
+                            {"field": "Until: 24:00"}, {"field": 2},
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Until: 24:00"}, {"field": 3}
+                        ]
+                    },
+                    "Decreasing Through": {
+                        "data": [
+                            {"field": "Through: 6/30"}, {"field": "For: AllDays"},
+                            {"field": "Until: 24:00"}, {"field": 1},
+                            {"field": "Through: 5/31"}, {"field": "For: AllDays"},
+                            {"field": "Until: 24:00"}, {"field": 2},
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Until: 24:00"}, {"field": 3}
+                        ]
+                    },
+                    "Missing Final Through": {
+                        "data": [
+                            {"field": "Through: 6/30"}, {"field": "For: AllDays"},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        for object_name in ["Duplicate Through", "Decreasing Through"] {
+            assert!(result.report.diagnostics.iter().any(|diagnostic| {
+                diagnostic.code == "InvalidScheduleCompactThroughOrder"
+                    && diagnostic.object_name.as_deref() == Some(object_name)
+            }));
+        }
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.code == "MissingScheduleCompactFinalThrough"
+                && diagnostic.object_name.as_deref() == Some("Missing Final Through")
+        }));
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_schedule_compact_until_order_and_incomplete_profiles()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Schedule:Compact": {
+                    "Decreasing Until": {
+                        "data": [
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Until: 12:00"}, {"field": 1},
+                            {"field": "Until: 08:00"}, {"field": 2},
+                            {"field": "Until: 24:00"}, {"field": 3}
+                        ]
+                    },
+                    "Incomplete Day": {
+                        "data": [
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Until: 23:00"}, {"field": 1}
+                        ]
+                    },
+                    "Missing Value": {
+                        "data": [
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Until: 24:00"}
+                        ]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        for (object_name, code) in [
+            ("Decreasing Until", "InvalidScheduleCompactUntilOrder"),
+            ("Incomplete Day", "IncompleteScheduleCompactDayProfile"),
+            ("Missing Value", "MissingScheduleCompactValue"),
+        ] {
+            assert!(result.report.diagnostics.iter().any(|diagnostic| {
+                diagnostic.code == code && diagnostic.object_name.as_deref() == Some(object_name)
+            }));
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_schedule_compact_unknown_day_type_and_interpolation()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Schedule:Compact": {
+                    "Unknown Day": {
+                        "data": [
+                            {"field": "Through: 12/31"},
+                            {"field": "For: Funday AllOtherDays"},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    },
+                    "Interpolation": {
+                        "data": [
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Interpolate: Average"},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.code == "UnsupportedScheduleCompactDayType"
+                && diagnostic.object_name.as_deref() == Some("Unknown Day")
+        }));
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.code == "UnsupportedScheduleCompactInterpolation"
+                && diagnostic.object_name.as_deref() == Some("Interpolation")
+        }));
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_schedule_compact_malformed_state_order_and_nonfixed_through()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Schedule:Compact": {
+                    "Malformed Order": {
+                        "data": [
+                            {"field": "For: AllDays"},
+                            {"field": "Until: 24:00"}, {"field": 1},
+                            {"field": "Through: 12/31"},
+                            {"field": "For: AllDays"},
+                            {"field": 2},
+                            {"field": "Until: 24:00"}
+                        ]
+                    },
+                    "Dynamic Through": {
+                        "data": [
+                            {"field": "Through: 1st Monday in January"},
+                            {"field": "For: AllDays"},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        for code in [
+            "InvalidScheduleCompactOrder",
+            "InvalidScheduleCompactValue",
+            "MissingScheduleCompactValue",
+        ] {
+            assert!(result.report.diagnostics.iter().any(|diagnostic| {
+                diagnostic.code == code
+                    && diagnostic.object_name.as_deref() == Some("Malformed Order")
+            }));
+        }
+        assert!(result.report.diagnostics.iter().any(|diagnostic| {
+            diagnostic.code == "InvalidScheduleCompactThrough"
+                && diagnostic.object_name.as_deref() == Some("Dynamic Through")
+        }));
 
         Ok(())
     }

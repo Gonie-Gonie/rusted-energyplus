@@ -189,6 +189,7 @@ $surfaceWeather = "crates\ep_runtime\src\heat_balance\surface_weather.rs"
 $timestep = "crates\ep_runtime\src\heat_balance\timestep.rs"
 $typedIds = "crates\ep_model\src\ids.rs"
 $calendarObjects = "crates\ep_model\src\objects\calendar.rs"
+$scheduleObjects = "crates\ep_model\src\objects\schedules.rs"
 $rawModel = "crates\ep_raw_model\src\lib.rs"
 $idfOrder = "crates\ep_raw_model\src\idf_order.rs"
 $compiler = "crates\ep_compiler\src\compiler.rs"
@@ -200,6 +201,7 @@ $runConfig = "crates\ep_run\src\config.rs"
 $runSupport = "crates\ep_run\src\support.rs"
 $cli = "crates\ep_cli\src\main.rs"
 $runtime = "crates\ep_runtime\src\runtime.rs"
+$runtimeError = "crates\ep_runtime\src\error.rs"
 $weather = "crates\ep_runtime\src\weather.rs"
 $weatherCalendar = "crates\ep_runtime\src\weather_calendar.rs"
 $weatherTests = "crates\ep_runtime\src\weather_tests.rs"
@@ -226,6 +228,7 @@ $epwSouthernDstGate = "scripts\compare\compare-calendar-epw-dst-southern-wrap-ex
 $epwSouthernDstStartGate = "scripts\compare\compare-calendar-epw-dst-southern-wrap-start-exact.ps1"
 $crossYearDstGate = "scripts\compare\compare-calendar-epw-dst-cross-year-start-year-projection-exact.ps1"
 $crossYearSpecialDayGate = "scripts\compare\compare-calendar-special-day-cross-year-start-year-projection-exact.ps1"
+$compactThroughForGate = "scripts\compare\compare-calendar-schedule-compact-through-for-day-type-exact.ps1"
 $probeSummaryReport = "tools\reporting\dynamic_heat_balance_probe_summary.py"
 $dynamicDiagnosticScript = "scripts\compare\official-dynamic-heat-balance-diagnostic.ps1"
 $dynamicCompatScript = "scripts\compare\official-dynamic-heat-balance-compat-candidate.ps1"
@@ -265,6 +268,7 @@ foreach ($entry in @(
         @($timestep, "heat-balance timestep ownership module"),
         @($typedIds, "typed compact ID module"),
         @($calendarObjects, "typed calendar control module"),
+        @($scheduleObjects, "typed compact schedule module"),
         @($rawModel, "raw-model declaration-order API"),
         @($idfOrder, "targeted IDF declaration-order recovery"),
         @($compiler, "typed model compiler"),
@@ -276,6 +280,7 @@ foreach ($entry in @(
         @($runSupport, "arbitrary-run support assessment"),
         @($cli, "CLI conformance gate"),
         @($runtime, "runtime orchestration root"),
+        @($runtimeError, "runtime fail-closed error contract"),
         @($weather, "runtime weather module"),
         @($weatherCalendar, "EPW calendar metadata parser"),
         @($weatherTests, "EPW weather parser tests"),
@@ -294,6 +299,7 @@ foreach ($entry in @(
         @($weekendHolidayGate, "fixed-Sunday Yes/No/blank weekend holiday gate"),
         @($overlapOrderGate, "paired special-day overlap declaration-order gate"),
         @($crossYearSpecialDayGate, "cross-year start-year special-day gate"),
+        @($compactThroughForGate, "Schedule:Compact Through/For day-type gate"),
         @($crossYearDstGate, "cross-year start-year daylight-saving gate"),
         @($probeSummaryReport, "dynamic heat-balance probe summary reporter"),
         @($dynamicDiagnosticScript, "dynamic heat-balance diagnostic comparison script"),
@@ -815,7 +821,28 @@ Assert-Contains -Path $crossYearDstGate -Pattern '\$series\.expected_samples -ne
 Assert-Contains -Path $crossYearDstGate -Pattern 'Site Daylight Saving Time Status \\\[\\\] !Hourly\$[\s\S]*\$values\.Count -ne 96 -or \$timestampRows\.Count -ne 96[\s\S]*\$expectedDailyValues = @\(0\.0, 0\.0, 0\.0, 1\.0\)[\s\S]*\$expectedDailyTypes = @\("Tuesday", "Wednesday", "Thursday", "Friday"\)' -Description "cross-year start-year DST raw EnergyPlus values and timestamp fields"
 Assert-Contains -Path $crossYearDstGate -Pattern 'Environment,CROSS YEAR DST START YEAR RUN PERIOD,WeatherFileRunPeriod,12/30/2031,01/02/2032,Tuesday,4,Use RunPeriod Specified Day,Yes,No,No,No,No,Clark and Allen[\s\S]*Environment:Daylight Saving,Yes,WeatherFile,01/02,01/03[\s\S]*EnergyPlus Completed Successfully-- 0 Warning; 0 Severe Errors;[\s\S]*Cross-year start-year daylight-saving projection exact gate passed\.' -Description "cross-year start-year DST exact EIO, clean completion, and blocking success"
 Assert-Contains -Path $algorithmLedger -Pattern 'calendar_epw_dst_cross_year_start_year_projection_hourly_exact_001[\s\S]*2031 environment-start annual table[\s\S]*The zero-tolerance gate proves 96 ordered-exact-unique Site Daylight Saving Time Status samples' -Description "cross-year start-year DST bounded algorithm evidence"
+Assert-Contains -Path $scheduleObjects -Pattern 'pub enum ScheduleDayType[\s\S]*Sunday,[\s\S]*Saturday,[\s\S]*Holiday,[\s\S]*SummerDesignDay,[\s\S]*WinterDesignDay,[\s\S]*CustomDay1,[\s\S]*CustomDay2' -Description "typed twelve-way Schedule:Compact day types"
+Assert-Contains -Path $scheduleObjects -Pattern 'pub struct ScheduleCompactDayProfile[\s\S]*day_types: Vec<ScheduleDayType>[\s\S]*segments: Vec<ScheduleCompactSegment>[\s\S]*pub struct ScheduleCompactPeriod[\s\S]*through_schedule_day_of_year: u16[\s\S]*day_profiles: Vec<ScheduleCompactDayProfile>' -Description "typed source-ordered compact schedule periods and profiles"
+Assert-Contains -Path $compiler -Pattern 'fn compact_schedule_periods\s*\([\s\S]*fn compact_schedule_day_types\s*\([\s\S]*AllOtherDays[\s\S]*fn finish_compact_schedule_profile\s*\([\s\S]*fn finish_compact_schedule_period\s*\(' -Description "compiler Through/For/AllOtherDays source-order pipeline"
+Assert-Contains -Path $compiler -Pattern 'fn parses_schedule_compact_periods_and_source_ordered_all_other_days\s*\([\s\S]*Through: 1/1[\s\S]*For: Thursday[\s\S]*For: AllOtherDays[\s\S]*Through: 12/31[\s\S]*For: Holiday' -Description "compiler exact Through/For source-order test"
+Assert-Contains -Path $compiler -Pattern 'fn schedule_compact_all_other_days_is_applied_after_same_field_selectors\s*\([\s\S]*For: AllOtherDays Monday AllOtherDays[\s\S]*assert_eq!\(day_types\[0\], ScheduleDayType::Monday\)[\s\S]*for day_type in ALL_SCHEDULE_DAY_TYPES' -Description "compiler same-For explicit selector precedes two-pass AllOtherDays complement"
+Assert-Contains -Path $compiler -Pattern 'fn rejects_schedule_compact_duplicate_group_and_all_other_assignments\s*\([\s\S]*fn expands_schedule_compact_weekday_weekend_and_special_day_tokens\s*\([\s\S]*fn rejects_schedule_compact_through_order_and_missing_final_date\s*\([\s\S]*fn rejects_schedule_compact_until_order_and_incomplete_profiles\s*\([\s\S]*fn rejects_schedule_compact_unknown_day_type_and_interpolation\s*\(' -Description "compiler compact-schedule boundary diagnostics"
+Assert-Contains -Path $schedules -Pattern 'pub fn precompute_schedule_value_series_for_time_axis\s*\([\s\S]*compact_schedule_series_for_time_axis[\s\S]*point\.schedule_day_of_year[\s\S]*model_schedule_day_type\(point\.day_type\)[\s\S]*point\.hour\.clamp\(1, 24\) \* 60' -Description "runtime compact schedule consumes calendar ordinal, day type, and hour"
+Assert-Contains -Path $schedules -Pattern '\.find\(\|period\| schedule_day_of_year <= u32::from\(period\.through_schedule_day_of_year\)\)[\s\S]*\.find\(\|profile\| profile\.day_types\.contains\(&day_type\)\)[\s\S]*compact_interval_value' -Description "runtime Through then For then Until lookup order"
+Assert-Contains -Path $runtimeTestSourceOrder -Pattern 'fn compact_schedule_time_axis_consumes_cross_year_period_day_type_and_hour\s*\([\s\S]*fn compact_schedule_time_axis_selects_until_segment_by_hour\s*\([\s\S]*fn hour_only_schedule_consumers_reject_calendar_variation_and_missing_ids\s*\(' -Description "runtime calendar-aware and hour-only compact schedule tests"
+Assert-Contains -Path $runtimeError -Pattern 'InvalidInternalGainSchedule \{[\s\S]*equipment_name: String[\s\S]*schedule_id: u32[\s\S]*reason: String' -Description "typed fail-closed invalid internal-gain schedule error"
+Assert-Contains -Path $schedules -Pattern 'pub\(crate\) fn validate_hour_only_internal_gain_schedules\s*\([\s\S]*hour_only_single_period_compact_schedule_segments\(schedule\)[\s\S]*schedule ID \{\} is unresolved[\s\S]*RuntimeError::InvalidInternalGainSchedule' -Description "hour-only internal gains reject calendar-varying and unresolved schedules"
+Assert-Contains -Path $runtimeTestSourceOrder -Pattern 'calendar-varying internal-gain schedule must be rejected[\s\S]*initialize_heat_balance_state[\s\S]*Err\(RuntimeError::InvalidInternalGainSchedule[\s\S]*simulate_first_zone_uncontrolled[\s\S]*Err\(RuntimeError::InvalidInternalGainSchedule[\s\S]*missing convective schedule must be rejected[\s\S]*missing radiant schedule must be rejected' -Description "gain trace, heat-balance initialization, and first-zone paths fail closed"
+Assert-Contains -Path $compactThroughForGate -Pattern '\$CaseId = "calendar_schedule_compact_through_for_day_type_hourly_exact_001"[\s\S]*\$sourceFileRef -cne \$IdfRef[\s\S]*Assert-SamePath[\s\S]*\$expectedStagedIdf = \$idfText' -Description "Through/For canonical manifest and staged-input provenance"
+Assert-Contains -Path $compactThroughForGate -Pattern '\$expandedStagedIdf -cne "input\.idf" -or \$expandedConvertedEpjson -cne "input\.epJSON"[\s\S]*\$expectedStagedIdf = \$idfText \+ "`n" \+ \$injectionFooter \+ "`n"' -Description "Through/For exact expanded staged-IDF and converted-epJSON provenance"
+Assert-Contains -Path $compactThroughForGate -Pattern '\$actualIdfObjectVectors = @\([\s\S]*\$expectedIdfObjectVectors = @\([\s\S]*"Version\|26\.1"[\s\S]*"RunPeriod\|Through For Day Type Run Period[\s\S]*"Schedule:Compact\|Through For Day Type Schedule[\s\S]*"Output:Variable\|Environment\|Site Day Type Index\|Hourly"[\s\S]*\$actualIdfObjectVectors -join' -Description "Through/For complete ten-object order and field-vector lock"
+Assert-Contains -Path $compactThroughForGate -Pattern '\$expectedCompactFields = @\([\s\S]*"Through: 1/1"[\s\S]*"For: Thursday"[\s\S]*"For: AllOtherDays"[\s\S]*"Through: 12/31"[\s\S]*"For: Tuesday"[\s\S]*"For: Wednesday"[\s\S]*"For: Holiday"[\s\S]*\$weatherLines\.Count -ne 128[\s\S]*\$weatherRows\.Count -ne 120' -Description "Through/For exact IDF field vector and EPW shape"
+Assert-Contains -Path $compactThroughForGate -Pattern '\$summary\.time_axis_samples -ne 120[\s\S]*\$summary\.series_count -ne 1[\s\S]*\$null -ne \$summary\.weather_record_selection[\s\S]*\$series\.expected_samples -ne 120[\s\S]*timestamp_contract -ne "ordered-exact-unique"[\s\S]*max_abs_delta -ne 0\.0' -Description "Through/For single exact series and explicit record-selection nonclaim"
+Assert-Contains -Path $compactThroughForGate -Pattern '\$scheduleValues\.Count -ne 120 -or \$dayTypeValues\.Count -ne 120 -or \$timestampRows\.Count -ne 120[\s\S]*\$expectedDailyScheduleValues = @\(103\.0, 104\.0, 105\.0, 108\.0, 199\.0\)[\s\S]*\$expectedDailyTypeValues = @\(3\.0, 4\.0, 5\.0, 8\.0, 7\.0\)' -Description "Through/For raw EnergyPlus schedule, day-type, and timestamp rows"
+Assert-Contains -Path $compactThroughForGate -Pattern 'Environment,THROUGH FOR DAY TYPE RUN PERIOD,WeatherFileRunPeriod,12/30/2031,01/03/2032,Tuesday,5,Use RunPeriod Specified Day,No,No,No,No,No,Clark and Allen[\s\S]*Environment:Daylight Saving,No,RunPeriod Object[\s\S]*Environment:Special Days,CROSS YEAR NEW YEAR HOLIDAY,Holiday,InputFile,01/02,  1[\s\S]*EnergyPlus Completed Successfully-- 0 Warning; 0 Severe Errors;[\s\S]*Schedule:Compact Through and For day-type exact gate passed\.' -Description "Through/For exact EIO, clean completion, and blocking success"
+Assert-Contains -Path $algorithmLedger -Pattern 'calendar_schedule_compact_through_for_day_type_hourly_exact_001[\s\S]*120 ordered-exact-unique zero-tolerance Schedule Value samples[\s\S]*Rust EPW record selection is null and unclaimed' -Description "Through/For bounded algorithm evidence"
 Assert-Contains -Path $algorithmLedger -Pattern '(?s)\[\[algorithm\]\]\s*id = "calendar_time_state"(?:(?!\[\[algorithm\]\]).)*status = "scaffold"(?:(?!\[\[algorithm\]\]).)*claim_level = "none"' -Description "calendar algorithm remains scaffold with no family claim"
+Assert-Contains -Path $algorithmLedger -Pattern 'routine\.update_schedule_vals\.completion_status = "source_mapped"' -Description "UpdateScheduleVals remains source-mapped"
 Assert-Contains -Path $algorithmLedger -Pattern 'routine\.set_special_day_dates\.completion_status = "source_mapped"' -Description "SetSpecialDayDates remains source-mapped"
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn later_typed_special_day_definition_overwrites_an_earlier_definition\s*\(' -Description "special-day later-wins unit test"
 Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn weekend_rule_shifts_only_fixed_single_day_special_days_to_monday\s*\(' -Description "special-day weekend-rule unit test"

@@ -1,12 +1,14 @@
 //! Schedule lookup and internal-gain trace helpers.
 
+use crate::error::RuntimeError;
 use crate::geometry::zone_floor_area_m2;
 use crate::heat_balance::state::SurfaceHeatBalanceState;
-use crate::time_axis::TimeAxis;
+use crate::time_axis::{DayType, TimeAxis};
 use ep_model::{
     OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, People,
-    PeopleNumberCalculationMethod, ScheduleCompact, ScheduleCompactSegment, ScheduleConstant,
-    ScheduleId, TypedModel, ZoneId,
+    PeopleNumberCalculationMethod, ScheduleCompact, ScheduleCompactDayProfile,
+    ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant, ScheduleDayType, ScheduleId,
+    TypedModel, ZoneId,
 };
 use std::collections::BTreeSet;
 
@@ -31,10 +33,7 @@ fn internal_gain_for_equipment_w(
     equipment: &OtherEquipment,
     hour_ending: u32,
 ) -> f64 {
-    let schedule_multiplier = equipment
-        .schedule
-        .and_then(|schedule_id| schedule_value(model, schedule_id, hour_ending))
-        .unwrap_or(1.0);
+    let schedule_multiplier = hour_only_schedule_multiplier(model, equipment.schedule, hour_ending);
     let sensible_fraction = (1.0 - equipment.fraction_latent - equipment.fraction_lost).max(0.0);
 
     other_equipment_design_level_w(model, equipment) * schedule_multiplier * sensible_fraction
@@ -58,10 +57,7 @@ fn convective_internal_gain_for_equipment_w(
     equipment: &OtherEquipment,
     hour_ending: u32,
 ) -> f64 {
-    let schedule_multiplier = equipment
-        .schedule
-        .and_then(|schedule_id| schedule_value(model, schedule_id, hour_ending))
-        .unwrap_or(1.0);
+    let schedule_multiplier = hour_only_schedule_multiplier(model, equipment.schedule, hour_ending);
     let convective_fraction =
         (1.0 - equipment.fraction_latent - equipment.fraction_radiant - equipment.fraction_lost)
             .max(0.0);
@@ -83,13 +79,56 @@ fn radiant_internal_gain_for_equipment_w(
     equipment: &OtherEquipment,
     hour_ending: u32,
 ) -> f64 {
-    let schedule_multiplier = equipment
-        .schedule
-        .and_then(|schedule_id| schedule_value(model, schedule_id, hour_ending))
-        .unwrap_or(1.0);
+    let schedule_multiplier = hour_only_schedule_multiplier(model, equipment.schedule, hour_ending);
     let radiant_fraction = equipment.fraction_radiant.max(0.0);
 
     other_equipment_design_level_w(model, equipment) * schedule_multiplier * radiant_fraction
+}
+
+fn hour_only_schedule_multiplier(
+    model: &TypedModel,
+    schedule_id: Option<ScheduleId>,
+    hour_ending: u32,
+) -> f64 {
+    let Some(schedule_id) = schedule_id else {
+        return 1.0;
+    };
+    schedule_value(model, schedule_id, hour_ending).unwrap_or(f64::NAN)
+}
+
+pub(crate) fn validate_hour_only_internal_gain_schedules(
+    model: &TypedModel,
+) -> Result<(), RuntimeError> {
+    for equipment in &model.other_equipment {
+        let Some(schedule_id) = equipment.schedule else {
+            continue;
+        };
+        if model
+            .schedules
+            .iter()
+            .any(|schedule| schedule.id == schedule_id)
+        {
+            continue;
+        }
+
+        let reason = match model
+            .compact_schedules
+            .iter()
+            .find(|schedule| schedule.id == schedule_id)
+        {
+            Some(schedule) => match hour_only_single_period_compact_schedule_segments(schedule) {
+                Ok(_) => continue,
+                Err(reason) => reason,
+            },
+            None => format!("schedule ID {} is unresolved", schedule_id.0),
+        };
+        return Err(RuntimeError::InvalidInternalGainSchedule {
+            equipment_name: equipment.name.0.clone(),
+            schedule_id: schedule_id.0,
+            reason,
+        });
+    }
+    Ok(())
 }
 
 fn other_equipment_design_level_w(model: &TypedModel, equipment: &OtherEquipment) -> f64 {
@@ -191,7 +230,11 @@ pub(crate) fn schedule_value(
         .compact_schedules
         .iter()
         .find(|schedule| schedule.id == schedule_id)
-        .and_then(|schedule| compact_schedule_value(&schedule.segments, minute_of_day))
+        .and_then(|schedule| {
+            hour_only_single_period_compact_schedule_segments(schedule)
+                .ok()
+                .and_then(|segments| compact_schedule_value(segments, minute_of_day))
+        })
 }
 
 fn compact_schedule_value(segments: &[ScheduleCompactSegment], minute_of_day: u32) -> Option<f64> {
@@ -231,6 +274,11 @@ pub enum ScheduleSeriesKind {
         /// Ordered daily intervals in minute-of-day space.
         intervals: Vec<CompiledScheduleInterval>,
     },
+    /// Schedule:Compact annual periods and day-type profiles.
+    CompactCalendarProfiles {
+        /// Source-ordered annual periods compiled for calendar-aware lookup.
+        periods: Vec<CompiledSchedulePeriod>,
+    },
 }
 
 /// One precompiled daily schedule interval.
@@ -242,6 +290,24 @@ pub struct CompiledScheduleInterval {
     pub end_minute_of_day: u32,
     /// Interval schedule value.
     pub value: f64,
+}
+
+/// One compiled day-type profile within a compact-schedule period.
+#[derive(Clone, Debug, PartialEq)]
+pub struct CompiledScheduleDayProfile {
+    /// Expanded schedule day types that consume these intervals.
+    pub day_types: Vec<ScheduleDayType>,
+    /// Ordered daily intervals in minute-of-day space.
+    pub intervals: Vec<CompiledScheduleInterval>,
+}
+
+/// One compiled annual period in a compact schedule.
+#[derive(Clone, Debug, PartialEq)]
+pub struct CompiledSchedulePeriod {
+    /// Inclusive leap-shaped schedule ordinal at which this period ends.
+    pub through_schedule_day_of_year: u16,
+    /// Source-ordered day-type profiles within this period.
+    pub day_profiles: Vec<CompiledScheduleDayProfile>,
 }
 
 /// One sampled zone internal-gain output series.
@@ -272,18 +338,22 @@ pub fn simulate_constant_schedules(model: &TypedModel, sample_count: usize) -> V
         .collect()
 }
 
-/// Simulates constant and supported compact schedules for a fixed number of hourly samples.
-#[must_use]
-pub fn simulate_schedule_values(model: &TypedModel, sample_count: usize) -> Vec<ScheduleTrace> {
+/// Simulates constant and calendar-invariant compact schedules for hourly samples.
+pub fn simulate_schedule_values(
+    model: &TypedModel,
+    sample_count: usize,
+) -> Result<Vec<ScheduleTrace>, String> {
     precompute_schedule_value_series(model, sample_count)
 }
 
-/// Precomputes constant and supported compact schedules for hourly samples.
-#[must_use]
+/// Precomputes constant and calendar-invariant compact schedules for hourly samples.
+///
+/// Calendar-varying compact schedules require a TimeAxis and are rejected by
+/// this hour-only API rather than being evaluated against an implicit day type.
 pub fn precompute_schedule_value_series(
     model: &TypedModel,
     sample_count: usize,
-) -> Vec<ScheduleValueSeries> {
+) -> Result<Vec<ScheduleValueSeries>, String> {
     let hours = (0..sample_count).map(|index| u32::try_from(index % 24 + 1).unwrap_or(24));
     precompute_schedule_value_series_for_hours(model, hours)
 }
@@ -294,27 +364,36 @@ pub fn precompute_schedule_value_series_for_time_axis(
     model: &TypedModel,
     time_axis: &TimeAxis,
 ) -> Vec<ScheduleValueSeries> {
-    precompute_schedule_value_series_for_hours(
-        model,
-        time_axis.points.iter().map(|point| point.hour),
-    )
+    model
+        .schedules
+        .iter()
+        .map(|schedule| {
+            constant_schedule_series(schedule, time_axis.points.iter().map(|point| point.hour))
+        })
+        .chain(
+            model
+                .compact_schedules
+                .iter()
+                .map(|schedule| compact_schedule_series_for_time_axis(schedule, time_axis)),
+        )
+        .collect()
 }
 
 fn precompute_schedule_value_series_for_hours(
     model: &TypedModel,
     hours: impl IntoIterator<Item = u32> + Clone,
-) -> Vec<ScheduleValueSeries> {
-    model
+) -> Result<Vec<ScheduleValueSeries>, String> {
+    let constants = model
         .schedules
         .iter()
         .map(|schedule| constant_schedule_series(schedule, hours.clone()))
-        .chain(
-            model
-                .compact_schedules
-                .iter()
-                .map(|schedule| compact_schedule_series(schedule, hours.clone())),
-        )
-        .collect()
+        .collect::<Vec<_>>();
+    let compact = model
+        .compact_schedules
+        .iter()
+        .map(|schedule| compact_schedule_series_for_hours(schedule, hours.clone()))
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(constants.into_iter().chain(compact).collect())
 }
 
 fn constant_schedule_series(
@@ -335,11 +414,12 @@ fn constant_schedule_series(
     }
 }
 
-fn compact_schedule_series(
+fn compact_schedule_series_for_hours(
     schedule: &ScheduleCompact,
     hours: impl IntoIterator<Item = u32>,
-) -> ScheduleValueSeries {
-    let intervals = precompile_compact_schedule_intervals(&schedule.segments);
+) -> Result<ScheduleValueSeries, String> {
+    let segments = hour_only_single_period_compact_schedule_segments(schedule)?;
+    let intervals = precompile_compact_schedule_intervals(segments);
     let values = hours
         .into_iter()
         .map(|hour_ending| {
@@ -348,12 +428,176 @@ fn compact_schedule_series(
         })
         .collect();
 
-    ScheduleTrace {
+    Ok(ScheduleTrace {
         schedule_id: schedule.id,
         schedule_name: schedule.name.0.clone(),
         kind: ScheduleSeriesKind::CompactIntervals { intervals },
         values,
+    })
+}
+
+fn compact_schedule_series_for_time_axis(
+    schedule: &ScheduleCompact,
+    time_axis: &TimeAxis,
+) -> ScheduleValueSeries {
+    let periods = precompile_compact_schedule_periods(schedule);
+    let values = time_axis
+        .points
+        .iter()
+        .map(|point| {
+            compiled_compact_schedule_value(
+                &periods,
+                point.schedule_day_of_year,
+                model_schedule_day_type(point.day_type),
+                point.hour.clamp(1, 24) * 60,
+            )
+            .unwrap_or(f64::NAN)
+        })
+        .collect();
+
+    ScheduleTrace {
+        schedule_id: schedule.id,
+        schedule_name: schedule.name.0.clone(),
+        kind: ScheduleSeriesKind::CompactCalendarProfiles { periods },
+        values,
     }
+}
+
+/// Returns the shared daily profile accepted by hour-only schedule consumers.
+///
+/// Such consumers can evaluate only a single annual period ending on schedule
+/// ordinal 366 whose twelve day types all resolve to equivalent Until segments.
+pub fn hour_only_single_period_compact_schedule_segments(
+    schedule: &ScheduleCompact,
+) -> Result<&[ScheduleCompactSegment], String> {
+    if schedule.periods.len() != 1 {
+        return Err(format!(
+            "Schedule:Compact {} has {} Through periods; hour-only consumers require one",
+            schedule.name.0,
+            schedule.periods.len()
+        ));
+    }
+    let period = &schedule.periods[0];
+    if period.through_schedule_day_of_year != 366 {
+        return Err(format!(
+            "Schedule:Compact {} ends at schedule ordinal {}; hour-only consumers require 366",
+            schedule.name.0, period.through_schedule_day_of_year
+        ));
+    }
+
+    let mut baseline: Option<&[ScheduleCompactSegment]> = None;
+    for day_type in ALL_SCHEDULE_DAY_TYPES {
+        let Some(profile) = unique_day_profile(period, day_type) else {
+            return Err(format!(
+                "Schedule:Compact {} must assign day type {day_type:?} exactly once for hour-only consumption",
+                schedule.name.0
+            ));
+        };
+        if let Some(expected) = baseline {
+            if profile.segments.as_slice() != expected {
+                return Err(format!(
+                    "Schedule:Compact {} varies by day type; hour-only consumers require equivalent profiles",
+                    schedule.name.0
+                ));
+            }
+        } else {
+            baseline = Some(&profile.segments);
+        }
+    }
+
+    baseline.ok_or_else(|| {
+        format!(
+            "Schedule:Compact {} has no calendar-invariant day profile",
+            schedule.name.0
+        )
+    })
+}
+
+/// Precompiles all annual periods and day-type profiles in one compact schedule.
+#[must_use]
+pub fn precompile_compact_schedule_periods(
+    schedule: &ScheduleCompact,
+) -> Vec<CompiledSchedulePeriod> {
+    schedule
+        .periods
+        .iter()
+        .map(|period| CompiledSchedulePeriod {
+            through_schedule_day_of_year: period.through_schedule_day_of_year,
+            day_profiles: period
+                .day_profiles
+                .iter()
+                .map(|profile| CompiledScheduleDayProfile {
+                    day_types: profile.day_types.clone(),
+                    intervals: precompile_compact_schedule_intervals(&profile.segments),
+                })
+                .collect(),
+        })
+        .collect()
+}
+
+const ALL_SCHEDULE_DAY_TYPES: [ScheduleDayType; 12] = [
+    ScheduleDayType::Sunday,
+    ScheduleDayType::Monday,
+    ScheduleDayType::Tuesday,
+    ScheduleDayType::Wednesday,
+    ScheduleDayType::Thursday,
+    ScheduleDayType::Friday,
+    ScheduleDayType::Saturday,
+    ScheduleDayType::Holiday,
+    ScheduleDayType::SummerDesignDay,
+    ScheduleDayType::WinterDesignDay,
+    ScheduleDayType::CustomDay1,
+    ScheduleDayType::CustomDay2,
+];
+
+fn model_schedule_day_type(day_type: DayType) -> ScheduleDayType {
+    match day_type {
+        DayType::Sunday => ScheduleDayType::Sunday,
+        DayType::Monday => ScheduleDayType::Monday,
+        DayType::Tuesday => ScheduleDayType::Tuesday,
+        DayType::Wednesday => ScheduleDayType::Wednesday,
+        DayType::Thursday => ScheduleDayType::Thursday,
+        DayType::Friday => ScheduleDayType::Friday,
+        DayType::Saturday => ScheduleDayType::Saturday,
+        DayType::Holiday => ScheduleDayType::Holiday,
+        DayType::SummerDesignDay => ScheduleDayType::SummerDesignDay,
+        DayType::WinterDesignDay => ScheduleDayType::WinterDesignDay,
+        DayType::CustomDay1 => ScheduleDayType::CustomDay1,
+        DayType::CustomDay2 => ScheduleDayType::CustomDay2,
+    }
+}
+
+fn unique_day_profile(
+    period: &ScheduleCompactPeriod,
+    day_type: ScheduleDayType,
+) -> Option<&ScheduleCompactDayProfile> {
+    let mut matches = period
+        .day_profiles
+        .iter()
+        .filter(|profile| profile.day_types.contains(&day_type));
+    let profile = matches.next()?;
+    if matches.next().is_some() {
+        return None;
+    }
+    Some(profile)
+}
+
+fn compiled_compact_schedule_value(
+    periods: &[CompiledSchedulePeriod],
+    schedule_day_of_year: u32,
+    day_type: ScheduleDayType,
+    minute_of_day: u32,
+) -> Option<f64> {
+    periods
+        .iter()
+        .find(|period| schedule_day_of_year <= u32::from(period.through_schedule_day_of_year))
+        .and_then(|period| {
+            period
+                .day_profiles
+                .iter()
+                .find(|profile| profile.day_types.contains(&day_type))
+        })
+        .and_then(|profile| compact_interval_value(&profile.intervals, minute_of_day))
 }
 
 /// Precompiles Schedule:Compact Until segments into closed daily intervals.
@@ -392,12 +636,15 @@ fn compact_interval_value(
 }
 
 /// Simulates zone total internal convective heating rates for hourly samples.
-#[must_use]
+///
+/// Calendar-varying or unresolved schedules are rejected explicitly because
+/// this API has no calendar axis with which to evaluate them.
 pub fn simulate_zone_internal_convective_gains(
     model: &TypedModel,
     sample_count: usize,
-) -> Vec<ZoneInternalGainTrace> {
-    model
+) -> Result<Vec<ZoneInternalGainTrace>, RuntimeError> {
+    validate_hour_only_internal_gain_schedules(model)?;
+    Ok(model
         .zones
         .iter()
         .map(|zone| {
@@ -413,16 +660,19 @@ pub fn simulate_zone_internal_convective_gains(
                 values_w,
             }
         })
-        .collect()
+        .collect())
 }
 
 /// Simulates zone total internal radiant heating rates for hourly samples.
-#[must_use]
+///
+/// Calendar-varying or unresolved schedules are rejected explicitly because
+/// this API has no calendar axis with which to evaluate them.
 pub fn simulate_zone_internal_radiant_gains(
     model: &TypedModel,
     sample_count: usize,
-) -> Vec<ZoneInternalGainTrace> {
-    model
+) -> Result<Vec<ZoneInternalGainTrace>, RuntimeError> {
+    validate_hour_only_internal_gain_schedules(model)?;
+    Ok(model
         .zones
         .iter()
         .map(|zone| ZoneInternalGainTrace {
@@ -435,5 +685,5 @@ pub fn simulate_zone_internal_radiant_gains(
                 })
                 .collect(),
         })
-        .collect()
+        .collect())
 }

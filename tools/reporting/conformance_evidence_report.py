@@ -57,7 +57,20 @@ CLAIM_BOUNDARY = (
     "ending Tuesday when leap years are observed and 48 ending simulation Monday when they are "
     "not. Gregorian, weather, and schedule day-of-year state is source-mapped and unit-tested "
     "internally, but this hour-only external pair does not prove those ordinal fields. It also does "
-    "not claim general EPW record selection. The separate weather record-offset case proves only "
+    "not claim general EPW record selection. The separate Schedule:Compact Through/For day-type "
+    "case covers only one non-actual 2031-12-30 through 2032-01-03 RunPeriod, fixed Month/Day "
+    "Through 1/1 and 12/31 periods, the declared source-ordered For selectors and AllOtherDays "
+    "complements, and one hourly Until endpoint per profile. Its 120 ordered, exact, unique, "
+    "zero-tolerance Schedule Value samples and timestamps follow daily order 103/104/105/108/199, "
+    "each repeated 24 times. The gate separately locks raw EnergyPlus schedule and day-type ESO "
+    "values and timestamp fields, exact Environment, disabled Environment:Daylight Saving, and "
+    "input-file Environment:Special Days EIO rows, plus clean 0 Warning/0 Severe completion. Rust "
+    "schedule-day ordinals 365/366/1/2/3 are source-mapped unit-test and summary diagnostics, not "
+    "ESO/EIO-emitted fields, and Rust EPW record selection is null and unclaimed in this schedule-only "
+    "case. DST schedule-clock/hour-24 tomorrow behavior, subhourly interpolation, other schedule "
+    "families, additional periods/RunPeriods/year boundaries, actual/design-day/warmup execution, "
+    "internal-gain/HVAC/IdealLoads calendar consumption, Rust raw ESO parity, and broad warning/error "
+    "parity remain unclaimed. The separate weather record-offset case proves only "
     "same-year non-actual, single-data-period, one-record-per-hour month/day positioning: 24 leading "
     "decoy rows are skipped and 48 ordered hourly dry-bulb timestamps and values match exactly. "
     "Weather-required heat-balance ep_run setup consumes the same selector before weather-timestep "
@@ -263,6 +276,7 @@ CASE_LABELS = {
     "surface_temperature_nomass_001": "Surface no-mass",
     "schedule_constant_001": "Schedule const",
     "calendar_schedule_hourly_exact_001": "Calendar/sched exact",
+    "calendar_schedule_compact_through_for_day_type_hourly_exact_001": "Compact Through/For",
     "calendar_schedule_weather_leap_policy_no_001": "Weather calendar no-leap",
     "calendar_dst_fixed_date_hourly_exact_001": "Calendar DST fixed enabled",
     "calendar_dst_fixed_date_disabled_hourly_exact_001": "Calendar DST fixed disabled",
@@ -299,6 +313,7 @@ KEY_LABELS = {
     "ZONE ONE": "Zone One",
     "ALWAYSON": "AlwaysOn",
     "CALENDAR HOURLY 1 TO 24": "Calendar 1-24",
+    "THROUGH FOR DAY TYPE SCHEDULE": "Through/For day type",
     "Environment": "Env",
     "ENVIRONMENT": "Env",
 }
@@ -388,6 +403,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Compact Through/For",
+        command="compare-calendar-schedule-compact-through-for-day-type-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_through_for_day_type_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_through_for_day_type_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_through_for_day_type_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="Weather calendar",

@@ -299,6 +299,12 @@
                          "help":  "Gate ordered, exact, unique hourly calendar timestamps and Schedule:Compact values across the 2016 leap day."
                      },
                      {
+                         "name":  "compare-calendar-schedule-compact-through-for-day-type-exact",
+                         "path":  "compare\\compare-calendar-schedule-compact-through-for-day-type-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact Schedule:Compact Through and source-ordered For day-type consumption across one year boundary."
+                     },
+                     {
                          "name":  "compare-weather-effective-calendar",
                          "path":  "compare\\compare-weather-effective-calendar.ps1",
                          "group":  "compare",

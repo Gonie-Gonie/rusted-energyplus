@@ -4,8 +4,10 @@ use ep_conformance::{
     OutputFrequency, OutputRequest, SourceArtifact, TimestampContract, VariableClass,
 };
 use ep_model::{
-    DayOfWeek, FirstHourInterpolationStartingValues, NormalizedName, RunPeriod, RunPeriodId,
-    ScheduleCompact, ScheduleCompactSegment, ScheduleId, TimestepConfig, TypedModel,
+    CalendarDateRule, DayOfWeek, FirstHourInterpolationStartingValues, NormalizedName, RunPeriod,
+    RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact,
+    ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleDayType,
+    ScheduleId, SpecialDayType, TimestepConfig, TypedModel,
 };
 use ep_runtime::{
     DayType, DaylightSavingPeriodSource, EpwCalendarDateRule, EpwCalendarMetadata,
@@ -18,6 +20,72 @@ use super::{
     precompute_schedule_value_series_for_time_axis, schedule_samples, weather_calendar_json,
     weather_samples,
 };
+
+fn all_schedule_day_types() -> Vec<ScheduleDayType> {
+    vec![
+        ScheduleDayType::Sunday,
+        ScheduleDayType::Monday,
+        ScheduleDayType::Tuesday,
+        ScheduleDayType::Wednesday,
+        ScheduleDayType::Thursday,
+        ScheduleDayType::Friday,
+        ScheduleDayType::Saturday,
+        ScheduleDayType::Holiday,
+        ScheduleDayType::SummerDesignDay,
+        ScheduleDayType::WinterDesignDay,
+        ScheduleDayType::CustomDay1,
+        ScheduleDayType::CustomDay2,
+    ]
+}
+
+fn compact_day_profile(day_types: Vec<ScheduleDayType>, value: f64) -> ScheduleCompactDayProfile {
+    ScheduleCompactDayProfile {
+        day_types,
+        segments: vec![ScheduleCompactSegment {
+            until_minute_of_day: 24 * 60,
+            value,
+        }],
+    }
+}
+
+fn cross_year_day_type_compact_schedule(id: ScheduleId) -> ScheduleCompact {
+    let period_one_other_days = all_schedule_day_types()
+        .into_iter()
+        .filter(|day_type| *day_type != ScheduleDayType::Thursday)
+        .collect();
+    let period_two_other_days = all_schedule_day_types()
+        .into_iter()
+        .filter(|day_type| {
+            !matches!(
+                day_type,
+                ScheduleDayType::Tuesday | ScheduleDayType::Wednesday | ScheduleDayType::Holiday
+            )
+        })
+        .collect();
+    ScheduleCompact {
+        id,
+        name: NormalizedName::new("Cross Year Day Type"),
+        schedule_type_limits: None,
+        periods: vec![
+            ScheduleCompactPeriod {
+                through_schedule_day_of_year: 1,
+                day_profiles: vec![
+                    compact_day_profile(vec![ScheduleDayType::Thursday], 105.0),
+                    compact_day_profile(period_one_other_days, 199.0),
+                ],
+            },
+            ScheduleCompactPeriod {
+                through_schedule_day_of_year: 366,
+                day_profiles: vec![
+                    compact_day_profile(vec![ScheduleDayType::Tuesday], 103.0),
+                    compact_day_profile(vec![ScheduleDayType::Wednesday], 104.0),
+                    compact_day_profile(vec![ScheduleDayType::Holiday], 108.0),
+                    compact_day_profile(period_two_other_days, 199.0),
+                ],
+            },
+        ],
+    }
+}
 
 #[test]
 fn schedule_samples_resolves_compact_trace_from_shared_name_registry()
@@ -34,12 +102,18 @@ fn schedule_samples_resolves_compact_trace_from_shared_name_registry()
         id: schedule_id,
         name: NormalizedName::new("Calendar Hourly"),
         schedule_type_limits: None,
-        segments: (1..=24)
-            .map(|hour| ScheduleCompactSegment {
-                until_minute_of_day: hour * 60,
-                value: f64::from(hour),
-            })
-            .collect(),
+        periods: vec![ScheduleCompactPeriod {
+            through_schedule_day_of_year: 366,
+            day_profiles: vec![ScheduleCompactDayProfile {
+                day_types: all_schedule_day_types(),
+                segments: (1..=24)
+                    .map(|hour| ScheduleCompactSegment {
+                        until_minute_of_day: hour * 60,
+                        value: f64::from(hour),
+                    })
+                    .collect(),
+            }],
+        }],
     });
     let time_axis = build_hourly_time_axis(&model).map_err(std::io::Error::other)?;
     let schedule_series = precompute_schedule_value_series_for_time_axis(&model, &time_axis);
@@ -68,6 +142,109 @@ fn schedule_samples_resolves_compact_trace_from_shared_name_registry()
     assert_eq!(timestamps.len(), 24);
     assert_eq!(samples.first().map(|sample| sample.value), Some(1.0));
     assert_eq!(samples.last().map(|sample| sample.value), Some(24.0));
+    Ok(())
+}
+
+#[test]
+fn schedule_samples_consume_cross_year_through_and_for_profiles()
+-> Result<(), Box<dyn std::error::Error>> {
+    let schedule_id = ScheduleId(41);
+    let mut model = TypedModel {
+        timestep: TimestepConfig {
+            number_of_timesteps_per_hour: 1,
+        },
+        run_periods: vec![RunPeriod {
+            id: RunPeriodId(0),
+            name: NormalizedName::new("Cross Year Schedule"),
+            begin_month: 12,
+            begin_day_of_month: 30,
+            begin_year: Some(2031),
+            end_month: 1,
+            end_day_of_month: 3,
+            end_year: Some(2032),
+            day_of_week_for_start_day: Some(DayOfWeek::Tuesday),
+            first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues::Hour24,
+            use_weather_file_holidays_and_special_days: false,
+            use_weather_file_daylight_saving_period: false,
+            apply_weekend_holiday_rule: false,
+            use_weather_file_rain_indicators: false,
+            use_weather_file_snow_indicators: false,
+            treat_weather_as_actual: false,
+        }],
+        run_period_special_days: vec![RunPeriodSpecialDay {
+            id: RunPeriodSpecialDayId(0),
+            name: NormalizedName::new("January Second Holiday"),
+            start_date: CalendarDateRule::MonthDay {
+                month: 1,
+                day_of_month: 2,
+            },
+            duration_days: 1,
+            special_day_type: SpecialDayType::Holiday,
+        }],
+        compact_schedules: vec![cross_year_day_type_compact_schedule(schedule_id)],
+        ..TypedModel::default()
+    };
+    assert!(
+        model
+            .schedule_names
+            .insert("Cross Year Day Type", schedule_id)
+            .is_none()
+    );
+
+    let time_axis = build_hourly_time_axis(&model).map_err(std::io::Error::other)?;
+    let schedule_series = precompute_schedule_value_series_for_time_axis(&model, &time_axis);
+    let output = OutputRequest {
+        key: "CROSS YEAR DAY TYPE".to_string(),
+        variable: "Schedule Value".to_string(),
+        frequency: OutputFrequency::Hourly,
+        class: VariableClass::Schedule,
+        source: SourceArtifact::Eso,
+        timestamp_contract: Some(TimestampContract::OrderedExactUnique),
+        domain: None,
+        level: None,
+        abs_tol: None,
+        rmse_tol: None,
+        rel_tol: None,
+    };
+
+    let samples = schedule_samples(&output, &model, &time_axis, &schedule_series)
+        .map_err(std::io::Error::other)?;
+    assert_eq!(samples.len(), 120);
+    assert_eq!(
+        time_axis
+            .points
+            .chunks_exact(24)
+            .map(|day| day[0].schedule_day_of_year)
+            .collect::<Vec<_>>(),
+        vec![365, 366, 1, 2, 3]
+    );
+    assert_eq!(
+        samples
+            .chunks_exact(24)
+            .map(|day| day[0].value)
+            .collect::<Vec<_>>(),
+        vec![103.0, 104.0, 105.0, 108.0, 199.0]
+    );
+    assert!(
+        samples
+            .chunks_exact(24)
+            .all(|day| day.iter().all(|sample| sample.value == day[0].value))
+    );
+    for (index, label) in [
+        (0, "day_type=Tuesday"),
+        (24, "day_type=Wednesday"),
+        (48, "day_type=Thursday"),
+        (72, "day_type=Holiday"),
+        (96, "day_type=Saturday"),
+    ] {
+        assert!(
+            samples[index]
+                .timestamp
+                .as_deref()
+                .is_some_and(|timestamp| timestamp.contains(label))
+        );
+    }
+
     Ok(())
 }
 
