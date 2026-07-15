@@ -11,7 +11,8 @@ use ep_model::{
     DayOfWeek, DayScheduleId, FirstHourInterpolationStartingValues, NormalizedName, RunPeriod,
     RunPeriodId, ScheduleCompactSegment, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList,
     ScheduleDayType, ScheduleFile, ScheduleFileColumnSeparator, ScheduleId, ScheduleInterpolation,
-    ScheduleWeekDaily, ScheduleYear, TimestepConfig, TypedModel, WeekScheduleId,
+    ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, TimestepConfig, TypedModel,
+    WeekScheduleId,
 };
 
 fn hourly_file_schedule() -> ScheduleFile {
@@ -76,6 +77,71 @@ fn annual_day_week_year_model() -> TypedModel {
         year_schedules: vec![year_schedule],
         ..TypedModel::default()
     }
+}
+
+fn annual_compact_week_model() -> TypedModel {
+    let regular_day = ScheduleDayHourly {
+        id: DayScheduleId(0),
+        name: NormalizedName::new("Compact Regular Day"),
+        schedule_type_limits: None,
+        hourly_values: [20.0; 24],
+    };
+    let holiday_day = ScheduleDayHourly {
+        id: DayScheduleId(1),
+        name: NormalizedName::new("Compact Holiday Day"),
+        schedule_type_limits: None,
+        hourly_values: [80.0; 24],
+    };
+    let daily_week = ScheduleWeekDaily {
+        id: WeekScheduleId(0),
+        name: NormalizedName::new("Daily Prefix Week"),
+        day_schedules: [regular_day.id; 12],
+    };
+    let mut compact_day_schedules = [regular_day.id; 12];
+    compact_day_schedules[7] = holiday_day.id;
+    let compact_week = ScheduleWeekCompact {
+        id: WeekScheduleId(1),
+        name: NormalizedName::new("Compact Week"),
+        day_schedules: compact_day_schedules,
+    };
+    let year_schedule = ScheduleYear {
+        id: ScheduleId(70),
+        name: NormalizedName::new("Compact Annual"),
+        schedule_type_limits: None,
+        week_schedules: [compact_week.id; 366],
+    };
+
+    TypedModel {
+        day_schedules: vec![regular_day, holiday_day],
+        week_schedules: vec![daily_week],
+        week_compact_schedules: vec![compact_week],
+        year_schedules: vec![year_schedule],
+        ..TypedModel::default()
+    }
+}
+
+fn interval_mode_compact_week_model() -> TypedModel {
+    let mut model = interval_mode_model();
+    let compact_schedules = std::mem::take(&mut model.week_schedules)
+        .into_iter()
+        .map(|schedule| ScheduleWeekCompact {
+            id: WeekScheduleId(schedule.id.0 + 1),
+            name: schedule.name,
+            day_schedules: schedule.day_schedules,
+        })
+        .collect::<Vec<_>>();
+    model.week_schedules.push(ScheduleWeekDaily {
+        id: WeekScheduleId(0),
+        name: NormalizedName::new("Interval Daily Prefix"),
+        day_schedules: [DayScheduleId(0); 12],
+    });
+    model.week_compact_schedules = compact_schedules;
+    for schedule in &mut model.year_schedules {
+        for week_schedule_id in &mut schedule.week_schedules {
+            week_schedule_id.0 += 1;
+        }
+    }
+    model
 }
 
 fn interval_mode_segments() -> Vec<ScheduleCompactSegment> {
@@ -615,4 +681,102 @@ fn hourly_axis_treats_day_list_linear_as_no_but_rejects_average() {
         return;
     };
     assert!(average_trace.values.iter().all(|value| value.is_nan()));
+}
+
+#[test]
+fn compact_week_shared_id_offset_selects_special_day_and_preserves_daily_lookup() {
+    let model = annual_compact_week_model();
+    let compact_year = &model.year_schedules[0];
+
+    assert_eq!(
+        year_schedule_hourly_value(&model, compact_year, 1, ScheduleDayType::Monday, 60,),
+        Some(20.0)
+    );
+    assert_eq!(
+        year_schedule_hourly_value(&model, compact_year, 1, ScheduleDayType::Holiday, 60,),
+        Some(80.0)
+    );
+
+    let daily_year = ScheduleYear {
+        id: ScheduleId(71),
+        name: NormalizedName::new("Daily Annual"),
+        schedule_type_limits: None,
+        week_schedules: [WeekScheduleId(0); 366],
+    };
+    assert_eq!(
+        year_schedule_hourly_value(&model, &daily_year, 1, ScheduleDayType::Holiday, 60,),
+        Some(20.0)
+    );
+}
+
+#[test]
+fn compact_week_malformed_shared_ids_fail_closed() {
+    let mut mismatched_payload = annual_compact_week_model();
+    mismatched_payload.week_compact_schedules[0].id = WeekScheduleId(9);
+    assert_eq!(
+        year_schedule_hourly_value(
+            &mismatched_payload,
+            &mismatched_payload.year_schedules[0],
+            1,
+            ScheduleDayType::Holiday,
+            60,
+        ),
+        None
+    );
+
+    let mut out_of_range_pointer = annual_compact_week_model();
+    out_of_range_pointer.year_schedules[0].week_schedules = [WeekScheduleId(9); 366];
+    assert_eq!(
+        year_schedule_hourly_value(
+            &out_of_range_pointer,
+            &out_of_range_pointer.year_schedules[0],
+            1,
+            ScheduleDayType::Holiday,
+            60,
+        ),
+        None
+    );
+}
+
+#[test]
+fn compact_week_interval_reference_uses_compiled_day_table_and_hourly_fail_close() {
+    let model = interval_mode_compact_week_model();
+    let environment_axis =
+        build_environment_time_axis_for_run_period_with_zone_timesteps(&model.run_periods[0], 1, 4);
+    assert!(
+        environment_axis.is_ok(),
+        "one-day interval axis should build"
+    );
+    let Ok(environment_axis) = environment_axis else {
+        return;
+    };
+    let traces =
+        precompute_schedule_value_series_for_environment_time_axis(&model, &environment_axis);
+    let trace = traces
+        .iter()
+        .find(|trace| trace.schedule_id == ScheduleId(41));
+    assert!(trace.is_some(), "compact-week annual trace should exist");
+    let Some(trace) = trace else {
+        return;
+    };
+    assert_eq!(&trace.values[..5], [10.0, 120.0, 175.0, 175.0, 175.0]);
+    assert!(matches!(
+        trace.kind,
+        ScheduleSeriesKind::YearWeekDayCompiledProfiles { .. }
+    ));
+
+    let hourly_axis = build_hourly_time_axis(&model);
+    assert!(hourly_axis.is_ok(), "one-day hourly axis should build");
+    let Ok(hourly_axis) = hourly_axis else {
+        return;
+    };
+    let traces = precompute_schedule_value_series_for_time_axis(&model, &hourly_axis);
+    let trace = traces
+        .iter()
+        .find(|trace| trace.schedule_id == ScheduleId(41));
+    assert!(trace.is_some(), "compact-week hourly trace should exist");
+    let Some(trace) = trace else {
+        return;
+    };
+    assert!(trace.values.iter().all(|value| value.is_nan()));
 }

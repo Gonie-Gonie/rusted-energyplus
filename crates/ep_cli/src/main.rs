@@ -381,7 +381,18 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
         "  day_list_schedules: {}",
         model.typed.day_list_schedules.len()
     );
-    println!("  week_schedules: {}", model.typed.week_schedules.len());
+    println!(
+        "  week_schedules: {}",
+        model.typed.week_schedules.len() + model.typed.week_compact_schedules.len()
+    );
+    println!(
+        "  week_daily_schedules: {}",
+        model.typed.week_schedules.len()
+    );
+    println!(
+        "  week_compact_schedules: {}",
+        model.typed.week_compact_schedules.len()
+    );
     println!("  year_schedules: {}", model.typed.year_schedules.len());
     println!("  other_equipment: {}", model.typed.other_equipment.len());
     println!(
@@ -17073,7 +17084,15 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
         model.day_interval_schedules.len()
     );
     println!("  day_list_schedules: {}", model.day_list_schedules.len());
-    println!("  week_schedules: {}", model.week_schedules.len());
+    println!(
+        "  week_schedules: {}",
+        model.week_schedules.len() + model.week_compact_schedules.len()
+    );
+    println!("  week_daily_schedules: {}", model.week_schedules.len());
+    println!(
+        "  week_compact_schedules: {}",
+        model.week_compact_schedules.len()
+    );
     println!("  year_schedules: {}", model.year_schedules.len());
     println!("  other_equipment: {}", model.other_equipment.len());
     println!(

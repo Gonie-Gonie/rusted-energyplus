@@ -108,14 +108,14 @@ name = "Schedule:Day:Interval"
 family = "schedule"
 status = "typed"
 first_evidence = "calendar_schedule_day_interval_modes_exact_001"
-support_boundary = "Typed as source-ordered Until/value segments plus blank/default-No, Average, or Linear interpolation in the shared DayScheduleId namespace after Schedule:Day:Hourly. Limited EnergyPlus 26.1 conformance covers exactly three Timestep,4 profiles consumed through one Week:Daily and Year over 2032-01-01 through 2032-01-03, producing one 288-sample ordered-exact-unique zero-tolerance Schedule Value series with exact raw values/timestamps and 0 Warning/0 Severe completion. Day:List, Week:Compact, unaligned-No warnings, other interval/timestep shapes, Hourly aggregation, diagnostic parity, special-day/DST/tomorrow behavior, downstream consumers, and broad ScheduleManager parity remain unclaimed."
+support_boundary = "Typed as source-ordered Until/value segments plus blank/default-No, Average, or Linear interpolation in the shared DayScheduleId namespace after Schedule:Day:Hourly. Limited EnergyPlus 26.1 conformance covers exactly three Timestep,4 profiles consumed through one Week:Daily and Year over 2032-01-01 through 2032-01-03, producing one 288-sample ordered-exact-unique zero-tolerance Schedule Value series with exact raw values/timestamps and 0 Warning/0 Severe completion. The separate calendar_schedule_week_compact_day_types_exact_001 case consumes two constant explicit-No Interval profiles through Week:Compact but does not revalidate interpolation. Day:List, other Week:Compact combinations, unaligned-No warnings, other interval/timestep shapes, Hourly aggregation, diagnostic parity, other special-day/DST/tomorrow behavior, downstream consumers, and broad ScheduleManager parity remain unclaimed."
 
 [[object]]
 name = "Schedule:Day:List"
 family = "schedule"
 status = "typed"
 first_evidence = "calendar_schedule_day_list_modes_exact_001"
-support_boundary = "Typed as source-ordered values with Minutes per Item and blank/default-No, Average, or Linear interpolation in the shared DayScheduleId namespace after Schedule:Day:Hourly and Schedule:Day:Interval. Limited EnergyPlus 26.1 conformance covers exactly three Minutes-per-Item-20 Timestep,4 profiles consumed through one Week:Daily and Year over 2032-01-01 through 2032-01-03, producing one 288-sample ordered-exact-unique zero-tolerance Schedule Value series. The gate proves the source-actual Day:List behavior that Average computes minute-window means while Linear equals No endpoint sampling, plus exact raw values/timestamps and 0 Warning/0 Severe completion. Week:Compact, other minute/timestep shapes, blank-value and malformed-count diagnostics, a documentation-intended Linear ramp, Hourly aggregation, special-day/DST/tomorrow behavior, downstream consumers, and broad ScheduleManager parity remain unclaimed."
+support_boundary = "Typed as source-ordered values with Minutes per Item and blank/default-No, Average, or Linear interpolation in the shared DayScheduleId namespace after Schedule:Day:Hourly and Schedule:Day:Interval. Limited EnergyPlus 26.1 conformance covers exactly three Minutes-per-Item-20 Timestep,4 profiles consumed through one Week:Daily and Year over 2032-01-01 through 2032-01-03, producing one 288-sample ordered-exact-unique zero-tolerance Schedule Value series. The gate proves the source-actual Day:List behavior that Average computes minute-window means while Linear equals No endpoint sampling, plus exact raw values/timestamps and 0 Warning/0 Severe completion. The separate calendar_schedule_week_compact_day_types_exact_001 case consumes two constant explicit-No List profiles through Week:Compact but does not revalidate interpolation. Other Week:Compact combinations, other minute/timestep shapes, blank-value and malformed-count diagnostics, a documentation-intended Linear ramp, Hourly aggregation, other special-day/DST/tomorrow behavior, downstream consumers, and broad ScheduleManager parity remain unclaimed."
 
 [[object]]
 name = "Schedule:Week:Daily"
@@ -123,6 +123,13 @@ family = "schedule"
 status = "typed"
 first_evidence = "calendar_schedule_day_hourly_week_daily_year_leap_exact_001"
 support_boundary = "Typed as 12 resolved Schedule:Day references in EnergyPlus day-type order. The exact case externally consumes only Week A Sunday/Monday and Week B Tuesday over 2016-02-28 through 2016-03-01; the other nine day-type selections, Schedule:Week:Compact, missing-reference diagnostic parity, DST/holiday/tomorrow combinations, design-day execution, and downstream consumers remain unclaimed."
+
+[[object]]
+name = "Schedule:Week:Compact"
+family = "schedule"
+status = "typed"
+first_evidence = "calendar_schedule_week_compact_day_types_exact_001"
+support_boundary = "Typed as source-ordered DayType List/Schedule:Day pairs compiled into 12 resolved day pointers in the shared WeekScheduleId namespace after Schedule:Week:Daily. Limited EnergyPlus 26.1 conformance covers exactly one seven-pair Weekdays, Weekends, Holiday, SummerDesignDay, WinterDesignDay, CustomDay1, and CustomDay2 mapping consumed through one full-year Schedule:Year over 2032-01-01 through 2032-01-07 at Timestep,4. The gate proves one 672-sample ordered-exact-unique zero-tolerance Schedule Value series, exact raw values/timestamps, the resolved 12-slot WeekSchedule EIO row, converted epJSON pair order, five special-day rows, and 0 Warning/0 Severe completion. AllDays, AllOtherDays, omitted For prefixes, arbitrary combined lists, selector/reference diagnostic parity, other pair orders, other profiles/calendars, DST/tomorrow behavior, downstream consumers, and broad ScheduleManager parity remain unclaimed."
 
 [[object]]
 name = "Schedule:Year"

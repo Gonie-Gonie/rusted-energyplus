@@ -19,7 +19,7 @@ use ep_model::{
     ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
     ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleDayType,
     ScheduleFile, ScheduleFileColumnSeparator, ScheduleId, ScheduleInterpolation,
-    ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekDaily, ScheduleYear,
+    ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear,
     SetpointManagerComponent, SiteLocation, SolarDistribution, SpecialDayType, SunExposure,
     Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
     ThermostatSetpointId, TimestepConfig, TypedModel, Version, WeekScheduleId, WindExposure, Zone,
@@ -227,6 +227,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Schedule:Day:Interval",
     "Schedule:Day:List",
     "Schedule:Week:Daily",
+    "Schedule:Week:Compact",
     "Schedule:Year",
     "OtherEquipment",
     "People",
@@ -315,6 +316,7 @@ impl<'a> Compiler<'a> {
         self.parse_day_interval_schedules(&mut model);
         self.parse_day_list_schedules(&mut model);
         self.parse_week_daily_schedules(&mut model);
+        self.parse_week_compact_schedules(&mut model);
         self.parse_year_schedules(&mut model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
@@ -1563,6 +1565,155 @@ impl<'a> Compiler<'a> {
                 day_schedules,
             });
         }
+    }
+
+    fn parse_week_compact_schedules(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "Schedule:Week:Compact";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            if model.week_schedule_names.resolve(&name).is_some() {
+                self.duplicate_name(OBJECT_TYPE, &name);
+                continue;
+            }
+
+            let Some(day_schedules) =
+                self.schedule_week_compact_day_schedules(model, &name, &object)
+            else {
+                continue;
+            };
+            let week_schedule_index =
+                model.week_schedules.len() + model.week_compact_schedules.len();
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, week_schedule_index) else {
+                continue;
+            };
+            let id = WeekScheduleId(id_value);
+            if model.week_schedule_names.insert(&name, id).is_some() {
+                self.duplicate_name(OBJECT_TYPE, &name);
+                continue;
+            }
+            model.week_compact_schedules.push(ScheduleWeekCompact {
+                id,
+                name: NormalizedName::new(&name),
+                day_schedules,
+            });
+        }
+    }
+
+    fn schedule_week_compact_day_schedules(
+        &mut self,
+        model: &TypedModel,
+        object_name: &str,
+        object: &RawObject,
+    ) -> Option<[DayScheduleId; 12]> {
+        const OBJECT_TYPE: &str = "Schedule:Week:Compact";
+        const FIELD: &str = "data";
+        let Some(value) = field_value(object, FIELD) else {
+            self.error(
+                "MissingRequiredField",
+                OBJECT_TYPE,
+                Some(object_name),
+                Some(FIELD),
+                format!("{OBJECT_TYPE}/{object_name} requires field {FIELD}"),
+            );
+            return None;
+        };
+        let RawValue::Array(entries) = value else {
+            self.invalid_field_type(OBJECT_TYPE, object_name, FIELD, "array");
+            return None;
+        };
+
+        let mut assigned_day_types = [false; 12];
+        let mut day_schedules = [DayScheduleId(0); 12];
+        let mut entries_valid = true;
+        for (index, value) in entries.iter().enumerate() {
+            let RawValue::Object(fields) = value else {
+                self.error(
+                    "InvalidFieldType",
+                    OBJECT_TYPE,
+                    Some(object_name),
+                    Some(FIELD),
+                    format!("{OBJECT_TYPE}/{object_name} {FIELD} entry {index} must be an object"),
+                );
+                entries_valid = false;
+                continue;
+            };
+            let entry = RawObject {
+                fields: fields.clone(),
+                source_span: None,
+            };
+            let entry_name = format!("{object_name}[{index}]");
+            let (Some(day_type_list), Some(day_schedule_name)) = (
+                self.required_string(OBJECT_TYPE, &entry_name, &entry, "daytype_list"),
+                self.required_string(OBJECT_TYPE, &entry_name, &entry, "schedule_day_name"),
+            ) else {
+                entries_valid = false;
+                continue;
+            };
+
+            // EnergyPlus resolves the day schedule before processing the selector. A missing
+            // reference therefore must not consume any day types for later AllOtherDays pairs.
+            let Some(day_schedule_id) = self.resolve_name(
+                &model.day_schedule_names,
+                OBJECT_TYPE,
+                &entry_name,
+                "schedule_day_name",
+                &day_schedule_name,
+                "Schedule:Day",
+            ) else {
+                entries_valid = false;
+                continue;
+            };
+
+            let selection = process_week_compact_day_types(&day_type_list, &mut assigned_day_types);
+            if !selection.recognized {
+                self.error(
+                    "InvalidScheduleWeekCompactDayTypeList",
+                    OBJECT_TYPE,
+                    Some(&entry_name),
+                    Some("daytype_list"),
+                    format!(
+                        "{OBJECT_TYPE}/{entry_name} has no valid day assignments in '{day_type_list}'"
+                    ),
+                );
+                entries_valid = false;
+                continue;
+            }
+            if selection.duplicate {
+                self.error(
+                    "DuplicateScheduleWeekCompactDayType",
+                    OBJECT_TYPE,
+                    Some(&entry_name),
+                    Some("daytype_list"),
+                    format!(
+                        "{OBJECT_TYPE}/{entry_name} attempts a duplicate day assignment in '{day_type_list}'"
+                    ),
+                );
+                entries_valid = false;
+                continue;
+            }
+
+            for (day_schedule, selected) in day_schedules.iter_mut().zip(selection.selected) {
+                if selected {
+                    *day_schedule = day_schedule_id;
+                }
+            }
+        }
+
+        if let Some(index) = assigned_day_types.iter().position(|assigned| !assigned) {
+            self.error(
+                "MissingScheduleWeekCompactDayAssignments",
+                OBJECT_TYPE,
+                Some(object_name),
+                Some(FIELD),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} is missing an assignment for {}",
+                    schedule_day_type_name(ALL_SCHEDULE_DAY_TYPES[index])
+                ),
+            );
+            entries_valid = false;
+        }
+
+        entries_valid.then_some(day_schedules)
     }
 
     fn parse_year_schedules(&mut self, model: &mut TypedModel) {
@@ -5932,6 +6083,85 @@ const ALL_SCHEDULE_DAY_TYPES: [ScheduleDayType; 12] = [
     ScheduleDayType::CustomDay2,
 ];
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+struct WeekCompactDayTypeSelection {
+    selected: [bool; 12],
+    recognized: bool,
+    duplicate: bool,
+}
+
+fn process_week_compact_day_types(
+    value: &str,
+    assigned: &mut [bool; 12],
+) -> WeekCompactDayTypeSelection {
+    let value = value.to_ascii_uppercase();
+    let mut selection = WeekCompactDayTypeSelection {
+        selected: [false; 12],
+        recognized: false,
+        duplicate: false,
+    };
+
+    macro_rules! select_if_present {
+        ($needle:literal, [$($index:expr),+ $(,)?]) => {
+            if value.contains($needle) {
+                selection.recognized = true;
+                select_week_compact_day_types(
+                    &mut selection.selected,
+                    assigned,
+                    &mut selection.duplicate,
+                    &[$($index),+],
+                );
+            }
+        };
+    }
+
+    // Keep this order aligned with EnergyPlus ProcessForDayTypes. It intentionally uses
+    // substring matching rather than tokenization; optional `For` and `:` text is irrelevant.
+    select_if_present!("WEEKDAY", [1, 2, 3, 4, 5]);
+    select_if_present!("MONDAY", [1]);
+    select_if_present!("TUESDAY", [2]);
+    select_if_present!("WEDNESDAY", [3]);
+    select_if_present!("THURSDAY", [4]);
+    select_if_present!("FRIDAY", [5]);
+    select_if_present!("WEEKEND", [0, 6]);
+    select_if_present!("SATURDAY", [6]);
+    select_if_present!("SUNDAY", [0]);
+    select_if_present!("CUSTOMDAY1", [10]);
+    select_if_present!("CUSTOMDAY2", [11]);
+    select_if_present!("ALLDAY", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    select_if_present!("HOLIDAY", [7]);
+    select_if_present!("SUMMER", [8]);
+    select_if_present!("WINTER", [9]);
+
+    if value.contains("ALLOTHERDAY") {
+        selection.recognized = true;
+        for (selected, assigned) in selection.selected.iter_mut().zip(assigned.iter_mut()) {
+            if !*assigned {
+                *selected = true;
+                *assigned = true;
+            }
+        }
+    }
+
+    selection
+}
+
+fn select_week_compact_day_types(
+    selected: &mut [bool; 12],
+    assigned: &mut [bool; 12],
+    duplicate: &mut bool,
+    indices: &[usize],
+) {
+    for index in indices {
+        selected[*index] = true;
+        if assigned[*index] {
+            *duplicate = true;
+        } else {
+            assigned[*index] = true;
+        }
+    }
+}
+
 fn expand_compact_day_type_token(token: &str) -> Option<Vec<ScheduleDayType>> {
     match token.to_ascii_lowercase().as_str() {
         "alldays" => Some(ALL_SCHEDULE_DAY_TYPES.to_vec()),
@@ -6482,6 +6712,7 @@ mod tests {
     mod schedule_day_interval;
     mod schedule_day_list;
     mod schedule_file;
+    mod schedule_week_compact;
     mod schedule_year;
 
     use super::{

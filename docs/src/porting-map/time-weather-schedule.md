@@ -643,6 +643,49 @@ rejection and lookup branches remain source/unit evidence; the parent
 `calendar_time_state`, `ProcessScheduleInput`, `populateFromMinuteVals`, and
 `getHrTsVal` records remain incomplete.
 
+## Schedule:Week:Compact Day-Type Evidence Checkpoint
+
+`calendar_schedule_week_compact_day_types_exact_001` advances to the next
+public/input object in EnergyPlus `ProcessScheduleInput` source order. One
+`Schedule:Week:Compact` maps Weekdays, Weekends, Holiday, SummerDesignDay,
+WinterDesignDay, CustomDay1, and CustomDay2 to seven profiles drawn from the
+shared Schedule:Day Hourly, Interval, and List namespace. A full-year
+`Schedule:Year` consumes the resulting week pointer.
+
+The mapped EnergyPlus 26.1 intake is `Sched::ProcessScheduleInput` lines
+1082-1142, after all `Schedule:Week:Daily` objects and before
+`Schedule:Year`. Each source-ordered pair resolves its Day schedule before
+calling `Sched::ProcessForDayTypes` lines 3075-3248. Weekdays expands to
+Monday through Friday, Weekends expands to Sunday and Saturday, the five
+special tokens fill the remaining slots, duplicate selection is an error, and
+all 12 day types must be assigned. Rust follows the family ordering in the
+shared WeekSchedule ID space and materializes the completed 12-pointer table
+for immutable Year lookup.
+
+The exact non-actual RunPeriod is 2032-01-01 through 2032-01-07 at
+`Timestep,4`. Its day types are Thursday, Holiday, Saturday,
+SummerDesignDay, WinterDesignDay, CustomDay1, and CustomDay2. The blocking
+gate proves one series of 672 ordered, unique Timestep `Schedule Value`
+samples and timestamps at zero tolerance: daily values are respectively
+`11`, `33`, `22`, `44`, `55`, `66`, and `77`, each repeated 96 times. It also
+locks every raw EnergyPlus value and timestep timestamp field; the exact
+Environment, disabled-daylight-saving, five special-day, and resolved 12-slot
+WeekSchedule EIO rows; converted epJSON pair order; and successful completion
+with exactly 0 Warning and 0 Severe errors.
+
+This checkpoint does not claim AllDays, AllOtherDays, an omitted `For:`
+prefix, arbitrary combined day-type lists, duplicate/missing/invalid selector
+or missing-reference diagnostic text/count/order parity, other pair orders or
+overwrite behavior, other timestep or day-profile shapes, Day interpolation
+revalidation, EPW holiday precedence, weekend shifting, overlapping special
+days, DST/tomorrow rollover, Year wrap/overlap/missing ranges, actual design-day
+environments, Hourly aggregation, actual weather, warmup, multi-environment
+execution, EMS/current-value semantics, downstream gain/HVAC consumption,
+Rust raw ESO serialization, or broad `ScheduleManager` parity. Wider selector
+and fail-closed branches remain source/unit evidence; the parent
+`calendar_time_state`, `ProcessScheduleInput`, `ProcessForDayTypes`, and
+`getHrTsVal` records remain incomplete.
+
 ## Source-Order EPW Record Selection Checkpoint
 
 `EpwWeatherFile` now retains typed `EpwDataPeriods` metadata with its weather

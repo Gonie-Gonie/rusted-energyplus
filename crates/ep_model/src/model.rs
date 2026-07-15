@@ -10,7 +10,7 @@ use crate::{
     PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId,
     RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant,
     ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleFile, ScheduleId,
-    ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekDaily, ScheduleYear,
+    ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear,
     SetpointManagerComponent, SiteLocation, Surface, SurfaceConvectionAlgorithms, SurfaceId,
     ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version, WeekScheduleId, Zone,
     ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId, ZoneEquipmentObjectType,
@@ -62,6 +62,8 @@ pub struct TypedModel {
     pub day_schedule_names: NameMap<DayScheduleId>,
     /// Daily week schedules.
     pub week_schedules: Vec<ScheduleWeekDaily>,
+    /// Compact week schedules, assigned IDs after all daily week schedules.
+    pub week_compact_schedules: Vec<ScheduleWeekCompact>,
     /// Week schedule names.
     pub week_schedule_names: NameMap<WeekScheduleId>,
     /// Constant schedules.
@@ -202,6 +204,7 @@ impl Default for TypedModel {
             day_list_schedules: Vec::new(),
             day_schedule_names: NameMap::default(),
             week_schedules: Vec::new(),
+            week_compact_schedules: Vec::new(),
             week_schedule_names: NameMap::default(),
             schedules: Vec::new(),
             compact_schedules: Vec::new(),
@@ -282,6 +285,7 @@ impl TypedModel {
             + self.day_interval_schedules.len()
             + self.day_list_schedules.len()
             + self.week_schedules.len()
+            + self.week_compact_schedules.len()
             + self.schedules.len()
             + self.compact_schedules.len()
             + self.file_schedules.len()

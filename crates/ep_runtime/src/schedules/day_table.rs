@@ -8,7 +8,7 @@ use super::{
 use crate::time_axis::{EnvironmentTimeAxis, TimeAxis};
 use ep_model::{
     DayScheduleId, ScheduleDayInterval, ScheduleDayList, ScheduleDayType, ScheduleInterpolation,
-    ScheduleYear, TypedModel,
+    ScheduleYear, TypedModel, WeekScheduleId,
 };
 
 /// One immutable day profile prepared at zone-timestep resolution.
@@ -209,37 +209,45 @@ fn day_list_schedule_for_id(
         .filter(|schedule| schedule.id == day_schedule_id)
 }
 
+fn week_schedule_day_schedules(
+    model: &TypedModel,
+    week_schedule_id: WeekScheduleId,
+) -> Option<&[DayScheduleId; 12]> {
+    let daily_count = u32::try_from(model.week_schedules.len()).ok()?;
+    if week_schedule_id.0 < daily_count {
+        let daily_index = usize::try_from(week_schedule_id.0).ok()?;
+        return model
+            .week_schedules
+            .get(daily_index)
+            .filter(|schedule| schedule.id == week_schedule_id)
+            .map(|schedule| &schedule.day_schedules);
+    }
+
+    let compact_index = usize::try_from(week_schedule_id.0.checked_sub(daily_count)?).ok()?;
+    model
+        .week_compact_schedules
+        .get(compact_index)
+        .filter(|schedule| schedule.id == week_schedule_id)
+        .map(|schedule| &schedule.day_schedules)
+}
+
 fn year_schedule_references_compiled_day(model: &TypedModel, schedule: &ScheduleYear) -> bool {
     schedule.week_schedules.iter().any(|week_schedule_id| {
-        let Ok(week_schedule_index) = usize::try_from(week_schedule_id.0) else {
-            return false;
-        };
-        model
-            .week_schedules
-            .get(week_schedule_index)
-            .filter(|candidate| candidate.id == *week_schedule_id)
-            .is_some_and(|week_schedule| {
-                week_schedule.day_schedules.iter().any(|day_schedule_id| {
-                    day_interval_schedule_for_id(model, *day_schedule_id).is_some()
-                        || day_list_schedule_for_id(model, *day_schedule_id).is_some()
-                })
+        week_schedule_day_schedules(model, *week_schedule_id).is_some_and(|day_schedules| {
+            day_schedules.iter().any(|day_schedule_id| {
+                day_interval_schedule_for_id(model, *day_schedule_id).is_some()
+                    || day_list_schedule_for_id(model, *day_schedule_id).is_some()
             })
+        })
     })
 }
 
 fn year_schedule_requires_hourly_aggregation(model: &TypedModel, schedule: &ScheduleYear) -> bool {
     schedule.week_schedules.iter().any(|week_schedule_id| {
-        let Ok(week_schedule_index) = usize::try_from(week_schedule_id.0) else {
+        let Some(day_schedules) = week_schedule_day_schedules(model, *week_schedule_id) else {
             return true;
         };
-        let Some(week_schedule) = model
-            .week_schedules
-            .get(week_schedule_index)
-            .filter(|candidate| candidate.id == *week_schedule_id)
-        else {
-            return true;
-        };
-        week_schedule.day_schedules.iter().any(|day_schedule_id| {
+        day_schedules.iter().any(|day_schedule_id| {
             if let Some(schedule) = day_interval_schedule_for_id(model, *day_schedule_id) {
                 return schedule.interpolation != ScheduleInterpolation::No
                     || schedule
@@ -358,13 +366,7 @@ fn year_schedule_compiled_value(
 ) -> Option<f64> {
     let schedule_day_index = usize::try_from(schedule_day_of_year.checked_sub(1)?).ok()?;
     let week_schedule_id = *schedule.week_schedules.get(schedule_day_index)?;
-    let week_schedule_index = usize::try_from(week_schedule_id.0).ok()?;
-    let week_schedule = model
-        .week_schedules
-        .get(week_schedule_index)
-        .filter(|candidate| candidate.id == week_schedule_id)?;
-    let day_schedule_id = *week_schedule
-        .day_schedules
+    let day_schedule_id = *week_schedule_day_schedules(model, week_schedule_id)?
         .get(schedule_day_type_index(day_type))?;
     compiled_day_schedule_value(day_schedule_table, day_schedule_id, minute_of_day)
 }

@@ -93,6 +93,17 @@ pub struct ScheduleWeekDaily {
     pub day_schedules: [DayScheduleId; 12],
 }
 
+/// Immutable compact mapping from EnergyPlus day-type selectors to typed day schedules.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ScheduleWeekCompact {
+    /// Typed week-schedule ID shared with `Schedule:Week:Daily`.
+    pub id: WeekScheduleId,
+    /// Week-schedule name.
+    pub name: NormalizedName,
+    /// Materialized day-schedule IDs ordered Sunday through CustomDay2.
+    pub day_schedules: [DayScheduleId; 12],
+}
+
 /// Immutable annual schedule assembled from daily week-schedule pointers.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ScheduleYear {
