@@ -1850,8 +1850,29 @@ routine.psy_w_fn_tdb_h_error.required_for_full_domain = false
 routine.psy_w_fn_tdb_h.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_w_fn_tdb_h.source_routine = "PsyWFnTdbH"
 routine.psy_w_fn_tdb_h.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_w_fn_tdb_h.completion_status = "source_mapped"
+routine.psy_w_fn_tdb_h.completion_status = "state_mapped"
 routine.psy_w_fn_tdb_h.required_for_full_domain = false
+routine.psy_w_fn_tdb_h.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_w_fn_tdb_h.read_state = [
+  "arguments `TDB` and `H`; `EP_psych_stats` reads the per-state call counter; with `EP_psych_errors` enabled, `SuppressWarnings` is read only after a calculated `W <= -0.0001`, and routine 22 reads `WarmupFlag` and the dedicated humidity-ratio error index only for `W < -0.0001`, then reads `CalledFrom` only for the first such non-warmup warning",
+]
+routine.psy_w_fn_tdb_h.write_state = [
+  "the numerical formula and ordered `W < 0.0` fallback write no state; `EP_psych_stats` increments the per-state call count, while routine 22 mutates warning, scratch-string, error-index, and recurring-warning state only for non-warmup `W < -0.0001`",
+]
+routine.psy_w_fn_tdb_h.history_state_ownership = "numerical output is a pure function of raw `TDB` and `H`; `CalledFrom` and `SuppressWarnings` never change the result, while optional call statistics and one humidity-ratio recurring-warning history belong to each `EnergyPlusData` instance"
+routine.psy_w_fn_tdb_h.unsupported_state = [
+  "`EP_psych_stats` call counting plus `EP_psych_errors` warmup suppression, scratch string, warning stream and totals, caller timestamp, dedicated recurrence index/count/min/max with `[]` units, SQLite, and callback state",
+]
+routine.psy_w_fn_tdb_h.inactive_branches = [
+  "disabling `EP_psych_stats` compiles out the call-count increment; disabling `EP_psych_errors` compiles out the diagnostic dispatch and routine 22 without changing the unconditional floor of every strictly negative `W` to `1.0e-5`",
+  "with errors enabled, `SuppressWarnings = true` skips diagnostic dispatch for significant negative `W`, while warmup suppresses routine-22 messages and mutations; neither branch changes the numerical return",
+]
+routine.psy_w_fn_tdb_h.unsupported_active_branches = [
+  "default errors-enabled dispatch at `W <= -0.0001 && !SuppressWarnings`, including the routine-22 strict `W < -0.0001` recheck that makes exact `-0.0001` a diagnostic no-op, plus first-versus-recurring behavior, caller context, per-state recurrence, and the optional statistics-enabled every-call counter",
+]
+routine.psy_w_fn_tdb_h.not_claimed_branches = [
+  "external EnergyPlus numerical parity, cross-platform floating-point last-bit and exception parity, exact diagnostic formatting/side effects, statistics history, equivalence with existing ideal-loads approximations, and downstream C API, EMS, sizing, coil, or HVAC call-site migration",
+]
 
 routine.psy_psat_fn_temp_raw.source_file = "src/EnergyPlus/Psychrometrics.cc"
 routine.psy_psat_fn_temp_raw.source_routine = "PsyPsatFnTemp_raw"
