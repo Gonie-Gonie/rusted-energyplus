@@ -42,13 +42,13 @@ that the EnergyPlus routine has been ported.
 | 2 | `ShowPsychrometricSummary` | statistics/reporting | `Psychrometrics.hh:500`; `Psychrometrics.cc:136` | always present; summary body is active only with `EP_psych_stats` | intended diagnostics owner; unassigned | prove stats-enabled totals/hit counts and stats-disabled no-op behavior |
 | 3 | `PsyRhoAirFnPbTdbW_error` | diagnostics | `Psychrometrics.hh:503`; `Psychrometrics.cc:198` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | prove the exact negative-density trigger and immediate severe/continue/timestamp/fatal message flow, including caller versus unknown context |
 | 4 | `PsyRhoAirFnPbTdbW` | moist-air density | `Psychrometrics.hh:513,549` (inline implementations) | two always-present stateful/stateless overloads; one logical ticket | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rho_air_fn_pb_tdb_w`; guarded legacy wrapper: `energyplus_moist_air_density_kg_per_m3` | compare both overloads over source vectors, humidity floor behavior, diagnostics path, and mutual equivalence where domains overlap |
-| 5 | `PsyRhoAirFnPbTdbW_fast` | moist-air density fast path | `Psychrometrics.hh:576` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | compare with the ordinary density routine and lock the fast-path input-domain preconditions |
-| 6 | `PsyHfgAirFnWTdb` | latent enthalpy | `Psychrometrics.hh:593` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | coefficient-vector and temperature/humidity boundary parity |
-| 7 | `PsyHgAirFnWTdb` | water-vapor gas enthalpy | `Psychrometrics.hh:623` (inline) | always present | partial analogue: `ep_runtime::psychrometrics::energyplus_water_vapor_gas_enthalpy_j_per_kg` | source-vector parity including ignored-`W` semantics and temperature limits |
-| 8 | `PsyHFnTdbW` | moist-air enthalpy | `Psychrometrics.hh:648` (inline) | always present | partial analogue: `ep_runtime::ideal_loads::calc::psychrometrics::moist_air_enthalpy_j_per_kg` | coefficient-vector parity, humidity floor/domain behavior, and inverse round trips |
-| 9 | `PsyHFnTdbW_fast` | moist-air enthalpy fast path | `Psychrometrics.hh:668` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | ordinary/fast equivalence across the documented valid domain |
+| 5 | `PsyRhoAirFnPbTdbW_fast` | moist-air density fast path | `Psychrometrics.hh:576` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rho_air_fn_pb_tdb_w_fast` | compare with the ordinary density routine and lock the fast-path input-domain preconditions |
+| 6 | `PsyHfgAirFnWTdb` | latent enthalpy | `Psychrometrics.hh:593` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_hfg_air_fn_w_tdb` | coefficient-vector and temperature/humidity boundary parity |
+| 7 | `PsyHgAirFnWTdb` | water-vapor gas enthalpy | `Psychrometrics.hh:623` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_hg_air_fn_w_tdb`; legacy one-argument wrapper: `energyplus_water_vapor_gas_enthalpy_j_per_kg` | source-vector parity including ignored-`W` semantics and temperature limits |
+| 8 | `PsyHFnTdbW` | moist-air enthalpy | `Psychrometrics.hh:648` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_h_fn_tdb_w`; separate partial legacy analogue: `ep_runtime::ideal_loads::calc::psychrometrics::moist_air_enthalpy_j_per_kg` | coefficient-vector parity, humidity floor/domain behavior, and inverse round trips |
+| 9 | `PsyHFnTdbW_fast` | moist-air enthalpy fast path | `Psychrometrics.hh:668` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_h_fn_tdb_w_fast` | ordinary/fast equivalence across the documented valid domain |
 | 10 | `PsyCpAirFnW` | moist-air specific heat | `Psychrometrics.hh:679` (inline) | always present; owns a function-local last-input cache | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_cp_air_fn_w`; guarded legacy wrapper: `energyplus_moist_air_specific_heat_j_per_kg_k` | source-vector parity plus repeated, alternating, and multistate cache-isolation probes |
-| 11 | `PsyCpAirFnW_fast` | specific-heat fast path | `Psychrometrics.hh:718` (inline) | always present; owns a function-local last-input cache | intended `ep_runtime::psychrometrics`; unassigned | ordinary/fast equivalence and cache-hit/miss independence |
+| 11 | `PsyCpAirFnW_fast` | specific-heat fast path | `Psychrometrics.hh:718` (inline) | always present; owns a function-local last-input cache | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_cp_air_fn_w_fast` | ordinary/fast equivalence and cache-hit/miss independence |
 | 12 | `PsyTdbFnHW` | dry-bulb inversion | `Psychrometrics.hh:743` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | enthalpy round trips, denominator edge cases, and source-vector parity |
 | 13 | `PsyRhovFnTdbRhLBnd0C` | vapor density | `Psychrometrics.hh:764` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | lower-bound-at-0-C branch, RH limits, and pressure-independent source vectors |
 | 14 | `PsyRhovFnTdbWPb` | vapor density | `Psychrometrics.hh:789` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | humidity-ratio/pressure vectors, clamp rules, and inverse RH consistency |
@@ -182,6 +182,230 @@ not_claimed_branches:
 - external EnergyPlus numerical parity, C++ last-call-cache work/history parity under repeated or alternating calls, sentinel collision, and state/thread-isolation behavior
 <!-- routine-state-contract:v1 end psy_cp_air_fn_w -->
 
+## CP56-3 Direct Formula And Fast-Path Scaffold
+
+This checkpoint adds pure Rust numerical helpers for routines 5 through 9 and
+11 in source-interface order. The helpers and their local pinned-formula,
+evaluation-order, humidity-floor, ignored-argument, IEEE-edge, debug-assertion,
+release no-floor, repeated-call, and legacy-wrapper tests live in
+`crates/ep_runtime/src/psychrometrics.rs` and
+`crates/ep_runtime/src/psychrometrics_tests.rs`. These checks are Rust-only
+source-transcription evidence, not output captured from an external EnergyPlus
+oracle. The six tickets advance only to `state_mapped`; they do not advance to
+`implemented`, add conformance evidence, or change the parent algorithm's
+`status = "scaffold"` and `claim_level = "none"` boundary.
+
+The existing IdealLoads `moist_air_enthalpy_j_per_kg` helper remains separate:
+it has no `1.0e-5` humidity floor and groups the expression through kJ units,
+which can differ from the source-order formula by one ULP. Replacing its
+downstream consumers is deferred until that compatibility impact and the
+related inversion routines are handled explicitly. The existing one-argument
+water-vapor enthalpy API remains a bit-preserving wrapper over the new
+two-argument `PsyHgAirFnWTdb` numerical helper.
+
+### `PsyRhoAirFnPbTdbW_fast` (`psy_rho_air_fn_pb_tdb_w_fast`)
+
+The source at `Psychrometrics.hh:576-590` asserts `dw >= 1.0e-5`, evaluates
+the density formula without a humidity floor, and optionally delegates a
+negative result to `PsyRhoAirFnPbTdbW_error`. Because this fast overload does
+not supply `CalledFrom`, the enabled error helper uses its empty default and
+reports the `Unknown` caller timestamp before fatal termination. Rust uses
+`debug_assert!` and a pure raw-formula helper; exact assertion termination and
+the optional EnergyPlus diagnostic state remain deferred.
+
+<!-- routine-state-contract:v1 begin psy_rho_air_fn_pb_tdb_w_fast -->
+PsyRhoAirFnPbTdbW_fast
+
+read_state:
+- arguments `pb`, `tdb`, and `dw`; the debug assertion reads `dw`, and enabled `EP_psych_errors` diagnostics inspect a negative `rhoair` result
+
+write_state:
+- the numerical formula writes no state; enabled negative-density diagnostics mutate the EnergyPlus error stream and terminate through `PsyRhoAirFnPbTdbW_error`
+
+history_state_ownership:
+- no cross-call numerical history or cache; the source result is a pure function of `pb`, `tdb`, and already-adjusted `dw` before optional diagnostics
+
+unsupported_state:
+- `EP_psych_errors` severe/continue/Unknown-timestamp/fatal diagnostic state and exact C++ assertion-abort diagnostics
+
+inactive_branches:
+- `NDEBUG` removes the `dw >= 1.0e-5` assertion; disabling `EP_psych_errors` removes the negative-density diagnostic branch
+
+unsupported_active_branches:
+- assertion-enabled invalid-`dw` termination parity and enabled negative-density severe/continue/Unknown-timestamp/fatal behavior
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, invalid-precondition behavior outside the fast domain, diagnostic side effects, and C++ abort versus Rust panic equivalence
+<!-- routine-state-contract:v1 end psy_rho_air_fn_pb_tdb_w_fast -->
+
+### `PsyHfgAirFnWTdb` (`psy_hfg_air_fn_w_tdb`)
+
+The source at `Psychrometrics.hh:593-620` intentionally ignores `w`, floors
+temperature with `max(T, 0.0)`, and subtracts the fluid enthalpy term from the
+gas enthalpy term. The Rust helper preserves those two separate terms instead
+of algebraically combining coefficients, retaining the source behavior where
+positive infinity or an overflowing maximum finite temperature can produce
+`infinity - infinity` and therefore NaN.
+
+<!-- routine-state-contract:v1 begin psy_hfg_air_fn_w_tdb -->
+PsyHfgAirFnWTdb
+
+read_state:
+- arguments `w` and `T`; `w` is intentionally ignored and `T` is read through source `max(T, 0.0)` semantics
+
+write_state:
+- no state; the routine computes the gas enthalpy term minus the fluid enthalpy term without mutation
+
+history_state_ownership:
+- no cross-call history or cache; output depends only on `max(T, 0.0)` and the source evaluation order
+
+unsupported_state:
+- none; the source routine has no mutable state or cache
+
+inactive_branches:
+- none; the routine is always present and has no compile-time variant
+
+unsupported_active_branches:
+- none; there is no stateful or compile-conditional active branch
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, full IEEE-edge parity, and downstream latent-energy integration
+<!-- routine-state-contract:v1 end psy_hfg_air_fn_w_tdb -->
+
+### `PsyHgAirFnWTdb` (`psy_hg_air_fn_w_tdb`)
+
+The source at `Psychrometrics.hh:623-645` ignores `w` and evaluates
+`2500940.0 + 1858.95 * T`. The canonical Rust helper retains the two source
+arguments; the pre-existing one-argument runtime API delegates with a dummy
+humidity ratio because the value cannot affect the result.
+
+<!-- routine-state-contract:v1 begin psy_hg_air_fn_w_tdb -->
+PsyHgAirFnWTdb
+
+read_state:
+- arguments `w` and `T`; `w` is intentionally ignored and `T` supplies the linear water-vapor gas enthalpy term
+
+write_state:
+- no state; the routine evaluates `2500940.0 + 1858.95 * T` without mutation
+
+history_state_ownership:
+- no cross-call history or cache; output is a pure function of `T`
+
+unsupported_state:
+- none; the source routine has no mutable state or cache
+
+inactive_branches:
+- none; the routine is always present and has no compile-time variant
+
+unsupported_active_branches:
+- none; there is no stateful or compile-conditional active branch
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, ignored-`w` parity across all call sites, and full IEEE-edge parity
+<!-- routine-state-contract:v1 end psy_hg_air_fn_w_tdb -->
+
+### `PsyHFnTdbW` (`psy_h_fn_tdb_w`)
+
+The ordinary source formula at `Psychrometrics.hh:648-665` evaluates
+`1.00484e3 * TDB + max(dW, 1.0e-5) * (2.50094e6 + 1.85895e3 * TDB)`.
+The source max operation retains a NaN first argument rather than normalizing
+it to the floor. Rust uses the shared source-compatible floor helper and keeps
+the arithmetic in J/kg source order.
+
+<!-- routine-state-contract:v1 begin psy_h_fn_tdb_w -->
+PsyHFnTdbW
+
+read_state:
+- arguments `TDB` and `dW`; source `max(dW, 1.0e-5)` preserves a NaN first argument and supplies the humidity-ratio floor
+
+write_state:
+- no state; the dry-air and humidity-weighted enthalpy terms are evaluated in source order without mutation
+
+history_state_ownership:
+- no cross-call history or cache; output is a pure function of `TDB` and floored `dW`
+
+unsupported_state:
+- none; the source routine has no mutable state or cache
+
+inactive_branches:
+- none; the routine is always present and has no compile-time variant
+
+unsupported_active_branches:
+- none; there is no stateful or compile-conditional active branch
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, full humidity/temperature edge parity, inverse round trips, and downstream IdealLoads replacement
+<!-- routine-state-contract:v1 end psy_h_fn_tdb_w -->
+
+### `PsyHFnTdbW_fast` (`psy_h_fn_tdb_w_fast`)
+
+The source at `Psychrometrics.hh:668-676` asserts `dW >= 1.0e-5` and then
+uses the same enthalpy expression without a floor. Rust mirrors the source
+build split with `debug_assert!`: debug builds reject an invalid precondition,
+while release builds retain the raw no-floor calculation. Exact C++ assertion
+abort text and process behavior are outside this scaffold.
+
+<!-- routine-state-contract:v1 begin psy_h_fn_tdb_w_fast -->
+PsyHFnTdbW_fast
+
+read_state:
+- arguments `TDB` and already-adjusted `dW`; an assertion reads `dW >= 1.0e-5` before the unclamped formula
+
+write_state:
+- no state; the unclamped enthalpy formula evaluates without mutation after the assertion
+
+history_state_ownership:
+- no cross-call history or cache; output is a pure function of `TDB` and caller-adjusted `dW`
+
+unsupported_state:
+- exact C++ assertion-abort diagnostics; the numerical source routine has no mutable state
+
+inactive_branches:
+- `NDEBUG` removes the `dW >= 1.0e-5` assertion and leaves the raw unclamped expression active
+
+unsupported_active_branches:
+- assertion-enabled invalid-`dW` termination parity and exact C++ abort versus Rust panic behavior
+
+not_claimed_branches:
+- external EnergyPlus numerical parity and invalid-precondition behavior outside the documented fast domain
+<!-- routine-state-contract:v1 end psy_h_fn_tdb_w_fast -->
+
+### `PsyCpAirFnW_fast` (`psy_cp_air_fn_w_fast`)
+
+The source at `Psychrometrics.hh:718-738` asserts `dw >= 1.0e-5` before it
+reads its separate function-local `dwSave`/`cpaSave` cache. A valid-domain miss
+evaluates `1.00484e3 + dw * 1.85895e3`, and a repeated exact input returns the
+saved result. The cache changes work and history, not valid-domain output. In
+an `NDEBUG` build, the first invalid call with `dw == -100.0` collides with both
+initial sentinels and returns `-100.0`; assertion-enabled builds terminate
+before reading the cache. Rust keeps the valid-domain numerical path pure and
+defers that cache, sentinel, sharing, and concurrency policy.
+
+<!-- routine-state-contract:v1 begin psy_cp_air_fn_w_fast -->
+PsyCpAirFnW_fast
+
+read_state:
+- argument `dw` is checked by `assert(dw >= 1.0e-5)` before function-local static `dwSave`/`cpaSave`, both initialized to `-100.0`, are read for an exact cache hit
+
+write_state:
+- cache miss writes `dwSave = dw` and `cpaSave = 1.00484e3 + dw * 1.85895e3`; cache hit writes no state
+
+history_state_ownership:
+- EnergyPlus owns one function-local static last-call cache shared across calls and simulation states; Rust keeps the valid-domain numerical helper pure
+
+unsupported_state:
+- the function-local `dwSave`/`cpaSave` cache, cross-simulation sharing, concurrency policy, and the `NDEBUG` first-call `dw == -100.0` sentinel collision
+
+inactive_branches:
+- `NDEBUG` removes the pre-cache `dw >= 1.0e-5` assertion; the last-call cache itself is unconditional
+
+unsupported_active_branches:
+- cache hit/miss history, process-wide sharing, sentinel-collision behavior, and exact assertion-enabled C++ abort versus Rust panic parity
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, C++ cache work/history parity, sentinel collision, and state/thread-isolation behavior
+<!-- routine-state-contract:v1 end psy_cp_air_fn_w_fast -->
+
 ## Compile-Time Variant Boundary
 
 Unless `EP_nocache_Psychrometrics` is set, the EnergyPlus header enables
@@ -228,8 +452,10 @@ functions.
 
 ## Promotion Boundary
 
-The `PsyRhoAirFnPbTdbW` and `PsyCpAirFnW` tickets are `state_mapped`; the other
-51 ledger routines remain `source_mapped`. All 53 retain
+The `PsyRhoAirFnPbTdbW`, `PsyRhoAirFnPbTdbW_fast`, `PsyHfgAirFnWTdb`,
+`PsyHgAirFnWTdb`, `PsyHFnTdbW`, `PsyHFnTdbW_fast`, `PsyCpAirFnW`, and
+`PsyCpAirFnW_fast` tickets are `state_mapped`; the other 45 ledger routines
+remain `source_mapped`. All 53 retain
 `required_for_full_domain = false`. Before any ticket is promoted further, its
 Rust target, source-vector tests, compile-variant obligations, diagnostic
 behavior where applicable, and external evidence boundary must be recorded.

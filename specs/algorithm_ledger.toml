@@ -1482,32 +1482,132 @@ routine.psy_rho_air_fn_pb_tdb_w.not_claimed_branches = [
 routine.psy_rho_air_fn_pb_tdb_w_fast.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_rho_air_fn_pb_tdb_w_fast.source_routine = "PsyRhoAirFnPbTdbW_fast"
 routine.psy_rho_air_fn_pb_tdb_w_fast.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_rho_air_fn_pb_tdb_w_fast.completion_status = "source_mapped"
+routine.psy_rho_air_fn_pb_tdb_w_fast.completion_status = "state_mapped"
 routine.psy_rho_air_fn_pb_tdb_w_fast.required_for_full_domain = false
+routine.psy_rho_air_fn_pb_tdb_w_fast.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rho_air_fn_pb_tdb_w_fast.read_state = [
+  "arguments `pb`, `tdb`, and `dw`; the debug assertion reads `dw`, and enabled `EP_psych_errors` diagnostics inspect a negative `rhoair` result",
+]
+routine.psy_rho_air_fn_pb_tdb_w_fast.write_state = [
+  "the numerical formula writes no state; enabled negative-density diagnostics mutate the EnergyPlus error stream and terminate through `PsyRhoAirFnPbTdbW_error`",
+]
+routine.psy_rho_air_fn_pb_tdb_w_fast.history_state_ownership = "no cross-call numerical history or cache; the source result is a pure function of `pb`, `tdb`, and already-adjusted `dw` before optional diagnostics"
+routine.psy_rho_air_fn_pb_tdb_w_fast.unsupported_state = [
+  "`EP_psych_errors` severe/continue/Unknown-timestamp/fatal diagnostic state and exact C++ assertion-abort diagnostics",
+]
+routine.psy_rho_air_fn_pb_tdb_w_fast.inactive_branches = [
+  "`NDEBUG` removes the `dw >= 1.0e-5` assertion; disabling `EP_psych_errors` removes the negative-density diagnostic branch",
+]
+routine.psy_rho_air_fn_pb_tdb_w_fast.unsupported_active_branches = [
+  "assertion-enabled invalid-`dw` termination parity and enabled negative-density severe/continue/Unknown-timestamp/fatal behavior",
+]
+routine.psy_rho_air_fn_pb_tdb_w_fast.not_claimed_branches = [
+  "external EnergyPlus numerical parity, invalid-precondition behavior outside the fast domain, diagnostic side effects, and C++ abort versus Rust panic equivalence",
+]
 
 routine.psy_hfg_air_fn_w_tdb.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_hfg_air_fn_w_tdb.source_routine = "PsyHfgAirFnWTdb"
 routine.psy_hfg_air_fn_w_tdb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_hfg_air_fn_w_tdb.completion_status = "source_mapped"
+routine.psy_hfg_air_fn_w_tdb.completion_status = "state_mapped"
 routine.psy_hfg_air_fn_w_tdb.required_for_full_domain = false
+routine.psy_hfg_air_fn_w_tdb.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_hfg_air_fn_w_tdb.read_state = [
+  "arguments `w` and `T`; `w` is intentionally ignored and `T` is read through source `max(T, 0.0)` semantics",
+]
+routine.psy_hfg_air_fn_w_tdb.write_state = [
+  "no state; the routine computes the gas enthalpy term minus the fluid enthalpy term without mutation",
+]
+routine.psy_hfg_air_fn_w_tdb.history_state_ownership = "no cross-call history or cache; output depends only on `max(T, 0.0)` and the source evaluation order"
+routine.psy_hfg_air_fn_w_tdb.unsupported_state = [
+  "none; the source routine has no mutable state or cache",
+]
+routine.psy_hfg_air_fn_w_tdb.inactive_branches = [
+  "none; the routine is always present and has no compile-time variant",
+]
+routine.psy_hfg_air_fn_w_tdb.unsupported_active_branches = [
+  "none; there is no stateful or compile-conditional active branch",
+]
+routine.psy_hfg_air_fn_w_tdb.not_claimed_branches = [
+  "external EnergyPlus numerical parity, full IEEE-edge parity, and downstream latent-energy integration",
+]
 
 routine.psy_hg_air_fn_w_tdb.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_hg_air_fn_w_tdb.source_routine = "PsyHgAirFnWTdb"
 routine.psy_hg_air_fn_w_tdb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_hg_air_fn_w_tdb.completion_status = "source_mapped"
+routine.psy_hg_air_fn_w_tdb.completion_status = "state_mapped"
 routine.psy_hg_air_fn_w_tdb.required_for_full_domain = false
+routine.psy_hg_air_fn_w_tdb.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_hg_air_fn_w_tdb.read_state = [
+  "arguments `w` and `T`; `w` is intentionally ignored and `T` supplies the linear water-vapor gas enthalpy term",
+]
+routine.psy_hg_air_fn_w_tdb.write_state = [
+  "no state; the routine evaluates `2500940.0 + 1858.95 * T` without mutation",
+]
+routine.psy_hg_air_fn_w_tdb.history_state_ownership = "no cross-call history or cache; output is a pure function of `T`"
+routine.psy_hg_air_fn_w_tdb.unsupported_state = [
+  "none; the source routine has no mutable state or cache",
+]
+routine.psy_hg_air_fn_w_tdb.inactive_branches = [
+  "none; the routine is always present and has no compile-time variant",
+]
+routine.psy_hg_air_fn_w_tdb.unsupported_active_branches = [
+  "none; there is no stateful or compile-conditional active branch",
+]
+routine.psy_hg_air_fn_w_tdb.not_claimed_branches = [
+  "external EnergyPlus numerical parity, ignored-`w` parity across all call sites, and full IEEE-edge parity",
+]
 
 routine.psy_h_fn_tdb_w.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_h_fn_tdb_w.source_routine = "PsyHFnTdbW"
 routine.psy_h_fn_tdb_w.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_h_fn_tdb_w.completion_status = "source_mapped"
+routine.psy_h_fn_tdb_w.completion_status = "state_mapped"
 routine.psy_h_fn_tdb_w.required_for_full_domain = false
+routine.psy_h_fn_tdb_w.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_h_fn_tdb_w.read_state = [
+  "arguments `TDB` and `dW`; source `max(dW, 1.0e-5)` preserves a NaN first argument and supplies the humidity-ratio floor",
+]
+routine.psy_h_fn_tdb_w.write_state = [
+  "no state; the dry-air and humidity-weighted enthalpy terms are evaluated in source order without mutation",
+]
+routine.psy_h_fn_tdb_w.history_state_ownership = "no cross-call history or cache; output is a pure function of `TDB` and floored `dW`"
+routine.psy_h_fn_tdb_w.unsupported_state = [
+  "none; the source routine has no mutable state or cache",
+]
+routine.psy_h_fn_tdb_w.inactive_branches = [
+  "none; the routine is always present and has no compile-time variant",
+]
+routine.psy_h_fn_tdb_w.unsupported_active_branches = [
+  "none; there is no stateful or compile-conditional active branch",
+]
+routine.psy_h_fn_tdb_w.not_claimed_branches = [
+  "external EnergyPlus numerical parity, full humidity/temperature edge parity, inverse round trips, and downstream IdealLoads replacement",
+]
 
 routine.psy_h_fn_tdb_w_fast.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_h_fn_tdb_w_fast.source_routine = "PsyHFnTdbW_fast"
 routine.psy_h_fn_tdb_w_fast.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_h_fn_tdb_w_fast.completion_status = "source_mapped"
+routine.psy_h_fn_tdb_w_fast.completion_status = "state_mapped"
 routine.psy_h_fn_tdb_w_fast.required_for_full_domain = false
+routine.psy_h_fn_tdb_w_fast.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_h_fn_tdb_w_fast.read_state = [
+  "arguments `TDB` and already-adjusted `dW`; an assertion reads `dW >= 1.0e-5` before the unclamped formula",
+]
+routine.psy_h_fn_tdb_w_fast.write_state = [
+  "no state; the unclamped enthalpy formula evaluates without mutation after the assertion",
+]
+routine.psy_h_fn_tdb_w_fast.history_state_ownership = "no cross-call history or cache; output is a pure function of `TDB` and caller-adjusted `dW`"
+routine.psy_h_fn_tdb_w_fast.unsupported_state = [
+  "exact C++ assertion-abort diagnostics; the numerical source routine has no mutable state",
+]
+routine.psy_h_fn_tdb_w_fast.inactive_branches = [
+  "`NDEBUG` removes the `dW >= 1.0e-5` assertion and leaves the raw unclamped expression active",
+]
+routine.psy_h_fn_tdb_w_fast.unsupported_active_branches = [
+  "assertion-enabled invalid-`dW` termination parity and exact C++ abort versus Rust panic behavior",
+]
+routine.psy_h_fn_tdb_w_fast.not_claimed_branches = [
+  "external EnergyPlus numerical parity and invalid-precondition behavior outside the documented fast domain",
+]
 
 routine.psy_cp_air_fn_w.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_cp_air_fn_w.source_routine = "PsyCpAirFnW"
@@ -1538,8 +1638,28 @@ routine.psy_cp_air_fn_w.not_claimed_branches = [
 routine.psy_cp_air_fn_w_fast.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_cp_air_fn_w_fast.source_routine = "PsyCpAirFnW_fast"
 routine.psy_cp_air_fn_w_fast.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_cp_air_fn_w_fast.completion_status = "source_mapped"
+routine.psy_cp_air_fn_w_fast.completion_status = "state_mapped"
 routine.psy_cp_air_fn_w_fast.required_for_full_domain = false
+routine.psy_cp_air_fn_w_fast.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_cp_air_fn_w_fast.read_state = [
+  "argument `dw` is checked by `assert(dw >= 1.0e-5)` before function-local static `dwSave`/`cpaSave`, both initialized to `-100.0`, are read for an exact cache hit",
+]
+routine.psy_cp_air_fn_w_fast.write_state = [
+  "cache miss writes `dwSave = dw` and `cpaSave = 1.00484e3 + dw * 1.85895e3`; cache hit writes no state",
+]
+routine.psy_cp_air_fn_w_fast.history_state_ownership = "EnergyPlus owns one function-local static last-call cache shared across calls and simulation states; Rust keeps the valid-domain numerical helper pure"
+routine.psy_cp_air_fn_w_fast.unsupported_state = [
+  "the function-local `dwSave`/`cpaSave` cache, cross-simulation sharing, concurrency policy, and the `NDEBUG` first-call `dw == -100.0` sentinel collision",
+]
+routine.psy_cp_air_fn_w_fast.inactive_branches = [
+  "`NDEBUG` removes the pre-cache `dw >= 1.0e-5` assertion; the last-call cache itself is unconditional",
+]
+routine.psy_cp_air_fn_w_fast.unsupported_active_branches = [
+  "cache hit/miss history, process-wide sharing, sentinel-collision behavior, and exact assertion-enabled C++ abort versus Rust panic parity",
+]
+routine.psy_cp_air_fn_w_fast.not_claimed_branches = [
+  "external EnergyPlus numerical parity, C++ cache work/history parity, sentinel collision, and state/thread-isolation behavior",
+]
 
 routine.psy_tdb_fn_h_w.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_tdb_fn_h_w.source_routine = "PsyTdbFnHW"

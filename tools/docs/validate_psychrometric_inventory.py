@@ -76,8 +76,19 @@ EXPECTED_ROUTINES: tuple[tuple[str, str], ...] = (
     (SOURCE_CC, "CSplineint"),
 )
 
-STATE_MAPPED_ROUTINES = frozenset({"PsyRhoAirFnPbTdbW", "PsyCpAirFnW"})
-EXPECTED_STATUS_COUNTS = {"source_mapped": 51, "state_mapped": 2}
+STATE_MAPPED_ROUTINES = frozenset(
+    {
+        "PsyRhoAirFnPbTdbW",
+        "PsyRhoAirFnPbTdbW_fast",
+        "PsyHfgAirFnWTdb",
+        "PsyHgAirFnWTdb",
+        "PsyHFnTdbW",
+        "PsyHFnTdbW_fast",
+        "PsyCpAirFnW",
+        "PsyCpAirFnW_fast",
+    }
+)
+EXPECTED_STATUS_COUNTS = {"source_mapped": 45, "state_mapped": 8}
 
 
 def expected_completion_status(source_routine: str) -> str:
@@ -346,6 +357,24 @@ def self_test_inventory() -> int:
         "PsyRhoAirFnPbTdbW completion_status must be exactly 'state_mapped'",
     )
 
+    for name, source_routine in (
+        ("rho_fast_state_mapped_downgrade", "PsyRhoAirFnPbTdbW_fast"),
+        ("hfg_state_mapped_downgrade", "PsyHfgAirFnWTdb"),
+        ("hg_state_mapped_downgrade", "PsyHgAirFnWTdb"),
+        ("h_state_mapped_downgrade", "PsyHFnTdbW"),
+        ("h_fast_state_mapped_downgrade", "PsyHFnTdbW_fast"),
+        ("cp_fast_state_mapped_downgrade", "PsyCpAirFnW_fast"),
+    ):
+        candidate = copy.deepcopy(baseline)
+        routines(candidate)[find_key(candidate, source_routine)][
+            "completion_status"
+        ] = "source_mapped"
+        expect_invalid(
+            name,
+            candidate,
+            f"{source_routine} completion_status must be exactly 'state_mapped'",
+        )
+
     candidate = copy.deepcopy(baseline)
     routines(candidate)[find_key(candidate, "F7")]["completion_status"] = "state_mapped"
     expect_invalid(
@@ -428,7 +457,7 @@ def main() -> int:
     print("Psychrometric routine inventory check")
     print(f"  routines: {len(EXPECTED_ROUTINES)}")
     print("  source_order: exact EnergyPlus 26.1 interface order")
-    print("  completion_status: source_mapped=51, state_mapped=2")
+    print("  completion_status: source_mapped=45, state_mapped=8")
     print("  required_for_full_domain: false")
     print("  status: valid")
     return 0
