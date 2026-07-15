@@ -1818,8 +1818,28 @@ routine.psy_v_fn_tdb_w_pb_error.required_for_full_domain = false
 routine.psy_v_fn_tdb_w_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_v_fn_tdb_w_pb.source_routine = "PsyVFnTdbWPb"
 routine.psy_v_fn_tdb_w_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_v_fn_tdb_w_pb.completion_status = "source_mapped"
+routine.psy_v_fn_tdb_w_pb.completion_status = "state_mapped"
 routine.psy_v_fn_tdb_w_pb.required_for_full_domain = false
+routine.psy_v_fn_tdb_w_pb.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_v_fn_tdb_w_pb.read_state = [
+  "arguments `TDB`, `dW`, and `PB`; `EP_psych_stats` reads the per-state call counter, while `EP_psych_errors` reads `WarmupFlag` and the dedicated specific-volume error index and reads `CalledFrom` only for the first non-warmup `V <= -0.01` warning",
+]
+routine.psy_v_fn_tdb_w_pb.write_state = [
+  "the numerical formula and `V < 0.0` fallback write no state; `EP_psych_stats` increments the per-state call count, while `PsyVFnTdbWPb_error` mutates warning, scratch-string, error-index, and recurring-warning state only outside warmup",
+]
+routine.psy_v_fn_tdb_w_pb.history_state_ownership = "numerical output is a pure function of raw `TDB`, source-floored `dW`, and raw `PB`; optional call statistics and one specific-volume recurring-warning history belong to each `EnergyPlusData` instance"
+routine.psy_v_fn_tdb_w_pb.unsupported_state = [
+  "`EP_psych_stats` call counting plus `EP_psych_errors` warmup suppression, scratch string, warning stream and totals, caller timestamp, dedicated recurrence index/count/min/max, SQLite, and callback state",
+]
+routine.psy_v_fn_tdb_w_pb.inactive_branches = [
+  "disabling `EP_psych_stats` compiles out the call-count increment; disabling `EP_psych_errors` compiles out the `V <= -0.01` helper call and routine 20 without changing the unconditional `V < 0.0` fallback to `0.83`",
+]
+routine.psy_v_fn_tdb_w_pb.unsupported_active_branches = [
+  "default errors-enabled `V <= -0.01` warning flow, first-versus-recurring behavior, caller context, per-state recurrence, and the optional statistics-enabled every-call counter",
+]
+routine.psy_v_fn_tdb_w_pb.not_claimed_branches = [
+  "external EnergyPlus numerical parity, cross-platform floating-point last-bit and exception parity, exact diagnostic formatting/side effects, statistics history, and downstream EMS, C API, or HVAC call-site migration",
+]
 
 routine.psy_w_fn_tdb_h_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
 routine.psy_w_fn_tdb_h_error.source_routine = "PsyWFnTdbH_error"
