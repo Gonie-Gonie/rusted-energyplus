@@ -1,0 +1,52 @@
+id = "calendar_schedule_fmu_export_bounded_initial_value_failure_001"
+title = "FMU Export bounded initial value expected failure"
+milestone = "full-source-order-schedule-type-limits-scalar-bounds"
+purpose = "Block unless EnergyPlus 26.1 and Rust both reject one inactive FMU Export To Schedule Initial Value above its resolved Continuous ScheduleTypeLimits upper bound before numerical schedule output."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "This expected-failure fixture changes only the paired success fixture's Continuous ScheduleTypeLimits upper bound from 0.875 to 0.5 while retaining Initial Value 0.875.",
+  "EnergyPlus must terminate in ProcessScheduleInput with zero Schedule Value data samples and exactly 0 Warning and 1 Severe error. The exact diagnostic text, diagnostic count parity beyond that EnergyPlus completion summary, and numeric process exit code are not compared with Rust.",
+  "Rust must reject the object during typed compilation with ScheduleValueOutsideTypeLimits, produce no TypedModel, and enter no runtime schedule sampling. This is semantic blocking evidence, not numerical Schedule Value conformance.",
+  "The paired success fixture alone promotes exactly 96 zero-tolerance samples at the inclusive upper endpoint. This smoke/nonclaim manifest intentionally declares no tolerance or conformance-level output.",
+  "Schedule:Compact, Schedule:File, and Schedule:Year resolved min/max; Schedule:Day warning behavior and Discrete integer checks; one-sided, reversed, or blank numeric bounds; unit_type; unknown type-limit reference parity; multiple-violation diagnostic order, text, count, or process-exit parity; EMS/currentVal or live updates; and cross-family duplicate source-order parity remain outside the claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_schedule_fmu_export_bounded_initial_value_failure_001/calendar_schedule_fmu_export_bounded_initial_value_failure.idf"
+tier = "B"
+
+[scope]
+domains = ["schedule", "weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_schedule_fmu_export_bounded_initial_value_failure_001/calendar_schedule_fmu_export_bounded_initial_value_failure.idf"
+weather = "data/conformance_cases/calendar_schedule_fmu_export_bounded_initial_value_exact_001/calendar_schedule_fmu_export_bounded_initial_value_exact.epw"
+
+[[outputs]]
+key = "FMU EXPORT BOUNDED INITIAL VALUE"
+variable = "Schedule Value"
+frequency = "timestep"
+class = "schedule"
+source = "eso"
+domain = "schedule"
+level = "baseline"
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_schedule_fmu_export_bounded_initial_value_failure_001/compare/negative-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-schedule-fmu-export-bounded-initial-value-exact"
+blocking = true

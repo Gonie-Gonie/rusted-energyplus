@@ -730,10 +730,61 @@ representation and expands it to the requested time-axis length.
 binding, live exchange, warmup handoff, mutable updates or `currentVal`,
 termination/final exchange, Ptolemy lifecycle, global ExternalInterface
 behavior, other ExternalInterface variable or actuator families, exact
-duplicate diagnostic text, bounded `ScheduleTypeLimits` parity, unknown
+duplicate diagnostic text, bounded `ScheduleTypeLimits` behavior beyond the
+separate scalar checkpoint below, unknown
 type-limit warning parity, downstream consumers, multiple objects,
 actual/design-day/multi-environment execution, Rust raw ESO serialization, and
 broad FMU Export behavior remain outside this claim.
+
+## ScheduleTypeLimits Bounded Scalar Evidence Checkpoint
+
+`calendar_schedule_fmu_export_bounded_initial_value_exact_001` and
+`calendar_schedule_fmu_export_bounded_initial_value_failure_001` form a
+surgical pair around one inactive
+`ExternalInterface:FunctionalMockupUnitExport:To:Schedule`. Both fixtures use
+the same inner schedule name, `ProbeInput` metadata, `Initial Value=0.875`,
+one-day `Timestep,4` calendar, EPW, and output request. Only the resolved
+`ScheduleTypeLimits` Continuous upper bound differs: the promoted success case
+uses `[0.0,0.875]`, while the blocking smoke/nonclaim failure case uses
+`[0.0,0.5]`.
+
+EnergyPlus 26.1 reads the lower bound, upper bound, numeric type, and optional
+unit type in `Sched::ProcessScheduleInput` at `ScheduleManager.cc` lines
+725-800. The FMU Export schedule itself is populated at lines 2133-2196, then
+the common top-level schedule range pass at lines 2198-2219 calls the detailed
+schedule min/max machinery. `ScheduleDetailed::setMinMaxVals` at lines
+3307-3347 derives the stored extrema, and `ScheduleBase::checkMinMaxVals` at
+lines 3388-3414 performs the inclusive comparison with `FLT_EPSILON`. The
+shared initial-value population at lines 2706-2731 explains why the accepted
+scalar appears at every zone timestep before any live exchange.
+
+The success lane proves that equality with the upper endpoint is accepted. It
+locks exactly 96 ordered, unique Timestep `Schedule Value` samples and
+timestamps, all `0.875`, at zero tolerance; the exact raw ESO vector and
+timestamp fields; converted epJSON Continuous lower/upper/numeric-type fields
+and the FMU Export inner four-field object; exact Environment and disabled-DST
+EIO rows; the missing-activation warning once; and EnergyPlus completion with
+1 Warning and 0 Severe errors.
+
+The paired failure changes only `upper_limit_value` to `0.5`. EnergyPlus exits
+from `ProcessScheduleInput` with zero `Schedule Value` or timestamp data rows
+and its completion summary reports 0 Warning and 1 Severe error. Rust resolves
+the same type-limit ID and emits `ScheduleValueOutsideTypeLimits` during typed
+compilation, leaving the TypedModel absent and preventing graph, execution
+plan, result-store, or runtime schedule samples. This is semantic rejection
+evidence only: numerical output, diagnostic text/count equality, and numeric
+process-exit equality are not claimed for the failure lane.
+
+Rust applies this two-sided inclusive scalar validator to `Schedule:Constant`,
+`ExternalInterface:Schedule`, FMU Import To Schedule, and FMU Export To
+Schedule. Only the paired FMU Export Continuous branch has external numerical
+promotion here; the other scalar families remain source/unit evidence.
+Resolved `Schedule:Compact`, `Schedule:File`, and `Schedule:Year` min/max;
+`Schedule:Day` warning-only and Discrete-integer behavior; one-sided, reversed,
+or blank numeric bounds; `unit_type`; unknown type-limit reference parity;
+multiple-violation diagnostic order, text, count, or exit behavior;
+EMS/`currentVal` and live updates; and cross-family duplicate source-order
+parity remain outside the claim.
 
 ## Schedule:Day/Week/Year Leap-Table Evidence Checkpoint
 

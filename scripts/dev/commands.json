@@ -353,6 +353,12 @@
                          "help":  "Gate exact inactive FMU Export To Schedule initial-value population, inner schedule-name ownership, and its one missing-activation warning."
                      },
                      {
+                         "name":  "compare-calendar-schedule-fmu-export-bounded-initial-value-exact",
+                         "path":  "compare\\compare-calendar-schedule-fmu-export-bounded-initial-value-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate paired Continuous ScheduleTypeLimits FMU Export scalar bounds: inclusive upper-endpoint conformance and above-bound compile rejection."
+                     },
+                     {
                          "name":  "compare-calendar-schedule-day-hourly-week-daily-year-leap-exact",
                          "path":  "compare\\compare-calendar-schedule-day-hourly-week-daily-year-leap-exact.ps1",
                          "group":  "compare",

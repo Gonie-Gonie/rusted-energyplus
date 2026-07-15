@@ -1,0 +1,61 @@
+id = "calendar_schedule_fmu_export_bounded_initial_value_exact_001"
+title = "FMU Export bounded initial value at the inclusive Continuous upper endpoint"
+milestone = "full-source-order-schedule-type-limits-scalar-bounds"
+purpose = "Block on exact EnergyPlus 26.1 and Rust behavior for one inactive FMU Export To Schedule scalar whose Initial Value equals both its resolved Continuous ScheduleTypeLimits upper bound and the immutable timestep value."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The fixture is one non-actual 2032-01-01 Thursday RunPeriod with Timestep,4, all six RunPeriod weather/calendar policies set to No, and a synthetic 24-row EPW with no holidays or daylight saving.",
+  "ScheduleTypeLimits Continuous declares inclusive bounds [0.0,0.875]. One inactive ExternalInterface:FunctionalMockupUnitExport:To:Schedule has inner schedule_name FMU Export Bounded Initial Value, retains ProbeInput as inert metadata, and declares Initial Value 0.875 exactly at the upper endpoint.",
+  "The zero-tolerance external claim is exactly 96 ordered, unique Timestep Schedule Value samples and timestamps, each equal to 0.875. The exact EnergyPlus missing-activation warning occurs once and completion is 1 Warning and 0 Severe errors.",
+  "The paired calendar_schedule_fmu_export_bounded_initial_value_failure_001 fixture changes only the Continuous upper bound to 0.5. It is blocking smoke/nonclaim expected-failure evidence: EnergyPlus terminates before Schedule Value data samples, and Rust rejects during typed compilation before model or runtime samples.",
+  "The promoted bounded claim is limited to this Continuous scalar FMU Export initial value and its inclusive upper endpoint. Schedule:Constant, ExternalInterface:Schedule, and FMU Import scalar bounds are Rust source/unit evidence only without separate external numerical promotion.",
+  "Schedule:Compact, Schedule:File, and Schedule:Year resolved min/max; Schedule:Day warning behavior and Discrete integer checks; one-sided, reversed, or blank numeric bounds; unit_type; unknown type-limit reference parity; multiple-violation diagnostic order, text, count, or process-exit parity; EMS/currentVal or live updates; and cross-family duplicate source-order parity remain outside the claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_schedule_fmu_export_bounded_initial_value_exact_001/calendar_schedule_fmu_export_bounded_initial_value_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["schedule", "weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_schedule_fmu_export_bounded_initial_value_exact_001/calendar_schedule_fmu_export_bounded_initial_value_exact.idf"
+weather = "data/conformance_cases/calendar_schedule_fmu_export_bounded_initial_value_exact_001/calendar_schedule_fmu_export_bounded_initial_value_exact.epw"
+
+[[outputs]]
+key = "FMU EXPORT BOUNDED INITIAL VALUE"
+variable = "Schedule Value"
+frequency = "timestep"
+class = "schedule"
+source = "eso"
+domain = "schedule"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "schedule"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_schedule_fmu_export_bounded_initial_value_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-schedule-fmu-export-bounded-initial-value-exact"
+blocking = true

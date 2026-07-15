@@ -338,6 +338,7 @@ impl<'a> Compiler<'a> {
         self.parse_external_interface_schedules(&mut model);
         self.parse_external_interface_fmu_import_schedules(&mut model);
         self.parse_external_interface_fmu_export_schedules(&mut model);
+        self.validate_scalar_schedule_type_limits(&model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
@@ -2426,6 +2427,85 @@ impl<'a> Compiler<'a> {
                     fmu_variable_name,
                     initial_value,
                 },
+            );
+        }
+    }
+
+    fn validate_scalar_schedule_type_limits(&mut self, model: &TypedModel) {
+        for schedule in &model.schedules {
+            self.validate_scalar_schedule_value(
+                model,
+                "Schedule:Constant",
+                &schedule.name.0,
+                "hourly_value",
+                schedule.schedule_type_limits,
+                schedule.hourly_value,
+            );
+        }
+        for schedule in &model.external_interface_schedules {
+            self.validate_scalar_schedule_value(
+                model,
+                "ExternalInterface:Schedule",
+                &schedule.name.0,
+                "initial_value",
+                schedule.schedule_type_limits,
+                schedule.initial_value,
+            );
+        }
+        for schedule in &model.external_interface_fmu_import_schedules {
+            self.validate_scalar_schedule_value(
+                model,
+                "ExternalInterface:FunctionalMockupUnitImport:To:Schedule",
+                &schedule.name.0,
+                "initial_value",
+                schedule.schedule_type_limits,
+                schedule.initial_value,
+            );
+        }
+        for schedule in &model.external_interface_fmu_export_schedules {
+            self.validate_scalar_schedule_value(
+                model,
+                "ExternalInterface:FunctionalMockupUnitExport:To:Schedule",
+                &schedule.name.0,
+                "initial_value",
+                schedule.schedule_type_limits,
+                schedule.initial_value,
+            );
+        }
+    }
+
+    fn validate_scalar_schedule_value(
+        &mut self,
+        model: &TypedModel,
+        object_type: &str,
+        object_name: &str,
+        field: &str,
+        schedule_type_limits: Option<ScheduleTypeLimitId>,
+        value: f64,
+    ) {
+        let Some(type_limits_id) = schedule_type_limits else {
+            return;
+        };
+        let Some(type_limits) = model.schedule_type_limits.get(type_limits_id.0 as usize) else {
+            return;
+        };
+        let (Some(lower_limit), Some(upper_limit)) =
+            (type_limits.lower_limit, type_limits.upper_limit)
+        else {
+            return;
+        };
+
+        let tolerance = f64::from(f32::EPSILON);
+        if lower_limit - value > tolerance || value - upper_limit > tolerance {
+            self.error(
+                "ScheduleValueOutsideTypeLimits",
+                object_type,
+                Some(object_name),
+                Some(field),
+                format!(
+                    "{object_type}/{object_name} field {field} value {value} is outside ScheduleTypeLimits/{} inclusive range [{lower_limit}, {upper_limit}] with f32 epsilon tolerance",
+                    type_limits.name.0
+                ),
             );
         }
     }
@@ -7413,6 +7493,7 @@ mod tests {
     mod schedule_external_interface_fmu_import;
     mod schedule_file;
     mod schedule_file_shading;
+    mod schedule_scalar_type_limits;
     mod schedule_week_compact;
     mod schedule_year;
 

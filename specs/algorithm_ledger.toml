@@ -656,7 +656,35 @@ proof_variables = [
   "Schedule Value",
 ]
 claim_level = "limited-conformance"
-support_boundary = "Limited EnergyPlus 26.1 conformance only for calendar_schedule_fmu_export_initial_value_exact_001: one ExternalInterface:FunctionalMockupUnitExport:To:Schedule whose actual schedule identity is the inner schedule_name FMU Export Initial Value beneath the converted epJSON synthetic outer key ExternalInterface:FunctionalMockupUnitExport:To:Schedule 1, one unlimited Any Number type reference, inert ProbeInput FMU-variable metadata, Initial Value 0.875, no ExternalInterface activation or socket/provider configuration, one non-actual 2032-01-01 Thursday RunPeriod, and Timestep,4. The blocking gate proves exactly 96 ordered-exact-unique zero-tolerance Timestep Schedule Value samples and timestamps, all 0.875. It also locks the exact epJSON inner four-field shape and synthetic outer-key distinction, all raw EnergyPlus ESO values/timestamps, exact Environment and disabled-daylight-saving EIO rows, the exact EnergyPlus missing-activation warning once, and 1 Warning/0 Severe completion in ERR and END. Rust compiles only this inactive branch into one shared immutable initial-value scalar and precomputes the same value at every time-axis sample. The EnergyPlus warning lock is oracle evidence only; Rust warning text/count parity is unclaimed. socket.cfg and variables.cfg handling, provider resolution, FMU variable binding, live exchange, warmup handoff, mutable updates/currentVal, termination/final exchange, Ptolemy lifecycle, global ExternalInterface behavior, other ExternalInterface variable/actuator families, exact duplicate diagnostic text, bounded ScheduleTypeLimits parity, unknown type-limit warning parity, downstream consumers, multiple objects, actual/design-day/multienvironment execution, and Rust raw ESO serialization remain unclaimed. The mapped routines and live-binding source lines remain ownership context and are not promoted wholesale by this bounded entry."
+support_boundary = "Limited EnergyPlus 26.1 conformance only for calendar_schedule_fmu_export_initial_value_exact_001: one ExternalInterface:FunctionalMockupUnitExport:To:Schedule whose actual schedule identity is the inner schedule_name FMU Export Initial Value beneath the converted epJSON synthetic outer key ExternalInterface:FunctionalMockupUnitExport:To:Schedule 1, one unlimited Any Number type reference, inert ProbeInput FMU-variable metadata, Initial Value 0.875, no ExternalInterface activation or socket/provider configuration, one non-actual 2032-01-01 Thursday RunPeriod, and Timestep,4. The blocking gate proves exactly 96 ordered-exact-unique zero-tolerance Timestep Schedule Value samples and timestamps, all 0.875. It also locks the exact epJSON inner four-field shape and synthetic outer-key distinction, all raw EnergyPlus ESO values/timestamps, exact Environment and disabled-daylight-saving EIO rows, the exact EnergyPlus missing-activation warning once, and 1 Warning/0 Severe completion in ERR and END. Rust compiles only this inactive branch into one shared immutable initial-value scalar and precomputes the same value at every time-axis sample. The EnergyPlus warning lock is oracle evidence only; Rust warning text/count parity is unclaimed. socket.cfg and variables.cfg handling, provider resolution, FMU variable binding, live exchange, warmup handoff, mutable updates/currentVal, termination/final exchange, Ptolemy lifecycle, global ExternalInterface behavior, other ExternalInterface variable/actuator families, exact duplicate diagnostic text, unknown type-limit warning parity, downstream consumers, multiple objects, actual/design-day/multienvironment execution, and Rust raw ESO serialization remain unclaimed for this unlimited CP53 fixture. Its bounded behavior is not promoted by this entry: the separate calendar_schedule_fmu_export_bounded_initial_value_exact_001 entry promotes only the Continuous scalar inclusive endpoint [0.0,0.875], paired with calendar_schedule_fmu_export_bounded_initial_value_failure_001 smoke/nonclaim rejection above the upper bound; every other bounded ScheduleTypeLimits branch remains unclaimed. The mapped routines and live-binding source lines remain ownership context and are not promoted wholesale by this bounded entry."
+
+[[algorithm]]
+id = "schedule_type_limits_scalar_bounds"
+domain = "time"
+source_map = "docs/src/porting-map/time-weather-schedule.md"
+energyplus_source = [
+  "src/EnergyPlus/ScheduleManager.cc",
+  "src/EnergyPlus/ExternalInterface.cc",
+]
+port_ticket_mappings = [
+  "src/EnergyPlus/ScheduleManager.cc|ProcessScheduleInput|ProcessScheduleInput|Environment",
+  "src/EnergyPlus/ScheduleManager.cc|ExternalInterfaceSetSchedule|ExternalInterfaceSetSchedule|Environment",
+  "src/EnergyPlus/ExternalInterface.cc|WarnIfExternalInterfaceObjectsAreUsed|WarnIfExternalInterfaceObjectsAreUsed|Environment",
+]
+rust_target = [
+  "crates/ep_compiler/src/compiler.rs::Compiler::validate_scalar_schedule_type_limits",
+  "crates/ep_compiler/src/compiler.rs::Compiler::validate_scalar_schedule_value",
+  "crates/ep_runtime/src/schedules/external_interface.rs::external_interface_fmu_export_schedule_series",
+  "scripts/compare/compare-calendar-schedule-fmu-export-bounded-initial-value-exact.ps1",
+]
+status = "conformance"
+first_case = "calendar_schedule_fmu_export_bounded_initial_value_exact_001"
+first_evidence = "calendar_schedule_fmu_export_bounded_initial_value_exact_001"
+proof_variables = [
+  "Schedule Value",
+]
+claim_level = "limited-conformance"
+support_boundary = "Limited EnergyPlus 26.1 conformance only for the paired FMU Export To Schedule Continuous scalar fixtures. calendar_schedule_fmu_export_bounded_initial_value_exact_001 declares ScheduleTypeLimits Continuous bounds [0.0,0.875] and inactive Initial Value 0.875 exactly at the inclusive upper endpoint; its blocking gate proves one 96-sample ordered-exact-unique zero-tolerance Timestep Schedule Value series, all 0.875, exact raw ESO values/timestamps, exact Environment and disabled-DST EIO rows, the missing-activation warning once, and 1 Warning/0 Severe completion. calendar_schedule_fmu_export_bounded_initial_value_failure_001 changes only the upper bound to 0.5 and is blocking smoke/nonclaim rejection evidence: EnergyPlus terminates in ProcessScheduleInput with zero Schedule Value/timestamp data rows and 0 Warning/1 Severe, while Rust emits ScheduleValueOutsideTypeLimits during typed compilation, returns no TypedModel, and produces no graph, execution plan, result store, or runtime samples. Diagnostic text/count and numeric process-exit parity are not claimed. Rust applies the same two-sided inclusive scalar validator to Schedule:Constant, ExternalInterface:Schedule, and FMU Import To Schedule, but those families remain source/unit evidence without separate external numerical promotion. Resolved Schedule:Compact/File/Year minmax, Schedule:Day warning-only and Discrete-integer behavior, one-sided/reversed/blank numeric bounds, unit_type, unknown type-limit reference parity, multiple-violation diagnostic order/text/count/exit behavior, EMS/currentVal or live updates, and cross-family duplicate source-order parity remain unclaimed."
 
 [[algorithm]]
 id = "schedule_day_week_year_hourly_leap"

@@ -1,0 +1,51 @@
+Version,26.1;
+
+Building,
+  FMU Export Bounded Initial Value Exact Fixture,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+Timestep,4;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+RunPeriod,
+  FMU Export Bounded Initial Value Run Period,
+  1,
+  1,
+  2032,
+  1,
+  1,
+  2032,
+  Thursday,
+  No,
+  No,
+  No,
+  No,
+  No,
+  No;
+
+ScheduleTypeLimits,
+  Continuous,
+  0.0,
+  0.875,
+  Continuous;
+
+ExternalInterface:FunctionalMockupUnitExport:To:Schedule,
+  FMU Export Bounded Initial Value,
+  Continuous,
+  ProbeInput,
+  0.875;
+
+Output:Variable,
+  FMU EXPORT BOUNDED INITIAL VALUE,
+  Schedule Value,
+  Timestep;
