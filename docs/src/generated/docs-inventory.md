@@ -144,7 +144,7 @@ none
 | docs/src/porting-map/plant-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
 | docs/src/porting-map/plant.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
 | docs/src/porting-map/surface-balance-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-20 |
-| docs/src/porting-map/time-weather-schedule.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-14 |
+| docs/src/porting-map/time-weather-schedule.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-15 |
 | docs/src/porting-map/warmup-semantics-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-12 |
 | docs/src/porting-map/zone-air-update-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-14 |
 | docs/src/quick-start.md | guide | not in SUMMARY | n/a | present | active | docs | 2026-06-08 |

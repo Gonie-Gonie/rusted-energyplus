@@ -1,0 +1,60 @@
+id = "calendar_epw_dst_weekday_rules_hourly_exact_001"
+title = "EPW fourth-Monday through last-Wednesday daylight-saving exact"
+milestone = "full-source-order-calendar-epw-dst-weekday-rules"
+purpose = "Block on exact ordered hourly daylight-saving state for the EPW fourth-Monday-in-February through last-Wednesday-in-February declaration."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The claim is limited to the EPW rules `4th Monday in February` through `Last Wednesday in February`, their 2032 resolutions on February 23 and February 25, and 120 ordered and unique hour-ending Site Daylight Saving Time Status samples from 2032-02-22 through 2032-02-26.",
+  "The exact daily DST states are 0, 1, 1, 1, and 0, proving 72 active and 48 inactive hourly samples around both resolved weekday-rule boundaries; raw EnergyPlus oracle ESO timestamp fields and values are locked for all 120 samples.",
+  "The RunPeriod explicitly enables the weather-file daylight-saving period while disabling weather-file holidays, weekend observation, rain, snow, and actual-weather handling; no input-file special day or daylight-saving object is present.",
+  "The EnergyPlus EIO source and resolved 02/23 through 02/25 dates are exact evidence, and the oracle completes with exactly 0 Warning and 0 Severe errors.",
+  "Fixed-date rules, corresponding IDF RunPeriodControl:DaylightSavingTime forms, other ordinals, weekdays, months, years, southern-hemisphere or year-wrapping ranges, malformed headers, policy precedence, DST-shifted schedule lookup, tomorrow state, actual-weather execution, cross-year traversal or reprojection, Rust raw ESO serialization, and other output variables remain outside this claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_epw_dst_weekday_rules_hourly_exact_001/calendar_epw_dst_weekday_rules_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_epw_dst_weekday_rules_hourly_exact_001/calendar_epw_dst_weekday_rules_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_epw_dst_weekday_rules_hourly_exact_001/calendar_epw_dst_weekday_rules_hourly_exact.epw"
+
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Daylight Saving Time Status"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_epw_dst_weekday_rules_hourly_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-epw-dst-weekday-rules-exact"
+blocking = true

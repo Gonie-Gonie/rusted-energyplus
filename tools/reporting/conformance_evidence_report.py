@@ -69,10 +69,17 @@ CLAIM_BOUNDARY = (
     "setup remain outside the claim. The fixed-date EPW DST case proves only that its RunPeriod "
     "weather-file use flag activates the declared February 29 through March 1 period: 72 ordered, "
     "unique Site Daylight Saving Time Status samples and normalized timestamps match exactly, with "
-    "24 inactive followed by 48 active. Nth/last-weekday rules, southern year-wrap ranges, and "
-    "RunPeriod disabling remain source-mapped unit evidence only. The IDF "
-    "RunPeriodControl:DaylightSavingTime object, DST-shifted schedule lookup, and hour-24 rollover "
-    "remain outside this checkpoint. "
+    "24 inactive followed by 48 active. The separate weekday-boundary case proves only the literal "
+    "EPW pair `4th Monday in February` through `Last Wednesday in February` on the explicit "
+    "2032-02-22 through 2032-02-26 Sunday-start RunPeriod with policies No/Yes/No/No/No/No. The "
+    "boundaries resolve to days of year 54 through 56 without wrap; 120 ordered, unique, exact "
+    "samples follow daily status 0/1/1/1/0 with exactly 72 active hours. Its promoted series "
+    "metadata, all raw EnergyPlus oracle ESO timestamp fields and values, exact WeatherFile EIO "
+    "row, and clean 0 Warning/0 Severe completion are gate-locked. Other Nth/last-weekday forms, "
+    "southern year-wrap ranges, RunPeriod disabling, malformed headers, and policy precedence "
+    "remain unit/source evidence or unclaimed. The IDF RunPeriodControl:DaylightSavingTime object, "
+    "DST-shifted schedule lookup, hour-24 rollover, and Rust raw ESO serialization remain outside "
+    "this checkpoint. "
     "The fixed-date input-file special-day case separately proves one February 29 Holiday: 72 "
     "ordered, unique Site Day Type Index samples and normalized timestamps match exactly as "
     "24 Sunday values, 24 Holiday values, and 24 Tuesday values. The three fixed-Sunday "
@@ -181,6 +188,7 @@ CASE_LABELS = {
     "calendar_schedule_hourly_exact_001": "Calendar/sched exact",
     "calendar_schedule_weather_leap_policy_no_001": "Weather calendar no-leap",
     "calendar_dst_fixed_date_hourly_exact_001": "Calendar DST fixed",
+    "calendar_epw_dst_weekday_rules_hourly_exact_001": "EPW DST weekday pair",
     "calendar_special_day_fixed_date_hourly_exact_001": "Calendar special day",
     "calendar_special_day_nth_weekday_hourly_exact_001": "IDF fourth Sunday",
     "calendar_special_day_last_weekday_hourly_exact_001": "IDF last Sunday",
@@ -311,6 +319,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_fixed_date_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_fixed_date_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_dst_fixed_date_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="EPW DST weekday pair",
+        command="compare-calendar-epw-dst-weekday-rules-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_weekday_rules_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_weekday_rules_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_epw_dst_weekday_rules_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="Calendar special day",

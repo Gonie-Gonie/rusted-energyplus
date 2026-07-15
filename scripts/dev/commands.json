@@ -311,6 +311,12 @@
                          "help":  "Gate exact EPW fixed-date daylight-saving state and ordered hourly timestamps."
                      },
                      {
+                         "name":  "compare-calendar-epw-dst-weekday-rules-exact",
+                         "path":  "compare\\compare-calendar-epw-dst-weekday-rules-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate one exact EPW fourth-Monday-to-last-Wednesday daylight-saving boundary pair and ordered hourly state."
+                     },
+                     {
                          "name":  "compare-calendar-special-day-fixed-date-exact",
                          "path":  "compare\\compare-calendar-special-day-fixed-date-exact.ps1",
                          "group":  "compare",
