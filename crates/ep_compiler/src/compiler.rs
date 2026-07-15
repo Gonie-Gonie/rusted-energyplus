@@ -17,7 +17,7 @@ use ep_model::{
     PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod,
     RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
     ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
-    ScheduleConstant, ScheduleDayHourly, ScheduleDayType, ScheduleFile,
+    ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayType, ScheduleFile,
     ScheduleFileColumnSeparator, ScheduleId, ScheduleInterpolation, ScheduleTypeLimitId,
     ScheduleTypeLimits, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
     SolarDistribution, SpecialDayType, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
@@ -224,6 +224,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Schedule:Compact",
     "Schedule:File",
     "Schedule:Day:Hourly",
+    "Schedule:Day:Interval",
     "Schedule:Week:Daily",
     "Schedule:Year",
     "OtherEquipment",
@@ -310,6 +311,7 @@ impl<'a> Compiler<'a> {
         self.parse_compact_schedules(&mut model);
         self.parse_file_schedules(&mut model);
         self.parse_day_hourly_schedules(&mut model);
+        self.parse_day_interval_schedules(&mut model);
         self.parse_week_daily_schedules(&mut model);
         self.parse_year_schedules(&mut model);
         self.parse_zones(&mut model);
@@ -1157,6 +1159,189 @@ impl<'a> Compiler<'a> {
                 hourly_values,
             });
         }
+    }
+
+    fn parse_day_interval_schedules(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "Schedule:Day:Interval";
+        let minutes_per_timestep =
+            schedule_minutes_per_timestep(model.timestep.number_of_timesteps_per_hour);
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let schedule_type_limits = match self.optional_string(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "schedule_type_limits_name",
+            ) {
+                Some(type_limits_name) => self.resolve_name(
+                    &model.schedule_type_limit_names,
+                    OBJECT_TYPE,
+                    &name,
+                    "schedule_type_limits_name",
+                    &type_limits_name,
+                    "ScheduleTypeLimits",
+                ),
+                None => None,
+            };
+            let interpolation = self.enum_default(
+                OBJECT_TYPE,
+                &name,
+                (&object, "interpolate_to_timestep"),
+                ScheduleInterpolation::No,
+                "No",
+                parse_schedule_interpolation,
+            );
+            let Some(segments) =
+                self.day_interval_segments(&name, &object, interpolation, minutes_per_timestep)
+            else {
+                continue;
+            };
+
+            let day_schedule_index = model.day_schedules.len() + model.day_interval_schedules.len();
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, day_schedule_index) else {
+                continue;
+            };
+            let id = DayScheduleId(id_value);
+            if model.day_schedule_names.insert(&name, id).is_some() {
+                self.duplicate_name(OBJECT_TYPE, &name);
+                continue;
+            }
+
+            model.day_interval_schedules.push(ScheduleDayInterval {
+                id,
+                name: NormalizedName::new(&name),
+                schedule_type_limits,
+                interpolation,
+                segments,
+            });
+        }
+    }
+
+    fn day_interval_segments(
+        &mut self,
+        object_name: &str,
+        object: &RawObject,
+        interpolation: ScheduleInterpolation,
+        minutes_per_timestep: Option<u32>,
+    ) -> Option<Vec<ScheduleCompactSegment>> {
+        const OBJECT_TYPE: &str = "Schedule:Day:Interval";
+        const FIELD: &str = "data";
+        let Some(value) = field_value(object, FIELD) else {
+            self.error(
+                "MissingRequiredField",
+                OBJECT_TYPE,
+                Some(object_name),
+                Some(FIELD),
+                format!("{OBJECT_TYPE}/{object_name} requires field {FIELD}"),
+            );
+            return None;
+        };
+        let RawValue::Array(values) = value else {
+            self.invalid_field_type(OBJECT_TYPE, object_name, FIELD, "array");
+            return None;
+        };
+        if values.is_empty() {
+            self.error(
+                "MissingScheduleDayIntervalData",
+                OBJECT_TYPE,
+                Some(object_name),
+                Some(FIELD),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} requires at least one source-ordered time/value entry"
+                ),
+            );
+            return None;
+        }
+
+        let mut segments = Vec::with_capacity(values.len());
+        let mut entries_valid = true;
+        for (index, value) in values.iter().enumerate() {
+            let RawValue::Object(fields) = value else {
+                self.error(
+                    "InvalidFieldType",
+                    OBJECT_TYPE,
+                    Some(object_name),
+                    Some(FIELD),
+                    format!("{OBJECT_TYPE}/{object_name} {FIELD} entry {index} must be an object"),
+                );
+                entries_valid = false;
+                continue;
+            };
+            let entry = RawObject {
+                fields: fields.clone(),
+                source_span: None,
+            };
+            let entry_name = format!("{object_name}[{index}]");
+            let time = self.required_string(OBJECT_TYPE, &entry_name, &entry, "time");
+            let interval_value =
+                self.required_number(OBJECT_TYPE, &entry_name, &entry, "value_until_time");
+            let (Some(time), Some(interval_value)) = (time, interval_value) else {
+                entries_valid = false;
+                continue;
+            };
+            let Some(until_minute_of_day) = parse_schedule_time_minute(&time) else {
+                self.error(
+                    "InvalidScheduleDayIntervalTime",
+                    OBJECT_TYPE,
+                    Some(&entry_name),
+                    Some("time"),
+                    format!(
+                        "{OBJECT_TYPE}/{entry_name} has invalid time '{time}'; expected 00:01 through 24:00"
+                    ),
+                );
+                entries_valid = false;
+                continue;
+            };
+            if segments
+                .last()
+                .is_some_and(|segment: &ScheduleCompactSegment| {
+                    until_minute_of_day <= segment.until_minute_of_day
+                })
+            {
+                self.error(
+                    "InvalidScheduleDayIntervalTimeOrder",
+                    OBJECT_TYPE,
+                    Some(&entry_name),
+                    Some("time"),
+                    format!(
+                        "{OBJECT_TYPE}/{object_name} times must be strictly increasing; '{time}' is not later than the prior time"
+                    ),
+                );
+                entries_valid = false;
+                continue;
+            }
+            if interpolation == ScheduleInterpolation::No
+                && minutes_per_timestep.is_some_and(|minutes| until_minute_of_day % minutes != 0)
+            {
+                self.warning(
+                    "ScheduleDayIntervalTimeNotAlignedToTimestep",
+                    OBJECT_TYPE,
+                    Some(&entry_name),
+                    Some("time"),
+                    format!(
+                        "{OBJECT_TYPE}/{object_name} time {until_minute_of_day} minutes is not a multiple of the minutes per zone timestep"
+                    ),
+                );
+            }
+            segments.push(ScheduleCompactSegment {
+                until_minute_of_day,
+                value: interval_value,
+            });
+        }
+
+        if segments
+            .last()
+            .is_some_and(|segment| segment.until_minute_of_day != 1440)
+        {
+            self.error(
+                "IncompleteScheduleDayInterval",
+                OBJECT_TYPE,
+                Some(object_name),
+                Some(FIELD),
+                format!("{OBJECT_TYPE}/{object_name} must end with time 24:00"),
+            );
+            entries_valid = false;
+        }
+        entries_valid.then_some(segments)
     }
 
     fn parse_week_daily_schedules(&mut self, model: &mut TypedModel) {
@@ -4442,6 +4627,26 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn required_number(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<f64> {
+        let Some(value) = field_value(object, field) else {
+            self.error(
+                "MissingRequiredField",
+                object_type,
+                Some(object_name),
+                Some(field),
+                format!("{object_type}/{object_name} requires field {field}"),
+            );
+            return None;
+        };
+        self.number_value(object_type, object_name, field, value)
+    }
+
     fn optional_autosize_or_number(
         &mut self,
         object_type: &str,
@@ -5477,8 +5682,16 @@ fn compact_directive(value: &str, directive: &str) -> bool {
 }
 
 fn parse_schedule_interpolation(value: &str) -> Option<ScheduleInterpolation> {
-    let (_directive, interpolation) = value.split_once(':')?;
-    match interpolation.trim() {
+    let value = value.trim();
+    let value = if let Some((directive, interpolation)) = value.split_once(':') {
+        if !directive.trim().eq_ignore_ascii_case("Interpolate") {
+            return None;
+        }
+        interpolation.trim()
+    } else {
+        value
+    };
+    match value {
         interpolation if interpolation.eq_ignore_ascii_case("No") => {
             Some(ScheduleInterpolation::No)
         }
@@ -5649,9 +5862,14 @@ fn leap_schedule_ordinal(month: u32, day_of_month: u32) -> Option<usize> {
     usize::try_from(days_before_month.checked_add(day_of_month)?).ok()
 }
 
-fn parse_until_minute(value: &str) -> Option<u32> {
-    let (_directive, time) = value.split_once(':')?;
-    let time = time.trim();
+fn parse_schedule_time_minute(value: &str) -> Option<u32> {
+    let value = value.trim();
+    let time = if compact_directive(value, "Until") {
+        let (_directive, time) = value.split_once(':')?;
+        time.trim()
+    } else {
+        value
+    };
     let (hour, minute) = time.split_once(':')?;
     let hour = hour.trim().parse::<u32>().ok()?;
     let minute = minute.trim().parse::<u32>().ok()?;
@@ -5664,6 +5882,12 @@ fn parse_until_minute(value: &str) -> Option<u32> {
     } else {
         Some(minute_of_day)
     }
+}
+
+fn parse_until_minute(value: &str) -> Option<u32> {
+    compact_directive(value, "Until")
+        .then(|| parse_schedule_time_minute(value))
+        .flatten()
 }
 
 fn parse_terrain(value: &str) -> Option<Terrain> {
@@ -6095,6 +6319,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 
 #[cfg(test)]
 mod tests {
+    mod schedule_day_interval;
     mod schedule_file;
     mod schedule_year;
 

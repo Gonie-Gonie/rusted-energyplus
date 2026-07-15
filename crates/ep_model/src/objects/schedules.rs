@@ -50,7 +50,22 @@ pub struct ScheduleDayHourly {
     pub hourly_values: [f64; 24],
 }
 
-/// Immutable mapping from all EnergyPlus day types to hourly day schedules.
+/// Immutable interval profile referenced by week schedules.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ScheduleDayInterval {
+    /// Typed day-schedule ID shared with the other day-schedule families.
+    pub id: DayScheduleId,
+    /// Day-schedule name.
+    pub name: NormalizedName,
+    /// Optional type limits.
+    pub schedule_type_limits: Option<ScheduleTypeLimitId>,
+    /// Interpolation mode used to populate zone-timestep values.
+    pub interpolation: ScheduleInterpolation,
+    /// Source-ordered daily `Until` value segments.
+    pub segments: Vec<ScheduleCompactSegment>,
+}
+
+/// Immutable mapping from all EnergyPlus day types to typed day schedules.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ScheduleWeekDaily {
     /// Typed week-schedule ID.
@@ -130,7 +145,7 @@ pub struct ScheduleFile {
     pub values: Vec<f64>,
 }
 
-/// One value segment in a compact schedule day profile.
+/// One value segment in an interval-based schedule day profile.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ScheduleCompactSegment {
     /// Minute of day at which this segment ends, 1 through 1440.
@@ -139,7 +154,7 @@ pub struct ScheduleCompactSegment {
     pub value: f64,
 }
 
-/// Interpolation mode applied within one compact-schedule day profile.
+/// Interpolation mode applied within one interval-based day profile.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub enum ScheduleInterpolation {
     /// Hold each segment value constant until the next `Until` boundary.

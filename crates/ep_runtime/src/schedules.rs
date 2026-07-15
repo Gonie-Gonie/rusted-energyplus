@@ -8,9 +8,18 @@ use ep_model::{
     OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, People,
     PeopleNumberCalculationMethod, ScheduleCompact, ScheduleCompactDayProfile,
     ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant, ScheduleDayType, ScheduleFile,
-    ScheduleId, ScheduleInterpolation, ScheduleYear, TypedModel, ZoneId,
+    ScheduleId, ScheduleInterpolation, TypedModel, ZoneId,
 };
 use std::collections::BTreeSet;
+
+mod day_table;
+
+#[cfg(test)]
+use day_table::{compiled_day_schedule_value, year_schedule_hourly_value};
+use day_table::{
+    precompile_day_schedule_table, year_schedule_series_for_environment_time_axis,
+    year_schedule_series_for_time_axis,
+};
 
 #[cfg(test)]
 mod tests;
@@ -312,6 +321,15 @@ pub enum ScheduleSeriesKind {
         /// Immutable leap-shaped annual pointer count.
         schedule_day_count: usize,
     },
+    /// Direct annual lookup through an immutable zone-timestep day-profile cache.
+    YearWeekDayCompiledProfiles {
+        /// Immutable leap-shaped annual pointer count.
+        schedule_day_count: usize,
+        /// Number of unambiguous hourly and interval day profiles in the cache.
+        compiled_day_schedule_count: usize,
+        /// Whole minutes represented by every cached zone-timestep value.
+        minutes_per_timestep: u32,
+    },
 }
 
 /// One precompiled daily schedule interval.
@@ -409,6 +427,8 @@ pub fn precompute_schedule_value_series_for_time_axis(
     model: &TypedModel,
     time_axis: &TimeAxis,
 ) -> Vec<ScheduleValueSeries> {
+    let day_schedule_table =
+        precompile_day_schedule_table(model, time_axis.zone_timestep.timesteps_per_hour);
     model
         .schedules
         .iter()
@@ -427,12 +447,9 @@ pub fn precompute_schedule_value_series_for_time_axis(
                 .iter()
                 .map(|schedule| file_schedule_series_for_time_axis(schedule, time_axis)),
         )
-        .chain(
-            model
-                .year_schedules
-                .iter()
-                .map(|schedule| year_schedule_series_for_time_axis(model, schedule, time_axis)),
-        )
+        .chain(model.year_schedules.iter().map(|schedule| {
+            year_schedule_series_for_time_axis(model, schedule, time_axis, &day_schedule_table)
+        }))
         .collect()
 }
 
@@ -448,6 +465,8 @@ pub fn precompute_schedule_value_series_for_environment_time_axis(
     model: &TypedModel,
     time_axis: &EnvironmentTimeAxis,
 ) -> Vec<ScheduleValueSeries> {
+    let day_schedule_table =
+        precompile_day_schedule_table(model, time_axis.zone_timestep.timesteps_per_hour);
     model
         .schedules
         .iter()
@@ -465,7 +484,12 @@ pub fn precompute_schedule_value_series_for_environment_time_axis(
             }),
         )
         .chain(model.year_schedules.iter().map(|schedule| {
-            year_schedule_series_for_environment_time_axis(model, schedule, time_axis)
+            year_schedule_series_for_environment_time_axis(
+                model,
+                schedule,
+                time_axis,
+                &day_schedule_table,
+            )
         }))
         .collect()
 }
@@ -662,96 +686,6 @@ fn file_schedule_hourly_8760_value(
     schedule.values.get(source_index as usize).copied()
 }
 
-fn year_schedule_series_for_time_axis(
-    model: &TypedModel,
-    schedule: &ScheduleYear,
-    time_axis: &TimeAxis,
-) -> ScheduleValueSeries {
-    let values = time_axis
-        .points
-        .iter()
-        .map(|point| {
-            let (schedule_day_of_year, day_type, minute_of_day) =
-                detailed_schedule_lookup_state(point);
-            year_schedule_hourly_value(
-                model,
-                schedule,
-                schedule_day_of_year,
-                day_type,
-                minute_of_day,
-            )
-            .unwrap_or(f64::NAN)
-        })
-        .collect();
-
-    ScheduleTrace {
-        schedule_id: schedule.id,
-        schedule_name: schedule.name.0.clone(),
-        kind: ScheduleSeriesKind::YearWeekDayHourlyDirect {
-            schedule_day_count: schedule.week_schedules.len(),
-        },
-        values,
-    }
-}
-
-fn year_schedule_series_for_environment_time_axis(
-    model: &TypedModel,
-    schedule: &ScheduleYear,
-    time_axis: &EnvironmentTimeAxis,
-) -> ScheduleValueSeries {
-    let values = time_axis
-        .points
-        .iter()
-        .map(|point| {
-            let (schedule_day_of_year, day_type, minute_of_day) =
-                detailed_schedule_environment_lookup_state(point);
-            year_schedule_hourly_value(
-                model,
-                schedule,
-                schedule_day_of_year,
-                day_type,
-                minute_of_day,
-            )
-            .unwrap_or(f64::NAN)
-        })
-        .collect();
-
-    ScheduleTrace {
-        schedule_id: schedule.id,
-        schedule_name: schedule.name.0.clone(),
-        kind: ScheduleSeriesKind::YearWeekDayHourlyDirect {
-            schedule_day_count: schedule.week_schedules.len(),
-        },
-        values,
-    }
-}
-
-fn year_schedule_hourly_value(
-    model: &TypedModel,
-    schedule: &ScheduleYear,
-    schedule_day_of_year: u32,
-    day_type: ScheduleDayType,
-    minute_of_day: u32,
-) -> Option<f64> {
-    let schedule_day_index = usize::try_from(schedule_day_of_year.checked_sub(1)?).ok()?;
-    let week_schedule_id = *schedule.week_schedules.get(schedule_day_index)?;
-    let week_schedule_index = usize::try_from(week_schedule_id.0).ok()?;
-    let week_schedule = model
-        .week_schedules
-        .get(week_schedule_index)
-        .filter(|candidate| candidate.id == week_schedule_id)?;
-    let day_schedule_id = *week_schedule
-        .day_schedules
-        .get(schedule_day_type_index(day_type))?;
-    let day_schedule_index = usize::try_from(day_schedule_id.0).ok()?;
-    let day_schedule = model
-        .day_schedules
-        .get(day_schedule_index)
-        .filter(|candidate| candidate.id == day_schedule_id)?;
-    let hour_index = usize::try_from((minute_of_day.clamp(1, 1440) - 1) / 60).ok()?;
-    day_schedule.hourly_values.get(hour_index).copied()
-}
-
 #[derive(Clone, Copy, Debug, PartialEq)]
 struct DetailedScheduleLookupInput {
     schedule_day_of_year: u32,
@@ -922,23 +856,8 @@ fn precompile_compact_schedule_day_profile(
     minutes_per_timestep: Option<u32>,
 ) -> CompiledScheduleDayProfile {
     let minute_values = expand_compact_schedule_minute_values(profile);
-    let (minutes_per_timestep, zone_timestep_values) = minutes_per_timestep.map_or_else(
-        || (0, Vec::new()),
-        |minutes_per_timestep| {
-            let values = minute_values
-                .chunks_exact(minutes_per_timestep as usize)
-                .map(|window| match profile.interpolation {
-                    ScheduleInterpolation::Average => {
-                        window.iter().sum::<f64>() / f64::from(minutes_per_timestep)
-                    }
-                    ScheduleInterpolation::No | ScheduleInterpolation::Linear => {
-                        window.last().copied().unwrap_or(f64::NAN)
-                    }
-                })
-                .collect();
-            (minutes_per_timestep, values)
-        },
-    );
+    let (minutes_per_timestep, zone_timestep_values) =
+        reduce_schedule_minute_values(profile.interpolation, &minute_values, minutes_per_timestep);
 
     CompiledScheduleDayProfile {
         day_types: profile.day_types.clone(),
@@ -949,17 +868,57 @@ fn precompile_compact_schedule_day_profile(
     }
 }
 
+fn precompile_schedule_day_values(
+    interpolation: ScheduleInterpolation,
+    segments: &[ScheduleCompactSegment],
+    minutes_per_timestep: Option<u32>,
+) -> (u32, Vec<f64>) {
+    let minute_values = expand_schedule_minute_values(interpolation, segments);
+    reduce_schedule_minute_values(interpolation, &minute_values, minutes_per_timestep)
+}
+
+fn reduce_schedule_minute_values(
+    interpolation: ScheduleInterpolation,
+    minute_values: &[f64],
+    minutes_per_timestep: Option<u32>,
+) -> (u32, Vec<f64>) {
+    minutes_per_timestep.map_or_else(
+        || (0, Vec::new()),
+        |minutes_per_timestep| {
+            let values = minute_values
+                .chunks_exact(minutes_per_timestep as usize)
+                .map(|window| match interpolation {
+                    ScheduleInterpolation::Average => {
+                        window.iter().sum::<f64>() / f64::from(minutes_per_timestep)
+                    }
+                    ScheduleInterpolation::No | ScheduleInterpolation::Linear => {
+                        window.last().copied().unwrap_or(f64::NAN)
+                    }
+                })
+                .collect();
+            (minutes_per_timestep, values)
+        },
+    )
+}
+
 fn expand_compact_schedule_minute_values(profile: &ScheduleCompactDayProfile) -> Vec<f64> {
+    expand_schedule_minute_values(profile.interpolation, &profile.segments)
+}
+
+fn expand_schedule_minute_values(
+    interpolation: ScheduleInterpolation,
+    segments: &[ScheduleCompactSegment],
+) -> Vec<f64> {
     let mut minute_values = Vec::with_capacity(1440);
     let mut previous_until_minute = 0_u32;
     let mut previous_value = None;
 
-    for segment in &profile.segments {
+    for segment in segments {
         let until_minute = segment
             .until_minute_of_day
             .clamp(previous_until_minute, 1440);
         let duration_minutes = until_minute - previous_until_minute;
-        if profile.interpolation == ScheduleInterpolation::Linear {
+        if interpolation == ScheduleInterpolation::Linear {
             if let Some(start_value) = previous_value {
                 let increment = (segment.value - start_value) / f64::from(duration_minutes.max(1));
                 let mut current_value = start_value;

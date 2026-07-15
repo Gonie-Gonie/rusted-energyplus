@@ -1110,7 +1110,12 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
         ("constant_schedules", model.schedules.len()),
         ("compact_schedules", model.compact_schedules.len()),
         ("file_schedules", model.file_schedules.len()),
-        ("day_schedules", model.day_schedules.len()),
+        (
+            "day_schedules",
+            model.day_schedules.len() + model.day_interval_schedules.len(),
+        ),
+        ("day_hourly_schedules", model.day_schedules.len()),
+        ("day_interval_schedules", model.day_interval_schedules.len()),
         ("week_schedules", model.week_schedules.len()),
         ("year_schedules", model.year_schedules.len()),
         ("other_equipment", model.other_equipment.len()),

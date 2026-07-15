@@ -104,6 +104,13 @@ first_evidence = "calendar_schedule_day_hourly_week_daily_year_leap_exact_001"
 support_boundary = "Typed as an immutable 24-value hourly profile. Limited EnergyPlus 26.1 conformance covers only the three fully explicit profiles consumed by calendar_schedule_day_hourly_week_daily_year_leap_exact_001: Sunday Week A 101..124, Monday Week A 201..224, and Tuesday Week B 301..324. Blank/default values, ScheduleTypeLimits validation/warnings, other Day schedule families, downstream consumers, and broad diagnostics remain unclaimed."
 
 [[object]]
+name = "Schedule:Day:Interval"
+family = "schedule"
+status = "typed"
+first_evidence = "calendar_schedule_day_interval_modes_exact_001"
+support_boundary = "Typed as source-ordered Until/value segments plus blank/default-No, Average, or Linear interpolation in the shared DayScheduleId namespace after Schedule:Day:Hourly. Limited EnergyPlus 26.1 conformance covers exactly three Timestep,4 profiles consumed through one Week:Daily and Year over 2032-01-01 through 2032-01-03, producing one 288-sample ordered-exact-unique zero-tolerance Schedule Value series with exact raw values/timestamps and 0 Warning/0 Severe completion. Day:List, Week:Compact, unaligned-No warnings, other interval/timestep shapes, Hourly aggregation, diagnostic parity, special-day/DST/tomorrow behavior, downstream consumers, and broad ScheduleManager parity remain unclaimed."
+
+[[object]]
 name = "Schedule:Week:Daily"
 family = "schedule"
 status = "typed"

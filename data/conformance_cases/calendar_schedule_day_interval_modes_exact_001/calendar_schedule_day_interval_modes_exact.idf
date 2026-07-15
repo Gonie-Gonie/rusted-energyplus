@@ -1,0 +1,97 @@
+Version,26.1;
+
+Building,
+  Schedule Day Interval Modes Exact Fixture,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+Timestep,4;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+RunPeriod,
+  Schedule Day Interval Modes Run Period,
+  1,
+  1,
+  2032,
+  1,
+  3,
+  2032,
+  Thursday,
+  No,
+  No,
+  No,
+  No,
+  No,
+  No;
+
+ScheduleTypeLimits,
+  Any Number;
+
+Schedule:Day:Interval,
+  Interval Default No Day,
+  Any Number,
+  ,
+  Until: 00:15,
+  10,
+  Until: 24:00,
+  175;
+
+Schedule:Day:Interval,
+  Interval Average Day,
+  Any Number,
+  Average,
+  Until: 00:20,
+  10,
+  Until: 01:15,
+  175,
+  Until: 24:00,
+  175;
+
+Schedule:Day:Interval,
+  Interval Linear Day,
+  Any Number,
+  Linear,
+  Until: 00:20,
+  10,
+  Until: 01:15,
+  175,
+  Until: 24:00,
+  175;
+
+Schedule:Week:Daily,
+  Interval Modes Week,
+  Interval Default No Day,
+  Interval Default No Day,
+  Interval Default No Day,
+  Interval Default No Day,
+  Interval Default No Day,
+  Interval Average Day,
+  Interval Linear Day,
+  Interval Default No Day,
+  Interval Default No Day,
+  Interval Default No Day,
+  Interval Default No Day,
+  Interval Default No Day;
+
+Schedule:Year,
+  Day Interval Modes Schedule,
+  Any Number,
+  Interval Modes Week,
+  1,
+  1,
+  12,
+  31;
+
+Output:Variable,
+  DAY INTERVAL MODES SCHEDULE,
+  Schedule Value,
+  Timestep;

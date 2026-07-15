@@ -94,6 +94,7 @@ equivalent to advancing the reported run-period calendar.
 | day-schedule timestep population | `Sched::DaySchedule::populateFromMinuteVals` | EnergyPlus 26.1 lines 211-239 either averages each zone-timestep window or selects the minute at each timestep end. CP43 locks default-No end-minute sampling at aligned 15-minute endpoints for one `Timestep,4` profile. CP44 separately locks explicit No and Linear endpoint sampling plus the Average 15-minute window mean for exactly three profiles in its one-day `Timestep,4` fixture; other timestep counts, mixed multi-profile modes, hourly aggregation, and broader population behavior remain unclaimed. |
 | file schedule intake and 366-day expansion | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 1573-1863 validate `Schedule:File` metadata, resolve and parse the selected external column, build hourly day schedules, and keep a 366-day table. CP45 locks only one flat comma CSV with one skipped header, selected column 2, 8760 numeric hourly rows, explicit No interpolation, 60 minutes per item, and DST adjustment No. Lines 1858-1862 alias February 29 to February 28 when the actual selected-column row count is below 8784. |
 | day/week/year schedule intake and annual pointer expansion | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 803-854 load 24-value `Schedule:Day:Hourly` profiles, lines 1046-1078 resolve all 12 `Schedule:Week:Daily` day-type pointers, and lines 1149-1246 expand source-ordered `Schedule:Year` ranges into a 366-day Week table. CP46 locks only two non-wrapping Year ranges whose intentionally unassigned day 60 copies day 59's Week pointer at lines 1223-1227. |
+| interval day-schedule intake | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 858-932 parse `Schedule:Day:Interval` after all Day:Hourly objects and before later Day/Week families. CP47 locks one blank/default-No aligned profile plus Average and Linear non-aligned profiles at `Timestep,4`, reusing `ProcessIntervalFields` and `DaySchedule::populateFromMinuteVals` minute-to-zone-timestep semantics. |
 | schedule current values | `Sched::UpdateScheduleVals` | Writes every schedule's `currentVal`: an EMS value wins when actuated; otherwise it calls `getHrTsVal(state, HourOfDay, TimeStep)`. It does not calculate or advance calendar state. |
 | detailed schedule lookup | `Sched::ScheduleDetailed::getHrTsVal` | Reads `DayOfYear_Schedule`, weekday, holiday index, `DSTIndicator`, hour, and zone timestep. It applies schedule-specific DST use, rolls DST-shifted hour 24 into tomorrow's weekday/holiday, selects holiday or weekday day schedule, and returns the indexed timestep value. |
 | constant schedule lookup | `Sched::ScheduleConstant::getHrTsVal` | Returns the stored constant timestep value independently of date and hour; EMS override remains the caller's current-value policy. |
@@ -555,6 +556,48 @@ parity. Wider typed rejection and lookup branches remain source/unit evidence;
 the parent `calendar_time_state`, `ProcessScheduleInput`, and
 `getHrTsVal` routine records remain scaffold/source-mapped rather than
 complete.
+
+## Schedule:Day:Interval Three-Mode Evidence Checkpoint
+
+`calendar_schedule_day_interval_modes_exact_001` adds the next public/input
+object in EnergyPlus `ProcessScheduleInput` source order. Three
+`Schedule:Day:Interval` profiles share the existing DaySchedule namespace and
+are selected through one `Schedule:Week:Daily` plus one full-year
+`Schedule:Year`. Thursday omits `Interpolate to Timestep` to exercise the
+default `No` path with an aligned `00:15` boundary. Friday declares `Average`
+and Saturday declares `Linear`, both with `00:20` and `01:15` boundaries.
+
+The mapped EnergyPlus 26.1 path is `Sched::ProcessScheduleInput` lines 858-932,
+which runs after Day:Hourly intake and before Day:List and Week processing.
+`Sched::ProcessIntervalFields` lines 2733-2961 builds a 1,440-minute day:
+No and Average use flat interval minutes, while Linear keeps the first interval
+flat and ramps from the preceding declared value across later intervals.
+`Sched::DaySchedule::populateFromMinuteVals` lines 211-239 averages each
+15-minute window only for Average; No and Linear select the timestep-ending
+minute. The Year/Week lookup then follows
+`Sched::ScheduleDetailed::getHrTsVal` lines 2490-2541.
+
+The exact non-actual RunPeriod is 2032-01-01 through 2032-01-03 at
+`Timestep,4`, with daylight saving and holidays disabled. The blocking gate
+proves one series of 288 ordered, unique Timestep `Schedule Value` samples and
+timestamps at zero tolerance. Thursday is `10` once then `175` for 95 samples;
+Friday is `10, 120` then `175` for 94 samples; Saturday is
+`10, 40, 85, 130` then `175` for 92 samples. It also locks the raw EnergyPlus
+ESO values and timestep timestamp fields, exact Environment and
+disabled-daylight-saving EIO rows, and successful completion with exactly
+0 Warning and 0 Severe errors.
+
+This checkpoint does not claim `Schedule:Day:List`,
+`Schedule:Week:Compact`, an unaligned explicit/default-No warning, other
+interval shapes or timestep counts, Hourly report aggregation,
+ScheduleTypeLimits warning parity, malformed-time/overlap/incomplete diagnostic
+text or count parity, holiday/design/custom-day selection, DST/tomorrow
+rollover, EMS/current-value semantics, downstream gain/HVAC consumption,
+warmup, actual weather, multi-environment execution, Rust raw ESO
+serialization, or broad `ScheduleManager` parity. Wider typed rejection and
+lookup branches remain source/unit evidence; the parent
+`calendar_time_state`, `ProcessScheduleInput`, `ProcessIntervalFields`,
+`populateFromMinuteVals`, and `getHrTsVal` records remain incomplete.
 
 ## Source-Order EPW Record Selection Checkpoint
 

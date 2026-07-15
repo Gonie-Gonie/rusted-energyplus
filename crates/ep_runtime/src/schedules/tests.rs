@@ -1,12 +1,17 @@
 use super::{
-    ScheduleSeriesKind, file_schedule_hourly_8760_value, precompute_schedule_value_series,
+    ScheduleSeriesKind, compiled_day_schedule_value, file_schedule_hourly_8760_value,
+    precompile_day_schedule_table, precompute_schedule_value_series,
+    precompute_schedule_value_series_for_environment_time_axis,
     precompute_schedule_value_series_for_time_axis, year_schedule_hourly_value,
 };
-use crate::time_axis::build_hourly_time_axis;
+use crate::time_axis::{
+    build_environment_time_axis_for_run_period_with_zone_timesteps, build_hourly_time_axis,
+};
 use ep_model::{
-    DayScheduleId, NormalizedName, ScheduleDayHourly, ScheduleDayType, ScheduleFile,
-    ScheduleFileColumnSeparator, ScheduleId, ScheduleWeekDaily, ScheduleYear, TypedModel,
-    WeekScheduleId,
+    DayOfWeek, DayScheduleId, FirstHourInterpolationStartingValues, NormalizedName, RunPeriod,
+    RunPeriodId, ScheduleCompactSegment, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayType,
+    ScheduleFile, ScheduleFileColumnSeparator, ScheduleId, ScheduleInterpolation,
+    ScheduleWeekDaily, ScheduleYear, TimestepConfig, TypedModel, WeekScheduleId,
 };
 
 fn hourly_file_schedule() -> ScheduleFile {
@@ -69,6 +74,95 @@ fn annual_day_week_year_model() -> TypedModel {
         day_schedules: vec![regular_day, march_day],
         week_schedules: vec![regular_week, march_week],
         year_schedules: vec![year_schedule],
+        ..TypedModel::default()
+    }
+}
+
+fn interval_mode_segments() -> Vec<ScheduleCompactSegment> {
+    vec![
+        ScheduleCompactSegment {
+            until_minute_of_day: 20,
+            value: 10.0,
+        },
+        ScheduleCompactSegment {
+            until_minute_of_day: 75,
+            value: 175.0,
+        },
+        ScheduleCompactSegment {
+            until_minute_of_day: 1440,
+            value: 175.0,
+        },
+    ]
+}
+
+fn interval_mode_model() -> TypedModel {
+    let hourly_day = ScheduleDayHourly {
+        id: DayScheduleId(0),
+        name: NormalizedName::new("Hourly Prefix"),
+        schedule_type_limits: None,
+        hourly_values: [7.0; 24],
+    };
+    let interval_schedules = [
+        ("Interval No", ScheduleInterpolation::No),
+        ("Interval Average", ScheduleInterpolation::Average),
+        ("Interval Linear", ScheduleInterpolation::Linear),
+    ]
+    .into_iter()
+    .enumerate()
+    .map(|(index, (name, interpolation))| ScheduleDayInterval {
+        id: DayScheduleId(u32::try_from(index + 1).unwrap_or_default()),
+        name: NormalizedName::new(name),
+        schedule_type_limits: None,
+        interpolation,
+        segments: interval_mode_segments(),
+    })
+    .collect::<Vec<_>>();
+    let week_schedules = interval_schedules
+        .iter()
+        .enumerate()
+        .map(|(index, day_schedule)| ScheduleWeekDaily {
+            id: WeekScheduleId(u32::try_from(index).unwrap_or_default()),
+            name: NormalizedName::new(&format!("Week {}", index + 1)),
+            day_schedules: [day_schedule.id; 12],
+        })
+        .collect::<Vec<_>>();
+    let year_schedules = week_schedules
+        .iter()
+        .enumerate()
+        .map(|(index, week_schedule)| ScheduleYear {
+            id: ScheduleId(40 + u32::try_from(index).unwrap_or_default()),
+            name: NormalizedName::new(&format!("Year {}", index + 1)),
+            schedule_type_limits: None,
+            week_schedules: [week_schedule.id; 366],
+        })
+        .collect::<Vec<_>>();
+
+    TypedModel {
+        timestep: TimestepConfig {
+            number_of_timesteps_per_hour: 4,
+        },
+        run_periods: vec![RunPeriod {
+            id: RunPeriodId(0),
+            name: NormalizedName::new("Interval Day"),
+            begin_month: 1,
+            begin_day_of_month: 1,
+            begin_year: Some(2032),
+            end_month: 1,
+            end_day_of_month: 1,
+            end_year: Some(2032),
+            day_of_week_for_start_day: Some(DayOfWeek::Thursday),
+            first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues::Hour24,
+            use_weather_file_holidays_and_special_days: false,
+            use_weather_file_daylight_saving_period: false,
+            apply_weekend_holiday_rule: false,
+            use_weather_file_rain_indicators: false,
+            use_weather_file_snow_indicators: false,
+            treat_weather_as_actual: false,
+        }],
+        day_schedules: vec![hourly_day],
+        day_interval_schedules: interval_schedules,
+        week_schedules,
+        year_schedules,
         ..TypedModel::default()
     }
 }
@@ -200,4 +294,93 @@ fn annual_series_kind_records_immutable_direct_pointer_count() {
             schedule_day_count: 366
         }
     );
+}
+
+#[test]
+fn interval_modes_precompute_exact_zone_timestep_vectors() {
+    let model = interval_mode_model();
+    let axis =
+        build_environment_time_axis_for_run_period_with_zone_timesteps(&model.run_periods[0], 1, 4);
+    assert!(axis.is_ok(), "one-day interval axis should build");
+    let Ok(axis) = axis else {
+        return;
+    };
+
+    let traces = precompute_schedule_value_series_for_environment_time_axis(&model, &axis);
+    assert_eq!(
+        traces.iter().map(|trace| trace.values.len()).sum::<usize>(),
+        288
+    );
+    for (schedule_id, first_values) in [
+        (ScheduleId(40), vec![10.0, 175.0, 175.0, 175.0, 175.0]),
+        (ScheduleId(41), vec![10.0, 120.0, 175.0, 175.0, 175.0]),
+        (ScheduleId(42), vec![10.0, 40.0, 85.0, 130.0, 175.0]),
+    ] {
+        let trace = traces.iter().find(|trace| trace.schedule_id == schedule_id);
+        assert!(trace.is_some(), "interval-backed annual trace should exist");
+        let Some(trace) = trace else {
+            return;
+        };
+        assert_eq!(&trace.values[..5], first_values.as_slice());
+        assert!(trace.values[5..].iter().all(|value| *value == 175.0));
+        assert_eq!(
+            trace.kind,
+            ScheduleSeriesKind::YearWeekDayCompiledProfiles {
+                schedule_day_count: 366,
+                compiled_day_schedule_count: 4,
+                minutes_per_timestep: 15,
+            }
+        );
+    }
+}
+
+#[test]
+fn compiled_day_table_uses_shared_id_offsets_and_is_immutable() {
+    let mut model = interval_mode_model();
+    assert_eq!(
+        model
+            .day_interval_schedules
+            .iter()
+            .map(|schedule| schedule.id)
+            .collect::<Vec<_>>(),
+        vec![DayScheduleId(1), DayScheduleId(2), DayScheduleId(3)]
+    );
+
+    let table = precompile_day_schedule_table(&model, 4);
+    assert_eq!(table.resolved_schedule_count(), 4);
+    assert_eq!(
+        compiled_day_schedule_value(&table, DayScheduleId(0), 30),
+        Some(7.0)
+    );
+    assert_eq!(
+        compiled_day_schedule_value(&table, DayScheduleId(1), 30),
+        Some(175.0)
+    );
+
+    model.day_interval_schedules[0].segments[1].value = 999.0;
+    assert_eq!(
+        compiled_day_schedule_value(&table, DayScheduleId(1), 30),
+        Some(175.0),
+        "compiled day cache must not observe later model mutation"
+    );
+}
+
+#[test]
+fn hourly_axis_fails_closed_for_interval_profiles_needing_aggregation() {
+    let model = interval_mode_model();
+    let axis = build_hourly_time_axis(&model);
+    assert!(axis.is_ok(), "one-day hourly axis should build");
+    let Ok(axis) = axis else {
+        return;
+    };
+
+    let traces = precompute_schedule_value_series_for_time_axis(&model, &axis);
+    for schedule_id in [ScheduleId(40), ScheduleId(41), ScheduleId(42)] {
+        let trace = traces.iter().find(|trace| trace.schedule_id == schedule_id);
+        assert!(trace.is_some(), "interval-backed annual trace should exist");
+        let Some(trace) = trace else {
+            return;
+        };
+        assert!(trace.values.iter().all(|value| value.is_nan()));
+    }
 }

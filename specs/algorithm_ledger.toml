@@ -315,6 +315,7 @@ family_cases = [
   "calendar_schedule_compact_interpolation_modes_exact_001",
   "calendar_schedule_file_8760_leap_exact_001",
   "calendar_schedule_day_hourly_week_daily_year_leap_exact_001",
+  "calendar_schedule_day_interval_modes_exact_001",
   "calendar_schedule_compact_zone_timestep_exact_001",
   "calendar_schedule_dst_hour24_tomorrow_day_type_exact_001",
   "calendar_schedule_weather_leap_policy_no_001",
@@ -555,6 +556,34 @@ proof_variables = [
 ]
 claim_level = "limited-conformance"
 support_boundary = "Limited EnergyPlus 26.1 conformance only for calendar_schedule_day_hourly_week_daily_year_leap_exact_001: three explicit 24-value Schedule:Day:Hourly profiles, two Schedule:Week:Daily objects with all 12 typed day references, and one Schedule:Year whose source-ordered Week A 1/1-2/28 and Week B 3/1-12/31 ranges intentionally leave leap-shaped day 60 unassigned. EnergyPlus ProcessScheduleInput copies day 59's Week A pointer to day 60, after which Monday selects 201 through 224. The exact non-actual 2016-02-28 through 2016-03-01 gate proves 72 ordered-exact-unique zero-tolerance hourly Schedule Value samples and timestamps: Sunday Week A is 101 through 124, Monday on the copied Week A pointer is 201 through 224, and Tuesday Week B is 301 through 324. It also locks raw EnergyPlus ESO values/timestamps, the exact Environment and disabled daylight-saving EIO rows, and 0 Warning/0 Severe completion. Rust stores immutable fixed day, week, and 366-day direct lookup arrays. The claim excludes Day:Hourly blank/default and ScheduleTypeLimits warning parity, consumption of the other nine Week:Daily day types, Schedule:Day:Interval, Schedule:Day:List, Schedule:Week:Compact, Year range wrap plus missing/overlap/reference diagnostic parity, DST/holiday/tomorrow combinations, actual/design-day/warmup/multiyear execution, EMS/currentVal, downstream gains/HVAC consumption, Rust raw ESO, and broad ScheduleManager parity. Typed Rust rejection and wider unit branches are source evidence only. The calendar_time_state algorithm and ProcessScheduleInput/getHrTsVal routine records remain scaffold/source_mapped and are not promoted by this bounded entry."
+
+[[algorithm]]
+id = "schedule_day_interval_modes"
+domain = "time"
+source_map = "docs/src/porting-map/time-weather-schedule.md"
+energyplus_source = [
+  "src/EnergyPlus/ScheduleManager.cc",
+]
+port_ticket_mappings = [
+  "src/EnergyPlus/ScheduleManager.cc|ProcessScheduleInput|ProcessScheduleInput|Environment",
+  "src/EnergyPlus/ScheduleManager.cc|ProcessIntervalFields|ProcessIntervalFields|Environment",
+  "src/EnergyPlus/ScheduleManager.cc|populateFromMinuteVals|populateFromMinuteVals|Environment",
+  "src/EnergyPlus/ScheduleManager.cc|getHrTsVal|getHrTsVal|Environment",
+]
+rust_target = [
+  "crates/ep_model/src/objects/schedules.rs::ScheduleDayInterval",
+  "crates/ep_compiler/src/compiler.rs::Compiler::parse_day_interval_schedules",
+  "crates/ep_runtime/src/schedules/day_table.rs::CompiledDayScheduleTable",
+  "crates/ep_runtime/src/schedules.rs::precompute_schedule_value_series_for_environment_time_axis",
+]
+status = "conformance"
+first_case = "calendar_schedule_day_interval_modes_exact_001"
+first_evidence = "calendar_schedule_day_interval_modes_exact_001"
+proof_variables = [
+  "Schedule Value",
+]
+claim_level = "limited-conformance"
+support_boundary = "Limited EnergyPlus 26.1 conformance only for calendar_schedule_day_interval_modes_exact_001: three Schedule:Day:Interval profiles selected on Thursday, Friday, and Saturday through one Schedule:Week:Daily and one full-year Schedule:Year at Timestep,4. Thursday omits interpolation and proves the default-No aligned profile as 10 once then 175 for 95 samples; Friday proves Average across a non-aligned 00:20 boundary as 10, 120, then 175 for 94 samples; Saturday proves the flat first Linear interval and later ramp as 10, 40, 85, 130, then 175 for 92 samples. The non-actual 2032-01-01 through 2032-01-03 gate proves one 288-sample ordered-exact-unique zero-tolerance Timestep Schedule Value series and timestamps, raw EnergyPlus values/timestep timestamp fields, exact Environment and disabled-daylight-saving EIO rows, and 0 Warning/0 Severe completion. Rust retains source segments and interpolation, shares DayScheduleId after all Day:Hourly objects, and compiles immutable O(1) zone-timestep day values before annual lookup. The claim excludes Schedule:Day:List, Schedule:Week:Compact, an unaligned No warning, other shapes/timestep counts, Hourly report aggregation, type-limit and malformed/overlap/incomplete diagnostic parity, holidays/design/custom days, DST/tomorrow, EMS/currentVal, downstream gains/HVAC, warmup/actual-weather/multi-environment execution, Rust raw ESO, and broad ScheduleManager parity. Wider rejection and lookup branches are source/unit evidence only; parent routines remain incomplete."
 
 [[algorithm]]
 id = "air_side_node_state"

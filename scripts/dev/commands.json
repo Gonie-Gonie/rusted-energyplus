@@ -335,6 +335,12 @@
                          "help":  "Gate exact Schedule:Day:Hourly, Schedule:Week:Daily, and Schedule:Year omitted-February-29 pointer behavior."
                      },
                      {
+                         "name":  "compare-calendar-schedule-day-interval-modes-exact",
+                         "path":  "compare\\compare-calendar-schedule-day-interval-modes-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact Schedule:Day:Interval default-No, Average, and Linear values through Week:Daily and Year at each zone timestep."
+                     },
+                     {
                          "name":  "compare-weather-effective-calendar",
                          "path":  "compare\\compare-weather-effective-calendar.ps1",
                          "group":  "compare",

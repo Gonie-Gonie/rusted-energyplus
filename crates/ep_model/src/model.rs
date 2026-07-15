@@ -9,9 +9,9 @@ use crate::{
     People, PlantBranch, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
     PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId,
     RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant,
-    ScheduleDayHourly, ScheduleFile, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
-    ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation, Surface,
-    SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
+    ScheduleDayHourly, ScheduleDayInterval, ScheduleFile, ScheduleId, ScheduleTypeLimitId,
+    ScheduleTypeLimits, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
+    Surface, SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
     TimestepConfig, Version, WeekScheduleId, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
     ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
     ZoneThermostat, ZoneThermostatId,
@@ -54,6 +54,8 @@ pub struct TypedModel {
     pub schedule_type_limit_names: NameMap<ScheduleTypeLimitId>,
     /// Hourly day schedules.
     pub day_schedules: Vec<ScheduleDayHourly>,
+    /// Interval day schedules, assigned IDs after all hourly day schedules.
+    pub day_interval_schedules: Vec<ScheduleDayInterval>,
     /// Day schedule names.
     pub day_schedule_names: NameMap<DayScheduleId>,
     /// Daily week schedules.
@@ -194,6 +196,7 @@ impl Default for TypedModel {
             schedule_type_limits: Vec::new(),
             schedule_type_limit_names: NameMap::default(),
             day_schedules: Vec::new(),
+            day_interval_schedules: Vec::new(),
             day_schedule_names: NameMap::default(),
             week_schedules: Vec::new(),
             week_schedule_names: NameMap::default(),
@@ -273,6 +276,7 @@ impl TypedModel {
             + self.constructions.len()
             + self.schedule_type_limits.len()
             + self.day_schedules.len()
+            + self.day_interval_schedules.len()
             + self.week_schedules.len()
             + self.schedules.len()
             + self.compact_schedules.len()
