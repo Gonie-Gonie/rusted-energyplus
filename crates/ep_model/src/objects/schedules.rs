@@ -1,4 +1,4 @@
-use crate::{NormalizedName, ScheduleId, ScheduleTypeLimitId};
+use crate::{DayScheduleId, NormalizedName, ScheduleId, ScheduleTypeLimitId, WeekScheduleId};
 
 /// Schedule numeric type.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -35,6 +35,43 @@ pub struct ScheduleConstant {
     pub schedule_type_limits: Option<ScheduleTypeLimitId>,
     /// Constant hourly value.
     pub hourly_value: f64,
+}
+
+/// Immutable hourly profile referenced by week schedules.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ScheduleDayHourly {
+    /// Typed day-schedule ID.
+    pub id: DayScheduleId,
+    /// Day-schedule name.
+    pub name: NormalizedName,
+    /// Optional type limits.
+    pub schedule_type_limits: Option<ScheduleTypeLimitId>,
+    /// Hour-ending values for hours 1 through 24.
+    pub hourly_values: [f64; 24],
+}
+
+/// Immutable mapping from all EnergyPlus day types to hourly day schedules.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ScheduleWeekDaily {
+    /// Typed week-schedule ID.
+    pub id: WeekScheduleId,
+    /// Week-schedule name.
+    pub name: NormalizedName,
+    /// Day-schedule IDs ordered Sunday through CustomDay2.
+    pub day_schedules: [DayScheduleId; 12],
+}
+
+/// Immutable annual schedule assembled from daily week-schedule pointers.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ScheduleYear {
+    /// Typed ID shared with top-level schedule families.
+    pub id: ScheduleId,
+    /// Annual schedule name.
+    pub name: NormalizedName,
+    /// Optional type limits.
+    pub schedule_type_limits: Option<ScheduleTypeLimitId>,
+    /// Week-schedule pointer for every leap-shaped ordinal day, 1 through 366.
+    pub week_schedules: [WeekScheduleId; 366],
 }
 
 /// Delimiter used by one flat `Schedule:File` input.

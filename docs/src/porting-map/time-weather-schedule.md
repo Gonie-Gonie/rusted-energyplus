@@ -93,6 +93,7 @@ equivalent to advancing the reported run-period calendar.
 | compact interval minute expansion | `Sched::ProcessIntervalFields` | EnergyPlus 26.1 lines 2733-2961 decode each `Until` endpoint, fill the 1,440-minute day, and choose flat versus Linear minute values. CP43 exercises aligned endpoints and flat fill under default Interpolate:No. CP44 separately locks explicit-No flat fill, Average flat minute values, a flat first Linear interval, the later cross-hour Linear ramp, and the explicit-No-only non-aligned warning for `Until: 00:20` and `01:15` in one exact fixture. `Until 24:MM` correction, malformed/overlap/zero/incomplete profiles, other interval shapes, and broad diagnostic parity remain unclaimed. |
 | day-schedule timestep population | `Sched::DaySchedule::populateFromMinuteVals` | EnergyPlus 26.1 lines 211-239 either averages each zone-timestep window or selects the minute at each timestep end. CP43 locks default-No end-minute sampling at aligned 15-minute endpoints for one `Timestep,4` profile. CP44 separately locks explicit No and Linear endpoint sampling plus the Average 15-minute window mean for exactly three profiles in its one-day `Timestep,4` fixture; other timestep counts, mixed multi-profile modes, hourly aggregation, and broader population behavior remain unclaimed. |
 | file schedule intake and 366-day expansion | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 1573-1863 validate `Schedule:File` metadata, resolve and parse the selected external column, build hourly day schedules, and keep a 366-day table. CP45 locks only one flat comma CSV with one skipped header, selected column 2, 8760 numeric hourly rows, explicit No interpolation, 60 minutes per item, and DST adjustment No. Lines 1858-1862 alias February 29 to February 28 when the actual selected-column row count is below 8784. |
+| day/week/year schedule intake and annual pointer expansion | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 803-854 load 24-value `Schedule:Day:Hourly` profiles, lines 1046-1078 resolve all 12 `Schedule:Week:Daily` day-type pointers, and lines 1149-1246 expand source-ordered `Schedule:Year` ranges into a 366-day Week table. CP46 locks only two non-wrapping Year ranges whose intentionally unassigned day 60 copies day 59's Week pointer at lines 1223-1227. |
 | schedule current values | `Sched::UpdateScheduleVals` | Writes every schedule's `currentVal`: an EMS value wins when actuated; otherwise it calls `getHrTsVal(state, HourOfDay, TimeStep)`. It does not calculate or advance calendar state. |
 | detailed schedule lookup | `Sched::ScheduleDetailed::getHrTsVal` | Reads `DayOfYear_Schedule`, weekday, holiday index, `DSTIndicator`, hour, and zone timestep. It applies schedule-specific DST use, rolls DST-shifted hour 24 into tomorrow's weekday/holiday, selects holiday or weekday day schedule, and returns the indexed timestep value. |
 | constant schedule lookup | `Sched::ScheduleConstant::getHrTsVal` | Returns the stored constant timestep value independently of date and hour; EMS override remains the caller's current-value policy. |
@@ -512,6 +513,48 @@ metadata, `Schedule:File:Shading`, actual/design-day/warmup/multiyear
 execution, EMS/current-value semantics, downstream schedule consumption,
 arbitrary-run sidecar staging, Rust raw ESO serialization, or broad
 warning/error and file-search parity.
+
+## Schedule:Day/Week/Year Leap-Table Evidence Checkpoint
+
+`calendar_schedule_day_hourly_week_daily_year_leap_exact_001` adds one
+bounded public/input chain from three `Schedule:Day:Hourly` profiles through
+two `Schedule:Week:Daily` objects to one `Schedule:Year`. Every day
+profile declares all 24 hourly values and every Week object resolves all 12
+EnergyPlus day-type fields. The Year object assigns Week A to 1/1 through 2/28
+and Week B to 3/1 through 12/31, intentionally leaving leap-shaped schedule day
+60 unassigned.
+
+The mapped EnergyPlus 26.1 path is `Sched::ProcessScheduleInput`:
+lines 803-854 copy each Day:Hourly value to every zone timestep, lines
+1046-1078 resolve the Week:Daily day pointers in Sunday-through-CustomDay2
+order, and lines 1149-1246 expand the Year ranges. Lines 1223-1227 special-case
+an unassigned February 29 by copying day 59's Week pointer to day 60.
+`ScheduleDetailed::getHrTsVal` lines 2490-2541 then selects the current
+schedule ordinal, Week day type, hour, and timestep. Rust mirrors these
+ownership boundaries with immutable 24-hour Day arrays, 12-pointer Week arrays,
+and a 366-pointer Year array compiled before runtime.
+
+The exact non-actual RunPeriod is 2016-02-28 through 2016-03-01 with
+daylight saving and holidays disabled. The blocking gate proves one series of
+72 ordered, unique hourly `Schedule Value` timestamps and values at zero
+tolerance: Week A Sunday is `101..124`; February 29 reuses Week A and
+selects its Monday `201..224`; March 1 selects Week B Tuesday
+`301..324`. It also locks the raw EnergyPlus ESO values and timestamp
+fields, the exact Environment and disabled-daylight-saving EIO rows, and
+successful completion with exactly 0 Warning and 0 Severe errors.
+
+This checkpoint does not claim Day:Hourly blank/default handling or
+ScheduleTypeLimits warning parity, external consumption of the other nine Week
+day types, `Schedule:Day:Interval`, `Schedule:Day:List`,
+`Schedule:Week:Compact`, Year range-wrap behavior, EnergyPlus missing,
+overlap, invalid-date, or missing-reference diagnostic text/count parity,
+DST/holiday/tomorrow combinations, actual/design-day/warmup/multiyear
+execution, EMS/current-value semantics, downstream internal-gain or HVAC
+consumption, Rust raw ESO serialization, or broad `ScheduleManager`
+parity. Wider typed rejection and lookup branches remain source/unit evidence;
+the parent `calendar_time_state`, `ProcessScheduleInput`, and
+`getHrTsVal` routine records remain scaffold/source-mapped rather than
+complete.
 
 ## Source-Order EPW Record Selection Checkpoint
 

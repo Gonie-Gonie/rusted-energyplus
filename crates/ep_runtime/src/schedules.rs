@@ -8,7 +8,7 @@ use ep_model::{
     OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, People,
     PeopleNumberCalculationMethod, ScheduleCompact, ScheduleCompactDayProfile,
     ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant, ScheduleDayType, ScheduleFile,
-    ScheduleId, ScheduleInterpolation, TypedModel, ZoneId,
+    ScheduleId, ScheduleInterpolation, ScheduleYear, TypedModel, ZoneId,
 };
 use std::collections::BTreeSet;
 
@@ -130,6 +130,16 @@ pub(crate) fn validate_hour_only_internal_gain_schedules(
             {
                 format!(
                     "Schedule:File ID {} requires a calendar-aware precomputed schedule series",
+                    schedule_id.0
+                )
+            }
+            None if model
+                .year_schedules
+                .iter()
+                .any(|schedule| schedule.id == schedule_id) =>
+            {
+                format!(
+                    "Schedule:Year ID {} requires a calendar-aware precomputed schedule series",
                     schedule_id.0
                 )
             }
@@ -297,6 +307,11 @@ pub enum ScheduleSeriesKind {
         /// Immutable source value count loaded during compilation.
         source_value_count: usize,
     },
+    /// Direct `Schedule:Year` -> `Schedule:Week:Daily` -> `Schedule:Day:Hourly` lookup.
+    YearWeekDayHourlyDirect {
+        /// Immutable leap-shaped annual pointer count.
+        schedule_day_count: usize,
+    },
 }
 
 /// One precompiled daily schedule interval.
@@ -372,8 +387,9 @@ pub fn simulate_schedule_values(
 
 /// Precomputes constant and calendar-invariant compact schedules for hourly samples.
 ///
-/// Calendar-varying compact schedules require a TimeAxis and are rejected by
-/// this hour-only API rather than being evaluated against an implicit day type.
+/// Calendar-varying compact, file-backed, and annual schedules require a
+/// TimeAxis and are rejected by this hour-only API rather than being evaluated
+/// against an implicit calendar state.
 pub fn precompute_schedule_value_series(
     model: &TypedModel,
     sample_count: usize,
@@ -382,11 +398,12 @@ pub fn precompute_schedule_value_series(
     precompute_schedule_value_series_for_hours(model, hours)
 }
 
-/// Precomputes constant and supported compact schedules for a run-period time axis.
+/// Precomputes every supported typed schedule for a run-period time axis.
 ///
 /// This axis has hourly samples, so compact profiles using Average or Linear
 /// interpolation or subhourly Until boundaries return NaN values until hourly
-/// schedule aggregation is ported.
+/// schedule aggregation is ported. File and annual schedules use the axis'
+/// schedule ordinal, while annual schedules also select the active day type.
 #[must_use]
 pub fn precompute_schedule_value_series_for_time_axis(
     model: &TypedModel,
@@ -410,11 +427,17 @@ pub fn precompute_schedule_value_series_for_time_axis(
                 .iter()
                 .map(|schedule| file_schedule_series_for_time_axis(schedule, time_axis)),
         )
+        .chain(
+            model
+                .year_schedules
+                .iter()
+                .map(|schedule| year_schedule_series_for_time_axis(model, schedule, time_axis)),
+        )
         .collect()
 }
 
-/// Precomputes constant and supported compact schedules for every zone timestep
-/// in one simulation environment.
+/// Precomputes every supported typed schedule for every zone timestep in one
+/// simulation environment.
 ///
 /// Compact profiles are expanded to EnergyPlus' minute lattice and reduced to
 /// zone-timestep values before calendar lookup. The current DST state shifts
@@ -441,6 +464,9 @@ pub fn precompute_schedule_value_series_for_environment_time_axis(
                 file_schedule_series_for_environment_time_axis(schedule, time_axis)
             }),
         )
+        .chain(model.year_schedules.iter().map(|schedule| {
+            year_schedule_series_for_environment_time_axis(model, schedule, time_axis)
+        }))
         .collect()
 }
 
@@ -451,6 +477,12 @@ fn precompute_schedule_value_series_for_hours(
     if !model.file_schedules.is_empty() {
         return Err(
             "Schedule:File requires a calendar-aware TimeAxis; the hour-only API has no annual source index"
+                .to_string(),
+        );
+    }
+    if !model.year_schedules.is_empty() {
+        return Err(
+            "Schedule:Year requires a calendar-aware TimeAxis; the hour-only API has no annual day or day-type state"
                 .to_string(),
         );
     }
@@ -628,6 +660,96 @@ fn file_schedule_hourly_8760_value(
         .checked_mul(24)?
         .checked_add(hour_ending.clamp(1, 24) - 1)?;
     schedule.values.get(source_index as usize).copied()
+}
+
+fn year_schedule_series_for_time_axis(
+    model: &TypedModel,
+    schedule: &ScheduleYear,
+    time_axis: &TimeAxis,
+) -> ScheduleValueSeries {
+    let values = time_axis
+        .points
+        .iter()
+        .map(|point| {
+            let (schedule_day_of_year, day_type, minute_of_day) =
+                detailed_schedule_lookup_state(point);
+            year_schedule_hourly_value(
+                model,
+                schedule,
+                schedule_day_of_year,
+                day_type,
+                minute_of_day,
+            )
+            .unwrap_or(f64::NAN)
+        })
+        .collect();
+
+    ScheduleTrace {
+        schedule_id: schedule.id,
+        schedule_name: schedule.name.0.clone(),
+        kind: ScheduleSeriesKind::YearWeekDayHourlyDirect {
+            schedule_day_count: schedule.week_schedules.len(),
+        },
+        values,
+    }
+}
+
+fn year_schedule_series_for_environment_time_axis(
+    model: &TypedModel,
+    schedule: &ScheduleYear,
+    time_axis: &EnvironmentTimeAxis,
+) -> ScheduleValueSeries {
+    let values = time_axis
+        .points
+        .iter()
+        .map(|point| {
+            let (schedule_day_of_year, day_type, minute_of_day) =
+                detailed_schedule_environment_lookup_state(point);
+            year_schedule_hourly_value(
+                model,
+                schedule,
+                schedule_day_of_year,
+                day_type,
+                minute_of_day,
+            )
+            .unwrap_or(f64::NAN)
+        })
+        .collect();
+
+    ScheduleTrace {
+        schedule_id: schedule.id,
+        schedule_name: schedule.name.0.clone(),
+        kind: ScheduleSeriesKind::YearWeekDayHourlyDirect {
+            schedule_day_count: schedule.week_schedules.len(),
+        },
+        values,
+    }
+}
+
+fn year_schedule_hourly_value(
+    model: &TypedModel,
+    schedule: &ScheduleYear,
+    schedule_day_of_year: u32,
+    day_type: ScheduleDayType,
+    minute_of_day: u32,
+) -> Option<f64> {
+    let schedule_day_index = usize::try_from(schedule_day_of_year.checked_sub(1)?).ok()?;
+    let week_schedule_id = *schedule.week_schedules.get(schedule_day_index)?;
+    let week_schedule_index = usize::try_from(week_schedule_id.0).ok()?;
+    let week_schedule = model
+        .week_schedules
+        .get(week_schedule_index)
+        .filter(|candidate| candidate.id == week_schedule_id)?;
+    let day_schedule_id = *week_schedule
+        .day_schedules
+        .get(schedule_day_type_index(day_type))?;
+    let day_schedule_index = usize::try_from(day_schedule_id.0).ok()?;
+    let day_schedule = model
+        .day_schedules
+        .get(day_schedule_index)
+        .filter(|candidate| candidate.id == day_schedule_id)?;
+    let hour_index = usize::try_from((minute_of_day.clamp(1, 1440) - 1) / 60).ok()?;
+    day_schedule.hourly_values.get(hour_index).copied()
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -892,6 +1014,23 @@ fn model_schedule_day_type(day_type: DayType) -> ScheduleDayType {
         DayType::WinterDesignDay => ScheduleDayType::WinterDesignDay,
         DayType::CustomDay1 => ScheduleDayType::CustomDay1,
         DayType::CustomDay2 => ScheduleDayType::CustomDay2,
+    }
+}
+
+const fn schedule_day_type_index(day_type: ScheduleDayType) -> usize {
+    match day_type {
+        ScheduleDayType::Sunday => 0,
+        ScheduleDayType::Monday => 1,
+        ScheduleDayType::Tuesday => 2,
+        ScheduleDayType::Wednesday => 3,
+        ScheduleDayType::Thursday => 4,
+        ScheduleDayType::Friday => 5,
+        ScheduleDayType::Saturday => 6,
+        ScheduleDayType::Holiday => 7,
+        ScheduleDayType::SummerDesignDay => 8,
+        ScheduleDayType::WinterDesignDay => 9,
+        ScheduleDayType::CustomDay1 => 10,
+        ScheduleDayType::CustomDay2 => 11,
     }
 }
 

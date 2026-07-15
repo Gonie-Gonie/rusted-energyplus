@@ -3,7 +3,7 @@
 use ep_model::{
     AirLoopHvac, AutoOrNumber, AutosizeOrNumber, AvailabilityManagerComponent, BoilerHotWater,
     BranchId, BranchListId, Building, ChillerElectricEir, CoilComponent, CoilComponentKind,
-    ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId,
+    ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId, DayScheduleId,
     DehumidificationControlType, DemandControlledVentilationType, DesignSpecificationOutdoorAir,
     DesignSpecificationOutdoorAirId, DesignSpecificationOutdoorAirMethod, FanComponent,
     FanComponentKind, FirstHourInterpolationStartingValues, HeatRecoveryType,
@@ -17,11 +17,12 @@ use ep_model::{
     PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod,
     RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
     ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
-    ScheduleConstant, ScheduleDayType, ScheduleFile, ScheduleFileColumnSeparator, ScheduleId,
-    ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits, SetpointManagerComponent,
-    SiteLocation, SolarDistribution, SpecialDayType, SunExposure, Surface, SurfaceId, SurfaceType,
-    Terrain, ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId,
-    TimestepConfig, TypedModel, Version, WindExposure, Zone, ZoneEquipmentConnection,
+    ScheduleConstant, ScheduleDayHourly, ScheduleDayType, ScheduleFile,
+    ScheduleFileColumnSeparator, ScheduleId, ScheduleInterpolation, ScheduleTypeLimitId,
+    ScheduleTypeLimits, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
+    SolarDistribution, SpecialDayType, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
+    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
+    TypedModel, Version, WeekScheduleId, WindExposure, Zone, ZoneEquipmentConnection,
     ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId,
     ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
     ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
@@ -222,6 +223,9 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Schedule:Constant",
     "Schedule:Compact",
     "Schedule:File",
+    "Schedule:Day:Hourly",
+    "Schedule:Week:Daily",
+    "Schedule:Year",
     "OtherEquipment",
     "People",
     "ThermostatSetpoint:DualSetpoint",
@@ -305,6 +309,9 @@ impl<'a> Compiler<'a> {
         self.parse_schedules(&mut model);
         self.parse_compact_schedules(&mut model);
         self.parse_file_schedules(&mut model);
+        self.parse_day_hourly_schedules(&mut model);
+        self.parse_week_daily_schedules(&mut model);
+        self.parse_year_schedules(&mut model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
@@ -1105,6 +1112,318 @@ impl<'a> Compiler<'a> {
                 values,
             });
         }
+    }
+
+    fn parse_day_hourly_schedules(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("Schedule:Day:Hourly") {
+            let schedule_type_limits = match self.optional_string(
+                "Schedule:Day:Hourly",
+                &name,
+                &object,
+                "schedule_type_limits_name",
+            ) {
+                Some(type_limits_name) => self.resolve_name(
+                    &model.schedule_type_limit_names,
+                    "Schedule:Day:Hourly",
+                    &name,
+                    "schedule_type_limits_name",
+                    &type_limits_name,
+                    "ScheduleTypeLimits",
+                ),
+                None => None,
+            };
+            let Some(id_value) =
+                self.checked_id("Schedule:Day:Hourly", &name, model.day_schedules.len())
+            else {
+                continue;
+            };
+            let id = DayScheduleId(id_value);
+            if model.day_schedule_names.insert(&name, id).is_some() {
+                self.duplicate_name("Schedule:Day:Hourly", &name);
+                continue;
+            }
+
+            let mut hourly_values = [0.0; 24];
+            for (hour_index, hourly_value) in hourly_values.iter_mut().enumerate() {
+                let field = format!("hour_{}", hour_index + 1);
+                *hourly_value =
+                    self.number_default("Schedule:Day:Hourly", &name, &object, &field, 0.0);
+            }
+
+            model.day_schedules.push(ScheduleDayHourly {
+                id,
+                name: NormalizedName::new(&name),
+                schedule_type_limits,
+                hourly_values,
+            });
+        }
+    }
+
+    fn parse_week_daily_schedules(&mut self, model: &mut TypedModel) {
+        const DAY_FIELDS: [&str; 12] = [
+            "sunday_schedule_day_name",
+            "monday_schedule_day_name",
+            "tuesday_schedule_day_name",
+            "wednesday_schedule_day_name",
+            "thursday_schedule_day_name",
+            "friday_schedule_day_name",
+            "saturday_schedule_day_name",
+            "holiday_schedule_day_name",
+            "summerdesignday_schedule_day_name",
+            "winterdesignday_schedule_day_name",
+            "customday1_schedule_day_name",
+            "customday2_schedule_day_name",
+        ];
+
+        for (name, object) in self.objects("Schedule:Week:Daily") {
+            let mut day_schedules = [DayScheduleId(0); 12];
+            let mut references_complete = true;
+            for (day_schedule, field) in day_schedules.iter_mut().zip(DAY_FIELDS) {
+                let Some(day_schedule_name) =
+                    self.required_string("Schedule:Week:Daily", &name, &object, field)
+                else {
+                    references_complete = false;
+                    continue;
+                };
+                let Some(day_schedule_id) = self.resolve_name(
+                    &model.day_schedule_names,
+                    "Schedule:Week:Daily",
+                    &name,
+                    field,
+                    &day_schedule_name,
+                    "Schedule:Day",
+                ) else {
+                    references_complete = false;
+                    continue;
+                };
+                *day_schedule = day_schedule_id;
+            }
+            if !references_complete {
+                continue;
+            }
+
+            let Some(id_value) =
+                self.checked_id("Schedule:Week:Daily", &name, model.week_schedules.len())
+            else {
+                continue;
+            };
+            let id = WeekScheduleId(id_value);
+            if model.week_schedule_names.insert(&name, id).is_some() {
+                self.duplicate_name("Schedule:Week:Daily", &name);
+                continue;
+            }
+            model.week_schedules.push(ScheduleWeekDaily {
+                id,
+                name: NormalizedName::new(&name),
+                day_schedules,
+            });
+        }
+    }
+
+    fn parse_year_schedules(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("Schedule:Year") {
+            let schedule_type_limits = match self.optional_string(
+                "Schedule:Year",
+                &name,
+                &object,
+                "schedule_type_limits_name",
+            ) {
+                Some(type_limits_name) => self.resolve_name(
+                    &model.schedule_type_limit_names,
+                    "Schedule:Year",
+                    &name,
+                    "schedule_type_limits_name",
+                    &type_limits_name,
+                    "ScheduleTypeLimits",
+                ),
+                None => None,
+            };
+            let Some(week_schedules) = self.schedule_year_week_pointers(model, &name, &object)
+            else {
+                continue;
+            };
+
+            let schedule_index = model.schedules.len()
+                + model.compact_schedules.len()
+                + model.file_schedules.len()
+                + model.year_schedules.len();
+            let Some(id_value) = self.checked_id("Schedule:Year", &name, schedule_index) else {
+                continue;
+            };
+            let id = ScheduleId(id_value);
+            if model.schedule_names.insert(&name, id).is_some() {
+                self.duplicate_name("Schedule:Year", &name);
+                continue;
+            }
+            model.year_schedules.push(ScheduleYear {
+                id,
+                name: NormalizedName::new(&name),
+                schedule_type_limits,
+                week_schedules,
+            });
+        }
+    }
+
+    fn schedule_year_week_pointers(
+        &mut self,
+        model: &TypedModel,
+        object_name: &str,
+        object: &RawObject,
+    ) -> Option<[WeekScheduleId; 366]> {
+        const OBJECT_TYPE: &str = "Schedule:Year";
+        const FIELD: &str = "schedule_weeks";
+        let Some(value) = field_value(object, FIELD) else {
+            self.error(
+                "MissingRequiredField",
+                OBJECT_TYPE,
+                Some(object_name),
+                Some(FIELD),
+                format!("{OBJECT_TYPE}/{object_name} requires field {FIELD}"),
+            );
+            return None;
+        };
+        let RawValue::Array(values) = value else {
+            self.invalid_field_type(OBJECT_TYPE, object_name, FIELD, "array");
+            return None;
+        };
+        if values.is_empty() || values.len() > 53 {
+            self.error(
+                "InvalidScheduleYearRangeCount",
+                OBJECT_TYPE,
+                Some(object_name),
+                Some(FIELD),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} requires between 1 and 53 source-ordered week ranges"
+                ),
+            );
+            return None;
+        }
+
+        let mut week_schedules = [None; 366];
+        let mut assignments = [0_u8; 366];
+        let mut ranges_valid = true;
+        for (index, value) in values.iter().enumerate() {
+            let RawValue::Object(fields) = value else {
+                self.error(
+                    "InvalidFieldType",
+                    OBJECT_TYPE,
+                    Some(object_name),
+                    Some(FIELD),
+                    format!("{OBJECT_TYPE}/{object_name} {FIELD} entry {index} must be an object"),
+                );
+                ranges_valid = false;
+                continue;
+            };
+            let entry = RawObject {
+                fields: fields.clone(),
+                source_span: None,
+            };
+            let entry_name = format!("{object_name}[{index}]");
+            let Some(schedule_week_name) =
+                self.required_string(OBJECT_TYPE, &entry_name, &entry, "schedule_week_name")
+            else {
+                ranges_valid = false;
+                continue;
+            };
+            let Some(week_schedule) = self.resolve_name(
+                &model.week_schedule_names,
+                OBJECT_TYPE,
+                &entry_name,
+                "schedule_week_name",
+                &schedule_week_name,
+                "Schedule:Week",
+            ) else {
+                ranges_valid = false;
+                continue;
+            };
+            let (Some(start_month), Some(start_day), Some(end_month), Some(end_day)) = (
+                self.required_u32(OBJECT_TYPE, &entry_name, &entry, "start_month"),
+                self.required_u32(OBJECT_TYPE, &entry_name, &entry, "start_day"),
+                self.required_u32(OBJECT_TYPE, &entry_name, &entry, "end_month"),
+                self.required_u32(OBJECT_TYPE, &entry_name, &entry, "end_day"),
+            ) else {
+                ranges_valid = false;
+                continue;
+            };
+            let Some(start_ordinal) = leap_schedule_ordinal(start_month, start_day) else {
+                self.error(
+                    "InvalidScheduleYearDate",
+                    OBJECT_TYPE,
+                    Some(&entry_name),
+                    Some("start_month"),
+                    format!(
+                        "{OBJECT_TYPE}/{entry_name} has invalid start date {start_month}/{start_day}"
+                    ),
+                );
+                ranges_valid = false;
+                continue;
+            };
+            let Some(end_ordinal) = leap_schedule_ordinal(end_month, end_day) else {
+                self.error(
+                    "InvalidScheduleYearDate",
+                    OBJECT_TYPE,
+                    Some(&entry_name),
+                    Some("end_month"),
+                    format!(
+                        "{OBJECT_TYPE}/{entry_name} has invalid end date {end_month}/{end_day}"
+                    ),
+                );
+                ranges_valid = false;
+                continue;
+            };
+
+            if start_ordinal <= end_ordinal {
+                for ordinal in start_ordinal..=end_ordinal {
+                    assignments[ordinal - 1] += 1;
+                    week_schedules[ordinal - 1] = Some(week_schedule);
+                }
+            } else {
+                for ordinal in start_ordinal..=366 {
+                    assignments[ordinal - 1] += 1;
+                    week_schedules[ordinal - 1] = Some(week_schedule);
+                }
+                for ordinal in 1..=end_ordinal {
+                    assignments[ordinal - 1] += 1;
+                    week_schedules[ordinal - 1] = Some(week_schedule);
+                }
+            }
+        }
+
+        if assignments[59] == 0 {
+            assignments[59] = assignments[58];
+            week_schedules[59] = week_schedules[58];
+        }
+        if let Some(index) = assignments.iter().position(|count| *count == 0) {
+            self.error(
+                "MissingScheduleYearDays",
+                OBJECT_TYPE,
+                Some(object_name),
+                Some(FIELD),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} leaves leap-shaped ordinal day {} unassigned",
+                    index + 1
+                ),
+            );
+            ranges_valid = false;
+        }
+        if let Some(index) = assignments.iter().position(|count| *count > 1) {
+            self.error(
+                "OverlappingScheduleYearDays",
+                OBJECT_TYPE,
+                Some(object_name),
+                Some(FIELD),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} assigns leap-shaped ordinal day {} more than once",
+                    index + 1
+                ),
+            );
+            ranges_valid = false;
+        }
+        if !ranges_valid {
+            return None;
+        }
+
+        Some(week_schedules.map(|week_schedule| week_schedule.unwrap_or(WeekScheduleId(0))))
     }
 
     fn schedule_file_values(
@@ -5317,6 +5636,19 @@ fn parse_compact_through_ordinal(value: &str) -> Option<u16> {
         .checked_add(u16::try_from(day_of_month).ok()?)
 }
 
+fn leap_schedule_ordinal(month: u32, day_of_month: u32) -> Option<usize> {
+    const DAYS_IN_MONTH: [u32; 12] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    let month_index = usize::try_from(month.checked_sub(1)?).ok()?;
+    let days_in_month = *DAYS_IN_MONTH.get(month_index)?;
+    if day_of_month == 0 || day_of_month > days_in_month {
+        return None;
+    }
+    let days_before_month = DAYS_IN_MONTH[..month_index]
+        .iter()
+        .try_fold(0_u32, |total, days| total.checked_add(*days))?;
+    usize::try_from(days_before_month.checked_add(day_of_month)?).ok()
+}
+
 fn parse_until_minute(value: &str) -> Option<u32> {
     let (_directive, time) = value.split_once(':')?;
     let time = time.trim();
@@ -5764,6 +6096,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 #[cfg(test)]
 mod tests {
     mod schedule_file;
+    mod schedule_year;
 
     use super::{
         ALL_SCHEDULE_DAY_TYPES, CompileStage, DiagnosticSeverity, ObjectCoverageStatus,

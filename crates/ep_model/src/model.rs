@@ -3,17 +3,18 @@
 use crate::{
     AirLoopHvac, AvailabilityManagerComponent, BoilerHotWater, BranchId, BranchListId, Building,
     ChillerElectricEir, CoilComponent, ComponentId, ConnectorId, ConnectorListId, Construction,
-    ConstructionId, DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId, FanComponent,
-    IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId, LoopId, Material, MaterialId,
-    NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName, OtherEquipment, People,
-    PlantBranch, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
+    ConstructionId, DayScheduleId, DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId,
+    FanComponent, IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId, LoopId, Material,
+    MaterialId, NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName, OtherEquipment,
+    People, PlantBranch, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
     PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId,
-    RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant, ScheduleFile,
-    ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SetpointManagerComponent, SiteLocation,
-    Surface, SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
-    TimestepConfig, Version, Zone, ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId,
-    ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
-    ZoneThermostatId,
+    RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant,
+    ScheduleDayHourly, ScheduleFile, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
+    ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation, Surface,
+    SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
+    TimestepConfig, Version, WeekScheduleId, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
+    ZoneThermostat, ZoneThermostatId,
 };
 
 /// Minimal typed model for early compiler stages.
@@ -51,12 +52,22 @@ pub struct TypedModel {
     pub schedule_type_limits: Vec<ScheduleTypeLimits>,
     /// Schedule type limit names.
     pub schedule_type_limit_names: NameMap<ScheduleTypeLimitId>,
+    /// Hourly day schedules.
+    pub day_schedules: Vec<ScheduleDayHourly>,
+    /// Day schedule names.
+    pub day_schedule_names: NameMap<DayScheduleId>,
+    /// Daily week schedules.
+    pub week_schedules: Vec<ScheduleWeekDaily>,
+    /// Week schedule names.
+    pub week_schedule_names: NameMap<WeekScheduleId>,
     /// Constant schedules.
     pub schedules: Vec<ScheduleConstant>,
     /// Compact schedules.
     pub compact_schedules: Vec<ScheduleCompact>,
     /// File-backed schedules loaded into immutable source values.
     pub file_schedules: Vec<ScheduleFile>,
+    /// Annual schedules composed from day and week schedule references.
+    pub year_schedules: Vec<ScheduleYear>,
     /// Schedule names.
     pub schedule_names: NameMap<ScheduleId>,
     /// Zone internal gains from OtherEquipment objects.
@@ -182,9 +193,14 @@ impl Default for TypedModel {
             construction_names: NameMap::default(),
             schedule_type_limits: Vec::new(),
             schedule_type_limit_names: NameMap::default(),
+            day_schedules: Vec::new(),
+            day_schedule_names: NameMap::default(),
+            week_schedules: Vec::new(),
+            week_schedule_names: NameMap::default(),
             schedules: Vec::new(),
             compact_schedules: Vec::new(),
             file_schedules: Vec::new(),
+            year_schedules: Vec::new(),
             schedule_names: NameMap::default(),
             other_equipment: Vec::new(),
             other_equipment_names: NameMap::default(),
@@ -256,9 +272,12 @@ impl TypedModel {
             + self.materials.len()
             + self.constructions.len()
             + self.schedule_type_limits.len()
+            + self.day_schedules.len()
+            + self.week_schedules.len()
             + self.schedules.len()
             + self.compact_schedules.len()
             + self.file_schedules.len()
+            + self.year_schedules.len()
             + self.other_equipment.len()
             + self.people.len()
             + self.thermostat_dual_setpoints.len()

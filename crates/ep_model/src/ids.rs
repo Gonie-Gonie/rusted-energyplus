@@ -14,6 +14,8 @@ typed_id!(ConstructionId);
 typed_id!(MaterialId);
 typed_id!(InternalGainId);
 typed_id!(ScheduleTypeLimitId);
+typed_id!(DayScheduleId);
+typed_id!(WeekScheduleId);
 typed_id!(ScheduleId);
 typed_id!(RunPeriodId);
 typed_id!(RunPeriodSpecialDayId);

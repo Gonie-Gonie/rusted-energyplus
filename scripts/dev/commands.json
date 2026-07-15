@@ -329,6 +329,12 @@
                          "help":  "Gate exact Schedule:File comma-column intake and 8760-row February 28 duplication on leap day."
                      },
                      {
+                         "name":  "compare-calendar-schedule-day-hourly-week-daily-year-leap-exact",
+                         "path":  "compare\\compare-calendar-schedule-day-hourly-week-daily-year-leap-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact Schedule:Day:Hourly, Schedule:Week:Daily, and Schedule:Year omitted-February-29 pointer behavior."
+                     },
+                     {
                          "name":  "compare-weather-effective-calendar",
                          "path":  "compare\\compare-weather-effective-calendar.ps1",
                          "group":  "compare",
