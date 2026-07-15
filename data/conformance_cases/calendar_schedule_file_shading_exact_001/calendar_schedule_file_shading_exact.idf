@@ -1,0 +1,47 @@
+Version,26.1;
+
+Building,
+  Schedule File Shading Exact Fixture,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+Timestep,4;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+RunPeriod,
+  Schedule File Shading Run Period,
+  1,
+  1,
+  2013,
+  1,
+  1,
+  2013,
+  Tuesday,
+  No,
+  No,
+  No,
+  No,
+  No,
+  No;
+
+Schedule:File:Shading,
+  schedule_file_shading.csv;
+
+Output:Variable,
+  ALPHA SURFACE_SHADING,
+  Schedule Value,
+  Timestep;
+
+Output:Variable,
+  BETA SURFACE_SHADING,
+  Schedule Value,
+  Timestep;

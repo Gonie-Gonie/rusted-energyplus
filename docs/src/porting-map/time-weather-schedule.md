@@ -93,6 +93,7 @@ equivalent to advancing the reported run-period calendar.
 | compact interval minute expansion | `Sched::ProcessIntervalFields` | EnergyPlus 26.1 lines 2733-2961 decode each `Until` endpoint, fill the 1,440-minute day, and choose flat versus Linear minute values. CP43 exercises aligned endpoints and flat fill under default Interpolate:No. CP44 separately locks explicit-No flat fill, Average flat minute values, a flat first Linear interval, the later cross-hour Linear ramp, and the explicit-No-only non-aligned warning for `Until: 00:20` and `01:15` in one exact fixture. `Until 24:MM` correction, malformed/overlap/zero/incomplete profiles, other interval shapes, and broad diagnostic parity remain unclaimed. |
 | day-schedule timestep population | `Sched::DaySchedule::populateFromMinuteVals` | EnergyPlus 26.1 lines 211-239 either averages each zone-timestep window or selects the minute at each timestep end. CP43 locks default-No end-minute sampling at aligned 15-minute endpoints for one `Timestep,4` profile. CP44 separately locks explicit No and Linear endpoint sampling plus the Average 15-minute window mean for exactly three profiles in its one-day `Timestep,4` fixture; other timestep counts, mixed multi-profile modes, hourly aggregation, and broader population behavior remain unclaimed. |
 | file schedule intake and 366-day expansion | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 1573-1863 validate `Schedule:File` metadata, resolve and parse the selected external column, build hourly day schedules, and keep a 366-day table. CP45 locks only one flat comma CSV with one skipped header, selected column 2, 8760 numeric hourly rows, explicit No interpolation, 60 minutes per item, and DST adjustment No. Lines 1858-1862 alias February 29 to February 28 when the actual selected-column row count is below 8784. |
+| shading-file schedule intake and generated columns | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 552-713 resolve the unique `Schedule:File:Shading` sidecar, parse comma input with one header row, and require exactly 365 or 366 days times 24 hours times the model timestep count. Lines 1871-1959 skip column zero and create one `<header>_shading` detailed schedule per unique remaining header. CP50 locks only one common-year 35,040-row, `Timestep,4`, two-surface-column CSV and the first day's two generated Schedule Value vectors; it deliberately omits surfaces and Imported ShadowCalculation. |
 | day/week/year schedule intake and annual pointer expansion | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 803-854 load 24-value `Schedule:Day:Hourly` profiles, lines 1046-1078 resolve all 12 `Schedule:Week:Daily` day-type pointers, and lines 1149-1246 expand source-ordered `Schedule:Year` ranges into a 366-day Week table. CP46 locks only two non-wrapping Year ranges whose intentionally unassigned day 60 copies day 59's Week pointer at lines 1223-1227. |
 | interval day-schedule intake | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 858-932 parse `Schedule:Day:Interval` after all Day:Hourly objects and before later Day/Week families. CP47 locks one blank/default-No aligned profile plus Average and Linear non-aligned profiles at `Timestep,4`, reusing `ProcessIntervalFields` and `DaySchedule::populateFromMinuteVals` minute-to-zone-timestep semantics. |
 | schedule current values | `Sched::UpdateScheduleVals` | Writes every schedule's `currentVal`: an EMS value wins when actuated; otherwise it calls `getHrTsVal(state, HourOfDay, TimeStep)`. It does not calculate or advance calendar state. |
@@ -514,6 +515,47 @@ metadata, `Schedule:File:Shading`, actual/design-day/warmup/multiyear
 execution, EMS/current-value semantics, downstream schedule consumption,
 arbitrary-run sidecar staging, Rust raw ESO serialization, or broad
 warning/error and file-search parity.
+
+## Schedule:File:Shading Generated-Schedule Evidence Checkpoint
+
+`calendar_schedule_file_shading_exact_001` adds the next bounded external-file
+schedule path. Its byte-staged sidecar has the exact header
+`Date/Time,ALPHA SURFACE,BETA SURFACE` followed by 35,040 comma rows:
+365 days times 24 hours times four zone timesteps. The first column uses
+canonical `MM/DD HH:MM` text, while the remaining unique headers generate
+`ALPHA SURFACE_shading` and `BETA SURFACE_shading` schedules. Every source
+day repeats opposite 96-value profiles: alpha rises `0.01..0.96` and beta
+falls `0.96..0.01`.
+
+The mapped EnergyPlus 26.1 intake is `Sched::ProcessScheduleInput` lines
+552-713 and 1871-1959. The first phase resolves the one sidecar, skips one CSV
+header row, and requires a row count equal to the current common/leap year
+times 24 times `TimeStepsInHour`. The second phase excludes column zero and
+constructs one detailed file schedule named `<header>_shading` for each unique
+remaining header. Rust retains the sidecar basename, source day count,
+timestep count, header provenance, generated name, and immutable values, then
+maps schedule day, hour-ending, and zone-timestep coordinates to source rows.
+
+The blocking gate proves exactly two ordered-exact-unique 96-sample Timestep
+`Schedule Value` series and timestamps at zero tolerance for the non-actual
+2013-01-01 RunPeriod. It also locks byte-identical sidecar staging, the
+converted epJSON `file_name` and two output keys, both raw EnergyPlus ESO value
+vectors and all 96 timestamp rows, the exact EIO Environment and default
+PolygonClipping/non-Imported shadowing rows, and clean 0 Warning/0 Severe
+completion.
+
+This checkpoint deliberately contains no zones, surfaces, or
+`ShadowCalculation` object. It proves ScheduleManager CSV intake, unique
+header-to-generated-schedule naming, column separation, and first-day
+quarter-hour row lookup only. It does not claim Imported ShadowCalculation,
+surface-name consumption, `Surface Outside Face Sunlit Fraction`, incident
+solar, or heat-balance effects. JSON and unknown extensions, multiple objects,
+duplicate/missing/extra/blank/trailing headers, nonnumeric/short/extra rows,
+timestamp parsing or validation, other timestep counts, the 366-day branch
+and February 29 behavior, actual/design-day/warmup/multi-environment
+execution, EMS/current-value semantics, downstream consumers, Rust raw ESO
+serialization, and broad warning/error/file-search parity remain outside the
+claim.
 
 ## Schedule:Day/Week/Year Leap-Table Evidence Checkpoint
 

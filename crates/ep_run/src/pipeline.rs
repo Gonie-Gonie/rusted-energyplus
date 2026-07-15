@@ -1102,6 +1102,10 @@ fn write_compile_artifacts(
 }
 
 fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
+    let file_shading_generated_schedules = model
+        .file_shading_schedule
+        .as_ref()
+        .map_or(0, |schedule| schedule.columns.len());
     BTreeMap::from([
         ("zones", model.zones.len()),
         ("surfaces", model.surfaces.len()),
@@ -1110,6 +1114,22 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
         ("constant_schedules", model.schedules.len()),
         ("compact_schedules", model.compact_schedules.len()),
         ("file_schedules", model.file_schedules.len()),
+        (
+            "file_shading_schedule_objects",
+            usize::from(model.file_shading_schedule.is_some()),
+        ),
+        (
+            "file_shading_generated_schedules",
+            file_shading_generated_schedules,
+        ),
+        (
+            "schedules",
+            model.schedules.len()
+                + model.compact_schedules.len()
+                + model.file_schedules.len()
+                + file_shading_generated_schedules
+                + model.year_schedules.len(),
+        ),
         (
             "day_schedules",
             model.day_schedules.len()
@@ -1214,6 +1234,11 @@ fn write_graph_and_plan(
             "schedule_ids": model.typed.schedules.len()
                 + model.typed.compact_schedules.len()
                 + model.typed.file_schedules.len()
+                + model
+                    .typed
+                    .file_shading_schedule
+                    .as_ref()
+                    .map_or(0, |schedule| schedule.columns.len())
                 + model.typed.year_schedules.len(),
             "weather_series_indices": 1,
             "output_handles": precomputed.output_registry.len(),
@@ -1897,9 +1922,12 @@ mod tests {
         artifact_map, ctf_split_trace_enabled, execution_stage_snapshots,
         full_surface_trace_opt_in, input_error_diagnostic_code, selected_trace_enabled,
         source_order_gate_summary, source_order_stage_state_snapshots,
-        trace_level_enables_stage_snapshots,
+        trace_level_enables_stage_snapshots, typed_counts,
     };
     use ep_compiler::compile_raw_model;
+    use ep_model::{
+        NormalizedName, ScheduleFileShading, ScheduleFileShadingColumn, ScheduleId, TypedModel,
+    };
     use ep_raw_model::parse_epjson_str_with_idf_order;
     use ep_runtime::{
         DayType, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
@@ -2194,5 +2222,31 @@ mod tests {
         ] {
             assert_eq!(artifacts[key], expected.display().to_string());
         }
+    }
+
+    #[test]
+    fn typed_counts_separate_file_shading_object_and_generated_schedules() {
+        let model = TypedModel {
+            file_shading_schedule: Some(ScheduleFileShading {
+                file_name: "shading.csv".to_string(),
+                timesteps_per_hour: 1,
+                source_day_count: 365,
+                columns: [7_u32, 11]
+                    .into_iter()
+                    .map(|id| ScheduleFileShadingColumn {
+                        id: ScheduleId(id),
+                        surface_header: format!("Surface {id}"),
+                        schedule_name: NormalizedName::new(&format!("Surface {id}_shading")),
+                        values: Vec::new(),
+                    })
+                    .collect(),
+            }),
+            ..TypedModel::default()
+        };
+
+        let counts = typed_counts(&model);
+        assert_eq!(counts["file_shading_schedule_objects"], 1);
+        assert_eq!(counts["file_shading_generated_schedules"], 2);
+        assert_eq!(counts["schedules"], 2);
     }
 }

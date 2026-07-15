@@ -9,12 +9,13 @@ use crate::{
     People, PlantBranch, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
     PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId,
     RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant,
-    ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleFile, ScheduleId,
-    ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear,
-    SetpointManagerComponent, SiteLocation, Surface, SurfaceConvectionAlgorithms, SurfaceId,
-    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version, WeekScheduleId, Zone,
-    ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId, ZoneEquipmentObjectType,
-    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatId,
+    ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleFile, ScheduleFileShading,
+    ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact, ScheduleWeekDaily,
+    ScheduleYear, SetpointManagerComponent, SiteLocation, Surface, SurfaceConvectionAlgorithms,
+    SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version,
+    WeekScheduleId, Zone, ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId,
+    ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
+    ZoneThermostatId,
 };
 
 /// Minimal typed model for early compiler stages.
@@ -66,6 +67,8 @@ pub struct TypedModel {
     pub week_compact_schedules: Vec<ScheduleWeekCompact>,
     /// Week schedule names.
     pub week_schedule_names: NameMap<WeekScheduleId>,
+    /// Unique bulk surface-shading schedule file, when declared.
+    pub file_shading_schedule: Option<ScheduleFileShading>,
     /// Constant schedules.
     pub schedules: Vec<ScheduleConstant>,
     /// Compact schedules.
@@ -206,6 +209,7 @@ impl Default for TypedModel {
             week_schedules: Vec::new(),
             week_compact_schedules: Vec::new(),
             week_schedule_names: NameMap::default(),
+            file_shading_schedule: None,
             schedules: Vec::new(),
             compact_schedules: Vec::new(),
             file_schedules: Vec::new(),
@@ -286,6 +290,7 @@ impl TypedModel {
             + self.day_list_schedules.len()
             + self.week_schedules.len()
             + self.week_compact_schedules.len()
+            + usize::from(self.file_shading_schedule.is_some())
             + self.schedules.len()
             + self.compact_schedules.len()
             + self.file_schedules.len()

@@ -13,12 +13,16 @@ use ep_model::{
 use std::collections::BTreeSet;
 
 mod day_table;
+mod file_shading;
 
 #[cfg(test)]
 use day_table::{compiled_day_schedule_value, year_schedule_hourly_value};
 use day_table::{
     precompile_day_schedule_table, year_schedule_series_for_environment_time_axis,
     year_schedule_series_for_time_axis,
+};
+use file_shading::{
+    file_shading_series_for_environment_time_axis, file_shading_series_for_time_axis,
 };
 
 #[cfg(test)]
@@ -139,6 +143,21 @@ pub(crate) fn validate_hour_only_internal_gain_schedules(
             {
                 format!(
                     "Schedule:File ID {} requires a calendar-aware precomputed schedule series",
+                    schedule_id.0
+                )
+            }
+            None if model
+                .file_shading_schedule
+                .as_ref()
+                .is_some_and(|schedule| {
+                    schedule
+                        .columns
+                        .iter()
+                        .any(|column| column.id == schedule_id)
+                }) =>
+            {
+                format!(
+                    "Schedule:File:Shading generated schedule ID {} requires a calendar- and zone-timestep-aware precomputed schedule series",
                     schedule_id.0
                 )
             }
@@ -316,6 +335,15 @@ pub enum ScheduleSeriesKind {
         /// Immutable source value count loaded during compilation.
         source_value_count: usize,
     },
+    /// One surface column generated from immutable `Schedule:File:Shading` zone-timestep values.
+    FileShadingZoneTimestep {
+        /// Number of source calendar days represented by the immutable values.
+        source_day_count: u32,
+        /// Source values per hour.
+        timesteps_per_hour: u32,
+        /// Immutable source value count loaded during compilation.
+        source_value_count: usize,
+    },
     /// Direct `Schedule:Year` -> `Schedule:Week:Daily` -> `Schedule:Day:Hourly` lookup.
     YearWeekDayHourlyDirect {
         /// Immutable leap-shaped annual pointer count.
@@ -422,6 +450,8 @@ pub fn precompute_schedule_value_series(
 /// interpolation or subhourly Until boundaries return NaN values until hourly
 /// schedule aggregation is ported. File and annual schedules use the axis'
 /// schedule ordinal, while annual schedules also select the active day type.
+/// File:Shading columns average their immutable zone-timestep source values
+/// when the axis timestep count matches and fail closed to NaN otherwise.
 #[must_use]
 pub fn precompute_schedule_value_series_for_time_axis(
     model: &TypedModel,
@@ -430,11 +460,13 @@ pub fn precompute_schedule_value_series_for_time_axis(
     let day_schedule_table =
         precompile_day_schedule_table(model, time_axis.zone_timestep.timesteps_per_hour);
     model
-        .schedules
-        .iter()
-        .map(|schedule| {
+        .file_shading_schedule
+        .as_ref()
+        .into_iter()
+        .flat_map(|schedule| file_shading_series_for_time_axis(schedule, time_axis))
+        .chain(model.schedules.iter().map(|schedule| {
             constant_schedule_series(schedule, time_axis.points.iter().map(|point| point.hour))
-        })
+        }))
         .chain(
             model
                 .compact_schedules
@@ -468,11 +500,13 @@ pub fn precompute_schedule_value_series_for_environment_time_axis(
     let day_schedule_table =
         precompile_day_schedule_table(model, time_axis.zone_timestep.timesteps_per_hour);
     model
-        .schedules
-        .iter()
-        .map(|schedule| {
+        .file_shading_schedule
+        .as_ref()
+        .into_iter()
+        .flat_map(|schedule| file_shading_series_for_environment_time_axis(schedule, time_axis))
+        .chain(model.schedules.iter().map(|schedule| {
             constant_schedule_series(schedule, time_axis.points.iter().map(|point| point.hour))
-        })
+        }))
         .chain(
             model.compact_schedules.iter().map(|schedule| {
                 compact_schedule_series_for_environment_time_axis(schedule, time_axis)
@@ -498,6 +532,12 @@ fn precompute_schedule_value_series_for_hours(
     model: &TypedModel,
     hours: impl IntoIterator<Item = u32> + Clone,
 ) -> Result<Vec<ScheduleValueSeries>, String> {
+    if model.file_shading_schedule.is_some() {
+        return Err(
+            "Schedule:File:Shading requires a calendar- and zone-timestep-aware TimeAxis; the hour-only API has no annual source index or zone timestep"
+                .to_string(),
+        );
+    }
     if !model.file_schedules.is_empty() {
         return Err(
             "Schedule:File requires a calendar-aware TimeAxis; the hour-only API has no annual source index"

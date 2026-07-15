@@ -544,9 +544,11 @@ fn push_steps_to_stage(
 fn schedule_ids(model: &SimulationModel) -> impl Iterator<Item = ScheduleId> + '_ {
     model
         .typed
-        .schedules
+        .file_shading_schedule
         .iter()
-        .map(|schedule| schedule.id)
+        .flat_map(|schedule| schedule.columns.iter())
+        .map(|column| column.id)
+        .chain(model.typed.schedules.iter().map(|schedule| schedule.id))
         .chain(
             model
                 .typed

@@ -173,6 +173,32 @@ pub struct ScheduleFile {
     pub values: Vec<f64>,
 }
 
+/// All surface sunlit-fraction schedules loaded from one `Schedule:File:Shading` sidecar.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ScheduleFileShading {
+    /// Source filename retained for diagnostics and provenance.
+    pub file_name: String,
+    /// Zone timesteps represented by each source hour.
+    pub timesteps_per_hour: u32,
+    /// Number of source calendar days, either 365 or 366.
+    pub source_day_count: u32,
+    /// Generated surface schedules in deterministic header order.
+    pub columns: Vec<ScheduleFileShadingColumn>,
+}
+
+/// One generated surface schedule from a `Schedule:File:Shading` column.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ScheduleFileShadingColumn {
+    /// Typed ID shared with all other top-level schedule families.
+    pub id: ScheduleId,
+    /// Surface-column header retained for diagnostics and provenance.
+    pub surface_header: String,
+    /// Normalized generated schedule name, `{surface_header}_shading`.
+    pub schedule_name: NormalizedName,
+    /// Immutable source values ordered by day, hour, and zone timestep.
+    pub values: Vec<f64>,
+}
+
 /// One value segment in an interval-based schedule day profile.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ScheduleCompactSegment {

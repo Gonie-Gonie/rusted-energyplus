@@ -530,6 +530,37 @@ claim_level = "limited-conformance"
 support_boundary = "Limited EnergyPlus 26.1 conformance only for calendar_schedule_file_8760_leap_exact_001: one staged flat comma CSV basename with one header plus exactly 8760 three-column numeric rows, selected one-based column 2, Rows to Skip=1, Number of Hours=8760, explicit Interpolate=No, Minutes per Item=60, Adjust Schedule for Daylight Savings=No, Timestep=4, and the non-actual 2016-02-28 through 2016-03-01 RunPeriod. The blocking gate proves 72 ordered-exact-unique zero-tolerance hourly Schedule Value samples and timestamps: February 28 is 1393 through 1416, February 29 repeats 1393 through 1416 exactly, and March 1 is 1417 through 1440. It also locks byte-identical auxiliary staging beside input.idf, raw EnergyPlus ESO values/timestamp fields, and exact 0 Warning/0 Severe completion. Rust loads the selected column once into immutable typed values and maps leap-shaped day 60 to source day 59, shifting later days back one source day. The claim excludes 8784 rows, declared-hour/actual-row mismatch, short/extra/missing/non-numeric diagnostics, subhourly input, Interpolate=Yes or blank/default, active/default DST adjustment, other separators/skip/column shapes, JSON/unknown extensions, same-path cache metadata, Schedule:File:Shading, actual/design-day/warmup/multiyear execution, EMS/currentVal, downstream consumption, arbitrary-run staging, Rust raw ESO, and broad warning/error/file-search parity. Typed Rust diagnostics for those rejected branches are source/unit evidence only. The calendar_time_state algorithm and ProcessScheduleInput routine remain scaffold/source_mapped and are not promoted by this bounded entry."
 
 [[algorithm]]
+id = "schedule_file_shading_zone_timestep"
+domain = "time"
+source_map = "docs/src/porting-map/time-weather-schedule.md"
+energyplus_source = [
+  "src/EnergyPlus/DataSystemVariables.cc",
+  "src/EnergyPlus/ScheduleManager.cc",
+]
+port_ticket_mappings = [
+  "src/EnergyPlus/DataSystemVariables.cc|CheckForActualFilePath|CheckForActualFilePath|Environment",
+  "src/EnergyPlus/ScheduleManager.cc|ProcessScheduleInput|ProcessScheduleInput|Environment",
+  "src/EnergyPlus/ScheduleManager.cc|getHrTsVal|getHrTsVal|Environment",
+]
+rust_target = [
+  "crates/ep_model/src/objects/schedules.rs::ScheduleFileShading",
+  "crates/ep_model/src/objects/schedules.rs::ScheduleFileShadingColumn",
+  "crates/ep_compiler/src/compiler.rs::compile_raw_model_with_auxiliary_root",
+  "crates/ep_compiler/src/compiler.rs::Compiler::parse_file_shading_schedule",
+  "crates/ep_runtime/src/schedules/file_shading.rs::file_shading_series_for_environment_time_axis",
+  "crates/ep_runtime/src/schedules/file_shading.rs::file_shading_zone_timestep_value",
+  "crates/ep_runtime/src/schedules.rs::precompute_schedule_value_series_for_environment_time_axis",
+]
+status = "conformance"
+first_case = "calendar_schedule_file_shading_exact_001"
+first_evidence = "calendar_schedule_file_shading_exact_001"
+proof_variables = [
+  "Schedule Value",
+]
+claim_level = "limited-conformance"
+support_boundary = "Limited EnergyPlus 26.1 conformance only for calendar_schedule_file_shading_exact_001: one byte-staged flat comma CSV basename with one header plus exactly 35,040 rows for a common-year Timestep,4 source. The timestamp column is excluded and the two unique surface headers generate ALPHA SURFACE_shading and BETA SURFACE_shading schedules. The blocking gate proves two 96-sample ordered-exact-unique zero-tolerance Timestep Schedule Value series on 2013-01-01: 0.01..0.96 and 0.96..0.01. It also locks the converted epJSON file_name, raw EnergyPlus ESO values/timestamps, exact EIO environment and default PolygonClipping/non-Imported row, and 0 Warning/0 Severe completion. Rust loads the two columns once into immutable typed values and maps the calendar day, hour-ending, and zone timestep to a source row. The case has no zones, surfaces, or ShadowCalculation object and therefore does not promote Imported solar consumption, surface matching, sunlit fraction, incident solar, or heat balance. JSON/unknown extensions, multiple objects, duplicate/missing/extra/trailing headers, nonnumeric/short/extra data, timestamp validation, other timestep counts, 366-day input and February 29 behavior, actual/design-day/warmup/multienvironment execution, EMS/currentVal, downstream consumers, Rust raw ESO, and broad file-search or diagnostic parity remain unclaimed. Typed rejection branches and wider common-year/leap lookup branches are source/unit evidence only. The calendar_time_state algorithm and ProcessScheduleInput/getHrTsVal routine records remain scaffold/source_mapped and are not promoted by this bounded entry."
+
+[[algorithm]]
 id = "schedule_day_week_year_hourly_leap"
 domain = "time"
 source_map = "docs/src/porting-map/time-weather-schedule.md"

@@ -345,6 +345,11 @@ fn print_help() {
 }
 
 fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
+    let file_shading_generated_schedules = model
+        .typed
+        .file_shading_schedule
+        .as_ref()
+        .map_or(0, |schedule| schedule.columns.len());
     println!("ExecutionPlan");
     println!("  zones: {}", model.typed.zones.len());
     println!("  surfaces: {}", model.typed.surfaces.len());
@@ -355,6 +360,7 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
         model.typed.schedules.len()
             + model.typed.compact_schedules.len()
             + model.typed.file_schedules.len()
+            + file_shading_generated_schedules
             + model.typed.year_schedules.len()
     );
     println!("  constant_schedules: {}", model.typed.schedules.len());
@@ -363,6 +369,11 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
         model.typed.compact_schedules.len()
     );
     println!("  file_schedules: {}", model.typed.file_schedules.len());
+    println!(
+        "  file_shading_schedule_objects: {}",
+        usize::from(model.typed.file_shading_schedule.is_some())
+    );
+    println!("  file_shading_generated_schedules: {file_shading_generated_schedules}");
     println!(
         "  day_schedules: {}",
         model.typed.day_schedules.len()
@@ -9459,10 +9470,22 @@ fn schedule_name_for_id(model: &TypedModel, schedule_id: Option<ScheduleId>) -> 
     };
 
     model
-        .schedules
-        .iter()
-        .find(|schedule| schedule.id == schedule_id)
-        .map(|schedule| schedule.name.0.clone())
+        .file_shading_schedule
+        .as_ref()
+        .and_then(|schedule| {
+            schedule
+                .columns
+                .iter()
+                .find(|column| column.id == schedule_id)
+                .map(|column| column.schedule_name.0.clone())
+        })
+        .or_else(|| {
+            model
+                .schedules
+                .iter()
+                .find(|schedule| schedule.id == schedule_id)
+                .map(|schedule| schedule.name.0.clone())
+        })
         .or_else(|| {
             model
                 .compact_schedules
@@ -17041,6 +17064,10 @@ fn print_raw_model_summary(summary: &RawModelSummary) {
 }
 
 fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
+    let file_shading_generated_schedules = model
+        .file_shading_schedule
+        .as_ref()
+        .map_or(0, |schedule| schedule.columns.len());
     println!("TypedModel");
     println!("  version: {}", model.version);
     println!("  raw_objects: {}", report.raw_object_count);
@@ -17067,11 +17094,17 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
         model.schedules.len()
             + model.compact_schedules.len()
             + model.file_schedules.len()
+            + file_shading_generated_schedules
             + model.year_schedules.len()
     );
     println!("  constant_schedules: {}", model.schedules.len());
     println!("  compact_schedules: {}", model.compact_schedules.len());
     println!("  file_schedules: {}", model.file_schedules.len());
+    println!(
+        "  file_shading_schedule_objects: {}",
+        usize::from(model.file_shading_schedule.is_some())
+    );
+    println!("  file_shading_generated_schedules: {file_shading_generated_schedules}");
     println!(
         "  day_schedules: {}",
         model.day_schedules.len()

@@ -97,6 +97,13 @@ first_evidence = "calendar_schedule_file_8760_leap_exact_001"
 support_boundary = "Typed and limited EnergyPlus 26.1 conformance only for calendar_schedule_file_8760_leap_exact_001: one safe staged flat comma CSV basename with one header and exactly 8760 three-column numeric rows; one-based column 2, one skipped row, declared 8760 hours, explicit Interpolate=No, 60 minutes per item, and Adjust Schedule for Daylight Savings=No. The blocking gate proves 72 ordered-exact-unique zero-tolerance hourly Schedule Value samples and timestamps over 2016-02-28 through 2016-03-01 as 1393..1416, the same 1393..1416 repeated on February 29, then 1417..1440. Byte-identical sidecar staging, raw EnergyPlus values/timestamps, and 0 Warning/0 Severe completion are locked. 8784 rows, row-count mismatches, file diagnostics, subhourly/interpolated/DST-adjusted paths, other separators or shapes, shared caches, shading, arbitrary-run staging, downstream consumption, EMS/currentVal, Rust raw ESO, and broad parity remain unclaimed."
 
 [[object]]
+name = "Schedule:File:Shading"
+family = "schedule"
+status = "typed"
+first_evidence = "calendar_schedule_file_shading_exact_001"
+support_boundary = "Typed and limited EnergyPlus 26.1 conformance only for calendar_schedule_file_shading_exact_001: one safe staged comma CSV basename with the exact Date/Time, ALPHA SURFACE, and BETA SURFACE headers plus exactly 35,040 common-year Timestep,4 data rows. The two unique non-timestamp headers generate ALPHA SURFACE_shading and BETA SURFACE_shading schedules. The blocking gate proves two 96-sample ordered-exact-unique zero-tolerance Timestep Schedule Value series on 2013-01-01: alpha 0.01..0.96 and beta 0.96..0.01. Byte-identical sidecar staging, converted epJSON file_name, raw EnergyPlus ESO values/timestamps, exact EIO environment plus default non-Imported shadowing row, and 0 Warning/0 Severe completion are locked. The fixture deliberately has no zones, surfaces, or ShadowCalculation object, so Imported ShadowCalculation, surface lookup or consumption, sunlit fraction, incident solar, and heat-balance effects are unclaimed. JSON/unknown extensions, multiple objects, header and numeric diagnostics, other timestep/day-count branches, timestamp validation, EMS/currentVal, downstream consumption, Rust raw ESO, and broad parity remain unclaimed."
+
+[[object]]
 name = "Schedule:Day:Hourly"
 family = "schedule"
 status = "typed"

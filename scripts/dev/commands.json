@@ -329,6 +329,12 @@
                          "help":  "Gate exact Schedule:File comma-column intake and 8760-row February 28 duplication on leap day."
                      },
                      {
+                         "name":  "compare-calendar-schedule-file-shading-exact",
+                         "path":  "compare\\compare-calendar-schedule-file-shading-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact Schedule:File:Shading 35,040-row CSV intake, generated schedule names, and two quarter-hour column vectors."
+                     },
+                     {
                          "name":  "compare-calendar-schedule-day-hourly-week-daily-year-leap-exact",
                          "path":  "compare\\compare-calendar-schedule-day-hourly-week-daily-year-leap-exact.ps1",
                          "group":  "compare",

@@ -768,9 +768,11 @@ fn normalize_identity(value: &str) -> String {
 
 fn schedule_ids(model: &TypedModel) -> impl Iterator<Item = ScheduleId> + '_ {
     model
-        .schedules
+        .file_shading_schedule
         .iter()
-        .map(|schedule| schedule.id)
+        .flat_map(|schedule| schedule.columns.iter())
+        .map(|column| column.id)
+        .chain(model.schedules.iter().map(|schedule| schedule.id))
         .chain(model.compact_schedules.iter().map(|schedule| schedule.id))
         .chain(model.file_schedules.iter().map(|schedule| schedule.id))
         .chain(model.year_schedules.iter().map(|schedule| schedule.id))
@@ -778,10 +780,22 @@ fn schedule_ids(model: &TypedModel) -> impl Iterator<Item = ScheduleId> + '_ {
 
 fn schedule_name_for_id(model: &TypedModel, schedule_id: ScheduleId) -> Option<String> {
     model
-        .schedules
-        .iter()
-        .find(|schedule| schedule.id == schedule_id)
-        .map(|schedule| schedule.name.0.clone())
+        .file_shading_schedule
+        .as_ref()
+        .and_then(|schedule| {
+            schedule
+                .columns
+                .iter()
+                .find(|column| column.id == schedule_id)
+                .map(|column| column.schedule_name.0.clone())
+        })
+        .or_else(|| {
+            model
+                .schedules
+                .iter()
+                .find(|schedule| schedule.id == schedule_id)
+                .map(|schedule| schedule.name.0.clone())
+        })
         .or_else(|| {
             model
                 .compact_schedules

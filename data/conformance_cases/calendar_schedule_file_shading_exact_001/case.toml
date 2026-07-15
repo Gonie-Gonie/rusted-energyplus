@@ -1,0 +1,74 @@
+id = "calendar_schedule_file_shading_exact_001"
+title = "Schedule:File:Shading CSV column mapping at zone timesteps"
+milestone = "full-source-order-schedule-file-shading"
+purpose = "Block on exact EnergyPlus Schedule:File:Shading comma-file intake, surface-header schedule-name generation, and source-row mapping at Timestep,4."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The fixture is one non-actual common-year 2013-01-01 Tuesday RunPeriod with Timestep,4, all six RunPeriod weather/calendar policies set to No, and a synthetic 24-row EPW with no daylight saving or holidays.",
+  "The comma CSV contains the exact header Date/Time,ALPHA SURFACE,BETA SURFACE plus 35,040 data rows: 365 days times 24 hours times 4 timesteps. The first column carries canonical MM/DD HH:MM labels; the two remaining unique headers create ALPHA SURFACE_shading and BETA SURFACE_shading schedules.",
+  "Every source day repeats two distinct 96-sample vectors. ALPHA SURFACE rises from 0.01 through 0.96 while BETA SURFACE falls from 0.96 through 0.01, so the zero-tolerance claim proves header-to-schedule mapping, column separation, and ordered quarter-hour row lookup for exactly the first common-year day.",
+  "The external claim is exactly 96 ordered, unique Timestep Schedule Value samples and timestamps for each generated schedule. EnergyPlus must also retain the staged sidecar byte-for-byte, the converted epJSON file_name, the exact clean EIO environment row, and zero-warning completion artifacts.",
+  "There are deliberately no zones, surfaces, or ShadowCalculation object. This case proves ScheduleManager CSV intake and generated schedule outputs only; it does not claim Imported ShadowCalculation, surface-name consumption, Surface Outside Face Sunlit Fraction, incident solar, or heat-balance effects.",
+  "JSON and unknown-extension inputs, multiple Schedule:File:Shading objects, duplicate, missing, extra, blank, or trailing headers, nonnumeric, short, or extra data, timestamp parsing or validation, other timestep counts, the 366-day row-count branch, February 29 behavior, actual-weather, daylight-saving, cross-year traversal, EMS actuation, a Rust currentVal store, downstream consumers, Rust raw ESO serialization, and broad warning/error parity remain outside the claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_schedule_file_shading_exact_001/calendar_schedule_file_shading_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["schedule", "weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_schedule_file_shading_exact_001/calendar_schedule_file_shading_exact.idf"
+weather = "data/conformance_cases/calendar_schedule_file_shading_exact_001/calendar_schedule_file_shading_exact.epw"
+auxiliary_files = ["schedule_file_shading.csv"]
+
+[[outputs]]
+key = "ALPHA SURFACE_SHADING"
+variable = "Schedule Value"
+frequency = "timestep"
+class = "schedule"
+source = "eso"
+domain = "schedule"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[outputs]]
+key = "BETA SURFACE_SHADING"
+variable = "Schedule Value"
+frequency = "timestep"
+class = "schedule"
+source = "eso"
+domain = "schedule"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "schedule"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_schedule_file_shading_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-schedule-file-shading-exact"
+blocking = true

@@ -18,19 +18,29 @@ use ep_model::{
     RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
     ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
     ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleDayType,
-    ScheduleFile, ScheduleFileColumnSeparator, ScheduleId, ScheduleInterpolation,
-    ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear,
-    SetpointManagerComponent, SiteLocation, SolarDistribution, SpecialDayType, SunExposure,
-    Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
-    ThermostatSetpointId, TimestepConfig, TypedModel, Version, WeekScheduleId, WindExposure, Zone,
-    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
-    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
-    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
+    ScheduleFile, ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn,
+    ScheduleId, ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits,
+    ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
+    SolarDistribution, SpecialDayType, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
+    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
+    TypedModel, Version, WeekScheduleId, WindExposure, Zone, ZoneEquipmentConnection,
+    ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId,
+    ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
+    ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
+use std::collections::BTreeMap;
 use std::path::{Component, Path};
 
 const MAX_OPAQUE_CONSTRUCTION_LAYERS: usize = 10;
+
+#[derive(Clone, Copy)]
+struct AuxiliaryFileDiagnosticCodes {
+    missing_root: &'static str,
+    unsupported_path: &'static str,
+    root_or_read_failed: &'static str,
+    file_not_found: &'static str,
+}
 
 /// Ordered model compiler stages.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -223,6 +233,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Schedule:Constant",
     "Schedule:Compact",
     "Schedule:File",
+    "Schedule:File:Shading",
     "Schedule:Day:Hourly",
     "Schedule:Day:Interval",
     "Schedule:Day:List",
@@ -308,6 +319,7 @@ impl<'a> Compiler<'a> {
         self.parse_site_location(&mut model);
         self.parse_materials(&mut model);
         self.parse_constructions(&mut model);
+        self.parse_file_shading_schedule(&mut model);
         self.parse_schedule_type_limits(&mut model);
         self.parse_schedules(&mut model);
         self.parse_compact_schedules(&mut model);
@@ -867,6 +879,300 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_file_shading_schedule(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "Schedule:File:Shading";
+        let objects = self.objects(OBJECT_TYPE);
+        if objects.len() > 1 {
+            self.warning(
+                "ExtraScheduleFileShadingObjectsIgnored",
+                OBJECT_TYPE,
+                None,
+                None,
+                format!(
+                    "{OBJECT_TYPE} has {} objects; only the first source-ordered object is used",
+                    objects.len()
+                ),
+            );
+        }
+        let Some((object_name, object)) = objects.into_iter().next() else {
+            return;
+        };
+        let Some(file_name) = self.required_string(OBJECT_TYPE, &object_name, &object, "file_name")
+        else {
+            return;
+        };
+
+        let is_csv = Path::new(&file_name)
+            .extension()
+            .and_then(|extension| extension.to_str())
+            .is_some_and(|extension| extension.eq_ignore_ascii_case("csv"));
+        if !is_csv {
+            self.error(
+                "UnsupportedScheduleFileShadingFormat",
+                OBJECT_TYPE,
+                Some(&object_name),
+                Some("file_name"),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} currently requires a staged comma-separated .csv file"
+                ),
+            );
+            return;
+        }
+
+        let Some(contents) = self.read_staged_auxiliary_file(
+            OBJECT_TYPE,
+            &object_name,
+            &file_name,
+            AuxiliaryFileDiagnosticCodes {
+                missing_root: "MissingScheduleFileShadingAuxiliaryRoot",
+                unsupported_path: "UnsupportedScheduleFileShadingPath",
+                root_or_read_failed: "ScheduleFileShadingReadFailed",
+                file_not_found: "ScheduleFileShadingNotFound",
+            },
+        ) else {
+            return;
+        };
+        let mut lines = contents.lines();
+        let Some(header_line) = lines.next() else {
+            self.error(
+                "EmptyScheduleFileShading",
+                OBJECT_TYPE,
+                Some(&object_name),
+                Some("file_name"),
+                format!("{OBJECT_TYPE}/{object_name} requires one CSV header row"),
+            );
+            return;
+        };
+        let header_line = header_line.strip_prefix('\u{feff}').unwrap_or(header_line);
+        let mut headers = match parse_delimited_row(header_line, ',') {
+            Ok(headers) => headers
+                .into_iter()
+                .map(|header| header.trim().to_string())
+                .collect::<Vec<_>>(),
+            Err(reason) => {
+                self.error(
+                    "ScheduleFileShadingCsvParseFailed",
+                    OBJECT_TYPE,
+                    Some(&object_name),
+                    Some("file_name"),
+                    format!("{OBJECT_TYPE}/{object_name} header row could not be parsed: {reason}"),
+                );
+                return;
+            }
+        };
+
+        let legacy_trailing_parenthesis = headers.last().is_some_and(|header| header == "()");
+        if legacy_trailing_parenthesis {
+            headers.pop();
+            self.warning(
+                "ScheduleFileShadingLegacyEmptySurfaceColumnRemoved",
+                OBJECT_TYPE,
+                Some(&object_name),
+                Some("file_name"),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} removed the legacy trailing () surface header"
+                ),
+            );
+        }
+        if headers.is_empty() {
+            self.error(
+                "InvalidScheduleFileShadingHeader",
+                OBJECT_TYPE,
+                Some(&object_name),
+                Some("file_name"),
+                format!("{OBJECT_TYPE}/{object_name} requires a timestamp header column"),
+            );
+            return;
+        }
+        if let Some(index) = headers
+            .iter()
+            .enumerate()
+            .skip(1)
+            .find_map(|(index, header)| header.is_empty().then_some(index))
+        {
+            self.error(
+                "InvalidScheduleFileShadingHeader",
+                OBJECT_TYPE,
+                Some(&object_name),
+                Some("file_name"),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} surface header column {} must not be blank",
+                    index + 1
+                ),
+            );
+            return;
+        }
+
+        let data_lines = lines.collect::<Vec<_>>();
+        let timesteps_per_hour = model.timestep.number_of_timesteps_per_hour;
+        if timesteps_per_hour == 0 {
+            self.error(
+                "InvalidScheduleFileShadingTimestep",
+                OBJECT_TYPE,
+                Some(&object_name),
+                Some("file_name"),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} requires a positive number of timesteps per hour"
+                ),
+            );
+            return;
+        }
+        let Some(items_per_day) = 24_u32.checked_mul(timesteps_per_hour) else {
+            self.error(
+                "InvalidScheduleFileShadingTimestep",
+                OBJECT_TYPE,
+                Some(&object_name),
+                Some("file_name"),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} timestep count overflowed the annual row calculation"
+                ),
+            );
+            return;
+        };
+        let (Some(non_leap_row_count), Some(leap_row_count)) = (
+            365_u32.checked_mul(items_per_day),
+            366_u32.checked_mul(items_per_day),
+        ) else {
+            self.error(
+                "InvalidScheduleFileShadingTimestep",
+                OBJECT_TYPE,
+                Some(&object_name),
+                Some("file_name"),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} timestep count overflowed the annual row calculation"
+                ),
+            );
+            return;
+        };
+        let source_day_count = if usize::try_from(non_leap_row_count).ok() == Some(data_lines.len())
+        {
+            Some(365)
+        } else if usize::try_from(leap_row_count).ok() == Some(data_lines.len()) {
+            Some(366)
+        } else {
+            None
+        };
+        let Some(source_day_count) = source_day_count else {
+            self.error(
+                "InvalidScheduleFileShadingRowCount",
+                OBJECT_TYPE,
+                Some(&object_name),
+                Some("file_name"),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} requires exactly {} or {} data rows for {timesteps_per_hour} timesteps per hour, found {}",
+                    non_leap_row_count,
+                    leap_row_count,
+                    data_lines.len()
+                ),
+            );
+            return;
+        };
+
+        let mut first_header_indices = BTreeMap::new();
+        for (index, header) in headers.iter().enumerate() {
+            first_header_indices.entry(header.clone()).or_insert(index);
+        }
+        let selected_headers = first_header_indices
+            .into_iter()
+            .filter(|(_header, index)| *index != 0)
+            .collect::<Vec<_>>();
+        let mut column_values = selected_headers
+            .iter()
+            .map(|_header| Vec::with_capacity(data_lines.len()))
+            .collect::<Vec<_>>();
+
+        for (row_index, line) in data_lines.iter().enumerate() {
+            let mut fields = match parse_delimited_row(line, ',') {
+                Ok(fields) => fields,
+                Err(reason) => {
+                    self.error(
+                        "ScheduleFileShadingCsvParseFailed",
+                        OBJECT_TYPE,
+                        Some(&object_name),
+                        Some("file_name"),
+                        format!(
+                            "{OBJECT_TYPE}/{object_name} row {} could not be parsed: {reason}",
+                            row_index + 2
+                        ),
+                    );
+                    return;
+                }
+            };
+            if legacy_trailing_parenthesis
+                && fields.len() == headers.len() + 1
+                && fields.last().is_some_and(|field| field.trim().is_empty())
+            {
+                fields.pop();
+            }
+            if fields.len() != headers.len() {
+                self.error(
+                    "InvalidScheduleFileShadingColumnCount",
+                    OBJECT_TYPE,
+                    Some(&object_name),
+                    Some("file_name"),
+                    format!(
+                        "{OBJECT_TYPE}/{object_name} row {} has {} columns, but the header defines {}",
+                        row_index + 2,
+                        fields.len(),
+                        headers.len()
+                    ),
+                );
+                return;
+            }
+
+            for ((surface_header, column_index), values) in
+                selected_headers.iter().zip(column_values.iter_mut())
+            {
+                let value = match fields[*column_index].trim().parse::<f64>() {
+                    Ok(value) if value.is_finite() => value,
+                    Ok(_) | Err(_) => {
+                        self.error(
+                            "ScheduleFileShadingColumnNonNumeric",
+                            OBJECT_TYPE,
+                            Some(&object_name),
+                            Some("file_name"),
+                            format!(
+                                "{OBJECT_TYPE}/{object_name} surface column {surface_header:?} row {} is not a finite number",
+                                row_index + 2
+                            ),
+                        );
+                        return;
+                    }
+                };
+                values.push(value);
+            }
+        }
+
+        let mut columns = Vec::with_capacity(selected_headers.len());
+        for ((surface_header, _column_index), values) in
+            selected_headers.into_iter().zip(column_values)
+        {
+            let generated_name = format!("{surface_header}_shading");
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &generated_name, columns.len())
+            else {
+                continue;
+            };
+            let id = ScheduleId(id_value);
+            if model.schedule_names.insert(&generated_name, id).is_some() {
+                self.duplicate_name(OBJECT_TYPE, &generated_name);
+                continue;
+            }
+            columns.push(ScheduleFileShadingColumn {
+                id,
+                surface_header,
+                schedule_name: NormalizedName::new(&generated_name),
+                values,
+            });
+        }
+
+        model.file_shading_schedule = Some(ScheduleFileShading {
+            file_name,
+            timesteps_per_hour,
+            source_day_count,
+            columns,
+        });
+    }
+
     fn parse_schedules(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("Schedule:Constant") {
             let schedule_type_limits = match self.optional_string(
@@ -885,8 +1191,8 @@ impl<'a> Compiler<'a> {
                 ),
                 None => None,
             };
-            let Some(id_value) = self.checked_id("Schedule:Constant", &name, model.schedules.len())
-            else {
+            let schedule_index = file_shading_schedule_column_count(model) + model.schedules.len();
+            let Some(id_value) = self.checked_id("Schedule:Constant", &name, schedule_index) else {
                 continue;
             };
             let id = ScheduleId(id_value);
@@ -930,7 +1236,9 @@ impl<'a> Compiler<'a> {
                 ),
                 None => None,
             };
-            let schedule_index = model.schedules.len() + model.compact_schedules.len();
+            let schedule_index = file_shading_schedule_column_count(model)
+                + model.schedules.len()
+                + model.compact_schedules.len();
             let Some(id_value) = self.checked_id("Schedule:Compact", &name, schedule_index) else {
                 continue;
             };
@@ -1079,8 +1387,10 @@ impl<'a> Compiler<'a> {
                 supported = false;
             }
 
-            let schedule_index =
-                model.schedules.len() + model.compact_schedules.len() + model.file_schedules.len();
+            let schedule_index = file_shading_schedule_column_count(model)
+                + model.schedules.len()
+                + model.compact_schedules.len()
+                + model.file_schedules.len();
             let Some(id_value) = self.checked_id("Schedule:File", &name, schedule_index) else {
                 continue;
             };
@@ -1739,7 +2049,8 @@ impl<'a> Compiler<'a> {
                 continue;
             };
 
-            let schedule_index = model.schedules.len()
+            let schedule_index = file_shading_schedule_column_count(model)
+                + model.schedules.len()
                 + model.compact_schedules.len()
                 + model.file_schedules.len()
                 + model.year_schedules.len();
@@ -1922,23 +2233,21 @@ impl<'a> Compiler<'a> {
         Some(week_schedules.map(|week_schedule| week_schedule.unwrap_or(WeekScheduleId(0))))
     }
 
-    fn schedule_file_values(
+    fn read_staged_auxiliary_file(
         &mut self,
+        object_type: &str,
         object_name: &str,
         file_name: &str,
-        column_number: u32,
-        rows_to_skip_at_top: u32,
-        number_of_hours_of_data: u32,
-        column_separator: ScheduleFileColumnSeparator,
-    ) -> Option<Vec<f64>> {
+        diagnostic_codes: AuxiliaryFileDiagnosticCodes,
+    ) -> Option<String> {
         let Some(auxiliary_root) = self.auxiliary_root else {
             self.error(
-                "MissingScheduleFileAuxiliaryRoot",
-                "Schedule:File",
+                diagnostic_codes.missing_root,
+                object_type,
                 Some(object_name),
                 Some("file_name"),
                 format!(
-                    "Schedule:File/{object_name} requires a staged auxiliary-file root during compilation"
+                    "{object_type}/{object_name} requires a staged auxiliary-file root during compilation"
                 ),
             );
             return None;
@@ -1953,12 +2262,12 @@ impl<'a> Compiler<'a> {
             })
         {
             self.error(
-                "UnsupportedScheduleFilePath",
-                "Schedule:File",
+                diagnostic_codes.unsupported_path,
+                object_type,
                 Some(object_name),
                 Some("file_name"),
                 format!(
-                    "Schedule:File/{object_name} file_name must stay below the staged auxiliary-file root"
+                    "{object_type}/{object_name} file_name must stay below the staged auxiliary-file root"
                 ),
             );
             return None;
@@ -1968,12 +2277,12 @@ impl<'a> Compiler<'a> {
             Ok(path) => path,
             Err(error) => {
                 self.error(
-                    "ScheduleFileReadFailed",
-                    "Schedule:File",
+                    diagnostic_codes.root_or_read_failed,
+                    object_type,
                     Some(object_name),
                     Some("file_name"),
                     format!(
-                        "Schedule:File/{object_name} could not resolve auxiliary root {}: {error}",
+                        "{object_type}/{object_name} could not resolve auxiliary root {}: {error}",
                         auxiliary_root.display()
                     ),
                 );
@@ -1985,12 +2294,12 @@ impl<'a> Compiler<'a> {
             Ok(path) => path,
             Err(error) => {
                 self.error(
-                    "ScheduleFileNotFound",
-                    "Schedule:File",
+                    diagnostic_codes.file_not_found,
+                    object_type,
                     Some(object_name),
                     Some("file_name"),
                     format!(
-                        "Schedule:File/{object_name} could not open {}: {error}",
+                        "{object_type}/{object_name} could not open {}: {error}",
                         requested_path.display()
                     ),
                 );
@@ -1999,32 +2308,54 @@ impl<'a> Compiler<'a> {
         };
         if !canonical_path.starts_with(&canonical_root) {
             self.error(
-                "UnsupportedScheduleFilePath",
-                "Schedule:File",
+                diagnostic_codes.unsupported_path,
+                object_type,
                 Some(object_name),
                 Some("file_name"),
                 format!(
-                    "Schedule:File/{object_name} resolved outside the staged auxiliary-file root"
+                    "{object_type}/{object_name} resolved outside the staged auxiliary-file root"
                 ),
             );
             return None;
         }
-        let contents = match std::fs::read_to_string(&canonical_path) {
-            Ok(contents) => contents,
+        match std::fs::read_to_string(&canonical_path) {
+            Ok(contents) => Some(contents),
             Err(error) => {
                 self.error(
-                    "ScheduleFileReadFailed",
-                    "Schedule:File",
+                    diagnostic_codes.root_or_read_failed,
+                    object_type,
                     Some(object_name),
                     Some("file_name"),
                     format!(
-                        "Schedule:File/{object_name} failed to read {}: {error}",
+                        "{object_type}/{object_name} failed to read {}: {error}",
                         canonical_path.display()
                     ),
                 );
-                return None;
+                None
             }
-        };
+        }
+    }
+
+    fn schedule_file_values(
+        &mut self,
+        object_name: &str,
+        file_name: &str,
+        column_number: u32,
+        rows_to_skip_at_top: u32,
+        number_of_hours_of_data: u32,
+        column_separator: ScheduleFileColumnSeparator,
+    ) -> Option<Vec<f64>> {
+        let contents = self.read_staged_auxiliary_file(
+            "Schedule:File",
+            object_name,
+            file_name,
+            AuxiliaryFileDiagnosticCodes {
+                missing_root: "MissingScheduleFileAuxiliaryRoot",
+                unsupported_path: "UnsupportedScheduleFilePath",
+                root_or_read_failed: "ScheduleFileReadFailed",
+                file_not_found: "ScheduleFileNotFound",
+            },
+        )?;
 
         let data_lines = contents
             .lines()
@@ -6064,6 +6395,13 @@ fn parse_delimited_row(line: &str, delimiter: char) -> Result<Vec<String>, &'sta
     Ok(fields)
 }
 
+fn file_shading_schedule_column_count(model: &TypedModel) -> usize {
+    model
+        .file_shading_schedule
+        .as_ref()
+        .map_or(0, |schedule| schedule.columns.len())
+}
+
 fn schedule_minutes_per_timestep(timesteps_per_hour: u32) -> Option<u32> {
     (timesteps_per_hour > 0 && 60 % timesteps_per_hour == 0).then(|| 60 / timesteps_per_hour)
 }
@@ -6712,6 +7050,7 @@ mod tests {
     mod schedule_day_interval;
     mod schedule_day_list;
     mod schedule_file;
+    mod schedule_file_shading;
     mod schedule_week_compact;
     mod schedule_year;
 
