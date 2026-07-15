@@ -7,22 +7,25 @@ use crate::time_axis::{DayType, EnvironmentTimeAxis, EnvironmentTimePoint, TimeA
 use ep_model::{
     OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, People,
     PeopleNumberCalculationMethod, ScheduleCompact, ScheduleCompactDayProfile,
-    ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant, ScheduleDayType, ScheduleFile,
-    ScheduleId, ScheduleInterpolation, TypedModel, ZoneId,
+    ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleDayType, ScheduleFile, ScheduleId,
+    ScheduleInterpolation, TypedModel, ZoneId,
 };
 use std::collections::BTreeSet;
 
+mod constant;
 mod day_table;
 mod external_interface;
 mod file_shading;
 
+use constant::constant_schedule_series;
+pub use constant::simulate_constant_schedules;
 #[cfg(test)]
 use day_table::{compiled_day_schedule_value, year_schedule_hourly_value};
 use day_table::{
     precompile_day_schedule_table, year_schedule_series_for_environment_time_axis,
     year_schedule_series_for_time_axis,
 };
-use external_interface::external_interface_schedule_series;
+use external_interface::external_interface_schedule_series_iter;
 use file_shading::{
     file_shading_series_for_environment_time_axis, file_shading_series_for_time_axis,
 };
@@ -328,7 +331,7 @@ pub enum ScheduleSeriesKind {
         /// Constant value reused for every timestep.
         value: f64,
     },
-    /// Immutable initial value of an `ExternalInterface:Schedule`.
+    /// Immutable initial value of an external-interface schedule family.
     ExternalInterfaceInitialValue {
         /// Initial value reused until an external interface update is ported.
         value: f64,
@@ -419,23 +422,6 @@ pub struct ZoneInternalGainTrace {
     pub values_w: Vec<f64>,
 }
 
-/// Simulates constant schedules for a fixed number of samples.
-#[must_use]
-pub fn simulate_constant_schedules(model: &TypedModel, sample_count: usize) -> Vec<ScheduleTrace> {
-    model
-        .schedules
-        .iter()
-        .map(|schedule| ScheduleTrace {
-            schedule_id: schedule.id,
-            schedule_name: schedule.name.0.clone(),
-            kind: ScheduleSeriesKind::ConstantScalar {
-                value: schedule.hourly_value,
-            },
-            values: vec![schedule.hourly_value; sample_count],
-        })
-        .collect()
-}
-
 /// Simulates constant and calendar-invariant compact schedules for hourly samples.
 pub fn simulate_schedule_values(
     model: &TypedModel,
@@ -495,11 +481,10 @@ pub fn precompute_schedule_value_series_for_time_axis(
         .chain(model.year_schedules.iter().map(|schedule| {
             year_schedule_series_for_time_axis(model, schedule, time_axis, &day_schedule_table)
         }))
-        .chain(
-            model.external_interface_schedules.iter().map(|schedule| {
-                external_interface_schedule_series(schedule, time_axis.points.len())
-            }),
-        )
+        .chain(external_interface_schedule_series_iter(
+            model,
+            time_axis.points.len(),
+        ))
         .collect()
 }
 
@@ -543,11 +528,10 @@ pub fn precompute_schedule_value_series_for_environment_time_axis(
                 &day_schedule_table,
             )
         }))
-        .chain(
-            model.external_interface_schedules.iter().map(|schedule| {
-                external_interface_schedule_series(schedule, time_axis.points.len())
-            }),
-        )
+        .chain(external_interface_schedule_series_iter(
+            model,
+            time_axis.points.len(),
+        ))
         .collect()
 }
 
@@ -584,33 +568,12 @@ fn precompute_schedule_value_series_for_hours(
         .map(|schedule| compact_schedule_series_for_hours(schedule, hours.clone()))
         .collect::<Result<Vec<_>, _>>()?;
     let sample_count = hours.into_iter().count();
-    let external = model
-        .external_interface_schedules
-        .iter()
-        .map(|schedule| external_interface_schedule_series(schedule, sample_count));
+    let external = external_interface_schedule_series_iter(model, sample_count);
     Ok(constants
         .into_iter()
         .chain(compact)
         .chain(external)
         .collect())
-}
-
-fn constant_schedule_series(
-    schedule: &ScheduleConstant,
-    hours: impl IntoIterator<Item = u32>,
-) -> ScheduleValueSeries {
-    let values = hours
-        .into_iter()
-        .map(|_hour| schedule.hourly_value)
-        .collect();
-    ScheduleTrace {
-        schedule_id: schedule.id,
-        schedule_name: schedule.name.0.clone(),
-        kind: ScheduleSeriesKind::ConstantScalar {
-            value: schedule.hourly_value,
-        },
-        values,
-    }
 }
 
 fn compact_schedule_series_for_hours(

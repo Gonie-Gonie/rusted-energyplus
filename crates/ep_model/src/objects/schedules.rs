@@ -130,6 +130,25 @@ pub struct ExternalInterfaceSchedule {
     pub initial_value: f64,
 }
 
+/// FMU-import schedule initialized locally while its external interface is inactive.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ExternalInterfaceFmuImportSchedule {
+    /// Typed ID shared with all other top-level schedule families.
+    pub id: ScheduleId,
+    /// Schedule name.
+    pub name: NormalizedName,
+    /// Optional type limits.
+    pub schedule_type_limits: Option<ScheduleTypeLimitId>,
+    /// Retain-case FMU archive filename.
+    pub fmu_file_name: String,
+    /// Retain-case FMU instance name.
+    pub fmu_instance_name: String,
+    /// Retain-case FMU output-variable name.
+    pub fmu_variable_name: String,
+    /// Value held while live FMU-import exchange is inactive.
+    pub initial_value: f64,
+}
+
 /// Delimiter used by one flat `Schedule:File` input.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub enum ScheduleFileColumnSeparator {

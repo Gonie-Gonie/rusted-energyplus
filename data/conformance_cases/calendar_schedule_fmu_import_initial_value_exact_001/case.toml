@@ -1,0 +1,60 @@
+id = "calendar_schedule_fmu_import_initial_value_exact_001"
+title = "FMU Import To Schedule inactive initial value at zone timesteps"
+milestone = "full-source-order-fmu-import-to-schedule"
+purpose = "Block on exact EnergyPlus ExternalInterface:FunctionalMockupUnitImport:To:Schedule initial-value population when no ExternalInterface activation or FMU provider object is present."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The fixture is one non-actual 2032-01-01 Thursday RunPeriod with Timestep,4, all six RunPeriod weather/calendar policies set to No, and a synthetic 24-row EPW with no holidays or daylight saving.",
+  "One ExternalInterface:FunctionalMockupUnitImport:To:Schedule named FMU IMPORT INITIAL VALUE references ScheduleTypeLimits Any Number, retains missing.fmu, ProbeInstance, and ProbeOutput as inert binding metadata, and declares Initial Value 0.625. No ExternalInterface activation object or FunctionalMockupUnitImport provider object is present, so EnergyPlus retains that initial value and emits its missing-activation warning exactly once without opening the named FMU file.",
+  "The zero-tolerance external claim is exactly 96 ordered, unique Timestep Schedule Value samples and timestamps, each equal to 0.625. The gate also locks all raw EnergyPlus ESO values and timestamp fields.",
+  "Converted epJSON must retain exactly one schedule with schedule_type_limits_names Any Number, the three FMU binding strings, and initial_value 0.625 while containing no ExternalInterface activation or FunctionalMockupUnitImport provider family. Exact Environment and disabled-daylight-saving EIO rows plus the one-warning successful ERR and END completion records are also locked.",
+  "FMU provider resolution, object-list validation or diagnostics, FMU file opening/unpacking and modelDescription parsing, FMI 1 import binding, From:Variable instances, value-reference or causality checks, live exchange and warmup updates, the activated-without-provider permissive EnergyPlus no-op branch, bounded ScheduleTypeLimits validation, downstream consumers, multiple objects, broad diagnostic parity, actual/design-day/multi-environment execution, and Rust raw ESO serialization remain outside the claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_schedule_fmu_import_initial_value_exact_001/calendar_schedule_fmu_import_initial_value_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["schedule", "weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_schedule_fmu_import_initial_value_exact_001/calendar_schedule_fmu_import_initial_value_exact.idf"
+weather = "data/conformance_cases/calendar_schedule_fmu_import_initial_value_exact_001/calendar_schedule_fmu_import_initial_value_exact.epw"
+
+[[outputs]]
+key = "FMU IMPORT INITIAL VALUE"
+variable = "Schedule Value"
+frequency = "timestep"
+class = "schedule"
+source = "eso"
+domain = "schedule"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "schedule"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_schedule_fmu_import_initial_value_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-schedule-fmu-import-initial-value-exact"
+blocking = true

@@ -1,0 +1,50 @@
+Version,26.1;
+
+Building,
+  FMU Import Schedule Initial Value Exact Fixture,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+Timestep,4;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+RunPeriod,
+  FMU Import Schedule Initial Value Run Period,
+  1,
+  1,
+  2032,
+  1,
+  1,
+  2032,
+  Thursday,
+  No,
+  No,
+  No,
+  No,
+  No,
+  No;
+
+ScheduleTypeLimits,
+  Any Number;
+
+ExternalInterface:FunctionalMockupUnitImport:To:Schedule,
+  FMU Import Initial Value,
+  Any Number,
+  missing.fmu,
+  ProbeInstance,
+  ProbeOutput,
+  0.625;
+
+Output:Variable,
+  FMU IMPORT INITIAL VALUE,
+  Schedule Value,
+  Timestep;

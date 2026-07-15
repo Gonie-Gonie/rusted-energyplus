@@ -577,6 +577,13 @@ fn schedule_ids(model: &SimulationModel) -> impl Iterator<Item = ScheduleId> + '
                 .iter()
                 .map(|schedule| schedule.id),
         )
+        .chain(
+            model
+                .typed
+                .external_interface_fmu_import_schedules
+                .iter()
+                .map(|schedule| schedule.id),
+        )
 }
 
 fn compile_stage_contracts(

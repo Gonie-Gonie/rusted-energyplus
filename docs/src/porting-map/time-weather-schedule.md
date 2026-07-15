@@ -95,6 +95,7 @@ equivalent to advancing the reported run-period calendar.
 | file schedule intake and 366-day expansion | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 1573-1863 validate `Schedule:File` metadata, resolve and parse the selected external column, build hourly day schedules, and keep a 366-day table. CP45 locks only one flat comma CSV with one skipped header, selected column 2, 8760 numeric hourly rows, explicit No interpolation, 60 minutes per item, and DST adjustment No. Lines 1858-1862 alias February 29 to February 28 when the actual selected-column row count is below 8784. |
 | shading-file schedule intake and generated columns | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 552-713 resolve the unique `Schedule:File:Shading` sidecar, parse comma input with one header row, and require exactly 365 or 366 days times 24 hours times the model timestep count. Lines 1871-1959 skip column zero and create one `<header>_shading` detailed schedule per unique remaining header. CP50 locks only one common-year 35,040-row, `Timestep,4`, two-surface-column CSV and the first day's two generated Schedule Value vectors; it deliberately omits surfaces and Imported ShadowCalculation. |
 | inactive external-interface schedule intake | `Sched::ProcessScheduleInput`; `Sched::ExternalInterfaceSetSchedule`; `ExternalInterface::GetExternalInterfaceInput`; `ExternalInterface::WarnIfExternalInterfaceObjectsAreUsed`; `SimulationManager::ManageSimulation` | EnergyPlus 26.1 `ScheduleManager.cc` lines 490-497 size intake storage; lines 2004-2062 create one detailed schedule plus internal day/week ownership and seed every zone timestep from Initial Value; lines 2198-2219 apply type-limit validation; and lines 2706-2731 fill the day cache. `ExternalInterface.cc` lines 187-192 and 2317-2331 detect the missing BCVTB activation and emit the fixed-value warning. `SimulationManager.cc` lines 493-536 show the live-exchange call before weather/schedule work; CP51 deliberately leaves that interface inactive and locks only the immutable initial value. |
+| inactive FMU import-to-schedule intake | `Sched::ProcessScheduleInput`; `Sched::ExternalInterfaceSetSchedule`; `ExternalInterface::GetExternalInterfaceInput`; `ExternalInterface::WarnIfExternalInterfaceObjectsAreUsed`; `SimulationManager::ManageSimulation` | EnergyPlus 26.1 `ScheduleManager.cc` lines 499-504 size this source-ordered family after `ExternalInterface:Schedule`; lines 2065-2130 retain the FMU file/instance/variable binding strings, create detailed day/week ownership, and seed all 366 days from Initial Value; lines 2198-2219 own the later type-limit pass; and lines 2706-2731 fill the day cache. `ExternalInterface.cc` lines 201-205 and 2317-2331 emit the missing-activation warning; lines 1331-1430 and 705-708 own live binding and updates. `SimulationManager.cc` lines 493-536 provide exchange-order context. CP52 omits both activation and provider objects and locks only the immutable initial scalar. |
 | day/week/year schedule intake and annual pointer expansion | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 803-854 load 24-value `Schedule:Day:Hourly` profiles, lines 1046-1078 resolve all 12 `Schedule:Week:Daily` day-type pointers, and lines 1149-1246 expand source-ordered `Schedule:Year` ranges into a 366-day Week table. CP46 locks only two non-wrapping Year ranges whose intentionally unassigned day 60 copies day 59's Week pointer at lines 1223-1227. |
 | interval day-schedule intake | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 858-932 parse `Schedule:Day:Interval` after all Day:Hourly objects and before later Day/Week families. CP47 locks one blank/default-No aligned profile plus Average and Linear non-aligned profiles at `Timestep,4`, reusing `ProcessIntervalFields` and `DaySchedule::populateFromMinuteVals` minute-to-zone-timestep semantics. |
 | schedule current values | `Sched::UpdateScheduleVals` | Writes every schedule's `currentVal`: an EMS value wins when actuated; otherwise it calls `getHrTsVal(state, HourOfDay, TimeStep)`. It does not calculate or advance calendar state. |
@@ -608,6 +609,68 @@ serialization, and the following
 `ExternalInterface:FunctionalMockupUnitImport:To:Schedule` and
 `ExternalInterface:FunctionalMockupUnitExport:To:Schedule` families remain
 outside this claim.
+
+## FMU Import To Schedule Inactive Initial-Value Evidence Checkpoint
+
+`calendar_schedule_fmu_import_initial_value_exact_001` adds the next
+source-ordered external schedule family. The fixture contains exactly one
+`ExternalInterface:FunctionalMockupUnitImport:To:Schedule` named
+`FMU IMPORT INITIAL VALUE`, references the unlimited `Any Number`
+`ScheduleTypeLimits`, retains `missing.fmu`,
+`ProbeInstance`, and `ProbeOutput` as inert binding
+metadata, declares `Initial Value=0.625`, and deliberately omits both
+the `ExternalInterface` activation object and the
+`ExternalInterface:FunctionalMockupUnitImport` provider object. It
+runs one non-actual 2032-01-01 Thursday at `Timestep,4` against a
+24-row EPW with no holidays or daylight saving.
+
+EnergyPlus 26.1 prescans this family immediately after
+`ExternalInterface:Schedule` at `ScheduleManager.cc` lines
+499-504. `Sched::ProcessScheduleInput` lines 2065-2130 then applies
+the global, case-insensitive schedule-name collision rule, reads the optional
+type-limit reference and required file/instance/variable binding strings plus
+initial value, creates the internal detailed day/week ownership, calls
+`Sched::ExternalInterfaceSetSchedule`, and points all 366 days at the
+initialized week. The shared scalar population routine at lines 2706-2731
+writes `0.625` into every hour and zone timestep. The later
+type-limit pass at lines 2198-2219 is ownership context; this unlimited fixture
+does not exercise bounded validation. The corresponding IDD definition is
+lines 86573-86600, and the epJSON schema entry is lines 161579-161681.
+
+With no FMU Import activation,
+`ExternalInterface::GetExternalInterfaceInput` lines 201-205 invokes
+`WarnIfExternalInterfaceObjectsAreUsed`; lines 2317-2331 emit the
+exact two-line warning that values will not be updated. The blocking gate
+requires that warning exactly once. The live branch binds FMU
+import-to-schedule variables at `ExternalInterface.cc` lines
+1331-1430 and updates values at lines 705-708. Those routines, FMU file access,
+and the `SimulationManager::ManageSimulation` zone-timestep exchange
+order at lines 493-536 are source ownership only because this fixture has no
+activation or provider object.
+
+The external numerical claim is exactly one series of 96 ordered, unique
+Timestep `Schedule Value` samples and timestamps, all equal to
+`0.625`, at zero tolerance. The gate also locks the complete IDF
+object vector and EPW, all 96 raw EnergyPlus ESO values and timestamp fields,
+converted epJSON retention of
+`schedule_type_limits_names=Any Number`,
+`fmu_file_name=missing.fmu`,
+`fmu_instance_name=ProbeInstance`,
+`fmu_variable_name=ProbeOutput`, and
+`initial_value=0.625` with no activation or provider family, exact
+Environment and disabled-daylight-saving EIO rows, and successful ERR/END
+completion with exactly 1 Warning and 0 Severe errors. Rust stores this
+inactive family through the shared immutable initial-value series
+representation and expands it to the requested time-axis length.
+
+FMU provider resolution, object-list validation or diagnostics, FMU file
+opening/unpacking and `modelDescription` parsing, FMI 1 import
+binding, `From:Variable` instances, value-reference or causality
+checks, live exchange and warmup updates, the activated-without-provider
+permissive EnergyPlus no-op branch, bounded type-limit validation, downstream
+consumers, multiple objects, broad diagnostic parity including Rust warning
+text/count, actual/design-day/multi-environment execution, and Rust raw ESO
+serialization remain outside this claim.
 
 ## Schedule:Day/Week/Year Leap-Table Evidence Checkpoint
 

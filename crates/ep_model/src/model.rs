@@ -4,18 +4,19 @@ use crate::{
     AirLoopHvac, AvailabilityManagerComponent, BoilerHotWater, BranchId, BranchListId, Building,
     ChillerElectricEir, CoilComponent, ComponentId, ConnectorId, ConnectorListId, Construction,
     ConstructionId, DayScheduleId, DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId,
-    ExternalInterfaceSchedule, FanComponent, IdealLoadsAirSystem, IdealLoadsAirSystemId,
-    InternalGainId, LoopId, Material, MaterialId, NameMap, Node, NodeId, NodeList, NodeListId,
-    NormalizedName, OtherEquipment, People, PlantBranch, PlantBranchList, PlantConnector,
-    PlantConnectorKind, PlantConnectorList, PlantLoop, PumpConstantSpeed, RunPeriod,
-    RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
-    ScheduleCompact, ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList,
-    ScheduleFile, ScheduleFileShading, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
-    ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
-    Surface, SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
-    TimestepConfig, Version, WeekScheduleId, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
-    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
-    ZoneThermostat, ZoneThermostatId,
+    ExternalInterfaceFmuImportSchedule, ExternalInterfaceSchedule, FanComponent,
+    IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId, LoopId, Material, MaterialId,
+    NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName, OtherEquipment, People,
+    PlantBranch, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
+    PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId,
+    RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant,
+    ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleFile, ScheduleFileShading,
+    ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact, ScheduleWeekDaily,
+    ScheduleYear, SetpointManagerComponent, SiteLocation, Surface, SurfaceConvectionAlgorithms,
+    SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version,
+    WeekScheduleId, Zone, ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId,
+    ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
+    ZoneThermostatId,
 };
 
 /// Minimal typed model for early compiler stages.
@@ -79,6 +80,8 @@ pub struct TypedModel {
     pub year_schedules: Vec<ScheduleYear>,
     /// Inactive external-interface schedules held at their initial values.
     pub external_interface_schedules: Vec<ExternalInterfaceSchedule>,
+    /// Inactive FMU-import schedules held at their initial values.
+    pub external_interface_fmu_import_schedules: Vec<ExternalInterfaceFmuImportSchedule>,
     /// Schedule names.
     pub schedule_names: NameMap<ScheduleId>,
     /// Zone internal gains from OtherEquipment objects.
@@ -217,6 +220,7 @@ impl Default for TypedModel {
             file_schedules: Vec::new(),
             year_schedules: Vec::new(),
             external_interface_schedules: Vec::new(),
+            external_interface_fmu_import_schedules: Vec::new(),
             schedule_names: NameMap::default(),
             other_equipment: Vec::new(),
             other_equipment_names: NameMap::default(),
@@ -299,6 +303,7 @@ impl TypedModel {
             + self.file_schedules.len()
             + self.year_schedules.len()
             + self.external_interface_schedules.len()
+            + self.external_interface_fmu_import_schedules.len()
             + self.other_equipment.len()
             + self.people.len()
             + self.thermostat_dual_setpoints.len()

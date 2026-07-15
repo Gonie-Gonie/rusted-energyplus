@@ -1119,6 +1119,10 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
             model.external_interface_schedules.len(),
         ),
         (
+            "external_interface_fmu_import_schedules",
+            model.external_interface_fmu_import_schedules.len(),
+        ),
+        (
             "file_shading_schedule_objects",
             usize::from(model.file_shading_schedule.is_some()),
         ),
@@ -1133,7 +1137,8 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
                 + model.file_schedules.len()
                 + file_shading_generated_schedules
                 + model.year_schedules.len()
-                + model.external_interface_schedules.len(),
+                + model.external_interface_schedules.len()
+                + model.external_interface_fmu_import_schedules.len(),
         ),
         (
             "day_schedules",
@@ -1245,7 +1250,8 @@ fn write_graph_and_plan(
                     .as_ref()
                     .map_or(0, |schedule| schedule.columns.len())
                 + model.typed.year_schedules.len()
-                + model.typed.external_interface_schedules.len(),
+                + model.typed.external_interface_schedules.len()
+                + model.typed.external_interface_fmu_import_schedules.len(),
             "weather_series_indices": 1,
             "output_handles": precomputed.output_registry.len(),
         },
@@ -1932,8 +1938,8 @@ mod tests {
     };
     use ep_compiler::compile_raw_model;
     use ep_model::{
-        ExternalInterfaceSchedule, NormalizedName, ScheduleFileShading, ScheduleFileShadingColumn,
-        ScheduleId, TypedModel,
+        ExternalInterfaceFmuImportSchedule, ExternalInterfaceSchedule, NormalizedName,
+        ScheduleFileShading, ScheduleFileShadingColumn, ScheduleId, TypedModel,
     };
     use ep_raw_model::parse_epjson_str_with_idf_order;
     use ep_runtime::{
@@ -2258,7 +2264,7 @@ mod tests {
     }
 
     #[test]
-    fn typed_counts_include_external_interface_schedules() {
+    fn typed_counts_include_external_interface_schedule_families() {
         let model = TypedModel {
             external_interface_schedules: vec![ExternalInterfaceSchedule {
                 id: ScheduleId(0),
@@ -2266,11 +2272,21 @@ mod tests {
                 schedule_type_limits: None,
                 initial_value: 0.375,
             }],
+            external_interface_fmu_import_schedules: vec![ExternalInterfaceFmuImportSchedule {
+                id: ScheduleId(1),
+                name: NormalizedName::new("FMU Import"),
+                schedule_type_limits: None,
+                fmu_file_name: "unused.fmu".to_string(),
+                fmu_instance_name: "UnusedInstance".to_string(),
+                fmu_variable_name: "UnusedOutput".to_string(),
+                initial_value: 0.625,
+            }],
             ..TypedModel::default()
         };
 
         let counts = typed_counts(&model);
         assert_eq!(counts["external_interface_schedules"], 1);
-        assert_eq!(counts["schedules"], 1);
+        assert_eq!(counts["external_interface_fmu_import_schedules"], 1);
+        assert_eq!(counts["schedules"], 2);
     }
 }

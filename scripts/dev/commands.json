@@ -341,6 +341,12 @@
                          "help":  "Gate exact inactive ExternalInterface:Schedule initial-value population and its one missing-activation warning."
                      },
                      {
+                         "name":  "compare-calendar-schedule-fmu-import-initial-value-exact",
+                         "path":  "compare\\compare-calendar-schedule-fmu-import-initial-value-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact inactive FMU Import To Schedule initial-value population, inert binding metadata, and its one missing-activation warning."
+                     },
+                     {
                          "name":  "compare-calendar-schedule-day-hourly-week-daily-year-leap-exact",
                          "path":  "compare\\compare-calendar-schedule-day-hourly-week-daily-year-leap-exact.ps1",
                          "group":  "compare",
