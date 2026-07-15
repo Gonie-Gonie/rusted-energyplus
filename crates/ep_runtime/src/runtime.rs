@@ -36,10 +36,11 @@ use crate::heat_balance::ctf::{
     surface_outside_conduction_flux_w_per_m2, surface_outside_conduction_rate_w,
     update_surface_ctf_history_constants,
 };
-use crate::heat_balance::initialization::initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache;
+use crate::heat_balance::initialization::initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled;
 #[cfg(test)]
 pub(crate) use crate::heat_balance::initialization::{
     initialize_heat_balance_state, initialize_heat_balance_state_with_ctf_coefficients,
+    initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache,
 };
 #[cfg(test)]
 use crate::heat_balance::inside_convection::{
@@ -103,10 +104,12 @@ use crate::heat_balance::surface_weather::{
     energyplus_exterior_wet_context_fraction, energyplus_exterior_wet_timestep_fraction,
     energyplus_weather_record_is_rain_at_timestep,
 };
-pub(crate) use crate::heat_balance::timestep::advance_heat_balance_state_one_timestep_internal_with_schedule_cache;
+pub(crate) use crate::heat_balance::timestep::advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled;
 #[cfg(test)]
 pub(crate) use crate::heat_balance::timestep::{
     advance_heat_balance_state_one_timestep, advance_heat_balance_state_one_timestep_internal,
+    advance_heat_balance_state_one_timestep_internal_with_live_schedule_profiled,
+    advance_heat_balance_state_one_timestep_internal_with_schedule_cache,
 };
 pub(crate) use crate::heat_balance::trace::*;
 pub(crate) use crate::heat_balance::warmup::run_heat_balance_run_period_warmup;
@@ -135,7 +138,7 @@ pub use crate::psychrometrics::{
     energyplus_standard_zone_air_heat_capacity_j_per_k,
     energyplus_water_vapor_gas_enthalpy_j_per_kg, energyplus_zone_air_heat_capacity_j_per_k,
 };
-use crate::schedules::precompute_hour_only_internal_gain_schedule_cache;
+use crate::schedules::precompute_hour_only_internal_gain_schedule_cache_profiled;
 #[cfg(test)]
 use crate::schedules::update_surface_radiant_internal_gain_source_terms;
 pub use crate::schedules::{
@@ -288,35 +291,39 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     let first_hour_interpolation_starting_values =
         run_period_first_hour_interpolation_starting_values(&model.typed);
     let heat_balance_runtime_config = options.zone_air_algorithm.runtime_config();
-    let (mut state, internal_gain_schedule_cache) = init_heat_balance_source_order_path(|| {
-        let schedule_cache = precompute_hour_only_internal_gain_schedule_cache(&model.typed)?;
-        let mut state = initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache(
-            model,
-            options.initial_zone_air_temperature_c,
-            ctf_coefficients,
-            &schedule_cache,
-        )?;
-        seed_zone_air_humidity_ratios_from_weather_series(
-            &mut state,
-            weather_series,
-            weather_dry_bulb_c[0],
-            zone_steps_per_hour,
-            first_hour_interpolation_starting_values,
-        );
-        match options.ctf_initial_history_policy {
-            HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue => {
-                seed_initial_surface_ctf_boundary_histories(&mut state, weather_dry_bulb_c[0]);
-            }
-            HeatBalanceCtfInitialHistoryPolicy::EnergyPlusSurfInitial => {
-                seed_energyplus_initial_surface_ctf_histories(
-                    &mut state,
+    let (mut state, internal_gain_schedule_cache, mut internal_gain_schedule_cache_profile) =
+        init_heat_balance_source_order_path(|| {
+            let (schedule_cache, mut schedule_cache_profile) =
+                precompute_hour_only_internal_gain_schedule_cache_profiled(&model.typed)?;
+            let mut state =
+                initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled(
+                    model,
                     options.initial_zone_air_temperature_c,
-                    weather_dry_bulb_c[0],
-                );
+                    ctf_coefficients,
+                    &schedule_cache,
+                    &mut schedule_cache_profile,
+                )?;
+            seed_zone_air_humidity_ratios_from_weather_series(
+                &mut state,
+                weather_series,
+                weather_dry_bulb_c[0],
+                zone_steps_per_hour,
+                first_hour_interpolation_starting_values,
+            );
+            match options.ctf_initial_history_policy {
+                HeatBalanceCtfInitialHistoryPolicy::BoundaryTemperatureAndUValue => {
+                    seed_initial_surface_ctf_boundary_histories(&mut state, weather_dry_bulb_c[0]);
+                }
+                HeatBalanceCtfInitialHistoryPolicy::EnergyPlusSurfInitial => {
+                    seed_energyplus_initial_surface_ctf_histories(
+                        &mut state,
+                        options.initial_zone_air_temperature_c,
+                        weather_dry_bulb_c[0],
+                    );
+                }
             }
-        }
-        Ok::<(HeatBalanceState, ScheduleSeriesCache), RuntimeError>((state, schedule_cache))
-    })?;
+            Ok::<_, RuntimeError>((state, schedule_cache, schedule_cache_profile))
+        })?;
     let mut warmup_day_end_zone_air_states = Vec::new();
     let warmup = run_heat_balance_run_period_warmup(
         &model.typed,
@@ -341,9 +348,10 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
          surface_iteration_count,
          inside_hconv_reevaluation_interval,
          surface_loop_zone_air_correction| {
-            advance_heat_balance_state_one_timestep_internal_with_schedule_cache(
+            advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled(
                 model,
                 &internal_gain_schedule_cache,
+                &mut internal_gain_schedule_cache_profile.warmup,
                 state,
                 input,
                 weather_context,
@@ -385,6 +393,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
     } = sample_heat_balance_run_period(
         model,
         &internal_gain_schedule_cache,
+        &mut internal_gain_schedule_cache_profile.run_period,
         &mut state,
         weather_dry_bulb_c,
         weather_records,
@@ -464,6 +473,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         state,
         results,
         summary,
+        internal_gain_schedule_cache_profile,
     })
 }
 

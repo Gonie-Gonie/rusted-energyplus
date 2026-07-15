@@ -3,8 +3,12 @@
 mod schedule_cache;
 mod state_shell;
 
-pub use schedule_cache::initialize_heat_balance_state_with_ctf_coefficients;
+#[cfg(test)]
 pub(crate) use schedule_cache::initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache;
+pub(crate) use schedule_cache::initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache_profiled;
+pub use schedule_cache::{
+    initialize_heat_balance_state, initialize_heat_balance_state_with_ctf_coefficients,
+};
 
 use crate::error::RuntimeError;
 use crate::geometry::{surface_area_m2, surface_azimuth_deg, surface_tilt_deg, zone_volume_m3};
@@ -24,27 +28,17 @@ use crate::heat_balance::surface_manager::ConstructionThermalDataCache;
 use crate::heat_balance::zone_air_correction::ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO;
 use crate::heat_balance::zone_predictor_corrector::energyplus_zone_air_temperature_coefficients;
 use crate::psychrometrics::energyplus_standard_zone_air_heat_capacity_j_per_k;
-use crate::schedules::{
-    ScheduleSeriesCache, convective_internal_gain_w_from_cache,
-    update_surface_radiant_internal_gain_source_terms_from_cache,
-};
+use crate::schedules::{InternalGainSchedulePhaseOperations, ScheduleSeriesCache};
 use ep_model::SimulationModel;
 use state_shell::finish_heat_balance_state;
 
 const ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K: f64 = 3.076;
-/// Initializes the heat-balance state shell without advancing the solver.
-pub fn initialize_heat_balance_state(
-    model: &SimulationModel,
-    initial_zone_air_temperature_c: f64,
-) -> Result<HeatBalanceState, RuntimeError> {
-    initialize_heat_balance_state_with_ctf_coefficients(model, initial_zone_air_temperature_c, &[])
-}
-
 fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
     model: &SimulationModel,
     initial_zone_air_temperature_c: f64,
     ctf_coefficients: &[ConstructionCtfCoefficientOverride],
     schedule_cache: &ScheduleSeriesCache,
+    mut operations: Option<&mut InternalGainSchedulePhaseOperations>,
 ) -> Result<HeatBalanceState, RuntimeError> {
     let ctf_coefficients_by_construction = construction_ctf_coefficients_by_name(ctf_coefficients);
     let mut zones = Vec::with_capacity(model.typed.zones.len());
@@ -75,12 +69,13 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO,
             )
             .unwrap_or(0.0),
-            convective_internal_gain_w: convective_internal_gain_w_from_cache(
-                &model.typed,
-                schedule_cache,
-                zone.id,
-                1,
-            ),
+            convective_internal_gain_w:
+                schedule_cache::convective_internal_gain_w_for_initialization(
+                    &model.typed,
+                    schedule_cache,
+                    zone.id,
+                    operations.as_deref_mut(),
+                ),
             opaque_surface_conductance_w_per_k: 0.0,
             opaque_surface_heat_gain_w: 0.0,
             opaque_surface_outside_conduction_w: 0.0,
@@ -169,11 +164,11 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             })
         })
         .collect::<Result<Vec<_>, RuntimeError>>()?;
-    update_surface_radiant_internal_gain_source_terms_from_cache(
+    schedule_cache::initialize_surface_radiant_internal_gains(
         &model.typed,
         schedule_cache,
         &mut surfaces,
-        1,
+        operations,
     );
     let surface_indexes = HeatBalanceSurfaceIndexes::from_model_surfaces(model, &surfaces);
 

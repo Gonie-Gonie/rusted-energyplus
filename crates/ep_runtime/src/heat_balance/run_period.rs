@@ -48,7 +48,7 @@ use crate::heat_balance::surface_weather::{
     energyplus_exterior_wet_reference_temperature_c,
     energyplus_weather_record_is_rain_at_timestep_with_starting_values,
 };
-use crate::heat_balance::timestep::advance_heat_balance_state_one_timestep_internal_with_schedule_cache;
+use crate::heat_balance::timestep::advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled;
 use crate::heat_balance::trace::{
     HeatBalanceCtfHistorySlotFirstSampleAccumulator, HeatBalanceRunPeriodSamples,
     SurfaceHeatBalanceTraceSums, ZoneAirDebugTraceSums, push_surface_heat_balance_trace_averages,
@@ -61,7 +61,7 @@ use crate::heat_balance::trace::{
 use crate::psychrometrics::{
     energyplus_moist_air_density_kg_per_m3, energyplus_moist_air_specific_heat_j_per_kg_k,
 };
-use crate::schedules::ScheduleSeriesCache;
+use crate::schedules::{InternalGainSchedulePhaseOperations, ScheduleSeriesCache};
 use crate::weather::{
     EpwRecord, WeatherTimestepSeries, energyplus_weather_atmospheric_pressure_for_context,
     energyplus_weather_dry_bulb_at_timestep_with_starting_values,
@@ -75,6 +75,7 @@ use std::collections::BTreeMap;
 pub(crate) fn sample_heat_balance_run_period(
     model: &SimulationModel,
     schedule_cache: &ScheduleSeriesCache,
+    schedule_operations: &mut InternalGainSchedulePhaseOperations,
     state: &mut HeatBalanceState,
     weather_dry_bulb_c: &[f64],
     weather_records: Option<&[EpwRecord]>,
@@ -209,9 +210,10 @@ pub(crate) fn sample_heat_balance_run_period(
                     if is_raining { 1.0 } else { 0.0 }
                 })
                 .unwrap_or(0.0);
-            advance_heat_balance_state_one_timestep_internal_with_schedule_cache(
+            advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled(
                 &model.typed,
                 schedule_cache,
+                schedule_operations,
                 &mut *state,
                 HeatBalanceStepInput {
                     outdoor_dry_bulb_c: timestep_outdoor_dry_bulb_c,

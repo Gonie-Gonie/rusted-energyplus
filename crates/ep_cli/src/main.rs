@@ -39,6 +39,10 @@ use ep_run::{
     PartialRunPolicy, RunConfig, RunExitCode, RunMode, RunOutputFormat, TraceLevel, TraceSelection,
     run_arbitrary_idf,
 };
+use ep_runtime::schedules::{
+    HEAT_BALANCE_INTERNAL_GAIN_SCHEDULE_PROFILE_SCOPE,
+    HeatBalanceInternalGainScheduleOperationProfile, InternalGainSchedulePhaseOperations,
+};
 use ep_runtime::{
     ConstructionCtfCoefficientOverride, ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO,
     ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA, EnergyPlusCompatibilityStage, ExecutionPlan,
@@ -4884,6 +4888,7 @@ struct HeatBalanceGateDiagnostic {
 #[derive(Clone, Debug, PartialEq)]
 struct HeatBalancePerformanceProfile {
     phases: Vec<HeatBalancePerformancePhase>,
+    internal_gain_schedule_cache_operations: HeatBalanceInternalGainScheduleOperationProfile,
     compatibility_mode_separated_from_fast_mode: bool,
     speedup_claim_policy: &'static str,
     trace_write_policy: &'static str,
@@ -4901,6 +4906,8 @@ impl HeatBalancePerformanceProfile {
     fn new() -> Self {
         Self {
             phases: Vec::new(),
+            internal_gain_schedule_cache_operations:
+                HeatBalanceInternalGainScheduleOperationProfile::default(),
             compatibility_mode_separated_from_fast_mode: true,
             speedup_claim_policy: "speedup is reported only when the conformance gate status is pass",
             trace_write_policy: "trace write time is measured as zero when trace output is disabled",
@@ -5543,11 +5550,13 @@ fn build_heat_balance_conformance_diagnostic(
             &ctf_coefficients,
         )
         .map_err(|error| error.to_string())?;
+    performance_profile.internal_gain_schedule_cache_operations =
+        simulation.internal_gain_schedule_cache_profile;
     performance_profile.push(
         "runtime_heat_balance_execution",
         "ep_runtime",
         elapsed_seconds_since(runtime_start),
-        "execute heat-balance compatibility runtime using precomputed weather inputs; ep_runtime consumes a separately prepared referenced-only 24-hour cache for validated hour-only OtherEquipment gains, while this full-axis schedule cache remains profile-only",
+        "execute heat-balance compatibility runtime using precomputed weather inputs; ep_runtime consumes a separately prepared referenced-only 24-hour cache for validated hour-only OtherEquipment gains, while this full-axis schedule cache remains profile-only; the simulation exports deterministic build/initialization/warmup/run-period operation counts without cache-specific wall-clock attribution",
     );
     append_surface_incident_solar_radiation_series(
         &mut simulation.results,
@@ -10738,6 +10747,12 @@ fn render_heat_balance_performance_summary_json(
         "  \"rust_runtime_heat_balance_wall_seconds\": {},\n",
         json_optional_number(profile.phase_wall_seconds("runtime_heat_balance_execution"))
     ));
+    json.push_str(&format!(
+        "  \"internal_gain_schedule_cache_operations\": {},\n",
+        heat_balance_internal_gain_schedule_operation_profile_json(
+            &profile.internal_gain_schedule_cache_operations,
+        )
+    ));
     json.push_str("  \"required_phase_names\": [\"parse_time\", \"raw_model_build\", \"typed_model_compile\", \"simulation_model_compile\", \"model_graph_build\", \"execution_plan_build\", \"weather_schedule_precompute\", \"runtime_heat_balance_execution\", \"output_report_generation\", \"trace_write\"],\n");
     json.push_str("  \"phases\": [\n");
     json.push_str(&format!(
@@ -10779,6 +10794,12 @@ fn heat_balance_performance_profile_json(profile: &HeatBalancePerformanceProfile
         "\"trace_write_policy\": {}, ",
         json_string(profile.trace_write_policy)
     ));
+    json.push_str(&format!(
+        "\"internal_gain_schedule_cache_operations\": {}, ",
+        heat_balance_internal_gain_schedule_operation_profile_json(
+            &profile.internal_gain_schedule_cache_operations,
+        )
+    ));
     json.push_str("\"phases\": [");
     for (index, phase) in profile.phases.iter().enumerate() {
         if index > 0 {
@@ -10793,6 +10814,82 @@ fn heat_balance_performance_profile_json(profile: &HeatBalancePerformanceProfile
         ));
     }
     json.push_str("] }");
+    json
+}
+
+fn internal_gain_schedule_phase_operations_json(
+    operations: &InternalGainSchedulePhaseOperations,
+) -> String {
+    format!(
+        "{{ \"cached_value_lookup_count\": {}, \"live_fallback_lookup_count\": {}, \"live_schedule_family_chain_scan_count\": {}, \"compact_profile_resolution_count\": {}, \"compact_value_evaluation_count\": {} }}",
+        operations.cached_value_lookup_count,
+        operations.live_fallback_lookup_count,
+        operations.live_schedule_family_chain_scan_count,
+        operations.compact_profile_resolution_count,
+        operations.compact_value_evaluation_count,
+    )
+}
+
+fn heat_balance_internal_gain_schedule_operation_profile_json(
+    profile: &HeatBalanceInternalGainScheduleOperationProfile,
+) -> String {
+    let mut json = String::new();
+    json.push_str("{ ");
+    json.push_str(&format!(
+        "\"scope\": {}, ",
+        json_string(HEAT_BALANCE_INTERNAL_GAIN_SCHEDULE_PROFILE_SCOPE)
+    ));
+    json.push_str("\"measurement\": \"deterministic operation counts; not wall-clock timing or cache-specific speedup attribution\", ");
+    json.push_str("\"remaining_iteration\": \"OtherEquipment, zone, surface, and people iteration is not counted as a schedule-object-family chain scan\", ");
+    json.push_str(&format!(
+        "\"referenced_only_cache_build_count\": {}, ",
+        profile.referenced_only_cache_build_count
+    ));
+    json.push_str(&format!(
+        "\"cache_entry_count\": {}, ",
+        profile.cache_entry_count
+    ));
+    json.push_str(&format!(
+        "\"cache_logical_sample_count\": {}, ",
+        profile.cache_logical_sample_count
+    ));
+    json.push_str(&format!(
+        "\"cache_build_compact_value_evaluation_count\": {}, ",
+        profile.cache_build_compact_value_evaluation_count
+    ));
+    json.push_str(&format!(
+        "\"initialization\": {}, ",
+        internal_gain_schedule_phase_operations_json(&profile.initialization)
+    ));
+    json.push_str(&format!(
+        "\"warmup\": {}, ",
+        internal_gain_schedule_phase_operations_json(&profile.warmup)
+    ));
+    json.push_str(&format!(
+        "\"run_period\": {}, ",
+        internal_gain_schedule_phase_operations_json(&profile.run_period)
+    ));
+    json.push_str(&format!(
+        "\"total_cached_value_lookup_count\": {}, ",
+        profile.total_cached_value_lookup_count()
+    ));
+    json.push_str(&format!(
+        "\"total_live_fallback_lookup_count\": {}, ",
+        profile.total_live_fallback_lookup_count()
+    ));
+    json.push_str(&format!(
+        "\"total_live_schedule_family_chain_scan_count\": {}, ",
+        profile.total_live_schedule_family_chain_scan_count()
+    ));
+    json.push_str(&format!(
+        "\"total_compact_profile_resolution_count\": {}, ",
+        profile.total_compact_profile_resolution_count()
+    ));
+    json.push_str(&format!(
+        "\"total_compact_value_evaluation_count\": {} ",
+        profile.total_compact_value_evaluation_count()
+    ));
+    json.push('}');
     json
 }
 
@@ -11777,6 +11874,63 @@ fn render_heat_balance_conformance_report(
         diagnostic
             .performance_profile
             .compatibility_mode_separated_from_fast_mode
+    ));
+    let schedule_profile = &diagnostic
+        .performance_profile
+        .internal_gain_schedule_cache_operations;
+    report.push_str(&format!(
+        "internal_gain_schedule_cache_profile_scope: {}\n",
+        HEAT_BALANCE_INTERNAL_GAIN_SCHEDULE_PROFILE_SCOPE
+    ));
+    report.push_str("internal_gain_schedule_cache_profile_measurement: deterministic operation counts; not wall-clock timing or cache-specific speedup attribution\n");
+    report.push_str("internal_gain_schedule_cache_remaining_iteration: OtherEquipment, zone, surface, and people iteration is not counted as a schedule-object-family chain scan\n");
+    report.push_str(&format!(
+        "internal_gain_schedule_cache_builds: {}\n",
+        schedule_profile.referenced_only_cache_build_count
+    ));
+    report.push_str(&format!(
+        "internal_gain_schedule_cache_entries: {}\n",
+        schedule_profile.cache_entry_count
+    ));
+    report.push_str(&format!(
+        "internal_gain_schedule_cache_logical_samples: {}\n",
+        schedule_profile.cache_logical_sample_count
+    ));
+    report.push_str(&format!(
+        "internal_gain_schedule_cache_build_compact_evaluations: {}\n",
+        schedule_profile.cache_build_compact_value_evaluation_count
+    ));
+    report.push_str(&format!(
+        "internal_gain_schedule_cache_initialization_reads: {}\n",
+        schedule_profile.initialization.cached_value_lookup_count
+    ));
+    report.push_str(&format!(
+        "internal_gain_schedule_cache_warmup_reads: {}\n",
+        schedule_profile.warmup.cached_value_lookup_count
+    ));
+    report.push_str(&format!(
+        "internal_gain_schedule_cache_run_period_reads: {}\n",
+        schedule_profile.run_period.cached_value_lookup_count
+    ));
+    report.push_str(&format!(
+        "internal_gain_schedule_cache_total_reads: {}\n",
+        schedule_profile.total_cached_value_lookup_count()
+    ));
+    report.push_str(&format!(
+        "internal_gain_schedule_cache_hot_live_fallback_lookups: {}\n",
+        schedule_profile.total_live_fallback_lookup_count()
+    ));
+    report.push_str(&format!(
+        "internal_gain_schedule_cache_hot_schedule_family_chain_scans: {}\n",
+        schedule_profile.total_live_schedule_family_chain_scan_count()
+    ));
+    report.push_str(&format!(
+        "internal_gain_schedule_cache_hot_compact_profile_resolutions: {}\n",
+        schedule_profile.total_compact_profile_resolution_count()
+    ));
+    report.push_str(&format!(
+        "internal_gain_schedule_cache_hot_compact_value_evaluations: {}\n",
+        schedule_profile.total_compact_value_evaluation_count()
     ));
     report.push_str(&format!(
         "zone_air_algorithm: {}\n",
@@ -20464,6 +20618,30 @@ mod tests {
         };
 
         assert_eq!(super::run_period_eso_values(&series), vec![23.0, 24.0]);
+    }
+
+    #[test]
+    fn heat_balance_schedule_operation_profile_json_separates_build_and_hot_counts() {
+        let mut profile = super::HeatBalanceInternalGainScheduleOperationProfile {
+            referenced_only_cache_build_count: 1,
+            cache_entry_count: 1,
+            cache_logical_sample_count: 24,
+            cache_build_compact_value_evaluation_count: 24,
+            ..Default::default()
+        };
+        profile.initialization.cached_value_lookup_count = 2;
+        profile.warmup.cached_value_lookup_count = 288;
+        profile.run_period.cached_value_lookup_count = 576;
+        let json = super::heat_balance_internal_gain_schedule_operation_profile_json(&profile);
+
+        assert!(json.contains("\"referenced_only_cache_build_count\": 1"));
+        assert!(json.contains("\"cache_build_compact_value_evaluation_count\": 24"));
+        assert!(json.contains("\"total_cached_value_lookup_count\": 866"));
+        assert!(json.contains("\"total_live_schedule_family_chain_scan_count\": 0"));
+        assert!(json.contains("\"total_compact_profile_resolution_count\": 0"));
+        assert!(json.contains("\"total_compact_value_evaluation_count\": 0"));
+        assert!(json.contains("not wall-clock timing or cache-specific speedup attribution"));
+        assert!(json.contains("OtherEquipment, zone, surface, and people iteration"));
     }
 
     #[test]

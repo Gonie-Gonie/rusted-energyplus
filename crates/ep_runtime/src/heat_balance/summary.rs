@@ -10,6 +10,7 @@ use crate::heat_balance::state::{
     HeatBalanceZoneAirReportSampling, HeatBalanceZoneAirStateSample,
     HeatBalanceZoneConductionReportSource,
 };
+use crate::schedules::HeatBalanceInternalGainScheduleOperationProfile;
 /// Summary of the executed heat-balance warmup loop.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct HeatBalanceWarmupSummary {
@@ -150,4 +151,6 @@ pub struct HeatBalanceSimulation {
     pub results: ResultStore,
     /// Trace summary.
     pub summary: HeatBalanceSimulationSummary,
+    /// Deterministic operation counts for the specialized internal-gain schedule cache.
+    pub internal_gain_schedule_cache_profile: HeatBalanceInternalGainScheduleOperationProfile,
 }

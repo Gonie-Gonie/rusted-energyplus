@@ -3,8 +3,10 @@
 use super::constant::constant_cached_schedule_series;
 use super::external_interface::external_interface_cached_schedule_series_iter;
 use super::{
-    CachedScheduleSeries, ScheduleSampleStorage, ScheduleSeriesCache, ScheduleSeriesKind,
-    compact_schedule_value, convective_internal_gain_for_equipment_with_multiplier_w,
+    CachedScheduleSeries, HeatBalanceInternalGainScheduleOperationProfile,
+    InternalGainSchedulePhaseOperations, ScheduleSampleStorage, ScheduleSeriesCache,
+    ScheduleSeriesKind, compact_schedule_value,
+    convective_internal_gain_for_equipment_with_multiplier_w,
     hour_only_single_period_compact_schedule_segments, precompile_compact_schedule_intervals,
     radiant_internal_gain_for_equipment_with_multiplier_w,
     update_surface_radiant_internal_gain_source_terms_with,
@@ -19,10 +21,19 @@ const HOUR_ONLY_SAMPLE_COUNT: usize = 24;
 pub(crate) fn precompute_hour_only_internal_gain_schedule_cache(
     model: &TypedModel,
 ) -> Result<ScheduleSeriesCache, RuntimeError> {
+    let (cache, _) =
+        precompute_hour_only_internal_gain_schedule_cache_with_build_operations(model)?;
+    Ok(cache)
+}
+
+fn precompute_hour_only_internal_gain_schedule_cache_with_build_operations(
+    model: &TypedModel,
+) -> Result<(ScheduleSeriesCache, usize), RuntimeError> {
     super::validate_hour_only_internal_gain_schedules(model)?;
 
     let mut referenced_schedule_ids = BTreeSet::new();
     let mut entries = Vec::new();
+    let mut compact_value_evaluation_count = 0_usize;
     for equipment in &model.other_equipment {
         let Some(schedule_id) = equipment.schedule else {
             continue;
@@ -32,20 +43,41 @@ pub(crate) fn precompute_hour_only_internal_gain_schedule_cache(
                 model,
                 schedule_id,
                 &equipment.name.0,
+                &mut compact_value_evaluation_count,
             )?);
         }
     }
 
-    Ok(ScheduleSeriesCache::from_entries(
-        HOUR_ONLY_SAMPLE_COUNT,
-        entries,
+    Ok((
+        ScheduleSeriesCache::from_entries(HOUR_ONLY_SAMPLE_COUNT, entries),
+        compact_value_evaluation_count,
     ))
+}
+
+pub(crate) fn precompute_hour_only_internal_gain_schedule_cache_profiled(
+    model: &TypedModel,
+) -> Result<
+    (
+        ScheduleSeriesCache,
+        HeatBalanceInternalGainScheduleOperationProfile,
+    ),
+    RuntimeError,
+> {
+    let (cache, compact_value_evaluation_count) =
+        precompute_hour_only_internal_gain_schedule_cache_with_build_operations(model)?;
+    let profile = HeatBalanceInternalGainScheduleOperationProfile::for_single_build(
+        cache.len(),
+        cache.profile().logical_sample_count,
+        compact_value_evaluation_count,
+    );
+    Ok((cache, profile))
 }
 
 fn referenced_cached_schedule_series(
     model: &TypedModel,
     schedule_id: ScheduleId,
     equipment_name: &str,
+    compact_value_evaluation_count: &mut usize,
 ) -> Result<CachedScheduleSeries, RuntimeError> {
     if let Some(schedule) = model
         .schedules
@@ -73,12 +105,12 @@ fn referenced_cached_schedule_series(
                 invalid_internal_gain_schedule(equipment_name, schedule_id, reason)
             })?;
         let intervals = precompile_compact_schedule_intervals(segments);
-        let samples = (1_u32..=24)
-            .map(|hour_ending| {
-                compact_schedule_value(segments, hour_ending * 60).unwrap_or(f64::NAN)
-            })
-            .collect::<Vec<_>>()
-            .into_boxed_slice();
+        let mut samples = Vec::with_capacity(HOUR_ONLY_SAMPLE_COUNT);
+        for hour_ending in 1_u32..=24 {
+            *compact_value_evaluation_count = compact_value_evaluation_count.saturating_add(1);
+            samples.push(compact_schedule_value(segments, hour_ending * 60).unwrap_or(f64::NAN));
+        }
+        let samples = samples.into_boxed_slice();
         return Ok(CachedScheduleSeries {
             schedule_id,
             schedule_name: schedule.name.0.clone(),
@@ -106,14 +138,18 @@ fn invalid_internal_gain_schedule(
     }
 }
 
-fn hour_only_schedule_multiplier_from_cache(
+fn hour_only_schedule_multiplier_from_cache_with_operations(
     schedule_cache: &ScheduleSeriesCache,
     schedule_id: Option<ScheduleId>,
     hour_ending: u32,
+    operations: Option<&mut InternalGainSchedulePhaseOperations>,
 ) -> f64 {
     let Some(schedule_id) = schedule_id else {
         return 1.0;
     };
+    if let Some(operations) = operations {
+        operations.record_cached_value_lookup();
+    }
     let sample_index = (hour_ending.clamp(1, 24) - 1) as usize;
     schedule_cache
         .value(schedule_id, sample_index)
@@ -126,23 +162,57 @@ pub(crate) fn convective_internal_gain_w_from_cache(
     zone_id: ZoneId,
     hour_ending: u32,
 ) -> f64 {
-    model
+    convective_internal_gain_w_from_cache_with_operations(
+        model,
+        schedule_cache,
+        zone_id,
+        hour_ending,
+        None,
+    )
+}
+
+pub(crate) fn convective_internal_gain_w_from_cache_profiled(
+    model: &TypedModel,
+    schedule_cache: &ScheduleSeriesCache,
+    zone_id: ZoneId,
+    hour_ending: u32,
+    operations: &mut InternalGainSchedulePhaseOperations,
+) -> f64 {
+    convective_internal_gain_w_from_cache_with_operations(
+        model,
+        schedule_cache,
+        zone_id,
+        hour_ending,
+        Some(operations),
+    )
+}
+
+fn convective_internal_gain_w_from_cache_with_operations(
+    model: &TypedModel,
+    schedule_cache: &ScheduleSeriesCache,
+    zone_id: ZoneId,
+    hour_ending: u32,
+    mut operations: Option<&mut InternalGainSchedulePhaseOperations>,
+) -> f64 {
+    let mut total_w = 0.0;
+    for equipment in model
         .other_equipment
         .iter()
         .filter(|equipment| equipment.zone == zone_id)
-        .map(|equipment| {
-            let schedule_multiplier = hour_only_schedule_multiplier_from_cache(
-                schedule_cache,
-                equipment.schedule,
-                hour_ending,
-            );
-            convective_internal_gain_for_equipment_with_multiplier_w(
-                model,
-                equipment,
-                schedule_multiplier,
-            )
-        })
-        .sum()
+    {
+        let schedule_multiplier = hour_only_schedule_multiplier_from_cache_with_operations(
+            schedule_cache,
+            equipment.schedule,
+            hour_ending,
+            operations.as_deref_mut(),
+        );
+        total_w += convective_internal_gain_for_equipment_with_multiplier_w(
+            model,
+            equipment,
+            schedule_multiplier,
+        );
+    }
+    total_w
 }
 
 pub(super) fn radiant_internal_gain_w_from_cache(
@@ -151,23 +221,41 @@ pub(super) fn radiant_internal_gain_w_from_cache(
     zone_id: ZoneId,
     hour_ending: u32,
 ) -> f64 {
-    model
+    radiant_internal_gain_w_from_cache_with_operations(
+        model,
+        schedule_cache,
+        zone_id,
+        hour_ending,
+        None,
+    )
+}
+
+fn radiant_internal_gain_w_from_cache_with_operations(
+    model: &TypedModel,
+    schedule_cache: &ScheduleSeriesCache,
+    zone_id: ZoneId,
+    hour_ending: u32,
+    mut operations: Option<&mut InternalGainSchedulePhaseOperations>,
+) -> f64 {
+    let mut total_w = 0.0;
+    for equipment in model
         .other_equipment
         .iter()
         .filter(|equipment| equipment.zone == zone_id)
-        .map(|equipment| {
-            let schedule_multiplier = hour_only_schedule_multiplier_from_cache(
-                schedule_cache,
-                equipment.schedule,
-                hour_ending,
-            );
-            radiant_internal_gain_for_equipment_with_multiplier_w(
-                model,
-                equipment,
-                schedule_multiplier,
-            )
-        })
-        .sum()
+    {
+        let schedule_multiplier = hour_only_schedule_multiplier_from_cache_with_operations(
+            schedule_cache,
+            equipment.schedule,
+            hour_ending,
+            operations.as_deref_mut(),
+        );
+        total_w += radiant_internal_gain_for_equipment_with_multiplier_w(
+            model,
+            equipment,
+            schedule_multiplier,
+        );
+    }
+    total_w
 }
 
 pub(crate) fn update_surface_radiant_internal_gain_source_terms_from_cache(
@@ -178,6 +266,24 @@ pub(crate) fn update_surface_radiant_internal_gain_source_terms_from_cache(
 ) {
     update_surface_radiant_internal_gain_source_terms_with(surfaces, |zone_id| {
         radiant_internal_gain_w_from_cache(model, schedule_cache, zone_id, hour_ending)
+    });
+}
+
+pub(crate) fn update_surface_radiant_internal_gain_source_terms_from_cache_profiled(
+    model: &TypedModel,
+    schedule_cache: &ScheduleSeriesCache,
+    surfaces: &mut [SurfaceHeatBalanceState],
+    hour_ending: u32,
+    operations: &mut InternalGainSchedulePhaseOperations,
+) {
+    update_surface_radiant_internal_gain_source_terms_with(surfaces, |zone_id| {
+        radiant_internal_gain_w_from_cache_with_operations(
+            model,
+            schedule_cache,
+            zone_id,
+            hour_ending,
+            Some(&mut *operations),
+        )
     });
 }
 
