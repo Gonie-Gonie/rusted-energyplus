@@ -49,10 +49,10 @@ that the EnergyPlus routine has been ported.
 | 9 | `PsyHFnTdbW_fast` | moist-air enthalpy fast path | `Psychrometrics.hh:668` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_h_fn_tdb_w_fast` | ordinary/fast equivalence across the documented valid domain |
 | 10 | `PsyCpAirFnW` | moist-air specific heat | `Psychrometrics.hh:679` (inline) | always present; owns a function-local last-input cache | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_cp_air_fn_w`; guarded legacy wrapper: `energyplus_moist_air_specific_heat_j_per_kg_k` | source-vector parity plus repeated, alternating, and multistate cache-isolation probes |
 | 11 | `PsyCpAirFnW_fast` | specific-heat fast path | `Psychrometrics.hh:718` (inline) | always present; owns a function-local last-input cache | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_cp_air_fn_w_fast` | ordinary/fast equivalence and cache-hit/miss independence |
-| 12 | `PsyTdbFnHW` | dry-bulb inversion | `Psychrometrics.hh:743` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | enthalpy round trips, denominator edge cases, and source-vector parity |
-| 13 | `PsyRhovFnTdbRhLBnd0C` | vapor density | `Psychrometrics.hh:764` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | lower-bound-at-0-C branch, RH limits, and pressure-independent source vectors |
-| 14 | `PsyRhovFnTdbWPb` | vapor density | `Psychrometrics.hh:789` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | humidity-ratio/pressure vectors, clamp rules, and inverse RH consistency |
-| 15 | `PsyRhovFnTdbWPb_fast` | vapor-density fast path | `Psychrometrics.hh:815` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | ordinary/fast equivalence and valid-domain boundaries |
+| 12 | `PsyTdbFnHW` | dry-bulb inversion | `Psychrometrics.hh:743` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_tdb_fn_h_w`; separate partial legacy analogue: `ep_runtime::ideal_loads::outdoor_air::psychrometrics::dry_bulb_from_enthalpy_and_humidity_ratio` | source vectors, humidity-floor/IEEE edges, and source-evaluation round trips |
+| 13 | `PsyRhovFnTdbRhLBnd0C` | vapor density | `Psychrometrics.hh:764` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rhov_fn_tdb_rh_lbnd0c` | unclamped below-zero-C temperatures, raw RH/IEEE edges, and pressure-independent source vectors |
+| 14 | `PsyRhovFnTdbWPb` | vapor density | `Psychrometrics.hh:789` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rhov_fn_tdb_w_pb` | humidity-ratio floor, pressure/source vectors, IEEE edges, and future inverse-RH consistency |
+| 15 | `PsyRhovFnTdbWPb_fast` | vapor-density fast path | `Psychrometrics.hh:815` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rhov_fn_tdb_w_pb_fast` | ordinary/fast valid-domain equivalence, debug assertion, and `NDEBUG` raw no-floor behavior |
 | 16 | `PsyRhFnTdbRhovLBnd0C_error` | diagnostics | `Psychrometrics.hh:826`; `Psychrometrics.cc:222` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | exact out-of-range trigger, caller text, recurrence suppression, and error-state mutation |
 | 17 | `PsyRhFnTdbRhovLBnd0C` | relative humidity | `Psychrometrics.hh:835` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | 0-C lower-bound branch, clamping/error thresholds, and vapor-density round trips |
 | 18 | `PsyTwbFnTdbWPb` | wet-bulb solve and cache | `Psychrometrics.hh:879,895`; `Psychrometrics.cc:281,356` | cached and no-cache same-name variants selected by `EP_cache_PsyTwbFnTdbWPb`; one logical ticket | partial analogue: `ep_runtime::psychrometrics::energyplus_outdoor_wet_bulb_c` | cached/no-cache/raw agreement, iteration convergence/failure, cache-key quantization, and caller-context behavior |
@@ -406,6 +406,159 @@ not_claimed_branches:
 - external EnergyPlus numerical parity, C++ cache work/history parity, sentinel collision, and state/thread-isolation behavior
 <!-- routine-state-contract:v1 end psy_cp_air_fn_w_fast -->
 
+## CP56-4 Dry-Bulb Inversion And Vapor-Density Scaffold
+
+This checkpoint adds pure Rust numerical helpers for routines 12 through 15 in
+source-interface order. The helpers and their local pinned-formula,
+source-evaluation round-trip, humidity-floor, unclamped-temperature/RH,
+pressure, IEEE-edge, debug-assertion, release no-floor, and ordinary/fast tests
+live in `crates/ep_runtime/src/psychrometrics.rs` and
+`crates/ep_runtime/src/psychrometrics_inverse_density_tests.rs`. These checks
+are Rust-only source-transcription evidence, not output captured from an
+external EnergyPlus oracle. The four tickets advance only to `state_mapped`;
+they do not advance to `implemented`, add conformance evidence, or change the
+parent algorithm's `status = "scaffold"` and `claim_level = "none"` boundary.
+
+The existing IdealLoads moist-air enthalpy inverse remains separate. Its
+arithmetic grouping and lack of the canonical `1.0e-5` humidity floor can
+produce different results, so replacing its downstream consumers is deferred
+until the paired enthalpy/inverse compatibility boundary is handled explicitly.
+
+### `PsyTdbFnHW` (`psy_tdb_fn_h_w`)
+
+The source at `Psychrometrics.hh:743-761` first assigns
+`W = max(dW, 1.0e-5)` and then evaluates
+`(H - 2.50094e6 * W) / (1.00484e3 + 1.85895e3 * W)`. Rust computes the
+source-compatible humidity floor once and preserves the source numerator and
+denominator grouping. The routine has no cache, diagnostics, or mutable state.
+
+<!-- routine-state-contract:v1 begin psy_tdb_fn_h_w -->
+PsyTdbFnHW
+
+read_state:
+- arguments `H` and `dW`; source `max(dW, 1.0e-5)` preserves a NaN first argument and supplies the humidity-ratio floor
+
+write_state:
+- no state; the dry-bulb inverse is evaluated from `H` and floored `dW` without mutation
+
+history_state_ownership:
+- no cross-call history or cache; output is a pure function of `H` and floored `dW`
+
+unsupported_state:
+- none; the source routine has no mutable state or cache
+
+inactive_branches:
+- none; the routine is always present and has no compile-time variant
+
+unsupported_active_branches:
+- none; there is no stateful or compile-conditional active branch
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, full IEEE-edge parity, and downstream IdealLoads inverse replacement
+<!-- routine-state-contract:v1 end psy_tdb_fn_h_w -->
+
+### `PsyRhovFnTdbRhLBnd0C` (`psy_rhov_fn_tdb_rh_lbnd0c`)
+
+Despite the historical identifier, the source at
+`Psychrometrics.hh:764-786` does not lower-bound `Tdb` at 0 C and does not
+clamp `RH`. It evaluates the supplied values directly through
+`RH / (461.52 * (Tdb + Constant::Kelvin)) *
+exp(23.7093 - 4111.0 / ((Tdb + Constant::Kelvin) - 35.45))`. Rust preserves
+that unclamped expression. Platform-level `exp` last-bit and floating-point
+exception behavior remain outside this scaffold.
+
+<!-- routine-state-contract:v1 begin psy_rhov_fn_tdb_rh_lbnd0c -->
+PsyRhovFnTdbRhLBnd0C
+
+read_state:
+- arguments `Tdb` and `RH` exactly as supplied; despite the historical `LBnd0C` name, the routine applies neither a 0 C temperature lower bound nor RH validation/clamping
+
+write_state:
+- no state; the pressure-independent exponential vapor-density formula evaluates without mutation
+
+history_state_ownership:
+- no cross-call history or cache; output is a pure function of raw `Tdb`, raw `RH`, `Constant::Kelvin`, and the source exponential expression
+
+unsupported_state:
+- none; the source routine has no mutable state or cache
+
+inactive_branches:
+- none; the routine is always present and has no compile-time variant
+
+unsupported_active_branches:
+- none; there is no stateful or compile-conditional active branch
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, cross-platform `std::exp` last-bit and floating-point exception parity, and inverse-relative-humidity integration
+<!-- routine-state-contract:v1 end psy_rhov_fn_tdb_rh_lbnd0c -->
+
+### `PsyRhovFnTdbWPb` (`psy_rhov_fn_tdb_w_pb`)
+
+The ordinary source at `Psychrometrics.hh:789-812` first assigns
+`W = max(dW, 1.0e-5)` and then computes
+`W * PB / (461.52 * (Tdb + Constant::Kelvin) * (W + 0.62198))`. Rust applies
+the shared source-compatible floor once and preserves the source rational
+grouping. Temperature and pressure are not validated or clamped.
+
+<!-- routine-state-contract:v1 begin psy_rhov_fn_tdb_w_pb -->
+PsyRhovFnTdbWPb
+
+read_state:
+- arguments `Tdb`, `dW`, and `PB`; source `max(dW, 1.0e-5)` preserves a NaN first argument and supplies the humidity-ratio floor
+
+write_state:
+- no state; the vapor-density rational expression evaluates without mutation
+
+history_state_ownership:
+- no cross-call history or cache; output is a pure function of `Tdb`, `PB`, and floored `dW`
+
+unsupported_state:
+- none; the source routine has no mutable state or cache
+
+inactive_branches:
+- none; the routine is always present and has no compile-time variant
+
+unsupported_active_branches:
+- none; there is no stateful or compile-conditional active branch
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, full nonphysical-input/IEEE-edge parity, inverse-relative-humidity integration, and downstream surface or EMPD migration
+<!-- routine-state-contract:v1 end psy_rhov_fn_tdb_w_pb -->
+
+### `PsyRhovFnTdbWPb_fast` (`psy_rhov_fn_tdb_w_pb_fast`)
+
+The source at `Psychrometrics.hh:815-822` asserts `dW >= 1.0e-5` and evaluates
+the same rational expression with the caller-supplied humidity ratio and no
+floor. Rust mirrors the source build split with `debug_assert!`: debug builds
+reject an invalid precondition, while release builds retain the raw no-floor
+calculation. Exact C++ assertion abort text and process behavior are outside
+this scaffold.
+
+<!-- routine-state-contract:v1 begin psy_rhov_fn_tdb_w_pb_fast -->
+PsyRhovFnTdbWPb_fast
+
+read_state:
+- arguments `Tdb`, caller-adjusted `dW`, and `PB`; an assertion reads `dW >= 1.0e-5` before the unclamped formula
+
+write_state:
+- no state; the unclamped vapor-density rational expression evaluates without mutation after the assertion
+
+history_state_ownership:
+- no cross-call history or cache; output is a pure function of `Tdb`, `PB`, and caller-adjusted `dW`
+
+unsupported_state:
+- exact C++ assertion-abort diagnostics; the numerical source routine has no mutable state
+
+inactive_branches:
+- `NDEBUG` removes the `dW >= 1.0e-5` assertion and leaves the raw unclamped expression active
+
+unsupported_active_branches:
+- assertion-enabled invalid-`dW` termination parity and exact C++ abort versus Rust panic behavior
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, C++ `NDEBUG` versus Rust debug-assertion build-policy equivalence, invalid-precondition behavior outside the documented fast domain, and downstream fast-call-site migration
+<!-- routine-state-contract:v1 end psy_rhov_fn_tdb_w_pb_fast -->
+
 ## Compile-Time Variant Boundary
 
 Unless `EP_nocache_Psychrometrics` is set, the EnergyPlus header enables
@@ -453,9 +606,10 @@ functions.
 ## Promotion Boundary
 
 The `PsyRhoAirFnPbTdbW`, `PsyRhoAirFnPbTdbW_fast`, `PsyHfgAirFnWTdb`,
-`PsyHgAirFnWTdb`, `PsyHFnTdbW`, `PsyHFnTdbW_fast`, `PsyCpAirFnW`, and
-`PsyCpAirFnW_fast` tickets are `state_mapped`; the other 45 ledger routines
-remain `source_mapped`. All 53 retain
+`PsyHgAirFnWTdb`, `PsyHFnTdbW`, `PsyHFnTdbW_fast`, `PsyCpAirFnW`,
+`PsyCpAirFnW_fast`, `PsyTdbFnHW`, `PsyRhovFnTdbRhLBnd0C`,
+`PsyRhovFnTdbWPb`, and `PsyRhovFnTdbWPb_fast` tickets are `state_mapped`; the
+other 41 ledger routines remain `source_mapped`. All 53 retain
 `required_for_full_domain = false`. Before any ticket is promoted further, its
 Rust target, source-vector tests, compile-variant obligations, diagnostic
 behavior where applicable, and external evidence boundary must be recorded.
