@@ -46,6 +46,18 @@ pub struct ScheduleCompactSegment {
     pub value: f64,
 }
 
+/// Interpolation mode applied within one compact-schedule day profile.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum ScheduleInterpolation {
+    /// Hold each segment value constant until the next `Until` boundary.
+    #[default]
+    No,
+    /// Average minute-level values over each zone timestep.
+    Average,
+    /// Linearly interpolate between consecutive segment values.
+    Linear,
+}
+
 /// EnergyPlus schedule day type consumed by `Schedule:Compact` `For` rules.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum ScheduleDayType {
@@ -80,6 +92,8 @@ pub enum ScheduleDayType {
 pub struct ScheduleCompactDayProfile {
     /// Day types assigned by this `For` rule, after group expansion.
     pub day_types: Vec<ScheduleDayType>,
+    /// Interpolation mode declared for this `For` rule.
+    pub interpolation: ScheduleInterpolation,
     /// Source-ordered daily `Until` value segments.
     pub segments: Vec<ScheduleCompactSegment>,
 }
@@ -93,7 +107,7 @@ pub struct ScheduleCompactPeriod {
     pub day_profiles: Vec<ScheduleCompactDayProfile>,
 }
 
-/// Compact schedule using source-ordered `Through`, `For`, and `Until` rules.
+/// Compact schedule using source-ordered `Through`, `For`, `Interpolate`, and `Until` rules.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ScheduleCompact {
     /// Typed ID.

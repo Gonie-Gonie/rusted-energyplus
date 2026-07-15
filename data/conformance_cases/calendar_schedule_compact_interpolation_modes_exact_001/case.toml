@@ -1,0 +1,86 @@
+id = "calendar_schedule_compact_interpolation_modes_exact_001"
+title = "Schedule:Compact explicit interpolation modes at zone timesteps"
+milestone = "full-source-order-schedule-compact-interpolation-modes"
+purpose = "Block on exact EnergyPlus Schedule:Compact source-order handling and Timestep Schedule Value semantics for explicit No, Average, and Linear directives in this one-day Timestep,4 fixture."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The fixture is one non-actual 2032-01-01 Thursday RunPeriod with Timestep,4, all six RunPeriod weather/calendar policies set to No, and a synthetic 24-row EPW with no daylight saving or holidays.",
+  "Three source-ordered Schedule:Compact profiles use explicit Interpolate: No, Interpolate: Average, and Interpolate: Linear directives with the same Until: 00:20 value 10, Until: 01:15 value 175, and Until: 24:00 value 175 fields. The nonzero first value distinguishes EnergyPlus's flat first Linear interval from an incorrect zero-seeded ramp, while the cross-hour 01:15 boundary distinguishes continuous day-minute interpolation from an hour-local implementation.",
+  "The zero-tolerance claim is exactly 96 ordered, unique Timestep Schedule Value samples and timestamps per series. The first five values are No [10, 175, 175, 175, 175], Average [10, 120, 175, 175, 175], and Linear [10, 40, 85, 130, 175]; samples 6 through 96 are 175 for every series.",
+  "The EnergyPlus oracle completes with exactly one warning: the non-multiple UNTIL: 00:20 warning belongs to the explicit Interpolate: No profile only. General warning parity is not claimed.",
+  "Other timestep counts, Until 24:MM correction, overlap/zero/incomplete schedule errors, daylight-saving combinations, multi-profile mixed interpolation modes, hourly aggregation, and downstream schedule consumption remain outside the claim.",
+  "Other schedule families, UpdateScheduleVals orchestration, EMS override behavior, and a Rust currentVal store remain outside the claim.",
+  "Rust raw ESO serialization, Rust EPW record selection, and broad EnergyPlus warning/error parity remain outside the claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_schedule_compact_interpolation_modes_exact_001/calendar_schedule_compact_interpolation_modes_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["schedule", "weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_schedule_compact_interpolation_modes_exact_001/calendar_schedule_compact_interpolation_modes_exact.idf"
+weather = "data/conformance_cases/calendar_schedule_compact_interpolation_modes_exact_001/calendar_schedule_compact_interpolation_modes_exact.epw"
+
+[[outputs]]
+key = "INTERPOLATION NO SCHEDULE"
+variable = "Schedule Value"
+frequency = "timestep"
+class = "schedule"
+source = "eso"
+domain = "schedule"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[outputs]]
+key = "INTERPOLATION AVERAGE SCHEDULE"
+variable = "Schedule Value"
+frequency = "timestep"
+class = "schedule"
+source = "eso"
+domain = "schedule"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[outputs]]
+key = "INTERPOLATION LINEAR SCHEDULE"
+variable = "Schedule Value"
+frequency = "timestep"
+class = "schedule"
+source = "eso"
+domain = "schedule"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "schedule"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_schedule_compact_interpolation_modes_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-schedule-compact-interpolation-modes-exact"
+blocking = true

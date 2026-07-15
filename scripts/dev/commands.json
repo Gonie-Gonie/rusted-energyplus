@@ -317,6 +317,12 @@
                          "help":  "Gate exact Schedule:Compact Interpolate:No values at each zone timestep."
                      },
                      {
+                         "name":  "compare-calendar-schedule-compact-interpolation-modes-exact",
+                         "path":  "compare\\compare-calendar-schedule-compact-interpolation-modes-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact Schedule:Compact explicit No, Average, and Linear interpolation values at each zone timestep."
+                     },
+                     {
                          "name":  "compare-weather-effective-calendar",
                          "path":  "compare\\compare-weather-effective-calendar.ps1",
                          "group":  "compare",

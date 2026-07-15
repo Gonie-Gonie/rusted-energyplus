@@ -17,13 +17,14 @@ use ep_model::{
     PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod,
     RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
     ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
-    ScheduleConstant, ScheduleDayType, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
-    SetpointManagerComponent, SiteLocation, SolarDistribution, SpecialDayType, SunExposure,
-    Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
-    ThermostatSetpointId, TimestepConfig, TypedModel, Version, WindExposure, Zone,
-    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
-    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
-    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
+    ScheduleConstant, ScheduleDayType, ScheduleId, ScheduleInterpolation, ScheduleTypeLimitId,
+    ScheduleTypeLimits, SetpointManagerComponent, SiteLocation, SolarDistribution, SpecialDayType,
+    SunExposure, Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType,
+    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, TypedModel, Version,
+    WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
+    ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat,
+    ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
+    parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 
@@ -260,6 +261,7 @@ struct CompactSchedulePeriodBuilder {
 struct CompactScheduleProfileBuilder {
     profile: ScheduleCompactDayProfile,
     pending_until_minute_of_day: Option<u32>,
+    interpolation_explicit: bool,
 }
 
 impl<'a> Compiler<'a> {
@@ -882,6 +884,8 @@ impl<'a> Compiler<'a> {
     }
 
     fn parse_compact_schedules(&mut self, model: &mut TypedModel) {
+        let minutes_per_timestep =
+            schedule_minutes_per_timestep(model.timestep.number_of_timesteps_per_hour);
         for (name, object) in self.objects("Schedule:Compact") {
             let schedule_type_limits = match self.optional_string(
                 "Schedule:Compact",
@@ -908,7 +912,8 @@ impl<'a> Compiler<'a> {
                 self.duplicate_name("Schedule:Compact", &name);
                 continue;
             }
-            let Some(periods) = self.compact_schedule_periods(&name, &object) else {
+            let Some(periods) = self.compact_schedule_periods(&name, &object, minutes_per_timestep)
+            else {
                 continue;
             };
 
@@ -4156,6 +4161,7 @@ impl<'a> Compiler<'a> {
         &mut self,
         object_name: &str,
         object: &RawObject,
+        minutes_per_timestep: Option<u32>,
     ) -> Option<Vec<ScheduleCompactPeriod>> {
         let Some(value) = field_value(object, "data") else {
             self.error(
@@ -4258,10 +4264,66 @@ impl<'a> Compiler<'a> {
                     current_profile = Some(CompactScheduleProfileBuilder {
                         profile: ScheduleCompactDayProfile {
                             day_types,
+                            interpolation: ScheduleInterpolation::No,
                             segments: Vec::new(),
                         },
                         pending_until_minute_of_day: None,
+                        interpolation_explicit: false,
                     });
+                }
+                RawValue::String(text) if compact_directive(text, "Interpolate") => {
+                    let Some(profile) = current_profile.as_mut() else {
+                        self.error(
+                            "InvalidScheduleCompactInterpolationOrder",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!(
+                                "Schedule:Compact/{object_name} Interpolate directive appears before a For directive"
+                            ),
+                        );
+                        continue;
+                    };
+                    if profile.interpolation_explicit {
+                        self.error(
+                            "DuplicateScheduleCompactInterpolation",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!(
+                                "Schedule:Compact/{object_name} For profile has more than one Interpolate directive"
+                            ),
+                        );
+                        continue;
+                    }
+                    if profile.pending_until_minute_of_day.is_some()
+                        || !profile.profile.segments.is_empty()
+                    {
+                        self.error(
+                            "InvalidScheduleCompactInterpolationOrder",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!(
+                                "Schedule:Compact/{object_name} Interpolate directive must immediately follow its For directive"
+                            ),
+                        );
+                        continue;
+                    }
+                    let Some(interpolation) = parse_schedule_interpolation(text) else {
+                        self.error(
+                            "InvalidScheduleCompactInterpolation",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!(
+                                "Schedule:Compact/{object_name} has invalid Interpolate directive '{text}'"
+                            ),
+                        );
+                        continue;
+                    };
+                    profile.profile.interpolation = interpolation;
+                    profile.interpolation_explicit = true;
                 }
                 RawValue::String(text) if compact_directive(text, "Until") => {
                     let Some(profile) = current_profile.as_mut() else {
@@ -4317,6 +4379,20 @@ impl<'a> Compiler<'a> {
                         );
                         continue;
                     }
+                    if profile.profile.interpolation == ScheduleInterpolation::No
+                        && minutes_per_timestep
+                            .is_some_and(|minutes| until_minute_of_day % minutes != 0)
+                    {
+                        self.warning(
+                            "ScheduleCompactUntilNotAlignedToTimestep",
+                            "Schedule:Compact",
+                            Some(object_name),
+                            Some("data"),
+                            format!(
+                                "Schedule:Compact/{object_name} Until minute {until_minute_of_day} is not a multiple of the minutes per zone timestep"
+                            ),
+                        );
+                    }
                     profile.pending_until_minute_of_day = Some(until_minute_of_day);
                 }
                 RawValue::Number(_text) => {
@@ -4354,17 +4430,6 @@ impl<'a> Compiler<'a> {
                         until_minute_of_day,
                         value,
                     });
-                }
-                RawValue::String(text) if compact_directive(text, "Interpolate") => {
-                    self.error(
-                        "UnsupportedScheduleCompactInterpolation",
-                        "Schedule:Compact",
-                        Some(object_name),
-                        Some("data"),
-                        format!(
-                            "Schedule:Compact/{object_name} does not support Interpolate directives"
-                        ),
-                    );
                 }
                 RawValue::String(text) => {
                     self.error(
@@ -4618,6 +4683,24 @@ impl<'a> Compiler<'a> {
         });
     }
 
+    fn warning(
+        &mut self,
+        code: &str,
+        object_type: &str,
+        object_name: Option<&str>,
+        field: Option<&str>,
+        message: String,
+    ) {
+        self.diagnostics.push(ModelDiagnostic {
+            severity: DiagnosticSeverity::Warning,
+            code: code.to_string(),
+            object_type: object_type.to_string(),
+            object_name: object_name.map(str::to_string),
+            field: field.map(str::to_string),
+            message,
+        });
+    }
+
     fn duplicate_name(&mut self, object_type: &str, object_name: &str) {
         self.error(
             "DuplicateName",
@@ -4695,6 +4778,26 @@ fn compact_directive(value: &str, directive: &str) -> bool {
         .get(..directive.len())
         .is_some_and(|prefix| prefix.eq_ignore_ascii_case(directive))
         && value[directive.len()..].trim_start().starts_with(':')
+}
+
+fn parse_schedule_interpolation(value: &str) -> Option<ScheduleInterpolation> {
+    let (_directive, interpolation) = value.split_once(':')?;
+    match interpolation.trim() {
+        interpolation if interpolation.eq_ignore_ascii_case("No") => {
+            Some(ScheduleInterpolation::No)
+        }
+        interpolation if interpolation.eq_ignore_ascii_case("Average") => {
+            Some(ScheduleInterpolation::Average)
+        }
+        interpolation if interpolation.eq_ignore_ascii_case("Linear") => {
+            Some(ScheduleInterpolation::Linear)
+        }
+        _ => None,
+    }
+}
+
+fn schedule_minutes_per_timestep(timesteps_per_hour: u32) -> Option<u32> {
+    (timesteps_per_hour > 0 && 60 % timesteps_per_hour == 0).then(|| 60 / timesteps_per_hour)
 }
 
 const ALL_SCHEDULE_DAY_TYPES: [ScheduleDayType; 12] = [
@@ -5246,7 +5349,7 @@ mod tests {
         LoadDistributionScheme, MaterialSurfaceRoughness, ModelGraph,
         OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType,
         OutsideSurfaceConvectionAlgorithm, PeopleNumberCalculationMethod, PlantConnectorKind,
-        ScheduleDayType, SpecialDayType,
+        ScheduleDayType, ScheduleInterpolation, SpecialDayType,
     };
     use ep_raw_model::{parse_epjson_str, parse_epjson_str_with_idf_order};
 
@@ -6114,6 +6217,10 @@ mod tests {
                 .len(),
             12
         );
+        assert_eq!(
+            model.compact_schedules[0].periods[0].day_profiles[0].interpolation,
+            ScheduleInterpolation::No
+        );
         let segments = &model.compact_schedules[0].periods[0].day_profiles[0].segments;
         assert_eq!(segments.len(), 3);
         assert_eq!(segments[0].until_minute_of_day, 8 * 60);
@@ -6435,8 +6542,188 @@ mod tests {
     }
 
     #[test]
-    fn rejects_schedule_compact_unknown_day_type_and_interpolation()
+    fn parses_schedule_compact_interpolation_modes() -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Schedule:Compact": {
+                    "Default No": {
+                        "data": [
+                            {"field": "Through: 12/31"},
+                            {"field": "For: AllDays"},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    },
+                    "Explicit No": {
+                        "data": [
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Interpolate: No"},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    },
+                    "Average": {
+                        "data": [
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Interpolate: Average"},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    },
+                    "Linear": {
+                        "data": [
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Interpolate: Linear"},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        let Some(model) = result.model else {
+            return Err(std::io::Error::other("expected typed model").into());
+        };
+        for (name, expected) in [
+            ("DEFAULT NO", ScheduleInterpolation::No),
+            ("EXPLICIT NO", ScheduleInterpolation::No),
+            ("AVERAGE", ScheduleInterpolation::Average),
+            ("LINEAR", ScheduleInterpolation::Linear),
+        ] {
+            let schedule = model
+                .compact_schedules
+                .iter()
+                .find(|schedule| schedule.name.0 == name)
+                .ok_or_else(|| std::io::Error::other(format!("missing schedule {name}")))?;
+            assert_eq!(schedule.periods[0].day_profiles[0].interpolation, expected);
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_invalid_duplicate_and_misplaced_schedule_compact_interpolation()
     -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Schedule:Compact": {
+                    "Invalid Mode": {
+                        "data": [
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Interpolate: Spline"},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    },
+                    "Duplicate Mode": {
+                        "data": [
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Interpolate: No"},
+                            {"field": "Interpolate: Linear"},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    },
+                    "Misplaced Mode": {
+                        "data": [
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Until: 12:00"}, {"field": 0},
+                            {"field": "Interpolate: Average"},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(result.has_errors());
+        for (object_name, code) in [
+            ("Invalid Mode", "InvalidScheduleCompactInterpolation"),
+            ("Duplicate Mode", "DuplicateScheduleCompactInterpolation"),
+            ("Misplaced Mode", "InvalidScheduleCompactInterpolationOrder"),
+        ] {
+            assert!(result.report.diagnostics.iter().any(|diagnostic| {
+                diagnostic.code == code && diagnostic.object_name.as_deref() == Some(object_name)
+            }));
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn warns_only_for_no_interpolation_until_not_aligned_to_valid_timestep()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let raw_model = parse_epjson_str(
+            r#"{
+                "Timestep": {
+                    "Quarter Hour": {"number_of_timesteps_per_hour": 4}
+                },
+                "Schedule:Compact": {
+                    "Default No": {
+                        "data": [
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Until: 00:20"}, {"field": 0},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    },
+                    "Explicit No": {
+                        "data": [
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Interpolate: No"},
+                            {"field": "Until: 00:20"}, {"field": 0},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    },
+                    "Average": {
+                        "data": [
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Interpolate: Average"},
+                            {"field": "Until: 00:20"}, {"field": 0},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    },
+                    "Linear": {
+                        "data": [
+                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
+                            {"field": "Interpolate: Linear"},
+                            {"field": "Until: 00:20"}, {"field": 0},
+                            {"field": "Until: 24:00"}, {"field": 1}
+                        ]
+                    }
+                }
+            }"#,
+        )?;
+
+        let result = compile_raw_model(&raw_model);
+
+        assert!(!result.has_errors());
+        assert!(result.model.is_some());
+        let warnings = result
+            .report
+            .diagnostics
+            .iter()
+            .filter(|diagnostic| {
+                diagnostic.severity == DiagnosticSeverity::Warning
+                    && diagnostic.code == "ScheduleCompactUntilNotAlignedToTimestep"
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(warnings.len(), 2);
+        assert!(
+            warnings
+                .iter()
+                .any(|diagnostic| { diagnostic.object_name.as_deref() == Some("Default No") })
+        );
+        assert!(
+            warnings
+                .iter()
+                .any(|diagnostic| { diagnostic.object_name.as_deref() == Some("Explicit No") })
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn rejects_schedule_compact_unknown_day_type() -> Result<(), Box<dyn std::error::Error>> {
         let raw_model = parse_epjson_str(
             r#"{
                 "Schedule:Compact": {
@@ -6444,13 +6731,6 @@ mod tests {
                         "data": [
                             {"field": "Through: 12/31"},
                             {"field": "For: Funday AllOtherDays"},
-                            {"field": "Until: 24:00"}, {"field": 1}
-                        ]
-                    },
-                    "Interpolation": {
-                        "data": [
-                            {"field": "Through: 12/31"}, {"field": "For: AllDays"},
-                            {"field": "Interpolate: Average"},
                             {"field": "Until: 24:00"}, {"field": 1}
                         ]
                     }
@@ -6464,10 +6744,6 @@ mod tests {
         assert!(result.report.diagnostics.iter().any(|diagnostic| {
             diagnostic.code == "UnsupportedScheduleCompactDayType"
                 && diagnostic.object_name.as_deref() == Some("Unknown Day")
-        }));
-        assert!(result.report.diagnostics.iter().any(|diagnostic| {
-            diagnostic.code == "UnsupportedScheduleCompactInterpolation"
-                && diagnostic.object_name.as_deref() == Some("Interpolation")
         }));
 
         Ok(())

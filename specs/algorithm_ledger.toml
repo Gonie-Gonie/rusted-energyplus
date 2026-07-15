@@ -259,6 +259,7 @@ rust_target = [
   "crates/ep_model/src/objects/calendar.rs::SpecialDayType",
   "crates/ep_model/src/objects/calendar.rs::RunPeriodSpecialDay",
   "crates/ep_model/src/objects/schedules.rs::ScheduleDayType",
+  "crates/ep_model/src/objects/schedules.rs::ScheduleInterpolation",
   "crates/ep_model/src/objects/schedules.rs::ScheduleCompactDayProfile",
   "crates/ep_model/src/objects/schedules.rs::ScheduleCompactPeriod",
   "crates/ep_model/src/objects/schedules.rs::ScheduleCompact",
@@ -287,6 +288,7 @@ rust_target = [
   "crates/ep_runtime/src/schedules.rs::detailed_schedule_lookup_state",
   "crates/ep_runtime/src/schedules.rs::precompute_schedule_value_series_for_environment_time_axis",
   "crates/ep_runtime/src/schedules.rs::detailed_schedule_environment_lookup_state",
+  "crates/ep_runtime/src/schedules.rs::precompile_compact_schedule_periods",
   "crates/ep_runtime/src/schedules.rs::precompile_compact_schedule_intervals",
   "crates/ep_runtime/src/weather_calendar.rs::EpwCalendarDateRule",
   "crates/ep_runtime/src/weather_calendar.rs::EpwDaylightSavingPeriod",
@@ -310,6 +312,7 @@ first_case = "schedule_constant_001"
 family_cases = [
   "calendar_schedule_hourly_exact_001",
   "calendar_schedule_compact_through_for_day_type_hourly_exact_001",
+  "calendar_schedule_compact_interpolation_modes_exact_001",
   "calendar_schedule_compact_zone_timestep_exact_001",
   "calendar_schedule_dst_hour24_tomorrow_day_type_exact_001",
   "calendar_schedule_weather_leap_policy_no_001",
@@ -459,6 +462,37 @@ routine.write_time_stamp_format_data.source_routine = "WriteTimeStampFormatData"
 routine.write_time_stamp_format_data.source_map = "docs/src/porting-map/time-weather-schedule.md"
 routine.write_time_stamp_format_data.completion_status = "source_mapped"
 routine.write_time_stamp_format_data.required_for_full_domain = true
+
+[[algorithm]]
+id = "schedule_compact_interpolation_modes"
+domain = "time"
+source_map = "docs/src/porting-map/time-weather-schedule.md"
+energyplus_source = [
+  "src/EnergyPlus/SimulationManager.cc",
+  "src/EnergyPlus/ScheduleManager.cc",
+]
+port_ticket_mappings = [
+  "src/EnergyPlus/SimulationManager.cc|GetProjectData|GetProjectData|Environment",
+  "src/EnergyPlus/ScheduleManager.cc|ProcessScheduleInput|ProcessScheduleInput|Environment",
+  "src/EnergyPlus/ScheduleManager.cc|ProcessIntervalFields|ProcessIntervalFields|Environment",
+  "src/EnergyPlus/ScheduleManager.cc|populateFromMinuteVals|populateFromMinuteVals|Environment",
+]
+rust_target = [
+  "crates/ep_model/src/objects/schedules.rs::ScheduleInterpolation",
+  "crates/ep_model/src/objects/schedules.rs::ScheduleCompactDayProfile",
+  "crates/ep_compiler/src/compiler.rs::Compiler::parse_compact_schedules",
+  "crates/ep_compiler/src/compiler.rs::Compiler::compact_schedule_periods",
+  "crates/ep_runtime/src/schedules.rs::precompile_compact_schedule_periods",
+  "crates/ep_runtime/src/schedules.rs::precompute_schedule_value_series_for_environment_time_axis",
+]
+status = "conformance"
+first_case = "calendar_schedule_compact_interpolation_modes_exact_001"
+first_evidence = "calendar_schedule_compact_interpolation_modes_exact_001"
+proof_variables = [
+  "Schedule Value",
+]
+claim_level = "limited-conformance"
+support_boundary = "Limited EnergyPlus 26.1 conformance only for calendar_schedule_compact_interpolation_modes_exact_001: one non-actual 2032-01-01 Thursday, Timestep,4, all calendar policies No, and three source-ordered all-days Schedule:Compact objects using explicit Interpolate:No, Average, and Linear with Until 00:20=10, 01:15=175, and 24:00=175. The blocking gate proves exactly three 96-sample ordered-exact-unique zero-tolerance Timestep Schedule Value series. Their first five values are No 10/175/175/175/175, Average 10/120/175/175/175, and Linear 10/40/85/130/175; samples 6 through 96 are 175. It locks the first Linear interval flat, the later cross-hour day-minute ramp, the Average 15-minute window mean, explicit-No endpoint selection, all 288 raw EnergyPlus values, 96 shared timestamp rows, exact Environment and disabled daylight-saving EIO rows, and the fixture's exact 1 Warning/0 Severe completion with the one non-multiple Until warning attached only to explicit No. Rust expands through an intermediate 1,440-minute lattice and stores an immutable 96-value zone-timestep cache; Rust EPW record selection is null and unclaimed. Other timestep counts, Until 24:MM correction, malformed/overlap/zero/incomplete profiles, DST plus subhourly interpolation, mixed multi-profile modes, hourly aggregation, downstream consumption, Schedule:File, public/input Schedule:Day:*, Schedule:Week:*, and Schedule:Year, UpdateScheduleVals, EMS/currentVal, Rust raw ESO serialization, and broad diagnostic or schedule parity remain unclaimed. Typed Rust invalid/duplicate/misplaced directive errors and the compiler warning code are source/unit evidence only. The exact EnergyPlus oracle warning text/count is locked only for this one fixture; Rust warning text/count parity remains unclaimed. The calendar_time_state algorithm and its ProcessScheduleInput, ProcessIntervalFields, populateFromMinuteVals, UpdateScheduleVals, and getHrTsVal routine records remain scaffold/source_mapped and are not promoted by this bounded entry."
 
 [[algorithm]]
 id = "air_side_node_state"

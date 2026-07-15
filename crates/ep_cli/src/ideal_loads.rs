@@ -8097,7 +8097,7 @@ mod schedule_boundary_tests {
     use super::*;
     use ep_model::{
         ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
-        ScheduleDayType,
+        ScheduleDayType, ScheduleInterpolation,
     };
 
     fn all_schedule_day_types() -> Vec<ScheduleDayType> {
@@ -8131,6 +8131,7 @@ mod schedule_boundary_tests {
                 day_profiles: vec![
                     ScheduleCompactDayProfile {
                         day_types: vec![ScheduleDayType::Tuesday],
+                        interpolation: ScheduleInterpolation::No,
                         segments: vec![ScheduleCompactSegment {
                             until_minute_of_day: 24 * 60,
                             value: 1.0,
@@ -8138,6 +8139,7 @@ mod schedule_boundary_tests {
                     },
                     ScheduleCompactDayProfile {
                         day_types: other_days,
+                        interpolation: ScheduleInterpolation::No,
                         segments: vec![ScheduleCompactSegment {
                             until_minute_of_day: 24 * 60,
                             value: 2.0,

@@ -8,7 +8,7 @@ use ep_model::{
     OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, People,
     PeopleNumberCalculationMethod, ScheduleCompact, ScheduleCompactDayProfile,
     ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant, ScheduleDayType, ScheduleId,
-    TypedModel, ZoneId,
+    ScheduleInterpolation, TypedModel, ZoneId,
 };
 use std::collections::BTreeSet;
 
@@ -297,8 +297,14 @@ pub struct CompiledScheduleInterval {
 pub struct CompiledScheduleDayProfile {
     /// Expanded schedule day types that consume these intervals.
     pub day_types: Vec<ScheduleDayType>,
+    /// Interpolation mode used to prepare zone-timestep values.
+    pub interpolation: ScheduleInterpolation,
     /// Ordered daily intervals in minute-of-day space.
     pub intervals: Vec<CompiledScheduleInterval>,
+    /// Whole minutes represented by each prepared zone-timestep value.
+    pub minutes_per_timestep: u32,
+    /// Immutable daily values at zone-timestep resolution.
+    pub zone_timestep_values: Vec<f64>,
 }
 
 /// One compiled annual period in a compact schedule.
@@ -359,6 +365,10 @@ pub fn precompute_schedule_value_series(
 }
 
 /// Precomputes constant and supported compact schedules for a run-period time axis.
+///
+/// This axis has hourly samples, so compact profiles using Average or Linear
+/// interpolation or subhourly Until boundaries return NaN values until hourly
+/// schedule aggregation is ported.
 #[must_use]
 pub fn precompute_schedule_value_series_for_time_axis(
     model: &TypedModel,
@@ -382,10 +392,10 @@ pub fn precompute_schedule_value_series_for_time_axis(
 /// Precomputes constant and supported compact schedules for every zone timestep
 /// in one simulation environment.
 ///
-/// Compact schedules currently use EnergyPlus' no-interpolation endpoint
-/// semantics: each zone timestep reads the schedule value at that timestep's
-/// ending minute. The current DST state shifts only the lookup hour, preserving
-/// the one-based zone-timestep position within that hour.
+/// Compact profiles are expanded to EnergyPlus' minute lattice and reduced to
+/// zone-timestep values before calendar lookup. The current DST state shifts
+/// only the lookup hour, preserving the one-based zone-timestep position within
+/// that hour.
 #[must_use]
 pub fn precompute_schedule_value_series_for_environment_time_axis(
     model: &TypedModel,
@@ -466,11 +476,24 @@ fn compact_schedule_series_for_time_axis(
     schedule: &ScheduleCompact,
     time_axis: &TimeAxis,
 ) -> ScheduleValueSeries {
-    let periods = precompile_compact_schedule_periods(schedule);
+    let periods =
+        precompile_compact_schedule_periods(schedule, time_axis.zone_timestep.timesteps_per_hour);
+    let requires_hourly_aggregation = schedule.periods.iter().any(|period| {
+        period.day_profiles.iter().any(|profile| {
+            profile.interpolation != ScheduleInterpolation::No
+                || profile
+                    .segments
+                    .iter()
+                    .any(|segment| segment.until_minute_of_day % 60 != 0)
+        })
+    });
     let values = time_axis
         .points
         .iter()
         .map(|point| {
+            if requires_hourly_aggregation {
+                return f64::NAN;
+            }
             let (schedule_day_of_year, day_type, minute_of_day) =
                 detailed_schedule_lookup_state(point);
             compiled_compact_schedule_value(&periods, schedule_day_of_year, day_type, minute_of_day)
@@ -490,7 +513,8 @@ fn compact_schedule_series_for_environment_time_axis(
     schedule: &ScheduleCompact,
     time_axis: &EnvironmentTimeAxis,
 ) -> ScheduleValueSeries {
-    let periods = precompile_compact_schedule_periods(schedule);
+    let periods =
+        precompile_compact_schedule_periods(schedule, time_axis.zone_timestep.timesteps_per_hour);
     let values = time_axis
         .points
         .iter()
@@ -595,7 +619,29 @@ pub fn hour_only_single_period_compact_schedule_segments(
         ));
     }
 
-    let mut baseline: Option<&[ScheduleCompactSegment]> = None;
+    if let Some(profile) = period
+        .day_profiles
+        .iter()
+        .find(|profile| profile.interpolation != ScheduleInterpolation::No)
+    {
+        return Err(format!(
+            "Schedule:Compact {} uses Interpolate:{:?}; hour-only consumers require Interpolate:No",
+            schedule.name.0, profile.interpolation
+        ));
+    }
+    if period.day_profiles.iter().any(|profile| {
+        profile
+            .segments
+            .iter()
+            .any(|segment| segment.until_minute_of_day % 60 != 0)
+    }) {
+        return Err(format!(
+            "Schedule:Compact {} uses subhourly Until boundaries; hour-only consumers require whole-hour boundaries until hourly aggregation is ported",
+            schedule.name.0
+        ));
+    }
+
+    let mut baseline: Option<(ScheduleInterpolation, &[ScheduleCompactSegment])> = None;
     for day_type in ALL_SCHEDULE_DAY_TYPES {
         let Some(profile) = unique_day_profile(period, day_type) else {
             return Err(format!(
@@ -603,31 +649,40 @@ pub fn hour_only_single_period_compact_schedule_segments(
                 schedule.name.0
             ));
         };
-        if let Some(expected) = baseline {
-            if profile.segments.as_slice() != expected {
+        if let Some((expected_interpolation, expected_segments)) = baseline {
+            if profile.interpolation != expected_interpolation
+                || profile.segments.as_slice() != expected_segments
+            {
                 return Err(format!(
                     "Schedule:Compact {} varies by day type; hour-only consumers require equivalent profiles",
                     schedule.name.0
                 ));
             }
         } else {
-            baseline = Some(&profile.segments);
+            baseline = Some((profile.interpolation, &profile.segments));
         }
     }
 
-    baseline.ok_or_else(|| {
-        format!(
-            "Schedule:Compact {} has no calendar-invariant day profile",
-            schedule.name.0
-        )
-    })
+    baseline
+        .map(|(_interpolation, segments)| segments)
+        .ok_or_else(|| {
+            format!(
+                "Schedule:Compact {} has no calendar-invariant day profile",
+                schedule.name.0
+            )
+        })
 }
 
-/// Precompiles all annual periods and day-type profiles in one compact schedule.
+/// Precompiles all annual periods and day-type profiles at zone-timestep resolution.
+///
+/// A timestep count that does not divide 60 produces empty prepared profiles so
+/// lookup fails closed instead of approximating fractional-minute windows.
 #[must_use]
 pub fn precompile_compact_schedule_periods(
     schedule: &ScheduleCompact,
+    timesteps_per_hour: u32,
 ) -> Vec<CompiledSchedulePeriod> {
+    let minutes_per_timestep = schedule_minutes_per_timestep(timesteps_per_hour);
     schedule
         .periods
         .iter()
@@ -636,13 +691,80 @@ pub fn precompile_compact_schedule_periods(
             day_profiles: period
                 .day_profiles
                 .iter()
-                .map(|profile| CompiledScheduleDayProfile {
-                    day_types: profile.day_types.clone(),
-                    intervals: precompile_compact_schedule_intervals(&profile.segments),
+                .map(|profile| {
+                    precompile_compact_schedule_day_profile(profile, minutes_per_timestep)
                 })
                 .collect(),
         })
         .collect()
+}
+
+fn precompile_compact_schedule_day_profile(
+    profile: &ScheduleCompactDayProfile,
+    minutes_per_timestep: Option<u32>,
+) -> CompiledScheduleDayProfile {
+    let minute_values = expand_compact_schedule_minute_values(profile);
+    let (minutes_per_timestep, zone_timestep_values) = minutes_per_timestep.map_or_else(
+        || (0, Vec::new()),
+        |minutes_per_timestep| {
+            let values = minute_values
+                .chunks_exact(minutes_per_timestep as usize)
+                .map(|window| match profile.interpolation {
+                    ScheduleInterpolation::Average => {
+                        window.iter().sum::<f64>() / f64::from(minutes_per_timestep)
+                    }
+                    ScheduleInterpolation::No | ScheduleInterpolation::Linear => {
+                        window.last().copied().unwrap_or(f64::NAN)
+                    }
+                })
+                .collect();
+            (minutes_per_timestep, values)
+        },
+    );
+
+    CompiledScheduleDayProfile {
+        day_types: profile.day_types.clone(),
+        interpolation: profile.interpolation,
+        intervals: precompile_compact_schedule_intervals(&profile.segments),
+        minutes_per_timestep,
+        zone_timestep_values,
+    }
+}
+
+fn expand_compact_schedule_minute_values(profile: &ScheduleCompactDayProfile) -> Vec<f64> {
+    let mut minute_values = Vec::with_capacity(1440);
+    let mut previous_until_minute = 0_u32;
+    let mut previous_value = None;
+
+    for segment in &profile.segments {
+        let until_minute = segment
+            .until_minute_of_day
+            .clamp(previous_until_minute, 1440);
+        let duration_minutes = until_minute - previous_until_minute;
+        if profile.interpolation == ScheduleInterpolation::Linear {
+            if let Some(start_value) = previous_value {
+                let increment = (segment.value - start_value) / f64::from(duration_minutes.max(1));
+                let mut current_value = start_value;
+                for _minute in 1..=duration_minutes {
+                    current_value += increment;
+                    minute_values.push(current_value);
+                }
+            } else {
+                minute_values.resize(until_minute as usize, segment.value);
+            }
+        } else {
+            minute_values.resize(until_minute as usize, segment.value);
+        }
+        previous_until_minute = until_minute;
+        previous_value = Some(segment.value);
+    }
+
+    minute_values.resize(1440, previous_value.unwrap_or(f64::NAN));
+    minute_values
+}
+
+fn schedule_minutes_per_timestep(timesteps_per_hour: u32) -> Option<u32> {
+    (timesteps_per_hour > 0 && 60 % timesteps_per_hour == 0).then(|| 60 / timesteps_per_hour)
 }
 
 const ALL_SCHEDULE_DAY_TYPES: [ScheduleDayType; 12] = [
@@ -707,7 +829,16 @@ fn compiled_compact_schedule_value(
                 .iter()
                 .find(|profile| profile.day_types.contains(&day_type))
         })
-        .and_then(|profile| compact_interval_value(&profile.intervals, minute_of_day))
+        .and_then(|profile| {
+            let minute = minute_of_day.clamp(1, 1440);
+            let value_index = minute
+                .checked_sub(1)?
+                .checked_div(profile.minutes_per_timestep)?;
+            profile
+                .zone_timestep_values
+                .get(value_index as usize)
+                .copied()
+        })
 }
 
 /// Precompiles Schedule:Compact Until segments into closed daily intervals.

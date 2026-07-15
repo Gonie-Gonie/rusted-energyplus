@@ -8,7 +8,7 @@ use ep_model::{
     CalendarDateRule, DayOfWeek, FirstHourInterpolationStartingValues, NormalizedName, RunPeriod,
     RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact,
     ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleDayType,
-    ScheduleId, SpecialDayType, TimestepConfig, TypedModel,
+    ScheduleId, ScheduleInterpolation, SpecialDayType, TimestepConfig, TypedModel,
 };
 use ep_runtime::{
     DayType, DaylightSavingPeriodSource, EpwCalendarDateRule, EpwCalendarMetadata,
@@ -79,6 +79,7 @@ fn all_schedule_day_types() -> Vec<ScheduleDayType> {
 fn compact_day_profile(day_types: Vec<ScheduleDayType>, value: f64) -> ScheduleCompactDayProfile {
     ScheduleCompactDayProfile {
         day_types,
+        interpolation: ScheduleInterpolation::No,
         segments: vec![ScheduleCompactSegment {
             until_minute_of_day: 24 * 60,
             value,
@@ -206,6 +207,7 @@ fn timestep_schedule_samples_use_environment_axis_values_and_unique_labels()
                 through_schedule_day_of_year: 366,
                 day_profiles: vec![ScheduleCompactDayProfile {
                     day_types: all_schedule_day_types(),
+                    interpolation: ScheduleInterpolation::No,
                     segments: vec![
                         ScheduleCompactSegment {
                             until_minute_of_day: 15,
@@ -311,6 +313,7 @@ fn schedule_samples_resolves_compact_trace_from_shared_name_registry()
             through_schedule_day_of_year: 366,
             day_profiles: vec![ScheduleCompactDayProfile {
                 day_types: all_schedule_day_types(),
+                interpolation: ScheduleInterpolation::No,
                 segments: (1..=24)
                     .map(|hour| ScheduleCompactSegment {
                         until_minute_of_day: hour * 60,

@@ -92,12 +92,29 @@ CLAIM_BOUNDARY = (
     "clean 0 Warning/0 Severe completion. Rust EPW record selection is null and unclaimed for this "
     "schedule-only case. This proves only omitted-directive default ownership, flat minute-field "
     "expansion, default-No end-minute sampling, and explicit detailed-schedule timestep indexing for "
-    "that one aligned case. Explicit Interpolate directives, Average, Linear, non-aligned Until warning "
+    "that one aligned case. For that CP43 fixture, explicit Interpolate directives, Average, Linear, "
+    "non-aligned Until warning "
     "and resulting sampling behavior, timestep-count correction/defaulting, DST interaction, "
     "Schedule:File and the public/input Schedule:Day:*, Schedule:Week:*, and Schedule:Year families, "
     "UpdateScheduleVals, EMS/currentVal "
     "policy, downstream consumption, Rust raw ESO serialization, and broad warning/error parity remain "
-    "unclaimed. The separate weather record-offset "
+    "unclaimed. The separate Schedule:Compact explicit-interpolation case covers only one non-actual "
+    "2032-01-01 Thursday with Timestep,4, all calendar policies No, and three source-ordered AllDays "
+    "profiles using explicit No, Average, and Linear with Until 00:20=10, 01:15=175, and 24:00=175. "
+    "Its three 96-sample ordered-exact-unique zero-tolerance Timestep Schedule Value series begin "
+    "No 10/175/175/175/175, Average 10/120/175/175/175, and Linear 10/40/85/130/175; every later "
+    "sample is 175. This locks the flat first Linear interval, subsequent cross-hour day-minute ramp, "
+    "Average 15-minute window mean, and explicit-No endpoint selection for this fixture. The gate "
+    "also locks all 288 raw EnergyPlus values, 96 shared raw timestamp rows, exact Environment and "
+    "disabled Environment:Daylight Saving EIO rows, and exact 1 Warning/0 Severe completion. The "
+    "single non-multiple Until warning belongs only to explicit No. Rust expands through an intermediate "
+    "1,440-minute lattice and stores an immutable 96-value zone-timestep cache. Rust EPW record selection "
+    "is null and unclaimed. Other timestep counts, Until 24:MM correction, malformed/overlap/zero/incomplete "
+    "profiles, DST plus subhourly interpolation, mixed multi-profile modes, hourly aggregation, downstream "
+    "consumption, Schedule:File, Schedule:Day:*, Schedule:Week:*, Schedule:Year, UpdateScheduleVals, "
+    "EMS/currentVal, Rust raw ESO serialization, and broad diagnostic or schedule parity remain unclaimed. "
+    "The exact EnergyPlus oracle warning text/count is locked only for this fixture; Rust warning text/count "
+    "parity remains unclaimed. The separate weather record-offset "
     "case proves only "
     "same-year non-actual, single-data-period, one-record-per-hour month/day positioning: 24 leading "
     "decoy rows are skipped and 48 ordered hourly dry-bulb timestamps and values match exactly. "
@@ -305,6 +322,7 @@ CASE_LABELS = {
     "schedule_constant_001": "Schedule const",
     "calendar_schedule_hourly_exact_001": "Calendar/sched exact",
     "calendar_schedule_compact_through_for_day_type_hourly_exact_001": "Compact Through/For",
+    "calendar_schedule_compact_interpolation_modes_exact_001": "Compact interpolation",
     "calendar_schedule_compact_zone_timestep_exact_001": "Compact zone timestep",
     "calendar_schedule_dst_hour24_tomorrow_day_type_exact_001": "DST schedule rollover",
     "calendar_schedule_weather_leap_policy_no_001": "Weather calendar no-leap",
@@ -345,6 +363,9 @@ KEY_LABELS = {
     "CALENDAR HOURLY 1 TO 24": "Calendar 1-24",
     "THROUGH FOR DAY TYPE SCHEDULE": "Through/For day type",
     "ZONE TIMESTEP SCHEDULE": "Zone timestep schedule",
+    "INTERPOLATION NO SCHEDULE": "Interp No",
+    "INTERPOLATION AVERAGE SCHEDULE": "Interp Average",
+    "INTERPOLATION LINEAR SCHEDULE": "Interp Linear",
     "DST FINAL ROLLOVER SCHEDULE": "DST final rollover",
     "Environment": "Env",
     "ENVIRONMENT": "Env",
@@ -449,6 +470,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_zone_timestep_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_zone_timestep_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_zone_timestep_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Compact interpolation",
+        command="compare-calendar-schedule-compact-interpolation-modes-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_interpolation_modes_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_interpolation_modes_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_interpolation_modes_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="DST schedule rollover",

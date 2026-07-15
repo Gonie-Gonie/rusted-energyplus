@@ -95,7 +95,10 @@
         NodeStateStore, node_temperature_setpoint_from_energyplus,
         simulate_ideal_loads_node_state_projection,
     };
-    use crate::schedules::precompute_schedule_value_series_for_environment_time_axis;
+    use crate::schedules::{
+        precompile_compact_schedule_periods,
+        precompute_schedule_value_series_for_environment_time_axis,
+    };
     use crate::time_axis::{Date, next_day};
     use crate::{
         ExecutionStage, ExecutionStageKind, ExecutionStep, RuntimeOutputRegistry,
@@ -127,8 +130,9 @@
         OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
         PeopleNumberCalculationMethod, Point3, RunPeriod, RunPeriodId, ScheduleCompact,
         ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant,
-        ScheduleDayType, ScheduleId, SimulationModel, SiteLocation, SunExposure, Surface, SurfaceId,
-        SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
+        ScheduleDayType, ScheduleId, ScheduleInterpolation, SimulationModel, SiteLocation,
+        SunExposure, Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType,
+        ThermostatDualSetpoint,
         ThermostatSetpointId, TimestepConfig, TypedModel, WindExposure, Zone,
         ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
         ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId, ZoneThermostat,
@@ -159,6 +163,7 @@
     ) -> ScheduleCompactDayProfile {
         ScheduleCompactDayProfile {
             day_types,
+            interpolation: ScheduleInterpolation::No,
             segments: vec![ScheduleCompactSegment {
                 until_minute_of_day: 24 * 60,
                 value,
@@ -742,6 +747,7 @@
                 through_schedule_day_of_year: 366,
                 day_profiles: vec![ScheduleCompactDayProfile {
                     day_types: all_schedule_day_types(),
+                    interpolation: ScheduleInterpolation::No,
                     segments: vec![
                         ScheduleCompactSegment {
                             until_minute_of_day: 8 * 60,
@@ -971,6 +977,7 @@
                     through_schedule_day_of_year: 366,
                     day_profiles: vec![ScheduleCompactDayProfile {
                         day_types: all_schedule_day_types(),
+                        interpolation: ScheduleInterpolation::No,
                         segments: vec![
                             ScheduleCompactSegment {
                                 until_minute_of_day: 8 * 60,
@@ -1037,6 +1044,7 @@
                     through_schedule_day_of_year: 366,
                     day_profiles: vec![ScheduleCompactDayProfile {
                         day_types: all_schedule_day_types(),
+                        interpolation: ScheduleInterpolation::No,
                         segments: vec![
                             ScheduleCompactSegment {
                                 until_minute_of_day: 15,
@@ -1128,6 +1136,151 @@
     }
 
     #[test]
+    fn compact_schedule_environment_axis_applies_no_average_and_linear_interpolation()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let compact_schedule =
+            |id: u32, name: &str, interpolation: ScheduleInterpolation| ScheduleCompact {
+                id: ScheduleId(id),
+                name: NormalizedName::new(name),
+                schedule_type_limits: None,
+                periods: vec![ScheduleCompactPeriod {
+                    through_schedule_day_of_year: 366,
+                    day_profiles: vec![ScheduleCompactDayProfile {
+                        day_types: all_schedule_day_types(),
+                        interpolation,
+                        segments: vec![
+                            ScheduleCompactSegment {
+                                until_minute_of_day: 20,
+                                value: 0.0,
+                            },
+                            ScheduleCompactSegment {
+                                until_minute_of_day: 60,
+                                value: 60.0,
+                            },
+                            ScheduleCompactSegment {
+                                until_minute_of_day: 1440,
+                                value: 60.0,
+                            },
+                        ],
+                    }],
+                }],
+            };
+        let model = TypedModel {
+            timestep: TimestepConfig {
+                number_of_timesteps_per_hour: 4,
+            },
+            run_periods: vec![RunPeriod {
+                id: RunPeriodId(0),
+                name: NormalizedName::new("Interpolation Day"),
+                begin_month: 1,
+                begin_day_of_month: 1,
+                begin_year: Some(2032),
+                end_month: 1,
+                end_day_of_month: 1,
+                end_year: Some(2032),
+                day_of_week_for_start_day: Some(DayOfWeek::Thursday),
+                first_hour_interpolation_starting_values:
+                    FirstHourInterpolationStartingValues::Hour24,
+                use_weather_file_holidays_and_special_days: false,
+                use_weather_file_daylight_saving_period: false,
+                apply_weekend_holiday_rule: false,
+                use_weather_file_rain_indicators: false,
+                use_weather_file_snow_indicators: false,
+                treat_weather_as_actual: false,
+            }],
+            compact_schedules: vec![
+                compact_schedule(60, "No Interpolation", ScheduleInterpolation::No),
+                compact_schedule(61, "Average Interpolation", ScheduleInterpolation::Average),
+                compact_schedule(62, "Linear Interpolation", ScheduleInterpolation::Linear),
+            ],
+            ..TypedModel::default()
+        };
+
+        let environment_axes = build_environment_time_axes(&model)?;
+        let series = precompute_schedule_value_series_for_environment_time_axis(
+            &model,
+            &environment_axes[0],
+        );
+        for (schedule_id, expected_first_hour) in [
+            (ScheduleId(60), [0.0, 60.0, 60.0, 60.0]),
+            (ScheduleId(61), [0.0, 40.0, 60.0, 60.0]),
+            (ScheduleId(62), [0.0, 15.0, 37.5, 60.0]),
+        ] {
+            let trace = series
+                .iter()
+                .find(|trace| trace.schedule_id == schedule_id)
+                .expect("interpolated schedule trace");
+            assert_eq!(trace.values.len(), 96);
+            assert_eq!(trace.values[..4], expected_first_hour);
+            assert!(trace.values[4..].iter().all(|value| *value == 60.0));
+            let ScheduleSeriesKind::CompactCalendarProfiles { periods } = &trace.kind else {
+                return Err(std::io::Error::other(
+                    "expected compiled compact calendar profiles",
+                )
+                .into());
+            };
+            assert_eq!(periods[0].day_profiles[0].zone_timestep_values.len(), 96);
+            assert_eq!(
+                periods[0].day_profiles[0].zone_timestep_values,
+                trace.values
+            );
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn compact_schedule_linear_interpolation_keeps_first_interval_flat_across_hour_boundary() {
+        let schedule = |interpolation| ScheduleCompact {
+            id: ScheduleId(63),
+            name: NormalizedName::new("Linear Source Order"),
+            schedule_type_limits: None,
+            periods: vec![ScheduleCompactPeriod {
+                through_schedule_day_of_year: 366,
+                day_profiles: vec![ScheduleCompactDayProfile {
+                    day_types: all_schedule_day_types(),
+                    interpolation,
+                    segments: vec![
+                        ScheduleCompactSegment {
+                            until_minute_of_day: 20,
+                            value: 10.0,
+                        },
+                        ScheduleCompactSegment {
+                            until_minute_of_day: 75,
+                            value: 175.0,
+                        },
+                        ScheduleCompactSegment {
+                            until_minute_of_day: 1440,
+                            value: 175.0,
+                        },
+                    ],
+                }],
+            }],
+        };
+
+        for (interpolation, expected) in [
+            (
+                ScheduleInterpolation::No,
+                [10.0, 175.0, 175.0, 175.0, 175.0],
+            ),
+            (
+                ScheduleInterpolation::Average,
+                [10.0, 120.0, 175.0, 175.0, 175.0],
+            ),
+            (
+                ScheduleInterpolation::Linear,
+                [10.0, 40.0, 85.0, 130.0, 175.0],
+            ),
+        ] {
+            let periods = precompile_compact_schedule_periods(&schedule(interpolation), 4);
+            assert_eq!(
+                periods[0].day_profiles[0].zone_timestep_values[..5],
+                expected
+            );
+        }
+    }
+
+    #[test]
     fn detailed_schedule_environment_axis_preserves_zone_timestep_across_dst_shift_and_wrap()
     -> Result<(), Box<dyn std::error::Error>> {
         let schedule_id = ScheduleId(50);
@@ -1173,6 +1326,7 @@
                         through_schedule_day_of_year: 1,
                         day_profiles: vec![ScheduleCompactDayProfile {
                             day_types: all_schedule_day_types(),
+                            interpolation: ScheduleInterpolation::No,
                             segments: vec![
                                 ScheduleCompactSegment {
                                     until_minute_of_day: 15,
@@ -1201,6 +1355,7 @@
                         through_schedule_day_of_year: 366,
                         day_profiles: vec![ScheduleCompactDayProfile {
                             day_types: all_schedule_day_types(),
+                            interpolation: ScheduleInterpolation::No,
                             segments: vec![
                                 ScheduleCompactSegment {
                                     until_minute_of_day: 60,
@@ -1317,6 +1472,7 @@
                         through_schedule_day_of_year: 304,
                         day_profiles: vec![ScheduleCompactDayProfile {
                             day_types: all_schedule_day_types(),
+                            interpolation: ScheduleInterpolation::No,
                             segments: vec![
                                 ScheduleCompactSegment {
                                     until_minute_of_day: 23 * 60,
@@ -1333,6 +1489,7 @@
                         through_schedule_day_of_year: 305,
                         day_profiles: vec![ScheduleCompactDayProfile {
                             day_types: all_schedule_day_types(),
+                            interpolation: ScheduleInterpolation::No,
                             segments: vec![
                                 ScheduleCompactSegment {
                                     until_minute_of_day: 60,
@@ -1350,6 +1507,7 @@
                         day_profiles: vec![
                             ScheduleCompactDayProfile {
                                 day_types: vec![ScheduleDayType::Holiday],
+                                interpolation: ScheduleInterpolation::No,
                                 segments: vec![
                                     ScheduleCompactSegment {
                                         until_minute_of_day: 60,
@@ -1363,6 +1521,7 @@
                             },
                             ScheduleCompactDayProfile {
                                 day_types: non_holiday_day_types.clone(),
+                                interpolation: ScheduleInterpolation::No,
                                 segments: vec![
                                     ScheduleCompactSegment {
                                         until_minute_of_day: 60,
@@ -1381,6 +1540,7 @@
                         day_profiles: vec![
                             ScheduleCompactDayProfile {
                                 day_types: vec![ScheduleDayType::Holiday],
+                                interpolation: ScheduleInterpolation::No,
                                 segments: vec![
                                     ScheduleCompactSegment {
                                         until_minute_of_day: 60,
@@ -1394,6 +1554,7 @@
                             },
                             ScheduleCompactDayProfile {
                                 day_types: non_holiday_day_types,
+                                interpolation: ScheduleInterpolation::No,
                                 segments: vec![
                                     ScheduleCompactSegment {
                                         until_minute_of_day: 60,
@@ -1520,6 +1681,7 @@
                         through_schedule_day_of_year: 1,
                         day_profiles: vec![ScheduleCompactDayProfile {
                             day_types: all_schedule_day_types(),
+                            interpolation: ScheduleInterpolation::No,
                             segments: vec![
                                 ScheduleCompactSegment {
                                     until_minute_of_day: 60,
@@ -1536,6 +1698,7 @@
                         through_schedule_day_of_year: 366,
                         day_profiles: vec![ScheduleCompactDayProfile {
                             day_types: all_schedule_day_types(),
+                            interpolation: ScheduleInterpolation::No,
                             segments: vec![
                                 ScheduleCompactSegment {
                                     until_minute_of_day: 60,
@@ -1649,6 +1812,74 @@
                     ..
                 }
             ));
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn hour_only_schedule_consumers_fail_closed_when_hourly_aggregation_is_required()
+    -> Result<(), Box<dyn std::error::Error>> {
+        for (interpolation, segments, expected_error) in [
+            (
+                ScheduleInterpolation::Average,
+                vec![ScheduleCompactSegment {
+                    until_minute_of_day: 1440,
+                    value: 1.0,
+                }],
+                "hour-only consumers require Interpolate:No",
+            ),
+            (
+                ScheduleInterpolation::Linear,
+                vec![ScheduleCompactSegment {
+                    until_minute_of_day: 1440,
+                    value: 1.0,
+                }],
+                "hour-only consumers require Interpolate:No",
+            ),
+            (
+                ScheduleInterpolation::No,
+                vec![
+                    ScheduleCompactSegment {
+                        until_minute_of_day: 20,
+                        value: 0.0,
+                    },
+                    ScheduleCompactSegment {
+                        until_minute_of_day: 1440,
+                        value: 1.0,
+                    },
+                ],
+                "hour-only consumers require whole-hour boundaries",
+            ),
+        ] {
+            let model = TypedModel {
+                timestep: TimestepConfig {
+                    number_of_timesteps_per_hour: 4,
+                },
+                compact_schedules: vec![ScheduleCompact {
+                    id: ScheduleId(64),
+                    name: NormalizedName::new("Subhourly Interpolation"),
+                    schedule_type_limits: None,
+                    periods: vec![ScheduleCompactPeriod {
+                        through_schedule_day_of_year: 366,
+                        day_profiles: vec![ScheduleCompactDayProfile {
+                            day_types: all_schedule_day_types(),
+                            interpolation,
+                            segments,
+                        }],
+                    }],
+                }],
+                ..TypedModel::default()
+            };
+
+            let error = precompute_schedule_value_series(&model, 24)
+                .expect_err("hour-only series must reject interpolation");
+            assert!(error.contains(expected_error));
+
+            let axis = build_hourly_time_axis(&model)?;
+            let calendar_series =
+                precompute_schedule_value_series_for_time_axis(&model, &axis);
+            assert!(calendar_series[0].values.iter().all(|value| value.is_nan()));
         }
 
         Ok(())
