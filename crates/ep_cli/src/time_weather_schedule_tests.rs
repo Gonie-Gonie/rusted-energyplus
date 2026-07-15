@@ -7,20 +7,21 @@ use ep_conformance::{
 use ep_model::{
     CalendarDateRule, DayOfWeek, FirstHourInterpolationStartingValues, NormalizedName, RunPeriod,
     RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact,
-    ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleDayType,
-    ScheduleId, ScheduleInterpolation, SpecialDayType, TimestepConfig, TypedModel,
+    ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant,
+    ScheduleDayType, ScheduleId, ScheduleInterpolation, SpecialDayType, TimestepConfig, TypedModel,
 };
 use ep_runtime::{
     DayType, DaylightSavingPeriodSource, EpwCalendarDateRule, EpwCalendarMetadata,
     EpwDaylightSavingPeriod, EpwRecord, ResolvedDaylightSavingDate, ResolvedDaylightSavingPeriod,
-    build_environment_time_axes, build_hourly_time_axis_with_weather_metadata,
+    ScheduleSeriesIndexKind, build_environment_time_axes,
+    build_hourly_time_axis_with_weather_metadata, precompute_constant_schedule_cache,
 };
 
 use super::{
     append_daylight_saving_markdown, build_hourly_time_axis,
-    precompute_schedule_value_series_for_environment_time_axis,
-    precompute_schedule_value_series_for_time_axis, schedule_samples, schedule_timestep_samples,
-    validate_manifest, weather_calendar_json, weather_samples,
+    precompute_schedule_cache_for_environment_time_axis, precompute_schedule_cache_for_time_axis,
+    schedule_samples, schedule_timestep_samples, validate_manifest, weather_calendar_json,
+    weather_samples,
 };
 
 fn report_manifest(outputs: &str) -> Result<ConformanceCase, Box<dyn std::error::Error>> {
@@ -246,8 +247,7 @@ fn timestep_schedule_samples_use_environment_axis_values_and_unique_labels()
         .into_iter()
         .next()
         .ok_or_else(|| std::io::Error::other("missing environment time axis"))?;
-    let schedule_series =
-        precompute_schedule_value_series_for_environment_time_axis(&model, &time_axis);
+    let schedule_cache = precompute_schedule_cache_for_environment_time_axis(&model, &time_axis);
     let output = OutputRequest {
         key: "TIMESTEP SCHEDULE".to_string(),
         variable: "Schedule Value".to_string(),
@@ -262,7 +262,7 @@ fn timestep_schedule_samples_use_environment_axis_values_and_unique_labels()
         rel_tol: None,
     };
 
-    let samples = schedule_timestep_samples(&output, &model, &time_axis, &schedule_series)
+    let samples = schedule_timestep_samples(&output, &model, &time_axis, &schedule_cache)
         .map_err(std::io::Error::other)?;
     let timestamps = samples
         .iter()
@@ -324,7 +324,7 @@ fn schedule_samples_resolves_compact_trace_from_shared_name_registry()
         }],
     });
     let time_axis = build_hourly_time_axis(&model).map_err(std::io::Error::other)?;
-    let schedule_series = precompute_schedule_value_series_for_time_axis(&model, &time_axis);
+    let schedule_cache = precompute_schedule_cache_for_time_axis(&model, &time_axis);
     let output = OutputRequest {
         key: "CALENDAR HOURLY".to_string(),
         variable: "Schedule Value".to_string(),
@@ -339,7 +339,7 @@ fn schedule_samples_resolves_compact_trace_from_shared_name_registry()
         rel_tol: None,
     };
 
-    let samples = schedule_samples(&output, &model, &time_axis, &schedule_series)
+    let samples = schedule_samples(&output, &model, &time_axis, &schedule_cache)
         .map_err(std::io::Error::other)?;
     let timestamps = samples
         .iter()
@@ -400,7 +400,7 @@ fn schedule_samples_consume_cross_year_through_and_for_profiles()
     );
 
     let time_axis = build_hourly_time_axis(&model).map_err(std::io::Error::other)?;
-    let schedule_series = precompute_schedule_value_series_for_time_axis(&model, &time_axis);
+    let schedule_cache = precompute_schedule_cache_for_time_axis(&model, &time_axis);
     let output = OutputRequest {
         key: "CROSS YEAR DAY TYPE".to_string(),
         variable: "Schedule Value".to_string(),
@@ -415,7 +415,7 @@ fn schedule_samples_consume_cross_year_through_and_for_profiles()
         rel_tol: None,
     };
 
-    let samples = schedule_samples(&output, &model, &time_axis, &schedule_series)
+    let samples = schedule_samples(&output, &model, &time_axis, &schedule_cache)
         .map_err(std::io::Error::other)?;
     assert_eq!(samples.len(), 120);
     assert_eq!(
@@ -453,6 +453,60 @@ fn schedule_samples_consume_cross_year_through_and_for_profiles()
         );
     }
 
+    Ok(())
+}
+
+#[test]
+fn schedule_samples_consume_constant_scalar_cache_without_dense_allocation()
+-> Result<(), Box<dyn std::error::Error>> {
+    let schedule_id = ScheduleId(0);
+    let mut model = TypedModel {
+        schedules: vec![ScheduleConstant {
+            id: schedule_id,
+            name: NormalizedName::new("Scalar Schedule"),
+            schedule_type_limits: None,
+            hourly_value: 0.625,
+        }],
+        compact_schedules: vec![cross_year_day_type_compact_schedule(ScheduleId(9))],
+        ..TypedModel::default()
+    };
+    assert!(
+        model
+            .schedule_names
+            .insert("Scalar Schedule", schedule_id)
+            .is_none()
+    );
+    let time_axis = build_hourly_time_axis(&model).map_err(std::io::Error::other)?;
+    let schedule_cache = precompute_constant_schedule_cache(&model, time_axis.sample_count());
+    let profile = schedule_cache.profile();
+
+    assert_eq!(schedule_cache.len(), 1);
+    assert_eq!(profile.scalar_series_count, 1);
+    assert_eq!(profile.dense_series_count, 0);
+    assert_eq!(profile.logical_sample_count, time_axis.sample_count());
+    assert_eq!(profile.allocated_dense_sample_count, 0);
+    assert_eq!(profile.index_kind, ScheduleSeriesIndexKind::DenseIdentity);
+    assert_eq!(profile.ambiguous_id_count, 0);
+
+    let output = OutputRequest {
+        key: "SCALAR SCHEDULE".to_string(),
+        variable: "Schedule Value".to_string(),
+        frequency: OutputFrequency::Hourly,
+        class: VariableClass::Schedule,
+        source: SourceArtifact::Eso,
+        timestamp_contract: Some(TimestampContract::OrderedExactUnique),
+        domain: None,
+        level: None,
+        abs_tol: None,
+        rmse_tol: None,
+        rel_tol: None,
+    };
+    let samples = schedule_samples(&output, &model, &time_axis, &schedule_cache)
+        .map_err(std::io::Error::other)?;
+
+    assert_eq!(samples.len(), time_axis.sample_count());
+    assert!(samples.iter().all(|sample| sample.value == 0.625));
+    assert!(samples.iter().all(|sample| sample.timestamp.is_some()));
     Ok(())
 }
 

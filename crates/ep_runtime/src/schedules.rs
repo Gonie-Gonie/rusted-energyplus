@@ -23,7 +23,7 @@ pub use cache::{
     ScheduleSeriesCache, ScheduleSeriesIndexKind, precompute_schedule_cache,
     precompute_schedule_cache_for_environment_time_axis, precompute_schedule_cache_for_time_axis,
 };
-pub use constant::simulate_constant_schedules;
+pub use constant::{precompute_constant_schedule_cache, simulate_constant_schedules};
 #[cfg(test)]
 use day_table::{
     compiled_day_schedule_value, precompile_day_schedule_table, year_schedule_hourly_value,

@@ -12,13 +12,13 @@ use ep_conformance::{
     TimestampContract, VariableClass,
 };
 use ep_model::TypedModel;
-use ep_runtime::schedules::precompute_schedule_value_series_for_environment_time_axis;
 use ep_runtime::{
-    EnvironmentTimeAxis, EpwEnvironmentWeather, ScheduleValueSeries, TimeAxis,
+    EnvironmentTimeAxis, EpwEnvironmentWeather, ScheduleSeriesCache, TimeAxis,
     build_environment_time_axes, build_environment_time_axes_with_weather_metadata,
     build_hourly_time_axis, build_hourly_time_axis_with_weather_metadata, load_epw_weather_file,
     normalized_environment_timestep_timestamp_label, normalized_hourly_timestamp_label,
-    precompute_schedule_value_series_for_time_axis, select_epw_environment_weather,
+    precompute_schedule_cache_for_environment_time_axis, precompute_schedule_cache_for_time_axis,
+    select_epw_environment_weather,
 };
 
 use crate::conformance_artifacts::{
@@ -338,18 +338,15 @@ fn build_context<'a>(
     } else {
         None
     };
-    let schedule_series = manifest
+    let schedule_cache = manifest
         .outputs
         .iter()
         .any(|output| output.class == VariableClass::Schedule)
         .then(|| {
             if let Some(environment_time_axis) = environment_time_axis.as_ref() {
-                precompute_schedule_value_series_for_environment_time_axis(
-                    &model,
-                    environment_time_axis,
-                )
+                precompute_schedule_cache_for_environment_time_axis(&model, environment_time_axis)
             } else {
-                precompute_schedule_value_series_for_time_axis(&model, &time_axis)
+                precompute_schedule_cache_for_time_axis(&model, &time_axis)
             }
         });
     let has_weather_output = manifest
@@ -384,7 +381,7 @@ fn build_context<'a>(
             &model,
             &time_axis,
             environment_time_axis.as_ref(),
-            schedule_series.as_deref(),
+            schedule_cache.as_ref(),
             weather_records,
         )?;
         let tolerance = tolerance_for_output(manifest, output)?;
@@ -482,16 +479,16 @@ fn observed_samples(
     model: &TypedModel,
     time_axis: &TimeAxis,
     environment_time_axis: Option<&EnvironmentTimeAxis>,
-    schedule_series: Option<&[ScheduleValueSeries]>,
+    schedule_cache: Option<&ScheduleSeriesCache>,
     weather_records: Option<&[ep_runtime::EpwRecord]>,
 ) -> Result<Vec<SeriesSample>, String> {
     match output.class {
         VariableClass::Schedule => {
-            let schedule_series =
-                schedule_series.ok_or_else(|| "missing precomputed schedule series".to_string())?;
+            let schedule_cache =
+                schedule_cache.ok_or_else(|| "missing precomputed schedule series".to_string())?;
             match output.frequency {
                 OutputFrequency::Hourly => {
-                    schedule_samples(output, model, time_axis, schedule_series)
+                    schedule_samples(output, model, time_axis, schedule_cache)
                 }
                 OutputFrequency::Timestep => schedule_timestep_samples(
                     output,
@@ -499,7 +496,7 @@ fn observed_samples(
                     environment_time_axis.ok_or_else(|| {
                         "missing environment time axis for timestep schedule".to_string()
                     })?,
-                    schedule_series,
+                    schedule_cache,
                 ),
                 _ => Err(format!(
                     "unsupported schedule output frequency: {}",
@@ -519,50 +516,51 @@ fn schedule_samples(
     output: &OutputRequest,
     model: &TypedModel,
     time_axis: &TimeAxis,
-    schedule_series: &[ScheduleValueSeries],
+    schedule_cache: &ScheduleSeriesCache,
 ) -> Result<Vec<SeriesSample>, String> {
     let schedule_id = model
         .schedule_names
         .resolve(&output.key)
         .ok_or_else(|| format!("missing schedule {}", output.key))?;
-    let trace = schedule_series
-        .iter()
-        .find(|trace| trace.schedule_id == schedule_id)
+    let trace = schedule_cache
+        .get(schedule_id)
         .ok_or_else(|| format!("missing schedule trace {}", output.key))?;
-    if trace.values.len() != time_axis.sample_count() {
+    if trace.len() != time_axis.sample_count() {
         return Err(format!(
             "schedule trace {} has {} samples but time axis requires {}",
             output.key,
-            trace.values.len(),
+            trace.len(),
             time_axis.sample_count()
         ));
     }
-    Ok(samples_with_time_axis(&trace.values, time_axis))
+    Ok(samples_with_time_axis(trace.values(), time_axis))
 }
 
 fn schedule_timestep_samples(
     output: &OutputRequest,
     model: &TypedModel,
     time_axis: &EnvironmentTimeAxis,
-    schedule_series: &[ScheduleValueSeries],
+    schedule_cache: &ScheduleSeriesCache,
 ) -> Result<Vec<SeriesSample>, String> {
     let schedule_id = model
         .schedule_names
         .resolve(&output.key)
         .ok_or_else(|| format!("missing schedule {}", output.key))?;
-    let trace = schedule_series
-        .iter()
-        .find(|trace| trace.schedule_id == schedule_id)
+    let trace = schedule_cache
+        .get(schedule_id)
         .ok_or_else(|| format!("missing schedule trace {}", output.key))?;
-    if trace.values.len() != time_axis.sample_count() {
+    if trace.len() != time_axis.sample_count() {
         return Err(format!(
             "schedule trace {} has {} samples but environment time axis requires {}",
             output.key,
-            trace.values.len(),
+            trace.len(),
             time_axis.sample_count()
         ));
     }
-    Ok(samples_with_environment_time_axis(&trace.values, time_axis))
+    Ok(samples_with_environment_time_axis(
+        trace.values(),
+        time_axis,
+    ))
 }
 
 fn weather_samples(
@@ -600,7 +598,7 @@ fn weather_samples(
             .map(|record| weather_value(output, record))
             .collect::<Result<Vec<_>, _>>()?
     };
-    Ok(samples_with_time_axis(&values, time_axis))
+    Ok(samples_with_time_axis(values.iter().copied(), time_axis))
 }
 
 fn weather_value(output: &OutputRequest, record: &ep_runtime::EpwRecord) -> Result<f64, String> {
@@ -626,10 +624,12 @@ fn weather_value(output: &OutputRequest, record: &ep_runtime::EpwRecord) -> Resu
     }
 }
 
-fn samples_with_time_axis(values: &[f64], time_axis: &TimeAxis) -> Vec<SeriesSample> {
+fn samples_with_time_axis(
+    values: impl IntoIterator<Item = f64>,
+    time_axis: &TimeAxis,
+) -> Vec<SeriesSample> {
     values
-        .iter()
-        .copied()
+        .into_iter()
         .zip(&time_axis.points)
         .map(|(value, point)| {
             SeriesSample::timestamped(
@@ -642,12 +642,11 @@ fn samples_with_time_axis(values: &[f64], time_axis: &TimeAxis) -> Vec<SeriesSam
 }
 
 fn samples_with_environment_time_axis(
-    values: &[f64],
+    values: impl IntoIterator<Item = f64>,
     time_axis: &EnvironmentTimeAxis,
 ) -> Vec<SeriesSample> {
     values
-        .iter()
-        .copied()
+        .into_iter()
         .zip(&time_axis.points)
         .map(|(value, point)| {
             SeriesSample::timestamped(

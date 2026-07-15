@@ -138,10 +138,11 @@ pub use crate::schedules::{
     ScheduleSampleStorage, ScheduleSeriesCache, ScheduleSeriesIndexKind, ScheduleSeriesKind,
     ScheduleTrace, ScheduleValueSeries, ZONE_TOTAL_INTERNAL_CONVECTIVE_HEATING_RATE_VARIABLE,
     ZONE_TOTAL_INTERNAL_RADIANT_HEATING_RATE_VARIABLE, ZoneInternalGainTrace,
-    precompile_compact_schedule_intervals, precompute_schedule_cache,
-    precompute_schedule_cache_for_environment_time_axis, precompute_schedule_cache_for_time_axis,
-    precompute_schedule_value_series, precompute_schedule_value_series_for_time_axis,
-    simulate_constant_schedules, simulate_schedule_values, simulate_zone_internal_convective_gains,
+    precompile_compact_schedule_intervals, precompute_constant_schedule_cache,
+    precompute_schedule_cache, precompute_schedule_cache_for_environment_time_axis,
+    precompute_schedule_cache_for_time_axis, precompute_schedule_value_series,
+    precompute_schedule_value_series_for_time_axis, simulate_constant_schedules,
+    simulate_schedule_values, simulate_zone_internal_convective_gains,
     simulate_zone_internal_radiant_gains,
 };
 use crate::time_axis::run_period_first_hour_interpolation_starting_values;

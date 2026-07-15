@@ -16,9 +16,10 @@ use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, load_epjson_file, load_epjson_file_with_idf_order};
 use ep_runtime::{
     ExecutionPlan, ExecutionStep, HeatBalanceSimulationOptions, IdealLoadsCompatibilityOptions,
-    NodeStateProjectionOptions, ResultStore, RuntimePrecomputedData, ScheduleValueSeries, TimeAxis,
-    WeatherTimestepSeries, build_hourly_time_axis, build_hourly_time_axis_with_weather_metadata,
-    load_epw_weather_file, precompute_runtime_data, precompute_schedule_value_series_for_time_axis,
+    NodeStateProjectionOptions, ResultStore, RuntimePrecomputedData, ScheduleCacheProfile,
+    ScheduleSeriesCache, ScheduleSeriesIndexKind, TimeAxis, WeatherTimestepSeries,
+    build_hourly_time_axis, build_hourly_time_axis_with_weather_metadata, load_epw_weather_file,
+    precompute_runtime_data, precompute_schedule_cache_for_time_axis,
     precompute_weather_timestep_series, select_epw_environment_weather,
     simulate_heat_balance_zone_air_temperatures_with_weather_series,
     simulate_ideal_loads_node_state_projection, simulate_ideal_loads_purchased_air_compat,
@@ -129,13 +130,15 @@ struct RustRuntimeResult {
     results: ResultStore,
     runtime_class: RuntimeClass,
     sample_count: usize,
+    schedule_cache_sample_count: usize,
+    schedule_cache_profile: ScheduleCacheProfile,
     source_order_gate: SourceOrderGateSummary,
 }
 
 struct PreparedRuntimeInputs {
     sample_count: usize,
     time_axis: TimeAxis,
-    schedule_series: Vec<ScheduleValueSeries>,
+    schedule_cache: ScheduleSeriesCache,
     weather_series: Option<WeatherTimestepSeries>,
 }
 
@@ -675,6 +678,25 @@ fn finish_early(
     })
 }
 
+/// Deterministic cache storage/index metadata, not a runtime timing measurement.
+fn schedule_cache_json(sample_count: usize, profile: ScheduleCacheProfile) -> Value {
+    let index_kind = match profile.index_kind {
+        ScheduleSeriesIndexKind::DenseIdentity => "dense_identity",
+        ScheduleSeriesIndexKind::Sparse => "sparse",
+    };
+    json!({
+        "sample_count": sample_count,
+        "profile": {
+            "scalar_series_count": profile.scalar_series_count,
+            "dense_series_count": profile.dense_series_count,
+            "logical_sample_count": profile.logical_sample_count,
+            "allocated_dense_sample_count": profile.allocated_dense_sample_count,
+            "index_kind": index_kind,
+            "ambiguous_id_count": profile.ambiguous_id_count,
+        },
+    })
+}
+
 #[allow(clippy::too_many_arguments)]
 fn finish_successful_summary(
     config: &RunConfig,
@@ -775,6 +797,10 @@ fn finish_successful_summary(
             "runtime_class": result.runtime_class.id(),
             "samples": result.sample_count,
             "series": result.results.series.len(),
+            "schedule_cache": schedule_cache_json(
+                result.schedule_cache_sample_count,
+                result.schedule_cache_profile,
+            ),
             "source_order_stages": result.source_order_gate.actual_executed_source_order_stages.clone(),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
@@ -1570,12 +1596,12 @@ fn prepare_runtime_inputs(
         &time_axis,
         runtime_class_requires_weather(runtime_class),
     )?;
-    let schedule_series = precompute_schedule_value_series_for_time_axis(&model.typed, &time_axis);
+    let schedule_cache = precompute_schedule_cache_for_time_axis(&model.typed, &time_axis);
 
     Ok(PreparedRuntimeInputs {
         sample_count,
         time_axis,
-        schedule_series,
+        schedule_cache,
         weather_series,
     })
 }
@@ -1588,6 +1614,8 @@ fn execute_rust_runtime(
 ) -> Result<RustRuntimeResult, String> {
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
     let sample_count = runtime_inputs.sample_count;
+    let schedule_cache_sample_count = runtime_inputs.schedule_cache.sample_count();
+    let schedule_cache_profile = runtime_inputs.schedule_cache.profile();
     match runtime_class {
         RuntimeClass::OneZoneHeatBalanceCompatibility
         | RuntimeClass::HeatBalanceZoneAirDiagnostic => {
@@ -1595,7 +1623,7 @@ fn execute_rust_runtime(
                 "weather records are required for heat-balance runtime".to_string()
             })?;
             let _runtime_time_axis_samples = runtime_inputs.time_axis.sample_count();
-            let _runtime_precomputed_schedule_count = runtime_inputs.schedule_series.len();
+            let _runtime_precomputed_schedule_count = runtime_inputs.schedule_cache.len();
             let options = HeatBalanceSimulationOptions::hourly_samples(sample_count);
             let simulation = simulate_heat_balance_zone_air_temperatures_with_weather_series(
                 model,
@@ -1607,6 +1635,8 @@ fn execute_rust_runtime(
                 results: simulation.results,
                 runtime_class,
                 sample_count,
+                schedule_cache_sample_count,
+                schedule_cache_profile,
                 source_order_gate,
             })
         }
@@ -1625,6 +1655,8 @@ fn execute_rust_runtime(
                 results: simulation.results,
                 runtime_class,
                 sample_count,
+                schedule_cache_sample_count,
+                schedule_cache_profile,
                 source_order_gate,
             })
         }
@@ -1638,6 +1670,8 @@ fn execute_rust_runtime(
                 results: projection.results,
                 runtime_class,
                 sample_count,
+                schedule_cache_sample_count,
+                schedule_cache_profile,
                 source_order_gate,
             })
         }
@@ -1938,8 +1972,8 @@ mod tests {
 
     use super::{
         artifact_map, ctf_split_trace_enabled, execution_stage_snapshots,
-        full_surface_trace_opt_in, input_error_diagnostic_code, selected_trace_enabled,
-        source_order_gate_summary, source_order_stage_state_snapshots,
+        full_surface_trace_opt_in, input_error_diagnostic_code, schedule_cache_json,
+        selected_trace_enabled, source_order_gate_summary, source_order_stage_state_snapshots,
         trace_level_enables_stage_snapshots, typed_counts,
     };
     use ep_compiler::compile_raw_model;
@@ -1951,7 +1985,7 @@ mod tests {
     use ep_raw_model::parse_epjson_str_with_idf_order;
     use ep_runtime::{
         DayType, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
-        ExecutionStep, build_hourly_time_axis,
+        ExecutionStep, ScheduleCacheProfile, ScheduleSeriesIndexKind, build_hourly_time_axis,
     };
 
     use crate::{TraceLevel, TraceSelection};
@@ -1974,6 +2008,38 @@ mod tests {
             input_error_diagnostic_code("failed to stage epJSON input: denied"),
             "RawModelParseFailed"
         );
+    }
+
+    #[test]
+    fn schedule_cache_json_exposes_stable_structural_profile() {
+        let profile = ScheduleCacheProfile {
+            scalar_series_count: 2,
+            dense_series_count: 3,
+            logical_sample_count: 120,
+            allocated_dense_sample_count: 72,
+            index_kind: ScheduleSeriesIndexKind::DenseIdentity,
+            ambiguous_id_count: 0,
+        };
+
+        let cache = schedule_cache_json(24, profile);
+        assert_eq!(cache["sample_count"], 24);
+        assert_eq!(cache["profile"]["scalar_series_count"], 2);
+        assert_eq!(cache["profile"]["dense_series_count"], 3);
+        assert_eq!(cache["profile"]["logical_sample_count"], 120);
+        assert_eq!(cache["profile"]["allocated_dense_sample_count"], 72);
+        assert_eq!(cache["profile"]["index_kind"], "dense_identity");
+        assert_eq!(cache["profile"]["ambiguous_id_count"], 0);
+
+        let sparse = schedule_cache_json(
+            24,
+            ScheduleCacheProfile {
+                index_kind: ScheduleSeriesIndexKind::Sparse,
+                ambiguous_id_count: 1,
+                ..profile
+            },
+        );
+        assert_eq!(sparse["profile"]["index_kind"], "sparse");
+        assert_eq!(sparse["profile"]["ambiguous_id_count"], 1);
     }
 
     #[test]

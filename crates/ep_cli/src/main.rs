@@ -93,8 +93,8 @@ use ep_runtime::{
     build_hourly_time_axis, energyplus_heat_balance_compatibility_stages,
     energyplus_zone_air_heat_capacity_j_per_k, load_epw_dry_bulb_series, load_epw_records,
     normalized_hourly_timestamp_label, output_store_type_for_variable,
-    precompute_schedule_value_series_for_time_axis, precompute_weather_timestep_series,
-    simulate_constant_schedules, simulate_first_zone_uncontrolled,
+    precompute_constant_schedule_cache, precompute_schedule_cache_for_time_axis,
+    precompute_weather_timestep_series, simulate_first_zone_uncontrolled,
     simulate_heat_balance_zone_air_temperatures,
     simulate_heat_balance_zone_air_temperatures_with_weather_series_and_ctf_coefficients,
     simulate_ideal_loads_node_state_projection, simulate_plant_state_projection, surface_area_m2,
@@ -3422,7 +3422,7 @@ fn run_compare_schedule_value(args: &[String]) -> i32 {
         .map(|(_id, _name, values)| values.len())
         .max()
         .unwrap_or(0);
-    let traces = simulate_constant_schedules(model, sample_count);
+    let schedule_cache = precompute_constant_schedule_cache(model, sample_count);
     let mut passed = true;
 
     println!("Schedule Value Comparison");
@@ -3431,15 +3431,15 @@ fn run_compare_schedule_value(args: &[String]) -> i32 {
     println!("  tolerance_policy: default");
     println!("  schedules: {}", oracle_series.len());
     for (schedule_id, schedule_name, expected_values) in oracle_series {
-        let Some(trace) = traces.iter().find(|trace| trace.schedule_id == schedule_id) else {
+        let Some(trace) = schedule_cache.get(schedule_id) else {
             eprintln!("missing Rust schedule trace: {schedule_name}");
             return 1;
         };
-        let comparison = compare_series(
-            &expected_values,
-            &trace.values[..expected_values.len()],
-            Tolerance::default(),
-        );
+        let observed_values = trace
+            .values()
+            .take(expected_values.len())
+            .collect::<Vec<_>>();
+        let comparison = compare_series(&expected_values, &observed_values, Tolerance::default());
         if !comparison.passed {
             passed = false;
         }
@@ -5517,8 +5517,8 @@ fn build_heat_balance_conformance_diagnostic(
     let weather_schedule_precompute_start = Instant::now();
     let time_axis =
         build_hourly_time_axis(&simulation_model.typed).map_err(|error| error.to_string())?;
-    let _schedule_series =
-        precompute_schedule_value_series_for_time_axis(&simulation_model.typed, &time_axis);
+    let _schedule_cache =
+        precompute_schedule_cache_for_time_axis(&simulation_model.typed, &time_axis);
     let weather_series = precompute_weather_timestep_series(
         &weather_records,
         simulation_model
@@ -5547,7 +5547,7 @@ fn build_heat_balance_conformance_diagnostic(
         "runtime_heat_balance_execution",
         "ep_runtime",
         elapsed_seconds_since(runtime_start),
-        "execute heat-balance compatibility runtime using precomputed weather/schedule inputs",
+        "execute heat-balance compatibility runtime using precomputed weather inputs; the schedule cache is prepared and profiled but is not yet consumed by heat-balance calculations",
     );
     append_surface_incident_solar_radiation_series(
         &mut simulation.results,
