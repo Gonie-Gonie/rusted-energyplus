@@ -41,6 +41,16 @@ fn energyplus_psy_cp_air_fn_w_raw(humidity_ratio: f64) -> f64 {
     1.004_84e3 + humidity_ratio * 1.858_95e3
 }
 
+#[inline]
+fn energyplus_psy_rhov_fn_tdb_w_pb_raw(
+    dry_bulb_c: f64,
+    humidity_ratio: f64,
+    atmospheric_pressure_pa: f64,
+) -> f64 {
+    humidity_ratio * atmospheric_pressure_pa
+        / (461.52 * (dry_bulb_c + KELVIN_OFFSET) * (humidity_ratio + 0.621_98))
+}
+
 pub(crate) fn energyplus_outdoor_wet_bulb_c(
     dry_bulb_c: f64,
     relative_humidity_percent: f64,
@@ -265,6 +275,56 @@ pub fn energyplus_psy_cp_air_fn_w_fast(humidity_ratio: f64) -> f64 {
     energyplus_psy_cp_air_fn_w_raw(humidity_ratio)
 }
 
+/// Canonical EnergyPlus 26.1 `PsyTdbFnHW` dry-bulb inversion in Celsius.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_tdb_fn_h_w(enthalpy_j_per_kg: f64, humidity_ratio: f64) -> f64 {
+    let humidity_ratio = energyplus_humidity_ratio_floor(humidity_ratio);
+    (enthalpy_j_per_kg - 2.500_94e6 * humidity_ratio) / (1.004_84e3 + 1.858_95e3 * humidity_ratio)
+}
+
+/// Canonical EnergyPlus 26.1 `PsyRhovFnTdbRhLBnd0C` vapor density in kg/m3.
+///
+/// Despite the historical source name, this routine does not clamp dry-bulb
+/// temperature to 0 C; the source exponential is evaluated with the supplied
+/// temperature and relative humidity without validation.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_rhov_fn_tdb_rh_lbnd0c(dry_bulb_c: f64, relative_humidity: f64) -> f64 {
+    relative_humidity / (461.52 * (dry_bulb_c + KELVIN_OFFSET))
+        * (23.709_3 - 4_111.0 / ((dry_bulb_c + KELVIN_OFFSET) - 35.45)).exp()
+}
+
+/// Canonical EnergyPlus 26.1 `PsyRhovFnTdbWPb` vapor density in kg/m3.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_rhov_fn_tdb_w_pb(
+    dry_bulb_c: f64,
+    humidity_ratio: f64,
+    atmospheric_pressure_pa: f64,
+) -> f64 {
+    energyplus_psy_rhov_fn_tdb_w_pb_raw(
+        dry_bulb_c,
+        energyplus_humidity_ratio_floor(humidity_ratio),
+        atmospheric_pressure_pa,
+    )
+}
+
+/// Canonical EnergyPlus 26.1 `PsyRhovFnTdbWPb_fast` numerical path.
+///
+/// The caller must provide `humidity_ratio >= 1.0e-5`. As in the C++ source,
+/// the precondition is checked only when debug assertions are enabled.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_rhov_fn_tdb_w_pb_fast(
+    dry_bulb_c: f64,
+    humidity_ratio: f64,
+    atmospheric_pressure_pa: f64,
+) -> f64 {
+    debug_assert!(humidity_ratio >= ENERGYPLUS_MIN_HUMIDITY_RATIO);
+    energyplus_psy_rhov_fn_tdb_w_pb_raw(dry_bulb_c, humidity_ratio, atmospheric_pressure_pa)
+}
+
 /// Returns guarded EnergyPlus-style moist-air density in kg/m3.
 ///
 /// This compatibility wrapper retains its pre-existing validation contract and
@@ -402,3 +462,7 @@ fn energyplus_psychrometric_psat_cache_temperature_c(temperature_c: f64) -> f64 
 #[cfg(test)]
 #[path = "psychrometrics_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_inverse_density_tests.rs"]
+mod inverse_density_tests;
