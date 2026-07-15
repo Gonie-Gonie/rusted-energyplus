@@ -554,6 +554,13 @@ fn schedule_ids(model: &SimulationModel) -> impl Iterator<Item = ScheduleId> + '
                 .iter()
                 .map(|schedule| schedule.id),
         )
+        .chain(
+            model
+                .typed
+                .file_schedules
+                .iter()
+                .map(|schedule| schedule.id),
+        )
 }
 
 fn compile_stage_contracts(

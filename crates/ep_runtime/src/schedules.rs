@@ -7,10 +7,13 @@ use crate::time_axis::{DayType, EnvironmentTimeAxis, EnvironmentTimePoint, TimeA
 use ep_model::{
     OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, People,
     PeopleNumberCalculationMethod, ScheduleCompact, ScheduleCompactDayProfile,
-    ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant, ScheduleDayType, ScheduleId,
-    ScheduleInterpolation, TypedModel, ZoneId,
+    ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant, ScheduleDayType, ScheduleFile,
+    ScheduleId, ScheduleInterpolation, TypedModel, ZoneId,
 };
 use std::collections::BTreeSet;
+
+#[cfg(test)]
+mod tests;
 
 /// EnergyPlus ESO variable for zone total internal convective sensible gains.
 pub const ZONE_TOTAL_INTERNAL_CONVECTIVE_HEATING_RATE_VARIABLE: &str =
@@ -120,6 +123,16 @@ pub(crate) fn validate_hour_only_internal_gain_schedules(
                 Ok(_) => continue,
                 Err(reason) => reason,
             },
+            None if model
+                .file_schedules
+                .iter()
+                .any(|schedule| schedule.id == schedule_id) =>
+            {
+                format!(
+                    "Schedule:File ID {} requires a calendar-aware precomputed schedule series",
+                    schedule_id.0
+                )
+            }
             None => format!("schedule ID {} is unresolved", schedule_id.0),
         };
         return Err(RuntimeError::InvalidInternalGainSchedule {
@@ -279,6 +292,11 @@ pub enum ScheduleSeriesKind {
         /// Source-ordered annual periods compiled for calendar-aware lookup.
         periods: Vec<CompiledSchedulePeriod>,
     },
+    /// Hourly `Schedule:File` values with EnergyPlus' 8760-row leap-day expansion.
+    FileHourly8760 {
+        /// Immutable source value count loaded during compilation.
+        source_value_count: usize,
+    },
 }
 
 /// One precompiled daily schedule interval.
@@ -386,6 +404,12 @@ pub fn precompute_schedule_value_series_for_time_axis(
                 .iter()
                 .map(|schedule| compact_schedule_series_for_time_axis(schedule, time_axis)),
         )
+        .chain(
+            model
+                .file_schedules
+                .iter()
+                .map(|schedule| file_schedule_series_for_time_axis(schedule, time_axis)),
+        )
         .collect()
 }
 
@@ -412,6 +436,11 @@ pub fn precompute_schedule_value_series_for_environment_time_axis(
                 compact_schedule_series_for_environment_time_axis(schedule, time_axis)
             }),
         )
+        .chain(
+            model.file_schedules.iter().map(|schedule| {
+                file_schedule_series_for_environment_time_axis(schedule, time_axis)
+            }),
+        )
         .collect()
 }
 
@@ -419,6 +448,12 @@ fn precompute_schedule_value_series_for_hours(
     model: &TypedModel,
     hours: impl IntoIterator<Item = u32> + Clone,
 ) -> Result<Vec<ScheduleValueSeries>, String> {
+    if !model.file_schedules.is_empty() {
+        return Err(
+            "Schedule:File requires a calendar-aware TimeAxis; the hour-only API has no annual source index"
+                .to_string(),
+        );
+    }
     let constants = model
         .schedules
         .iter()
@@ -532,6 +567,67 @@ fn compact_schedule_series_for_environment_time_axis(
         kind: ScheduleSeriesKind::CompactCalendarProfiles { periods },
         values,
     }
+}
+
+fn file_schedule_series_for_time_axis(
+    schedule: &ScheduleFile,
+    time_axis: &TimeAxis,
+) -> ScheduleValueSeries {
+    let values = time_axis
+        .points
+        .iter()
+        .map(|point| {
+            file_schedule_hourly_8760_value(schedule, point.schedule_day_of_year, point.hour)
+                .unwrap_or(f64::NAN)
+        })
+        .collect();
+    ScheduleTrace {
+        schedule_id: schedule.id,
+        schedule_name: schedule.name.0.clone(),
+        kind: ScheduleSeriesKind::FileHourly8760 {
+            source_value_count: schedule.values.len(),
+        },
+        values,
+    }
+}
+
+fn file_schedule_series_for_environment_time_axis(
+    schedule: &ScheduleFile,
+    time_axis: &EnvironmentTimeAxis,
+) -> ScheduleValueSeries {
+    let values = time_axis
+        .points
+        .iter()
+        .map(|point| {
+            file_schedule_hourly_8760_value(schedule, point.schedule_day_of_year, point.hour)
+                .unwrap_or(f64::NAN)
+        })
+        .collect();
+    ScheduleTrace {
+        schedule_id: schedule.id,
+        schedule_name: schedule.name.0.clone(),
+        kind: ScheduleSeriesKind::FileHourly8760 {
+            source_value_count: schedule.values.len(),
+        },
+        values,
+    }
+}
+
+fn file_schedule_hourly_8760_value(
+    schedule: &ScheduleFile,
+    schedule_day_of_year: u32,
+    hour_ending: u32,
+) -> Option<f64> {
+    let schedule_day = schedule_day_of_year.clamp(1, 366);
+    let source_day = match schedule_day {
+        60 => 59,
+        day if day > 60 => day - 1,
+        day => day,
+    };
+    let source_index = (source_day - 1)
+        .checked_mul(24)?
+        .checked_add(hour_ending.clamp(1, 24) - 1)?;
+    schedule.values.get(source_index as usize).copied()
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]

@@ -59,6 +59,25 @@ pub enum ValidationError {
         /// Field path.
         field: &'static str,
     },
+    /// An auxiliary input file name was empty.
+    EmptyAuxiliaryFile {
+        /// Zero-based auxiliary file index.
+        index: usize,
+    },
+    /// An auxiliary input file was not a safe simple basename.
+    InvalidAuxiliaryFileName {
+        /// Zero-based auxiliary file index.
+        index: usize,
+        /// Rejected file name.
+        file_name: String,
+    },
+    /// Two auxiliary input files resolve to the same case-insensitive basename.
+    DuplicateAuxiliaryFile {
+        /// Zero-based auxiliary file index where the duplicate was found.
+        index: usize,
+        /// Duplicate file name.
+        file_name: String,
+    },
     /// v2 metadata table was missing.
     MissingManifestV2,
     /// v2 manifest schema marker was not supported.
@@ -183,6 +202,17 @@ impl Display for ValidationError {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::MissingField { field } => write!(formatter, "missing required field {field}"),
+            Self::EmptyAuxiliaryFile { index } => {
+                write!(formatter, "input auxiliary file {index} is empty")
+            }
+            Self::InvalidAuxiliaryFileName { index, file_name } => write!(
+                formatter,
+                "input auxiliary file {index} must be a safe simple basename, got {file_name:?}"
+            ),
+            Self::DuplicateAuxiliaryFile { index, file_name } => write!(
+                formatter,
+                "input auxiliary file {index} duplicates staged basename {file_name}"
+            ),
             Self::MissingManifestV2 => write!(formatter, "missing required table manifest_v2"),
             Self::UnsupportedManifestV2Schema { schema } => {
                 write!(formatter, "unsupported manifest_v2.schema {schema}")

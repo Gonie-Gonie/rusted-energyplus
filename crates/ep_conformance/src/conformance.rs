@@ -81,6 +81,7 @@ impl ConformanceCase {
         if let Some(epjson) = self.input.epjson.as_deref() {
             require_non_empty("input.epjson", epjson)?;
         }
+        validate_auxiliary_files(&self.input.auxiliary_files)?;
         if let Some(boundary) = self.boundary.as_ref() {
             boundary.validate()?;
         }
@@ -338,6 +339,9 @@ pub struct CaseInput {
     pub weather: Option<String>,
     /// Optional epJSON path produced from the IDF.
     pub epjson: Option<String>,
+    /// Auxiliary input files staged beside the IDF, expressed as safe simple basenames.
+    #[serde(default)]
+    pub auxiliary_files: Vec<String>,
 }
 
 /// Explicit boundary for a dynamic candidate or diagnostic case.
@@ -531,6 +535,42 @@ fn require_non_empty(field: &'static str, value: &str) -> Result<(), ValidationE
         return Err(ValidationError::MissingField { field });
     }
     Ok(())
+}
+
+fn validate_auxiliary_files(auxiliary_files: &[String]) -> Result<(), ValidationError> {
+    let mut staged_names = BTreeSet::new();
+    for (index, file_name) in auxiliary_files.iter().enumerate() {
+        if file_name.trim().is_empty() {
+            return Err(ValidationError::EmptyAuxiliaryFile { index });
+        }
+        if !is_safe_auxiliary_basename(file_name) {
+            return Err(ValidationError::InvalidAuxiliaryFileName {
+                index,
+                file_name: file_name.clone(),
+            });
+        }
+
+        let normalized = file_name.to_ascii_uppercase();
+        if !staged_names.insert(normalized) {
+            return Err(ValidationError::DuplicateAuxiliaryFile {
+                index,
+                file_name: file_name.clone(),
+            });
+        }
+    }
+    Ok(())
+}
+
+fn is_safe_auxiliary_basename(file_name: &str) -> bool {
+    let normalized = file_name.to_ascii_uppercase();
+    file_name == file_name.trim()
+        && !matches!(file_name, "." | "..")
+        && !file_name.contains(['/', '\\', ':', '\0'])
+        && !matches!(
+            normalized.as_str(),
+            "INPUT.IDF" | "INPUT.EPJSON" | "WEATHER.EPW" | "CASE-EXPANDED.TOML"
+        )
+        && !normalized.starts_with("EPLUSOUT.")
 }
 
 fn require_output_non_empty(

@@ -352,13 +352,16 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     println!("  materials: {}", model.typed.materials.len());
     println!(
         "  schedules: {}",
-        model.typed.schedules.len() + model.typed.compact_schedules.len()
+        model.typed.schedules.len()
+            + model.typed.compact_schedules.len()
+            + model.typed.file_schedules.len()
     );
     println!("  constant_schedules: {}", model.typed.schedules.len());
     println!(
         "  compact_schedules: {}",
         model.typed.compact_schedules.len()
     );
+    println!("  file_schedules: {}", model.typed.file_schedules.len());
     println!("  other_equipment: {}", model.typed.other_equipment.len());
     println!(
         "  thermostat_dual_setpoints: {}",
@@ -9435,6 +9438,13 @@ fn schedule_name_for_id(model: &TypedModel, schedule_id: Option<ScheduleId>) -> 
                 .find(|schedule| schedule.id == schedule_id)
                 .map(|schedule| schedule.name.0.clone())
         })
+        .or_else(|| {
+            model
+                .file_schedules
+                .iter()
+                .find(|schedule| schedule.id == schedule_id)
+                .map(|schedule| schedule.name.0.clone())
+        })
         .unwrap_or_else(|| "MISSING SCHEDULE".to_string())
 }
 
@@ -17015,10 +17025,11 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
     );
     println!(
         "  schedules: {}",
-        model.schedules.len() + model.compact_schedules.len()
+        model.schedules.len() + model.compact_schedules.len() + model.file_schedules.len()
     );
     println!("  constant_schedules: {}", model.schedules.len());
     println!("  compact_schedules: {}", model.compact_schedules.len());
+    println!("  file_schedules: {}", model.file_schedules.len());
     println!("  other_equipment: {}", model.other_equipment.len());
     println!(
         "  thermostat_dual_setpoints: {}",

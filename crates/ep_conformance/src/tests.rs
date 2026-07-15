@@ -1487,6 +1487,88 @@ fn rejects_unknown_timestamp_contract_during_deserialization() {
     assert!(matches!(result, Err(ManifestError::Toml(_))));
 }
 
+#[test]
+fn accepts_safe_auxiliary_file_basenames_and_defaults_to_empty()
+-> Result<(), Box<dyn std::error::Error>> {
+    let without_auxiliary = parse_case_str(&auxiliary_file_case(None))?;
+    assert!(without_auxiliary.input.auxiliary_files.is_empty());
+
+    let with_auxiliary = parse_case_str(&auxiliary_file_case(Some(
+        "auxiliary_files = [\"schedule.csv\", \"schedule values.txt\"]",
+    )))?;
+    assert_eq!(
+        with_auxiliary.input.auxiliary_files,
+        ["schedule.csv", "schedule values.txt"]
+    );
+    Ok(())
+}
+
+#[test]
+fn rejects_empty_unsafe_and_duplicate_auxiliary_file_names() {
+    let empty = parse_case_str(&auxiliary_file_case(Some("auxiliary_files = [\"   \"]")));
+    assert!(matches!(
+        empty,
+        Err(ManifestError::Validation(
+            ValidationError::EmptyAuxiliaryFile { index: 0 }
+        ))
+    ));
+
+    for unsafe_name in [
+        ".",
+        "..",
+        "nested/schedule.csv",
+        "nested\\schedule.csv",
+        "C:\\schedule.csv",
+        " schedule.csv",
+        "input.idf",
+        "eplusout.err",
+    ] {
+        let manifest = auxiliary_file_case(Some(&format!(
+            "auxiliary_files = [{}]",
+            toml_string(unsafe_name)
+        )));
+        assert!(matches!(
+            parse_case_str(&manifest),
+            Err(ManifestError::Validation(
+                ValidationError::InvalidAuxiliaryFileName { index: 0, .. }
+            ))
+        ));
+    }
+
+    let duplicate = parse_case_str(&auxiliary_file_case(Some(
+        "auxiliary_files = [\"schedule.csv\", \"SCHEDULE.CSV\"]",
+    )));
+    assert!(matches!(
+        duplicate,
+        Err(ManifestError::Validation(
+            ValidationError::DuplicateAuxiliaryFile { index: 1, .. }
+        ))
+    ));
+}
+
+fn auxiliary_file_case(input_extension: Option<&str>) -> String {
+    let input_extension = input_extension.unwrap_or_default();
+    format!(
+        r#"
+id = "auxiliary_file_case"
+title = "Auxiliary file case"
+milestone = "P1"
+purpose = "Exercise auxiliary input validation."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+
+[input]
+idf = "input.idf"
+{input_extension}
+"#
+    )
+}
+
+fn toml_string(value: &str) -> String {
+    format!("{value:?}")
+}
+
 fn timestamp_contract_case(
     source: &str,
     frequency: &str,

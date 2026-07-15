@@ -17,16 +17,17 @@ use ep_model::{
     PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod,
     RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
     ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
-    ScheduleConstant, ScheduleDayType, ScheduleId, ScheduleInterpolation, ScheduleTypeLimitId,
-    ScheduleTypeLimits, SetpointManagerComponent, SiteLocation, SolarDistribution, SpecialDayType,
-    SunExposure, Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType,
-    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, TypedModel, Version,
-    WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
-    ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat,
-    ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
-    parse_calendar_date_rule,
+    ScheduleConstant, ScheduleDayType, ScheduleFile, ScheduleFileColumnSeparator, ScheduleId,
+    ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits, SetpointManagerComponent,
+    SiteLocation, SolarDistribution, SpecialDayType, SunExposure, Surface, SurfaceId, SurfaceType,
+    Terrain, ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId,
+    TimestepConfig, TypedModel, Version, WindExposure, Zone, ZoneEquipmentConnection,
+    ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId,
+    ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
+    ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
+use std::path::{Component, Path};
 
 const MAX_OPAQUE_CONSTRUCTION_LAYERS: usize = 10;
 
@@ -168,7 +169,16 @@ impl CompileResult {
 /// Compiles a RawModel into the first typed model subset.
 #[must_use]
 pub fn compile_raw_model(raw_model: &RawModel) -> CompileResult {
-    Compiler::new(raw_model).compile()
+    Compiler::new(raw_model, None).compile()
+}
+
+/// Compiles a RawModel and resolves file-backed schedules below one staged auxiliary root.
+#[must_use]
+pub fn compile_raw_model_with_auxiliary_root(
+    raw_model: &RawModel,
+    auxiliary_root: &Path,
+) -> CompileResult {
+    Compiler::new(raw_model, Some(auxiliary_root)).compile()
 }
 
 /// Returns the current TypedModel coverage status for an object type.
@@ -211,6 +221,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "ScheduleTypeLimits",
     "Schedule:Constant",
     "Schedule:Compact",
+    "Schedule:File",
     "OtherEquipment",
     "People",
     "ThermostatSetpoint:DualSetpoint",
@@ -249,6 +260,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
 
 struct Compiler<'a> {
     raw_model: &'a RawModel,
+    auxiliary_root: Option<&'a Path>,
     diagnostics: Vec<ModelDiagnostic>,
     defaults_applied: Vec<DefaultApplication>,
 }
@@ -265,9 +277,10 @@ struct CompactScheduleProfileBuilder {
 }
 
 impl<'a> Compiler<'a> {
-    fn new(raw_model: &'a RawModel) -> Self {
+    fn new(raw_model: &'a RawModel, auxiliary_root: Option<&'a Path>) -> Self {
         Self {
             raw_model,
+            auxiliary_root,
             diagnostics: Vec::new(),
             defaults_applied: Vec::new(),
         }
@@ -291,6 +304,7 @@ impl<'a> Compiler<'a> {
         self.parse_schedule_type_limits(&mut model);
         self.parse_schedules(&mut model);
         self.parse_compact_schedules(&mut model);
+        self.parse_file_schedules(&mut model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
@@ -924,6 +938,349 @@ impl<'a> Compiler<'a> {
                 periods,
             });
         }
+    }
+
+    fn parse_file_schedules(&mut self, model: &mut TypedModel) {
+        for (name, object) in self.objects("Schedule:File") {
+            let schedule_type_limits = match self.optional_string(
+                "Schedule:File",
+                &name,
+                &object,
+                "schedule_type_limits_name",
+            ) {
+                Some(type_limits_name) => self.resolve_name(
+                    &model.schedule_type_limit_names,
+                    "Schedule:File",
+                    &name,
+                    "schedule_type_limits_name",
+                    &type_limits_name,
+                    "ScheduleTypeLimits",
+                ),
+                None => None,
+            };
+            let Some(file_name) =
+                self.required_string("Schedule:File", &name, &object, "file_name")
+            else {
+                continue;
+            };
+            let Some(column_number) =
+                self.required_positive_u32("Schedule:File", &name, &object, "column_number")
+            else {
+                continue;
+            };
+            let Some(rows_to_skip_at_top) =
+                self.required_u32("Schedule:File", &name, &object, "rows_to_skip_at_top")
+            else {
+                continue;
+            };
+            let number_of_hours_of_data = self.u32_default(
+                "Schedule:File",
+                &name,
+                &object,
+                "number_of_hours_of_data",
+                8760,
+            );
+            let column_separator = self.enum_default(
+                "Schedule:File",
+                &name,
+                (&object, "column_separator"),
+                ScheduleFileColumnSeparator::Comma,
+                "Comma",
+                parse_schedule_file_column_separator,
+            );
+            let interpolate_to_timestep = self.enum_default(
+                "Schedule:File",
+                &name,
+                (&object, "interpolate_to_timestep"),
+                false,
+                "No",
+                parse_yes_no,
+            );
+            let minutes_per_item =
+                self.u32_default("Schedule:File", &name, &object, "minutes_per_item", 60);
+            let adjust_schedule_for_daylight_savings = self.enum_default(
+                "Schedule:File",
+                &name,
+                (&object, "adjust_schedule_for_daylight_savings"),
+                true,
+                "Yes",
+                parse_yes_no,
+            );
+
+            let mut supported = true;
+            if number_of_hours_of_data != 8760 {
+                self.error(
+                    "InvalidScheduleFileHoursOfData",
+                    "Schedule:File",
+                    Some(&name),
+                    Some("number_of_hours_of_data"),
+                    format!(
+                        "Schedule:File/{name} currently requires exactly 8760 hours of data; 8784 and declared/actual row-count mismatch branches are not yet ported"
+                    ),
+                );
+                supported = false;
+            }
+            if minutes_per_item == 0 || 60 % minutes_per_item != 0 {
+                self.error(
+                    "InvalidScheduleFileMinutesPerItem",
+                    "Schedule:File",
+                    Some(&name),
+                    Some("minutes_per_item"),
+                    format!(
+                        "Schedule:File/{name} field minutes_per_item must be a positive divisor of 60"
+                    ),
+                );
+                supported = false;
+            } else if minutes_per_item != 60 {
+                self.error(
+                    "UnsupportedScheduleFileMinutesPerItem",
+                    "Schedule:File",
+                    Some(&name),
+                    Some("minutes_per_item"),
+                    format!(
+                        "Schedule:File/{name} subhourly minutes_per_item={minutes_per_item} is not yet ported"
+                    ),
+                );
+                supported = false;
+            }
+            if interpolate_to_timestep {
+                self.error(
+                    "UnsupportedScheduleFileInterpolation",
+                    "Schedule:File",
+                    Some(&name),
+                    Some("interpolate_to_timestep"),
+                    format!("Schedule:File/{name} Interpolate to Timestep=Yes is not yet ported"),
+                );
+                supported = false;
+            }
+            if adjust_schedule_for_daylight_savings {
+                self.error(
+                    "UnsupportedScheduleFileDaylightSavingAdjustment",
+                    "Schedule:File",
+                    Some(&name),
+                    Some("adjust_schedule_for_daylight_savings"),
+                    format!(
+                        "Schedule:File/{name} daylight-saving adjustment is not yet ported; set Adjust Schedule for Daylight Savings=No"
+                    ),
+                );
+                supported = false;
+            }
+
+            let schedule_index =
+                model.schedules.len() + model.compact_schedules.len() + model.file_schedules.len();
+            let Some(id_value) = self.checked_id("Schedule:File", &name, schedule_index) else {
+                continue;
+            };
+            let id = ScheduleId(id_value);
+            if model.schedule_names.insert(&name, id).is_some() {
+                self.duplicate_name("Schedule:File", &name);
+                continue;
+            }
+
+            let values = if supported {
+                self.schedule_file_values(
+                    &name,
+                    &file_name,
+                    column_number,
+                    rows_to_skip_at_top,
+                    number_of_hours_of_data,
+                    column_separator,
+                )
+                .unwrap_or_default()
+            } else {
+                Vec::new()
+            };
+            model.file_schedules.push(ScheduleFile {
+                id,
+                name: NormalizedName::new(&name),
+                schedule_type_limits,
+                file_name,
+                column_number,
+                rows_to_skip_at_top,
+                number_of_hours_of_data,
+                column_separator,
+                interpolate_to_timestep,
+                minutes_per_item,
+                adjust_schedule_for_daylight_savings,
+                values,
+            });
+        }
+    }
+
+    fn schedule_file_values(
+        &mut self,
+        object_name: &str,
+        file_name: &str,
+        column_number: u32,
+        rows_to_skip_at_top: u32,
+        number_of_hours_of_data: u32,
+        column_separator: ScheduleFileColumnSeparator,
+    ) -> Option<Vec<f64>> {
+        let Some(auxiliary_root) = self.auxiliary_root else {
+            self.error(
+                "MissingScheduleFileAuxiliaryRoot",
+                "Schedule:File",
+                Some(object_name),
+                Some("file_name"),
+                format!(
+                    "Schedule:File/{object_name} requires a staged auxiliary-file root during compilation"
+                ),
+            );
+            return None;
+        };
+        let relative_path = Path::new(file_name);
+        if relative_path.is_absolute()
+            || relative_path.components().any(|component| {
+                matches!(
+                    component,
+                    Component::ParentDir | Component::RootDir | Component::Prefix(_)
+                )
+            })
+        {
+            self.error(
+                "UnsupportedScheduleFilePath",
+                "Schedule:File",
+                Some(object_name),
+                Some("file_name"),
+                format!(
+                    "Schedule:File/{object_name} file_name must stay below the staged auxiliary-file root"
+                ),
+            );
+            return None;
+        }
+
+        let canonical_root = match std::fs::canonicalize(auxiliary_root) {
+            Ok(path) => path,
+            Err(error) => {
+                self.error(
+                    "ScheduleFileReadFailed",
+                    "Schedule:File",
+                    Some(object_name),
+                    Some("file_name"),
+                    format!(
+                        "Schedule:File/{object_name} could not resolve auxiliary root {}: {error}",
+                        auxiliary_root.display()
+                    ),
+                );
+                return None;
+            }
+        };
+        let requested_path = auxiliary_root.join(relative_path);
+        let canonical_path = match std::fs::canonicalize(&requested_path) {
+            Ok(path) => path,
+            Err(error) => {
+                self.error(
+                    "ScheduleFileNotFound",
+                    "Schedule:File",
+                    Some(object_name),
+                    Some("file_name"),
+                    format!(
+                        "Schedule:File/{object_name} could not open {}: {error}",
+                        requested_path.display()
+                    ),
+                );
+                return None;
+            }
+        };
+        if !canonical_path.starts_with(&canonical_root) {
+            self.error(
+                "UnsupportedScheduleFilePath",
+                "Schedule:File",
+                Some(object_name),
+                Some("file_name"),
+                format!(
+                    "Schedule:File/{object_name} resolved outside the staged auxiliary-file root"
+                ),
+            );
+            return None;
+        }
+        let contents = match std::fs::read_to_string(&canonical_path) {
+            Ok(contents) => contents,
+            Err(error) => {
+                self.error(
+                    "ScheduleFileReadFailed",
+                    "Schedule:File",
+                    Some(object_name),
+                    Some("file_name"),
+                    format!(
+                        "Schedule:File/{object_name} failed to read {}: {error}",
+                        canonical_path.display()
+                    ),
+                );
+                return None;
+            }
+        };
+
+        let data_lines = contents
+            .lines()
+            .skip(rows_to_skip_at_top as usize)
+            .collect::<Vec<_>>();
+        if data_lines.len() != number_of_hours_of_data as usize {
+            self.error(
+                "InvalidScheduleFileRowCount",
+                "Schedule:File",
+                Some(object_name),
+                Some("number_of_hours_of_data"),
+                format!(
+                    "Schedule:File/{object_name} requires exactly {number_of_hours_of_data} selected data rows after skipping {rows_to_skip_at_top}, found {}",
+                    data_lines.len()
+                ),
+            );
+            return None;
+        }
+
+        let selected_index = (column_number - 1) as usize;
+        let mut values = Vec::with_capacity(data_lines.len());
+        for (row_index, line) in data_lines.iter().enumerate() {
+            let fields = match parse_delimited_row(line, column_separator.delimiter()) {
+                Ok(fields) => fields,
+                Err(reason) => {
+                    self.error(
+                        "ScheduleFileCsvParseFailed",
+                        "Schedule:File",
+                        Some(object_name),
+                        Some("file_name"),
+                        format!(
+                            "Schedule:File/{object_name} row {} could not be parsed: {reason}",
+                            rows_to_skip_at_top as usize + row_index + 1
+                        ),
+                    );
+                    return None;
+                }
+            };
+            let Some(selected) = fields.get(selected_index) else {
+                self.error(
+                    "ScheduleFileColumnOutOfRange",
+                    "Schedule:File",
+                    Some(object_name),
+                    Some("column_number"),
+                    format!(
+                        "Schedule:File/{object_name} requested column {column_number}, but row {} has only {} columns",
+                        rows_to_skip_at_top as usize + row_index + 1,
+                        fields.len()
+                    ),
+                );
+                return None;
+            };
+            let value = match selected.trim().parse::<f64>() {
+                Ok(value) if value.is_finite() => value,
+                Ok(_) | Err(_) => {
+                    self.error(
+                        "ScheduleFileSelectedColumnNonNumeric",
+                        "Schedule:File",
+                        Some(object_name),
+                        Some("column_number"),
+                        format!(
+                            "Schedule:File/{object_name} selected column {column_number} row {} is not a finite number",
+                            rows_to_skip_at_top as usize + row_index + 1
+                        ),
+                    );
+                    return None;
+                }
+            };
+            values.push(value);
+        }
+        Some(values)
     }
 
     fn parse_zones(&mut self, model: &mut TypedModel) {
@@ -3926,6 +4283,26 @@ impl<'a> Compiler<'a> {
         None
     }
 
+    fn required_u32(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<u32> {
+        let Some(value) = self.optional_u32(object_type, object_name, object, field) else {
+            self.error(
+                "MissingRequiredField",
+                object_type,
+                Some(object_name),
+                Some(field),
+                format!("{object_type}/{object_name} requires field {field}"),
+            );
+            return None;
+        };
+        Some(value)
+    }
+
     fn auto_default(
         &mut self,
         object_type: &str,
@@ -4796,6 +5173,54 @@ fn parse_schedule_interpolation(value: &str) -> Option<ScheduleInterpolation> {
     }
 }
 
+fn parse_schedule_file_column_separator(value: &str) -> Option<ScheduleFileColumnSeparator> {
+    match value.trim() {
+        value if value.eq_ignore_ascii_case("Comma") => Some(ScheduleFileColumnSeparator::Comma),
+        value if value.eq_ignore_ascii_case("Tab") => Some(ScheduleFileColumnSeparator::Tab),
+        value if value.eq_ignore_ascii_case("Space") => Some(ScheduleFileColumnSeparator::Space),
+        value if value.eq_ignore_ascii_case("Semicolon") => {
+            Some(ScheduleFileColumnSeparator::Semicolon)
+        }
+        _ => None,
+    }
+}
+
+fn parse_delimited_row(line: &str, delimiter: char) -> Result<Vec<String>, &'static str> {
+    let mut fields = Vec::new();
+    let mut field = String::new();
+    let mut characters = line.chars().peekable();
+    let mut in_quotes = false;
+
+    while let Some(character) = characters.next() {
+        if in_quotes {
+            if character == '"' {
+                if characters.peek() == Some(&'"') {
+                    field.push('"');
+                    characters.next();
+                } else {
+                    in_quotes = false;
+                }
+            } else {
+                field.push(character);
+            }
+        } else if character == delimiter {
+            fields.push(std::mem::take(&mut field));
+        } else if character == '"' {
+            if !field.is_empty() {
+                return Err("quote appeared after unquoted field content");
+            }
+            in_quotes = true;
+        } else {
+            field.push(character);
+        }
+    }
+    if in_quotes {
+        return Err("quoted field was not terminated");
+    }
+    fields.push(field);
+    Ok(fields)
+}
+
 fn schedule_minutes_per_timestep(timesteps_per_hour: u32) -> Option<u32> {
     (timesteps_per_hour > 0 && 60 % timesteps_per_hour == 0).then(|| 60 / timesteps_per_hour)
 }
@@ -5338,6 +5763,8 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 
 #[cfg(test)]
 mod tests {
+    mod schedule_file;
+
     use super::{
         ALL_SCHEDULE_DAY_TYPES, CompileStage, DiagnosticSeverity, ObjectCoverageStatus,
         compile_raw_model,

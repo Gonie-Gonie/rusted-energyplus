@@ -1109,6 +1109,7 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
         ("materials", model.materials.len()),
         ("constant_schedules", model.schedules.len()),
         ("compact_schedules", model.compact_schedules.len()),
+        ("file_schedules", model.file_schedules.len()),
         ("other_equipment", model.other_equipment.len()),
         ("people", model.people.len()),
         (
@@ -1194,7 +1195,9 @@ fn write_graph_and_plan(
             "surface_loop_targets": model.typed.surfaces.len(),
             "zone_loop_targets": model.typed.zones.len(),
             "construction_coefficient_references": model.typed.constructions.len(),
-            "schedule_ids": model.typed.schedules.len() + model.typed.compact_schedules.len(),
+            "schedule_ids": model.typed.schedules.len()
+                + model.typed.compact_schedules.len()
+                + model.typed.file_schedules.len(),
             "weather_series_indices": 1,
             "output_handles": precomputed.output_registry.len(),
         },

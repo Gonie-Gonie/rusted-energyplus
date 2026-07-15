@@ -92,6 +92,7 @@ equivalent to advancing the reported run-period calendar.
 | compact schedule input/default ownership | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 1248-1477 create the internal compact day/week schedules and dispatch their intervals. Lines 1253 and 1404-1418 make the `Interpolate` directive optional and retain the day schedule's default `No` state when the next field is `Until`. CP43 exercises only that omitted-directive default. CP44 separately locks explicit No, Average, and Linear intake only for its one-day, three-profile `Timestep,4` fixture; explicit-mode intake beyond that exact case remains unclaimed. |
 | compact interval minute expansion | `Sched::ProcessIntervalFields` | EnergyPlus 26.1 lines 2733-2961 decode each `Until` endpoint, fill the 1,440-minute day, and choose flat versus Linear minute values. CP43 exercises aligned endpoints and flat fill under default Interpolate:No. CP44 separately locks explicit-No flat fill, Average flat minute values, a flat first Linear interval, the later cross-hour Linear ramp, and the explicit-No-only non-aligned warning for `Until: 00:20` and `01:15` in one exact fixture. `Until 24:MM` correction, malformed/overlap/zero/incomplete profiles, other interval shapes, and broad diagnostic parity remain unclaimed. |
 | day-schedule timestep population | `Sched::DaySchedule::populateFromMinuteVals` | EnergyPlus 26.1 lines 211-239 either averages each zone-timestep window or selects the minute at each timestep end. CP43 locks default-No end-minute sampling at aligned 15-minute endpoints for one `Timestep,4` profile. CP44 separately locks explicit No and Linear endpoint sampling plus the Average 15-minute window mean for exactly three profiles in its one-day `Timestep,4` fixture; other timestep counts, mixed multi-profile modes, hourly aggregation, and broader population behavior remain unclaimed. |
+| file schedule intake and 366-day expansion | `Sched::ProcessScheduleInput` | EnergyPlus 26.1 lines 1573-1863 validate `Schedule:File` metadata, resolve and parse the selected external column, build hourly day schedules, and keep a 366-day table. CP45 locks only one flat comma CSV with one skipped header, selected column 2, 8760 numeric hourly rows, explicit No interpolation, 60 minutes per item, and DST adjustment No. Lines 1858-1862 alias February 29 to February 28 when the actual selected-column row count is below 8784. |
 | schedule current values | `Sched::UpdateScheduleVals` | Writes every schedule's `currentVal`: an EMS value wins when actuated; otherwise it calls `getHrTsVal(state, HourOfDay, TimeStep)`. It does not calculate or advance calendar state. |
 | detailed schedule lookup | `Sched::ScheduleDetailed::getHrTsVal` | Reads `DayOfYear_Schedule`, weekday, holiday index, `DSTIndicator`, hour, and zone timestep. It applies schedule-specific DST use, rolls DST-shifted hour 24 into tomorrow's weekday/holiday, selects holiday or weekday day schedule, and returns the indexed timestep value. |
 | constant schedule lookup | `Sched::ScheduleConstant::getHrTsVal` | Returns the stored constant timestep value independently of date and hour; EMS override remains the caller's current-value policy. |
@@ -468,6 +469,49 @@ remain unclaimed. Typed compiler rejection and the warning code are Rust
 source/unit evidence only. The exact EnergyPlus oracle warning text/count is
 locked only for this one fixture; Rust warning text/count parity remains
 unclaimed.
+
+## Schedule:File 8760-Row Leap-Day Evidence Checkpoint
+
+`calendar_schedule_file_8760_leap_exact_001` adds the first bounded
+`Schedule:File` path. Its staged sidecar contains one header followed by
+exactly 8760 comma-separated rows with three numeric columns. The IDF selects
+one-based column 2, skips the header, declares 8760 hours, uses explicit
+`Interpolate to Timestep=No`, sets 60 minutes per item, and explicitly
+disables schedule daylight-saving adjustment. The conformance manifest names
+the sidecar through `input.auxiliary_files`; the baseline runner
+validates a safe basename and copies the same bytes beside staged
+`input.idf` for both normal and short EnergyPlus run directories. Rust
+compiles against that staged root, reads the selected column once, and retains
+its 8760 values as immutable typed schedule input.
+
+The mapped EnergyPlus 26.1 path is
+`DataSystemVariables::CheckForActualFilePath` lines 117-203 followed by
+`Sched::ProcessScheduleInput` lines 1573-1863. The latter validates
+the metadata at lines 1608-1674, parses or reuses the external file at lines
+1676-1779, copies each hourly item to every zone timestep at lines 1831-1839,
+and always builds a 366-day schedule table. When the actual selected column
+contains fewer than 8784 hourly-equivalent rows, lines 1858-1862 point day 60
+at day 59 without consuming another source day. Rust mirrors that branch by
+mapping leap-shaped schedule ordinal 60 to source day 59 and shifting later
+ordinals back one source day.
+
+The exact RunPeriod is 2016-02-28 through 2016-03-01. The blocking gate proves
+72 ordered, unique hourly `Schedule Value` timestamps and values at
+zero tolerance: February 28 is `1393..1416`, February 29 repeats
+`1393..1416` exactly, and March 1 is `1417..1440`. It also
+verifies that the staged CSV is byte-identical to the canonical fixture, locks
+the selected raw EnergyPlus ESO values and timestamp fields, and requires
+EnergyPlus to complete with exactly 0 Warning and 0 Severe errors.
+
+This checkpoint does not claim 8784-row unique-February-29 behavior,
+declared-hour versus actual-row-count mismatches, short/extra/missing or
+non-numeric file diagnostics, subhourly minutes per item, interpolation Yes or
+blank/default behavior, active/default daylight-saving adjustment, other
+separators/header counts/columns, JSON or unknown extensions, same-path cache
+metadata, `Schedule:File:Shading`, actual/design-day/warmup/multiyear
+execution, EMS/current-value semantics, downstream schedule consumption,
+arbitrary-run sidecar staging, Rust raw ESO serialization, or broad
+warning/error and file-search parity.
 
 ## Source-Order EPW Record Selection Checkpoint
 

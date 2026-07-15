@@ -323,6 +323,12 @@
                          "help":  "Gate exact Schedule:Compact explicit No, Average, and Linear interpolation values at each zone timestep."
                      },
                      {
+                         "name":  "compare-calendar-schedule-file-8760-leap-exact",
+                         "path":  "compare\\compare-calendar-schedule-file-8760-leap-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact Schedule:File comma-column intake and 8760-row February 28 duplication on leap day."
+                     },
+                     {
                          "name":  "compare-weather-effective-calendar",
                          "path":  "compare\\compare-weather-effective-calendar.ps1",
                          "group":  "compare",

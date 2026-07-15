@@ -6,7 +6,7 @@ use ep_compare::{
     SeriesSample, Tolerance, compare_ordered_timestamp_samples_v2, compare_series_samples_v2,
     load_eso_time_series,
 };
-use ep_compiler::compile_raw_model;
+use ep_compiler::compile_raw_model_with_auxiliary_root;
 use ep_conformance::{
     ComparisonClass, ConformanceCase, OutputFrequency, OutputLevel, OutputRequest, SourceArtifact,
     TimestampContract, VariableClass,
@@ -287,7 +287,7 @@ fn build_context<'a>(
     baseline: &BaselineSummary,
 ) -> Result<TimeWeatherScheduleContext<'a>, String> {
     let raw_model = baseline.load_raw_model()?;
-    let compile_result = compile_raw_model(&raw_model);
+    let compile_result = compile_raw_model_with_auxiliary_root(&raw_model, &baseline.output_dir);
     let model = compile_result.model.ok_or_else(|| {
         let diagnostics = compile_result
             .report

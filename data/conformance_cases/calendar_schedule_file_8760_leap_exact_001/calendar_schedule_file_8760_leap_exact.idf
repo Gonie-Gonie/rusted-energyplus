@@ -1,0 +1,54 @@
+Version,26.1;
+
+Building,
+  Schedule File 8760 Leap Exact Fixture,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+Timestep,4;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+RunPeriod,
+  Schedule File 8760 Leap Run Period,
+  2,
+  28,
+  2016,
+  3,
+  1,
+  2016,
+  Sunday,
+  No,
+  No,
+  No,
+  No,
+  No,
+  No;
+
+ScheduleTypeLimits,
+  Any Number;
+
+Schedule:File,
+  Selected Column 8760 Schedule,
+  Any Number,
+  schedule_file_8760.csv,
+  2,
+  1,
+  8760,
+  Comma,
+  No,
+  60,
+  No;
+
+Output:Variable,
+  SELECTED COLUMN 8760 SCHEDULE,
+  Schedule Value,
+  Hourly;

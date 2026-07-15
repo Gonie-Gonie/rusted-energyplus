@@ -38,6 +38,12 @@ pub(crate) struct BaselineSummary {
     pub(crate) timing: BaselineTimingSummary,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct AuxiliaryFileProvenance {
+    source: PathBuf,
+    staged: PathBuf,
+}
+
 impl BaselineSummary {
     pub(crate) fn load_raw_model(&self) -> Result<RawModel, String> {
         load_epjson_file_with_idf_order(&self.epjson, &self.idf).map_err(|error| {
@@ -196,6 +202,17 @@ pub(crate) fn generate_conformance_baseline_in_dir(
         .map_err(|error| format!("failed to create baseline output directory: {error}"))?;
     let input_idf = output_dir.join("input.idf");
     let injection = stage_idf_with_output_requests(&source_idf, &input_idf, manifest)?;
+    let auxiliary_files =
+        stage_case_auxiliary_files(case_path, &manifest.input.auxiliary_files, output_dir)?;
+    let staged_weather = source_weather
+        .as_ref()
+        .map(|weather| {
+            let staged = output_dir.join("weather.epw");
+            std::fs::copy(weather, &staged)
+                .map(|_| staged)
+                .map_err(|error| format!("failed to stage EnergyPlus weather.epw: {error}"))
+        })
+        .transpose()?;
 
     let input_arg = process_path_argument(&input_idf);
     let output_arg = process_path_argument(output_dir);
@@ -218,10 +235,11 @@ pub(crate) fn generate_conformance_baseline_in_dir(
         })?;
         std::fs::copy(&input_idf, run_dir.join("input.idf"))
             .map_err(|error| format!("failed to stage EnergyPlus input.idf: {error}"))?;
-        if let Some(weather) = source_weather.as_ref() {
+        if let Some(weather) = staged_weather.as_ref() {
             std::fs::copy(weather, run_dir.join("weather.epw"))
                 .map_err(|error| format!("failed to stage EnergyPlus weather.epw: {error}"))?;
         }
+        copy_staged_auxiliary_files(&auxiliary_files, &run_dir)?;
         Some(run_dir)
     } else {
         None
@@ -236,10 +254,11 @@ pub(crate) fn generate_conformance_baseline_in_dir(
         }
         energyplus_command.arg("-d").arg(".").arg("input.idf");
     } else {
-        if let Some(weather) = source_weather.as_ref() {
-            energyplus_command.arg("-w").arg(weather);
+        energyplus_command.current_dir(output_dir);
+        if staged_weather.is_some() {
+            energyplus_command.arg("-w").arg("weather.epw");
         }
-        energyplus_command.arg("-d").arg(output_arg).arg(input_arg);
+        energyplus_command.arg("-d").arg(".").arg("input.idf");
     }
     let energyplus_start = Instant::now();
     let energyplus_output = energyplus_command
@@ -300,7 +319,12 @@ pub(crate) fn generate_conformance_baseline_in_dir(
     let expanded_manifest_start = Instant::now();
     std::fs::write(
         &expanded_manifest,
-        render_expanded_case_manifest(manifest, source_weather.as_deref(), &injection),
+        render_expanded_case_manifest(
+            manifest,
+            source_weather.as_deref(),
+            &auxiliary_files,
+            &injection,
+        ),
     )
     .map_err(|error| format!("failed to write expanded case manifest: {error}"))?;
     let expanded_manifest_write_wall_seconds = elapsed_seconds_since(expanded_manifest_start);
@@ -331,6 +355,7 @@ pub(crate) fn generate_conformance_baseline_in_dir(
 fn render_expanded_case_manifest(
     manifest: &ConformanceCase,
     source_weather: Option<&Path>,
+    auxiliary_files: &[AuxiliaryFileProvenance],
     injection: &OutputInjectionSummary,
 ) -> String {
     let mut toml = String::new();
@@ -365,6 +390,17 @@ fn render_expanded_case_manifest(
     }
     push_toml_string_field(&mut toml, "converted_epjson", "input.epJSON");
     toml.push('\n');
+    for auxiliary in auxiliary_files {
+        toml.push_str("[[input.auxiliary_files]]\n");
+        push_toml_string_field(&mut toml, "source", &auxiliary.source.display().to_string());
+        let staged_name = auxiliary
+            .staged
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or_default();
+        push_toml_string_field(&mut toml, "staged", staged_name);
+        toml.push('\n');
+    }
 
     toml.push_str("[output_injection]\n");
     toml.push_str("schema = \"rusted-energyplus.output-injection.v1\"\n");
@@ -522,6 +558,54 @@ fn process_path_argument(path: &Path) -> String {
         .replace('\\', "/")
 }
 
+fn stage_case_auxiliary_files(
+    case_path: &Path,
+    auxiliary_file_names: &[String],
+    output_dir: &Path,
+) -> Result<Vec<AuxiliaryFileProvenance>, String> {
+    let case_dir = case_path.parent().unwrap_or_else(|| Path::new("."));
+    let mut staged_files = Vec::with_capacity(auxiliary_file_names.len());
+    for file_name in auxiliary_file_names {
+        let source = case_dir.join(file_name);
+        if !source.is_file() {
+            return Err(format!("missing case auxiliary file: {}", source.display()));
+        }
+        let staged = output_dir.join(file_name);
+        std::fs::copy(&source, &staged).map_err(|error| {
+            format!(
+                "failed to stage auxiliary file {} as {}: {error}",
+                source.display(),
+                staged.display()
+            )
+        })?;
+        staged_files.push(AuxiliaryFileProvenance { source, staged });
+    }
+    Ok(staged_files)
+}
+
+fn copy_staged_auxiliary_files(
+    auxiliary_files: &[AuxiliaryFileProvenance],
+    destination_dir: &Path,
+) -> Result<(), String> {
+    for auxiliary in auxiliary_files {
+        let staged_name = auxiliary.staged.file_name().ok_or_else(|| {
+            format!(
+                "staged auxiliary file has no basename: {}",
+                auxiliary.staged.display()
+            )
+        })?;
+        let destination = destination_dir.join(staged_name);
+        std::fs::copy(&auxiliary.staged, &destination).map_err(|error| {
+            format!(
+                "failed to copy staged auxiliary file {} as {}: {error}",
+                auxiliary.staged.display(),
+                destination.display()
+            )
+        })?;
+    }
+    Ok(())
+}
+
 fn short_energyplus_run_dir(output_dir: &Path) -> Result<PathBuf, String> {
     let current_dir =
         std::env::current_dir().map_err(|error| format!("failed to read current dir: {error}"))?;
@@ -642,9 +726,90 @@ timestamp_contract = "ordered-exact-unique"
             surface_details: false,
         };
 
-        let expanded = render_expanded_case_manifest(&manifest, None, &injection);
+        let expanded = render_expanded_case_manifest(&manifest, None, &[], &injection);
 
         assert!(expanded.contains("timestamp_contract = \"ordered-exact-unique\""));
+        Ok(())
+    }
+
+    #[test]
+    fn expanded_manifest_records_auxiliary_source_and_staged_provenance()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let manifest = parse_case_str(
+            r#"
+id = "auxiliary_provenance_001"
+title = "auxiliary provenance"
+milestone = "test"
+purpose = "test expanded auxiliary provenance"
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+
+[input]
+idf = "input.idf"
+auxiliary_files = ["schedule.csv"]
+"#,
+        )?;
+        let injection = OutputInjectionSummary {
+            outputs: 0,
+            meters: 0,
+            surface_details: false,
+        };
+        let auxiliary_files = [AuxiliaryFileProvenance {
+            source: PathBuf::from("case").join("schedule.csv"),
+            staged: PathBuf::from("oracle").join("schedule.csv"),
+        }];
+
+        let expanded = render_expanded_case_manifest(&manifest, None, &auxiliary_files, &injection);
+
+        assert!(expanded.contains("[[input.auxiliary_files]]"));
+        let expected_source = format!(
+            "source = {}",
+            json_string(
+                &PathBuf::from("case")
+                    .join("schedule.csv")
+                    .display()
+                    .to_string()
+            )
+        );
+        assert!(expanded.contains(&expected_source));
+        assert!(expanded.contains("staged = \"schedule.csv\""));
+        Ok(())
+    }
+
+    #[test]
+    fn auxiliary_files_are_staged_for_normal_and_short_energyplus_run_directories()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let unique = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)?
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!(
+            "rusted-energyplus-auxiliary-stage-{}-{unique}",
+            std::process::id()
+        ));
+        let case_dir = root.join("case");
+        let output_dir = root.join("oracle");
+        let short_run_dir = root.join("short");
+        std::fs::create_dir_all(&case_dir)?;
+        std::fs::create_dir_all(&output_dir)?;
+        std::fs::create_dir_all(&short_run_dir)?;
+        let case_path = case_dir.join("case.toml");
+        std::fs::write(&case_path, "")?;
+        std::fs::write(case_dir.join("schedule.csv"), b"header\n1.25\n")?;
+
+        let staged =
+            stage_case_auxiliary_files(&case_path, &["schedule.csv".to_string()], &output_dir)?;
+        copy_staged_auxiliary_files(&staged, &short_run_dir)?;
+
+        assert_eq!(
+            std::fs::read(output_dir.join("schedule.csv"))?,
+            b"header\n1.25\n"
+        );
+        assert_eq!(
+            std::fs::read(short_run_dir.join("schedule.csv"))?,
+            b"header\n1.25\n"
+        );
+        std::fs::remove_dir_all(root)?;
         Ok(())
     }
 

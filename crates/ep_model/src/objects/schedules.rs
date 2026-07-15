@@ -37,6 +37,62 @@ pub struct ScheduleConstant {
     pub hourly_value: f64,
 }
 
+/// Delimiter used by one flat `Schedule:File` input.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum ScheduleFileColumnSeparator {
+    /// Comma-separated values.
+    #[default]
+    Comma,
+    /// Tab-separated values.
+    Tab,
+    /// Space-separated values.
+    Space,
+    /// Semicolon-separated values.
+    Semicolon,
+}
+
+impl ScheduleFileColumnSeparator {
+    /// Returns the delimiter character consumed by the flat-file parser.
+    #[must_use]
+    pub const fn delimiter(self) -> char {
+        match self {
+            Self::Comma => ',',
+            Self::Tab => '\t',
+            Self::Space => ' ',
+            Self::Semicolon => ';',
+        }
+    }
+}
+
+/// Hourly values loaded from one supported `Schedule:File` sidecar.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ScheduleFile {
+    /// Typed ID shared with all other schedule families.
+    pub id: ScheduleId,
+    /// Schedule name.
+    pub name: NormalizedName,
+    /// Optional type limits.
+    pub schedule_type_limits: Option<ScheduleTypeLimitId>,
+    /// Source filename retained for diagnostics and provenance.
+    pub file_name: String,
+    /// One-based selected column.
+    pub column_number: u32,
+    /// Header rows skipped before numeric data.
+    pub rows_to_skip_at_top: u32,
+    /// Declared source-hour count.
+    pub number_of_hours_of_data: u32,
+    /// Source column delimiter.
+    pub column_separator: ScheduleFileColumnSeparator,
+    /// Whether EnergyPlus timestep interpolation was requested.
+    pub interpolate_to_timestep: bool,
+    /// Source minutes represented by each item.
+    pub minutes_per_item: u32,
+    /// Whether the file lookup follows daylight-saving shifts.
+    pub adjust_schedule_for_daylight_savings: bool,
+    /// Immutable source values loaded during compilation.
+    pub values: Vec<f64>,
+}
+
 /// One value segment in a compact schedule day profile.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ScheduleCompactSegment {

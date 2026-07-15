@@ -8,9 +8,9 @@ use crate::{
     NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName, OtherEquipment, People,
     PlantBranch, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
     PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId,
-    RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant, ScheduleId,
-    ScheduleTypeLimitId, ScheduleTypeLimits, SetpointManagerComponent, SiteLocation, Surface,
-    SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
+    RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant, ScheduleFile,
+    ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, SetpointManagerComponent, SiteLocation,
+    Surface, SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
     TimestepConfig, Version, Zone, ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId,
     ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
     ZoneThermostatId,
@@ -55,6 +55,8 @@ pub struct TypedModel {
     pub schedules: Vec<ScheduleConstant>,
     /// Compact schedules.
     pub compact_schedules: Vec<ScheduleCompact>,
+    /// File-backed schedules loaded into immutable source values.
+    pub file_schedules: Vec<ScheduleFile>,
     /// Schedule names.
     pub schedule_names: NameMap<ScheduleId>,
     /// Zone internal gains from OtherEquipment objects.
@@ -182,6 +184,7 @@ impl Default for TypedModel {
             schedule_type_limit_names: NameMap::default(),
             schedules: Vec::new(),
             compact_schedules: Vec::new(),
+            file_schedules: Vec::new(),
             schedule_names: NameMap::default(),
             other_equipment: Vec::new(),
             other_equipment_names: NameMap::default(),
@@ -255,6 +258,7 @@ impl TypedModel {
             + self.schedule_type_limits.len()
             + self.schedules.len()
             + self.compact_schedules.len()
+            + self.file_schedules.len()
             + self.other_equipment.len()
             + self.people.len()
             + self.thermostat_dual_setpoints.len()

@@ -772,6 +772,7 @@ fn schedule_ids(model: &TypedModel) -> impl Iterator<Item = ScheduleId> + '_ {
         .iter()
         .map(|schedule| schedule.id)
         .chain(model.compact_schedules.iter().map(|schedule| schedule.id))
+        .chain(model.file_schedules.iter().map(|schedule| schedule.id))
 }
 
 fn schedule_name_for_id(model: &TypedModel, schedule_id: ScheduleId) -> Option<String> {
@@ -783,6 +784,13 @@ fn schedule_name_for_id(model: &TypedModel, schedule_id: ScheduleId) -> Option<S
         .or_else(|| {
             model
                 .compact_schedules
+                .iter()
+                .find(|schedule| schedule.id == schedule_id)
+                .map(|schedule| schedule.name.0.clone())
+        })
+        .or_else(|| {
+            model
+                .file_schedules
                 .iter()
                 .find(|schedule| schedule.id == schedule_id)
                 .map(|schedule| schedule.name.0.clone())
