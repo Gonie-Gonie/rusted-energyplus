@@ -141,6 +141,18 @@ pub struct EnvironmentTimePoint {
     pub dst: bool,
     /// Special schedule day type when one overrides the weekday.
     pub special_day_type: Option<DayType>,
+    /// Tomorrow weekday exposed to detailed schedule hour-24 rollover.
+    ///
+    /// On the final environment day EnergyPlus retains the current weekday
+    /// because it does not prefetch a day beyond the run period.
+    pub tomorrow_day_of_week: DayOfWeek,
+    /// Tomorrow effective schedule day type after special-day overrides.
+    ///
+    /// This likewise retains the final day's type when no tomorrow prefetch
+    /// occurs at the end of the environment.
+    pub tomorrow_day_type: DayType,
+    /// Tomorrow special schedule day type, when one overrides the weekday.
+    pub tomorrow_special_day_type: Option<DayType>,
     /// EnergyPlus hour ending, 1-24.
     pub hour: u32,
     /// One-based zone timestep within the hour.
@@ -243,6 +255,15 @@ pub struct TimePoint {
     pub dst: bool,
     /// Special schedule day type when one overrides the weekday.
     pub special_day_type: Option<DayType>,
+    /// Tomorrow weekday exposed to detailed schedule hour-24 rollover.
+    ///
+    /// The final run-period day intentionally retains today's weekday to
+    /// match EnergyPlus' no-prefetch environment boundary.
+    pub tomorrow_day_of_week: DayOfWeek,
+    /// Tomorrow effective schedule day type after special-day overrides.
+    pub tomorrow_day_type: DayType,
+    /// Tomorrow special schedule day type, when one overrides the weekday.
+    pub tomorrow_special_day_type: Option<DayType>,
     /// EnergyPlus-style hour ending, 1-24.
     pub hour: u32,
     /// Start minute of the hourly interval.
@@ -601,7 +622,8 @@ fn build_environment_time_axis_for_run_period_internal(
         .saturating_mul(zone_timesteps_per_hour as usize);
     let mut points = Vec::with_capacity(total_points);
 
-    for day in days {
+    for (day_index, day) in days.iter().enumerate() {
+        let tomorrow = days.get(day_index + 1).unwrap_or(day);
         for hour in 1..=24 {
             for zone_timestep in 1..=zone_timesteps_per_hour {
                 let start_minute = f64::from(zone_timestep - 1) * interval_minutes;
@@ -626,6 +648,9 @@ fn build_environment_time_axis_for_run_period_internal(
                     day_type: day.day_type,
                     dst: day.dst,
                     special_day_type: day.special_day_type,
+                    tomorrow_day_of_week: tomorrow.day_of_week,
+                    tomorrow_day_type: tomorrow.day_type,
+                    tomorrow_special_day_type: tomorrow.special_day_type,
                     hour,
                     zone_timestep,
                     start_minute,
@@ -809,7 +834,8 @@ fn build_hourly_time_axis_for_run_period_internal(
     )?;
     let mut points = Vec::with_capacity(days.len() * 24);
 
-    for day in days {
+    for (day_index, day) in days.iter().enumerate() {
+        let tomorrow = days.get(day_index + 1).unwrap_or(day);
         for hour in 1..=24 {
             points.push(TimePoint {
                 sample_index: points.len(),
@@ -828,6 +854,9 @@ fn build_hourly_time_axis_for_run_period_internal(
                 day_type: day.day_type,
                 dst: day.dst,
                 special_day_type: day.special_day_type,
+                tomorrow_day_of_week: tomorrow.day_of_week,
+                tomorrow_day_type: tomorrow.day_type,
+                tomorrow_special_day_type: tomorrow.special_day_type,
                 hour,
                 start_minute: 0.0,
                 end_minute: 60.0,

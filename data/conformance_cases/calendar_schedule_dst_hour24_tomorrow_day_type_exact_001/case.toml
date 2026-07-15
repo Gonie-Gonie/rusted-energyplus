@@ -1,0 +1,59 @@
+id = "calendar_schedule_dst_hour24_tomorrow_day_type_exact_001"
+title = "Schedule:Compact daylight-saving hour-24 tomorrow day-type lookup"
+milestone = "full-source-order-schedule-compact-dst-hour24-tomorrow-day-type"
+purpose = "Block on exact EnergyPlus source-order daylight-saving schedule-clock lookup, including hour-24 rollover to the next schedule ordinal and the TomorrowVariables day type."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The explicit non-actual RunPeriod spans only 2032-10-30 through 2032-11-01, declares Saturday as its start weekday, enables the EPW Last Sunday in October through Last Sunday in March daylight-saving period, and resolves one input-file November 1 Holiday.",
+  "The zero-tolerance external schedule claim is exactly 72 ordered, unique Schedule Value samples and timestamps: 100 repeated for 23 hours then 124; 200 repeated for 23 hours then 801; and 800 repeated for 23 hours then 901. The gate separately locks raw EnergyPlus daylight-saving daily states 0, 1, 1 and day-type indices 7, 1, 8.",
+  "October 30 hour 24 remains on the non-DST schedule clock and returns 124. October 31 hour 24 advances to November 1 hour 1 and consumes the tomorrow Holiday day type to return 801. Final-day November 1 hour 24 advances the schedule ordinal to November 2 while EnergyPlus retains the final Holiday TomorrowVariables buffer, selecting the later Holiday profile hour 1 value 901.",
+  "This case proves only one three-day non-actual RunPeriod, one EPW southern-wrap named-date daylight-saving period, one fixed-date input Holiday, default daylight-saving use by Schedule:Compact, fixed Month/Day Through boundaries, declared For selectors, hourly Until endpoints, the two DST hour-24 rollover boundaries, and clean completion. Schedule-specific daylight-saving opt-out, subhourly values or interpolation, other schedule families, additional RunPeriods or DATA PERIODS, year-end schedule-ordinal wrap, actual weather, design days, warmup, Rust EPW record selection, internal-gain/HVAC/IdealLoads calendar consumption, Rust raw ESO serialization, and broad EnergyPlus warning/error parity remain outside the claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_schedule_dst_hour24_tomorrow_day_type_exact_001/calendar_schedule_dst_hour24_tomorrow_day_type_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["schedule", "weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_schedule_dst_hour24_tomorrow_day_type_exact_001/calendar_schedule_dst_hour24_tomorrow_day_type_exact.idf"
+weather = "data/conformance_cases/calendar_schedule_dst_hour24_tomorrow_day_type_exact_001/calendar_schedule_dst_hour24_tomorrow_day_type_exact.epw"
+
+[[outputs]]
+key = "DST FINAL ROLLOVER SCHEDULE"
+variable = "Schedule Value"
+frequency = "hourly"
+class = "schedule"
+source = "eso"
+domain = "schedule"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "schedule"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_schedule_dst_hour24_tomorrow_day_type_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-schedule-dst-hour24-tomorrow-day-type-exact"
+blocking = true

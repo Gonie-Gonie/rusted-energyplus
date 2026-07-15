@@ -3,7 +3,7 @@
 use crate::error::RuntimeError;
 use crate::geometry::zone_floor_area_m2;
 use crate::heat_balance::state::SurfaceHeatBalanceState;
-use crate::time_axis::{DayType, TimeAxis};
+use crate::time_axis::{DayType, TimeAxis, TimePoint};
 use ep_model::{
     OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, People,
     PeopleNumberCalculationMethod, ScheduleCompact, ScheduleCompactDayProfile,
@@ -445,13 +445,10 @@ fn compact_schedule_series_for_time_axis(
         .points
         .iter()
         .map(|point| {
-            compiled_compact_schedule_value(
-                &periods,
-                point.schedule_day_of_year,
-                model_schedule_day_type(point.day_type),
-                point.hour.clamp(1, 24) * 60,
-            )
-            .unwrap_or(f64::NAN)
+            let (schedule_day_of_year, day_type, minute_of_day) =
+                detailed_schedule_lookup_state(point);
+            compiled_compact_schedule_value(&periods, schedule_day_of_year, day_type, minute_of_day)
+                .unwrap_or(f64::NAN)
         })
         .collect();
 
@@ -461,6 +458,32 @@ fn compact_schedule_series_for_time_axis(
         kind: ScheduleSeriesKind::CompactCalendarProfiles { periods },
         values,
     }
+}
+
+fn detailed_schedule_lookup_state(point: &TimePoint) -> (u32, ScheduleDayType, u32) {
+    let shifted_hour = point.hour.clamp(1, 24) + u32::from(point.dst);
+    if shifted_hour <= 24 {
+        return (
+            point.schedule_day_of_year,
+            model_schedule_day_type(point.day_type),
+            shifted_hour * 60,
+        );
+    }
+
+    let next_schedule_day_of_year = if point.schedule_day_of_year >= 366 {
+        1
+    } else {
+        point.schedule_day_of_year + 1
+    };
+    (
+        next_schedule_day_of_year,
+        model_schedule_day_type(
+            point
+                .tomorrow_special_day_type
+                .unwrap_or_else(|| point.tomorrow_day_of_week.into()),
+        ),
+        (shifted_hour - 24) * 60,
+    )
 }
 
 /// Returns the shared daily profile accepted by hour-only schedule consumers.

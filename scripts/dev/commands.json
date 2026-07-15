@@ -305,6 +305,12 @@
                          "help":  "Gate exact Schedule:Compact Through and source-ordered For day-type consumption across one year boundary."
                      },
                      {
+                         "name":  "compare-calendar-schedule-dst-hour24-tomorrow-day-type-exact",
+                         "path":  "compare\\compare-calendar-schedule-dst-hour24-tomorrow-day-type-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact Schedule:Compact daylight-saving hour-24 rollover into the next schedule ordinal and tomorrow day type."
+                     },
+                     {
                          "name":  "compare-weather-effective-calendar",
                          "path":  "compare\\compare-weather-effective-calendar.ps1",
                          "group":  "compare",

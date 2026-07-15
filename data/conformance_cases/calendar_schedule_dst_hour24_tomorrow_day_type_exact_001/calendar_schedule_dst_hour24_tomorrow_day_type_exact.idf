@@ -1,0 +1,96 @@
+Version,26.1;
+
+Building,
+  Calendar Schedule DST Final Rollover Exact Fixture,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+Timestep,4;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+RunPeriod,
+  DST Schedule Final Rollover Run Period,
+  10,
+  30,
+  2032,
+  11,
+  1,
+  2032,
+  Saturday,
+  No,
+  Yes,
+  No,
+  No,
+  No,
+  No;
+
+RunPeriodControl:SpecialDays,
+  Final Rollover Holiday,
+  11/1,
+  1,
+  Holiday;
+
+ScheduleTypeLimits,
+  Any Number;
+
+Schedule:Compact,
+  DST Final Rollover Schedule,
+  Any Number,
+  Through: 10/30,
+  For: AllDays,
+  Until: 23:00,
+  100,
+  Until: 24:00,
+  124,
+  Through: 10/31,
+  For: AllDays,
+  Until: 1:00,
+  201,
+  Until: 24:00,
+  200,
+  Through: 11/1,
+  For: Holiday,
+  Until: 1:00,
+  801,
+  Until: 24:00,
+  800,
+  For: AllOtherDays,
+  Until: 1:00,
+  301,
+  Until: 24:00,
+  300,
+  Through: 12/31,
+  For: Holiday,
+  Until: 1:00,
+  901,
+  Until: 24:00,
+  900,
+  For: AllOtherDays,
+  Until: 1:00,
+  401,
+  Until: 24:00,
+  400;
+
+Output:Variable,
+  DST FINAL ROLLOVER SCHEDULE,
+  Schedule Value,
+  Hourly;
+
+Output:Variable,
+  Environment,
+  Site Daylight Saving Time Status,
+  Hourly;
+
+Output:Variable,
+  Environment,
+  Site Day Type Index,
+  Hourly;

@@ -83,6 +83,7 @@ required_routines = [
   "update_weather_data",
   "set_current_weather",
   "update_schedule_vals",
+  "schedule_detailed_get_hr_ts_val",
   "write_time_stamp_format_data",
 ]
 

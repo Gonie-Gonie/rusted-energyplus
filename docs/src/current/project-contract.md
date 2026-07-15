@@ -64,6 +64,12 @@ listed routine is `family_gated` or `complete` in
 this rule. Full runtime compatibility remains locked until all EnergyPlus
 domains have complete inventories.
 
+The canonical time-domain inventory includes
+`schedule_detailed_get_hr_ts_val` (`ScheduleDetailed::getHrTsVal`) as a
+required routine. It remains `source_mapped`; this inventory addition does not
+promote `calendar_time_state`, `Sched::UpdateScheduleVals`, or broad detailed-
+schedule conformance.
+
 The root marker `routine_completion_schema = "routine_completion.v1"` records
 the one-time introduction of routine-level completion metadata. The PR-ticket
 bootstrap exemption applies only while this marker changes from absent to

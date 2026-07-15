@@ -70,7 +70,20 @@ CLAIM_BOUNDARY = (
     "case. DST schedule-clock/hour-24 tomorrow behavior, subhourly interpolation, other schedule "
     "families, additional periods/RunPeriods/year boundaries, actual/design-day/warmup execution, "
     "internal-gain/HVAC/IdealLoads calendar consumption, Rust raw ESO parity, and broad warning/error "
-    "parity remain unclaimed. The separate weather record-offset case proves only "
+    "parity remain unclaimed. The separate detailed Schedule:Compact daylight-saving rollover case "
+    "covers only the non-actual 2032-10-30 through 2032-11-01 RunPeriod. Its 72 ordered, exact, unique, "
+    "zero-tolerance Schedule Value samples and timestamps are 100 repeated 23 times then 124, 200 "
+    "repeated 23 times then 801, and 800 repeated 23 times then 901. The gate separately locks all raw "
+    "EnergyPlus schedule values, daily DST 0/1/1, day types 7/1/8, their ESO timestamp fields, exact "
+    "Environment, Environment:Daylight Saving, and Environment:Special Days EIO rows, and clean 0 "
+    "Warning/0 Severe completion. This source-exact boundary proves current-day DST +1-hour detailed "
+    "lookup, DST hour 24 advancing to the next schedule ordinal and tomorrow Holiday profile, and the "
+    "final-run hour retaining the stale final Holiday TomorrowVariables day type while advancing the "
+    "ordinal. Rust EPW record selection is null and unclaimed. Schedule-specific DST opt-out, subhourly "
+    "values or interpolation, other schedule families or boundaries, actual/design-day/warmup execution, "
+    "downstream internal-gain/HVAC/IdealLoads calendar consumption, EMS/current-value semantics, Rust "
+    "raw ESO parity, and broad warning/error parity remain unclaimed. The separate weather record-offset "
+    "case proves only "
     "same-year non-actual, single-data-period, one-record-per-hour month/day positioning: 24 leading "
     "decoy rows are skipped and 48 ordered hourly dry-bulb timestamps and values match exactly. "
     "Weather-required heat-balance ep_run setup consumes the same selector before weather-timestep "
@@ -277,6 +290,7 @@ CASE_LABELS = {
     "schedule_constant_001": "Schedule const",
     "calendar_schedule_hourly_exact_001": "Calendar/sched exact",
     "calendar_schedule_compact_through_for_day_type_hourly_exact_001": "Compact Through/For",
+    "calendar_schedule_dst_hour24_tomorrow_day_type_exact_001": "DST schedule rollover",
     "calendar_schedule_weather_leap_policy_no_001": "Weather calendar no-leap",
     "calendar_dst_fixed_date_hourly_exact_001": "Calendar DST fixed enabled",
     "calendar_dst_fixed_date_disabled_hourly_exact_001": "Calendar DST fixed disabled",
@@ -314,6 +328,7 @@ KEY_LABELS = {
     "ALWAYSON": "AlwaysOn",
     "CALENDAR HOURLY 1 TO 24": "Calendar 1-24",
     "THROUGH FOR DAY TYPE SCHEDULE": "Through/For day type",
+    "DST FINAL ROLLOVER SCHEDULE": "DST final rollover",
     "Environment": "Env",
     "ENVIRONMENT": "Env",
 }
@@ -410,6 +425,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_through_for_day_type_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_through_for_day_type_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_through_for_day_type_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="DST schedule rollover",
+        command="compare-calendar-schedule-dst-hour24-tomorrow-day-type-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_dst_hour24_tomorrow_day_type_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_dst_hour24_tomorrow_day_type_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_dst_hour24_tomorrow_day_type_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="Weather calendar",

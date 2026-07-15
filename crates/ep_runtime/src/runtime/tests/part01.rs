@@ -994,6 +994,323 @@
     }
 
     #[test]
+    fn detailed_schedule_dst_shift_uses_tomorrow_type_and_final_stale_type()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let constant_id = ScheduleId(45);
+        let detailed_id = ScheduleId(46);
+        let non_holiday_day_types = all_schedule_day_types()
+            .into_iter()
+            .filter(|day_type| *day_type != ScheduleDayType::Holiday)
+            .collect::<Vec<_>>();
+        let model = TypedModel {
+            timestep: TimestepConfig {
+                number_of_timesteps_per_hour: 1,
+            },
+            run_periods: vec![RunPeriod {
+                id: RunPeriodId(0),
+                name: NormalizedName::new("DST Schedule Rollover"),
+                begin_month: 10,
+                begin_day_of_month: 30,
+                begin_year: Some(2032),
+                end_month: 11,
+                end_day_of_month: 1,
+                end_year: Some(2032),
+                day_of_week_for_start_day: Some(DayOfWeek::Saturday),
+                first_hour_interpolation_starting_values:
+                    FirstHourInterpolationStartingValues::Hour24,
+                use_weather_file_holidays_and_special_days: false,
+                use_weather_file_daylight_saving_period: false,
+                apply_weekend_holiday_rule: false,
+                use_weather_file_rain_indicators: false,
+                use_weather_file_snow_indicators: false,
+                treat_weather_as_actual: false,
+            }],
+            run_period_daylight_saving_time: Some(ep_model::RunPeriodDaylightSavingTime {
+                start_date: CalendarDateRule::MonthDay {
+                    month: 10,
+                    day_of_month: 31,
+                },
+                end_date: CalendarDateRule::MonthDay {
+                    month: 11,
+                    day_of_month: 1,
+                },
+            }),
+            run_period_special_days: vec![RunPeriodSpecialDay {
+                id: RunPeriodSpecialDayId(0),
+                name: NormalizedName::new("Final Rollover Holiday"),
+                start_date: CalendarDateRule::MonthDay {
+                    month: 11,
+                    day_of_month: 1,
+                },
+                duration_days: 1,
+                special_day_type: SpecialDayType::Holiday,
+            }],
+            schedules: vec![ScheduleConstant {
+                id: constant_id,
+                name: NormalizedName::new("DST Independent Constant"),
+                schedule_type_limits: None,
+                hourly_value: 42.0,
+            }],
+            compact_schedules: vec![ScheduleCompact {
+                id: detailed_id,
+                name: NormalizedName::new("DST Final Rollover"),
+                schedule_type_limits: None,
+                periods: vec![
+                    ScheduleCompactPeriod {
+                        through_schedule_day_of_year: 304,
+                        day_profiles: vec![ScheduleCompactDayProfile {
+                            day_types: all_schedule_day_types(),
+                            segments: vec![
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 23 * 60,
+                                    value: 100.0,
+                                },
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 24 * 60,
+                                    value: 124.0,
+                                },
+                            ],
+                        }],
+                    },
+                    ScheduleCompactPeriod {
+                        through_schedule_day_of_year: 305,
+                        day_profiles: vec![ScheduleCompactDayProfile {
+                            day_types: all_schedule_day_types(),
+                            segments: vec![
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 60,
+                                    value: 201.0,
+                                },
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 24 * 60,
+                                    value: 200.0,
+                                },
+                            ],
+                        }],
+                    },
+                    ScheduleCompactPeriod {
+                        through_schedule_day_of_year: 306,
+                        day_profiles: vec![
+                            ScheduleCompactDayProfile {
+                                day_types: vec![ScheduleDayType::Holiday],
+                                segments: vec![
+                                    ScheduleCompactSegment {
+                                        until_minute_of_day: 60,
+                                        value: 801.0,
+                                    },
+                                    ScheduleCompactSegment {
+                                        until_minute_of_day: 24 * 60,
+                                        value: 800.0,
+                                    },
+                                ],
+                            },
+                            ScheduleCompactDayProfile {
+                                day_types: non_holiday_day_types.clone(),
+                                segments: vec![
+                                    ScheduleCompactSegment {
+                                        until_minute_of_day: 60,
+                                        value: 301.0,
+                                    },
+                                    ScheduleCompactSegment {
+                                        until_minute_of_day: 24 * 60,
+                                        value: 300.0,
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    ScheduleCompactPeriod {
+                        through_schedule_day_of_year: 366,
+                        day_profiles: vec![
+                            ScheduleCompactDayProfile {
+                                day_types: vec![ScheduleDayType::Holiday],
+                                segments: vec![
+                                    ScheduleCompactSegment {
+                                        until_minute_of_day: 60,
+                                        value: 901.0,
+                                    },
+                                    ScheduleCompactSegment {
+                                        until_minute_of_day: 24 * 60,
+                                        value: 900.0,
+                                    },
+                                ],
+                            },
+                            ScheduleCompactDayProfile {
+                                day_types: non_holiday_day_types,
+                                segments: vec![
+                                    ScheduleCompactSegment {
+                                        until_minute_of_day: 60,
+                                        value: 401.0,
+                                    },
+                                    ScheduleCompactSegment {
+                                        until_minute_of_day: 24 * 60,
+                                        value: 400.0,
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            }],
+            ..TypedModel::default()
+        };
+
+        let axis = build_hourly_time_axis(&model)?;
+        assert_eq!(axis.sample_count(), 72);
+        assert_eq!(
+            axis.points
+                .chunks_exact(24)
+                .map(|day| (day[0].dst, day[0].day_type, day[0].tomorrow_day_type))
+                .collect::<Vec<_>>(),
+            vec![
+                (
+                    false,
+                    crate::DayType::Saturday,
+                    crate::DayType::Sunday,
+                ),
+                (true, crate::DayType::Sunday, crate::DayType::Holiday),
+                (true, crate::DayType::Holiday, crate::DayType::Holiday),
+            ]
+        );
+        assert_eq!(
+            axis.points[71].tomorrow_day_of_week,
+            axis.points[71].day_of_week
+        );
+        assert_eq!(
+            axis.points[71].tomorrow_special_day_type,
+            axis.points[71].special_day_type
+        );
+
+        let series = precompute_schedule_value_series_for_time_axis(&model, &axis);
+        let constant = series
+            .iter()
+            .find(|trace| trace.schedule_id == constant_id)
+            .expect("constant schedule series");
+        assert_eq!(constant.values, vec![42.0; 72]);
+        let detailed = series
+            .iter()
+            .find(|trace| trace.schedule_id == detailed_id)
+            .expect("detailed schedule series");
+        let mut expected = vec![100.0; 23];
+        expected.push(124.0);
+        expected.extend(vec![200.0; 23]);
+        expected.push(801.0);
+        expected.extend(vec![800.0; 23]);
+        expected.push(901.0);
+        assert_eq!(detailed.values, expected);
+
+        let environment_axes = build_environment_time_axes(&model)?;
+        assert_eq!(environment_axes.len(), 1);
+        let environment_axis = &environment_axes[0];
+        assert_eq!(
+            environment_axis.points[47].tomorrow_day_type,
+            crate::DayType::Holiday
+        );
+        assert_eq!(
+            environment_axis.points[71].tomorrow_day_type,
+            environment_axis.points[71].day_type
+        );
+        assert_eq!(
+            environment_axis.points[71].tomorrow_day_of_week,
+            environment_axis.points[71].day_of_week
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn detailed_schedule_dst_hour_24_wraps_schedule_ordinal_367_to_one()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let schedule_id = ScheduleId(47);
+        let model = TypedModel {
+            timestep: TimestepConfig {
+                number_of_timesteps_per_hour: 1,
+            },
+            run_periods: vec![RunPeriod {
+                id: RunPeriodId(0),
+                name: NormalizedName::new("DST Schedule Ordinal Wrap"),
+                begin_month: 12,
+                begin_day_of_month: 31,
+                begin_year: Some(2032),
+                end_month: 12,
+                end_day_of_month: 31,
+                end_year: Some(2032),
+                day_of_week_for_start_day: Some(DayOfWeek::Friday),
+                first_hour_interpolation_starting_values:
+                    FirstHourInterpolationStartingValues::Hour24,
+                use_weather_file_holidays_and_special_days: false,
+                use_weather_file_daylight_saving_period: false,
+                apply_weekend_holiday_rule: false,
+                use_weather_file_rain_indicators: false,
+                use_weather_file_snow_indicators: false,
+                treat_weather_as_actual: false,
+            }],
+            run_period_daylight_saving_time: Some(ep_model::RunPeriodDaylightSavingTime {
+                start_date: CalendarDateRule::MonthDay {
+                    month: 12,
+                    day_of_month: 31,
+                },
+                end_date: CalendarDateRule::MonthDay {
+                    month: 12,
+                    day_of_month: 31,
+                },
+            }),
+            compact_schedules: vec![ScheduleCompact {
+                id: schedule_id,
+                name: NormalizedName::new("DST Schedule Ordinal Wrap"),
+                schedule_type_limits: None,
+                periods: vec![
+                    ScheduleCompactPeriod {
+                        through_schedule_day_of_year: 1,
+                        day_profiles: vec![ScheduleCompactDayProfile {
+                            day_types: all_schedule_day_types(),
+                            segments: vec![
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 60,
+                                    value: 11.0,
+                                },
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 24 * 60,
+                                    value: 12.0,
+                                },
+                            ],
+                        }],
+                    },
+                    ScheduleCompactPeriod {
+                        through_schedule_day_of_year: 366,
+                        day_profiles: vec![ScheduleCompactDayProfile {
+                            day_types: all_schedule_day_types(),
+                            segments: vec![
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 60,
+                                    value: 21.0,
+                                },
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 24 * 60,
+                                    value: 22.0,
+                                },
+                            ],
+                        }],
+                    },
+                ],
+            }],
+            ..TypedModel::default()
+        };
+
+        let axis = build_hourly_time_axis(&model)?;
+        assert!(axis.points.iter().all(|point| point.dst));
+        assert_eq!(axis.points[23].schedule_day_of_year, 366);
+        assert_eq!(
+            axis.points[23].tomorrow_day_type,
+            axis.points[23].day_type
+        );
+        let series = precompute_schedule_value_series_for_time_axis(&model, &axis);
+        let mut expected = vec![22.0; 23];
+        expected.push(11.0);
+        assert_eq!(series[0].values, expected);
+        Ok(())
+    }
+
+    #[test]
     fn hour_only_schedule_consumers_reject_calendar_variation_and_missing_ids()
     -> Result<(), Box<dyn std::error::Error>> {
         let schedule_id = ScheduleId(42);
