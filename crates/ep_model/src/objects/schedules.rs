@@ -65,6 +65,23 @@ pub struct ScheduleDayInterval {
     pub segments: Vec<ScheduleCompactSegment>,
 }
 
+/// Immutable source-value list referenced by week schedules.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ScheduleDayList {
+    /// Typed day-schedule ID shared with the other day-schedule families.
+    pub id: DayScheduleId,
+    /// Day-schedule name.
+    pub name: NormalizedName,
+    /// Optional type limits.
+    pub schedule_type_limits: Option<ScheduleTypeLimitId>,
+    /// Interpolation mode used to populate zone-timestep values.
+    pub interpolation: ScheduleInterpolation,
+    /// Source minutes represented by each list item.
+    pub minutes_per_item: u32,
+    /// Source-ordered values covering exactly one 24-hour day.
+    pub values: Vec<f64>,
+}
+
 /// Immutable mapping from all EnergyPlus day types to typed day schedules.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ScheduleWeekDaily {

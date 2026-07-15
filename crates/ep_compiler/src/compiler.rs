@@ -17,15 +17,15 @@ use ep_model::{
     PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod,
     RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
     ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
-    ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayType, ScheduleFile,
-    ScheduleFileColumnSeparator, ScheduleId, ScheduleInterpolation, ScheduleTypeLimitId,
-    ScheduleTypeLimits, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
-    SolarDistribution, SpecialDayType, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
-    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
-    TypedModel, Version, WeekScheduleId, WindExposure, Zone, ZoneEquipmentConnection,
-    ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId,
-    ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
-    ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
+    ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleDayType,
+    ScheduleFile, ScheduleFileColumnSeparator, ScheduleId, ScheduleInterpolation,
+    ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekDaily, ScheduleYear,
+    SetpointManagerComponent, SiteLocation, SolarDistribution, SpecialDayType, SunExposure,
+    Surface, SurfaceId, SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
+    ThermostatSetpointId, TimestepConfig, TypedModel, Version, WeekScheduleId, WindExposure, Zone,
+    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
+    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 use std::path::{Component, Path};
@@ -225,6 +225,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Schedule:File",
     "Schedule:Day:Hourly",
     "Schedule:Day:Interval",
+    "Schedule:Day:List",
     "Schedule:Week:Daily",
     "Schedule:Year",
     "OtherEquipment",
@@ -312,6 +313,7 @@ impl<'a> Compiler<'a> {
         self.parse_file_schedules(&mut model);
         self.parse_day_hourly_schedules(&mut model);
         self.parse_day_interval_schedules(&mut model);
+        self.parse_day_list_schedules(&mut model);
         self.parse_week_daily_schedules(&mut model);
         self.parse_year_schedules(&mut model);
         self.parse_zones(&mut model);
@@ -1342,6 +1344,164 @@ impl<'a> Compiler<'a> {
             entries_valid = false;
         }
         entries_valid.then_some(segments)
+    }
+
+    fn parse_day_list_schedules(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "Schedule:Day:List";
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let schedule_type_limits = match self.optional_string(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "schedule_type_limits_name",
+            ) {
+                Some(type_limits_name) => self.resolve_name(
+                    &model.schedule_type_limit_names,
+                    OBJECT_TYPE,
+                    &name,
+                    "schedule_type_limits_name",
+                    &type_limits_name,
+                    "ScheduleTypeLimits",
+                ),
+                None => None,
+            };
+            let interpolation = self.enum_default(
+                OBJECT_TYPE,
+                &name,
+                (&object, "interpolate_to_timestep"),
+                ScheduleInterpolation::No,
+                "No",
+                parse_schedule_interpolation,
+            );
+            let Some(minutes_per_item) = self.day_list_minutes_per_item(&name, &object) else {
+                continue;
+            };
+            let Some(values) = self.day_list_values(&name, &object, minutes_per_item) else {
+                continue;
+            };
+
+            let day_schedule_index = model.day_schedules.len()
+                + model.day_interval_schedules.len()
+                + model.day_list_schedules.len();
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, day_schedule_index) else {
+                continue;
+            };
+            let id = DayScheduleId(id_value);
+            if model.day_schedule_names.insert(&name, id).is_some() {
+                self.duplicate_name(OBJECT_TYPE, &name);
+                continue;
+            }
+
+            model.day_list_schedules.push(ScheduleDayList {
+                id,
+                name: NormalizedName::new(&name),
+                schedule_type_limits,
+                interpolation,
+                minutes_per_item,
+                values,
+            });
+        }
+    }
+
+    fn day_list_minutes_per_item(&mut self, object_name: &str, object: &RawObject) -> Option<u32> {
+        const OBJECT_TYPE: &str = "Schedule:Day:List";
+        const FIELD: &str = "minutes_per_item";
+        let minutes_per_item = self.required_u32(OBJECT_TYPE, object_name, object, FIELD)?;
+        if !(1..=60).contains(&minutes_per_item) {
+            self.error(
+                "InvalidNumericRange",
+                OBJECT_TYPE,
+                Some(object_name),
+                Some(FIELD),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} field {FIELD} must be between 1 and 60, got {minutes_per_item}"
+                ),
+            );
+            return None;
+        }
+        if 60 % minutes_per_item != 0 {
+            self.error(
+                "InvalidScheduleDayListMinutesPerItem",
+                OBJECT_TYPE,
+                Some(object_name),
+                Some(FIELD),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} field {FIELD} must divide 60 evenly, got {minutes_per_item}"
+                ),
+            );
+            return None;
+        }
+        Some(minutes_per_item)
+    }
+
+    fn day_list_values(
+        &mut self,
+        object_name: &str,
+        object: &RawObject,
+        minutes_per_item: u32,
+    ) -> Option<Vec<f64>> {
+        const OBJECT_TYPE: &str = "Schedule:Day:List";
+        const FIELD: &str = "extensions";
+        let Some(value) = field_value(object, FIELD) else {
+            self.error(
+                "MissingRequiredField",
+                OBJECT_TYPE,
+                Some(object_name),
+                Some(FIELD),
+                format!("{OBJECT_TYPE}/{object_name} requires field {FIELD}"),
+            );
+            return None;
+        };
+        let RawValue::Array(entries) = value else {
+            self.invalid_field_type(OBJECT_TYPE, object_name, FIELD, "array");
+            return None;
+        };
+        let expected_count = (1440 / minutes_per_item) as usize;
+        if entries.len() != expected_count {
+            self.error(
+                "InvalidScheduleDayListValueCount",
+                OBJECT_TYPE,
+                Some(object_name),
+                Some(FIELD),
+                format!(
+                    "{OBJECT_TYPE}/{object_name} requires exactly {expected_count} source values for {minutes_per_item} minutes per item, found {}",
+                    entries.len()
+                ),
+            );
+            return None;
+        }
+
+        let mut values = Vec::with_capacity(expected_count);
+        let mut entries_valid = true;
+        for (index, entry) in entries.iter().enumerate() {
+            let RawValue::Object(fields) = entry else {
+                self.error(
+                    "InvalidFieldType",
+                    OBJECT_TYPE,
+                    Some(object_name),
+                    Some(FIELD),
+                    format!("{OBJECT_TYPE}/{object_name} {FIELD} entry {index} must be an object"),
+                );
+                entries_valid = false;
+                continue;
+            };
+            let entry_object = RawObject {
+                fields: fields.clone(),
+                source_span: None,
+            };
+            let entry_name = format!("{object_name}[{index}]");
+            match field_value(&entry_object, "value") {
+                Some(value) => match self.number_value(OBJECT_TYPE, &entry_name, "value", value) {
+                    Some(value) => values.push(value),
+                    None => entries_valid = false,
+                },
+                None => {
+                    self.record_default(OBJECT_TYPE, &entry_name, "value", "0.0");
+                    values.push(0.0);
+                }
+            }
+        }
+        entries_valid.then_some(values)
     }
 
     fn parse_week_daily_schedules(&mut self, model: &mut TypedModel) {
@@ -6320,6 +6480,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 #[cfg(test)]
 mod tests {
     mod schedule_day_interval;
+    mod schedule_day_list;
     mod schedule_file;
     mod schedule_year;
 

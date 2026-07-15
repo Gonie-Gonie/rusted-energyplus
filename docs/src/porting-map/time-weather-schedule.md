@@ -599,6 +599,50 @@ lookup branches remain source/unit evidence; the parent
 `calendar_time_state`, `ProcessScheduleInput`, `ProcessIntervalFields`,
 `populateFromMinuteVals`, and `getHrTsVal` records remain incomplete.
 
+## Schedule:Day:List Source-Actual Modes Evidence Checkpoint
+
+`calendar_schedule_day_list_modes_exact_001` advances to the next public/input
+object in EnergyPlus `ProcessScheduleInput` source order. Three
+`Schedule:Day:List` profiles share the DaySchedule namespace after the existing
+Hourly and Interval families, and one `Schedule:Week:Daily` plus one full-year
+`Schedule:Year` selects them on Thursday, Friday, and Saturday. Every profile
+uses `Minutes per Item = 20` and the same 72 source-ordered values:
+`10, 70, 160`, then 69 values of `175`. Thursday omits `Interpolate to
+Timestep`, Friday declares `Average`, and Saturday declares `Linear`.
+
+The mapped EnergyPlus 26.1 intake is `Sched::ProcessScheduleInput` lines
+936-1042, after Day:Interval and before Week:Daily. It requires a positive
+integer Minutes per Item that divides 60 and exactly `1440 / minutes` values,
+then repeats each source value across its allotted minutes. Unlike
+Day:Interval, this path does not build a Linear ramp.
+`Sched::DaySchedule::populateFromMinuteVals` lines 211-239 averages a zone
+timestep window only for Average; both No and Linear select its ending minute.
+The resulting EnergyPlus 26.1 source-actual Day:List behavior is therefore
+`Linear == No`, even though the public interpolation vocabulary includes
+Linear. The Year/Week/Day lookup then follows
+`Sched::ScheduleDetailed::getHrTsVal` lines 2490-2541.
+
+The exact non-actual RunPeriod is 2032-01-01 through 2032-01-03 at
+`Timestep,4`, with daylight saving and holidays disabled. The blocking gate
+proves one series of 288 ordered, unique Timestep `Schedule Value` samples and
+timestamps at zero tolerance. Thursday No is `10, 70, 160, 160` then `175` for
+92 samples; Friday Average is `10, 50, 100, 160` then `175` for 92 samples;
+Saturday Linear exactly repeats the No vector. The gate also locks all 216
+source values, raw EnergyPlus ESO values and timestep timestamp fields, exact
+Environment and disabled-daylight-saving EIO rows, and successful completion
+with exactly 0 Warning and 0 Severe errors.
+
+This checkpoint does not claim `Schedule:Week:Compact`, Minutes per Item other
+than 20, other timestep counts, blank-value or malformed-count diagnostic text
+or order parity, ScheduleTypeLimits warning parity, the documentation-intended
+Day:List Linear ramp, Hourly report aggregation, holiday/design/custom-day
+selection, DST/tomorrow rollover, EMS/current-value semantics, downstream
+gain/HVAC consumption, warmup, actual weather, multi-environment execution,
+Rust raw ESO serialization, or broad `ScheduleManager` parity. Wider typed
+rejection and lookup branches remain source/unit evidence; the parent
+`calendar_time_state`, `ProcessScheduleInput`, `populateFromMinuteVals`, and
+`getHrTsVal` records remain incomplete.
+
 ## Source-Order EPW Record Selection Checkpoint
 
 `EpwWeatherFile` now retains typed `EpwDataPeriods` metadata with its weather

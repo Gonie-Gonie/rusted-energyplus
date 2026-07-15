@@ -341,6 +341,12 @@
                          "help":  "Gate exact Schedule:Day:Interval default-No, Average, and Linear values through Week:Daily and Year at each zone timestep."
                      },
                      {
+                         "name":  "compare-calendar-schedule-day-list-modes-exact",
+                         "path":  "compare\\compare-calendar-schedule-day-list-modes-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact Schedule:Day:List 20-minute default-No, Average, and EnergyPlus 26.1 source-actual Linear values through Week:Daily and Year at each zone timestep."
+                     },
+                     {
                          "name":  "compare-weather-effective-calendar",
                          "path":  "compare\\compare-weather-effective-calendar.ps1",
                          "group":  "compare",

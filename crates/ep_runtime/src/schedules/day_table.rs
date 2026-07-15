@@ -7,8 +7,8 @@ use super::{
 };
 use crate::time_axis::{EnvironmentTimeAxis, TimeAxis};
 use ep_model::{
-    DayScheduleId, ScheduleDayInterval, ScheduleDayType, ScheduleInterpolation, ScheduleYear,
-    TypedModel,
+    DayScheduleId, ScheduleDayInterval, ScheduleDayList, ScheduleDayType, ScheduleInterpolation,
+    ScheduleYear, TypedModel,
 };
 
 /// One immutable day profile prepared at zone-timestep resolution.
@@ -39,7 +39,8 @@ pub(super) fn precompile_day_schedule_table(
     let table_len = model
         .day_schedules
         .len()
-        .saturating_add(model.day_interval_schedules.len());
+        .saturating_add(model.day_interval_schedules.len())
+        .saturating_add(model.day_list_schedules.len());
     let mut schedules = vec![None; table_len];
     let mut ambiguous_ids = vec![false; table_len];
 
@@ -78,10 +79,64 @@ pub(super) fn precompile_day_schedule_table(
         );
     }
 
+    for schedule in &model.day_list_schedules {
+        let zone_timestep_values =
+            precompile_schedule_day_list_values(schedule, minutes_per_timestep);
+        insert_compiled_day_schedule(
+            &mut schedules,
+            &mut ambiguous_ids,
+            CompiledDaySchedule {
+                day_schedule_id: schedule.id,
+                zone_timestep_values,
+            },
+        );
+    }
+
     CompiledDayScheduleTable {
         minutes_per_timestep: minutes_per_timestep.unwrap_or(0),
         schedules,
     }
+}
+
+fn precompile_schedule_day_list_values(
+    schedule: &ScheduleDayList,
+    minutes_per_timestep: Option<u32>,
+) -> Vec<f64> {
+    let (Some(minutes_per_timestep), Ok(minutes_per_item)) = (
+        minutes_per_timestep,
+        usize::try_from(schedule.minutes_per_item),
+    ) else {
+        return Vec::new();
+    };
+    let Ok(minutes_per_timestep_usize) = usize::try_from(minutes_per_timestep) else {
+        return Vec::new();
+    };
+    if minutes_per_item == 0
+        || minutes_per_timestep_usize == 0
+        || schedule.values.len().checked_mul(minutes_per_item) != Some(1440)
+    {
+        return Vec::new();
+    }
+
+    // Schedule:Day:List is a flat source-value list. EnergyPlus repeats each
+    // item over its fixed minute width; `Linear` does not create ramps here.
+    let minute_values = schedule
+        .values
+        .iter()
+        .flat_map(|value| std::iter::repeat_n(*value, minutes_per_item))
+        .collect::<Vec<_>>();
+
+    minute_values
+        .chunks_exact(minutes_per_timestep_usize)
+        .map(|window| match schedule.interpolation {
+            ScheduleInterpolation::Average => {
+                window.iter().sum::<f64>() / f64::from(minutes_per_timestep)
+            }
+            ScheduleInterpolation::No | ScheduleInterpolation::Linear => {
+                window.last().copied().unwrap_or(f64::NAN)
+            }
+        })
+        .collect()
 }
 
 fn insert_compiled_day_schedule(
@@ -140,7 +195,21 @@ fn day_interval_schedule_for_id(
         .filter(|schedule| schedule.id == day_schedule_id)
 }
 
-fn year_schedule_references_interval_day(model: &TypedModel, schedule: &ScheduleYear) -> bool {
+fn day_list_schedule_for_id(
+    model: &TypedModel,
+    day_schedule_id: DayScheduleId,
+) -> Option<&ScheduleDayList> {
+    let hourly_count = u32::try_from(model.day_schedules.len()).ok()?;
+    let interval_count = u32::try_from(model.day_interval_schedules.len()).ok()?;
+    let list_offset = hourly_count.checked_add(interval_count)?;
+    let list_index = usize::try_from(day_schedule_id.0.checked_sub(list_offset)?).ok()?;
+    model
+        .day_list_schedules
+        .get(list_index)
+        .filter(|schedule| schedule.id == day_schedule_id)
+}
+
+fn year_schedule_references_compiled_day(model: &TypedModel, schedule: &ScheduleYear) -> bool {
     schedule.week_schedules.iter().any(|week_schedule_id| {
         let Ok(week_schedule_index) = usize::try_from(week_schedule_id.0) else {
             return false;
@@ -152,6 +221,7 @@ fn year_schedule_references_interval_day(model: &TypedModel, schedule: &Schedule
             .is_some_and(|week_schedule| {
                 week_schedule.day_schedules.iter().any(|day_schedule_id| {
                     day_interval_schedule_for_id(model, *day_schedule_id).is_some()
+                        || day_list_schedule_for_id(model, *day_schedule_id).is_some()
                 })
             })
     })
@@ -177,6 +247,10 @@ fn year_schedule_requires_hourly_aggregation(model: &TypedModel, schedule: &Sche
                         .iter()
                         .any(|segment| segment.until_minute_of_day % 60 != 0);
             }
+            if let Some(schedule) = day_list_schedule_for_id(model, *day_schedule_id) {
+                return schedule.minutes_per_item != 60
+                    || schedule.interpolation == ScheduleInterpolation::Average;
+            }
             let Ok(day_schedule_index) = usize::try_from(day_schedule_id.0) else {
                 return true;
             };
@@ -193,7 +267,7 @@ fn year_schedule_series_kind(
     schedule: &ScheduleYear,
     day_schedule_table: &CompiledDayScheduleTable,
 ) -> ScheduleSeriesKind {
-    if year_schedule_references_interval_day(model, schedule) {
+    if year_schedule_references_compiled_day(model, schedule) {
         ScheduleSeriesKind::YearWeekDayCompiledProfiles {
             schedule_day_count: schedule.week_schedules.len(),
             compiled_day_schedule_count: day_schedule_table.resolved_schedule_count(),

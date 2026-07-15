@@ -9,12 +9,12 @@ use crate::{
     People, PlantBranch, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
     PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId,
     RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant,
-    ScheduleDayHourly, ScheduleDayInterval, ScheduleFile, ScheduleId, ScheduleTypeLimitId,
-    ScheduleTypeLimits, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
-    Surface, SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
-    TimestepConfig, Version, WeekScheduleId, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
-    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
-    ZoneThermostat, ZoneThermostatId,
+    ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleFile, ScheduleId,
+    ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekDaily, ScheduleYear,
+    SetpointManagerComponent, SiteLocation, Surface, SurfaceConvectionAlgorithms, SurfaceId,
+    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version, WeekScheduleId, Zone,
+    ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId, ZoneEquipmentObjectType,
+    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatId,
 };
 
 /// Minimal typed model for early compiler stages.
@@ -56,6 +56,8 @@ pub struct TypedModel {
     pub day_schedules: Vec<ScheduleDayHourly>,
     /// Interval day schedules, assigned IDs after all hourly day schedules.
     pub day_interval_schedules: Vec<ScheduleDayInterval>,
+    /// List day schedules, assigned IDs after all hourly and interval day schedules.
+    pub day_list_schedules: Vec<ScheduleDayList>,
     /// Day schedule names.
     pub day_schedule_names: NameMap<DayScheduleId>,
     /// Daily week schedules.
@@ -197,6 +199,7 @@ impl Default for TypedModel {
             schedule_type_limit_names: NameMap::default(),
             day_schedules: Vec::new(),
             day_interval_schedules: Vec::new(),
+            day_list_schedules: Vec::new(),
             day_schedule_names: NameMap::default(),
             week_schedules: Vec::new(),
             week_schedule_names: NameMap::default(),
@@ -277,6 +280,7 @@ impl TypedModel {
             + self.schedule_type_limits.len()
             + self.day_schedules.len()
             + self.day_interval_schedules.len()
+            + self.day_list_schedules.len()
             + self.week_schedules.len()
             + self.schedules.len()
             + self.compact_schedules.len()
