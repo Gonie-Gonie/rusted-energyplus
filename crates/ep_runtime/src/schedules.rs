@@ -12,22 +12,21 @@ use ep_model::{
 };
 use std::collections::BTreeSet;
 
+mod cache;
 mod constant;
 mod day_table;
 mod external_interface;
 mod file_shading;
 
-use constant::constant_schedule_series;
+pub use cache::{
+    CachedScheduleSeries, ScheduleCacheProfile, ScheduleSampleIter, ScheduleSampleStorage,
+    ScheduleSeriesCache, ScheduleSeriesIndexKind, precompute_schedule_cache,
+    precompute_schedule_cache_for_environment_time_axis, precompute_schedule_cache_for_time_axis,
+};
 pub use constant::simulate_constant_schedules;
 #[cfg(test)]
-use day_table::{compiled_day_schedule_value, year_schedule_hourly_value};
 use day_table::{
-    precompile_day_schedule_table, year_schedule_series_for_environment_time_axis,
-    year_schedule_series_for_time_axis,
-};
-use external_interface::external_interface_schedule_series_iter;
-use file_shading::{
-    file_shading_series_for_environment_time_axis, file_shading_series_for_time_axis,
+    compiled_day_schedule_value, precompile_day_schedule_table, year_schedule_hourly_value,
 };
 
 #[cfg(test)]
@@ -439,8 +438,7 @@ pub fn precompute_schedule_value_series(
     model: &TypedModel,
     sample_count: usize,
 ) -> Result<Vec<ScheduleValueSeries>, String> {
-    let hours = (0..sample_count).map(|index| u32::try_from(index % 24 + 1).unwrap_or(24));
-    precompute_schedule_value_series_for_hours(model, hours)
+    precompute_schedule_cache(model, sample_count).map(ScheduleSeriesCache::into_traces)
 }
 
 /// Precomputes every supported typed schedule for a run-period time axis.
@@ -456,36 +454,7 @@ pub fn precompute_schedule_value_series_for_time_axis(
     model: &TypedModel,
     time_axis: &TimeAxis,
 ) -> Vec<ScheduleValueSeries> {
-    let day_schedule_table =
-        precompile_day_schedule_table(model, time_axis.zone_timestep.timesteps_per_hour);
-    model
-        .file_shading_schedule
-        .as_ref()
-        .into_iter()
-        .flat_map(|schedule| file_shading_series_for_time_axis(schedule, time_axis))
-        .chain(model.schedules.iter().map(|schedule| {
-            constant_schedule_series(schedule, time_axis.points.iter().map(|point| point.hour))
-        }))
-        .chain(
-            model
-                .compact_schedules
-                .iter()
-                .map(|schedule| compact_schedule_series_for_time_axis(schedule, time_axis)),
-        )
-        .chain(
-            model
-                .file_schedules
-                .iter()
-                .map(|schedule| file_schedule_series_for_time_axis(schedule, time_axis)),
-        )
-        .chain(model.year_schedules.iter().map(|schedule| {
-            year_schedule_series_for_time_axis(model, schedule, time_axis, &day_schedule_table)
-        }))
-        .chain(external_interface_schedule_series_iter(
-            model,
-            time_axis.points.len(),
-        ))
-        .collect()
+    precompute_schedule_cache_for_time_axis(model, time_axis).into_traces()
 }
 
 /// Precomputes every supported typed schedule for every zone timestep in one
@@ -500,80 +469,7 @@ pub fn precompute_schedule_value_series_for_environment_time_axis(
     model: &TypedModel,
     time_axis: &EnvironmentTimeAxis,
 ) -> Vec<ScheduleValueSeries> {
-    let day_schedule_table =
-        precompile_day_schedule_table(model, time_axis.zone_timestep.timesteps_per_hour);
-    model
-        .file_shading_schedule
-        .as_ref()
-        .into_iter()
-        .flat_map(|schedule| file_shading_series_for_environment_time_axis(schedule, time_axis))
-        .chain(model.schedules.iter().map(|schedule| {
-            constant_schedule_series(schedule, time_axis.points.iter().map(|point| point.hour))
-        }))
-        .chain(
-            model.compact_schedules.iter().map(|schedule| {
-                compact_schedule_series_for_environment_time_axis(schedule, time_axis)
-            }),
-        )
-        .chain(
-            model.file_schedules.iter().map(|schedule| {
-                file_schedule_series_for_environment_time_axis(schedule, time_axis)
-            }),
-        )
-        .chain(model.year_schedules.iter().map(|schedule| {
-            year_schedule_series_for_environment_time_axis(
-                model,
-                schedule,
-                time_axis,
-                &day_schedule_table,
-            )
-        }))
-        .chain(external_interface_schedule_series_iter(
-            model,
-            time_axis.points.len(),
-        ))
-        .collect()
-}
-
-fn precompute_schedule_value_series_for_hours(
-    model: &TypedModel,
-    hours: impl IntoIterator<Item = u32> + Clone,
-) -> Result<Vec<ScheduleValueSeries>, String> {
-    if model.file_shading_schedule.is_some() {
-        return Err(
-            "Schedule:File:Shading requires a calendar- and zone-timestep-aware TimeAxis; the hour-only API has no annual source index or zone timestep"
-                .to_string(),
-        );
-    }
-    if !model.file_schedules.is_empty() {
-        return Err(
-            "Schedule:File requires a calendar-aware TimeAxis; the hour-only API has no annual source index"
-                .to_string(),
-        );
-    }
-    if !model.year_schedules.is_empty() {
-        return Err(
-            "Schedule:Year requires a calendar-aware TimeAxis; the hour-only API has no annual day or day-type state"
-                .to_string(),
-        );
-    }
-    let constants = model
-        .schedules
-        .iter()
-        .map(|schedule| constant_schedule_series(schedule, hours.clone()))
-        .collect::<Vec<_>>();
-    let compact = model
-        .compact_schedules
-        .iter()
-        .map(|schedule| compact_schedule_series_for_hours(schedule, hours.clone()))
-        .collect::<Result<Vec<_>, _>>()?;
-    let sample_count = hours.into_iter().count();
-    let external = external_interface_schedule_series_iter(model, sample_count);
-    Ok(constants
-        .into_iter()
-        .chain(compact)
-        .chain(external)
-        .collect())
+    precompute_schedule_cache_for_environment_time_axis(model, time_axis).into_traces()
 }
 
 fn compact_schedule_series_for_hours(

@@ -1,6 +1,6 @@
 //! Immutable initial-value handling for supported external-interface schedule families.
 
-use super::{ScheduleSeriesKind, ScheduleTrace, ScheduleValueSeries};
+use super::{CachedScheduleSeries, ScheduleSampleStorage, ScheduleSeriesKind};
 use ep_model::{
     ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
     ExternalInterfaceSchedule, ScheduleId, TypedModel,
@@ -31,11 +31,11 @@ pub(super) fn external_interface_schedule_value(
         })
 }
 
-fn external_interface_schedule_series(
+fn external_interface_cached_schedule_series(
     schedule: &ExternalInterfaceSchedule,
     sample_count: usize,
-) -> ScheduleValueSeries {
-    initial_value_schedule_series(
+) -> CachedScheduleSeries {
+    initial_value_cached_schedule_series(
         schedule.id,
         &schedule.name.0,
         schedule.initial_value,
@@ -43,11 +43,11 @@ fn external_interface_schedule_series(
     )
 }
 
-fn external_interface_fmu_import_schedule_series(
+fn external_interface_fmu_import_cached_schedule_series(
     schedule: &ExternalInterfaceFmuImportSchedule,
     sample_count: usize,
-) -> ScheduleValueSeries {
-    initial_value_schedule_series(
+) -> CachedScheduleSeries {
+    initial_value_cached_schedule_series(
         schedule.id,
         &schedule.name.0,
         schedule.initial_value,
@@ -55,11 +55,11 @@ fn external_interface_fmu_import_schedule_series(
     )
 }
 
-fn external_interface_fmu_export_schedule_series(
+fn external_interface_fmu_export_cached_schedule_series(
     schedule: &ExternalInterfaceFmuExportSchedule,
     sample_count: usize,
-) -> ScheduleValueSeries {
-    initial_value_schedule_series(
+) -> CachedScheduleSeries {
+    initial_value_cached_schedule_series(
         schedule.id,
         &schedule.name.0,
         schedule.initial_value,
@@ -67,36 +67,39 @@ fn external_interface_fmu_export_schedule_series(
     )
 }
 
-fn initial_value_schedule_series(
+fn initial_value_cached_schedule_series(
     schedule_id: ScheduleId,
     schedule_name: &str,
     initial_value: f64,
     sample_count: usize,
-) -> ScheduleValueSeries {
-    ScheduleTrace {
+) -> CachedScheduleSeries {
+    CachedScheduleSeries {
         schedule_id,
         schedule_name: schedule_name.to_string(),
         kind: ScheduleSeriesKind::ExternalInterfaceInitialValue {
             value: initial_value,
         },
-        values: vec![initial_value; sample_count],
+        samples: ScheduleSampleStorage::Scalar {
+            value: initial_value,
+            len: sample_count,
+        },
     }
 }
 
-pub(super) fn external_interface_schedule_series_iter(
+pub(super) fn external_interface_cached_schedule_series_iter(
     model: &TypedModel,
     sample_count: usize,
-) -> impl Iterator<Item = ScheduleValueSeries> + '_ {
+) -> impl Iterator<Item = CachedScheduleSeries> + '_ {
     model
         .external_interface_schedules
         .iter()
-        .map(move |schedule| external_interface_schedule_series(schedule, sample_count))
+        .map(move |schedule| external_interface_cached_schedule_series(schedule, sample_count))
         .chain(
             model
                 .external_interface_fmu_import_schedules
                 .iter()
                 .map(move |schedule| {
-                    external_interface_fmu_import_schedule_series(schedule, sample_count)
+                    external_interface_fmu_import_cached_schedule_series(schedule, sample_count)
                 }),
         )
         .chain(
@@ -104,7 +107,7 @@ pub(super) fn external_interface_schedule_series_iter(
                 .external_interface_fmu_export_schedules
                 .iter()
                 .map(move |schedule| {
-                    external_interface_fmu_export_schedule_series(schedule, sample_count)
+                    external_interface_fmu_export_cached_schedule_series(schedule, sample_count)
                 }),
         )
 }
