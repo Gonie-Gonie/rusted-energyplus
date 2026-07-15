@@ -1,0 +1,39 @@
+Version,26.1;
+
+Building,
+  Calendar EPW Holiday Weekday Rules Exact Fixture,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+Timestep,4;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+RunPeriod,
+  EPW Holiday Weekday Rules Run Period,
+  2,
+  23,
+  2032,
+  2,
+  25,
+  2032,
+  Monday,
+  Yes, !- Use Weather File Holidays and Special Days
+  No,  !- Use Weather File Daylight Saving Period
+  No,  !- Apply Weekend Holiday Rule
+  No,  !- Use Weather File Rain Indicators
+  No,  !- Use Weather File Snow Indicators
+  No;  !- Treat Weather as Actual
+
+Output:Variable,
+  Environment,
+  Site Day Type Index,
+  Hourly;

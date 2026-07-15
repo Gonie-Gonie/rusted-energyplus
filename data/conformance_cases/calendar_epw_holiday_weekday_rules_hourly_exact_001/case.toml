@@ -1,0 +1,60 @@
+id = "calendar_epw_holiday_weekday_rules_hourly_exact_001"
+title = "EPW Nth/last-weekday holiday rules exact order"
+milestone = "full-source-order-calendar-epw-holiday-weekday-rules"
+purpose = "Block on exact ordered hourly Site Day Type Index state for two source-ordered EPW weekday holiday rules."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The claim is limited to the source-ordered EPW rules `4th Monday in February` and `Last Wednesday in February`, their 2032 resolutions on February 23 and February 25, and 72 ordered and unique hour-ending Site Day Type Index samples from 2032-02-23 through 2032-02-25.",
+  "EnergyPlus projects each enabled weather-file holiday with its source-exact Sunday day type (index 1), so the three daily indices are 1, 3, and 1; the oracle EIO names, types, and sources and the Rust resolved definitions retain EPW header order.",
+  "The RunPeriod explicitly enables weather-file holidays while disabling weather-file daylight saving, weekend observation, rain, snow, and actual-weather handling; no input-file special day or daylight-saving object is present.",
+  "The EnergyPlus oracle completes with exactly 0 Warning and 0 Severe errors; warning text, count, or repetition parity beyond those exact clean completion counts is not claimed.",
+  "Corresponding IDF weekday forms, fixed-date EPW rules, other ordinals, weekdays, months, years, header orderings, overlaps, other holiday combinations, other policy combinations, malformed headers, weekend shifting, EIO special-day dates, schedule lookup, tomorrow state, actual-weather execution, cross-year traversal or reprojection, and raw ESO serialization remain outside this claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_epw_holiday_weekday_rules_hourly_exact_001/calendar_epw_holiday_weekday_rules_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_epw_holiday_weekday_rules_hourly_exact_001/calendar_epw_holiday_weekday_rules_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_epw_holiday_weekday_rules_hourly_exact_001/calendar_epw_holiday_weekday_rules_hourly_exact.epw"
+
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Day Type Index"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_epw_holiday_weekday_rules_hourly_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-epw-holiday-weekday-rules-exact"
+blocking = true
