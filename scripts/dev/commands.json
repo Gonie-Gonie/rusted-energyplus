@@ -311,6 +311,12 @@
                          "help":  "Gate exact Schedule:Compact daylight-saving hour-24 rollover into the next schedule ordinal and tomorrow day type."
                      },
                      {
+                         "name":  "compare-calendar-schedule-compact-zone-timestep-exact",
+                         "path":  "compare\\compare-calendar-schedule-compact-zone-timestep-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate exact Schedule:Compact Interpolate:No values at each zone timestep."
+                     },
+                     {
                          "name":  "compare-weather-effective-calendar",
                          "path":  "compare\\compare-weather-effective-calendar.ps1",
                          "group":  "compare",

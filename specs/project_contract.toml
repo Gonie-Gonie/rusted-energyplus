@@ -68,6 +68,7 @@ claim_key = "time_compatibility"
 routine_inventory_complete = false
 required_routines = [
   "manage_simulation",
+  "get_project_data",
   "get_run_period_data",
   "setup_environment_types",
   "get_next_environment",
@@ -82,6 +83,9 @@ required_routines = [
   "read_eplus_weather_for_day",
   "update_weather_data",
   "set_current_weather",
+  "process_schedule_input",
+  "process_interval_fields",
+  "day_schedule_populate_from_minute_vals",
   "update_schedule_vals",
   "schedule_detailed_get_hr_ts_val",
   "write_time_stamp_format_data",

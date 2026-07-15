@@ -1,0 +1,58 @@
+Version,26.1;
+
+Building,
+  Schedule Compact Zone Timestep Exact Fixture,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+Timestep,4;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+RunPeriod,
+  Schedule Compact Zone Timestep Run Period,
+  1,
+  1,
+  2032,
+  1,
+  1,
+  2032,
+  Thursday,
+  No,
+  No,
+  No,
+  No,
+  No,
+  No;
+
+ScheduleTypeLimits,
+  Any Number;
+
+Schedule:Compact,
+  Zone Timestep Schedule,
+  Any Number,
+  Through: 12/31,
+  For: AllDays,
+  Until: 00:15,
+  11,
+  Until: 00:30,
+  12,
+  Until: 00:45,
+  13,
+  Until: 01:00,
+  14,
+  Until: 24:00,
+  90;
+
+Output:Variable,
+  ZONE TIMESTEP SCHEDULE,
+  Schedule Value,
+  Timestep;

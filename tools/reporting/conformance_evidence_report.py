@@ -82,7 +82,22 @@ CLAIM_BOUNDARY = (
     "ordinal. Rust EPW record selection is null and unclaimed. Schedule-specific DST opt-out, subhourly "
     "values or interpolation, other schedule families or boundaries, actual/design-day/warmup execution, "
     "downstream internal-gain/HVAC/IdealLoads calendar consumption, EMS/current-value semantics, Rust "
-    "raw ESO parity, and broad warning/error parity remain unclaimed. The separate weather record-offset "
+    "raw ESO parity, and broad warning/error parity remain unclaimed. The separate Schedule:Compact "
+    "zone-timestep case covers only one non-actual 2032-01-01 "
+    "RunPeriod with Timestep,4 and the default Interpolate:No meaning represented by an omitted "
+    "Interpolate directive. Its 96 ordered, exact, unique, zero-tolerance Schedule Value samples and "
+    "timestamps are 11, 12, 13, and 14 at the four aligned 15-minute endpoints in hour 1, followed by "
+    "90 for the remaining 92 zone timesteps. The gate locks all 96 raw EnergyPlus values and timestep "
+    "timestamp fields, the exact Environment and disabled Environment:Daylight Saving EIO rows, and "
+    "clean 0 Warning/0 Severe completion. Rust EPW record selection is null and unclaimed for this "
+    "schedule-only case. This proves only omitted-directive default ownership, flat minute-field "
+    "expansion, default-No end-minute sampling, and explicit detailed-schedule timestep indexing for "
+    "that one aligned case. Explicit Interpolate directives, Average, Linear, non-aligned Until warning "
+    "and resulting sampling behavior, timestep-count correction/defaulting, DST interaction, "
+    "Schedule:File and the public/input Schedule:Day:*, Schedule:Week:*, and Schedule:Year families, "
+    "UpdateScheduleVals, EMS/currentVal "
+    "policy, downstream consumption, Rust raw ESO serialization, and broad warning/error parity remain "
+    "unclaimed. The separate weather record-offset "
     "case proves only "
     "same-year non-actual, single-data-period, one-record-per-hour month/day positioning: 24 leading "
     "decoy rows are skipped and 48 ordered hourly dry-bulb timestamps and values match exactly. "
@@ -290,6 +305,7 @@ CASE_LABELS = {
     "schedule_constant_001": "Schedule const",
     "calendar_schedule_hourly_exact_001": "Calendar/sched exact",
     "calendar_schedule_compact_through_for_day_type_hourly_exact_001": "Compact Through/For",
+    "calendar_schedule_compact_zone_timestep_exact_001": "Compact zone timestep",
     "calendar_schedule_dst_hour24_tomorrow_day_type_exact_001": "DST schedule rollover",
     "calendar_schedule_weather_leap_policy_no_001": "Weather calendar no-leap",
     "calendar_dst_fixed_date_hourly_exact_001": "Calendar DST fixed enabled",
@@ -328,6 +344,7 @@ KEY_LABELS = {
     "ALWAYSON": "AlwaysOn",
     "CALENDAR HOURLY 1 TO 24": "Calendar 1-24",
     "THROUGH FOR DAY TYPE SCHEDULE": "Through/For day type",
+    "ZONE TIMESTEP SCHEDULE": "Zone timestep schedule",
     "DST FINAL ROLLOVER SCHEDULE": "DST final rollover",
     "Environment": "Env",
     "ENVIRONMENT": "Env",
@@ -425,6 +442,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_through_for_day_type_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_through_for_day_type_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_through_for_day_type_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Compact zone timestep",
+        command="compare-calendar-schedule-compact-zone-timestep-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_zone_timestep_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_zone_timestep_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_schedule_compact_zone_timestep_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="DST schedule rollover",

@@ -95,6 +95,7 @@
         NodeStateStore, node_temperature_setpoint_from_energyplus,
         simulate_ideal_loads_node_state_projection,
     };
+    use crate::schedules::precompute_schedule_value_series_for_environment_time_axis;
     use crate::time_axis::{Date, next_day};
     use crate::{
         ExecutionStage, ExecutionStageKind, ExecutionStep, RuntimeOutputRegistry,
@@ -102,7 +103,8 @@
         build_environment_time_axes_with_weather_metadata, build_execution_plan,
         build_hourly_time_axis, build_hourly_time_axis_for_run_period,
         build_hourly_time_axis_for_run_period_with_weather_metadata,
-        energyplus_heat_balance_compatibility_stages, normalized_hourly_timestamp_label,
+        energyplus_heat_balance_compatibility_stages,
+        normalized_environment_timestep_timestamp_label, normalized_hourly_timestamp_label,
         precompute_runtime_data, resolve_run_period_calendar,
         resolve_weather_environment_calendar,
     };
@@ -990,6 +992,261 @@
         assert_eq!(series.len(), 1);
         assert_eq!(series[0].values[..8], [1.0; 8]);
         assert_eq!(series[0].values[8..], [2.0; 16]);
+        Ok(())
+    }
+
+    #[test]
+    fn compact_schedule_environment_axis_selects_each_zone_timestep_end_minute()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let constant_id = ScheduleId(48);
+        let detailed_id = ScheduleId(49);
+        let model = TypedModel {
+            timestep: TimestepConfig {
+                number_of_timesteps_per_hour: 4,
+            },
+            run_periods: vec![RunPeriod {
+                id: RunPeriodId(0),
+                name: NormalizedName::new("Zone Timestep Schedule"),
+                begin_month: 1,
+                begin_day_of_month: 1,
+                begin_year: Some(2017),
+                end_month: 1,
+                end_day_of_month: 1,
+                end_year: Some(2017),
+                day_of_week_for_start_day: Some(DayOfWeek::Sunday),
+                first_hour_interpolation_starting_values:
+                    FirstHourInterpolationStartingValues::Hour24,
+                use_weather_file_holidays_and_special_days: false,
+                use_weather_file_daylight_saving_period: false,
+                apply_weekend_holiday_rule: false,
+                use_weather_file_rain_indicators: false,
+                use_weather_file_snow_indicators: false,
+                treat_weather_as_actual: false,
+            }],
+            schedules: vec![ScheduleConstant {
+                id: constant_id,
+                name: NormalizedName::new("Zone Timestep Constant"),
+                schedule_type_limits: None,
+                hourly_value: 0.5,
+            }],
+            compact_schedules: vec![ScheduleCompact {
+                id: detailed_id,
+                name: NormalizedName::new("Zone Timestep Detailed"),
+                schedule_type_limits: None,
+                periods: vec![ScheduleCompactPeriod {
+                    through_schedule_day_of_year: 366,
+                    day_profiles: vec![ScheduleCompactDayProfile {
+                        day_types: all_schedule_day_types(),
+                        segments: vec![
+                            ScheduleCompactSegment {
+                                until_minute_of_day: 15,
+                                value: 11.0,
+                            },
+                            ScheduleCompactSegment {
+                                until_minute_of_day: 30,
+                                value: 12.0,
+                            },
+                            ScheduleCompactSegment {
+                                until_minute_of_day: 45,
+                                value: 13.0,
+                            },
+                            ScheduleCompactSegment {
+                                until_minute_of_day: 60,
+                                value: 14.0,
+                            },
+                            ScheduleCompactSegment {
+                                until_minute_of_day: 23 * 60,
+                                value: 20.0,
+                            },
+                            ScheduleCompactSegment {
+                                until_minute_of_day: 23 * 60 + 15,
+                                value: 21.0,
+                            },
+                            ScheduleCompactSegment {
+                                until_minute_of_day: 23 * 60 + 30,
+                                value: 22.0,
+                            },
+                            ScheduleCompactSegment {
+                                until_minute_of_day: 23 * 60 + 45,
+                                value: 23.0,
+                            },
+                            ScheduleCompactSegment {
+                                until_minute_of_day: 24 * 60,
+                                value: 24.0,
+                            },
+                        ],
+                    }],
+                }],
+            }],
+            ..TypedModel::default()
+        };
+
+        let environment_axes = build_environment_time_axes(&model)?;
+        assert_eq!(environment_axes.len(), 1);
+        let environment_axis = &environment_axes[0];
+        assert_eq!(environment_axis.sample_count(), 96);
+        assert_eq!(environment_axis.points[0].zone_timestep, 1);
+        assert_eq!(environment_axis.points[0].end_minute, 15.0);
+        assert_eq!(environment_axis.points[3].zone_timestep, 4);
+        assert_eq!(environment_axis.points[3].end_minute, 60.0);
+        assert_eq!(environment_axis.points[4].hour, 2);
+        assert_eq!(environment_axis.points[4].zone_timestep, 1);
+
+        let series =
+            precompute_schedule_value_series_for_environment_time_axis(&model, environment_axis);
+        let constant = series
+            .iter()
+            .find(|trace| trace.schedule_id == constant_id)
+            .expect("constant environment-timestep series");
+        assert_eq!(constant.values, vec![0.5; 96]);
+
+        let detailed = series
+            .iter()
+            .find(|trace| trace.schedule_id == detailed_id)
+            .expect("detailed environment-timestep series");
+        let mut expected = vec![11.0, 12.0, 13.0, 14.0];
+        expected.extend(vec![20.0; 88]);
+        expected.extend([21.0, 22.0, 23.0, 24.0]);
+        assert_eq!(detailed.values, expected);
+
+        assert_eq!(
+            normalized_environment_timestep_timestamp_label(
+                environment_axis,
+                &environment_axis.points[0],
+            ),
+            "env=ZONE TIMESTEP SCHEDULE;day=1;month=1;date=1;dst=0;hour=1;start=0.00;end=15.00;day_type=Sunday"
+        );
+        assert_eq!(
+            normalized_environment_timestep_timestamp_label(
+                environment_axis,
+                &environment_axis.points[95],
+            ),
+            "env=ZONE TIMESTEP SCHEDULE;day=1;month=1;date=1;dst=0;hour=24;start=45.00;end=60.00;day_type=Sunday"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn detailed_schedule_environment_axis_preserves_zone_timestep_across_dst_shift_and_wrap()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let schedule_id = ScheduleId(50);
+        let model = TypedModel {
+            timestep: TimestepConfig {
+                number_of_timesteps_per_hour: 4,
+            },
+            run_periods: vec![RunPeriod {
+                id: RunPeriodId(0),
+                name: NormalizedName::new("DST Zone Timestep Wrap"),
+                begin_month: 12,
+                begin_day_of_month: 31,
+                begin_year: Some(2032),
+                end_month: 12,
+                end_day_of_month: 31,
+                end_year: Some(2032),
+                day_of_week_for_start_day: Some(DayOfWeek::Friday),
+                first_hour_interpolation_starting_values:
+                    FirstHourInterpolationStartingValues::Hour24,
+                use_weather_file_holidays_and_special_days: false,
+                use_weather_file_daylight_saving_period: false,
+                apply_weekend_holiday_rule: false,
+                use_weather_file_rain_indicators: false,
+                use_weather_file_snow_indicators: false,
+                treat_weather_as_actual: false,
+            }],
+            run_period_daylight_saving_time: Some(ep_model::RunPeriodDaylightSavingTime {
+                start_date: CalendarDateRule::MonthDay {
+                    month: 12,
+                    day_of_month: 31,
+                },
+                end_date: CalendarDateRule::MonthDay {
+                    month: 12,
+                    day_of_month: 31,
+                },
+            }),
+            compact_schedules: vec![ScheduleCompact {
+                id: schedule_id,
+                name: NormalizedName::new("DST Zone Timestep Detailed"),
+                schedule_type_limits: None,
+                periods: vec![
+                    ScheduleCompactPeriod {
+                        through_schedule_day_of_year: 1,
+                        day_profiles: vec![ScheduleCompactDayProfile {
+                            day_types: all_schedule_day_types(),
+                            segments: vec![
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 15,
+                                    value: 101.0,
+                                },
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 30,
+                                    value: 102.0,
+                                },
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 45,
+                                    value: 103.0,
+                                },
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 60,
+                                    value: 104.0,
+                                },
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 24 * 60,
+                                    value: 109.0,
+                                },
+                            ],
+                        }],
+                    },
+                    ScheduleCompactPeriod {
+                        through_schedule_day_of_year: 366,
+                        day_profiles: vec![ScheduleCompactDayProfile {
+                            day_types: all_schedule_day_types(),
+                            segments: vec![
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 60,
+                                    value: 200.0,
+                                },
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 60 + 15,
+                                    value: 211.0,
+                                },
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 60 + 30,
+                                    value: 212.0,
+                                },
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 60 + 45,
+                                    value: 213.0,
+                                },
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 2 * 60,
+                                    value: 214.0,
+                                },
+                                ScheduleCompactSegment {
+                                    until_minute_of_day: 24 * 60,
+                                    value: 220.0,
+                                },
+                            ],
+                        }],
+                    },
+                ],
+            }],
+            ..TypedModel::default()
+        };
+
+        let environment_axes = build_environment_time_axes(&model)?;
+        let environment_axis = &environment_axes[0];
+        assert_eq!(environment_axis.sample_count(), 96);
+        assert!(environment_axis.points.iter().all(|point| point.dst));
+        assert_eq!(environment_axis.points[95].schedule_day_of_year, 366);
+
+        let series =
+            precompute_schedule_value_series_for_environment_time_axis(&model, environment_axis);
+        let mut expected = vec![211.0, 212.0, 213.0, 214.0];
+        expected.extend(vec![220.0; 88]);
+        expected.extend([101.0, 102.0, 103.0, 104.0]);
+        assert_eq!(series[0].values, expected);
+
         Ok(())
     }
 

@@ -3,7 +3,7 @@
 use crate::error::RuntimeError;
 use crate::geometry::zone_floor_area_m2;
 use crate::heat_balance::state::SurfaceHeatBalanceState;
-use crate::time_axis::{DayType, TimeAxis, TimePoint};
+use crate::time_axis::{DayType, EnvironmentTimeAxis, EnvironmentTimePoint, TimeAxis, TimePoint};
 use ep_model::{
     OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, People,
     PeopleNumberCalculationMethod, ScheduleCompact, ScheduleCompactDayProfile,
@@ -379,6 +379,32 @@ pub fn precompute_schedule_value_series_for_time_axis(
         .collect()
 }
 
+/// Precomputes constant and supported compact schedules for every zone timestep
+/// in one simulation environment.
+///
+/// Compact schedules currently use EnergyPlus' no-interpolation endpoint
+/// semantics: each zone timestep reads the schedule value at that timestep's
+/// ending minute. The current DST state shifts only the lookup hour, preserving
+/// the one-based zone-timestep position within that hour.
+#[must_use]
+pub fn precompute_schedule_value_series_for_environment_time_axis(
+    model: &TypedModel,
+    time_axis: &EnvironmentTimeAxis,
+) -> Vec<ScheduleValueSeries> {
+    model
+        .schedules
+        .iter()
+        .map(|schedule| {
+            constant_schedule_series(schedule, time_axis.points.iter().map(|point| point.hour))
+        })
+        .chain(
+            model.compact_schedules.iter().map(|schedule| {
+                compact_schedule_series_for_environment_time_axis(schedule, time_axis)
+            }),
+        )
+        .collect()
+}
+
 fn precompute_schedule_value_series_for_hours(
     model: &TypedModel,
     hours: impl IntoIterator<Item = u32> + Clone,
@@ -460,30 +486,91 @@ fn compact_schedule_series_for_time_axis(
     }
 }
 
-fn detailed_schedule_lookup_state(point: &TimePoint) -> (u32, ScheduleDayType, u32) {
-    let shifted_hour = point.hour.clamp(1, 24) + u32::from(point.dst);
-    if shifted_hour <= 24 {
-        return (
-            point.schedule_day_of_year,
-            model_schedule_day_type(point.day_type),
-            shifted_hour * 60,
-        );
-    }
+fn compact_schedule_series_for_environment_time_axis(
+    schedule: &ScheduleCompact,
+    time_axis: &EnvironmentTimeAxis,
+) -> ScheduleValueSeries {
+    let periods = precompile_compact_schedule_periods(schedule);
+    let values = time_axis
+        .points
+        .iter()
+        .map(|point| {
+            let (schedule_day_of_year, day_type, minute_of_day) =
+                detailed_schedule_environment_lookup_state(point);
+            compiled_compact_schedule_value(&periods, schedule_day_of_year, day_type, minute_of_day)
+                .unwrap_or(f64::NAN)
+        })
+        .collect();
 
-    let next_schedule_day_of_year = if point.schedule_day_of_year >= 366 {
-        1
-    } else {
-        point.schedule_day_of_year + 1
-    };
-    (
-        next_schedule_day_of_year,
-        model_schedule_day_type(
+    ScheduleTrace {
+        schedule_id: schedule.id,
+        schedule_name: schedule.name.0.clone(),
+        kind: ScheduleSeriesKind::CompactCalendarProfiles { periods },
+        values,
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct DetailedScheduleLookupInput {
+    schedule_day_of_year: u32,
+    current_day_type: ScheduleDayType,
+    tomorrow_day_type: ScheduleDayType,
+    dst: bool,
+    hour: u32,
+    timestep_end_minute: u32,
+}
+
+fn detailed_schedule_lookup_state(point: &TimePoint) -> (u32, ScheduleDayType, u32) {
+    detailed_schedule_lookup_state_from_input(DetailedScheduleLookupInput {
+        schedule_day_of_year: point.schedule_day_of_year,
+        current_day_type: model_schedule_day_type(point.day_type),
+        tomorrow_day_type: model_schedule_day_type(
             point
                 .tomorrow_special_day_type
                 .unwrap_or_else(|| point.tomorrow_day_of_week.into()),
         ),
-        (shifted_hour - 24) * 60,
-    )
+        dst: point.dst,
+        hour: point.hour,
+        timestep_end_minute: 60,
+    })
+}
+
+fn detailed_schedule_environment_lookup_state(
+    point: &EnvironmentTimePoint,
+) -> (u32, ScheduleDayType, u32) {
+    detailed_schedule_lookup_state_from_input(DetailedScheduleLookupInput {
+        schedule_day_of_year: point.schedule_day_of_year,
+        current_day_type: model_schedule_day_type(point.day_type),
+        tomorrow_day_type: model_schedule_day_type(
+            point
+                .tomorrow_special_day_type
+                .unwrap_or_else(|| point.tomorrow_day_of_week.into()),
+        ),
+        dst: point.dst,
+        hour: point.hour,
+        timestep_end_minute: point.end_minute.round().clamp(1.0, 60.0) as u32,
+    })
+}
+
+fn detailed_schedule_lookup_state_from_input(
+    input: DetailedScheduleLookupInput,
+) -> (u32, ScheduleDayType, u32) {
+    let mut lookup_hour = input.hour.clamp(1, 24) + u32::from(input.dst);
+    let mut schedule_day_of_year = input.schedule_day_of_year;
+    let mut day_type = input.current_day_type;
+
+    if lookup_hour > 24 {
+        lookup_hour -= 24;
+        schedule_day_of_year = if schedule_day_of_year >= 366 {
+            1
+        } else {
+            schedule_day_of_year + 1
+        };
+        day_type = input.tomorrow_day_type;
+    }
+
+    let minute_of_day = (lookup_hour - 1) * 60 + input.timestep_end_minute;
+    (schedule_day_of_year, day_type, minute_of_day)
 }
 
 /// Returns the shared daily profile accepted by hour-only schedule consumers.

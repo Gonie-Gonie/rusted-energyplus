@@ -12,11 +12,13 @@ use ep_conformance::{
     TimestampContract, VariableClass,
 };
 use ep_model::TypedModel;
+use ep_runtime::schedules::precompute_schedule_value_series_for_environment_time_axis;
 use ep_runtime::{
-    EpwEnvironmentWeather, ScheduleValueSeries, TimeAxis, build_hourly_time_axis,
-    build_hourly_time_axis_with_weather_metadata, load_epw_weather_file,
-    normalized_hourly_timestamp_label, precompute_schedule_value_series_for_time_axis,
-    select_epw_environment_weather,
+    EnvironmentTimeAxis, EpwEnvironmentWeather, ScheduleValueSeries, TimeAxis,
+    build_environment_time_axes, build_environment_time_axes_with_weather_metadata,
+    build_hourly_time_axis, build_hourly_time_axis_with_weather_metadata, load_epw_weather_file,
+    normalized_environment_timestep_timestamp_label, normalized_hourly_timestamp_label,
+    precompute_schedule_value_series_for_time_axis, select_epw_environment_weather,
 };
 
 use crate::conformance_artifacts::{
@@ -46,8 +48,30 @@ struct TimeWeatherScheduleContext<'a> {
     manifest: &'a ConformanceCase,
     model: TypedModel,
     time_axis: TimeAxis,
+    environment_time_axis: Option<EnvironmentTimeAxis>,
     weather_environment: Option<EpwEnvironmentWeather>,
     rows: Vec<TimeWeatherScheduleRow>,
+}
+
+impl TimeWeatherScheduleContext<'_> {
+    fn sample_count(&self) -> usize {
+        self.environment_time_axis.as_ref().map_or_else(
+            || self.time_axis.sample_count(),
+            EnvironmentTimeAxis::sample_count,
+        )
+    }
+
+    fn timestamp_rule(&self) -> &'static str {
+        match self.manifest.outputs[0].frequency {
+            OutputFrequency::Hourly => {
+                "hour-ending hourly samples aligned by EnergyPlus ESO timestamp labels"
+            }
+            OutputFrequency::Timestep => {
+                "zone-timestep ending samples aligned by EnergyPlus ESO timestamp labels"
+            }
+            _ => unreachable!("report validation admits only hourly or timestep outputs"),
+        }
+    }
 }
 
 struct TimeWeatherScheduleRow {
@@ -185,14 +209,40 @@ fn validate_manifest(manifest: &ConformanceCase) -> Result<(), String> {
             "time/weather/schedule report requires at least one conformance output".to_string(),
         );
     }
+
+    let frequency = manifest.outputs[0].frequency;
+    if manifest
+        .outputs
+        .iter()
+        .any(|output| output.frequency != frequency)
+    {
+        return Err(
+            "time/weather/schedule report requires homogeneous hourly or timestep outputs; mixed output frequencies are unsupported"
+                .to_string(),
+        );
+    }
+    if !matches!(
+        frequency,
+        OutputFrequency::Hourly | OutputFrequency::Timestep
+    ) {
+        return Err(format!(
+            "time/weather/schedule report supports hourly or timestep outputs, got {}",
+            output_frequency_label(frequency)
+        ));
+    }
+    if frequency == OutputFrequency::Timestep
+        && manifest
+            .outputs
+            .iter()
+            .any(|output| output.class == VariableClass::Weather)
+    {
+        return Err(
+            "time/weather/schedule report does not support timestep weather outputs; timestep outputs must all be schedules"
+                .to_string(),
+        );
+    }
+
     for output in &manifest.outputs {
-        if output.frequency != OutputFrequency::Hourly {
-            return Err(format!(
-                "time/weather/schedule report requires hourly outputs, got {} for {}",
-                output_frequency_label(output.frequency),
-                output.variable
-            ));
-        }
         if output.source != SourceArtifact::Eso {
             return Err(format!(
                 "time/weather/schedule report requires eso source, got {} for {}",
@@ -267,11 +317,41 @@ fn build_context<'a>(
             },
         )
         .map_err(|error| format!("failed to build time axis: {error}"))?;
+    let environment_time_axis = if manifest.outputs[0].frequency == OutputFrequency::Timestep {
+        let axes = weather_file
+            .as_ref()
+            .map_or_else(
+                || build_environment_time_axes(&model),
+                |weather_file| {
+                    build_environment_time_axes_with_weather_metadata(
+                        &model,
+                        &weather_file.calendar_metadata,
+                    )
+                },
+            )
+            .map_err(|error| format!("failed to build environment time axis: {error}"))?;
+        Some(
+            axes.into_iter()
+                .next()
+                .ok_or_else(|| "model produced no environment time axis".to_string())?,
+        )
+    } else {
+        None
+    };
     let schedule_series = manifest
         .outputs
         .iter()
         .any(|output| output.class == VariableClass::Schedule)
-        .then(|| precompute_schedule_value_series_for_time_axis(&model, &time_axis));
+        .then(|| {
+            if let Some(environment_time_axis) = environment_time_axis.as_ref() {
+                precompute_schedule_value_series_for_environment_time_axis(
+                    &model,
+                    environment_time_axis,
+                )
+            } else {
+                precompute_schedule_value_series_for_time_axis(&model, &time_axis)
+            }
+        });
     let has_weather_output = manifest
         .outputs
         .iter()
@@ -303,6 +383,7 @@ fn build_context<'a>(
             output,
             &model,
             &time_axis,
+            environment_time_axis.as_ref(),
             schedule_series.as_deref(),
             weather_records,
         )?;
@@ -390,6 +471,7 @@ fn build_context<'a>(
         manifest,
         model,
         time_axis,
+        environment_time_axis,
         weather_environment,
         rows,
     })
@@ -399,16 +481,32 @@ fn observed_samples(
     output: &OutputRequest,
     model: &TypedModel,
     time_axis: &TimeAxis,
+    environment_time_axis: Option<&EnvironmentTimeAxis>,
     schedule_series: Option<&[ScheduleValueSeries]>,
     weather_records: Option<&[ep_runtime::EpwRecord]>,
 ) -> Result<Vec<SeriesSample>, String> {
     match output.class {
-        VariableClass::Schedule => schedule_samples(
-            output,
-            model,
-            time_axis,
-            schedule_series.ok_or_else(|| "missing precomputed schedule series".to_string())?,
-        ),
+        VariableClass::Schedule => {
+            let schedule_series =
+                schedule_series.ok_or_else(|| "missing precomputed schedule series".to_string())?;
+            match output.frequency {
+                OutputFrequency::Hourly => {
+                    schedule_samples(output, model, time_axis, schedule_series)
+                }
+                OutputFrequency::Timestep => schedule_timestep_samples(
+                    output,
+                    model,
+                    environment_time_axis.ok_or_else(|| {
+                        "missing environment time axis for timestep schedule".to_string()
+                    })?,
+                    schedule_series,
+                ),
+                _ => Err(format!(
+                    "unsupported schedule output frequency: {}",
+                    output_frequency_label(output.frequency)
+                )),
+            }
+        }
         VariableClass::Weather => weather_samples(output, time_axis, weather_records),
         _ => Err(format!(
             "unsupported output class for time/weather/schedule report: {}",
@@ -440,6 +538,31 @@ fn schedule_samples(
         ));
     }
     Ok(samples_with_time_axis(&trace.values, time_axis))
+}
+
+fn schedule_timestep_samples(
+    output: &OutputRequest,
+    model: &TypedModel,
+    time_axis: &EnvironmentTimeAxis,
+    schedule_series: &[ScheduleValueSeries],
+) -> Result<Vec<SeriesSample>, String> {
+    let schedule_id = model
+        .schedule_names
+        .resolve(&output.key)
+        .ok_or_else(|| format!("missing schedule {}", output.key))?;
+    let trace = schedule_series
+        .iter()
+        .find(|trace| trace.schedule_id == schedule_id)
+        .ok_or_else(|| format!("missing schedule trace {}", output.key))?;
+    if trace.values.len() != time_axis.sample_count() {
+        return Err(format!(
+            "schedule trace {} has {} samples but environment time axis requires {}",
+            output.key,
+            trace.values.len(),
+            time_axis.sample_count()
+        ));
+    }
+    Ok(samples_with_environment_time_axis(&trace.values, time_axis))
 }
 
 fn weather_samples(
@@ -512,6 +635,24 @@ fn samples_with_time_axis(values: &[f64], time_axis: &TimeAxis) -> Vec<SeriesSam
             SeriesSample::timestamped(
                 point.sample_index,
                 normalized_hourly_timestamp_label(time_axis, point),
+                value,
+            )
+        })
+        .collect()
+}
+
+fn samples_with_environment_time_axis(
+    values: &[f64],
+    time_axis: &EnvironmentTimeAxis,
+) -> Vec<SeriesSample> {
+    values
+        .iter()
+        .copied()
+        .zip(&time_axis.points)
+        .map(|(value, point)| {
+            SeriesSample::timestamped(
+                point.sample_index,
+                normalized_environment_timestep_timestamp_label(time_axis, point),
                 value,
             )
         })
@@ -620,9 +761,7 @@ fn render_markdown(context: &TimeWeatherScheduleContext<'_>) -> String {
         report.push_str(&format!("gate_script: {}\n", gate.script));
         report.push_str(&format!("gate_blocking: {}\n", gate.blocking));
     }
-    report.push_str(
-        "timestamp_rule: hour-ending hourly samples aligned by EnergyPlus ESO timestamp labels\n\n",
-    );
+    report.push_str(&format!("timestamp_rule: {}\n\n", context.timestamp_rule()));
     report.push_str(
         "timestamp_contract_rule: ordered-exact-unique is opt-in and requires present, unique, same-index exact timestamp labels\n\n",
     );
@@ -638,10 +777,7 @@ fn render_markdown(context: &TimeWeatherScheduleContext<'_>) -> String {
             .filter(|row| row.is_conformance())
             .count()
     ));
-    report.push_str(&format!(
-        "time_axis_samples: {}\n",
-        context.time_axis.sample_count()
-    ));
+    report.push_str(&format!("time_axis_samples: {}\n", context.sample_count()));
     if let Some(calendar) = context.time_axis.weather_calendar.as_ref() {
         report.push_str("weather_calendar_policy_applied: true\n");
         report.push_str(&format!(
@@ -848,11 +984,14 @@ fn render_json(context: &TimeWeatherScheduleContext<'_>) -> String {
         "  \"status\": {},\n",
         json_string(overall_status(&context.rows))
     ));
-    json.push_str("  \"timestamp_rule\": \"hour-ending hourly samples aligned by EnergyPlus ESO timestamp labels\",\n");
+    json.push_str(&format!(
+        "  \"timestamp_rule\": {},\n",
+        json_string(context.timestamp_rule())
+    ));
     json.push_str("  \"timestamp_contract_rule\": \"ordered-exact-unique is opt-in and requires present, unique, same-index exact timestamp labels\",\n");
     json.push_str(&format!(
         "  \"time_axis_samples\": {},\n",
-        context.time_axis.sample_count()
+        context.sample_count()
     ));
     json.push_str(&format!(
         "  \"weather_calendar\": {},\n",

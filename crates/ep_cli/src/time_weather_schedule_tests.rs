@@ -1,7 +1,8 @@
 use std::collections::BTreeSet;
 
 use ep_conformance::{
-    OutputFrequency, OutputRequest, SourceArtifact, TimestampContract, VariableClass,
+    ConformanceCase, OutputFrequency, OutputRequest, SourceArtifact, TimestampContract,
+    VariableClass, parse_case_str,
 };
 use ep_model::{
     CalendarDateRule, DayOfWeek, FirstHourInterpolationStartingValues, NormalizedName, RunPeriod,
@@ -12,14 +13,51 @@ use ep_model::{
 use ep_runtime::{
     DayType, DaylightSavingPeriodSource, EpwCalendarDateRule, EpwCalendarMetadata,
     EpwDaylightSavingPeriod, EpwRecord, ResolvedDaylightSavingDate, ResolvedDaylightSavingPeriod,
-    build_hourly_time_axis_with_weather_metadata,
+    build_environment_time_axes, build_hourly_time_axis_with_weather_metadata,
 };
 
 use super::{
     append_daylight_saving_markdown, build_hourly_time_axis,
-    precompute_schedule_value_series_for_time_axis, schedule_samples, weather_calendar_json,
-    weather_samples,
+    precompute_schedule_value_series_for_environment_time_axis,
+    precompute_schedule_value_series_for_time_axis, schedule_samples, schedule_timestep_samples,
+    validate_manifest, weather_calendar_json, weather_samples,
 };
+
+fn report_manifest(outputs: &str) -> Result<ConformanceCase, Box<dyn std::error::Error>> {
+    let manifest = format!(
+        r#"
+id = "time_weather_schedule_test"
+title = "Time weather schedule test"
+milestone = "test"
+purpose = "Exercise report validation"
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+
+[input]
+idf = "test.idf"
+
+{outputs}
+
+[[tolerances]]
+variable_class = "schedule"
+max_abs = 0.0
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+
+[report]
+format = "markdown"
+path = "test-report.md"
+
+[gate]
+script = "scripts/dev.cmd test"
+blocking = true
+"#
+    );
+    Ok(parse_case_str(&manifest)?)
+}
 
 fn all_schedule_day_types() -> Vec<ScheduleDayType> {
     vec![
@@ -85,6 +123,173 @@ fn cross_year_day_type_compact_schedule(id: ScheduleId) -> ScheduleCompact {
             },
         ],
     }
+}
+
+#[test]
+fn manifest_accepts_homogeneous_timestep_schedule_outputs() -> Result<(), Box<dyn std::error::Error>>
+{
+    let manifest = report_manifest(
+        r#"
+[[outputs]]
+key = "TIMESTEP SCHEDULE"
+variable = "Schedule Value"
+frequency = "timestep"
+class = "schedule"
+source = "eso"
+level = "conformance"
+"#,
+    )?;
+
+    validate_manifest(&manifest).map_err(std::io::Error::other)?;
+    Ok(())
+}
+
+#[test]
+fn manifest_rejects_mixed_hourly_and_timestep_outputs() -> Result<(), Box<dyn std::error::Error>> {
+    let manifest = report_manifest(
+        r#"
+[[outputs]]
+key = "HOURLY SCHEDULE"
+variable = "Schedule Value"
+frequency = "hourly"
+class = "schedule"
+source = "eso"
+level = "conformance"
+
+[[outputs]]
+key = "TIMESTEP SCHEDULE"
+variable = "Schedule Value"
+frequency = "timestep"
+class = "schedule"
+source = "eso"
+level = "conformance"
+"#,
+    )?;
+
+    let error = validate_manifest(&manifest).expect_err("mixed frequencies must fail");
+    assert!(error.contains("mixed output frequencies are unsupported"));
+    Ok(())
+}
+
+#[test]
+fn manifest_rejects_timestep_weather_outputs() -> Result<(), Box<dyn std::error::Error>> {
+    let manifest = report_manifest(
+        r#"
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Outdoor Air Drybulb Temperature"
+frequency = "timestep"
+class = "weather"
+source = "eso"
+level = "conformance"
+"#,
+    )?;
+
+    let error = validate_manifest(&manifest).expect_err("timestep weather must fail");
+    assert!(error.contains("does not support timestep weather outputs"));
+    Ok(())
+}
+
+#[test]
+fn timestep_schedule_samples_use_environment_axis_values_and_unique_labels()
+-> Result<(), Box<dyn std::error::Error>> {
+    let schedule_id = ScheduleId(52);
+    let mut model = TypedModel {
+        timestep: TimestepConfig {
+            number_of_timesteps_per_hour: 4,
+        },
+        compact_schedules: vec![ScheduleCompact {
+            id: schedule_id,
+            name: NormalizedName::new("Timestep Schedule"),
+            schedule_type_limits: None,
+            periods: vec![ScheduleCompactPeriod {
+                through_schedule_day_of_year: 366,
+                day_profiles: vec![ScheduleCompactDayProfile {
+                    day_types: all_schedule_day_types(),
+                    segments: vec![
+                        ScheduleCompactSegment {
+                            until_minute_of_day: 15,
+                            value: 1.0,
+                        },
+                        ScheduleCompactSegment {
+                            until_minute_of_day: 30,
+                            value: 2.0,
+                        },
+                        ScheduleCompactSegment {
+                            until_minute_of_day: 45,
+                            value: 3.0,
+                        },
+                        ScheduleCompactSegment {
+                            until_minute_of_day: 60,
+                            value: 4.0,
+                        },
+                        ScheduleCompactSegment {
+                            until_minute_of_day: 24 * 60,
+                            value: 9.0,
+                        },
+                    ],
+                }],
+            }],
+        }],
+        ..TypedModel::default()
+    };
+    assert!(
+        model
+            .schedule_names
+            .insert("Timestep Schedule", schedule_id)
+            .is_none()
+    );
+    let time_axis = build_environment_time_axes(&model)
+        .map_err(std::io::Error::other)?
+        .into_iter()
+        .next()
+        .ok_or_else(|| std::io::Error::other("missing environment time axis"))?;
+    let schedule_series =
+        precompute_schedule_value_series_for_environment_time_axis(&model, &time_axis);
+    let output = OutputRequest {
+        key: "TIMESTEP SCHEDULE".to_string(),
+        variable: "Schedule Value".to_string(),
+        frequency: OutputFrequency::Timestep,
+        class: VariableClass::Schedule,
+        source: SourceArtifact::Eso,
+        timestamp_contract: None,
+        domain: None,
+        level: None,
+        abs_tol: None,
+        rmse_tol: None,
+        rel_tol: None,
+    };
+
+    let samples = schedule_timestep_samples(&output, &model, &time_axis, &schedule_series)
+        .map_err(std::io::Error::other)?;
+    let timestamps = samples
+        .iter()
+        .filter_map(|sample| sample.timestamp.as_deref())
+        .collect::<BTreeSet<_>>();
+
+    assert_eq!(samples.len(), 96);
+    assert_eq!(timestamps.len(), 96);
+    assert_eq!(
+        samples
+            .iter()
+            .take(5)
+            .map(|sample| sample.value)
+            .collect::<Vec<_>>(),
+        vec![1.0, 2.0, 3.0, 4.0, 9.0]
+    );
+    assert!(
+        samples[0]
+            .timestamp
+            .as_deref()
+            .is_some_and(|timestamp| timestamp.contains("hour=1;start=0.00;end=15.00"))
+    );
+    assert!(
+        samples[3]
+            .timestamp
+            .as_deref()
+            .is_some_and(|timestamp| timestamp.contains("hour=1;start=45.00;end=60.00"))
+    );
+    Ok(())
 }
 
 #[test]

@@ -36,8 +36,8 @@ pub struct OutputRequest {
     pub class: VariableClass,
     /// EnergyPlus artifact that should be used as the oracle source.
     pub source: SourceArtifact,
-    /// Optional timestamp ordering and uniqueness contract for the supported
-    /// hourly schedule ESO series.
+    /// Optional timestamp ordering and uniqueness contract for supported
+    /// hourly schedule/weather and timestep schedule ESO series.
     pub timestamp_contract: Option<TimestampContract>,
     /// v2 domain label used by release coverage matrices.
     pub domain: Option<EvidenceDomain>,
@@ -64,11 +64,12 @@ impl OutputRequest {
     }
 
     pub(super) fn validate(&self, index: usize) -> Result<(), ValidationError> {
-        if self.timestamp_contract.is_some()
-            && !(self.frequency == OutputFrequency::Hourly
-                && self.source == SourceArtifact::Eso
+        let supports_timestamp_contract = self.source == SourceArtifact::Eso
+            && ((self.frequency == OutputFrequency::Hourly
                 && matches!(self.class, VariableClass::Schedule | VariableClass::Weather))
-        {
+                || (self.frequency == OutputFrequency::Timestep
+                    && self.class == VariableClass::Schedule));
+        if self.timestamp_contract.is_some() && !supports_timestamp_contract {
             return Err(ValidationError::InvalidTimestampContractOutput { index });
         }
         Ok(())

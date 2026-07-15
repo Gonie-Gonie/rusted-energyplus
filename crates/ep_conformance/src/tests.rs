@@ -1429,10 +1429,9 @@ fn absent_timestamp_contract_remains_backward_compatible() -> Result<(), Box<dyn
 }
 
 #[test]
-fn accepts_weather_and_rejects_timestamp_contract_outside_hourly_eso_boundary() {
+fn accepts_supported_eso_timestamp_contracts_and_rejects_other_boundaries() {
     for (source, frequency) in [
         ("eso", "static"),
-        ("eso", "timestep"),
         ("mtr", "hourly"),
         ("sql", "hourly"),
         ("csv", "daily"),
@@ -1454,6 +1453,18 @@ fn accepts_weather_and_rejects_timestamp_contract_outside_hourly_eso_boundary() 
     let weather = timestamp_contract_case("eso", "hourly", Some("ordered-exact-unique"))
         .replace("class = \"schedule\"", "class = \"weather\"");
     assert!(parse_case_str(&weather).is_ok());
+
+    let timestep_schedule =
+        timestamp_contract_case("eso", "timestep", Some("ordered-exact-unique"));
+    assert!(parse_case_str(&timestep_schedule).is_ok());
+
+    let timestep_weather = timestep_schedule.replace("class = \"schedule\"", "class = \"weather\"");
+    assert!(matches!(
+        parse_case_str(&timestep_weather),
+        Err(ManifestError::Validation(
+            ValidationError::InvalidTimestampContractOutput { index: 0 }
+        ))
+    ));
 
     let wrong_class = timestamp_contract_case("eso", "hourly", Some("ordered-exact-unique"))
         .replace("class = \"schedule\"", "class = \"zone-state\"");
