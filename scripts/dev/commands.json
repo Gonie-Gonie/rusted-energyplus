@@ -311,6 +311,12 @@
                          "help":  "Gate exact EPW fixed-date daylight-saving state and ordered hourly timestamps."
                      },
                      {
+                         "name":  "compare-calendar-dst-fixed-date-policy-exact",
+                         "path":  "compare\\compare-calendar-dst-fixed-date-policy-exact.ps1",
+                         "group":  "compare",
+                         "help":  "Gate paired exact EPW fixed-date daylight-saving RunPeriod enable/disable state."
+                     },
+                     {
                          "name":  "compare-calendar-epw-dst-weekday-rules-exact",
                          "path":  "compare\\compare-calendar-epw-dst-weekday-rules-exact.ps1",
                          "group":  "compare",

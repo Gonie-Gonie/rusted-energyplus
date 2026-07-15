@@ -1,13 +1,13 @@
-id = "calendar_dst_fixed_date_hourly_exact_001"
-title = "EPW fixed-date daylight-saving enabled policy exact"
+id = "calendar_dst_fixed_date_disabled_hourly_exact_001"
+title = "EPW fixed-date daylight-saving disabled policy exact"
 milestone = "full-source-order-calendar-dst-fixed-date-policy"
-purpose = "Block on the enabled side of an exact paired RunPeriod weather-file daylight-saving use-policy comparison."
+purpose = "Block on the disabled side of an exact paired RunPeriod weather-file daylight-saving use-policy comparison."
 comparison_class = "conformance"
 conformance_claim = true
 oracle_version = "26.1.0"
 notes = [
-  "This case is paired with calendar_dst_fixed_date_disabled_hourly_exact_001 and uses the same leap-observed EPW with exactly 80 nonblank lines declaring the fixed 2/29 through 3/1 daylight-saving period.",
-  "The RunPeriod explicitly enables that weather-file period, proving 72 ordered, unique hour-ending Site Daylight Saving Time Status samples with daily states 0, 1, and 1 and exactly 48 active hours.",
+  "This case is paired with calendar_dst_fixed_date_hourly_exact_001 and reuses its leap-observed EPW with exactly 80 nonblank lines declaring the fixed 2/29 through 3/1 daylight-saving period.",
+  "The RunPeriod explicitly disables that weather-file period, proving 72 ordered, unique hour-ending Site Daylight Saving Time Status samples with daily states 0, 0, and 0 and exactly 0 active hours.",
   "The paired IDFs are byte-equivalent after normalizing only the RunPeriod Use Weather File Daylight Saving Period token Yes versus No; Building name, RunPeriod identity and dates, other policies, and output request remain identical.",
   "External evidence is limited to the exact enabled-versus-disabled fixed-date policy pair, all raw EnergyPlus ESO values and timestamp fields, the exact EnergyPlus 26.1 Environment and Environment:Daylight Saving rows, and clean 0 Warning and 0 Severe completion.",
   "The Rust weather-file declaration, RunPeriod-use, active-state, resolved-period, and active-sample fields are locked summary diagnostics; they are not additional fields emitted by the EnergyPlus EIO rows.",
@@ -18,7 +18,7 @@ notes = [
 [manifest_v2]
 schema = "rusted-energyplus.case-manifest.v2"
 source_kind = "local-fixture"
-source_file = "data/conformance_cases/calendar_dst_fixed_date_hourly_exact_001/calendar_dst_fixed_date_hourly_exact.idf"
+source_file = "data/conformance_cases/calendar_dst_fixed_date_disabled_hourly_exact_001/calendar_dst_fixed_date_disabled_hourly_exact.idf"
 tier = "A"
 
 [scope]
@@ -33,7 +33,7 @@ has_python_plugin = false
 has_daylighting = false
 
 [input]
-idf = "data/conformance_cases/calendar_dst_fixed_date_hourly_exact_001/calendar_dst_fixed_date_hourly_exact.idf"
+idf = "data/conformance_cases/calendar_dst_fixed_date_disabled_hourly_exact_001/calendar_dst_fixed_date_disabled_hourly_exact.idf"
 weather = "data/conformance_cases/calendar_dst_fixed_date_hourly_exact_001/calendar_dst_fixed_date_hourly_exact.epw"
 
 [[outputs]]
@@ -55,7 +55,7 @@ max_rmse = 0.0
 
 [report]
 format = "markdown"
-path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_dst_fixed_date_hourly_exact_001/compare/compare-report.md"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_dst_fixed_date_disabled_hourly_exact_001/compare/compare-report.md"
 
 [gate]
 script = "scripts/dev.cmd compare-calendar-dst-fixed-date-policy-exact"
