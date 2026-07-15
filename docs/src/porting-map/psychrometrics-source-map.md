@@ -53,8 +53,8 @@ that the EnergyPlus routine has been ported.
 | 13 | `PsyRhovFnTdbRhLBnd0C` | vapor density | `Psychrometrics.hh:764` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rhov_fn_tdb_rh_lbnd0c` | unclamped below-zero-C temperatures, raw RH/IEEE edges, and pressure-independent source vectors |
 | 14 | `PsyRhovFnTdbWPb` | vapor density | `Psychrometrics.hh:789` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rhov_fn_tdb_w_pb` | humidity-ratio floor, pressure/source vectors, IEEE edges, and future inverse-RH consistency |
 | 15 | `PsyRhovFnTdbWPb_fast` | vapor-density fast path | `Psychrometrics.hh:815` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rhov_fn_tdb_w_pb_fast` | ordinary/fast valid-domain equivalence, debug assertion, and `NDEBUG` raw no-floor behavior |
-| 16 | `PsyRhFnTdbRhovLBnd0C_error` | diagnostics | `Psychrometrics.hh:826`; `Psychrometrics.cc:222` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | exact out-of-range trigger, caller text, recurrence suppression, and error-state mutation |
-| 17 | `PsyRhFnTdbRhovLBnd0C` | relative humidity | `Psychrometrics.hh:835` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | 0-C lower-bound branch, clamping/error thresholds, and vapor-density round trips |
+| 16 | `PsyRhFnTdbRhovLBnd0C_error` | diagnostics | `Psychrometrics.hh:826`; `Psychrometrics.cc:222` | compiled only with `EP_psych_errors` | intended per-simulation psychrometric diagnostics owner; unassigned | strict high/low triggers, warmup suppression, first/caller text, and shared high/low recurring-warning state |
+| 17 | `PsyRhFnTdbRhovLBnd0C` | relative humidity | `Psychrometrics.hh:835` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rh_fn_tdb_rhov_lbnd0c`; stateful statistics/diagnostics adapter unassigned | positive-vapor ternary, raw supplied-temperature behavior with no 0-C clamp, correction/error thresholds, and vapor-density round trips |
 | 18 | `PsyTwbFnTdbWPb` | wet-bulb solve and cache | `Psychrometrics.hh:879,895`; `Psychrometrics.cc:281,356` | cached and no-cache same-name variants selected by `EP_cache_PsyTwbFnTdbWPb`; one logical ticket | partial analogue: `ep_runtime::psychrometrics::energyplus_outdoor_wet_bulb_c` | cached/no-cache/raw agreement, iteration convergence/failure, cache-key quantization, and caller-context behavior |
 | 19 | `PsyTwbFnTdbWPb_raw` | wet-bulb raw solve | `Psychrometrics.hh:886`; `Psychrometrics.cc:347` | exists only with `EP_cache_PsyTwbFnTdbWPb` | partial analogue: `ep_runtime::psychrometrics::energyplus_outdoor_wet_bulb_c` | direct raw-vector parity and identity with cache misses |
 | 20 | `PsyVFnTdbWPb_error` | diagnostics | `Psychrometrics.hh:905`; `Psychrometrics.cc:569` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | exact invalid-volume trigger, caller text, recurrence suppression, and error-state mutation |
@@ -559,6 +559,82 @@ not_claimed_branches:
 - external EnergyPlus numerical parity, C++ `NDEBUG` versus Rust debug-assertion build-policy equivalence, invalid-precondition behavior outside the documented fast domain, and downstream fast-call-site migration
 <!-- routine-state-contract:v1 end psy_rhov_fn_tdb_w_pb_fast -->
 
+## CP56-5 Lower-Bound Relative-Humidity Numerical Scaffold
+
+This checkpoint adds the pure Rust numerical return path for routine 17. Its
+local EMS source-fixture, forward/inverse, positive-vapor ternary,
+out-of-range-only correction, below-zero-temperature, NaN/infinity,
+signed-zero, zero-Kelvin, and exponential-pole tests live in
+`crates/ep_runtime/src/psychrometrics.rs` and
+`crates/ep_runtime/src/psychrometrics_relative_humidity_tests.rs`. These are
+Rust-only source-transcription checks, not output captured from an external
+EnergyPlus oracle. Routine 17 advances only to `state_mapped`; it does not
+advance to `implemented`, add conformance evidence, or change the parent
+algorithm's `status = "scaffold"` and `claim_level = "none"` boundary.
+
+Routine 16 remains `source_mapped`. EnergyPlus enables `USE_PSYCH_ERRORS` by
+default and leaves `USE_PSYCH_STATS` disabled by default. The error helper owns
+per-`EnergyPlusData` warning history that the current Rust runtime cannot
+honestly replace with a process-global or pure predicate. The optional
+`EP_psych_stats` counter is also excluded from the pure helper. This split
+preserves the numerical return while keeping the default oracle-build warning
+and recurrence behavior explicitly deferred.
+
+### `PsyRhFnTdbRhovLBnd0C_error` (`psy_rh_fn_tdb_rhov_lbnd0c_error`)
+
+The helper is declared at `Psychrometrics.hh:825-832` and implemented under
+`EP_psych_errors` at `Psychrometrics.cc:221-277`. Routine 17 calls it only for
+raw relative humidity strictly below `-0.05` or strictly above `1.01`; the
+exact endpoints are corrected silently. During warmup the helper changes no
+diagnostic state. On the first non-warmup occurrence it writes the formatted
+input scratch string, warning, caller-or-`Unknown` timestamp, input details,
+and direction-specific reset text. Every non-warmup occurrence then updates
+one recurring-warning index, count, minimum, and maximum in percent. High and
+low excursions share that one index, so a first high warning suppresses the
+later low first-message path and vice versa.
+
+The error index, scratch string, warning stream and totals, recurring-warning
+table, and SQLite/callback effects are per-simulation `EnergyPlusData` state.
+Rust has no owner for that state in this checkpoint; routine 16 therefore has
+no Rust implementation or completion claim.
+
+### `PsyRhFnTdbRhovLBnd0C` (`psy_rh_fn_tdb_rhov_lbnd0c`)
+
+The source at `Psychrometrics.hh:834-875` first increments its per-function
+call count only when `EP_psych_stats` is enabled. It then evaluates the
+left-associated exponential expression only when `Rhovapor > 0.0`; negative,
+signed-zero, and NaN vapor-density inputs return literal positive zero without
+reading `Tdb`. Despite the historical identifier, the supplied temperature is
+not clamped to 0 C. A raw result inside `[0.0, 1.0]`, including values below
+`0.01`, is returned unchanged. Only a negative raw result is corrected to
+`0.01`, and only a result above one is corrected to `1.0`. The optional error
+helper sees the raw value before that correction.
+
+<!-- routine-state-contract:v1 begin psy_rh_fn_tdb_rhov_lbnd0c -->
+PsyRhFnTdbRhovLBnd0C
+
+read_state:
+- arguments `Tdb` and `Rhovapor`; `EP_psych_stats` reads the per-state call counter, while `EP_psych_errors` reads `WarmupFlag` and the shared error index and reads `CalledFrom` only for the first non-warmup extreme-range warning
+
+write_state:
+- the numerical formula and return correction write no state; `EP_psych_stats` increments the per-state call count, while the enabled extreme-range helper mutates warning, scratch-string, error-index, and recurring-warning state only outside warmup
+
+history_state_ownership:
+- numerical output is a pure function of raw `Tdb` and `Rhovapor`; optional call statistics and one shared high/low recurring-warning history belong to each `EnergyPlusData` instance
+
+unsupported_state:
+- `EP_psych_stats` call counting plus `EP_psych_errors` warmup suppression, scratch string, warning stream and totals, caller timestamp, shared recurrence index/count/min/max, SQLite, and callback state
+
+inactive_branches:
+- disabling `EP_psych_stats` compiles out the call-count increment; disabling `EP_psych_errors` compiles out the extreme-range helper call and routine 16 itself without changing the numerical correction
+
+unsupported_active_branches:
+- default errors-enabled strict `< -0.05` or `> 1.01` warning flow, first-versus-recurring behavior, shared high/low recurrence, and the optional statistics-enabled every-call counter
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, cross-platform `std::exp` last-bit and floating-point exception parity, exact diagnostic formatting/side effects, statistics history, and downstream surface, EMPD, room-air, or EMS migration
+<!-- routine-state-contract:v1 end psy_rh_fn_tdb_rhov_lbnd0c -->
+
 ## Compile-Time Variant Boundary
 
 Unless `EP_nocache_Psychrometrics` is set, the EnergyPlus header enables
@@ -608,8 +684,9 @@ functions.
 The `PsyRhoAirFnPbTdbW`, `PsyRhoAirFnPbTdbW_fast`, `PsyHfgAirFnWTdb`,
 `PsyHgAirFnWTdb`, `PsyHFnTdbW`, `PsyHFnTdbW_fast`, `PsyCpAirFnW`,
 `PsyCpAirFnW_fast`, `PsyTdbFnHW`, `PsyRhovFnTdbRhLBnd0C`,
-`PsyRhovFnTdbWPb`, and `PsyRhovFnTdbWPb_fast` tickets are `state_mapped`; the
-other 41 ledger routines remain `source_mapped`. All 53 retain
+`PsyRhovFnTdbWPb`, `PsyRhovFnTdbWPb_fast`, and
+`PsyRhFnTdbRhovLBnd0C` tickets are `state_mapped`; the other 40 ledger routines
+remain `source_mapped`. All 53 retain
 `required_for_full_domain = false`. Before any ticket is promoted further, its
 Rust target, source-vector tests, compile-variant obligations, diagnostic
 behavior where applicable, and external evidence boundary must be recorded.

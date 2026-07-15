@@ -1774,8 +1774,28 @@ routine.psy_rh_fn_tdb_rhov_lbnd0c_error.required_for_full_domain = false
 routine.psy_rh_fn_tdb_rhov_lbnd0c.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_rh_fn_tdb_rhov_lbnd0c.source_routine = "PsyRhFnTdbRhovLBnd0C"
 routine.psy_rh_fn_tdb_rhov_lbnd0c.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_rh_fn_tdb_rhov_lbnd0c.completion_status = "source_mapped"
+routine.psy_rh_fn_tdb_rhov_lbnd0c.completion_status = "state_mapped"
 routine.psy_rh_fn_tdb_rhov_lbnd0c.required_for_full_domain = false
+routine.psy_rh_fn_tdb_rhov_lbnd0c.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rh_fn_tdb_rhov_lbnd0c.read_state = [
+  "arguments `Tdb` and `Rhovapor`; `EP_psych_stats` reads the per-state call counter, while `EP_psych_errors` reads `WarmupFlag` and the shared error index and reads `CalledFrom` only for the first non-warmup extreme-range warning",
+]
+routine.psy_rh_fn_tdb_rhov_lbnd0c.write_state = [
+  "the numerical formula and return correction write no state; `EP_psych_stats` increments the per-state call count, while the enabled extreme-range helper mutates warning, scratch-string, error-index, and recurring-warning state only outside warmup",
+]
+routine.psy_rh_fn_tdb_rhov_lbnd0c.history_state_ownership = "numerical output is a pure function of raw `Tdb` and `Rhovapor`; optional call statistics and one shared high/low recurring-warning history belong to each `EnergyPlusData` instance"
+routine.psy_rh_fn_tdb_rhov_lbnd0c.unsupported_state = [
+  "`EP_psych_stats` call counting plus `EP_psych_errors` warmup suppression, scratch string, warning stream and totals, caller timestamp, shared recurrence index/count/min/max, SQLite, and callback state",
+]
+routine.psy_rh_fn_tdb_rhov_lbnd0c.inactive_branches = [
+  "disabling `EP_psych_stats` compiles out the call-count increment; disabling `EP_psych_errors` compiles out the extreme-range helper call and routine 16 itself without changing the numerical correction",
+]
+routine.psy_rh_fn_tdb_rhov_lbnd0c.unsupported_active_branches = [
+  "default errors-enabled strict `< -0.05` or `> 1.01` warning flow, first-versus-recurring behavior, shared high/low recurrence, and the optional statistics-enabled every-call counter",
+]
+routine.psy_rh_fn_tdb_rhov_lbnd0c.not_claimed_branches = [
+  "external EnergyPlus numerical parity, cross-platform `std::exp` last-bit and floating-point exception parity, exact diagnostic formatting/side effects, statistics history, and downstream surface, EMPD, room-air, or EMS migration",
+]
 
 routine.psy_twb_fn_tdb_w_pb.source_file = "src/EnergyPlus/Psychrometrics.cc"
 routine.psy_twb_fn_tdb_w_pb.source_routine = "PsyTwbFnTdbWPb"
