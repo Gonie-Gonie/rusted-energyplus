@@ -175,6 +175,28 @@ if ($performanceSummary.speedup_claim_allowed -ne $true) {
 if ([double]$performanceSummary.energyplus_oracle_wall_seconds -lt 0.0 -or [double]$performanceSummary.rust_compare_report_wall_seconds -lt 0.0) {
     throw "Oracle/Rust performance comparison times must be non-negative"
 }
+$scheduleOperations = $performanceSummary.internal_gain_schedule_cache_operations
+if ($scheduleOperations.scope -ne "ep_runtime heat-balance simulation referenced-only OtherEquipment cache; excludes ep_cli full-axis precompute and public one-step fallback") {
+    throw "Unexpected B5 internal-gain schedule operation scope: $($scheduleOperations.scope)"
+}
+if ($scheduleOperations.measurement -ne "deterministic operation counts; not wall-clock timing or cache-specific speedup attribution") {
+    throw "Unexpected B5 internal-gain schedule operation measurement: $($scheduleOperations.measurement)"
+}
+if ($scheduleOperations.remaining_iteration -ne "OtherEquipment, zone, surface, and people iteration is not counted as a schedule-object-family chain scan") {
+    throw "Unexpected B5 internal-gain schedule remaining-iteration boundary: $($scheduleOperations.remaining_iteration)"
+}
+if ($scheduleOperations.referenced_only_cache_build_count -ne 1 -or $scheduleOperations.cache_entry_count -ne 1 -or $scheduleOperations.cache_logical_sample_count -ne 24) {
+    throw "Unexpected B5 referenced-only cache build/profile: builds=$($scheduleOperations.referenced_only_cache_build_count), entries=$($scheduleOperations.cache_entry_count), logical_samples=$($scheduleOperations.cache_logical_sample_count)"
+}
+if ($scheduleOperations.cache_build_compact_value_evaluation_count -ne 0) {
+    throw "Official Constant-only B5 cache must not evaluate Compact values during build: $($scheduleOperations.cache_build_compact_value_evaluation_count)"
+}
+if ($scheduleOperations.initialization.cached_value_lookup_count -ne 4 -or $scheduleOperations.warmup.cached_value_lookup_count -ne 7680 -or $scheduleOperations.run_period.cached_value_lookup_count -ne 140160 -or $scheduleOperations.total_cached_value_lookup_count -ne 147844) {
+    throw "Unexpected B5 phase cache reads: init=$($scheduleOperations.initialization.cached_value_lookup_count), warmup=$($scheduleOperations.warmup.cached_value_lookup_count), run=$($scheduleOperations.run_period.cached_value_lookup_count), total=$($scheduleOperations.total_cached_value_lookup_count)"
+}
+if ($scheduleOperations.total_live_fallback_lookup_count -ne 0 -or $scheduleOperations.total_live_schedule_family_chain_scan_count -ne 0 -or $scheduleOperations.total_compact_profile_resolution_count -ne 0 -or $scheduleOperations.total_compact_value_evaluation_count -ne 0) {
+    throw "B5 cached simulation hot path must record zero live fallback/family-chain/Compact work"
+}
 if ($summary.time_axis.source -ne "shared TimeAxis for weather/schedule/output/report") {
     throw "Unexpected C1 time axis source: $($summary.time_axis.source)"
 }
@@ -1431,6 +1453,15 @@ Assert-Contains -Text $runtimeSourceText -Pattern "precompute_hour_only_internal
 Assert-Contains -Text $runtimeSourceText -Pattern "&internal_gain_schedule_cache" -Description "B5 runtime reuses one internal-gain cache across warmup and run period"
 Assert-Contains -Text $timestepSourceText -Pattern "advance_heat_balance_state_one_timestep_internal_with_schedule_cache" -Description "B5 timestep cached internal-gain path"
 Assert-Contains -Text $runPeriodSourceText -Pattern "schedule_cache: &ScheduleSeriesCache" -Description "B5 run-period sampler owns borrowed cache boundary"
+Assert-Contains -Text $runtimeSourceText -Pattern "internal_gain_schedule_cache_profile.warmup" -Description "B5 warmup operation-count ownership"
+Assert-Contains -Text $runtimeSourceText -Pattern "internal_gain_schedule_cache_profile.run_period" -Description "B5 run-period operation-count ownership"
+Assert-Contains -Text $timestepSourceText -Pattern "advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled" -Description "B5 profiled cached timestep path"
+Assert-Contains -Text $mainSourceText -Pattern '\"internal_gain_schedule_cache_operations\"' -Description "B5 deterministic operation-count JSON"
+Assert-Contains -Text $reportText -Pattern "internal_gain_schedule_cache_builds: 1" -Description "B5 markdown single specialized cache build"
+Assert-Contains -Text $reportText -Pattern "internal_gain_schedule_cache_remaining_iteration: OtherEquipment, zone, surface, and people iteration is not counted as a schedule-object-family chain scan" -Description "B5 markdown remaining-iteration boundary"
+Assert-Contains -Text $reportText -Pattern "internal_gain_schedule_cache_total_reads: 147844" -Description "B5 markdown exact phase-total cache reads"
+Assert-Contains -Text $reportText -Pattern "internal_gain_schedule_cache_hot_schedule_family_chain_scans: 0" -Description "B5 markdown zero hot schedule-family-chain scans"
+Assert-Contains -Text $reportText -Pattern "internal_gain_schedule_cache_hot_compact_value_evaluations: 0" -Description "B5 markdown zero hot Compact evaluations"
 Assert-Contains -Text $pipelineSourceText -Pattern "simulate_heat_balance_zone_air_temperatures_with_weather_series" -Description "B5 runtime uses precomputed weather series"
 Assert-Contains -Text $weatherSourceText -Pattern "pub struct WeatherTimestepSeries" -Description "B5 WeatherTimestepSeries"
 Assert-Contains -Text $weatherSourceText -Pattern "timestep_dry_bulb_c" -Description "B5 dry-bulb vector"

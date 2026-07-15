@@ -1568,6 +1568,7 @@ The immutable cache is owned by these Rust targets:
 | `ep_runtime::schedules::ScheduleSeriesCache` | owns one source-ordered set of schedule entries for one time axis and provides typed-ID lookup |
 | `ep_runtime::schedules::ScheduleSampleStorage` | represents an immutable repeated scalar without a dense sample array, or a varying series as a boxed dense array |
 | `ep_runtime::schedules::ScheduleCacheProfile` | reports deterministic scalar/dense series counts, logical and dense-allocated sample counts, index kind, and distinct ambiguous-ID count |
+| `ep_runtime::schedules::HeatBalanceInternalGainScheduleOperationProfile` | records simulation-owned, deterministic build, initialization, warmup, and run-period operation counts for the referenced-only `OtherEquipment` cache without mutating cache state |
 | `precompute_schedule_cache_for_time_axis` and `precompute_schedule_cache_for_environment_time_axis` | compile the existing supported schedule families against the shared hourly or environment time axis |
 | the legacy `precompute_schedule_value_series*` functions | materialize `Vec` traces from the cache so existing callers retain their public return types and numerical behavior |
 | `ep_cli` schedule-report consumers | own the cache across report generation and resolve each requested schedule once by typed ID rather than scanning legacy traces |
@@ -1621,13 +1622,43 @@ clamping, substep reuse, and daily reuse; repeated gain lookup no longer scans
 schedule families or reparses Compact segments. A separate public one-step test
 keeps the live-model fallback boundary explicit.
 
-`ScheduleCacheProfile` remains deterministic representation evidence only. This
-checkpoint is not a wall-clock benchmark and adds no EnergyPlus numerical
-heat-balance conformance. It also does not claim Schedule:File,
-Schedule:File:Shading, Schedule:Year, or calendar-aware downstream consumption;
-IdealLoads consumption; a weather-cache redesign; cache sharing across
-environments or repeated runs; live EMS/current-value mutation; live
-ExternalInterface/FMU exchange; or any new ScheduleManager routine completion.
+The full-axis `ScheduleCacheProfile` remains deterministic representation and
+allocation evidence only. Separately, the simulation-owned
+`HeatBalanceInternalGainScheduleOperationProfile` measures the referenced-only
+hour-only `OtherEquipment` cache and excludes `ep_cli` full-axis precomputation
+and the public one-step fallback. It records one successful cache construction,
+the cache entry and logical-sample counts, and Compact value evaluations during
+construction, then separates indexed cache reads for initialization, warmup,
+and the reported run period. A referenced calendar-invariant Compact profile is
+evaluated 24 times while its 24-sample cache entry is built. During those three
+simulation phases the cached path records zero live fallback lookups, zero
+entries into the legacy schedule-object-family chain, zero Compact profile
+resolutions, and zero Compact value evaluations. The counters belong to the
+simulation result; the cache remains immutable.
+
+The Rust cached-versus-live 24-hour timestep A/B test uses one Constant and one
+Compact schedule and compares the `f64` bits of convective gain, zone mean air
+temperature, and each surface's radiant source and inside/outside temperatures.
+Both lanes start from one shared cached initialization, so this test isolates
+repeated timestep access and does not directly establish cache-on/off
+initialization bit equality.
+It also makes the operation contrast nonvacuous: the cached path performs 96
+indexed reads and no hot live operations, while the reference path performs 96
+live fallback lookups and family-chain entries plus 48 Compact profile
+resolutions and value evaluations. The build records two entries, 48 logical
+samples, and 24 Compact evaluations.
+
+Zero schedule-family-chain scans does not mean zero remaining work:
+`OtherEquipment`, zone, surface, and people iteration remains. These
+deterministic operation counts are not wall-clock timing, a cache-specific
+speedup attribution, or a new numerical compatibility claim. This checkpoint
+adds no EnergyPlus numerical heat-balance or Schedule Value promotion and does
+not claim Schedule:File, Schedule:File:Shading, Schedule:Year, or calendar-aware
+downstream consumption; IdealLoads, HVAC availability, or thermostat
+consumption; a weather-cache redesign; cache sharing across environments or
+repeated runs; live EMS/current-value mutation; live ExternalInterface/FMU
+exchange; warning parity; broad ScheduleManager completion; or elimination of
+lookups in other runtime hot paths.
 
 ## Current Rust Boundary
 

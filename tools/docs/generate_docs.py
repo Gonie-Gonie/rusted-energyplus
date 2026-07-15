@@ -56,6 +56,17 @@ def list_value(value: Any) -> str:
     return str(value)
 
 
+def support_boundary_value(item: dict[str, Any]) -> str:
+    return " ".join(
+        value
+        for value in (
+            str(item.get("support_boundary", "")).strip(),
+            str(item.get("support_boundary_addendum", "")).strip(),
+        )
+        if value
+    )
+
+
 def repo_path(path: Path, repo_root: Path) -> str:
     return str(path.relative_to(repo_root)).replace("\\", "/")
 
@@ -169,7 +180,7 @@ def algorithm_ledger(repo_root: Path) -> str:
                 str(item.get("first_evidence", item.get("first_case", ""))),
                 list_value(item.get("proof_variables", [])),
                 str(item.get("claim_level", "")),
-                str(item.get("support_boundary", "")),
+                support_boundary_value(item),
             ]
         )
         for routine_id, routine in item.get("routine", {}).items():
@@ -331,7 +342,7 @@ def object_coverage(repo_root: Path) -> str:
             str(item.get("family", "")),
             str(item.get("status", "")),
             str(item.get("first_evidence", item.get("first_case", ""))),
-            str(item.get("support_boundary", "")),
+            support_boundary_value(item),
         ]
         for item in spec.get("object", [])
     ]
@@ -359,7 +370,7 @@ def variable_coverage(repo_root: Path) -> str:
             str(item.get("domain", "")),
             str(item.get("status", "")),
             str(item.get("first_evidence", item.get("first_case", ""))),
-            str(item.get("support_boundary", "")),
+            support_boundary_value(item),
         ]
         for item in spec.get("variable", [])
     ]
