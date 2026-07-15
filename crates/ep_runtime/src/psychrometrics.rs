@@ -9,6 +9,18 @@ const ENERGYPLUS_PSAT_CACHE_GRID_SHIFT: u32 = 64 - 12 - ENERGYPLUS_PSAT_CACHE_PR
 /// Standard atmospheric pressure used by EnergyPlus psychrometric defaults.
 pub const ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA: f64 = 101_325.0;
 
+#[inline]
+fn energyplus_humidity_ratio_floor(humidity_ratio: f64) -> f64 {
+    // EnergyPlus uses `std::max` in the stateless density overload and its
+    // equivalent `ObjexxFCL::max` helper in the stateful/Cp paths. Unlike
+    // `f64::max`, both return their first argument when it is NaN.
+    if humidity_ratio < ENERGYPLUS_MIN_HUMIDITY_RATIO {
+        ENERGYPLUS_MIN_HUMIDITY_RATIO
+    } else {
+        humidity_ratio
+    }
+}
+
 pub(crate) fn energyplus_outdoor_wet_bulb_c(
     dry_bulb_c: f64,
     relative_humidity_percent: f64,
@@ -131,7 +143,42 @@ pub fn energyplus_standard_zone_air_heat_capacity_j_per_k(
     )
 }
 
-/// Returns EnergyPlus `PsyRhoAirFnPbTdbW`-style moist-air density in kg/m3.
+/// Canonical, stateless EnergyPlus 26.1 `PsyRhoAirFnPbTdbW` calculation.
+///
+/// This follows the unguarded C++ overload exactly, including its humidity-ratio
+/// floor and IEEE-754 propagation for NaN, infinity, signed zero, and invalid
+/// physical inputs. The `EP_psych_errors` overload's stateful negative-density
+/// fatal branch is a separate, deferred error-reporting boundary.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_rho_air_fn_pb_tdb_w(
+    atmospheric_pressure_pa: f64,
+    dry_bulb_c: f64,
+    humidity_ratio: f64,
+) -> f64 {
+    atmospheric_pressure_pa
+        / (287.0
+            * (dry_bulb_c + KELVIN_OFFSET)
+            * (1.0 + 1.607_768_7 * energyplus_humidity_ratio_floor(humidity_ratio)))
+}
+
+/// Canonical, stateless EnergyPlus 26.1 `PsyCpAirFnW` calculation.
+///
+/// EnergyPlus wraps this expression in a last-call cache whose physical-domain
+/// behavior is output-neutral. This pure function intentionally ports the
+/// numerical result without mutable cache or sentinel state; cache accounting
+/// and performance parity are separate, deferred work.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_cp_air_fn_w(humidity_ratio: f64) -> f64 {
+    1.004_84e3 + energyplus_humidity_ratio_floor(humidity_ratio) * 1.858_95e3
+}
+
+/// Returns guarded EnergyPlus-style moist-air density in kg/m3.
+///
+/// This compatibility wrapper retains its pre-existing validation contract and
+/// NaN-humidity normalization; use [`energyplus_psy_rho_air_fn_pb_tdb_w`] for
+/// the canonical unguarded EnergyPlus numerical semantics.
 pub fn energyplus_moist_air_density_kg_per_m3(
     atmospheric_pressure_pa: f64,
     dry_bulb_c: f64,
@@ -147,14 +194,23 @@ pub fn energyplus_moist_air_density_kg_per_m3(
     if dry_bulb_k <= 0.0 {
         return None;
     }
-    let humidity_ratio = humidity_ratio.max(ENERGYPLUS_MIN_HUMIDITY_RATIO);
 
-    Some(atmospheric_pressure_pa / (287.0 * dry_bulb_k * (1.0 + 1.607_768_7 * humidity_ratio)))
+    // Preserve this wrapper's historical `f64::max` behavior, which maps NaN
+    // humidity to the floor, before delegating to the canonical calculation.
+    Some(energyplus_psy_rho_air_fn_pb_tdb_w(
+        atmospheric_pressure_pa,
+        dry_bulb_c,
+        humidity_ratio.max(ENERGYPLUS_MIN_HUMIDITY_RATIO),
+    ))
 }
 
-/// Returns EnergyPlus `PsyCpAirFnW`-style moist-air specific heat in J/kg-K.
+/// Returns guarded EnergyPlus-style moist-air specific heat in J/kg-K.
+///
+/// This compatibility wrapper retains its pre-existing NaN-humidity
+/// normalization; use [`energyplus_psy_cp_air_fn_w`] for the canonical
+/// EnergyPlus numerical semantics.
 pub fn energyplus_moist_air_specific_heat_j_per_kg_k(humidity_ratio: f64) -> f64 {
-    1.004_84e3 + humidity_ratio.max(ENERGYPLUS_MIN_HUMIDITY_RATIO) * 1.858_95e3
+    energyplus_psy_cp_air_fn_w(humidity_ratio.max(ENERGYPLUS_MIN_HUMIDITY_RATIO))
 }
 
 /// Returns EnergyPlus `PsyHgAirFnWTdb` water-vapor gas enthalpy in J/kg.
@@ -251,3 +307,7 @@ fn energyplus_psychrometric_psat_cache_temperature_c(temperature_c: f64) -> f64 
     tag <<= ENERGYPLUS_PSAT_CACHE_GRID_SHIFT;
     f64::from_bits(tag as u64)
 }
+
+#[cfg(test)]
+#[path = "psychrometrics_tests.rs"]
+mod tests;

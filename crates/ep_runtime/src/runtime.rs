@@ -134,7 +134,8 @@ pub(crate) use crate::heat_balance::{surface_air_sky_radiation_split, surface_sk
 pub(crate) use crate::psychrometrics::energyplus_outdoor_wet_bulb_c;
 pub use crate::psychrometrics::{
     ENERGYPLUS_STANDARD_ATMOSPHERIC_PRESSURE_PA, energyplus_moist_air_density_kg_per_m3,
-    energyplus_moist_air_specific_heat_j_per_kg_k, energyplus_psychrometric_humidity_ratio_from_rh,
+    energyplus_moist_air_specific_heat_j_per_kg_k, energyplus_psy_cp_air_fn_w,
+    energyplus_psy_rho_air_fn_pb_tdb_w, energyplus_psychrometric_humidity_ratio_from_rh,
     energyplus_standard_zone_air_heat_capacity_j_per_k,
     energyplus_water_vapor_gas_enthalpy_j_per_kg, energyplus_zone_air_heat_capacity_j_per_k,
 };
