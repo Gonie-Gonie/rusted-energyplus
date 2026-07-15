@@ -35,7 +35,9 @@ use crate::heat_balance::zone_predictor_corrector::{
 };
 use crate::heat_balance::{air_manager, manager, surface_manager, zone_predictor_corrector};
 use crate::schedules::{
-    convective_internal_gain_w, update_surface_radiant_internal_gain_source_terms,
+    ScheduleSeriesCache, convective_internal_gain_w, convective_internal_gain_w_from_cache,
+    update_surface_radiant_internal_gain_source_terms,
+    update_surface_radiant_internal_gain_source_terms_from_cache,
 };
 use crate::weather::HeatBalanceWeatherContext;
 use ep_model::{OutsideBoundaryCondition, TypedModel};
@@ -73,9 +75,60 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal(
     inside_hconv_reevaluation_interval: Option<u32>,
     surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
 ) {
+    advance_heat_balance_state_one_timestep_internal_with_optional_schedule_cache(
+        model,
+        None,
+        state,
+        input,
+        weather_context,
+        runtime_config,
+        surface_iteration_count,
+        inside_hconv_reevaluation_interval,
+        surface_loop_zone_air_correction,
+    );
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn advance_heat_balance_state_one_timestep_internal_with_schedule_cache(
+    model: &TypedModel,
+    schedule_cache: &ScheduleSeriesCache,
+    state: &mut HeatBalanceState,
+    input: HeatBalanceStepInput,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    runtime_config: HeatBalanceRuntimeConfig,
+    surface_iteration_count: u32,
+    inside_hconv_reevaluation_interval: Option<u32>,
+    surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
+) {
+    advance_heat_balance_state_one_timestep_internal_with_optional_schedule_cache(
+        model,
+        Some(schedule_cache),
+        state,
+        input,
+        weather_context,
+        runtime_config,
+        surface_iteration_count,
+        inside_hconv_reevaluation_interval,
+        surface_loop_zone_air_correction,
+    );
+}
+
+#[allow(clippy::too_many_arguments)]
+fn advance_heat_balance_state_one_timestep_internal_with_optional_schedule_cache(
+    model: &TypedModel,
+    schedule_cache: Option<&ScheduleSeriesCache>,
+    state: &mut HeatBalanceState,
+    input: HeatBalanceStepInput,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    runtime_config: HeatBalanceRuntimeConfig,
+    surface_iteration_count: u32,
+    inside_hconv_reevaluation_interval: Option<u32>,
+    surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
+) {
     manager::manage_heat_balance_source_order_path(|| {
         advance_heat_balance_state_one_timestep_source_order_path(
             model,
+            schedule_cache,
             state,
             input,
             weather_context,
@@ -89,6 +142,7 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal(
 
 fn advance_heat_balance_state_one_timestep_source_order_path(
     model: &TypedModel,
+    schedule_cache: Option<&ScheduleSeriesCache>,
     state: &mut HeatBalanceState,
     input: HeatBalanceStepInput,
     weather_context: Option<HeatBalanceWeatherContext<'_>>,
@@ -218,8 +272,17 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
                                     zone.previous_air_humidity_ratios[0],
                                     zone.previous_air_humidity_ratios[1],
                                 ];
-                                zone.convective_internal_gain_w =
-                                    convective_internal_gain_w(model, zone.zone_id, hour_ending);
+                                zone.convective_internal_gain_w = schedule_cache.map_or_else(
+                                    || convective_internal_gain_w(model, zone.zone_id, hour_ending),
+                                    |schedule_cache| {
+                                        convective_internal_gain_w_from_cache(
+                                            model,
+                                            schedule_cache,
+                                            zone.zone_id,
+                                            hour_ending,
+                                        )
+                                    },
+                                );
 
                                 let zone_surface_indexes =
                                     state.surface_indexes.surfaces_for_zone(zone.zone_id);
@@ -317,7 +380,16 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
             );
         });
     });
-    update_surface_radiant_internal_gain_source_terms(model, &mut state.surfaces, hour_ending);
+    if let Some(schedule_cache) = schedule_cache {
+        update_surface_radiant_internal_gain_source_terms_from_cache(
+            model,
+            schedule_cache,
+            &mut state.surfaces,
+            hour_ending,
+        );
+    } else {
+        update_surface_radiant_internal_gain_source_terms(model, &mut state.surfaces, hour_ending);
+    }
     let use_current_inside_for_first_longwave =
         runtime_config.use_current_inside_for_first_longwave;
     let converge_interleaved_surface_iterations_to_energyplus_tolerance =

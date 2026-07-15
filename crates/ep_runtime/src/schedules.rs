@@ -17,6 +17,7 @@ mod constant;
 mod day_table;
 mod external_interface;
 mod file_shading;
+mod internal_gain_cache;
 
 pub use cache::{
     CachedScheduleSeries, ScheduleCacheProfile, ScheduleSampleIter, ScheduleSampleStorage,
@@ -27,6 +28,10 @@ pub use constant::{precompute_constant_schedule_cache, simulate_constant_schedul
 #[cfg(test)]
 use day_table::{
     compiled_day_schedule_value, precompile_day_schedule_table, year_schedule_hourly_value,
+};
+pub(crate) use internal_gain_cache::update_surface_radiant_internal_gain_source_terms_from_cache;
+pub(crate) use internal_gain_cache::{
+    convective_internal_gain_w_from_cache, precompute_hour_only_internal_gain_schedule_cache,
 };
 
 #[cfg(test)]
@@ -78,6 +83,14 @@ fn convective_internal_gain_for_equipment_w(
     hour_ending: u32,
 ) -> f64 {
     let schedule_multiplier = hour_only_schedule_multiplier(model, equipment.schedule, hour_ending);
+    convective_internal_gain_for_equipment_with_multiplier_w(model, equipment, schedule_multiplier)
+}
+
+fn convective_internal_gain_for_equipment_with_multiplier_w(
+    model: &TypedModel,
+    equipment: &OtherEquipment,
+    schedule_multiplier: f64,
+) -> f64 {
     let convective_fraction =
         (1.0 - equipment.fraction_latent - equipment.fraction_radiant - equipment.fraction_lost)
             .max(0.0);
@@ -100,6 +113,14 @@ fn radiant_internal_gain_for_equipment_w(
     hour_ending: u32,
 ) -> f64 {
     let schedule_multiplier = hour_only_schedule_multiplier(model, equipment.schedule, hour_ending);
+    radiant_internal_gain_for_equipment_with_multiplier_w(model, equipment, schedule_multiplier)
+}
+
+fn radiant_internal_gain_for_equipment_with_multiplier_w(
+    model: &TypedModel,
+    equipment: &OtherEquipment,
+    schedule_multiplier: f64,
+) -> f64 {
     let radiant_fraction = equipment.fraction_radiant.max(0.0);
 
     other_equipment_design_level_w(model, equipment) * schedule_multiplier * radiant_fraction
@@ -238,6 +259,15 @@ pub(crate) fn update_surface_radiant_internal_gain_source_terms(
     surfaces: &mut [SurfaceHeatBalanceState],
     hour_ending: u32,
 ) {
+    update_surface_radiant_internal_gain_source_terms_with(surfaces, |zone_id| {
+        radiant_internal_gain_w(model, zone_id, hour_ending)
+    });
+}
+
+fn update_surface_radiant_internal_gain_source_terms_with(
+    surfaces: &mut [SurfaceHeatBalanceState],
+    mut radiant_gain_w_for_zone: impl FnMut(ZoneId) -> f64,
+) {
     for surface in surfaces.iter_mut() {
         surface.inside_radiant_internal_gain_w_per_m2 = 0.0;
     }
@@ -247,7 +277,7 @@ pub(crate) fn update_surface_radiant_internal_gain_source_terms(
         .map(|surface| surface.zone_id)
         .collect::<BTreeSet<_>>();
     for zone_id in zone_ids {
-        let radiant_gain_w = radiant_internal_gain_w(model, zone_id, hour_ending);
+        let radiant_gain_w = radiant_gain_w_for_zone(zone_id);
         if radiant_gain_w <= 0.0 {
             continue;
         }
@@ -1009,7 +1039,7 @@ pub fn simulate_zone_internal_convective_gains(
     model: &TypedModel,
     sample_count: usize,
 ) -> Result<Vec<ZoneInternalGainTrace>, RuntimeError> {
-    validate_hour_only_internal_gain_schedules(model)?;
+    let schedule_cache = precompute_hour_only_internal_gain_schedule_cache(model)?;
     Ok(model
         .zones
         .iter()
@@ -1017,7 +1047,12 @@ pub fn simulate_zone_internal_convective_gains(
             let values_w = (0..sample_count)
                 .map(|index| {
                     let hour_ending = u32::try_from(index % 24 + 1).unwrap_or(24);
-                    convective_internal_gain_w(model, zone.id, hour_ending)
+                    convective_internal_gain_w_from_cache(
+                        model,
+                        &schedule_cache,
+                        zone.id,
+                        hour_ending,
+                    )
                 })
                 .collect();
             ZoneInternalGainTrace {
@@ -1037,7 +1072,7 @@ pub fn simulate_zone_internal_radiant_gains(
     model: &TypedModel,
     sample_count: usize,
 ) -> Result<Vec<ZoneInternalGainTrace>, RuntimeError> {
-    validate_hour_only_internal_gain_schedules(model)?;
+    let schedule_cache = precompute_hour_only_internal_gain_schedule_cache(model)?;
     Ok(model
         .zones
         .iter()
@@ -1047,7 +1082,12 @@ pub fn simulate_zone_internal_radiant_gains(
             values_w: (0..sample_count)
                 .map(|index| {
                     let hour_ending = u32::try_from(index % 24 + 1).unwrap_or(24);
-                    radiant_internal_gain_w(model, zone.id, hour_ending)
+                    internal_gain_cache::radiant_internal_gain_w_from_cache(
+                        model,
+                        &schedule_cache,
+                        zone.id,
+                        hour_ending,
+                    )
                 })
                 .collect(),
         })

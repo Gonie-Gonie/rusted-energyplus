@@ -1,5 +1,11 @@
 //! Heat-balance state initialization and diagnostic CTF seeding helpers.
 
+mod schedule_cache;
+mod state_shell;
+
+pub use schedule_cache::initialize_heat_balance_state_with_ctf_coefficients;
+pub(crate) use schedule_cache::initialize_heat_balance_state_with_ctf_coefficients_and_schedule_cache;
+
 use crate::error::RuntimeError;
 use crate::geometry::{surface_area_m2, surface_azimuth_deg, surface_tilt_deg, zone_volume_m3};
 use crate::heat_balance::ctf::{
@@ -19,10 +25,11 @@ use crate::heat_balance::zone_air_correction::ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDI
 use crate::heat_balance::zone_predictor_corrector::energyplus_zone_air_temperature_coefficients;
 use crate::psychrometrics::energyplus_standard_zone_air_heat_capacity_j_per_k;
 use crate::schedules::{
-    convective_internal_gain_w, update_surface_radiant_internal_gain_source_terms,
-    validate_hour_only_internal_gain_schedules,
+    ScheduleSeriesCache, convective_internal_gain_w_from_cache,
+    update_surface_radiant_internal_gain_source_terms_from_cache,
 };
 use ep_model::SimulationModel;
+use state_shell::finish_heat_balance_state;
 
 const ENERGYPLUS_INITIAL_CONVECTION_COEFFICIENT_W_PER_M2_K: f64 = 3.076;
 /// Initializes the heat-balance state shell without advancing the solver.
@@ -33,18 +40,12 @@ pub fn initialize_heat_balance_state(
     initialize_heat_balance_state_with_ctf_coefficients(model, initial_zone_air_temperature_c, &[])
 }
 
-/// Initializes the heat-balance state shell with diagnostic CTF coefficient rows.
-///
-/// This is an oracle-isolation hook for heat-balance diagnostics. It does not
-/// calculate EnergyPlus CTF coefficients; callers may provide rows already
-/// emitted by EnergyPlus so surface history behavior can be tested separately
-/// from coefficient generation.
-pub fn initialize_heat_balance_state_with_ctf_coefficients(
+fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
     model: &SimulationModel,
     initial_zone_air_temperature_c: f64,
     ctf_coefficients: &[ConstructionCtfCoefficientOverride],
+    schedule_cache: &ScheduleSeriesCache,
 ) -> Result<HeatBalanceState, RuntimeError> {
-    validate_hour_only_internal_gain_schedules(&model.typed)?;
     let ctf_coefficients_by_construction = construction_ctf_coefficients_by_name(ctf_coefficients);
     let mut zones = Vec::with_capacity(model.typed.zones.len());
     for zone in &model.typed.zones {
@@ -74,7 +75,12 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
                 ENERGYPLUS_DEFAULT_ZONE_AIR_HUMIDITY_RATIO,
             )
             .unwrap_or(0.0),
-            convective_internal_gain_w: convective_internal_gain_w(&model.typed, zone.id, 1),
+            convective_internal_gain_w: convective_internal_gain_w_from_cache(
+                &model.typed,
+                schedule_cache,
+                zone.id,
+                1,
+            ),
             opaque_surface_conductance_w_per_k: 0.0,
             opaque_surface_heat_gain_w: 0.0,
             opaque_surface_outside_conduction_w: 0.0,
@@ -163,7 +169,12 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
             })
         })
         .collect::<Result<Vec<_>, RuntimeError>>()?;
-    update_surface_radiant_internal_gain_source_terms(&model.typed, &mut surfaces, 1);
+    update_surface_radiant_internal_gain_source_terms_from_cache(
+        &model.typed,
+        schedule_cache,
+        &mut surfaces,
+        1,
+    );
     let surface_indexes = HeatBalanceSurfaceIndexes::from_model_surfaces(model, &surfaces);
 
     for zone in &mut zones {
@@ -194,27 +205,10 @@ pub fn initialize_heat_balance_state_with_ctf_coefficients(
             });
     }
 
-    Ok(HeatBalanceState {
-        timestep_index: 0,
+    Ok(finish_heat_balance_state(
         zones,
         surfaces,
         surface_indexes,
-        construction_cache_hash: construction_thermal_data.coefficient_cache_hash,
-        construction_cache_build_wall_seconds: construction_thermal_data.build_wall_seconds,
-        construction_cache_entry_count: construction_thermal_data.len(),
-        construction_cache_no_mass_count: construction_thermal_data.no_mass_construction_ids.len(),
-        construction_cache_massive_ctf_count: construction_thermal_data
-            .massive_ctf_construction_ids
-            .len(),
-        construction_cache_eio_seeded_count: construction_thermal_data.eio_seeded_count(),
-        construction_cache_rust_generated_count: construction_thermal_data.rust_generated_count(),
-        variable_system_timestep_placeholder: true,
-        hvac_iteration_count: 0,
-        plant_iteration_count: 0,
-        last_ctf_history_slot_terms: Vec::new(),
-        last_ctf_history_slot_terms_after_advance: Vec::new(),
-        last_inside_surface_iteration_count: 0,
-        last_inside_surface_iteration_max_delta_c: f64::NAN,
-        last_inside_surface_iteration_max_delta_surface_name: None,
-    })
+        &construction_thermal_data,
+    ))
 }
