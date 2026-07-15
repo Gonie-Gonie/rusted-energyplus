@@ -1,0 +1,60 @@
+id = "calendar_schedule_fmu_export_initial_value_exact_001"
+title = "FMU Export To Schedule inactive initial value at zone timesteps"
+milestone = "full-source-order-fmu-export-to-schedule"
+purpose = "Block on exact EnergyPlus ExternalInterface:FunctionalMockupUnitExport:To:Schedule initial-value population when no ExternalInterface activation or live provider configuration is present."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The fixture is one non-actual 2032-01-01 Thursday RunPeriod with Timestep,4, all six RunPeriod weather/calendar policies set to No, and a synthetic 24-row EPW with no holidays or daylight saving.",
+  "One ExternalInterface:FunctionalMockupUnitExport:To:Schedule has inner schedule_name FMU Export Initial Value, reported through the normalized Schedule Value key FMU EXPORT INITIAL VALUE, references ScheduleTypeLimits Any Number, retains ProbeInput as inert FMU variable metadata, and declares Initial Value 0.875. No ExternalInterface activation object or socket/provider configuration is present, so EnergyPlus retains that initial value and emits its missing-activation warning exactly once.",
+  "The zero-tolerance external claim is exactly 96 ordered, unique Timestep Schedule Value samples and timestamps, each equal to 0.875. The gate also locks all raw EnergyPlus ESO values and timestamp fields.",
+  "Converted epJSON must retain exactly one family member under the synthetic outer key ExternalInterface:FunctionalMockupUnitExport:To:Schedule 1; its actual schedule identity remains the inner schedule_name FMU Export Initial Value beside schedule_type_limits_names Any Number, fmu_variable_name ProbeInput, and initial_value 0.875. No ExternalInterface activation family is present. Exact Environment and disabled-daylight-saving EIO rows plus the one-warning successful ERR and END completion records are also locked.",
+  "socket.cfg and variables.cfg handling, provider resolution, FMU variable binding, live exchange, warmup handoff, mutable updates or currentVal state, termination or final exchange, Ptolemy lifecycle, global ExternalInterface behavior, other ExternalInterface variable or actuator families, exact duplicate diagnostic text, bounded ScheduleTypeLimits parity, unknown type-limit warning parity, downstream consumers, multiple objects, actual/design-day/multi-environment execution, and Rust raw ESO serialization remain outside the claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_schedule_fmu_export_initial_value_exact_001/calendar_schedule_fmu_export_initial_value_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["schedule", "weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_schedule_fmu_export_initial_value_exact_001/calendar_schedule_fmu_export_initial_value_exact.idf"
+weather = "data/conformance_cases/calendar_schedule_fmu_export_initial_value_exact_001/calendar_schedule_fmu_export_initial_value_exact.epw"
+
+[[outputs]]
+key = "FMU EXPORT INITIAL VALUE"
+variable = "Schedule Value"
+frequency = "timestep"
+class = "schedule"
+source = "eso"
+domain = "schedule"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "schedule"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_schedule_fmu_export_initial_value_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-schedule-fmu-export-initial-value-exact"
+blocking = true

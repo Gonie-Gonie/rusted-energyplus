@@ -2,7 +2,8 @@
 
 use super::{ScheduleSeriesKind, ScheduleTrace, ScheduleValueSeries};
 use ep_model::{
-    ExternalInterfaceFmuImportSchedule, ExternalInterfaceSchedule, ScheduleId, TypedModel,
+    ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
+    ExternalInterfaceSchedule, ScheduleId, TypedModel,
 };
 
 pub(super) fn external_interface_schedule_value(
@@ -17,6 +18,13 @@ pub(super) fn external_interface_schedule_value(
         .or_else(|| {
             model
                 .external_interface_fmu_import_schedules
+                .iter()
+                .find(|schedule| schedule.id == schedule_id)
+                .map(|schedule| schedule.initial_value)
+        })
+        .or_else(|| {
+            model
+                .external_interface_fmu_export_schedules
                 .iter()
                 .find(|schedule| schedule.id == schedule_id)
                 .map(|schedule| schedule.initial_value)
@@ -37,6 +45,18 @@ fn external_interface_schedule_series(
 
 fn external_interface_fmu_import_schedule_series(
     schedule: &ExternalInterfaceFmuImportSchedule,
+    sample_count: usize,
+) -> ScheduleValueSeries {
+    initial_value_schedule_series(
+        schedule.id,
+        &schedule.name.0,
+        schedule.initial_value,
+        sample_count,
+    )
+}
+
+fn external_interface_fmu_export_schedule_series(
+    schedule: &ExternalInterfaceFmuExportSchedule,
     sample_count: usize,
 ) -> ScheduleValueSeries {
     initial_value_schedule_series(
@@ -79,6 +99,14 @@ pub(super) fn external_interface_schedule_series_iter(
                     external_interface_fmu_import_schedule_series(schedule, sample_count)
                 }),
         )
+        .chain(
+            model
+                .external_interface_fmu_export_schedules
+                .iter()
+                .map(move |schedule| {
+                    external_interface_fmu_export_schedule_series(schedule, sample_count)
+                }),
+        )
 }
 
 #[cfg(test)]
@@ -98,10 +126,11 @@ mod tests {
         build_execution_plan,
     };
     use ep_model::{
-        DayOfWeek, ExternalInterfaceFmuImportSchedule, FirstHourInterpolationStartingValues,
-        InternalGainId, NormalizedName, OtherEquipment, OtherEquipmentDesignLevelCalculationMethod,
-        RunPeriod, RunPeriodId, ScheduleConstant, ScheduleId, ScheduleYear, SimulationModel,
-        TimestepConfig, TypedModel, WeekScheduleId, ZoneId,
+        DayOfWeek, ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
+        FirstHourInterpolationStartingValues, InternalGainId, NormalizedName, OtherEquipment,
+        OtherEquipmentDesignLevelCalculationMethod, RunPeriod, RunPeriodId, ScheduleConstant,
+        ScheduleId, ScheduleYear, SimulationModel, TimestepConfig, TypedModel, WeekScheduleId,
+        ZoneId,
     };
 
     fn external_schedule(id: u32, value: f64) -> ExternalInterfaceSchedule {
@@ -121,6 +150,16 @@ mod tests {
             fmu_file_name: "UnusedModel.fmu".to_string(),
             fmu_instance_name: "UnusedInstance".to_string(),
             fmu_variable_name: "UnusedOutput".to_string(),
+            initial_value: value,
+        }
+    }
+
+    fn fmu_export_schedule(id: u32, value: f64) -> ExternalInterfaceFmuExportSchedule {
+        ExternalInterfaceFmuExportSchedule {
+            id: ScheduleId(id),
+            name: NormalizedName::new("FMU Export Fraction"),
+            schedule_type_limits: None,
+            fmu_variable_name: "UnusedInput".to_string(),
             initial_value: value,
         }
     }
@@ -215,6 +254,70 @@ mod tests {
     }
 
     #[test]
+    fn fmu_export_initial_value_is_immutable_on_all_time_axis_paths() {
+        let model = TypedModel {
+            timestep: TimestepConfig {
+                number_of_timesteps_per_hour: 4,
+            },
+            external_interface_fmu_export_schedules: vec![fmu_export_schedule(14, 0.875)],
+            ..TypedModel::default()
+        };
+
+        let hour_only = precompute_schedule_value_series(&model, 24)
+            .expect("inactive FMU-export schedules support hour-only precompute");
+        assert_eq!(hour_only[0].values, vec![0.875; 24]);
+
+        let hourly_axis = build_hourly_time_axis(&model).expect("hourly axis should build");
+        let hourly = precompute_schedule_value_series_for_time_axis(&model, &hourly_axis);
+        assert_eq!(hourly[0].values.len(), hourly_axis.points.len());
+        assert!(hourly[0].values.iter().all(|value| *value == 0.875));
+        assert_eq!(
+            hourly[0].kind,
+            ScheduleSeriesKind::ExternalInterfaceInitialValue { value: 0.875 }
+        );
+
+        let environment_axis = build_environment_time_axis_for_run_period_with_zone_timesteps(
+            &one_day_run_period(),
+            1,
+            4,
+        )
+        .expect("one-day environment axis should build");
+        let environment =
+            precompute_schedule_value_series_for_environment_time_axis(&model, &environment_axis);
+        assert_eq!(environment[0].values, vec![0.875; 96]);
+    }
+
+    #[test]
+    fn fmu_export_default_zero_initial_value_supports_downstream_consumers() {
+        let schedule = fmu_export_schedule(28, 0.0);
+        let model = TypedModel {
+            external_interface_fmu_export_schedules: vec![schedule],
+            other_equipment: vec![OtherEquipment {
+                id: InternalGainId(0),
+                name: NormalizedName::new("Equipment"),
+                fuel_type: NormalizedName::new("None"),
+                zone: ZoneId(0),
+                schedule: Some(ScheduleId(28)),
+                design_level_calculation_method:
+                    OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel,
+                design_level_w: 100.0,
+                power_per_floor_area_w_per_m2: 0.0,
+                power_per_person_w: 0.0,
+                fraction_latent: 0.0,
+                fraction_radiant: 0.0,
+                fraction_lost: 0.0,
+                carbon_dioxide_generation_rate_m3_per_s_w: 0.0,
+            }],
+            ..TypedModel::default()
+        };
+
+        assert_eq!(schedule_value(&model, ScheduleId(28), 19), Some(0.0));
+        validate_hour_only_internal_gain_schedules(&model)
+            .expect("FMU-export default-zero values are scalar schedules");
+        assert_eq!(internal_gain_w(&model, ZoneId(0), 19), 0.0);
+    }
+
+    #[test]
     fn fmu_import_initial_value_supports_hour_only_downstream_consumers() {
         let schedule = fmu_import_schedule(27, 0.375);
         let model = TypedModel {
@@ -261,6 +364,7 @@ mod tests {
             }],
             external_interface_schedules: vec![external_schedule(9, 0.375)],
             external_interface_fmu_import_schedules: vec![fmu_import_schedule(10, 0.625)],
+            external_interface_fmu_export_schedules: vec![fmu_export_schedule(11, 0.875)],
             ..TypedModel::default()
         };
         let axis = build_hourly_time_axis(&typed).expect("hourly axis should build");
@@ -270,7 +374,13 @@ mod tests {
                 .iter()
                 .map(|trace| trace.schedule_id)
                 .collect::<Vec<_>>(),
-            [ScheduleId(7), ScheduleId(8), ScheduleId(9), ScheduleId(10)]
+            [
+                ScheduleId(7),
+                ScheduleId(8),
+                ScheduleId(9),
+                ScheduleId(10),
+                ScheduleId(11)
+            ]
         );
 
         let model = SimulationModel::from_typed(typed);
@@ -286,7 +396,13 @@ mod tests {
             .collect::<Vec<_>>();
         assert_eq!(
             evaluated,
-            [ScheduleId(7), ScheduleId(8), ScheduleId(9), ScheduleId(10)]
+            [
+                ScheduleId(7),
+                ScheduleId(8),
+                ScheduleId(9),
+                ScheduleId(10),
+                ScheduleId(11)
+            ]
         );
         let init = plan
             .stages
@@ -295,7 +411,13 @@ mod tests {
             .expect("InitHeatBalance stage should exist");
         assert_eq!(
             init.prebound.schedule_ids,
-            [ScheduleId(7), ScheduleId(8), ScheduleId(9), ScheduleId(10)]
+            [
+                ScheduleId(7),
+                ScheduleId(8),
+                ScheduleId(9),
+                ScheduleId(10),
+                ScheduleId(11)
+            ]
         );
 
         let registry = RuntimeOutputRegistry::from_model(&model);
@@ -311,7 +433,8 @@ mod tests {
                 "CONSTANT",
                 "ANNUAL",
                 "EXTERNAL FRACTION",
-                "FMU IMPORT FRACTION"
+                "FMU IMPORT FRACTION",
+                "FMU EXPORT FRACTION"
             ]
         );
         assert!(
@@ -326,6 +449,14 @@ mod tests {
             registry
                 .find_output(&RuntimeOutputRequest::hourly(
                     "FMU Import Fraction",
+                    "Schedule Value",
+                ))
+                .is_some()
+        );
+        assert!(
+            registry
+                .find_output(&RuntimeOutputRequest::hourly(
+                    "FMU Export Fraction",
                     "Schedule Value",
                 ))
                 .is_some()

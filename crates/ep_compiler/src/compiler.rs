@@ -6,7 +6,8 @@ use ep_model::{
     ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId, DayScheduleId,
     DehumidificationControlType, DemandControlledVentilationType, DesignSpecificationOutdoorAir,
     DesignSpecificationOutdoorAirId, DesignSpecificationOutdoorAirMethod,
-    ExternalInterfaceFmuImportSchedule, ExternalInterfaceSchedule, FanComponent, FanComponentKind,
+    ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
+    ExternalInterfaceSchedule, FanComponent, FanComponentKind,
     FirstHourInterpolationStartingValues, HeatRecoveryType, HumidificationControlType,
     IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
     InsideSurfaceConvectionAlgorithm, InternalGainId, LoadDistributionScheme, LoopId, Material,
@@ -243,6 +244,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Schedule:Year",
     "ExternalInterface:Schedule",
     "ExternalInterface:FunctionalMockupUnitImport:To:Schedule",
+    "ExternalInterface:FunctionalMockupUnitExport:To:Schedule",
     "OtherEquipment",
     "People",
     "ThermostatSetpoint:DualSetpoint",
@@ -335,6 +337,7 @@ impl<'a> Compiler<'a> {
         self.parse_year_schedules(&mut model);
         self.parse_external_interface_schedules(&mut model);
         self.parse_external_interface_fmu_import_schedules(&mut model);
+        self.parse_external_interface_fmu_export_schedules(&mut model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
@@ -2301,6 +2304,125 @@ impl<'a> Compiler<'a> {
                     schedule_type_limits,
                     fmu_file_name,
                     fmu_instance_name,
+                    fmu_variable_name,
+                    initial_value,
+                },
+            );
+        }
+    }
+
+    fn parse_external_interface_fmu_export_schedules(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "ExternalInterface:FunctionalMockupUnitExport:To:Schedule";
+        const SCHEDULE_NAME_FIELD: &str = "schedule_name";
+        const TYPE_LIMITS_FIELD: &str = "schedule_type_limits_names";
+        let objects = self.objects(OBJECT_TYPE);
+        if objects.is_empty() {
+            return;
+        }
+
+        let live_exchange_active =
+            self.objects("ExternalInterface")
+                .iter()
+                .any(|(_name, object)| {
+                    matches!(
+                        field_value(object, "name_of_external_interface"),
+                        Some(RawValue::String(value))
+                            if value.eq_ignore_ascii_case("FunctionalMockupUnitExport")
+                    )
+                });
+        if live_exchange_active {
+            self.error(
+                "UnsupportedExternalInterfaceLiveExchange",
+                OBJECT_TYPE,
+                None,
+                None,
+                format!(
+                    "{OBJECT_TYPE} with ExternalInterface=FunctionalMockupUnitExport requires live FMU updates, which are not yet ported; compilation fails closed"
+                ),
+            );
+        } else {
+            self.warning(
+                "InactiveExternalInterfaceFmuExportScheduleHeldAtInitialValue",
+                OBJECT_TYPE,
+                None,
+                None,
+                format!(
+                    "{OBJECT_TYPE} FMU export exchange is inactive; all schedules are held at their initial values"
+                ),
+            );
+        }
+
+        for (instance_key, object) in objects {
+            let Some(schedule_name) =
+                self.required_string(OBJECT_TYPE, &instance_key, &object, SCHEDULE_NAME_FIELD)
+            else {
+                continue;
+            };
+            let schedule_type_limits = match self.optional_string(
+                OBJECT_TYPE,
+                &schedule_name,
+                &object,
+                TYPE_LIMITS_FIELD,
+            ) {
+                Some(type_limits_name) => self.resolve_name(
+                    &model.schedule_type_limit_names,
+                    OBJECT_TYPE,
+                    &schedule_name,
+                    TYPE_LIMITS_FIELD,
+                    &type_limits_name,
+                    "ScheduleTypeLimits",
+                ),
+                None => {
+                    let type_limits_missing = match field_value(&object, TYPE_LIMITS_FIELD) {
+                        None => true,
+                        Some(RawValue::String(value)) => value.trim().is_empty(),
+                        Some(_) => false,
+                    };
+                    if type_limits_missing {
+                        self.warning(
+                            "MissingExternalInterfaceFmuExportScheduleTypeLimits",
+                            OBJECT_TYPE,
+                            Some(&schedule_name),
+                            Some(TYPE_LIMITS_FIELD),
+                            format!(
+                                "{OBJECT_TYPE}/{schedule_name} has no Schedule Type Limits Name; Schedule will not be validated."
+                            ),
+                        );
+                    }
+                    None
+                }
+            };
+            let Some(fmu_variable_name) =
+                self.required_string(OBJECT_TYPE, &schedule_name, &object, "fmu_variable_name")
+            else {
+                continue;
+            };
+            let initial_value =
+                self.number_default(OBJECT_TYPE, &schedule_name, &object, "initial_value", 0.0);
+
+            let schedule_index = file_shading_schedule_column_count(model)
+                + model.schedules.len()
+                + model.compact_schedules.len()
+                + model.file_schedules.len()
+                + model.year_schedules.len()
+                + model.external_interface_schedules.len()
+                + model.external_interface_fmu_import_schedules.len()
+                + model.external_interface_fmu_export_schedules.len();
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &schedule_name, schedule_index)
+            else {
+                continue;
+            };
+            let id = ScheduleId(id_value);
+            if model.schedule_names.insert(&schedule_name, id).is_some() {
+                self.duplicate_name(OBJECT_TYPE, &schedule_name);
+                continue;
+            }
+
+            model.external_interface_fmu_export_schedules.push(
+                ExternalInterfaceFmuExportSchedule {
+                    id,
+                    name: NormalizedName::new(&schedule_name),
+                    schedule_type_limits,
                     fmu_variable_name,
                     initial_value,
                 },
@@ -7287,6 +7409,7 @@ mod tests {
     mod schedule_day_interval;
     mod schedule_day_list;
     mod schedule_external_interface;
+    mod schedule_external_interface_fmu_export;
     mod schedule_external_interface_fmu_import;
     mod schedule_file;
     mod schedule_file_shading;

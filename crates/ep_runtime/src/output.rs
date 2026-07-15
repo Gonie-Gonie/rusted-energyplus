@@ -788,6 +788,12 @@ fn schedule_ids(model: &TypedModel) -> impl Iterator<Item = ScheduleId> + '_ {
                 .iter()
                 .map(|schedule| schedule.id),
         )
+        .chain(
+            model
+                .external_interface_fmu_export_schedules
+                .iter()
+                .map(|schedule| schedule.id),
+        )
 }
 
 fn schedule_name_for_id(model: &TypedModel, schedule_id: ScheduleId) -> Option<String> {
@@ -839,6 +845,13 @@ fn schedule_name_for_id(model: &TypedModel, schedule_id: ScheduleId) -> Option<S
         .or_else(|| {
             model
                 .external_interface_fmu_import_schedules
+                .iter()
+                .find(|schedule| schedule.id == schedule_id)
+                .map(|schedule| schedule.name.0.clone())
+        })
+        .or_else(|| {
+            model
+                .external_interface_fmu_export_schedules
                 .iter()
                 .find(|schedule| schedule.id == schedule_id)
                 .map(|schedule| schedule.name.0.clone())
