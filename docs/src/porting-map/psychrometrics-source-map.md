@@ -635,6 +635,68 @@ not_claimed_branches:
 - external EnergyPlus numerical parity, cross-platform `std::exp` last-bit and floating-point exception parity, exact diagnostic formatting/side effects, statistics history, and downstream surface, EMPD, room-air, or EMS migration
 <!-- routine-state-contract:v1 end psy_rh_fn_tdb_rhov_lbnd0c -->
 
+## Routines 18-19 Cached Wet-Bulb Deferral Boundary
+
+The two wet-bulb tickets remain `source_mapped`. The current Rust
+`energyplus_outdoor_wet_bulb_c` helper is a production weather adapter that
+accepts relative humidity in percent, validates finite inputs and pressure,
+converts RH to humidity ratio, returns `Option<f64>`, and lets its callers fall
+back to dry-bulb temperature. EnergyPlus routines 18 and 19 instead accept a
+humidity ratio directly, continue through many non-finite or nonphysical
+inputs, and return `Real64`. Renaming that adapter, delegating either canonical
+ticket to it, or migrating weather callers would therefore change the source
+contract.
+
+### `PsyTwbFnTdbWPb` (`psy_twb_fn_tdb_w_pb`)
+
+The default cache-enabled build owns 1,048,576 direct-mapped entries in each
+`PsychrometricCacheData`. Each entry stores the upper 32 bits of the `Tdb`, `W`,
+and `Pb` bit patterns plus the result: `twbprecision_bits = 20` makes
+`Grid_Shift = 32`, and the index is
+`(Tdb_tag ^ W_tag ^ Pb_tag) & 0xFFFFF`. A miss overwrites all three tags and
+evaluates `PsyTwbFnTdbWPb_raw` on reconstructed inputs whose lower 32 bits are
+zero. A hit returns the saved value without replaying raw diagnostics,
+`CalledFrom`, raw call/iteration statistics, the saved boiling-pressure state,
+or nested saturation caches. Fresh entries contain three zero tags and a zero
+result, so an all-zero-tag lookup is a source-defined initial hit rather than a
+miss. Optional statistics still count every public cache lookup.
+
+With `EP_nocache_Psychrometrics`, the same public name compiles the raw body
+directly on the original inputs and `PsyTwbFnTdbWPb_raw` is absent. That switch
+also disables the nested `PsyPsatFnTemp` and `PsyTsatFnPb` caches, so a hybrid
+Rust path with only the outer cache removed would not represent the upstream
+no-cache variant. Promotion requires a per-simulation cache owner, exact tag,
+sentinel, collision, and initialization tests, cache-hit side-effect tests,
+independent-state isolation, and separate default-cache and no-cache evidence.
+
+### `PsyTwbFnTdbWPb_raw` (`psy_twb_fn_tdb_w_pb_raw`)
+
+The named raw routine exists only in the cache-enabled build and bypasses only
+the outer wet-bulb cache. It reads `iconvTol`, `last_Patm`, `last_tBoil`, the
+warmup flag, three shared warning indices, and optional call/iteration
+statistics. A changed pressure calls `PsyTsatFnPb` and writes the exact-pressure
+`last_Patm`/`last_tBoil` pair; every iteration calls `PsyPsatFnTemp`, so the raw
+routine still reads and mutates nested cache, interpolation, saved-value,
+diagnostic, and statistics state.
+
+Numerically, every negative humidity ratio is reset to `1.0e-5`, while only
+values `<= -0.0001` enter the humidity-warning branch. The solver starts at
+`TDB`, limits a guess at or above `tBoil - 0.09` to `tBoil - 0.1`, applies the
+separate nonnegative and negative wet-bulb formulas, and calls
+`General::Iterate` with a 100-iteration limit. Temperature inputs `<= -100` or
+`>= 200`, significant negative humidity, and iteration failure may warn outside
+warmup but do not replace the returned numerical continuation. The final cap is
+the ordered comparison `if (TWB > TDB) TWB = TDB`, not an IEEE-NaN-changing
+`min` operation.
+
+Promotion requires canonical `PsyTsatFnPb` and `PsyPsatFnTemp` dependencies,
+an explicit owner for the saved pressure/boiling pair and diagnostic/statistics
+history, upstream below-freezing and near-zero vectors, boiling-limit and
+nonconvergence vectors, negative-humidity threshold tests, and NaN, infinity,
+signed-zero, denominator, and final-cap evidence. A pure arithmetic scaffold
+would not represent the named raw interface while those active default-build
+dependencies remain absent.
+
 ## Compile-Time Variant Boundary
 
 Unless `EP_nocache_Psychrometrics` is set, the EnergyPlus header enables
