@@ -79,13 +79,6 @@ pub(super) fn resolve_special_day_axis_state(
     metadata: Option<&EpwCalendarMetadata>,
     special_days: &[RunPeriodSpecialDay],
 ) -> Result<SpecialDayAxisState, TimeAxisError> {
-    if !special_days.is_empty() && calendar.start_year != calendar.end_year {
-        return Err(TimeAxisError::SpecialDayCrossYearUnsupported {
-            run_period_name: run_period.name.0.clone(),
-            start_year: calendar.start_year,
-            end_year: calendar.end_year,
-        });
-    }
     let weather_effective_leap_year = weather_calendar
         .map(|calendar| calendar.start_year_is_weather_effective_leap_year)
         .unwrap_or(calendar.start_year_is_leap_year);

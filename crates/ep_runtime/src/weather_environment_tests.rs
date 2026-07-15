@@ -147,6 +147,70 @@ fn selects_nonactual_start_offset_and_materializes_day_buffers()
 }
 
 #[test]
+fn selects_nonactual_cross_year_source_days_in_order() -> Result<(), Box<dyn std::error::Error>> {
+    let mut records = source_day(1999, 12, 31, 0.0);
+    records.extend(source_day(2004, 1, 1, 100.0));
+    records.extend(source_day(2007, 1, 2, 200.0));
+    let weather = weather_file(true, vec![data_period(12, 31, 1, 2)], records);
+    let mut run_period = run_period("Cross Year Source", 12, 31, 1, 2);
+    run_period.begin_year = Some(2031);
+    run_period.end_year = Some(2032);
+    run_period.day_of_week_for_start_day = Some(DayOfWeek::Wednesday);
+    let axis = axis_for(&run_period, true)?;
+
+    let selected = select_epw_environment_weather(&weather, &axis)?;
+
+    assert_eq!(selected.source_start_record_index, 0);
+    assert_eq!(selected.hourly_records().len(), 72);
+    assert_eq!(
+        selected.selected_source_record_indices,
+        (0..72).collect::<Vec<_>>()
+    );
+    assert_eq!(
+        selected
+            .hourly_records()
+            .iter()
+            .step_by(24)
+            .map(|record| (record.year, record.month, record.day))
+            .collect::<Vec<_>>(),
+        vec![(1999, 12, 31), (2004, 1, 1), (2007, 1, 2)]
+    );
+    assert_eq!(
+        axis.points
+            .iter()
+            .step_by(24)
+            .map(|point| (
+                point.year,
+                point.month,
+                point.day_of_month,
+                point.day_of_week
+            ))
+            .collect::<Vec<_>>(),
+        vec![
+            (2031, 12, 31, DayOfWeek::Wednesday),
+            (2032, 1, 1, DayOfWeek::Thursday),
+            (2032, 1, 2, DayOfWeek::Friday),
+        ]
+    );
+    assert_eq!(selected.day_buffer_transitions.len(), 3);
+    assert_eq!(
+        selected.day_buffer_transitions[0].tomorrow_source_record_start,
+        24
+    );
+    assert_eq!(
+        selected.day_buffer_transitions[1].tomorrow_source_record_start,
+        48
+    );
+    assert_eq!(
+        selected.day_buffer_transitions[2].tomorrow_source_record_start,
+        48
+    );
+    assert!(!selected.day_buffer_transitions[2].prefetched_next_day);
+
+    Ok(())
+}
+
+#[test]
 fn selected_stream_resets_first_hour_seed_and_carries_previous_day_hour_24()
 -> Result<(), Box<dyn std::error::Error>> {
     let mut records = source_day(2016, 6, 30, -1_000.0);

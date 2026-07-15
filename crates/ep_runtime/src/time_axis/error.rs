@@ -39,24 +39,6 @@ pub enum TimeAxisError {
         /// Run period name.
         run_period_name: String,
     },
-    /// Metadata-aware cross-year weather traversal is not implemented yet.
-    WeatherMetadataCrossYearUnsupported {
-        /// Run period name.
-        run_period_name: String,
-        /// Resolved Gregorian start year.
-        start_year: u32,
-        /// Resolved Gregorian end year.
-        end_year: u32,
-    },
-    /// Cross-year special-day tables require per-year reprojection.
-    SpecialDayCrossYearUnsupported {
-        /// Run period name.
-        run_period_name: String,
-        /// Resolved Gregorian start year.
-        start_year: u32,
-        /// Resolved Gregorian end year.
-        end_year: u32,
-    },
     /// An EPW nth-weekday daylight-saving rule has no date in the resolved month.
     DaylightSavingDateRuleDoesNotExist {
         /// Run period name.
@@ -118,22 +100,6 @@ impl Display for TimeAxisError {
             Self::ActualWeatherUnsupported { run_period_name } => write!(
                 formatter,
                 "run period {run_period_name} treats weather as actual, but metadata-aware EPW record traversal is not implemented"
-            ),
-            Self::WeatherMetadataCrossYearUnsupported {
-                run_period_name,
-                start_year,
-                end_year,
-            } => write!(
-                formatter,
-                "run period {run_period_name} spans {start_year}-{end_year}, but metadata-aware cross-year weather traversal is not implemented"
-            ),
-            Self::SpecialDayCrossYearUnsupported {
-                run_period_name,
-                start_year,
-                end_year,
-            } => write!(
-                formatter,
-                "run period {run_period_name} spans {start_year}-{end_year}, but cross-year special-day reprojection is not implemented"
             ),
             Self::DaylightSavingDateRuleDoesNotExist {
                 run_period_name,

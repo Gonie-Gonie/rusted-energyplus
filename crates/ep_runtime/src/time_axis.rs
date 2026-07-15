@@ -75,9 +75,10 @@ impl ResolvedRunPeriodCalendar {
 
 /// Calendar state after applying the EPW leap-year policy to one run period.
 ///
-/// `gregorian` remains the input-date interpretation. `total_days` follows
-/// weather-effective endpoint ordinals: with EPW leap years disabled, a
-/// February 29 endpoint aliases March 1 rather than reducing the duration.
+/// `gregorian` remains the input-date interpretation. Across multiple Gregorian
+/// years, `total_days` removes every February 29 skipped by EPW policy. Within
+/// one year, weather-effective endpoint ordinals preserve the EnergyPlus alias:
+/// a February 29 endpoint maps to March 1 rather than reducing the duration.
 /// Thus a February-29-only period has Gregorian/skipped/effective counts 1/1/1.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ResolvedWeatherEnvironmentCalendar {

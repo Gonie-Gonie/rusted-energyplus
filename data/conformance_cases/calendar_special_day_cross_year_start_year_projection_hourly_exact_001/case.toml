@@ -1,0 +1,59 @@
+id = "calendar_special_day_cross_year_start_year_projection_hourly_exact_001"
+title = "Cross-year special-day start-year annual-table projection"
+milestone = "full-source-order-calendar-special-day-cross-year-start-year-projection"
+purpose = "Block on exact ordered hourly day types when a non-actual RunPeriod crosses one year boundary while SetSpecialDayDates retains the environment start-year Nth-weekday annual table."
+comparison_class = "conformance"
+conformance_claim = true
+oracle_version = "26.1.0"
+notes = [
+  "The explicit RunPeriod spans only 2031-12-30 through 2032-01-02 and declares Tuesday as its start weekday. EnergyPlus 26.1 resolves the single 1st Thursday in January Holiday against the 2031 environment-start annual table as January 2, then retains that ordinal across this one non-actual year boundary.",
+  "The zero-tolerance claim is exactly 96 ordered, unique Site Day Type Index samples and timestamps in daily order Tuesday=3, Wednesday=4, Thursday=5, Holiday=8. A Gregorian 2032 reprojection to January 1 is deliberately not claimed because it contradicts the executable oracle on this path.",
+  "The EPW has one wrapping DATA PERIOD, one record per hour, four source days, Leap Year Observed=Yes, no holidays or daylight-saving range, and deliberately non-semantic row years because Treat Weather as Actual is No.",
+  "This case proves only one non-actual December-to-January transition, environment-start-year Nth-weekday annual-table retention, ordered source-day traversal, and clean completion. Later annual resets, multiple year boundaries, February 29 traversal, actual weather, EPW holidays, weekend shifting, duration wrap, overlaps, DST, warmup lifecycle parity, records per hour greater than one, multiple data periods, broad WeatherManager behavior, and broad schedule behavior remain outside the claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/calendar_special_day_cross_year_start_year_projection_hourly_exact_001/calendar_special_day_cross_year_start_year_projection_hourly_exact.idf"
+tier = "A"
+
+[scope]
+domains = ["weather"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/calendar_special_day_cross_year_start_year_projection_hourly_exact_001/calendar_special_day_cross_year_start_year_projection_hourly_exact.idf"
+weather = "data/conformance_cases/calendar_special_day_cross_year_start_year_projection_hourly_exact_001/calendar_special_day_cross_year_start_year_projection_hourly_exact.epw"
+
+[[outputs]]
+key = "ENVIRONMENT"
+variable = "Site Day Type Index"
+frequency = "hourly"
+class = "weather"
+source = "eso"
+domain = "weather"
+level = "conformance"
+abs_tol = 0.0
+rmse_tol = 0.0
+timestamp_contract = "ordered-exact-unique"
+
+[[tolerances]]
+variable_class = "weather"
+max_abs = 0.0
+max_rmse = 0.0
+
+[report]
+format = "markdown"
+path = ".runtime/time-weather-schedule-conformance/26.1.0/calendar_special_day_cross_year_start_year_projection_hourly_exact_001/compare/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-calendar-special-day-cross-year-start-year-projection-exact"
+blocking = true

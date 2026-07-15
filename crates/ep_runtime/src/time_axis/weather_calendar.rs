@@ -7,8 +7,9 @@ use ep_model::RunPeriod;
 
 /// Applies EPW leap-year policy to a Gregorian run-period calendar.
 ///
-/// This resolves calendar-axis shape only. Actual-weather and cross-year EPW
-/// record traversal remain explicit errors until DATA PERIOD selection is ported.
+/// This resolves calendar-axis shape only. Actual-weather traversal remains an
+/// explicit error. Non-actual cross-year ranges retain Gregorian year changes
+/// while applying the EPW leap-day policy to each year in the range.
 pub fn resolve_weather_environment_calendar(
     run_period: &RunPeriod,
     metadata: &EpwCalendarMetadata,
@@ -19,14 +20,6 @@ pub fn resolve_weather_environment_calendar(
             run_period_name: run_period.name.0.clone(),
         });
     }
-    if gregorian.start_year != gregorian.end_year {
-        return Err(TimeAxisError::WeatherMetadataCrossYearUnsupported {
-            run_period_name: run_period.name.0.clone(),
-            start_year: gregorian.start_year,
-            end_year: gregorian.end_year,
-        });
-    }
-
     let leap_days_skipped = if metadata.leap_year_observed {
         0
     } else {
@@ -34,6 +27,12 @@ pub fn resolve_weather_environment_calendar(
     };
     let total_days = if metadata.leap_year_observed {
         gregorian.total_days
+    } else if gregorian.start_year != gregorian.end_year {
+        gregorian
+            .total_days
+            .checked_sub(leap_days_skipped)
+            .filter(|days| *days > 0)
+            .ok_or_else(|| invalid_range_error(run_period))?
     } else {
         let start = weather_effective_ordinal_day(
             run_period,

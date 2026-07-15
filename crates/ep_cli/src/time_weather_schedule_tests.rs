@@ -162,6 +162,10 @@ fn daylight_saving_reports_distinguish_input_file_precedence()
     assert!(markdown.contains("daylight_saving_hourly_samples: 1\n"));
 
     let json = weather_calendar_json(&time_axis);
+    assert!(json.contains("\"start_year\": 2017"));
+    assert!(json.contains("\"end_year\": 2017"));
+    assert!(json.contains("\"end_year_gregorian_leap\": false"));
+    assert!(json.contains("\"end_year_weather_effective_leap\": false"));
     assert!(json.contains("\"weather_file_period_declared\": true"));
     assert!(json.contains("\"run_period_uses_weather_file_period\": false"));
     assert!(json.contains("\"input_file_period_declared\": true"));

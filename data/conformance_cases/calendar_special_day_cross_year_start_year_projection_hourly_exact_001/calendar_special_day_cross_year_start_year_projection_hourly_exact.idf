@@ -1,0 +1,45 @@
+Version,26.1;
+
+Building,
+  Calendar Special Day Cross Year Start Year Projection Exact Fixture,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+Timestep,4;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+RunPeriod,
+  Cross Year Special Day Run Period,
+  12,
+  30,
+  2031,
+  1,
+  2,
+  2032,
+  Tuesday,
+  No,  !- Use Weather File Holidays and Special Days
+  No,  !- Use Weather File Daylight Saving Period
+  No,  !- Apply Weekend Holiday Rule
+  No,  !- Use Weather File Rain Indicators
+  No,  !- Use Weather File Snow Indicators
+  No;  !- Treat Weather as Actual
+
+RunPeriodControl:SpecialDays,
+  Cross Year New Year Holiday,
+  1st Thursday in January,
+  1,
+  Holiday;
+
+Output:Variable,
+  Environment,
+  Site Day Type Index,
+  Hourly;

@@ -123,6 +123,23 @@ CLAIM_BOUNDARY = (
     "remain unit/source evidence or unclaimed. RunPeriodControl:DaylightSavingTime behavior beyond "
     "the exact fixed-date precedence case, DST-shifted schedule lookup, hour-24 rollover, and Rust "
     "raw ESO serialization remain outside this checkpoint. "
+    "The cross-year start-year special-day case separately proves only one non-actual, single-DATA-"
+    "PERIOD, one-record-per-hour transition from 2031-12-30 through 2032-01-02. Its explicit "
+    "Tuesday-start RunPeriod and single input-file `1st Thursday in January` Holiday are resolved "
+    "against the 2031 environment-start annual table and retained across that one boundary, so "
+    "96 ordered, exact, unique, zero-tolerance Site Day Type Index values and timestamps follow "
+    "daily order Tuesday=3, Wednesday=4, Thursday=5, Holiday=8, with January 2 as the Holiday. "
+    "The gate locks all 96 raw EnergyPlus ESO values and hourly timestamp rows, exact EnergyPlus "
+    "26.1 rows Environment,CROSS YEAR SPECIAL DAY RUN PERIOD,WeatherFileRunPeriod,12/30/2031,"
+    "01/02/2032,Tuesday,4,Use RunPeriod Specified Day,No,No,No,No,No,Clark and Allen and "
+    "Environment:Special Days,CROSS YEAR NEW YEAR HOLIDAY,Holiday,InputFile,01/02,  1, plus clean "
+    "0 Warning/0 Severe completion. Rust calendar-year, record-selection, resolved-day, and sample-"
+    "count fields are summary diagnostics rather than additional EIO output. A Gregorian 2032 "
+    "reprojection to January 1 is deliberately not claimed. Actual "
+    "weather, multiple year boundaries or DATA PERIODS, later annual resets/reprojection, DST "
+    "cross-year semantics, February 29 coupling, EPW holidays, weekend shifting, duration wrap, "
+    "overlaps, warmup lifecycle parity, records per hour above one, broad WeatherManager behavior, "
+    "and broad schedule behavior remain unclaimed. "
     "The fixed-date input-file special-day case separately proves one February 29 Holiday: 72 "
     "ordered, unique Site Day Type Index samples and normalized timestamps match exactly as "
     "24 Sunday values, 24 Holiday values, and 24 Tuesday values. The three fixed-Sunday "
@@ -169,8 +186,9 @@ CLAIM_BOUNDARY = (
     "EPW holidays beyond the paired fixed use-policy cases and exact two-rule weekday case below; "
     "other special-day types; duration/date combinations beyond the "
     "exact pair below; overlap arrangements beyond the exact pair, declaration order beyond "
-    "SpecialDays and the exact EPW header, warning parity, actual cross-year run "
-    "periods, or per-year reprojection; schedule lookup; tomorrow state; and raw ESO timestamp "
+    "SpecialDays and the exact EPW header, warning parity, actual-weather cross-year run "
+    "periods, non-actual cross-year execution beyond the exact single-boundary fixture, or per-year "
+    "reprojection; schedule lookup; tomorrow state; and raw ESO timestamp "
     "serialization remain outside this claim. The paired duration-wrap input-file Holiday cases "
     "each use an explicit January 1 through January 3 same-year RunPeriod and one December 31 "
     "duration-three Holiday. The common-year 2017 case resolves day of year 365 and matches 72 "
@@ -178,8 +196,9 @@ CLAIM_BOUNDARY = (
     "leap-observed 2016 case resolves day of year 366 and matches 72 samples in daily order 8/8/1. "
     "Each series contains exactly 48 Holiday=8 samples. All RunPeriod policy flags are explicitly "
     "No. This proves only the common-year `JDay1 == 366 && LeapYearAdd == 0` and leap-year "
-    "`JDay1 == 367` SetSpecialDayDates source branches for a same-year cyclic annual table. Actual "
-    "cross-year execution or reprojection; overlap, precedence, declaration order, or warnings; "
+    "`JDay1 == 367` SetSpecialDayDates source branches for a same-year cyclic annual table. "
+    "Actual-weather cross-year execution, non-actual cross-year execution beyond the exact "
+    "single-boundary fixture, or per-year reprojection; overlap, precedence, declaration order, or warnings; "
     "other durations, dates, special-day types, policy values, or EPW calendar rules remain outside "
     "the claim. The paired overlapping input-file SpecialDays cases share the explicit 2016-02-28 "
     "through 2016-03-01 RunPeriod, two duration-one February 29 definitions named Zulu Holiday "
@@ -218,7 +237,8 @@ CLAIM_BOUNDARY = (
     "unclaimed. Weekend shifting and holidays beyond the declared fixed and two-rule cases, EPW/IDF "
     "precedence beyond the separate exact mixed collision, schedule day-type "
     "lookup, tomorrow state, raw ESO timestamp "
-    "serialization, actual-weather year matching, cross-year traversal, multiple-data-period execution, "
+    "serialization, actual-weather year matching, cross-year traversal beyond the exact single-boundary "
+    "fixture, multiple-data-period execution, "
     "records-per-hour greater than one, "
     "subhourly solar interpolation, complete SetCurrentWeather/solar/WeatherManager conformance, "
     "and general time, weather, and schedule compatibility are not claimed."
@@ -237,6 +257,7 @@ CASE_LABELS = {
     "calendar_epw_dst_southern_wrap_hourly_exact_001": "EPW DST southern wrap",
     "calendar_epw_dst_southern_wrap_start_hourly_exact_001": "EPW DST southern start",
     "calendar_special_day_fixed_date_hourly_exact_001": "Calendar special day",
+    "calendar_special_day_cross_year_start_year_projection_hourly_exact_001": "Cross-year start-year holiday",
     "calendar_special_day_nth_weekday_hourly_exact_001": "IDF fourth Sunday",
     "calendar_special_day_last_weekday_hourly_exact_001": "IDF last Sunday",
     "calendar_special_day_weekend_rule_enabled_hourly_exact_001": "Weekend holiday enabled",
@@ -408,6 +429,13 @@ CASE_SPECS = (
         summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_fixed_date_hourly_exact_001\compare\compare-summary.json",
         oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_fixed_date_hourly_exact_001\oracle\eplusout.end",
         oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_fixed_date_hourly_exact_001\oracle\eplusout.err",
+    ),
+    CaseSpec(
+        milestone="Cross-year start-year holiday",
+        command="compare-calendar-special-day-cross-year-start-year-projection-exact",
+        summary_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_cross_year_start_year_projection_hourly_exact_001\compare\compare-summary.json",
+        oracle_end_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_cross_year_start_year_projection_hourly_exact_001\oracle\eplusout.end",
+        oracle_err_path=r".runtime\time-weather-schedule-conformance\26.1.0\calendar_special_day_cross_year_start_year_projection_hourly_exact_001\oracle\eplusout.err",
     ),
     CaseSpec(
         milestone="IDF fourth Sunday",

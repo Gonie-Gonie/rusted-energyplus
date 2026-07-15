@@ -212,29 +212,51 @@ fn special_day_duration_is_inclusive_and_wraps_the_same_year_annual_table()
 }
 
 #[test]
-fn cross_year_special_days_are_rejected_until_each_year_can_be_reprojected() {
+fn cross_year_special_days_reuse_the_source_start_year_annual_table()
+-> Result<(), Box<dyn std::error::Error>> {
     let model = special_day_test_model(
-        special_day_test_run_period("Cross Year Special", (2016, 12, 31), (2017, 1, 1), false),
+        special_day_test_run_period("Cross Year Special", (2031, 12, 30), (2032, 1, 2), false),
         vec![special_day_input(
             0,
-            "Annual Holiday",
-            SpecialDayDateRule::MonthDay {
-                month: 6,
-                day_of_month: 15,
+            "First Thursday In January",
+            SpecialDayDateRule::NthWeekdayInMonth {
+                nth: 1,
+                weekday: DayOfWeek::Thursday,
+                month: 1,
             },
             1,
             SpecialDayType::Holiday,
         )],
     );
+    let hourly_axis = build_hourly_time_axis(&model)?;
+    let environment_axes = build_environment_time_axes(&model)?;
+    let environment_axis = &environment_axes[0];
 
     assert_eq!(
-        build_hourly_time_axis(&model).expect_err("cross-year special days need yearly projection"),
-        TimeAxisError::SpecialDayCrossYearUnsupported {
-            run_period_name: "CROSS YEAR SPECIAL".to_string(),
-            start_year: 2016,
-            end_year: 2017,
-        }
+        (
+            hourly_axis.special_days.resolved_days[0].start.month,
+            hourly_axis.special_days.resolved_days[0].start.day_of_month,
+            hourly_axis.special_days.resolved_days[0].start.day_of_year,
+        ),
+        (1, 2, 2)
     );
+    assert_eq!(hourly_axis.sample_count(), 4 * 24);
+    assert_eq!(environment_axis.sample_count(), 4 * 24);
+
+    for (date, expected) in [
+        ((2031, 12, 30), (crate::DayType::Tuesday, None, 3)),
+        ((2031, 12, 31), (crate::DayType::Wednesday, None, 4)),
+        ((2032, 1, 1), (crate::DayType::Thursday, None, 5)),
+        (
+            (2032, 1, 2),
+            (crate::DayType::Holiday, Some(crate::DayType::Holiday), 8),
+        ),
+    ] {
+        assert_hourly_special_day(&hourly_axis, date, expected);
+        assert_environment_special_day(environment_axis, date, expected);
+    }
+
+    Ok(())
 }
 
 #[test]

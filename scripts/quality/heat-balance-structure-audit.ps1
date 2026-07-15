@@ -204,6 +204,8 @@ $weather = "crates\ep_runtime\src\weather.rs"
 $weatherCalendar = "crates\ep_runtime\src\weather_calendar.rs"
 $weatherTests = "crates\ep_runtime\src\weather_tests.rs"
 $timeAxis = "crates\ep_runtime\src\time_axis.rs"
+$timeAxisWeatherCalendar = "crates\ep_runtime\src\time_axis\weather_calendar.rs"
+$weatherEnvironment = "crates\ep_runtime\src\weather_environment.rs"
 $calendarRules = "crates\ep_runtime\src\time_axis\calendar_rules.rs"
 $dayType = "crates\ep_runtime\src\time_axis\day_type.rs"
 $daylightSaving = "crates\ep_runtime\src\time_axis\daylight_saving.rs"
@@ -222,6 +224,7 @@ $dstEpwIdfPrecedenceGate = "scripts\compare\compare-calendar-dst-epw-idf-precede
 $epwWeekdayDstGate = "scripts\compare\compare-calendar-epw-dst-weekday-rules-exact.ps1"
 $epwSouthernDstGate = "scripts\compare\compare-calendar-epw-dst-southern-wrap-exact.ps1"
 $epwSouthernDstStartGate = "scripts\compare\compare-calendar-epw-dst-southern-wrap-start-exact.ps1"
+$crossYearSpecialDayGate = "scripts\compare\compare-calendar-special-day-cross-year-start-year-projection-exact.ps1"
 $probeSummaryReport = "tools\reporting\dynamic_heat_balance_probe_summary.py"
 $dynamicDiagnosticScript = "scripts\compare\official-dynamic-heat-balance-diagnostic.ps1"
 $dynamicCompatScript = "scripts\compare\official-dynamic-heat-balance-compat-candidate.ps1"
@@ -276,6 +279,8 @@ foreach ($entry in @(
         @($weatherCalendar, "EPW calendar metadata parser"),
         @($weatherTests, "EPW weather parser tests"),
         @($timeAxis, "runtime time-axis module"),
+        @($timeAxisWeatherCalendar, "runtime weather-calendar axis module"),
+        @($weatherEnvironment, "runtime weather-environment selector"),
         @($calendarRules, "shared calendar-rule resolver"),
         @($dayType, "EnergyPlus day-type module"),
         @($daylightSaving, "runtime daylight-saving resolver"),
@@ -287,6 +292,7 @@ foreach ($entry in @(
         @($durationWrapGate, "common-year and leap-year special-day duration-wrap gate"),
         @($weekendHolidayGate, "fixed-Sunday Yes/No/blank weekend holiday gate"),
         @($overlapOrderGate, "paired special-day overlap declaration-order gate"),
+        @($crossYearSpecialDayGate, "cross-year start-year special-day gate"),
         @($probeSummaryReport, "dynamic heat-balance probe summary reporter"),
         @($dynamicDiagnosticScript, "dynamic heat-balance diagnostic comparison script"),
         @($dynamicCompatScript, "dynamic heat-balance compatibility comparison script"),
@@ -655,7 +661,7 @@ Assert-Contains -Path $calendarRules -Pattern 'day_of_month > days_in_month\(wea
 Assert-Contains -Path $dayType -Pattern 'pub const fn energyplus_index\s*\(' -Description "EnergyPlus Site Day Type Index mapping"
 Assert-Contains -Path $specialDays -Pattern 'pub struct SpecialDayAxisState' -Description "shared time-axis special-day state"
 Assert-Contains -Path $specialDays -Pattern 'fn resolve_special_day_axis_state\s*\(' -Description "time-axis special-day resolver"
-Assert-Contains -Path $specialDays -Pattern 'SpecialDayCrossYearUnsupported' -Description "cross-year special-day explicit rejection"
+Assert-Contains -Path $specialDays -Pattern 'weather_calendar[\s\S]*start_year_is_weather_effective_leap_year[\s\S]*unwrap_or\(calendar\.start_year_is_leap_year\)' -Description "special-day annual table uses the environment start-year weather shape"
 Assert-Contains -Path $specialDays -Pattern 'SpecialDayDateRuleDoesNotExist' -Description "special-day nonexistent Nth-weekday error mapping"
 Assert-Contains -Path $specialDays -Pattern 'CalendarRuleResolutionError::NthWeekdayDoesNotExist[\s\S]*TimeAxisError::SpecialDayDateRuleDoesNotExist' -Description "Nth-weekday resolver-to-special-day error mapping"
 Assert-Contains -Path $specialDays -Pattern 'run_period.use_weather_file_holidays_and_special_days' -Description "RunPeriod EPW holiday use-policy branch"
@@ -740,6 +746,20 @@ Assert-Contains -Path $compiler -Pattern 'fn parse_run_period_daylight_saving_ti
 Assert-Contains -Path $daylightSaving -Pattern 'pub enum DaylightSavingPeriodSource[\s\S]*InputFile[\s\S]*input_file_period_declared[\s\S]*if let Some\(period\) = input_file_period[\s\S]*DaylightSavingPeriodSource::InputFile' -Description "input-file daylight-saving precedence resolver"
 Assert-Contains -Path $timeWeatherSchedule -Pattern 'input_file_daylight_saving_period_declared:[\s\S]*daylight_saving_effective_source:[\s\S]*input_file_period_declared[\s\S]*effective_source' -Description "input-file daylight-saving Markdown and JSON diagnostics"
 Assert-Contains -Path $algorithmLedger -Pattern 'source_routine = "GetDSTData"[\s\S]*completion_status = "source_mapped"[\s\S]*source_routine = "SetDSTDateRanges"[\s\S]*completion_status = "source_mapped"' -Description "daylight-saving intake and projection source-map routines"
+Assert-Contains -Path $crossYearSpecialDayGate -Pattern '\$CaseId = "calendar_special_day_cross_year_start_year_projection_hourly_exact_001"[\s\S]*timestamp_contract = "ordered-exact-unique"[\s\S]*Tuesday=3, Wednesday=4, Thursday=5, Holiday=8[\s\S]*script = "scripts/dev\.cmd compare-calendar-special-day-cross-year-start-year-projection-exact"' -Description "cross-year start-year special-day exact manifest contract"
+Assert-Contains -Path $crossYearSpecialDayGate -Pattern '\$sourceFileRef -cne \$IdfRef -or \$manifestIdfRef -cne \$IdfRef[\s\S]*\$manifestWeatherRef -cne \$WeatherRef[\s\S]*Assert-SamePath[^\r\n]*\$manifestIdfRef[\s\S]*Assert-SamePath[^\r\n]*\$manifestWeatherRef[\s\S]*\$expandedIdfRef[\s\S]*\$expandedWeatherRef[\s\S]*Assert-SamePath[^\r\n]*\$expandedIdfRef[\s\S]*Assert-SamePath[^\r\n]*\$expandedWeatherRef[\s\S]*\$expectedStagedIdf = \$idfText[\s\S]*\$stagedIdfText -cne \$expectedStagedIdf' -Description "cross-year special-day canonical manifest, expanded input, and staged-IDF provenance"
+Assert-Contains -Path $crossYearSpecialDayGate -Pattern '\$ExpectedDataPeriod = "DATA PERIODS,1,1,Data,Tuesday,12/30,1/2"|DATA PERIODS,1,1,Data,Tuesday,12/30,1/2' -Description "cross-year start-year single wrapping data period"
+Assert-Contains -Path $crossYearSpecialDayGate -Pattern '\$runPeriodObjects\.Count -ne 1 -or \$specialDayObjects\.Count -ne 1 -or \$outputObjects\.Count -ne 1[\s\S]*"12", "30", "2031", "1", "2", "2032", "Tuesday"[\s\S]*"No", "No", "No", "No", "No", "No"[\s\S]*"Cross Year New Year Holiday", "1st Thursday in January", "1", "Holiday"[\s\S]*RunPeriodControl:DaylightSavingTime' -Description "cross-year start-year isolated RunPeriod and one special-day object"
+Assert-Contains -Path $crossYearSpecialDayGate -Pattern '\$weatherLines\.Count -ne 104[\s\S]*\$weatherRows\.Count -ne 96[\s\S]*\$expectedYears = @\(2031, 2031, 2032, 2032\)[\s\S]*\$expectedMonths = @\(12, 12, 1, 1\)[\s\S]*\$expectedDays = @\(30, 31, 1, 2\)[\s\S]*for \(\$index = 0; \$index -lt 96; \+\+\$index\)' -Description "cross-year start-year exact 96-row source order"
+Assert-Contains -Path $crossYearSpecialDayGate -Pattern '\$summary\.time_axis_samples -ne 96[\s\S]*\$calendar\.start_year -ne 2031 -or \$calendar\.end_year -ne 2032[\s\S]*gregorian_calendar_days -ne 4[\s\S]*weather_effective_calendar_days -ne 4[\s\S]*\$selection\.data_period_index -ne 1[\s\S]*selected_hourly_records -ne 96[\s\S]*day_buffer_transitions -ne 4' -Description "cross-year start-year calendar and weather-selection summary"
+Assert-Contains -Path $crossYearSpecialDayGate -Pattern '\$specialDays\.input_file_declared -ne 1[\s\S]*resolved_count -ne 1[\s\S]*hourly_samples -ne 24[\s\S]*start_month -ne 1[\s\S]*start_day -ne 2[\s\S]*start_day_of_year -ne 2[\s\S]*day_type -ne "Holiday"[\s\S]*day_type_index -ne 8[\s\S]*weekend_shift_days -ne 0' -Description "cross-year special day retains the start-year January 2 projection"
+Assert-Contains -Path $crossYearSpecialDayGate -Pattern '\$resolved\[0\]\.source -cne "input-file"[\s\S]*special_day_resolved: CROSS YEAR NEW YEAR HOLIDAY 1/2 duration=1 day_type=Holiday weekend_shift_days=0 source=input-file' -Description "cross-year special-day input-file source diagnostics"
+Assert-Contains -Path $crossYearSpecialDayGate -Pattern '\$series\.expected_samples -ne 96[\s\S]*timestamp_contract -ne "ordered-exact-unique"[\s\S]*\$expectedFirst = "env=CROSS YEAR SPECIAL DAY RUN PERIOD;day=1;month=12;date=30[\s\S]*\$expectedLast = "env=CROSS YEAR SPECIAL DAY RUN PERIOD;day=4;month=1;date=2[\s\S]*max_abs_delta -ne 0\.0[\s\S]*first_timestamp_divergence' -Description "cross-year special-day ordered exact unique zero-delta series"
+Assert-Contains -Path $crossYearSpecialDayGate -Pattern 'Site Day Type Index \\\[\\\] !Hourly\$[\s\S]*\$values\.Count -ne 96 -or \$timestampRows\.Count -ne 96[\s\S]*\$expectedDailyValues = @\(3\.0, 4\.0, 5\.0, 8\.0\)[\s\S]*\$expectedDailyTypes = @\("Tuesday", "Wednesday", "Thursday", "Holiday"\)[\s\S]*for \(\$index = 0; \$index -lt 96; \+\+\$index\)' -Description "cross-year special-day raw EnergyPlus values and timestamp day types"
+Assert-Contains -Path $crossYearSpecialDayGate -Pattern 'Environment,CROSS YEAR SPECIAL DAY RUN PERIOD,WeatherFileRunPeriod,12/30/2031,01/02/2032,Tuesday,4,Use RunPeriod Specified Day,No,No,No,No,No,Clark and Allen[\s\S]*Environment:Special Days,CROSS YEAR NEW YEAR HOLIDAY,Holiday,InputFile,01/02,  1[\s\S]*EnergyPlus Completed Successfully-- 0 Warning; 0 Severe Errors;[\s\S]*special_day_hourly_samples: 24[\s\S]*Cross-year start-year special-day projection exact gate passed\.' -Description "cross-year start-year exact EIO, clean completion, and blocking success"
+Assert-Contains -Path $timeAxisWeatherCalendar -Pattern 'run_period\.treat_weather_as_actual[\s\S]*ActualWeatherUnsupported[\s\S]*gregorian\.start_year != gregorian\.end_year[\s\S]*checked_sub\(leap_days_skipped\)' -Description "non-actual cross-year weather-calendar branch with actual-weather rejection"
+Assert-Contains -Path $weatherEnvironment -Pattern 'for day_index in 0\.\.weather_calendar\.total_days[\s\S]*first_record\.month != expected\.month[\s\S]*advance_source_day' -Description "weather environment traverses cross-year source days against the resolved axis"
+Assert-Contains -Path $algorithmLedger -Pattern 'calendar_special_day_cross_year_start_year_projection_hourly_exact_001[\s\S]*resolved against the 2031 environment-start annual table[\s\S]*96 ordered-exact-unique zero-tolerance Site Day Type Index samples' -Description "cross-year start-year special-day bounded algorithm evidence"
 Assert-Contains -Path $epwWeekdayDstGate -Pattern '\$ExpectedHeader = "HOLIDAYS/DAYLIGHT SAVINGS,Yes,4th Monday in February,Last Wednesday in February,0"[\s\S]*\$ExpectedDataPeriod = "DATA PERIODS,1,1,Data,Sunday,2/22,2/26"[\s\S]*\$weatherLines\.Count -ne 128[\s\S]*\$weatherRows\.Count -ne 120' -Description "EPW weekday DST exact eight-header, 120-row source shape"
 Assert-Contains -Path $epwWeekdayDstGate -Pattern '\$ExpectedDataPeriod = "DATA PERIODS,1,1,Data,Sunday,2/22,2/26"[\s\S]*\$dataPeriodHeaders\.Count -ne 1 -or \$dataPeriodHeaders\[0\] -cne \$ExpectedDataPeriod' -Description "EPW weekday DST unique case-sensitive data-period header"
 Assert-Contains -Path $epwWeekdayDstGate -Pattern 'for \(\$rowIndex = 0; \$rowIndex -lt 120; \+\+\$rowIndex\)[\s\S]*\$dayIndex = \[int\]\[math\]::Floor\(\$rowIndex / 24\)[\s\S]*\$expectedHour = \(\$rowIndex % 24\) \+ 1[\s\S]*\$fields\[2\] -ne \$ExpectedDates\[\$dayIndex\][\s\S]*\$fields\[3\] -ne \$expectedHour' -Description "EPW weekday DST full 120-row source order"
@@ -791,7 +811,7 @@ Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'build_hourly_time_axis\(
 Assert-Contains -Path $pipeline -Pattern 'prepare_runtime_inputs\([\s\S]*diagnostics\.error\("RuntimeConvergenceFailure", "runtime", error\)' -Description "ep_run runtime-input error diagnostic projection"
 Assert-Contains -Path $pipeline -Pattern 'load_epjson_file_with_idf_order' -Description "IDF arbitrary-run preserves configured declaration order"
 Assert-Contains -Path $pipeline -Pattern 'RunExitCode::Runtime' -Description "ep_run runtime failure exit mapping"
-Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn cross_year_special_days_are_rejected_until_each_year_can_be_reprojected\s*\(' -Description "cross-year special-day explicit rejection test"
+Assert-Contains -Path $runtimeTestSpecialDays -Pattern 'fn cross_year_special_days_reuse_the_source_start_year_annual_table\s*\([\s\S]*\(1, 2, 2\)[\s\S]*4 \* 24[\s\S]*DayType::Tuesday[\s\S]*DayType::Wednesday[\s\S]*DayType::Thursday[\s\S]*DayType::Holiday' -Description "cross-year special-day start-year annual-table retention test"
 Assert-Contains -Path $runtimeTestEpwHolidays -Pattern 'fn run_period_flag_enables_epw_sunday_type_holiday_on_both_time_axes\s*\(' -Description "EPW holiday policy and Sunday-type both-axis test"
 Assert-Contains -Path $runtimeTestEpwHolidays -Pattern 'fn disabling_epw_holidays_does_not_disable_input_file_special_days\s*\(' -Description "EPW-only holiday filtering test"
 Assert-Contains -Path $runtimeTestEpwHolidays -Pattern 'fn input_file_custom_day_overwrites_weather_file_holiday_on_the_same_date\s*\(' -Description "EPW then input-file same-date precedence unit test"

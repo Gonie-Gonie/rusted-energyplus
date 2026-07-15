@@ -794,28 +794,40 @@ fn metadata_aware_calendar_rejects_actual_weather_for_both_leap_policies() {
 }
 
 #[test]
-fn metadata_aware_calendar_rejects_cross_year_run_periods() {
+fn metadata_aware_calendar_applies_cross_year_leap_policy() {
     let mut run_period = test_run_period("Cross Year Weather", 3, 1, 3, 1);
-    run_period.begin_year = Some(2016);
-    run_period.end_year = Some(2017);
+    run_period.begin_year = Some(2015);
+    run_period.end_year = Some(2016);
 
-    for leap_year_observed in [false, true] {
-        assert!(matches!(
-            resolve_weather_environment_calendar(
-                &run_period,
-                &EpwCalendarMetadata {
-                    leap_year_observed,
-                    daylight_saving_period: None,
-                    holidays: Vec::new(),
-                }
-            ),
-            Err(TimeAxisError::WeatherMetadataCrossYearUnsupported {
-                start_year: 2016,
-                end_year: 2017,
-                ..
-            })
-        ));
-    }
+    let no_leap = resolve_weather_environment_calendar(
+        &run_period,
+        &EpwCalendarMetadata {
+            leap_year_observed: false,
+            daylight_saving_period: None,
+            holidays: Vec::new(),
+        },
+    )
+    .expect("non-actual cross-year weather calendar");
+    assert_eq!(no_leap.gregorian.total_days, 367);
+    assert_eq!(no_leap.leap_days_skipped, 1);
+    assert_eq!(no_leap.total_days, 366);
+    assert!(!no_leap.start_year_is_weather_effective_leap_year);
+    assert!(!no_leap.end_year_is_weather_effective_leap_year);
+
+    let leap = resolve_weather_environment_calendar(
+        &run_period,
+        &EpwCalendarMetadata {
+            leap_year_observed: true,
+            daylight_saving_period: None,
+            holidays: Vec::new(),
+        },
+    )
+    .expect("leap-observed cross-year weather calendar");
+    assert_eq!(leap.gregorian.total_days, 367);
+    assert_eq!(leap.leap_days_skipped, 0);
+    assert_eq!(leap.total_days, 367);
+    assert!(!leap.start_year_is_weather_effective_leap_year);
+    assert!(leap.end_year_is_weather_effective_leap_year);
 }
 
 #[test]
