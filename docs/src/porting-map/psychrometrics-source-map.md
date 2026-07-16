@@ -65,9 +65,9 @@ that the EnergyPlus routine has been ported.
 | 25 | `PsyPsatFnTemp` | saturation pressure and cache | `Psychrometrics.hh:1016,1066`; cached inline in header, no-cache implementation `Psychrometrics.cc:649` | variants selected by `EP_cache_PsyPsatFnTemp`; one logical ticket | partial finite numerical projection: private saturation-pressure compatibility helper and cache-temperature quantizer; cache owner unassigned | cached/no-cache/raw agreement, cache-key quantization/collisions, range guards, and repeated-call stability |
 | 26 | `PsyTsatFnHPb_raw` | saturation temperature from enthalpy/pressure raw path | `Psychrometrics.hh:1074`; `Psychrometrics.cc:900` | exists only with `EP_cache_PsyTsatFnHPb` | intended `ep_runtime::psychrometrics`; unassigned | raw inversion vectors, convergence/limits, and identity with cache misses |
 | 27 | `PsyTsatFnHPb` | saturation temperature from enthalpy/pressure and cache | `Psychrometrics.hh:1079,1123`; cached inline in header, no-cache implementation `Psychrometrics.cc:906` | variants selected by `EP_cache_PsyTsatFnHPb`; one logical ticket | intended `ep_runtime::psychrometrics`; unassigned | cached/no-cache/raw agreement, two-input cache key, convergence, and boundary vectors |
-| 28 | `PsyRhovFnTdbRh` | vapor density | `Psychrometrics.hh:1131` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | temperature/RH vectors, physical-domain limits, and reciprocal RH checks |
-| 29 | `PsyRhFnTdbRhov_error` | diagnostics | `Psychrometrics.hh:1161`; `Psychrometrics.cc:1075` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | exact RH-bound trigger, caller text, recurrence suppression, and error-state mutation |
-| 30 | `PsyRhFnTdbRhov` | relative humidity | `Psychrometrics.hh:1169` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | vapor-density round trips, clamp/error thresholds, and temperature extremes |
+| 28 | `PsyRhovFnTdbRh` | vapor density | `Psychrometrics.hh:1131` (inline) | always present | canonical default-build numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rhov_fn_tdb_rh`; stateful saturation-pressure cache/statistics/diagnostics adapter unassigned | temperature/RH vectors, physical-domain limits, and reciprocal RH checks |
+| 29 | `PsyRhFnTdbRhov_error` | diagnostics | `Psychrometrics.hh:1161`; `Psychrometrics.cc:1075` | compiled only with `EP_psych_errors` | intended per-simulation diagnostics owner; unassigned | exact RH-bound trigger, caller text, recurrence suppression, and error-state mutation |
+| 30 | `PsyRhFnTdbRhov` | relative humidity | `Psychrometrics.hh:1169` (inline) | always present | canonical default-build numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rh_fn_tdb_rhov`; stateful statistics/cache/diagnostics adapter unassigned | vapor-density round trips, clamp/error thresholds, and temperature extremes |
 | 31 | `PsyRhFnTdbWPb_error` | diagnostics | `Psychrometrics.hh:1215`; `Psychrometrics.cc:1133` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | exact RH-bound trigger, caller context, recurrence suppression, and corrected return path |
 | 32 | `PsyRhFnTdbWPb` | relative humidity | `Psychrometrics.hh:1223` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | humidity/pressure vectors, clamp/error thresholds, and humidity-ratio round trips |
 | 33 | `PsyWFnTdpPb_error` | diagnostics | `Psychrometrics.hh:1272`; `Psychrometrics.cc:1191` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | pressure-crossing correction loop, exact trigger, caller context, and recurrence suppression |
@@ -937,9 +937,9 @@ and state-isolation contracts have an explicit Rust owner and tests.
 
 ## Routines 26-27 Enthalpy/Pressure Saturation Deferral Boundary
 
-Both enthalpy/pressure saturation tickets remain `source_mapped`; the inventory
-therefore remains at 37 source-mapped and 16 state-mapped routines. The current
-private IdealLoads
+Both enthalpy/pressure saturation tickets remain `source_mapped`. The
+subsequent routines 28 and 30 promotion does not change this deferral. The
+current private IdealLoads
 `saturation_temperature_from_enthalpy_and_pressure_c` helper is not a
 canonical analogue. It rejects non-finite enthalpy, non-finite pressure, and
 nonpositive pressure, performs 80 bisections over `[-100, 200] C`, and composes
@@ -1042,6 +1042,116 @@ an exact two-input cache owner with sentinel, same-tag, collision, lifecycle,
 wrong-counter, and hit-side-effect tests. Default-cache and
 `EP_nocache_Psychrometrics` oracle evidence and downstream C API, EMS, coil,
 heat-recovery, and HVAC migration remain separate requirements.
+
+## CP56-10 Vapor-Density And Relative-Humidity Numerical Scaffold
+
+This checkpoint advances `PsyRhovFnTdbRh` and `PsyRhFnTdbRhov` to
+`state_mapped` while leaving their stateful saturation-pressure dependency and
+the separately named `PsyRhFnTdbRhov_error` helper unimplemented. The
+inventory is now 35 source-mapped and 18 state-mapped routines. The parent
+inventory remains `status = "scaffold"`, `claim_level = "none"`, and all 53
+routines remain outside the full-domain required set.
+
+Both Rust helpers model the standard EnergyPlus build's numerical projection:
+they truncate the saturation-pressure input to the routine-25 cache
+representative whose low 28 bits are zero, evaluate the default non-IF97 raw
+formula, and then use the original unquantized `Tdb` in the outer ideal-gas
+arithmetic. They do not own the 1,048,576-entry cache, replay hit/miss side
+effects, or represent the no-cache or IF97 compile variants. The pre-existing
+`LBnd0C` forward and inverse helpers remain separate empirical-exponential
+routines and are not aliases for routines 28 or 30.
+
+Pinned evidence covers the EnergyPlus EMS vectors `(30 C, 0.5)` to
+`0.015174171 kg/m3` and `(30 C, 0.01 kg/m3)` to `0.3295072808`, a non-grid
+temperature that distinguishes the default cache representative from the
+no-cache raw value, valid-domain round trips, unbounded forward RH inputs,
+inverse correction branches, the positive-vapor lazy gate, absolute-zero
+denominators, signed zero, NaN, and infinities. These are source-fixture and
+local formula tests, not an external EnergyPlus domain claim.
+
+### `PsyRhovFnTdbRh` (`psy_rhov_fn_tdb_rh`)
+
+The source unconditionally calls `PsyPsatFnTemp(state, Tdb, CalledFrom)` and
+then evaluates `(Psat * RH) / (461.52 * (Tdb + 273.15))`. It has no local
+statistics counter, validation, clamp, or diagnostic branch. Negative and
+supersaturated RH therefore remain linear inputs, and even zero or NaN RH
+still performs the nested saturation-pressure lookup and its side effects.
+
+<!-- routine-state-contract:v1 begin psy_rhov_fn_tdb_rh -->
+PsyRhovFnTdbRh
+
+read_state:
+- arguments `Tdb`, `RH`, and `CalledFrom`; the default build reads the routine-25 signed temperature tag, direct-mapped cache entry, and optional public lookup counter, while a miss reads raw saturation-pressure statistics, warmup, range-warning history, and caller context
+
+write_state:
+- the outer ideal-gas arithmetic writes no state; every cached saturation-pressure lookup may increment its optional wrapper counter, while a miss overwrites one cache entry and may update raw-call statistics and non-warmup range-warning state
+
+history_state_ownership:
+- for ordinary finite inputs, the default non-IF97 numerical projection is a deterministic function of original `Tdb` and `RH` plus the tag-derived saturation-pressure representative; cache hit, miss, collision, initialization, and warning/statistics history belong to each `EnergyPlusData` instance
+
+unsupported_state:
+- the routine-25 cache array and lifecycle, signed tag/hash/sentinel/collision behavior, public and raw counters, warmup suppression, warning stream and totals, caller timestamp, recurrence state, SQLite, and callback state
+
+inactive_branches:
+- `EP_nocache_Psychrometrics` removes the nested cache and named raw interface, evaluates saturation pressure at original unquantized `Tdb`, and can change ordinary non-grid results
+- disabling `EP_psych_stats` removes nested counters; disabling `EP_psych_errors` removes nested range diagnostics; defining `EP_IF97` replaces the liquid-water saturation-pressure branch
+
+unsupported_active_branches:
+- the default cache lookup, representative-temperature raw miss, hit suppression of `CalledFrom` and raw side effects, sentinel/collision/lifecycle behavior, errors-enabled out-of-range diagnostics, and optional statistics-enabled counters
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, cached/no-cache/IF97 equivalence, exact cache or diagnostic/statistics side effects, and C API, EMS, HAMT, EMPD, surface, or other downstream migration
+<!-- routine-state-contract:v1 end psy_rhov_fn_tdb_rh -->
+
+### `PsyRhFnTdbRhov_error` Deferral (`psy_rh_fn_tdb_rhov_error`)
+
+The errors-only helper remains `source_mapped`. It acts only for strict
+`RHValue > 1.01` or, in an `else if` branch, strict `RHValue < -0.05`;
+exact endpoints and NaN are no-ops. Warmup suppresses every mutation. High and
+low excursions share one `RhFnTdbRhov` error index and recurring min/max
+history, so whichever direction occurs first owns the only detailed
+caller-aware warning; a later opposite excursion contributes only to the
+shared recurring record. The high reset text says `100.0 %` and the low text
+says `1%`. A per-simulation warning owner, alternating-direction recurrence
+tests, and exact formatting/callback/SQLite evidence are required before this
+ticket can advance.
+
+### `PsyRhFnTdbRhov` (`psy_rh_fn_tdb_rhov`)
+
+Optional statistics increment before any input gate. The numerical body calls
+saturation pressure only when `Rhovapor > 0.0`, using the fixed nested caller
+name `PsyRhFnTdbRhov` rather than the external `CalledFrom`. Negative values,
+signed zero, negative infinity, and NaN vapor density return literal positive
+zero without a nested lookup. A raw result inside `[0.0, 1.0]`, including
+values below `0.01`, is returned unchanged. Only a negative result becomes
+`0.01` and only a result above one becomes `1.0`; the optional error helper
+sees the raw value before that correction and uses external `CalledFrom`.
+
+<!-- routine-state-contract:v1 begin psy_rh_fn_tdb_rhov -->
+PsyRhFnTdbRhov
+
+read_state:
+- arguments `Tdb`, `Rhovapor`, and `CalledFrom`; optional statistics read the routine-30 counter on every call, positive vapor reads routine-25 cache/raw state with a fixed nested caller name, and extreme raw RH reads warmup plus the shared routine-29 warning index and external caller context
+
+write_state:
+- the numerical calculation and ordered correction write no state; optional statistics increment the routine-30 counter before the positivity gate, positive vapor may mutate nested saturation-pressure cache/statistics/diagnostics state, and non-warmup extreme raw RH may mutate the shared high/low warning history
+
+history_state_ownership:
+- for a fixed compile variant, the numerical projection is an input function, while the routine-25 hit/miss history and routine-29 shared high/low recurrence history affect nested side effects and belong to each `EnergyPlusData` instance
+
+unsupported_state:
+- the routine-30 call counter; routine-25 cache, lifecycle, counters, and range diagnostics; routine-29 warmup suppression, warning stream and totals, scratch string, caller timestamp, shared recurrence index/count/min/max, SQLite, and callback state
+
+inactive_branches:
+- nonpositive or NaN `Rhovapor` skips saturation pressure and routine-29 dispatch but does not skip the optional routine-30 call counter
+- `EP_nocache_Psychrometrics` evaluates exact-temperature saturation pressure on every positive-vapor call; disabling statistics or errors removes the corresponding state mutations; `EP_IF97` changes the liquid-water dependency
+
+unsupported_active_branches:
+- default cached saturation-pressure lookup and hit/miss side effects, optional every-call statistics, and default errors-enabled dispatch only for strict raw `RH < -0.05` or `RH > 1.01` with warmup and shared high/low recurrence
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, cached/no-cache/IF97 equivalence, exact diagnostic/statistics/cache behavior, threshold nextafter messaging, and C API, EMS, HAMT, EMPD, room-air, surface, or other downstream migration
+<!-- routine-state-contract:v1 end psy_rh_fn_tdb_rhov -->
 
 ## Compile-Time Variant Boundary
 

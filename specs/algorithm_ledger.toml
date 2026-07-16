@@ -1923,8 +1923,29 @@ routine.psy_tsat_fn_h_pb.required_for_full_domain = false
 routine.psy_rhov_fn_tdb_rh.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_rhov_fn_tdb_rh.source_routine = "PsyRhovFnTdbRh"
 routine.psy_rhov_fn_tdb_rh.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_rhov_fn_tdb_rh.completion_status = "source_mapped"
+routine.psy_rhov_fn_tdb_rh.completion_status = "state_mapped"
 routine.psy_rhov_fn_tdb_rh.required_for_full_domain = false
+routine.psy_rhov_fn_tdb_rh.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rhov_fn_tdb_rh.read_state = [
+  "arguments `Tdb`, `RH`, and `CalledFrom`; the default build reads the routine-25 signed temperature tag, direct-mapped cache entry, and optional public lookup counter, while a miss reads raw saturation-pressure statistics, warmup, range-warning history, and caller context",
+]
+routine.psy_rhov_fn_tdb_rh.write_state = [
+  "the outer ideal-gas arithmetic writes no state; every cached saturation-pressure lookup may increment its optional wrapper counter, while a miss overwrites one cache entry and may update raw-call statistics and non-warmup range-warning state",
+]
+routine.psy_rhov_fn_tdb_rh.history_state_ownership = "for ordinary finite inputs, the default non-IF97 numerical projection is a deterministic function of original `Tdb` and `RH` plus the tag-derived saturation-pressure representative; cache hit, miss, collision, initialization, and warning/statistics history belong to each `EnergyPlusData` instance"
+routine.psy_rhov_fn_tdb_rh.unsupported_state = [
+  "the routine-25 cache array and lifecycle, signed tag/hash/sentinel/collision behavior, public and raw counters, warmup suppression, warning stream and totals, caller timestamp, recurrence state, SQLite, and callback state",
+]
+routine.psy_rhov_fn_tdb_rh.inactive_branches = [
+  "`EP_nocache_Psychrometrics` removes the nested cache and named raw interface, evaluates saturation pressure at original unquantized `Tdb`, and can change ordinary non-grid results",
+  "disabling `EP_psych_stats` removes nested counters; disabling `EP_psych_errors` removes nested range diagnostics; defining `EP_IF97` replaces the liquid-water saturation-pressure branch",
+]
+routine.psy_rhov_fn_tdb_rh.unsupported_active_branches = [
+  "the default cache lookup, representative-temperature raw miss, hit suppression of `CalledFrom` and raw side effects, sentinel/collision/lifecycle behavior, errors-enabled out-of-range diagnostics, and optional statistics-enabled counters",
+]
+routine.psy_rhov_fn_tdb_rh.not_claimed_branches = [
+  "external EnergyPlus numerical parity, cached/no-cache/IF97 equivalence, exact cache or diagnostic/statistics side effects, and C API, EMS, HAMT, EMPD, surface, or other downstream migration",
+]
 
 routine.psy_rh_fn_tdb_rhov_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
 routine.psy_rh_fn_tdb_rhov_error.source_routine = "PsyRhFnTdbRhov_error"
@@ -1935,8 +1956,29 @@ routine.psy_rh_fn_tdb_rhov_error.required_for_full_domain = false
 routine.psy_rh_fn_tdb_rhov.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_rh_fn_tdb_rhov.source_routine = "PsyRhFnTdbRhov"
 routine.psy_rh_fn_tdb_rhov.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_rh_fn_tdb_rhov.completion_status = "source_mapped"
+routine.psy_rh_fn_tdb_rhov.completion_status = "state_mapped"
 routine.psy_rh_fn_tdb_rhov.required_for_full_domain = false
+routine.psy_rh_fn_tdb_rhov.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rh_fn_tdb_rhov.read_state = [
+  "arguments `Tdb`, `Rhovapor`, and `CalledFrom`; optional statistics read the routine-30 counter on every call, positive vapor reads routine-25 cache/raw state with a fixed nested caller name, and extreme raw RH reads warmup plus the shared routine-29 warning index and external caller context",
+]
+routine.psy_rh_fn_tdb_rhov.write_state = [
+  "the numerical calculation and ordered correction write no state; optional statistics increment the routine-30 counter before the positivity gate, positive vapor may mutate nested saturation-pressure cache/statistics/diagnostics state, and non-warmup extreme raw RH may mutate the shared high/low warning history",
+]
+routine.psy_rh_fn_tdb_rhov.history_state_ownership = "for a fixed compile variant, the numerical projection is an input function, while the routine-25 hit/miss history and routine-29 shared high/low recurrence history affect nested side effects and belong to each `EnergyPlusData` instance"
+routine.psy_rh_fn_tdb_rhov.unsupported_state = [
+  "the routine-30 call counter; routine-25 cache, lifecycle, counters, and range diagnostics; routine-29 warmup suppression, warning stream and totals, scratch string, caller timestamp, shared recurrence index/count/min/max, SQLite, and callback state",
+]
+routine.psy_rh_fn_tdb_rhov.inactive_branches = [
+  "nonpositive or NaN `Rhovapor` skips saturation pressure and routine-29 dispatch but does not skip the optional routine-30 call counter",
+  "`EP_nocache_Psychrometrics` evaluates exact-temperature saturation pressure on every positive-vapor call; disabling statistics or errors removes the corresponding state mutations; `EP_IF97` changes the liquid-water dependency",
+]
+routine.psy_rh_fn_tdb_rhov.unsupported_active_branches = [
+  "default cached saturation-pressure lookup and hit/miss side effects, optional every-call statistics, and default errors-enabled dispatch only for strict raw `RH < -0.05` or `RH > 1.01` with warmup and shared high/low recurrence",
+]
+routine.psy_rh_fn_tdb_rhov.not_claimed_branches = [
+  "external EnergyPlus numerical parity, cached/no-cache/IF97 equivalence, exact diagnostic/statistics/cache behavior, threshold nextafter messaging, and C API, EMS, HAMT, EMPD, room-air, surface, or other downstream migration",
+]
 
 routine.psy_rh_fn_tdb_w_pb_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
 routine.psy_rh_fn_tdb_w_pb_error.source_routine = "PsyRhFnTdbWPb_error"
