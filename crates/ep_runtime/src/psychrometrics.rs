@@ -630,6 +630,41 @@ pub fn energyplus_psy_w_fn_tdb_rh_pb(
     }
 }
 
+/// Canonical EnergyPlus 26.1 `PsyWFnTdbTwbPb` ordinary-finite default-build
+/// numerical path.
+///
+/// This preserves the source's ordered wet-bulb clamp, saturation-pressure
+/// evaluation, coefficient grouping, and strictly-negative fallback through
+/// `PsyWFnTdbRhPb` at 0.01% relative humidity. Cache lifecycle, statistics,
+/// both diagnostic helpers, compile variants, and history-dependent cache
+/// sentinel behavior remain separate stateful source contracts.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_w_fn_tdb_twb_pb(
+    dry_bulb_c: f64,
+    wet_bulb_c: f64,
+    atmospheric_pressure_pa: f64,
+) -> f64 {
+    let wet_bulb_c = if wet_bulb_c > dry_bulb_c {
+        dry_bulb_c
+    } else {
+        wet_bulb_c
+    };
+    let wet_saturation_pressure_pa =
+        energyplus_psy_psat_fn_temp_default_numerical_projection(wet_bulb_c);
+    let saturated_humidity_ratio = 0.621_98 * wet_saturation_pressure_pa
+        / (atmospheric_pressure_pa - wet_saturation_pressure_pa);
+    let humidity_ratio = ((2501.0 - 2.381 * wet_bulb_c) * saturated_humidity_ratio
+        - (dry_bulb_c - wet_bulb_c))
+        / (2501.0 + 1.805 * dry_bulb_c - 4.186 * wet_bulb_c);
+
+    if humidity_ratio < 0.0 {
+        energyplus_psy_w_fn_tdb_rh_pb(dry_bulb_c, 0.0001, atmospheric_pressure_pa)
+    } else {
+        humidity_ratio
+    }
+}
+
 fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option<f64> {
     if !temperature_c.is_finite() {
         return None;
@@ -683,3 +718,7 @@ mod humidity_ratio_relative_humidity_tests;
 #[cfg(test)]
 #[path = "psychrometrics_relative_humidity_humidity_ratio_tests.rs"]
 mod relative_humidity_humidity_ratio_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_wet_bulb_humidity_ratio_tests.rs"]
+mod wet_bulb_humidity_ratio_tests;
