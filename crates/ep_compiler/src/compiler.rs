@@ -37,7 +37,8 @@ use ep_model::{
     WindowGasProperties, WindowGasType, WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
-    WindowGlazingSpectralAverageMaterial, WindowScreenBeamReflectanceModel,
+    WindowGlazingSpectralAverageMaterial, WindowGlazingThermochromicGroupMaterial,
+    WindowGlazingThermochromicState, WindowScreenBeamReflectanceModel,
     WindowScreenEquivalentLayerMaterial, WindowScreenEquivalentLayerSolarProperties,
     WindowScreenEquivalentLayerVisibleProperties, WindowScreenMaterial,
     WindowScreenTransmittanceMapResolution, WindowShadeEquivalentLayerMaterial,
@@ -90,6 +91,7 @@ fn window_construction_layer_kind(
         | MaterialDefinition::AirGap(_)
         | MaterialDefinition::InfraredTransparent(_)
         | MaterialDefinition::RoofVegetation(_)
+        | MaterialDefinition::WindowGlazingThermochromicGroup(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
         | MaterialDefinition::WindowShadeEquivalentLayer(_)
@@ -108,6 +110,7 @@ fn window_glazing_is_solar_diffusing(definition: &MaterialDefinition) -> bool {
         | MaterialDefinition::AirGap(_)
         | MaterialDefinition::InfraredTransparent(_)
         | MaterialDefinition::RoofVegetation(_)
+        | MaterialDefinition::WindowGlazingThermochromicGroup(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowGas(_)
         | MaterialDefinition::WindowGasMixture(_)
@@ -148,6 +151,7 @@ fn window_gap_signature(definition: &MaterialDefinition) -> Option<WindowGapSign
         | MaterialDefinition::AirGap(_)
         | MaterialDefinition::InfraredTransparent(_)
         | MaterialDefinition::RoofVegetation(_)
+        | MaterialDefinition::WindowGlazingThermochromicGroup(_)
         | MaterialDefinition::WindowGlazingSpectralAverage(_)
         | MaterialDefinition::WindowGlazingRefractionExtinction(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -398,6 +402,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "WindowMaterial:Blind",
     "WindowMaterial:Blind:EquivalentLayer",
     "Material:RoofVegetation",
+    "WindowMaterial:GlazingGroup:Thermochromic",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -979,6 +984,7 @@ impl<'a> Compiler<'a> {
         self.parse_window_blind_materials(model);
         self.parse_window_blind_equivalent_layer_materials(model);
         self.parse_roof_vegetation_materials(model);
+        self.parse_window_glazing_thermochromic_group_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -4729,6 +4735,164 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_window_glazing_thermochromic_group_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowMaterial:GlazingGroup:Thermochromic";
+        const STATES_FIELD: &str = "temperature_data";
+        const TEMPERATURE_FIELD: &str = "optical_data_temperature";
+        const GLAZING_FIELD: &str = "window_material_glazing_name";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            // EnergyPlus reserves the thermochromic parent in the shared
+            // material namespace before resolving its child glazing names.
+            // Keep that order so self/earlier-group references resolve to the
+            // wrong material type while later-group references remain missing.
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::WindowGlazingThermochromicGroup(
+                    WindowGlazingThermochromicGroupMaterial {
+                        first_state: 0,
+                        state_count: 0,
+                    },
+                ),
+            });
+
+            let Some(value) = field_value(&object, STATES_FIELD) else {
+                self.error(
+                    "MissingRequiredField",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some(STATES_FIELD),
+                    format!(
+                        "{OBJECT_TYPE}/{name} requires at least one source-ordered temperature/glazing state in field {STATES_FIELD}"
+                    ),
+                );
+                continue;
+            };
+            let RawValue::Array(entries) = value else {
+                self.invalid_field_type(OBJECT_TYPE, &name, STATES_FIELD, "array");
+                continue;
+            };
+            if entries.is_empty() {
+                self.error(
+                    "MissingThermochromicGlazingState",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some(STATES_FIELD),
+                    format!(
+                        "{OBJECT_TYPE}/{name} requires at least one source-ordered temperature/glazing state; EnergyPlus 26.1 later dereferences the first state"
+                    ),
+                );
+                continue;
+            }
+
+            let mut states = Vec::with_capacity(entries.len());
+            let mut states_valid = true;
+            for (index, entry) in entries.iter().enumerate() {
+                let RawValue::Object(fields) = entry else {
+                    self.error(
+                        "InvalidFieldType",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some(STATES_FIELD),
+                        format!(
+                            "{OBJECT_TYPE}/{name} {STATES_FIELD} entry {index} must be an object"
+                        ),
+                    );
+                    states_valid = false;
+                    continue;
+                };
+                let entry_object = RawObject {
+                    fields: fields.clone(),
+                    source_span: None,
+                };
+                let entry_name = format!("{name}[{index}]");
+                let optical_data_temperature_c = self.required_number(
+                    OBJECT_TYPE,
+                    &entry_name,
+                    &entry_object,
+                    TEMPERATURE_FIELD,
+                );
+                let glazing_name =
+                    self.required_string(OBJECT_TYPE, &entry_name, &entry_object, GLAZING_FIELD);
+                let (Some(optical_data_temperature_c), Some(glazing_name)) =
+                    (optical_data_temperature_c, glazing_name)
+                else {
+                    states_valid = false;
+                    continue;
+                };
+                let Some(glazing_material) = self.resolve_name(
+                    &model.material_names,
+                    OBJECT_TYPE,
+                    &entry_name,
+                    GLAZING_FIELD,
+                    &glazing_name,
+                    "ordinary window glazing material",
+                ) else {
+                    states_valid = false;
+                    continue;
+                };
+                let supported_glazing = model
+                    .materials
+                    .get(glazing_material.0 as usize)
+                    .is_some_and(|material| {
+                        matches!(
+                            material.definition,
+                            MaterialDefinition::WindowGlazingSpectralAverage(_)
+                                | MaterialDefinition::WindowGlazingRefractionExtinction(_)
+                        )
+                    });
+                if !supported_glazing {
+                    self.error(
+                        "InvalidThermochromicGlazingReferenceType",
+                        OBJECT_TYPE,
+                        Some(&entry_name),
+                        Some(GLAZING_FIELD),
+                        format!(
+                            "{OBJECT_TYPE}/{entry_name} field {GLAZING_FIELD} references material '{glazing_name}', but a thermochromic state must reference a typed WindowMaterial:Glazing or WindowMaterial:Glazing:RefractionExtinctionMethod"
+                        ),
+                    );
+                    states_valid = false;
+                    continue;
+                }
+
+                states.push(WindowGlazingThermochromicState {
+                    optical_data_temperature_c,
+                    glazing_material,
+                });
+            }
+            if !states_valid {
+                continue;
+            }
+
+            let Some(first_state) = self.checked_id(
+                OBJECT_TYPE,
+                &name,
+                model.window_glazing_thermochromic_state_arena.len(),
+            ) else {
+                continue;
+            };
+            let Some(state_count) = self.checked_id(OBJECT_TYPE, &name, states.len()) else {
+                continue;
+            };
+            model
+                .window_glazing_thermochromic_state_arena
+                .extend(states);
+            model.materials[id.0 as usize].definition =
+                MaterialDefinition::WindowGlazingThermochromicGroup(
+                    WindowGlazingThermochromicGroupMaterial {
+                        first_state,
+                        state_count,
+                    },
+                );
+        }
+    }
+
     fn reserve_material_identity(
         &mut self,
         model: &mut TypedModel,
@@ -4840,6 +5004,30 @@ impl<'a> Compiler<'a> {
         construction_name: &str,
         layers: &[MaterialId],
     ) -> Option<ConstructionKind> {
+        if let Some((layer_index, material)) =
+            layers
+                .iter()
+                .enumerate()
+                .find_map(|(layer_index, material_id)| {
+                    let material = model.materials.get(material_id.0 as usize)?;
+                    (material.family() == ep_model::MaterialFamily::ThermochromicGroup)
+                        .then_some((layer_index, material))
+                })
+        {
+            let layer_field = construction_layer_field(layer_index);
+            self.error(
+                "UnsupportedThermochromicGlazingGroupConstruction",
+                "Construction",
+                Some(construction_name),
+                Some(&layer_field),
+                format!(
+                    "Construction/{construction_name} cannot yet consume thermochromic glazing group {}; EnergyPlus CreateTCConstructions expansion and timestep state selection remain deferred",
+                    material.name.0
+                ),
+            );
+            return None;
+        }
+
         if let Some((layer_index, material)) =
             layers
                 .iter()
@@ -12892,6 +13080,7 @@ mod tests {
     mod window_material_gas_mixture;
     mod window_material_glazing;
     mod window_material_glazing_equivalent_layer;
+    mod window_material_glazing_group_thermochromic;
     mod window_material_glazing_refraction_extinction;
     mod window_material_screen;
     mod window_material_screen_equivalent_layer;

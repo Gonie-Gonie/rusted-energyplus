@@ -14,7 +14,8 @@ use crate::{
     ScheduleDayInterval, ScheduleDayList, ScheduleFile, ScheduleFileShading, ScheduleId,
     ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear,
     SetpointManagerComponent, SiteLocation, Surface, SurfaceConvectionAlgorithms, SurfaceId,
-    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version, WeekScheduleId, Zone,
+    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version, WeekScheduleId,
+    WindowGlazingThermochromicGroupMaterial, WindowGlazingThermochromicState, Zone,
     ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId, ZoneEquipmentObjectType,
     ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatId,
 };
@@ -48,6 +49,8 @@ pub struct TypedModel {
     pub materials: Vec<Material>,
     /// Material names.
     pub material_names: NameMap<MaterialId>,
+    /// Ordered thermochromic glazing states referenced by range descriptors on materials.
+    pub window_glazing_thermochromic_state_arena: Vec<WindowGlazingThermochromicState>,
     /// Constructions.
     pub constructions: Vec<Construction>,
     /// Construction names.
@@ -208,6 +211,7 @@ impl Default for TypedModel {
             site: None,
             materials: Vec::new(),
             material_names: NameMap::default(),
+            window_glazing_thermochromic_state_arena: Vec::new(),
             constructions: Vec::new(),
             construction_names: NameMap::default(),
             schedule_type_limits: Vec::new(),
@@ -284,6 +288,21 @@ impl Default for TypedModel {
 }
 
 impl TypedModel {
+    /// Returns the ordered state slice described by a thermochromic glazing group.
+    ///
+    /// Returns `None` when the descriptor overflows or lies outside the state arena.
+    #[must_use]
+    pub fn window_glazing_thermochromic_states(
+        &self,
+        group: WindowGlazingThermochromicGroupMaterial,
+    ) -> Option<&[WindowGlazingThermochromicState]> {
+        let first_state = usize::try_from(group.first_state).ok()?;
+        let state_count = usize::try_from(group.state_count).ok()?;
+        let end = first_state.checked_add(state_count)?;
+        self.window_glazing_thermochromic_state_arena
+            .get(first_state..end)
+    }
+
     /// Number of typed object instances in the current subset.
     #[must_use]
     pub fn object_count(&self) -> usize {

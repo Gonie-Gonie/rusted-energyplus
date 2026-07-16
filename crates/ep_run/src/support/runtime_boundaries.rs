@@ -413,6 +413,17 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|material| material.kind() == MaterialKind::RoofVegetation)
             .count(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "WindowMaterial:GlazingGroup:Thermochromic",
+        typed_model
+            .materials
+            .iter()
+            .filter(|material| material.kind() == MaterialKind::WindowGlazingThermochromicGroup)
+            .count(),
+    );
 
     push_typed_unsupported_object(
         registry,

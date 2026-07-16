@@ -4,6 +4,7 @@ use ep_compiler::compile_raw_model;
 use ep_raw_model::parse_epjson_str;
 
 mod material_roof_vegetation;
+mod window_glazing_thermochromic_group;
 mod window_material_blind_equivalent_layer;
 
 #[test]
