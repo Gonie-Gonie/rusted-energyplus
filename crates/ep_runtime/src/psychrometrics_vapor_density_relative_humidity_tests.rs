@@ -1,7 +1,8 @@
 use super::{
     KELVIN_OFFSET, energyplus_psy_psat_fn_temp_default_numerical_projection,
-    energyplus_psy_psat_fn_temp_raw, energyplus_psy_rh_fn_tdb_rhov, energyplus_psy_rhov_fn_tdb_rh,
-    energyplus_psychrometric_psat_cache_temperature_c,
+    energyplus_psy_psat_fn_temp_raw, energyplus_psy_rh_fn_tdb_rhov,
+    energyplus_psy_rh_fn_tdb_rhov_lbnd0c, energyplus_psy_rhov_fn_tdb_rh,
+    energyplus_psy_rhov_fn_tdb_rh_lbnd0c, energyplus_psychrometric_psat_cache_temperature_c,
 };
 
 fn assert_bits(actual: f64, expected: f64) {
@@ -26,15 +27,17 @@ fn vapor_density_for_raw_relative_humidity(dry_bulb_c: f64, relative_humidity: f
 
 #[test]
 fn vapor_density_and_relative_humidity_match_pinned_ems_vectors() {
-    assert_close(
-        energyplus_psy_rhov_fn_tdb_rh(30.0, 0.5),
-        0.015_174_171,
-        1.0e-8,
+    let vapor_density = energyplus_psy_rhov_fn_tdb_rh(30.0, 0.5);
+    let relative_humidity = energyplus_psy_rh_fn_tdb_rhov(30.0, 0.01);
+    assert_close(vapor_density, 0.015_174_171, 1.0e-8);
+    assert_close(relative_humidity, 0.329_507_280_8, 1.0e-8);
+    assert_ne!(
+        vapor_density.to_bits(),
+        energyplus_psy_rhov_fn_tdb_rh_lbnd0c(30.0, 0.5).to_bits()
     );
-    assert_close(
-        energyplus_psy_rh_fn_tdb_rhov(30.0, 0.01),
-        0.329_507_280_8,
-        1.0e-8,
+    assert_ne!(
+        relative_humidity.to_bits(),
+        energyplus_psy_rh_fn_tdb_rhov_lbnd0c(30.0, 0.01).to_bits()
     );
 }
 
@@ -96,13 +99,14 @@ fn vapor_density_preserves_source_ieee_arithmetic() {
         f64::INFINITY,
     );
 
-    for relative_humidity in [-0.25, 1.5] {
+    for relative_humidity in [f64::NEG_INFINITY, -0.25, 1.5, f64::INFINITY] {
         assert_bits(
             energyplus_psy_rhov_fn_tdb_rh(30.0, relative_humidity),
             (energyplus_psy_psat_fn_temp_default_numerical_projection(30.0) * relative_humidity)
                 / (461.52 * (30.0 + KELVIN_OFFSET)),
         );
     }
+    assert!(energyplus_psy_rhov_fn_tdb_rh(30.0, f64::NAN).is_nan());
 }
 
 #[test]
@@ -133,6 +137,7 @@ fn relative_humidity_preserves_in_range_values_and_corrects_only_outside() {
 #[test]
 fn relative_humidity_preserves_positive_branch_ieee_results() {
     assert!(energyplus_psy_rh_fn_tdb_rhov(f64::NAN, 0.01).is_nan());
+    assert_bits(energyplus_psy_rh_fn_tdb_rhov(30.0, f64::INFINITY), 1.0);
     assert_bits(energyplus_psy_rh_fn_tdb_rhov(f64::INFINITY, 0.01), 1.0);
     assert_bits(energyplus_psy_rh_fn_tdb_rhov(f64::NEG_INFINITY, 0.01), 0.01);
     assert_bits(energyplus_psy_rh_fn_tdb_rhov(-KELVIN_OFFSET, 0.01), 0.0);
