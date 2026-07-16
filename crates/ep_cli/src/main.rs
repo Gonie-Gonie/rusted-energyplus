@@ -11,6 +11,7 @@ mod ideal_loads;
 mod internal_gains;
 mod static_model;
 mod time_weather_schedule;
+mod window_material_blind;
 mod window_material_drape_equivalent_layer;
 mod window_material_screen;
 mod window_material_screen_equivalent_layer;
@@ -125,6 +126,7 @@ use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 use time_weather_schedule::generate_time_weather_schedule_report;
+use window_material_blind::run_compare_window_material_blind;
 use window_material_drape_equivalent_layer::run_compare_window_material_drape_equivalent_layer;
 use window_material_screen::run_compare_window_material_screen;
 use window_material_screen_equivalent_layer::run_compare_window_material_screen_equivalent_layer;
@@ -350,6 +352,9 @@ fn print_help() {
     println!("  compare window-material-gas <input.epJSON> <eplusout.eio>");
     println!("  compare window-material-gap-equivalent-layer <input.epJSON> <eplusout.eio>");
     println!("  compare window-material-gas-mixture <input.epJSON> <eplusout.eio>");
+    println!(
+        "  compare window-material-blind <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
+    );
     println!("  compare window-material-shade <input.epJSON> <eplusout.eio>");
     println!(
         "  compare window-material-shade-equivalent-layer <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
@@ -3388,6 +3393,7 @@ fn run_compare_command(args: &[String]) -> i32 {
             run_compare_window_material_gap_equivalent_layer(&args[1..])
         }
         Some("window-material-gas-mixture") => run_compare_window_material_gas_mixture(&args[1..]),
+        Some("window-material-blind") => run_compare_window_material_blind(&args[1..]),
         Some("window-material-shade") => run_compare_window_material_shade(&args[1..]),
         Some("window-material-shade-equivalent-layer") => {
             run_compare_window_material_shade_equivalent_layer(&args[1..])
@@ -3426,6 +3432,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             );
             eprintln!(
                 "usage: eplus-rs compare window-material-gas-mixture <input.epJSON> <eplusout.eio>"
+            );
+            eprintln!(
+                "usage: eplus-rs compare window-material-blind <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
             );
             eprintln!(
                 "usage: eplus-rs compare window-material-shade <input.epJSON> <eplusout.eio>"
@@ -3474,6 +3483,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             );
             eprintln!(
                 "usage: eplus-rs compare window-material-gas-mixture <input.epJSON> <eplusout.eio>"
+            );
+            eprintln!(
+                "usage: eplus-rs compare window-material-blind <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
             );
             eprintln!(
                 "usage: eplus-rs compare window-material-shade <input.epJSON> <eplusout.eio>"

@@ -2,6 +2,7 @@
 
 mod material_details;
 mod types;
+mod window_material_blind;
 mod window_material_drape_equivalent_layer;
 mod window_material_screen;
 mod window_material_screen_equivalent_layer;
@@ -10,6 +11,7 @@ mod window_material_shade_equivalent_layer;
 
 pub use material_details::*;
 pub use types::*;
+pub use window_material_blind::*;
 pub use window_material_drape_equivalent_layer::*;
 pub use window_material_screen::*;
 pub use window_material_screen_equivalent_layer::*;
@@ -110,6 +112,14 @@ pub fn load_eio_window_material_drape_equivalent_layer(
 ) -> Result<Vec<EioWindowMaterialDrapeEquivalentLayer>, EioError> {
     let contents = std::fs::read_to_string(path)?;
     parse_eio_window_material_drape_equivalent_layer(&contents)
+}
+
+/// Loads specialized ordinary window-blind rows from an EnergyPlus EIO file.
+pub fn load_eio_window_material_blind(
+    path: impl AsRef<Path>,
+) -> Result<Vec<EioWindowMaterialBlind>, EioError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_eio_window_material_blind(&contents)
 }
 
 /// Loads specialized ordinary window-screen rows from an EnergyPlus EIO file.

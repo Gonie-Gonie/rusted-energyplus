@@ -356,6 +356,31 @@ pub struct EioWindowMaterialDrapeEquivalentLayer {
     pub pleated_length_m: f64,
 }
 
+/// Ordinary window-blind values read from an EnergyPlus `eplusout.eio` row.
+///
+/// EnergyPlus emits one specialized row for every successfully reported
+/// ordinary-window construction-layer occurrence. Repeated material names
+/// therefore remain distinct entries in source emission order.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioWindowMaterialBlind {
+    /// EnergyPlus-normalized material name.
+    pub material_name: String,
+    /// Blind slat width in meters.
+    pub slat_width_m: f64,
+    /// Blind slat separation in meters.
+    pub slat_separation_m: f64,
+    /// Blind slat thickness in meters.
+    pub slat_thickness_m: f64,
+    /// Blind slat angle in degrees.
+    pub slat_angle_deg: f64,
+    /// Normal-incidence slat beam solar transmittance.
+    pub slat_beam_solar_transmittance: f64,
+    /// Front-side normal-incidence slat beam solar reflectance.
+    pub slat_beam_solar_front_reflectance: f64,
+    /// Distance from the blind to the adjacent glazing in meters.
+    pub blind_to_glass_distance_m: f64,
+}
+
 /// Ordinary window-screen values read from an EnergyPlus `eplusout.eio` row.
 ///
 /// EnergyPlus emits one specialized row for every ordinary-window
@@ -519,6 +544,8 @@ pub enum EioError {
     MissingWindowMaterialShadeEquivalentLayer,
     /// No `WindowMaterial:Drape:EquivalentLayer` rows were present.
     MissingWindowMaterialDrapeEquivalentLayer,
+    /// The exact `WindowMaterial:Blind` header was not present.
+    MissingWindowMaterialBlindHeader,
     /// The exact `WindowMaterial:Screen` header was not present.
     MissingWindowMaterialScreenHeader,
     /// The exact `WindowMaterial:Screen:EquivalentLayer` header was not
@@ -663,6 +690,31 @@ pub enum EioError {
         /// Parse failure reason.
         reason: String,
     },
+    /// A candidate `WindowMaterial:Blind` header did not match the source literal.
+    InvalidWindowMaterialBlindHeader {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
+    /// More than one exact `WindowMaterial:Blind` header was present.
+    DuplicateWindowMaterialBlindHeader {
+        /// One-based line number of the repeated header.
+        line: usize,
+        /// Raw repeated header text.
+        text: String,
+    },
+    /// A `WindowMaterial:Blind` row could not be parsed.
+    InvalidWindowMaterialBlind {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
     /// A candidate `WindowMaterial:Screen` header did not match the source literal.
     InvalidWindowMaterialScreenHeader {
         /// One-based line number.
@@ -779,6 +831,9 @@ impl Display for EioError {
                     "EIO WindowMaterial:Drape:EquivalentLayer not found"
                 )
             }
+            Self::MissingWindowMaterialBlindHeader => {
+                write!(formatter, "exact EIO WindowMaterial:Blind header not found")
+            }
             Self::MissingWindowMaterialScreenHeader => {
                 write!(
                     formatter,
@@ -863,6 +918,18 @@ impl Display for EioError {
                 formatter,
                 "invalid EIO WindowMaterial:Drape:EquivalentLayer at line {line}: {reason}: {text}"
             ),
+            Self::InvalidWindowMaterialBlindHeader { line, text, reason } => write!(
+                formatter,
+                "invalid EIO WindowMaterial:Blind header at line {line}: {reason}: {text}"
+            ),
+            Self::DuplicateWindowMaterialBlindHeader { line, text } => write!(
+                formatter,
+                "duplicate EIO WindowMaterial:Blind header at line {line}: {text}"
+            ),
+            Self::InvalidWindowMaterialBlind { line, text, reason } => write!(
+                formatter,
+                "invalid EIO WindowMaterial:Blind at line {line}: {reason}: {text}"
+            ),
             Self::InvalidWindowMaterialScreenHeader { line, text, reason } => write!(
                 formatter,
                 "invalid EIO WindowMaterial:Screen header at line {line}: {reason}: {text}"
@@ -920,6 +987,7 @@ impl std::error::Error for EioError {
             | Self::MissingWindowMaterialShade
             | Self::MissingWindowMaterialShadeEquivalentLayer
             | Self::MissingWindowMaterialDrapeEquivalentLayer
+            | Self::MissingWindowMaterialBlindHeader
             | Self::MissingWindowMaterialScreenHeader
             | Self::MissingWindowMaterialScreenEquivalentLayerHeader
             | Self::MissingWindowMaterialGapEquivalentLayer
@@ -937,6 +1005,9 @@ impl std::error::Error for EioError {
             | Self::InvalidWindowMaterialShade { .. }
             | Self::InvalidWindowMaterialShadeEquivalentLayer { .. }
             | Self::InvalidWindowMaterialDrapeEquivalentLayer { .. }
+            | Self::InvalidWindowMaterialBlindHeader { .. }
+            | Self::DuplicateWindowMaterialBlindHeader { .. }
+            | Self::InvalidWindowMaterialBlind { .. }
             | Self::InvalidWindowMaterialScreenHeader { .. }
             | Self::DuplicateWindowMaterialScreenHeader { .. }
             | Self::InvalidWindowMaterialScreen { .. }

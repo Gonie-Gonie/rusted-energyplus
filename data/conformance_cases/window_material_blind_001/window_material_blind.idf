@@ -1,0 +1,350 @@
+Version,26.1;
+
+SimulationControl,No,No,No,No,Yes,No;
+
+Building,Window Material Blind Compare,0.0,Suburbs,0.04,0.4,FullExterior,25,6;
+
+Timestep,4;
+
+HeatBalanceAlgorithm,ConductionTransferFunction;
+
+SurfaceConvectionAlgorithm:Inside,TARP;
+
+SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+Site:Location,Golden,39.74,-105.18,-7.0,1829.0;
+
+Site:GroundTemperature:BuildingSurface,18,18,18,18,18,18,18,18,18,18,18,18;
+
+RunPeriod,Run Period 1,1,1,2013,1,1,2013,Tuesday,Yes,Yes,No,Yes,Yes;
+
+GlobalGeometryRules,UpperLeftCorner,CounterClockWise,World;
+
+ScheduleTypeLimits,
+  On Off,
+  0,
+  1,
+  Discrete;
+
+Schedule:Constant,
+  Blind Off Schedule,
+  On Off,
+  0;
+
+Material,
+  DISTINCTIVE BLIND OPAQUE HOST MATERIAL,
+  Rough,
+  0.113,
+  0.347,
+  913.0,
+  836.0,
+  0.87,
+  0.63,
+  0.58;
+
+WindowMaterial:Glazing,
+  DISTINCTIVE BLIND TEST GLASS,
+  SpectralAverage,
+  ,
+  0.006,
+  0.775,
+  0.071,
+  0.071,
+  0.881,
+  0.080,
+  0.080,
+  0.0,
+  0.84,
+  0.84,
+  0.9;
+
+! Definition order intentionally differs from construction and name order.
+WindowMaterial:Blind,
+  Z HIGH PRECISION REUSED BLIND,
+  Vertical,
+  0.0245678,
+  0.0187654,
+  0.000654321,
+  63.4567,
+  17.2345,
+  0.123456,
+  0.234567,
+  0.345678,
+  0.123456,
+  0.234567,
+  0.345678,
+  0.112233,
+  0.223344,
+  0.334455,
+  0.112233,
+  0.223344,
+  0.334455,
+  0.0234567,
+  0.765432,
+  0.654321,
+  0.0345678,
+  0.1111,
+  0.2222,
+  0.3333,
+  0.4444,
+  10,
+  170;
+
+! Valid definition deliberately absent from every construction.
+WindowMaterial:Blind,
+  M UNUSED BLIND,
+  Horizontal,
+  0.020,
+  0.020,
+  ,
+  ,
+  ,
+  ,
+  0.1,
+  0.1,
+  ,
+  0.1,
+  0.1,
+  0.0;
+
+! Slat thickness, angle, conductivity, distance, openings, and angle limits default.
+WindowMaterial:Blind,
+  A DEFAULTED USED BLIND,
+  Horizontal,
+  0.025,
+  0.01875,
+  ,
+  ,
+  ,
+  ,
+  0.2,
+  0.2,
+  ,
+  0.2,
+  0.2,
+  0.0;
+
+Construction,
+  A BASE BLIND TEST WINDOW CONSTRUCTION,
+  DISTINCTIVE BLIND TEST GLASS;
+
+Construction,
+  B DEFAULTED EXTERIOR BLIND WINDOW CONSTRUCTION,
+  A DEFAULTED USED BLIND,
+  DISTINCTIVE BLIND TEST GLASS;
+
+Construction,
+  C HIGH PRECISION INTERIOR BLIND WINDOW CONSTRUCTION,
+  DISTINCTIVE BLIND TEST GLASS,
+  Z HIGH PRECISION REUSED BLIND;
+
+Construction,
+  D HIGH PRECISION UNUSED EXTERIOR BLIND CONSTRUCTION,
+  Z HIGH PRECISION REUSED BLIND,
+  DISTINCTIVE BLIND TEST GLASS;
+
+Construction,
+  E BLIND OPAQUE HOST CONSTRUCTION,
+  DISTINCTIVE BLIND OPAQUE HOST MATERIAL;
+
+! Keeps D nominally referenced without assigning it to a surface or
+! multiplying its construction-layer material occurrence.
+EnergyManagementSystem:ConstructionIndexVariable,
+  UnusedHighPrecisionBlindConstructionIndex,
+  D HIGH PRECISION UNUSED EXTERIOR BLIND CONSTRUCTION;
+
+Zone,BLIND TEST ZONE,0,0,0,0,1,1,3,48,16;
+
+BuildingSurface:Detailed,
+  BLIND TEST FLOOR,
+  Floor,
+  E BLIND OPAQUE HOST CONSTRUCTION,
+  BLIND TEST ZONE,
+  ,
+  Ground,
+  ,
+  NoSun,
+  NoWind,
+  1.0,
+  4,
+  4,4,0,
+  4,0,0,
+  0,0,0,
+  0,4,0;
+
+BuildingSurface:Detailed,
+  BLIND TEST ROOF,
+  Roof,
+  E BLIND OPAQUE HOST CONSTRUCTION,
+  BLIND TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.0,
+  4,
+  0,4,3,
+  0,0,3,
+  4,0,3,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  BLIND TEST WEST WALL,
+  Wall,
+  E BLIND OPAQUE HOST CONSTRUCTION,
+  BLIND TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,4,3,
+  0,4,0,
+  0,0,0,
+  0,0,3;
+
+BuildingSurface:Detailed,
+  BLIND TEST EAST WALL,
+  Wall,
+  E BLIND OPAQUE HOST CONSTRUCTION,
+  BLIND TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,0,3,
+  4,0,0,
+  4,4,0,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  DISTINCTIVE BLIND WINDOW HOST WALL,
+  Wall,
+  E BLIND OPAQUE HOST CONSTRUCTION,
+  BLIND TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,0,3,
+  0,0,0,
+  4,0,0,
+  4,0,3;
+
+BuildingSurface:Detailed,
+  BLIND TEST NORTH WALL,
+  Wall,
+  E BLIND OPAQUE HOST CONSTRUCTION,
+  BLIND TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,4,3,
+  4,4,0,
+  0,4,0,
+  0,4,3;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE DEFAULTED BLIND TEST WINDOW,
+  Window,
+  A BASE BLIND TEST WINDOW CONSTRUCTION,
+  DISTINCTIVE BLIND WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  0.10,0,2.80,
+  0.10,0,1.80,
+  0.90,0,1.80,
+  0.90,0,2.80;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE FIRST HIGH PRECISION BLIND TEST WINDOW,
+  Window,
+  A BASE BLIND TEST WINDOW CONSTRUCTION,
+  DISTINCTIVE BLIND WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  1.20,0,2.80,
+  1.20,0,1.80,
+  2.00,0,1.80,
+  2.00,0,2.80;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE SECOND HIGH PRECISION BLIND TEST WINDOW,
+  Window,
+  A BASE BLIND TEST WINDOW CONSTRUCTION,
+  DISTINCTIVE BLIND WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  2.30,0,2.80,
+  2.30,0,1.80,
+  3.10,0,1.80,
+  3.10,0,2.80;
+
+WindowShadingControl,
+  DEFAULTED BLIND CONTROL,
+  BLIND TEST ZONE,
+  1,
+  ExteriorBlind,
+  B DEFAULTED EXTERIOR BLIND WINDOW CONSTRUCTION,
+  OnIfScheduleAllows,
+  Blind Off Schedule,
+  ,
+  Yes,
+  No,
+  ,
+  ,
+  ,
+  ,
+  ,
+  Sequential,
+  DISTINCTIVE DEFAULTED BLIND TEST WINDOW;
+
+WindowShadingControl,
+  HIGH PRECISION BLIND CONTROL,
+  BLIND TEST ZONE,
+  2,
+  InteriorBlind,
+  C HIGH PRECISION INTERIOR BLIND WINDOW CONSTRUCTION,
+  OnIfScheduleAllows,
+  Blind Off Schedule,
+  ,
+  Yes,
+  No,
+  ,
+  ,
+  ,
+  ,
+  ,
+  Sequential,
+  DISTINCTIVE FIRST HIGH PRECISION BLIND TEST WINDOW,
+  DISTINCTIVE SECOND HIGH PRECISION BLIND TEST WINDOW;
+
+! A reporting element is required to keep the EnergyPlus run warning-free.
+! It is not part of the diagnostic manifest or comparison claim.
+Output:Variable,*,Zone Mean Air Temperature,Hourly;
+
+Output:Constructions,Constructions,Materials;
+
+Output:Surfaces:List,Details;

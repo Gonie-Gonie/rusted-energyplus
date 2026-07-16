@@ -24,8 +24,9 @@ Primary reference sources:
   `GetMaterialData`, `GetVariableAbsorptanceInput`, and
   `CalcScreenTransmittance`
 - `src/EnergyPlus/Material.hh` for the base-material class hierarchy
-- `src/EnergyPlus/WindowManager.cc::CalcWindowScreenProperties` and the
-  ordinary-window construction/material EIO writer
+- `src/EnergyPlus/WindowManager.cc::CalcWindowScreenProperties`,
+  `ReportGlass`, and `CalcNominalWindowCond` for bounded screen initialization,
+  ordinary-window construction/material EIO, and Blind report-skip behavior
 - `src/EnergyPlus/PhaseChangeModeling/HysteresisModel.cc::GetHysteresisData`
 - `src/EnergyPlus/HeatBalFiniteDiffManager.cc::GetCondFDInput`
 - `src/EnergyPlus/MoistureBalanceEMPDManager.cc::GetMoistureBalanceEMPDInput`
@@ -936,12 +937,53 @@ the blind slat width. The unsafe exterior/interior Blind-Gap-Glass end holes
 fail closed, as do every other placement outside the bounded patterns.
 
 Arbitrary-run assessment counts and blocks every blind definition, including
-definitions unused by any construction. No EIO case or proof variable is
-registered at this typed-only checkpoint. `CalcBlindProperties`, beam-beam
-transmittance and other blind optics, daylighting, shading-control/surface
-behavior, variable slat-angle runtime, window thermal execution,
-`Construction:WindowEquivalentLayer`, `WindowMaterial:Blind:EquivalentLayer`,
-exact diagnostic order/text/multiplicity, and conformance remain deferred.
+definitions unused by any construction.
+
+`window_material_blind_001` adds a nonblocking diagnostic EnergyPlus 26.1
+static EIO parser/comparator gate. The generic `Material Details` lane
+requires exactly one normalized-name row for each typed definition, including
+construction-unused M, and the smoke fixture locks source declaration order
+Z,M,A. Every generic row is `Rough` and has zero resistance, thickness,
+conductivity, density, specific heat, and thermal, solar, and visible
+absorptance. `Output:Constructions, Materials` activates this table, while a
+Constructions-only run emits no generic rows.
+
+The specialized header is exact:
+`! <WindowMaterial:Blind>,Material Name,Slat Width {m},Slat Separation {m},Slat Thickness {m},Slat Angle {deg},Slat Beam Solar Transmittance,Slat Beam Solar Front Reflectance,Blind To Glass Distance {m}`.
+It and every specialized row each have exactly nine comma-separated tokens.
+Rows preserve construction-layer
+occurrences rather than definition or surface multiplicity: the fixture's
+exact sequence is A,Z,Z and excludes M. The seven numeric fields are raw
+input N1 slat width, N2 separation, and N3 thickness serialized with source
+`{:.4R}`, then N4 angle, N6 beam solar transmittance, N7 front beam solar
+reflectance, and N21 glass distance with source `{:.3R}`. `slatTAR` remains
+the raw input record used by `ReportGlass`; `CalcBlindProperties` writes the
+separate angle-indexed `TARs` tables. The Rust comparator therefore does not
+reproduce or claim computed blind optics.
+
+Within the bounded Rust scope, `Output:Constructions, Constructions`, at least
+one Blind definition, and at least one typed ordinary fenestration
+Construction require the specialized header; a header with zero data rows is
+valid. The primary lane emits generic and specialized evidence, Materials-only
+emits generic Z,M,A with no specialized header, and Constructions-only emits
+specialized A,Z,Z without generic rows. All three EnergyPlus 26.1 oracle runs
+complete with zero warnings and zero severe errors. Construction C is shared
+by two surfaces without multiplying its Z row. Surface-unused construction D
+still emits the second Z; its fixture-only
+`EnergyManagementSystem:ConstructionIndexVariable` reference merely suppresses
+an oracle unused-construction warning.
+
+The comparator predicts exterior/interior Blind rows only when an exact bare
+companion glazing stack exists. It fails closed for between-glass Blind and
+missing-bare report behavior because `CalcNominalWindowCond` returns an error
+flag and `ReportGlass` skips those construction rows. Exact bare/blinded
+`WindowConstruction`, detailed-window, `WindowShadingControl`, and EMS rows
+are fixture-integrity locks only. Rust EIO serialization,
+`CalcBlindProperties`, beam-beam and all other blind optics, ratings,
+daylighting, control/surface/EMS behavior, variable-angle and window thermal
+runtime, between-glass or missing-bare reporting, broad declaration or
+diagnostic ordering, `Construction:WindowEquivalentLayer`,
+`WindowMaterial:Blind:EquivalentLayer`, and conformance remain unclaimed.
 
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. The two ordinary glazing variants, `WindowMaterial:Gas`,
@@ -1173,16 +1215,19 @@ the deferred families.
 | `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, and ordinary Blind objects plus only the regular Glazing `SpectralAverage` branch are implemented |
 | `CalcScreenTransmittance` | `source_mapped` | the Screen fixture comparator reproduces only its normal-incidence A/Z paths and the values required by the bounded static EIO row |
 | `CalcWindowScreenProperties` | `source_mapped` | the Screen fixture comparator reproduces only its reverse-order 18 by 18 initialization integration and fixture activation boundary |
+| `ReportGlass` | `source_mapped` | owns the bounded Blind specialized header, raw seven-field row serialization, construction-occurrence order, and post-`CalcNominalWindowCond` skip behavior |
+| `CalcNominalWindowCond` | `source_mapped` | owns the exact-bare-companion search and the missing-bare/between-glass error flags that make `ReportGlass` omit those construction rows; Rust fail-closes rather than reproducing this calculation |
 | `GetVariableAbsorptanceInput` | `source_mapped` | owns the post-base variable-absorptance overlay |
 | `GetHysteresisData` | `source_mapped` | owns the post-base hysteresis overlay |
 | `GetCondFDInput` | `source_mapped` | owns PhaseChange then VariableThermalConductivity |
 | `GetMoistureBalanceEMPDInput` | `source_mapped` | owns the EMPD settings overlay |
 | `GetHeatBalHAMTInput` | `source_mapped` | owns the six ordered HAMT objects |
 
-All nine routine records have `required_for_full_domain = false`. The
+All eleven routine records have `required_for_full_domain = false`. The
 bounded implementation slice does not promote the whole
 `GetMaterialData`, `CalcScreenTransmittance`, or
-`CalcWindowScreenProperties` routines beyond `source_mapped`.
+`CalcWindowScreenProperties`, `ReportGlass`, or `CalcNominalWindowCond`
+routines beyond `source_mapped`.
 
 ## Evidence And Promotion Boundary
 

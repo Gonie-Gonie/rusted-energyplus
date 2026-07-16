@@ -1,0 +1,86 @@
+id = "window_material_blind_001"
+title = "Ordinary window blind static definition and occurrence evidence"
+milestone = "v0.8-heat-balance"
+purpose = "Compare the bounded Rust WindowMaterial:Blind typed slice with EnergyPlus generic definition and ordinary-window construction occurrence EIO evidence."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The fixture defines three WindowMaterial:Blind objects in source order Z, M, A: one high-precision blind reused by an interior and an exterior construction, one valid blind unused by every construction, and one defaulted blind used by one exterior construction.",
+  "The generic Material Details table echoes all three definitions exactly once in Z, M, A order, including unused M. It locks Rough and the generic table's fixed zero resistance, thickness, conductivity, density, specific heat, and thermal, solar, and visible absorptance fields.",
+  "The specialized WindowMaterial:Blind table emits three construction-layer occurrences in construction order A, Z, Z. The unused M definition is absent, and Z occurs once for each construction rather than once per surface.",
+  "The exterior and interior blinded constructions each have the exact layer list of A BASE BLIND TEST WINDOW CONSTRUCTION plus one blind at the corresponding edge. Between-glass blinds and unmatched bare stacks are outside this bounded fixture because EnergyPlus can skip their material rows during nominal-window setup.",
+  "Two FenestrationSurface:Detailed windows share the interior Z shading construction through one WindowShadingControl. The exterior Z construction has no surface but still emits one specialized occurrence because reporting walks window constructions; its fixture-only EnergyManagementSystem:ConstructionIndexVariable reference suppresses EnergyPlus's nominally-unused-construction warning.",
+  "A constant-zero schedule keeps the exterior and interior blind controls inactive during simulation. Controls, surfaces, and EMS are fixture locks only and are not comparison claims.",
+  "The primary oracle run requests Output:Constructions selections Constructions and Materials and emits both generic and specialized tables. A Materials-only run emits the generic Z, M, A rows but no WindowConstruction or specialized Blind header/rows. A Constructions-only run emits the WindowConstruction rows and specialized A, Z, Z rows but no generic Material Details header/rows.",
+  "The exact specialized header and each exact data row contain nine comma-separated tokens. Slat width, separation, and thickness use source {:.4R}; slat angle, beam solar transmittance, beam solar front reflectance, and blind-to-glass distance use source {:.3R}.",
+  "Definition order intentionally differs from occurrence and normalized-name order. Construction declarations remain in canonical name order because ConvertInputFormat erases broad IDF declaration order; no broad or arbitrary declaration-order parity is claimed.",
+  "The smoke gate requires clean EnergyPlus 26.1.0 primary, Materials-only, and Constructions-only runs; exact activation, headers, rows, multiplicity, and ordering; converted epJSON artifacts; and the bounded Rust command compare window-material-blind in explicit exact mode.",
+  "This is non-blocking diagnostic-only static material evidence and makes no WindowMaterial:Blind conformance, blind TAR calculation, angle interpolation, slat-angle control, window optics, thermal, daylighting, shading-control, surface, EMS, between-glass, construction-rating, runtime, or declaration-order claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/window_material_blind_001/window_material_blind.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface", "construction"]
+has_zone = true
+has_surface = true
+has_fenestration = true
+has_air_loop = false
+has_plant_loop = false
+has_ems = true
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/window_material_blind_001/window_material_blind.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+epjson = ".runtime/compare-window-material-blind/26.1.0/window-material-blind.epJSON"
+
+[[outputs]]
+key = "*"
+variable = "WindowMaterial:Blind Generic Definition Details"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "WindowMaterial:Blind Layer Occurrences"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "WindowConstruction Layer Summary"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "DISTINCTIVE FIRST HIGH PRECISION BLIND TEST WINDOW"
+variable = "HeatTransfer Surface Static Inputs"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/window_material_blind_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-window-material-blind-smoke"
+blocking = false
