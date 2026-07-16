@@ -19,6 +19,8 @@ pub enum MaterialKind {
     WindowGlazingEquivalentLayer,
     /// WindowMaterial:Gas object.
     WindowGas,
+    /// WindowMaterial:Gap:EquivalentLayer object.
+    WindowGapEquivalentLayer,
 }
 
 /// High-level material family used to keep construction consumers separate.
@@ -323,7 +325,7 @@ pub struct WindowGlazingEquivalentLayerMaterial {
     pub thermal_resistance_m2_k_per_w: f64,
 }
 
-/// Gas species supported by WindowMaterial:Gas.
+/// Gas species shared by ordinary and equivalent-layer window gaps.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum WindowGasType {
     /// User-supplied thermophysical coefficients.
@@ -348,6 +350,20 @@ impl WindowGasType {
             "Argon" => Some(Self::Argon),
             "Krypton" => Some(Self::Krypton),
             "Xenon" => Some(Self::Xenon),
+            _ => None,
+        }
+    }
+
+    /// Parses the uppercase gas token used by
+    /// WindowMaterial:Gap:EquivalentLayer in EnergyPlus 26.1 epJSON.
+    #[must_use]
+    pub fn from_equivalent_layer_energyplus_name(value: &str) -> Option<Self> {
+        match value {
+            "CUSTOM" => Some(Self::Custom),
+            "AIR" => Some(Self::Air),
+            "ARGON" => Some(Self::Argon),
+            "KRYPTON" => Some(Self::Krypton),
+            "XENON" => Some(Self::Xenon),
             _ => None,
         }
     }
@@ -509,6 +525,58 @@ impl WindowGasMaterial {
     }
 }
 
+/// Venting mode for an equivalent-layer window gap.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum WindowGapVentType {
+    /// Gas-tight gap with no indoor or outdoor venting.
+    Sealed,
+    /// Gap vented to the indoor environment.
+    VentedIndoor,
+    /// Gap vented to the outdoor environment.
+    VentedOutdoor,
+}
+
+impl WindowGapVentType {
+    /// Parses the exact EnergyPlus epJSON vent-type token.
+    #[must_use]
+    pub fn from_energyplus_name(value: &str) -> Option<Self> {
+        match value {
+            "Sealed" => Some(Self::Sealed),
+            "VentedIndoor" => Some(Self::VentedIndoor),
+            "VentedOutdoor" => Some(Self::VentedOutdoor),
+            _ => None,
+        }
+    }
+}
+
+/// Fully resolved WindowMaterial:Gap:EquivalentLayer payload.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WindowGapEquivalentLayerMaterial {
+    /// Selected gas species.
+    pub gas_type: WindowGasType,
+    /// Gap thickness in meters.
+    pub thickness_m: f64,
+    /// Indoor/outdoor venting relationship.
+    pub gap_vent_type: WindowGapVentType,
+    /// User-supplied custom properties or source-fixed standard-gas properties.
+    pub properties: WindowGasProperties,
+}
+
+impl WindowGapEquivalentLayerMaterial {
+    /// Returns conductivity at the supplied absolute temperature.
+    #[must_use]
+    pub fn conductivity_at_temperature_k(self, temperature_k: f64) -> f64 {
+        self.properties.conductivity.at_temperature_k(temperature_k)
+    }
+
+    /// Returns the source-order nominal resistance evaluated at 300 K.
+    #[must_use]
+    pub fn nominal_thermal_resistance_m2_k_per_w(self) -> Option<f64> {
+        let conductivity = self.properties.conductivity.at_300_k();
+        (self.thickness_m > 0.0 && conductivity > 0.0).then_some(self.thickness_m / conductivity)
+    }
+}
+
 /// Object-specific material payload.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum MaterialDefinition {
@@ -529,6 +597,8 @@ pub enum MaterialDefinition {
     WindowGlazingEquivalentLayer(WindowGlazingEquivalentLayerMaterial),
     /// Single-gas ordinary window gap.
     WindowGas(WindowGasMaterial),
+    /// Single-gas equivalent-layer window gap.
+    WindowGapEquivalentLayer(WindowGapEquivalentLayerMaterial),
 }
 
 /// Borrowed opaque material payload used by opaque-only consumers.
@@ -704,6 +774,9 @@ impl Material {
                 MaterialKind::WindowGlazingEquivalentLayer
             }
             MaterialDefinition::WindowGas(_) => MaterialKind::WindowGas,
+            MaterialDefinition::WindowGapEquivalentLayer(_) => {
+                MaterialKind::WindowGapEquivalentLayer
+            }
         }
     }
 
@@ -718,7 +791,8 @@ impl Material {
             MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGas(_) => MaterialFamily::Fenestration,
-            MaterialDefinition::WindowGlazingEquivalentLayer(_) => MaterialFamily::EquivalentLayer,
+            MaterialDefinition::WindowGlazingEquivalentLayer(_)
+            | MaterialDefinition::WindowGapEquivalentLayer(_) => MaterialFamily::EquivalentLayer,
         }
     }
 
@@ -735,7 +809,8 @@ impl Material {
             MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
-            | MaterialDefinition::WindowGas(_) => None,
+            | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
 
@@ -752,7 +827,8 @@ impl Material {
             | MaterialDefinition::InfraredTransparent(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
-            | MaterialDefinition::WindowGas(_) => None,
+            | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
 
@@ -769,7 +845,8 @@ impl Material {
             | MaterialDefinition::InfraredTransparent(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
-            | MaterialDefinition::WindowGas(_) => None,
+            | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
 
@@ -786,7 +863,8 @@ impl Material {
             | MaterialDefinition::InfraredTransparent(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
-            | MaterialDefinition::WindowGas(_) => None,
+            | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
 
@@ -801,7 +879,26 @@ impl Material {
             | MaterialDefinition::InfraredTransparent(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
-            | MaterialDefinition::WindowGlazingEquivalentLayer(_) => None,
+            | MaterialDefinition::WindowGlazingEquivalentLayer(_)
+            | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
+        }
+    }
+
+    /// Borrows the equivalent-layer window-gap payload when applicable.
+    #[must_use]
+    pub const fn as_window_gap_equivalent_layer(
+        &self,
+    ) -> Option<&WindowGapEquivalentLayerMaterial> {
+        match &self.definition {
+            MaterialDefinition::WindowGapEquivalentLayer(material) => Some(material),
+            MaterialDefinition::Regular(_)
+            | MaterialDefinition::NoMass(_)
+            | MaterialDefinition::AirGap(_)
+            | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectralAverage(_)
+            | MaterialDefinition::WindowGlazingRefractionExtinction(_)
+            | MaterialDefinition::WindowGlazingEquivalentLayer(_)
+            | MaterialDefinition::WindowGas(_) => None,
         }
     }
 

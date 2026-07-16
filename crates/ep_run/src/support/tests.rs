@@ -199,6 +199,50 @@ fn typed_window_gas_remains_run_blocked() -> Result<(), Box<dyn std::error::Erro
 }
 
 #[test]
+fn typed_window_gap_equivalent_layer_remains_run_blocked() -> Result<(), Box<dyn std::error::Error>>
+{
+    let raw = parse_epjson_str(
+        r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "Zone": {"Zone One": {"volume": 100}},
+                "WindowMaterial:Gap:EquivalentLayer": {
+                    "Vented Gap": {
+                        "gas_type": "AIR",
+                        "thickness": 0.0127,
+                        "gap_vent_type": "VentedOutdoor"
+                    }
+                }
+            }"#,
+    )?;
+    let result = compile_raw_model(&raw);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let assessment = assess_support(
+        &raw,
+        &result.report,
+        result.model.as_ref(),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+    );
+
+    assert_eq!(assessment.status, SupportStatus::Unsupported);
+    assert_eq!(assessment.run_result_state, RunResultState::RunBlocked);
+    assert_eq!(assessment.runtime_class, RuntimeClass::None);
+    assert!(assessment.unsupported_objects.iter().any(|entry| {
+        entry.object_type == "WindowMaterial:Gap:EquivalentLayer"
+            && entry.count == 1
+            && entry.note
+                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+    }));
+    assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
+        diagnostic.code == "UnsupportedSurfaceBoundary"
+            && diagnostic.object_type.as_deref() == Some("WindowMaterial:Gap:EquivalentLayer")
+    }));
+    Ok(())
+}
+
+#[test]
 fn missing_registry_capability_blocks_runtime_selection() -> Result<(), Box<dyn std::error::Error>>
 {
     let raw = parse_epjson_str(
