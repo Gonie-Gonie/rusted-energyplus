@@ -575,6 +575,12 @@
                          "help":  "Compare window-blind definitions, construction occurrences, and three reporting lanes with EnergyPlus EIO."
                      },
                      {
+                         "name":  "compare-window-material-blind-equivalent-layer-smoke",
+                         "path":  "compare\\compare-window-material-blind-equivalent-layer-smoke.ps1",
+                         "group":  "compare",
+                         "help":  "Compare equivalent-layer window-blind definitions, no-newline construction-layer occurrences, and three reporting lanes with EnergyPlus EIO."
+                     },
+                     {
                          "name":  "compare-window-material-shade-smoke",
                          "path":  "compare\\compare-window-material-shade-smoke.ps1",
                          "group":  "compare",

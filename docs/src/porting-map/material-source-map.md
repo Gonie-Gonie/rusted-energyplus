@@ -1048,12 +1048,35 @@ the common equivalent-layer boundary; only the still-deferred
 Arbitrary-run assessment counts and blocks every definition, including
 definitions unused by a construction.
 
-This typed checkpoint adds no EIO parser, comparator, fixture, proof variable,
-or conformance evidence. `Construction:WindowEquivalentLayer` typing and
-packing, `CheckAndFixCFSLayer`, ASHWAT coefficient generation/evaluation,
-slat-angle control execution, optics and thermal calculations, surfaces,
-ratings, daylighting, runtime, EIO serialization, broad diagnostic parity,
-and conformance remain deferred.
+`window_material_blind_equivalent_layer_001` adds a bounded nonblocking EIO
+parser/comparator fixture and two diagnostic proof variables. Its generic
+Material Details rows are one-per-definition in source order Z,M,A, including
+construction-unused M, with exact `Rough` and eight zero base fields. The
+specialized header has 18 tokens, including four source `Slate` typos and a
+final `Slat Angle Control` label, but every payload has only 17 tokens because
+the angle-control value is omitted. Identity and orientation precede 14
+numeric fields, all serialized with source `{:.5R}`. Visible inputs N9-N12 and
+N16-N18 are not reported. A proves default Horizontal orientation, 0.0015 m
+crown and 45 degree angle plus zero defaulted beam transmittances, solar
+diffuse state, and infrared state while retaining required beam-diffuse
+reflectances. Z proves a distinctive negative angle, high-precision geometry
+and optics, and byte-identical duplicate reuse.
+
+EnergyPlus 26.1's Blind:EquivalentLayer format has no trailing newline. The A
+payload is directly followed on the same physical line by Construction B, the
+first Z by Construction C, and the final Z by the next EIO header. The bounded
+parser recovers those source-actual logical boundaries and compares exact
+A,Z,Z occurrence order while excluding M. Two detailed windows share B without
+multiplying its Z row; surface-unused A and C are retained only by fixture EMS
+construction-index references. Primary, Materials-only, and
+Constructions-only independently lock report activation and complete with zero
+warnings and zero severe errors.
+
+This evidence does not type or pack `Construction:WindowEquivalentLayer` and
+does not promote `CheckAndFixCFSLayer`, ASHWAT coefficient
+generation/evaluation, slat-angle control execution, optics and thermal
+calculations, surfaces, ratings, daylighting, runtime, EIO serialization,
+broad diagnostic parity, or conformance.
 
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. The two ordinary glazing variants, `WindowMaterial:Gas`,
@@ -1285,9 +1308,11 @@ N19-N21 initialized-zero state, zero beam-beam slots, source warning/recovery
 order for separation, width, and crown, `Rough`/resistance-only state,
 directional infrared/thermal projections, shared-name/source order,
 EquivalentLayer family classification, ordinary-Construction rejection,
-typed coverage, and the all-definition runtime block. Equivalent-layer
-construction packing, EIO, ASHWAT behavior, optics/thermal/control execution,
-surfaces, ratings, daylighting, runtime, and conformance remain deferred.
+typed coverage, and the all-definition runtime block. The dedicated static EIO
+case separately locks exact generic definitions and malformed no-newline A,Z,Z
+occurrences without promoting equivalent-layer construction packing, ASHWAT
+behavior, optics/thermal/control execution, surfaces, ratings, daylighting,
+runtime, EIO serialization, or conformance.
 
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
@@ -1414,14 +1439,18 @@ header plus A,Z,Z construction-occurrence sequence. This static evidence does
 not promote `CalcBlindProperties`, window optics/thermal execution,
 daylighting, shading control, surface behavior, or conformance.
 
-`WindowMaterial:Blind:EquivalentLayer` remains typed/source evidence only:
-no EIO case or diagnostic proof variable is added. Its complete
-input/default/bounds, blank-sensitive group assignments, 26.1 N16-N18 index
-quirk, four optical sums, warning-only geometry recovery, source-effective
-TAR/infrared/thermal/control state, ordinary-Construction exclusion, and
-explicit arbitrary-run block do not promote equivalent-layer construction
-packing, ASHWAT behavior, optics/thermal/control execution, surfaces,
-daylighting, ratings, runtime, or conformance.
+`window_material_blind_equivalent_layer_001` compares every equivalent-layer
+Blind definition against its generic `Rough`/all-zero row, including unused M,
+and locks the exact malformed header plus logical A,Z,Z construction-occurrence
+sequence. Its 18-token header names angle control while its 17-token payload
+omits it; all 14 numeric payload fields use source `{:.5R}`. The gate preserves
+the EnergyPlus 26.1 absence of a trailing newline and the exact following
+Construction/header suffixes. A locks defaults and source-effective zero
+states; duplicate Z locks a negative high-precision angle and reuse. The three
+clean reporting lanes independently prove generic/specialized activation.
+Equivalent-layer construction packing, ASHWAT behavior,
+optics/thermal/control execution, surfaces, daylighting, ratings, EIO
+serialization, runtime, and conformance remain unclaimed.
 These tests and static EIO smokes remain bounded evidence, not an EnergyPlus
 material-family or window gate.
 

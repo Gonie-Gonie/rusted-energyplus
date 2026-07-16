@@ -1,0 +1,317 @@
+Version,26.1;
+
+SimulationControl,No,No,No,No,Yes,No;
+
+Building,Window Material Blind EquivalentLayer Compare,0.0,Suburbs,0.04,0.4,FullExterior,25,6;
+
+Timestep,4;
+
+HeatBalanceAlgorithm,ConductionTransferFunction;
+
+SurfaceConvectionAlgorithm:Inside,TARP;
+
+SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+Site:Location,Golden,39.74,-105.18,-7.0,1829.0;
+
+Site:GroundTemperature:BuildingSurface,18,18,18,18,18,18,18,18,18,18,18,18;
+
+RunPeriod,Run Period 1,1,1,2013,1,1,2013,Tuesday,Yes,Yes,No,Yes,Yes;
+
+GlobalGeometryRules,UpperLeftCorner,CounterClockWise,World;
+
+Material,
+  DISTINCTIVE EQL BLIND OPAQUE HOST MATERIAL,
+  Rough,
+  0.113,
+  0.347,
+  913.0,
+  836.0,
+  0.87,
+  0.63,
+  0.58;
+
+WindowMaterial:Glazing:EquivalentLayer,
+  DISTINCTIVE EQL BLIND TEST GLASS,
+  SpectralAverage,
+  ,
+  0.83,
+  0.83,
+  0.08,
+  0.08,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.76,
+  0.14,
+  0.14,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.84,
+  0.84,
+  0.158;
+
+WindowMaterial:Gap:EquivalentLayer,
+  DISTINCTIVE SEALED AIR EQL BLIND GAP,
+  Air,
+  0.0127,
+  Sealed;
+
+! Definition source order intentionally differs from canonical name order.
+WindowMaterial:Blind:EquivalentLayer,
+  Z HIGH PRECISION REUSED EQL BLIND,
+  Vertical,
+  0.0245678,
+  0.0187654,
+  0.000654321,
+  -63.4567,
+  0.123456,
+  0.234567,
+  0.345678,
+  0.456789,
+  0.112233,
+  0.223344,
+  0.334455,
+  0.445566,
+  0.0234567,
+  0.765432,
+  0.654321,
+  0.0345678,
+  0.1111,
+  0.2222,
+  0.0345678,
+  0.765432,
+  0.654321,
+  MaximizeSolar;
+
+! Valid but unused. It must appear only in the generic Material Details table.
+WindowMaterial:Blind:EquivalentLayer,
+  M UNUSED EQL BLIND,
+  Horizontal,
+  0.020,
+  0.020,
+  ,
+  ,
+  ,
+  ,
+  0.1333,
+  0.1444,
+  ,
+  ,
+  ,
+  ,
+  ,
+  0.2555,
+  0.2666;
+
+! Optional orientation, geometry/control inputs and guarded optical groups are blank.
+WindowMaterial:Blind:EquivalentLayer,
+  A DEFAULTED USED EQL BLIND,
+  ,
+  0.020,
+  0.020,
+  ,
+  ,
+  ,
+  ,
+  0.1111,
+  0.1222,
+  ,
+  ,
+  ,
+  ,
+  ,
+  0.2333,
+  0.2444;
+
+! Construction source order is the canonical A/B/C occurrence order locked by EIO.
+Construction:WindowEquivalentLayer,
+  A DEFAULTED EQL BLIND WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL BLIND TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL BLIND GAP,
+  DISTINCTIVE EQL BLIND TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL BLIND GAP,
+  A DEFAULTED USED EQL BLIND;
+
+Construction:WindowEquivalentLayer,
+  B HIGH PRECISION FIRST EQL BLIND WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL BLIND TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL BLIND GAP,
+  DISTINCTIVE EQL BLIND TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL BLIND GAP,
+  Z HIGH PRECISION REUSED EQL BLIND;
+
+Construction:WindowEquivalentLayer,
+  C HIGH PRECISION SECOND EQL BLIND WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL BLIND TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL BLIND GAP,
+  DISTINCTIVE EQL BLIND TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL BLIND GAP,
+  Z HIGH PRECISION REUSED EQL BLIND;
+
+Construction,
+  D EQL BLIND OPAQUE HOST CONSTRUCTION,
+  DISTINCTIVE EQL BLIND OPAQUE HOST MATERIAL;
+
+! Fixture-only references prevent nominally-unused-construction warnings without
+! assigning the defaulted or second high-precision construction to a surface.
+EnergyManagementSystem:ConstructionIndexVariable,
+  DefaultedEqlBlindConstructionIndex,
+  A DEFAULTED EQL BLIND WINDOW CONSTRUCTION;
+
+EnergyManagementSystem:ConstructionIndexVariable,
+  UnusedHighPrecisionEqlBlindConstructionIndex,
+  C HIGH PRECISION SECOND EQL BLIND WINDOW CONSTRUCTION;
+
+Zone,EQL BLIND TEST ZONE,0,0,0,0,1,1,3,48,16;
+
+BuildingSurface:Detailed,
+  EQL BLIND TEST FLOOR,
+  Floor,
+  D EQL BLIND OPAQUE HOST CONSTRUCTION,
+  EQL BLIND TEST ZONE,
+  ,
+  Ground,
+  ,
+  NoSun,
+  NoWind,
+  1.0,
+  4,
+  4,4,0,
+  4,0,0,
+  0,0,0,
+  0,4,0;
+
+BuildingSurface:Detailed,
+  EQL BLIND TEST ROOF,
+  Roof,
+  D EQL BLIND OPAQUE HOST CONSTRUCTION,
+  EQL BLIND TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.0,
+  4,
+  0,4,3,
+  0,0,3,
+  4,0,3,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  EQL BLIND TEST WEST WALL,
+  Wall,
+  D EQL BLIND OPAQUE HOST CONSTRUCTION,
+  EQL BLIND TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,4,3,
+  0,4,0,
+  0,0,0,
+  0,0,3;
+
+BuildingSurface:Detailed,
+  EQL BLIND TEST EAST WALL,
+  Wall,
+  D EQL BLIND OPAQUE HOST CONSTRUCTION,
+  EQL BLIND TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,0,3,
+  4,0,0,
+  4,4,0,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  DISTINCTIVE EQL BLIND WINDOW HOST WALL,
+  Wall,
+  D EQL BLIND OPAQUE HOST CONSTRUCTION,
+  EQL BLIND TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,0,3,
+  0,0,0,
+  4,0,0,
+  4,0,3;
+
+BuildingSurface:Detailed,
+  EQL BLIND TEST NORTH WALL,
+  Wall,
+  D EQL BLIND OPAQUE HOST CONSTRUCTION,
+  EQL BLIND TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,4,3,
+  4,4,0,
+  0,4,0,
+  0,4,3;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE FIRST HIGH PRECISION EQL BLIND TEST WINDOW,
+  Window,
+  B HIGH PRECISION FIRST EQL BLIND WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL BLIND WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  0.50,0,2.80,
+  0.50,0,1.80,
+  1.50,0,1.80,
+  1.50,0,2.80;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE SECOND HIGH PRECISION EQL BLIND TEST WINDOW,
+  Window,
+  B HIGH PRECISION FIRST EQL BLIND WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL BLIND WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  2.00,0,2.80,
+  2.00,0,1.80,
+  3.00,0,1.80,
+  3.00,0,2.80;
+
+! A reporting element is required to keep the EnergyPlus run warning-free.
+! It is not part of the diagnostic manifest or comparison claim.
+Output:Variable,*,Zone Mean Air Temperature,Hourly;
+
+Output:Constructions,Constructions,Materials;
+
+Output:Surfaces:List,Details;

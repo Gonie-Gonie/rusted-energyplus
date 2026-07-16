@@ -444,6 +444,49 @@ pub struct EioWindowMaterialScreenEquivalentLayer {
     pub wire_diameter_m: f64,
 }
 
+/// Equivalent-layer window-blind values read from an EnergyPlus
+/// `eplusout.eio` record.
+///
+/// EnergyPlus emits one record per equivalent-layer construction-layer
+/// occurrence, so repeated material names remain distinct entries in source
+/// emission order. The 26.1 header advertises a slat-angle-control field, but
+/// the source data format does not emit that value.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioWindowMaterialBlindEquivalentLayer {
+    /// EnergyPlus-normalized material name.
+    pub material_name: String,
+    /// Canonical EnergyPlus slat orientation text.
+    pub slat_orientation: String,
+    /// Source-effective slat width in meters.
+    pub slat_width_m: f64,
+    /// Source-effective clear slat separation in meters.
+    pub slat_separation_m: f64,
+    /// Source-effective slat crown in meters.
+    pub slat_crown_m: f64,
+    /// Source-effective slat angle in degrees.
+    pub slat_angle_deg: f64,
+    /// Front-side solar beam-to-diffuse transmittance.
+    pub front_beam_diffuse_solar_transmittance: f64,
+    /// Back-side solar beam-to-diffuse transmittance.
+    pub back_beam_diffuse_solar_transmittance: f64,
+    /// Front-side solar beam-to-diffuse reflectance.
+    pub front_beam_diffuse_solar_reflectance: f64,
+    /// Back-side solar beam-to-diffuse reflectance.
+    pub back_beam_diffuse_solar_reflectance: f64,
+    /// Shared front/back solar diffuse-to-diffuse transmittance.
+    pub diffuse_diffuse_solar_transmittance: f64,
+    /// Front-side solar diffuse-to-diffuse reflectance.
+    pub front_diffuse_diffuse_solar_reflectance: f64,
+    /// Back-side solar diffuse-to-diffuse reflectance.
+    pub back_diffuse_diffuse_solar_reflectance: f64,
+    /// Shared front/back infrared transmittance.
+    pub infrared_transmittance: f64,
+    /// Front-side infrared emissivity.
+    pub front_infrared_emissivity: f64,
+    /// Back-side infrared emissivity.
+    pub back_infrared_emissivity: f64,
+}
+
 /// Equivalent-layer window gap values read from an EnergyPlus `eplusout.eio` row.
 ///
 /// EnergyPlus emits one row for every equivalent-layer construction-layer
@@ -546,6 +589,9 @@ pub enum EioError {
     MissingWindowMaterialDrapeEquivalentLayer,
     /// The exact `WindowMaterial:Blind` header was not present.
     MissingWindowMaterialBlindHeader,
+    /// The exact `WindowMaterial:Blind:EquivalentLayer` header was not
+    /// present.
+    MissingWindowMaterialBlindEquivalentLayerHeader,
     /// The exact `WindowMaterial:Screen` header was not present.
     MissingWindowMaterialScreenHeader,
     /// The exact `WindowMaterial:Screen:EquivalentLayer` header was not
@@ -715,6 +761,34 @@ pub enum EioError {
         /// Parse failure reason.
         reason: String,
     },
+    /// A candidate `WindowMaterial:Blind:EquivalentLayer` header did not
+    /// match the source literal.
+    InvalidWindowMaterialBlindEquivalentLayerHeader {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
+    /// More than one exact `WindowMaterial:Blind:EquivalentLayer` header was
+    /// present.
+    DuplicateWindowMaterialBlindEquivalentLayerHeader {
+        /// One-based line number of the repeated header.
+        line: usize,
+        /// Raw repeated header text.
+        text: String,
+    },
+    /// A `WindowMaterial:Blind:EquivalentLayer` record could not be parsed.
+    InvalidWindowMaterialBlindEquivalentLayer {
+        /// One-based physical line number.
+        line: usize,
+        /// Raw physical line text. It may contain the following concatenated
+        /// EIO record because EnergyPlus 26.1 omits this record's newline.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
     /// A candidate `WindowMaterial:Screen` header did not match the source literal.
     InvalidWindowMaterialScreenHeader {
         /// One-based line number.
@@ -834,6 +908,12 @@ impl Display for EioError {
             Self::MissingWindowMaterialBlindHeader => {
                 write!(formatter, "exact EIO WindowMaterial:Blind header not found")
             }
+            Self::MissingWindowMaterialBlindEquivalentLayerHeader => {
+                write!(
+                    formatter,
+                    "exact EIO WindowMaterial:Blind:EquivalentLayer header not found"
+                )
+            }
             Self::MissingWindowMaterialScreenHeader => {
                 write!(
                     formatter,
@@ -930,6 +1010,20 @@ impl Display for EioError {
                 formatter,
                 "invalid EIO WindowMaterial:Blind at line {line}: {reason}: {text}"
             ),
+            Self::InvalidWindowMaterialBlindEquivalentLayerHeader { line, text, reason } => {
+                write!(
+                    formatter,
+                    "invalid EIO WindowMaterial:Blind:EquivalentLayer header at line {line}: {reason}: {text}"
+                )
+            }
+            Self::DuplicateWindowMaterialBlindEquivalentLayerHeader { line, text } => write!(
+                formatter,
+                "duplicate EIO WindowMaterial:Blind:EquivalentLayer header at line {line}: {text}"
+            ),
+            Self::InvalidWindowMaterialBlindEquivalentLayer { line, text, reason } => write!(
+                formatter,
+                "invalid EIO WindowMaterial:Blind:EquivalentLayer at line {line}: {reason}: {text}"
+            ),
             Self::InvalidWindowMaterialScreenHeader { line, text, reason } => write!(
                 formatter,
                 "invalid EIO WindowMaterial:Screen header at line {line}: {reason}: {text}"
@@ -988,6 +1082,7 @@ impl std::error::Error for EioError {
             | Self::MissingWindowMaterialShadeEquivalentLayer
             | Self::MissingWindowMaterialDrapeEquivalentLayer
             | Self::MissingWindowMaterialBlindHeader
+            | Self::MissingWindowMaterialBlindEquivalentLayerHeader
             | Self::MissingWindowMaterialScreenHeader
             | Self::MissingWindowMaterialScreenEquivalentLayerHeader
             | Self::MissingWindowMaterialGapEquivalentLayer
@@ -1008,6 +1103,9 @@ impl std::error::Error for EioError {
             | Self::InvalidWindowMaterialBlindHeader { .. }
             | Self::DuplicateWindowMaterialBlindHeader { .. }
             | Self::InvalidWindowMaterialBlind { .. }
+            | Self::InvalidWindowMaterialBlindEquivalentLayerHeader { .. }
+            | Self::DuplicateWindowMaterialBlindEquivalentLayerHeader { .. }
+            | Self::InvalidWindowMaterialBlindEquivalentLayer { .. }
             | Self::InvalidWindowMaterialScreenHeader { .. }
             | Self::DuplicateWindowMaterialScreenHeader { .. }
             | Self::InvalidWindowMaterialScreen { .. }
