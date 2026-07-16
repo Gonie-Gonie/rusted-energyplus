@@ -733,6 +733,24 @@ pub fn energyplus_psy_tsat_fn_pb_raw(pressure_pa: f64) -> f64 {
     saturation_temperature_c
 }
 
+/// Canonical EnergyPlus 26.1 `PsyTdpFnWPb` default cached-build,
+/// interpolation-disabled numerical miss projection in Celsius.
+///
+/// This preserves the ordered 1e-5 humidity-ratio floor and the source's
+/// multiply/add/divide grouping before calling the isolated `PsyTsatFnPb_raw`
+/// numerical core. It models a nonzero-tag outer-cache miss and a raw
+/// saved-value miss. The public saturation-temperature cache's tag-zero false
+/// hit, first-writer and collision history, raw saved pair, interpolation,
+/// statistics, diagnostics, lifecycle, and compile variants remain separate
+/// state contracts.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_tdp_fn_w_pb(humidity_ratio: f64, atmospheric_pressure_pa: f64) -> f64 {
+    let humidity_ratio = energyplus_humidity_ratio_floor(humidity_ratio);
+    let dew_pressure_pa = atmospheric_pressure_pa * humidity_ratio / (0.621_98 + humidity_ratio);
+    energyplus_psy_tsat_fn_pb_raw(dew_pressure_pa)
+}
+
 fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option<f64> {
     if !temperature_c.is_finite() {
         return None;
@@ -798,3 +816,7 @@ mod relative_humidity_enthalpy_tests;
 #[cfg(test)]
 #[path = "psychrometrics_saturation_temperature_pressure_tests.rs"]
 mod saturation_temperature_pressure_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_dew_point_humidity_ratio_tests.rs"]
+mod dew_point_humidity_ratio_tests;
