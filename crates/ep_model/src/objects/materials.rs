@@ -3,6 +3,7 @@ use crate::{AutoOrNumber, ConstructionId, MaterialId, NormalizedName};
 mod window_drape_equivalent_layer;
 mod window_gas;
 mod window_screen;
+mod window_screen_equivalent_layer;
 mod window_shade;
 mod window_shade_equivalent_layer;
 
@@ -14,6 +15,10 @@ pub use window_gas::{
 };
 pub use window_screen::{
     WindowScreenBeamReflectanceModel, WindowScreenMaterial, WindowScreenTransmittanceMapResolution,
+};
+pub use window_screen_equivalent_layer::{
+    WindowScreenEquivalentLayerMaterial, WindowScreenEquivalentLayerSolarProperties,
+    WindowScreenEquivalentLayerVisibleProperties,
 };
 pub use window_shade::WindowShadeMaterial;
 pub use window_shade_equivalent_layer::{
@@ -51,6 +56,8 @@ pub enum MaterialKind {
     WindowDrapeEquivalentLayer,
     /// WindowMaterial:Screen object.
     WindowScreen,
+    /// WindowMaterial:Screen:EquivalentLayer object.
+    WindowScreenEquivalentLayer,
 }
 
 /// High-level material family used to keep construction consumers separate.
@@ -387,6 +394,8 @@ pub enum MaterialDefinition {
     WindowDrapeEquivalentLayer(WindowDrapeEquivalentLayerMaterial),
     /// Ordinary exterior window screen.
     WindowScreen(WindowScreenMaterial),
+    /// Equivalent-layer window screen.
+    WindowScreenEquivalentLayer(WindowScreenEquivalentLayerMaterial),
 }
 
 /// Borrowed opaque material payload used by opaque-only consumers.
@@ -574,6 +583,9 @@ impl Material {
                 MaterialKind::WindowDrapeEquivalentLayer
             }
             MaterialDefinition::WindowScreen(_) => MaterialKind::WindowScreen,
+            MaterialDefinition::WindowScreenEquivalentLayer(_) => {
+                MaterialKind::WindowScreenEquivalentLayer
+            }
         }
     }
 
@@ -594,7 +606,8 @@ impl Material {
             MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_)
             | MaterialDefinition::WindowShadeEquivalentLayer(_)
-            | MaterialDefinition::WindowDrapeEquivalentLayer(_) => MaterialFamily::EquivalentLayer,
+            | MaterialDefinition::WindowDrapeEquivalentLayer(_)
+            | MaterialDefinition::WindowScreenEquivalentLayer(_) => MaterialFamily::EquivalentLayer,
         }
     }
 
@@ -617,7 +630,8 @@ impl Material {
             | MaterialDefinition::WindowGapEquivalentLayer(_)
             | MaterialDefinition::WindowShadeEquivalentLayer(_)
             | MaterialDefinition::WindowDrapeEquivalentLayer(_)
-            | MaterialDefinition::WindowScreen(_) => None,
+            | MaterialDefinition::WindowScreen(_)
+            | MaterialDefinition::WindowScreenEquivalentLayer(_) => None,
         }
     }
 
@@ -640,7 +654,8 @@ impl Material {
             | MaterialDefinition::WindowGapEquivalentLayer(_)
             | MaterialDefinition::WindowShadeEquivalentLayer(_)
             | MaterialDefinition::WindowDrapeEquivalentLayer(_)
-            | MaterialDefinition::WindowScreen(_) => None,
+            | MaterialDefinition::WindowScreen(_)
+            | MaterialDefinition::WindowScreenEquivalentLayer(_) => None,
         }
     }
 
@@ -663,7 +678,8 @@ impl Material {
             | MaterialDefinition::WindowGapEquivalentLayer(_)
             | MaterialDefinition::WindowShadeEquivalentLayer(_)
             | MaterialDefinition::WindowDrapeEquivalentLayer(_)
-            | MaterialDefinition::WindowScreen(_) => None,
+            | MaterialDefinition::WindowScreen(_)
+            | MaterialDefinition::WindowScreenEquivalentLayer(_) => None,
         }
     }
 
@@ -686,7 +702,8 @@ impl Material {
             | MaterialDefinition::WindowGapEquivalentLayer(_)
             | MaterialDefinition::WindowShadeEquivalentLayer(_)
             | MaterialDefinition::WindowDrapeEquivalentLayer(_)
-            | MaterialDefinition::WindowScreen(_) => None,
+            | MaterialDefinition::WindowScreen(_)
+            | MaterialDefinition::WindowScreenEquivalentLayer(_) => None,
         }
     }
 
@@ -707,7 +724,8 @@ impl Material {
             | MaterialDefinition::WindowGapEquivalentLayer(_)
             | MaterialDefinition::WindowShadeEquivalentLayer(_)
             | MaterialDefinition::WindowDrapeEquivalentLayer(_)
-            | MaterialDefinition::WindowScreen(_) => None,
+            | MaterialDefinition::WindowScreen(_)
+            | MaterialDefinition::WindowScreenEquivalentLayer(_) => None,
         }
     }
 
@@ -730,7 +748,8 @@ impl Material {
             | MaterialDefinition::WindowShade(_)
             | MaterialDefinition::WindowShadeEquivalentLayer(_)
             | MaterialDefinition::WindowDrapeEquivalentLayer(_)
-            | MaterialDefinition::WindowScreen(_) => None,
+            | MaterialDefinition::WindowScreen(_)
+            | MaterialDefinition::WindowScreenEquivalentLayer(_) => None,
         }
     }
 
@@ -751,7 +770,8 @@ impl Material {
             | MaterialDefinition::WindowGapEquivalentLayer(_)
             | MaterialDefinition::WindowShadeEquivalentLayer(_)
             | MaterialDefinition::WindowDrapeEquivalentLayer(_)
-            | MaterialDefinition::WindowScreen(_) => None,
+            | MaterialDefinition::WindowScreen(_)
+            | MaterialDefinition::WindowScreenEquivalentLayer(_) => None,
         }
     }
 
@@ -772,7 +792,8 @@ impl Material {
             | MaterialDefinition::WindowGapEquivalentLayer(_)
             | MaterialDefinition::WindowShadeEquivalentLayer(_)
             | MaterialDefinition::WindowDrapeEquivalentLayer(_)
-            | MaterialDefinition::WindowScreen(_) => None,
+            | MaterialDefinition::WindowScreen(_)
+            | MaterialDefinition::WindowScreenEquivalentLayer(_) => None,
         }
     }
 
@@ -795,7 +816,8 @@ impl Material {
             | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowShade(_)
             | MaterialDefinition::WindowDrapeEquivalentLayer(_)
-            | MaterialDefinition::WindowScreen(_) => None,
+            | MaterialDefinition::WindowScreen(_)
+            | MaterialDefinition::WindowScreenEquivalentLayer(_) => None,
         }
     }
 
@@ -818,7 +840,8 @@ impl Material {
             | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowShade(_)
             | MaterialDefinition::WindowShadeEquivalentLayer(_)
-            | MaterialDefinition::WindowScreen(_) => None,
+            | MaterialDefinition::WindowScreen(_)
+            | MaterialDefinition::WindowScreenEquivalentLayer(_) => None,
         }
     }
 
@@ -839,7 +862,32 @@ impl Material {
             | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowShade(_)
             | MaterialDefinition::WindowShadeEquivalentLayer(_)
-            | MaterialDefinition::WindowDrapeEquivalentLayer(_) => None,
+            | MaterialDefinition::WindowDrapeEquivalentLayer(_)
+            | MaterialDefinition::WindowScreenEquivalentLayer(_) => None,
+        }
+    }
+
+    /// Borrows the equivalent-layer window-screen payload when applicable.
+    #[must_use]
+    pub const fn as_window_screen_equivalent_layer(
+        &self,
+    ) -> Option<&WindowScreenEquivalentLayerMaterial> {
+        match &self.definition {
+            MaterialDefinition::WindowScreenEquivalentLayer(material) => Some(material),
+            MaterialDefinition::Regular(_)
+            | MaterialDefinition::NoMass(_)
+            | MaterialDefinition::AirGap(_)
+            | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectralAverage(_)
+            | MaterialDefinition::WindowGlazingRefractionExtinction(_)
+            | MaterialDefinition::WindowGlazingEquivalentLayer(_)
+            | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGapEquivalentLayer(_)
+            | MaterialDefinition::WindowGasMixture(_)
+            | MaterialDefinition::WindowShade(_)
+            | MaterialDefinition::WindowShadeEquivalentLayer(_)
+            | MaterialDefinition::WindowDrapeEquivalentLayer(_)
+            | MaterialDefinition::WindowScreen(_) => None,
         }
     }
 

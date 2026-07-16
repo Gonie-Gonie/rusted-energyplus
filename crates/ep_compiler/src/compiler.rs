@@ -34,7 +34,9 @@ use ep_model::{
     WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
-    WindowGlazingSpectralAverageMaterial, WindowScreenBeamReflectanceModel, WindowScreenMaterial,
+    WindowGlazingSpectralAverageMaterial, WindowScreenBeamReflectanceModel,
+    WindowScreenEquivalentLayerMaterial, WindowScreenEquivalentLayerSolarProperties,
+    WindowScreenEquivalentLayerVisibleProperties, WindowScreenMaterial,
     WindowScreenTransmittanceMapResolution, WindowShadeEquivalentLayerMaterial,
     WindowShadeEquivalentLayerSideOpticalProperties, WindowShadeMaterial, WindowStandardGasType,
     Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
@@ -85,7 +87,8 @@ fn window_construction_layer_kind(
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
         | MaterialDefinition::WindowShadeEquivalentLayer(_)
-        | MaterialDefinition::WindowDrapeEquivalentLayer(_) => None,
+        | MaterialDefinition::WindowDrapeEquivalentLayer(_)
+        | MaterialDefinition::WindowScreenEquivalentLayer(_) => None,
     }
 }
 
@@ -104,7 +107,8 @@ fn window_glazing_is_solar_diffusing(definition: &MaterialDefinition) -> bool {
         | MaterialDefinition::WindowScreen(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
         | MaterialDefinition::WindowShadeEquivalentLayer(_)
-        | MaterialDefinition::WindowDrapeEquivalentLayer(_) => false,
+        | MaterialDefinition::WindowDrapeEquivalentLayer(_)
+        | MaterialDefinition::WindowScreenEquivalentLayer(_) => false,
     }
 }
 
@@ -140,7 +144,8 @@ fn window_gap_signature(definition: &MaterialDefinition) -> Option<WindowGapSign
         | MaterialDefinition::WindowScreen(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
         | MaterialDefinition::WindowShadeEquivalentLayer(_)
-        | MaterialDefinition::WindowDrapeEquivalentLayer(_) => return None,
+        | MaterialDefinition::WindowDrapeEquivalentLayer(_)
+        | MaterialDefinition::WindowScreenEquivalentLayer(_) => return None,
     };
     Some(WindowGapSignature {
         gas_types,
@@ -376,6 +381,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "WindowMaterial:Shade:EquivalentLayer",
     "WindowMaterial:Drape:EquivalentLayer",
     "WindowMaterial:Screen",
+    "WindowMaterial:Screen:EquivalentLayer",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -953,6 +959,7 @@ impl<'a> Compiler<'a> {
         self.parse_window_shade_equivalent_layer_materials(model);
         self.parse_window_drape_equivalent_layer_materials(model);
         self.parse_window_screen_materials(model);
+        self.parse_window_screen_equivalent_layer_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -3284,6 +3291,251 @@ impl<'a> Compiler<'a> {
                         .max(0.0),
                     thermal_absorptance,
                 }),
+            });
+        }
+    }
+
+    fn parse_window_screen_equivalent_layer_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowMaterial:Screen:EquivalentLayer";
+        const SOLAR_BEAM_BEAM_FIELD: &str = "screen_beam_beam_solar_transmittance";
+        const SOLAR_BEAM_DIFFUSE_TRANSMITTANCE_FIELD: &str =
+            "screen_beam_diffuse_solar_transmittance";
+        const SOLAR_BEAM_DIFFUSE_REFLECTANCE_FIELD: &str = "screen_beam_diffuse_solar_reflectance";
+        const VISIBLE_BEAM_BEAM_FIELD: &str = "screen_beam_beam_visible_transmittance";
+        const VISIBLE_BEAM_DIFFUSE_TRANSMITTANCE_FIELD: &str =
+            "screen_beam_diffuse_visible_transmittance";
+        const VISIBLE_BEAM_DIFFUSE_REFLECTANCE_FIELD: &str =
+            "screen_beam_diffuse_visible_reflectance";
+        const INFRARED_TRANSMITTANCE_FIELD: &str = "screen_infrared_transmittance";
+        const INFRARED_EMISSIVITY_FIELD: &str = "screen_infrared_emissivity";
+        const WIRE_SPACING_FIELD: &str = "screen_wire_spacing";
+        const WIRE_DIAMETER_FIELD: &str = "screen_wire_diameter";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let beam_beam_solar_transmittance = self.auto_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                SOLAR_BEAM_BEAM_FIELD,
+                (0.0, true),
+                (1.0, false),
+            );
+            let beam_diffuse_solar_transmittance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                SOLAR_BEAM_DIFFUSE_TRANSMITTANCE_FIELD,
+                (0.0, true),
+                (1.0, false),
+            );
+            let beam_diffuse_solar_reflectance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                SOLAR_BEAM_DIFFUSE_REFLECTANCE_FIELD,
+                (0.0, true),
+                (1.0, false),
+            );
+            let beam_beam_visible_transmittance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                VISIBLE_BEAM_BEAM_FIELD,
+                (0.0, true),
+                (1.0, false),
+            );
+            let beam_diffuse_visible_transmittance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                VISIBLE_BEAM_DIFFUSE_TRANSMITTANCE_FIELD,
+                (0.0, true),
+                (1.0, false),
+            );
+            let diffuse_diffuse_visible_reflectance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                VISIBLE_BEAM_DIFFUSE_REFLECTANCE_FIELD,
+                (0.0, true),
+                (1.0, false),
+            );
+            let infrared_transmittance = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                INFRARED_TRANSMITTANCE_FIELD,
+                0.02,
+                (0.0, true),
+                (1.0, false),
+            );
+            let infrared_emissivity = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                INFRARED_EMISSIVITY_FIELD,
+                0.93,
+                (0.0, false),
+                (1.0, false),
+            );
+
+            // GetMaterialData tests the blank flags before copying N9/N10.
+            // Consequently omitted/blank inputs leave the class defaults at
+            // zero even though the schema advertises 0.025 m and 0.005 m.
+            let wire_spacing_m = self.number_minimum_when_present_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                WIRE_SPACING_FIELD,
+                0.0,
+                0.00001,
+                false,
+            );
+            let wire_diameter_m = self.number_minimum_when_present_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                WIRE_DIAMETER_FIELD,
+                0.0,
+                0.00001,
+                false,
+            );
+
+            let (
+                Some(beam_diffuse_solar_transmittance),
+                Some(beam_diffuse_solar_reflectance),
+                Some(beam_beam_visible_transmittance),
+                Some(beam_diffuse_visible_transmittance),
+                Some(diffuse_diffuse_visible_reflectance),
+                Some(wire_spacing_m),
+                Some(wire_diameter_m),
+            ) = (
+                beam_diffuse_solar_transmittance,
+                beam_diffuse_solar_reflectance,
+                beam_beam_visible_transmittance,
+                beam_diffuse_visible_transmittance,
+                diffuse_diffuse_visible_reflectance,
+                wire_spacing_m,
+                wire_diameter_m,
+            )
+            else {
+                continue;
+            };
+
+            let geometry_valid = if wire_spacing_m == 0.0 && wire_diameter_m == 0.0 {
+                true
+            } else if wire_diameter_m >= wire_spacing_m {
+                self.error(
+                    "InvalidWindowScreenEquivalentLayerGeometry",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some(WIRE_DIAMETER_FIELD),
+                    format!(
+                        "{OBJECT_TYPE}/{name} screen wire diameter must be less than effective screen wire spacing; got diameter {wire_diameter_m} m and spacing {wire_spacing_m} m"
+                    ),
+                );
+                false
+            } else {
+                true
+            };
+
+            let mut openness_valid = true;
+            if geometry_valid
+                && wire_spacing_m > 0.0
+                && let AutoOrNumber::Value(specified_openness) = beam_beam_solar_transmittance
+            {
+                let calculated_openness = (1.0 - wire_diameter_m / wire_spacing_m).powi(2);
+                let relative_excess =
+                    (specified_openness - calculated_openness) / calculated_openness;
+                if relative_excess > 0.01 {
+                    self.error(
+                        "InvalidWindowScreenEquivalentLayerOpennessMismatch",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some(SOLAR_BEAM_BEAM_FIELD),
+                        format!(
+                            "{OBJECT_TYPE}/{name} specified screen openness {specified_openness} exceeds the {calculated_openness} value calculated as (1 - diameter / spacing)^2 by more than 1%; the typed compiler does not apply EnergyPlus's wire-diameter recovery"
+                        ),
+                    );
+                    openness_valid = false;
+                }
+            }
+
+            let mut optical_sums_valid = true;
+            if let AutoOrNumber::Value(beam_beam_solar_transmittance) =
+                beam_beam_solar_transmittance
+            {
+                let sum = beam_beam_solar_transmittance + beam_diffuse_solar_reflectance;
+                if sum >= 1.0 {
+                    self.error(
+                        "InvalidWindowScreenEquivalentLayerOpticalSum",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some(SOLAR_BEAM_DIFFUSE_REFLECTANCE_FIELD),
+                        format!(
+                            "{OBJECT_TYPE}/{name} beam-beam solar transmittance plus beam-diffuse solar reflectance must be less than 1.0, got {sum}"
+                        ),
+                    );
+                    optical_sums_valid = false;
+                }
+            }
+            let visible_sum = beam_beam_visible_transmittance + diffuse_diffuse_visible_reflectance;
+            if visible_sum >= 1.0 {
+                self.error(
+                    "InvalidWindowScreenEquivalentLayerOpticalSum",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some(VISIBLE_BEAM_DIFFUSE_REFLECTANCE_FIELD),
+                    format!(
+                        "{OBJECT_TYPE}/{name} beam-beam visible transmittance plus diffuse-diffuse visible reflectance must be less than 1.0, got {visible_sum}"
+                    ),
+                );
+                optical_sums_valid = false;
+            }
+
+            if !geometry_valid || !openness_valid || !optical_sums_valid {
+                continue;
+            }
+
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            let solar = WindowScreenEquivalentLayerSolarProperties {
+                beam_beam_transmittance: beam_beam_solar_transmittance,
+                beam_diffuse_transmittance: beam_diffuse_solar_transmittance,
+                beam_diffuse_reflectance: beam_diffuse_solar_reflectance,
+            };
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::WindowScreenEquivalentLayer(
+                    WindowScreenEquivalentLayerMaterial {
+                        roughness: MaterialSurfaceRoughness::MediumRough,
+                        front_solar: solar,
+                        back_solar: solar,
+                        front_visible: WindowScreenEquivalentLayerVisibleProperties {
+                            beam_beam_transmittance: beam_beam_visible_transmittance,
+                            beam_diffuse_transmittance: beam_diffuse_visible_transmittance,
+                            // EnergyPlus 26.1 writes N6 to TAR.Vis.Ft.Df.Ref.
+                            beam_diffuse_reflectance: 0.0,
+                            diffuse_diffuse_reflectance: diffuse_diffuse_visible_reflectance,
+                        },
+                        back_visible: WindowScreenEquivalentLayerVisibleProperties::default(),
+                        infrared_transmittance,
+                        front_infrared_emissivity: infrared_emissivity,
+                        back_infrared_emissivity: infrared_emissivity,
+                        front_thermal_absorptance: infrared_emissivity,
+                        back_thermal_absorptance: infrared_emissivity,
+                        thermal_transmittance: infrared_transmittance,
+                        // The MaterialBase field read by EnergyPlus's final
+                        // thermal-sum check is never assigned from N8.
+                        base_thermal_absorptance: 0.0,
+                        wire_spacing_m,
+                        wire_diameter_m,
+                    },
+                ),
             });
         }
     }
@@ -9152,6 +9404,90 @@ impl<'a> Compiler<'a> {
         default
     }
 
+    #[allow(clippy::too_many_arguments)]
+    fn number_bounded_blank_default(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+        default: f64,
+        minimum: (f64, bool),
+        maximum: (f64, bool),
+    ) -> f64 {
+        if matches!(
+            field_value(object, field),
+            Some(RawValue::String(value)) if value.trim().is_empty()
+        ) {
+            self.record_default(object_type, object_name, field, &format_number(default));
+            return default;
+        }
+        self.number_bounded_default(
+            object_type,
+            object_name,
+            object,
+            field,
+            default,
+            minimum,
+            maximum,
+        )
+    }
+
+    /// Applies a default only when a numeric field is absent or blank, while
+    /// enforcing a lower bound on explicitly supplied values.
+    ///
+    /// This differs from `number_bounded_default`: the default may
+    /// intentionally lie outside the explicit-input bound. EnergyPlus's
+    /// equivalent-layer screen leaves blank wire dimensions at zero but
+    /// requires each explicit dimension to exceed its source threshold.
+    #[allow(clippy::too_many_arguments)]
+    fn number_minimum_when_present_default(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+        default: f64,
+        minimum: f64,
+        inclusive: bool,
+    ) -> Option<f64> {
+        let value = match field_value(object, field) {
+            None => {
+                self.record_default(object_type, object_name, field, &format_number(default));
+                return Some(default);
+            }
+            Some(RawValue::String(value)) if value.trim().is_empty() => {
+                self.record_default(object_type, object_name, field, &format_number(default));
+                return Some(default);
+            }
+            Some(value) => self.number_value(object_type, object_name, field, value)?,
+        };
+        let valid = if inclusive {
+            value >= minimum
+        } else {
+            value > minimum
+        };
+        if valid {
+            return Some(value);
+        }
+
+        let comparison = if inclusive {
+            "greater than or equal to"
+        } else {
+            "greater than"
+        };
+        self.error(
+            "InvalidNumericRange",
+            object_type,
+            Some(object_name),
+            Some(field),
+            format!(
+                "{object_type}/{object_name} field {field} must be {comparison} {minimum} when explicitly supplied, got {value}"
+            ),
+        );
+        None
+    }
+
     fn u32_default(
         &mut self,
         object_type: &str,
@@ -9305,6 +9641,68 @@ impl<'a> Compiler<'a> {
             Some(field),
             format!(
                 "{object_type}/{object_name} field {field} must be between {minimum} and {maximum}, got {number}"
+            ),
+        );
+        default
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn auto_bounded_default(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+        minimum: (f64, bool),
+        maximum: (f64, bool),
+    ) -> AutoOrNumber {
+        let default = AutoOrNumber::AutoCalculate;
+        let number = match field_value(object, field) {
+            Some(RawValue::String(value)) if value.trim().is_empty() => {
+                self.record_default(object_type, object_name, field, "Autocalculate");
+                return default;
+            }
+            Some(RawValue::String(value)) if value.trim().eq_ignore_ascii_case("Autocalculate") => {
+                return default;
+            }
+            Some(RawValue::String(value)) => {
+                self.invalid_enum_value(object_type, object_name, field, value);
+                return default;
+            }
+            Some(value) => match self.number_value(object_type, object_name, field, value) {
+                Some(number) => number,
+                None => return default,
+            },
+            None => {
+                self.record_default(object_type, object_name, field, "Autocalculate");
+                return default;
+            }
+        };
+
+        let minimum_valid = if minimum.1 {
+            number >= minimum.0
+        } else {
+            number > minimum.0
+        };
+        let maximum_valid = if maximum.1 {
+            number <= maximum.0
+        } else {
+            number < maximum.0
+        };
+        if minimum_valid && maximum_valid {
+            return AutoOrNumber::Value(number);
+        }
+
+        let lower_bracket = if minimum.1 { "[" } else { "(" };
+        let upper_bracket = if maximum.1 { "]" } else { ")" };
+        self.error(
+            "InvalidNumericRange",
+            object_type,
+            Some(object_name),
+            Some(field),
+            format!(
+                "{object_type}/{object_name} field {field} must be in {lower_bracket}{}, {}{upper_bracket}, got {number}",
+                minimum.0, maximum.0
             ),
         );
         default
@@ -11068,6 +11466,7 @@ mod tests {
     mod window_material_glazing_equivalent_layer;
     mod window_material_glazing_refraction_extinction;
     mod window_material_screen;
+    mod window_material_screen_equivalent_layer;
     mod window_material_shade;
     mod window_material_shade_equivalent_layer;
 
