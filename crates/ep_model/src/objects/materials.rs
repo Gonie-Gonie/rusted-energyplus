@@ -341,6 +341,18 @@ pub enum WindowGasType {
 }
 
 impl WindowGasType {
+    /// Returns the canonical EnergyPlus 26.1 display and EIO token.
+    #[must_use]
+    pub const fn energyplus_name(self) -> &'static str {
+        match self {
+            Self::Custom => "Custom",
+            Self::Air => "Air",
+            Self::Argon => "Argon",
+            Self::Krypton => "Krypton",
+            Self::Xenon => "Xenon",
+        }
+    }
+
     /// Parses an EnergyPlus gas-type token.
     #[must_use]
     pub fn from_energyplus_name(value: &str) -> Option<Self> {
@@ -537,6 +549,16 @@ pub enum WindowGapVentType {
 }
 
 impl WindowGapVentType {
+    /// Returns the canonical EnergyPlus 26.1 display and EIO token.
+    #[must_use]
+    pub const fn energyplus_name(self) -> &'static str {
+        match self {
+            Self::Sealed => "Sealed",
+            Self::VentedIndoor => "VentedIndoor",
+            Self::VentedOutdoor => "VentedOutdoor",
+        }
+    }
+
     /// Parses the exact EnergyPlus epJSON vent-type token.
     #[must_use]
     pub fn from_energyplus_name(value: &str) -> Option<Self> {

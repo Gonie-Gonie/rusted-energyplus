@@ -5,7 +5,8 @@ use crate::{
     compare_series_v2, parse_eio_construction_ctf, parse_eio_construction_ctf_coefficients,
     parse_eio_construction_material_summaries, parse_eio_heat_transfer_surfaces,
     parse_eio_material_ctf_summary, parse_eio_other_equipment_nominal,
-    parse_eio_surface_geometry_rules, parse_eio_warmup_environments, parse_eio_window_material_gas,
+    parse_eio_surface_geometry_rules, parse_eio_warmup_environments,
+    parse_eio_window_material_gap_equivalent_layer, parse_eio_window_material_gas,
     parse_eio_window_material_glazing, parse_eio_window_material_glazing_equivalent_layer,
     parse_eio_zone_geometry, parse_eso_series, parse_eso_time_series, parse_mtr_time_series,
     parse_mtr_time_series_for_frequency,
@@ -907,6 +908,126 @@ fn eio_window_material_gas_parser_reports_missing_rows() {
     assert!(matches!(
         parse_eio_window_material_gas("Program Version,EnergyPlus\n"),
         Err(EioError::MissingWindowMaterialGas)
+    ));
+}
+
+#[test]
+fn parses_eio_equivalent_layer_gap_rows_and_preserves_repeats()
+-> Result<(), Box<dyn std::error::Error>> {
+    let rows = parse_eio_window_material_gap_equivalent_layer(
+        r#"! <WindowMaterial:Gap:EquivalentLayer>, Material Name, GasType, Gap Thickness {m}, Gap Vent Type
+ Program Version,EnergyPlus
+ WindowMaterial:Gap:EquivalentLayer, argon eql gap ,Argon,0.0127000,Sealed
+ WindowMaterial:Gap:EquivalentLayer, argon eql gap ,Argon,1.27000E-002,VentedIndoor
+ WindowMaterial:Gap:EquivalentLayer, air eql gap,Air,0.0063500,VentedOutdoor
+ WindowMaterial:Gap:EquivalentLayerExtra,IGNORED,Air,0.1,Sealed
+ windowmaterial:gap:equivalentlayer,IGNORED,Air,0.1,Sealed
+"#,
+    )?;
+
+    assert_eq!(rows.len(), 3);
+    assert_eq!(rows[0].material_name, "ARGON EQL GAP");
+    assert_eq!(rows[0].gas_type, "Argon");
+    assert_eq!(rows[0].gap_thickness_m, 0.0127);
+    assert_eq!(rows[0].gap_vent_type, "Sealed");
+    assert_eq!(rows[1].material_name, rows[0].material_name);
+    assert_eq!(rows[1].gas_type, rows[0].gas_type);
+    assert_eq!(rows[1].gap_thickness_m, rows[0].gap_thickness_m);
+    assert_eq!(rows[1].gap_vent_type, "VentedIndoor");
+    assert_eq!(rows[2].material_name, "AIR EQL GAP");
+    assert_eq!(rows[2].gas_type, "Air");
+    assert_eq!(rows[2].gap_thickness_m, 0.00635);
+    assert_eq!(rows[2].gap_vent_type, "VentedOutdoor");
+    Ok(())
+}
+
+#[test]
+fn eio_equivalent_layer_gap_parser_requires_exact_field_count() {
+    let too_few = parse_eio_window_material_gap_equivalent_layer(
+        "WindowMaterial:Gap:EquivalentLayer,GAP,Argon,0.0127\n",
+    )
+    .expect_err("an equivalent-layer gap row with one missing value must fail");
+    let too_many = parse_eio_window_material_gap_equivalent_layer(
+        "WindowMaterial:Gap:EquivalentLayer,GAP,Argon,0.0127,Sealed,EXTRA\n",
+    )
+    .expect_err("an equivalent-layer gap row with an extra value must fail");
+
+    assert!(matches!(
+        too_few,
+        EioError::InvalidWindowMaterialGapEquivalentLayer { line: 1, .. }
+    ));
+    assert!(matches!(
+        too_many,
+        EioError::InvalidWindowMaterialGapEquivalentLayer { line: 1, .. }
+    ));
+}
+
+#[test]
+fn eio_equivalent_layer_gap_parser_rejects_invalid_fields() {
+    let invalid_number = parse_eio_window_material_gap_equivalent_layer(
+        "WindowMaterial:Gap:EquivalentLayer,GAP,Argon,not-a-number,Sealed\n",
+    )
+    .expect_err("invalid equivalent-layer gap thickness must fail");
+    let missing_name = parse_eio_window_material_gap_equivalent_layer(
+        "WindowMaterial:Gap:EquivalentLayer,,Argon,0.0127,Sealed\n",
+    )
+    .expect_err("missing equivalent-layer gap material name must fail");
+    let missing_type = parse_eio_window_material_gap_equivalent_layer(
+        "WindowMaterial:Gap:EquivalentLayer,GAP,,0.0127,Sealed\n",
+    )
+    .expect_err("missing equivalent-layer gap gas type must fail");
+    let missing_vent_type = parse_eio_window_material_gap_equivalent_layer(
+        "WindowMaterial:Gap:EquivalentLayer,GAP,Argon,0.0127,\n",
+    )
+    .expect_err("missing equivalent-layer gap vent type must fail");
+
+    assert!(matches!(
+        &invalid_number,
+        EioError::InvalidWindowMaterialGapEquivalentLayer { .. }
+    ));
+    if let EioError::InvalidWindowMaterialGapEquivalentLayer { line, reason, .. } = invalid_number {
+        assert_eq!(line, 1);
+        assert_eq!(reason, "invalid Gap Thickness {m}");
+    }
+    for (error, expected_reason) in [
+        (missing_name, "missing Material Name"),
+        (missing_type, "missing Gas Type"),
+        (missing_vent_type, "missing Gap Vent Type"),
+    ] {
+        assert!(matches!(
+            &error,
+            EioError::InvalidWindowMaterialGapEquivalentLayer { .. }
+        ));
+        if let EioError::InvalidWindowMaterialGapEquivalentLayer { line, reason, .. } = error {
+            assert_eq!(line, 1);
+            assert_eq!(reason, expected_reason);
+        }
+    }
+
+    for invalid_thickness in ["0", "-0.0127", "NaN", "inf", "-inf"] {
+        let error = parse_eio_window_material_gap_equivalent_layer(&format!(
+            "WindowMaterial:Gap:EquivalentLayer,GAP,Argon,{invalid_thickness},Sealed\n"
+        ))
+        .expect_err("non-positive or non-finite equivalent-layer gap thickness must fail");
+        assert!(matches!(
+            &error,
+            EioError::InvalidWindowMaterialGapEquivalentLayer { .. }
+        ));
+        if let EioError::InvalidWindowMaterialGapEquivalentLayer { line, reason, .. } = error {
+            assert_eq!(line, 1);
+            assert_eq!(
+                reason,
+                "Gap Thickness {m} must be finite and greater than zero"
+            );
+        }
+    }
+}
+
+#[test]
+fn eio_equivalent_layer_gap_parser_reports_missing_rows() {
+    assert!(matches!(
+        parse_eio_window_material_gap_equivalent_layer("Program Version,EnergyPlus\n"),
+        Err(EioError::MissingWindowMaterialGapEquivalentLayer)
     ));
 }
 

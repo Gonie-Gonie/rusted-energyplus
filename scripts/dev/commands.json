@@ -557,6 +557,12 @@
                          "help":  "Compare single-gas window-material occurrences with EnergyPlus EIO evidence."
                      },
                      {
+                         "name":  "compare-window-material-gap-equivalent-layer-smoke",
+                         "path":  "compare\\compare-window-material-gap-equivalent-layer-smoke.ps1",
+                         "group":  "compare",
+                         "help":  "Compare equivalent-layer window-gap occurrences with EnergyPlus EIO evidence."
+                     },
+                     {
                          "name":  "compare-internal-gains-smoke",
                          "path":  "compare\\compare-internal-gains-smoke.ps1",
                          "group":  "compare",

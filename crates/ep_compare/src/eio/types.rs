@@ -246,6 +246,22 @@ pub struct EioWindowMaterialGas {
     pub thickness_m: f64,
 }
 
+/// Equivalent-layer window gap values read from an EnergyPlus `eplusout.eio` row.
+///
+/// EnergyPlus emits one row for every equivalent-layer construction-layer
+/// occurrence, so repeated material names remain distinct rows.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioWindowMaterialGapEquivalentLayer {
+    /// EnergyPlus-normalized material name.
+    pub material_name: String,
+    /// Canonical EnergyPlus gas type text, such as `Air` or `Argon`.
+    pub gas_type: String,
+    /// Gap-layer thickness in meters.
+    pub gap_thickness_m: f64,
+    /// Canonical EnergyPlus gap vent type text, such as `Sealed`.
+    pub gap_vent_type: String,
+}
+
 /// Equivalent-layer glazing values read from an EnergyPlus `eplusout.eio` row.
 ///
 /// EnergyPlus emits one row for every equivalent-layer construction-layer
@@ -322,6 +338,8 @@ pub enum EioError {
     MissingWindowMaterialGlazing,
     /// No `WindowMaterial:Gas` rows were present.
     MissingWindowMaterialGas,
+    /// No `WindowMaterial:Gap:EquivalentLayer` rows were present.
+    MissingWindowMaterialGapEquivalentLayer,
     /// No `WindowMaterial:Glazing:EquivalentLayer` rows were present.
     MissingWindowMaterialGlazingEquivalentLayer,
     /// A grouped construction/material summary could not be parsed.
@@ -423,6 +441,15 @@ pub enum EioError {
         /// Parse failure reason.
         reason: String,
     },
+    /// A `WindowMaterial:Gap:EquivalentLayer` row could not be parsed.
+    InvalidWindowMaterialGapEquivalentLayer {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
     /// A `WindowMaterial:Glazing:EquivalentLayer` row could not be parsed.
     InvalidWindowMaterialGlazingEquivalentLayer {
         /// One-based line number.
@@ -461,6 +488,12 @@ impl Display for EioError {
             }
             Self::MissingWindowMaterialGas => {
                 write!(formatter, "EIO WindowMaterial:Gas not found")
+            }
+            Self::MissingWindowMaterialGapEquivalentLayer => {
+                write!(
+                    formatter,
+                    "EIO WindowMaterial:Gap:EquivalentLayer not found"
+                )
             }
             Self::MissingWindowMaterialGlazingEquivalentLayer => {
                 write!(
@@ -512,6 +545,10 @@ impl Display for EioError {
                 formatter,
                 "invalid EIO WindowMaterial:Gas at line {line}: {reason}: {text}"
             ),
+            Self::InvalidWindowMaterialGapEquivalentLayer { line, text, reason } => write!(
+                formatter,
+                "invalid EIO WindowMaterial:Gap:EquivalentLayer at line {line}: {reason}: {text}"
+            ),
             Self::InvalidWindowMaterialGlazingEquivalentLayer { line, text, reason } => write!(
                 formatter,
                 "invalid EIO WindowMaterial:Glazing:EquivalentLayer at line {line}: {reason}: {text}"
@@ -535,6 +572,7 @@ impl std::error::Error for EioError {
             | Self::MissingMaterialCtfSummary
             | Self::MissingWindowMaterialGlazing
             | Self::MissingWindowMaterialGas
+            | Self::MissingWindowMaterialGapEquivalentLayer
             | Self::MissingWindowMaterialGlazingEquivalentLayer
             | Self::InvalidSurfaceGeometry { .. }
             | Self::InvalidOtherEquipmentNominal { .. }
@@ -545,6 +583,7 @@ impl std::error::Error for EioError {
             | Self::InvalidWarmupEnvironment { .. }
             | Self::InvalidWindowMaterialGlazing { .. }
             | Self::InvalidWindowMaterialGas { .. }
+            | Self::InvalidWindowMaterialGapEquivalentLayer { .. }
             | Self::InvalidWindowMaterialGlazingEquivalentLayer { .. } => None,
         }
     }

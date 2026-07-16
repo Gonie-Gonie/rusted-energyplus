@@ -350,8 +350,8 @@ storage initializes to `Sealed`, the 26.1 schema requires the field and the
 source's alpha-blank guard checks the required gas field rather than the vent
 field, so valid input always parses the supplied vent token.
 
-The typed checkpoint deliberately stops before
-`Construction:WindowEquivalentLayer` and ASHWAT runtime execution. In
+The implementation deliberately stops before typing
+`Construction:WindowEquivalentLayer` or adding ASHWAT runtime execution. In
 particular, the 26.1 equivalent-layer transfer path copies specific-heat
 coefficients into its viscosity slots, and its FRA evaluation repeats the
 linear coefficient for each quadratic term. `BuildGap` also emits a severe
@@ -360,9 +360,23 @@ typed material thickness is below that value, while EIO continues to report
 the original material thickness. Reproducing or correcting these source
 quirks requires a later runtime boundary and is not claimed here.
 Ordinary `Construction` rejects this equivalent-layer gap, arbitrary-run
-assessment counts it as explicitly unsupported, and no external EIO,
-occurrence-order, optics, rating, or heat-transfer claim is added by the
-typed-only slice.
+assessment counts it as explicitly unsupported, and the typed payload is
+never projected through an opaque-material accessor.
+
+`window_material_gap_equivalent_layer_001` adds a separate nonblocking
+diagnostic EnergyPlus 26.1 EIO gate. Its clean oracle fixture emits seven
+`Construction:WindowEquivalentLayer` gap-layer occurrences across all five
+gas types and all three vent modes, including one reused Argon material; one
+valid but unreferenced Air definition is absent. The Rust bridge compares the
+exact fixture sequence, material identity, canonical gas and vent types, and
+thickness after the source `{:.3R}` serialization policy. Material definition
+order differs from occurrence order. Construction names and IDF declarations
+are aligned with converted-epJSON canonical order, so arbitrary IDF
+declaration-order parity remains unclaimed. The exact construction, host, and
+detailed-window rows are oracle-only fixture locks. EIO omits Custom
+coefficients/properties and nominal resistance, and the gate adds no
+construction typing/rating, optics, ASHWAT/BuildGap, runtime, or conformance
+claim.
 
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. The two ordinary glazing variants and `WindowMaterial:Gas` use the
@@ -457,6 +471,15 @@ typed-test evidence only. Runtime-boundary tests separately lock the explicit
 arbitrary-run block. Rust/EnergyPlus row-order parity, window optics and thermal
 execution, runtime behavior, and conformance remain unclaimed.
 
+`WindowMaterial:Gap:EquivalentLayer` compiler tests lock its uppercase gas
+tokens, required vent mode, all standard/Custom property behavior, shared
+material names, source order, consumer family, and explicit runtime block.
+`window_material_gap_equivalent_layer_001` adds the clean seven-occurrence
+exact-EIO sequence described above, including duplicate reuse and unused
+definition exclusion. EIO exposes only material name, canonical gas type,
+source-formatted thickness, and canonical vent type; the remaining typed
+fields and every construction/runtime behavior remain outside the gate.
+
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
 dynamic AirGap/IRT heat transfer. It also does not claim exact EnergyPlus
@@ -517,10 +540,15 @@ as a duplicate-aware multiset across all five gas types. Multiplicity, name,
 and canonical gas type are exact, and thickness is exact after source
 `{:.3R}` normalization. Custom coefficients/properties and nominal resistance
 remain typed-only because the EIO row omits them.
+`window_material_gap_equivalent_layer_001` compares the exact fixture-ordered
+seven-row equivalent-layer gap sequence across all five gas types and all
+three vent modes, including one reused material and excluding one unused
+definition. Name, canonical gas/vent type, and source-formatted thickness are
+exact; arbitrary IDF construction declaration order remains unclaimed.
 These tests and static EIO smokes remain bounded evidence, not an EnergyPlus
 material-family or window gate.
 
-The Gas EIO smoke does not promote numerical window behavior, runtime
+The gas EIO smokes do not promote numerical window behavior, runtime
 execution, or conformance.
 
 CP58 remains incomplete until, at minimum:

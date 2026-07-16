@@ -892,6 +892,79 @@ pub fn parse_eio_window_material_gas(
     Ok(gas_rows)
 }
 
+/// Parses `WindowMaterial:Gap:EquivalentLayer` rows from EnergyPlus EIO contents.
+///
+/// Rows are returned in emission order and repeated material names are
+/// preserved because EnergyPlus emits the row once per equivalent-layer
+/// construction-layer occurrence.
+pub fn parse_eio_window_material_gap_equivalent_layer(
+    contents: &str,
+) -> Result<Vec<EioWindowMaterialGapEquivalentLayer>, EioError> {
+    const FIELD_COUNT: usize = 5;
+    const ROW_LABEL: &str = "WindowMaterial:Gap:EquivalentLayer,";
+
+    let mut gap_rows = Vec::new();
+    for (line_index, line) in contents.lines().enumerate() {
+        let line_number = line_index + 1;
+        let trimmed = line.trim();
+        if !trimmed.starts_with(ROW_LABEL) {
+            continue;
+        }
+
+        let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+        if fields.len() != FIELD_COUNT {
+            return Err(EioError::InvalidWindowMaterialGapEquivalentLayer {
+                line: line_number,
+                text: line.to_string(),
+                reason: format!(
+                    "expected exactly 4 data fields after the row label ({FIELD_COUNT} comma-separated fields total), found {} data fields",
+                    fields.len().saturating_sub(1)
+                ),
+            });
+        }
+
+        let material_name = required_window_gap_equivalent_layer_field(
+            &fields,
+            1,
+            line_number,
+            line,
+            "Material Name",
+        )?
+        .to_ascii_uppercase();
+        let gas_type =
+            required_window_gap_equivalent_layer_field(&fields, 2, line_number, line, "Gas Type")?
+                .to_string();
+        let gap_thickness_m = parse_window_gap_equivalent_layer_f64_field(
+            &fields,
+            3,
+            line_number,
+            line,
+            "Gap Thickness {m}",
+        )?;
+        let gap_vent_type = required_window_gap_equivalent_layer_field(
+            &fields,
+            4,
+            line_number,
+            line,
+            "Gap Vent Type",
+        )?
+        .to_string();
+
+        gap_rows.push(EioWindowMaterialGapEquivalentLayer {
+            material_name,
+            gas_type,
+            gap_thickness_m,
+            gap_vent_type,
+        });
+    }
+
+    if gap_rows.is_empty() {
+        return Err(EioError::MissingWindowMaterialGapEquivalentLayer);
+    }
+
+    Ok(gap_rows)
+}
+
 /// Parses `WindowMaterial:Glazing:EquivalentLayer` EIO rows.
 ///
 /// Rows are returned in emission order and repeated material names are
@@ -1336,6 +1409,49 @@ fn parse_window_gas_f64_field(
         })?;
     if !value.is_finite() || value <= 0.0 {
         return Err(EioError::InvalidWindowMaterialGas {
+            line,
+            text: text.to_string(),
+            reason: format!("{field} must be finite and greater than zero"),
+        });
+    }
+    Ok(value)
+}
+
+fn required_window_gap_equivalent_layer_field<'a>(
+    fields: &'a [&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<&'a str, EioError> {
+    let value = required_field(fields, index);
+    if value.is_empty() {
+        Err(EioError::InvalidWindowMaterialGapEquivalentLayer {
+            line,
+            text: text.to_string(),
+            reason: format!("missing {field}"),
+        })
+    } else {
+        Ok(value)
+    }
+}
+
+fn parse_window_gap_equivalent_layer_f64_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<f64, EioError> {
+    let value = required_field(fields, index)
+        .parse::<f64>()
+        .map_err(|_error| EioError::InvalidWindowMaterialGapEquivalentLayer {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })?;
+    if !value.is_finite() || value <= 0.0 {
+        return Err(EioError::InvalidWindowMaterialGapEquivalentLayer {
             line,
             text: text.to_string(),
             reason: format!("{field} must be finite and greater than zero"),

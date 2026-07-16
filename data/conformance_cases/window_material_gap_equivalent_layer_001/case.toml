@@ -1,0 +1,76 @@
+id = "window_material_gap_equivalent_layer_001"
+title = "Equivalent-layer window gap static occurrence evidence"
+milestone = "v0.8-heat-balance"
+purpose = "Compare the bounded Rust WindowMaterial:Gap:EquivalentLayer typed slice with EnergyPlus repeated equivalent-layer gap EIO evidence across all five gas types and all three gap vent modes."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The fixture defines Air, Argon, Custom, Krypton, and Xenon equivalent-layer gaps. Active Air gaps exercise VentedIndoor and VentedOutdoor, while the active nonvented gases exercise Sealed, so all five gas types and all three vent modes appear in EIO occurrences.",
+  "Six distinct gap definitions are used by seven Construction:WindowEquivalentLayer objects. The Argon gap is reused once, producing two exact Argon occurrence rows.",
+  "A seventh valid Sealed Air definition is deliberately unused by every equivalent-layer construction. Its absence from EIO locks that gap rows are construction-layer occurrences rather than a definition dump.",
+  "Gap definition order and material-name order are intentionally different from construction occurrence and layer order. Construction declarations remain in canonical construction-name order because the bounded Rust comparison has no IDF declaration-order overlay.",
+  "The Custom gap has valid, nondefault A+B*T+C*T^2 gas-property coefficients and an explicit specific-heat ratio. Those coefficients are typed-only because the EnergyPlus gap EIO row exposes only material name, canonical gas type, serialized thickness, and vent type.",
+  "Each construction is assigned to a nonoverlapping FenestrationSurface:Detailed object on one distinct opaque host wall. The named Custom window and its host supply exact fixture-integrity rows; equivalent-layer construction ratings and window behavior remain oracle-only evidence.",
+  "The smoke gate requires a clean EnergyPlus 26.1.0 run, the exact gap EIO header, the exact ordered seven-row construction/gap sequence, exclusion of the unused definition, and exact host/window integrity rows before invoking the Rust typed-value bridge.",
+  "The Rust bridge compares occurrence count, material name, canonical gas type, and canonical vent type exactly, and compares thickness exactly after reproducing the EnergyPlus 26.1 {:.3R} EIO serialization policy.",
+  "Construction declaration-order parity outside this canonical fixture, equivalent-layer layer-count semantics, construction ratings, ASHWAT optics, heat-transfer runtime, and fenestration behavior are not claimed.",
+  "This is non-blocking diagnostic-only static input evidence and makes no WindowMaterial:Gap:EquivalentLayer conformance claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/window_material_gap_equivalent_layer_001/window_material_gap_equivalent_layer.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface", "construction"]
+has_zone = true
+has_surface = true
+has_fenestration = true
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/window_material_gap_equivalent_layer_001/window_material_gap_equivalent_layer.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+epjson = ".runtime/compare-window-material-gap-equivalent-layer/26.1.0/window-material-gap-equivalent-layer.epJSON"
+
+[[outputs]]
+key = "*"
+variable = "WindowMaterial:Gap:EquivalentLayer Layer Occurrences"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "WindowConstruction Layer Summary"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "DISTINCTIVE EQL GAP TEST WINDOW"
+variable = "HeatTransfer Surface Static Inputs"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/window_material_gap_equivalent_layer_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-window-material-gap-equivalent-layer-smoke"
+blocking = false

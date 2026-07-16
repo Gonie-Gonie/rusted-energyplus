@@ -1,0 +1,388 @@
+Version,26.1;
+
+SimulationControl,No,No,No,No,Yes,No;
+
+Building,Window Material Gap EquivalentLayer Compare,0.0,Suburbs,0.04,0.4,FullExterior,25,6;
+
+Timestep,4;
+
+HeatBalanceAlgorithm,ConductionTransferFunction;
+
+SurfaceConvectionAlgorithm:Inside,TARP;
+
+SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+Site:Location,Golden,39.74,-105.18,-7.0,1829.0;
+
+Site:GroundTemperature:BuildingSurface,18,18,18,18,18,18,18,18,18,18,18,18;
+
+RunPeriod,Run Period 1,1,1,2013,1,1,2013,Tuesday,Yes,Yes,No,Yes,Yes;
+
+GlobalGeometryRules,UpperLeftCorner,CounterClockWise,World;
+
+Material,
+  DISTINCTIVE EQL GAP OPAQUE HOST MATERIAL,
+  Rough,
+  0.113,
+  0.347,
+  913.0,
+  836.0,
+  0.87,
+  0.63,
+  0.58;
+
+WindowMaterial:Glazing:EquivalentLayer,
+  DISTINCTIVE EQL GAP TEST GLASS,
+  SpectralAverage,
+  ,
+  0.83,
+  0.83,
+  0.08,
+  0.08,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.76,
+  0.14,
+  0.14,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.84,
+  0.84,
+  0.158;
+
+! Material definition order is intentionally different from construction
+! occurrence order and from material-name order. EIO rows must follow the
+! construction/layer traversal, not this object-definition sequence.
+WindowMaterial:Gap:EquivalentLayer,
+  Z XENON SEALED EQL GAP,
+  Xenon,
+  0.0155,
+  Sealed;
+
+! This valid definition is deliberately unused by every equivalent-layer
+! construction. Its absence from EIO locks occurrence rather than definition
+! emission semantics.
+WindowMaterial:Gap:EquivalentLayer,
+  DISTINCTIVE UNUSED AIR SEALED EQL GAP,
+  Air,
+  0.0166,
+  Sealed;
+
+WindowMaterial:Gap:EquivalentLayer,
+  M CUSTOM SEALED EQL GAP,
+  Custom,
+  0.0133,
+  Sealed,
+  0.0015,
+  0.00008,
+  0.00000001,
+  0.000004,
+  0.00000005,
+  0.00000000001,
+  700.0,
+  0.2,
+  0.0001,
+  44.0,
+  1.4;
+
+WindowMaterial:Gap:EquivalentLayer,
+  A AIR VENTED OUTDOOR EQL GAP,
+  Air,
+  0.0122,
+  VentedOutdoor;
+
+WindowMaterial:Gap:EquivalentLayer,
+  Y KRYPTON SEALED EQL GAP,
+  Krypton,
+  0.0144,
+  Sealed;
+
+WindowMaterial:Gap:EquivalentLayer,
+  B AIR VENTED INDOOR EQL GAP,
+  Air,
+  0.0111,
+  VentedIndoor;
+
+WindowMaterial:Gap:EquivalentLayer,
+  C ARGON SEALED EQL GAP,
+  Argon,
+  0.0177,
+  Sealed;
+
+! Construction names are declared in canonical order because the bounded Rust
+! bridge has no IDF declaration-order overlay. Their referenced gap sequence is
+! deliberately unrelated to the gap definition/name order above.
+Construction:WindowEquivalentLayer,
+  A CUSTOM EQL WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL GAP TEST GLASS,
+  M CUSTOM SEALED EQL GAP,
+  DISTINCTIVE EQL GAP TEST GLASS;
+
+Construction:WindowEquivalentLayer,
+  B AIR OUTDOOR EQL WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL GAP TEST GLASS,
+  A AIR VENTED OUTDOOR EQL GAP,
+  DISTINCTIVE EQL GAP TEST GLASS;
+
+Construction:WindowEquivalentLayer,
+  C KRYPTON EQL WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL GAP TEST GLASS,
+  Y KRYPTON SEALED EQL GAP,
+  DISTINCTIVE EQL GAP TEST GLASS;
+
+Construction:WindowEquivalentLayer,
+  D AIR INDOOR EQL WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL GAP TEST GLASS,
+  B AIR VENTED INDOOR EQL GAP,
+  DISTINCTIVE EQL GAP TEST GLASS;
+
+Construction:WindowEquivalentLayer,
+  E XENON EQL WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL GAP TEST GLASS,
+  Z XENON SEALED EQL GAP,
+  DISTINCTIVE EQL GAP TEST GLASS;
+
+Construction:WindowEquivalentLayer,
+  F ARGON EQL WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL GAP TEST GLASS,
+  C ARGON SEALED EQL GAP,
+  DISTINCTIVE EQL GAP TEST GLASS;
+
+Construction:WindowEquivalentLayer,
+  G REUSED ARGON EQL WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL GAP TEST GLASS,
+  C ARGON SEALED EQL GAP,
+  DISTINCTIVE EQL GAP TEST GLASS;
+
+Construction,
+  H EQL GAP OPAQUE HOST CONSTRUCTION,
+  DISTINCTIVE EQL GAP OPAQUE HOST MATERIAL;
+
+Zone,EQL GAP TEST ZONE,0,0,0,0,1,1,3,48,16;
+
+BuildingSurface:Detailed,
+  EQL GAP TEST FLOOR,
+  Floor,
+  H EQL GAP OPAQUE HOST CONSTRUCTION,
+  EQL GAP TEST ZONE,
+  ,
+  Ground,
+  ,
+  NoSun,
+  NoWind,
+  1.0,
+  4,
+  4,4,0,
+  4,0,0,
+  0,0,0,
+  0,4,0;
+
+BuildingSurface:Detailed,
+  EQL GAP TEST ROOF,
+  Roof,
+  H EQL GAP OPAQUE HOST CONSTRUCTION,
+  EQL GAP TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.0,
+  4,
+  0,4,3,
+  0,0,3,
+  4,0,3,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  EQL GAP TEST WEST WALL,
+  Wall,
+  H EQL GAP OPAQUE HOST CONSTRUCTION,
+  EQL GAP TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,4,3,
+  0,4,0,
+  0,0,0,
+  0,0,3;
+
+BuildingSurface:Detailed,
+  EQL GAP TEST EAST WALL,
+  Wall,
+  H EQL GAP OPAQUE HOST CONSTRUCTION,
+  EQL GAP TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,0,3,
+  4,0,0,
+  4,4,0,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  DISTINCTIVE EQL GAP WINDOW HOST WALL,
+  Wall,
+  H EQL GAP OPAQUE HOST CONSTRUCTION,
+  EQL GAP TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,0,3,
+  0,0,0,
+  4,0,0,
+  4,0,3;
+
+BuildingSurface:Detailed,
+  EQL GAP TEST NORTH WALL,
+  Wall,
+  H EQL GAP OPAQUE HOST CONSTRUCTION,
+  EQL GAP TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,4,3,
+  4,4,0,
+  0,4,0,
+  0,4,3;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE EQL GAP TEST WINDOW,
+  Window,
+  A CUSTOM EQL WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL GAP WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  0.10,0,2.80,
+  0.10,0,1.80,
+  0.85,0,1.80,
+  0.85,0,2.80;
+
+FenestrationSurface:Detailed,
+  EQL GAP AIR OUTDOOR WINDOW,
+  Window,
+  B AIR OUTDOOR EQL WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL GAP WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  0.95,0,2.80,
+  0.95,0,1.80,
+  1.70,0,1.80,
+  1.70,0,2.80;
+
+FenestrationSurface:Detailed,
+  EQL GAP KRYPTON WINDOW,
+  Window,
+  C KRYPTON EQL WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL GAP WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  1.80,0,2.80,
+  1.80,0,1.80,
+  2.55,0,1.80,
+  2.55,0,2.80;
+
+FenestrationSurface:Detailed,
+  EQL GAP AIR INDOOR WINDOW,
+  Window,
+  D AIR INDOOR EQL WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL GAP WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  2.65,0,2.80,
+  2.65,0,1.80,
+  3.40,0,1.80,
+  3.40,0,2.80;
+
+FenestrationSurface:Detailed,
+  EQL GAP XENON WINDOW,
+  Window,
+  E XENON EQL WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL GAP WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  0.10,0,1.60,
+  0.10,0,0.60,
+  0.85,0,0.60,
+  0.85,0,1.60;
+
+FenestrationSurface:Detailed,
+  EQL GAP ARGON WINDOW,
+  Window,
+  F ARGON EQL WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL GAP WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  0.95,0,1.60,
+  0.95,0,0.60,
+  1.70,0,0.60,
+  1.70,0,1.60;
+
+FenestrationSurface:Detailed,
+  EQL GAP REUSED ARGON WINDOW,
+  Window,
+  G REUSED ARGON EQL WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL GAP WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  1.80,0,1.60,
+  1.80,0,0.60,
+  2.55,0,0.60,
+  2.55,0,1.60;
+
+! A reporting element is required to keep the EnergyPlus run warning-free.
+! It is not part of the diagnostic manifest or comparison claim.
+Output:Variable,*,Zone Mean Air Temperature,Hourly;
+
+Output:Constructions,Constructions;
+
+Output:Surfaces:List,Details;

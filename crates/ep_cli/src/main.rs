@@ -23,7 +23,8 @@ use ep_compare::{
     load_eio_heat_transfer_surfaces, load_eio_other_equipment_nominal,
     load_eio_surface_geometry_rules, load_eio_warmup_environments,
     load_eio_window_material_glazing, load_eio_window_material_glazing_equivalent_layer,
-    load_eio_zone_geometry, load_eso_series, load_eso_time_series, parse_eio_window_material_gas,
+    load_eio_zone_geometry, load_eso_series, load_eso_time_series,
+    parse_eio_window_material_gap_equivalent_layer, parse_eio_window_material_gas,
 };
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_conformance::{
@@ -35,11 +36,12 @@ use ep_model::{
     AutoOrNumber, Construction, ConstructionKind, GeometryCoordinateSystem, GlobalGeometryRules,
     Material, MaterialDefinition, ModelGraph, OtherEquipment, OutsideBoundaryCondition, Point3,
     ScheduleId, SimulationModel, StartingVertexPosition, SurfaceType, TypedModel,
-    VertexEntryDirection, WindowGasMaterial, WindowGasType, WindowGlazingEquivalentLayerMaterial,
-    WindowGlazingRefractionExtinctionMaterial, WindowGlazingSpectralAverageMaterial,
+    VertexEntryDirection, WindowGapEquivalentLayerMaterial, WindowGasMaterial, WindowGasType,
+    WindowGlazingEquivalentLayerMaterial, WindowGlazingRefractionExtinctionMaterial,
+    WindowGlazingSpectralAverageMaterial,
 };
 use ep_oracle::default_oracle_release;
-use ep_raw_model::{RawModel, RawModelSummary, load_epjson_file};
+use ep_raw_model::{RawModel, RawModelSummary, RawValue, load_epjson_file};
 use ep_run::{
     PartialRunPolicy, RunConfig, RunExitCode, RunMode, RunOutputFormat, TraceLevel, TraceSelection,
     run_arbitrary_idf,
@@ -336,6 +338,7 @@ fn print_help() {
     println!("  compare window-glazing-refraction-extinction <input.epJSON> <eplusout.eio>");
     println!("  compare window-glazing-equivalent-layer <input.epJSON> <eplusout.eio>");
     println!("  compare window-material-gas <input.epJSON> <eplusout.eio>");
+    println!("  compare window-material-gap-equivalent-layer <input.epJSON> <eplusout.eio>");
     println!("  compare internal-gains <input.epJSON> <eplusout.eio>");
     println!("  compare internal-convective-gain <input.epJSON> <eplusout.eso>");
     println!("  compare weather-fields <weather.epw> <eplusout.eso>");
@@ -3357,6 +3360,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             run_compare_window_glazing_equivalent_layer(&args[1..])
         }
         Some("window-material-gas") => run_compare_window_material_gas(&args[1..]),
+        Some("window-material-gap-equivalent-layer") => {
+            run_compare_window_material_gap_equivalent_layer(&args[1..])
+        }
         Some("internal-gains") => run_compare_internal_gains(&args[1..]),
         Some("internal-convective-gain") => run_compare_internal_convective_gain(&args[1..]),
         Some("weather-fields") | Some("weather-drybulb") => run_compare_weather_fields(&args[1..]),
@@ -3379,6 +3385,9 @@ fn run_compare_command(args: &[String]) -> i32 {
                 "usage: eplus-rs compare window-glazing-equivalent-layer <input.epJSON> <eplusout.eio>"
             );
             eprintln!("usage: eplus-rs compare window-material-gas <input.epJSON> <eplusout.eio>");
+            eprintln!(
+                "usage: eplus-rs compare window-material-gap-equivalent-layer <input.epJSON> <eplusout.eio>"
+            );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(
                 "usage: eplus-rs compare internal-convective-gain <input.epJSON> <eplusout.eso>"
@@ -3406,6 +3415,9 @@ fn run_compare_command(args: &[String]) -> i32 {
                 "usage: eplus-rs compare window-glazing-equivalent-layer <input.epJSON> <eplusout.eio>"
             );
             eprintln!("usage: eplus-rs compare window-material-gas <input.epJSON> <eplusout.eio>");
+            eprintln!(
+                "usage: eplus-rs compare window-material-gap-equivalent-layer <input.epJSON> <eplusout.eio>"
+            );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(
                 "usage: eplus-rs compare internal-convective-gain <input.epJSON> <eplusout.eso>"
@@ -4550,6 +4562,126 @@ fn run_compare_window_material_gas(args: &[String]) -> i32 {
             oracle_row.thickness_m,
             formatted_rust_thickness,
             rust_row.fields.thickness_m,
+            if row_pass { "pass" } else { "fail" },
+        );
+    }
+
+    println!(
+        "  first_divergence: {}",
+        first_divergence.unwrap_or_else(|| "none".to_string())
+    );
+    println!("  status: {}", if passed { "pass" } else { "fail" });
+    if passed { 0 } else { 1 }
+}
+
+fn run_compare_window_material_gap_equivalent_layer(args: &[String]) -> i32 {
+    const USAGE: &str = "usage: eplus-rs compare window-material-gap-equivalent-layer <input.epJSON> <eplusout.eio>";
+    let Some(input_path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!("{USAGE}");
+        return 2;
+    };
+    let Some(eio_path) = args.get(1) else {
+        eprintln!("missing eplusout.eio path");
+        eprintln!("{USAGE}");
+        return 2;
+    };
+
+    let raw_model = match load_epjson_file(input_path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model else {
+        print_compile_diagnostics(&result.report);
+        return 1;
+    };
+    let rust_rows = match window_material_gap_equivalent_layer_rows(&raw_model, &model) {
+        Ok(rows) => rows,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    if rust_rows.is_empty() {
+        eprintln!(
+            "no WindowMaterial:Gap:EquivalentLayer occurrences are referenced by Construction:WindowEquivalentLayer objects"
+        );
+        return 1;
+    }
+
+    let eio_contents = match std::fs::read_to_string(eio_path) {
+        Ok(contents) => contents,
+        Err(error) => {
+            eprintln!("failed to read {}: {error}", eio_path);
+            return 1;
+        }
+    };
+    let oracle_rows = match parse_eio_window_material_gap_equivalent_layer(&eio_contents) {
+        Ok(rows) => rows,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+
+    let mut passed = rust_rows.len() == oracle_rows.len();
+    let mut first_divergence = None;
+    if !passed {
+        first_divergence = Some(format!(
+            "material_occurrence_count expected {} observed {}",
+            oracle_rows.len(),
+            rust_rows.len()
+        ));
+    }
+
+    println!("Window Material Gap EquivalentLayer Comparison");
+    println!("  comparison_class: smoke");
+    println!("  conformance_claim: false");
+    println!("  window_runtime_claim: false");
+    println!("  fenestration_surface_claim: false");
+    println!("  equivalent_layer_construction_claim: false");
+    println!("  construction_rating_claim: false");
+    println!("  broad_idf_declaration_order_claim: false");
+    println!("  arbitrary_idf_declaration_order_claim: false");
+    println!(
+        "  occurrence_order_policy: epjson-canonical-construction-name-then-layer-order-exact"
+    );
+    println!("  tolerance_policy: energyplus-26.1-round-sig-digits-3-normalized-exact");
+    println!("  material_occurrences: {}", rust_rows.len());
+    println!("  oracle_material_rows: {}", oracle_rows.len());
+
+    for (occurrence_index, (rust_row, oracle_row)) in rust_rows.iter().zip(&oracle_rows).enumerate()
+    {
+        let row_pass = window_material_gap_equivalent_layer_row_matches(rust_row, oracle_row);
+        if !row_pass {
+            passed = false;
+            record_window_material_gap_equivalent_layer_divergence(
+                &mut first_divergence,
+                rust_row,
+                oracle_row,
+                occurrence_index,
+            );
+        }
+        let formatted_rust_thickness =
+            energyplus_window_gas_eio_thickness(rust_row.fields.thickness_m).unwrap_or(f64::NAN);
+        println!(
+            "  occurrence: {} rust_construction: {} rust_layer: {} material: {}/{} gas_type: {}/{} gap_thickness_m_eio: {:.9}/{:.9} rust_input_thickness_m: {:.9} gap_vent_type: {}/{} status: {}",
+            occurrence_index + 1,
+            rust_row.construction_name,
+            rust_row.layer_number,
+            oracle_row.material_name,
+            rust_row.material_name,
+            oracle_row.gas_type,
+            rust_row.fields.gas_type.energyplus_name(),
+            oracle_row.gap_thickness_m,
+            formatted_rust_thickness,
+            rust_row.fields.thickness_m,
+            oracle_row.gap_vent_type,
+            rust_row.fields.gap_vent_type.energyplus_name(),
             if row_pass { "pass" } else { "fail" },
         );
     }
@@ -10296,14 +10428,98 @@ fn window_material_gas_rows(model: &TypedModel) -> Result<Vec<WindowMaterialGasR
     Ok(rows)
 }
 
-const fn window_gas_type_name(gas_type: WindowGasType) -> &'static str {
-    match gas_type {
-        WindowGasType::Custom => "Custom",
-        WindowGasType::Air => "Air",
-        WindowGasType::Argon => "Argon",
-        WindowGasType::Krypton => "Krypton",
-        WindowGasType::Xenon => "Xenon",
+#[derive(Clone, Debug)]
+struct WindowMaterialGapEquivalentLayerRow {
+    construction_name: String,
+    layer_number: usize,
+    material_name: String,
+    fields: WindowGapEquivalentLayerMaterial,
+}
+
+fn window_material_gap_equivalent_layer_rows(
+    raw_model: &RawModel,
+    model: &TypedModel,
+) -> Result<Vec<WindowMaterialGapEquivalentLayerRow>, String> {
+    const OBJECT_TYPE: &str = "Construction:WindowEquivalentLayer";
+    const MAX_LAYERS: usize = 11;
+
+    let constructions = raw_model
+        .ordered_instances(OBJECT_TYPE)
+        .map_err(|error| error.to_string())?;
+    let mut rows = Vec::new();
+    for (construction_name, construction) in constructions {
+        let mut missing_optional_layer = false;
+        for layer_number in 1..=MAX_LAYERS {
+            let field_name = if layer_number == 1 {
+                "outside_layer".to_string()
+            } else {
+                format!("layer_{layer_number}")
+            };
+            let Some(value) = construction
+                .fields
+                .iter()
+                .find(|(field, _value)| field.0 == field_name)
+                .map(|(_field, value)| value)
+            else {
+                if layer_number == 1 {
+                    return Err(format!(
+                        "{OBJECT_TYPE}/{} requires field outside_layer",
+                        construction_name.0
+                    ));
+                }
+                missing_optional_layer = true;
+                continue;
+            };
+            if missing_optional_layer {
+                return Err(format!(
+                    "{OBJECT_TYPE}/{} has noncontiguous layer field {field_name}",
+                    construction_name.0
+                ));
+            }
+            let RawValue::String(material_name) = value else {
+                return Err(format!(
+                    "{OBJECT_TYPE}/{} field {field_name} must be a string",
+                    construction_name.0
+                ));
+            };
+            if material_name.trim().is_empty() {
+                return Err(format!(
+                    "{OBJECT_TYPE}/{} field {field_name} must be nonblank",
+                    construction_name.0
+                ));
+            }
+
+            let Some(material_id) = model.material_names.resolve(material_name) else {
+                // Other equivalent-layer material objects remain outside the
+                // current typed subset and do not emit this EIO row type.
+                continue;
+            };
+            let material = model
+                .materials
+                .iter()
+                .find(|material| material.id == material_id)
+                .ok_or_else(|| {
+                    format!(
+                        "{OBJECT_TYPE}/{} field {field_name} references a missing typed material",
+                        construction_name.0
+                    )
+                })?;
+            let MaterialDefinition::WindowGapEquivalentLayer(fields) = material.definition else {
+                continue;
+            };
+            rows.push(WindowMaterialGapEquivalentLayerRow {
+                construction_name: construction_name.0.trim().to_ascii_uppercase(),
+                layer_number,
+                material_name: material.name.0.clone(),
+                fields,
+            });
+        }
     }
+    Ok(rows)
+}
+
+const fn window_gas_type_name(gas_type: WindowGasType) -> &'static str {
+    gas_type.energyplus_name()
 }
 
 fn window_material_gas_pairings(
@@ -10425,6 +10641,82 @@ fn record_window_material_gas_divergence(
             format!(
                 "{prefix} field thickness_m expected {:.9} observed input {:.9} EnergyPlus .3R {:?}",
                 oracle_row.thickness_m, rust_row.fields.thickness_m, formatted_rust_thickness
+            ),
+        );
+    }
+}
+
+fn window_material_gap_equivalent_layer_row_matches(
+    rust_row: &WindowMaterialGapEquivalentLayerRow,
+    oracle_row: &ep_compare::EioWindowMaterialGapEquivalentLayer,
+) -> bool {
+    oracle_row
+        .material_name
+        .eq_ignore_ascii_case(&rust_row.material_name)
+        && oracle_row.gas_type == rust_row.fields.gas_type.energyplus_name()
+        && energyplus_window_gas_eio_thickness(rust_row.fields.thickness_m)
+            == Some(oracle_row.gap_thickness_m)
+        && oracle_row.gap_vent_type == rust_row.fields.gap_vent_type.energyplus_name()
+}
+
+fn record_window_material_gap_equivalent_layer_divergence(
+    first_divergence: &mut Option<String>,
+    rust_row: &WindowMaterialGapEquivalentLayerRow,
+    oracle_row: &ep_compare::EioWindowMaterialGapEquivalentLayer,
+    occurrence_index: usize,
+) {
+    let prefix = format!(
+        "occurrence {} construction {} layer {} material {}",
+        occurrence_index + 1,
+        rust_row.construction_name,
+        rust_row.layer_number,
+        rust_row.material_name
+    );
+    if !oracle_row
+        .material_name
+        .eq_ignore_ascii_case(&rust_row.material_name)
+    {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "{prefix} field material_name expected {} observed {}",
+                oracle_row.material_name, rust_row.material_name
+            ),
+        );
+        return;
+    }
+
+    let rust_gas_type = rust_row.fields.gas_type.energyplus_name();
+    if oracle_row.gas_type != rust_gas_type {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "{prefix} field gas_type expected {} observed {}",
+                oracle_row.gas_type, rust_gas_type
+            ),
+        );
+        return;
+    }
+
+    let formatted_rust_thickness = energyplus_window_gas_eio_thickness(rust_row.fields.thickness_m);
+    if formatted_rust_thickness != Some(oracle_row.gap_thickness_m) {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "{prefix} field gap_thickness_m expected {:.9} observed input {:.9} EnergyPlus .3R {:?}",
+                oracle_row.gap_thickness_m, rust_row.fields.thickness_m, formatted_rust_thickness
+            ),
+        );
+        return;
+    }
+
+    let rust_gap_vent_type = rust_row.fields.gap_vent_type.energyplus_name();
+    if oracle_row.gap_vent_type != rust_gap_vent_type {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "{prefix} field gap_vent_type expected {} observed {}",
+                oracle_row.gap_vent_type, rust_gap_vent_type
             ),
         );
     }
@@ -23553,6 +23845,201 @@ mod tests {
         for invalid in [0.0, -0.01, f64::NAN, f64::INFINITY] {
             assert_eq!(super::energyplus_window_gas_eio_thickness(invalid), None);
         }
+    }
+
+    fn window_material_gap_equivalent_layer_test_model()
+    -> (ep_raw_model::RawModel, ep_model::TypedModel) {
+        let raw_model = ep_raw_model::parse_epjson_str(
+            r#"{
+                "WindowMaterial:Gap:EquivalentLayer": {
+                    "A Used Air": {
+                        "gas_type":"AIR",
+                        "thickness":0.00635,
+                        "gap_vent_type":"VentedIndoor"
+                    },
+                    "M Unused Xenon": {
+                        "gas_type":"XENON",
+                        "thickness":0.009,
+                        "gap_vent_type":"VentedOutdoor"
+                    },
+                    "Z Used Argon": {
+                        "gas_type":"ARGON",
+                        "thickness":0.0127,
+                        "gap_vent_type":"Sealed"
+                    }
+                },
+                "Construction:WindowEquivalentLayer": {
+                    "A First Unused Construction": {
+                        "outside_layer":"Z Used Argon",
+                        "layer_2":"A Used Air",
+                        "layer_3":"Z Used Argon"
+                    },
+                    "B Second Unused Construction": {
+                        "outside_layer":"A Used Air"
+                    }
+                }
+            }"#,
+        )
+        .expect("equivalent-layer gap comparison epJSON should parse");
+        let result = ep_compiler::compile_raw_model(&raw_model);
+        assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+        let model = result
+            .model
+            .expect("equivalent-layer gap comparison model should compile");
+        (raw_model, model)
+    }
+
+    #[test]
+    fn window_material_gap_equivalent_layer_rows_use_raw_construction_and_layer_order() {
+        let (raw_model, model) = window_material_gap_equivalent_layer_test_model();
+        let rows = super::window_material_gap_equivalent_layer_rows(&raw_model, &model)
+            .expect("equivalent-layer gap occurrences should build");
+
+        assert_eq!(
+            model
+                .materials
+                .iter()
+                .filter_map(|material| {
+                    matches!(
+                        material.definition,
+                        ep_model::MaterialDefinition::WindowGapEquivalentLayer(_)
+                    )
+                    .then_some(material.name.0.as_str())
+                })
+                .collect::<Vec<_>>(),
+            vec!["A USED AIR", "M UNUSED XENON", "Z USED ARGON"],
+            "material definition order must differ from construction occurrence order"
+        );
+        assert_eq!(
+            rows.iter()
+                .map(|row| {
+                    (
+                        row.construction_name.as_str(),
+                        row.layer_number,
+                        row.material_name.as_str(),
+                    )
+                })
+                .collect::<Vec<_>>(),
+            vec![
+                ("A FIRST UNUSED CONSTRUCTION", 1, "Z USED ARGON"),
+                ("A FIRST UNUSED CONSTRUCTION", 2, "A USED AIR"),
+                ("A FIRST UNUSED CONSTRUCTION", 3, "Z USED ARGON"),
+                ("B SECOND UNUSED CONSTRUCTION", 1, "A USED AIR"),
+            ],
+            "raw canonical construction order and numeric layer order must be preserved"
+        );
+        assert!(
+            rows.iter().all(|row| row.material_name != "M UNUSED XENON"),
+            "an unused gap definition must not create an EIO occurrence"
+        );
+        assert_eq!(
+            rows.iter()
+                .map(|row| {
+                    (
+                        row.fields.gas_type.energyplus_name(),
+                        row.fields.gap_vent_type.energyplus_name(),
+                    )
+                })
+                .collect::<Vec<_>>(),
+            vec![
+                ("Argon", "Sealed"),
+                ("Air", "VentedIndoor"),
+                ("Argon", "Sealed"),
+                ("Air", "VentedIndoor"),
+            ]
+        );
+    }
+
+    #[test]
+    fn window_material_gap_equivalent_layer_matching_is_exact_ordered_and_duplicate_aware() {
+        let (raw_model, model) = window_material_gap_equivalent_layer_test_model();
+        let rust_rows = super::window_material_gap_equivalent_layer_rows(&raw_model, &model)
+            .expect("equivalent-layer gap occurrences should build");
+        let oracle_rows = ep_compare::parse_eio_window_material_gap_equivalent_layer(
+            r#" WindowMaterial:Gap:EquivalentLayer,Z USED ARGON,Argon,0.012700,Sealed
+ WindowMaterial:Gap:EquivalentLayer,A USED AIR,Air,0.006350,VentedIndoor
+ WindowMaterial:Gap:EquivalentLayer,Z USED ARGON,Argon,0.012700,Sealed
+ WindowMaterial:Gap:EquivalentLayer,A USED AIR,Air,0.006350,VentedIndoor
+"#,
+        )
+        .expect("equivalent-layer gap EIO rows should parse");
+
+        assert_eq!(oracle_rows.len(), rust_rows.len());
+        assert!(
+            rust_rows
+                .iter()
+                .zip(&oracle_rows)
+                .all(|(rust_row, oracle_row)| {
+                    super::window_material_gap_equivalent_layer_row_matches(rust_row, oracle_row)
+                })
+        );
+
+        let mut wrong_order = oracle_rows.clone();
+        wrong_order.swap(0, 1);
+        assert!(
+            rust_rows
+                .iter()
+                .zip(&wrong_order)
+                .any(|(rust_row, oracle_row)| {
+                    !super::window_material_gap_equivalent_layer_row_matches(rust_row, oracle_row)
+                }),
+            "the comparison must not repair an out-of-order oracle sequence by name"
+        );
+
+        let missing_duplicate = oracle_rows[..oracle_rows.len() - 1].to_vec();
+        assert_ne!(missing_duplicate.len(), rust_rows.len());
+        let mut extra_duplicate = oracle_rows.clone();
+        extra_duplicate.push(oracle_rows[0].clone());
+        assert_ne!(extra_duplicate.len(), rust_rows.len());
+        let mut unexpected_unused = oracle_rows.clone();
+        unexpected_unused.push(ep_compare::EioWindowMaterialGapEquivalentLayer {
+            material_name: "M UNUSED XENON".to_string(),
+            gas_type: "Xenon".to_string(),
+            gap_thickness_m: 0.009,
+            gap_vent_type: "VentedOutdoor".to_string(),
+        });
+        assert_ne!(unexpected_unused.len(), rust_rows.len());
+
+        let mut noncanonical_gas_type = oracle_rows[0].clone();
+        noncanonical_gas_type.gas_type = "argon".to_string();
+        assert!(!super::window_material_gap_equivalent_layer_row_matches(
+            &rust_rows[0],
+            &noncanonical_gas_type,
+        ));
+        let mut noncanonical_vent_type = oracle_rows[0].clone();
+        noncanonical_vent_type.gap_vent_type = "sealed".to_string();
+        assert!(!super::window_material_gap_equivalent_layer_row_matches(
+            &rust_rows[0],
+            &noncanonical_vent_type,
+        ));
+        let mut wrong_thickness = oracle_rows[0].clone();
+        wrong_thickness.gap_thickness_m += 0.000001;
+        assert!(!super::window_material_gap_equivalent_layer_row_matches(
+            &rust_rows[0],
+            &wrong_thickness,
+        ));
+
+        let mut rounded_rust = rust_rows[0].clone();
+        rounded_rust.fields.thickness_m = 0.123456;
+        let mut rounded_oracle = oracle_rows[0].clone();
+        rounded_oracle.gap_thickness_m = 0.123;
+        assert!(super::window_material_gap_equivalent_layer_row_matches(
+            &rounded_rust,
+            &rounded_oracle,
+        ));
+
+        let mut divergence = None;
+        super::record_window_material_gap_equivalent_layer_divergence(
+            &mut divergence,
+            &rust_rows[0],
+            &noncanonical_vent_type,
+            0,
+        );
+        assert!(
+            divergence
+                .as_deref()
+                .is_some_and(|value| value.contains("field gap_vent_type"))
+        );
     }
 
     #[test]
