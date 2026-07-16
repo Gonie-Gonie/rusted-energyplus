@@ -780,6 +780,46 @@ pub fn energyplus_psy_tdp_fn_tdb_twb_pb(
     }
 }
 
+/// Canonical EnergyPlus 26.1 `F6` fifth-degree Horner polynomial.
+///
+/// The nested multiply/add order is part of the source contract; this helper
+/// intentionally does not expand, reassociate, or fuse the expression.
+#[must_use]
+#[inline]
+#[allow(clippy::too_many_arguments)]
+pub fn energyplus_f6(x: f64, a0: f64, a1: f64, a2: f64, a3: f64, a4: f64, a5: f64) -> f64 {
+    a0 + x * (a1 + x * (a2 + x * (a3 + x * (a4 + x * a5))))
+}
+
+/// Canonical EnergyPlus 26.1 `F7` sixth-degree scaled Horner polynomial.
+///
+/// EnergyPlus completes the nested polynomial before the final `1.0E10`
+/// division. Scaling coefficients early would change rounding and overflow.
+#[must_use]
+#[inline]
+#[allow(clippy::too_many_arguments)]
+pub fn energyplus_f7(x: f64, a0: f64, a1: f64, a2: f64, a3: f64, a4: f64, a5: f64, a6: f64) -> f64 {
+    (a0 + x * (a1 + x * (a2 + x * (a3 + x * (a4 + x * (a5 + x * a6)))))) / 1.0e10
+}
+
+/// Canonical EnergyPlus 26.1 `CPCW` chilled-water specific heat in J/(kg K).
+///
+/// The source intentionally ignores its temperature argument.
+#[must_use]
+#[inline]
+pub const fn energyplus_cpcw(_temperature_c: f64) -> f64 {
+    4_180.0
+}
+
+/// Canonical EnergyPlus 26.1 `CPHW` hot-water specific heat in J/(kg K).
+///
+/// The source intentionally ignores its temperature argument.
+#[must_use]
+#[inline]
+pub const fn energyplus_cphw(_temperature_c: f64) -> f64 {
+    4_180.0
+}
+
 fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option<f64> {
     if !temperature_c.is_finite() {
         return None;
@@ -853,3 +893,7 @@ mod dew_point_humidity_ratio_tests;
 #[cfg(test)]
 #[path = "psychrometrics_dew_point_dry_wet_bulb_tests.rs"]
 mod dew_point_dry_wet_bulb_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_polynomial_water_tests.rs"]
+mod polynomial_water_tests;
