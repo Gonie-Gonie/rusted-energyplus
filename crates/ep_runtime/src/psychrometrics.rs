@@ -4,6 +4,7 @@ const KELVIN_OFFSET: f64 = 273.15;
 const ENERGYPLUS_MIN_HUMIDITY_RATIO: f64 = 1.0e-5;
 const ENERGYPLUS_PSYCHROMETRIC_ITERATION_TOLERANCE: f64 = 0.0001;
 const ENERGYPLUS_WET_BULB_MAX_ITERATIONS: u32 = 100;
+const ENERGYPLUS_TSAT_PRESSURE_MAX_ITERATIONS: u32 = 50;
 const ENERGYPLUS_PSAT_CACHE_PRECISION_BITS: u32 = 24;
 const ENERGYPLUS_PSAT_CACHE_GRID_SHIFT: u32 = 64 - 12 - ENERGYPLUS_PSAT_CACHE_PRECISION_BITS;
 /// Standard atmospheric pressure used by EnergyPlus psychrometric defaults.
@@ -688,6 +689,50 @@ pub fn energyplus_psy_h_fn_tdb_rh_pb(
     energyplus_psy_h_fn_tdb_w(dry_bulb_c, humidity_ratio)
 }
 
+/// Canonical EnergyPlus 26.1 default cached-build `PsyTsatFnPb_raw`
+/// non-interpolation numerical path in Celsius.
+///
+/// This preserves the ordered pressure bounds, strict triple-point shortcut,
+/// 100 C initial guess, nested default `PsyPsatFnTemp` representative, and
+/// the source's 50-iteration `General::Iterate` sequence. The source routine's
+/// saved-value sentinel and last-call shortcut, interpolation override,
+/// statistics, diagnostics, cache lifecycle, and nested nonfinite sentinel
+/// behavior remain separate state contracts.
+#[must_use]
+pub fn energyplus_psy_tsat_fn_pb_raw(pressure_pa: f64) -> f64 {
+    if pressure_pa >= 1_555_000.0 {
+        return 200.0;
+    }
+    if pressure_pa <= 0.0017 {
+        return -100.0;
+    }
+    if pressure_pa > 611.0 && pressure_pa < 611.25 {
+        return 0.0;
+    }
+
+    let mut saturation_temperature_c = 100.0;
+    let mut previous_temperature_c = 0.0;
+    let mut previous_error_pa = 0.0;
+    for iteration in 1..=ENERGYPLUS_TSAT_PRESSURE_MAX_ITERATIONS {
+        let saturation_pressure_pa =
+            energyplus_psy_psat_fn_temp_default_numerical_projection(saturation_temperature_c);
+        let error_pa = pressure_pa - saturation_pressure_pa;
+        let (next_temperature_c, converged) = energyplus_general_iterate(
+            saturation_temperature_c,
+            error_pa,
+            &mut previous_temperature_c,
+            &mut previous_error_pa,
+            iteration,
+            ENERGYPLUS_PSYCHROMETRIC_ITERATION_TOLERANCE,
+        );
+        saturation_temperature_c = next_temperature_c;
+        if converged {
+            break;
+        }
+    }
+    saturation_temperature_c
+}
+
 fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option<f64> {
     if !temperature_c.is_finite() {
         return None;
@@ -749,3 +794,7 @@ mod wet_bulb_humidity_ratio_tests;
 #[cfg(test)]
 #[path = "psychrometrics_relative_humidity_enthalpy_tests.rs"]
 mod relative_humidity_enthalpy_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_saturation_temperature_pressure_tests.rs"]
+mod saturation_temperature_pressure_tests;
