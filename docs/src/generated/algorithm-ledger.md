@@ -124,7 +124,7 @@ Algorithm status is maintained in `specs/algorithm_ledger.toml`. Routine complet
 | psy_tsat_fn_pb | psychrometrics | psychrometric_routine_inventory | source_mapped | no | src/EnergyPlus/Psychrometrics.hh::PsyTsatFnPb | docs/src/porting-map/psychrometrics-source-map.md |  |  |  |
 | psy_tdp_fn_w_pb | psychrometrics | psychrometric_routine_inventory | state_mapped | no | src/EnergyPlus/Psychrometrics.hh::PsyTdpFnWPb | docs/src/porting-map/psychrometrics-source-map.md | docs/src/porting-map/psychrometrics-source-map.md |  |  |
 | psy_tdp_fn_tdb_twb_pb_error | psychrometrics | psychrometric_routine_inventory | source_mapped | no | src/EnergyPlus/Psychrometrics.cc::PsyTdpFnTdbTwbPb_error | docs/src/porting-map/psychrometrics-source-map.md |  |  |  |
-| psy_tdp_fn_tdb_twb_pb | psychrometrics | psychrometric_routine_inventory | source_mapped | no | src/EnergyPlus/Psychrometrics.hh::PsyTdpFnTdbTwbPb | docs/src/porting-map/psychrometrics-source-map.md |  |  |  |
+| psy_tdp_fn_tdb_twb_pb | psychrometrics | psychrometric_routine_inventory | state_mapped | no | src/EnergyPlus/Psychrometrics.hh::PsyTdpFnTdbTwbPb | docs/src/porting-map/psychrometrics-source-map.md | docs/src/porting-map/psychrometrics-source-map.md |  |  |
 | f6 | psychrometrics | psychrometric_routine_inventory | source_mapped | no | src/EnergyPlus/Psychrometrics.hh::F6 | docs/src/porting-map/psychrometrics-source-map.md |  |  |  |
 | f7 | psychrometrics | psychrometric_routine_inventory | source_mapped | no | src/EnergyPlus/Psychrometrics.hh::F7 | docs/src/porting-map/psychrometrics-source-map.md |  |  |  |
 | cpcw | psychrometrics | psychrometric_routine_inventory | source_mapped | no | src/EnergyPlus/Psychrometrics.hh::CPCW | docs/src/porting-map/psychrometrics-source-map.md |  |  |  |

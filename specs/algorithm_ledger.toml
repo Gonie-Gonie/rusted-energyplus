@@ -2186,7 +2186,7 @@ routine.psy_tdp_fn_w_pb.unsupported_active_branches = [
   "the default routine-42 direct-map lookup, including ordinary-finite same-tag first-writer reuse, collisions, mutable precision, fresh tag-zero false hits, and complete raw-side-effect suppression on a hit; miss-side exact saved-value reuse, default errors-enabled diagnostics, optional statistics, nested routine-25 cache behavior, and the runtime spline branch selected by PerformancePrecisionTradeoffs",
 ]
 routine.psy_tdp_fn_w_pb.not_claimed_branches = [
-  "external EnergyPlus numerical parity, full public routine-42 sequence or cache-history parity, cached/no-cache/interpolation/`EP_IF97` equivalence, full IEEE/overflow/NaN-payload and cross-platform iterative last-bit parity, exact nested diagnostics/statistics/cache effects, C/Python API or EMS dispatch, inverse round trips through source-mapped routine 34, routine-45 composition, or sizing, coil, radiant, refrigeration, reporting, and other downstream consumer migration",
+  "external EnergyPlus numerical parity, full public routine-42 sequence or cache-history parity, cached/no-cache/interpolation/`EP_IF97` equivalence, full IEEE/overflow/NaN-payload and cross-platform iterative last-bit parity, exact nested diagnostics/statistics/cache effects, C/Python API or EMS dispatch, inverse round trips through source-mapped routine 34, full stateful routine-45 cache/diagnostic sequence, or sizing, coil, radiant, refrigeration, reporting, and other downstream consumer migration",
 ]
 
 routine.psy_tdp_fn_tdb_twb_pb_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
@@ -2198,8 +2198,30 @@ routine.psy_tdp_fn_tdb_twb_pb_error.required_for_full_domain = false
 routine.psy_tdp_fn_tdb_twb_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_tdp_fn_tdb_twb_pb.source_routine = "PsyTdpFnTdbTwbPb"
 routine.psy_tdp_fn_tdb_twb_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_tdp_fn_tdb_twb_pb.completion_status = "source_mapped"
+routine.psy_tdp_fn_tdb_twb_pb.completion_status = "state_mapped"
 routine.psy_tdp_fn_tdb_twb_pb.required_for_full_domain = false
+routine.psy_tdp_fn_tdb_twb_pb.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_tdp_fn_tdb_twb_pb.read_state = [
+  "arguments `TDB`, original `TWB`, `PB`, and `CalledFrom`; with statistics enabled routine 45 first reads its `TdpFnTdbTwbPb` call counter, then unconditionally invokes routine 39, whose reads include its own counter, routine-25 saturation-pressure cache/tag/statistics/range-diagnostic/caller state, routines 37/38 diagnostic gates, and negative-result fallback through routines 36/35; routine 45 applies an ordered `1.0e-5` floor to `W`, unconditionally invokes routine 43, and thereby reads routine-42 direct-map precision/tag/cache plus miss-side routine-41 saved/interpolation/statistics/range/nonconvergence/caller state and nested routine-25 state; when `TDP` exceeds the original `TWB`, an errors build reads `TWB + 0.1`, and a strict excess dispatches routine 44, which rechecks the threshold and reads `WarmupFlag`, the dedicated error index/recurrence, first-detail `CalledFrom`, and simulation timestamp context",
+]
+routine.psy_tdp_fn_tdb_twb_pb.write_state = [
+  "the pure numerical scaffold writes no state; optional statistics increment routine 45's own call counter before every nested call, while routines 39 and 43 may update their nested cache, statistics, saved/interpolation, and diagnostic state; for a strict non-warmup diagnostic excess, routine 44 may overwrite the shared scratch string twice, emit first warning/timestamp/continuations only when its index is zero, then update the recurring index/count and raw pre-cap `TDP` minimum/maximum in C plus warning totals, SQLite, and callbacks; the final numeric cap itself writes no source state",
+]
+routine.psy_tdp_fn_tdb_twb_pb.history_state_ownership = "for ordinary-finite arguments under the default non-IF97 build, the modeled result is deterministic only for collision-free routine-25 representative lookups followed by a routine-42 nonzero-tag miss and a routine-41 non-saved, interpolation-disabled numerical path; the full source is history-dependent through shared routine-25 entries, routine-42 first-writer/tag-zero/collision/precision state, and routine-41 saved/interpolation state, and a final wet-bulb cap may mask a changed return without suppressing nested cache, statistics, or diagnostics, all owned by each `EnergyPlusData` instance"
+routine.psy_tdp_fn_tdb_twb_pb.unsupported_state = [
+  "routine-45 optional statistics; routine-39 counter, corrected-wet-bulb and negative-humidity diagnostics, `ReportErrors`/warmup/index/recurrence/caller state, nested routine-25 direct-map lifecycle/sentinel/collisions/statistics/range diagnostics, and routine-36/35 fallback effects; routine-42 mutable precision, signed tag/hash/direct-map entries, first-writer aliases, tag-zero sentinel, collisions, lifecycle, and hit suppression; routine-41 saved pair, interpolation flag/spline, counters, range/nonconvergence diagnostics, caller formatting, and nested routine-25 effects; routine-44 warmup/index/recurrence/shared-string/warning/timestamp/SQLite/callback state",
+]
+routine.psy_tdp_fn_tdb_twb_pb.inactive_branches = [
+  "routine 39 results strictly below `1.0e-5` select literal `1.0e-5`; values at or above the floor are retained, and unordered NaN is retained rather than replaced because the source max returns its first argument",
+  "`TDP <= original TWB` and unordered comparisons return `TDP`; every ordered excess returns the original `TWB`, but only strict `TDP > TWB + 0.1` dispatches routine 44, so exact or smaller 0.1 C excesses cap silently",
+  "disabling `EP_psych_stats` removes routine 45 and nested counters, while disabling `EP_psych_errors` removes routine 44 and all nested warnings without changing the local floor or final cap; `EP_nocache_Psychrometrics`, `EP_IF97`, and runtime interpolation select different nested numerical/state paths",
+]
+routine.psy_tdp_fn_tdb_twb_pb.unsupported_active_branches = [
+  "complete routine-39 and routine-43 cache/history sequences, including routine-25 and routine-42 first-writer aliases, collisions, sentinels, mutable precision, routine-41 saved-value reuse and spline mode, optional statistics, and errors-enabled routine-37/38/35/44 warning, warmup, caller, scratch-string, recurring-index/count/min/max, SQLite, and callback effects",
+]
+routine.psy_tdp_fn_tdb_twb_pb.not_claimed_branches = [
+  "external EnergyPlus numerical parity, full cache-hit/miss or diagnostic sequence parity, cached/no-cache/interpolation/`EP_IF97` equivalence, full IEEE/NaN-payload/floating-point-exception and cross-platform iterative last-bit parity, exact statistics/warnings/caller/recurrence effects, C/Python API or EMS dispatch, seven direct production consumers, downstream HVAC/collector behavior, or broad psychrometric migration",
+]
 
 routine.f6.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.f6.source_routine = "F6"

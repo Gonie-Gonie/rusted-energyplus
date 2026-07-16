@@ -81,8 +81,8 @@ that the EnergyPlus routine has been ported.
 | 41 | `PsyTsatFnPb_raw` | saturation temperature from pressure raw path | `Psychrometrics.hh:1490`; `Psychrometrics.cc:1266` | exists only with `EP_cache_PsyTsatFnPb` | canonical default cached-build, non-interpolation, fresh/non-saved numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_tsat_fn_pb_raw`; saved pair, spline, statistics, diagnostics, and nested state remain unassigned | raw inversion vectors, ordered clamps and strict triple shortcut, source iteration literals/order, representative nested saturation pressure, exhaustion edge, and repeated-call purity |
 | 42 | `PsyTsatFnPb` | saturation temperature from pressure and cache/interpolation | `Psychrometrics.hh:1495,1523`; cached inline in header, no-cache implementation `Psychrometrics.cc:1272` | variants selected by `EP_cache_PsyTsatFnPb`; one logical ticket | intended `ep_runtime::psychrometrics`; stateful public wrapper unassigned | first-writer direct-map cache history, original-pressure misses, tag-0 false hit, collision/precision/lifecycle behavior, raw saved-pair and interpolation interaction, and separate no-cache evidence |
 | 43 | `PsyTdpFnWPb` | dew point from humidity ratio | `Psychrometrics.hh:1529` (inline) | always present | canonical finite-physical default cached-build isolated nonzero-tag outer/raw-miss numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_tdp_fn_w_pb`; routine-42 cache/saved/interpolation/diagnostic/statistics state unassigned | EMS asserted vector, ordered humidity floor and NaN preservation, exact dew-pressure grouping and overflow edge, nested raw projection, clamp/strict-gap/IEEE edges, round trips, and repeated-call purity |
-| 44 | `PsyTdpFnTdbTwbPb_error` | diagnostics | `Psychrometrics.hh:1556`; `Psychrometrics.cc:861` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | dew-point-above-wet-bulb threshold, clamp, caller text, and recurrence suppression |
-| 45 | `PsyTdpFnTdbTwbPb` | dew point from dry/wet bulb | `Psychrometrics.hh:1566` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | composed humidity/dew-point vectors, 1e-5 floor, and wet-bulb upper clamp |
+| 44 | `PsyTdpFnTdbTwbPb_error` | diagnostics | `Psychrometrics.hh:1556`; `Psychrometrics.cc:861` | compiled only with `EP_psych_errors` | intended errors-enabled diagnostics owner; unassigned | strict dew-point-above-wet-bulb-plus-0.1 self-recheck, warmup-only gate, no numeric clamp, caller/Unknown text, shared scratch writes, and first/recurring state |
+| 45 | `PsyTdpFnTdbTwbPb` | dew point from dry/wet bulb | `Psychrometrics.hh:1566` (inline) | always present | canonical ordinary-finite default cached-build isolated nested numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_tdp_fn_tdb_twb_pb`; routine-39/43/44 cache, saved/interpolation, statistics, diagnostics, caller, and lifecycle state unassigned | EMS asserted vector, exact routine-39/floor/routine-43 composition, positive sub-floor cases, ordered cap to the original wet bulb, silent-versus-diagnostic excess boundary, IEEE edges, and repeated-call purity |
 | 46 | `F6` | polynomial helper | `Psychrometrics.hh:1600` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | Horner-order coefficient vectors, signs, zeroes, and floating-point evaluation order |
 | 47 | `F7` | scaled polynomial helper | `Psychrometrics.hh:1605` (broken-line inline declaration) | always present | intended `ep_runtime::psychrometrics`; unassigned | Horner-order coefficient vectors and exact final `1.0E10` scaling; keep this ticket in every count audit |
 | 48 | `CPCW` | chilled-water specific heat | `Psychrometrics.hh:1611` (inline) | always present; temperature argument intentionally unused | intended `ep_runtime::psychrometrics`; unassigned | exact 4180 J/(kg K) result over representative and extreme temperatures |
@@ -1783,8 +1783,96 @@ unsupported_active_branches:
 - the default routine-42 direct-map lookup, including ordinary-finite same-tag first-writer reuse, collisions, mutable precision, fresh tag-zero false hits, and complete raw-side-effect suppression on a hit; miss-side exact saved-value reuse, default errors-enabled diagnostics, optional statistics, nested routine-25 cache behavior, and the runtime spline branch selected by PerformancePrecisionTradeoffs
 
 not_claimed_branches:
-- external EnergyPlus numerical parity, full public routine-42 sequence or cache-history parity, cached/no-cache/interpolation/`EP_IF97` equivalence, full IEEE/overflow/NaN-payload and cross-platform iterative last-bit parity, exact nested diagnostics/statistics/cache effects, C/Python API or EMS dispatch, inverse round trips through source-mapped routine 34, routine-45 composition, or sizing, coil, radiant, refrigeration, reporting, and other downstream consumer migration
+- external EnergyPlus numerical parity, full public routine-42 sequence or cache-history parity, cached/no-cache/interpolation/`EP_IF97` equivalence, full IEEE/overflow/NaN-payload and cross-platform iterative last-bit parity, exact nested diagnostics/statistics/cache effects, C/Python API or EMS dispatch, inverse round trips through source-mapped routine 34, full stateful routine-45 cache/diagnostic sequence, or sizing, coil, radiant, refrigeration, reporting, and other downstream consumer migration
 <!-- routine-state-contract:v1 end psy_tdp_fn_w_pb -->
+
+## CP56-17 Dry/Wet-Bulb Dew-Point Numerical Scaffold
+
+This checkpoint advances `PsyTdpFnTdbTwbPb` to `state_mapped` while keeping
+its errors-only helper `PsyTdpFnTdbTwbPb_error` at `source_mapped`. The
+inventory is now 28 source-mapped and 25 state-mapped routines. The parent
+inventory remains `status = "scaffold"`, `claim_level = "none"`, and all 53
+routines remain outside the full-domain required set.
+
+Routine 44 is a diagnostics owner, not the owner of the numerical clamp. It is
+compiled only with `EP_psych_errors`, rechecks strict
+`TDP > TWB + 0.1`, and suppresses every effect during warmup without reading
+`ReportErrors`. On the first non-warmup occurrence it emits the warning,
+formats either the supplied `CalledFrom` or `Routine=Unknown,`, and overwrites
+the shared psychrometric scratch string twice; every qualifying non-warmup
+call then updates the same recurring index/count and raw pre-cap `TDP`
+minimum/maximum in C. The helper neither returns nor mutates the dew-point
+value. Because the Rust runtime has no equivalent warning/index/scratch/
+recurrence adapter, its exact emission and state transitions remain
+unimplemented.
+
+The new `energyplus_psy_tdp_fn_tdb_twb_pb` helper preserves routine 45's
+numeric order. It calls routine 39 with the original arguments, applies a
+second ordered `max(W, 1.0e-5)`, calls routine 43 unconditionally, and only
+then compares the result with the original input `TWB`. Any ordered
+`TDP > TWB` returns that original wet-bulb value in every compile variant.
+Only a strict excess above `TWB + 0.1` asks routine 44 to diagnose, so an
+exact or smaller 0.1 C excess is still clamped silently. Ordered comparisons
+retain a NaN child value and preserve the source signed-zero choice; replacing
+the final branch with an unordered minimum is outside the claim.
+
+The upstream EMS test supplies the sole exact numerical assertion:
+`TDB = 30 C`, `TWB = 16 C`, and `PB = 101325 Pa` produce
+`5.573987554 C` within `1e-8`. That program executes twice and checks the
+final value, so it does not distinguish a cold miss from a cache hit. The C
+and Python functional examples only print the `24/17/101325` result. Their
+`16/17/101325` error-callback example activates routine 39's
+wet-bulb-above-dry-bulb warning before its local clamp; its dew point remains
+below the original 17 C wet bulb and is not evidence for routine 44.
+
+Rust evidence covers the EMS vector, a positive routine-39 result below
+`1e-5`, exact composition, and repeated stateless output stability. Clean
+saturated vectors isolate the diagnostic boundary without routine-39
+negative-humidity fallback: `-57/-57/101325` yields an unclamped excess of
+about `0.07057 C` and is silently capped, while `-60/-60/101325` yields an
+excess of about `3.07057 C` and would diagnose before the same cap. A
+`20/20/101325` vector pins the ordinary small numerical overshoot, a
+`10/20/101325` vector proves that the final comparison uses the original
+wet bulb rather than routine 39's corrected local value, and partial
+NaN/infinity/signed-zero cases pin ordered composition. These are unit
+oracles for the isolated projection, not proof of warning or cache sequence
+parity.
+
+Routine 45 has no intrinsic loop. Its routine-43 raw miss can reach routine
+41's structurally bounded 50-evaluation solve. Source audit finds seven
+direct production calls across four C++ files: one functional API wrapper,
+three evaporative-cooler calls, two photovoltaic-thermal collector calls, and
+one EMS dispatcher. None of those wrappers or consumers is migrated by this
+checkpoint.
+
+### `PsyTdpFnTdbTwbPb` (`psy_tdp_fn_tdb_twb_pb`)
+
+<!-- routine-state-contract:v1 begin psy_tdp_fn_tdb_twb_pb -->
+PsyTdpFnTdbTwbPb
+
+read_state:
+- arguments `TDB`, original `TWB`, `PB`, and `CalledFrom`; with statistics enabled routine 45 first reads its `TdpFnTdbTwbPb` call counter, then unconditionally invokes routine 39, whose reads include its own counter, routine-25 saturation-pressure cache/tag/statistics/range-diagnostic/caller state, routines 37/38 diagnostic gates, and negative-result fallback through routines 36/35; routine 45 applies an ordered `1.0e-5` floor to `W`, unconditionally invokes routine 43, and thereby reads routine-42 direct-map precision/tag/cache plus miss-side routine-41 saved/interpolation/statistics/range/nonconvergence/caller state and nested routine-25 state; when `TDP` exceeds the original `TWB`, an errors build reads `TWB + 0.1`, and a strict excess dispatches routine 44, which rechecks the threshold and reads `WarmupFlag`, the dedicated error index/recurrence, first-detail `CalledFrom`, and simulation timestamp context
+
+write_state:
+- the pure numerical scaffold writes no state; optional statistics increment routine 45's own call counter before every nested call, while routines 39 and 43 may update their nested cache, statistics, saved/interpolation, and diagnostic state; for a strict non-warmup diagnostic excess, routine 44 may overwrite the shared scratch string twice, emit first warning/timestamp/continuations only when its index is zero, then update the recurring index/count and raw pre-cap `TDP` minimum/maximum in C plus warning totals, SQLite, and callbacks; the final numeric cap itself writes no source state
+
+history_state_ownership:
+- for ordinary-finite arguments under the default non-IF97 build, the modeled result is deterministic only for collision-free routine-25 representative lookups followed by a routine-42 nonzero-tag miss and a routine-41 non-saved, interpolation-disabled numerical path; the full source is history-dependent through shared routine-25 entries, routine-42 first-writer/tag-zero/collision/precision state, and routine-41 saved/interpolation state, and a final wet-bulb cap may mask a changed return without suppressing nested cache, statistics, or diagnostics, all owned by each `EnergyPlusData` instance
+
+unsupported_state:
+- routine-45 optional statistics; routine-39 counter, corrected-wet-bulb and negative-humidity diagnostics, `ReportErrors`/warmup/index/recurrence/caller state, nested routine-25 direct-map lifecycle/sentinel/collisions/statistics/range diagnostics, and routine-36/35 fallback effects; routine-42 mutable precision, signed tag/hash/direct-map entries, first-writer aliases, tag-zero sentinel, collisions, lifecycle, and hit suppression; routine-41 saved pair, interpolation flag/spline, counters, range/nonconvergence diagnostics, caller formatting, and nested routine-25 effects; routine-44 warmup/index/recurrence/shared-string/warning/timestamp/SQLite/callback state
+
+inactive_branches:
+- routine 39 results strictly below `1.0e-5` select literal `1.0e-5`; values at or above the floor are retained, and unordered NaN is retained rather than replaced because the source max returns its first argument
+- `TDP <= original TWB` and unordered comparisons return `TDP`; every ordered excess returns the original `TWB`, but only strict `TDP > TWB + 0.1` dispatches routine 44, so exact or smaller 0.1 C excesses cap silently
+- disabling `EP_psych_stats` removes routine 45 and nested counters, while disabling `EP_psych_errors` removes routine 44 and all nested warnings without changing the local floor or final cap; `EP_nocache_Psychrometrics`, `EP_IF97`, and runtime interpolation select different nested numerical/state paths
+
+unsupported_active_branches:
+- complete routine-39 and routine-43 cache/history sequences, including routine-25 and routine-42 first-writer aliases, collisions, sentinels, mutable precision, routine-41 saved-value reuse and spline mode, optional statistics, and errors-enabled routine-37/38/35/44 warning, warmup, caller, scratch-string, recurring-index/count/min/max, SQLite, and callback effects
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, full cache-hit/miss or diagnostic sequence parity, cached/no-cache/interpolation/`EP_IF97` equivalence, full IEEE/NaN-payload/floating-point-exception and cross-platform iterative last-bit parity, exact statistics/warnings/caller/recurrence effects, C/Python API or EMS dispatch, seven direct production consumers, downstream HVAC/collector behavior, or broad psychrometric migration
+<!-- routine-state-contract:v1 end psy_tdp_fn_tdb_twb_pb -->
 
 ## Compile-Time Variant Boundary
 
@@ -1838,8 +1926,9 @@ The `PsyRhoAirFnPbTdbW`, `PsyRhoAirFnPbTdbW_fast`, `PsyHfgAirFnWTdb`,
 `PsyRhovFnTdbWPb`, `PsyRhovFnTdbWPb_fast`, `PsyRhFnTdbRhovLBnd0C`,
 `PsyVFnTdbWPb`, `PsyWFnTdbH`, `PsyPsatFnTemp_raw`, `PsyRhovFnTdbRh`,
 `PsyRhFnTdbRhov`, `PsyRhFnTdbWPb`, `PsyWFnTdbRhPb`,
-`PsyWFnTdbTwbPb`, `PsyHFnTdbRhPb`, `PsyTsatFnPb_raw`, and
-`PsyTdpFnWPb` tickets are `state_mapped`; the other 29 ledger routines remain
+`PsyWFnTdbTwbPb`, `PsyHFnTdbRhPb`, `PsyTsatFnPb_raw`,
+`PsyTdpFnWPb`, and `PsyTdpFnTdbTwbPb` tickets are `state_mapped`; the other
+28 ledger routines remain
 `source_mapped`. All 53 retain
 `required_for_full_domain = false`. Before any
 ticket is promoted further, its
