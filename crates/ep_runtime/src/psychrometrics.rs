@@ -665,6 +665,29 @@ pub fn energyplus_psy_w_fn_tdb_twb_pb(
     }
 }
 
+/// Canonical EnergyPlus 26.1 `PsyHFnTdbRhPb` ordinary-finite default-build
+/// numerical path in J/kg.
+///
+/// The source first calls `PsyWFnTdbRhPb`, applies a second ordered 1e-5
+/// humidity-ratio floor, and then calls `PsyHFnTdbW`, whose own floor remains
+/// intact. This pure composition preserves that order while deferring nested
+/// saturation-pressure cache, statistics, diagnostics, caller, and compile
+/// variant state.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_h_fn_tdb_rh_pb(
+    dry_bulb_c: f64,
+    relative_humidity: f64,
+    atmospheric_pressure_pa: f64,
+) -> f64 {
+    let humidity_ratio = energyplus_humidity_ratio_floor(energyplus_psy_w_fn_tdb_rh_pb(
+        dry_bulb_c,
+        relative_humidity,
+        atmospheric_pressure_pa,
+    ));
+    energyplus_psy_h_fn_tdb_w(dry_bulb_c, humidity_ratio)
+}
+
 fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option<f64> {
     if !temperature_c.is_finite() {
         return None;
@@ -722,3 +745,7 @@ mod relative_humidity_humidity_ratio_tests;
 #[cfg(test)]
 #[path = "psychrometrics_wet_bulb_humidity_ratio_tests.rs"]
 mod wet_bulb_humidity_ratio_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_relative_humidity_enthalpy_tests.rs"]
+mod relative_humidity_enthalpy_tests;
