@@ -1,0 +1,329 @@
+Version,26.1;
+
+SimulationControl,No,No,No,No,Yes,No;
+
+Building,Window Material Screen Compare,0.0,Suburbs,0.04,0.4,FullExterior,25,6;
+
+Timestep,4;
+
+HeatBalanceAlgorithm,ConductionTransferFunction;
+
+SurfaceConvectionAlgorithm:Inside,TARP;
+
+SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+Site:Location,Golden,39.74,-105.18,-7.0,1829.0;
+
+Site:GroundTemperature:BuildingSurface,18,18,18,18,18,18,18,18,18,18,18,18;
+
+RunPeriod,Run Period 1,1,1,2013,1,1,2013,Tuesday,Yes,Yes,No,Yes,Yes;
+
+GlobalGeometryRules,UpperLeftCorner,CounterClockWise,World;
+
+ScheduleTypeLimits,
+  On Off,
+  0,
+  1,
+  Discrete;
+
+Schedule:Constant,
+  Screen Off Schedule,
+  On Off,
+  0;
+
+Material,
+  DISTINCTIVE SCREEN OPAQUE HOST MATERIAL,
+  Rough,
+  0.113,
+  0.347,
+  913.0,
+  836.0,
+  0.87,
+  0.63,
+  0.58;
+
+WindowMaterial:Glazing,
+  DISTINCTIVE SCREEN TEST GLASS,
+  SpectralAverage,
+  ,
+  0.006,
+  0.775,
+  0.071,
+  0.071,
+  0.881,
+  0.080,
+  0.080,
+  0.0,
+  0.84,
+  0.84,
+  0.9;
+
+! Definition order intentionally differs from construction and name order.
+WindowMaterial:Screen,
+  Z HIGH PRECISION REUSED SCREEN,
+  ModelAsDirectBeam,
+  0.123456,
+  0.234567,
+  0.812345,
+  17.2345,
+  0.0123456,
+  0.0034567,
+  0.0345678,
+  0.1111,
+  0.2222,
+  0.3333,
+  0.4444,
+  0;
+
+! Valid but absent from every construction.
+WindowMaterial:Screen,
+  M UNUSED SCREEN,
+  DoNotModel,
+  0.15,
+  0.25,
+  0.75,
+  11.5,
+  0.01,
+  0.0025,
+  0.03,
+  0,
+  0,
+  0,
+  0,
+  0;
+
+! Optional method, emissivity, conductivity, distance, openings, and map angle default.
+WindowMaterial:Screen,
+  A DEFAULTED USED SCREEN,
+  ,
+  0.1,
+  0.2,
+  ,
+  ,
+  0.01,
+  0.002;
+
+Construction,
+  A BASE SCREEN TEST WINDOW CONSTRUCTION,
+  DISTINCTIVE SCREEN TEST GLASS;
+
+Construction,
+  B DEFAULTED SCREEN WINDOW CONSTRUCTION,
+  A DEFAULTED USED SCREEN,
+  DISTINCTIVE SCREEN TEST GLASS;
+
+Construction,
+  C HIGH PRECISION FIRST SCREEN WINDOW CONSTRUCTION,
+  Z HIGH PRECISION REUSED SCREEN,
+  DISTINCTIVE SCREEN TEST GLASS;
+
+Construction,
+  D HIGH PRECISION SECOND SCREEN WINDOW CONSTRUCTION,
+  Z HIGH PRECISION REUSED SCREEN,
+  DISTINCTIVE SCREEN TEST GLASS;
+
+Construction,
+  E SCREEN OPAQUE HOST CONSTRUCTION,
+  DISTINCTIVE SCREEN OPAQUE HOST MATERIAL;
+
+! Keeps the second high-precision screen construction nominally referenced
+! without assigning it to a surface or multiplying its material occurrence.
+EnergyManagementSystem:ConstructionIndexVariable,
+  UnusedHighPrecisionScreenConstructionIndex,
+  D HIGH PRECISION SECOND SCREEN WINDOW CONSTRUCTION;
+
+Zone,SCREEN TEST ZONE,0,0,0,0,1,1,3,48,16;
+
+BuildingSurface:Detailed,
+  SCREEN TEST FLOOR,
+  Floor,
+  E SCREEN OPAQUE HOST CONSTRUCTION,
+  SCREEN TEST ZONE,
+  ,
+  Ground,
+  ,
+  NoSun,
+  NoWind,
+  1.0,
+  4,
+  4,4,0,
+  4,0,0,
+  0,0,0,
+  0,4,0;
+
+BuildingSurface:Detailed,
+  SCREEN TEST ROOF,
+  Roof,
+  E SCREEN OPAQUE HOST CONSTRUCTION,
+  SCREEN TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.0,
+  4,
+  0,4,3,
+  0,0,3,
+  4,0,3,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  SCREEN TEST WEST WALL,
+  Wall,
+  E SCREEN OPAQUE HOST CONSTRUCTION,
+  SCREEN TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,4,3,
+  0,4,0,
+  0,0,0,
+  0,0,3;
+
+BuildingSurface:Detailed,
+  SCREEN TEST EAST WALL,
+  Wall,
+  E SCREEN OPAQUE HOST CONSTRUCTION,
+  SCREEN TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,0,3,
+  4,0,0,
+  4,4,0,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  DISTINCTIVE SCREEN WINDOW HOST WALL,
+  Wall,
+  E SCREEN OPAQUE HOST CONSTRUCTION,
+  SCREEN TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,0,3,
+  0,0,0,
+  4,0,0,
+  4,0,3;
+
+BuildingSurface:Detailed,
+  SCREEN TEST NORTH WALL,
+  Wall,
+  E SCREEN OPAQUE HOST CONSTRUCTION,
+  SCREEN TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,4,3,
+  4,4,0,
+  0,4,0,
+  0,4,3;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE DEFAULTED SCREEN TEST WINDOW,
+  Window,
+  A BASE SCREEN TEST WINDOW CONSTRUCTION,
+  DISTINCTIVE SCREEN WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  0.10,0,2.80,
+  0.10,0,1.80,
+  0.90,0,1.80,
+  0.90,0,2.80;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE FIRST HIGH PRECISION SCREEN TEST WINDOW,
+  Window,
+  A BASE SCREEN TEST WINDOW CONSTRUCTION,
+  DISTINCTIVE SCREEN WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  1.20,0,2.80,
+  1.20,0,1.80,
+  2.00,0,1.80,
+  2.00,0,2.80;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE SECOND HIGH PRECISION SCREEN TEST WINDOW,
+  Window,
+  A BASE SCREEN TEST WINDOW CONSTRUCTION,
+  DISTINCTIVE SCREEN WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  2.30,0,2.80,
+  2.30,0,1.80,
+  3.10,0,1.80,
+  3.10,0,2.80;
+
+WindowShadingControl,
+  DEFAULTED SCREEN CONTROL,
+  SCREEN TEST ZONE,
+  1,
+  ExteriorScreen,
+  B DEFAULTED SCREEN WINDOW CONSTRUCTION,
+  OnIfScheduleAllows,
+  Screen Off Schedule,
+  ,
+  Yes,
+  No,
+  ,
+  ,
+  ,
+  ,
+  ,
+  Sequential,
+  DISTINCTIVE DEFAULTED SCREEN TEST WINDOW;
+
+WindowShadingControl,
+  HIGH PRECISION SCREEN CONTROL,
+  SCREEN TEST ZONE,
+  2,
+  ExteriorScreen,
+  C HIGH PRECISION FIRST SCREEN WINDOW CONSTRUCTION,
+  OnIfScheduleAllows,
+  Screen Off Schedule,
+  ,
+  Yes,
+  No,
+  ,
+  ,
+  ,
+  ,
+  ,
+  Sequential,
+  DISTINCTIVE FIRST HIGH PRECISION SCREEN TEST WINDOW,
+  DISTINCTIVE SECOND HIGH PRECISION SCREEN TEST WINDOW;
+
+! A reporting element is required to keep the EnergyPlus run warning-free.
+! It is not part of the diagnostic manifest or comparison claim.
+Output:Variable,*,Zone Mean Air Temperature,Hourly;
+
+Output:Constructions,Constructions,Materials;
+
+Output:Surfaces:List,Details;

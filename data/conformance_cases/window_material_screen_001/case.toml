@@ -1,0 +1,89 @@
+id = "window_material_screen_001"
+title = "Ordinary exterior window screen static definition and occurrence evidence"
+milestone = "v0.8-heat-balance"
+purpose = "Compare the bounded Rust WindowMaterial:Screen typed slice with EnergyPlus generic definition and ordinary-window construction occurrence EIO evidence."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The fixture defines three WindowMaterial:Screen objects in source order Z, M, A: one high-precision screen reused by two constructions, one valid screen unused by every construction, and one defaulted screen used by one construction.",
+  "The generic Material Details table echoes all three definitions exactly once in Z, M, A order, including unused M. It locks MediumRough, source-derived thickness/conductivity and thermal, solar, and visible absorptance, plus the generic table's fixed zero base resistance, density, and specific heat; the separate nonzero nominal resistance is not reported.",
+  "The specialized WindowMaterial:Screen table emits three construction-layer occurrences in construction order A, Z, Z. The unused M definition is absent, and Z occurs once for each of two constructions rather than once per surface.",
+  "Each screened construction is exactly one exterior Screen followed by the layer list of A BASE SCREEN TEST WINDOW CONSTRUCTION. The bounded comparator fails closed outside this matching-bare shape because EnergyPlus can skip a screened construction's material row when nominal-window setup finds no matching bare construction.",
+  "Two FenestrationSurface:Detailed windows share the first Z shading construction through WindowShadingControl. The second Z construction has no surface but still emits one specialized occurrence because reporting walks window constructions; its fixture EnergyManagementSystem:ConstructionIndexVariable reference only suppresses EnergyPlus's nominally-unused-construction warning.",
+  "A constant-zero schedule keeps both ExteriorScreen controls inactive during simulation while allowing EnergyPlus to initialize screen optical properties and complete with zero warnings and zero severe errors.",
+  "The primary oracle run requests Output:Constructions selections Constructions and Materials and emits both generic and specialized tables. A Materials-only run emits the generic Z, M, A rows but no WindowConstruction or specialized Screen header/rows. A Constructions-only run emits the WindowConstruction rows and specialized A, Z, Z rows but no generic Material Details header/rows.",
+  "The exact specialized header and each exact data row contain twelve comma-separated tokens. Thickness uses source {:.5R}; all other specialized numeric fields use source {:.3R}.",
+  "The bounded Rust comparison may replay CalcScreenTransmittance at normal incidence and EnergyPlus's fixed 18 by 18 quarter-hemisphere integration solely to reproduce these static specialized EIO initialization fields. That fixture-local source replay is not a general angle-dependent TAR, window optics, or runtime claim.",
+  "Opening multipliers and map resolution are retained by the typed object but are not exposed by either compared EIO table. The fixture uses map resolution zero and makes no opening-airflow or transmittance-map claim.",
+  "Both fixture reflectances are positive. Zero-reflectance source-NaN behavior and duplicate or multiple WindowShadingControl active-selection order remain explicit nonclaims and fail closed in the bounded comparison.",
+  "Definition order intentionally differs from occurrence and normalized-name order. Construction declarations remain in canonical name order because ConvertInputFormat erases broad IDF declaration order; no broad or arbitrary declaration-order parity is claimed.",
+  "The smoke gate requires clean EnergyPlus 26.1.0 primary, Materials-only, and Constructions-only runs; exact activation, headers, rows, multiplicity, and ordering; converted epJSON artifacts; and the bounded Rust command `compare window-material-screen` in explicit exact mode.",
+  "This is non-blocking diagnostic-only static material evidence and makes no WindowMaterial:Screen conformance, general runtime angle-dependent TAR, transmittance-map, shading-control, surface, window runtime, general optics, thermal, daylighting, construction-rating, or declaration-order claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/window_material_screen_001/window_material_screen.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface", "construction"]
+has_zone = true
+has_surface = true
+has_fenestration = true
+has_air_loop = false
+has_plant_loop = false
+has_ems = true
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/window_material_screen_001/window_material_screen.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+epjson = ".runtime/compare-window-material-screen/26.1.0/window-material-screen.epJSON"
+
+[[outputs]]
+key = "*"
+variable = "WindowMaterial:Screen Generic Definition Details"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "WindowMaterial:Screen Layer Occurrences"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "WindowConstruction Layer Summary"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "DISTINCTIVE FIRST HIGH PRECISION SCREEN TEST WINDOW"
+variable = "HeatTransfer Surface Static Inputs"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/window_material_screen_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-window-material-screen-smoke"
+blocking = false

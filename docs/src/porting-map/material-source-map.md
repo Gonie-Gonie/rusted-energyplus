@@ -21,8 +21,11 @@ Primary reference sources:
 - `src/EnergyPlus/HeatBalanceManager.cc::GetHeatBalanceInput` for common
   material-input orchestration
 - `src/EnergyPlus/Material.cc::GetWindowGlassSpectralData`,
-  `GetMaterialData`, and `GetVariableAbsorptanceInput`
+  `GetMaterialData`, `GetVariableAbsorptanceInput`, and
+  `CalcScreenTransmittance`
 - `src/EnergyPlus/Material.hh` for the base-material class hierarchy
+- `src/EnergyPlus/WindowManager.cc::CalcWindowScreenProperties` and the
+  ordinary-window construction/material EIO writer
 - `src/EnergyPlus/PhaseChangeModeling/HysteresisModel.cc::GetHysteresisData`
 - `src/EnergyPlus/HeatBalFiniteDiffManager.cc::GetCondFDInput`
 - `src/EnergyPlus/MoistureBalanceEMPDManager.cc::GetMoistureBalanceEMPDInput`
@@ -152,7 +155,7 @@ This checkpoint migrates the first four base definitions from a single
 option-heavy record to discriminated material definitions under a shared
 identity envelope, adds one explicitly partial fifth variant for the
 `SpectralAverage` branch of source-order object 5, and gives source-order
-objects 6 through 11 complete bounded variants.
+objects 6 through 14 complete bounded variants.
 
 ### `Material` / regular
 
@@ -715,12 +718,61 @@ bounded typed divergence, not a claim of broad diagnostic parity.
 
 Arbitrary-run assessment counts every typed screen definition, including
 definitions unused by any construction, and explicitly blocks execution.
-Dynamic angle-dependent TAR evaluation, diffuse integration, transmittance-map
-generation, `WindowShadingControl`/surface activation, EIO material reporting,
-window optics and heat transfer, daylighting, exact diagnostics/order, and
-conformance remain deferred. First typed evidence is the named compiler and
-runtime test set; this typed-only checkpoint adds no external family case or
-proof variable.
+
+`window_material_screen_001` adds a separate nonblocking diagnostic
+EnergyPlus 26.1 static EIO gate. The generic `Material Details` comparison
+requires exactly one row for each fixture definition in the source Z,M,A
+sequence, including M, which is unused by every construction. It locks
+`MediumRough`, zero resistance, density, and specific heat, source
+`{:.4R}` wire-diameter thickness, source `{:.3R}` conductivity, and source
+`{:.4R}` solid-fraction-adjusted thermal, solar, and visible absorptance.
+The reflected-beam enum, raw reflectance/emissivity, spacing, glass distance,
+opening multipliers, map resolution, and nominal resistance are absent from
+that generic table.
+
+The specialized table preserves the exact 12-token source header, including
+the missing space in `Screen To GlassDistance`. Its exact construction-layer
+occurrence sequence is A,Z,Z: the defaulted material occurs in construction B,
+the high-precision material occurs in C and D, and unused M is absent.
+Thickness uses `{:.5R}`; conductivity, solid-fraction thermal absorptance,
+normal-incidence beam solar transmittance, normal solar and visible
+reflectance, diffuse solar and visible reflectance, diameter/spacing ratio,
+and screen-to-glass distance use `{:.3R}`.
+Each screened fixture construction becomes the exterior Screen plus the exact
+layer tail of bare construction A. The comparator fails closed for a screened
+occurrence without a matching bare fenestration construction because
+EnergyPlus can skip its material row during nominal-window calculation.
+
+The EnergyPlus source header condition is broader than occurrence use:
+selecting `Constructions` with at least one Screen definition and any window
+construction can validly emit the exact header with zero Screen data rows.
+The bounded Rust comparator predicts header presence only inside its typed
+ordinary-fenestration `Construction` scope; complex and equivalent-layer
+window header activation remains unclaimed. Within that scope the parser
+accepts the header-only shape, while the declared fixture separately requires
+A,Z,Z.
+
+The bounded comparator reproduces the source normal-incidence
+`CalcScreenTransmittance` path and the reverse-order 18 by 18
+`CalcWindowScreenProperties` quarter-hemisphere integration for the
+fixture's two `ExteriorScreen`-activated definitions only. A constant-zero
+control schedule still lets EnergyPlus initialize A and Z. Two surfaces share
+construction C without multiplying its row; surface-unused construction D
+still emits a second Z occurrence because C initialized the shared material.
+The fixture-only `EnergyManagementSystem:ConstructionIndexVariable` reference
+to D merely suppresses the oracle's unused-construction warning.
+
+The primary lane selects both `Constructions` and `Materials`; a
+Materials-only lane emits generic Z,M,A rows without a specialized header,
+and a Constructions-only lane emits specialized A,Z,Z rows without the generic
+table. All three oracle runs complete with zero warnings and zero severe
+errors. This evidence does not promote either parent routine wholesale.
+`DoNotModel` specialized optics, zero-reflectance source-NaN behavior,
+duplicate/multiple-control active-selection order, arbitrary activation or
+declaration order, general angle-dependent TAR evaluation, transmittance-map
+generation, opening-multiplier behavior, window optics and heat transfer,
+`WindowShadingControl` or surface behavior, ratings, daylighting, broad
+diagnostics/order, and conformance remain deferred.
 
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. The two ordinary glazing variants, `WindowMaterial:Gas`,
@@ -893,8 +945,11 @@ the strict diameter-below-spacing relationship, solid-fraction optical and
 nominal-resistance derivations, shared-name/source order, Fenestration family
 classification, the exterior-only plain-window Construction subset, explicit
 rejection of the unsafe `Screen, Gap, Glass` source hole, typed coverage, and
-the all-definition runtime block. No Screen EIO or numerical window evidence
-is added by this typed-only checkpoint.
+the all-definition runtime block. `window_material_screen_001` separately
+locks all generic definition rows, the exact specialized header, the
+duplicate-aware A,Z,Z occurrence sequence, the fixture-bounded normal and
+diffuse initialization replay, and independent Materials/Constructions report
+activation without promoting window runtime or conformance.
 
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
@@ -909,15 +964,18 @@ the deferred families.
 |---|---|---|
 | `GetWindowGlassSpectralData` | `source_mapped` | owns the pre-material spectral dataset read |
 | `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, and ordinary Screen objects plus only the regular Glazing `SpectralAverage` branch are implemented |
+| `CalcScreenTransmittance` | `source_mapped` | the Screen fixture comparator reproduces only its normal-incidence A/Z paths and the values required by the bounded static EIO row |
+| `CalcWindowScreenProperties` | `source_mapped` | the Screen fixture comparator reproduces only its reverse-order 18 by 18 initialization integration and fixture activation boundary |
 | `GetVariableAbsorptanceInput` | `source_mapped` | owns the post-base variable-absorptance overlay |
 | `GetHysteresisData` | `source_mapped` | owns the post-base hysteresis overlay |
 | `GetCondFDInput` | `source_mapped` | owns PhaseChange then VariableThermalConductivity |
 | `GetMoistureBalanceEMPDInput` | `source_mapped` | owns the EMPD settings overlay |
 | `GetHeatBalHAMTInput` | `source_mapped` | owns the six ordered HAMT objects |
 
-All seven routine records have `required_for_full_domain = false`. The
+All nine routine records have `required_for_full_domain = false`. The
 bounded implementation slice does not promote the whole
-`GetMaterialData` routine beyond `source_mapped`.
+`GetMaterialData`, `CalcScreenTransmittance`, or
+`CalcWindowScreenProperties` routines beyond `source_mapped`.
 
 ## Evidence And Promotion Boundary
 
@@ -989,9 +1047,13 @@ definition unused by every construction. Its specialized exact malformed
 header and A,Z,Z,P,Q occurrence sequence lock reuse, exclusion of the unused
 definition, zeroed one-sided pleats, and source `{:.4R}`/`{:.5R}` formatting;
 visible inputs remain typed-only because EIO omits them.
-`WindowMaterial:Screen` remains typed-only: compiler/runtime tests cover its
-input, derivation, Construction, namespace, family, and run-block boundaries,
-but no external family case, proof variable, or EIO comparison is registered.
+`window_material_screen_001` compares every Screen definition against its
+generic row, including unused M, and locks the exact specialized-header A,Z,Z
+construction-occurrence sequence. For fixture-activated A and Z only, the
+comparator reproduces the source normal-incidence calculation and reverse
+18 by 18 diffuse integration needed by those EIO fields. The three clean
+reporting lanes independently prove generic/specialized activation; runtime
+window, control, surface, map, and conformance behavior remains unclaimed.
 These tests and static EIO smokes remain bounded evidence, not an EnergyPlus
 material-family or window gate.
 

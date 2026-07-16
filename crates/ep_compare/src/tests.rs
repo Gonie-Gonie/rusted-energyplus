@@ -1,5 +1,6 @@
 mod material_details;
 mod window_material_drape_equivalent_layer;
+mod window_material_screen;
 mod window_material_shade;
 mod window_material_shade_equivalent_layer;
 

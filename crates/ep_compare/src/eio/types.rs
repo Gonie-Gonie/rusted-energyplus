@@ -356,6 +356,37 @@ pub struct EioWindowMaterialDrapeEquivalentLayer {
     pub pleated_length_m: f64,
 }
 
+/// Ordinary window-screen values read from an EnergyPlus `eplusout.eio` row.
+///
+/// EnergyPlus emits one specialized row for every ordinary-window
+/// construction-layer occurrence. Repeated material names therefore remain
+/// distinct entries in source emission order.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioWindowMaterialScreen {
+    /// EnergyPlus-normalized material name.
+    pub material_name: String,
+    /// Screen-wire diameter emitted as material thickness in meters.
+    pub thickness_m: f64,
+    /// Screen-wire conductivity in W/m-K.
+    pub conductivity_w_per_m_k: f64,
+    /// Solid-fraction-adjusted long-wave thermal absorptance.
+    pub thermal_absorptance: f64,
+    /// Normal-incidence beam solar transmittance.
+    pub solar_transmittance: f64,
+    /// Front-side normal-incidence solar reflectance.
+    pub solar_reflectance: f64,
+    /// Front-side normal-incidence visible reflectance.
+    pub visible_reflectance: f64,
+    /// Diffuse solar reflectance.
+    pub diffuse_solar_reflectance: f64,
+    /// Diffuse visible reflectance.
+    pub diffuse_visible_reflectance: f64,
+    /// Screen-wire diameter divided by wire spacing.
+    pub diameter_to_spacing_ratio: f64,
+    /// Distance from the screen to the adjacent glazing in meters.
+    pub screen_to_glass_distance_m: f64,
+}
+
 /// Equivalent-layer window gap values read from an EnergyPlus `eplusout.eio` row.
 ///
 /// EnergyPlus emits one row for every equivalent-layer construction-layer
@@ -456,6 +487,8 @@ pub enum EioError {
     MissingWindowMaterialShadeEquivalentLayer,
     /// No `WindowMaterial:Drape:EquivalentLayer` rows were present.
     MissingWindowMaterialDrapeEquivalentLayer,
+    /// The exact `WindowMaterial:Screen` header was not present.
+    MissingWindowMaterialScreenHeader,
     /// No `WindowMaterial:Gap:EquivalentLayer` rows were present.
     MissingWindowMaterialGapEquivalentLayer,
     /// No `WindowMaterial:Glazing:EquivalentLayer` rows were present.
@@ -595,6 +628,31 @@ pub enum EioError {
         /// Parse failure reason.
         reason: String,
     },
+    /// A candidate `WindowMaterial:Screen` header did not match the source literal.
+    InvalidWindowMaterialScreenHeader {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
+    /// More than one exact `WindowMaterial:Screen` header was present.
+    DuplicateWindowMaterialScreenHeader {
+        /// One-based line number of the repeated header.
+        line: usize,
+        /// Raw repeated header text.
+        text: String,
+    },
+    /// A `WindowMaterial:Screen` row could not be parsed.
+    InvalidWindowMaterialScreen {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
     /// A `WindowMaterial:Gap:EquivalentLayer` row could not be parsed.
     InvalidWindowMaterialGapEquivalentLayer {
         /// One-based line number.
@@ -657,6 +715,12 @@ impl Display for EioError {
                 write!(
                     formatter,
                     "EIO WindowMaterial:Drape:EquivalentLayer not found"
+                )
+            }
+            Self::MissingWindowMaterialScreenHeader => {
+                write!(
+                    formatter,
+                    "exact EIO WindowMaterial:Screen header not found"
                 )
             }
             Self::MissingWindowMaterialGapEquivalentLayer => {
@@ -731,6 +795,18 @@ impl Display for EioError {
                 formatter,
                 "invalid EIO WindowMaterial:Drape:EquivalentLayer at line {line}: {reason}: {text}"
             ),
+            Self::InvalidWindowMaterialScreenHeader { line, text, reason } => write!(
+                formatter,
+                "invalid EIO WindowMaterial:Screen header at line {line}: {reason}: {text}"
+            ),
+            Self::DuplicateWindowMaterialScreenHeader { line, text } => write!(
+                formatter,
+                "duplicate EIO WindowMaterial:Screen header at line {line}: {text}"
+            ),
+            Self::InvalidWindowMaterialScreen { line, text, reason } => write!(
+                formatter,
+                "invalid EIO WindowMaterial:Screen at line {line}: {reason}: {text}"
+            ),
             Self::InvalidWindowMaterialGapEquivalentLayer { line, text, reason } => write!(
                 formatter,
                 "invalid EIO WindowMaterial:Gap:EquivalentLayer at line {line}: {reason}: {text}"
@@ -762,6 +838,7 @@ impl std::error::Error for EioError {
             | Self::MissingWindowMaterialShade
             | Self::MissingWindowMaterialShadeEquivalentLayer
             | Self::MissingWindowMaterialDrapeEquivalentLayer
+            | Self::MissingWindowMaterialScreenHeader
             | Self::MissingWindowMaterialGapEquivalentLayer
             | Self::MissingWindowMaterialGlazingEquivalentLayer
             | Self::InvalidSurfaceGeometry { .. }
@@ -777,6 +854,9 @@ impl std::error::Error for EioError {
             | Self::InvalidWindowMaterialShade { .. }
             | Self::InvalidWindowMaterialShadeEquivalentLayer { .. }
             | Self::InvalidWindowMaterialDrapeEquivalentLayer { .. }
+            | Self::InvalidWindowMaterialScreenHeader { .. }
+            | Self::DuplicateWindowMaterialScreenHeader { .. }
+            | Self::InvalidWindowMaterialScreen { .. }
             | Self::InvalidWindowMaterialGapEquivalentLayer { .. }
             | Self::InvalidWindowMaterialGlazingEquivalentLayer { .. } => None,
         }

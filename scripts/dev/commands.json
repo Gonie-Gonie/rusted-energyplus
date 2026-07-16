@@ -587,6 +587,12 @@
                          "help":  "Compare equivalent-layer window-drape definitions and malformed construction-layer EIO occurrences."
                      },
                      {
+                         "name":  "compare-window-material-screen-smoke",
+                         "path":  "compare\\compare-window-material-screen-smoke.ps1",
+                         "group":  "compare",
+                         "help":  "Compare window-screen definitions, construction occurrences, and reporting activation with EnergyPlus EIO."
+                     },
+                     {
                          "name":  "compare-internal-gains-smoke",
                          "path":  "compare\\compare-internal-gains-smoke.ps1",
                          "group":  "compare",
