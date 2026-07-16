@@ -28,10 +28,10 @@ use ep_model::{
     SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
     ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
     TypedModel, Version, VertexEntryDirection, WeekScheduleId, WindExposure,
-    WindowGlazingSpectralAverageMaterial, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
-    ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
-    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatControl,
-    ZoneThermostatId, parse_calendar_date_rule,
+    WindowGlazingRefractionExtinctionMaterial, WindowGlazingSpectralAverageMaterial, Zone,
+    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
+    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 use std::collections::BTreeMap;
@@ -236,6 +236,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Material:NoMass",
     "Material:AirGap",
     "Material:InfraredTransparent",
+    "WindowMaterial:Glazing:RefractionExtinctionMethod",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -804,6 +805,7 @@ impl<'a> Compiler<'a> {
         self.parse_air_gap_materials(model);
         self.parse_infrared_transparent_materials(model);
         self.parse_window_glazing_materials(model);
+        self.parse_window_glazing_refraction_extinction_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -1184,6 +1186,147 @@ impl<'a> Compiler<'a> {
                         solar_diffusing,
                         youngs_modulus_pa,
                         poissons_ratio,
+                    },
+                ),
+            });
+        }
+    }
+
+    fn parse_window_glazing_refraction_extinction_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowMaterial:Glazing:RefractionExtinctionMethod";
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let thickness_m =
+                self.required_number_minimum(OBJECT_TYPE, &name, &object, "thickness", 0.0, false);
+            let solar_index_of_refraction = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "solar_index_of_refraction",
+                1.0,
+                false,
+            );
+            let solar_extinction_coefficient_per_m = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "solar_extinction_coefficient",
+                0.0,
+                false,
+            );
+            let visible_index_of_refraction = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "visible_index_of_refraction",
+                1.0,
+                false,
+            );
+            let visible_extinction_coefficient_per_m = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "visible_extinction_coefficient",
+                0.0,
+                false,
+            );
+            let infrared_transmittance_at_normal_incidence = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "infrared_transmittance_at_normal_incidence",
+                0.0,
+                (0.0, true),
+                (1.0, false),
+            );
+            let infrared_hemispherical_emissivity = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "infrared_hemispherical_emissivity",
+                0.84,
+                (0.0, false),
+                (1.0, false),
+            );
+            let conductivity_w_per_m_k = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "conductivity",
+                0.9,
+                (0.0, false),
+                (f64::INFINITY, true),
+            );
+            let dirt_correction_factor_for_solar_and_visible_transmittance = self
+                .number_bounded_default(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "dirt_correction_factor_for_solar_and_visible_transmittance",
+                    1.0,
+                    (0.0, false),
+                    (1.0, true),
+                );
+            let solar_diffusing = self.enum_default(
+                OBJECT_TYPE,
+                &name,
+                (&object, "solar_diffusing"),
+                false,
+                "No",
+                parse_yes_no,
+            );
+
+            let (
+                Some(thickness_m),
+                Some(solar_index_of_refraction),
+                Some(solar_extinction_coefficient_per_m),
+                Some(visible_index_of_refraction),
+                Some(visible_extinction_coefficient_per_m),
+            ) = (
+                thickness_m,
+                solar_index_of_refraction,
+                solar_extinction_coefficient_per_m,
+                visible_index_of_refraction,
+                visible_extinction_coefficient_per_m,
+            )
+            else {
+                continue;
+            };
+
+            let infrared_sum =
+                infrared_transmittance_at_normal_incidence + infrared_hemispherical_emissivity;
+            if infrared_sum >= 1.0 {
+                self.error(
+                    "InvalidWindowGlazingOpticalSum",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("infrared_hemispherical_emissivity"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} infrared_transmittance_at_normal_incidence plus infrared_hemispherical_emissivity must be less than 1, got {infrared_sum}"
+                    ),
+                );
+                continue;
+            }
+
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::WindowGlazingRefractionExtinction(
+                    WindowGlazingRefractionExtinctionMaterial {
+                        thickness_m,
+                        solar_index_of_refraction,
+                        solar_extinction_coefficient_per_m,
+                        visible_index_of_refraction,
+                        visible_extinction_coefficient_per_m,
+                        infrared_transmittance_at_normal_incidence,
+                        infrared_hemispherical_emissivity,
+                        conductivity_w_per_m_k,
+                        dirt_correction_factor_for_solar_and_visible_transmittance,
+                        solar_diffusing,
                     },
                 ),
             });
@@ -8393,6 +8536,7 @@ mod tests {
     mod schedule_week_compact;
     mod schedule_year;
     mod window_material_glazing;
+    mod window_material_glazing_refraction_extinction;
 
     use super::{
         ALL_SCHEDULE_DAY_TYPES, CompileStage, DiagnosticSeverity, ObjectCoverageStatus,

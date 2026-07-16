@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-07-15
+last_reviewed: 2026-07-16
 ---
 
 # Heat Balance Source Map
@@ -48,7 +48,7 @@ claim.
 |---|---|---|
 | heat-balance driver | `ManageHeatBalance` | mapped-not-ported |
 | project heat-balance controls | `GetProjectControlData` | mapped-not-ported |
-| material input | `Material::GetWindowGlassSpectralData` -> `Material::GetMaterialData` -> `Material::GetHysteresisData` | all 34 public base/overlay objects are inventoried in [the material-family source map](material-source-map.md); Regular, NoMass, AirGap, and InfraredTransparent plus only the `WindowMaterial:Glazing` `SpectralAverage` branch are typed, while full window behavior remains blocked |
+| material input | `Material::GetWindowGlassSpectralData` -> `Material::GetMaterialData` -> `Material::GetHysteresisData` | all 34 public base/overlay objects are inventoried in [the material-family source map](material-source-map.md); Regular, NoMass, AirGap, InfraredTransparent, and RefractionExtinctionMethod plus only the `WindowMaterial:Glazing` `SpectralAverage` branch are typed, while full window behavior remains blocked |
 | construction input | `GetConstructData` | typed opaque and single-glazing construction kinds are separated; the opaque runtime/CLI path rejects or filters fenestration stacks, `material_opaque_variants_001` checks exact static opaque layer counts, names, order, and resistance only, and window construction/CTF behavior is not ported |
 | zone input | `GetZoneData` | typed geometry subset exists; source map required before expansion |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |

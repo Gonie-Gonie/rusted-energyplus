@@ -76,6 +76,13 @@ first_evidence = "material_opaque_variants_001"
 support_boundary = "Typed as the name-only opaque infrared-transparent variant with fixed source values and the intended sole-layer construction invariant. material_opaque_variants_001 adds nonblocking diagnostic EnergyPlus 26.1 EIO evidence only for the exact sole-layer paired-interzone fixture: grouped layer count, source-declared material identity, order, and thermal resistance 0.01 m2-K/W. The generic Material CTF Summary row shape is not treated as an independent object-type discriminator. IRT interzone warnings, the upstream non-first-layer validation gap and exact diagnostics, CondFD behavior, dynamic heat transfer, and conformance remain unclaimed."
 
 [[object]]
+name = "WindowMaterial:Glazing:RefractionExtinctionMethod"
+family = "material"
+status = "typed"
+first_evidence = "window_glazing_refraction_extinction_001"
+support_boundary = "The complete EnergyPlus 26.1 input object is typed with all five required refraction/extinction fields, five defaulted thermal/dirt/diffusing fields, shared material-name resolution, and source-order normal-incidence optical derivation. The bounded implementation intentionally reproduces the 26.1 visible-back-reflectance assignment to solar-front reflectance. window_glazing_refraction_extinction_001 adds nonblocking diagnostic exact-EIO evidence for thickness plus the derived and emitted material fields, with oracle-only proof of use by one detailed window. The four raw solar/visible refraction-index and extinction-coefficient inputs remain typed-only because EIO omits them. Fenestration surfaces, window runtime optics/heat transfer, broad construction layering, blocking compatibility, and conformance remain unsupported."
+
+[[object]]
 name = "Construction"
 family = "construction"
 status = "typed"

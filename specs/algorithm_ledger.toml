@@ -2559,19 +2559,24 @@ rust_target = [
   "crates/ep_cli/src/main.rs::construction_material_rows",
   "crates/ep_compare/src/eio.rs::parse_eio_window_material_glazing",
   "crates/ep_cli/src/main.rs::run_compare_window_glazing_spectral_average",
+  "crates/ep_model/src/objects/materials.rs::WindowGlazingRefractionExtinctionMaterial",
+  "crates/ep_compiler/src/compiler.rs::Compiler::parse_window_glazing_refraction_extinction_materials",
+  "crates/ep_cli/src/main.rs::run_compare_window_glazing_refraction_extinction",
+  "crates/ep_run/src/support/runtime_boundaries.rs::assess_typed_runtime_boundaries",
 ]
 status = "scaffold"
 first_case = "construction_materials_001"
 family_cases = [
   "material_opaque_variants_001",
   "window_glazing_spectral_average_001",
+  "window_glazing_refraction_extinction_001",
 ]
 proof_variables = [
   "Construction CTF Layer Count",
   "Material CTF Summary Thermal Resistance",
 ]
 claim_level = "none"
-support_boundary = "CP58 material-family scaffold: all 34 EnergyPlus 26.1 public material base/overlay objects and their source-owned order are inventoried. The bounded typed implementation covers Material, Material:NoMass, Material:AirGap, and Material:InfraredTransparent plus only the SpectralAverage branch of WindowMaterial:Glazing; Spectral, SpectralAndAngle, and BSDF explicitly fail closed. MaterialFamily and ConstructionKind prevent glazing fields from entering opaque projections, reject mixed stacks and fenestration use by BuildingSurface:Detailed, and filter or reject window constructions in the opaque runtime/CLI path. The current window construction boundary is a single glazing layer because gas and shading dependencies remain untyped. material_opaque_variants_001 adds nonblocking diagnostic EnergyPlus 26.1 grouped-EIO evidence only for its exact opaque construction groups. window_glazing_spectral_average_001 adds nonblocking diagnostic exact-EIO evidence for all 16 fields EnergyPlus emits from one bounded SpectralAverage material, with typed-only Young's modulus and Poisson's ratio plus oracle-only exact construction and actual detailed-window surface evidence. It does not compile or execute that fenestration surface in Rust. GlazingSpectralData, window surfaces and runtime optics/thermal behavior, RefractionExtinction, EquivalentLayer, the remaining 17 base definitions and 12 overlays/datasets, complete GetMaterialData behavior, algorithm-specific consumers, blocking family gates, and broad material/construction/conduction/window behavior remain deferred; this scaffold/source-mapped entry adds no conformance claim."
+support_boundary = "CP58 material-family scaffold: all 34 EnergyPlus 26.1 public material base/overlay objects and their source-owned order are inventoried. The bounded typed implementation covers Material, Material:NoMass, Material:AirGap, Material:InfraredTransparent, and the complete WindowMaterial:Glazing:RefractionExtinctionMethod object plus only the SpectralAverage branch of WindowMaterial:Glazing; Spectral, SpectralAndAngle, and BSDF explicitly fail closed. RefractionExtinction preserves all raw n/k inputs, applies the EnergyPlus 26.1 normal-incidence formulas, and intentionally copies solar-front reflectance to visible-back for source parity. MaterialFamily and ConstructionKind prevent glazing fields from entering opaque projections, reject mixed stacks and fenestration use by BuildingSurface:Detailed, and filter or reject window constructions in the opaque runtime/CLI path. Arbitrary-run support assessment explicitly run-blocks the fully typed RefractionExtinctionMethod object under the existing Window* surface-boundary rule. The current window construction boundary is a single glazing layer because gas and shading dependencies remain untyped. material_opaque_variants_001 adds nonblocking diagnostic EnergyPlus 26.1 grouped-EIO evidence only for its exact opaque construction groups. window_glazing_spectral_average_001 and window_glazing_refraction_extinction_001 add separate nonblocking diagnostic exact-EIO evidence for all 16 normalized material fields, the four raw n/k inputs as typed-only non-emitted evidence, and oracle-only exact construction and actual detailed-window surface use. Neither compiles or executes that fenestration surface in Rust. GlazingSpectralData, window surfaces and runtime optics/thermal behavior, EquivalentLayer, the remaining 16 base definitions and 12 overlays/datasets, complete GetMaterialData behavior, algorithm-specific consumers, blocking family gates, and broad material/construction/conduction/window behavior remain deferred; this scaffold/source-mapped entry adds no conformance claim."
 
 routine.get_window_glass_spectral_data.source_file = "src/EnergyPlus/Material.cc"
 routine.get_window_glass_spectral_data.source_routine = "GetWindowGlassSpectralData"

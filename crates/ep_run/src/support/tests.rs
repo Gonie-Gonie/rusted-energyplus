@@ -63,6 +63,52 @@ fn simple_one_zone_model_is_supported() -> Result<(), Box<dyn std::error::Error>
 }
 
 #[test]
+fn typed_refraction_extinction_glazing_remains_run_blocked()
+-> Result<(), Box<dyn std::error::Error>> {
+    let raw = parse_epjson_str(
+        r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "Zone": {"Zone One": {"volume": 100}},
+                "WindowMaterial:Glazing:RefractionExtinctionMethod": {
+                    "Alternative Glass": {
+                        "thickness": 0.006,
+                        "solar_index_of_refraction": 1.5,
+                        "solar_extinction_coefficient": 20.0,
+                        "visible_index_of_refraction": 1.6,
+                        "visible_extinction_coefficient": 10.0
+                    }
+                }
+            }"#,
+    )?;
+    let result = compile_raw_model(&raw);
+    let assessment = assess_support(
+        &raw,
+        &result.report,
+        result.model.as_ref(),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+    );
+
+    assert_eq!(assessment.status, SupportStatus::Unsupported);
+    assert_eq!(assessment.run_result_state, RunResultState::RunBlocked);
+    assert_eq!(assessment.runtime_class, RuntimeClass::None);
+    assert!(assessment.unsupported_objects.iter().any(|entry| {
+        entry.object_type == "WindowMaterial:Glazing:RefractionExtinctionMethod"
+            && entry.count == 1
+            && entry.note
+                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+    }));
+    assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
+        diagnostic.code == "UnsupportedSurfaceBoundary"
+            && diagnostic.object_type.as_deref()
+                == Some("WindowMaterial:Glazing:RefractionExtinctionMethod")
+    }));
+    Ok(())
+}
+
+#[test]
 fn missing_registry_capability_blocks_runtime_selection() -> Result<(), Box<dyn std::error::Error>>
 {
     let raw = parse_epjson_str(

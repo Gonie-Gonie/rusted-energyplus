@@ -1,7 +1,8 @@
 use std::collections::BTreeSet;
 
 use ep_model::{
-    DehumidificationControlType, HumidificationControlType, SimulationModel, TypedModel,
+    DehumidificationControlType, HumidificationControlType, MaterialKind, SimulationModel,
+    TypedModel,
 };
 use ep_raw_model::RawModel;
 use ep_runtime::{
@@ -268,6 +269,18 @@ pub(super) fn assess_typed_runtime_boundaries(
             ),
         );
     }
+
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "WindowMaterial:Glazing:RefractionExtinctionMethod",
+        typed_model
+            .materials
+            .iter()
+            .filter(|material| material.kind() == MaterialKind::WindowGlazingRefractionExtinction)
+            .count(),
+    );
 
     push_typed_unsupported_object(
         registry,

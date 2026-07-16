@@ -1,0 +1,73 @@
+id = "window_glazing_refraction_extinction_001"
+title = "Window glazing refraction-extinction static material evidence"
+milestone = "v0.8-heat-balance"
+purpose = "Compare the bounded Rust WindowMaterial:Glazing:RefractionExtinctionMethod typed slice with EnergyPlus normalized material, window-construction, and fenestration-surface EIO evidence."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The fixture assigns one complete, nondefault refraction-extinction glazing material to a one-layer window construction and an actual FenestrationSurface:Detailed on a distinct opaque host wall.",
+  "Solar and visible indices of refraction and extinction coefficients deliberately differ so the two derived optical bands cannot be conflated.",
+  "EnergyPlus normalizes this input method to a WindowMaterial:Glazing SpectralAverage EIO row; that row cannot by itself identify the original input object type.",
+  "The EnergyPlus 26.1 source-actual normalized row repeats solar front reflectance in the visible-back slot; this diagnostic gate preserves that source behavior without claiming intended visible-back optical physics.",
+  "Thickness is compared directly with the normalized EnergyPlus row. The four solar/visible refraction-index and extinction-coefficient inputs remain typed-only Rust bridge evidence because EIO omits them.",
+  "The smoke gate requires a clean EnergyPlus 26.1.0 run, exactly one normalized glazing material row, one matching window-construction row, and one matching fenestration heat-transfer surface row.",
+  "This is non-blocking diagnostic-only static input evidence. It makes no claim for window heat-transfer runtime, optical calculations, whole-window behavior, dynamic simulation parity, or WindowMaterial:Glazing:RefractionExtinctionMethod conformance.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/window_glazing_refraction_extinction_001/window_glazing_refraction_extinction.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface", "construction"]
+has_zone = true
+has_surface = true
+has_fenestration = true
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/window_glazing_refraction_extinction_001/window_glazing_refraction_extinction.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+epjson = ".runtime/compare-window-glazing-refraction-extinction/26.1.0/window-glazing-refraction-extinction.epJSON"
+
+[[outputs]]
+key = "DISTINCTIVE REFRACTION EXTINCTION GLASS"
+variable = "Normalized WindowMaterial:Glazing Static Inputs"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "DISTINCTIVE REFRACTION EXTINCTION WINDOW CONSTRUCTION"
+variable = "WindowConstruction Layer Summary"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "DISTINCTIVE REFRACTION EXTINCTION WINDOW"
+variable = "HeatTransfer Surface Static Inputs"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/window_glazing_refraction_extinction_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-window-glazing-refraction-extinction-smoke"
+blocking = false

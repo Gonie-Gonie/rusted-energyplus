@@ -539,6 +539,12 @@
                          "help":  "Compare bounded SpectralAverage window-glazing inputs with exact EnergyPlus EIO evidence."
                      },
                      {
+                         "name":  "compare-window-glazing-refraction-extinction-smoke",
+                         "path":  "compare\\compare-window-glazing-refraction-extinction-smoke.ps1",
+                         "group":  "compare",
+                         "help":  "Compare refraction-extinction window-glazing inputs with normalized EnergyPlus EIO evidence."
+                     },
+                     {
                          "name":  "compare-internal-gains-smoke",
                          "path":  "compare\\compare-internal-gains-smoke.ps1",
                          "group":  "compare",

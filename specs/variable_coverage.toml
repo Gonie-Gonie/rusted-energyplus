@@ -567,6 +567,38 @@ first_evidence = "official_1zone_static_model_001"
 support_boundary = "Static EIO conformance only; no dynamic runtime response or algorithm parity claim."
 
 [[variable]]
+name = "WindowMaterial:Glazing Static Inputs"
+domain = "construction"
+status = "diagnostic"
+first_case = "window_glazing_spectral_average_001"
+first_evidence = "window_glazing_spectral_average_001"
+support_boundary = "Non-blocking SpectralAverage input and EnergyPlus EIO row comparison only; no window heat-transfer runtime, optical calculation, or conformance claim."
+
+[[variable]]
+name = "Normalized WindowMaterial:Glazing Static Inputs"
+domain = "construction"
+status = "diagnostic"
+first_case = "window_glazing_refraction_extinction_001"
+first_evidence = "window_glazing_refraction_extinction_001"
+support_boundary = "Non-blocking RefractionExtinctionMethod typed-input and EnergyPlus-normalized SpectralAverage EIO row comparison only; no window heat-transfer runtime, optical calculation, or conformance claim."
+
+[[variable]]
+name = "WindowConstruction Layer Summary"
+domain = "construction"
+status = "diagnostic"
+first_case = "window_glazing_spectral_average_001"
+first_evidence = "window_glazing_spectral_average_001"
+support_boundary = "Non-blocking one-layer window-construction EIO comparison in the declared glazing fixtures only; no whole-window or construction conformance claim."
+
+[[variable]]
+name = "HeatTransfer Surface Static Inputs"
+domain = "surface"
+status = "diagnostic"
+first_case = "window_glazing_spectral_average_001"
+first_evidence = "window_glazing_spectral_average_001"
+support_boundary = "Non-blocking fenestration-surface EIO identity and static-input comparison in the declared glazing fixtures only; no fenestration heat-transfer runtime or surface conformance claim."
+
+[[variable]]
 name = "Surface Inside Face Temperature"
 domain = "heat_balance"
 status = "conformance"
