@@ -828,9 +828,42 @@ ordinary `WindowMaterial:Screen`, and the payload belongs to
 assessment counts every typed definition, including definitions unused by any
 construction, and blocks execution. Equivalent-layer construction packing,
 `CheckAndFixCFSLayer`, `IS_OPENNESS`, ASHWAT optics and thermal behavior,
-ratings, surfaces, EIO parsing/comparison, exact diagnostic recovery and text,
-runtime execution, and conformance remain unsupported. This typed-only
-checkpoint adds no conformance case or proof variable.
+ratings, surfaces, exact diagnostic recovery and text, runtime execution, and
+conformance remain unsupported.
+
+`window_material_screen_equivalent_layer_001` adds a separate nonblocking
+diagnostic EnergyPlus 26.1 static EIO gate and bounded Rust parser/CLI
+comparator without promoting any of those deferred consumers. Its generic
+`Material Details` comparison requires exactly one `MediumRough`/all-zero row
+for every fixture definition in source Z,M,A order, including
+`M UNUSED EQL SCREEN`, which appears in no construction. The specialized
+comparison preserves the malformed source shape exactly: its header has nine
+comma-separated tokens, while each row has twelve. The exact
+construction-occurrence sequence is A,Z,Z; A contains the default
+`Autocalculate`/blank-geometry definition, and B and C reuse the high-precision
+Z definition. M is excluded.
+
+The A row locks EnergyPlus's raw `Autocalculate` value as `-99999.0000` and
+blank wire spacing/diameter as `0.00000`/`0.00000`. Each specialized row emits
+the shared beam-beam solar value once, duplicates N2 and N3 into front/back
+solar slots, emits shared infrared transmittance once, duplicates N8 into
+front/back emissivity slots, and omits visible N4-N6. Solar and infrared values
+use source `{:.4R}` serialization; wire spacing and diameter use `{:.5R}`.
+Construction B is shared by two surfaces without multiplying its Z row, while
+surface-unused A and C are referenced only by fixture
+`EnergyManagementSystem:ConstructionIndexVariable` objects and still emit
+their A and Z occurrences.
+
+The primary lane selects both `Constructions` and `Materials`; Materials-only
+emits generic Z,M,A rows with no specialized header, and the CLI maps the
+expected specialized-parser missing-header result to an empty occurrence set.
+Constructions-only emits specialized A,Z,Z rows with no generic table. All
+three EnergyPlus runs must complete with zero warnings and zero severe errors.
+Exact equivalent-layer construction and surface topology are fixture-integrity
+locks only. This case does not serialize EIO, type or execute
+`Construction:WindowEquivalentLayer`, reproduce
+`CheckAndFixCFSLayer`/`IS_OPENNESS`/ASHWAT behavior, or claim ratings, EMS,
+surface, runtime, diagnostic-text, broad ordering, or conformance parity.
 
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. The two ordinary glazing variants, `WindowMaterial:Gas`,
@@ -1023,7 +1056,13 @@ those sums, and omission of the ineffective scalar-`AbsorpThermal` infrared
 sum. The asymmetric greater-than-one-percent openness recovery fails closed;
 shared-name/source order, EquivalentLayer family classification,
 ordinary-`Construction` rejection, typed coverage, and the all-definition
-runtime block are covered. No EIO or construction-consumer evidence is added.
+runtime block are covered. `window_material_screen_equivalent_layer_001`
+separately locks the generic Z,M,A definition rows, malformed nine-token
+specialized header, exact twelve-token A,Z,Z occurrence rows, raw
+`Autocalculate` and blank-geometry sentinels, source `{:.4R}`/`{:.5R}`
+serialization, and independent Materials/Constructions report activation.
+Equivalent-layer construction behavior, surfaces, EMS, runtime, and
+conformance remain unclaimed.
 
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
@@ -1130,9 +1169,14 @@ comparator reproduces the source normal-incidence calculation and reverse
 18 by 18 diffuse integration needed by those EIO fields. The three clean
 reporting lanes independently prove generic/specialized activation; runtime
 window, control, surface, map, and conformance behavior remains unclaimed.
-`WindowMaterial:Screen:EquivalentLayer` contributes typed compiler and
-runtime-block evidence only; it adds no EIO row, fixture, case, or proof
-variable.
+`window_material_screen_equivalent_layer_001` compares every equivalent-layer
+Screen definition against its generic all-zero row, including unused M, and
+locks the exact malformed-header A,Z,Z construction-occurrence sequence. Its A
+row preserves raw `Autocalculate` and blank geometry, while its duplicated
+front/back solar and infrared values plus wire geometry use source
+`{:.4R}`/`{:.5R}` formatting. The three clean reporting lanes independently
+prove generic/specialized activation; construction packing, ASHWAT behavior,
+surfaces, EMS, runtime, and conformance remain unclaimed.
 These tests and static EIO smokes remain bounded evidence, not an EnergyPlus
 material-family or window gate.
 

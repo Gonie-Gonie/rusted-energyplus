@@ -593,6 +593,12 @@
                          "help":  "Compare window-screen definitions, construction occurrences, and reporting activation with EnergyPlus EIO."
                      },
                      {
+                         "name":  "compare-window-material-screen-equivalent-layer-smoke",
+                         "path":  "compare\\compare-window-material-screen-equivalent-layer-smoke.ps1",
+                         "group":  "compare",
+                         "help":  "Compare equivalent-layer window-screen definitions, malformed construction-layer occurrences, and three reporting lanes with EnergyPlus EIO."
+                     },
+                     {
                          "name":  "compare-internal-gains-smoke",
                          "path":  "compare\\compare-internal-gains-smoke.ps1",
                          "group":  "compare",

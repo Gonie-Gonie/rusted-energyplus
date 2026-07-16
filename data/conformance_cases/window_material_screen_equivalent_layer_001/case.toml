@@ -1,0 +1,84 @@
+id = "window_material_screen_equivalent_layer_001"
+title = "Equivalent-layer window screen static definition and occurrence evidence"
+milestone = "v0.8-heat-balance"
+purpose = "Compare the bounded WindowMaterial:Screen:EquivalentLayer typed slice with EnergyPlus generic definition and equivalent-layer construction occurrence EIO evidence."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The fixture defines three WindowMaterial:Screen:EquivalentLayer objects in explicit source order Z, M, A: one high-precision screen reused by two equivalent-layer constructions, one valid unused screen, and one construction occurrence with default Autocalculate beam-beam solar transmittance plus blank wire spacing and diameter.",
+  "Construction:WindowEquivalentLayer declarations use canonical source order A, B, C. A contains the default-Autocalculate blank-geometry definition, while B and C contain the same high-precision Z definition; the exact specialized occurrence sequence is therefore A, Z, Z.",
+  "Two FenestrationSurface:Detailed windows share construction B, but B emits one specialized Z occurrence. Construction C has no surface but emits the second Z occurrence. Fixture-only EnergyManagementSystem:ConstructionIndexVariable objects reference surface-unused constructions A and C solely to avoid nominally-unused-construction warnings.",
+  "The generic Material Details table echoes all three definitions exactly once in source order Z, M, A, including unused M, with canonical name, MediumRough roughness, and zero resistance, thickness, conductivity, density, specific heat, and thermal, solar, and visible absorptance fields.",
+  "The specialized WindowMaterial:Screen:EquivalentLayer header is the malformed EnergyPlus source shape with nine comma-separated tokens, while each data row has twelve. Rows duplicate N2 and N3 for front/back solar state, omit required visible inputs N4 through N6, duplicate N8 for front/back emissivity, and retain N9 and N10.",
+  "The A row locks the raw EnergyPlus Autocalculate sentinel as -99999.0000 and source-effective blank geometry as 0.00000/0.00000. The Z rows lock source formatting and reuse multiplicity for high-precision numeric values.",
+  "The primary oracle lane requests Constructions and Materials and emits both generic and specialized tables. The Materials-only lane retains generic Z, M, A rows while omitting equivalent-layer construction and specialized rows. The Constructions-only lane retains construction and specialized A, Z, Z rows while omitting generic Material Details.",
+  "The gate requires clean EnergyPlus 26.1.0 completion for all three lanes, converted epJSON artifacts, exact headers and rows, exact definition and occurrence order, exact token counts, inclusion of unused M only in generic output, the expected reporting activation boundaries, and passing bounded Rust comparisons in explicit exact mode.",
+  "The bounded Rust comparison covers typed definitions and parsed static EIO rows only. This remains non-blocking diagnostic evidence and makes no Rust EIO serializer, equivalent-layer construction packing, CheckAndFixCFSLayer, ASHWAT optics/thermal, rating, surface behavior, runtime, broad diagnostic-text, or conformance claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/window_material_screen_equivalent_layer_001/window_material_screen_equivalent_layer.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface", "construction"]
+has_zone = true
+has_surface = true
+has_fenestration = true
+has_air_loop = false
+has_plant_loop = false
+has_ems = true
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/window_material_screen_equivalent_layer_001/window_material_screen_equivalent_layer.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+epjson = ".runtime/compare-window-material-screen-equivalent-layer/26.1.0/window-material-screen-equivalent-layer.epJSON"
+
+[[outputs]]
+key = "*"
+variable = "WindowMaterial:Screen:EquivalentLayer Generic Definition Details"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "WindowMaterial:Screen:EquivalentLayer Layer Occurrences"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "WindowConstruction Layer Summary"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "DISTINCTIVE FIRST HIGH PRECISION EQL SCREEN TEST WINDOW"
+variable = "HeatTransfer Surface Static Inputs"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/window_material_screen_equivalent_layer_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-window-material-screen-equivalent-layer-smoke"
+blocking = false

@@ -387,6 +387,38 @@ pub struct EioWindowMaterialScreen {
     pub screen_to_glass_distance_m: f64,
 }
 
+/// Equivalent-layer window-screen values read from an EnergyPlus
+/// `eplusout.eio` row.
+///
+/// EnergyPlus emits one row for every equivalent-layer construction-layer
+/// occurrence, so repeated material names remain distinct entries in source
+/// emission order. Visible-band inputs are absent from this source table.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioWindowMaterialScreenEquivalentLayer {
+    /// EnergyPlus-normalized material name.
+    pub material_name: String,
+    /// Shared front/back beam-to-beam solar transmittance.
+    pub beam_beam_solar_transmittance: f64,
+    /// Front-side beam-to-diffuse solar transmittance.
+    pub front_beam_diffuse_solar_transmittance: f64,
+    /// Back-side beam-to-diffuse solar transmittance.
+    pub back_beam_diffuse_solar_transmittance: f64,
+    /// Front-side beam-to-diffuse solar reflectance.
+    pub front_beam_diffuse_solar_reflectance: f64,
+    /// Back-side beam-to-diffuse solar reflectance.
+    pub back_beam_diffuse_solar_reflectance: f64,
+    /// Shared front/back infrared transmittance.
+    pub infrared_transmittance: f64,
+    /// Front-side infrared emissivity.
+    pub front_infrared_emissivity: f64,
+    /// Back-side infrared emissivity.
+    pub back_infrared_emissivity: f64,
+    /// Source-effective screen-wire spacing in meters.
+    pub wire_spacing_m: f64,
+    /// Source-effective screen-wire diameter in meters.
+    pub wire_diameter_m: f64,
+}
+
 /// Equivalent-layer window gap values read from an EnergyPlus `eplusout.eio` row.
 ///
 /// EnergyPlus emits one row for every equivalent-layer construction-layer
@@ -489,6 +521,9 @@ pub enum EioError {
     MissingWindowMaterialDrapeEquivalentLayer,
     /// The exact `WindowMaterial:Screen` header was not present.
     MissingWindowMaterialScreenHeader,
+    /// The exact `WindowMaterial:Screen:EquivalentLayer` header was not
+    /// present.
+    MissingWindowMaterialScreenEquivalentLayerHeader,
     /// No `WindowMaterial:Gap:EquivalentLayer` rows were present.
     MissingWindowMaterialGapEquivalentLayer,
     /// No `WindowMaterial:Glazing:EquivalentLayer` rows were present.
@@ -653,6 +688,33 @@ pub enum EioError {
         /// Parse failure reason.
         reason: String,
     },
+    /// A candidate `WindowMaterial:Screen:EquivalentLayer` header did not
+    /// match the source literal.
+    InvalidWindowMaterialScreenEquivalentLayerHeader {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
+    /// More than one exact `WindowMaterial:Screen:EquivalentLayer` header was
+    /// present.
+    DuplicateWindowMaterialScreenEquivalentLayerHeader {
+        /// One-based line number of the repeated header.
+        line: usize,
+        /// Raw repeated header text.
+        text: String,
+    },
+    /// A `WindowMaterial:Screen:EquivalentLayer` row could not be parsed.
+    InvalidWindowMaterialScreenEquivalentLayer {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
     /// A `WindowMaterial:Gap:EquivalentLayer` row could not be parsed.
     InvalidWindowMaterialGapEquivalentLayer {
         /// One-based line number.
@@ -721,6 +783,12 @@ impl Display for EioError {
                 write!(
                     formatter,
                     "exact EIO WindowMaterial:Screen header not found"
+                )
+            }
+            Self::MissingWindowMaterialScreenEquivalentLayerHeader => {
+                write!(
+                    formatter,
+                    "exact EIO WindowMaterial:Screen:EquivalentLayer header not found"
                 )
             }
             Self::MissingWindowMaterialGapEquivalentLayer => {
@@ -807,6 +875,20 @@ impl Display for EioError {
                 formatter,
                 "invalid EIO WindowMaterial:Screen at line {line}: {reason}: {text}"
             ),
+            Self::InvalidWindowMaterialScreenEquivalentLayerHeader { line, text, reason } => {
+                write!(
+                    formatter,
+                    "invalid EIO WindowMaterial:Screen:EquivalentLayer header at line {line}: {reason}: {text}"
+                )
+            }
+            Self::DuplicateWindowMaterialScreenEquivalentLayerHeader { line, text } => write!(
+                formatter,
+                "duplicate EIO WindowMaterial:Screen:EquivalentLayer header at line {line}: {text}"
+            ),
+            Self::InvalidWindowMaterialScreenEquivalentLayer { line, text, reason } => write!(
+                formatter,
+                "invalid EIO WindowMaterial:Screen:EquivalentLayer at line {line}: {reason}: {text}"
+            ),
             Self::InvalidWindowMaterialGapEquivalentLayer { line, text, reason } => write!(
                 formatter,
                 "invalid EIO WindowMaterial:Gap:EquivalentLayer at line {line}: {reason}: {text}"
@@ -839,6 +921,7 @@ impl std::error::Error for EioError {
             | Self::MissingWindowMaterialShadeEquivalentLayer
             | Self::MissingWindowMaterialDrapeEquivalentLayer
             | Self::MissingWindowMaterialScreenHeader
+            | Self::MissingWindowMaterialScreenEquivalentLayerHeader
             | Self::MissingWindowMaterialGapEquivalentLayer
             | Self::MissingWindowMaterialGlazingEquivalentLayer
             | Self::InvalidSurfaceGeometry { .. }
@@ -857,6 +940,9 @@ impl std::error::Error for EioError {
             | Self::InvalidWindowMaterialScreenHeader { .. }
             | Self::DuplicateWindowMaterialScreenHeader { .. }
             | Self::InvalidWindowMaterialScreen { .. }
+            | Self::InvalidWindowMaterialScreenEquivalentLayerHeader { .. }
+            | Self::DuplicateWindowMaterialScreenEquivalentLayerHeader { .. }
+            | Self::InvalidWindowMaterialScreenEquivalentLayer { .. }
             | Self::InvalidWindowMaterialGapEquivalentLayer { .. }
             | Self::InvalidWindowMaterialGlazingEquivalentLayer { .. } => None,
         }

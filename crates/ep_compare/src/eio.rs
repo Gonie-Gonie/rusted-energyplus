@@ -4,6 +4,7 @@ mod material_details;
 mod types;
 mod window_material_drape_equivalent_layer;
 mod window_material_screen;
+mod window_material_screen_equivalent_layer;
 mod window_material_shade;
 mod window_material_shade_equivalent_layer;
 
@@ -11,6 +12,7 @@ pub use material_details::*;
 pub use types::*;
 pub use window_material_drape_equivalent_layer::*;
 pub use window_material_screen::*;
+pub use window_material_screen_equivalent_layer::*;
 pub use window_material_shade::*;
 pub use window_material_shade_equivalent_layer::*;
 
@@ -116,6 +118,15 @@ pub fn load_eio_window_material_screen(
 ) -> Result<Vec<EioWindowMaterialScreen>, EioError> {
     let contents = std::fs::read_to_string(path)?;
     parse_eio_window_material_screen(&contents)
+}
+
+/// Loads specialized equivalent-layer window-screen rows from an EnergyPlus
+/// EIO file.
+pub fn load_eio_window_material_screen_equivalent_layer(
+    path: impl AsRef<Path>,
+) -> Result<Vec<EioWindowMaterialScreenEquivalentLayer>, EioError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_eio_window_material_screen_equivalent_layer(&contents)
 }
 
 /// Loads warmup environment rows from an EnergyPlus EIO file.

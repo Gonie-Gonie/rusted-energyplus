@@ -1,0 +1,283 @@
+Version,26.1;
+
+SimulationControl,No,No,No,No,Yes,No;
+
+Building,Window Material Screen EquivalentLayer Compare,0.0,Suburbs,0.04,0.4,FullExterior,25,6;
+
+Timestep,4;
+
+HeatBalanceAlgorithm,ConductionTransferFunction;
+
+SurfaceConvectionAlgorithm:Inside,TARP;
+
+SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+Site:Location,Golden,39.74,-105.18,-7.0,1829.0;
+
+Site:GroundTemperature:BuildingSurface,18,18,18,18,18,18,18,18,18,18,18,18;
+
+RunPeriod,Run Period 1,1,1,2013,1,1,2013,Tuesday,Yes,Yes,No,Yes,Yes;
+
+GlobalGeometryRules,UpperLeftCorner,CounterClockWise,World;
+
+Material,
+  DISTINCTIVE EQL SCREEN OPAQUE HOST MATERIAL,
+  Rough,
+  0.113,
+  0.347,
+  913.0,
+  836.0,
+  0.87,
+  0.63,
+  0.58;
+
+WindowMaterial:Glazing:EquivalentLayer,
+  DISTINCTIVE EQL SCREEN TEST GLASS,
+  SpectralAverage,
+  ,
+  0.83,
+  0.83,
+  0.08,
+  0.08,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.76,
+  0.14,
+  0.14,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.84,
+  0.84,
+  0.158;
+
+WindowMaterial:Gap:EquivalentLayer,
+  DISTINCTIVE SEALED AIR EQL SCREEN GAP,
+  Air,
+  0.0127,
+  Sealed;
+
+! Definition source order intentionally differs from canonical name order.
+WindowMaterial:Screen:EquivalentLayer,
+  Z HIGH PRECISION REUSED EQL SCREEN,
+  0.7269803798445946,
+  0.0123456,
+  0.123456,
+  0.234567,
+  0.345678,
+  0.456789,
+  0.0234567,
+  0.765432,
+  0.0234567,
+  0.00345678;
+
+! Valid but unused. It must appear only in the generic Material Details table.
+WindowMaterial:Screen:EquivalentLayer,
+  M UNUSED EQL SCREEN,
+  0.64,
+  0.01,
+  0.10,
+  0.20,
+  0.30,
+  0.40,
+  ,
+  ,
+  0.025,
+  0.005;
+
+! Autocalculate and both blank geometry fields retain their source-effective
+! raw/effective sentinels in the specialized construction occurrence row.
+WindowMaterial:Screen:EquivalentLayer,
+  A DEFAULT AUTO BLANK GEOMETRY EQL SCREEN,
+  ,
+  0.1111,
+  0.1222,
+  0.2333,
+  0.2444,
+  0.2555;
+
+! Construction source order is the canonical A/B/C occurrence order locked by EIO.
+Construction:WindowEquivalentLayer,
+  A DEFAULT AUTO EQL SCREEN WINDOW CONSTRUCTION,
+  A DEFAULT AUTO BLANK GEOMETRY EQL SCREEN,
+  DISTINCTIVE SEALED AIR EQL SCREEN GAP,
+  DISTINCTIVE EQL SCREEN TEST GLASS;
+
+Construction:WindowEquivalentLayer,
+  B HIGH PRECISION FIRST EQL SCREEN WINDOW CONSTRUCTION,
+  Z HIGH PRECISION REUSED EQL SCREEN,
+  DISTINCTIVE SEALED AIR EQL SCREEN GAP,
+  DISTINCTIVE EQL SCREEN TEST GLASS;
+
+Construction:WindowEquivalentLayer,
+  C HIGH PRECISION SECOND EQL SCREEN WINDOW CONSTRUCTION,
+  Z HIGH PRECISION REUSED EQL SCREEN,
+  DISTINCTIVE SEALED AIR EQL SCREEN GAP,
+  DISTINCTIVE EQL SCREEN TEST GLASS;
+
+Construction,
+  D EQL SCREEN OPAQUE HOST CONSTRUCTION,
+  DISTINCTIVE EQL SCREEN OPAQUE HOST MATERIAL;
+
+! Fixture-only references prevent nominally-unused-construction warnings without
+! assigning the blank-geometry or second high-precision construction to a surface.
+EnergyManagementSystem:ConstructionIndexVariable,
+  DefaultAutoEqlScreenConstructionIndex,
+  A DEFAULT AUTO EQL SCREEN WINDOW CONSTRUCTION;
+
+EnergyManagementSystem:ConstructionIndexVariable,
+  UnusedHighPrecisionEqlScreenConstructionIndex,
+  C HIGH PRECISION SECOND EQL SCREEN WINDOW CONSTRUCTION;
+
+Zone,EQL SCREEN TEST ZONE,0,0,0,0,1,1,3,48,16;
+
+BuildingSurface:Detailed,
+  EQL SCREEN TEST FLOOR,
+  Floor,
+  D EQL SCREEN OPAQUE HOST CONSTRUCTION,
+  EQL SCREEN TEST ZONE,
+  ,
+  Ground,
+  ,
+  NoSun,
+  NoWind,
+  1.0,
+  4,
+  4,4,0,
+  4,0,0,
+  0,0,0,
+  0,4,0;
+
+BuildingSurface:Detailed,
+  EQL SCREEN TEST ROOF,
+  Roof,
+  D EQL SCREEN OPAQUE HOST CONSTRUCTION,
+  EQL SCREEN TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.0,
+  4,
+  0,4,3,
+  0,0,3,
+  4,0,3,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  EQL SCREEN TEST WEST WALL,
+  Wall,
+  D EQL SCREEN OPAQUE HOST CONSTRUCTION,
+  EQL SCREEN TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,4,3,
+  0,4,0,
+  0,0,0,
+  0,0,3;
+
+BuildingSurface:Detailed,
+  EQL SCREEN TEST EAST WALL,
+  Wall,
+  D EQL SCREEN OPAQUE HOST CONSTRUCTION,
+  EQL SCREEN TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,0,3,
+  4,0,0,
+  4,4,0,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  DISTINCTIVE EQL SCREEN WINDOW HOST WALL,
+  Wall,
+  D EQL SCREEN OPAQUE HOST CONSTRUCTION,
+  EQL SCREEN TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,0,3,
+  0,0,0,
+  4,0,0,
+  4,0,3;
+
+BuildingSurface:Detailed,
+  EQL SCREEN TEST NORTH WALL,
+  Wall,
+  D EQL SCREEN OPAQUE HOST CONSTRUCTION,
+  EQL SCREEN TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,4,3,
+  4,4,0,
+  0,4,0,
+  0,4,3;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE FIRST HIGH PRECISION EQL SCREEN TEST WINDOW,
+  Window,
+  B HIGH PRECISION FIRST EQL SCREEN WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL SCREEN WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  0.50,0,2.80,
+  0.50,0,1.80,
+  1.50,0,1.80,
+  1.50,0,2.80;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE SECOND HIGH PRECISION EQL SCREEN TEST WINDOW,
+  Window,
+  B HIGH PRECISION FIRST EQL SCREEN WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL SCREEN WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  2.00,0,2.80,
+  2.00,0,1.80,
+  3.00,0,1.80,
+  3.00,0,2.80;
+
+! A reporting element is required to keep the EnergyPlus run warning-free.
+! It is not part of the diagnostic manifest or comparison claim.
+Output:Variable,*,Zone Mean Air Temperature,Hourly;
+
+Output:Constructions,Constructions,Materials;
+
+Output:Surfaces:List,Details;
