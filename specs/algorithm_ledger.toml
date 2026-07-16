@@ -2073,8 +2073,31 @@ routine.psy_w_fn_tdb_twb_pb_humidity_error.required_for_full_domain = false
 routine.psy_w_fn_tdb_twb_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_w_fn_tdb_twb_pb.source_routine = "PsyWFnTdbTwbPb"
 routine.psy_w_fn_tdb_twb_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_w_fn_tdb_twb_pb.completion_status = "source_mapped"
+routine.psy_w_fn_tdb_twb_pb.completion_status = "state_mapped"
 routine.psy_w_fn_tdb_twb_pb.required_for_full_domain = false
+routine.psy_w_fn_tdb_twb_pb.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_w_fn_tdb_twb_pb.read_state = [
+  "arguments `TDB`, `TWBin`, `PB`, and `CalledFrom`; optional statistics read the routine-39 counter before the clamp; strict `TWBin > TDB + 0.01` reads routine-37 `ReportErrors`, warmup, `WFnTdbTwbPb` error index, global recurrence, scratch, and external-caller state; every call reads routine-25 signed tag/hash/cache-entry and wrapper-counter state at the corrected wet bulb, while a miss reads raw saturation-pressure statistics/range-warning state and nested caller context; raw `W < 0.0` reads routine-38 `ReportErrors`, warmup, `WFnTdbTwbPb2` index, title-deduplicated global recurrence, scratch, and external-caller state before reading the routine-36 counter and a second routine-25 lookup at `TDB`",
+]
+routine.psy_w_fn_tdb_twb_pb.write_state = [
+  "the ordered clamp, formula, and fallback selection write no state; optional own statistics increment before the clamp, an active routine-37 dispatch may mutate its first-warning and unique recurrence state before correction, the first nested lookup may overwrite a cache entry and mutate raw statistics/range diagnostics, an active routine-38 dispatch may mutate its first-warning state and the recurring record shared with routine 35 before fallback, and the negative branch may increment the routine-36 counter and mutate a second saturation-pressure cache entry and raw side effects",
+]
+routine.psy_w_fn_tdb_twb_pb.history_state_ownership = "ordinary finite default non-IF97 output is a deterministic function of the original inputs and corrected-wet-bulb and dry-bulb tag representatives; the first lookup can change fallback hit/overwrite order, cache collision and reachable negative-NaN sentinel history can affect full-source nonfinite numerical results, and routine-37 recurrence plus routine-38's title-deduplicated shared routine-35 recurrence belong to each `EnergyPlusData` instance"
+routine.psy_w_fn_tdb_twb_pb.unsupported_state = [
+  "routine-39 and fallback routine-36 counters; both routine-25 cache lookups, lifecycle, signed tags/hashes/sentinel/collisions, public/raw counters, range diagnostics, warmup, and nested callers; `ReportErrors`, shared scratch string, warning stream/totals, both error indices and first-detail gates, routine-37 recurrence, routine-38's merged routine-35 recurrence count/min/max, SQLite, and callback state",
+]
+routine.psy_w_fn_tdb_twb_pb.inactive_branches = [
+  "`TWBin <= TDB` or an unordered comparison skips clamp and routine 37; `TDB < TWBin <= TDB + 0.01` clamps silently; a larger ordered excess still clamps even when diagnostics are gated off",
+  "raw `W >= 0.0`, negative zero, or NaN skips routine 38 and the fallback; raw `W < 0.0` always takes routine 36 regardless of diagnostic compile/runtime gates",
+  "disabling statistics or errors removes the corresponding mutations; `EP_nocache_Psychrometrics` evaluates original unquantized temperatures, and `EP_IF97` changes liquid-water saturation pressure",
+]
+routine.psy_w_fn_tdb_twb_pb.unsupported_active_branches = [
+  "both default saturation-pressure cache lookups with representative misses, hit suppression, overwrite order, raw side effects, counters, negative-NaN sentinel, and lifecycle behavior",
+  "default errors-enabled routine-37 and routine-38 flows with `ReportErrors`, warmup, first/recurring diagnostics, exact caller formatting, and routine-38 cross-routine-35 recurring-title aliasing",
+]
+routine.psy_w_fn_tdb_twb_pb.not_claimed_branches = [
+  "external EnergyPlus numerical parity, cached/no-cache/IF97 equivalence, full IEEE and negative-NaN sentinel parity, exact diagnostic/statistics/cache behavior, raw-W zero and final-formula denominator nextafter boundaries, the private routine-18 guess and its 100-iteration consumer, API or EMS dispatch, and weather, surface, coil, chiller, cooling-tower, evaporative, refrigeration, or other downstream migration",
+]
 
 routine.psy_h_fn_tdb_rh_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_h_fn_tdb_rh_pb.source_routine = "PsyHFnTdbRhPb"
