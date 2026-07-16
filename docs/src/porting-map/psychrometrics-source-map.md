@@ -87,9 +87,9 @@ that the EnergyPlus routine has been ported.
 | 47 | `F7` | scaled polynomial helper | `Psychrometrics.hh:1605` (broken-line inline declaration) | always present | canonical stateless degree-6 Horner helper with final `/ 1.0E10`: `ep_runtime::psychrometrics::energyplus_f7` | indirect routine-26 source vector, nested Horner order, division-versus-multiplication and early-scaling differences, overflow, IEEE edges, and repeated-call purity |
 | 48 | `CPCW` | chilled-water specific heat | `Psychrometrics.hh:1611` (inline) | always present; temperature argument intentionally unused | canonical exact constant helper: `ep_runtime::psychrometrics::energyplus_cpcw` | upstream EMS 4180 assertion, exact result over every finite/nonfinite/signed-zero temperature class, and repeated-call purity |
 | 49 | `CPHW` | hot-water specific heat | `Psychrometrics.hh:1624` (inline) | always present; temperature argument intentionally unused | canonical exact constant helper: `ep_runtime::psychrometrics::energyplus_cphw` | upstream EMS 4180 assertion, exact result over every finite/nonfinite/signed-zero temperature class, and repeated-call purity |
-| 50 | `RhoH2O` | water density | `Psychrometrics.hh:1637` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | polynomial coefficient vectors across the documented temperature range and boundary handling |
-| 51 | `PsyDeltaHSenFnTdb2Tdb1W` | sensible enthalpy delta | `Psychrometrics.hh:1654` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | sign convention, 1e-5 humidity floor, zero delta, and equality with the stated enthalpy subtraction |
-| 52 | `PsyDeltaHSenFnTdb2W2Tdb1W1` | sensible enthalpy delta | `Psychrometrics.hh:1679` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | minimum-humidity selection, direction/sign, and delegation equality with routine 51 |
+| 50 | `RhoH2O` | water density | `Psychrometrics.hh:1637` (inline) | always present | canonical stateless source-order polynomial: `ep_runtime::psychrometrics::energyplus_rho_h2o` | upstream EMS vector, independent square/cube evaluation, left-associated coefficient order, documented-range boundaries without a runtime clamp, IEEE edges, and repeated-call purity |
+| 51 | `PsyDeltaHSenFnTdb2Tdb1W` | sensible enthalpy delta | `Psychrometrics.hh:1654` (inline) | always present | canonical stateless source-order helper: `ep_runtime::psychrometrics::energyplus_psy_delta_h_sen_fn_tdb2_tdb1_w` | sign convention, literal-first 1e-5 ordered humidity floor including NaN, signed zero, source coefficient order, finite enthalpy-subtraction comparison, IEEE edges, and repeated-call purity |
+| 52 | `PsyDeltaHSenFnTdb2W2Tdb1W1` | sensible enthalpy delta | `Psychrometrics.hh:1679` (inline) | always present | canonical stateless ordered-minimum delegation: `ep_runtime::psychrometrics::energyplus_psy_delta_h_sen_fn_tdb2_w2_tdb1_w1` | finite minimum selection, Objexx second-argument equality/unordered behavior, both NaN directions, exact delegation to routine 51, and repeated-call purity |
 | 53 | `CSplineint` | spline interpolation | `Psychrometrics.hh:1698`; `Psychrometrics.cc:1450` | always present | intended `ep_runtime::psychrometrics`; unassigned | pinned table knots, between-knot interpolation, endpoint/range behavior, and sample-count handling |
 
 ## CP56-2 Numerical Scaffold: Density And Specific Heat
@@ -2030,6 +2030,128 @@ not_claimed_branches:
 - EMS parser/dispatch parity, caller expression side effects beyond ordinary Rust argument evaluation, 21 direct production consumers, coil/collector/tank/water-use integration, or downstream migration despite the exact helper result
 <!-- routine-state-contract:v1 end cphw -->
 
+## CP56-19 Water Density And Sensible-Enthalpy Helpers
+
+This checkpoint advances `RhoH2O`, `PsyDeltaHSenFnTdb2Tdb1W`, and
+`PsyDeltaHSenFnTdb2W2Tdb1W1` to `state_mapped`. The inventory is now 21
+source-mapped and 32 state-mapped routines. The parent inventory remains
+`status = "scaffold"`, `claim_level = "none"`, and all 53 routines remain
+outside the full-domain required set.
+
+`energyplus_rho_h2o` preserves the source's independent `pow_2(TB)` and
+`pow_3(TB)` multiply chains and the left-associated coefficient expression.
+It does not convert the polynomial to Horner form, use `powi` or `mul_add`,
+or enforce the source comment's nominal 0 C through 150 C range. The direct
+upstream EMS assertion supplies `RhoH2O(20) = 998.2331862652 kg/m3` within
+`1e-8`; its adjacent comment incorrectly says 60 C. Rust tests additionally
+pin the 150 C last-bit distinction from a Horner rewrite, below-range
+extrapolation, and nonfinite arithmetic. The 51 live production calls across
+20 C++ files and the EMS dispatcher are not migrated.
+
+`energyplus_psy_delta_h_sen_fn_tdb2_tdb1_w` preserves the positive-heating
+`TDB2 - TDB1` direction and the exact expression
+`(1004.84 + max(1e-5, W) * 1858.95) * (TDB2 - TDB1)`. The first argument of
+the Objexx maximum is the literal floor, so equality, values below the floor,
+and unordered `W = NaN` all select `1e-5`. That differs from the NaN behavior
+of earlier routines whose humidity ratio is the first maximum argument. The
+source comment's enthalpy-subtraction form is algebraic explanation, not a
+nested call; Rust compares it only over ordinary finite vectors. There is no
+direct upstream helper assertion. Existing zone-equipment evidence is
+indirect through a sensible-output calculation.
+
+`energyplus_psy_delta_h_sen_fn_tdb2_w2_tdb1_w1` evaluates the exact Objexx
+two-argument minimum `W1 < W2 ? W1 : W2` and delegates the selected value to
+routine 51. This is intentionally not Rust `f64::min`: equality and unordered
+comparisons choose the second argument `W2`. Consequently `W1 = NaN` with
+finite `W2` retains `W2`, while finite `W1` with `W2 = NaN` forwards NaN and
+routine 51 replaces it with `1e-5`. The 17 production calls across seven C++
+files and their HVAC integration remain outside this checkpoint.
+
+All three helpers are always present and own no `EnergyPlusData`, cache,
+statistics, diagnostic, mutable state, loop, compile branch, or cross-call
+history.
+
+### `RhoH2O` (`rho_h2o`)
+
+<!-- routine-state-contract:v1 begin rho_h2o -->
+RhoH2O
+
+read_state:
+- argument `TB` and the four literal polynomial coefficients exactly as supplied; the routine has no `EnergyPlusData`, `CalledFrom`, static/global field, cache, statistic, diagnostic, flag, or runtime range setting, and separately evaluates `TB * TB` and `TB * TB * TB`
+
+write_state:
+- no state; the routine combines the constant, linear, independently squared, and independently cubed terms in source left-associated order without mutation, validation, clamping, Horner conversion, `powi`, or explicit fused multiply-add
+
+history_state_ownership:
+- no cross-call history or cache; under a fixed floating-point environment the result is a pure function of `TB` and the stated source expression
+
+unsupported_state:
+- none; the source routine has no mutable state, cache, counter, diagnostic, or lifecycle
+
+inactive_branches:
+- none; the routine is always present and has no compile-time branch, guard, clamp, validation, short-circuit, or loop
+
+unsupported_active_branches:
+- none; there is no stateful or compile-conditional active branch
+
+not_claimed_branches:
+- enforcement or physical validity of the documented 0 C through 150 C range, cross-compiler/platform contraction, excess-precision, rounding-mode, floating-point-exception or NaN-payload last-bit parity, EMS parser/dispatch parity, 51 direct production consumers, or downstream chiller, coil, evaporative, humidifier, tank, and reporting migration
+<!-- routine-state-contract:v1 end rho_h2o -->
+
+### `PsyDeltaHSenFnTdb2Tdb1W` (`psy_delta_h_sen_fn_tdb2_tdb1_w`)
+
+<!-- routine-state-contract:v1 begin psy_delta_h_sen_fn_tdb2_tdb1_w -->
+PsyDeltaHSenFnTdb2Tdb1W
+
+read_state:
+- arguments `TDB2`, `TDB1`, and `W` plus literal `1.0e-5`, `1.00484e3`, and `1.85895e3`; the routine has no `EnergyPlusData`, `CalledFrom`, static/global field, cache, statistic, diagnostic, or flag, and its ordered `max(1.0e-5, W)` selects the first literal when `1.0e-5 < W` is false, including equality, lower values, and unordered NaN
+
+write_state:
+- no state; the routine forms the humidity-dependent coefficient, then `TDB2 - TDB1`, and multiplies them without mutation, nested enthalpy calls, validation, or explicit fused multiply-add
+
+history_state_ownership:
+- no cross-call history or cache; under a fixed floating-point environment the result is a pure function of `TDB2`, `TDB1`, and the literal-first ordered humidity floor
+
+unsupported_state:
+- none; the source routine has no mutable state, cache, counter, diagnostic, or lifecycle
+
+inactive_branches:
+- `1.0e-5 < W` retains `W`; equality, every lower ordered value, and unordered NaN select literal `1.0e-5`, while the routine is otherwise always present with no compile-time branch, validation, short-circuit, or loop
+
+unsupported_active_branches:
+- none; there is no stateful or compile-conditional active branch
+
+not_claimed_branches:
+- a direct upstream helper oracle, bitwise identity with the explanatory two-call enthalpy subtraction for every IEEE input, cross-compiler/platform contraction, excess-precision, rounding-mode, floating-point-exception or NaN-payload last-bit parity, the two external production call sites plus routine-52 delegation, downstream mass-flow multiplication, or zone-equipment integration
+<!-- routine-state-contract:v1 end psy_delta_h_sen_fn_tdb2_tdb1_w -->
+
+### `PsyDeltaHSenFnTdb2W2Tdb1W1` (`psy_delta_h_sen_fn_tdb2_w2_tdb1_w1`)
+
+<!-- routine-state-contract:v1 begin psy_delta_h_sen_fn_tdb2_w2_tdb1_w1 -->
+PsyDeltaHSenFnTdb2W2Tdb1W1
+
+read_state:
+- arguments `TDB2`, `W2`, `TDB1`, and `W1`; the routine has no `EnergyPlusData`, `CalledFrom`, static/global field, cache, statistic, diagnostic, or flag, evaluates the ordered Objexx minimum as `W1 < W2 ? W1 : W2`, and then unconditionally reads the pure routine-51 coefficient and floor inputs
+
+write_state:
+- no state; the routine stores only a local minimum and delegates `TDB2`, `TDB1`, and that value to routine 51 without mutation, validation, or duplicated enthalpy arithmetic
+
+history_state_ownership:
+- no cross-call history or cache; under a fixed floating-point environment the result is a pure function of the four arguments, the second-argument-on-equality-or-unordered minimum, and routine 51
+
+unsupported_state:
+- none; the source routine and its routine-51 dependency have no mutable state, cache, counter, diagnostic, or lifecycle
+
+inactive_branches:
+- ordered `W1 < W2` selects `W1`; equality, `W1 > W2`, and unordered comparisons select `W2`, after which routine 51 independently applies its literal-first `1.0e-5` floor; the routine has no compile-time branch, validation, short-circuit, or loop
+
+unsupported_active_branches:
+- none; there is no stateful or compile-conditional active branch
+
+not_claimed_branches:
+- a direct upstream helper oracle, Rust `f64::min` semantics, cross-compiler/platform contraction, excess-precision, rounding-mode, floating-point-exception or NaN-payload last-bit parity, 17 direct production consumers, mass-flow multiplication, or downstream furnace, duct, heat-pump, VRF, unitary, and zone-air-loop migration
+<!-- routine-state-contract:v1 end psy_delta_h_sen_fn_tdb2_w2_tdb1_w1 -->
+
 ## Compile-Time Variant Boundary
 
 Unless `EP_nocache_Psychrometrics` is set, the EnergyPlus header enables
@@ -2083,8 +2205,9 @@ The `PsyRhoAirFnPbTdbW`, `PsyRhoAirFnPbTdbW_fast`, `PsyHfgAirFnWTdb`,
 `PsyVFnTdbWPb`, `PsyWFnTdbH`, `PsyPsatFnTemp_raw`, `PsyRhovFnTdbRh`,
 `PsyRhFnTdbRhov`, `PsyRhFnTdbWPb`, `PsyWFnTdbRhPb`,
 `PsyWFnTdbTwbPb`, `PsyHFnTdbRhPb`, `PsyTsatFnPb_raw`,
-`PsyTdpFnWPb`, `PsyTdpFnTdbTwbPb`, `F6`, `F7`, `CPCW`, and `CPHW` tickets
-are `state_mapped`; the other 24 ledger routines remain
+`PsyTdpFnWPb`, `PsyTdpFnTdbTwbPb`, `F6`, `F7`, `CPCW`, `CPHW`, `RhoH2O`,
+`PsyDeltaHSenFnTdb2Tdb1W`, and `PsyDeltaHSenFnTdb2W2Tdb1W1` tickets are
+`state_mapped`; the other 21 ledger routines remain
 `source_mapped`. All 53 retain
 `required_for_full_domain = false`. Before any
 ticket is promoted further, its

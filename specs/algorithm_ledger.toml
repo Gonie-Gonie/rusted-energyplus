@@ -2330,20 +2330,80 @@ routine.cphw.not_claimed_branches = [
 routine.rho_h2o.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.rho_h2o.source_routine = "RhoH2O"
 routine.rho_h2o.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.rho_h2o.completion_status = "source_mapped"
+routine.rho_h2o.completion_status = "state_mapped"
 routine.rho_h2o.required_for_full_domain = false
+routine.rho_h2o.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.rho_h2o.read_state = [
+  "argument `TB` and the four literal polynomial coefficients exactly as supplied; the routine has no `EnergyPlusData`, `CalledFrom`, static/global field, cache, statistic, diagnostic, flag, or runtime range setting, and separately evaluates `TB * TB` and `TB * TB * TB`",
+]
+routine.rho_h2o.write_state = [
+  "no state; the routine combines the constant, linear, independently squared, and independently cubed terms in source left-associated order without mutation, validation, clamping, Horner conversion, `powi`, or explicit fused multiply-add",
+]
+routine.rho_h2o.history_state_ownership = "no cross-call history or cache; under a fixed floating-point environment the result is a pure function of `TB` and the stated source expression"
+routine.rho_h2o.unsupported_state = [
+  "none; the source routine has no mutable state, cache, counter, diagnostic, or lifecycle",
+]
+routine.rho_h2o.inactive_branches = [
+  "none; the routine is always present and has no compile-time branch, guard, clamp, validation, short-circuit, or loop",
+]
+routine.rho_h2o.unsupported_active_branches = [
+  "none; there is no stateful or compile-conditional active branch",
+]
+routine.rho_h2o.not_claimed_branches = [
+  "enforcement or physical validity of the documented 0 C through 150 C range, cross-compiler/platform contraction, excess-precision, rounding-mode, floating-point-exception or NaN-payload last-bit parity, EMS parser/dispatch parity, 51 direct production consumers, or downstream chiller, coil, evaporative, humidifier, tank, and reporting migration",
+]
 
 routine.psy_delta_h_sen_fn_tdb2_tdb1_w.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_delta_h_sen_fn_tdb2_tdb1_w.source_routine = "PsyDeltaHSenFnTdb2Tdb1W"
 routine.psy_delta_h_sen_fn_tdb2_tdb1_w.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_delta_h_sen_fn_tdb2_tdb1_w.completion_status = "source_mapped"
+routine.psy_delta_h_sen_fn_tdb2_tdb1_w.completion_status = "state_mapped"
 routine.psy_delta_h_sen_fn_tdb2_tdb1_w.required_for_full_domain = false
+routine.psy_delta_h_sen_fn_tdb2_tdb1_w.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_delta_h_sen_fn_tdb2_tdb1_w.read_state = [
+  "arguments `TDB2`, `TDB1`, and `W` plus literal `1.0e-5`, `1.00484e3`, and `1.85895e3`; the routine has no `EnergyPlusData`, `CalledFrom`, static/global field, cache, statistic, diagnostic, or flag, and its ordered `max(1.0e-5, W)` selects the first literal when `1.0e-5 < W` is false, including equality, lower values, and unordered NaN",
+]
+routine.psy_delta_h_sen_fn_tdb2_tdb1_w.write_state = [
+  "no state; the routine forms the humidity-dependent coefficient, then `TDB2 - TDB1`, and multiplies them without mutation, nested enthalpy calls, validation, or explicit fused multiply-add",
+]
+routine.psy_delta_h_sen_fn_tdb2_tdb1_w.history_state_ownership = "no cross-call history or cache; under a fixed floating-point environment the result is a pure function of `TDB2`, `TDB1`, and the literal-first ordered humidity floor"
+routine.psy_delta_h_sen_fn_tdb2_tdb1_w.unsupported_state = [
+  "none; the source routine has no mutable state, cache, counter, diagnostic, or lifecycle",
+]
+routine.psy_delta_h_sen_fn_tdb2_tdb1_w.inactive_branches = [
+  "`1.0e-5 < W` retains `W`; equality, every lower ordered value, and unordered NaN select literal `1.0e-5`, while the routine is otherwise always present with no compile-time branch, validation, short-circuit, or loop",
+]
+routine.psy_delta_h_sen_fn_tdb2_tdb1_w.unsupported_active_branches = [
+  "none; there is no stateful or compile-conditional active branch",
+]
+routine.psy_delta_h_sen_fn_tdb2_tdb1_w.not_claimed_branches = [
+  "a direct upstream helper oracle, bitwise identity with the explanatory two-call enthalpy subtraction for every IEEE input, cross-compiler/platform contraction, excess-precision, rounding-mode, floating-point-exception or NaN-payload last-bit parity, the two external production call sites plus routine-52 delegation, downstream mass-flow multiplication, or zone-equipment integration",
+]
 
 routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.source_routine = "PsyDeltaHSenFnTdb2W2Tdb1W1"
 routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.completion_status = "source_mapped"
+routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.completion_status = "state_mapped"
 routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.required_for_full_domain = false
+routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.read_state = [
+  "arguments `TDB2`, `W2`, `TDB1`, and `W1`; the routine has no `EnergyPlusData`, `CalledFrom`, static/global field, cache, statistic, diagnostic, or flag, evaluates the ordered Objexx minimum as `W1 < W2 ? W1 : W2`, and then unconditionally reads the pure routine-51 coefficient and floor inputs",
+]
+routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.write_state = [
+  "no state; the routine stores only a local minimum and delegates `TDB2`, `TDB1`, and that value to routine 51 without mutation, validation, or duplicated enthalpy arithmetic",
+]
+routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.history_state_ownership = "no cross-call history or cache; under a fixed floating-point environment the result is a pure function of the four arguments, the second-argument-on-equality-or-unordered minimum, and routine 51"
+routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.unsupported_state = [
+  "none; the source routine and its routine-51 dependency have no mutable state, cache, counter, diagnostic, or lifecycle",
+]
+routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.inactive_branches = [
+  "ordered `W1 < W2` selects `W1`; equality, `W1 > W2`, and unordered comparisons select `W2`, after which routine 51 independently applies its literal-first `1.0e-5` floor; the routine has no compile-time branch, validation, short-circuit, or loop",
+]
+routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.unsupported_active_branches = [
+  "none; there is no stateful or compile-conditional active branch",
+]
+routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.not_claimed_branches = [
+  "a direct upstream helper oracle, Rust `f64::min` semantics, cross-compiler/platform contraction, excess-precision, rounding-mode, floating-point-exception or NaN-payload last-bit parity, 17 direct production consumers, mass-flow multiplication, or downstream furnace, duct, heat-pump, VRF, unitary, and zone-air-loop migration",
+]
 
 routine.c_splineint.source_file = "src/EnergyPlus/Psychrometrics.cc"
 routine.c_splineint.source_routine = "CSplineint"
