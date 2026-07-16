@@ -1,5 +1,12 @@
 //! EnergyPlus psychrometric helper functions used by runtime and IdealLoads.
 
+#[path = "psychrometrics_spline_tables.rs"]
+mod spline_tables;
+
+use spline_tables::{
+    ENERGYPLUS_TSAT_FN_PB_D2Y, ENERGYPLUS_TSAT_FN_PB_Y, ENERGYPLUS_TSAT_SPLINE_SAMPLE_COUNT,
+};
+
 const KELVIN_OFFSET: f64 = 273.15;
 const ENERGYPLUS_MIN_HUMIDITY_RATIO: f64 = 1.0e-5;
 const ENERGYPLUS_PSYCHROMETRIC_ITERATION_TOLERANCE: f64 = 0.0001;
@@ -876,6 +883,51 @@ pub fn energyplus_psy_delta_h_sen_fn_tdb2_w2_tdb1_w1(
     energyplus_psy_delta_h_sen_fn_tdb2_tdb1_w(dry_bulb_2_c, dry_bulb_1_c, minimum_humidity_ratio)
 }
 
+/// Canonical EnergyPlus 26.1 `CSplineint` fixed-table cubic spline.
+///
+/// This is not a general spline API: `sample_data_size` selects a prefix of
+/// EnergyPlus's immutable 1,651-point pressure tables. The source's shifted
+/// 64-Pa bin, truncation toward zero, endpoint extrapolation, and decimal
+/// `0.1666666667` factor are preserved exactly.
+///
+/// EnergyPlus has undefined behavior for a sample count outside 2..=1651 or
+/// for an `x` whose C++ `double`-to-`int` conversion is undefined. This safe
+/// port asserts that supported domain.
+#[must_use]
+pub fn energyplus_c_splineint(sample_data_size: i32, x: f64) -> f64 {
+    assert!(
+        (2..=ENERGYPLUS_TSAT_SPLINE_SAMPLE_COUNT as i32).contains(&sample_data_size),
+        "EnergyPlus CSplineint sample_data_size must be in 2..={ENERGYPLUS_TSAT_SPLINE_SAMPLE_COUNT}"
+    );
+    assert!(x.is_finite(), "EnergyPlus CSplineint x must be finite");
+    let truncated_x = x.trunc();
+    assert!(
+        truncated_x >= f64::from(i32::MIN) && truncated_x <= f64::from(i32::MAX),
+        "EnergyPlus CSplineint truncated x must fit in a C++ int"
+    );
+
+    let x_int = truncated_x as i32;
+    let mut sample_index = (x_int >> 6) - 1;
+    if sample_index < 0 {
+        sample_index = 0;
+    }
+    if sample_index > sample_data_size - 2 {
+        sample_index = sample_data_size - 2;
+    }
+
+    let sample_index = sample_index as usize;
+    let h = 64.0;
+    let upper_sample_x = 64 * (sample_index as i32 + 1);
+    let a = (f64::from(upper_sample_x) - x) / h;
+    let b = 1.0 - a;
+    a * ENERGYPLUS_TSAT_FN_PB_Y[sample_index]
+        + b * ENERGYPLUS_TSAT_FN_PB_Y[sample_index + 1]
+        + ((a * a * a - a) * ENERGYPLUS_TSAT_FN_PB_D2Y[sample_index]
+            + (b * b * b - b) * ENERGYPLUS_TSAT_FN_PB_D2Y[sample_index + 1])
+            * (h * h)
+            * 0.166_666_666_7
+}
+
 fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option<f64> {
     if !temperature_c.is_finite() {
         return None;
@@ -957,3 +1009,7 @@ mod polynomial_water_tests;
 #[cfg(test)]
 #[path = "psychrometrics_water_density_sensible_enthalpy_tests.rs"]
 mod water_density_sensible_enthalpy_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_spline_tests.rs"]
+mod spline_tests;
