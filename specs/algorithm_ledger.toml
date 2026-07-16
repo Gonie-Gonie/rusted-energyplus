@@ -1989,8 +1989,29 @@ routine.psy_rh_fn_tdb_w_pb_error.required_for_full_domain = false
 routine.psy_rh_fn_tdb_w_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_rh_fn_tdb_w_pb.source_routine = "PsyRhFnTdbWPb"
 routine.psy_rh_fn_tdb_w_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_rh_fn_tdb_w_pb.completion_status = "source_mapped"
+routine.psy_rh_fn_tdb_w_pb.completion_status = "state_mapped"
 routine.psy_rh_fn_tdb_w_pb.required_for_full_domain = false
+routine.psy_rh_fn_tdb_w_pb.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_rh_fn_tdb_w_pb.read_state = [
+  "arguments `TDB`, `dW`, `PB`, and `CalledFrom`; optional statistics read the routine-32 counter before all work, every call reads routine-25 signed tag/hash/cache-entry and wrapper-counter state, a miss reads raw saturation-pressure statistics/range-warning state plus nested caller context, and an extreme raw RH reads routine-31 warmup/shared-error-index and external-caller state",
+]
+routine.psy_rh_fn_tdb_w_pb.write_state = [
+  "the humidity floor, unsimplified formula, and ordered correction write no state; optional own statistics increment on every call before saturation pressure, the nested lookup may increment its wrapper counter and on a miss overwrite a cache entry and mutate raw statistics/range diagnostics, and a non-warmup extreme raw RH may mutate routine-31 warning, scratch-string, and shared recurrence state",
+]
+routine.psy_rh_fn_tdb_w_pb.history_state_ownership = "ordinary finite default non-IF97 output is a deterministic function of the original inputs and tag-derived saturation-pressure representative; cache hit/miss/collision history changes nested side effects, the reachable negative-NaN tag `-1000` can make full-source numerical output history-dependent through the fresh-entry sentinel, and cache plus high/low recurrence state belong to each `EnergyPlusData` instance"
+routine.psy_rh_fn_tdb_w_pb.unsupported_state = [
+  "the routine-32 call counter; routine-25 cache array, lifecycle, signed tag/hash/sentinel/collision behavior, public/raw counters, range diagnostics, warmup, and nested caller; routine-31 warning stream/totals, scratch string, caller timestamp, shared recurrence index/count/min/max, SQLite, and callback state",
+]
+routine.psy_rh_fn_tdb_w_pb.inactive_branches = [
+  "an in-range raw RH skips routine-31 dispatch but never skips the optional own counter or unconditional saturation-pressure lookup; disabling statistics or errors removes the corresponding mutations",
+  "`EP_nocache_Psychrometrics` evaluates saturation pressure at original unquantized `TDB` on every call and can change ordinary non-grid results; `EP_IF97` changes the liquid-water dependency",
+]
+routine.psy_rh_fn_tdb_w_pb.unsupported_active_branches = [
+  "the default cached saturation-pressure lookup, representative miss, hit suppression of nested raw side effects/caller context, negative-NaN sentinel and lifecycle behavior, optional every-call statistics, and default errors-enabled strict `RH < -0.05` or `RH > 1.01` flow with warmup and shared high/low recurrence",
+]
+routine.psy_rh_fn_tdb_w_pb.not_claimed_branches = [
+  "external EnergyPlus numerical parity, cached/no-cache/IF97 equivalence, full IEEE and negative-NaN sentinel parity, exact diagnostic/statistics/cache behavior, threshold nextafter messaging, API or EMS dispatch, and coil, heat-recovery, thermal-comfort, weather, zone, or other downstream migration",
+]
 
 routine.psy_w_fn_tdp_pb_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
 routine.psy_w_fn_tdp_pb_error.source_routine = "PsyWFnTdpPb_error"

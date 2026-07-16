@@ -69,7 +69,7 @@ that the EnergyPlus routine has been ported.
 | 29 | `PsyRhFnTdbRhov_error` | diagnostics | `Psychrometrics.hh:1161`; `Psychrometrics.cc:1075` | compiled only with `EP_psych_errors` | intended per-simulation diagnostics owner; unassigned | exact RH-bound trigger, caller text, recurrence suppression, and error-state mutation |
 | 30 | `PsyRhFnTdbRhov` | relative humidity | `Psychrometrics.hh:1169` (inline) | always present | canonical default-build numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rh_fn_tdb_rhov`; stateful statistics/cache/diagnostics adapter unassigned | vapor-density round trips, clamp/error thresholds, and temperature extremes |
 | 31 | `PsyRhFnTdbWPb_error` | diagnostics | `Psychrometrics.hh:1215`; `Psychrometrics.cc:1133` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | exact RH-bound trigger, caller context, recurrence suppression, and corrected return path |
-| 32 | `PsyRhFnTdbWPb` | relative humidity | `Psychrometrics.hh:1223` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | humidity/pressure vectors, clamp/error thresholds, and humidity-ratio round trips |
+| 32 | `PsyRhFnTdbWPb` | relative humidity | `Psychrometrics.hh:1223` (inline) | always present | canonical ordinary-finite default-build numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_rh_fn_tdb_w_pb`; stateful statistics/cache/diagnostics adapter unassigned | humidity/pressure vectors, clamp/error thresholds, and humidity-ratio round trips |
 | 33 | `PsyWFnTdpPb_error` | diagnostics | `Psychrometrics.hh:1272`; `Psychrometrics.cc:1191` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | pressure-crossing correction loop, exact trigger, caller context, and recurrence suppression |
 | 34 | `PsyWFnTdpPb` | humidity ratio from dew point | `Psychrometrics.hh:1281` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | dew-point/pressure vectors, pressure-crossing correction, and dew-point round trips |
 | 35 | `PsyWFnTdbRhPb_error` | diagnostics | `Psychrometrics.hh:1333`; `Psychrometrics.cc:1228` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | negative-humidity trigger, caller context, recurrence suppression, and denominator-approach diagnostics |
@@ -1153,6 +1153,84 @@ not_claimed_branches:
 - external EnergyPlus numerical parity, cached/no-cache/IF97 equivalence, exact diagnostic/statistics/cache behavior, threshold nextafter messaging, and C API, EMS, HAMT, EMPD, room-air, surface, or other downstream migration
 <!-- routine-state-contract:v1 end psy_rh_fn_tdb_rhov -->
 
+## CP56-11 Humidity-Ratio Relative-Humidity Numerical Scaffold
+
+This checkpoint advances `PsyRhFnTdbWPb` to `state_mapped` while leaving its
+separately named `PsyRhFnTdbWPb_error` helper unimplemented. The inventory is
+now 34 source-mapped and 19 state-mapped routines. The parent inventory
+remains `status = "scaffold"`, `claim_level = "none"`, and all 53 routines
+remain outside the full-domain required set.
+
+The Rust helper preserves the source's unsimplified evaluation order:
+unconditional saturation pressure first, first-argument-NaN-preserving
+`max(dW, 1.0e-5)` semantics, degree of saturation
+`W / (0.62198 * PWS / (PB - PWS))`, relative humidity
+`U / (1.0 - (1.0 - U) * (PWS / PB))`, and correction only when the raw result
+is outside `[0.0, 1.0]`. It models the ordinary-finite standard-build
+projection by evaluating saturation pressure at the routine-25 cache
+representative. It does not own or replay that cache.
+
+Pinned evidence covers the EnergyPlus EMS vector
+`(30 C, 0.01, 101325 Pa) -> 0.377598442`, the C/Python API's print-only
+`(24 C, 0.009, 101325 Pa)` vector, a non-grid temperature that separates the
+default cache representative from no-cache evaluation, valid-domain inverse
+round trips, the humidity-ratio floor, low-positive preservation, high/low
+correction, pressure zero and saturation singularities, NaN, and infinities.
+These are source-fixture and local formula tests, not external EnergyPlus
+domain, API, EMS-dispatch, or downstream integration claims.
+
+### `PsyRhFnTdbWPb_error` Deferral (`psy_rh_fn_tdb_w_pb_error`)
+
+The errors-only helper remains `source_mapped`. It acts only for strict
+`RHValue > 1.01` or, in an `else if` branch, strict `RHValue < -0.05`; exact
+endpoints and NaN are no-ops. Warmup suppresses every mutation. High and low
+excursions share one `RhFnTdbWPb` error index and recurring min/max history,
+so whichever direction occurs first owns the only detailed warning. The
+reported humidity ratio is the already-floored `W`. The high reset text says
+`100.0%`, the low text says `1%`, a nonempty caller has no trailing comma,
+and an empty caller produces `Routine=Unknown,`. A per-simulation warning
+owner, alternating-direction recurrence tests, and exact
+formatting/timestamp/callback/SQLite evidence are required before this ticket
+can advance.
+
+### `PsyRhFnTdbWPb` (`psy_rh_fn_tdb_w_pb`)
+
+Optional own statistics increment before all other work. Saturation pressure
+is then looked up unconditionally, even for NaN humidity ratio or singular
+pressure. An empty external `CalledFrom` becomes fixed `PsyRhFnTdbWPb` for
+the nested saturation-pressure call, but the original empty view reaches the
+routine-31 helper and therefore reports `Unknown`. A raw result in
+`[0.0, 1.0]`, including positive values below `0.01` and signed zero, is
+returned unchanged. Only a negative result becomes `0.01` and only a result
+above one becomes `1.0`; the optional error helper sees the raw result before
+that correction.
+
+<!-- routine-state-contract:v1 begin psy_rh_fn_tdb_w_pb -->
+PsyRhFnTdbWPb
+
+read_state:
+- arguments `TDB`, `dW`, `PB`, and `CalledFrom`; optional statistics read the routine-32 counter before all work, every call reads routine-25 signed tag/hash/cache-entry and wrapper-counter state, a miss reads raw saturation-pressure statistics/range-warning state plus nested caller context, and an extreme raw RH reads routine-31 warmup/shared-error-index and external-caller state
+
+write_state:
+- the humidity floor, unsimplified formula, and ordered correction write no state; optional own statistics increment on every call before saturation pressure, the nested lookup may increment its wrapper counter and on a miss overwrite a cache entry and mutate raw statistics/range diagnostics, and a non-warmup extreme raw RH may mutate routine-31 warning, scratch-string, and shared recurrence state
+
+history_state_ownership:
+- ordinary finite default non-IF97 output is a deterministic function of the original inputs and tag-derived saturation-pressure representative; cache hit/miss/collision history changes nested side effects, the reachable negative-NaN tag `-1000` can make full-source numerical output history-dependent through the fresh-entry sentinel, and cache plus high/low recurrence state belong to each `EnergyPlusData` instance
+
+unsupported_state:
+- the routine-32 call counter; routine-25 cache array, lifecycle, signed tag/hash/sentinel/collision behavior, public/raw counters, range diagnostics, warmup, and nested caller; routine-31 warning stream/totals, scratch string, caller timestamp, shared recurrence index/count/min/max, SQLite, and callback state
+
+inactive_branches:
+- an in-range raw RH skips routine-31 dispatch but never skips the optional own counter or unconditional saturation-pressure lookup; disabling statistics or errors removes the corresponding mutations
+- `EP_nocache_Psychrometrics` evaluates saturation pressure at original unquantized `TDB` on every call and can change ordinary non-grid results; `EP_IF97` changes the liquid-water dependency
+
+unsupported_active_branches:
+- the default cached saturation-pressure lookup, representative miss, hit suppression of nested raw side effects/caller context, negative-NaN sentinel and lifecycle behavior, optional every-call statistics, and default errors-enabled strict `RH < -0.05` or `RH > 1.01` flow with warmup and shared high/low recurrence
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, cached/no-cache/IF97 equivalence, full IEEE and negative-NaN sentinel parity, exact diagnostic/statistics/cache behavior, threshold nextafter messaging, API or EMS dispatch, and coil, heat-recovery, thermal-comfort, weather, zone, or other downstream migration
+<!-- routine-state-contract:v1 end psy_rh_fn_tdb_w_pb -->
+
 ## Compile-Time Variant Boundary
 
 Unless `EP_nocache_Psychrometrics` is set, the EnergyPlus header enables
@@ -1203,8 +1281,9 @@ The `PsyRhoAirFnPbTdbW`, `PsyRhoAirFnPbTdbW_fast`, `PsyHfgAirFnWTdb`,
 `PsyHgAirFnWTdb`, `PsyHFnTdbW`, `PsyHFnTdbW_fast`, `PsyCpAirFnW`,
 `PsyCpAirFnW_fast`, `PsyTdbFnHW`, `PsyRhovFnTdbRhLBnd0C`,
 `PsyRhovFnTdbWPb`, `PsyRhovFnTdbWPb_fast`, `PsyRhFnTdbRhovLBnd0C`,
-`PsyVFnTdbWPb`, `PsyWFnTdbH`, and `PsyPsatFnTemp_raw` tickets are
-`state_mapped`; the other 37 ledger routines remain `source_mapped`. All 53 retain
+`PsyVFnTdbWPb`, `PsyWFnTdbH`, `PsyPsatFnTemp_raw`, `PsyRhovFnTdbRh`,
+`PsyRhFnTdbRhov`, and `PsyRhFnTdbWPb` tickets are `state_mapped`; the other
+34 ledger routines remain `source_mapped`. All 53 retain
 `required_for_full_domain = false`. Before any ticket is promoted further, its
 Rust target, source-vector tests, compile-variant obligations, diagnostic
 behavior where applicable, and external evidence boundary must be recorded.
