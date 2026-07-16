@@ -519,14 +519,59 @@ pub fn energyplus_psy_psat_fn_temp_raw(temperature_c: f64) -> f64 {
     1_555_073.745_636_215
 }
 
+#[inline]
+fn energyplus_psy_psat_fn_temp_default_numerical_projection(temperature_c: f64) -> f64 {
+    energyplus_psy_psat_fn_temp_raw(energyplus_psychrometric_psat_cache_temperature_c(
+        temperature_c,
+    ))
+}
+
+/// Canonical EnergyPlus 26.1 `PsyRhovFnTdbRh` default-build numerical path.
+///
+/// The source calls the default `PsyPsatFnTemp` cache before applying the
+/// ideal-gas expression. This pure scaffold preserves the cache's representative
+/// temperature and source arithmetic order while deferring cache lifecycle,
+/// statistics, diagnostics, and the history-dependent sentinel edge.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_rhov_fn_tdb_rh(dry_bulb_c: f64, relative_humidity: f64) -> f64 {
+    (energyplus_psy_psat_fn_temp_default_numerical_projection(dry_bulb_c) * relative_humidity)
+        / (461.52 * (dry_bulb_c + KELVIN_OFFSET))
+}
+
+/// Canonical EnergyPlus 26.1 `PsyRhFnTdbRhov` default-build numerical path.
+///
+/// Nonpositive and NaN vapor density bypass saturation pressure and return
+/// positive zero. Raw relative humidity is corrected only when it lies outside
+/// `0.0..=1.0`: negative values become `0.01` and values above one become
+/// `1.0`. Optional statistics, diagnostics, and saturation-pressure cache state
+/// remain separate stateful source contracts.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_rh_fn_tdb_rhov(dry_bulb_c: f64, vapor_density_kg_per_m3: f64) -> f64 {
+    let relative_humidity = if vapor_density_kg_per_m3 > 0.0 {
+        vapor_density_kg_per_m3 * 461.52 * (dry_bulb_c + KELVIN_OFFSET)
+            / energyplus_psy_psat_fn_temp_default_numerical_projection(dry_bulb_c)
+    } else {
+        0.0
+    };
+
+    if relative_humidity < 0.0 {
+        0.01
+    } else if relative_humidity > 1.0 {
+        1.0
+    } else {
+        relative_humidity
+    }
+}
+
 fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option<f64> {
     if !temperature_c.is_finite() {
         return None;
     }
-    // EnergyPlus' default PsyPsatFnTemp path keys a cache by truncating the dry-bulb
-    // temperature bits before evaluating the raw saturation-pressure polynomial.
-    let temperature_c = energyplus_psychrometric_psat_cache_temperature_c(temperature_c);
-    Some(energyplus_psy_psat_fn_temp_raw(temperature_c))
+    Some(energyplus_psy_psat_fn_temp_default_numerical_projection(
+        temperature_c,
+    ))
 }
 
 fn energyplus_psychrometric_psat_cache_temperature_c(temperature_c: f64) -> f64 {
@@ -561,3 +606,7 @@ mod humidity_ratio_tests;
 #[cfg(test)]
 #[path = "psychrometrics_saturation_pressure_tests.rs"]
 mod saturation_pressure_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_vapor_density_relative_humidity_tests.rs"]
+mod vapor_density_relative_humidity_tests;
