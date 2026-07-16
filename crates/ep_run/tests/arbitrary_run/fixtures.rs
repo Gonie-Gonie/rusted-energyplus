@@ -39,7 +39,7 @@ pub(crate) const ONE_ZONE_EPJSON: &str = r#"{
   "Building": {"Defaulted Building": {"terrain": "Suburbs"}},
   "Timestep": {"Timestep 1": {}},
   "Site:Location": {"Denver Site": {"latitude": 39.74, "longitude": -105.18}},
-  "Material:NoMass": {"R13": {"thermal_resistance": 2.29}},
+  "Material:NoMass": {"R13": {"roughness": "MediumRough", "thermal_resistance": 2.29}},
   "Construction": {"Wall Construction": {"outside_layer": "R13"}},
   "ScheduleTypeLimits": {
     "Fraction": {
@@ -69,7 +69,7 @@ pub(crate) const ONE_ZONE_EPJSON: &str = r#"{
 }"#;
 
 pub(crate) const MISSING_SURFACE_ZONE_EPJSON: &str = r#"{
-  "Material:NoMass": {"R13": {}},
+  "Material:NoMass": {"R13": {"roughness": "MediumRough", "thermal_resistance": 2.29}},
   "Construction": {"Wall Construction": {"outside_layer": "R13"}},
   "BuildingSurface:Detailed": {
     "Wall One": {
