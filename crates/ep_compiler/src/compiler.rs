@@ -34,7 +34,8 @@ use ep_model::{
     WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
-    WindowGlazingSpectralAverageMaterial, WindowShadeEquivalentLayerMaterial,
+    WindowGlazingSpectralAverageMaterial, WindowScreenBeamReflectanceModel, WindowScreenMaterial,
+    WindowScreenTransmittanceMapResolution, WindowShadeEquivalentLayerMaterial,
     WindowShadeEquivalentLayerSideOpticalProperties, WindowShadeMaterial, WindowStandardGasType,
     Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
     ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat,
@@ -54,6 +55,7 @@ enum WindowConstructionLayerKind {
     Glass,
     Gap,
     Shade,
+    Screen,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -75,6 +77,7 @@ fn window_construction_layer_kind(
             Some(WindowConstructionLayerKind::Gap)
         }
         MaterialDefinition::WindowShade(_) => Some(WindowConstructionLayerKind::Shade),
+        MaterialDefinition::WindowScreen(_) => Some(WindowConstructionLayerKind::Screen),
         MaterialDefinition::Regular(_)
         | MaterialDefinition::NoMass(_)
         | MaterialDefinition::AirGap(_)
@@ -98,6 +101,7 @@ fn window_glazing_is_solar_diffusing(definition: &MaterialDefinition) -> bool {
         | MaterialDefinition::WindowGas(_)
         | MaterialDefinition::WindowGasMixture(_)
         | MaterialDefinition::WindowShade(_)
+        | MaterialDefinition::WindowScreen(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
         | MaterialDefinition::WindowShadeEquivalentLayer(_)
         | MaterialDefinition::WindowDrapeEquivalentLayer(_) => false,
@@ -133,6 +137,7 @@ fn window_gap_signature(definition: &MaterialDefinition) -> Option<WindowGapSign
         | MaterialDefinition::WindowGlazingRefractionExtinction(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowShade(_)
+        | MaterialDefinition::WindowScreen(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
         | MaterialDefinition::WindowShadeEquivalentLayer(_)
         | MaterialDefinition::WindowDrapeEquivalentLayer(_) => return None,
@@ -370,6 +375,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "WindowMaterial:Shade",
     "WindowMaterial:Shade:EquivalentLayer",
     "WindowMaterial:Drape:EquivalentLayer",
+    "WindowMaterial:Screen",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -946,6 +952,7 @@ impl<'a> Compiler<'a> {
         self.parse_window_shade_materials(model);
         self.parse_window_shade_equivalent_layer_materials(model);
         self.parse_window_drape_equivalent_layer_materials(model);
+        self.parse_window_screen_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -3027,6 +3034,260 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_window_screen_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowMaterial:Screen";
+        const MAP_RESOLUTION_FIELD: &str =
+            "angle_of_resolution_for_screen_transmittance_output_map";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let beam_reflectance_model = self.enum_default(
+                OBJECT_TYPE,
+                &name,
+                (&object, "reflected_beam_transmittance_accounting_method"),
+                WindowScreenBeamReflectanceModel::ModelAsDiffuse,
+                "ModelAsDiffuse",
+                WindowScreenBeamReflectanceModel::from_energyplus_name,
+            );
+            let diffuse_solar_reflectance_input = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "diffuse_solar_reflectance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let diffuse_visible_reflectance_input = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "diffuse_visible_reflectance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let thermal_hemispherical_emissivity_input = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "thermal_hemispherical_emissivity",
+                0.9,
+                (0.0, false),
+                (1.0, false),
+            );
+            let conductivity_w_per_m_k = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "conductivity",
+                221.0,
+                (0.0, false),
+                (f64::INFINITY, true),
+            );
+            let screen_material_spacing_m = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "screen_material_spacing",
+                0.0,
+                false,
+            );
+            let screen_material_diameter_m = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "screen_material_diameter",
+                0.0,
+                false,
+            );
+            let screen_to_glass_distance_m = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "screen_to_glass_distance",
+                0.025,
+                (0.001, true),
+                (1.0, true),
+            );
+            let top_opening_multiplier = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "top_opening_multiplier",
+                0.0,
+                0.0..=1.0,
+            );
+            let bottom_opening_multiplier = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "bottom_opening_multiplier",
+                0.0,
+                0.0..=1.0,
+            );
+            let left_side_opening_multiplier = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "left_side_opening_multiplier",
+                0.0,
+                0.0..=1.0,
+            );
+            let right_side_opening_multiplier = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "right_side_opening_multiplier",
+                0.0,
+                0.0..=1.0,
+            );
+            let transmittance_map_resolution = match field_value(&object, MAP_RESOLUTION_FIELD) {
+                None => {
+                    self.record_default(OBJECT_TYPE, &name, MAP_RESOLUTION_FIELD, "0");
+                    WindowScreenTransmittanceMapResolution::Disabled
+                }
+                Some(RawValue::String(value)) if value.trim().is_empty() => {
+                    self.record_default(OBJECT_TYPE, &name, MAP_RESOLUTION_FIELD, "0");
+                    WindowScreenTransmittanceMapResolution::Disabled
+                }
+                Some(value) => {
+                    match self.number_value(OBJECT_TYPE, &name, MAP_RESOLUTION_FIELD, value) {
+                        Some(0.0) => WindowScreenTransmittanceMapResolution::Disabled,
+                        Some(1.0) => WindowScreenTransmittanceMapResolution::Degrees1,
+                        Some(2.0) => WindowScreenTransmittanceMapResolution::Degrees2,
+                        Some(3.0) => WindowScreenTransmittanceMapResolution::Degrees3,
+                        Some(5.0) => WindowScreenTransmittanceMapResolution::Degrees5,
+                        Some(value) => {
+                            self.error(
+                            "InvalidNumericEnumValue",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some(MAP_RESOLUTION_FIELD),
+                            format!(
+                                "{OBJECT_TYPE}/{name} field {MAP_RESOLUTION_FIELD} must be one of 0, 1, 2, 3, or 5, got {value}"
+                            ),
+                        );
+                            WindowScreenTransmittanceMapResolution::Disabled
+                        }
+                        None => WindowScreenTransmittanceMapResolution::Disabled,
+                    }
+                }
+            };
+
+            let geometry_valid = match (screen_material_spacing_m, screen_material_diameter_m) {
+                (Some(spacing), Some(diameter)) if diameter >= spacing => {
+                    self.error(
+                        "InvalidWindowScreenGeometry",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some("screen_material_diameter"),
+                        format!(
+                            "{OBJECT_TYPE}/{name} screen material diameter must be less than screen material spacing; got diameter {diameter} m and spacing {spacing} m"
+                        ),
+                    );
+                    false
+                }
+                _ => true,
+            };
+
+            let (
+                Some(diffuse_solar_reflectance_input),
+                Some(diffuse_visible_reflectance_input),
+                Some(screen_material_spacing_m),
+                Some(screen_material_diameter_m),
+            ) = (
+                diffuse_solar_reflectance_input,
+                diffuse_visible_reflectance_input,
+                screen_material_spacing_m,
+                screen_material_diameter_m,
+            )
+            else {
+                continue;
+            };
+            if !geometry_valid {
+                continue;
+            }
+
+            let diameter_to_spacing_ratio = screen_material_diameter_m / screen_material_spacing_m;
+            let direct_normal_transmittance = (1.0 - diameter_to_spacing_ratio).powi(2);
+            let solid_fraction = 1.0 - direct_normal_transmittance;
+            let solar_reflectance = diffuse_solar_reflectance_input * solid_fraction;
+            let visible_reflectance = diffuse_visible_reflectance_input * solid_fraction;
+            let thermal_absorptance = thermal_hemispherical_emissivity_input * solid_fraction;
+
+            // Preserve EnergyPlus's final effective-property checks. They are
+            // algebraically redundant for ordinary schema-valid inputs, but
+            // still reject an extreme ratio when floating-point rounding makes
+            // the open-area transmittance exactly one.
+            let mut optical_sums_valid = true;
+            for (field, band, effective_property) in [
+                ("diffuse_solar_reflectance", "solar", solar_reflectance),
+                (
+                    "diffuse_visible_reflectance",
+                    "visible",
+                    visible_reflectance,
+                ),
+                (
+                    "thermal_hemispherical_emissivity",
+                    "thermal",
+                    thermal_absorptance,
+                ),
+            ] {
+                let sum = direct_normal_transmittance + effective_property;
+                if sum >= 1.0 {
+                    self.error(
+                        "InvalidWindowScreenOpticalSum",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some(field),
+                        format!(
+                            "{OBJECT_TYPE}/{name} effective {band} transmittance/property sum must be less than 1.0, got {sum}"
+                        ),
+                    );
+                    optical_sums_valid = false;
+                }
+            }
+            if !optical_sums_valid {
+                continue;
+            }
+
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::WindowScreen(WindowScreenMaterial {
+                    roughness: MaterialSurfaceRoughness::MediumRough,
+                    beam_reflectance_model,
+                    diffuse_solar_reflectance_input,
+                    diffuse_visible_reflectance_input,
+                    thermal_hemispherical_emissivity_input,
+                    conductivity_w_per_m_k,
+                    screen_material_spacing_m,
+                    screen_material_diameter_m,
+                    screen_to_glass_distance_m,
+                    top_opening_multiplier,
+                    bottom_opening_multiplier,
+                    left_side_opening_multiplier,
+                    right_side_opening_multiplier,
+                    transmittance_map_resolution,
+                    direct_normal_transmittance,
+                    solar_reflectance,
+                    visible_reflectance,
+                    visible_transmittance: direct_normal_transmittance,
+                    thermal_transmittance: direct_normal_transmittance,
+                    airflow_permeability: direct_normal_transmittance,
+                    solar_absorptance: (1.0 - direct_normal_transmittance - solar_reflectance)
+                        .max(0.0),
+                    visible_absorptance: (1.0 - direct_normal_transmittance - visible_reflectance)
+                        .max(0.0),
+                    thermal_absorptance,
+                }),
+            });
+        }
+    }
+
     fn reserve_material_identity(
         &mut self,
         model: &mut TypedModel,
@@ -3181,15 +3442,19 @@ impl<'a> Compiler<'a> {
                 return None;
             }
 
-            let has_shade = layers.iter().any(|material_id| {
+            let has_shading_device = layers.iter().any(|material_id| {
                 model
                     .materials
                     .get(material_id.0 as usize)
                     .is_some_and(|material| {
-                        matches!(material.definition, MaterialDefinition::WindowShade(_))
+                        matches!(
+                            material.definition,
+                            MaterialDefinition::WindowShade(_)
+                                | MaterialDefinition::WindowScreen(_)
+                        )
                     })
             });
-            if has_shade {
+            if has_shading_device {
                 return self.validate_shaded_window_material_layers(
                     model,
                     construction_name,
@@ -3375,7 +3640,7 @@ impl<'a> Compiler<'a> {
                 Some(construction_name),
                 None,
                 format!(
-                    "Construction/{construction_name} contains a material outside the ordinary Glass, Gas, GasMixture, and Shade subset"
+                    "Construction/{construction_name} contains a material outside the ordinary Glass, Gas, GasMixture, Shade, and Screen subset"
                 ),
             );
             return None;
@@ -3387,6 +3652,89 @@ impl<'a> Compiler<'a> {
                 (*kind == WindowConstructionLayerKind::Shade).then_some(index)
             })
             .collect::<Vec<_>>();
+        let screen_indices = kinds
+            .iter()
+            .enumerate()
+            .filter_map(|(index, kind)| {
+                (*kind == WindowConstructionLayerKind::Screen).then_some(index)
+            })
+            .collect::<Vec<_>>();
+
+        if !screen_indices.is_empty() {
+            if screen_indices.len() != 1 || !shade_indices.is_empty() {
+                let layer_index = screen_indices.get(1).copied().unwrap_or(screen_indices[0]);
+                let layer_field = construction_layer_field(layer_index);
+                self.error(
+                    "InvalidWindowScreenCount",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&layer_field),
+                    format!(
+                        "Construction/{construction_name} must contain exactly one WindowMaterial:Screen and no other shading device; found {} screens and {} shades",
+                        screen_indices.len(),
+                        shade_indices.len()
+                    ),
+                );
+                return None;
+            }
+            let screen_index = screen_indices[0];
+
+            if let Some((layer_index, material)) = materials
+                .iter()
+                .enumerate()
+                .find(|(_, material)| window_glazing_is_solar_diffusing(&material.definition))
+            {
+                let layer_field = construction_layer_field(layer_index);
+                self.error(
+                    "InvalidSolarDiffusingGlazingWithScreen",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&layer_field),
+                    format!(
+                        "Construction/{construction_name} cannot combine solar-diffusing glazing {} with WindowMaterial:Screen",
+                        material.name.0
+                    ),
+                );
+                return None;
+            }
+
+            // EnergyPlus 26.1's broad checks admit Screen-Gap-Glass, but
+            // downstream screen initialization assumes exterior screens are
+            // directly adjacent to the first glazing layer. Reject that unsafe
+            // source hole explicitly before the general placement diagnostic.
+            if kinds.first() == Some(&WindowConstructionLayerKind::Screen)
+                && kinds.get(1) == Some(&WindowConstructionLayerKind::Gap)
+            {
+                let layer_field = construction_layer_field(screen_index);
+                self.error(
+                    "UnsafeWindowScreenEndLayering",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&layer_field),
+                    format!(
+                        "Construction/{construction_name} uses an unsafe Screen-Gap-Glass exterior pattern; the safe typed subset requires the exterior Screen directly against glazing"
+                    ),
+                );
+                return None;
+            }
+
+            let exterior = kinds.first() == Some(&WindowConstructionLayerKind::Screen)
+                && is_plain_window_stack(&kinds[1..]);
+            if !exterior {
+                let layer_field = construction_layer_field(screen_index);
+                self.error(
+                    "InvalidWindowScreenConstructionLayering",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&layer_field),
+                    format!(
+                        "Construction/{construction_name} has an unsupported Screen placement; the safe typed subset permits one exterior Screen directly followed by a plain Glass ((Gas|GasMixture) Glass) stack"
+                    ),
+                );
+                return None;
+            }
+            return Some(ConstructionKind::Fenestration);
+        }
 
         if shade_indices.len() != 1 {
             let layer_index = shade_indices.get(1).copied().unwrap_or(0);
@@ -10719,6 +11067,7 @@ mod tests {
     mod window_material_glazing;
     mod window_material_glazing_equivalent_layer;
     mod window_material_glazing_refraction_extinction;
+    mod window_material_screen;
     mod window_material_shade;
     mod window_material_shade_equivalent_layer;
 

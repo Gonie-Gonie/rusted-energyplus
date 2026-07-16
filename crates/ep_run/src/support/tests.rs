@@ -466,6 +466,78 @@ fn typed_equivalent_layer_window_drapes_including_unused_remain_run_blocked()
 }
 
 #[test]
+fn typed_window_screens_including_unused_remain_run_blocked()
+-> Result<(), Box<dyn std::error::Error>> {
+    let raw = parse_epjson_str(
+        r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "Zone": {"Zone One": {"volume": 100}},
+                "WindowMaterial:Glazing": {
+                    "Screen Test Glass": {
+                        "optical_data_type": "SpectralAverage",
+                        "thickness": 0.003
+                    }
+                },
+                "WindowMaterial:Screen": {
+                    "Defaulted Screen": {
+                        "diffuse_solar_reflectance": 0.1,
+                        "diffuse_visible_reflectance": 0.2,
+                        "screen_material_spacing": 0.01,
+                        "screen_material_diameter": 0.002
+                    },
+                    "Unused High Precision Screen": {
+                        "reflected_beam_transmittance_accounting_method": "ModelAsDirectBeam",
+                        "diffuse_solar_reflectance": 0.123456,
+                        "diffuse_visible_reflectance": 0.234567,
+                        "thermal_hemispherical_emissivity": 0.812345,
+                        "conductivity": 17.2345,
+                        "screen_material_spacing": 0.0123456,
+                        "screen_material_diameter": 0.0034567,
+                        "screen_to_glass_distance": 0.0345678,
+                        "top_opening_multiplier": 0.1111,
+                        "bottom_opening_multiplier": 0.2222,
+                        "left_side_opening_multiplier": 0.3333,
+                        "right_side_opening_multiplier": 0.4444,
+                        "angle_of_resolution_for_screen_transmittance_output_map": 0
+                    }
+                },
+                "Construction": {
+                    "Used Screen Construction": {
+                        "outside_layer": "Defaulted Screen",
+                        "layer_2": "Screen Test Glass"
+                    }
+                }
+            }"#,
+    )?;
+    let result = compile_raw_model(&raw);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let assessment = assess_support(
+        &raw,
+        &result.report,
+        result.model.as_ref(),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+    );
+
+    assert_eq!(assessment.status, SupportStatus::Unsupported);
+    assert_eq!(assessment.run_result_state, RunResultState::RunBlocked);
+    assert_eq!(assessment.runtime_class, RuntimeClass::None);
+    assert!(assessment.unsupported_objects.iter().any(|entry| {
+        entry.object_type == "WindowMaterial:Screen"
+            && entry.count == 2
+            && entry.note
+                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+    }));
+    assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
+        diagnostic.code == "UnsupportedSurfaceBoundary"
+            && diagnostic.object_type.as_deref() == Some("WindowMaterial:Screen")
+    }));
+    Ok(())
+}
+
+#[test]
 fn missing_registry_capability_blocks_runtime_selection() -> Result<(), Box<dyn std::error::Error>>
 {
     let raw = parse_epjson_str(
