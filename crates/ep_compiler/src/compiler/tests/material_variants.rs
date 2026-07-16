@@ -91,12 +91,12 @@ fn material_variants_materialize_required_fields_and_defaults()
         model.materials[2].roughness(),
         Some(MaterialSurfaceRoughness::MediumRough)
     );
-    assert!(model.materials[2].is_resistance_only());
+    assert_eq!(model.materials[2].is_resistance_only(), Some(true));
     assert_eq!(model.materials[2].thermal_resistance(), Some(0.18));
     assert_eq!(model.materials[2].heat_capacity_per_area(), None);
-    assert_eq!(model.materials[2].thermal_absorptance(), 0.0);
-    assert_eq!(model.materials[2].solar_absorptance(), 0.0);
-    assert_eq!(model.materials[2].visible_absorptance(), 0.0);
+    assert_eq!(model.materials[2].thermal_absorptance(), Some(0.0));
+    assert_eq!(model.materials[2].solar_absorptance(), Some(0.0));
+    assert_eq!(model.materials[2].visible_absorptance(), Some(0.0));
 
     let MaterialDefinition::InfraredTransparent(_) = &model.materials[3].definition else {
         return Err(std::io::Error::other(
@@ -106,12 +106,12 @@ fn material_variants_materialize_required_fields_and_defaults()
     };
     assert_eq!(model.materials[3].kind(), MaterialKind::InfraredTransparent);
     assert_eq!(model.materials[3].roughness(), None);
-    assert!(model.materials[3].is_resistance_only());
+    assert_eq!(model.materials[3].is_resistance_only(), Some(true));
     assert_eq!(model.materials[3].thermal_resistance(), Some(0.01));
     assert_eq!(model.materials[3].heat_capacity_per_area(), None);
-    assert_eq!(model.materials[3].thermal_absorptance(), 0.9999);
-    assert_eq!(model.materials[3].solar_absorptance(), 1.0);
-    assert_eq!(model.materials[3].visible_absorptance(), 1.0);
+    assert_eq!(model.materials[3].thermal_absorptance(), Some(0.9999));
+    assert_eq!(model.materials[3].solar_absorptance(), Some(1.0));
+    assert_eq!(model.materials[3].visible_absorptance(), Some(1.0));
 
     for object_type in ["Material:AirGap", "Material:InfraredTransparent"] {
         let coverage = result

@@ -53,6 +53,7 @@
         model.constructions.push(Construction {
             id: ConstructionId(0),
             name: NormalizedName::new("Wall"),
+            kind: ConstructionKind::Opaque,
             outside_layer: MaterialId(0),
             layers: vec![MaterialId(0)],
         });
@@ -119,6 +120,7 @@
         model.constructions.push(Construction {
             id: ConstructionId(0),
             name: NormalizedName::new("Wall"),
+            kind: ConstructionKind::Opaque,
             outside_layer: MaterialId(0),
             layers: vec![MaterialId(0)],
         });

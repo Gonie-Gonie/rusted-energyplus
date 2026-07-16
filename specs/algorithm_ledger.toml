@@ -2554,6 +2554,9 @@ energyplus_source = [
 rust_target = [
   "crates/ep_model/src/objects/materials.rs::Material",
   "crates/ep_compiler/src/compiler.rs::Compiler::parse_materials",
+  "crates/ep_runtime/src/heat_balance/surface_manager.rs::ConstructionThermalDataCache",
+  "crates/ep_runtime/src/execution_plan.rs::compile_stage_contracts",
+  "crates/ep_cli/src/main.rs::construction_material_rows",
 ]
 status = "scaffold"
 first_case = "construction_materials_001"
@@ -2562,7 +2565,7 @@ proof_variables = [
   "Material CTF Summary Thermal Resistance",
 ]
 claim_level = "none"
-support_boundary = "CP58 material-family scaffold: all 34 EnergyPlus 26.1 public material base/overlay objects and their source-owned order are inventoried, while the bounded typed implementation covers only Material, Material:NoMass, Material:AirGap, and Material:InfraredTransparent variants. The AirGap positive R-only/fixed-value and middle-layer checks plus the IRT fixed-value and intended single-layer checks are typed boundaries. material_opaque_variants_001 adds nonblocking diagnostic EnergyPlus 26.1 grouped-EIO evidence only for its exact four construction groups: every declared layer count, material name, outside-to-inside order, and thermal resistance, including two adjacent AirGap layers, their reverse order, and a sole IRT layer. The generic IRT material-summary row is not an independent object-type discriminator. CondFD and broader paired-interzone semantics, dynamic heat transfer, exact diagnostic parity for the upstream non-first-layer IRT validation gap, the remaining 18 base definitions and 12 overlays/datasets, complete GetMaterialData behavior, algorithm-specific consumers, blocking family gates, and broad material/construction/conduction/window behavior remain deferred; this scaffold/source-mapped entry does not add a conformance claim."
+support_boundary = "CP58 material-family scaffold: all 34 EnergyPlus 26.1 public material base/overlay objects and their source-owned order are inventoried. The bounded typed implementation covers Material, Material:NoMass, Material:AirGap, and Material:InfraredTransparent plus only the SpectralAverage branch of WindowMaterial:Glazing; Spectral, SpectralAndAngle, and BSDF explicitly fail closed. MaterialFamily and ConstructionKind prevent glazing fields from entering opaque projections, reject mixed stacks and fenestration use by BuildingSurface:Detailed, and filter or reject window constructions in the opaque runtime/CLI path. The current window construction boundary is a single glazing layer because gas and shading dependencies remain untyped. material_opaque_variants_001 adds nonblocking diagnostic EnergyPlus 26.1 grouped-EIO evidence only for its exact opaque construction groups. There is no external glazing gate in this code checkpoint. GlazingSpectralData, window surfaces and runtime optics/thermal behavior, RefractionExtinction, EquivalentLayer, the remaining 17 base definitions and 12 overlays/datasets, complete GetMaterialData behavior, algorithm-specific consumers, blocking family gates, and broad material/construction/conduction/window behavior remain deferred; this scaffold/source-mapped entry adds no conformance claim."
 
 routine.get_window_glass_spectral_data.source_file = "src/EnergyPlus/Material.cc"
 routine.get_window_glass_spectral_data.source_routine = "GetWindowGlassSpectralData"

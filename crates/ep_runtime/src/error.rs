@@ -2,6 +2,8 @@
 
 use std::fmt::{Display, Formatter};
 
+use ep_model::{ConstructionKind, MaterialFamily};
+
 /// Runtime error for the first simulation subset.
 #[derive(Debug, PartialEq)]
 pub enum RuntimeError {
@@ -39,10 +41,28 @@ pub enum RuntimeError {
         /// Surface name.
         surface_name: String,
     },
+    /// An opaque building surface references a non-opaque construction.
+    UnsupportedConstructionForOpaqueHeatBalance {
+        /// Surface name.
+        surface_name: String,
+        /// Referenced construction name.
+        construction_name: String,
+        /// Referenced construction family.
+        construction_kind: ConstructionKind,
+    },
     /// A construction references a material that is not available.
     MissingMaterial {
         /// Construction name.
         construction_name: String,
+    },
+    /// An opaque construction contains a material from another consumer family.
+    UnsupportedMaterialForOpaqueHeatBalance {
+        /// Construction name.
+        construction_name: String,
+        /// Material name.
+        material_name: String,
+        /// Material family.
+        material_family: MaterialFamily,
     },
     /// A material has no usable thermal resistance.
     MissingThermalResistance {
@@ -104,9 +124,27 @@ impl Display for RuntimeError {
                 formatter,
                 "surface {surface_name} references a missing construction"
             ),
+            Self::UnsupportedConstructionForOpaqueHeatBalance {
+                surface_name,
+                construction_name,
+                construction_kind,
+            } => write!(
+                formatter,
+                "surface {surface_name} references {kind} construction {construction_name}, which the opaque heat-balance runtime cannot consume",
+                kind = construction_kind.id()
+            ),
             Self::MissingMaterial { construction_name } => write!(
                 formatter,
                 "construction {construction_name} references a missing material"
+            ),
+            Self::UnsupportedMaterialForOpaqueHeatBalance {
+                construction_name,
+                material_name,
+                material_family,
+            } => write!(
+                formatter,
+                "opaque construction {construction_name} contains {family} material {material_name}, which the opaque heat-balance runtime cannot consume",
+                family = material_family.id()
             ),
             Self::MissingThermalResistance { material_name } => write!(
                 formatter,

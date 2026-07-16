@@ -120,8 +120,8 @@
         meter_rate_to_energy_j, meter_value_is_zero_near_j,
     };
     use ep_model::{
-        AutoOrNumber, AutosizeOrNumber, CalendarDateRule, Construction, ConstructionId, DayOfWeek,
-        DehumidificationControlType, DemandControlledVentilationType,
+        AutoOrNumber, AutosizeOrNumber, CalendarDateRule, Construction, ConstructionId,
+        ConstructionKind, DayOfWeek, DehumidificationControlType, DemandControlledVentilationType,
         FirstHourInterpolationStartingValues, HeatRecoveryType, HumidificationControlType,
         IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
         InternalGainId, LoadDistributionScheme, Material, MaterialId,

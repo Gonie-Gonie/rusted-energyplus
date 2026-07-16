@@ -2,8 +2,8 @@
 
 use crate::{RuntimeOutputRegistry, manage_heat_balance_source_order_stages};
 use ep_model::{
-    ConstructionId, IdealLoadsAirSystemId, OutputHandle, ScheduleId, SimulationModel, SurfaceId,
-    ZoneEquipmentListId, ZoneId, ZoneThermostatId,
+    ConstructionId, ConstructionKind, IdealLoadsAirSystemId, OutputHandle, ScheduleId,
+    SimulationModel, SurfaceId, ZoneEquipmentListId, ZoneId, ZoneThermostatId,
 };
 
 /// Runtime execution-plan stage kind.
@@ -603,12 +603,6 @@ fn compile_stage_contracts(
         .iter()
         .map(|output| output.handle)
         .collect::<Vec<_>>();
-    let surface_ids = model
-        .typed
-        .surfaces
-        .iter()
-        .map(|surface| surface.id)
-        .collect::<Vec<_>>();
     let zone_ids = model
         .typed
         .zones
@@ -619,7 +613,15 @@ fn compile_stage_contracts(
         .typed
         .constructions
         .iter()
+        .filter(|construction| construction.kind == ConstructionKind::Opaque)
         .map(|construction| construction.id)
+        .collect::<Vec<_>>();
+    let surface_ids = model
+        .typed
+        .surfaces
+        .iter()
+        .filter(|surface| construction_ids.contains(&surface.construction))
+        .map(|surface| surface.id)
         .collect::<Vec<_>>();
     let schedule_ids = schedule_ids(model).collect::<Vec<_>>();
     let weather_series_indices = vec![0_usize];

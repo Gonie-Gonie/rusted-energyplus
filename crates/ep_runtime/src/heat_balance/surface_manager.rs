@@ -4,8 +4,8 @@ use crate::RuntimeError;
 use crate::execution_plan::{EnergyPlusCompatibilityStage, ExecutionStageKind};
 use crate::heat_balance::ctf::ConstructionCtfCoefficientOverride;
 use ep_model::{
-    Construction, ConstructionId, Material, MaterialId, MaterialSurfaceRoughness, Surface,
-    TypedModel,
+    Construction, ConstructionId, ConstructionKind, Material, MaterialId, MaterialSurfaceRoughness,
+    OpaqueMaterialRef, Surface, TypedModel,
 };
 use std::collections::BTreeMap;
 use std::hash::{Hash, Hasher};
@@ -82,11 +82,20 @@ impl ConstructionThermalDataCache {
         >,
     ) -> Result<Self, RuntimeError> {
         let build_start = Instant::now();
-        let mut entries = Vec::with_capacity(model.constructions.len());
+        let mut entries = Vec::with_capacity(
+            model
+                .constructions
+                .iter()
+                .filter(|construction| construction.kind == ConstructionKind::Opaque)
+                .count(),
+        );
         let mut no_mass_construction_ids = Vec::new();
         let mut massive_ctf_construction_ids = Vec::new();
 
         for construction in &model.constructions {
+            if construction.kind != ConstructionKind::Opaque {
+                continue;
+            }
             let entry = construction_thermal_data(
                 model,
                 construction,
@@ -100,6 +109,8 @@ impl ConstructionThermalDataCache {
             }
             entries.push(entry);
         }
+
+        validate_surface_construction_families(model)?;
 
         let coefficient_cache_hash = construction_cache_hash(&entries);
         Ok(Self {
@@ -166,20 +177,28 @@ fn construction_thermal_data(
 ) -> Result<ConstructionThermalData, RuntimeError> {
     let layer_ids = construction_layer_stack(construction);
     let layer_materials = layer_materials(model, construction, &layer_ids)?;
+    let opaque_layer_materials = opaque_layer_materials(&layer_materials, construction)?;
     let outside_material =
         layer_materials
             .first()
             .ok_or_else(|| RuntimeError::MissingMaterial {
                 construction_name: construction.name.0.clone(),
             })?;
-    let inside_material = layer_materials
-        .last()
-        .ok_or_else(|| RuntimeError::MissingMaterial {
-            construction_name: construction.name.0.clone(),
-        })?;
+    let outside_opaque_material =
+        *opaque_layer_materials
+            .first()
+            .ok_or_else(|| RuntimeError::MissingMaterial {
+                construction_name: construction.name.0.clone(),
+            })?;
+    let inside_opaque_material =
+        *opaque_layer_materials
+            .last()
+            .ok_or_else(|| RuntimeError::MissingMaterial {
+                construction_name: construction.name.0.clone(),
+            })?;
     let thermal_resistance_m2_k_per_w =
-        material_thermal_resistance_sum(&layer_materials, construction)?;
-    let heat_capacity_j_per_m2_k = material_heat_capacity_per_area_sum(&layer_materials);
+        material_thermal_resistance_sum(&layer_materials, &opaque_layer_materials, construction)?;
+    let heat_capacity_j_per_m2_k = material_heat_capacity_per_area_sum(&opaque_layer_materials);
     let ctf_coefficients = ctf_coefficients_by_construction
         .get(&construction.name.0)
         .map(|rows| rows.iter().copied().cloned().collect::<Vec<_>>())
@@ -197,14 +216,20 @@ fn construction_thermal_data(
         material_layer_stack: layer_ids,
         outside_layer_material_id: outside_material.id,
         outside_layer_material_name: outside_material.name.0.clone(),
-        outside_layer_roughness: outside_material
+        outside_layer_roughness: outside_opaque_material
             .roughness()
             .unwrap_or(MaterialSurfaceRoughness::MediumRough),
         thermal_resistance_m2_k_per_w,
         heat_capacity_j_per_m2_k,
-        thermal_absorptance: outside_material.thermal_absorptance(),
-        inside_thermal_absorptance: inside_material.thermal_absorptance(),
-        solar_absorptance: outside_material.solar_absorptance(),
+        thermal_absorptance: outside_opaque_material
+            .surface_properties()
+            .thermal_absorptance,
+        inside_thermal_absorptance: inside_opaque_material
+            .surface_properties()
+            .thermal_absorptance,
+        solar_absorptance: outside_opaque_material
+            .surface_properties()
+            .solar_absorptance,
         ctf_coefficient_source,
         ctf_coefficients,
     })
@@ -237,13 +262,32 @@ fn layer_materials<'a>(
     Ok(layer_materials)
 }
 
+fn opaque_layer_materials<'a>(
+    layer_materials: &[&'a Material],
+    construction: &Construction,
+) -> Result<Vec<OpaqueMaterialRef<'a>>, RuntimeError> {
+    layer_materials
+        .iter()
+        .map(|material| {
+            material.as_opaque().ok_or_else(|| {
+                RuntimeError::UnsupportedMaterialForOpaqueHeatBalance {
+                    construction_name: construction.name.0.clone(),
+                    material_name: material.name.0.clone(),
+                    material_family: material.family(),
+                }
+            })
+        })
+        .collect()
+}
+
 fn material_thermal_resistance_sum(
     layer_materials: &[&Material],
+    opaque_layer_materials: &[OpaqueMaterialRef<'_>],
     construction: &Construction,
 ) -> Result<f64, RuntimeError> {
     let mut thermal_resistance_m2_k_per_w = 0.0;
-    for material in layer_materials {
-        thermal_resistance_m2_k_per_w += material.thermal_resistance().ok_or_else(|| {
+    for (material, opaque_material) in layer_materials.iter().zip(opaque_layer_materials) {
+        thermal_resistance_m2_k_per_w += opaque_material.thermal_resistance().ok_or_else(|| {
             RuntimeError::MissingThermalResistance {
                 material_name: material.name.0.clone(),
             }
@@ -258,8 +302,10 @@ fn material_thermal_resistance_sum(
     }
 }
 
-fn material_heat_capacity_per_area_sum(layer_materials: &[&Material]) -> Option<f64> {
-    let heat_capacity_j_per_m2_k = layer_materials
+fn material_heat_capacity_per_area_sum(
+    opaque_layer_materials: &[OpaqueMaterialRef<'_>],
+) -> Option<f64> {
+    let heat_capacity_j_per_m2_k = opaque_layer_materials
         .iter()
         .filter_map(|material| material.heat_capacity_per_area())
         .sum::<f64>();
@@ -268,6 +314,26 @@ fn material_heat_capacity_per_area_sum(layer_materials: &[&Material]) -> Option<
     } else {
         None
     }
+}
+
+fn validate_surface_construction_families(model: &TypedModel) -> Result<(), RuntimeError> {
+    for surface in &model.surfaces {
+        let Some(construction) = model
+            .constructions
+            .iter()
+            .find(|construction| construction.id == surface.construction)
+        else {
+            continue;
+        };
+        if construction.kind != ConstructionKind::Opaque {
+            return Err(RuntimeError::UnsupportedConstructionForOpaqueHeatBalance {
+                surface_name: surface.name.0.clone(),
+                construction_name: construction.name.0.clone(),
+                construction_kind: construction.kind,
+            });
+        }
+    }
+    Ok(())
 }
 
 fn construction_cache_hash(entries: &[ConstructionThermalData]) -> u64 {

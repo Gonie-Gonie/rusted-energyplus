@@ -48,8 +48,8 @@ claim.
 |---|---|---|
 | heat-balance driver | `ManageHeatBalance` | mapped-not-ported |
 | project heat-balance controls | `GetProjectControlData` | mapped-not-ported |
-| material input | `Material::GetWindowGlassSpectralData` -> `Material::GetMaterialData` -> `Material::GetHysteresisData` | all 34 public base/overlay objects are inventoried in [the material-family source map](material-source-map.md); only Regular, NoMass, AirGap, and InfraredTransparent belong to the bounded typed-variant checkpoint, with nonblocking grouped-EIO evidence for the exact AirGap/IRT fixture |
-| construction input | `GetConstructData` | typed opaque layer stack exists; `material_opaque_variants_001` checks exact static layer counts, names, order, and resistance only; CTF coefficients are not ported |
+| material input | `Material::GetWindowGlassSpectralData` -> `Material::GetMaterialData` -> `Material::GetHysteresisData` | all 34 public base/overlay objects are inventoried in [the material-family source map](material-source-map.md); Regular, NoMass, AirGap, and InfraredTransparent plus only the `WindowMaterial:Glazing` `SpectralAverage` branch are typed, while full window behavior remains blocked |
+| construction input | `GetConstructData` | typed opaque and single-glazing construction kinds are separated; the opaque runtime/CLI path rejects or filters fenestration stacks, `material_opaque_variants_001` checks exact static opaque layer counts, names, order, and resistance only, and window construction/CTF behavior is not ported |
 | zone input | `GetZoneData` | typed geometry subset exists; source map required before expansion |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |

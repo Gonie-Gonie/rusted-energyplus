@@ -198,6 +198,115 @@
         Ok(())
     }
 
+    fn spectral_average_window_material(id: MaterialId, name: &str) -> Material {
+        Material {
+            id,
+            name: NormalizedName::new(name),
+            definition: ep_model::MaterialDefinition::WindowGlazingSpectralAverage(
+                ep_model::WindowGlazingSpectralAverageMaterial {
+                    thickness_m: 0.006,
+                    solar_transmittance_at_normal_incidence: 0.775,
+                    front_side_solar_reflectance_at_normal_incidence: 0.071,
+                    back_side_solar_reflectance_at_normal_incidence: 0.071,
+                    visible_transmittance_at_normal_incidence: 0.881,
+                    front_side_visible_reflectance_at_normal_incidence: 0.08,
+                    back_side_visible_reflectance_at_normal_incidence: 0.08,
+                    infrared_transmittance_at_normal_incidence: 0.0,
+                    front_side_infrared_hemispherical_emissivity: 0.84,
+                    back_side_infrared_hemispherical_emissivity: 0.84,
+                    conductivity_w_per_m_k: 0.9,
+                    dirt_correction_factor_for_solar_and_visible_transmittance: 1.0,
+                    solar_diffusing: false,
+                    youngs_modulus_pa: 72.0e9,
+                    poissons_ratio: 0.22,
+                },
+            ),
+        }
+    }
+
+    #[test]
+    fn opaque_runtime_filters_unreferenced_fenestration_construction()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut typed = cube_model();
+        typed
+            .materials
+            .push(spectral_average_window_material(MaterialId(1), "Clear Glass"));
+        typed.constructions.push(Construction {
+            id: ConstructionId(1),
+            name: NormalizedName::new("Window"),
+            kind: ConstructionKind::Fenestration,
+            outside_layer: MaterialId(1),
+            layers: vec![MaterialId(1)],
+        });
+        let model = SimulationModel::from_typed(typed);
+
+        let state = initialize_heat_balance_state(&model, 20.0)?;
+        assert_eq!(state.construction_cache_entry_count, 1);
+
+        let plan = build_execution_plan(&model);
+        let calc_inside =
+            stage_with_kind(&plan.stages, ExecutionStageKind::CalcHeatBalanceInsideSurf);
+        assert_eq!(
+            calc_inside.prebound.construction_ids,
+            vec![ConstructionId(0)]
+        );
+        assert_eq!(
+            calc_inside.prebound.surface_ids.len(),
+            model.typed.surfaces.len()
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn opaque_runtime_rejects_surface_using_fenestration_construction() {
+        let mut typed = cube_model();
+        typed.constructions[0].kind = ConstructionKind::Fenestration;
+        let model = SimulationModel::from_typed(typed);
+
+        let plan = build_execution_plan(&model);
+        let calc_inside =
+            stage_with_kind(&plan.stages, ExecutionStageKind::CalcHeatBalanceInsideSurf);
+        assert!(calc_inside.prebound.construction_ids.is_empty());
+        assert!(calc_inside.prebound.surface_ids.is_empty());
+
+        let error = initialize_heat_balance_state(&model, 20.0)
+            .expect_err("fenestration construction must not enter opaque heat balance");
+        assert!(matches!(
+            &error,
+            RuntimeError::UnsupportedConstructionForOpaqueHeatBalance {
+                construction_name,
+                construction_kind: ConstructionKind::Fenestration,
+                ..
+            } if construction_name == "WALL"
+        ));
+        assert!(error.to_string().contains(
+            "references fenestration construction WALL, which the opaque heat-balance runtime cannot consume"
+        ));
+    }
+
+    #[test]
+    fn opaque_runtime_rejects_fenestration_material_in_opaque_construction() {
+        let mut typed = cube_model();
+        typed.materials[0] =
+            spectral_average_window_material(MaterialId(0), "Misclassified Glass");
+        let model = SimulationModel::from_typed(typed);
+
+        let error = initialize_heat_balance_state(&model, 20.0)
+            .expect_err("fenestration material must not enter opaque heat balance");
+        assert!(matches!(
+            &error,
+            RuntimeError::UnsupportedMaterialForOpaqueHeatBalance {
+                construction_name,
+                material_name,
+                material_family: ep_model::MaterialFamily::Fenestration,
+            } if construction_name == "WALL" && material_name == "MISCLASSIFIED GLASS"
+        ));
+        assert!(error.to_string().contains(
+            "opaque construction WALL contains fenestration material MISCLASSIFIED GLASS"
+        ));
+    }
+
     #[test]
     fn heat_balance_state_uses_inside_layer_absorptance_for_interior_sources()
     -> Result<(), Box<dyn std::error::Error>> {
@@ -232,6 +341,7 @@
         typed.constructions.push(Construction {
             id: ConstructionId(1),
             name: NormalizedName::new("High Inside Wall"),
+            kind: ConstructionKind::Opaque,
             outside_layer: MaterialId(0),
             layers: vec![MaterialId(0), MaterialId(2)],
         });

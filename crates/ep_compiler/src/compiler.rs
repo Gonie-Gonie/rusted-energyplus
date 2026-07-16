@@ -4,7 +4,7 @@ use ep_model::{
     AirGapMaterial, AirLoopHvac, AutoOrNumber, AutosizeOrNumber, AvailabilityManagerComponent,
     BoilerHotWater, BranchId, BranchListId, Building, ChillerElectricEir, CoilComponent,
     CoilComponentKind, ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId,
-    DayScheduleId, DehumidificationControlType, DemandControlledVentilationType,
+    ConstructionKind, DayScheduleId, DehumidificationControlType, DemandControlledVentilationType,
     DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId,
     DesignSpecificationOutdoorAirMethod, ExternalInterfaceFmuExportSchedule,
     ExternalInterfaceFmuImportSchedule, ExternalInterfaceSchedule, FanComponent, FanComponentKind,
@@ -27,10 +27,11 @@ use ep_model::{
     ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation, SolarDistribution,
     SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
     ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
-    TypedModel, Version, VertexEntryDirection, WeekScheduleId, WindExposure, Zone,
-    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
-    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
-    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
+    TypedModel, Version, VertexEntryDirection, WeekScheduleId, WindExposure,
+    WindowGlazingSpectralAverageMaterial, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
+    ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
+    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatControl,
+    ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 use std::collections::BTreeMap;
@@ -802,6 +803,7 @@ impl<'a> Compiler<'a> {
         self.parse_nomass_materials(model);
         self.parse_air_gap_materials(model);
         self.parse_infrared_transparent_materials(model);
+        self.parse_window_glazing_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -948,6 +950,246 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_window_glazing_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowMaterial:Glazing";
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let optical_data_type =
+                self.required_string(OBJECT_TYPE, &name, &object, "optical_data_type");
+            let thickness_m =
+                self.required_number_minimum(OBJECT_TYPE, &name, &object, "thickness", 0.0, false);
+            let Some(optical_data_type) = optical_data_type else {
+                continue;
+            };
+            if !optical_data_type.eq_ignore_ascii_case("SpectralAverage") {
+                if ["BSDF", "Spectral", "SpectralAndAngle"]
+                    .iter()
+                    .any(|candidate| optical_data_type.eq_ignore_ascii_case(candidate))
+                {
+                    self.error(
+                        "UnsupportedWindowGlazingOpticalDataType",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some("optical_data_type"),
+                        format!(
+                            "{OBJECT_TYPE}/{name} optical data type {optical_data_type} depends on a later source-order checkpoint; only SpectralAverage is currently typed"
+                        ),
+                    );
+                } else {
+                    self.invalid_enum_value(
+                        OBJECT_TYPE,
+                        &name,
+                        "optical_data_type",
+                        &optical_data_type,
+                    );
+                }
+                continue;
+            }
+
+            let solar_transmittance_at_normal_incidence = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "solar_transmittance_at_normal_incidence",
+                0.0,
+                0.0..=1.0,
+            );
+            let front_side_solar_reflectance_at_normal_incidence = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "front_side_solar_reflectance_at_normal_incidence",
+                0.0,
+                0.0..=1.0,
+            );
+            let back_side_solar_reflectance_at_normal_incidence = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "back_side_solar_reflectance_at_normal_incidence",
+                0.0,
+                0.0..=1.0,
+            );
+            let visible_transmittance_at_normal_incidence = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "visible_transmittance_at_normal_incidence",
+                0.0,
+                0.0..=1.0,
+            );
+            let front_side_visible_reflectance_at_normal_incidence = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "front_side_visible_reflectance_at_normal_incidence",
+                0.0,
+                0.0..=1.0,
+            );
+            let back_side_visible_reflectance_at_normal_incidence = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "back_side_visible_reflectance_at_normal_incidence",
+                0.0,
+                0.0..=1.0,
+            );
+            let infrared_transmittance_at_normal_incidence = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "infrared_transmittance_at_normal_incidence",
+                0.0,
+                0.0..=1.0,
+            );
+            let front_side_infrared_hemispherical_emissivity = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "front_side_infrared_hemispherical_emissivity",
+                0.84,
+                (0.0, false),
+                (1.0, false),
+            );
+            let back_side_infrared_hemispherical_emissivity = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "back_side_infrared_hemispherical_emissivity",
+                0.84,
+                (0.0, false),
+                (1.0, false),
+            );
+            let conductivity_w_per_m_k = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "conductivity",
+                0.9,
+                (0.0, false),
+                (f64::INFINITY, true),
+            );
+            let dirt_correction_factor_for_solar_and_visible_transmittance = self
+                .number_bounded_default(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "dirt_correction_factor_for_solar_and_visible_transmittance",
+                    1.0,
+                    (0.0, false),
+                    (1.0, true),
+                );
+            let solar_diffusing = self.enum_default(
+                OBJECT_TYPE,
+                &name,
+                (&object, "solar_diffusing"),
+                false,
+                "No",
+                parse_yes_no,
+            );
+            let youngs_modulus_pa = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "young_s_modulus",
+                72_000_000_000.0,
+                (0.0, false),
+                (f64::INFINITY, true),
+            );
+            let poissons_ratio = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "poisson_s_ratio",
+                0.22,
+                (0.0, false),
+                (1.0, false),
+            );
+            let Some(thickness_m) = thickness_m else {
+                continue;
+            };
+
+            let optical_sums = [
+                (
+                    "front_side_solar_reflectance_at_normal_incidence",
+                    solar_transmittance_at_normal_incidence
+                        + front_side_solar_reflectance_at_normal_incidence,
+                ),
+                (
+                    "back_side_solar_reflectance_at_normal_incidence",
+                    solar_transmittance_at_normal_incidence
+                        + back_side_solar_reflectance_at_normal_incidence,
+                ),
+                (
+                    "front_side_visible_reflectance_at_normal_incidence",
+                    visible_transmittance_at_normal_incidence
+                        + front_side_visible_reflectance_at_normal_incidence,
+                ),
+                (
+                    "back_side_visible_reflectance_at_normal_incidence",
+                    visible_transmittance_at_normal_incidence
+                        + back_side_visible_reflectance_at_normal_incidence,
+                ),
+                (
+                    "front_side_infrared_hemispherical_emissivity",
+                    infrared_transmittance_at_normal_incidence
+                        + front_side_infrared_hemispherical_emissivity,
+                ),
+                (
+                    "back_side_infrared_hemispherical_emissivity",
+                    infrared_transmittance_at_normal_incidence
+                        + back_side_infrared_hemispherical_emissivity,
+                ),
+            ];
+            let mut sums_valid = true;
+            for (field, sum) in optical_sums {
+                if sum > 1.0 {
+                    self.error(
+                        "InvalidWindowGlazingOpticalSum",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some(field),
+                        format!(
+                            "{OBJECT_TYPE}/{name} transmittance plus the {field} value must be less than or equal to 1, got {sum}"
+                        ),
+                    );
+                    sums_valid = false;
+                }
+            }
+            if !sums_valid {
+                continue;
+            }
+
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::WindowGlazingSpectralAverage(
+                    WindowGlazingSpectralAverageMaterial {
+                        thickness_m,
+                        solar_transmittance_at_normal_incidence,
+                        front_side_solar_reflectance_at_normal_incidence,
+                        back_side_solar_reflectance_at_normal_incidence,
+                        visible_transmittance_at_normal_incidence,
+                        front_side_visible_reflectance_at_normal_incidence,
+                        back_side_visible_reflectance_at_normal_incidence,
+                        infrared_transmittance_at_normal_incidence,
+                        front_side_infrared_hemispherical_emissivity,
+                        back_side_infrared_hemispherical_emissivity,
+                        conductivity_w_per_m_k,
+                        dirt_correction_factor_for_solar_and_visible_transmittance,
+                        solar_diffusing,
+                        youngs_modulus_pa,
+                        poissons_ratio,
+                    },
+                ),
+            });
+        }
+    }
+
     fn reserve_material_identity(
         &mut self,
         model: &mut TypedModel,
@@ -1003,9 +1245,10 @@ impl<'a> Compiler<'a> {
             if !layers_valid {
                 continue;
             }
-            if !self.validate_construction_material_layers(model, &name, &layers) {
+            let Some(kind) = self.validate_construction_material_layers(model, &name, &layers)
+            else {
                 continue;
-            }
+            };
             let Some(id_value) = self.checked_id("Construction", &name, model.constructions.len())
             else {
                 continue;
@@ -1019,6 +1262,7 @@ impl<'a> Compiler<'a> {
             model.constructions.push(Construction {
                 id,
                 name: NormalizedName::new(&name),
+                kind,
                 outside_layer,
                 layers,
             });
@@ -1030,7 +1274,40 @@ impl<'a> Compiler<'a> {
         model: &TypedModel,
         construction_name: &str,
         layers: &[MaterialId],
-    ) -> bool {
+    ) -> Option<ConstructionKind> {
+        let fenestration_layer_count = layers
+            .iter()
+            .filter_map(|material_id| model.materials.get(material_id.0 as usize))
+            .filter(|material| material.family() == ep_model::MaterialFamily::Fenestration)
+            .count();
+        if fenestration_layer_count != 0 {
+            if fenestration_layer_count != layers.len() {
+                self.error(
+                    "MixedConstructionMaterialFamilies",
+                    "Construction",
+                    Some(construction_name),
+                    None,
+                    format!(
+                        "Construction/{construction_name} cannot mix opaque and fenestration materials"
+                    ),
+                );
+                return None;
+            }
+            if layers.len() != 1 {
+                self.error(
+                    "UnsupportedWindowConstructionLayering",
+                    "Construction",
+                    Some(construction_name),
+                    Some("layer_2"),
+                    format!(
+                        "Construction/{construction_name} has multiple glazing layers; gas and shading layer source-order dependencies are not typed yet"
+                    ),
+                );
+                return None;
+            }
+            return Some(ConstructionKind::Fenestration);
+        }
+
         let mut valid = true;
         if let Some(outside_material) = layers
             .first()
@@ -1102,7 +1379,7 @@ impl<'a> Compiler<'a> {
             valid = false;
         }
 
-        valid
+        valid.then_some(ConstructionKind::Opaque)
     }
 
     fn parse_schedule_type_limits(&mut self, model: &mut TypedModel) {
@@ -4894,6 +5171,22 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
+            if model
+                .constructions
+                .get(construction.0 as usize)
+                .is_some_and(|candidate| candidate.kind != ConstructionKind::Opaque)
+            {
+                self.error(
+                    "InvalidBuildingSurfaceConstructionKind",
+                    "BuildingSurface:Detailed",
+                    Some(&name),
+                    Some("construction_name"),
+                    format!(
+                        "BuildingSurface:Detailed/{name} requires an opaque construction; {construction_name} is a fenestration construction"
+                    ),
+                );
+                continue;
+            }
             let Some(zone_name) =
                 self.required_string("BuildingSurface:Detailed", &name, &object, "zone_name")
             else {
@@ -6199,6 +6492,47 @@ impl<'a> Compiler<'a> {
             Some(field),
             format!(
                 "{object_type}/{object_name} field {field} must be between {min} and {max}, got {value}"
+            ),
+        );
+        default
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn number_bounded_default(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+        default: f64,
+        minimum: (f64, bool),
+        maximum: (f64, bool),
+    ) -> f64 {
+        let value = self.number_default(object_type, object_name, object, field, default);
+        let minimum_valid = if minimum.1 {
+            value >= minimum.0
+        } else {
+            value > minimum.0
+        };
+        let maximum_valid = if maximum.1 {
+            value <= maximum.0
+        } else {
+            value < maximum.0
+        };
+        if minimum_valid && maximum_valid {
+            return value;
+        }
+
+        let lower_bracket = if minimum.1 { "[" } else { "(" };
+        let upper_bracket = if maximum.1 { "]" } else { ")" };
+        self.error(
+            "InvalidNumericRange",
+            object_type,
+            Some(object_name),
+            Some(field),
+            format!(
+                "{object_type}/{object_name} field {field} must be in {lower_bracket}{}, {}{upper_bracket}, got {value}",
+                minimum.0, maximum.0
             ),
         );
         default
@@ -8058,6 +8392,7 @@ mod tests {
     mod schedule_scalar_type_limits;
     mod schedule_week_compact;
     mod schedule_year;
+    mod window_material_glazing;
 
     use super::{
         ALL_SCHEDULE_DAY_TYPES, CompileStage, DiagnosticSeverity, ObjectCoverageStatus,

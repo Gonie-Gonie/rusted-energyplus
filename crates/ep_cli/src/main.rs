@@ -31,8 +31,8 @@ use ep_conformance::{
     load_case_v2_file,
 };
 use ep_model::{
-    Construction, GeometryCoordinateSystem, GlobalGeometryRules, Material, ModelGraph,
-    OtherEquipment, OutsideBoundaryCondition, Point3, ScheduleId, SimulationModel,
+    Construction, ConstructionKind, GeometryCoordinateSystem, GlobalGeometryRules, Material,
+    ModelGraph, OtherEquipment, OutsideBoundaryCondition, Point3, ScheduleId, SimulationModel,
     StartingVertexPosition, SurfaceType, TypedModel, VertexEntryDirection,
 };
 use ep_oracle::default_oracle_release;
@@ -3800,7 +3800,9 @@ fn run_compare_construction_materials(args: &[String]) -> i32 {
         }
     };
     if rust_rows.is_empty() {
-        eprintln!("no Construction objects are available for construction/material comparison");
+        eprintln!(
+            "no opaque Construction objects are available for construction/material comparison"
+        );
         return 1;
     }
 
@@ -9452,6 +9454,7 @@ fn construction_material_rows(model: &TypedModel) -> Result<Vec<ConstructionMate
     model
         .constructions
         .iter()
+        .filter(|construction| construction.kind == ConstructionKind::Opaque)
         .map(|construction| construction_material_row(model, construction))
         .collect()
 }
@@ -9460,6 +9463,7 @@ fn construction_layer_material_count(model: &TypedModel) -> usize {
     model
         .constructions
         .iter()
+        .filter(|construction| construction.kind == ConstructionKind::Opaque)
         .map(|construction| {
             let layer_ids = if construction.layers.is_empty() {
                 std::slice::from_ref(&construction.outside_layer)
@@ -9475,6 +9479,12 @@ fn construction_material_row(
     model: &TypedModel,
     construction: &Construction,
 ) -> Result<ConstructionMaterialRow, String> {
+    if construction.kind != ConstructionKind::Opaque {
+        return Err(format!(
+            "construction {} is not an opaque CTF construction",
+            construction.name.0
+        ));
+    }
     let layer_materials = materials_for_construction(model, construction)?;
     if layer_materials.is_empty() {
         return Err(format!(
@@ -21020,6 +21030,53 @@ mod tests {
             &oracle,
             tolerance
         ));
+    }
+
+    #[test]
+    fn construction_material_compare_filters_fenestration_constructions() {
+        let raw_model = ep_raw_model::parse_epjson_str(
+            r#"{
+                "Material:NoMass": {
+                    "Opaque": {
+                        "roughness":"Rough",
+                        "thermal_resistance":0.5
+                    }
+                },
+                "WindowMaterial:Glazing": {
+                    "Clear": {
+                        "optical_data_type":"SpectralAverage",
+                        "thickness":0.003
+                    }
+                },
+                "Construction": {
+                    "Wall": {"outside_layer":"Opaque"},
+                    "Window": {"outside_layer":"Clear"}
+                }
+            }"#,
+        )
+        .expect("mixed construction-family epJSON should parse");
+        let result = ep_compiler::compile_raw_model(&raw_model);
+        assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+        let model = result
+            .model
+            .expect("mixed construction families should type");
+
+        let rows = super::construction_material_rows(&model)
+            .expect("opaque construction material rows should build");
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].construction_name, "WALL");
+        assert_eq!(super::construction_layer_material_count(&model), 1);
+
+        let window = model
+            .constructions
+            .iter()
+            .find(|construction| construction.name.0 == "WINDOW")
+            .expect("window construction");
+        assert!(
+            super::construction_material_row(&model, window)
+                .expect_err("window construction must not enter opaque comparison")
+                .contains("not an opaque CTF construction")
+        );
     }
 
     #[test]

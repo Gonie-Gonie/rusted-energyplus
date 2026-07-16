@@ -1648,14 +1648,15 @@ pub struct PlantBranchComponentEdge {
 mod tests {
     use crate::{
         AirLoopHvac, AutoOrNumber, BranchId, BranchListId, ComponentId, ComponentRegistryCategory,
-        ConnectorId, ConnectorListId, Construction, ConstructionId, FanComponent, FanComponentKind,
-        InsideSurfaceConvectionAlgorithm, LoopId, Material, MaterialDefinition, MaterialId,
-        MaterialKind, MaterialSurfaceRoughness, ModelGraph, NameMap, NoMassMaterial, Node,
-        NodeGraphDiagnosticCode, NodeId, NormalizedName, OpaqueSurfaceProperties,
-        OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, PlantBranch,
-        PlantBranchComponent, PlantBranchList, PlantConnectorKind, PlantConnectorList,
+        ConnectorId, ConnectorListId, Construction, ConstructionId, ConstructionKind, FanComponent,
+        FanComponentKind, InsideSurfaceConvectionAlgorithm, LoopId, Material, MaterialDefinition,
+        MaterialFamily, MaterialId, MaterialKind, MaterialSurfaceRoughness, ModelGraph, NameMap,
+        NoMassMaterial, Node, NodeGraphDiagnosticCode, NodeId, NormalizedName,
+        OpaqueSurfaceProperties, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm,
+        PlantBranch, PlantBranchComponent, PlantBranchList, PlantConnectorKind, PlantConnectorList,
         PlantConnectorListEntry, PlantLoop, PlantLoopSide, RegularMaterial, SunExposure, Surface,
-        SurfaceId, SurfaceType, TypedModel, Version, WindExposure, ZoneId,
+        SurfaceId, SurfaceType, TypedModel, Version, WindExposure,
+        WindowGlazingSpectralAverageMaterial, ZoneId,
     };
 
     #[test]
@@ -1727,7 +1728,7 @@ mod tests {
         assert_eq!(material.no_mass_thermal_resistance_m2_k_per_w(), None);
         assert_eq!(material.thermal_resistance(), Some(0.05));
         assert_eq!(material.heat_capacity_per_area(), Some(160_000.0));
-        assert_eq!(material.thermal_absorptance(), 0.9);
+        assert_eq!(material.thermal_absorptance(), Some(0.9));
         assert_eq!(
             MaterialSurfaceRoughness::from_energyplus_name("mediumrough"),
             Some(MaterialSurfaceRoughness::MediumRough)
@@ -1752,8 +1753,55 @@ mod tests {
         assert_eq!(material.no_mass_thermal_resistance_m2_k_per_w(), Some(1.0));
         assert_eq!(material.thermal_resistance(), Some(1.0));
         assert_eq!(material.heat_capacity_per_area(), None);
-        assert_eq!(material.solar_absorptance(), 0.7);
-        assert_eq!(material.visible_absorptance(), 0.7);
+        assert_eq!(material.solar_absorptance(), Some(0.7));
+        assert_eq!(material.visible_absorptance(), Some(0.7));
+    }
+
+    #[test]
+    fn window_glazing_stays_outside_opaque_material_projections() {
+        let material = Material {
+            id: MaterialId(0),
+            name: NormalizedName::new("Clear Glass"),
+            definition: MaterialDefinition::WindowGlazingSpectralAverage(
+                WindowGlazingSpectralAverageMaterial {
+                    thickness_m: 0.006,
+                    solar_transmittance_at_normal_incidence: 0.775,
+                    front_side_solar_reflectance_at_normal_incidence: 0.071,
+                    back_side_solar_reflectance_at_normal_incidence: 0.071,
+                    visible_transmittance_at_normal_incidence: 0.881,
+                    front_side_visible_reflectance_at_normal_incidence: 0.08,
+                    back_side_visible_reflectance_at_normal_incidence: 0.08,
+                    infrared_transmittance_at_normal_incidence: 0.0,
+                    front_side_infrared_hemispherical_emissivity: 0.84,
+                    back_side_infrared_hemispherical_emissivity: 0.84,
+                    conductivity_w_per_m_k: 0.9,
+                    dirt_correction_factor_for_solar_and_visible_transmittance: 1.0,
+                    solar_diffusing: false,
+                    youngs_modulus_pa: 72.0e9,
+                    poissons_ratio: 0.22,
+                },
+            ),
+        };
+
+        assert_eq!(material.kind(), MaterialKind::WindowGlazing);
+        assert_eq!(material.family(), MaterialFamily::Fenestration);
+        assert!(material.as_opaque().is_none());
+        assert_eq!(
+            material
+                .as_window_glazing_spectral_average()
+                .map(|glazing| glazing.thickness_m),
+            Some(0.006)
+        );
+        assert_eq!(material.roughness(), None);
+        assert_eq!(material.thickness_m(), None);
+        assert_eq!(material.conductivity_w_per_m_k(), None);
+        assert_eq!(material.density_kg_per_m3(), None);
+        assert_eq!(material.specific_heat_j_per_kg_k(), None);
+        assert_eq!(material.no_mass_thermal_resistance_m2_k_per_w(), None);
+        assert_eq!(material.is_resistance_only(), None);
+        assert_eq!(material.surface_properties(), None);
+        assert_eq!(material.thermal_resistance(), None);
+        assert_eq!(material.heat_capacity_per_area(), None);
     }
 
     #[test]
@@ -1762,6 +1810,7 @@ mod tests {
         model.constructions.push(Construction {
             id: ConstructionId(0),
             name: NormalizedName::new("Wall"),
+            kind: ConstructionKind::Opaque,
             outside_layer: MaterialId(0),
             layers: vec![MaterialId(0), MaterialId(1)],
         });
