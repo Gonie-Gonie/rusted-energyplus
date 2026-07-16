@@ -9,7 +9,7 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 
 | Check | Result |
 |---|---|
-| docs files | 84 |
+| docs files | 85 |
 | SUMMARY links | 19 |
 | README h2 sections | 5 |
 | README h2 section limit | pass |
@@ -25,7 +25,7 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 | Non-core SUMMARY sections | 0 |
 | SUMMARY section scope violations | 0 |
 | Release notes in Current nav | 0 |
-| Non-generated docs not in SUMMARY | 64 |
+| Non-generated docs not in SUMMARY | 65 |
 
 ## Current Navigation Check
 
@@ -138,6 +138,7 @@ none
 | docs/src/porting-map/hvac.md | source-map | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/porting-map/ideal-loads-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-15 |
 | docs/src/porting-map/input-and-schema.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-06-05 |
+| docs/src/porting-map/material-source-map.md | source-map | not in SUMMARY | n/a | present | active | compiler | 2026-07-15 |
 | docs/src/porting-map/node-state-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
 | docs/src/porting-map/output-reporting.md | source-map | not in SUMMARY | n/a | present | active | conformance | 2026-06-07 |
 | docs/src/porting-map/output-variable-source-map.md | source-map | not in SUMMARY | n/a | present | active | conformance | 2026-06-08 |

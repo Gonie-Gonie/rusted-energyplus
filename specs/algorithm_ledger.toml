@@ -2537,3 +2537,70 @@ routine.get_vertices.unsupported_active_branches = [
 routine.get_vertices.not_claimed_branches = [
   "full-routine `GetVertices` parity, exact trigonometric last-bit parity, diagnostic and counter parity, EIO equality outside the declared transformed fixture, zone volume closure, fenestration, shading, daylighting, solar, heat balance, or broad geometry conformance",
 ]
+
+[[algorithm]]
+id = "material_object_family_variants"
+domain = "construction"
+source_map = "docs/src/porting-map/material-source-map.md"
+energyplus_source = [
+  "src/EnergyPlus/HeatBalanceManager.cc",
+  "src/EnergyPlus/Material.cc",
+  "src/EnergyPlus/Material.hh",
+  "src/EnergyPlus/PhaseChangeModeling/HysteresisModel.cc",
+  "src/EnergyPlus/HeatBalFiniteDiffManager.cc",
+  "src/EnergyPlus/MoistureBalanceEMPDManager.cc",
+  "src/EnergyPlus/HeatBalanceHAMTManager.cc",
+]
+rust_target = [
+  "crates/ep_model/src/objects/materials.rs::Material",
+  "crates/ep_compiler/src/compiler.rs::Compiler::parse_materials",
+]
+status = "scaffold"
+first_case = "construction_materials_001"
+proof_variables = [
+  "Material CTF Summary Thermal Resistance",
+]
+claim_level = "none"
+support_boundary = "CP58 material-family scaffold: all 34 EnergyPlus 26.1 public material base/overlay objects and their source-owned order are inventoried, while the bounded typed implementation covers only Material and Material:NoMass variants. The remaining 20 base definitions and 12 overlays/datasets, complete GetMaterialData behavior, algorithm-specific consumers, blocking family gates, and broad material/construction/conduction/window behavior remain deferred; this entry does not add a conformance claim."
+
+routine.get_window_glass_spectral_data.source_file = "src/EnergyPlus/Material.cc"
+routine.get_window_glass_spectral_data.source_routine = "GetWindowGlassSpectralData"
+routine.get_window_glass_spectral_data.source_map = "docs/src/porting-map/material-source-map.md"
+routine.get_window_glass_spectral_data.completion_status = "source_mapped"
+routine.get_window_glass_spectral_data.required_for_full_domain = false
+
+routine.get_material_data.source_file = "src/EnergyPlus/Material.cc"
+routine.get_material_data.source_routine = "GetMaterialData"
+routine.get_material_data.source_map = "docs/src/porting-map/material-source-map.md"
+routine.get_material_data.completion_status = "source_mapped"
+routine.get_material_data.required_for_full_domain = false
+
+routine.get_variable_absorptance_input.source_file = "src/EnergyPlus/Material.cc"
+routine.get_variable_absorptance_input.source_routine = "GetVariableAbsorptanceInput"
+routine.get_variable_absorptance_input.source_map = "docs/src/porting-map/material-source-map.md"
+routine.get_variable_absorptance_input.completion_status = "source_mapped"
+routine.get_variable_absorptance_input.required_for_full_domain = false
+
+routine.get_hysteresis_data.source_file = "src/EnergyPlus/PhaseChangeModeling/HysteresisModel.cc"
+routine.get_hysteresis_data.source_routine = "GetHysteresisData"
+routine.get_hysteresis_data.source_map = "docs/src/porting-map/material-source-map.md"
+routine.get_hysteresis_data.completion_status = "source_mapped"
+routine.get_hysteresis_data.required_for_full_domain = false
+
+routine.get_cond_fd_input.source_file = "src/EnergyPlus/HeatBalFiniteDiffManager.cc"
+routine.get_cond_fd_input.source_routine = "GetCondFDInput"
+routine.get_cond_fd_input.source_map = "docs/src/porting-map/material-source-map.md"
+routine.get_cond_fd_input.completion_status = "source_mapped"
+routine.get_cond_fd_input.required_for_full_domain = false
+
+routine.get_moisture_balance_empd_input.source_file = "src/EnergyPlus/MoistureBalanceEMPDManager.cc"
+routine.get_moisture_balance_empd_input.source_routine = "GetMoistureBalanceEMPDInput"
+routine.get_moisture_balance_empd_input.source_map = "docs/src/porting-map/material-source-map.md"
+routine.get_moisture_balance_empd_input.completion_status = "source_mapped"
+routine.get_moisture_balance_empd_input.required_for_full_domain = false
+
+routine.get_heat_bal_hamt_input.source_file = "src/EnergyPlus/HeatBalanceHAMTManager.cc"
+routine.get_heat_bal_hamt_input.source_routine = "GetHeatBalHAMTInput"
+routine.get_heat_bal_hamt_input.source_map = "docs/src/porting-map/material-source-map.md"
+routine.get_heat_bal_hamt_input.completion_status = "source_mapped"
+routine.get_heat_bal_hamt_input.required_for_full_domain = false

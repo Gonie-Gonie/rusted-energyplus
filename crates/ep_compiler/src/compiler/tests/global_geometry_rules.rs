@@ -62,7 +62,9 @@ fn compile_surface_fixture(global_geometry_rules_object: &str) -> CompileResult 
             "Building": {{
                 "Building": {{"north_axis": 180}}
             }},
-            "Material:NoMass": {{"R13": {{}}}},
+            "Material:NoMass": {{
+                "R13": {{"roughness": "Rough", "thermal_resistance": 1.0}}
+            }},
             "Construction": {{
                 "Wall Construction": {{"outside_layer": "R13"}}
             }},

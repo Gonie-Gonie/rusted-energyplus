@@ -11,12 +11,13 @@ use ep_model::{
     FirstHourInterpolationStartingValues, GeometryCoordinateSystem, GlobalGeometryRules,
     HeatRecoveryType, HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId,
     IdealLoadsFuelType, IdealLoadsLimit, InsideSurfaceConvectionAlgorithm, InternalGainId,
-    LoadDistributionScheme, LoopId, Material, MaterialId, MaterialKind, MaterialSurfaceRoughness,
-    NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName, NumericType, OtherEquipment,
+    LoadDistributionScheme, LoopId, Material, MaterialDefinition, MaterialId,
+    MaterialSurfaceRoughness, NameMap, NoMassMaterial, Node, NodeId, NodeList, NodeListId,
+    NormalizedName, NumericType, OpaqueSurfaceProperties, OtherEquipment,
     OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutsideBoundaryCondition,
     OutsideSurfaceConvectionAlgorithm, People, PeopleNumberCalculationMethod, PlantBranch,
     PlantBranchComponent, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
-    PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RunPeriod,
+    PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RegularMaterial, RunPeriod,
     RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
     ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
     ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleDayType,
@@ -795,67 +796,120 @@ impl<'a> Compiler<'a> {
     }
 
     fn parse_materials(&mut self, model: &mut TypedModel) {
-        for (object_type, kind) in [
-            ("Material", MaterialKind::Mass),
-            ("Material:NoMass", MaterialKind::NoMass),
-        ] {
-            for (name, object) in self.objects(object_type) {
-                let Some(id_value) = self.checked_id(object_type, &name, model.materials.len())
-                else {
-                    continue;
-                };
-                let id = MaterialId(id_value);
-                if model.material_names.insert(&name, id).is_some() {
-                    self.duplicate_name(object_type, &name);
-                    continue;
-                }
+        self.parse_regular_materials(model);
+        self.parse_nomass_materials(model);
+    }
 
-                model.materials.push(Material {
-                    id,
-                    name: NormalizedName::new(&name),
-                    kind,
-                    roughness: self.optional_material_roughness(object_type, &name, &object),
-                    conductivity_w_per_m_k: self.optional_number(
-                        object_type,
-                        &name,
-                        &object,
-                        "conductivity",
-                    ),
-                    density_kg_per_m3: self.optional_number(object_type, &name, &object, "density"),
-                    specific_heat_j_per_kg_k: self.optional_number(
-                        object_type,
-                        &name,
-                        &object,
-                        "specific_heat",
-                    ),
-                    thickness_m: self.optional_number(object_type, &name, &object, "thickness"),
-                    thermal_resistance_m2_k_per_w: self.optional_number(
-                        object_type,
-                        &name,
-                        &object,
-                        "thermal_resistance",
-                    ),
-                    thermal_absorptance: self.optional_number(
-                        object_type,
-                        &name,
-                        &object,
-                        "thermal_absorptance",
-                    ),
-                    solar_absorptance: self.optional_number(
-                        object_type,
-                        &name,
-                        &object,
-                        "solar_absorptance",
-                    ),
-                    visible_absorptance: self.optional_number(
-                        object_type,
-                        &name,
-                        &object,
-                        "visible_absorptance",
-                    ),
-                });
-            }
+    fn parse_regular_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "Material";
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let roughness = self.required_material_roughness(OBJECT_TYPE, &name, &object);
+            let thickness_m =
+                self.required_number_minimum(OBJECT_TYPE, &name, &object, "thickness", 0.0, false);
+            let conductivity_w_per_m_k = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "conductivity",
+                0.0,
+                false,
+            );
+            let density_kg_per_m3 =
+                self.required_number_minimum(OBJECT_TYPE, &name, &object, "density", 0.0, false);
+            let specific_heat_j_per_kg_k = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "specific_heat",
+                100.0,
+                true,
+            );
+            let surface = self.opaque_surface_properties(OBJECT_TYPE, &name, &object);
+            let (
+                Some(roughness),
+                Some(thickness_m),
+                Some(conductivity_w_per_m_k),
+                Some(density_kg_per_m3),
+                Some(specific_heat_j_per_kg_k),
+            ) = (
+                roughness,
+                thickness_m,
+                conductivity_w_per_m_k,
+                density_kg_per_m3,
+                specific_heat_j_per_kg_k,
+            )
+            else {
+                continue;
+            };
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::Regular(RegularMaterial {
+                    roughness,
+                    thickness_m,
+                    conductivity_w_per_m_k,
+                    density_kg_per_m3,
+                    specific_heat_j_per_kg_k,
+                    surface,
+                }),
+            });
         }
+    }
+
+    fn parse_nomass_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "Material:NoMass";
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let roughness = self.required_material_roughness(OBJECT_TYPE, &name, &object);
+            let thermal_resistance_m2_k_per_w = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "thermal_resistance",
+                0.001,
+                true,
+            );
+            let surface = self.opaque_surface_properties(OBJECT_TYPE, &name, &object);
+            let (Some(roughness), Some(thermal_resistance_m2_k_per_w)) =
+                (roughness, thermal_resistance_m2_k_per_w)
+            else {
+                continue;
+            };
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::NoMass(NoMassMaterial {
+                    roughness,
+                    thermal_resistance_m2_k_per_w,
+                    surface,
+                }),
+            });
+        }
+    }
+
+    fn reserve_material_identity(
+        &mut self,
+        model: &mut TypedModel,
+        object_type: &str,
+        name: &str,
+    ) -> Option<(MaterialId, NormalizedName)> {
+        let id = MaterialId(self.checked_id(object_type, name, model.materials.len())?);
+        if model.material_names.insert(name, id).is_some() {
+            self.duplicate_name(object_type, name);
+            return None;
+        }
+        Some((id, NormalizedName::new(name)))
     }
 
     fn parse_constructions(&mut self, model: &mut TypedModel) {
@@ -5758,13 +5812,13 @@ impl<'a> Compiler<'a> {
         }
     }
 
-    fn optional_material_roughness(
+    fn required_material_roughness(
         &mut self,
         object_type: &str,
         object_name: &str,
         object: &RawObject,
     ) -> Option<MaterialSurfaceRoughness> {
-        let roughness = self.optional_string(object_type, object_name, object, "roughness")?;
+        let roughness = self.required_string(object_type, object_name, object, "roughness")?;
         match MaterialSurfaceRoughness::from_energyplus_name(&roughness) {
             Some(value) => Some(value),
             None => {
@@ -5778,6 +5832,77 @@ impl<'a> Compiler<'a> {
                 None
             }
         }
+    }
+
+    fn opaque_surface_properties(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+    ) -> OpaqueSurfaceProperties {
+        OpaqueSurfaceProperties {
+            thermal_absorptance: self.material_absorptance_default(
+                object_type,
+                object_name,
+                object,
+                "thermal_absorptance",
+                0.9,
+                false,
+                0.99999,
+            ),
+            solar_absorptance: self.material_absorptance_default(
+                object_type,
+                object_name,
+                object,
+                "solar_absorptance",
+                0.7,
+                true,
+                1.0,
+            ),
+            visible_absorptance: self.material_absorptance_default(
+                object_type,
+                object_name,
+                object,
+                "visible_absorptance",
+                0.7,
+                true,
+                1.0,
+            ),
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn material_absorptance_default(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+        default: f64,
+        minimum_inclusive: bool,
+        maximum: f64,
+    ) -> f64 {
+        let value = self.number_default(object_type, object_name, object, field, default);
+        let above_minimum = if minimum_inclusive {
+            value >= 0.0
+        } else {
+            value > 0.0
+        };
+        if above_minimum && value <= maximum {
+            return value;
+        }
+
+        let lower_bound = if minimum_inclusive { "[0" } else { "(0" };
+        self.error(
+            "InvalidNumericRange",
+            object_type,
+            Some(object_name),
+            Some(field),
+            format!(
+                "{object_type}/{object_name} field {field} must be in {lower_bound}, {maximum}], got {value}"
+            ),
+        );
+        default
     }
 
     fn optional_number(
@@ -5811,6 +5936,42 @@ impl<'a> Compiler<'a> {
             return None;
         };
         self.number_value(object_type, object_name, field, value)
+    }
+
+    fn required_number_minimum(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+        minimum: f64,
+        inclusive: bool,
+    ) -> Option<f64> {
+        let value = self.required_number(object_type, object_name, object, field)?;
+        let valid = if inclusive {
+            value >= minimum
+        } else {
+            value > minimum
+        };
+        if valid {
+            return Some(value);
+        }
+
+        let comparison = if inclusive {
+            "greater than or equal to"
+        } else {
+            "greater than"
+        };
+        self.error(
+            "InvalidNumericRange",
+            object_type,
+            Some(object_name),
+            Some(field),
+            format!(
+                "{object_type}/{object_name} field {field} must be {comparison} {minimum}, got {value}"
+            ),
+        );
+        None
     }
 
     fn optional_autosize_or_number(
@@ -7753,6 +7914,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 #[cfg(test)]
 mod tests {
     mod global_geometry_rules;
+    mod material_variants;
     mod schedule_day_interval;
     mod schedule_day_list;
     mod schedule_external_interface;
@@ -7786,7 +7948,10 @@ mod tests {
             r#"{
                 "Version": {"Version 1": {"version_identifier": "26.1"}},
                 "Timestep": {"Timestep 1": {}},
-                "Material:NoMass": {"R13": {}, "Finish": {}},
+                "Material:NoMass": {
+                    "R13": {"roughness": "Rough", "thermal_resistance": 1.0},
+                    "Finish": {"roughness": "Rough", "thermal_resistance": 0.1}
+                },
                 "Construction": {"Wall Construction": {"outside_layer": "R13", "layer_2": "Finish"}},
                 "Zone": {"Zone One": {}},
                 "BuildingSurface:Detailed": {
@@ -7981,13 +8146,13 @@ mod tests {
         };
         assert_eq!(model.materials.len(), 2);
         assert_eq!(
-            model.materials[0].roughness,
+            model.materials[0].roughness(),
             Some(MaterialSurfaceRoughness::MediumRough)
         );
         assert_eq!(model.materials[0].thermal_resistance(), Some(0.05));
         assert_eq!(model.materials[0].heat_capacity_per_area(), Some(160_000.0));
         assert_eq!(
-            model.materials[1].roughness,
+            model.materials[1].roughness(),
             Some(MaterialSurfaceRoughness::Rough)
         );
         assert_eq!(model.materials[1].thermal_resistance(), Some(2.29));
@@ -9966,7 +10131,9 @@ mod tests {
     fn missing_surface_zone_emits_diagnostic() -> Result<(), Box<dyn std::error::Error>> {
         let raw_model = parse_epjson_str(
             r#"{
-                "Material:NoMass": {"R13": {}},
+                "Material:NoMass": {
+                    "R13": {"roughness": "Rough", "thermal_resistance": 1.0}
+                },
                 "Construction": {"Wall Construction": {"outside_layer": "R13"}},
                 "BuildingSurface:Detailed": {
                     "Wall One": {

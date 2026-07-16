@@ -40,16 +40,15 @@
         model.materials.push(Material {
             id: MaterialId(0),
             name: NormalizedName::new("R1"),
-            kind: MaterialKind::NoMass,
-            roughness: Some(MaterialSurfaceRoughness::Rough),
-            conductivity_w_per_m_k: None,
-            density_kg_per_m3: None,
-            specific_heat_j_per_kg_k: None,
-            thickness_m: None,
-            thermal_resistance_m2_k_per_w: Some(1.0),
-            thermal_absorptance: Some(0.9),
-            solar_absorptance: Some(0.75),
-            visible_absorptance: Some(0.75),
+            definition: ep_model::MaterialDefinition::NoMass(ep_model::NoMassMaterial {
+                roughness: MaterialSurfaceRoughness::Rough,
+                thermal_resistance_m2_k_per_w: 1.0,
+                surface: ep_model::OpaqueSurfaceProperties {
+                    thermal_absorptance: 0.9,
+                    solar_absorptance: 0.75,
+                    visible_absorptance: 0.75,
+                },
+            }),
         });
         model.constructions.push(Construction {
             id: ConstructionId(0),
@@ -107,16 +106,15 @@
         model.materials.push(Material {
             id: MaterialId(0),
             name: NormalizedName::new("R1"),
-            kind: MaterialKind::NoMass,
-            roughness: Some(MaterialSurfaceRoughness::Rough),
-            conductivity_w_per_m_k: None,
-            density_kg_per_m3: None,
-            specific_heat_j_per_kg_k: None,
-            thickness_m: None,
-            thermal_resistance_m2_k_per_w: Some(1.0),
-            thermal_absorptance: Some(0.9),
-            solar_absorptance: Some(0.75),
-            visible_absorptance: Some(0.75),
+            definition: ep_model::MaterialDefinition::NoMass(ep_model::NoMassMaterial {
+                roughness: MaterialSurfaceRoughness::Rough,
+                thermal_resistance_m2_k_per_w: 1.0,
+                surface: ep_model::OpaqueSurfaceProperties {
+                    thermal_absorptance: 0.9,
+                    solar_absorptance: 0.75,
+                    visible_absorptance: 0.75,
+                },
+            }),
         });
         model.constructions.push(Construction {
             id: ConstructionId(0),

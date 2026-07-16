@@ -1649,12 +1649,13 @@ mod tests {
     use crate::{
         AirLoopHvac, AutoOrNumber, BranchId, BranchListId, ComponentId, ComponentRegistryCategory,
         ConnectorId, ConnectorListId, Construction, ConstructionId, FanComponent, FanComponentKind,
-        InsideSurfaceConvectionAlgorithm, LoopId, Material, MaterialId, MaterialKind,
-        MaterialSurfaceRoughness, ModelGraph, NameMap, Node, NodeGraphDiagnosticCode, NodeId,
-        NormalizedName, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, PlantBranch,
+        InsideSurfaceConvectionAlgorithm, LoopId, Material, MaterialDefinition, MaterialId,
+        MaterialKind, MaterialSurfaceRoughness, ModelGraph, NameMap, NoMassMaterial, Node,
+        NodeGraphDiagnosticCode, NodeId, NormalizedName, OpaqueSurfaceProperties,
+        OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, PlantBranch,
         PlantBranchComponent, PlantBranchList, PlantConnectorKind, PlantConnectorList,
-        PlantConnectorListEntry, PlantLoop, PlantLoopSide, SunExposure, Surface, SurfaceId,
-        SurfaceType, TypedModel, Version, WindExposure, ZoneId,
+        PlantConnectorListEntry, PlantLoop, PlantLoopSide, RegularMaterial, SunExposure, Surface,
+        SurfaceId, SurfaceType, TypedModel, Version, WindExposure, ZoneId,
     };
 
     #[test]
@@ -1707,24 +1708,52 @@ mod tests {
         let material = Material {
             id: MaterialId(0),
             name: NormalizedName::new("Concrete"),
-            kind: MaterialKind::Mass,
-            roughness: None,
-            conductivity_w_per_m_k: Some(2.0),
-            density_kg_per_m3: Some(2_000.0),
-            specific_heat_j_per_kg_k: Some(800.0),
-            thickness_m: Some(0.1),
-            thermal_resistance_m2_k_per_w: None,
-            thermal_absorptance: Some(0.9),
-            solar_absorptance: Some(0.75),
-            visible_absorptance: Some(0.75),
+            definition: MaterialDefinition::Regular(RegularMaterial {
+                roughness: MaterialSurfaceRoughness::MediumRough,
+                thickness_m: 0.1,
+                conductivity_w_per_m_k: 2.0,
+                density_kg_per_m3: 2_000.0,
+                specific_heat_j_per_kg_k: 800.0,
+                surface: OpaqueSurfaceProperties {
+                    thermal_absorptance: 0.9,
+                    solar_absorptance: 0.75,
+                    visible_absorptance: 0.75,
+                },
+            }),
         };
 
+        assert_eq!(material.kind(), MaterialKind::Mass);
+        assert_eq!(material.thickness_m(), Some(0.1));
+        assert_eq!(material.no_mass_thermal_resistance_m2_k_per_w(), None);
         assert_eq!(material.thermal_resistance(), Some(0.05));
         assert_eq!(material.heat_capacity_per_area(), Some(160_000.0));
+        assert_eq!(material.thermal_absorptance(), 0.9);
         assert_eq!(
             MaterialSurfaceRoughness::from_energyplus_name("mediumrough"),
             Some(MaterialSurfaceRoughness::MediumRough)
         );
+    }
+
+    #[test]
+    fn no_mass_material_projects_resistance_without_mass_fields() {
+        let material = Material {
+            id: MaterialId(0),
+            name: NormalizedName::new("R1"),
+            definition: MaterialDefinition::NoMass(NoMassMaterial {
+                roughness: MaterialSurfaceRoughness::Rough,
+                thermal_resistance_m2_k_per_w: 1.0,
+                surface: OpaqueSurfaceProperties::default(),
+            }),
+        };
+
+        assert_eq!(material.kind(), MaterialKind::NoMass);
+        assert_eq!(material.roughness(), Some(MaterialSurfaceRoughness::Rough));
+        assert_eq!(material.thickness_m(), None);
+        assert_eq!(material.no_mass_thermal_resistance_m2_k_per_w(), Some(1.0));
+        assert_eq!(material.thermal_resistance(), Some(1.0));
+        assert_eq!(material.heat_capacity_per_area(), None);
+        assert_eq!(material.solar_absorptance(), 0.7);
+        assert_eq!(material.visible_absorptance(), 0.7);
     }
 
     #[test]

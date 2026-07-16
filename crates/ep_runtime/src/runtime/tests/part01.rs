@@ -124,7 +124,7 @@
         DehumidificationControlType, DemandControlledVentilationType,
         FirstHourInterpolationStartingValues, HeatRecoveryType, HumidificationControlType,
         IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
-        InternalGainId, LoadDistributionScheme, Material, MaterialId, MaterialKind,
+        InternalGainId, LoadDistributionScheme, Material, MaterialId,
         MaterialSurfaceRoughness, Node, NodeId, NodeList, NodeListId, NormalizedName, OtherEquipment,
         OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutputHandle,
         OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,

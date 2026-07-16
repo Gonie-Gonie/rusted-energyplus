@@ -12,8 +12,6 @@ use std::hash::{Hash, Hasher};
 use std::time::Instant;
 
 const SOURCE_FILE: &str = "src/EnergyPlus/HeatBalanceSurfaceManager.cc";
-const DEFAULT_MATERIAL_THERMAL_ABSORPTANCE: f64 = 0.9;
-const DEFAULT_MATERIAL_SOLAR_ABSORPTANCE: f64 = 0.7;
 
 /// Source of CTF coefficients held by one construction thermal cache entry.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -200,19 +198,13 @@ fn construction_thermal_data(
         outside_layer_material_id: outside_material.id,
         outside_layer_material_name: outside_material.name.0.clone(),
         outside_layer_roughness: outside_material
-            .roughness
+            .roughness()
             .unwrap_or(MaterialSurfaceRoughness::MediumRough),
         thermal_resistance_m2_k_per_w,
         heat_capacity_j_per_m2_k,
-        thermal_absorptance: outside_material
-            .thermal_absorptance
-            .unwrap_or(DEFAULT_MATERIAL_THERMAL_ABSORPTANCE),
-        inside_thermal_absorptance: inside_material
-            .thermal_absorptance
-            .unwrap_or(DEFAULT_MATERIAL_THERMAL_ABSORPTANCE),
-        solar_absorptance: outside_material
-            .solar_absorptance
-            .unwrap_or(DEFAULT_MATERIAL_SOLAR_ABSORPTANCE),
+        thermal_absorptance: outside_material.thermal_absorptance(),
+        inside_thermal_absorptance: inside_material.thermal_absorptance(),
+        solar_absorptance: outside_material.solar_absorptance(),
         ctf_coefficient_source,
         ctf_coefficients,
     })

@@ -205,30 +205,28 @@
         typed.materials.push(Material {
             id: MaterialId(1),
             name: NormalizedName::new("Inside Low Absorptance"),
-            kind: MaterialKind::NoMass,
-            roughness: Some(MaterialSurfaceRoughness::Smooth),
-            conductivity_w_per_m_k: None,
-            density_kg_per_m3: None,
-            specific_heat_j_per_kg_k: None,
-            thickness_m: None,
-            thermal_resistance_m2_k_per_w: Some(1.0),
-            thermal_absorptance: Some(0.2),
-            solar_absorptance: Some(0.2),
-            visible_absorptance: Some(0.2),
+            definition: ep_model::MaterialDefinition::NoMass(ep_model::NoMassMaterial {
+                roughness: MaterialSurfaceRoughness::Smooth,
+                thermal_resistance_m2_k_per_w: 1.0,
+                surface: ep_model::OpaqueSurfaceProperties {
+                    thermal_absorptance: 0.2,
+                    solar_absorptance: 0.2,
+                    visible_absorptance: 0.2,
+                },
+            }),
         });
         typed.materials.push(Material {
             id: MaterialId(2),
             name: NormalizedName::new("Inside High Absorptance"),
-            kind: MaterialKind::NoMass,
-            roughness: Some(MaterialSurfaceRoughness::Smooth),
-            conductivity_w_per_m_k: None,
-            density_kg_per_m3: None,
-            specific_heat_j_per_kg_k: None,
-            thickness_m: None,
-            thermal_resistance_m2_k_per_w: Some(1.0),
-            thermal_absorptance: Some(0.8),
-            solar_absorptance: Some(0.8),
-            visible_absorptance: Some(0.8),
+            definition: ep_model::MaterialDefinition::NoMass(ep_model::NoMassMaterial {
+                roughness: MaterialSurfaceRoughness::Smooth,
+                thermal_resistance_m2_k_per_w: 1.0,
+                surface: ep_model::OpaqueSurfaceProperties {
+                    thermal_absorptance: 0.8,
+                    solar_absorptance: 0.8,
+                    visible_absorptance: 0.8,
+                },
+            }),
         });
         typed.constructions[0].layers = vec![MaterialId(0), MaterialId(1)];
         typed.constructions.push(Construction {

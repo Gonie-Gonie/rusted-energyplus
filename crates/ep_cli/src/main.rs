@@ -9476,10 +9476,10 @@ fn construction_material_row(
         layer_count: layer_materials.len(),
         outside_layer_material_name: material.name.0.clone(),
         thermal_conductance_w_per_m2_k: 1.0 / construction_thermal_resistance_m2_k_per_w,
-        material_thickness_m: material.thickness_m,
-        material_conductivity_w_per_m_k: material.conductivity_w_per_m_k,
-        material_density_kg_per_m3: material.density_kg_per_m3,
-        material_specific_heat_j_per_kg_k: material.specific_heat_j_per_kg_k,
+        material_thickness_m: material.thickness_m(),
+        material_conductivity_w_per_m_k: material.conductivity_w_per_m_k(),
+        material_density_kg_per_m3: material.density_kg_per_m3(),
+        material_specific_heat_j_per_kg_k: material.specific_heat_j_per_kg_k(),
         material_thermal_resistance_m2_k_per_w,
     })
 }
