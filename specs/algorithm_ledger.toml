@@ -2102,8 +2102,31 @@ routine.psy_w_fn_tdb_twb_pb.not_claimed_branches = [
 routine.psy_h_fn_tdb_rh_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_h_fn_tdb_rh_pb.source_routine = "PsyHFnTdbRhPb"
 routine.psy_h_fn_tdb_rh_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_h_fn_tdb_rh_pb.completion_status = "source_mapped"
+routine.psy_h_fn_tdb_rh_pb.completion_status = "state_mapped"
 routine.psy_h_fn_tdb_rh_pb.required_for_full_domain = false
+routine.psy_h_fn_tdb_rh_pb.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_h_fn_tdb_rh_pb.read_state = [
+  "arguments `TDB`, `RH`, `PB`, and `CalledFrom`; routine 40 itself reads no mutable state and owns no counter; it forwards `CalledFrom` unchanged to routine 36, which reads its optional counter, routine-25 signed tag/hash/cache entry and optional wrapper counter on every call, miss-side routine-24 statistics, warmup, range-warning, and nested caller state, and for raw `W <= -0.0001` routine-35 warmup, error index, title-deduplicated global recurrence, scratch, and external-caller state; the outer ordered floor and routine 8 read no mutable state",
+]
+routine.psy_h_fn_tdb_rh_pb.write_state = [
+  "the three ordered humidity-ratio floors and routine-8 enthalpy arithmetic write no state; only nested routine 36 may increment its counter, overwrite a routine-25 cache entry, mutate raw saturation-pressure statistics and range diagnostics on a miss, and mutate routine-35 first-warning, scratch, index, and the recurring record shared with routine 38",
+]
+routine.psy_h_fn_tdb_rh_pb.history_state_ownership = "ordinary finite default non-IF97 output is deterministic from the original arguments and the dry-bulb tag representative used only for saturation pressure; cache hit, miss, and collision history changes nested side effects, while reachable negative-NaN sentinel history can change the nested humidity-ratio value and side effects but the original NaN `TDB` keeps the final enthalpy classification NaN; routine-35 first-warning/index state and its title-deduplicated routine-38 recurrence belong to each `EnergyPlusData` instance"
+routine.psy_h_fn_tdb_rh_pb.unsupported_state = [
+  "nested routine-36 counter; routine-25 cache lifecycle, signed tag/hash/sentinel/collisions, wrapper and raw counters, warmup range diagnostics, and nested caller context; routine-35 shared scratch string, warning stream/totals, first-detail gate, error index, routine-38-shared recurrence count/min/max, SQLite, and callback state",
+]
+routine.psy_h_fn_tdb_rh_pb.inactive_branches = [
+  "raw routine-36 `W > -0.0001` or NaN skips routine 35; every `W < 1.0e-5` is still numerically floored, and the outer routine-40 and inner routine-8 ordered floors preserve rather than replace NaN",
+  "disabling statistics removes counters, disabling errors removes routine 35, and warmup suppresses routine 35 without suppressing the numerical floors or saturation-pressure cache lookup",
+  "`EP_nocache_Psychrometrics` evaluates saturation pressure at the original unquantized `TDB`, while `EP_IF97` changes the liquid-water saturation-pressure branch",
+]
+routine.psy_h_fn_tdb_rh_pb.unsupported_active_branches = [
+  "the default cached routine-25 lookup with representative misses, hit suppression of nested raw side effects and caller context, cache lifecycle/collisions, negative-NaN sentinel, and optional routine-36 and saturation-pressure statistics",
+  "the default errors-enabled inclusive raw `W <= -0.0001` routine-35 flow with warmup, first/recurring diagnostics, exact caller formatting, and cross-routine-38 recurring-title aliasing",
+]
+routine.psy_h_fn_tdb_rh_pb.not_claimed_branches = [
+  "external EnergyPlus numerical parity, cached/no-cache/IF97 equivalence, full IEEE and negative-NaN sentinel payload parity, exact nested diagnostic/statistics/cache behavior, API or EMS dispatch, the downstream WaterCoils root solve, and cooling-tower, evaporative-cooler, hybrid-cooler, refrigeration, water-coil, or other consumer migration",
+]
 
 routine.psy_tsat_fn_pb_raw.source_file = "src/EnergyPlus/Psychrometrics.cc"
 routine.psy_tsat_fn_pb_raw.source_routine = "PsyTsatFnPb_raw"

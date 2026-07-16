@@ -99,9 +99,10 @@ STATE_MAPPED_ROUTINES = frozenset(
         "PsyRhFnTdbWPb",
         "PsyWFnTdbRhPb",
         "PsyWFnTdbTwbPb",
+        "PsyHFnTdbRhPb",
     }
 )
-EXPECTED_STATUS_COUNTS = {"source_mapped": 32, "state_mapped": 21}
+EXPECTED_STATUS_COUNTS = {"source_mapped": 31, "state_mapped": 22}
 
 
 def expected_completion_status(source_routine: str) -> str:
@@ -390,6 +391,7 @@ def self_test_inventory() -> int:
         ("rh_w_pb_state_mapped_downgrade", "PsyRhFnTdbWPb"),
         ("w_tdb_rh_pb_state_mapped_downgrade", "PsyWFnTdbRhPb"),
         ("w_tdb_twb_pb_state_mapped_downgrade", "PsyWFnTdbTwbPb"),
+        ("h_tdb_rh_pb_state_mapped_downgrade", "PsyHFnTdbRhPb"),
     ):
         candidate = copy.deepcopy(baseline)
         routines(candidate)[find_key(candidate, source_routine)][
@@ -483,7 +485,7 @@ def main() -> int:
     print("Psychrometric routine inventory check")
     print(f"  routines: {len(EXPECTED_ROUTINES)}")
     print("  source_order: exact EnergyPlus 26.1 interface order")
-    print("  completion_status: source_mapped=32, state_mapped=21")
+    print("  completion_status: source_mapped=31, state_mapped=22")
     print("  required_for_full_domain: false")
     print("  status: valid")
     return 0
