@@ -565,6 +565,38 @@ pub fn energyplus_psy_rh_fn_tdb_rhov(dry_bulb_c: f64, vapor_density_kg_per_m3: f
     }
 }
 
+/// Canonical EnergyPlus 26.1 `PsyRhFnTdbWPb` ordinary-finite default-build
+/// numerical path.
+///
+/// Saturation pressure is evaluated before applying the humidity-ratio floor,
+/// and the degree-of-saturation expression retains the source grouping. This
+/// pure scaffold uses the default cache's representative temperature while
+/// deferring cache lifecycle, statistics, diagnostics, compile variants, and
+/// the history-dependent negative-NaN sentinel edge.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_rh_fn_tdb_w_pb(
+    dry_bulb_c: f64,
+    humidity_ratio: f64,
+    atmospheric_pressure_pa: f64,
+) -> f64 {
+    let saturation_pressure_pa =
+        energyplus_psy_psat_fn_temp_default_numerical_projection(dry_bulb_c);
+    let humidity_ratio = energyplus_humidity_ratio_floor(humidity_ratio);
+    let degree_of_saturation = humidity_ratio
+        / (0.621_98 * saturation_pressure_pa / (atmospheric_pressure_pa - saturation_pressure_pa));
+    let relative_humidity = degree_of_saturation
+        / (1.0 - (1.0 - degree_of_saturation) * (saturation_pressure_pa / atmospheric_pressure_pa));
+
+    if relative_humidity < 0.0 {
+        0.01
+    } else if relative_humidity > 1.0 {
+        1.0
+    } else {
+        relative_humidity
+    }
+}
+
 fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option<f64> {
     if !temperature_c.is_finite() {
         return None;
@@ -610,3 +642,7 @@ mod saturation_pressure_tests;
 #[cfg(test)]
 #[path = "psychrometrics_vapor_density_relative_humidity_tests.rs"]
 mod vapor_density_relative_humidity_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_humidity_ratio_relative_humidity_tests.rs"]
+mod humidity_ratio_relative_humidity_tests;
