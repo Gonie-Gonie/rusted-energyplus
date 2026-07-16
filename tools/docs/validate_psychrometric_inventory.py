@@ -103,9 +103,13 @@ STATE_MAPPED_ROUTINES = frozenset(
         "PsyTsatFnPb_raw",
         "PsyTdpFnWPb",
         "PsyTdpFnTdbTwbPb",
+        "F6",
+        "F7",
+        "CPCW",
+        "CPHW",
     }
 )
-EXPECTED_STATUS_COUNTS = {"source_mapped": 28, "state_mapped": 25}
+EXPECTED_STATUS_COUNTS = {"source_mapped": 24, "state_mapped": 29}
 
 
 def expected_completion_status(source_routine: str) -> str:
@@ -398,6 +402,10 @@ def self_test_inventory() -> int:
         ("tsat_pb_raw_state_mapped_downgrade", "PsyTsatFnPb_raw"),
         ("tdp_w_pb_state_mapped_downgrade", "PsyTdpFnWPb"),
         ("tdp_tdb_twb_pb_state_mapped_downgrade", "PsyTdpFnTdbTwbPb"),
+        ("f6_state_mapped_downgrade", "F6"),
+        ("f7_state_mapped_downgrade", "F7"),
+        ("cpcw_state_mapped_downgrade", "CPCW"),
+        ("cphw_state_mapped_downgrade", "CPHW"),
     ):
         candidate = copy.deepcopy(baseline)
         routines(candidate)[find_key(candidate, source_routine)][
@@ -410,18 +418,22 @@ def self_test_inventory() -> int:
         )
 
     candidate = copy.deepcopy(baseline)
-    routines(candidate)[find_key(candidate, "F7")]["completion_status"] = "state_mapped"
+    routines(candidate)[find_key(candidate, "InitializePsychRoutines")][
+        "completion_status"
+    ] = "state_mapped"
     expect_invalid(
         "source_mapped_routine_promotion",
         candidate,
-        "F7 completion_status must be exactly 'source_mapped'",
+        "InitializePsychRoutines completion_status must be exactly 'source_mapped'",
     )
 
     candidate = copy.deepcopy(baseline)
     routines(candidate)[find_key(candidate, "PsyCpAirFnW")][
         "completion_status"
     ] = "source_mapped"
-    routines(candidate)[find_key(candidate, "F7")]["completion_status"] = "state_mapped"
+    routines(candidate)[find_key(candidate, "InitializePsychRoutines")][
+        "completion_status"
+    ] = "state_mapped"
     expect_invalid(
         "status_swap_preserves_counts",
         candidate,
@@ -491,7 +503,7 @@ def main() -> int:
     print("Psychrometric routine inventory check")
     print(f"  routines: {len(EXPECTED_ROUTINES)}")
     print("  source_order: exact EnergyPlus 26.1 interface order")
-    print("  completion_status: source_mapped=28, state_mapped=25")
+    print("  completion_status: source_mapped=24, state_mapped=29")
     print("  required_for_full_domain: false")
     print("  status: valid")
     return 0

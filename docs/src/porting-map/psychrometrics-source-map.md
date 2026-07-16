@@ -83,10 +83,10 @@ that the EnergyPlus routine has been ported.
 | 43 | `PsyTdpFnWPb` | dew point from humidity ratio | `Psychrometrics.hh:1529` (inline) | always present | canonical finite-physical default cached-build isolated nonzero-tag outer/raw-miss numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_tdp_fn_w_pb`; routine-42 cache/saved/interpolation/diagnostic/statistics state unassigned | EMS asserted vector, ordered humidity floor and NaN preservation, exact dew-pressure grouping and overflow edge, nested raw projection, clamp/strict-gap/IEEE edges, round trips, and repeated-call purity |
 | 44 | `PsyTdpFnTdbTwbPb_error` | diagnostics | `Psychrometrics.hh:1556`; `Psychrometrics.cc:861` | compiled only with `EP_psych_errors` | intended errors-enabled diagnostics owner; unassigned | strict dew-point-above-wet-bulb-plus-0.1 self-recheck, warmup-only gate, no numeric clamp, caller/Unknown text, shared scratch writes, and first/recurring state |
 | 45 | `PsyTdpFnTdbTwbPb` | dew point from dry/wet bulb | `Psychrometrics.hh:1566` (inline) | always present | canonical ordinary-finite default cached-build isolated nested numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_tdp_fn_tdb_twb_pb`; routine-39/43/44 cache, saved/interpolation, statistics, diagnostics, caller, and lifecycle state unassigned | EMS asserted vector, exact routine-39/floor/routine-43 composition, positive sub-floor cases, ordered cap to the original wet bulb, silent-versus-diagnostic excess boundary, IEEE edges, and repeated-call purity |
-| 46 | `F6` | polynomial helper | `Psychrometrics.hh:1600` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | Horner-order coefficient vectors, signs, zeroes, and floating-point evaluation order |
-| 47 | `F7` | scaled polynomial helper | `Psychrometrics.hh:1605` (broken-line inline declaration) | always present | intended `ep_runtime::psychrometrics`; unassigned | Horner-order coefficient vectors and exact final `1.0E10` scaling; keep this ticket in every count audit |
-| 48 | `CPCW` | chilled-water specific heat | `Psychrometrics.hh:1611` (inline) | always present; temperature argument intentionally unused | intended `ep_runtime::psychrometrics`; unassigned | exact 4180 J/(kg K) result over representative and extreme temperatures |
-| 49 | `CPHW` | hot-water specific heat | `Psychrometrics.hh:1624` (inline) | always present; temperature argument intentionally unused | intended `ep_runtime::psychrometrics`; unassigned | exact 4180 J/(kg K) result over representative and extreme temperatures |
+| 46 | `F6` | polynomial helper | `Psychrometrics.hh:1600` (inline) | always present | canonical stateless degree-5 Horner helper: `ep_runtime::psychrometrics::energyplus_f6` | indirect routine-26 source vectors, nested Horner/no-FMA order, expanded-polynomial difference, IEEE edges, and repeated-call purity |
+| 47 | `F7` | scaled polynomial helper | `Psychrometrics.hh:1605` (broken-line inline declaration) | always present | canonical stateless degree-6 Horner helper with final `/ 1.0E10`: `ep_runtime::psychrometrics::energyplus_f7` | indirect routine-26 source vector, nested Horner order, division-versus-multiplication and early-scaling differences, overflow, IEEE edges, and repeated-call purity |
+| 48 | `CPCW` | chilled-water specific heat | `Psychrometrics.hh:1611` (inline) | always present; temperature argument intentionally unused | canonical exact constant helper: `ep_runtime::psychrometrics::energyplus_cpcw` | upstream EMS 4180 assertion, exact result over every finite/nonfinite/signed-zero temperature class, and repeated-call purity |
+| 49 | `CPHW` | hot-water specific heat | `Psychrometrics.hh:1624` (inline) | always present; temperature argument intentionally unused | canonical exact constant helper: `ep_runtime::psychrometrics::energyplus_cphw` | upstream EMS 4180 assertion, exact result over every finite/nonfinite/signed-zero temperature class, and repeated-call purity |
 | 50 | `RhoH2O` | water density | `Psychrometrics.hh:1637` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | polynomial coefficient vectors across the documented temperature range and boundary handling |
 | 51 | `PsyDeltaHSenFnTdb2Tdb1W` | sensible enthalpy delta | `Psychrometrics.hh:1654` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | sign convention, 1e-5 humidity floor, zero delta, and equality with the stated enthalpy subtraction |
 | 52 | `PsyDeltaHSenFnTdb2W2Tdb1W1` | sensible enthalpy delta | `Psychrometrics.hh:1679` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | minimum-humidity selection, direction/sign, and delegation equality with routine 51 |
@@ -1034,9 +1034,10 @@ does not exercise a hit. There is no upstream sentinel, same-tag alias,
 collision, initialization-versus-clear, independent-state, hit-side-effect,
 or cached-versus-no-cache test.
 
-Promotion of these tickets requires source-order implementations of `F6` and
-`F7`; canonical routine-25, routine-36, and routine-39 dependency contracts;
-all polynomial-boundary, clamp, signed-floor, IEEE, exact-pressure-band,
+CP56-18 supplies source-order `F6` and `F7` helpers and therefore satisfies
+only that seed-helper prerequisite. Promotion of these tickets still requires
+canonical routine-25, routine-36, and routine-39 dependency contracts; all
+polynomial-boundary, clamp, signed-floor, IEEE, exact-pressure-band,
 convergence, and failure vectors; per-state warning/statistics isolation; and
 an exact two-input cache owner with sentinel, same-tag, collision, lifecycle,
 wrong-counter, and hit-side-effect tests. Default-cache and
@@ -1874,6 +1875,161 @@ not_claimed_branches:
 - external EnergyPlus numerical parity, full cache-hit/miss or diagnostic sequence parity, cached/no-cache/interpolation/`EP_IF97` equivalence, full IEEE/NaN-payload/floating-point-exception and cross-platform iterative last-bit parity, exact statistics/warnings/caller/recurrence effects, C/Python API or EMS dispatch, seven direct production consumers, downstream HVAC/collector behavior, or broad psychrometric migration
 <!-- routine-state-contract:v1 end psy_tdp_fn_tdb_twb_pb -->
 
+## CP56-18 Polynomial And Constant-Water Helpers
+
+This checkpoint advances `F6`, `F7`, `CPCW`, and `CPHW` to
+`state_mapped`. The inventory is now 24 source-mapped and 29 state-mapped
+routines. The parent inventory remains `status = "scaffold"`,
+`claim_level = "none"`, and all 53 routines remain outside the full-domain
+required set.
+
+`energyplus_f6` mirrors the five nested multiply/add levels of the source
+degree-5 Horner expression. `energyplus_f7` mirrors six such levels and
+divides the completed numerator by literal `1.0E10`. Neither implementation
+uses `mul_add`, expands powers, reassociates terms, pre-scales coefficients,
+or replaces division with multiplication by `1e-10`. Those distinctions are
+observable: the source routine-26 case-5 vector at `X = 75223` separates the
+source result from both expanded and fused evaluation, `F7(0, 7, 0...)`
+separates final division from multiplication by one ULP, and a large
+high-order coefficient can overflow before F7's final scaling even when an
+early-scaled polynomial would remain finite. EnergyPlus explicitly disables
+floating-point contraction for Clang builds; cross-compiler excess precision,
+rounding mode, exception flags, and NaN payloads remain outside the claim.
+
+There are no direct upstream F6 or F7 assertions. All eight F6 call
+expressions and the sole F7 call expression are mutually exclusive seed cases
+inside source routine 26. The EMS assertion
+`PsyTsatFnHPb(30000, 101325) = 10.318382617 C` within `1e-8` forms
+`HH = 47863.7`, selects case 4, skips pressure correction, and therefore
+indirectly pins the exact F6 helper result. The upstream raw saturation-
+temperature suite reaches the case-9 F7 endpoint `HH = 45866000` but checks
+the enclosing result only as approximately 100 C within 1 C. Rust tests
+therefore distinguish the exact F6 path from the local source-literal F7
+regression and do not mislabel either as a direct helper oracle. Supplying
+these seed helpers does not promote routine 26's piecewise selection,
+pressure-correction loop, cache, statistics, or diagnostics.
+
+`energyplus_cpcw` and `energyplus_cphw` preserve two distinct source
+interfaces even though both return exact binary64 `4180.0` and intentionally
+ignore the value of their caller-evaluated temperature argument. The direct
+EMS tests assert `CpCW(30)` and `CpHW(60)` each equal 4180 within `1e-8`.
+Rust tests additionally cover finite values, infinities, both signed zeros,
+and a payload-bearing quiet NaN. Production audit finds six live CPCW calls
+across three C++ files and 21 live CPHW calls across seven; two extra
+`SteamCoils.cc` CPHW text matches are comments. No EMS dispatcher, plant,
+coil, tank, water-use, or other consumer is migrated here.
+
+All four helpers are always present, have no loop, cache, statistics,
+diagnostic, compile branch, mutable state, or cross-call history.
+
+### `F6` (`f6`)
+
+<!-- routine-state-contract:v1 begin f6 -->
+F6
+
+read_state:
+- arguments `X` and `A0` through `A5` exactly as supplied; the routine has no `EnergyPlusData`, `CalledFrom`, static/global field, cache, statistic, diagnostic, or flag, and its nested source expression semantically evaluates every coefficient
+
+write_state:
+- no state; the routine performs exactly five dependency-ordered multiply/add levels without mutation, explicit fused multiply-add, expansion, or coefficient scaling
+
+history_state_ownership:
+- no cross-call history or cache; under a fixed floating-point environment the result is a pure function of `X` and `A0` through `A5` in the stated Horner order
+
+unsupported_state:
+- none; the source routine has no mutable state, cache, counter, diagnostic, or lifecycle
+
+inactive_branches:
+- none; the routine is always present and has no compile-time branch, guard, short-circuit, or loop
+
+unsupported_active_branches:
+- none; there is no stateful or compile-conditional active branch
+
+not_claimed_branches:
+- a direct upstream F6 helper oracle, cross-compiler/platform fused contraction, excess precision, rounding-mode, floating-point-exception or NaN-payload last-bit parity, routine-26 piecewise selection/pressure correction/cache/statistics/diagnostics, or downstream saturation-temperature migration
+<!-- routine-state-contract:v1 end f6 -->
+
+### `F7` (`f7`)
+
+<!-- routine-state-contract:v1 begin f7 -->
+F7
+
+read_state:
+- arguments `X` and `A0` through `A6` exactly as supplied; the routine has no `EnergyPlusData`, `CalledFrom`, static/global field, cache, statistic, diagnostic, or flag, evaluates every coefficient through six nested Horner levels, and reads literal `1.0E10` only after forming the complete numerator
+
+write_state:
+- no state; the routine performs six dependency-ordered multiply/add levels and one final division without mutation, explicit fused multiply-add, expansion, early coefficient scaling, or substitution of multiplication by `1e-10`
+
+history_state_ownership:
+- no cross-call history or cache; under a fixed floating-point environment the result is a pure function of `X` and `A0` through `A6` in the stated Horner-then-division order
+
+unsupported_state:
+- none; the source routine has no mutable state, cache, counter, diagnostic, or lifecycle
+
+inactive_branches:
+- none; the routine is always present and has no compile-time branch, guard, short-circuit, or loop
+
+unsupported_active_branches:
+- none; there is no stateful or compile-conditional active branch
+
+not_claimed_branches:
+- a direct upstream F7 helper oracle, cross-compiler/platform fused contraction, excess precision, rounding-mode, floating-point-exception or NaN-payload last-bit parity, routine-26 case selection/clamp/pressure correction/cache/statistics/diagnostics, or downstream saturation-temperature migration
+<!-- routine-state-contract:v1 end f7 -->
+
+### `CPCW` (`cpcw`)
+
+<!-- routine-state-contract:v1 begin cpcw -->
+CPCW
+
+read_state:
+- formal argument `Temperature` is passed and caller-evaluated but its value is intentionally never read by the body; the routine has no `EnergyPlusData`, static/global field, cache, statistic, diagnostic, flag, or compile setting
+
+write_state:
+- no state; the routine returns exact literal `4180.0` without mutation or input validation
+
+history_state_ownership:
+- no cross-call history or cache; the return is the same constant for every finite, nonfinite, NaN, and signed-zero temperature value
+
+unsupported_state:
+- none; the source routine has no mutable state, cache, counter, diagnostic, or lifecycle
+
+inactive_branches:
+- none; the routine is always present and has no compile-time branch, guard, validation, or loop
+
+unsupported_active_branches:
+- none; there is no stateful or compile-conditional active branch
+
+not_claimed_branches:
+- EMS parser/dispatch parity, caller expression side effects beyond ordinary Rust argument evaluation, six direct production consumers, plant/node/ice-storage integration, or downstream migration despite the exact helper result
+<!-- routine-state-contract:v1 end cpcw -->
+
+### `CPHW` (`cphw`)
+
+<!-- routine-state-contract:v1 begin cphw -->
+CPHW
+
+read_state:
+- formal argument `Temperature` is passed and caller-evaluated but its value is intentionally never read by the body; the routine has no `EnergyPlusData`, static/global field, cache, statistic, diagnostic, flag, or compile setting
+
+write_state:
+- no state; the routine returns exact literal `4180.0` without mutation or input validation
+
+history_state_ownership:
+- no cross-call history or cache; the return is the same constant for every finite, nonfinite, NaN, and signed-zero temperature value
+
+unsupported_state:
+- none; the source routine has no mutable state, cache, counter, diagnostic, or lifecycle
+
+inactive_branches:
+- none; the routine is always present and has no compile-time branch, guard, validation, or loop
+
+unsupported_active_branches:
+- none; there is no stateful or compile-conditional active branch
+
+not_claimed_branches:
+- EMS parser/dispatch parity, caller expression side effects beyond ordinary Rust argument evaluation, 21 direct production consumers, coil/collector/tank/water-use integration, or downstream migration despite the exact helper result
+<!-- routine-state-contract:v1 end cphw -->
+
 ## Compile-Time Variant Boundary
 
 Unless `EP_nocache_Psychrometrics` is set, the EnergyPlus header enables
@@ -1927,8 +2083,8 @@ The `PsyRhoAirFnPbTdbW`, `PsyRhoAirFnPbTdbW_fast`, `PsyHfgAirFnWTdb`,
 `PsyVFnTdbWPb`, `PsyWFnTdbH`, `PsyPsatFnTemp_raw`, `PsyRhovFnTdbRh`,
 `PsyRhFnTdbRhov`, `PsyRhFnTdbWPb`, `PsyWFnTdbRhPb`,
 `PsyWFnTdbTwbPb`, `PsyHFnTdbRhPb`, `PsyTsatFnPb_raw`,
-`PsyTdpFnWPb`, and `PsyTdpFnTdbTwbPb` tickets are `state_mapped`; the other
-28 ledger routines remain
+`PsyTdpFnWPb`, `PsyTdpFnTdbTwbPb`, `F6`, `F7`, `CPCW`, and `CPHW` tickets
+are `state_mapped`; the other 24 ledger routines remain
 `source_mapped`. All 53 retain
 `required_for_full_domain = false`. Before any
 ticket is promoted further, its

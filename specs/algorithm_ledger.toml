@@ -2226,26 +2226,106 @@ routine.psy_tdp_fn_tdb_twb_pb.not_claimed_branches = [
 routine.f6.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.f6.source_routine = "F6"
 routine.f6.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.f6.completion_status = "source_mapped"
+routine.f6.completion_status = "state_mapped"
 routine.f6.required_for_full_domain = false
+routine.f6.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.f6.read_state = [
+  "arguments `X` and `A0` through `A5` exactly as supplied; the routine has no `EnergyPlusData`, `CalledFrom`, static/global field, cache, statistic, diagnostic, or flag, and its nested source expression semantically evaluates every coefficient",
+]
+routine.f6.write_state = [
+  "no state; the routine performs exactly five dependency-ordered multiply/add levels without mutation, explicit fused multiply-add, expansion, or coefficient scaling",
+]
+routine.f6.history_state_ownership = "no cross-call history or cache; under a fixed floating-point environment the result is a pure function of `X` and `A0` through `A5` in the stated Horner order"
+routine.f6.unsupported_state = [
+  "none; the source routine has no mutable state, cache, counter, diagnostic, or lifecycle",
+]
+routine.f6.inactive_branches = [
+  "none; the routine is always present and has no compile-time branch, guard, short-circuit, or loop",
+]
+routine.f6.unsupported_active_branches = [
+  "none; there is no stateful or compile-conditional active branch",
+]
+routine.f6.not_claimed_branches = [
+  "a direct upstream F6 helper oracle, cross-compiler/platform fused contraction, excess precision, rounding-mode, floating-point-exception or NaN-payload last-bit parity, routine-26 piecewise selection/pressure correction/cache/statistics/diagnostics, or downstream saturation-temperature migration",
+]
 
 routine.f7.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.f7.source_routine = "F7"
 routine.f7.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.f7.completion_status = "source_mapped"
+routine.f7.completion_status = "state_mapped"
 routine.f7.required_for_full_domain = false
+routine.f7.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.f7.read_state = [
+  "arguments `X` and `A0` through `A6` exactly as supplied; the routine has no `EnergyPlusData`, `CalledFrom`, static/global field, cache, statistic, diagnostic, or flag, evaluates every coefficient through six nested Horner levels, and reads literal `1.0E10` only after forming the complete numerator",
+]
+routine.f7.write_state = [
+  "no state; the routine performs six dependency-ordered multiply/add levels and one final division without mutation, explicit fused multiply-add, expansion, early coefficient scaling, or substitution of multiplication by `1e-10`",
+]
+routine.f7.history_state_ownership = "no cross-call history or cache; under a fixed floating-point environment the result is a pure function of `X` and `A0` through `A6` in the stated Horner-then-division order"
+routine.f7.unsupported_state = [
+  "none; the source routine has no mutable state, cache, counter, diagnostic, or lifecycle",
+]
+routine.f7.inactive_branches = [
+  "none; the routine is always present and has no compile-time branch, guard, short-circuit, or loop",
+]
+routine.f7.unsupported_active_branches = [
+  "none; there is no stateful or compile-conditional active branch",
+]
+routine.f7.not_claimed_branches = [
+  "a direct upstream F7 helper oracle, cross-compiler/platform fused contraction, excess precision, rounding-mode, floating-point-exception or NaN-payload last-bit parity, routine-26 case selection/clamp/pressure correction/cache/statistics/diagnostics, or downstream saturation-temperature migration",
+]
 
 routine.cpcw.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.cpcw.source_routine = "CPCW"
 routine.cpcw.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.cpcw.completion_status = "source_mapped"
+routine.cpcw.completion_status = "state_mapped"
 routine.cpcw.required_for_full_domain = false
+routine.cpcw.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.cpcw.read_state = [
+  "formal argument `Temperature` is passed and caller-evaluated but its value is intentionally never read by the body; the routine has no `EnergyPlusData`, static/global field, cache, statistic, diagnostic, flag, or compile setting",
+]
+routine.cpcw.write_state = [
+  "no state; the routine returns exact literal `4180.0` without mutation or input validation",
+]
+routine.cpcw.history_state_ownership = "no cross-call history or cache; the return is the same constant for every finite, nonfinite, NaN, and signed-zero temperature value"
+routine.cpcw.unsupported_state = [
+  "none; the source routine has no mutable state, cache, counter, diagnostic, or lifecycle",
+]
+routine.cpcw.inactive_branches = [
+  "none; the routine is always present and has no compile-time branch, guard, validation, or loop",
+]
+routine.cpcw.unsupported_active_branches = [
+  "none; there is no stateful or compile-conditional active branch",
+]
+routine.cpcw.not_claimed_branches = [
+  "EMS parser/dispatch parity, caller expression side effects beyond ordinary Rust argument evaluation, six direct production consumers, plant/node/ice-storage integration, or downstream migration despite the exact helper result",
+]
 
 routine.cphw.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.cphw.source_routine = "CPHW"
 routine.cphw.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.cphw.completion_status = "source_mapped"
+routine.cphw.completion_status = "state_mapped"
 routine.cphw.required_for_full_domain = false
+routine.cphw.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.cphw.read_state = [
+  "formal argument `Temperature` is passed and caller-evaluated but its value is intentionally never read by the body; the routine has no `EnergyPlusData`, static/global field, cache, statistic, diagnostic, flag, or compile setting",
+]
+routine.cphw.write_state = [
+  "no state; the routine returns exact literal `4180.0` without mutation or input validation",
+]
+routine.cphw.history_state_ownership = "no cross-call history or cache; the return is the same constant for every finite, nonfinite, NaN, and signed-zero temperature value"
+routine.cphw.unsupported_state = [
+  "none; the source routine has no mutable state, cache, counter, diagnostic, or lifecycle",
+]
+routine.cphw.inactive_branches = [
+  "none; the routine is always present and has no compile-time branch, guard, validation, or loop",
+]
+routine.cphw.unsupported_active_branches = [
+  "none; there is no stateful or compile-conditional active branch",
+]
+routine.cphw.not_claimed_branches = [
+  "EMS parser/dispatch parity, caller expression side effects beyond ordinary Rust argument evaluation, 21 direct production consumers, coil/collector/tank/water-use integration, or downstream migration despite the exact helper result",
+]
 
 routine.rho_h2o.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.rho_h2o.source_routine = "RhoH2O"
