@@ -348,6 +348,64 @@ fn typed_window_shades_including_unused_remain_run_blocked()
 }
 
 #[test]
+fn typed_equivalent_layer_window_shades_including_unused_remain_run_blocked()
+-> Result<(), Box<dyn std::error::Error>> {
+    let raw = parse_epjson_str(
+        r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "Zone": {"Zone One": {"volume": 100}},
+                "WindowMaterial:Shade:EquivalentLayer": {
+                    "Defaulted Equivalent Shade": {
+                        "front_side_shade_beam_diffuse_solar_transmittance": 0.1,
+                        "back_side_shade_beam_diffuse_solar_transmittance": 0.2,
+                        "front_side_shade_beam_diffuse_solar_reflectance": 0.3,
+                        "back_side_shade_beam_diffuse_solar_reflectance": 0.2
+                    },
+                    "Unused Asymmetric Equivalent Shade": {
+                        "shade_beam_beam_solar_transmittance": 0.1,
+                        "front_side_shade_beam_diffuse_solar_transmittance": 0.2,
+                        "back_side_shade_beam_diffuse_solar_transmittance": 0.3,
+                        "front_side_shade_beam_diffuse_solar_reflectance": 0.3,
+                        "back_side_shade_beam_diffuse_solar_reflectance": 0.2,
+                        "shade_beam_beam_visible_transmittance_at_normal_incidence": 0.1,
+                        "shade_beam_diffuse_visible_transmittance_at_normal_incidence": 0.2,
+                        "shade_beam_diffuse_visible_reflectance_at_normal_incidence": 0.3,
+                        "shade_material_infrared_transmittance": 0.1,
+                        "front_side_shade_material_infrared_emissivity": 0.7,
+                        "back_side_shade_material_infrared_emissivity": 0.6
+                    }
+                }
+            }"#,
+    )?;
+    let result = compile_raw_model(&raw);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let assessment = assess_support(
+        &raw,
+        &result.report,
+        result.model.as_ref(),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+    );
+
+    assert_eq!(assessment.status, SupportStatus::Unsupported);
+    assert_eq!(assessment.run_result_state, RunResultState::RunBlocked);
+    assert_eq!(assessment.runtime_class, RuntimeClass::None);
+    assert!(assessment.unsupported_objects.iter().any(|entry| {
+        entry.object_type == "WindowMaterial:Shade:EquivalentLayer"
+            && entry.count == 2
+            && entry.note
+                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+    }));
+    assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
+        diagnostic.code == "UnsupportedSurfaceBoundary"
+            && diagnostic.object_type.as_deref() == Some("WindowMaterial:Shade:EquivalentLayer")
+    }));
+    Ok(())
+}
+
+#[test]
 fn missing_registry_capability_blocks_runtime_selection() -> Result<(), Box<dyn std::error::Error>>
 {
     let raw = parse_epjson_str(

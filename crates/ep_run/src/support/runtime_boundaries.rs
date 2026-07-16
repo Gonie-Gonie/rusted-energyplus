@@ -336,6 +336,17 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|material| material.kind() == MaterialKind::WindowShade)
             .count(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "WindowMaterial:Shade:EquivalentLayer",
+        typed_model
+            .materials
+            .iter()
+            .filter(|material| material.kind() == MaterialKind::WindowShadeEquivalentLayer)
+            .count(),
+    );
 
     push_typed_unsupported_object(
         registry,
