@@ -607,12 +607,20 @@ first_evidence = "window_material_gap_equivalent_layer_001"
 support_boundary = "Non-blocking diagnostic comparison of the exact fixture-ordered EnergyPlus 26.1 Construction:WindowEquivalentLayer gap-layer occurrence sequence across all five gases and all three vent modes. Occurrence count/order, material name, canonical gas type, and vent type are exact; thickness is exact after reproducing the source {:.3R} EIO serialization policy. One material is reused and one valid definition unused by all equivalent-layer constructions is excluded. Construction names and IDF declarations are intentionally aligned with converted-epJSON canonical order, so arbitrary IDF construction declaration-order parity remains unclaimed. Custom coefficients/properties and nominal resistance, Construction:WindowEquivalentLayer typing/ratings, ASHWAT/BuildGap behavior, window runtime, and conformance remain unclaimed."
 
 [[variable]]
+name = "WindowMaterial:GasMixture Generic Definition Details"
+domain = "construction"
+status = "diagnostic"
+first_case = "window_material_gas_mixture_001"
+first_evidence = "window_material_gas_mixture_001"
+support_boundary = "Non-blocking diagnostic by-name comparison of the six typed WindowMaterial:GasMixture definitions against the EnergyPlus 26.1 generic Material Details rows. Each fixture definition appears exactly once, including the unused definition; MediumRough, source-{:.4R}-serialized thickness, and the fixed zero resistance, conductivity, density, specific-heat, and absorptance fields are exact. The shared WindowMaterial:Gas header is exact and has zero gas data rows. Generic rows expose no active-component count, species, fractions, order, nominal resistance, occurrence/use/reuse status, or mixture thermal behavior. The two exact seven-layer WindowConstruction rows and host/window surface rows are oracle-only fixture-integrity locks. Broad declaration order, construction ratings, fenestration runtime, surface behavior, and conformance remain unclaimed."
+
+[[variable]]
 name = "WindowConstruction Layer Summary"
 domain = "construction"
 status = "diagnostic"
 first_case = "window_glazing_spectral_average_001"
 first_evidence = "window_glazing_spectral_average_001"
-support_boundary = "Non-blocking diagnostic one-layer ordinary window-construction and one-solid equivalent-layer construction EIO fixture-integrity comparisons in the declared glazing fixtures, plus the six exact three-layer ordinary WindowConstruction rows in window_material_gas_001 and the seven exact glass-gap-glass Construction:WindowEquivalentLayer rows in window_material_gap_equivalent_layer_001. Ratings, Rust construction behavior, whole-window behavior, and construction conformance remain unclaimed."
+support_boundary = "Non-blocking diagnostic one-layer ordinary window-construction and one-solid equivalent-layer construction EIO fixture-integrity comparisons in the declared glazing fixtures, plus the six exact glass-gap-glass ordinary WindowConstruction rows in window_material_gas_001, the seven exact glass-gap-glass Construction:WindowEquivalentLayer rows in window_material_gap_equivalent_layer_001, and the two exact seven-layer ordinary WindowConstruction rows in window_material_gas_mixture_001. Ratings, Rust construction behavior, whole-window behavior, and construction conformance remain unclaimed."
 
 [[variable]]
 name = "HeatTransfer Surface Static Inputs"

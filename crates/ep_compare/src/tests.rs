@@ -1,3 +1,5 @@
+mod material_details;
+
 use crate::{
     EioError, EioSurfaceVertex, OrderedTimestampDivergenceReason, SeriesAlignment,
     SeriesComparisonStatus, SeriesDivergenceKind, SeriesSample, Tolerance,

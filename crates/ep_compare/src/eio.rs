@@ -1,7 +1,9 @@
 //! EnergyPlus EIO diagnostic table readers.
 
+mod material_details;
 mod types;
 
+pub use material_details::*;
 pub use types::*;
 
 use std::path::Path;

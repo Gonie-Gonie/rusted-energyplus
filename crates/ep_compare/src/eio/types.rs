@@ -152,6 +152,34 @@ pub struct EioMaterialCtfSummary {
     pub thermal_resistance_m2_k_per_w: f64,
 }
 
+/// Generic material values read from an EnergyPlus `Material Details` row.
+///
+/// Rows are returned in EnergyPlus emission order. Repeated material names are
+/// retained because this type represents EIO rows rather than a name-keyed map.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioMaterialDetails {
+    /// EnergyPlus-normalized material name.
+    pub material_name: String,
+    /// EIO `ThermalResistance {m2-K/w}`.
+    pub thermal_resistance_m2_k_per_w: f64,
+    /// EIO surface roughness label.
+    pub roughness: String,
+    /// Material thickness in meters.
+    pub thickness_m: f64,
+    /// Material conductivity in W/m-K.
+    pub conductivity_w_per_m_k: f64,
+    /// Material density in kg/m3.
+    pub density_kg_per_m3: f64,
+    /// Material specific heat in J/kg-K.
+    pub specific_heat_j_per_kg_k: f64,
+    /// Long-wave thermal absorptance.
+    pub thermal_absorptance: f64,
+    /// Solar absorptance.
+    pub solar_absorptance: f64,
+    /// Visible absorptance.
+    pub visible_absorptance: f64,
+}
+
 /// EIO row format used to describe a construction material layer.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum EioMaterialCtfSummaryFormat {
@@ -334,6 +362,8 @@ pub enum EioError {
     MissingConstructionCtfCoefficient,
     /// No `Material CTF Summary` rows were present.
     MissingMaterialCtfSummary,
+    /// No `Material Details` rows were present.
+    MissingMaterialDetails,
     /// No `WindowMaterial:Glazing` rows were present.
     MissingWindowMaterialGlazing,
     /// No `WindowMaterial:Gas` rows were present.
@@ -423,6 +453,15 @@ pub enum EioError {
         /// Parse failure reason.
         reason: String,
     },
+    /// A `Material Details` row could not be parsed.
+    InvalidMaterialDetails {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
     /// A `WindowMaterial:Glazing` row could not be parsed.
     InvalidWindowMaterialGlazing {
         /// One-based line number.
@@ -483,6 +522,7 @@ impl Display for EioError {
             Self::MissingMaterialCtfSummary => {
                 write!(formatter, "EIO Material CTF Summary not found")
             }
+            Self::MissingMaterialDetails => write!(formatter, "EIO Material Details not found"),
             Self::MissingWindowMaterialGlazing => {
                 write!(formatter, "EIO WindowMaterial:Glazing not found")
             }
@@ -529,6 +569,10 @@ impl Display for EioError {
                 formatter,
                 "invalid EIO Material CTF Summary at line {line}: {reason}: {text}"
             ),
+            Self::InvalidMaterialDetails { line, text, reason } => write!(
+                formatter,
+                "invalid EIO Material Details at line {line}: {reason}: {text}"
+            ),
             Self::InvalidConstructionMaterialSummary { line, text, reason } => write!(
                 formatter,
                 "invalid EIO construction/material summary at line {line}: {reason}: {text}"
@@ -570,6 +614,7 @@ impl std::error::Error for EioError {
             | Self::MissingConstructionCtf
             | Self::MissingConstructionCtfCoefficient
             | Self::MissingMaterialCtfSummary
+            | Self::MissingMaterialDetails
             | Self::MissingWindowMaterialGlazing
             | Self::MissingWindowMaterialGas
             | Self::MissingWindowMaterialGapEquivalentLayer
@@ -579,6 +624,7 @@ impl std::error::Error for EioError {
             | Self::InvalidConstructionCtf { .. }
             | Self::InvalidConstructionCtfCoefficient { .. }
             | Self::InvalidMaterialCtfSummary { .. }
+            | Self::InvalidMaterialDetails { .. }
             | Self::InvalidConstructionMaterialSummary { .. }
             | Self::InvalidWarmupEnvironment { .. }
             | Self::InvalidWindowMaterialGlazing { .. }

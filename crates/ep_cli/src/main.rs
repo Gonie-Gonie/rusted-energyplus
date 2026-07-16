@@ -23,7 +23,7 @@ use ep_compare::{
     load_eio_heat_transfer_surfaces, load_eio_other_equipment_nominal,
     load_eio_surface_geometry_rules, load_eio_warmup_environments,
     load_eio_window_material_glazing, load_eio_window_material_glazing_equivalent_layer,
-    load_eio_zone_geometry, load_eso_series, load_eso_time_series,
+    load_eio_zone_geometry, load_eso_series, load_eso_time_series, parse_eio_material_details,
     parse_eio_window_material_gap_equivalent_layer, parse_eio_window_material_gas,
 };
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
@@ -36,9 +36,9 @@ use ep_model::{
     AutoOrNumber, Construction, ConstructionKind, GeometryCoordinateSystem, GlobalGeometryRules,
     Material, MaterialDefinition, ModelGraph, OtherEquipment, OutsideBoundaryCondition, Point3,
     ScheduleId, SimulationModel, StartingVertexPosition, SurfaceType, TypedModel,
-    VertexEntryDirection, WindowGapEquivalentLayerMaterial, WindowGasMaterial, WindowGasType,
-    WindowGlazingEquivalentLayerMaterial, WindowGlazingRefractionExtinctionMaterial,
-    WindowGlazingSpectralAverageMaterial,
+    VertexEntryDirection, WindowGapEquivalentLayerMaterial, WindowGasMaterial,
+    WindowGasMixtureMaterial, WindowGasType, WindowGlazingEquivalentLayerMaterial,
+    WindowGlazingRefractionExtinctionMaterial, WindowGlazingSpectralAverageMaterial,
 };
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, RawModelSummary, RawValue, load_epjson_file};
@@ -339,6 +339,7 @@ fn print_help() {
     println!("  compare window-glazing-equivalent-layer <input.epJSON> <eplusout.eio>");
     println!("  compare window-material-gas <input.epJSON> <eplusout.eio>");
     println!("  compare window-material-gap-equivalent-layer <input.epJSON> <eplusout.eio>");
+    println!("  compare window-material-gas-mixture <input.epJSON> <eplusout.eio>");
     println!("  compare internal-gains <input.epJSON> <eplusout.eio>");
     println!("  compare internal-convective-gain <input.epJSON> <eplusout.eso>");
     println!("  compare weather-fields <weather.epw> <eplusout.eso>");
@@ -3363,6 +3364,7 @@ fn run_compare_command(args: &[String]) -> i32 {
         Some("window-material-gap-equivalent-layer") => {
             run_compare_window_material_gap_equivalent_layer(&args[1..])
         }
+        Some("window-material-gas-mixture") => run_compare_window_material_gas_mixture(&args[1..]),
         Some("internal-gains") => run_compare_internal_gains(&args[1..]),
         Some("internal-convective-gain") => run_compare_internal_convective_gain(&args[1..]),
         Some("weather-fields") | Some("weather-drybulb") => run_compare_weather_fields(&args[1..]),
@@ -3387,6 +3389,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             eprintln!("usage: eplus-rs compare window-material-gas <input.epJSON> <eplusout.eio>");
             eprintln!(
                 "usage: eplus-rs compare window-material-gap-equivalent-layer <input.epJSON> <eplusout.eio>"
+            );
+            eprintln!(
+                "usage: eplus-rs compare window-material-gas-mixture <input.epJSON> <eplusout.eio>"
             );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(
@@ -3417,6 +3422,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             eprintln!("usage: eplus-rs compare window-material-gas <input.epJSON> <eplusout.eio>");
             eprintln!(
                 "usage: eplus-rs compare window-material-gap-equivalent-layer <input.epJSON> <eplusout.eio>"
+            );
+            eprintln!(
+                "usage: eplus-rs compare window-material-gas-mixture <input.epJSON> <eplusout.eio>"
             );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(
@@ -4682,6 +4690,159 @@ fn run_compare_window_material_gap_equivalent_layer(args: &[String]) -> i32 {
             rust_row.fields.thickness_m,
             oracle_row.gap_vent_type,
             rust_row.fields.gap_vent_type.energyplus_name(),
+            if row_pass { "pass" } else { "fail" },
+        );
+    }
+
+    println!(
+        "  first_divergence: {}",
+        first_divergence.unwrap_or_else(|| "none".to_string())
+    );
+    println!("  status: {}", if passed { "pass" } else { "fail" });
+    if passed { 0 } else { 1 }
+}
+
+fn run_compare_window_material_gas_mixture(args: &[String]) -> i32 {
+    const USAGE: &str =
+        "usage: eplus-rs compare window-material-gas-mixture <input.epJSON> <eplusout.eio>";
+    let Some(input_path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!("{USAGE}");
+        return 2;
+    };
+    let Some(eio_path) = args.get(1) else {
+        eprintln!("missing eplusout.eio path");
+        eprintln!("{USAGE}");
+        return 2;
+    };
+
+    let raw_model = match load_epjson_file(input_path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model else {
+        print_compile_diagnostics(&result.report);
+        return 1;
+    };
+    let rust_rows = window_material_gas_mixture_rows(&model);
+    if rust_rows.is_empty() {
+        eprintln!("no WindowMaterial:GasMixture objects are available for comparison");
+        return 1;
+    }
+
+    let eio_contents = match std::fs::read_to_string(eio_path) {
+        Ok(contents) => contents,
+        Err(error) => {
+            eprintln!("failed to read {}: {error}", eio_path);
+            return 1;
+        }
+    };
+    let oracle_rows = match parse_eio_material_details(&eio_contents) {
+        Ok(rows) => rows,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let oracle_indices = window_material_gas_mixture_oracle_indices(&rust_rows, &oracle_rows);
+    let oracle_material_rows = oracle_indices.iter().map(Vec::len).sum::<usize>();
+    let (gas_header_rows, gas_data_rows) = window_material_gas_eio_shape(&eio_contents);
+
+    let mut passed = true;
+    let mut first_divergence = None;
+    if gas_header_rows != 1 {
+        passed = false;
+        record_first_divergence(
+            &mut first_divergence,
+            format!("shared WindowMaterial:Gas header expected 1 observed {gas_header_rows}"),
+        );
+    }
+    if gas_data_rows != 0 {
+        passed = false;
+        record_first_divergence(
+            &mut first_divergence,
+            format!("WindowMaterial:Gas data rows expected 0 observed {gas_data_rows}"),
+        );
+    }
+
+    println!("Window Material Gas Mixture Comparison");
+    println!("  comparison_class: smoke");
+    println!("  conformance_claim: false");
+    println!("  window_runtime_claim: false");
+    println!("  fenestration_surface_claim: false");
+    println!("  construction_rating_claim: false");
+    println!("  component_count_claim: false");
+    println!("  component_species_claim: false");
+    println!("  component_fraction_claim: false");
+    println!("  component_order_claim: false");
+    println!("  mixture_occurrence_claim: false");
+    println!("  mixture_reuse_claim: false");
+    println!("  mixture_unused_definition_claim: false");
+    println!("  nominal_resistance_claim: false");
+    println!("  broad_idf_declaration_order_claim: false");
+    println!("  arbitrary_idf_declaration_order_claim: false");
+    println!("  tolerance_policy: energyplus-26.1-round-sig-digits-4-normalized-exact");
+    println!("  material_objects: {}", rust_rows.len());
+    println!("  oracle_material_rows: {oracle_material_rows}");
+    println!("  oracle_material_detail_rows: {}", oracle_rows.len());
+    println!("  gas_header_present: {}", gas_header_rows == 1);
+    println!("  gas_header_rows: {gas_header_rows}");
+    println!("  gas_data_rows: {gas_data_rows}");
+
+    for (rust_index, matching_indices) in oracle_indices.iter().enumerate() {
+        let rust_row = &rust_rows[rust_index];
+        if matching_indices.len() != 1 {
+            passed = false;
+            record_first_divergence(
+                &mut first_divergence,
+                format!(
+                    "material {} expected exactly one Material Details row observed {}",
+                    rust_row.material_name,
+                    matching_indices.len()
+                ),
+            );
+            println!(
+                "  definition: {} material: {} oracle_matches: {} status: fail",
+                rust_index + 1,
+                rust_row.material_name,
+                matching_indices.len()
+            );
+            continue;
+        }
+
+        let oracle_row = &oracle_rows[matching_indices[0]];
+        let row_pass = window_material_gas_mixture_row_matches(rust_row, oracle_row);
+        if !row_pass {
+            passed = false;
+            record_window_material_gas_mixture_divergence(
+                &mut first_divergence,
+                rust_row,
+                oracle_row,
+            );
+        }
+        let formatted_rust_thickness =
+            energyplus_material_details_eio_thickness(rust_row.fields.thickness_m)
+                .unwrap_or(f64::NAN);
+        println!(
+            "  definition: {} material: {}/{} roughness: {}/MediumRough thickness_m_eio: {:.9}/{:.9} rust_input_thickness_m: {:.9} thermal_resistance: {:.9}/0 conductivity: {:.9}/0 density: {:.9}/0 specific_heat: {:.9}/0 absorptances_thermal_solar_visible: {:.9},{:.9},{:.9}/0,0,0 status: {}",
+            rust_index + 1,
+            oracle_row.material_name,
+            rust_row.material_name,
+            oracle_row.roughness,
+            oracle_row.thickness_m,
+            formatted_rust_thickness,
+            rust_row.fields.thickness_m,
+            oracle_row.thermal_resistance_m2_k_per_w,
+            oracle_row.conductivity_w_per_m_k,
+            oracle_row.density_kg_per_m3,
+            oracle_row.specific_heat_j_per_kg_k,
+            oracle_row.thermal_absorptance,
+            oracle_row.solar_absorptance,
+            oracle_row.visible_absorptance,
             if row_pass { "pass" } else { "fail" },
         );
     }
@@ -10429,6 +10590,28 @@ fn window_material_gas_rows(model: &TypedModel) -> Result<Vec<WindowMaterialGasR
 }
 
 #[derive(Clone, Debug)]
+struct WindowMaterialGasMixtureRow {
+    material_name: String,
+    fields: WindowGasMixtureMaterial,
+}
+
+fn window_material_gas_mixture_rows(model: &TypedModel) -> Vec<WindowMaterialGasMixtureRow> {
+    model
+        .materials
+        .iter()
+        .filter_map(|material| {
+            let MaterialDefinition::WindowGasMixture(fields) = material.definition else {
+                return None;
+            };
+            Some(WindowMaterialGasMixtureRow {
+                material_name: material.name.0.clone(),
+                fields,
+            })
+        })
+        .collect()
+}
+
+#[derive(Clone, Debug)]
 struct WindowMaterialGapEquivalentLayerRow {
     construction_name: String,
     layer_number: usize,
@@ -10547,41 +10730,176 @@ fn window_material_gas_pairings(
 }
 
 fn energyplus_window_gas_eio_thickness(thickness_m: f64) -> Option<f64> {
-    // WindowManager.cc writes this field with `{:.3R}`. IOFiles.hh selects
-    // fixed output at this threshold and nudges positive values by the same
-    // number of ULPs before decimal formatting to retain RoundSigDigits parity.
+    energyplus_round_sig_digits_positive(thickness_m, 3)
+}
+
+fn energyplus_material_details_eio_thickness(thickness_m: f64) -> Option<f64> {
+    energyplus_round_sig_digits_positive(thickness_m, 4)
+}
+
+fn energyplus_round_sig_digits_positive(value: f64, precision: usize) -> Option<f64> {
+    // EnergyPlus IOFiles.hh selects fixed output at this threshold. It nudges
+    // positive fixed values up to 100000 by three ULPs and scientific values
+    // by one ULP before formatting to retain the legacy RoundSigDigits behavior.
     const FIXED_OUTPUT_THRESHOLD: f64 = f64::from_bits(0x3fb9_9999_9999_9999);
     const MAX_DIGITS_10: i32 = 17;
-    const PRECISION: i32 = 3;
 
-    if !thickness_m.is_finite() || thickness_m <= 0.0 {
+    if !value.is_finite() || value <= 0.0 || precision > MAX_DIGITS_10 as usize {
         return None;
     }
 
-    let fixed_output = thickness_m >= FIXED_OUTPUT_THRESHOLD;
+    let precision_i32 = precision as i32;
+    let fixed_output = value >= FIXED_OUTPUT_THRESHOLD;
     let rendered = if fixed_output {
-        let precision =
-            if thickness_m > 100_000.0 && thickness_m.log10() as i32 + PRECISION >= MAX_DIGITS_10 {
+        let output_precision =
+            if value > 100_000.0 && value.log10() as i32 + precision_i32 >= MAX_DIGITS_10 {
                 0
             } else {
-                PRECISION as usize
+                precision
             };
-        let mut adjusted = thickness_m;
-        if thickness_m <= 100_000.0 {
+        let mut adjusted = value;
+        if value <= 100_000.0 {
             for _ in 0..3 {
                 adjusted = f64::from_bits(adjusted.to_bits() + 1);
             }
         }
-        format!("{adjusted:.precision$}")
+        format!("{adjusted:.output_precision$}")
     } else {
-        let adjusted = f64::from_bits(thickness_m.to_bits() + 1);
-        format!("{adjusted:.3E}")
+        let adjusted = f64::from_bits(value.to_bits() + 1);
+        format!("{adjusted:.precision$E}")
     };
 
     rendered
         .parse::<f64>()
         .ok()
         .filter(|value| value.is_finite() && *value > 0.0)
+}
+
+const WINDOW_MATERIAL_GAS_EIO_HEADER: &str =
+    "! <WindowMaterial:Gas>,Material Name,GasType,Thickness {m}";
+
+fn window_material_gas_eio_shape(eio_contents: &str) -> (usize, usize) {
+    let mut header_rows = 0;
+    let mut data_rows = 0;
+    for line in eio_contents.lines() {
+        if line == WINDOW_MATERIAL_GAS_EIO_HEADER {
+            header_rows += 1;
+        }
+        if line.trim_start().starts_with("WindowMaterial:Gas,") {
+            data_rows += 1;
+        }
+    }
+    (header_rows, data_rows)
+}
+
+fn normalized_material_name(name: &str) -> String {
+    name.trim().to_ascii_uppercase()
+}
+
+fn window_material_gas_mixture_oracle_indices(
+    rust_rows: &[WindowMaterialGasMixtureRow],
+    oracle_rows: &[ep_compare::EioMaterialDetails],
+) -> Vec<Vec<usize>> {
+    let mut indices_by_name = std::collections::BTreeMap::<String, Vec<usize>>::new();
+    for (oracle_index, oracle_row) in oracle_rows.iter().enumerate() {
+        indices_by_name
+            .entry(normalized_material_name(&oracle_row.material_name))
+            .or_default()
+            .push(oracle_index);
+    }
+    rust_rows
+        .iter()
+        .map(|rust_row| {
+            indices_by_name
+                .get(&normalized_material_name(&rust_row.material_name))
+                .cloned()
+                .unwrap_or_default()
+        })
+        .collect()
+}
+
+fn window_material_gas_mixture_numeric_fields(
+    rust_row: &WindowMaterialGasMixtureRow,
+    oracle_row: &ep_compare::EioMaterialDetails,
+) -> [(&'static str, f64, f64); 8] {
+    [
+        (
+            "thickness_m",
+            oracle_row.thickness_m,
+            energyplus_material_details_eio_thickness(rust_row.fields.thickness_m)
+                .unwrap_or(f64::NAN),
+        ),
+        (
+            "thermal_resistance_m2_k_per_w",
+            oracle_row.thermal_resistance_m2_k_per_w,
+            0.0,
+        ),
+        (
+            "conductivity_w_per_m_k",
+            oracle_row.conductivity_w_per_m_k,
+            0.0,
+        ),
+        ("density_kg_per_m3", oracle_row.density_kg_per_m3, 0.0),
+        (
+            "specific_heat_j_per_kg_k",
+            oracle_row.specific_heat_j_per_kg_k,
+            0.0,
+        ),
+        ("thermal_absorptance", oracle_row.thermal_absorptance, 0.0),
+        ("solar_absorptance", oracle_row.solar_absorptance, 0.0),
+        ("visible_absorptance", oracle_row.visible_absorptance, 0.0),
+    ]
+}
+
+fn window_material_gas_mixture_row_matches(
+    rust_row: &WindowMaterialGasMixtureRow,
+    oracle_row: &ep_compare::EioMaterialDetails,
+) -> bool {
+    oracle_row.material_name == rust_row.material_name
+        && oracle_row.roughness == "MediumRough"
+        && window_material_gas_mixture_numeric_fields(rust_row, oracle_row)
+            .into_iter()
+            .all(|(_field, oracle_value, expected_value)| oracle_value == expected_value)
+}
+
+fn record_window_material_gas_mixture_divergence(
+    first_divergence: &mut Option<String>,
+    rust_row: &WindowMaterialGasMixtureRow,
+    oracle_row: &ep_compare::EioMaterialDetails,
+) {
+    let prefix = format!("material {}", rust_row.material_name);
+    if oracle_row.material_name != rust_row.material_name {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "{prefix} field material_name expected {} observed {}",
+                rust_row.material_name, oracle_row.material_name
+            ),
+        );
+        return;
+    }
+    if oracle_row.roughness != "MediumRough" {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "{prefix} field roughness expected MediumRough observed {}",
+                oracle_row.roughness
+            ),
+        );
+        return;
+    }
+    if let Some((field, oracle_value, expected_value)) =
+        window_material_gas_mixture_numeric_fields(rust_row, oracle_row)
+            .into_iter()
+            .find(|(_field, oracle_value, expected_value)| oracle_value != expected_value)
+    {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "{prefix} field {field} expected {expected_value:.9} observed {oracle_value:.9}"
+            ),
+        );
+    }
 }
 
 fn window_material_gas_row_matches(
@@ -23844,6 +24162,238 @@ mod tests {
         );
         for invalid in [0.0, -0.01, f64::NAN, f64::INFINITY] {
             assert_eq!(super::energyplus_window_gas_eio_thickness(invalid), None);
+        }
+    }
+
+    fn window_material_gas_mixture_test_model() -> ep_model::TypedModel {
+        let raw_model = ep_raw_model::parse_epjson_str(
+            r#"{
+                "WindowMaterial:GasMixture": {
+                    "Alpha Mix": {
+                        "thickness":0.123456,
+                        "number_of_gases_in_mixture":2,
+                        "gas_1_type":"Air",
+                        "gas_1_fraction":0.6,
+                        "gas_2_type":"Argon",
+                        "gas_2_fraction":0.4
+                    },
+                    "Beta Mix": {
+                        "thickness":0.00000123456,
+                        "number_of_gases_in_mixture":1,
+                        "gas_1_type":"Xenon",
+                        "gas_1_fraction":1.0,
+                        "gas_2_type":"Krypton",
+                        "gas_2_fraction":1.0
+                    }
+                }
+            }"#,
+        )
+        .expect("window gas-mixture comparison epJSON should parse");
+        let result = ep_compiler::compile_raw_model(&raw_model);
+        assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+        result
+            .model
+            .expect("window gas-mixture comparison model should compile")
+    }
+
+    fn window_material_gas_mixture_oracle_rows() -> Vec<ep_compare::EioMaterialDetails> {
+        ep_compare::parse_eio_material_details(
+            r#" Material Details,BETA MIX,0.0000,MediumRough,1.2346E-006,0.000,0.000,0.000,0.0000,0.0000,0.0000
+ Material Details,UNRELATED GLASS,0.2000,Smooth,0.0030,1.000,2.000,3.000,0.8400,0.5000,0.5000
+ Material Details,ALPHA MIX,0.0000,MediumRough,0.1235,0.000,0.000,0.000,0.0000,0.0000,0.0000
+"#,
+        )
+        .expect("Material Details rows should parse")
+    }
+
+    #[test]
+    fn window_material_gas_mixture_matching_is_definition_based_and_order_independent() {
+        let model = window_material_gas_mixture_test_model();
+        let rust_rows = super::window_material_gas_mixture_rows(&model);
+        let oracle_rows = window_material_gas_mixture_oracle_rows();
+
+        assert_eq!(
+            rust_rows
+                .iter()
+                .map(|row| row.material_name.as_str())
+                .collect::<Vec<_>>(),
+            vec!["ALPHA MIX", "BETA MIX"]
+        );
+        let indices = super::window_material_gas_mixture_oracle_indices(&rust_rows, &oracle_rows);
+        assert_eq!(indices, vec![vec![2], vec![0]]);
+        assert!(
+            indices
+                .iter()
+                .enumerate()
+                .all(|(rust_index, oracle_indices)| {
+                    super::window_material_gas_mixture_row_matches(
+                        &rust_rows[rust_index],
+                        &oracle_rows[oracle_indices[0]],
+                    )
+                })
+        );
+
+        let missing_alpha = oracle_rows[..2].to_vec();
+        assert_eq!(
+            super::window_material_gas_mixture_oracle_indices(&rust_rows, &missing_alpha),
+            vec![vec![], vec![0]],
+            "a missing mixture definition must remain unmatched"
+        );
+
+        let mut duplicate_beta = oracle_rows.clone();
+        duplicate_beta.push(oracle_rows[0].clone());
+        assert_eq!(
+            super::window_material_gas_mixture_oracle_indices(&rust_rows, &duplicate_beta),
+            vec![vec![2], vec![0, 3]],
+            "duplicate matching Material Details rows must not be collapsed"
+        );
+
+        let mut extra_unrelated = oracle_rows.clone();
+        let mut unrelated = oracle_rows[1].clone();
+        unrelated.material_name = "ANOTHER UNRELATED MATERIAL".to_string();
+        extra_unrelated.push(unrelated);
+        assert_eq!(
+            super::window_material_gas_mixture_oracle_indices(&rust_rows, &extra_unrelated),
+            vec![vec![2], vec![0]],
+            "generic rows for unrelated materials are intentionally ignored"
+        );
+    }
+
+    #[test]
+    fn window_material_gas_mixture_matching_gates_exact_generic_fields() {
+        let model = window_material_gas_mixture_test_model();
+        let rust_row = super::window_material_gas_mixture_rows(&model)
+            .into_iter()
+            .next()
+            .expect("Alpha Mix should be typed");
+        let base = window_material_gas_mixture_oracle_rows()[2].clone();
+        assert!(super::window_material_gas_mixture_row_matches(
+            &rust_row, &base
+        ));
+
+        let mut wrong_name = base.clone();
+        wrong_name.material_name = "alpha mix".to_string();
+        assert_eq!(
+            super::window_material_gas_mixture_oracle_indices(
+                std::slice::from_ref(&rust_row),
+                std::slice::from_ref(&wrong_name),
+            ),
+            vec![vec![0]],
+            "lookup normalizes names before exact canonical field comparison"
+        );
+        assert!(!super::window_material_gas_mixture_row_matches(
+            &rust_row,
+            &wrong_name,
+        ));
+
+        let mut wrong_roughness = base.clone();
+        wrong_roughness.roughness = "Smooth".to_string();
+        assert!(!super::window_material_gas_mixture_row_matches(
+            &rust_row,
+            &wrong_roughness,
+        ));
+
+        let mut wrong_thickness = base.clone();
+        wrong_thickness.thickness_m += 0.0001;
+        assert!(!super::window_material_gas_mixture_row_matches(
+            &rust_row,
+            &wrong_thickness,
+        ));
+
+        let mut wrong_zero_rows = Vec::new();
+        let mut wrong = base.clone();
+        wrong.thermal_resistance_m2_k_per_w = 0.1;
+        wrong_zero_rows.push(wrong);
+        let mut wrong = base.clone();
+        wrong.conductivity_w_per_m_k = 0.1;
+        wrong_zero_rows.push(wrong);
+        let mut wrong = base.clone();
+        wrong.density_kg_per_m3 = 0.1;
+        wrong_zero_rows.push(wrong);
+        let mut wrong = base.clone();
+        wrong.specific_heat_j_per_kg_k = 0.1;
+        wrong_zero_rows.push(wrong);
+        let mut wrong = base.clone();
+        wrong.thermal_absorptance = 0.1;
+        wrong_zero_rows.push(wrong);
+        let mut wrong = base.clone();
+        wrong.solar_absorptance = 0.1;
+        wrong_zero_rows.push(wrong);
+        let mut wrong = base.clone();
+        wrong.visible_absorptance = 0.1;
+        wrong_zero_rows.push(wrong);
+        assert!(wrong_zero_rows.iter().all(|oracle_row| {
+            !super::window_material_gas_mixture_row_matches(&rust_row, oracle_row)
+        }));
+
+        let mut divergence = None;
+        super::record_window_material_gas_mixture_divergence(
+            &mut divergence,
+            &rust_row,
+            &wrong_roughness,
+        );
+        assert!(
+            divergence
+                .as_deref()
+                .is_some_and(|value| value.contains("field roughness"))
+        );
+    }
+
+    #[test]
+    fn window_material_gas_mixture_requires_exact_shared_gas_header_and_no_data_rows() {
+        let exact = format!(
+            "{}\n Material Details,MIX,0.0000,MediumRough,0.0127,0.000,0.000,0.000,0.0000,0.0000,0.0000\n",
+            super::WINDOW_MATERIAL_GAS_EIO_HEADER
+        );
+        assert_eq!(super::window_material_gas_eio_shape(&exact), (1, 0));
+
+        let wrong_spacing = "! <WindowMaterial:Gas>, Material Name,GasType,Thickness {m}\n";
+        assert_eq!(
+            super::window_material_gas_eio_shape(wrong_spacing),
+            (0, 0),
+            "the shared EnergyPlus 26.1 header is an exact gate"
+        );
+
+        let data_row = format!(
+            "{}\n WindowMaterial:Gas,FAKE MIXTURE,Air,0.012700\n",
+            super::WINDOW_MATERIAL_GAS_EIO_HEADER
+        );
+        assert_eq!(super::window_material_gas_eio_shape(&data_row), (1, 1));
+
+        let duplicate_header = format!(
+            "{}\n{}\n",
+            super::WINDOW_MATERIAL_GAS_EIO_HEADER,
+            super::WINDOW_MATERIAL_GAS_EIO_HEADER
+        );
+        assert_eq!(
+            super::window_material_gas_eio_shape(&duplicate_header),
+            (2, 0)
+        );
+    }
+
+    #[test]
+    fn window_material_gas_mixture_thickness_uses_four_digit_round_sig_format() {
+        assert_eq!(
+            super::energyplus_material_details_eio_thickness(0.123456),
+            Some(0.1235)
+        );
+        assert_eq!(
+            super::energyplus_material_details_eio_thickness(0.00000123456),
+            Some(0.0000012346)
+        );
+        assert_eq!(
+            super::energyplus_material_details_eio_thickness(1_000_000.123_45),
+            Some(1_000_000.123_4)
+        );
+        assert_eq!(
+            super::energyplus_material_details_eio_thickness(100_000_000_000_000.6),
+            Some(100_000_000_000_001.0)
+        );
+        for invalid in [0.0, -0.01, f64::NAN, f64::INFINITY] {
+            assert_eq!(
+                super::energyplus_material_details_eio_thickness(invalid),
+                None
+            );
         }
     }
 

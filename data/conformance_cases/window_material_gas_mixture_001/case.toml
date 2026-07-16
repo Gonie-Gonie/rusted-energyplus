@@ -1,0 +1,76 @@
+id = "window_material_gas_mixture_001"
+title = "Window material gas-mixture generic definition evidence"
+milestone = "v0.8-heat-balance"
+purpose = "Compare the bounded Rust WindowMaterial:GasMixture typed slice with EnergyPlus generic Material Details definition rows."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The fixture defines six WindowMaterial:GasMixture objects spanning declared component counts one through four, all four standard gas species, nonunit fraction sums, reversed component order, a repeated species, and source-accepted missing active third-component fraction input.",
+  "A COUNT1 XENON MIX retains the schema-required second gas pair as inactive input. D COUNT3 ZERO THIRD MIX omits its active Krypton fraction, which EnergyPlus 26.1 stores as numeric zero in the material input path.",
+  "Five definitions occur in two valid seven-layer Glass-GasMixture-Glass ordinary window constructions. A COUNT1 XENON MIX is reused, while Z UNUSED KRYPTON XENON MIX is deliberately unused.",
+  "EnergyPlus generic Material Details rows are definition echoes: they contain every gas-mixture definition exactly once, including the unused definition, and do not reveal construction occurrence or reuse semantics.",
+  "The generic rows expose only the canonical material name, MediumRough roughness, EnergyPlus {:.4R} thickness serialization, and fixed zero values for resistance, conductivity, density, specific heat, and absorptances.",
+  "The shared WindowMaterial:Gas header is present but there are no WindowMaterial:Gas data rows for a gas-mixture-only fixture. Gas-mixture component count, species, fractions, component order, and first-gas nominal resistance are absent from EIO and remain typed-only evidence.",
+  "The two WindowConstruction rows and named heat-transfer-surface rows are exact oracle-only fixture-integrity locks. Their ratings, layer behavior, surface behavior, and window runtime are not Rust parity claims.",
+  "Construction declarations remain in canonical name order because ConvertInputFormat erases broad IDF declaration order. No broad or arbitrary IDF declaration-order parity is claimed.",
+  "The smoke gate requires a clean EnergyPlus 26.1.0 run, the exact generic Material Details and shared gas headers, the exact six by-definition gas-mixture rows, zero single-gas data rows, exact construction and surface integrity rows, and a passing bounded Rust comparison.",
+  "This is non-blocking diagnostic-only static definition evidence and makes no WindowMaterial:GasMixture conformance claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/window_material_gas_mixture_001/window_material_gas_mixture.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface", "construction"]
+has_zone = true
+has_surface = true
+has_fenestration = true
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/window_material_gas_mixture_001/window_material_gas_mixture.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+epjson = ".runtime/compare-window-material-gas-mixture/26.1.0/window-material-gas-mixture.epJSON"
+
+[[outputs]]
+key = "*"
+variable = "WindowMaterial:GasMixture Generic Definition Details"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "WindowConstruction Layer Summary"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "DISTINCTIVE GAS TEST WINDOW"
+variable = "HeatTransfer Surface Static Inputs"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/window_material_gas_mixture_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-window-material-gas-mixture-smoke"
+blocking = false

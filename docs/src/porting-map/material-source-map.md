@@ -420,9 +420,21 @@ mixture exists but has no `GasMixture` data-row case in the construction-layer
 report switch. Generic `Material Details` reporting can echo a mixture
 definition's name, fixed roughness, and thickness, but it exposes none of the
 component count, types, fractions, order, or first-gas nominal-resistance
-shortcut and is not gated in this typed checkpoint. The implementation
-therefore invents no dedicated mixture EIO row and adds no external
-occurrence, conductivity, window-runtime, or conformance claim.
+shortcut. `window_material_gas_mixture_001` gates that bounded generic row
+instead of inventing a dedicated mixture EIO shape. It compares all six typed
+fixture definitions by normalized name, requires exactly one generic row per
+definition including the unused mixture, and locks `MediumRough`, source
+`{:.4R}` thickness serialization, and the fixed zero resistance,
+conductivity, density, specific-heat, and absorptance columns. The shared
+`WindowMaterial:Gas` header is exact and has zero gas data rows.
+
+Those definition rows cannot establish component count, species, fractions,
+order, first-gas nominal resistance, construction occurrence, reuse, or
+whether a definition is used. The fixture's two exact seven-layer
+`WindowConstruction` rows and its host/window rows are therefore oracle-only
+integrity locks. Broad IDF declaration order, mixture conductivity or other
+thermal properties, construction ratings, window runtime, surface behavior,
+and conformance remain unclaimed.
 
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. The two ordinary glazing variants, `WindowMaterial:Gas`, and
@@ -536,8 +548,12 @@ bounds, safe missing-active-type failure, inactive-field validation and
 discard, standard-gas-only enum, non-unit sums, duplicates, first-gas-only
 nominal resistance, source order, shared names, ordinary-construction
 alternation, consumer family, and explicit runtime block. EnergyPlus emits no
-mixture material data row, so all mixture fields and behavior remain
-typed/source evidence at this checkpoint.
+dedicated mixture construction-layer data row.
+`window_material_gas_mixture_001` instead adds the clean six-definition
+generic-`Material Details` gate described above, including the unused
+definition, the exact shared header with zero gas rows, and two oracle-only
+seven-layer construction summaries. Component and occurrence semantics remain
+typed/source evidence because the generic report omits them.
 
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
