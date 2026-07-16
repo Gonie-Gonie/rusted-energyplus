@@ -27,7 +27,8 @@ use ep_model::{
     ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation, SolarDistribution,
     SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
     ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
-    TypedModel, Version, VertexEntryDirection, WeekScheduleId, WindExposure,
+    TypedModel, Version, VertexEntryDirection, WeekScheduleId, WindExposure, WindowGasMaterial,
+    WindowGasPolynomialCoefficients, WindowGasProperties, WindowGasType,
     WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
@@ -241,6 +242,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Material:InfraredTransparent",
     "WindowMaterial:Glazing:RefractionExtinctionMethod",
     "WindowMaterial:Glazing:EquivalentLayer",
+    "WindowMaterial:Gas",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -811,6 +813,7 @@ impl<'a> Compiler<'a> {
         self.parse_window_glazing_materials(model);
         self.parse_window_glazing_refraction_extinction_materials(model);
         self.parse_window_glazing_equivalent_layer_materials(model);
+        self.parse_window_gas_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -1643,12 +1646,207 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_window_gas_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowMaterial:Gas";
+        const CUSTOM_COEFFICIENT_FIELDS: [&str; 9] = [
+            "conductivity_coefficient_a",
+            "conductivity_coefficient_b",
+            "conductivity_coefficient_c",
+            "viscosity_coefficient_a",
+            "viscosity_coefficient_b",
+            "viscosity_coefficient_c",
+            "specific_heat_coefficient_a",
+            "specific_heat_coefficient_b",
+            "specific_heat_coefficient_c",
+        ];
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let gas_type = self.required_enum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "gas_type",
+                WindowGasType::from_energyplus_name,
+            );
+            let thickness_m =
+                self.required_number_minimum(OBJECT_TYPE, &name, &object, "thickness", 0.0, false);
+            let (Some(gas_type), Some(thickness_m)) = (gas_type, thickness_m) else {
+                continue;
+            };
+
+            let conductivity_a =
+                self.optional_number(OBJECT_TYPE, &name, &object, CUSTOM_COEFFICIENT_FIELDS[0]);
+            let conductivity_b =
+                self.optional_number(OBJECT_TYPE, &name, &object, CUSTOM_COEFFICIENT_FIELDS[1]);
+            let conductivity_c =
+                self.optional_number(OBJECT_TYPE, &name, &object, CUSTOM_COEFFICIENT_FIELDS[2]);
+            let viscosity_a = self.optional_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                CUSTOM_COEFFICIENT_FIELDS[3],
+                (0.0, false),
+                (f64::INFINITY, true),
+            );
+            let viscosity_b =
+                self.optional_number(OBJECT_TYPE, &name, &object, CUSTOM_COEFFICIENT_FIELDS[4]);
+            let viscosity_c =
+                self.optional_number(OBJECT_TYPE, &name, &object, CUSTOM_COEFFICIENT_FIELDS[5]);
+            let specific_heat_a = self.optional_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                CUSTOM_COEFFICIENT_FIELDS[6],
+                (0.0, false),
+                (f64::INFINITY, true),
+            );
+            let specific_heat_b =
+                self.optional_number(OBJECT_TYPE, &name, &object, CUSTOM_COEFFICIENT_FIELDS[7]);
+            let specific_heat_c =
+                self.optional_number(OBJECT_TYPE, &name, &object, CUSTOM_COEFFICIENT_FIELDS[8]);
+            let molecular_weight_g_per_mol = self.optional_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "molecular_weight",
+                (20.0, true),
+                (200.0, true),
+            );
+            let specific_heat_ratio = self.optional_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "specific_heat_ratio",
+                (1.0, false),
+                (f64::INFINITY, true),
+            );
+
+            let supplied_properties = [
+                (CUSTOM_COEFFICIENT_FIELDS[0], conductivity_a),
+                (CUSTOM_COEFFICIENT_FIELDS[1], conductivity_b),
+                (CUSTOM_COEFFICIENT_FIELDS[2], conductivity_c),
+                (CUSTOM_COEFFICIENT_FIELDS[3], viscosity_a),
+                (CUSTOM_COEFFICIENT_FIELDS[4], viscosity_b),
+                (CUSTOM_COEFFICIENT_FIELDS[5], viscosity_c),
+                (CUSTOM_COEFFICIENT_FIELDS[6], specific_heat_a),
+                (CUSTOM_COEFFICIENT_FIELDS[7], specific_heat_b),
+                (CUSTOM_COEFFICIENT_FIELDS[8], specific_heat_c),
+                ("molecular_weight", molecular_weight_g_per_mol),
+                ("specific_heat_ratio", specific_heat_ratio),
+            ];
+            let mut properties_valid = supplied_properties
+                .iter()
+                .all(|(field, value)| field_value(&object, field).is_none() || value.is_some());
+
+            let properties = if let Some(properties) = gas_type.standard_properties() {
+                properties
+            } else {
+                for (field, value) in [
+                    (CUSTOM_COEFFICIENT_FIELDS[3], viscosity_a),
+                    (CUSTOM_COEFFICIENT_FIELDS[6], specific_heat_a),
+                    ("molecular_weight", molecular_weight_g_per_mol),
+                ] {
+                    if value.is_none() && field_value(&object, field).is_none() {
+                        self.error(
+                            "MissingCustomWindowGasProperty",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some(field),
+                            format!(
+                                "{OBJECT_TYPE}/{name} custom gas field {field} is effectively required because EnergyPlus reads a blank value as zero and requires it to be positive"
+                            ),
+                        );
+                        properties_valid = false;
+                    }
+                }
+
+                let properties = WindowGasProperties {
+                    conductivity: WindowGasPolynomialCoefficients {
+                        coefficient_a: conductivity_a.unwrap_or(0.0),
+                        coefficient_b: conductivity_b.unwrap_or(0.0),
+                        coefficient_c: conductivity_c.unwrap_or(0.0),
+                    },
+                    viscosity: WindowGasPolynomialCoefficients {
+                        coefficient_a: viscosity_a.unwrap_or(0.0),
+                        coefficient_b: viscosity_b.unwrap_or(0.0),
+                        coefficient_c: viscosity_c.unwrap_or(0.0),
+                    },
+                    specific_heat: WindowGasPolynomialCoefficients {
+                        coefficient_a: specific_heat_a.unwrap_or(0.0),
+                        coefficient_b: specific_heat_b.unwrap_or(0.0),
+                        coefficient_c: specific_heat_c.unwrap_or(0.0),
+                    },
+                    molecular_weight_g_per_mol: molecular_weight_g_per_mol.unwrap_or(0.0),
+                    // EnergyPlus 26.1 accepts a blank custom specific-heat ratio
+                    // and stores the input processor's numeric zero.
+                    specific_heat_ratio: specific_heat_ratio.unwrap_or(0.0),
+                };
+
+                let conductivity_fields_well_typed = [
+                    (CUSTOM_COEFFICIENT_FIELDS[0], conductivity_a),
+                    (CUSTOM_COEFFICIENT_FIELDS[1], conductivity_b),
+                    (CUSTOM_COEFFICIENT_FIELDS[2], conductivity_c),
+                ]
+                .iter()
+                .all(|(field, value)| field_value(&object, field).is_none() || value.is_some());
+                let conductivity_at_300_k = properties.conductivity.at_300_k();
+                if properties_valid
+                    && conductivity_fields_well_typed
+                    && conductivity_at_300_k <= 0.0
+                {
+                    self.error(
+                        "InvalidWindowGasConductivityAt300K",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some("conductivity_coefficient_a"),
+                        format!(
+                            "{OBJECT_TYPE}/{name} conductivity A + 300*B + 90000*C must be greater than zero; A={}, B={}, C={}, k300={conductivity_at_300_k}",
+                            properties.conductivity.coefficient_a,
+                            properties.conductivity.coefficient_b,
+                            properties.conductivity.coefficient_c,
+                        ),
+                    );
+                    properties_valid = false;
+                }
+                properties
+            };
+
+            if !properties_valid {
+                continue;
+            }
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::WindowGas(WindowGasMaterial {
+                    gas_type,
+                    thickness_m,
+                    properties,
+                }),
+            });
+        }
+    }
+
     fn reserve_material_identity(
         &mut self,
         model: &mut TypedModel,
         object_type: &str,
         name: &str,
     ) -> Option<(MaterialId, NormalizedName)> {
+        if name.trim().is_empty() {
+            self.error(
+                "MissingRequiredField",
+                object_type,
+                Some(name),
+                Some("name"),
+                format!("{object_type} requires a nonblank object name"),
+            );
+            return None;
+        }
         let id = MaterialId(self.checked_id(object_type, name, model.materials.len())?);
         if model.material_names.insert(name, id).is_some() {
             self.duplicate_name(object_type, name);
@@ -1774,14 +1972,77 @@ impl<'a> Compiler<'a> {
                 );
                 return None;
             }
-            if layers.len() != 1 {
+            if layers.len() > 7 {
                 self.error(
-                    "UnsupportedWindowConstructionLayering",
+                    "InvalidWindowConstructionLayering",
                     "Construction",
                     Some(construction_name),
-                    Some("layer_2"),
+                    Some("layer_8"),
                     format!(
-                        "Construction/{construction_name} has multiple glazing layers; gas and shading layer source-order dependencies are not typed yet"
+                        "Construction/{construction_name} has more than four glazing layers and three gas gaps"
+                    ),
+                );
+                return None;
+            }
+            for (layer_index, material_id) in layers.iter().enumerate() {
+                let Some(material) = model.materials.get(material_id.0 as usize) else {
+                    let layer_field = if layer_index == 0 {
+                        "outside_layer".to_string()
+                    } else {
+                        format!("layer_{}", layer_index + 1)
+                    };
+                    self.error(
+                        "InvalidConstructionMaterialReference",
+                        "Construction",
+                        Some(construction_name),
+                        Some(&layer_field),
+                        format!(
+                            "Construction/{construction_name} field {layer_field} resolved to an unavailable material ID"
+                        ),
+                    );
+                    return None;
+                };
+                let is_glazing = matches!(
+                    material.definition,
+                    MaterialDefinition::WindowGlazingSpectralAverage(_)
+                        | MaterialDefinition::WindowGlazingRefractionExtinction(_)
+                );
+                let is_gas = matches!(material.definition, MaterialDefinition::WindowGas(_));
+                let expects_glazing = layer_index % 2 == 0;
+                if (expects_glazing && is_glazing) || (!expects_glazing && is_gas) {
+                    continue;
+                }
+
+                let layer_field = if layer_index == 0 {
+                    "outside_layer".to_string()
+                } else {
+                    format!("layer_{}", layer_index + 1)
+                };
+                let expected = if expects_glazing {
+                    "a glazing layer"
+                } else {
+                    "a WindowMaterial:Gas gap"
+                };
+                self.error(
+                    "InvalidWindowConstructionLayering",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&layer_field),
+                    format!(
+                        "Construction/{construction_name} field {layer_field} must be {expected}; the typed window subset requires Glass (Gas Glass) repeated up to three times"
+                    ),
+                );
+                return None;
+            }
+            if layers.len().is_multiple_of(2) {
+                let layer_field = format!("layer_{}", layers.len());
+                self.error(
+                    "InvalidWindowConstructionLayering",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&layer_field),
+                    format!(
+                        "Construction/{construction_name} field {layer_field} is a trailing gas gap; a window construction must end with glazing"
                     ),
                 );
                 return None;
@@ -6825,6 +7086,46 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
+    fn optional_number_bounded(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+        minimum: (f64, bool),
+        maximum: (f64, bool),
+    ) -> Option<f64> {
+        let value = self.optional_number(object_type, object_name, object, field)?;
+        let minimum_valid = if minimum.1 {
+            value >= minimum.0
+        } else {
+            value > minimum.0
+        };
+        let maximum_valid = if maximum.1 {
+            value <= maximum.0
+        } else {
+            value < maximum.0
+        };
+        if minimum_valid && maximum_valid {
+            return Some(value);
+        }
+
+        let lower_bracket = if minimum.1 { "[" } else { "(" };
+        let upper_bracket = if maximum.1 { "]" } else { ")" };
+        self.error(
+            "InvalidNumericRange",
+            object_type,
+            Some(object_name),
+            Some(field),
+            format!(
+                "{object_type}/{object_name} field {field} must be in {lower_bracket}{}, {}{upper_bracket}, got {value}",
+                minimum.0, maximum.0
+            ),
+        );
+        None
+    }
+
     fn required_number(
         &mut self,
         object_type: &str,
@@ -7338,7 +7639,12 @@ impl<'a> Compiler<'a> {
         match self.optional_enum(object_type, object_name, object, field, parser) {
             Some(value) => Some(value),
             None => {
-                if field_value(object, field).is_none() {
+                let missing = match field_value(object, field) {
+                    None => true,
+                    Some(RawValue::String(value)) => value.trim().is_empty(),
+                    Some(_) => false,
+                };
+                if missing {
                     self.error(
                         "MissingRequiredField",
                         object_type,
@@ -8949,6 +9255,7 @@ mod tests {
     mod schedule_scalar_type_limits;
     mod schedule_week_compact;
     mod schedule_year;
+    mod window_material_gas;
     mod window_material_glazing;
     mod window_material_glazing_equivalent_layer;
     mod window_material_glazing_refraction_extinction;

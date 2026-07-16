@@ -292,6 +292,17 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|material| material.kind() == MaterialKind::WindowGlazingEquivalentLayer)
             .count(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "WindowMaterial:Gas",
+        typed_model
+            .materials
+            .iter()
+            .filter(|material| material.kind() == MaterialKind::WindowGas)
+            .count(),
+    );
 
     push_typed_unsupported_object(
         registry,

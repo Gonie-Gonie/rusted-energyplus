@@ -351,7 +351,7 @@ fn constructions_and_building_surfaces_fail_closed_at_family_boundaries() {
             None,
         ),
         (
-            "UnsupportedWindowConstructionLayering",
+            "InvalidWindowConstructionLayering",
             "Construction",
             "Multiple Glass",
             Some("layer_2"),
