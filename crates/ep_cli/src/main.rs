@@ -11,6 +11,7 @@ mod ideal_loads;
 mod internal_gains;
 mod static_model;
 mod time_weather_schedule;
+mod window_material_drape_equivalent_layer;
 mod window_material_shade;
 mod window_material_shade_equivalent_layer;
 
@@ -122,6 +123,7 @@ use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 use time_weather_schedule::generate_time_weather_schedule_report;
+use window_material_drape_equivalent_layer::run_compare_window_material_drape_equivalent_layer;
 use window_material_shade::run_compare_window_material_shade;
 use window_material_shade_equivalent_layer::run_compare_window_material_shade_equivalent_layer;
 
@@ -347,6 +349,9 @@ fn print_help() {
     println!("  compare window-material-shade <input.epJSON> <eplusout.eio>");
     println!(
         "  compare window-material-shade-equivalent-layer <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
+    );
+    println!(
+        "  compare window-material-drape-equivalent-layer <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
     );
     println!("  compare internal-gains <input.epJSON> <eplusout.eio>");
     println!("  compare internal-convective-gain <input.epJSON> <eplusout.eso>");
@@ -3377,6 +3382,9 @@ fn run_compare_command(args: &[String]) -> i32 {
         Some("window-material-shade-equivalent-layer") => {
             run_compare_window_material_shade_equivalent_layer(&args[1..])
         }
+        Some("window-material-drape-equivalent-layer") => {
+            run_compare_window_material_drape_equivalent_layer(&args[1..])
+        }
         Some("internal-gains") => run_compare_internal_gains(&args[1..]),
         Some("internal-convective-gain") => run_compare_internal_convective_gain(&args[1..]),
         Some("weather-fields") | Some("weather-drybulb") => run_compare_weather_fields(&args[1..]),
@@ -3410,6 +3418,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             );
             eprintln!(
                 "usage: eplus-rs compare window-material-shade-equivalent-layer <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
+            );
+            eprintln!(
+                "usage: eplus-rs compare window-material-drape-equivalent-layer <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
             );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(
@@ -3449,6 +3460,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             );
             eprintln!(
                 "usage: eplus-rs compare window-material-shade-equivalent-layer <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
+            );
+            eprintln!(
+                "usage: eplus-rs compare window-material-drape-equivalent-layer <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
             );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(

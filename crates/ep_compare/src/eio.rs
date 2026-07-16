@@ -2,11 +2,13 @@
 
 mod material_details;
 mod types;
+mod window_material_drape_equivalent_layer;
 mod window_material_shade;
 mod window_material_shade_equivalent_layer;
 
 pub use material_details::*;
 pub use types::*;
+pub use window_material_drape_equivalent_layer::*;
 pub use window_material_shade::*;
 pub use window_material_shade_equivalent_layer::*;
 
@@ -96,6 +98,14 @@ pub fn load_eio_window_material_shade_equivalent_layer(
 ) -> Result<Vec<EioWindowMaterialShadeEquivalentLayer>, EioError> {
     let contents = std::fs::read_to_string(path)?;
     parse_eio_window_material_shade_equivalent_layer(&contents)
+}
+
+/// Loads equivalent-layer window drape rows from an EnergyPlus EIO file.
+pub fn load_eio_window_material_drape_equivalent_layer(
+    path: impl AsRef<Path>,
+) -> Result<Vec<EioWindowMaterialDrapeEquivalentLayer>, EioError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_eio_window_material_drape_equivalent_layer(&contents)
 }
 
 /// Loads warmup environment rows from an EnergyPlus EIO file.

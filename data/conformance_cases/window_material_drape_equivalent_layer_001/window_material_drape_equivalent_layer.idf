@@ -1,0 +1,342 @@
+Version,26.1;
+
+SimulationControl,No,No,No,No,Yes,No;
+
+Building,Window Material Drape EquivalentLayer Compare,0.0,Suburbs,0.04,0.4,FullExterior,25,6;
+
+Timestep,4;
+
+HeatBalanceAlgorithm,ConductionTransferFunction;
+
+SurfaceConvectionAlgorithm:Inside,TARP;
+
+SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+Site:Location,Golden,39.74,-105.18,-7.0,1829.0;
+
+Site:GroundTemperature:BuildingSurface,18,18,18,18,18,18,18,18,18,18,18,18;
+
+RunPeriod,Run Period 1,1,1,2013,1,1,2013,Tuesday,Yes,Yes,No,Yes,Yes;
+
+GlobalGeometryRules,UpperLeftCorner,CounterClockWise,World;
+
+Material,
+  DISTINCTIVE EQL DRAPE OPAQUE HOST MATERIAL,
+  Rough,
+  0.113,
+  0.347,
+  913.0,
+  836.0,
+  0.87,
+  0.63,
+  0.58;
+
+WindowMaterial:Glazing:EquivalentLayer,
+  DISTINCTIVE EQL DRAPE TEST GLASS,
+  SpectralAverage,
+  ,
+  0.83,
+  0.83,
+  0.08,
+  0.08,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.76,
+  0.14,
+  0.14,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.84,
+  0.84,
+  0.158;
+
+WindowMaterial:Gap:EquivalentLayer,
+  DISTINCTIVE SEALED AIR EQL DRAPE GAP,
+  Air,
+  0.0127,
+  Sealed;
+
+! Definition order intentionally differs from occurrence/name order.
+WindowMaterial:Drape:EquivalentLayer,
+  Z HIGH PRECISION REUSED EQL DRAPE,
+  0.0000123456,
+  0.123456,
+  0.234567,
+  0.345678,
+  0.456789,
+  0.0234567,
+  0.134567,
+  0.245678,
+  0.0000345678,
+  0.765432,
+  0.654321,
+  0.0123456,
+  0.0234567;
+
+! Valid but unused. Optional beam-beam, visible, infrared, and pleat fields default.
+WindowMaterial:Drape:EquivalentLayer,
+  M DEFAULTED UNUSED EQL DRAPE,
+  ,
+  0.1333,
+  0.1444,
+  0.2555,
+  0.2666;
+
+! Used in a surface-unused construction. Optional fields default.
+WindowMaterial:Drape:EquivalentLayer,
+  A DEFAULTED USED EQL DRAPE,
+  ,
+  0.1111,
+  0.1222,
+  0.2333,
+  0.2444;
+
+! Width-only pleat input is source-normalized to two zero dimensions.
+WindowMaterial:Drape:EquivalentLayer,
+  P WIDTH ONLY EXPLICIT ZERO LENGTH EQL DRAPE,
+  0.01,
+  0.11,
+  0.12,
+  0.21,
+  0.22,
+  ,
+  ,
+  ,
+  0.04,
+  0.8,
+  0.7,
+  0.0123456,
+  0.0;
+
+! Length-only pleat input is source-normalized to two zero dimensions.
+WindowMaterial:Drape:EquivalentLayer,
+  Q EXPLICIT ZERO WIDTH LENGTH ONLY EQL DRAPE,
+  0.02,
+  0.12,
+  0.13,
+  0.22,
+  0.23,
+  ,
+  ,
+  ,
+  0.05,
+  0.75,
+  0.65,
+  0.0,
+  0.0234567;
+
+Construction:WindowEquivalentLayer,
+  A DEFAULTED EQL DRAPE WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL DRAPE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL DRAPE GAP,
+  DISTINCTIVE EQL DRAPE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL DRAPE GAP,
+  A DEFAULTED USED EQL DRAPE;
+
+Construction:WindowEquivalentLayer,
+  B HIGH PRECISION FIRST EQL DRAPE WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL DRAPE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL DRAPE GAP,
+  DISTINCTIVE EQL DRAPE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL DRAPE GAP,
+  Z HIGH PRECISION REUSED EQL DRAPE;
+
+Construction:WindowEquivalentLayer,
+  C HIGH PRECISION SECOND EQL DRAPE WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL DRAPE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL DRAPE GAP,
+  DISTINCTIVE EQL DRAPE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL DRAPE GAP,
+  Z HIGH PRECISION REUSED EQL DRAPE;
+
+Construction:WindowEquivalentLayer,
+  D WIDTH ONLY EQL DRAPE WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL DRAPE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL DRAPE GAP,
+  DISTINCTIVE EQL DRAPE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL DRAPE GAP,
+  P WIDTH ONLY EXPLICIT ZERO LENGTH EQL DRAPE;
+
+Construction:WindowEquivalentLayer,
+  E LENGTH ONLY EQL DRAPE WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL DRAPE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL DRAPE GAP,
+  DISTINCTIVE EQL DRAPE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL DRAPE GAP,
+  Q EXPLICIT ZERO WIDTH LENGTH ONLY EQL DRAPE;
+
+Construction,
+  F EQL DRAPE OPAQUE HOST CONSTRUCTION,
+  DISTINCTIVE EQL DRAPE OPAQUE HOST MATERIAL;
+
+! Fixture-only references prevent nominally-unused-construction warnings without
+! assigning the defaulted, second high-precision, or one-zero pleat cases to surfaces.
+EnergyManagementSystem:ConstructionIndexVariable,
+  DefaultedEqlDrapeConstructionIndex,
+  A DEFAULTED EQL DRAPE WINDOW CONSTRUCTION;
+
+EnergyManagementSystem:ConstructionIndexVariable,
+  UnusedHighPrecisionEqlDrapeConstructionIndex,
+  C HIGH PRECISION SECOND EQL DRAPE WINDOW CONSTRUCTION;
+
+EnergyManagementSystem:ConstructionIndexVariable,
+  WidthOnlyEqlDrapeConstructionIndex,
+  D WIDTH ONLY EQL DRAPE WINDOW CONSTRUCTION;
+
+EnergyManagementSystem:ConstructionIndexVariable,
+  LengthOnlyEqlDrapeConstructionIndex,
+  E LENGTH ONLY EQL DRAPE WINDOW CONSTRUCTION;
+
+Zone,EQL DRAPE TEST ZONE,0,0,0,0,1,1,3,48,16;
+
+BuildingSurface:Detailed,
+  EQL DRAPE TEST FLOOR,
+  Floor,
+  F EQL DRAPE OPAQUE HOST CONSTRUCTION,
+  EQL DRAPE TEST ZONE,
+  ,
+  Ground,
+  ,
+  NoSun,
+  NoWind,
+  1.0,
+  4,
+  4,4,0,
+  4,0,0,
+  0,0,0,
+  0,4,0;
+
+BuildingSurface:Detailed,
+  EQL DRAPE TEST ROOF,
+  Roof,
+  F EQL DRAPE OPAQUE HOST CONSTRUCTION,
+  EQL DRAPE TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.0,
+  4,
+  0,4,3,
+  0,0,3,
+  4,0,3,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  EQL DRAPE TEST WEST WALL,
+  Wall,
+  F EQL DRAPE OPAQUE HOST CONSTRUCTION,
+  EQL DRAPE TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,4,3,
+  0,4,0,
+  0,0,0,
+  0,0,3;
+
+BuildingSurface:Detailed,
+  EQL DRAPE TEST EAST WALL,
+  Wall,
+  F EQL DRAPE OPAQUE HOST CONSTRUCTION,
+  EQL DRAPE TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,0,3,
+  4,0,0,
+  4,4,0,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  DISTINCTIVE EQL DRAPE WINDOW HOST WALL,
+  Wall,
+  F EQL DRAPE OPAQUE HOST CONSTRUCTION,
+  EQL DRAPE TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,0,3,
+  0,0,0,
+  4,0,0,
+  4,0,3;
+
+BuildingSurface:Detailed,
+  EQL DRAPE TEST NORTH WALL,
+  Wall,
+  F EQL DRAPE OPAQUE HOST CONSTRUCTION,
+  EQL DRAPE TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,4,3,
+  4,4,0,
+  0,4,0,
+  0,4,3;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE FIRST HIGH PRECISION EQL DRAPE TEST WINDOW,
+  Window,
+  B HIGH PRECISION FIRST EQL DRAPE WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL DRAPE WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  0.50,0,2.80,
+  0.50,0,1.80,
+  1.50,0,1.80,
+  1.50,0,2.80;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE SECOND HIGH PRECISION EQL DRAPE TEST WINDOW,
+  Window,
+  B HIGH PRECISION FIRST EQL DRAPE WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL DRAPE WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  2.00,0,2.80,
+  2.00,0,1.80,
+  3.00,0,1.80,
+  3.00,0,2.80;
+
+! A reporting element is required to keep the EnergyPlus run warning-free.
+! It is not part of the diagnostic manifest or comparison claim.
+Output:Variable,*,Zone Mean Air Temperature,Hourly;
+
+Output:Constructions,Constructions,Materials;
+
+Output:Surfaces:List,Details;

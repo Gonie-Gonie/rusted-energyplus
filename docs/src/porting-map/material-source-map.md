@@ -631,20 +631,44 @@ payload belongs to `MaterialFamily::EquivalentLayer`, ordinary
 deferred. Arbitrary-run assessment counts every typed drape definition,
 including unused definitions, and explicitly blocks execution.
 
-No family case, proof variable, EIO parser/comparator, or external evidence is
-added at this checkpoint. EnergyPlus 26.1's specialized drape EIO shape is
-known to be malformed: its header advertises separate front/back beam-beam
-columns and contains an additional empty column, while each data row emits
-the shared beam-beam value only once before the four directional
-beam-diffuse values, infrared values, and pleat dimensions. That shape remains
-deferred rather than being normalized into a false claim.
+First typed evidence remains the named compiler/runtime test set.
 
-First evidence is the named compiler test that materializes every input,
-default, and source quirk. Equivalent-layer construction typing and packing,
-ASHWAT drape coefficients and numerical optics/thermal behavior, pleat
-geometry effects, ratings, daylighting, surfaces, EIO comparison, runtime
-execution, exact diagnostics, broad ordering, and any conformance claim
-remain unsupported.
+`window_material_drape_equivalent_layer_001` adds a separate nonblocking
+diagnostic EnergyPlus 26.1 EIO gate. Its generic `Material Details` comparison
+is keyed by normalized name and requires exactly one row for every fixture
+drape definition, including the definition absent from every construction.
+Those rows lock `MediumRough` plus zero resistance, thickness, conductivity,
+density, specific heat, and all three scalar absorptances. They expose none of
+the thirteen optical, infrared, emissivity, or pleat inputs, directional
+thermal projections, use/reuse state, or construction occurrence.
+
+The specialized comparison preserves the malformed upstream shape exactly
+rather than normalizing it. The literal header has 14 comma-separated tokens:
+it advertises separate front/back beam-beam values and contains an empty
+seventh token. Each data row has only 12 tokens and emits material identity,
+the shared N1 beam-beam value once, N2-N5 directional solar beam-diffuse
+values, N9 infrared transmittance, N10/N11 emissivities, and N12/N13 effective
+pleat dimensions. N1, N2-N5, and N9-N11 use EnergyPlus `{:.4R}` serialization;
+N12/N13 use `{:.5R}`. Visible N6-N8 are absent.
+
+The exact fixture-local specialized sequence is A,Z,Z,P,Q: the defaulted
+drape appears once, the high-precision drape appears twice through two
+construction layers, and the two one-sided pleat inputs each report effective
+zero/zero dimensions. The definition absent from every construction is
+excluded. Surfaces do not multiply rows, and surface-unused constructions
+still emit independently of surface use. Fixture-only
+`EnergyManagementSystem:ConstructionIndexVariable` references merely suppress
+oracle unused-construction warnings and are not compared.
+
+The specialized header requires an `Output:Constructions` object selecting
+`Constructions`, at least one drape definition, and any ordinary,
+complex-fenestration, or equivalent-layer window construction. Selecting only
+`Materials` requests the generic table but not the specialized table.
+Equivalent-layer construction typing and packing, arbitrary IDF declaration
+order, ASHWAT drape coefficients and numerical optics/thermal/pleat behavior,
+visible optical use, ratings, daylighting, surfaces, EMS behavior, runtime,
+exact input-validation diagnostics, broad ordering, and conformance remain
+unsupported.
 
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. The two ordinary glazing variants, `WindowMaterial:Gas`, and
@@ -803,9 +827,11 @@ solar beam-beam storage, front-only visible TAR storage with zero back-visible
 state, fixed roughness/resistance-only behavior and thermal projections,
 all-or-nothing effective pleat dimensions, shared-name/source order,
 equivalent-layer family classification, ordinary-`Construction` rejection,
-typed coverage, and the explicit runtime block. The malformed specialized
-EnergyPlus 26.1 drape EIO header/data shape remains deferred and supplies no
-external evidence or conformance.
+typed coverage, and the explicit runtime block.
+`window_material_drape_equivalent_layer_001` separately locks every generic
+definition row and the malformed-header, duplicate-aware A,Z,Z,P,Q
+construction-occurrence sequence described above, without promoting
+construction, surface, EMS, window execution, or conformance.
 
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
@@ -892,9 +918,12 @@ defaulted occurrence and two high-precision reused occurrences, proving that
 surfaces do not multiply construction rows and that a surface-unused,
 fixture-EMS-referenced construction still emits its layer; visible inputs
 remain typed-only because EIO omits them.
-The equivalent-layer drape checkpoint remains typed-only. Its malformed
-EnergyPlus 26.1 specialized header/data alignment is documented but has no
-family case, proof variable, parser, comparator, or external gate.
+`window_material_drape_equivalent_layer_001` compares all five fixture drape
+definitions against their generic `MediumRough`/all-zero rows, including the
+definition unused by every construction. Its specialized exact malformed
+header and A,Z,Z,P,Q occurrence sequence lock reuse, exclusion of the unused
+definition, zeroed one-sided pleats, and source `{:.4R}`/`{:.5R}` formatting;
+visible inputs remain typed-only because EIO omits them.
 These tests and static EIO smokes remain bounded evidence, not an EnergyPlus
 material-family or window gate.
 
