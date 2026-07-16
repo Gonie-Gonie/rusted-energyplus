@@ -1877,8 +1877,30 @@ routine.psy_w_fn_tdb_h.not_claimed_branches = [
 routine.psy_psat_fn_temp_raw.source_file = "src/EnergyPlus/Psychrometrics.cc"
 routine.psy_psat_fn_temp_raw.source_routine = "PsyPsatFnTemp_raw"
 routine.psy_psat_fn_temp_raw.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_psat_fn_temp_raw.completion_status = "source_mapped"
+routine.psy_psat_fn_temp_raw.completion_status = "state_mapped"
 routine.psy_psat_fn_temp_raw.required_for_full_domain = false
+routine.psy_psat_fn_temp_raw.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_psat_fn_temp_raw.read_state = [
+  "arguments `T` and `CalledFrom`; `EP_psych_stats` reads the per-state raw saturation-pressure call counter, while `EP_psych_errors` reads `WarmupFlag` on every raw evaluation and, for non-warmup `T <= -100.0` or `T >= 200.0`, reads the dedicated saturation-pressure error index and reads `CalledFrom` only for the first such warning",
+]
+routine.psy_psat_fn_temp_raw.write_state = [
+  "the piecewise saturation-pressure calculation writes no state; `EP_psych_stats` increments the per-state raw call counter before the range check, while `EP_psych_errors` mutates warning, error-index, and recurring-warning state only for out-of-range calls outside warmup",
+]
+routine.psy_psat_fn_temp_raw.history_state_ownership = "the numerical result has no cross-call history and is a pure function of raw `T` plus the selected non-IF97 or `EP_IF97` compile branch; `CalledFrom` never changes the result, while optional raw-call statistics and one saturation-pressure recurring-warning history belong to each `EnergyPlusData` instance"
+routine.psy_psat_fn_temp_raw.unsupported_state = [
+  "`EP_psych_stats` raw-call counting plus `EP_psych_errors` warmup suppression, warning stream and totals, caller timestamp, dedicated recurrence index/count/min/max with `C` units, SQLite, and callback state",
+]
+routine.psy_psat_fn_temp_raw.inactive_branches = [
+  "with `EP_nocache_Psychrometrics`, the separately named routine 24 is absent and the same body is compiled as public `PsyPsatFnTemp` on the original unquantized input",
+  "disabling `EP_psych_stats` removes the raw-call increment, while disabling `EP_psych_errors` removes the inclusive endpoint/out-of-range warning flow without changing the pressure result",
+  "defining `EP_IF97` replaces the liquid-water polynomial and the above-200 C constant while leaving the ice branch unchanged; the standard EnergyPlus build does not select this branch",
+]
+routine.psy_psat_fn_temp_raw.unsupported_active_branches = [
+  "default errors-enabled warnings for `T <= -100.0` and `T >= 200.0`, including warmup suppression, first-versus-recurring behavior, caller context, and per-state recurrence, plus the optional statistics-enabled every-raw-call counter",
+]
+routine.psy_psat_fn_temp_raw.not_claimed_branches = [
+  "external EnergyPlus numerical parity, cross-platform `exp`/`log` last-bit and floating-point exception parity, the `EP_IF97` variant, exact diagnostic/statistics side effects, cached-wrapper or no-cache-public-interface parity, and downstream C API, EMS, moisture, weather, or HVAC call-site migration",
+]
 
 routine.psy_psat_fn_temp.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_psat_fn_temp.source_routine = "PsyPsatFnTemp"

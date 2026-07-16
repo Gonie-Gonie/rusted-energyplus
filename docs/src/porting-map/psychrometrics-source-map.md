@@ -61,8 +61,8 @@ that the EnergyPlus routine has been ported.
 | 21 | `PsyVFnTdbWPb` | moist-air specific volume | `Psychrometrics.hh:914` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_v_fn_tdb_w_pb`; stateful statistics/diagnostics adapter unassigned | source vectors, invalid-result fallback, and density reciprocal relationship within source tolerances |
 | 22 | `PsyWFnTdbH_error` | diagnostics | `Psychrometrics.hh:954`; `Psychrometrics.cc:606` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | negative-humidity trigger, corrected value, recurrence suppression, and caller context |
 | 23 | `PsyWFnTdbH` | humidity-ratio inversion | `Psychrometrics.hh:962` (inline) | always present | canonical numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_w_fn_tdb_h`; stateful statistics/diagnostics adapter unassigned | enthalpy round trips, humidity floor/correction branches, and source vectors |
-| 24 | `PsyPsatFnTemp_raw` | saturation pressure raw path | `Psychrometrics.hh:1002`; `Psychrometrics.cc:642` | exists only with `EP_cache_PsyPsatFnTemp`; internal formula selects non-IF97 versus `EP_IF97` branch | partial analogue: private `energyplus_psychrometric_saturation_pressure_pa` | raw branch vectors across ice/water boundaries, range guards, and both IF97 compile branches |
-| 25 | `PsyPsatFnTemp` | saturation pressure and cache | `Psychrometrics.hh:1016,1066`; cached inline in header, no-cache implementation `Psychrometrics.cc:649` | variants selected by `EP_cache_PsyPsatFnTemp`; one logical ticket | partial analogue: private saturation-pressure helper and cache-temperature quantizer | cached/no-cache/raw agreement, cache-key quantization/collisions, range guards, and repeated-call stability |
+| 24 | `PsyPsatFnTemp_raw` | saturation pressure raw path | `Psychrometrics.hh:1002`; `Psychrometrics.cc:642` | exists only with `EP_cache_PsyPsatFnTemp`; internal formula selects non-IF97 versus `EP_IF97` branch | canonical default non-IF97 numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_psat_fn_temp_raw`; stateful statistics/diagnostics and IF97 branch unassigned | raw branch vectors across ice/water boundaries, range guards, and both IF97 compile branches |
+| 25 | `PsyPsatFnTemp` | saturation pressure and cache | `Psychrometrics.hh:1016,1066`; cached inline in header, no-cache implementation `Psychrometrics.cc:649` | variants selected by `EP_cache_PsyPsatFnTemp`; one logical ticket | partial finite numerical projection: private saturation-pressure compatibility helper and cache-temperature quantizer; cache owner unassigned | cached/no-cache/raw agreement, cache-key quantization/collisions, range guards, and repeated-call stability |
 | 26 | `PsyTsatFnHPb_raw` | saturation temperature from enthalpy/pressure raw path | `Psychrometrics.hh:1074`; `Psychrometrics.cc:900` | exists only with `EP_cache_PsyTsatFnHPb` | intended `ep_runtime::psychrometrics`; unassigned | raw inversion vectors, convergence/limits, and identity with cache misses |
 | 27 | `PsyTsatFnHPb` | saturation temperature from enthalpy/pressure and cache | `Psychrometrics.hh:1079,1123`; cached inline in header, no-cache implementation `Psychrometrics.cc:906` | variants selected by `EP_cache_PsyTsatFnHPb`; one logical ticket | intended `ep_runtime::psychrometrics`; unassigned | cached/no-cache/raw agreement, two-input cache key, convergence, and boundary vectors |
 | 28 | `PsyRhovFnTdbRh` | vapor density | `Psychrometrics.hh:1131` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | temperature/RH vectors, physical-domain limits, and reciprocal RH checks |
@@ -841,6 +841,100 @@ not_claimed_branches:
 - external EnergyPlus numerical parity, cross-platform floating-point last-bit and exception parity, exact diagnostic formatting/side effects, statistics history, equivalence with existing ideal-loads approximations, and downstream C API, EMS, sizing, coil, or HVAC call-site migration
 <!-- routine-state-contract:v1 end psy_w_fn_tdb_h -->
 
+## CP56-8 Raw Saturation-Pressure Numerical Scaffold
+
+This checkpoint advances only `PsyPsatFnTemp_raw` to `state_mapped` and leaves
+the public cached/no-cache `PsyPsatFnTemp` ticket at `source_mapped`. The parent
+inventory remains `status = "scaffold"`, `claim_level = "none"`, and all 53
+routines remain outside the full-domain required set.
+
+The standard EnergyPlus build enables psychrometric caching and errors, leaves
+psychrometric statistics disabled, and does not define `EP_IF97`. The canonical
+Rust raw helper therefore implements only the default Hyland-Wexler numerical
+body. With `Tkel = T + 273.15`, source order is: the low constant
+`0.001405102123874164` for `Tkel < 173.15`, the ice expression for
+`Tkel < 273.16`, the default liquid-water expression for `Tkel <= 473.15`, and
+the high constant `1555073.745636215` otherwise. The inactive `EP_IF97` branch
+replaces only the liquid expression and high constant.
+
+Those comparisons are deliberately stated in terms of calculated `Tkel`.
+Binary rounding makes exact `-100 C` take the low-constant branch, exact
+`0.01 C` remain on the ice branch, and exact `200 C` take the liquid branch.
+The diagnostic trigger is separate and inclusive on original input
+`T <= -100.0 || T >= 200.0`, so the endpoint warning behavior cannot be
+inferred from the numerical branch alone. Raw negative infinity returns the
+low constant; positive infinity and NaN fall through to the high constant;
+signed zero produces one common ice-branch result.
+
+Pinned evidence covers the direct EnergyPlus EMS 30 C fixture
+`4246.030243592 Pa`, the functional-API 24 C example near `2985 Pa`, low/ice/
+liquid/high branch vectors, the rounded triple-point and endpoint boundaries,
+IEEE inputs, and repeated/alternating calls. Exact Rust bits pin only the local
+source transcription; external EnergyPlus and cross-platform `exp`/`log`
+last-bit equivalence remain unclaimed.
+
+The pre-existing private `energyplus_psychrometric_saturation_pressure_pa`
+remains a guarded compatibility adapter rather than either canonical ticket.
+It rejects non-finite values, truncates finite input to the default cache
+representative, and now delegates the formula to the raw helper. Its two direct
+callers and all downstream Weather, moisture, and IdealLoads call sites retain
+their existing `Option<f64>` behavior; none are migrated by this checkpoint.
+
+### `PsyPsatFnTemp_raw` (`psy_psat_fn_temp_raw`)
+
+The canonical Rust numerical scaffold is
+`ep_runtime::psychrometrics::energyplus_psy_psat_fn_temp_raw`. Raw range
+warnings and statistics remain per-simulation state and are not emulated by
+the pure helper.
+
+<!-- routine-state-contract:v1 begin psy_psat_fn_temp_raw -->
+PsyPsatFnTemp_raw
+
+read_state:
+- arguments `T` and `CalledFrom`; `EP_psych_stats` reads the per-state raw saturation-pressure call counter, while `EP_psych_errors` reads `WarmupFlag` on every raw evaluation and, for non-warmup `T <= -100.0` or `T >= 200.0`, reads the dedicated saturation-pressure error index and reads `CalledFrom` only for the first such warning
+
+write_state:
+- the piecewise saturation-pressure calculation writes no state; `EP_psych_stats` increments the per-state raw call counter before the range check, while `EP_psych_errors` mutates warning, error-index, and recurring-warning state only for out-of-range calls outside warmup
+
+history_state_ownership:
+- the numerical result has no cross-call history and is a pure function of raw `T` plus the selected non-IF97 or `EP_IF97` compile branch; `CalledFrom` never changes the result, while optional raw-call statistics and one saturation-pressure recurring-warning history belong to each `EnergyPlusData` instance
+
+unsupported_state:
+- `EP_psych_stats` raw-call counting plus `EP_psych_errors` warmup suppression, warning stream and totals, caller timestamp, dedicated recurrence index/count/min/max with `C` units, SQLite, and callback state
+
+inactive_branches:
+- with `EP_nocache_Psychrometrics`, the separately named routine 24 is absent and the same body is compiled as public `PsyPsatFnTemp` on the original unquantized input
+- disabling `EP_psych_stats` removes the raw-call increment, while disabling `EP_psych_errors` removes the inclusive endpoint/out-of-range warning flow without changing the pressure result
+- defining `EP_IF97` replaces the liquid-water polynomial and the above-200 C constant while leaving the ice branch unchanged; the standard EnergyPlus build does not select this branch
+
+unsupported_active_branches:
+- default errors-enabled warnings for `T <= -100.0` and `T >= 200.0`, including warmup suppression, first-versus-recurring behavior, caller context, and per-state recurrence, plus the optional statistics-enabled every-raw-call counter
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, cross-platform `exp`/`log` last-bit and floating-point exception parity, the `EP_IF97` variant, exact diagnostic/statistics side effects, cached-wrapper or no-cache-public-interface parity, and downstream C API, EMS, moisture, weather, or HVAC call-site migration
+<!-- routine-state-contract:v1 end psy_psat_fn_temp_raw -->
+
+### `PsyPsatFnTemp` Cache Deferral (`psy_psat_fn_temp`)
+
+The default wrapper owns 1,048,576 direct-mapped per-`EnergyPlusData` entries,
+uses signed `bits(T) >> 28` tags, indexes with `tag & 0xFFFFF`, compares the full
+tag, and evaluates routine 24 at a representative whose low 28 bits are zero.
+Same-tag inputs alias; different tags sharing a hash evict and recompute. Cache
+hits skip raw statistics, diagnostics, and `CalledFrom`, while the optional
+public lookup counter still increments. A warmup miss can therefore suppress a
+later non-warmup warning until eviction.
+
+Each entry initializes to `iTdb = -1000` and `Psat = 0.0`. The reachable
+negative-NaN tag `-1000` (representative bits `0xffffffc180000000`) is a fresh
+false hit returning `0.0`; after a colliding overwrite, the same input misses
+and raw NaN returns the high constant. This makes routine 25 numerically
+history-dependent outside the physical finite domain. `InitializePsychRoutines`
+refills the array, and cache lifecycle and independent-state ownership remain
+unimplemented in Rust. The no-cache build additionally removes the named raw
+interface and applies the body to original, unquantized `T`. Routine 25 cannot
+advance until those cache, sentinel, compile-variant, diagnostic, statistics,
+and state-isolation contracts have an explicit Rust owner and tests.
+
 ## Compile-Time Variant Boundary
 
 Unless `EP_nocache_Psychrometrics` is set, the EnergyPlus header enables
@@ -891,8 +985,8 @@ The `PsyRhoAirFnPbTdbW`, `PsyRhoAirFnPbTdbW_fast`, `PsyHfgAirFnWTdb`,
 `PsyHgAirFnWTdb`, `PsyHFnTdbW`, `PsyHFnTdbW_fast`, `PsyCpAirFnW`,
 `PsyCpAirFnW_fast`, `PsyTdbFnHW`, `PsyRhovFnTdbRhLBnd0C`,
 `PsyRhovFnTdbWPb`, `PsyRhovFnTdbWPb_fast`, `PsyRhFnTdbRhovLBnd0C`,
-`PsyVFnTdbWPb`, and `PsyWFnTdbH` tickets are `state_mapped`; the other 38
-ledger routines remain `source_mapped`. All 53 retain
+`PsyVFnTdbWPb`, `PsyWFnTdbH`, and `PsyPsatFnTemp_raw` tickets are
+`state_mapped`; the other 37 ledger routines remain `source_mapped`. All 53 retain
 `required_for_full_domain = false`. Before any ticket is promoted further, its
 Rust target, source-vector tests, compile-variant obligations, diagnostic
 behavior where applicable, and external evidence boundary must be recorded.
