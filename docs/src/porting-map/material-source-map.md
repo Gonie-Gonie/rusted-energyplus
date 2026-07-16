@@ -352,6 +352,22 @@ because EIO omits them. Exact
 prove actual use only on the oracle side; the Rust window runtime remains
 unimplemented.
 
+`window_glazing_equivalent_layer_001` adds a dedicated nonblocking
+EnergyPlus 26.1 exact-EIO gate for the complete typed equivalent-layer
+material. Its row has 18 CSV tokens total: the row label plus 17 data fields.
+Rust compares the material identity, `SpectralAverage`, the emitted blank
+dataset slot, and all 14 solar/infrared numeric fields. The 11 visible inputs
+and thermal resistance remain typed-only because this EIO row omits them.
+Parser and CLI tests separately lock the `-99999` EIO sentinel used when the
+three solar diffuse-diffuse inputs are `Autocalculate`, without treating it as
+an ASHWAT-derived value. EnergyPlus emits a material row for each
+equivalent-layer construction-layer occurrence; every oracle occurrence is
+validated by material identity while construction occurrence parity remains
+unclaimed. The exact one-solid `Construction:WindowEquivalentLayer`, opaque
+host, and detailed-window rows prove fixture use only on the oracle side.
+Their layer semantics, U-factor, SHGC, solar transmittance, surface behavior,
+and runtime are not Rust parity claims.
+
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
 dynamic AirGap/IRT heat transfer. It also does not claim exact EnergyPlus
@@ -400,8 +416,13 @@ on a detailed window. The gate is explicitly nonblocking, diagnostic-only,
 and does not compile or execute the fenestration surface in Rust.
 `window_glazing_refraction_extinction_001` applies the same boundary to the
 alternative-input object while comparing every normalized EIO field and
-retaining raw n/k as typed-only evidence. These tests and static EIO smokes
-remain bounded evidence, not an EnergyPlus material-family or window gate.
+retaining raw n/k as typed-only evidence.
+`window_glazing_equivalent_layer_001` compares the dedicated emitted identity
+and all 14 solar/infrared numeric fields, while retaining 11 visible inputs
+and thermal resistance as typed-only evidence and treating the
+equivalent-layer construction and surface rows as oracle-only fixture locks.
+These tests and static EIO smokes remain bounded evidence, not an EnergyPlus
+material-family or window gate.
 
 CP58 remains incomplete until, at minimum:
 

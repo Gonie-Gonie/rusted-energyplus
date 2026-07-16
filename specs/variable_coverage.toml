@@ -572,7 +572,7 @@ domain = "construction"
 status = "diagnostic"
 first_case = "window_glazing_spectral_average_001"
 first_evidence = "window_glazing_spectral_average_001"
-support_boundary = "Non-blocking SpectralAverage input and EnergyPlus EIO row comparison only; no window heat-transfer runtime, optical calculation, or conformance claim."
+support_boundary = "Non-blocking diagnostic SpectralAverage input and EnergyPlus EIO row comparison only; no window heat-transfer runtime, optical calculation, or conformance claim."
 
 [[variable]]
 name = "Normalized WindowMaterial:Glazing Static Inputs"
@@ -580,7 +580,15 @@ domain = "construction"
 status = "diagnostic"
 first_case = "window_glazing_refraction_extinction_001"
 first_evidence = "window_glazing_refraction_extinction_001"
-support_boundary = "Non-blocking RefractionExtinctionMethod typed-input and EnergyPlus-normalized SpectralAverage EIO row comparison only; no window heat-transfer runtime, optical calculation, or conformance claim."
+support_boundary = "Non-blocking diagnostic RefractionExtinctionMethod typed-input and EnergyPlus-normalized SpectralAverage EIO row comparison only; no window heat-transfer runtime, optical calculation, or conformance claim."
+
+[[variable]]
+name = "WindowMaterial:Glazing:EquivalentLayer Static Inputs"
+domain = "construction"
+status = "diagnostic"
+first_case = "window_glazing_equivalent_layer_001"
+first_evidence = "window_glazing_equivalent_layer_001"
+support_boundary = "Non-blocking diagnostic comparison of the EnergyPlus 26.1 equivalent-layer EIO identity fields and 14 emitted solar/infrared numeric fields only; the 11 visible inputs, thermal resistance, spectral-dataset input preservation, ASHWAT/window runtime, equivalent-layer construction ratings, and conformance remain unclaimed."
 
 [[variable]]
 name = "WindowConstruction Layer Summary"
@@ -588,7 +596,7 @@ domain = "construction"
 status = "diagnostic"
 first_case = "window_glazing_spectral_average_001"
 first_evidence = "window_glazing_spectral_average_001"
-support_boundary = "Non-blocking one-layer window-construction EIO comparison in the declared glazing fixtures only; no whole-window or construction conformance claim."
+support_boundary = "Non-blocking diagnostic one-layer ordinary window-construction and one-solid equivalent-layer construction EIO fixture-integrity comparisons in the declared glazing fixtures only; equivalent-layer ratings and Rust construction behavior, whole-window behavior, and construction conformance remain unclaimed."
 
 [[variable]]
 name = "HeatTransfer Surface Static Inputs"
@@ -596,7 +604,7 @@ domain = "surface"
 status = "diagnostic"
 first_case = "window_glazing_spectral_average_001"
 first_evidence = "window_glazing_spectral_average_001"
-support_boundary = "Non-blocking fenestration-surface EIO identity and static-input comparison in the declared glazing fixtures only; no fenestration heat-transfer runtime or surface conformance claim."
+support_boundary = "Non-blocking diagnostic fenestration-surface EIO identity and static-input fixture-integrity comparison in the declared glazing fixtures only; equivalent-layer surface evidence is oracle-only, and no fenestration heat-transfer runtime or surface conformance claim is attached."
 
 [[variable]]
 name = "Surface Inside Face Temperature"

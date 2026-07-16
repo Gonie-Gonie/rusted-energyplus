@@ -86,8 +86,8 @@ support_boundary = "The complete EnergyPlus 26.1 input object is typed with all 
 name = "WindowMaterial:Glazing:EquivalentLayer"
 family = "material"
 status = "typed"
-first_evidence = "compiler-unit-tests"
-support_boundary = "The complete EnergyPlus 26.1 source-effective input object is typed after RefractionExtinctionMethod: all 26 numeric inputs, the SpectralAverage-only mode, six bounded Autocalculate-or-number fields, defaults, shared material-name resolution, and its separate equivalent-layer consumer family. The spectral dataset string is type-checked then discarded because EnergyPlus ignores it for the only supported mode. Ordinary Construction rejects this family; Construction:WindowEquivalentLayer, ASHWAT optics/ratings, fenestration surfaces, and runtime heat transfer remain untyped and run-blocked. Compiler and support-boundary tests are the first evidence; no external numerical or conformance claim is attached at this checkpoint."
+first_evidence = "window_glazing_equivalent_layer_001"
+support_boundary = "The complete EnergyPlus 26.1 source-effective input object is typed after RefractionExtinctionMethod: all 26 numeric inputs, the SpectralAverage-only mode, six bounded Autocalculate-or-number fields, defaults, shared material-name resolution, and its separate equivalent-layer consumer family. The spectral dataset string is type-checked then discarded because EnergyPlus ignores it for the only supported mode. window_glazing_equivalent_layer_001 adds nonblocking diagnostic exact-EIO evidence for material identity and all 14 emitted solar/infrared numeric fields. The 11 visible optical inputs and thermal resistance remain typed-only because EIO omits them; the exact one-solid Construction:WindowEquivalentLayer and detailed-window rows are oracle-only fixture-integrity evidence. Ordinary Construction rejects this family, and Construction:WindowEquivalentLayer typing, occurrence parity, ASHWAT optics/ratings, fenestration runtime, spectral-dataset input preservation, and conformance remain unsupported."
 
 [[object]]
 name = "Construction"

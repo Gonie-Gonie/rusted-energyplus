@@ -1,0 +1,74 @@
+id = "window_glazing_equivalent_layer_001"
+title = "Equivalent-layer window glazing static material evidence"
+milestone = "v0.8-heat-balance"
+purpose = "Compare the bounded Rust WindowMaterial:Glazing:EquivalentLayer typed slice with EnergyPlus equivalent-layer material EIO evidence while locking oracle-only construction and fenestration fixture use."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The fixture assigns one complete, explicit-numeric equivalent-layer glazing material to a one-solid-layer Construction:WindowEquivalentLayer and an actual FenestrationSurface:Detailed on a distinct opaque host wall.",
+  "The one-solid-layer construction intentionally needs no equivalent-layer gap, shade, drape, blind, or screen dependency.",
+  "The dedicated EnergyPlus EIO row contains the material identity fields and 14 numeric solar/infrared fields. Rust compares all of those emitted values.",
+  "The 11 visible optical inputs and thermal resistance remain typed-only because EnergyPlus omits them from this EIO row.",
+  "EnergyPlus ignores the optional spectral dataset input for the supported SpectralAverage mode and emits a blank dataset field; this fixture leaves that input blank and makes no preservation claim.",
+  "The exact Construction:WindowEquivalentLayer row and host/window HeatTransfer Surface rows are oracle-only fixture-integrity locks. Its layer count is the solid-layer count, while U-factor, SHGC, and solar transmittance are EnergyPlus-derived ratings.",
+  "EnergyPlus emits equivalent-layer material rows per construction-layer occurrence; the Rust bridge validates every oracle occurrence by material identity while construction occurrence parity remains unclaimed.",
+  "This is non-blocking diagnostic-only static input evidence. It makes no claim for Construction:WindowEquivalentLayer typing, ASHWAT optics, ratings, fenestration runtime, dynamic heat transfer, or conformance.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/window_glazing_equivalent_layer_001/window_glazing_equivalent_layer.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface", "construction"]
+has_zone = true
+has_surface = true
+has_fenestration = true
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/window_glazing_equivalent_layer_001/window_glazing_equivalent_layer.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+epjson = ".runtime/compare-window-glazing-equivalent-layer/26.1.0/window-glazing-equivalent-layer.epJSON"
+
+[[outputs]]
+key = "DISTINCTIVE EQUIVALENT LAYER GLASS"
+variable = "WindowMaterial:Glazing:EquivalentLayer Static Inputs"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "DISTINCTIVE EQUIVALENT LAYER WINDOW CONSTRUCTION"
+variable = "WindowConstruction Layer Summary"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "DISTINCTIVE EQUIVALENT LAYER WINDOW"
+variable = "HeatTransfer Surface Static Inputs"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/window_glazing_equivalent_layer_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-window-glazing-equivalent-layer-smoke"
+blocking = false

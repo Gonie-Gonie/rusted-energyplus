@@ -76,6 +76,14 @@ pub fn load_eio_window_material_glazing(
     parse_eio_window_material_glazing(&contents)
 }
 
+/// Loads equivalent-layer window glazing rows from an EnergyPlus EIO file.
+pub fn load_eio_window_material_glazing_equivalent_layer(
+    path: impl AsRef<Path>,
+) -> Result<Vec<EioWindowMaterialGlazingEquivalentLayer>, EioError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_eio_window_material_glazing_equivalent_layer(&contents)
+}
+
 /// Loads warmup environment rows from an EnergyPlus EIO file.
 pub fn load_eio_warmup_environments(
     path: impl AsRef<Path>,
@@ -831,6 +839,127 @@ pub fn parse_eio_window_material_glazing(
     Ok(glazing_rows)
 }
 
+/// Parses `WindowMaterial:Glazing:EquivalentLayer` EIO rows.
+///
+/// Rows are returned in emission order and repeated material names are
+/// preserved because EnergyPlus emits the row once per construction layer.
+pub fn parse_eio_window_material_glazing_equivalent_layer(
+    contents: &str,
+) -> Result<Vec<EioWindowMaterialGlazingEquivalentLayer>, EioError> {
+    const FIELD_COUNT: usize = 18;
+    const ROW_LABEL: &str = "WindowMaterial:Glazing:EquivalentLayer,";
+
+    let mut glazing_rows = Vec::new();
+    for (line_index, line) in contents.lines().enumerate() {
+        let line_number = line_index + 1;
+        let trimmed = line.trim();
+        if !trimmed.starts_with(ROW_LABEL) {
+            continue;
+        }
+
+        let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+        if fields.len() != FIELD_COUNT {
+            return Err(EioError::InvalidWindowMaterialGlazingEquivalentLayer {
+                line: line_number,
+                text: line.to_string(),
+                reason: format!(
+                    "expected exactly 17 data fields after the row label ({FIELD_COUNT} comma-separated fields total), found {} data fields",
+                    fields.len().saturating_sub(1)
+                ),
+            });
+        }
+
+        let material_name = required_window_glazing_equivalent_layer_field(
+            &fields,
+            1,
+            line_number,
+            line,
+            "Material Name",
+        )?
+        .to_ascii_uppercase();
+        let optical_data_type = required_window_glazing_equivalent_layer_field(
+            &fields,
+            2,
+            line_number,
+            line,
+            "Optical Data Type",
+        )?
+        .to_string();
+        let spectral_data_set_name = match required_field(&fields, 3) {
+            "" => None,
+            name => Some(name.to_ascii_uppercase()),
+        };
+        let parse_number = |index, field| {
+            parse_window_glazing_equivalent_layer_f64_field(
+                &fields,
+                index,
+                line_number,
+                line,
+                field,
+            )
+        };
+
+        glazing_rows.push(EioWindowMaterialGlazingEquivalentLayer {
+            material_name,
+            optical_data_type,
+            spectral_data_set_name,
+            front_beam_beam_solar_transmittance: parse_number(
+                4,
+                "Front Side Beam-Beam Solar Transmittance",
+            )?,
+            back_beam_beam_solar_transmittance: parse_number(
+                5,
+                "Back Side Beam-Beam Solar Transmittance",
+            )?,
+            front_beam_beam_solar_reflectance: parse_number(
+                6,
+                "Front Side Beam-Beam Solar Reflectance",
+            )?,
+            back_beam_beam_solar_reflectance: parse_number(
+                7,
+                "Back Side Beam-Beam Solar Reflectance",
+            )?,
+            front_beam_diffuse_solar_transmittance: parse_number(
+                8,
+                "Front Side Beam-Diffuse Solar Transmittance",
+            )?,
+            back_beam_diffuse_solar_transmittance: parse_number(
+                9,
+                "Back Side Beam-Diffuse Solar Transmittance",
+            )?,
+            front_beam_diffuse_solar_reflectance: parse_number(
+                10,
+                "Front Side Beam-Diffuse Solar Reflectance",
+            )?,
+            back_beam_diffuse_solar_reflectance: parse_number(
+                11,
+                "Back Side Beam-Diffuse Solar Reflectance",
+            )?,
+            diffuse_diffuse_solar_transmittance: parse_number(
+                12,
+                "Diffuse-Diffuse Solar Transmittance",
+            )?,
+            front_diffuse_diffuse_solar_reflectance: parse_number(
+                13,
+                "Front Side Diffuse-Diffuse Solar Reflectance",
+            )?,
+            back_diffuse_diffuse_solar_reflectance: parse_number(
+                14,
+                "Back Side Diffuse-Diffuse Solar Reflectance",
+            )?,
+            infrared_transmittance: parse_number(15, "Infrared Transmittance")?,
+            front_infrared_emissivity: parse_number(16, "Front Side Infrared Emissivity")?,
+            back_infrared_emissivity: parse_number(17, "Back Side Infrared Emissivity")?,
+        });
+    }
+
+    if glazing_rows.is_empty() {
+        return Err(EioError::MissingWindowMaterialGlazingEquivalentLayer);
+    }
+
+    Ok(glazing_rows)
+}
+
 /// Parses `Environment` and following `Environment:WarmupDays` rows.
 pub fn parse_eio_warmup_environments(
     contents: &str,
@@ -1117,6 +1246,43 @@ fn parse_window_glazing_bool_field(
             reason: format!("invalid {field}: expected Yes or No"),
         }),
     }
+}
+
+fn required_window_glazing_equivalent_layer_field<'a>(
+    fields: &'a [&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<&'a str, EioError> {
+    let value = required_field(fields, index);
+    if value.is_empty() {
+        Err(EioError::InvalidWindowMaterialGlazingEquivalentLayer {
+            line,
+            text: text.to_string(),
+            reason: format!("missing {field}"),
+        })
+    } else {
+        Ok(value)
+    }
+}
+
+fn parse_window_glazing_equivalent_layer_f64_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<f64, EioError> {
+    required_field(fields, index)
+        .parse::<f64>()
+        .map_err(
+            |_error| EioError::InvalidWindowMaterialGlazingEquivalentLayer {
+                line,
+                text: text.to_string(),
+                reason: format!("invalid {field}"),
+            },
+        )
 }
 
 fn parse_construction_material_f64_field(

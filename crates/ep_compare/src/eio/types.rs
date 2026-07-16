@@ -232,6 +232,48 @@ pub struct EioWindowMaterialGlazing {
     pub solar_diffusing: bool,
 }
 
+/// Equivalent-layer glazing values read from an EnergyPlus `eplusout.eio` row.
+///
+/// EnergyPlus emits one row for every equivalent-layer construction-layer
+/// occurrence, so repeated material names remain distinct rows.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioWindowMaterialGlazingEquivalentLayer {
+    /// EnergyPlus-normalized material name.
+    pub material_name: String,
+    /// EIO optical data model name; EnergyPlus 26.1 emits `SpectralAverage`.
+    pub optical_data_type: String,
+    /// EnergyPlus-normalized spectral data set name, when one is emitted.
+    pub spectral_data_set_name: Option<String>,
+    /// Front-side beam-beam solar transmittance.
+    pub front_beam_beam_solar_transmittance: f64,
+    /// Back-side beam-beam solar transmittance.
+    pub back_beam_beam_solar_transmittance: f64,
+    /// Front-side beam-beam solar reflectance.
+    pub front_beam_beam_solar_reflectance: f64,
+    /// Back-side beam-beam solar reflectance.
+    pub back_beam_beam_solar_reflectance: f64,
+    /// Front-side beam-diffuse solar transmittance.
+    pub front_beam_diffuse_solar_transmittance: f64,
+    /// Back-side beam-diffuse solar transmittance.
+    pub back_beam_diffuse_solar_transmittance: f64,
+    /// Front-side beam-diffuse solar reflectance.
+    pub front_beam_diffuse_solar_reflectance: f64,
+    /// Back-side beam-diffuse solar reflectance.
+    pub back_beam_diffuse_solar_reflectance: f64,
+    /// Shared front/back diffuse-diffuse solar transmittance.
+    pub diffuse_diffuse_solar_transmittance: f64,
+    /// Front-side diffuse-diffuse solar reflectance.
+    pub front_diffuse_diffuse_solar_reflectance: f64,
+    /// Back-side diffuse-diffuse solar reflectance.
+    pub back_diffuse_diffuse_solar_reflectance: f64,
+    /// Shared front/back infrared transmittance.
+    pub infrared_transmittance: f64,
+    /// Front-side infrared emissivity.
+    pub front_infrared_emissivity: f64,
+    /// Back-side infrared emissivity.
+    pub back_infrared_emissivity: f64,
+}
+
 /// Warmup day counts read from EnergyPlus `eplusout.eio` environment sections.
 #[derive(Clone, Debug, PartialEq)]
 pub struct EioWarmupEnvironment {
@@ -264,6 +306,8 @@ pub enum EioError {
     MissingMaterialCtfSummary,
     /// No `WindowMaterial:Glazing` rows were present.
     MissingWindowMaterialGlazing,
+    /// No `WindowMaterial:Glazing:EquivalentLayer` rows were present.
+    MissingWindowMaterialGlazingEquivalentLayer,
     /// A grouped construction/material summary could not be parsed.
     InvalidConstructionMaterialSummary {
         /// One-based line number.
@@ -354,6 +398,15 @@ pub enum EioError {
         /// Parse failure reason.
         reason: String,
     },
+    /// A `WindowMaterial:Glazing:EquivalentLayer` row could not be parsed.
+    InvalidWindowMaterialGlazingEquivalentLayer {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
 }
 
 impl Display for EioError {
@@ -380,6 +433,12 @@ impl Display for EioError {
             }
             Self::MissingWindowMaterialGlazing => {
                 write!(formatter, "EIO WindowMaterial:Glazing not found")
+            }
+            Self::MissingWindowMaterialGlazingEquivalentLayer => {
+                write!(
+                    formatter,
+                    "EIO WindowMaterial:Glazing:EquivalentLayer not found"
+                )
             }
             Self::InvalidSurfaceGeometry { line, text, reason } => write!(
                 formatter,
@@ -421,6 +480,10 @@ impl Display for EioError {
                 formatter,
                 "invalid EIO WindowMaterial:Glazing at line {line}: {reason}: {text}"
             ),
+            Self::InvalidWindowMaterialGlazingEquivalentLayer { line, text, reason } => write!(
+                formatter,
+                "invalid EIO WindowMaterial:Glazing:EquivalentLayer at line {line}: {reason}: {text}"
+            ),
         }
     }
 }
@@ -439,6 +502,7 @@ impl std::error::Error for EioError {
             | Self::MissingConstructionCtfCoefficient
             | Self::MissingMaterialCtfSummary
             | Self::MissingWindowMaterialGlazing
+            | Self::MissingWindowMaterialGlazingEquivalentLayer
             | Self::InvalidSurfaceGeometry { .. }
             | Self::InvalidOtherEquipmentNominal { .. }
             | Self::InvalidConstructionCtf { .. }
@@ -446,7 +510,8 @@ impl std::error::Error for EioError {
             | Self::InvalidMaterialCtfSummary { .. }
             | Self::InvalidConstructionMaterialSummary { .. }
             | Self::InvalidWarmupEnvironment { .. }
-            | Self::InvalidWindowMaterialGlazing { .. } => None,
+            | Self::InvalidWindowMaterialGlazing { .. }
+            | Self::InvalidWindowMaterialGlazingEquivalentLayer { .. } => None,
         }
     }
 }

@@ -545,6 +545,12 @@
                          "help":  "Compare refraction-extinction window-glazing inputs with normalized EnergyPlus EIO evidence."
                      },
                      {
+                         "name":  "compare-window-glazing-equivalent-layer-smoke",
+                         "path":  "compare\\compare-window-glazing-equivalent-layer-smoke.ps1",
+                         "group":  "compare",
+                         "help":  "Compare equivalent-layer window-glazing inputs with EnergyPlus EIO evidence."
+                     },
+                     {
                          "name":  "compare-internal-gains-smoke",
                          "path":  "compare\\compare-internal-gains-smoke.ps1",
                          "group":  "compare",

@@ -6,8 +6,9 @@ use crate::{
     parse_eio_construction_material_summaries, parse_eio_heat_transfer_surfaces,
     parse_eio_material_ctf_summary, parse_eio_other_equipment_nominal,
     parse_eio_surface_geometry_rules, parse_eio_warmup_environments,
-    parse_eio_window_material_glazing, parse_eio_zone_geometry, parse_eso_series,
-    parse_eso_time_series, parse_mtr_time_series, parse_mtr_time_series_for_frequency,
+    parse_eio_window_material_glazing, parse_eio_window_material_glazing_equivalent_layer,
+    parse_eio_zone_geometry, parse_eso_series, parse_eso_time_series, parse_mtr_time_series,
+    parse_mtr_time_series_for_frequency,
 };
 
 #[test]
@@ -807,6 +808,109 @@ fn eio_window_material_glazing_parser_reports_missing_rows() {
     assert!(matches!(
         parse_eio_window_material_glazing("Program Version,EnergyPlus\n"),
         Err(EioError::MissingWindowMaterialGlazing)
+    ));
+}
+
+#[test]
+fn parses_eio_equivalent_layer_glazing_rows_and_preserves_repeats()
+-> Result<(), Box<dyn std::error::Error>> {
+    let rows = parse_eio_window_material_glazing_equivalent_layer(
+        r#"! <WindowMaterial:Glazing:EquivalentLayer>,Material Name,Optical Data Type,Spectral Data Set Name,Front Beam-Beam Solar Transmittance,Back Beam-Beam Solar Transmittance,Front Beam-Beam Solar Reflectance,Back Beam-Beam Solar Reflectance,Front Beam-Diffuse Solar Transmittance,Back Beam-Diffuse Solar Transmittance,Front Beam-Diffuse Solar Reflectance,Back Beam-Diffuse Solar Reflectance,Diffuse-Diffuse Solar Transmittance,Front Diffuse-Diffuse Solar Reflectance,Back Diffuse-Diffuse Solar Reflectance,Infrared Transmittance,Front Infrared Emissivity,Back Infrared Emissivity
+ WindowMaterial:Glazing:EquivalentLayer, equivalent glass ,SpectralAverage,,0.61200,0.61300,0.13700,0.14900,3.10000E-002,0.03200,0.14100,0.14200,0.50100,0.20100,0.20200,1.10000E-002,0.82300,0.78600
+ WindowMaterial:Glazing:EquivalentLayer, equivalent glass ,SpectralAverage,,0.71200,0.71300,0.23700,0.24900,0.04100,0.04200,0.24100,0.24200,-99999.00000,-99999.00000,-99999.00000,0.02100,0.83300,0.79600
+"#,
+    )?;
+
+    assert_eq!(rows.len(), 2);
+    assert_eq!(rows[0].material_name, "EQUIVALENT GLASS");
+    assert_eq!(rows[0].optical_data_type, "SpectralAverage");
+    assert_eq!(rows[0].spectral_data_set_name, None);
+    assert_eq!(rows[0].front_beam_beam_solar_transmittance, 0.612);
+    assert_eq!(rows[0].back_beam_beam_solar_transmittance, 0.613);
+    assert_eq!(rows[0].front_beam_beam_solar_reflectance, 0.137);
+    assert_eq!(rows[0].back_beam_beam_solar_reflectance, 0.149);
+    assert_eq!(rows[0].front_beam_diffuse_solar_transmittance, 0.031);
+    assert_eq!(rows[0].back_beam_diffuse_solar_transmittance, 0.032);
+    assert_eq!(rows[0].front_beam_diffuse_solar_reflectance, 0.141);
+    assert_eq!(rows[0].back_beam_diffuse_solar_reflectance, 0.142);
+    assert_eq!(rows[0].diffuse_diffuse_solar_transmittance, 0.501);
+    assert_eq!(rows[0].front_diffuse_diffuse_solar_reflectance, 0.201);
+    assert_eq!(rows[0].back_diffuse_diffuse_solar_reflectance, 0.202);
+    assert_eq!(rows[0].infrared_transmittance, 0.011);
+    assert_eq!(rows[0].front_infrared_emissivity, 0.823);
+    assert_eq!(rows[0].back_infrared_emissivity, 0.786);
+    assert_eq!(rows[1].material_name, rows[0].material_name);
+    assert_eq!(rows[1].front_beam_beam_solar_transmittance, 0.712);
+    assert_eq!(rows[1].diffuse_diffuse_solar_transmittance, -99_999.0);
+    assert_eq!(rows[1].front_diffuse_diffuse_solar_reflectance, -99_999.0);
+    assert_eq!(rows[1].back_diffuse_diffuse_solar_reflectance, -99_999.0);
+    Ok(())
+}
+
+#[test]
+fn eio_equivalent_layer_glazing_parser_requires_exact_field_count() {
+    let too_few = parse_eio_window_material_glazing_equivalent_layer(
+        "WindowMaterial:Glazing:EquivalentLayer,GLASS,SpectralAverage,,0.612,0.613,0.137,0.149,0.031,0.032,0.141,0.142,0.501,0.201,0.202,0.011,0.823\n",
+    )
+    .expect_err("an equivalent-layer row with one missing value must fail");
+    let too_many = parse_eio_window_material_glazing_equivalent_layer(
+        "WindowMaterial:Glazing:EquivalentLayer,GLASS,SpectralAverage,,0.612,0.613,0.137,0.149,0.031,0.032,0.141,0.142,0.501,0.201,0.202,0.011,0.823,0.786,EXTRA\n",
+    )
+    .expect_err("an equivalent-layer row with an extra value must fail");
+
+    assert!(matches!(
+        too_few,
+        EioError::InvalidWindowMaterialGlazingEquivalentLayer { line: 1, .. }
+    ));
+    assert!(matches!(
+        too_many,
+        EioError::InvalidWindowMaterialGlazingEquivalentLayer { line: 1, .. }
+    ));
+}
+
+#[test]
+fn eio_equivalent_layer_glazing_parser_rejects_invalid_fields() {
+    let invalid_number = parse_eio_window_material_glazing_equivalent_layer(
+        "WindowMaterial:Glazing:EquivalentLayer,GLASS,SpectralAverage,,not-a-number,0.613,0.137,0.149,0.031,0.032,0.141,0.142,0.501,0.201,0.202,0.011,0.823,0.786\n",
+    )
+    .expect_err("invalid equivalent-layer numeric fields must fail");
+    let missing_name = parse_eio_window_material_glazing_equivalent_layer(
+        "WindowMaterial:Glazing:EquivalentLayer,,SpectralAverage,,0.612,0.613,0.137,0.149,0.031,0.032,0.141,0.142,0.501,0.201,0.202,0.011,0.823,0.786\n",
+    )
+    .expect_err("missing equivalent-layer material name must fail");
+
+    assert!(
+        matches!(
+            invalid_number,
+            EioError::InvalidWindowMaterialGlazingEquivalentLayer { .. }
+        ),
+        "unexpected equivalent-layer numeric error: {invalid_number}"
+    );
+    if let EioError::InvalidWindowMaterialGlazingEquivalentLayer { line, reason, .. } =
+        invalid_number
+    {
+        assert_eq!(line, 1);
+        assert_eq!(reason, "invalid Front Side Beam-Beam Solar Transmittance");
+    }
+    assert!(
+        matches!(
+            missing_name,
+            EioError::InvalidWindowMaterialGlazingEquivalentLayer { .. }
+        ),
+        "unexpected equivalent-layer name error: {missing_name}"
+    );
+    if let EioError::InvalidWindowMaterialGlazingEquivalentLayer { line, reason, .. } = missing_name
+    {
+        assert_eq!(line, 1);
+        assert_eq!(reason, "missing Material Name");
+    }
+}
+
+#[test]
+fn eio_equivalent_layer_glazing_parser_reports_missing_rows() {
+    assert!(matches!(
+        parse_eio_window_material_glazing_equivalent_layer("Program Version,EnergyPlus\n"),
+        Err(EioError::MissingWindowMaterialGlazingEquivalentLayer)
     ));
 }
 

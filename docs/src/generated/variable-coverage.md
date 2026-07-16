@@ -11,9 +11,9 @@ Variable coverage is maintained in `specs/variable_coverage.toml`.
 | Status | Count |
 |---|---|
 | conformance | 122 |
-| diagnostic | 14 |
+| diagnostic | 15 |
 | baseline | 10 |
-| total | 146 |
+| total | 147 |
 <!-- ANCHOR_END: current-status-variable-summary -->
 
 ## Variables
@@ -91,10 +91,11 @@ Variable coverage is maintained in `specs/variable_coverage.toml`.
 | Material CTF Summary Specific Heat | construction | conformance | official_1zone_static_model_001 | Static EIO conformance only; no dynamic runtime response or algorithm parity claim. |
 | Material CTF Summary Thermal Resistance | construction | conformance | official_1zone_static_model_001 | Static EIO conformance only; no dynamic runtime response or algorithm parity claim. |
 | Material CTF Summary Thickness | construction | conformance | official_1zone_static_model_001 | Static EIO conformance only; no dynamic runtime response or algorithm parity claim. |
-| WindowMaterial:Glazing Static Inputs | construction | diagnostic | window_glazing_spectral_average_001 | Non-blocking SpectralAverage input and EnergyPlus EIO row comparison only; no window heat-transfer runtime, optical calculation, or conformance claim. |
-| Normalized WindowMaterial:Glazing Static Inputs | construction | diagnostic | window_glazing_refraction_extinction_001 | Non-blocking RefractionExtinctionMethod typed-input and EnergyPlus-normalized SpectralAverage EIO row comparison only; no window heat-transfer runtime, optical calculation, or conformance claim. |
-| WindowConstruction Layer Summary | construction | diagnostic | window_glazing_spectral_average_001 | Non-blocking one-layer window-construction EIO comparison in the declared glazing fixtures only; no whole-window or construction conformance claim. |
-| HeatTransfer Surface Static Inputs | surface | diagnostic | window_glazing_spectral_average_001 | Non-blocking fenestration-surface EIO identity and static-input comparison in the declared glazing fixtures only; no fenestration heat-transfer runtime or surface conformance claim. |
+| WindowMaterial:Glazing Static Inputs | construction | diagnostic | window_glazing_spectral_average_001 | Non-blocking diagnostic SpectralAverage input and EnergyPlus EIO row comparison only; no window heat-transfer runtime, optical calculation, or conformance claim. |
+| Normalized WindowMaterial:Glazing Static Inputs | construction | diagnostic | window_glazing_refraction_extinction_001 | Non-blocking diagnostic RefractionExtinctionMethod typed-input and EnergyPlus-normalized SpectralAverage EIO row comparison only; no window heat-transfer runtime, optical calculation, or conformance claim. |
+| WindowMaterial:Glazing:EquivalentLayer Static Inputs | construction | diagnostic | window_glazing_equivalent_layer_001 | Non-blocking diagnostic comparison of the EnergyPlus 26.1 equivalent-layer EIO identity fields and 14 emitted solar/infrared numeric fields only; the 11 visible inputs, thermal resistance, spectral-dataset input preservation, ASHWAT/window runtime, equivalent-layer construction ratings, and conformance remain unclaimed. |
+| WindowConstruction Layer Summary | construction | diagnostic | window_glazing_spectral_average_001 | Non-blocking diagnostic one-layer ordinary window-construction and one-solid equivalent-layer construction EIO fixture-integrity comparisons in the declared glazing fixtures only; equivalent-layer ratings and Rust construction behavior, whole-window behavior, and construction conformance remain unclaimed. |
+| HeatTransfer Surface Static Inputs | surface | diagnostic | window_glazing_spectral_average_001 | Non-blocking diagnostic fenestration-surface EIO identity and static-input fixture-integrity comparison in the declared glazing fixtures only; equivalent-layer surface evidence is oracle-only, and no fenestration heat-transfer runtime or surface conformance claim is attached. |
 | Surface Inside Face Temperature | heat_balance | conformance | surface_temperature_nomass_001 | Tolerance-gated for declared opaque no-mass surface cases and named official 1ZoneUncontrolled dynamic candidate roof/wall/floor surfaces; no broad solar, fenestration, or general surface heat-balance claim. |
 | Surface Outside Face Temperature | heat_balance | conformance | surface_temperature_nomass_001 | Tolerance-gated for declared opaque no-mass surface cases and named official 1ZoneUncontrolled dynamic candidate roof/wall/floor surfaces; no broad solar, fenestration, or general exterior boundary claim. |
 | Zone Mean Air Temperature | heat_balance | conformance | heat_balance_nomass_001 | Tolerance-gated for declared no-mass heat-balance cases and the official 1ZoneUncontrolled dynamic source-order compatibility lane; no general heat-balance or HVAC claim. |
