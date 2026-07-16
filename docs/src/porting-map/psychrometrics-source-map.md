@@ -935,6 +935,114 @@ interface and applies the body to original, unquantized `T`. Routine 25 cannot
 advance until those cache, sentinel, compile-variant, diagnostic, statistics,
 and state-isolation contracts have an explicit Rust owner and tests.
 
+## Routines 26-27 Enthalpy/Pressure Saturation Deferral Boundary
+
+Both enthalpy/pressure saturation tickets remain `source_mapped`; the inventory
+therefore remains at 37 source-mapped and 16 state-mapped routines. The current
+private IdealLoads
+`saturation_temperature_from_enthalpy_and_pressure_c` helper is not a
+canonical analogue. It rejects non-finite enthalpy, non-finite pressure, and
+nonpositive pressure, performs 80 bisections over `[-100, 200] C`, and composes
+the guarded RH humidity-ratio adapter with an IdealLoads enthalpy helper.
+EnergyPlus instead uses a nine-piece polynomial seed, conditionally performs a
+secant correction through other stateful psychrometric routines, and exposes a
+history-dependent default cache. Renaming or delegating either canonical
+ticket to the private helper would change its source contract.
+
+### `PsyTsatFnHPb_raw` (`psy_tsat_fn_h_pb_raw`)
+
+The named raw routine exists only in the default cache-enabled build. It first
+forms `HH = H + 17863.7` and gives the relative-error denominator a signed
+nonzero floor: `Hloc = max(1.0e-5, H)` when `H >= 0.0`, otherwise
+`min(-1.0e-5, H)`. A binary search over
+`[-42400, -22138, -670.12, 27297, 75222, 183790, 475770, 1544500,
+3835300, 45866000]` selects one of nine source-ordered Horner polynomials.
+Only `HH < -42400` and `HH > 45866000` are clamped before the outer
+polynomials; the errors-enabled diagnostic test is separately inclusive at
+the two endpoints.
+
+Pressure does not affect that seed. The correction runs only when
+`abs(PB - 101330) / 101330 > 0.01`; finite values at or inside the exact
+one-percent boundary keep the seed, and a NaN pressure also skips correction
+because the ordered comparison is false. When the predicate is true, the
+routine evaluates saturated enthalpy at the seed through
+`PsyWFnTdbTwbPb(state, T1, T1, PB, CalledFrom)` and `PsyHFnTdbW`, then starts
+a secant correction from `T2 = 0.9 * T1`. It accepts relative enthalpy error
+`<= 1.0e-5` or exact `Y2 == Y1`. The source loop tests
+`IterCount <= 30` before incrementing, so it can evaluate 31 iterations. If no
+break assigns a corrected temperature, the returned `T` remains the original
+polynomial seed rather than the last `T2`. A break on iteration 31 still leaves
+`IterCount > 30`, so the first out-of-range diagnostic path can label that
+successful break as nonconvergence.
+
+That correction is not a pure arithmetic tail. Routine 39 calls the deferred
+routine-25 saturation-pressure cache, owns statistics and two diagnostics
+paths, and can fall back through routine 36 after a negative humidity result.
+The seed itself uses the separately inventoried `F6` and `F7` routines 46 and
+47. Implementing only the standard-pressure polynomial, or privately
+duplicating those later routines, would neither preserve the named raw
+interface nor follow the source-order checkpoint policy.
+Although the cached-build raw and no-cache public bodies are textually the
+same, their transitive routine-25 calls are not: the default build sees
+cache-representative temperatures while the no-cache build evaluates the
+original temperature. Bitwise raw/no-cache identity is therefore not assumed.
+
+With default errors enabled, `HH <= -42400 || HH >= 45866000` warns only
+outside warmup and updates the dedicated recurring-warning history. The local
+`FlagError` is set only inside the first-warning block where that history index
+is still zero. Consequently, only the first non-warmup out-of-range call emits
+the initial-temperature continuation and can emit the severe nonconvergence
+follow-up; later recurring calls and warmup calls cannot. Optional statistics
+increment the `TsatFnHPb` counter on every raw evaluation but never accumulate
+this routine's iteration count. Calls in the pressure-correction path
+additionally read and mutate the nested routines' cache, diagnostic,
+statistics, and caller-context state.
+
+The direct v26.1 unit evidence covers all nine polynomial regions, the low and
+high clamps, one cache miss, and the 91325 Pa correction result
+`18.819 C`. It does not cover exact polynomial boundaries, the exact pressure
+band edges, IEEE inputs, `Y2 == Y1`, 31-iteration failure, warmup and recurring
+diagnostics, or nested cache effects. The C/Python functional example only
+prints an approximate result, and the EMS fixtures do not assert a numerical
+oracle.
+
+### `PsyTsatFnHPb` (`psy_tsat_fn_h_pb`)
+
+The default wrapper owns 1,048,576 direct-mapped entries per
+`EnergyPlusData`. It treats each `f64` bit pattern as signed `Int64`, shifts
+both tags right by 24 (`tsat_hbp_precision_bits = 28`), and indexes
+`(H_tag ^ Pb_tag) & 0xFFFFF` while comparing both full tags. On a miss it
+writes the tags and calls routine 26 with the original `H` and `Pb`, not
+representatives with their low bits cleared. Different same-tag inputs
+therefore reuse whichever original input populated the entry first; finite
+inputs can have first-writer-dependent results. XOR collisions evict the
+entry, and hits skip raw diagnostics, raw statistics, nested calls, and
+`CalledFrom`.
+
+Fresh entries are `(iH = 0, iPb = 0, Tsat = 0.0)`, so a lookup whose two tags
+are both zero is an initial false hit returning zero without evaluating raw.
+`InitializePsychRoutines` refills the array, but
+`PsychrometricCacheData::clear_state()` does not reset it. The optional wrapper
+statistics increment is also source-observable: the header increments
+`TwbFnTdbWPb_cache`, not `TsatFnHPb`. The no-cache compile variant removes the
+named raw routine and compiles the same raw body directly as public
+`PsyTsatFnHPb` on every original input.
+
+The upstream test labelled as a cache hit first stores `(H, 101325)` and later
+looks up `(H, 101330)`; those pressures have different full tags, so the test
+does not exercise a hit. There is no upstream sentinel, same-tag alias,
+collision, initialization-versus-clear, independent-state, hit-side-effect,
+or cached-versus-no-cache test.
+
+Promotion of these tickets requires source-order implementations of `F6` and
+`F7`; canonical routine-25, routine-36, and routine-39 dependency contracts;
+all polynomial-boundary, clamp, signed-floor, IEEE, exact-pressure-band,
+convergence, and failure vectors; per-state warning/statistics isolation; and
+an exact two-input cache owner with sentinel, same-tag, collision, lifecycle,
+wrong-counter, and hit-side-effect tests. Default-cache and
+`EP_nocache_Psychrometrics` oracle evidence and downstream C API, EMS, coil,
+heat-recovery, and HVAC migration remain separate requirements.
+
 ## Compile-Time Variant Boundary
 
 Unless `EP_nocache_Psychrometrics` is set, the EnergyPlus header enables
