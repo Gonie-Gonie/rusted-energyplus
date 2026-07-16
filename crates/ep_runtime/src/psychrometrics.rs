@@ -751,6 +751,35 @@ pub fn energyplus_psy_tdp_fn_w_pb(humidity_ratio: f64, atmospheric_pressure_pa: 
     energyplus_psy_tsat_fn_pb_raw(dew_pressure_pa)
 }
 
+/// Canonical EnergyPlus 26.1 `PsyTdpFnTdbTwbPb` ordinary-finite
+/// default-build numerical path in Celsius.
+///
+/// This preserves the source composition through `PsyWFnTdbTwbPb`, its
+/// second ordered 1e-5 humidity-ratio floor, `PsyTdpFnWPb`, and the final
+/// ordered clamp to the original wet-bulb temperature. Statistics, warnings,
+/// recurring diagnostics, nested cache history, interpolation, lifecycle,
+/// and compile variants remain separate stateful source contracts.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_tdp_fn_tdb_twb_pb(
+    dry_bulb_c: f64,
+    wet_bulb_c: f64,
+    atmospheric_pressure_pa: f64,
+) -> f64 {
+    let humidity_ratio = energyplus_humidity_ratio_floor(energyplus_psy_w_fn_tdb_twb_pb(
+        dry_bulb_c,
+        wet_bulb_c,
+        atmospheric_pressure_pa,
+    ));
+    let dew_point_c = energyplus_psy_tdp_fn_w_pb(humidity_ratio, atmospheric_pressure_pa);
+
+    if dew_point_c > wet_bulb_c {
+        wet_bulb_c
+    } else {
+        dew_point_c
+    }
+}
+
 fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option<f64> {
     if !temperature_c.is_finite() {
         return None;
@@ -820,3 +849,7 @@ mod saturation_temperature_pressure_tests;
 #[cfg(test)]
 #[path = "psychrometrics_dew_point_humidity_ratio_tests.rs"]
 mod dew_point_humidity_ratio_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_dew_point_dry_wet_bulb_tests.rs"]
+mod dew_point_dry_wet_bulb_tests;
