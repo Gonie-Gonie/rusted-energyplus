@@ -533,6 +533,12 @@
                          "help":  "Compare ordered regular, air-gap, and infrared-transparent construction layers with EnergyPlus EIO."
                      },
                      {
+                         "name":  "compare-material-roof-vegetation-smoke",
+                         "path":  "compare\\compare-material-roof-vegetation-smoke.ps1",
+                         "group":  "compare",
+                         "help":  "Compare vegetated-roof material definitions and reporting selectors with generic EnergyPlus EIO evidence."
+                     },
+                     {
                          "name":  "compare-window-glazing-spectral-average-smoke",
                          "path":  "compare\\compare-window-glazing-spectral-average-smoke.ps1",
                          "group":  "compare",

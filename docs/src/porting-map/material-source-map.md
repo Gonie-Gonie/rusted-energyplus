@@ -1114,6 +1114,45 @@ and resets initial moisture to saturation. The compiler materializes that
 same clamp. It does not invent relationships among residual, initial, and
 saturation moisture beyond this one check.
 
+#### Bounded generic `Material Details` diagnostic
+
+`material_roof_vegetation_001` adds a nonblocking diagnostic for the generic
+EnergyPlus 26.1 `Material Details` report. Each payload has exactly 11
+comma-separated tokens, in this order: the `Material Details` row label,
+normalized material name, thermal resistance, roughness, thickness,
+conductivity, density, specific heat, thermal absorptance, solar absorptance,
+and visible absorptance. `Material:RoofVegetation` takes the generic material
+branch; EnergyPlus emits no dedicated RoofVegetation header or row.
+
+The fixture's exact source definition order is `Z USED EXPLICIT ROOF
+VEGETATION`, `M DEFAULTED UNUSED ROOF VEGETATION`, then `A UNUSED EXPLICIT
+ROOF VEGETATION`. All three definitions emit exactly one generic row in that
+Z,M,A order. Z is the only definition used by a construction, while M and A
+are unused by every construction; definition reporting therefore includes
+both used and unused stored materials and does not multiply Z for use or
+reuse. This locks only the fixture-local source order, not broad material
+declaration or report order.
+
+Thermal resistance, thickness, and all three absorptances use EnergyPlus
+`{:.4R}` serialization. Conductivity, density, and specific heat use
+`{:.3R}`. The values are the dry input snapshot written before EcoRoof runtime
+updates; resistance is soil thickness divided by dry-soil conductivity. The
+generic row does not expose plant inputs, the ignored soil-layer label,
+moisture values or recovery, or the moisture-diffusion method.
+
+| Fixture lane | `Output:Constructions` selection | Generic `Material Details` | Shared `Material CTF Summary` |
+|---|---|---|---|
+| primary | `Constructions, Materials` | exact header plus Z,M,A | exact shared header plus one used-Z row |
+| Materials-only | `Materials` | exact header plus Z,M,A | absent |
+| Constructions-only | `Constructions` | absent | exact shared header plus one used-Z row |
+
+The CTF header, the single used-Z CTF row, and the fixture construction row are
+oracle-only fixture-integrity locks; they are not case outputs or proof
+variables and do not establish CTF or construction parity. This checkpoint
+also excludes EcoRoof runtime and water balance, plant/moisture/method/soil
+label parity, the one-used-material-across-surfaces rule, broad ordering or
+diagnostic parity, and conformance.
+
 An EcoRoof material is intended to be the outside layer. Upstream sets
 `TypeIsEcoRoof` and searches for illegal interior EcoRoof layers only when
 the first layer is already EcoRoof, so an interior-only occurrence behind a
@@ -1128,8 +1167,9 @@ run-blocked before arbitrary Rust execution. EnergyPlus's dynamic EcoRoof
 state is shared across surfaces, requires one effective EcoRoof material for
 all used vegetated constructions, and supports only the CTF heat-transfer
 algorithm. Those singleton/state updates, moisture redistribution,
-evapotranspiration, irrigation, surface coupling, reporting, EIO comparison,
-runtime execution, broad diagnostic parity, and conformance remain deferred.
+evapotranspiration, irrigation, surface coupling, runtime execution, and broad
+diagnostic parity remain deferred. The bounded generic diagnostic above does
+not promote any of those behaviors or conformance.
 
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. `Material:RoofVegetation` joins the opaque family with a dedicated
@@ -1377,8 +1417,10 @@ and the dry-soil opaque projections. Construction tests accept an outside
 RoofVegetation layer and deliberately fail closed for every interior
 occurrence, including the upstream interior-only validation hole. Support
 assessment tests count and run-block all typed definitions, including unused
-ones. Dynamic EcoRoof state, surface use, CTF coupling, moisture and plant
-physics, EIO, runtime, and conformance remain unclaimed.
+ones. `material_roof_vegetation_001` separately locks only the generic
+11-token dry-input definition rows and selector matrix described above.
+Dynamic EcoRoof state, surface use, CTF coupling, moisture and plant physics,
+broad EIO behavior, runtime, and conformance remain unclaimed.
 
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
@@ -1392,7 +1434,7 @@ the deferred families.
 | Routine | Completion status | Inventory obligation |
 |---|---|---|
 | `GetWindowGlassSpectralData` | `source_mapped` | owns the pre-material spectral dataset read |
-| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, and RoofVegetation objects plus only the regular Glazing `SpectralAverage` branch are implemented |
+| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, and RoofVegetation objects plus only the regular Glazing `SpectralAverage` branch are implemented, while the RoofVegetation CLI compares only its bounded generic definition row |
 | `CalcScreenTransmittance` | `source_mapped` | the Screen fixture comparator reproduces only its normal-incidence A/Z paths and the values required by the bounded static EIO row |
 | `CalcWindowScreenProperties` | `source_mapped` | the Screen fixture comparator reproduces only its reverse-order 18 by 18 initialization integration and fixture activation boundary |
 | `ReportGlass` | `source_mapped` | owns the bounded Blind specialized header, raw seven-field row serialization, construction-occurrence order, and post-`CalcNominalWindowCond` skip behavior |
@@ -1518,6 +1560,22 @@ clean reporting lanes independently prove generic/specialized activation.
 Equivalent-layer construction packing, ASHWAT behavior,
 optics/thermal/control execution, surfaces, daylighting, ratings, EIO
 serialization, runtime, and conformance remain unclaimed.
+
+The `material_roof_vegetation_001` smoke gate locks the exact generic 11-token
+definition rows, including their `{:.4R}`/`{:.3R}` numeric lexemes, in fixture
+source order Z,M,A. Z is used by the sole vegetated construction; defaulted M
+and explicit A are unused, but all three definitions appear exactly once. The
+bounded CLI separately locks normalized identity, roughness, source-rounded
+numeric values, and the dry-input resistance derivation; its numeric matching
+makes no row-order or textual-serialization claim. Its primary, Materials-only,
+and Constructions-only lanes isolate
+generic-report activation from the shared CTF report. The used-Z CTF summary
+and construction row remain oracle-only fixture locks, and there is no
+dedicated RoofVegetation EIO row. This evidence excludes plant, soil-label,
+moisture, and method fields; CTF/construction behavior; EcoRoof runtime and
+water balance; the one-used-material rule; broad order or diagnostics; and
+conformance.
+
 These tests and static EIO smokes remain bounded evidence, not an EnergyPlus
 material-family or window gate.
 

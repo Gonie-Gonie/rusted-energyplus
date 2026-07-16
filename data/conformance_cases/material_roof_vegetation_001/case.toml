@@ -1,0 +1,58 @@
+id = "material_roof_vegetation_001"
+title = "Roof vegetation generic material-definition EIO evidence"
+milestone = "v0.8-heat-balance"
+purpose = "Compare the bounded Rust Material:RoofVegetation typed slice with EnergyPlus generic static Material Details definition rows."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The fixture defines three Material:RoofVegetation objects in exact IDF source order Z, M, A: one explicit Z definition used as the outside layer of the single roof construction, one fully defaulted M definition unused by every construction, and one explicit A definition unused by every construction.",
+  "The roof construction uses only Z and places a normal opaque host material inside it. Walls and the floor use only the normal opaque host construction. This fixture does not exercise the EnergyPlus one-distinct-EcoRoof-material-across-used-surfaces error path.",
+  "The generic Material Details table emits exactly one row per RoofVegetation definition in fixture order Z, M, A, including unused M and A. It exposes only normalized identity, dry-soil roughness, thickness, conductivity, density, specific heat, thermal/solar/visible absorptance, and thickness-over-conductivity resistance.",
+  "The fully blank M object locks the EnergyPlus defaults visible in this table: 0.2857 m2-K/W resistance, MediumRough, 0.1000 m thickness, 0.350 W/m-K conductivity, 1100.000 kg/m3 density, 1200.000 J/kg-K specific heat, and 0.9000/0.7000/0.7500 absorptances.",
+  "Plant height, leaf area and optical properties, stomatal resistance, the source-inactive soil-layer label, saturation/residual/initial moisture, initial-moisture recovery, and moisture diffusion method are absent from Material Details and receive no EIO claim.",
+  "The primary oracle run requests both Constructions and Materials. A Materials-only run retains the exact generic Z, M, A definition rows and omits the CTF table. A Constructions-only run omits the generic Material Details table and retains the used Z Material CTF Summary occurrence.",
+  "The exact shared Material CTF Summary header and used Z row are oracle-only fixture-integrity locks. That row is a used construction-layer occurrence, can repeat when one material is reused by multiple used constructions, and is not a Rust construction or CTF proof variable in this case.",
+  "The one-zone one-day CTF fixture uses sixty timesteps per hour so EnergyPlus initializes the Advanced EcoRoof input without its low-timestep stability warning. All three oracle lanes must complete with zero warnings and zero severe errors.",
+  "The smoke gate requires exact generic header and eleven-token row shape, exact Z/M/A values and ordering, selector activation, converted epJSON artifacts, and the bounded Rust command `compare material-roof-vegetation` in explicit exact mode for all three lanes.",
+  "This is non-blocking diagnostic-only static input evidence. It makes no Material:RoofVegetation conformance, EcoRoof plant physics, moisture or water balance, precipitation or irrigation, surface heat-balance execution, construction behavior, runtime, broad declaration-order, or diagnostic-text claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/material_roof_vegetation_001/material_roof_vegetation.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface", "construction"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/material_roof_vegetation_001/material_roof_vegetation.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+epjson = ".runtime/compare-material-roof-vegetation/26.1.0/material-roof-vegetation.epJSON"
+
+[[outputs]]
+key = "*"
+variable = "Material:RoofVegetation Generic Definition Details"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/material_roof_vegetation_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-material-roof-vegetation-smoke"
+blocking = false

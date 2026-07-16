@@ -9,6 +9,7 @@
 mod conformance_artifacts;
 mod ideal_loads;
 mod internal_gains;
+mod material_roof_vegetation;
 mod static_model;
 mod time_weather_schedule;
 mod window_material_blind;
@@ -122,6 +123,7 @@ use ideal_loads::{
     generate_ideal_loads_no_oa_sensible_report, generate_ideal_loads_outdoor_air_design_flow_report,
 };
 use internal_gains::{generate_internal_gains_report, run_compare_internal_convective_gain};
+use material_roof_vegetation::run_compare_material_roof_vegetation;
 use static_model::generate_static_model_report;
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
@@ -372,6 +374,9 @@ fn print_help() {
     );
     println!(
         "  compare window-material-blind-equivalent-layer <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
+    );
+    println!(
+        "  compare material-roof-vegetation <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
     );
     println!("  compare internal-gains <input.epJSON> <eplusout.eio>");
     println!("  compare internal-convective-gain <input.epJSON> <eplusout.eso>");
@@ -3413,6 +3418,7 @@ fn run_compare_command(args: &[String]) -> i32 {
         Some("window-material-blind-equivalent-layer") => {
             run_compare_window_material_blind_equivalent_layer(&args[1..])
         }
+        Some("material-roof-vegetation") => run_compare_material_roof_vegetation(&args[1..]),
         Some("internal-gains") => run_compare_internal_gains(&args[1..]),
         Some("internal-convective-gain") => run_compare_internal_convective_gain(&args[1..]),
         Some("weather-fields") | Some("weather-drybulb") => run_compare_weather_fields(&args[1..]),
@@ -3461,6 +3467,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             );
             eprintln!(
                 "usage: eplus-rs compare window-material-blind-equivalent-layer <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
+            );
+            eprintln!(
+                "usage: eplus-rs compare material-roof-vegetation <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
             );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(
@@ -3515,6 +3524,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             );
             eprintln!(
                 "usage: eplus-rs compare window-material-blind-equivalent-layer <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
+            );
+            eprintln!(
+                "usage: eplus-rs compare material-roof-vegetation <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
             );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(
