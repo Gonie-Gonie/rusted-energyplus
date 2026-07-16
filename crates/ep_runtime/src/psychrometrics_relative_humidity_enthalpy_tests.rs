@@ -174,6 +174,20 @@ fn nonfinite_inputs_preserve_ordered_source_behavior() {
 }
 
 #[test]
+fn infinite_humidity_preserves_the_latent_coefficient_zero_boundary() {
+    let coefficient_zero_c: f64 = -2_500_940.0 / 1_858.95;
+    assert_bits(
+        energyplus_psy_h_fn_tdb_rh_pb(coefficient_zero_c.next_down(), f64::INFINITY, 101_325.0),
+        f64::NEG_INFINITY,
+    );
+    assert!(energyplus_psy_h_fn_tdb_rh_pb(coefficient_zero_c, f64::INFINITY, 101_325.0).is_nan());
+    assert_bits(
+        energyplus_psy_h_fn_tdb_rh_pb(coefficient_zero_c.next_up(), f64::INFINITY, 101_325.0),
+        f64::INFINITY,
+    );
+}
+
+#[test]
 fn repeated_and_alternating_calls_are_output_stable() {
     let first = energyplus_psy_h_fn_tdb_rh_pb(30.0, 0.5, 101_325.0);
     let second = energyplus_psy_h_fn_tdb_rh_pb(-5.0, 0.8, 90_000.0);
