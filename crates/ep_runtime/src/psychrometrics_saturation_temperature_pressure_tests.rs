@@ -183,6 +183,13 @@ fn nan_runs_the_bounded_source_iteration_and_remains_nan() {
 }
 
 #[test]
+fn iteration_contract_pins_source_literals_and_exhaustion_edge() {
+    assert_eq!(ENERGYPLUS_TSAT_PRESSURE_MAX_ITERATIONS, 50);
+    assert_bits(ENERGYPLUS_PSYCHROMETRIC_ITERATION_TOLERANCE, 0.0001);
+    assert!(energyplus_psy_tsat_fn_pb_raw(1_555_000.0_f64.next_down()).is_nan());
+}
+
+#[test]
 fn repeated_and_alternating_calls_are_output_stable() {
     let first = energyplus_psy_tsat_fn_pb_raw(101_325.0);
     let second = energyplus_psy_tsat_fn_pb_raw(2_000.0);
