@@ -597,6 +597,39 @@ pub fn energyplus_psy_rh_fn_tdb_w_pb(
     }
 }
 
+/// Canonical EnergyPlus 26.1 `PsyWFnTdbRhPb` ordinary-finite default-build
+/// numerical path.
+///
+/// The saturation-pressure call remains unconditional, and both the 1000 Pa
+/// denominator floor and 1e-5 humidity-ratio floor use the source's ordered
+/// comparisons. This preserves first-argument NaN propagation instead of
+/// adopting Rust's `f64::max` NaN behavior. Cache lifecycle, statistics,
+/// diagnostics, compile variants, and the history-dependent cache-sentinel
+/// edge remain separate stateful source contracts.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_w_fn_tdb_rh_pb(
+    dry_bulb_c: f64,
+    relative_humidity: f64,
+    atmospheric_pressure_pa: f64,
+) -> f64 {
+    let dew_pressure_pa =
+        relative_humidity * energyplus_psy_psat_fn_temp_default_numerical_projection(dry_bulb_c);
+    let pressure_difference_pa = atmospheric_pressure_pa - dew_pressure_pa;
+    let denominator_pa = if pressure_difference_pa < 1000.0 {
+        1000.0
+    } else {
+        pressure_difference_pa
+    };
+    let humidity_ratio = dew_pressure_pa * 0.621_98 / denominator_pa;
+
+    if humidity_ratio < ENERGYPLUS_MIN_HUMIDITY_RATIO {
+        ENERGYPLUS_MIN_HUMIDITY_RATIO
+    } else {
+        humidity_ratio
+    }
+}
+
 fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option<f64> {
     if !temperature_c.is_finite() {
         return None;
@@ -646,3 +679,7 @@ mod vapor_density_relative_humidity_tests;
 #[cfg(test)]
 #[path = "psychrometrics_humidity_ratio_relative_humidity_tests.rs"]
 mod humidity_ratio_relative_humidity_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_relative_humidity_humidity_ratio_tests.rs"]
+mod relative_humidity_humidity_ratio_tests;
