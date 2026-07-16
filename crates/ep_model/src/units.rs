@@ -1,6 +1,6 @@
 //! Unit-bearing scalar wrappers and geometry primitives.
 
-/// Numeric field that may be set to EnergyPlus Autocalculate.
+/// Numeric field that EnergyPlus may derive from other applicable inputs.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum AutoOrNumber {
     /// EnergyPlus should calculate the value from model geometry.

@@ -9,7 +9,12 @@ fn simple_one_zone_model_is_supported() -> Result<(), Box<dyn std::error::Error>
         r#"{
                 "Version": {"Version 1": {"version_identifier": "26.1"}},
                 "Zone": {"Zone One": {"volume": 100}},
-                "Material:NoMass": {"R13": {"thermal_resistance": 2.29}},
+                "Material:NoMass": {
+                    "R13": {
+                        "roughness": "MediumRough",
+                        "thermal_resistance": 2.29
+                    }
+                },
                 "Construction": {"Wall": {"outside_layer": "R13"}},
                 "BuildingSurface:Detailed": {
                     "Wall One": {
@@ -104,6 +109,49 @@ fn typed_refraction_extinction_glazing_remains_run_blocked()
         diagnostic.code == "UnsupportedSurfaceBoundary"
             && diagnostic.object_type.as_deref()
                 == Some("WindowMaterial:Glazing:RefractionExtinctionMethod")
+    }));
+    Ok(())
+}
+
+#[test]
+fn typed_equivalent_layer_glazing_remains_run_blocked() -> Result<(), Box<dyn std::error::Error>> {
+    let raw = parse_epjson_str(
+        r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "Zone": {"Zone One": {"volume": 100}},
+                "WindowMaterial:Glazing:EquivalentLayer": {
+                    "Equivalent Glass": {
+                        "front_side_beam_beam_solar_transmittance": 0.61,
+                        "back_side_beam_beam_solar_transmittance": 0.62,
+                        "front_side_beam_beam_solar_reflectance": 0.21,
+                        "back_side_beam_beam_solar_reflectance": 0.22
+                    }
+                }
+            }"#,
+    )?;
+    let result = compile_raw_model(&raw);
+    let assessment = assess_support(
+        &raw,
+        &result.report,
+        result.model.as_ref(),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+    );
+
+    assert_eq!(assessment.status, SupportStatus::Unsupported);
+    assert_eq!(assessment.run_result_state, RunResultState::RunBlocked);
+    assert_eq!(assessment.runtime_class, RuntimeClass::None);
+    assert!(assessment.unsupported_objects.iter().any(|entry| {
+        entry.object_type == "WindowMaterial:Glazing:EquivalentLayer"
+            && entry.count == 1
+            && entry.note
+                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+    }));
+    assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
+        diagnostic.code == "UnsupportedSurfaceBoundary"
+            && diagnostic.object_type.as_deref() == Some("WindowMaterial:Glazing:EquivalentLayer")
     }));
     Ok(())
 }

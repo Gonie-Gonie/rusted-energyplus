@@ -83,6 +83,13 @@ first_evidence = "window_glazing_refraction_extinction_001"
 support_boundary = "The complete EnergyPlus 26.1 input object is typed with all five required refraction/extinction fields, five defaulted thermal/dirt/diffusing fields, shared material-name resolution, and source-order normal-incidence optical derivation. The bounded implementation intentionally reproduces the 26.1 visible-back-reflectance assignment to solar-front reflectance. window_glazing_refraction_extinction_001 adds nonblocking diagnostic exact-EIO evidence for thickness plus the derived and emitted material fields, with oracle-only proof of use by one detailed window. The four raw solar/visible refraction-index and extinction-coefficient inputs remain typed-only because EIO omits them. Fenestration surfaces, window runtime optics/heat transfer, broad construction layering, blocking compatibility, and conformance remain unsupported."
 
 [[object]]
+name = "WindowMaterial:Glazing:EquivalentLayer"
+family = "material"
+status = "typed"
+first_evidence = "compiler-unit-tests"
+support_boundary = "The complete EnergyPlus 26.1 source-effective input object is typed after RefractionExtinctionMethod: all 26 numeric inputs, the SpectralAverage-only mode, six bounded Autocalculate-or-number fields, defaults, shared material-name resolution, and its separate equivalent-layer consumer family. The spectral dataset string is type-checked then discarded because EnergyPlus ignores it for the only supported mode. Ordinary Construction rejects this family; Construction:WindowEquivalentLayer, ASHWAT optics/ratings, fenestration surfaces, and runtime heat transfer remain untyped and run-blocked. Compiler and support-boundary tests are the first evidence; no external numerical or conformance claim is attached at this checkpoint."
+
+[[object]]
 name = "Construction"
 family = "construction"
 status = "typed"

@@ -1,4 +1,4 @@
-use crate::{ConstructionId, MaterialId, NormalizedName};
+use crate::{AutoOrNumber, ConstructionId, MaterialId, NormalizedName};
 
 /// Material flavor tracked by the first typed subset.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -15,15 +15,20 @@ pub enum MaterialKind {
     WindowGlazing,
     /// WindowMaterial:Glazing:RefractionExtinctionMethod object.
     WindowGlazingRefractionExtinction,
+    /// WindowMaterial:Glazing:EquivalentLayer object.
+    WindowGlazingEquivalentLayer,
 }
 
-/// High-level material family used to keep opaque and fenestration consumers separate.
+/// High-level material family used to keep construction consumers separate.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum MaterialFamily {
     /// Opaque heat-transfer material.
     Opaque,
-    /// Fenestration material.
+    /// Regular fenestration material consumed by `Construction`.
     Fenestration,
+    /// Equivalent-layer fenestration material consumed only by
+    /// `Construction:WindowEquivalentLayer`.
+    EquivalentLayer,
 }
 
 impl MaterialFamily {
@@ -33,6 +38,7 @@ impl MaterialFamily {
         match self {
             Self::Opaque => "opaque",
             Self::Fenestration => "fenestration",
+            Self::EquivalentLayer => "equivalent-layer",
         }
     }
 }
@@ -262,6 +268,59 @@ fn refraction_extinction_band_properties(
     (transmittance, reflectance)
 }
 
+/// Front/back beam optical properties for one equivalent-layer band.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WindowGlazingEquivalentLayerDirectionalProperties {
+    /// Front-side transmittance.
+    pub front_transmittance: f64,
+    /// Back-side transmittance.
+    pub back_transmittance: f64,
+    /// Front-side reflectance.
+    pub front_reflectance: f64,
+    /// Back-side reflectance.
+    pub back_reflectance: f64,
+}
+
+/// Diffuse-diffuse optical properties for one equivalent-layer band.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WindowGlazingEquivalentLayerDiffuseProperties {
+    /// Shared front/back transmittance, or EnergyPlus `Autocalculate`.
+    pub transmittance: AutoOrNumber,
+    /// Front-side reflectance, or EnergyPlus `Autocalculate`.
+    pub front_reflectance: AutoOrNumber,
+    /// Back-side reflectance, or EnergyPlus `Autocalculate`.
+    pub back_reflectance: AutoOrNumber,
+}
+
+/// Beam and diffuse optical properties for one equivalent-layer band.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WindowGlazingEquivalentLayerOpticalBand {
+    /// Direct beam-to-beam properties.
+    pub beam_beam: WindowGlazingEquivalentLayerDirectionalProperties,
+    /// Beam-to-diffuse properties.
+    pub beam_diffuse: WindowGlazingEquivalentLayerDirectionalProperties,
+    /// Diffuse-to-diffuse properties.
+    pub diffuse_diffuse: WindowGlazingEquivalentLayerDiffuseProperties,
+}
+
+/// Required and default-applied fields for a
+/// `WindowMaterial:Glazing:EquivalentLayer` object.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WindowGlazingEquivalentLayerMaterial {
+    /// Solar-band properties.
+    pub solar: WindowGlazingEquivalentLayerOpticalBand,
+    /// Visible-band properties.
+    pub visible: WindowGlazingEquivalentLayerOpticalBand,
+    /// Shared front/back infrared transmittance.
+    pub infrared_transmittance: f64,
+    /// Front-side infrared emissivity.
+    pub front_infrared_emissivity: f64,
+    /// Back-side infrared emissivity.
+    pub back_infrared_emissivity: f64,
+    /// Area-normalized thermal resistance in m2-K/W.
+    pub thermal_resistance_m2_k_per_w: f64,
+}
+
 /// Object-specific material payload.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum MaterialDefinition {
@@ -278,6 +337,8 @@ pub enum MaterialDefinition {
     /// Window glazing whose optical properties are derived from refraction and
     /// extinction inputs.
     WindowGlazingRefractionExtinction(WindowGlazingRefractionExtinctionMaterial),
+    /// Equivalent-layer glazing with directional and diffuse optical inputs.
+    WindowGlazingEquivalentLayer(WindowGlazingEquivalentLayerMaterial),
 }
 
 /// Borrowed opaque material payload used by opaque-only consumers.
@@ -449,6 +510,9 @@ impl Material {
             MaterialDefinition::WindowGlazingRefractionExtinction(_) => {
                 MaterialKind::WindowGlazingRefractionExtinction
             }
+            MaterialDefinition::WindowGlazingEquivalentLayer(_) => {
+                MaterialKind::WindowGlazingEquivalentLayer
+            }
         }
     }
 
@@ -464,6 +528,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_) => {
                 MaterialFamily::Fenestration
             }
+            MaterialDefinition::WindowGlazingEquivalentLayer(_) => MaterialFamily::EquivalentLayer,
         }
     }
 
@@ -478,7 +543,8 @@ impl Material {
                 Some(OpaqueMaterialRef::InfraredTransparent(material))
             }
             MaterialDefinition::WindowGlazingSpectralAverage(_)
-            | MaterialDefinition::WindowGlazingRefractionExtinction(_) => None,
+            | MaterialDefinition::WindowGlazingRefractionExtinction(_)
+            | MaterialDefinition::WindowGlazingEquivalentLayer(_) => None,
         }
     }
 
@@ -493,7 +559,8 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
-            | MaterialDefinition::WindowGlazingRefractionExtinction(_) => None,
+            | MaterialDefinition::WindowGlazingRefractionExtinction(_)
+            | MaterialDefinition::WindowGlazingEquivalentLayer(_) => None,
         }
     }
 
@@ -508,7 +575,24 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
-            | MaterialDefinition::WindowGlazingSpectralAverage(_) => None,
+            | MaterialDefinition::WindowGlazingSpectralAverage(_)
+            | MaterialDefinition::WindowGlazingEquivalentLayer(_) => None,
+        }
+    }
+
+    /// Borrows the equivalent-layer glazing payload when applicable.
+    #[must_use]
+    pub const fn as_window_glazing_equivalent_layer(
+        &self,
+    ) -> Option<&WindowGlazingEquivalentLayerMaterial> {
+        match &self.definition {
+            MaterialDefinition::WindowGlazingEquivalentLayer(material) => Some(material),
+            MaterialDefinition::Regular(_)
+            | MaterialDefinition::NoMass(_)
+            | MaterialDefinition::AirGap(_)
+            | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectralAverage(_)
+            | MaterialDefinition::WindowGlazingRefractionExtinction(_) => None,
         }
     }
 

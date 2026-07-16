@@ -28,10 +28,13 @@ use ep_model::{
     SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
     ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
     TypedModel, Version, VertexEntryDirection, WeekScheduleId, WindExposure,
-    WindowGlazingRefractionExtinctionMaterial, WindowGlazingSpectralAverageMaterial, Zone,
-    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
-    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
-    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
+    WindowGlazingEquivalentLayerDiffuseProperties,
+    WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
+    WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
+    WindowGlazingSpectralAverageMaterial, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
+    ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
+    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatControl,
+    ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 use std::collections::BTreeMap;
@@ -237,6 +240,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Material:AirGap",
     "Material:InfraredTransparent",
     "WindowMaterial:Glazing:RefractionExtinctionMethod",
+    "WindowMaterial:Glazing:EquivalentLayer",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -806,6 +810,7 @@ impl<'a> Compiler<'a> {
         self.parse_infrared_transparent_materials(model);
         self.parse_window_glazing_materials(model);
         self.parse_window_glazing_refraction_extinction_materials(model);
+        self.parse_window_glazing_equivalent_layer_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -1333,6 +1338,311 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_window_glazing_equivalent_layer_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowMaterial:Glazing:EquivalentLayer";
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let optical_data_type = match field_value(&object, "optical_data_type") {
+                Some(RawValue::String(value)) if value.trim().is_empty() => {
+                    self.record_default(OBJECT_TYPE, &name, "optical_data_type", "SpectralAverage");
+                    "SpectralAverage".to_string()
+                }
+                Some(RawValue::String(value)) => value.clone(),
+                Some(_) => {
+                    self.invalid_field_type(OBJECT_TYPE, &name, "optical_data_type", "string");
+                    continue;
+                }
+                None => {
+                    self.record_default(OBJECT_TYPE, &name, "optical_data_type", "SpectralAverage");
+                    "SpectralAverage".to_string()
+                }
+            };
+            if optical_data_type.eq_ignore_ascii_case("Spectral") {
+                self.error(
+                    "UnsupportedWindowGlazingEquivalentLayerOpticalDataType",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("optical_data_type"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} optical data type Spectral is not supported by EnergyPlus 26.1; only SpectralAverage is accepted"
+                    ),
+                );
+                continue;
+            }
+            if !optical_data_type.eq_ignore_ascii_case("SpectralAverage") {
+                self.invalid_enum_value(
+                    OBJECT_TYPE,
+                    &name,
+                    "optical_data_type",
+                    &optical_data_type,
+                );
+                continue;
+            }
+
+            // EnergyPlus 26.1 ignores this reference for its only supported
+            // SpectralAverage branch, but its input type is still validated.
+            let _spectral_data_set_name = self.optional_string(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "window_glass_spectral_data_set_name",
+            );
+
+            let required_solar = (
+                self.required_number_range(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "front_side_beam_beam_solar_transmittance",
+                    0.0..=1.0,
+                ),
+                self.required_number_range(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "back_side_beam_beam_solar_transmittance",
+                    0.0..=1.0,
+                ),
+                self.required_number_range(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "front_side_beam_beam_solar_reflectance",
+                    0.0..=1.0,
+                ),
+                self.required_number_range(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "back_side_beam_beam_solar_reflectance",
+                    0.0..=1.0,
+                ),
+            );
+            let (
+                Some(front_beam_beam_solar_transmittance),
+                Some(back_beam_beam_solar_transmittance),
+                Some(front_beam_beam_solar_reflectance),
+                Some(back_beam_beam_solar_reflectance),
+            ) = required_solar
+            else {
+                continue;
+            };
+
+            let solar = WindowGlazingEquivalentLayerOpticalBand {
+                beam_beam: WindowGlazingEquivalentLayerDirectionalProperties {
+                    front_transmittance: front_beam_beam_solar_transmittance,
+                    back_transmittance: back_beam_beam_solar_transmittance,
+                    front_reflectance: front_beam_beam_solar_reflectance,
+                    back_reflectance: back_beam_beam_solar_reflectance,
+                },
+                beam_diffuse: WindowGlazingEquivalentLayerDirectionalProperties {
+                    front_transmittance: self.number_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "front_side_beam_diffuse_solar_transmittance",
+                        0.0,
+                        0.0..=1.0,
+                    ),
+                    back_transmittance: self.number_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "back_side_beam_diffuse_solar_transmittance",
+                        0.0,
+                        0.0..=1.0,
+                    ),
+                    front_reflectance: self.number_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "front_side_beam_diffuse_solar_reflectance",
+                        0.0,
+                        0.0..=1.0,
+                    ),
+                    back_reflectance: self.number_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "back_side_beam_diffuse_solar_reflectance",
+                        0.0,
+                        0.0..=1.0,
+                    ),
+                },
+                diffuse_diffuse: WindowGlazingEquivalentLayerDiffuseProperties {
+                    transmittance: self.auto_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "diffuse_diffuse_solar_transmittance",
+                        0.0..=1.0,
+                    ),
+                    front_reflectance: self.auto_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "front_side_diffuse_diffuse_solar_reflectance",
+                        0.0..=1.0,
+                    ),
+                    back_reflectance: self.auto_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "back_side_diffuse_diffuse_solar_reflectance",
+                        0.0..=1.0,
+                    ),
+                },
+            };
+            let visible = WindowGlazingEquivalentLayerOpticalBand {
+                beam_beam: WindowGlazingEquivalentLayerDirectionalProperties {
+                    front_transmittance: self.number_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "front_side_beam_beam_visible_solar_transmittance",
+                        0.0,
+                        0.0..=1.0,
+                    ),
+                    back_transmittance: self.number_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "back_side_beam_beam_visible_solar_transmittance",
+                        0.0,
+                        0.0..=1.0,
+                    ),
+                    front_reflectance: self.number_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "front_side_beam_beam_visible_solar_reflectance",
+                        0.0,
+                        0.0..=1.0,
+                    ),
+                    back_reflectance: self.number_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "back_side_beam_beam_visible_solar_reflectance",
+                        0.0,
+                        0.0..=1.0,
+                    ),
+                },
+                beam_diffuse: WindowGlazingEquivalentLayerDirectionalProperties {
+                    front_transmittance: self.number_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "front_side_beam_diffuse_visible_solar_transmittance",
+                        0.0,
+                        0.0..=1.0,
+                    ),
+                    back_transmittance: self.number_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "back_side_beam_diffuse_visible_solar_transmittance",
+                        0.0,
+                        0.0..=1.0,
+                    ),
+                    front_reflectance: self.number_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "front_side_beam_diffuse_visible_solar_reflectance",
+                        0.0,
+                        0.0..=1.0,
+                    ),
+                    back_reflectance: self.number_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "back_side_beam_diffuse_visible_solar_reflectance",
+                        0.0,
+                        0.0..=1.0,
+                    ),
+                },
+                diffuse_diffuse: WindowGlazingEquivalentLayerDiffuseProperties {
+                    transmittance: self.auto_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "diffuse_diffuse_visible_solar_transmittance",
+                        0.0..=1.0,
+                    ),
+                    front_reflectance: self.auto_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "front_side_diffuse_diffuse_visible_solar_reflectance",
+                        0.0..=1.0,
+                    ),
+                    back_reflectance: self.auto_range_default(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        "back_side_diffuse_diffuse_visible_solar_reflectance",
+                        0.0..=1.0,
+                    ),
+                },
+            };
+            let infrared_transmittance = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "infrared_transmittance_applies_to_front_and_back_",
+                0.0,
+                0.0..=1.0,
+            );
+            let front_infrared_emissivity = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "front_side_infrared_emissivity",
+                0.84,
+                (0.0, false),
+                (1.0, false),
+            );
+            let back_infrared_emissivity = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "back_side_infrared_emissivity",
+                0.84,
+                (0.0, false),
+                (1.0, false),
+            );
+            let thermal_resistance_m2_k_per_w = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "thermal_resistance",
+                0.158,
+                (0.0, false),
+                (f64::INFINITY, true),
+            );
+
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::WindowGlazingEquivalentLayer(
+                    WindowGlazingEquivalentLayerMaterial {
+                        solar,
+                        visible,
+                        infrared_transmittance,
+                        front_infrared_emissivity,
+                        back_infrared_emissivity,
+                        thermal_resistance_m2_k_per_w,
+                    },
+                ),
+            });
+        }
+    }
+
     fn reserve_material_identity(
         &mut self,
         model: &mut TypedModel,
@@ -1418,6 +1728,34 @@ impl<'a> Compiler<'a> {
         construction_name: &str,
         layers: &[MaterialId],
     ) -> Option<ConstructionKind> {
+        if let Some((layer_index, material)) =
+            layers
+                .iter()
+                .enumerate()
+                .find_map(|(layer_index, material_id)| {
+                    let material = model.materials.get(material_id.0 as usize)?;
+                    (material.family() == ep_model::MaterialFamily::EquivalentLayer)
+                        .then_some((layer_index, material))
+                })
+        {
+            let layer_field = if layer_index == 0 {
+                "outside_layer".to_string()
+            } else {
+                format!("layer_{}", layer_index + 1)
+            };
+            self.error(
+                "InvalidEquivalentLayerConstruction",
+                "Construction",
+                Some(construction_name),
+                Some(&layer_field),
+                format!(
+                    "Construction/{construction_name} cannot consume WindowMaterial:Glazing:EquivalentLayer {}; only the deferred Construction:WindowEquivalentLayer object may use equivalent-layer materials",
+                    material.name.0
+                ),
+            );
+            return None;
+        }
+
         let fenestration_layer_count = layers
             .iter()
             .filter_map(|material_id| model.materials.get(material_id.0 as usize))
@@ -6543,6 +6881,33 @@ impl<'a> Compiler<'a> {
         None
     }
 
+    fn required_number_range(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+        range: std::ops::RangeInclusive<f64>,
+    ) -> Option<f64> {
+        let value = self.required_number(object_type, object_name, object, field)?;
+        if range.contains(&value) {
+            return Some(value);
+        }
+
+        let minimum = *range.start();
+        let maximum = *range.end();
+        self.error(
+            "InvalidNumericRange",
+            object_type,
+            Some(object_name),
+            Some(field),
+            format!(
+                "{object_type}/{object_name} field {field} must be between {minimum} and {maximum}, got {value}"
+            ),
+        );
+        None
+    }
+
     fn optional_autosize_or_number(
         &mut self,
         object_type: &str,
@@ -6788,6 +7153,55 @@ impl<'a> Compiler<'a> {
                 default
             }
         }
+    }
+
+    fn auto_range_default(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+        range: std::ops::RangeInclusive<f64>,
+    ) -> AutoOrNumber {
+        let default = AutoOrNumber::AutoCalculate;
+        let value = match field_value(object, field) {
+            Some(RawValue::String(value))
+                if value.trim().is_empty() || value.eq_ignore_ascii_case("Autocalculate") =>
+            {
+                return default;
+            }
+            Some(RawValue::String(value)) => {
+                self.invalid_enum_value(object_type, object_name, field, value);
+                return default;
+            }
+            Some(value) => self
+                .number_value(object_type, object_name, field, value)
+                .map(AutoOrNumber::Value)
+                .unwrap_or(default),
+            None => {
+                self.record_default(object_type, object_name, field, "Autocalculate");
+                return default;
+            }
+        };
+        let AutoOrNumber::Value(number) = value else {
+            return default;
+        };
+        if range.contains(&number) {
+            return value;
+        }
+
+        let minimum = *range.start();
+        let maximum = *range.end();
+        self.error(
+            "InvalidNumericRange",
+            object_type,
+            Some(object_name),
+            Some(field),
+            format!(
+                "{object_type}/{object_name} field {field} must be between {minimum} and {maximum}, got {number}"
+            ),
+        );
+        default
     }
 
     fn optional_enum<T: Copy>(
@@ -8536,6 +8950,7 @@ mod tests {
     mod schedule_week_compact;
     mod schedule_year;
     mod window_material_glazing;
+    mod window_material_glazing_equivalent_layer;
     mod window_material_glazing_refraction_extinction;
 
     use super::{
