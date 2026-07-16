@@ -483,6 +483,42 @@ fn energyplus_psychrometric_humidity_ratio_from_wet_bulb_guess(
     }
 }
 
+/// Canonical EnergyPlus 26.1 default non-IF97 `PsyPsatFnTemp_raw` numerical path.
+///
+/// The source range clamps and ice/liquid-water expressions are preserved.
+/// Optional statistics, out-of-range diagnostics, and the alternate `EP_IF97`
+/// compile branch are outside this pure numerical scaffold.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_psat_fn_temp_raw(temperature_c: f64) -> f64 {
+    let temperature_k = temperature_c + KELVIN_OFFSET;
+    if temperature_k < 173.15 {
+        return 0.001405102123874164;
+    }
+    if temperature_k < 273.16 {
+        return (-5674.5359 / temperature_k
+            + 6.392_524_7
+            + temperature_k
+                * (-0.967_784_3e-2
+                    + temperature_k
+                        * (0.622_157_01e-6
+                            + temperature_k
+                                * (0.207_478_25e-8 - 0.948_402_4e-12 * temperature_k)))
+            + 4.163_501_9 * temperature_k.ln())
+        .exp();
+    }
+    if temperature_k <= 473.15 {
+        return (-5800.2206 / temperature_k
+            + 1.391_499_3
+            + temperature_k
+                * (-0.048_640_239
+                    + temperature_k * (0.417_647_68e-4 - 0.144_520_93e-7 * temperature_k))
+            + 6.545_967_3 * temperature_k.ln())
+        .exp();
+    }
+    1_555_073.745_636_215
+}
+
 fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option<f64> {
     if !temperature_c.is_finite() {
         return None;
@@ -490,36 +526,7 @@ fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option
     // EnergyPlus' default PsyPsatFnTemp path keys a cache by truncating the dry-bulb
     // temperature bits before evaluating the raw saturation-pressure polynomial.
     let temperature_c = energyplus_psychrometric_psat_cache_temperature_c(temperature_c);
-    let temperature_k = temperature_c + KELVIN_OFFSET;
-    if temperature_k < 173.15 {
-        return Some(0.001405102123874164);
-    }
-    if temperature_k < 273.16 {
-        return Some(
-            (-5674.5359 / temperature_k
-                + 6.392_524_7
-                + temperature_k
-                    * (-0.967_784_3e-2
-                        + temperature_k
-                            * (0.622_157_01e-6
-                                + temperature_k
-                                    * (0.207_478_25e-8 - 0.948_402_4e-12 * temperature_k)))
-                + 4.163_501_9 * temperature_k.ln())
-            .exp(),
-        );
-    }
-    if temperature_k <= 473.15 {
-        return Some(
-            (-5800.2206 / temperature_k
-                + 1.391_499_3
-                + temperature_k
-                    * (-0.048_640_239
-                        + temperature_k * (0.417_647_68e-4 - 0.144_520_93e-7 * temperature_k))
-                + 6.545_967_3 * temperature_k.ln())
-            .exp(),
-        );
-    }
-    Some(1_555_073.745_636_215)
+    Some(energyplus_psy_psat_fn_temp_raw(temperature_c))
 }
 
 fn energyplus_psychrometric_psat_cache_temperature_c(temperature_c: f64) -> f64 {
@@ -550,3 +557,7 @@ mod specific_volume_tests;
 #[cfg(test)]
 #[path = "psychrometrics_humidity_ratio_tests.rs"]
 mod humidity_ratio_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_saturation_pressure_tests.rs"]
+mod saturation_pressure_tests;
