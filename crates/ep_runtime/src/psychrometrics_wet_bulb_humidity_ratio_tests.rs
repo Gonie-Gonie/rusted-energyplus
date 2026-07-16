@@ -151,6 +151,33 @@ fn pressure_pole_and_nonfinite_inputs_preserve_ordered_source_behavior() {
         energyplus_psy_w_fn_tdb_twb_pb(30.0, 16.0, wet_saturation_pressure),
         f64::INFINITY,
     );
+
+    let pressure_below_pole = wet_saturation_pressure.next_down();
+    let raw_below_pole =
+        source_grouped_humidity_ratio(30.0, 16.0, pressure_below_pole, wet_saturation_pressure);
+    assert!(raw_below_pole < 0.0, "raw={raw_below_pole:?}");
+    assert_bits(
+        energyplus_psy_w_fn_tdb_twb_pb(30.0, 16.0, pressure_below_pole),
+        energyplus_psy_w_fn_tdb_rh_pb(30.0, 0.0001, pressure_below_pole),
+    );
+
+    let pressure_above_pole = wet_saturation_pressure.next_up();
+    let raw_above_pole =
+        source_grouped_humidity_ratio(30.0, 16.0, pressure_above_pole, wet_saturation_pressure);
+    assert!(raw_above_pole > 0.0, "raw={raw_above_pole:?}");
+    assert_bits(
+        energyplus_psy_w_fn_tdb_twb_pb(30.0, 16.0, pressure_above_pole),
+        raw_above_pole,
+    );
+
+    assert_bits(
+        energyplus_psy_w_fn_tdb_twb_pb(16.0, 16.0, f64::NEG_INFINITY),
+        -0.0,
+    );
+    assert_bits(
+        energyplus_psy_w_fn_tdb_twb_pb(16.0, 16.0, f64::INFINITY),
+        0.0,
+    );
     assert!(energyplus_psy_w_fn_tdb_twb_pb(30.0, f64::NAN, 101_325.0).is_nan());
     assert!(energyplus_psy_w_fn_tdb_twb_pb(f64::NAN, 16.0, 101_325.0).is_nan());
     assert!(energyplus_psy_w_fn_tdb_twb_pb(30.0, 16.0, f64::NAN).is_nan());
