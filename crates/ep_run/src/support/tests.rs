@@ -289,6 +289,65 @@ fn typed_window_gas_mixture_remains_run_blocked() -> Result<(), Box<dyn std::err
 }
 
 #[test]
+fn typed_window_shades_including_unused_remain_run_blocked()
+-> Result<(), Box<dyn std::error::Error>> {
+    let raw = parse_epjson_str(
+        r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "Zone": {"Zone One": {"volume": 100}},
+                "WindowMaterial:Shade": {
+                    "Interior Shade": {
+                        "solar_transmittance": 0.1,
+                        "solar_reflectance": 0.6,
+                        "visible_transmittance": 0.1,
+                        "visible_reflectance": 0.6,
+                        "infrared_hemispherical_emissivity": 0.8,
+                        "infrared_transmittance": 0.0,
+                        "thickness": 0.001,
+                        "conductivity": 0.2
+                    },
+                    "Unused Exterior Shade": {
+                        "solar_transmittance": 0.2,
+                        "solar_reflectance": 0.5,
+                        "visible_transmittance": 0.2,
+                        "visible_reflectance": 0.5,
+                        "infrared_hemispherical_emissivity": 0.7,
+                        "infrared_transmittance": 0.1,
+                        "thickness": 0.002,
+                        "conductivity": 0.3
+                    }
+                }
+            }"#,
+    )?;
+    let result = compile_raw_model(&raw);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let assessment = assess_support(
+        &raw,
+        &result.report,
+        result.model.as_ref(),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+    );
+
+    assert_eq!(assessment.status, SupportStatus::Unsupported);
+    assert_eq!(assessment.run_result_state, RunResultState::RunBlocked);
+    assert_eq!(assessment.runtime_class, RuntimeClass::None);
+    assert!(assessment.unsupported_objects.iter().any(|entry| {
+        entry.object_type == "WindowMaterial:Shade"
+            && entry.count == 2
+            && entry.note
+                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+    }));
+    assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
+        diagnostic.code == "UnsupportedSurfaceBoundary"
+            && diagnostic.object_type.as_deref() == Some("WindowMaterial:Shade")
+    }));
+    Ok(())
+}
+
+#[test]
 fn missing_registry_capability_blocks_runtime_selection() -> Result<(), Box<dyn std::error::Error>>
 {
     let raw = parse_epjson_str(

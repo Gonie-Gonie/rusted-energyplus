@@ -33,16 +33,128 @@ use ep_model::{
     WindowGasProperties, WindowGasType, WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
-    WindowGlazingSpectralAverageMaterial, WindowStandardGasType, Zone, ZoneEquipmentConnection,
-    ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId,
-    ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
-    ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
+    WindowGlazingSpectralAverageMaterial, WindowShadeMaterial, WindowStandardGasType, Zone,
+    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
+    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 use std::collections::BTreeMap;
 use std::path::{Component, Path};
 
 const MAX_OPAQUE_CONSTRUCTION_LAYERS: usize = 10;
+const MAX_WINDOW_CONSTRUCTION_LAYERS: usize = 8;
+const MAX_BETWEEN_GLASS_SHADE_GAP_THICKNESS_DIFFERENCE_M: f64 = 0.0005;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum WindowConstructionLayerKind {
+    Glass,
+    Gap,
+    Shade,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct WindowGapSignature {
+    gas_types: [Option<WindowGasType>; 5],
+    fractions: [f64; 5],
+    thickness_m: f64,
+}
+
+fn window_construction_layer_kind(
+    definition: &MaterialDefinition,
+) -> Option<WindowConstructionLayerKind> {
+    match definition {
+        MaterialDefinition::WindowGlazingSpectralAverage(_)
+        | MaterialDefinition::WindowGlazingRefractionExtinction(_) => {
+            Some(WindowConstructionLayerKind::Glass)
+        }
+        MaterialDefinition::WindowGas(_) | MaterialDefinition::WindowGasMixture(_) => {
+            Some(WindowConstructionLayerKind::Gap)
+        }
+        MaterialDefinition::WindowShade(_) => Some(WindowConstructionLayerKind::Shade),
+        MaterialDefinition::Regular(_)
+        | MaterialDefinition::NoMass(_)
+        | MaterialDefinition::AirGap(_)
+        | MaterialDefinition::InfraredTransparent(_)
+        | MaterialDefinition::WindowGlazingEquivalentLayer(_)
+        | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
+    }
+}
+
+fn window_glazing_is_solar_diffusing(definition: &MaterialDefinition) -> bool {
+    match definition {
+        MaterialDefinition::WindowGlazingSpectralAverage(material) => material.solar_diffusing,
+        MaterialDefinition::WindowGlazingRefractionExtinction(material) => material.solar_diffusing,
+        MaterialDefinition::Regular(_)
+        | MaterialDefinition::NoMass(_)
+        | MaterialDefinition::AirGap(_)
+        | MaterialDefinition::InfraredTransparent(_)
+        | MaterialDefinition::WindowGlazingEquivalentLayer(_)
+        | MaterialDefinition::WindowGas(_)
+        | MaterialDefinition::WindowGasMixture(_)
+        | MaterialDefinition::WindowShade(_)
+        | MaterialDefinition::WindowGapEquivalentLayer(_) => false,
+    }
+}
+
+fn window_gap_signature(definition: &MaterialDefinition) -> Option<WindowGapSignature> {
+    let mut gas_types = [None; 5];
+    let mut fractions = [0.0; 5];
+    let thickness_m = match definition {
+        MaterialDefinition::WindowGas(material) => {
+            // MaterialGasMix's five Gas records default to Custom. The
+            // single-gas parser overwrites only slot zero, so the four
+            // inactive slots remain Custom during DataHeatBalance's exact
+            // fixed-slot comparison.
+            gas_types[1..].fill(Some(WindowGasType::Custom));
+            gas_types[0] = Some(material.gas_type);
+            fractions[0] = 1.0;
+            material.thickness_m
+        }
+        MaterialDefinition::WindowGasMixture(material) => {
+            for (index, component) in material.gases.components().iter().enumerate() {
+                gas_types[index] = Some(component.gas_type.as_window_gas_type());
+                fractions[index] = component.fraction;
+            }
+            material.thickness_m
+        }
+        MaterialDefinition::Regular(_)
+        | MaterialDefinition::NoMass(_)
+        | MaterialDefinition::AirGap(_)
+        | MaterialDefinition::InfraredTransparent(_)
+        | MaterialDefinition::WindowGlazingSpectralAverage(_)
+        | MaterialDefinition::WindowGlazingRefractionExtinction(_)
+        | MaterialDefinition::WindowGlazingEquivalentLayer(_)
+        | MaterialDefinition::WindowShade(_)
+        | MaterialDefinition::WindowGapEquivalentLayer(_) => return None,
+    };
+    Some(WindowGapSignature {
+        gas_types,
+        fractions,
+        thickness_m,
+    })
+}
+
+fn is_plain_window_stack(kinds: &[WindowConstructionLayerKind]) -> bool {
+    !kinds.is_empty()
+        && kinds.len() <= 7
+        && !kinds.len().is_multiple_of(2)
+        && kinds.iter().enumerate().all(|(index, kind)| {
+            if index.is_multiple_of(2) {
+                *kind == WindowConstructionLayerKind::Glass
+            } else {
+                *kind == WindowConstructionLayerKind::Gap
+            }
+        })
+}
+
+fn construction_layer_field(layer_index: usize) -> String {
+    if layer_index == 0 {
+        "outside_layer".to_string()
+    } else {
+        format!("layer_{}", layer_index + 1)
+    }
+}
 
 #[derive(Clone, Copy)]
 struct AuxiliaryFileDiagnosticCodes {
@@ -246,6 +358,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "WindowMaterial:Gas",
     "WindowMaterial:Gap:EquivalentLayer",
     "WindowMaterial:GasMixture",
+    "WindowMaterial:Shade",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -819,6 +932,7 @@ impl<'a> Compiler<'a> {
         self.parse_window_gas_materials(model);
         self.parse_window_gap_equivalent_layer_materials(model);
         self.parse_window_gas_mixture_materials(model);
+        self.parse_window_shade_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -2219,6 +2333,219 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_window_shade_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowMaterial:Shade";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let solar_transmittance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "solar_transmittance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let solar_reflectance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "solar_reflectance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let visible_transmittance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "visible_transmittance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let visible_reflectance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "visible_reflectance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let infrared_hemispherical_emissivity = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "infrared_hemispherical_emissivity",
+                (0.0, false),
+                (1.0, false),
+            );
+            let infrared_transmittance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "infrared_transmittance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let thickness_m =
+                self.required_number_minimum(OBJECT_TYPE, &name, &object, "thickness", 0.0, false);
+            let conductivity_w_per_m_k = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "conductivity",
+                0.0,
+                false,
+            );
+
+            let shade_to_glass_distance_m = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "shade_to_glass_distance",
+                0.05,
+                (0.001, true),
+                (1.0, true),
+            );
+            let top_opening_multiplier = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "top_opening_multiplier",
+                0.5,
+                0.0..=1.0,
+            );
+            let bottom_opening_multiplier = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "bottom_opening_multiplier",
+                0.5,
+                0.0..=1.0,
+            );
+            let left_side_opening_multiplier = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "left_side_opening_multiplier",
+                0.5,
+                0.0..=1.0,
+            );
+            let right_side_opening_multiplier = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "right_side_opening_multiplier",
+                0.5,
+                0.0..=1.0,
+            );
+            let airflow_permeability = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "airflow_permeability",
+                0.0,
+                0.0..=0.8,
+            );
+
+            let mut combinations_valid = true;
+            for (left, right, left_field, right_field, band) in [
+                (
+                    solar_transmittance,
+                    solar_reflectance,
+                    "solar_transmittance",
+                    "solar_reflectance",
+                    "solar",
+                ),
+                (
+                    visible_transmittance,
+                    visible_reflectance,
+                    "visible_transmittance",
+                    "visible_reflectance",
+                    "visible",
+                ),
+                (
+                    infrared_hemispherical_emissivity,
+                    infrared_transmittance,
+                    "infrared_hemispherical_emissivity",
+                    "infrared_transmittance",
+                    "infrared",
+                ),
+            ] {
+                if let (Some(left), Some(right)) = (left, right)
+                    && left + right >= 1.0
+                {
+                    self.error(
+                        "InvalidWindowShadeOpticalSum",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some(left_field),
+                        format!(
+                            "{OBJECT_TYPE}/{name} {band} fields {left_field} + {right_field} must be less than 1.0, got {}",
+                            left + right
+                        ),
+                    );
+                    combinations_valid = false;
+                }
+            }
+
+            let (
+                Some(solar_transmittance),
+                Some(solar_reflectance),
+                Some(visible_transmittance),
+                Some(visible_reflectance),
+                Some(infrared_hemispherical_emissivity),
+                Some(infrared_transmittance),
+                Some(thickness_m),
+                Some(conductivity_w_per_m_k),
+            ) = (
+                solar_transmittance,
+                solar_reflectance,
+                visible_transmittance,
+                visible_reflectance,
+                infrared_hemispherical_emissivity,
+                infrared_transmittance,
+                thickness_m,
+                conductivity_w_per_m_k,
+            )
+            else {
+                continue;
+            };
+            if !combinations_valid {
+                continue;
+            }
+
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::WindowShade(WindowShadeMaterial {
+                    roughness: MaterialSurfaceRoughness::MediumRough,
+                    solar_transmittance,
+                    solar_reflectance,
+                    visible_transmittance,
+                    visible_reflectance,
+                    infrared_hemispherical_emissivity,
+                    infrared_transmittance,
+                    thickness_m,
+                    conductivity_w_per_m_k,
+                    solar_absorptance: (1.0 - solar_transmittance - solar_reflectance).max(0.0),
+                    // EnergyPlus 26.1 does not assign the corresponding
+                    // visible absorptance while reading WindowMaterial:Shade.
+                    visible_absorptance: 0.0,
+                    shade_to_glass_distance_m,
+                    top_opening_multiplier,
+                    bottom_opening_multiplier,
+                    left_side_opening_multiplier,
+                    right_side_opening_multiplier,
+                    airflow_permeability,
+                }),
+            });
+        }
+    }
+
     fn reserve_material_identity(
         &mut self,
         model: &mut TypedModel,
@@ -2360,18 +2687,35 @@ impl<'a> Compiler<'a> {
                 );
                 return None;
             }
-            if layers.len() > 7 {
+            if layers.len() > MAX_WINDOW_CONSTRUCTION_LAYERS {
                 self.error(
                     "InvalidWindowConstructionLayering",
                     "Construction",
                     Some(construction_name),
-                    Some("layer_8"),
+                    Some("layer_9"),
                     format!(
-                        "Construction/{construction_name} has more than four glazing layers and three gas gaps"
+                        "Construction/{construction_name} has more than the EnergyPlus maximum of eight window layers (four glazing layers, three gas gaps, and one shading device)"
                     ),
                 );
                 return None;
             }
+
+            let has_shade = layers.iter().any(|material_id| {
+                model
+                    .materials
+                    .get(material_id.0 as usize)
+                    .is_some_and(|material| {
+                        matches!(material.definition, MaterialDefinition::WindowShade(_))
+                    })
+            });
+            if has_shade {
+                return self.validate_shaded_window_material_layers(
+                    model,
+                    construction_name,
+                    layers,
+                );
+            }
+
             for (layer_index, material_id) in layers.iter().enumerate() {
                 let Some(material) = model.materials.get(material_id.0 as usize) else {
                     let layer_field = if layer_index == 0 {
@@ -2513,6 +2857,207 @@ impl<'a> Compiler<'a> {
         }
 
         valid.then_some(ConstructionKind::Opaque)
+    }
+
+    fn validate_shaded_window_material_layers(
+        &mut self,
+        model: &TypedModel,
+        construction_name: &str,
+        layers: &[MaterialId],
+    ) -> Option<ConstructionKind> {
+        let mut materials = Vec::with_capacity(layers.len());
+        for (layer_index, material_id) in layers.iter().enumerate() {
+            let Some(material) = model.materials.get(material_id.0 as usize) else {
+                let layer_field = construction_layer_field(layer_index);
+                self.error(
+                    "InvalidConstructionMaterialReference",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&layer_field),
+                    format!(
+                        "Construction/{construction_name} field {layer_field} resolved to an unavailable material ID"
+                    ),
+                );
+                return None;
+            };
+            materials.push(material);
+        }
+
+        let Some(kinds) = materials
+            .iter()
+            .map(|material| window_construction_layer_kind(&material.definition))
+            .collect::<Option<Vec<_>>>()
+        else {
+            self.error(
+                "InvalidWindowShadeConstructionMaterial",
+                "Construction",
+                Some(construction_name),
+                None,
+                format!(
+                    "Construction/{construction_name} contains a material outside the ordinary Glass, Gas, GasMixture, and Shade subset"
+                ),
+            );
+            return None;
+        };
+        let shade_indices = kinds
+            .iter()
+            .enumerate()
+            .filter_map(|(index, kind)| {
+                (*kind == WindowConstructionLayerKind::Shade).then_some(index)
+            })
+            .collect::<Vec<_>>();
+
+        if shade_indices.len() != 1 {
+            let layer_index = shade_indices.get(1).copied().unwrap_or(0);
+            let layer_field = construction_layer_field(layer_index);
+            self.error(
+                "InvalidWindowShadeCount",
+                "Construction",
+                Some(construction_name),
+                Some(&layer_field),
+                format!(
+                    "Construction/{construction_name} must contain exactly one shading device in the typed Shade subset; found {}",
+                    shade_indices.len()
+                ),
+            );
+            return None;
+        }
+        let shade_index = shade_indices[0];
+
+        if let Some((layer_index, material)) = materials
+            .iter()
+            .enumerate()
+            .find(|(_, material)| window_glazing_is_solar_diffusing(&material.definition))
+        {
+            let layer_field = construction_layer_field(layer_index);
+            self.error(
+                "InvalidSolarDiffusingGlazingWithShade",
+                "Construction",
+                Some(construction_name),
+                Some(&layer_field),
+                format!(
+                    "Construction/{construction_name} cannot combine solar-diffusing glazing {} with WindowMaterial:Shade",
+                    material.name.0
+                ),
+            );
+            return None;
+        }
+
+        // EnergyPlus 26.1's broad layering checks accidentally accept both end
+        // patterns. The exterior form reaches an access violation in window
+        // initialization; the mirrored interior form completes despite the
+        // source's stated direct-adjacency rule. Reject both at this boundary.
+        let unsafe_exterior_hole = matches!(
+            kinds.as_slice(),
+            [
+                WindowConstructionLayerKind::Shade,
+                WindowConstructionLayerKind::Gap,
+                WindowConstructionLayerKind::Glass
+            ]
+        );
+        let unsafe_interior_hole = matches!(
+            kinds.as_slice(),
+            [
+                WindowConstructionLayerKind::Glass,
+                WindowConstructionLayerKind::Gap,
+                WindowConstructionLayerKind::Shade
+            ]
+        );
+        if unsafe_exterior_hole || unsafe_interior_hole {
+            let layer_field = construction_layer_field(shade_index);
+            self.error(
+                "UnsafeWindowShadeEndLayering",
+                "Construction",
+                Some(construction_name),
+                Some(&layer_field),
+                format!(
+                    "Construction/{construction_name} uses a Shade-Gap-Glass end pattern outside the safe typed subset: the exterior ordering reaches an EnergyPlus 26.1 access violation, while the mirrored interior ordering is source-asymmetrically accepted despite the intended direct-adjacency rule"
+                ),
+            );
+            return None;
+        }
+
+        let exterior = kinds.first() == Some(&WindowConstructionLayerKind::Shade)
+            && is_plain_window_stack(&kinds[1..]);
+        let interior = kinds.last() == Some(&WindowConstructionLayerKind::Shade)
+            && is_plain_window_stack(&kinds[..kinds.len() - 1]);
+        let between_double = matches!(
+            kinds.as_slice(),
+            [
+                WindowConstructionLayerKind::Glass,
+                WindowConstructionLayerKind::Gap,
+                WindowConstructionLayerKind::Shade,
+                WindowConstructionLayerKind::Gap,
+                WindowConstructionLayerKind::Glass
+            ]
+        );
+        let between_triple = matches!(
+            kinds.as_slice(),
+            [
+                WindowConstructionLayerKind::Glass,
+                WindowConstructionLayerKind::Gap,
+                WindowConstructionLayerKind::Glass,
+                WindowConstructionLayerKind::Gap,
+                WindowConstructionLayerKind::Shade,
+                WindowConstructionLayerKind::Gap,
+                WindowConstructionLayerKind::Glass
+            ]
+        );
+
+        if !(exterior || interior || between_double || between_triple) {
+            let layer_field = construction_layer_field(shade_index);
+            self.error(
+                "InvalidWindowShadeConstructionLayering",
+                "Construction",
+                Some(construction_name),
+                Some(&layer_field),
+                format!(
+                    "Construction/{construction_name} has an unsupported Shade placement; the safe typed subset permits exterior or interior Shade directly against one-to-four panes, or between-glass Shade in the source-defined double- and triple-pane positions"
+                ),
+            );
+            return None;
+        }
+
+        if between_double || between_triple {
+            let left_gap = window_gap_signature(&materials[shade_index - 1].definition)?;
+            let right_gap = window_gap_signature(&materials[shade_index + 1].definition)?;
+
+            // Match EnergyPlus's fixed five-slot type/fraction comparison.
+            // Custom coefficient records are intentionally not compared.
+            if left_gap.gas_types != right_gap.gas_types
+                || left_gap.fractions != right_gap.fractions
+            {
+                let layer_field = construction_layer_field(shade_index + 1);
+                self.error(
+                    "InvalidBetweenGlassShadeGasComposition",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&layer_field),
+                    format!(
+                        "Construction/{construction_name} requires identical gas species and fractions on both sides of its between-glass Shade"
+                    ),
+                );
+                return None;
+            }
+            if (left_gap.thickness_m - right_gap.thickness_m).abs()
+                > MAX_BETWEEN_GLASS_SHADE_GAP_THICKNESS_DIFFERENCE_M
+            {
+                let layer_field = construction_layer_field(shade_index + 1);
+                self.error(
+                    "InvalidBetweenGlassShadeGapThickness",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&layer_field),
+                    format!(
+                        "Construction/{construction_name} requires adjacent between-glass Shade gap thicknesses to differ by no more than 0.0005 m; got {} m and {} m",
+                        left_gap.thickness_m, right_gap.thickness_m
+                    ),
+                );
+                return None;
+            }
+        }
+
+        Some(ConstructionKind::Fenestration)
     }
 
     fn parse_schedule_type_limits(&mut self, model: &mut TypedModel) {
@@ -7537,6 +8082,46 @@ impl<'a> Compiler<'a> {
         self.number_value(object_type, object_name, field, value)
     }
 
+    #[allow(clippy::too_many_arguments)]
+    fn required_number_bounded(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+        minimum: (f64, bool),
+        maximum: (f64, bool),
+    ) -> Option<f64> {
+        let value = self.required_number(object_type, object_name, object, field)?;
+        let minimum_valid = if minimum.1 {
+            value >= minimum.0
+        } else {
+            value > minimum.0
+        };
+        let maximum_valid = if maximum.1 {
+            value <= maximum.0
+        } else {
+            value < maximum.0
+        };
+        if minimum_valid && maximum_valid {
+            return Some(value);
+        }
+
+        let lower_bracket = if minimum.1 { "[" } else { "(" };
+        let upper_bracket = if maximum.1 { "]" } else { ")" };
+        self.error(
+            "InvalidNumericRange",
+            object_type,
+            Some(object_name),
+            Some(field),
+            format!(
+                "{object_type}/{object_name} field {field} must be in {lower_bracket}{}, {}{upper_bracket}, got {value}",
+                minimum.0, maximum.0
+            ),
+        );
+        None
+    }
+
     fn required_number_minimum(
         &mut self,
         object_type: &str,
@@ -9652,6 +10237,7 @@ mod tests {
     mod window_material_glazing;
     mod window_material_glazing_equivalent_layer;
     mod window_material_glazing_refraction_extinction;
+    mod window_material_shade;
 
     use super::{
         ALL_SCHEDULE_DAY_TYPES, CompileStage, DiagnosticSeverity, ObjectCoverageStatus,

@@ -1,5 +1,9 @@
 use crate::{AutoOrNumber, ConstructionId, MaterialId, NormalizedName};
 
+mod window_shade;
+
+pub use window_shade::WindowShadeMaterial;
+
 /// Material flavor tracked by the first typed subset.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum MaterialKind {
@@ -23,6 +27,8 @@ pub enum MaterialKind {
     WindowGapEquivalentLayer,
     /// WindowMaterial:GasMixture object.
     WindowGasMixture,
+    /// WindowMaterial:Shade object.
+    WindowShade,
 }
 
 /// High-level material family used to keep construction consumers separate.
@@ -765,6 +771,8 @@ pub enum MaterialDefinition {
     WindowGapEquivalentLayer(WindowGapEquivalentLayerMaterial),
     /// Ordinary window gap containing one to four built-in gases.
     WindowGasMixture(WindowGasMixtureMaterial),
+    /// Ordinary window shade.
+    WindowShade(WindowShadeMaterial),
 }
 
 /// Borrowed opaque material payload used by opaque-only consumers.
@@ -944,6 +952,7 @@ impl Material {
                 MaterialKind::WindowGapEquivalentLayer
             }
             MaterialDefinition::WindowGasMixture(_) => MaterialKind::WindowGasMixture,
+            MaterialDefinition::WindowShade(_) => MaterialKind::WindowShade,
         }
     }
 
@@ -958,7 +967,8 @@ impl Material {
             MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGas(_)
-            | MaterialDefinition::WindowGasMixture(_) => MaterialFamily::Fenestration,
+            | MaterialDefinition::WindowGasMixture(_)
+            | MaterialDefinition::WindowShade(_) => MaterialFamily::Fenestration,
             MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_) => MaterialFamily::EquivalentLayer,
         }
@@ -979,6 +989,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGasMixture(_)
+            | MaterialDefinition::WindowShade(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
@@ -998,6 +1009,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGasMixture(_)
+            | MaterialDefinition::WindowShade(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
@@ -1017,6 +1029,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGasMixture(_)
+            | MaterialDefinition::WindowShade(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
@@ -1036,6 +1049,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGasMixture(_)
+            | MaterialDefinition::WindowShade(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
@@ -1053,6 +1067,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGasMixture(_)
+            | MaterialDefinition::WindowShade(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
@@ -1072,7 +1087,8 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGas(_)
-            | MaterialDefinition::WindowGasMixture(_) => None,
+            | MaterialDefinition::WindowGasMixture(_)
+            | MaterialDefinition::WindowShade(_) => None,
         }
     }
 
@@ -1089,6 +1105,25 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowShade(_)
+            | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
+        }
+    }
+
+    /// Borrows the ordinary window-shade payload when applicable.
+    #[must_use]
+    pub const fn as_window_shade(&self) -> Option<&WindowShadeMaterial> {
+        match &self.definition {
+            MaterialDefinition::WindowShade(material) => Some(material),
+            MaterialDefinition::Regular(_)
+            | MaterialDefinition::NoMass(_)
+            | MaterialDefinition::AirGap(_)
+            | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectralAverage(_)
+            | MaterialDefinition::WindowGlazingRefractionExtinction(_)
+            | MaterialDefinition::WindowGlazingEquivalentLayer(_)
+            | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
