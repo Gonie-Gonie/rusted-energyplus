@@ -1231,6 +1231,98 @@ not_claimed_branches:
 - external EnergyPlus numerical parity, cached/no-cache/IF97 equivalence, full IEEE and negative-NaN sentinel parity, exact diagnostic/statistics/cache behavior, threshold nextafter messaging, API or EMS dispatch, and coil, heat-recovery, thermal-comfort, weather, zone, or other downstream migration
 <!-- routine-state-contract:v1 end psy_rh_fn_tdb_w_pb -->
 
+## Routines 33-34 Dew-Point/Pressure Humidity-Ratio Deferral Boundary
+
+Both `PsyWFnTdpPb_error` and `PsyWFnTdpPb` remain `source_mapped`. The
+inventory stays at 34 source-mapped and 19 state-mapped routines. Rust has no
+exact analogue or canonical caller: parsed EPW dew point is retained as
+weather data but is not converted through this routine. The existing
+`energyplus_psychrometric_humidity_ratio_from_rh` compatibility helper is a
+different RH-based routine-36 path with a 1000 Pa denominator floor, a
+`1.0e-5` output floor, finite-input guards, and an `Option` result.
+
+### `PsyWFnTdpPb` (`psy_w_fn_tdp_pb`)
+
+Optional own statistics increment once before the initial unconditional
+`PsyPsatFnTemp` call. An empty `CalledFrom` is replaced by fixed
+`PsyWFnTdpPb` for that call and every later lookup; a nonempty caller is
+forwarded. The source then evaluates
+`PDEW * 0.62198 / (PB - PDEW)` with no pressure guard or humidity-ratio
+floor.
+
+Only a strictly negative initial `W` enters correction. The routine initializes
+floating-point `DeltaT = 0.0` and `PDEW1 = PDEW`, then repeatedly increments
+`DeltaT` by exactly one and looks up saturation pressure at
+`TDP - DeltaT` while `PDEW1 >= PB`. It returns the humidity ratio at the
+first whole-degree-decrement temperature whose saturation pressure is
+strictly below `PB`; there is no interpolation, solver tolerance, iteration
+limit, or final floor. Exact `PB == PDEW` instead divides by positive zero,
+returns positive infinity, and skips both correction and diagnostics because
+`W < 0.0` is false.
+
+The errors-enabled dispatch tests the original negative `W` against inclusive
+`W <= -0.0001` only after correction, but passes corrected `W1` and
+`DeltaT` to routine 33. Warmup suppresses only diagnostic mutations, not the
+correction loop or returned value. Each loop step performs another public
+routine-25 lookup, so default-cache wrapper counts, hits, misses, raw
+statistics, range warnings, caller propagation, and overwrite order are
+observable. The no-cache build instead evaluates every original
+`TDP - DeltaT` directly, and `EP_IF97` changes the liquid-water dependency.
+
+The loop is not total over `f64` inputs. The default non-IF97 raw saturation
+pressure never drops below `0.001405102123874164 Pa`, so a correction entered
+with finite `PB` at or below that value, including finite negative pressure
+and signed zero, cannot terminate. NaN or positive-infinite `TDP` with ordinary
+pressure can keep the saturation pressure above `PB` forever. Large finite
+`TDP` can also make subtracting unit increments ineffective, and at
+`DeltaT = 2^53` the increment itself can stop changing `DeltaT`.
+
+Routine-25 cache history adds a stronger boundary. Its reachable
+negative-NaN tag `-1000` is a fresh-entry false hit with `PDEW = 0.0`, which
+can make this routine return zero immediately. After a colliding eviction, the
+same input can miss, obtain the raw high saturation-pressure constant, and
+enter a nonterminating correction for ordinary pressure. Thus full default
+behavior can be history-dependent in both numerical result and termination,
+not merely in diagnostics.
+
+### `PsyWFnTdpPb_error` (`psy_w_fn_tdp_pb_error`)
+
+The helper does not repeat the original-W threshold. On a parent dispatch it
+first checks warmup. Outside warmup, a zero dedicated `WFnTdpPb` error index
+emits one detailed warning using original `TDP` and `PB`, the external caller
+or `Unknown`, then overwrites the shared scratch string with corrected
+`TDP - DeltaT`, integer-cast `DeltaT`, and corrected `W1`. Both nonempty and
+Unknown caller continuations include a trailing comma. Every non-warmup
+dispatch records corrected `W1`, not the original invalid value, in the shared
+recurring min/max record with `[]` units.
+
+The warning stream and totals, scratch string, timestamp, recurrence
+index/count/min/max, callback, and SQLite mutations belong to each
+`EnergyPlusData` instance. No current Rust owner or state-isolation evidence
+exists for them.
+
+### Evidence And Promotion Requirements
+
+Direct EnergyPlus 26.1 evidence covers the EMS no-correction vector
+`(16 C, 101325 Pa) -> 0.0113664167`, `(99 C, 101325 Pa) -> 17.5250143`
+without correction, `(100 C, 101325 Pa)` corrected by one degree to the same
+value, and `(100 C, 81000 Pa)` corrected by seven degrees to
+`20.07942181`. The latter two tests also lock first-warning text with an
+Unknown caller. The C/Python functional examples only print the ordinary
+`(13 C, 101325 Pa)` result near `0.009`. Existing downstream tests either
+reuse the routine itself as expected data or exercise sizing, defrost, coil,
+and weather control flow without an independent oracle.
+
+Promotion requires an explicit Rust invalid-domain and cancellation policy
+that does not masquerade as the unbounded source loop; a routine-25 cache
+owner with sentinel, collision, lifecycle, and per-step side-effect tests;
+cached/no-cache/IF97 evidence; exact pressure-equality and neighboring branch
+vectors; warmup, first/recurring, caller, and state-isolation diagnostics; and
+representative EMS, API, WaterCoils, DXCoils, design-day, and sizing
+integration. Source-equivalent nonterminating inputs must be tested only
+through an isolated watchdog or a separately declared safe boundary, never by
+calling an unbounded unit test directly.
+
 ## Compile-Time Variant Boundary
 
 Unless `EP_nocache_Psychrometrics` is set, the EnergyPlus header enables
