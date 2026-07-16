@@ -631,13 +631,29 @@ first_evidence = "window_material_shade_001"
 support_boundary = "Non-blocking diagnostic duplicate-aware comparison of EnergyPlus 26.1 WindowMaterial:Shade EIO construction-layer occurrences. The exact specialized header and fixture occurrence multiplicity are locked; each compared row contains material identity plus source-{:.3R}-serialized thickness, conductivity, infrared emissivity, solar transmittance, visible transmittance, and solar reflectance. Reuse produces repeated rows, while a definition absent from every shade construction is excluded. The row does not expose visible reflectance, infrared transmittance, placement/opening/permeability inputs, nominal resistance, active shading-control state, ratings, optics/thermal/daylighting behavior, or surface use. Broad row/declaration order, runtime, and conformance remain unclaimed."
 
 [[variable]]
+name = "WindowMaterial:Shade:EquivalentLayer Generic Definition Details"
+domain = "construction"
+status = "diagnostic"
+first_case = "window_material_shade_equivalent_layer_001"
+first_evidence = "window_material_shade_equivalent_layer_001"
+support_boundary = "Non-blocking diagnostic by-name comparison of all three typed fixture WindowMaterial:Shade:EquivalentLayer definitions against EnergyPlus 26.1 generic Material Details rows. Exactly one row per definition is required, including the unused/defaulted shade. MediumRough and fixed zero resistance, thickness, conductivity, density, specific heat, and thermal/solar/visible absorptance fields are exact. Generic rows expose none of the eleven optical inputs, directional thermal projections, occurrence/use/reuse state, construction behavior, EMS behavior, runtime, or conformance."
+
+[[variable]]
+name = "WindowMaterial:Shade:EquivalentLayer Layer Occurrences"
+domain = "construction"
+status = "diagnostic"
+first_case = "window_material_shade_equivalent_layer_001"
+first_evidence = "window_material_shade_equivalent_layer_001"
+support_boundary = "Non-blocking diagnostic duplicate-aware comparison of EnergyPlus 26.1 WindowMaterial:Shade:EquivalentLayer construction-layer occurrences. The exact specialized header and fixture-local ordered sequence are locked: one defaulted shade occurrence plus two high-precision reused occurrences, with the unused shade definition excluded. The header is expected only when Output:Constructions selects Constructions and at least one ordinary, complex-fenestration, or equivalent-layer window construction exists; a Materials-only selection does not request it. Each row contains identity plus source-{:.4R}-serialized duplicated front/back beam-beam solar transmittance, four directional beam-diffuse solar values, infrared transmittance, and directional emissivities. Two surfaces sharing one construction do not multiply its row; a surface-unused construction nominally referenced only by a fixture EnergyManagementSystem:ConstructionIndexVariable emits its own row. The three visible inputs are omitted. Construction typing/packing, ratings, optics/thermal/daylighting, EMS behavior, surfaces, runtime, broad order, and conformance remain unclaimed."
+
+[[variable]]
 name = "WindowConstruction Layer Summary"
 domain = "construction"
 status = "diagnostic"
 first_case = "window_glazing_spectral_average_001"
 first_evidence = "window_glazing_spectral_average_001"
 support_boundary = "Non-blocking diagnostic one-layer ordinary window-construction and one-solid equivalent-layer construction EIO fixture-integrity comparisons in the declared glazing fixtures, plus the six exact glass-gap-glass ordinary WindowConstruction rows in window_material_gas_001, the seven exact glass-gap-glass Construction:WindowEquivalentLayer rows in window_material_gap_equivalent_layer_001, and the two exact seven-layer ordinary WindowConstruction rows in window_material_gas_mixture_001. Ratings, Rust construction behavior, whole-window behavior, and construction conformance remain unclaimed."
-support_boundary_addendum = "window_material_shade_001 adds exact bare, exterior-shade, and interior-shade ordinary WindowConstruction rows as oracle-only fixture-integrity locks. It does not promote construction ratings, shading behavior, runtime, or conformance."
+support_boundary_addendum = "window_material_shade_001 adds exact bare, exterior-shade, and interior-shade ordinary WindowConstruction rows as oracle-only fixture-integrity locks. window_material_shade_equivalent_layer_001 adds three exact Construction:WindowEquivalentLayer rows, including one surface-unused construction nominally referenced only by a fixture EnergyManagementSystem:ConstructionIndexVariable, under the same oracle-only boundary. Neither fixture promotes construction ratings, packing, shading behavior, EMS behavior, runtime, or conformance."
 
 [[variable]]
 name = "HeatTransfer Surface Static Inputs"
@@ -646,7 +662,7 @@ status = "diagnostic"
 first_case = "window_glazing_spectral_average_001"
 first_evidence = "window_glazing_spectral_average_001"
 support_boundary = "Non-blocking diagnostic fenestration-surface EIO identity and static-input fixture-integrity comparison in the declared glazing fixtures only; equivalent-layer surface evidence is oracle-only, and no fenestration heat-transfer runtime or surface conformance claim is attached."
-support_boundary_addendum = "window_material_shade_001 adds only its named opaque host and detailed-window rows as oracle fixture-integrity locks; Shade material parity remains confined to the two dedicated diagnostic variables."
+support_boundary_addendum = "window_material_shade_001 adds only its named opaque host and detailed-window rows as oracle fixture-integrity locks; Shade material parity remains confined to the two dedicated diagnostic variables. window_material_shade_equivalent_layer_001 likewise locks one opaque host and three detailed-window rows only to prove fixture topology; its surface-unused construction has no surface row, and equivalent-layer Shade parity remains confined to its two dedicated diagnostic variables. No surface, EMS, runtime, or conformance behavior is promoted."
 
 [[variable]]
 name = "Surface Inside Face Temperature"

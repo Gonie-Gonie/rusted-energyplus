@@ -547,11 +547,43 @@ The object belongs to `MaterialFamily::EquivalentLayer`. Ordinary
 `Construction:WindowEquivalentLayer` consumer is not typed or inferred from
 the source's weak layer validation. Arbitrary-run assessment counts every
 typed definition, including unused definitions, and blocks execution. First
-evidence is the named compiler/runtime test set only. Specialized EIO,
-equivalent-layer construction packing, ASHWAT roller-blind coefficients,
-openness-adjusted longwave behavior, visible optical use, ratings, surfaces,
-runtime, broad diagnostics/order, and conformance remain unclaimed at this
-typed checkpoint.
+typed evidence is the named compiler/runtime test set.
+
+`window_material_shade_equivalent_layer_001` adds a separate nonblocking
+diagnostic EnergyPlus 26.1 EIO gate. Its generic `Material Details` comparison
+is definition keyed and requires exactly one row for every equivalent-layer
+shade, including the unused definition. Those rows lock `MediumRough` plus
+zero resistance, thickness, conductivity, density, specific heat, and all
+three scalar absorptances. They expose none of the eleven optical inputs,
+directional thermal projections, use/reuse state, or construction occurrence.
+
+The specialized `WindowMaterial:Shade:EquivalentLayer` comparison locks a
+duplicate-aware, fixture-local ordered sequence of equivalent-layer construction
+occurrences. The
+defaulted used shade appears once, the high-precision shade reused by two
+constructions appears twice, and the unused definition is absent. Material
+name, the front/back duplicate of shared beam-beam solar transmittance, the
+four directional beam-diffuse solar values, infrared transmittance, and both
+infrared emissivities are locked with EnergyPlus `{:.4R}` serialization, as is
+the exact one-row header. The three visible inputs do not appear in this EIO
+table and remain outside external evidence.
+
+The header expectation also reproduces the shared source gate: an
+`Output:Constructions` object must select `Constructions`, and at least one
+ordinary, complex-fenestration, or equivalent-layer window construction must
+exist. Selecting only `Materials` does not request this specialized table.
+
+Occurrence derives from `Construction:WindowEquivalentLayer` layers: a
+surface-unused construction still emits its material occurrence, while
+additional fenestration surfaces do not multiply it. A fixture-only
+`EnergyManagementSystem:ConstructionIndexVariable` nominally references that
+surface-unused construction to suppress EnergyPlus's unused-construction
+warning; EMS behavior is not compared. The exact construction, host, and
+window rows in the fixture remain oracle-integrity locks only. Equivalent-layer
+construction typing and packing, arbitrary declaration-order parity, ASHWAT
+roller-blind coefficients, openness-adjusted longwave behavior, visible
+optical use, ratings, surfaces, EMS, runtime, broad diagnostics/order, and
+conformance remain unclaimed.
 
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. The two ordinary glazing variants, `WindowMaterial:Gas`, and
@@ -693,7 +725,10 @@ the duplicated front/back solar beam-beam value, the front-only visible TAR
 storage and zero back-visible quirk, fixed roughness/resistance-only and
 thermal projections, shared-name/source order, equivalent-layer consumer
 family, ordinary-Construction rejection, typed coverage, and explicit runtime
-block. No external EIO evidence is attached at this typed checkpoint.
+block. `window_material_shade_equivalent_layer_001` separately locks the
+all-definition generic zero rows and the duplicate-aware specialized
+equivalent-layer construction occurrences described above, without promoting
+construction, surface, window execution, or conformance.
 
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
@@ -771,6 +806,13 @@ the generic report omits them.
 including the unused definition, plus the two specialized construction-layer
 occurrences created by exterior/interior reuse. Its exact construction and
 surface rows remain oracle-only integrity locks.
+`window_material_shade_equivalent_layer_001` compares all three equivalent-layer
+shade definitions against their generic `MediumRough`/all-zero rows, including
+the unused definition. Its specialized exact-header sequence contains one
+defaulted occurrence and two high-precision reused occurrences, proving that
+surfaces do not multiply construction rows and that a surface-unused,
+fixture-EMS-referenced construction still emits its layer; visible inputs
+remain typed-only because EIO omits them.
 These tests and static EIO smokes remain bounded evidence, not an EnergyPlus
 material-family or window gate.
 

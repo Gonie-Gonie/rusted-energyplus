@@ -1,0 +1,293 @@
+Version,26.1;
+
+SimulationControl,No,No,No,No,Yes,No;
+
+Building,Window Material Shade EquivalentLayer Compare,0.0,Suburbs,0.04,0.4,FullExterior,25,6;
+
+Timestep,4;
+
+HeatBalanceAlgorithm,ConductionTransferFunction;
+
+SurfaceConvectionAlgorithm:Inside,TARP;
+
+SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+Site:Location,Golden,39.74,-105.18,-7.0,1829.0;
+
+Site:GroundTemperature:BuildingSurface,18,18,18,18,18,18,18,18,18,18,18,18;
+
+RunPeriod,Run Period 1,1,1,2013,1,1,2013,Tuesday,Yes,Yes,No,Yes,Yes;
+
+GlobalGeometryRules,UpperLeftCorner,CounterClockWise,World;
+
+Material,
+  DISTINCTIVE EQL SHADE OPAQUE HOST MATERIAL,
+  Rough,
+  0.113,
+  0.347,
+  913.0,
+  836.0,
+  0.87,
+  0.63,
+  0.58;
+
+WindowMaterial:Glazing:EquivalentLayer,
+  DISTINCTIVE EQL SHADE TEST GLASS,
+  SpectralAverage,
+  ,
+  0.83,
+  0.83,
+  0.08,
+  0.08,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.76,
+  0.14,
+  0.14,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.84,
+  0.84,
+  0.158;
+
+WindowMaterial:Gap:EquivalentLayer,
+  DISTINCTIVE SEALED AIR EQL SHADE GAP,
+  Air,
+  0.0127,
+  Sealed;
+
+! Definition order intentionally differs from occurrence/name order.
+WindowMaterial:Shade:EquivalentLayer,
+  Z HIGH PRECISION REUSED EQL SHADE,
+  0.0000123456,
+  0.123456,
+  0.234567,
+  0.345678,
+  0.456789,
+  0.0234567,
+  0.134567,
+  0.245678,
+  0.0000345678,
+  0.765432,
+  0.654321;
+
+! Valid but unused. Optional beam-beam, visible, and infrared fields default.
+WindowMaterial:Shade:EquivalentLayer,
+  M DEFAULTED UNUSED EQL SHADE,
+  ,
+  0.1333,
+  0.1444,
+  0.2555,
+  0.2666;
+
+! Used once. Optional beam-beam, visible, and infrared fields default.
+WindowMaterial:Shade:EquivalentLayer,
+  A DEFAULTED USED EQL SHADE,
+  ,
+  0.1111,
+  0.1222,
+  0.2333,
+  0.2444;
+
+Construction:WindowEquivalentLayer,
+  A DEFAULTED EQL SHADE WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL SHADE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL SHADE GAP,
+  DISTINCTIVE EQL SHADE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL SHADE GAP,
+  A DEFAULTED USED EQL SHADE;
+
+Construction:WindowEquivalentLayer,
+  B HIGH PRECISION FIRST EQL SHADE WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL SHADE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL SHADE GAP,
+  DISTINCTIVE EQL SHADE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL SHADE GAP,
+  Z HIGH PRECISION REUSED EQL SHADE;
+
+Construction:WindowEquivalentLayer,
+  C HIGH PRECISION SECOND EQL SHADE WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL SHADE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL SHADE GAP,
+  DISTINCTIVE EQL SHADE TEST GLASS,
+  DISTINCTIVE SEALED AIR EQL SHADE GAP,
+  Z HIGH PRECISION REUSED EQL SHADE;
+
+Construction,
+  D EQL SHADE OPAQUE HOST CONSTRUCTION,
+  DISTINCTIVE EQL SHADE OPAQUE HOST MATERIAL;
+
+! This fixture-only reference prevents EnergyPlus's nominally-unused-
+! construction warning without assigning construction C to any surface.
+EnergyManagementSystem:ConstructionIndexVariable,
+  UnusedEqlShadeConstructionIndex,
+  C HIGH PRECISION SECOND EQL SHADE WINDOW CONSTRUCTION;
+
+Zone,EQL SHADE TEST ZONE,0,0,0,0,1,1,3,48,16;
+
+BuildingSurface:Detailed,
+  EQL SHADE TEST FLOOR,
+  Floor,
+  D EQL SHADE OPAQUE HOST CONSTRUCTION,
+  EQL SHADE TEST ZONE,
+  ,
+  Ground,
+  ,
+  NoSun,
+  NoWind,
+  1.0,
+  4,
+  4,4,0,
+  4,0,0,
+  0,0,0,
+  0,4,0;
+
+BuildingSurface:Detailed,
+  EQL SHADE TEST ROOF,
+  Roof,
+  D EQL SHADE OPAQUE HOST CONSTRUCTION,
+  EQL SHADE TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.0,
+  4,
+  0,4,3,
+  0,0,3,
+  4,0,3,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  EQL SHADE TEST WEST WALL,
+  Wall,
+  D EQL SHADE OPAQUE HOST CONSTRUCTION,
+  EQL SHADE TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,4,3,
+  0,4,0,
+  0,0,0,
+  0,0,3;
+
+BuildingSurface:Detailed,
+  EQL SHADE TEST EAST WALL,
+  Wall,
+  D EQL SHADE OPAQUE HOST CONSTRUCTION,
+  EQL SHADE TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,0,3,
+  4,0,0,
+  4,4,0,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  DISTINCTIVE EQL SHADE WINDOW HOST WALL,
+  Wall,
+  D EQL SHADE OPAQUE HOST CONSTRUCTION,
+  EQL SHADE TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,0,3,
+  0,0,0,
+  4,0,0,
+  4,0,3;
+
+BuildingSurface:Detailed,
+  EQL SHADE TEST NORTH WALL,
+  Wall,
+  D EQL SHADE OPAQUE HOST CONSTRUCTION,
+  EQL SHADE TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,4,3,
+  4,4,0,
+  0,4,0,
+  0,4,3;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE DEFAULTED EQL SHADE TEST WINDOW,
+  Window,
+  A DEFAULTED EQL SHADE WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL SHADE WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  0.10,0,2.80,
+  0.10,0,1.80,
+  0.90,0,1.80,
+  0.90,0,2.80;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE FIRST HIGH PRECISION EQL SHADE TEST WINDOW,
+  Window,
+  B HIGH PRECISION FIRST EQL SHADE WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL SHADE WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  1.20,0,2.80,
+  1.20,0,1.80,
+  2.00,0,1.80,
+  2.00,0,2.80;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE SECOND HIGH PRECISION EQL SHADE TEST WINDOW,
+  Window,
+  B HIGH PRECISION FIRST EQL SHADE WINDOW CONSTRUCTION,
+  DISTINCTIVE EQL SHADE WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  2.30,0,2.80,
+  2.30,0,1.80,
+  3.10,0,1.80,
+  3.10,0,2.80;
+
+! A reporting element is required to keep the EnergyPlus run warning-free.
+! It is not part of the diagnostic manifest or comparison claim.
+Output:Variable,*,Zone Mean Air Temperature,Hourly;
+
+Output:Constructions,Constructions,Materials;
+
+Output:Surfaces:List,Details;

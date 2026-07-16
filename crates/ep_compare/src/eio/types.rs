@@ -296,6 +296,34 @@ pub struct EioWindowMaterialShade {
     pub solar_reflectance: f64,
 }
 
+/// Equivalent-layer window shade values read from an EnergyPlus `eplusout.eio` row.
+///
+/// EnergyPlus emits one row for every equivalent-layer construction-layer
+/// occurrence, so repeated material names remain distinct rows.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioWindowMaterialShadeEquivalentLayer {
+    /// EnergyPlus-normalized material name.
+    pub material_name: String,
+    /// Front-side beam-beam solar transmittance.
+    pub front_beam_beam_solar_transmittance: f64,
+    /// Back-side beam-beam solar transmittance.
+    pub back_beam_beam_solar_transmittance: f64,
+    /// Front-side beam-diffuse solar transmittance.
+    pub front_beam_diffuse_solar_transmittance: f64,
+    /// Back-side beam-diffuse solar transmittance.
+    pub back_beam_diffuse_solar_transmittance: f64,
+    /// Front-side beam-diffuse solar reflectance.
+    pub front_beam_diffuse_solar_reflectance: f64,
+    /// Back-side beam-diffuse solar reflectance.
+    pub back_beam_diffuse_solar_reflectance: f64,
+    /// Shared front/back infrared transmittance.
+    pub infrared_transmittance: f64,
+    /// Front-side infrared emissivity.
+    pub front_infrared_emissivity: f64,
+    /// Back-side infrared emissivity.
+    pub back_infrared_emissivity: f64,
+}
+
 /// Equivalent-layer window gap values read from an EnergyPlus `eplusout.eio` row.
 ///
 /// EnergyPlus emits one row for every equivalent-layer construction-layer
@@ -392,6 +420,8 @@ pub enum EioError {
     MissingWindowMaterialGas,
     /// No `WindowMaterial:Shade` rows were present.
     MissingWindowMaterialShade,
+    /// No `WindowMaterial:Shade:EquivalentLayer` rows were present.
+    MissingWindowMaterialShadeEquivalentLayer,
     /// No `WindowMaterial:Gap:EquivalentLayer` rows were present.
     MissingWindowMaterialGapEquivalentLayer,
     /// No `WindowMaterial:Glazing:EquivalentLayer` rows were present.
@@ -513,6 +543,15 @@ pub enum EioError {
         /// Parse failure reason.
         reason: String,
     },
+    /// A `WindowMaterial:Shade:EquivalentLayer` row could not be parsed.
+    InvalidWindowMaterialShadeEquivalentLayer {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
     /// A `WindowMaterial:Gap:EquivalentLayer` row could not be parsed.
     InvalidWindowMaterialGapEquivalentLayer {
         /// One-based line number.
@@ -564,6 +603,12 @@ impl Display for EioError {
             }
             Self::MissingWindowMaterialShade => {
                 write!(formatter, "EIO WindowMaterial:Shade not found")
+            }
+            Self::MissingWindowMaterialShadeEquivalentLayer => {
+                write!(
+                    formatter,
+                    "EIO WindowMaterial:Shade:EquivalentLayer not found"
+                )
             }
             Self::MissingWindowMaterialGapEquivalentLayer => {
                 write!(
@@ -629,6 +674,10 @@ impl Display for EioError {
                 formatter,
                 "invalid EIO WindowMaterial:Shade at line {line}: {reason}: {text}"
             ),
+            Self::InvalidWindowMaterialShadeEquivalentLayer { line, text, reason } => write!(
+                formatter,
+                "invalid EIO WindowMaterial:Shade:EquivalentLayer at line {line}: {reason}: {text}"
+            ),
             Self::InvalidWindowMaterialGapEquivalentLayer { line, text, reason } => write!(
                 formatter,
                 "invalid EIO WindowMaterial:Gap:EquivalentLayer at line {line}: {reason}: {text}"
@@ -658,6 +707,7 @@ impl std::error::Error for EioError {
             | Self::MissingWindowMaterialGlazing
             | Self::MissingWindowMaterialGas
             | Self::MissingWindowMaterialShade
+            | Self::MissingWindowMaterialShadeEquivalentLayer
             | Self::MissingWindowMaterialGapEquivalentLayer
             | Self::MissingWindowMaterialGlazingEquivalentLayer
             | Self::InvalidSurfaceGeometry { .. }
@@ -671,6 +721,7 @@ impl std::error::Error for EioError {
             | Self::InvalidWindowMaterialGlazing { .. }
             | Self::InvalidWindowMaterialGas { .. }
             | Self::InvalidWindowMaterialShade { .. }
+            | Self::InvalidWindowMaterialShadeEquivalentLayer { .. }
             | Self::InvalidWindowMaterialGapEquivalentLayer { .. }
             | Self::InvalidWindowMaterialGlazingEquivalentLayer { .. } => None,
         }

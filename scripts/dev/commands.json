@@ -575,6 +575,12 @@
                          "help":  "Compare window-shade definitions and construction-layer occurrences with EnergyPlus EIO evidence."
                      },
                      {
+                         "name":  "compare-window-material-shade-equivalent-layer-smoke",
+                         "path":  "compare\\compare-window-material-shade-equivalent-layer-smoke.ps1",
+                         "group":  "compare",
+                         "help":  "Compare equivalent-layer window-shade definitions and construction-layer occurrences with EnergyPlus EIO evidence."
+                     },
+                     {
                          "name":  "compare-internal-gains-smoke",
                          "path":  "compare\\compare-internal-gains-smoke.ps1",
                          "group":  "compare",
