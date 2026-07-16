@@ -402,6 +402,17 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|material| material.kind() == MaterialKind::WindowBlindEquivalentLayer)
             .count(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "Material:RoofVegetation",
+        typed_model
+            .materials
+            .iter()
+            .filter(|material| material.kind() == MaterialKind::RoofVegetation)
+            .count(),
+    );
 
     push_typed_unsupported_object(
         registry,

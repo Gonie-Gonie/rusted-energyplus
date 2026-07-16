@@ -55,10 +55,10 @@ different:
 | inventoried public objects | 34 / 34 | Every in-boundary EnergyPlus 26.1 object is named below with its source owner and order. |
 | base definitions | 22 / 22 inventoried | `GetMaterialData` processing order is locked below. |
 | overlays and datasets | 12 / 12 inventoried | Common-startup or algorithm-local owner and order are locked below. |
-| typed Rust material variants | 17 | Four complete opaque-object slices, the `WindowMaterial:Glazing` `SpectralAverage` branch, and the complete `RefractionExtinctionMethod`, glazing `EquivalentLayer`, `WindowMaterial:Gas`, gap `EquivalentLayer`, `WindowMaterial:GasMixture`, ordinary `WindowMaterial:Shade`, shade `EquivalentLayer`, drape `EquivalentLayer`, ordinary `WindowMaterial:Screen`, screen `EquivalentLayer`, ordinary `WindowMaterial:Blind`, and blind `EquivalentLayer` objects have distinct payloads. |
-| complete bounded public-object slices | 16 / 34 | `Material`, `Material:NoMass`, `Material:AirGap`, `Material:InfraredTransparent`, `WindowMaterial:Glazing:RefractionExtinctionMethod`, `WindowMaterial:Glazing:EquivalentLayer`, `WindowMaterial:Gas`, `WindowMaterial:Gap:EquivalentLayer`, `WindowMaterial:GasMixture`, `WindowMaterial:Shade`, `WindowMaterial:Shade:EquivalentLayer`, `WindowMaterial:Drape:EquivalentLayer`, `WindowMaterial:Screen`, `WindowMaterial:Screen:EquivalentLayer`, `WindowMaterial:Blind`, and `WindowMaterial:Blind:EquivalentLayer` have their source-effective fields and bounded compiler contracts typed. |
+| typed Rust material variants | 18 | Five complete opaque-family slices, the `WindowMaterial:Glazing` `SpectralAverage` branch, and the complete `RefractionExtinctionMethod`, glazing `EquivalentLayer`, `WindowMaterial:Gas`, gap `EquivalentLayer`, `WindowMaterial:GasMixture`, ordinary `WindowMaterial:Shade`, shade `EquivalentLayer`, drape `EquivalentLayer`, ordinary `WindowMaterial:Screen`, screen `EquivalentLayer`, ordinary `WindowMaterial:Blind`, and blind `EquivalentLayer` objects have distinct payloads. |
+| complete bounded public-object slices | 17 / 34 | `Material`, `Material:NoMass`, `Material:AirGap`, `Material:InfraredTransparent`, `WindowMaterial:Glazing:RefractionExtinctionMethod`, `WindowMaterial:Glazing:EquivalentLayer`, `WindowMaterial:Gas`, `WindowMaterial:Gap:EquivalentLayer`, `WindowMaterial:GasMixture`, `WindowMaterial:Shade`, `WindowMaterial:Shade:EquivalentLayer`, `WindowMaterial:Drape:EquivalentLayer`, `WindowMaterial:Screen`, `WindowMaterial:Screen:EquivalentLayer`, `WindowMaterial:Blind`, `WindowMaterial:Blind:EquivalentLayer`, and `Material:RoofVegetation` have their source-effective fields and bounded compiler contracts typed. |
 | partial bounded public-object slices | 1 / 34 | Only `WindowMaterial:Glazing` with `Optical Data Type = SpectralAverage` is typed; `Spectral`, `SpectralAndAngle`, and `BSDF` remain explicitly unsupported. |
-| wholly deferred public objects | 17 / 34 | The other 5 base definitions and all 12 overlays/datasets remain unported as variants. |
+| wholly deferred public objects | 16 / 34 | The other 4 base definitions and all 12 overlays/datasets remain unported as variants. |
 
 This is a CP58 scaffold checkpoint. Complete inventory does not mean complete
 schema, validation, runtime, optics, moisture, phase-change, or heat-transfer
@@ -104,7 +104,7 @@ The following table is the public-object processing order inside
 | 15 | `WindowMaterial:Screen:EquivalentLayer` | equivalent-layer screen | complete bounded typed variant with source sentinels, storage quirks, and a deferred equivalent-layer construction consumer |
 | 16 | `WindowMaterial:Blind` | slatted blind | complete bounded typed variant with source-effective defaults, slat-property constraints, and safe ordinary-window layering |
 | 17 | `WindowMaterial:Blind:EquivalentLayer` | equivalent-layer blind | complete bounded typed variant with source blank-group/index quirks, warning-only geometry recovery, and a deferred equivalent-layer construction consumer |
-| 18 | `Material:RoofVegetation` | eco-roof material and vegetation state | deferred |
+| 18 | `Material:RoofVegetation` | eco-roof material and vegetation state | complete bounded typed input and dry-soil opaque projection; dynamic EcoRoof runtime blocked |
 | 19 | `WindowMaterial:GlazingGroup:Thermochromic` | thermochromic glazing-group parent | deferred |
 | 20 | `WindowMaterial:SimpleGlazingSystem` | derived simple glazing system | deferred |
 | 21 | `WindowMaterial:Gap` | complex-fenestration gap, including optional deflection-state and support-pillar references | deferred |
@@ -156,7 +156,7 @@ This checkpoint migrates the first four base definitions from a single
 option-heavy record to discriminated material definitions under a shared
 identity envelope, adds one explicitly partial fifth variant for the
 `SpectralAverage` branch of source-order object 5, and gives source-order
-objects 6 through 16 complete bounded variants.
+objects 6 through 18 complete bounded variants.
 
 ### `Material` / regular
 
@@ -1078,8 +1078,62 @@ generation/evaluation, slat-angle control execution, optics and thermal
 calculations, surfaces, ratings, daylighting, runtime, EIO serialization,
 broad diagnostic parity, or conformance.
 
+### `Material:RoofVegetation`
+
+The eighteenth source-order object owns vegetation inputs plus the dry-soil
+material state consumed by EnergyPlus's EcoRoof path. The name is the only
+required field. The compiler applies the EnergyPlus 26.1 defaults and exact
+schema bounds to all 15 numeric fields: plant height 0.2 m in (0.005, 1], leaf
+area index 1 in (0.001, 5], leaf reflectivity 0.22 in [0.05, 0.5], leaf
+emissivity 0.95 in [0.8, 1], minimum stomatal resistance 180 s/m in
+[50, 300], soil thickness 0.1 m in (0.05, 0.7], dry-soil conductivity
+0.35 W/m-K in [0.2, 1.5], dry-soil density 1100 kg/m3 in [300, 2000],
+dry-soil specific heat 1200 J/kg-K in (500, 2000], thermal absorptance 0.9 in
+(0.8, 1], solar absorptance 0.7 in [0.4, 0.9], visible absorptance 0.75 in
+(0.5, 1], saturation moisture 0.3 in (0.1, 0.5], residual moisture 0.01 in
+[0.01, 0.1], and initial moisture 0.1 in (0.05, 0.5].
+
+Roughness accepts the six common opaque-material values and defaults to
+`MediumRough`. `Simple` and `Advanced` are the exact moisture-diffusion
+tokens, with blank or missing input selecting `Advanced`, which maps to the
+source's `SchaapGenuchten` branch. `Soil Layer Name` defaults to
+`Green Roof Soil` and is type-checked, but `GetMaterialData` explicitly
+ignores A2; the source-effective Rust payload therefore does not retain it.
+
+EnergyPlus stores the vegetation values, dry-soil properties, absorptances,
+porosity, residual and initial moisture, and calculation method in
+`MaterialEcoRoof`. Nominal thermal resistance is soil thickness divided by
+dry-soil conductivity. Rust exposes the same dry-soil roughness, thickness,
+conductivity, density, specific heat, surface absorptances, resistance, and
+area heat capacity through the opaque-material boundary while retaining the
+plant and moisture state in `RoofVegetationMaterial`.
+
+The one source-owned cross-field recovery is warning-only: when initial
+volumetric moisture exceeds saturation, EnergyPlus reports the combination
+and resets initial moisture to saturation. The compiler materializes that
+same clamp. It does not invent relationships among residual, initial, and
+saturation moisture beyond this one check.
+
+An EcoRoof material is intended to be the outside layer. Upstream sets
+`TypeIsEcoRoof` and searches for illegal interior EcoRoof layers only when
+the first layer is already EcoRoof, so an interior-only occurrence behind a
+regular outside layer passes the 26.1 construction check and silently loses
+EcoRoof behavior. The bounded compiler fails closed for every non-outside
+`Material:RoofVegetation` reference instead of reproducing that validation
+hole. This deliberate diagnostic divergence matches the existing
+infrared-transparent fail-closed policy.
+
+Every typed RoofVegetation definition, including an unused one, is explicitly
+run-blocked before arbitrary Rust execution. EnergyPlus's dynamic EcoRoof
+state is shared across surfaces, requires one effective EcoRoof material for
+all used vegetated constructions, and supports only the CTF heat-transfer
+algorithm. Those singleton/state updates, moisture redistribution,
+evapotranspiration, irrigation, surface coupling, reporting, EIO comparison,
+runtime execution, broad diagnostic parity, and conformance remain deferred.
+
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
-consumers. The two ordinary glazing variants, `WindowMaterial:Gas`,
+consumers. `Material:RoofVegetation` joins the opaque family with a dedicated
+outside-layer invariant. The two ordinary glazing variants, `WindowMaterial:Gas`,
 `WindowMaterial:GasMixture`, `WindowMaterial:Shade`,
 `WindowMaterial:Screen`, and `WindowMaterial:Blind` use the ordinary
 fenestration family, while
@@ -1101,7 +1155,8 @@ boundary fail with dedicated runtime errors. Arbitrary-run support assessment
 also counts every typed `WindowMaterial:Gas` and `WindowMaterial:GasMixture`
 occurrence as explicitly unsupported and run-blocks it before execution; the
 same explicit run block applies to every typed equivalent-layer gap, shade,
-drape, screen, or blind and every ordinary screen or blind definition. Glazing
+drape, screen, or blind, every ordinary screen or blind definition, and every
+RoofVegetation definition. Glazing
 thickness, conductivity, and
 asymmetric infrared emissivity, gap thickness and resolved single-gas or
 ordered mixture properties, and the equivalent-layer shade/drape TAR inputs
@@ -1121,9 +1176,9 @@ objects, then all `Material:NoMass`, `Material:AirGap`, and
 `WindowMaterial:GasMixture`, `WindowMaterial:Shade`, and
 `WindowMaterial:Shade:EquivalentLayer`, then
 `WindowMaterial:Drape:EquivalentLayer`, `WindowMaterial:Screen`, and
-`WindowMaterial:Screen:EquivalentLayer`, followed by `WindowMaterial:Blind`
-and `WindowMaterial:Blind:EquivalentLayer`, and keeps their names in the
-shared material registry.
+`WindowMaterial:Screen:EquivalentLayer`, followed by `WindowMaterial:Blind`,
+`WindowMaterial:Blind:EquivalentLayer`, and `Material:RoofVegetation`, and
+keeps their names in the shared material registry.
 `material_opaque_variants_001` adds
 nonblocking diagnostic EnergyPlus 26.1 grouped-EIO evidence for its exact
 static fixture: construction and layer counts plus every outside-to-inside
@@ -1314,9 +1369,20 @@ occurrences without promoting equivalent-layer construction packing, ASHWAT
 behavior, optics/thermal/control execution, surfaces, ratings, daylighting,
 runtime, EIO serialization, or conformance.
 
+`Material:RoofVegetation` compiler tests lock every default, all 15 numeric
+schema ranges including their inclusive/exclusive endpoints, both public
+enum/default contracts, the ignored-but-type-checked soil-layer name, shared
+material identity and source order, the warning-only initial-moisture clamp,
+and the dry-soil opaque projections. Construction tests accept an outside
+RoofVegetation layer and deliberately fail closed for every interior
+occurrence, including the upstream interior-only validation hole. Support
+assessment tests count and run-block all typed definitions, including unused
+ones. Dynamic EcoRoof state, surface use, CTF coupling, moisture and plant
+physics, EIO, runtime, and conformance remain unclaimed.
+
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
-dynamic AirGap/IRT heat transfer. It also does not claim exact EnergyPlus
+dynamic AirGap/IRT heat transfer or EcoRoof execution. It also does not claim exact EnergyPlus
 diagnostic text, all input-processor default behavior, internal F/C-factor
 material injection, EMS mutation, broad material EIO formatting, or any of
 the deferred families.
@@ -1326,7 +1392,7 @@ the deferred families.
 | Routine | Completion status | Inventory obligation |
 |---|---|---|
 | `GetWindowGlassSpectralData` | `source_mapped` | owns the pre-material spectral dataset read |
-| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, and blind EquivalentLayer objects plus only the regular Glazing `SpectralAverage` branch are implemented |
+| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, and RoofVegetation objects plus only the regular Glazing `SpectralAverage` branch are implemented |
 | `CalcScreenTransmittance` | `source_mapped` | the Screen fixture comparator reproduces only its normal-incidence A/Z paths and the values required by the bounded static EIO row |
 | `CalcWindowScreenProperties` | `source_mapped` | the Screen fixture comparator reproduces only its reverse-order 18 by 18 initialization integration and fixture activation boundary |
 | `ReportGlass` | `source_mapped` | owns the bounded Blind specialized header, raw seven-field row serialization, construction-occurrence order, and post-`CalcNominalWindowCond` skip behavior |
@@ -1353,11 +1419,11 @@ gate compares all 10 emitted material-layer rows, including two adjacent
 AirGap layers in both directions and the sole IRT layer, without promoting a
 runtime or conformance claim.
 
-Typed model/compiler tests additionally prove that the four opaque states,
+Typed model/compiler tests additionally prove that the four original opaque states,
 the partial regular-glazing state, and the complete RefractionExtinction,
 glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade,
 shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, and screen
-EquivalentLayer plus ordinary Blind and blind EquivalentLayer
+EquivalentLayer plus ordinary Blind, blind EquivalentLayer, and RoofVegetation
 states are represented separately; their required fields, defaults,
 exclusive/inclusive bounds, regular-glazing energy sums, shared names, source
 order, formulas, 26.1 quirks, Autocalculate states, uppercase equivalent-gap
@@ -1369,7 +1435,8 @@ source-effective pleats, Screen solid-fraction optical derivations, screen
 EquivalentLayer sentinel/blank-geometry/visible-storage quirks, Blind optical
 sums/equalities/geometry/slot projections, blind EquivalentLayer
 blank-group/index quirks, four optical sums, warning-only geometry recovery,
-infrared defaults, and family boundaries are compiled; and the bounded
+infrared defaults, RoofVegetation defaults/bounds/moisture clamp and dry-soil
+projections, and family boundaries are compiled; and the bounded
 AirGap/IRT construction invariants, equivalent-layer construction exclusion,
 ordinary Glass/Gas-or-GasMixture alternation, and safe exterior, interior, and
 between-glass Shade/Blind patterns plus the exterior-only Screen pattern are
@@ -1459,7 +1526,7 @@ execution, or conformance.
 
 CP58 remains incomplete until, at minimum:
 
-- the other 5 base definitions and the three deferred
+- the other 4 base definitions and the three deferred
   `WindowMaterial:Glazing` optical branches have schema-complete typed variants
 - all 12 overlays/datasets have typed attachment and validation models
 - source-order attachment, duplicate/reference diagnostics, generated

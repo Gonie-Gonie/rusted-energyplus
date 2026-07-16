@@ -1,5 +1,6 @@
 use crate::{AutoOrNumber, ConstructionId, MaterialId, NormalizedName};
 
+mod roof_vegetation;
 mod window_blind;
 mod window_blind_equivalent_layer;
 mod window_drape_equivalent_layer;
@@ -9,6 +10,7 @@ mod window_screen_equivalent_layer;
 mod window_shade;
 mod window_shade_equivalent_layer;
 
+pub use roof_vegetation::{RoofVegetationMaterial, RoofVegetationMoistureDiffusionMethod};
 pub use window_blind::{
     WindowBlindDirectionalOpticalProperties, WindowBlindMaterial, WindowBlindSlatAngleType,
     WindowBlindSlatOrientation,
@@ -71,6 +73,8 @@ pub enum MaterialKind {
     WindowBlind,
     /// WindowMaterial:Blind:EquivalentLayer object.
     WindowBlindEquivalentLayer,
+    /// Material:RoofVegetation object.
+    RoofVegetation,
 }
 
 /// High-level material family used to keep construction consumers separate.
@@ -413,6 +417,8 @@ pub enum MaterialDefinition {
     WindowBlind(WindowBlindMaterial),
     /// Equivalent-layer window blind.
     WindowBlindEquivalentLayer(WindowBlindEquivalentLayerMaterial),
+    /// Vegetated-roof plant and dry-soil material.
+    RoofVegetation(RoofVegetationMaterial),
 }
 
 /// Borrowed opaque material payload used by opaque-only consumers.
@@ -426,6 +432,8 @@ pub enum OpaqueMaterialRef<'a> {
     AirGap(&'a AirGapMaterial),
     /// Infrared-transparent opaque material.
     InfraredTransparent(&'a InfraredTransparentMaterial),
+    /// Vegetated-roof plant and dry-soil material.
+    RoofVegetation(&'a RoofVegetationMaterial),
 }
 
 const AIR_GAP_SURFACE_PROPERTIES: OpaqueSurfaceProperties = OpaqueSurfaceProperties {
@@ -448,44 +456,49 @@ impl<'a> OpaqueMaterialRef<'a> {
     pub const fn roughness(self) -> Option<MaterialSurfaceRoughness> {
         match self {
             Self::Regular(material) => Some(material.roughness),
+            Self::RoofVegetation(material) => Some(material.roughness),
             Self::NoMass(material) => Some(material.roughness),
             Self::AirGap(_) => Some(MaterialSurfaceRoughness::MediumRough),
             Self::InfraredTransparent(_) => None,
         }
     }
 
-    /// Returns the regular-material thickness projection when applicable.
+    /// Returns the mass-bearing opaque-material thickness when applicable.
     #[must_use]
     pub const fn thickness_m(self) -> Option<f64> {
         match self {
             Self::Regular(material) => Some(material.thickness_m),
+            Self::RoofVegetation(material) => Some(material.thickness_m),
             Self::NoMass(_) | Self::AirGap(_) | Self::InfraredTransparent(_) => None,
         }
     }
 
-    /// Returns the regular-material conductivity projection when applicable.
+    /// Returns the mass-bearing opaque-material conductivity when applicable.
     #[must_use]
     pub const fn conductivity_w_per_m_k(self) -> Option<f64> {
         match self {
             Self::Regular(material) => Some(material.conductivity_w_per_m_k),
+            Self::RoofVegetation(material) => Some(material.dry_soil_conductivity_w_per_m_k),
             Self::NoMass(_) | Self::AirGap(_) | Self::InfraredTransparent(_) => None,
         }
     }
 
-    /// Returns the regular-material density projection when applicable.
+    /// Returns the mass-bearing opaque-material density when applicable.
     #[must_use]
     pub const fn density_kg_per_m3(self) -> Option<f64> {
         match self {
             Self::Regular(material) => Some(material.density_kg_per_m3),
+            Self::RoofVegetation(material) => Some(material.dry_soil_density_kg_per_m3),
             Self::NoMass(_) | Self::AirGap(_) | Self::InfraredTransparent(_) => None,
         }
     }
 
-    /// Returns the regular-material specific-heat projection when applicable.
+    /// Returns the mass-bearing opaque-material specific heat when applicable.
     #[must_use]
     pub const fn specific_heat_j_per_kg_k(self) -> Option<f64> {
         match self {
             Self::Regular(material) => Some(material.specific_heat_j_per_kg_k),
+            Self::RoofVegetation(material) => Some(material.dry_soil_specific_heat_j_per_kg_k),
             Self::NoMass(_) | Self::AirGap(_) | Self::InfraredTransparent(_) => None,
         }
     }
@@ -495,14 +508,17 @@ impl<'a> OpaqueMaterialRef<'a> {
     pub const fn no_mass_thermal_resistance_m2_k_per_w(self) -> Option<f64> {
         match self {
             Self::NoMass(material) => Some(material.thermal_resistance_m2_k_per_w),
-            Self::Regular(_) | Self::AirGap(_) | Self::InfraredTransparent(_) => None,
+            Self::Regular(_)
+            | Self::AirGap(_)
+            | Self::InfraredTransparent(_)
+            | Self::RoofVegetation(_) => None,
         }
     }
 
     /// Returns whether EnergyPlus treats the opaque material as resistance-only.
     #[must_use]
     pub const fn is_resistance_only(self) -> bool {
-        !matches!(self, Self::Regular(_))
+        !matches!(self, Self::Regular(_) | Self::RoofVegetation(_))
     }
 
     /// Returns the shared opaque surface properties.
@@ -510,6 +526,7 @@ impl<'a> OpaqueMaterialRef<'a> {
     pub const fn surface_properties(self) -> &'a OpaqueSurfaceProperties {
         match self {
             Self::Regular(material) => &material.surface,
+            Self::RoofVegetation(material) => &material.surface,
             Self::NoMass(material) => &material.surface,
             Self::AirGap(_) => &AIR_GAP_SURFACE_PROPERTIES,
             Self::InfraredTransparent(_) => &INFRARED_TRANSPARENT_SURFACE_PROPERTIES,
@@ -525,6 +542,11 @@ impl<'a> OpaqueMaterialRef<'a> {
             {
                 Some(material.thickness_m / material.conductivity_w_per_m_k)
             }
+            Self::RoofVegetation(material)
+                if material.thickness_m > 0.0 && material.dry_soil_conductivity_w_per_m_k > 0.0 =>
+            {
+                Some(material.thickness_m / material.dry_soil_conductivity_w_per_m_k)
+            }
             Self::NoMass(material) if material.thermal_resistance_m2_k_per_w > 0.0 => {
                 Some(material.thermal_resistance_m2_k_per_w)
             }
@@ -534,7 +556,7 @@ impl<'a> OpaqueMaterialRef<'a> {
             Self::InfraredTransparent(_) => {
                 Some(INFRARED_TRANSPARENT_THERMAL_RESISTANCE_M2_K_PER_W)
             }
-            Self::Regular(_) | Self::NoMass(_) | Self::AirGap(_) => None,
+            Self::Regular(_) | Self::NoMass(_) | Self::AirGap(_) | Self::RoofVegetation(_) => None,
         }
     }
 
@@ -553,9 +575,22 @@ impl<'a> OpaqueMaterialRef<'a> {
                         * material.specific_heat_j_per_kg_k,
                 )
             }
-            Self::Regular(_) | Self::NoMass(_) | Self::AirGap(_) | Self::InfraredTransparent(_) => {
-                None
+            Self::RoofVegetation(material)
+                if material.thickness_m > 0.0
+                    && material.dry_soil_density_kg_per_m3 > 0.0
+                    && material.dry_soil_specific_heat_j_per_kg_k > 0.0 =>
+            {
+                Some(
+                    material.thickness_m
+                        * material.dry_soil_density_kg_per_m3
+                        * material.dry_soil_specific_heat_j_per_kg_k,
+                )
             }
+            Self::Regular(_)
+            | Self::NoMass(_)
+            | Self::AirGap(_)
+            | Self::InfraredTransparent(_)
+            | Self::RoofVegetation(_) => None,
         }
     }
 }
@@ -607,6 +642,7 @@ impl Material {
             MaterialDefinition::WindowBlindEquivalentLayer(_) => {
                 MaterialKind::WindowBlindEquivalentLayer
             }
+            MaterialDefinition::RoofVegetation(_) => MaterialKind::RoofVegetation,
         }
     }
 
@@ -617,7 +653,8 @@ impl Material {
             MaterialDefinition::Regular(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
-            | MaterialDefinition::InfraredTransparent(_) => MaterialFamily::Opaque,
+            | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::RoofVegetation(_) => MaterialFamily::Opaque,
             MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGas(_)
@@ -644,7 +681,35 @@ impl Material {
             MaterialDefinition::InfraredTransparent(material) => {
                 Some(OpaqueMaterialRef::InfraredTransparent(material))
             }
+            MaterialDefinition::RoofVegetation(material) => {
+                Some(OpaqueMaterialRef::RoofVegetation(material))
+            }
             MaterialDefinition::WindowGlazingSpectralAverage(_)
+            | MaterialDefinition::WindowGlazingRefractionExtinction(_)
+            | MaterialDefinition::WindowGlazingEquivalentLayer(_)
+            | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGasMixture(_)
+            | MaterialDefinition::WindowShade(_)
+            | MaterialDefinition::WindowGapEquivalentLayer(_)
+            | MaterialDefinition::WindowShadeEquivalentLayer(_)
+            | MaterialDefinition::WindowDrapeEquivalentLayer(_)
+            | MaterialDefinition::WindowScreen(_)
+            | MaterialDefinition::WindowScreenEquivalentLayer(_)
+            | MaterialDefinition::WindowBlind(_)
+            | MaterialDefinition::WindowBlindEquivalentLayer(_) => None,
+        }
+    }
+
+    /// Borrows the vegetated-roof payload when applicable.
+    #[must_use]
+    pub const fn as_roof_vegetation(&self) -> Option<&RoofVegetationMaterial> {
+        match &self.definition {
+            MaterialDefinition::RoofVegetation(material) => Some(material),
+            MaterialDefinition::Regular(_)
+            | MaterialDefinition::NoMass(_)
+            | MaterialDefinition::AirGap(_)
+            | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGas(_)
@@ -668,6 +733,7 @@ impl Material {
         match &self.definition {
             MaterialDefinition::WindowGlazingSpectralAverage(material) => Some(material),
             MaterialDefinition::Regular(_)
+            | MaterialDefinition::RoofVegetation(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
@@ -694,6 +760,7 @@ impl Material {
         match &self.definition {
             MaterialDefinition::WindowGlazingRefractionExtinction(material) => Some(material),
             MaterialDefinition::Regular(_)
+            | MaterialDefinition::RoofVegetation(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
@@ -720,6 +787,7 @@ impl Material {
         match &self.definition {
             MaterialDefinition::WindowGlazingEquivalentLayer(material) => Some(material),
             MaterialDefinition::Regular(_)
+            | MaterialDefinition::RoofVegetation(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
@@ -744,6 +812,7 @@ impl Material {
         match &self.definition {
             MaterialDefinition::WindowGas(material) => Some(material),
             MaterialDefinition::Regular(_)
+            | MaterialDefinition::RoofVegetation(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
@@ -770,6 +839,7 @@ impl Material {
         match &self.definition {
             MaterialDefinition::WindowGapEquivalentLayer(material) => Some(material),
             MaterialDefinition::Regular(_)
+            | MaterialDefinition::RoofVegetation(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
@@ -794,6 +864,7 @@ impl Material {
         match &self.definition {
             MaterialDefinition::WindowGasMixture(material) => Some(material),
             MaterialDefinition::Regular(_)
+            | MaterialDefinition::RoofVegetation(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
@@ -818,6 +889,7 @@ impl Material {
         match &self.definition {
             MaterialDefinition::WindowShade(material) => Some(material),
             MaterialDefinition::Regular(_)
+            | MaterialDefinition::RoofVegetation(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
@@ -844,6 +916,7 @@ impl Material {
         match &self.definition {
             MaterialDefinition::WindowShadeEquivalentLayer(material) => Some(material),
             MaterialDefinition::Regular(_)
+            | MaterialDefinition::RoofVegetation(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
@@ -870,6 +943,7 @@ impl Material {
         match &self.definition {
             MaterialDefinition::WindowDrapeEquivalentLayer(material) => Some(material),
             MaterialDefinition::Regular(_)
+            | MaterialDefinition::RoofVegetation(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
@@ -894,6 +968,7 @@ impl Material {
         match &self.definition {
             MaterialDefinition::WindowScreen(material) => Some(material),
             MaterialDefinition::Regular(_)
+            | MaterialDefinition::RoofVegetation(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
@@ -920,6 +995,7 @@ impl Material {
         match &self.definition {
             MaterialDefinition::WindowScreenEquivalentLayer(material) => Some(material),
             MaterialDefinition::Regular(_)
+            | MaterialDefinition::RoofVegetation(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
@@ -944,6 +1020,7 @@ impl Material {
         match &self.definition {
             MaterialDefinition::WindowBlind(material) => Some(material),
             MaterialDefinition::Regular(_)
+            | MaterialDefinition::RoofVegetation(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
@@ -970,6 +1047,7 @@ impl Material {
         match &self.definition {
             MaterialDefinition::WindowBlindEquivalentLayer(material) => Some(material),
             MaterialDefinition::Regular(_)
+            | MaterialDefinition::RoofVegetation(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
@@ -994,27 +1072,27 @@ impl Material {
         self.as_opaque().and_then(OpaqueMaterialRef::roughness)
     }
 
-    /// Returns the opaque regular-material thickness projection when applicable.
+    /// Returns the mass-bearing opaque-material thickness when applicable.
     #[must_use]
     pub fn thickness_m(&self) -> Option<f64> {
         self.as_opaque().and_then(OpaqueMaterialRef::thickness_m)
     }
 
-    /// Returns the opaque regular-material conductivity projection when applicable.
+    /// Returns the mass-bearing opaque-material conductivity when applicable.
     #[must_use]
     pub fn conductivity_w_per_m_k(&self) -> Option<f64> {
         self.as_opaque()
             .and_then(OpaqueMaterialRef::conductivity_w_per_m_k)
     }
 
-    /// Returns the opaque regular-material density projection when applicable.
+    /// Returns the mass-bearing opaque-material density when applicable.
     #[must_use]
     pub fn density_kg_per_m3(&self) -> Option<f64> {
         self.as_opaque()
             .and_then(OpaqueMaterialRef::density_kg_per_m3)
     }
 
-    /// Returns the opaque regular-material specific-heat projection when applicable.
+    /// Returns the mass-bearing opaque-material specific heat when applicable.
     #[must_use]
     pub fn specific_heat_j_per_kg_k(&self) -> Option<f64> {
         self.as_opaque()

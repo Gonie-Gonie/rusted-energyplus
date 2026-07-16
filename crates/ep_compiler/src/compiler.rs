@@ -18,10 +18,11 @@ use ep_model::{
     OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
     PeopleNumberCalculationMethod, PlantBranch, PlantBranchComponent, PlantBranchList,
     PlantConnector, PlantConnectorKind, PlantConnectorList, PlantConnectorListEntry, PlantLoop,
-    Point3, PumpConstantSpeed, RegularMaterial, RunPeriod, RunPeriodDaylightSavingTime,
-    RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact,
-    ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant,
-    ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleDayType, ScheduleFile,
+    Point3, PumpConstantSpeed, RegularMaterial, RoofVegetationMaterial,
+    RoofVegetationMoistureDiffusionMethod, RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId,
+    RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleCompactDayProfile,
+    ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant, ScheduleDayHourly,
+    ScheduleDayInterval, ScheduleDayList, ScheduleDayType, ScheduleFile,
     ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn, ScheduleId,
     ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact,
     ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation, SolarDistribution,
@@ -88,6 +89,7 @@ fn window_construction_layer_kind(
         | MaterialDefinition::NoMass(_)
         | MaterialDefinition::AirGap(_)
         | MaterialDefinition::InfraredTransparent(_)
+        | MaterialDefinition::RoofVegetation(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
         | MaterialDefinition::WindowShadeEquivalentLayer(_)
@@ -105,6 +107,7 @@ fn window_glazing_is_solar_diffusing(definition: &MaterialDefinition) -> bool {
         | MaterialDefinition::NoMass(_)
         | MaterialDefinition::AirGap(_)
         | MaterialDefinition::InfraredTransparent(_)
+        | MaterialDefinition::RoofVegetation(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowGas(_)
         | MaterialDefinition::WindowGasMixture(_)
@@ -144,6 +147,7 @@ fn window_gap_signature(definition: &MaterialDefinition) -> Option<WindowGapSign
         | MaterialDefinition::NoMass(_)
         | MaterialDefinition::AirGap(_)
         | MaterialDefinition::InfraredTransparent(_)
+        | MaterialDefinition::RoofVegetation(_)
         | MaterialDefinition::WindowGlazingSpectralAverage(_)
         | MaterialDefinition::WindowGlazingRefractionExtinction(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -393,6 +397,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "WindowMaterial:Screen:EquivalentLayer",
     "WindowMaterial:Blind",
     "WindowMaterial:Blind:EquivalentLayer",
+    "Material:RoofVegetation",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -973,6 +978,7 @@ impl<'a> Compiler<'a> {
         self.parse_window_screen_equivalent_layer_materials(model);
         self.parse_window_blind_materials(model);
         self.parse_window_blind_equivalent_layer_materials(model);
+        self.parse_roof_vegetation_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -4492,6 +4498,237 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_roof_vegetation_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "Material:RoofVegetation";
+        const SOIL_LAYER_NAME_FIELD: &str = "soil_layer_name";
+        const SATURATION_MOISTURE_FIELD: &str =
+            "saturation_volumetric_moisture_content_of_the_soil_layer";
+        const RESIDUAL_MOISTURE_FIELD: &str =
+            "residual_volumetric_moisture_content_of_the_soil_layer";
+        const INITIAL_MOISTURE_FIELD: &str =
+            "initial_volumetric_moisture_content_of_the_soil_layer";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let height_of_plants_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "height_of_plants",
+                0.2,
+                (0.005, false),
+                (1.0, true),
+            );
+            let leaf_area_index = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "leaf_area_index",
+                1.0,
+                (0.001, false),
+                (5.0, true),
+            );
+            let leaf_reflectivity = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "leaf_reflectivity",
+                0.22,
+                (0.05, true),
+                (0.5, true),
+            );
+            let leaf_emissivity = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "leaf_emissivity",
+                0.95,
+                (0.8, true),
+                (1.0, true),
+            );
+            let minimum_stomatal_resistance_s_per_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "minimum_stomatal_resistance",
+                180.0,
+                (50.0, true),
+                (300.0, true),
+            );
+
+            // EnergyPlus reads A2 and applies its schema default, but
+            // GetMaterialData explicitly discards the value as an inactive
+            // soil label. Preserve that source-effective boundary while still
+            // validating the input type and recording the default ledger.
+            match field_value(&object, SOIL_LAYER_NAME_FIELD) {
+                Some(RawValue::String(value)) if value.trim().is_empty() => self.record_default(
+                    OBJECT_TYPE,
+                    &name,
+                    SOIL_LAYER_NAME_FIELD,
+                    "Green Roof Soil",
+                ),
+                Some(RawValue::String(_)) => {}
+                Some(_) => {
+                    self.invalid_field_type(OBJECT_TYPE, &name, SOIL_LAYER_NAME_FIELD, "string");
+                }
+                None => self.record_default(
+                    OBJECT_TYPE,
+                    &name,
+                    SOIL_LAYER_NAME_FIELD,
+                    "Green Roof Soil",
+                ),
+            }
+
+            let roughness = self.enum_default(
+                OBJECT_TYPE,
+                &name,
+                (&object, "roughness"),
+                MaterialSurfaceRoughness::MediumRough,
+                "MediumRough",
+                MaterialSurfaceRoughness::from_energyplus_name,
+            );
+            let thickness_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "thickness",
+                0.1,
+                (0.05, false),
+                (0.7, true),
+            );
+            let dry_soil_conductivity_w_per_m_k = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "conductivity_of_dry_soil",
+                0.35,
+                (0.2, true),
+                (1.5, true),
+            );
+            let dry_soil_density_kg_per_m3 = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "density_of_dry_soil",
+                1100.0,
+                (300.0, true),
+                (2000.0, true),
+            );
+            let dry_soil_specific_heat_j_per_kg_k = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "specific_heat_of_dry_soil",
+                1200.0,
+                (500.0, false),
+                (2000.0, true),
+            );
+            let surface = OpaqueSurfaceProperties {
+                thermal_absorptance: self.number_bounded_blank_default(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "thermal_absorptance",
+                    0.9,
+                    (0.8, false),
+                    (1.0, true),
+                ),
+                solar_absorptance: self.number_bounded_blank_default(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "solar_absorptance",
+                    0.7,
+                    (0.4, true),
+                    (0.9, true),
+                ),
+                visible_absorptance: self.number_bounded_blank_default(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "visible_absorptance",
+                    0.75,
+                    (0.5, false),
+                    (1.0, true),
+                ),
+            };
+            let saturation_volumetric_moisture_content = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                SATURATION_MOISTURE_FIELD,
+                0.3,
+                (0.1, false),
+                (0.5, true),
+            );
+            let residual_volumetric_moisture_content = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                RESIDUAL_MOISTURE_FIELD,
+                0.01,
+                (0.01, true),
+                (0.1, true),
+            );
+            let mut initial_volumetric_moisture_content = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                INITIAL_MOISTURE_FIELD,
+                0.1,
+                (0.05, false),
+                (0.5, true),
+            );
+            let moisture_diffusion_method = self.enum_default(
+                OBJECT_TYPE,
+                &name,
+                (&object, "moisture_diffusion_calculation_method"),
+                RoofVegetationMoistureDiffusionMethod::Advanced,
+                "Advanced",
+                RoofVegetationMoistureDiffusionMethod::from_energyplus_name,
+            );
+
+            if initial_volumetric_moisture_content > saturation_volumetric_moisture_content {
+                self.warning(
+                    "RoofVegetationInitialMoistureReset",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some(INITIAL_MOISTURE_FIELD),
+                    format!(
+                        "{OBJECT_TYPE}/{name} initial volumetric moisture content {initial_volumetric_moisture_content} exceeds saturation {saturation_volumetric_moisture_content}; EnergyPlus resets it to saturation"
+                    ),
+                );
+                initial_volumetric_moisture_content = saturation_volumetric_moisture_content;
+            }
+
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::RoofVegetation(RoofVegetationMaterial {
+                    height_of_plants_m,
+                    leaf_area_index,
+                    leaf_reflectivity,
+                    leaf_emissivity,
+                    minimum_stomatal_resistance_s_per_m,
+                    roughness,
+                    thickness_m,
+                    dry_soil_conductivity_w_per_m_k,
+                    dry_soil_density_kg_per_m3,
+                    dry_soil_specific_heat_j_per_kg_k,
+                    surface,
+                    saturation_volumetric_moisture_content,
+                    residual_volumetric_moisture_content,
+                    initial_volumetric_moisture_content,
+                    moisture_diffusion_method,
+                }),
+            });
+        }
+    }
+
     fn reserve_material_identity(
         &mut self,
         model: &mut TypedModel,
@@ -4753,6 +4990,25 @@ impl<'a> Compiler<'a> {
         }
 
         let mut valid = true;
+        for (layer_index, material_id) in layers.iter().enumerate().skip(1) {
+            let Some(material) = model.materials.get(material_id.0 as usize) else {
+                continue;
+            };
+            if matches!(material.definition, MaterialDefinition::RoofVegetation(_)) {
+                let layer_field = construction_layer_field(layer_index);
+                self.error(
+                    "InvalidRoofVegetationLayerPosition",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&layer_field),
+                    format!(
+                        "Construction/{construction_name} can use Material:RoofVegetation {} only as its outside layer; the typed subset fails closed on the EnergyPlus 26.1 interior-layer validation hole",
+                        material.name.0
+                    ),
+                );
+                valid = false;
+            }
+        }
         if let Some(outside_material) = layers
             .first()
             .and_then(|material_id| model.materials.get(material_id.0 as usize))
@@ -12616,6 +12872,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 #[cfg(test)]
 mod tests {
     mod global_geometry_rules;
+    mod material_roof_vegetation;
     mod material_variants;
     mod schedule_day_interval;
     mod schedule_day_list;
