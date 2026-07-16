@@ -3,6 +3,8 @@ use crate::{PartialRunPolicy, RunMode, RunOutputFormat, TraceLevel};
 use ep_compiler::compile_raw_model;
 use ep_raw_model::parse_epjson_str;
 
+mod window_material_blind_equivalent_layer;
+
 #[test]
 fn simple_one_zone_model_is_supported() -> Result<(), Box<dyn std::error::Error>> {
     let raw = parse_epjson_str(

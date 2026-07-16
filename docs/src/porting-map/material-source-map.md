@@ -55,10 +55,10 @@ different:
 | inventoried public objects | 34 / 34 | Every in-boundary EnergyPlus 26.1 object is named below with its source owner and order. |
 | base definitions | 22 / 22 inventoried | `GetMaterialData` processing order is locked below. |
 | overlays and datasets | 12 / 12 inventoried | Common-startup or algorithm-local owner and order are locked below. |
-| typed Rust material variants | 16 | Four complete opaque-object slices, the `WindowMaterial:Glazing` `SpectralAverage` branch, and the complete `RefractionExtinctionMethod`, glazing `EquivalentLayer`, `WindowMaterial:Gas`, gap `EquivalentLayer`, `WindowMaterial:GasMixture`, ordinary `WindowMaterial:Shade`, shade `EquivalentLayer`, drape `EquivalentLayer`, ordinary `WindowMaterial:Screen`, screen `EquivalentLayer`, and ordinary `WindowMaterial:Blind` objects have distinct payloads. |
-| complete bounded public-object slices | 15 / 34 | `Material`, `Material:NoMass`, `Material:AirGap`, `Material:InfraredTransparent`, `WindowMaterial:Glazing:RefractionExtinctionMethod`, `WindowMaterial:Glazing:EquivalentLayer`, `WindowMaterial:Gas`, `WindowMaterial:Gap:EquivalentLayer`, `WindowMaterial:GasMixture`, `WindowMaterial:Shade`, `WindowMaterial:Shade:EquivalentLayer`, `WindowMaterial:Drape:EquivalentLayer`, `WindowMaterial:Screen`, `WindowMaterial:Screen:EquivalentLayer`, and `WindowMaterial:Blind` have their source-effective fields and bounded compiler contracts typed. |
+| typed Rust material variants | 17 | Four complete opaque-object slices, the `WindowMaterial:Glazing` `SpectralAverage` branch, and the complete `RefractionExtinctionMethod`, glazing `EquivalentLayer`, `WindowMaterial:Gas`, gap `EquivalentLayer`, `WindowMaterial:GasMixture`, ordinary `WindowMaterial:Shade`, shade `EquivalentLayer`, drape `EquivalentLayer`, ordinary `WindowMaterial:Screen`, screen `EquivalentLayer`, ordinary `WindowMaterial:Blind`, and blind `EquivalentLayer` objects have distinct payloads. |
+| complete bounded public-object slices | 16 / 34 | `Material`, `Material:NoMass`, `Material:AirGap`, `Material:InfraredTransparent`, `WindowMaterial:Glazing:RefractionExtinctionMethod`, `WindowMaterial:Glazing:EquivalentLayer`, `WindowMaterial:Gas`, `WindowMaterial:Gap:EquivalentLayer`, `WindowMaterial:GasMixture`, `WindowMaterial:Shade`, `WindowMaterial:Shade:EquivalentLayer`, `WindowMaterial:Drape:EquivalentLayer`, `WindowMaterial:Screen`, `WindowMaterial:Screen:EquivalentLayer`, `WindowMaterial:Blind`, and `WindowMaterial:Blind:EquivalentLayer` have their source-effective fields and bounded compiler contracts typed. |
 | partial bounded public-object slices | 1 / 34 | Only `WindowMaterial:Glazing` with `Optical Data Type = SpectralAverage` is typed; `Spectral`, `SpectralAndAngle`, and `BSDF` remain explicitly unsupported. |
-| wholly deferred public objects | 18 / 34 | The other 6 base definitions and all 12 overlays/datasets remain unported as variants. |
+| wholly deferred public objects | 17 / 34 | The other 5 base definitions and all 12 overlays/datasets remain unported as variants. |
 
 This is a CP58 scaffold checkpoint. Complete inventory does not mean complete
 schema, validation, runtime, optics, moisture, phase-change, or heat-transfer
@@ -103,7 +103,7 @@ The following table is the public-object processing order inside
 | 14 | `WindowMaterial:Screen` | exterior window screen | complete bounded typed variant with source defaults, solid-fraction optical projections, and safe exterior-only ordinary-window layering |
 | 15 | `WindowMaterial:Screen:EquivalentLayer` | equivalent-layer screen | complete bounded typed variant with source sentinels, storage quirks, and a deferred equivalent-layer construction consumer |
 | 16 | `WindowMaterial:Blind` | slatted blind | complete bounded typed variant with source-effective defaults, slat-property constraints, and safe ordinary-window layering |
-| 17 | `WindowMaterial:Blind:EquivalentLayer` | equivalent-layer blind | deferred |
+| 17 | `WindowMaterial:Blind:EquivalentLayer` | equivalent-layer blind | complete bounded typed variant with source blank-group/index quirks, warning-only geometry recovery, and a deferred equivalent-layer construction consumer |
 | 18 | `Material:RoofVegetation` | eco-roof material and vegetation state | deferred |
 | 19 | `WindowMaterial:GlazingGroup:Thermochromic` | thermochromic glazing-group parent | deferred |
 | 20 | `WindowMaterial:SimpleGlazingSystem` | derived simple glazing system | deferred |
@@ -982,8 +982,78 @@ are fixture-integrity locks only. Rust EIO serialization,
 `CalcBlindProperties`, beam-beam and all other blind optics, ratings,
 daylighting, control/surface/EMS behavior, variable-angle and window thermal
 runtime, between-glass or missing-bare reporting, broad declaration or
-diagnostic ordering, `Construction:WindowEquivalentLayer`,
-`WindowMaterial:Blind:EquivalentLayer`, and conformance remain unclaimed.
+diagnostic ordering, `Construction:WindowEquivalentLayer`, and conformance
+remain unclaimed.
+
+### `WindowMaterial:Blind:EquivalentLayer`
+
+The seventeenth source-order object has one slat orientation, one slat-angle
+control, and 21 numeric inputs. `Horizontal` and `Vertical` are accepted, with
+`Horizontal` as the missing/blank default. Its six required numeric fields are
+slat width and separation, N7/N8 front/back beam-diffuse solar reflectance,
+and N14/N15 front/back diffuse-diffuse solar reflectance. Width and separation
+are bounded (0, 0.025] m. Slat crown defaults to 0.0015 m in [0, 0.00156], and
+slat angle defaults to 45 degrees in [-90, 90]. `FixedSlatAngle`,
+`MaximizeSolar`, and `BlockBeamSolar` are the exact control tokens, with
+`FixedSlatAngle` selected by default.
+
+All 17 optical inputs N5-N21 are bounded [0, 1). N5 and N6 front/back
+beam-diffuse solar transmittance default to zero; N7 and N8 front/back
+beam-diffuse solar reflectance are required. N9 and N10 visible
+transmittances default to zero, while N11 and N12 visible reflectances have no
+schema default. EnergyPlus tests all four blank flags before assigning any
+visible beam state, so an incomplete N9-N12 group leaves both sides at their
+initialized zeros even when some values were supplied.
+
+N13 diffuse-diffuse solar transmittance has a numeric default of zero, while
+N14 and N15 directional solar reflectances are required. The source assigns
+the solar diffuse-diffuse record only when all three fields were explicitly
+present. Consequently, omitting N13 leaves N13-N15 source-ineffective even
+though its numeric buffer value is zero and N14/N15 are present. N16-N18 are
+optional visible diffuse-diffuse inputs. When all three are present,
+EnergyPlus 26.1 tests their blank flags but mistakenly copies N13-N15 into the
+visible record; the supplied N16-N18 numeric values are validated but not
+retained. An incomplete N16-N18 group leaves the visible diffuse-diffuse
+record zero.
+
+N19 infrared transmittance and N20/N21 directional emissivities are guarded
+individually. A missing field leaves its class-initialized zero, so the schema
+emissivity defaults of 0.9 do not become source-effective unless the values
+are explicitly present. Effective N19 is shared front/back, directional
+thermal absorptance equals effective emissivity, and thermal transmittance
+equals effective infrared transmittance. All beam-beam TAR slots remain zero.
+
+Only four source optical sums are enforced: raw N5+N7, N6+N8, N9+N11, and
+N10+N12 must each be strictly below one. The source adds no diffuse-diffuse
+solar/visible or infrared sum, and Rust does not invent one.
+
+Geometry recovery is warning-only and order-sensitive. The source first
+warns when the original width is below the original separation without
+changing either value. It then replaces separation below 0.001 m with
+0.025 m; replaces width below 0.001 m or greater than or equal to twice the
+corrected separation with that separation; and replaces crown greater than
+or equal to half the corrected width with zero. Rust retains these
+source-effective recovered values and warnings. Inputs outside the schema
+angle bounds fail compilation before the source's out-of-range angle recovery
+would be materialized.
+
+`WindowBlindEquivalentLayerMaterial` fixes roughness to `Rough`, is
+resistance-only, has no nominal resistance, and retains the effective
+geometry, directional solar/visible TAR state, infrared/thermal projections,
+and slat-angle control. Its normalized name joins the shared material
+registry immediately after ordinary Blind, and its family is
+`MaterialFamily::EquivalentLayer`. Ordinary `Construction` rejects it with
+the common equivalent-layer boundary; only the still-deferred
+`Construction:WindowEquivalentLayer` is its intended construction consumer.
+Arbitrary-run assessment counts and blocks every definition, including
+definitions unused by a construction.
+
+This typed checkpoint adds no EIO parser, comparator, fixture, proof variable,
+or conformance evidence. `Construction:WindowEquivalentLayer` typing and
+packing, `CheckAndFixCFSLayer`, ASHWAT coefficient generation/evaluation,
+slat-angle control execution, optics and thermal calculations, surfaces,
+ratings, daylighting, runtime, EIO serialization, broad diagnostic parity,
+and conformance remain deferred.
 
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. The two ordinary glazing variants, `WindowMaterial:Gas`,
@@ -993,7 +1063,8 @@ fenestration family, while
 equivalent-layer glazing, `WindowMaterial:Gap:EquivalentLayer`, and
 `WindowMaterial:Shade:EquivalentLayer` plus
 `WindowMaterial:Drape:EquivalentLayer` and
-`WindowMaterial:Screen:EquivalentLayer` share the separate equivalent-layer
+`WindowMaterial:Screen:EquivalentLayer` plus
+`WindowMaterial:Blind:EquivalentLayer` share the separate equivalent-layer
 family. An ordinary `Construction` accepts the
 unshaded `Glass ((Gas|GasMixture) Glass){0..3}` subset, the bounded exterior,
 interior, double-between, and triple-between Shade or Blind patterns above,
@@ -1007,13 +1078,15 @@ boundary fail with dedicated runtime errors. Arbitrary-run support assessment
 also counts every typed `WindowMaterial:Gas` and `WindowMaterial:GasMixture`
 occurrence as explicitly unsupported and run-blocks it before execution; the
 same explicit run block applies to every typed equivalent-layer gap, shade,
-drape, or screen and every ordinary screen or blind definition. Glazing
+drape, screen, or blind and every ordinary screen or blind definition. Glazing
 thickness, conductivity, and
 asymmetric infrared emissivity, gap thickness and resolved single-gas or
 ordered mixture properties, and the equivalent-layer shade/drape TAR inputs
 plus equivalent-layer screen sentinel, visible, infrared, and wire-geometry
-state and ordinary-blind slat geometry/optics stay in their dedicated payloads
-and are never projected through opaque material accessors.
+state, ordinary-blind slat geometry/optics, and equivalent-layer blind
+geometry, blank-group/index quirks, TAR, infrared, thermal, and control state
+stay in their dedicated payloads and are never projected through opaque
+material accessors.
 
 The compiler preserves EnergyPlus family order by compiling all `Material`
 objects, then all `Material:NoMass`, `Material:AirGap`, and
@@ -1025,8 +1098,9 @@ objects, then all `Material:NoMass`, `Material:AirGap`, and
 `WindowMaterial:GasMixture`, `WindowMaterial:Shade`, and
 `WindowMaterial:Shade:EquivalentLayer`, then
 `WindowMaterial:Drape:EquivalentLayer`, `WindowMaterial:Screen`, and
-`WindowMaterial:Screen:EquivalentLayer`, followed by `WindowMaterial:Blind`,
-and keeps their names in the shared material registry.
+`WindowMaterial:Screen:EquivalentLayer`, followed by `WindowMaterial:Blind`
+and `WindowMaterial:Blind:EquivalentLayer`, and keeps their names in the
+shared material registry.
 `material_opaque_variants_001` adds
 nonblocking diagnostic EnergyPlus 26.1 grouped-EIO evidence for its exact
 static fixture: construction and layer counts plus every outside-to-inside
@@ -1198,7 +1272,22 @@ exterior/interior/double-between/triple-between ordinary-Construction
 patterns, common Shade/Screen/Blind device-count and solar-diffusing limits,
 adjacent-gap signature/width equality plus the blind gap-sum width rule,
 fail-closed unsafe end holes, typed coverage, and the all-definition runtime
-block are covered. EIO and blind numerical runtime remain deferred.
+block are covered. `window_material_blind_001` separately locks its bounded
+generic and specialized static EIO rows without promoting `CalcBlindProperties`
+or blind numerical runtime.
+
+`WindowMaterial:Blind:EquivalentLayer` compiler tests lock the exact six
+required fields, both enums and defaults, all 21 numeric bounds, the four and
+only four source strict optical sums, and the blank-sensitive N9-N12 and
+N13-N15 assignment groups. They also lock the N16-N18 gate that copies
+N13-N15 rather than the supplied visible values, the individually blank
+N19-N21 initialized-zero state, zero beam-beam slots, source warning/recovery
+order for separation, width, and crown, `Rough`/resistance-only state,
+directional infrared/thermal projections, shared-name/source order,
+EquivalentLayer family classification, ordinary-Construction rejection,
+typed coverage, and the all-definition runtime block. Equivalent-layer
+construction packing, EIO, ASHWAT behavior, optics/thermal/control execution,
+surfaces, ratings, daylighting, runtime, and conformance remain deferred.
 
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
@@ -1212,7 +1301,7 @@ the deferred families.
 | Routine | Completion status | Inventory obligation |
 |---|---|---|
 | `GetWindowGlassSpectralData` | `source_mapped` | owns the pre-material spectral dataset read |
-| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, and ordinary Blind objects plus only the regular Glazing `SpectralAverage` branch are implemented |
+| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, and blind EquivalentLayer objects plus only the regular Glazing `SpectralAverage` branch are implemented |
 | `CalcScreenTransmittance` | `source_mapped` | the Screen fixture comparator reproduces only its normal-incidence A/Z paths and the values required by the bounded static EIO row |
 | `CalcWindowScreenProperties` | `source_mapped` | the Screen fixture comparator reproduces only its reverse-order 18 by 18 initialization integration and fixture activation boundary |
 | `ReportGlass` | `source_mapped` | owns the bounded Blind specialized header, raw seven-field row serialization, construction-occurrence order, and post-`CalcNominalWindowCond` skip behavior |
@@ -1243,7 +1332,7 @@ Typed model/compiler tests additionally prove that the four opaque states,
 the partial regular-glazing state, and the complete RefractionExtinction,
 glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade,
 shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, and screen
-EquivalentLayer plus ordinary Blind
+EquivalentLayer plus ordinary Blind and blind EquivalentLayer
 states are represented separately; their required fields, defaults,
 exclusive/inclusive bounds, regular-glazing energy sums, shared names, source
 order, formulas, 26.1 quirks, Autocalculate states, uppercase equivalent-gap
@@ -1253,8 +1342,9 @@ front-only visible storage, equivalent-layer drape three-sum constraints,
 omitted back-side checks, front-infrared equality, front-only visible storage,
 source-effective pleats, Screen solid-fraction optical derivations, screen
 EquivalentLayer sentinel/blank-geometry/visible-storage quirks, Blind optical
-sums/equalities/geometry/slot projections, and family boundaries are compiled;
-and the bounded
+sums/equalities/geometry/slot projections, blind EquivalentLayer
+blank-group/index quirks, four optical sums, warning-only geometry recovery,
+infrared defaults, and family boundaries are compiled; and the bounded
 AirGap/IRT construction invariants, equivalent-layer construction exclusion,
 ordinary Glass/Gas-or-GasMixture alternation, and safe exterior, interior, and
 between-glass Shade/Blind patterns plus the exterior-only Screen pattern are
@@ -1318,12 +1408,20 @@ front/back solar and infrared values plus wire geometry use source
 prove generic/specialized activation; construction packing, ASHWAT behavior,
 surfaces, EMS, runtime, and conformance remain unclaimed.
 
-`WindowMaterial:Blind` remains typed/source evidence only: no EIO case or
-diagnostic proof variable is added. Its complete input/default/bounds,
-optical relations, warning and geometry branches, raw slat-property storage,
-bounded ordinary-Construction placements, and explicit arbitrary-run block
-do not promote `CalcBlindProperties`, window optics/thermal execution,
+`window_material_blind_001` compares every ordinary Blind definition against
+its generic all-zero row, including unused M, and locks the exact specialized
+header plus A,Z,Z construction-occurrence sequence. This static evidence does
+not promote `CalcBlindProperties`, window optics/thermal execution,
 daylighting, shading control, surface behavior, or conformance.
+
+`WindowMaterial:Blind:EquivalentLayer` remains typed/source evidence only:
+no EIO case or diagnostic proof variable is added. Its complete
+input/default/bounds, blank-sensitive group assignments, 26.1 N16-N18 index
+quirk, four optical sums, warning-only geometry recovery, source-effective
+TAR/infrared/thermal/control state, ordinary-Construction exclusion, and
+explicit arbitrary-run block do not promote equivalent-layer construction
+packing, ASHWAT behavior, optics/thermal/control execution, surfaces,
+daylighting, ratings, runtime, or conformance.
 These tests and static EIO smokes remain bounded evidence, not an EnergyPlus
 material-family or window gate.
 
@@ -1332,7 +1430,7 @@ execution, or conformance.
 
 CP58 remains incomplete until, at minimum:
 
-- the other 6 base definitions and the three deferred
+- the other 5 base definitions and the three deferred
   `WindowMaterial:Glazing` optical branches have schema-complete typed variants
 - all 12 overlays/datasets have typed attachment and validation models
 - source-order attachment, duplicate/reference diagnostics, generated

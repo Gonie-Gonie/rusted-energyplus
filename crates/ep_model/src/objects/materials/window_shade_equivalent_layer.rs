@@ -1,6 +1,6 @@
 use super::MaterialSurfaceRoughness;
 
-/// One side's normal-incidence beam properties for an equivalent-layer shade.
+/// One side's normal-incidence beam properties for equivalent-layer shading.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct WindowShadeEquivalentLayerSideOpticalProperties {
     /// Direct beam-to-beam transmittance.

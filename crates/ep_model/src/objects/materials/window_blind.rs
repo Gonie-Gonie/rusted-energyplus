@@ -1,6 +1,6 @@
 use super::MaterialSurfaceRoughness;
 
-/// Slat-axis orientation for an ordinary `WindowMaterial:Blind`.
+/// Slat-axis orientation shared by ordinary and equivalent-layer blinds.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum WindowBlindSlatOrientation {
     /// Slats run horizontally.
@@ -31,7 +31,7 @@ pub enum WindowBlindSlatAngleType {
 
 /// Transmittance and directional front/back reflectances for one slat optical
 /// path.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct WindowBlindDirectionalOpticalProperties {
     /// Slat transmittance for this optical path.
     pub transmittance: f64,
