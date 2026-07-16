@@ -820,6 +820,62 @@ pub const fn energyplus_cphw(_temperature_c: f64) -> f64 {
     4_180.0
 }
 
+/// Canonical EnergyPlus 26.1 `RhoH2O` liquid-water density in kg/m3.
+///
+/// The source evaluates separate square and cube powers before combining the
+/// polynomial from left to right. It documents a 0 C through 150 C range but
+/// applies no runtime clamp or validation.
+#[must_use]
+#[inline]
+pub fn energyplus_rho_h2o(temperature_c: f64) -> f64 {
+    let temperature_squared = temperature_c * temperature_c;
+    let temperature_cubed = temperature_c * temperature_c * temperature_c;
+    1_000.120_7 + 8.321_587_4e-4 * temperature_c - 4.929_976e-3 * temperature_squared
+        + 8.479_186_3e-6 * temperature_cubed
+}
+
+/// Canonical EnergyPlus 26.1 `PsyDeltaHSenFnTdb2Tdb1W` sensible
+/// moist-air enthalpy difference in J/kg.
+///
+/// The source passes literal `1.0e-5` as the first argument to its ordered
+/// maximum. Consequently an unordered NaN humidity ratio selects the literal
+/// floor instead of propagating NaN.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_delta_h_sen_fn_tdb2_tdb1_w(
+    dry_bulb_2_c: f64,
+    dry_bulb_1_c: f64,
+    humidity_ratio: f64,
+) -> f64 {
+    let humidity_ratio = if ENERGYPLUS_MIN_HUMIDITY_RATIO < humidity_ratio {
+        humidity_ratio
+    } else {
+        ENERGYPLUS_MIN_HUMIDITY_RATIO
+    };
+    (1.004_84e3 + humidity_ratio * 1.858_95e3) * (dry_bulb_2_c - dry_bulb_1_c)
+}
+
+/// Canonical EnergyPlus 26.1 `PsyDeltaHSenFnTdb2W2Tdb1W1` sensible
+/// moist-air enthalpy difference in J/kg.
+///
+/// The ordered source minimum returns its second argument when the comparison
+/// is unordered, then delegates unchanged to `PsyDeltaHSenFnTdb2Tdb1W`.
+#[must_use]
+#[inline]
+pub fn energyplus_psy_delta_h_sen_fn_tdb2_w2_tdb1_w1(
+    dry_bulb_2_c: f64,
+    humidity_ratio_2: f64,
+    dry_bulb_1_c: f64,
+    humidity_ratio_1: f64,
+) -> f64 {
+    let minimum_humidity_ratio = if humidity_ratio_1 < humidity_ratio_2 {
+        humidity_ratio_1
+    } else {
+        humidity_ratio_2
+    };
+    energyplus_psy_delta_h_sen_fn_tdb2_tdb1_w(dry_bulb_2_c, dry_bulb_1_c, minimum_humidity_ratio)
+}
+
 fn energyplus_psychrometric_saturation_pressure_pa(temperature_c: f64) -> Option<f64> {
     if !temperature_c.is_finite() {
         return None;
@@ -897,3 +953,7 @@ mod dew_point_dry_wet_bulb_tests;
 #[cfg(test)]
 #[path = "psychrometrics_polynomial_water_tests.rs"]
 mod polynomial_water_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_water_density_sensible_enthalpy_tests.rs"]
+mod water_density_sensible_enthalpy_tests;
