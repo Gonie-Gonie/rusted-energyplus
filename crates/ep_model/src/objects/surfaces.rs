@@ -1,5 +1,63 @@
 use crate::{AutoOrNumber, ConstructionId, NormalizedName, Point3, SurfaceId, ZoneId};
 
+/// Declared first vertex for detailed surface input.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum StartingVertexPosition {
+    /// Upper-left corner as viewed from outside the surface.
+    UpperLeftCorner,
+    /// Lower-left corner as viewed from outside the surface.
+    LowerLeftCorner,
+    /// Upper-right corner as viewed from outside the surface.
+    UpperRightCorner,
+    /// Lower-right corner as viewed from outside the surface.
+    LowerRightCorner,
+}
+
+/// Declared detailed-surface vertex entry direction.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum VertexEntryDirection {
+    /// Counter-clockwise as viewed from outside the surface.
+    CounterClockwise,
+    /// Clockwise as viewed from outside the surface.
+    Clockwise,
+}
+
+/// Coordinate system selected by `GlobalGeometryRules`.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum GeometryCoordinateSystem {
+    /// Coordinates are relative to the zone origin.
+    Relative,
+    /// Coordinates are absolute facility/world coordinates.
+    World,
+}
+
+/// Typed `GlobalGeometryRules` input settings.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct GlobalGeometryRules {
+    /// Declared starting vertex position.
+    pub starting_vertex_position: StartingVertexPosition,
+    /// Declared vertex entry direction.
+    pub vertex_entry_direction: VertexEntryDirection,
+    /// Detailed-surface coordinate system.
+    pub coordinate_system: GeometryCoordinateSystem,
+    /// Daylighting reference point coordinate system.
+    pub daylighting_reference_point_coordinate_system: GeometryCoordinateSystem,
+    /// Rectangular/simple surface coordinate system.
+    pub rectangular_surface_coordinate_system: GeometryCoordinateSystem,
+}
+
+impl Default for GlobalGeometryRules {
+    fn default() -> Self {
+        Self {
+            starting_vertex_position: StartingVertexPosition::UpperLeftCorner,
+            vertex_entry_direction: VertexEntryDirection::CounterClockwise,
+            coordinate_system: GeometryCoordinateSystem::World,
+            daylighting_reference_point_coordinate_system: GeometryCoordinateSystem::Relative,
+            rectangular_surface_coordinate_system: GeometryCoordinateSystem::Relative,
+        }
+    }
+}
+
 /// Building surface type.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SurfaceType {

@@ -12,11 +12,13 @@ Reference version: EnergyPlus 26.1.0
 Reference source: `src/EnergyPlus/SurfaceGeometry.cc` at the repository-locked
 EnergyPlus `v26.1.0` commit.
 
-This CP57 checkpoint records the detailed opaque-surface coordinate path. It
-does not claim that Rust currently parses `GlobalGeometryRules`, transforms
-surface vertices, or matches EnergyPlus geometry diagnostics. The existing
-`surface_geometry_001` case remains smoke, nonclaim, and nonblocking evidence
-for the default zero-rotation world-coordinate fixture.
+This CP57 checkpoint records the detailed opaque-surface coordinate path. Rust
+now types and parses `GlobalGeometryRules`, including EnergyPlus aliases and
+warning fallbacks, while preserving an explicit compatibility deviation for an
+absent source-required singleton. It does not yet transform surface vertices
+or match EnergyPlus geometry diagnostics. The existing `surface_geometry_001`
+case remains smoke, nonclaim, and nonblocking evidence for the default
+zero-rotation world-coordinate fixture.
 
 ## Source Order
 
@@ -24,7 +26,7 @@ for the default zero-rotation world-coordinate fixture.
 |---|---|---|---|
 | 1 | `SetupZoneGeometry` | `source_mapped` | Owns building and zone rotation trigonometric initialization, calls `GetSurfaceData`, and later tears down temporary zone arrays; equipment, window, shading, and solar setup remain outside this checkpoint. |
 | 2 | `GetSurfaceData` | `source_mapped` | Calls `GetGeometryParameters`, applies world-coordinate warning policy, inventories every surface family, and dispatches detailed heat-transfer input; allocation, sorting, interzone matching, fenestration, shading, and diagnostics remain deferred. |
-| 3 | `GetGeometryParameters` | `state_mapped` | Maps the unique `GlobalGeometryRules` fields, coordinate-mode flags, mismatch checks, diagnostics, and EIO reporting without claiming a Rust implementation. |
+| 3 | `GetGeometryParameters` | `state_mapped` | Maps the unique `GlobalGeometryRules` fields, coordinate-mode flags, mismatch checks, diagnostics, and EIO reporting. The typed Rust parser covers field normalization and fallbacks, but source-required-object and cross-coordinate warning parity remain deferred. |
 | 4 | `GetHTSurfaceData` | `source_mapped` | Reads detailed heat-transfer surface objects and delegates vertex processing to `GetVertices`; construction, boundary, zone/space, validation, and all non-opaque families remain deferred. |
 | 5 | `GetVertices` | `state_mapped` | Maps vertex ordering and the relative/world coordinate branch plus the broader derived-geometry state that surrounds it; only the coordinate branch is the bounded future implementation target. |
 
@@ -40,7 +42,7 @@ then `GetHTSurfaceData` delegates detailed vertices to `GetVertices`.
 GetGeometryParameters
 
 read_state:
-- the unique `GlobalGeometryRules` object; its starting-vertex-position, vertex-entry-direction, surface coordinate-system, daylight-reference-point coordinate-system, and rectangular-surface coordinate-system alpha fields; zone origins used by coordinate-mismatch checks; the input object count; and the caller-owned error flag
+- the unique `GlobalGeometryRules` object; its starting-vertex-position, vertex-entry-direction, surface coordinate-system, daylight-reference-point coordinate-system, and rectangular-surface coordinate-system alpha fields; zone origins used by coordinate-mismatch checks; and the input object count
 
 write_state:
 - `DataSurfaces::Corner`, `DataSurfaces::CCW`, `DataSurfaces::WorldCoordSystem`, `DataSurfaces::DaylRefWorldCoordSystem`, `SurfaceGeometryData::RectSurfRefWorldCoordSystem`, the caller-owned error flag, warning and severe diagnostic streams, and the `Surface Geometry` EIO row
@@ -57,11 +59,11 @@ inactive_branches:
 - invalid surface-coordinate text warns and defaults to World, invalid optional coordinate text warns and defaults to Relative, and mixed coordinate modes or nonzero zone origins can emit mismatch warnings
 
 unsupported_active_branches:
-- every diagnostic and reporting side effect, optional daylight and rectangular coordinate mode, and repeated-input lifecycle behavior
+- exact diagnostic counts and text, cross-coordinate mismatch warnings, EIO emission, and repeated-input lifecycle behavior
 - downstream use of the parsed flags by detailed, simple, daylighting, fenestration, shading, solar, and heat-balance paths
 
 not_claimed_branches:
-- a typed Rust `GlobalGeometryRules` object, compiler acceptance or rejection parity, implemented coordinate transformation, exact EnergyPlus warning or EIO parity, alternate surface families, daylighting, `GeometryTransform`, Appendix G rotation, fenestration, shading, solar, or broad geometry conformance
+- source-required-object absence parity, cross-coordinate mismatch warning parity, implemented coordinate transformation, exact EnergyPlus diagnostic or EIO-emission parity, alternate surface families, daylighting, `GeometryTransform`, Appendix G rotation, fenestration, shading, solar, or broad geometry conformance
 <!-- routine-state-contract:v1 end get_geometry_parameters -->
 
 ### `GetVertices` (`get_vertices`)
@@ -98,7 +100,6 @@ not_claimed_branches:
 
 This inventory contains five routines: three `source_mapped` and two
 `state_mapped`. Every routine has `required_for_full_domain = false`.
-Promotion requires a typed geometry-rules owner, an implemented canonical
-world-vertex path, source-vector tests, and blocking transformed geometry EIO
-families. The default `surface_geometry_001` smoke case does not satisfy those
-requirements.
+Promotion requires an implemented canonical world-vertex path, source-vector
+tests, and blocking transformed geometry EIO families. The default
+`surface_geometry_001` smoke case does not satisfy those requirements.

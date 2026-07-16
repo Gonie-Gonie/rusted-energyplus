@@ -8,11 +8,11 @@ use ep_model::{
     DesignSpecificationOutdoorAirId, DesignSpecificationOutdoorAirMethod,
     ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
     ExternalInterfaceSchedule, FanComponent, FanComponentKind,
-    FirstHourInterpolationStartingValues, HeatRecoveryType, HumidificationControlType,
-    IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
-    InsideSurfaceConvectionAlgorithm, InternalGainId, LoadDistributionScheme, LoopId, Material,
-    MaterialId, MaterialKind, MaterialSurfaceRoughness, NameMap, Node, NodeId, NodeList,
-    NodeListId, NormalizedName, NumericType, OtherEquipment,
+    FirstHourInterpolationStartingValues, GeometryCoordinateSystem, GlobalGeometryRules,
+    HeatRecoveryType, HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId,
+    IdealLoadsFuelType, IdealLoadsLimit, InsideSurfaceConvectionAlgorithm, InternalGainId,
+    LoadDistributionScheme, LoopId, Material, MaterialId, MaterialKind, MaterialSurfaceRoughness,
+    NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName, NumericType, OtherEquipment,
     OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutsideBoundaryCondition,
     OutsideSurfaceConvectionAlgorithm, People, PeopleNumberCalculationMethod, PlantBranch,
     PlantBranchComponent, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
@@ -23,12 +23,13 @@ use ep_model::{
     ScheduleFile, ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn,
     ScheduleId, ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits,
     ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
-    SolarDistribution, SpecialDayType, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
-    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
-    TypedModel, Version, WeekScheduleId, WindExposure, Zone, ZoneEquipmentConnection,
-    ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId,
-    ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
-    ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
+    SolarDistribution, SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId,
+    SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
+    ThermostatSetpointId, TimestepConfig, TypedModel, Version, VertexEntryDirection,
+    WeekScheduleId, WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
+    ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
+    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatControl,
+    ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 use std::collections::BTreeMap;
@@ -221,6 +222,7 @@ pub fn compile_coverage(raw_model: &RawModel) -> Vec<ObjectCoverage> {
 const TYPED_OBJECT_TYPES: &[&str] = &[
     "Version",
     "Building",
+    "GlobalGeometryRules",
     "Timestep",
     "SurfaceConvectionAlgorithm:Inside",
     "SurfaceConvectionAlgorithm:Outside",
@@ -316,6 +318,7 @@ impl<'a> Compiler<'a> {
         };
 
         self.parse_building(&mut model);
+        self.parse_global_geometry_rules(&mut model);
         self.parse_timestep(&mut model);
         self.parse_surface_convection_algorithms(&mut model);
         self.parse_run_periods(&mut model);
@@ -481,6 +484,74 @@ impl<'a> Compiler<'a> {
             ),
         };
         model.building = Some(building);
+    }
+
+    fn parse_global_geometry_rules(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "GlobalGeometryRules";
+        let Some((name, object)) = self.single_object(OBJECT_TYPE) else {
+            // Compatibility boundary: unlike EnergyPlus, the current compiler accepts snippets
+            // without the source-required singleton.
+            return;
+        };
+
+        let starting_vertex_position = self
+            .required_string(OBJECT_TYPE, &name, &object, "starting_vertex_position")
+            .and_then(|value| match parse_starting_vertex_position(&value) {
+                Some(parsed) => Some(parsed),
+                None => {
+                    self.invalid_enum_value(OBJECT_TYPE, &name, "starting_vertex_position", &value);
+                    None
+                }
+            });
+        let vertex_entry_direction = self
+            .required_string(OBJECT_TYPE, &name, &object, "vertex_entry_direction")
+            .and_then(|value| match parse_vertex_entry_direction(&value) {
+                Some(parsed) => Some(parsed),
+                None => {
+                    self.invalid_enum_value(OBJECT_TYPE, &name, "vertex_entry_direction", &value);
+                    None
+                }
+            });
+        let coordinate_system = self.enum_warning_default(
+            OBJECT_TYPE,
+            &name,
+            (&object, "coordinate_system"),
+            GeometryCoordinateSystem::World,
+            "World",
+            true,
+            parse_geometry_coordinate_system,
+        );
+        let daylighting_reference_point_coordinate_system = self.enum_warning_default(
+            OBJECT_TYPE,
+            &name,
+            (&object, "daylighting_reference_point_coordinate_system"),
+            GeometryCoordinateSystem::Relative,
+            "Relative",
+            false,
+            parse_geometry_coordinate_system,
+        );
+        let rectangular_surface_coordinate_system = self.enum_warning_default(
+            OBJECT_TYPE,
+            &name,
+            (&object, "rectangular_surface_coordinate_system"),
+            GeometryCoordinateSystem::Relative,
+            "Relative",
+            false,
+            parse_geometry_coordinate_system,
+        );
+
+        let (Some(starting_vertex_position), Some(vertex_entry_direction)) =
+            (starting_vertex_position, vertex_entry_direction)
+        else {
+            return;
+        };
+        model.global_geometry_rules = Some(GlobalGeometryRules {
+            starting_vertex_position,
+            vertex_entry_direction,
+            coordinate_system,
+            daylighting_reference_point_coordinate_system,
+            rectangular_surface_coordinate_system,
+        });
     }
 
     fn parse_timestep(&mut self, model: &mut TypedModel) {
@@ -5992,6 +6063,71 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
+    fn enum_warning_default<T: Copy>(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        field_ref: (&RawObject, &str),
+        default: T,
+        default_label: &str,
+        warn_on_missing: bool,
+        parser: fn(&str) -> Option<T>,
+    ) -> T {
+        let (object, field) = field_ref;
+        match field_value(object, field) {
+            Some(RawValue::String(value)) if value.trim().is_empty() => {
+                if warn_on_missing {
+                    self.warning(
+                        "MissingRequiredFieldDefaulted",
+                        object_type,
+                        Some(object_name),
+                        Some(field),
+                        format!(
+                            "{object_type}/{object_name} field {field} is required; defaulting to '{default_label}'"
+                        ),
+                    );
+                }
+                self.record_default(object_type, object_name, field, default_label);
+                default
+            }
+            Some(RawValue::String(value)) => match parser(value) {
+                Some(parsed) => parsed,
+                None => {
+                    self.warning(
+                        "InvalidEnumValueDefaulted",
+                        object_type,
+                        Some(object_name),
+                        Some(field),
+                        format!(
+                            "{object_type}/{object_name} field {field} has unsupported value '{value}'; defaulting to '{default_label}'"
+                        ),
+                    );
+                    default
+                }
+            },
+            Some(_value) => {
+                self.invalid_field_type(object_type, object_name, field, "string enum");
+                default
+            }
+            None => {
+                if warn_on_missing {
+                    self.warning(
+                        "MissingRequiredFieldDefaulted",
+                        object_type,
+                        Some(object_name),
+                        Some(field),
+                        format!(
+                            "{object_type}/{object_name} field {field} is required; defaulting to '{default_label}'"
+                        ),
+                    );
+                }
+                self.record_default(object_type, object_name, field, default_label);
+                default
+            }
+        }
+    }
+
     fn required_enum<T: Copy>(
         &mut self,
         object_type: &str,
@@ -7427,6 +7563,52 @@ fn parse_yes_no(value: &str) -> Option<bool> {
     }
 }
 
+fn parse_starting_vertex_position(value: &str) -> Option<StartingVertexPosition> {
+    let value = value.trim();
+    match value {
+        value if value.eq_ignore_ascii_case("UpperLeftCorner") => {
+            Some(StartingVertexPosition::UpperLeftCorner)
+        }
+        value if value.eq_ignore_ascii_case("LowerLeftCorner") => {
+            Some(StartingVertexPosition::LowerLeftCorner)
+        }
+        value if value.eq_ignore_ascii_case("UpperRightCorner") => {
+            Some(StartingVertexPosition::UpperRightCorner)
+        }
+        value if value.eq_ignore_ascii_case("LowerRightCorner") => {
+            Some(StartingVertexPosition::LowerRightCorner)
+        }
+        _ => None,
+    }
+}
+
+fn parse_vertex_entry_direction(value: &str) -> Option<VertexEntryDirection> {
+    let value = value.trim();
+    match value {
+        value
+            if value.eq_ignore_ascii_case("CCW")
+                || value.eq_ignore_ascii_case("Counterclockwise") =>
+        {
+            Some(VertexEntryDirection::CounterClockwise)
+        }
+        value if value.eq_ignore_ascii_case("CW") || value.eq_ignore_ascii_case("Clockwise") => {
+            Some(VertexEntryDirection::Clockwise)
+        }
+        _ => None,
+    }
+}
+
+fn parse_geometry_coordinate_system(value: &str) -> Option<GeometryCoordinateSystem> {
+    let value = value.trim();
+    match value {
+        value if value.eq_ignore_ascii_case("Relative") => Some(GeometryCoordinateSystem::Relative),
+        value if value.eq_ignore_ascii_case("World") || value.eq_ignore_ascii_case("Absolute") => {
+            Some(GeometryCoordinateSystem::World)
+        }
+        _ => None,
+    }
+}
+
 fn parse_surface_type(value: &str) -> Option<SurfaceType> {
     match value {
         value if value.eq_ignore_ascii_case("Ceiling") => Some(SurfaceType::Ceiling),
@@ -7486,6 +7668,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 
 #[cfg(test)]
 mod tests {
+    mod global_geometry_rules;
     mod schedule_day_interval;
     mod schedule_day_list;
     mod schedule_external_interface;

@@ -5,18 +5,18 @@ use crate::{
     ChillerElectricEir, CoilComponent, ComponentId, ConnectorId, ConnectorListId, Construction,
     ConstructionId, DayScheduleId, DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId,
     ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
-    ExternalInterfaceSchedule, FanComponent, IdealLoadsAirSystem, IdealLoadsAirSystemId,
-    InternalGainId, LoopId, Material, MaterialId, NameMap, Node, NodeId, NodeList, NodeListId,
-    NormalizedName, OtherEquipment, People, PlantBranch, PlantBranchList, PlantConnector,
-    PlantConnectorKind, PlantConnectorList, PlantLoop, PumpConstantSpeed, RunPeriod,
-    RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
-    ScheduleCompact, ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList,
-    ScheduleFile, ScheduleFileShading, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
-    ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
-    Surface, SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
-    TimestepConfig, Version, WeekScheduleId, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
-    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
-    ZoneThermostat, ZoneThermostatId,
+    ExternalInterfaceSchedule, FanComponent, GlobalGeometryRules, IdealLoadsAirSystem,
+    IdealLoadsAirSystemId, InternalGainId, LoopId, Material, MaterialId, NameMap, Node, NodeId,
+    NodeList, NodeListId, NormalizedName, OtherEquipment, People, PlantBranch, PlantBranchList,
+    PlantConnector, PlantConnectorKind, PlantConnectorList, PlantLoop, PumpConstantSpeed,
+    RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay,
+    RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant, ScheduleDayHourly,
+    ScheduleDayInterval, ScheduleDayList, ScheduleFile, ScheduleFileShading, ScheduleId,
+    ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear,
+    SetpointManagerComponent, SiteLocation, Surface, SurfaceConvectionAlgorithms, SurfaceId,
+    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version, WeekScheduleId, Zone,
+    ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId, ZoneEquipmentObjectType,
+    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatId,
 };
 
 /// Minimal typed model for early compiler stages.
@@ -26,6 +26,8 @@ pub struct TypedModel {
     pub version: Version,
     /// Building settings.
     pub building: Option<Building>,
+    /// Global surface geometry input rules, when declared.
+    pub global_geometry_rules: Option<GlobalGeometryRules>,
     /// Zone timestep config.
     pub timestep: TimestepConfig,
     /// Global surface convection algorithm settings.
@@ -195,6 +197,7 @@ impl Default for TypedModel {
         Self {
             version: Version::oracle_26_1_0(),
             building: None,
+            global_geometry_rules: None,
             timestep: TimestepConfig::default(),
             surface_convection_algorithms: SurfaceConvectionAlgorithms::default(),
             run_periods: Vec::new(),
@@ -285,6 +288,7 @@ impl TypedModel {
     #[must_use]
     pub fn object_count(&self) -> usize {
         usize::from(self.building.is_some())
+            + usize::from(self.global_geometry_rules.is_some())
             + usize::from(self.site.is_some())
             + 1
             + usize::from(self.surface_convection_algorithms.inside.is_some())
@@ -1669,6 +1673,16 @@ mod tests {
         model.surface_convection_algorithms.outside = Some(OutsideSurfaceConvectionAlgorithm::Doe2);
 
         assert_eq!(model.object_count(), 3);
+    }
+
+    #[test]
+    fn object_count_includes_explicit_global_geometry_rules() {
+        let mut model = TypedModel::default();
+        assert_eq!(model.object_count(), 1);
+
+        model.global_geometry_rules = Some(crate::GlobalGeometryRules::default());
+
+        assert_eq!(model.object_count(), 2);
     }
 
     #[test]

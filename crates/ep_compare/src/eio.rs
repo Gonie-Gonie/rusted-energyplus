@@ -97,11 +97,51 @@ pub fn parse_eio_surface_geometry_rules(
         }
 
         rules = Some(EioSurfaceGeometryRules {
-            starting_corner: required_field(&fields, 1).to_string(),
-            vertex_input_direction: required_field(&fields, 2).to_string(),
-            coordinate_system: required_field(&fields, 3).to_string(),
-            daylight_reference_point_coordinate_system: required_field(&fields, 4).to_string(),
-            rectangular_surface_coordinate_system: required_field(&fields, 5).to_string(),
+            starting_corner: parse_surface_geometry_choice(
+                &fields,
+                1,
+                line_number,
+                line,
+                "Starting Corner",
+                &[
+                    "UpperLeftCorner",
+                    "LowerLeftCorner",
+                    "LowerRightCorner",
+                    "UpperRightCorner",
+                ],
+            )?,
+            vertex_input_direction: parse_surface_geometry_choice(
+                &fields,
+                2,
+                line_number,
+                line,
+                "Vertex Input Direction",
+                &["Counterclockwise", "Clockwise"],
+            )?,
+            coordinate_system: parse_surface_geometry_choice(
+                &fields,
+                3,
+                line_number,
+                line,
+                "Coordinate System",
+                &["WorldCoordinateSystem", "RelativeCoordinateSystem"],
+            )?,
+            daylight_reference_point_coordinate_system: parse_surface_geometry_choice(
+                &fields,
+                4,
+                line_number,
+                line,
+                "Daylight Reference Point Coordinate System",
+                &["WorldCoordinateSystem", "RelativeCoordinateSystem"],
+            )?,
+            rectangular_surface_coordinate_system: parse_surface_geometry_choice(
+                &fields,
+                5,
+                line_number,
+                line,
+                "Rectangular Surface Coordinate System",
+                &["WorldCoordinateSystem", "RelativeToZoneOrigin"],
+            )?,
         });
     }
 
@@ -517,6 +557,26 @@ pub fn parse_eio_warmup_environments(
 
 fn required_field<'a>(fields: &'a [&str], index: usize) -> &'a str {
     fields.get(index).copied().unwrap_or("")
+}
+
+fn parse_surface_geometry_choice(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+    choices: &[&str],
+) -> Result<String, EioError> {
+    let value = required_field(fields, index);
+    if choices.contains(&value) {
+        Ok(value.to_string())
+    } else {
+        Err(EioError::InvalidSurfaceGeometry {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })
+    }
 }
 
 fn parse_f64_field(

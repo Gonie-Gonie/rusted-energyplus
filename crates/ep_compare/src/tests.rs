@@ -1,5 +1,5 @@
 use crate::{
-    OrderedTimestampDivergenceReason, SeriesAlignment, SeriesComparisonStatus,
+    EioError, OrderedTimestampDivergenceReason, SeriesAlignment, SeriesComparisonStatus,
     SeriesDivergenceKind, SeriesSample, Tolerance, compare_ordered_timestamp_samples_v2,
     compare_series, compare_series_samples_v2, compare_series_v2, parse_eio_construction_ctf,
     parse_eio_construction_ctf_coefficients, parse_eio_heat_transfer_surfaces,
@@ -489,6 +489,31 @@ fn parses_eio_surface_geometry_rules() -> Result<(), Box<dyn std::error::Error>>
     );
 
     Ok(())
+}
+
+#[test]
+fn rejects_missing_duplicate_and_invalid_eio_surface_geometry_rules() {
+    assert!(matches!(
+        parse_eio_surface_geometry_rules("Program Version,EnergyPlus\n"),
+        Err(EioError::MissingSurfaceGeometry)
+    ));
+
+    let duplicate = "Surface Geometry,UpperLeftCorner,Counterclockwise,WorldCoordinateSystem,RelativeCoordinateSystem,RelativeToZoneOrigin\n".repeat(2);
+    assert!(matches!(
+        parse_eio_surface_geometry_rules(&duplicate),
+        Err(EioError::InvalidSurfaceGeometry { line: 2, .. })
+    ));
+
+    assert!(matches!(
+        parse_eio_surface_geometry_rules(
+            "Surface Geometry,UpperLeftCorner,Counterclockwise,Bogus,RelativeCoordinateSystem,RelativeToZoneOrigin\n"
+        ),
+        Err(EioError::InvalidSurfaceGeometry { line: 1, .. })
+    ));
+    assert!(matches!(
+        parse_eio_surface_geometry_rules("Surface Geometry,,,,,\n"),
+        Err(EioError::InvalidSurfaceGeometry { line: 1, .. })
+    ));
 }
 
 #[test]
