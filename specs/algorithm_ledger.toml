@@ -2131,8 +2131,29 @@ routine.psy_h_fn_tdb_rh_pb.not_claimed_branches = [
 routine.psy_tsat_fn_pb_raw.source_file = "src/EnergyPlus/Psychrometrics.cc"
 routine.psy_tsat_fn_pb_raw.source_routine = "PsyTsatFnPb_raw"
 routine.psy_tsat_fn_pb_raw.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_tsat_fn_pb_raw.completion_status = "source_mapped"
+routine.psy_tsat_fn_pb_raw.completion_status = "state_mapped"
 routine.psy_tsat_fn_pb_raw.required_for_full_domain = false
+routine.psy_tsat_fn_pb_raw.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_tsat_fn_pb_raw.read_state = [
+  "arguments `Press` and `CalledFrom`; optional statistics read the `TsatFnPb` call and accumulated-iteration counters; with errors enabled the pressure-range preflight reads `WarmupFlag` before the saved-value shortcut and, for non-warmup `Press <= 0.0017` or `Press >= 1555000.0`, reads the range-warning index/recurrence and first-detail caller context; every raw call then reads `Press_Save` and an exact-equality hit reads `tSat_Save`; a miss reads `useInterpolationPsychTsatFnPb`, while the modeled default non-interpolation path calls routine 25 for each bounded estimate and reads its signed tag/hash/cache entry, optional lookup/raw counters, miss-side warmup/range-warning/caller state, and selected default or `EP_IF97` formula; an exhausted solve additionally reads `WarmupFlag`, the `TsatFnPb2` warning index/recurrence, and first-detail caller context",
+]
+routine.psy_tsat_fn_pb_raw.write_state = [
+  "the pure numerical scaffold writes no state; optional statistics increment the `TsatFnPb` call counter before diagnostics and the saved-value test, then only a non-saved path adds local `iter` to the iteration total (`0` for interpolation, pressure clamps, or the strict 611.0-to-611.25 shortcut, `1..50` on convergence, and `51` after 50 exhausted evaluations); range and nonconvergence flows may mutate two error indices, recurring count/min/max records, warning/timestamp/continuation totals, SQLite, and callbacks; on a miss the source overwrites `Press_Save` before choosing interpolation or iteration and writes `tSat_Save` after the result, while nested routine 25 may update lookup/raw counters, overwrite a cache entry, and mutate miss-side diagnostics",
+]
+routine.psy_tsat_fn_pb_raw.history_state_ownership = "the ordinary-finite default cached-build, non-IF97, interpolation-disabled result is deterministic only for the modeled fresh/non-saved raw numerical projection; the source owns an exact `Press_Save`/`tSat_Save` pair initialized and cleared to `-99999.0`, so initial `Press == -99999.0` is a finite false hit, exact repeated pressure can return a result from an earlier interpolation mode, and direct raw calls and routine-42 misses share that pair; nested routine-25 cache and diagnostic/statistics history plus both routine-41 warning histories belong to each `EnergyPlusData` instance"
+routine.psy_tsat_fn_pb_raw.unsupported_state = [
+  "the saved-pair initialization, exact-equality hit/miss ordering, clear lifecycle, and sharing with routine 42; `useInterpolationPsychTsatFnPb`, the routine-53 spline tables/path, and PerformancePrecisionTradeoffs mode changes; optional call/iteration statistics; warmup, two first/recurring warning indices, caller formatting, resultant-temperature continuation, warning totals/stream, SQLite, and callbacks; nested routine-25 cache lifecycle, signed tag/hash/sentinel/collisions, lookup/raw statistics, range diagnostics, caller context, and nonfinite payload behavior",
+]
+routine.psy_tsat_fn_pb_raw.inactive_branches = [
+  "`EP_nocache_Psychrometrics` removes the separately named routine 41 and compiles this body as public routine 42, with nested saturation pressure evaluated at each original unquantized temperature estimate",
+  "defining `EP_IF97` changes the nested liquid-water saturation-pressure branch and therefore the iterative trajectory; disabling `EP_psych_stats` removes both own counter mutations, while disabling `EP_psych_errors` removes range/nonconvergence diagnostics without changing the numerical branches",
+]
+routine.psy_tsat_fn_pb_raw.unsupported_active_branches = [
+  "exact saved-value hits, including the fresh `-99999.0` sentinel and mode-stale returns; the runtime spline branch selected by `useInterpolationPsychTsatFnPb`; default errors-enabled inclusive range diagnostics before the saved shortcut and 50-evaluation nonconvergence diagnostics afterward; nested default routine-25 hit/miss suppression, cache lifecycle, statistics, range warnings, caller relabeling, and negative-NaN sentinel behavior",
+]
+routine.psy_tsat_fn_pb_raw.not_claimed_branches = [
+  "external EnergyPlus numerical parity, cross-platform secant/`exp`/`log` last-bit and floating-point-exception parity, full IEEE/NaN-payload parity, saved-state or interpolation parity, routine-42 cached/no-cache parity, `EP_IF97` parity, exact diagnostic/statistics/cache side effects, PerformancePrecisionTradeoffs behavior, or downstream API, EMS, dew-point, HVAC, sizing, and other consumer migration",
+]
 
 routine.psy_tsat_fn_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_tsat_fn_pb.source_routine = "PsyTsatFnPb"

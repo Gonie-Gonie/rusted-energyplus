@@ -78,8 +78,8 @@ that the EnergyPlus routine has been ported.
 | 38 | `PsyWFnTdbTwbPb_humidity_error` | diagnostics | `Psychrometrics.hh:1398`; `Psychrometrics.cc:822` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | strict negative-humidity trigger, ReportErrors/warmup gates, caller text, and typo-title recurrence aliasing with routine 35 |
 | 39 | `PsyWFnTdbTwbPb` | humidity ratio from wet bulb | `Psychrometrics.hh:1408` (inline) | always present | canonical ordinary-finite default-build numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_w_fn_tdb_twb_pb`; stateful cache/statistics/diagnostics adapter unassigned; private routine-18 iteration guess remains separate | source vectors, cache representative, ordered wet-bulb clamp, exact coefficient grouping, negative-humidity routine-36 fallback, and IEEE edges |
 | 40 | `PsyHFnTdbRhPb` | enthalpy from RH | `Psychrometrics.hh:1462` (inline) | always present | canonical ordinary-finite default-build numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_h_fn_tdb_rh_pb`; nested routine-36 cache/statistics/diagnostics adapter unassigned | EMS/API source vectors, cache representative, all three ordered humidity floors, exact routine-8 grouping, and IEEE edges |
-| 41 | `PsyTsatFnPb_raw` | saturation temperature from pressure raw path | `Psychrometrics.hh:1490`; `Psychrometrics.cc:1266` | exists only with `EP_cache_PsyTsatFnPb` | intended `ep_runtime::psychrometrics`; unassigned | raw inversion vectors, convergence/range guards, and identity with cache misses |
-| 42 | `PsyTsatFnPb` | saturation temperature from pressure and cache/interpolation | `Psychrometrics.hh:1495,1523`; cached inline in header, no-cache implementation `Psychrometrics.cc:1272` | variants selected by `EP_cache_PsyTsatFnPb`; one logical ticket | intended `ep_runtime::psychrometrics`; unassigned | cached/no-cache/raw agreement, interpolation toggle, key quantization, saved-state behavior, and limits |
+| 41 | `PsyTsatFnPb_raw` | saturation temperature from pressure raw path | `Psychrometrics.hh:1490`; `Psychrometrics.cc:1266` | exists only with `EP_cache_PsyTsatFnPb` | canonical default cached-build, non-interpolation, fresh/non-saved numerical scaffold: `ep_runtime::psychrometrics::energyplus_psy_tsat_fn_pb_raw`; saved pair, spline, statistics, diagnostics, and nested state remain unassigned | raw inversion vectors, ordered clamps and strict triple shortcut, source iteration literals/order, representative nested saturation pressure, exhaustion edge, and repeated-call purity |
+| 42 | `PsyTsatFnPb` | saturation temperature from pressure and cache/interpolation | `Psychrometrics.hh:1495,1523`; cached inline in header, no-cache implementation `Psychrometrics.cc:1272` | variants selected by `EP_cache_PsyTsatFnPb`; one logical ticket | intended `ep_runtime::psychrometrics`; stateful public wrapper unassigned | first-writer direct-map cache history, original-pressure misses, tag-0 false hit, collision/precision/lifecycle behavior, raw saved-pair and interpolation interaction, and separate no-cache evidence |
 | 43 | `PsyTdpFnWPb` | dew point from humidity ratio | `Psychrometrics.hh:1529` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | humidity floor, pressure vectors, saturation-temperature dependency, and round trips |
 | 44 | `PsyTdpFnTdbTwbPb_error` | diagnostics | `Psychrometrics.hh:1556`; `Psychrometrics.cc:861` | compiled only with `EP_psych_errors` | intended diagnostics owner; unassigned | dew-point-above-wet-bulb threshold, clamp, caller text, and recurrence suppression |
 | 45 | `PsyTdpFnTdbTwbPb` | dew point from dry/wet bulb | `Psychrometrics.hh:1566` (inline) | always present | intended `ep_runtime::psychrometrics`; unassigned | composed humidity/dew-point vectors, 1e-5 floor, and wet-bulb upper clamp |
@@ -1602,6 +1602,109 @@ not_claimed_branches:
 - external EnergyPlus numerical parity, cached/no-cache/IF97 equivalence, full IEEE and negative-NaN sentinel payload parity, exact nested diagnostic/statistics/cache behavior, API or EMS dispatch, the downstream WaterCoils root solve, and cooling-tower, evaporative-cooler, hybrid-cooler, refrigeration, water-coil, or other consumer migration
 <!-- routine-state-contract:v1 end psy_h_fn_tdb_rh_pb -->
 
+## CP56-15 Saturation-Temperature Pressure Raw Numerical Scaffold
+
+This checkpoint advances only `PsyTsatFnPb_raw` to `state_mapped` and leaves
+the public cached/no-cache `PsyTsatFnPb` ticket at `source_mapped`. The
+inventory is now 30 source-mapped and 23 state-mapped routines. The parent
+inventory remains `status = "scaffold"`, `claim_level = "none"`, and all 53
+routines remain outside the full-domain required set.
+
+The new `energyplus_psy_tsat_fn_pb_raw` helper models the default cached
+build's interpolation-disabled, fresh/non-saved numerical projection. It
+preserves the ordered `Press >= 1555000.0` and `Press <= 0.0017` clamps,
+the strict `611.0 < Press < 611.25` zero shortcut, the 100 C initial guess,
+and at most 50 saturation-pressure evaluations. Each iteration calls the
+routine-25 default cache representative, evaluates `Press - Psat`, and then
+uses the exact `General::Iterate` order: strict delta `< 0.0001` or exact
+zero residual convergence, first-step 1.1 multiplier, and a positive
+`1.0e-9` replacement for a small secant denominator. The returned value is
+the last next guess, including after exhaustion; the upper clamp's immediate
+predecessor exercises all 50 evaluations and yields NaN on the tested Rust
+platform.
+
+This pure helper deliberately excludes source state that surrounds that
+numerical path. The source increments optional statistics and emits inclusive
+range diagnostics before testing `Press == Press_Save`. A saved hit therefore
+can still mutate call/range-warning state, but returns before iteration
+statistics, nonconvergence diagnostics, `tSat_Save` update, and the
+resultant-temperature continuation. The saved pair initializes to
+`-99999.0`, so a fresh `Press == -99999.0` returns the sentinel
+`tSat_Save` after its range diagnostic rather than taking the lower numerical
+clamp. On a miss the source writes `Press_Save` before selecting the spline
+or iterative path, and writes `tSat_Save` afterward. The interpolation flag,
+routine-53 spline, both warning families, statistics, lifecycle, and nested
+routine-25 state remain deferred.
+
+### Public `PsyTsatFnPb` deferral
+
+`PsyTsatFnPb` is not represented by a stateless delegation to the new helper.
+The default wrapper owns 1,048,576 direct-mapped entries. It derives a signed
+full tag with mutable
+`Grid_Shift = 64 - 12 - tsatprecision_bits` (24 bits/shift 28 by default,
+20 bits/shift 32 under PerformancePrecisionTradeoffs), indexes with
+`tag & 0xFFFFF`, and passes the original pressure to raw on a miss. It does
+not reconstruct a representative pressure. Same-tag ordinary finite
+pressures are therefore first-writer-dependent, collisions evict, and hits
+suppress the complete raw path, including its pre-saved-test diagnostics and
+statistics. The wrapper owns no separate lookup counter.
+
+The live array uses `cached_tsat_h_pb` entries initialized with pressure tag
+zero and temperature zero; the unused `cached_tsat_pb` type's `-1000`
+pressure sentinel does not govern this cache. A fresh tag-zero input such as
+positive zero or a sufficiently small positive subnormal consequently
+false-hits at 0 C. After a hash-zero collision evicts that entry, the same
+input can miss and return the raw lower clamp of -100 C.
+`InitializePsychRoutines` refills the array, while cache-data `clear_state`
+resets statistics and precision but not entries. Saved-pair and interpolation
+state clear separately, and neither precision nor interpolation changes
+invalidate existing public-cache entries.
+
+With `EP_nocache_Psychrometrics`, routine 41 is absent and its stateful body
+is compiled under the public routine-42 name. It retains the saved pair,
+interpolation selection, diagnostics, and statistics, while nested routine 25
+uses the exact unquantized estimate. Cached/no-cache last-bit equality and
+universal cache/raw identity are therefore not claimed. Both numerical
+variants are structurally bounded: the iterative path performs at most 50
+pressure evaluations. On exhaustion the source loop variable is 51, adds 51
+to statistics, reports 51, and returns the next guess produced by the 50th
+evaluation without evaluating that guess again.
+
+Existing upstream tests do not close these state gaps. The nominal cache-hit
+test does not perform a second call. The spline comparison adds `1e-60` to
+50-120 kPa pressures, which is bit-identical in binary64 and takes the saved
+hit before the spline. The interpolation sample test exercises iterative
+public calls at table knots rather than `CSplineint`. None is evidence for
+public-cache history or the active spline branch.
+
+### `PsyTsatFnPb_raw` (`psy_tsat_fn_pb_raw`)
+
+<!-- routine-state-contract:v1 begin psy_tsat_fn_pb_raw -->
+PsyTsatFnPb_raw
+
+read_state:
+- arguments `Press` and `CalledFrom`; optional statistics read the `TsatFnPb` call and accumulated-iteration counters; with errors enabled the pressure-range preflight reads `WarmupFlag` before the saved-value shortcut and, for non-warmup `Press <= 0.0017` or `Press >= 1555000.0`, reads the range-warning index/recurrence and first-detail caller context; every raw call then reads `Press_Save` and an exact-equality hit reads `tSat_Save`; a miss reads `useInterpolationPsychTsatFnPb`, while the modeled default non-interpolation path calls routine 25 for each bounded estimate and reads its signed tag/hash/cache entry, optional lookup/raw counters, miss-side warmup/range-warning/caller state, and selected default or `EP_IF97` formula; an exhausted solve additionally reads `WarmupFlag`, the `TsatFnPb2` warning index/recurrence, and first-detail caller context
+
+write_state:
+- the pure numerical scaffold writes no state; optional statistics increment the `TsatFnPb` call counter before diagnostics and the saved-value test, then only a non-saved path adds local `iter` to the iteration total (`0` for interpolation, pressure clamps, or the strict 611.0-to-611.25 shortcut, `1..50` on convergence, and `51` after 50 exhausted evaluations); range and nonconvergence flows may mutate two error indices, recurring count/min/max records, warning/timestamp/continuation totals, SQLite, and callbacks; on a miss the source overwrites `Press_Save` before choosing interpolation or iteration and writes `tSat_Save` after the result, while nested routine 25 may update lookup/raw counters, overwrite a cache entry, and mutate miss-side diagnostics
+
+history_state_ownership:
+- the ordinary-finite default cached-build, non-IF97, interpolation-disabled result is deterministic only for the modeled fresh/non-saved raw numerical projection; the source owns an exact `Press_Save`/`tSat_Save` pair initialized and cleared to `-99999.0`, so initial `Press == -99999.0` is a finite false hit, exact repeated pressure can return a result from an earlier interpolation mode, and direct raw calls and routine-42 misses share that pair; nested routine-25 cache and diagnostic/statistics history plus both routine-41 warning histories belong to each `EnergyPlusData` instance
+
+unsupported_state:
+- the saved-pair initialization, exact-equality hit/miss ordering, clear lifecycle, and sharing with routine 42; `useInterpolationPsychTsatFnPb`, the routine-53 spline tables/path, and PerformancePrecisionTradeoffs mode changes; optional call/iteration statistics; warmup, two first/recurring warning indices, caller formatting, resultant-temperature continuation, warning totals/stream, SQLite, and callbacks; nested routine-25 cache lifecycle, signed tag/hash/sentinel/collisions, lookup/raw statistics, range diagnostics, caller context, and nonfinite payload behavior
+
+inactive_branches:
+- `EP_nocache_Psychrometrics` removes the separately named routine 41 and compiles this body as public routine 42, with nested saturation pressure evaluated at each original unquantized temperature estimate
+- defining `EP_IF97` changes the nested liquid-water saturation-pressure branch and therefore the iterative trajectory; disabling `EP_psych_stats` removes both own counter mutations, while disabling `EP_psych_errors` removes range/nonconvergence diagnostics without changing the numerical branches
+
+unsupported_active_branches:
+- exact saved-value hits, including the fresh `-99999.0` sentinel and mode-stale returns; the runtime spline branch selected by `useInterpolationPsychTsatFnPb`; default errors-enabled inclusive range diagnostics before the saved shortcut and 50-evaluation nonconvergence diagnostics afterward; nested default routine-25 hit/miss suppression, cache lifecycle, statistics, range warnings, caller relabeling, and negative-NaN sentinel behavior
+
+not_claimed_branches:
+- external EnergyPlus numerical parity, cross-platform secant/`exp`/`log` last-bit and floating-point-exception parity, full IEEE/NaN-payload parity, saved-state or interpolation parity, routine-42 cached/no-cache parity, `EP_IF97` parity, exact diagnostic/statistics/cache side effects, PerformancePrecisionTradeoffs behavior, or downstream API, EMS, dew-point, HVAC, sizing, and other consumer migration
+<!-- routine-state-contract:v1 end psy_tsat_fn_pb_raw -->
+
 ## Compile-Time Variant Boundary
 
 Unless `EP_nocache_Psychrometrics` is set, the EnergyPlus header enables
@@ -1654,8 +1757,8 @@ The `PsyRhoAirFnPbTdbW`, `PsyRhoAirFnPbTdbW_fast`, `PsyHfgAirFnWTdb`,
 `PsyRhovFnTdbWPb`, `PsyRhovFnTdbWPb_fast`, `PsyRhFnTdbRhovLBnd0C`,
 `PsyVFnTdbWPb`, `PsyWFnTdbH`, `PsyPsatFnTemp_raw`, `PsyRhovFnTdbRh`,
 `PsyRhFnTdbRhov`, `PsyRhFnTdbWPb`, `PsyWFnTdbRhPb`,
-`PsyWFnTdbTwbPb`, and `PsyHFnTdbRhPb` tickets are `state_mapped`; the other
-31 ledger routines remain `source_mapped`. All 53 retain
+`PsyWFnTdbTwbPb`, `PsyHFnTdbRhPb`, and `PsyTsatFnPb_raw` tickets are
+`state_mapped`; the other 30 ledger routines remain `source_mapped`. All 53 retain
 `required_for_full_domain = false`. Before any
 ticket is promoted further, its
 Rust target, source-vector tests, compile-variant obligations, diagnostic
