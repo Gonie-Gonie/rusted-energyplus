@@ -2164,8 +2164,30 @@ routine.psy_tsat_fn_pb.required_for_full_domain = false
 routine.psy_tdp_fn_w_pb.source_file = "src/EnergyPlus/Psychrometrics.hh"
 routine.psy_tdp_fn_w_pb.source_routine = "PsyTdpFnWPb"
 routine.psy_tdp_fn_w_pb.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.psy_tdp_fn_w_pb.completion_status = "source_mapped"
+routine.psy_tdp_fn_w_pb.completion_status = "state_mapped"
 routine.psy_tdp_fn_w_pb.required_for_full_domain = false
+routine.psy_tdp_fn_w_pb.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.psy_tdp_fn_w_pb.read_state = [
+  "arguments `W`, `PB`, and `CalledFrom`; routine 43 itself reads no mutable state and owns no counter, applies the ordered `1.0e-5` humidity-ratio floor, computes `PDEW = PB * W0 / (0.62198 + W0)`, and unconditionally forwards `PDEW` plus `CalledFrom` to routine 42; the default cached wrapper then reads mutable `tsatprecision_bits`, the signed pressure tag/hash/cache entry, and a hit's cached temperature, while a miss reads routine-41 saved-pair, interpolation, optional call/iteration statistics, warmup, two warning histories, caller context, and iterative-path routine-25 cache/statistics/diagnostic state",
+]
+routine.psy_tdp_fn_w_pb.write_state = [
+  "the ordered humidity floor and dew-pressure arithmetic write no state, and routine 43 has no statistics or diagnostics of its own; a default routine-42 hit writes no state, while a miss writes the direct-map pressure tag before calling raw and stores the returned saturation temperature afterward; the nested raw path may overwrite `Press_Save` and `tSat_Save`, increment call/iteration statistics, mutate range/nonconvergence diagnostics, and update routine-25 cache/statistics/diagnostic state; the public wrapper owns no separate lookup counter",
+]
+routine.psy_tdp_fn_w_pb.history_state_ownership = "for finite physical arguments whose derived `PDEW` takes a nonzero-tag default-cache miss followed by a non-saved, interpolation-disabled, non-IF97 raw path, the modeled numerical projection is deterministic from `W` and `PB` and `CalledFrom` changes only deferred diagnostics; the full source return is nevertheless history-dependent because routine 42 stores the first original pressure for each tag, shares entries with every other routine-42 consumer, has a fresh tag-zero false hit, can derive the raw pair's fresh `-99999.0` false hit, and shares routine-41 saved/interpolation and nested state, all owned by each `EnergyPlusData` instance"
+routine.psy_tdp_fn_w_pb.unsupported_state = [
+  "routine-42 mutable precision, signed tag/hash/direct-map entries, first-writer aliases, tag-zero sentinel, collisions, initialization versus clear lifecycle, and hit suppression; routine-41 saved pair, interpolation flag/spline path, call/iteration statistics, warmup, range/nonconvergence warning indices and recurrences, exact caller formatting, warning stream/totals, SQLite, and callbacks; nested routine-25 cache lifecycle, sentinel/collisions, statistics, diagnostics, caller relabeling, and nonfinite payload behavior",
+]
+routine.psy_tdp_fn_w_pb.inactive_branches = [
+  "`W < 1.0e-5`, including negative infinity and either signed zero, selects literal `1.0e-5`; `W >= 1.0e-5` retains `W`, and unordered NaN retains `W` rather than substituting the floor because source max returns its first argument; none of these local branches emits diagnostics",
+  "`EP_nocache_Psychrometrics` removes routine 42's outer cache and named routine 41, evaluates the same stateful body on every derived `PDEW`, and makes nested saturation pressure use each original unquantized temperature estimate",
+  "defining `EP_IF97` changes the nested liquid-water saturation-pressure formula and iterative trajectory; disabling `EP_psych_stats` removes nested counters and disabling `EP_psych_errors` removes nested range/nonconvergence diagnostics, while routine 43's floor and `PDEW` arithmetic remain unchanged",
+]
+routine.psy_tdp_fn_w_pb.unsupported_active_branches = [
+  "the default routine-42 direct-map lookup, including ordinary-finite same-tag first-writer reuse, collisions, mutable precision, fresh tag-zero false hits, and complete raw-side-effect suppression on a hit; miss-side exact saved-value reuse, default errors-enabled diagnostics, optional statistics, nested routine-25 cache behavior, and the runtime spline branch selected by PerformancePrecisionTradeoffs",
+]
+routine.psy_tdp_fn_w_pb.not_claimed_branches = [
+  "external EnergyPlus numerical parity, full public routine-42 sequence or cache-history parity, cached/no-cache/interpolation/`EP_IF97` equivalence, full IEEE/overflow/NaN-payload and cross-platform iterative last-bit parity, exact nested diagnostics/statistics/cache effects, C/Python API or EMS dispatch, inverse round trips through source-mapped routine 34, routine-45 composition, or sizing, coil, radiant, refrigeration, reporting, and other downstream consumer migration",
+]
 
 routine.psy_tdp_fn_tdb_twb_pb_error.source_file = "src/EnergyPlus/Psychrometrics.cc"
 routine.psy_tdp_fn_tdb_twb_pb_error.source_routine = "PsyTdpFnTdbTwbPb_error"

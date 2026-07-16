@@ -177,8 +177,9 @@ fn raw_saved_sentinel_is_outside_the_pure_projection() {
     let dew_pressure_pa = atmospheric_pressure_pa * humidity_ratio / (0.621_98 + humidity_ratio);
 
     assert_bits(dew_pressure_pa, -99_999.0);
-    // A fresh source raw call false-hits its saved pair at -99999 C. This
-    // isolated non-saved numerical projection instead reaches the lower clamp.
+    // A fresh source raw call false-hits its saved pair at input pressure
+    // -99999 Pa and returns the initial -99999 C. This isolated non-saved
+    // numerical projection instead reaches the lower clamp.
     assert_bits(
         energyplus_psy_tdp_fn_w_pb(humidity_ratio, atmospheric_pressure_pa),
         -100.0,
