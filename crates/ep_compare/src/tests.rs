@@ -3,10 +3,11 @@ use crate::{
     SeriesComparisonStatus, SeriesDivergenceKind, SeriesSample, Tolerance,
     compare_ordered_timestamp_samples_v2, compare_series, compare_series_samples_v2,
     compare_series_v2, parse_eio_construction_ctf, parse_eio_construction_ctf_coefficients,
-    parse_eio_heat_transfer_surfaces, parse_eio_material_ctf_summary,
-    parse_eio_other_equipment_nominal, parse_eio_surface_geometry_rules,
-    parse_eio_warmup_environments, parse_eio_zone_geometry, parse_eso_series,
-    parse_eso_time_series, parse_mtr_time_series, parse_mtr_time_series_for_frequency,
+    parse_eio_construction_material_summaries, parse_eio_heat_transfer_surfaces,
+    parse_eio_material_ctf_summary, parse_eio_other_equipment_nominal,
+    parse_eio_surface_geometry_rules, parse_eio_warmup_environments, parse_eio_zone_geometry,
+    parse_eso_series, parse_eso_time_series, parse_mtr_time_series,
+    parse_mtr_time_series_for_frequency,
 };
 
 #[test]
@@ -711,6 +712,89 @@ fn parses_eio_material_ctf_summary_rows() -> Result<(), Box<dyn std::error::Erro
     assert_eq!(materials[0].thermal_resistance_m2_k_per_w, 2.291);
 
     Ok(())
+}
+
+#[test]
+fn groups_ordered_generic_and_air_material_rows_by_construction()
+-> Result<(), Box<dyn std::error::Error>> {
+    let summaries = parse_eio_construction_material_summaries(
+        r#"! <Construction CTF>,Construction Name,...
+! <Material CTF Summary>,Material Name,...
+! <Material:Air CTF Summary>,Material Name,ThermalResistance {m2-K/w}
+ Construction CTF,MIXED WALL,   1,   3,   1,   0.250,         2.5000,   0.900,   0.900,   0.750,   0.750,Rough
+ Material CTF Summary,OUTSIDE SOLID,  0.0500,         1.000,    800.000,      900.000,       0.050
+ Material:Air CTF Summary,CENTER AIR GAP,       0.180
+ Material CTF Summary,INSIDE SOLID,  0.1200,         1.200,    900.000,     1000.000,       0.100
+ Construction CTF,IR ONLY,   2,   1,   1,   0.250,       100.0000,   1.000,   1.000,   1.000,   1.000,None
+ Material CTF Summary,IR TRANSPARENT,  0.0000,         0.000,      0.000,        0.000,       0.010
+"#,
+    )?;
+
+    assert_eq!(summaries.len(), 2);
+    assert_eq!(summaries[0].construction.construction_name, "MIXED WALL");
+    assert_eq!(summaries[0].construction.layer_count, 3);
+    assert_eq!(
+        summaries[0]
+            .layers
+            .iter()
+            .map(|layer| layer.material_name.as_str())
+            .collect::<Vec<_>>(),
+        vec!["OUTSIDE SOLID", "CENTER AIR GAP", "INSIDE SOLID"]
+    );
+    assert_eq!(
+        summaries[0]
+            .layers
+            .iter()
+            .map(|layer| layer.thermal_resistance_m2_k_per_w)
+            .collect::<Vec<_>>(),
+        vec![0.05, 0.18, 0.1]
+    );
+    assert_eq!(
+        summaries[0].layers[1].summary_format,
+        crate::EioMaterialCtfSummaryFormat::Air
+    );
+    assert_eq!(summaries[0].layers[1].thickness_m, None);
+
+    // EnergyPlus emits IRT through the generic row, which does not encode its object type.
+    assert_eq!(summaries[1].layers[0].material_name, "IR TRANSPARENT");
+    assert_eq!(
+        summaries[1].layers[0].summary_format,
+        crate::EioMaterialCtfSummaryFormat::Material
+    );
+    assert_eq!(summaries[1].layers[0].thermal_resistance_m2_k_per_w, 0.01);
+
+    Ok(())
+}
+
+#[test]
+fn grouped_material_parser_rejects_declared_layer_count_mismatch() {
+    let error = parse_eio_construction_material_summaries(
+        r#" Construction CTF,MIXED WALL,   1,   2,   1,   0.250,         4.3478,   0.900,   0.900,   0.750,   0.750,Rough
+ Material CTF Summary,ONLY ONE,  0.0500,         1.000,    800.000,      900.000,       0.050
+"#,
+    )
+    .expect_err("declared and emitted layer counts must agree");
+
+    assert!(matches!(
+        error,
+        EioError::InvalidConstructionMaterialSummary { .. }
+    ));
+    if let EioError::InvalidConstructionMaterialSummary { line, reason, .. } = error {
+        assert_eq!(line, 1);
+        assert!(reason.contains("declares 2 layers but has 1"));
+    }
+}
+
+#[test]
+fn grouped_material_parser_rejects_layer_before_construction() {
+    let error =
+        parse_eio_construction_material_summaries(" Material:Air CTF Summary,ORPHAN GAP,0.180\n")
+            .expect_err("a layer must belong to a construction");
+
+    assert!(matches!(
+        error,
+        EioError::InvalidConstructionMaterialSummary { line: 1, .. }
+    ));
 }
 
 #[test]

@@ -1,0 +1,117 @@
+id = "material_opaque_variants_001"
+title = "Opaque material variant EIO layer ordering"
+milestone = "v0.8-heat-balance"
+purpose = "Compare Rust Regular, AirGap, and InfraredTransparent construction-layer interpretation with EnergyPlus construction-grouped EIO rows."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The MIXED OPAQUE construction deliberately places two consecutive Material:AirGap layers between regular solid outside and inside layers.",
+  "The reciprocal surface uses MIXED OPAQUE REVERSE so the asymmetric solid and gap properties appear in physically reversed layer order.",
+  "The IRT ONLY construction deliberately uses Material:InfraredTransparent as its sole layer on a paired interzone surface.",
+  "All three variant constructions are assigned across two reciprocal BuildingSurface:Detailed interzone pairs so EnergyPlus validates their intended use.",
+  "The smoke gate groups every Construction CTF row with all emitted material summary rows and fails construction-count, layer-count, material-name, outside-to-inside order, or thermal-resistance mismatches.",
+  "This remains non-blocking diagnostic evidence for the exact static fixture. It does not claim dynamic air-gap heat transfer, IRT interzone warning parity, CondFD behavior, general construction or conduction behavior, or material-family conformance.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/material_opaque_variants_001/material_opaque_variants.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface", "construction"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/material_opaque_variants_001/material_opaque_variants.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+epjson = ".runtime/compare-material-opaque-variants/26.1.0/material-opaque-variants.epJSON"
+
+[[outputs]]
+key = "EXTERIOR SOLID"
+variable = "Construction CTF Layer Count"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "EXTERIOR SOLID"
+variable = "Material CTF Summary Thermal Resistance"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "MIXED OPAQUE"
+variable = "Construction CTF Layer Count"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "MIXED OPAQUE"
+variable = "Material CTF Summary Thermal Resistance"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "MIXED OPAQUE REVERSE"
+variable = "Construction CTF Layer Count"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "MIXED OPAQUE REVERSE"
+variable = "Material CTF Summary Thermal Resistance"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "IRT ONLY"
+variable = "Construction CTF Layer Count"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "IRT ONLY"
+variable = "Material CTF Summary Thermal Resistance"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/material_opaque_variants_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-material-opaque-variants-smoke"
+blocking = false

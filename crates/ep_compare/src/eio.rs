@@ -44,6 +44,14 @@ pub fn load_eio_construction_ctf(
     parse_eio_construction_ctf(&contents)
 }
 
+/// Loads construction CTF rows grouped with their ordered material layers.
+pub fn load_eio_construction_material_summaries(
+    path: impl AsRef<Path>,
+) -> Result<Vec<EioConstructionMaterialSummary>, EioError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_eio_construction_material_summaries(&contents)
+}
+
 /// Loads construction CTF coefficient rows from an EnergyPlus EIO file.
 pub fn load_eio_construction_ctf_coefficients(
     path: impl AsRef<Path>,
@@ -397,55 +405,7 @@ pub fn parse_eio_construction_ctf(contents: &str) -> Result<Vec<EioConstructionC
             });
         }
 
-        constructions.push(EioConstructionCtf {
-            construction_name: required_field(&fields, 1).to_ascii_uppercase(),
-            index: parse_construction_usize_field(&fields, 2, line_number, line, "Index")?,
-            layer_count: parse_construction_usize_field(&fields, 3, line_number, line, "#Layers")?,
-            ctf_count: parse_construction_usize_field(&fields, 4, line_number, line, "#CTFs")?,
-            timestep_hours: parse_construction_f64_field(
-                &fields,
-                5,
-                line_number,
-                line,
-                "Time Step {hours}",
-            )?,
-            thermal_conductance_w_per_m2_k: parse_construction_f64_field(
-                &fields,
-                6,
-                line_number,
-                line,
-                "ThermalConductance {w/m2-K}",
-            )?,
-            outer_thermal_absorptance: parse_construction_f64_field(
-                &fields,
-                7,
-                line_number,
-                line,
-                "OuterThermalAbsorptance",
-            )?,
-            inner_thermal_absorptance: parse_construction_f64_field(
-                &fields,
-                8,
-                line_number,
-                line,
-                "InnerThermalAbsorptance",
-            )?,
-            outer_solar_absorptance: parse_construction_f64_field(
-                &fields,
-                9,
-                line_number,
-                line,
-                "OuterSolarAbsorptance",
-            )?,
-            inner_solar_absorptance: parse_construction_f64_field(
-                &fields,
-                10,
-                line_number,
-                line,
-                "InnerSolarAbsorptance",
-            )?,
-            roughness: required_field(&fields, 11).to_string(),
-        });
+        constructions.push(parse_construction_ctf_row(&fields, line_number, line)?);
     }
 
     if constructions.is_empty() {
@@ -453,6 +413,152 @@ pub fn parse_eio_construction_ctf(contents: &str) -> Result<Vec<EioConstructionC
     }
 
     Ok(constructions)
+}
+
+/// Parses `Construction CTF` rows together with their outside-to-inside material summaries.
+///
+/// Both `Material CTF Summary` and resistance-only `Material:Air CTF Summary` rows are
+/// accepted. The generic material row is also used for infrared-transparent material, so
+/// callers must not infer an EnergyPlus object type from the row format alone.
+pub fn parse_eio_construction_material_summaries(
+    contents: &str,
+) -> Result<Vec<EioConstructionMaterialSummary>, EioError> {
+    type PendingSummary = (usize, String, EioConstructionMaterialSummary);
+
+    let mut summaries = Vec::new();
+    let mut pending: Option<PendingSummary> = None;
+    for (line_index, line) in contents.lines().enumerate() {
+        let line_number = line_index + 1;
+        let trimmed = line.trim();
+        if trimmed.starts_with("Construction CTF,") {
+            if let Some(previous) = pending.take() {
+                finish_construction_material_summary(previous, &mut summaries)?;
+            }
+            let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+            if fields.len() <= 11 {
+                return Err(EioError::InvalidConstructionCtf {
+                    line: line_number,
+                    text: line.to_string(),
+                    reason: format!("expected at least 12 fields, found {}", fields.len()),
+                });
+            }
+            pending = Some((
+                line_number,
+                line.to_string(),
+                EioConstructionMaterialSummary {
+                    construction: parse_construction_ctf_row(&fields, line_number, line)?,
+                    layers: Vec::new(),
+                },
+            ));
+            continue;
+        }
+
+        let summary_format = if trimmed.starts_with("Material CTF Summary,") {
+            Some(EioMaterialCtfSummaryFormat::Material)
+        } else if trimmed.starts_with("Material:Air CTF Summary,") {
+            Some(EioMaterialCtfSummaryFormat::Air)
+        } else {
+            None
+        };
+        let Some(summary_format) = summary_format else {
+            continue;
+        };
+        let Some((_construction_line, _construction_text, current)) = pending.as_mut() else {
+            return Err(EioError::InvalidConstructionMaterialSummary {
+                line: line_number,
+                text: line.to_string(),
+                reason: "material summary appeared before any Construction CTF row".to_string(),
+            });
+        };
+        current.layers.push(parse_construction_material_layer(
+            trimmed,
+            summary_format,
+            line_number,
+            line,
+        )?);
+    }
+
+    if let Some(previous) = pending.take() {
+        finish_construction_material_summary(previous, &mut summaries)?;
+    }
+    if summaries.is_empty() {
+        return Err(EioError::MissingConstructionCtf);
+    }
+
+    Ok(summaries)
+}
+
+fn finish_construction_material_summary(
+    pending: (usize, String, EioConstructionMaterialSummary),
+    summaries: &mut Vec<EioConstructionMaterialSummary>,
+) -> Result<(), EioError> {
+    let (line, text, summary) = pending;
+    if summary.construction.layer_count != summary.layers.len() {
+        return Err(EioError::InvalidConstructionMaterialSummary {
+            line,
+            text,
+            reason: format!(
+                "construction {} declares {} layers but has {} material summary rows",
+                summary.construction.construction_name,
+                summary.construction.layer_count,
+                summary.layers.len()
+            ),
+        });
+    }
+    summaries.push(summary);
+    Ok(())
+}
+
+fn parse_construction_material_layer(
+    trimmed: &str,
+    summary_format: EioMaterialCtfSummaryFormat,
+    line_number: usize,
+    line: &str,
+) -> Result<EioConstructionMaterialLayer, EioError> {
+    let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+    let required_fields = match summary_format {
+        EioMaterialCtfSummaryFormat::Material => 7,
+        EioMaterialCtfSummaryFormat::Air => 3,
+    };
+    if fields.len() < required_fields {
+        return Err(EioError::InvalidConstructionMaterialSummary {
+            line: line_number,
+            text: line.to_string(),
+            reason: format!(
+                "expected at least {required_fields} fields, found {}",
+                fields.len()
+            ),
+        });
+    }
+
+    let parse_field = |index, field| {
+        parse_construction_material_f64_field(&fields, index, line_number, line, field)
+    };
+    let (
+        thickness_m,
+        conductivity_w_per_m_k,
+        density_kg_per_m3,
+        specific_heat_j_per_kg_k,
+        resistance_index,
+    ) = match summary_format {
+        EioMaterialCtfSummaryFormat::Material => (
+            Some(parse_field(2, "Thickness {m}")?),
+            Some(parse_field(3, "Conductivity {w/m-K}")?),
+            Some(parse_field(4, "Density {kg/m3}")?),
+            Some(parse_field(5, "Specific Heat {J/kg-K}")?),
+            6,
+        ),
+        EioMaterialCtfSummaryFormat::Air => (None, None, None, None, 2),
+    };
+    Ok(EioConstructionMaterialLayer {
+        material_name: required_field(&fields, 1).to_ascii_uppercase(),
+        summary_format,
+        thickness_m,
+        conductivity_w_per_m_k,
+        density_kg_per_m3,
+        specific_heat_j_per_kg_k,
+        thermal_resistance_m2_k_per_w: parse_field(resistance_index, "ThermalResistance {m2-K/w}")?,
+    })
 }
 
 /// Parses `CTF` coefficient rows from EnergyPlus EIO contents.
@@ -625,6 +731,56 @@ fn required_field<'a>(fields: &'a [&str], index: usize) -> &'a str {
     fields.get(index).copied().unwrap_or("")
 }
 
+fn parse_construction_ctf_row(
+    fields: &[&str],
+    line: usize,
+    text: &str,
+) -> Result<EioConstructionCtf, EioError> {
+    Ok(EioConstructionCtf {
+        construction_name: required_field(fields, 1).to_ascii_uppercase(),
+        index: parse_construction_usize_field(fields, 2, line, text, "Index")?,
+        layer_count: parse_construction_usize_field(fields, 3, line, text, "#Layers")?,
+        ctf_count: parse_construction_usize_field(fields, 4, line, text, "#CTFs")?,
+        timestep_hours: parse_construction_f64_field(fields, 5, line, text, "Time Step {hours}")?,
+        thermal_conductance_w_per_m2_k: parse_construction_f64_field(
+            fields,
+            6,
+            line,
+            text,
+            "ThermalConductance {w/m2-K}",
+        )?,
+        outer_thermal_absorptance: parse_construction_f64_field(
+            fields,
+            7,
+            line,
+            text,
+            "OuterThermalAbsorptance",
+        )?,
+        inner_thermal_absorptance: parse_construction_f64_field(
+            fields,
+            8,
+            line,
+            text,
+            "InnerThermalAbsorptance",
+        )?,
+        outer_solar_absorptance: parse_construction_f64_field(
+            fields,
+            9,
+            line,
+            text,
+            "OuterSolarAbsorptance",
+        )?,
+        inner_solar_absorptance: parse_construction_f64_field(
+            fields,
+            10,
+            line,
+            text,
+            "InnerSolarAbsorptance",
+        )?,
+        roughness: required_field(fields, 11).to_string(),
+    })
+}
+
 fn parse_surface_geometry_choice(
     fields: &[&str],
     index: usize,
@@ -751,6 +907,22 @@ fn parse_material_f64_field(
     required_field(fields, index)
         .parse::<f64>()
         .map_err(|_error| EioError::InvalidMaterialCtfSummary {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })
+}
+
+fn parse_construction_material_f64_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<f64, EioError> {
+    required_field(fields, index)
+        .parse::<f64>()
+        .map_err(|_error| EioError::InvalidConstructionMaterialSummary {
             line,
             text: text.to_string(),
             reason: format!("invalid {field}"),

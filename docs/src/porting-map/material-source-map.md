@@ -208,13 +208,20 @@ claimed.
 The compiler preserves EnergyPlus family order by compiling all `Material`
 objects, then all `Material:NoMass`, `Material:AirGap`, and
 `Material:InfraredTransparent` objects in that order, and keeps their names
-in the shared material registry. This checkpoint does not port the IRT
-paired-interzone surface-use semantics or non-interzone warnings, the CondFD
-prohibition and algorithm behavior, or official EnergyPlus oracle EIO evidence
-for the two new variants. It also does not claim exact EnergyPlus diagnostic
-text, all input-processor default behavior, internal F/C-factor material
-injection, EMS mutation, material EIO formatting, or any of the deferred
-families.
+in the shared material registry. `material_opaque_variants_001` adds
+nonblocking diagnostic EnergyPlus 26.1 grouped-EIO evidence for its exact
+static fixture: construction and layer counts plus every outside-to-inside
+material name, order, and thermal resistance are compared for the regular,
+two-adjacent-AirGap, reversed, and sole-layer IRT construction groups. The
+generic `Material CTF Summary` row emitted for IRT is treated as a row shape,
+not as an independent object-type discriminator.
+
+This checkpoint does not port the IRT paired-interzone surface-use semantics
+or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
+dynamic AirGap/IRT heat transfer. It also does not claim exact EnergyPlus
+diagnostic text, all input-processor default behavior, internal F/C-factor
+material injection, EMS mutation, broad material EIO formatting, or any of
+the deferred families.
 
 ## Routine Inventory
 
@@ -236,11 +243,17 @@ four-variant implementation slice does not promote the whole
 
 The existing `construction_materials_001` case remains nonblocking smoke
 evidence for selected static EIO fields of its existing regular and no-mass
-inputs. Typed model/compiler tests can prove that four object-specific states
+inputs. `material_opaque_variants_001` separately contributes nonblocking
+diagnostic grouped-EIO evidence for the exact four-construction fixture. Its
+gate compares all 10 emitted material-layer rows, including two adjacent
+AirGap layers in both directions and the sole IRT layer, without promoting a
+runtime or conformance claim.
+
+Typed model/compiler tests additionally prove that four object-specific states
 are represented separately, required fields and fixed defaults are compiled,
 and the bounded AirGap/IRT construction invariants are rejected or accepted as
-declared. Those tests are internal evidence, not an EnergyPlus oracle family
-gate, and this checkpoint adds no AirGap/IRT oracle EIO evidence.
+declared. Those tests and the static EIO smoke remain bounded evidence, not an
+EnergyPlus material-family gate.
 
 CP58 remains incomplete until, at minimum:
 

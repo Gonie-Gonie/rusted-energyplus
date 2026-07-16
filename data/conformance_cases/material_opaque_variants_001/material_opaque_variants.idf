@@ -1,0 +1,335 @@
+Version,26.1;
+
+SimulationControl,No,No,No,No,Yes,No;
+
+Building,Material Opaque Variants Compare,0.0,Suburbs,0.04,0.4,FullExterior,25,6;
+
+Timestep,4;
+
+HeatBalanceAlgorithm,ConductionTransferFunction;
+
+SurfaceConvectionAlgorithm:Inside,TARP;
+
+SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+Site:Location,Golden,39.74,-105.18,-7.0,1829.0;
+
+Site:GroundTemperature:BuildingSurface,18,18,18,18,18,18,18,18,18,18,18,18;
+
+RunPeriod,Run Period 1,1,1,2013,1,1,2013,Tuesday,Yes,Yes,No,Yes,Yes;
+
+GlobalGeometryRules,UpperLeftCorner,CounterClockWise,World;
+
+Material,
+  EXTERIOR REGULAR,
+  MediumRough,
+  0.10,
+  1.00,
+  800.0,
+  1000.0,
+  0.90,
+  0.70,
+  0.70;
+
+Material,
+  OPAQUE OUTSIDE REGULAR,
+  MediumRough,
+  0.05,
+  1.00,
+  1000.0,
+  800.0,
+  0.90,
+  0.70,
+  0.70;
+
+Material:AirGap,
+  OPAQUE GAP ONE,
+  0.18;
+
+Material:AirGap,
+  OPAQUE GAP TWO,
+  0.12;
+
+Material,
+  OPAQUE INSIDE REGULAR,
+  Smooth,
+  0.08,
+  0.40,
+  500.0,
+  1200.0,
+  0.90,
+  0.70,
+  0.70;
+
+Material:InfraredTransparent,
+  IRT MATERIAL;
+
+Construction,
+  EXTERIOR SOLID,
+  EXTERIOR REGULAR;
+
+Construction,
+  MIXED OPAQUE,
+  OPAQUE OUTSIDE REGULAR,
+  OPAQUE GAP ONE,
+  OPAQUE GAP TWO,
+  OPAQUE INSIDE REGULAR;
+
+Construction,
+  MIXED OPAQUE REVERSE,
+  OPAQUE INSIDE REGULAR,
+  OPAQUE GAP TWO,
+  OPAQUE GAP ONE,
+  OPAQUE OUTSIDE REGULAR;
+
+Construction,
+  IRT ONLY,
+  IRT MATERIAL;
+
+Zone,ZONE A,0,0,0,0,1,1,1,1;
+
+Zone,ZONE B,0,0,0,0,1,1,1,1;
+
+BuildingSurface:Detailed,
+  ZONE A FLOOR,
+  Floor,
+  EXTERIOR SOLID,
+  ZONE A,
+  ,
+  Ground,
+  ,
+  NoSun,
+  NoWind,
+  1.0,
+  4,
+  0,0,0,
+  0,1,0,
+  1,1,0,
+  1,0,0;
+
+BuildingSurface:Detailed,
+  ZONE A ROOF,
+  Roof,
+  EXTERIOR SOLID,
+  ZONE A,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.0,
+  4,
+  0,0,1,
+  1,0,1,
+  1,1,1,
+  0,1,1;
+
+BuildingSurface:Detailed,
+  ZONE A WEST,
+  Wall,
+  EXTERIOR SOLID,
+  ZONE A,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  0,0,0,
+  0,0,1,
+  0,1,1,
+  0,1,0;
+
+BuildingSurface:Detailed,
+  ZONE A SOUTH,
+  Wall,
+  EXTERIOR SOLID,
+  ZONE A,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  0,0,0,
+  1,0,0,
+  1,0,1,
+  0,0,1;
+
+BuildingSurface:Detailed,
+  ZONE A NORTH,
+  Wall,
+  EXTERIOR SOLID,
+  ZONE A,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  0,1,0,
+  0,1,1,
+  1,1,1,
+  1,1,0;
+
+BuildingSurface:Detailed,
+  ZONE A MIXED INTERZONE,
+  Wall,
+  MIXED OPAQUE,
+  ZONE A,
+  ,
+  Surface,
+  ZONE B MIXED INTERZONE,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  1,0,0,
+  1,0.5,0,
+  1,0.5,1,
+  1,0,1;
+
+BuildingSurface:Detailed,
+  ZONE A IRT INTERZONE,
+  Wall,
+  IRT ONLY,
+  ZONE A,
+  ,
+  Surface,
+  ZONE B IRT INTERZONE,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  1,0.5,0,
+  1,1,0,
+  1,1,1,
+  1,0.5,1;
+
+BuildingSurface:Detailed,
+  ZONE B FLOOR,
+  Floor,
+  EXTERIOR SOLID,
+  ZONE B,
+  ,
+  Ground,
+  ,
+  NoSun,
+  NoWind,
+  1.0,
+  4,
+  1,0,0,
+  1,1,0,
+  2,1,0,
+  2,0,0;
+
+BuildingSurface:Detailed,
+  ZONE B ROOF,
+  Roof,
+  EXTERIOR SOLID,
+  ZONE B,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.0,
+  4,
+  1,0,1,
+  2,0,1,
+  2,1,1,
+  1,1,1;
+
+BuildingSurface:Detailed,
+  ZONE B EAST,
+  Wall,
+  EXTERIOR SOLID,
+  ZONE B,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  2,0,0,
+  2,1,0,
+  2,1,1,
+  2,0,1;
+
+BuildingSurface:Detailed,
+  ZONE B SOUTH,
+  Wall,
+  EXTERIOR SOLID,
+  ZONE B,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  1,0,0,
+  2,0,0,
+  2,0,1,
+  1,0,1;
+
+BuildingSurface:Detailed,
+  ZONE B NORTH,
+  Wall,
+  EXTERIOR SOLID,
+  ZONE B,
+  ,
+  Outdoors,
+  ,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  1,1,0,
+  1,1,1,
+  2,1,1,
+  2,1,0;
+
+BuildingSurface:Detailed,
+  ZONE B MIXED INTERZONE,
+  Wall,
+  MIXED OPAQUE REVERSE,
+  ZONE B,
+  ,
+  Surface,
+  ZONE A MIXED INTERZONE,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  1,0,0,
+  1,0,1,
+  1,0.5,1,
+  1,0.5,0;
+
+BuildingSurface:Detailed,
+  ZONE B IRT INTERZONE,
+  Wall,
+  IRT ONLY,
+  ZONE B,
+  ,
+  Surface,
+  ZONE A IRT INTERZONE,
+  NoSun,
+  NoWind,
+  0.5,
+  4,
+  1,0.5,0,
+  1,0.5,1,
+  1,1,1,
+  1,1,0;
+
+Output:Surfaces:List,Details;
+
+Output:Diagnostics,DisplayAdvancedReportVariables;
+
+Output:Constructions,Constructions;

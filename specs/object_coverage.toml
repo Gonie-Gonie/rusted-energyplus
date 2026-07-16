@@ -62,11 +62,25 @@ first_evidence = "heat_balance_nomass_001"
 support_boundary = "Typed for declared opaque no-mass heat-balance cases only."
 
 [[object]]
+name = "Material:AirGap"
+family = "material"
+status = "typed"
+first_evidence = "material_opaque_variants_001"
+support_boundary = "Typed as the positive R-only opaque air-gap variant with fixed source defaults and middle-layer construction validation. material_opaque_variants_001 adds nonblocking diagnostic EnergyPlus 26.1 EIO evidence only for the exact two-gap paired-interzone fixture: grouped layer count, material name, outside-to-inside order, and thermal resistance. Dynamic air-gap heat transfer, window-gap families, CondFD behavior, broad construction use, and a material-family conformance claim remain outside this evidence."
+
+[[object]]
+name = "Material:InfraredTransparent"
+family = "material"
+status = "typed"
+first_evidence = "material_opaque_variants_001"
+support_boundary = "Typed as the name-only opaque infrared-transparent variant with fixed source values and the intended sole-layer construction invariant. material_opaque_variants_001 adds nonblocking diagnostic EnergyPlus 26.1 EIO evidence only for the exact sole-layer paired-interzone fixture: grouped layer count, source-declared material identity, order, and thermal resistance 0.01 m2-K/W. The generic Material CTF Summary row shape is not treated as an independent object-type discriminator. IRT interzone warnings, the upstream non-first-layer validation gap and exact diagnostics, CondFD behavior, dynamic heat transfer, and conformance remain unclaimed."
+
+[[object]]
 name = "Construction"
 family = "construction"
 status = "typed"
 first_evidence = "heat_balance_nomass_001"
-support_boundary = "Typed for surface/material links and declared static construction evidence."
+support_boundary = "Typed for surface/material links and declared static construction evidence. material_opaque_variants_001 separately adds nonblocking diagnostic EnergyPlus 26.1 EIO evidence for the exact EXTERIOR SOLID, MIXED OPAQUE, reversed mixed, and sole-layer IRT construction groups, including every layer count, material name, outside-to-inside order, and thermal resistance. It does not promote general construction, CTF generation, conduction, or heat-balance conformance."
 
 [[object]]
 name = "ScheduleTypeLimits"

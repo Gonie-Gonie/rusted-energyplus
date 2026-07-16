@@ -19,8 +19,8 @@ use conformance_artifacts::{
 };
 use ep_compare::{
     SeriesSample, Tolerance, compare_series, load_eio_construction_ctf,
-    load_eio_construction_ctf_coefficients, load_eio_heat_transfer_surfaces,
-    load_eio_material_ctf_summary, load_eio_other_equipment_nominal,
+    load_eio_construction_ctf_coefficients, load_eio_construction_material_summaries,
+    load_eio_heat_transfer_surfaces, load_eio_other_equipment_nominal,
     load_eio_surface_geometry_rules, load_eio_warmup_environments, load_eio_zone_geometry,
     load_eso_series, load_eso_time_series,
 };
@@ -3804,15 +3804,8 @@ fn run_compare_construction_materials(args: &[String]) -> i32 {
         return 1;
     }
 
-    let oracle_constructions = match load_eio_construction_ctf(eio_path) {
-        Ok(constructions) => constructions,
-        Err(error) => {
-            eprintln!("{error}");
-            return 1;
-        }
-    };
-    let oracle_materials = match load_eio_material_ctf_summary(eio_path) {
-        Ok(materials) => materials,
+    let oracle_summaries = match load_eio_construction_material_summaries(eio_path) {
+        Ok(summaries) => summaries,
         Err(error) => {
             eprintln!("{error}");
             return 1;
@@ -3820,17 +3813,26 @@ fn run_compare_construction_materials(args: &[String]) -> i32 {
     };
 
     let rust_material_count = construction_layer_material_count(&model);
+    let oracle_material_count = oracle_summaries
+        .iter()
+        .map(|summary| summary.layers.len())
+        .sum::<usize>();
     let tolerance = Tolerance {
         absolute: 0.001,
         relative: 1.0e-6,
     };
-    let mut passed = rust_rows.len() == oracle_constructions.len();
+    let mut passed =
+        rust_rows.len() == oracle_summaries.len() && rust_material_count == oracle_material_count;
     let mut first_divergence = None;
-    if rust_rows.len() != oracle_constructions.len() {
+    if rust_rows.len() != oracle_summaries.len() {
         first_divergence = Some(format!(
             "construction_count expected {} observed {}",
-            oracle_constructions.len(),
+            oracle_summaries.len(),
             rust_rows.len()
+        ));
+    } else if rust_material_count != oracle_material_count {
+        first_divergence = Some(format!(
+            "material_layer_count expected {oracle_material_count} observed {rust_material_count}"
         ));
     }
 
@@ -3839,12 +3841,14 @@ fn run_compare_construction_materials(args: &[String]) -> i32 {
     println!("  conformance_claim: false");
     println!("  tolerance_policy: absolute-0.001");
     println!("  constructions: {}", rust_rows.len());
-    println!("  oracle_constructions: {}", oracle_constructions.len());
+    println!("  oracle_constructions: {}", oracle_summaries.len());
     println!("  materials: {}", rust_material_count);
-    println!("  oracle_materials: {}", oracle_materials.len());
+    println!("  oracle_materials: {}", oracle_material_count);
     for rust_row in &rust_rows {
-        let Some(oracle_construction) = oracle_constructions.iter().find(|row| {
-            row.construction_name
+        let Some(oracle_summary) = oracle_summaries.iter().find(|summary| {
+            summary
+                .construction
+                .construction_name
                 .eq_ignore_ascii_case(&rust_row.construction_name)
         }) else {
             passed = false;
@@ -3858,16 +3862,13 @@ fn run_compare_construction_materials(args: &[String]) -> i32 {
             );
             continue;
         };
-        let Some(oracle_material) = oracle_materials.iter().find(|row| {
-            row.material_name
-                .eq_ignore_ascii_case(&rust_row.outside_layer_material_name)
-        }) else {
+        let Some(oracle_outside_layer) = oracle_summary.layers.first() else {
             passed = false;
             record_first_divergence(
                 &mut first_divergence,
                 format!(
-                    "construction {} material {} missing_in_eio",
-                    rust_row.construction_name, rust_row.outside_layer_material_name
+                    "construction {} has no EIO layers",
+                    rust_row.construction_name
                 ),
             );
             println!(
@@ -3876,37 +3877,60 @@ fn run_compare_construction_materials(args: &[String]) -> i32 {
             );
             continue;
         };
+        let rust_outside_layer = match outside_construction_material_layer(rust_row) {
+            Ok(layer) => layer,
+            Err(error) => {
+                passed = false;
+                record_first_divergence(&mut first_divergence, error);
+                println!(
+                    "  construction: {} status: fail",
+                    rust_row.construction_name
+                );
+                continue;
+            }
+        };
 
-        let row_pass = construction_material_row_matches(
-            rust_row,
-            oracle_construction,
-            oracle_material,
-            tolerance,
-        );
+        let row_pass = construction_material_row_matches(rust_row, oracle_summary, tolerance);
         if !row_pass {
             passed = false;
             record_construction_material_field_divergence(
                 &mut first_divergence,
                 rust_row,
-                oracle_construction,
-                oracle_material,
+                oracle_summary,
                 tolerance,
             );
         }
 
         println!(
-            "  construction: {} layers: {}/{} material: {}/{} thermal_conductance_w_per_m2_k: {:.6}/{:.6} material_resistance_m2_k_per_w: {:.6}/{:.6} status: {}",
+            "  construction: {} declared_layers: {} oracle_layers: {} rust_layers: {} material: {}/{} thermal_conductance_w_per_m2_k: {:.6}/{:.6} material_resistance_m2_k_per_w: {:.6}/{:.6} status: {}",
             rust_row.construction_name,
-            oracle_construction.layer_count,
-            rust_row.layer_count,
-            oracle_material.material_name,
-            rust_row.outside_layer_material_name,
-            oracle_construction.thermal_conductance_w_per_m2_k,
+            oracle_summary.construction.layer_count,
+            oracle_summary.layers.len(),
+            rust_row.layers.len(),
+            oracle_outside_layer.material_name,
+            rust_outside_layer.material_name,
+            oracle_summary.construction.thermal_conductance_w_per_m2_k,
             rust_row.thermal_conductance_w_per_m2_k,
-            oracle_material.thermal_resistance_m2_k_per_w,
-            rust_row.material_thermal_resistance_m2_k_per_w,
+            oracle_outside_layer.thermal_resistance_m2_k_per_w,
+            rust_outside_layer.material_thermal_resistance_m2_k_per_w,
             if row_pass { "pass" } else { "fail" }
         );
+        for (layer_index, (oracle_layer, rust_layer)) in oracle_summary
+            .layers
+            .iter()
+            .zip(&rust_row.layers)
+            .enumerate()
+        {
+            println!(
+                "    layer: {} material: {}/{} eio_format: {} thermal_resistance_m2_k_per_w: {:.6}/{:.6}",
+                layer_index + 1,
+                oracle_layer.material_name,
+                rust_layer.material_name,
+                eio_material_summary_format_label(oracle_layer.summary_format),
+                oracle_layer.thermal_resistance_m2_k_per_w,
+                rust_layer.material_thermal_resistance_m2_k_per_w
+            );
+        }
     }
 
     println!(
@@ -9407,11 +9431,16 @@ const WEATHER_COMPARE_FIELDS: &[WeatherCompareField] = &[
     },
 ];
 
+#[derive(Clone, Debug)]
 struct ConstructionMaterialRow {
     construction_name: String,
-    layer_count: usize,
-    outside_layer_material_name: String,
+    layers: Vec<ConstructionMaterialLayerRow>,
     thermal_conductance_w_per_m2_k: f64,
+}
+
+#[derive(Clone, Debug)]
+struct ConstructionMaterialLayerRow {
+    material_name: String,
     material_thickness_m: Option<f64>,
     material_conductivity_w_per_m_k: Option<f64>,
     material_density_kg_per_m3: Option<f64>,
@@ -9431,16 +9460,15 @@ fn construction_layer_material_count(model: &TypedModel) -> usize {
     model
         .constructions
         .iter()
-        .flat_map(|construction| {
+        .map(|construction| {
             let layer_ids = if construction.layers.is_empty() {
                 std::slice::from_ref(&construction.outside_layer)
             } else {
                 construction.layers.as_slice()
             };
-            layer_ids.iter().copied()
+            layer_ids.len()
         })
-        .collect::<BTreeSet<_>>()
-        .len()
+        .sum()
 }
 
 fn construction_material_row(
@@ -9448,39 +9476,57 @@ fn construction_material_row(
     construction: &Construction,
 ) -> Result<ConstructionMaterialRow, String> {
     let layer_materials = materials_for_construction(model, construction)?;
-    let material = layer_materials.first().ok_or_else(|| {
-        format!(
+    if layer_materials.is_empty() {
+        return Err(format!(
             "construction {} references no material layers",
             construction.name.0
-        )
-    })?;
-    let material_thermal_resistance_m2_k_per_w =
-        material.thermal_resistance().ok_or_else(|| {
-            format!(
-                "construction {} outside layer {} has no positive thermal resistance",
-                construction.name.0, material.name.0
-            )
-        })?;
-    let mut construction_thermal_resistance_m2_k_per_w = 0.0;
-    for material in &layer_materials {
-        construction_thermal_resistance_m2_k_per_w +=
-            material.thermal_resistance().ok_or_else(|| {
-                format!(
-                    "construction {} layer {} has no positive thermal resistance",
-                    construction.name.0, material.name.0
-                )
-            })?;
+        ));
+    }
+    let layers = layer_materials
+        .iter()
+        .map(|material| {
+            let material_thermal_resistance_m2_k_per_w =
+                material.thermal_resistance().ok_or_else(|| {
+                    format!(
+                        "construction {} layer {} has no positive thermal resistance",
+                        construction.name.0, material.name.0
+                    )
+                })?;
+            Ok(ConstructionMaterialLayerRow {
+                material_name: material.name.0.clone(),
+                material_thickness_m: material.thickness_m(),
+                material_conductivity_w_per_m_k: material.conductivity_w_per_m_k(),
+                material_density_kg_per_m3: material.density_kg_per_m3(),
+                material_specific_heat_j_per_kg_k: material.specific_heat_j_per_kg_k(),
+                material_thermal_resistance_m2_k_per_w,
+            })
+        })
+        .collect::<Result<Vec<_>, String>>()?;
+    let construction_thermal_resistance_m2_k_per_w = layers
+        .iter()
+        .map(|layer| layer.material_thermal_resistance_m2_k_per_w)
+        .sum::<f64>();
+    if construction_thermal_resistance_m2_k_per_w <= 0.0 {
+        return Err(format!(
+            "construction {} has no positive thermal resistance",
+            construction.name.0
+        ));
     }
     Ok(ConstructionMaterialRow {
         construction_name: construction.name.0.clone(),
-        layer_count: layer_materials.len(),
-        outside_layer_material_name: material.name.0.clone(),
+        layers,
         thermal_conductance_w_per_m2_k: 1.0 / construction_thermal_resistance_m2_k_per_w,
-        material_thickness_m: material.thickness_m(),
-        material_conductivity_w_per_m_k: material.conductivity_w_per_m_k(),
-        material_density_kg_per_m3: material.density_kg_per_m3(),
-        material_specific_heat_j_per_kg_k: material.specific_heat_j_per_kg_k(),
-        material_thermal_resistance_m2_k_per_w,
+    })
+}
+
+fn outside_construction_material_layer(
+    row: &ConstructionMaterialRow,
+) -> Result<&ConstructionMaterialLayerRow, String> {
+    row.layers.first().ok_or_else(|| {
+        format!(
+            "construction {} references no material layers",
+            row.construction_name
+        )
     })
 }
 
@@ -9658,46 +9704,65 @@ fn internal_gain_row_matches(
 
 fn construction_material_row_matches(
     rust_row: &ConstructionMaterialRow,
-    oracle_construction: &ep_compare::EioConstructionCtf,
-    oracle_material: &ep_compare::EioMaterialCtfSummary,
+    oracle_summary: &ep_compare::EioConstructionMaterialSummary,
     tolerance: Tolerance,
 ) -> bool {
-    oracle_construction.layer_count == rust_row.layer_count
-        && oracle_material
-            .material_name
-            .eq_ignore_ascii_case(&rust_row.outside_layer_material_name)
+    oracle_summary.construction.layer_count == oracle_summary.layers.len()
+        && oracle_summary.layers.len() == rust_row.layers.len()
         && tolerance.accepts(
-            oracle_construction.thermal_conductance_w_per_m2_k,
+            oracle_summary.construction.thermal_conductance_w_per_m2_k,
             rust_row.thermal_conductance_w_per_m2_k,
         )
-        && material_field_matches(
-            oracle_material.thickness_m,
-            rust_row.material_thickness_m,
-            tolerance,
-        )
-        && material_field_matches(
-            oracle_material.conductivity_w_per_m_k,
-            rust_row.material_conductivity_w_per_m_k,
-            tolerance,
-        )
-        && material_field_matches(
-            oracle_material.density_kg_per_m3,
-            rust_row.material_density_kg_per_m3,
-            tolerance,
-        )
-        && material_field_matches(
-            oracle_material.specific_heat_j_per_kg_k,
-            rust_row.material_specific_heat_j_per_kg_k,
-            tolerance,
-        )
-        && tolerance.accepts(
-            oracle_material.thermal_resistance_m2_k_per_w,
-            rust_row.material_thermal_resistance_m2_k_per_w,
-        )
+        && oracle_summary
+            .layers
+            .iter()
+            .zip(&rust_row.layers)
+            .all(|(oracle_layer, rust_layer)| {
+                oracle_layer
+                    .material_name
+                    .eq_ignore_ascii_case(&rust_layer.material_name)
+                    && tolerance.accepts(
+                        oracle_layer.thermal_resistance_m2_k_per_w,
+                        rust_layer.material_thermal_resistance_m2_k_per_w,
+                    )
+                    && material_field_matches(
+                        oracle_layer.thickness_m,
+                        rust_layer.material_thickness_m,
+                        tolerance,
+                    )
+                    && material_field_matches(
+                        oracle_layer.conductivity_w_per_m_k,
+                        rust_layer.material_conductivity_w_per_m_k,
+                        tolerance,
+                    )
+                    && material_field_matches(
+                        oracle_layer.density_kg_per_m3,
+                        rust_layer.material_density_kg_per_m3,
+                        tolerance,
+                    )
+                    && material_field_matches(
+                        oracle_layer.specific_heat_j_per_kg_k,
+                        rust_layer.material_specific_heat_j_per_kg_k,
+                        tolerance,
+                    )
+            })
 }
 
-fn material_field_matches(expected: f64, observed: Option<f64>, tolerance: Tolerance) -> bool {
-    tolerance.accepts(expected, observed.unwrap_or(0.0))
+fn material_field_matches(
+    expected: Option<f64>,
+    observed: Option<f64>,
+    tolerance: Tolerance,
+) -> bool {
+    tolerance.accepts(expected.unwrap_or(0.0), observed.unwrap_or(0.0))
+}
+
+fn eio_material_summary_format_label(
+    format: ep_compare::EioMaterialCtfSummaryFormat,
+) -> &'static str {
+    match format {
+        ep_compare::EioMaterialCtfSummaryFormat::Material => "material",
+        ep_compare::EioMaterialCtfSummaryFormat::Air => "air",
+    }
 }
 
 fn record_first_divergence(first_divergence: &mut Option<String>, value: String) {
@@ -10000,39 +10065,115 @@ fn angle_abs_delta_deg(expected: f64, observed: f64) -> f64 {
 fn record_construction_material_field_divergence(
     first_divergence: &mut Option<String>,
     rust_row: &ConstructionMaterialRow,
-    oracle_construction: &ep_compare::EioConstructionCtf,
-    oracle_material: &ep_compare::EioMaterialCtfSummary,
+    oracle_summary: &ep_compare::EioConstructionMaterialSummary,
     tolerance: Tolerance,
 ) {
-    if oracle_construction.layer_count != rust_row.layer_count {
+    if oracle_summary.construction.layer_count != oracle_summary.layers.len() {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "construction {} field oracle_layer_count declared {} parsed {}",
+                rust_row.construction_name,
+                oracle_summary.construction.layer_count,
+                oracle_summary.layers.len()
+            ),
+        );
+        return;
+    }
+
+    if oracle_summary.layers.len() != rust_row.layers.len() {
         record_first_divergence(
             first_divergence,
             format!(
                 "construction {} field layer_count expected {} observed {}",
-                rust_row.construction_name, oracle_construction.layer_count, rust_row.layer_count
+                rust_row.construction_name,
+                oracle_summary.layers.len(),
+                rust_row.layers.len()
             ),
         );
         return;
     }
 
-    if !oracle_material
-        .material_name
-        .eq_ignore_ascii_case(&rust_row.outside_layer_material_name)
+    for (layer_index, (oracle_layer, rust_layer)) in oracle_summary
+        .layers
+        .iter()
+        .zip(&rust_row.layers)
+        .enumerate()
     {
-        record_first_divergence(
-            first_divergence,
-            format!(
-                "construction {} field outside_layer expected {} observed {}",
-                rust_row.construction_name,
-                oracle_material.material_name,
-                rust_row.outside_layer_material_name
+        if !oracle_layer
+            .material_name
+            .eq_ignore_ascii_case(&rust_layer.material_name)
+        {
+            record_first_divergence(
+                first_divergence,
+                format!(
+                    "construction {} layer {} field material_name expected {} observed {}",
+                    rust_row.construction_name,
+                    layer_index + 1,
+                    oracle_layer.material_name,
+                    rust_layer.material_name
+                ),
+            );
+            return;
+        }
+        if !tolerance.accepts(
+            oracle_layer.thermal_resistance_m2_k_per_w,
+            rust_layer.material_thermal_resistance_m2_k_per_w,
+        ) {
+            record_first_divergence(
+                first_divergence,
+                format!(
+                    "construction {} layer {} field thermal_resistance_m2_k_per_w expected {:.6} observed {:.6}",
+                    rust_row.construction_name,
+                    layer_index + 1,
+                    oracle_layer.thermal_resistance_m2_k_per_w,
+                    rust_layer.material_thermal_resistance_m2_k_per_w
+                ),
+            );
+            return;
+        }
+
+        for (field, expected, observed) in [
+            (
+                "material_thickness_m",
+                oracle_layer.thickness_m,
+                rust_layer.material_thickness_m,
             ),
-        );
-        return;
+            (
+                "material_conductivity_w_per_m_k",
+                oracle_layer.conductivity_w_per_m_k,
+                rust_layer.material_conductivity_w_per_m_k,
+            ),
+            (
+                "material_density_kg_per_m3",
+                oracle_layer.density_kg_per_m3,
+                rust_layer.material_density_kg_per_m3,
+            ),
+            (
+                "material_specific_heat_j_per_kg_k",
+                oracle_layer.specific_heat_j_per_kg_k,
+                rust_layer.material_specific_heat_j_per_kg_k,
+            ),
+        ] {
+            if !material_field_matches(expected, observed, tolerance) {
+                record_first_divergence(
+                    first_divergence,
+                    format!(
+                        "construction {} layer {} field {} expected {:.6} observed {:.6}",
+                        rust_row.construction_name,
+                        layer_index + 1,
+                        field,
+                        expected.unwrap_or(0.0),
+                        observed.unwrap_or(0.0)
+                    ),
+                );
+                return;
+            }
+        }
     }
 
     if !tolerance.accepts(
-        oracle_construction.thermal_conductance_w_per_m2_k,
+        oracle_summary.construction.thermal_conductance_w_per_m2_k,
         rust_row.thermal_conductance_w_per_m2_k,
     ) {
         record_first_divergence(
@@ -10040,61 +10181,8 @@ fn record_construction_material_field_divergence(
             format!(
                 "construction {} field thermal_conductance_w_per_m2_k expected {:.6} observed {:.6}",
                 rust_row.construction_name,
-                oracle_construction.thermal_conductance_w_per_m2_k,
+                oracle_summary.construction.thermal_conductance_w_per_m2_k,
                 rust_row.thermal_conductance_w_per_m2_k
-            ),
-        );
-        return;
-    }
-
-    for (field, expected, observed) in [
-        (
-            "material_thickness_m",
-            oracle_material.thickness_m,
-            rust_row.material_thickness_m,
-        ),
-        (
-            "material_conductivity_w_per_m_k",
-            oracle_material.conductivity_w_per_m_k,
-            rust_row.material_conductivity_w_per_m_k,
-        ),
-        (
-            "material_density_kg_per_m3",
-            oracle_material.density_kg_per_m3,
-            rust_row.material_density_kg_per_m3,
-        ),
-        (
-            "material_specific_heat_j_per_kg_k",
-            oracle_material.specific_heat_j_per_kg_k,
-            rust_row.material_specific_heat_j_per_kg_k,
-        ),
-    ] {
-        if !material_field_matches(expected, observed, tolerance) {
-            record_first_divergence(
-                first_divergence,
-                format!(
-                    "construction {} field {} expected {:.6} observed {:.6}",
-                    rust_row.construction_name,
-                    field,
-                    expected,
-                    observed.unwrap_or(0.0)
-                ),
-            );
-            return;
-        }
-    }
-
-    if !tolerance.accepts(
-        oracle_material.thermal_resistance_m2_k_per_w,
-        rust_row.material_thermal_resistance_m2_k_per_w,
-    ) {
-        record_first_divergence(
-            first_divergence,
-            format!(
-                "construction {} field material_thermal_resistance_m2_k_per_w expected {:.6} observed {:.6}",
-                rust_row.construction_name,
-                oracle_material.thermal_resistance_m2_k_per_w,
-                rust_row.material_thermal_resistance_m2_k_per_w
             ),
         );
     }
@@ -20831,6 +20919,107 @@ mod tests {
         assert!(json.contains("\"total_compact_value_evaluation_count\": 0"));
         assert!(json.contains("not wall-clock timing or cache-specific speedup attribution"));
         assert!(json.contains("OtherEquipment, zone, surface, and people iteration"));
+    }
+
+    #[test]
+    fn construction_material_match_gates_every_ordered_layer() {
+        let oracle = ep_compare::parse_eio_construction_material_summaries(
+            r#" Construction CTF,MIXED WALL,1,3,1,0.25,3.030303,0.9,0.9,0.7,0.7,Rough
+ Material CTF Summary,OUTSIDE,0.05,1.0,800.0,900.0,0.05
+ Material:Air CTF Summary,AIR GAP,0.18
+ Material CTF Summary,INSIDE,0.12,1.2,900.0,1000.0,0.10
+"#,
+        )
+        .expect("grouped EIO rows")
+        .remove(0);
+        let rust = super::ConstructionMaterialRow {
+            construction_name: "MIXED WALL".to_string(),
+            thermal_conductance_w_per_m2_k: 1.0 / 0.33,
+            layers: vec![
+                super::ConstructionMaterialLayerRow {
+                    material_name: "OUTSIDE".to_string(),
+                    material_thickness_m: Some(0.05),
+                    material_conductivity_w_per_m_k: Some(1.0),
+                    material_density_kg_per_m3: Some(800.0),
+                    material_specific_heat_j_per_kg_k: Some(900.0),
+                    material_thermal_resistance_m2_k_per_w: 0.05,
+                },
+                super::ConstructionMaterialLayerRow {
+                    material_name: "AIR GAP".to_string(),
+                    material_thickness_m: None,
+                    material_conductivity_w_per_m_k: None,
+                    material_density_kg_per_m3: None,
+                    material_specific_heat_j_per_kg_k: None,
+                    material_thermal_resistance_m2_k_per_w: 0.18,
+                },
+                super::ConstructionMaterialLayerRow {
+                    material_name: "INSIDE".to_string(),
+                    material_thickness_m: Some(0.12),
+                    material_conductivity_w_per_m_k: Some(1.2),
+                    material_density_kg_per_m3: Some(900.0),
+                    material_specific_heat_j_per_kg_k: Some(1000.0),
+                    material_thermal_resistance_m2_k_per_w: 0.10,
+                },
+            ],
+        };
+        let tolerance = ep_compare::Tolerance {
+            absolute: 0.001,
+            relative: 1.0e-6,
+        };
+
+        assert!(super::construction_material_row_matches(
+            &rust, &oracle, tolerance
+        ));
+        assert_eq!(
+            super::eio_material_summary_format_label(oracle.layers[1].summary_format),
+            "air"
+        );
+
+        let mut reordered = rust.clone();
+        reordered.layers.swap(0, 2);
+        assert!(!super::construction_material_row_matches(
+            &reordered, &oracle, tolerance
+        ));
+        let mut divergence = None;
+        super::record_construction_material_field_divergence(
+            &mut divergence,
+            &reordered,
+            &oracle,
+            tolerance,
+        );
+        assert!(
+            divergence
+                .as_deref()
+                .is_some_and(|value| value.contains("layer 1 field material_name"))
+        );
+
+        let mut missing_layer = rust.clone();
+        missing_layer.layers.pop();
+        assert!(!super::construction_material_row_matches(
+            &missing_layer,
+            &oracle,
+            tolerance
+        ));
+        let mut divergence = None;
+        super::record_construction_material_field_divergence(
+            &mut divergence,
+            &missing_layer,
+            &oracle,
+            tolerance,
+        );
+        assert!(
+            divergence
+                .as_deref()
+                .is_some_and(|value| value.contains("field layer_count expected 3 observed 2"))
+        );
+
+        let mut wrong_resistance = rust;
+        wrong_resistance.layers[1].material_thermal_resistance_m2_k_per_w = 0.25;
+        assert!(!super::construction_material_row_matches(
+            &wrong_resistance,
+            &oracle,
+            tolerance
+        ));
     }
 
     #[test]

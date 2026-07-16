@@ -527,6 +527,12 @@
                          "help":  "Compare construction/material thermal inputs with EnergyPlus EIO."
                      },
                      {
+                         "name":  "compare-material-opaque-variants-smoke",
+                         "path":  "compare\\compare-material-opaque-variants-smoke.ps1",
+                         "group":  "compare",
+                         "help":  "Compare ordered regular, air-gap, and infrared-transparent construction layers with EnergyPlus EIO."
+                     },
+                     {
                          "name":  "compare-internal-gains-smoke",
                          "path":  "compare\\compare-internal-gains-smoke.ps1",
                          "group":  "compare",

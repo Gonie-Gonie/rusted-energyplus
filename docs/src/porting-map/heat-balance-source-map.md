@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-15
 ---
 
 # Heat Balance Source Map
@@ -48,8 +48,8 @@ claim.
 |---|---|---|
 | heat-balance driver | `ManageHeatBalance` | mapped-not-ported |
 | project heat-balance controls | `GetProjectControlData` | mapped-not-ported |
-| material input | `Material::GetWindowGlassSpectralData` -> `Material::GetMaterialData` -> `Material::GetHysteresisData` | all 34 public base/overlay objects are inventoried in [the material-family source map](material-source-map.md); only Regular, NoMass, AirGap, and InfraredTransparent belong to the bounded typed-variant checkpoint |
-| construction input | `GetConstructData` | typed opaque layer stack exists; CTF coefficients not ported |
+| material input | `Material::GetWindowGlassSpectralData` -> `Material::GetMaterialData` -> `Material::GetHysteresisData` | all 34 public base/overlay objects are inventoried in [the material-family source map](material-source-map.md); only Regular, NoMass, AirGap, and InfraredTransparent belong to the bounded typed-variant checkpoint, with nonblocking grouped-EIO evidence for the exact AirGap/IRT fixture |
+| construction input | `GetConstructData` | typed opaque layer stack exists; `material_opaque_variants_001` checks exact static layer counts, names, order, and resistance only; CTF coefficients are not ported |
 | zone input | `GetZoneData` | typed geometry subset exists; source map required before expansion |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
@@ -211,7 +211,7 @@ EnergyPlus 26.1.0 ownership boundaries explicit:
 |---|---|---|
 | `DataHeatBalance::ZoneData` | `ep_model::Zone`, `ep_runtime::ZoneHeatBalanceState` | geometry is partial; heat capacity and histories are not conformance-ready |
 | `DataSurface::SurfaceData` | `ep_model::Surface`, `ep_runtime::SurfaceHeatBalanceState` | opaque surface subset only; outside-layer roughness metadata is tracked for future exterior convection work |
-| construction/material CTF data | `ep_model::Construction`, `ep_model::Material`, `ep_runtime::SurfaceCtfState` | ordered opaque layer stack, diagnostic EIO coefficient seeding for steady/no-mass rows, and CTF history advancement exist; mass-material coefficient generation and face-temperature CTF solving are not ported |
+| construction/material CTF data | `ep_model::Construction`, `ep_model::Material`, `ep_runtime::SurfaceCtfState` | ordered opaque layer stack, nonblocking grouped-EIO evidence for the exact Regular/AirGap/IRT fixture, diagnostic EIO coefficient seeding for steady/no-mass rows, and CTF history advancement exist; the grouped material evidence is static only, while mass-material coefficient generation and face-temperature CTF solving are not ported |
 | zone predictor histories, sums, and coefficients such as `MAT`, `XMAT`, `DSXMAT`, `SumHA`, `SumHATsurf`, `SumHATref`, `TempDepCoef`, `TempIndCoef`, `AirPowerCap`, and `TempHistoryTerm` | `ep_runtime::ZoneHeatBalanceState`, `ep_runtime::ZoneAirTemperatureCoefficients`, and future `ep_runtime::zone_air` histories | diagnostic shell keeps MAT history, stores surface convection sums, and snapshots EnergyPlus-shaped zone-air coefficients for future predictor wiring; full predictor/corrector equations are not ported |
 | internal gain sums such as `SumIntGain` | `simulate_zone_internal_convective_gains` and future state fields | convective trace conformance only for declared v0.26 case |
 
@@ -1190,9 +1190,12 @@ Current Rust boundary:
   surfaces only
 - `heat_balance_nomass_001`: `Material:NoMass` variant
 - `heat_balance_mass_001`: simple mass material variant
+- `material_opaque_variants_001`: nonblocking static grouped-EIO layer evidence
+  for the exact Regular/AirGap/IRT construction fixture
 
-These cases may remain diagnostic-only until v0.8 declares tolerances and
-blocking gates.
+The heat-balance cases may remain diagnostic-only until v0.8 declares
+tolerances and blocking gates. `material_opaque_variants_001` remains a
+nonblocking static smoke and does not supply dynamic heat-balance evidence.
 
 ## Stop Rule
 

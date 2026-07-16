@@ -152,6 +152,46 @@ pub struct EioMaterialCtfSummary {
     pub thermal_resistance_m2_k_per_w: f64,
 }
 
+/// EIO row format used to describe a construction material layer.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum EioMaterialCtfSummaryFormat {
+    /// The seven-field `Material CTF Summary` format.
+    ///
+    /// This format is also emitted for `Material:InfraredTransparent`, so it
+    /// identifies the EIO row shape rather than the EnergyPlus object type.
+    Material,
+    /// The resistance-only `Material:Air CTF Summary` format.
+    Air,
+}
+
+/// One material layer nested under an EnergyPlus `Construction CTF` row.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioConstructionMaterialLayer {
+    /// EnergyPlus-normalized material name.
+    pub material_name: String,
+    /// EIO row format; this is not a reliable EnergyPlus material object type.
+    pub summary_format: EioMaterialCtfSummaryFormat,
+    /// EIO material thickness in meters when the generic material row supplies it.
+    pub thickness_m: Option<f64>,
+    /// EIO conductivity in W/m-K when the generic material row supplies it.
+    pub conductivity_w_per_m_k: Option<f64>,
+    /// EIO density in kg/m3 when the generic material row supplies it.
+    pub density_kg_per_m3: Option<f64>,
+    /// EIO specific heat in J/kg-K when the generic material row supplies it.
+    pub specific_heat_j_per_kg_k: Option<f64>,
+    /// EIO area-normalized thermal resistance in m2-K/W.
+    pub thermal_resistance_m2_k_per_w: f64,
+}
+
+/// A `Construction CTF` row grouped with its ordered material-layer summaries.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioConstructionMaterialSummary {
+    /// Construction-level CTF summary and declared layer count.
+    pub construction: EioConstructionCtf,
+    /// Material layers in EnergyPlus outside-to-inside emission order.
+    pub layers: Vec<EioConstructionMaterialLayer>,
+}
+
 /// Warmup day counts read from EnergyPlus `eplusout.eio` environment sections.
 #[derive(Clone, Debug, PartialEq)]
 pub struct EioWarmupEnvironment {
@@ -182,6 +222,15 @@ pub enum EioError {
     MissingConstructionCtfCoefficient,
     /// No `Material CTF Summary` rows were present.
     MissingMaterialCtfSummary,
+    /// A grouped construction/material summary could not be parsed.
+    InvalidConstructionMaterialSummary {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
     /// A `Surface Geometry` row could not be parsed.
     InvalidSurfaceGeometry {
         /// One-based line number.
@@ -306,6 +355,10 @@ impl Display for EioError {
                 formatter,
                 "invalid EIO Material CTF Summary at line {line}: {reason}: {text}"
             ),
+            Self::InvalidConstructionMaterialSummary { line, text, reason } => write!(
+                formatter,
+                "invalid EIO construction/material summary at line {line}: {reason}: {text}"
+            ),
             Self::InvalidWarmupEnvironment { line, text, reason } => write!(
                 formatter,
                 "invalid EIO Environment:WarmupDays at line {line}: {reason}: {text}"
@@ -332,6 +385,7 @@ impl std::error::Error for EioError {
             | Self::InvalidConstructionCtf { .. }
             | Self::InvalidConstructionCtfCoefficient { .. }
             | Self::InvalidMaterialCtfSummary { .. }
+            | Self::InvalidConstructionMaterialSummary { .. }
             | Self::InvalidWarmupEnvironment { .. } => None,
         }
     }

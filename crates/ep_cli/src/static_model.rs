@@ -1,5 +1,5 @@
 use ep_compare::{
-    load_eio_construction_ctf, load_eio_heat_transfer_surfaces, load_eio_material_ctf_summary,
+    load_eio_construction_material_summaries, load_eio_heat_transfer_surfaces,
     load_eio_other_equipment_nominal,
 };
 use ep_compiler::compile_raw_model;
@@ -315,12 +315,13 @@ fn build_static_model_report(
         let construction_rows = construction_material_rows(&model)?;
         object_counts.constructions = construction_rows.len();
         object_counts.materials = construction_layer_material_count(&model);
-        object_counts.oracle_constructions = load_eio_construction_ctf(&baseline.eio)
-            .map_err(|error| format!("failed to load construction EIO rows: {error}"))?
-            .len();
-        object_counts.oracle_materials = load_eio_material_ctf_summary(&baseline.eio)
-            .map_err(|error| format!("failed to load material EIO rows: {error}"))?
-            .len();
+        let oracle_summaries = load_eio_construction_material_summaries(&baseline.eio)
+            .map_err(|error| format!("failed to load construction/material EIO rows: {error}"))?;
+        object_counts.oracle_constructions = oracle_summaries.len();
+        object_counts.oracle_materials = oracle_summaries
+            .iter()
+            .map(|summary| summary.layers.len())
+            .sum();
     }
     if manifest
         .outputs
@@ -404,61 +405,77 @@ fn compare_construction_material_output(
         .into_iter()
         .filter(|row| key_matches(&output.key, &row.construction_name))
         .collect();
-    let oracle_constructions = load_eio_construction_ctf(&baseline.eio)
-        .map_err(|error| format!("failed to load construction EIO rows: {error}"))?;
-    let oracle_materials = load_eio_material_ctf_summary(&baseline.eio)
-        .map_err(|error| format!("failed to load material EIO rows: {error}"))?;
-    let oracle_count = oracle_constructions
+    let oracle_summaries = load_eio_construction_material_summaries(&baseline.eio)
+        .map_err(|error| format!("failed to load construction/material EIO rows: {error}"))?;
+    let oracle_count = oracle_summaries
         .iter()
-        .filter(|row| key_matches(&output.key, &row.construction_name))
+        .filter(|summary| key_matches(&output.key, &summary.construction.construction_name))
         .count();
     let mut comparison = FieldComparison::new(oracle_count, rust_rows.len());
     for rust_row in &rust_rows {
-        let Some(oracle_construction) = oracle_constructions.iter().find(|row| {
-            row.construction_name
+        let Some(oracle_summary) = oracle_summaries.iter().find(|summary| {
+            summary
+                .construction
+                .construction_name
                 .eq_ignore_ascii_case(&rust_row.construction_name)
         }) else {
             comparison.record_missing(&format!("construction {}", rust_row.construction_name));
             continue;
         };
-        let Some(oracle_material) = oracle_materials.iter().find(|row| {
-            row.material_name
-                .eq_ignore_ascii_case(&rust_row.outside_layer_material_name)
-        }) else {
+        if oracle_summary.layers.len() != rust_row.layers.len()
+            && comparison.first_divergence.is_none()
+        {
+            comparison.first_divergence = Some(format!(
+                "construction {} layer_count expected {} observed {}",
+                rust_row.construction_name,
+                oracle_summary.layers.len(),
+                rust_row.layers.len()
+            ));
+        }
+        let Some(oracle_material) = oracle_summary.layers.first() else {
             comparison.record_missing(&format!(
-                "material {}",
-                rust_row.outside_layer_material_name
+                "construction {} outside material",
+                rust_row.construction_name
+            ));
+            continue;
+        };
+        let Some(rust_material) = rust_row.layers.first() else {
+            comparison.record_missing(&format!(
+                "construction {} Rust outside material",
+                rust_row.construction_name
             ));
             continue;
         };
         match output.variable.as_str() {
             "Construction CTF Layer Count" => comparison.record_numeric(
-                oracle_construction.layer_count as f64,
-                rust_row.layer_count as f64,
+                oracle_summary.construction.layer_count as f64,
+                rust_row.layers.len() as f64,
             ),
             "Construction CTF Thermal Conductance" => comparison.record_numeric(
-                oracle_construction.thermal_conductance_w_per_m2_k,
+                oracle_summary.construction.thermal_conductance_w_per_m2_k,
                 rust_row.thermal_conductance_w_per_m2_k,
             ),
             "Material CTF Summary Thickness" => comparison.record_numeric(
-                oracle_material.thickness_m,
-                rust_row.material_thickness_m.unwrap_or(0.0),
+                oracle_material.thickness_m.unwrap_or(0.0),
+                rust_material.material_thickness_m.unwrap_or(0.0),
             ),
             "Material CTF Summary Conductivity" => comparison.record_numeric(
-                oracle_material.conductivity_w_per_m_k,
-                rust_row.material_conductivity_w_per_m_k.unwrap_or(0.0),
+                oracle_material.conductivity_w_per_m_k.unwrap_or(0.0),
+                rust_material.material_conductivity_w_per_m_k.unwrap_or(0.0),
             ),
             "Material CTF Summary Density" => comparison.record_numeric(
-                oracle_material.density_kg_per_m3,
-                rust_row.material_density_kg_per_m3.unwrap_or(0.0),
+                oracle_material.density_kg_per_m3.unwrap_or(0.0),
+                rust_material.material_density_kg_per_m3.unwrap_or(0.0),
             ),
             "Material CTF Summary Specific Heat" => comparison.record_numeric(
-                oracle_material.specific_heat_j_per_kg_k,
-                rust_row.material_specific_heat_j_per_kg_k.unwrap_or(0.0),
+                oracle_material.specific_heat_j_per_kg_k.unwrap_or(0.0),
+                rust_material
+                    .material_specific_heat_j_per_kg_k
+                    .unwrap_or(0.0),
             ),
             "Material CTF Summary Thermal Resistance" => comparison.record_numeric(
                 oracle_material.thermal_resistance_m2_k_per_w,
-                rust_row.material_thermal_resistance_m2_k_per_w,
+                rust_material.material_thermal_resistance_m2_k_per_w,
             ),
             variable => {
                 return Err(format!(

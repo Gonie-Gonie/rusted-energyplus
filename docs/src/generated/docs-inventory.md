@@ -133,7 +133,7 @@ none
 | docs/src/porting-map/conduction-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-10 |
 | docs/src/porting-map/geometry-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-15 |
 | docs/src/porting-map/geometry.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
-| docs/src/porting-map/heat-balance-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-14 |
+| docs/src/porting-map/heat-balance-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-15 |
 | docs/src/porting-map/heat-balance.md | source-map | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/porting-map/hvac.md | source-map | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/porting-map/ideal-loads-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-15 |
