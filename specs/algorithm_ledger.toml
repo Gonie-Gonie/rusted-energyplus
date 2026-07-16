@@ -2437,15 +2437,21 @@ domain = "geometry"
 source_map = "docs/src/porting-map/geometry-source-map.md"
 energyplus_source = [
   "src/EnergyPlus/SurfaceGeometry.cc",
+  "src/EnergyPlus/Vectors.cc",
 ]
 rust_target = [
   "crates/ep_compiler/src/compiler.rs::Compiler::parse_global_geometry_rules",
+  "crates/ep_compiler/src/compiler.rs::canonical_world_surface_vertices",
   "crates/ep_compare/src/eio.rs::parse_eio_surface_geometry_rules",
+  "crates/ep_compare/src/eio.rs::parse_eio_heat_transfer_surfaces",
+  "crates/ep_cli/src/main.rs::run_compare_surface_geometry",
+  "crates/ep_runtime/src/geometry.rs::surface_azimuth_deg",
   "crates/ep_runtime/src/geometry.rs::surface_geometry_summaries",
   "crates/ep_runtime/src/geometry.rs::zone_geometry_summaries",
 ]
 status = "scaffold"
 first_case = "surface_geometry_001"
+family_cases = ["surface_geometry_transform_001"]
 proof_variables = [
   "HeatTransfer Surface Class",
   "HeatTransfer Surface Area (Net)",
@@ -2454,7 +2460,7 @@ proof_variables = [
   "HeatTransfer Surface Tilt",
 ]
 claim_level = "none"
-support_boundary = "CP57 scaffold inventory for the EnergyPlus 26.1 detailed opaque-surface geometry coordinate path. It maps five source routines and two state contracts, types and parses GlobalGeometryRules, and reads normalized Surface Geometry EIO rows, but it does not transform vertices, add transformed-coordinate EIO evidence, or make a geometry conformance claim."
+support_boundary = "CP57 scaffold with a bounded implementation for the EnergyPlus 26.1 detailed opaque-surface coordinate path. It types and parses GlobalGeometryRules, canonicalizes starting-corner and vertex-direction order, projects Relative coordinates through zone rotation, origin, and building rotation, follows DetermineAzimuthAndTilt horizontal azimuth semantics, parses DetailsWithVertices EIO rows, and matches one six-surface transformed-coordinate oracle smoke. It does not promote the mapped routines, add a blocking gate, or make a geometry conformance claim."
 
 routine.setup_zone_geometry.source_file = "src/EnergyPlus/SurfaceGeometry.cc"
 routine.setup_zone_geometry.source_routine = "SetupZoneGeometry"
@@ -2491,10 +2497,10 @@ routine.get_geometry_parameters.inactive_branches = [
 ]
 routine.get_geometry_parameters.unsupported_active_branches = [
   "exact diagnostic counts and text, cross-coordinate mismatch warnings, EIO emission, and repeated-input lifecycle behavior",
-  "downstream use of the parsed flags by detailed, simple, daylighting, fenestration, shading, solar, and heat-balance paths",
+  "downstream use of the parsed flags by simple rectangular, daylighting, fenestration, shading, solar, and heat-balance paths",
 ]
 routine.get_geometry_parameters.not_claimed_branches = [
-  "source-required-object absence parity, cross-coordinate mismatch warning parity, implemented coordinate transformation, exact EnergyPlus diagnostic or EIO-emission parity, alternate surface families, daylighting, `GeometryTransform`, Appendix G rotation, fenestration, shading, solar, or broad geometry conformance",
+  "source-required-object absence parity, cross-coordinate mismatch warning parity, exact EnergyPlus diagnostic or general EIO-emission parity, alternate surface families, daylighting, `GeometryTransform`, Appendix G rotation, fenestration, shading, solar, or broad geometry conformance",
 ]
 
 routine.get_ht_surface_data.source_file = "src/EnergyPlus/SurfaceGeometry.cc"
@@ -2517,7 +2523,7 @@ routine.get_vertices.write_state = [
 ]
 routine.get_vertices.history_state_ownership = "input flags and rotation arrays are initialized earlier in the same `EnergyPlusData` geometry lifecycle and each surface result is owned by that simulation state; the routine has no independent cross-call numerical cache, but diagnostics and aggregate error counters persist across surfaces"
 routine.get_vertices.unsupported_state = [
-  "coincident-vertex removal, degenerate-surface accounting, normal and area derivation, roof or floor reversal, orientation diagnostics, multipliers, view-factor autocalculation, local coordinate systems, and `GeometryTransform` aspect changes",
+  "coincident-vertex removal, degenerate-surface accounting, exact source-order normal and area derivation, roof or floor correction, orientation diagnostics, multipliers, view-factor autocalculation, local coordinate systems, and `GeometryTransform` aspect changes",
   "detached-building, daylighting, simple rectangular, fenestration, shading, interzone, and downstream solar or heat-balance state",
 ]
 routine.get_vertices.inactive_branches = [
@@ -2525,9 +2531,9 @@ routine.get_vertices.inactive_branches = [
   "Relative coordinates apply zone relative-north rotation, zone-origin translation, and building rotation for zoned surfaces; World coordinates ignore those values and apply only Appendix G rotation, while detached-building surfaces follow their source-specific building branch",
 ]
 routine.get_vertices.unsupported_active_branches = [
-  "all `GetVertices` behavior outside the bounded detailed opaque-surface order and relative/world projection, including diagnostics, vertex deletion, derived geometry, correction, and aspect transformation",
-  "Appendix G rotation, detached surfaces, non-opaque surface families, and every downstream consumer of transformed coordinates",
+  "all `GetVertices` behavior outside the implemented detailed opaque-surface order and relative/world projection, including diagnostics, vertex deletion, source-order derived geometry, correction, and aspect transformation",
+  "Appendix G rotation, detached surfaces, non-opaque surface families, and downstream consumers beyond the existing typed opaque-surface runtime",
 ]
 routine.get_vertices.not_claimed_branches = [
-  "a Rust `GetVertices` implementation, exact trigonometric or last-bit parity, complete starting-corner and entry-direction behavior, diagnostic and counter parity, EIO row equality for transformed cases, zone volume closure, fenestration, shading, daylighting, solar, heat balance, or broad geometry conformance",
+  "full-routine `GetVertices` parity, exact trigonometric last-bit parity, diagnostic and counter parity, EIO equality outside the declared transformed fixture, zone volume closure, fenestration, shading, daylighting, solar, heat balance, or broad geometry conformance",
 ]

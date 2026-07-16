@@ -202,13 +202,77 @@ pub fn parse_eio_heat_transfer_surfaces(
         }
 
         let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
-        if fields.len() <= 13 {
+        const DETAILS_FIELD_COUNT: usize = 27;
+        const FIRST_VERTEX_FIELD: usize = DETAILS_FIELD_COUNT;
+        if fields.len() < DETAILS_FIELD_COUNT {
             return Err(EioError::InvalidHeatTransferSurface {
                 line: line_number,
                 text: line.to_string(),
-                reason: format!("expected at least 14 fields, found {}", fields.len()),
+                reason: format!(
+                    "expected at least {DETAILS_FIELD_COUNT} fields, found {}",
+                    fields.len()
+                ),
             });
         }
+
+        let side_count = parse_surface_usize_field(&fields, 26, line_number, line, "#Sides")?;
+        if side_count == 0 {
+            return Err(EioError::InvalidHeatTransferSurface {
+                line: line_number,
+                text: line.to_string(),
+                reason: "#Sides must be greater than zero".to_string(),
+            });
+        }
+        let expected_details_with_vertices_field_count = side_count
+            .checked_mul(3)
+            .and_then(|coordinate_count| DETAILS_FIELD_COUNT.checked_add(coordinate_count))
+            .ok_or_else(|| EioError::InvalidHeatTransferSurface {
+                line: line_number,
+                text: line.to_string(),
+                reason: "DetailsWithVertices field count overflow".to_string(),
+            })?;
+        let world_vertices = if fields.len() == DETAILS_FIELD_COUNT {
+            None
+        } else if fields.len() == expected_details_with_vertices_field_count {
+            let mut vertices = Vec::with_capacity(side_count);
+            for vertex_index in 0..side_count {
+                let field_index = FIRST_VERTEX_FIELD + 3 * vertex_index;
+                let vertex_number = vertex_index + 1;
+                vertices.push(EioSurfaceVertex {
+                    x_m: parse_surface_f64_field(
+                        &fields,
+                        field_index,
+                        line_number,
+                        line,
+                        &format!("Vertex {vertex_number} X {{m}}"),
+                    )?,
+                    y_m: parse_surface_f64_field(
+                        &fields,
+                        field_index + 1,
+                        line_number,
+                        line,
+                        &format!("Vertex {vertex_number} Y {{m}}"),
+                    )?,
+                    z_m: parse_surface_f64_field(
+                        &fields,
+                        field_index + 2,
+                        line_number,
+                        line,
+                        &format!("Vertex {vertex_number} Z {{m}}"),
+                    )?,
+                });
+            }
+            Some(vertices)
+        } else {
+            return Err(EioError::InvalidHeatTransferSurface {
+                line: line_number,
+                text: line.to_string(),
+                reason: format!(
+                    "expected {DETAILS_FIELD_COUNT} fields for Details or {expected_details_with_vertices_field_count} fields for DetailsWithVertices with {side_count} sides, found {}",
+                    fields.len()
+                ),
+            });
+        };
 
         surfaces.push(EioHeatTransferSurface {
             surface_name: required_field(&fields, 1).to_ascii_uppercase(),
@@ -224,6 +288,8 @@ pub fn parse_eio_heat_transfer_surfaces(
             )?,
             azimuth_deg: parse_surface_f64_field(&fields, 12, line_number, line, "Azimuth {deg}")?,
             tilt_deg: parse_surface_f64_field(&fields, 13, line_number, line, "Tilt {deg}")?,
+            side_count,
+            world_vertices,
         });
     }
 
@@ -620,6 +686,22 @@ fn parse_surface_f64_field(
 ) -> Result<f64, EioError> {
     required_field(fields, index)
         .parse::<f64>()
+        .map_err(|_error| EioError::InvalidHeatTransferSurface {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })
+}
+
+fn parse_surface_usize_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<usize, EioError> {
+    required_field(fields, index)
+        .parse::<usize>()
         .map_err(|_error| EioError::InvalidHeatTransferSurface {
             line,
             text: text.to_string(),

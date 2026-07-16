@@ -1,0 +1,86 @@
+id = "surface_geometry_transform_001"
+title = "Relative surface geometry world-coordinate transformation"
+milestone = "cp57-geometry-coordinate-transformation"
+purpose = "Compare Rust canonical world vertices, area, azimuth, and tilt with EnergyPlus DetailsWithVertices EIO rows under nonzero building rotation, zone rotation, and zone origin."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The fixture uses Relative detailed-surface coordinates, Building North Axis 30 degrees, Zone Direction of Relative North 45 degrees, and Zone origin (10,20,3).",
+  "DetailsWithVertices exposes EnergyPlus canonical UpperLeftCorner, Counterclockwise, World coordinate vertices after GetVertices processing.",
+  "The case remains nonclaim and nonblocking while Appendix G, detached shading, daylighting, fenestration, and degenerate diagnostics remain outside the checkpoint.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/surface_geometry_transform_001/surface_geometry_transform.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface"]
+has_zone = true
+has_surface = true
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/surface_geometry_transform_001/surface_geometry_transform.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Class"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Area (Net)"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Area (Gross)"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Azimuth"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "HeatTransfer Surface Tilt"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/surface_geometry_transform_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-surface-geometry-smoke"
+blocking = false

@@ -126,6 +126,161 @@ function Get-ChangedTomlSectionKeys {
     )
 }
 
+function Remove-TomlQuotedArrayValue {
+    param(
+        [AllowEmptyString()][Parameter(Mandatory = $true)][string]$Text,
+        [Parameter(Mandatory = $true)][string]$Value
+    )
+
+    $normalized = $Text -replace "\r\n?", "`n"
+    $quotedValue = [regex]::Escape('"' + $Value + '"')
+    $withoutStandaloneLine = [regex]::Replace(
+        $normalized,
+        '(?m)^[ \t]*' + $quotedValue + '[ \t]*,[ \t]*(?:\n|\z)',
+        ''
+    )
+    if ($withoutStandaloneLine -ne $normalized) {
+        return $withoutStandaloneLine.Trim()
+    }
+
+    $withoutMiddleValue = [regex]::Replace(
+        $normalized,
+        ',[ \t]*' + $quotedValue,
+        ''
+    )
+    if ($withoutMiddleValue -ne $normalized) {
+        return $withoutMiddleValue.Trim()
+    }
+
+    return ([regex]::Replace(
+        $normalized,
+        $quotedValue + '[ \t]*,[ \t]*',
+        ''
+    )).Trim()
+}
+
+function Assert-CapabilityRegistrySectionCoverage {
+    param(
+        [AllowEmptyString()][Parameter(Mandatory = $true)][string]$BaseText,
+        [AllowEmptyString()][Parameter(Mandatory = $true)][string]$HeadText,
+        [Parameter(Mandatory = $true)][string]$AlgorithmId
+    )
+
+    $baseBlocks = Get-TomlArrayTableBlocksById -Text $BaseText -Table "capability"
+    $headBlocks = Get-TomlArrayTableBlocksById -Text $HeadText -Table "capability"
+    $baseConsumedBlocks = Get-TomlArrayTableBlocksById -Text $BaseText -Table "consumed_object"
+    $headConsumedBlocks = Get-TomlArrayTableBlocksById -Text $HeadText -Table "consumed_object"
+    $baseSections = Get-TomlDocumentSectionMap -Text $BaseText
+    $headSections = Get-TomlDocumentSectionMap -Text $HeadText
+    $changedSections = @(Get-ChangedTomlSectionKeys -BaseText $BaseText -HeadText $HeadText)
+    $rawOnlyRemovalSections = @(
+        $changedSections |
+            Where-Object {
+                $_ -eq "array:partial_rule:inactive_or_unused_raw_objects" -or
+                $_ -eq "table:arbitrary_run.ignored_raw_only_objects"
+            }
+    )
+    $uncoveredSections = @(
+        $changedSections |
+            Where-Object {
+                $_ -notlike "array:capability:*" -and
+                $_ -notlike "array:consumed_object:*" -and
+                $rawOnlyRemovalSections -notcontains $_
+            }
+    )
+    if ($uncoveredSections.Count -gt 0) {
+        throw "Capability registry changes outside linked sections are not covered by an Algorithm Port Ticket: $($uncoveredSections -join ', ')"
+    }
+    if ($changedSections.Count -eq 0) {
+        throw "Capability spec changed without a changed registry section."
+    }
+
+    $changedCapabilityIds = @(
+        $changedSections |
+            Where-Object { $_ -like "array:capability:*" } |
+            ForEach-Object { $_.Substring("array:capability:".Length) }
+    )
+    foreach ($id in $changedCapabilityIds) {
+        $algorithms = @()
+        if ($baseBlocks.ContainsKey($id)) {
+            $algorithms += @(Get-TomlStringArrayValues -Text $baseBlocks[$id] -Name "algorithms")
+        }
+        if ($headBlocks.ContainsKey($id)) {
+            $algorithms += @(Get-TomlStringArrayValues -Text $headBlocks[$id] -Name "algorithms")
+        }
+        if ($algorithms -notcontains $AlgorithmId) {
+            throw "Changed capability $id is not linked to ticket Algorithm ID $AlgorithmId."
+        }
+    }
+
+    $changedConsumedObjectIds = @(
+        $changedSections |
+            Where-Object { $_ -like "array:consumed_object:*" } |
+            ForEach-Object { $_.Substring("array:consumed_object:".Length) }
+    )
+    $linkedConsumedObjectTypes = @()
+    foreach ($id in $changedConsumedObjectIds) {
+        $algorithms = @()
+        if ($baseConsumedBlocks.ContainsKey($id)) {
+            $algorithms += @(
+                Get-TomlStringArrayValues -Text $baseConsumedBlocks[$id] -Name "algorithms"
+            )
+        }
+        if ($headConsumedBlocks.ContainsKey($id)) {
+            $algorithms += @(
+                Get-TomlStringArrayValues -Text $headConsumedBlocks[$id] -Name "algorithms"
+            )
+        }
+        if ($algorithms -notcontains $AlgorithmId) {
+            throw "Changed consumed object $id is not linked to ticket Algorithm ID $AlgorithmId."
+        }
+
+        $objectTypes = @()
+        if ($baseConsumedBlocks.ContainsKey($id)) {
+            $objectTypes += @(
+                Get-TomlStringValue -Text $baseConsumedBlocks[$id] -Name "object_type"
+            )
+        }
+        if ($headConsumedBlocks.ContainsKey($id)) {
+            $objectTypes += @(
+                Get-TomlStringValue -Text $headConsumedBlocks[$id] -Name "object_type"
+            )
+        }
+        $objectTypes = @($objectTypes | Where-Object { $_ } | Sort-Object -Unique)
+        if ($objectTypes.Count -ne 1) {
+            throw "Changed consumed object $id must preserve exactly one object_type."
+        }
+        $linkedConsumedObjectTypes += $objectTypes[0]
+    }
+    $linkedConsumedObjectTypes = @($linkedConsumedObjectTypes | Sort-Object -Unique)
+
+    foreach ($section in $rawOnlyRemovalSections) {
+        if (
+            -not $baseSections.ContainsKey($section) -or
+            -not $headSections.ContainsKey($section)
+        ) {
+            throw "Raw-only registry cleanup must preserve section $section."
+        }
+        $expectedHead = $baseSections[$section]
+        $removedObjectTypes = @()
+        foreach ($objectType in $linkedConsumedObjectTypes) {
+            if ($expectedHead -match [regex]::Escape('"' + $objectType + '"')) {
+                $expectedHead = Remove-TomlQuotedArrayValue `
+                    -Text $expectedHead `
+                    -Value $objectType
+                $removedObjectTypes += $objectType
+            }
+        }
+        if ($removedObjectTypes.Count -eq 0) {
+            throw "Raw-only registry cleanup $section has no linked consumed object removal."
+        }
+        $actualHead = ($headSections[$section] -replace "\r\n?", "`n").Trim()
+        if ($expectedHead -cne $actualHead) {
+            throw "Raw-only registry cleanup $section must only remove linked consumed objects: $($removedObjectTypes -join ', ')"
+        }
+    }
+}
+
 function Get-RoutineCompletionIds {
     param([AllowEmptyString()][Parameter(Mandatory = $true)][string]$Text)
 
@@ -664,26 +819,10 @@ function Assert-ChangedContractCoverage {
         if ([string]::IsNullOrWhiteSpace($BaseRevision)) { throw "Capability block coverage requires a merge-base revision." }
         $baseText = Get-GitFileText -Revision $BaseRevision -Path "specs/capabilities.toml"
         $headText = Get-Content -Encoding UTF8 -Raw -LiteralPath (Join-Path $RepoRoot "specs\capabilities.toml")
-        $baseBlocks = Get-TomlArrayTableBlocksById -Text $baseText -Table "capability"
-        $headBlocks = Get-TomlArrayTableBlocksById -Text $headText -Table "capability"
-        $changedSections = @(Get-ChangedTomlSectionKeys -BaseText $baseText -HeadText $headText)
-        $nonCapabilitySections = @($changedSections | Where-Object { $_ -notlike "array:capability:*" })
-        if ($nonCapabilitySections.Count -gt 0) {
-            throw "Capability registry changes outside [[capability]] blocks are not covered by an Algorithm Port Ticket: $($nonCapabilitySections -join ', ')"
-        }
-        $changedIds = @(
-            $changedSections |
-                ForEach-Object { $_.Substring("array:capability:".Length) }
-        )
-        if ($changedIds.Count -eq 0) { throw "Capability spec changed without a changed capability block." }
-        foreach ($id in $changedIds) {
-            $algorithms = @()
-            if ($baseBlocks.ContainsKey($id)) { $algorithms += @(Get-TomlStringArrayValues -Text $baseBlocks[$id] -Name "algorithms") }
-            if ($headBlocks.ContainsKey($id)) { $algorithms += @(Get-TomlStringArrayValues -Text $headBlocks[$id] -Name "algorithms") }
-            if ($algorithms -notcontains $AlgorithmId) {
-                throw "Changed capability $id is not linked to ticket Algorithm ID $AlgorithmId."
-            }
-        }
+        Assert-CapabilityRegistrySectionCoverage `
+            -BaseText $baseText `
+            -HeadText $headText `
+            -AlgorithmId $AlgorithmId
     }
 
     if ($SourceOrderFiles -contains "scripts/dev/commands.json") {

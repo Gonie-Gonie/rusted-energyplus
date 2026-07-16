@@ -9,16 +9,22 @@ last_reviewed: 2026-07-15
 
 Reference version: EnergyPlus 26.1.0
 
-Reference source: `src/EnergyPlus/SurfaceGeometry.cc` at the repository-locked
-EnergyPlus `v26.1.0` commit.
+Reference sources at the repository-locked EnergyPlus `v26.1.0` commit:
 
-This CP57 checkpoint records the detailed opaque-surface coordinate path. Rust
-now types and parses `GlobalGeometryRules`, including EnergyPlus aliases and
-warning fallbacks, while preserving an explicit compatibility deviation for an
-absent source-required singleton. It does not yet transform surface vertices
-or match EnergyPlus geometry diagnostics. The existing `surface_geometry_001`
-case remains smoke, nonclaim, and nonblocking evidence for the default
-zero-rotation world-coordinate fixture.
+- `src/EnergyPlus/SurfaceGeometry.cc` for geometry rules, vertex ordering, and
+  world-coordinate projection
+- `src/EnergyPlus/Vectors.cc::DetermineAzimuthAndTilt` for the horizontal
+  surface azimuth convention exercised by the transformed fixture
+
+This CP57 checkpoint implements the bounded detailed opaque-surface coordinate
+path. Rust types and parses `GlobalGeometryRules`, including EnergyPlus aliases
+and warning fallbacks, preserves an explicit compatibility deviation for an
+absent source-required singleton, canonicalizes input vertex order, and projects
+Relative coordinates through zone rotation, zone origin, and building rotation
+into world coordinates. `surface_geometry_transform_001` locks those results
+against EnergyPlus `DetailsWithVertices` EIO rows. The case remains smoke,
+nonclaim, and nonblocking; broad geometry diagnostics and the other source
+families remain outside this checkpoint.
 
 ## Source Order
 
@@ -28,7 +34,7 @@ zero-rotation world-coordinate fixture.
 | 2 | `GetSurfaceData` | `source_mapped` | Calls `GetGeometryParameters`, applies world-coordinate warning policy, inventories every surface family, and dispatches detailed heat-transfer input; allocation, sorting, interzone matching, fenestration, shading, and diagnostics remain deferred. |
 | 3 | `GetGeometryParameters` | `state_mapped` | Maps the unique `GlobalGeometryRules` fields, coordinate-mode flags, mismatch checks, diagnostics, and EIO reporting. The typed Rust parser covers field normalization and fallbacks, but source-required-object and cross-coordinate warning parity remain deferred. |
 | 4 | `GetHTSurfaceData` | `source_mapped` | Reads detailed heat-transfer surface objects and delegates vertex processing to `GetVertices`; construction, boundary, zone/space, validation, and all non-opaque families remain deferred. |
-| 5 | `GetVertices` | `state_mapped` | Maps vertex ordering and the relative/world coordinate branch plus the broader derived-geometry state that surrounds it; only the coordinate branch is the bounded future implementation target. |
+| 5 | `GetVertices` | `state_mapped` | The bounded detailed opaque-surface ordering and relative/world projection branch is implemented and oracle-smoke tested. The ledger status remains `state_mapped` until an Algorithm Port Ticket and blocking family gate promote the routine; the rest of the source routine remains deferred. |
 
 The source call chain is `SetupZoneGeometry` -> `GetSurfaceData`.
 `GetSurfaceData` invokes `GetGeometryParameters` before surface-family input,
@@ -60,10 +66,10 @@ inactive_branches:
 
 unsupported_active_branches:
 - exact diagnostic counts and text, cross-coordinate mismatch warnings, EIO emission, and repeated-input lifecycle behavior
-- downstream use of the parsed flags by detailed, simple, daylighting, fenestration, shading, solar, and heat-balance paths
+- downstream use of the parsed flags by simple rectangular, daylighting, fenestration, shading, solar, and heat-balance paths
 
 not_claimed_branches:
-- source-required-object absence parity, cross-coordinate mismatch warning parity, implemented coordinate transformation, exact EnergyPlus diagnostic or EIO-emission parity, alternate surface families, daylighting, `GeometryTransform`, Appendix G rotation, fenestration, shading, solar, or broad geometry conformance
+- source-required-object absence parity, cross-coordinate mismatch warning parity, exact EnergyPlus diagnostic or general EIO-emission parity, alternate surface families, daylighting, `GeometryTransform`, Appendix G rotation, fenestration, shading, solar, or broad geometry conformance
 <!-- routine-state-contract:v1 end get_geometry_parameters -->
 
 ### `GetVertices` (`get_vertices`)
@@ -81,7 +87,7 @@ history_state_ownership:
 - input flags and rotation arrays are initialized earlier in the same `EnergyPlusData` geometry lifecycle and each surface result is owned by that simulation state; the routine has no independent cross-call numerical cache, but diagnostics and aggregate error counters persist across surfaces
 
 unsupported_state:
-- coincident-vertex removal, degenerate-surface accounting, normal and area derivation, roof or floor reversal, orientation diagnostics, multipliers, view-factor autocalculation, local coordinate systems, and `GeometryTransform` aspect changes
+- coincident-vertex removal, degenerate-surface accounting, exact source-order normal and area derivation, roof or floor correction, orientation diagnostics, multipliers, view-factor autocalculation, local coordinate systems, and `GeometryTransform` aspect changes
 - detached-building, daylighting, simple rectangular, fenestration, shading, interzone, and downstream solar or heat-balance state
 
 inactive_branches:
@@ -89,17 +95,38 @@ inactive_branches:
 - Relative coordinates apply zone relative-north rotation, zone-origin translation, and building rotation for zoned surfaces; World coordinates ignore those values and apply only Appendix G rotation, while detached-building surfaces follow their source-specific building branch
 
 unsupported_active_branches:
-- all `GetVertices` behavior outside the bounded detailed opaque-surface order and relative/world projection, including diagnostics, vertex deletion, derived geometry, correction, and aspect transformation
-- Appendix G rotation, detached surfaces, non-opaque surface families, and every downstream consumer of transformed coordinates
+- all `GetVertices` behavior outside the implemented detailed opaque-surface order and relative/world projection, including diagnostics, vertex deletion, source-order derived geometry, correction, and aspect transformation
+- Appendix G rotation, detached surfaces, non-opaque surface families, and downstream consumers beyond the existing typed opaque-surface runtime
 
 not_claimed_branches:
-- a Rust `GetVertices` implementation, exact trigonometric or last-bit parity, complete starting-corner and entry-direction behavior, diagnostic and counter parity, EIO row equality for transformed cases, zone volume closure, fenestration, shading, daylighting, solar, heat balance, or broad geometry conformance
+- full-routine `GetVertices` parity, exact trigonometric last-bit parity, diagnostic and counter parity, EIO equality outside the declared transformed fixture, zone volume closure, fenestration, shading, daylighting, solar, heat balance, or broad geometry conformance
 <!-- routine-state-contract:v1 end get_vertices -->
+
+## CP57 Transformed-Coordinate Evidence
+
+`surface_geometry_transform_001` uses `UpperLeftCorner`,
+`CounterClockWise`, and `Relative` coordinates with Building North Axis
+30 degrees, Zone Direction of Relative North 45 degrees, and zone origin
+`(10, 20, 3)`. Its six detailed opaque surfaces request
+`Output:Surfaces:List,DetailsWithVertices`.
+
+The smoke gate compares the normalized `Surface Geometry` rules row, side
+counts, canonical world XYZ triples, surface class, net and gross area,
+azimuth, and tilt. All six world-vertex vectors match EnergyPlus 26.1.0 at the
+declared 0.01 m absolute and 1e-6 relative tolerance. This evidence proves only
+the declared fixture and does not create a geometry conformance claim.
+
+For horizontal surfaces, `DetermineAzimuthAndTilt` defines the local X axis
+from vertex 2 to vertex 3 before computing azimuth. Rust follows that convention
+instead of selecting the first available horizontal edge; the fixture locks
+FLOOR at 345 degrees and ROOF at 75 degrees after the combined -75 degree
+zone/building rotation.
 
 ## Promotion Boundary
 
 This inventory contains five routines: three `source_mapped` and two
 `state_mapped`. Every routine has `required_for_full_domain = false`.
-Promotion requires an implemented canonical world-vertex path, source-vector
-tests, and blocking transformed geometry EIO families. The default
-`surface_geometry_001` smoke case does not satisfy those requirements.
+The canonical world-vertex path and source-vector tests now exist, but routine
+promotion still requires an Algorithm Port Ticket and blocking transformed
+geometry EIO families. Neither `surface_geometry_001` nor
+`surface_geometry_transform_001` satisfies that blocking requirement.

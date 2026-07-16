@@ -20,8 +20,9 @@ use conformance_artifacts::{
 use ep_compare::{
     SeriesSample, Tolerance, compare_series, load_eio_construction_ctf,
     load_eio_construction_ctf_coefficients, load_eio_heat_transfer_surfaces,
-    load_eio_material_ctf_summary, load_eio_other_equipment_nominal, load_eio_warmup_environments,
-    load_eio_zone_geometry, load_eso_series, load_eso_time_series,
+    load_eio_material_ctf_summary, load_eio_other_equipment_nominal,
+    load_eio_surface_geometry_rules, load_eio_warmup_environments, load_eio_zone_geometry,
+    load_eso_series, load_eso_time_series,
 };
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_conformance::{
@@ -30,8 +31,9 @@ use ep_conformance::{
     load_case_v2_file,
 };
 use ep_model::{
-    Construction, Material, ModelGraph, OtherEquipment, OutsideBoundaryCondition, ScheduleId,
-    SimulationModel, SurfaceType, TypedModel,
+    Construction, GeometryCoordinateSystem, GlobalGeometryRules, Material, ModelGraph,
+    OtherEquipment, OutsideBoundaryCondition, Point3, ScheduleId, SimulationModel,
+    StartingVertexPosition, SurfaceType, TypedModel, VertexEntryDirection,
 };
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, RawModelSummary, load_epjson_file};
@@ -3620,14 +3622,41 @@ fn run_compare_surface_geometry(args: &[String]) -> i32 {
             return 1;
         }
     };
+    let oracle_rules = match load_eio_surface_geometry_rules(eio_path) {
+        Ok(rules) => rules,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let rust_rules = model.global_geometry_rules.unwrap_or_default();
 
     let tolerance = Tolerance {
         absolute: 0.01,
         relative: 1.0e-6,
     };
-    let mut passed = rust_surfaces.len() == oracle_surfaces.len();
+    let rules_pass = surface_geometry_rules_match(rust_rules, &oracle_rules);
+    let mut passed = rust_surfaces.len() == oracle_surfaces.len() && rules_pass;
     let mut first_divergence = None;
-    if rust_surfaces.len() != oracle_surfaces.len() {
+    if !rules_pass {
+        first_divergence = Some(format!(
+            "surface_geometry_rules expected {}/{}/{}/{}/{} observed {}/{}/{}/{}/{}",
+            oracle_rules.starting_corner,
+            oracle_rules.vertex_input_direction,
+            oracle_rules.coordinate_system,
+            oracle_rules.daylight_reference_point_coordinate_system,
+            oracle_rules.rectangular_surface_coordinate_system,
+            starting_vertex_position_label(rust_rules.starting_vertex_position),
+            vertex_entry_direction_label(rust_rules.vertex_entry_direction),
+            geometry_coordinate_system_label(rust_rules.coordinate_system),
+            geometry_coordinate_system_label(
+                rust_rules.daylighting_reference_point_coordinate_system
+            ),
+            rectangular_geometry_coordinate_system_label(
+                rust_rules.rectangular_surface_coordinate_system
+            )
+        ));
+    } else if rust_surfaces.len() != oracle_surfaces.len() {
         first_divergence = Some(format!(
             "surface_count expected {} observed {}",
             oracle_surfaces.len(),
@@ -3641,7 +3670,40 @@ fn run_compare_surface_geometry(args: &[String]) -> i32 {
     println!("  tolerance_policy: absolute-0.01-relative-0.000001");
     println!("  surfaces: {}", rust_surfaces.len());
     println!("  oracle_surfaces: {}", oracle_surfaces.len());
+    println!(
+        "  rules: starting_corner: {}/{} vertex_direction: {}/{} coordinate_system: {}/{} daylight_coordinate_system: {}/{} rectangular_coordinate_system: {}/{} status: {}",
+        oracle_rules.starting_corner,
+        starting_vertex_position_label(rust_rules.starting_vertex_position),
+        oracle_rules.vertex_input_direction,
+        vertex_entry_direction_label(rust_rules.vertex_entry_direction),
+        oracle_rules.coordinate_system,
+        geometry_coordinate_system_label(rust_rules.coordinate_system),
+        oracle_rules.daylight_reference_point_coordinate_system,
+        geometry_coordinate_system_label(rust_rules.daylighting_reference_point_coordinate_system),
+        oracle_rules.rectangular_surface_coordinate_system,
+        rectangular_geometry_coordinate_system_label(
+            rust_rules.rectangular_surface_coordinate_system
+        ),
+        if rules_pass { "pass" } else { "fail" }
+    );
     for rust_surface in &rust_surfaces {
+        let Some(rust_vertices) = model
+            .surfaces
+            .iter()
+            .find(|surface| surface.id == rust_surface.surface_id)
+            .map(|surface| surface.vertices.as_slice())
+        else {
+            passed = false;
+            record_first_divergence(
+                &mut first_divergence,
+                format!(
+                    "surface {} missing_typed_vertices",
+                    rust_surface.surface_name
+                ),
+            );
+            println!("  surface: {} status: fail", rust_surface.surface_name);
+            continue;
+        };
         let Some(oracle_surface) = oracle_surfaces.iter().find(|surface| {
             surface
                 .surface_name
@@ -3656,19 +3718,28 @@ fn run_compare_surface_geometry(args: &[String]) -> i32 {
             continue;
         };
 
-        let surface_pass = surface_geometry_row_matches(rust_surface, oracle_surface, tolerance);
+        let surface_pass =
+            surface_geometry_row_matches(rust_surface, rust_vertices, oracle_surface, tolerance);
         if !surface_pass {
             passed = false;
             record_surface_geometry_field_divergence(
                 &mut first_divergence,
                 rust_surface,
+                rust_vertices,
                 oracle_surface,
                 tolerance,
             );
         }
+        let vertex_status = match &oracle_surface.world_vertices {
+            None => "not-requested",
+            Some(vertices) if surface_world_vertices_match(vertices, rust_vertices, tolerance) => {
+                "pass"
+            }
+            Some(_) => "fail",
+        };
 
         println!(
-            "  surface: {} class: {}/{} area_net_m2: {:.6}/{:.6} area_gross_m2: {:.6}/{:.6} azimuth_deg: {:.6}/{:.6} tilt_deg: {:.6}/{:.6} zone: {} status: {}",
+            "  surface: {} class: {}/{} area_net_m2: {:.6}/{:.6} area_gross_m2: {:.6}/{:.6} azimuth_deg: {:.6}/{:.6} tilt_deg: {:.6}/{:.6} sides: {}/{} world_vertices: {} zone: {} status: {}",
             rust_surface.surface_name,
             oracle_surface.surface_class,
             surface_type_label(rust_surface.surface_type),
@@ -3680,6 +3751,9 @@ fn run_compare_surface_geometry(args: &[String]) -> i32 {
             rust_surface.azimuth_deg,
             oracle_surface.tilt_deg,
             rust_surface.tilt_deg,
+            oracle_surface.side_count,
+            rust_vertices.len(),
+            vertex_status,
             rust_surface.zone_name,
             if surface_pass { "pass" } else { "fail" }
         );
@@ -9699,6 +9773,7 @@ fn record_geometry_field_divergence(
 
 fn surface_geometry_row_matches(
     rust_surface: &SurfaceGeometrySummary,
+    rust_vertices: &[Point3],
     oracle_surface: &ep_compare::EioHeatTransferSurface,
     tolerance: Tolerance,
 ) -> bool {
@@ -9713,11 +9788,17 @@ fn surface_geometry_row_matches(
             tolerance,
         )
         && angle_accepts(oracle_surface.tilt_deg, rust_surface.tilt_deg, tolerance)
+        && oracle_surface.side_count == rust_vertices.len()
+        && oracle_surface
+            .world_vertices
+            .as_ref()
+            .is_none_or(|vertices| surface_world_vertices_match(vertices, rust_vertices, tolerance))
 }
 
 fn record_surface_geometry_field_divergence(
     first_divergence: &mut Option<String>,
     rust_surface: &SurfaceGeometrySummary,
+    rust_vertices: &[Point3],
     oracle_surface: &ep_compare::EioHeatTransferSurface,
     tolerance: Tolerance,
 ) {
@@ -9781,6 +9862,114 @@ fn record_surface_geometry_field_divergence(
                 rust_surface.surface_name, oracle_surface.tilt_deg, rust_surface.tilt_deg
             ),
         );
+        return;
+    }
+
+    if oracle_surface.side_count != rust_vertices.len() {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "surface {} field side_count expected {} observed {}",
+                rust_surface.surface_name,
+                oracle_surface.side_count,
+                rust_vertices.len()
+            ),
+        );
+        return;
+    }
+
+    let Some(oracle_vertices) = &oracle_surface.world_vertices else {
+        return;
+    };
+    for (vertex_index, (oracle_vertex, rust_vertex)) in
+        oracle_vertices.iter().zip(rust_vertices).enumerate()
+    {
+        for (axis, expected, observed) in [
+            ("x_m", oracle_vertex.x_m, rust_vertex.x_m),
+            ("y_m", oracle_vertex.y_m, rust_vertex.y_m),
+            ("z_m", oracle_vertex.z_m, rust_vertex.z_m),
+        ] {
+            if !tolerance.accepts(expected, observed) {
+                record_first_divergence(
+                    first_divergence,
+                    format!(
+                        "surface {} vertex {} field {} expected {:.6} observed {:.6}",
+                        rust_surface.surface_name,
+                        vertex_index + 1,
+                        axis,
+                        expected,
+                        observed
+                    ),
+                );
+                return;
+            }
+        }
+    }
+}
+
+fn surface_world_vertices_match(
+    oracle_vertices: &[ep_compare::EioSurfaceVertex],
+    rust_vertices: &[Point3],
+    tolerance: Tolerance,
+) -> bool {
+    oracle_vertices.len() == rust_vertices.len()
+        && oracle_vertices
+            .iter()
+            .zip(rust_vertices)
+            .all(|(oracle, rust)| {
+                tolerance.accepts(oracle.x_m, rust.x_m)
+                    && tolerance.accepts(oracle.y_m, rust.y_m)
+                    && tolerance.accepts(oracle.z_m, rust.z_m)
+            })
+}
+
+fn surface_geometry_rules_match(
+    rust_rules: GlobalGeometryRules,
+    oracle_rules: &ep_compare::EioSurfaceGeometryRules,
+) -> bool {
+    oracle_rules.starting_corner
+        == starting_vertex_position_label(rust_rules.starting_vertex_position)
+        && oracle_rules.vertex_input_direction
+            == vertex_entry_direction_label(rust_rules.vertex_entry_direction)
+        && oracle_rules.coordinate_system
+            == geometry_coordinate_system_label(rust_rules.coordinate_system)
+        && oracle_rules.daylight_reference_point_coordinate_system
+            == geometry_coordinate_system_label(
+                rust_rules.daylighting_reference_point_coordinate_system,
+            )
+        && oracle_rules.rectangular_surface_coordinate_system
+            == rectangular_geometry_coordinate_system_label(
+                rust_rules.rectangular_surface_coordinate_system,
+            )
+}
+
+fn starting_vertex_position_label(position: StartingVertexPosition) -> &'static str {
+    match position {
+        StartingVertexPosition::UpperLeftCorner => "UpperLeftCorner",
+        StartingVertexPosition::LowerLeftCorner => "LowerLeftCorner",
+        StartingVertexPosition::UpperRightCorner => "UpperRightCorner",
+        StartingVertexPosition::LowerRightCorner => "LowerRightCorner",
+    }
+}
+
+fn vertex_entry_direction_label(direction: VertexEntryDirection) -> &'static str {
+    match direction {
+        VertexEntryDirection::CounterClockwise => "Counterclockwise",
+        VertexEntryDirection::Clockwise => "Clockwise",
+    }
+}
+
+fn geometry_coordinate_system_label(system: GeometryCoordinateSystem) -> &'static str {
+    match system {
+        GeometryCoordinateSystem::Relative => "RelativeCoordinateSystem",
+        GeometryCoordinateSystem::World => "WorldCoordinateSystem",
+    }
+}
+
+fn rectangular_geometry_coordinate_system_label(system: GeometryCoordinateSystem) -> &'static str {
+    match system {
+        GeometryCoordinateSystem::Relative => "RelativeToZoneOrigin",
+        GeometryCoordinateSystem::World => "WorldCoordinateSystem",
     }
 }
 

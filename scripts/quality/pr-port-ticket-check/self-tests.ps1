@@ -972,4 +972,91 @@ status = "initial"
         throw "Capability section self-test did not preserve a root change beside a capability mutation."
     }
     Write-Host "OK PR port-ticket self-test: capability_root_hitchhike"
+
+    $syntheticLinkedRegistryBase = @"
+[[partial_rule]]
+id = "inactive_or_unused_raw_objects"
+object_patterns = ["GlobalGeometryRules", "SimulationControl"]
+reason = "base reason"
+
+[arbitrary_run.ignored_raw_only_objects]
+objects = [
+  "GlobalGeometryRules",
+  "SimulationControl",
+]
+"@
+    $syntheticLinkedRegistryHead = @"
+[[consumed_object]]
+id = "global_geometry_rules"
+object_type = "GlobalGeometryRules"
+algorithms = [
+  "algorithm_a",
+]
+reason = "typed consumer"
+
+[[partial_rule]]
+id = "inactive_or_unused_raw_objects"
+object_patterns = ["SimulationControl"]
+reason = "base reason"
+
+[arbitrary_run.ignored_raw_only_objects]
+objects = [
+  "SimulationControl",
+]
+"@
+    Assert-CapabilityRegistrySectionCoverage `
+        -BaseText $syntheticLinkedRegistryBase `
+        -HeadText $syntheticLinkedRegistryHead `
+        -AlgorithmId "algorithm_a"
+    Write-Host "OK PR port-ticket self-test: linked_capability_metadata_sections"
+
+    $unlinkedRegistryRejected = $false
+    try {
+        $syntheticUnlinkedRegistryHead = $syntheticLinkedRegistryHead -replace '(?ms)^algorithms\s*=\s*\[.*?^\]\s*', ''
+        Assert-CapabilityRegistrySectionCoverage `
+            -BaseText $syntheticLinkedRegistryBase `
+            -HeadText $syntheticUnlinkedRegistryHead `
+            -AlgorithmId "algorithm_a"
+    }
+    catch {
+        $unlinkedRegistryRejected = $true
+    }
+    if (-not $unlinkedRegistryRejected) {
+        throw "Capability registry section self-test accepted metadata without an algorithm link."
+    }
+    Write-Host "OK PR port-ticket self-test: unlinked_capability_metadata_rejected"
+
+    $rawOnlyHitchhikeRejected = $false
+    try {
+        $syntheticRawOnlyHitchhikeHead = $syntheticLinkedRegistryHead.Replace(
+            'reason = "base reason"',
+            'reason = "unrelated changed reason"'
+        )
+        Assert-CapabilityRegistrySectionCoverage `
+            -BaseText $syntheticLinkedRegistryBase `
+            -HeadText $syntheticRawOnlyHitchhikeHead `
+            -AlgorithmId "algorithm_a"
+    }
+    catch {
+        $rawOnlyHitchhikeRejected = $true
+    }
+    if (-not $rawOnlyHitchhikeRejected) {
+        throw "Capability registry section self-test accepted a raw-only cleanup hitchhike."
+    }
+    Write-Host "OK PR port-ticket self-test: raw_only_cleanup_hitchhike_rejected"
+
+    $unrelatedRegistryRejected = $false
+    try {
+        Assert-CapabilityRegistrySectionCoverage `
+            -BaseText $syntheticCapabilityBase `
+            -HeadText $syntheticCapabilityHead `
+            -AlgorithmId "algorithm_a"
+    }
+    catch {
+        $unrelatedRegistryRejected = $true
+    }
+    if (-not $unrelatedRegistryRejected) {
+        throw "Capability registry section self-test accepted an unrelated unsupported-rule mutation."
+    }
+    Write-Host "OK PR port-ticket self-test: unrelated_capability_metadata_rejected"
 }

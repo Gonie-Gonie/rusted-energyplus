@@ -441,7 +441,6 @@ fn warn_for_ignored_semantic_objects(raw_model: &RawModel, diagnostics: &mut Run
                 | "SimulationControl"
                 | "SizingPeriod:DesignDay"
                 | "Exterior:Lights"
-                | "GlobalGeometryRules"
         ) {
             diagnostics.push(
                 RunDiagnostic::new(

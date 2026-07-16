@@ -32,6 +32,17 @@ pub struct EioZoneGeometry {
     pub exterior_gross_wall_area_m2: f64,
 }
 
+/// A world-coordinate surface vertex read from EnergyPlus `eplusout.eio`.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct EioSurfaceVertex {
+    /// World X coordinate in meters.
+    pub x_m: f64,
+    /// World Y coordinate in meters.
+    pub y_m: f64,
+    /// World Z coordinate in meters.
+    pub z_m: f64,
+}
+
 /// Surface geometry values read from EnergyPlus `eplusout.eio`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct EioHeatTransferSurface {
@@ -49,6 +60,10 @@ pub struct EioHeatTransferSurface {
     pub azimuth_deg: f64,
     /// EIO `Tilt {deg}`.
     pub tilt_deg: f64,
+    /// EIO `#Sides`.
+    pub side_count: usize,
+    /// Canonical world-coordinate vertices when `DetailsWithVertices` was requested.
+    pub world_vertices: Option<Vec<EioSurfaceVertex>>,
 }
 
 /// OtherEquipment nominal internal gain values read from EnergyPlus `eplusout.eio`.

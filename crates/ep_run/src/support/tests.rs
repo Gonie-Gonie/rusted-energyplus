@@ -158,6 +158,55 @@ fn output_objects_use_partial_rule_from_registry() -> Result<(), Box<dyn std::er
 }
 
 #[test]
+fn global_geometry_rules_are_consumed_without_ignored_semantics_warning()
+-> Result<(), Box<dyn std::error::Error>> {
+    let raw = parse_epjson_str(
+        r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "GlobalGeometryRules": {
+                    "Rules": {
+                        "starting_vertex_position": "UpperLeftCorner",
+                        "vertex_entry_direction": "CounterClockWise",
+                        "coordinate_system": "Relative",
+                        "daylighting_reference_point_coordinate_system": "Relative",
+                        "rectangular_surface_coordinate_system": "Relative"
+                    }
+                },
+                "Zone": {"Zone One": {"volume": 100}}
+            }"#,
+    )?;
+    let result = compile_raw_model(&raw);
+    let assessment = assess_support(
+        &raw,
+        &result.report,
+        result.model.as_ref(),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+    );
+
+    assert!(
+        result
+            .model
+            .as_ref()
+            .and_then(|model| model.global_geometry_rules)
+            .is_some()
+    );
+    assert!(
+        assessment
+            .ignored_raw_only_objects
+            .iter()
+            .all(|entry| entry.object_type != "GlobalGeometryRules")
+    );
+    assert!(assessment.diagnostics.diagnostics.iter().all(|diagnostic| {
+        diagnostic.object_type.as_deref() != Some("GlobalGeometryRules")
+            || diagnostic.code != "UnsupportedAlgorithmIgnored"
+    }));
+    Ok(())
+}
+
+#[test]
 fn hvac_air_loop_uses_unsupported_rule_from_registry() -> Result<(), Box<dyn std::error::Error>> {
     let raw = parse_epjson_str(
         r#"{

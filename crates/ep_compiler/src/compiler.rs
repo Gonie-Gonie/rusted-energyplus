@@ -4736,6 +4736,20 @@ impl<'a> Compiler<'a> {
             else {
                 continue;
             };
+            let Some(zone_geometry) = model.zones.iter().find(|candidate| candidate.id == zone)
+            else {
+                continue;
+            };
+            let vertices = canonical_world_surface_vertices(
+                vertices,
+                model.global_geometry_rules.unwrap_or_default(),
+                zone_geometry.direction_of_relative_north_deg,
+                zone_geometry.origin,
+                model
+                    .building
+                    .as_ref()
+                    .map_or(0.0, |building| building.north_axis_deg),
+            );
             let Some(id_value) =
                 self.checked_id("BuildingSurface:Detailed", &name, model.surfaces.len())
             else {
@@ -7561,6 +7575,76 @@ fn parse_yes_no(value: &str) -> Option<bool> {
         value if value.eq_ignore_ascii_case("No") => Some(false),
         _ => None,
     }
+}
+
+fn canonical_world_surface_vertices(
+    mut vertices: Vec<Point3>,
+    rules: GlobalGeometryRules,
+    zone_relative_north_deg: f64,
+    zone_origin: Point3,
+    building_north_axis_deg: f64,
+) -> Vec<Point3> {
+    if rules.vertex_entry_direction == VertexEntryDirection::Clockwise && vertices.len() > 1 {
+        // EnergyPlus GetVertices preserves vertex 1 and reverses vertices 2 through N.
+        vertices[1..].reverse();
+    }
+
+    // Preserve the source loop semantics rather than reducing this to a four-vertex rotation.
+    let vertex_count = vertices.len();
+    if vertex_count >= 3 {
+        let mut this_corner = match rules.starting_vertex_position {
+            StartingVertexPosition::UpperLeftCorner => 1,
+            StartingVertexPosition::LowerLeftCorner => 2,
+            StartingVertexPosition::LowerRightCorner => 3,
+            StartingVertexPosition::UpperRightCorner => 4,
+        };
+        while this_corner != 1 {
+            if vertex_count < 4 && this_corner == 4 {
+                break;
+            }
+            let mut target = this_corner;
+            let mut source = this_corner + 1;
+            if source > vertex_count {
+                source = 1;
+            }
+            for _ in 0..vertex_count - 1 {
+                vertices.swap(target - 1, source - 1);
+                target += 1;
+                source += 1;
+                if target > vertex_count {
+                    target = 1;
+                }
+                if source > vertex_count {
+                    source = 1;
+                }
+            }
+            this_corner += 1;
+            if this_corner > vertex_count {
+                this_corner = 1;
+            }
+        }
+    }
+
+    if rules.coordinate_system == GeometryCoordinateSystem::Relative {
+        let zone_angle_rad = (-zone_relative_north_deg).to_radians();
+        let zone_cos = zone_angle_rad.cos();
+        let zone_sin = zone_angle_rad.sin();
+        let building_angle_rad = (-building_north_axis_deg).to_radians();
+        let building_cos = building_angle_rad.cos();
+        let building_sin = building_angle_rad.sin();
+
+        for vertex in &mut vertices {
+            let building_relative_x =
+                vertex.x_m * zone_cos - vertex.y_m * zone_sin + zone_origin.x_m;
+            let building_relative_y =
+                vertex.x_m * zone_sin + vertex.y_m * zone_cos + zone_origin.y_m;
+            vertex.x_m = building_relative_x * building_cos - building_relative_y * building_sin;
+            vertex.y_m = building_relative_x * building_sin + building_relative_y * building_cos;
+            vertex.z_m += zone_origin.z_m;
+        }
+    }
+
+    vertices
 }
 
 fn parse_starting_vertex_position(value: &str) -> Option<StartingVertexPosition> {

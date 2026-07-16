@@ -635,7 +635,7 @@ DATA PERIODS
         assert_eq!(floor.zone_name, "ZONE ONE");
         assert_eq!(floor.surface_type, SurfaceType::Floor);
         assert_eq!(floor.area_m2, 1.0);
-        assert!((floor.azimuth_deg - 270.0).abs() < 1.0e-9);
+        assert!((floor.azimuth_deg - 90.0).abs() < 1.0e-9);
         assert!((floor.tilt_deg - 180.0).abs() < 1.0e-9);
 
         let roof = summaries
@@ -644,7 +644,7 @@ DATA PERIODS
             .ok_or_else(|| std::io::Error::other("missing roof surface"))?;
         assert_eq!(roof.surface_type, SurfaceType::Roof);
         assert_eq!(roof.area_m2, 1.0);
-        assert!((roof.azimuth_deg - 0.0).abs() < 1.0e-9);
+        assert!((roof.azimuth_deg - 180.0).abs() < 1.0e-9);
         assert!((roof.tilt_deg - 0.0).abs() < 1.0e-9);
 
         let wall_azimuths = [
@@ -665,6 +665,31 @@ DATA PERIODS
         }
 
         Ok(())
+    }
+
+    #[test]
+    fn horizontal_surface_azimuth_matches_energyplus_second_edge_rule() {
+        let angle_rad = (-75.0_f64).to_radians();
+        let rotate = |x_m: f64, y_m: f64, z_m: f64| Point3 {
+            x_m: x_m * angle_rad.cos() - y_m * angle_rad.sin(),
+            y_m: x_m * angle_rad.sin() + y_m * angle_rad.cos(),
+            z_m,
+        };
+        let floor = [
+            rotate(0.0, 1.0, 0.0),
+            rotate(1.0, 1.0, 0.0),
+            rotate(1.0, 0.0, 0.0),
+            rotate(0.0, 0.0, 0.0),
+        ];
+        let roof = [
+            rotate(1.0, 0.0, 1.0),
+            rotate(1.0, 1.0, 1.0),
+            rotate(0.0, 1.0, 1.0),
+            rotate(0.0, 0.0, 1.0),
+        ];
+
+        assert!((surface_azimuth_deg(&floor) - 345.0).abs() < 1.0e-9);
+        assert!((surface_azimuth_deg(&roof) - 75.0).abs() < 1.0e-9);
     }
 
     #[test]

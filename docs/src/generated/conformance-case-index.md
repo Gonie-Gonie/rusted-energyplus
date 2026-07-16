@@ -115,6 +115,7 @@ Case metadata is read from `data/conformance_cases/*/case.toml`.
 | ptac_diagnostic_001 | C3-airloop-hvac-skeleton | diagnostic-only | false | C | hvac, node, zone | baseline | data/conformance_cases/ptac_diagnostic_001/case.toml |
 | schedule_constant_001 | v0.22-time-weather-schedule-conformance | conformance | true | A | schedule | conformance | data/conformance_cases/schedule_constant_001/case.toml |
 | surface_geometry_001 | v0.5-geometry-internal-variables | smoke | false | A | zone, surface | diagnostic | data/conformance_cases/surface_geometry_001/case.toml |
+| surface_geometry_transform_001 | cp57-geometry-coordinate-transformation | smoke | false | A | zone, surface | diagnostic | data/conformance_cases/surface_geometry_transform_001/case.toml |
 | surface_temperature_nomass_001 | v0.9-surface-temperature | conformance | true | A | zone, surface | conformance | data/conformance_cases/surface_temperature_nomass_001/case.toml |
 | weather_fields_001 | v0.22-time-weather-schedule-conformance | conformance | true | A | weather | conformance, diagnostic | data/conformance_cases/weather_fields_001/case.toml |
 | weather_record_start_offset_nonactual_001 | full-source-order-weather-record-selection | conformance | true | A | weather | conformance | data/conformance_cases/weather_record_start_offset_nonactual_001/case.toml |

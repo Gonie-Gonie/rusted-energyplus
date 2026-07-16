@@ -297,6 +297,21 @@ def validate_spec_cross_references(
                     f"capability {capability_id} evidence case {case_id} must use comparison_class=conformance",
                 )
 
+    for consumed_object in registry.get("consumed_object", []):
+        consumed_id = str(consumed_object.get("id", "")).strip() or "<missing-id>"
+        algorithm_refs = values(consumed_object, "algorithms")
+        require(
+            len(algorithm_refs) == len(set(algorithm_refs)),
+            errors,
+            f"consumed_object {consumed_id} algorithm references must be unique",
+        )
+        for algorithm_id in algorithm_refs:
+            require(
+                algorithm_id in algorithm_by_id,
+                errors,
+                f"consumed_object {consumed_id} references unknown algorithm ledger id {algorithm_id}",
+            )
+
     for algorithm in algorithms:
         algorithm_id = str(algorithm.get("id", "")).strip() or "<missing-id>"
         status = str(algorithm.get("status", "")).strip()
@@ -471,7 +486,15 @@ def cross_spec_self_test_fixture() -> tuple[
                 "algorithms": ["fixture_algorithm"],
                 "evidence_cases": ["fixture_case"],
             }
-        ]
+        ],
+        "consumed_object": [
+            {
+                "id": "fixture_consumed_object",
+                "object_type": "Fixture:Consumed",
+                "algorithms": ["fixture_algorithm"],
+                "reason": "Fixture object is consumed by the fixture algorithm.",
+            }
+        ],
     }
     ledger = {
         "algorithm": [
@@ -514,6 +537,7 @@ def validate_cross_spec_self_test(errors: list[str]) -> None:
     registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
     fixture_errors: list[str] = []
     validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    validate_rules(registry, fixture_errors)
     require(not fixture_errors, errors, f"cross-spec valid-fixture self-test failed: {fixture_errors}")
 
     registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
@@ -524,6 +548,64 @@ def validate_cross_spec_self_test(errors: list[str]) -> None:
         any("references unknown algorithm ledger id" in error for error in fixture_errors),
         errors,
         "cross-spec self-test did not reject an unknown capability algorithm",
+    )
+
+    registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
+    registry["consumed_object"][0]["algorithms"] = ["missing_algorithm"]
+    fixture_errors = []
+    validate_spec_cross_references(registry, ledger, variable_coverage, cases, fixture_errors)
+    require(
+        any(
+            "consumed_object fixture_consumed_object references unknown algorithm" in error
+            for error in fixture_errors
+        ),
+        errors,
+        "cross-spec self-test did not reject an unknown consumed-object algorithm",
+    )
+
+    registry, _, _, _ = cross_spec_self_test_fixture()
+    del registry["consumed_object"][0]["reason"]
+    fixture_errors = []
+    validate_rules(registry, fixture_errors)
+    require(
+        any(
+            "consumed_object fixture_consumed_object must define non-empty reason" in error
+            for error in fixture_errors
+        ),
+        errors,
+        "cross-spec self-test did not reject incomplete consumed-object metadata",
+    )
+
+    registry, _, _, _ = cross_spec_self_test_fixture()
+    registry["partial_rule"] = [
+        {
+            "id": "fixture_partial",
+            "object_patterns": ["Fixture:Consumed"],
+            "eligible_state": "partial_supported_run",
+            "reason": "inactive fixture",
+        }
+    ]
+    fixture_errors = []
+    validate_rules(registry, fixture_errors)
+    require(
+        any("must not remain in partial_rule" in error for error in fixture_errors),
+        errors,
+        "cross-spec self-test did not reject consumed-object partial-rule overlap",
+    )
+
+    registry, _, _, _ = cross_spec_self_test_fixture()
+    registry["arbitrary_run"] = {
+        "ignored_raw_only_objects": {"objects": ["Fixture:Consumed"]}
+    }
+    fixture_errors = []
+    validate_rules(registry, fixture_errors)
+    require(
+        any(
+            "must not remain in arbitrary_run.ignored_raw_only_objects" in error
+            for error in fixture_errors
+        ),
+        errors,
+        "cross-spec self-test did not reject consumed-object ignored-list overlap",
     )
 
     registry, ledger, variable_coverage, cases = cross_spec_self_test_fixture()
@@ -652,6 +734,57 @@ def validate_rules(registry: dict[str, Any], errors: list[str]) -> None:
     capabilities = registry.get("capability", [])
     unsupported_rules = registry.get("unsupported_rule", [])
     partial_rules = registry.get("partial_rule", [])
+    consumed_objects = registry.get("consumed_object", [])
+
+    consumed_ids = [str(item.get("id", "")).strip() for item in consumed_objects]
+    consumed_object_types = [
+        str(item.get("object_type", "")).strip() for item in consumed_objects
+    ]
+    require(all(consumed_ids), errors, "consumed_object ids must be non-empty")
+    require(
+        len(consumed_ids) == len(set(consumed_ids)),
+        errors,
+        "consumed_object ids must be unique",
+    )
+    require(
+        all(consumed_object_types),
+        errors,
+        "consumed_object object_type values must be non-empty",
+    )
+    require(
+        len(consumed_object_types) == len(set(consumed_object_types)),
+        errors,
+        "consumed_object object_type values must be unique",
+    )
+
+    partial_patterns = {
+        pattern for rule in partial_rules for pattern in values(rule, "object_patterns")
+    }
+    ignored_raw_only_objects = set(
+        values(
+            registry.get("arbitrary_run", {}).get("ignored_raw_only_objects", {}),
+            "objects",
+        )
+    )
+    for consumed_object in consumed_objects:
+        consumed_id = str(consumed_object.get("id", "")).strip() or "<missing-id>"
+        object_type = str(consumed_object.get("object_type", "")).strip()
+        for field in ("id", "object_type", "algorithms", "reason"):
+            require(
+                bool(consumed_object.get(field)),
+                errors,
+                f"consumed_object {consumed_id} must define non-empty {field}",
+            )
+        require(
+            object_type not in partial_patterns,
+            errors,
+            f"consumed_object {consumed_id} object_type {object_type!r} must not remain in partial_rule object_patterns",
+        )
+        require(
+            object_type not in ignored_raw_only_objects,
+            errors,
+            f"consumed_object {consumed_id} object_type {object_type!r} must not remain in arbitrary_run.ignored_raw_only_objects",
+        )
 
     required_objects = sorted(
         {
@@ -772,6 +905,9 @@ def main() -> int:
     algorithm_ref_count = sum(
         len(values(capability, "algorithms"))
         for capability in registry.get("capability", [])
+    ) + sum(
+        len(values(consumed_object, "algorithms"))
+        for consumed_object in registry.get("consumed_object", [])
     )
     evidence_ref_count = sum(
         len(values(capability, "evidence_cases"))
@@ -789,6 +925,7 @@ def main() -> int:
     print(f"  capability_ids: {', '.join(capability_ids)}")
     print(f"  unsupported_rules: {len(registry.get('unsupported_rule', []))}")
     print(f"  partial_rules: {len(registry.get('partial_rule', []))}")
+    print(f"  consumed_objects: {len(registry.get('consumed_object', []))}")
     print(f"  algorithm_ledger_references: {algorithm_ref_count}")
     print(f"  evidence_case_references: {evidence_ref_count}")
     print(f"  covered_manifest_output_variables: {output_variable_count}")

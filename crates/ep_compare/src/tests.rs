@@ -1,12 +1,12 @@
 use crate::{
-    EioError, OrderedTimestampDivergenceReason, SeriesAlignment, SeriesComparisonStatus,
-    SeriesDivergenceKind, SeriesSample, Tolerance, compare_ordered_timestamp_samples_v2,
-    compare_series, compare_series_samples_v2, compare_series_v2, parse_eio_construction_ctf,
-    parse_eio_construction_ctf_coefficients, parse_eio_heat_transfer_surfaces,
-    parse_eio_material_ctf_summary, parse_eio_other_equipment_nominal,
-    parse_eio_surface_geometry_rules, parse_eio_warmup_environments, parse_eio_zone_geometry,
-    parse_eso_series, parse_eso_time_series, parse_mtr_time_series,
-    parse_mtr_time_series_for_frequency,
+    EioError, EioSurfaceVertex, OrderedTimestampDivergenceReason, SeriesAlignment,
+    SeriesComparisonStatus, SeriesDivergenceKind, SeriesSample, Tolerance,
+    compare_ordered_timestamp_samples_v2, compare_series, compare_series_samples_v2,
+    compare_series_v2, parse_eio_construction_ctf, parse_eio_construction_ctf_coefficients,
+    parse_eio_heat_transfer_surfaces, parse_eio_material_ctf_summary,
+    parse_eio_other_equipment_nominal, parse_eio_surface_geometry_rules,
+    parse_eio_warmup_environments, parse_eio_zone_geometry, parse_eso_series,
+    parse_eso_time_series, parse_mtr_time_series, parse_mtr_time_series_for_frequency,
 };
 
 #[test]
@@ -464,8 +464,83 @@ fn parses_eio_heat_transfer_surface_rows() -> Result<(), Box<dyn std::error::Err
     assert_eq!(surfaces[0].area_gross_m2, 1.0);
     assert_eq!(surfaces[0].azimuth_deg, 90.0);
     assert_eq!(surfaces[0].tilt_deg, 90.0);
+    assert_eq!(surfaces[0].side_count, 4);
+    assert_eq!(surfaces[0].world_vertices, None);
 
     Ok(())
+}
+
+#[test]
+fn parses_eio_heat_transfer_surface_details_with_vertices() -> Result<(), Box<dyn std::error::Error>>
+{
+    let surfaces = parse_eio_heat_transfer_surfaces(
+        r#"! <HeatTransfer Surface>,Surface Name,...,#Sides,Vertex 1 X {m},Vertex 1 Y {m},Vertex 1 Z {m},{etc}
+ HeatTransfer Surface,TRANSFORMED WALL,Wall,,CTF - ConductionTransferFunction,WALL CONSTRUCTION,1.000,0.870,,6.00,6.00,6.00,123.45,90.00,2.00,3.00,0.00,ExternalEnvironment,DOE-2,ASHRAETARP,SunExposed,WindExposed,0.50,0.50,0.50,0.50,4,-13.25,-18.50,34.75,-10.00,-18.50,34.75,-10.00,-18.50,37.25,-13.25,-18.50,37.25
+"#,
+    )?;
+
+    assert_eq!(surfaces.len(), 1);
+    assert_eq!(surfaces[0].surface_name, "TRANSFORMED WALL");
+    assert_eq!(surfaces[0].side_count, 4);
+    assert_eq!(
+        surfaces[0].world_vertices,
+        Some(vec![
+            EioSurfaceVertex {
+                x_m: -13.25,
+                y_m: -18.5,
+                z_m: 34.75,
+            },
+            EioSurfaceVertex {
+                x_m: -10.0,
+                y_m: -18.5,
+                z_m: 34.75,
+            },
+            EioSurfaceVertex {
+                x_m: -10.0,
+                y_m: -18.5,
+                z_m: 37.25,
+            },
+            EioSurfaceVertex {
+                x_m: -13.25,
+                y_m: -18.5,
+                z_m: 37.25,
+            },
+        ])
+    );
+
+    Ok(())
+}
+
+#[test]
+fn rejects_eio_heat_transfer_surface_vertex_count_mismatch() {
+    let result = parse_eio_heat_transfer_surfaces(
+        "HeatTransfer Surface,TRANSFORMED WALL,Wall,,CTF - ConductionTransferFunction,WALL CONSTRUCTION,1.000,0.870,,6.00,6.00,6.00,123.45,90.00,2.00,3.00,0.00,ExternalEnvironment,DOE-2,ASHRAETARP,SunExposed,WindExposed,0.50,0.50,0.50,0.50,4,-13.25,-18.50,34.75,-10.00,-18.50,34.75,-10.00,-18.50,37.25\n",
+    );
+
+    assert!(matches!(
+        result,
+        Err(EioError::InvalidHeatTransferSurface { line: 1, .. })
+    ));
+}
+
+#[test]
+fn rejects_eio_heat_transfer_surface_zero_or_overflowing_side_count() {
+    let zero_sides = parse_eio_heat_transfer_surfaces(
+        "HeatTransfer Surface,ZERO SIDES,Wall,,CTF - ConductionTransferFunction,WALL CONSTRUCTION,1.000,0.870,,6.00,6.00,6.00,123.45,90.00,2.00,3.00,0.00,ExternalEnvironment,DOE-2,ASHRAETARP,SunExposed,WindExposed,0.50,0.50,0.50,0.50,0\n",
+    );
+    assert!(matches!(
+        zero_sides,
+        Err(EioError::InvalidHeatTransferSurface { line: 1, .. })
+    ));
+
+    let overflowing_sides = parse_eio_heat_transfer_surfaces(&format!(
+        "HeatTransfer Surface,OVERFLOWING SIDES,Wall,,CTF - ConductionTransferFunction,WALL CONSTRUCTION,1.000,0.870,,6.00,6.00,6.00,123.45,90.00,2.00,3.00,0.00,ExternalEnvironment,DOE-2,ASHRAETARP,SunExposed,WindExposed,0.50,0.50,0.50,0.50,{}\n",
+        usize::MAX
+    ));
+    assert!(matches!(
+        overflowing_sides,
+        Err(EioError::InvalidHeatTransferSurface { line: 1, .. })
+    ));
 }
 
 #[test]

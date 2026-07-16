@@ -162,9 +162,14 @@ pub(crate) fn surface_azimuth_deg(vertices: &[Point3]) -> f64 {
         return normalize_degrees(normal.x.atan2(normal.y).to_degrees());
     }
 
-    first_horizontal_edge(vertices)
-        .map(|edge| normalize_degrees((-edge.x).atan2(edge.y).to_degrees()))
-        .unwrap_or(0.0)
+    // EnergyPlus DetermineAzimuthAndTilt defines the local x axis from vertex 2 to
+    // vertex 3 for horizontal surfaces, whose normal cannot define an azimuth.
+    let edge = vector_between(vertices[1], vertices[2]);
+    if edge.x.hypot(edge.y) <= 1.0e-12 {
+        return 0.0;
+    }
+
+    normalize_degrees(180.0 - edge.y.atan2(edge.x).to_degrees())
 }
 
 pub(crate) fn surface_tilt_deg(surface_type: SurfaceType, vertices: &[Point3]) -> f64 {
@@ -211,19 +216,6 @@ fn polygon_normal(vertices: &[Point3]) -> Option<Vector3> {
     } else {
         None
     }
-}
-
-fn first_horizontal_edge(vertices: &[Point3]) -> Option<Vector3> {
-    vertices
-        .windows(2)
-        .map(|window| vector_between(window[0], window[1]))
-        .chain(
-            vertices
-                .first()
-                .zip(vertices.last())
-                .map(|(first, last)| vector_between(*last, *first)),
-        )
-        .find(|edge| edge.x.hypot(edge.y) > 1.0e-12)
 }
 
 fn normalize_degrees(value: f64) -> f64 {

@@ -253,9 +253,17 @@ reason = "Reporting requests can be exported or reported unsupported without cha
 
 [[partial_rule]]
 id = "inactive_or_unused_raw_objects"
-object_patterns = ["SimulationControl", "SizingPeriod:DesignDay", "GlobalGeometryRules", "HeatBalanceAlgorithm", "ShadowCalculation", "Exterior:Lights"]
+object_patterns = ["SimulationControl", "SizingPeriod:DesignDay", "HeatBalanceAlgorithm", "ShadowCalculation", "Exterior:Lights"]
 eligible_state = "partial_supported_run"
 reason = "Preserved for diagnostics or staging when inactive for the current runtime subset."
+
+[[consumed_object]]
+id = "global_geometry_rules"
+object_type = "GlobalGeometryRules"
+algorithms = [
+  "geometry_coordinate_transformation",
+]
+reason = "Typed compiler geometry canonicalization consumes these rules before arbitrary runtime execution."
 
 [arbitrary_run.runtime.heat_balance_zone_air_diagnostic]
 status = "supported-compatibility"
@@ -307,7 +315,6 @@ reason = "preserved for diagnostics or handled by output/oracle staging rather t
 objects = [
   "SimulationControl",
   "SizingPeriod:DesignDay",
-  "GlobalGeometryRules",
   "HeatBalanceAlgorithm",
   "ShadowCalculation",
   "Exterior:Lights",

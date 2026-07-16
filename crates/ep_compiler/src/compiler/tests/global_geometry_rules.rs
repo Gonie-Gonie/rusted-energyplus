@@ -1,8 +1,11 @@
 use super::super::{
-    CompileResult, DiagnosticSeverity, ObjectCoverageStatus, compile_raw_model,
-    typed_coverage_status,
+    CompileResult, DiagnosticSeverity, ObjectCoverageStatus, canonical_world_surface_vertices,
+    compile_raw_model, typed_coverage_status,
 };
-use ep_model::{GeometryCoordinateSystem, StartingVertexPosition, VertexEntryDirection};
+use ep_model::{
+    GeometryCoordinateSystem, GlobalGeometryRules, Point3, StartingVertexPosition,
+    VertexEntryDirection,
+};
 use ep_raw_model::parse_epjson_str;
 
 fn compile_rules(fields: &str) -> CompileResult {
@@ -25,6 +28,232 @@ fn required_fields(corner: &str, direction: &str, coordinate_system: &str) -> St
            "vertex_entry_direction": "{direction}",
            "coordinate_system": "{coordinate_system}""#
     )
+}
+
+fn point(x_m: f64, y_m: f64, z_m: f64) -> Point3 {
+    Point3 { x_m, y_m, z_m }
+}
+
+fn assert_point_close(actual: Point3, expected: Point3, tolerance: f64) {
+    assert!(
+        (actual.x_m - expected.x_m).abs() <= tolerance,
+        "x mismatch: actual {}, expected {}",
+        actual.x_m,
+        expected.x_m
+    );
+    assert!(
+        (actual.y_m - expected.y_m).abs() <= tolerance,
+        "y mismatch: actual {}, expected {}",
+        actual.y_m,
+        expected.y_m
+    );
+    assert!(
+        (actual.z_m - expected.z_m).abs() <= tolerance,
+        "z mismatch: actual {}, expected {}",
+        actual.z_m,
+        expected.z_m
+    );
+}
+
+fn compile_surface_fixture(global_geometry_rules_object: &str) -> CompileResult {
+    let epjson = format!(
+        r#"{{
+            {global_geometry_rules_object}
+            "Building": {{
+                "Building": {{"north_axis": 180}}
+            }},
+            "Material:NoMass": {{"R13": {{}}}},
+            "Construction": {{
+                "Wall Construction": {{"outside_layer": "R13"}}
+            }},
+            "Zone": {{
+                "Zone One": {{
+                    "direction_of_relative_north": 90,
+                    "x_origin": 10,
+                    "y_origin": 20,
+                    "z_origin": 30
+                }}
+            }},
+            "BuildingSurface:Detailed": {{
+                "Wall One": {{
+                    "surface_type": "Wall",
+                    "construction_name": "Wall Construction",
+                    "zone_name": "Zone One",
+                    "outside_boundary_condition": "Outdoors",
+                    "vertices": [
+                        {{"vertex_x_coordinate": 2, "vertex_y_coordinate": 3, "vertex_z_coordinate": 4}},
+                        {{"vertex_x_coordinate": 2, "vertex_y_coordinate": 2, "vertex_z_coordinate": 4}},
+                        {{"vertex_x_coordinate": 3, "vertex_y_coordinate": 2, "vertex_z_coordinate": 4}}
+                    ]
+                }}
+            }}
+        }}"#
+    );
+    let raw_model = parse_epjson_str(&epjson).expect("surface fixture epJSON should parse");
+    compile_raw_model(&raw_model)
+}
+
+#[test]
+fn canonicalizes_all_starting_corners_for_ccw_and_cw_input() {
+    let upper_left = point(0.0, 1.0, 0.0);
+    let lower_left = point(0.0, 0.0, 0.0);
+    let lower_right = point(1.0, 0.0, 0.0);
+    let upper_right = point(1.0, 1.0, 0.0);
+    let canonical = vec![upper_left, lower_left, lower_right, upper_right];
+    let cases = [
+        (
+            StartingVertexPosition::UpperLeftCorner,
+            vec![upper_left, lower_left, lower_right, upper_right],
+            vec![upper_left, upper_right, lower_right, lower_left],
+        ),
+        (
+            StartingVertexPosition::LowerLeftCorner,
+            vec![lower_left, lower_right, upper_right, upper_left],
+            vec![lower_left, upper_left, upper_right, lower_right],
+        ),
+        (
+            StartingVertexPosition::LowerRightCorner,
+            vec![lower_right, upper_right, upper_left, lower_left],
+            vec![lower_right, lower_left, upper_left, upper_right],
+        ),
+        (
+            StartingVertexPosition::UpperRightCorner,
+            vec![upper_right, upper_left, lower_left, lower_right],
+            vec![upper_right, lower_right, lower_left, upper_left],
+        ),
+    ];
+
+    for (starting_vertex_position, ccw_vertices, cw_vertices) in cases {
+        for (vertex_entry_direction, vertices) in [
+            (VertexEntryDirection::CounterClockwise, ccw_vertices),
+            (VertexEntryDirection::Clockwise, cw_vertices),
+        ] {
+            let actual = canonical_world_surface_vertices(
+                vertices,
+                GlobalGeometryRules {
+                    starting_vertex_position,
+                    vertex_entry_direction,
+                    ..GlobalGeometryRules::default()
+                },
+                0.0,
+                point(0.0, 0.0, 0.0),
+                0.0,
+            );
+            assert_eq!(actual, canonical);
+        }
+    }
+}
+
+#[test]
+fn relative_zone_rotation_matches_official_45_and_90_degree_sign_vectors() {
+    let rules = GlobalGeometryRules {
+        coordinate_system: GeometryCoordinateSystem::Relative,
+        ..GlobalGeometryRules::default()
+    };
+    let input = point(2.048, 3.048, 0.9);
+
+    let rotated_45 =
+        canonical_world_surface_vertices(vec![input], rules, 45.0, point(0.0, 0.0, 0.0), 0.0);
+    assert_point_close(rotated_45[0], point(3.603, 0.707, 0.9), 5.0e-4);
+
+    let rotated_90 =
+        canonical_world_surface_vertices(vec![input], rules, 90.0, point(0.0, 0.0, 0.0), 0.0);
+    assert_point_close(rotated_90[0], point(3.048, -2.048, 0.9), 1.0e-12);
+}
+
+#[test]
+fn relative_transform_applies_zone_rotation_origin_then_building_rotation() {
+    let rules = GlobalGeometryRules {
+        coordinate_system: GeometryCoordinateSystem::Relative,
+        ..GlobalGeometryRules::default()
+    };
+    let actual = canonical_world_surface_vertices(
+        vec![point(2.0, 3.0, 4.0)],
+        rules,
+        90.0,
+        point(10.0, 20.0, 30.0),
+        180.0,
+    );
+
+    assert_point_close(actual[0], point(-13.0, -18.0, 34.0), 1.0e-12);
+}
+
+#[test]
+fn building_rotation_uses_direct_negative_angle_for_negative_and_over_360_values() {
+    let rules = GlobalGeometryRules {
+        coordinate_system: GeometryCoordinateSystem::Relative,
+        ..GlobalGeometryRules::default()
+    };
+    let input = point(2.0, 3.0, 4.0);
+
+    for building_north_axis_deg in [-405.0_f64, 765.0_f64] {
+        let angle_rad = (-building_north_axis_deg).to_radians();
+        let expected = point(
+            input.x_m * angle_rad.cos() - input.y_m * angle_rad.sin(),
+            input.x_m * angle_rad.sin() + input.y_m * angle_rad.cos(),
+            input.z_m,
+        );
+        let actual = canonical_world_surface_vertices(
+            vec![input],
+            rules,
+            0.0,
+            point(0.0, 0.0, 0.0),
+            building_north_axis_deg,
+        );
+
+        assert_eq!(actual[0], expected);
+    }
+}
+
+#[test]
+fn world_coordinates_ignore_nonzero_building_and_zone_transforms() {
+    let input = vec![
+        point(2.0, 3.0, 4.0),
+        point(-5.0, 7.0, 11.0),
+        point(13.0, -17.0, 19.0),
+    ];
+    let actual = canonical_world_surface_vertices(
+        input.clone(),
+        GlobalGeometryRules::default(),
+        91.0,
+        point(10.0, 20.0, 30.0),
+        -37.0,
+    );
+
+    assert_eq!(actual, input);
+}
+
+#[test]
+fn compiler_stores_relative_vertices_in_canonical_world_coordinates() {
+    let result = compile_surface_fixture(
+        r#""GlobalGeometryRules": {
+            "Rules": {
+                "starting_vertex_position": "UpperLeftCorner",
+                "vertex_entry_direction": "Counterclockwise",
+                "coordinate_system": "Relative"
+            }
+        },"#,
+    );
+
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let first_vertex = result
+        .model
+        .expect("relative surface fixture should compile")
+        .surfaces[0]
+        .vertices[0];
+    assert_point_close(first_vertex, point(-13.0, -18.0, 34.0), 1.0e-12);
+}
+
+#[test]
+fn compiler_missing_rules_preserves_legacy_world_vertices() {
+    let result = compile_surface_fixture("");
+
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let model = result
+        .model
+        .expect("surface fixture without geometry rules should compile");
+    assert!(model.global_geometry_rules.is_none());
+    assert_eq!(model.surfaces[0].vertices[0], point(2.0, 3.0, 4.0));
 }
 
 #[test]

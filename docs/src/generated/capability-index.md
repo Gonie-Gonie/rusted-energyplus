@@ -32,4 +32,4 @@ Capability metadata is maintained in `specs/capabilities.toml` and consumed by `
 | ID | Object patterns | Eligible state | Reason |
 |---|---|---|---|
 | ignored_reporting_objects | `Output:*`<br>`OutputControl:*` | partial_supported_run | Reporting requests can be exported or reported unsupported without changing simulation semantics. |
-| inactive_or_unused_raw_objects | `SimulationControl`<br>`SizingPeriod:DesignDay`<br>`GlobalGeometryRules`<br>`HeatBalanceAlgorithm`<br>`ShadowCalculation`<br>`Exterior:Lights` | partial_supported_run | Preserved for diagnostics or staging when inactive for the current runtime subset. |
+| inactive_or_unused_raw_objects | `SimulationControl`<br>`SizingPeriod:DesignDay`<br>`HeatBalanceAlgorithm`<br>`ShadowCalculation`<br>`Exterior:Lights` | partial_supported_run | Preserved for diagnostics or staging when inactive for the current runtime subset. |
