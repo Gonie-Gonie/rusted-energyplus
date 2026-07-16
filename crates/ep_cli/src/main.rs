@@ -11,6 +11,7 @@ mod ideal_loads;
 mod internal_gains;
 mod static_model;
 mod time_weather_schedule;
+mod window_material_shade;
 
 use conformance_artifacts::{
     BaselineSummary, ReportTimingSummary, append_timing_to_json_object, elapsed_seconds_since,
@@ -120,6 +121,7 @@ use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 use time_weather_schedule::generate_time_weather_schedule_report;
+use window_material_shade::run_compare_window_material_shade;
 
 const HEAT_BALANCE_BOTTLENECK_LIMIT: usize = 8;
 const HEAT_BALANCE_TOP_RMSE_LIMIT: usize = 10;
@@ -340,6 +342,7 @@ fn print_help() {
     println!("  compare window-material-gas <input.epJSON> <eplusout.eio>");
     println!("  compare window-material-gap-equivalent-layer <input.epJSON> <eplusout.eio>");
     println!("  compare window-material-gas-mixture <input.epJSON> <eplusout.eio>");
+    println!("  compare window-material-shade <input.epJSON> <eplusout.eio>");
     println!("  compare internal-gains <input.epJSON> <eplusout.eio>");
     println!("  compare internal-convective-gain <input.epJSON> <eplusout.eso>");
     println!("  compare weather-fields <weather.epw> <eplusout.eso>");
@@ -3365,6 +3368,7 @@ fn run_compare_command(args: &[String]) -> i32 {
             run_compare_window_material_gap_equivalent_layer(&args[1..])
         }
         Some("window-material-gas-mixture") => run_compare_window_material_gas_mixture(&args[1..]),
+        Some("window-material-shade") => run_compare_window_material_shade(&args[1..]),
         Some("internal-gains") => run_compare_internal_gains(&args[1..]),
         Some("internal-convective-gain") => run_compare_internal_convective_gain(&args[1..]),
         Some("weather-fields") | Some("weather-drybulb") => run_compare_weather_fields(&args[1..]),
@@ -3392,6 +3396,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             );
             eprintln!(
                 "usage: eplus-rs compare window-material-gas-mixture <input.epJSON> <eplusout.eio>"
+            );
+            eprintln!(
+                "usage: eplus-rs compare window-material-shade <input.epJSON> <eplusout.eio>"
             );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(
@@ -3425,6 +3432,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             );
             eprintln!(
                 "usage: eplus-rs compare window-material-gas-mixture <input.epJSON> <eplusout.eio>"
+            );
+            eprintln!(
+                "usage: eplus-rs compare window-material-shade <input.epJSON> <eplusout.eio>"
             );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(

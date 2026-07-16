@@ -1,0 +1,85 @@
+id = "window_material_shade_001"
+title = "Window material shade static definition and layer-occurrence evidence"
+milestone = "v0.8-heat-balance"
+purpose = "Compare the bounded Rust WindowMaterial:Shade typed slice with EnergyPlus generic definition and specialized construction-layer EIO evidence."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The fixture defines two WindowMaterial:Shade objects: one high-precision shade reused by exactly one exterior-shade and one interior-shade ordinary window construction, plus one valid defaulted shade definition that is unused.",
+  "Two bare-glass FenestrationSurface:Detailed windows are associated with separate ExteriorShade and InteriorShade WindowShadingControl objects. This makes both shaded constructions nominally used and permits a clean EnergyPlus run; shading-control behavior remains outside the claim.",
+  "The generic Material Details table echoes both definitions exactly once, including the unused shade. It exposes the canonical name, MediumRough roughness, EnergyPlus {:.4R} thickness, {:.3R} conductivity, zero resistance/density/specific heat/visible absorptance, {:.4R} thermal absorptance, and computed solar absorptance 1 minus solar transmittance minus solar reflectance.",
+  "The specialized WindowMaterial:Shade table emits one construction-layer occurrence for each exterior/interior reuse of the high-precision shade. It exposes canonical name, {:.3R} thickness, conductivity, thermal absorptance, solar transmittance, visible transmittance, and solar reflectance. The unused shade definition is absent from this occurrence table.",
+  "Visible reflectance, infrared transmittance, shade-to-glass distance, opening multipliers, airflow permeability, and nominal resistance are not emitted in either bounded EIO table and remain typed-only evidence.",
+  "Between-glass shade adjacency is deliberately excluded. Window optics, thermal behavior, daylighting, shaded-window runtime, and WindowShadingControl behavior are not compared.",
+  "The three WindowConstruction rows and named heat-transfer-surface rows are exact oracle-only fixture-integrity locks. Their ratings, optical values, layer behavior, and surface behavior are not Rust parity claims.",
+  "Construction declarations remain in canonical name order because ConvertInputFormat erases broad IDF declaration order. No broad or arbitrary IDF declaration-order parity is claimed.",
+  "The smoke gate requires a clean EnergyPlus 26.1.0 run, exact generic and specialized headers, two exact generic definition rows, two exact specialized shade occurrences, exclusion of the unused definition from occurrences, exact construction/surface integrity rows, and a passing bounded Rust comparison.",
+  "This is non-blocking diagnostic-only static material evidence and makes no WindowMaterial:Shade conformance claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/window_material_shade_001/window_material_shade.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface", "construction"]
+has_zone = true
+has_surface = true
+has_fenestration = true
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/window_material_shade_001/window_material_shade.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+epjson = ".runtime/compare-window-material-shade/26.1.0/window-material-shade.epJSON"
+
+[[outputs]]
+key = "*"
+variable = "WindowMaterial:Shade Generic Definition Details"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "WindowMaterial:Shade Layer Occurrences"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "WindowConstruction Layer Summary"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "DISTINCTIVE EXTERIOR SHADE TEST WINDOW"
+variable = "HeatTransfer Surface Static Inputs"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/window_material_shade_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-window-material-shade-smoke"
+blocking = false

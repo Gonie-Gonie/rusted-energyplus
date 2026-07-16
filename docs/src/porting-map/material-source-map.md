@@ -487,9 +487,30 @@ diagnostic contract that exterior/interior shades must directly adjoin
 glass. This is an explicit safety hardening, not a diagnostic-parity claim.
 Arbitrary-run assessment counts every typed shade definition, including an
 unused one, and blocks execution because window shading, optics, thermal
-behavior, daylighting, and controls remain unported. The named compiler and
-runtime tests are the first evidence for this checkpoint; no Shade EIO,
-surface behavior, runtime execution, or conformance claim is added yet.
+behavior, daylighting, and controls remain unported.
+
+`window_material_shade_001` adds a separate nonblocking diagnostic
+EnergyPlus 26.1 EIO gate. Its generic `Material Details` comparison is
+definition keyed: every fixture Shade must appear exactly once, including an
+unused definition. It locks `MediumRough`, zero resistance, density, specific
+heat, and visible absorptance, source `{:.4R}` thickness, source `{:.3R}`
+conductivity, and source `{:.4R}` infrared emissivity and derived solar
+absorptance. The generic row exposes no visible reflectance, infrared
+transmittance, shade-to-glass distance, opening multipliers, airflow
+permeability, nominal resistance, occurrence, reuse, or control state.
+
+The specialized `WindowMaterial:Shade` comparison is a duplicate-aware
+construction-layer occurrence multiset. Reusing one Shade in multiple
+ordinary window constructions emits repeated rows, while a definition absent
+from every shade construction emits none. Material name plus source
+`{:.3R}` thickness, conductivity, infrared emissivity, solar transmittance,
+visible transmittance, and solar reflectance are exact, as is the one
+specialized header. The clean fixture deliberately excludes between-glass
+Shade reporting because EnergyPlus skips that construction's window report
+after an oracle warning. Construction and surface rows are fixture-integrity
+locks only. Broad row/declaration order, construction ratings, active
+shading-control semantics, surface behavior, daylighting, optics/thermal
+runtime, and conformance remain unclaimed.
 
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. The two ordinary glazing variants, `WindowMaterial:Gas`, and
@@ -617,6 +638,10 @@ source order, the bounded exterior/interior/between-glass Construction
 patterns, solar-diffusing rejection, adjacent-gap gas signatures and width
 tolerance, safe failure of the two exterior/interior gas-adjacency holes,
 consumer family, and explicit runtime block.
+`window_material_shade_001` separately locks the bounded generic definition
+and duplicate-aware specialized construction-occurrence EIO shapes described
+above, including reuse and unused-definition behavior, without promoting
+window execution or conformance.
 
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
@@ -653,15 +678,15 @@ runtime or conformance claim.
 
 Typed model/compiler tests additionally prove that the four opaque states,
 the partial regular-glazing state, and the complete RefractionExtinction,
-glazing EquivalentLayer, Gas, gap EquivalentLayer, and GasMixture states are
-represented separately; their required fields, defaults,
+glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, and Shade
+states are represented separately; their required fields, defaults,
 exclusive/inclusive bounds, regular-glazing energy sums, shared names, source
 order, formulas, 26.1 quirks, Autocalculate states, uppercase equivalent-gap
 gas tokens, required vent modes, standard/custom gas resolution, ordered
 mixture prefix semantics, and family boundaries are compiled; and the bounded
 AirGap/IRT construction invariants, equivalent-layer construction exclusion,
-and ordinary Glass/Gas-or-GasMixture alternation are rejected or accepted as
-declared.
+ordinary Glass/Gas-or-GasMixture alternation, and safe exterior, interior, and
+between-glass Shade patterns are rejected or accepted as declared.
 `window_glazing_spectral_average_001` adds an external exact-EIO smoke gate
 for every field EnergyPlus emits from the bounded `SpectralAverage` material
 slice, together with oracle-only proof that the fixture uses that construction
@@ -684,10 +709,18 @@ seven-row equivalent-layer gap sequence across all five gas types and all
 three vent modes, including one reused material and excluding one unused
 definition. Name, canonical gas/vent type, and source-formatted thickness are
 exact; arbitrary IDF construction declaration order remains unclaimed.
+`window_material_gas_mixture_001` compares all six fixture definitions by
+name against their generic `Material Details` echoes, including the unused
+mixture, while component and occurrence semantics remain typed-only because
+the generic report omits them.
+`window_material_shade_001` compares two generic Shade definition rows,
+including the unused definition, plus the two specialized construction-layer
+occurrences created by exterior/interior reuse. Its exact construction and
+surface rows remain oracle-only integrity locks.
 These tests and static EIO smokes remain bounded evidence, not an EnergyPlus
 material-family or window gate.
 
-The gas EIO smokes do not promote numerical window behavior, runtime
+These material EIO smokes do not promote numerical window behavior, runtime
 execution, or conformance.
 
 CP58 remains incomplete until, at minimum:

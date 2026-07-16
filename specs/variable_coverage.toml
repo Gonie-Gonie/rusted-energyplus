@@ -615,12 +615,29 @@ first_evidence = "window_material_gas_mixture_001"
 support_boundary = "Non-blocking diagnostic by-name comparison of the six typed WindowMaterial:GasMixture definitions against the EnergyPlus 26.1 generic Material Details rows. Each fixture definition appears exactly once, including the unused definition; MediumRough, source-{:.4R}-serialized thickness, and the fixed zero resistance, conductivity, density, specific-heat, and absorptance fields are exact. The shared WindowMaterial:Gas header is exact and has zero gas data rows. Generic rows expose no active-component count, species, fractions, order, nominal resistance, occurrence/use/reuse status, or mixture thermal behavior. The two exact seven-layer WindowConstruction rows and host/window surface rows are oracle-only fixture-integrity locks. Broad declaration order, construction ratings, fenestration runtime, surface behavior, and conformance remain unclaimed."
 
 [[variable]]
+name = "WindowMaterial:Shade Generic Definition Details"
+domain = "construction"
+status = "diagnostic"
+first_case = "window_material_shade_001"
+first_evidence = "window_material_shade_001"
+support_boundary = "Non-blocking diagnostic by-name comparison of every typed fixture WindowMaterial:Shade definition against EnergyPlus 26.1 generic Material Details rows. Exactly one row per definition is required, including the unused/defaulted shade. MediumRough, fixed zero resistance/density/specific heat/visible absorptance, source-{:.4R}-serialized thickness, source-{:.3R}-serialized conductivity, and source-{:.4R}-serialized infrared emissivity and derived solar absorptance are exact. Generic rows do not expose visible reflectance, infrared transmittance, shade-to-glass distance, opening multipliers, airflow permeability, nominal resistance, construction occurrence/reuse, controls, or runtime behavior. Construction and surface rows are fixture-integrity locks only; broad order, window behavior, and conformance remain unclaimed."
+
+[[variable]]
+name = "WindowMaterial:Shade Layer Occurrences"
+domain = "construction"
+status = "diagnostic"
+first_case = "window_material_shade_001"
+first_evidence = "window_material_shade_001"
+support_boundary = "Non-blocking diagnostic duplicate-aware comparison of EnergyPlus 26.1 WindowMaterial:Shade EIO construction-layer occurrences. The exact specialized header and fixture occurrence multiplicity are locked; each compared row contains material identity plus source-{:.3R}-serialized thickness, conductivity, infrared emissivity, solar transmittance, visible transmittance, and solar reflectance. Reuse produces repeated rows, while a definition absent from every shade construction is excluded. The row does not expose visible reflectance, infrared transmittance, placement/opening/permeability inputs, nominal resistance, active shading-control state, ratings, optics/thermal/daylighting behavior, or surface use. Broad row/declaration order, runtime, and conformance remain unclaimed."
+
+[[variable]]
 name = "WindowConstruction Layer Summary"
 domain = "construction"
 status = "diagnostic"
 first_case = "window_glazing_spectral_average_001"
 first_evidence = "window_glazing_spectral_average_001"
 support_boundary = "Non-blocking diagnostic one-layer ordinary window-construction and one-solid equivalent-layer construction EIO fixture-integrity comparisons in the declared glazing fixtures, plus the six exact glass-gap-glass ordinary WindowConstruction rows in window_material_gas_001, the seven exact glass-gap-glass Construction:WindowEquivalentLayer rows in window_material_gap_equivalent_layer_001, and the two exact seven-layer ordinary WindowConstruction rows in window_material_gas_mixture_001. Ratings, Rust construction behavior, whole-window behavior, and construction conformance remain unclaimed."
+support_boundary_addendum = "window_material_shade_001 adds exact bare, exterior-shade, and interior-shade ordinary WindowConstruction rows as oracle-only fixture-integrity locks. It does not promote construction ratings, shading behavior, runtime, or conformance."
 
 [[variable]]
 name = "HeatTransfer Surface Static Inputs"
@@ -629,6 +646,7 @@ status = "diagnostic"
 first_case = "window_glazing_spectral_average_001"
 first_evidence = "window_glazing_spectral_average_001"
 support_boundary = "Non-blocking diagnostic fenestration-surface EIO identity and static-input fixture-integrity comparison in the declared glazing fixtures only; equivalent-layer surface evidence is oracle-only, and no fenestration heat-transfer runtime or surface conformance claim is attached."
+support_boundary_addendum = "window_material_shade_001 adds only its named opaque host and detailed-window rows as oracle fixture-integrity locks; Shade material parity remains confined to the two dedicated diagnostic variables."
 
 [[variable]]
 name = "Surface Inside Face Temperature"

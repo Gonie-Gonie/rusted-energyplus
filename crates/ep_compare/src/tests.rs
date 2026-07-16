@@ -1,4 +1,5 @@
 mod material_details;
+mod window_material_shade;
 
 use crate::{
     EioError, EioSurfaceVertex, OrderedTimestampDivergenceReason, SeriesAlignment,

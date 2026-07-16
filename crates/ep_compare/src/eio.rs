@@ -2,9 +2,11 @@
 
 mod material_details;
 mod types;
+mod window_material_shade;
 
 pub use material_details::*;
 pub use types::*;
+pub use window_material_shade::*;
 
 use std::path::Path;
 
