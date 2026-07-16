@@ -591,12 +591,20 @@ first_evidence = "window_glazing_equivalent_layer_001"
 support_boundary = "Non-blocking diagnostic comparison of the EnergyPlus 26.1 equivalent-layer EIO identity fields and 14 emitted solar/infrared numeric fields only; the 11 visible inputs, thermal resistance, spectral-dataset input preservation, ASHWAT/window runtime, equivalent-layer construction ratings, and conformance remain unclaimed."
 
 [[variable]]
+name = "WindowMaterial:Gas Layer Occurrences"
+domain = "construction"
+status = "diagnostic"
+first_case = "window_material_gas_001"
+first_evidence = "window_material_gas_001"
+support_boundary = "Non-blocking diagnostic comparison of the duplicate-aware EnergyPlus 26.1 ordinary-window gas-layer occurrence multiset only: multiplicity, material name, and canonical gas type are exact, and thickness is exact after reproducing the source {:.3R} EIO serialization policy, across all five gas types, one reused material, and one unused definition excluded by the oracle. Custom coefficients/properties and nominal resistance, Rust/EnergyPlus row-order parity, window optics and thermal runtime, construction ratings, and conformance remain unclaimed."
+
+[[variable]]
 name = "WindowConstruction Layer Summary"
 domain = "construction"
 status = "diagnostic"
 first_case = "window_glazing_spectral_average_001"
 first_evidence = "window_glazing_spectral_average_001"
-support_boundary = "Non-blocking diagnostic one-layer ordinary window-construction and one-solid equivalent-layer construction EIO fixture-integrity comparisons in the declared glazing fixtures only; equivalent-layer ratings and Rust construction behavior, whole-window behavior, and construction conformance remain unclaimed."
+support_boundary = "Non-blocking diagnostic one-layer ordinary window-construction and one-solid equivalent-layer construction EIO fixture-integrity comparisons in the declared glazing fixtures, plus the six exact three-layer ordinary WindowConstruction rows in window_material_gas_001. Ratings, Rust construction behavior, whole-window behavior, and construction conformance remain unclaimed."
 
 [[variable]]
 name = "HeatTransfer Surface Static Inputs"

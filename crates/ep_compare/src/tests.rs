@@ -5,7 +5,7 @@ use crate::{
     compare_series_v2, parse_eio_construction_ctf, parse_eio_construction_ctf_coefficients,
     parse_eio_construction_material_summaries, parse_eio_heat_transfer_surfaces,
     parse_eio_material_ctf_summary, parse_eio_other_equipment_nominal,
-    parse_eio_surface_geometry_rules, parse_eio_warmup_environments,
+    parse_eio_surface_geometry_rules, parse_eio_warmup_environments, parse_eio_window_material_gas,
     parse_eio_window_material_glazing, parse_eio_window_material_glazing_equivalent_layer,
     parse_eio_zone_geometry, parse_eso_series, parse_eso_time_series, parse_mtr_time_series,
     parse_mtr_time_series_for_frequency,
@@ -808,6 +808,105 @@ fn eio_window_material_glazing_parser_reports_missing_rows() {
     assert!(matches!(
         parse_eio_window_material_glazing("Program Version,EnergyPlus\n"),
         Err(EioError::MissingWindowMaterialGlazing)
+    ));
+}
+
+#[test]
+fn parses_eio_window_material_gas_rows_and_preserves_repeats()
+-> Result<(), Box<dyn std::error::Error>> {
+    let rows = parse_eio_window_material_gas(
+        r#"! <WindowMaterial:Gas>,Material Name,GasType,Thickness {m}
+ Program Version,EnergyPlus
+ WindowMaterial:Gas, argon gap ,Argon,0.0127000
+ WindowMaterial:Gas, argon gap ,Argon,1.27000E-002
+ WindowMaterial:Gas, air gap,Air,0.0063500
+ WindowMaterial:Glazing,IGNORED,SpectralAverage
+"#,
+    )?;
+
+    assert_eq!(rows.len(), 3);
+    assert_eq!(rows[0].material_name, "ARGON GAP");
+    assert_eq!(rows[0].gas_type, "Argon");
+    assert_eq!(rows[0].thickness_m, 0.0127);
+    assert_eq!(rows[1].material_name, rows[0].material_name);
+    assert_eq!(rows[1].gas_type, rows[0].gas_type);
+    assert_eq!(rows[1].thickness_m, rows[0].thickness_m);
+    assert_eq!(rows[2].material_name, "AIR GAP");
+    assert_eq!(rows[2].gas_type, "Air");
+    assert_eq!(rows[2].thickness_m, 0.00635);
+    Ok(())
+}
+
+#[test]
+fn eio_window_material_gas_parser_requires_exact_field_count() {
+    let too_few = parse_eio_window_material_gas("WindowMaterial:Gas,GAP,Argon\n")
+        .expect_err("a gas row with one missing value must fail");
+    let too_many = parse_eio_window_material_gas("WindowMaterial:Gas,GAP,Argon,0.0127,EXTRA\n")
+        .expect_err("a gas row with an extra value must fail");
+
+    assert!(matches!(
+        too_few,
+        EioError::InvalidWindowMaterialGas { line: 1, .. }
+    ));
+    assert!(matches!(
+        too_many,
+        EioError::InvalidWindowMaterialGas { line: 1, .. }
+    ));
+}
+
+#[test]
+fn eio_window_material_gas_parser_rejects_invalid_fields() {
+    let invalid_number =
+        parse_eio_window_material_gas("WindowMaterial:Gas,GAP,Argon,not-a-number\n")
+            .expect_err("invalid gas thickness must fail");
+    let missing_name = parse_eio_window_material_gas("WindowMaterial:Gas,,Argon,0.0127\n")
+        .expect_err("missing gas material name must fail");
+    let missing_type = parse_eio_window_material_gas("WindowMaterial:Gas,GAP,,0.0127\n")
+        .expect_err("missing gas type must fail");
+
+    assert!(matches!(
+        &invalid_number,
+        EioError::InvalidWindowMaterialGas { .. }
+    ));
+    if let EioError::InvalidWindowMaterialGas { line, reason, .. } = invalid_number {
+        assert_eq!(line, 1);
+        assert_eq!(reason, "invalid Thickness {m}");
+    }
+    assert!(matches!(
+        &missing_name,
+        EioError::InvalidWindowMaterialGas { .. }
+    ));
+    if let EioError::InvalidWindowMaterialGas { line, reason, .. } = missing_name {
+        assert_eq!(line, 1);
+        assert_eq!(reason, "missing Material Name");
+    }
+    assert!(matches!(
+        &missing_type,
+        EioError::InvalidWindowMaterialGas { .. }
+    ));
+    if let EioError::InvalidWindowMaterialGas { line, reason, .. } = missing_type {
+        assert_eq!(line, 1);
+        assert_eq!(reason, "missing Gas Type");
+    }
+
+    for invalid_thickness in ["0", "-0.0127", "NaN", "inf"] {
+        let error = parse_eio_window_material_gas(&format!(
+            "WindowMaterial:Gas,GAP,Argon,{invalid_thickness}\n"
+        ))
+        .expect_err("non-positive or non-finite gas thickness must fail");
+        assert!(matches!(&error, EioError::InvalidWindowMaterialGas { .. }));
+        if let EioError::InvalidWindowMaterialGas { line, reason, .. } = error {
+            assert_eq!(line, 1);
+            assert_eq!(reason, "Thickness {m} must be finite and greater than zero");
+        }
+    }
+}
+
+#[test]
+fn eio_window_material_gas_parser_reports_missing_rows() {
+    assert!(matches!(
+        parse_eio_window_material_gas("Program Version,EnergyPlus\n"),
+        Err(EioError::MissingWindowMaterialGas)
     ));
 }
 

@@ -11,9 +11,9 @@ Variable coverage is maintained in `specs/variable_coverage.toml`.
 | Status | Count |
 |---|---|
 | conformance | 122 |
-| diagnostic | 15 |
+| diagnostic | 16 |
 | baseline | 10 |
-| total | 147 |
+| total | 148 |
 <!-- ANCHOR_END: current-status-variable-summary -->
 
 ## Variables
@@ -94,7 +94,8 @@ Variable coverage is maintained in `specs/variable_coverage.toml`.
 | WindowMaterial:Glazing Static Inputs | construction | diagnostic | window_glazing_spectral_average_001 | Non-blocking diagnostic SpectralAverage input and EnergyPlus EIO row comparison only; no window heat-transfer runtime, optical calculation, or conformance claim. |
 | Normalized WindowMaterial:Glazing Static Inputs | construction | diagnostic | window_glazing_refraction_extinction_001 | Non-blocking diagnostic RefractionExtinctionMethod typed-input and EnergyPlus-normalized SpectralAverage EIO row comparison only; no window heat-transfer runtime, optical calculation, or conformance claim. |
 | WindowMaterial:Glazing:EquivalentLayer Static Inputs | construction | diagnostic | window_glazing_equivalent_layer_001 | Non-blocking diagnostic comparison of the EnergyPlus 26.1 equivalent-layer EIO identity fields and 14 emitted solar/infrared numeric fields only; the 11 visible inputs, thermal resistance, spectral-dataset input preservation, ASHWAT/window runtime, equivalent-layer construction ratings, and conformance remain unclaimed. |
-| WindowConstruction Layer Summary | construction | diagnostic | window_glazing_spectral_average_001 | Non-blocking diagnostic one-layer ordinary window-construction and one-solid equivalent-layer construction EIO fixture-integrity comparisons in the declared glazing fixtures only; equivalent-layer ratings and Rust construction behavior, whole-window behavior, and construction conformance remain unclaimed. |
+| WindowMaterial:Gas Layer Occurrences | construction | diagnostic | window_material_gas_001 | Non-blocking diagnostic comparison of the duplicate-aware EnergyPlus 26.1 ordinary-window gas-layer occurrence multiset only: multiplicity, material name, and canonical gas type are exact, and thickness is exact after reproducing the source {:.3R} EIO serialization policy, across all five gas types, one reused material, and one unused definition excluded by the oracle. Custom coefficients/properties and nominal resistance, Rust/EnergyPlus row-order parity, window optics and thermal runtime, construction ratings, and conformance remain unclaimed. |
+| WindowConstruction Layer Summary | construction | diagnostic | window_glazing_spectral_average_001 | Non-blocking diagnostic one-layer ordinary window-construction and one-solid equivalent-layer construction EIO fixture-integrity comparisons in the declared glazing fixtures, plus the six exact three-layer ordinary WindowConstruction rows in window_material_gas_001. Ratings, Rust construction behavior, whole-window behavior, and construction conformance remain unclaimed. |
 | HeatTransfer Surface Static Inputs | surface | diagnostic | window_glazing_spectral_average_001 | Non-blocking diagnostic fenestration-surface EIO identity and static-input fixture-integrity comparison in the declared glazing fixtures only; equivalent-layer surface evidence is oracle-only, and no fenestration heat-transfer runtime or surface conformance claim is attached. |
 | Surface Inside Face Temperature | heat_balance | conformance | surface_temperature_nomass_001 | Tolerance-gated for declared opaque no-mass surface cases and named official 1ZoneUncontrolled dynamic candidate roof/wall/floor surfaces; no broad solar, fenestration, or general surface heat-balance claim. |
 | Surface Outside Face Temperature | heat_balance | conformance | surface_temperature_nomass_001 | Tolerance-gated for declared opaque no-mass surface cases and named official 1ZoneUncontrolled dynamic candidate roof/wall/floor surfaces; no broad solar, fenestration, or general exterior boundary claim. |

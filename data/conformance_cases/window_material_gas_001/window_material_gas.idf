@@ -1,0 +1,339 @@
+Version,26.1;
+
+SimulationControl,No,No,No,No,Yes,No;
+
+Building,Window Material Gas Compare,0.0,Suburbs,0.04,0.4,FullExterior,25,6;
+
+Timestep,4;
+
+HeatBalanceAlgorithm,ConductionTransferFunction;
+
+SurfaceConvectionAlgorithm:Inside,TARP;
+
+SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+Site:Location,Golden,39.74,-105.18,-7.0,1829.0;
+
+Site:GroundTemperature:BuildingSurface,18,18,18,18,18,18,18,18,18,18,18,18;
+
+RunPeriod,Run Period 1,1,1,2013,1,1,2013,Tuesday,Yes,Yes,No,Yes,Yes;
+
+GlobalGeometryRules,UpperLeftCorner,CounterClockWise,World;
+
+Material,
+  DISTINCTIVE GAS OPAQUE HOST MATERIAL,
+  Rough,
+  0.113,
+  0.347,
+  913.0,
+  836.0,
+  0.87,
+  0.63,
+  0.58;
+
+WindowMaterial:Glazing,
+  DISTINCTIVE GAS TEST GLASS,
+  SpectralAverage,
+  ,
+  0.0064,
+  0.612,
+  0.137,
+  0.149,
+  0.721,
+  0.109,
+  0.123,
+  0.021,
+  0.823,
+  0.786,
+  1.17,
+  0.93,
+  No,
+  68000000000.0,
+  0.24;
+
+WindowMaterial:Gas,
+  DISTINCTIVE AIR GAP,
+  Air,
+  0.0111;
+
+WindowMaterial:Gas,
+  DISTINCTIVE ARGON GAP,
+  Argon,
+  0.0122;
+
+! EnergyPlus 26.1 stores a blank Custom specific-heat ratio as numeric zero and
+! does not validate it; the bounded Rust slice deliberately preserves that
+! source-actual typed/input quirk. All supplied Custom coefficients are valid.
+WindowMaterial:Gas,
+  DISTINCTIVE CUSTOM GAP BLANK RATIO,
+  Custom,
+  0.0133,
+  0.0015,
+  0.00008,
+  0.00000001,
+  0.000004,
+  0.00000005,
+  0.00000000001,
+  700.0,
+  0.2,
+  0.0001,
+  44.0,
+  ;
+
+WindowMaterial:Gas,
+  DISTINCTIVE KRYPTON GAP,
+  Krypton,
+  0.0144;
+
+WindowMaterial:Gas,
+  DISTINCTIVE XENON GAP,
+  Xenon,
+  0.0155;
+
+! This valid definition is intentionally not referenced by any Construction.
+! WindowMaterial:Gas EIO rows are construction-layer occurrences, not a dump of
+! every definition; the smoke gate locks this exclusion explicitly.
+WindowMaterial:Gas,
+  DISTINCTIVE UNUSED AIR GAP,
+  Air,
+  0.0166;
+
+Construction,
+  A AIR WINDOW CONSTRUCTION,
+  DISTINCTIVE GAS TEST GLASS,
+  DISTINCTIVE AIR GAP,
+  DISTINCTIVE GAS TEST GLASS;
+
+Construction,
+  B ARGON WINDOW CONSTRUCTION,
+  DISTINCTIVE GAS TEST GLASS,
+  DISTINCTIVE ARGON GAP,
+  DISTINCTIVE GAS TEST GLASS;
+
+Construction,
+  C CUSTOM WINDOW CONSTRUCTION,
+  DISTINCTIVE GAS TEST GLASS,
+  DISTINCTIVE CUSTOM GAP BLANK RATIO,
+  DISTINCTIVE GAS TEST GLASS;
+
+Construction,
+  D KRYPTON WINDOW CONSTRUCTION,
+  DISTINCTIVE GAS TEST GLASS,
+  DISTINCTIVE KRYPTON GAP,
+  DISTINCTIVE GAS TEST GLASS;
+
+Construction,
+  E XENON WINDOW CONSTRUCTION,
+  DISTINCTIVE GAS TEST GLASS,
+  DISTINCTIVE XENON GAP,
+  DISTINCTIVE GAS TEST GLASS;
+
+Construction,
+  F REUSED AIR WINDOW CONSTRUCTION,
+  DISTINCTIVE GAS TEST GLASS,
+  DISTINCTIVE AIR GAP,
+  DISTINCTIVE GAS TEST GLASS;
+
+Construction,
+  G OPAQUE HOST CONSTRUCTION,
+  DISTINCTIVE GAS OPAQUE HOST MATERIAL;
+
+Zone,GAS TEST ZONE,0,0,0,0,1,1,3,48,16;
+
+BuildingSurface:Detailed,
+  GAS TEST FLOOR,
+  Floor,
+  G OPAQUE HOST CONSTRUCTION,
+  GAS TEST ZONE,
+  ,
+  Ground,
+  ,
+  NoSun,
+  NoWind,
+  1.0,
+  4,
+  4,4,0,
+  4,0,0,
+  0,0,0,
+  0,4,0;
+
+BuildingSurface:Detailed,
+  GAS TEST ROOF,
+  Roof,
+  G OPAQUE HOST CONSTRUCTION,
+  GAS TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.0,
+  4,
+  0,4,3,
+  0,0,3,
+  4,0,3,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  GAS TEST WEST WALL,
+  Wall,
+  G OPAQUE HOST CONSTRUCTION,
+  GAS TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,4,3,
+  0,4,0,
+  0,0,0,
+  0,0,3;
+
+BuildingSurface:Detailed,
+  GAS TEST EAST WALL,
+  Wall,
+  G OPAQUE HOST CONSTRUCTION,
+  GAS TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,0,3,
+  4,0,0,
+  4,4,0,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  DISTINCTIVE GAS WINDOW HOST WALL,
+  Wall,
+  G OPAQUE HOST CONSTRUCTION,
+  GAS TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,0,3,
+  0,0,0,
+  4,0,0,
+  4,0,3;
+
+BuildingSurface:Detailed,
+  GAS TEST NORTH WALL,
+  Wall,
+  G OPAQUE HOST CONSTRUCTION,
+  GAS TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,4,3,
+  4,4,0,
+  0,4,0,
+  0,4,3;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE GAS TEST WINDOW,
+  Window,
+  A AIR WINDOW CONSTRUCTION,
+  DISTINCTIVE GAS WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  0.2,0,2.8,
+  0.2,0,1.7,
+  1.1,0,1.7,
+  1.1,0,2.8;
+
+FenestrationSurface:Detailed,
+  GAS TEST ARGON WINDOW,
+  Window,
+  B ARGON WINDOW CONSTRUCTION,
+  DISTINCTIVE GAS WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  1.2,0,2.8,
+  1.2,0,1.7,
+  2.1,0,1.7,
+  2.1,0,2.8;
+
+FenestrationSurface:Detailed,
+  GAS TEST CUSTOM WINDOW,
+  Window,
+  C CUSTOM WINDOW CONSTRUCTION,
+  DISTINCTIVE GAS WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  2.2,0,2.8,
+  2.2,0,1.7,
+  3.1,0,1.7,
+  3.1,0,2.8;
+
+FenestrationSurface:Detailed,
+  GAS TEST KRYPTON WINDOW,
+  Window,
+  D KRYPTON WINDOW CONSTRUCTION,
+  DISTINCTIVE GAS WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  0.2,0,1.5,
+  0.2,0,0.4,
+  1.1,0,0.4,
+  1.1,0,1.5;
+
+FenestrationSurface:Detailed,
+  GAS TEST XENON WINDOW,
+  Window,
+  E XENON WINDOW CONSTRUCTION,
+  DISTINCTIVE GAS WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  1.2,0,1.5,
+  1.2,0,0.4,
+  2.1,0,0.4,
+  2.1,0,1.5;
+
+FenestrationSurface:Detailed,
+  GAS TEST REUSED AIR WINDOW,
+  Window,
+  F REUSED AIR WINDOW CONSTRUCTION,
+  DISTINCTIVE GAS WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  2.2,0,1.5,
+  2.2,0,0.4,
+  3.1,0,0.4,
+  3.1,0,1.5;
+
+Output:Variable,*,Zone Mean Air Temperature,Hourly;
+
+Output:Constructions,Constructions;
+
+Output:Surfaces:List,Details;

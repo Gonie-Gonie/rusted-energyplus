@@ -401,15 +401,22 @@ host, and detailed-window rows prove fixture use only on the oracle side.
 Their layer semantics, U-factor, SHGC, solar transmittance, surface behavior,
 and runtime are not Rust parity claims.
 
-`WindowMaterial:Gas` has Rust typed/unit-test evidence only at this checkpoint.
-Compiler tests lock all four standard-gas constant records and source
-replacement of valid custom fields; Custom coefficient storage, missing-ratio
-zero, 300 K conductivity and nominal-resistance derivation; required fields,
-enum and numeric bounds, shared-name and source order; typed coverage; and the
-exact `Glass (Gas Glass){0..3}` Construction subset. Runtime-boundary tests
-separately lock its explicit arbitrary-run block. No Gas family case,
-EnergyPlus EIO/external comparison evidence, window thermal execution, or
-conformance claim is added yet.
+`WindowMaterial:Gas` compiler tests lock all four standard-gas constant records
+and source replacement of valid custom fields; Custom coefficient storage,
+missing-ratio zero, 300 K conductivity and nominal-resistance derivation;
+required fields, enum and numeric bounds, shared-name and source order; typed
+coverage; and the exact `Glass (Gas Glass){0..3}` Construction subset.
+`window_material_gas_001` adds a nonblocking EnergyPlus 26.1 exact-EIO gate for
+the duplicate-aware multiset of gas-layer occurrences in ordinary window
+Constructions. It covers Air, Argon, Krypton, Xenon, and Custom, repeats a
+reused gas, excludes an unused definition, and compares material name, gas
+type, and thickness for every occurrence. Multiplicity, name, and canonical
+type are exact; Rust thickness is normalized with the source `{:.3R}` policy
+before an exact numeric comparison. EIO does not expose Custom
+coefficients, resolved properties, or nominal resistance, so those remain
+typed-test evidence only. Runtime-boundary tests separately lock the explicit
+arbitrary-run block. Rust/EnergyPlus row-order parity, window optics and thermal
+execution, runtime behavior, and conformance remain unclaimed.
 
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
@@ -465,12 +472,16 @@ retaining raw n/k as typed-only evidence.
 and all 14 solar/infrared numeric fields, while retaining 11 visible inputs
 and thermal resistance as typed-only evidence and treating the
 equivalent-layer construction and surface rows as oracle-only fixture locks.
+`window_material_gas_001` compares every ordinary-window gas-layer occurrence
+as a duplicate-aware multiset across all five gas types. Multiplicity, name,
+and canonical gas type are exact, and thickness is exact after source
+`{:.3R}` normalization. Custom coefficients/properties and nominal resistance
+remain typed-only because the EIO row omits them.
 These tests and static EIO smokes remain bounded evidence, not an EnergyPlus
 material-family or window gate.
 
-Gas remains typed-only here: there is no Gas EIO smoke or external EnergyPlus
-case in this checkpoint, and the compiler tests do not promote numerical
-window behavior.
+The Gas EIO smoke does not promote numerical window behavior, runtime
+execution, or conformance.
 
 CP58 remains incomplete until, at minimum:
 

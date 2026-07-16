@@ -123,4 +123,5 @@ Case metadata is read from `data/conformance_cases/*/case.toml`.
 | window_glazing_equivalent_layer_001 | v0.8-heat-balance | smoke | false | A | zone, surface, construction | diagnostic | data/conformance_cases/window_glazing_equivalent_layer_001/case.toml |
 | window_glazing_refraction_extinction_001 | v0.8-heat-balance | smoke | false | A | zone, surface, construction | diagnostic | data/conformance_cases/window_glazing_refraction_extinction_001/case.toml |
 | window_glazing_spectral_average_001 | v0.8-heat-balance | smoke | false | A | zone, surface, construction | diagnostic | data/conformance_cases/window_glazing_spectral_average_001/case.toml |
+| window_material_gas_001 | v0.8-heat-balance | smoke | false | A | zone, surface, construction | diagnostic | data/conformance_cases/window_material_gas_001/case.toml |
 | zone_temperature_diagnostic_001 | P2-heat-balance-diagnostics | diagnostic-only | false | B | zone, surface | diagnostic | data/conformance_cases/zone_temperature_diagnostic_001/case.toml |

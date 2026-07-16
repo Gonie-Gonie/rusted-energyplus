@@ -839,6 +839,59 @@ pub fn parse_eio_window_material_glazing(
     Ok(glazing_rows)
 }
 
+/// Parses `WindowMaterial:Gas` rows from EnergyPlus EIO contents.
+///
+/// Rows are returned in emission order and repeated material names are
+/// preserved. EnergyPlus 26.1 emits these rows for gas-layer occurrences in
+/// reported non-BSDF ordinary window constructions.
+pub fn parse_eio_window_material_gas(
+    contents: &str,
+) -> Result<Vec<EioWindowMaterialGas>, EioError> {
+    const FIELD_COUNT: usize = 4;
+    const ROW_LABEL: &str = "WindowMaterial:Gas,";
+
+    let mut gas_rows = Vec::new();
+    for (line_index, line) in contents.lines().enumerate() {
+        let line_number = line_index + 1;
+        let trimmed = line.trim();
+        if !trimmed.starts_with(ROW_LABEL) {
+            continue;
+        }
+
+        let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+        if fields.len() != FIELD_COUNT {
+            return Err(EioError::InvalidWindowMaterialGas {
+                line: line_number,
+                text: line.to_string(),
+                reason: format!(
+                    "expected exactly 3 data fields after the row label ({FIELD_COUNT} comma-separated fields total), found {} data fields",
+                    fields.len().saturating_sub(1)
+                ),
+            });
+        }
+
+        let material_name =
+            required_window_gas_field(&fields, 1, line_number, line, "Material Name")?
+                .to_ascii_uppercase();
+        let gas_type =
+            required_window_gas_field(&fields, 2, line_number, line, "Gas Type")?.to_string();
+        let thickness_m =
+            parse_window_gas_f64_field(&fields, 3, line_number, line, "Thickness {m}")?;
+
+        gas_rows.push(EioWindowMaterialGas {
+            material_name,
+            gas_type,
+            thickness_m,
+        });
+    }
+
+    if gas_rows.is_empty() {
+        return Err(EioError::MissingWindowMaterialGas);
+    }
+
+    Ok(gas_rows)
+}
+
 /// Parses `WindowMaterial:Glazing:EquivalentLayer` EIO rows.
 ///
 /// Rows are returned in emission order and repeated material names are
@@ -1246,6 +1299,49 @@ fn parse_window_glazing_bool_field(
             reason: format!("invalid {field}: expected Yes or No"),
         }),
     }
+}
+
+fn required_window_gas_field<'a>(
+    fields: &'a [&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<&'a str, EioError> {
+    let value = required_field(fields, index);
+    if value.is_empty() {
+        Err(EioError::InvalidWindowMaterialGas {
+            line,
+            text: text.to_string(),
+            reason: format!("missing {field}"),
+        })
+    } else {
+        Ok(value)
+    }
+}
+
+fn parse_window_gas_f64_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<f64, EioError> {
+    let value = required_field(fields, index)
+        .parse::<f64>()
+        .map_err(|_error| EioError::InvalidWindowMaterialGas {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })?;
+    if !value.is_finite() || value <= 0.0 {
+        return Err(EioError::InvalidWindowMaterialGas {
+            line,
+            text: text.to_string(),
+            reason: format!("{field} must be finite and greater than zero"),
+        });
+    }
+    Ok(value)
 }
 
 fn required_window_glazing_equivalent_layer_field<'a>(

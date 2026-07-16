@@ -1,0 +1,74 @@
+id = "window_material_gas_001"
+title = "Window material single-gas static evidence"
+milestone = "v0.8-heat-balance"
+purpose = "Compare the bounded Rust WindowMaterial:Gas typed slice with EnergyPlus repeated gas-layer EIO evidence across all five gas types."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The fixture defines Air, Argon, Custom, Krypton, and Xenon single-gas materials and places each in a valid Glass-Gas-Glass ordinary window construction.",
+  "The Air material is reused by a second alphabetically ordered construction, so the EnergyPlus EIO contains six gas-layer occurrences for five material objects in deterministic construction order.",
+  "A sixth, valid Air definition is deliberately unused. Its absence from the EIO locks that WindowMaterial:Gas rows are construction-layer occurrences and that unused definitions are excluded.",
+  "The Custom gas has valid, nondefault A+B*T+C*T^2 property coefficients and deliberately omits its specific-heat ratio. EnergyPlus 26.1 stores that numeric blank as zero and its source path does not validate it; the bounded Rust typed slice intentionally preserves this source-actual quirk.",
+  "All six constructions are assigned to nonoverlapping FenestrationSurface:Detailed objects on one distinct opaque host wall so the oracle run is warning-free. The named Air window and its host supply the exact fixture-integrity rows; construction ratings and window heat-transfer behavior remain oracle-only evidence.",
+  "The smoke gate requires a clean EnergyPlus 26.1.0 run, the exact gas EIO header, the exact ordered six-row gas occurrence sequence, and exact host/window integrity rows before invoking the Rust typed-value bridge.",
+  "The Rust bridge compares occurrence count, material name, and canonical gas type exactly, and compares thickness exactly after reproducing the EnergyPlus 26.1 {:.3R} EIO serialization policy.",
+  "This is non-blocking diagnostic-only static input evidence. It makes no claim for window heat-transfer runtime, optical calculations, construction ratings, whole-window behavior, dynamic simulation parity, or WindowMaterial:Gas conformance.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/window_material_gas_001/window_material_gas.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface", "construction"]
+has_zone = true
+has_surface = true
+has_fenestration = true
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/window_material_gas_001/window_material_gas.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+epjson = ".runtime/compare-window-material-gas/26.1.0/window-material-gas.epJSON"
+
+[[outputs]]
+key = "*"
+variable = "WindowMaterial:Gas Layer Occurrences"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "*"
+variable = "WindowConstruction Layer Summary"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "DISTINCTIVE GAS TEST WINDOW"
+variable = "HeatTransfer Surface Static Inputs"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/window_material_gas_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-window-material-gas-smoke"
+blocking = false
