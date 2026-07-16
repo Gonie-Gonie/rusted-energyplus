@@ -28,10 +28,11 @@ use ep_model::{
     SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
     ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
     TypedModel, Version, VertexEntryDirection, WeekScheduleId, WindExposure,
-    WindowDrapeEquivalentLayerMaterial, WindowGapEquivalentLayerMaterial, WindowGapVentType,
-    WindowGasMaterial, WindowGasMixture, WindowGasMixtureComponent, WindowGasMixtureMaterial,
-    WindowGasPolynomialCoefficients, WindowGasProperties, WindowGasType,
-    WindowGlazingEquivalentLayerDiffuseProperties,
+    WindowBlindDirectionalOpticalProperties, WindowBlindMaterial, WindowBlindSlatAngleType,
+    WindowBlindSlatOrientation, WindowDrapeEquivalentLayerMaterial,
+    WindowGapEquivalentLayerMaterial, WindowGapVentType, WindowGasMaterial, WindowGasMixture,
+    WindowGasMixtureComponent, WindowGasMixtureMaterial, WindowGasPolynomialCoefficients,
+    WindowGasProperties, WindowGasType, WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
     WindowGlazingSpectralAverageMaterial, WindowScreenBeamReflectanceModel,
@@ -58,6 +59,7 @@ enum WindowConstructionLayerKind {
     Gap,
     Shade,
     Screen,
+    Blind,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -80,6 +82,7 @@ fn window_construction_layer_kind(
         }
         MaterialDefinition::WindowShade(_) => Some(WindowConstructionLayerKind::Shade),
         MaterialDefinition::WindowScreen(_) => Some(WindowConstructionLayerKind::Screen),
+        MaterialDefinition::WindowBlind(_) => Some(WindowConstructionLayerKind::Blind),
         MaterialDefinition::Regular(_)
         | MaterialDefinition::NoMass(_)
         | MaterialDefinition::AirGap(_)
@@ -105,6 +108,7 @@ fn window_glazing_is_solar_diffusing(definition: &MaterialDefinition) -> bool {
         | MaterialDefinition::WindowGasMixture(_)
         | MaterialDefinition::WindowShade(_)
         | MaterialDefinition::WindowScreen(_)
+        | MaterialDefinition::WindowBlind(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
         | MaterialDefinition::WindowShadeEquivalentLayer(_)
         | MaterialDefinition::WindowDrapeEquivalentLayer(_)
@@ -142,6 +146,7 @@ fn window_gap_signature(definition: &MaterialDefinition) -> Option<WindowGapSign
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowShade(_)
         | MaterialDefinition::WindowScreen(_)
+        | MaterialDefinition::WindowBlind(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
         | MaterialDefinition::WindowShadeEquivalentLayer(_)
         | MaterialDefinition::WindowDrapeEquivalentLayer(_)
@@ -382,6 +387,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "WindowMaterial:Drape:EquivalentLayer",
     "WindowMaterial:Screen",
     "WindowMaterial:Screen:EquivalentLayer",
+    "WindowMaterial:Blind",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -960,6 +966,7 @@ impl<'a> Compiler<'a> {
         self.parse_window_drape_equivalent_layer_materials(model);
         self.parse_window_screen_materials(model);
         self.parse_window_screen_equivalent_layer_materials(model);
+        self.parse_window_blind_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -3540,6 +3547,495 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_window_blind_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowMaterial:Blind";
+        const OPTICAL_LIMIT: f64 = 1.0;
+        const BEAM_DIFFUSE_TOLERANCE: f64 = 1.0e-5;
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let slat_orientation = self.enum_default(
+                OBJECT_TYPE,
+                &name,
+                (&object, "slat_orientation"),
+                WindowBlindSlatOrientation::Horizontal,
+                "Horizontal",
+                WindowBlindSlatOrientation::from_energyplus_name,
+            );
+            let slat_width_m = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "slat_width",
+                (0.0, false),
+                (1.0, true),
+            );
+            let slat_separation_m = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "slat_separation",
+                (0.0, false),
+                (1.0, true),
+            );
+            let slat_thickness_m = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "slat_thickness",
+                0.00025,
+                (0.0, false),
+                (0.1, true),
+            );
+            let slat_angle_deg = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "slat_angle",
+                45.0,
+                0.0..=180.0,
+            );
+            let slat_conductivity_w_per_m_k = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "slat_conductivity",
+                221.0,
+                (0.0, false),
+                (f64::INFINITY, true),
+            );
+
+            let slat_beam_solar_transmittance = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "slat_beam_solar_transmittance",
+                0.0,
+                (0.0, true),
+                (1.0, false),
+            );
+            let front_side_slat_beam_solar_reflectance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "front_side_slat_beam_solar_reflectance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let back_side_slat_beam_solar_reflectance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "back_side_slat_beam_solar_reflectance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let slat_diffuse_solar_transmittance = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "slat_diffuse_solar_transmittance",
+                0.0,
+                (0.0, true),
+                (1.0, false),
+            );
+            let front_side_slat_diffuse_solar_reflectance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "front_side_slat_diffuse_solar_reflectance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let back_side_slat_diffuse_solar_reflectance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "back_side_slat_diffuse_solar_reflectance",
+                (0.0, true),
+                (1.0, false),
+            );
+
+            let slat_beam_visible_transmittance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "slat_beam_visible_transmittance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let front_side_slat_beam_visible_reflectance = self
+                .optional_number_bounded(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "front_side_slat_beam_visible_reflectance",
+                    (0.0, true),
+                    (1.0, false),
+                )
+                .unwrap_or(0.0);
+            let back_side_slat_beam_visible_reflectance = self
+                .optional_number_bounded(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "back_side_slat_beam_visible_reflectance",
+                    (0.0, true),
+                    (1.0, false),
+                )
+                .unwrap_or(0.0);
+            let slat_diffuse_visible_transmittance = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "slat_diffuse_visible_transmittance",
+                0.0,
+                (0.0, true),
+                (1.0, false),
+            );
+            let front_side_slat_diffuse_visible_reflectance = self
+                .optional_number_bounded(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "front_side_slat_diffuse_visible_reflectance",
+                    (0.0, true),
+                    (1.0, false),
+                )
+                .unwrap_or(0.0);
+            let back_side_slat_diffuse_visible_reflectance = self
+                .optional_number_bounded(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "back_side_slat_diffuse_visible_reflectance",
+                    (0.0, true),
+                    (1.0, false),
+                )
+                .unwrap_or(0.0);
+
+            let slat_infrared_hemispherical_transmittance = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "slat_infrared_hemispherical_transmittance",
+                0.0,
+                (0.0, true),
+                (1.0, false),
+            );
+            let front_side_slat_infrared_hemispherical_emissivity = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "front_side_slat_infrared_hemispherical_emissivity",
+                0.9,
+                (0.0, true),
+                (1.0, false),
+            );
+            let back_side_slat_infrared_hemispherical_emissivity = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "back_side_slat_infrared_hemispherical_emissivity",
+                0.9,
+                (0.0, true),
+                (1.0, false),
+            );
+            let blind_to_glass_distance_m = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "blind_to_glass_distance",
+                0.05,
+                0.01..=1.0,
+            );
+            let top_opening_multiplier = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "blind_top_opening_multiplier",
+                0.5,
+                0.0..=1.0,
+            );
+            let bottom_opening_multiplier = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "blind_bottom_opening_multiplier",
+                0.0,
+                0.0..=1.0,
+            );
+            let left_side_opening_multiplier = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "blind_left_side_opening_multiplier",
+                0.5,
+                0.0..=1.0,
+            );
+            let right_side_opening_multiplier = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "blind_right_side_opening_multiplier",
+                0.5,
+                0.0..=1.0,
+            );
+            let minimum_slat_angle_deg = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "minimum_slat_angle",
+                0.0,
+                0.0..=180.0,
+            );
+            let maximum_slat_angle_deg = self.number_range_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "maximum_slat_angle",
+                180.0,
+                0.0..=180.0,
+            );
+
+            let (
+                Some(slat_width_m),
+                Some(slat_separation_m),
+                Some(front_side_slat_beam_solar_reflectance),
+                Some(back_side_slat_beam_solar_reflectance),
+                Some(front_side_slat_diffuse_solar_reflectance),
+                Some(back_side_slat_diffuse_solar_reflectance),
+                Some(slat_beam_visible_transmittance),
+            ) = (
+                slat_width_m,
+                slat_separation_m,
+                front_side_slat_beam_solar_reflectance,
+                back_side_slat_beam_solar_reflectance,
+                front_side_slat_diffuse_solar_reflectance,
+                back_side_slat_diffuse_solar_reflectance,
+                slat_beam_visible_transmittance,
+            )
+            else {
+                continue;
+            };
+
+            if slat_width_m < slat_separation_m {
+                self.warning(
+                    "WindowBlindSlatWidthLessThanSeparation",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("slat_width"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} slat width {slat_width_m} m is less than slat separation {slat_separation_m} m; direct beam can pass when the slat angle is zero"
+                    ),
+                );
+            }
+
+            let optical_sums = [
+                (
+                    "front_side_slat_beam_solar_reflectance",
+                    slat_beam_solar_transmittance + front_side_slat_beam_solar_reflectance,
+                ),
+                (
+                    "back_side_slat_beam_solar_reflectance",
+                    slat_beam_solar_transmittance + back_side_slat_beam_solar_reflectance,
+                ),
+                (
+                    "front_side_slat_diffuse_solar_reflectance",
+                    slat_diffuse_solar_transmittance + front_side_slat_diffuse_solar_reflectance,
+                ),
+                (
+                    "back_side_slat_diffuse_solar_reflectance",
+                    slat_diffuse_solar_transmittance + back_side_slat_diffuse_solar_reflectance,
+                ),
+                (
+                    "front_side_slat_beam_visible_reflectance",
+                    slat_beam_visible_transmittance + front_side_slat_beam_visible_reflectance,
+                ),
+                (
+                    "back_side_slat_beam_visible_reflectance",
+                    slat_beam_visible_transmittance + back_side_slat_beam_visible_reflectance,
+                ),
+                (
+                    "front_side_slat_diffuse_visible_reflectance",
+                    slat_diffuse_visible_transmittance
+                        + front_side_slat_diffuse_visible_reflectance,
+                ),
+                (
+                    "back_side_slat_diffuse_visible_reflectance",
+                    slat_diffuse_visible_transmittance + back_side_slat_diffuse_visible_reflectance,
+                ),
+                (
+                    "front_side_slat_infrared_hemispherical_emissivity",
+                    slat_infrared_hemispherical_transmittance
+                        + front_side_slat_infrared_hemispherical_emissivity,
+                ),
+                (
+                    "back_side_slat_infrared_hemispherical_emissivity",
+                    slat_infrared_hemispherical_transmittance
+                        + back_side_slat_infrared_hemispherical_emissivity,
+                ),
+            ];
+            let mut valid = true;
+            for (field, sum) in optical_sums {
+                if sum >= OPTICAL_LIMIT {
+                    self.error(
+                        "InvalidWindowBlindOpticalSum",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some(field),
+                        format!(
+                            "{OBJECT_TYPE}/{name} transmittance plus reflectance or emissivity for field {field} must be less than 1.0, got {sum}"
+                        ),
+                    );
+                    valid = false;
+                }
+            }
+
+            let beam_diffuse_pairs = [
+                (
+                    "slat_diffuse_solar_transmittance",
+                    slat_beam_solar_transmittance,
+                    slat_diffuse_solar_transmittance,
+                ),
+                (
+                    "front_side_slat_diffuse_solar_reflectance",
+                    front_side_slat_beam_solar_reflectance,
+                    front_side_slat_diffuse_solar_reflectance,
+                ),
+                (
+                    "back_side_slat_diffuse_solar_reflectance",
+                    back_side_slat_beam_solar_reflectance,
+                    back_side_slat_diffuse_solar_reflectance,
+                ),
+                (
+                    "slat_diffuse_visible_transmittance",
+                    slat_beam_visible_transmittance,
+                    slat_diffuse_visible_transmittance,
+                ),
+                (
+                    "front_side_slat_diffuse_visible_reflectance",
+                    front_side_slat_beam_visible_reflectance,
+                    front_side_slat_diffuse_visible_reflectance,
+                ),
+                (
+                    "back_side_slat_diffuse_visible_reflectance",
+                    back_side_slat_beam_visible_reflectance,
+                    back_side_slat_diffuse_visible_reflectance,
+                ),
+            ];
+            for (field, beam, diffuse) in beam_diffuse_pairs {
+                if (beam - diffuse).abs() > BEAM_DIFFUSE_TOLERANCE {
+                    self.error(
+                        "InvalidWindowBlindBeamDiffuseMismatch",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some(field),
+                        format!(
+                            "{OBJECT_TYPE}/{name} beam and diffuse slat properties for field {field} must differ by no more than {BEAM_DIFFUSE_TOLERANCE}, got {beam} and {diffuse}"
+                        ),
+                    );
+                    valid = false;
+                }
+            }
+
+            if blind_to_glass_distance_m < 0.5 * slat_width_m {
+                self.error(
+                    "InvalidWindowBlindToGlassDistance",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("blind_to_glass_distance"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} blind-to-glass distance {blind_to_glass_distance_m} m must be at least half the slat width {slat_width_m} m"
+                    ),
+                );
+                valid = false;
+            }
+
+            if slat_separation_m + slat_thickness_m < slat_width_m {
+                let minimum_geometry_angle_deg = (slat_thickness_m
+                    / (slat_thickness_m + slat_separation_m))
+                    .asin()
+                    .to_degrees();
+                let maximum_geometry_angle_deg = 180.0 - minimum_geometry_angle_deg;
+                if slat_angle_deg < minimum_geometry_angle_deg
+                    || slat_angle_deg > maximum_geometry_angle_deg
+                {
+                    self.error(
+                        "InvalidWindowBlindSlatGeometry",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some("slat_angle"),
+                        format!(
+                            "{OBJECT_TYPE}/{name} slat angle {slat_angle_deg} degrees must be between the geometry limits {minimum_geometry_angle_deg} and {maximum_geometry_angle_deg} degrees"
+                        ),
+                    );
+                    valid = false;
+                }
+            }
+
+            if !valid {
+                continue;
+            }
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::WindowBlind(WindowBlindMaterial {
+                    roughness: MaterialSurfaceRoughness::Rough,
+                    slat_orientation,
+                    slat_width_m,
+                    slat_separation_m,
+                    slat_thickness_m,
+                    slat_angle_deg,
+                    slat_conductivity_w_per_m_k,
+                    solar_beam_diffuse: WindowBlindDirectionalOpticalProperties {
+                        transmittance: slat_beam_solar_transmittance,
+                        front_reflectance: front_side_slat_beam_solar_reflectance,
+                        back_reflectance: back_side_slat_beam_solar_reflectance,
+                    },
+                    solar_diffuse_diffuse: WindowBlindDirectionalOpticalProperties {
+                        transmittance: slat_diffuse_solar_transmittance,
+                        front_reflectance: front_side_slat_diffuse_solar_reflectance,
+                        back_reflectance: back_side_slat_diffuse_solar_reflectance,
+                    },
+                    visible_beam_diffuse: WindowBlindDirectionalOpticalProperties {
+                        transmittance: slat_beam_visible_transmittance,
+                        front_reflectance: front_side_slat_beam_visible_reflectance,
+                        back_reflectance: back_side_slat_beam_visible_reflectance,
+                    },
+                    visible_diffuse_diffuse: WindowBlindDirectionalOpticalProperties {
+                        transmittance: slat_diffuse_visible_transmittance,
+                        front_reflectance: front_side_slat_diffuse_visible_reflectance,
+                        back_reflectance: back_side_slat_diffuse_visible_reflectance,
+                    },
+                    front_infrared_transmittance: slat_infrared_hemispherical_transmittance,
+                    back_infrared_transmittance: slat_infrared_hemispherical_transmittance,
+                    front_infrared_emissivity: front_side_slat_infrared_hemispherical_emissivity,
+                    back_infrared_emissivity: back_side_slat_infrared_hemispherical_emissivity,
+                    blind_to_glass_distance_m,
+                    top_opening_multiplier,
+                    bottom_opening_multiplier,
+                    left_side_opening_multiplier,
+                    right_side_opening_multiplier,
+                    minimum_slat_angle_deg,
+                    maximum_slat_angle_deg,
+                    slat_angle_type: WindowBlindSlatAngleType::Fixed,
+                    slat_crown_m: 0.0,
+                    base_thickness_m: 0.0,
+                    base_conductivity_w_per_m_k: 0.0,
+                    base_thermal_resistance_m2_k_per_w: 0.0,
+                    base_solar_absorptance: 0.0,
+                    base_visible_absorptance: 0.0,
+                    base_thermal_absorptance: 0.0,
+                }),
+            });
+        }
+    }
+
     fn reserve_material_identity(
         &mut self,
         model: &mut TypedModel,
@@ -3583,12 +4079,28 @@ impl<'a> Compiler<'a> {
             };
             let mut layers = vec![outside_layer];
             let mut layers_valid = true;
+            let mut first_missing_layer_number = None;
             for layer_number in 2..=MAX_OPAQUE_CONSTRUCTION_LAYERS {
                 let field = format!("layer_{layer_number}");
                 let Some(layer_name) = self.optional_string("Construction", &name, &object, &field)
                 else {
+                    first_missing_layer_number.get_or_insert(layer_number);
                     continue;
                 };
+                if let Some(missing_layer_number) = first_missing_layer_number {
+                    let missing_field = format!("layer_{missing_layer_number}");
+                    self.error(
+                        "NonContiguousConstructionLayers",
+                        "Construction",
+                        Some(&name),
+                        Some(&missing_field),
+                        format!(
+                            "Construction/{name} field {missing_field} is blank or missing before populated field {field}; construction layers must be contiguous"
+                        ),
+                    );
+                    layers_valid = false;
+                    continue;
+                }
                 let Some(layer) = self.resolve_name(
                     &model.material_names,
                     "Construction",
@@ -3703,6 +4215,7 @@ impl<'a> Compiler<'a> {
                             material.definition,
                             MaterialDefinition::WindowShade(_)
                                 | MaterialDefinition::WindowScreen(_)
+                                | MaterialDefinition::WindowBlind(_)
                         )
                     })
             });
@@ -3892,7 +4405,7 @@ impl<'a> Compiler<'a> {
                 Some(construction_name),
                 None,
                 format!(
-                    "Construction/{construction_name} contains a material outside the ordinary Glass, Gas, GasMixture, Shade, and Screen subset"
+                    "Construction/{construction_name} contains a material outside the ordinary Glass, Gas, GasMixture, Shade, Screen, and Blind subset"
                 ),
             );
             return None;
@@ -3911,9 +4424,16 @@ impl<'a> Compiler<'a> {
                 (*kind == WindowConstructionLayerKind::Screen).then_some(index)
             })
             .collect::<Vec<_>>();
+        let blind_indices = kinds
+            .iter()
+            .enumerate()
+            .filter_map(|(index, kind)| {
+                (*kind == WindowConstructionLayerKind::Blind).then_some(index)
+            })
+            .collect::<Vec<_>>();
 
         if !screen_indices.is_empty() {
-            if screen_indices.len() != 1 || !shade_indices.is_empty() {
+            if screen_indices.len() != 1 || !shade_indices.is_empty() || !blind_indices.is_empty() {
                 let layer_index = screen_indices.get(1).copied().unwrap_or(screen_indices[0]);
                 let layer_field = construction_layer_field(layer_index);
                 self.error(
@@ -3922,9 +4442,10 @@ impl<'a> Compiler<'a> {
                     Some(construction_name),
                     Some(&layer_field),
                     format!(
-                        "Construction/{construction_name} must contain exactly one WindowMaterial:Screen and no other shading device; found {} screens and {} shades",
+                        "Construction/{construction_name} must contain exactly one WindowMaterial:Screen and no other shading device; found {} screens, {} shades, and {} blinds",
                         screen_indices.len(),
-                        shade_indices.len()
+                        shade_indices.len(),
+                        blind_indices.len()
                     ),
                 );
                 return None;
@@ -3988,7 +4509,32 @@ impl<'a> Compiler<'a> {
             return Some(ConstructionKind::Fenestration);
         }
 
-        if shade_indices.len() != 1 {
+        if !blind_indices.is_empty() {
+            if blind_indices.len() != 1 || !shade_indices.is_empty() {
+                let layer_index = blind_indices.get(1).copied().unwrap_or(blind_indices[0]);
+                let layer_field = construction_layer_field(layer_index);
+                self.error(
+                    "InvalidWindowBlindCount",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&layer_field),
+                    format!(
+                        "Construction/{construction_name} must contain exactly one WindowMaterial:Blind and no other shading device; found {} blinds and {} shades",
+                        blind_indices.len(),
+                        shade_indices.len()
+                    ),
+                );
+                return None;
+            }
+            return self.validate_blind_window_material_layers(
+                construction_name,
+                &materials,
+                &kinds,
+                blind_indices[0],
+            );
+        }
+
+        if shade_indices.len() != 1 || !blind_indices.is_empty() {
             let layer_index = shade_indices.get(1).copied().unwrap_or(0);
             let layer_field = construction_layer_field(layer_index);
             self.error(
@@ -4132,6 +4678,165 @@ impl<'a> Compiler<'a> {
                     format!(
                         "Construction/{construction_name} requires adjacent between-glass Shade gap thicknesses to differ by no more than 0.0005 m; got {} m and {} m",
                         left_gap.thickness_m, right_gap.thickness_m
+                    ),
+                );
+                return None;
+            }
+        }
+
+        Some(ConstructionKind::Fenestration)
+    }
+
+    fn validate_blind_window_material_layers(
+        &mut self,
+        construction_name: &str,
+        materials: &[&Material],
+        kinds: &[WindowConstructionLayerKind],
+        blind_index: usize,
+    ) -> Option<ConstructionKind> {
+        if let Some((layer_index, material)) = materials
+            .iter()
+            .enumerate()
+            .find(|(_, material)| window_glazing_is_solar_diffusing(&material.definition))
+        {
+            let layer_field = construction_layer_field(layer_index);
+            self.error(
+                "InvalidSolarDiffusingGlazingWithBlind",
+                "Construction",
+                Some(construction_name),
+                Some(&layer_field),
+                format!(
+                    "Construction/{construction_name} cannot combine solar-diffusing glazing {} with WindowMaterial:Blind",
+                    material.name.0
+                ),
+            );
+            return None;
+        }
+
+        // Match the Shade boundary: EnergyPlus's broad end-layer checks admit
+        // gap-separated end devices even though downstream initialization
+        // requires the exterior/interior device to touch glazing directly.
+        let unsafe_exterior_hole = matches!(
+            kinds,
+            [
+                WindowConstructionLayerKind::Blind,
+                WindowConstructionLayerKind::Gap,
+                WindowConstructionLayerKind::Glass
+            ]
+        );
+        let unsafe_interior_hole = matches!(
+            kinds,
+            [
+                WindowConstructionLayerKind::Glass,
+                WindowConstructionLayerKind::Gap,
+                WindowConstructionLayerKind::Blind
+            ]
+        );
+        if unsafe_exterior_hole || unsafe_interior_hole {
+            let layer_field = construction_layer_field(blind_index);
+            self.error(
+                "UnsafeWindowBlindEndLayering",
+                "Construction",
+                Some(construction_name),
+                Some(&layer_field),
+                format!(
+                    "Construction/{construction_name} uses a Blind-Gap-Glass end pattern outside the safe typed subset; an exterior or interior Blind must be directly adjacent to glazing"
+                ),
+            );
+            return None;
+        }
+
+        let exterior = kinds.first() == Some(&WindowConstructionLayerKind::Blind)
+            && is_plain_window_stack(&kinds[1..]);
+        let interior = kinds.last() == Some(&WindowConstructionLayerKind::Blind)
+            && is_plain_window_stack(&kinds[..kinds.len() - 1]);
+        let between_double = matches!(
+            kinds,
+            [
+                WindowConstructionLayerKind::Glass,
+                WindowConstructionLayerKind::Gap,
+                WindowConstructionLayerKind::Blind,
+                WindowConstructionLayerKind::Gap,
+                WindowConstructionLayerKind::Glass
+            ]
+        );
+        let between_triple = matches!(
+            kinds,
+            [
+                WindowConstructionLayerKind::Glass,
+                WindowConstructionLayerKind::Gap,
+                WindowConstructionLayerKind::Glass,
+                WindowConstructionLayerKind::Gap,
+                WindowConstructionLayerKind::Blind,
+                WindowConstructionLayerKind::Gap,
+                WindowConstructionLayerKind::Glass
+            ]
+        );
+
+        if !(exterior || interior || between_double || between_triple) {
+            let layer_field = construction_layer_field(blind_index);
+            self.error(
+                "InvalidWindowBlindConstructionLayering",
+                "Construction",
+                Some(construction_name),
+                Some(&layer_field),
+                format!(
+                    "Construction/{construction_name} has an unsupported Blind placement; the safe typed subset permits exterior or interior Blind directly against one-to-four panes, or between-glass Blind in the source-defined double- and triple-pane positions"
+                ),
+            );
+            return None;
+        }
+
+        if between_double || between_triple {
+            let left_gap = window_gap_signature(&materials[blind_index - 1].definition)?;
+            let right_gap = window_gap_signature(&materials[blind_index + 1].definition)?;
+
+            if left_gap.gas_types != right_gap.gas_types
+                || left_gap.fractions != right_gap.fractions
+            {
+                let layer_field = construction_layer_field(blind_index + 1);
+                self.error(
+                    "InvalidBetweenGlassBlindGasComposition",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&layer_field),
+                    format!(
+                        "Construction/{construction_name} requires identical gas species and fractions on both sides of its between-glass Blind"
+                    ),
+                );
+                return None;
+            }
+            if (left_gap.thickness_m - right_gap.thickness_m).abs()
+                > MAX_BETWEEN_GLASS_SHADE_GAP_THICKNESS_DIFFERENCE_M
+            {
+                let layer_field = construction_layer_field(blind_index + 1);
+                self.error(
+                    "InvalidBetweenGlassBlindGapThickness",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&layer_field),
+                    format!(
+                        "Construction/{construction_name} requires adjacent between-glass Blind gap thicknesses to differ by no more than 0.0005 m; got {} m and {} m",
+                        left_gap.thickness_m, right_gap.thickness_m
+                    ),
+                );
+                return None;
+            }
+
+            let MaterialDefinition::WindowBlind(blind) = &materials[blind_index].definition else {
+                return None;
+            };
+            let adjacent_gap_thickness_m = left_gap.thickness_m + right_gap.thickness_m;
+            if adjacent_gap_thickness_m < blind.slat_width_m {
+                let layer_field = construction_layer_field(blind_index);
+                self.error(
+                    "InvalidBetweenGlassBlindGapWidth",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&layer_field),
+                    format!(
+                        "Construction/{construction_name} requires the two adjacent between-glass Blind gaps to total at least the slat width; got {adjacent_gap_thickness_m} m of gap and {} m of slat width",
+                        blind.slat_width_m
                     ),
                 );
                 return None;
@@ -11458,6 +12163,7 @@ mod tests {
     mod schedule_scalar_type_limits;
     mod schedule_week_compact;
     mod schedule_year;
+    mod window_material_blind;
     mod window_material_drape_equivalent_layer;
     mod window_material_gap_equivalent_layer;
     mod window_material_gas;

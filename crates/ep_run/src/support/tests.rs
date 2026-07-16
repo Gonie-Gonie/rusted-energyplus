@@ -596,6 +596,84 @@ fn typed_equivalent_layer_window_screens_including_unused_remain_run_blocked()
 }
 
 #[test]
+fn typed_window_blinds_including_unused_remain_run_blocked()
+-> Result<(), Box<dyn std::error::Error>> {
+    let raw = parse_epjson_str(
+        r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "Zone": {"Zone One": {"volume": 100}},
+                "WindowMaterial:Blind": {
+                    "Defaulted Blind": {
+                        "slat_width": 0.02,
+                        "slat_separation": 0.02,
+                        "front_side_slat_beam_solar_reflectance": 0.2,
+                        "back_side_slat_beam_solar_reflectance": 0.3,
+                        "front_side_slat_diffuse_solar_reflectance": 0.2,
+                        "back_side_slat_diffuse_solar_reflectance": 0.3,
+                        "slat_beam_visible_transmittance": 0.0
+                    },
+                    "Unused Vertical Blind": {
+                        "slat_orientation": "Vertical",
+                        "slat_width": 0.03,
+                        "slat_separation": 0.02,
+                        "slat_thickness": 0.001,
+                        "slat_angle": 60.0,
+                        "slat_conductivity": 15.0,
+                        "slat_beam_solar_transmittance": 0.11,
+                        "front_side_slat_beam_solar_reflectance": 0.22,
+                        "back_side_slat_beam_solar_reflectance": 0.33,
+                        "slat_diffuse_solar_transmittance": 0.11,
+                        "front_side_slat_diffuse_solar_reflectance": 0.22,
+                        "back_side_slat_diffuse_solar_reflectance": 0.33,
+                        "slat_beam_visible_transmittance": 0.14,
+                        "front_side_slat_beam_visible_reflectance": 0.25,
+                        "back_side_slat_beam_visible_reflectance": 0.35,
+                        "slat_diffuse_visible_transmittance": 0.14,
+                        "front_side_slat_diffuse_visible_reflectance": 0.25,
+                        "back_side_slat_diffuse_visible_reflectance": 0.35,
+                        "slat_infrared_hemispherical_transmittance": 0.12,
+                        "front_side_slat_infrared_hemispherical_emissivity": 0.70,
+                        "back_side_slat_infrared_hemispherical_emissivity": 0.60,
+                        "blind_to_glass_distance": 0.02,
+                        "blind_top_opening_multiplier": 0.1,
+                        "blind_bottom_opening_multiplier": 0.2,
+                        "blind_left_side_opening_multiplier": 0.3,
+                        "blind_right_side_opening_multiplier": 0.4,
+                        "minimum_slat_angle": 11.0,
+                        "maximum_slat_angle": 169.0
+                    }
+                }
+            }"#,
+    )?;
+    let result = compile_raw_model(&raw);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let assessment = assess_support(
+        &raw,
+        &result.report,
+        result.model.as_ref(),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+    );
+
+    assert_eq!(assessment.status, SupportStatus::Unsupported);
+    assert_eq!(assessment.run_result_state, RunResultState::RunBlocked);
+    assert_eq!(assessment.runtime_class, RuntimeClass::None);
+    assert!(assessment.unsupported_objects.iter().any(|entry| {
+        entry.object_type == "WindowMaterial:Blind"
+            && entry.count == 2
+            && entry.note
+                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+    }));
+    assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
+        diagnostic.code == "UnsupportedSurfaceBoundary"
+            && diagnostic.object_type.as_deref() == Some("WindowMaterial:Blind")
+    }));
+    Ok(())
+}
+
+#[test]
 fn missing_registry_capability_blocks_runtime_selection() -> Result<(), Box<dyn std::error::Error>>
 {
     let raw = parse_epjson_str(
