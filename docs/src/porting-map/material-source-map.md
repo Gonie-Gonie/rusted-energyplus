@@ -51,8 +51,8 @@ different:
 | inventoried public objects | 34 / 34 | Every in-boundary EnergyPlus 26.1 object is named below with its source owner and order. |
 | base definitions | 22 / 22 inventoried | `GetMaterialData` processing order is locked below. |
 | overlays and datasets | 12 / 12 inventoried | Common-startup or algorithm-local owner and order are locked below. |
-| typed Rust variants | 2 / 34 | Only `Material` and `Material:NoMass` belong to this bounded migration. |
-| deferred typed variants | 32 / 34 | The other 20 base definitions and all 12 overlays/datasets remain unported as variants. |
+| typed Rust variants | 4 / 34 | `Material`, `Material:NoMass`, `Material:AirGap`, and `Material:InfraredTransparent` belong to this bounded migration. |
+| deferred typed variants | 30 / 34 | The other 18 base definitions and all 12 overlays/datasets remain unported as variants. |
 
 This is a CP58 scaffold checkpoint. Complete inventory does not mean complete
 schema, validation, runtime, optics, moisture, phase-change, or heat-transfer
@@ -83,8 +83,8 @@ The following table is the public-object processing order inside
 |---:|---|---|---|
 | 1 | `Material` | regular opaque material with thickness, conductivity, density, specific heat, roughness, and absorptances | bounded typed `Regular` variant |
 | 2 | `Material:NoMass` | regular R-only opaque material with roughness, resistance, and absorptances | bounded typed `NoMass` variant |
-| 3 | `Material:AirGap` | opaque air-space resistance material | deferred |
-| 4 | `Material:InfraredTransparent` | infrared-transparent material | deferred |
+| 3 | `Material:AirGap` | opaque air-space resistance material | bounded typed `AirGap` variant |
+| 4 | `Material:InfraredTransparent` | infrared-transparent material | bounded typed `InfraredTransparent` variant |
 | 5 | `WindowMaterial:Glazing` | detailed glazing definition | deferred |
 | 6 | `WindowMaterial:Glazing:RefractionExtinctionMethod` | glazing using refraction/extinction input | deferred |
 | 7 | `WindowMaterial:Glazing:EquivalentLayer` | equivalent-layer glazing | deferred |
@@ -144,9 +144,9 @@ base definitions are 1 through 22 and the `MaterialProperty:*` entries are 23
 through 34. The source-sequence column, not that schema number, controls
 initialization behavior.
 
-## Bounded Regular And NoMass Contract
+## Bounded Four-Variant Contract
 
-This checkpoint migrates only the first two base definitions from a single
+This checkpoint migrates only the first four base definitions from a single
 option-heavy record to discriminated material definitions under a shared
 identity envelope.
 
@@ -177,9 +177,41 @@ defaults. EnergyPlus stores this as a regular material with `ROnly = true`;
 the bounded Rust model represents that distinction directly as the `NoMass`
 variant.
 
+### `Material:AirGap`
+
+EnergyPlus requires thermal resistance greater than 0 m2-K/W. The object has
+no roughness or absorptance inputs: `GetMaterialData` fixes roughness to
+`MediumRough`, stores the input as an R-only resistance, and leaves the base
+thermal, solar, and visible absorptances at 0. The bounded Rust variant owns
+the positive resistance directly and exposes those fixed source values.
+
+Construction validation restricts an air gap to a middle layer. It cannot be
+the outside/first or inside/final layer, so a construction containing an
+`AirGap` must have material layers on both sides. Dynamic air-gap heat
+transfer and window-gap families are outside this opaque R-only variant.
+
+### `Material:InfraredTransparent`
+
+The public object supplies only its name. `GetMaterialData` fixes its R-only
+thermal resistance to 0.01 m2-K/W and its thermal, solar, and visible
+absorptances to 0.9999, 1.0, and 1.0. The bounded Rust variant stores those
+fixed source values without inventing user-configurable fields.
+
+The intended construction invariant is a single IRT layer. Upstream
+`CheckAndSetConstructionProperties` applies that check only when the outside
+layer is infrared-transparent, leaving a malformed non-first-layer IRT input
+outside that validation branch. The bounded Rust compiler enforces the
+intended invariant wherever an IRT reference appears instead of reproducing
+that upstream validation gap; exact malformed-input diagnostic parity is not
+claimed.
+
 The compiler preserves EnergyPlus family order by compiling all `Material`
-objects before `Material:NoMass` objects and keeps their names in the shared
-material registry. This checkpoint does not claim exact EnergyPlus diagnostic
+objects, then all `Material:NoMass`, `Material:AirGap`, and
+`Material:InfraredTransparent` objects in that order, and keeps their names
+in the shared material registry. This checkpoint does not port the IRT
+paired-interzone surface-use semantics or non-interzone warnings, the CondFD
+prohibition and algorithm behavior, or official EnergyPlus oracle EIO evidence
+for the two new variants. It also does not claim exact EnergyPlus diagnostic
 text, all input-processor default behavior, internal F/C-factor material
 injection, EMS mutation, material EIO formatting, or any of the deferred
 families.
@@ -189,7 +221,7 @@ families.
 | Routine | Completion status | Inventory obligation |
 |---|---|---|
 | `GetWindowGlassSpectralData` | `source_mapped` | owns the pre-material spectral dataset read |
-| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; only its Regular/NoMass typed slice is implemented |
+| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; only its Regular/NoMass/AirGap/InfraredTransparent typed slice is implemented |
 | `GetVariableAbsorptanceInput` | `source_mapped` | owns the post-base variable-absorptance overlay |
 | `GetHysteresisData` | `source_mapped` | owns the post-base hysteresis overlay |
 | `GetCondFDInput` | `source_mapped` | owns PhaseChange then VariableThermalConductivity |
@@ -197,20 +229,22 @@ families.
 | `GetHeatBalHAMTInput` | `source_mapped` | owns the six ordered HAMT objects |
 
 All seven routine records have `required_for_full_domain = false`. The
-Regular/NoMass implementation slice does not promote the whole
+four-variant implementation slice does not promote the whole
 `GetMaterialData` routine beyond `source_mapped`.
 
 ## Evidence And Promotion Boundary
 
 The existing `construction_materials_001` case remains nonblocking smoke
-evidence for selected static EIO fields. Typed model/compiler tests can prove
-that Regular and NoMass invalid cross-variant states are no longer
-representable and that required fields/defaults are compiled, but they are not
-an EnergyPlus oracle family gate.
+evidence for selected static EIO fields of its existing regular and no-mass
+inputs. Typed model/compiler tests can prove that four object-specific states
+are represented separately, required fields and fixed defaults are compiled,
+and the bounded AirGap/IRT construction invariants are rejected or accepted as
+declared. Those tests are internal evidence, not an EnergyPlus oracle family
+gate, and this checkpoint adds no AirGap/IRT oracle EIO evidence.
 
 CP58 remains incomplete until, at minimum:
 
-- the other 20 base definitions have schema-complete typed variants
+- the other 18 base definitions have schema-complete typed variants
 - all 12 overlays/datasets have typed attachment and validation models
 - source-order attachment, duplicate/reference diagnostics, generated
   F/C-factor materials, reporting, EMS, and algorithm-specific consumers are

@@ -7,6 +7,10 @@ pub enum MaterialKind {
     Mass,
     /// Material:NoMass object.
     NoMass,
+    /// Material:AirGap object.
+    AirGap,
+    /// Material:InfraredTransparent object.
+    InfraredTransparent,
 }
 
 /// EnergyPlus material surface roughness.
@@ -91,6 +95,17 @@ pub struct NoMassMaterial {
     pub surface: OpaqueSurfaceProperties,
 }
 
+/// User-supplied fields for a `Material:AirGap` object.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct AirGapMaterial {
+    /// Area-normalized thermal resistance in m2-K/W.
+    pub thermal_resistance_m2_k_per_w: f64,
+}
+
+/// Name-only `Material:InfraredTransparent` payload.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct InfraredTransparentMaterial;
+
 /// Object-specific material payload.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum MaterialDefinition {
@@ -98,7 +113,25 @@ pub enum MaterialDefinition {
     Regular(RegularMaterial),
     /// Opaque material with resistance but no heat capacity.
     NoMass(NoMassMaterial),
+    /// Opaque air gap with source-fixed roughness and resistance-only behavior.
+    AirGap(AirGapMaterial),
+    /// Infrared-transparent material whose thermal properties are fixed by EnergyPlus.
+    InfraredTransparent(InfraredTransparentMaterial),
 }
+
+const AIR_GAP_SURFACE_PROPERTIES: OpaqueSurfaceProperties = OpaqueSurfaceProperties {
+    thermal_absorptance: 0.0,
+    solar_absorptance: 0.0,
+    visible_absorptance: 0.0,
+};
+
+const INFRARED_TRANSPARENT_SURFACE_PROPERTIES: OpaqueSurfaceProperties = OpaqueSurfaceProperties {
+    thermal_absorptance: 0.9999,
+    solar_absorptance: 1.0,
+    visible_absorptance: 1.0,
+};
+
+const INFRARED_TRANSPARENT_THERMAL_RESISTANCE_M2_K_PER_W: f64 = 0.01;
 
 /// Minimal material identity plus an object-specific definition.
 #[derive(Clone, Debug, PartialEq)]
@@ -118,6 +151,8 @@ impl Material {
         match self.definition {
             MaterialDefinition::Regular(_) => MaterialKind::Mass,
             MaterialDefinition::NoMass(_) => MaterialKind::NoMass,
+            MaterialDefinition::AirGap(_) => MaterialKind::AirGap,
+            MaterialDefinition::InfraredTransparent(_) => MaterialKind::InfraredTransparent,
         }
     }
 
@@ -127,6 +162,8 @@ impl Material {
         match self.definition {
             MaterialDefinition::Regular(material) => Some(material.roughness),
             MaterialDefinition::NoMass(material) => Some(material.roughness),
+            MaterialDefinition::AirGap(_) => Some(MaterialSurfaceRoughness::MediumRough),
+            MaterialDefinition::InfraredTransparent(_) => None,
         }
     }
 
@@ -135,7 +172,9 @@ impl Material {
     pub const fn thickness_m(&self) -> Option<f64> {
         match self.definition {
             MaterialDefinition::Regular(material) => Some(material.thickness_m),
-            MaterialDefinition::NoMass(_) => None,
+            MaterialDefinition::NoMass(_)
+            | MaterialDefinition::AirGap(_)
+            | MaterialDefinition::InfraredTransparent(_) => None,
         }
     }
 
@@ -144,7 +183,9 @@ impl Material {
     pub const fn conductivity_w_per_m_k(&self) -> Option<f64> {
         match self.definition {
             MaterialDefinition::Regular(material) => Some(material.conductivity_w_per_m_k),
-            MaterialDefinition::NoMass(_) => None,
+            MaterialDefinition::NoMass(_)
+            | MaterialDefinition::AirGap(_)
+            | MaterialDefinition::InfraredTransparent(_) => None,
         }
     }
 
@@ -153,7 +194,9 @@ impl Material {
     pub const fn density_kg_per_m3(&self) -> Option<f64> {
         match self.definition {
             MaterialDefinition::Regular(material) => Some(material.density_kg_per_m3),
-            MaterialDefinition::NoMass(_) => None,
+            MaterialDefinition::NoMass(_)
+            | MaterialDefinition::AirGap(_)
+            | MaterialDefinition::InfraredTransparent(_) => None,
         }
     }
 
@@ -162,7 +205,9 @@ impl Material {
     pub const fn specific_heat_j_per_kg_k(&self) -> Option<f64> {
         match self.definition {
             MaterialDefinition::Regular(material) => Some(material.specific_heat_j_per_kg_k),
-            MaterialDefinition::NoMass(_) => None,
+            MaterialDefinition::NoMass(_)
+            | MaterialDefinition::AirGap(_)
+            | MaterialDefinition::InfraredTransparent(_) => None,
         }
     }
 
@@ -172,6 +217,18 @@ impl Material {
         match self.definition {
             MaterialDefinition::Regular(_) => None,
             MaterialDefinition::NoMass(material) => Some(material.thermal_resistance_m2_k_per_w),
+            MaterialDefinition::AirGap(_) | MaterialDefinition::InfraredTransparent(_) => None,
+        }
+    }
+
+    /// Returns whether EnergyPlus treats the material as resistance-only.
+    #[must_use]
+    pub const fn is_resistance_only(&self) -> bool {
+        match self.definition {
+            MaterialDefinition::Regular(_) => false,
+            MaterialDefinition::NoMass(_)
+            | MaterialDefinition::AirGap(_)
+            | MaterialDefinition::InfraredTransparent(_) => true,
         }
     }
 
@@ -199,6 +256,8 @@ impl Material {
         match &self.definition {
             MaterialDefinition::Regular(material) => &material.surface,
             MaterialDefinition::NoMass(material) => &material.surface,
+            MaterialDefinition::AirGap(_) => &AIR_GAP_SURFACE_PROPERTIES,
+            MaterialDefinition::InfraredTransparent(_) => &INFRARED_TRANSPARENT_SURFACE_PROPERTIES,
         }
     }
 
@@ -216,7 +275,17 @@ impl Material {
             {
                 Some(material.thermal_resistance_m2_k_per_w)
             }
-            MaterialDefinition::Regular(_) | MaterialDefinition::NoMass(_) => None,
+            MaterialDefinition::AirGap(material)
+                if material.thermal_resistance_m2_k_per_w > 0.0 =>
+            {
+                Some(material.thermal_resistance_m2_k_per_w)
+            }
+            MaterialDefinition::InfraredTransparent(_) => {
+                Some(INFRARED_TRANSPARENT_THERMAL_RESISTANCE_M2_K_PER_W)
+            }
+            MaterialDefinition::Regular(_)
+            | MaterialDefinition::NoMass(_)
+            | MaterialDefinition::AirGap(_) => None,
         }
     }
 
@@ -235,7 +304,10 @@ impl Material {
                         * material.specific_heat_j_per_kg_k,
                 )
             }
-            MaterialDefinition::Regular(_) | MaterialDefinition::NoMass(_) => None,
+            MaterialDefinition::Regular(_)
+            | MaterialDefinition::NoMass(_)
+            | MaterialDefinition::AirGap(_)
+            | MaterialDefinition::InfraredTransparent(_) => None,
         }
     }
 }

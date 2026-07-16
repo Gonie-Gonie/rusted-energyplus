@@ -48,7 +48,7 @@ claim.
 |---|---|---|
 | heat-balance driver | `ManageHeatBalance` | mapped-not-ported |
 | project heat-balance controls | `GetProjectControlData` | mapped-not-ported |
-| material input | `Material::GetWindowGlassSpectralData` -> `Material::GetMaterialData` -> `Material::GetHysteresisData` | all 34 public base/overlay objects are inventoried in [the material-family source map](material-source-map.md); only Regular and NoMass belong to the bounded typed-variant checkpoint |
+| material input | `Material::GetWindowGlassSpectralData` -> `Material::GetMaterialData` -> `Material::GetHysteresisData` | all 34 public base/overlay objects are inventoried in [the material-family source map](material-source-map.md); only Regular, NoMass, AirGap, and InfraredTransparent belong to the bounded typed-variant checkpoint |
 | construction input | `GetConstructData` | typed opaque layer stack exists; CTF coefficients not ported |
 | zone input | `GetZoneData` | typed geometry subset exists; source map required before expansion |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |

@@ -1,36 +1,36 @@
 //! Model compiler stage contracts.
 
 use ep_model::{
-    AirLoopHvac, AutoOrNumber, AutosizeOrNumber, AvailabilityManagerComponent, BoilerHotWater,
-    BranchId, BranchListId, Building, ChillerElectricEir, CoilComponent, CoilComponentKind,
-    ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId, DayScheduleId,
-    DehumidificationControlType, DemandControlledVentilationType, DesignSpecificationOutdoorAir,
-    DesignSpecificationOutdoorAirId, DesignSpecificationOutdoorAirMethod,
-    ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
-    ExternalInterfaceSchedule, FanComponent, FanComponentKind,
+    AirGapMaterial, AirLoopHvac, AutoOrNumber, AutosizeOrNumber, AvailabilityManagerComponent,
+    BoilerHotWater, BranchId, BranchListId, Building, ChillerElectricEir, CoilComponent,
+    CoilComponentKind, ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId,
+    DayScheduleId, DehumidificationControlType, DemandControlledVentilationType,
+    DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId,
+    DesignSpecificationOutdoorAirMethod, ExternalInterfaceFmuExportSchedule,
+    ExternalInterfaceFmuImportSchedule, ExternalInterfaceSchedule, FanComponent, FanComponentKind,
     FirstHourInterpolationStartingValues, GeometryCoordinateSystem, GlobalGeometryRules,
     HeatRecoveryType, HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId,
-    IdealLoadsFuelType, IdealLoadsLimit, InsideSurfaceConvectionAlgorithm, InternalGainId,
-    LoadDistributionScheme, LoopId, Material, MaterialDefinition, MaterialId,
-    MaterialSurfaceRoughness, NameMap, NoMassMaterial, Node, NodeId, NodeList, NodeListId,
-    NormalizedName, NumericType, OpaqueSurfaceProperties, OtherEquipment,
-    OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutsideBoundaryCondition,
-    OutsideSurfaceConvectionAlgorithm, People, PeopleNumberCalculationMethod, PlantBranch,
-    PlantBranchComponent, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
-    PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RegularMaterial, RunPeriod,
-    RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
-    ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
-    ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleDayType,
-    ScheduleFile, ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn,
-    ScheduleId, ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits,
-    ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
-    SolarDistribution, SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId,
-    SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
-    ThermostatSetpointId, TimestepConfig, TypedModel, Version, VertexEntryDirection,
-    WeekScheduleId, WindExposure, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
-    ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
-    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatControl,
-    ZoneThermostatId, parse_calendar_date_rule,
+    IdealLoadsFuelType, IdealLoadsLimit, InfraredTransparentMaterial,
+    InsideSurfaceConvectionAlgorithm, InternalGainId, LoadDistributionScheme, LoopId, Material,
+    MaterialDefinition, MaterialId, MaterialSurfaceRoughness, NameMap, NoMassMaterial, Node,
+    NodeId, NodeList, NodeListId, NormalizedName, NumericType, OpaqueSurfaceProperties,
+    OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType,
+    OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
+    PeopleNumberCalculationMethod, PlantBranch, PlantBranchComponent, PlantBranchList,
+    PlantConnector, PlantConnectorKind, PlantConnectorList, PlantConnectorListEntry, PlantLoop,
+    Point3, PumpConstantSpeed, RegularMaterial, RunPeriod, RunPeriodDaylightSavingTime,
+    RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact,
+    ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant,
+    ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleDayType, ScheduleFile,
+    ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn, ScheduleId,
+    ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact,
+    ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation, SolarDistribution,
+    SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
+    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
+    TypedModel, Version, VertexEntryDirection, WeekScheduleId, WindExposure, Zone,
+    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
+    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 use std::collections::BTreeMap;
@@ -233,6 +233,8 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Site:Location",
     "Material",
     "Material:NoMass",
+    "Material:AirGap",
+    "Material:InfraredTransparent",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -798,6 +800,8 @@ impl<'a> Compiler<'a> {
     fn parse_materials(&mut self, model: &mut TypedModel) {
         self.parse_regular_materials(model);
         self.parse_nomass_materials(model);
+        self.parse_air_gap_materials(model);
+        self.parse_infrared_transparent_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -898,6 +902,52 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_air_gap_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "Material:AirGap";
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let Some(thermal_resistance_m2_k_per_w) = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "thermal_resistance",
+                0.0,
+                false,
+            ) else {
+                continue;
+            };
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::AirGap(AirGapMaterial {
+                    thermal_resistance_m2_k_per_w,
+                }),
+            });
+        }
+    }
+
+    fn parse_infrared_transparent_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "Material:InfraredTransparent";
+        for (name, _object) in self.objects(OBJECT_TYPE) {
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::InfraredTransparent(InfraredTransparentMaterial),
+            });
+        }
+    }
+
     fn reserve_material_identity(
         &mut self,
         model: &mut TypedModel,
@@ -953,6 +1003,9 @@ impl<'a> Compiler<'a> {
             if !layers_valid {
                 continue;
             }
+            if !self.validate_construction_material_layers(model, &name, &layers) {
+                continue;
+            }
             let Some(id_value) = self.checked_id("Construction", &name, model.constructions.len())
             else {
                 continue;
@@ -970,6 +1023,86 @@ impl<'a> Compiler<'a> {
                 layers,
             });
         }
+    }
+
+    fn validate_construction_material_layers(
+        &mut self,
+        model: &TypedModel,
+        construction_name: &str,
+        layers: &[MaterialId],
+    ) -> bool {
+        let mut valid = true;
+        if let Some(outside_material) = layers
+            .first()
+            .and_then(|material_id| model.materials.get(material_id.0 as usize))
+            && matches!(outside_material.definition, MaterialDefinition::AirGap(_))
+        {
+            self.error(
+                "InvalidAirGapLayerPosition",
+                "Construction",
+                Some(construction_name),
+                Some("outside_layer"),
+                format!(
+                    "Construction/{construction_name} cannot use Material:AirGap {} as its outside layer",
+                    outside_material.name.0
+                ),
+            );
+            valid = false;
+        }
+
+        if layers.len() > 1
+            && let Some(inside_material) = layers
+                .last()
+                .and_then(|material_id| model.materials.get(material_id.0 as usize))
+            && matches!(inside_material.definition, MaterialDefinition::AirGap(_))
+        {
+            let inside_field = format!("layer_{}", layers.len());
+            self.error(
+                "InvalidAirGapLayerPosition",
+                "Construction",
+                Some(construction_name),
+                Some(&inside_field),
+                format!(
+                    "Construction/{construction_name} cannot use Material:AirGap {} as its inside layer",
+                    inside_material.name.0
+                ),
+            );
+            valid = false;
+        }
+
+        if layers.len() != 1
+            && let Some((layer_index, material)) =
+                layers
+                    .iter()
+                    .enumerate()
+                    .find_map(|(layer_index, material_id)| {
+                        let material = model.materials.get(material_id.0 as usize)?;
+                        matches!(
+                            material.definition,
+                            MaterialDefinition::InfraredTransparent(_)
+                        )
+                        .then_some((layer_index, material))
+                    })
+        {
+            let layer_field = if layer_index == 0 {
+                "outside_layer".to_string()
+            } else {
+                format!("layer_{}", layer_index + 1)
+            };
+            self.error(
+                "InvalidInfraredTransparentConstruction",
+                "Construction",
+                Some(construction_name),
+                Some(&layer_field),
+                format!(
+                    "Construction/{construction_name} must use Material:InfraredTransparent {} as its only layer",
+                    material.name.0
+                ),
+            );
+            valid = false;
+        }
+
+        valid
     }
 
     fn parse_schedule_type_limits(&mut self, model: &mut TypedModel) {
