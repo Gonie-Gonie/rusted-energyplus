@@ -90,7 +90,7 @@ that the EnergyPlus routine has been ported.
 | 50 | `RhoH2O` | water density | `Psychrometrics.hh:1637` (inline) | always present | canonical stateless source-order polynomial: `ep_runtime::psychrometrics::energyplus_rho_h2o` | upstream EMS vector, independent square/cube evaluation, left-associated coefficient order, documented-range boundaries without a runtime clamp, IEEE edges, and repeated-call purity |
 | 51 | `PsyDeltaHSenFnTdb2Tdb1W` | sensible enthalpy delta | `Psychrometrics.hh:1654` (inline) | always present | canonical stateless source-order helper: `ep_runtime::psychrometrics::energyplus_psy_delta_h_sen_fn_tdb2_tdb1_w` | sign convention, literal-first 1e-5 ordered humidity floor including NaN, signed zero, source coefficient order, finite enthalpy-subtraction comparison, IEEE edges, and repeated-call purity |
 | 52 | `PsyDeltaHSenFnTdb2W2Tdb1W1` | sensible enthalpy delta | `Psychrometrics.hh:1679` (inline) | always present | canonical stateless ordered-minimum delegation: `ep_runtime::psychrometrics::energyplus_psy_delta_h_sen_fn_tdb2_w2_tdb1_w1` | finite minimum selection, Objexx second-argument equality/unordered behavior, both NaN directions, exact delegation to routine 51, and repeated-call purity |
-| 53 | `CSplineint` | spline interpolation | `Psychrometrics.hh:1698`; `Psychrometrics.cc:1450` | always present | intended `ep_runtime::psychrometrics`; unassigned | pinned table knots, between-knot interpolation, endpoint/range behavior, and sample-count handling |
+| 53 | `CSplineint` | spline interpolation | `Psychrometrics.hh:136,303,1698`; `Psychrometrics.cc:1450` | always present | canonical fixed-table source-order spline: `ep_runtime::psychrometrics::energyplus_c_splineint` with immutable `psychrometrics_spline_tables` | full table bit folds, shifted-bin/truncation behavior, exact decimal spline factor, knots and between-knot vectors, source discontinuity, endpoint extrapolation, sample-count prefix bounds, unsupported C++-undefined inputs, and repeated-call purity |
 
 ## CP56-2 Numerical Scaffold: Density And Specific Heat
 
@@ -2152,6 +2152,77 @@ not_claimed_branches:
 - a direct upstream helper oracle, Rust `f64::min` semantics, cross-compiler/platform contraction, excess-precision, rounding-mode, floating-point-exception or NaN-payload last-bit parity, 17 direct production consumers, mass-flow multiplication, or downstream furnace, duct, heat-pump, VRF, unitary, and zone-air-loop migration
 <!-- routine-state-contract:v1 end psy_delta_h_sen_fn_tdb2_w2_tdb1_w1 -->
 
+## CP56-20 Fixed Saturation-Temperature Spline
+
+This checkpoint advances the final `CSplineint` inventory routine to
+`state_mapped`. The inventory is now 20 source-mapped and 33 state-mapped
+routines. The parent inventory remains `status = "scaffold"`,
+`claim_level = "none"`, and all 53 routines remain outside the full-domain
+required set.
+
+`energyplus_c_splineint` is intentionally not a general cubic-spline API. It
+reads the exact 1,651-element `tsat_fn_pb_y` and `tsat_fn_pb_d2y` tables from
+EnergyPlus 26.1, preserved as immutable Rust constants. Tests fold every
+binary64 value and pin the individual table hashes plus a combined hash, so a
+literal, order, or table-length transcription change fails independently of
+the interpolation spot vectors.
+
+The source truncates `x` toward zero through `static_cast<int>`, computes
+`j = (x_int >> 6) - 1`, applies the lower clamp before the
+`j > n - 2` upper clamp, and then uses the original untruncated `x` for `A`
+and `B`. The implementation preserves `h = 64`, left-associated cubic
+products, and the decimal factor `0.1666666667` rather than replacing it with
+`1.0 / 6.0`. The shifted bin is observable: `x = 127.999` evaluates the
+first pair and returns approximately `-74.704 C`, while `x = 128` selects
+the next pair and returns `-17.74197121 C`. Low and high inputs extrapolate
+through the selected endpoint pair; `x` itself is never clamped.
+
+The sole production call is routine 41's runtime interpolation branch with
+`n = 1651`. The safe Rust API also supports every source-defined prefix
+`2 <= n <= 1651` and finite `x` whose truncation fits a C++ `int`, and
+asserts before indexing otherwise. The upstream C++ routine has undefined
+behavior for smaller or oversized counts, nonfinite `x`, or an out-of-range
+floating-to-integer conversion, so panic identity for those inputs is not a
+parity claim.
+
+There is no direct upstream `CSplineint` assertion. The test named
+`Psychrometrics_CSpline_Test` first stores the iterative result, adds
+`1e-60` to a 50-to-120-kPa pressure (which leaves the binary64 value
+unchanged), and therefore takes the saved-value hit before the spline branch.
+The interpolation sample test likewise calls the iterative public routine at
+table knots with interpolation disabled. Rust's direct vectors and full-table
+hashes are source-derived local evidence, not mislabeled upstream helper
+oracles. Implementing this routine does not promote routine 41 or 42's
+interpolation flag, saved pair, public cache, statistics, diagnostics, or
+lifecycle.
+
+### `CSplineint` (`c_splineint`)
+
+<!-- routine-state-contract:v1 begin c_splineint -->
+CSplineint
+
+read_state:
+- arguments `n` and `x` plus the immutable 1,651-element `tsat_fn_pb_y` and `tsat_fn_pb_d2y` compile-time tables; for the supported source-defined domain the routine truncates `x` toward zero to a C++-`int`-equivalent value, derives and clamps `j`, then reads exactly `y[j]`, `y[j + 1]`, `d2y[j]`, and `d2y[j + 1]`; it has no `EnergyPlusData`, `CalledFrom`, mutable static/global field, cache, statistic, diagnostic, flag, or runtime table owner
+
+write_state:
+- no state; the routine stores only local `x_int`, `j`, `A`, `B`, and `y`-expression intermediates and evaluates the fixed cubic formula without table mutation, input clamping, search, iteration, allocation, or explicit fused multiply-add
+
+history_state_ownership:
+- no cross-call history or cache; under a fixed floating-point environment and within the supported source-defined input domain, the result is a pure function of `n`, `x`, and the immutable source tables
+
+unsupported_state:
+- none; the source routine has no mutable state, cache, counter, diagnostic, or lifecycle, and its parent routine's interpolation flag and saved/cache/diagnostic/statistics state are not owned here
+
+inactive_branches:
+- after truncation toward zero, `j = (x_int >> 6) - 1` is first raised to zero when negative and then lowered to `n - 2` when above that bound; the original `x` remains unbounded for endpoint extrapolation, and the routine is always present with no compile-time branch, short-circuit, or loop
+
+unsupported_active_branches:
+- none; every source-defined numeric bin and endpoint-extrapolation branch is implemented, and there is no stateful or compile-conditional active branch
+
+not_claimed_branches:
+- behavior for `n < 2`, `n > 1651`, NaN or infinite `x`, or finite `x` whose truncation does not fit a C++ `int` because the upstream conversion or indexing is undefined; a direct upstream helper oracle; cross-compiler/platform signed-shift, contraction, excess-precision, rounding-mode, floating-point-exception or NaN-payload last-bit parity; routine-41/42 interpolation selection, saved pair, cache, statistics, diagnostics, lifecycle, or downstream saturation-temperature migration
+<!-- routine-state-contract:v1 end c_splineint -->
+
 ## Compile-Time Variant Boundary
 
 Unless `EP_nocache_Psychrometrics` is set, the EnergyPlus header enables
@@ -2206,8 +2277,8 @@ The `PsyRhoAirFnPbTdbW`, `PsyRhoAirFnPbTdbW_fast`, `PsyHfgAirFnWTdb`,
 `PsyRhFnTdbRhov`, `PsyRhFnTdbWPb`, `PsyWFnTdbRhPb`,
 `PsyWFnTdbTwbPb`, `PsyHFnTdbRhPb`, `PsyTsatFnPb_raw`,
 `PsyTdpFnWPb`, `PsyTdpFnTdbTwbPb`, `F6`, `F7`, `CPCW`, `CPHW`, `RhoH2O`,
-`PsyDeltaHSenFnTdb2Tdb1W`, and `PsyDeltaHSenFnTdb2W2Tdb1W1` tickets are
-`state_mapped`; the other 21 ledger routines remain
+`PsyDeltaHSenFnTdb2Tdb1W`, `PsyDeltaHSenFnTdb2W2Tdb1W1`, and `CSplineint`
+tickets are `state_mapped`; the other 20 ledger routines remain
 `source_mapped`. All 53 retain
 `required_for_full_domain = false`. Before any
 ticket is promoted further, its

@@ -2408,5 +2408,25 @@ routine.psy_delta_h_sen_fn_tdb2_w2_tdb1_w1.not_claimed_branches = [
 routine.c_splineint.source_file = "src/EnergyPlus/Psychrometrics.cc"
 routine.c_splineint.source_routine = "CSplineint"
 routine.c_splineint.source_map = "docs/src/porting-map/psychrometrics-source-map.md"
-routine.c_splineint.completion_status = "source_mapped"
+routine.c_splineint.completion_status = "state_mapped"
 routine.c_splineint.required_for_full_domain = false
+routine.c_splineint.state_mapping_ref = "docs/src/porting-map/psychrometrics-source-map.md"
+routine.c_splineint.read_state = [
+  "arguments `n` and `x` plus the immutable 1,651-element `tsat_fn_pb_y` and `tsat_fn_pb_d2y` compile-time tables; for the supported source-defined domain the routine truncates `x` toward zero to a C++-`int`-equivalent value, derives and clamps `j`, then reads exactly `y[j]`, `y[j + 1]`, `d2y[j]`, and `d2y[j + 1]`; it has no `EnergyPlusData`, `CalledFrom`, mutable static/global field, cache, statistic, diagnostic, flag, or runtime table owner",
+]
+routine.c_splineint.write_state = [
+  "no state; the routine stores only local `x_int`, `j`, `A`, `B`, and `y`-expression intermediates and evaluates the fixed cubic formula without table mutation, input clamping, search, iteration, allocation, or explicit fused multiply-add",
+]
+routine.c_splineint.history_state_ownership = "no cross-call history or cache; under a fixed floating-point environment and within the supported source-defined input domain, the result is a pure function of `n`, `x`, and the immutable source tables"
+routine.c_splineint.unsupported_state = [
+  "none; the source routine has no mutable state, cache, counter, diagnostic, or lifecycle, and its parent routine's interpolation flag and saved/cache/diagnostic/statistics state are not owned here",
+]
+routine.c_splineint.inactive_branches = [
+  "after truncation toward zero, `j = (x_int >> 6) - 1` is first raised to zero when negative and then lowered to `n - 2` when above that bound; the original `x` remains unbounded for endpoint extrapolation, and the routine is always present with no compile-time branch, short-circuit, or loop",
+]
+routine.c_splineint.unsupported_active_branches = [
+  "none; every source-defined numeric bin and endpoint-extrapolation branch is implemented, and there is no stateful or compile-conditional active branch",
+]
+routine.c_splineint.not_claimed_branches = [
+  "behavior for `n < 2`, `n > 1651`, NaN or infinite `x`, or finite `x` whose truncation does not fit a C++ `int` because the upstream conversion or indexing is undefined; a direct upstream helper oracle; cross-compiler/platform signed-shift, contraction, excess-precision, rounding-mode, floating-point-exception or NaN-payload last-bit parity; routine-41/42 interpolation selection, saved pair, cache, statistics, diagnostics, lifecycle, or downstream saturation-temperature migration",
+]

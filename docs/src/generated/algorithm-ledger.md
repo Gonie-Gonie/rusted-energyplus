@@ -132,7 +132,7 @@ Algorithm status is maintained in `specs/algorithm_ledger.toml`. Routine complet
 | rho_h2o | psychrometrics | psychrometric_routine_inventory | state_mapped | no | src/EnergyPlus/Psychrometrics.hh::RhoH2O | docs/src/porting-map/psychrometrics-source-map.md | docs/src/porting-map/psychrometrics-source-map.md |  |  |
 | psy_delta_h_sen_fn_tdb2_tdb1_w | psychrometrics | psychrometric_routine_inventory | state_mapped | no | src/EnergyPlus/Psychrometrics.hh::PsyDeltaHSenFnTdb2Tdb1W | docs/src/porting-map/psychrometrics-source-map.md | docs/src/porting-map/psychrometrics-source-map.md |  |  |
 | psy_delta_h_sen_fn_tdb2_w2_tdb1_w1 | psychrometrics | psychrometric_routine_inventory | state_mapped | no | src/EnergyPlus/Psychrometrics.hh::PsyDeltaHSenFnTdb2W2Tdb1W1 | docs/src/porting-map/psychrometrics-source-map.md | docs/src/porting-map/psychrometrics-source-map.md |  |  |
-| c_splineint | psychrometrics | psychrometric_routine_inventory | source_mapped | no | src/EnergyPlus/Psychrometrics.cc::CSplineint | docs/src/porting-map/psychrometrics-source-map.md |  |  |  |
+| c_splineint | psychrometrics | psychrometric_routine_inventory | state_mapped | no | src/EnergyPlus/Psychrometrics.cc::CSplineint | docs/src/porting-map/psychrometrics-source-map.md | docs/src/porting-map/psychrometrics-source-map.md |  |  |
 
 ## Full-Domain Claim Readiness
 
