@@ -28,15 +28,15 @@ use ep_model::{
     SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
     ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
     TypedModel, Version, VertexEntryDirection, WeekScheduleId, WindExposure,
-    WindowGapEquivalentLayerMaterial, WindowGapVentType, WindowGasMaterial,
-    WindowGasPolynomialCoefficients, WindowGasProperties, WindowGasType,
-    WindowGlazingEquivalentLayerDiffuseProperties,
+    WindowGapEquivalentLayerMaterial, WindowGapVentType, WindowGasMaterial, WindowGasMixture,
+    WindowGasMixtureComponent, WindowGasMixtureMaterial, WindowGasPolynomialCoefficients,
+    WindowGasProperties, WindowGasType, WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
-    WindowGlazingSpectralAverageMaterial, Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId,
-    ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType,
-    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatControl,
-    ZoneThermostatId, parse_calendar_date_rule,
+    WindowGlazingSpectralAverageMaterial, WindowStandardGasType, Zone, ZoneEquipmentConnection,
+    ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId,
+    ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
+    ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 use std::collections::BTreeMap;
@@ -245,6 +245,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "WindowMaterial:Glazing:EquivalentLayer",
     "WindowMaterial:Gas",
     "WindowMaterial:Gap:EquivalentLayer",
+    "WindowMaterial:GasMixture",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -817,6 +818,7 @@ impl<'a> Compiler<'a> {
         self.parse_window_glazing_equivalent_layer_materials(model);
         self.parse_window_gas_materials(model);
         self.parse_window_gap_equivalent_layer_materials(model);
+        self.parse_window_gas_mixture_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -2031,6 +2033,192 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_window_gas_mixture_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowMaterial:GasMixture";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let thickness_m =
+                self.required_number_minimum(OBJECT_TYPE, &name, &object, "thickness", 0.0, false);
+            let number_of_gases = self
+                .required_number(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "number_of_gases_in_mixture",
+                )
+                .and_then(|value| {
+                    if value.fract() != 0.0 {
+                        self.error(
+                            "InvalidInteger",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some("number_of_gases_in_mixture"),
+                            format!(
+                                "{OBJECT_TYPE}/{name} field number_of_gases_in_mixture must be an integer, got {value}"
+                            ),
+                        );
+                        None
+                    } else if !(1.0..=4.0).contains(&value) {
+                        self.error(
+                            "InvalidNumericRange",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some("number_of_gases_in_mixture"),
+                            format!(
+                                "{OBJECT_TYPE}/{name} field number_of_gases_in_mixture must be between 1 and 4, got {value}"
+                            ),
+                        );
+                        None
+                    } else {
+                        Some(value as usize)
+                    }
+                });
+
+            let mut gas_types = [None; 4];
+            let mut fractions = [None; 4];
+            let mut fields_valid = true;
+            for gas_index in 0..4 {
+                let gas_number = gas_index + 1;
+                let gas_type_field = format!("gas_{gas_number}_type");
+                let fraction_field = format!("gas_{gas_number}_fraction");
+                let schema_required = gas_index < 2;
+
+                let gas_type = if schema_required {
+                    self.required_enum(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        &gas_type_field,
+                        WindowStandardGasType::from_energyplus_name,
+                    )
+                } else {
+                    self.optional_enum(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        &gas_type_field,
+                        WindowStandardGasType::from_energyplus_name,
+                    )
+                };
+                let gas_type_was_supplied = match field_value(&object, &gas_type_field) {
+                    Some(RawValue::String(value)) => !value.trim().is_empty(),
+                    Some(_) => true,
+                    None => false,
+                };
+                if gas_type.is_none() && (schema_required || gas_type_was_supplied) {
+                    fields_valid = false;
+                }
+                gas_types[gas_index] = gas_type;
+
+                let fraction = if schema_required {
+                    self.required_number(OBJECT_TYPE, &name, &object, &fraction_field)
+                } else {
+                    self.optional_number(OBJECT_TYPE, &name, &object, &fraction_field)
+                };
+                if let Some(value) = fraction {
+                    if value > 0.0 && value <= 1.0 {
+                        fractions[gas_index] = Some(value);
+                    } else {
+                        self.error(
+                            "InvalidNumericRange",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some(&fraction_field),
+                            format!(
+                                "{OBJECT_TYPE}/{name} field {fraction_field} must be in (0, 1], got {value}"
+                            ),
+                        );
+                        fields_valid = false;
+                    }
+                } else if schema_required || field_value(&object, &fraction_field).is_some() {
+                    fields_valid = false;
+                }
+            }
+
+            if let Some(number_of_gases) = number_of_gases {
+                for (gas_index, gas_type) in gas_types.iter().enumerate().take(number_of_gases) {
+                    if gas_type.is_none() {
+                        let field = format!("gas_{}_type", gas_index + 1);
+                        let supplied_but_invalid = match field_value(&object, &field) {
+                            Some(RawValue::String(value)) => !value.trim().is_empty(),
+                            Some(_) => true,
+                            None => false,
+                        };
+                        if gas_index >= 2 && !supplied_but_invalid {
+                            self.error(
+                                "MissingActiveWindowGasMixtureType",
+                                OBJECT_TYPE,
+                                Some(&name),
+                                Some(&field),
+                                format!(
+                                    "{OBJECT_TYPE}/{name} active gas {} requires field {field}; rejecting the missing type instead of following EnergyPlus 26.1's invalid-index path",
+                                    gas_index + 1
+                                ),
+                            );
+                        }
+                        fields_valid = false;
+                    }
+                }
+            }
+
+            let (Some(thickness_m), Some(number_of_gases)) = (thickness_m, number_of_gases) else {
+                continue;
+            };
+            if !fields_valid {
+                continue;
+            }
+
+            let component = |gas_index: usize| {
+                gas_types[gas_index].map(|gas_type| WindowGasMixtureComponent {
+                    gas_type,
+                    // EnergyPlus's numeric input buffer supplies zero for a blank
+                    // optional active third or fourth fraction.
+                    fraction: fractions[gas_index].unwrap_or(0.0),
+                })
+            };
+            let gases = match number_of_gases {
+                1 => component(0).map(|gas_1| WindowGasMixture::One([gas_1])),
+                2 => match (component(0), component(1)) {
+                    (Some(gas_1), Some(gas_2)) => Some(WindowGasMixture::Two([gas_1, gas_2])),
+                    _ => None,
+                },
+                3 => match (component(0), component(1), component(2)) {
+                    (Some(gas_1), Some(gas_2), Some(gas_3)) => {
+                        Some(WindowGasMixture::Three([gas_1, gas_2, gas_3]))
+                    }
+                    _ => None,
+                },
+                4 => match (component(0), component(1), component(2), component(3)) {
+                    (Some(gas_1), Some(gas_2), Some(gas_3), Some(gas_4)) => {
+                        Some(WindowGasMixture::Four([gas_1, gas_2, gas_3, gas_4]))
+                    }
+                    _ => None,
+                },
+                _ => None,
+            };
+            let Some(gases) = gases else {
+                // Missing active gas types have already emitted a fail-safe
+                // diagnostic above. Keep construction panic-free if this
+                // invariant changes later.
+                continue;
+            };
+
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::WindowGasMixture(WindowGasMixtureMaterial {
+                    thickness_m,
+                    gases,
+                }),
+            });
+        }
+    }
+
     fn reserve_material_identity(
         &mut self,
         model: &mut TypedModel,
@@ -2207,7 +2395,10 @@ impl<'a> Compiler<'a> {
                     MaterialDefinition::WindowGlazingSpectralAverage(_)
                         | MaterialDefinition::WindowGlazingRefractionExtinction(_)
                 );
-                let is_gas = matches!(material.definition, MaterialDefinition::WindowGas(_));
+                let is_gas = matches!(
+                    material.definition,
+                    MaterialDefinition::WindowGas(_) | MaterialDefinition::WindowGasMixture(_)
+                );
                 let expects_glazing = layer_index % 2 == 0;
                 if (expects_glazing && is_glazing) || (!expects_glazing && is_gas) {
                     continue;
@@ -2221,7 +2412,7 @@ impl<'a> Compiler<'a> {
                 let expected = if expects_glazing {
                     "a glazing layer"
                 } else {
-                    "a WindowMaterial:Gas gap"
+                    "a WindowMaterial:Gas gap or WindowMaterial:GasMixture gap"
                 };
                 self.error(
                     "InvalidWindowConstructionLayering",
@@ -2229,7 +2420,7 @@ impl<'a> Compiler<'a> {
                     Some(construction_name),
                     Some(&layer_field),
                     format!(
-                        "Construction/{construction_name} field {layer_field} must be {expected}; the typed window subset requires Glass (Gas Glass) repeated up to three times"
+                        "Construction/{construction_name} field {layer_field} must be {expected}; the typed window subset requires Glass ((Gas|GasMixture) Glass) repeated up to three times"
                     ),
                 );
                 return None;
@@ -9457,6 +9648,7 @@ mod tests {
     mod schedule_year;
     mod window_material_gap_equivalent_layer;
     mod window_material_gas;
+    mod window_material_gas_mixture;
     mod window_material_glazing;
     mod window_material_glazing_equivalent_layer;
     mod window_material_glazing_refraction_extinction;

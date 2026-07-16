@@ -51,10 +51,10 @@ different:
 | inventoried public objects | 34 / 34 | Every in-boundary EnergyPlus 26.1 object is named below with its source owner and order. |
 | base definitions | 22 / 22 inventoried | `GetMaterialData` processing order is locked below. |
 | overlays and datasets | 12 / 12 inventoried | Common-startup or algorithm-local owner and order are locked below. |
-| typed Rust material variants | 9 | Four complete opaque-object slices, the `WindowMaterial:Glazing` `SpectralAverage` branch, and the complete `RefractionExtinctionMethod`, glazing `EquivalentLayer`, `WindowMaterial:Gas`, and gap `EquivalentLayer` objects have distinct payloads. |
-| complete bounded public-object slices | 8 / 34 | `Material`, `Material:NoMass`, `Material:AirGap`, `Material:InfraredTransparent`, `WindowMaterial:Glazing:RefractionExtinctionMethod`, `WindowMaterial:Glazing:EquivalentLayer`, `WindowMaterial:Gas`, and `WindowMaterial:Gap:EquivalentLayer` have their source-effective fields and bounded compiler contracts typed. |
+| typed Rust material variants | 10 | Four complete opaque-object slices, the `WindowMaterial:Glazing` `SpectralAverage` branch, and the complete `RefractionExtinctionMethod`, glazing `EquivalentLayer`, `WindowMaterial:Gas`, gap `EquivalentLayer`, and `WindowMaterial:GasMixture` objects have distinct payloads. |
+| complete bounded public-object slices | 9 / 34 | `Material`, `Material:NoMass`, `Material:AirGap`, `Material:InfraredTransparent`, `WindowMaterial:Glazing:RefractionExtinctionMethod`, `WindowMaterial:Glazing:EquivalentLayer`, `WindowMaterial:Gas`, `WindowMaterial:Gap:EquivalentLayer`, and `WindowMaterial:GasMixture` have their source-effective fields and bounded compiler contracts typed. |
 | partial bounded public-object slices | 1 / 34 | Only `WindowMaterial:Glazing` with `Optical Data Type = SpectralAverage` is typed; `Spectral`, `SpectralAndAngle`, and `BSDF` remain explicitly unsupported. |
-| wholly deferred public objects | 25 / 34 | The other 13 base definitions and all 12 overlays/datasets remain unported as variants. |
+| wholly deferred public objects | 24 / 34 | The other 12 base definitions and all 12 overlays/datasets remain unported as variants. |
 
 This is a CP58 scaffold checkpoint. Complete inventory does not mean complete
 schema, validation, runtime, optics, moisture, phase-change, or heat-transfer
@@ -92,7 +92,7 @@ The following table is the public-object processing order inside
 | 7 | `WindowMaterial:Glazing:EquivalentLayer` | equivalent-layer glazing | complete bounded typed variant; dedicated consumer family, construction and runtime deferred |
 | 8 | `WindowMaterial:Gas` | single-gas window gap | complete bounded typed variant with resolved standard/custom gas properties |
 | 9 | `WindowMaterial:Gap:EquivalentLayer` | equivalent-layer gap | complete bounded typed variant with vent mode and resolved standard/custom gas properties |
-| 10 | `WindowMaterial:GasMixture` | multi-gas window gap | deferred |
+| 10 | `WindowMaterial:GasMixture` | multi-gas window gap | complete bounded typed variant with an ordered one-to-four standard-gas mixture |
 | 11 | `WindowMaterial:Shade` | window shade | deferred |
 | 12 | `WindowMaterial:Shade:EquivalentLayer` | equivalent-layer shade | deferred |
 | 13 | `WindowMaterial:Drape:EquivalentLayer` | equivalent-layer drape | deferred |
@@ -378,13 +378,60 @@ coefficients/properties and nominal resistance, and the gate adds no
 construction typing/rating, optics, ASHWAT/BuildGap, runtime, or conformance
 claim.
 
+### `WindowMaterial:GasMixture`
+
+The tenth source-order object has a positive thickness and an integer
+`number_of_gases_in_mixture` from 1 through 4. Its component gas enum is
+limited to `Air`, `Argon`, `Krypton`, and `Xenon`; `Custom` is not a
+schema-valid mixture component. Gas 1 and Gas 2 type/fraction fields are
+unconditionally required by the 26.1 schema even when the declared active
+count is 1. The bounded compiler validates both required pairs and then
+preserves only the declared active prefix, so a one-gas mixture deliberately
+discards its schema-required Gas 2 dummy pair.
+
+Gas 3 and Gas 4 fields are schema-optional. When either position is active,
+its type is effectively required by `GetMaterialData`, but a missing active
+fraction retains the input processor's numeric blank value of 0.0. An
+explicit 0.0 fraction remains schema-invalid, while every explicitly supplied
+fraction must be greater than 0 and no greater than 1. Supplied inactive
+fields are still enum/type/bounds checked before valid inactive data is
+discarded. Missing active gas types fail safely in Rust instead of reproducing
+the 26.1 invalid-enum indexing path.
+
+EnergyPlus applies no fraction-sum, uniqueness, or normalization rule.
+Ordered active components therefore retain duplicate gases, non-unit sums,
+and missing optional active fractions as zero. Every active component resolves
+the exact standard-gas property record already shared by the single-gas
+variants. Nominal resistance is intentionally thickness divided by only the
+first component's 300 K conductivity; it is not a mixture-property average.
+Runtime window routines later consume the ordered raw fractions, but that
+thermal behavior is not implemented or claimed here.
+
+The variant belongs to the ordinary fenestration family and participates in
+the same `Glass (Gas-or-GasMixture Glass){0..3}` construction alternation as
+`WindowMaterial:Gas`. It is outside the equivalent-layer family;
+`Construction:WindowEquivalentLayer` typing and validation remain deferred.
+The later `WindowMaterial:Gap` complex-fenestration reference path may also
+consume a gas mixture, but that object remains deferred. Arbitrary-run
+assessment explicitly blocks the typed mixture before execution.
+
+EnergyPlus 26.1 prints the shared `WindowMaterial:Gas` EIO header when any gas
+mixture exists but has no `GasMixture` data-row case in the construction-layer
+report switch. Generic `Material Details` reporting can echo a mixture
+definition's name, fixed roughness, and thickness, but it exposes none of the
+component count, types, fractions, order, or first-gas nominal-resistance
+shortcut and is not gated in this typed checkpoint. The implementation
+therefore invents no dedicated mixture EIO row and adds no external
+occurrence, conductivity, window-runtime, or conformance claim.
+
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
-consumers. The two ordinary glazing variants and `WindowMaterial:Gas` use the
-ordinary fenestration family, while equivalent-layer glazing and
-`WindowMaterial:Gap:EquivalentLayer` share the separate equivalent-layer
-family. An ordinary `Construction` accepts exactly
-`Glass (Gas Glass){0..3}`: one through four glazing panes, beginning and ending
-with ordinary glazing and alternating with up to three typed gas gaps. It
+consumers. The two ordinary glazing variants, `WindowMaterial:Gas`, and
+`WindowMaterial:GasMixture` use the ordinary fenestration family, while
+equivalent-layer glazing and `WindowMaterial:Gap:EquivalentLayer` share the
+separate equivalent-layer family. An ordinary `Construction` accepts exactly
+`Glass ((Gas|GasMixture) Glass){0..3}`: one through four glazing panes,
+beginning and ending with ordinary glazing and alternating with up to three
+typed single-gas or gas-mixture gaps. It
 rejects gas-only, trailing-gas, adjacent-glass, adjacent-gas, overlong, and
 mixed opaque/window stacks. Shade, blind, and screen dependencies remain
 untyped. A
@@ -392,12 +439,13 @@ untyped. A
 The opaque runtime cache, execution plan, and construction-material CLI
 comparison filter it out, while hand-built typed models that cross the family
 boundary fail with dedicated runtime errors. Arbitrary-run support assessment
-also counts every typed `WindowMaterial:Gas` occurrence as an explicitly
-unsupported object and run-blocks it before execution; the same explicit
-run block applies to every typed equivalent-layer gap. Glazing thickness,
-conductivity, and asymmetric infrared emissivity, plus gas thickness and
-resolved thermophysical properties, stay in their fenestration payloads and
-are never projected through opaque material accessors.
+also counts every typed `WindowMaterial:Gas` and `WindowMaterial:GasMixture`
+occurrence as explicitly unsupported and run-blocks it before execution; the
+same explicit run block applies to every typed equivalent-layer gap. Glazing
+thickness, conductivity, and asymmetric infrared emissivity, plus gap
+thickness and resolved single-gas or ordered mixture properties, stay in
+their fenestration payloads and are never projected through opaque material
+accessors.
 
 The compiler preserves EnergyPlus family order by compiling all `Material`
 objects, then all `Material:NoMass`, `Material:AirGap`, and
@@ -405,8 +453,9 @@ objects, then all `Material:NoMass`, `Material:AirGap`, and
 `WindowMaterial:Glazing` and then
 `WindowMaterial:Glazing:RefractionExtinctionMethod` and
 `WindowMaterial:Glazing:EquivalentLayer` objects, followed by
-`WindowMaterial:Gas` and `WindowMaterial:Gap:EquivalentLayer`, and keeps their
-names in the shared material registry.
+`WindowMaterial:Gas`, `WindowMaterial:Gap:EquivalentLayer`, and
+`WindowMaterial:GasMixture`, and keeps their names in the shared material
+registry.
 `material_opaque_variants_001` adds
 nonblocking diagnostic EnergyPlus 26.1 grouped-EIO evidence for its exact
 static fixture: construction and layer counts plus every outside-to-inside
@@ -480,6 +529,16 @@ definition exclusion. EIO exposes only material name, canonical gas type,
 source-formatted thickness, and canonical vent type; the remaining typed
 fields and every construction/runtime behavior remain outside the gate.
 
+`WindowMaterial:GasMixture` compiler tests lock the one-through-four active
+component shapes and order, the required Gas 1/Gas 2 input pairs, one-gas
+dummy-pair discard, missing active Gas 3/Gas 4 fraction zero, supplied-field
+bounds, safe missing-active-type failure, inactive-field validation and
+discard, standard-gas-only enum, non-unit sums, duplicates, first-gas-only
+nominal resistance, source order, shared names, ordinary-construction
+alternation, consumer family, and explicit runtime block. EnergyPlus emits no
+mixture material data row, so all mixture fields and behavior remain
+typed/source evidence at this checkpoint.
+
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
 dynamic AirGap/IRT heat transfer. It also does not claim exact EnergyPlus
@@ -492,7 +551,7 @@ the deferred families.
 | Routine | Completion status | Inventory obligation |
 |---|---|---|
 | `GetWindowGlassSpectralData` | `source_mapped` | owns the pre-material spectral dataset read |
-| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, and gap EquivalentLayer objects plus only the regular Glazing `SpectralAverage` branch are implemented |
+| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, and GasMixture objects plus only the regular Glazing `SpectralAverage` branch are implemented |
 | `GetVariableAbsorptanceInput` | `source_mapped` | owns the post-base variable-absorptance overlay |
 | `GetHysteresisData` | `source_mapped` | owns the post-base hysteresis overlay |
 | `GetCondFDInput` | `source_mapped` | owns PhaseChange then VariableThermalConductivity |
@@ -515,14 +574,15 @@ runtime or conformance claim.
 
 Typed model/compiler tests additionally prove that the four opaque states,
 the partial regular-glazing state, and the complete RefractionExtinction,
-glazing EquivalentLayer, Gas, and gap EquivalentLayer states are represented
-separately; their required fields, defaults, exclusive/inclusive bounds,
-regular-glazing energy sums, shared names, source order, formulas, 26.1
-quirks, Autocalculate states, uppercase equivalent-gap gas tokens, required
-vent modes, standard/custom gas resolution, and family boundaries are
-compiled; and the bounded AirGap/IRT construction invariants,
-equivalent-layer construction exclusion, and ordinary Glass/Gas alternation
-are rejected or accepted as declared.
+glazing EquivalentLayer, Gas, gap EquivalentLayer, and GasMixture states are
+represented separately; their required fields, defaults,
+exclusive/inclusive bounds, regular-glazing energy sums, shared names, source
+order, formulas, 26.1 quirks, Autocalculate states, uppercase equivalent-gap
+gas tokens, required vent modes, standard/custom gas resolution, ordered
+mixture prefix semantics, and family boundaries are compiled; and the bounded
+AirGap/IRT construction invariants, equivalent-layer construction exclusion,
+and ordinary Glass/Gas-or-GasMixture alternation are rejected or accepted as
+declared.
 `window_glazing_spectral_average_001` adds an external exact-EIO smoke gate
 for every field EnergyPlus emits from the bounded `SpectralAverage` material
 slice, together with oracle-only proof that the fixture uses that construction
@@ -553,7 +613,7 @@ execution, or conformance.
 
 CP58 remains incomplete until, at minimum:
 
-- the other 13 base definitions and the three deferred
+- the other 12 base definitions and the three deferred
   `WindowMaterial:Glazing` optical branches have schema-complete typed variants
 - all 12 overlays/datasets have typed attachment and validation models
 - source-order attachment, duplicate/reference diagnostics, generated

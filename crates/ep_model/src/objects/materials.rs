@@ -21,6 +21,8 @@ pub enum MaterialKind {
     WindowGas,
     /// WindowMaterial:Gap:EquivalentLayer object.
     WindowGapEquivalentLayer,
+    /// WindowMaterial:GasMixture object.
+    WindowGasMixture,
 }
 
 /// High-level material family used to keep construction consumers separate.
@@ -537,6 +539,146 @@ impl WindowGasMaterial {
     }
 }
 
+/// Built-in gas species permitted by `WindowMaterial:GasMixture`.
+///
+/// EnergyPlus 26.1 does not permit `Custom` in this object, so this type keeps
+/// that invalid state out of the typed model.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum WindowStandardGasType {
+    /// Built-in dry-air coefficients.
+    Air,
+    /// Built-in argon coefficients.
+    Argon,
+    /// Built-in krypton coefficients.
+    Krypton,
+    /// Built-in xenon coefficients.
+    Xenon,
+}
+
+impl WindowStandardGasType {
+    /// Returns the canonical EnergyPlus 26.1 epJSON and display token.
+    #[must_use]
+    pub const fn energyplus_name(self) -> &'static str {
+        match self {
+            Self::Air => "Air",
+            Self::Argon => "Argon",
+            Self::Krypton => "Krypton",
+            Self::Xenon => "Xenon",
+        }
+    }
+
+    /// Parses the exact EnergyPlus 26.1 epJSON gas token.
+    #[must_use]
+    pub fn from_energyplus_name(value: &str) -> Option<Self> {
+        match value {
+            "Air" => Some(Self::Air),
+            "Argon" => Some(Self::Argon),
+            "Krypton" => Some(Self::Krypton),
+            "Xenon" => Some(Self::Xenon),
+            _ => None,
+        }
+    }
+
+    /// Returns the corresponding shared window-gas species.
+    #[must_use]
+    pub const fn as_window_gas_type(self) -> WindowGasType {
+        match self {
+            Self::Air => WindowGasType::Air,
+            Self::Argon => WindowGasType::Argon,
+            Self::Krypton => WindowGasType::Krypton,
+            Self::Xenon => WindowGasType::Xenon,
+        }
+    }
+
+    /// Returns the EnergyPlus 26.1 built-in properties for this gas.
+    #[must_use]
+    pub fn properties(self) -> WindowGasProperties {
+        match self.as_window_gas_type().standard_properties() {
+            Some(properties) => properties,
+            None => unreachable!("WindowStandardGasType cannot represent Custom"),
+        }
+    }
+}
+
+/// One active gas and its input fraction in a window gas mixture.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WindowGasMixtureComponent {
+    /// Built-in gas species. Custom gases are unrepresentable here.
+    pub gas_type: WindowStandardGasType,
+    /// Input fraction, preserved without normalization.
+    pub fraction: f64,
+}
+
+impl WindowGasMixtureComponent {
+    /// Returns the source-fixed properties for this component's gas species.
+    #[must_use]
+    pub fn properties(self) -> WindowGasProperties {
+        self.gas_type.properties()
+    }
+}
+
+/// Active-prefix representation for the one-to-four gases accepted by
+/// `WindowMaterial:GasMixture`.
+///
+/// The variant encodes the active count, so invalid counts and holes in the
+/// active prefix cannot be represented.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum WindowGasMixture {
+    /// One active gas.
+    One([WindowGasMixtureComponent; 1]),
+    /// Two active gases.
+    Two([WindowGasMixtureComponent; 2]),
+    /// Three active gases.
+    Three([WindowGasMixtureComponent; 3]),
+    /// Four active gases.
+    Four([WindowGasMixtureComponent; 4]),
+}
+
+impl WindowGasMixture {
+    /// Returns the active components in source order.
+    #[must_use]
+    pub const fn components(&self) -> &[WindowGasMixtureComponent] {
+        match self {
+            Self::One(components) => components,
+            Self::Two(components) => components,
+            Self::Three(components) => components,
+            Self::Four(components) => components,
+        }
+    }
+
+    /// Returns the encoded active gas count.
+    #[must_use]
+    pub const fn len(&self) -> usize {
+        self.components().len()
+    }
+
+    /// Returns false because every variant contains at least one component.
+    #[must_use]
+    pub const fn is_empty(&self) -> bool {
+        false
+    }
+}
+
+/// Fully resolved `WindowMaterial:GasMixture` payload.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WindowGasMixtureMaterial {
+    /// Gap thickness in meters.
+    pub thickness_m: f64,
+    /// One-to-four active gas components in source order.
+    pub gases: WindowGasMixture,
+}
+
+impl WindowGasMixtureMaterial {
+    /// Returns the source-order nominal resistance evaluated from only the
+    /// first gas's conductivity at 300 K.
+    #[must_use]
+    pub fn nominal_thermal_resistance_m2_k_per_w(self) -> Option<f64> {
+        let first = self.gases.components().first()?;
+        let conductivity = first.properties().conductivity.at_300_k();
+        (self.thickness_m > 0.0 && conductivity > 0.0).then_some(self.thickness_m / conductivity)
+    }
+}
+
 /// Venting mode for an equivalent-layer window gap.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum WindowGapVentType {
@@ -621,6 +763,8 @@ pub enum MaterialDefinition {
     WindowGas(WindowGasMaterial),
     /// Single-gas equivalent-layer window gap.
     WindowGapEquivalentLayer(WindowGapEquivalentLayerMaterial),
+    /// Ordinary window gap containing one to four built-in gases.
+    WindowGasMixture(WindowGasMixtureMaterial),
 }
 
 /// Borrowed opaque material payload used by opaque-only consumers.
@@ -799,6 +943,7 @@ impl Material {
             MaterialDefinition::WindowGapEquivalentLayer(_) => {
                 MaterialKind::WindowGapEquivalentLayer
             }
+            MaterialDefinition::WindowGasMixture(_) => MaterialKind::WindowGasMixture,
         }
     }
 
@@ -812,7 +957,8 @@ impl Material {
             | MaterialDefinition::InfraredTransparent(_) => MaterialFamily::Opaque,
             MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
-            | MaterialDefinition::WindowGas(_) => MaterialFamily::Fenestration,
+            | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGasMixture(_) => MaterialFamily::Fenestration,
             MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_) => MaterialFamily::EquivalentLayer,
         }
@@ -832,6 +978,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
@@ -850,6 +997,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
@@ -868,6 +1016,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
@@ -886,6 +1035,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
@@ -902,6 +1052,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
+            | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
@@ -920,7 +1071,25 @@ impl Material {
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
-            | MaterialDefinition::WindowGas(_) => None,
+            | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGasMixture(_) => None,
+        }
+    }
+
+    /// Borrows the ordinary window gas-mixture payload when applicable.
+    #[must_use]
+    pub const fn as_window_gas_mixture(&self) -> Option<&WindowGasMixtureMaterial> {
+        match &self.definition {
+            MaterialDefinition::WindowGasMixture(material) => Some(material),
+            MaterialDefinition::Regular(_)
+            | MaterialDefinition::NoMass(_)
+            | MaterialDefinition::AirGap(_)
+            | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectralAverage(_)
+            | MaterialDefinition::WindowGlazingRefractionExtinction(_)
+            | MaterialDefinition::WindowGlazingEquivalentLayer(_)
+            | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGapEquivalentLayer(_) => None,
         }
     }
 

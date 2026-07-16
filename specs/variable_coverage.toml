@@ -612,7 +612,7 @@ domain = "construction"
 status = "diagnostic"
 first_case = "window_glazing_spectral_average_001"
 first_evidence = "window_glazing_spectral_average_001"
-support_boundary = "Non-blocking diagnostic one-layer ordinary window-construction and one-solid equivalent-layer construction EIO fixture-integrity comparisons in the declared glazing fixtures, plus the six exact three-layer ordinary WindowConstruction rows in window_material_gas_001 and the seven exact three-layer Construction:WindowEquivalentLayer rows in window_material_gap_equivalent_layer_001. Ratings, Rust construction behavior, whole-window behavior, and construction conformance remain unclaimed."
+support_boundary = "Non-blocking diagnostic one-layer ordinary window-construction and one-solid equivalent-layer construction EIO fixture-integrity comparisons in the declared glazing fixtures, plus the six exact three-layer ordinary WindowConstruction rows in window_material_gas_001 and the seven exact glass-gap-glass Construction:WindowEquivalentLayer rows in window_material_gap_equivalent_layer_001. Ratings, Rust construction behavior, whole-window behavior, and construction conformance remain unclaimed."
 
 [[variable]]
 name = "HeatTransfer Surface Static Inputs"
