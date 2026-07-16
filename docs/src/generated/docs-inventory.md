@@ -9,7 +9,7 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 
 | Check | Result |
 |---|---|
-| docs files | 83 |
+| docs files | 84 |
 | SUMMARY links | 19 |
 | README h2 sections | 5 |
 | README h2 section limit | pass |
@@ -25,7 +25,7 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 | Non-core SUMMARY sections | 0 |
 | SUMMARY section scope violations | 0 |
 | Release notes in Current nav | 0 |
-| Non-generated docs not in SUMMARY | 63 |
+| Non-generated docs not in SUMMARY | 64 |
 
 ## Current Navigation Check
 
@@ -131,6 +131,7 @@ none
 | docs/src/porting-map/algorithm-ledger.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-07-14 |
 | docs/src/porting-map/algorithm-port-ticket.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-06-25 |
 | docs/src/porting-map/conduction-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-10 |
+| docs/src/porting-map/geometry-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-15 |
 | docs/src/porting-map/geometry.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
 | docs/src/porting-map/heat-balance-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-14 |
 | docs/src/porting-map/heat-balance.md | source-map | not in SUMMARY | n/a | none |  |  |  |

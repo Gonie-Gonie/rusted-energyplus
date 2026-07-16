@@ -4,8 +4,9 @@ use crate::{
     compare_series, compare_series_samples_v2, compare_series_v2, parse_eio_construction_ctf,
     parse_eio_construction_ctf_coefficients, parse_eio_heat_transfer_surfaces,
     parse_eio_material_ctf_summary, parse_eio_other_equipment_nominal,
-    parse_eio_warmup_environments, parse_eio_zone_geometry, parse_eso_series,
-    parse_eso_time_series, parse_mtr_time_series, parse_mtr_time_series_for_frequency,
+    parse_eio_surface_geometry_rules, parse_eio_warmup_environments, parse_eio_zone_geometry,
+    parse_eso_series, parse_eso_time_series, parse_mtr_time_series,
+    parse_mtr_time_series_for_frequency,
 };
 
 #[test]
@@ -463,6 +464,29 @@ fn parses_eio_heat_transfer_surface_rows() -> Result<(), Box<dyn std::error::Err
     assert_eq!(surfaces[0].area_gross_m2, 1.0);
     assert_eq!(surfaces[0].azimuth_deg, 90.0);
     assert_eq!(surfaces[0].tilt_deg, 90.0);
+
+    Ok(())
+}
+
+#[test]
+fn parses_eio_surface_geometry_rules() -> Result<(), Box<dyn std::error::Error>> {
+    let rules = parse_eio_surface_geometry_rules(
+        r#"! <Surface Geometry>,Starting Corner,Vertex Input Direction,Coordinate System,Daylight Reference Point Coordinate System,Rectangular (Simple) Surface Coordinate System
+ Surface Geometry,UpperLeftCorner,Counterclockwise,RelativeCoordinateSystem,WorldCoordinateSystem,RelativeToZoneOrigin
+"#,
+    )?;
+
+    assert_eq!(rules.starting_corner, "UpperLeftCorner");
+    assert_eq!(rules.vertex_input_direction, "Counterclockwise");
+    assert_eq!(rules.coordinate_system, "RelativeCoordinateSystem");
+    assert_eq!(
+        rules.daylight_reference_point_coordinate_system,
+        "WorldCoordinateSystem"
+    );
+    assert_eq!(
+        rules.rectangular_surface_coordinate_system,
+        "RelativeToZoneOrigin"
+    );
 
     Ok(())
 }

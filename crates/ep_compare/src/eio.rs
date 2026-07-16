@@ -6,6 +6,14 @@ pub use types::*;
 
 use std::path::Path;
 
+/// Loads the global `Surface Geometry` row from an EnergyPlus EIO file.
+pub fn load_eio_surface_geometry_rules(
+    path: impl AsRef<Path>,
+) -> Result<EioSurfaceGeometryRules, EioError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_eio_surface_geometry_rules(&contents)
+}
+
 /// Loads zone geometry rows from an EnergyPlus EIO file.
 pub fn load_eio_zone_geometry(path: impl AsRef<Path>) -> Result<Vec<EioZoneGeometry>, EioError> {
     let contents = std::fs::read_to_string(path)?;
@@ -58,6 +66,46 @@ pub fn load_eio_warmup_environments(
 ) -> Result<Vec<EioWarmupEnvironment>, EioError> {
     let contents = std::fs::read_to_string(path)?;
     parse_eio_warmup_environments(&contents)
+}
+
+/// Parses the unique `Surface Geometry` row from EnergyPlus EIO contents.
+pub fn parse_eio_surface_geometry_rules(
+    contents: &str,
+) -> Result<EioSurfaceGeometryRules, EioError> {
+    let mut rules = None;
+    for (line_index, line) in contents.lines().enumerate() {
+        let line_number = line_index + 1;
+        let trimmed = line.trim();
+        if !trimmed.starts_with("Surface Geometry,") {
+            continue;
+        }
+
+        let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+        if fields.len() < 6 {
+            return Err(EioError::InvalidSurfaceGeometry {
+                line: line_number,
+                text: line.to_string(),
+                reason: format!("expected at least 6 fields, found {}", fields.len()),
+            });
+        }
+        if rules.is_some() {
+            return Err(EioError::InvalidSurfaceGeometry {
+                line: line_number,
+                text: line.to_string(),
+                reason: "expected exactly one Surface Geometry row".to_string(),
+            });
+        }
+
+        rules = Some(EioSurfaceGeometryRules {
+            starting_corner: required_field(&fields, 1).to_string(),
+            vertex_input_direction: required_field(&fields, 2).to_string(),
+            coordinate_system: required_field(&fields, 3).to_string(),
+            daylight_reference_point_coordinate_system: required_field(&fields, 4).to_string(),
+            rectangular_surface_coordinate_system: required_field(&fields, 5).to_string(),
+        });
+    }
+
+    rules.ok_or(EioError::MissingSurfaceGeometry)
 }
 
 /// Parses `Zone Information` rows from EnergyPlus EIO contents.

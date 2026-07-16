@@ -1,6 +1,22 @@
 //! EnergyPlus EIO diagnostic table value types and errors.
 
 use std::fmt::{Display, Formatter};
+
+/// Global surface-geometry rules read from EnergyPlus `eplusout.eio`.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct EioSurfaceGeometryRules {
+    /// Normalized starting corner.
+    pub starting_corner: String,
+    /// Normalized vertex input direction.
+    pub vertex_input_direction: String,
+    /// Normalized detailed-surface coordinate system.
+    pub coordinate_system: String,
+    /// Normalized daylight reference-point coordinate system.
+    pub daylight_reference_point_coordinate_system: String,
+    /// Normalized rectangular-surface coordinate system.
+    pub rectangular_surface_coordinate_system: String,
+}
+
 /// Zone geometry values read from EnergyPlus `eplusout.eio`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct EioZoneGeometry {
@@ -137,6 +153,8 @@ pub struct EioWarmupEnvironment {
 pub enum EioError {
     /// File read failed.
     Io(std::io::Error),
+    /// No `Surface Geometry` row was present.
+    MissingSurfaceGeometry,
     /// No `Zone Information` rows were present.
     MissingZoneInformation,
     /// No `HeatTransfer Surface` rows were present.
@@ -149,6 +167,15 @@ pub enum EioError {
     MissingConstructionCtfCoefficient,
     /// No `Material CTF Summary` rows were present.
     MissingMaterialCtfSummary,
+    /// A `Surface Geometry` row could not be parsed.
+    InvalidSurfaceGeometry {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
     /// An `Environment:WarmupDays` row could not be parsed.
     InvalidWarmupEnvironment {
         /// One-based line number.
@@ -218,6 +245,7 @@ impl Display for EioError {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Io(error) => write!(formatter, "failed to read EIO: {error}"),
+            Self::MissingSurfaceGeometry => write!(formatter, "EIO Surface Geometry not found"),
             Self::MissingZoneInformation => write!(formatter, "EIO Zone Information not found"),
             Self::MissingHeatTransferSurface => {
                 write!(formatter, "EIO HeatTransfer Surface not found")
@@ -235,6 +263,10 @@ impl Display for EioError {
             Self::MissingMaterialCtfSummary => {
                 write!(formatter, "EIO Material CTF Summary not found")
             }
+            Self::InvalidSurfaceGeometry { line, text, reason } => write!(
+                formatter,
+                "invalid EIO Surface Geometry at line {line}: {reason}: {text}"
+            ),
             Self::InvalidZoneInformation { line, text, reason } => write!(
                 formatter,
                 "invalid EIO Zone Information at line {line}: {reason}: {text}"
@@ -271,7 +303,8 @@ impl std::error::Error for EioError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Io(error) => Some(error),
-            Self::MissingZoneInformation
+            Self::MissingSurfaceGeometry
+            | Self::MissingZoneInformation
             | Self::MissingHeatTransferSurface
             | Self::MissingOtherEquipmentNominal
             | Self::InvalidZoneInformation { .. }
@@ -279,6 +312,7 @@ impl std::error::Error for EioError {
             | Self::MissingConstructionCtf
             | Self::MissingConstructionCtfCoefficient
             | Self::MissingMaterialCtfSummary
+            | Self::InvalidSurfaceGeometry { .. }
             | Self::InvalidOtherEquipmentNominal { .. }
             | Self::InvalidConstructionCtf { .. }
             | Self::InvalidConstructionCtfCoefficient { .. }
