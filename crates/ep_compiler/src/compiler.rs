@@ -42,11 +42,11 @@ use ep_model::{
     WindowScreenEquivalentLayerMaterial, WindowScreenEquivalentLayerSolarProperties,
     WindowScreenEquivalentLayerVisibleProperties, WindowScreenMaterial,
     WindowScreenTransmittanceMapResolution, WindowShadeEquivalentLayerMaterial,
-    WindowShadeEquivalentLayerSideOpticalProperties, WindowShadeMaterial, WindowStandardGasType,
-    Zone, ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
-    ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat,
-    ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatControl, ZoneThermostatId,
-    parse_calendar_date_rule,
+    WindowShadeEquivalentLayerSideOpticalProperties, WindowShadeMaterial,
+    WindowSimpleGlazingMaterial, WindowStandardGasType, Zone, ZoneEquipmentConnection,
+    ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId,
+    ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
+    ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 use std::collections::BTreeMap;
@@ -92,6 +92,7 @@ fn window_construction_layer_kind(
         | MaterialDefinition::InfraredTransparent(_)
         | MaterialDefinition::RoofVegetation(_)
         | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+        | MaterialDefinition::WindowSimpleGlazing(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
         | MaterialDefinition::WindowShadeEquivalentLayer(_)
@@ -111,6 +112,7 @@ fn window_glazing_is_solar_diffusing(definition: &MaterialDefinition) -> bool {
         | MaterialDefinition::InfraredTransparent(_)
         | MaterialDefinition::RoofVegetation(_)
         | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+        | MaterialDefinition::WindowSimpleGlazing(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowGas(_)
         | MaterialDefinition::WindowGasMixture(_)
@@ -152,6 +154,7 @@ fn window_gap_signature(definition: &MaterialDefinition) -> Option<WindowGapSign
         | MaterialDefinition::InfraredTransparent(_)
         | MaterialDefinition::RoofVegetation(_)
         | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+        | MaterialDefinition::WindowSimpleGlazing(_)
         | MaterialDefinition::WindowGlazingSpectralAverage(_)
         | MaterialDefinition::WindowGlazingRefractionExtinction(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -403,6 +406,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "WindowMaterial:Blind:EquivalentLayer",
     "Material:RoofVegetation",
     "WindowMaterial:GlazingGroup:Thermochromic",
+    "WindowMaterial:SimpleGlazingSystem",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -985,6 +989,7 @@ impl<'a> Compiler<'a> {
         self.parse_window_blind_equivalent_layer_materials(model);
         self.parse_roof_vegetation_materials(model);
         self.parse_window_glazing_thermochromic_group_materials(model);
+        self.parse_window_simple_glazing_system_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -4893,6 +4898,98 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_window_simple_glazing_system_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowMaterial:SimpleGlazingSystem";
+        const U_FACTOR_FIELD: &str = "u_factor";
+        const SHGC_FIELD: &str = "solar_heat_gain_coefficient";
+        const VISIBLE_TRANSMITTANCE_FIELD: &str = "visible_transmittance";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let u_factor_with_film_coefficients_w_per_m2_k = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                U_FACTOR_FIELD,
+                0.0,
+                false,
+            );
+            let solar_heat_gain_coefficient = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                SHGC_FIELD,
+                (0.0, false),
+                (1.0, false),
+            );
+            let input_visible_transmittance_at_normal_incidence =
+                match field_value(&object, VISIBLE_TRANSMITTANCE_FIELD) {
+                    None => Some(None),
+                    Some(_) => self
+                        .optional_number_bounded(
+                            OBJECT_TYPE,
+                            &name,
+                            &object,
+                            VISIBLE_TRANSMITTANCE_FIELD,
+                            (0.0, false),
+                            (1.0, false),
+                        )
+                        .map(Some),
+                };
+            let (
+                Some(u_factor_with_film_coefficients_w_per_m2_k),
+                Some(solar_heat_gain_coefficient),
+                Some(input_visible_transmittance_at_normal_incidence),
+            ) = (
+                u_factor_with_film_coefficients_w_per_m2_k,
+                solar_heat_gain_coefficient,
+                input_visible_transmittance_at_normal_incidence,
+            )
+            else {
+                continue;
+            };
+
+            let material = WindowSimpleGlazingMaterial::from_performance_indices(
+                u_factor_with_film_coefficients_w_per_m2_k,
+                solar_heat_gain_coefficient,
+                input_visible_transmittance_at_normal_incidence,
+            );
+            if material.conductivity_w_per_m_k.is_nan() || material.conductivity_w_per_m_k <= 0.0 {
+                self.error(
+                    "InvalidSimpleGlazingDerivedConductivity",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some(U_FACTOR_FIELD),
+                    format!(
+                        "{OBJECT_TYPE}/{name} derived conductivity must be greater than zero; U-factor {u_factor_with_film_coefficients_w_per_m2_k} produced {} W/m-K",
+                        material.conductivity_w_per_m_k
+                    ),
+                );
+                continue;
+            }
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            if material.film_resistance_clamped {
+                self.warning(
+                    "SimpleGlazingFilmResistanceClamped",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some(U_FACTOR_FIELD),
+                    format!(
+                        "{OBJECT_TYPE}: {name} has U-factor higher than that provided by surface film resistances; check value of U-factor"
+                    ),
+                );
+            }
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::WindowSimpleGlazing(material),
+            });
+        }
+    }
+
     fn reserve_material_identity(
         &mut self,
         model: &mut TypedModel,
@@ -5022,6 +5119,30 @@ impl<'a> Compiler<'a> {
                 Some(&layer_field),
                 format!(
                     "Construction/{construction_name} cannot yet consume thermochromic glazing group {}; EnergyPlus CreateTCConstructions expansion and timestep state selection remain deferred",
+                    material.name.0
+                ),
+            );
+            return None;
+        }
+
+        if let Some((layer_index, material)) =
+            layers
+                .iter()
+                .enumerate()
+                .find_map(|(layer_index, material_id)| {
+                    let material = model.materials.get(material_id.0 as usize)?;
+                    (material.family() == ep_model::MaterialFamily::SimpleGlazing)
+                        .then_some((layer_index, material))
+                })
+        {
+            let layer_field = construction_layer_field(layer_index);
+            self.error(
+                "UnsupportedSimpleGlazingSystemConstruction",
+                "Construction",
+                Some(construction_name),
+                Some(&layer_field),
+                format!(
+                    "Construction/{construction_name} cannot yet consume simple glazing system {}; window optics, thermal behavior, and nominal U-factor adjustment remain deferred",
                     material.name.0
                 ),
             );
@@ -13086,6 +13207,7 @@ mod tests {
     mod window_material_screen_equivalent_layer;
     mod window_material_shade;
     mod window_material_shade_equivalent_layer;
+    mod window_material_simple_glazing_system;
 
     use super::{
         ALL_SCHEDULE_DAY_TYPES, CompileStage, DiagnosticSeverity, ObjectCoverageStatus,

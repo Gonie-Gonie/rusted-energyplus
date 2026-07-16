@@ -10,6 +10,7 @@ mod window_screen;
 mod window_screen_equivalent_layer;
 mod window_shade;
 mod window_shade_equivalent_layer;
+mod window_simple_glazing;
 
 pub use roof_vegetation::{RoofVegetationMaterial, RoofVegetationMoistureDiffusionMethod};
 pub use window_blind::{
@@ -43,6 +44,7 @@ pub use window_shade::WindowShadeMaterial;
 pub use window_shade_equivalent_layer::{
     WindowShadeEquivalentLayerMaterial, WindowShadeEquivalentLayerSideOpticalProperties,
 };
+pub use window_simple_glazing::WindowSimpleGlazingMaterial;
 
 /// Material flavor tracked by the first typed subset.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -63,6 +65,8 @@ pub enum MaterialKind {
     WindowGlazingEquivalentLayer,
     /// WindowMaterial:GlazingGroup:Thermochromic object.
     WindowGlazingThermochromicGroup,
+    /// WindowMaterial:SimpleGlazingSystem object.
+    WindowSimpleGlazing,
     /// WindowMaterial:Gas object.
     WindowGas,
     /// WindowMaterial:Gap:EquivalentLayer object.
@@ -99,6 +103,8 @@ pub enum MaterialFamily {
     EquivalentLayer,
     /// Thermochromic glazing group whose construction/runtime consumer is deferred.
     ThermochromicGroup,
+    /// Simple glazing system whose dedicated construction consumer is deferred.
+    SimpleGlazing,
 }
 
 impl MaterialFamily {
@@ -110,6 +116,7 @@ impl MaterialFamily {
             Self::Fenestration => "fenestration",
             Self::EquivalentLayer => "equivalent-layer",
             Self::ThermochromicGroup => "thermochromic-group",
+            Self::SimpleGlazing => "simple-glazing",
         }
     }
 }
@@ -227,6 +234,8 @@ pub enum MaterialDefinition {
     WindowGlazingEquivalentLayer(WindowGlazingEquivalentLayerMaterial),
     /// Ordered thermochromic glazing states held in the model's flat state arena.
     WindowGlazingThermochromicGroup(WindowGlazingThermochromicGroupMaterial),
+    /// Simple glazing performance indices and their source-derived equivalent layer.
+    WindowSimpleGlazing(WindowSimpleGlazingMaterial),
     /// Single-gas ordinary window gap.
     WindowGas(WindowGasMaterial),
     /// Single-gas equivalent-layer window gap.
@@ -455,6 +464,7 @@ impl Material {
             MaterialDefinition::WindowGlazingThermochromicGroup(_) => {
                 MaterialKind::WindowGlazingThermochromicGroup
             }
+            MaterialDefinition::WindowSimpleGlazing(_) => MaterialKind::WindowSimpleGlazing,
             MaterialDefinition::WindowGas(_) => MaterialKind::WindowGas,
             MaterialDefinition::WindowGapEquivalentLayer(_) => {
                 MaterialKind::WindowGapEquivalentLayer
@@ -504,6 +514,7 @@ impl Material {
             MaterialDefinition::WindowGlazingThermochromicGroup(_) => {
                 MaterialFamily::ThermochromicGroup
             }
+            MaterialDefinition::WindowSimpleGlazing(_) => MaterialFamily::SimpleGlazing,
         }
     }
 
@@ -524,6 +535,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowShade(_)
@@ -550,6 +562,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowShade(_)
@@ -578,6 +591,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowShade(_)
@@ -606,6 +620,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowShade(_)
@@ -634,6 +649,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowShade(_)
@@ -662,6 +678,34 @@ impl Material {
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
+            | MaterialDefinition::WindowGas(_)
+            | MaterialDefinition::WindowGasMixture(_)
+            | MaterialDefinition::WindowShade(_)
+            | MaterialDefinition::WindowGapEquivalentLayer(_)
+            | MaterialDefinition::WindowShadeEquivalentLayer(_)
+            | MaterialDefinition::WindowDrapeEquivalentLayer(_)
+            | MaterialDefinition::WindowScreen(_)
+            | MaterialDefinition::WindowScreenEquivalentLayer(_)
+            | MaterialDefinition::WindowBlind(_)
+            | MaterialDefinition::WindowBlindEquivalentLayer(_) => None,
+        }
+    }
+
+    /// Borrows the simple glazing-system payload when applicable.
+    #[must_use]
+    pub const fn as_window_simple_glazing(&self) -> Option<&WindowSimpleGlazingMaterial> {
+        match &self.definition {
+            MaterialDefinition::WindowSimpleGlazing(material) => Some(material),
+            MaterialDefinition::Regular(_)
+            | MaterialDefinition::RoofVegetation(_)
+            | MaterialDefinition::NoMass(_)
+            | MaterialDefinition::AirGap(_)
+            | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectralAverage(_)
+            | MaterialDefinition::WindowGlazingRefractionExtinction(_)
+            | MaterialDefinition::WindowGlazingEquivalentLayer(_)
+            | MaterialDefinition::WindowGlazingThermochromicGroup(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowShade(_)
@@ -689,6 +733,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowShade(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_)
@@ -717,6 +762,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowShade(_)
@@ -743,6 +789,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowShade(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_)
@@ -769,6 +816,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGasMixture(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_)
@@ -797,6 +845,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_)
             | MaterialDefinition::WindowGasMixture(_)
@@ -825,6 +874,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_)
             | MaterialDefinition::WindowGasMixture(_)
@@ -851,6 +901,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_)
             | MaterialDefinition::WindowGasMixture(_)
@@ -879,6 +930,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_)
             | MaterialDefinition::WindowGasMixture(_)
@@ -905,6 +957,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_)
             | MaterialDefinition::WindowGasMixture(_)
@@ -933,6 +986,7 @@ impl Material {
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
+            | MaterialDefinition::WindowSimpleGlazing(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGapEquivalentLayer(_)
             | MaterialDefinition::WindowGasMixture(_)

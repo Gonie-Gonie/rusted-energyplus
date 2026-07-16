@@ -6,6 +6,7 @@ use ep_raw_model::parse_epjson_str;
 mod material_roof_vegetation;
 mod window_glazing_thermochromic_group;
 mod window_material_blind_equivalent_layer;
+mod window_simple_glazing;
 
 #[test]
 fn simple_one_zone_model_is_supported() -> Result<(), Box<dyn std::error::Error>> {
