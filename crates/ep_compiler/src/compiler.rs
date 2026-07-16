@@ -28,9 +28,10 @@ use ep_model::{
     SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
     ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
     TypedModel, Version, VertexEntryDirection, WeekScheduleId, WindExposure,
-    WindowGapEquivalentLayerMaterial, WindowGapVentType, WindowGasMaterial, WindowGasMixture,
-    WindowGasMixtureComponent, WindowGasMixtureMaterial, WindowGasPolynomialCoefficients,
-    WindowGasProperties, WindowGasType, WindowGlazingEquivalentLayerDiffuseProperties,
+    WindowDrapeEquivalentLayerMaterial, WindowGapEquivalentLayerMaterial, WindowGapVentType,
+    WindowGasMaterial, WindowGasMixture, WindowGasMixtureComponent, WindowGasMixtureMaterial,
+    WindowGasPolynomialCoefficients, WindowGasProperties, WindowGasType,
+    WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
     WindowGlazingSpectralAverageMaterial, WindowShadeEquivalentLayerMaterial,
@@ -80,7 +81,8 @@ fn window_construction_layer_kind(
         | MaterialDefinition::InfraredTransparent(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
-        | MaterialDefinition::WindowShadeEquivalentLayer(_) => None,
+        | MaterialDefinition::WindowShadeEquivalentLayer(_)
+        | MaterialDefinition::WindowDrapeEquivalentLayer(_) => None,
     }
 }
 
@@ -97,7 +99,8 @@ fn window_glazing_is_solar_diffusing(definition: &MaterialDefinition) -> bool {
         | MaterialDefinition::WindowGasMixture(_)
         | MaterialDefinition::WindowShade(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
-        | MaterialDefinition::WindowShadeEquivalentLayer(_) => false,
+        | MaterialDefinition::WindowShadeEquivalentLayer(_)
+        | MaterialDefinition::WindowDrapeEquivalentLayer(_) => false,
     }
 }
 
@@ -131,7 +134,8 @@ fn window_gap_signature(definition: &MaterialDefinition) -> Option<WindowGapSign
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowShade(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
-        | MaterialDefinition::WindowShadeEquivalentLayer(_) => return None,
+        | MaterialDefinition::WindowShadeEquivalentLayer(_)
+        | MaterialDefinition::WindowDrapeEquivalentLayer(_) => return None,
     };
     Some(WindowGapSignature {
         gas_types,
@@ -365,6 +369,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "WindowMaterial:GasMixture",
     "WindowMaterial:Shade",
     "WindowMaterial:Shade:EquivalentLayer",
+    "WindowMaterial:Drape:EquivalentLayer",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -940,6 +945,7 @@ impl<'a> Compiler<'a> {
         self.parse_window_gas_mixture_materials(model);
         self.parse_window_shade_materials(model);
         self.parse_window_shade_equivalent_layer_materials(model);
+        self.parse_window_drape_equivalent_layer_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -2771,6 +2777,250 @@ impl<'a> Compiler<'a> {
                         front_thermal_absorptance: front_side_shade_material_infrared_emissivity,
                         back_thermal_absorptance: back_side_shade_material_infrared_emissivity,
                         thermal_transmittance: shade_material_infrared_transmittance,
+                    },
+                ),
+            });
+        }
+    }
+
+    fn parse_window_drape_equivalent_layer_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowMaterial:Drape:EquivalentLayer";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let drape_beam_beam_solar_transmittance_at_normal_incidence = self
+                .number_bounded_default(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "drape_beam_beam_solar_transmittance_at_normal_incidence",
+                    0.0,
+                    (0.0, true),
+                    (0.2, true),
+                );
+            let front_side_drape_beam_diffuse_solar_transmittance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "front_side_drape_beam_diffuse_solar_transmittance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let back_side_drape_beam_diffuse_solar_transmittance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "back_side_drape_beam_diffuse_solar_transmittance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let front_side_drape_beam_diffuse_solar_reflectance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "front_side_drape_beam_diffuse_solar_reflectance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let back_side_drape_beam_diffuse_solar_reflectance = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "back_side_drape_beam_diffuse_solar_reflectance",
+                (0.0, true),
+                (1.0, false),
+            );
+            let drape_beam_beam_visible_transmittance = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "drape_beam_beam_visible_transmittance",
+                0.0,
+                (0.0, true),
+                (1.0, false),
+            );
+            let drape_beam_diffuse_visible_transmittance = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "drape_beam_diffuse_visible_transmittance",
+                0.0,
+                (0.0, true),
+                (1.0, false),
+            );
+            let drape_beam_diffuse_visible_reflectance = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "drape_beam_diffuse_visible_reflectance",
+                0.0,
+                (0.0, true),
+                (1.0, false),
+            );
+            let drape_material_infrared_transmittance = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "drape_material_infrared_transmittance",
+                0.05,
+                (0.0, true),
+                (1.0, false),
+            );
+            let front_side_drape_material_infrared_emissivity = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "front_side_drape_material_infrared_emissivity",
+                0.87,
+                (0.0, false),
+                (1.0, false),
+            );
+            let back_side_drape_material_infrared_emissivity = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "back_side_drape_material_infrared_emissivity",
+                0.87,
+                (0.0, false),
+                (1.0, false),
+            );
+            let width_of_pleated_fabric = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "width_of_pleated_fabric",
+                0.0,
+                (0.0, true),
+                (f64::INFINITY, true),
+            );
+            let length_of_pleated_fabric = self.number_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "length_of_pleated_fabric",
+                0.0,
+                (0.0, true),
+                (f64::INFINITY, true),
+            );
+
+            let mut combinations_valid = true;
+            if let (Some(front_transmittance), Some(front_reflectance)) = (
+                front_side_drape_beam_diffuse_solar_transmittance,
+                front_side_drape_beam_diffuse_solar_reflectance,
+            ) {
+                let sum = drape_beam_beam_solar_transmittance_at_normal_incidence
+                    + front_transmittance
+                    + front_reflectance;
+                if sum >= 1.0 {
+                    self.error(
+                        "InvalidWindowDrapeEquivalentLayerOpticalSum",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some("drape_beam_beam_solar_transmittance_at_normal_incidence"),
+                        format!(
+                            "{OBJECT_TYPE}/{name} front solar optical-property sum must be less than 1.0, got {sum}"
+                        ),
+                    );
+                    combinations_valid = false;
+                }
+            }
+            let visible_sum = drape_beam_beam_visible_transmittance
+                + drape_beam_diffuse_visible_transmittance
+                + drape_beam_diffuse_visible_reflectance;
+            if visible_sum >= 1.0 {
+                self.error(
+                    "InvalidWindowDrapeEquivalentLayerOpticalSum",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("drape_beam_beam_visible_transmittance"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} visible optical-property sum must be less than 1.0, got {visible_sum}"
+                    ),
+                );
+                combinations_valid = false;
+            }
+            let front_infrared_sum = drape_material_infrared_transmittance
+                + front_side_drape_material_infrared_emissivity;
+            if front_infrared_sum > 1.0 {
+                self.error(
+                    "InvalidWindowDrapeEquivalentLayerOpticalSum",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("drape_material_infrared_transmittance"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} front infrared optical-property sum must be less than or equal to 1.0, got {front_infrared_sum}"
+                    ),
+                );
+                combinations_valid = false;
+            }
+
+            let (
+                Some(front_side_drape_beam_diffuse_solar_transmittance),
+                Some(back_side_drape_beam_diffuse_solar_transmittance),
+                Some(front_side_drape_beam_diffuse_solar_reflectance),
+                Some(back_side_drape_beam_diffuse_solar_reflectance),
+            ) = (
+                front_side_drape_beam_diffuse_solar_transmittance,
+                back_side_drape_beam_diffuse_solar_transmittance,
+                front_side_drape_beam_diffuse_solar_reflectance,
+                back_side_drape_beam_diffuse_solar_reflectance,
+            )
+            else {
+                continue;
+            };
+            if !combinations_valid {
+                continue;
+            }
+
+            let (pleated_width_m, pleated_length_m) =
+                if width_of_pleated_fabric != 0.0 && length_of_pleated_fabric != 0.0 {
+                    (width_of_pleated_fabric, length_of_pleated_fabric)
+                } else {
+                    (0.0, 0.0)
+                };
+
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::WindowDrapeEquivalentLayer(
+                    WindowDrapeEquivalentLayerMaterial {
+                        roughness: MaterialSurfaceRoughness::MediumRough,
+                        front_solar: WindowShadeEquivalentLayerSideOpticalProperties {
+                            beam_beam_transmittance:
+                                drape_beam_beam_solar_transmittance_at_normal_incidence,
+                            beam_diffuse_transmittance:
+                                front_side_drape_beam_diffuse_solar_transmittance,
+                            beam_diffuse_reflectance:
+                                front_side_drape_beam_diffuse_solar_reflectance,
+                        },
+                        back_solar: WindowShadeEquivalentLayerSideOpticalProperties {
+                            beam_beam_transmittance:
+                                drape_beam_beam_solar_transmittance_at_normal_incidence,
+                            beam_diffuse_transmittance:
+                                back_side_drape_beam_diffuse_solar_transmittance,
+                            beam_diffuse_reflectance:
+                                back_side_drape_beam_diffuse_solar_reflectance,
+                        },
+                        front_visible: WindowShadeEquivalentLayerSideOpticalProperties {
+                            beam_beam_transmittance: drape_beam_beam_visible_transmittance,
+                            beam_diffuse_transmittance: drape_beam_diffuse_visible_transmittance,
+                            beam_diffuse_reflectance: drape_beam_diffuse_visible_reflectance,
+                        },
+                        // GetMaterialData assigns N6-N8 only to the front
+                        // visible TAR slots in EnergyPlus 26.1.
+                        back_visible: WindowShadeEquivalentLayerSideOpticalProperties::default(),
+                        infrared_transmittance: drape_material_infrared_transmittance,
+                        front_infrared_emissivity: front_side_drape_material_infrared_emissivity,
+                        back_infrared_emissivity: back_side_drape_material_infrared_emissivity,
+                        front_thermal_absorptance: front_side_drape_material_infrared_emissivity,
+                        back_thermal_absorptance: back_side_drape_material_infrared_emissivity,
+                        thermal_transmittance: drape_material_infrared_transmittance,
+                        pleated_width_m,
+                        pleated_length_m,
                     },
                 ),
             });
@@ -10462,6 +10712,7 @@ mod tests {
     mod schedule_scalar_type_limits;
     mod schedule_week_compact;
     mod schedule_year;
+    mod window_material_drape_equivalent_layer;
     mod window_material_gap_equivalent_layer;
     mod window_material_gas;
     mod window_material_gas_mixture;
