@@ -21,8 +21,9 @@ use ep_compare::{
     SeriesSample, Tolerance, compare_series, load_eio_construction_ctf,
     load_eio_construction_ctf_coefficients, load_eio_construction_material_summaries,
     load_eio_heat_transfer_surfaces, load_eio_other_equipment_nominal,
-    load_eio_surface_geometry_rules, load_eio_warmup_environments, load_eio_zone_geometry,
-    load_eso_series, load_eso_time_series,
+    load_eio_surface_geometry_rules, load_eio_warmup_environments,
+    load_eio_window_material_glazing, load_eio_zone_geometry, load_eso_series,
+    load_eso_time_series,
 };
 use ep_compiler::{CompileReport, DiagnosticSeverity, compile_raw_model};
 use ep_conformance::{
@@ -32,8 +33,9 @@ use ep_conformance::{
 };
 use ep_model::{
     Construction, ConstructionKind, GeometryCoordinateSystem, GlobalGeometryRules, Material,
-    ModelGraph, OtherEquipment, OutsideBoundaryCondition, Point3, ScheduleId, SimulationModel,
-    StartingVertexPosition, SurfaceType, TypedModel, VertexEntryDirection,
+    MaterialDefinition, ModelGraph, OtherEquipment, OutsideBoundaryCondition, Point3, ScheduleId,
+    SimulationModel, StartingVertexPosition, SurfaceType, TypedModel, VertexEntryDirection,
+    WindowGlazingSpectralAverageMaterial,
 };
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, RawModelSummary, load_epjson_file};
@@ -329,6 +331,7 @@ fn print_help() {
     println!("  compare geometry <input.epJSON> <eplusout.eio>");
     println!("  compare surface-geometry <input.epJSON> <eplusout.eio>");
     println!("  compare construction-materials <input.epJSON> <eplusout.eio>");
+    println!("  compare window-glazing-spectral-average <input.epJSON> <eplusout.eio>");
     println!("  compare internal-gains <input.epJSON> <eplusout.eio>");
     println!("  compare internal-convective-gain <input.epJSON> <eplusout.eso>");
     println!("  compare weather-fields <weather.epw> <eplusout.eso>");
@@ -3340,6 +3343,9 @@ fn run_compare_command(args: &[String]) -> i32 {
         Some("geometry") => run_compare_geometry(&args[1..]),
         Some("surface-geometry") => run_compare_surface_geometry(&args[1..]),
         Some("construction-materials") => run_compare_construction_materials(&args[1..]),
+        Some("window-glazing-spectral-average") => {
+            run_compare_window_glazing_spectral_average(&args[1..])
+        }
         Some("internal-gains") => run_compare_internal_gains(&args[1..]),
         Some("internal-convective-gain") => run_compare_internal_convective_gain(&args[1..]),
         Some("weather-fields") | Some("weather-drybulb") => run_compare_weather_fields(&args[1..]),
@@ -3351,6 +3357,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             eprintln!("usage: eplus-rs compare surface-geometry <input.epJSON> <eplusout.eio>");
             eprintln!(
                 "usage: eplus-rs compare construction-materials <input.epJSON> <eplusout.eio>"
+            );
+            eprintln!(
+                "usage: eplus-rs compare window-glazing-spectral-average <input.epJSON> <eplusout.eio>"
             );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(
@@ -3368,6 +3377,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             eprintln!("usage: eplus-rs compare surface-geometry <input.epJSON> <eplusout.eio>");
             eprintln!(
                 "usage: eplus-rs compare construction-materials <input.epJSON> <eplusout.eio>"
+            );
+            eprintln!(
+                "usage: eplus-rs compare window-glazing-spectral-average <input.epJSON> <eplusout.eio>"
             );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(
@@ -3941,6 +3953,158 @@ fn run_compare_construction_materials(args: &[String]) -> i32 {
     );
     println!("  status: {}", if passed { "pass" } else { "fail" });
 
+    if passed { 0 } else { 1 }
+}
+
+fn run_compare_window_glazing_spectral_average(args: &[String]) -> i32 {
+    const USAGE: &str =
+        "usage: eplus-rs compare window-glazing-spectral-average <input.epJSON> <eplusout.eio>";
+    let Some(input_path) = args.first() else {
+        eprintln!("missing input path");
+        eprintln!("{USAGE}");
+        return 2;
+    };
+    let Some(eio_path) = args.get(1) else {
+        eprintln!("missing eplusout.eio path");
+        eprintln!("{USAGE}");
+        return 2;
+    };
+
+    let raw_model = match load_epjson_file(input_path) {
+        Ok(model) => model,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    let result = compile_raw_model(&raw_model);
+    let Some(model) = result.model else {
+        print_compile_diagnostics(&result.report);
+        return 1;
+    };
+    let rust_rows = match window_glazing_spectral_average_rows(&model) {
+        Ok(rows) => rows,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    if rust_rows.is_empty() {
+        eprintln!(
+            "no referenced WindowMaterial:Glazing SpectralAverage objects are available for comparison"
+        );
+        return 1;
+    }
+    let oracle_rows = match load_eio_window_material_glazing(eio_path) {
+        Ok(rows) => rows,
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+
+    let tolerance = Tolerance {
+        absolute: 0.00001,
+        relative: 0.0,
+    };
+    let mut passed = rust_rows.len() == oracle_rows.len();
+    let mut first_divergence = None;
+    if !passed {
+        first_divergence = Some(format!(
+            "material_occurrence_count expected {} observed {}",
+            oracle_rows.len(),
+            rust_rows.len()
+        ));
+    }
+
+    println!("Window Glazing SpectralAverage Comparison");
+    println!("  comparison_class: smoke");
+    println!("  conformance_claim: false");
+    println!("  window_runtime_claim: false");
+    println!("  tolerance_policy: absolute-0.00001");
+    println!("  material_occurrences: {}", rust_rows.len());
+    println!("  oracle_material_rows: {}", oracle_rows.len());
+
+    for (rust_index, oracle_index) in
+        window_glazing_spectral_average_pairings(&rust_rows, &oracle_rows)
+    {
+        let rust_row = &rust_rows[rust_index];
+        let oracle_row = &oracle_rows[oracle_index];
+        let row_pass = window_glazing_spectral_average_row_matches(rust_row, oracle_row, tolerance);
+        if !row_pass {
+            passed = false;
+            record_window_glazing_spectral_average_divergence(
+                &mut first_divergence,
+                rust_row,
+                oracle_row,
+                tolerance,
+                oracle_index,
+            );
+        }
+        let rust_solar_diffusing = yes_no(rust_row.fields.solar_diffusing);
+        let oracle_solar_diffusing = yes_no(oracle_row.solar_diffusing);
+        println!(
+            "  occurrence: {} rust_construction: {} material: {}/{} optical_data_type: {}/SpectralAverage spectral_data_set: {}/NONE thickness_m: {:.6}/{:.6} solar_t: {:.6}/{:.6} solar_rf: {:.6}/{:.6} solar_rb: {:.6}/{:.6} visible_t: {:.6}/{:.6} visible_rf: {:.6}/{:.6} visible_rb: {:.6}/{:.6} infrared_t: {:.6}/{:.6} infrared_ef: {:.6}/{:.6} infrared_eb: {:.6}/{:.6} conductivity_w_per_m_k: {:.6}/{:.6} dirt_factor: {:.6}/{:.6} solar_diffusing: {}/{} status: {}",
+            oracle_index + 1,
+            rust_row.construction_name,
+            oracle_row.material_name,
+            rust_row.material_name,
+            oracle_row.optical_data_type,
+            oracle_row
+                .spectral_data_set_name
+                .as_deref()
+                .unwrap_or("NONE"),
+            oracle_row.thickness_m,
+            rust_row.fields.thickness_m,
+            oracle_row.solar_transmittance,
+            rust_row.fields.solar_transmittance_at_normal_incidence,
+            oracle_row.front_solar_reflectance,
+            rust_row
+                .fields
+                .front_side_solar_reflectance_at_normal_incidence,
+            oracle_row.back_solar_reflectance,
+            rust_row
+                .fields
+                .back_side_solar_reflectance_at_normal_incidence,
+            oracle_row.visible_transmittance,
+            rust_row.fields.visible_transmittance_at_normal_incidence,
+            oracle_row.front_visible_reflectance,
+            rust_row
+                .fields
+                .front_side_visible_reflectance_at_normal_incidence,
+            oracle_row.back_visible_reflectance,
+            rust_row
+                .fields
+                .back_side_visible_reflectance_at_normal_incidence,
+            oracle_row.infrared_transmittance,
+            rust_row.fields.infrared_transmittance_at_normal_incidence,
+            oracle_row.front_thermal_emissivity,
+            rust_row.fields.front_side_infrared_hemispherical_emissivity,
+            oracle_row.back_thermal_emissivity,
+            rust_row.fields.back_side_infrared_hemispherical_emissivity,
+            oracle_row.conductivity_w_per_m_k,
+            rust_row.fields.conductivity_w_per_m_k,
+            oracle_row.dirt_factor,
+            rust_row
+                .fields
+                .dirt_correction_factor_for_solar_and_visible_transmittance,
+            oracle_solar_diffusing,
+            rust_solar_diffusing,
+            if row_pass { "pass" } else { "fail" },
+        );
+        println!(
+            "    typed_only: material: {} youngs_modulus_pa: {:.6} poissons_ratio: {:.6}",
+            rust_row.material_name,
+            rust_row.fields.youngs_modulus_pa,
+            rust_row.fields.poissons_ratio,
+        );
+    }
+
+    println!(
+        "  first_divergence: {}",
+        first_divergence.unwrap_or_else(|| "none".to_string())
+    );
+    println!("  status: {}", if passed { "pass" } else { "fail" });
     if passed { 0 } else { 1 }
 }
 
@@ -9564,6 +9728,283 @@ fn materials_for_construction<'a>(
                 })
         })
         .collect()
+}
+
+#[derive(Clone, Debug)]
+struct WindowGlazingSpectralAverageRow {
+    construction_name: String,
+    material_name: String,
+    fields: WindowGlazingSpectralAverageMaterial,
+}
+
+fn window_glazing_spectral_average_rows(
+    model: &TypedModel,
+) -> Result<Vec<WindowGlazingSpectralAverageRow>, String> {
+    let mut rows = Vec::new();
+    for construction in model
+        .constructions
+        .iter()
+        .filter(|construction| construction.kind == ConstructionKind::Fenestration)
+    {
+        for material in materials_for_construction(model, construction)? {
+            let MaterialDefinition::WindowGlazingSpectralAverage(fields) = material.definition
+            else {
+                return Err(format!(
+                    "fenestration construction {} layer {} is not a WindowMaterial:Glazing SpectralAverage material",
+                    construction.name.0, material.name.0
+                ));
+            };
+            rows.push(WindowGlazingSpectralAverageRow {
+                construction_name: construction.name.0.clone(),
+                material_name: material.name.0.clone(),
+                fields,
+            });
+        }
+    }
+    Ok(rows)
+}
+
+fn window_glazing_spectral_average_row_matches(
+    rust_row: &WindowGlazingSpectralAverageRow,
+    oracle_row: &ep_compare::EioWindowMaterialGlazing,
+    tolerance: Tolerance,
+) -> bool {
+    oracle_row
+        .material_name
+        .eq_ignore_ascii_case(&rust_row.material_name)
+        && oracle_row
+            .optical_data_type
+            .eq_ignore_ascii_case("SpectralAverage")
+        && oracle_row.spectral_data_set_name.is_none()
+        && tolerance.accepts(oracle_row.thickness_m, rust_row.fields.thickness_m)
+        && tolerance.accepts(
+            oracle_row.solar_transmittance,
+            rust_row.fields.solar_transmittance_at_normal_incidence,
+        )
+        && tolerance.accepts(
+            oracle_row.front_solar_reflectance,
+            rust_row
+                .fields
+                .front_side_solar_reflectance_at_normal_incidence,
+        )
+        && tolerance.accepts(
+            oracle_row.back_solar_reflectance,
+            rust_row
+                .fields
+                .back_side_solar_reflectance_at_normal_incidence,
+        )
+        && tolerance.accepts(
+            oracle_row.visible_transmittance,
+            rust_row.fields.visible_transmittance_at_normal_incidence,
+        )
+        && tolerance.accepts(
+            oracle_row.front_visible_reflectance,
+            rust_row
+                .fields
+                .front_side_visible_reflectance_at_normal_incidence,
+        )
+        && tolerance.accepts(
+            oracle_row.back_visible_reflectance,
+            rust_row
+                .fields
+                .back_side_visible_reflectance_at_normal_incidence,
+        )
+        && tolerance.accepts(
+            oracle_row.infrared_transmittance,
+            rust_row.fields.infrared_transmittance_at_normal_incidence,
+        )
+        && tolerance.accepts(
+            oracle_row.front_thermal_emissivity,
+            rust_row.fields.front_side_infrared_hemispherical_emissivity,
+        )
+        && tolerance.accepts(
+            oracle_row.back_thermal_emissivity,
+            rust_row.fields.back_side_infrared_hemispherical_emissivity,
+        )
+        && tolerance.accepts(
+            oracle_row.conductivity_w_per_m_k,
+            rust_row.fields.conductivity_w_per_m_k,
+        )
+        && tolerance.accepts(
+            oracle_row.dirt_factor,
+            rust_row
+                .fields
+                .dirt_correction_factor_for_solar_and_visible_transmittance,
+        )
+        && oracle_row.solar_diffusing == rust_row.fields.solar_diffusing
+}
+
+fn window_glazing_spectral_average_pairings(
+    rust_rows: &[WindowGlazingSpectralAverageRow],
+    oracle_rows: &[ep_compare::EioWindowMaterialGlazing],
+) -> Vec<(usize, usize)> {
+    let mut unmatched_rust_indices = (0..rust_rows.len()).collect::<Vec<_>>();
+    let mut pairings = Vec::with_capacity(rust_rows.len().min(oracle_rows.len()));
+
+    for (oracle_index, oracle_row) in oracle_rows.iter().enumerate() {
+        let matching_position = unmatched_rust_indices
+            .iter()
+            .position(|rust_index| {
+                rust_rows[*rust_index]
+                    .material_name
+                    .eq_ignore_ascii_case(&oracle_row.material_name)
+            })
+            .or_else(|| (!unmatched_rust_indices.is_empty()).then_some(0));
+        let Some(matching_position) = matching_position else {
+            break;
+        };
+        let rust_index = unmatched_rust_indices.remove(matching_position);
+        pairings.push((rust_index, oracle_index));
+    }
+
+    pairings
+}
+
+fn record_window_glazing_spectral_average_divergence(
+    first_divergence: &mut Option<String>,
+    rust_row: &WindowGlazingSpectralAverageRow,
+    oracle_row: &ep_compare::EioWindowMaterialGlazing,
+    tolerance: Tolerance,
+    occurrence_index: usize,
+) {
+    let prefix = format!(
+        "occurrence {} construction {} material {}",
+        occurrence_index + 1,
+        rust_row.construction_name,
+        rust_row.material_name
+    );
+    if !oracle_row
+        .material_name
+        .eq_ignore_ascii_case(&rust_row.material_name)
+    {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "{prefix} field material_name expected {} observed {}",
+                oracle_row.material_name, rust_row.material_name
+            ),
+        );
+        return;
+    }
+    if !oracle_row
+        .optical_data_type
+        .eq_ignore_ascii_case("SpectralAverage")
+    {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "{prefix} field optical_data_type expected {} observed SpectralAverage",
+                oracle_row.optical_data_type
+            ),
+        );
+        return;
+    }
+    if oracle_row.spectral_data_set_name.is_some() {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "{prefix} field spectral_data_set_name expected {:?} observed None",
+                oracle_row.spectral_data_set_name
+            ),
+        );
+        return;
+    }
+
+    let numeric_fields = [
+        (
+            "thickness_m",
+            oracle_row.thickness_m,
+            rust_row.fields.thickness_m,
+        ),
+        (
+            "solar_transmittance",
+            oracle_row.solar_transmittance,
+            rust_row.fields.solar_transmittance_at_normal_incidence,
+        ),
+        (
+            "front_solar_reflectance",
+            oracle_row.front_solar_reflectance,
+            rust_row
+                .fields
+                .front_side_solar_reflectance_at_normal_incidence,
+        ),
+        (
+            "back_solar_reflectance",
+            oracle_row.back_solar_reflectance,
+            rust_row
+                .fields
+                .back_side_solar_reflectance_at_normal_incidence,
+        ),
+        (
+            "visible_transmittance",
+            oracle_row.visible_transmittance,
+            rust_row.fields.visible_transmittance_at_normal_incidence,
+        ),
+        (
+            "front_visible_reflectance",
+            oracle_row.front_visible_reflectance,
+            rust_row
+                .fields
+                .front_side_visible_reflectance_at_normal_incidence,
+        ),
+        (
+            "back_visible_reflectance",
+            oracle_row.back_visible_reflectance,
+            rust_row
+                .fields
+                .back_side_visible_reflectance_at_normal_incidence,
+        ),
+        (
+            "infrared_transmittance",
+            oracle_row.infrared_transmittance,
+            rust_row.fields.infrared_transmittance_at_normal_incidence,
+        ),
+        (
+            "front_thermal_emissivity",
+            oracle_row.front_thermal_emissivity,
+            rust_row.fields.front_side_infrared_hemispherical_emissivity,
+        ),
+        (
+            "back_thermal_emissivity",
+            oracle_row.back_thermal_emissivity,
+            rust_row.fields.back_side_infrared_hemispherical_emissivity,
+        ),
+        (
+            "conductivity_w_per_m_k",
+            oracle_row.conductivity_w_per_m_k,
+            rust_row.fields.conductivity_w_per_m_k,
+        ),
+        (
+            "dirt_factor",
+            oracle_row.dirt_factor,
+            rust_row
+                .fields
+                .dirt_correction_factor_for_solar_and_visible_transmittance,
+        ),
+    ];
+    for (field, expected, observed) in numeric_fields {
+        if !tolerance.accepts(expected, observed) {
+            record_first_divergence(
+                first_divergence,
+                format!("{prefix} field {field} expected {expected:.6} observed {observed:.6}"),
+            );
+            return;
+        }
+    }
+    if oracle_row.solar_diffusing != rust_row.fields.solar_diffusing {
+        record_first_divergence(
+            first_divergence,
+            format!(
+                "{prefix} field solar_diffusing expected {} observed {}",
+                yes_no(oracle_row.solar_diffusing),
+                yes_no(rust_row.fields.solar_diffusing)
+            ),
+        );
+    }
+}
+
+fn yes_no(value: bool) -> &'static str {
+    if value { "Yes" } else { "No" }
 }
 
 struct OtherEquipmentNominalRow {
@@ -21076,6 +21517,149 @@ mod tests {
             super::construction_material_row(&model, window)
                 .expect_err("window construction must not enter opaque comparison")
                 .contains("not an opaque CTF construction")
+        );
+    }
+
+    #[test]
+    fn window_glazing_comparison_repeats_construction_occurrences_and_gates_every_eio_field() {
+        let raw_model = ep_raw_model::parse_epjson_str(
+            r#"{
+                "WindowMaterial:Glazing": {
+                    "Evidence Glass": {
+                        "optical_data_type":"SpectralAverage",
+                        "thickness":0.006,
+                        "solar_transmittance_at_normal_incidence":0.61,
+                        "front_side_solar_reflectance_at_normal_incidence":0.11,
+                        "back_side_solar_reflectance_at_normal_incidence":0.12,
+                        "visible_transmittance_at_normal_incidence":0.71,
+                        "front_side_visible_reflectance_at_normal_incidence":0.08,
+                        "back_side_visible_reflectance_at_normal_incidence":0.09,
+                        "infrared_transmittance_at_normal_incidence":0.03,
+                        "front_side_infrared_hemispherical_emissivity":0.81,
+                        "back_side_infrared_hemispherical_emissivity":0.82,
+                        "conductivity":1.05,
+                        "dirt_correction_factor_for_solar_and_visible_transmittance":0.91,
+                        "solar_diffusing":"Yes",
+                        "young_s_modulus":73000000000.0,
+                        "poisson_s_ratio":0.23
+                    }
+                },
+                "Construction": {
+                    "Window A": {"outside_layer":"Evidence Glass"},
+                    "Window B": {"outside_layer":"Evidence Glass"}
+                }
+            }"#,
+        )
+        .expect("window glazing comparison epJSON should parse");
+        let result = ep_compiler::compile_raw_model(&raw_model);
+        assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+        let model = result.model.expect("window glazing comparison model");
+        let rust_rows = super::window_glazing_spectral_average_rows(&model)
+            .expect("window glazing occurrences");
+        assert_eq!(rust_rows.len(), 2);
+        assert_eq!(rust_rows[0].construction_name, "WINDOW A");
+        assert_eq!(rust_rows[1].construction_name, "WINDOW B");
+        assert_eq!(rust_rows[0].fields.youngs_modulus_pa, 73_000_000_000.0);
+        assert_eq!(rust_rows[0].fields.poissons_ratio, 0.23);
+
+        let oracle_rows = ep_compare::parse_eio_window_material_glazing(
+            " WindowMaterial:Glazing,EVIDENCE GLASS,SpectralAverage,,0.00600,0.61000,0.11000,0.12000,0.71000,0.08000,0.09000,0.03000,0.81000,0.82000,1.05000,0.91000,Yes\n",
+        )
+        .expect("window glazing EIO row");
+        let oracle = &oracle_rows[0];
+        let tolerance = ep_compare::Tolerance {
+            absolute: 0.00001,
+            relative: 0.0,
+        };
+        assert!(super::window_glazing_spectral_average_row_matches(
+            &rust_rows[0],
+            oracle,
+            tolerance,
+        ));
+
+        let mut other_rust_row = rust_rows[0].clone();
+        other_rust_row.material_name = "OTHER GLASS".to_string();
+        let differently_ordered_rust_rows = vec![rust_rows[0].clone(), other_rust_row];
+        let differently_ordered_oracle_rows = ep_compare::parse_eio_window_material_glazing(
+            "WindowMaterial:Glazing,OTHER GLASS,SpectralAverage,,0.00600,0.61000,0.11000,0.12000,0.71000,0.08000,0.09000,0.03000,0.81000,0.82000,1.05000,0.91000,Yes\n\
+             WindowMaterial:Glazing,EVIDENCE GLASS,SpectralAverage,,0.00600,0.61000,0.11000,0.12000,0.71000,0.08000,0.09000,0.03000,0.81000,0.82000,1.05000,0.91000,Yes\n",
+        )
+        .expect("differently ordered glazing EIO rows");
+        assert_eq!(
+            super::window_glazing_spectral_average_pairings(
+                &differently_ordered_rust_rows,
+                &differently_ordered_oracle_rows,
+            ),
+            vec![(1, 0), (0, 1)],
+            "flat EIO rows must pair by material occurrence instead of construction order"
+        );
+
+        for field_index in 0..12 {
+            let mut changed = oracle.clone();
+            match field_index {
+                0 => changed.thickness_m += 0.1,
+                1 => changed.solar_transmittance += 0.1,
+                2 => changed.front_solar_reflectance += 0.1,
+                3 => changed.back_solar_reflectance += 0.1,
+                4 => changed.visible_transmittance += 0.1,
+                5 => changed.front_visible_reflectance += 0.1,
+                6 => changed.back_visible_reflectance += 0.1,
+                7 => changed.infrared_transmittance += 0.1,
+                8 => changed.front_thermal_emissivity += 0.1,
+                9 => changed.back_thermal_emissivity += 0.1,
+                10 => changed.conductivity_w_per_m_k += 0.1,
+                11 => changed.dirt_factor += 0.1,
+                _ => unreachable!(),
+            }
+            assert!(
+                !super::window_glazing_spectral_average_row_matches(
+                    &rust_rows[0],
+                    &changed,
+                    tolerance,
+                ),
+                "field index {field_index} must be gated"
+            );
+        }
+
+        for changed in [
+            ep_compare::EioWindowMaterialGlazing {
+                material_name: "OTHER".to_string(),
+                ..oracle.clone()
+            },
+            ep_compare::EioWindowMaterialGlazing {
+                optical_data_type: "Spectral".to_string(),
+                ..oracle.clone()
+            },
+            ep_compare::EioWindowMaterialGlazing {
+                spectral_data_set_name: Some("DATA".to_string()),
+                ..oracle.clone()
+            },
+            ep_compare::EioWindowMaterialGlazing {
+                solar_diffusing: false,
+                ..oracle.clone()
+            },
+        ] {
+            assert!(!super::window_glazing_spectral_average_row_matches(
+                &rust_rows[0],
+                &changed,
+                tolerance,
+            ));
+        }
+
+        let mut divergence = None;
+        let mut changed = oracle.clone();
+        changed.back_visible_reflectance += 0.1;
+        super::record_window_glazing_spectral_average_divergence(
+            &mut divergence,
+            &rust_rows[0],
+            &changed,
+            tolerance,
+            0,
+        );
+        assert!(
+            divergence
+                .as_deref()
+                .is_some_and(|value| value.contains("field back_visible_reflectance"))
         );
     }
 

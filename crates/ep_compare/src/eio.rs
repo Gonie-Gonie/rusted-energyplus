@@ -68,6 +68,14 @@ pub fn load_eio_material_ctf_summary(
     parse_eio_material_ctf_summary(&contents)
 }
 
+/// Loads window glazing material rows from an EnergyPlus EIO file.
+pub fn load_eio_window_material_glazing(
+    path: impl AsRef<Path>,
+) -> Result<Vec<EioWindowMaterialGlazing>, EioError> {
+    let contents = std::fs::read_to_string(path)?;
+    parse_eio_window_material_glazing(&contents)
+}
+
 /// Loads warmup environment rows from an EnergyPlus EIO file.
 pub fn load_eio_warmup_environments(
     path: impl AsRef<Path>,
@@ -678,6 +686,151 @@ pub fn parse_eio_material_ctf_summary(
     Ok(materials)
 }
 
+/// Parses `WindowMaterial:Glazing` rows from EnergyPlus EIO contents.
+///
+/// Rows are returned in emission order and repeated material names are
+/// preserved because EnergyPlus emits the row once per construction layer.
+pub fn parse_eio_window_material_glazing(
+    contents: &str,
+) -> Result<Vec<EioWindowMaterialGlazing>, EioError> {
+    const FIELD_COUNT: usize = 17;
+
+    let mut glazing_rows = Vec::new();
+    for (line_index, line) in contents.lines().enumerate() {
+        let line_number = line_index + 1;
+        let trimmed = line.trim();
+        if !trimmed.starts_with("WindowMaterial:Glazing,") {
+            continue;
+        }
+
+        let fields = trimmed.split(',').map(str::trim).collect::<Vec<_>>();
+        if fields.len() != FIELD_COUNT {
+            return Err(EioError::InvalidWindowMaterialGlazing {
+                line: line_number,
+                text: line.to_string(),
+                reason: format!(
+                    "expected exactly 16 data fields after the row label ({FIELD_COUNT} comma-separated fields total), found {} data fields",
+                    fields.len().saturating_sub(1)
+                ),
+            });
+        }
+
+        let material_name =
+            required_window_glazing_field(&fields, 1, line_number, line, "Material Name")?
+                .to_ascii_uppercase();
+        let optical_data_type =
+            required_window_glazing_field(&fields, 2, line_number, line, "Optical Data Type")?
+                .to_string();
+        let spectral_data_set_name = match required_field(&fields, 3) {
+            "" => None,
+            name => Some(name.to_ascii_uppercase()),
+        };
+
+        glazing_rows.push(EioWindowMaterialGlazing {
+            material_name,
+            optical_data_type,
+            spectral_data_set_name,
+            thickness_m: parse_window_glazing_f64_field(
+                &fields,
+                4,
+                line_number,
+                line,
+                "Thickness {m}",
+            )?,
+            solar_transmittance: parse_window_glazing_f64_field(
+                &fields,
+                5,
+                line_number,
+                line,
+                "Solar Transmittance",
+            )?,
+            front_solar_reflectance: parse_window_glazing_f64_field(
+                &fields,
+                6,
+                line_number,
+                line,
+                "Front Solar Reflectance",
+            )?,
+            back_solar_reflectance: parse_window_glazing_f64_field(
+                &fields,
+                7,
+                line_number,
+                line,
+                "Back Solar Reflectance",
+            )?,
+            visible_transmittance: parse_window_glazing_f64_field(
+                &fields,
+                8,
+                line_number,
+                line,
+                "Visible Transmittance",
+            )?,
+            front_visible_reflectance: parse_window_glazing_f64_field(
+                &fields,
+                9,
+                line_number,
+                line,
+                "Front Visible Reflectance",
+            )?,
+            back_visible_reflectance: parse_window_glazing_f64_field(
+                &fields,
+                10,
+                line_number,
+                line,
+                "Back Visible Reflectance",
+            )?,
+            infrared_transmittance: parse_window_glazing_f64_field(
+                &fields,
+                11,
+                line_number,
+                line,
+                "Infrared Transmittance",
+            )?,
+            front_thermal_emissivity: parse_window_glazing_f64_field(
+                &fields,
+                12,
+                line_number,
+                line,
+                "Front Thermal Emissivity",
+            )?,
+            back_thermal_emissivity: parse_window_glazing_f64_field(
+                &fields,
+                13,
+                line_number,
+                line,
+                "Back Thermal Emissivity",
+            )?,
+            conductivity_w_per_m_k: parse_window_glazing_f64_field(
+                &fields,
+                14,
+                line_number,
+                line,
+                "Conductivity {W/m-K}",
+            )?,
+            dirt_factor: parse_window_glazing_f64_field(
+                &fields,
+                15,
+                line_number,
+                line,
+                "Dirt Factor",
+            )?,
+            solar_diffusing: parse_window_glazing_bool_field(
+                &fields,
+                16,
+                line_number,
+                line,
+                "Solar Diffusing",
+            )?,
+        });
+    }
+
+    if glazing_rows.is_empty() {
+        return Err(EioError::MissingWindowMaterialGlazing);
+    }
+
+    Ok(glazing_rows)
+}
+
 /// Parses `Environment` and following `Environment:WarmupDays` rows.
 pub fn parse_eio_warmup_environments(
     contents: &str,
@@ -911,6 +1064,59 @@ fn parse_material_f64_field(
             text: text.to_string(),
             reason: format!("invalid {field}"),
         })
+}
+
+fn required_window_glazing_field<'a>(
+    fields: &'a [&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<&'a str, EioError> {
+    let value = required_field(fields, index);
+    if value.is_empty() {
+        Err(EioError::InvalidWindowMaterialGlazing {
+            line,
+            text: text.to_string(),
+            reason: format!("missing {field}"),
+        })
+    } else {
+        Ok(value)
+    }
+}
+
+fn parse_window_glazing_f64_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<f64, EioError> {
+    required_field(fields, index)
+        .parse::<f64>()
+        .map_err(|_error| EioError::InvalidWindowMaterialGlazing {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}"),
+        })
+}
+
+fn parse_window_glazing_bool_field(
+    fields: &[&str],
+    index: usize,
+    line: usize,
+    text: &str,
+    field: &str,
+) -> Result<bool, EioError> {
+    match required_field(fields, index) {
+        "Yes" => Ok(true),
+        "No" => Ok(false),
+        _ => Err(EioError::InvalidWindowMaterialGlazing {
+            line,
+            text: text.to_string(),
+            reason: format!("invalid {field}: expected Yes or No"),
+        }),
+    }
 }
 
 fn parse_construction_material_f64_field(

@@ -1,0 +1,185 @@
+Version,26.1;
+
+SimulationControl,No,No,No,No,Yes,No;
+
+Building,Window Glazing SpectralAverage Compare,0.0,Suburbs,0.04,0.4,FullExterior,25,6;
+
+Timestep,4;
+
+HeatBalanceAlgorithm,ConductionTransferFunction;
+
+SurfaceConvectionAlgorithm:Inside,TARP;
+
+SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+Site:Location,Golden,39.74,-105.18,-7.0,1829.0;
+
+Site:GroundTemperature:BuildingSurface,18,18,18,18,18,18,18,18,18,18,18,18;
+
+RunPeriod,Run Period 1,1,1,2013,1,1,2013,Tuesday,Yes,Yes,No,Yes,Yes;
+
+GlobalGeometryRules,UpperLeftCorner,CounterClockWise,World;
+
+Material,
+  DISTINCTIVE OPAQUE HOST MATERIAL,
+  Rough,
+  0.113,
+  0.347,
+  913.0,
+  836.0,
+  0.87,
+  0.63,
+  0.58;
+
+WindowMaterial:Glazing,
+  DISTINCTIVE SPECTRAL AVERAGE GLASS,
+  SpectralAverage,
+  ,
+  0.0073,
+  0.612,
+  0.137,
+  0.149,
+  0.721,
+  0.109,
+  0.123,
+  0.021,
+  0.823,
+  0.786,
+  1.17,
+  0.93,
+  Yes,
+  68000000000.0,
+  0.24;
+
+Construction,
+  DISTINCTIVE OPAQUE HOST CONSTRUCTION,
+  DISTINCTIVE OPAQUE HOST MATERIAL;
+
+Construction,
+  DISTINCTIVE SPECTRAL AVERAGE WINDOW CONSTRUCTION,
+  DISTINCTIVE SPECTRAL AVERAGE GLASS;
+
+Zone,WINDOW TEST ZONE,0,0,0,0,1,1,3,48,16;
+
+BuildingSurface:Detailed,
+  WINDOW TEST FLOOR,
+  Floor,
+  DISTINCTIVE OPAQUE HOST CONSTRUCTION,
+  WINDOW TEST ZONE,
+  ,
+  Ground,
+  ,
+  NoSun,
+  NoWind,
+  1.0,
+  4,
+  4,4,0,
+  4,0,0,
+  0,0,0,
+  0,4,0;
+
+BuildingSurface:Detailed,
+  WINDOW TEST ROOF,
+  Roof,
+  DISTINCTIVE OPAQUE HOST CONSTRUCTION,
+  WINDOW TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.0,
+  4,
+  0,4,3,
+  0,0,3,
+  4,0,3,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  WINDOW TEST WEST WALL,
+  Wall,
+  DISTINCTIVE OPAQUE HOST CONSTRUCTION,
+  WINDOW TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,4,3,
+  0,4,0,
+  0,0,0,
+  0,0,3;
+
+BuildingSurface:Detailed,
+  WINDOW TEST EAST WALL,
+  Wall,
+  DISTINCTIVE OPAQUE HOST CONSTRUCTION,
+  WINDOW TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,0,3,
+  4,0,0,
+  4,4,0,
+  4,4,3;
+
+BuildingSurface:Detailed,
+  DISTINCTIVE WINDOW HOST WALL,
+  Wall,
+  DISTINCTIVE OPAQUE HOST CONSTRUCTION,
+  WINDOW TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  0,0,3,
+  0,0,0,
+  4,0,0,
+  4,0,3;
+
+BuildingSurface:Detailed,
+  WINDOW TEST NORTH WALL,
+  Wall,
+  DISTINCTIVE OPAQUE HOST CONSTRUCTION,
+  WINDOW TEST ZONE,
+  ,
+  Outdoors,
+  ,
+  SunExposed,
+  WindExposed,
+  0.5,
+  4,
+  4,4,3,
+  4,4,0,
+  0,4,0,
+  0,4,3;
+
+FenestrationSurface:Detailed,
+  DISTINCTIVE SPECTRAL AVERAGE WINDOW,
+  Window,
+  DISTINCTIVE SPECTRAL AVERAGE WINDOW CONSTRUCTION,
+  DISTINCTIVE WINDOW HOST WALL,
+  ,
+  0.5,
+  ,
+  1.0,
+  4,
+  1,0,2.5,
+  1,0,0.5,
+  3,0,0.5,
+  3,0,2.5;
+
+Output:Variable,*,Zone Mean Air Temperature,Hourly;
+
+Output:Constructions,Constructions;
+
+Output:Surfaces:List,Details;

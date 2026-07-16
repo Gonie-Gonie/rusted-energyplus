@@ -533,6 +533,12 @@
                          "help":  "Compare ordered regular, air-gap, and infrared-transparent construction layers with EnergyPlus EIO."
                      },
                      {
+                         "name":  "compare-window-glazing-spectral-average-smoke",
+                         "path":  "compare\\compare-window-glazing-spectral-average-smoke.ps1",
+                         "group":  "compare",
+                         "help":  "Compare bounded SpectralAverage window-glazing inputs with exact EnergyPlus EIO evidence."
+                     },
+                     {
                          "name":  "compare-internal-gains-smoke",
                          "path":  "compare\\compare-internal-gains-smoke.ps1",
                          "group":  "compare",

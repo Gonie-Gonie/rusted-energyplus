@@ -261,6 +261,18 @@ two-adjacent-AirGap, reversed, and sole-layer IRT construction groups. The
 generic `Material CTF Summary` row emitted for IRT is treated as a row shape,
 not as an independent object-type discriminator.
 
+`window_glazing_spectral_average_001` separately adds nonblocking
+EnergyPlus 26.1 exact-EIO evidence for the bounded glazing branch. Its clean
+oracle run emits exactly one `WindowMaterial:Glazing` row, and the Rust bridge
+compares all 16 data fields: normalized material name, optical data type,
+blank spectral dataset, thickness, every solar/visible/infrared optical
+value, both thermal emissivities, conductivity, dirt factor, and
+solar-diffusing state. Young's modulus and Poisson's ratio remain typed-only
+evidence because EnergyPlus omits them from that EIO row. Exact
+`WindowConstruction` plus host and fenestration `HeatTransfer Surface` rows
+prove that the oracle material is assigned to an actual detailed window;
+they do not prove a Rust window-surface or runtime path.
+
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
 dynamic AirGap/IRT heat transfer. It also does not claim exact EnergyPlus
@@ -298,9 +310,13 @@ Typed model/compiler tests additionally prove that the four opaque states and
 the partial glazing state are represented separately; the glazing required
 fields, defaults, exclusive/inclusive bounds, energy sums, shared names, and
 family boundaries are compiled; and the bounded AirGap/IRT construction
-invariants are rejected or accepted as declared. There is not yet an external
-glazing oracle gate in this code checkpoint. These tests and the existing
-opaque static EIO smoke remain bounded evidence, not an EnergyPlus
+invariants are rejected or accepted as declared.
+`window_glazing_spectral_average_001` adds an external exact-EIO smoke gate
+for every field EnergyPlus emits from the bounded `SpectralAverage` material
+slice, together with oracle-only proof that the fixture uses that construction
+on a detailed window. The gate is explicitly nonblocking, diagnostic-only,
+and does not compile or execute the fenestration surface in Rust. These tests
+and static EIO smokes remain bounded evidence, not an EnergyPlus
 material-family or window gate.
 
 CP58 remains incomplete until, at minimum:

@@ -5,9 +5,9 @@ use crate::{
     compare_series_v2, parse_eio_construction_ctf, parse_eio_construction_ctf_coefficients,
     parse_eio_construction_material_summaries, parse_eio_heat_transfer_surfaces,
     parse_eio_material_ctf_summary, parse_eio_other_equipment_nominal,
-    parse_eio_surface_geometry_rules, parse_eio_warmup_environments, parse_eio_zone_geometry,
-    parse_eso_series, parse_eso_time_series, parse_mtr_time_series,
-    parse_mtr_time_series_for_frequency,
+    parse_eio_surface_geometry_rules, parse_eio_warmup_environments,
+    parse_eio_window_material_glazing, parse_eio_zone_geometry, parse_eso_series,
+    parse_eso_time_series, parse_mtr_time_series, parse_mtr_time_series_for_frequency,
 };
 
 #[test]
@@ -712,6 +712,102 @@ fn parses_eio_material_ctf_summary_rows() -> Result<(), Box<dyn std::error::Erro
     assert_eq!(materials[0].thermal_resistance_m2_k_per_w, 2.291);
 
     Ok(())
+}
+
+#[test]
+fn parses_eio_window_material_glazing_rows_and_preserves_repeats()
+-> Result<(), Box<dyn std::error::Error>> {
+    let rows = parse_eio_window_material_glazing(
+        r#"! <WindowMaterial:Glazing>, Material Name, Optical Data Type, Spectral Data Set Name, Thickness {m}, Solar Transmittance,Front Solar Reflectance, Back Solar Reflectance, Visible Transmittance, Front Visible Reflectance,Back Visible Reflectance,Infrared Transmittance, Front Thermal Emissivity, Back Thermal Emissivity,Conductivity {W/m-K},Dirt Factor,Solar Diffusing
+ WindowMaterial:Glazing, clear glass , SpectralAverage, , 0.00600, 0.77500, 0.07100, 0.07100, 0.88100, 0.08000, 0.08000, 0.00000, 0.84000, 0.84000, 1.00000, 0.90000, No
+ WindowMaterial:Glazing, clear glass , SpectralAverage, , 0.00600, 0.77500, 0.07100, 0.07100, 0.88100, 0.08000, 0.08000, 0.00000, 0.84000, 0.84000, 1.00000, 0.90000, Yes
+ WindowMaterial:Glazing, spectral glass, Spectral, custom spectral data, 0.00300, 0.70000, 0.10000, 0.11000, 0.80000, 0.09000, 0.10000, 0.01000, 0.82000, 0.83000, 0.90000, 1.00000, No
+"#,
+    )?;
+
+    assert_eq!(rows.len(), 3);
+    assert_eq!(rows[0].material_name, "CLEAR GLASS");
+    assert_eq!(rows[0].optical_data_type, "SpectralAverage");
+    assert_eq!(rows[0].spectral_data_set_name, None);
+    assert_eq!(rows[0].thickness_m, 0.006);
+    assert_eq!(rows[0].solar_transmittance, 0.775);
+    assert_eq!(rows[0].front_solar_reflectance, 0.071);
+    assert_eq!(rows[0].back_solar_reflectance, 0.071);
+    assert_eq!(rows[0].visible_transmittance, 0.881);
+    assert_eq!(rows[0].front_visible_reflectance, 0.08);
+    assert_eq!(rows[0].back_visible_reflectance, 0.08);
+    assert_eq!(rows[0].infrared_transmittance, 0.0);
+    assert_eq!(rows[0].front_thermal_emissivity, 0.84);
+    assert_eq!(rows[0].back_thermal_emissivity, 0.84);
+    assert_eq!(rows[0].conductivity_w_per_m_k, 1.0);
+    assert_eq!(rows[0].dirt_factor, 0.9);
+    assert!(!rows[0].solar_diffusing);
+    assert_eq!(rows[1].material_name, rows[0].material_name);
+    assert!(rows[1].solar_diffusing);
+    assert_eq!(
+        rows[2].spectral_data_set_name.as_deref(),
+        Some("CUSTOM SPECTRAL DATA")
+    );
+
+    Ok(())
+}
+
+#[test]
+fn eio_window_material_glazing_parser_requires_exact_field_count() {
+    let too_few = parse_eio_window_material_glazing(
+        "WindowMaterial:Glazing,GLASS,SpectralAverage,,0.006,0.775,0.071,0.071,0.881,0.08,0.08,0.0,0.84,0.84,1.0,0.9\n",
+    )
+    .expect_err("a glazing row with one missing value must fail");
+    let too_many = parse_eio_window_material_glazing(
+        "WindowMaterial:Glazing,GLASS,SpectralAverage,,0.006,0.775,0.071,0.071,0.881,0.08,0.08,0.0,0.84,0.84,1.0,0.9,No,EXTRA\n",
+    )
+    .expect_err("a glazing row with an extra value must fail");
+
+    assert!(matches!(
+        too_few,
+        EioError::InvalidWindowMaterialGlazing { line: 1, .. }
+    ));
+    assert!(matches!(
+        too_many,
+        EioError::InvalidWindowMaterialGlazing { line: 1, .. }
+    ));
+}
+
+#[test]
+fn eio_window_material_glazing_parser_rejects_invalid_field_types() {
+    let invalid_number = parse_eio_window_material_glazing(
+        "WindowMaterial:Glazing,GLASS,SpectralAverage,,not-a-number,0.775,0.071,0.071,0.881,0.08,0.08,0.0,0.84,0.84,1.0,0.9,No\n",
+    )
+    .expect_err("invalid numeric fields must fail");
+    let invalid_bool = parse_eio_window_material_glazing(
+        "WindowMaterial:Glazing,GLASS,SpectralAverage,,0.006,0.775,0.071,0.071,0.881,0.08,0.08,0.0,0.84,0.84,1.0,0.9,Maybe\n",
+    )
+    .expect_err("Solar Diffusing must be Yes or No");
+
+    assert!(matches!(
+        &invalid_number,
+        EioError::InvalidWindowMaterialGlazing { .. }
+    ));
+    if let EioError::InvalidWindowMaterialGlazing { line, reason, .. } = invalid_number {
+        assert_eq!(line, 1);
+        assert_eq!(reason, "invalid Thickness {m}");
+    }
+    assert!(matches!(
+        &invalid_bool,
+        EioError::InvalidWindowMaterialGlazing { .. }
+    ));
+    if let EioError::InvalidWindowMaterialGlazing { line, reason, .. } = invalid_bool {
+        assert_eq!(line, 1);
+        assert!(reason.contains("expected Yes or No"));
+    }
+}
+
+#[test]
+fn eio_window_material_glazing_parser_reports_missing_rows() {
+    assert!(matches!(
+        parse_eio_window_material_glazing("Program Version,EnergyPlus\n"),
+        Err(EioError::MissingWindowMaterialGlazing)
+    ));
 }
 
 #[test]

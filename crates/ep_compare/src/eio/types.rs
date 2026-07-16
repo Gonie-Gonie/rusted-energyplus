@@ -192,6 +192,46 @@ pub struct EioConstructionMaterialSummary {
     pub layers: Vec<EioConstructionMaterialLayer>,
 }
 
+/// Window glazing material values read from an EnergyPlus `eplusout.eio` row.
+///
+/// EnergyPlus emits one row for every construction-layer occurrence, so callers
+/// must not assume material names are unique within the parsed row sequence.
+#[derive(Clone, Debug, PartialEq)]
+pub struct EioWindowMaterialGlazing {
+    /// EnergyPlus-normalized material name.
+    pub material_name: String,
+    /// EIO optical data model name, such as `SpectralAverage`.
+    pub optical_data_type: String,
+    /// EnergyPlus-normalized spectral data set name, when one is emitted.
+    pub spectral_data_set_name: Option<String>,
+    /// Glazing thickness in meters.
+    pub thickness_m: f64,
+    /// Normal-incidence solar transmittance.
+    pub solar_transmittance: f64,
+    /// Front-side normal-incidence solar reflectance.
+    pub front_solar_reflectance: f64,
+    /// Back-side normal-incidence solar reflectance.
+    pub back_solar_reflectance: f64,
+    /// Normal-incidence visible transmittance.
+    pub visible_transmittance: f64,
+    /// Front-side normal-incidence visible reflectance.
+    pub front_visible_reflectance: f64,
+    /// Back-side normal-incidence visible reflectance.
+    pub back_visible_reflectance: f64,
+    /// Infrared transmittance.
+    pub infrared_transmittance: f64,
+    /// Front-side thermal emissivity.
+    pub front_thermal_emissivity: f64,
+    /// Back-side thermal emissivity.
+    pub back_thermal_emissivity: f64,
+    /// Glazing conductivity in W/m-K.
+    pub conductivity_w_per_m_k: f64,
+    /// Dirt correction factor for solar and visible transmittance.
+    pub dirt_factor: f64,
+    /// Whether the glazing is solar diffusing.
+    pub solar_diffusing: bool,
+}
+
 /// Warmup day counts read from EnergyPlus `eplusout.eio` environment sections.
 #[derive(Clone, Debug, PartialEq)]
 pub struct EioWarmupEnvironment {
@@ -222,6 +262,8 @@ pub enum EioError {
     MissingConstructionCtfCoefficient,
     /// No `Material CTF Summary` rows were present.
     MissingMaterialCtfSummary,
+    /// No `WindowMaterial:Glazing` rows were present.
+    MissingWindowMaterialGlazing,
     /// A grouped construction/material summary could not be parsed.
     InvalidConstructionMaterialSummary {
         /// One-based line number.
@@ -303,6 +345,15 @@ pub enum EioError {
         /// Parse failure reason.
         reason: String,
     },
+    /// A `WindowMaterial:Glazing` row could not be parsed.
+    InvalidWindowMaterialGlazing {
+        /// One-based line number.
+        line: usize,
+        /// Raw line text.
+        text: String,
+        /// Parse failure reason.
+        reason: String,
+    },
 }
 
 impl Display for EioError {
@@ -326,6 +377,9 @@ impl Display for EioError {
             }
             Self::MissingMaterialCtfSummary => {
                 write!(formatter, "EIO Material CTF Summary not found")
+            }
+            Self::MissingWindowMaterialGlazing => {
+                write!(formatter, "EIO WindowMaterial:Glazing not found")
             }
             Self::InvalidSurfaceGeometry { line, text, reason } => write!(
                 formatter,
@@ -363,6 +417,10 @@ impl Display for EioError {
                 formatter,
                 "invalid EIO Environment:WarmupDays at line {line}: {reason}: {text}"
             ),
+            Self::InvalidWindowMaterialGlazing { line, text, reason } => write!(
+                formatter,
+                "invalid EIO WindowMaterial:Glazing at line {line}: {reason}: {text}"
+            ),
         }
     }
 }
@@ -380,13 +438,15 @@ impl std::error::Error for EioError {
             | Self::MissingConstructionCtf
             | Self::MissingConstructionCtfCoefficient
             | Self::MissingMaterialCtfSummary
+            | Self::MissingWindowMaterialGlazing
             | Self::InvalidSurfaceGeometry { .. }
             | Self::InvalidOtherEquipmentNominal { .. }
             | Self::InvalidConstructionCtf { .. }
             | Self::InvalidConstructionCtfCoefficient { .. }
             | Self::InvalidMaterialCtfSummary { .. }
             | Self::InvalidConstructionMaterialSummary { .. }
-            | Self::InvalidWarmupEnvironment { .. } => None,
+            | Self::InvalidWarmupEnvironment { .. }
+            | Self::InvalidWindowMaterialGlazing { .. } => None,
         }
     }
 }

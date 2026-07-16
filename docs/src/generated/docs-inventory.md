@@ -138,7 +138,7 @@ none
 | docs/src/porting-map/hvac.md | source-map | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/porting-map/ideal-loads-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-15 |
 | docs/src/porting-map/input-and-schema.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-06-05 |
-| docs/src/porting-map/material-source-map.md | source-map | not in SUMMARY | n/a | present | active | compiler | 2026-07-15 |
+| docs/src/porting-map/material-source-map.md | source-map | not in SUMMARY | n/a | present | active | compiler | 2026-07-16 |
 | docs/src/porting-map/node-state-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |
 | docs/src/porting-map/output-reporting.md | source-map | not in SUMMARY | n/a | present | active | conformance | 2026-06-07 |
 | docs/src/porting-map/output-variable-source-map.md | source-map | not in SUMMARY | n/a | present | active | conformance | 2026-06-08 |

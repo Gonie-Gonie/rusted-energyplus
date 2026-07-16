@@ -1,0 +1,70 @@
+id = "window_glazing_spectral_average_001"
+title = "Window glazing SpectralAverage static material evidence"
+milestone = "v0.8-heat-balance"
+purpose = "Compare the bounded Rust WindowMaterial:Glazing SpectralAverage typed slice with EnergyPlus material, window-construction, and fenestration-surface EIO evidence."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The fixture assigns one complete, nondefault SpectralAverage glazing material to a one-layer window construction and an actual FenestrationSurface:Detailed on a distinct opaque host wall.",
+  "Young's modulus and Poisson's ratio are deliberately nondefault typed-only inputs because EnergyPlus does not emit them in the WindowMaterial:Glazing EIO row.",
+  "The smoke gate requires a clean EnergyPlus 26.1.0 run, exactly one matching glazing material row, one matching window-construction row, and one matching fenestration heat-transfer surface row before invoking the Rust typed-value bridge.",
+  "This is non-blocking diagnostic-only static input evidence. It makes no claim for window heat-transfer runtime, optical calculations, whole-window behavior, dynamic simulation parity, or WindowMaterial:Glazing conformance.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/window_glazing_spectral_average_001/window_glazing_spectral_average.idf"
+tier = "A"
+
+[scope]
+domains = ["zone", "surface", "construction"]
+has_zone = true
+has_surface = true
+has_fenestration = true
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/window_glazing_spectral_average_001/window_glazing_spectral_average.idf"
+weather = ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw"
+epjson = ".runtime/compare-window-glazing-spectral-average/26.1.0/window-glazing-spectral-average.epJSON"
+
+[[outputs]]
+key = "DISTINCTIVE SPECTRAL AVERAGE GLASS"
+variable = "WindowMaterial:Glazing Static Inputs"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "DISTINCTIVE SPECTRAL AVERAGE WINDOW CONSTRUCTION"
+variable = "WindowConstruction Layer Summary"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[[outputs]]
+key = "DISTINCTIVE SPECTRAL AVERAGE WINDOW"
+variable = "HeatTransfer Surface Static Inputs"
+frequency = "static"
+class = "surface-state"
+source = "eio"
+domain = "surface"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/window_glazing_spectral_average_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-window-glazing-spectral-average-smoke"
+blocking = false
