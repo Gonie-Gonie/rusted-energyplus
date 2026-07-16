@@ -38,7 +38,7 @@ fn dew_point_matches_upstream_ems_vector() {
 }
 
 #[test]
-fn dew_point_matches_local_energyplus_261_regression_vectors() {
+fn dew_point_matches_local_regression_vectors() {
     for (humidity_ratio, atmospheric_pressure_pa, expected_dew_point_c) in [
         (0.009_870_370_393_138_59, 101_325.0, 13.846_750_136_054_634),
         (
@@ -96,9 +96,9 @@ fn dew_pressure_composition_preserves_source_grouping() {
 
     // The adjacent pressure first multiplies without overflow, then crosses
     // the source's multiplication-before-division overflow boundary.
-    assert_ne!(
-        energyplus_psy_tdp_fn_w_pb(f64::MAX, 1.0).to_bits(),
-        200.0_f64.to_bits()
+    assert_bits(
+        energyplus_psy_tdp_fn_w_pb(f64::MAX, 1.0),
+        energyplus_psy_tsat_fn_pb_raw(1.0),
     );
     assert_bits(
         energyplus_psy_tdp_fn_w_pb(f64::MAX, 1.0_f64.next_up()),
@@ -171,12 +171,44 @@ fn composed_pressure_reaches_raw_clamps_and_triple_shortcut() {
 }
 
 #[test]
-fn repeated_and_alternating_calls_are_output_stable() {
-    let first = energyplus_psy_tdp_fn_w_pb(0.01, 101_325.0);
-    let second = energyplus_psy_tdp_fn_w_pb(0.02, 80_000.0);
+fn raw_saved_sentinel_is_outside_the_pure_projection() {
+    let humidity_ratio = 0.01;
+    let atmospheric_pressure_pa = -6_319_736.802;
+    let dew_pressure_pa = atmospheric_pressure_pa * humidity_ratio / (0.621_98 + humidity_ratio);
 
+    assert_bits(dew_pressure_pa, -99_999.0);
+    // A fresh source raw call false-hits its saved pair at -99999 C. This
+    // isolated non-saved numerical projection instead reaches the lower clamp.
+    assert_bits(
+        energyplus_psy_tdp_fn_w_pb(humidity_ratio, atmospheric_pressure_pa),
+        -100.0,
+    );
+}
+
+#[test]
+fn same_outer_cache_tag_inputs_remain_distinct_and_output_stable() {
+    const DEFAULT_TSAT_GRID_SHIFT: u32 = 64 - 12 - 24;
+
+    let humidity_ratio = 0.01;
+    let first_pressure_pa = 101_325.0_f64;
+    let second_pressure_pa = first_pressure_pa.next_down();
+    let dew_pressure =
+        |pressure_pa: f64| pressure_pa * humidity_ratio / (0.621_98 + humidity_ratio);
+    let first_tag = (dew_pressure(first_pressure_pa).to_bits() as i64) >> DEFAULT_TSAT_GRID_SHIFT;
+    let second_tag = (dew_pressure(second_pressure_pa).to_bits() as i64) >> DEFAULT_TSAT_GRID_SHIFT;
+    assert_eq!(first_tag, second_tag);
+
+    let first = energyplus_psy_tdp_fn_w_pb(humidity_ratio, first_pressure_pa);
+    let second = energyplus_psy_tdp_fn_w_pb(humidity_ratio, second_pressure_pa);
+    assert_ne!(first.to_bits(), second.to_bits());
     for _ in 0..16 {
-        assert_bits(energyplus_psy_tdp_fn_w_pb(0.01, 101_325.0), first);
-        assert_bits(energyplus_psy_tdp_fn_w_pb(0.02, 80_000.0), second);
+        assert_bits(
+            energyplus_psy_tdp_fn_w_pb(humidity_ratio, first_pressure_pa),
+            first,
+        );
+        assert_bits(
+            energyplus_psy_tdp_fn_w_pb(humidity_ratio, second_pressure_pa),
+            second,
+        );
     }
 }
