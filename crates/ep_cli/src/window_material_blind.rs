@@ -383,11 +383,7 @@ fn window_blind_definitions(model: &TypedModel) -> Vec<WindowBlindDefinition> {
 }
 
 fn construction_layers(construction: &Construction) -> &[ep_model::MaterialId] {
-    if construction.layers.is_empty() {
-        std::slice::from_ref(&construction.outside_layer)
-    } else {
-        construction.layers.as_slice()
-    }
+    construction.effective_layers()
 }
 
 fn window_blind_occurrences(model: &TypedModel) -> Result<Vec<WindowBlindOccurrence>, String> {

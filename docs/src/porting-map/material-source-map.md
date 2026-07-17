@@ -2599,6 +2599,13 @@ geometry, blank-group/index quirks, TAR, infrared, thermal, and control state
 stay in their dedicated payloads and are never projected through opaque
 material accessors.
 
+CP88 adds `Construction:AirBoundary` only as a zero-layer construction
+descriptor. It consumes or synthesizes no `Material`, creates no
+construction/material graph edge, does not widen the 34-object material
+inventory or public attachment namespace, and cannot be targeted by any
+material overlay. Its surface, enclosure, and optional simple-mixing consumers
+remain run-blocked and are mapped in the heat-balance source map.
+
 The compiler preserves EnergyPlus family order by compiling all `Material`
 objects, then all `Material:NoMass`, `Material:AirGap`, and
 `Material:InfraredTransparent` objects, followed by

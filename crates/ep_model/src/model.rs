@@ -517,7 +517,7 @@ impl ModelGraph {
                 .iter()
                 .flat_map(|construction| {
                     construction
-                        .layers
+                        .effective_layers()
                         .iter()
                         .enumerate()
                         .map(|(index, material)| ConstructionMaterialEdge {
@@ -1913,10 +1913,11 @@ mod tests {
             id: ConstructionId(0),
             name: NormalizedName::new("Wall"),
             kind: ConstructionKind::Opaque,
-            outside_layer: MaterialId(0),
+            outside_layer: Some(MaterialId(0)),
             layers: vec![MaterialId(0), MaterialId(1)],
             thermochromic_master: None,
             ground_factor: None,
+            air_boundary: None,
         });
         model.surfaces.push(Surface {
             id: SurfaceId(0),

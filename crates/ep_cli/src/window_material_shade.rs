@@ -231,12 +231,7 @@ fn window_shade_definitions(model: &TypedModel) -> Vec<WindowShadeDefinition> {
 fn window_shade_occurrences(model: &TypedModel) -> Result<Vec<WindowShadeOccurrence>, String> {
     let mut rows = Vec::new();
     for construction in &model.constructions {
-        let layer_ids = if construction.layers.is_empty() {
-            std::slice::from_ref(&construction.outside_layer)
-        } else {
-            construction.layers.as_slice()
-        };
-        for (layer_index, layer_id) in layer_ids.iter().enumerate() {
+        for (layer_index, layer_id) in construction.effective_layers().iter().enumerate() {
             let material = model
                 .materials
                 .iter()

@@ -215,7 +215,7 @@ fn construction_preserves_ten_layer_order_graph_and_family_classification()
         .map(|index| material_id(&model, &format!("M{index:02}")))
         .collect::<Result<Vec<_>, _>>()?;
     assert_eq!(opaque.kind, ConstructionKind::Opaque);
-    assert_eq!(opaque.outside_layer, expected[0]);
+    assert_eq!(opaque.outside_layer, Some(expected[0]));
     assert_eq!(opaque.layers, expected);
     assert_eq!(opaque.thermochromic_master, None);
 
@@ -288,7 +288,7 @@ fn thermochromic_constructions_substitute_every_parent_and_retain_last_metadata(
         .find(|construction| construction.name.0 == "TC OUTSIDE")
         .ok_or_else(|| std::io::Error::other("missing outside TC construction"))?;
     assert_eq!(tc_outside.layers, vec![glass_10]);
-    assert_eq!(tc_outside.outside_layer, glass_10);
+    assert_eq!(tc_outside.outside_layer, Some(glass_10));
     let outside_master = tc_outside
         .thermochromic_master
         .ok_or_else(|| std::io::Error::other("missing outside TC metadata"))?;

@@ -263,11 +263,7 @@ fn construction_thermal_data(
 }
 
 fn construction_layer_stack(construction: &Construction) -> Vec<MaterialId> {
-    if construction.layers.is_empty() {
-        vec![construction.outside_layer]
-    } else {
-        construction.layers.clone()
-    }
+    construction.effective_layers().to_vec()
 }
 
 fn layer_materials<'a>(

@@ -109,6 +109,26 @@ its concrete detailed/constant implementations. The `UpdateScheduleVals` and
 `WriteTimeStampFormatData` tokens are deliberately retained because schedule
 and output parity must be checked at these exact ownership boundaries.
 
+## AirBoundary Schedule-Identity Consumer Boundary
+
+CP88 adds one declaration-only consumer of the completed top-level schedule
+namespace. `Construction:AirBoundary` remains ordered after ordinary and F/C
+constructions, but Rust materializes only that family after `Schedule:Constant`,
+`Schedule:Compact`, `Schedule:File`, Day/Week/Year, ExternalInterface, and both
+FMU schedule families so an active `SimpleMixing` name can resolve to the
+existing `ScheduleId`. This local pass-order deviation is recorded in the
+heat-balance source map and does not claim complete `GetConstructData` order
+parity.
+
+A missing or blank active schedule uses an explicit
+`AirBoundaryMixingSchedule::AlwaysOn` selector; it does not synthesize a new
+`Schedule:Constant`, allocate another schedule ID, or change schedule object
+coverage. `None` does not resolve its inactive schedule name. Both selectors
+remain compile-time identities only: `Sched::UpdateScheduleVals`, `currentVal`,
+`getHrTsVal`, generated `ZoneCrossMixing`, AirflowNetwork interaction, mixing
+flow calculations, and every runtime/output consumer remain unsupported and
+run-blocked. CP88 adds no schedule conformance case or proof variable.
+
 ## First Rust Checkpoint: Calendar Spine and Hourly Projection
 
 The first checkpoint introduces one canonical run-period calendar spine:

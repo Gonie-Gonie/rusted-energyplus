@@ -10517,14 +10517,7 @@ fn construction_layer_material_count(model: &TypedModel) -> usize {
         .constructions
         .iter()
         .filter(|construction| construction.is_ordinary_opaque())
-        .map(|construction| {
-            let layer_ids = if construction.layers.is_empty() {
-                std::slice::from_ref(&construction.outside_layer)
-            } else {
-                construction.layers.as_slice()
-            };
-            layer_ids.len()
-        })
+        .map(|construction| construction.effective_layers().len())
         .sum()
 }
 
@@ -10597,12 +10590,8 @@ fn materials_for_construction<'a>(
     model: &'a TypedModel,
     construction: &Construction,
 ) -> Result<Vec<&'a Material>, String> {
-    let layer_ids = if construction.layers.is_empty() {
-        std::slice::from_ref(&construction.outside_layer)
-    } else {
-        construction.layers.as_slice()
-    };
-    layer_ids
+    construction
+        .effective_layers()
         .iter()
         .map(|layer_id| {
             model
@@ -23344,6 +23333,9 @@ mod tests {
                         "area":100.0,
                         "perimeterexposed":20.0
                     }
+                },
+                "Construction:AirBoundary": {
+                    "Unused Air Boundary": {"air_exchange_method":"None"}
                 }
             }"#,
         )
@@ -23379,6 +23371,18 @@ mod tests {
         assert!(
             super::construction_material_row(&model, slab)
                 .expect_err("F-factor construction must not enter CTF comparison")
+                .contains("not an opaque CTF construction")
+        );
+
+        let air_boundary = model
+            .constructions
+            .iter()
+            .find(|construction| construction.name.0 == "UNUSED AIR BOUNDARY")
+            .expect("air-boundary construction");
+        assert!(air_boundary.effective_layers().is_empty());
+        assert!(
+            super::construction_material_row(&model, air_boundary)
+                .expect_err("air boundary must not enter CTF comparison")
                 .contains("not an opaque CTF construction")
         );
     }

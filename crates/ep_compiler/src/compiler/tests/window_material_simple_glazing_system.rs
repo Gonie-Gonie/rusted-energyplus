@@ -667,7 +667,7 @@ fn sole_layer_simple_glazing_materializes_a_fenestration_construction_and_graph_
         .ok_or_else(|| std::io::Error::other("missing simple-glazing construction"))?;
 
     assert_eq!(construction.kind, ConstructionKind::Fenestration);
-    assert_eq!(construction.outside_layer, material_id);
+    assert_eq!(construction.outside_layer, Some(material_id));
     assert_eq!(construction.layers, vec![material_id]);
     assert_eq!(construction.thermochromic_master, None);
 

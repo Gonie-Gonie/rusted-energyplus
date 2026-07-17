@@ -1,11 +1,12 @@
 //! Model compiler stage contracts.
 
 use ep_model::{
-    AirGapMaterial, AirLoopHvac, AutoOrNumber, AutosizeOrNumber, AvailabilityManagerComponent,
-    BoilerHotWater, BranchId, BranchListId, Building, ChillerElectricEir, CoilComponent,
-    CoilComponentKind, ComponentId, ConnectorId, ConnectorListId, Construction,
-    ConstructionGroundFactor, ConstructionId, ConstructionKind, ConstructionThermochromicMaster,
-    DayScheduleId, DeferredVariableAbsorptanceFunction, DehumidificationControlType,
+    AirBoundaryAirExchange, AirBoundaryMixingSchedule, AirGapMaterial, AirLoopHvac, AutoOrNumber,
+    AutosizeOrNumber, AvailabilityManagerComponent, BoilerHotWater, BranchId, BranchListId,
+    Building, ChillerElectricEir, CoilComponent, CoilComponentKind, ComponentId, ConnectorId,
+    ConnectorListId, Construction, ConstructionAirBoundary, ConstructionGroundFactor,
+    ConstructionId, ConstructionKind, ConstructionThermochromicMaster, DayScheduleId,
+    DeferredVariableAbsorptanceFunction, DehumidificationControlType,
     DemandControlledVentilationType, DesignSpecificationOutdoorAir,
     DesignSpecificationOutdoorAirId, DesignSpecificationOutdoorAirMethod,
     ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
@@ -81,6 +82,7 @@ const MAX_WINDOW_CONSTRUCTION_LAYERS: usize = 8;
 const MAX_BETWEEN_GLASS_SHADE_GAP_THICKNESS_DIFFERENCE_M: f64 = 0.0005;
 const FFACTOR_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:FfactorGroundFloor";
 const CFACTOR_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:CfactorUndergroundWall";
+const AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:AirBoundary";
 const FC_FACTOR_CONCRETE_NAME: &str = "~FC_Concrete";
 const FC_FACTOR_INSULATION_NAME_PREFIX: &str = "~FC_Insulation_";
 const FC_FACTOR_CONCRETE_THERMAL_RESISTANCE_M2_K_PER_W: f64 = 0.15 / 1.95;
@@ -507,6 +509,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Construction",
     FFACTOR_CONSTRUCTION_OBJECT_TYPE,
     CFACTOR_CONSTRUCTION_OBJECT_TYPE,
+    AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
     "ScheduleTypeLimits",
     "Schedule:Constant",
     "Schedule:Compact",
@@ -580,6 +583,12 @@ struct CompactScheduleProfileBuilder {
     interpolation_explicit: bool,
 }
 
+#[derive(Clone, Copy)]
+enum AirBoundaryAirExchangeMethod {
+    None,
+    SimpleMixing,
+}
+
 impl<'a> Compiler<'a> {
     fn new(raw_model: &'a RawModel, auxiliary_root: Option<&'a Path>) -> Self {
         let object_type_counts = raw_model.object_type_counts();
@@ -635,6 +644,7 @@ impl<'a> Compiler<'a> {
         self.parse_external_interface_schedules(&mut model);
         self.parse_external_interface_fmu_import_schedules(&mut model);
         self.parse_external_interface_fmu_export_schedules(&mut model);
+        self.parse_air_boundary_constructions(&mut model);
         self.parse_material_variable_absorptances(&mut model);
         self.parse_material_phase_change_hystereses(&mut model);
         self.parse_material_phase_changes(&mut model);
@@ -8741,10 +8751,11 @@ impl<'a> Compiler<'a> {
                 id,
                 name: NormalizedName::new(&name),
                 kind,
-                outside_layer,
+                outside_layer: Some(outside_layer),
                 layers,
                 thermochromic_master,
                 ground_factor: None,
+                air_boundary: None,
             });
         }
 
@@ -8820,7 +8831,7 @@ impl<'a> Compiler<'a> {
                 id,
                 name: NormalizedName::new(&name),
                 kind: ConstructionKind::Opaque,
-                outside_layer: insulation,
+                outside_layer: Some(insulation),
                 layers: vec![insulation, concrete],
                 thermochromic_master: None,
                 ground_factor: Some(ConstructionGroundFactor::FfactorGroundFloor {
@@ -8830,6 +8841,7 @@ impl<'a> Compiler<'a> {
                     effective_thermal_resistance_m2_k_per_w,
                     insulation_thermal_resistance_m2_k_per_w,
                 }),
+                air_boundary: None,
             });
         }
     }
@@ -8899,7 +8911,7 @@ impl<'a> Compiler<'a> {
                 id,
                 name: NormalizedName::new(&name),
                 kind: ConstructionKind::Opaque,
-                outside_layer: insulation,
+                outside_layer: Some(insulation),
                 layers: vec![insulation, concrete],
                 thermochromic_master: None,
                 ground_factor: Some(ConstructionGroundFactor::CfactorUndergroundWall {
@@ -8909,6 +8921,178 @@ impl<'a> Compiler<'a> {
                     effective_thermal_resistance_m2_k_per_w,
                     insulation_thermal_resistance_m2_k_per_w,
                 }),
+                air_boundary: None,
+            });
+        }
+    }
+
+    fn parse_air_boundary_constructions(&mut self, model: &mut TypedModel) {
+        const METHOD_FIELD: &str = "air_exchange_method";
+        const AIR_CHANGES_FIELD: &str = "simple_mixing_air_changes_per_hour";
+        const SCHEDULE_FIELD: &str = "simple_mixing_schedule_name";
+
+        for (name, object) in self.objects(AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE) {
+            let name_valid = if name.trim().is_empty() {
+                self.error(
+                    "MissingRequiredField",
+                    AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!(
+                        "{AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE} requires a nonblank object name"
+                    ),
+                );
+                false
+            } else {
+                true
+            };
+
+            let method = match field_value(&object, METHOD_FIELD) {
+                None => {
+                    self.record_default(
+                        AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
+                        &name,
+                        METHOD_FIELD,
+                        "None",
+                    );
+                    Some(AirBoundaryAirExchangeMethod::None)
+                }
+                Some(RawValue::String(value)) if value.trim().is_empty() => {
+                    self.record_default(
+                        AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
+                        &name,
+                        METHOD_FIELD,
+                        "None",
+                    );
+                    Some(AirBoundaryAirExchangeMethod::None)
+                }
+                Some(RawValue::String(value)) if value.eq_ignore_ascii_case("None") => {
+                    Some(AirBoundaryAirExchangeMethod::None)
+                }
+                Some(RawValue::String(value)) if value.eq_ignore_ascii_case("SimpleMixing") => {
+                    Some(AirBoundaryAirExchangeMethod::SimpleMixing)
+                }
+                Some(RawValue::String(value)) => {
+                    self.invalid_enum_value(
+                        AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
+                        &name,
+                        METHOD_FIELD,
+                        value,
+                    );
+                    None
+                }
+                Some(_value) => {
+                    self.invalid_field_type(
+                        AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
+                        &name,
+                        METHOD_FIELD,
+                        "string enum",
+                    );
+                    None
+                }
+            };
+
+            let air_changes_input = match field_value(&object, AIR_CHANGES_FIELD) {
+                None => Some(None),
+                Some(RawValue::String(value)) if value.trim().is_empty() => Some(None),
+                Some(value) => {
+                    let number = self.number_value(
+                        AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
+                        &name,
+                        AIR_CHANGES_FIELD,
+                        value,
+                    );
+                    match number {
+                        Some(number) if number >= 0.0 => Some(Some(number)),
+                        Some(number) => {
+                            self.error(
+                                "InvalidNumericRange",
+                                AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
+                                Some(&name),
+                                Some(AIR_CHANGES_FIELD),
+                                format!(
+                                    "{AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE}/{name} field {AIR_CHANGES_FIELD} must be greater than or equal to 0, got {number}"
+                                ),
+                            );
+                            None
+                        }
+                        None => None,
+                    }
+                }
+            };
+            let schedule_name = self.optional_reference_name_checked(
+                AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
+                &name,
+                &object,
+                SCHEDULE_FIELD,
+            );
+
+            let air_exchange = match (method, air_changes_input, schedule_name) {
+                (Some(AirBoundaryAirExchangeMethod::None), Some(_), Some(_)) => {
+                    Some(AirBoundaryAirExchange::None)
+                }
+                (
+                    Some(AirBoundaryAirExchangeMethod::SimpleMixing),
+                    Some(air_changes_input),
+                    Some(schedule_name),
+                ) => {
+                    let air_changes_per_hour = air_changes_input.unwrap_or_else(|| {
+                        self.record_default(
+                            AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
+                            &name,
+                            AIR_CHANGES_FIELD,
+                            "0.5",
+                        );
+                        0.5
+                    });
+                    let schedule = match schedule_name {
+                        None => Some(AirBoundaryMixingSchedule::AlwaysOn),
+                        Some(schedule_name) => self
+                            .resolve_name(
+                                &model.schedule_names,
+                                AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
+                                &name,
+                                SCHEDULE_FIELD,
+                                &schedule_name,
+                                "Schedule",
+                            )
+                            .map(AirBoundaryMixingSchedule::User),
+                    };
+                    schedule.map(|schedule| AirBoundaryAirExchange::SimpleMixing {
+                        air_changes_per_hour,
+                        schedule,
+                    })
+                }
+                _ => None,
+            };
+            let Some(air_exchange) = air_exchange else {
+                continue;
+            };
+            if !name_valid {
+                continue;
+            }
+
+            let Some(id_value) = self.checked_id(
+                AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
+                &name,
+                model.constructions.len(),
+            ) else {
+                continue;
+            };
+            let id = ConstructionId(id_value);
+            if model.construction_names.insert(&name, id).is_some() {
+                self.duplicate_name(AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE, &name);
+                continue;
+            }
+            model.constructions.push(Construction {
+                id,
+                name: NormalizedName::new(&name),
+                kind: ConstructionKind::AirBoundary,
+                outside_layer: None,
+                layers: Vec::new(),
+                thermochromic_master: None,
+                ground_factor: None,
+                air_boundary: Some(ConstructionAirBoundary { air_exchange }),
             });
         }
     }
@@ -13683,7 +13867,7 @@ impl<'a> Compiler<'a> {
                     Some(&name),
                     Some("construction_name"),
                     format!(
-                        "BuildingSurface:Detailed/{name} requires an ordinary opaque construction; {construction_name} is fenestration or a deferred F/C-factor ground construction"
+                        "BuildingSurface:Detailed/{name} requires an ordinary opaque construction; {construction_name} is fenestration, a deferred F/C-factor ground construction, or an air boundary awaiting surface pairing"
                     ),
                 );
                 continue;
@@ -17361,6 +17545,7 @@ fn source_effective_hamt_sorption_points(
 #[cfg(test)]
 mod tests {
     mod construction;
+    mod construction_air_boundary;
     mod construction_ground_factor;
     mod global_geometry_rules;
     mod material_property_glazing_spectral_data;

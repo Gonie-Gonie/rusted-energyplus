@@ -594,6 +594,17 @@ pub(super) fn assess_typed_runtime_boundaries(
             })
             .count(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "Construction:AirBoundary",
+        typed_model
+            .constructions
+            .iter()
+            .filter(|construction| construction.is_air_boundary())
+            .count(),
+    );
 
     push_typed_unsupported_object(
         registry,

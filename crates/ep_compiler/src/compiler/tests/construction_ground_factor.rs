@@ -164,7 +164,10 @@ fn ground_factor_constructions_preserve_source_order_internal_materials_formulas
     for (index, construction) in model.constructions[1..].iter().enumerate() {
         assert_eq!(construction.kind, ConstructionKind::Opaque);
         assert!(!construction.is_ordinary_opaque());
-        assert_eq!(construction.outside_layer, MaterialId(3 + index as u32));
+        assert_eq!(
+            construction.outside_layer,
+            Some(MaterialId(3 + index as u32))
+        );
         assert_eq!(
             construction.layers,
             vec![MaterialId(3 + index as u32), MaterialId(1)]
@@ -191,7 +194,12 @@ fn ground_factor_constructions_preserve_source_order_internal_materials_formulas
         assert_close(effective, expected_effective[index]);
         assert_close(insulation, expected_effective[index] - CONCRETE_RESISTANCE);
         assert_close(
-            no_mass_resistance(&model, construction.outside_layer)?,
+            no_mass_resistance(
+                &model,
+                construction
+                    .outside_layer
+                    .ok_or_else(|| std::io::Error::other("missing outside layer"))?,
+            )?,
             insulation,
         );
     }
@@ -289,9 +297,15 @@ fn staged_idf_order_controls_ordinary_f_and_c_construction_ordinals()
         ]
     );
     for (index, construction) in model.constructions[2..].iter().enumerate() {
-        assert_eq!(construction.outside_layer, MaterialId(2 + index as u32));
         assert_eq!(
-            model.materials[construction.outside_layer.0 as usize].name,
+            construction.outside_layer,
+            Some(MaterialId(2 + index as u32))
+        );
+        let outside_layer = construction
+            .outside_layer
+            .ok_or_else(|| std::io::Error::other("missing outside layer"))?;
+        assert_eq!(
+            model.materials[outside_layer.0 as usize].name,
             NormalizedName::new(&format!("~FC_Insulation_{}", index + 1))
         );
     }

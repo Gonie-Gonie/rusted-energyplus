@@ -54,10 +54,11 @@
             id: ConstructionId(0),
             name: NormalizedName::new("Wall"),
             kind: ConstructionKind::Opaque,
-            outside_layer: MaterialId(0),
+            outside_layer: Some(MaterialId(0)),
             layers: vec![MaterialId(0)],
             thermochromic_master: None,
             ground_factor: None,
+            air_boundary: None,
         });
         model.schedules.push(ScheduleConstant {
             id: ScheduleId(0),
@@ -123,10 +124,11 @@
             id: ConstructionId(0),
             name: NormalizedName::new("Wall"),
             kind: ConstructionKind::Opaque,
-            outside_layer: MaterialId(0),
+            outside_layer: Some(MaterialId(0)),
             layers: vec![MaterialId(0)],
             thermochromic_master: None,
             ground_factor: None,
+            air_boundary: None,
         });
         model.zones.push(Zone {
             id: ZoneId(0),

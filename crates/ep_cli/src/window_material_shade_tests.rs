@@ -121,6 +121,25 @@ fn shade_rows_include_all_definitions_and_duplicate_construction_occurrences()
 }
 
 #[test]
+fn shade_occurrence_scan_ignores_zero_layer_air_boundaries()
+-> Result<(), Box<dyn std::error::Error>> {
+    let raw_model = parse_epjson_str(
+        r#"{
+            "Construction:AirBoundary": {
+                "Unused Air Boundary": {"air_exchange_method":"None"}
+            }
+        }"#,
+    )?;
+    let result = ep_compiler::compile_raw_model(&raw_model);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let model = result
+        .model
+        .ok_or_else(|| std::io::Error::other("expected typed air boundary"))?;
+    assert!(window_shade_occurrences(&model)?.is_empty());
+    Ok(())
+}
+
+#[test]
 fn exact_comparison_is_definition_based_and_duplicate_aware()
 -> Result<(), Box<dyn std::error::Error>> {
     let model = shade_test_model()?;

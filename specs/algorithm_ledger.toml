@@ -160,7 +160,7 @@ routine.get_construct_data.completion_status = "source_mapped"
 routine.get_construct_data.required_for_full_domain = true
 routine.get_construct_data.state_mapping_ref = "docs/src/porting-map/heat-balance-source-map.md"
 routine.get_construct_data.read_state = [
-  "EnergyPlus calls `GetConstructData` after `GetFrameAndDividerData` and before `GetBuildingData`; within it, every ordinary `Construction` is read before the separately state-mapped F-factor then C-factor generation pass and before the deferred AirBoundary, complex-fenestration, internal-heat-source, equivalent-layer, and WindowDataFile branches",
+  "EnergyPlus calls `GetConstructData` after `GetFrameAndDividerData` and before `GetBuildingData`; within it, every ordinary `Construction` is read before the separately state-mapped F-factor then C-factor generation pass and the separately state-mapped AirBoundary pass, followed by deferred complex-fenestration, internal-heat-source, equivalent-layer, and WindowDataFile branches",
   "one required nonblank outer-key name in an independent normalized construction namespace, one required outside-layer material name, and optional layers 2 through 10 that must form a contiguous populated prefix; every populated layer resolves through the typed material namespace",
   "every typed `WindowMaterial:GlazingGroup:Thermochromic` parent encountered in layer order contributes its first ordered glazing state to the effective layer stack; the existing typed parent contract guarantees at least one state",
   "a `WindowMaterial:SimpleGlazingSystem` material is accepted only when it is the sole ordinary-Construction layer, matching the intended whole-system input while excluding EnergyPlus 26.1's multi-layer validation holes",
@@ -175,7 +175,7 @@ routine.get_construct_data.write_state = [
 ]
 routine.get_construct_data.history_state_ownership = "TypedModel owns immutable construction layer stacks and optional thermochromic master metadata; this checkpoint creates no thermochromic child constructions, active-state history, or mutable window state"
 routine.get_construct_data.unsupported_state = [
-  "multi-layer or shaded ordinary `Construction` consumption of `WindowMaterial:SimpleGlazingSystem` and the remaining special `Construction:AirBoundary`, `Construction:ComplexFenestrationState`, `ConstructionProperty:InternalHeatSource`, `Construction:WindowEquivalentLayer`, and `Construction:WindowDataFile` input branches",
+  "multi-layer or shaded ordinary `Construction` consumption of `WindowMaterial:SimpleGlazingSystem` and the remaining special `Construction:ComplexFenestrationState`, `ConstructionProperty:InternalHeatSource`, `Construction:WindowEquivalentLayer`, and `Construction:WindowDataFile` input branches",
   "`CreateTCConstructions` child allocation and copying, source-formatted child names, surface-active construction switching, temperature-driven state selection, fenestration binding, optics, thermal calculations, daylighting, shading, nominal-U adjustment, CTF generation, and EIO or other construction reporting",
 ]
 routine.get_construct_data.inactive_branches = [
@@ -189,7 +189,7 @@ routine.get_construct_data.unsupported_active_branches = [
   "valid bounded fenestration constructions remain typed graph state only and do not enter the opaque runtime thermal cache or acquire window execution",
 ]
 routine.get_construct_data.not_claimed_branches = [
-  "complete `GetConstructData` parity, source case-collision behavior, invalid-before-name source side effects, exact diagnostics/order/multiplicity, multi-layer or shaded SimpleGlazingSystem source quirks, thermochromic child generation/naming/state selection, remaining special construction families and overlays, nominal-U or CTF calculations, EIO/SQLite and other reporting, window or ground physics, runtime numerics, and conformance",
+  "complete `GetConstructData` parity, source case-collision behavior, invalid-before-name source side effects, exact diagnostics/order/multiplicity, multi-layer or shaded SimpleGlazingSystem source quirks, thermochromic child generation/naming/state selection, remaining special construction families and overlays, nominal-U or CTF calculations, EIO/SQLite and other reporting, window, air-boundary, or ground physics, runtime numerics, and conformance",
 ]
 
 routine.create_fc_factor_constructions.source_file = "src/EnergyPlus/HeatBalanceManager.cc"
@@ -225,6 +225,44 @@ routine.create_fc_factor_constructions.unsupported_active_branches = [
 ]
 routine.create_fc_factor_constructions.not_claimed_branches = [
   "surface binding and geometry validation, ground-temperature and CTF/runtime behavior, internal-material public attachment behavior, source collision and invalid-object side effects, no-thermal-mass flags, nominal-U and reporting parity, exact diagnostics/order/multiplicity, runtime numerics, EIO/SQLite, and conformance",
+]
+
+routine.create_air_boundary_constructions.source_file = "src/EnergyPlus/HeatBalanceManager.cc"
+routine.create_air_boundary_constructions.source_routine = "CreateAirBoundaryConstructions"
+routine.create_air_boundary_constructions.source_map = "docs/src/porting-map/heat-balance-source-map.md"
+routine.create_air_boundary_constructions.completion_status = "state_mapped"
+routine.create_air_boundary_constructions.required_for_full_domain = false
+routine.create_air_boundary_constructions.state_mapping_ref = "docs/src/porting-map/heat-balance-source-map.md"
+routine.create_air_boundary_constructions.read_state = [
+  "the `Construction:AirBoundary` epJSON object map after every ordinary, F-factor, and C-factor construction; EnergyPlus iterates that map directly, so records materialize in case-sensitive lexical key order rather than staged source-IDF declaration order, and Rust preserves the same family-local order",
+  "one required nonblank outer-key name in the shared case-insensitive Construction namespace; `air_exchange_method` missing or blank defaults to `None` and otherwise accepts case-insensitive `None` or `SimpleMixing` within the Rust parser convention",
+  "a supplied nonblank `simple_mixing_air_changes_per_hour` must be finite and nonnegative without an upper bound; `SimpleMixing` applies the source default 0.5 when it is missing or blank, while `None` retains source-effective zero mixing state",
+  "only `SimpleMixing` consumes `simple_mixing_schedule_name`: missing or Rust-normalized blank input selects an explicit always-on sentinel, while a nonblank name resolves case-insensitively through the existing typed top-level schedule namespace after Rust schedule materialization; `None` ignores the schedule field and creates no schedule dependency",
+]
+routine.create_air_boundary_constructions.write_state = [
+  "one dedicated zero-layer air-boundary construction descriptor per valid record, appended after every C-factor construction with a shared `ConstructionId` and normalized Construction name but no outside material, material layer, thermochromic or ground-factor metadata, or construction/material graph edge",
+  "`None` retains false simple-mixing state, zero air changes per hour, and no schedule selector; inactive supplied mixing fields do not create executable state",
+  "`SimpleMixing` retains true mixing state, the effective nonnegative air-changes-per-hour value, and either a resolved user `ScheduleId` or an explicit always-on selector without synthesizing another typed Schedule object",
+  "blank names, malformed or out-of-range numeric input, invalid enums, unresolved active schedule references, and normalized duplicate Construction names fail before Rust ID or name reservation; this deliberately does not reproduce source partial-slot and name-reservation side effects after an active schedule lookup failure",
+]
+routine.create_air_boundary_constructions.history_state_ownership = "TypedModel owns immutable zero-layer air-boundary and optional simple-mixing descriptors; no surface pair, enclosure, cross-mixing object, schedule current value, or mutable heat-balance history is allocated"
+routine.create_air_boundary_constructions.unsupported_state = [
+  "base-surface or fenestration-surface binding, `Surface` or `Zone` outside-boundary validation, paired nonadiabatic interzone checks, child-fenestration exclusion, `AirBoundaryNoHT` surface conversion, and surface heat-transfer suppression",
+  "solar, radiant, and daylighting enclosure grouping, `AnyAirBoundary`, view-factor and enclosure remapping, and every geometry-dependent surface mutation",
+  "space-pair deduplication, minimum-space-volume times air-changes-per-hour divided by 3600 flow derivation, AirflowNetwork suppression, generated `ZoneCrossMixing`, schedule current-value consumption, zone mixing calculations, and mixing output variables",
+  "nominal-U and CTF skip behavior beyond the typed zero-layer flag, construction or surface EIO/SQLite reporting, exact diagnostics, and conformance evidence",
+]
+routine.create_air_boundary_constructions.inactive_branches = [
+  "when no `Construction:AirBoundary` definition exists, ordinary, F-factor, and C-factor construction behavior is unchanged",
+  "`None` leaves simple mixing disabled with zero air changes and no schedule selector even when inactive mixing fields are supplied; their schedule name is not resolved",
+  "`SimpleMixing` with no effective schedule name retains only the explicit always-on selector; no schedule sampling or downstream mixing state is activated",
+]
+routine.create_air_boundary_constructions.unsupported_active_branches = [
+  "every valid `Construction:AirBoundary` definition, including every unused `None` or `SimpleMixing` definition, is reported as `UnsupportedSurfaceBoundary` and `RunBlocked`; no partial or compatibility runtime is admitted",
+  "`BuildingSurface:Detailed` deliberately rejects an air-boundary construction until interzone pairing, enclosure grouping, no-heat-transfer surface conversion, and optional simple-mixing consumers are ported; a supported referenced schedule does not weaken this block",
+]
+routine.create_air_boundary_constructions.not_claimed_branches = [
+  "complete `GetConstructData` or Rust compiler pass-order parity, source case-collision lookup and invalid-after-reservation side effects, explicit-empty native-epJSON behavior, canonical enum casing, exact diagnostics/order/multiplicity, surface and enclosure behavior, schedule sampling, AirflowNetwork interaction, zone mixing, reporting, runtime numerics, EIO/SQLite, and conformance",
 ]
 
 [[algorithm]]

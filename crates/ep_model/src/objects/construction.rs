@@ -1,6 +1,6 @@
 //! Typed construction records and source-projected metadata.
 
-use crate::{ConstructionId, MaterialId, NormalizedName};
+use crate::{ConstructionId, MaterialId, NormalizedName, ScheduleId};
 
 /// Consumer family for an ordered construction layer stack.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -9,6 +9,8 @@ pub enum ConstructionKind {
     Opaque,
     /// Fenestration construction reserved for a dedicated window heat-balance path.
     Fenestration,
+    /// Zero-layer air boundary reserved for enclosure and interzone mixing paths.
+    AirBoundary,
 }
 
 impl ConstructionKind {
@@ -18,8 +20,39 @@ impl ConstructionKind {
         match self {
             Self::Opaque => "opaque",
             Self::Fenestration => "fenestration",
+            Self::AirBoundary => "air_boundary",
         }
     }
+}
+
+/// Schedule source used by a simple-mixing air boundary.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum AirBoundaryMixingSchedule {
+    /// Blank or omitted input selects EnergyPlus's built-in always-on schedule.
+    AlwaysOn,
+    /// Explicit user schedule resolved through the shared schedule namespace.
+    User(ScheduleId),
+}
+
+/// Air-exchange behavior retained for a zero-layer air boundary construction.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum AirBoundaryAirExchange {
+    /// No interzone air exchange is requested by this construction.
+    None,
+    /// Simple scheduled mixing at the source air-changes-per-hour input.
+    SimpleMixing {
+        /// Air changes per hour.
+        air_changes_per_hour: f64,
+        /// Built-in or explicitly named mixing schedule.
+        schedule: AirBoundaryMixingSchedule,
+    },
+}
+
+/// Source-projected metadata for `Construction:AirBoundary`.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ConstructionAirBoundary {
+    /// Requested air-exchange method and its dependent inputs.
+    pub air_exchange: AirBoundaryAirExchange,
 }
 
 /// Source inputs and derived resistance state for a generated F/C-factor construction.
@@ -78,7 +111,9 @@ pub struct Construction {
     /// Consumer family for this construction.
     pub kind: ConstructionKind,
     /// Effective outside layer material (including first-state TC substitution).
-    pub outside_layer: MaterialId,
+    ///
+    /// Zero-layer air-boundary constructions have no outside material.
+    pub outside_layer: Option<MaterialId>,
     /// Ordered material layers from outside to inside.
     pub layers: Vec<MaterialId>,
     /// Source-style thermochromic master metadata for the last group parent in the stack.
@@ -88,6 +123,8 @@ pub struct Construction {
     pub thermochromic_master: Option<ConstructionThermochromicMaster>,
     /// F/C-factor source and derived state for generated ground constructions.
     pub ground_factor: Option<ConstructionGroundFactor>,
+    /// Zero-layer air-boundary source state when this is an air boundary.
+    pub air_boundary: Option<ConstructionAirBoundary>,
 }
 
 impl Construction {
@@ -96,5 +133,21 @@ impl Construction {
     #[must_use]
     pub const fn is_ordinary_opaque(&self) -> bool {
         matches!(self.kind, ConstructionKind::Opaque) && self.ground_factor.is_none()
+    }
+
+    /// Returns whether this record is a zero-layer air boundary construction.
+    #[must_use]
+    pub const fn is_air_boundary(&self) -> bool {
+        matches!(self.kind, ConstructionKind::AirBoundary)
+    }
+
+    /// Returns the effective layer stack, retaining the legacy outside-only fallback.
+    #[must_use]
+    pub fn effective_layers(&self) -> &[MaterialId] {
+        if self.layers.is_empty() {
+            self.outside_layer.as_slice()
+        } else {
+            self.layers.as_slice()
+        }
     }
 }

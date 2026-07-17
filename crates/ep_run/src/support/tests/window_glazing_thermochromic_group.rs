@@ -86,7 +86,7 @@ fn typed_thermochromic_groups_including_consumed_and_unused_remain_run_blocked()
         .resolve("Mixed Ordinary Glazing Group")
         .ok_or_else(|| std::io::Error::other("missing thermochromic parent"))?;
     assert_eq!(master.layers, vec![spectral_glazing]);
-    assert_eq!(master.outside_layer, spectral_glazing);
+    assert_eq!(master.outside_layer, Some(spectral_glazing));
     assert_eq!(
         master
             .thermochromic_master

@@ -45,7 +45,7 @@ fn typed_simple_glazing_materials_including_unused_remain_run_blocked()
     assert_eq!(model.constructions[0].layers.len(), 1);
     assert_eq!(
         model.constructions[0].outside_layer,
-        model.constructions[0].layers[0]
+        Some(model.constructions[0].layers[0])
     );
     assert_eq!(
         model

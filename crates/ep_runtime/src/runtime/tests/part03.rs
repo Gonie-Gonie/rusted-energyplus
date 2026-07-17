@@ -235,10 +235,11 @@
             id: ConstructionId(1),
             name: NormalizedName::new("Window"),
             kind: ConstructionKind::Fenestration,
-            outside_layer: MaterialId(1),
+            outside_layer: Some(MaterialId(1)),
             layers: vec![MaterialId(1)],
             thermochromic_master: None,
             ground_factor: None,
+            air_boundary: None,
         });
         let model = SimulationModel::from_typed(typed);
 
@@ -269,7 +270,7 @@
             .materials
             .push(spectral_average_window_material(MaterialId(99), "Clear Glass"));
         typed.constructions[0].id = ConstructionId(42);
-        typed.constructions[0].outside_layer = MaterialId(10);
+        typed.constructions[0].outside_layer = Some(MaterialId(10));
         typed.constructions[0].layers = vec![MaterialId(10)];
         for surface in &mut typed.surfaces {
             surface.construction = ConstructionId(42);
@@ -280,10 +281,11 @@
                 id: ConstructionId(7),
                 name: NormalizedName::new("Filtered Window"),
                 kind: ConstructionKind::Fenestration,
-                outside_layer: MaterialId(99),
+                outside_layer: Some(MaterialId(99)),
                 layers: vec![MaterialId(99)],
                 thermochromic_master: None,
                 ground_factor: None,
+                air_boundary: None,
             },
         );
 
@@ -304,7 +306,7 @@
         ));
 
         let mut missing_material = cube_model();
-        missing_material.constructions[0].outside_layer = MaterialId(99);
+        missing_material.constructions[0].outside_layer = Some(MaterialId(99));
         missing_material.constructions[0].layers = vec![MaterialId(99)];
         assert!(matches!(
             crate::heat_balance::surface_manager::ConstructionThermalDataCache::build(
@@ -341,6 +343,38 @@
         ));
         assert!(error.to_string().contains(
             "references fenestration construction WALL, which the opaque heat-balance runtime cannot consume"
+        ));
+    }
+
+    #[test]
+    fn opaque_runtime_filters_and_rejects_air_boundary_construction() {
+        let mut typed = cube_model();
+        typed.constructions[0].kind = ConstructionKind::AirBoundary;
+        typed.constructions[0].outside_layer = None;
+        typed.constructions[0].layers.clear();
+        typed.constructions[0].air_boundary = Some(ConstructionAirBoundary {
+            air_exchange: AirBoundaryAirExchange::None,
+        });
+        let model = SimulationModel::from_typed(typed);
+
+        let plan = build_execution_plan(&model);
+        let calc_inside =
+            stage_with_kind(&plan.stages, ExecutionStageKind::CalcHeatBalanceInsideSurf);
+        assert!(calc_inside.prebound.construction_ids.is_empty());
+        assert!(calc_inside.prebound.surface_ids.is_empty());
+
+        let error = initialize_heat_balance_state(&model, 20.0)
+            .expect_err("air boundary must not enter opaque heat balance");
+        assert!(matches!(
+            &error,
+            RuntimeError::UnsupportedConstructionForOpaqueHeatBalance {
+                construction_name,
+                construction_kind: ConstructionKind::AirBoundary,
+                ..
+            } if construction_name == "WALL"
+        ));
+        assert!(error.to_string().contains(
+            "references air_boundary construction WALL, which the opaque heat-balance runtime cannot consume"
         ));
     }
 
@@ -432,10 +466,11 @@
             id: ConstructionId(1),
             name: NormalizedName::new("High Inside Wall"),
             kind: ConstructionKind::Opaque,
-            outside_layer: MaterialId(0),
+            outside_layer: Some(MaterialId(0)),
             layers: vec![MaterialId(0), MaterialId(2)],
             thermochromic_master: None,
             ground_factor: None,
+            air_boundary: None,
         });
         typed.surfaces[0].construction = ConstructionId(1);
         typed.other_equipment[0].fraction_radiant = 0.25;

@@ -352,12 +352,7 @@ fn has_window_screen_construction_occurrence(model: &TypedModel) -> bool {
         if construction.kind != ConstructionKind::Fenestration {
             return false;
         }
-        let layers = if construction.layers.is_empty() {
-            std::slice::from_ref(&construction.outside_layer)
-        } else {
-            construction.layers.as_slice()
-        };
-        layers.iter().any(|material_id| {
+        construction.effective_layers().iter().any(|material_id| {
             model.materials.iter().any(|material| {
                 material.id == *material_id
                     && matches!(material.definition, MaterialDefinition::WindowScreen(_))
@@ -460,10 +455,19 @@ fn activated_window_screen_material_names(
                 control_name.0
             ));
         }
+        let outside_layer = shaded_construction
+            .effective_layers()
+            .first()
+            .ok_or_else(|| {
+                format!(
+                    "{WINDOW_SHADING_CONTROL_OBJECT_TYPE}/{} shaded construction {shaded_construction_name} has no outside material",
+                    control_name.0
+                )
+            })?;
         let screen_material = model
             .materials
             .iter()
-            .find(|material| material.id == shaded_construction.outside_layer)
+            .find(|material| material.id == *outside_layer)
             .ok_or_else(|| {
                 format!(
                     "{WINDOW_SHADING_CONTROL_OBJECT_TYPE}/{} shaded construction {shaded_construction_name} has a missing outside material",
@@ -544,11 +548,7 @@ fn window_screen_occurrences(
         if construction.kind != ConstructionKind::Fenestration {
             continue;
         }
-        let layers = if construction.layers.is_empty() {
-            std::slice::from_ref(&construction.outside_layer)
-        } else {
-            construction.layers.as_slice()
-        };
+        let layers = construction.effective_layers();
         for (layer_index, material_id) in layers.iter().enumerate() {
             let material = model
                 .materials
@@ -589,11 +589,7 @@ fn window_screen_occurrences(
                     {
                         return false;
                     }
-                    let candidate_layers = if candidate.layers.is_empty() {
-                        std::slice::from_ref(&candidate.outside_layer)
-                    } else {
-                        candidate.layers.as_slice()
-                    };
+                    let candidate_layers = candidate.effective_layers();
                     candidate_layers == bare_layers
                 });
             if !has_bare_companion {
