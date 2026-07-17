@@ -14,7 +14,10 @@ use ep_model::{
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
     IdealLoadsLimit, InfraredTransparentMaterial, InsideSurfaceConvectionAlgorithm, InternalGainId,
     LoadDistributionScheme, LoopId, Material, MaterialDefinition,
-    MaterialHeatAndMoistureTransferSettings, MaterialHeatAndMoistureTransferSettingsId, MaterialId,
+    MaterialHeatAndMoistureTransferSettings, MaterialHeatAndMoistureTransferSettingsId,
+    MaterialHeatAndMoistureTransferSorptionIsotherm,
+    MaterialHeatAndMoistureTransferSorptionIsothermId,
+    MaterialHeatAndMoistureTransferSorptionPoint, MaterialId,
     MaterialMoisturePenetrationDepthSettings, MaterialMoisturePenetrationDepthSettingsId,
     MaterialPhaseChange, MaterialPhaseChangeHysteresis, MaterialPhaseChangeHysteresisId,
     MaterialPhaseChangeId, MaterialSurfaceRoughness, MaterialVariableAbsorptance,
@@ -480,6 +483,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "MaterialProperty:VariableThermalConductivity",
     "MaterialProperty:MoisturePenetrationDepth:Settings",
     "MaterialProperty:HeatAndMoistureTransfer:Settings",
+    "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -596,6 +600,7 @@ impl<'a> Compiler<'a> {
         self.parse_material_variable_thermal_conductivities(&mut model);
         self.parse_material_moisture_penetration_depth_settings(&mut model);
         self.parse_material_heat_and_moisture_transfer_settings(&mut model);
+        self.parse_material_heat_and_moisture_transfer_sorption_isotherms(&mut model);
         self.validate_scalar_schedule_type_limits(&model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
@@ -2631,6 +2636,204 @@ impl<'a> Compiler<'a> {
                     initial_water_content_ratio,
                 },
             );
+        }
+    }
+
+    fn parse_material_heat_and_moisture_transfer_sorption_isotherms(
+        &mut self,
+        model: &mut TypedModel,
+    ) {
+        const OBJECT_TYPE: &str = "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm";
+        const MAX_COORDINATES: usize = 25;
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let diagnostics_before_fields = self.diagnostics.len();
+            let material_name = self.required_string(OBJECT_TYPE, &name, &object, "material_name");
+            let number_of_isotherm_coordinates = self
+                .required_number(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "number_of_isotherm_coordinates",
+                )
+                .and_then(|value| {
+                    if value.fract() != 0.0 {
+                        self.error(
+                            "InvalidInteger",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some("number_of_isotherm_coordinates"),
+                            format!(
+                                "{OBJECT_TYPE}/{name} field number_of_isotherm_coordinates must be an integer, got {value}"
+                            ),
+                        );
+                        None
+                    } else if !(1.0..=MAX_COORDINATES as f64).contains(&value) {
+                        self.error(
+                            "InvalidNumericRange",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some("number_of_isotherm_coordinates"),
+                            format!(
+                                "{OBJECT_TYPE}/{name} field number_of_isotherm_coordinates must be between 1 and {MAX_COORDINATES}, got {value}"
+                            ),
+                        );
+                        None
+                    } else {
+                        Some(value as u8)
+                    }
+                });
+
+            let mut parsed_points = Vec::with_capacity(MAX_COORDINATES);
+            for coordinate in 1..=MAX_COORDINATES {
+                let relative_humidity_field = format!("relative_humidity_fraction_{coordinate}");
+                let moisture_content_field = format!("moisture_content_{coordinate}");
+                let relative_humidity_fraction = if coordinate == 1 {
+                    self.required_number_bounded(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        &relative_humidity_field,
+                        (0.0, true),
+                        (1.0, true),
+                    )
+                } else {
+                    self.optional_number_bounded(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        &relative_humidity_field,
+                        (0.0, true),
+                        (1.0, true),
+                    )
+                };
+                let moisture_content_kg_per_m3 = if coordinate == 1 {
+                    self.required_number_bounded(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        &moisture_content_field,
+                        (0.0, true),
+                        (f64::INFINITY, false),
+                    )
+                } else {
+                    self.optional_number_bounded(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        &moisture_content_field,
+                        (0.0, true),
+                        (f64::INFINITY, false),
+                    )
+                };
+                parsed_points.push(MaterialHeatAndMoistureTransferSorptionPoint {
+                    relative_humidity_fraction: relative_humidity_fraction.unwrap_or(0.0),
+                    moisture_content_kg_per_m3: moisture_content_kg_per_m3.unwrap_or(0.0),
+                });
+            }
+            if self.diagnostics.len() != diagnostics_before_fields {
+                continue;
+            }
+            let (Some(material_name), Some(number_of_isotherm_coordinates)) =
+                (material_name, number_of_isotherm_coordinates)
+            else {
+                continue;
+            };
+
+            let Some(reference_material) = self.resolve_name(
+                &model.material_names,
+                OBJECT_TYPE,
+                &name,
+                "material_name",
+                &material_name,
+                "Material",
+            ) else {
+                continue;
+            };
+            let Some(settings) = model
+                .material_heat_and_moisture_transfer_settings
+                .iter()
+                .find(|settings| settings.reference_material == reference_material)
+            else {
+                self.error(
+                    "MissingHeatAndMoistureTransferSettings",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("material_name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} requires MaterialProperty:HeatAndMoistureTransfer:Settings for material {material_name}"
+                    ),
+                );
+                continue;
+            };
+            let reference_settings = settings.id;
+            let porosity = settings.porosity;
+            if model
+                .material_heat_and_moisture_transfer_sorption_isotherms
+                .iter()
+                .any(|isotherm| isotherm.reference_material == reference_material)
+            {
+                self.error(
+                    "DuplicateHeatAndMoistureTransferSorptionMaterial",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("material_name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} repeats a material that already has a sorption isotherm"
+                    ),
+                );
+                continue;
+            }
+
+            let input_points =
+                parsed_points[..usize::from(number_of_isotherm_coordinates)].to_vec();
+            let (effective_points, moisture_content_was_adjusted) =
+                source_effective_hamt_sorption_points(&input_points, porosity);
+            if effective_points.iter().any(|point| {
+                !point.relative_humidity_fraction.is_finite()
+                    || !point.moisture_content_kg_per_m3.is_finite()
+            }) {
+                self.error(
+                    "InvalidHeatAndMoistureTransferSorptionDerivedState",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    None,
+                    format!(
+                        "{OBJECT_TYPE}/{name} source-equivalent endpoint or averaging state is not finite"
+                    ),
+                );
+                continue;
+            }
+            if moisture_content_was_adjusted {
+                self.warning(
+                    "HeatAndMoistureTransferSorptionDataAdjusted",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    None,
+                    format!(
+                        "{OBJECT_TYPE}/{name} source-equivalent adjacent moisture averaging was applied"
+                    ),
+                );
+            }
+
+            let id_value = model
+                .material_heat_and_moisture_transfer_sorption_isotherms
+                .len();
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, id_value) else {
+                continue;
+            };
+            model
+                .material_heat_and_moisture_transfer_sorption_isotherms
+                .push(MaterialHeatAndMoistureTransferSorptionIsotherm {
+                    id: MaterialHeatAndMoistureTransferSorptionIsothermId(id_value),
+                    name: NormalizedName::new(&name),
+                    reference_material,
+                    reference_settings,
+                    number_of_isotherm_coordinates,
+                    input_points,
+                    effective_points,
+                    moisture_content_was_adjusted,
+                });
         }
     }
 
@@ -15371,11 +15574,58 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
     }
 }
 
+fn source_effective_hamt_sorption_points(
+    input_points: &[MaterialHeatAndMoistureTransferSorptionPoint],
+    porosity: f64,
+) -> (Vec<MaterialHeatAndMoistureTransferSorptionPoint>, bool) {
+    let mut points = input_points.to_vec();
+    points.push(MaterialHeatAndMoistureTransferSorptionPoint {
+        relative_humidity_fraction: 1.01,
+        moisture_content_kg_per_m3: porosity * 1000.0,
+    });
+    points.push(MaterialHeatAndMoistureTransferSorptionPoint {
+        relative_humidity_fraction: 0.0,
+        moisture_content_kg_per_m3: 0.0,
+    });
+
+    for left in 0..points.len() - 1 {
+        for right in left + 1..points.len() {
+            if points[left].relative_humidity_fraction > points[right].relative_humidity_fraction {
+                points.swap(left, right);
+            }
+        }
+    }
+
+    let mut moisture_content_was_adjusted = false;
+    for _ in 0..100 {
+        let mut pass_unchanged = true;
+        for index in 0..points.len() - 1 {
+            if points[index].moisture_content_kg_per_m3
+                > points[index + 1].moisture_content_kg_per_m3
+            {
+                moisture_content_was_adjusted = true;
+                let average = (points[index].moisture_content_kg_per_m3
+                    + points[index + 1].moisture_content_kg_per_m3)
+                    / 2.0;
+                points[index].moisture_content_kg_per_m3 = average;
+                points[index + 1].moisture_content_kg_per_m3 = average;
+                pass_unchanged = false;
+            }
+        }
+        if pass_unchanged {
+            break;
+        }
+    }
+
+    (points, moisture_content_was_adjusted)
+}
+
 #[cfg(test)]
 mod tests {
     mod global_geometry_rules;
     mod material_property_glazing_spectral_data;
     mod material_property_heat_and_moisture_transfer_settings;
+    mod material_property_heat_and_moisture_transfer_sorption_isotherm;
     mod material_property_moisture_penetration_depth_settings;
     mod material_property_phase_change;
     mod material_property_phase_change_hysteresis;

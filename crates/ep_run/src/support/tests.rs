@@ -5,6 +5,7 @@ use ep_raw_model::parse_epjson_str;
 
 mod glazing_spectral_data;
 mod material_heat_and_moisture_transfer_settings;
+mod material_heat_and_moisture_transfer_sorption_isotherm;
 mod material_moisture_penetration_depth_settings;
 mod material_phase_change;
 mod material_phase_change_hysteresis;
