@@ -241,9 +241,9 @@ reason = "Sizing workflows are not ported."
 
 [[unsupported_rule]]
 id = "unsupported_surface_boundary"
-object_patterns = ["FenestrationSurface:*", "Window*", "Daylighting:*", "Shading:*", "Site:Ground*", "Material:RoofVegetation", "MaterialProperty:VariableAbsorptance", "MaterialProperty:PhaseChangeHysteresis", "MaterialProperty:PhaseChange"]
+object_patterns = ["FenestrationSurface:*", "Window*", "Daylighting:*", "Shading:*", "Site:Ground*", "Material:RoofVegetation", "MaterialProperty:VariableAbsorptance", "MaterialProperty:PhaseChangeHysteresis", "MaterialProperty:PhaseChange", "MaterialProperty:VariableThermalConductivity"]
 severity = "run_blocked"
-reason = "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+reason = "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
 
 [[partial_rule]]
 id = "ignored_reporting_objects"

@@ -15,11 +15,13 @@ use ep_model::{
     IdealLoadsLimit, InfraredTransparentMaterial, InsideSurfaceConvectionAlgorithm, InternalGainId,
     LoadDistributionScheme, LoopId, Material, MaterialDefinition, MaterialId, MaterialPhaseChange,
     MaterialPhaseChangeHysteresis, MaterialPhaseChangeHysteresisId, MaterialPhaseChangeId,
-    MaterialSurfaceRoughness, MaterialVariableAbsorptance, MaterialVariableAbsorptanceId, NameMap,
-    NoMassMaterial, Node, NodeId, NodeList, NodeListId, NormalizedName, NumericType,
-    OpaqueSurfaceProperties, OtherEquipment, OtherEquipmentDesignLevelCalculationMethod,
-    OutdoorAirEconomizerType, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
-    PeopleNumberCalculationMethod, PhaseChangeHysteresisCurve, PhaseChangeHysteresisThermalState,
+    MaterialSurfaceRoughness, MaterialVariableAbsorptance, MaterialVariableAbsorptanceId,
+    MaterialVariableThermalConductivity, MaterialVariableThermalConductivityId,
+    MaterialVariableThermalConductivityPoint, NameMap, NoMassMaterial, Node, NodeId, NodeList,
+    NodeListId, NormalizedName, NumericType, OpaqueSurfaceProperties, OtherEquipment,
+    OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutsideBoundaryCondition,
+    OutsideSurfaceConvectionAlgorithm, People, PeopleNumberCalculationMethod,
+    PhaseChangeHysteresisCurve, PhaseChangeHysteresisThermalState,
     PhaseChangeTemperatureEnthalpyPoint, PlantBranch, PlantBranchComponent, PlantBranchList,
     PlantConnector, PlantConnectorKind, PlantConnectorList, PlantConnectorListEntry, PlantLoop,
     Point3, PumpConstantSpeed, RegularMaterial, RoofVegetationMaterial,
@@ -473,6 +475,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "MaterialProperty:VariableAbsorptance",
     "MaterialProperty:PhaseChangeHysteresis",
     "MaterialProperty:PhaseChange",
+    "MaterialProperty:VariableThermalConductivity",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -586,6 +589,7 @@ impl<'a> Compiler<'a> {
         self.parse_material_variable_absorptances(&mut model);
         self.parse_material_phase_change_hystereses(&mut model);
         self.parse_material_phase_changes(&mut model);
+        self.parse_material_variable_thermal_conductivities(&mut model);
         self.validate_scalar_schedule_type_limits(&model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
@@ -2169,6 +2173,184 @@ impl<'a> Compiler<'a> {
                     Some(&field),
                     format!(
                         "{OBJECT_TYPE}/{object_name} field {field} must be greater than or equal to the preceding enthalpy"
+                    ),
+                );
+                valid = false;
+            }
+        }
+
+        valid.then_some(points)
+    }
+
+    fn parse_material_variable_thermal_conductivities(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "MaterialProperty:VariableThermalConductivity";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            if name.trim().is_empty() {
+                self.error(
+                    "MissingRequiredField",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE} requires a non-blank material name"),
+                );
+                continue;
+            }
+
+            let Some(temperature_conductivity_points) =
+                self.material_variable_thermal_conductivity_points(&name, &object)
+            else {
+                continue;
+            };
+
+            let Some(reference_material) = self.resolve_name(
+                &model.material_names,
+                OBJECT_TYPE,
+                &name,
+                "name",
+                &name,
+                "Material",
+            ) else {
+                continue;
+            };
+            let Some(material) = model.materials.get(reference_material.0 as usize) else {
+                self.error(
+                    "InvalidReference",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE}/{name} resolved material outside the material arena"),
+                );
+                continue;
+            };
+            if !matches!(
+                material.definition,
+                MaterialDefinition::Regular(_) | MaterialDefinition::NoMass(_)
+            ) {
+                self.error(
+                    "InvalidVariableThermalConductivityMaterialType",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE}/{name} must reference Material or Material:NoMass"),
+                );
+                continue;
+            }
+            if model
+                .material_variable_thermal_conductivities
+                .iter()
+                .any(|attachment| attachment.reference_material == reference_material)
+            {
+                self.error(
+                    "DuplicateVariableThermalConductivityMaterial",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} repeats a material that already has temperature-conductivity properties"
+                    ),
+                );
+                continue;
+            }
+
+            let id_value = model.material_variable_thermal_conductivities.len();
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, id_value) else {
+                continue;
+            };
+            model.material_variable_thermal_conductivities.push(
+                MaterialVariableThermalConductivity {
+                    id: MaterialVariableThermalConductivityId(id_value),
+                    name: NormalizedName::new(&name),
+                    reference_material,
+                    temperature_conductivity_points,
+                },
+            );
+        }
+    }
+
+    fn material_variable_thermal_conductivity_points(
+        &mut self,
+        object_name: &str,
+        object: &RawObject,
+    ) -> Option<Vec<MaterialVariableThermalConductivityPoint>> {
+        const OBJECT_TYPE: &str = "MaterialProperty:VariableThermalConductivity";
+        const VALUES_FIELD: &str = "values";
+
+        let entries = match field_value(object, VALUES_FIELD) {
+            Some(RawValue::Array(entries)) => entries.as_slice(),
+            Some(_value) => {
+                self.invalid_field_type(OBJECT_TYPE, object_name, VALUES_FIELD, "array");
+                return None;
+            }
+            None => &[],
+        };
+        let mut points = Vec::with_capacity(entries.len());
+        let mut valid = true;
+        for (entry_index, entry) in entries.iter().enumerate() {
+            let RawValue::Object(fields) = entry else {
+                self.invalid_field_type(OBJECT_TYPE, object_name, VALUES_FIELD, "array of objects");
+                valid = false;
+                continue;
+            };
+            let temperature_field = format!("{VALUES_FIELD}[{entry_index}].temperature");
+            let conductivity_field = format!("{VALUES_FIELD}[{entry_index}].thermal_conductivity");
+            let temperature_c = match fields.get(&FieldName("temperature".to_string())) {
+                Some(value) => {
+                    self.number_value(OBJECT_TYPE, object_name, &temperature_field, value)
+                }
+                None => {
+                    self.error(
+                        "MissingRequiredField",
+                        OBJECT_TYPE,
+                        Some(object_name),
+                        Some(&temperature_field),
+                        format!("{OBJECT_TYPE}/{object_name} requires field {temperature_field}"),
+                    );
+                    None
+                }
+            };
+            let thermal_conductivity_w_per_m_k = match fields
+                .get(&FieldName("thermal_conductivity".to_string()))
+            {
+                Some(value) => {
+                    self.number_value(OBJECT_TYPE, object_name, &conductivity_field, value)
+                }
+                None => {
+                    self.error(
+                        "MissingRequiredField",
+                        OBJECT_TYPE,
+                        Some(object_name),
+                        Some(&conductivity_field),
+                        format!("{OBJECT_TYPE}/{object_name} requires field {conductivity_field}"),
+                    );
+                    None
+                }
+            };
+            let (Some(temperature_c), Some(thermal_conductivity_w_per_m_k)) =
+                (temperature_c, thermal_conductivity_w_per_m_k)
+            else {
+                valid = false;
+                continue;
+            };
+            points.push(MaterialVariableThermalConductivityPoint {
+                temperature_c,
+                thermal_conductivity_w_per_m_k,
+            });
+        }
+        if !valid {
+            return None;
+        }
+
+        for (point_index, pair) in points.windows(2).enumerate() {
+            if pair[1].temperature_c <= pair[0].temperature_c {
+                let field = format!("{VALUES_FIELD}[{}].temperature", point_index + 1);
+                self.error(
+                    "NonIncreasingVariableThermalConductivityTemperature",
+                    OBJECT_TYPE,
+                    Some(object_name),
+                    Some(&field),
+                    format!(
+                        "{OBJECT_TYPE}/{object_name} field {field} must be greater than the preceding temperature"
                     ),
                 );
                 valid = false;
@@ -14922,6 +15104,7 @@ mod tests {
     mod material_property_phase_change;
     mod material_property_phase_change_hysteresis;
     mod material_property_variable_absorptance;
+    mod material_property_variable_thermal_conductivity;
     mod material_roof_vegetation;
     mod material_variants;
     mod schedule_day_interval;
