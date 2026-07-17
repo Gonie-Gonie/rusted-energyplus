@@ -56,9 +56,11 @@ different:
 | base definitions | 22 / 22 inventoried | `GetMaterialData` processing order is locked below. |
 | overlays and datasets | 12 / 12 inventoried | Common-startup or algorithm-local owner and order are locked below. |
 | typed Rust material variants | 22 | Five complete opaque-family slices, the `WindowMaterial:Glazing` `SpectralAverage` branch, and the complete `RefractionExtinctionMethod`, glazing `EquivalentLayer`, `WindowMaterial:Gas`, gap `EquivalentLayer`, `WindowMaterial:GasMixture`, ordinary `WindowMaterial:Shade`, shade `EquivalentLayer`, drape `EquivalentLayer`, ordinary `WindowMaterial:Screen`, screen `EquivalentLayer`, ordinary `WindowMaterial:Blind`, blind `EquivalentLayer`, thermochromic glazing-group, simple-glazing-system, complex-fenestration gap, and complex-fenestration shade objects have distinct payloads. |
-| complete bounded public-object slices | 21 / 34 | `Material`, `Material:NoMass`, `Material:AirGap`, `Material:InfraredTransparent`, `WindowMaterial:Glazing:RefractionExtinctionMethod`, `WindowMaterial:Glazing:EquivalentLayer`, `WindowMaterial:Gas`, `WindowMaterial:Gap:EquivalentLayer`, `WindowMaterial:GasMixture`, `WindowMaterial:Shade`, `WindowMaterial:Shade:EquivalentLayer`, `WindowMaterial:Drape:EquivalentLayer`, `WindowMaterial:Screen`, `WindowMaterial:Screen:EquivalentLayer`, `WindowMaterial:Blind`, `WindowMaterial:Blind:EquivalentLayer`, `Material:RoofVegetation`, `WindowMaterial:GlazingGroup:Thermochromic`, `WindowMaterial:SimpleGlazingSystem`, `WindowMaterial:Gap`, and `WindowMaterial:ComplexShade` have their source-effective fields and bounded compiler contracts typed. |
+| complete bounded base-definition slices | 21 / 22 | `Material`, `Material:NoMass`, `Material:AirGap`, `Material:InfraredTransparent`, `WindowMaterial:Glazing:RefractionExtinctionMethod`, `WindowMaterial:Glazing:EquivalentLayer`, `WindowMaterial:Gas`, `WindowMaterial:Gap:EquivalentLayer`, `WindowMaterial:GasMixture`, `WindowMaterial:Shade`, `WindowMaterial:Shade:EquivalentLayer`, `WindowMaterial:Drape:EquivalentLayer`, `WindowMaterial:Screen`, `WindowMaterial:Screen:EquivalentLayer`, `WindowMaterial:Blind`, `WindowMaterial:Blind:EquivalentLayer`, `Material:RoofVegetation`, `WindowMaterial:GlazingGroup:Thermochromic`, `WindowMaterial:SimpleGlazingSystem`, `WindowMaterial:Gap`, and `WindowMaterial:ComplexShade` have their source-effective fields and bounded compiler contracts typed. |
+| standalone typed datasets | 1 / 12 | `MaterialProperty:GlazingSpectralData` is typed in a separate deterministic standalone arena and name map; it is not a `MaterialDefinition` variant. |
+| complete bounded public-object slices | 22 / 34 | The 21 complete base-definition slices plus the standalone glazing spectral dataset are complete within their declared bounded compiler contracts. |
 | partial bounded public-object slices | 1 / 34 | Only `WindowMaterial:Glazing` with `Optical Data Type = SpectralAverage` is typed; `Spectral`, `SpectralAndAngle`, and `BSDF` remain explicitly unsupported. |
-| wholly deferred public objects | 12 / 34 | All 12 overlays/datasets remain unported as variants; no base definition is wholly deferred. |
+| wholly deferred public objects | 11 / 34 | The remaining 11 overlays/datasets are wholly deferred; no base definition is wholly deferred. |
 
 The inventory scaffold began at CP58; the counts and typed states above are
 cumulative through the current checkpoint. Complete inventory does not mean
@@ -80,6 +82,79 @@ The spectral dataset therefore exists before a glazing definition resolves a
 spectral-data reference. Variable absorptance exists only after base materials
 have been created. Hysteresis then upgrades an already-created regular
 material.
+
+## Standalone Glazing Spectral Dataset Typed Contract
+
+`MaterialProperty:GlazingSpectralData` is a complete bounded standalone input
+checkpoint, not a twenty-third material variant. The compiler reads it before
+all `GetMaterialData` base definitions and stores it in a separate normalized
+name map and deterministic compiler-ordered dataset arena. Every definition is
+parsed and validated even when unused. The fixed-then-extension point vector
+preserves source field order, but broad IDF/epJSON dataset declaration-order
+parity is not claimed. A valid unused dataset remains runtime-inert inside an
+otherwise-supported model: it adds no `MaterialDefinition`, construction
+layer, arbitrary-run blocker, or runtime execution state.
+
+The positional numeric stream mirrors the EnergyPlus 26.1 InputProcessor
+shape. Fixed keys are read in quartet order
+`wavelength_N, transmittance_N, front_reflectance_N, back_reflectance_N` for
+`N = 1..4`, followed by extension objects with the same four fields. With no
+extensions, the last present fixed numeric field determines the active span;
+omitted positions inside that span read as zero. A name-only definition has
+zero points. A non-empty extension establishes all sixteen fixed numeric
+positions before its extension points, so omitted fixed values are again
+zero-filled. The active span must end on a complete quartet, and zero through
+800 points are accepted; an incomplete final quartet or a point count above
+800 fails closed before a typed model is published.
+
+Each source-ordered point applies the bounded source rules:
+
+- transmittance below 0.001 is silently replaced by 0.001 before validation
+- wavelength is in `[0.1, 4.0]` microns and strictly increases
+- transmittance is at most 1.01
+- front and back reflectance are each in `[0, 1.02]`
+- transmittance plus either directional reflectance is at most 1.03
+
+Normalized duplicate dataset names and all invalid point/order/count states
+fail closed. This dataset checkpoint does not activate any glazing consumer.
+`WindowMaterial:Glazing` `Spectral` remains compiler-blocked despite the typed
+dataset arena; `SpectralAndAngle` and `BSDF` remain blocked on their separate
+data and complex-fenestration paths. Spectral reference linkage,
+interpolation, angular or hemispherical optics, WindowManager consumers,
+constructions, surfaces, EIO serialization, runtime numerical behavior, broad
+dataset declaration-order parity, exact diagnostic text/order/multiplicity,
+and conformance remain unclaimed.
+
+### `GetWindowGlassSpectralData` state contract
+
+<!-- routine-state-contract:v1 begin get_window_glass_spectral_data -->
+GetWindowGlassSpectralData
+
+read_state:
+- `MaterialProperty:GlazingSpectralData` definitions at the common-startup stage in deterministic compiler order: normalized name plus the positional numeric stream formed from fixed quartets 1 through 4 followed by extensible quartets; a name-only object has zero points, while omitted values inside the active numeric span read as zero
+- for each complete quartet, wavelength, transmittance, front reflectance, and back reflectance; point count is bounded from zero through 800, and every dataset is validated even when no glazing references it
+
+write_state:
+- a separate normalized glazing-spectral-data name map and deterministic standalone `GlazingSpectralData` arena whose records own source-field-ordered `GlazingSpectralPoint` vectors; neither arena is a `MaterialDefinition` variant
+- source-effective validated point values: transmittance below 0.001 is silently replaced by 0.001; wavelength remains in [0.1,4.0] microns and strictly increasing, transmittance is at most 1.01, each reflectance is in [0,1.02], and transmittance plus either reflectance is at most 1.03
+- compile failure before typed-model publication for an incomplete final quartet, more than 800 points, duplicate normalized dataset names, invalid wavelength/order, invalid reflectance/transmittance, or either optical-sum violation; source warning/severe/fatal wording is not claimed
+
+history_state_ownership:
+- no cross-call or runtime history; the compiled model owns immutable dataset descriptors and point vectors for the lifetime of that typed model
+
+unsupported_state:
+- glazing-material dataset reference resolution and every active `WindowMaterial:Glazing` `Spectral`, `SpectralAndAngle`, or `BSDF` consumer; WindowManager optical tables, constructions, surfaces, reporting, and runtime state
+
+inactive_branches:
+- valid unused datasets, including zero-point name-only definitions, remain compile-time data only and add no arbitrary-run blocker or runtime execution state
+- the no-extension branch derives its numeric span from the last present fixed field; any non-empty extension establishes all four fixed quartets before the extension points, with omitted positions zero-filled as by the source InputProcessor
+
+unsupported_active_branches:
+- `WindowMaterial:Glazing` `Spectral` remains compiler-blocked despite the dataset arena; `SpectralAndAngle` and `BSDF` remain blocked on their separate data and complex-fenestration paths
+
+not_claimed_branches:
+- active spectral reference linkage, interpolation or angular/hemispherical optics, WindowManager consumers, constructions, surfaces, EIO serialization, runtime numerical behavior, broad dataset declaration-order parity, exact diagnostic text/order/multiplicity, and conformance
+<!-- routine-state-contract:v1 end get_window_glass_spectral_data -->
 
 ## Base Definition Source Order
 
@@ -133,7 +208,7 @@ algorithm. The exact order guaranteed by each source owner is:
 
 | Source sequence | Schema family number | Public object | Kind | Cumulative typed state |
 |---|---:|---|---|---|
-| common HB 1 | 34 | `MaterialProperty:GlazingSpectralData` | standalone glazing dataset read by `GetWindowGlassSpectralData` | deferred |
+| common HB 1 | 34 | `MaterialProperty:GlazingSpectralData` | standalone glazing dataset read by `GetWindowGlassSpectralData` | complete bounded typed dataset; runtime-inert while unused |
 | common HB 2 tail | 27 | `MaterialProperty:VariableAbsorptance` | base-material overlay read by `GetVariableAbsorptanceInput` after all 22 base families | deferred |
 | common HB 3 | 25 | `MaterialProperty:PhaseChangeHysteresis` | regular-material overlay read by `GetHysteresisData` | deferred |
 | CondFD 1 | 24 | `MaterialProperty:PhaseChange` | temperature/enthalpy overlay read first by `GetCondFDInput` | deferred |
@@ -153,11 +228,10 @@ initialization behavior.
 
 ## Bounded Typed Contract
 
-This checkpoint migrates the first four base definitions from a single
-option-heavy record to discriminated material definitions under a shared
-identity envelope, adds one explicitly partial fifth variant for the
-`SpectralAverage` branch of source-order object 5, and gives source-order
-objects 6 through 22 complete bounded variants.
+The bounded base-definition contract retains 21 complete variants plus one
+explicitly partial `WindowMaterial:Glazing` variant for its `SpectralAverage`
+branch. The standalone glazing spectral dataset is typed separately and does
+not change the 22-variant material-definition count.
 
 ### `Material` / regular
 
@@ -238,11 +312,12 @@ The compiler enforces the EnergyPlus 26.1 contract used by this branch:
   correction, `No` solar diffusing, 72 GPa Young's modulus, and 0.22
   Poisson's ratio
 
-`Spectral` is not approximated with zero optical properties: it remains
-blocked until `MaterialProperty:GlazingSpectralData` is typed in the earlier
-`GetWindowGlassSpectralData` source stage. `SpectralAndAngle` remains blocked
-on bivariate table/curve typing, and `BSDF` remains blocked on the complex
-fenestration path.
+`Spectral` is not approximated with zero optical properties. Although the
+earlier `GetWindowGlassSpectralData` stage now owns a complete bounded typed
+dataset arena, dataset-reference resolution and the active spectral glazing
+consumer remain blocked. `SpectralAndAngle` remains blocked on bivariate
+table/curve typing, and `BSDF` remains blocked on the complex-fenestration
+path.
 
 ### `WindowMaterial:Glazing:RefractionExtinctionMethod`
 
@@ -1832,15 +1907,16 @@ bounded generic `Material Details` evidence above.
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
 dynamic AirGap/IRT heat transfer or EcoRoof execution. It also does not claim exact EnergyPlus
-diagnostic text, all input-processor default behavior, internal F/C-factor
-material injection, EMS mutation, broad material EIO formatting, or any of
-the 12 deferred overlay/dataset families.
+diagnostic text, all input-processor default behavior beyond the standalone
+spectral-dataset contract, internal F/C-factor material injection, EMS
+mutation, broad material EIO formatting, or any of the remaining 11 deferred
+overlay/dataset families.
 
 ## Routine Inventory
 
 | Routine | Completion status | Inventory obligation |
 |---|---|---|
-| `GetWindowGlassSpectralData` | `source_mapped` | owns the pre-material spectral dataset read |
+| `GetWindowGlassSpectralData` | `state_mapped` | owns the complete bounded pre-material standalone dataset read, positional zero-fill, transmittance floor, point validation, separate typed arena/name map, and valid-unused runtime-inert boundary; active glazing consumers remain blocked |
 | `MaterialGlass::SetupSimpleWindowGlazingSystem` | `state_mapped` | its complete material-owned performance-index block model, optional-visible branch, reversed intermediate-U film-resistance interpolation, and materializing high-U resistance clamp are typed; construction, angular/hemispherical optics, reporting, runtime, and conformance remain outside the mapping |
 | `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, RoofVegetation, Thermochromic glazing-group, SimpleGlazingSystem, and complex-fenestration Gap and ComplexShade objects plus only the regular Glazing `SpectralAverage` branch are implemented; RoofVegetation, SimpleGlazingSystem, and complex-fenestration Gap and ComplexShade have bounded generic-definition CLI comparisons, while Thermochromic EIO remains unclaimed |
 | `CalcScreenTransmittance` | `source_mapped` | the Screen fixture comparator reproduces only its normal-incidence A/Z paths and the values required by the bounded static EIO row |
@@ -1854,12 +1930,12 @@ the 12 deferred overlay/dataset families.
 | `GetHeatBalHAMTInput` | `source_mapped` | owns the six ordered HAMT objects |
 
 All twelve routine records have `required_for_full_domain = false`. The
-bounded implementation slice does not promote the whole
-`GetMaterialData`, `CalcScreenTransmittance`, or
-`CalcWindowScreenProperties`, `ReportGlass`, or `CalcNominalWindowCond`
-routines beyond `source_mapped`; only the declared material-owned
-`SetupSimpleWindowGlazingSystem` state mapping is complete within its bounded
-input domain.
+bounded implementation slice does not promote the whole `GetMaterialData`,
+`CalcScreenTransmittance`, `CalcWindowScreenProperties`, `ReportGlass`, or
+`CalcNominalWindowCond` routines beyond `source_mapped`. Only the declared
+standalone `GetWindowGlassSpectralData` input boundary and the material-owned
+`SetupSimpleWindowGlazingSystem` calculation are `state_mapped` within their
+bounded input domains.
 
 ## Evidence And Promotion Boundary
 
@@ -2058,7 +2134,8 @@ CP58 remains incomplete until, at minimum:
 
 - the three deferred `WindowMaterial:Glazing` optical branches have
   schema-complete typed variants
-- all 12 overlays/datasets have typed attachment and validation models
+- the remaining 11 overlays/datasets have typed attachment and validation
+  models
 - source-order attachment, duplicate/reference diagnostics, generated
   F/C-factor materials, reporting, EMS, and algorithm-specific consumers are
   mapped and implemented

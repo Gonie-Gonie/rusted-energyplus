@@ -8,35 +8,35 @@ use ep_model::{
     DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId,
     DesignSpecificationOutdoorAirMethod, ExternalInterfaceFmuExportSchedule,
     ExternalInterfaceFmuImportSchedule, ExternalInterfaceSchedule, FanComponent, FanComponentKind,
-    FirstHourInterpolationStartingValues, GeometryCoordinateSystem, GlobalGeometryRules,
-    HeatRecoveryType, HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId,
-    IdealLoadsFuelType, IdealLoadsLimit, InfraredTransparentMaterial,
-    InsideSurfaceConvectionAlgorithm, InternalGainId, LoadDistributionScheme, LoopId, Material,
-    MaterialDefinition, MaterialId, MaterialSurfaceRoughness, NameMap, NoMassMaterial, Node,
-    NodeId, NodeList, NodeListId, NormalizedName, NumericType, OpaqueSurfaceProperties,
-    OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType,
-    OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
-    PeopleNumberCalculationMethod, PlantBranch, PlantBranchComponent, PlantBranchList,
-    PlantConnector, PlantConnectorKind, PlantConnectorList, PlantConnectorListEntry, PlantLoop,
-    Point3, PumpConstantSpeed, RegularMaterial, RoofVegetationMaterial,
-    RoofVegetationMoistureDiffusionMethod, RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId,
-    RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleCompactDayProfile,
-    ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant, ScheduleDayHourly,
-    ScheduleDayInterval, ScheduleDayList, ScheduleDayType, ScheduleFile,
-    ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn, ScheduleId,
-    ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact,
-    ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation, SolarDistribution,
-    SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
-    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
-    TypedModel, Version, VertexEntryDirection, WeekScheduleId, WindExposure,
-    WindowBlindDirectionalOpticalProperties, WindowBlindEquivalentLayerMaterial,
-    WindowBlindEquivalentLayerSlatAngleControl, WindowBlindMaterial, WindowBlindSlatAngleType,
-    WindowBlindSlatOrientation, WindowComplexGapGasComposition, WindowComplexGapMaterial,
-    WindowComplexGapSupportPillar, WindowComplexShadeLayerType, WindowComplexShadeMaterial,
-    WindowDrapeEquivalentLayerMaterial, WindowGapEquivalentLayerMaterial, WindowGapVentType,
-    WindowGasMaterial, WindowGasMixture, WindowGasMixtureComponent, WindowGasMixtureMaterial,
-    WindowGasPolynomialCoefficients, WindowGasProperties, WindowGasType,
-    WindowGlazingEquivalentLayerDiffuseProperties,
+    FirstHourInterpolationStartingValues, GeometryCoordinateSystem, GlazingSpectralData,
+    GlazingSpectralDataId, GlazingSpectralPoint, GlobalGeometryRules, HeatRecoveryType,
+    HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
+    IdealLoadsLimit, InfraredTransparentMaterial, InsideSurfaceConvectionAlgorithm, InternalGainId,
+    LoadDistributionScheme, LoopId, Material, MaterialDefinition, MaterialId,
+    MaterialSurfaceRoughness, NameMap, NoMassMaterial, Node, NodeId, NodeList, NodeListId,
+    NormalizedName, NumericType, OpaqueSurfaceProperties, OtherEquipment,
+    OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutsideBoundaryCondition,
+    OutsideSurfaceConvectionAlgorithm, People, PeopleNumberCalculationMethod, PlantBranch,
+    PlantBranchComponent, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
+    PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RegularMaterial,
+    RoofVegetationMaterial, RoofVegetationMoistureDiffusionMethod, RunPeriod,
+    RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
+    ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
+    ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleDayType,
+    ScheduleFile, ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn,
+    ScheduleId, ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits,
+    ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
+    SolarDistribution, SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId,
+    SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
+    ThermostatSetpointId, TimestepConfig, TypedModel, Version, VertexEntryDirection,
+    WeekScheduleId, WindExposure, WindowBlindDirectionalOpticalProperties,
+    WindowBlindEquivalentLayerMaterial, WindowBlindEquivalentLayerSlatAngleControl,
+    WindowBlindMaterial, WindowBlindSlatAngleType, WindowBlindSlatOrientation,
+    WindowComplexGapGasComposition, WindowComplexGapMaterial, WindowComplexGapSupportPillar,
+    WindowComplexShadeLayerType, WindowComplexShadeMaterial, WindowDrapeEquivalentLayerMaterial,
+    WindowGapEquivalentLayerMaterial, WindowGapVentType, WindowGasMaterial, WindowGasMixture,
+    WindowGasMixtureComponent, WindowGasMixtureMaterial, WindowGasPolynomialCoefficients,
+    WindowGasProperties, WindowGasType, WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
     WindowGlazingSpectralAverageMaterial, WindowGlazingThermochromicGroupMaterial,
@@ -396,6 +396,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "RunPeriodControl:SpecialDays",
     "RunPeriodControl:DaylightSavingTime",
     "Site:Location",
+    "MaterialProperty:GlazingSpectralData",
     "Material",
     "Material:NoMass",
     "Material:AirGap",
@@ -510,6 +511,7 @@ impl<'a> Compiler<'a> {
         self.parse_run_period_special_days(&mut model);
         self.parse_run_period_daylight_saving_time(&mut model);
         self.parse_site_location(&mut model);
+        self.parse_glazing_spectral_data(&mut model);
         self.parse_materials(&mut model);
         self.parse_constructions(&mut model);
         self.parse_file_shading_schedule(&mut model);
@@ -977,6 +979,289 @@ impl<'a> Compiler<'a> {
             time_zone_hours: self.number_default("Site:Location", &name, &object, "time_zone", 0.0),
             elevation_m: self.number_default("Site:Location", &name, &object, "elevation", 0.0),
         });
+    }
+
+    fn parse_glazing_spectral_data(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "MaterialProperty:GlazingSpectralData";
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let points = self.glazing_spectral_points(OBJECT_TYPE, &name, &object);
+            let name_is_valid = if name.trim().is_empty() {
+                self.error(
+                    "MissingRequiredField",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE} requires a non-blank dataset name"),
+                );
+                false
+            } else {
+                true
+            };
+            let (Some(points), true) = (points, name_is_valid) else {
+                continue;
+            };
+
+            let Some(id_value) =
+                self.checked_id(OBJECT_TYPE, &name, model.glazing_spectral_data.len())
+            else {
+                continue;
+            };
+            let id = GlazingSpectralDataId(id_value);
+            if model
+                .glazing_spectral_data_names
+                .insert(&name, id)
+                .is_some()
+            {
+                self.duplicate_name(OBJECT_TYPE, &name);
+                continue;
+            }
+            model.glazing_spectral_data.push(GlazingSpectralData {
+                id,
+                name: NormalizedName::new(&name),
+                points,
+            });
+        }
+    }
+
+    fn glazing_spectral_points(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+    ) -> Option<Vec<GlazingSpectralPoint>> {
+        const FIXED_FIELDS: [[&str; 4]; 4] = [
+            [
+                "wavelength_1",
+                "transmittance_1",
+                "front_reflectance_1",
+                "back_reflectance_1",
+            ],
+            [
+                "wavelength_2",
+                "transmittance_2",
+                "front_reflectance_2",
+                "back_reflectance_2",
+            ],
+            [
+                "wavelength_3",
+                "transmittance_3",
+                "front_reflectance_3",
+                "back_reflectance_3",
+            ],
+            [
+                "wavelength_4",
+                "transmittance_4",
+                "front_reflectance_4",
+                "back_reflectance_4",
+            ],
+        ];
+        const EXTENSION_FIELDS: [&str; 4] = [
+            "wavelength",
+            "transmittance",
+            "front_reflectance",
+            "back_reflectance",
+        ];
+        const MAX_POINTS: usize = 800;
+
+        let flat_fixed_fields = FIXED_FIELDS.into_iter().flatten().collect::<Vec<_>>();
+        let last_explicit_fixed_field = flat_fixed_fields
+            .iter()
+            .enumerate()
+            .filter_map(|(index, field)| field_value(object, field).map(|_value| index + 1))
+            .max()
+            .unwrap_or(0);
+
+        let mut valid = true;
+        let extension_entries = match field_value(object, "extensions") {
+            Some(RawValue::Array(entries)) => entries.as_slice(),
+            Some(_value) => {
+                self.invalid_field_type(object_type, object_name, "extensions", "array");
+                valid = false;
+                &[]
+            }
+            None => &[],
+        };
+        let fixed_field_count = if extension_entries.is_empty() {
+            last_explicit_fixed_field
+        } else {
+            flat_fixed_fields.len()
+        };
+        let mut values = Vec::<(String, Option<f64>)>::with_capacity(
+            fixed_field_count.saturating_add(extension_entries.len().saturating_mul(4)),
+        );
+
+        for field in flat_fixed_fields.into_iter().take(fixed_field_count) {
+            let value = match field_value(object, field) {
+                Some(value) => self.number_value(object_type, object_name, field, value),
+                None => Some(0.0),
+            };
+            valid &= value.is_some();
+            values.push((field.to_string(), value));
+        }
+
+        for (entry_index, entry) in extension_entries.iter().enumerate() {
+            let RawValue::Object(fields) = entry else {
+                self.invalid_field_type(object_type, object_name, "extensions", "array of objects");
+                valid = false;
+                values.extend(
+                    EXTENSION_FIELDS
+                        .map(|field| (format!("extensions[{entry_index}].{field}"), None)),
+                );
+                continue;
+            };
+            for field in EXTENSION_FIELDS {
+                let diagnostic_field = format!("extensions[{entry_index}].{field}");
+                let value = match fields.get(&FieldName(field.to_string())) {
+                    Some(value) => {
+                        self.number_value(object_type, object_name, &diagnostic_field, value)
+                    }
+                    None => Some(0.0),
+                };
+                valid &= value.is_some();
+                values.push((diagnostic_field, value));
+            }
+        }
+
+        if !values.len().is_multiple_of(4) {
+            self.error(
+                "InvalidGlazingSpectralDataFieldCount",
+                object_type,
+                Some(object_name),
+                None,
+                format!(
+                    "{object_type}/{object_name} has {} numeric positions; glazing spectral data requires complete wavelength/transmittance/front-reflectance/back-reflectance quartets",
+                    values.len()
+                ),
+            );
+            return None;
+        }
+        let point_count = values.len() / 4;
+        if point_count > MAX_POINTS {
+            self.error(
+                "TooManyGlazingSpectralDataPoints",
+                object_type,
+                Some(object_name),
+                Some("extensions"),
+                format!(
+                    "{object_type}/{object_name} has {point_count} wavelength quartets; EnergyPlus 26.1 supports at most {MAX_POINTS}"
+                ),
+            );
+            return None;
+        }
+
+        let mut points = Vec::with_capacity(point_count);
+        let mut previous_wavelength = None;
+        for quartet in values.chunks_exact(4) {
+            let (wavelength_field, wavelength) = (&quartet[0].0, quartet[0].1);
+            let (transmittance_field, raw_transmittance) = (&quartet[1].0, quartet[1].1);
+            let (front_reflectance_field, front_reflectance) = (&quartet[2].0, quartet[2].1);
+            let (back_reflectance_field, back_reflectance) = (&quartet[3].0, quartet[3].1);
+
+            if let Some(wavelength) = wavelength {
+                if !(0.1..=4.0).contains(&wavelength) {
+                    self.error(
+                        "InvalidGlazingSpectralWavelength",
+                        object_type,
+                        Some(object_name),
+                        Some(wavelength_field),
+                        format!(
+                            "{object_type}/{object_name} field {wavelength_field} must be in [0.1, 4.0] microns, got {wavelength}"
+                        ),
+                    );
+                    valid = false;
+                }
+                if previous_wavelength.is_some_and(|previous| wavelength <= previous) {
+                    self.error(
+                        "NonIncreasingGlazingSpectralWavelength",
+                        object_type,
+                        Some(object_name),
+                        Some(wavelength_field),
+                        format!(
+                            "{object_type}/{object_name} field {wavelength_field} must be greater than the preceding wavelength"
+                        ),
+                    );
+                    valid = false;
+                }
+                previous_wavelength = Some(wavelength);
+            }
+
+            let transmittance = raw_transmittance.map(|value| value.max(0.001));
+            if let Some(transmittance) = transmittance
+                && transmittance > 1.01
+            {
+                self.error(
+                    "InvalidGlazingSpectralTransmittance",
+                    object_type,
+                    Some(object_name),
+                    Some(transmittance_field),
+                    format!(
+                        "{object_type}/{object_name} field {transmittance_field} is {transmittance} after the 0.001 source clamp and must not exceed 1.01"
+                    ),
+                );
+                valid = false;
+            }
+
+            for (field, reflectance) in [
+                (front_reflectance_field, front_reflectance),
+                (back_reflectance_field, back_reflectance),
+            ] {
+                if reflectance.is_some_and(|value| !(0.0..=1.02).contains(&value)) {
+                    self.error(
+                        "InvalidGlazingSpectralReflectance",
+                        object_type,
+                        Some(object_name),
+                        Some(field),
+                        format!(
+                            "{object_type}/{object_name} field {field} must be in [0, 1.02], got {}",
+                            reflectance.unwrap_or_default()
+                        ),
+                    );
+                    valid = false;
+                }
+            }
+
+            for (field, reflectance) in [
+                (front_reflectance_field, front_reflectance),
+                (back_reflectance_field, back_reflectance),
+            ] {
+                if transmittance
+                    .zip(reflectance)
+                    .is_some_and(|(tau, rho)| tau + rho > 1.03)
+                {
+                    self.error(
+                        "InvalidGlazingSpectralOpticalSum",
+                        object_type,
+                        Some(object_name),
+                        Some(field),
+                        format!(
+                            "{object_type}/{object_name} adjusted transmittance plus field {field} must not exceed 1.03"
+                        ),
+                    );
+                    valid = false;
+                }
+            }
+
+            if let (
+                Some(wavelength_microns),
+                Some(transmittance),
+                Some(front_reflectance),
+                Some(back_reflectance),
+            ) = (
+                wavelength,
+                transmittance,
+                front_reflectance,
+                back_reflectance,
+            ) {
+                points.push(GlazingSpectralPoint {
+                    wavelength_microns,
+                    transmittance,
+                    front_reflectance,
+                    back_reflectance,
+                });
+            }
+        }
+
+        valid.then_some(points)
     }
 
     fn parse_materials(&mut self, model: &mut TypedModel) {
@@ -13744,6 +14029,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 #[cfg(test)]
 mod tests {
     mod global_geometry_rules;
+    mod material_property_glazing_spectral_data;
     mod material_roof_vegetation;
     mod material_variants;
     mod schedule_day_interval;

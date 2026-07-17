@@ -5,17 +5,17 @@ use crate::{
     ChillerElectricEir, CoilComponent, ComponentId, ConnectorId, ConnectorListId, Construction,
     ConstructionId, DayScheduleId, DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId,
     ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
-    ExternalInterfaceSchedule, FanComponent, GlobalGeometryRules, IdealLoadsAirSystem,
-    IdealLoadsAirSystemId, InternalGainId, LoopId, Material, MaterialId, NameMap, Node, NodeId,
-    NodeList, NodeListId, NormalizedName, OtherEquipment, People, PlantBranch, PlantBranchList,
-    PlantConnector, PlantConnectorKind, PlantConnectorList, PlantLoop, PumpConstantSpeed,
-    RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay,
-    RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant, ScheduleDayHourly,
-    ScheduleDayInterval, ScheduleDayList, ScheduleFile, ScheduleFileShading, ScheduleId,
-    ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear,
-    SetpointManagerComponent, SiteLocation, Surface, SurfaceConvectionAlgorithms, SurfaceId,
-    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version, WeekScheduleId,
-    WindowGlazingThermochromicGroupMaterial, WindowGlazingThermochromicState, Zone,
+    ExternalInterfaceSchedule, FanComponent, GlazingSpectralData, GlazingSpectralDataId,
+    GlobalGeometryRules, IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId, LoopId,
+    Material, MaterialId, NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName,
+    OtherEquipment, People, PlantBranch, PlantBranchList, PlantConnector, PlantConnectorKind,
+    PlantConnectorList, PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodDaylightSavingTime,
+    RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant,
+    ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleFile, ScheduleFileShading,
+    ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact, ScheduleWeekDaily,
+    ScheduleYear, SetpointManagerComponent, SiteLocation, Surface, SurfaceConvectionAlgorithms,
+    SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version,
+    WeekScheduleId, WindowGlazingThermochromicGroupMaterial, WindowGlazingThermochromicState, Zone,
     ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId, ZoneEquipmentObjectType,
     ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatId,
 };
@@ -45,6 +45,10 @@ pub struct TypedModel {
     pub run_period_daylight_saving_time: Option<RunPeriodDaylightSavingTime>,
     /// Site location.
     pub site: Option<SiteLocation>,
+    /// Standalone glazing spectral datasets.
+    pub glazing_spectral_data: Vec<GlazingSpectralData>,
+    /// Glazing spectral dataset names in their separate namespace.
+    pub glazing_spectral_data_names: NameMap<GlazingSpectralDataId>,
     /// Materials.
     pub materials: Vec<Material>,
     /// Material names.
@@ -209,6 +213,8 @@ impl Default for TypedModel {
             run_period_special_day_names: NameMap::default(),
             run_period_daylight_saving_time: None,
             site: None,
+            glazing_spectral_data: Vec::new(),
+            glazing_spectral_data_names: NameMap::default(),
             materials: Vec::new(),
             material_names: NameMap::default(),
             window_glazing_thermochromic_state_arena: Vec::new(),
@@ -315,6 +321,7 @@ impl TypedModel {
             + self.run_periods.len()
             + self.run_period_special_days.len()
             + usize::from(self.run_period_daylight_saving_time.is_some())
+            + self.glazing_spectral_data.len()
             + self.materials.len()
             + self.constructions.len()
             + self.schedule_type_limits.len()

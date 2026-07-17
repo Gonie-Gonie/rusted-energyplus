@@ -3,6 +3,7 @@ use crate::{PartialRunPolicy, RunMode, RunOutputFormat, TraceLevel};
 use ep_compiler::compile_raw_model;
 use ep_raw_model::parse_epjson_str;
 
+mod glazing_spectral_data;
 mod material_roof_vegetation;
 mod window_glazing_thermochromic_group;
 mod window_material_blind_equivalent_layer;

@@ -3,6 +3,7 @@
 mod air_distribution;
 mod building;
 mod calendar;
+mod glazing_spectral_data;
 mod hvac;
 mod ideal_loads;
 mod internal_gains;
@@ -15,6 +16,7 @@ mod thermostats;
 pub use air_distribution::*;
 pub use building::*;
 pub use calendar::*;
+pub use glazing_spectral_data::*;
 pub use hvac::*;
 pub use ideal_loads::*;
 pub use internal_gains::*;
