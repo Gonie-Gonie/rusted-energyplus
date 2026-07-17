@@ -31,6 +31,8 @@ Primary reference sources:
 - `src/EnergyPlus/HeatBalFiniteDiffManager.cc::GetCondFDInput`
 - `src/EnergyPlus/MoistureBalanceEMPDManager.cc::GetMoistureBalanceEMPDInput`
 - `src/EnergyPlus/HeatBalanceHAMTManager.cc::GetHeatBalHAMTInput`
+- `src/EnergyPlus/DataSurfaces.cc::GetVariableAbsorptanceSurfaceList`
+- `src/EnergyPlus/HeatBalanceSurfaceManager.cc::UpdateVariableAbsorptances`
 
 ## Inventory Boundary
 
@@ -58,9 +60,10 @@ different:
 | typed Rust material variants | 22 | Five complete opaque-family slices, the `WindowMaterial:Glazing` `SpectralAverage` branch, and the complete `RefractionExtinctionMethod`, glazing `EquivalentLayer`, `WindowMaterial:Gas`, gap `EquivalentLayer`, `WindowMaterial:GasMixture`, ordinary `WindowMaterial:Shade`, shade `EquivalentLayer`, drape `EquivalentLayer`, ordinary `WindowMaterial:Screen`, screen `EquivalentLayer`, ordinary `WindowMaterial:Blind`, blind `EquivalentLayer`, thermochromic glazing-group, simple-glazing-system, complex-fenestration gap, and complex-fenestration shade objects have distinct payloads. |
 | complete bounded base-definition slices | 21 / 22 | `Material`, `Material:NoMass`, `Material:AirGap`, `Material:InfraredTransparent`, `WindowMaterial:Glazing:RefractionExtinctionMethod`, `WindowMaterial:Glazing:EquivalentLayer`, `WindowMaterial:Gas`, `WindowMaterial:Gap:EquivalentLayer`, `WindowMaterial:GasMixture`, `WindowMaterial:Shade`, `WindowMaterial:Shade:EquivalentLayer`, `WindowMaterial:Drape:EquivalentLayer`, `WindowMaterial:Screen`, `WindowMaterial:Screen:EquivalentLayer`, `WindowMaterial:Blind`, `WindowMaterial:Blind:EquivalentLayer`, `Material:RoofVegetation`, `WindowMaterial:GlazingGroup:Thermochromic`, `WindowMaterial:SimpleGlazingSystem`, `WindowMaterial:Gap`, and `WindowMaterial:ComplexShade` have their source-effective fields and bounded compiler contracts typed. |
 | standalone typed datasets | 1 / 12 | `MaterialProperty:GlazingSpectralData` is typed in a separate deterministic standalone arena and name map; it is not a `MaterialDefinition` variant. |
-| complete bounded public-object slices | 22 / 34 | The 21 complete base-definition slices plus the standalone glazing spectral dataset are complete within their declared bounded compiler contracts. |
+| typed material overlays | 1 / 12 | `MaterialProperty:VariableAbsorptance` is typed in a separate overlay arena after its eligible base-material and schedule dependencies are available; it is not a `MaterialDefinition` variant. |
+| complete bounded public-object slices | 23 / 34 | The 21 complete base-definition slices, standalone glazing spectral dataset, and variable-absorptance overlay are complete within their declared bounded compiler contracts. |
 | partial bounded public-object slices | 1 / 34 | Only `WindowMaterial:Glazing` with `Optical Data Type = SpectralAverage` is typed; `Spectral`, `SpectralAndAngle`, and `BSDF` remain explicitly unsupported. |
-| wholly deferred public objects | 11 / 34 | The remaining 11 overlays/datasets are wholly deferred; no base definition is wholly deferred. |
+| wholly deferred public objects | 10 / 34 | The remaining 10 overlays/datasets are wholly deferred; no base definition is wholly deferred. |
 
 The inventory scaffold began at CP58; the counts and typed states above are
 cumulative through the current checkpoint. Complete inventory does not mean
@@ -80,8 +83,9 @@ heat-transfer behavior.
 
 The spectral dataset therefore exists before a glazing definition resolves a
 spectral-data reference. Variable absorptance exists only after base materials
-have been created. Hysteresis then upgrades an already-created regular
-material.
+have been created; Rust publishes its typed overlay only after the shared
+schedule namespace is also available. Hysteresis then upgrades an
+already-created regular material.
 
 ## Standalone Glazing Spectral Dataset Typed Contract
 
@@ -156,6 +160,88 @@ not_claimed_branches:
 - active spectral reference linkage, interpolation or angular/hemispherical optics, WindowManager consumers, constructions, surfaces, EIO serialization, runtime numerical behavior, broad dataset declaration-order parity, exact diagnostic text/order/multiplicity, and conformance
 <!-- routine-state-contract:v1 end get_window_glass_spectral_data -->
 
+## Variable Absorptance Overlay Typed Contract
+
+`MaterialProperty:VariableAbsorptance` is a complete bounded typed-input
+overlay, not a material variant. Each record owns a normalized overlay name,
+a resolved `MaterialId`, and either scheduled or function-driven control state
+in a separate deterministic arena. Only `Material` and `Material:NoMass`
+targets are accepted because those are the two public inputs created with
+EnergyPlus `Group::Regular`; AirGap, InfraredTransparent, RoofVegetation, and
+every window family fail closed. Overlay names use a separate namespace, so an
+overlay may have the same name as its target material.
+
+All four optional dependency names are read before the selected control is
+validated. A nonblank name that does not resolve has the source-effective null
+pointer state and is silently discarded. Scheduled control requires at least
+one resolved thermal or solar schedule and rejects any resolved function.
+Function control requires at least one resolved thermal or solar Curve/Table
+identity and rejects any resolved schedule. The three function signals are
+`SurfaceTemperature`, `SurfaceReceivedSolarRadiation`, and
+`SpaceHeatingCoolingMode`; missing or blank control defaults to
+`SurfaceTemperature`. User schedules resolve through the typed shared
+`ScheduleId` namespace, while the two EnergyPlus built-ins `Constant-0.0` and
+`Constant-1.0` have explicit typed sentinels. Function references retain the
+normalized identity and object type of one of the twenty EnergyPlus 26.1
+`Curve:*` families or `Table:Lookup`; their payload validation, dimensions,
+interpolation, and evaluation remain deferred with those raw-only dependency
+objects. The incidental AirflowNetwork wind-pressure-coefficient alias in the
+same C++ curve map is outside the public Curve/Table field contract and fails
+closed in this checkpoint.
+
+EnergyPlus permits multiple differently named overlays to overwrite the same
+material in input order. Rust does not yet recover IDF declaration order for
+this object, so the bounded checkpoint accepts at most one overlay per target
+and fails closed on a second target occurrence. Normalized overlay-name
+duplicates, ambiguous Curve/Table identities, collisions between a user
+schedule and either built-in schedule name, invalid fields, missing/wrong-type
+targets, selected-family absence, and resolved opposite-family dependencies
+all fail before overlay identity or target ownership is reserved. Broad
+diagnostic and declaration-order parity remain unclaimed.
+
+Every typed overlay, including one attached to an unused material, blocks
+arbitrary runtime execution. Rust does not yet build the exterior-first-layer
+surface list, evaluate schedules or functions, select the three trigger
+signals, or apply the source `[0.0001, 0.9999]` clamp. In particular, runtime
+support does not reproduce the EnergyPlus 26.1 scheduled-solar defect that
+tests the solar schedule pointer but reads the thermal schedule pointer. The
+object emits no dedicated EIO row, so this checkpoint adds compiler and
+support-boundary tests but no case manifest, proof variable, runtime numerical
+claim, or conformance claim.
+
+### `GetVariableAbsorptanceInput` state contract
+
+<!-- routine-state-contract:v1 begin get_variable_absorptance_input -->
+GetVariableAbsorptanceInput
+
+read_state:
+- deterministic compiler-ordered `MaterialProperty:VariableAbsorptance` definitions after all 22 base material families; Rust delays publication until the shared schedule namespace is also typed
+- normalized overlay name, required material name, defaulted four-way control signal, and optional thermal/solar function and schedule names
+- existing base-material registry, typed user-schedule registry plus `Constant-0.0`/`Constant-1.0`, and the raw EnergyPlus 26.1 Curve/Table name namespace
+
+write_state:
+- a separate normalized overlay-name map and `MaterialVariableAbsorptance` arena; each record resolves exactly one `Material` or `Material:NoMass` target and stores either scheduled dependencies or one of the three function signals with deferred Curve/Table identities
+- source-effective null state for each nonblank dependency name that does not resolve; selected control still requires at least one resolved dependency, and a resolved opposite-family dependency fails compilation
+- compile failure before identity or target reservation for malformed fields, invalid control, missing or non-Regular target, ambiguous dependency identity, selected-family absence, resolved opposite-family state, normalized overlay-name duplicate, or a second overlay for one target
+
+history_state_ownership:
+- no runtime history in this checkpoint; the compiled model owns immutable overlay descriptors while surface activation and timestep updates remain unsupported
+
+unsupported_state:
+- Curve/Table payload typing, dimensional validation, interpolation and evaluation; exterior variable-absorptance surface-list construction; thermal/solar surface-array mutation; trigger evaluation; clamping; construction and surface behavior; reporting and conformance
+
+inactive_branches:
+- within the declared public Curve/Table and shared schedule namespaces, unresolved optional names become null as `Curve::GetCurve` or `Sched::GetSchedule` would; they are harmless when another selected-family dependency resolves
+- overlay names share no namespace with material names, while at most one valid overlay may target each material in the bounded checkpoint
+
+unsupported_active_branches:
+- every valid overlay is typed but run-blocking, including overlays attached only to unused materials
+- source last-wins multiplicity and IDF declaration-order recovery are deferred; a repeated target fails closed
+
+not_claimed_branches:
+- exact source diagnostic severity/text/order/early-return behavior, Curve/Table dependency validation, `GetVariableAbsorptanceSurfaceList`, `UpdateVariableAbsorptances`, the scheduled-solar pointer defect, EIO serialization, runtime numerical behavior, and conformance
+<!-- routine-state-contract:v1 end get_variable_absorptance_input -->
+
 ## Base Definition Source Order
 
 The following table is the public-object processing order inside
@@ -209,7 +295,7 @@ algorithm. The exact order guaranteed by each source owner is:
 | Source sequence | Schema family number | Public object | Kind | Cumulative typed state |
 |---|---:|---|---|---|
 | common HB 1 | 34 | `MaterialProperty:GlazingSpectralData` | standalone glazing dataset read by `GetWindowGlassSpectralData` | complete bounded typed dataset; runtime-inert while unused |
-| common HB 2 tail | 27 | `MaterialProperty:VariableAbsorptance` | base-material overlay read by `GetVariableAbsorptanceInput` after all 22 base families | deferred |
+| common HB 2 tail | 27 | `MaterialProperty:VariableAbsorptance` | base-material overlay read by `GetVariableAbsorptanceInput` after all 22 base families | complete bounded typed overlay; all definitions runtime-blocked |
 | common HB 3 | 25 | `MaterialProperty:PhaseChangeHysteresis` | regular-material overlay read by `GetHysteresisData` | deferred |
 | CondFD 1 | 24 | `MaterialProperty:PhaseChange` | temperature/enthalpy overlay read first by `GetCondFDInput` | deferred |
 | CondFD 2 | 26 | `MaterialProperty:VariableThermalConductivity` | temperature/conductivity overlay read second by `GetCondFDInput` | deferred |
@@ -231,7 +317,9 @@ initialization behavior.
 The bounded base-definition contract retains 21 complete variants plus one
 explicitly partial `WindowMaterial:Glazing` variant for its `SpectralAverage`
 branch. The standalone glazing spectral dataset is typed separately and does
-not change the 22-variant material-definition count.
+not change the 22-variant material-definition count. The variable-absorptance
+overlay is likewise held outside `MaterialDefinition`; it resolves only
+Regular/NoMass targets and leaves their immutable base payloads unchanged.
 
 ### `Material` / regular
 
@@ -1904,13 +1992,27 @@ matrices, TARCOG/WCE, BSDF optics, EIO/reporting, runtime, broad diagnostic
 parity, or conformance. The dedicated static case separately locks only the
 bounded generic `Material Details` evidence above.
 
+`MaterialProperty:VariableAbsorptance` model and compiler tests lock both
+eligible target variants; all four case-insensitive control signals and the
+SurfaceTemperature default; typed user and built-in schedule references;
+deferred Curve/Table identity; source-null unresolved optional names; thermal,
+solar, and dual selected dependencies; selected-family-before-opposite-family
+validation; exact wrong-family target rejection; normalized overlay names;
+ambiguous dependency and duplicate-target fail-close behavior; validation
+before identity reservation; typed coverage; and object-count inclusion. The
+support-boundary test attaches overlays to both used and unused materials and
+requires one explicit all-definition `UnsupportedSurfaceBoundary` run block.
+No test claims surface activation, curve/schedule evaluation, timestep
+mutation, clamping, the source scheduled-solar pointer defect, EIO, runtime
+numerics, or conformance.
+
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
 dynamic AirGap/IRT heat transfer or EcoRoof execution. It also does not claim exact EnergyPlus
 diagnostic text, all input-processor default behavior beyond the standalone
-spectral-dataset contract, internal F/C-factor material injection, EMS
-mutation, broad material EIO formatting, or any of the remaining 11 deferred
-overlay/dataset families.
+spectral-dataset and variable-absorptance contracts, internal F/C-factor
+material injection, EMS mutation, broad material EIO formatting, or any of the
+remaining 10 deferred overlay/dataset families.
 
 ## Routine Inventory
 
@@ -1923,18 +2025,21 @@ overlay/dataset families.
 | `CalcWindowScreenProperties` | `source_mapped` | the Screen fixture comparator reproduces only its reverse-order 18 by 18 initialization integration and fixture activation boundary |
 | `ReportGlass` | `source_mapped` | owns the bounded Blind specialized header, raw seven-field row serialization, construction-occurrence order, and post-`CalcNominalWindowCond` skip behavior |
 | `CalcNominalWindowCond` | `source_mapped` | owns the exact-bare-companion search and the missing-bare/between-glass error flags that make `ReportGlass` omit those construction rows; Rust fail-closes rather than reproducing this calculation |
-| `GetVariableAbsorptanceInput` | `source_mapped` | owns the post-base variable-absorptance overlay |
+| `GetVariableAbsorptanceInput` | `state_mapped` | owns the complete bounded post-base overlay read: exact Regular/NoMass target gate, defaulted four-way control, source-null unresolved dependency names, selected/opposite dependency rules, separate typed arena/name map, one-overlay-per-target fail-close boundary, and universal runtime block |
+| `GetVariableAbsorptanceSurfaceList` | `source_mapped` | owns exterior-first-layer surface activation and interior-layer warnings; no Rust execution state is added by the typed-input checkpoint |
+| `UpdateVariableAbsorptances` | `source_mapped` | owns schedule/function trigger evaluation, exterior thermal/solar mutation, clamping, and the EnergyPlus 26.1 scheduled-solar pointer defect; all runtime behavior remains unsupported |
 | `GetHysteresisData` | `source_mapped` | owns the post-base hysteresis overlay |
 | `GetCondFDInput` | `source_mapped` | owns PhaseChange then VariableThermalConductivity |
 | `GetMoistureBalanceEMPDInput` | `source_mapped` | owns the EMPD settings overlay |
 | `GetHeatBalHAMTInput` | `source_mapped` | owns the six ordered HAMT objects |
 
-All twelve routine records have `required_for_full_domain = false`. The
+All fourteen routine records have `required_for_full_domain = false`. The
 bounded implementation slice does not promote the whole `GetMaterialData`,
 `CalcScreenTransmittance`, `CalcWindowScreenProperties`, `ReportGlass`, or
 `CalcNominalWindowCond` routines beyond `source_mapped`. Only the declared
 standalone `GetWindowGlassSpectralData` input boundary and the material-owned
-`SetupSimpleWindowGlazingSystem` calculation are `state_mapped` within their
+`SetupSimpleWindowGlazingSystem` calculation plus the declared
+`GetVariableAbsorptanceInput` overlay boundary are `state_mapped` within their
 bounded input domains.
 
 ## Evidence And Promotion Boundary
@@ -2134,7 +2239,7 @@ CP58 remains incomplete until, at minimum:
 
 - the three deferred `WindowMaterial:Glazing` optical branches have
   schema-complete typed variants
-- the remaining 11 overlays/datasets have typed attachment and validation
+- the remaining 10 overlays/datasets have typed attachment and validation
   models
 - source-order attachment, duplicate/reference diagnostics, generated
   F/C-factor materials, reporting, EMS, and algorithm-specific consumers are

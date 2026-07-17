@@ -4,39 +4,42 @@ use ep_model::{
     AirGapMaterial, AirLoopHvac, AutoOrNumber, AutosizeOrNumber, AvailabilityManagerComponent,
     BoilerHotWater, BranchId, BranchListId, Building, ChillerElectricEir, CoilComponent,
     CoilComponentKind, ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId,
-    ConstructionKind, DayScheduleId, DehumidificationControlType, DemandControlledVentilationType,
-    DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId,
-    DesignSpecificationOutdoorAirMethod, ExternalInterfaceFmuExportSchedule,
-    ExternalInterfaceFmuImportSchedule, ExternalInterfaceSchedule, FanComponent, FanComponentKind,
+    ConstructionKind, DayScheduleId, DeferredVariableAbsorptanceFunction,
+    DehumidificationControlType, DemandControlledVentilationType, DesignSpecificationOutdoorAir,
+    DesignSpecificationOutdoorAirId, DesignSpecificationOutdoorAirMethod,
+    ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
+    ExternalInterfaceSchedule, FanComponent, FanComponentKind,
     FirstHourInterpolationStartingValues, GeometryCoordinateSystem, GlazingSpectralData,
     GlazingSpectralDataId, GlazingSpectralPoint, GlobalGeometryRules, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
     IdealLoadsLimit, InfraredTransparentMaterial, InsideSurfaceConvectionAlgorithm, InternalGainId,
     LoadDistributionScheme, LoopId, Material, MaterialDefinition, MaterialId,
-    MaterialSurfaceRoughness, NameMap, NoMassMaterial, Node, NodeId, NodeList, NodeListId,
-    NormalizedName, NumericType, OpaqueSurfaceProperties, OtherEquipment,
-    OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutsideBoundaryCondition,
-    OutsideSurfaceConvectionAlgorithm, People, PeopleNumberCalculationMethod, PlantBranch,
-    PlantBranchComponent, PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList,
-    PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed, RegularMaterial,
-    RoofVegetationMaterial, RoofVegetationMoistureDiffusionMethod, RunPeriod,
-    RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
-    ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
-    ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleDayType,
-    ScheduleFile, ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn,
-    ScheduleId, ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits,
-    ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
-    SolarDistribution, SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId,
-    SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
-    ThermostatSetpointId, TimestepConfig, TypedModel, Version, VertexEntryDirection,
-    WeekScheduleId, WindExposure, WindowBlindDirectionalOpticalProperties,
-    WindowBlindEquivalentLayerMaterial, WindowBlindEquivalentLayerSlatAngleControl,
-    WindowBlindMaterial, WindowBlindSlatAngleType, WindowBlindSlatOrientation,
-    WindowComplexGapGasComposition, WindowComplexGapMaterial, WindowComplexGapSupportPillar,
-    WindowComplexShadeLayerType, WindowComplexShadeMaterial, WindowDrapeEquivalentLayerMaterial,
-    WindowGapEquivalentLayerMaterial, WindowGapVentType, WindowGasMaterial, WindowGasMixture,
-    WindowGasMixtureComponent, WindowGasMixtureMaterial, WindowGasPolynomialCoefficients,
-    WindowGasProperties, WindowGasType, WindowGlazingEquivalentLayerDiffuseProperties,
+    MaterialSurfaceRoughness, MaterialVariableAbsorptance, MaterialVariableAbsorptanceId, NameMap,
+    NoMassMaterial, Node, NodeId, NodeList, NodeListId, NormalizedName, NumericType,
+    OpaqueSurfaceProperties, OtherEquipment, OtherEquipmentDesignLevelCalculationMethod,
+    OutdoorAirEconomizerType, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
+    PeopleNumberCalculationMethod, PlantBranch, PlantBranchComponent, PlantBranchList,
+    PlantConnector, PlantConnectorKind, PlantConnectorList, PlantConnectorListEntry, PlantLoop,
+    Point3, PumpConstantSpeed, RegularMaterial, RoofVegetationMaterial,
+    RoofVegetationMoistureDiffusionMethod, RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId,
+    RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleCompactDayProfile,
+    ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant, ScheduleDayHourly,
+    ScheduleDayInterval, ScheduleDayList, ScheduleDayType, ScheduleFile,
+    ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn, ScheduleId,
+    ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact,
+    ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation, SolarDistribution,
+    SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
+    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
+    TypedModel, VariableAbsorptanceControl, VariableAbsorptanceFunctionSignal,
+    VariableAbsorptanceSchedule, Version, VertexEntryDirection, WeekScheduleId, WindExposure,
+    WindowBlindDirectionalOpticalProperties, WindowBlindEquivalentLayerMaterial,
+    WindowBlindEquivalentLayerSlatAngleControl, WindowBlindMaterial, WindowBlindSlatAngleType,
+    WindowBlindSlatOrientation, WindowComplexGapGasComposition, WindowComplexGapMaterial,
+    WindowComplexGapSupportPillar, WindowComplexShadeLayerType, WindowComplexShadeMaterial,
+    WindowDrapeEquivalentLayerMaterial, WindowGapEquivalentLayerMaterial, WindowGapVentType,
+    WindowGasMaterial, WindowGasMixture, WindowGasMixtureComponent, WindowGasMixtureMaterial,
+    WindowGasPolynomialCoefficients, WindowGasProperties, WindowGasType,
+    WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
     WindowGlazingSpectralAverageMaterial, WindowGlazingThermochromicGroupMaterial,
@@ -57,6 +60,53 @@ use std::path::{Component, Path};
 const MAX_OPAQUE_CONSTRUCTION_LAYERS: usize = 10;
 const MAX_WINDOW_CONSTRUCTION_LAYERS: usize = 8;
 const MAX_BETWEEN_GLASS_SHADE_GAP_THICKNESS_DIFFERENCE_M: f64 = 0.0005;
+
+const VARIABLE_ABSORPTANCE_FUNCTION_OBJECT_TYPES: &[&str] = &[
+    "Curve:Biquadratic",
+    "Curve:Cubic",
+    "Curve:Quartic",
+    "Curve:Quadratic",
+    "Curve:QuadLinear",
+    "Curve:QuintLinear",
+    "Curve:QuadraticLinear",
+    "Curve:CubicLinear",
+    "Curve:Linear",
+    "Curve:Bicubic",
+    "Curve:Triquadratic",
+    "Curve:Exponent",
+    "Curve:FanPressureRise",
+    "Curve:ExponentialSkewNormal",
+    "Curve:Sigmoid",
+    "Curve:RectangularHyperbola1",
+    "Curve:RectangularHyperbola2",
+    "Curve:ExponentialDecay",
+    "Curve:DoubleExponentialDecay",
+    "Curve:ChillerPartLoadWithLift",
+    "Table:Lookup",
+];
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum ParsedVariableAbsorptanceControlSignal {
+    SurfaceTemperature,
+    SurfaceReceivedSolarRadiation,
+    SpaceHeatingCoolingMode,
+    Scheduled,
+}
+
+impl ParsedVariableAbsorptanceControlSignal {
+    const fn function_signal(self) -> Option<VariableAbsorptanceFunctionSignal> {
+        match self {
+            Self::SurfaceTemperature => Some(VariableAbsorptanceFunctionSignal::SurfaceTemperature),
+            Self::SurfaceReceivedSolarRadiation => {
+                Some(VariableAbsorptanceFunctionSignal::SurfaceReceivedSolarRadiation)
+            }
+            Self::SpaceHeatingCoolingMode => {
+                Some(VariableAbsorptanceFunctionSignal::SpaceHeatingCoolingMode)
+            }
+            Self::Scheduled => None,
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum WindowConstructionLayerKind {
@@ -418,6 +468,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "WindowMaterial:SimpleGlazingSystem",
     "WindowMaterial:Gap",
     "WindowMaterial:ComplexShade",
+    "MaterialProperty:VariableAbsorptance",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -528,6 +579,7 @@ impl<'a> Compiler<'a> {
         self.parse_external_interface_schedules(&mut model);
         self.parse_external_interface_fmu_import_schedules(&mut model);
         self.parse_external_interface_fmu_export_schedules(&mut model);
+        self.parse_material_variable_absorptances(&mut model);
         self.validate_scalar_schedule_type_limits(&model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
@@ -1287,6 +1339,396 @@ impl<'a> Compiler<'a> {
         self.parse_window_simple_glazing_system_materials(model);
         self.parse_window_complex_gap_materials(model);
         self.parse_window_complex_shade_materials(model);
+    }
+
+    fn parse_material_variable_absorptances(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "MaterialProperty:VariableAbsorptance";
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            if name.trim().is_empty() {
+                self.error(
+                    "MissingRequiredField",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE} requires a non-blank overlay name"),
+                );
+                continue;
+            }
+            let reference_material_name =
+                self.required_string(OBJECT_TYPE, &name, &object, "reference_material_name");
+            let control_signal =
+                self.variable_absorptance_control_signal(OBJECT_TYPE, &name, &object);
+            let thermal_function_name = self.optional_reference_name_checked(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "thermal_absorptance_function_name",
+            );
+            let thermal_schedule_name = self.optional_reference_name_checked(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "thermal_absorptance_schedule_name",
+            );
+            let solar_function_name = self.optional_reference_name_checked(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "solar_absorptance_function_name",
+            );
+            let solar_schedule_name = self.optional_reference_name_checked(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "solar_absorptance_schedule_name",
+            );
+            let (
+                Some(reference_material_name),
+                Some(control_signal),
+                Some(thermal_function_name),
+                Some(thermal_schedule_name),
+                Some(solar_function_name),
+                Some(solar_schedule_name),
+            ) = (
+                reference_material_name,
+                control_signal,
+                thermal_function_name,
+                thermal_schedule_name,
+                solar_function_name,
+                solar_schedule_name,
+            )
+            else {
+                continue;
+            };
+
+            let Some(reference_material) = self.resolve_name(
+                &model.material_names,
+                OBJECT_TYPE,
+                &name,
+                "reference_material_name",
+                &reference_material_name,
+                "Material",
+            ) else {
+                continue;
+            };
+            let Some(material) = model.materials.get(reference_material.0 as usize) else {
+                self.error(
+                    "InvalidReference",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("reference_material_name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} resolved material '{reference_material_name}' outside the material arena"
+                    ),
+                );
+                continue;
+            };
+            if !matches!(
+                material.definition,
+                MaterialDefinition::Regular(_) | MaterialDefinition::NoMass(_)
+            ) {
+                self.error(
+                    "InvalidVariableAbsorptanceMaterialType",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("reference_material_name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} reference material '{reference_material_name}' must be Material or Material:NoMass"
+                    ),
+                );
+                continue;
+            }
+
+            let thermal_function = self.variable_absorptance_function_reference(
+                OBJECT_TYPE,
+                &name,
+                "thermal_absorptance_function_name",
+                thermal_function_name.as_deref(),
+            );
+            let solar_function = self.variable_absorptance_function_reference(
+                OBJECT_TYPE,
+                &name,
+                "solar_absorptance_function_name",
+                solar_function_name.as_deref(),
+            );
+            let thermal_schedule = self.variable_absorptance_schedule_reference(
+                model,
+                OBJECT_TYPE,
+                &name,
+                "thermal_absorptance_schedule_name",
+                thermal_schedule_name.as_deref(),
+            );
+            let solar_schedule = self.variable_absorptance_schedule_reference(
+                model,
+                OBJECT_TYPE,
+                &name,
+                "solar_absorptance_schedule_name",
+                solar_schedule_name.as_deref(),
+            );
+            let (
+                Some(thermal_function),
+                Some(solar_function),
+                Some(thermal_schedule),
+                Some(solar_schedule),
+            ) = (
+                thermal_function,
+                solar_function,
+                thermal_schedule,
+                solar_schedule,
+            )
+            else {
+                continue;
+            };
+
+            let control = match control_signal {
+                ParsedVariableAbsorptanceControlSignal::Scheduled => {
+                    if thermal_schedule.is_none() && solar_schedule.is_none() {
+                        self.error(
+                            "MissingVariableAbsorptanceSchedule",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some("control_signal"),
+                            format!(
+                                "{OBJECT_TYPE}/{name} uses Scheduled control but neither absorptance schedule resolves"
+                            ),
+                        );
+                        continue;
+                    }
+                    if thermal_function.is_some() || solar_function.is_some() {
+                        self.error(
+                            "UnexpectedVariableAbsorptanceFunction",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some("control_signal"),
+                            format!(
+                                "{OBJECT_TYPE}/{name} uses Scheduled control but also resolves an absorptance function"
+                            ),
+                        );
+                        continue;
+                    }
+                    VariableAbsorptanceControl::Scheduled {
+                        thermal: thermal_schedule,
+                        solar: solar_schedule,
+                    }
+                }
+                ParsedVariableAbsorptanceControlSignal::SurfaceTemperature
+                | ParsedVariableAbsorptanceControlSignal::SurfaceReceivedSolarRadiation
+                | ParsedVariableAbsorptanceControlSignal::SpaceHeatingCoolingMode => {
+                    if thermal_function.is_none() && solar_function.is_none() {
+                        self.error(
+                            "MissingVariableAbsorptanceFunction",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some("control_signal"),
+                            format!(
+                                "{OBJECT_TYPE}/{name} uses function control but neither absorptance function resolves"
+                            ),
+                        );
+                        continue;
+                    }
+                    if thermal_schedule.is_some() || solar_schedule.is_some() {
+                        self.error(
+                            "UnexpectedVariableAbsorptanceSchedule",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some("control_signal"),
+                            format!(
+                                "{OBJECT_TYPE}/{name} uses function control but also resolves an absorptance schedule"
+                            ),
+                        );
+                        continue;
+                    }
+                    let Some(signal) = control_signal.function_signal() else {
+                        continue;
+                    };
+                    VariableAbsorptanceControl::Function {
+                        signal,
+                        thermal: thermal_function,
+                        solar: solar_function,
+                    }
+                }
+            };
+
+            if model
+                .material_variable_absorptances
+                .iter()
+                .any(|overlay| overlay.reference_material == reference_material)
+            {
+                self.error(
+                    "DuplicateVariableAbsorptanceMaterial",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("reference_material_name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} repeats reference material '{reference_material_name}'; source-order last-wins overlays are outside the bounded typed subset"
+                    ),
+                );
+                continue;
+            }
+
+            let id_value = model.material_variable_absorptances.len();
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, id_value) else {
+                continue;
+            };
+            let id = MaterialVariableAbsorptanceId(id_value);
+            if model
+                .material_variable_absorptance_names
+                .insert(&name, id)
+                .is_some()
+            {
+                self.error(
+                    "DuplicateName",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    None,
+                    format!(
+                        "duplicate normalized {OBJECT_TYPE} name '{}'",
+                        NormalizedName::new(&name).0
+                    ),
+                );
+                continue;
+            }
+            model
+                .material_variable_absorptances
+                .push(MaterialVariableAbsorptance {
+                    id,
+                    name: NormalizedName::new(&name),
+                    reference_material,
+                    control,
+                });
+        }
+    }
+
+    fn variable_absorptance_control_signal(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+    ) -> Option<ParsedVariableAbsorptanceControlSignal> {
+        const FIELD: &str = "control_signal";
+        match field_value(object, FIELD) {
+            Some(RawValue::String(value)) if value.trim().is_empty() => {
+                self.record_default(object_type, object_name, FIELD, "SurfaceTemperature");
+                Some(ParsedVariableAbsorptanceControlSignal::SurfaceTemperature)
+            }
+            Some(RawValue::String(value)) if value.eq_ignore_ascii_case("SurfaceTemperature") => {
+                Some(ParsedVariableAbsorptanceControlSignal::SurfaceTemperature)
+            }
+            Some(RawValue::String(value))
+                if value.eq_ignore_ascii_case("SurfaceReceivedSolarRadiation") =>
+            {
+                Some(ParsedVariableAbsorptanceControlSignal::SurfaceReceivedSolarRadiation)
+            }
+            Some(RawValue::String(value))
+                if value.eq_ignore_ascii_case("SpaceHeatingCoolingMode") =>
+            {
+                Some(ParsedVariableAbsorptanceControlSignal::SpaceHeatingCoolingMode)
+            }
+            Some(RawValue::String(value)) if value.eq_ignore_ascii_case("Scheduled") => {
+                Some(ParsedVariableAbsorptanceControlSignal::Scheduled)
+            }
+            Some(RawValue::String(value)) => {
+                self.invalid_enum_value(object_type, object_name, FIELD, value);
+                None
+            }
+            Some(_value) => {
+                self.invalid_field_type(object_type, object_name, FIELD, "string enum");
+                None
+            }
+            None => {
+                self.record_default(object_type, object_name, FIELD, "SurfaceTemperature");
+                Some(ParsedVariableAbsorptanceControlSignal::SurfaceTemperature)
+            }
+        }
+    }
+
+    fn variable_absorptance_function_reference(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        field: &str,
+        reference_name: Option<&str>,
+    ) -> Option<Option<DeferredVariableAbsorptanceFunction>> {
+        let Some(reference_name) = reference_name else {
+            return Some(None);
+        };
+        let normalized_name = NormalizedName::new(reference_name);
+        let matches = self
+            .raw_model
+            .objects
+            .iter()
+            .filter(|(candidate_type, _instances)| {
+                VARIABLE_ABSORPTANCE_FUNCTION_OBJECT_TYPES
+                    .iter()
+                    .any(|allowed| candidate_type.0.eq_ignore_ascii_case(allowed))
+            })
+            .flat_map(|(candidate_type, instances)| {
+                let normalized_name = normalized_name.clone();
+                instances
+                    .keys()
+                    .filter(move |candidate_name| {
+                        NormalizedName::new(&candidate_name.0) == normalized_name
+                    })
+                    .map(move |candidate_name| DeferredVariableAbsorptanceFunction {
+                        object_type: candidate_type.0.clone(),
+                        name: NormalizedName::new(&candidate_name.0),
+                    })
+            })
+            .collect::<Vec<_>>();
+        match matches.as_slice() {
+            [] => Some(None),
+            [resolved] => Some(Some(resolved.clone())),
+            _ => {
+                self.error(
+                    "AmbiguousVariableAbsorptanceFunction",
+                    object_type,
+                    Some(object_name),
+                    Some(field),
+                    format!(
+                        "{object_type}/{object_name} function reference '{reference_name}' resolves to multiple curve/table objects"
+                    ),
+                );
+                None
+            }
+        }
+    }
+
+    fn variable_absorptance_schedule_reference(
+        &mut self,
+        model: &TypedModel,
+        object_type: &str,
+        object_name: &str,
+        field: &str,
+        reference_name: Option<&str>,
+    ) -> Option<Option<VariableAbsorptanceSchedule>> {
+        let Some(reference_name) = reference_name else {
+            return Some(None);
+        };
+        let user_schedule = model.schedule_names.resolve(reference_name);
+        let built_in = if reference_name.eq_ignore_ascii_case("Constant-0.0") {
+            Some(VariableAbsorptanceSchedule::ConstantZero)
+        } else if reference_name.eq_ignore_ascii_case("Constant-1.0") {
+            Some(VariableAbsorptanceSchedule::ConstantOne)
+        } else {
+            None
+        };
+        match (user_schedule, built_in) {
+            (Some(_schedule), Some(_built_in)) => {
+                self.error(
+                    "AmbiguousVariableAbsorptanceSchedule",
+                    object_type,
+                    Some(object_name),
+                    Some(field),
+                    format!(
+                        "{object_type}/{object_name} schedule reference '{reference_name}' collides with an EnergyPlus built-in schedule"
+                    ),
+                );
+                None
+            }
+            (Some(schedule), None) => Some(Some(VariableAbsorptanceSchedule::User(schedule))),
+            (None, Some(built_in)) => Some(Some(built_in)),
+            (None, None) => Some(None),
+        }
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -14030,6 +14472,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 mod tests {
     mod global_geometry_rules;
     mod material_property_glazing_spectral_data;
+    mod material_property_variable_absorptance;
     mod material_roof_vegetation;
     mod material_variants;
     mod schedule_day_interval;

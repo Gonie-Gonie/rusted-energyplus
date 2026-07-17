@@ -5,6 +5,7 @@ use ep_raw_model::parse_epjson_str;
 
 mod glazing_spectral_data;
 mod material_roof_vegetation;
+mod material_variable_absorptance;
 mod window_glazing_thermochromic_group;
 mod window_material_blind_equivalent_layer;
 mod window_material_complex_shade;
