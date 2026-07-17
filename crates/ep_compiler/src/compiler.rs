@@ -31,7 +31,8 @@ use ep_model::{
     TypedModel, Version, VertexEntryDirection, WeekScheduleId, WindExposure,
     WindowBlindDirectionalOpticalProperties, WindowBlindEquivalentLayerMaterial,
     WindowBlindEquivalentLayerSlatAngleControl, WindowBlindMaterial, WindowBlindSlatAngleType,
-    WindowBlindSlatOrientation, WindowDrapeEquivalentLayerMaterial,
+    WindowBlindSlatOrientation, WindowComplexGapGasComposition, WindowComplexGapMaterial,
+    WindowComplexGapSupportPillar, WindowDrapeEquivalentLayerMaterial,
     WindowGapEquivalentLayerMaterial, WindowGapVentType, WindowGasMaterial, WindowGasMixture,
     WindowGasMixtureComponent, WindowGasMixtureMaterial, WindowGasPolynomialCoefficients,
     WindowGasProperties, WindowGasType, WindowGlazingEquivalentLayerDiffuseProperties,
@@ -93,6 +94,7 @@ fn window_construction_layer_kind(
         | MaterialDefinition::RoofVegetation(_)
         | MaterialDefinition::WindowGlazingThermochromicGroup(_)
         | MaterialDefinition::WindowSimpleGlazing(_)
+        | MaterialDefinition::WindowComplexGap(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
         | MaterialDefinition::WindowShadeEquivalentLayer(_)
@@ -113,6 +115,7 @@ fn window_glazing_is_solar_diffusing(definition: &MaterialDefinition) -> bool {
         | MaterialDefinition::RoofVegetation(_)
         | MaterialDefinition::WindowGlazingThermochromicGroup(_)
         | MaterialDefinition::WindowSimpleGlazing(_)
+        | MaterialDefinition::WindowComplexGap(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowGas(_)
         | MaterialDefinition::WindowGasMixture(_)
@@ -155,6 +158,7 @@ fn window_gap_signature(definition: &MaterialDefinition) -> Option<WindowGapSign
         | MaterialDefinition::RoofVegetation(_)
         | MaterialDefinition::WindowGlazingThermochromicGroup(_)
         | MaterialDefinition::WindowSimpleGlazing(_)
+        | MaterialDefinition::WindowComplexGap(_)
         | MaterialDefinition::WindowGlazingSpectralAverage(_)
         | MaterialDefinition::WindowGlazingRefractionExtinction(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -407,6 +411,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Material:RoofVegetation",
     "WindowMaterial:GlazingGroup:Thermochromic",
     "WindowMaterial:SimpleGlazingSystem",
+    "WindowMaterial:Gap",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -990,6 +995,7 @@ impl<'a> Compiler<'a> {
         self.parse_roof_vegetation_materials(model);
         self.parse_window_glazing_thermochromic_group_materials(model);
         self.parse_window_simple_glazing_system_materials(model);
+        self.parse_window_complex_gap_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -4990,6 +4996,291 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_window_complex_gap_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowMaterial:Gap";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let thickness_m =
+                self.required_number_minimum(OBJECT_TYPE, &name, &object, "thickness", 0.0, false);
+            // EnergyPlus 26.1's epJSON key includes the trailing underscore.
+            // Reading only this exact key keeps a misspelled near-match from
+            // silently becoming a missing or different reference.
+            let gas_reference_name =
+                self.required_string(OBJECT_TYPE, &name, &object, "gas_or_gas_mixture_");
+            let pressure_pa = self.number_minimum_when_present_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "pressure",
+                101_325.0,
+                0.0,
+                false,
+            );
+            let deflection_reference = self.optional_reference_name_checked(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "deflection_state",
+            );
+            let support_pillar_reference =
+                self.optional_reference_name_checked(OBJECT_TYPE, &name, &object, "support_pillar");
+            let (
+                Some(thickness_m),
+                Some(gas_reference_name),
+                Some(pressure_pa),
+                Some(deflection_reference),
+                Some(support_pillar_reference),
+            ) = (
+                thickness_m,
+                gas_reference_name,
+                pressure_pa,
+                deflection_reference,
+                support_pillar_reference,
+            )
+            else {
+                continue;
+            };
+
+            let gas = self.window_complex_gap_gas(model, &name, &gas_reference_name);
+            let deflected_thickness_m =
+                self.window_complex_gap_deflected_thickness(&name, deflection_reference.as_deref());
+            let support_pillar =
+                self.window_complex_gap_support_pillar(&name, support_pillar_reference.as_deref());
+            let (Some(gas), Some(deflected_thickness_m), Some(support_pillar)) =
+                (gas, deflected_thickness_m, support_pillar)
+            else {
+                continue;
+            };
+
+            // Every fallible field and reference check is complete before the
+            // shared material namespace is mutated.
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::WindowComplexGap(WindowComplexGapMaterial {
+                    thickness_m,
+                    pressure_pa,
+                    gas,
+                    deflected_thickness_m,
+                    support_pillar,
+                }),
+            });
+        }
+    }
+
+    fn window_complex_gap_gas(
+        &mut self,
+        model: &TypedModel,
+        gap_name: &str,
+        gas_reference_name: &str,
+    ) -> Option<WindowComplexGapGasComposition> {
+        const OBJECT_TYPE: &str = "WindowMaterial:Gap";
+        const FIELD: &str = "gas_or_gas_mixture_";
+        let source_material_id = self.resolve_name(
+            &model.material_names,
+            OBJECT_TYPE,
+            gap_name,
+            FIELD,
+            gas_reference_name,
+            "earlier WindowMaterial:Gas or WindowMaterial:GasMixture",
+        )?;
+        let Some(source_material) = model.materials.get(source_material_id.0 as usize) else {
+            self.error(
+                "InvalidWindowComplexGapGasReference",
+                OBJECT_TYPE,
+                Some(gap_name),
+                Some(FIELD),
+                format!(
+                    "{OBJECT_TYPE}/{gap_name} field {FIELD} resolved '{gas_reference_name}' to an unavailable material ID"
+                ),
+            );
+            return None;
+        };
+
+        match &source_material.definition {
+            MaterialDefinition::WindowGas(source) => Some(WindowComplexGapGasComposition::Single {
+                source_material_id,
+                gas_type: source.gas_type,
+                properties: source.properties,
+            }),
+            MaterialDefinition::WindowGasMixture(source) => {
+                Some(WindowComplexGapGasComposition::Mixture {
+                    source_material_id,
+                    gases: source.gases,
+                })
+            }
+            _ => {
+                self.error(
+                    "InvalidWindowComplexGapGasReference",
+                    OBJECT_TYPE,
+                    Some(gap_name),
+                    Some(FIELD),
+                    format!(
+                        "{OBJECT_TYPE}/{gap_name} field {FIELD} references material '{gas_reference_name}', but only an earlier WindowMaterial:Gas or WindowMaterial:GasMixture may supply complex-gap gas state"
+                    ),
+                );
+                None
+            }
+        }
+    }
+
+    fn window_complex_gap_deflected_thickness(
+        &mut self,
+        gap_name: &str,
+        reference_name: Option<&str>,
+    ) -> Option<f64> {
+        const OBJECT_TYPE: &str = "WindowMaterial:Gap";
+        const FIELD: &str = "deflection_state";
+        const TARGET_TYPE: &str = "WindowGap:DeflectionState";
+        let Some(reference_name) = reference_name else {
+            return Some(0.0);
+        };
+        let (helper_name, helper) = self.resolve_raw_named_object_case_insensitive(
+            OBJECT_TYPE,
+            gap_name,
+            FIELD,
+            TARGET_TYPE,
+            reference_name,
+        )?;
+
+        let deflected_thickness_m = self.number_minimum_when_present_default(
+            TARGET_TYPE,
+            &helper_name,
+            &helper,
+            "deflected_thickness",
+            0.0,
+            0.0,
+            true,
+        );
+        // Material.cc copies only deflected thickness. The other two fields
+        // are still parsed and range-checked here, then deliberately discarded.
+        let initial_temperature_c = self.number_minimum_when_present_default(
+            TARGET_TYPE,
+            &helper_name,
+            &helper,
+            "initial_temperature",
+            25.0,
+            0.0,
+            true,
+        );
+        let initial_pressure_pa = self.number_minimum_when_present_default(
+            TARGET_TYPE,
+            &helper_name,
+            &helper,
+            "initial_pressure",
+            101_325.0,
+            0.0,
+            true,
+        );
+        let (Some(deflected_thickness_m), Some(_), Some(_)) = (
+            deflected_thickness_m,
+            initial_temperature_c,
+            initial_pressure_pa,
+        ) else {
+            return None;
+        };
+        Some(deflected_thickness_m)
+    }
+
+    fn window_complex_gap_support_pillar(
+        &mut self,
+        gap_name: &str,
+        reference_name: Option<&str>,
+    ) -> Option<Option<WindowComplexGapSupportPillar>> {
+        const OBJECT_TYPE: &str = "WindowMaterial:Gap";
+        const FIELD: &str = "support_pillar";
+        const TARGET_TYPE: &str = "WindowGap:SupportPillar";
+        let Some(reference_name) = reference_name else {
+            return Some(None);
+        };
+        let (helper_name, helper) = self.resolve_raw_named_object_case_insensitive(
+            OBJECT_TYPE,
+            gap_name,
+            FIELD,
+            TARGET_TYPE,
+            reference_name,
+        )?;
+
+        let spacing_m = self.number_minimum_when_present_default(
+            TARGET_TYPE,
+            &helper_name,
+            &helper,
+            "spacing",
+            0.04,
+            0.0,
+            false,
+        );
+        let radius_m = self.number_minimum_when_present_default(
+            TARGET_TYPE,
+            &helper_name,
+            &helper,
+            "radius",
+            0.0004,
+            0.0,
+            false,
+        );
+        let (Some(spacing_m), Some(radius_m)) = (spacing_m, radius_m) else {
+            return None;
+        };
+        Some(Some(WindowComplexGapSupportPillar {
+            spacing_m,
+            radius_m,
+        }))
+    }
+
+    fn resolve_raw_named_object_case_insensitive(
+        &mut self,
+        source_object_type: &str,
+        source_object_name: &str,
+        source_field: &str,
+        target_object_type: &str,
+        target_name: &str,
+    ) -> Option<(String, RawObject)> {
+        let normalized_target = NormalizedName::new(target_name);
+        let mut matches = self
+            .objects(target_object_type)
+            .into_iter()
+            .filter(|(candidate_name, _)| NormalizedName::new(candidate_name) == normalized_target)
+            .collect::<Vec<_>>();
+        match matches.len() {
+            0 => {
+                self.error(
+                    "MissingReference",
+                    source_object_type,
+                    Some(source_object_name),
+                    Some(source_field),
+                    format!(
+                        "{source_object_type}/{source_object_name} field {source_field} references missing {target_object_type} '{target_name}'"
+                    ),
+                );
+                None
+            }
+            1 => matches.pop(),
+            _ => {
+                let candidates = matches
+                    .iter()
+                    .map(|(candidate_name, _)| candidate_name.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                self.error(
+                    "AmbiguousReference",
+                    source_object_type,
+                    Some(source_object_name),
+                    Some(source_field),
+                    format!(
+                        "{source_object_type}/{source_object_name} field {source_field} reference '{target_name}' ambiguously matches multiple {target_object_type} objects: {candidates}"
+                    ),
+                );
+                None
+            }
+        }
+    }
+
     fn reserve_material_identity(
         &mut self,
         model: &mut TypedModel,
@@ -5101,6 +5392,30 @@ impl<'a> Compiler<'a> {
         construction_name: &str,
         layers: &[MaterialId],
     ) -> Option<ConstructionKind> {
+        if let Some((layer_index, material)) =
+            layers
+                .iter()
+                .enumerate()
+                .find_map(|(layer_index, material_id)| {
+                    let material = model.materials.get(material_id.0 as usize)?;
+                    (material.family() == ep_model::MaterialFamily::ComplexFenestration)
+                        .then_some((layer_index, material))
+                })
+        {
+            let layer_field = construction_layer_field(layer_index);
+            self.error(
+                "UnsupportedComplexFenestrationConstruction",
+                "Construction",
+                Some(construction_name),
+                Some(&layer_field),
+                format!(
+                    "Construction/{construction_name} cannot consume complex-fenestration gap {}; WindowMaterial:Gap is reserved for future Construction:ComplexFenestrationState support and is not an ordinary window gas gap",
+                    material.name.0
+                ),
+            );
+            return None;
+        }
+
         if let Some((layer_index, material)) =
             layers
                 .iter()
@@ -10723,6 +11038,26 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    /// Reads an optional reference without conflating a malformed value with
+    /// an absent or blank field. The outer option is validation success; the
+    /// inner option is reference presence.
+    fn optional_reference_name_checked(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<Option<String>> {
+        match field_value(object, field) {
+            Some(RawValue::String(value)) if !value.trim().is_empty() => Some(Some(value.clone())),
+            Some(RawValue::String(_)) | None => Some(None),
+            Some(_value) => {
+                self.invalid_field_type(object_type, object_name, field, "string");
+                None
+            }
+        }
+    }
+
     fn required_material_roughness(
         &mut self,
         object_type: &str,
@@ -13196,6 +13531,7 @@ mod tests {
     mod window_material_blind;
     mod window_material_blind_equivalent_layer;
     mod window_material_drape_equivalent_layer;
+    mod window_material_gap;
     mod window_material_gap_equivalent_layer;
     mod window_material_gas;
     mod window_material_gas_mixture;

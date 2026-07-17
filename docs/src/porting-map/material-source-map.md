@@ -55,14 +55,15 @@ different:
 | inventoried public objects | 34 / 34 | Every in-boundary EnergyPlus 26.1 object is named below with its source owner and order. |
 | base definitions | 22 / 22 inventoried | `GetMaterialData` processing order is locked below. |
 | overlays and datasets | 12 / 12 inventoried | Common-startup or algorithm-local owner and order are locked below. |
-| typed Rust material variants | 20 | Five complete opaque-family slices, the `WindowMaterial:Glazing` `SpectralAverage` branch, and the complete `RefractionExtinctionMethod`, glazing `EquivalentLayer`, `WindowMaterial:Gas`, gap `EquivalentLayer`, `WindowMaterial:GasMixture`, ordinary `WindowMaterial:Shade`, shade `EquivalentLayer`, drape `EquivalentLayer`, ordinary `WindowMaterial:Screen`, screen `EquivalentLayer`, ordinary `WindowMaterial:Blind`, blind `EquivalentLayer`, thermochromic glazing-group, and simple-glazing-system objects have distinct payloads. |
-| complete bounded public-object slices | 19 / 34 | `Material`, `Material:NoMass`, `Material:AirGap`, `Material:InfraredTransparent`, `WindowMaterial:Glazing:RefractionExtinctionMethod`, `WindowMaterial:Glazing:EquivalentLayer`, `WindowMaterial:Gas`, `WindowMaterial:Gap:EquivalentLayer`, `WindowMaterial:GasMixture`, `WindowMaterial:Shade`, `WindowMaterial:Shade:EquivalentLayer`, `WindowMaterial:Drape:EquivalentLayer`, `WindowMaterial:Screen`, `WindowMaterial:Screen:EquivalentLayer`, `WindowMaterial:Blind`, `WindowMaterial:Blind:EquivalentLayer`, `Material:RoofVegetation`, `WindowMaterial:GlazingGroup:Thermochromic`, and `WindowMaterial:SimpleGlazingSystem` have their source-effective fields and bounded compiler contracts typed. |
+| typed Rust material variants | 21 | Five complete opaque-family slices, the `WindowMaterial:Glazing` `SpectralAverage` branch, and the complete `RefractionExtinctionMethod`, glazing `EquivalentLayer`, `WindowMaterial:Gas`, gap `EquivalentLayer`, `WindowMaterial:GasMixture`, ordinary `WindowMaterial:Shade`, shade `EquivalentLayer`, drape `EquivalentLayer`, ordinary `WindowMaterial:Screen`, screen `EquivalentLayer`, ordinary `WindowMaterial:Blind`, blind `EquivalentLayer`, thermochromic glazing-group, simple-glazing-system, and complex-fenestration gap objects have distinct payloads. |
+| complete bounded public-object slices | 20 / 34 | `Material`, `Material:NoMass`, `Material:AirGap`, `Material:InfraredTransparent`, `WindowMaterial:Glazing:RefractionExtinctionMethod`, `WindowMaterial:Glazing:EquivalentLayer`, `WindowMaterial:Gas`, `WindowMaterial:Gap:EquivalentLayer`, `WindowMaterial:GasMixture`, `WindowMaterial:Shade`, `WindowMaterial:Shade:EquivalentLayer`, `WindowMaterial:Drape:EquivalentLayer`, `WindowMaterial:Screen`, `WindowMaterial:Screen:EquivalentLayer`, `WindowMaterial:Blind`, `WindowMaterial:Blind:EquivalentLayer`, `Material:RoofVegetation`, `WindowMaterial:GlazingGroup:Thermochromic`, `WindowMaterial:SimpleGlazingSystem`, and `WindowMaterial:Gap` have their source-effective fields and bounded compiler contracts typed. |
 | partial bounded public-object slices | 1 / 34 | Only `WindowMaterial:Glazing` with `Optical Data Type = SpectralAverage` is typed; `Spectral`, `SpectralAndAngle`, and `BSDF` remain explicitly unsupported. |
-| wholly deferred public objects | 14 / 34 | The other 2 base definitions and all 12 overlays/datasets remain unported as variants. |
+| wholly deferred public objects | 13 / 34 | The remaining base definition, `WindowMaterial:ComplexShade`, and all 12 overlays/datasets remain unported as variants. |
 
-This is a CP58 scaffold checkpoint. Complete inventory does not mean complete
-schema, validation, runtime, optics, moisture, phase-change, or heat-transfer
-behavior.
+The inventory scaffold began at CP58; the counts and typed states above are
+cumulative through the current checkpoint. Complete inventory does not mean
+complete schema, validation, runtime, optics, moisture, phase-change, or
+heat-transfer behavior.
 
 ## Common Startup Order
 
@@ -85,7 +86,7 @@ material.
 The following table is the public-object processing order inside
 `Material::GetMaterialData`. It is not the schema presentation order.
 
-| Source order | Public object | Source role | CP58 typed state |
+| Source order | Public object | Source role | Cumulative typed state |
 |---:|---|---|---|
 | 1 | `Material` | regular opaque material with thickness, conductivity, density, specific heat, roughness, and absorptances | bounded typed `Regular` variant |
 | 2 | `Material:NoMass` | regular R-only opaque material with roughness, resistance, and absorptances | bounded typed `NoMass` variant |
@@ -107,7 +108,7 @@ The following table is the public-object processing order inside
 | 18 | `Material:RoofVegetation` | eco-roof material and vegetation state | complete bounded typed input and dry-soil opaque projection; dynamic EcoRoof runtime blocked |
 | 19 | `WindowMaterial:GlazingGroup:Thermochromic` | thermochromic glazing-group parent | complete bounded typed ordered-state parent; construction generation and runtime selection deferred |
 | 20 | `WindowMaterial:SimpleGlazingSystem` | derived simple glazing system | complete bounded typed block model; dedicated family, construction and runtime blocked |
-| 21 | `WindowMaterial:Gap` | complex-fenestration gap, including optional deflection-state and support-pillar references | deferred |
+| 21 | `WindowMaterial:Gap` | complex-fenestration gap, including optional deflection-state and support-pillar references | complete bounded typed variant with copied gas/helper state; dedicated consumer and runtime deferred |
 | 22 | `WindowMaterial:ComplexShade` | complex-fenestration shade | deferred |
 
 Two conditional internal injections occur between public-object steps and must
@@ -130,7 +131,7 @@ There is no single global order among CondFD, EMPD, and HAMT overlays. Each
 manager reads its own input lazily on the first use of that heat-transfer
 algorithm. The exact order guaranteed by each source owner is:
 
-| Source sequence | Schema family number | Public object | Kind | CP58 typed state |
+| Source sequence | Schema family number | Public object | Kind | Cumulative typed state |
 |---|---:|---|---|---|
 | common HB 1 | 34 | `MaterialProperty:GlazingSpectralData` | standalone glazing dataset read by `GetWindowGlassSpectralData` | deferred |
 | common HB 2 tail | 27 | `MaterialProperty:VariableAbsorptance` | base-material overlay read by `GetVariableAbsorptanceInput` after all 22 base families | deferred |
@@ -156,7 +157,7 @@ This checkpoint migrates the first four base definitions from a single
 option-heavy record to discriminated material definitions under a shared
 identity envelope, adds one explicitly partial fifth variant for the
 `SpectralAverage` branch of source-order object 5, and gives source-order
-objects 6 through 20 complete bounded variants.
+objects 6 through 21 complete bounded variants.
 
 ### `Material` / regular
 
@@ -1338,6 +1339,56 @@ optics, construction ratings, window thermal behavior, surfaces, daylighting,
 output variables, Rust EIO serialization, runtime, broad diagnostic and
 declaration-order parity, and conformance remain unclaimed.
 
+### `WindowMaterial:Gap`
+
+The twenty-first source-order object defines a gap exclusively for a complex
+fenestration system. Thickness is required and strictly positive. The schema's
+exact `gas_or_gas_mixture_` key, including its trailing underscore, is also
+required and resolves case-insensitively against an already compiled
+`WindowMaterial:Gas` or `WindowMaterial:GasMixture`. Pressure defaults to
+101325 Pa; `GetMaterialData` requires it to be strictly positive even though
+the epJSON schema declares no minimum.
+
+EnergyPlus copies the referenced gas state into the complex gap rather than
+turning the referenced ordinary gap into its consumer. The typed
+`WindowComplexGapGasComposition` therefore stores either one copied gas type
+and property record or the copied ordered mixture, together with the source
+`MaterialId` only as graph provenance. It does not copy the referenced
+material name, thickness, or nominal resistance. `WindowComplexGapMaterial`
+owns its own thickness and pressure, and deliberately invents no nominal
+resistance. The source-fixed base state is `Rough`, R-only, with zero
+resistance, conductivity, density, specific heat, and absorptances; those
+generic report projections are not promoted as typed-checkpoint evidence.
+
+`WindowGap:DeflectionState` and `WindowGap:SupportPillar` remain raw-only
+helper families outside the 34-object material inventory. The compiler
+resolves only helpers referenced by a gap, case-insensitively and lazily. A
+referenced deflection helper validates its nonnegative deflected thickness,
+initial temperature, and initial pressure, then retains only the deflected
+thickness because that is the only field copied by `GetMaterialData`; the
+initial temperature and pressure are discarded. A missing deflection
+reference leaves the copied thickness at zero. A referenced support-pillar
+helper requires positive spacing and radius and copies only those two values;
+an omitted reference remains `None`. No relationship between nominal and
+deflected thickness, or between pillar radius and spacing, is added because
+the source block enforces none.
+
+The upstream reference path performs an unchecked downcast after an object-list
+lookup and allocates the gap before several later failures. Rust deliberately
+fails closed on missing, ambiguous, malformed, or wrong-family references and
+reserves the shared material identity only after all fallible validation and
+resolution completes. The dedicated `MaterialFamily::ComplexFenestration`
+keeps the payload out of opaque, ordinary fenestration, equivalent-layer,
+thermochromic, and simple-glazing consumers. Every ordinary `Construction`
+position rejects it. Its sole intended
+`Construction:ComplexFenestrationState` consumer, complex-window packing,
+deflection execution, pillar conduction, optics, thermal behavior, surfaces,
+ratings, daylighting, and reporting remain deferred. Arbitrary-run support
+assessment counts and blocks every typed definition, including unused gaps,
+as `UnsupportedSurfaceBoundary`/`RunBlocked` with no runtime class. This typed
+checkpoint promotes no EIO fixture, parser, comparator, family case, proof
+variable, Rust EIO serialization, runtime, or conformance claim.
+
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. `Material:RoofVegetation` joins the opaque family with a dedicated
 outside-layer invariant. The two ordinary glazing variants, `WindowMaterial:Gas`,
@@ -1350,7 +1401,8 @@ equivalent-layer glazing, `WindowMaterial:Gap:EquivalentLayer`, and
 `WindowMaterial:Screen:EquivalentLayer` plus
 `WindowMaterial:Blind:EquivalentLayer` share the separate equivalent-layer
 family. Thermochromic glazing-group parents use their own deferred-consumer
-family, and SimpleGlazing definitions use a separate fully blocked family. An ordinary `Construction` accepts the
+family, SimpleGlazing definitions use a separate fully blocked family, and
+complex-fenestration gaps use a dedicated deferred-consumer family. An ordinary `Construction` accepts the
 unshaded `Glass ((Gas|GasMixture) Glass){0..3}` subset, the bounded exterior,
 interior, double-between, and triple-between Shade or Blind patterns above,
 and one exterior Screen directly before that plain window stack. It rejects
@@ -1364,7 +1416,8 @@ also counts every typed `WindowMaterial:Gas` and `WindowMaterial:GasMixture`
 occurrence as explicitly unsupported and run-blocks it before execution; the
 same explicit run block applies to every typed equivalent-layer gap, shade,
 drape, screen, or blind, every ordinary screen or blind definition, and every
-RoofVegetation definition. Glazing
+RoofVegetation definition, thermochromic group, SimpleGlazing definition, and
+complex-fenestration gap. Glazing
 thickness, conductivity, and
 asymmetric infrared emissivity, gap thickness and resolved single-gas or
 ordered mixture properties, and the equivalent-layer shade/drape TAR inputs
@@ -1387,8 +1440,8 @@ objects, then all `Material:NoMass`, `Material:AirGap`, and
 `WindowMaterial:Screen:EquivalentLayer`, followed by `WindowMaterial:Blind`,
 `WindowMaterial:Blind:EquivalentLayer`, `Material:RoofVegetation`, and
 `WindowMaterial:GlazingGroup:Thermochromic`, then
-`WindowMaterial:SimpleGlazingSystem`, and keeps their names in the shared
-material registry. Because the thermochromic group is compiled first, its
+`WindowMaterial:SimpleGlazingSystem`, then `WindowMaterial:Gap`, and keeps
+their names in the shared material registry. Because the thermochromic group is compiled first, its
 child references cannot resolve the later SimpleGlazing family.
 `material_opaque_variants_001` adds
 nonblocking diagnostic EnergyPlus 26.1 grouped-EIO evidence for its exact
@@ -1617,6 +1670,20 @@ specialized glazing or construction reporting, incident-angle or hemispherical
 optics, window thermal behavior, Rust EIO serialization, runtime, or
 conformance.
 
+`WindowMaterial:Gap` model and compiler tests lock its twenty-first-object
+source order, exact trailing-underscore gas field, positive own thickness and
+pressure/default, case-insensitive Gas/GasMixture resolution, copied single or
+ordered-mixture state, and source-material ID as graph provenance only. They
+also lock lazy case-insensitive raw-helper resolution, validation then discard
+of deflection initial temperature/pressure, copying only deflected thickness
+and optional pillar spacing/radius, missing/ambiguous/wrong-family fail-closed
+behavior, identity reservation after every fallible step, the dedicated
+complex-fenestration family, universal ordinary-`Construction` rejection, typed
+coverage, and the all-definition arbitrary-run block. They do not claim a
+nominal resistance, helper-family typed inventory, relationship constraints
+absent from the source, `Construction:ComplexFenestrationState`, EIO or other
+reporting, window algorithms, runtime execution, or conformance.
+
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
 dynamic AirGap/IRT heat transfer or EcoRoof execution. It also does not claim exact EnergyPlus
@@ -1630,7 +1697,7 @@ the deferred families.
 |---|---|---|
 | `GetWindowGlassSpectralData` | `source_mapped` | owns the pre-material spectral dataset read |
 | `MaterialGlass::SetupSimpleWindowGlazingSystem` | `state_mapped` | its complete material-owned performance-index block model, optional-visible branch, reversed intermediate-U film-resistance interpolation, and materializing high-U resistance clamp are typed; construction, angular/hemispherical optics, reporting, runtime, and conformance remain outside the mapping |
-| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, RoofVegetation, Thermochromic glazing-group, and SimpleGlazingSystem objects plus only the regular Glazing `SpectralAverage` branch are implemented; RoofVegetation and SimpleGlazingSystem have bounded generic-definition CLI comparisons, while Thermochromic EIO remains unclaimed |
+| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, RoofVegetation, Thermochromic glazing-group, SimpleGlazingSystem, and complex-fenestration Gap objects plus only the regular Glazing `SpectralAverage` branch are implemented; RoofVegetation and SimpleGlazingSystem have bounded generic-definition CLI comparisons, while Thermochromic and complex-fenestration Gap EIO remain unclaimed |
 | `CalcScreenTransmittance` | `source_mapped` | the Screen fixture comparator reproduces only its normal-incidence A/Z paths and the values required by the bounded static EIO row |
 | `CalcWindowScreenProperties` | `source_mapped` | the Screen fixture comparator reproduces only its reverse-order 18 by 18 initialization integration and fixture activation boundary |
 | `ReportGlass` | `source_mapped` | owns the bounded Blind specialized header, raw seven-field row serialization, construction-occurrence order, and post-`CalcNominalWindowCond` skip behavior |
@@ -1664,7 +1731,7 @@ the partial regular-glazing state, and the complete RefractionExtinction,
 glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade,
 shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, and screen
 EquivalentLayer plus ordinary Blind, blind EquivalentLayer, RoofVegetation,
-Thermochromic glazing-group, and SimpleGlazingSystem states are represented
+Thermochromic glazing-group, SimpleGlazingSystem, and complex-fenestration Gap states are represented
 separately; their required fields, defaults,
 exclusive/inclusive bounds, regular-glazing energy sums, shared names, source
 order, formulas, 26.1 quirks, Autocalculate states, uppercase equivalent-gap
@@ -1680,7 +1747,8 @@ infrared defaults, RoofVegetation defaults/bounds/moisture clamp and dry-soil
 projections, Thermochromic ordered temperature/MaterialId references and
 minimum-one safety gate, SimpleGlazing optional-visible identity, complete
 block-model formulas, reversed intermediate-U interpolation, and high-U
-warning/clamp, and family boundaries are compiled; and the bounded
+warning/clamp, complex-gap copied gas/helper state and provenance-only source
+identity, and family boundaries are compiled; and the bounded
 AirGap/IRT construction invariants, equivalent-layer construction exclusion,
 ordinary Glass/Gas-or-GasMixture alternation, and safe exterior, interior, and
 between-glass Shade/Blind patterns plus the exterior-only Screen pattern and
@@ -1807,7 +1875,7 @@ execution, or conformance.
 
 CP58 remains incomplete until, at minimum:
 
-- the other 2 base definitions and the three deferred
+- the remaining base definition and the three deferred
   `WindowMaterial:Glazing` optical branches have schema-complete typed variants
 - all 12 overlays/datasets have typed attachment and validation models
 - source-order attachment, duplicate/reference diagnostics, generated
