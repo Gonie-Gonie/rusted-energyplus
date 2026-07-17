@@ -17,16 +17,18 @@ use ep_model::{
     MaterialHeatAndMoistureTransferSettings, MaterialHeatAndMoistureTransferSettingsId,
     MaterialHeatAndMoistureTransferSorptionIsotherm,
     MaterialHeatAndMoistureTransferSorptionIsothermId,
-    MaterialHeatAndMoistureTransferSorptionPoint, MaterialId,
-    MaterialMoisturePenetrationDepthSettings, MaterialMoisturePenetrationDepthSettingsId,
-    MaterialPhaseChange, MaterialPhaseChangeHysteresis, MaterialPhaseChangeHysteresisId,
-    MaterialPhaseChangeId, MaterialSurfaceRoughness, MaterialVariableAbsorptance,
-    MaterialVariableAbsorptanceId, MaterialVariableThermalConductivity,
-    MaterialVariableThermalConductivityId, MaterialVariableThermalConductivityPoint, NameMap,
-    NoMassMaterial, Node, NodeId, NodeList, NodeListId, NormalizedName, NumericType,
-    OpaqueSurfaceProperties, OtherEquipment, OtherEquipmentDesignLevelCalculationMethod,
-    OutdoorAirEconomizerType, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
-    PeopleNumberCalculationMethod, PhaseChangeHysteresisCurve, PhaseChangeHysteresisThermalState,
+    MaterialHeatAndMoistureTransferSorptionPoint, MaterialHeatAndMoistureTransferSuction,
+    MaterialHeatAndMoistureTransferSuctionId, MaterialHeatAndMoistureTransferSuctionPoint,
+    MaterialId, MaterialMoisturePenetrationDepthSettings,
+    MaterialMoisturePenetrationDepthSettingsId, MaterialPhaseChange, MaterialPhaseChangeHysteresis,
+    MaterialPhaseChangeHysteresisId, MaterialPhaseChangeId, MaterialSurfaceRoughness,
+    MaterialVariableAbsorptance, MaterialVariableAbsorptanceId,
+    MaterialVariableThermalConductivity, MaterialVariableThermalConductivityId,
+    MaterialVariableThermalConductivityPoint, NameMap, NoMassMaterial, Node, NodeId, NodeList,
+    NodeListId, NormalizedName, NumericType, OpaqueSurfaceProperties, OtherEquipment,
+    OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutsideBoundaryCondition,
+    OutsideSurfaceConvectionAlgorithm, People, PeopleNumberCalculationMethod,
+    PhaseChangeHysteresisCurve, PhaseChangeHysteresisThermalState,
     PhaseChangeTemperatureEnthalpyPoint, PlantBranch, PlantBranchComponent, PlantBranchList,
     PlantConnector, PlantConnectorKind, PlantConnectorList, PlantConnectorListEntry, PlantLoop,
     Point3, PumpConstantSpeed, RegularMaterial, RoofVegetationMaterial,
@@ -484,6 +486,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "MaterialProperty:MoisturePenetrationDepth:Settings",
     "MaterialProperty:HeatAndMoistureTransfer:Settings",
     "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm",
+    "MaterialProperty:HeatAndMoistureTransfer:Suction",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -601,6 +604,7 @@ impl<'a> Compiler<'a> {
         self.parse_material_moisture_penetration_depth_settings(&mut model);
         self.parse_material_heat_and_moisture_transfer_settings(&mut model);
         self.parse_material_heat_and_moisture_transfer_sorption_isotherms(&mut model);
+        self.parse_material_heat_and_moisture_transfer_suctions(&mut model);
         self.validate_scalar_schedule_type_limits(&model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
@@ -2834,6 +2838,202 @@ impl<'a> Compiler<'a> {
                     effective_points,
                     moisture_content_was_adjusted,
                 });
+        }
+    }
+
+    fn parse_material_heat_and_moisture_transfer_suctions(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "MaterialProperty:HeatAndMoistureTransfer:Suction";
+        const MAX_POINTS: usize = 25;
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let diagnostics_before_fields = self.diagnostics.len();
+            let material_name = self.required_string(OBJECT_TYPE, &name, &object, "material_name");
+            let number_of_suction_points = self
+                .required_number(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "number_of_suction_points",
+                )
+                .and_then(|value| {
+                    if value.fract() != 0.0 {
+                        self.error(
+                            "InvalidInteger",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some("number_of_suction_points"),
+                            format!(
+                                "{OBJECT_TYPE}/{name} field number_of_suction_points must be an integer, got {value}"
+                            ),
+                        );
+                        None
+                    } else if !(1.0..=MAX_POINTS as f64).contains(&value) {
+                        self.error(
+                            "InvalidNumericRange",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some("number_of_suction_points"),
+                            format!(
+                                "{OBJECT_TYPE}/{name} field number_of_suction_points must be between 1 and {MAX_POINTS}, got {value}"
+                            ),
+                        );
+                        None
+                    } else {
+                        Some(value as u8)
+                    }
+                });
+
+            let mut parsed_points = Vec::with_capacity(MAX_POINTS);
+            for point in 1..=MAX_POINTS {
+                let moisture_content_field = format!("moisture_content_{point}");
+                let liquid_transport_coefficient_field =
+                    format!("liquid_transport_coefficient_{point}");
+                let moisture_content_kg_per_m3 = if point == 1 {
+                    self.required_number_bounded(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        &moisture_content_field,
+                        (0.0, true),
+                        (f64::INFINITY, false),
+                    )
+                } else {
+                    self.optional_number_bounded(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        &moisture_content_field,
+                        (0.0, true),
+                        (f64::INFINITY, false),
+                    )
+                };
+                let liquid_transport_coefficient_m2_per_s = if point == 1 {
+                    self.required_number_bounded(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        &liquid_transport_coefficient_field,
+                        (0.0, true),
+                        (f64::INFINITY, false),
+                    )
+                } else {
+                    self.optional_number_bounded(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        &liquid_transport_coefficient_field,
+                        (0.0, true),
+                        (f64::INFINITY, false),
+                    )
+                };
+                parsed_points.push(MaterialHeatAndMoistureTransferSuctionPoint {
+                    moisture_content_kg_per_m3: moisture_content_kg_per_m3.unwrap_or(0.0),
+                    liquid_transport_coefficient_m2_per_s: liquid_transport_coefficient_m2_per_s
+                        .unwrap_or(0.0),
+                });
+            }
+            if self.diagnostics.len() != diagnostics_before_fields {
+                continue;
+            }
+            let (Some(material_name), Some(number_of_suction_points)) =
+                (material_name, number_of_suction_points)
+            else {
+                continue;
+            };
+
+            let Some(reference_material) = self.resolve_name(
+                &model.material_names,
+                OBJECT_TYPE,
+                &name,
+                "material_name",
+                &material_name,
+                "Material",
+            ) else {
+                continue;
+            };
+            let Some(sorption_isotherm) = model
+                .material_heat_and_moisture_transfer_sorption_isotherms
+                .iter()
+                .find(|isotherm| isotherm.reference_material == reference_material)
+            else {
+                self.error(
+                    "MissingHeatAndMoistureTransferSorptionIsotherm",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("material_name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} requires MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm for material {material_name}"
+                    ),
+                );
+                continue;
+            };
+            let reference_sorption_isotherm = sorption_isotherm.id;
+            let Some(sorption_high_water_content) = sorption_isotherm
+                .effective_points
+                .last()
+                .map(|point| point.moisture_content_kg_per_m3)
+            else {
+                self.error(
+                    "InvalidHeatAndMoistureTransferSuctionDependency",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("material_name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} resolved an empty source-effective sorption isotherm"
+                    ),
+                );
+                continue;
+            };
+            if model
+                .material_heat_and_moisture_transfer_suctions
+                .iter()
+                .any(|suction| suction.reference_material == reference_material)
+            {
+                self.error(
+                    "DuplicateHeatAndMoistureTransferSuctionMaterial",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("material_name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} repeats a material that already has suction data"
+                    ),
+                );
+                continue;
+            }
+
+            let input_points = parsed_points[..usize::from(number_of_suction_points)].to_vec();
+            let mut effective_points = input_points.clone();
+            let Some(last_input_point) = input_points.last() else {
+                self.error(
+                    "InvalidHeatAndMoistureTransferSuctionDerivedState",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    None,
+                    format!("{OBJECT_TYPE}/{name} has no active suction point"),
+                );
+                continue;
+            };
+            effective_points.push(MaterialHeatAndMoistureTransferSuctionPoint {
+                moisture_content_kg_per_m3: sorption_high_water_content,
+                liquid_transport_coefficient_m2_per_s: last_input_point
+                    .liquid_transport_coefficient_m2_per_s,
+            });
+
+            let id_value = model.material_heat_and_moisture_transfer_suctions.len();
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, id_value) else {
+                continue;
+            };
+            model.material_heat_and_moisture_transfer_suctions.push(
+                MaterialHeatAndMoistureTransferSuction {
+                    id: MaterialHeatAndMoistureTransferSuctionId(id_value),
+                    name: NormalizedName::new(&name),
+                    reference_material,
+                    reference_sorption_isotherm,
+                    number_of_suction_points,
+                    input_points,
+                    effective_points,
+                },
+            );
         }
     }
 
@@ -15626,6 +15826,7 @@ mod tests {
     mod material_property_glazing_spectral_data;
     mod material_property_heat_and_moisture_transfer_settings;
     mod material_property_heat_and_moisture_transfer_sorption_isotherm;
+    mod material_property_heat_and_moisture_transfer_suction;
     mod material_property_moisture_penetration_depth_settings;
     mod material_property_phase_change;
     mod material_property_phase_change_hysteresis;

@@ -8,9 +8,9 @@ use crate::{
     ExternalInterfaceSchedule, FanComponent, GlazingSpectralData, GlazingSpectralDataId,
     GlobalGeometryRules, IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId, LoopId,
     Material, MaterialHeatAndMoistureTransferSettings,
-    MaterialHeatAndMoistureTransferSorptionIsotherm, MaterialId,
-    MaterialMoisturePenetrationDepthSettings, MaterialPhaseChange, MaterialPhaseChangeHysteresis,
-    MaterialVariableAbsorptance, MaterialVariableAbsorptanceId,
+    MaterialHeatAndMoistureTransferSorptionIsotherm, MaterialHeatAndMoistureTransferSuction,
+    MaterialId, MaterialMoisturePenetrationDepthSettings, MaterialPhaseChange,
+    MaterialPhaseChangeHysteresis, MaterialVariableAbsorptance, MaterialVariableAbsorptanceId,
     MaterialVariableThermalConductivity, NameMap, Node, NodeId, NodeList, NodeListId,
     NormalizedName, OtherEquipment, People, PlantBranch, PlantBranchList, PlantConnector,
     PlantConnectorKind, PlantConnectorList, PlantLoop, PumpConstantSpeed, RunPeriod,
@@ -75,6 +75,8 @@ pub struct TypedModel {
     /// HAMT sorption-isotherm attachments keyed by referenced material names.
     pub material_heat_and_moisture_transfer_sorption_isotherms:
         Vec<MaterialHeatAndMoistureTransferSorptionIsotherm>,
+    /// HAMT suction attachments keyed by referenced material names.
+    pub material_heat_and_moisture_transfer_suctions: Vec<MaterialHeatAndMoistureTransferSuction>,
     /// Ordered thermochromic glazing states referenced by range descriptors on materials.
     pub window_glazing_thermochromic_state_arena: Vec<WindowGlazingThermochromicState>,
     /// Constructions.
@@ -247,6 +249,7 @@ impl Default for TypedModel {
             material_moisture_penetration_depth_settings: Vec::new(),
             material_heat_and_moisture_transfer_settings: Vec::new(),
             material_heat_and_moisture_transfer_sorption_isotherms: Vec::new(),
+            material_heat_and_moisture_transfer_suctions: Vec::new(),
             window_glazing_thermochromic_state_arena: Vec::new(),
             constructions: Vec::new(),
             construction_names: NameMap::default(),
@@ -362,6 +365,7 @@ impl TypedModel {
             + self
                 .material_heat_and_moisture_transfer_sorption_isotherms
                 .len()
+            + self.material_heat_and_moisture_transfer_suctions.len()
             + self.constructions.len()
             + self.schedule_type_limits.len()
             + self.day_schedules.len()

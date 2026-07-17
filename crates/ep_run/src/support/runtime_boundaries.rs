@@ -512,6 +512,15 @@ pub(super) fn assess_typed_runtime_boundaries(
             .material_heat_and_moisture_transfer_sorption_isotherms
             .len(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "MaterialProperty:HeatAndMoistureTransfer:Suction",
+        typed_model
+            .material_heat_and_moisture_transfer_suctions
+            .len(),
+    );
 
     push_typed_unsupported_object(
         registry,
