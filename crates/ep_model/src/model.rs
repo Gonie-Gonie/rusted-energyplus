@@ -10,8 +10,9 @@ use crate::{
     Material, MaterialHeatAndMoistureTransferDiffusion,
     MaterialHeatAndMoistureTransferRedistribution, MaterialHeatAndMoistureTransferSettings,
     MaterialHeatAndMoistureTransferSorptionIsotherm, MaterialHeatAndMoistureTransferSuction,
-    MaterialId, MaterialMoisturePenetrationDepthSettings, MaterialPhaseChange,
-    MaterialPhaseChangeHysteresis, MaterialVariableAbsorptance, MaterialVariableAbsorptanceId,
+    MaterialHeatAndMoistureTransferThermalConductivity, MaterialId,
+    MaterialMoisturePenetrationDepthSettings, MaterialPhaseChange, MaterialPhaseChangeHysteresis,
+    MaterialVariableAbsorptance, MaterialVariableAbsorptanceId,
     MaterialVariableThermalConductivity, NameMap, Node, NodeId, NodeList, NodeListId,
     NormalizedName, OtherEquipment, People, PlantBranch, PlantBranchList, PlantConnector,
     PlantConnectorKind, PlantConnectorList, PlantLoop, PumpConstantSpeed, RunPeriod,
@@ -84,6 +85,9 @@ pub struct TypedModel {
     /// HAMT water-vapor diffusion attachments keyed by referenced material names.
     pub material_heat_and_moisture_transfer_diffusions:
         Vec<MaterialHeatAndMoistureTransferDiffusion>,
+    /// HAMT thermal-conductivity attachments keyed by referenced material names.
+    pub material_heat_and_moisture_transfer_thermal_conductivities:
+        Vec<MaterialHeatAndMoistureTransferThermalConductivity>,
     /// Ordered thermochromic glazing states referenced by range descriptors on materials.
     pub window_glazing_thermochromic_state_arena: Vec<WindowGlazingThermochromicState>,
     /// Constructions.
@@ -259,6 +263,7 @@ impl Default for TypedModel {
             material_heat_and_moisture_transfer_suctions: Vec::new(),
             material_heat_and_moisture_transfer_redistributions: Vec::new(),
             material_heat_and_moisture_transfer_diffusions: Vec::new(),
+            material_heat_and_moisture_transfer_thermal_conductivities: Vec::new(),
             window_glazing_thermochromic_state_arena: Vec::new(),
             constructions: Vec::new(),
             construction_names: NameMap::default(),
@@ -379,6 +384,9 @@ impl TypedModel {
                 .material_heat_and_moisture_transfer_redistributions
                 .len()
             + self.material_heat_and_moisture_transfer_diffusions.len()
+            + self
+                .material_heat_and_moisture_transfer_thermal_conductivities
+                .len()
             + self.constructions.len()
             + self.schedule_type_limits.len()
             + self.day_schedules.len()

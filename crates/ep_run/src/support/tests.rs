@@ -9,6 +9,7 @@ mod material_heat_and_moisture_transfer_redistribution;
 mod material_heat_and_moisture_transfer_settings;
 mod material_heat_and_moisture_transfer_sorption_isotherm;
 mod material_heat_and_moisture_transfer_suction;
+mod material_heat_and_moisture_transfer_thermal_conductivity;
 mod material_moisture_penetration_depth_settings;
 mod material_phase_change;
 mod material_phase_change_hysteresis;

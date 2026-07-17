@@ -23,6 +23,7 @@ typed_id!(MaterialHeatAndMoistureTransferSorptionIsothermId);
 typed_id!(MaterialHeatAndMoistureTransferSuctionId);
 typed_id!(MaterialHeatAndMoistureTransferRedistributionId);
 typed_id!(MaterialHeatAndMoistureTransferDiffusionId);
+typed_id!(MaterialHeatAndMoistureTransferThermalConductivityId);
 typed_id!(InternalGainId);
 typed_id!(ScheduleTypeLimitId);
 typed_id!(DayScheduleId);
