@@ -1,0 +1,89 @@
+Version,
+  26.1;
+
+Timestep,
+  4;
+
+Building,
+  SIMPLE GLAZING SYSTEM STATIC EIO,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+Site:Location,
+  ORACLE SITE,
+  39.77,
+  -104.87,
+  -7.0,
+  1611.0;
+
+SizingPeriod:DesignDay,
+  ORACLE WINTER DAY,
+  1,
+  21,
+  WinterDesignDay,
+  -10.0,
+  0.0,
+  ,
+  ,
+  Wetbulb,
+  -10.0,
+  ,
+  ,
+  ,
+  ,
+  83411.0,
+  2.3,
+  180.0,
+  No,
+  No,
+  No,
+  ASHRAEClearSky,
+  ,
+  ,
+  ,
+  ,
+  1.0;
+
+SimulationControl,
+  No,
+  No,
+  No,
+  Yes,
+  No,
+  No,
+  1;
+
+Output:Variable,
+  *,
+  Site Outdoor Air Drybulb Temperature,
+  Hourly;
+
+Output:Constructions,Constructions,Materials;
+
+WindowMaterial:SimpleGlazingSystem,
+  Z MISSING VISIBLE,
+  2.7,
+  0.4,
+  ;
+
+WindowMaterial:SimpleGlazingSystem,
+  M CHANGED OPTICS,
+  2.7,
+  0.8,
+  0.2;
+
+WindowMaterial:SimpleGlazingSystem,
+  A CHANGED THERMAL,
+  5.0,
+  0.7,
+  0.4;

@@ -1303,16 +1303,40 @@ not_claimed_branches:
 - TransAndReflAtPhi incident-angle dependence, hemispherical averaging, normalized specialized glazing serialization, construction conductance/U-factor/SHGC reporting, window ratings, surfaces, daylighting, window heat transfer, runtime execution, Rust EIO serialization, broad diagnostics, and conformance
 <!-- routine-state-contract:v1 end setup_simple_window_glazing_system -->
 
-EnergyPlus can emit one generic `Material Details` definition row per stored
-SimpleGlazing material, including unused definitions. That row is recorded as
-an honest possible future static evidence boundary, but this checkpoint adds
-no EIO comparator, case, proof variable, or claim. The normalized specialized
-`WindowMaterial:Glazing` row requires deferred construction/report behavior
-and is outside the boundary. Specialized glazing and construction rows,
-construction conductance/U-factor/SHGC, incident-angle and hemispherical
-optics, window thermal behavior, ratings, surfaces, daylighting, output
-variables, Rust EIO serialization, runtime, broad diagnostic parity, and
-conformance remain unclaimed.
+#### Bounded generic `Material Details` diagnostic
+
+`window_material_simple_glazing_system_001` adds a nonblocking diagnostic for
+the generic EnergyPlus 26.1 `Material Details` report through
+`run_compare_window_material_simple_glazing_system`. The warning-free, no-zone
+fixture keeps all three SimpleGlazing definitions unused and locks the
+fixture-local source IDF sequence Z,M,A. Z uses U-factor 2.7 with no visible
+transmittance. M uses the same U-factor while changing SHGC and supplying an
+explicit visible transmittance; because the generic row exposes only the base
+thermal material projection, Z and M have identical numeric payloads. A uses
+U-factor 5 and produces a distinct resistance, thickness, and conductivity.
+
+Every payload has exactly 11 comma-separated tokens: `Material Details`,
+normalized material name, thermal resistance, roughness, thickness,
+conductivity, density, specific heat, thermal absorptance, solar absorptance,
+and visible absorptance. The rows are `VerySmooth`, density and specific heat
+are zero, thermal absorptance is 0.84, and solar and visible absorptance remain
+zero. Resistance, thickness, and all three absorptances use source `{:.4R}`;
+conductivity, density, and specific heat use source `{:.3R}`.
+
+The lane selecting both `Constructions` and `Materials` and the Materials-only
+lane each emit exactly one generic header followed by Z,M,A. The
+Constructions-only and blank/default lanes emit neither the generic header nor
+any generic rows. No lane contains a specialized `WindowMaterial:Glazing` or
+`WindowConstruction` header or data row because the fixture defines no window
+construction. This bounded selector and row-shape evidence does not promote
+`GetMaterialData` or `ReportGlass` wholesale.
+
+SHGC, explicit or defaulted visible transmittance, derived normal-incidence
+solar/visible transmittance and reflectance, construction use/reuse occurrence,
+specialized glazing and construction reporting, angular and hemispherical
+optics, construction ratings, window thermal behavior, surfaces, daylighting,
+output variables, Rust EIO serialization, runtime, broad diagnostic and
+declaration-order parity, and conformance remain unclaimed.
 
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. `Material:RoofVegetation` joins the opaque family with a dedicated
@@ -1587,9 +1611,11 @@ and high-U warning/clamp recovery. They also lock exclusive numeric bounds,
 required/type diagnostics, the shared material namespace and source order,
 the unavailable thermochromic-child relationship, typed coverage, universal
 ordinary-`Construction` rejection, and the all-definition arbitrary-run block.
-They do not promote specialized glazing or construction reporting,
-incident-angle or hemispherical optics, window thermal behavior, EIO, runtime,
-or conformance.
+The dedicated static case separately locks only the bounded generic
+`Material Details` evidence above. The tests and case do not promote
+specialized glazing or construction reporting, incident-angle or hemispherical
+optics, window thermal behavior, Rust EIO serialization, runtime, or
+conformance.
 
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
@@ -1604,7 +1630,7 @@ the deferred families.
 |---|---|---|
 | `GetWindowGlassSpectralData` | `source_mapped` | owns the pre-material spectral dataset read |
 | `MaterialGlass::SetupSimpleWindowGlazingSystem` | `state_mapped` | its complete material-owned performance-index block model, optional-visible branch, reversed intermediate-U film-resistance interpolation, and materializing high-U resistance clamp are typed; construction, angular/hemispherical optics, reporting, runtime, and conformance remain outside the mapping |
-| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, RoofVegetation, Thermochromic glazing-group, and SimpleGlazingSystem objects plus only the regular Glazing `SpectralAverage` branch are implemented; RoofVegetation alone currently has a bounded generic-definition CLI comparison, while Thermochromic and SimpleGlazing EIO remain unclaimed |
+| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, RoofVegetation, Thermochromic glazing-group, and SimpleGlazingSystem objects plus only the regular Glazing `SpectralAverage` branch are implemented; RoofVegetation and SimpleGlazingSystem have bounded generic-definition CLI comparisons, while Thermochromic EIO remains unclaimed |
 | `CalcScreenTransmittance` | `source_mapped` | the Screen fixture comparator reproduces only its normal-incidence A/Z paths and the values required by the bounded static EIO row |
 | `CalcWindowScreenProperties` | `source_mapped` | the Screen fixture comparator reproduces only its reverse-order 18 by 18 initialization integration and fixture activation boundary |
 | `ReportGlass` | `source_mapped` | owns the bounded Blind specialized header, raw seven-field row serialization, construction-occurrence order, and post-`CalcNominalWindowCond` skip behavior |
@@ -1758,11 +1784,20 @@ EIO checkpoint is claimed because the parent generic row depends on an
 upstream negative roughness index and the construction rows require the still
 deferred master/child generation algorithm.
 
-SimpleGlazingSystem evidence is also typed-only in this checkpoint. Its generic
-`Material Details` definition row is a viable future static diagnostic, but no
-fixture, parser/comparator promotion, proof variable, or EIO claim is added.
-Specialized normalized glazing rows depend on the deliberately blocked
-construction/report path and remain outside the boundary.
+`window_material_simple_glazing_system_001` adds a bounded generic-definition
+diagnostic for all-unused Z,M,A in fixture source IDF order. Both-selector and
+Materials-only runs each contain one exact header and three exact 11-token
+rows; Constructions-only and blank/default runs contain none. Z and M share
+U-factor 2.7 but differ in SHGC and visible input, so their identical generic
+numeric payloads lock the report's non-exposure of those optical inputs; A at
+U-factor 5 locks a distinct thermal payload. All rows are `VerySmooth`, use the
+source `{:.4R}`/`{:.3R}` descriptors, and retain zero density, specific heat,
+solar absorptance, and visible absorptance plus 0.84 thermal absorptance. The
+fixture has no specialized glazing or window-construction header/data. SHGC,
+visible and derived optics, use/reuse occurrences, `ReportGlass`, construction
+ratings, angular/hemispherical optics, runtime, Rust EIO serialization, broad
+diagnostic/declaration-order parity, and conformance remain outside the
+boundary; neither parent source routine is promoted wholesale.
 
 These tests and static EIO smokes remain bounded evidence, not an EnergyPlus
 material-family or window gate.

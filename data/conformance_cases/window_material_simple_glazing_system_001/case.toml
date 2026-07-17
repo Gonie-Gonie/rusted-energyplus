@@ -1,0 +1,57 @@
+id = "window_material_simple_glazing_system_001"
+title = "Simple glazing system generic material-definition EIO evidence"
+milestone = "v0.8-heat-balance"
+purpose = "Compare the bounded Rust WindowMaterial:SimpleGlazingSystem typed slice with EnergyPlus generic static Material Details definition rows."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The warning-free no-zone fixture defines exactly three unused WindowMaterial:SimpleGlazingSystem objects in IDF source order Z, M, A. It contains no Construction, Zone, BuildingSurface:Detailed, or FenestrationSurface:Detailed object.",
+  "Z supplies U-factor 2.7 W/m2-K and SHGC 0.4 with a genuinely blank optional visible transmittance. M keeps U-factor 2.7 while changing SHGC to 0.8 and explicitly setting visible transmittance to 0.2. A selects the higher-U block-model branch with U-factor 5.0, SHGC 0.7, and visible transmittance 0.4.",
+  "The generic Material Details table emits exactly one row per definition in fixture order Z, M, A and normalizes the names to uppercase. Z and M produce identical generic rows despite different SHGC and visible inputs, proving that this table exposes only the derived thermal block layer and shared base-material projections.",
+  "The exact generic row fields are normalized identity, block-layer thermal resistance, VerySmooth roughness, derived thickness, derived conductivity, zero density, zero specific heat, 0.84 thermal absorptance, and zero base solar and visible absorptances. The zero solar and visible values are not derived glazing optical absorptances.",
+  "The primary oracle run requests both Constructions and Materials. A Materials-only run retains the exact generic Z, M, A rows. Constructions-only and blank/default-selector runs emit no generic Material Details header or rows.",
+  "Because every SimpleGlazing definition is unused and no window Construction exists, all four lanes must omit WindowConstruction and WindowMaterial:Glazing headers and data rows. This is an explicit absence boundary, not construction or specialized-glazing evidence.",
+  "The design-day fixture requests one site output variable and supplies a nonzero ASHRAE clear-sky clearness so EnergyPlus 26.1 completes every lane with zero warnings and zero severe errors without an opaque host zone.",
+  "The smoke gate requires exact generic header and eleven-token row shape, exact Z/M/A values and ordering in both Materials-enabled lanes, selector activation, converted epJSON artifacts, and the bounded Rust command `compare window-material-simple-glazing-system` in explicit exact mode for all four lanes.",
+  "SHGC and visible optical values, solar or visible reflectance and transmittance, angular or diffuse optics, emissivity faces, dirt factor, solar-diffusing behavior, high-U clamp warnings, subnormal-U fatal diagnostics, specialized glazing rows, construction ratings, window heat transfer, surface behavior, runtime, and broad declaration-order behavior remain outside this evidence.",
+  "This is non-blocking diagnostic-only static input evidence. It makes no WindowMaterial:SimpleGlazingSystem conformance, construction, zone, surface, fenestration, runtime, Rust EIO serialization, or diagnostic-text claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/window_material_simple_glazing_system_001/window_material_simple_glazing_system.idf"
+tier = "A"
+
+[scope]
+domains = ["construction"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/window_material_simple_glazing_system_001/window_material_simple_glazing_system.idf"
+epjson = ".runtime/compare-window-material-simple-glazing-system/26.1.0/window-material-simple-glazing-system.epJSON"
+
+[[outputs]]
+key = "*"
+variable = "WindowMaterial:SimpleGlazingSystem Generic Definition Details"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/window_material_simple_glazing_system_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-window-material-simple-glazing-system-smoke"
+blocking = false

@@ -19,6 +19,7 @@ mod window_material_screen;
 mod window_material_screen_equivalent_layer;
 mod window_material_shade;
 mod window_material_shade_equivalent_layer;
+mod window_material_simple_glazing_system;
 
 use conformance_artifacts::{
     BaselineSummary, ReportTimingSummary, append_timing_to_json_object, elapsed_seconds_since,
@@ -136,6 +137,7 @@ use window_material_screen::run_compare_window_material_screen;
 use window_material_screen_equivalent_layer::run_compare_window_material_screen_equivalent_layer;
 use window_material_shade::run_compare_window_material_shade;
 use window_material_shade_equivalent_layer::run_compare_window_material_shade_equivalent_layer;
+use window_material_simple_glazing_system::run_compare_window_material_simple_glazing_system;
 
 const HEAT_BALANCE_BOTTLENECK_LIMIT: usize = 8;
 const HEAT_BALANCE_TOP_RMSE_LIMIT: usize = 10;
@@ -377,6 +379,9 @@ fn print_help() {
     );
     println!(
         "  compare material-roof-vegetation <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
+    );
+    println!(
+        "  compare window-material-simple-glazing-system <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
     );
     println!("  compare internal-gains <input.epJSON> <eplusout.eio>");
     println!("  compare internal-convective-gain <input.epJSON> <eplusout.eso>");
@@ -3419,6 +3424,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             run_compare_window_material_blind_equivalent_layer(&args[1..])
         }
         Some("material-roof-vegetation") => run_compare_material_roof_vegetation(&args[1..]),
+        Some("window-material-simple-glazing-system") => {
+            run_compare_window_material_simple_glazing_system(&args[1..])
+        }
         Some("internal-gains") => run_compare_internal_gains(&args[1..]),
         Some("internal-convective-gain") => run_compare_internal_convective_gain(&args[1..]),
         Some("weather-fields") | Some("weather-drybulb") => run_compare_weather_fields(&args[1..]),
@@ -3470,6 +3478,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             );
             eprintln!(
                 "usage: eplus-rs compare material-roof-vegetation <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
+            );
+            eprintln!(
+                "usage: eplus-rs compare window-material-simple-glazing-system <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
             );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(
@@ -3527,6 +3538,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             );
             eprintln!(
                 "usage: eplus-rs compare material-roof-vegetation <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
+            );
+            eprintln!(
+                "usage: eplus-rs compare window-material-simple-glazing-system <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
             );
             eprintln!("usage: eplus-rs compare internal-gains <input.epJSON> <eplusout.eio>");
             eprintln!(

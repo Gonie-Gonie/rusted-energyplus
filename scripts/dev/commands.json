@@ -557,6 +557,12 @@
                          "help":  "Compare equivalent-layer window-glazing inputs with EnergyPlus EIO evidence."
                      },
                      {
+                         "name":  "compare-window-material-simple-glazing-system-smoke",
+                         "path":  "compare\\compare-window-material-simple-glazing-system-smoke.ps1",
+                         "group":  "compare",
+                         "help":  "Compare simple-glazing-system generic definitions and four reporting-selector lanes with exact EnergyPlus EIO evidence."
+                     },
+                     {
                          "name":  "compare-window-material-gas-smoke",
                          "path":  "compare\\compare-window-material-gas-smoke.ps1",
                          "group":  "compare",
