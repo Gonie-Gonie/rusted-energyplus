@@ -32,10 +32,11 @@ use ep_model::{
     WindowBlindDirectionalOpticalProperties, WindowBlindEquivalentLayerMaterial,
     WindowBlindEquivalentLayerSlatAngleControl, WindowBlindMaterial, WindowBlindSlatAngleType,
     WindowBlindSlatOrientation, WindowComplexGapGasComposition, WindowComplexGapMaterial,
-    WindowComplexGapSupportPillar, WindowDrapeEquivalentLayerMaterial,
-    WindowGapEquivalentLayerMaterial, WindowGapVentType, WindowGasMaterial, WindowGasMixture,
-    WindowGasMixtureComponent, WindowGasMixtureMaterial, WindowGasPolynomialCoefficients,
-    WindowGasProperties, WindowGasType, WindowGlazingEquivalentLayerDiffuseProperties,
+    WindowComplexGapSupportPillar, WindowComplexShadeLayerType, WindowComplexShadeMaterial,
+    WindowDrapeEquivalentLayerMaterial, WindowGapEquivalentLayerMaterial, WindowGapVentType,
+    WindowGasMaterial, WindowGasMixture, WindowGasMixtureComponent, WindowGasMixtureMaterial,
+    WindowGasPolynomialCoefficients, WindowGasProperties, WindowGasType,
+    WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
     WindowGlazingSpectralAverageMaterial, WindowGlazingThermochromicGroupMaterial,
@@ -95,6 +96,7 @@ fn window_construction_layer_kind(
         | MaterialDefinition::WindowGlazingThermochromicGroup(_)
         | MaterialDefinition::WindowSimpleGlazing(_)
         | MaterialDefinition::WindowComplexGap(_)
+        | MaterialDefinition::WindowComplexShade(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowGapEquivalentLayer(_)
         | MaterialDefinition::WindowShadeEquivalentLayer(_)
@@ -116,6 +118,7 @@ fn window_glazing_is_solar_diffusing(definition: &MaterialDefinition) -> bool {
         | MaterialDefinition::WindowGlazingThermochromicGroup(_)
         | MaterialDefinition::WindowSimpleGlazing(_)
         | MaterialDefinition::WindowComplexGap(_)
+        | MaterialDefinition::WindowComplexShade(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
         | MaterialDefinition::WindowGas(_)
         | MaterialDefinition::WindowGasMixture(_)
@@ -159,6 +162,7 @@ fn window_gap_signature(definition: &MaterialDefinition) -> Option<WindowGapSign
         | MaterialDefinition::WindowGlazingThermochromicGroup(_)
         | MaterialDefinition::WindowSimpleGlazing(_)
         | MaterialDefinition::WindowComplexGap(_)
+        | MaterialDefinition::WindowComplexShade(_)
         | MaterialDefinition::WindowGlazingSpectralAverage(_)
         | MaterialDefinition::WindowGlazingRefractionExtinction(_)
         | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -412,6 +416,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "WindowMaterial:GlazingGroup:Thermochromic",
     "WindowMaterial:SimpleGlazingSystem",
     "WindowMaterial:Gap",
+    "WindowMaterial:ComplexShade",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -996,6 +1001,7 @@ impl<'a> Compiler<'a> {
         self.parse_window_glazing_thermochromic_group_materials(model);
         self.parse_window_simple_glazing_system_materials(model);
         self.parse_window_complex_gap_materials(model);
+        self.parse_window_complex_shade_materials(model);
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -5073,6 +5079,228 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_window_complex_shade_materials(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowMaterial:ComplexShade";
+        const SLAT_WIDTH_FIELD: &str = "slat_width";
+        const SLAT_CURVE_FIELD: &str = "slat_curve";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let diagnostics_before_fields = self.diagnostics.len();
+            let layer_type = self.enum_default(
+                OBJECT_TYPE,
+                &name,
+                (&object, "layer_type"),
+                WindowComplexShadeLayerType::OtherShadingType,
+                "OtherShadingType",
+                WindowComplexShadeLayerType::from_energyplus_name,
+            );
+            let thickness_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "thickness",
+                0.002,
+                (0.0, false),
+                (f64::INFINITY, false),
+            );
+            let conductivity_w_per_m_k = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "conductivity",
+                1.0,
+                (0.0, false),
+                (f64::INFINITY, false),
+            );
+            let infrared_transmittance = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "ir_transmittance",
+                0.0,
+                (0.0, true),
+                (1.0, true),
+            );
+            let front_infrared_emissivity = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "front_emissivity",
+                0.84,
+                (0.0, false),
+                (1.0, true),
+            );
+            let back_infrared_emissivity = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "back_emissivity",
+                0.84,
+                (0.0, false),
+                (1.0, true),
+            );
+            let top_opening_multiplier = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "top_opening_multiplier",
+                0.0,
+                (0.0, true),
+                (1.0, true),
+            );
+            let bottom_opening_multiplier = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "bottom_opening_multiplier",
+                0.0,
+                (0.0, true),
+                (1.0, true),
+            );
+            let left_side_opening_multiplier = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "left_side_opening_multiplier",
+                0.0,
+                (0.0, true),
+                (1.0, true),
+            );
+            let right_side_opening_multiplier = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "right_side_opening_multiplier",
+                0.0,
+                (0.0, true),
+                (1.0, true),
+            );
+            let front_opening_multiplier = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "front_opening_multiplier",
+                0.05,
+                (0.0, true),
+                (1.0, true),
+            );
+            let slat_width_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                SLAT_WIDTH_FIELD,
+                0.016,
+                (0.0, false),
+                (f64::INFINITY, false),
+            );
+            let slat_spacing_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "slat_spacing",
+                0.012,
+                (0.0, false),
+                (f64::INFINITY, false),
+            );
+            let slat_thickness_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "slat_thickness",
+                0.0006,
+                (0.0, false),
+                (f64::INFINITY, false),
+            );
+            let slat_angle_deg = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "slat_angle",
+                90.0,
+                (-90.0, true),
+                (90.0, true),
+            );
+            let slat_conductivity_w_per_m_k = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "slat_conductivity",
+                160.0,
+                (0.0, false),
+                (f64::INFINITY, false),
+            );
+            let slat_curvature_radius_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                SLAT_CURVE_FIELD,
+                0.0,
+                (0.0, true),
+                (f64::INFINITY, false),
+            );
+
+            // Do not let an invalid first definition consume the shared
+            // material identity needed by a later case-insensitive name.
+            if self.diagnostics.len() != diagnostics_before_fields {
+                continue;
+            }
+            if layer_type.is_venetian()
+                && slat_curvature_radius_m > 0.0
+                && slat_curvature_radius_m < slat_width_m / 2.0
+            {
+                self.error(
+                    "InvalidWindowComplexShadeSlatCurve",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some(SLAT_CURVE_FIELD),
+                    format!(
+                        "{OBJECT_TYPE}/{name} field {SLAT_CURVE_FIELD} must be zero or at least half {SLAT_WIDTH_FIELD} for a Venetian layer; got radius {slat_curvature_radius_m} m and width {slat_width_m} m"
+                    ),
+                );
+                continue;
+            }
+
+            let Some((id, normalized_name)) =
+                self.reserve_material_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            model.materials.push(Material {
+                id,
+                name: normalized_name,
+                definition: MaterialDefinition::WindowComplexShade(WindowComplexShadeMaterial {
+                    roughness: MaterialSurfaceRoughness::Rough,
+                    layer_type,
+                    thickness_m,
+                    conductivity_w_per_m_k,
+                    infrared_transmittance,
+                    front_infrared_emissivity,
+                    back_infrared_emissivity,
+                    thermal_absorptance: back_infrared_emissivity,
+                    front_thermal_absorptance: front_infrared_emissivity,
+                    back_thermal_absorptance: back_infrared_emissivity,
+                    top_opening_multiplier,
+                    bottom_opening_multiplier,
+                    left_side_opening_multiplier,
+                    right_side_opening_multiplier,
+                    front_opening_multiplier,
+                    slat_width_m,
+                    slat_spacing_m,
+                    slat_thickness_m,
+                    slat_angle_deg,
+                    slat_conductivity_w_per_m_k,
+                    slat_curvature_radius_m,
+                    density_kg_per_m3: 0.0,
+                    specific_heat_j_per_kg_k: 0.0,
+                    base_thermal_resistance_m2_k_per_w: 0.0,
+                    base_nominal_thermal_resistance_m2_k_per_w: 0.0,
+                    solar_absorptance: 0.0,
+                    visible_absorptance: 0.0,
+                }),
+            });
+        }
+    }
+
     fn window_complex_gap_gas(
         &mut self,
         model: &TypedModel,
@@ -5409,7 +5637,7 @@ impl<'a> Compiler<'a> {
                 Some(construction_name),
                 Some(&layer_field),
                 format!(
-                    "Construction/{construction_name} cannot consume complex-fenestration gap {}; WindowMaterial:Gap is reserved for future Construction:ComplexFenestrationState support and is not an ordinary window gas gap",
+                    "Construction/{construction_name} cannot consume complex-fenestration material {}; WindowMaterial:Gap and WindowMaterial:ComplexShade are reserved for future Construction:ComplexFenestrationState support and are not ordinary Construction layers",
                     material.name.0
                 ),
             );
@@ -13530,6 +13758,7 @@ mod tests {
     mod schedule_year;
     mod window_material_blind;
     mod window_material_blind_equivalent_layer;
+    mod window_material_complex_shade;
     mod window_material_drape_equivalent_layer;
     mod window_material_gap;
     mod window_material_gap_equivalent_layer;
