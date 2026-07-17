@@ -6,6 +6,7 @@ use ep_raw_model::parse_epjson_str;
 mod construction_air_boundary;
 mod construction_complex_fenestration_state;
 mod construction_ground_factor;
+mod construction_property_internal_heat_source;
 mod glazing_spectral_data;
 mod material_heat_and_moisture_transfer_diffusion;
 mod material_heat_and_moisture_transfer_redistribution;

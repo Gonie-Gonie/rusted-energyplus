@@ -616,6 +616,17 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|construction| construction.is_complex_fenestration())
             .count(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "ConstructionProperty:InternalHeatSource",
+        typed_model
+            .constructions
+            .iter()
+            .filter(|construction| construction.has_internal_heat_source())
+            .count(),
+    );
 
     push_typed_unsupported_object(
         registry,

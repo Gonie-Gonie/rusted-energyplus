@@ -60,6 +60,7 @@
             ground_factor: None,
             air_boundary: None,
             complex_fenestration: None,
+            internal_heat_source: None,
         });
         model.schedules.push(ScheduleConstant {
             id: ScheduleId(0),
@@ -131,6 +132,7 @@
             ground_factor: None,
             air_boundary: None,
             complex_fenestration: None,
+            internal_heat_source: None,
         });
         model.zones.push(Zone {
             id: ZoneId(0),

@@ -169,6 +169,34 @@ pub struct ConstructionComplexFenestrationState {
     pub optical_layers: Vec<ComplexFenestrationOpticalLayer>,
 }
 
+/// CTF dimensionality selected by `ConstructionProperty:InternalHeatSource`.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ConstructionInternalHeatSourceDimensions {
+    /// One-dimensional conduction transfer-function calculation.
+    OneDimensional,
+    /// Two-dimensional conduction transfer-function calculation.
+    TwoDimensional,
+}
+
+/// Source-projected metadata attached by `ConstructionProperty:InternalHeatSource`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ConstructionInternalHeatSource {
+    /// Normalized nonsemantic source-object name retained for diagnostics.
+    pub name: NormalizedName,
+    /// Source location as the source-effective one-based layer count before the source.
+    pub source_after_layer: u32,
+    /// Requested temperature location as a one-based layer count.
+    pub temperature_after_layer: u32,
+    /// Requested one- or two-dimensional CTF calculation.
+    pub ctf_dimensions: ConstructionInternalHeatSourceDimensions,
+    /// Original full spacing between adjacent tubes or resistance wires in meters.
+    pub tube_spacing_m: f64,
+    /// Half-spacing retained by the EnergyPlus construction state in meters.
+    pub half_tube_spacing_m: f64,
+    /// Perpendicular temperature position in the inclusive range `[0, 1]`.
+    pub temperature_location_perpendicular: f64,
+}
+
 /// Schedule source used by a simple-mixing air boundary.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum AirBoundaryMixingSchedule {
@@ -271,6 +299,8 @@ pub struct Construction {
     pub air_boundary: Option<ConstructionAirBoundary>,
     /// BSDF source state when this is a complex-fenestration construction.
     pub complex_fenestration: Option<ConstructionComplexFenestrationState>,
+    /// Internal heat-source declaration attached to this construction, when present.
+    pub internal_heat_source: Option<ConstructionInternalHeatSource>,
 }
 
 impl Construction {
@@ -291,6 +321,12 @@ impl Construction {
     #[must_use]
     pub const fn is_complex_fenestration(&self) -> bool {
         matches!(self.kind, ConstructionKind::ComplexFenestration)
+    }
+
+    /// Returns whether an internal heat-source declaration targets this construction.
+    #[must_use]
+    pub const fn has_internal_heat_source(&self) -> bool {
+        self.internal_heat_source.is_some()
     }
 
     /// Returns the effective layer stack, retaining the legacy outside-only fallback.

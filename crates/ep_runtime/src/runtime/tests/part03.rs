@@ -241,6 +241,7 @@
             ground_factor: None,
             air_boundary: None,
             complex_fenestration: None,
+            internal_heat_source: None,
         });
         let model = SimulationModel::from_typed(typed);
 
@@ -288,6 +289,7 @@
                 ground_factor: None,
                 air_boundary: None,
                 complex_fenestration: None,
+                internal_heat_source: None,
             },
         );
 
@@ -474,6 +476,7 @@
             ground_factor: None,
             air_boundary: None,
             complex_fenestration: None,
+            internal_heat_source: None,
         });
         typed.surfaces[0].construction = ConstructionId(1);
         typed.other_equipment[0].fraction_radiant = 0.25;

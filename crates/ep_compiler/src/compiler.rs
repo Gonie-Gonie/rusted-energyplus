@@ -1,6 +1,7 @@
 //! Model compiler stage contracts.
 
 mod complex_fenestration;
+mod construction_internal_heat_source;
 
 use ep_model::{
     AirBoundaryAirExchange, AirBoundaryMixingSchedule, AirGapMaterial, AirLoopHvac, AutoOrNumber,
@@ -86,6 +87,7 @@ const FFACTOR_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:FfactorGroundFloor"
 const CFACTOR_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:CfactorUndergroundWall";
 const AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:AirBoundary";
 const COMPLEX_FENESTRATION_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:ComplexFenestrationState";
+const INTERNAL_HEAT_SOURCE_OBJECT_TYPE: &str = "ConstructionProperty:InternalHeatSource";
 const FC_FACTOR_CONCRETE_NAME: &str = "~FC_Concrete";
 const FC_FACTOR_INSULATION_NAME_PREFIX: &str = "~FC_Insulation_";
 const FC_FACTOR_CONCRETE_THERMAL_RESISTANCE_M2_K_PER_W: f64 = 0.15 / 1.95;
@@ -514,6 +516,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     CFACTOR_CONSTRUCTION_OBJECT_TYPE,
     AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
     COMPLEX_FENESTRATION_CONSTRUCTION_OBJECT_TYPE,
+    INTERNAL_HEAT_SOURCE_OBJECT_TYPE,
     "ScheduleTypeLimits",
     "Schedule:Constant",
     "Schedule:Compact",
@@ -650,6 +653,7 @@ impl<'a> Compiler<'a> {
         self.parse_external_interface_fmu_export_schedules(&mut model);
         self.parse_air_boundary_constructions(&mut model);
         self.parse_complex_fenestration_states(&mut model);
+        self.parse_construction_internal_heat_sources(&mut model);
         self.parse_material_variable_absorptances(&mut model);
         self.parse_material_phase_change_hystereses(&mut model);
         self.parse_material_phase_changes(&mut model);
@@ -8762,6 +8766,7 @@ impl<'a> Compiler<'a> {
                 ground_factor: None,
                 air_boundary: None,
                 complex_fenestration: None,
+                internal_heat_source: None,
             });
         }
 
@@ -8849,6 +8854,7 @@ impl<'a> Compiler<'a> {
                 }),
                 air_boundary: None,
                 complex_fenestration: None,
+                internal_heat_source: None,
             });
         }
     }
@@ -8930,6 +8936,7 @@ impl<'a> Compiler<'a> {
                 }),
                 air_boundary: None,
                 complex_fenestration: None,
+                internal_heat_source: None,
             });
         }
     }
@@ -9102,6 +9109,7 @@ impl<'a> Compiler<'a> {
                 ground_factor: None,
                 air_boundary: Some(ConstructionAirBoundary { air_exchange }),
                 complex_fenestration: None,
+                internal_heat_source: None,
             });
         }
     }
@@ -17557,6 +17565,7 @@ mod tests {
     mod construction_air_boundary;
     mod construction_complex_fenestration_state;
     mod construction_ground_factor;
+    mod construction_property_internal_heat_source;
     mod global_geometry_rules;
     mod material_property_glazing_spectral_data;
     mod material_property_heat_and_moisture_transfer_diffusion;

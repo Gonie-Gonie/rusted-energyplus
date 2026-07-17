@@ -2622,6 +2622,15 @@ families remain raw-only;
 all complex-state definitions and all complex-fenestration material definitions
 remain all-definition run blockers, and window execution is not enabled.
 
+CP90 likewise adds no `Material` variant, public material-object inventory
+entry, material ID, or material attachment namespace. Its bounded
+`ConstructionProperty:InternalHeatSource` pass attaches construction-local
+immutable declaration metadata only to an already materialized ordinary opaque
+construction and neither adds nor reorders any construction/material graph
+edge. Material consumers, resistance-layer source remapping, CTF/QTF state,
+source/sink runtime, reporting, and conformance remain blocked and are mapped
+in the heat-balance source map.
+
 The compiler preserves EnergyPlus family order by compiling all `Material`
 objects, then all `Material:NoMass`, `Material:AirGap`, and
 `Material:InfraredTransparent` objects, followed by

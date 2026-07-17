@@ -632,6 +632,7 @@ impl Compiler<'_> {
                 visible_back_reflectance,
                 optical_layers,
             }),
+            internal_heat_source: None,
         });
     }
 

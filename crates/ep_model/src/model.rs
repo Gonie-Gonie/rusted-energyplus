@@ -398,6 +398,11 @@ impl TypedModel {
                 .material_heat_and_moisture_transfer_thermal_conductivities
                 .len()
             + self.constructions.len()
+            + self
+                .constructions
+                .iter()
+                .filter(|construction| construction.has_internal_heat_source())
+                .count()
             + self.schedule_type_limits.len()
             + self.day_schedules.len()
             + self.day_interval_schedules.len()
@@ -1919,6 +1924,7 @@ mod tests {
             ground_factor: None,
             air_boundary: None,
             complex_fenestration: None,
+            internal_heat_source: None,
         });
         model.surfaces.push(Surface {
             id: SurfaceId(0),
