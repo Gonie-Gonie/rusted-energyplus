@@ -53,22 +53,23 @@ use ep_model::{
     WindowBlindEquivalentLayerSlatAngleControl, WindowBlindMaterial, WindowBlindSlatAngleType,
     WindowBlindSlatOrientation, WindowComplexGapGasComposition, WindowComplexGapMaterial,
     WindowComplexGapSupportPillar, WindowComplexShadeLayerType, WindowComplexShadeMaterial,
-    WindowDrapeEquivalentLayerMaterial, WindowGapEquivalentLayerMaterial, WindowGapVentType,
-    WindowGasMaterial, WindowGasMixture, WindowGasMixtureComponent, WindowGasMixtureMaterial,
-    WindowGasPolynomialCoefficients, WindowGasProperties, WindowGasType,
-    WindowGlazingEquivalentLayerDiffuseProperties,
+    WindowDividerProperties, WindowDividerType, WindowDrapeEquivalentLayerMaterial,
+    WindowFrameAndDivider, WindowFrameAndDividerId, WindowFrameProperties,
+    WindowGapEquivalentLayerMaterial, WindowGapVentType, WindowGasMaterial, WindowGasMixture,
+    WindowGasMixtureComponent, WindowGasMixtureMaterial, WindowGasPolynomialCoefficients,
+    WindowGasProperties, WindowGasType, WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
     WindowGlazingSpectralAverageMaterial, WindowGlazingThermochromicGroupMaterial,
-    WindowGlazingThermochromicState, WindowScreenBeamReflectanceModel,
-    WindowScreenEquivalentLayerMaterial, WindowScreenEquivalentLayerSolarProperties,
-    WindowScreenEquivalentLayerVisibleProperties, WindowScreenMaterial,
-    WindowScreenTransmittanceMapResolution, WindowShadeEquivalentLayerMaterial,
-    WindowShadeEquivalentLayerSideOpticalProperties, WindowShadeMaterial,
-    WindowSimpleGlazingMaterial, WindowStandardGasType, Zone, ZoneEquipmentConnection,
-    ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId,
-    ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat,
-    ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
+    WindowGlazingThermochromicState, WindowNfrcProductType, WindowRevealProperties,
+    WindowScreenBeamReflectanceModel, WindowScreenEquivalentLayerMaterial,
+    WindowScreenEquivalentLayerSolarProperties, WindowScreenEquivalentLayerVisibleProperties,
+    WindowScreenMaterial, WindowScreenTransmittanceMapResolution,
+    WindowShadeEquivalentLayerMaterial, WindowShadeEquivalentLayerSideOpticalProperties,
+    WindowShadeMaterial, WindowSimpleGlazingMaterial, WindowStandardGasType, Zone,
+    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
+    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 use std::collections::BTreeMap;
@@ -496,6 +497,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "MaterialProperty:HeatAndMoistureTransfer:Redistribution",
     "MaterialProperty:HeatAndMoistureTransfer:Diffusion",
     "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity",
+    "WindowProperty:FrameAndDivider",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -592,6 +594,7 @@ impl<'a> Compiler<'a> {
         self.parse_site_location(&mut model);
         self.parse_glazing_spectral_data(&mut model);
         self.parse_materials(&mut model);
+        self.parse_window_frame_and_dividers(&mut model);
         self.parse_constructions(&mut model);
         self.parse_file_shading_schedule(&mut model);
         self.parse_schedule_type_limits(&mut model);
@@ -1378,6 +1381,344 @@ impl<'a> Compiler<'a> {
         self.parse_window_simple_glazing_system_materials(model);
         self.parse_window_complex_gap_materials(model);
         self.parse_window_complex_shade_materials(model);
+    }
+
+    fn parse_window_frame_and_dividers(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "WindowProperty:FrameAndDivider";
+        const SOURCE_EDGE_WIDTH_M: f64 = 0.06355;
+        const SOURCE_INT_UPPER_EXCLUSIVE: f64 = 2_147_483_648.0;
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let diagnostics_before_fields = self.diagnostics.len();
+            if name.trim().is_empty() {
+                self.error(
+                    "MissingRequiredField",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE} requires a nonblank object name"),
+                );
+            }
+
+            let frame_width_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "frame_width",
+                0.0,
+                (0.0, true),
+                (1.0, true),
+            );
+            let mut frame_outside_projection_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "frame_outside_projection",
+                0.0,
+                (0.0, true),
+                (0.5, true),
+            );
+            let mut frame_inside_projection_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "frame_inside_projection",
+                0.0,
+                (0.0, true),
+                (0.5, true),
+            );
+            let frame_conductance_w_per_m2_k = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "frame_conductance",
+                0.0,
+                (0.0, true),
+                (f64::INFINITY, false),
+            );
+            let frame_edge_to_center_glass_conductance_ratio = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "ratio_of_frame_edge_glass_conductance_to_center_of_glass_conductance",
+                1.0,
+                (0.0, false),
+                (4.0, true),
+            );
+            let frame_solar_absorptance = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "frame_solar_absorptance",
+                0.7,
+                (0.0, true),
+                (1.0, true),
+            );
+            let frame_visible_absorptance = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "frame_visible_absorptance",
+                0.7,
+                (0.0, true),
+                (1.0, true),
+            );
+            let frame_thermal_hemispherical_emissivity = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "frame_thermal_hemispherical_emissivity",
+                0.9,
+                (0.0, false),
+                (f64::INFINITY, false),
+            );
+            let divider_type = self.enum_default(
+                OBJECT_TYPE,
+                &name,
+                (&object, "divider_type"),
+                WindowDividerType::DividedLite,
+                "DividedLite",
+                WindowDividerType::from_energyplus_name,
+            );
+            let mut divider_width_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "divider_width",
+                0.0,
+                (0.0, true),
+                (0.5, true),
+            );
+            let horizontal_count_input = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "number_of_horizontal_dividers",
+                0.0,
+                (0.0, true),
+                (SOURCE_INT_UPPER_EXCLUSIVE, false),
+            );
+            let vertical_count_input = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "number_of_vertical_dividers",
+                0.0,
+                (0.0, true),
+                (SOURCE_INT_UPPER_EXCLUSIVE, false),
+            );
+            let mut divider_outside_projection_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "divider_outside_projection",
+                0.0,
+                (0.0, true),
+                (0.5, true),
+            );
+            let mut divider_inside_projection_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "divider_inside_projection",
+                0.0,
+                (0.0, true),
+                (0.5, true),
+            );
+            let divider_conductance_w_per_m2_k = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "divider_conductance",
+                0.0,
+                (0.0, true),
+                (f64::INFINITY, false),
+            );
+            let divider_edge_to_center_glass_conductance_ratio = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "ratio_of_divider_edge_glass_conductance_to_center_of_glass_conductance",
+                1.0,
+                (0.0, false),
+                (4.0, true),
+            );
+            let divider_solar_absorptance = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "divider_solar_absorptance",
+                0.0,
+                (0.0, true),
+                (1.0, true),
+            );
+            let divider_visible_absorptance = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "divider_visible_absorptance",
+                0.0,
+                (0.0, true),
+                (1.0, true),
+            );
+            let divider_thermal_hemispherical_emissivity = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "divider_thermal_hemispherical_emissivity",
+                0.9,
+                (0.0, false),
+                (1.0, false),
+            );
+            let outside_reveal_solar_absorptance = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "outside_reveal_solar_absorptance",
+                0.0,
+                (0.0, true),
+                (1.0, true),
+            );
+            let mut inside_sill_depth_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "inside_sill_depth",
+                0.0,
+                (0.0, true),
+                (2.0, true),
+            );
+            let inside_sill_solar_absorptance = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "inside_sill_solar_absorptance",
+                0.0,
+                (0.0, true),
+                (1.0, true),
+            );
+            let inside_reveal_depth_m = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "inside_reveal_depth",
+                0.0,
+                (0.0, true),
+                (2.0, true),
+            );
+            let inside_reveal_solar_absorptance = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "inside_reveal_solar_absorptance",
+                0.0,
+                (0.0, true),
+                (1.0, true),
+            );
+            let nfrc_product_type = self.enum_default(
+                OBJECT_TYPE,
+                &name,
+                (&object, "nfrc_product_type_for_assembly_calculations"),
+                WindowNfrcProductType::CurtainWall,
+                "CurtainWall",
+                WindowNfrcProductType::from_energyplus_name,
+            );
+
+            if self.diagnostics.len() != diagnostics_before_fields {
+                continue;
+            }
+
+            let horizontal_count = horizontal_count_input.trunc() as u32;
+            let vertical_count = vertical_count_input.trunc() as u32;
+
+            if frame_width_m == 0.0 {
+                frame_outside_projection_m = 0.0;
+                frame_inside_projection_m = 0.0;
+            }
+            if divider_width_m == 0.0 || divider_type == WindowDividerType::Suspended {
+                divider_outside_projection_m = 0.0;
+                divider_inside_projection_m = 0.0;
+            }
+            if divider_width_m > 0.0 && horizontal_count == 0 && vertical_count == 0 {
+                self.warning(
+                    "WindowFrameAndDividerWidthResetWithoutDividers",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("divider_width"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} has positive divider width but zero effective horizontal and vertical divider counts; EnergyPlus resets divider width to zero"
+                    ),
+                );
+                divider_width_m = 0.0;
+            }
+            if inside_sill_depth_m < inside_reveal_depth_m {
+                self.warning(
+                    "WindowFrameAndDividerInsideSillDepthReset",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("inside_sill_depth"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} inside sill depth {inside_sill_depth_m} m is less than inside reveal depth {inside_reveal_depth_m} m; EnergyPlus resets it to the reveal depth"
+                    ),
+                );
+                inside_sill_depth_m = inside_reveal_depth_m;
+            }
+
+            let Some(id_value) =
+                self.checked_id(OBJECT_TYPE, &name, model.window_frame_and_dividers.len())
+            else {
+                continue;
+            };
+            let id = WindowFrameAndDividerId(id_value);
+            if model
+                .window_frame_and_divider_names
+                .insert(&name, id)
+                .is_some()
+            {
+                self.duplicate_name(OBJECT_TYPE, &name);
+                continue;
+            }
+
+            model.window_frame_and_dividers.push(WindowFrameAndDivider {
+                id,
+                name: NormalizedName::new(&name),
+                frame: WindowFrameProperties {
+                    width_m: frame_width_m,
+                    outside_projection_m: frame_outside_projection_m,
+                    inside_projection_m: frame_inside_projection_m,
+                    conductance_w_per_m2_k: frame_conductance_w_per_m2_k,
+                    edge_to_center_glass_conductance_ratio:
+                        frame_edge_to_center_glass_conductance_ratio,
+                    solar_absorptance: frame_solar_absorptance,
+                    visible_absorptance: frame_visible_absorptance,
+                    thermal_hemispherical_emissivity: frame_thermal_hemispherical_emissivity,
+                    edge_width_m: SOURCE_EDGE_WIDTH_M,
+                },
+                divider: WindowDividerProperties {
+                    divider_type,
+                    width_m: divider_width_m,
+                    horizontal_count,
+                    vertical_count,
+                    outside_projection_m: divider_outside_projection_m,
+                    inside_projection_m: divider_inside_projection_m,
+                    conductance_w_per_m2_k: divider_conductance_w_per_m2_k,
+                    edge_to_center_glass_conductance_ratio:
+                        divider_edge_to_center_glass_conductance_ratio,
+                    solar_absorptance: divider_solar_absorptance,
+                    visible_absorptance: divider_visible_absorptance,
+                    thermal_hemispherical_emissivity: divider_thermal_hemispherical_emissivity,
+                    edge_width_m: SOURCE_EDGE_WIDTH_M,
+                },
+                reveal: WindowRevealProperties {
+                    outside_solar_absorptance: outside_reveal_solar_absorptance,
+                    inside_sill_depth_m,
+                    inside_sill_solar_absorptance,
+                    inside_reveal_depth_m,
+                    inside_reveal_solar_absorptance,
+                },
+                nfrc_product_type,
+            });
+        }
     }
 
     fn parse_material_variable_absorptances(&mut self, model: &mut TypedModel) {
@@ -16571,6 +16912,7 @@ mod tests {
     mod window_material_shade;
     mod window_material_shade_equivalent_layer;
     mod window_material_simple_glazing_system;
+    mod window_property_frame_and_divider;
 
     use super::{
         ALL_SCHEDULE_DAY_TYPES, CompileStage, DiagnosticSeverity, ObjectCoverageStatus,

@@ -24,6 +24,7 @@ mod schedules;
 mod surface_vapor_coefficients;
 mod surfaces;
 mod thermostats;
+mod window_frame_and_divider;
 
 pub use air_distribution::*;
 pub use building::*;
@@ -49,3 +50,4 @@ pub use schedules::*;
 pub use surface_vapor_coefficients::*;
 pub use surfaces::*;
 pub use thermostats::*;
+pub use window_frame_and_divider::*;

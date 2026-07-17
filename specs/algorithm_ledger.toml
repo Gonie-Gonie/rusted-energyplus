@@ -117,6 +117,42 @@ routine.manage_heat_balance.source_map = "docs/src/porting-map/heat-balance-sour
 routine.manage_heat_balance.completion_status = "source_mapped"
 routine.manage_heat_balance.required_for_full_domain = true
 
+routine.get_frame_and_divider_data.source_file = "src/EnergyPlus/HeatBalanceManager.cc"
+routine.get_frame_and_divider_data.source_routine = "GetFrameAndDividerData"
+routine.get_frame_and_divider_data.source_map = "docs/src/porting-map/heat-balance-source-map.md"
+routine.get_frame_and_divider_data.completion_status = "state_mapped"
+routine.get_frame_and_divider_data.required_for_full_domain = false
+routine.get_frame_and_divider_data.state_mapping_ref = "docs/src/porting-map/heat-balance-source-map.md"
+routine.get_frame_and_divider_data.read_state = [
+  "EnergyPlus source places `GetFrameAndDividerData` after `Material::GetHysteresisData` and before `GetConstructData`; Rust deterministically reads `WindowProperty:FrameAndDivider` after base `parse_materials` and before `parse_constructions`, while its separate `parse_material_phase_change_hystereses` pass remains later; every definition is read eagerly, including an all-default, reveal-only, or unused record",
+  "one required nonblank outer-key name in an independent normalized namespace; Divider Type defaults to `DividedLite` and accepts `DividedLite` or `Suspended`, while NFRC Product Type defaults to `CurtainWall` and accepts `CasementDouble`, `CasementSingle`, `DualAction`, `Fixed`, `Garage`, `Greenhouse`, `HingedEscape`, `HorizontalSlider`, `Jal`, `Pivoted`, `ProjectingSingle`, `ProjectingDual`, `DoorSidelite`, `Skylight`, `SlidingPatioDoor`, `CurtainWall`, `SpandrelPanel`, `SideHingedDoor`, `DoorTransom`, `TropicalAwning`, `TubularDaylightingDevice`, or `VerticalSlider`",
+  "all 23 numeric fields as finite values with source-effective defaults and bounds: frame width [0,1] default 0, two frame projections [0,0.5] default 0, nonnegative frame conductance default 0 without upper bound, frame edge/center ratio (0,4] default 1, frame solar/visible absorptance [0,1] default 0.7, frame emissivity greater than 0 without upper bound default 0.9; divider width [0,0.5] default 0, two counts default 0, two divider projections [0,0.5] default 0, nonnegative divider conductance default 0 without upper bound, divider edge/center ratio (0,4] default 1, divider solar/visible absorptance [0,1] default 0, divider emissivity (0,1) default 0.9; three reveal absorptances [0,1] default 0 and two reveal depths [0,2] default 0",
+  "horizontal and vertical divider counts accept finite values in [0,2147483648), truncate toward zero into nonnegative integer state, and have no cross-field validity requirement; no material, construction, surface, schedule, geometry, or usage dependency is read",
+]
+routine.get_frame_and_divider_data.write_state = [
+  "a separate deterministic `WindowFrameAndDivider` arena and normalized name map; each record owns a typed ID, normalized name, nested `WindowFrameProperties`, `WindowDividerProperties`, and `WindowRevealProperties`, and one `WindowNfrcProductType`",
+  "source correction order first clears both frame projections when frame width is zero, then clears both divider projections when divider width is zero or type is `Suspended`, then warns and resets a still-positive divider width when both effective counts are zero without revisiting the prior projection result, and finally warns and raises an inside sill shallower than the inside reveal to the reveal depth",
+  "source-fixed frame and divider edge widths of 0.06355 m; no WINDOW 5 mullion orientation or synthesized frame/divider state is invented",
+  "two nonblocking typed diagnostics identify the positive-divider-width/zero-count reset and the inside-sill-depth reset without claiming EnergyPlus warning text, severity, order, or multiplicity",
+  "compile failure before typed ID or normalized-name reservation for a blank name, malformed or out-of-range numeric, count outside the finite [0,2147483648) boundary, invalid enum, or case-insensitive duplicate name; normalized duplicate rejection and invalid-enum rejection deliberately fail closed relative to source case-collision lookup and invalid-token fallback behavior",
+]
+routine.get_frame_and_divider_data.history_state_ownership = "TypedModel owns immutable frame/divider/reveal descriptors; this checkpoint allocates no mutable window history"
+routine.get_frame_and_divider_data.unsupported_state = [
+  "fenestration-surface and legacy Window or GlazedDoor reference binding, first-match case-collision behavior, geometry and projected area state, frame/divider edge areas, reveal and sill geometry, and surface-local frame/divider pointers",
+  "WINDOW 5 synthesized records and mullion orientation, between-glass shading mutation of shared divider width, window optical and thermal state, NFRC assembly calculations, reports, output variables, and runtime numerical state",
+]
+routine.get_frame_and_divider_data.inactive_branches = [
+  "zero frame width silently leaves both frame projections at zero; zero divider width or `Suspended` silently leaves both divider projections at zero; a positive divider width with zero effective counts resets only the width after projection correction, so positive divided-lite projections intentionally remain possible beside the recovered zero width",
+  "all-default, reveal-only, unused, non-fenestration-referenced, and names colliding with Material, Construction, or BuildingSurface namespaces remain valid typed records because this input has no cross-object dependency",
+]
+routine.get_frame_and_divider_data.unsupported_active_branches = [
+  "every valid `WindowProperty:FrameAndDivider` definition is typed but reported as `UnsupportedSurfaceBoundary` and `RunBlocked`, including all-default and unused definitions; no partial run is allowed",
+  "valid frame emissivity above 1, fractional divider counts truncated toward zero, source-recovered positive-width/zero-count input, and source-recovered shallow-sill input remain typed but do not activate a runtime or reporting consumer",
+]
+routine.get_frame_and_divider_data.not_claimed_branches = [
+  "Hysteresis-relative Rust compiler pass order and complete `GetHeatBalanceInput` order parity, native-epJSON canonical enum casing, source case-colliding name lookup and declaration ordering, invalid-enum fallback, exact diagnostic text/severity/order/multiplicity, fenestration binding, geometry, WINDOW 5 synthesis, between-glass shading mutation, optics, thermal execution, NFRC assembly calculations, EIO/SQLite or other reporting, runtime numerics, and conformance",
+]
+
 [[algorithm]]
 id = "heat_balance_surface_manager_source_order"
 domain = "heat_balance"

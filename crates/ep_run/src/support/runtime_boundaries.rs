@@ -552,6 +552,13 @@ pub(super) fn assess_typed_runtime_boundaries(
         registry,
         unsupported_objects,
         diagnostics,
+        "WindowProperty:FrameAndDivider",
+        typed_model.window_frame_and_dividers.len(),
+    );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
         "SurfaceProperties:VaporCoefficients",
         typed_model.surface_vapor_coefficients.len(),
     );

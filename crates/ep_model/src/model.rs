@@ -22,9 +22,10 @@ use crate::{
     ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
     Surface, SurfaceConvectionAlgorithms, SurfaceId, SurfaceVaporCoefficients,
     ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version, WeekScheduleId,
-    WindowGlazingThermochromicGroupMaterial, WindowGlazingThermochromicState, Zone,
-    ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId, ZoneEquipmentObjectType,
-    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatId,
+    WindowFrameAndDivider, WindowFrameAndDividerId, WindowGlazingThermochromicGroupMaterial,
+    WindowGlazingThermochromicState, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
+    ZoneThermostat, ZoneThermostatId,
 };
 
 /// Minimal typed model for early compiler stages.
@@ -234,6 +235,10 @@ pub struct TypedModel {
     pub surface_names: NameMap<SurfaceId>,
     /// Constant exterior/interior vapor-transfer coefficient attachments.
     pub surface_vapor_coefficients: Vec<SurfaceVaporCoefficients>,
+    /// User-declared window frame, divider, and reveal property records.
+    pub window_frame_and_dividers: Vec<WindowFrameAndDivider>,
+    /// Window frame-and-divider names in their independent namespace.
+    pub window_frame_and_divider_names: NameMap<WindowFrameAndDividerId>,
 }
 
 impl Default for TypedModel {
@@ -339,6 +344,8 @@ impl Default for TypedModel {
             surfaces: Vec::new(),
             surface_names: NameMap::default(),
             surface_vapor_coefficients: Vec::new(),
+            window_frame_and_dividers: Vec::new(),
+            window_frame_and_divider_names: NameMap::default(),
         }
     }
 }
@@ -431,6 +438,7 @@ impl TypedModel {
             + self.zones.len()
             + self.surfaces.len()
             + self.surface_vapor_coefficients.len()
+            + self.window_frame_and_dividers.len()
     }
 }
 

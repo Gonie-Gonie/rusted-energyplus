@@ -11,6 +11,7 @@ macro_rules! typed_id {
 typed_id!(ZoneId);
 typed_id!(SurfaceId);
 typed_id!(SurfaceVaporCoefficientsId);
+typed_id!(WindowFrameAndDividerId);
 typed_id!(ConstructionId);
 typed_id!(MaterialId);
 typed_id!(GlazingSpectralDataId);

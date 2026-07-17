@@ -47,6 +47,7 @@ Algorithm status is maintained in `specs/algorithm_ledger.toml`. Routine complet
 | Routine ID | Domain | Parent algorithm | Completion status | Required | EnergyPlus routine | Source map | State map | Rust target | Family gates |
 |---|---|---|---|---|---|---|---|---|---|
 | manage_heat_balance | heat_balance | heat_balance_manager_source_order | source_mapped | yes | src/EnergyPlus/HeatBalanceManager.cc::ManageHeatBalance | docs/src/porting-map/heat-balance-source-map.md |  |  |  |
+| get_frame_and_divider_data | heat_balance | heat_balance_manager_source_order | state_mapped | no | src/EnergyPlus/HeatBalanceManager.cc::GetFrameAndDividerData | docs/src/porting-map/heat-balance-source-map.md | docs/src/porting-map/heat-balance-source-map.md |  |  |
 | manage_surface_heat_balance | heat_balance | heat_balance_surface_manager_source_order | source_mapped | yes | src/EnergyPlus/HeatBalanceSurfaceManager.cc::ManageSurfaceHeatBalance | docs/src/porting-map/heat-balance-source-map.md |  |  |  |
 | calc_heat_balance_inside_surf_2_ctf_only | heat_balance | heat_balance_surface_manager_source_order | source_mapped | yes | src/EnergyPlus/HeatBalanceSurfaceManager.cc::CalcHeatBalanceInsideSurf2CTFOnly | docs/src/porting-map/heat-balance-source-map.md |  |  |  |
 | manage_air_heat_balance | heat_balance | heat_balance_air_manager_source_order | source_mapped | yes | src/EnergyPlus/HeatBalanceAirManager.cc::ManageAirHeatBalance | docs/src/porting-map/heat-balance-source-map.md |  |  |  |
