@@ -14,7 +14,9 @@ use ep_model::{
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
     IdealLoadsLimit, InfraredTransparentMaterial, InsideSurfaceConvectionAlgorithm, InternalGainId,
     LoadDistributionScheme, LoopId, Material, MaterialDefinition,
-    MaterialHeatAndMoistureTransferRedistribution, MaterialHeatAndMoistureTransferRedistributionId,
+    MaterialHeatAndMoistureTransferDiffusion, MaterialHeatAndMoistureTransferDiffusionId,
+    MaterialHeatAndMoistureTransferDiffusionPoint, MaterialHeatAndMoistureTransferRedistribution,
+    MaterialHeatAndMoistureTransferRedistributionId,
     MaterialHeatAndMoistureTransferRedistributionPoint, MaterialHeatAndMoistureTransferSettings,
     MaterialHeatAndMoistureTransferSettingsId, MaterialHeatAndMoistureTransferSorptionIsotherm,
     MaterialHeatAndMoistureTransferSorptionIsothermId,
@@ -489,6 +491,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm",
     "MaterialProperty:HeatAndMoistureTransfer:Suction",
     "MaterialProperty:HeatAndMoistureTransfer:Redistribution",
+    "MaterialProperty:HeatAndMoistureTransfer:Diffusion",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -608,6 +611,7 @@ impl<'a> Compiler<'a> {
         self.parse_material_heat_and_moisture_transfer_sorption_isotherms(&mut model);
         self.parse_material_heat_and_moisture_transfer_suctions(&mut model);
         self.parse_material_heat_and_moisture_transfer_redistributions(&mut model);
+        self.parse_material_heat_and_moisture_transfer_diffusions(&mut model);
         self.validate_scalar_schedule_type_limits(&model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
@@ -3239,6 +3243,198 @@ impl<'a> Compiler<'a> {
                     input_points,
                     effective_points,
                 });
+        }
+    }
+
+    fn parse_material_heat_and_moisture_transfer_diffusions(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "MaterialProperty:HeatAndMoistureTransfer:Diffusion";
+        const MAX_POINTS: usize = 25;
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let diagnostics_before_fields = self.diagnostics.len();
+            let material_name = self.required_string(OBJECT_TYPE, &name, &object, "material_name");
+            let number_of_data_pairs = self
+                .required_number(OBJECT_TYPE, &name, &object, "number_of_data_pairs")
+                .and_then(|value| {
+                    if value.fract() != 0.0 {
+                        self.error(
+                            "InvalidInteger",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some("number_of_data_pairs"),
+                            format!(
+                                "{OBJECT_TYPE}/{name} field number_of_data_pairs must be an integer, got {value}"
+                            ),
+                        );
+                        None
+                    } else if !(1.0..=MAX_POINTS as f64).contains(&value) {
+                        self.error(
+                            "InvalidNumericRange",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some("number_of_data_pairs"),
+                            format!(
+                                "{OBJECT_TYPE}/{name} field number_of_data_pairs must be between 1 and {MAX_POINTS}, got {value}"
+                            ),
+                        );
+                        None
+                    } else {
+                        Some(value as u8)
+                    }
+                });
+
+            let mut parsed_points = Vec::with_capacity(MAX_POINTS);
+            for point in 1..=MAX_POINTS {
+                let relative_humidity_fraction_field =
+                    format!("relative_humidity_fraction_{point}");
+                let water_vapor_diffusion_resistance_factor_field =
+                    format!("water_vapor_diffusion_resistance_factor_{point}");
+                let relative_humidity_fraction = if point == 1 {
+                    self.required_number_bounded(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        &relative_humidity_fraction_field,
+                        (0.0, true),
+                        (1.0, true),
+                    )
+                } else {
+                    self.optional_number_bounded(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        &relative_humidity_fraction_field,
+                        (0.0, true),
+                        (1.0, true),
+                    )
+                };
+                let water_vapor_diffusion_resistance_factor = if point == 1 {
+                    self.required_number_bounded(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        &water_vapor_diffusion_resistance_factor_field,
+                        (0.0, true),
+                        (f64::INFINITY, false),
+                    )
+                } else {
+                    self.optional_number_bounded(
+                        OBJECT_TYPE,
+                        &name,
+                        &object,
+                        &water_vapor_diffusion_resistance_factor_field,
+                        (0.0, true),
+                        (f64::INFINITY, false),
+                    )
+                };
+                parsed_points.push(MaterialHeatAndMoistureTransferDiffusionPoint {
+                    relative_humidity_fraction: relative_humidity_fraction.unwrap_or(0.0),
+                    water_vapor_diffusion_resistance_factor:
+                        water_vapor_diffusion_resistance_factor.unwrap_or(0.0),
+                });
+            }
+            if self.diagnostics.len() != diagnostics_before_fields {
+                continue;
+            }
+            let (Some(material_name), Some(number_of_data_pairs)) =
+                (material_name, number_of_data_pairs)
+            else {
+                continue;
+            };
+
+            let Some(reference_material) = self.resolve_name(
+                &model.material_names,
+                OBJECT_TYPE,
+                &name,
+                "material_name",
+                &material_name,
+                "Material",
+            ) else {
+                continue;
+            };
+            let Some(sorption_isotherm) = model
+                .material_heat_and_moisture_transfer_sorption_isotherms
+                .iter()
+                .find(|isotherm| isotherm.reference_material == reference_material)
+            else {
+                self.error(
+                    "MissingHeatAndMoistureTransferSorptionIsotherm",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("material_name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} requires MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm for material {material_name}"
+                    ),
+                );
+                continue;
+            };
+            let reference_sorption_isotherm = sorption_isotherm.id;
+            let Some(sorption_last_relative_humidity_fraction) = sorption_isotherm
+                .effective_points
+                .last()
+                .map(|point| point.relative_humidity_fraction)
+            else {
+                self.error(
+                    "InvalidHeatAndMoistureTransferDiffusionDependency",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("material_name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} resolved an empty source-effective sorption isotherm"
+                    ),
+                );
+                continue;
+            };
+            if model
+                .material_heat_and_moisture_transfer_diffusions
+                .iter()
+                .any(|diffusion| diffusion.reference_material == reference_material)
+            {
+                self.error(
+                    "DuplicateHeatAndMoistureTransferDiffusionMaterial",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("material_name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} repeats a material that already has diffusion data"
+                    ),
+                );
+                continue;
+            }
+
+            let input_points = parsed_points[..usize::from(number_of_data_pairs)].to_vec();
+            let mut effective_points = input_points.clone();
+            let Some(last_input_point) = input_points.last() else {
+                self.error(
+                    "InvalidHeatAndMoistureTransferDiffusionDerivedState",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    None,
+                    format!("{OBJECT_TYPE}/{name} has no active diffusion point"),
+                );
+                continue;
+            };
+            effective_points.push(MaterialHeatAndMoistureTransferDiffusionPoint {
+                relative_humidity_fraction: sorption_last_relative_humidity_fraction,
+                water_vapor_diffusion_resistance_factor: last_input_point
+                    .water_vapor_diffusion_resistance_factor,
+            });
+
+            let id_value = model.material_heat_and_moisture_transfer_diffusions.len();
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, id_value) else {
+                continue;
+            };
+            model.material_heat_and_moisture_transfer_diffusions.push(
+                MaterialHeatAndMoistureTransferDiffusion {
+                    id: MaterialHeatAndMoistureTransferDiffusionId(id_value),
+                    name: NormalizedName::new(&name),
+                    reference_material,
+                    reference_sorption_isotherm,
+                    number_of_data_pairs,
+                    input_points,
+                    effective_points,
+                },
+            );
         }
     }
 
@@ -16029,6 +16225,7 @@ fn source_effective_hamt_sorption_points(
 mod tests {
     mod global_geometry_rules;
     mod material_property_glazing_spectral_data;
+    mod material_property_heat_and_moisture_transfer_diffusion;
     mod material_property_heat_and_moisture_transfer_redistribution;
     mod material_property_heat_and_moisture_transfer_settings;
     mod material_property_heat_and_moisture_transfer_sorption_isotherm;

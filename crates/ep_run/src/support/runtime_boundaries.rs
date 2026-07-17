@@ -530,6 +530,15 @@ pub(super) fn assess_typed_runtime_boundaries(
             .material_heat_and_moisture_transfer_redistributions
             .len(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "MaterialProperty:HeatAndMoistureTransfer:Diffusion",
+        typed_model
+            .material_heat_and_moisture_transfer_diffusions
+            .len(),
+    );
 
     push_typed_unsupported_object(
         registry,

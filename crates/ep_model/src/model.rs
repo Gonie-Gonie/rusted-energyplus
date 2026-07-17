@@ -7,22 +7,23 @@ use crate::{
     ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
     ExternalInterfaceSchedule, FanComponent, GlazingSpectralData, GlazingSpectralDataId,
     GlobalGeometryRules, IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId, LoopId,
-    Material, MaterialHeatAndMoistureTransferRedistribution,
-    MaterialHeatAndMoistureTransferSettings, MaterialHeatAndMoistureTransferSorptionIsotherm,
-    MaterialHeatAndMoistureTransferSuction, MaterialId, MaterialMoisturePenetrationDepthSettings,
-    MaterialPhaseChange, MaterialPhaseChangeHysteresis, MaterialVariableAbsorptance,
-    MaterialVariableAbsorptanceId, MaterialVariableThermalConductivity, NameMap, Node, NodeId,
-    NodeList, NodeListId, NormalizedName, OtherEquipment, People, PlantBranch, PlantBranchList,
-    PlantConnector, PlantConnectorKind, PlantConnectorList, PlantLoop, PumpConstantSpeed,
-    RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay,
-    RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant, ScheduleDayHourly,
-    ScheduleDayInterval, ScheduleDayList, ScheduleFile, ScheduleFileShading, ScheduleId,
-    ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear,
-    SetpointManagerComponent, SiteLocation, Surface, SurfaceConvectionAlgorithms, SurfaceId,
-    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version, WeekScheduleId,
-    WindowGlazingThermochromicGroupMaterial, WindowGlazingThermochromicState, Zone,
-    ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId, ZoneEquipmentObjectType,
-    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatId,
+    Material, MaterialHeatAndMoistureTransferDiffusion,
+    MaterialHeatAndMoistureTransferRedistribution, MaterialHeatAndMoistureTransferSettings,
+    MaterialHeatAndMoistureTransferSorptionIsotherm, MaterialHeatAndMoistureTransferSuction,
+    MaterialId, MaterialMoisturePenetrationDepthSettings, MaterialPhaseChange,
+    MaterialPhaseChangeHysteresis, MaterialVariableAbsorptance, MaterialVariableAbsorptanceId,
+    MaterialVariableThermalConductivity, NameMap, Node, NodeId, NodeList, NodeListId,
+    NormalizedName, OtherEquipment, People, PlantBranch, PlantBranchList, PlantConnector,
+    PlantConnectorKind, PlantConnectorList, PlantLoop, PumpConstantSpeed, RunPeriod,
+    RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
+    ScheduleCompact, ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList,
+    ScheduleFile, ScheduleFileShading, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
+    ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
+    Surface, SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
+    TimestepConfig, Version, WeekScheduleId, WindowGlazingThermochromicGroupMaterial,
+    WindowGlazingThermochromicState, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
+    ZoneThermostat, ZoneThermostatId,
 };
 
 /// Minimal typed model for early compiler stages.
@@ -80,6 +81,9 @@ pub struct TypedModel {
     /// HAMT redistribution attachments keyed by referenced material names.
     pub material_heat_and_moisture_transfer_redistributions:
         Vec<MaterialHeatAndMoistureTransferRedistribution>,
+    /// HAMT water-vapor diffusion attachments keyed by referenced material names.
+    pub material_heat_and_moisture_transfer_diffusions:
+        Vec<MaterialHeatAndMoistureTransferDiffusion>,
     /// Ordered thermochromic glazing states referenced by range descriptors on materials.
     pub window_glazing_thermochromic_state_arena: Vec<WindowGlazingThermochromicState>,
     /// Constructions.
@@ -254,6 +258,7 @@ impl Default for TypedModel {
             material_heat_and_moisture_transfer_sorption_isotherms: Vec::new(),
             material_heat_and_moisture_transfer_suctions: Vec::new(),
             material_heat_and_moisture_transfer_redistributions: Vec::new(),
+            material_heat_and_moisture_transfer_diffusions: Vec::new(),
             window_glazing_thermochromic_state_arena: Vec::new(),
             constructions: Vec::new(),
             construction_names: NameMap::default(),
@@ -373,6 +378,7 @@ impl TypedModel {
             + self
                 .material_heat_and_moisture_transfer_redistributions
                 .len()
+            + self.material_heat_and_moisture_transfer_diffusions.len()
             + self.constructions.len()
             + self.schedule_type_limits.len()
             + self.day_schedules.len()

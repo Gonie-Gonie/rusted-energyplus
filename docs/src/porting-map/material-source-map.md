@@ -62,10 +62,10 @@ different:
 | typed Rust material variants | 22 | Five complete opaque-family slices, the `WindowMaterial:Glazing` `SpectralAverage` branch, and the complete `RefractionExtinctionMethod`, glazing `EquivalentLayer`, `WindowMaterial:Gas`, gap `EquivalentLayer`, `WindowMaterial:GasMixture`, ordinary `WindowMaterial:Shade`, shade `EquivalentLayer`, drape `EquivalentLayer`, ordinary `WindowMaterial:Screen`, screen `EquivalentLayer`, ordinary `WindowMaterial:Blind`, blind `EquivalentLayer`, thermochromic glazing-group, simple-glazing-system, complex-fenestration gap, and complex-fenestration shade objects have distinct payloads. |
 | complete bounded base-definition slices | 21 / 22 | `Material`, `Material:NoMass`, `Material:AirGap`, `Material:InfraredTransparent`, `WindowMaterial:Glazing:RefractionExtinctionMethod`, `WindowMaterial:Glazing:EquivalentLayer`, `WindowMaterial:Gas`, `WindowMaterial:Gap:EquivalentLayer`, `WindowMaterial:GasMixture`, `WindowMaterial:Shade`, `WindowMaterial:Shade:EquivalentLayer`, `WindowMaterial:Drape:EquivalentLayer`, `WindowMaterial:Screen`, `WindowMaterial:Screen:EquivalentLayer`, `WindowMaterial:Blind`, `WindowMaterial:Blind:EquivalentLayer`, `Material:RoofVegetation`, `WindowMaterial:GlazingGroup:Thermochromic`, `WindowMaterial:SimpleGlazingSystem`, `WindowMaterial:Gap`, and `WindowMaterial:ComplexShade` have their source-effective fields and bounded compiler contracts typed. |
 | standalone typed datasets | 1 / 12 | `MaterialProperty:GlazingSpectralData` is typed in a separate deterministic standalone arena and name map; it is not a `MaterialDefinition` variant. |
-| typed material overlays | 9 / 12 | `MaterialProperty:VariableAbsorptance` is typed in a separate overlay arena after its eligible base-material and schedule dependencies are available. `MaterialProperty:PhaseChangeHysteresis`, `MaterialProperty:PhaseChange`, `MaterialProperty:VariableThermalConductivity`, `MaterialProperty:MoisturePenetrationDepth:Settings`, `MaterialProperty:HeatAndMoistureTransfer:Settings`, `MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm`, `MaterialProperty:HeatAndMoistureTransfer:Suction`, and `MaterialProperty:HeatAndMoistureTransfer:Redistribution` are typed in separate attachment arenas keyed by their existing material targets. None is a `MaterialDefinition` variant. |
-| complete bounded public-object slices | 31 / 34 | The 21 complete base-definition slices, standalone glazing spectral dataset, variable-absorptance overlay, phase-change-hysteresis attachment, phase-change temperature-enthalpy attachment, variable-thermal-conductivity attachment, EMPD settings attachment, HAMT settings attachment, HAMT sorption-isotherm attachment, HAMT suction attachment, and HAMT redistribution attachment are complete within their declared bounded compiler contracts. |
+| typed material overlays | 10 / 12 | `MaterialProperty:VariableAbsorptance` is typed in a separate overlay arena after its eligible base-material and schedule dependencies are available. `MaterialProperty:PhaseChangeHysteresis`, `MaterialProperty:PhaseChange`, `MaterialProperty:VariableThermalConductivity`, `MaterialProperty:MoisturePenetrationDepth:Settings`, `MaterialProperty:HeatAndMoistureTransfer:Settings`, `MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm`, `MaterialProperty:HeatAndMoistureTransfer:Suction`, `MaterialProperty:HeatAndMoistureTransfer:Redistribution`, and `MaterialProperty:HeatAndMoistureTransfer:Diffusion` are typed in separate attachment arenas keyed by their existing material targets. None is a `MaterialDefinition` variant. |
+| complete bounded public-object slices | 32 / 34 | The 21 complete base-definition slices, standalone glazing spectral dataset, variable-absorptance overlay, phase-change-hysteresis attachment, phase-change temperature-enthalpy attachment, variable-thermal-conductivity attachment, EMPD settings attachment, HAMT settings attachment, HAMT sorption-isotherm attachment, HAMT suction attachment, HAMT redistribution attachment, and HAMT diffusion attachment are complete within their declared bounded compiler contracts. |
 | partial bounded public-object slices | 1 / 34 | Only `WindowMaterial:Glazing` with `Optical Data Type = SpectralAverage` is typed; `Spectral`, `SpectralAndAngle`, and `BSDF` remain explicitly unsupported. |
-| wholly deferred public objects | 2 / 34 | The remaining 2 HAMT datasets are wholly deferred; no base definition is wholly deferred. |
+| wholly deferred public objects | 1 / 34 | The final `MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity` HAMT dataset is wholly deferred; no base definition is wholly deferred. |
 
 The inventory scaffold began at CP58; the counts and typed states above are
 cumulative through the current checkpoint. Complete inventory does not mean
@@ -113,17 +113,18 @@ definition even when EnergyPlus would never invoke the semantic reader.
 
 `MaterialProperty:HeatAndMoistureTransfer:Settings`,
 `MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm`,
-`MaterialProperty:HeatAndMoistureTransfer:Suction`, and
-`MaterialProperty:HeatAndMoistureTransfer:Redistribution` are the first four of
+`MaterialProperty:HeatAndMoistureTransfer:Suction`,
+`MaterialProperty:HeatAndMoistureTransfer:Redistribution`, and
+`MaterialProperty:HeatAndMoistureTransfer:Diffusion` are the first five of
 six objects owned by `GetHeatBalHAMTInput`. EnergyPlus invokes that reader only
 when the first actual HAMT surface reaches `ManageHeatBalHAMT`; selecting the
 global HAMT algorithm without such a surface does not trigger the semantic
 read. Within the reader, Settings precedes SorptionIsotherm, Suction,
 Redistribution, Diffusion, and ThermalConductivity. Rust publishes immutable
-Settings, SorptionIsotherm, Suction, and Redistribution attachments after EMPD
-in that deterministic compiler order, validates all four eagerly, and does not
-claim a global source order among CondFD, EMPD, and HAMT managers. The two later
-HAMT datasets remain deferred.
+Settings, SorptionIsotherm, Suction, Redistribution, and Diffusion attachments
+after EMPD in that deterministic compiler order, validates all five eagerly,
+and does not claim a global source order among CondFD, EMPD, and HAMT managers.
+The final ThermalConductivity HAMT dataset remains deferred.
 
 ## Standalone Glazing Spectral Dataset Typed Contract
 
@@ -355,7 +356,7 @@ inactive_branches:
 
 unsupported_active_branches:
 - every valid attachment is typed but run-blocking, including one attached only to an unused material
-- internally generated F/C-factor material targets remain outside the executable boundary; typed PhaseChange, VariableThermalConductivity, EMPD settings, HAMT Settings, HAMT Sorption, HAMT Suction, and HAMT Redistribution attachments may coexist on the same public target while every combination remains run-blocking, and the two later HAMT datasets remain deferred
+- internally generated F/C-factor material targets remain outside the executable boundary; typed PhaseChange, VariableThermalConductivity, EMPD settings, HAMT Settings, HAMT Sorption, HAMT Suction, HAMT Redistribution, and HAMT Diffusion attachments may coexist on the same public target while every combination remains run-blocking, and the final HAMT ThermalConductivity dataset remains deferred
 
 not_claimed_branches:
 - exact source diagnostic severity/text/order/multiplicity, material-pointer replacement and EMS-address behavior, mutable hysteresis state-machine and known source defects, CondFD or PCM-storage numerical behavior, generic CondFD EIO/output variables, runtime numerical behavior, and conformance
@@ -629,22 +630,22 @@ target, making the later record effective. Rust deliberately validates every
 definition eagerly and rejects repeated targets. It does not replace the base
 pointer, set `hasHAMT`, or invent a mutable `MaterialHAMT` subclass.
 
-The dependent SorptionIsotherm, Suction, and Redistribution passes are now typed
-in their own immutable arenas. SorptionIsotherm requires this Settings
-attachment. Suction and Redistribution are independent siblings that each
-require the resulting typed SorptionIsotherm; Redistribution does not require a
-Suction attachment. The two later HAMT datasets remain deferred; their reader
-passes append Sorption endpoints. Later active-construction validation may
-synthesize a constant-conductivity table from the positive base conductivity.
-Used HAMT constructions require every
+The dependent SorptionIsotherm, Suction, Redistribution, and Diffusion passes
+are now typed in their own immutable arenas. SorptionIsotherm requires this
+Settings attachment. Suction, Redistribution, and Diffusion are independent
+siblings that each require the resulting typed SorptionIsotherm; none depends
+on either of the other two. The final ThermalConductivity HAMT dataset remains
+deferred; its reader appends a Sorption endpoint. Later active-construction
+validation may synthesize a constant-conductivity table from the positive base
+conductivity. Used HAMT constructions require every
 layer to be a HAMT material and allocate a nonlinear cell grid. This checkpoint
-executes none of those consumers. Every Settings, SorptionIsotherm, Suction, or
-Redistribution attachment, including one on an unused material, blocks arbitrary
-runtime. The six fixed HAMT surface outputs, three per-cell output families,
-HAMT cells and origins EIO, generic Material Nominal Resistance EIO, and SQLite
-porosity path remain unsupported; none of the four typed HAMT objects has a
-dedicated EIO row. No manifest, comparator, proof variable, runtime numerical
-claim, or conformance claim is added.
+executes none of those consumers. Every Settings, SorptionIsotherm, Suction,
+Redistribution, or Diffusion attachment, including one on an unused material,
+blocks arbitrary runtime. The six fixed HAMT surface outputs, three per-cell
+output families, HAMT cells and origins EIO, generic Material Nominal Resistance
+EIO, and SQLite porosity path remain unsupported; none of the five typed HAMT
+objects has a dedicated EIO row. No manifest, comparator, proof variable,
+runtime numerical claim, or conformance claim is added.
 
 ## Heat And Moisture Transfer Sorption Isotherm Attachment Typed Contract
 
@@ -692,11 +693,13 @@ semantic read only after the first actual HAMT surface and effectively lets a
 later duplicate target replace the earlier active curve; Rust validates every
 definition eagerly and rejects repetition. The typed Suction and Redistribution
 passes independently consume the indexed last source-effective Sorption moisture
-point only to materialize their respective appended transport endpoints. The two
-later transport datasets, runtime interpolation and every other sorption
-consumer, construction completeness, cell allocation and history, outputs and
-reports, exact warning text/order/count, runtime numerics, and conformance remain
-unsupported. Every definition,
+point to materialize their respective appended liquid-transport endpoints, while
+the typed Diffusion pass independently consumes the indexed last
+source-effective Sorption relative humidity for its appended vapor-transport
+endpoint. The final ThermalConductivity dataset, runtime interpolation and every
+other sorption consumer, construction completeness, cell allocation and history,
+outputs and reports, exact warning text/order/count, runtime numerics, and
+conformance remain unsupported. Every definition,
 including one on an unused material, blocks arbitrary runtime. No manifest,
 comparator, or proof variable is added.
 
@@ -745,13 +748,14 @@ identity or ownership is reserved. Rust exact-integer and finite-only rules are
 deliberate bounded fail-closes; exact EnergyPlus IDF fractional-count and
 nonfinite handling remain unclaimed. Eager validation, dependency safety, and
 duplicate rejection also fail closed relative to source lazy first-surface
-reading and later-effective replacement. The typed Redistribution sibling may
-coexist on the same target and independently requires SorptionIsotherm, not
-Suction. Every definition, including one on an unused material, blocks arbitrary
-runtime. Diffusion, ThermalConductivity, rain-selected Suction and ordinary
-Redistribution interpolation, construction and cell state, outputs and reports,
-exact diagnostics/order/multiplicity, runtime numerics, and conformance remain
-unsupported. No manifest, comparator, or proof variable is added.
+reading and later-effective replacement. The typed Redistribution and Diffusion
+source-order siblings may coexist on the same target and each independently
+requires SorptionIsotherm, not Suction or the other sibling. Every definition,
+including one on an unused material, blocks arbitrary runtime. Diffusion
+interpolation, the final ThermalConductivity dataset, rain-selected Suction and
+ordinary Redistribution interpolation, construction and cell state, outputs and
+reports, exact diagnostics/order/multiplicity, runtime numerics, and conformance
+remain unsupported. No manifest, comparator, or proof variable is added.
 
 ## Heat And Moisture Transfer Redistribution Attachment Typed Contract
 
@@ -799,12 +803,69 @@ attachment identity or ownership is reserved. Rust exact-integer and finite-only
 rules are deliberate bounded fail-closes; exact EnergyPlus IDF fractional-count,
 nonfinite, and missing-Sorption failure behavior remain unclaimed. Eager
 validation, dependency safety, and duplicate rejection also fail closed relative
+to source lazy first-surface reading and later-effective replacement. The typed
+Diffusion source-order sibling may coexist on the same target and independently
+requires SorptionIsotherm, not Suction or Redistribution. Every definition,
+including one on an unused material, blocks arbitrary runtime. EnergyPlus
+normally interpolates Redistribution when its rain condition is false and
+Suction when it is true; both paths, Diffusion interpolation, the final
+ThermalConductivity dataset, construction and cell state, outputs and reports,
+exact diagnostics/order/multiplicity, runtime numerics, and conformance remain
+unsupported. No manifest, comparator, or proof variable is added.
+
+## Heat And Moisture Transfer Diffusion Attachment Typed Contract
+
+`MaterialProperty:HeatAndMoistureTransfer:Diffusion` is the complete bounded
+fifth `GetHeatBalHAMTInput` pass. It is an immutable attachment rather than a
+material variant. Its outer epJSON instance key is nonsemantic and may be blank
+or collide case-insensitively; Rust retains only a normalized diagnostic
+snapshot and creates no name map. The required inner `material_name` is the
+semantic target. It must resolve to a public `Material` that already owns a
+typed SorptionIsotherm attachment and therefore a typed Settings attachment.
+Suction and Redistribution are source-order predecessors but neither is a
+dependency: a target with Material, Settings, SorptionIsotherm, and Diffusion but
+neither liquid-transport attachment remains valid typed input. Each record
+stores its `MaterialId` and
+`MaterialHeatAndMoistureTransferSorptionIsothermId`; the base definition and
+prerequisite or optional sibling attachments remain unchanged.
+
+The executable schema and textual IDD expose a fixed tail of 25 diffusion pairs,
+not an extension array. `number_of_data_pairs` is required and must be an exact
+integer from 1 through 25. Pair 1 is required; pairs 2 through 25 are optional.
+Rust validates every supplied scalar, including fields beyond the declared
+count, then retains only the declared active prefix. Missing optional fields
+inside that prefix independently become source-equivalent zero, including
+either half of a pair, while valid supplied fields beyond the count are ignored.
+Relative-humidity fraction is finite and in inclusive `[0,1]`; water-vapor
+diffusion resistance factor is finite and nonnegative with no upper bound.
+Authored order, repeated or descending relative humidity, repeated or arbitrarily
+ordered resistance factors, and every relationship between the columns remain
+valid: the source performs no diffusion-table sorting, correction, monotonicity
+or uniqueness check, clamp, cross-field rule, or table-validation warning.
+
+Each attachment owns both the active zero-filled input prefix and the
+source-effective vector. Rust preserves that prefix in authored order, then
+appends exactly one point whose relative humidity is the indexed last point of
+the source-effective SorptionIsotherm and whose water-vapor diffusion resistance
+factor is copied from the last active Diffusion point. An authored count of 25
+therefore produces 26 source-effective points. Within the bounded Sorption
+contract, the appended relative humidity is 1.01. EnergyPlus checks only shared
+HAMT state before this pass and then indexes the Sorption endpoint without a
+distinct guard; Rust requires the typed Sorption dependency and fails closed on
+that unsafe path without inventing a dependency on Suction or Redistribution.
+
+Missing or blank targets, missing SorptionIsotherm, missing required fields,
+malformed/nonfinite/out-of-range supplied fields, invalid counts, and a second
+case-insensitive Diffusion attachment for one `MaterialId` fail before
+attachment identity or ownership is reserved. Rust exact-integer and finite-only
+rules are deliberate bounded fail-closes; exact EnergyPlus IDF fractional-count,
+nonfinite, and missing-Sorption failure behavior remain unclaimed. Eager
+validation, dependency safety, and duplicate rejection also fail closed relative
 to source lazy first-surface reading and later-effective replacement. Every
 definition, including one on an unused material, blocks arbitrary runtime.
-EnergyPlus normally interpolates Redistribution when its rain condition is
-false and Suction when it is true; both paths, Diffusion,
-ThermalConductivity, construction and cell state, outputs and reports, exact
-diagnostics/order/multiplicity, runtime numerics, and conformance remain
+Diffusion interpolation, the final ThermalConductivity dataset, construction and
+cell state, outputs and reports, exact diagnostics/order/multiplicity including
+the aggregate unused-HAMT warning, runtime numerics, and conformance remain
 unsupported. No manifest, comparator, or proof variable is added.
 
 ### `GetHeatBalHAMTInput` state contract
@@ -821,7 +882,9 @@ read_state:
 - the fixed 25-pair suction tail: pair 1 is required, pairs 2 through 25 are optional, every supplied scalar is validated, missing optional active-prefix scalars become zero, and positions beyond the declared count are ignored after validation; moisture content and liquid transport coefficient are finite and nonnegative without upper or cross-field bounds, and authored order is retained without sorting or correction
 - deterministic compiler-ordered `MaterialProperty:HeatAndMoistureTransfer:Redistribution` definitions after Suction; each has a nonsemantic outer-key snapshot, a semantic inner material target, and a required exact-integer redistribution-point count from 1 through 25
 - the fixed 25-pair redistribution tail: pair 1 is required, pairs 2 through 25 are optional, every supplied scalar is validated, missing optional active-prefix scalars become zero, and positions beyond the declared count are ignored after validation; moisture content and liquid transport coefficient are finite and nonnegative without upper or cross-field bounds, and authored order is retained without sorting or correction
-- the existing public base-material and attachment registries, where only `Material` with an existing typed Settings attachment is a Sorption target and only the same material with a typed Sorption attachment is independently eligible for Suction and Redistribution; neither transport attachment depends on the other, Rust does not synthesize internal `~FC_Concrete` targets, and it deliberately fails closed on source warning-ignored R-only `Material:NoMass`
+- deterministic compiler-ordered `MaterialProperty:HeatAndMoistureTransfer:Diffusion` definitions after Redistribution; each has a nonsemantic outer-key snapshot, a semantic inner material target, and a required exact-integer data-pair count from 1 through 25
+- the fixed 25-pair diffusion tail: pair 1 is required, pairs 2 through 25 are optional, every supplied scalar is validated, missing optional active-prefix scalars become zero, and positions beyond the declared count are ignored after validation; relative humidity is finite in inclusive [0,1] and water-vapor diffusion resistance factor is finite and nonnegative without an upper or cross-field bound, and authored order is retained without sorting or correction
+- the existing public base-material and attachment registries, where only `Material` with an existing typed Settings attachment is a Sorption target and only the same material with a typed Sorption attachment is independently eligible for Suction, Redistribution, and Diffusion; none of those three attachments depends on another, Rust does not synthesize internal `~FC_Concrete` targets, and it deliberately fails closed on source warning-ignored R-only `Material:NoMass`
 
 write_state:
 - a separate deterministic `MaterialHeatAndMoistureTransferSettings` attachment arena whose records own a typed ID, normalized outer-key snapshot, resolved `MaterialId`, porosity, and initial water-content ratio; the outer key is not published as a name map
@@ -831,29 +894,31 @@ write_state:
 - source-effective Suction points formed by preserving the active input prefix exactly, then appending one point whose moisture content is the indexed last source-effective Sorption moisture and whose liquid transport coefficient is the last active Suction coefficient; no Suction sort, correction, warning, monotonicity, uniqueness, or cross-column rule is invented
 - a separate deterministic `MaterialHeatAndMoistureTransferRedistribution` attachment arena whose records own a typed ID, normalized outer-key snapshot, resolved `MaterialId`, SorptionIsotherm ID, declared count, count-selected zero-filled input points, and source-effective points; the outer key is not published as a name map
 - source-effective Redistribution points formed by preserving the active input prefix exactly, then appending one point whose moisture content is the indexed last source-effective Sorption moisture and whose liquid transport coefficient is the last active Redistribution coefficient; no Redistribution-table sorting, correction, monotonicity or uniqueness check, clamp, cross-column rule, or table-validation warning is invented
+- a separate deterministic `MaterialHeatAndMoistureTransferDiffusion` attachment arena whose records own a typed ID, normalized outer-key snapshot, resolved `MaterialId`, SorptionIsotherm ID, declared count, count-selected zero-filled input points, and source-effective points; the outer key is not published as a name map
+- source-effective Diffusion points formed by preserving the active input prefix exactly, then appending one point whose relative humidity is the indexed last source-effective Sorption relative humidity and whose water-vapor diffusion resistance factor is the last active Diffusion factor; no Diffusion-table sorting, correction, monotonicity or uniqueness check, clamp, cross-field rule, or table-validation warning is invented
 - the referenced base `MaterialDefinition` remains unchanged and no mutable `MaterialHAMT` subclass or `hasHAMT` state is invented
-- compile failure before attachment ID or target reservation for a blank or missing inner target, any non-`Material` public target, missing Settings or Sorption dependency, missing required field, malformed/nonfinite/out-of-range supplied field, invalid Sorption, Suction, or Redistribution count, derived nonfinite Sorption state, or a repeated case-insensitive Settings, Sorption, Suction, or Redistribution attachment for one material; blank or case-colliding outer keys remain valid for distinct targets
+- compile failure before attachment ID or target reservation for a blank or missing inner target, any non-`Material` public target, missing Settings or Sorption dependency, missing required field, malformed/nonfinite/out-of-range supplied field, invalid Sorption, Suction, Redistribution, or Diffusion count, derived nonfinite Sorption state, or a repeated case-insensitive Settings, Sorption, Suction, Redistribution, or Diffusion attachment for one material; blank or case-colliding outer keys remain valid for distinct targets
 
 history_state_ownership:
-- no mutable HAMT cell temperature, relative humidity, vapor pressure, water content, flux, iteration, report, or timestep history in this checkpoint; the compiled model owns immutable Settings plus source-effective Sorption, Suction, and Redistribution descriptors while every runtime consumer remains unsupported
+- no mutable HAMT cell temperature, relative humidity, vapor pressure, water content, flux, iteration, report, or timestep history in this checkpoint; the compiled model owns immutable Settings plus source-effective Sorption, Suction, Redistribution, and Diffusion descriptors while every runtime consumer remains unsupported
 
 unsupported_state:
-- source `MaterialHAMT` pointer replacement and `hasHAMT`, the two later Diffusion and ThermalConductivity passes, their remaining endpoint coupling and base-conductivity fallback, plus the trailing seventh `SurfaceProperties:VaporCoefficients` reader pass
+- source `MaterialHAMT` pointer replacement and `hasHAMT`, the final ThermalConductivity pass and its Sorption endpoint coupling, later active-construction base-conductivity fallback, plus the trailing seventh `SurfaceProperties:VaporCoefficients` reader pass
 - active HAMT surface discovery, all-layer construction eligibility, cell-grid allocation, initial-water-to-relative-humidity conversion, interpolation and nonlinear heat/moisture state, six fixed surface outputs, three per-cell output families, HAMT cells/origins and generic nominal-resistance EIO, SQLite porosity reporting, runtime numerics, and conformance
 
 inactive_branches:
-- EnergyPlus performs semantic target resolution and all six ordered HAMT passes only when the first actual HAMT surface enters `ManageHeatBalHAMT`; a global HAMT selection with no such surface does not invoke this reader, while Rust deliberately performs bounded Settings, Sorption, Suction, and Redistribution validation for every definition eagerly and fails closed
+- EnergyPlus performs semantic target resolution and all six ordered HAMT passes only when the first actual HAMT surface enters `ManageHeatBalHAMT`; a global HAMT selection with no such surface does not invoke this reader, while Rust deliberately performs bounded Settings, Sorption, Suction, Redistribution, and Diffusion validation for every definition eagerly and fails closed
 - EnergyPlus warning-ignores an R-only `Material:NoMass` Settings target; Rust rejects it so no valid-looking typed attachment silently disappears
-- EnergyPlus checks shared HAMT state before Suction and Redistribution but each pass then indexes the Sorption endpoint without an explicit missing-Sorption guard; Rust requires the typed Sorption dependency independently for both transport attachments and fails closed on those unsafe paths without inventing a Suction-to-Redistribution dependency
-- a missing or blank initial water-content ratio becomes 0.2; missing optional Sorption, Suction, or Redistribution scalars inside the declared prefix become zero and supplied fields beyond the count are ignored after validation; no nonsemantic outer instance key owns target identity or duplicate detection
+- EnergyPlus checks shared HAMT state before Suction, Redistribution, and Diffusion but each pass then indexes the Sorption endpoint without an explicit missing-Sorption guard; Rust requires the typed Sorption dependency independently for all three attachments and fails closed on those unsafe paths without inventing dependencies among them
+- a missing or blank initial water-content ratio becomes 0.2; missing optional Sorption, Suction, Redistribution, or Diffusion scalars inside the declared prefix become zero and supplied fields beyond the count are ignored after validation; no nonsemantic outer instance key owns target identity or duplicate detection
 
 unsupported_active_branches:
-- every valid Settings, Sorption, Suction, or Redistribution attachment is typed but run-blocking, including one attached only to an unused material
-- inclusive porosity and relative-humidity endpoints, zero or above-porosity Sorption moisture, unordered or duplicate relative humidity, source-adjusted descending Sorption moisture, and unordered, duplicate, or descending Suction and Redistribution moisture/coefficient points remain typed state but never reach HAMT initialization, interpolation, or numerical state
-- internally generated F/C-factor concrete targets and source effective later-replacement behavior for repeated case-insensitive Settings, Sorption, Suction, or Redistribution material targets remain outside the executable boundary
+- every valid Settings, Sorption, Suction, Redistribution, or Diffusion attachment is typed but run-blocking, including one attached only to an unused material
+- inclusive porosity and relative-humidity endpoints, zero or above-porosity Sorption moisture, unordered or duplicate relative humidity, source-adjusted descending Sorption moisture, unordered, duplicate, or descending Suction and Redistribution moisture/coefficient points, and unordered or duplicate Diffusion relative humidity with arbitrary nonnegative resistance-factor ordering remain typed state but never reach HAMT initialization, interpolation, or numerical state
+- internally generated F/C-factor concrete targets and source effective later-replacement behavior for repeated case-insensitive Settings, Sorption, Suction, Redistribution, or Diffusion material targets remain outside the executable boundary
 
 not_claimed_branches:
-- exact EnergyPlus diagnostic severity/text/order/multiplicity including Sorption correction-warning parity, lazy algorithm/use gating, the aggregate unused-HAMT warning counted in `SurfaceGeometry`, R-only warning-and-ignore parity, source duplicate replacement order, known Sorption IDF fractional-count rounding and exact Suction or Redistribution IDF fractional-count behavior, source retention of nonfinite Settings or Sorption scalars and their observed severe/crash paths, exact source handling of nonfinite Suction or Redistribution scalars or missing Sorption state, material-subclass and cross-attachment pointer lifetime behavior, the two later datasets and their endpoint coupling, the trailing `SurfaceProperties:VaporCoefficients` pass, construction and cell initialization, sorption plus rain-selected suction and ordinary redistribution interpolation and heat/moisture runtime behavior, surface and cell output variables, EIO or SQLite serialization, runtime numerical behavior, and conformance
+- exact EnergyPlus diagnostic severity/text/order/multiplicity including Sorption correction-warning parity, lazy algorithm/use gating, the aggregate unused-HAMT warning counted in `SurfaceGeometry`, R-only warning-and-ignore parity, source duplicate replacement order, known Sorption IDF fractional-count rounding and exact Suction, Redistribution, or Diffusion IDF fractional-count behavior, source retention of nonfinite Settings or Sorption scalars and their observed severe/crash paths, exact source handling of nonfinite Suction, Redistribution, or Diffusion scalars or missing Sorption state, material-subclass and cross-attachment pointer lifetime behavior, the final ThermalConductivity dataset, its Sorption endpoint coupling, and active-construction base-conductivity fallback, the trailing `SurfaceProperties:VaporCoefficients` pass, construction and cell initialization, sorption plus rain-selected suction, ordinary redistribution, diffusion, and thermal-conductivity interpolation and heat/moisture runtime behavior, surface and cell output variables, EIO or SQLite serialization, runtime numerical behavior, and conformance
 <!-- routine-state-contract:v1 end get_heat_bal_hamt_input -->
 
 ## Base Definition Source Order
@@ -918,7 +983,7 @@ algorithm. The exact order guaranteed by each source owner is:
 | HAMT 2 | 29 | `MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm` | second HAMT pass; settings-dependent fixed-tail sorption dataset | complete bounded typed attachment for public Material targets with existing typed Settings; all definitions runtime-blocked |
 | HAMT 3 | 30 | `MaterialProperty:HeatAndMoistureTransfer:Suction` | third HAMT pass; sorption-dependent fixed-tail suction dataset | complete bounded typed attachment for public Material targets with existing typed SorptionIsotherm; all definitions runtime-blocked |
 | HAMT 4 | 31 | `MaterialProperty:HeatAndMoistureTransfer:Redistribution` | fourth HAMT pass; sorption-dependent fixed-tail redistribution dataset independent of Suction | complete bounded typed attachment for public Material targets with existing typed SorptionIsotherm; all definitions runtime-blocked |
-| HAMT 5 | 32 | `MaterialProperty:HeatAndMoistureTransfer:Diffusion` | HAMT diffusion dataset | deferred |
+| HAMT 5 | 32 | `MaterialProperty:HeatAndMoistureTransfer:Diffusion` | fifth HAMT pass; sorption-dependent fixed-tail water-vapor diffusion dataset independent of Suction and Redistribution | complete bounded typed attachment for public Material targets with existing typed SorptionIsotherm; all definitions runtime-blocked |
 | HAMT 6 | 33 | `MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity` | HAMT thermal-conductivity dataset | deferred |
 
 The schema family number preserves the canonical 34-object inventory order:
@@ -956,10 +1021,14 @@ moisture with the last active Suction coefficient. The Redistribution attachment
 is a fourth separate arena with the same SorptionIsotherm dependency but no
 Suction dependency. It retains its own authored-order prefix and appends the
 indexed last Sorption moisture with the last active Redistribution coefficient.
-All four leave the base payload unchanged and block every runtime consumer while
-the two later HAMT datasets remain deferred. The trailing
-`SurfaceProperties:VaporCoefficients` reader pass is likewise outside this
-checkpoint and is not part of the material-object counts.
+The Diffusion attachment is a fifth separate arena with the same
+SorptionIsotherm dependency but no Suction or Redistribution dependency. It
+retains its authored-order relative-humidity/resistance-factor prefix and appends
+the indexed last Sorption relative humidity with the last active Diffusion
+factor. All five leave the base payload unchanged and block every runtime
+consumer while the final ThermalConductivity HAMT dataset remains deferred. The
+trailing `SurfaceProperties:VaporCoefficients` reader pass is likewise outside
+this checkpoint and is not part of the material-object counts.
 
 ### `Material` / regular
 
@@ -2730,8 +2799,8 @@ regular materials and requires one explicit all-definition
 `UnsupportedSurfaceBoundary` run block. No test claims source lazy semantic
 validation, R-only warning-and-ignore parity, repeated-target replacement,
 internal F/C-factor targets, `MaterialHAMT` replacement, the typed
-SorptionIsotherm, Suction, and Redistribution runtime consumers, the two later
-datasets, the trailing
+SorptionIsotherm, Suction, Redistribution, and Diffusion runtime consumers, the
+final ThermalConductivity dataset, the trailing
 `SurfaceProperties:VaporCoefficients` reader pass,
 all-layer construction eligibility, cell state, output variables, EIO or SQLite
 reporting, runtime numerics, or conformance.
@@ -2755,8 +2824,9 @@ inclusion. The support-boundary test attaches SorptionIsotherm records to used
 and unused materials and requires one explicit all-definition
 `UnsupportedSurfaceBoundary` run block. No test claims source lazy semantic
 validation, repeated-target replacement, nonfinite or crash-path parity, the
-typed Suction and Redistribution runtime consumers, the two later datasets,
-runtime interpolation, construction/cell state, output variables,
+typed Suction, Redistribution, and Diffusion runtime consumers, the final
+ThermalConductivity dataset, runtime interpolation, construction/cell state,
+output variables,
 EIO or SQLite reporting, runtime numerics, or conformance.
 
 `MaterialProperty:HeatAndMoistureTransfer:Suction` model and compiler tests
@@ -2781,9 +2851,9 @@ test attaches Suction records to used and unused materials and requires one
 explicit all-definition `UnsupportedSurfaceBoundary` run block. No test claims
 source lazy semantic validation, repeated-target replacement, fractional-count
 rounding, exact source nonfinite or missing-Sorption failure behavior, the typed
-Redistribution sibling's runtime consumer, the two later datasets, runtime
-interpolation, construction/cell state, output
-variables, EIO or SQLite reporting, runtime numerics, or conformance.
+Redistribution and Diffusion siblings' runtime consumers, the final
+ThermalConductivity dataset, runtime interpolation, construction/cell state,
+output variables, EIO or SQLite reporting, runtime numerics, or conformance.
 
 `MaterialProperty:HeatAndMoistureTransfer:Redistribution` model and compiler
 tests lock nonsemantic blank and case-colliding outer keys; semantic inner target
@@ -2810,8 +2880,37 @@ one explicit all-definition `UnsupportedSurfaceBoundary` run block. No test
 claims source lazy semantic validation, repeated-target replacement,
 fractional-count rounding, exact source nonfinite or missing-Sorption failure
 behavior, rain-selected Suction or ordinary Redistribution interpolation, the
-two later datasets, construction/cell state, output variables, EIO or SQLite
-reporting, runtime numerics, or conformance.
+typed Diffusion runtime consumer, the final ThermalConductivity dataset,
+construction/cell state, output variables, EIO or SQLite reporting, runtime
+numerics, or conformance.
+
+`MaterialProperty:HeatAndMoistureTransfer:Diffusion` model and compiler tests
+lock nonsemantic blank and case-colliding outer keys; semantic inner target
+resolution through an existing typed SorptionIsotherm attachment; explicit
+success without either Suction or Redistribution; the exact-integer count range
+1 through 25; the fixed 25-pair tail with required pair 1, component-wise
+optional active-prefix zero fill, and validation before declared-count
+truncation; and finite inclusive `[0,1]` relative humidity plus finite
+nonnegative unbounded water-vapor diffusion resistance factor. They retain
+unordered, duplicate, and descending authored relative humidity and arbitrary
+resistance-factor order without diffusion-table sorting, correction,
+monotonicity or uniqueness checks, clamping, a cross-field rule, or a
+table-validation warning. The source-effective vector appends exactly one
+point: the indexed last source-effective Sorption relative humidity and the last
+active Diffusion factor. Tests separately lock that the endpoint copies the
+Sorption relative-humidity column rather than moisture. They also lock count 1
+and 25 boundaries, the resulting count-plus-one vector, valid inactive-field
+ignore and invalid inactive-field rejection, public Material-plus-Sorption
+dependency, deliberate missing-Sorption fail-close, case-insensitive
+duplicate-target rejection, validation before ID reservation, coexistence with
+all earlier typed material attachments, typed coverage, and object-count
+inclusion. The support-boundary test attaches Diffusion records to used and
+unused materials and requires one explicit all-definition
+`UnsupportedSurfaceBoundary` run block. No test claims source lazy semantic
+validation, repeated-target replacement, fractional-count rounding, exact
+source nonfinite or missing-Sorption failure behavior, diffusion interpolation,
+the final ThermalConductivity dataset, construction/cell state, output
+variables, EIO or SQLite reporting, runtime numerics, or conformance.
 
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
@@ -2819,9 +2918,9 @@ dynamic AirGap/IRT heat transfer or EcoRoof execution. It also does not claim ex
 diagnostic text, all input-processor default behavior beyond the standalone
 spectral-dataset, variable-absorptance, phase-change-hysteresis, and phase-change
 temperature-enthalpy, variable-thermal-conductivity, EMPD settings, and HAMT
-Settings, SorptionIsotherm, Suction, and Redistribution contracts, internal F/C-factor
-material injection, EMS mutation, broad material EIO formatting, or any of the
-remaining 2 deferred HAMT dataset families.
+Settings, SorptionIsotherm, Suction, Redistribution, and Diffusion contracts,
+internal F/C-factor material injection, EMS mutation, broad material EIO
+formatting, or the final deferred ThermalConductivity HAMT dataset family.
 
 ## Routine Inventory
 
@@ -2840,7 +2939,7 @@ remaining 2 deferred HAMT dataset families.
 | `GetHysteresisData` | `state_mapped` | owns the complete bounded post-base hysteresis attachment read: public Material/NoMass target gate, thirteen required strict-positive inputs, grouped typed state and source-derived specific heats, duplicate-target fail-close boundary, and universal runtime block |
 | `GetCondFDInput` | `state_mapped` | owns the complete bounded PhaseChange and VariableThermalConductivity typed-input passes: public Material/NoMass target gate, PhaseChange's defaulted finite coefficient, both unbounded complete ordered point vectors, family-local duplicate-target fail-close boundaries, deliberate eager validation, and universal runtime blocks; its CondFD settings and all numerical state remain unsupported |
 | `GetMoistureBalanceEMPDInput` | `state_mapped` | owns the complete bounded EMPD settings pass: public Material-only target gate, seven required fixed fields, two defaulted automatic-depth states and explicit bounds, warning-only depth ordering, duplicate-target fail-close boundary, deliberate eager semantic validation, and universal runtime block; automatic depth materialization, placement, state, reporting, and numerics remain unsupported |
-| `GetHeatBalHAMTInput` | `state_mapped` | owns the complete bounded Settings, SorptionIsotherm, Suction, and Redistribution passes: nonsemantic outer keys; semantic Material-only targets; Sorption-dependent sibling transport attachments; all three fixed 25-pair/count/zero-fill states and finite validation; source-effective Sorption endpoints, sort, and adjacent correction; authored-order Suction and Redistribution points plus independent indexed Sorption-last/last-coefficient endpoint copies; family-local duplicate, dependency-safety, and derived-nonfinite fail-close boundaries; deliberate eager validation and NoMass fail-close; and universal runtime blocks; the two later datasets, trailing SurfaceProperties:VaporCoefficients pass, pointer replacement, construction/cell state, interpolation, reporting, and numerics remain unsupported |
+| `GetHeatBalHAMTInput` | `state_mapped` | owns the complete bounded Settings, SorptionIsotherm, Suction, Redistribution, and Diffusion passes: nonsemantic outer keys; semantic Material-only targets; three independently Sorption-dependent sibling transport attachments; all four fixed 25-pair/count/zero-fill states and finite validation; source-effective Sorption endpoints, sort, and adjacent correction; authored-order Suction, Redistribution, and Diffusion points; indexed last Sorption moisture for the liquid tables and indexed last Sorption relative humidity for Diffusion; last-active dependent-value endpoint copies; family-local duplicate, dependency-safety, and derived-nonfinite fail-close boundaries; deliberate eager validation and NoMass fail-close; and universal runtime blocks; the final ThermalConductivity dataset, trailing SurfaceProperties:VaporCoefficients pass, pointer replacement, construction/cell state, interpolation, reporting, and numerics remain unsupported |
 
 All fourteen routine records have `required_for_full_domain = false`. The
 bounded implementation slice does not promote the whole `GetMaterialData`,
@@ -2851,9 +2950,9 @@ standalone `GetWindowGlassSpectralData` input boundary and the material-owned
 `GetVariableAbsorptanceInput` overlay boundary, `GetHysteresisData` attachment
 boundary, the declared `GetCondFDInput` PhaseChange and
 VariableThermalConductivity passes, the declared
-`GetMoistureBalanceEMPDInput` settings pass, and the declared first four
-`GetHeatBalHAMTInput` Settings, SorptionIsotherm, Suction, and Redistribution
-passes are `state_mapped`
+`GetMoistureBalanceEMPDInput` settings pass, and the declared first five
+`GetHeatBalHAMTInput` Settings, SorptionIsotherm, Suction, Redistribution, and
+Diffusion passes are `state_mapped`
 within their bounded input domains.
 
 ## Evidence And Promotion Boundary
@@ -3053,8 +3152,8 @@ CP58 remains incomplete until, at minimum:
 
 - the three deferred `WindowMaterial:Glazing` optical branches have
   schema-complete typed variants
-- the remaining 2 HAMT datasets have typed attachment and validation
-  models
+- the final `MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity` HAMT
+  dataset has a typed attachment and validation model
 - source-order attachment, duplicate/reference diagnostics, generated
   F/C-factor materials, reporting, EMS, and algorithm-specific consumers are
   mapped and implemented

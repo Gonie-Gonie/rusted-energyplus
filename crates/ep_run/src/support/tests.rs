@@ -4,6 +4,7 @@ use ep_compiler::compile_raw_model;
 use ep_raw_model::parse_epjson_str;
 
 mod glazing_spectral_data;
+mod material_heat_and_moisture_transfer_diffusion;
 mod material_heat_and_moisture_transfer_redistribution;
 mod material_heat_and_moisture_transfer_settings;
 mod material_heat_and_moisture_transfer_sorption_isotherm;
