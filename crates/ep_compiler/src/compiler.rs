@@ -13,7 +13,8 @@ use ep_model::{
     GlazingSpectralDataId, GlazingSpectralPoint, GlobalGeometryRules, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
     IdealLoadsLimit, InfraredTransparentMaterial, InsideSurfaceConvectionAlgorithm, InternalGainId,
-    LoadDistributionScheme, LoopId, Material, MaterialDefinition, MaterialId,
+    LoadDistributionScheme, LoopId, Material, MaterialDefinition,
+    MaterialHeatAndMoistureTransferSettings, MaterialHeatAndMoistureTransferSettingsId, MaterialId,
     MaterialMoisturePenetrationDepthSettings, MaterialMoisturePenetrationDepthSettingsId,
     MaterialPhaseChange, MaterialPhaseChangeHysteresis, MaterialPhaseChangeHysteresisId,
     MaterialPhaseChangeId, MaterialSurfaceRoughness, MaterialVariableAbsorptance,
@@ -478,6 +479,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "MaterialProperty:PhaseChange",
     "MaterialProperty:VariableThermalConductivity",
     "MaterialProperty:MoisturePenetrationDepth:Settings",
+    "MaterialProperty:HeatAndMoistureTransfer:Settings",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -593,6 +595,7 @@ impl<'a> Compiler<'a> {
         self.parse_material_phase_changes(&mut model);
         self.parse_material_variable_thermal_conductivities(&mut model);
         self.parse_material_moisture_penetration_depth_settings(&mut model);
+        self.parse_material_heat_and_moisture_transfer_settings(&mut model);
         self.validate_scalar_schedule_type_limits(&model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
@@ -2533,6 +2536,99 @@ impl<'a> Compiler<'a> {
                     deep_layer_penetration_depth_m,
                     coating_layer_thickness_m,
                     coating_layer_water_vapor_diffusion_resistance_factor,
+                },
+            );
+        }
+    }
+
+    fn parse_material_heat_and_moisture_transfer_settings(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "MaterialProperty:HeatAndMoistureTransfer:Settings";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let diagnostics_before_fields = self.diagnostics.len();
+            let material_name = self.required_string(OBJECT_TYPE, &name, &object, "material_name");
+            let porosity = self.required_number_bounded(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "porosity",
+                (0.0, true),
+                (1.0, true),
+            );
+            let initial_water_content_ratio = self.number_bounded_blank_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "initial_water_content_ratio",
+                0.2,
+                (0.0, true),
+                (f64::INFINITY, false),
+            );
+            if self.diagnostics.len() != diagnostics_before_fields {
+                continue;
+            }
+            let (Some(material_name), Some(porosity)) = (material_name, porosity) else {
+                continue;
+            };
+
+            let Some(reference_material) = self.resolve_name(
+                &model.material_names,
+                OBJECT_TYPE,
+                &name,
+                "material_name",
+                &material_name,
+                "Material",
+            ) else {
+                continue;
+            };
+            let Some(material) = model.materials.get(reference_material.0 as usize) else {
+                self.error(
+                    "InvalidReference",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("material_name"),
+                    format!("{OBJECT_TYPE}/{name} resolved material outside the material arena"),
+                );
+                continue;
+            };
+            if !matches!(material.definition, MaterialDefinition::Regular(_)) {
+                self.error(
+                    "InvalidHeatAndMoistureTransferMaterialType",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("material_name"),
+                    format!("{OBJECT_TYPE}/{name} must reference Material"),
+                );
+                continue;
+            }
+            if model
+                .material_heat_and_moisture_transfer_settings
+                .iter()
+                .any(|settings| settings.reference_material == reference_material)
+            {
+                self.error(
+                    "DuplicateHeatAndMoistureTransferSettingsMaterial",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("material_name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} repeats a material that already has HAMT settings"
+                    ),
+                );
+                continue;
+            }
+
+            let id_value = model.material_heat_and_moisture_transfer_settings.len();
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, id_value) else {
+                continue;
+            };
+            model.material_heat_and_moisture_transfer_settings.push(
+                MaterialHeatAndMoistureTransferSettings {
+                    id: MaterialHeatAndMoistureTransferSettingsId(id_value),
+                    name: NormalizedName::new(&name),
+                    reference_material,
+                    porosity,
+                    initial_water_content_ratio,
                 },
             );
         }
@@ -15279,6 +15375,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 mod tests {
     mod global_geometry_rules;
     mod material_property_glazing_spectral_data;
+    mod material_property_heat_and_moisture_transfer_settings;
     mod material_property_moisture_penetration_depth_settings;
     mod material_property_phase_change;
     mod material_property_phase_change_hysteresis;

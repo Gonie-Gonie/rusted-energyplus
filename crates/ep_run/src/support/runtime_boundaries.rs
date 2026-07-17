@@ -494,6 +494,15 @@ pub(super) fn assess_typed_runtime_boundaries(
             .material_moisture_penetration_depth_settings
             .len(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "MaterialProperty:HeatAndMoistureTransfer:Settings",
+        typed_model
+            .material_heat_and_moisture_transfer_settings
+            .len(),
+    );
 
     push_typed_unsupported_object(
         registry,

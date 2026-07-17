@@ -7,8 +7,9 @@ use crate::{
     ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
     ExternalInterfaceSchedule, FanComponent, GlazingSpectralData, GlazingSpectralDataId,
     GlobalGeometryRules, IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId, LoopId,
-    Material, MaterialId, MaterialMoisturePenetrationDepthSettings, MaterialPhaseChange,
-    MaterialPhaseChangeHysteresis, MaterialVariableAbsorptance, MaterialVariableAbsorptanceId,
+    Material, MaterialHeatAndMoistureTransferSettings, MaterialId,
+    MaterialMoisturePenetrationDepthSettings, MaterialPhaseChange, MaterialPhaseChangeHysteresis,
+    MaterialVariableAbsorptance, MaterialVariableAbsorptanceId,
     MaterialVariableThermalConductivity, NameMap, Node, NodeId, NodeList, NodeListId,
     NormalizedName, OtherEquipment, People, PlantBranch, PlantBranchList, PlantConnector,
     PlantConnectorKind, PlantConnectorList, PlantLoop, PumpConstantSpeed, RunPeriod,
@@ -68,6 +69,8 @@ pub struct TypedModel {
     pub material_variable_thermal_conductivities: Vec<MaterialVariableThermalConductivity>,
     /// EMPD settings attachments keyed by referenced material names.
     pub material_moisture_penetration_depth_settings: Vec<MaterialMoisturePenetrationDepthSettings>,
+    /// HAMT settings attachments keyed by referenced material names.
+    pub material_heat_and_moisture_transfer_settings: Vec<MaterialHeatAndMoistureTransferSettings>,
     /// Ordered thermochromic glazing states referenced by range descriptors on materials.
     pub window_glazing_thermochromic_state_arena: Vec<WindowGlazingThermochromicState>,
     /// Constructions.
@@ -238,6 +241,7 @@ impl Default for TypedModel {
             material_phase_changes: Vec::new(),
             material_variable_thermal_conductivities: Vec::new(),
             material_moisture_penetration_depth_settings: Vec::new(),
+            material_heat_and_moisture_transfer_settings: Vec::new(),
             window_glazing_thermochromic_state_arena: Vec::new(),
             constructions: Vec::new(),
             construction_names: NameMap::default(),
@@ -349,6 +353,7 @@ impl TypedModel {
             + self.material_phase_changes.len()
             + self.material_variable_thermal_conductivities.len()
             + self.material_moisture_penetration_depth_settings.len()
+            + self.material_heat_and_moisture_transfer_settings.len()
             + self.constructions.len()
             + self.schedule_type_limits.len()
             + self.day_schedules.len()
