@@ -442,7 +442,7 @@ Write-Utf8NoBomFile -Path $oneZonePath -Contents @'
   "Building": {"Defaulted Building": {"terrain": "Suburbs"}},
   "Timestep": {"Timestep 1": {}},
   "Site:Location": {"Denver Site": {"latitude": 39.74, "longitude": -105.18}},
-  "Material:NoMass": {"R13": {"thermal_resistance": 2.29}},
+  "Material:NoMass": {"R13": {"roughness": "Rough", "thermal_resistance": 2.29}},
   "Construction": {"Wall Construction": {"outside_layer": "R13"}},
   "ScheduleTypeLimits": {
     "Fraction": {
