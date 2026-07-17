@@ -1,0 +1,156 @@
+Version,
+  26.1;
+
+Timestep,
+  4;
+
+Building,
+  COMPLEX SHADE STATIC EIO,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+Site:Location,
+  ORACLE SITE,
+  39.77,
+  -104.87,
+  -7.0,
+  1611.0;
+
+SizingPeriod:DesignDay,
+  ORACLE WINTER DAY,
+  1,
+  21,
+  WinterDesignDay,
+  -10.0,
+  0.0,
+  ,
+  ,
+  Wetbulb,
+  -10.0,
+  ,
+  ,
+  ,
+  ,
+  83411.0,
+  2.3,
+  180.0,
+  No,
+  No,
+  No,
+  ASHRAEClearSky,
+  ,
+  ,
+  ,
+  ,
+  1.0;
+
+SimulationControl,
+  No,
+  No,
+  No,
+  Yes,
+  No,
+  No,
+  1;
+
+Output:Variable,
+  *,
+  Site Outdoor Air Drybulb Temperature,
+  Hourly;
+
+Output:Constructions,Constructions,Materials;
+
+WindowMaterial:ComplexShade,
+  Z FULL DEFAULTS;
+
+WindowMaterial:ComplexShade,
+  Y BSDF CUSTOM BASE,
+  BSDF,
+  0.003,
+  2.0,
+  0.1,
+  0.7,
+  0.8,
+  0.1,
+  0.2,
+  0.3,
+  0.4,
+  0.5;
+
+WindowMaterial:ComplexShade,
+  X OTHER NONVENETIAN SUBHALF,
+  OtherShadingType,
+  0.004,
+  3.0,
+  0.2,
+  0.6,
+  0.9,
+  0.2,
+  0.3,
+  0.4,
+  0.5,
+  0.6,
+  0.040,
+  0.030,
+  0.002,
+  -45.0,
+  77.0,
+  0.001;
+
+WindowMaterial:ComplexShade,
+  W PERFORATED DEFAULTS,
+  Perforated;
+
+WindowMaterial:ComplexShade,
+  V VENETIAN H EQUAL HALF,
+  VenetianHorizontal,
+  0.002,
+  1.0,
+  0.0,
+  0.84,
+  0.84,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.05,
+  0.016,
+  0.012,
+  0.0006,
+  90.0,
+  160.0,
+  0.008;
+
+WindowMaterial:ComplexShade,
+  U VENETIAN V FLAT,
+  VenetianVertical,
+  0.002,
+  1.0,
+  0.0,
+  0.84,
+  0.84,
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.05,
+  0.016,
+  0.012,
+  0.0006,
+  -90.0,
+  160.0,
+  0.0;
+
+WindowMaterial:ComplexShade,
+  T WOVEN DEFAULTS,
+  Woven;

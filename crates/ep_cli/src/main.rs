@@ -14,6 +14,7 @@ mod static_model;
 mod time_weather_schedule;
 mod window_material_blind;
 mod window_material_blind_equivalent_layer;
+mod window_material_complex_shade;
 mod window_material_drape_equivalent_layer;
 mod window_material_gap;
 mod window_material_screen;
@@ -133,6 +134,7 @@ use std::time::Instant;
 use time_weather_schedule::generate_time_weather_schedule_report;
 use window_material_blind::run_compare_window_material_blind;
 use window_material_blind_equivalent_layer::run_compare_window_material_blind_equivalent_layer;
+use window_material_complex_shade::run_compare_window_material_complex_shade;
 use window_material_drape_equivalent_layer::run_compare_window_material_drape_equivalent_layer;
 use window_material_gap::run_compare_window_material_gap;
 use window_material_screen::run_compare_window_material_screen;
@@ -384,6 +386,9 @@ fn print_help() {
     );
     println!(
         "  compare window-material-simple-glazing-system <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
+    );
+    println!(
+        "  compare window-material-complex-shade <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
     );
     println!(
         "  compare window-material-gap <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
@@ -3432,6 +3437,9 @@ fn run_compare_command(args: &[String]) -> i32 {
         Some("window-material-simple-glazing-system") => {
             run_compare_window_material_simple_glazing_system(&args[1..])
         }
+        Some("window-material-complex-shade") => {
+            run_compare_window_material_complex_shade(&args[1..])
+        }
         Some("window-material-gap") => run_compare_window_material_gap(&args[1..]),
         Some("internal-gains") => run_compare_internal_gains(&args[1..]),
         Some("internal-convective-gain") => run_compare_internal_convective_gain(&args[1..]),
@@ -3487,6 +3495,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             );
             eprintln!(
                 "usage: eplus-rs compare window-material-simple-glazing-system <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
+            );
+            eprintln!(
+                "usage: eplus-rs compare window-material-complex-shade <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
             );
             eprintln!(
                 "usage: eplus-rs compare window-material-gap <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
@@ -3550,6 +3561,9 @@ fn run_compare_command(args: &[String]) -> i32 {
             );
             eprintln!(
                 "usage: eplus-rs compare window-material-simple-glazing-system <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
+            );
+            eprintln!(
+                "usage: eplus-rs compare window-material-complex-shade <input.epJSON> <eplusout.eio> [--tolerance exact|near]"
             );
             eprintln!(
                 "usage: eplus-rs compare window-material-gap <input.epJSON> <eplusout.eio> [--tolerance exact|near]"

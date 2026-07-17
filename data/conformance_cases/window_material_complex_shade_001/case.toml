@@ -1,0 +1,57 @@
+id = "window_material_complex_shade_001"
+title = "Complex-shade generic material-definition EIO evidence"
+milestone = "v0.8-heat-balance"
+purpose = "Compare the bounded Rust WindowMaterial:ComplexShade typed slice with EnergyPlus generic static Material Details definition rows."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The warning-free no-zone fixture defines exactly seven unused WindowMaterial:ComplexShade objects in source IDF order Z, Y, X, W, V, U, T. It contains no Construction, Construction:ComplexFenestrationState, Zone, BuildingSurface:Detailed, or FenestrationSurface:Detailed object.",
+  "Z leaves every input at its source default. Y selects BSDF and changes the base thickness, conductivity, infrared transmittance, both emissivities, and five opening multipliers. X selects OtherShadingType and supplies non-Venetian slat geometry whose 0.001 m curve is below half its 0.040 m width. W and T select Perforated and Woven while otherwise defaulted. V selects VenetianHorizontal with curve exactly half its 0.016 m slat width. U selects VenetianVertical with a flat slat.",
+  "The both-selector and Materials-only lanes each emit exactly one generic Material Details header, one empty Material:Air header, and exactly seven target rows in fixture-local source IDF order Z, Y, X, W, V, U, T. Constructions-only and blank/default-selector lanes emit no generic target header or data.",
+  "Each exact eleven-token target row locks normalized identity, zero thermal resistance, Rough roughness, source thickness and conductivity, zero density and specific heat, the source back emissivity projected as thermal absorptance, and zero solar and visible absorptance. The generic row does not expose layer type, front emissivity, infrared transmittance, openings, slat state, or curve geometry.",
+  "The both-selector and Constructions-only lanes each emit exactly the four empty Construction CTF, Material CTF Summary, Material:Air CTF Summary, and CTF headers. Materials-only and blank/default-selector lanes emit none of those CTF headers; all four lanes emit no CTF data row for this no-construction fixture.",
+  "No lane emits a dedicated WindowMaterial:ComplexShade, WindowMaterial:Glazing, or WindowConstruction header or data row. Every lane completes with zero warnings and zero severe errors.",
+  "ConvertInputFormat canonicalizes the ComplexShade object keys as T, U, V, W, X, Y, Z rather than preserving fixture-local source IDF order, and it leaves the fully defaulted Z object empty. The smoke gate locks that observed converted artifact while explicitly declining broad IDF/epJSON declaration-order parity.",
+  "The smoke gate generates and verifies all four Output:Constructions selector variants, converted epJSON artifacts, exact oracle rows and selector shapes, and the bounded Rust command `compare window-material-complex-shade` in explicit exact mode.",
+  "Layer classification, infrared transmittance, front emissivity, openings, slat geometry, slat-angle or curve validation outside the accepted fixture values, complex-fenestration construction use, TARCOG or WCE behavior, ratings, daylighting, surfaces, runtime, diagnostics, and broad declaration-order behavior remain outside this evidence.",
+  "This is non-blocking diagnostic-only static input evidence. It makes no WindowMaterial:ComplexShade conformance, complex-fenestration construction, zone, surface, fenestration, runtime, Rust EIO serialization, or diagnostic-text claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/window_material_complex_shade_001/window_material_complex_shade.idf"
+tier = "A"
+
+[scope]
+domains = ["construction"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/window_material_complex_shade_001/window_material_complex_shade.idf"
+epjson = ".runtime/compare-window-material-complex-shade/26.1.0/window-material-complex-shade.epJSON"
+
+[[outputs]]
+key = "*"
+variable = "WindowMaterial:ComplexShade Generic Definition Details"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/window_material_complex_shade_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-window-material-complex-shade-smoke"
+blocking = false

@@ -1481,9 +1481,37 @@ its alternating solid/gap packing, directional optical matrices,
 slat behavior, BSDF optics, shading flags, surfaces, ratings, and daylighting
 remain deferred. Arbitrary-run support assessment counts and blocks every
 definition, including unused definitions, as
-`UnsupportedSurfaceBoundary`/`RunBlocked` with no runtime class. EIO/reporting,
-Rust serialization, runtime execution, broad diagnostic parity, and
-conformance remain unclaimed.
+`UnsupportedSurfaceBoundary`/`RunBlocked` with no runtime class.
+EIO/reporting beyond the bounded generic diagnostic below, Rust serialization,
+runtime execution, broad diagnostic parity, and conformance remain unclaimed.
+
+`window_material_complex_shade_001` adds only a bounded, nonblocking,
+diagnostic EnergyPlus 26.1 generic `Material Details` comparison through
+`crates/ep_cli/src/window_material_complex_shade.rs::run_compare_window_material_complex_shade`
+and the `WindowMaterial:ComplexShade Generic Definition Details` proof
+variable. Its warning-free, no-zone source-IDF fixture keeps seven unused
+definitions in fixture-local Z,Y,X,W,V,U,T order. The both-selector
+`Constructions,Materials` and Materials-only lanes each contain one exact
+11-token generic header and seven exact target rows; Constructions-only and
+blank/default contain neither the generic header nor target data.
+
+Every target row is `Rough`, has zero resistance, density, specific heat,
+solar absorptance, and visible absorptance, reports its definition's own
+thickness and conductivity, and maps BackEmissivity to thermal absorptance.
+An empty `Material:Air` header in Materials-enabled lanes and empty generic
+Construction CTF, Material CTF Summary, Material:Air CTF Summary, and CTF
+headers in Constructions-enabled lanes remain outside target evidence. No
+dedicated `WindowMaterial:ComplexShade`, `WindowMaterial:Glazing`, or
+`WindowConstruction` data row appears. `ConvertInputFormat` reorders the
+definitions T,U,V,W,X,Y,Z and converted epJSON EIO follows that order, so only
+source-IDF fixture-local Z,Y,X,W,V,U,T ordering is claimed.
+
+Layer type, infrared transmittance, front emissivity, opening multipliers,
+slat geometry and properties, curve state, construction use or occurrence,
+`Construction:ComplexFenestrationState` packing, TARCOG/WCE/BSDF behavior,
+thermal behavior, Rust EIO serialization, runtime, broad diagnostics, and
+conformance remain unclaimed. The comparator does not promote
+`GetMaterialData` or another parent source routine wholesale.
 
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. `Material:RoofVegetation` joins the opaque family with a dedicated
@@ -1798,7 +1826,8 @@ arbitrary-run block. Representative evidence is
 `compiler::tests::window_material_complex_shade::window_complex_shade_materializes_source_defaults_and_source_order`.
 The tests do not claim the complex-fenestration-state consumer, directional
 matrices, TARCOG/WCE, BSDF optics, EIO/reporting, runtime, broad diagnostic
-parity, or conformance.
+parity, or conformance. The dedicated static case separately locks only the
+bounded generic `Material Details` evidence above.
 
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
@@ -1813,7 +1842,7 @@ the 12 deferred overlay/dataset families.
 |---|---|---|
 | `GetWindowGlassSpectralData` | `source_mapped` | owns the pre-material spectral dataset read |
 | `MaterialGlass::SetupSimpleWindowGlazingSystem` | `state_mapped` | its complete material-owned performance-index block model, optional-visible branch, reversed intermediate-U film-resistance interpolation, and materializing high-U resistance clamp are typed; construction, angular/hemispherical optics, reporting, runtime, and conformance remain outside the mapping |
-| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, RoofVegetation, Thermochromic glazing-group, SimpleGlazingSystem, and complex-fenestration Gap and ComplexShade objects plus only the regular Glazing `SpectralAverage` branch are implemented; RoofVegetation, SimpleGlazingSystem, and complex-fenestration Gap have bounded generic-definition CLI comparisons, while Thermochromic and ComplexShade EIO remain unclaimed |
+| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, RoofVegetation, Thermochromic glazing-group, SimpleGlazingSystem, and complex-fenestration Gap and ComplexShade objects plus only the regular Glazing `SpectralAverage` branch are implemented; RoofVegetation, SimpleGlazingSystem, and complex-fenestration Gap and ComplexShade have bounded generic-definition CLI comparisons, while Thermochromic EIO remains unclaimed |
 | `CalcScreenTransmittance` | `source_mapped` | the Screen fixture comparator reproduces only its normal-incidence A/Z paths and the values required by the bounded static EIO row |
 | `CalcWindowScreenProperties` | `source_mapped` | the Screen fixture comparator reproduces only its reverse-order 18 by 18 initialization integration and fixture activation boundary |
 | `ReportGlass` | `source_mapped` | owns the bounded Blind specialized header, raw seven-field row serialization, construction-occurrence order, and post-`CalcNominalWindowCond` skip behavior |
@@ -2003,9 +2032,21 @@ surfaces, ratings, daylighting, Rust EIO serialization, runtime, broad
 diagnostics, conformance, and whole-routine promotion remain outside the
 boundary.
 
-ComplexShade evidence is typed-only. No EIO checkpoint, complex-fenestration
-state packing, directional-matrix, TARCOG/WCE, BSDF, runtime, or conformance
-claim is introduced for it.
+`window_material_complex_shade_001` adds a bounded generic-definition
+diagnostic for seven unused ComplexShade definitions in a warning-free
+no-zone source-IDF fixture. Both-selector and Materials-only runs contain one
+exact 11-token generic header and the exact Z,Y,X,W,V,U,T target rows;
+Constructions-only and blank/default contain no generic header or target data.
+Every target is `Rough`, reports its own thickness and conductivity, maps
+BackEmissivity to thermal absorptance, and has zero resistance, density,
+specific heat, solar absorptance, and visible absorptance. Empty
+`Material:Air` and generic CTF headers remain outside target evidence, and no
+dedicated ComplexShade, Glazing, or WindowConstruction data row appears.
+Converted epJSON emits T,U,V,W,X,Y,Z, so only the source-IDF fixture-local
+sequence is claimed. Layer type, infrared transmittance, front emissivity,
+openings, slats, curve, use, complex-fenestration-state packing, TARCOG/WCE,
+BSDF, thermal behavior, Rust EIO serialization, runtime, broad diagnostics,
+conformance, and whole-routine promotion remain outside the boundary.
 
 These tests and static EIO smokes remain bounded evidence, not an EnergyPlus
 material-family or window gate.

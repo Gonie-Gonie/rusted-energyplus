@@ -569,6 +569,12 @@
                          "help":  "Compare complex-fenestration gap generic definitions and four reporting-selector lanes with exact EnergyPlus EIO evidence."
                      },
                      {
+                         "name":  "compare-window-material-complex-shade-smoke",
+                         "path":  "compare\\compare-window-material-complex-shade-smoke.ps1",
+                         "group":  "compare",
+                         "help":  "Compare complex-shade generic definitions and four reporting-selector lanes with exact EnergyPlus EIO evidence."
+                     },
+                     {
                          "name":  "compare-window-material-gas-smoke",
                          "path":  "compare\\compare-window-material-gas-smoke.ps1",
                          "group":  "compare",
