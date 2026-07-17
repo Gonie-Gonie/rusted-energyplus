@@ -20,11 +20,11 @@ use crate::{
     ScheduleCompact, ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList,
     ScheduleFile, ScheduleFileShading, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
     ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
-    Surface, SurfaceConvectionAlgorithms, SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId,
-    TimestepConfig, Version, WeekScheduleId, WindowGlazingThermochromicGroupMaterial,
-    WindowGlazingThermochromicState, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
-    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
-    ZoneThermostat, ZoneThermostatId,
+    Surface, SurfaceConvectionAlgorithms, SurfaceId, SurfaceVaporCoefficients,
+    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version, WeekScheduleId,
+    WindowGlazingThermochromicGroupMaterial, WindowGlazingThermochromicState, Zone,
+    ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId, ZoneEquipmentObjectType,
+    ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatId,
 };
 
 /// Minimal typed model for early compiler stages.
@@ -232,6 +232,8 @@ pub struct TypedModel {
     pub surfaces: Vec<Surface>,
     /// Surface names.
     pub surface_names: NameMap<SurfaceId>,
+    /// Constant exterior/interior vapor-transfer coefficient attachments.
+    pub surface_vapor_coefficients: Vec<SurfaceVaporCoefficients>,
 }
 
 impl Default for TypedModel {
@@ -336,6 +338,7 @@ impl Default for TypedModel {
             zone_names: NameMap::default(),
             surfaces: Vec::new(),
             surface_names: NameMap::default(),
+            surface_vapor_coefficients: Vec::new(),
         }
     }
 }
@@ -427,6 +430,7 @@ impl TypedModel {
             + self.chillers_electric_eir.len()
             + self.zones.len()
             + self.surfaces.len()
+            + self.surface_vapor_coefficients.len()
     }
 }
 

@@ -44,7 +44,8 @@ use ep_model::{
     ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn, ScheduleId,
     ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact,
     ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation, SolarDistribution,
-    SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
+    SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType,
+    SurfaceVaporCoefficient, SurfaceVaporCoefficients, SurfaceVaporCoefficientsId, Terrain,
     ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
     TypedModel, VariableAbsorptanceControl, VariableAbsorptanceFunctionSignal,
     VariableAbsorptanceSchedule, Version, VertexEntryDirection, WeekScheduleId, WindExposure,
@@ -544,6 +545,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Chiller:Electric:EIR",
     "Zone",
     "BuildingSurface:Detailed",
+    "SurfaceProperties:VaporCoefficients",
 ];
 
 struct Compiler<'a> {
@@ -642,6 +644,7 @@ impl<'a> Compiler<'a> {
         self.parse_other_equipment(&mut model);
         self.parse_people(&mut model);
         self.parse_surfaces(&mut model);
+        self.parse_surface_vapor_coefficients(&mut model);
 
         let typed_object_count = model.object_count();
         let has_errors = self
@@ -12951,6 +12954,104 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_surface_vapor_coefficients(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "SurfaceProperties:VaporCoefficients";
+        const EXTERNAL_CONSTANT_FIELD: &str = "constant_external_vapor_transfer_coefficient";
+        const EXTERNAL_VALUE_FIELD: &str = "external_vapor_coefficient_value";
+        const INTERNAL_CONSTANT_FIELD: &str = "constant_internal_vapor_transfer_coefficient";
+        const INTERNAL_VALUE_FIELD: &str = "internal_vapor_coefficient_value";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let diagnostics_before_fields = self.diagnostics.len();
+            let surface_name = self.required_string(OBJECT_TYPE, &name, &object, "surface_name");
+            let external = SurfaceVaporCoefficient {
+                is_constant: self.enum_default(
+                    OBJECT_TYPE,
+                    &name,
+                    (&object, EXTERNAL_CONSTANT_FIELD),
+                    false,
+                    "No",
+                    parse_yes_no,
+                ),
+                value_kg_per_pa_s_m2: self.number_bounded_blank_default(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    EXTERNAL_VALUE_FIELD,
+                    0.0,
+                    (0.0, true),
+                    (f64::INFINITY, false),
+                ),
+            };
+            let internal = SurfaceVaporCoefficient {
+                is_constant: self.enum_default(
+                    OBJECT_TYPE,
+                    &name,
+                    (&object, INTERNAL_CONSTANT_FIELD),
+                    false,
+                    "No",
+                    parse_yes_no,
+                ),
+                value_kg_per_pa_s_m2: self.number_bounded_blank_default(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    INTERNAL_VALUE_FIELD,
+                    0.0,
+                    (0.0, true),
+                    (f64::INFINITY, false),
+                ),
+            };
+            if self.diagnostics.len() != diagnostics_before_fields {
+                continue;
+            }
+            let Some(surface_name) = surface_name else {
+                continue;
+            };
+            let Some(reference_surface) = self.resolve_name(
+                &model.surface_names,
+                OBJECT_TYPE,
+                &name,
+                "surface_name",
+                &surface_name,
+                "BuildingSurface:Detailed",
+            ) else {
+                continue;
+            };
+            if model
+                .surface_vapor_coefficients
+                .iter()
+                .any(|coefficients| coefficients.reference_surface == reference_surface)
+            {
+                self.error(
+                    "DuplicateSurfaceVaporCoefficientsSurface",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("surface_name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} repeats a surface that already has vapor coefficients"
+                    ),
+                );
+                continue;
+            }
+
+            let Some(id_value) =
+                self.checked_id(OBJECT_TYPE, &name, model.surface_vapor_coefficients.len())
+            else {
+                continue;
+            };
+            model
+                .surface_vapor_coefficients
+                .push(SurfaceVaporCoefficients {
+                    id: SurfaceVaporCoefficientsId(id_value),
+                    name: NormalizedName::new(&name),
+                    reference_surface,
+                    external,
+                    internal,
+                });
+        }
+    }
+
     fn zone_equipment_entries(
         &mut self,
         model: &TypedModel,
@@ -16452,6 +16553,7 @@ mod tests {
     mod schedule_scalar_type_limits;
     mod schedule_week_compact;
     mod schedule_year;
+    mod surface_properties_vapor_coefficients;
     mod window_material_blind;
     mod window_material_blind_equivalent_layer;
     mod window_material_complex_shade;

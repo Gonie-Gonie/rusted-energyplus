@@ -117,15 +117,18 @@ definition even when EnergyPlus would never invoke the semantic reader.
 `MaterialProperty:HeatAndMoistureTransfer:Redistribution`, and
 `MaterialProperty:HeatAndMoistureTransfer:Diffusion`, and
 `MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity` are the six
-material objects owned by `GetHeatBalHAMTInput`. EnergyPlus invokes that reader only
-when the first actual HAMT surface reaches `ManageHeatBalHAMT`; selecting the
-global HAMT algorithm without such a surface does not trigger the semantic
-read. Within the reader, Settings precedes SorptionIsotherm, Suction,
-Redistribution, Diffusion, and ThermalConductivity. Rust publishes immutable
-Settings, SorptionIsotherm, Suction, Redistribution, Diffusion, and
-ThermalConductivity attachments after EMPD in that deterministic compiler
-order, validates all six eagerly,
-and does not claim a global source order among CondFD, EMPD, and HAMT managers.
+material objects owned by `GetHeatBalHAMTInput`.
+`SurfaceProperties:VaporCoefficients` is its separate final surface-property
+pass outside the material inventory. EnergyPlus invokes that reader only when
+the first actual HAMT surface reaches `ManageHeatBalHAMT`; selecting the global
+HAMT algorithm without such a surface does not trigger the semantic read.
+Within the reader, Settings precedes SorptionIsotherm, Suction, Redistribution,
+Diffusion, ThermalConductivity, and then VaporCoefficients. Rust publishes the
+six immutable material attachments after EMPD in that deterministic compiler
+order, then publishes VaporCoefficients after `BuildingSurface:Detailed` so its
+semantic target resolves to `SurfaceId`. Rust validates all seven passes
+eagerly and does not claim a global source order among CondFD, EMPD, and HAMT
+managers.
 
 ## Standalone Glazing Spectral Dataset Typed Contract
 
@@ -938,6 +941,65 @@ aggregate unused-HAMT warning, runtime numerics, and conformance remain
 unsupported. No manifest, comparator, or proof variable is added, and the
 object has no dedicated EIO row.
 
+## Surface Vapor Coefficients Attachment Typed Contract
+
+`SurfaceProperties:VaporCoefficients` is the complete bounded final seventh
+pass of `GetHeatBalHAMTInput`, after the six material passes and after Rust has
+compiled `BuildingSurface:Detailed`. It is an immutable surface attachment,
+not a material variant or one of the 34 material inventory objects. The outer
+epJSON instance key is nonsemantic and may be blank or collide
+case-insensitively for distinct targets; Rust retains only a normalized
+diagnostic snapshot and publishes no name map. The required inner
+`surface_name` is the semantic target and resolves to `SurfaceId` through the
+typed `BuildingSurface:Detailed` registry.
+
+Each record preserves four input states independently. Missing or blank
+external and internal constant flags default to `No`; otherwise each accepts
+case-insensitive `Yes` or `No`. Missing or blank external and internal vapor
+coefficient values default to finite zero. Every supplied value must be finite
+and nonnegative, with no upper bound. The schema and source impose no
+flag/value or cross-side relationship, so `Yes` with zero, `No` with a positive
+value, and unequal external/internal states remain valid typed input. The raw
+values are retained even when their corresponding flags are `No`; they are not
+collapsed into `Option<f64>` or discarded.
+
+The case-insensitive flag parser follows the project-wide typed-input policy.
+EnergyPlus native epJSON schema validation instead requires canonical `Yes` or
+`No` spelling while the IDF path normalizes choice fields, so exact
+native-epJSON casing parity is not claimed.
+
+The surface reference is the only dependency. EnergyPlus searches its common
+surface array and does not require that the target select HAMT, use a HAMT
+construction, or own any Settings, Sorption, or later material attachment.
+Rust likewise invents no such dependency. Its current typed surface namespace
+contains only `BuildingSurface:Detailed`, so targets from the other EnergyPlus
+`SurfaceNames` families deliberately fail closed until those families are
+typed. Parsing occurs after `BuildingSurface:Detailed`, while the six material
+passes retain their earlier compiler order; this preserves the seventh-pass
+relationship without claiming a global lazy manager order.
+
+Blank or missing targets, missing typed surfaces, malformed flags,
+malformed/nonfinite/negative values, and a second target resolving to the same
+`SurfaceId` fail before `SurfaceVaporCoefficientsId` or target ownership
+is reserved. The duplicate rule is deliberately stricter than EnergyPlus.
+Source records are processed in input order and each side is written only for
+`Yes`: a later `Yes` replaces the earlier value on that side, a later `No`
+does not clear it, and external and internal values may come from different
+records. Rust rejects every repeated surface target until IDF declaration order
+and this per-side last-Yes accumulation are recovered. Blank or
+case-colliding outer keys remain valid for distinct surfaces.
+
+EnergyPlus reads all seven passes only when the first actual HAMT surface enters
+`ManageHeatBalHAMT`; Rust validates every VaporCoefficients definition eagerly.
+Every valid record, including both-No, zero-valued, non-HAMT, and otherwise
+runtime-inert records, blocks arbitrary execution as
+`UnsupportedSurfaceBoundary`. Boundary vapor-transfer derivation and fixed
+replacement, the internal `HMassConvInFD` rewrite, the accepted zero-vtc state
+and its resistance behavior, HAMT cell initialization and numerical execution,
+exact diagnostics/order/multiplicity, reporting, and conformance remain
+unsupported. The object has no dedicated EIO row, and no manifest, comparator,
+or proof variable is added.
+
 ### `GetHeatBalHAMTInput` state contract
 
 <!-- routine-state-contract:v1 begin get_heat_bal_hamt_input -->
@@ -956,7 +1018,10 @@ read_state:
 - the fixed 25-pair diffusion tail: pair 1 is required, pairs 2 through 25 are optional, every supplied scalar is validated, missing optional active-prefix scalars become zero, and positions beyond the declared count are ignored after validation; relative humidity is finite in inclusive [0,1] and water-vapor diffusion resistance factor is finite and nonnegative without an upper or cross-field bound, and authored order is retained without sorting or correction
 - deterministic compiler-ordered `MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity` definitions after Diffusion; each has a nonsemantic outer-key snapshot, a semantic inner material target, and a required exact-integer thermal-coordinate count from 1 through 25
 - the fixed 25-pair thermal-conductivity tail: pair 1 is required, pairs 2 through 25 are optional, every supplied scalar is validated, missing optional active-prefix scalars become zero, and positions beyond the declared count are ignored after validation; supplied moisture content is finite and nonnegative, supplied thermal conductivity is finite and strictly positive, neither has an upper bound, and authored order is retained without sorting or correction
+- deterministic compiler-ordered `SurfaceProperties:VaporCoefficients` definitions as the final seventh pass after ThermalConductivity and after `BuildingSurface:Detailed` compilation; each has a nonsemantic outer-key snapshot and a required semantic inner `surface_name` target resolved only through the typed BuildingSurface namespace
+- the two independent constant flags as missing or blank default No or case-insensitive Yes/No, plus their two raw vapor-coefficient values as missing or blank finite zero or supplied finite nonnegative values without upper, flag/value, or cross-side bounds; Yes with zero and No with a positive value remain valid typed input
 - the existing public base-material and attachment registries, where only `Material` with an existing typed Settings attachment is a Sorption target and only the same material with a typed Sorption attachment is independently eligible for Suction, Redistribution, Diffusion, and ThermalConductivity; none of those four attachments depends on another, Rust does not synthesize internal `~FC_Concrete` targets, and it deliberately fails closed on source warning-ignored R-only `Material:NoMass`
+- the existing typed `BuildingSurface:Detailed` registry, where any resolved `SurfaceId` is eligible without a HAMT-algorithm, construction, material, Settings, or Sorption dependency, while other EnergyPlus `SurfaceNames` families deliberately fail closed
 
 write_state:
 - a separate deterministic `MaterialHeatAndMoistureTransferSettings` attachment arena whose records own a typed ID, normalized outer-key snapshot, resolved `MaterialId`, porosity, and initial water-content ratio; the outer key is not published as a name map
@@ -970,29 +1035,33 @@ write_state:
 - source-effective Diffusion points formed by preserving the active input prefix exactly, then appending one point whose relative humidity is the indexed last source-effective Sorption relative humidity and whose water-vapor diffusion resistance factor is the last active Diffusion factor; no Diffusion-table sorting, correction, monotonicity or uniqueness check, clamp, cross-field rule, or table-validation warning is invented
 - a separate deterministic `MaterialHeatAndMoistureTransferThermalConductivity` attachment arena whose records own a typed ID, normalized outer-key snapshot, resolved `MaterialId`, SorptionIsotherm ID, declared count, count-selected zero-filled input points, and source-effective points; the outer key is not published as a name map
 - source-effective ThermalConductivity points formed by preserving the active input prefix exactly, then appending one point whose moisture content is the indexed last source-effective Sorption moisture and whose thermal conductivity is the last active ThermalConductivity value; no thermal-conductivity-table sorting, correction, monotonicity or uniqueness check, clamp, cross-field rule, or table-validation warning is invented
+- a separate deterministic `SurfaceVaporCoefficients` arena whose records own a typed ID, normalized outer-key snapshot, resolved `SurfaceId`, and separate external/internal constant booleans plus raw values; the outer key is not published as a name map and no mutable surface or HAMT cell state is written
 - the referenced base `MaterialDefinition` remains unchanged and no mutable `MaterialHAMT` subclass or `hasHAMT` state is invented
 - compile failure before attachment ID or target reservation for a blank or missing inner target, any non-`Material` public target, missing Settings or Sorption dependency, missing required field, malformed/nonfinite/out-of-range supplied field, invalid Sorption, Suction, Redistribution, Diffusion, or ThermalConductivity count, derived nonfinite Sorption state, or a repeated case-insensitive Settings, Sorption, Suction, Redistribution, Diffusion, or ThermalConductivity attachment for one material; blank or case-colliding outer keys remain valid for distinct targets
+- compile failure before `SurfaceVaporCoefficientsId` or surface ownership reservation for a blank or missing surface target, a target outside the typed `BuildingSurface:Detailed` namespace, malformed flags, malformed/nonfinite/negative values, or a repeated target resolving to the same `SurfaceId`; blank or case-colliding outer keys remain valid for distinct targets
 
 history_state_ownership:
-- no mutable HAMT cell temperature, relative humidity, vapor pressure, water content, flux, iteration, report, or timestep history in this checkpoint; the compiled model owns immutable Settings plus source-effective Sorption, Suction, Redistribution, Diffusion, and ThermalConductivity descriptors while every runtime consumer remains unsupported
+- no mutable HAMT cell temperature, relative humidity, vapor pressure, water content, flux, iteration, report, boundary-vapor-transfer, or timestep history in this checkpoint; the compiled model owns immutable Settings plus source-effective Sorption, Suction, Redistribution, Diffusion, and ThermalConductivity descriptors and immutable surface vapor-coefficient input snapshots while every runtime consumer remains unsupported
 
 unsupported_state:
-- source `MaterialHAMT` pointer replacement and `hasHAMT`, later active-construction absent-table base-conductivity fallback and its diagnostics, plus the trailing seventh `SurfaceProperties:VaporCoefficients` reader pass
-- active HAMT surface discovery, all-layer construction eligibility, cell-grid allocation, initial-water-to-relative-humidity conversion, interpolation and nonlinear heat/moisture state, six fixed surface outputs, three per-cell output families, HAMT cells/origins and generic nominal-resistance EIO, SQLite porosity reporting, runtime numerics, and conformance
+- source `MaterialHAMT` pointer replacement and `hasHAMT`, plus the later active-construction absent-table base-conductivity fallback and its diagnostics
+- active HAMT surface discovery, all-layer construction eligibility, boundary vapor-transfer derivation or fixed replacement, the internal `HMassConvInFD` rewrite, zero-vtc resistance behavior, cell-grid allocation, initial-water-to-relative-humidity conversion, interpolation and nonlinear heat/moisture state, six fixed surface outputs, three per-cell output families, HAMT cells/origins and generic nominal-resistance EIO, SQLite porosity reporting, runtime numerics, and conformance
 
 inactive_branches:
-- EnergyPlus performs semantic target resolution and all six ordered HAMT material passes only when the first actual HAMT surface enters `ManageHeatBalHAMT`; a global HAMT selection with no such surface does not invoke this reader, while Rust deliberately performs bounded Settings, Sorption, Suction, Redistribution, Diffusion, and ThermalConductivity validation for every definition eagerly and fails closed
+- EnergyPlus performs semantic target resolution for all six ordered HAMT material passes plus the final surface-vapor-coefficient pass only when the first actual HAMT surface enters `ManageHeatBalHAMT`; a global HAMT selection with no such surface does not invoke this reader, while Rust deliberately performs bounded validation for every definition eagerly and fails closed
 - EnergyPlus warning-ignores an R-only `Material:NoMass` Settings target; Rust rejects it so no valid-looking typed attachment silently disappears
 - EnergyPlus checks shared HAMT state before Suction, Redistribution, Diffusion, and ThermalConductivity but each pass then indexes the Sorption endpoint without an explicit missing-Sorption guard; Rust requires the typed Sorption dependency independently for all four attachments and fails closed on those unsafe paths without inventing dependencies among them
 - a missing or blank initial water-content ratio becomes 0.2; missing optional Sorption, Suction, Redistribution, Diffusion, or ThermalConductivity scalars inside the declared prefix become zero and supplied fields beyond the count are ignored after validation; an omitted optional active thermal conductivity may therefore become zero although a supplied zero is invalid, and no nonsemantic outer instance key owns target identity or duplicate detection
+- missing or blank external/internal VaporCoefficients flags become No and missing or blank values become zero; source No leaves an earlier same-side Yes write unchanged, while Rust rejects every repeated surface target until declaration-order and per-side last-Yes accumulation are recovered
 
 unsupported_active_branches:
 - every valid Settings, Sorption, Suction, Redistribution, Diffusion, or ThermalConductivity attachment is typed but run-blocking, including one attached only to an unused material
+- every valid SurfaceProperties:VaporCoefficients definition is typed but run-blocking, including both-No, zero-valued, non-HAMT, and otherwise runtime-inert records
 - inclusive porosity and relative-humidity endpoints, zero or above-porosity Sorption moisture, unordered or duplicate relative humidity, source-adjusted descending Sorption moisture, unordered, duplicate, or descending Suction and Redistribution moisture/coefficient points, unordered or duplicate Diffusion relative humidity with arbitrary nonnegative resistance-factor ordering, and unordered, duplicate, or descending ThermalConductivity moisture/value points including source-zero-filled optional values remain typed state but never reach HAMT initialization, interpolation, or numerical state
 - internally generated F/C-factor concrete targets and source effective later-replacement behavior for repeated case-insensitive Settings, Sorption, Suction, Redistribution, Diffusion, or ThermalConductivity material targets remain outside the executable boundary
 
 not_claimed_branches:
-- exact EnergyPlus diagnostic severity/text/order/multiplicity including Sorption correction-warning parity, lazy algorithm/use gating, the aggregate unused-HAMT warning counted in `SurfaceGeometry`, R-only warning-and-ignore parity, source duplicate replacement order, known Sorption IDF fractional-count rounding and exact Suction, Redistribution, Diffusion, or ThermalConductivity IDF fractional-count behavior, source retention of nonfinite Settings or Sorption scalars and their observed severe/crash paths, exact source handling of nonfinite Suction, Redistribution, Diffusion, or ThermalConductivity scalars or missing Sorption state, material-subclass and cross-attachment pointer lifetime behavior, active-construction absent-table base-conductivity fallback and its warning/error branches, the trailing `SurfaceProperties:VaporCoefficients` pass, construction and cell initialization, sorption plus rain-selected suction, ordinary redistribution, diffusion, and thermal-conductivity interpolation and heat/moisture runtime behavior, surface and cell output variables, EIO or SQLite serialization, runtime numerical behavior, and conformance
+- exact EnergyPlus diagnostic severity/text/order/multiplicity including Sorption correction-warning parity, lazy algorithm/use gating, the aggregate unused-HAMT warning counted in `SurfaceGeometry`, R-only warning-and-ignore parity, source duplicate replacement order, VaporCoefficients per-side last-Yes accumulation and declaration order, native-epJSON canonical Yes/No casing parity versus Rust's project-wide case-insensitive parser, known Sorption IDF fractional-count rounding and exact Suction, Redistribution, Diffusion, or ThermalConductivity IDF fractional-count behavior, source retention of nonfinite Settings or Sorption scalars and their observed severe/crash paths, exact source handling of nonfinite Suction, Redistribution, Diffusion, ThermalConductivity, or VaporCoefficients scalars or missing Sorption state, material-subclass and cross-attachment pointer lifetime behavior, legacy non-BuildingSurface `SurfaceNames` targets, active-construction absent-table base-conductivity fallback and its warning/error branches, construction and cell initialization, boundary vtc derivation/replacement and `HMassConvInFD` mutation, sorption plus rain-selected suction, ordinary redistribution, diffusion, thermal-conductivity interpolation and heat/moisture runtime behavior, zero-vtc resistance behavior, surface and cell output variables, EIO or SQLite serialization, runtime numerical behavior, and conformance
 <!-- routine-state-contract:v1 end get_heat_bal_hamt_input -->
 
 ## Base Definition Source Order
@@ -1059,6 +1128,7 @@ algorithm. The exact order guaranteed by each source owner is:
 | HAMT 4 | 31 | `MaterialProperty:HeatAndMoistureTransfer:Redistribution` | fourth HAMT pass; sorption-dependent fixed-tail redistribution dataset independent of Suction | complete bounded typed attachment for public Material targets with existing typed SorptionIsotherm; all definitions runtime-blocked |
 | HAMT 5 | 32 | `MaterialProperty:HeatAndMoistureTransfer:Diffusion` | fifth HAMT pass; sorption-dependent fixed-tail water-vapor diffusion dataset independent of Suction and Redistribution | complete bounded typed attachment for public Material targets with existing typed SorptionIsotherm; all definitions runtime-blocked |
 | HAMT 6 | 33 | `MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity` | sixth HAMT material pass; sorption-dependent fixed-tail conductivity dataset independent of Suction, Redistribution, and Diffusion | complete bounded typed attachment for public Material targets with existing typed SorptionIsotherm; all definitions runtime-blocked |
+| HAMT 7 | outside the 34-object material inventory | `SurfaceProperties:VaporCoefficients` | final HAMT pass after all material tables; surface-targeted external/internal fixed vapor-transfer inputs | complete bounded typed attachment for the Rust `BuildingSurface:Detailed` subset; all definitions runtime-blocked |
 
 The schema family number preserves the canonical 34-object inventory order:
 base definitions are 1 through 22 and the `MaterialProperty:*` entries are 23
@@ -1104,8 +1174,13 @@ same SorptionIsotherm dependency but no Suction, Redistribution, or Diffusion
 dependency. It retains its authored-order moisture/conductivity prefix and
 appends the indexed last Sorption moisture with the last active conductivity.
 All six leave the base payload unchanged and block every runtime consumer. The
-trailing `SurfaceProperties:VaporCoefficients` reader pass is likewise outside
-this checkpoint and is not part of the material-object counts.
+final `SurfaceProperties:VaporCoefficients` pass is typed separately after
+`BuildingSurface:Detailed`: it owns an independent arena keyed by `SurfaceId`,
+preserves the two constant booleans and two raw coefficient values without a
+HAMT material or algorithm dependency, and blocks every runtime consumer. It
+remains outside the 34-object material inventory and does not change the 22
+material variants, 11/12 typed material-overlay count, 33/34 complete bounded
+material slices, 1/34 partial slice, or 0/34 wholly deferred count.
 
 ### `Material` / regular
 
@@ -2877,8 +2952,7 @@ regular materials and requires one explicit all-definition
 validation, R-only warning-and-ignore parity, repeated-target replacement,
 internal F/C-factor targets, `MaterialHAMT` replacement, the typed
 SorptionIsotherm, Suction, Redistribution, Diffusion, and ThermalConductivity
-runtime consumers, the construction-local absent-table fallback, the trailing
-`SurfaceProperties:VaporCoefficients` reader pass,
+runtime consumers, the construction-local absent-table fallback,
 all-layer construction eligibility, cell state, output variables, EIO or SQLite
 reporting, runtime numerics, or conformance.
 
@@ -3018,6 +3092,30 @@ behavior, construction-local absent-table fallback and warnings,
 thermal-conductivity interpolation, construction/cell state, output variables,
 EIO or SQLite reporting, runtime numerics, or conformance.
 
+`SurfaceProperties:VaporCoefficients` model and compiler tests lock the
+nonsemantic blank and case-colliding outer keys; required semantic inner
+`surface_name`; parse-after-`BuildingSurface:Detailed` `SurfaceId` resolution;
+the deliberate BuildingSurface-only target boundary; and explicit success
+without a HAMT algorithm, HAMT construction, material Settings, or Sorption
+attachment. They preserve the external and internal constant booleans and raw
+values independently; lock missing and blank No/zero defaults; accept
+case-insensitive Yes/No under the project-wide enum parser; validate finite
+nonnegative unbounded values without a flag/value or cross-side relationship;
+and retain `Yes` with zero plus `No` with a positive value. Tests also lock
+duplicate targets resolving to the same `SurfaceId`, validation before ID or
+target reservation, typed coverage, and object-count inclusion. Representative
+compiler evidence is
+`compiler::tests::surface_properties_vapor_coefficients::surface_vapor_coefficients_materialize_defaults_and_surface_targets`.
+The exact runtime evidence
+`crates/ep_run/src/support/tests/surface_properties_vapor_coefficients.rs::surface_vapor_coefficients_block_every_definition_before_runtime`
+counts every definition and requires one explicit all-definition
+`UnsupportedSurfaceBoundary` run block. No test claims native-epJSON canonical
+Yes/No casing parity, source lazy semantic validation, legacy
+non-BuildingSurface `SurfaceNames`, per-side last-Yes duplicate accumulation or
+IDF declaration order, boundary-vtc derivation/replacement, the internal
+`HMassConvInFD` rewrite, zero-vtc resistance behavior, HAMT cell state,
+reporting, runtime numerics, or conformance.
+
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
 dynamic AirGap/IRT heat transfer or EcoRoof execution. It also does not claim exact EnergyPlus
@@ -3025,10 +3123,10 @@ diagnostic text, all input-processor default behavior beyond the standalone
 spectral-dataset, variable-absorptance, phase-change-hysteresis, and phase-change
 temperature-enthalpy, variable-thermal-conductivity, EMPD settings, and HAMT
 Settings, SorptionIsotherm, Suction, Redistribution, Diffusion, and
-ThermalConductivity contracts,
+ThermalConductivity plus SurfaceProperties:VaporCoefficients contracts,
 internal F/C-factor material injection, EMS mutation, broad material EIO
-formatting, the trailing `SurfaceProperties:VaporCoefficients` pass, or HAMT
-runtime consumers and construction-local conductivity fallback.
+formatting, or HAMT runtime consumers and construction-local conductivity
+fallback.
 
 ## Routine Inventory
 
@@ -3047,7 +3145,7 @@ runtime consumers and construction-local conductivity fallback.
 | `GetHysteresisData` | `state_mapped` | owns the complete bounded post-base hysteresis attachment read: public Material/NoMass target gate, thirteen required strict-positive inputs, grouped typed state and source-derived specific heats, duplicate-target fail-close boundary, and universal runtime block |
 | `GetCondFDInput` | `state_mapped` | owns the complete bounded PhaseChange and VariableThermalConductivity typed-input passes: public Material/NoMass target gate, PhaseChange's defaulted finite coefficient, both unbounded complete ordered point vectors, family-local duplicate-target fail-close boundaries, deliberate eager validation, and universal runtime blocks; its CondFD settings and all numerical state remain unsupported |
 | `GetMoistureBalanceEMPDInput` | `state_mapped` | owns the complete bounded EMPD settings pass: public Material-only target gate, seven required fixed fields, two defaulted automatic-depth states and explicit bounds, warning-only depth ordering, duplicate-target fail-close boundary, deliberate eager semantic validation, and universal runtime block; automatic depth materialization, placement, state, reporting, and numerics remain unsupported |
-| `GetHeatBalHAMTInput` | `state_mapped` | owns the complete bounded six material passes for Settings, SorptionIsotherm, Suction, Redistribution, Diffusion, and ThermalConductivity: nonsemantic outer keys; semantic Material-only targets; four independently Sorption-dependent sibling transport/property attachments; all five fixed 25-pair/count/zero-fill states and finite validation, including the supplied-conductivity strict-positive rule and source-zero-filled optional conductivity; source-effective Sorption endpoints, sort, and adjacent correction; authored-order Suction, Redistribution, Diffusion, and ThermalConductivity points; indexed last Sorption moisture for the liquid and conductivity tables and indexed last Sorption relative humidity for Diffusion; last-active dependent-value endpoint copies; family-local duplicate, dependency-safety, and derived-nonfinite fail-close boundaries; deliberate eager validation and NoMass fail-close; and universal runtime blocks; the trailing SurfaceProperties:VaporCoefficients pass, pointer replacement, construction-local absent-table fallback, construction/cell state, interpolation, reporting, and numerics remain unsupported, so the routine remains `state_mapped` |
+| `GetHeatBalHAMTInput` | `state_mapped` | owns the complete bounded six material passes for Settings, SorptionIsotherm, Suction, Redistribution, Diffusion, and ThermalConductivity plus the final SurfaceProperties:VaporCoefficients surface pass: nonsemantic outer keys; semantic Material-only and typed BuildingSurface-only targets; four independently Sorption-dependent sibling material attachments; all five fixed 25-pair/count/zero-fill states and finite validation; source-effective endpoints and corrections; independent default-No booleans and finite nonnegative default-zero raw vapor values without HAMT dependency or flag/value coupling; family-local material and surface duplicate fail-close boundaries; and deliberate eager validation plus universal runtime blocks. Source per-side last-Yes VaporCoefficients accumulation, native-epJSON enum-casing parity, pointer replacement, construction-local absent-table fallback, boundary-vtc and `HMassConvInFD` state, construction/cell initialization, interpolation, reporting, and numerics remain unsupported, so the routine remains `state_mapped` |
 
 All fourteen routine records have `required_for_full_domain = false`. The
 bounded implementation slice does not promote the whole `GetMaterialData`,
@@ -3058,10 +3156,11 @@ standalone `GetWindowGlassSpectralData` input boundary and the material-owned
 `GetVariableAbsorptanceInput` overlay boundary, `GetHysteresisData` attachment
 boundary, the declared `GetCondFDInput` PhaseChange and
 VariableThermalConductivity passes, the declared
-`GetMoistureBalanceEMPDInput` settings pass, and the declared six
-`GetHeatBalHAMTInput` Settings, SorptionIsotherm, Suction, Redistribution, and
-Diffusion, and ThermalConductivity material passes are `state_mapped`
-within their bounded input domains.
+`GetMoistureBalanceEMPDInput` settings pass, the declared six
+`GetHeatBalHAMTInput` material passes (Settings, SorptionIsotherm, Suction,
+Redistribution, Diffusion, and ThermalConductivity), and the final seventh
+`SurfaceProperties:VaporCoefficients` surface pass are `state_mapped` within
+their bounded input domains.
 
 ## Evidence And Promotion Boundary
 

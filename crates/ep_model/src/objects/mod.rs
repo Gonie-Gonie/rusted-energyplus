@@ -21,6 +21,7 @@ mod material_variable_thermal_conductivity;
 mod materials;
 mod plant;
 mod schedules;
+mod surface_vapor_coefficients;
 mod surfaces;
 mod thermostats;
 
@@ -45,5 +46,6 @@ pub use material_variable_thermal_conductivity::*;
 pub use materials::*;
 pub use plant::*;
 pub use schedules::*;
+pub use surface_vapor_coefficients::*;
 pub use surfaces::*;
 pub use thermostats::*;

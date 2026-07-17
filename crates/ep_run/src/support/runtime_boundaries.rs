@@ -548,6 +548,13 @@ pub(super) fn assess_typed_runtime_boundaries(
             .material_heat_and_moisture_transfer_thermal_conductivities
             .len(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "SurfaceProperties:VaporCoefficients",
+        typed_model.surface_vapor_coefficients.len(),
+    );
 
     push_typed_unsupported_object(
         registry,
