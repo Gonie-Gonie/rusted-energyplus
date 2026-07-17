@@ -14,32 +14,33 @@ use ep_model::{
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
     IdealLoadsLimit, InfraredTransparentMaterial, InsideSurfaceConvectionAlgorithm, InternalGainId,
     LoadDistributionScheme, LoopId, Material, MaterialDefinition, MaterialId,
-    MaterialSurfaceRoughness, MaterialVariableAbsorptance, MaterialVariableAbsorptanceId, NameMap,
-    NoMassMaterial, Node, NodeId, NodeList, NodeListId, NormalizedName, NumericType,
-    OpaqueSurfaceProperties, OtherEquipment, OtherEquipmentDesignLevelCalculationMethod,
-    OutdoorAirEconomizerType, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
-    PeopleNumberCalculationMethod, PlantBranch, PlantBranchComponent, PlantBranchList,
-    PlantConnector, PlantConnectorKind, PlantConnectorList, PlantConnectorListEntry, PlantLoop,
-    Point3, PumpConstantSpeed, RegularMaterial, RoofVegetationMaterial,
-    RoofVegetationMoistureDiffusionMethod, RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId,
-    RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleCompactDayProfile,
-    ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant, ScheduleDayHourly,
-    ScheduleDayInterval, ScheduleDayList, ScheduleDayType, ScheduleFile,
-    ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn, ScheduleId,
-    ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact,
-    ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation, SolarDistribution,
-    SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
-    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
-    TypedModel, VariableAbsorptanceControl, VariableAbsorptanceFunctionSignal,
-    VariableAbsorptanceSchedule, Version, VertexEntryDirection, WeekScheduleId, WindExposure,
-    WindowBlindDirectionalOpticalProperties, WindowBlindEquivalentLayerMaterial,
-    WindowBlindEquivalentLayerSlatAngleControl, WindowBlindMaterial, WindowBlindSlatAngleType,
-    WindowBlindSlatOrientation, WindowComplexGapGasComposition, WindowComplexGapMaterial,
-    WindowComplexGapSupportPillar, WindowComplexShadeLayerType, WindowComplexShadeMaterial,
-    WindowDrapeEquivalentLayerMaterial, WindowGapEquivalentLayerMaterial, WindowGapVentType,
-    WindowGasMaterial, WindowGasMixture, WindowGasMixtureComponent, WindowGasMixtureMaterial,
-    WindowGasPolynomialCoefficients, WindowGasProperties, WindowGasType,
-    WindowGlazingEquivalentLayerDiffuseProperties,
+    MaterialPhaseChangeHysteresis, MaterialPhaseChangeHysteresisId, MaterialSurfaceRoughness,
+    MaterialVariableAbsorptance, MaterialVariableAbsorptanceId, NameMap, NoMassMaterial, Node,
+    NodeId, NodeList, NodeListId, NormalizedName, NumericType, OpaqueSurfaceProperties,
+    OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType,
+    OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
+    PeopleNumberCalculationMethod, PhaseChangeHysteresisCurve, PhaseChangeHysteresisThermalState,
+    PlantBranch, PlantBranchComponent, PlantBranchList, PlantConnector, PlantConnectorKind,
+    PlantConnectorList, PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed,
+    RegularMaterial, RoofVegetationMaterial, RoofVegetationMoistureDiffusionMethod, RunPeriod,
+    RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
+    ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
+    ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleDayType,
+    ScheduleFile, ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn,
+    ScheduleId, ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits,
+    ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
+    SolarDistribution, SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId,
+    SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
+    ThermostatSetpointId, TimestepConfig, TypedModel, VariableAbsorptanceControl,
+    VariableAbsorptanceFunctionSignal, VariableAbsorptanceSchedule, Version, VertexEntryDirection,
+    WeekScheduleId, WindExposure, WindowBlindDirectionalOpticalProperties,
+    WindowBlindEquivalentLayerMaterial, WindowBlindEquivalentLayerSlatAngleControl,
+    WindowBlindMaterial, WindowBlindSlatAngleType, WindowBlindSlatOrientation,
+    WindowComplexGapGasComposition, WindowComplexGapMaterial, WindowComplexGapSupportPillar,
+    WindowComplexShadeLayerType, WindowComplexShadeMaterial, WindowDrapeEquivalentLayerMaterial,
+    WindowGapEquivalentLayerMaterial, WindowGapVentType, WindowGasMaterial, WindowGasMixture,
+    WindowGasMixtureComponent, WindowGasMixtureMaterial, WindowGasPolynomialCoefficients,
+    WindowGasProperties, WindowGasType, WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
     WindowGlazingSpectralAverageMaterial, WindowGlazingThermochromicGroupMaterial,
@@ -469,6 +470,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "WindowMaterial:Gap",
     "WindowMaterial:ComplexShade",
     "MaterialProperty:VariableAbsorptance",
+    "MaterialProperty:PhaseChangeHysteresis",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -580,6 +582,7 @@ impl<'a> Compiler<'a> {
         self.parse_external_interface_fmu_import_schedules(&mut model);
         self.parse_external_interface_fmu_export_schedules(&mut model);
         self.parse_material_variable_absorptances(&mut model);
+        self.parse_material_phase_change_hystereses(&mut model);
         self.validate_scalar_schedule_type_limits(&model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
@@ -1728,6 +1731,247 @@ impl<'a> Compiler<'a> {
             (Some(schedule), None) => Some(Some(VariableAbsorptanceSchedule::User(schedule))),
             (None, Some(built_in)) => Some(Some(built_in)),
             (None, None) => Some(None),
+        }
+    }
+
+    fn parse_material_phase_change_hystereses(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "MaterialProperty:PhaseChangeHysteresis";
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            if name.trim().is_empty() {
+                self.error(
+                    "MissingRequiredField",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE} requires a non-blank material name"),
+                );
+                continue;
+            }
+
+            let total_latent_heat_j_per_kg = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "latent_heat_during_the_entire_phase_change_process",
+                0.0,
+                false,
+            );
+            let liquid_conductivity_w_per_m_k = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "liquid_state_thermal_conductivity",
+                0.0,
+                false,
+            );
+            let liquid_density_kg_per_m3 = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "liquid_state_density",
+                0.0,
+                false,
+            );
+            let liquid_specific_heat_j_per_kg_k = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "liquid_state_specific_heat",
+                0.0,
+                false,
+            );
+            let melting_high_temperature_difference_c = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "high_temperature_difference_of_melting_curve",
+                0.0,
+                false,
+            );
+            let peak_melting_temperature_c = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "peak_melting_temperature",
+                0.0,
+                false,
+            );
+            let melting_low_temperature_difference_c = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "low_temperature_difference_of_melting_curve",
+                0.0,
+                false,
+            );
+            let solid_conductivity_w_per_m_k = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "solid_state_thermal_conductivity",
+                0.0,
+                false,
+            );
+            let solid_density_kg_per_m3 = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "solid_state_density",
+                0.0,
+                false,
+            );
+            let solid_specific_heat_j_per_kg_k = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "solid_state_specific_heat",
+                0.0,
+                false,
+            );
+            let freezing_high_temperature_difference_c = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "high_temperature_difference_of_freezing_curve",
+                0.0,
+                false,
+            );
+            let peak_freezing_temperature_c = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "peak_freezing_temperature",
+                0.0,
+                false,
+            );
+            let freezing_low_temperature_difference_c = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "low_temperature_difference_of_freezing_curve",
+                0.0,
+                false,
+            );
+            let (
+                Some(total_latent_heat_j_per_kg),
+                Some(liquid_conductivity_w_per_m_k),
+                Some(liquid_density_kg_per_m3),
+                Some(liquid_specific_heat_j_per_kg_k),
+                Some(melting_high_temperature_difference_c),
+                Some(peak_melting_temperature_c),
+                Some(melting_low_temperature_difference_c),
+                Some(solid_conductivity_w_per_m_k),
+                Some(solid_density_kg_per_m3),
+                Some(solid_specific_heat_j_per_kg_k),
+                Some(freezing_high_temperature_difference_c),
+                Some(peak_freezing_temperature_c),
+                Some(freezing_low_temperature_difference_c),
+            ) = (
+                total_latent_heat_j_per_kg,
+                liquid_conductivity_w_per_m_k,
+                liquid_density_kg_per_m3,
+                liquid_specific_heat_j_per_kg_k,
+                melting_high_temperature_difference_c,
+                peak_melting_temperature_c,
+                melting_low_temperature_difference_c,
+                solid_conductivity_w_per_m_k,
+                solid_density_kg_per_m3,
+                solid_specific_heat_j_per_kg_k,
+                freezing_high_temperature_difference_c,
+                peak_freezing_temperature_c,
+                freezing_low_temperature_difference_c,
+            )
+            else {
+                continue;
+            };
+
+            let Some(reference_material) = self.resolve_name(
+                &model.material_names,
+                OBJECT_TYPE,
+                &name,
+                "name",
+                &name,
+                "Material",
+            ) else {
+                continue;
+            };
+            let Some(material) = model.materials.get(reference_material.0 as usize) else {
+                self.error(
+                    "InvalidReference",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE}/{name} resolved material outside the material arena"),
+                );
+                continue;
+            };
+            if !matches!(
+                material.definition,
+                MaterialDefinition::Regular(_) | MaterialDefinition::NoMass(_)
+            ) {
+                self.error(
+                    "InvalidPhaseChangeHysteresisMaterialType",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE}/{name} must reference Material or Material:NoMass"),
+                );
+                continue;
+            }
+            if model
+                .material_phase_change_hystereses
+                .iter()
+                .any(|attachment| attachment.reference_material == reference_material)
+            {
+                self.error(
+                    "DuplicatePhaseChangeHysteresisMaterial",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} repeats a material that already has hysteresis properties"
+                    ),
+                );
+                continue;
+            }
+
+            let id_value = model.material_phase_change_hystereses.len();
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, id_value) else {
+                continue;
+            };
+            let id = MaterialPhaseChangeHysteresisId(id_value);
+            let transition_specific_heat_j_per_kg_k =
+                (solid_specific_heat_j_per_kg_k + liquid_specific_heat_j_per_kg_k) / 2.0;
+            model
+                .material_phase_change_hystereses
+                .push(MaterialPhaseChangeHysteresis {
+                    id,
+                    name: NormalizedName::new(&name),
+                    reference_material,
+                    total_latent_heat_j_per_kg,
+                    liquid_state: PhaseChangeHysteresisThermalState {
+                        conductivity_w_per_m_k: liquid_conductivity_w_per_m_k,
+                        density_kg_per_m3: liquid_density_kg_per_m3,
+                        specific_heat_j_per_kg_k: liquid_specific_heat_j_per_kg_k,
+                    },
+                    melting_curve: PhaseChangeHysteresisCurve {
+                        high_temperature_difference_c: melting_high_temperature_difference_c,
+                        peak_temperature_c: peak_melting_temperature_c,
+                        low_temperature_difference_c: melting_low_temperature_difference_c,
+                    },
+                    solid_state: PhaseChangeHysteresisThermalState {
+                        conductivity_w_per_m_k: solid_conductivity_w_per_m_k,
+                        density_kg_per_m3: solid_density_kg_per_m3,
+                        specific_heat_j_per_kg_k: solid_specific_heat_j_per_kg_k,
+                    },
+                    freezing_curve: PhaseChangeHysteresisCurve {
+                        high_temperature_difference_c: freezing_high_temperature_difference_c,
+                        peak_temperature_c: peak_freezing_temperature_c,
+                        low_temperature_difference_c: freezing_low_temperature_difference_c,
+                    },
+                    transition_specific_heat_j_per_kg_k,
+                    initial_specific_heat_j_per_kg_k: solid_specific_heat_j_per_kg_k,
+                });
         }
     }
 
@@ -14472,6 +14716,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 mod tests {
     mod global_geometry_rules;
     mod material_property_glazing_spectral_data;
+    mod material_property_phase_change_hysteresis;
     mod material_property_variable_absorptance;
     mod material_roof_vegetation;
     mod material_variants;

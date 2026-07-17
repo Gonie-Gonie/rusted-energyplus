@@ -60,10 +60,10 @@ different:
 | typed Rust material variants | 22 | Five complete opaque-family slices, the `WindowMaterial:Glazing` `SpectralAverage` branch, and the complete `RefractionExtinctionMethod`, glazing `EquivalentLayer`, `WindowMaterial:Gas`, gap `EquivalentLayer`, `WindowMaterial:GasMixture`, ordinary `WindowMaterial:Shade`, shade `EquivalentLayer`, drape `EquivalentLayer`, ordinary `WindowMaterial:Screen`, screen `EquivalentLayer`, ordinary `WindowMaterial:Blind`, blind `EquivalentLayer`, thermochromic glazing-group, simple-glazing-system, complex-fenestration gap, and complex-fenestration shade objects have distinct payloads. |
 | complete bounded base-definition slices | 21 / 22 | `Material`, `Material:NoMass`, `Material:AirGap`, `Material:InfraredTransparent`, `WindowMaterial:Glazing:RefractionExtinctionMethod`, `WindowMaterial:Glazing:EquivalentLayer`, `WindowMaterial:Gas`, `WindowMaterial:Gap:EquivalentLayer`, `WindowMaterial:GasMixture`, `WindowMaterial:Shade`, `WindowMaterial:Shade:EquivalentLayer`, `WindowMaterial:Drape:EquivalentLayer`, `WindowMaterial:Screen`, `WindowMaterial:Screen:EquivalentLayer`, `WindowMaterial:Blind`, `WindowMaterial:Blind:EquivalentLayer`, `Material:RoofVegetation`, `WindowMaterial:GlazingGroup:Thermochromic`, `WindowMaterial:SimpleGlazingSystem`, `WindowMaterial:Gap`, and `WindowMaterial:ComplexShade` have their source-effective fields and bounded compiler contracts typed. |
 | standalone typed datasets | 1 / 12 | `MaterialProperty:GlazingSpectralData` is typed in a separate deterministic standalone arena and name map; it is not a `MaterialDefinition` variant. |
-| typed material overlays | 1 / 12 | `MaterialProperty:VariableAbsorptance` is typed in a separate overlay arena after its eligible base-material and schedule dependencies are available; it is not a `MaterialDefinition` variant. |
-| complete bounded public-object slices | 23 / 34 | The 21 complete base-definition slices, standalone glazing spectral dataset, and variable-absorptance overlay are complete within their declared bounded compiler contracts. |
+| typed material overlays | 2 / 12 | `MaterialProperty:VariableAbsorptance` is typed in a separate overlay arena after its eligible base-material and schedule dependencies are available. `MaterialProperty:PhaseChangeHysteresis` is typed in a separate attachment arena keyed directly by its existing material target. Neither is a `MaterialDefinition` variant. |
+| complete bounded public-object slices | 24 / 34 | The 21 complete base-definition slices, standalone glazing spectral dataset, variable-absorptance overlay, and phase-change-hysteresis attachment are complete within their declared bounded compiler contracts. |
 | partial bounded public-object slices | 1 / 34 | Only `WindowMaterial:Glazing` with `Optical Data Type = SpectralAverage` is typed; `Spectral`, `SpectralAndAngle`, and `BSDF` remain explicitly unsupported. |
-| wholly deferred public objects | 10 / 34 | The remaining 10 overlays/datasets are wholly deferred; no base definition is wholly deferred. |
+| wholly deferred public objects | 9 / 34 | The remaining 9 overlays/datasets are wholly deferred; no base definition is wholly deferred. |
 
 The inventory scaffold began at CP58; the counts and typed states above are
 cumulative through the current checkpoint. Complete inventory does not mean
@@ -84,8 +84,9 @@ heat-transfer behavior.
 The spectral dataset therefore exists before a glazing definition resolves a
 spectral-data reference. Variable absorptance exists only after base materials
 have been created; Rust publishes its typed overlay only after the shared
-schedule namespace is also available. Hysteresis then upgrades an
-already-created regular material.
+schedule namespace is also available. Rust then publishes the hysteresis
+attachment in the same source-relative order; EnergyPlus upgrades an
+already-created public `Material` or `Material:NoMass` target in place.
 
 ## Standalone Glazing Spectral Dataset Typed Contract
 
@@ -242,6 +243,87 @@ not_claimed_branches:
 - exact source diagnostic severity/text/order/early-return behavior, Curve/Table dependency validation, `GetVariableAbsorptanceSurfaceList`, `UpdateVariableAbsorptances`, the scheduled-solar pointer defect, EIO serialization, runtime numerical behavior, and conformance
 <!-- routine-state-contract:v1 end get_variable_absorptance_input -->
 
+## Phase-Change Hysteresis Attachment Typed Contract
+
+`MaterialProperty:PhaseChangeHysteresis` is a complete bounded typed-input
+attachment, not a material variant. Its object key is the referenced material
+name itself; there is no independent overlay name or namespace. Each valid
+record retains a normalized target snapshot, resolves a `MaterialId`, and is
+stored in a deterministic `MaterialPhaseChangeHysteresis` arena with its own
+typed ID. The underlying `MaterialDefinition` stays unchanged.
+
+The actual EnergyPlus 26.1 gate accepts `Group::Regular`. Both public
+`Material` and `Material:NoMass` are created in that group, even though the
+schema memo describes a regular material and NoMass remains R-only. Rust
+therefore accepts those two public target variants and rejects AirGap,
+InfraredTransparent, RoofVegetation, and every window family. EnergyPlus can
+also resolve internally generated `~FC_Concrete` and `~FC_Insulation_n`
+targets; those aliases remain outside this bounded public target set because
+Rust does not yet synthesize F/C-factor materials.
+
+All thirteen numeric fields are required, finite, and strictly greater than
+zero, including both Celsius peak temperatures. In source field order they
+are total latent heat; liquid conductivity, density, and specific heat;
+high/peak/low melting-curve temperatures; solid conductivity, density, and
+specific heat; and high/peak/low freezing-curve temperatures. The schema and
+reader define no defaults, enums, upper bounds, or relationship checks among
+the two peaks, curve widths, or solid/liquid properties. The typed attachment
+groups the liquid and solid states and the melting and freezing curves, then
+stores the two source-initialized derived values: transition specific heat is
+the solid/liquid mean, and initial prior specific heat is the solid value.
+
+Numeric and key validation precede target reservation. A blank key, missing
+or wrong-family target, malformed/nonpositive field, or second
+case-insensitive attachment for the same material fails closed. An invalid
+first occurrence does not reserve the target or consume an ID. A valid
+hysteresis attachment may coexist on the same Regular target with the earlier
+typed `MaterialProperty:VariableAbsorptance` overlay, matching the common
+startup order.
+
+Every typed attachment, including one on an unused material, blocks arbitrary
+runtime execution. Rust does not replace base-material pointers, set mutable
+`hasPCM` state, allocate CondFD node histories, calculate hysteretic enthalpy,
+specific heat, density, or conductivity, or supply `ThermalStorage:PCM`.
+EnergyPlus 26.1 also contains material-shared history, R-layer cast,
+transition-state, curve-selection, EMPD/HAMT replacement, and EMS pointer
+hazards in these downstream paths; none is executed by this checkpoint. The
+object emits no dedicated EIO row, so this checkpoint adds compiler and
+support-boundary tests but no case manifest, proof variable, runtime numerical
+claim, or conformance claim.
+
+### `GetHysteresisData` state contract
+
+<!-- routine-state-contract:v1 begin get_hysteresis_data -->
+GetHysteresisData
+
+read_state:
+- deterministic compiler-ordered `MaterialProperty:PhaseChangeHysteresis` definitions after the earlier variable-absorptance overlay; the object key is the existing material reference and has no independent overlay namespace
+- thirteen required finite numeric fields in source order: total latent heat; liquid conductivity/density/specific heat; high/peak/low melting-curve temperatures; solid conductivity/density/specific heat; and high/peak/low freezing-curve temperatures; every value is strictly greater than zero, with no defaults, enums, upper bounds, or cross-field rules
+- the existing public base-material registry, where actual EnergyPlus `Group::Regular` admits `Material` and `Material:NoMass`; Rust does not synthesize internal `~FC_Concrete` or `~FC_Insulation_n` targets
+
+write_state:
+- a separate deterministic `MaterialPhaseChangeHysteresis` attachment arena whose records own a typed ID, normalized target snapshot, resolved `MaterialId`, total latent heat, grouped liquid/solid thermal states, and grouped melting/freezing curves; the object key is not published as a separate name map
+- source-initialized transition specific heat equal to the solid/liquid mean and initial prior specific heat equal to the solid value; the referenced base `MaterialDefinition` remains unchanged
+- compile failure before attachment ID or target reservation for a blank key, missing or non-Regular-group public target, any missing/malformed/nonpositive numeric field, or a second case-insensitive attachment for one material
+
+history_state_ownership:
+- no mutable phase, reversal, enthalpy, or prior-specific-heat history in this checkpoint; the compiled model owns immutable attachment descriptors while every downstream consumer remains unsupported
+
+unsupported_state:
+- source material-pointer replacement and `hasPCM`; CondFD material/node allocation, phase and reversal histories, hysteretic enthalpy/Cp/density/conductivity evaluation, construction and surface behavior, `ThermalStorage:PCM`, EMS pointer rebinding, reporting, and conformance
+
+inactive_branches:
+- all-positive inputs remain valid regardless of melting/freezing peak order or liquid/solid property relationships because the source defines no cross-field constraint
+- `Material:NoMass` passes the source `Group::Regular` gate even though downstream CondFD R-only branches can bypass PCM evaluation
+
+unsupported_active_branches:
+- every valid attachment is typed but run-blocking, including one attached only to an unused material
+- internally generated F/C-factor material targets and coexistence with deferred PhaseChange, VariableThermalConductivity, EMPD, or HAMT inputs remain outside the executable boundary
+
+not_claimed_branches:
+- exact source diagnostic severity/text/order/multiplicity, material-pointer replacement and EMS-address behavior, mutable hysteresis state-machine and known source defects, CondFD or PCM-storage numerical behavior, generic CondFD EIO/output variables, runtime numerical behavior, and conformance
+<!-- routine-state-contract:v1 end get_hysteresis_data -->
+
 ## Base Definition Source Order
 
 The following table is the public-object processing order inside
@@ -296,7 +378,7 @@ algorithm. The exact order guaranteed by each source owner is:
 |---|---:|---|---|---|
 | common HB 1 | 34 | `MaterialProperty:GlazingSpectralData` | standalone glazing dataset read by `GetWindowGlassSpectralData` | complete bounded typed dataset; runtime-inert while unused |
 | common HB 2 tail | 27 | `MaterialProperty:VariableAbsorptance` | base-material overlay read by `GetVariableAbsorptanceInput` after all 22 base families | complete bounded typed overlay; all definitions runtime-blocked |
-| common HB 3 | 25 | `MaterialProperty:PhaseChangeHysteresis` | regular-material overlay read by `GetHysteresisData` | deferred |
+| common HB 3 | 25 | `MaterialProperty:PhaseChangeHysteresis` | Regular-group material attachment read by `GetHysteresisData` | complete bounded typed attachment for public Material/NoMass targets; all definitions runtime-blocked |
 | CondFD 1 | 24 | `MaterialProperty:PhaseChange` | temperature/enthalpy overlay read first by `GetCondFDInput` | deferred |
 | CondFD 2 | 26 | `MaterialProperty:VariableThermalConductivity` | temperature/conductivity overlay read second by `GetCondFDInput` | deferred |
 | EMPD 1 | 23 | `MaterialProperty:MoisturePenetrationDepth:Settings` | regular-material moisture overlay read by `GetMoistureBalanceEMPDInput` | deferred |
@@ -320,6 +402,9 @@ branch. The standalone glazing spectral dataset is typed separately and does
 not change the 22-variant material-definition count. The variable-absorptance
 overlay is likewise held outside `MaterialDefinition`; it resolves only
 Regular/NoMass targets and leaves their immutable base payloads unchanged.
+The phase-change-hysteresis attachment also lives in a separate arena, uses
+its object key directly as the Regular/NoMass material reference, and leaves
+the base payload unchanged while its runtime upgrade remains blocked.
 
 ### `Material` / regular
 
@@ -2006,13 +2091,28 @@ No test claims surface activation, curve/schedule evaluation, timestep
 mutation, clamping, the source scheduled-solar pointer defect, EIO, runtime
 numerics, or conformance.
 
+`MaterialProperty:PhaseChangeHysteresis` model and compiler tests lock both
+actual public `Group::Regular` target variants (`Material` and
+`Material:NoMass`); the exact thirteen-field source order; exhaustive
+required, finite-number, and strict-positive validation; absence of invented
+peak/property relationships; grouped liquid/solid and melting/freezing state;
+source-derived transition and initial specific heat; normalized target
+snapshots; case-insensitive duplicate-target rejection; validation before ID
+or target reservation; coexistence with VariableAbsorptance; typed coverage;
+and object-count inclusion. The support-boundary test attaches hysteresis to
+both used and unused materials and requires one explicit all-definition
+`UnsupportedSurfaceBoundary` run block. No test claims internal F/C-factor
+targets, material pointer replacement, `hasPCM`, CondFD or PCM-storage
+consumption, mutable histories, hysteresis equations, EIO/output reporting,
+runtime numerics, or conformance.
+
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
 dynamic AirGap/IRT heat transfer or EcoRoof execution. It also does not claim exact EnergyPlus
 diagnostic text, all input-processor default behavior beyond the standalone
-spectral-dataset and variable-absorptance contracts, internal F/C-factor
+spectral-dataset, variable-absorptance, and phase-change-hysteresis contracts, internal F/C-factor
 material injection, EMS mutation, broad material EIO formatting, or any of the
-remaining 10 deferred overlay/dataset families.
+remaining 9 deferred overlay/dataset families.
 
 ## Routine Inventory
 
@@ -2028,7 +2128,7 @@ remaining 10 deferred overlay/dataset families.
 | `GetVariableAbsorptanceInput` | `state_mapped` | owns the complete bounded post-base overlay read: exact Regular/NoMass target gate, defaulted four-way control, source-null unresolved dependency names, selected/opposite dependency rules, separate typed arena/name map, one-overlay-per-target fail-close boundary, and universal runtime block |
 | `GetVariableAbsorptanceSurfaceList` | `source_mapped` | owns exterior-first-layer surface activation and interior-layer warnings; no Rust execution state is added by the typed-input checkpoint |
 | `UpdateVariableAbsorptances` | `source_mapped` | owns schedule/function trigger evaluation, exterior thermal/solar mutation, clamping, and the EnergyPlus 26.1 scheduled-solar pointer defect; all runtime behavior remains unsupported |
-| `GetHysteresisData` | `source_mapped` | owns the post-base hysteresis overlay |
+| `GetHysteresisData` | `state_mapped` | owns the complete bounded post-base hysteresis attachment read: public Material/NoMass target gate, thirteen required strict-positive inputs, grouped typed state and source-derived specific heats, duplicate-target fail-close boundary, and universal runtime block |
 | `GetCondFDInput` | `source_mapped` | owns PhaseChange then VariableThermalConductivity |
 | `GetMoistureBalanceEMPDInput` | `source_mapped` | owns the EMPD settings overlay |
 | `GetHeatBalHAMTInput` | `source_mapped` | owns the six ordered HAMT objects |
@@ -2039,8 +2139,8 @@ bounded implementation slice does not promote the whole `GetMaterialData`,
 `CalcNominalWindowCond` routines beyond `source_mapped`. Only the declared
 standalone `GetWindowGlassSpectralData` input boundary and the material-owned
 `SetupSimpleWindowGlazingSystem` calculation plus the declared
-`GetVariableAbsorptanceInput` overlay boundary are `state_mapped` within their
-bounded input domains.
+`GetVariableAbsorptanceInput` overlay boundary and `GetHysteresisData`
+attachment boundary are `state_mapped` within their bounded input domains.
 
 ## Evidence And Promotion Boundary
 
@@ -2239,7 +2339,7 @@ CP58 remains incomplete until, at minimum:
 
 - the three deferred `WindowMaterial:Glazing` optical branches have
   schema-complete typed variants
-- the remaining 10 overlays/datasets have typed attachment and validation
+- the remaining 9 overlays/datasets have typed attachment and validation
   models
 - source-order attachment, duplicate/reference diagnostics, generated
   F/C-factor materials, reporting, EMS, and algorithm-specific consumers are

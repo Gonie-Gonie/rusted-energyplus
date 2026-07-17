@@ -7,16 +7,16 @@ use crate::{
     ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
     ExternalInterfaceSchedule, FanComponent, GlazingSpectralData, GlazingSpectralDataId,
     GlobalGeometryRules, IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId, LoopId,
-    Material, MaterialId, MaterialVariableAbsorptance, MaterialVariableAbsorptanceId, NameMap,
-    Node, NodeId, NodeList, NodeListId, NormalizedName, OtherEquipment, People, PlantBranch,
-    PlantBranchList, PlantConnector, PlantConnectorKind, PlantConnectorList, PlantLoop,
-    PumpConstantSpeed, RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay,
-    RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant, ScheduleDayHourly,
-    ScheduleDayInterval, ScheduleDayList, ScheduleFile, ScheduleFileShading, ScheduleId,
-    ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear,
-    SetpointManagerComponent, SiteLocation, Surface, SurfaceConvectionAlgorithms, SurfaceId,
-    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version, WeekScheduleId,
-    WindowGlazingThermochromicGroupMaterial, WindowGlazingThermochromicState, Zone,
+    Material, MaterialId, MaterialPhaseChangeHysteresis, MaterialVariableAbsorptance,
+    MaterialVariableAbsorptanceId, NameMap, Node, NodeId, NodeList, NodeListId, NormalizedName,
+    OtherEquipment, People, PlantBranch, PlantBranchList, PlantConnector, PlantConnectorKind,
+    PlantConnectorList, PlantLoop, PumpConstantSpeed, RunPeriod, RunPeriodDaylightSavingTime,
+    RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant,
+    ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleFile, ScheduleFileShading,
+    ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact, ScheduleWeekDaily,
+    ScheduleYear, SetpointManagerComponent, SiteLocation, Surface, SurfaceConvectionAlgorithms,
+    SurfaceId, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version,
+    WeekScheduleId, WindowGlazingThermochromicGroupMaterial, WindowGlazingThermochromicState, Zone,
     ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId, ZoneEquipmentObjectType,
     ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneThermostat, ZoneThermostatId,
 };
@@ -58,6 +58,8 @@ pub struct TypedModel {
     pub material_variable_absorptances: Vec<MaterialVariableAbsorptance>,
     /// Variable-absorptance overlay names in their separate namespace.
     pub material_variable_absorptance_names: NameMap<MaterialVariableAbsorptanceId>,
+    /// Hysteretic phase-change attachments keyed by their referenced material names.
+    pub material_phase_change_hystereses: Vec<MaterialPhaseChangeHysteresis>,
     /// Ordered thermochromic glazing states referenced by range descriptors on materials.
     pub window_glazing_thermochromic_state_arena: Vec<WindowGlazingThermochromicState>,
     /// Constructions.
@@ -224,6 +226,7 @@ impl Default for TypedModel {
             material_names: NameMap::default(),
             material_variable_absorptances: Vec::new(),
             material_variable_absorptance_names: NameMap::default(),
+            material_phase_change_hystereses: Vec::new(),
             window_glazing_thermochromic_state_arena: Vec::new(),
             constructions: Vec::new(),
             construction_names: NameMap::default(),
@@ -331,6 +334,7 @@ impl TypedModel {
             + self.glazing_spectral_data.len()
             + self.materials.len()
             + self.material_variable_absorptances.len()
+            + self.material_phase_change_hystereses.len()
             + self.constructions.len()
             + self.schedule_type_limits.len()
             + self.day_schedules.len()
