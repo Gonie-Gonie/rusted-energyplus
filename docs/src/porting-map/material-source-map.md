@@ -1095,8 +1095,8 @@ The following table is the public-object processing order inside
 | 18 | `Material:RoofVegetation` | eco-roof material and vegetation state | complete bounded typed input and dry-soil opaque projection; dynamic EcoRoof runtime blocked |
 | 19 | `WindowMaterial:GlazingGroup:Thermochromic` | thermochromic glazing-group parent | complete bounded typed ordered-state parent; construction generation and runtime selection deferred |
 | 20 | `WindowMaterial:SimpleGlazingSystem` | derived simple glazing system | complete bounded typed block model; dedicated family with sole-layer ordinary-Construction consumption; runtime blocked |
-| 21 | `WindowMaterial:Gap` | complex-fenestration gap, including optional deflection-state and support-pillar references | complete bounded typed variant with copied gas/helper state; dedicated consumer and runtime deferred |
-| 22 | `WindowMaterial:ComplexShade` | complex-fenestration shade | complete bounded typed variant with source defaults/projections; dedicated consumer and runtime deferred |
+| 21 | `WindowMaterial:Gap` | complex-fenestration gap, including optional deflection-state and support-pillar references | complete bounded typed variant with copied gas/helper state; bounded complex-state layer consumption typed, runtime deferred |
+| 22 | `WindowMaterial:ComplexShade` | complex-fenestration shade | complete bounded typed variant with source defaults/projections; bounded complex-state layer consumption typed, runtime deferred |
 
 Two conditional internal injections occur between public-object steps and must
 not be mistaken for additional public schema variants:
@@ -1278,8 +1278,9 @@ The compiler enforces the EnergyPlus 26.1 contract used by this branch:
 earlier `GetWindowGlassSpectralData` stage now owns a complete bounded typed
 dataset arena, dataset-reference resolution and the active spectral glazing
 consumer remain blocked. `SpectralAndAngle` remains blocked on bivariate
-table/curve typing, and `BSDF` remains blocked on the complex-fenestration
-path.
+table/curve typing. Regular-glazing `BSDF` also remains blocked: the bounded
+complex-state layer pack accepts only this object's `SpectralAverage` branch
+or `WindowMaterial:ComplexShade` at solid positions.
 
 ### `WindowMaterial:Glazing:RefractionExtinctionMethod`
 
@@ -1454,10 +1455,10 @@ the same `Glass (Gas-or-GasMixture Glass){0..3}` construction alternation as
 `WindowMaterial:Gas`. It is outside the equivalent-layer family;
 `Construction:WindowEquivalentLayer` typing and validation remain deferred.
 The later typed `WindowMaterial:Gap` complex-fenestration reference path may
-also consume a copied gas-mixture state, while its
-`Construction:ComplexFenestrationState` consumer and runtime remain deferred.
-Arbitrary-run assessment explicitly blocks the typed mixture before
-execution.
+also consume a copied gas-mixture state. CP89's bounded
+`Construction:ComplexFenestrationState` layer pack can retain that Gap
+identity and copied state, while complex-window execution remains deferred.
+Arbitrary-run assessment explicitly blocks the typed mixture before execution.
 
 EnergyPlus 26.1 prints the shared `WindowMaterial:Gas` EIO header when any gas
 mixture exists but has no `GasMixture` data-row case in the construction-layer
@@ -2426,12 +2427,14 @@ reserves the shared material identity only after all fallible validation and
 resolution completes. The dedicated `MaterialFamily::ComplexFenestration`
 keeps the payload out of opaque, ordinary fenestration, equivalent-layer,
 thermochromic, and simple-glazing consumers. Every ordinary `Construction`
-position rejects it. Its sole intended
-`Construction:ComplexFenestrationState` consumer, complex-window packing,
-deflection execution, pillar conduction, optics, thermal behavior, surfaces,
-ratings, daylighting, and reporting remain deferred. Arbitrary-run support
-assessment counts and blocks every typed definition, including unused gaps,
-as `UnsupportedSurfaceBoundary`/`RunBlocked` with no runtime class. Rust EIO
+position rejects it. CP89's bounded
+`Construction:ComplexFenestrationState` consumer accepts it only at alternating
+gap positions between supported solid layers and retains its ordered
+`MaterialId` and graph edge. Complex-window execution, deflection execution,
+pillar conduction, optics, thermal behavior, surfaces, ratings, daylighting,
+and reporting remain deferred. Arbitrary-run support assessment counts and
+blocks every typed definition, including unused gaps, as
+`UnsupportedSurfaceBoundary`/`RunBlocked` with no runtime class. Rust EIO
 serialization, runtime, and conformance remain outside this typed checkpoint.
 
 #### Bounded generic `Material Details` diagnostic
@@ -2517,12 +2520,13 @@ shared material namespace, and all field/relationship validation completes
 before identity reservation. It uses the same
 `MaterialFamily::ComplexFenestration` boundary as `WindowMaterial:Gap`.
 Ordinary `Construction` rejects either complex-fenestration material in every
-position. The intended `Construction:ComplexFenestrationState` consumer and
-its alternating solid/gap packing, directional optical matrices,
-`WindowThermalModel:Params`, opening-area conversion, TARCOG/WCE thermal and
-slat behavior, BSDF optics, shading flags, surfaces, ratings, and daylighting
-remain deferred. Arbitrary-run support assessment counts and blocks every
-definition, including unused definitions, as
+position. CP89's bounded `Construction:ComplexFenestrationState` consumer
+accepts it as a solid optical layer alongside SpectralAverage glazing, retains
+the alternating solid/gap identity and directional absorptance matrix
+snapshots, and emits its ordered graph edge. Matrix consumption by BSDF
+optics, opening-area conversion, TARCOG/WCE thermal and slat behavior, shading
+flags, surfaces, ratings, and daylighting remain deferred. Arbitrary-run
+support assessment counts and blocks every definition, including unused definitions, as
 `UnsupportedSurfaceBoundary`/`RunBlocked` with no runtime class.
 EIO/reporting beyond the bounded generic diagnostic below, Rust serialization,
 runtime execution, broad diagnostic parity, and conformance remain unclaimed.
@@ -2571,9 +2575,9 @@ bounded ordinary master consumption: `Construction` maps first-state
 substitution and final-parent metadata, while child generation and runtime
 state selection remain deferred. SimpleGlazing definitions use a separate
 family with a sole-layer ordinary-Construction consumer and an all-definition
-runtime block, and
-complex-fenestration gaps and shades share a dedicated deferred-consumer
-family. An ordinary `Construction` accepts the
+runtime block, and complex-fenestration gaps and shades share a dedicated
+family consumed only by CP89's bounded complex-state layer pack. An ordinary
+`Construction` accepts the
 unshaded `Glass ((Gas|GasMixture) Glass){0..3}` subset, the bounded exterior,
 interior, double-between, and triple-between Shade or Blind patterns above,
 and one exterior Screen directly before that plain window stack. It rejects
@@ -2605,6 +2609,18 @@ construction/material graph edge, does not widen the 34-object material
 inventory or public attachment namespace, and cannot be targeted by any
 material overlay. Its surface, enclosure, and optional simple-mixing consumers
 remain run-blocked and are mapped in the heat-balance source map.
+
+CP89 adds no material variant or public material-object inventory entry. Its
+separate `Construction:ComplexFenestrationState` pass accepts only typed
+SpectralAverage glazing or ComplexShade in one to five solid positions and
+typed WindowMaterial:Gap in zero to four alternating gap positions. It retains
+ordered material identities and graph edges plus raw-helper matrix snapshots;
+thermal helpers are all-definition validated whenever any CFS exists, while
+the matrix catalog is activated only after a CFS name survives the shared
+Construction-name gate and then validates all matrix definitions. Both helper
+families remain raw-only;
+all complex-state definitions and all complex-fenestration material definitions
+remain all-definition run blockers, and window execution is not enabled.
 
 The compiler preserves EnergyPlus family order by compiling all `Material`
 objects, then all `Material:NoMass`, `Material:AirGap`, and
@@ -2862,12 +2878,13 @@ of deflection initial temperature/pressure, copying only deflected thickness
 and optional pillar spacing/radius, missing/ambiguous/wrong-family fail-closed
 behavior, identity reservation after every fallible step, the dedicated
 complex-fenestration family, universal ordinary-`Construction` rejection, typed
-coverage, and the all-definition arbitrary-run block. They do not claim a
-nominal resistance, helper-family typed inventory, relationship constraints
-absent from the source, `Construction:ComplexFenestrationState`, specialized
-window reporting, window algorithms, runtime execution, or conformance. The
-dedicated static case separately locks only the bounded generic `Material
-Details` evidence above.
+coverage, and the all-definition arbitrary-run block. These material-local
+tests do not claim a nominal resistance, helper-family typed inventory,
+relationship constraints absent from the source, specialized window reporting,
+window algorithms, runtime execution, or conformance. The separate CP89
+construction tests own only bounded `Construction:ComplexFenestrationState`
+layer identity, matrix snapshots, and graph consumption. The dedicated static
+case separately locks only the bounded generic `Material Details` evidence above.
 
 `WindowMaterial:ComplexShade` model and compiler tests lock its
 twenty-second-object source order; all six layer types and their default; all
@@ -2881,10 +2898,12 @@ shared namespace and complex-fenestration family, universal ordinary
 `Construction` rejection, typed coverage, and the all-definition
 arbitrary-run block. Representative evidence is
 `compiler::tests::window_material_complex_shade::window_complex_shade_materializes_source_defaults_and_source_order`.
-The tests do not claim the complex-fenestration-state consumer, directional
+These material-local tests do not claim a complex-state consumer, directional
 matrices, TARCOG/WCE, BSDF optics, EIO/reporting, runtime, broad diagnostic
-parity, or conformance. The dedicated static case separately locks only the
-bounded generic `Material Details` evidence above.
+parity, or conformance. The separate CP89 construction tests own only bounded
+complex-state layer identity, directional matrix snapshots, and graph
+consumption. The dedicated static case separately locks only the bounded
+generic `Material Details` evidence above.
 
 `MaterialProperty:VariableAbsorptance` model and compiler tests lock both
 eligible target variants; all four case-insensitive control signals and the
@@ -3233,9 +3252,10 @@ and family boundaries are compiled; and the bounded
 AirGap/IRT construction invariants, equivalent-layer construction exclusion,
 ordinary Glass/Gas-or-GasMixture alternation, and safe exterior, interior, and
 between-glass Shade/Blind patterns plus the exterior-only Screen pattern, the
-sole-layer SimpleGlazing consumer with multi-layer rejection, and universal
-complex-fenestration material construction rejection are rejected or accepted
-as declared.
+sole-layer SimpleGlazing consumer with multi-layer rejection, universal
+ordinary-Construction rejection of complex-fenestration materials, and bounded
+complex-state acceptance of SpectralAverage-or-ComplexShade solids alternating
+with Gap layers are rejected or accepted as declared.
 `window_glazing_spectral_average_001` adds an external exact-EIO smoke gate
 for every field EnergyPlus emits from the bounded `SpectralAverage` material
 slice, together with oracle-only proof that the fixture uses that construction

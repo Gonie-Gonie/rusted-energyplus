@@ -605,6 +605,17 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|construction| construction.is_air_boundary())
             .count(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "Construction:ComplexFenestrationState",
+        typed_model
+            .constructions
+            .iter()
+            .filter(|construction| construction.is_complex_fenestration())
+            .count(),
+    );
 
     push_typed_unsupported_object(
         registry,

@@ -1918,6 +1918,7 @@ mod tests {
             thermochromic_master: None,
             ground_factor: None,
             air_boundary: None,
+            complex_fenestration: None,
         });
         model.surfaces.push(Surface {
             id: SurfaceId(0),

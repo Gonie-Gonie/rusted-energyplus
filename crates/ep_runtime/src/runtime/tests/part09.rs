@@ -59,6 +59,7 @@
             thermochromic_master: None,
             ground_factor: None,
             air_boundary: None,
+            complex_fenestration: None,
         });
         model.schedules.push(ScheduleConstant {
             id: ScheduleId(0),
@@ -129,6 +130,7 @@
             thermochromic_master: None,
             ground_factor: None,
             air_boundary: None,
+            complex_fenestration: None,
         });
         model.zones.push(Zone {
             id: ZoneId(0),

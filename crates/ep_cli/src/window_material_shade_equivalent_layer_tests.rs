@@ -478,8 +478,38 @@ fn header_requires_constructions_report_and_a_window_construction()
                 "back_side_shade_beam_diffuse_solar_reflectance": 0.4
             }
         },
+        "WindowMaterial:Glazing": {
+            "CFS Glass": {"optical_data_type":"SpectralAverage", "thickness":0.003}
+        },
+        "WindowThermalModel:Params": {"CFS Thermal": {}},
+        "Matrix:TwoDimension": {
+            "CFS Basis": {"number_of_rows":1, "number_of_columns":1,
+                "values":[{"value":0.0}]},
+            "CFS Solar Front": {"number_of_rows":1, "number_of_columns":1,
+                "values":[{"value":0.1}]},
+            "CFS Solar Back": {"number_of_rows":1, "number_of_columns":1,
+                "values":[{"value":0.2}]},
+            "CFS Visible Front": {"number_of_rows":1, "number_of_columns":1,
+                "values":[{"value":0.3}]},
+            "CFS Visible Back": {"number_of_rows":1, "number_of_columns":1,
+                "values":[{"value":0.4}]},
+            "CFS Abs Front": {"number_of_rows":1, "number_of_columns":1,
+                "values":[{"value":0.5}]},
+            "CFS Abs Back": {"number_of_rows":1, "number_of_columns":1,
+                "values":[{"value":0.6}]}
+        },
         "Construction:ComplexFenestrationState": {
-            "Raw BSDF Construction": {}
+            "Typed BSDF Construction": {
+                "window_thermal_model":"CFS Thermal",
+                "basis_matrix_name":"CFS Basis",
+                "solar_optical_complex_front_transmittance_matrix_name":"CFS Solar Front",
+                "solar_optical_complex_back_reflectance_matrix_name":"CFS Solar Back",
+                "visible_optical_complex_front_transmittance_matrix_name":"CFS Visible Front",
+                "visible_optical_complex_back_transmittance_matrix_name":"CFS Visible Back",
+                "outside_layer_name":"CFS Glass",
+                "outside_layer_directional_front_absorptance_matrix_name":"CFS Abs Front",
+                "outside_layer_directional_back_absorptance_matrix_name":"CFS Abs Back"
+            }
         }
     }"#;
     let (raw_model, model) = compile_models(&with_constructions_report(
@@ -494,7 +524,7 @@ fn header_requires_constructions_report_and_a_window_construction()
     )?;
     assert!(
         comparison.passed,
-        "a raw complex-fenestration construction triggers the shared window header: {:?}",
+        "a typed complex-fenestration construction triggers the shared window header: {:?}",
         comparison.first_divergence
     );
     assert!(comparison.occurrences.is_empty());

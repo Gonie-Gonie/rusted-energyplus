@@ -1,5 +1,7 @@
 //! Model compiler stage contracts.
 
+mod complex_fenestration;
+
 use ep_model::{
     AirBoundaryAirExchange, AirBoundaryMixingSchedule, AirGapMaterial, AirLoopHvac, AutoOrNumber,
     AutosizeOrNumber, AvailabilityManagerComponent, BoilerHotWater, BranchId, BranchListId,
@@ -83,6 +85,7 @@ const MAX_BETWEEN_GLASS_SHADE_GAP_THICKNESS_DIFFERENCE_M: f64 = 0.0005;
 const FFACTOR_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:FfactorGroundFloor";
 const CFACTOR_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:CfactorUndergroundWall";
 const AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:AirBoundary";
+const COMPLEX_FENESTRATION_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:ComplexFenestrationState";
 const FC_FACTOR_CONCRETE_NAME: &str = "~FC_Concrete";
 const FC_FACTOR_INSULATION_NAME_PREFIX: &str = "~FC_Insulation_";
 const FC_FACTOR_CONCRETE_THERMAL_RESISTANCE_M2_K_PER_W: f64 = 0.15 / 1.95;
@@ -510,6 +513,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     FFACTOR_CONSTRUCTION_OBJECT_TYPE,
     CFACTOR_CONSTRUCTION_OBJECT_TYPE,
     AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE,
+    COMPLEX_FENESTRATION_CONSTRUCTION_OBJECT_TYPE,
     "ScheduleTypeLimits",
     "Schedule:Constant",
     "Schedule:Compact",
@@ -645,6 +649,7 @@ impl<'a> Compiler<'a> {
         self.parse_external_interface_fmu_import_schedules(&mut model);
         self.parse_external_interface_fmu_export_schedules(&mut model);
         self.parse_air_boundary_constructions(&mut model);
+        self.parse_complex_fenestration_states(&mut model);
         self.parse_material_variable_absorptances(&mut model);
         self.parse_material_phase_change_hystereses(&mut model);
         self.parse_material_phase_changes(&mut model);
@@ -8756,6 +8761,7 @@ impl<'a> Compiler<'a> {
                 thermochromic_master,
                 ground_factor: None,
                 air_boundary: None,
+                complex_fenestration: None,
             });
         }
 
@@ -8842,6 +8848,7 @@ impl<'a> Compiler<'a> {
                     insulation_thermal_resistance_m2_k_per_w,
                 }),
                 air_boundary: None,
+                complex_fenestration: None,
             });
         }
     }
@@ -8922,6 +8929,7 @@ impl<'a> Compiler<'a> {
                     insulation_thermal_resistance_m2_k_per_w,
                 }),
                 air_boundary: None,
+                complex_fenestration: None,
             });
         }
     }
@@ -9093,6 +9101,7 @@ impl<'a> Compiler<'a> {
                 thermochromic_master: None,
                 ground_factor: None,
                 air_boundary: Some(ConstructionAirBoundary { air_exchange }),
+                complex_fenestration: None,
             });
         }
     }
@@ -9308,7 +9317,7 @@ impl<'a> Compiler<'a> {
                 Some(construction_name),
                 Some(&layer_field),
                 format!(
-                    "Construction/{construction_name} cannot consume complex-fenestration material {}; WindowMaterial:Gap and WindowMaterial:ComplexShade are reserved for future Construction:ComplexFenestrationState support and are not ordinary Construction layers",
+                    "Construction/{construction_name} cannot consume complex-fenestration material {}; WindowMaterial:Gap and WindowMaterial:ComplexShade are accepted only in the bounded Construction:ComplexFenestrationState layer pack and are not ordinary Construction layers",
                     material.name.0
                 ),
             );
@@ -17546,6 +17555,7 @@ fn source_effective_hamt_sorption_points(
 mod tests {
     mod construction;
     mod construction_air_boundary;
+    mod construction_complex_fenestration_state;
     mod construction_ground_factor;
     mod global_geometry_rules;
     mod material_property_glazing_spectral_data;
