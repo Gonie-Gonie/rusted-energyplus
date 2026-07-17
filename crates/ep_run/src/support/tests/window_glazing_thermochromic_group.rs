@@ -5,7 +5,7 @@ use ep_model::MaterialKind;
 use ep_raw_model::parse_epjson_str;
 
 #[test]
-fn typed_thermochromic_groups_including_unused_remain_run_blocked()
+fn typed_thermochromic_groups_including_consumed_and_unused_remain_run_blocked()
 -> Result<(), Box<dyn std::error::Error>> {
     let raw = parse_epjson_str(
         r#"{
@@ -47,6 +47,11 @@ fn typed_thermochromic_groups_including_unused_remain_run_blocked()
                         }
                     ]
                 }
+            },
+            "Construction": {
+                "Thermochromic Master": {
+                    "outside_layer": "Mixed Ordinary Glazing Group"
+                }
             }
         }"#,
     )?;
@@ -66,6 +71,28 @@ fn typed_thermochromic_groups_including_unused_remain_run_blocked()
             .count(),
         2,
         "all thermochromic definitions must remain typed even when unused"
+    );
+    let master = model
+        .construction_names
+        .resolve("Thermochromic Master")
+        .and_then(|id| model.constructions.get(id.0 as usize))
+        .ok_or_else(|| std::io::Error::other("expected typed thermochromic master"))?;
+    let spectral_glazing = model
+        .material_names
+        .resolve("Spectral Average Glass")
+        .ok_or_else(|| std::io::Error::other("missing first thermochromic glazing state"))?;
+    let parent = model
+        .material_names
+        .resolve("Mixed Ordinary Glazing Group")
+        .ok_or_else(|| std::io::Error::other("missing thermochromic parent"))?;
+    assert_eq!(master.layers, vec![spectral_glazing]);
+    assert_eq!(master.outside_layer, spectral_glazing);
+    assert_eq!(
+        master
+            .thermochromic_master
+            .ok_or_else(|| std::io::Error::other("missing thermochromic master metadata"))?
+            .parent_material,
+        parent
     );
 
     let assessment = assess_support(

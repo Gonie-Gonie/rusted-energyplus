@@ -3,6 +3,7 @@
 use crate::RuntimeError;
 use crate::execution_plan::{EnergyPlusCompatibilityStage, ExecutionStageKind};
 use crate::heat_balance::ctf::ConstructionCtfCoefficientOverride;
+use crate::heat_balance::id_slot_index::TypedIdSlotIndex;
 use ep_model::{
     Construction, ConstructionId, ConstructionKind, Material, MaterialId, MaterialSurfaceRoughness,
     OpaqueMaterialRef, Surface, TypedModel,
@@ -54,6 +55,8 @@ pub(crate) struct ConstructionThermalData {
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct ConstructionThermalDataCache {
     entries: Vec<ConstructionThermalData>,
+    construction_slots: TypedIdSlotIndex,
+    entry_index_by_construction_slot: Vec<Option<usize>>,
     pub(crate) no_mass_construction_ids: Vec<ConstructionId>,
     pub(crate) massive_ctf_construction_ids: Vec<ConstructionId>,
     pub(crate) coefficient_cache_hash: u64,
@@ -91,6 +94,15 @@ impl ConstructionThermalDataCache {
         );
         let mut no_mass_construction_ids = Vec::new();
         let mut massive_ctf_construction_ids = Vec::new();
+        let construction_slots = TypedIdSlotIndex::new(
+            model
+                .constructions
+                .iter()
+                .map(|construction| construction.id.0),
+        );
+        let material_slots =
+            TypedIdSlotIndex::new(model.materials.iter().map(|material| material.id.0));
+        let mut entry_index_by_construction_slot = vec![None; model.constructions.len()];
 
         for construction in &model.constructions {
             if construction.kind != ConstructionKind::Opaque {
@@ -98,6 +110,7 @@ impl ConstructionThermalDataCache {
             }
             let entry = construction_thermal_data(
                 model,
+                &material_slots,
                 construction,
                 entries.len(),
                 ctf_coefficients_by_construction,
@@ -107,14 +120,24 @@ impl ConstructionThermalDataCache {
             } else {
                 no_mass_construction_ids.push(entry.construction_id);
             }
+            if let Some(index_slot) = construction_slots
+                .slot(construction.id.0)
+                .and_then(|slot| entry_index_by_construction_slot.get_mut(slot))
+            {
+                if index_slot.is_none() {
+                    *index_slot = Some(entry.cache_index);
+                }
+            }
             entries.push(entry);
         }
 
-        validate_surface_construction_families(model)?;
+        validate_surface_construction_families(model, &construction_slots)?;
 
         let coefficient_cache_hash = construction_cache_hash(&entries);
         Ok(Self {
             entries,
+            construction_slots,
+            entry_index_by_construction_slot,
             no_mass_construction_ids,
             massive_ctf_construction_ids,
             coefficient_cache_hash,
@@ -152,9 +175,12 @@ impl ConstructionThermalDataCache {
         &self,
         surface: &Surface,
     ) -> Result<&ConstructionThermalData, RuntimeError> {
-        self.entries
-            .iter()
-            .find(|entry| entry.construction_id == surface.construction)
+        self.construction_slots
+            .slot(surface.construction.0)
+            .and_then(|slot| self.entry_index_by_construction_slot.get(slot))
+            .and_then(|entry_index| *entry_index)
+            .and_then(|entry_index| self.entries.get(entry_index))
+            .filter(|entry| entry.construction_id == surface.construction)
             .ok_or_else(|| RuntimeError::MissingConstruction {
                 surface_name: surface.name.0.clone(),
             })
@@ -171,12 +197,13 @@ pub(crate) fn surface_thermal_properties(
 
 fn construction_thermal_data(
     model: &TypedModel,
+    material_slots: &TypedIdSlotIndex,
     construction: &Construction,
     cache_index: usize,
     ctf_coefficients_by_construction: &BTreeMap<String, Vec<&ConstructionCtfCoefficientOverride>>,
 ) -> Result<ConstructionThermalData, RuntimeError> {
     let layer_ids = construction_layer_stack(construction);
-    let layer_materials = layer_materials(model, construction, &layer_ids)?;
+    let layer_materials = layer_materials(model, material_slots, construction, &layer_ids)?;
     let opaque_layer_materials = opaque_layer_materials(&layer_materials, construction)?;
     let outside_material =
         layer_materials
@@ -245,15 +272,16 @@ fn construction_layer_stack(construction: &Construction) -> Vec<MaterialId> {
 
 fn layer_materials<'a>(
     model: &'a TypedModel,
+    material_slots: &TypedIdSlotIndex,
     construction: &Construction,
     layer_ids: &[MaterialId],
 ) -> Result<Vec<&'a Material>, RuntimeError> {
     let mut layer_materials = Vec::with_capacity(layer_ids.len());
     for layer_id in layer_ids {
-        let material = model
-            .materials
-            .iter()
-            .find(|material| material.id == *layer_id)
+        let material = material_slots
+            .slot(layer_id.0)
+            .and_then(|slot| model.materials.get(slot))
+            .filter(|material| material.id == *layer_id)
             .ok_or_else(|| RuntimeError::MissingMaterial {
                 construction_name: construction.name.0.clone(),
             })?;
@@ -316,12 +344,15 @@ fn material_heat_capacity_per_area_sum(
     }
 }
 
-fn validate_surface_construction_families(model: &TypedModel) -> Result<(), RuntimeError> {
+fn validate_surface_construction_families(
+    model: &TypedModel,
+    construction_slots: &TypedIdSlotIndex,
+) -> Result<(), RuntimeError> {
     for surface in &model.surfaces {
-        let Some(construction) = model
-            .constructions
-            .iter()
-            .find(|construction| construction.id == surface.construction)
+        let Some(construction) = construction_slots
+            .slot(surface.construction.0)
+            .and_then(|slot| model.constructions.get(slot))
+            .filter(|construction| construction.id == surface.construction)
         else {
             continue;
         };

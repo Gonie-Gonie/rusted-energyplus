@@ -1915,6 +1915,7 @@ mod tests {
             kind: ConstructionKind::Opaque,
             outside_layer: MaterialId(0),
             layers: vec![MaterialId(0), MaterialId(1)],
+            thermochromic_master: None,
         });
         model.surfaces.push(Surface {
             id: SurfaceId(0),

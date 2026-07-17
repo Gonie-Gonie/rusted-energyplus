@@ -2227,12 +2227,14 @@ the unused-empty source hole, not a runtime-parity claim.
 The typed parent keeps a copyable start/count descriptor into a flat model
 arena of `(temperature, MaterialId)` states. A dedicated
 `ThermochromicGroup` material family prevents ordinary opaque, fenestration,
-and equivalent-layer consumers from mistaking the parent for a completed
-glazing layer. Every ordinary `Construction` reference is rejected until the
-source behavior that replaces the parent with its first glazing and creates a
-master plus one child construction per state is ported. Arbitrary-run support
-assessment also counts and blocks every group definition, including unused
-parents.
+and equivalent-layer consumers from mistaking the parent itself for a
+completed glazing layer. Bounded ordinary `Construction` consumption now
+maps the `GetConstructData` master branch: every parent layer is replaced in
+the effective stack by its first glazing state, while only the final parent
+encountered is retained in zero-based material-layer and glazing-layer master
+metadata. Creating the master/child construction series remains deferred.
+Arbitrary-run support assessment still counts and blocks every group
+definition, including unused parents.
 
 No thermochromic-specific EIO row exists. The generic `Material Details` path
 indexes the parent's unset `Invalid` roughness as `-1`, so the observed 26.1
@@ -2548,8 +2550,11 @@ equivalent-layer glazing, `WindowMaterial:Gap:EquivalentLayer`, and
 `WindowMaterial:Drape:EquivalentLayer` and
 `WindowMaterial:Screen:EquivalentLayer` plus
 `WindowMaterial:Blind:EquivalentLayer` share the separate equivalent-layer
-family. Thermochromic glazing-group parents use their own deferred-consumer
-family, SimpleGlazing definitions use a separate fully blocked family, and
+family. Thermochromic glazing-group parents remain a distinct family with
+bounded ordinary master consumption: `Construction` maps first-state
+substitution and final-parent metadata, while child generation and runtime
+state selection remain deferred. SimpleGlazing definitions use a separate
+fully blocked family, and
 complex-fenestration gaps and shades share a dedicated deferred-consumer
 family. An ordinary `Construction` accepts the
 unshaded `Glass ((Gas|GasMixture) Glass){0..3}` subset, the bounded exterior,
@@ -2801,10 +2806,11 @@ material namespace and nineteenth-object source order, ordered arena storage,
 case-insensitive resolution to both supported ordinary glazing variants, and
 the intentional preservation of unsorted temperatures and duplicate states.
 They also lock required entry types, missing and wrong-family references, the
-minimum-one fail-closed rule, ordinary-Construction rejection, typed coverage,
-and the all-definition arbitrary-run block. They do not claim source handling
-of unsafe empty parents, child-construction generation, dynamic state
-selection, EIO output, or runtime behavior.
+minimum-one fail-closed rule, ordinary-`Construction` first-state substitution,
+final-parent master metadata, typed coverage, and the all-definition
+arbitrary-run block. They do not claim source handling of unsafe empty parents,
+child-construction generation, dynamic state selection, EIO output, or runtime
+behavior.
 
 `WindowMaterial:SimpleGlazingSystem` model and compiler tests lock the complete
 source block-model fields, `Option` visible-input identity, low/intermediate/high

@@ -33,6 +33,7 @@ claim_key = "broad_heat_balance_compatibility"
 routine_inventory_complete = false
 required_routines = [
   "manage_heat_balance",
+  "get_construct_data",
   "manage_surface_heat_balance",
   "calc_heat_balance_inside_surf_2_ctf_only",
   "manage_air_heat_balance",

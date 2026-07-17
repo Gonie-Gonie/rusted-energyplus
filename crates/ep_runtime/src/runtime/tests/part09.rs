@@ -56,6 +56,7 @@
             kind: ConstructionKind::Opaque,
             outside_layer: MaterialId(0),
             layers: vec![MaterialId(0)],
+            thermochromic_master: None,
         });
         model.schedules.push(ScheduleConstant {
             id: ScheduleId(0),
@@ -123,6 +124,7 @@
             kind: ConstructionKind::Opaque,
             outside_layer: MaterialId(0),
             layers: vec![MaterialId(0)],
+            thermochromic_master: None,
         });
         model.zones.push(Zone {
             id: ZoneId(0),

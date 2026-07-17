@@ -403,7 +403,7 @@ fn thermochromic_group_shares_the_global_material_name_namespace()
 }
 
 #[test]
-fn thermochromic_group_construction_consumption_fails_closed_until_runtime_is_typed()
+fn thermochromic_group_construction_consumption_maps_the_first_state_and_master_metadata()
 -> Result<(), Box<dyn std::error::Error>> {
     let raw = parse_epjson_str(
         r#"{
@@ -433,17 +433,47 @@ fn thermochromic_group_construction_consumption_fails_closed_until_runtime_is_ty
     )?;
     let result = compile_raw_model(&raw);
 
-    assert!(result.has_errors());
-    for (object_name, field) in [
-        ("A Group Outside", "outside_layer"),
-        ("B Group Later", "layer_3"),
-    ] {
-        assert!(result.report.diagnostics.iter().any(|diagnostic| {
-            diagnostic.code == "UnsupportedThermochromicGlazingGroupConstruction"
-                && diagnostic.object_type == "Construction"
-                && diagnostic.object_name.as_deref() == Some(object_name)
-                && diagnostic.field.as_deref() == Some(field)
-        }));
-    }
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let model = result
+        .model
+        .ok_or_else(|| std::io::Error::other("expected typed TC master constructions"))?;
+    let glass = model
+        .material_names
+        .resolve("Glass")
+        .ok_or_else(|| std::io::Error::other("missing effective glazing"))?;
+    let air_gap = model
+        .material_names
+        .resolve("Air Gap")
+        .ok_or_else(|| std::io::Error::other("missing window gas"))?;
+    let parent = model
+        .material_names
+        .resolve("TC Group")
+        .ok_or_else(|| std::io::Error::other("missing TC parent"))?;
+    let outside = model
+        .constructions
+        .iter()
+        .find(|construction| construction.name.0 == "A GROUP OUTSIDE")
+        .ok_or_else(|| std::io::Error::other("missing outside TC construction"))?;
+    assert_eq!(outside.layers, vec![glass]);
+    let outside_master = outside
+        .thermochromic_master
+        .ok_or_else(|| std::io::Error::other("missing outside TC metadata"))?;
+    assert_eq!(outside_master.parent_material, parent);
+    assert_eq!(outside_master.layer_index, 0);
+    assert_eq!(outside_master.glazing_layer_index, 0);
+
+    let later = model
+        .constructions
+        .iter()
+        .find(|construction| construction.name.0 == "B GROUP LATER")
+        .ok_or_else(|| std::io::Error::other("missing later TC construction"))?;
+    assert_eq!(later.layers, vec![glass, air_gap, glass]);
+    let later_master = later
+        .thermochromic_master
+        .ok_or_else(|| std::io::Error::other("missing later TC metadata"))?;
+    assert_eq!(later_master.parent_material, parent);
+    assert_eq!(later_master.layer_index, 2);
+    assert_eq!(later_master.glazing_layer_index, 1);
+    assert_eq!(model.constructions.len(), 2, "TC children remain deferred");
     Ok(())
 }

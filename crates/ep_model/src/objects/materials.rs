@@ -111,7 +111,7 @@ pub enum MaterialFamily {
     /// Equivalent-layer fenestration material consumed only by
     /// `Construction:WindowEquivalentLayer`.
     EquivalentLayer,
-    /// Thermochromic glazing group whose construction/runtime consumer is deferred.
+    /// Non-executable thermochromic parent whose child generation/runtime consumer is deferred.
     ThermochromicGroup,
     /// Simple glazing system whose dedicated construction consumer is deferred.
     SimpleGlazing,
@@ -1221,7 +1221,18 @@ impl ConstructionKind {
     }
 }
 
-/// Construction resolved to an ordered material layer stack.
+/// Thermochromic parent metadata retained on an effective construction stack.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct ConstructionThermochromicMaster {
+    /// Thermochromic glazing-group material replaced by its first typed state.
+    pub parent_material: MaterialId,
+    /// Zero-based construction layer index (EnergyPlus `TCLayerNum` is one-based).
+    pub layer_index: u32,
+    /// Zero-based source glass-layer ordinal (EnergyPlus `TCGlassNum` is one-based).
+    pub glazing_layer_index: u32,
+}
+
+/// Construction resolved to an ordered, effective material layer stack.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Construction {
     /// Typed ID.
@@ -1230,8 +1241,13 @@ pub struct Construction {
     pub name: NormalizedName,
     /// Consumer family for this construction.
     pub kind: ConstructionKind,
-    /// Outside layer material.
+    /// Effective outside layer material (including first-state TC substitution).
     pub outside_layer: MaterialId,
     /// Ordered material layers from outside to inside.
     pub layers: Vec<MaterialId>,
+    /// Source-style thermochromic master metadata for the last group parent in the stack.
+    ///
+    /// The effective layer stack contains the parent's first glazing state. Generating
+    /// thermochromic child constructions and selecting states at runtime remain deferred.
+    pub thermochromic_master: Option<ConstructionThermochromicMaster>,
 }

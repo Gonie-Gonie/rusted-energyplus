@@ -10,6 +10,7 @@ pub mod air_manager;
 pub mod algorithm;
 pub mod convection;
 pub mod ctf;
+pub(crate) mod id_slot_index;
 pub mod initialization;
 pub mod inside_convection;
 pub mod longwave;

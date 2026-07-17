@@ -4,8 +4,9 @@ use ep_model::{
     AirGapMaterial, AirLoopHvac, AutoOrNumber, AutosizeOrNumber, AvailabilityManagerComponent,
     BoilerHotWater, BranchId, BranchListId, Building, ChillerElectricEir, CoilComponent,
     CoilComponentKind, ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId,
-    ConstructionKind, DayScheduleId, DeferredVariableAbsorptanceFunction,
-    DehumidificationControlType, DemandControlledVentilationType, DesignSpecificationOutdoorAir,
+    ConstructionKind, ConstructionThermochromicMaster, DayScheduleId,
+    DeferredVariableAbsorptanceFunction, DehumidificationControlType,
+    DemandControlledVentilationType, DesignSpecificationOutdoorAir,
     DesignSpecificationOutdoorAirId, DesignSpecificationOutdoorAirMethod,
     ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
     ExternalInterfaceSchedule, FanComponent, FanComponentKind,
@@ -8516,73 +8517,101 @@ impl<'a> Compiler<'a> {
     }
 
     fn parse_constructions(&mut self, model: &mut TypedModel) {
-        for (name, object) in self.objects("Construction") {
-            let Some(outside_layer_name) =
-                self.required_string("Construction", &name, &object, "outside_layer")
-            else {
-                continue;
-            };
-            let Some(outside_layer) = self.resolve_name(
-                &model.material_names,
-                "Construction",
-                &name,
-                "outside_layer",
-                &outside_layer_name,
-                "Material",
-            ) else {
-                continue;
-            };
-            let mut layers = vec![outside_layer];
-            let mut layers_valid = true;
-            let mut first_missing_layer_number = None;
+        const OBJECT_TYPE: &str = "Construction";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            let mut fields_valid = true;
+            if name.trim().is_empty() {
+                self.error(
+                    "MissingRequiredField",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE} requires a nonblank object name"),
+                );
+                fields_valid = false;
+            }
+
+            // Read every layer field before deciding whether the object can be
+            // materialized. This keeps malformed optional references distinct
+            // from blanks and preserves all useful diagnostics on one pass.
+            let outside_layer_name =
+                self.required_string(OBJECT_TYPE, &name, &object, "outside_layer");
+            if outside_layer_name.is_none() {
+                fields_valid = false;
+            }
+            let mut layer_names = Vec::with_capacity(MAX_OPAQUE_CONSTRUCTION_LAYERS);
+            layer_names.push(outside_layer_name);
             for layer_number in 2..=MAX_OPAQUE_CONSTRUCTION_LAYERS {
                 let field = format!("layer_{layer_number}");
-                let Some(layer_name) = self.optional_string("Construction", &name, &object, &field)
-                else {
-                    first_missing_layer_number.get_or_insert(layer_number);
+                match self.optional_reference_name_checked(OBJECT_TYPE, &name, &object, &field) {
+                    Some(layer_name) => layer_names.push(layer_name),
+                    None => {
+                        fields_valid = false;
+                        layer_names.push(None);
+                    }
+                }
+            }
+
+            let mut first_missing_layer_index = None;
+            let mut resolved_layers = Vec::with_capacity(MAX_OPAQUE_CONSTRUCTION_LAYERS);
+            for (layer_index, layer_name) in layer_names.into_iter().enumerate() {
+                let field = construction_layer_field(layer_index);
+                let Some(layer_name) = layer_name else {
+                    first_missing_layer_index.get_or_insert(layer_index);
+                    resolved_layers.push(None);
                     continue;
                 };
-                if let Some(missing_layer_number) = first_missing_layer_number {
-                    let missing_field = format!("layer_{missing_layer_number}");
+
+                if let Some(missing_layer_index) = first_missing_layer_index {
+                    let missing_field = construction_layer_field(missing_layer_index);
                     self.error(
                         "NonContiguousConstructionLayers",
-                        "Construction",
+                        OBJECT_TYPE,
                         Some(&name),
                         Some(&missing_field),
                         format!(
-                            "Construction/{name} field {missing_field} is blank or missing before populated field {field}; construction layers must be contiguous"
+                            "{OBJECT_TYPE}/{name} field {missing_field} is blank, missing, or malformed before populated field {field}; construction layers must be contiguous"
                         ),
                     );
-                    layers_valid = false;
-                    continue;
+                    fields_valid = false;
                 }
-                let Some(layer) = self.resolve_name(
+
+                let layer = self.resolve_name(
                     &model.material_names,
-                    "Construction",
+                    OBJECT_TYPE,
                     &name,
                     &field,
                     &layer_name,
                     "Material",
-                ) else {
-                    layers_valid = false;
-                    continue;
-                };
-                layers.push(layer);
+                );
+                if layer.is_none() {
+                    fields_valid = false;
+                }
+                resolved_layers.push(layer);
             }
-            if !layers_valid {
+            if !fields_valid {
                 continue;
             }
+
+            let mut layers = resolved_layers.into_iter().flatten().collect::<Vec<_>>();
+            let Some(thermochromic_master) =
+                self.substitute_construction_thermochromic_layers(model, &name, &mut layers)
+            else {
+                continue;
+            };
             let Some(kind) = self.validate_construction_material_layers(model, &name, &layers)
             else {
                 continue;
             };
-            let Some(id_value) = self.checked_id("Construction", &name, model.constructions.len())
+            let outside_layer = layers[0];
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, model.constructions.len())
             else {
                 continue;
             };
             let id = ConstructionId(id_value);
             if model.construction_names.insert(&name, id).is_some() {
-                self.duplicate_name("Construction", &name);
+                self.duplicate_name(OBJECT_TYPE, &name);
                 continue;
             }
 
@@ -8592,8 +8621,81 @@ impl<'a> Compiler<'a> {
                 kind,
                 outside_layer,
                 layers,
+                thermochromic_master,
             });
         }
+    }
+
+    fn substitute_construction_thermochromic_layers(
+        &mut self,
+        model: &TypedModel,
+        construction_name: &str,
+        layers: &mut [MaterialId],
+    ) -> Option<Option<ConstructionThermochromicMaster>> {
+        let mut thermochromic_master = None;
+        let mut glazing_layer_index = 0_u32;
+        let mut valid = true;
+
+        for (layer_index, layer) in layers.iter_mut().enumerate() {
+            let Some(material) = model.materials.get(layer.0 as usize) else {
+                let field = construction_layer_field(layer_index);
+                self.error(
+                    "InvalidConstructionMaterialReference",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&field),
+                    format!(
+                        "Construction/{construction_name} field {field} resolved to an unavailable material ID"
+                    ),
+                );
+                valid = false;
+                continue;
+            };
+
+            let MaterialDefinition::WindowGlazingThermochromicGroup(group) = &material.definition
+            else {
+                if matches!(
+                    &material.definition,
+                    MaterialDefinition::WindowGlazingSpectralAverage(_)
+                        | MaterialDefinition::WindowGlazingRefractionExtinction(_)
+                ) {
+                    glazing_layer_index += 1;
+                }
+                continue;
+            };
+
+            let field = construction_layer_field(layer_index);
+            let Some(first_state) = model
+                .window_glazing_thermochromic_states(*group)
+                .and_then(|states| states.first())
+                .copied()
+            else {
+                self.error(
+                    "InvalidThermochromicGlazingGroupStateRange",
+                    "Construction",
+                    Some(construction_name),
+                    Some(&field),
+                    format!(
+                        "Construction/{construction_name} field {field} references thermochromic glazing group {}, but its first typed glazing state is unavailable",
+                        material.name.0
+                    ),
+                );
+                valid = false;
+                glazing_layer_index += 1;
+                continue;
+            };
+
+            let parent_material = *layer;
+            *layer = first_state.glazing_material;
+            thermochromic_master = Some(ConstructionThermochromicMaster {
+                parent_material,
+                layer_index: layer_index as u32,
+                glazing_layer_index,
+            });
+            glazing_layer_index += 1;
+        }
+
+        valid.then_some(thermochromic_master)
     }
 
     fn validate_construction_material_layers(
@@ -8620,30 +8722,6 @@ impl<'a> Compiler<'a> {
                 Some(&layer_field),
                 format!(
                     "Construction/{construction_name} cannot consume complex-fenestration material {}; WindowMaterial:Gap and WindowMaterial:ComplexShade are reserved for future Construction:ComplexFenestrationState support and are not ordinary Construction layers",
-                    material.name.0
-                ),
-            );
-            return None;
-        }
-
-        if let Some((layer_index, material)) =
-            layers
-                .iter()
-                .enumerate()
-                .find_map(|(layer_index, material_id)| {
-                    let material = model.materials.get(material_id.0 as usize)?;
-                    (material.family() == ep_model::MaterialFamily::ThermochromicGroup)
-                        .then_some((layer_index, material))
-                })
-        {
-            let layer_field = construction_layer_field(layer_index);
-            self.error(
-                "UnsupportedThermochromicGlazingGroupConstruction",
-                "Construction",
-                Some(construction_name),
-                Some(&layer_field),
-                format!(
-                    "Construction/{construction_name} cannot yet consume thermochromic glazing group {}; EnergyPlus CreateTCConstructions expansion and timestep state selection remain deferred",
                     material.name.0
                 ),
             );
@@ -16869,6 +16947,7 @@ fn source_effective_hamt_sorption_points(
 
 #[cfg(test)]
 mod tests {
+    mod construction;
     mod global_geometry_rules;
     mod material_property_glazing_spectral_data;
     mod material_property_heat_and_moisture_transfer_diffusion;

@@ -237,6 +237,7 @@
             kind: ConstructionKind::Fenestration,
             outside_layer: MaterialId(1),
             layers: vec![MaterialId(1)],
+            thermochromic_master: None,
         });
         let model = SimulationModel::from_typed(typed);
 
@@ -255,6 +256,62 @@
             model.typed.surfaces.len()
         );
 
+        Ok(())
+    }
+
+    #[test]
+    fn construction_thermal_cache_indexes_sparse_reordered_and_filtered_ids()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut typed = cube_model();
+        typed.materials[0].id = MaterialId(10);
+        typed
+            .materials
+            .push(spectral_average_window_material(MaterialId(99), "Clear Glass"));
+        typed.constructions[0].id = ConstructionId(42);
+        typed.constructions[0].outside_layer = MaterialId(10);
+        typed.constructions[0].layers = vec![MaterialId(10)];
+        for surface in &mut typed.surfaces {
+            surface.construction = ConstructionId(42);
+        }
+        typed.constructions.insert(
+            0,
+            Construction {
+                id: ConstructionId(7),
+                name: NormalizedName::new("Filtered Window"),
+                kind: ConstructionKind::Fenestration,
+                outside_layer: MaterialId(99),
+                layers: vec![MaterialId(99)],
+                thermochromic_master: None,
+            },
+        );
+
+        let cache = crate::heat_balance::surface_manager::ConstructionThermalDataCache::build(
+            &typed,
+            &BTreeMap::new(),
+        )?;
+        assert_eq!(cache.len(), 1);
+        let opaque_data = cache.data_for_surface(&typed.surfaces[0])?;
+        assert_eq!(opaque_data.cache_index, 0);
+        assert_eq!(opaque_data.construction_id, ConstructionId(42));
+
+        let mut filtered_surface = typed.surfaces[0].clone();
+        filtered_surface.construction = ConstructionId(7);
+        assert!(matches!(
+            cache.data_for_surface(&filtered_surface),
+            Err(RuntimeError::MissingConstruction { .. })
+        ));
+
+        let mut missing_material = cube_model();
+        missing_material.constructions[0].outside_layer = MaterialId(99);
+        missing_material.constructions[0].layers = vec![MaterialId(99)];
+        assert!(matches!(
+            crate::heat_balance::surface_manager::ConstructionThermalDataCache::build(
+                &missing_material,
+                &BTreeMap::new(),
+            ),
+            Err(RuntimeError::MissingMaterial { construction_name })
+                if construction_name == "WALL"
+        ));
         Ok(())
     }
 
@@ -344,6 +401,7 @@
             kind: ConstructionKind::Opaque,
             outside_layer: MaterialId(0),
             layers: vec![MaterialId(0), MaterialId(2)],
+            thermochromic_master: None,
         });
         typed.surfaces[0].construction = ConstructionId(1);
         typed.other_equipment[0].fraction_radiant = 0.25;
