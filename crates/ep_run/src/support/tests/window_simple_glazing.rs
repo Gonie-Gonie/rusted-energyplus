@@ -21,6 +21,11 @@ fn typed_simple_glazing_materials_including_unused_remain_run_blocked()
                     "solar_heat_gain_coefficient": 0.57,
                     "visible_transmittance": 0.61
                 }
+            },
+            "Construction": {
+                "Consumed Whole Window System": {
+                    "outside_layer": "Default Visible Transmittance"
+                }
             }
         }"#,
     )?;
@@ -32,6 +37,16 @@ fn typed_simple_glazing_materials_including_unused_remain_run_blocked()
         .as_ref()
         .ok_or_else(|| std::io::Error::other("expected typed simple glazing materials"))?;
     assert_eq!(model.materials.len(), 2);
+    assert_eq!(model.constructions.len(), 1);
+    assert_eq!(
+        model.constructions[0].kind,
+        ep_model::ConstructionKind::Fenestration
+    );
+    assert_eq!(model.constructions[0].layers.len(), 1);
+    assert_eq!(
+        model.constructions[0].outside_layer,
+        model.constructions[0].layers[0]
+    );
     assert_eq!(
         model
             .materials

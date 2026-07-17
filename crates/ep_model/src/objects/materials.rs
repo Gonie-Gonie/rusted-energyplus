@@ -113,7 +113,8 @@ pub enum MaterialFamily {
     EquivalentLayer,
     /// Non-executable thermochromic parent whose child generation/runtime consumer is deferred.
     ThermochromicGroup,
-    /// Simple glazing system whose dedicated construction consumer is deferred.
+    /// Whole-system simple glazing accepted only as a sole ordinary construction layer.
+    /// Window runtime and multi-layer source quirks remain deferred.
     SimpleGlazing,
     /// Complex-fenestration material whose dedicated construction consumer is deferred.
     ComplexFenestration,

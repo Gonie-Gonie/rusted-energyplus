@@ -1090,7 +1090,7 @@ The following table is the public-object processing order inside
 | 17 | `WindowMaterial:Blind:EquivalentLayer` | equivalent-layer blind | complete bounded typed variant with source blank-group/index quirks, warning-only geometry recovery, and a deferred equivalent-layer construction consumer |
 | 18 | `Material:RoofVegetation` | eco-roof material and vegetation state | complete bounded typed input and dry-soil opaque projection; dynamic EcoRoof runtime blocked |
 | 19 | `WindowMaterial:GlazingGroup:Thermochromic` | thermochromic glazing-group parent | complete bounded typed ordered-state parent; construction generation and runtime selection deferred |
-| 20 | `WindowMaterial:SimpleGlazingSystem` | derived simple glazing system | complete bounded typed block model; dedicated family, construction and runtime blocked |
+| 20 | `WindowMaterial:SimpleGlazingSystem` | derived simple glazing system | complete bounded typed block model; dedicated family with sole-layer ordinary-Construction consumption; runtime blocked |
 | 21 | `WindowMaterial:Gap` | complex-fenestration gap, including optional deflection-state and support-pillar references | complete bounded typed variant with copied gas/helper state; dedicated consumer and runtime deferred |
 | 22 | `WindowMaterial:ComplexShade` | complex-fenestration shade | complete bounded typed variant with source defaults/projections; dedicated consumer and runtime deferred |
 
@@ -2294,12 +2294,15 @@ and a thermochromic child lookup cannot resolve a SimpleGlazing definition
 even when the input text declares it first. Later material consumers can
 resolve the typed identity normally.
 
-The payload uses the dedicated `MaterialFamily::SimpleGlazing`. This checkpoint
-does not treat the whole-system input as ordinary detailed glass: every
-`Construction` reference explicitly fails closed with
-`UnsupportedSimpleGlazingSystemConstruction`, regardless of layer count or
-position. Arbitrary-run assessment independently counts and blocks every typed
-definition, including unused definitions, as
+The payload uses the dedicated `MaterialFamily::SimpleGlazing` rather than
+pretending that the whole-system input is ordinary detailed glass. The bounded
+ordinary-`Construction` consumer accepts it only as the sole layer, retains the
+same material ID as the outside layer and sole graph target, and classifies the
+construction as fenestration. Multi-layer and shaded uses continue to fail
+closed with `UnsupportedSimpleGlazingSystemConstruction`; this intentionally
+avoids EnergyPlus 26.1's downstream validation holes. Arbitrary-run assessment
+independently counts and blocks every typed definition, including consumed and
+unused definitions, as
 `UnsupportedSurfaceBoundary`/`RunBlocked` with no runtime class.
 
 #### `SetupSimpleWindowGlazingSystem` state contract
@@ -2318,7 +2321,7 @@ history_state_ownership:
 - no cross-call history or cache; each typed material owns its immutable raw performance indices, optional visible-input state, derived block-model fields, and clamp flag
 
 unsupported_state:
-- Construction ownership and layer packing, specialized WindowMaterial:Glazing and WindowConstruction report state, angular or hemispherical optical tables, surface/window thermal state, daylighting, ratings, output variables, and runtime state
+- multi-layer or shaded Construction packing and all construction-derived thermal state, specialized WindowMaterial:Glazing and WindowConstruction report state, angular or hemispherical optical tables, surface/window thermal state, daylighting, ratings, output variables, and runtime state; the separate GetConstructData mapping owns only sole-layer typed identity and graph linkage
 
 inactive_branches:
 - winter interior-film resistance branches at U-factor 5.85; thickness branches at inverse layer resistance 7; solar correlations below 3.4, from 3.4 through 4.5, and above 4.5 W/m2-K with SHGC thresholds 0.15 and 0.7206; the intermediate-U summer-film path deliberately preserves the EnergyPlus 26.1 `(low - high) * fraction + low` reversed interpolation direction
@@ -2554,14 +2557,16 @@ family. Thermochromic glazing-group parents remain a distinct family with
 bounded ordinary master consumption: `Construction` maps first-state
 substitution and final-parent metadata, while child generation and runtime
 state selection remain deferred. SimpleGlazing definitions use a separate
-fully blocked family, and
+family with a sole-layer ordinary-Construction consumer and an all-definition
+runtime block, and
 complex-fenestration gaps and shades share a dedicated deferred-consumer
 family. An ordinary `Construction` accepts the
 unshaded `Glass ((Gas|GasMixture) Glass){0..3}` subset, the bounded exterior,
 interior, double-between, and triple-between Shade or Blind patterns above,
 and one exterior Screen directly before that plain window stack. It rejects
 gas-only, trailing-gas, adjacent-glass, adjacent-gas, invalid shading-device
-placement, overlong, and mixed opaque/window stacks. A
+placement, overlong, and mixed opaque/window stacks; it separately accepts a
+sole whole-system SimpleGlazing layer while rejecting every multi-layer use. A
 `BuildingSurface:Detailed` cannot reference that fenestration construction.
 The opaque runtime cache, execution plan, and construction-material CLI
 comparison filter it out, while hand-built typed models that cross the family
@@ -2818,8 +2823,10 @@ U-factor branches, SHGC thresholds, the reversed intermediate summer-film
 interpolation, fixed material state, explicit-visible reflectance polynomials,
 and high-U warning/clamp recovery. They also lock exclusive numeric bounds,
 required/type diagnostics, the shared material namespace and source order,
-the unavailable thermochromic-child relationship, typed coverage, universal
-ordinary-`Construction` rejection, and the all-definition arbitrary-run block.
+the unavailable thermochromic-child relationship, typed coverage, the
+single-layer ordinary-`Construction` identity/kind/graph mapping, multi-layer
+fail-closed boundary, and the consumed-plus-unused all-definition arbitrary-run
+block.
 The dedicated static case separately locks only the bounded generic
 `Material Details` evidence above. The tests and case do not promote
 specialized glazing or construction reporting, incident-angle or hemispherical
@@ -3139,7 +3146,7 @@ fallback.
 | Routine | Completion status | Inventory obligation |
 |---|---|---|
 | `GetWindowGlassSpectralData` | `state_mapped` | owns the complete bounded pre-material standalone dataset read, positional zero-fill, transmittance floor, point validation, separate typed arena/name map, and valid-unused runtime-inert boundary; active glazing consumers remain blocked |
-| `MaterialGlass::SetupSimpleWindowGlazingSystem` | `state_mapped` | its complete material-owned performance-index block model, optional-visible branch, reversed intermediate-U film-resistance interpolation, and materializing high-U resistance clamp are typed; construction, angular/hemispherical optics, reporting, runtime, and conformance remain outside the mapping |
+| `MaterialGlass::SetupSimpleWindowGlazingSystem` | `state_mapped` | its complete material-owned performance-index block model, optional-visible branch, reversed intermediate-U film-resistance interpolation, and materializing high-U resistance clamp are typed; the separate `GetConstructData` mapping owns sole-layer construction identity/graph linkage, while multi-layer packing, angular/hemispherical optics, reporting, runtime, and conformance remain outside this mapping |
 | `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, RoofVegetation, Thermochromic glazing-group, SimpleGlazingSystem, and complex-fenestration Gap and ComplexShade objects plus only the regular Glazing `SpectralAverage` branch are implemented; RoofVegetation, SimpleGlazingSystem, and complex-fenestration Gap and ComplexShade have bounded generic-definition CLI comparisons, while Thermochromic EIO remains unclaimed |
 | `CalcScreenTransmittance` | `source_mapped` | the Screen fixture comparator reproduces only its normal-incidence A/Z paths and the values required by the bounded static EIO row |
 | `CalcWindowScreenProperties` | `source_mapped` | the Screen fixture comparator reproduces only its reverse-order 18 by 18 initialization integration and fixture activation boundary |
@@ -3205,9 +3212,10 @@ mapping, Venetian-only curve relationship with half-width equality accepted,
 and family boundaries are compiled; and the bounded
 AirGap/IRT construction invariants, equivalent-layer construction exclusion,
 ordinary Glass/Gas-or-GasMixture alternation, and safe exterior, interior, and
-between-glass Shade/Blind patterns plus the exterior-only Screen pattern and
-universal SimpleGlazing and complex-fenestration material construction
-rejection are rejected or accepted as declared.
+between-glass Shade/Blind patterns plus the exterior-only Screen pattern, the
+sole-layer SimpleGlazing consumer with multi-layer rejection, and universal
+complex-fenestration material construction rejection are rejected or accepted
+as declared.
 `window_glazing_spectral_average_001` adds an external exact-EIO smoke gate
 for every field EnergyPlus emits from the bounded `SpectralAverage` material
 slice, together with oracle-only proof that the fixture uses that construction

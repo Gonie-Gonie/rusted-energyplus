@@ -2,7 +2,9 @@ use super::super::{
     CompileResult, DiagnosticSeverity, ObjectCoverageStatus, compile_raw_model,
     typed_coverage_status,
 };
-use ep_model::{MaterialFamily, MaterialKind, MaterialSurfaceRoughness};
+use ep_model::{
+    ConstructionKind, MaterialFamily, MaterialKind, MaterialSurfaceRoughness, ModelGraph,
+};
 use ep_raw_model::parse_epjson_str;
 
 const OBJECT_TYPE: &str = "WindowMaterial:SimpleGlazingSystem";
@@ -633,7 +635,56 @@ fn thermochromic_group_cannot_resolve_a_later_simple_glazing_child()
 }
 
 #[test]
-fn every_simple_glazing_construction_reference_fails_closed()
+fn sole_layer_simple_glazing_materializes_a_fenestration_construction_and_graph_edge()
+-> Result<(), Box<dyn std::error::Error>> {
+    let raw = parse_epjson_str(
+        r#"{
+            "WindowMaterial:SimpleGlazingSystem": {
+                "Whole Window System": {
+                    "u_factor":3.0,
+                    "solar_heat_gain_coefficient":0.5
+                }
+            },
+            "Construction": {
+                "Simple Window": {"outside_layer":"Whole Window System"}
+            }
+        }"#,
+    )?;
+    let result = compile_raw_model(&raw);
+
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let model = result
+        .model
+        .ok_or_else(|| std::io::Error::other("expected typed simple-glazing construction"))?;
+    let material_id = model
+        .material_names
+        .resolve("Whole Window System")
+        .ok_or_else(|| std::io::Error::other("missing simple-glazing material"))?;
+    let construction = model
+        .constructions
+        .iter()
+        .find(|construction| construction.name.0 == "SIMPLE WINDOW")
+        .ok_or_else(|| std::io::Error::other("missing simple-glazing construction"))?;
+
+    assert_eq!(construction.kind, ConstructionKind::Fenestration);
+    assert_eq!(construction.outside_layer, material_id);
+    assert_eq!(construction.layers, vec![material_id]);
+    assert_eq!(construction.thermochromic_master, None);
+
+    let graph = ModelGraph::from_typed(&model);
+    let edges = graph
+        .construction_materials
+        .iter()
+        .filter(|edge| edge.construction == construction.id)
+        .collect::<Vec<_>>();
+    assert_eq!(edges.len(), 1);
+    assert_eq!(edges[0].material, material_id);
+    assert_eq!(edges[0].layer_index, 0);
+    Ok(())
+}
+
+#[test]
+fn multi_layer_simple_glazing_construction_references_fail_closed()
 -> Result<(), Box<dyn std::error::Error>> {
     let raw = parse_epjson_str(
         r#"{
@@ -656,7 +707,10 @@ fn every_simple_glazing_construction_reference_fails_closed()
                 "Simple": {"u_factor":3.0,"solar_heat_gain_coefficient":0.5}
             },
             "Construction": {
-                "A Simple Outside": {"outside_layer":"Simple"},
+                "A Simple Then Glass": {
+                    "outside_layer":"Simple",
+                    "layer_2":"Glass"
+                },
                 "B Simple Layer Two": {
                     "outside_layer":"Glass",
                     "layer_2":"Simple"
@@ -677,7 +731,7 @@ fn every_simple_glazing_construction_reference_fails_closed()
 
     assert!(result.has_errors());
     for (object_name, field) in [
-        ("A Simple Outside", "outside_layer"),
+        ("A Simple Then Glass", "outside_layer"),
         ("B Simple Layer Two", "layer_2"),
         ("C Simple Layer Three", "layer_3"),
         ("D Opaque Then Simple", "layer_2"),

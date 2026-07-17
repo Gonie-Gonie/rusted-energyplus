@@ -50,7 +50,7 @@ claim.
 | project heat-balance controls | `GetProjectControlData` | mapped-not-ported |
 | material input | `Material::GetWindowGlassSpectralData` -> `Material::GetMaterialData` -> `Material::GetHysteresisData` | all 34 public base/overlay objects are inventoried in [the material-family source map](material-source-map.md); Regular, NoMass, AirGap, InfraredTransparent, RefractionExtinctionMethod, and EquivalentLayer plus only the `WindowMaterial:Glazing` `SpectralAverage` branch are typed, while equivalent-layer construction and full window behavior remain blocked |
 | window frame/divider input | `GetFrameAndDividerData` | EnergyPlus places this routine after hysteresis and before construction input; Rust types the complete bounded object after base `parse_materials` and before `parse_constructions`, while its separate Hysteresis pass remains later, so complete pass-order parity is not claimed; every definition, including unused records, remains runtime-blocking |
-| construction input | `GetConstructData` | source-mapped only: required names, contiguous material-layer prefixes, independent normalized construction identity, bounded opaque/fenestration validation, and the ordinary-Construction thermochromic-parent first-state substitution/master-metadata branch are typed; all special construction families, SimpleGlazing consumption, `CreateTCConstructions`, nominal-U/CTF/reporting, and window execution remain deferred |
+| construction input | `GetConstructData` | source-mapped only: required names, contiguous material-layer prefixes, independent normalized construction identity, bounded opaque/fenestration validation, thermochromic-parent first-state substitution/master metadata, and sole-layer SimpleGlazingSystem consumption are typed; all special construction families, multi-layer SimpleGlazing quirks, `CreateTCConstructions`, nominal-U/CTF/reporting, and window execution remain deferred |
 | zone input | `GetZoneData` | typed geometry subset exists; source map required before expansion |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
@@ -279,6 +279,12 @@ IDs. Checked direct-index construction/material and opaque-cache lookups are
 structural hardening only; the existing thermochromic parent capability keeps
 all such definitions runtime-blocked, and no window execution is promoted.
 
+CP86 also accepts the intended whole-system SimpleGlazing form only when it is
+the sole ordinary-`Construction` layer. The original SimpleGlazing material ID
+is retained as the outside layer, sole ordered layer, and graph target, and the
+construction is classified as fenestration. Multi-layer source-validation
+holes and every window runtime consumer remain fail-closed.
+
 ### `GetConstructData` bounded ordinary state contract
 
 <!-- routine-state-contract:v1 begin get_construct_data -->
@@ -288,11 +294,13 @@ read_state:
 - EnergyPlus calls `GetConstructData` after `GetFrameAndDividerData` and before `GetBuildingData`; within it, every ordinary `Construction` is read before the deferred F-factor, C-factor, AirBoundary, complex-fenestration, internal-heat-source, equivalent-layer, and WindowDataFile branches
 - one required nonblank outer-key name in an independent normalized construction namespace, one required outside-layer material name, and optional layers 2 through 10 that must form a contiguous populated prefix; every populated layer resolves through the typed material namespace
 - every typed `WindowMaterial:GlazingGroup:Thermochromic` parent encountered in layer order contributes its first ordered glazing state to the effective layer stack; the existing typed parent contract guarantees at least one state
+- a `WindowMaterial:SimpleGlazingSystem` material is accepted only when it is the sole ordinary-Construction layer, matching the intended whole-system input while excluding EnergyPlus 26.1's multi-layer validation holes
 - all layer references, contiguous-prefix rules, bounded opaque/fenestration family and topology checks, unsupported-consumer checks, and normalized duplicate checks complete before a `ConstructionId` or name is reserved
 
 write_state:
 - the deterministic `Construction` arena and independent normalized name map retain each valid ID, normalized name, bounded opaque-or-fenestration kind, effective outside layer, and ordered effective outside-to-inside material stack
 - every thermochromic parent layer is replaced by its first-state glazing `MaterialId`; the final parent encountered overwrites the source-shaped zero-based parent-material-layer and glazing-layer metadata slots while earlier parent substitutions remain in the effective stack
+- a sole-layer SimpleGlazingSystem construction is retained as Fenestration with the original material ID in outside-layer, ordered-layer, and construction/material graph state; no detailed-glazing child is synthesized
 - construction/material model-graph edges are emitted from the effective material stack, so thermochromic edges target first-state glazing materials rather than parent group descriptors
 - runtime construction/material resolution and opaque construction thermal-cache building use checked direct-index lookups; these structural paths do not enable thermochromic or other window execution
 
@@ -300,19 +308,21 @@ history_state_ownership:
 - TypedModel owns immutable construction layer stacks and optional thermochromic master metadata; this checkpoint creates no thermochromic child constructions, active-state history, or mutable window state
 
 unsupported_state:
-- ordinary `Construction` consumption of `WindowMaterial:SimpleGlazingSystem` and the special `Construction:FfactorGroundFloor`, `Construction:CfactorUndergroundWall`, `Construction:AirBoundary`, `Construction:ComplexFenestrationState`, `ConstructionProperty:InternalHeatSource`, `Construction:WindowEquivalentLayer`, and `Construction:WindowDataFile` input branches
+- multi-layer or shaded ordinary `Construction` consumption of `WindowMaterial:SimpleGlazingSystem` and the special `Construction:FfactorGroundFloor`, `Construction:CfactorUndergroundWall`, `Construction:AirBoundary`, `Construction:ComplexFenestrationState`, `ConstructionProperty:InternalHeatSource`, `Construction:WindowEquivalentLayer`, and `Construction:WindowDataFile` input branches
 - `CreateTCConstructions` child allocation and copying, source-formatted child names, surface-active construction switching, temperature-driven state selection, fenestration binding, optics, thermal calculations, daylighting, shading, nominal-U adjustment, CTF generation, and EIO or other construction reporting
 
 inactive_branches:
 - ordinary constructions without a thermochromic parent retain their existing effective material stacks and bounded opaque/fenestration classification; for these records the input and effective stacks are identical
+- a sole-layer SimpleGlazingSystem construction retains its one source material ID and has no thermochromic metadata; no multi-layer source quirk is materialized
 - when more than one thermochromic parent is present, every parent is first-state substituted but only the final parent owns the zero-based master metadata, preserving the source overwrite behavior without generating child constructions
 
 unsupported_active_branches:
 - every typed thermochromic parent remains an all-definition runtime blocker through its existing parent-material capability rule, including an unused parent and a parent consumed by a valid ordinary `Construction`; direct-index structural lookup does not weaken that block
+- every typed SimpleGlazingSystem definition remains an all-definition runtime blocker, including an unused definition and one consumed by a valid sole-layer ordinary `Construction`
 - valid bounded fenestration constructions remain typed graph state only and do not enter the opaque runtime thermal cache or acquire window execution
 
 not_claimed_branches:
-- complete `GetConstructData` parity, source declaration and case-collision behavior, invalid-before-name source side effects, exact diagnostics/order/multiplicity, SimpleGlazingSystem consumption, thermochromic child generation/naming/state selection, all special construction families and overlays, nominal-U or CTF calculations, EIO/SQLite and other reporting, window or ground physics, runtime numerics, and conformance
+- complete `GetConstructData` parity, source declaration and case-collision behavior, invalid-before-name source side effects, exact diagnostics/order/multiplicity, multi-layer or shaded SimpleGlazingSystem source quirks, thermochromic child generation/naming/state selection, all special construction families and overlays, nominal-U or CTF calculations, EIO/SQLite and other reporting, window or ground physics, runtime numerics, and conformance
 <!-- routine-state-contract:v1 end get_construct_data -->
 
 ## Data Structure Map
@@ -322,7 +332,7 @@ not_claimed_branches:
 | `DataHeatBalance::ZoneData` | `ep_model::Zone`, `ep_runtime::ZoneHeatBalanceState` | geometry is partial; heat capacity and histories are not conformance-ready |
 | `DataSurface::SurfaceData` | `ep_model::Surface`, `ep_runtime::SurfaceHeatBalanceState` | opaque surface subset only; outside-layer roughness metadata is tracked for future exterior convection work |
 | `DataSurfaces::FrameDividerProperties` | `ep_model::WindowFrameAndDivider`, `ep_model::WindowFrameProperties`, `ep_model::WindowDividerProperties`, `ep_model::WindowRevealProperties` | complete bounded immutable user-input descriptors and an independent normalized namespace are typed; fenestration binding, geometry, WINDOW 5 synthesis, shading mutation, window physics, NFRC calculations, reporting, and runtime remain blocked |
-| `Construction::ConstructionProps::{Name, TotLayers, LayerPoint, isTCWindow, isTCMaster, TCMasterMatNum, TCLayerNum, TCGlassNum}` and construction/material CTF data | `ep_model::Construction`, optional immutable thermochromic master metadata, `ep_model::ModelGraph::construction_materials`, checked runtime direct-index construction/material lookup, and `ep_runtime::SurfaceCtfState` | ordinary input layers resolve into a bounded opaque/fenestration construction; every thermochromic parent contributes its first glazing state to the effective stack and only the final parent owns zero-based master metadata, while graph edges use effective glazing IDs. The opaque runtime cache, static Regular/AirGap/IRT EIO evidence, diagnostic steady/no-mass coefficient seeding, and CTF histories do not enable thermochromic/window execution, child construction generation, mass-material coefficient generation, or broad face-temperature solving |
+| `Construction::ConstructionProps::{Name, TotLayers, LayerPoint, isTCWindow, isTCMaster, TCMasterMatNum, TCLayerNum, TCGlassNum}` and construction/material CTF data | `ep_model::Construction`, optional immutable thermochromic master metadata, `ep_model::ModelGraph::construction_materials`, checked runtime direct-index construction/material lookup, and `ep_runtime::SurfaceCtfState` | ordinary input layers resolve into a bounded opaque/fenestration construction; every thermochromic parent contributes its first glazing state to the effective stack and only the final parent owns zero-based master metadata, while a sole SimpleGlazingSystem layer retains its original material identity and Fenestration kind. Graph edges follow the effective or retained IDs. The opaque runtime cache, static Regular/AirGap/IRT EIO evidence, diagnostic steady/no-mass coefficient seeding, and CTF histories do not enable thermochromic/window execution, multi-layer SimpleGlazing quirks, child construction generation, mass-material coefficient generation, or broad face-temperature solving |
 | zone predictor histories, sums, and coefficients such as `MAT`, `XMAT`, `DSXMAT`, `SumHA`, `SumHATsurf`, `SumHATref`, `TempDepCoef`, `TempIndCoef`, `AirPowerCap`, and `TempHistoryTerm` | `ep_runtime::ZoneHeatBalanceState`, `ep_runtime::ZoneAirTemperatureCoefficients`, and future `ep_runtime::zone_air` histories | diagnostic shell keeps MAT history, stores surface convection sums, and snapshots EnergyPlus-shaped zone-air coefficients for future predictor wiring; full predictor/corrector equations are not ported |
 | internal gain sums such as `SumIntGain` | `simulate_zone_internal_convective_gains` and future state fields | convective trace conformance only for declared v0.26 case |
 

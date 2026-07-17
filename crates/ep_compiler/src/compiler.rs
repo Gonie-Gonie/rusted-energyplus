@@ -8738,6 +8738,16 @@ impl<'a> Compiler<'a> {
                         .then_some((layer_index, material))
                 })
         {
+            if layer_index == 0
+                && layers.len() == 1
+                && matches!(
+                    material.definition,
+                    MaterialDefinition::WindowSimpleGlazing(_)
+                )
+            {
+                return Some(ConstructionKind::Fenestration);
+            }
+
             let layer_field = construction_layer_field(layer_index);
             self.error(
                 "UnsupportedSimpleGlazingSystemConstruction",
@@ -8745,7 +8755,7 @@ impl<'a> Compiler<'a> {
                 Some(construction_name),
                 Some(&layer_field),
                 format!(
-                    "Construction/{construction_name} cannot yet consume simple glazing system {}; window optics, thermal behavior, and nominal U-factor adjustment remain deferred",
+                    "Construction/{construction_name} can consume simple glazing system {} only as its sole layer; multi-layer simple-glazing validation, window optics, thermal behavior, and nominal U-factor adjustment remain deferred",
                     material.name.0
                 ),
             );
