@@ -21,6 +21,7 @@ typed_id!(MaterialMoisturePenetrationDepthSettingsId);
 typed_id!(MaterialHeatAndMoistureTransferSettingsId);
 typed_id!(MaterialHeatAndMoistureTransferSorptionIsothermId);
 typed_id!(MaterialHeatAndMoistureTransferSuctionId);
+typed_id!(MaterialHeatAndMoistureTransferRedistributionId);
 typed_id!(InternalGainId);
 typed_id!(ScheduleTypeLimitId);
 typed_id!(DayScheduleId);

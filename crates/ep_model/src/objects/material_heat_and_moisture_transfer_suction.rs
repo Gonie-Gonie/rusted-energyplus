@@ -27,6 +27,6 @@ pub struct MaterialHeatAndMoistureTransferSuction {
     pub number_of_suction_points: u8,
     /// Count-selected coordinates after source blank numeric fields become zero.
     pub input_points: Vec<MaterialHeatAndMoistureTransferSuctionPoint>,
-    /// Source-effective coordinates after appending the sorption high-water endpoint.
+    /// Source-effective coordinates after appending the indexed last Sorption moisture point.
     pub effective_points: Vec<MaterialHeatAndMoistureTransferSuctionPoint>,
 }

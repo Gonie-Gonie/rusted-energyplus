@@ -3,11 +3,11 @@ use super::super::{
     typed_coverage_status,
 };
 use ep_model::{
-    MaterialDefinition, MaterialHeatAndMoistureTransferSuctionId, NormalizedName, TypedModel,
+    MaterialDefinition, MaterialHeatAndMoistureTransferRedistributionId, NormalizedName, TypedModel,
 };
 use ep_raw_model::{FieldName, ObjectName, ObjectType, RawModel, RawValue, parse_epjson_str};
 
-const OBJECT_TYPE: &str = "MaterialProperty:HeatAndMoistureTransfer:Suction";
+const OBJECT_TYPE: &str = "MaterialProperty:HeatAndMoistureTransfer:Redistribution";
 
 fn one_material_model(instance_name: &str, material_name: &str) -> String {
     format!(
@@ -35,7 +35,7 @@ fn one_material_model(instance_name: &str, material_name: &str) -> String {
             "{OBJECT_TYPE}": {{
                 "{instance_name}": {{
                     "material_name":"{material_name}",
-                    "number_of_suction_points":1,
+                    "number_of_redistribution_points":1,
                     "moisture_content_1":10,
                     "liquid_transport_coefficient_1":1e-9
                 }}
@@ -44,14 +44,14 @@ fn one_material_model(instance_name: &str, material_name: &str) -> String {
     )
 }
 
-fn suction_object_mut<'a>(
+fn redistribution_object_mut<'a>(
     raw: &'a mut RawModel,
     instance_name: &str,
 ) -> Result<&'a mut ep_raw_model::RawObject, Box<dyn std::error::Error>> {
     raw.objects
         .get_mut(&ObjectType(OBJECT_TYPE.to_string()))
         .and_then(|instances| instances.get_mut(&ObjectName(instance_name.to_string())))
-        .ok_or_else(|| std::io::Error::other("missing raw HAMT suction object").into())
+        .ok_or_else(|| std::io::Error::other("missing raw HAMT redistribution object").into())
 }
 
 fn sorption_object_mut(
@@ -76,7 +76,7 @@ fn has_error(result: &CompileResult, code: &str, object_name: &str, field: Optio
 }
 
 #[test]
-fn suction_materializes_source_endpoint_and_existing_attachments()
+fn redistribution_materializes_source_endpoint_and_existing_attachments()
 -> Result<(), Box<dyn std::error::Error>> {
     let raw = parse_epjson_str(
         r#"{
@@ -130,15 +130,18 @@ fn suction_materializes_source_endpoint_and_existing_attachments()
                 "B Curve": {"material_name":"B Wall","number_of_isotherm_coordinates":1,"relative_humidity_fraction_1":0.5,"moisture_content_1":10}
             },
             "MaterialProperty:HeatAndMoistureTransfer:Suction": {
-                "A Suction": {
+                "A Suction": {"material_name":"A Wall","number_of_suction_points":1,"moisture_content_1":25,"liquid_transport_coefficient_1":3e-9}
+            },
+            "MaterialProperty:HeatAndMoistureTransfer:Redistribution": {
+                "A Redistribution": {
                     "material_name":"a wall",
-                    "number_of_suction_points":2,
+                    "number_of_redistribution_points":2,
                     "moisture_content_1":100,
                     "liquid_transport_coefficient_1":1e-9,
                     "moisture_content_2":50,
                     "liquid_transport_coefficient_2":2e-9
                 },
-                "B Suction": {"material_name":"B WALL","number_of_suction_points":1,"moisture_content_1":0,"liquid_transport_coefficient_1":0}
+                "B Redistribution": {"material_name":"B WALL","number_of_redistribution_points":1,"moisture_content_1":0,"liquid_transport_coefficient_1":0}
             }
         }"#,
     )?;
@@ -148,14 +151,19 @@ fn suction_materializes_source_endpoint_and_existing_attachments()
         .model
         .as_ref()
         .ok_or_else(|| std::io::Error::other("expected typed model"))?;
-    assert_eq!(model.material_heat_and_moisture_transfer_suctions.len(), 2);
+    assert_eq!(
+        model
+            .material_heat_and_moisture_transfer_redistributions
+            .len(),
+        2
+    );
 
-    let a = &model.material_heat_and_moisture_transfer_suctions[0];
-    let b = &model.material_heat_and_moisture_transfer_suctions[1];
-    assert_eq!(a.id, MaterialHeatAndMoistureTransferSuctionId(0));
-    assert_eq!(a.name, NormalizedName::new("A Suction"));
+    let a = &model.material_heat_and_moisture_transfer_redistributions[0];
+    let b = &model.material_heat_and_moisture_transfer_redistributions[1];
+    assert_eq!(a.id, MaterialHeatAndMoistureTransferRedistributionId(0));
+    assert_eq!(a.name, NormalizedName::new("A Redistribution"));
     assert_eq!(a.reference_sorption_isotherm.0, 0);
-    assert_eq!(a.number_of_suction_points, 2);
+    assert_eq!(a.number_of_redistribution_points, 2);
     assert_eq!(
         a.input_points
             .iter()
@@ -203,7 +211,12 @@ fn suction_materializes_source_endpoint_and_existing_attachments()
             .len(),
         2
     );
-    assert_eq!(model.object_count(), 14);
+    assert_eq!(model.material_heat_and_moisture_transfer_suctions.len(), 1);
+    assert_ne!(
+        model.material_heat_and_moisture_transfer_suctions[0].reference_material,
+        b.reference_material
+    );
+    assert_eq!(model.object_count(), 15);
     assert_eq!(result.report.typed_object_count, model.object_count());
     assert_eq!(
         typed_coverage_status(OBJECT_TYPE),
@@ -218,9 +231,9 @@ fn suction_materializes_source_endpoint_and_existing_attachments()
 }
 
 #[test]
-fn suction_endpoint_uses_indexed_sorption_last_not_maximum()
+fn redistribution_endpoint_uses_indexed_sorption_last_not_maximum()
 -> Result<(), Box<dyn std::error::Error>> {
-    let mut raw = parse_epjson_str(&one_material_model("Suction", "HAMT Wall"))?;
+    let mut raw = parse_epjson_str(&one_material_model("Redistribution", "HAMT Wall"))?;
     let sorption = sorption_object_mut(&mut raw)?;
     sorption.fields.insert(
         FieldName("number_of_isotherm_coordinates".to_string()),
@@ -257,10 +270,12 @@ fn suction_endpoint_uses_indexed_sorption_last_not_maximum()
         .ok_or_else(|| std::io::Error::other("expected source-effective sorption points"))?;
     assert!(sorption_last < sorption_max);
     assert_eq!(
-        model.material_heat_and_moisture_transfer_suctions[0]
+        model.material_heat_and_moisture_transfer_redistributions[0]
             .effective_points
             .last()
-            .ok_or_else(|| std::io::Error::other("expected source-effective suction endpoint"))?
+            .ok_or_else(|| std::io::Error::other(
+                "expected source-effective redistribution endpoint"
+            ))?
             .moisture_content_kg_per_m3
             .to_bits(),
         sorption_last.to_bits()
@@ -269,7 +284,7 @@ fn suction_endpoint_uses_indexed_sorption_last_not_maximum()
 }
 
 #[test]
-fn suction_preserves_nonsemantic_keys_count_zero_fill_and_inactive_fields()
+fn redistribution_preserves_nonsemantic_keys_count_zero_fill_and_inactive_fields()
 -> Result<(), Box<dyn std::error::Error>> {
     let raw = parse_epjson_str(
         r#"{
@@ -288,10 +303,10 @@ fn suction_preserves_nonsemantic_keys_count_zero_fill_and_inactive_fields()
                 "B": {"material_name":"B","number_of_isotherm_coordinates":1,"relative_humidity_fraction_1":0.5,"moisture_content_1":10},
                 "C": {"material_name":"C","number_of_isotherm_coordinates":1,"relative_humidity_fraction_1":0.5,"moisture_content_1":10}
             },
-            "MaterialProperty:HeatAndMoistureTransfer:Suction": {
+            "MaterialProperty:HeatAndMoistureTransfer:Redistribution": {
                 "   ": {
                     "material_name":"A",
-                    "number_of_suction_points":3,
+                    "number_of_redistribution_points":3,
                     "moisture_content_1":0.4,
                     "liquid_transport_coefficient_1":40,
                     "liquid_transport_coefficient_2":20,
@@ -299,7 +314,7 @@ fn suction_preserves_nonsemantic_keys_count_zero_fill_and_inactive_fields()
                 },
                 "Curve": {
                     "material_name":"B",
-                    "number_of_suction_points":1,
+                    "number_of_redistribution_points":1,
                     "moisture_content_1":0.25,
                     "liquid_transport_coefficient_1":2,
                     "moisture_content_25":0.9,
@@ -307,7 +322,7 @@ fn suction_preserves_nonsemantic_keys_count_zero_fill_and_inactive_fields()
                 },
                 "curve": {
                     "material_name":"C",
-                    "number_of_suction_points":25,
+                    "number_of_redistribution_points":25,
                     "moisture_content_1":0.5,
                     "liquid_transport_coefficient_1":5
                 }
@@ -320,55 +335,64 @@ fn suction_preserves_nonsemantic_keys_count_zero_fill_and_inactive_fields()
         .model
         .as_ref()
         .ok_or_else(|| std::io::Error::other("expected typed model"))?;
-    let suctions = &model.material_heat_and_moisture_transfer_suctions;
-    assert_eq!(suctions.len(), 3);
-    assert_eq!(suctions[0].name, NormalizedName::new("   "));
-    assert_eq!(suctions[1].name, suctions[2].name);
-    assert_eq!(suctions[0].input_points.len(), 3);
-    assert_eq!(suctions[0].input_points[1].moisture_content_kg_per_m3, 0.0);
+    let redistributions = &model.material_heat_and_moisture_transfer_redistributions;
+    assert_eq!(redistributions.len(), 3);
+    assert_eq!(redistributions[0].name, NormalizedName::new("   "));
+    assert_eq!(redistributions[1].name, redistributions[2].name);
+    assert_eq!(redistributions[0].input_points.len(), 3);
     assert_eq!(
-        suctions[0].input_points[1].liquid_transport_coefficient_m2_per_s,
-        20.0
-    );
-    assert_eq!(suctions[0].input_points[2].moisture_content_kg_per_m3, 0.9);
-    assert_eq!(
-        suctions[0].input_points[2].liquid_transport_coefficient_m2_per_s,
+        redistributions[0].input_points[1].moisture_content_kg_per_m3,
         0.0
     );
     assert_eq!(
-        suctions[0].effective_points[0].moisture_content_kg_per_m3,
+        redistributions[0].input_points[1].liquid_transport_coefficient_m2_per_s,
+        20.0
+    );
+    assert_eq!(
+        redistributions[0].input_points[2].moisture_content_kg_per_m3,
+        0.9
+    );
+    assert_eq!(
+        redistributions[0].input_points[2].liquid_transport_coefficient_m2_per_s,
+        0.0
+    );
+    assert_eq!(
+        redistributions[0].effective_points[0].moisture_content_kg_per_m3,
         0.4
     );
     assert_eq!(
-        suctions[0].effective_points[1].moisture_content_kg_per_m3,
+        redistributions[0].effective_points[1].moisture_content_kg_per_m3,
         0.0
     );
-    assert_eq!(suctions[1].input_points.len(), 1);
+    assert_eq!(redistributions[1].input_points.len(), 1);
     assert_eq!(
-        suctions[1].input_points[0].liquid_transport_coefficient_m2_per_s,
+        redistributions[1].input_points[0].liquid_transport_coefficient_m2_per_s,
         2.0
     );
-    assert_eq!(suctions[2].input_points.len(), 25);
-    assert_eq!(suctions[2].input_points[24].moisture_content_kg_per_m3, 0.0);
+    assert_eq!(redistributions[2].input_points.len(), 25);
     assert_eq!(
-        suctions[2].input_points[24].liquid_transport_coefficient_m2_per_s,
+        redistributions[2].input_points[24].moisture_content_kg_per_m3,
         0.0
     );
-    assert_eq!(suctions[2].effective_points.len(), 26);
+    assert_eq!(
+        redistributions[2].input_points[24].liquid_transport_coefficient_m2_per_s,
+        0.0
+    );
+    assert_eq!(redistributions[2].effective_points.len(), 26);
     Ok(())
 }
 
 #[test]
-fn suction_requires_integer_count_and_schema_bounded_finite_fields()
+fn redistribution_requires_integer_count_and_schema_bounded_finite_fields()
 -> Result<(), Box<dyn std::error::Error>> {
     for field in [
         "material_name",
-        "number_of_suction_points",
+        "number_of_redistribution_points",
         "moisture_content_1",
         "liquid_transport_coefficient_1",
     ] {
         let mut raw = parse_epjson_str(&one_material_model("Curve", "HAMT Wall"))?;
-        suction_object_mut(&mut raw, "Curve")?
+        redistribution_object_mut(&mut raw, "Curve")?
             .fields
             .remove(&FieldName(field.to_string()));
         let result = compile_raw_model(&raw);
@@ -385,13 +409,18 @@ fn suction_requires_integer_count_and_schema_bounded_finite_fields()
         (1.5, "InvalidInteger"),
     ] {
         let mut raw = parse_epjson_str(&one_material_model("Curve", "HAMT Wall"))?;
-        suction_object_mut(&mut raw, "Curve")?.fields.insert(
-            FieldName("number_of_suction_points".to_string()),
+        redistribution_object_mut(&mut raw, "Curve")?.fields.insert(
+            FieldName("number_of_redistribution_points".to_string()),
             RawValue::Number(value.to_string()),
         );
         let result = compile_raw_model(&raw);
         assert!(
-            has_error(&result, code, "Curve", Some("number_of_suction_points")),
+            has_error(
+                &result,
+                code,
+                "Curve",
+                Some("number_of_redistribution_points")
+            ),
             "value={value}, diagnostics={:?}",
             result.report.diagnostics
         );
@@ -404,7 +433,7 @@ fn suction_requires_integer_count_and_schema_bounded_finite_fields()
         ("liquid_transport_coefficient_25", -0.1),
     ] {
         let mut raw = parse_epjson_str(&one_material_model("Curve", "HAMT Wall"))?;
-        suction_object_mut(&mut raw, "Curve")?.fields.insert(
+        redistribution_object_mut(&mut raw, "Curve")?.fields.insert(
             FieldName(field.to_string()),
             RawValue::Number(value.to_string()),
         );
@@ -417,7 +446,7 @@ fn suction_requires_integer_count_and_schema_bounded_finite_fields()
     }
 
     for field in [
-        "number_of_suction_points",
+        "number_of_redistribution_points",
         "moisture_content_1",
         "liquid_transport_coefficient_1",
         "moisture_content_25",
@@ -425,7 +454,7 @@ fn suction_requires_integer_count_and_schema_bounded_finite_fields()
     ] {
         for value in ["NaN", "inf", "-inf"] {
             let mut raw = parse_epjson_str(&one_material_model("Curve", "HAMT Wall"))?;
-            suction_object_mut(&mut raw, "Curve")?.fields.insert(
+            redistribution_object_mut(&mut raw, "Curve")?.fields.insert(
                 FieldName(field.to_string()),
                 RawValue::Number(value.to_string()),
             );
@@ -441,14 +470,14 @@ fn suction_requires_integer_count_and_schema_bounded_finite_fields()
 }
 
 #[test]
-fn suction_requires_an_existing_sorption_isotherm_target() -> Result<(), Box<dyn std::error::Error>>
-{
+fn redistribution_requires_an_existing_sorption_isotherm_target()
+-> Result<(), Box<dyn std::error::Error>> {
     let without_sorption = parse_epjson_str(
         r#"{
             "Material": {"M": {"roughness":"Rough","thickness":0.1,"conductivity":1,"density":900,"specific_heat":1000}},
             "MaterialProperty:HeatAndMoistureTransfer:Settings": {"Settings": {"material_name":"M","porosity":0.5}},
-            "MaterialProperty:HeatAndMoistureTransfer:Suction": {
-                "Curve": {"material_name":"M","number_of_suction_points":1,"moisture_content_1":10,"liquid_transport_coefficient_1":1e-9}
+            "MaterialProperty:HeatAndMoistureTransfer:Redistribution": {
+                "Curve": {"material_name":"M","number_of_redistribution_points":1,"moisture_content_1":10,"liquid_transport_coefficient_1":1e-9}
             }
         }"#,
     )?;
@@ -477,7 +506,7 @@ fn suction_requires_an_existing_sorption_isotherm_target() -> Result<(), Box<dyn
             r#"{{
                 "{object_type}": {{"Target": {{{base_fields}}}}},
                 "{OBJECT_TYPE}": {{
-                    "Curve": {{"material_name":"Target","number_of_suction_points":1,"moisture_content_1":10,"liquid_transport_coefficient_1":1e-9}}
+                    "Curve": {{"material_name":"Target","number_of_redistribution_points":1,"moisture_content_1":10,"liquid_transport_coefficient_1":1e-9}}
                 }}
             }}"#
         ))?;
@@ -511,10 +540,12 @@ fn suction_requires_an_existing_sorption_isotherm_target() -> Result<(), Box<dyn
     ));
 
     let mut blank = parse_epjson_str(&one_material_model("Curve", "HAMT Wall"))?;
-    suction_object_mut(&mut blank, "Curve")?.fields.insert(
-        FieldName("material_name".to_string()),
-        RawValue::String("   ".to_string()),
-    );
+    redistribution_object_mut(&mut blank, "Curve")?
+        .fields
+        .insert(
+            FieldName("material_name".to_string()),
+            RawValue::String("   ".to_string()),
+        );
     let result = compile_raw_model(&blank);
     assert!(has_error(
         &result,
@@ -526,23 +557,23 @@ fn suction_requires_an_existing_sorption_isotherm_target() -> Result<(), Box<dyn
 }
 
 #[test]
-fn suction_duplicate_target_fails_and_invalid_first_does_not_reserve()
+fn redistribution_duplicate_target_fails_and_invalid_first_does_not_reserve()
 -> Result<(), Box<dyn std::error::Error>> {
     let duplicate = parse_epjson_str(
         r#"{
             "Material": {"M": {"roughness":"Rough","thickness":0.1,"conductivity":1,"density":900,"specific_heat":1000}},
             "MaterialProperty:HeatAndMoistureTransfer:Settings": {"Settings": {"material_name":"M","porosity":0.5}},
             "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm": {"Sorption": {"material_name":"M","number_of_isotherm_coordinates":1,"relative_humidity_fraction_1":0.5,"moisture_content_1":10}},
-            "MaterialProperty:HeatAndMoistureTransfer:Suction": {
-                "A": {"material_name":"M","number_of_suction_points":1,"moisture_content_1":10,"liquid_transport_coefficient_1":1e-9},
-                "B": {"material_name":"m","number_of_suction_points":1,"moisture_content_1":20,"liquid_transport_coefficient_1":2e-9}
+            "MaterialProperty:HeatAndMoistureTransfer:Redistribution": {
+                "A": {"material_name":"M","number_of_redistribution_points":1,"moisture_content_1":10,"liquid_transport_coefficient_1":1e-9},
+                "B": {"material_name":"m","number_of_redistribution_points":1,"moisture_content_1":20,"liquid_transport_coefficient_1":2e-9}
             }
         }"#,
     )?;
     let result = compile_raw_model(&duplicate);
     assert!(has_error(
         &result,
-        "DuplicateHeatAndMoistureTransferSuctionMaterial",
+        "DuplicateHeatAndMoistureTransferRedistributionMaterial",
         "B",
         Some("material_name")
     ));
@@ -552,9 +583,9 @@ fn suction_duplicate_target_fails_and_invalid_first_does_not_reserve()
             "Material": {"M": {"roughness":"Rough","thickness":0.1,"conductivity":1,"density":900,"specific_heat":1000}},
             "MaterialProperty:HeatAndMoistureTransfer:Settings": {"Settings": {"material_name":"M","porosity":0.5}},
             "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm": {"Sorption": {"material_name":"M","number_of_isotherm_coordinates":1,"relative_humidity_fraction_1":0.5,"moisture_content_1":10}},
-            "MaterialProperty:HeatAndMoistureTransfer:Suction": {
-                "A": {"material_name":"M","number_of_suction_points":1,"moisture_content_1":-1,"liquid_transport_coefficient_1":1e-9},
-                "B": {"material_name":"m","number_of_suction_points":1,"moisture_content_1":20,"liquid_transport_coefficient_1":2e-9}
+            "MaterialProperty:HeatAndMoistureTransfer:Redistribution": {
+                "A": {"material_name":"M","number_of_redistribution_points":1,"moisture_content_1":-1,"liquid_transport_coefficient_1":1e-9},
+                "B": {"material_name":"m","number_of_redistribution_points":1,"moisture_content_1":20,"liquid_transport_coefficient_1":2e-9}
             }
         }"#,
     )?;
@@ -563,21 +594,26 @@ fn suction_duplicate_target_fails_and_invalid_first_does_not_reserve()
     compiler.parse_materials(&mut model);
     compiler.parse_material_heat_and_moisture_transfer_settings(&mut model);
     compiler.parse_material_heat_and_moisture_transfer_sorption_isotherms(&mut model);
-    compiler.parse_material_heat_and_moisture_transfer_suctions(&mut model);
-    assert_eq!(model.material_heat_and_moisture_transfer_suctions.len(), 1);
+    compiler.parse_material_heat_and_moisture_transfer_redistributions(&mut model);
     assert_eq!(
-        model.material_heat_and_moisture_transfer_suctions[0].id,
-        MaterialHeatAndMoistureTransferSuctionId(0)
+        model
+            .material_heat_and_moisture_transfer_redistributions
+            .len(),
+        1
     );
     assert_eq!(
-        model.material_heat_and_moisture_transfer_suctions[0].name,
+        model.material_heat_and_moisture_transfer_redistributions[0].id,
+        MaterialHeatAndMoistureTransferRedistributionId(0)
+    );
+    assert_eq!(
+        model.material_heat_and_moisture_transfer_redistributions[0].name,
         NormalizedName::new("B")
     );
     assert!(compiler.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "InvalidNumericRange" && diagnostic.object_name.as_deref() == Some("A")
     }));
     assert!(compiler.diagnostics.iter().all(|diagnostic| {
-        diagnostic.code != "DuplicateHeatAndMoistureTransferSuctionMaterial"
+        diagnostic.code != "DuplicateHeatAndMoistureTransferRedistributionMaterial"
     }));
     Ok(())
 }
