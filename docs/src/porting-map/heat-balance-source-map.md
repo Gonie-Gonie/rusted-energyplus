@@ -50,7 +50,7 @@ claim.
 | project heat-balance controls | `GetProjectControlData` | mapped-not-ported |
 | material input | `Material::GetWindowGlassSpectralData` -> `Material::GetMaterialData` -> `Material::GetHysteresisData` | all 34 public base/overlay objects are inventoried in [the material-family source map](material-source-map.md); Regular, NoMass, AirGap, InfraredTransparent, RefractionExtinctionMethod, and EquivalentLayer plus only the `WindowMaterial:Glazing` `SpectralAverage` branch are typed, while equivalent-layer construction and full window behavior remain blocked |
 | window frame/divider input | `GetFrameAndDividerData` | EnergyPlus places this routine after hysteresis and before construction input; Rust types the complete bounded object after base `parse_materials` and before `parse_constructions`, while its separate Hysteresis pass remains later, so complete pass-order parity is not claimed; every definition, including unused records, remains runtime-blocking |
-| construction input | `GetConstructData` | source-mapped only: required names, contiguous material-layer prefixes, independent normalized construction identity, bounded opaque/fenestration validation, thermochromic-parent first-state substitution/master metadata, and sole-layer SimpleGlazingSystem consumption are typed; all special construction families, multi-layer SimpleGlazing quirks, `CreateTCConstructions`, nominal-U/CTF/reporting, and window execution remain deferred |
+| construction input | `GetConstructData` / `CreateFCfactorConstructions` | the parent remains source-mapped; required ordinary names/layers, bounded opaque/fenestration validation, thermochromic first-state metadata, and sole-layer SimpleGlazingSystem are typed, while the separate F-then-C generator is state-mapped with private raw-count internal materials, exact formulas, metadata, layers, graph edges, and all-definition run blocking; remaining special constructions, surface pairing, CTF/reporting, and window/ground execution remain deferred |
 | zone input | `GetZoneData` | typed geometry subset exists; source map required before expansion |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
@@ -264,11 +264,11 @@ not_claimed_branches:
 
 EnergyPlus 26.1.0 calls `GetConstructData` after `GetFrameAndDividerData` and
 before `GetBuildingData`. The routine reads all ordinary `Construction`
-objects first, then enters its F-factor/C-factor, AirBoundary, complex
-fenestration, internal heat source, equivalent-layer, and WindowDataFile
-branches. This checkpoint therefore remains `source_mapped`: it widens only
-the already typed ordinary-construction path and does not claim any later
-special branch or the complete parent routine.
+objects first, then calls the separately state-mapped F-factor/C-factor
+generator before entering its AirBoundary, complex fenestration, internal heat
+source, equivalent-layer, and WindowDataFile branches. The parent routine
+therefore remains `source_mapped`: the ordinary path and bounded F/C generator
+do not imply completion of the remaining special branches.
 
 The bounded ordinary input retains its required construction name and ordered
 material prefix. CP85 adds the source `GlassTCParent` handling: every typed
@@ -291,7 +291,7 @@ holes and every window runtime consumer remain fail-closed.
 GetConstructData
 
 read_state:
-- EnergyPlus calls `GetConstructData` after `GetFrameAndDividerData` and before `GetBuildingData`; within it, every ordinary `Construction` is read before the deferred F-factor, C-factor, AirBoundary, complex-fenestration, internal-heat-source, equivalent-layer, and WindowDataFile branches
+- EnergyPlus calls `GetConstructData` after `GetFrameAndDividerData` and before `GetBuildingData`; within it, every ordinary `Construction` is read before the separately state-mapped F-factor then C-factor generation pass and before the deferred AirBoundary, complex-fenestration, internal-heat-source, equivalent-layer, and WindowDataFile branches
 - one required nonblank outer-key name in an independent normalized construction namespace, one required outside-layer material name, and optional layers 2 through 10 that must form a contiguous populated prefix; every populated layer resolves through the typed material namespace
 - every typed `WindowMaterial:GlazingGroup:Thermochromic` parent encountered in layer order contributes its first ordered glazing state to the effective layer stack; the existing typed parent contract guarantees at least one state
 - a `WindowMaterial:SimpleGlazingSystem` material is accepted only when it is the sole ordinary-Construction layer, matching the intended whole-system input while excluding EnergyPlus 26.1's multi-layer validation holes
@@ -308,7 +308,7 @@ history_state_ownership:
 - TypedModel owns immutable construction layer stacks and optional thermochromic master metadata; this checkpoint creates no thermochromic child constructions, active-state history, or mutable window state
 
 unsupported_state:
-- multi-layer or shaded ordinary `Construction` consumption of `WindowMaterial:SimpleGlazingSystem` and the special `Construction:FfactorGroundFloor`, `Construction:CfactorUndergroundWall`, `Construction:AirBoundary`, `Construction:ComplexFenestrationState`, `ConstructionProperty:InternalHeatSource`, `Construction:WindowEquivalentLayer`, and `Construction:WindowDataFile` input branches
+- multi-layer or shaded ordinary `Construction` consumption of `WindowMaterial:SimpleGlazingSystem` and the remaining special `Construction:AirBoundary`, `Construction:ComplexFenestrationState`, `ConstructionProperty:InternalHeatSource`, `Construction:WindowEquivalentLayer`, and `Construction:WindowDataFile` input branches
 - `CreateTCConstructions` child allocation and copying, source-formatted child names, surface-active construction switching, temperature-driven state selection, fenestration binding, optics, thermal calculations, daylighting, shading, nominal-U adjustment, CTF generation, and EIO or other construction reporting
 
 inactive_branches:
@@ -322,8 +322,53 @@ unsupported_active_branches:
 - valid bounded fenestration constructions remain typed graph state only and do not enter the opaque runtime thermal cache or acquire window execution
 
 not_claimed_branches:
-- complete `GetConstructData` parity, source declaration and case-collision behavior, invalid-before-name source side effects, exact diagnostics/order/multiplicity, multi-layer or shaded SimpleGlazingSystem source quirks, thermochromic child generation/naming/state selection, all special construction families and overlays, nominal-U or CTF calculations, EIO/SQLite and other reporting, window or ground physics, runtime numerics, and conformance
+- complete `GetConstructData` parity, source case-collision behavior, invalid-before-name source side effects, exact diagnostics/order/multiplicity, multi-layer or shaded SimpleGlazingSystem source quirks, thermochromic child generation/naming/state selection, remaining special construction families and overlays, nominal-U or CTF calculations, EIO/SQLite and other reporting, window or ground physics, runtime numerics, and conformance
 <!-- routine-state-contract:v1 end get_construct_data -->
+
+## Bounded F/C-Factor Construction Generation Notes
+
+EnergyPlus allocates the common concrete and per-object fictitious insulation
+materials from raw F/C counts during material input, then
+`CreateFCfactorConstructions` creates every F-factor construction before every
+C-factor construction. Rust preserves that family and staged-IDF declaration
+order, keeps generated material names private, and retains the exact bounded
+input formulas and graph. Surface pairing and ground runtime remain blocked.
+
+### `CreateFCfactorConstructions` state contract
+
+<!-- routine-state-contract:v1 begin create_fc_factor_constructions -->
+CreateFCfactorConstructions
+
+read_state:
+- raw `Construction:FfactorGroundFloor` and `Construction:CfactorUndergroundWall` counts allocate source-ordered private material slots: public `Material`, common `~FC_Concrete`, public `Material:NoMass`, then one `~FC_Insulation_n` for every raw F object followed by every raw C object; staged IDF declaration-order overlays preserve ordinary, F-family, and C-family ordinals independently
+- each F-factor record has a required nonblank shared Construction name plus required finite `f_factor` and `area` greater than zero and exact epJSON `perimeterexposed` greater than or equal to zero; positive perimeter derives `Reff = area/(perimeter*f_factor)-0.135-0.03`, while zero perimeter derives `Reff = 177`
+- each C-factor record has a required nonblank shared Construction name plus required finite `c_factor` and `height` greater than zero; equivalent soil resistance is 0.12 at height less than or equal to 0.25 m, 0.92 at height greater than or equal to 2.5 m, and `0.0607+0.3479*height` between, with `Reff = 1/c_factor+soil resistance`
+- the common MediumRough concrete has thickness 0.15 m, conductivity 1.95 W/m-K, density 2240 kg/m3, specific heat 900 J/kg-K, and default opaque absorptances; each MediumRough resistance-only insulation has all three absorptances zero and derives `Rfic = Reff-(0.15/1.95)`, which must be finite and greater than zero together with finite `Reff`
+
+write_state:
+- one typed opaque `Construction` per valid record after every ordinary Construction and in all-F-then-all-C order, with a distinct F-factor or C-factor metadata discriminant retaining source inputs, derived effective resistance, generated insulation resistance, and C-factor soil resistance where applicable
+- each generated construction owns the outside-to-inside layer stack `[private insulation, private concrete]`; the construction/material graph emits both ordered edges and the raw-ordinal insulation slot receives the derived resistance
+- internal materials live in the typed material arena but are deliberately absent from public `material_names` and every public attachment-target lookup; exact normalized generated-name collisions from user material families fail closed, while nonidentical names such as `~FC_Insulation_01` remain public
+- invalid fields, nonpositive or nonfinite derived insulation resistance, and duplicate Construction names reserve no Construction ID or name; raw-count internal slots and later-family ordinals remain stable, while exact EnergyPlus invalid-object and collision side effects are not reproduced
+
+history_state_ownership:
+- TypedModel owns immutable generated ground-factor construction metadata and layer stacks; no surface-local ground-temperature, CTF, CondFD, HAMT, or mutable heat-balance history is allocated
+
+unsupported_state:
+- `GroundFCfactorMethod` surface-type pairing, detailed-surface and rectangular-surface boundary conversion, F area/perimeter and C height geometry checks, `Site:GroundTemperature:FCfactorMethod`, EPW fallback, monthly ground state, CTF/CondFD/HAMT calculation, and ground heat-balance execution
+- public attachment targeting of private internal materials, EMS mutation, `ConstructionProperty:InternalHeatSource`, nominal-U adjustment, generic material/construction EIO timing, envelope/SQLite reporting, exact diagnostics/order/multiplicity, and conformance evidence
+
+inactive_branches:
+- when no raw F-factor or C-factor definition exists, no internal concrete or insulation material is injected and ordinary material/construction behavior is unchanged
+- F-factor exposed perimeter exactly zero uses the source 177 m2-K/W effective-resistance branch; C-factor heights exactly 0.25 m and 2.5 m use the lower and upper constant soil-resistance branches respectively
+
+unsupported_active_branches:
+- every valid F-factor or C-factor definition, including every unused definition, is reported as `UnsupportedSurfaceBoundary` and `RunBlocked`; no partial or compatibility runtime is admitted
+- `BuildingSurface:Detailed` deliberately rejects a generated F/C-factor construction until the downstream `GroundFCfactorMethod` pairing and validation checkpoint is ported; reporting and runtime consumers likewise filter generated stacks from ordinary opaque constructions
+
+not_claimed_branches:
+- surface binding and geometry validation, ground-temperature and CTF/runtime behavior, internal-material public attachment behavior, source collision and invalid-object side effects, no-thermal-mass flags, nominal-U and reporting parity, exact diagnostics/order/multiplicity, runtime numerics, EIO/SQLite, and conformance
+<!-- routine-state-contract:v1 end create_fc_factor_constructions -->
 
 ## Data Structure Map
 
@@ -333,6 +378,7 @@ not_claimed_branches:
 | `DataSurface::SurfaceData` | `ep_model::Surface`, `ep_runtime::SurfaceHeatBalanceState` | opaque surface subset only; outside-layer roughness metadata is tracked for future exterior convection work |
 | `DataSurfaces::FrameDividerProperties` | `ep_model::WindowFrameAndDivider`, `ep_model::WindowFrameProperties`, `ep_model::WindowDividerProperties`, `ep_model::WindowRevealProperties` | complete bounded immutable user-input descriptors and an independent normalized namespace are typed; fenestration binding, geometry, WINDOW 5 synthesis, shading mutation, window physics, NFRC calculations, reporting, and runtime remain blocked |
 | `Construction::ConstructionProps::{Name, TotLayers, LayerPoint, isTCWindow, isTCMaster, TCMasterMatNum, TCLayerNum, TCGlassNum}` and construction/material CTF data | `ep_model::Construction`, optional immutable thermochromic master metadata, `ep_model::ModelGraph::construction_materials`, checked runtime direct-index construction/material lookup, and `ep_runtime::SurfaceCtfState` | ordinary input layers resolve into a bounded opaque/fenestration construction; every thermochromic parent contributes its first glazing state to the effective stack and only the final parent owns zero-based master metadata, while a sole SimpleGlazingSystem layer retains its original material identity and Fenestration kind. Graph edges follow the effective or retained IDs. The opaque runtime cache, static Regular/AirGap/IRT EIO evidence, diagnostic steady/no-mass coefficient seeding, and CTF histories do not enable thermochromic/window execution, multi-layer SimpleGlazing quirks, child construction generation, mass-material coefficient generation, or broad face-temperature solving |
+| F/C-factor construction flags, source dimensions/factors, `NominalR`, and generated material layer points | `ep_model::ConstructionGroundFactor`, private generated entries in `TypedModel::materials`, and `ModelGraph::construction_materials` | exact bounded generation formulas, ordinary-then-F-then-C ordering, private names, raw ordinals, and two graph edges are retained; surface pairing, ground temperatures, CTF/runtime, reporting, and public attachment targeting remain blocked |
 | zone predictor histories, sums, and coefficients such as `MAT`, `XMAT`, `DSXMAT`, `SumHA`, `SumHATsurf`, `SumHATref`, `TempDepCoef`, `TempIndCoef`, `AirPowerCap`, and `TempHistoryTerm` | `ep_runtime::ZoneHeatBalanceState`, `ep_runtime::ZoneAirTemperatureCoefficients`, and future `ep_runtime::zone_air` histories | diagnostic shell keeps MAT history, stores surface convection sums, and snapshots EnergyPlus-shaped zone-air coefficients for future predictor wiring; full predictor/corrector equations are not ported |
 | internal gain sums such as `SumIntGain` | `simulate_zone_internal_convective_gains` and future state fields | convective trace conformance only for declared v0.26 case |
 

@@ -1,8 +1,8 @@
 use std::collections::BTreeSet;
 
 use ep_model::{
-    DehumidificationControlType, HumidificationControlType, MaterialKind, SimulationModel,
-    TypedModel,
+    ConstructionGroundFactor, DehumidificationControlType, HumidificationControlType, MaterialKind,
+    SimulationModel, TypedModel,
 };
 use ep_raw_model::RawModel;
 use ep_runtime::{
@@ -561,6 +561,38 @@ pub(super) fn assess_typed_runtime_boundaries(
         diagnostics,
         "SurfaceProperties:VaporCoefficients",
         typed_model.surface_vapor_coefficients.len(),
+    );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "Construction:FfactorGroundFloor",
+        typed_model
+            .constructions
+            .iter()
+            .filter(|construction| {
+                matches!(
+                    construction.ground_factor,
+                    Some(ConstructionGroundFactor::FfactorGroundFloor { .. })
+                )
+            })
+            .count(),
+    );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "Construction:CfactorUndergroundWall",
+        typed_model
+            .constructions
+            .iter()
+            .filter(|construction| {
+                matches!(
+                    construction.ground_factor,
+                    Some(ConstructionGroundFactor::CfactorUndergroundWall { .. })
+                )
+            })
+            .count(),
     );
 
     push_typed_unsupported_object(

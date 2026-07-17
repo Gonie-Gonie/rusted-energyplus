@@ -1,4 +1,4 @@
-use crate::{ConstructionId, MaterialId, NormalizedName};
+use crate::{MaterialId, NormalizedName};
 
 mod roof_vegetation;
 mod window_blind;
@@ -1200,55 +1200,4 @@ impl Material {
         self.as_opaque()
             .and_then(OpaqueMaterialRef::heat_capacity_per_area)
     }
-}
-
-/// Consumer family for an ordered construction layer stack.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum ConstructionKind {
-    /// Opaque construction consumed by the existing surface heat-balance path.
-    Opaque,
-    /// Fenestration construction reserved for a dedicated window heat-balance path.
-    Fenestration,
-}
-
-impl ConstructionKind {
-    /// Stable diagnostic identifier.
-    #[must_use]
-    pub const fn id(self) -> &'static str {
-        match self {
-            Self::Opaque => "opaque",
-            Self::Fenestration => "fenestration",
-        }
-    }
-}
-
-/// Thermochromic parent metadata retained on an effective construction stack.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct ConstructionThermochromicMaster {
-    /// Thermochromic glazing-group material replaced by its first typed state.
-    pub parent_material: MaterialId,
-    /// Zero-based construction layer index (EnergyPlus `TCLayerNum` is one-based).
-    pub layer_index: u32,
-    /// Zero-based source glass-layer ordinal (EnergyPlus `TCGlassNum` is one-based).
-    pub glazing_layer_index: u32,
-}
-
-/// Construction resolved to an ordered, effective material layer stack.
-#[derive(Clone, Debug, PartialEq)]
-pub struct Construction {
-    /// Typed ID.
-    pub id: ConstructionId,
-    /// Construction name.
-    pub name: NormalizedName,
-    /// Consumer family for this construction.
-    pub kind: ConstructionKind,
-    /// Effective outside layer material (including first-state TC substitution).
-    pub outside_layer: MaterialId,
-    /// Ordered material layers from outside to inside.
-    pub layers: Vec<MaterialId>,
-    /// Source-style thermochromic master metadata for the last group parent in the stack.
-    ///
-    /// The effective layer stack contains the parent's first glazing state. Generating
-    /// thermochromic child constructions and selecting states at runtime remain deferred.
-    pub thermochromic_master: Option<ConstructionThermochromicMaster>,
 }

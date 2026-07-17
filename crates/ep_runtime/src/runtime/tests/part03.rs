@@ -238,6 +238,7 @@
             outside_layer: MaterialId(1),
             layers: vec![MaterialId(1)],
             thermochromic_master: None,
+            ground_factor: None,
         });
         let model = SimulationModel::from_typed(typed);
 
@@ -282,6 +283,7 @@
                 outside_layer: MaterialId(99),
                 layers: vec![MaterialId(99)],
                 thermochromic_master: None,
+                ground_factor: None,
             },
         );
 
@@ -339,6 +341,37 @@
         ));
         assert!(error.to_string().contains(
             "references fenestration construction WALL, which the opaque heat-balance runtime cannot consume"
+        ));
+    }
+
+    #[test]
+    fn opaque_runtime_filters_and_rejects_ground_factor_construction() {
+        let mut typed = cube_model();
+        typed.constructions[0].ground_factor =
+            Some(ConstructionGroundFactor::FfactorGroundFloor {
+                f_factor_w_per_m_k: 0.5,
+                area_m2: 100.0,
+                perimeter_exposed_m: 20.0,
+                effective_thermal_resistance_m2_k_per_w: 9.835,
+                insulation_thermal_resistance_m2_k_per_w: 9.758_076_923_076_923,
+            });
+        let model = SimulationModel::from_typed(typed);
+
+        let plan = build_execution_plan(&model);
+        let calc_inside =
+            stage_with_kind(&plan.stages, ExecutionStageKind::CalcHeatBalanceInsideSurf);
+        assert!(calc_inside.prebound.construction_ids.is_empty());
+        assert!(calc_inside.prebound.surface_ids.is_empty());
+
+        let error = initialize_heat_balance_state(&model, 20.0)
+            .expect_err("ground-factor construction must not enter opaque heat balance");
+        assert!(matches!(
+            &error,
+            RuntimeError::UnsupportedConstructionForOpaqueHeatBalance {
+                construction_name,
+                construction_kind: ConstructionKind::Opaque,
+                ..
+            } if construction_name == "WALL"
         ));
     }
 
@@ -402,6 +435,7 @@
             outside_layer: MaterialId(0),
             layers: vec![MaterialId(0), MaterialId(2)],
             thermochromic_master: None,
+            ground_factor: None,
         });
         typed.surfaces[0].construction = ConstructionId(1);
         typed.other_equipment[0].fraction_radiant = 0.25;

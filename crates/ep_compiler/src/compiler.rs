@@ -3,9 +3,9 @@
 use ep_model::{
     AirGapMaterial, AirLoopHvac, AutoOrNumber, AutosizeOrNumber, AvailabilityManagerComponent,
     BoilerHotWater, BranchId, BranchListId, Building, ChillerElectricEir, CoilComponent,
-    CoilComponentKind, ComponentId, ConnectorId, ConnectorListId, Construction, ConstructionId,
-    ConstructionKind, ConstructionThermochromicMaster, DayScheduleId,
-    DeferredVariableAbsorptanceFunction, DehumidificationControlType,
+    CoilComponentKind, ComponentId, ConnectorId, ConnectorListId, Construction,
+    ConstructionGroundFactor, ConstructionId, ConstructionKind, ConstructionThermochromicMaster,
+    DayScheduleId, DeferredVariableAbsorptanceFunction, DehumidificationControlType,
     DemandControlledVentilationType, DesignSpecificationOutdoorAir,
     DesignSpecificationOutdoorAirId, DesignSpecificationOutdoorAirMethod,
     ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
@@ -79,6 +79,11 @@ use std::path::{Component, Path};
 const MAX_OPAQUE_CONSTRUCTION_LAYERS: usize = 10;
 const MAX_WINDOW_CONSTRUCTION_LAYERS: usize = 8;
 const MAX_BETWEEN_GLASS_SHADE_GAP_THICKNESS_DIFFERENCE_M: f64 = 0.0005;
+const FFACTOR_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:FfactorGroundFloor";
+const CFACTOR_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:CfactorUndergroundWall";
+const FC_FACTOR_CONCRETE_NAME: &str = "~FC_Concrete";
+const FC_FACTOR_INSULATION_NAME_PREFIX: &str = "~FC_Insulation_";
+const FC_FACTOR_CONCRETE_THERMAL_RESISTANCE_M2_K_PER_W: f64 = 0.15 / 1.95;
 
 const VARIABLE_ABSORPTANCE_FUNCTION_OBJECT_TYPES: &[&str] = &[
     "Curve:Biquadratic",
@@ -500,6 +505,8 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity",
     "WindowProperty:FrameAndDivider",
     "Construction",
+    FFACTOR_CONSTRUCTION_OBJECT_TYPE,
+    CFACTOR_CONSTRUCTION_OBJECT_TYPE,
     "ScheduleTypeLimits",
     "Schedule:Constant",
     "Schedule:Compact",
@@ -556,6 +563,10 @@ struct Compiler<'a> {
     auxiliary_root: Option<&'a Path>,
     diagnostics: Vec<ModelDiagnostic>,
     defaults_applied: Vec<DefaultApplication>,
+    ffactor_construction_count: usize,
+    cfactor_construction_count: usize,
+    fc_factor_concrete_material: Option<MaterialId>,
+    fc_factor_insulation_materials: Vec<MaterialId>,
 }
 
 struct CompactSchedulePeriodBuilder {
@@ -571,11 +582,24 @@ struct CompactScheduleProfileBuilder {
 
 impl<'a> Compiler<'a> {
     fn new(raw_model: &'a RawModel, auxiliary_root: Option<&'a Path>) -> Self {
+        let object_type_counts = raw_model.object_type_counts();
+        let ffactor_construction_count = object_type_counts
+            .get(FFACTOR_CONSTRUCTION_OBJECT_TYPE)
+            .copied()
+            .unwrap_or(0);
+        let cfactor_construction_count = object_type_counts
+            .get(CFACTOR_CONSTRUCTION_OBJECT_TYPE)
+            .copied()
+            .unwrap_or(0);
         Self {
             raw_model,
             auxiliary_root,
             diagnostics: Vec::new(),
             defaults_applied: Vec::new(),
+            ffactor_construction_count,
+            cfactor_construction_count,
+            fc_factor_concrete_material: None,
+            fc_factor_insulation_materials: Vec::new(),
         }
     }
 
@@ -1361,7 +1385,9 @@ impl<'a> Compiler<'a> {
 
     fn parse_materials(&mut self, model: &mut TypedModel) {
         self.parse_regular_materials(model);
+        self.inject_fc_factor_concrete_material(model);
         self.parse_nomass_materials(model);
+        self.inject_fc_factor_insulation_materials(model);
         self.parse_air_gap_materials(model);
         self.parse_infrared_transparent_materials(model);
         self.parse_window_glazing_materials(model);
@@ -3984,6 +4010,65 @@ impl<'a> Compiler<'a> {
                     input_points,
                     effective_points,
                 });
+        }
+    }
+
+    fn fc_factor_object_count(&self) -> usize {
+        self.ffactor_construction_count + self.cfactor_construction_count
+    }
+
+    fn inject_fc_factor_concrete_material(&mut self, model: &mut TypedModel) {
+        if self.fc_factor_object_count() == 0 {
+            return;
+        }
+        let Some(id_value) = self.checked_id(
+            "internal F/C-factor material",
+            FC_FACTOR_CONCRETE_NAME,
+            model.materials.len(),
+        ) else {
+            return;
+        };
+        let id = MaterialId(id_value);
+        model.materials.push(Material {
+            id,
+            name: NormalizedName::new(FC_FACTOR_CONCRETE_NAME),
+            definition: MaterialDefinition::Regular(RegularMaterial {
+                roughness: MaterialSurfaceRoughness::MediumRough,
+                thickness_m: 0.15,
+                conductivity_w_per_m_k: 1.95,
+                density_kg_per_m3: 2240.0,
+                specific_heat_j_per_kg_k: 900.0,
+                surface: OpaqueSurfaceProperties::default(),
+            }),
+        });
+        self.fc_factor_concrete_material = Some(id);
+    }
+
+    fn inject_fc_factor_insulation_materials(&mut self, model: &mut TypedModel) {
+        let object_count = self.fc_factor_object_count();
+        self.fc_factor_insulation_materials.reserve(object_count);
+        for ordinal in 1..=object_count {
+            let name = format!("{FC_FACTOR_INSULATION_NAME_PREFIX}{ordinal}");
+            let Some(id_value) =
+                self.checked_id("internal F/C-factor material", &name, model.materials.len())
+            else {
+                return;
+            };
+            let id = MaterialId(id_value);
+            model.materials.push(Material {
+                id,
+                name: NormalizedName::new(&name),
+                definition: MaterialDefinition::NoMass(NoMassMaterial {
+                    roughness: MaterialSurfaceRoughness::MediumRough,
+                    thermal_resistance_m2_k_per_w: 0.0,
+                    surface: OpaqueSurfaceProperties {
+                        thermal_absorptance: 0.0,
+                        solar_absorptance: 0.0,
+                        visible_absorptance: 0.0,
+                    },
+                }),
+            });
+            self.fc_factor_insulation_materials.push(id);
         }
     }
 
@@ -8508,12 +8593,49 @@ impl<'a> Compiler<'a> {
             );
             return None;
         }
+        if self.is_reserved_fc_factor_material_name(name) {
+            self.error(
+                "ReservedInternalGroundFactorMaterialName",
+                object_type,
+                Some(name),
+                Some("name"),
+                format!(
+                    "{object_type}/{name} conflicts with an internal material name reserved by Construction:FfactorGroundFloor or Construction:CfactorUndergroundWall"
+                ),
+            );
+            return None;
+        }
         let id = MaterialId(self.checked_id(object_type, name, model.materials.len())?);
         if model.material_names.insert(name, id).is_some() {
             self.duplicate_name(object_type, name);
             return None;
         }
         Some((id, NormalizedName::new(name)))
+    }
+
+    fn is_reserved_fc_factor_material_name(&self, name: &str) -> bool {
+        if self.fc_factor_object_count() == 0 {
+            return false;
+        }
+        let normalized = NormalizedName::new(name);
+        if normalized == NormalizedName::new(FC_FACTOR_CONCRETE_NAME) {
+            return true;
+        }
+        let normalized_prefix = FC_FACTOR_INSULATION_NAME_PREFIX.to_ascii_uppercase();
+        normalized
+            .0
+            .strip_prefix(&normalized_prefix)
+            .and_then(|suffix| {
+                suffix
+                    .parse::<usize>()
+                    .ok()
+                    .map(|ordinal| (suffix, ordinal))
+            })
+            .is_some_and(|(suffix, ordinal)| {
+                ordinal >= 1
+                    && ordinal <= self.fc_factor_object_count()
+                    && suffix == ordinal.to_string()
+            })
     }
 
     fn parse_constructions(&mut self, model: &mut TypedModel) {
@@ -8622,8 +8744,289 @@ impl<'a> Compiler<'a> {
                 outside_layer,
                 layers,
                 thermochromic_master,
+                ground_factor: None,
             });
         }
+
+        self.parse_ffactor_ground_floor_constructions(model);
+        self.parse_cfactor_underground_wall_constructions(model);
+    }
+
+    fn parse_ffactor_ground_floor_constructions(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = FFACTOR_CONSTRUCTION_OBJECT_TYPE;
+        for (ordinal, (name, object)) in self.objects(OBJECT_TYPE).into_iter().enumerate() {
+            let name_valid = self.validate_ground_factor_construction_name(OBJECT_TYPE, &name);
+            let f_factor_w_per_m_k =
+                self.required_number_minimum(OBJECT_TYPE, &name, &object, "f_factor", 0.0, false);
+            let area_m2 =
+                self.required_number_minimum(OBJECT_TYPE, &name, &object, "area", 0.0, false);
+            let perimeter_exposed_m = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "perimeterexposed",
+                0.0,
+                true,
+            );
+            let (Some(f_factor_w_per_m_k), Some(area_m2), Some(perimeter_exposed_m)) =
+                (f_factor_w_per_m_k, area_m2, perimeter_exposed_m)
+            else {
+                continue;
+            };
+            if !name_valid {
+                continue;
+            }
+
+            let effective_thermal_resistance_m2_k_per_w = if perimeter_exposed_m == 0.0 {
+                177.0
+            } else {
+                area_m2 / (perimeter_exposed_m * f_factor_w_per_m_k) - 0.135 - 0.03
+            };
+            let insulation_thermal_resistance_m2_k_per_w = effective_thermal_resistance_m2_k_per_w
+                - FC_FACTOR_CONCRETE_THERMAL_RESISTANCE_M2_K_PER_W;
+            if !effective_thermal_resistance_m2_k_per_w.is_finite()
+                || !insulation_thermal_resistance_m2_k_per_w.is_finite()
+                || insulation_thermal_resistance_m2_k_per_w <= 0.0
+            {
+                self.invalid_ground_factor_resistance(
+                    OBJECT_TYPE,
+                    &name,
+                    effective_thermal_resistance_m2_k_per_w,
+                    insulation_thermal_resistance_m2_k_per_w,
+                );
+                continue;
+            }
+
+            let Some((concrete, insulation)) =
+                self.fc_factor_materials_for_ordinal(model, OBJECT_TYPE, &name, ordinal)
+            else {
+                continue;
+            };
+            let Some(id) =
+                self.reserve_ground_factor_construction_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            if !self.set_fc_factor_insulation_resistance(
+                model,
+                OBJECT_TYPE,
+                &name,
+                insulation,
+                insulation_thermal_resistance_m2_k_per_w,
+            ) {
+                continue;
+            }
+            model.constructions.push(Construction {
+                id,
+                name: NormalizedName::new(&name),
+                kind: ConstructionKind::Opaque,
+                outside_layer: insulation,
+                layers: vec![insulation, concrete],
+                thermochromic_master: None,
+                ground_factor: Some(ConstructionGroundFactor::FfactorGroundFloor {
+                    f_factor_w_per_m_k,
+                    area_m2,
+                    perimeter_exposed_m,
+                    effective_thermal_resistance_m2_k_per_w,
+                    insulation_thermal_resistance_m2_k_per_w,
+                }),
+            });
+        }
+    }
+
+    fn parse_cfactor_underground_wall_constructions(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = CFACTOR_CONSTRUCTION_OBJECT_TYPE;
+        for (ordinal, (name, object)) in self.objects(OBJECT_TYPE).into_iter().enumerate() {
+            let name_valid = self.validate_ground_factor_construction_name(OBJECT_TYPE, &name);
+            let c_factor_w_per_m2_k =
+                self.required_number_minimum(OBJECT_TYPE, &name, &object, "c_factor", 0.0, false);
+            let height_m =
+                self.required_number_minimum(OBJECT_TYPE, &name, &object, "height", 0.0, false);
+            let (Some(c_factor_w_per_m2_k), Some(height_m)) = (c_factor_w_per_m2_k, height_m)
+            else {
+                continue;
+            };
+            if !name_valid {
+                continue;
+            }
+
+            let equivalent_soil_thermal_resistance_m2_k_per_w = if height_m <= 0.25 {
+                0.12
+            } else if height_m >= 2.5 {
+                0.92
+            } else {
+                0.0607 + 0.3479 * height_m
+            };
+            let effective_thermal_resistance_m2_k_per_w =
+                1.0 / c_factor_w_per_m2_k + equivalent_soil_thermal_resistance_m2_k_per_w;
+            let insulation_thermal_resistance_m2_k_per_w = effective_thermal_resistance_m2_k_per_w
+                - FC_FACTOR_CONCRETE_THERMAL_RESISTANCE_M2_K_PER_W;
+            if !equivalent_soil_thermal_resistance_m2_k_per_w.is_finite()
+                || !effective_thermal_resistance_m2_k_per_w.is_finite()
+                || !insulation_thermal_resistance_m2_k_per_w.is_finite()
+                || insulation_thermal_resistance_m2_k_per_w <= 0.0
+            {
+                self.invalid_ground_factor_resistance(
+                    OBJECT_TYPE,
+                    &name,
+                    effective_thermal_resistance_m2_k_per_w,
+                    insulation_thermal_resistance_m2_k_per_w,
+                );
+                continue;
+            }
+
+            let insulation_ordinal = self.ffactor_construction_count + ordinal;
+            let Some((concrete, insulation)) =
+                self.fc_factor_materials_for_ordinal(model, OBJECT_TYPE, &name, insulation_ordinal)
+            else {
+                continue;
+            };
+            let Some(id) =
+                self.reserve_ground_factor_construction_identity(model, OBJECT_TYPE, &name)
+            else {
+                continue;
+            };
+            if !self.set_fc_factor_insulation_resistance(
+                model,
+                OBJECT_TYPE,
+                &name,
+                insulation,
+                insulation_thermal_resistance_m2_k_per_w,
+            ) {
+                continue;
+            }
+            model.constructions.push(Construction {
+                id,
+                name: NormalizedName::new(&name),
+                kind: ConstructionKind::Opaque,
+                outside_layer: insulation,
+                layers: vec![insulation, concrete],
+                thermochromic_master: None,
+                ground_factor: Some(ConstructionGroundFactor::CfactorUndergroundWall {
+                    c_factor_w_per_m2_k,
+                    height_m,
+                    equivalent_soil_thermal_resistance_m2_k_per_w,
+                    effective_thermal_resistance_m2_k_per_w,
+                    insulation_thermal_resistance_m2_k_per_w,
+                }),
+            });
+        }
+    }
+
+    fn validate_ground_factor_construction_name(&mut self, object_type: &str, name: &str) -> bool {
+        if !name.trim().is_empty() {
+            return true;
+        }
+        self.error(
+            "MissingRequiredField",
+            object_type,
+            Some(name),
+            Some("name"),
+            format!("{object_type} requires a nonblank object name"),
+        );
+        false
+    }
+
+    fn invalid_ground_factor_resistance(
+        &mut self,
+        object_type: &str,
+        name: &str,
+        effective_resistance: f64,
+        insulation_resistance: f64,
+    ) {
+        self.error(
+            "InvalidGroundFactorThermalResistance",
+            object_type,
+            Some(name),
+            None,
+            format!(
+                "{object_type}/{name} derives effective resistance {effective_resistance} m2-K/W and fictitious-insulation resistance {insulation_resistance} m2-K/W; both must be finite and the insulation resistance must be greater than zero"
+            ),
+        );
+    }
+
+    fn fc_factor_materials_for_ordinal(
+        &mut self,
+        model: &TypedModel,
+        object_type: &str,
+        name: &str,
+        ordinal: usize,
+    ) -> Option<(MaterialId, MaterialId)> {
+        let concrete = self.fc_factor_concrete_material;
+        let insulation = self.fc_factor_insulation_materials.get(ordinal).copied();
+        let Some((concrete, insulation)) = concrete.zip(insulation) else {
+            self.error(
+                "MissingInternalGroundFactorMaterial",
+                object_type,
+                Some(name),
+                None,
+                format!(
+                    "{object_type}/{name} has no source-ordered internal concrete/insulation material pair"
+                ),
+            );
+            return None;
+        };
+        let concrete_valid = model
+            .materials
+            .get(concrete.0 as usize)
+            .is_some_and(|material| matches!(material.definition, MaterialDefinition::Regular(_)));
+        let insulation_valid = model
+            .materials
+            .get(insulation.0 as usize)
+            .is_some_and(|material| matches!(material.definition, MaterialDefinition::NoMass(_)));
+        if concrete_valid && insulation_valid {
+            return Some((concrete, insulation));
+        }
+        self.error(
+            "InvalidInternalGroundFactorMaterial",
+            object_type,
+            Some(name),
+            None,
+            format!(
+                "{object_type}/{name} resolved an invalid internal concrete/insulation material pair"
+            ),
+        );
+        None
+    }
+
+    fn reserve_ground_factor_construction_identity(
+        &mut self,
+        model: &mut TypedModel,
+        object_type: &str,
+        name: &str,
+    ) -> Option<ConstructionId> {
+        let id = ConstructionId(self.checked_id(object_type, name, model.constructions.len())?);
+        if model.construction_names.insert(name, id).is_some() {
+            self.duplicate_name(object_type, name);
+            return None;
+        }
+        Some(id)
+    }
+
+    fn set_fc_factor_insulation_resistance(
+        &mut self,
+        model: &mut TypedModel,
+        object_type: &str,
+        name: &str,
+        insulation: MaterialId,
+        resistance: f64,
+    ) -> bool {
+        let Some(Material {
+            definition: MaterialDefinition::NoMass(material),
+            ..
+        }) = model.materials.get_mut(insulation.0 as usize)
+        else {
+            self.error(
+                "InvalidInternalGroundFactorMaterial",
+                object_type,
+                Some(name),
+                None,
+                format!("{object_type}/{name} cannot update its internal insulation material"),
+            );
+            return false;
+        };
+        material.thermal_resistance_m2_k_per_w = resistance;
+        true
     }
 
     fn substitute_construction_thermochromic_layers(
@@ -13272,7 +13675,7 @@ impl<'a> Compiler<'a> {
             if model
                 .constructions
                 .get(construction.0 as usize)
-                .is_some_and(|candidate| candidate.kind != ConstructionKind::Opaque)
+                .is_some_and(|candidate| !candidate.is_ordinary_opaque())
             {
                 self.error(
                     "InvalidBuildingSurfaceConstructionKind",
@@ -13280,7 +13683,7 @@ impl<'a> Compiler<'a> {
                     Some(&name),
                     Some("construction_name"),
                     format!(
-                        "BuildingSurface:Detailed/{name} requires an opaque construction; {construction_name} is a fenestration construction"
+                        "BuildingSurface:Detailed/{name} requires an ordinary opaque construction; {construction_name} is fenestration or a deferred F/C-factor ground construction"
                     ),
                 );
                 continue;
@@ -16958,6 +17361,7 @@ fn source_effective_hamt_sorption_points(
 #[cfg(test)]
 mod tests {
     mod construction;
+    mod construction_ground_factor;
     mod global_geometry_rules;
     mod material_property_glazing_spectral_data;
     mod material_property_heat_and_moisture_transfer_diffusion;

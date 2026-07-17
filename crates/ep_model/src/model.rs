@@ -59,7 +59,7 @@ pub struct TypedModel {
     pub glazing_spectral_data_names: NameMap<GlazingSpectralDataId>,
     /// Materials.
     pub materials: Vec<Material>,
-    /// Material names.
+    /// Public input-material names; generated private internal materials are excluded.
     pub material_names: NameMap<MaterialId>,
     /// Variable thermal/solar absorptance overlays.
     pub material_variable_absorptances: Vec<MaterialVariableAbsorptance>,
@@ -1916,6 +1916,7 @@ mod tests {
             outside_layer: MaterialId(0),
             layers: vec![MaterialId(0), MaterialId(1)],
             thermochromic_master: None,
+            ground_factor: None,
         });
         model.surfaces.push(Surface {
             id: SurfaceId(0),

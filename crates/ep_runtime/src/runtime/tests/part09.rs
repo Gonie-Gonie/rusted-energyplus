@@ -57,6 +57,7 @@
             outside_layer: MaterialId(0),
             layers: vec![MaterialId(0)],
             thermochromic_master: None,
+            ground_factor: None,
         });
         model.schedules.push(ScheduleConstant {
             id: ScheduleId(0),
@@ -125,6 +126,7 @@
             outside_layer: MaterialId(0),
             layers: vec![MaterialId(0)],
             thermochromic_master: None,
+            ground_factor: None,
         });
         model.zones.push(Zone {
             id: ZoneId(0),

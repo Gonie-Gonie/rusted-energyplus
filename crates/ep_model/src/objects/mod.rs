@@ -3,6 +3,7 @@
 mod air_distribution;
 mod building;
 mod calendar;
+mod construction;
 mod glazing_spectral_data;
 mod hvac;
 mod ideal_loads;
@@ -29,6 +30,7 @@ mod window_frame_and_divider;
 pub use air_distribution::*;
 pub use building::*;
 pub use calendar::*;
+pub use construction::*;
 pub use glazing_spectral_data::*;
 pub use hvac::*;
 pub use ideal_loads::*;

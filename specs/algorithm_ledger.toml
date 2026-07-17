@@ -160,7 +160,7 @@ routine.get_construct_data.completion_status = "source_mapped"
 routine.get_construct_data.required_for_full_domain = true
 routine.get_construct_data.state_mapping_ref = "docs/src/porting-map/heat-balance-source-map.md"
 routine.get_construct_data.read_state = [
-  "EnergyPlus calls `GetConstructData` after `GetFrameAndDividerData` and before `GetBuildingData`; within it, every ordinary `Construction` is read before the deferred F-factor, C-factor, AirBoundary, complex-fenestration, internal-heat-source, equivalent-layer, and WindowDataFile branches",
+  "EnergyPlus calls `GetConstructData` after `GetFrameAndDividerData` and before `GetBuildingData`; within it, every ordinary `Construction` is read before the separately state-mapped F-factor then C-factor generation pass and before the deferred AirBoundary, complex-fenestration, internal-heat-source, equivalent-layer, and WindowDataFile branches",
   "one required nonblank outer-key name in an independent normalized construction namespace, one required outside-layer material name, and optional layers 2 through 10 that must form a contiguous populated prefix; every populated layer resolves through the typed material namespace",
   "every typed `WindowMaterial:GlazingGroup:Thermochromic` parent encountered in layer order contributes its first ordered glazing state to the effective layer stack; the existing typed parent contract guarantees at least one state",
   "a `WindowMaterial:SimpleGlazingSystem` material is accepted only when it is the sole ordinary-Construction layer, matching the intended whole-system input while excluding EnergyPlus 26.1's multi-layer validation holes",
@@ -175,7 +175,7 @@ routine.get_construct_data.write_state = [
 ]
 routine.get_construct_data.history_state_ownership = "TypedModel owns immutable construction layer stacks and optional thermochromic master metadata; this checkpoint creates no thermochromic child constructions, active-state history, or mutable window state"
 routine.get_construct_data.unsupported_state = [
-  "multi-layer or shaded ordinary `Construction` consumption of `WindowMaterial:SimpleGlazingSystem` and the special `Construction:FfactorGroundFloor`, `Construction:CfactorUndergroundWall`, `Construction:AirBoundary`, `Construction:ComplexFenestrationState`, `ConstructionProperty:InternalHeatSource`, `Construction:WindowEquivalentLayer`, and `Construction:WindowDataFile` input branches",
+  "multi-layer or shaded ordinary `Construction` consumption of `WindowMaterial:SimpleGlazingSystem` and the remaining special `Construction:AirBoundary`, `Construction:ComplexFenestrationState`, `ConstructionProperty:InternalHeatSource`, `Construction:WindowEquivalentLayer`, and `Construction:WindowDataFile` input branches",
   "`CreateTCConstructions` child allocation and copying, source-formatted child names, surface-active construction switching, temperature-driven state selection, fenestration binding, optics, thermal calculations, daylighting, shading, nominal-U adjustment, CTF generation, and EIO or other construction reporting",
 ]
 routine.get_construct_data.inactive_branches = [
@@ -189,7 +189,42 @@ routine.get_construct_data.unsupported_active_branches = [
   "valid bounded fenestration constructions remain typed graph state only and do not enter the opaque runtime thermal cache or acquire window execution",
 ]
 routine.get_construct_data.not_claimed_branches = [
-  "complete `GetConstructData` parity, source declaration and case-collision behavior, invalid-before-name source side effects, exact diagnostics/order/multiplicity, multi-layer or shaded SimpleGlazingSystem source quirks, thermochromic child generation/naming/state selection, all special construction families and overlays, nominal-U or CTF calculations, EIO/SQLite and other reporting, window or ground physics, runtime numerics, and conformance",
+  "complete `GetConstructData` parity, source case-collision behavior, invalid-before-name source side effects, exact diagnostics/order/multiplicity, multi-layer or shaded SimpleGlazingSystem source quirks, thermochromic child generation/naming/state selection, remaining special construction families and overlays, nominal-U or CTF calculations, EIO/SQLite and other reporting, window or ground physics, runtime numerics, and conformance",
+]
+
+routine.create_fc_factor_constructions.source_file = "src/EnergyPlus/HeatBalanceManager.cc"
+routine.create_fc_factor_constructions.source_routine = "CreateFCfactorConstructions"
+routine.create_fc_factor_constructions.source_map = "docs/src/porting-map/heat-balance-source-map.md"
+routine.create_fc_factor_constructions.completion_status = "state_mapped"
+routine.create_fc_factor_constructions.required_for_full_domain = false
+routine.create_fc_factor_constructions.state_mapping_ref = "docs/src/porting-map/heat-balance-source-map.md"
+routine.create_fc_factor_constructions.read_state = [
+  "raw `Construction:FfactorGroundFloor` and `Construction:CfactorUndergroundWall` counts allocate source-ordered private material slots: public `Material`, common `~FC_Concrete`, public `Material:NoMass`, then one `~FC_Insulation_n` for every raw F object followed by every raw C object; staged IDF declaration-order overlays preserve ordinary, F-family, and C-family ordinals independently",
+  "each F-factor record has a required nonblank shared Construction name plus required finite `f_factor` and `area` greater than zero and exact epJSON `perimeterexposed` greater than or equal to zero; positive perimeter derives `Reff = area/(perimeter*f_factor)-0.135-0.03`, while zero perimeter derives `Reff = 177`",
+  "each C-factor record has a required nonblank shared Construction name plus required finite `c_factor` and `height` greater than zero; equivalent soil resistance is 0.12 at height less than or equal to 0.25 m, 0.92 at height greater than or equal to 2.5 m, and `0.0607+0.3479*height` between, with `Reff = 1/c_factor+soil resistance`",
+  "the common MediumRough concrete has thickness 0.15 m, conductivity 1.95 W/m-K, density 2240 kg/m3, specific heat 900 J/kg-K, and default opaque absorptances; each MediumRough resistance-only insulation has all three absorptances zero and derives `Rfic = Reff-(0.15/1.95)`, which must be finite and greater than zero together with finite `Reff`",
+]
+routine.create_fc_factor_constructions.write_state = [
+  "one typed opaque `Construction` per valid record after every ordinary Construction and in all-F-then-all-C order, with a distinct F-factor or C-factor metadata discriminant retaining source inputs, derived effective resistance, generated insulation resistance, and C-factor soil resistance where applicable",
+  "each generated construction owns the outside-to-inside layer stack `[private insulation, private concrete]`; the construction/material graph emits both ordered edges and the raw-ordinal insulation slot receives the derived resistance",
+  "internal materials live in the typed material arena but are deliberately absent from public `material_names` and every public attachment-target lookup; exact normalized generated-name collisions from user material families fail closed, while nonidentical names such as `~FC_Insulation_01` remain public",
+  "invalid fields, nonpositive or nonfinite derived insulation resistance, and duplicate Construction names reserve no Construction ID or name; raw-count internal slots and later-family ordinals remain stable, while exact EnergyPlus invalid-object and collision side effects are not reproduced",
+]
+routine.create_fc_factor_constructions.history_state_ownership = "TypedModel owns immutable generated ground-factor construction metadata and layer stacks; no surface-local ground-temperature, CTF, CondFD, HAMT, or mutable heat-balance history is allocated"
+routine.create_fc_factor_constructions.unsupported_state = [
+  "`GroundFCfactorMethod` surface-type pairing, detailed-surface and rectangular-surface boundary conversion, F area/perimeter and C height geometry checks, `Site:GroundTemperature:FCfactorMethod`, EPW fallback, monthly ground state, CTF/CondFD/HAMT calculation, and ground heat-balance execution",
+  "public attachment targeting of private internal materials, EMS mutation, `ConstructionProperty:InternalHeatSource`, nominal-U adjustment, generic material/construction EIO timing, envelope/SQLite reporting, exact diagnostics/order/multiplicity, and conformance evidence",
+]
+routine.create_fc_factor_constructions.inactive_branches = [
+  "when no raw F-factor or C-factor definition exists, no internal concrete or insulation material is injected and ordinary material/construction behavior is unchanged",
+  "F-factor exposed perimeter exactly zero uses the source 177 m2-K/W effective-resistance branch; C-factor heights exactly 0.25 m and 2.5 m use the lower and upper constant soil-resistance branches respectively",
+]
+routine.create_fc_factor_constructions.unsupported_active_branches = [
+  "every valid F-factor or C-factor definition, including every unused definition, is reported as `UnsupportedSurfaceBoundary` and `RunBlocked`; no partial or compatibility runtime is admitted",
+  "`BuildingSurface:Detailed` deliberately rejects a generated F/C-factor construction until the downstream `GroundFCfactorMethod` pairing and validation checkpoint is ported; reporting and runtime consumers likewise filter generated stacks from ordinary opaque constructions",
+]
+routine.create_fc_factor_constructions.not_claimed_branches = [
+  "surface binding and geometry validation, ground-temperature and CTF/runtime behavior, internal-material public attachment behavior, source collision and invalid-object side effects, no-thermal-mass flags, nominal-U and reporting parity, exact diagnostics/order/multiplicity, runtime numerics, EIO/SQLite, and conformance",
 ]
 
 [[algorithm]]
@@ -2942,7 +2977,7 @@ routine.get_hysteresis_data.state_mapping_ref = "docs/src/porting-map/material-s
 routine.get_hysteresis_data.read_state = [
   "deterministic compiler-ordered `MaterialProperty:PhaseChangeHysteresis` definitions after the earlier variable-absorptance overlay; the object key is the existing material reference and has no independent overlay namespace",
   "thirteen required finite numeric fields in source order: total latent heat; liquid conductivity/density/specific heat; high/peak/low melting-curve temperatures; solid conductivity/density/specific heat; and high/peak/low freezing-curve temperatures; every value is strictly greater than zero, with no defaults, enums, upper bounds, or cross-field rules",
-  "the existing public base-material registry, where actual EnergyPlus `Group::Regular` admits `Material` and `Material:NoMass`; Rust does not synthesize internal `~FC_Concrete` or `~FC_Insulation_n` targets",
+  "the existing public base-material registry, where actual EnergyPlus `Group::Regular` admits `Material` and `Material:NoMass`; Rust synthesizes private `~FC_Concrete` and `~FC_Insulation_n` material slots but deliberately omits them from public `material_names` and attachment-target resolution",
 ]
 routine.get_hysteresis_data.write_state = [
   "a separate deterministic `MaterialPhaseChangeHysteresis` attachment arena whose records own a typed ID, normalized target snapshot, resolved `MaterialId`, total latent heat, grouped liquid/solid thermal states, and grouped melting/freezing curves; the object key is not published as a separate name map",
@@ -2974,7 +3009,7 @@ routine.get_cond_fd_input.state_mapping_ref = "docs/src/porting-map/material-sou
 routine.get_cond_fd_input.read_state = [
   "deterministic compiler-ordered `MaterialProperty:PhaseChange` definitions after the common-startup hysteresis attachment; the object key is the existing material reference, the optional or blank conductivity-temperature coefficient defaults to zero, and the optional source-ordered `values` array contains zero or more complete temperature/enthalpy pairs with no executable-schema item-count cap",
   "deterministic compiler-ordered `MaterialProperty:VariableThermalConductivity` definitions after PhaseChange; the object key is the existing material reference, and the optional source-ordered `values` array contains zero or more complete temperature/thermal-conductivity pairs with no executable-schema item-count cap",
-  "the existing public base-material registry, where actual EnergyPlus `Group::Regular` admits `Material` and `Material:NoMass`; Rust does not synthesize internal `~FC_Concrete` or `~FC_Insulation_n` targets",
+  "the existing public base-material registry, where actual EnergyPlus `Group::Regular` admits `Material` and `Material:NoMass`; Rust synthesizes private `~FC_Concrete` and `~FC_Insulation_n` material slots but deliberately omits them from public `material_names` and attachment-target resolution",
   "finite coefficient, temperature, and enthalpy scalars with no scalar bounds; source-ordered temperatures must strictly increase and enthalpies must be nondecreasing, so equal or negative enthalpies and negative temperatures or coefficients remain valid",
   "finite Rust temperature and thermal-conductivity scalars with no scalar bounds; source-ordered temperatures must strictly increase, while conductivity has no ordering or sign rule, so negative, zero, equal, or decreasing finite conductivity remains valid",
 ]
@@ -3013,7 +3048,7 @@ routine.get_moisture_balance_empd_input.read_state = [
   "deterministic compiler-ordered `MaterialProperty:MoisturePenetrationDepth:Settings` definitions whose object keys are existing material references with no independent attachment namespace",
   "seven required finite numeric fields: water-vapor diffusion resistance factor, four moisture-equation coefficients, coating-layer thickness, and coating-layer water-vapor diffusion resistance factor; the resistance factor, coating thickness, and coating resistance factor are nonnegative while the four coefficients have no scalar or cross-field bounds",
   "surface-layer depth as missing, blank, case-insensitive Autocalculate, or an explicit finite value greater than zero; deep-layer depth uses the same automatic states or an explicit finite value greater than or equal to zero",
-  "the existing public base-material registry, where only `Material` satisfies the source Regular-and-not-ROnly target gate; Rust does not synthesize internal `~FC_Concrete` targets",
+  "the existing public base-material registry, where only `Material` satisfies the source Regular-and-not-ROnly target gate; Rust synthesizes private `~FC_Concrete` state but deliberately omits it from public `material_names` and attachment-target resolution",
 ]
 routine.get_moisture_balance_empd_input.write_state = [
   "a separate deterministic `MaterialMoisturePenetrationDepthSettings` attachment arena whose records own a typed ID, normalized target snapshot, resolved `MaterialId`, all seven fixed numeric inputs, and both penetration depths as `AutoOrNumber`; the object key is not published as a separate name map",
@@ -3060,7 +3095,7 @@ routine.get_heat_bal_hamt_input.read_state = [
   "the fixed 25-pair thermal-conductivity tail: pair 1 is required, pairs 2 through 25 are optional, every supplied scalar is validated, missing optional active-prefix scalars become zero, and positions beyond the declared count are ignored after validation; supplied moisture content is finite and nonnegative, supplied thermal conductivity is finite and strictly positive, neither has an upper bound, and authored order is retained without sorting or correction",
   "deterministic compiler-ordered `SurfaceProperties:VaporCoefficients` definitions as the final seventh pass after ThermalConductivity and after `BuildingSurface:Detailed` compilation; each has a nonsemantic outer-key snapshot and a required semantic inner `surface_name` target resolved only through the typed BuildingSurface namespace",
   "the two independent constant flags as missing or blank default No or case-insensitive Yes/No, plus their two raw vapor-coefficient values as missing or blank finite zero or supplied finite nonnegative values without upper, flag/value, or cross-side bounds; Yes with zero and No with a positive value remain valid typed input",
-  "the existing public base-material and attachment registries, where only `Material` with an existing typed Settings attachment is a Sorption target and only the same material with a typed Sorption attachment is independently eligible for Suction, Redistribution, Diffusion, and ThermalConductivity; none of those four attachments depends on another, Rust does not synthesize internal `~FC_Concrete` targets, and it deliberately fails closed on source warning-ignored R-only `Material:NoMass`",
+  "the existing public base-material and attachment registries, where only `Material` with an existing typed Settings attachment is a Sorption target and only the same material with a typed Sorption attachment is independently eligible for Suction, Redistribution, Diffusion, and ThermalConductivity; none of those four attachments depends on another, Rust synthesizes private `~FC_Concrete` state but deliberately omits it from public attachment resolution, and it deliberately fails closed on source warning-ignored R-only `Material:NoMass`",
   "the existing typed `BuildingSurface:Detailed` registry, where any resolved `SurfaceId` is eligible without a HAMT-algorithm, construction, material, Settings, or Sorption dependency, while other EnergyPlus `SurfaceNames` families deliberately fail closed",
 ]
 routine.get_heat_bal_hamt_input.write_state = [

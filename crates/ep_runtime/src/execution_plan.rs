@@ -2,8 +2,8 @@
 
 use crate::{RuntimeOutputRegistry, manage_heat_balance_source_order_stages};
 use ep_model::{
-    ConstructionId, ConstructionKind, IdealLoadsAirSystemId, OutputHandle, ScheduleId,
-    SimulationModel, SurfaceId, ZoneEquipmentListId, ZoneId, ZoneThermostatId,
+    ConstructionId, IdealLoadsAirSystemId, OutputHandle, ScheduleId, SimulationModel, SurfaceId,
+    ZoneEquipmentListId, ZoneId, ZoneThermostatId,
 };
 
 /// Runtime execution-plan stage kind.
@@ -613,7 +613,7 @@ fn compile_stage_contracts(
         .typed
         .constructions
         .iter()
-        .filter(|construction| construction.kind == ConstructionKind::Opaque)
+        .filter(|construction| construction.is_ordinary_opaque())
         .map(|construction| construction.id)
         .collect::<Vec<_>>();
     let surface_ids = model

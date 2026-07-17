@@ -10507,7 +10507,7 @@ fn construction_material_rows(model: &TypedModel) -> Result<Vec<ConstructionMate
     model
         .constructions
         .iter()
-        .filter(|construction| construction.kind == ConstructionKind::Opaque)
+        .filter(|construction| construction.is_ordinary_opaque())
         .map(|construction| construction_material_row(model, construction))
         .collect()
 }
@@ -10516,7 +10516,7 @@ fn construction_layer_material_count(model: &TypedModel) -> usize {
     model
         .constructions
         .iter()
-        .filter(|construction| construction.kind == ConstructionKind::Opaque)
+        .filter(|construction| construction.is_ordinary_opaque())
         .map(|construction| {
             let layer_ids = if construction.layers.is_empty() {
                 std::slice::from_ref(&construction.outside_layer)
@@ -10532,7 +10532,7 @@ fn construction_material_row(
     model: &TypedModel,
     construction: &Construction,
 ) -> Result<ConstructionMaterialRow, String> {
-    if construction.kind != ConstructionKind::Opaque {
+    if !construction.is_ordinary_opaque() {
         return Err(format!(
             "construction {} is not an opaque CTF construction",
             construction.name.0
@@ -23319,7 +23319,7 @@ mod tests {
     }
 
     #[test]
-    fn construction_material_compare_filters_fenestration_constructions() {
+    fn construction_material_compare_filters_non_ctf_constructions() {
         let raw_model = ep_raw_model::parse_epjson_str(
             r#"{
                 "Material:NoMass": {
@@ -23337,6 +23337,13 @@ mod tests {
                 "Construction": {
                     "Wall": {"outside_layer":"Opaque"},
                     "Window": {"outside_layer":"Clear"}
+                },
+                "Construction:FfactorGroundFloor": {
+                    "Slab": {
+                        "f_factor":0.5,
+                        "area":100.0,
+                        "perimeterexposed":20.0
+                    }
                 }
             }"#,
         )
@@ -23361,6 +23368,17 @@ mod tests {
         assert!(
             super::construction_material_row(&model, window)
                 .expect_err("window construction must not enter opaque comparison")
+                .contains("not an opaque CTF construction")
+        );
+
+        let slab = model
+            .constructions
+            .iter()
+            .find(|construction| construction.name.0 == "SLAB")
+            .expect("F-factor construction");
+        assert!(
+            super::construction_material_row(&model, slab)
+                .expect_err("F-factor construction must not enter CTF comparison")
                 .contains("not an opaque CTF construction")
         );
     }

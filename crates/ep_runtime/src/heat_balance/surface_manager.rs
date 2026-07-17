@@ -5,7 +5,7 @@ use crate::execution_plan::{EnergyPlusCompatibilityStage, ExecutionStageKind};
 use crate::heat_balance::ctf::ConstructionCtfCoefficientOverride;
 use crate::heat_balance::id_slot_index::TypedIdSlotIndex;
 use ep_model::{
-    Construction, ConstructionId, ConstructionKind, Material, MaterialId, MaterialSurfaceRoughness,
+    Construction, ConstructionId, Material, MaterialId, MaterialSurfaceRoughness,
     OpaqueMaterialRef, Surface, TypedModel,
 };
 use std::collections::BTreeMap;
@@ -89,7 +89,7 @@ impl ConstructionThermalDataCache {
             model
                 .constructions
                 .iter()
-                .filter(|construction| construction.kind == ConstructionKind::Opaque)
+                .filter(|construction| construction.is_ordinary_opaque())
                 .count(),
         );
         let mut no_mass_construction_ids = Vec::new();
@@ -105,7 +105,7 @@ impl ConstructionThermalDataCache {
         let mut entry_index_by_construction_slot = vec![None; model.constructions.len()];
 
         for construction in &model.constructions {
-            if construction.kind != ConstructionKind::Opaque {
+            if !construction.is_ordinary_opaque() {
                 continue;
             }
             let entry = construction_thermal_data(
@@ -356,7 +356,7 @@ fn validate_surface_construction_families(
         else {
             continue;
         };
-        if construction.kind != ConstructionKind::Opaque {
+        if !construction.is_ordinary_opaque() {
             return Err(RuntimeError::UnsupportedConstructionForOpaqueHeatBalance {
                 surface_name: surface.name.0.clone(),
                 construction_name: construction.name.0.clone(),

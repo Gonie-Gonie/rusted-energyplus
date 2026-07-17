@@ -301,7 +301,7 @@ pub fn load_epjson_file(path: impl AsRef<Path>) -> Result<RawModel, EpJsonError>
 
 /// Loads converted epJSON and overlays configured declaration order from staged IDF.
 ///
-/// The default target set is currently limited to `RunPeriodControl:SpecialDays`.
+/// The default target set covers source-order-sensitive special days and construction families.
 pub fn load_epjson_file_with_idf_order(
     epjson_path: impl AsRef<Path>,
     idf_path: impl AsRef<Path>,

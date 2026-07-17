@@ -301,7 +301,9 @@ therefore accepts those two public target variants and rejects AirGap,
 InfraredTransparent, RoofVegetation, and every window family. EnergyPlus can
 also resolve internally generated `~FC_Concrete` and `~FC_Insulation_n`
 targets; those aliases remain outside this bounded public target set because
-Rust does not yet synthesize F/C-factor materials.
+CP87 synthesizes private F/C-factor material slots in the typed material arena.
+The generated names are deliberately absent from public `material_names` and
+all attachment-target resolution.
 
 All thirteen numeric fields are required, finite, and strictly greater than
 zero, including both Celsius peak temperatures. In source field order they
@@ -341,7 +343,7 @@ GetHysteresisData
 read_state:
 - deterministic compiler-ordered `MaterialProperty:PhaseChangeHysteresis` definitions after the earlier variable-absorptance overlay; the object key is the existing material reference and has no independent overlay namespace
 - thirteen required finite numeric fields in source order: total latent heat; liquid conductivity/density/specific heat; high/peak/low melting-curve temperatures; solid conductivity/density/specific heat; and high/peak/low freezing-curve temperatures; every value is strictly greater than zero, with no defaults, enums, upper bounds, or cross-field rules
-- the existing public base-material registry, where actual EnergyPlus `Group::Regular` admits `Material` and `Material:NoMass`; Rust does not synthesize internal `~FC_Concrete` or `~FC_Insulation_n` targets
+- the existing public base-material registry, where actual EnergyPlus `Group::Regular` admits `Material` and `Material:NoMass`; Rust synthesizes private `~FC_Concrete` and `~FC_Insulation_n` material slots but deliberately omits them from public `material_names` and attachment-target resolution
 
 write_state:
 - a separate deterministic `MaterialPhaseChangeHysteresis` attachment arena whose records own a typed ID, normalized target snapshot, resolved `MaterialId`, total latent heat, grouped liquid/solid thermal states, and grouped melting/freezing curves; the object key is not published as a separate name map
@@ -391,7 +393,9 @@ The actual source target gate is `Group::Regular`, which admits the public
 `Material` and `Material:NoMass` variants. AirGap, InfraredTransparent,
 RoofVegetation, and every window family fail closed. EnergyPlus can also resolve
 internally generated `~FC_Concrete` and `~FC_Insulation_n` targets; those remain
-outside this public bounded target set because Rust does not synthesize them.
+outside this public bounded target set because Rust synthesizes them only as
+private material slots and deliberately omits them from public attachment
+resolution.
 Blank or missing targets, wrong families, malformed/incomplete/nonfinite pairs,
 ordering violations, and a repeated case-insensitive PhaseChange target fail
 before attachment identity or target ownership is reserved. EnergyPlus instead
@@ -476,7 +480,7 @@ GetCondFDInput
 read_state:
 - deterministic compiler-ordered `MaterialProperty:PhaseChange` definitions after the common-startup hysteresis attachment; the object key is the existing material reference, the optional or blank conductivity-temperature coefficient defaults to zero, and the optional source-ordered `values` array contains zero or more complete temperature/enthalpy pairs with no executable-schema item-count cap
 - deterministic compiler-ordered `MaterialProperty:VariableThermalConductivity` definitions after PhaseChange; the object key is the existing material reference, and the optional source-ordered `values` array contains zero or more complete temperature/thermal-conductivity pairs with no executable-schema item-count cap
-- the existing public base-material registry, where actual EnergyPlus `Group::Regular` admits `Material` and `Material:NoMass`; Rust does not synthesize internal `~FC_Concrete` or `~FC_Insulation_n` targets
+- the existing public base-material registry, where actual EnergyPlus `Group::Regular` admits `Material` and `Material:NoMass`; Rust synthesizes private `~FC_Concrete` and `~FC_Insulation_n` material slots but deliberately omits them from public `material_names` and attachment-target resolution
 - finite coefficient, temperature, and enthalpy scalars with no scalar bounds; source-ordered temperatures must strictly increase and enthalpies must be nondecreasing, so equal or negative enthalpies and negative temperatures or coefficients remain valid
 - finite Rust temperature and thermal-conductivity scalars with no scalar bounds; source-ordered temperatures must strictly increase, while conductivity has no ordering or sign rule, so negative, zero, equal, or decreasing finite conductivity remains valid
 
@@ -571,7 +575,7 @@ read_state:
 - deterministic compiler-ordered `MaterialProperty:MoisturePenetrationDepth:Settings` definitions whose object keys are existing material references with no independent attachment namespace
 - seven required finite numeric fields: water-vapor diffusion resistance factor, four moisture-equation coefficients, coating-layer thickness, and coating-layer water-vapor diffusion resistance factor; the resistance factor, coating thickness, and coating resistance factor are nonnegative while the four coefficients have no scalar or cross-field bounds
 - surface-layer depth as missing, blank, case-insensitive Autocalculate, or an explicit finite value greater than zero; deep-layer depth uses the same automatic states or an explicit finite value greater than or equal to zero
-- the existing public base-material registry, where only `Material` satisfies the source Regular-and-not-ROnly target gate; Rust does not synthesize internal `~FC_Concrete` targets
+- the existing public base-material registry, where only `Material` satisfies the source Regular-and-not-ROnly target gate; Rust synthesizes private `~FC_Concrete` state but deliberately omits it from public `material_names` and attachment-target resolution
 
 write_state:
 - a separate deterministic `MaterialMoisturePenetrationDepthSettings` attachment arena whose records own a typed ID, normalized target snapshot, resolved `MaterialId`, all seven fixed numeric inputs, and both penetration depths as `AutoOrNumber`; the object key is not published as a separate name map
@@ -1020,7 +1024,7 @@ read_state:
 - the fixed 25-pair thermal-conductivity tail: pair 1 is required, pairs 2 through 25 are optional, every supplied scalar is validated, missing optional active-prefix scalars become zero, and positions beyond the declared count are ignored after validation; supplied moisture content is finite and nonnegative, supplied thermal conductivity is finite and strictly positive, neither has an upper bound, and authored order is retained without sorting or correction
 - deterministic compiler-ordered `SurfaceProperties:VaporCoefficients` definitions as the final seventh pass after ThermalConductivity and after `BuildingSurface:Detailed` compilation; each has a nonsemantic outer-key snapshot and a required semantic inner `surface_name` target resolved only through the typed BuildingSurface namespace
 - the two independent constant flags as missing or blank default No or case-insensitive Yes/No, plus their two raw vapor-coefficient values as missing or blank finite zero or supplied finite nonnegative values without upper, flag/value, or cross-side bounds; Yes with zero and No with a positive value remain valid typed input
-- the existing public base-material and attachment registries, where only `Material` with an existing typed Settings attachment is a Sorption target and only the same material with a typed Sorption attachment is independently eligible for Suction, Redistribution, Diffusion, and ThermalConductivity; none of those four attachments depends on another, Rust does not synthesize internal `~FC_Concrete` targets, and it deliberately fails closed on source warning-ignored R-only `Material:NoMass`
+- the existing public base-material and attachment registries, where only `Material` with an existing typed Settings attachment is a Sorption target and only the same material with a typed Sorption attachment is independently eligible for Suction, Redistribution, Diffusion, and ThermalConductivity; none of those four attachments depends on another, Rust synthesizes private `~FC_Concrete` state but deliberately omits it from public attachment resolution, and it deliberately fails closed on source warning-ignored R-only `Material:NoMass`
 - the existing typed `BuildingSurface:Detailed` registry, where any resolved `SurfaceId` is eligible without a HAMT-algorithm, construction, material, Settings, or Sorption dependency, while other EnergyPlus `SurfaceNames` families deliberately fail closed
 
 write_state:
@@ -1101,6 +1105,15 @@ not be mistaken for additional public schema variants:
   construction exists
 - after `Material:NoMass`, one `~FC_Insulation_*` R-only material is created
   for each such construction
+
+CP87 implements those conditional injections from raw object counts. Rust
+preserves public `Material` -> private concrete -> public `Material:NoMass` ->
+private insulation order, numbers every raw F object before every raw C object,
+and uses staged-IDF family declaration order for the ordinals. Generated slots
+live in `TypedModel::materials` but are not published through
+`material_names`; public attachments therefore cannot resolve them. Exact
+normalized generated-name collisions from user material families fail closed,
+while nonidentical names such as `~FC_Insulation_01` remain public.
 
 The routine counts `Material:NoMass`, `Material:InfraredTransparent`, and
 `Material:AirGap` before step 1, but those count reads do not change the
@@ -3137,9 +3150,9 @@ spectral-dataset, variable-absorptance, phase-change-hysteresis, and phase-chang
 temperature-enthalpy, variable-thermal-conductivity, EMPD settings, and HAMT
 Settings, SorptionIsotherm, Suction, Redistribution, Diffusion, and
 ThermalConductivity plus SurfaceProperties:VaporCoefficients contracts,
-internal F/C-factor material injection, EMS mutation, broad material EIO
-formatting, or HAMT runtime consumers and construction-local conductivity
-fallback.
+public attachment targeting or EMS mutation of private F/C-factor materials,
+broad material EIO timing/formatting, or HAMT runtime consumers and
+construction-local conductivity fallback.
 
 ## Routine Inventory
 
@@ -3147,7 +3160,7 @@ fallback.
 |---|---|---|
 | `GetWindowGlassSpectralData` | `state_mapped` | owns the complete bounded pre-material standalone dataset read, positional zero-fill, transmittance floor, point validation, separate typed arena/name map, and valid-unused runtime-inert boundary; active glazing consumers remain blocked |
 | `MaterialGlass::SetupSimpleWindowGlazingSystem` | `state_mapped` | its complete material-owned performance-index block model, optional-visible branch, reversed intermediate-U film-resistance interpolation, and materializing high-U resistance clamp are typed; the separate `GetConstructData` mapping owns sole-layer construction identity/graph linkage, while multi-layer packing, angular/hemispherical optics, reporting, runtime, and conformance remain outside this mapping |
-| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, RoofVegetation, Thermochromic glazing-group, SimpleGlazingSystem, and complex-fenestration Gap and ComplexShade objects plus only the regular Glazing `SpectralAverage` branch are implemented; RoofVegetation, SimpleGlazingSystem, and complex-fenestration Gap and ComplexShade have bounded generic-definition CLI comparisons, while Thermochromic EIO remains unclaimed |
+| `GetMaterialData` | `source_mapped` | owns all 22 base families, the raw-count conditional F/C-factor injections, and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, RoofVegetation, Thermochromic glazing-group, SimpleGlazingSystem, and complex-fenestration Gap and ComplexShade objects plus only the regular Glazing `SpectralAverage` branch are implemented; CP87 adds private concrete/insulation slots with public-name exclusion but not their attachments or reporting; RoofVegetation, SimpleGlazingSystem, and complex-fenestration Gap and ComplexShade have bounded generic-definition CLI comparisons, while Thermochromic and F/C EIO remain unclaimed |
 | `CalcScreenTransmittance` | `source_mapped` | the Screen fixture comparator reproduces only its normal-incidence A/Z paths and the values required by the bounded static EIO row |
 | `CalcWindowScreenProperties` | `source_mapped` | the Screen fixture comparator reproduces only its reverse-order 18 by 18 initialization integration and fixture activation boundary |
 | `ReportGlass` | `source_mapped` | owns the bounded Blind specialized header, raw seven-field row serialization, construction-occurrence order, and post-`CalcNominalWindowCond` skip behavior |
@@ -3373,9 +3386,9 @@ CP58 remains incomplete until, at minimum:
 
 - the three deferred `WindowMaterial:Glazing` optical branches have
   schema-complete typed variants
-- source-order attachment, duplicate/reference diagnostics, generated
-  F/C-factor materials, reporting, EMS, and algorithm-specific consumers are
-  mapped and implemented
+- source-order attachment, duplicate/reference diagnostics, private F/C-factor
+  material attachment/reporting/EMS behavior, and algorithm-specific consumers
+  are mapped and implemented
 - declared blocking families cover opaque, window, equivalent-layer,
   complex-fenestration, eco-roof, EMPD, CondFD/PCM, and HAMT behavior
 

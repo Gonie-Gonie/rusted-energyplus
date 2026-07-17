@@ -14,13 +14,27 @@ pub struct IdfOrderTarget {
 
 /// IDF declaration-order targets backed by current source and oracle evidence.
 ///
-/// This default is deliberately limited to special-day overlap precedence. Other
-/// position-sensitive object families require their own identity and converter
-/// edge-case evidence before joining the fail-closed overlay.
-pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[IdfOrderTarget {
-    object_type: "RunPeriodControl:SpecialDays",
-    name_field_index: 0,
-}];
+/// This default is deliberately limited to source-order-sensitive families with
+/// explicit identity and converter edge-case evidence. Other position-sensitive
+/// families require the same evidence before joining the fail-closed overlay.
+pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
+    IdfOrderTarget {
+        object_type: "RunPeriodControl:SpecialDays",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Construction",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Construction:FfactorGroundFloor",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
+        object_type: "Construction:CfactorUndergroundWall",
+        name_field_index: 0,
+    },
+];
 
 /// Error returned when staged IDF declaration order cannot be recovered safely.
 #[derive(Clone, Debug, Eq, PartialEq)]
