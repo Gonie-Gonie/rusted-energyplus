@@ -1,0 +1,120 @@
+Version,
+  26.1;
+
+Timestep,
+  4;
+
+Building,
+  COMPLEX FENESTRATION GAP STATIC EIO,
+  0.0,
+  Suburbs,
+  0.04,
+  0.4,
+  FullExterior,
+  25,
+  6;
+
+GlobalGeometryRules,
+  UpperLeftCorner,
+  CounterClockWise,
+  World;
+
+Site:Location,
+  ORACLE SITE,
+  39.77,
+  -104.87,
+  -7.0,
+  1611.0;
+
+SizingPeriod:DesignDay,
+  ORACLE WINTER DAY,
+  1,
+  21,
+  WinterDesignDay,
+  -10.0,
+  0.0,
+  ,
+  ,
+  Wetbulb,
+  -10.0,
+  ,
+  ,
+  ,
+  ,
+  83411.0,
+  2.3,
+  180.0,
+  No,
+  No,
+  No,
+  ASHRAEClearSky,
+  ,
+  ,
+  ,
+  ,
+  1.0;
+
+SimulationControl,
+  No,
+  No,
+  No,
+  Yes,
+  No,
+  No,
+  1;
+
+Output:Variable,
+  *,
+  Site Outdoor Air Drybulb Temperature,
+  Hourly;
+
+Output:Constructions,Constructions,Materials;
+
+WindowMaterial:Gas,
+  SINGLE AIR SOURCE,
+  Air,
+  0.015;
+
+WindowMaterial:GasMixture,
+  MIXED AIR ARGON SOURCE,
+  0.0095,
+  2,
+  Air,
+  0.6,
+  Argon,
+  0.4;
+
+WindowGap:DeflectionState,
+  M DIFFERENT DEFLECTION,
+  0.0100,
+  20.0,
+  90000.0;
+
+WindowGap:SupportPillar,
+  M DIFFERENT PILLAR,
+  0.03,
+  0.0003;
+
+WindowMaterial:Gap,
+  Z DEFAULT PRESSURE,
+  0.0127,
+  SINGLE AIR SOURCE,
+  ,
+  ,
+  ;
+
+WindowMaterial:Gap,
+  M SAME THICKNESS DIFFERENT STATE,
+  0.0127,
+  MIXED AIR ARGON SOURCE,
+  90000.0,
+  M DIFFERENT DEFLECTION,
+  M DIFFERENT PILLAR;
+
+WindowMaterial:Gap,
+  A DIFFERENT THICKNESS,
+  0.006,
+  SINGLE AIR SOURCE,
+  120000.0,
+  ,
+  ;

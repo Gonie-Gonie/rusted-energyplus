@@ -416,9 +416,11 @@ The variant belongs to the ordinary fenestration family and participates in
 the same `Glass (Gas-or-GasMixture Glass){0..3}` construction alternation as
 `WindowMaterial:Gas`. It is outside the equivalent-layer family;
 `Construction:WindowEquivalentLayer` typing and validation remain deferred.
-The later `WindowMaterial:Gap` complex-fenestration reference path may also
-consume a gas mixture, but that object remains deferred. Arbitrary-run
-assessment explicitly blocks the typed mixture before execution.
+The later typed `WindowMaterial:Gap` complex-fenestration reference path may
+also consume a copied gas-mixture state, while its
+`Construction:ComplexFenestrationState` consumer and runtime remain deferred.
+Arbitrary-run assessment explicitly blocks the typed mixture before
+execution.
 
 EnergyPlus 26.1 prints the shared `WindowMaterial:Gas` EIO header when any gas
 mixture exists but has no `GasMixture` data-row case in the construction-layer
@@ -1357,8 +1359,10 @@ and property record or the copied ordered mixture, together with the source
 material name, thickness, or nominal resistance. `WindowComplexGapMaterial`
 owns its own thickness and pressure, and deliberately invents no nominal
 resistance. The source-fixed base state is `Rough`, R-only, with zero
-resistance, conductivity, density, specific heat, and absorptances; those
-generic report projections are not promoted as typed-checkpoint evidence.
+resistance, conductivity, density, specific heat, and absorptances. The
+bounded diagnostic below promotes only those generic report projections and
+the gap's own thickness; it does not expose or promote the copied gas/helper
+state.
 
 `WindowGap:DeflectionState` and `WindowGap:SupportPillar` remain raw-only
 helper families outside the 34-object material inventory. The compiler
@@ -1385,9 +1389,44 @@ position rejects it. Its sole intended
 deflection execution, pillar conduction, optics, thermal behavior, surfaces,
 ratings, daylighting, and reporting remain deferred. Arbitrary-run support
 assessment counts and blocks every typed definition, including unused gaps,
-as `UnsupportedSurfaceBoundary`/`RunBlocked` with no runtime class. This typed
-checkpoint promotes no EIO fixture, parser, comparator, family case, proof
-variable, Rust EIO serialization, runtime, or conformance claim.
+as `UnsupportedSurfaceBoundary`/`RunBlocked` with no runtime class. Rust EIO
+serialization, runtime, and conformance remain outside this typed checkpoint.
+
+#### Bounded generic `Material Details` diagnostic
+
+`window_material_gap_001` adds a nonblocking diagnostic for the generic
+EnergyPlus 26.1 `Material Details` report through
+`run_compare_window_material_gap`. Its warning-free, no-zone source-IDF
+fixture keeps three Gap definitions unused and locks only the fixture-local
+source sequence Z DEFAULT PRESSURE, M SAME THICKNESS DIFFERENT STATE, A
+DIFFERENT THICKNESS. Z and M have the same own thickness of 0.0127 m despite
+different referenced gas, pressure, deflection, and pillar state; A has a
+0.006 m own thickness.
+
+The lane selecting both `Constructions` and `Materials` and the Materials-only
+lane each emit exactly one exact 11-token generic header and one target row
+per Gap in Z,M,A order. Each target row locks normalized identity, `Rough`,
+source `{:.4R}` own thickness, and zero resistance, conductivity, density,
+specific heat, and thermal, solar, and visible absorptances. The two required
+`WindowMaterial:Gas`/`WindowMaterial:GasMixture` source definitions emit their
+own unrelated generic rows, and Materials-enabled lanes also emit an empty
+`Material:Air` header; target filtering excludes both.
+
+Constructions-only and blank/default lanes emit no generic `Material Details`
+header or data. Constructions-enabled lanes may nevertheless emit empty
+generic `Construction CTF`, `Material CTF Summary`, `Material:Air CTF
+Summary`, and `CTF` headers; these are outside the window-specific absence
+claim. No lane emits a dedicated `WindowMaterial:Gap`,
+`WindowMaterial:Glazing`, or `WindowConstruction` header or data row.
+
+`ConvertInputFormat` reorders the Gap definitions A,M,Z, and the converted
+epJSON EIO follows A,M,Z. The evidence therefore claims only source-IDF
+fixture-local Z,M,A order, not broad IDF/epJSON declaration-order parity. Gas
+species, mixture fractions/order, referenced gas identity/thickness, gap
+pressure, helper state, use/occurrence, complex-fenestration packing,
+deflection/pillar algorithms, optics/thermal behavior, surfaces, ratings,
+daylighting, Rust EIO serialization, runtime, broad diagnostics, conformance,
+and whole-routine `GetMaterialData` behavior remain unclaimed.
 
 `MaterialFamily` and `ConstructionKind` separate opaque and fenestration
 consumers. `Material:RoofVegetation` joins the opaque family with a dedicated
@@ -1681,8 +1720,10 @@ behavior, identity reservation after every fallible step, the dedicated
 complex-fenestration family, universal ordinary-`Construction` rejection, typed
 coverage, and the all-definition arbitrary-run block. They do not claim a
 nominal resistance, helper-family typed inventory, relationship constraints
-absent from the source, `Construction:ComplexFenestrationState`, EIO or other
-reporting, window algorithms, runtime execution, or conformance.
+absent from the source, `Construction:ComplexFenestrationState`, specialized
+window reporting, window algorithms, runtime execution, or conformance. The
+dedicated static case separately locks only the bounded generic `Material
+Details` evidence above.
 
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
@@ -1697,7 +1738,7 @@ the deferred families.
 |---|---|---|
 | `GetWindowGlassSpectralData` | `source_mapped` | owns the pre-material spectral dataset read |
 | `MaterialGlass::SetupSimpleWindowGlazingSystem` | `state_mapped` | its complete material-owned performance-index block model, optional-visible branch, reversed intermediate-U film-resistance interpolation, and materializing high-U resistance clamp are typed; construction, angular/hemispherical optics, reporting, runtime, and conformance remain outside the mapping |
-| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, RoofVegetation, Thermochromic glazing-group, SimpleGlazingSystem, and complex-fenestration Gap objects plus only the regular Glazing `SpectralAverage` branch are implemented; RoofVegetation and SimpleGlazingSystem have bounded generic-definition CLI comparisons, while Thermochromic and complex-fenestration Gap EIO remain unclaimed |
+| `GetMaterialData` | `source_mapped` | owns all 22 base families and the tail variable-absorptance call; its Regular/NoMass/AirGap/InfraredTransparent, RefractionExtinctionMethod, glazing EquivalentLayer, Gas, gap EquivalentLayer, GasMixture, ordinary Shade, shade EquivalentLayer, drape EquivalentLayer, ordinary Screen, screen EquivalentLayer, ordinary Blind, blind EquivalentLayer, RoofVegetation, Thermochromic glazing-group, SimpleGlazingSystem, and complex-fenestration Gap objects plus only the regular Glazing `SpectralAverage` branch are implemented; RoofVegetation, SimpleGlazingSystem, and complex-fenestration Gap have bounded generic-definition CLI comparisons, while Thermochromic EIO remains unclaimed |
 | `CalcScreenTransmittance` | `source_mapped` | the Screen fixture comparator reproduces only its normal-incidence A/Z paths and the values required by the bounded static EIO row |
 | `CalcWindowScreenProperties` | `source_mapped` | the Screen fixture comparator reproduces only its reverse-order 18 by 18 initialization integration and fixture activation boundary |
 | `ReportGlass` | `source_mapped` | owns the bounded Blind specialized header, raw seven-field row serialization, construction-occurrence order, and post-`CalcNominalWindowCond` skip behavior |
@@ -1866,6 +1907,24 @@ visible and derived optics, use/reuse occurrences, `ReportGlass`, construction
 ratings, angular/hemispherical optics, runtime, Rust EIO serialization, broad
 diagnostic/declaration-order parity, and conformance remain outside the
 boundary; neither parent source routine is promoted wholesale.
+
+`window_material_gap_001` adds a bounded generic-definition diagnostic for
+three unused Gap definitions in a warning-free no-zone source-IDF fixture.
+Both-selector and Materials-only runs each contain one exact 11-token header
+and the exact Z,M,A target rows; Constructions-only and blank/default contain
+no generic header or data. Every target is `Rough`, locks source `{:.4R}` own
+thickness, and has zero resistance, conductivity, density, specific heat, and
+absorptances. Z and M both report 0.0127 m despite different referenced gas,
+gap pressure, deflection, and pillar state; A reports 0.006 m. Two unrelated
+Gas/GasMixture generic rows and an empty `Material:Air` header are allowed in
+Materials-enabled lanes. Empty generic CTF headers in Constructions-enabled
+lanes are not window-specific evidence, and no dedicated Gap, Glazing, or
+WindowConstruction header/data appears. Converted epJSON emits A,M,Z, so only
+the source-IDF fixture-local sequence is claimed. Gas/mixture/helper state,
+pressure, use, complex-fenestration algorithms, optics/thermal behavior,
+surfaces, ratings, daylighting, Rust EIO serialization, runtime, broad
+diagnostics, conformance, and whole-routine promotion remain outside the
+boundary.
 
 These tests and static EIO smokes remain bounded evidence, not an EnergyPlus
 material-family or window gate.

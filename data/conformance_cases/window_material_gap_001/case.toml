@@ -1,0 +1,58 @@
+id = "window_material_gap_001"
+title = "Complex-fenestration window gap generic material-definition EIO evidence"
+milestone = "v0.8-heat-balance"
+purpose = "Compare the bounded Rust WindowMaterial:Gap typed slice with EnergyPlus generic static Material Details definition rows."
+comparison_class = "smoke"
+conformance_claim = false
+oracle_version = "26.1.0"
+notes = [
+  "The warning-free no-zone fixture defines exactly three unused WindowMaterial:Gap objects in IDF source order Z, M, A. It contains no Construction, Construction:ComplexFenestrationState, Zone, BuildingSurface:Detailed, or FenestrationSurface:Detailed object.",
+  "Z uses a single-gas source, its own 0.0127 m thickness, the default 101325 Pa pressure, and no deflection or support-pillar helper. M keeps its own 0.0127 m thickness while changing the copied state to a two-gas mixture, 90000 Pa pressure, a referenced deflection state, and a referenced support pillar. A uses the single-gas source with its own 0.006 m thickness.",
+  "The generic Material Details table emits exactly one target row per WindowMaterial:Gap definition in fixture order Z, M, A and normalizes names to uppercase. Z and M produce identical numeric payloads despite different identities and copied gas, pressure, deflection, and support-pillar state.",
+  "The exact target row fields are normalized identity, zero thermal resistance, Rough roughness, the gap object's own thickness, and zero conductivity, density, specific heat, and thermal, solar, and visible absorptance. The zeros are fixed base-material projections, not calculated gas conductance or resistance.",
+  "The primary oracle run requests both Constructions and Materials. A Materials-only run retains the exact target Z, M, A rows. Constructions-only and blank/default-selector runs emit no generic Material Details header or data rows.",
+  "The required WindowMaterial:Gas and WindowMaterial:GasMixture definitions may contribute their own generic material rows and the shared Material:Air header. The smoke gate filters the three target WindowMaterial:Gap rows exactly and does not claim exclusivity for the whole generic table.",
+  "Because every gap definition is unused and no window Construction exists, all four lanes must omit WindowMaterial:Glazing and WindowConstruction headers and data rows. WindowMaterial:Gap also has no dedicated specialized EIO header or row in this fixture.",
+  "The design-day fixture requests one site output variable and supplies a nonzero ASHRAE clear-sky clearness so EnergyPlus 26.1 completes every lane with zero warnings and zero severe errors without an opaque host zone.",
+  "The smoke gate requires the exact generic header and eleven-token target-row shape, exact Z/M/A target values and ordering in both Materials-enabled lanes, selector activation, converted epJSON artifacts, and the bounded Rust command `compare window-material-gap` in explicit exact mode for all four lanes.",
+  "Gas species and fractions, referenced gas thickness or identity, pressure, deflection-state initial conditions, deflected thickness, support-pillar geometry, use or reuse, Construction:ComplexFenestrationState behavior, construction ratings, window heat transfer, surface behavior, runtime, diagnostics, and broad IDF versus converted-epJSON declaration-order behavior remain outside this evidence.",
+  "This is non-blocking diagnostic-only static input evidence. It makes no WindowMaterial:Gap conformance, complex-fenestration construction, zone, surface, fenestration, runtime, Rust EIO serialization, or diagnostic-text claim.",
+]
+
+[manifest_v2]
+schema = "rusted-energyplus.case-manifest.v2"
+source_kind = "local-fixture"
+source_file = "data/conformance_cases/window_material_gap_001/window_material_gap.idf"
+tier = "A"
+
+[scope]
+domains = ["construction"]
+has_zone = false
+has_surface = false
+has_fenestration = false
+has_air_loop = false
+has_plant_loop = false
+has_ems = false
+has_python_plugin = false
+has_daylighting = false
+
+[input]
+idf = "data/conformance_cases/window_material_gap_001/window_material_gap.idf"
+epjson = ".runtime/compare-window-material-gap/26.1.0/window-material-gap.epJSON"
+
+[[outputs]]
+key = "*"
+variable = "WindowMaterial:Gap Generic Definition Details"
+frequency = "static"
+class = "construction-material"
+source = "eio"
+domain = "construction"
+level = "diagnostic"
+
+[report]
+format = "markdown"
+path = ".runtime/conformance/window_material_gap_001/compare-report.md"
+
+[gate]
+script = "scripts/dev.cmd compare-window-material-gap-smoke"
+blocking = false
