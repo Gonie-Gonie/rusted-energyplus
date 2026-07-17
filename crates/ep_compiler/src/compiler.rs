@@ -13,34 +13,35 @@ use ep_model::{
     GlazingSpectralDataId, GlazingSpectralPoint, GlobalGeometryRules, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
     IdealLoadsLimit, InfraredTransparentMaterial, InsideSurfaceConvectionAlgorithm, InternalGainId,
-    LoadDistributionScheme, LoopId, Material, MaterialDefinition, MaterialId,
-    MaterialPhaseChangeHysteresis, MaterialPhaseChangeHysteresisId, MaterialSurfaceRoughness,
-    MaterialVariableAbsorptance, MaterialVariableAbsorptanceId, NameMap, NoMassMaterial, Node,
-    NodeId, NodeList, NodeListId, NormalizedName, NumericType, OpaqueSurfaceProperties,
-    OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType,
-    OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
+    LoadDistributionScheme, LoopId, Material, MaterialDefinition, MaterialId, MaterialPhaseChange,
+    MaterialPhaseChangeHysteresis, MaterialPhaseChangeHysteresisId, MaterialPhaseChangeId,
+    MaterialSurfaceRoughness, MaterialVariableAbsorptance, MaterialVariableAbsorptanceId, NameMap,
+    NoMassMaterial, Node, NodeId, NodeList, NodeListId, NormalizedName, NumericType,
+    OpaqueSurfaceProperties, OtherEquipment, OtherEquipmentDesignLevelCalculationMethod,
+    OutdoorAirEconomizerType, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
     PeopleNumberCalculationMethod, PhaseChangeHysteresisCurve, PhaseChangeHysteresisThermalState,
-    PlantBranch, PlantBranchComponent, PlantBranchList, PlantConnector, PlantConnectorKind,
-    PlantConnectorList, PlantConnectorListEntry, PlantLoop, Point3, PumpConstantSpeed,
-    RegularMaterial, RoofVegetationMaterial, RoofVegetationMoistureDiffusionMethod, RunPeriod,
-    RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
-    ScheduleCompact, ScheduleCompactDayProfile, ScheduleCompactPeriod, ScheduleCompactSegment,
-    ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList, ScheduleDayType,
-    ScheduleFile, ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn,
-    ScheduleId, ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits,
-    ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
-    SolarDistribution, SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId,
-    SurfaceType, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
-    ThermostatSetpointId, TimestepConfig, TypedModel, VariableAbsorptanceControl,
-    VariableAbsorptanceFunctionSignal, VariableAbsorptanceSchedule, Version, VertexEntryDirection,
-    WeekScheduleId, WindExposure, WindowBlindDirectionalOpticalProperties,
-    WindowBlindEquivalentLayerMaterial, WindowBlindEquivalentLayerSlatAngleControl,
-    WindowBlindMaterial, WindowBlindSlatAngleType, WindowBlindSlatOrientation,
-    WindowComplexGapGasComposition, WindowComplexGapMaterial, WindowComplexGapSupportPillar,
-    WindowComplexShadeLayerType, WindowComplexShadeMaterial, WindowDrapeEquivalentLayerMaterial,
-    WindowGapEquivalentLayerMaterial, WindowGapVentType, WindowGasMaterial, WindowGasMixture,
-    WindowGasMixtureComponent, WindowGasMixtureMaterial, WindowGasPolynomialCoefficients,
-    WindowGasProperties, WindowGasType, WindowGlazingEquivalentLayerDiffuseProperties,
+    PhaseChangeTemperatureEnthalpyPoint, PlantBranch, PlantBranchComponent, PlantBranchList,
+    PlantConnector, PlantConnectorKind, PlantConnectorList, PlantConnectorListEntry, PlantLoop,
+    Point3, PumpConstantSpeed, RegularMaterial, RoofVegetationMaterial,
+    RoofVegetationMoistureDiffusionMethod, RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId,
+    RunPeriodSpecialDay, RunPeriodSpecialDayId, ScheduleCompact, ScheduleCompactDayProfile,
+    ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleConstant, ScheduleDayHourly,
+    ScheduleDayInterval, ScheduleDayList, ScheduleDayType, ScheduleFile,
+    ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn, ScheduleId,
+    ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact,
+    ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation, SolarDistribution,
+    SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType, Terrain,
+    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
+    TypedModel, VariableAbsorptanceControl, VariableAbsorptanceFunctionSignal,
+    VariableAbsorptanceSchedule, Version, VertexEntryDirection, WeekScheduleId, WindExposure,
+    WindowBlindDirectionalOpticalProperties, WindowBlindEquivalentLayerMaterial,
+    WindowBlindEquivalentLayerSlatAngleControl, WindowBlindMaterial, WindowBlindSlatAngleType,
+    WindowBlindSlatOrientation, WindowComplexGapGasComposition, WindowComplexGapMaterial,
+    WindowComplexGapSupportPillar, WindowComplexShadeLayerType, WindowComplexShadeMaterial,
+    WindowDrapeEquivalentLayerMaterial, WindowGapEquivalentLayerMaterial, WindowGapVentType,
+    WindowGasMaterial, WindowGasMixture, WindowGasMixtureComponent, WindowGasMixtureMaterial,
+    WindowGasPolynomialCoefficients, WindowGasProperties, WindowGasType,
+    WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
     WindowGlazingSpectralAverageMaterial, WindowGlazingThermochromicGroupMaterial,
@@ -471,6 +472,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "WindowMaterial:ComplexShade",
     "MaterialProperty:VariableAbsorptance",
     "MaterialProperty:PhaseChangeHysteresis",
+    "MaterialProperty:PhaseChange",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -583,6 +585,7 @@ impl<'a> Compiler<'a> {
         self.parse_external_interface_fmu_export_schedules(&mut model);
         self.parse_material_variable_absorptances(&mut model);
         self.parse_material_phase_change_hystereses(&mut model);
+        self.parse_material_phase_changes(&mut model);
         self.validate_scalar_schedule_type_limits(&model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
@@ -1973,6 +1976,206 @@ impl<'a> Compiler<'a> {
                     initial_specific_heat_j_per_kg_k: solid_specific_heat_j_per_kg_k,
                 });
         }
+    }
+
+    fn parse_material_phase_changes(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "MaterialProperty:PhaseChange";
+        const COEFFICIENT_FIELD: &str = "temperature_coefficient_for_thermal_conductivity";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            if name.trim().is_empty() {
+                self.error(
+                    "MissingRequiredField",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE} requires a non-blank material name"),
+                );
+                continue;
+            }
+
+            let diagnostics_before_fields = self.diagnostics.len();
+            let temperature_coefficient_for_thermal_conductivity_w_per_m_k2 = self
+                .number_bounded_blank_default(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    COEFFICIENT_FIELD,
+                    0.0,
+                    (f64::NEG_INFINITY, false),
+                    (f64::INFINITY, false),
+                );
+            let temperature_enthalpy_points =
+                self.material_phase_change_temperature_enthalpy_points(&name, &object);
+            if self.diagnostics.len() != diagnostics_before_fields {
+                continue;
+            }
+            let Some(temperature_enthalpy_points) = temperature_enthalpy_points else {
+                continue;
+            };
+
+            let Some(reference_material) = self.resolve_name(
+                &model.material_names,
+                OBJECT_TYPE,
+                &name,
+                "name",
+                &name,
+                "Material",
+            ) else {
+                continue;
+            };
+            let Some(material) = model.materials.get(reference_material.0 as usize) else {
+                self.error(
+                    "InvalidReference",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE}/{name} resolved material outside the material arena"),
+                );
+                continue;
+            };
+            if !matches!(
+                material.definition,
+                MaterialDefinition::Regular(_) | MaterialDefinition::NoMass(_)
+            ) {
+                self.error(
+                    "InvalidPhaseChangeMaterialType",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE}/{name} must reference Material or Material:NoMass"),
+                );
+                continue;
+            }
+            if model
+                .material_phase_changes
+                .iter()
+                .any(|attachment| attachment.reference_material == reference_material)
+            {
+                self.error(
+                    "DuplicatePhaseChangeMaterial",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} repeats a material that already has temperature-enthalpy properties"
+                    ),
+                );
+                continue;
+            }
+
+            let id_value = model.material_phase_changes.len();
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, id_value) else {
+                continue;
+            };
+            model.material_phase_changes.push(MaterialPhaseChange {
+                id: MaterialPhaseChangeId(id_value),
+                name: NormalizedName::new(&name),
+                reference_material,
+                temperature_coefficient_for_thermal_conductivity_w_per_m_k2,
+                temperature_enthalpy_points,
+            });
+        }
+    }
+
+    fn material_phase_change_temperature_enthalpy_points(
+        &mut self,
+        object_name: &str,
+        object: &RawObject,
+    ) -> Option<Vec<PhaseChangeTemperatureEnthalpyPoint>> {
+        const OBJECT_TYPE: &str = "MaterialProperty:PhaseChange";
+        const VALUES_FIELD: &str = "values";
+
+        let entries = match field_value(object, VALUES_FIELD) {
+            Some(RawValue::Array(entries)) => entries.as_slice(),
+            Some(_value) => {
+                self.invalid_field_type(OBJECT_TYPE, object_name, VALUES_FIELD, "array");
+                return None;
+            }
+            None => &[],
+        };
+        let mut points = Vec::with_capacity(entries.len());
+        let mut valid = true;
+        for (entry_index, entry) in entries.iter().enumerate() {
+            let RawValue::Object(fields) = entry else {
+                self.invalid_field_type(OBJECT_TYPE, object_name, VALUES_FIELD, "array of objects");
+                valid = false;
+                continue;
+            };
+            let temperature_field = format!("{VALUES_FIELD}[{entry_index}].temperature");
+            let enthalpy_field = format!("{VALUES_FIELD}[{entry_index}].enthalpy");
+            let temperature_c = match fields.get(&FieldName("temperature".to_string())) {
+                Some(value) => {
+                    self.number_value(OBJECT_TYPE, object_name, &temperature_field, value)
+                }
+                None => {
+                    self.error(
+                        "MissingRequiredField",
+                        OBJECT_TYPE,
+                        Some(object_name),
+                        Some(&temperature_field),
+                        format!("{OBJECT_TYPE}/{object_name} requires field {temperature_field}"),
+                    );
+                    None
+                }
+            };
+            let enthalpy_j_per_kg = match fields.get(&FieldName("enthalpy".to_string())) {
+                Some(value) => self.number_value(OBJECT_TYPE, object_name, &enthalpy_field, value),
+                None => {
+                    self.error(
+                        "MissingRequiredField",
+                        OBJECT_TYPE,
+                        Some(object_name),
+                        Some(&enthalpy_field),
+                        format!("{OBJECT_TYPE}/{object_name} requires field {enthalpy_field}"),
+                    );
+                    None
+                }
+            };
+            let (Some(temperature_c), Some(enthalpy_j_per_kg)) = (temperature_c, enthalpy_j_per_kg)
+            else {
+                valid = false;
+                continue;
+            };
+            points.push(PhaseChangeTemperatureEnthalpyPoint {
+                temperature_c,
+                enthalpy_j_per_kg,
+            });
+        }
+        if !valid {
+            return None;
+        }
+
+        for (point_index, pair) in points.windows(2).enumerate() {
+            if pair[1].temperature_c <= pair[0].temperature_c {
+                let field = format!("{VALUES_FIELD}[{}].temperature", point_index + 1);
+                self.error(
+                    "NonIncreasingPhaseChangeTemperature",
+                    OBJECT_TYPE,
+                    Some(object_name),
+                    Some(&field),
+                    format!(
+                        "{OBJECT_TYPE}/{object_name} field {field} must be greater than the preceding temperature"
+                    ),
+                );
+                valid = false;
+            }
+            if pair[1].enthalpy_j_per_kg < pair[0].enthalpy_j_per_kg {
+                let field = format!("{VALUES_FIELD}[{}].enthalpy", point_index + 1);
+                self.error(
+                    "DecreasingPhaseChangeEnthalpy",
+                    OBJECT_TYPE,
+                    Some(object_name),
+                    Some(&field),
+                    format!(
+                        "{OBJECT_TYPE}/{object_name} field {field} must be greater than or equal to the preceding enthalpy"
+                    ),
+                );
+                valid = false;
+            }
+        }
+
+        valid.then_some(points)
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -14716,6 +14919,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 mod tests {
     mod global_geometry_rules;
     mod material_property_glazing_spectral_data;
+    mod material_property_phase_change;
     mod material_property_phase_change_hysteresis;
     mod material_property_variable_absorptance;
     mod material_roof_vegetation;

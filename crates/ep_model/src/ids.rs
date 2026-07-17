@@ -15,6 +15,7 @@ typed_id!(MaterialId);
 typed_id!(GlazingSpectralDataId);
 typed_id!(MaterialVariableAbsorptanceId);
 typed_id!(MaterialPhaseChangeHysteresisId);
+typed_id!(MaterialPhaseChangeId);
 typed_id!(InternalGainId);
 typed_id!(ScheduleTypeLimitId);
 typed_id!(DayScheduleId);

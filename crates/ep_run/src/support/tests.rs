@@ -4,6 +4,7 @@ use ep_compiler::compile_raw_model;
 use ep_raw_model::parse_epjson_str;
 
 mod glazing_spectral_data;
+mod material_phase_change;
 mod material_phase_change_hysteresis;
 mod material_roof_vegetation;
 mod material_variable_absorptance;

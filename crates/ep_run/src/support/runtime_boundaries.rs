@@ -471,6 +471,13 @@ pub(super) fn assess_typed_runtime_boundaries(
         "MaterialProperty:PhaseChangeHysteresis",
         typed_model.material_phase_change_hystereses.len(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "MaterialProperty:PhaseChange",
+        typed_model.material_phase_changes.len(),
+    );
 
     push_typed_unsupported_object(
         registry,
