@@ -71,7 +71,7 @@ fn typed_equivalent_layer_window_blinds_including_unused_remain_run_blocked()
         entry.object_type == "WindowMaterial:Blind:EquivalentLayer"
             && entry.count == 2
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"

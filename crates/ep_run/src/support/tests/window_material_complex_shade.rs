@@ -57,7 +57,7 @@ fn typed_window_complex_shades_including_all_unused_definitions_remain_run_block
             && entry.count == 6
             && entry.status == "unsupported"
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"

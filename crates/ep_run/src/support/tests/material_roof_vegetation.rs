@@ -59,7 +59,7 @@ fn typed_roof_vegetation_materials_including_unused_remain_run_blocked()
         entry.object_type == "Material:RoofVegetation"
             && entry.count == 2
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"

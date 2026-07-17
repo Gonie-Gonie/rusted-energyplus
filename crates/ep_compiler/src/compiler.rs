@@ -13,15 +13,16 @@ use ep_model::{
     GlazingSpectralDataId, GlazingSpectralPoint, GlobalGeometryRules, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
     IdealLoadsLimit, InfraredTransparentMaterial, InsideSurfaceConvectionAlgorithm, InternalGainId,
-    LoadDistributionScheme, LoopId, Material, MaterialDefinition, MaterialId, MaterialPhaseChange,
-    MaterialPhaseChangeHysteresis, MaterialPhaseChangeHysteresisId, MaterialPhaseChangeId,
-    MaterialSurfaceRoughness, MaterialVariableAbsorptance, MaterialVariableAbsorptanceId,
-    MaterialVariableThermalConductivity, MaterialVariableThermalConductivityId,
-    MaterialVariableThermalConductivityPoint, NameMap, NoMassMaterial, Node, NodeId, NodeList,
-    NodeListId, NormalizedName, NumericType, OpaqueSurfaceProperties, OtherEquipment,
-    OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutsideBoundaryCondition,
-    OutsideSurfaceConvectionAlgorithm, People, PeopleNumberCalculationMethod,
-    PhaseChangeHysteresisCurve, PhaseChangeHysteresisThermalState,
+    LoadDistributionScheme, LoopId, Material, MaterialDefinition, MaterialId,
+    MaterialMoisturePenetrationDepthSettings, MaterialMoisturePenetrationDepthSettingsId,
+    MaterialPhaseChange, MaterialPhaseChangeHysteresis, MaterialPhaseChangeHysteresisId,
+    MaterialPhaseChangeId, MaterialSurfaceRoughness, MaterialVariableAbsorptance,
+    MaterialVariableAbsorptanceId, MaterialVariableThermalConductivity,
+    MaterialVariableThermalConductivityId, MaterialVariableThermalConductivityPoint, NameMap,
+    NoMassMaterial, Node, NodeId, NodeList, NodeListId, NormalizedName, NumericType,
+    OpaqueSurfaceProperties, OtherEquipment, OtherEquipmentDesignLevelCalculationMethod,
+    OutdoorAirEconomizerType, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
+    PeopleNumberCalculationMethod, PhaseChangeHysteresisCurve, PhaseChangeHysteresisThermalState,
     PhaseChangeTemperatureEnthalpyPoint, PlantBranch, PlantBranchComponent, PlantBranchList,
     PlantConnector, PlantConnectorKind, PlantConnectorList, PlantConnectorListEntry, PlantLoop,
     Point3, PumpConstantSpeed, RegularMaterial, RoofVegetationMaterial,
@@ -476,6 +477,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "MaterialProperty:PhaseChangeHysteresis",
     "MaterialProperty:PhaseChange",
     "MaterialProperty:VariableThermalConductivity",
+    "MaterialProperty:MoisturePenetrationDepth:Settings",
     "Construction",
     "ScheduleTypeLimits",
     "Schedule:Constant",
@@ -590,6 +592,7 @@ impl<'a> Compiler<'a> {
         self.parse_material_phase_change_hystereses(&mut model);
         self.parse_material_phase_changes(&mut model);
         self.parse_material_variable_thermal_conductivities(&mut model);
+        self.parse_material_moisture_penetration_depth_settings(&mut model);
         self.validate_scalar_schedule_type_limits(&model);
         self.parse_zones(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
@@ -2358,6 +2361,181 @@ impl<'a> Compiler<'a> {
         }
 
         valid.then_some(points)
+    }
+
+    fn parse_material_moisture_penetration_depth_settings(&mut self, model: &mut TypedModel) {
+        const OBJECT_TYPE: &str = "MaterialProperty:MoisturePenetrationDepth:Settings";
+
+        for (name, object) in self.objects(OBJECT_TYPE) {
+            if name.trim().is_empty() {
+                self.error(
+                    "MissingRequiredField",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE} requires a non-blank material name"),
+                );
+                continue;
+            }
+
+            let diagnostics_before_fields = self.diagnostics.len();
+            let water_vapor_diffusion_resistance_factor = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "water_vapor_diffusion_resistance_factor",
+                0.0,
+                true,
+            );
+            let moisture_equation_coefficient_a = self.required_number(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "moisture_equation_coefficient_a",
+            );
+            let moisture_equation_coefficient_b = self.required_number(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "moisture_equation_coefficient_b",
+            );
+            let moisture_equation_coefficient_c = self.required_number(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "moisture_equation_coefficient_c",
+            );
+            let moisture_equation_coefficient_d = self.required_number(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "moisture_equation_coefficient_d",
+            );
+            let surface_layer_penetration_depth_m = self.auto_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "surface_layer_penetration_depth",
+                (0.0, false),
+                (f64::INFINITY, false),
+            );
+            let deep_layer_penetration_depth_m = self.auto_bounded_default(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "deep_layer_penetration_depth",
+                (0.0, true),
+                (f64::INFINITY, false),
+            );
+            let coating_layer_thickness_m = self.required_number_minimum(
+                OBJECT_TYPE,
+                &name,
+                &object,
+                "coating_layer_thickness",
+                0.0,
+                true,
+            );
+            let coating_layer_water_vapor_diffusion_resistance_factor = self
+                .required_number_minimum(
+                    OBJECT_TYPE,
+                    &name,
+                    &object,
+                    "coating_layer_water_vapor_diffusion_resistance_factor",
+                    0.0,
+                    true,
+                );
+            if self.diagnostics.len() != diagnostics_before_fields {
+                continue;
+            }
+            let (
+                Some(water_vapor_diffusion_resistance_factor),
+                Some(moisture_equation_coefficient_a),
+                Some(moisture_equation_coefficient_b),
+                Some(moisture_equation_coefficient_c),
+                Some(moisture_equation_coefficient_d),
+                Some(coating_layer_thickness_m),
+                Some(coating_layer_water_vapor_diffusion_resistance_factor),
+            ) = (
+                water_vapor_diffusion_resistance_factor,
+                moisture_equation_coefficient_a,
+                moisture_equation_coefficient_b,
+                moisture_equation_coefficient_c,
+                moisture_equation_coefficient_d,
+                coating_layer_thickness_m,
+                coating_layer_water_vapor_diffusion_resistance_factor,
+            )
+            else {
+                continue;
+            };
+
+            let Some(reference_material) = self.resolve_name(
+                &model.material_names,
+                OBJECT_TYPE,
+                &name,
+                "name",
+                &name,
+                "Material",
+            ) else {
+                continue;
+            };
+            let Some(material) = model.materials.get(reference_material.0 as usize) else {
+                self.error(
+                    "InvalidReference",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE}/{name} resolved material outside the material arena"),
+                );
+                continue;
+            };
+            if !matches!(material.definition, MaterialDefinition::Regular(_)) {
+                self.error(
+                    "InvalidMoisturePenetrationDepthMaterialType",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!("{OBJECT_TYPE}/{name} must reference Material"),
+                );
+                continue;
+            }
+            if model
+                .material_moisture_penetration_depth_settings
+                .iter()
+                .any(|settings| settings.reference_material == reference_material)
+            {
+                self.error(
+                    "DuplicateMoisturePenetrationDepthMaterial",
+                    OBJECT_TYPE,
+                    Some(&name),
+                    Some("name"),
+                    format!(
+                        "{OBJECT_TYPE}/{name} repeats a material that already has EMPD settings"
+                    ),
+                );
+                continue;
+            }
+
+            let id_value = model.material_moisture_penetration_depth_settings.len();
+            let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, id_value) else {
+                continue;
+            };
+            model.material_moisture_penetration_depth_settings.push(
+                MaterialMoisturePenetrationDepthSettings {
+                    id: MaterialMoisturePenetrationDepthSettingsId(id_value),
+                    name: NormalizedName::new(&name),
+                    reference_material,
+                    water_vapor_diffusion_resistance_factor,
+                    moisture_equation_coefficient_a,
+                    moisture_equation_coefficient_b,
+                    moisture_equation_coefficient_c,
+                    moisture_equation_coefficient_d,
+                    surface_layer_penetration_depth_m,
+                    deep_layer_penetration_depth_m,
+                    coating_layer_thickness_m,
+                    coating_layer_water_vapor_diffusion_resistance_factor,
+                },
+            );
+        }
     }
 
     fn parse_regular_materials(&mut self, model: &mut TypedModel) {
@@ -15101,6 +15279,7 @@ fn parse_wind_exposure(value: &str) -> Option<WindExposure> {
 mod tests {
     mod global_geometry_rules;
     mod material_property_glazing_spectral_data;
+    mod material_property_moisture_penetration_depth_settings;
     mod material_property_phase_change;
     mod material_property_phase_change_hysteresis;
     mod material_property_variable_absorptance;

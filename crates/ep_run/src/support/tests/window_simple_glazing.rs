@@ -60,7 +60,7 @@ fn typed_simple_glazing_materials_including_unused_remain_run_blocked()
             && entry.count == 2
             && entry.status == "unsupported"
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"

@@ -4,6 +4,7 @@ use ep_compiler::compile_raw_model;
 use ep_raw_model::parse_epjson_str;
 
 mod glazing_spectral_data;
+mod material_moisture_penetration_depth_settings;
 mod material_phase_change;
 mod material_phase_change_hysteresis;
 mod material_roof_vegetation;
@@ -115,7 +116,7 @@ fn typed_refraction_extinction_glazing_remains_run_blocked()
         entry.object_type == "WindowMaterial:Glazing:RefractionExtinctionMethod"
             && entry.count == 1
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"
@@ -159,7 +160,7 @@ fn typed_equivalent_layer_glazing_remains_run_blocked() -> Result<(), Box<dyn st
         entry.object_type == "WindowMaterial:Glazing:EquivalentLayer"
             && entry.count == 1
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"
@@ -201,7 +202,7 @@ fn typed_window_gas_remains_run_blocked() -> Result<(), Box<dyn std::error::Erro
         entry.object_type == "WindowMaterial:Gas"
             && entry.count == 1
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"
@@ -245,7 +246,7 @@ fn typed_window_gap_equivalent_layer_remains_run_blocked() -> Result<(), Box<dyn
         entry.object_type == "WindowMaterial:Gap:EquivalentLayer"
             && entry.count == 1
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"
@@ -291,7 +292,7 @@ fn typed_window_gas_mixture_remains_run_blocked() -> Result<(), Box<dyn std::err
         entry.object_type == "WindowMaterial:GasMixture"
             && entry.count == 1
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"
@@ -350,7 +351,7 @@ fn typed_window_shades_including_unused_remain_run_blocked()
         entry.object_type == "WindowMaterial:Shade"
             && entry.count == 2
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"
@@ -408,7 +409,7 @@ fn typed_equivalent_layer_window_shades_including_unused_remain_run_blocked()
         entry.object_type == "WindowMaterial:Shade:EquivalentLayer"
             && entry.count == 2
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"
@@ -468,7 +469,7 @@ fn typed_equivalent_layer_window_drapes_including_unused_remain_run_blocked()
         entry.object_type == "WindowMaterial:Drape:EquivalentLayer"
             && entry.count == 2
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"
@@ -540,7 +541,7 @@ fn typed_window_screens_including_unused_remain_run_blocked()
         entry.object_type == "WindowMaterial:Screen"
             && entry.count == 2
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"
@@ -598,7 +599,7 @@ fn typed_equivalent_layer_window_screens_including_unused_remain_run_blocked()
         entry.object_type == "WindowMaterial:Screen:EquivalentLayer"
             && entry.count == 2
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"
@@ -676,7 +677,7 @@ fn typed_window_blinds_including_unused_remain_run_blocked()
         entry.object_type == "WindowMaterial:Blind"
             && entry.count == 2
             && entry.note
-                == "Fenestration, daylighting, shading, and advanced surface boundary objects are not ported."
+                == "Fenestration, daylighting, shading, and advanced material or surface runtime semantics are not ported."
     }));
     assert!(assessment.diagnostics.diagnostics.iter().any(|diagnostic| {
         diagnostic.code == "UnsupportedSurfaceBoundary"

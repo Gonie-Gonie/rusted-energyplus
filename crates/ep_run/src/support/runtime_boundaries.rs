@@ -485,6 +485,15 @@ pub(super) fn assess_typed_runtime_boundaries(
         "MaterialProperty:VariableThermalConductivity",
         typed_model.material_variable_thermal_conductivities.len(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "MaterialProperty:MoisturePenetrationDepth:Settings",
+        typed_model
+            .material_moisture_penetration_depth_settings
+            .len(),
+    );
 
     push_typed_unsupported_object(
         registry,

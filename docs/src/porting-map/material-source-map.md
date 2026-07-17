@@ -60,10 +60,10 @@ different:
 | typed Rust material variants | 22 | Five complete opaque-family slices, the `WindowMaterial:Glazing` `SpectralAverage` branch, and the complete `RefractionExtinctionMethod`, glazing `EquivalentLayer`, `WindowMaterial:Gas`, gap `EquivalentLayer`, `WindowMaterial:GasMixture`, ordinary `WindowMaterial:Shade`, shade `EquivalentLayer`, drape `EquivalentLayer`, ordinary `WindowMaterial:Screen`, screen `EquivalentLayer`, ordinary `WindowMaterial:Blind`, blind `EquivalentLayer`, thermochromic glazing-group, simple-glazing-system, complex-fenestration gap, and complex-fenestration shade objects have distinct payloads. |
 | complete bounded base-definition slices | 21 / 22 | `Material`, `Material:NoMass`, `Material:AirGap`, `Material:InfraredTransparent`, `WindowMaterial:Glazing:RefractionExtinctionMethod`, `WindowMaterial:Glazing:EquivalentLayer`, `WindowMaterial:Gas`, `WindowMaterial:Gap:EquivalentLayer`, `WindowMaterial:GasMixture`, `WindowMaterial:Shade`, `WindowMaterial:Shade:EquivalentLayer`, `WindowMaterial:Drape:EquivalentLayer`, `WindowMaterial:Screen`, `WindowMaterial:Screen:EquivalentLayer`, `WindowMaterial:Blind`, `WindowMaterial:Blind:EquivalentLayer`, `Material:RoofVegetation`, `WindowMaterial:GlazingGroup:Thermochromic`, `WindowMaterial:SimpleGlazingSystem`, `WindowMaterial:Gap`, and `WindowMaterial:ComplexShade` have their source-effective fields and bounded compiler contracts typed. |
 | standalone typed datasets | 1 / 12 | `MaterialProperty:GlazingSpectralData` is typed in a separate deterministic standalone arena and name map; it is not a `MaterialDefinition` variant. |
-| typed material overlays | 4 / 12 | `MaterialProperty:VariableAbsorptance` is typed in a separate overlay arena after its eligible base-material and schedule dependencies are available. `MaterialProperty:PhaseChangeHysteresis`, `MaterialProperty:PhaseChange`, and `MaterialProperty:VariableThermalConductivity` are typed in separate attachment arenas keyed directly by their existing material targets. None is a `MaterialDefinition` variant. |
-| complete bounded public-object slices | 26 / 34 | The 21 complete base-definition slices, standalone glazing spectral dataset, variable-absorptance overlay, phase-change-hysteresis attachment, phase-change temperature-enthalpy attachment, and variable-thermal-conductivity attachment are complete within their declared bounded compiler contracts. |
+| typed material overlays | 5 / 12 | `MaterialProperty:VariableAbsorptance` is typed in a separate overlay arena after its eligible base-material and schedule dependencies are available. `MaterialProperty:PhaseChangeHysteresis`, `MaterialProperty:PhaseChange`, `MaterialProperty:VariableThermalConductivity`, and `MaterialProperty:MoisturePenetrationDepth:Settings` are typed in separate attachment arenas keyed directly by their existing material targets. None is a `MaterialDefinition` variant. |
+| complete bounded public-object slices | 27 / 34 | The 21 complete base-definition slices, standalone glazing spectral dataset, variable-absorptance overlay, phase-change-hysteresis attachment, phase-change temperature-enthalpy attachment, variable-thermal-conductivity attachment, and EMPD settings attachment are complete within their declared bounded compiler contracts. |
 | partial bounded public-object slices | 1 / 34 | Only `WindowMaterial:Glazing` with `Optical Data Type = SpectralAverage` is typed; `Spectral`, `SpectralAndAngle`, and `BSDF` remain explicitly unsupported. |
-| wholly deferred public objects | 7 / 34 | The remaining 7 overlays/datasets are wholly deferred; no base definition is wholly deferred. |
+| wholly deferred public objects | 6 / 34 | The remaining 6 HAMT overlays/datasets are wholly deferred; no base definition is wholly deferred. |
 
 The inventory scaffold began at CP58; the counts and typed states above are
 cumulative through the current checkpoint. Complete inventory does not mean
@@ -99,6 +99,15 @@ and then VariableThermalConductivity. Rust publishes both immutable attachments 
 the common-startup hysteresis attachment in that same relative order but
 validates them eagerly for every compiled model; the no-CondFD source branch
 and this deliberate fail-closed difference are part of the contract below.
+
+`MaterialProperty:MoisturePenetrationDepth:Settings` is also outside common
+startup. EnergyPlus performs its semantic read only when an actual EMPD surface
+first enters `CalcMoistureBalanceEMPD` and BeginEnvironment initialization calls
+`GetMoistureBalanceEMPDInput`; selecting the global EMPD algorithm with no zones
+or surfaces is not enough. Rust publishes the immutable EMPD attachment after
+the two CondFD attachments as a deterministic compiler order, but this does not
+claim a cross-manager EnergyPlus source order. Rust eagerly validates every
+definition even when EnergyPlus would never invoke the semantic reader.
 
 ## Standalone Glazing Spectral Dataset Typed Contract
 
@@ -330,7 +339,7 @@ inactive_branches:
 
 unsupported_active_branches:
 - every valid attachment is typed but run-blocking, including one attached only to an unused material
-- internally generated F/C-factor material targets remain outside the executable boundary; typed PhaseChange and VariableThermalConductivity attachments may coexist on the same public target, while every combination remains run-blocking and EMPD/HAMT input coexistence remains deferred
+- internally generated F/C-factor material targets remain outside the executable boundary; typed PhaseChange, VariableThermalConductivity, and EMPD settings attachments may coexist on the same public target while every combination remains run-blocking, and HAMT input remains deferred
 
 not_claimed_branches:
 - exact source diagnostic severity/text/order/multiplicity, material-pointer replacement and EMS-address behavior, mutable hysteresis state-machine and known source defects, CondFD or PCM-storage numerical behavior, generic CondFD EIO/output variables, runtime numerical behavior, and conformance
@@ -477,6 +486,98 @@ not_claimed_branches:
 - the PhaseChange textual IDD three-through-one-hundred description, the VTC IDD's inconsistent first-three-required/one-hundred-pair text and declared 101st pair, native-epJSON PhaseChange zero-pair presence-count behavior, EnergyPlus IDF acceptance of nonfinite VTC scalars, exact diagnostic severity/text/order/multiplicity, source duplicate overwrite order, `MaterialFD` sentinel/interpolation/activation and specific-heat/conductivity behavior including the known boundary-conductivity defect, PhaseChange/VTC/Hysteresis/EMS precedence, EMPD/HAMT coexistence and Hysteresis subclass-lifetime hazards, generic EIO/output variables, runtime numerical behavior, and conformance
 <!-- routine-state-contract:v1 end get_cond_fd_input -->
 
+## Moisture Penetration Depth Settings Attachment Typed Contract
+
+`MaterialProperty:MoisturePenetrationDepth:Settings` is a complete bounded
+typed-input attachment, not a material variant. Its object key is the referenced
+material name itself; there is no independent attachment name or name map. Each
+valid record owns a typed ID, retains a normalized target snapshot, resolves a
+`MaterialId`, and is stored after the CondFD attachments in a separate
+deterministic `MaterialMoisturePenetrationDepthSettings` arena. This compiler
+order is not a claim that EnergyPlus imposes a global order among its CondFD,
+EMPD, and HAMT managers. The referenced `MaterialDefinition` stays unchanged.
+
+Seven fixed numeric inputs are required. Water-vapor diffusion resistance,
+coating thickness, and coating water-vapor diffusion resistance must be finite
+and greater than or equal to zero. Moisture-equation coefficients a, b, c, and d
+may be any finite values, with no sign, upper-bound, or cross-field rule. A
+missing, blank, or case-insensitive `Autocalculate` surface or deep penetration
+depth retains `AutoOrNumber::AutoCalculate`. An explicit surface depth must be
+finite and greater than zero; an explicit deep depth must be finite and greater
+than or equal to zero. Deep depth zero disables the deep layer. A nonzero deep
+depth no greater than the surface depth remains valid because EnergyPlus emits
+only a warning; Rust does not invent a rejecting relationship.
+
+The source reader immediately replaces a valid target with `MaterialEMPD` and
+materializes automatic surface and deep depths from one-day and three-week
+periods. That calculation uses fixed 24 C, 0.45 relative humidity, and 101325 Pa,
+psychrometric saturation pressure, base-material density, the resistance
+factor, and the slope of the a/b/c/d sorption curve. Rust preserves the input
+sentinel instead: the formula, its floating-point and nonfinite hazards, pointer
+replacement, and `hasEMPD` state are downstream runtime concerns and remain
+unsupported.
+
+Only public `Material` satisfies the source `Group::Regular && !ROnly` target
+gate. `Material:NoMass`, AirGap, InfraredTransparent, RoofVegetation, and every
+window family fail closed. Internal `~FC_Concrete` targets generated for F/C
+factor constructions remain outside the public bounded set. Missing or blank
+targets, wrong families, malformed/missing/nonfinite/out-of-range fields, and a
+second case-insensitive EMPD attachment for one material fail before attachment
+identity or target ownership is reserved. EnergyPlus performs the semantic
+target/default/placement read only when an actual EMPD surface first enters
+moisture calculation, and a repeated case-insensitive target is effectively
+replaced by the later record. Rust deliberately validates every definition
+eagerly and rejects repetition. Rust's finite-only rule also deliberately fails
+closed relative to EnergyPlus IDF execution, which can retain some NaN or
+infinite fixed scalars; depth fields remain finite in both boundaries.
+
+Every attachment, including one on an unused material, blocks arbitrary runtime
+execution. Rust does not perform positive-resistance per-zone eligibility,
+nonpositive-resistance calculation bypass, inside/outside/middle construction
+layer or every-zone placement validation, EMPD initialization and timestep
+history, moisture and latent heat coupling, the nine EMPD output variables, or
+the construction-scoped `Construction EMPD` EIO report. The report exists in
+EnergyPlus after the lazy reader has materialized numeric depths, but this
+checkpoint adds no manifest, comparator, proof variable, runtime numerical
+claim, or conformance claim.
+
+### `GetMoistureBalanceEMPDInput` state contract
+
+<!-- routine-state-contract:v1 begin get_moisture_balance_empd_input -->
+GetMoistureBalanceEMPDInput
+
+read_state:
+- deterministic compiler-ordered `MaterialProperty:MoisturePenetrationDepth:Settings` definitions whose object keys are existing material references with no independent attachment namespace
+- seven required finite numeric fields: water-vapor diffusion resistance factor, four moisture-equation coefficients, coating-layer thickness, and coating-layer water-vapor diffusion resistance factor; the resistance factor, coating thickness, and coating resistance factor are nonnegative while the four coefficients have no scalar or cross-field bounds
+- surface-layer depth as missing, blank, case-insensitive Autocalculate, or an explicit finite value greater than zero; deep-layer depth uses the same automatic states or an explicit finite value greater than or equal to zero
+- the existing public base-material registry, where only `Material` satisfies the source Regular-and-not-ROnly target gate; Rust does not synthesize internal `~FC_Concrete` targets
+
+write_state:
+- a separate deterministic `MaterialMoisturePenetrationDepthSettings` attachment arena whose records own a typed ID, normalized target snapshot, resolved `MaterialId`, all seven fixed numeric inputs, and both penetration depths as `AutoOrNumber`; the object key is not published as a separate name map
+- the referenced base `MaterialDefinition` remains unchanged and no mutable `MaterialEMPD` subclass or `hasEMPD` state is invented
+- compile failure before attachment ID or target reservation for a blank or missing target, any non-`Material` public target, any missing/malformed/nonfinite/out-of-range field, or a second case-insensitive attachment for one material
+
+history_state_ownership:
+- no mutable EMPD surface/deep-layer vapor density, moisture content, flux, latent heat, report, or timestep history in this checkpoint; the compiled model owns immutable settings descriptors while every downstream consumer remains unsupported
+
+unsupported_state:
+- the one-day and three-week penetration-depth autocalculation using fixed 24 C, 0.45 RH, 101325 Pa, Psychrometrics saturation pressure, base-material density, diffusion resistance, and sorption-curve slope
+- source material-pointer replacement and `hasEMPD`; active EMPD surface discovery, inside/outside/middle construction-layer and every-zone placement validation, positive-resistance per-zone eligibility and nonpositive-resistance calculation bypass, initialization, timestep calculation/update, latent coupling, nine EMPD output variables, Construction EMPD EIO reporting, runtime numerics, and conformance
+
+inactive_branches:
+- EnergyPlus performs semantic target resolution, default materialization, pointer replacement, and placement checks only when an actual EMPD surface first enters moisture calculation; a CTF model and a global EMPD selection with no zones or surfaces do not invoke this reader, while Rust deliberately performs its bounded semantic validation for every definition eagerly and fails closed
+- missing, blank, and explicit Autocalculate depths remain typed sentinels rather than prematurely materializing source-derived numbers
+- an explicit deep depth of zero disables the deep layer; a nonzero deep depth no greater than the surface depth remains accepted because the source emits only a warning, whose exact parity is deferred
+
+unsupported_active_branches:
+- every valid settings attachment is typed but run-blocking, including one attached only to an unused material
+- a schema-valid zero water-vapor diffusion resistance factor is retained as typed input but never reaches source per-zone eligibility or calculation-bypass behavior
+- internally generated F/C-factor concrete targets and source effective later-replacement behavior for repeated case-insensitive targets remain outside the executable boundary
+
+not_claimed_branches:
+- exact EnergyPlus diagnostic severity/text/order/multiplicity, lazy algorithm/use gating, source duplicate replacement order, EnergyPlus IDF acceptance of some nonfinite fixed scalars, automatic-depth floating-point results and nonfinite hazards, material-subclass and cross-attachment pointer lifetime behavior, zone and construction placement validation, moisture/latent runtime behavior, nine output variables, Construction EMPD EIO serialization, runtime numerical behavior, and conformance
+<!-- routine-state-contract:v1 end get_moisture_balance_empd_input -->
+
 ## Base Definition Source Order
 
 The following table is the public-object processing order inside
@@ -534,7 +635,7 @@ algorithm. The exact order guaranteed by each source owner is:
 | common HB 3 | 25 | `MaterialProperty:PhaseChangeHysteresis` | Regular-group material attachment read by `GetHysteresisData` | complete bounded typed attachment for public Material/NoMass targets; all definitions runtime-blocked |
 | CondFD 1 | 24 | `MaterialProperty:PhaseChange` | temperature/enthalpy attachment read first by `GetCondFDInput` after its CondFD settings pass | complete bounded typed attachment for public Material/NoMass targets; all definitions runtime-blocked |
 | CondFD 2 | 26 | `MaterialProperty:VariableThermalConductivity` | temperature/conductivity attachment read second by `GetCondFDInput` | complete bounded typed attachment for public Material/NoMass targets; all definitions runtime-blocked |
-| EMPD 1 | 23 | `MaterialProperty:MoisturePenetrationDepth:Settings` | regular-material moisture overlay read by `GetMoistureBalanceEMPDInput` | deferred |
+| EMPD 1 | 23 | `MaterialProperty:MoisturePenetrationDepth:Settings` | regular-material moisture overlay read by `GetMoistureBalanceEMPDInput` | complete bounded typed attachment for public Material targets; all definitions runtime-blocked |
 | HAMT 1 | 28 | `MaterialProperty:HeatAndMoistureTransfer:Settings` | HAMT base settings | deferred |
 | HAMT 2 | 29 | `MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm` | HAMT sorption dataset | deferred |
 | HAMT 3 | 30 | `MaterialProperty:HeatAndMoistureTransfer:Suction` | HAMT suction dataset | deferred |
@@ -561,6 +662,9 @@ the base payload unchanged while its runtime upgrade remains blocked. The
 PhaseChange and VariableThermalConductivity CondFD attachments likewise live in
 separate source-relative arenas keyed directly by Regular/NoMass references;
 their immutable base payloads and all runtime consumers remain blocked.
+The EMPD settings attachment is another separate arena keyed directly by a
+public `Material` reference; it retains automatic depth sentinels, leaves the
+base payload unchanged, and blocks every runtime consumer.
 
 ### `Material` / regular
 
@@ -2294,14 +2398,33 @@ repeated-target overwrite, internal F/C-factor targets, `MaterialFD`, sentinel
 or `TempCond` state, one/two-point execution, interpolation, activation,
 property precedence, EIO/output reporting, runtime numerics, or conformance.
 
+`MaterialProperty:MoisturePenetrationDepth:Settings` model and compiler tests
+lock the exact public `Material`-only target gate; seven required finite fixed
+fields; nonnegative resistance/coating values; arbitrary finite a/b/c/d
+coefficients; missing, blank, and case-insensitive `Autocalculate` depth
+sentinels; strict-positive explicit surface depth; nonnegative explicit deep
+depth including zero; warning-only deep/surface ordering; normalized target
+snapshots; case-insensitive duplicate-target rejection; validation before ID or
+target reservation; coexistence with VariableAbsorptance,
+PhaseChangeHysteresis, PhaseChange, and VariableThermalConductivity; typed
+coverage; and object-count inclusion. The support-boundary test attaches EMPD
+settings to used and unused regular materials and requires one explicit
+all-definition `UnsupportedSurfaceBoundary` run block. No test claims source
+lazy semantic validation, accepted nonfinite IDF fixed scalars, repeated-target
+replacement, internal F/C-factor targets, automatic depth calculation,
+`MaterialEMPD` replacement, construction/zone placement, state/history,
+moisture or latent coupling, the nine output variables, Construction EMPD EIO,
+runtime numerics, or conformance.
+
 This checkpoint does not port the IRT paired-interzone surface-use semantics
 or non-interzone warnings, the CondFD prohibition and algorithm behavior, or
 dynamic AirGap/IRT heat transfer or EcoRoof execution. It also does not claim exact EnergyPlus
 diagnostic text, all input-processor default behavior beyond the standalone
 spectral-dataset, variable-absorptance, phase-change-hysteresis, and phase-change
-temperature-enthalpy and variable-thermal-conductivity contracts, internal F/C-factor
+temperature-enthalpy, variable-thermal-conductivity, and EMPD settings
+contracts, internal F/C-factor
 material injection, EMS mutation, broad material EIO formatting, or any of the
-remaining 7 deferred overlay/dataset families.
+remaining 6 deferred HAMT overlay/dataset families.
 
 ## Routine Inventory
 
@@ -2319,7 +2442,7 @@ remaining 7 deferred overlay/dataset families.
 | `UpdateVariableAbsorptances` | `source_mapped` | owns schedule/function trigger evaluation, exterior thermal/solar mutation, clamping, and the EnergyPlus 26.1 scheduled-solar pointer defect; all runtime behavior remains unsupported |
 | `GetHysteresisData` | `state_mapped` | owns the complete bounded post-base hysteresis attachment read: public Material/NoMass target gate, thirteen required strict-positive inputs, grouped typed state and source-derived specific heats, duplicate-target fail-close boundary, and universal runtime block |
 | `GetCondFDInput` | `state_mapped` | owns the complete bounded PhaseChange and VariableThermalConductivity typed-input passes: public Material/NoMass target gate, PhaseChange's defaulted finite coefficient, both unbounded complete ordered point vectors, family-local duplicate-target fail-close boundaries, deliberate eager validation, and universal runtime blocks; its CondFD settings and all numerical state remain unsupported |
-| `GetMoistureBalanceEMPDInput` | `source_mapped` | owns the EMPD settings overlay |
+| `GetMoistureBalanceEMPDInput` | `state_mapped` | owns the complete bounded EMPD settings pass: public Material-only target gate, seven required fixed fields, two defaulted automatic-depth states and explicit bounds, warning-only depth ordering, duplicate-target fail-close boundary, deliberate eager semantic validation, and universal runtime block; automatic depth materialization, placement, state, reporting, and numerics remain unsupported |
 | `GetHeatBalHAMTInput` | `source_mapped` | owns the six ordered HAMT objects |
 
 All fourteen routine records have `required_for_full_domain = false`. The
@@ -2329,9 +2452,10 @@ bounded implementation slice does not promote the whole `GetMaterialData`,
 standalone `GetWindowGlassSpectralData` input boundary and the material-owned
 `SetupSimpleWindowGlazingSystem` calculation plus the declared
 `GetVariableAbsorptanceInput` overlay boundary, `GetHysteresisData` attachment
-boundary, and the declared `GetCondFDInput` PhaseChange and
-VariableThermalConductivity passes are `state_mapped` within their bounded input
-domains.
+boundary, the declared `GetCondFDInput` PhaseChange and
+VariableThermalConductivity passes, and the declared
+`GetMoistureBalanceEMPDInput` settings pass are `state_mapped` within their
+bounded input domains.
 
 ## Evidence And Promotion Boundary
 
@@ -2530,7 +2654,7 @@ CP58 remains incomplete until, at minimum:
 
 - the three deferred `WindowMaterial:Glazing` optical branches have
   schema-complete typed variants
-- the remaining 7 overlays/datasets have typed attachment and validation
+- the remaining 6 HAMT overlays/datasets have typed attachment and validation
   models
 - source-order attachment, duplicate/reference diagnostics, generated
   F/C-factor materials, reporting, EMS, and algorithm-specific consumers are
