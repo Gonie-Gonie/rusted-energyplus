@@ -627,6 +627,17 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|construction| construction.has_internal_heat_source())
             .count(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "Construction:WindowEquivalentLayer",
+        typed_model
+            .constructions
+            .iter()
+            .filter(|construction| construction.is_window_equivalent_layer())
+            .count(),
+    );
 
     push_typed_unsupported_object(
         registry,

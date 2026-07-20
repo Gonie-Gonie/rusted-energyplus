@@ -1081,17 +1081,17 @@ The following table is the public-object processing order inside
 | 4 | `Material:InfraredTransparent` | infrared-transparent material | bounded typed `InfraredTransparent` variant |
 | 5 | `WindowMaterial:Glazing` | detailed glazing definition | bounded typed `SpectralAverage` branch; `Spectral`, `SpectralAndAngle`, and `BSDF` deferred |
 | 6 | `WindowMaterial:Glazing:RefractionExtinctionMethod` | glazing using refraction/extinction input | complete bounded typed variant with source-parity normal-incidence derivation |
-| 7 | `WindowMaterial:Glazing:EquivalentLayer` | equivalent-layer glazing | complete bounded typed variant; dedicated consumer family, construction and runtime deferred |
+| 7 | `WindowMaterial:Glazing:EquivalentLayer` | equivalent-layer glazing | complete bounded typed variant; CP91 bounded construction declaration consumer, ASHWAT/runtime deferred |
 | 8 | `WindowMaterial:Gas` | single-gas window gap | complete bounded typed variant with resolved standard/custom gas properties |
-| 9 | `WindowMaterial:Gap:EquivalentLayer` | equivalent-layer gap | complete bounded typed variant with vent mode and resolved standard/custom gas properties |
+| 9 | `WindowMaterial:Gap:EquivalentLayer` | equivalent-layer gap | complete bounded typed variant with vent mode and resolved standard/custom gas properties; CP91 bounded construction declaration consumer |
 | 10 | `WindowMaterial:GasMixture` | multi-gas window gap | complete bounded typed variant with an ordered one-to-four standard-gas mixture |
 | 11 | `WindowMaterial:Shade` | window shade | complete bounded typed variant with source defaults, derived properties, and safe ordinary-window layering |
-| 12 | `WindowMaterial:Shade:EquivalentLayer` | equivalent-layer shade | complete bounded typed variant with source defaults, asymmetric visible storage, and a deferred equivalent-layer construction consumer |
-| 13 | `WindowMaterial:Drape:EquivalentLayer` | equivalent-layer drape | complete bounded typed variant with source defaults, asymmetric visible storage, source-effective pleats, and a deferred equivalent-layer construction consumer |
+| 12 | `WindowMaterial:Shade:EquivalentLayer` | equivalent-layer shade | complete bounded typed variant with source defaults, asymmetric visible storage, and a bounded CP91 construction declaration consumer |
+| 13 | `WindowMaterial:Drape:EquivalentLayer` | equivalent-layer drape | complete bounded typed variant with source defaults, asymmetric visible storage, source-effective pleats, and a bounded CP91 construction declaration consumer |
 | 14 | `WindowMaterial:Screen` | exterior window screen | complete bounded typed variant with source defaults, solid-fraction optical projections, and safe exterior-only ordinary-window layering |
-| 15 | `WindowMaterial:Screen:EquivalentLayer` | equivalent-layer screen | complete bounded typed variant with source sentinels, storage quirks, and a deferred equivalent-layer construction consumer |
+| 15 | `WindowMaterial:Screen:EquivalentLayer` | equivalent-layer screen | complete bounded typed variant with source sentinels, storage quirks, and a bounded CP91 construction declaration consumer |
 | 16 | `WindowMaterial:Blind` | slatted blind | complete bounded typed variant with source-effective defaults, slat-property constraints, and safe ordinary-window layering |
-| 17 | `WindowMaterial:Blind:EquivalentLayer` | equivalent-layer blind | complete bounded typed variant with source blank-group/index quirks, warning-only geometry recovery, and a deferred equivalent-layer construction consumer |
+| 17 | `WindowMaterial:Blind:EquivalentLayer` | equivalent-layer blind | complete bounded typed variant with source blank-group/index quirks, warning-only geometry recovery, and a bounded CP91 construction declaration consumer |
 | 18 | `Material:RoofVegetation` | eco-roof material and vegetation state | complete bounded typed input and dry-soil opaque projection; dynamic EcoRoof runtime blocked |
 | 19 | `WindowMaterial:GlazingGroup:Thermochromic` | thermochromic glazing-group parent | complete bounded typed ordered-state parent; construction generation and runtime selection deferred |
 | 20 | `WindowMaterial:SimpleGlazingSystem` | derived simple glazing system | complete bounded typed block model; dedicated family with sole-layer ordinary-Construction consumption; runtime blocked |
@@ -1335,9 +1335,10 @@ this compiler slice deliberately does not invent one.
 Equivalent-layer material has a dedicated `MaterialFamily::EquivalentLayer`
 consumer boundary. A regular `Construction` fails closed if any layer uses
 this family because upstream permits it only through
-`Construction:WindowEquivalentLayer`, which remains raw-only. The fully typed
-material is also explicitly run-blocked by the existing `Window*` unsupported
-surface boundary.
+`Construction:WindowEquivalentLayer`. CP91 types that bounded declaration
+consumer and its ordered graph edges; the fully typed construction and material
+definitions remain explicitly run-blocked by their unsupported-surface
+boundaries.
 
 This is static input typing, not an ASHWAT or window-runtime port. EnergyPlus
 stores but does not pass the visible inputs into its EQL optical model, emits
@@ -1393,9 +1394,10 @@ storage initializes to `Sealed`, the 26.1 schema requires the field and the
 source's alpha-blank guard checks the required gas field rather than the vent
 field, so valid input always parses the supplied vent token.
 
-The implementation deliberately stops before typing
-`Construction:WindowEquivalentLayer` or adding ASHWAT runtime execution. In
-particular, the 26.1 equivalent-layer transfer path copies specific-heat
+The material implementation deliberately stops before ASHWAT runtime
+execution. CP91 separately types only the bounded
+`Construction:WindowEquivalentLayer` declaration and graph. In particular, the
+26.1 equivalent-layer transfer path copies specific-heat
 coefficients into its viscosity slots, and its FRA evaluation repeats the
 linear coefficient for each quadratic term. `BuildGap` also emits a severe
 error and replaces the construction-local thickness with 0.0001 m when the
@@ -1452,8 +1454,9 @@ thermal behavior is not implemented or claimed here.
 
 The variant belongs to the ordinary fenestration family and participates in
 the same `Glass (Gas-or-GasMixture Glass){0..3}` construction alternation as
-`WindowMaterial:Gas`. It is outside the equivalent-layer family;
-`Construction:WindowEquivalentLayer` typing and validation remain deferred.
+`WindowMaterial:Gas`. It is outside the equivalent-layer family and therefore
+remains rejected by CP91's bounded `Construction:WindowEquivalentLayer`
+declaration consumer.
 The later typed `WindowMaterial:Gap` complex-fenestration reference path may
 also consume a copied gas-mixture state. CP89's bounded
 `Construction:ComplexFenestrationState` layer pack can retain that Gap
@@ -1588,11 +1591,12 @@ density, specific heat, and scalar absorptance fields remain zero or absent;
 no ordinary-shade solar/visible absorptance derivation is applied.
 
 The object belongs to `MaterialFamily::EquivalentLayer`. Ordinary
-`Construction` therefore rejects it, and the still-deferred
-`Construction:WindowEquivalentLayer` consumer is not typed or inferred from
-the source's weak layer validation. Arbitrary-run assessment counts every
-typed definition, including unused definitions, and blocks execution. First
-typed evidence is the named compiler/runtime test set.
+`Construction` therefore rejects it. CP91's separate bounded
+`Construction:WindowEquivalentLayer` consumer accepts this family, retains the
+authored contiguous layer pack without inventing later topology rules, and
+blocks every definition. Arbitrary-run assessment counts every typed material
+definition, including unused definitions, and blocks execution. First typed
+material evidence is the named compiler/runtime test set.
 
 `window_material_shade_equivalent_layer_001` adds a separate nonblocking
 diagnostic EnergyPlus 26.1 EIO gate. Its generic `Material Details` comparison
@@ -1672,9 +1676,11 @@ one-sided pleat.
 The object name participates in the same normalized material namespace and
 source-order duplicate detection as every preceding material family. The
 payload belongs to `MaterialFamily::EquivalentLayer`, ordinary
-`Construction` rejects it, and `Construction:WindowEquivalentLayer` remains
-deferred. Arbitrary-run assessment counts every typed drape definition,
-including unused definitions, and explicitly blocks execution.
+`Construction` rejects it, and CP91's bounded
+`Construction:WindowEquivalentLayer` declaration consumer accepts it without
+enabling ASHWAT or window runtime. Arbitrary-run assessment counts every typed
+drape definition, including unused definitions, and explicitly blocks
+execution.
 
 First typed evidence remains the named compiler/runtime test set.
 
@@ -1866,12 +1872,12 @@ into a symmetric closeness rule.
 The normalized name joins the shared material namespace immediately after
 ordinary `WindowMaterial:Screen`, and the payload belongs to
 `MaterialFamily::EquivalentLayer`. Ordinary `Construction` rejects it;
-`Construction:WindowEquivalentLayer` remains deferred. Arbitrary-run support
-assessment counts every typed definition, including definitions unused by any
-construction, and blocks execution. Equivalent-layer construction packing,
-`CheckAndFixCFSLayer`, `IS_OPENNESS`, ASHWAT optics and thermal behavior,
-ratings, surfaces, exact diagnostic recovery and text, runtime execution, and
-conformance remain unsupported.
+CP91's bounded `Construction:WindowEquivalentLayer` declaration consumer
+accepts it. Arbitrary-run support assessment counts every typed definition,
+including definitions unused by any construction, and blocks execution.
+Downstream topology repair, `CheckAndFixCFSLayer`, `IS_OPENNESS`, ASHWAT optics
+and thermal behavior, ratings, surfaces, exact diagnostic recovery and text,
+runtime execution, and conformance remain unsupported.
 
 `window_material_screen_equivalent_layer_001` adds a separate nonblocking
 diagnostic EnergyPlus 26.1 static EIO gate and bounded Rust parser/CLI
@@ -1902,8 +1908,8 @@ expected specialized-parser missing-header result to an empty occurrence set.
 Constructions-only emits specialized A,Z,Z rows with no generic table. All
 three EnergyPlus runs must complete with zero warnings and zero severe errors.
 Exact equivalent-layer construction and surface topology are fixture-integrity
-locks only. This case does not serialize EIO, type or execute
-`Construction:WindowEquivalentLayer`, reproduce
+locks only. This diagnostic case does not exercise the separate CP91 typed
+`Construction:WindowEquivalentLayer` path, serialize Rust EIO, execute it, or reproduce
 `CheckAndFixCFSLayer`/`IS_OPENNESS`/ASHWAT behavior, or claim ratings, EMS,
 surface, runtime, diagnostic-text, broad ordering, or conformance parity.
 
@@ -2023,8 +2029,8 @@ are fixture-integrity locks only. Rust EIO serialization,
 `CalcBlindProperties`, beam-beam and all other blind optics, ratings,
 daylighting, control/surface/EMS behavior, variable-angle and window thermal
 runtime, between-glass or missing-bare reporting, broad declaration or
-diagnostic ordering, `Construction:WindowEquivalentLayer`, and conformance
-remain unclaimed.
+diagnostic ordering, equivalent-layer ASHWAT/window consumption, and
+conformance remain unclaimed.
 
 ### `WindowMaterial:Blind:EquivalentLayer`
 
@@ -2084,8 +2090,9 @@ geometry, directional solar/visible TAR state, infrared/thermal projections,
 and slat-angle control. Its normalized name joins the shared material
 registry immediately after ordinary Blind, and its family is
 `MaterialFamily::EquivalentLayer`. Ordinary `Construction` rejects it with
-the common equivalent-layer boundary; only the still-deferred
-`Construction:WindowEquivalentLayer` is its intended construction consumer.
+the common equivalent-layer boundary; CP91's bounded
+`Construction:WindowEquivalentLayer` declaration path is its only typed
+construction consumer.
 Arbitrary-run assessment counts and blocks every definition, including
 definitions unused by a construction.
 
@@ -2113,8 +2120,8 @@ construction-index references. Primary, Materials-only, and
 Constructions-only independently lock report activation and complete with zero
 warnings and zero severe errors.
 
-This evidence does not type or pack `Construction:WindowEquivalentLayer` and
-does not promote `CheckAndFixCFSLayer`, ASHWAT coefficient
+This material-local evidence does not serve as CP91 construction-typing proof
+and does not promote `CheckAndFixCFSLayer`, ASHWAT coefficient
 generation/evaluation, slat-angle control execution, optics and thermal
 calculations, surfaces, ratings, daylighting, runtime, EIO serialization,
 broad diagnostic parity, or conformance.
@@ -2630,6 +2637,17 @@ construction and neither adds nor reorders any construction/material graph
 edge. Material consumers, resistance-layer source remapping, CTF/QTF state,
 source/sink runtime, reporting, and conformance remain blocked and are mapped
 in the heat-balance source map.
+
+CP91 also adds no material variant or public material-object inventory entry.
+Its bounded `Construction:WindowEquivalentLayer` pass is the first typed
+consumer shared by all six existing equivalent-layer material variants. It
+accepts a contiguous one-to-eleven-layer family-only pack, preserves staged-IDF
+family declaration order or native-epJSON lexical order, retains every ordered
+material identity and graph edge, and stores the zero-based source-family
+ordinal. It deliberately does not promote the later solid/gap repair,
+`FinalizeCFS`, ASHWAT optics/thermal state, ratings, surfaces, reporting, or
+runtime; every equivalent-layer construction and material definition remains
+run-blocked. The detailed contract is owned by the heat-balance source map.
 
 The compiler preserves EnergyPlus family order by compiling all `Material`
 objects, then all `Material:NoMass`, `Material:AirGap`, and
@@ -3258,7 +3276,8 @@ warning/clamp, complex-gap copied gas/helper state and provenance-only source
 identity, ComplexShade fixed Rough/R-only projections, back-emissivity scalar
 mapping, Venetian-only curve relationship with half-width equality accepted,
 and family boundaries are compiled; and the bounded
-AirGap/IRT construction invariants, equivalent-layer construction exclusion,
+AirGap/IRT construction invariants, ordinary-Construction exclusion of
+equivalent-layer materials plus CP91's dedicated family-only declaration path,
 ordinary Glass/Gas-or-GasMixture alternation, and safe exterior, interior, and
 between-glass Shade/Blind patterns plus the exterior-only Screen pattern, the
 sole-layer SimpleGlazing consumer with multi-layer rejection, universal

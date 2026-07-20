@@ -38,6 +38,10 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "Construction:ComplexFenestrationState",
         name_field_index: 0,
     },
+    IdfOrderTarget {
+        object_type: "Construction:WindowEquivalentLayer",
+        name_field_index: 0,
+    },
 ];
 
 /// Error returned when staged IDF declaration order cannot be recovered safely.

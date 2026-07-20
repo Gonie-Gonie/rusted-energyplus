@@ -14,6 +14,14 @@ use super::{
 };
 
 const BLIND_EQUIVALENT_LAYER_EPJSON: &str = r#"{
+    "WindowMaterial:Glazing:EquivalentLayer": {
+        "Typed EQL Glass": {
+            "front_side_beam_beam_solar_transmittance": 0.61,
+            "back_side_beam_beam_solar_transmittance": 0.62,
+            "front_side_beam_beam_solar_reflectance": 0.21,
+            "back_side_beam_beam_solar_reflectance": 0.22
+        }
+    },
     "WindowMaterial:Blind:EquivalentLayer": {
         "A Defaulted Used EQL Blind": {
             "slat_width": 0.02,
@@ -64,15 +72,15 @@ const BLIND_EQUIVALENT_LAYER_EPJSON: &str = r#"{
     },
     "Construction:WindowEquivalentLayer": {
         "A Defaulted EQL Blind Window Construction": {
-            "outside_layer": "Untyped EQL Glass",
+            "outside_layer": "Typed EQL Glass",
             "layer_2": "A Defaulted Used EQL Blind"
         },
         "B High Precision First EQL Blind Window Construction": {
-            "outside_layer": "Untyped EQL Glass",
+            "outside_layer": "Typed EQL Glass",
             "layer_2": "Z High Precision Reused EQL Blind"
         },
         "C High Precision Second EQL Blind Window Construction": {
-            "outside_layer": "Untyped EQL Glass",
+            "outside_layer": "Typed EQL Glass",
             "layer_2": "Z High Precision Reused EQL Blind"
         }
     }

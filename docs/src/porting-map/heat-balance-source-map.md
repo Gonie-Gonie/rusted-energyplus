@@ -48,9 +48,9 @@ claim.
 |---|---|---|
 | heat-balance driver | `ManageHeatBalance` | mapped-not-ported |
 | project heat-balance controls | `GetProjectControlData` | mapped-not-ported |
-| material input | `Material::GetWindowGlassSpectralData` -> `Material::GetMaterialData` -> `Material::GetHysteresisData` | all 34 public base/overlay objects are inventoried in [the material-family source map](material-source-map.md); Regular, NoMass, AirGap, InfraredTransparent, RefractionExtinctionMethod, and EquivalentLayer plus only the `WindowMaterial:Glazing` `SpectralAverage` branch are typed, while equivalent-layer construction and full window behavior remain blocked |
+| material input | `Material::GetWindowGlassSpectralData` -> `Material::GetMaterialData` -> `Material::GetHysteresisData` | all 34 public base/overlay objects are inventoried in [the material-family source map](material-source-map.md); Regular, NoMass, AirGap, InfraredTransparent, RefractionExtinctionMethod, and EquivalentLayer plus only the `WindowMaterial:Glazing` `SpectralAverage` branch are typed, while equivalent-layer topology/ASHWAT consumers and full window behavior remain blocked |
 | window frame/divider input | `GetFrameAndDividerData` | EnergyPlus places this routine after hysteresis and before construction input; Rust types the complete bounded object after base `parse_materials` and before `parse_constructions`, while its separate Hysteresis pass remains later, so complete pass-order parity is not claimed; every definition, including unused records, remains runtime-blocking |
-| construction input | `GetConstructData` / `CreateFCfactorConstructions` / `CreateAirBoundaryConstructions` / `SetupComplexFenestrationStateInput` | the parent remains source-mapped; required ordinary names/layers, bounded opaque/fenestration validation, thermochromic first-state metadata, sole-layer SimpleGlazingSystem, and the inline lexical InternalHeatSource overlay on an ordinary opaque construction are typed; the F-then-C generator is state-mapped with private raw-count internal materials and exact formulas; AirBoundary is state-mapped as lexical-order zero-layer declaration state; the following complex-state pass is state-mapped for only LBNLWINDOW/None with SpectralAverage or ComplexShade solids, WindowMaterial:Gap gaps, raw thermal/matrix helper validation, matrix dimensions, and ordered graph state; every F/C/Air/CFS/InternalHeatSource definition is run-blocked while the remaining equivalent-layer and WindowDataFile branches, surface consumers, CTF/QTF/reporting, and window/ground/source-sink execution remain deferred |
+| construction input | `GetConstructData` / `CreateFCfactorConstructions` / `CreateAirBoundaryConstructions` / `SetupComplexFenestrationStateInput` | the parent remains source-mapped; required ordinary names/layers, bounded opaque/fenestration validation, thermochromic first-state metadata, sole-layer SimpleGlazingSystem, the inline lexical InternalHeatSource overlay, and the following WindowEquivalentLayer family-only declaration state are typed; the F-then-C generator is state-mapped with private raw-count internal materials and exact formulas; AirBoundary is state-mapped as lexical-order zero-layer declaration state; the following complex-state pass is state-mapped for only LBNLWINDOW/None with SpectralAverage or ComplexShade solids, WindowMaterial:Gap gaps, raw thermal/matrix helper validation, matrix dimensions, and ordered graph state; every F/C/Air/CFS/InternalHeatSource/WindowEquivalentLayer definition is run-blocked while the remaining WindowDataFile branch, equivalent-layer ASHWAT consumers, surface consumers, CTF/QTF/reporting, and window/ground/source-sink execution remain deferred |
 | zone input | `GetZoneData` | typed geometry subset exists; source map required before expansion |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
@@ -266,12 +266,12 @@ EnergyPlus 26.1.0 calls `GetConstructData` after `GetFrameAndDividerData` and
 before `GetBuildingData`. The routine reads all ordinary `Construction`
 objects first, then calls the separately state-mapped F-factor/C-factor
 generator, AirBoundary reader, and `SetupComplexFenestrationStateInput` before
-entering its inline internal heat source overlay and then the equivalent-layer
-and WindowDataFile branches. The parent routine therefore remains
-`source_mapped`: the ordinary path, bounded F/C/Air/CFS readers, and bounded
-InternalHeatSource overlay do not imply completion of the remaining two
-special construction branches or any downstream CTF/QTF, surface, window, or
-source/sink consumer.
+entering its inline internal heat source overlay, equivalent-layer construction
+family, and final WindowDataFile branch. The parent routine therefore remains
+`source_mapped`: the ordinary path and bounded F/C/Air/CFS/InternalHeatSource/
+WindowEquivalentLayer readers do not imply completion of the remaining
+WindowDataFile branch or any downstream CTF/QTF, surface, window, or source/sink
+consumer.
 
 The bounded ordinary input retains its required construction name and ordered
 material prefix. CP85 adds the source `GlassTCParent` handling: every typed
@@ -298,13 +298,23 @@ keeps the same identity, kind, layer stack, and material graph. Source recovery
 quirks, broader construction-family targets, global source flags, and all
 CTF/QTF and runtime consumers remain fail-closed.
 
+CP91 types the following `Construction:WindowEquivalentLayer` declarations.
+Staged IDF preserves family-local declaration order through the `getObjectItem`
+order overlay, while native epJSON retains lexical instance-key order. A
+required outside layer and optional layers 2 through 11 form a contiguous pack;
+every reference must resolve to one of the six already typed equivalent-layer
+material variants. GetConstructData itself does not impose solid/gap
+alternation, so the bounded declaration retains one to eleven family-valid
+layers without inventing downstream topology repair or ASHWAT behavior. Every
+definition remains run-blocked.
+
 ### `GetConstructData` bounded ordinary state contract
 
 <!-- routine-state-contract:v1 begin get_construct_data -->
 GetConstructData
 
 read_state:
-- EnergyPlus calls `GetConstructData` after `GetFrameAndDividerData` and before `GetBuildingData`; within it, every ordinary `Construction` is read before the separately state-mapped F-factor then C-factor generation pass, AirBoundary pass, and SetupComplexFenestrationStateInput pass, followed by the bounded InternalHeatSource overlay and the deferred equivalent-layer and WindowDataFile branches
+- EnergyPlus calls `GetConstructData` after `GetFrameAndDividerData` and before `GetBuildingData`; within it, every ordinary `Construction` is read before the separately state-mapped F-factor then C-factor generation pass, AirBoundary pass, and SetupComplexFenestrationStateInput pass, followed by the bounded InternalHeatSource overlay, bounded WindowEquivalentLayer family, and deferred WindowDataFile branch
 - one required nonblank outer-key name in an independent normalized construction namespace, one required outside-layer material name, and optional layers 2 through 10 that must form a contiguous populated prefix; every populated layer resolves through the typed material namespace
 - every typed `WindowMaterial:GlazingGroup:Thermochromic` parent encountered in layer order contributes its first ordered glazing state to the effective layer stack; the existing typed parent contract guarantees at least one state
 - a `WindowMaterial:SimpleGlazingSystem` material is accepted only when it is the sole ordinary-Construction layer, matching the intended whole-system input while excluding EnergyPlus 26.1's multi-layer validation holes
@@ -312,6 +322,8 @@ read_state:
 - the `ConstructionProperty:InternalHeatSource` epJSON instance map is read directly in case-sensitive lexical outer-key order and deliberately remains outside staged IDF declaration-order recovery; its required nonblank outer key is a normalized diagnostic snapshot without a typed ID or name map, so case variants may coexist when they target different constructions
 - each internal-source record has a required nonblank case-insensitive shared-Construction reference restricted by the bounded contract to an ordinary opaque construction with at least two effective layers; both required one-based layer interfaces are positive integers in `1..TotLayers-1`, need not match, and have no ordering relationship
 - internal-source CTF dimensions are exactly integer 1 or 2, required finite tube spacing is in `[0.01,1.0]` m and derives a retained perpendicular half-spacing, and the optional finite perpendicular temperature position defaults to 0 in `[0,1]` and remains retained but inactive for a 1-D declaration
+- each `Construction:WindowEquivalentLayer` has a required nonblank name in the shared case-insensitive Construction namespace, one required outside layer, and optional layers 2 through 11 forming a contiguous one-to-eleven-layer prefix; every reference resolves case-insensitively to an already typed `MaterialFamily::EquivalentLayer` glazing, shade, drape, blind, screen, or gap definition
+- EnergyPlus reads equivalent-layer constructions through `getObjectItem`; staged IDF therefore preserves family-local declaration order through the explicit order overlay, while native epJSON without that overlay retains case-sensitive lexical instance-key order
 
 write_state:
 - the deterministic `Construction` arena and independent normalized name map retain each valid ID, normalized name, bounded opaque-or-fenestration kind, effective outside layer, and ordered effective outside-to-inside material stack
@@ -321,13 +333,16 @@ write_state:
 - runtime construction/material resolution and opaque construction thermal-cache building use checked direct-index lookups; these structural paths do not enable thermochromic or other window execution
 - one immutable internal-source descriptor on each valid unique target retains its normalized diagnostic source name, one-based source and requested-temperature interfaces, 1-D or 2-D selector, authored tube spacing, derived perpendicular half-spacing, and perpendicular temperature position without changing Construction identity, kind, layers, other construction-family metadata, material state, or graph edges
 - all internal-source fields and target constraints are validated before attachment; a malformed or missing earlier lexical record reserves no target, the first valid record attaches, and a later valid record for the same `ConstructionId` fails closed without overwriting the first descriptor
+- one dedicated `ConstructionKind::WindowEquivalentLayer` record per valid equivalent-layer definition after the InternalHeatSource overlay, retaining an explicit outside material, ordered material stack and construction/material graph edges, plus a zero-based family source index corresponding to EnergyPlus's one-based `EQLConsPtr` ordinal
+- all equivalent-layer fields, references, material families, contiguity, and shared-name duplication are validated before identity reservation; GetConstructData's family-only acceptance is preserved without inventing alternating solid/gap topology or downstream ASHWAT semantics
 
 history_state_ownership:
-- TypedModel owns immutable construction layer stacks, optional thermochromic master metadata, and optional internal-source declaration metadata; this checkpoint creates no thermochromic child constructions, global source-presence flag, CTF/QTF or source-node history, active-state history, or mutable window/surface state
+- TypedModel owns immutable construction layer stacks, optional thermochromic master metadata, optional internal-source declaration metadata, and equivalent-layer declaration ordinals; this checkpoint creates no thermochromic child constructions, global source-presence flag, CTF/QTF or source-node history, equivalent-layer ASHWAT state, active-state history, or mutable window/surface state
 
 unsupported_state:
-- multi-layer or shaded ordinary `Construction` consumption of `WindowMaterial:SimpleGlazingSystem` and the remaining `Construction:WindowEquivalentLayer` and `Construction:WindowDataFile` input branches
-- InternalHeatSource lookup or overlay of F-factor, C-factor, AirBoundary, window, or complex-fenestration constructions; future equivalent-layer or WindowDataFile targets; source warning recoveries for invalid layer interfaces, dimensions, spacing, or perpendicular position; and thermochromic child propagation
+- multi-layer or shaded ordinary `Construction` consumption of `WindowMaterial:SimpleGlazingSystem` and the remaining `Construction:WindowDataFile` input branch
+- InternalHeatSource lookup or overlay of F-factor, C-factor, AirBoundary, window, complex-fenestration, later equivalent-layer, or WindowDataFile constructions; source warning recoveries for invalid layer interfaces, dimensions, spacing, or perpendicular position; and thermochromic child propagation
+- `SetPreConstructionInputParameters` maximum-layer projection, `CheckAndFixCFSLayer`, `FinalizeCFS`, `SetEquivalentLayerWindowProperties`, ASHWAT optical and thermal calculations, nominal equivalent-layer resistance, U-factor/SHGC/rating state, and every equivalent-layer surface or window consumer
 - the global `AnyInternalHeatSourceInInput` and `SimpleCTFOnly` flags, resistance-layer merging and source-node remapping, CTF/QTF generation and histories, source/sink heat fluxes and interior temperatures, radiant-system, ventilated-slab, surface-ground-heat-exchanger, representative-surface, and other downstream consumers
 - `CreateTCConstructions` child allocation and copying, source-formatted child names, surface-active construction switching, temperature-driven state selection, fenestration binding, optics, thermal calculations, daylighting, shading, nominal-U adjustment, EIO or other construction reporting, and runtime or conformance behavior
 
@@ -336,15 +351,17 @@ inactive_branches:
 - a sole-layer SimpleGlazingSystem construction retains its one source material ID and has no thermochromic metadata; no multi-layer source quirk is materialized
 - when more than one thermochromic parent is present, every parent is first-state substituted but only the final parent owns the zero-based master metadata, preserving the source overwrite behavior without generating child constructions
 - when no valid `ConstructionProperty:InternalHeatSource` targets an ordinary opaque construction, every construction retains absent internal-source metadata; a retained nonzero perpendicular position on a 1-D declaration has no active consumer
+- when no `Construction:WindowEquivalentLayer` definition exists, the construction arena and graph gain no equivalent-layer state; when definitions exist, any one-to-eleven-layer contiguous family-only pack remains declaration data without topology repair or an executable window consumer
 
 unsupported_active_branches:
 - every typed thermochromic parent remains an all-definition runtime blocker through its existing parent-material capability rule, including an unused parent and a parent consumed by a valid ordinary `Construction`; direct-index structural lookup does not weaken that block
 - every typed SimpleGlazingSystem definition remains an all-definition runtime blocker, including an unused definition and one consumed by a valid sole-layer ordinary `Construction`
 - valid bounded fenestration constructions remain typed graph state only and do not enter the opaque runtime thermal cache or acquire window execution
 - every valid `ConstructionProperty:InternalHeatSource` definition, including one attached only to an otherwise unused construction, is reported as `UnsupportedSurfaceBoundary` and `RunBlocked` with `RuntimeClass::None`; a `BuildingSurface:Detailed` may retain the still-ordinary opaque target identity, but no partial or compatibility runtime is admitted
+- every valid `Construction:WindowEquivalentLayer` definition, including every unused definition, is reported as `UnsupportedSurfaceBoundary` and `RunBlocked` with `RuntimeClass::None`; supported equivalent-layer materials and graph edges do not admit surface binding, reporting, or partial window runtime
 
 not_claimed_branches:
-- complete `GetConstructData` parity, source case-collision and exact duplicate-key behavior, invalid-object and mark-used side effects, exact diagnostics/order/multiplicity, multi-layer or shaded SimpleGlazingSystem source quirks, thermochromic child generation/naming/state selection, the two remaining special construction families, broad InternalHeatSource target and recovery quirks, global flags, CTF/QTF calculations, nominal-U, EIO/SQLite and other reporting, window, air-boundary, ground, radiant, or source/sink physics, runtime numerics, and conformance
+- complete `GetConstructData` parity, source case-collision and exact duplicate-key behavior, invalid-object and mark-used side effects, exact diagnostics/order/multiplicity, multi-layer or shaded SimpleGlazingSystem source quirks, thermochromic child generation/naming/state selection, the remaining WindowDataFile input branch, broad InternalHeatSource target and recovery quirks, equivalent-layer topology repair and ASHWAT consumers, global flags, CTF/QTF calculations, nominal-U, EIO/SQLite and other reporting, window, air-boundary, ground, radiant, or source/sink physics, runtime numerics, and conformance
 <!-- routine-state-contract:v1 end get_construct_data -->
 
 ## Bounded F/C-Factor Construction Generation Notes
@@ -508,8 +525,8 @@ not_claimed_branches:
 ## Bounded Internal Heat Source Overlay Notes
 
 EnergyPlus reads the `ConstructionProperty:InternalHeatSource` epJSON object
-map directly after complex-fenestration states and before the deferred
-equivalent-layer and WindowDataFile construction branches. The bounded Rust
+map directly after complex-fenestration states and before the following typed
+equivalent-layer family and deferred WindowDataFile branch. The bounded Rust
 overlay therefore uses case-sensitive lexical outer-key order without an IDF
 declaration-order overlay. Its required outer key is retained only as a
 normalized diagnostic source-name snapshot, not as a typed identity or lookup
@@ -531,10 +548,37 @@ Every valid definition remains an exact `UnsupportedSurfaceBoundary` /
 `RunBlocked` declaration with `RuntimeClass::None`, including an unused target.
 No manifest, comparator, proof variable, runtime, reporting, or conformance
 claim is added. Broader F/C-factor, AirBoundary, window, complex-fenestration,
-equivalent-layer, and WindowDataFile targets; source warning recoveries;
+later equivalent-layer, and WindowDataFile targets; source warning recoveries;
 thermochromic-child propagation; global source-presence flags; resistance-layer
 remapping; CTF/QTF generation and histories; and every surface, radiant, or
 source/sink consumer remain deferred.
+
+## Bounded Equivalent-Layer Window Construction Notes
+
+EnergyPlus reads `Construction:WindowEquivalentLayer` after the internal heat
+source overlay through `getObjectItem`, so staged IDF declaration order is
+semantic for the family. Rust adds that object to the existing order overlay;
+native epJSON without the overlay continues to follow its case-sensitive
+lexical instance-key order. The required name shares the normalized
+Construction namespace. The required outside layer and optional layers 2
+through 11 must form a contiguous prefix and resolve case-insensitively to the
+typed EquivalentLayer material family.
+
+Each definition becomes a dedicated `ConstructionKind::WindowEquivalentLayer`
+with its ordered layer stack, construction/material graph edges, and zero-based
+family ordinal corresponding to EnergyPlus's one-based `EQLConsPtr`. All
+fallible validation precedes identity reservation. The source input routine
+accepts family-valid packs without enforcing solid/gap alternation, and Rust
+preserves that declaration behavior rather than projecting rules from later
+window initialization.
+
+Every equivalent-layer construction, including an unused definition, is an
+exact `UnsupportedSurfaceBoundary` / `RunBlocked` declaration with
+`RuntimeClass::None`. `SetPreConstructionInputParameters` maximum-layer state,
+`CheckAndFixCFSLayer`, `FinalizeCFS`, `SetEquivalentLayerWindowProperties`,
+ASHWAT optical/thermal calculations, ratings, surfaces, runtime execution,
+reporting, and conformance remain deferred. The following WindowDataFile input
+branch also remains unported, so `GetConstructData` stays source-mapped.
 
 ## Data Structure Map
 
@@ -548,6 +592,7 @@ source/sink consumer remain deferred.
 | `ConstructionProps::{TypeIsAirBoundary, TypeIsAirBoundaryMixing, AirBoundaryACH, AirBoundaryMixingSched}` with zero `TotLayers` | `ep_model::ConstructionKind::AirBoundary`, `ConstructionAirBoundary`, `AirBoundaryAirExchange`, and `AirBoundaryMixingSchedule` | lexical-order zero-layer descriptors retain `None` or `SimpleMixing` input state with an optional typed schedule identity or explicit always-on selector and emit no construction/material edge; surface pairing, enclosure remapping, generated cross-mixing, schedule sampling, reporting, and runtime remain blocked |
 | `ConstructionProps::BSDFInput`, complex-state layer points, `WindowThermalModel:Params`, and `Matrix:TwoDimension` snapshots | `ep_model::ConstructionKind::ComplexFenestration`, `ConstructionComplexFenestrationState`, `WindowThermalModelParameters`, `ComplexFenestrationMatrix`, `ComplexFenestrationOpticalLayer`, and `ModelGraph::construction_materials` | the bounded LBNLWINDOW/None declaration state retains normalized helper identities, original matrix spelling, derived basis length, dimension-checked global/solid optical snapshots, an alternating SpectralAverage-or-ComplexShade/Gap layer pack, and every ordered graph edge; helper families remain raw-only, while surfaces, BSDF/TARCOG/WCE calculations, reporting, runtime, and conformance remain blocked |
 | `ConstructionProps::{SourceSinkPresent, SourceAfterLayer, TempAfterLayer, SolutionDimensions, ThicknessPerpend, userTemperatureLocationPerpendicular}` | optional `ep_model::ConstructionInternalHeatSource` metadata on `ep_model::Construction` | lexical epJSON overlay state is validated before attaching to one ordinary opaque construction with at least two layers; it retains the normalized diagnostic source name, strict one-based interfaces, dimension selector, authored spacing, derived half-spacing, and perpendicular temperature position without changing construction/material identity, layers, or graph edges. Source recovery, broader targets, global flags, CTF/QTF state, runtime consumers, reporting, and conformance remain blocked |
+| equivalent-layer `ConstructionProps::{WindowTypeEQL, EQLConsPtr, TotLayers, LayerPoint}` | `ep_model::ConstructionKind::WindowEquivalentLayer`, `ConstructionWindowEquivalentLayer`, and `ModelGraph::construction_materials` | a staged-IDF-ordered or native-epJSON-lexical declaration retains one to eleven contiguous EquivalentLayer-family material identities, every graph edge, and a zero-based source ordinal; downstream topology repair, ASHWAT state, surfaces, reporting, runtime, ratings, and conformance remain blocked |
 | zone predictor histories, sums, and coefficients such as `MAT`, `XMAT`, `DSXMAT`, `SumHA`, `SumHATsurf`, `SumHATref`, `TempDepCoef`, `TempIndCoef`, `AirPowerCap`, and `TempHistoryTerm` | `ep_runtime::ZoneHeatBalanceState`, `ep_runtime::ZoneAirTemperatureCoefficients`, and future `ep_runtime::zone_air` histories | diagnostic shell keeps MAT history, stores surface convection sums, and snapshots EnergyPlus-shaped zone-air coefficients for future predictor wiring; full predictor/corrector equations are not ported |
 | internal gain sums such as `SumIntGain` | `simulate_zone_internal_convective_gains` and future state fields | convective trace conformance only for declared v0.26 case |
 

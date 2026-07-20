@@ -13,6 +13,8 @@ pub enum ConstructionKind {
     Fenestration,
     /// BSDF complex-fenestration construction reserved for dedicated window paths.
     ComplexFenestration,
+    /// Equivalent-layer fenestration construction reserved for the ASHWAT window path.
+    WindowEquivalentLayer,
     /// Zero-layer air boundary reserved for enclosure and interzone mixing paths.
     AirBoundary,
 }
@@ -25,6 +27,7 @@ impl ConstructionKind {
             Self::Opaque => "opaque",
             Self::Fenestration => "fenestration",
             Self::ComplexFenestration => "complex_fenestration",
+            Self::WindowEquivalentLayer => "window_equivalent_layer",
             Self::AirBoundary => "air_boundary",
         }
     }
@@ -197,6 +200,15 @@ pub struct ConstructionInternalHeatSource {
     pub temperature_location_perpendicular: f64,
 }
 
+/// Source-projected declaration state for `Construction:WindowEquivalentLayer`.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct ConstructionWindowEquivalentLayer {
+    /// Zero-based source-order index within the equivalent-layer construction family.
+    ///
+    /// EnergyPlus stores the corresponding `EQLConsPtr` as a one-based value.
+    pub source_index: u32,
+}
+
 /// Schedule source used by a simple-mixing air boundary.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum AirBoundaryMixingSchedule {
@@ -299,6 +311,8 @@ pub struct Construction {
     pub air_boundary: Option<ConstructionAirBoundary>,
     /// BSDF source state when this is a complex-fenestration construction.
     pub complex_fenestration: Option<ConstructionComplexFenestrationState>,
+    /// Equivalent-layer declaration state when this construction uses that window model.
+    pub window_equivalent_layer: Option<ConstructionWindowEquivalentLayer>,
     /// Internal heat-source declaration attached to this construction, when present.
     pub internal_heat_source: Option<ConstructionInternalHeatSource>,
 }
@@ -321,6 +335,12 @@ impl Construction {
     #[must_use]
     pub const fn is_complex_fenestration(&self) -> bool {
         matches!(self.kind, ConstructionKind::ComplexFenestration)
+    }
+
+    /// Returns whether this is a `Construction:WindowEquivalentLayer` record.
+    #[must_use]
+    pub const fn is_window_equivalent_layer(&self) -> bool {
+        matches!(self.kind, ConstructionKind::WindowEquivalentLayer)
     }
 
     /// Returns whether an internal heat-source declaration targets this construction.

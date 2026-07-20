@@ -60,6 +60,7 @@
             ground_factor: None,
             air_boundary: None,
             complex_fenestration: None,
+            window_equivalent_layer: None,
             internal_heat_source: None,
         });
         model.schedules.push(ScheduleConstant {
@@ -132,6 +133,7 @@
             ground_factor: None,
             air_boundary: None,
             complex_fenestration: None,
+            window_equivalent_layer: None,
             internal_heat_source: None,
         });
         model.zones.push(Zone {

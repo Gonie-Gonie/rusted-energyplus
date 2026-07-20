@@ -1924,6 +1924,7 @@ mod tests {
             ground_factor: None,
             air_boundary: None,
             complex_fenestration: None,
+            window_equivalent_layer: None,
             internal_heat_source: None,
         });
         model.surfaces.push(Surface {

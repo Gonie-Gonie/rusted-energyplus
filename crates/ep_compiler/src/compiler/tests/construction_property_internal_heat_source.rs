@@ -572,6 +572,7 @@ fn internal_heat_source_targets_are_bounded_to_multilayer_ordinary_opaque_constr
         ground_factor: None,
         air_boundary: None,
         complex_fenestration: None,
+        window_equivalent_layer: None,
         internal_heat_source: None,
     });
     compiler.parse_construction_internal_heat_sources(&mut model);
