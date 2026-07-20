@@ -4,6 +4,7 @@ mod complex_fenestration;
 mod construction_internal_heat_source;
 mod construction_window_data_file;
 mod construction_window_equivalent_layer;
+mod zone;
 
 use ep_model::{
     AirBoundaryAirExchange, AirBoundaryMixingSchedule, AirGapMaterial, AirLoopHvac, AutoOrNumber,
@@ -73,10 +74,10 @@ use ep_model::{
     WindowScreenEquivalentLayerSolarProperties, WindowScreenEquivalentLayerVisibleProperties,
     WindowScreenMaterial, WindowScreenTransmittanceMapResolution,
     WindowShadeEquivalentLayerMaterial, WindowShadeEquivalentLayerSideOpticalProperties,
-    WindowShadeMaterial, WindowSimpleGlazingMaterial, WindowStandardGasType, Zone,
+    WindowShadeMaterial, WindowSimpleGlazingMaterial, WindowStandardGasType,
     ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
-    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
-    ZoneThermostat, ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneThermostat,
+    ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
 use std::collections::BTreeMap;
@@ -12118,54 +12119,6 @@ impl<'a> Compiler<'a> {
         Some(values)
     }
 
-    fn parse_zones(&mut self, model: &mut TypedModel) {
-        for (name, object) in self.objects("Zone") {
-            let Some(id_value) = self.checked_id("Zone", &name, model.zones.len()) else {
-                continue;
-            };
-            let id = ZoneId(id_value);
-            if model.zone_names.insert(&name, id).is_some() {
-                self.duplicate_name("Zone", &name);
-                continue;
-            }
-
-            model.zones.push(Zone {
-                id,
-                name: NormalizedName::new(&name),
-                direction_of_relative_north_deg: self.number_default(
-                    "Zone",
-                    &name,
-                    &object,
-                    "direction_of_relative_north",
-                    0.0,
-                ),
-                origin: Point3 {
-                    x_m: self.number_default("Zone", &name, &object, "x_origin", 0.0),
-                    y_m: self.number_default("Zone", &name, &object, "y_origin", 0.0),
-                    z_m: self.number_default("Zone", &name, &object, "z_origin", 0.0),
-                },
-                zone_type: self.u32_default("Zone", &name, &object, "type", 1),
-                multiplier: self.u32_default("Zone", &name, &object, "multiplier", 1),
-                ceiling_height: self.auto_default(
-                    "Zone",
-                    &name,
-                    &object,
-                    "ceiling_height",
-                    AutoOrNumber::AutoCalculate,
-                    "Autocalculate",
-                ),
-                volume: self.auto_default(
-                    "Zone",
-                    &name,
-                    &object,
-                    "volume",
-                    AutoOrNumber::AutoCalculate,
-                    "Autocalculate",
-                ),
-            });
-        }
-    }
-
     fn parse_thermostat_dual_setpoints(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("ThermostatSetpoint:DualSetpoint") {
             let Some(heating_setpoint_schedule) = self.required_schedule_reference(
@@ -17625,6 +17578,7 @@ mod tests {
     mod window_material_shade_equivalent_layer;
     mod window_material_simple_glazing_system;
     mod window_property_frame_and_divider;
+    mod zone;
 
     use super::{
         ALL_SCHEDULE_DAY_TYPES, CompileStage, DiagnosticSeverity, ObjectCoverageStatus,

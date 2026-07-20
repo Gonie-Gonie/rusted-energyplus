@@ -170,6 +170,14 @@ fn single_ideal_loads_typed_model(system_supply: &str, connection_inlet: &str) -
         multiplier: 1,
         ceiling_height: AutoOrNumber::AutoCalculate,
         volume: AutoOrNumber::AutoCalculate,
+        floor_area: AutoOrNumber::AutoCalculate,
+        inside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+            ep_model::InsideSurfaceConvectionAlgorithm::Tarp,
+        ),
+        outside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+            ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
+        ),
+        is_part_of_total_floor_area: true,
     });
     for (id, name) in [
         (NodeId(0), "Zone Inlet"),

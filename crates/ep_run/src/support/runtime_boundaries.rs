@@ -270,6 +270,25 @@ pub(super) fn assess_typed_runtime_boundaries(
         );
     }
 
+    let zone_convection_override_count = typed_model
+        .zones
+        .iter()
+        .filter(|zone| {
+            zone.inside_convection_algorithm.is_override()
+                || zone.outside_convection_algorithm.is_override()
+        })
+        .count();
+    if zone_convection_override_count > 0 {
+        push_typed_boundary(
+            unsupported_objects,
+            diagnostics,
+            "Zone convection algorithm override",
+            zone_convection_override_count,
+            "UnsupportedZoneConvectionOverride",
+            "Zone-local convection algorithm overrides are typed but not consumed by the current arbitrary runtime",
+        );
+    }
+
     push_typed_unsupported_object(
         registry,
         unsupported_objects,

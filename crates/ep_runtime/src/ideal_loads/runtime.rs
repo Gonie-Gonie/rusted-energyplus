@@ -9,6 +9,7 @@ use ep_model::{
 
 use crate::{
     OutputSeries, ResultStore,
+    geometry::zone_floor_area_m2,
     ideal_loads::{
         IdealLoadsCompiledBranchFlags, IdealLoadsMinimumOutdoorAirCompatInput,
         IdealLoadsOutdoorAirContext, IdealLoadsOutdoorAirNodeState, IdealLoadsPurchasedAirBranch,
@@ -422,11 +423,11 @@ fn outdoor_air_specification<'a>(
 }
 
 fn outdoor_air_context(model: &SimulationModel, zone_id: ZoneId) -> IdealLoadsOutdoorAirContext {
-    let zone_volume_m3 = model
-        .typed
-        .zones
-        .iter()
-        .find(|zone| zone.id == zone_id)
+    let zone = model.typed.zones.iter().find(|zone| zone.id == zone_id);
+    let zone_floor_area_m2 = zone
+        .map(|zone| zone_floor_area_m2(&model.typed, zone))
+        .unwrap_or(0.0);
+    let zone_volume_m3 = zone
         .and_then(|zone| match zone.volume {
             AutoOrNumber::Value(value) if value.is_finite() => Some(value.max(0.0)),
             AutoOrNumber::Value(_) | AutoOrNumber::AutoCalculate => None,
@@ -449,7 +450,7 @@ fn outdoor_air_context(model: &SimulationModel, zone_id: ZoneId) -> IdealLoadsOu
 
     IdealLoadsOutdoorAirContext {
         design_people_count,
-        zone_floor_area_m2: 0.0,
+        zone_floor_area_m2,
         zone_volume_m3,
     }
 }
@@ -949,4 +950,81 @@ fn node_name(model: &SimulationModel, node: NodeId) -> String {
         .find(|candidate| candidate.id == node)
         .map(|candidate| candidate.name.0.clone())
         .unwrap_or_else(|| format!("Node {}", node.0))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::outdoor_air_context;
+    use ep_model::{
+        AutoOrNumber, ConstructionId, InsideSurfaceConvectionAlgorithm, NormalizedName,
+        OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, Point3, SimulationModel,
+        SunExposure, Surface, SurfaceId, SurfaceType, TypedModel, WindExposure, Zone,
+        ZoneConvectionAlgorithm, ZoneId,
+    };
+
+    #[test]
+    fn ideal_loads_outdoor_air_context_uses_surface_area_for_autocalculated_zone_floor() {
+        let mut typed = TypedModel::default();
+        typed.zones.push(Zone {
+            id: ZoneId(0),
+            name: NormalizedName::new("Zone One"),
+            direction_of_relative_north_deg: 0.0,
+            origin: Point3 {
+                x_m: 0.0,
+                y_m: 0.0,
+                z_m: 0.0,
+            },
+            zone_type: 1,
+            multiplier: 1,
+            ceiling_height: AutoOrNumber::AutoCalculate,
+            volume: AutoOrNumber::AutoCalculate,
+            floor_area: AutoOrNumber::AutoCalculate,
+            inside_convection_algorithm: ZoneConvectionAlgorithm::Inherited(
+                InsideSurfaceConvectionAlgorithm::Tarp,
+            ),
+            outside_convection_algorithm: ZoneConvectionAlgorithm::Inherited(
+                OutsideSurfaceConvectionAlgorithm::Doe2,
+            ),
+            is_part_of_total_floor_area: true,
+        });
+        typed.surfaces.push(Surface {
+            id: SurfaceId(0),
+            name: NormalizedName::new("Floor"),
+            surface_type: SurfaceType::Floor,
+            construction: ConstructionId(0),
+            zone: ZoneId(0),
+            outside_boundary_condition: OutsideBoundaryCondition::Ground,
+            outside_boundary_condition_object: None,
+            sun_exposure: SunExposure::NoSun,
+            wind_exposure: WindExposure::NoWind,
+            view_factor_to_ground: AutoOrNumber::AutoCalculate,
+            vertices: vec![
+                Point3 {
+                    x_m: 0.0,
+                    y_m: 0.0,
+                    z_m: 0.0,
+                },
+                Point3 {
+                    x_m: 2.0,
+                    y_m: 0.0,
+                    z_m: 0.0,
+                },
+                Point3 {
+                    x_m: 2.0,
+                    y_m: 3.0,
+                    z_m: 0.0,
+                },
+                Point3 {
+                    x_m: 0.0,
+                    y_m: 3.0,
+                    z_m: 0.0,
+                },
+            ],
+        });
+        let model = SimulationModel::from_typed(typed);
+
+        let context = outdoor_air_context(&model, ZoneId(0));
+
+        assert_eq!(context.zone_floor_area_m2, 6.0);
+    }
 }

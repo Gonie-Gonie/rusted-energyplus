@@ -13,6 +13,13 @@ first_evidence = "heat_balance_nomass_001"
 support_boundary = "Typed for model metadata and simple building scope; no global building simulation claim."
 
 [[object]]
+name = "Zone"
+family = "building"
+status = "typed"
+first_evidence = "compiler::tests::zone::zone_materializes_complete_public_inputs_and_source_defaults"
+support_boundary = "The bounded EnergyPlus 26.1 ProcessZoneData declaration front end retains a validated dense ZoneId/name, relative north, origin, standard Type=1, positive integer multiplier, raw AutoOrNumber ceiling height/volume/floor area, effective inherited-or-authored inside/outside convection selection, and Part of Total Floor Area. Missing/default/blank branches and staged-IDF declaration order versus native-epJSON lexical order are unit-checked, and positive authored floor area is consumed by current geometry, internal-gain, and IdealLoads area paths. Zone-local convection overrides are typed but fail closed as UnsupportedZoneConvectionOverride before arbitrary runtime execution. GetBuildingData and full GetZoneData ordering, ZoneList/ZoneGroup, nominal control, local environment, Space/default Space, geometry realization/correction/warnings, outdoor output registration, runtime convection/reporting, exact source diagnostics and name-collision behavior, numerical parity, and conformance remain unclaimed."
+
+[[object]]
 name = "Timestep"
 family = "time"
 status = "typed"

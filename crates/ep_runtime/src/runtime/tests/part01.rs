@@ -2057,6 +2057,14 @@
             multiplier: 1,
             ceiling_height: ep_model::AutoOrNumber::AutoCalculate,
             volume: ep_model::AutoOrNumber::AutoCalculate,
+            floor_area: ep_model::AutoOrNumber::AutoCalculate,
+            inside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+                ep_model::InsideSurfaceConvectionAlgorithm::Tarp,
+            ),
+            outside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+                ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
+            ),
+            is_part_of_total_floor_area: true,
         });
         let model = SimulationModel::from_typed(typed);
 

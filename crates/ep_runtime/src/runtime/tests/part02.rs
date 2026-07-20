@@ -32,6 +32,14 @@
             multiplier: 1,
             ceiling_height: AutoOrNumber::AutoCalculate,
             volume: AutoOrNumber::AutoCalculate,
+            floor_area: AutoOrNumber::AutoCalculate,
+            inside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+                ep_model::InsideSurfaceConvectionAlgorithm::Tarp,
+            ),
+            outside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+                ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
+            ),
+            is_part_of_total_floor_area: true,
         });
         typed
             .thermostat_dual_setpoints
@@ -393,6 +401,14 @@
             multiplier: 1,
             ceiling_height: AutoOrNumber::AutoCalculate,
             volume: AutoOrNumber::AutoCalculate,
+            floor_area: AutoOrNumber::AutoCalculate,
+            inside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+                ep_model::InsideSurfaceConvectionAlgorithm::Tarp,
+            ),
+            outside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+                ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
+            ),
+            is_part_of_total_floor_area: true,
         });
         typed.nodes.push(Node {
             id: NodeId(0),
@@ -620,6 +636,17 @@ DATA PERIODS
         assert_eq!(summaries[0].floor_area_m2, 1.0);
         assert_eq!(summaries[0].volume_m3, Some(1.0));
         assert_eq!(summaries[0].exterior_wall_area_m2, 4.0);
+    }
+
+    #[test]
+    fn positive_authored_zone_floor_area_overrides_surface_geometry_area() {
+        let mut model = cube_model();
+        model.zones[0].floor_area = AutoOrNumber::Value(12.5);
+
+        let summaries = zone_geometry_summaries(&model);
+
+        assert_eq!(summaries[0].floor_area_m2, 12.5);
+        assert_eq!(summaries[0].volume_m3, Some(1.0));
     }
 
     #[test]

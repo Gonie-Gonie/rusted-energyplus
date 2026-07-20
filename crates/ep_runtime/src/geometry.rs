@@ -52,6 +52,12 @@ pub fn surface_geometry_summaries(model: &TypedModel) -> Vec<SurfaceGeometrySumm
 }
 
 pub(crate) fn zone_floor_area_m2(model: &TypedModel, zone: &Zone) -> f64 {
+    if let AutoOrNumber::Value(floor_area_m2) = zone.floor_area
+        && floor_area_m2 > 0.0
+    {
+        return floor_area_m2;
+    }
+
     model
         .surfaces
         .iter()

@@ -103,6 +103,7 @@ port_ticket_mappings = [
 ]
 rust_target = [
   "crates/ep_runtime/src/heat_balance/manager.rs::manage_heat_balance_source_order_stages",
+  "crates/ep_compiler/src/compiler/zone.rs::Compiler::parse_zones",
 ]
 status = "scaffold"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
@@ -110,7 +111,7 @@ proof_variables = [
   "Zone Mean Air Temperature",
 ]
 claim_level = "none"
-support_boundary = "Source-order scaffold only for HeatBalanceManager stage barriers: GetHeatBalanceInput, InitHeatBalance, RecKeepHeatBalance, ReportHeatBalance, CheckWarmupConvergence, and EMS callback placeholders. This entry does not add a numerical conformance claim."
+support_boundary = "Source-order scaffold for HeatBalanceManager stage barriers plus a bounded immutable ProcessZoneData declaration front end. GetBuildingData and GetZoneData remain source-mapped wrappers; ZoneList, ZoneGroup, local environment, Space, geometry realization, reporting, and runtime convection remain deferred. This entry does not add a numerical conformance claim."
 routine.manage_heat_balance.source_file = "src/EnergyPlus/HeatBalanceManager.cc"
 routine.manage_heat_balance.source_routine = "ManageHeatBalance"
 routine.manage_heat_balance.source_map = "docs/src/porting-map/heat-balance-source-map.md"
@@ -328,6 +329,56 @@ routine.setup_complex_fenestration_state_input.unsupported_active_branches = [
 ]
 routine.setup_complex_fenestration_state_input.not_claimed_branches = [
   "complete `GetConstructData` parity, source partial-slot allocation and invalid-object side effects, broad IDF/native-epJSON order parity, source case-collision behavior, exact diagnostics/order/multiplicity, custom or axisymmetric bases, broad matrix semantics, surface and window behavior, optics, thermal calculations, ratings, daylighting, reporting, runtime numerics, EIO/SQLite, and conformance",
+]
+
+routine.get_building_data.source_file = "src/EnergyPlus/HeatBalanceManager.cc"
+routine.get_building_data.source_routine = "GetBuildingData"
+routine.get_building_data.source_map = "docs/src/porting-map/heat-balance-source-map.md"
+routine.get_building_data.completion_status = "source_mapped"
+routine.get_building_data.required_for_full_domain = true
+
+routine.get_zone_data.source_file = "src/EnergyPlus/HeatBalanceManager.cc"
+routine.get_zone_data.source_routine = "GetZoneData"
+routine.get_zone_data.source_map = "docs/src/porting-map/heat-balance-source-map.md"
+routine.get_zone_data.completion_status = "source_mapped"
+routine.get_zone_data.required_for_full_domain = true
+
+routine.process_zone_data.source_file = "src/EnergyPlus/HeatBalanceManager.cc"
+routine.process_zone_data.source_routine = "ProcessZoneData"
+routine.process_zone_data.source_map = "docs/src/porting-map/heat-balance-source-map.md"
+routine.process_zone_data.completion_status = "state_mapped"
+routine.process_zone_data.required_for_full_domain = false
+routine.process_zone_data.state_mapping_ref = "docs/src/porting-map/heat-balance-source-map.md"
+routine.process_zone_data.read_state = [
+  "EnergyPlus calls `GetBuildingData` after `GetConstructData` and orders `GetShadowingInput`, `GetZoneData`, then `SetupZoneGeometry`; bounded Rust state covers only each Zone declaration processed at the start of `GetZoneData`, while both wrappers remain source-mapped",
+  "one required nonblank outer-key name; finite relative-north and x/y/z origins default to zero without numeric bounds, Type defaults to and must equal integer 1, and Multiplier defaults to integer 1 with source-compatible positive signed-integer range",
+  "Ceiling Height, Volume, and Floor Area retain every finite authored number including zero or negative values, while missing, blank, or `Autocalculate` input retains an explicit `AutoCalculate` selector",
+  "inside overrides accept Simple, TARP, CeilingDiffuser, TrombeWall, AdaptiveConvectionAlgorithm, or ASTMC1340; outside overrides accept SimpleCombined, TARP, MoWiTT, DOE-2, or AdaptiveConvectionAlgorithm; blank or missing values inherit already parsed global selections, defaulting to TARP and DOE-2 when no global object exists",
+  "Part of Total Floor Area defaults to Yes and retains Yes as true or No as false; staged IDF Zone instances use recovered declaration order while native epJSON instances use lexical key order",
+]
+routine.process_zone_data.write_state = [
+  "a deterministic dense `Zone` arena and normalized name map retain each validated `ZoneId`, normalized name, relative-north angle, origin, source-forced standard Type value 1, positive multiplier, three `AutoOrNumber` selectors, and total-floor-area membership flag",
+  "each convection selection retains both its effective enum and whether it was inherited or authored locally; all fields and normalized duplicate checks complete before ID/name publication, so an invalid earlier record does not consume a dense identity",
+  "positive authored Floor Area is preferred by shared runtime geometry, schedule/internal-gain, CLI IdealLoads, and typed IdealLoads outdoor-air consumers; nonpositive or autocalculated values fall through to the available geometry path rather than being normalized during declaration parsing",
+  "any zone-local convection override is reported as `UnsupportedZoneConvectionOverride` and `RunBlocked` before arbitrary runtime execution because the current coefficient paths do not consume zone-local selectors",
+]
+routine.process_zone_data.history_state_ownership = "TypedModel owns immutable Zone declaration descriptors only; this checkpoint allocates no mutable zone-air, surface, weather, equipment, geometry, reporting, or predictor/corrector history"
+routine.process_zone_data.unsupported_state = [
+  "the remaining `GetZoneData` stages and allocations: pre-loop ZoneDaylight and resilience arrays; post-loop nominal `ZoneHVAC:EquipmentConnections` control lookup, ZoneList and ZoneGroup membership/multipliers, local-environment outdoor node linkage, post-local-environment ZonePreDefRep allocation, Space and SpaceList processing, and default Space creation",
+  "`SetupZoneGeometry` realization of ceiling height, volume, and floor area; five-percent comparison warnings, space-area adjustment, nonpositive-volume recovery, coordinate-system warnings, centroids, bounds, and other surface-derived state",
+  "four zone outdoor-air output registrations, weather and EMS updates, actual inside/outside convection coefficient selection, CeilingDiffuser recovery, building floor-area reporting, EIO/SQLite output, and conformance evidence",
+]
+routine.process_zone_data.inactive_branches = [
+  "missing or blank local convection fields inherit the effective project setting and do not add a runtime boundary; when the project object is absent the retained effective defaults are TARP inside and DOE-2 outside",
+  "missing, blank, or `Autocalculate` geometry selectors remain explicit auto state; authored zero or negative values remain finite declaration values but are treated as geometry selectors requiring downstream realization",
+  "Part of Total Floor Area equal to No is retained but has no current building-total reporting consumer; Type always materializes as the standard value 1",
+]
+routine.process_zone_data.unsupported_active_branches = [
+  "every authored zone-local inside or outside convection override, including one equal to the inherited effective value, is typed but blocks arbitrary runtime execution until the zone-local coefficient consumer is wired",
+  "ZoneList, ZoneGroup, local-environment, Space, and geometry-realization semantics remain outside this checkpoint even when corresponding raw objects or active surface geometry are present",
+]
+routine.process_zone_data.not_claimed_branches = [
+  "complete `GetBuildingData` or `GetZoneData` parity, broad Rust compiler pass-order parity, source control-character restoration, source/native canonical enum-case behavior, whitespace-preserving or case-colliding names, shared Zone/Space/ZoneList/SpaceList namespace uniqueness, invalid-input recovery, exact diagnostics/order/multiplicity, downstream geometry correction and warnings, output registration, runtime convection, reporting, numerical parity, and conformance",
 ]
 
 [[algorithm]]

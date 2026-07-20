@@ -82,6 +82,14 @@
             multiplier: 1,
             ceiling_height: AutoOrNumber::AutoCalculate,
             volume: AutoOrNumber::AutoCalculate,
+            floor_area: AutoOrNumber::AutoCalculate,
+            inside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+                ep_model::InsideSurfaceConvectionAlgorithm::Tarp,
+            ),
+            outside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+                ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
+            ),
+            is_part_of_total_floor_area: true,
         });
         model.other_equipment.push(OtherEquipment {
             id: InternalGainId(0),
@@ -145,6 +153,14 @@
             multiplier: 1,
             ceiling_height: AutoOrNumber::AutoCalculate,
             volume: AutoOrNumber::Value(1.0),
+            floor_area: AutoOrNumber::AutoCalculate,
+            inside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+                ep_model::InsideSurfaceConvectionAlgorithm::Tarp,
+            ),
+            outside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+                ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
+            ),
+            is_part_of_total_floor_area: true,
         });
         model.zones.push(Zone {
             id: ZoneId(1),
@@ -155,6 +171,14 @@
             multiplier: 1,
             ceiling_height: AutoOrNumber::AutoCalculate,
             volume: AutoOrNumber::Value(1.0),
+            floor_area: AutoOrNumber::AutoCalculate,
+            inside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+                ep_model::InsideSurfaceConvectionAlgorithm::Tarp,
+            ),
+            outside_convection_algorithm: ep_model::ZoneConvectionAlgorithm::Inherited(
+                ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
+            ),
+            is_part_of_total_floor_area: true,
         });
         model.surfaces.push(interzone_surface(
             0,

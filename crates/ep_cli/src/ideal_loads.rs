@@ -2366,6 +2366,12 @@ fn finite_min_max(values: &[f64]) -> (f64, f64) {
 }
 
 fn ideal_loads_zone_floor_area_m2(model: &TypedModel, zone: &Zone) -> f64 {
+    if let AutoOrNumber::Value(floor_area_m2) = zone.floor_area
+        && floor_area_m2 > 0.0
+    {
+        return floor_area_m2;
+    }
+
     model
         .surfaces
         .iter()

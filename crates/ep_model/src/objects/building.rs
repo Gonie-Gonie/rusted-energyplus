@@ -68,6 +68,8 @@ pub enum InsideSurfaceConvectionAlgorithm {
     Tarp,
     /// Ceiling diffuser mixed convection.
     CeilingDiffuser,
+    /// Trombe-wall convection correlation.
+    TrombeWall,
     /// EnergyPlus adaptive inside convection model selection.
     AdaptiveConvectionAlgorithm,
     /// ASTM C1340 mixed convection correlations.
@@ -96,6 +98,31 @@ pub struct SurfaceConvectionAlgorithms {
     pub inside: Option<InsideSurfaceConvectionAlgorithm>,
     /// Parsed `SurfaceConvectionAlgorithm:Outside` setting, when present.
     pub outside: Option<OutsideSurfaceConvectionAlgorithm>,
+}
+
+/// Effective zone convection selection and whether it was inherited or authored locally.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ZoneConvectionAlgorithm<T> {
+    /// The zone inherited the project-level selection.
+    Inherited(T),
+    /// The zone authored a local override.
+    Override(T),
+}
+
+impl<T: Copy> ZoneConvectionAlgorithm<T> {
+    /// Returns the effective algorithm used by the zone declaration.
+    #[must_use]
+    pub const fn effective(self) -> T {
+        match self {
+            Self::Inherited(value) | Self::Override(value) => value,
+        }
+    }
+
+    /// Returns whether the effective selection came from a zone-local override.
+    #[must_use]
+    pub const fn is_override(self) -> bool {
+        matches!(self, Self::Override(_))
+    }
 }
 
 /// Building-level typed settings.
@@ -234,4 +261,12 @@ pub struct Zone {
     pub ceiling_height: AutoOrNumber,
     /// Zone volume.
     pub volume: AutoOrNumber,
+    /// Zone floor area.
+    pub floor_area: AutoOrNumber,
+    /// Effective inside convection algorithm and its declaration source.
+    pub inside_convection_algorithm: ZoneConvectionAlgorithm<InsideSurfaceConvectionAlgorithm>,
+    /// Effective outside convection algorithm and its declaration source.
+    pub outside_convection_algorithm: ZoneConvectionAlgorithm<OutsideSurfaceConvectionAlgorithm>,
+    /// Whether the zone contributes to the building total floor area.
+    pub is_part_of_total_floor_area: bool,
 }

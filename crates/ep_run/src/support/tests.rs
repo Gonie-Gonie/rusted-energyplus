@@ -29,6 +29,7 @@ mod window_material_blind_equivalent_layer;
 mod window_material_complex_shade;
 mod window_material_gap;
 mod window_simple_glazing;
+mod zone;
 
 #[test]
 fn simple_one_zone_model_is_supported() -> Result<(), Box<dyn std::error::Error>> {
