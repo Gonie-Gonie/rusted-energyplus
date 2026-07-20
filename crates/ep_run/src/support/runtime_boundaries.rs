@@ -630,6 +630,13 @@ pub(super) fn assess_typed_runtime_boundaries(
         registry,
         unsupported_objects,
         diagnostics,
+        "SurfaceProperty:IncidentSolarMultiplier",
+        typed_model.surface_incident_solar_multiplier_requests.len(),
+    );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
         "Construction:FfactorGroundFloor",
         typed_model
             .constructions

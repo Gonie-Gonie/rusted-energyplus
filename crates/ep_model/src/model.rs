@@ -22,13 +22,14 @@ use crate::{
     ScheduleFile, ScheduleFileShading, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
     ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
     Space, SpaceId, SpaceList, SpaceListId, SpaceOrigin, SpaceTypeId, Surface,
-    SurfaceConvectionAlgorithms, SurfaceId, SurfaceVaporCoefficients, ThermostatDualSetpoint,
-    ThermostatSetpointId, TimestepConfig, VariableAbsorptanceSurfaceBinding, Version,
-    WeekScheduleId, WindowFrameAndDivider, WindowFrameAndDividerId,
-    WindowGlazingThermochromicGroupMaterial, WindowGlazingThermochromicState, Zone,
-    ZoneEquipmentConnection, ZoneEquipmentList, ZoneEquipmentListId, ZoneEquipmentObjectType,
-    ZoneGroup, ZoneGroupId, ZoneHumidistat, ZoneHumidistatId, ZoneId, ZoneList, ZoneListId,
-    ZoneLocalEnvironment, ZoneLocalEnvironmentId, ZoneThermostat, ZoneThermostatId,
+    SurfaceConvectionAlgorithms, SurfaceId, SurfaceIncidentSolarMultiplierRequest,
+    SurfaceVaporCoefficients, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
+    VariableAbsorptanceSurfaceBinding, Version, WeekScheduleId, WindowFrameAndDivider,
+    WindowFrameAndDividerId, WindowGlazingThermochromicGroupMaterial,
+    WindowGlazingThermochromicState, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneGroup, ZoneGroupId, ZoneHumidistat,
+    ZoneHumidistatId, ZoneId, ZoneList, ZoneListId, ZoneLocalEnvironment, ZoneLocalEnvironmentId,
+    ZoneThermostat, ZoneThermostatId,
 };
 
 /// Minimal typed model for early compiler stages.
@@ -262,6 +263,8 @@ pub struct TypedModel {
     pub surface_names: NameMap<SurfaceId>,
     /// Exterior opaque surfaces whose effective outside material has a variable-absorptance overlay.
     pub variable_absorptance_surface_bindings: Vec<VariableAbsorptanceSurfaceBinding>,
+    /// Validated incident-solar declarations awaiting fenestration-surface resolution.
+    pub surface_incident_solar_multiplier_requests: Vec<SurfaceIncidentSolarMultiplierRequest>,
     /// Constant exterior/interior vapor-transfer coefficient attachments.
     pub surface_vapor_coefficients: Vec<SurfaceVaporCoefficients>,
     /// User-declared window frame, divider, and reveal property records.
@@ -385,6 +388,7 @@ impl Default for TypedModel {
             surfaces: Vec::new(),
             surface_names: NameMap::default(),
             variable_absorptance_surface_bindings: Vec::new(),
+            surface_incident_solar_multiplier_requests: Vec::new(),
             surface_vapor_coefficients: Vec::new(),
             window_frame_and_dividers: Vec::new(),
             window_frame_and_divider_names: NameMap::default(),
@@ -494,6 +498,7 @@ impl TypedModel {
                 .count()
             + self.space_lists.len()
             + self.surfaces.len()
+            + self.surface_incident_solar_multiplier_requests.len()
             + self.surface_vapor_coefficients.len()
             + self.window_frame_and_dividers.len()
     }

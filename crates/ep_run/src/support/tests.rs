@@ -23,6 +23,7 @@ mod material_roof_vegetation;
 mod material_variable_absorptance;
 mod material_variable_thermal_conductivity;
 mod surface_properties_vapor_coefficients;
+mod surface_property_incident_solar_multiplier;
 mod window_frame_and_divider;
 mod window_glazing_thermochromic_group;
 mod window_material_blind_equivalent_layer;
