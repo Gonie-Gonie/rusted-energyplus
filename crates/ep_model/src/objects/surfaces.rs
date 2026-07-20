@@ -1,4 +1,4 @@
-use crate::{AutoOrNumber, ConstructionId, NormalizedName, Point3, SurfaceId, ZoneId};
+use crate::{AutoOrNumber, ConstructionId, NormalizedName, Point3, SpaceId, SurfaceId, ZoneId};
 
 /// Declared first vertex for detailed surface input.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -123,6 +123,8 @@ pub struct Surface {
     pub construction: ConstructionId,
     /// Resolved zone ID.
     pub zone: ZoneId,
+    /// Final Space assignment after the bounded `CreateMissingSpaces` pass.
+    pub space: SpaceId,
     /// Outside boundary condition.
     pub outside_boundary_condition: OutsideBoundaryCondition,
     /// Optional outside boundary condition object name.

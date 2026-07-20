@@ -4,7 +4,7 @@ use ep_model::{
     ConstructionGroundFactor, DehumidificationControlType, HumidificationControlType, MaterialKind,
     SimulationModel, TypedModel,
 };
-use ep_raw_model::{FieldName, RawModel, RawValue};
+use ep_raw_model::RawModel;
 use ep_runtime::{
     IdealLoadsPurchasedAirBranch, IdealLoadsUnsupportedFeature, classify_no_oa_sensible_subset,
     select_purchased_air_branch, validate_ideal_loads_zone_equipment_dispatch,
@@ -318,7 +318,12 @@ pub(super) fn assess_typed_runtime_boundaries(
         typed_model
             .spaces
             .iter()
-            .filter(|space| space.origin == ep_model::SpaceOrigin::Authored)
+            .filter(|space| {
+                matches!(
+                    space.origin,
+                    ep_model::SpaceOrigin::Authored | ep_model::SpaceOrigin::AutoZoneRemainder
+                )
+            })
             .count(),
     );
     push_typed_unsupported_object(
@@ -328,17 +333,6 @@ pub(super) fn assess_typed_runtime_boundaries(
         "SpaceList",
         typed_model.space_lists.len(),
     );
-    let surface_space_assignment_count = active_surface_space_assignment_count(raw_model);
-    if surface_space_assignment_count > 0 {
-        push_typed_boundary(
-            unsupported_objects,
-            diagnostics,
-            "BuildingSurface:Detailed space_name",
-            surface_space_assignment_count,
-            "UnsupportedSpacePartitioning",
-            "explicit BuildingSurface:Detailed space assignments are preserved in raw input but are not yet resolved or consumed",
-        );
-    }
 
     push_typed_unsupported_object(
         registry,
@@ -878,24 +872,6 @@ fn push_typed_boundary(
         note: note.to_string(),
     });
     diagnostics.error(code, "support", note);
-}
-
-fn active_surface_space_assignment_count(raw_model: &RawModel) -> usize {
-    let space_name_field = FieldName("space_name".to_string());
-    raw_model
-        .objects
-        .iter()
-        .find(|(object_type, _)| object_type.0 == "BuildingSurface:Detailed")
-        .map_or(0, |(_, instances)| {
-            instances
-                .values()
-                .filter(|object| match object.fields.get(&space_name_field) {
-                    Some(RawValue::String(value)) => !value.is_empty(),
-                    Some(_) => true,
-                    None => false,
-                })
-                .count()
-        })
 }
 
 fn warn_for_ignored_semantic_objects(raw_model: &RawModel, diagnostics: &mut RunDiagnostics) {

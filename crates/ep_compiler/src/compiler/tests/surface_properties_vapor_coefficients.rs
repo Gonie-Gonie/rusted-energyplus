@@ -437,6 +437,7 @@ fn vapor_coefficients_duplicate_target_fails_and_invalid_first_does_not_reserve(
     compiler.parse_materials(&mut model);
     compiler.parse_constructions(&mut model);
     compiler.parse_zones(&mut model);
+    compiler.parse_space_data(&mut model);
     compiler.parse_surfaces(&mut model);
     compiler.parse_surface_vapor_coefficients(&mut model);
 

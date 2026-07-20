@@ -109,6 +109,7 @@ rust_target = [
   "crates/ep_compiler/src/compiler/zone_collections.rs::Compiler::parse_zone_groups",
   "crates/ep_compiler/src/compiler/zone_local_environment.rs::Compiler::parse_zone_local_environments",
   "crates/ep_compiler/src/compiler/space.rs::Compiler::parse_space_data",
+  "crates/ep_compiler/src/compiler/surface_space.rs::Compiler::create_missing_spaces",
 ]
 status = "scaffold"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
@@ -116,7 +117,7 @@ proof_variables = [
   "Zone Mean Air Temperature",
 ]
 claim_level = "none"
-support_boundary = "Source-order scaffold for HeatBalanceManager stage barriers plus bounded immutable ProcessZoneData and post-Zone GetZoneData declaration state through nominal control, ZoneList, ZoneGroup, GetZoneLocalEnvData, and GetSpaceData processing while the intervening ZonePreDefRep allocation remains deferred. GetBuildingData and complete GetZoneData remain source-mapped wrappers; local-weather consumers, remainder-space/surface assignment, geometry realization, list-target expansion, comprehensive multiplier consumption, space heat balance, reporting, and runtime convection remain deferred. Zone grouping, every local-environment definition, every authored Space or SpaceList, and every active raw BuildingSurface:Detailed space_name fail closed before runtime; generated whole-zone default Spaces alone do not. This entry does not add a numerical conformance claim."
+support_boundary = "Source-order scaffold for HeatBalanceManager stage barriers plus bounded immutable ProcessZoneData and post-Zone GetZoneData declaration state through nominal control, ZoneList, ZoneGroup, GetZoneLocalEnvData, and GetSpaceData processing while the intervening ZonePreDefRep allocation remains deferred. A later CP97 composite surface-membership slice bounds the GetHTSurfaceData-owned typed BuildingSurface:Detailed space_name lookup through the full pre-remainder Space arena and same-Zone validation while the full routine remains source-mapped, then state-maps CreateMissingSpaces remainder detection and fallback assignment so every retained detailed opaque surface has a final SpaceId. GetBuildingData, complete GetZoneData, SetupZoneGeometry, GetSurfaceData, and full GetHTSurfaceData remain source-mapped wrappers; local-weather consumers, other surface families, opposite-surface generation, surface reordering and Space surface lists, geometry realization, list-target expansion, comprehensive multiplier consumption, space heat balance, reporting, and runtime convection remain deferred. Zone grouping, every local-environment definition, every authored Space or SpaceList, and every generated remainder Space fail closed before runtime; a sole generated whole-zone default remains inactive when no remainder is needed, including when every valid detailed surface explicitly references it. This entry does not add a numerical conformance claim."
 routine.manage_heat_balance.source_file = "src/EnergyPlus/HeatBalanceManager.cc"
 routine.manage_heat_balance.source_routine = "ManageHeatBalance"
 routine.manage_heat_balance.source_map = "docs/src/porting-map/heat-balance-source-map.md"
@@ -362,31 +363,31 @@ routine.get_zone_data.write_state = [
   "a deterministic dense ZoneGroup arena and independent normalized name map retain each validated `ZoneGroupId`, normalized name, ZoneListId, and multiplier; repeated list use or grouped-list Zone overlap fails before publication, while every valid member Zone receives the multiplier and the source-shaped ZoneList identity in `list_group`",
   "a deterministic dense ZoneLocalEnvironment arena and independent normalized name map retain each validated declaration, its ZoneId, and optional generic NodeId; each nonblank node resolves a one-member NodeList alias or registers/reuses a direct node, and ordered nonblank links overwrite the Zone link while a later blank node does not clear it",
   "deterministic Space, SpaceList, and first-seen SpaceType state retain validated authored declarations, ordered Zone/member links, then one whole-zone default for each Zone still without a Space",
-  "every valid ZoneList or ZoneGroup is reported as `UnsupportedZoneGrouping`, every valid ZoneProperty:LocalEnvironment as `UnsupportedZoneLocalEnvironment`, and every authored Space, SpaceList, or active raw BuildingSurface:Detailed space_name as `UnsupportedSpacePartitioning`, with `RunBlocked` before arbitrary runtime execution because downstream collection, local-weather, and space-partition consumers are not wired",
+  "every valid ZoneList or ZoneGroup is reported as `UnsupportedZoneGrouping`, every valid ZoneProperty:LocalEnvironment as `UnsupportedZoneLocalEnvironment`, and every authored Space or SpaceList as `UnsupportedSpacePartitioning`; the later CreateMissingSpaces contract applies that partition boundary to generated remainders while leaving sole whole-zone defaults inactive",
 ]
 routine.get_zone_data.history_state_ownership = "TypedModel owns immutable nominal-control, ZoneList, ZoneGroup, ZoneLocalEnvironment, Space, SpaceList, SpaceType, and per-Zone list/local-node/space declaration state only; this checkpoint allocates no mutable local weather, geometry, sizing, reporting, equipment, surface, space-air, or zone-air history"
 routine.get_zone_data.unsupported_state = [
   "the pre-Zone-loop ZoneDaylight and resilience allocations and the post-`GetZoneLocalEnvData` ZonePreDefRep allocation",
   "ZoneList expansion for People, gains, thermostat, sizing, and every other Zone-or-ZoneList consumer, plus comprehensive `Zone.Multiplier * Zone.ListMultiplier` consumption across geometry, loads, HVAC flows, sizing, and reports",
-  "OutdoorAir:Node condition inputs and node-connection metadata, remainder-space creation, surface-to-space assignment, Space-or-SpaceList target expansion, SetupZoneGeometry realization/correction, local weather and EMS state, space heat balance, reporting, runtime numerical behavior, and conformance evidence",
+  "OutdoorAir:Node condition inputs and node-connection metadata, Space-or-SpaceList target expansion, SetupZoneGeometry behavior beyond the separately bounded CP97 GetHTSurfaceData/CreateMissingSpaces surface-membership composite, local weather and EMS state, space heat balance, reporting, runtime numerical behavior, and conformance evidence",
 ]
 routine.get_zone_data.inactive_branches = [
   "when no raw equipment connection names a Zone, its nominal-control flag remains false without a diagnostic; unmatched connection names mark no Zone in this bounded phase",
   "when no ZoneList, ZoneGroup, or ZoneProperty:LocalEnvironment exists, every Zone retains list multiplier one, no list-group identity, and no linked outdoor-air node, adding no boundary from those absent families",
   "a ZoneGroup multiplier omitted from valid input retains one but still records group membership exactly like an authored multiplier and remains inside the fail-closed grouping boundary",
   "a blank or missing local-environment node remains an explicit no-node declaration and does not clear an earlier nonblank link for the same Zone",
-  "when no authored Space exists, GetSpaceData still creates one General whole-zone default per Zone but adds no space-partition runtime boundary unless an active raw surface space assignment is present",
+  "when no authored Space exists, GetSpaceData still creates one General whole-zone default per Zone; that default adds no space-partition runtime boundary, including when every valid typed detailed surface explicitly references the sole default and no remainder is needed",
 ]
 routine.get_zone_data.unsupported_active_branches = [
   "every valid ZoneList, including an otherwise unused definition, is typed but blocks arbitrary runtime execution until all Zone-or-ZoneList consumers expand it",
   "every valid ZoneGroup, including multiplier one, is typed but blocks arbitrary runtime execution until list multiplier semantics are comprehensively consumed",
   "every valid ZoneProperty:LocalEnvironment, including an otherwise unused definition or one with a blank node, is typed but blocks arbitrary runtime execution until local weather consumers are wired",
-  "every authored Space and every SpaceList, including an otherwise unused or empty list, is typed but blocks arbitrary runtime execution until space partitioning and all downstream consumers are wired",
-  "every nonempty or non-string raw BuildingSurface:Detailed space_name blocks defensively until the later surface-to-space lookup and same-Zone validation are ported; missing or exactly empty input adds no boundary",
+  "every authored Space and every SpaceList, including an otherwise unused or empty list, is typed but blocks arbitrary runtime execution until space partitioning and all downstream consumers are wired; generated remainder Spaces are blocked by the separate CreateMissingSpaces contract",
+  "typed BuildingSurface:Detailed lookup and same-Zone validation belong to the bounded GetHTSurfaceData cross-section, while final fallback assignment and mixed-assignment remainder generation belong to the state-mapped CreateMissingSpaces contract; the composite does not promote full GetHTSurfaceData or this parent routine",
   "the nominal-control scan does not validate or execute ZoneHVAC equipment; the existing later typed equipment-connection and IdealLoads boundaries remain authoritative",
 ]
 routine.get_zone_data.not_claimed_branches = [
-  "complete GetZoneData parity, broad compiler pass-order parity, source partial-allocation and invalid-input recovery side effects, exact diagnostics/text/order/multiplicity, whitespace-preserving or case-colliding names, complete shared Zone/Space/ZoneList/SpaceList namespace behavior, full OutdoorAir:Node/NodeList and local-weather state, ZonePreDefRep, remainder Spaces, surface assignment, geometry, sizing, reporting, numerical parity, and conformance",
+  "complete GetZoneData parity, broad compiler pass-order parity, source partial-allocation and invalid-input recovery side effects, exact diagnostics/text/order/multiplicity, whitespace-preserving or case-colliding names, complete shared Zone/Space/ZoneList/SpaceList namespace behavior, full OutdoorAir:Node/NodeList and local-weather state, ZonePreDefRep, SetupZoneGeometry beyond the separate bounded surface-membership slice, sizing, reporting, numerical parity, and conformance",
 ]
 
 routine.get_zone_local_env_data.source_file = "src/EnergyPlus/HeatBalanceManager.cc"
@@ -437,32 +438,32 @@ routine.get_space_data.read_state = [
   "authored Space outer keys are always lexical for both staged IDF and native epJSON because the source directly iterates the JSON object map; each Space requires a nonblank name and resolved nonblank Zone, while ceiling height, volume, and floor area preserve every finite number or default missing, blank, and Autocalculate input to AutoCalculate",
   "space type defaults to General for missing or blank input and joins a case-insensitive first-seen lexical-order registry; tag objects preserve array order, normalized text, duplicates, and empty or missing tag strings",
   "SpaceList outer keys are likewise always lexical while member arrays preserve authored order; missing or empty member arrays are valid, each present member resolves an authored Space, duplicate resolved members fail, and list names colliding with a Zone or authored Space fail",
-  "after all lists are processed, Zones are visited in typed order and each Zone without an authored Space receives one appended whole-zone default named after the Zone with AutoCalculate geometry, no tags, and the General space type; its late position keeps it unavailable to the preceding SpaceList lookup while later surface lookup remains deferred",
+  "after all lists are processed, Zones are visited in typed order and each Zone without an authored Space receives one appended whole-zone default named after the Zone with AutoCalculate geometry, no tags, and the General space type; its late position keeps it unavailable to the preceding SpaceList lookup while the later bounded GetHTSurfaceData cross-section can resolve it through the full pre-remainder Space arena",
 ]
 routine.get_space_data.write_state = [
   "a deterministic dense Space arena retains each fully validated authored declaration followed by generated whole-zone defaults; authored names alone enter the reference map, validation completes before SpaceId, SpaceTypeId, or Zone-link publication, and each Space retains its ZoneId, three AutoOrNumber selectors, normalized type name/id, ordered tags, and origin",
   "each Zone retains ordered SpaceIds and exits the routine with at least one Space; generated defaults reuse or append General through the separately bounded `GetGeneralSpaceTypeNum` helper and remain outside the authored-name map used by the preceding SpaceList phase",
   "a deterministic dense SpaceList arena and normalized name map retain each validated SpaceListId, lexical name, ordered authored SpaceIds, and maximum authored member-name length, including valid zero-member lists",
-  "every authored Space, SpaceList, and nonempty or non-string raw BuildingSurface:Detailed space_name is reported as `UnsupportedSpacePartitioning` and `RunBlocked` before arbitrary runtime execution, while generated whole-zone defaults alone add no runtime boundary",
+  "every authored Space and SpaceList is reported as `UnsupportedSpacePartitioning` and `RunBlocked` before arbitrary runtime execution; the separate CreateMissingSpaces contract applies the same boundary to generated remainder Spaces, while sole generated whole-zone defaults remain inactive even when valid detailed surfaces explicitly reference them",
 ]
 routine.get_space_data.history_state_ownership = "TypedModel owns immutable authored/default Space, SpaceList, SpaceType, and per-Zone SpaceId declaration topology only; this checkpoint allocates no mutable geometry, surface, space-air, zone-air, gain, HVAC, sizing, or reporting history"
 routine.get_space_data.unsupported_state = [
   "the preceding ZonePreDefRep allocation and all predefined-report mutation",
-  "SetupZoneGeometry remainder-space creation, surface-to-space assignment and reordering, calculated height/volume/floor area, floor/volume fractions, enclosure and surface ranges, and geometry correction/warnings",
+  "SetupZoneGeometry behavior beyond the separately bounded CP97 composite of GetHTSurfaceData typed detailed-surface lookup/same-Zone validation and CreateMissingSpaces remainder/fallback finalization: other surface families, opposite-surface generation, reordering, Space surface lists, calculated height/volume/floor area, floor/volume fractions, enclosure and surface ranges, and geometry correction/warnings",
   "Space-or-SpaceList target expansion for internal gains, infiltration, mixing, ventilation, sizing, outdoor air, HVAC, outputs, and every space heat-balance/reporting/runtime consumer",
 ]
 routine.get_space_data.inactive_branches = [
-  "with no authored Space, every Zone receives one General whole-zone default and no UnsupportedSpacePartitioning boundary is added unless an active raw surface space assignment is present",
+  "with no authored Space, every Zone receives one General whole-zone default and no UnsupportedSpacePartitioning boundary is added when detailed surfaces are all implicit or all validly explicit to that sole default",
   "a Zone with one or more authored Spaces receives no whole-zone default; if every Zone is covered and all authored types are non-General, the registry contains no General entry",
   "a SpaceList with a missing or empty member array is retained as a valid zero-member list but remains inside the all-definition runtime boundary",
 ]
 routine.get_space_data.unsupported_active_branches = [
   "every authored Space, including one using only defaults and not referenced by a surface or load, blocks arbitrary runtime execution until space partition consumers are wired",
   "every SpaceList, including an empty or otherwise unused definition, blocks arbitrary runtime execution until all Space-or-SpaceList consumers expand it",
-  "every nonempty or non-string raw BuildingSurface:Detailed space_name blocks defensively until SetupZoneGeometry resolves the shared Space arena and validates same-Zone membership; missing or exactly empty input remains inactive",
+  "typed BuildingSurface:Detailed lookup and same-Zone validation belong to the bounded GetHTSurfaceData cross-section, while final fallback assignment and mixed-assignment remainder generation belong to the state-mapped CreateMissingSpaces contract; this declaration routine does not claim either part",
 ]
 routine.get_space_data.not_claimed_branches = [
-  "complete GetSpaceData parity, source allocation sizes and partial invalid Space/SpaceType/Zone/list side effects, exact diagnostics/text/order/multiplicity, source whitespace preservation or case-colliding same-family names, complete shared Zone/ZoneList/Space/SpaceList namespace behavior, remainder Spaces, surfaces, geometry, loads, space heat balance, HVAC, reporting, numerical parity, and conformance",
+  "complete GetSpaceData parity, source allocation sizes and partial invalid Space/SpaceType/Zone/list side effects, exact diagnostics/text/order/multiplicity, source whitespace preservation or case-colliding same-family names, complete shared Zone/ZoneList/Space/SpaceList namespace behavior, SetupZoneGeometry beyond the separately bounded typed detailed-surface membership slice, loads, space heat balance, HVAC, reporting, numerical parity, and conformance",
 ]
 
 routine.get_general_space_type_num.source_file = "src/EnergyPlus/HeatBalanceManager.cc"
@@ -472,10 +473,10 @@ routine.get_general_space_type_num.completion_status = "state_mapped"
 routine.get_general_space_type_num.required_for_full_domain = false
 routine.get_general_space_type_num.state_mapping_ref = "docs/src/porting-map/heat-balance-source-map.md"
 routine.get_general_space_type_num.read_state = [
-  "GetSpaceData calls `GetGeneralSpaceTypeNum` only while generating a whole-zone default; the helper searches the ordered type registry built from validated authored Spaces using case-insensitive General matching",
+  "GetSpaceData calls `GetGeneralSpaceTypeNum` while generating a whole-zone default and CreateMissingSpaces calls it while generating a mixed-assignment remainder; the helper searches the ordered type registry built from validated authored Spaces and any earlier generated default using case-insensitive General matching",
 ]
 routine.get_general_space_type_num.write_state = [
-  "the helper reuses the first existing General SpaceTypeId or appends one General entry at the end and returns that dense identity; every generated default in the same model reuses it",
+  "the helper reuses the first existing General SpaceTypeId or appends one General entry at the end and returns that dense identity; every generated whole-zone default and remainder in the same model reuses it",
 ]
 routine.get_general_space_type_num.history_state_ownership = "TypedModel owns the immutable ordered normalized SpaceType name registry and dense IDs only; the helper allocates no mutable simulation history"
 routine.get_general_space_type_num.unsupported_state = [
@@ -483,11 +484,11 @@ routine.get_general_space_type_num.unsupported_state = [
   "all downstream type-based grouping, gains, reporting, geometry, HVAC, and space heat-balance consumers",
 ]
 routine.get_general_space_type_num.inactive_branches = [
-  "when every Zone already has an authored Space, no default is generated and the helper is not called, so a non-General-only authored registry remains unchanged",
-  "when General already exists from an authored Space, default creation reuses that identity without appending another type",
+  "when every Zone already has an authored Space and no mixed explicit/blank surface assignment requires a remainder, the helper is not called, so a non-General-only authored registry remains unchanged",
+  "when General already exists from an authored Space or earlier generated default, later default or remainder creation reuses that identity without appending another type",
 ]
 routine.get_general_space_type_num.unsupported_active_branches = [
-  "generated default creation and General identity alone add no runtime boundary; raw authored Space and SpaceList definitions are blocked by the parent GetSpaceData contract",
+  "generated whole-zone default creation and General identity alone add no runtime boundary; authored Space and SpaceList definitions are blocked by the parent GetSpaceData contract, while generated remainders are blocked by the separate CreateMissingSpaces contract",
 ]
 routine.get_general_space_type_num.not_claimed_branches = [
   "complete helper parity, source one-based numeric identity, allocation/counter side effects, whitespace-preserving labels, exact diagnostics, downstream type consumers, numerical parity, and conformance",
@@ -525,7 +526,7 @@ routine.process_zone_data.inactive_branches = [
 ]
 routine.process_zone_data.unsupported_active_branches = [
   "every authored zone-local inside or outside convection override, including one equal to the inherited effective value, is typed but blocks arbitrary runtime execution until the zone-local coefficient consumer is wired",
-  "Space declaration/default topology, nominal control, Zone collections, and local-environment node linkage belong to separate bounded GetSpaceData, GetZoneData, and GetZoneLocalEnvData contracts; remainder-space, surface-assignment, and geometry-realization semantics remain deferred",
+  "Space declaration/default topology, nominal control, Zone collections, and local-environment node linkage belong to separate bounded GetSpaceData, GetZoneData, and GetZoneLocalEnvData contracts; typed detailed-surface lookup/same-Zone validation and remainder/fallback assignment belong to the bounded CP97 GetHTSurfaceData/CreateMissingSpaces composite, while full GetHTSurfaceData and broader geometry realization remain deferred",
 ]
 routine.process_zone_data.not_claimed_branches = [
   "complete `GetBuildingData` or `GetZoneData` parity, broad Rust compiler pass-order parity, source control-character restoration, source/native canonical enum-case behavior, whitespace-preserving or case-colliding names, shared Zone/Space/ZoneList/SpaceList namespace uniqueness, invalid-input recovery, exact diagnostics/order/multiplicity, downstream geometry correction and warnings, output registration, runtime convection, reporting, numerical parity, and conformance",
@@ -2856,6 +2857,7 @@ energyplus_source = [
 rust_target = [
   "crates/ep_compiler/src/compiler.rs::Compiler::parse_global_geometry_rules",
   "crates/ep_compiler/src/compiler.rs::canonical_world_surface_vertices",
+  "crates/ep_compiler/src/compiler/surface_space.rs::Compiler::create_missing_spaces",
   "crates/ep_compare/src/eio.rs::parse_eio_surface_geometry_rules",
   "crates/ep_compare/src/eio.rs::parse_eio_heat_transfer_surfaces",
   "crates/ep_cli/src/main.rs::run_compare_surface_geometry",
@@ -2874,7 +2876,7 @@ proof_variables = [
   "HeatTransfer Surface Tilt",
 ]
 claim_level = "none"
-support_boundary = "CP57 scaffold with a bounded implementation for the EnergyPlus 26.1 detailed opaque-surface coordinate path. It types and parses GlobalGeometryRules, canonicalizes starting-corner and vertex-direction order, projects Relative coordinates through zone rotation, origin, and building rotation, follows DetermineAzimuthAndTilt horizontal azimuth semantics, parses DetailsWithVertices EIO rows, and matches one six-surface transformed-coordinate oracle smoke. It does not promote the mapped routines, add a blocking gate, or make a geometry conformance claim."
+support_boundary = "Geometry source-order scaffold with CP57 bounded detailed opaque-surface coordinate state: typed GlobalGeometryRules, canonical vertex order, Relative-to-world projection, horizontal azimuth semantics, and one nonclaim transformed-coordinate oracle smoke. CP97 adds a bounded composite for typed BuildingSurface:Detailed only: the GetHTSurfaceData-owned cross-section resolves optional Space references through the full pre-remainder arena and validates same-Zone membership while the full routine remains source-mapped, then state-mapped CreateMissingSpaces detects mixed assignments, appends one remainder per affected Zone, applies final fallback SpaceIds, and redirects implicit surfaces. SetupZoneGeometry, GetSurfaceData, and full GetHTSurfaceData remain source-mapped; other surface families, opposite-surface generation, reordering, Space surface lists, derived space/zone geometry, and runtime space heat balance remain deferred. This entry does not add numerical geometry conformance."
 
 routine.setup_zone_geometry.source_file = "src/EnergyPlus/SurfaceGeometry.cc"
 routine.setup_zone_geometry.source_routine = "SetupZoneGeometry"
@@ -2950,6 +2952,40 @@ routine.get_vertices.unsupported_active_branches = [
 ]
 routine.get_vertices.not_claimed_branches = [
   "full-routine `GetVertices` parity, exact trigonometric last-bit parity, diagnostic and counter parity, EIO equality outside the declared transformed fixture, zone volume closure, fenestration, shading, daylighting, solar, heat balance, or broad geometry conformance",
+]
+
+routine.create_missing_spaces.source_file = "src/EnergyPlus/SurfaceGeometry.cc"
+routine.create_missing_spaces.source_routine = "CreateMissingSpaces"
+routine.create_missing_spaces.source_map = "docs/src/porting-map/geometry-source-map.md"
+routine.create_missing_spaces.completion_status = "state_mapped"
+routine.create_missing_spaces.required_for_full_domain = false
+routine.create_missing_spaces.state_mapping_ref = "docs/src/porting-map/geometry-source-map.md"
+routine.create_missing_spaces.read_state = [
+  "EnergyPlus calls `CreateMissingSpaces` inside `GetSurfaceData` after all surface-family input, the fatal input-error gate, adjacent Zone/Space surface generation, and base-surface reconciliation, but before surface reordering; bounded Rust calls its partition pass after validated typed `BuildingSurface:Detailed` materialization and covers only that base detailed opaque family",
+  "the preceding bounded GetHTSurfaceData cross-section owns raw optional `space_name` handling: `resolve_surface_space` treats missing or blank input as implicit, rejects malformed values, searches the full pre-remainder Space arena in dense order with case-insensitive normalized matching including authored and `AutoZoneDefault` entries, and requires every explicit target to belong to the surface Zone; full GetHTSurfaceData remains source-mapped",
+  "as a prerequisite to `create_missing_spaces`, every retained typed surface therefore supplies a validated ZoneId, a provisional final-candidate SpaceId equal to either its explicit target or the Zone's existing last Space, and an ephemeral explicit/implicit classification; the pass reads those preclassified assignments to detect whether each Zone has both classes, while a Zone with no retained detailed surface has neither",
+]
+routine.create_missing_spaces.write_state = [
+  "every retained typed `BuildingSurface:Detailed` exits with a final `Surface.space: SpaceId`: an explicit valid target remains unchanged, an all-implicit Zone uses its existing last Space, and an implicit surface in a mixed explicit/implicit Zone is redirected to the newly appended remainder",
+  "each mixed Zone receives exactly one Zone-order appended Space named `<ZONE>-REMAINDER`, linked last in `Zone::spaces`, with `SpaceOrigin::AutoZoneRemainder`, AutoCalculate ceiling height/volume/floor area, no tags, and the General SpaceTypeId reused or appended through `GetGeneralSpaceTypeNum`; the remainder is deliberately absent from the authored Space name map and generated Spaces do not increase typed input object count",
+  "unknown, malformed, or cross-Zone explicit references fail compilation in the preceding bounded GetHTSurfaceData cross-section before this partition pass; every authored Space, SpaceList, and generated remainder is reported as `UnsupportedSpacePartitioning` and `RunBlocked`, while a sole `AutoZoneDefault` remains inactive when no remainder is needed, including when every valid typed surface explicitly references it",
+]
+routine.create_missing_spaces.history_state_ownership = "TypedModel owns immutable final detailed-surface SpaceIds, generated remainder descriptors, per-Zone ordered SpaceIds, and the shared SpaceType registry; this bounded pass allocates no mutable surface, geometry, space-air, zone-air, load, HVAC, sizing, or reporting history"
+routine.create_missing_spaces.unsupported_state = [
+  "all non-`BuildingSurface:Detailed` source families, non-heat-transfer and shading filters, InternalMass exclusion from remainder detection, subsurface inheritance, auto-generated interzone surfaces and warnings, and Outside Boundary Condition Zone/Space opposite-surface creation",
+  "the remainder of `GetSurfaceData` and `SetupZoneGeometry`: surface reordering, `Space.surfaces`, first/last ranges, calculated floor area/ceiling height/volume and fractions, enclosures, vertex realization/correction beyond the existing CP57 subset, reports, and runtime consumers",
+]
+routine.create_missing_spaces.inactive_branches = [
+  "a Zone with no retained typed detailed surface creates no remainder; a Zone whose retained surfaces are all implicit creates no remainder and assigns all of them to its existing last Space",
+  "a Zone whose retained surfaces are all explicit creates no remainder; prevalidated assignments to its sole generated whole-zone default add no `UnsupportedSpacePartitioning` boundary",
+  "General is appended only when a mixed Zone needs a remainder and the ordered type registry does not already contain it; otherwise the first existing General identity is reused",
+]
+routine.create_missing_spaces.unsupported_active_branches = [
+  "every generated `AutoZoneRemainder` blocks arbitrary runtime execution until space-level geometry, heat balance, loads, HVAC, and reporting consume the partition; authored Spaces and SpaceLists remain blocked by their existing parent contracts",
+  "final SurfaceId-to-SpaceId ownership is typed but does not claim surface sorting, per-Space surface lists, space heat-balance execution, or any numerical effect",
+]
+routine.create_missing_spaces.not_claimed_branches = [
+  "complete `SetupZoneGeometry`, `GetSurfaceData`, `GetHTSurfaceData`, or `CreateMissingSpaces` parity; source allocation/resize capacity, one-based counters, partial invalid-record side effects, whitespace-preserving or ambiguous case-colliding first-match behavior, exact diagnostics/order/multiplicity, legacy detailed surfaces, InternalMass, fenestration/subsurface inheritance, auto-generated adjacent surfaces and warnings, surface reordering, Space surface lists/ranges, geometry, loads, HVAC, reporting, numerical parity, and conformance",
 ]
 
 [[algorithm]]

@@ -280,7 +280,7 @@ pub struct Zone {
     pub is_nominal_controlled: bool,
     /// Last nonblank outdoor-air node linked by ZoneProperty:LocalEnvironment.
     pub linked_outdoor_air_node: Option<NodeId>,
-    /// Spaces assigned by GetSpaceData, in declaration/default-generation order.
+    /// Spaces assigned by GetSpaceData and CreateMissingSpaces, in source phase order.
     pub spaces: Vec<SpaceId>,
 }
 
@@ -330,9 +330,11 @@ pub enum SpaceOrigin {
     Authored,
     /// Whole-zone default created when a zone has no authored space.
     AutoZoneDefault,
+    /// Zone remainder created when explicit and blank surface assignments are mixed.
+    AutoZoneRemainder,
 }
 
-/// Thermal space declaration or whole-zone default.
+/// Thermal space declaration or generated zone partition.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Space {
     /// Typed ID.
@@ -353,7 +355,7 @@ pub struct Space {
     pub space_type_id: SpaceTypeId,
     /// Ordered, normalized reporting tags.
     pub tags: Vec<NormalizedName>,
-    /// Authored or whole-zone default origin.
+    /// Authored, whole-zone default, or generated remainder origin.
     pub origin: SpaceOrigin,
 }
 

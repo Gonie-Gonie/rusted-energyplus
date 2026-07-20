@@ -958,7 +958,7 @@ mod tests {
     use ep_model::{
         AutoOrNumber, ConstructionId, InsideSurfaceConvectionAlgorithm, NormalizedName,
         OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, Point3, SimulationModel,
-        SunExposure, Surface, SurfaceId, SurfaceType, TypedModel, WindExposure, Zone,
+        SpaceId, SunExposure, Surface, SurfaceId, SurfaceType, TypedModel, WindExposure, Zone,
         ZoneConvectionAlgorithm, ZoneId,
     };
 
@@ -998,6 +998,7 @@ mod tests {
             surface_type: SurfaceType::Floor,
             construction: ConstructionId(0),
             zone: ZoneId(0),
+            space: SpaceId(0),
             outside_boundary_condition: OutsideBoundaryCondition::Ground,
             outside_boundary_condition_object: None,
             sun_exposure: SunExposure::NoSun,

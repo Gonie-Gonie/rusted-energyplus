@@ -350,7 +350,7 @@ impl Compiler<'_> {
         }
     }
 
-    fn register_space_type(
+    pub(super) fn register_space_type(
         &mut self,
         model: &mut TypedModel,
         object_name: &str,

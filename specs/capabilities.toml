@@ -255,7 +255,7 @@ reason = "Zone-local outdoor-air node conditions and downstream weather consumer
 id = "unsupported_space_partitioning"
 object_patterns = ["Space", "SpaceList"]
 severity = "run_blocked"
-reason = "Authored Space partitioning, SpaceList expansion, surface assignment, and space-level heat-balance consumers are not ported."
+reason = "Authored and generated-remainder Space partitioning, SpaceList expansion, and space-level heat-balance consumers are not ported; sole generated whole-zone defaults remain inactive."
 
 [[unsupported_rule]]
 id = "unsupported_surface_boundary"

@@ -246,7 +246,7 @@ pub struct TypedModel {
     pub zone_local_environments: Vec<ZoneLocalEnvironment>,
     /// ZoneProperty:LocalEnvironment names.
     pub zone_local_environment_names: NameMap<ZoneLocalEnvironmentId>,
-    /// Authored spaces followed by generated whole-zone defaults.
+    /// Authored spaces, generated whole-zone defaults, then geometry remainders.
     pub spaces: Vec<Space>,
     /// Authored Space names used by the preceding SpaceList resolution phase.
     pub authored_space_names: NameMap<SpaceId>,
@@ -1810,8 +1810,8 @@ mod tests {
         NoMassMaterial, Node, NodeGraphDiagnosticCode, NodeId, NormalizedName,
         OpaqueSurfaceProperties, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm,
         PlantBranch, PlantBranchComponent, PlantBranchList, PlantConnectorKind, PlantConnectorList,
-        PlantConnectorListEntry, PlantLoop, PlantLoopSide, RegularMaterial, SunExposure, Surface,
-        SurfaceId, SurfaceType, TypedModel, Version, WindExposure,
+        PlantConnectorListEntry, PlantLoop, PlantLoopSide, RegularMaterial, SpaceId, SunExposure,
+        Surface, SurfaceId, SurfaceType, TypedModel, Version, WindExposure,
         WindowGlazingSpectralAverageMaterial, ZoneId,
     };
 
@@ -1982,6 +1982,7 @@ mod tests {
             surface_type: SurfaceType::Wall,
             construction: ConstructionId(0),
             zone: ZoneId(0),
+            space: SpaceId(0),
             outside_boundary_condition: OutsideBoundaryCondition::Outdoors,
             outside_boundary_condition_object: None,
             sun_exposure: SunExposure::SunExposed,

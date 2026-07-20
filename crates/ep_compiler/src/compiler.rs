@@ -5,6 +5,7 @@ mod construction_internal_heat_source;
 mod construction_window_data_file;
 mod construction_window_equivalent_layer;
 mod space;
+mod surface_space;
 mod zone;
 mod zone_collections;
 mod zone_local_environment;
@@ -691,6 +692,7 @@ impl<'a> Compiler<'a> {
         self.parse_node_lists(&mut model);
         self.parse_zone_local_environments(&mut model);
         self.parse_space_data(&mut model);
+        self.parse_surfaces(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
         self.parse_zone_humidistats(&mut model);
@@ -713,7 +715,6 @@ impl<'a> Compiler<'a> {
         self.parse_plant_loops(&mut model);
         self.parse_other_equipment(&mut model);
         self.parse_people(&mut model);
-        self.parse_surfaces(&mut model);
         self.parse_surface_vapor_coefficients(&mut model);
 
         let typed_object_count = model.object_count();
@@ -13824,6 +13825,8 @@ impl<'a> Compiler<'a> {
     }
 
     fn parse_surfaces(&mut self, model: &mut TypedModel) {
+        let diagnostics_before_surfaces = self.diagnostics.len();
+        let mut explicit_space_assignments = Vec::new();
         for (name, object) in self.objects("BuildingSurface:Detailed") {
             let Some(surface_type) = self.required_enum(
                 "BuildingSurface:Detailed",
@@ -13883,6 +13886,11 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
+            let Some((space, explicitly_assigned)) =
+                self.resolve_surface_space(model, &name, &object, zone)
+            else {
+                continue;
+            };
             let Some(outside_boundary_condition) = self.required_enum(
                 "BuildingSurface:Detailed",
                 &name,
@@ -13928,6 +13936,7 @@ impl<'a> Compiler<'a> {
                 surface_type,
                 construction,
                 zone,
+                space,
                 outside_boundary_condition,
                 outside_boundary_condition_object: self
                     .optional_string(
@@ -13963,6 +13972,14 @@ impl<'a> Compiler<'a> {
                 ),
                 vertices,
             });
+            explicit_space_assignments.push((id, explicitly_assigned));
+        }
+
+        let surface_errors = self.diagnostics[diagnostics_before_surfaces..]
+            .iter()
+            .any(|diagnostic| diagnostic.severity == DiagnosticSeverity::Error);
+        if !surface_errors {
+            self.create_missing_spaces(model, &explicit_space_assignments);
         }
     }
 
@@ -17574,6 +17591,7 @@ mod tests {
     mod schedule_year;
     mod space;
     mod surface_properties_vapor_coefficients;
+    mod surface_space;
     mod window_material_blind;
     mod window_material_blind_equivalent_layer;
     mod window_material_complex_shade;
