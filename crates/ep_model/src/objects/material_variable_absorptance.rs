@@ -1,4 +1,4 @@
-use crate::{MaterialId, MaterialVariableAbsorptanceId, NormalizedName, ScheduleId};
+use crate::{MaterialId, MaterialVariableAbsorptanceId, NormalizedName, ScheduleId, SurfaceId};
 
 /// A curve or table identity whose payload remains outside the typed model.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -63,4 +63,16 @@ pub struct MaterialVariableAbsorptance {
     pub reference_material: MaterialId,
     /// Source-resolved control and dependency state.
     pub control: VariableAbsorptanceControl,
+}
+
+/// One exterior opaque surface selected for variable-absorptance evaluation.
+///
+/// The binding records only the source `GetVariableAbsorptanceSurfaceList` selection. Runtime
+/// evaluation and mutation of surface absorptances remain outside this typed subset.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct VariableAbsorptanceSurfaceBinding {
+    /// Typed detailed-surface ID in deterministic surface order.
+    pub surface: SurfaceId,
+    /// Existing variable-absorptance overlay applied through the construction outside layer.
+    pub variable_absorptance: MaterialVariableAbsorptanceId,
 }

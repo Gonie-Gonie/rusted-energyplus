@@ -1,7 +1,7 @@
 use super::super::{RunResultState, RuntimeClass, SupportStatus, assess_support};
 use crate::{PartialRunPolicy, RunMode, RunOutputFormat, TraceLevel};
 use ep_compiler::compile_raw_model;
-use ep_model::MaterialVariableAbsorptanceId;
+use ep_model::{MaterialVariableAbsorptanceId, SurfaceId, VariableAbsorptanceSurfaceBinding};
 use ep_raw_model::parse_epjson_str;
 
 #[test]
@@ -54,6 +54,17 @@ fn variable_absorptance_blocks_used_and_unused_targets_before_runtime()
     assert_eq!(
         model.material_variable_absorptances[0].id,
         MaterialVariableAbsorptanceId(0)
+    );
+    let used_overlay = model
+        .material_variable_absorptance_names
+        .resolve("Used Overlay")
+        .ok_or_else(|| std::io::Error::other("expected used variable-absorptance overlay"))?;
+    assert_eq!(
+        model.variable_absorptance_surface_bindings,
+        vec![VariableAbsorptanceSurfaceBinding {
+            surface: SurfaceId(0),
+            variable_absorptance: used_overlay,
+        }]
     );
 
     let assessment = assess_support(

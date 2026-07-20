@@ -83,6 +83,11 @@ heat-transfer behavior.
 3. `GetHysteresisData` reads
    `MaterialProperty:PhaseChangeHysteresis`.
 
+After constructions, zones, and surfaces are available, the parent
+`GetHeatBalanceInput` order calls `GetBuildingData` and then
+`DataSurfaces::GetVariableAbsorptanceSurfaceList`. CP98 maps that later
+surface-selection state separately from the common material-input readers.
+
 The spectral dataset therefore exists before a glazing definition resolves a
 spectral-data reference. Variable absorptance exists only after base materials
 have been created; Rust publishes its typed overlay only after the shared
@@ -243,14 +248,16 @@ all fail before overlay identity or target ownership is reserved. Broad
 diagnostic and declaration-order parity remain unclaimed.
 
 Every typed overlay, including one attached to an unused material, blocks
-arbitrary runtime execution. Rust does not yet build the exterior-first-layer
-surface list, evaluate schedules or functions, select the three trigger
-signals, or apply the source `[0.0001, 0.9999]` clamp. In particular, runtime
-support does not reproduce the EnergyPlus 26.1 scheduled-solar defect that
-tests the solar schedule pointer but reads the thermal schedule pointer. The
-object emits no dedicated EIO row, so this checkpoint adds compiler and
-support-boundary tests but no case manifest, proof variable, runtime numerical
-claim, or conformance claim.
+arbitrary runtime execution. A later bounded compiler pass now selects the
+retained exterior detailed opaque surfaces whose construction outside layer
+owns an overlay, but it does not evaluate schedules or functions, select the
+three runtime trigger signals, or apply the source `[0.0001, 0.9999]` clamp. In
+particular, runtime support does not reproduce the EnergyPlus 26.1
+scheduled-solar defect that tests the solar schedule pointer but reads the
+thermal schedule pointer. The object emits no dedicated EIO row, so the typed
+overlay and surface-selection checkpoints add compiler and support-boundary
+tests but no case manifest, proof variable, runtime numerical claim, or
+conformance claim.
 
 ### `GetVariableAbsorptanceInput` state contract
 
@@ -268,10 +275,10 @@ write_state:
 - compile failure before identity or target reservation for malformed fields, invalid control, missing or non-Regular target, ambiguous dependency identity, selected-family absence, resolved opposite-family state, normalized overlay-name duplicate, or a second overlay for one target
 
 history_state_ownership:
-- no runtime history in this checkpoint; the compiled model owns immutable overlay descriptors while surface activation and timestep updates remain unsupported
+- no runtime history in this checkpoint; the compiled model owns immutable overlay descriptors, the separate CP98 contract owns immutable surface selection, and timestep updates remain unsupported
 
 unsupported_state:
-- Curve/Table payload typing, dimensional validation, interpolation and evaluation; exterior variable-absorptance surface-list construction; thermal/solar surface-array mutation; trigger evaluation; clamping; construction and surface behavior; reporting and conformance
+- Curve/Table payload typing, dimensional validation, interpolation and evaluation; the separately state-mapped exterior variable-absorptance surface selection does not execute thermal/solar surface-array mutation, trigger evaluation, clamping, construction behavior, reporting, or conformance
 
 inactive_branches:
 - within the declared public Curve/Table and shared schedule namespaces, unresolved optional names become null as `Curve::GetCurve` or `Sched::GetSchedule` would; they are harmless when another selected-family dependency resolves
@@ -282,8 +289,52 @@ unsupported_active_branches:
 - source last-wins multiplicity and IDF declaration-order recovery are deferred; a repeated target fails closed
 
 not_claimed_branches:
-- exact source diagnostic severity/text/order/early-return behavior, Curve/Table dependency validation, `GetVariableAbsorptanceSurfaceList`, `UpdateVariableAbsorptances`, the scheduled-solar pointer defect, EIO serialization, runtime numerical behavior, and conformance
+- exact source diagnostic severity/text/order/early-return behavior, Curve/Table dependency validation, the separately bounded `GetVariableAbsorptanceSurfaceList` selection, `UpdateVariableAbsorptances`, the scheduled-solar pointer defect, EIO serialization, runtime numerical behavior, and conformance
 <!-- routine-state-contract:v1 end get_variable_absorptance_input -->
+
+### `GetVariableAbsorptanceSurfaceList` state contract
+
+EnergyPlus invokes this DataSurfaces routine immediately after
+`GetBuildingData`. The bounded Rust pass runs after retained
+`BuildingSurface:Detailed` records have resolved their ConstructionIds and
+selects only an immutable surface-to-overlay identity vector. It also emits
+bounded warning diagnostics for a selected overlay on a non-outdoor outside
+layer or on any source-effective inside construction-layer occurrence. The
+selection does not weaken the existing all-definition runtime block.
+
+<!-- routine-state-contract:v1 begin get_variable_absorptance_surface_list -->
+GetVariableAbsorptanceSurfaceList
+
+read_state:
+- EnergyPlus calls `DataSurfaces::GetVariableAbsorptanceSurfaceList` immediately after `GetBuildingData`; bounded Rust calls `Compiler::build_variable_absorptance_surface_list` after the typed `BuildingSurface:Detailed` pass and publishes no selection when that surface pass added an error
+- the deterministic typed `MaterialVariableAbsorptance` arena, retained detailed opaque surfaces in dense SurfaceId order, each surface's resolved ConstructionId and `OutsideBoundaryCondition`, each construction's source-effective material-layer order, and all typed constructions in dense ConstructionId order
+- for surface selection, the source scans `AllHTSurfaceList`, skips zero-layer or null-outside-layer constructions and non-Regular outside materials, then tests whether the outside material has variable-absorptance control; bounded Rust scans only its already validated typed `BuildingSurface:Detailed` subset and matches the existing overlay by outside-layer MaterialId
+
+write_state:
+- `TypedModel::variable_absorptance_surface_bindings`, an immutable deterministic vector of `VariableAbsorptanceSurfaceBinding { surface, variable_absorptance }` records for each retained `Outdoors` detailed surface whose construction outside layer owns a typed overlay; binding order follows dense SurfaceId order and records no absorptance value or mutable surface state
+- a non-Outdoors retained detailed surface whose outside layer owns an overlay produces one bounded warning and no binding; those surface warnings are accumulated in dense SurfaceId order before construction-layer warnings are published
+- every typed construction is then scanned in dense ConstructionId order and every source-effective inside layer from one-based layer 2 onward is scanned in layer order; each occurrence whose MaterialId owns an overlay produces a warning independently, including repeated material occurrences, and never produces a surface binding
+- the binding vector is published once after both scans; an empty overlay arena publishes an empty vector without scanning, and a typed-surface parse error leaves the model's initially empty vector unpublished rather than exposing a partial selection
+
+history_state_ownership:
+- the compiled TypedModel owns immutable surface-to-overlay bindings only; this checkpoint creates no timestep history, mutable absorptance arrays, schedule/function evaluation state, trigger state, or output state
+
+unsupported_state:
+- `UpdateVariableAbsorptances`: schedule or Curve/Table evaluation, SurfaceTemperature/SurfaceReceivedSolarRadiation/SpaceHeatingCoolingMode triggers, exterior thermal/solar absorptance mutation, `[0.0001, 0.9999]` clamping, and the EnergyPlus 26.1 scheduled-solar thermal-pointer defect
+- the full source `AllHTSurfaceList`, source surface-family ingestion and reordering, legacy detailed surfaces, InternalMass, fenestration/subsurfaces, shading, generated counterpart surfaces, and any runtime or reporting consumer of the selected list
+
+inactive_branches:
+- with no valid typed variable-absorptance overlay, the binding vector is empty and the source-equivalent `AnyVariableAbsorptance` early-return branch performs no surface or construction scan
+- an overlay on an unused material or on a construction outside layer used only by a non-Outdoors retained surface creates no binding; the overlay remains covered by the existing all-definition `UnsupportedSurfaceBoundary` runtime block
+- an overlay used only below construction layer 1 creates no binding and only the bounded occurrence-local warning state; repeated inside-layer occurrences are not deduplicated
+
+unsupported_active_branches:
+- every typed `MaterialProperty:VariableAbsorptance` definition remains `UnsupportedSurfaceBoundary` and `RunBlocked`, including a definition with one or more compiled exterior bindings; selection does not add an executable capability, proof variable, manifest, comparator, or numerical claim
+- surface and inside-layer warnings are compile diagnostics only; Rust does not claim the source's exact warning severity text, punctuation, object naming, order across deferred surface families, or multiplicity outside the typed arenas
+
+not_claimed_branches:
+- complete `AllHTSurfaceList` membership or source reorder parity, other surface families, malformed/partial source recovery, exact warning text/order/multiplicity, `UpdateVariableAbsorptances`, construction or surface heat-transfer behavior, EIO/output serialization, runtime numerics, and conformance
+<!-- routine-state-contract:v1 end get_variable_absorptance_surface_list -->
 
 ## Phase-Change Hysteresis Attachment Typed Contract
 
@@ -3228,7 +3279,7 @@ construction-local conductivity fallback.
 | `ReportGlass` | `source_mapped` | owns the bounded Blind specialized header, raw seven-field row serialization, construction-occurrence order, and post-`CalcNominalWindowCond` skip behavior |
 | `CalcNominalWindowCond` | `source_mapped` | owns the exact-bare-companion search and the missing-bare/between-glass error flags that make `ReportGlass` omit those construction rows; Rust fail-closes rather than reproducing this calculation |
 | `GetVariableAbsorptanceInput` | `state_mapped` | owns the complete bounded post-base overlay read: exact Regular/NoMass target gate, defaulted four-way control, source-null unresolved dependency names, selected/opposite dependency rules, separate typed arena/name map, one-overlay-per-target fail-close boundary, and universal runtime block |
-| `GetVariableAbsorptanceSurfaceList` | `source_mapped` | owns exterior-first-layer surface activation and interior-layer warnings; no Rust execution state is added by the typed-input checkpoint |
+| `GetVariableAbsorptanceSurfaceList` | `state_mapped` | owns the bounded post-`GetBuildingData` selection of retained Outdoors detailed opaque surfaces whose construction outside layer owns a typed overlay, plus ordered non-outdoor-surface and every-inside-layer-occurrence warnings; immutable `VariableAbsorptanceSurfaceBinding` state is typed, while full `AllHTSurfaceList` membership/reorder parity, other surface families, exact warning text/order/multiplicity, and runtime evaluation remain unsupported |
 | `UpdateVariableAbsorptances` | `source_mapped` | owns schedule/function trigger evaluation, exterior thermal/solar mutation, clamping, and the EnergyPlus 26.1 scheduled-solar pointer defect; all runtime behavior remains unsupported |
 | `GetHysteresisData` | `state_mapped` | owns the complete bounded post-base hysteresis attachment read: public Material/NoMass target gate, thirteen required strict-positive inputs, grouped typed state and source-derived specific heats, duplicate-target fail-close boundary, and universal runtime block |
 | `GetCondFDInput` | `state_mapped` | owns the complete bounded PhaseChange and VariableThermalConductivity typed-input passes: public Material/NoMass target gate, PhaseChange's defaulted finite coefficient, both unbounded complete ordered point vectors, family-local duplicate-target fail-close boundaries, deliberate eager validation, and universal runtime blocks; its CondFD settings and all numerical state remain unsupported |
@@ -3241,14 +3292,15 @@ bounded implementation slice does not promote the whole `GetMaterialData`,
 `CalcNominalWindowCond` routines beyond `source_mapped`. Only the declared
 standalone `GetWindowGlassSpectralData` input boundary and the material-owned
 `SetupSimpleWindowGlazingSystem` calculation plus the declared
-`GetVariableAbsorptanceInput` overlay boundary, `GetHysteresisData` attachment
+`GetVariableAbsorptanceInput` overlay boundary, bounded
+`GetVariableAbsorptanceSurfaceList` selection, `GetHysteresisData` attachment
 boundary, the declared `GetCondFDInput` PhaseChange and
 VariableThermalConductivity passes, the declared
 `GetMoistureBalanceEMPDInput` settings pass, the declared six
 `GetHeatBalHAMTInput` material passes (Settings, SorptionIsotherm, Suction,
 Redistribution, Diffusion, and ThermalConductivity), and the final seventh
 `SurfaceProperties:VaporCoefficients` surface pass are `state_mapped` within
-their bounded input domains.
+their bounded input or immutable-selection domains.
 
 ## Evidence And Promotion Boundary
 

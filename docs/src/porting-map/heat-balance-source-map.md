@@ -36,6 +36,7 @@ claim.
 | global heat-balance report registration | `src/EnergyPlus/DataHeatBalance.cc` | `ep_runtime::ResultStore`, conformance report metadata |
 | surface heat balance | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | `ep_runtime::surface_balance` |
 | surface heat-balance declarations | `src/EnergyPlus/HeatBalanceSurfaceManager.hh` | `ep_runtime::surface_balance` |
+| surface/material selection state | `src/EnergyPlus/DataSurfaces.cc::GetVariableAbsorptanceSurfaceList` | `ep_model::VariableAbsorptanceSurfaceBinding`, `ep_compiler` |
 | zone air predictor/corrector | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `ep_runtime::zone_air` |
 | zone air declarations | `src/EnergyPlus/ZoneTempPredictorCorrector.hh` | `ep_runtime::zone_air` |
 | internal gains input summaries | `src/EnergyPlus/HeatBalanceInternalHeatGains.cc` | `ep_compiler`, `ep_runtime::internal_gains` |
@@ -52,6 +53,7 @@ claim.
 | window frame/divider input | `GetFrameAndDividerData` | EnergyPlus places this routine after hysteresis and before construction input; Rust types the complete bounded object after base `parse_materials` and before `parse_constructions`, while its separate Hysteresis pass remains later, so complete pass-order parity is not claimed; every definition, including unused records, remains runtime-blocking |
 | construction input | `GetConstructData` / `CreateFCfactorConstructions` / `CreateAirBoundaryConstructions` / `SetupComplexFenestrationStateInput` / `SearchWindow5DataFile` | the parent remains source-mapped; required ordinary names/layers, bounded opaque/fenestration validation, thermochromic first-state metadata, sole-layer SimpleGlazingSystem, the inline lexical InternalHeatSource overlay, the following WindowEquivalentLayer declaration state, and the final WindowDataFile request selector are typed; the F-then-C generator is state-mapped with private raw-count internal materials and exact formulas; AirBoundary is state-mapped as lexical-order zero-layer declaration state; the complex-state pass is state-mapped for bounded LBNLWINDOW/None graph state; every special construction definition/request is run-blocked while SearchWindow5DataFile expansion, equivalent-layer ASHWAT consumers, surface consumers, CTF/QTF/reporting, and window/ground/source-sink execution remain deferred |
 | building/zone/space input | `GetBuildingData` -> `GetZoneData` -> `ProcessZoneData` / `GetZoneLocalEnvData` / `GetSpaceData` / `GetGeneralSpaceTypeNum` -> `SetupZoneGeometry` / `GetHTSurfaceData` / `CreateMissingSpaces` | the HeatBalanceManager wrappers plus `SetupZoneGeometry`, `GetSurfaceData`, and full `GetHTSurfaceData` remain source-mapped; bounded declaration state continues through Space/SpaceList/default-Space creation, then a CP97 composite bounds the GetHT-owned typed detailed-surface Space lookup and same-Zone validation before state-mapped `CreateMissingSpaces` consumes preclassified assignments, creates mixed-assignment remainders, and applies final fallback SpaceIds. Collections, local environments, authored Spaces, SpaceLists, and generated remainders run-block; sole whole-zone defaults remain inactive when no remainder is needed, including when every valid detailed surface explicitly references the default. Other surface families, opposite-surface generation, reordering, Space surface lists, geometry realization, list consumers, outputs, and runtime convection remain deferred. |
+| variable-absorptance surface selection | `DataSurfaces::GetVariableAbsorptanceSurfaceList` immediately after `GetBuildingData` | CP98 state-maps the bounded retained `BuildingSurface:Detailed` subset: dense-order Outdoors surfaces whose construction outside layer owns a typed overlay receive immutable `VariableAbsorptanceSurfaceBinding` identities; non-Outdoors outside-layer uses warn without binding, followed by occurrence-local warnings for every typed construction layer after layer 1. Every overlay remains runtime-blocking. Full `AllHTSurfaceList` membership/reorder parity, other surface families, exact warning text/order/multiplicity outside typed arenas, `UpdateVariableAbsorptances`, runtime numerics, and conformance remain deferred. |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
 | inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
@@ -66,7 +68,7 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed immediately by `DataSurfaces::GetVariableAbsorptanceSurfaceList`
 3. `InitHeatBalance`
 4. outside opaque surface balance
 5. inside opaque surface balance
@@ -865,6 +867,30 @@ finalizer state contract is in
 The parent `SetupZoneGeometry`, `GetSurfaceData`, and full `GetHTSurfaceData`
 routines remain `source_mapped`.
 
+### CP98 `GetVariableAbsorptanceSurfaceList` bounded selection
+
+After `GetBuildingData` returns, EnergyPlus immediately calls
+`DataSurfaces::GetVariableAbsorptanceSurfaceList`. Bounded Rust preserves that
+relative barrier by calling
+`Compiler::build_variable_absorptance_surface_list` after the retained detailed
+surface pass has resolved ConstructionIds and only when that pass added no
+error. The pass scans retained surfaces in dense SurfaceId order. An `Outdoors`
+surface whose construction outside-layer MaterialId owns a typed
+`MaterialProperty:VariableAbsorptance` overlay receives one immutable
+`VariableAbsorptanceSurfaceBinding`; the same outside-layer use on a
+non-Outdoors surface produces a warning and no binding. Rust then scans every
+typed construction and every source-effective layer after layer 1 in dense
+construction/layer order, producing an independent warning for each overlay
+occurrence, without deduplication.
+
+This immutable selection does not weaken the existing all-definition
+`UnsupportedSurfaceBoundary` / `RunBlocked` boundary. The full source
+`AllHTSurfaceList` and source surface reorder, other surface families,
+`UpdateVariableAbsorptances`, exact warning text/punctuation/order/multiplicity
+outside the typed arenas, surface absorptance mutation, runtime numerics, and
+conformance remain deferred. The canonical contract is in
+[the material source map](material-source-map.md#getvariableabsorptancesurfacelist-state-contract).
+
 ### `ProcessZoneData` state contract
 
 <!-- routine-state-contract:v1 begin process_zone_data -->
@@ -913,6 +939,7 @@ not_claimed_branches:
 | `DataHeatBalance::ZoneLocalEnvironmentData` and `ZoneData::LinkedOutAirNode` | `ep_model::ZoneLocalEnvironment` and `Zone::linked_outdoor_air_node` | staged-IDF or native-epJSON ordered dense declarations retain resolved ZoneId and optional one-member-NodeList or direct generic NodeId; last nonblank link wins and a later blank does not clear it; every definition run-blocks until OutdoorAir:Node condition state and local-weather consumers are wired |
 | `DataHeatBalance::SpaceData`, `SpaceListData`, `spaceTypes`, and `ZoneData::spaceIndexes` | `ep_model::Space`, `ep_model::SpaceList`, `ep_model::SpaceOrigin`, `SpaceTypeId`, typed name maps, and `Zone::spaces` | lexical dense authored Spaces retain resolved Zone, numeric-or-Autocalculate geometry selectors, first-seen normalized type identity, ordered tags, and authored origin; lexical SpaceLists retain ordered authored-Space membership including valid empty lists; Zone-order General defaults ensure every Zone has a Space but remain outside the preceding SpaceList name map. A later bounded pass appends General `AutoZoneRemainder` entries for mixed detailed-surface assignments. Authored Spaces, every SpaceList, and remainders run-block; sole whole-zone defaults do not, while Space surface lists/geometry/runtime consumers remain deferred |
 | `DataSurface::SurfaceData::{Zone, spaceNum}` | `ep_model::Surface::{zone, space}` and `ep_model::SpaceOrigin` | the typed detailed opaque subset resolves optional Space names through the full pre-remainder arena with same-Zone validation, retains explicit targets, assigns all-implicit Zones to their existing last Space, and redirects mixed implicit surfaces to a Zone-order remainder; other surface families, opposite-surface generation, reordering, per-Space surface lists, geometry, and runtime consumers remain deferred |
+| `DataSurface::AllVaryAbsOpaqSurfaceList` selected by `GetVariableAbsorptanceSurfaceList` | `TypedModel::variable_absorptance_surface_bindings` and `ep_model::VariableAbsorptanceSurfaceBinding` | after the retained detailed-surface pass, dense-order Outdoors surfaces whose construction outside layer owns a typed overlay retain a SurfaceId-to-MaterialVariableAbsorptanceId binding; non-Outdoors outside-layer uses and each typed inside-layer occurrence produce bounded warnings only. Full `AllHTSurfaceList` membership/reorder parity, other surface families, runtime updates, exact warning text/order/multiplicity, numerics, and conformance remain deferred, and every overlay still run-blocks |
 | `DataSurfaces::FrameDividerProperties` | `ep_model::WindowFrameAndDivider`, `ep_model::WindowFrameProperties`, `ep_model::WindowDividerProperties`, `ep_model::WindowRevealProperties` | complete bounded immutable user-input descriptors and an independent normalized namespace are typed; fenestration binding, geometry, WINDOW 5 synthesis, shading mutation, window physics, NFRC calculations, reporting, and runtime remain blocked |
 | `Construction::ConstructionProps::{Name, TotLayers, LayerPoint, isTCWindow, isTCMaster, TCMasterMatNum, TCLayerNum, TCGlassNum}` and construction/material CTF data | `ep_model::Construction`, optional immutable thermochromic master metadata, `ep_model::ModelGraph::construction_materials`, checked runtime direct-index construction/material lookup, and `ep_runtime::SurfaceCtfState` | ordinary input layers resolve into a bounded opaque/fenestration construction; every thermochromic parent contributes its first glazing state to the effective stack and only the final parent owns zero-based master metadata, while a sole SimpleGlazingSystem layer retains its original material identity and Fenestration kind. Graph edges follow the effective or retained IDs. The opaque runtime cache, static Regular/AirGap/IRT EIO evidence, diagnostic steady/no-mass coefficient seeding, and CTF histories do not enable thermochromic/window execution, multi-layer SimpleGlazing quirks, child construction generation, mass-material coefficient generation, or broad face-temperature solving |
 | F/C-factor construction flags, source dimensions/factors, `NominalR`, and generated material layer points | `ep_model::ConstructionGroundFactor`, private generated entries in `TypedModel::materials`, and `ModelGraph::construction_materials` | exact bounded generation formulas, ordinary-then-F-then-C ordering, private names, raw ordinals, and two graph edges are retained; surface pairing, ground temperatures, CTF/runtime, reporting, and public attachment targeting remain blocked |

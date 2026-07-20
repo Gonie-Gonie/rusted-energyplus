@@ -6,6 +6,7 @@ mod construction_window_data_file;
 mod construction_window_equivalent_layer;
 mod space;
 mod surface_space;
+mod variable_absorptance_surface;
 mod zone;
 mod zone_collections;
 mod zone_local_environment;
@@ -692,7 +693,9 @@ impl<'a> Compiler<'a> {
         self.parse_node_lists(&mut model);
         self.parse_zone_local_environments(&mut model);
         self.parse_space_data(&mut model);
+        let diagnostics_before_surfaces = self.diagnostics.len();
         self.parse_surfaces(&mut model);
+        self.build_variable_absorptance_surface_list(&mut model, diagnostics_before_surfaces);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
         self.parse_zone_humidistats(&mut model);
@@ -17592,6 +17595,7 @@ mod tests {
     mod space;
     mod surface_properties_vapor_coefficients;
     mod surface_space;
+    mod variable_absorptance_surface;
     mod window_material_blind;
     mod window_material_blind_equivalent_layer;
     mod window_material_complex_shade;
