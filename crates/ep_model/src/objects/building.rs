@@ -1,4 +1,7 @@
-use crate::{AutoOrNumber, NormalizedName, Point3, RunPeriodId, ZoneGroupId, ZoneId, ZoneListId};
+use crate::{
+    AutoOrNumber, NodeId, NormalizedName, Point3, RunPeriodId, ZoneGroupId, ZoneId, ZoneListId,
+    ZoneLocalEnvironmentId,
+};
 
 /// EnergyPlus-compatible model version.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -275,6 +278,8 @@ pub struct Zone {
     pub is_part_of_total_floor_area: bool,
     /// Whether a raw ZoneHVAC:EquipmentConnections object names this zone.
     pub is_nominal_controlled: bool,
+    /// Last nonblank outdoor-air node linked by ZoneProperty:LocalEnvironment.
+    pub linked_outdoor_air_node: Option<NodeId>,
 }
 
 /// Ordered collection of thermal zones.
@@ -301,4 +306,17 @@ pub struct ZoneGroup {
     pub zone_list: ZoneListId,
     /// Positive list multiplier.
     pub multiplier: u32,
+}
+
+/// Zone-local outdoor environment declaration.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ZoneLocalEnvironment {
+    /// Typed ID.
+    pub id: ZoneLocalEnvironmentId,
+    /// ZoneProperty:LocalEnvironment name.
+    pub name: NormalizedName,
+    /// Referenced thermal zone.
+    pub zone: ZoneId,
+    /// Optional single outdoor-air node; blank input retains no link.
+    pub outdoor_air_node: Option<NodeId>,
 }

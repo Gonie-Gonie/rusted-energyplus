@@ -11,6 +11,7 @@ macro_rules! typed_id {
 typed_id!(ZoneId);
 typed_id!(ZoneListId);
 typed_id!(ZoneGroupId);
+typed_id!(ZoneLocalEnvironmentId);
 typed_id!(SurfaceId);
 typed_id!(SurfaceVaporCoefficientsId);
 typed_id!(WindowFrameAndDividerId);

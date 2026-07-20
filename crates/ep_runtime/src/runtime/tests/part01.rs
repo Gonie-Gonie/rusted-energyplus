@@ -2068,6 +2068,7 @@
             ),
             is_part_of_total_floor_area: true,
             is_nominal_controlled: false,
+            linked_outdoor_air_node: None,
         });
         let model = SimulationModel::from_typed(typed);
 

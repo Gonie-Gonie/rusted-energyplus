@@ -1136,6 +1136,10 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
         ("zones", model.zones.len()),
         ("zone_lists", model.zone_lists.len()),
         ("zone_groups", model.zone_groups.len()),
+        (
+            "zone_local_environments",
+            model.zone_local_environments.len(),
+        ),
         ("surfaces", model.surfaces.len()),
         ("constructions", model.constructions.len()),
         ("materials", model.materials.len()),

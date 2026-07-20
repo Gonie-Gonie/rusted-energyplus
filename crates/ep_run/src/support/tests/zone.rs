@@ -144,3 +144,50 @@ fn typed_zone_lists_and_groups_fail_closed_before_unconsumed_runtime_semantics()
     );
     Ok(())
 }
+
+#[test]
+fn typed_zone_local_environment_fails_closed_before_local_weather_consumption()
+-> Result<(), Box<dyn std::error::Error>> {
+    let raw = parse_epjson_str(
+        r#"{
+            "Zone": {"Zone One": {}},
+            "ZoneProperty:LocalEnvironment": {
+                "Zone Weather": {
+                    "zone_name":"Zone One",
+                    "outdoor_air_node_name":"Local Outdoor Node"
+                }
+            }
+        }"#,
+    )?;
+    let result = compile_raw_model(&raw);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+
+    let assessment = assess_support(
+        &raw,
+        &result.report,
+        result.model.as_ref(),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+    );
+
+    assert_eq!(assessment.status, SupportStatus::Unsupported);
+    assert_eq!(assessment.runtime_class, RuntimeClass::None);
+    assert_eq!(assessment.run_result_state, RunResultState::RunBlocked);
+    assert!(
+        assessment.unsupported_objects.iter().any(|entry| {
+            entry.object_type == "ZoneProperty:LocalEnvironment" && entry.count == 1
+        })
+    );
+    assert_eq!(
+        assessment
+            .diagnostics
+            .diagnostics
+            .iter()
+            .filter(|diagnostic| diagnostic.code == "UnsupportedZoneLocalEnvironment")
+            .count(),
+        1
+    );
+    Ok(())
+}

@@ -246,6 +246,12 @@ severity = "run_blocked"
 reason = "ZoneList target expansion and ZoneGroup list-multiplier runtime semantics are not ported."
 
 [[unsupported_rule]]
+id = "unsupported_zone_local_environment"
+object_patterns = ["ZoneProperty:LocalEnvironment"]
+severity = "run_blocked"
+reason = "Zone-local outdoor-air node conditions and downstream weather consumers are not ported."
+
+[[unsupported_rule]]
 id = "unsupported_surface_boundary"
 object_patterns = ["FenestrationSurface:*", "Window*", "Daylighting:*", "Shading:*", "Site:Ground*", "Material:RoofVegetation", "MaterialProperty:VariableAbsorptance", "MaterialProperty:PhaseChangeHysteresis", "MaterialProperty:PhaseChange", "MaterialProperty:VariableThermalConductivity", "MaterialProperty:MoisturePenetrationDepth:Settings", "MaterialProperty:HeatAndMoistureTransfer:Settings", "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm", "MaterialProperty:HeatAndMoistureTransfer:Suction", "MaterialProperty:HeatAndMoistureTransfer:Redistribution", "MaterialProperty:HeatAndMoistureTransfer:Diffusion", "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity", "SurfaceProperties:VaporCoefficients", "Construction:FfactorGroundFloor", "Construction:CfactorUndergroundWall", "Construction:AirBoundary", "Construction:ComplexFenestrationState", "ConstructionProperty:InternalHeatSource", "Construction:WindowEquivalentLayer", "Construction:WindowDataFile"]
 severity = "run_blocked"

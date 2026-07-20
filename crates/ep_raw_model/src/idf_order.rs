@@ -58,6 +58,10 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "ZoneGroup",
         name_field_index: 0,
     },
+    IdfOrderTarget {
+        object_type: "ZoneProperty:LocalEnvironment",
+        name_field_index: 0,
+    },
 ];
 
 /// Error returned when staged IDF declaration order cannot be recovered safely.

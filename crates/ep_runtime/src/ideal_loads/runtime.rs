@@ -989,6 +989,7 @@ mod tests {
             ),
             is_part_of_total_floor_area: true,
             is_nominal_controlled: false,
+            linked_outdoor_air_node: None,
         });
         typed.surfaces.push(Surface {
             id: SurfaceId(0),

@@ -3,7 +3,7 @@ use crate::{
     ZoneEquipmentConnectionId, ZoneEquipmentListId, ZoneId,
 };
 
-/// Typed air-side node discovered from node lists and HVAC node references.
+/// Typed air-side node discovered from node lists, local environments, and HVAC references.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Node {
     /// Typed ID.

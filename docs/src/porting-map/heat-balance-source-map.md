@@ -51,7 +51,7 @@ claim.
 | material input | `Material::GetWindowGlassSpectralData` -> `Material::GetMaterialData` -> `Material::GetHysteresisData` | all 34 public base/overlay objects are inventoried in [the material-family source map](material-source-map.md); Regular, NoMass, AirGap, InfraredTransparent, RefractionExtinctionMethod, and EquivalentLayer plus only the `WindowMaterial:Glazing` `SpectralAverage` branch are typed, while equivalent-layer topology/ASHWAT consumers and full window behavior remain blocked |
 | window frame/divider input | `GetFrameAndDividerData` | EnergyPlus places this routine after hysteresis and before construction input; Rust types the complete bounded object after base `parse_materials` and before `parse_constructions`, while its separate Hysteresis pass remains later, so complete pass-order parity is not claimed; every definition, including unused records, remains runtime-blocking |
 | construction input | `GetConstructData` / `CreateFCfactorConstructions` / `CreateAirBoundaryConstructions` / `SetupComplexFenestrationStateInput` / `SearchWindow5DataFile` | the parent remains source-mapped; required ordinary names/layers, bounded opaque/fenestration validation, thermochromic first-state metadata, sole-layer SimpleGlazingSystem, the inline lexical InternalHeatSource overlay, the following WindowEquivalentLayer declaration state, and the final WindowDataFile request selector are typed; the F-then-C generator is state-mapped with private raw-count internal materials and exact formulas; AirBoundary is state-mapped as lexical-order zero-layer declaration state; the complex-state pass is state-mapped for bounded LBNLWINDOW/None graph state; every special construction definition/request is run-blocked while SearchWindow5DataFile expansion, equivalent-layer ASHWAT consumers, surface consumers, CTF/QTF/reporting, and window/ground/source-sink execution remain deferred |
-| building/zone input | `GetBuildingData` -> `GetZoneData` -> `ProcessZoneData` | both wrappers remain source-mapped; the complete public `Zone` declaration handled by `ProcessZoneData` is state-mapped, and bounded `GetZoneData` state now continues through nominal-control marking, ZoneList, and ZoneGroup before stopping at `GetZoneLocalEnvData`; every collection definition run-blocks while local environment, Space, geometry realization, list consumers, outputs, and runtime convection remain deferred |
+| building/zone input | `GetBuildingData` -> `GetZoneData` -> `ProcessZoneData` | both wrappers remain source-mapped; the complete public `Zone` declaration handled by `ProcessZoneData` is state-mapped, and bounded `GetZoneData` state now continues through nominal-control marking, ZoneList, ZoneGroup, and the separately state-mapped `GetZoneLocalEnvData` before stopping at ZonePreDefRep allocation; every collection and local-environment definition run-blocks while local-weather consumers, Space, geometry realization, list consumers, outputs, and runtime convection remain deferred |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
 | inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
@@ -636,17 +636,17 @@ processes ZoneList and ZoneGroup, reads local-environment data, allocates
 ZonePreDefRep, and processes Space, SpaceList, or default Space records. Rust
 keeps both wrappers source-mapped, retains the complete immutable
 `ProcessZoneData` declaration state, and now continues the bounded
-`GetZoneData` state through nominal-control marking, ZoneList, and ZoneGroup
-before stopping at `GetZoneLocalEnvData`.
+`GetZoneData` state through nominal-control marking, ZoneList, ZoneGroup, and
+`GetZoneLocalEnvData` before stopping at ZonePreDefRep allocation.
 
-The staged-IDF order overlay now includes `Zone`, `ZoneList`, and `ZoneGroup`,
-so each dense arena follows family-local IDF declaration order. Native epJSON
-without that overlay continues to use lexical instance-key order. All 12 Zone
-public fields plus the required object-key name are validated before the dense
-ID and normalized name are published. A positive authored floor area is
-preferred by current area consumers; an authored local convection selector is
-retained but blocks arbitrary execution until the zone-local coefficient path
-consumes it.
+The staged-IDF order overlay now includes `Zone`, `ZoneList`, `ZoneGroup`, and
+`ZoneProperty:LocalEnvironment`, so each dense arena follows family-local IDF
+declaration order. Native epJSON without that overlay continues to use lexical
+instance-key order. All 12 Zone public fields plus the required object-key name
+are validated before the dense ID and normalized name are published. A positive
+authored floor area is preferred by current area consumers; an authored local
+convection selector is retained but blocks arbitrary execution until the
+zone-local coefficient path consumes it.
 
 After the Zone arena is complete, the bounded equipment-connection scan sets
 each Zone's nominal-control flag solely from case-insensitive raw `zone_name`
@@ -658,44 +658,98 @@ Every ZoneList and ZoneGroup definition remains fail-closed because current
 Zone-or-ZoneList consumers and comprehensive list-multiplier runtime paths are
 not yet wired.
 
+`GetZoneLocalEnvData` retains each resolved Zone and its optional generic node.
+A nonblank node can name a one-member NodeList alias or a direct node that is
+registered or reused. Ordered nonblank definitions overwrite the linked node
+on their Zone, while a later blank node does not clear an earlier link. The
+EnergyPlus 26.1 source checks outdoor-node membership only behind a
+short-circuited zero-node condition, so this bounded declaration phase does not
+require a direct node to have an `OutdoorAir:Node` definition. NodeList parsing
+therefore moves immediately before this phase, matching the source routine's
+lazy single-node lookup dependency without otherwise changing node order.
+Every local-environment definition remains fail-closed until its mutable local
+weather state and downstream consumers are wired.
+
 ### `GetZoneData` bounded collection state contract
 
 <!-- routine-state-contract:v1 begin get_zone_data -->
 GetZoneData
 
 read_state:
-- after all `ProcessZoneData` calls complete, EnergyPlus first derives nominal control for every Zone from raw `ZoneHVAC:EquipmentConnections.zone_name` presence, then processes every ZoneList, then every ZoneGroup before `GetZoneLocalEnvData`; bounded Rust preserves that phase order immediately after typed Zone publication
+- after all `ProcessZoneData` calls complete, EnergyPlus first derives nominal control for every Zone from raw `ZoneHVAC:EquipmentConnections.zone_name` presence, then processes every ZoneList, every ZoneGroup, and `GetZoneLocalEnvData`; bounded Rust preserves that phase order immediately after typed Zone publication and before the deferred ZonePreDefRep allocation and `GetSpaceData`
 - nominal control is a case-insensitive field-value existence scan independent of full equipment-connection field parsing; every Zone is explicitly retained as true for a matching raw zone name or false otherwise
 - each ZoneList has one required nonblank outer-key name and a nonempty `zones` array whose ordered entries each require one case-insensitively resolved Zone name; staged IDF lists use recovered declaration order while native epJSON lists use lexical outer-key order
 - each ZoneGroup has one required nonblank outer-key name, one required case-insensitively resolved ZoneList name, and an integer multiplier defaulting to one in the source-compatible positive signed-integer range; staged IDF groups use recovered declaration order while native epJSON groups use lexical outer-key order
+- each ZoneProperty:LocalEnvironment has one required nonblank outer-key name, one required case-insensitively resolved nonblank Zone name, and an optional outdoor-air node name; bounded Rust initializes NodeList declarations immediately before this phase because EnergyPlus `GetOnlySingleNode` lazily initializes them
 
 write_state:
 - each typed Zone retains `is_nominal_controlled`, default false and set true solely by the bounded raw equipment-connection scan without claiming full connection validity
 - a deterministic dense ZoneList arena and independent normalized name map retain each validated `ZoneListId`, normalized name, ordered ZoneId members, and maximum authored member-name length; empty, malformed, unresolved, or duplicate members fail before identity publication, while a Zone-name collision emits a nonblocking warning
 - a deterministic dense ZoneGroup arena and independent normalized name map retain each validated `ZoneGroupId`, normalized name, ZoneListId, and multiplier; repeated list use or grouped-list Zone overlap fails before publication, while every valid member Zone receives the multiplier and the source-shaped ZoneList identity in `list_group`
-- every valid ZoneList or ZoneGroup is reported as `UnsupportedZoneGrouping` and `RunBlocked` before arbitrary runtime execution because list-target expansion and comprehensive list-multiplier consumption are not wired
+- a deterministic dense ZoneLocalEnvironment arena and independent normalized name map retain each validated declaration, its ZoneId, and optional generic NodeId; each nonblank node resolves a one-member NodeList alias or registers/reuses a direct node, and ordered nonblank links overwrite the Zone link while a later blank node does not clear it
+- every valid ZoneList or ZoneGroup is reported as `UnsupportedZoneGrouping`, and every valid ZoneProperty:LocalEnvironment as `UnsupportedZoneLocalEnvironment`, with `RunBlocked` before arbitrary runtime execution because downstream collection and local-weather consumers are not wired
 
 history_state_ownership:
-- TypedModel owns immutable nominal-control, ZoneList, ZoneGroup, and per-Zone list-assignment declaration state only; this checkpoint allocates no mutable local-environment, space, geometry, sizing, reporting, equipment, surface, or zone-air history
+- TypedModel owns immutable nominal-control, ZoneList, ZoneGroup, ZoneLocalEnvironment, and per-Zone list/local-node declaration state only; this checkpoint allocates no mutable local weather, space, geometry, sizing, reporting, equipment, surface, or zone-air history
 
 unsupported_state:
-- the pre-Zone-loop ZoneDaylight and resilience allocations, `GetZoneLocalEnvData`, post-local-environment ZonePreDefRep allocation, `GetSpaceData`, Space and SpaceList parsing, and default Space creation
+- the pre-Zone-loop ZoneDaylight and resilience allocations, post-`GetZoneLocalEnvData` ZonePreDefRep allocation, `GetSpaceData`, Space and SpaceList parsing, and default Space creation
 - ZoneList expansion for People, gains, thermostat, sizing, and every other Zone-or-ZoneList consumer, plus comprehensive `Zone.Multiplier * Zone.ListMultiplier` consumption across geometry, loads, HVAC flows, sizing, and reports
-- SetupZoneGeometry realization and correction, outdoor output registration, local weather and EMS state, reporting, runtime numerical behavior, and conformance evidence
+- OutdoorAir:Node condition inputs and node-connection metadata, SetupZoneGeometry realization and correction, outdoor output registration, local weather and EMS state, reporting, runtime numerical behavior, and conformance evidence
 
 inactive_branches:
 - when no raw equipment connection names a Zone, its nominal-control flag remains false without a diagnostic; unmatched connection names mark no Zone in this bounded phase
-- when no ZoneList or ZoneGroup exists, every Zone retains list multiplier one and no list-group identity, adding no runtime boundary
+- when no ZoneList, ZoneGroup, or ZoneProperty:LocalEnvironment exists, every Zone retains list multiplier one, no list-group identity, and no linked outdoor-air node, adding no boundary from those absent families
 - a ZoneGroup multiplier omitted from valid input retains one but still records group membership exactly like an authored multiplier and remains inside the fail-closed grouping boundary
+- a blank or missing local-environment node remains an explicit no-node declaration and does not clear an earlier nonblank link for the same Zone
 
 unsupported_active_branches:
 - every valid ZoneList, including an otherwise unused definition, is typed but blocks arbitrary runtime execution until all Zone-or-ZoneList consumers expand it
 - every valid ZoneGroup, including multiplier one, is typed but blocks arbitrary runtime execution until list multiplier semantics are comprehensively consumed
+- every valid ZoneProperty:LocalEnvironment, including an otherwise unused definition or one with a blank node, is typed but blocks arbitrary runtime execution until local weather consumers are wired
 - the nominal-control scan does not validate or execute ZoneHVAC equipment; the existing later typed equipment-connection and IdealLoads boundaries remain authoritative
 
 not_claimed_branches:
-- complete GetZoneData parity, broad compiler pass-order parity, source partial-allocation and invalid-input recovery side effects, exact diagnostics/text/order/multiplicity, whitespace-preserving or case-colliding names, complete shared Zone/Space/ZoneList/SpaceList namespace behavior, local environment, Space/default Space, geometry, sizing, reporting, numerical parity, and conformance
+- complete GetZoneData parity, broad compiler pass-order parity, source partial-allocation and invalid-input recovery side effects, exact diagnostics/text/order/multiplicity, whitespace-preserving or case-colliding names, complete shared Zone/Space/ZoneList/SpaceList namespace behavior, full OutdoorAir:Node/NodeList and local-weather state, Space/default Space, geometry, sizing, reporting, numerical parity, and conformance
 <!-- routine-state-contract:v1 end get_zone_data -->
+
+### `GetZoneLocalEnvData` state contract
+
+<!-- routine-state-contract:v1 begin get_zone_local_env_data -->
+GetZoneLocalEnvData
+
+read_state:
+- EnergyPlus calls `GetZoneLocalEnvData` after ZoneGroup processing and before ZonePreDefRep allocation and `GetSpaceData`; bounded Rust moves existing NodeList parsing immediately before this phase because `GetOnlySingleNode` lazily initializes NodeLists
+- each ZoneProperty:LocalEnvironment has a required nonblank outer-key name and case-insensitively resolved nonblank `zone_name`; `outdoor_air_node_name` is optional, and blank or missing input retains no node; staged IDF instances use recovered declaration order while native epJSON instances use lexical outer-key order
+- a nonblank node first resolves a typed NodeList alias, accepting exactly one member and rejecting multiple members; otherwise an existing generic NodeId is reused or a new generic NodeId is registered
+- EnergyPlus 26.1 checks OutdoorAir:Node membership only inside a short-circuited `NodeNum == 0` condition, so bounded declaration state likewise does not require a nonblank direct node to have an OutdoorAir:Node definition
+- ordered declarations for the same Zone are allowed; each nonblank resolved node overwrites that Zone's link while a later blank node does not clear the previous link, so the last nonblank node wins
+
+write_state:
+- a deterministic dense ZoneLocalEnvironment arena and independent normalized name map retain each fully validated ZoneLocalEnvironmentId, normalized name, ZoneId, and optional generic NodeId; validation completes before identity, node, or Zone-link publication, so an invalid earlier record consumes none of those bounded identities or side effects
+- each Zone retains an optional linked outdoor-air NodeId; a one-member NodeList stores its member node, a direct name registers or reuses that generic node, and blank input stores no node
+- every valid ZoneProperty:LocalEnvironment definition is reported as `UnsupportedZoneLocalEnvironment` and `RunBlocked` before arbitrary runtime execution because mutable local-weather conditions and their consumers are not wired
+
+history_state_ownership:
+- TypedModel owns immutable local-environment declaration and per-Zone optional generic-node linkage only; this checkpoint allocates no mutable dry-bulb, wet-bulb, wind, psychrometric, EMS, surface, load, or zone-air history
+
+unsupported_state:
+- complete OutdoorAir:Node condition input including height, dry-bulb/wet-bulb/wind schedules, wind-pressure-coefficient curve and symmetry/angle controls, plus NodeConnection metadata
+- AnyLocalEnvironmentsInModel and mutable local dry-bulb, wet-bulb, humidity, pressure, wind, psychrometric, EMS, weather, surface, infiltration, load, and zone-air consumer state
+- source-sized partial records and invalid-input side effects, post-routine ZonePreDefRep allocation, `GetSpaceData`, Space and SpaceList processing, and default Space creation
+
+inactive_branches:
+- when no ZoneProperty:LocalEnvironment exists, the arena stays empty, every Zone node link stays absent, and no local-environment runtime boundary is added
+- a blank or missing node is a valid no-node declaration and does not clear an earlier nonblank link for the same Zone
+- multiple declarations may reference one Zone; only ordered declarations with a nonblank resolved node overwrite its link
+
+unsupported_active_branches:
+- every valid definition, including an otherwise unused record or a record with no node, blocks arbitrary runtime execution until local-weather consumers are wired
+- a nonblank direct generic NodeId does not claim an OutdoorAir:Node declaration or any local environmental conditions
+
+not_claimed_branches:
+- complete GetZoneLocalEnvData parity, source preallocation and partial invalid-record/node/link side effects, the source multi-member NodeList first-node side effect, exact diagnostics/text/order/multiplicity, whitespace-preserving or case-colliding names, OutdoorAir:Node condition state, local-weather consumers, Space, geometry, reporting, numerical parity, and conformance
+<!-- routine-state-contract:v1 end get_zone_local_env_data -->
 
 ### `ProcessZoneData` state contract
 
@@ -719,7 +773,7 @@ history_state_ownership:
 - TypedModel owns immutable Zone declaration descriptors only; this checkpoint allocates no mutable zone-air, surface, weather, equipment, geometry, reporting, or predictor/corrector history
 
 unsupported_state:
-- the remaining `GetZoneData` stages and allocations outside the separately bounded post-Zone collection contract: pre-loop ZoneDaylight and resilience arrays, local-environment outdoor node linkage, post-local-environment ZonePreDefRep allocation, Space and SpaceList processing, and default Space creation
+- the remaining `GetZoneData` stages and allocations outside this routine: pre-loop ZoneDaylight and resilience arrays, the separately bounded post-Zone collection and local-environment contracts, post-local-environment ZonePreDefRep allocation, Space and SpaceList processing, and default Space creation
 - `SetupZoneGeometry` realization of ceiling height, volume, and floor area; five-percent comparison warnings, space-area adjustment, nonpositive-volume recovery, coordinate-system warnings, centroids, bounds, and other surface-derived state
 - four zone outdoor-air output registrations, weather and EMS updates, actual inside/outside convection coefficient selection, CeilingDiffuser recovery, building floor-area reporting, EIO/SQLite output, and conformance evidence
 
@@ -730,7 +784,7 @@ inactive_branches:
 
 unsupported_active_branches:
 - every authored zone-local inside or outside convection override, including one equal to the inherited effective value, is typed but blocks arbitrary runtime execution until the zone-local coefficient consumer is wired
-- local-environment, Space, and geometry-realization semantics remain outside this checkpoint even when corresponding raw objects or active surface geometry are present; nominal control and Zone collections belong to the separate bounded GetZoneData contract
+- Space and geometry-realization semantics remain outside this checkpoint even when corresponding raw objects or active surface geometry are present; nominal control, Zone collections, and local-environment node linkage belong to the separate bounded GetZoneData and GetZoneLocalEnvData contracts
 
 not_claimed_branches:
 - complete `GetBuildingData` or `GetZoneData` parity, broad Rust compiler pass-order parity, source control-character restoration, source/native canonical enum-case behavior, whitespace-preserving or case-colliding names, shared Zone/Space/ZoneList/SpaceList namespace uniqueness, invalid-input recovery, exact diagnostics/order/multiplicity, downstream geometry correction and warnings, output registration, runtime convection, reporting, numerical parity, and conformance
@@ -740,8 +794,9 @@ not_claimed_branches:
 
 | EnergyPlus data | Rust target | Boundary |
 |---|---|---|
-| `DataHeatBalance::ZoneData` declaration and post-list fields | `ep_model::Zone`, `ep_model::ZoneConvectionAlgorithm` | dense ID/name, north/origin, standard type, direct multiplier, raw auto geometry selectors, effective inherited-or-local convection algorithms, total-floor-area membership, nominal-control presence, list multiplier, and source-shaped list identity are retained; positive authored floor area is consumed, while local convection overrides and Zone grouping run-block before deferred geometry/space/report/runtime state |
+| `DataHeatBalance::ZoneData` declaration and post-list/local-environment fields | `ep_model::Zone`, `ep_model::ZoneConvectionAlgorithm` | dense ID/name, north/origin, standard type, direct multiplier, raw auto geometry selectors, effective inherited-or-local convection algorithms, total-floor-area membership, nominal-control presence, list multiplier, source-shaped list identity, and optional linked generic outdoor-air node are retained; positive authored floor area is consumed, while local convection overrides, Zone grouping, and local-environment declarations run-block before deferred geometry/space/report/runtime state |
 | `DataHeatBalance::ZoneListData` and `ZoneGroupData` | `ep_model::ZoneList`, `ep_model::ZoneGroup`, and per-Zone `list_multiplier`/`list_group` | staged-IDF or native-epJSON ordered dense collections retain resolved membership, longest member name, list reference, positive multiplier, repeated-list and grouped-overlap validation, and member-Zone propagation; every definition run-blocks until list-target expansion and comprehensive list-multiplier consumption are wired |
+| `DataHeatBalance::ZoneLocalEnvironmentData` and `ZoneData::LinkedOutAirNode` | `ep_model::ZoneLocalEnvironment` and `Zone::linked_outdoor_air_node` | staged-IDF or native-epJSON ordered dense declarations retain resolved ZoneId and optional one-member-NodeList or direct generic NodeId; last nonblank link wins and a later blank does not clear it; every definition run-blocks until OutdoorAir:Node condition state and local-weather consumers are wired |
 | `DataSurface::SurfaceData` | `ep_model::Surface`, `ep_runtime::SurfaceHeatBalanceState` | opaque surface subset only; outside-layer roughness metadata is tracked for future exterior convection work |
 | `DataSurfaces::FrameDividerProperties` | `ep_model::WindowFrameAndDivider`, `ep_model::WindowFrameProperties`, `ep_model::WindowDividerProperties`, `ep_model::WindowRevealProperties` | complete bounded immutable user-input descriptors and an independent normalized namespace are typed; fenestration binding, geometry, WINDOW 5 synthesis, shading mutation, window physics, NFRC calculations, reporting, and runtime remain blocked |
 | `Construction::ConstructionProps::{Name, TotLayers, LayerPoint, isTCWindow, isTCMaster, TCMasterMatNum, TCLayerNum, TCGlassNum}` and construction/material CTF data | `ep_model::Construction`, optional immutable thermochromic master metadata, `ep_model::ModelGraph::construction_materials`, checked runtime direct-index construction/material lookup, and `ep_runtime::SurfaceCtfState` | ordinary input layers resolve into a bounded opaque/fenestration construction; every thermochromic parent contributes its first glazing state to the effective stack and only the final parent owns zero-based master metadata, while a sole SimpleGlazingSystem layer retains its original material identity and Fenestration kind. Graph edges follow the effective or retained IDs. The opaque runtime cache, static Regular/AirGap/IRT EIO evidence, diagnostic steady/no-mass coefficient seeding, and CTF histories do not enable thermochromic/window execution, multi-layer SimpleGlazing quirks, child construction generation, mass-material coefficient generation, or broad face-temperature solving |

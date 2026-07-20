@@ -303,6 +303,13 @@ pub(super) fn assess_typed_runtime_boundaries(
         "ZoneGroup",
         typed_model.zone_groups.len(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "ZoneProperty:LocalEnvironment",
+        typed_model.zone_local_environments.len(),
+    );
 
     push_typed_unsupported_object(
         registry,
@@ -904,6 +911,7 @@ fn unsupported_rule_code(rule_id: &str, object_type: &str) -> String {
         "unsupported_ems_python_airflow" => "UnsupportedRuntimeModifier",
         "unsupported_sizing" => "UnsupportedSizing",
         "unsupported_zone_grouping" => "UnsupportedZoneGrouping",
+        "unsupported_zone_local_environment" => "UnsupportedZoneLocalEnvironment",
         "unsupported_surface_boundary" => "UnsupportedSurfaceBoundary",
         _ => "UnsupportedObject",
     }

@@ -424,6 +424,10 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     println!("  zones: {}", model.typed.zones.len());
     println!("  zone_lists: {}", model.typed.zone_lists.len());
     println!("  zone_groups: {}", model.typed.zone_groups.len());
+    println!(
+        "  zone_local_environments: {}",
+        model.typed.zone_local_environments.len()
+    );
     println!("  surfaces: {}", model.typed.surfaces.len());
     println!("  constructions: {}", model.typed.constructions.len());
     println!("  materials: {}", model.typed.materials.len());
@@ -19944,6 +19948,10 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
     println!("  zones: {}", model.zones.len());
     println!("  zone_lists: {}", model.zone_lists.len());
     println!("  zone_groups: {}", model.zone_groups.len());
+    println!(
+        "  zone_local_environments: {}",
+        model.zone_local_environments.len()
+    );
     println!("  surfaces: {}", model.surfaces.len());
     println!("  diagnostics: {}", report.diagnostics.len());
     println!("  defaults_applied: {}", report.defaults_applied.len());

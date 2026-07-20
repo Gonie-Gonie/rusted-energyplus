@@ -158,6 +158,7 @@ impl Compiler<'_> {
                 outside_convection_algorithm,
                 is_part_of_total_floor_area,
                 is_nominal_controlled: false,
+                linked_outdoor_air_node: None,
             });
         }
     }

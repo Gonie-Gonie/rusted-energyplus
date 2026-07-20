@@ -6,6 +6,7 @@ mod construction_window_data_file;
 mod construction_window_equivalent_layer;
 mod zone;
 mod zone_collections;
+mod zone_local_environment;
 
 use ep_model::{
     AirBoundaryAirExchange, AirBoundaryMixingSchedule, AirGapMaterial, AirLoopHvac, AutoOrNumber,
@@ -552,6 +553,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "ZoneHVAC:EquipmentConnections",
     "ZoneList",
     "ZoneGroup",
+    "ZoneProperty:LocalEnvironment",
     "AirLoopHVAC",
     "Fan:ConstantVolume",
     "Fan:OnOff",
@@ -683,10 +685,11 @@ impl<'a> Compiler<'a> {
         self.mark_nominal_controlled_zones(&mut model);
         self.parse_zone_lists(&mut model);
         self.parse_zone_groups(&mut model);
+        self.parse_node_lists(&mut model);
+        self.parse_zone_local_environments(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
         self.parse_zone_humidistats(&mut model);
-        self.parse_node_lists(&mut model);
         self.parse_design_specification_outdoor_air(&mut model);
         self.parse_ideal_loads_air_systems(&mut model);
         self.parse_zone_equipment_lists(&mut model);
@@ -17586,6 +17589,7 @@ mod tests {
     mod window_property_frame_and_divider;
     mod zone;
     mod zone_collections;
+    mod zone_local_environment;
 
     use super::{
         ALL_SCHEDULE_DAY_TYPES, CompileStage, DiagnosticSeverity, ObjectCoverageStatus,

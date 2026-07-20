@@ -26,7 +26,8 @@ use crate::{
     WindowFrameAndDivider, WindowFrameAndDividerId, WindowGlazingThermochromicGroupMaterial,
     WindowGlazingThermochromicState, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
     ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneGroup, ZoneGroupId, ZoneHumidistat,
-    ZoneHumidistatId, ZoneId, ZoneList, ZoneListId, ZoneThermostat, ZoneThermostatId,
+    ZoneHumidistatId, ZoneId, ZoneList, ZoneListId, ZoneLocalEnvironment, ZoneLocalEnvironmentId,
+    ZoneThermostat, ZoneThermostatId,
 };
 
 /// Minimal typed model for early compiler stages.
@@ -240,6 +241,10 @@ pub struct TypedModel {
     pub zone_groups: Vec<ZoneGroup>,
     /// ZoneGroup names.
     pub zone_group_names: NameMap<ZoneGroupId>,
+    /// Zone-local outdoor environment declarations.
+    pub zone_local_environments: Vec<ZoneLocalEnvironment>,
+    /// ZoneProperty:LocalEnvironment names.
+    pub zone_local_environment_names: NameMap<ZoneLocalEnvironmentId>,
     /// Building surfaces.
     pub surfaces: Vec<Surface>,
     /// Surface names.
@@ -357,6 +362,8 @@ impl Default for TypedModel {
             zone_list_names: NameMap::default(),
             zone_groups: Vec::new(),
             zone_group_names: NameMap::default(),
+            zone_local_environments: Vec::new(),
+            zone_local_environment_names: NameMap::default(),
             surfaces: Vec::new(),
             surface_names: NameMap::default(),
             surface_vapor_coefficients: Vec::new(),
@@ -460,6 +467,7 @@ impl TypedModel {
             + self.zones.len()
             + self.zone_lists.len()
             + self.zone_groups.len()
+            + self.zone_local_environments.len()
             + self.surfaces.len()
             + self.surface_vapor_coefficients.len()
             + self.window_frame_and_dividers.len()
