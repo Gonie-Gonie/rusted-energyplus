@@ -976,6 +976,8 @@ mod tests {
             },
             zone_type: 1,
             multiplier: 1,
+            list_multiplier: 1,
+            list_group: None,
             ceiling_height: AutoOrNumber::AutoCalculate,
             volume: AutoOrNumber::AutoCalculate,
             floor_area: AutoOrNumber::AutoCalculate,
@@ -986,6 +988,7 @@ mod tests {
                 OutsideSurfaceConvectionAlgorithm::Doe2,
             ),
             is_part_of_total_floor_area: true,
+            is_nominal_controlled: false,
         });
         typed.surfaces.push(Surface {
             id: SurfaceId(0),

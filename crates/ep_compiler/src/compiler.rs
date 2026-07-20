@@ -5,6 +5,7 @@ mod construction_internal_heat_source;
 mod construction_window_data_file;
 mod construction_window_equivalent_layer;
 mod zone;
+mod zone_collections;
 
 use ep_model::{
     AirBoundaryAirExchange, AirBoundaryMixingSchedule, AirGapMaterial, AirLoopHvac, AutoOrNumber,
@@ -549,6 +550,8 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "ZoneHVAC:IdealLoadsAirSystem",
     "ZoneHVAC:EquipmentList",
     "ZoneHVAC:EquipmentConnections",
+    "ZoneList",
+    "ZoneGroup",
     "AirLoopHVAC",
     "Fan:ConstantVolume",
     "Fan:OnOff",
@@ -677,6 +680,9 @@ impl<'a> Compiler<'a> {
         self.parse_material_heat_and_moisture_transfer_thermal_conductivities(&mut model);
         self.validate_scalar_schedule_type_limits(&model);
         self.parse_zones(&mut model);
+        self.mark_nominal_controlled_zones(&mut model);
+        self.parse_zone_lists(&mut model);
+        self.parse_zone_groups(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
         self.parse_zone_humidistats(&mut model);
@@ -17579,6 +17585,7 @@ mod tests {
     mod window_material_simple_glazing_system;
     mod window_property_frame_and_divider;
     mod zone;
+    mod zone_collections;
 
     use super::{
         ALL_SCHEDULE_DAY_TYPES, CompileStage, DiagnosticSeverity, ObjectCoverageStatus,

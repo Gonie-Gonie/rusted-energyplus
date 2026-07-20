@@ -168,6 +168,8 @@ fn single_ideal_loads_typed_model(system_supply: &str, connection_inlet: &str) -
         },
         zone_type: 1,
         multiplier: 1,
+        list_multiplier: 1,
+        list_group: None,
         ceiling_height: AutoOrNumber::AutoCalculate,
         volume: AutoOrNumber::AutoCalculate,
         floor_area: AutoOrNumber::AutoCalculate,
@@ -178,6 +180,7 @@ fn single_ideal_loads_typed_model(system_supply: &str, connection_inlet: &str) -
             ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
         ),
         is_part_of_total_floor_area: true,
+        is_nominal_controlled: false,
     });
     for (id, name) in [
         (NodeId(0), "Zone Inlet"),

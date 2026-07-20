@@ -149,12 +149,15 @@ impl Compiler<'_> {
                 origin,
                 zone_type: 1,
                 multiplier,
+                list_multiplier: 1,
+                list_group: None,
                 ceiling_height,
                 volume,
                 floor_area,
                 inside_convection_algorithm,
                 outside_convection_algorithm,
                 is_part_of_total_floor_area,
+                is_nominal_controlled: false,
             });
         }
     }

@@ -422,6 +422,8 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
         .map_or(0, |schedule| schedule.columns.len());
     println!("ExecutionPlan");
     println!("  zones: {}", model.typed.zones.len());
+    println!("  zone_lists: {}", model.typed.zone_lists.len());
+    println!("  zone_groups: {}", model.typed.zone_groups.len());
     println!("  surfaces: {}", model.typed.surfaces.len());
     println!("  constructions: {}", model.typed.constructions.len());
     println!("  materials: {}", model.typed.materials.len());
@@ -19940,6 +19942,8 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
         model.chillers_electric_eir.len()
     );
     println!("  zones: {}", model.zones.len());
+    println!("  zone_lists: {}", model.zone_lists.len());
+    println!("  zone_groups: {}", model.zone_groups.len());
     println!("  surfaces: {}", model.surfaces.len());
     println!("  diagnostics: {}", report.diagnostics.len());
     println!("  defaults_applied: {}", report.defaults_applied.len());

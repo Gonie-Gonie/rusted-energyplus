@@ -81,6 +81,8 @@ fn zone_materializes_complete_public_inputs_and_source_defaults()
     );
     assert_eq!(authored.zone_type, 1);
     assert_eq!(authored.multiplier, 3);
+    assert_eq!(authored.list_multiplier, 1);
+    assert_eq!(authored.list_group, None);
     assert_eq!(authored.ceiling_height, AutoOrNumber::Value(0.0));
     assert_eq!(authored.volume, AutoOrNumber::Value(-5.0));
     assert_eq!(authored.floor_area, AutoOrNumber::Value(45.5));
@@ -93,6 +95,7 @@ fn zone_materializes_complete_public_inputs_and_source_defaults()
         ZoneConvectionAlgorithm::Override(OutsideSurfaceConvectionAlgorithm::MoWitt)
     );
     assert!(!authored.is_part_of_total_floor_area);
+    assert!(!authored.is_nominal_controlled);
 
     let inherited = &model.zones[1];
     assert_eq!(inherited.id, ZoneId(1));
@@ -141,6 +144,8 @@ fn zone_blank_auto_and_alpha_fields_use_energyplus_defaults()
     );
     assert_eq!(zone.zone_type, 1);
     assert_eq!(zone.multiplier, 1);
+    assert_eq!(zone.list_multiplier, 1);
+    assert_eq!(zone.list_group, None);
     assert_eq!(zone.ceiling_height, AutoOrNumber::AutoCalculate);
     assert_eq!(zone.volume, AutoOrNumber::AutoCalculate);
     assert_eq!(zone.floor_area, AutoOrNumber::AutoCalculate);
@@ -153,6 +158,7 @@ fn zone_blank_auto_and_alpha_fields_use_energyplus_defaults()
         ZoneConvectionAlgorithm::Inherited(OutsideSurfaceConvectionAlgorithm::Doe2)
     );
     assert!(zone.is_part_of_total_floor_area);
+    assert!(!zone.is_nominal_controlled);
     Ok(())
 }
 

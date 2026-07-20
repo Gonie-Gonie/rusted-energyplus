@@ -80,6 +80,8 @@
             },
             zone_type: 1,
             multiplier: 1,
+            list_multiplier: 1,
+            list_group: None,
             ceiling_height: AutoOrNumber::AutoCalculate,
             volume: AutoOrNumber::AutoCalculate,
             floor_area: AutoOrNumber::AutoCalculate,
@@ -90,6 +92,7 @@
                 ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
             ),
             is_part_of_total_floor_area: true,
+            is_nominal_controlled: false,
         });
         model.other_equipment.push(OtherEquipment {
             id: InternalGainId(0),
@@ -151,6 +154,8 @@
             origin: point(0.0, 0.0, 0.0),
             zone_type: 1,
             multiplier: 1,
+            list_multiplier: 1,
+            list_group: None,
             ceiling_height: AutoOrNumber::AutoCalculate,
             volume: AutoOrNumber::Value(1.0),
             floor_area: AutoOrNumber::AutoCalculate,
@@ -161,6 +166,7 @@
                 ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
             ),
             is_part_of_total_floor_area: true,
+            is_nominal_controlled: false,
         });
         model.zones.push(Zone {
             id: ZoneId(1),
@@ -169,6 +175,8 @@
             origin: point(1.0, 0.0, 0.0),
             zone_type: 1,
             multiplier: 1,
+            list_multiplier: 1,
+            list_group: None,
             ceiling_height: AutoOrNumber::AutoCalculate,
             volume: AutoOrNumber::Value(1.0),
             floor_area: AutoOrNumber::AutoCalculate,
@@ -179,6 +187,7 @@
                 ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
             ),
             is_part_of_total_floor_area: true,
+            is_nominal_controlled: false,
         });
         model.surfaces.push(interzone_surface(
             0,

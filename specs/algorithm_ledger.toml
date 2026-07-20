@@ -104,6 +104,9 @@ port_ticket_mappings = [
 rust_target = [
   "crates/ep_runtime/src/heat_balance/manager.rs::manage_heat_balance_source_order_stages",
   "crates/ep_compiler/src/compiler/zone.rs::Compiler::parse_zones",
+  "crates/ep_compiler/src/compiler/zone_collections.rs::Compiler::mark_nominal_controlled_zones",
+  "crates/ep_compiler/src/compiler/zone_collections.rs::Compiler::parse_zone_lists",
+  "crates/ep_compiler/src/compiler/zone_collections.rs::Compiler::parse_zone_groups",
 ]
 status = "scaffold"
 first_case = "official_1zone_uncontrolled_dynamic_conformance_candidate_001"
@@ -111,7 +114,7 @@ proof_variables = [
   "Zone Mean Air Temperature",
 ]
 claim_level = "none"
-support_boundary = "Source-order scaffold for HeatBalanceManager stage barriers plus a bounded immutable ProcessZoneData declaration front end. GetBuildingData and GetZoneData remain source-mapped wrappers; ZoneList, ZoneGroup, local environment, Space, geometry realization, reporting, and runtime convection remain deferred. This entry does not add a numerical conformance claim."
+support_boundary = "Source-order scaffold for HeatBalanceManager stage barriers plus bounded immutable ProcessZoneData and post-Zone GetZoneData declaration state through nominal control, ZoneList, and ZoneGroup processing. GetBuildingData and complete GetZoneData remain source-mapped wrappers; local environment, Space, geometry realization, list-target expansion, comprehensive list-multiplier consumption, reporting, and runtime convection remain deferred. Zone grouping fails closed before runtime. This entry does not add a numerical conformance claim."
 routine.manage_heat_balance.source_file = "src/EnergyPlus/HeatBalanceManager.cc"
 routine.manage_heat_balance.source_routine = "ManageHeatBalance"
 routine.manage_heat_balance.source_map = "docs/src/porting-map/heat-balance-source-map.md"
@@ -342,6 +345,38 @@ routine.get_zone_data.source_routine = "GetZoneData"
 routine.get_zone_data.source_map = "docs/src/porting-map/heat-balance-source-map.md"
 routine.get_zone_data.completion_status = "source_mapped"
 routine.get_zone_data.required_for_full_domain = true
+routine.get_zone_data.state_mapping_ref = "docs/src/porting-map/heat-balance-source-map.md"
+routine.get_zone_data.read_state = [
+  "after all `ProcessZoneData` calls complete, EnergyPlus first derives nominal control for every Zone from raw `ZoneHVAC:EquipmentConnections.zone_name` presence, then processes every ZoneList, then every ZoneGroup before `GetZoneLocalEnvData`; bounded Rust preserves that phase order immediately after typed Zone publication",
+  "nominal control is a case-insensitive field-value existence scan independent of full equipment-connection field parsing; every Zone is explicitly retained as true for a matching raw zone name or false otherwise",
+  "each ZoneList has one required nonblank outer-key name and a nonempty `zones` array whose ordered entries each require one case-insensitively resolved Zone name; staged IDF lists use recovered declaration order while native epJSON lists use lexical outer-key order",
+  "each ZoneGroup has one required nonblank outer-key name, one required case-insensitively resolved ZoneList name, and an integer multiplier defaulting to one in the source-compatible positive signed-integer range; staged IDF groups use recovered declaration order while native epJSON groups use lexical outer-key order",
+]
+routine.get_zone_data.write_state = [
+  "each typed Zone retains `is_nominal_controlled`, default false and set true solely by the bounded raw equipment-connection scan without claiming full connection validity",
+  "a deterministic dense ZoneList arena and independent normalized name map retain each validated `ZoneListId`, normalized name, ordered ZoneId members, and maximum authored member-name length; empty, malformed, unresolved, or duplicate members fail before identity publication, while a Zone-name collision emits a nonblocking warning",
+  "a deterministic dense ZoneGroup arena and independent normalized name map retain each validated `ZoneGroupId`, normalized name, ZoneListId, and multiplier; repeated list use or grouped-list Zone overlap fails before publication, while every valid member Zone receives the multiplier and the source-shaped ZoneList identity in `list_group`",
+  "every valid ZoneList or ZoneGroup is reported as `UnsupportedZoneGrouping` and `RunBlocked` before arbitrary runtime execution because list-target expansion and comprehensive list-multiplier consumption are not wired",
+]
+routine.get_zone_data.history_state_ownership = "TypedModel owns immutable nominal-control, ZoneList, ZoneGroup, and per-Zone list-assignment declaration state only; this checkpoint allocates no mutable local-environment, space, geometry, sizing, reporting, equipment, surface, or zone-air history"
+routine.get_zone_data.unsupported_state = [
+  "the pre-Zone-loop ZoneDaylight and resilience allocations, `GetZoneLocalEnvData`, post-local-environment ZonePreDefRep allocation, `GetSpaceData`, Space and SpaceList parsing, and default Space creation",
+  "ZoneList expansion for People, gains, thermostat, sizing, and every other Zone-or-ZoneList consumer, plus comprehensive `Zone.Multiplier * Zone.ListMultiplier` consumption across geometry, loads, HVAC flows, sizing, and reports",
+  "SetupZoneGeometry realization and correction, outdoor output registration, local weather and EMS state, reporting, runtime numerical behavior, and conformance evidence",
+]
+routine.get_zone_data.inactive_branches = [
+  "when no raw equipment connection names a Zone, its nominal-control flag remains false without a diagnostic; unmatched connection names mark no Zone in this bounded phase",
+  "when no ZoneList or ZoneGroup exists, every Zone retains list multiplier one and no list-group identity, adding no runtime boundary",
+  "a ZoneGroup multiplier omitted from valid input retains one but still records group membership exactly like an authored multiplier and remains inside the fail-closed grouping boundary",
+]
+routine.get_zone_data.unsupported_active_branches = [
+  "every valid ZoneList, including an otherwise unused definition, is typed but blocks arbitrary runtime execution until all Zone-or-ZoneList consumers expand it",
+  "every valid ZoneGroup, including multiplier one, is typed but blocks arbitrary runtime execution until list multiplier semantics are comprehensively consumed",
+  "the nominal-control scan does not validate or execute ZoneHVAC equipment; the existing later typed equipment-connection and IdealLoads boundaries remain authoritative",
+]
+routine.get_zone_data.not_claimed_branches = [
+  "complete GetZoneData parity, broad compiler pass-order parity, source partial-allocation and invalid-input recovery side effects, exact diagnostics/text/order/multiplicity, whitespace-preserving or case-colliding names, complete shared Zone/Space/ZoneList/SpaceList namespace behavior, local environment, Space/default Space, geometry, sizing, reporting, numerical parity, and conformance",
+]
 
 routine.process_zone_data.source_file = "src/EnergyPlus/HeatBalanceManager.cc"
 routine.process_zone_data.source_routine = "ProcessZoneData"
@@ -364,7 +399,7 @@ routine.process_zone_data.write_state = [
 ]
 routine.process_zone_data.history_state_ownership = "TypedModel owns immutable Zone declaration descriptors only; this checkpoint allocates no mutable zone-air, surface, weather, equipment, geometry, reporting, or predictor/corrector history"
 routine.process_zone_data.unsupported_state = [
-  "the remaining `GetZoneData` stages and allocations: pre-loop ZoneDaylight and resilience arrays; post-loop nominal `ZoneHVAC:EquipmentConnections` control lookup, ZoneList and ZoneGroup membership/multipliers, local-environment outdoor node linkage, post-local-environment ZonePreDefRep allocation, Space and SpaceList processing, and default Space creation",
+  "the remaining `GetZoneData` stages and allocations outside the separately bounded post-Zone collection contract: pre-loop ZoneDaylight and resilience arrays, local-environment outdoor node linkage, post-local-environment ZonePreDefRep allocation, Space and SpaceList processing, and default Space creation",
   "`SetupZoneGeometry` realization of ceiling height, volume, and floor area; five-percent comparison warnings, space-area adjustment, nonpositive-volume recovery, coordinate-system warnings, centroids, bounds, and other surface-derived state",
   "four zone outdoor-air output registrations, weather and EMS updates, actual inside/outside convection coefficient selection, CeilingDiffuser recovery, building floor-area reporting, EIO/SQLite output, and conformance evidence",
 ]
@@ -375,7 +410,7 @@ routine.process_zone_data.inactive_branches = [
 ]
 routine.process_zone_data.unsupported_active_branches = [
   "every authored zone-local inside or outside convection override, including one equal to the inherited effective value, is typed but blocks arbitrary runtime execution until the zone-local coefficient consumer is wired",
-  "ZoneList, ZoneGroup, local-environment, Space, and geometry-realization semantics remain outside this checkpoint even when corresponding raw objects or active surface geometry are present",
+  "local-environment, Space, and geometry-realization semantics remain outside this checkpoint even when corresponding raw objects or active surface geometry are present; nominal control and Zone collections belong to the separate bounded GetZoneData contract",
 ]
 routine.process_zone_data.not_claimed_branches = [
   "complete `GetBuildingData` or `GetZoneData` parity, broad Rust compiler pass-order parity, source control-character restoration, source/native canonical enum-case behavior, whitespace-preserving or case-colliding names, shared Zone/Space/ZoneList/SpaceList namespace uniqueness, invalid-input recovery, exact diagnostics/order/multiplicity, downstream geometry correction and warnings, output registration, runtime convection, reporting, numerical parity, and conformance",

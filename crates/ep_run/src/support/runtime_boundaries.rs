@@ -293,6 +293,21 @@ pub(super) fn assess_typed_runtime_boundaries(
         registry,
         unsupported_objects,
         diagnostics,
+        "ZoneList",
+        typed_model.zone_lists.len(),
+    );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "ZoneGroup",
+        typed_model.zone_groups.len(),
+    );
+
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
         "WindowMaterial:Glazing:RefractionExtinctionMethod",
         typed_model
             .materials
@@ -888,6 +903,7 @@ fn unsupported_rule_code(rule_id: &str, object_type: &str) -> String {
         "unsupported_plant" => "UnsupportedPlantObject",
         "unsupported_ems_python_airflow" => "UnsupportedRuntimeModifier",
         "unsupported_sizing" => "UnsupportedSizing",
+        "unsupported_zone_grouping" => "UnsupportedZoneGrouping",
         "unsupported_surface_boundary" => "UnsupportedSurfaceBoundary",
         _ => "UnsupportedObject",
     }

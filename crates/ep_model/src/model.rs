@@ -25,8 +25,8 @@ use crate::{
     ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version, WeekScheduleId,
     WindowFrameAndDivider, WindowFrameAndDividerId, WindowGlazingThermochromicGroupMaterial,
     WindowGlazingThermochromicState, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
-    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneId,
-    ZoneThermostat, ZoneThermostatId,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneGroup, ZoneGroupId, ZoneHumidistat,
+    ZoneHumidistatId, ZoneId, ZoneList, ZoneListId, ZoneThermostat, ZoneThermostatId,
 };
 
 /// Minimal typed model for early compiler stages.
@@ -232,6 +232,14 @@ pub struct TypedModel {
     pub zones: Vec<Zone>,
     /// Zone names.
     pub zone_names: NameMap<ZoneId>,
+    /// Zone lists.
+    pub zone_lists: Vec<ZoneList>,
+    /// ZoneList names.
+    pub zone_list_names: NameMap<ZoneListId>,
+    /// Zone groups.
+    pub zone_groups: Vec<ZoneGroup>,
+    /// ZoneGroup names.
+    pub zone_group_names: NameMap<ZoneGroupId>,
     /// Building surfaces.
     pub surfaces: Vec<Surface>,
     /// Surface names.
@@ -345,6 +353,10 @@ impl Default for TypedModel {
             chiller_electric_eir_names: NameMap::default(),
             zones: Vec::new(),
             zone_names: NameMap::default(),
+            zone_lists: Vec::new(),
+            zone_list_names: NameMap::default(),
+            zone_groups: Vec::new(),
+            zone_group_names: NameMap::default(),
             surfaces: Vec::new(),
             surface_names: NameMap::default(),
             surface_vapor_coefficients: Vec::new(),
@@ -446,6 +458,8 @@ impl TypedModel {
             + self.boilers_hot_water.len()
             + self.chillers_electric_eir.len()
             + self.zones.len()
+            + self.zone_lists.len()
+            + self.zone_groups.len()
             + self.surfaces.len()
             + self.surface_vapor_coefficients.len()
             + self.window_frame_and_dividers.len()

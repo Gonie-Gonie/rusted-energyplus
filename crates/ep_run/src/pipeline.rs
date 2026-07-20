@@ -1134,6 +1134,8 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
         .map_or(0, |schedule| schedule.columns.len());
     BTreeMap::from([
         ("zones", model.zones.len()),
+        ("zone_lists", model.zone_lists.len()),
+        ("zone_groups", model.zone_groups.len()),
         ("surfaces", model.surfaces.len()),
         ("constructions", model.constructions.len()),
         ("materials", model.materials.len()),

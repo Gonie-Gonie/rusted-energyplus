@@ -30,6 +30,8 @@
             },
             zone_type: 1,
             multiplier: 1,
+            list_multiplier: 1,
+            list_group: None,
             ceiling_height: AutoOrNumber::AutoCalculate,
             volume: AutoOrNumber::AutoCalculate,
             floor_area: AutoOrNumber::AutoCalculate,
@@ -40,6 +42,7 @@
                 ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
             ),
             is_part_of_total_floor_area: true,
+            is_nominal_controlled: false,
         });
         typed
             .thermostat_dual_setpoints
@@ -399,6 +402,8 @@
             },
             zone_type: 1,
             multiplier: 1,
+            list_multiplier: 1,
+            list_group: None,
             ceiling_height: AutoOrNumber::AutoCalculate,
             volume: AutoOrNumber::AutoCalculate,
             floor_area: AutoOrNumber::AutoCalculate,
@@ -409,6 +414,7 @@
                 ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
             ),
             is_part_of_total_floor_area: true,
+            is_nominal_controlled: false,
         });
         typed.nodes.push(Node {
             id: NodeId(0),

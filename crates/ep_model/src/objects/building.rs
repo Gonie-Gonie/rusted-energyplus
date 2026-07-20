@@ -1,4 +1,4 @@
-use crate::{AutoOrNumber, NormalizedName, Point3, RunPeriodId, ZoneId};
+use crate::{AutoOrNumber, NormalizedName, Point3, RunPeriodId, ZoneGroupId, ZoneId, ZoneListId};
 
 /// EnergyPlus-compatible model version.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -257,6 +257,10 @@ pub struct Zone {
     pub zone_type: u32,
     /// Zone multiplier.
     pub multiplier: u32,
+    /// Multiplier assigned through a ZoneGroup.
+    pub list_multiplier: u32,
+    /// ZoneList whose ZoneGroup assigned `list_multiplier`.
+    pub list_group: Option<ZoneListId>,
     /// Ceiling height.
     pub ceiling_height: AutoOrNumber,
     /// Zone volume.
@@ -269,4 +273,32 @@ pub struct Zone {
     pub outside_convection_algorithm: ZoneConvectionAlgorithm<OutsideSurfaceConvectionAlgorithm>,
     /// Whether the zone contributes to the building total floor area.
     pub is_part_of_total_floor_area: bool,
+    /// Whether a raw ZoneHVAC:EquipmentConnections object names this zone.
+    pub is_nominal_controlled: bool,
+}
+
+/// Ordered collection of thermal zones.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ZoneList {
+    /// Typed ID.
+    pub id: ZoneListId,
+    /// ZoneList name.
+    pub name: NormalizedName,
+    /// Resolved zone members in authored order.
+    pub zones: Vec<ZoneId>,
+    /// Longest authored zone-name length.
+    pub max_zone_name_length: usize,
+}
+
+/// ZoneList multiplier assignment.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ZoneGroup {
+    /// Typed ID.
+    pub id: ZoneGroupId,
+    /// ZoneGroup name.
+    pub name: NormalizedName,
+    /// Referenced ZoneList.
+    pub zone_list: ZoneListId,
+    /// Positive list multiplier.
+    pub multiplier: u32,
 }

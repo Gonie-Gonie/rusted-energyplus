@@ -51,7 +51,7 @@ claim.
 | material input | `Material::GetWindowGlassSpectralData` -> `Material::GetMaterialData` -> `Material::GetHysteresisData` | all 34 public base/overlay objects are inventoried in [the material-family source map](material-source-map.md); Regular, NoMass, AirGap, InfraredTransparent, RefractionExtinctionMethod, and EquivalentLayer plus only the `WindowMaterial:Glazing` `SpectralAverage` branch are typed, while equivalent-layer topology/ASHWAT consumers and full window behavior remain blocked |
 | window frame/divider input | `GetFrameAndDividerData` | EnergyPlus places this routine after hysteresis and before construction input; Rust types the complete bounded object after base `parse_materials` and before `parse_constructions`, while its separate Hysteresis pass remains later, so complete pass-order parity is not claimed; every definition, including unused records, remains runtime-blocking |
 | construction input | `GetConstructData` / `CreateFCfactorConstructions` / `CreateAirBoundaryConstructions` / `SetupComplexFenestrationStateInput` / `SearchWindow5DataFile` | the parent remains source-mapped; required ordinary names/layers, bounded opaque/fenestration validation, thermochromic first-state metadata, sole-layer SimpleGlazingSystem, the inline lexical InternalHeatSource overlay, the following WindowEquivalentLayer declaration state, and the final WindowDataFile request selector are typed; the F-then-C generator is state-mapped with private raw-count internal materials and exact formulas; AirBoundary is state-mapped as lexical-order zero-layer declaration state; the complex-state pass is state-mapped for bounded LBNLWINDOW/None graph state; every special construction definition/request is run-blocked while SearchWindow5DataFile expansion, equivalent-layer ASHWAT consumers, surface consumers, CTF/QTF/reporting, and window/ground/source-sink execution remain deferred |
-| building/zone input | `GetBuildingData` -> `GetZoneData` -> `ProcessZoneData` | both wrappers are source-mapped; the complete public `Zone` declaration handled by `ProcessZoneData` is state-mapped, while lists/groups, local environment, Space, geometry realization, outputs, and runtime convection remain deferred |
+| building/zone input | `GetBuildingData` -> `GetZoneData` -> `ProcessZoneData` | both wrappers remain source-mapped; the complete public `Zone` declaration handled by `ProcessZoneData` is state-mapped, and bounded `GetZoneData` state now continues through nominal-control marking, ZoneList, and ZoneGroup before stopping at `GetZoneLocalEnvData`; every collection definition run-blocks while local environment, Space, geometry realization, list consumers, outputs, and runtime convection remain deferred |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
 | inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
@@ -634,16 +634,68 @@ every `Zone` through `getObjectItem` and delegating its public fields to
 `ProcessZoneData`. After that loop it derives nominal equipment-control flags,
 processes ZoneList and ZoneGroup, reads local-environment data, allocates
 ZonePreDefRep, and processes Space, SpaceList, or default Space records. Rust
-therefore keeps both wrappers source-mapped and raises only the bounded
-immutable `ProcessZoneData` declaration state.
+keeps both wrappers source-mapped, retains the complete immutable
+`ProcessZoneData` declaration state, and now continues the bounded
+`GetZoneData` state through nominal-control marking, ZoneList, and ZoneGroup
+before stopping at `GetZoneLocalEnvData`.
 
-The staged-IDF order overlay now includes `Zone`, so dense IDs follow IDF
-declaration order. Native epJSON without that overlay continues to use lexical
-instance-key order. All 12 public fields plus the required object-key name are
-validated before the dense ID and normalized name are published. A positive
-authored floor area is preferred by current area consumers; an authored local
-convection selector is retained but blocks arbitrary execution until the
-zone-local coefficient path consumes it.
+The staged-IDF order overlay now includes `Zone`, `ZoneList`, and `ZoneGroup`,
+so each dense arena follows family-local IDF declaration order. Native epJSON
+without that overlay continues to use lexical instance-key order. All 12 Zone
+public fields plus the required object-key name are validated before the dense
+ID and normalized name are published. A positive authored floor area is
+preferred by current area consumers; an authored local convection selector is
+retained but blocks arbitrary execution until the zone-local coefficient path
+consumes it.
+
+After the Zone arena is complete, the bounded equipment-connection scan sets
+each Zone's nominal-control flag solely from case-insensitive raw `zone_name`
+presence. ZoneList then retains nonempty, ordered, resolved Zone membership and
+the longest authored member name. ZoneGroup retains its resolved list and
+positive multiplier, rejects repeated or overlapping grouped lists, and writes
+the multiplier plus the source-shaped ZoneList identity to every member Zone.
+Every ZoneList and ZoneGroup definition remains fail-closed because current
+Zone-or-ZoneList consumers and comprehensive list-multiplier runtime paths are
+not yet wired.
+
+### `GetZoneData` bounded collection state contract
+
+<!-- routine-state-contract:v1 begin get_zone_data -->
+GetZoneData
+
+read_state:
+- after all `ProcessZoneData` calls complete, EnergyPlus first derives nominal control for every Zone from raw `ZoneHVAC:EquipmentConnections.zone_name` presence, then processes every ZoneList, then every ZoneGroup before `GetZoneLocalEnvData`; bounded Rust preserves that phase order immediately after typed Zone publication
+- nominal control is a case-insensitive field-value existence scan independent of full equipment-connection field parsing; every Zone is explicitly retained as true for a matching raw zone name or false otherwise
+- each ZoneList has one required nonblank outer-key name and a nonempty `zones` array whose ordered entries each require one case-insensitively resolved Zone name; staged IDF lists use recovered declaration order while native epJSON lists use lexical outer-key order
+- each ZoneGroup has one required nonblank outer-key name, one required case-insensitively resolved ZoneList name, and an integer multiplier defaulting to one in the source-compatible positive signed-integer range; staged IDF groups use recovered declaration order while native epJSON groups use lexical outer-key order
+
+write_state:
+- each typed Zone retains `is_nominal_controlled`, default false and set true solely by the bounded raw equipment-connection scan without claiming full connection validity
+- a deterministic dense ZoneList arena and independent normalized name map retain each validated `ZoneListId`, normalized name, ordered ZoneId members, and maximum authored member-name length; empty, malformed, unresolved, or duplicate members fail before identity publication, while a Zone-name collision emits a nonblocking warning
+- a deterministic dense ZoneGroup arena and independent normalized name map retain each validated `ZoneGroupId`, normalized name, ZoneListId, and multiplier; repeated list use or grouped-list Zone overlap fails before publication, while every valid member Zone receives the multiplier and the source-shaped ZoneList identity in `list_group`
+- every valid ZoneList or ZoneGroup is reported as `UnsupportedZoneGrouping` and `RunBlocked` before arbitrary runtime execution because list-target expansion and comprehensive list-multiplier consumption are not wired
+
+history_state_ownership:
+- TypedModel owns immutable nominal-control, ZoneList, ZoneGroup, and per-Zone list-assignment declaration state only; this checkpoint allocates no mutable local-environment, space, geometry, sizing, reporting, equipment, surface, or zone-air history
+
+unsupported_state:
+- the pre-Zone-loop ZoneDaylight and resilience allocations, `GetZoneLocalEnvData`, post-local-environment ZonePreDefRep allocation, `GetSpaceData`, Space and SpaceList parsing, and default Space creation
+- ZoneList expansion for People, gains, thermostat, sizing, and every other Zone-or-ZoneList consumer, plus comprehensive `Zone.Multiplier * Zone.ListMultiplier` consumption across geometry, loads, HVAC flows, sizing, and reports
+- SetupZoneGeometry realization and correction, outdoor output registration, local weather and EMS state, reporting, runtime numerical behavior, and conformance evidence
+
+inactive_branches:
+- when no raw equipment connection names a Zone, its nominal-control flag remains false without a diagnostic; unmatched connection names mark no Zone in this bounded phase
+- when no ZoneList or ZoneGroup exists, every Zone retains list multiplier one and no list-group identity, adding no runtime boundary
+- a ZoneGroup multiplier omitted from valid input retains one but still records group membership exactly like an authored multiplier and remains inside the fail-closed grouping boundary
+
+unsupported_active_branches:
+- every valid ZoneList, including an otherwise unused definition, is typed but blocks arbitrary runtime execution until all Zone-or-ZoneList consumers expand it
+- every valid ZoneGroup, including multiplier one, is typed but blocks arbitrary runtime execution until list multiplier semantics are comprehensively consumed
+- the nominal-control scan does not validate or execute ZoneHVAC equipment; the existing later typed equipment-connection and IdealLoads boundaries remain authoritative
+
+not_claimed_branches:
+- complete GetZoneData parity, broad compiler pass-order parity, source partial-allocation and invalid-input recovery side effects, exact diagnostics/text/order/multiplicity, whitespace-preserving or case-colliding names, complete shared Zone/Space/ZoneList/SpaceList namespace behavior, local environment, Space/default Space, geometry, sizing, reporting, numerical parity, and conformance
+<!-- routine-state-contract:v1 end get_zone_data -->
 
 ### `ProcessZoneData` state contract
 
@@ -667,7 +719,7 @@ history_state_ownership:
 - TypedModel owns immutable Zone declaration descriptors only; this checkpoint allocates no mutable zone-air, surface, weather, equipment, geometry, reporting, or predictor/corrector history
 
 unsupported_state:
-- the remaining `GetZoneData` stages and allocations: pre-loop ZoneDaylight and resilience arrays; post-loop nominal `ZoneHVAC:EquipmentConnections` control lookup, ZoneList and ZoneGroup membership/multipliers, local-environment outdoor node linkage, post-local-environment ZonePreDefRep allocation, Space and SpaceList processing, and default Space creation
+- the remaining `GetZoneData` stages and allocations outside the separately bounded post-Zone collection contract: pre-loop ZoneDaylight and resilience arrays, local-environment outdoor node linkage, post-local-environment ZonePreDefRep allocation, Space and SpaceList processing, and default Space creation
 - `SetupZoneGeometry` realization of ceiling height, volume, and floor area; five-percent comparison warnings, space-area adjustment, nonpositive-volume recovery, coordinate-system warnings, centroids, bounds, and other surface-derived state
 - four zone outdoor-air output registrations, weather and EMS updates, actual inside/outside convection coefficient selection, CeilingDiffuser recovery, building floor-area reporting, EIO/SQLite output, and conformance evidence
 
@@ -678,7 +730,7 @@ inactive_branches:
 
 unsupported_active_branches:
 - every authored zone-local inside or outside convection override, including one equal to the inherited effective value, is typed but blocks arbitrary runtime execution until the zone-local coefficient consumer is wired
-- ZoneList, ZoneGroup, local-environment, Space, and geometry-realization semantics remain outside this checkpoint even when corresponding raw objects or active surface geometry are present
+- local-environment, Space, and geometry-realization semantics remain outside this checkpoint even when corresponding raw objects or active surface geometry are present; nominal control and Zone collections belong to the separate bounded GetZoneData contract
 
 not_claimed_branches:
 - complete `GetBuildingData` or `GetZoneData` parity, broad Rust compiler pass-order parity, source control-character restoration, source/native canonical enum-case behavior, whitespace-preserving or case-colliding names, shared Zone/Space/ZoneList/SpaceList namespace uniqueness, invalid-input recovery, exact diagnostics/order/multiplicity, downstream geometry correction and warnings, output registration, runtime convection, reporting, numerical parity, and conformance
@@ -688,7 +740,8 @@ not_claimed_branches:
 
 | EnergyPlus data | Rust target | Boundary |
 |---|---|---|
-| `DataHeatBalance::ZoneData` declaration fields | `ep_model::Zone`, `ep_model::ZoneConvectionAlgorithm` | dense ID/name, north/origin, standard type, multiplier, raw auto geometry selectors, effective inherited-or-local convection algorithms, and total-floor-area membership are retained; positive authored floor area is consumed, local convection overrides run-block, and downstream geometry/list/space/report/runtime state remains deferred |
+| `DataHeatBalance::ZoneData` declaration and post-list fields | `ep_model::Zone`, `ep_model::ZoneConvectionAlgorithm` | dense ID/name, north/origin, standard type, direct multiplier, raw auto geometry selectors, effective inherited-or-local convection algorithms, total-floor-area membership, nominal-control presence, list multiplier, and source-shaped list identity are retained; positive authored floor area is consumed, while local convection overrides and Zone grouping run-block before deferred geometry/space/report/runtime state |
+| `DataHeatBalance::ZoneListData` and `ZoneGroupData` | `ep_model::ZoneList`, `ep_model::ZoneGroup`, and per-Zone `list_multiplier`/`list_group` | staged-IDF or native-epJSON ordered dense collections retain resolved membership, longest member name, list reference, positive multiplier, repeated-list and grouped-overlap validation, and member-Zone propagation; every definition run-blocks until list-target expansion and comprehensive list-multiplier consumption are wired |
 | `DataSurface::SurfaceData` | `ep_model::Surface`, `ep_runtime::SurfaceHeatBalanceState` | opaque surface subset only; outside-layer roughness metadata is tracked for future exterior convection work |
 | `DataSurfaces::FrameDividerProperties` | `ep_model::WindowFrameAndDivider`, `ep_model::WindowFrameProperties`, `ep_model::WindowDividerProperties`, `ep_model::WindowRevealProperties` | complete bounded immutable user-input descriptors and an independent normalized namespace are typed; fenestration binding, geometry, WINDOW 5 synthesis, shading mutation, window physics, NFRC calculations, reporting, and runtime remain blocked |
 | `Construction::ConstructionProps::{Name, TotLayers, LayerPoint, isTCWindow, isTCMaster, TCMasterMatNum, TCLayerNum, TCGlassNum}` and construction/material CTF data | `ep_model::Construction`, optional immutable thermochromic master metadata, `ep_model::ModelGraph::construction_materials`, checked runtime direct-index construction/material lookup, and `ep_runtime::SurfaceCtfState` | ordinary input layers resolve into a bounded opaque/fenestration construction; every thermochromic parent contributes its first glazing state to the effective stack and only the final parent owns zero-based master metadata, while a sole SimpleGlazingSystem layer retains its original material identity and Fenestration kind. Graph edges follow the effective or retained IDs. The opaque runtime cache, static Regular/AirGap/IRT EIO evidence, diagnostic steady/no-mass coefficient seeding, and CTF histories do not enable thermochromic/window execution, multi-layer SimpleGlazing quirks, child construction generation, mass-material coefficient generation, or broad face-temperature solving |

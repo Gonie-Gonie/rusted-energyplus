@@ -2055,6 +2055,8 @@
             },
             zone_type: 1,
             multiplier: 1,
+            list_multiplier: 1,
+            list_group: None,
             ceiling_height: ep_model::AutoOrNumber::AutoCalculate,
             volume: ep_model::AutoOrNumber::AutoCalculate,
             floor_area: ep_model::AutoOrNumber::AutoCalculate,
@@ -2065,6 +2067,7 @@
                 ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
             ),
             is_part_of_total_floor_area: true,
+            is_nominal_controlled: false,
         });
         let model = SimulationModel::from_typed(typed);
 
