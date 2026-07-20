@@ -252,6 +252,12 @@ severity = "run_blocked"
 reason = "Zone-local outdoor-air node conditions and downstream weather consumers are not ported."
 
 [[unsupported_rule]]
+id = "unsupported_space_partitioning"
+object_patterns = ["Space", "SpaceList"]
+severity = "run_blocked"
+reason = "Authored Space partitioning, SpaceList expansion, surface assignment, and space-level heat-balance consumers are not ported."
+
+[[unsupported_rule]]
 id = "unsupported_surface_boundary"
 object_patterns = ["FenestrationSurface:*", "Window*", "Daylighting:*", "Shading:*", "Site:Ground*", "Material:RoofVegetation", "MaterialProperty:VariableAbsorptance", "MaterialProperty:PhaseChangeHysteresis", "MaterialProperty:PhaseChange", "MaterialProperty:VariableThermalConductivity", "MaterialProperty:MoisturePenetrationDepth:Settings", "MaterialProperty:HeatAndMoistureTransfer:Settings", "MaterialProperty:HeatAndMoistureTransfer:SorptionIsotherm", "MaterialProperty:HeatAndMoistureTransfer:Suction", "MaterialProperty:HeatAndMoistureTransfer:Redistribution", "MaterialProperty:HeatAndMoistureTransfer:Diffusion", "MaterialProperty:HeatAndMoistureTransfer:ThermalConductivity", "SurfaceProperties:VaporCoefficients", "Construction:FfactorGroundFloor", "Construction:CfactorUndergroundWall", "Construction:AirBoundary", "Construction:ComplexFenestrationState", "ConstructionProperty:InternalHeatSource", "Construction:WindowEquivalentLayer", "Construction:WindowDataFile"]
 severity = "run_blocked"

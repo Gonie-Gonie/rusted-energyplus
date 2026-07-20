@@ -44,6 +44,7 @@
             is_part_of_total_floor_area: true,
             is_nominal_controlled: false,
             linked_outdoor_air_node: None,
+            spaces: Vec::new(),
         });
         typed
             .thermostat_dual_setpoints
@@ -417,6 +418,7 @@
             is_part_of_total_floor_area: true,
             is_nominal_controlled: false,
             linked_outdoor_air_node: None,
+            spaces: Vec::new(),
         });
         typed.nodes.push(Node {
             id: NodeId(0),

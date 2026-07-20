@@ -94,6 +94,7 @@
             is_part_of_total_floor_area: true,
             is_nominal_controlled: false,
             linked_outdoor_air_node: None,
+            spaces: Vec::new(),
         });
         model.other_equipment.push(OtherEquipment {
             id: InternalGainId(0),
@@ -169,6 +170,7 @@
             is_part_of_total_floor_area: true,
             is_nominal_controlled: false,
             linked_outdoor_air_node: None,
+            spaces: Vec::new(),
         });
         model.zones.push(Zone {
             id: ZoneId(1),
@@ -191,6 +193,7 @@
             is_part_of_total_floor_area: true,
             is_nominal_controlled: false,
             linked_outdoor_air_node: None,
+            spaces: Vec::new(),
         });
         model.surfaces.push(interzone_surface(
             0,

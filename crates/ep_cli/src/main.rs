@@ -428,6 +428,18 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
         "  zone_local_environments: {}",
         model.typed.zone_local_environments.len()
     );
+    println!("  spaces: {}", model.typed.spaces.len());
+    println!(
+        "  authored_spaces: {}",
+        model
+            .typed
+            .spaces
+            .iter()
+            .filter(|space| space.origin == ep_model::SpaceOrigin::Authored)
+            .count()
+    );
+    println!("  space_lists: {}", model.typed.space_lists.len());
+    println!("  space_types: {}", model.typed.space_type_names.len());
     println!("  surfaces: {}", model.typed.surfaces.len());
     println!("  constructions: {}", model.typed.constructions.len());
     println!("  materials: {}", model.typed.materials.len());
@@ -19952,6 +19964,17 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
         "  zone_local_environments: {}",
         model.zone_local_environments.len()
     );
+    println!("  spaces: {}", model.spaces.len());
+    println!(
+        "  authored_spaces: {}",
+        model
+            .spaces
+            .iter()
+            .filter(|space| space.origin == ep_model::SpaceOrigin::Authored)
+            .count()
+    );
+    println!("  space_lists: {}", model.space_lists.len());
+    println!("  space_types: {}", model.space_type_names.len());
     println!("  surfaces: {}", model.surfaces.len());
     println!("  diagnostics: {}", report.diagnostics.len());
     println!("  defaults_applied: {}", report.defaults_applied.len());

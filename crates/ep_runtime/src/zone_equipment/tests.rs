@@ -182,6 +182,7 @@ fn single_ideal_loads_typed_model(system_supply: &str, connection_inlet: &str) -
         is_part_of_total_floor_area: true,
         is_nominal_controlled: false,
         linked_outdoor_air_node: None,
+        spaces: Vec::new(),
     });
     for (id, name) in [
         (NodeId(0), "Zone Inlet"),

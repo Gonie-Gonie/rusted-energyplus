@@ -1140,6 +1140,17 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
             "zone_local_environments",
             model.zone_local_environments.len(),
         ),
+        ("spaces", model.spaces.len()),
+        (
+            "authored_spaces",
+            model
+                .spaces
+                .iter()
+                .filter(|space| space.origin == ep_model::SpaceOrigin::Authored)
+                .count(),
+        ),
+        ("space_lists", model.space_lists.len()),
+        ("space_types", model.space_type_names.len()),
         ("surfaces", model.surfaces.len()),
         ("constructions", model.constructions.len()),
         ("materials", model.materials.len()),

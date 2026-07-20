@@ -1,6 +1,6 @@
 use crate::{
-    AutoOrNumber, NodeId, NormalizedName, Point3, RunPeriodId, ZoneGroupId, ZoneId, ZoneListId,
-    ZoneLocalEnvironmentId,
+    AutoOrNumber, NodeId, NormalizedName, Point3, RunPeriodId, SpaceId, SpaceListId, SpaceTypeId,
+    ZoneGroupId, ZoneId, ZoneListId, ZoneLocalEnvironmentId,
 };
 
 /// EnergyPlus-compatible model version.
@@ -280,6 +280,8 @@ pub struct Zone {
     pub is_nominal_controlled: bool,
     /// Last nonblank outdoor-air node linked by ZoneProperty:LocalEnvironment.
     pub linked_outdoor_air_node: Option<NodeId>,
+    /// Spaces assigned by GetSpaceData, in declaration/default-generation order.
+    pub spaces: Vec<SpaceId>,
 }
 
 /// Ordered collection of thermal zones.
@@ -319,4 +321,51 @@ pub struct ZoneLocalEnvironment {
     pub zone: ZoneId,
     /// Optional single outdoor-air node; blank input retains no link.
     pub outdoor_air_node: Option<NodeId>,
+}
+
+/// How a space entered the bounded GetSpaceData arena.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum SpaceOrigin {
+    /// Authored Space input object.
+    Authored,
+    /// Whole-zone default created when a zone has no authored space.
+    AutoZoneDefault,
+}
+
+/// Thermal space declaration or whole-zone default.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Space {
+    /// Typed ID.
+    pub id: SpaceId,
+    /// Space name, or the owning Zone name for a whole-zone default.
+    pub name: NormalizedName,
+    /// Owning thermal zone.
+    pub zone: ZoneId,
+    /// Authored ceiling height selector.
+    pub ceiling_height: AutoOrNumber,
+    /// Authored volume selector.
+    pub volume: AutoOrNumber,
+    /// Authored floor-area selector.
+    pub floor_area: AutoOrNumber,
+    /// Source-effective normalized space-type label.
+    pub space_type: NormalizedName,
+    /// First-seen identity for the space-type label.
+    pub space_type_id: SpaceTypeId,
+    /// Ordered, normalized reporting tags.
+    pub tags: Vec<NormalizedName>,
+    /// Authored or whole-zone default origin.
+    pub origin: SpaceOrigin,
+}
+
+/// Ordered collection of authored spaces.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SpaceList {
+    /// Typed ID.
+    pub id: SpaceListId,
+    /// SpaceList name.
+    pub name: NormalizedName,
+    /// Resolved authored Space members in array order.
+    pub spaces: Vec<SpaceId>,
+    /// Longest authored space-name length.
+    pub max_space_name_length: usize,
 }

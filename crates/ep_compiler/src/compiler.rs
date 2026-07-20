@@ -4,6 +4,7 @@ mod complex_fenestration;
 mod construction_internal_heat_source;
 mod construction_window_data_file;
 mod construction_window_equivalent_layer;
+mod space;
 mod zone;
 mod zone_collections;
 mod zone_local_environment;
@@ -554,6 +555,8 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "ZoneList",
     "ZoneGroup",
     "ZoneProperty:LocalEnvironment",
+    "Space",
+    "SpaceList",
     "AirLoopHVAC",
     "Fan:ConstantVolume",
     "Fan:OnOff",
@@ -687,6 +690,7 @@ impl<'a> Compiler<'a> {
         self.parse_zone_groups(&mut model);
         self.parse_node_lists(&mut model);
         self.parse_zone_local_environments(&mut model);
+        self.parse_space_data(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
         self.parse_zone_humidistats(&mut model);
@@ -17568,6 +17572,7 @@ mod tests {
     mod schedule_scalar_type_limits;
     mod schedule_week_compact;
     mod schedule_year;
+    mod space;
     mod surface_properties_vapor_coefficients;
     mod window_material_blind;
     mod window_material_blind_equivalent_layer;

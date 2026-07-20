@@ -21,9 +21,10 @@ use crate::{
     ScheduleCompact, ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList,
     ScheduleFile, ScheduleFileShading, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
     ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
-    Surface, SurfaceConvectionAlgorithms, SurfaceId, SurfaceVaporCoefficients,
-    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig, Version, WeekScheduleId,
-    WindowFrameAndDivider, WindowFrameAndDividerId, WindowGlazingThermochromicGroupMaterial,
+    Space, SpaceId, SpaceList, SpaceListId, SpaceOrigin, SpaceTypeId, Surface,
+    SurfaceConvectionAlgorithms, SurfaceId, SurfaceVaporCoefficients, ThermostatDualSetpoint,
+    ThermostatSetpointId, TimestepConfig, Version, WeekScheduleId, WindowFrameAndDivider,
+    WindowFrameAndDividerId, WindowGlazingThermochromicGroupMaterial,
     WindowGlazingThermochromicState, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
     ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneGroup, ZoneGroupId, ZoneHumidistat,
     ZoneHumidistatId, ZoneId, ZoneList, ZoneListId, ZoneLocalEnvironment, ZoneLocalEnvironmentId,
@@ -245,6 +246,16 @@ pub struct TypedModel {
     pub zone_local_environments: Vec<ZoneLocalEnvironment>,
     /// ZoneProperty:LocalEnvironment names.
     pub zone_local_environment_names: NameMap<ZoneLocalEnvironmentId>,
+    /// Authored spaces followed by generated whole-zone defaults.
+    pub spaces: Vec<Space>,
+    /// Authored Space names used by the preceding SpaceList resolution phase.
+    pub authored_space_names: NameMap<SpaceId>,
+    /// First-seen source-effective space-type labels.
+    pub space_type_names: NameMap<SpaceTypeId>,
+    /// Authored space lists.
+    pub space_lists: Vec<SpaceList>,
+    /// SpaceList names.
+    pub space_list_names: NameMap<SpaceListId>,
     /// Building surfaces.
     pub surfaces: Vec<Surface>,
     /// Surface names.
@@ -364,6 +375,11 @@ impl Default for TypedModel {
             zone_group_names: NameMap::default(),
             zone_local_environments: Vec::new(),
             zone_local_environment_names: NameMap::default(),
+            spaces: Vec::new(),
+            authored_space_names: NameMap::default(),
+            space_type_names: NameMap::default(),
+            space_lists: Vec::new(),
+            space_list_names: NameMap::default(),
             surfaces: Vec::new(),
             surface_names: NameMap::default(),
             surface_vapor_coefficients: Vec::new(),
@@ -468,6 +484,12 @@ impl TypedModel {
             + self.zone_lists.len()
             + self.zone_groups.len()
             + self.zone_local_environments.len()
+            + self
+                .spaces
+                .iter()
+                .filter(|space| space.origin == SpaceOrigin::Authored)
+                .count()
+            + self.space_lists.len()
             + self.surfaces.len()
             + self.surface_vapor_coefficients.len()
             + self.window_frame_and_dividers.len()
