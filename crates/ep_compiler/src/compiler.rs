@@ -2,6 +2,7 @@
 
 mod complex_fenestration;
 mod construction_internal_heat_source;
+mod construction_window_data_file;
 mod construction_window_equivalent_layer;
 
 use ep_model::{
@@ -90,6 +91,7 @@ const CFACTOR_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:CfactorUndergroundW
 const AIR_BOUNDARY_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:AirBoundary";
 const COMPLEX_FENESTRATION_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:ComplexFenestrationState";
 const INTERNAL_HEAT_SOURCE_OBJECT_TYPE: &str = "ConstructionProperty:InternalHeatSource";
+const WINDOW_DATA_FILE_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:WindowDataFile";
 const WINDOW_EQUIVALENT_LAYER_CONSTRUCTION_OBJECT_TYPE: &str = "Construction:WindowEquivalentLayer";
 const FC_FACTOR_CONCRETE_NAME: &str = "~FC_Concrete";
 const FC_FACTOR_INSULATION_NAME_PREFIX: &str = "~FC_Insulation_";
@@ -521,6 +523,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     COMPLEX_FENESTRATION_CONSTRUCTION_OBJECT_TYPE,
     INTERNAL_HEAT_SOURCE_OBJECT_TYPE,
     WINDOW_EQUIVALENT_LAYER_CONSTRUCTION_OBJECT_TYPE,
+    WINDOW_DATA_FILE_CONSTRUCTION_OBJECT_TYPE,
     "ScheduleTypeLimits",
     "Schedule:Constant",
     "Schedule:Compact",
@@ -659,6 +662,7 @@ impl<'a> Compiler<'a> {
         self.parse_complex_fenestration_states(&mut model);
         self.parse_construction_internal_heat_sources(&mut model);
         self.parse_window_equivalent_layer_constructions(&mut model);
+        self.parse_window_data_file_construction_requests(&mut model);
         self.parse_material_variable_absorptances(&mut model);
         self.parse_material_phase_change_hystereses(&mut model);
         self.parse_material_phase_changes(&mut model);
@@ -17575,6 +17579,7 @@ mod tests {
     mod construction_complex_fenestration_state;
     mod construction_ground_factor;
     mod construction_property_internal_heat_source;
+    mod construction_window_data_file;
     mod construction_window_equivalent_layer;
     mod global_geometry_rules;
     mod material_property_glazing_spectral_data;

@@ -2649,6 +2649,15 @@ ordinal. It deliberately does not promote the later solid/gap repair,
 runtime; every equivalent-layer construction and material definition remains
 run-blocked. The detailed contract is owned by the heat-balance source map.
 
+CP92 likewise adds no material variant, material ID, public material name, or
+construction/material graph edge. `Construction:WindowDataFile` is retained
+only as an ordered request with a normalized WINDOW5 entry name and a
+default-or-explicit retain-case file selector. The deferred
+`SearchWindow5DataFile` routine, not the request parser, owns generation of W5
+glass and gas materials, one or two constructions, frame/divider state, and
+angular optical data. Every request is run-blocked before file I/O; the detailed
+boundary is recorded in the heat-balance source map.
+
 The compiler preserves EnergyPlus family order by compiling all `Material`
 objects, then all `Material:NoMass`, `Material:AirGap`, and
 `Material:InfraredTransparent` objects, followed by

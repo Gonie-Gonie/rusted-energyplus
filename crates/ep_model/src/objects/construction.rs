@@ -209,6 +209,50 @@ pub struct ConstructionWindowEquivalentLayer {
     pub source_index: u32,
 }
 
+/// Default leaf name searched from EnergyPlus's current working folder.
+pub const DEFAULT_WINDOW5_DATA_FILE_NAME: &str = "Window5DataFile.dat";
+
+/// File selector retained from a `Construction:WindowDataFile` request.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum WindowDataFileSource {
+    /// A missing or blank field selects `Window5DataFile.dat` in the current working folder.
+    DefaultWorkingDirectory,
+    /// Explicit retain-case file name or path supplied by the input object.
+    Explicit(String),
+}
+
+impl WindowDataFileSource {
+    /// Returns the source-effective file name without resolving it against a run directory.
+    #[must_use]
+    pub fn file_name(&self) -> &str {
+        match self {
+            Self::DefaultWorkingDirectory => DEFAULT_WINDOW5_DATA_FILE_NAME,
+            Self::Explicit(file_name) => file_name,
+        }
+    }
+
+    /// Returns whether the source selected the current-working-folder default.
+    #[must_use]
+    pub const fn uses_default_working_directory(&self) -> bool {
+        matches!(self, Self::DefaultWorkingDirectory)
+    }
+}
+
+/// Typed request to synthesize window state from a legacy WINDOW5 data file.
+///
+/// This is deliberately not a [`Construction`] identity. The deferred
+/// `SearchWindow5DataFile` routine can create one or two constructions plus
+/// materials and frame/divider state only after it validates and parses the file.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ConstructionWindowDataFileRequest {
+    /// Zero-based source-order index within the request family.
+    pub source_index: u32,
+    /// Normalized WINDOW5 entry name to search for.
+    pub name: NormalizedName,
+    /// Default or explicit retain-case file selector.
+    pub source: WindowDataFileSource,
+}
+
 /// Schedule source used by a simple-mixing air boundary.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum AirBoundaryMixingSchedule {

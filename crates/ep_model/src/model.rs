@@ -3,7 +3,8 @@
 use crate::{
     AirLoopHvac, AvailabilityManagerComponent, BoilerHotWater, BranchId, BranchListId, Building,
     ChillerElectricEir, CoilComponent, ComponentId, ConnectorId, ConnectorListId, Construction,
-    ConstructionId, DayScheduleId, DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId,
+    ConstructionId, ConstructionWindowDataFileRequest, DayScheduleId,
+    DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId,
     ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
     ExternalInterfaceSchedule, FanComponent, GlazingSpectralData, GlazingSpectralDataId,
     GlobalGeometryRules, IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId, LoopId,
@@ -95,6 +96,8 @@ pub struct TypedModel {
     pub constructions: Vec<Construction>,
     /// Construction names.
     pub construction_names: NameMap<ConstructionId>,
+    /// Requests to synthesize constructions from legacy WINDOW5 data files.
+    pub construction_window_data_file_requests: Vec<ConstructionWindowDataFileRequest>,
     /// Schedule type limits.
     pub schedule_type_limits: Vec<ScheduleTypeLimits>,
     /// Schedule type limit names.
@@ -274,6 +277,7 @@ impl Default for TypedModel {
             window_glazing_thermochromic_state_arena: Vec::new(),
             constructions: Vec::new(),
             construction_names: NameMap::default(),
+            construction_window_data_file_requests: Vec::new(),
             schedule_type_limits: Vec::new(),
             schedule_type_limit_names: NameMap::default(),
             day_schedules: Vec::new(),
@@ -403,6 +407,7 @@ impl TypedModel {
                 .iter()
                 .filter(|construction| construction.has_internal_heat_source())
                 .count()
+            + self.construction_window_data_file_requests.len()
             + self.schedule_type_limits.len()
             + self.day_schedules.len()
             + self.day_interval_schedules.len()

@@ -638,6 +638,13 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|construction| construction.is_window_equivalent_layer())
             .count(),
     );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
+        "Construction:WindowDataFile",
+        typed_model.construction_window_data_file_requests.len(),
+    );
 
     push_typed_unsupported_object(
         registry,
