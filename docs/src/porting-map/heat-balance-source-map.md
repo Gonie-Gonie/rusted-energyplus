@@ -63,6 +63,8 @@ claim.
 | thermochromic child construction projection | `CreateTCConstructions` immediately after the representative-surface EIO block | CP103 state-maps a bounded immutable series/child projection from CP85 master metadata and ordered thermochromic states. Master ConstructionId order, state order including the first state, effective-layer cloning, final-master-layer substitution, initial temperature, and source-shaped generated names are retained in separate arenas. Main ConstructionIds/names/counts/graph state, WINDOW5-relative global append order, deep-copy state, active switching, reporting, and runtime remain deferred. |
 | no-Zone simulation validity diagnostic | inline `TotSurfaces > 0 && NumOfZones == 0` gate and `CheckValidSimulationObjects` immediately after `CreateTCConstructions` | CP104 state-maps a bounded diagnostic-only positive witness: absent prior Errors, an empty typed Zone arena plus raw `Shading:Site:Detailed` or `Shading:Building:Detailed` presence emits `InvalidSimulationWithoutZones` unless any one of the source's eight allowed collector/generator families is present in raw input. No model state is written. Full `TotSurfaces` parity, all other surface families, exact diagnostics/fatal sequencing, and collector/generator typing or runtime remain deferred. |
 | positive construction-use evidence | `CheckUsedConstructions` immediately after the no-Zone gate | CP105 state-maps only monotonic positive evidence. Rust resolves retained typed-surface ConstructionIds plus the six source-ordered raw reference families, stores sorted/deduplicated known-used IDs, and separately stores sorted/deduplicated known-CTF-used IDs only for non-window GroundHeatExchanger and EMS references. Missing, blank, wrong-type, and unresolved raw references stay silent. Absence remains unknown: no `IsUsed=false`/`IsUsedCTF=false`, unused count/name/warning, `DisplayExtraWarnings`, CTF/CondFD selection, runtime, or support claim is added. |
+| input-completion fatal barrier | inline `GetHeatBalanceInput` `ErrorsFound` check immediately after `CheckUsedConstructions` | mapped and deferred without a synthetic routine entry. EnergyPlus terminates immediately at source lines 311-313 before enclosure or internal-gain initialization. A failed Rust compile eventually returns `model = None`, which is a coarse fail-closed outcome, not exact parity for this short-circuit point, accumulated-diagnostic order, fatal text, or side effects. |
+| solar enclosure view-factor initialization | `HeatBalanceIntRadExchange::InitSolarViewFactors` at the parent call on `HeatBalanceManager.cc` line 316 | source-mapped and required for the full domain. It depends on the `ViewFactorInfo` report option and EIO/debug writers, aligned user view factors, complete Solar enclosure and Space heat-transfer-surface lists, AirBoundary merging/exclusion, Surface pointers and global report order, area/azimuth/tilt/inside-solar-absorptance state, zero- and one-surface branches, approximate or user matrices, InternalMass detection, `FixViewFactors`, and warning/fatal/report side effects. Existing Rust approximate/fix helpers and 1Zone EIO evidence do not promote this routine. |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
 | inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
@@ -77,7 +79,7 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, and `CheckUsedConstructions`; CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, and CP105 then collects only sorted/deduplicated positive construction-use evidence before the existing fatal barrier without inferring any unused state
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 324-325; CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, and CP106 source-maps the fatal barrier plus `InitSolarViewFactors`; internal-gain acquisition and Kiva setup are the next deferred checkpoints and receive no new routine rows here
 3. `InitHeatBalance`
 4. outside opaque surface balance
 5. inside opaque surface balance
@@ -1308,6 +1310,62 @@ name-map entry, graph edge, or support for any of the six raw referring
 families. Complete post-WINDOW5/post-thermochromic Construction identity and
 all other use paths remain deferred.
 
+### CP106 input-completion barrier and solar view-factor initialization map
+
+Immediately after `CheckUsedConstructions`, `GetHeatBalanceInput` checks its
+accumulated `ErrorsFound` flag at `HeatBalanceManager.cc` lines 311-313 and
+calls `ShowFatalError` before any later initialization when the flag is set.
+This is an inline input-completion barrier, not a source routine, so CP106 does
+not invent a routine-ledger row for it. A Rust compile containing any Error
+eventually returns `CompileResult { model: None, .. }`, which is a coarse
+fail-closed boundary. It does not reproduce the exact line-311 short circuit,
+the ordering of all diagnostics accumulated before that point, the EnergyPlus
+fatal diagnostic text, or fatal/reporting side effects.
+
+On successful input completion, the next parent call is
+`HeatBalanceIntRadExchange::InitSolarViewFactors(state)` at
+`HeatBalanceManager.cc` line 316. The routine first scans the `ViewFactorInfo`
+report option and may write EIO headings, then aligns any
+`ZoneProperty:UserViewFactors:BySurfaceName` input before visiting every Solar
+enclosure. Its prerequisites include the complete Solar enclosure collection,
+each enclosure's ordered Space membership, and every Space's complete
+heat-transfer-surface list. Those lists must already reflect AirBoundary-driven
+enclosure merging while AirBoundary surfaces themselves are excluded from the
+matrix population.
+
+For each enclosure the source constructs Surface pointer and back-pointer
+state, preserves global `AllSurfaceListReportOrder`, and gathers Surface area,
+azimuth, tilt, and Construction inside solar absorptance. Zero surfaces emit a
+severe error and set the local fatal flag. A one-surface enclosure takes its
+dedicated no-distribution branch. Larger enclosures consume an aligned user
+matrix when supplied or call `CalcApproximateViewFactors`, optionally preserve
+the pre-fix matrix for reports, detect InternalMass, and call
+`FixViewFactors`. That fixer owns the `N <= 3` warnings and Zone
+`EnforcedReciprocity` mutation, iterative reciprocity/completeness repair, the
+401st-iteration fallback and its warning/severe paths, and possible fatal
+termination. `InitSolarViewFactors` also owns EIO/debug report order and its
+final fatal-on-errors side effect.
+
+Rust already contains diagnostic helpers
+`energyplus_approximate_view_factors` and
+`fix_energyplus_approximate_view_factors`, plus a
+`approximate_view_factors_match_energyplus_1zone_eio` evidence test. CP106 does
+not promote those isolated calculations or the 1Zone EIO fixture to
+`InitSolarViewFactors`: Rust lacks complete Solar enclosure topology, complete
+surface-family and Space surface-list state, AirBoundary merging/exclusion,
+Surface/back-pointer and global report-order mutation, user-factor alignment,
+the zero/one/at-most-three-surface branches and warnings,
+`EnforcedReciprocity`, the 401st-iteration/fatal behavior, and the complete EIO
+and debug side effects. The routine is therefore `source_mapped` and remains
+required for full-domain support.
+
+The source-order tail recorded by this checkpoint continues through
+`ManageInternalHeatGains(state, true)` at line 320, which ensures Lights input
+precedes daylighting input, and conditional
+`kivaManager.setupKivaInstances(state)` at lines 324-325 when `AnyKiva` is
+true. Both are deferred next checkpoints; CP106 adds no routine-ledger row or
+Rust support claim for either call.
+
 ### `CheckValidSimulationObjects` state contract
 
 <!-- routine-state-contract:v1 begin check_valid_simulation_objects -->
@@ -1444,6 +1502,8 @@ not_claimed_branches:
 | `CreateTCConstructions` master `specTemp`/`TCChildConstrs` and child layer/name/temperature projection | `TypedModel::construction_thermochromic_series`, `TypedModel::construction_thermochromic_children`, `ep_model::ConstructionThermochromicSeries`, `ep_model::ConstructionThermochromicChild`, and `ep_model::ThermochromicConstructionChildId` | dense master-ConstructionId then ordered-state projection retains the initial first-state temperature and one child per state, including the first; each child clones the effective stack, replaces only the final retained TC layer, derives the outside layer, and uses source-shaped `{:.0R}` naming with pinned boundary examples. Projection IDs are not ConstructionIds; arbitrary-finite exact formatter equivalence, global append/count/name/graph state, WINDOW5-relative ordering, deep-copy fields, collision lookup, switching, reporting, and runtime remain deferred |
 | inline no-Zone gate and `CheckValidSimulationObjects` return consumed as caller diagnostics | `Compiler::check_valid_simulation_objects_bounded` and compile diagnostics only | after the CP103 projection and absent prior Errors, an empty typed Zone arena plus raw detailed Site/Building shading presence is a positive Surface witness; absence of all eight raw allowed collector/generator families emits one blocking `InvalidSimulationWithoutZones` Error. No model state is added. Full `TotSurfaces` parity, other surface families, exact severe/fatal behavior, allowed-family semantics, runtime, and conformance remain deferred; raw allowed presence is not a typing or support claim |
 | `CheckUsedConstructions` retained-surface plus six-family reference scan before `ConstructionProps::{IsUsed, IsUsedCTF}` and unused warnings | `TypedModel::known_used_constructions`, `TypedModel::known_ctf_used_constructions`, and `Compiler::collect_known_construction_use_evidence` | after the CP104 validity check and before the fatal barrier, error-free input produces sorted/deduplicated positive-only ConstructionId vectors. Known used is the union of retained typed surfaces and resolved Pipe Indoor/Outdoor/Underground, GroundHeatExchanger Surface, DaylightingDevice Tubular, and EMS ConstructionIndexVariable references in source-family order. Known CTF use contains only Opaque, including F/C, or AirBoundary IDs reached from the GroundHeatExchanger/EMS pair; all three window kinds are excluded. It mirrors only the source mark and does not assert AirBoundary CTF coefficient state. Missing/blank/wrong/unresolved fields and prior-error input publish nothing. Absence is unknown: false flags, unused count/names/warnings, `DisplayExtraWarnings`, complete generated/global identity, CTF/CondFD selection, runtime, support promotion, object counts, and graph edges remain deferred |
+| inline post-input `ErrorsFound` fatal barrier | final `CompileResult::model = None` on any Error, as a coarse fail-closed analogue only | EnergyPlus stops immediately after `CheckUsedConstructions` at lines 311-313, before `InitSolarViewFactors`; Rust does not model that exact checkpoint, source diagnostic ordering, fatal message, or side effects, and this inline barrier has no synthetic routine entry |
+| `ViewFactorInformation`, Solar enclosure `spaceNums`/`NumOfSurfaces`/`F`/`Area`/`SolAbsorptance`/`Azimuth`/`Tilt`/`SurfacePtr`/`SurfaceReportNums`, Surface Solar/Radiant enclosure back-pointers, and Zone `EnforcedReciprocity` | source-mapped `InitSolarViewFactors`; isolated `ep_runtime::heat_balance::radiation::{energyplus_approximate_view_factors, fix_energyplus_approximate_view_factors}` diagnostic helpers and the `approximate_view_factors_match_energyplus_1zone_eio` evidence test | the parent call is `HeatBalanceManager.cc` line 316. Full support requires report-option and EIO/debug behavior, user-factor alignment, complete merged Solar enclosure/Space/surface topology with AirBoundary exclusion, pointer/global-report ordering, geometric and inside-absorptance inputs, zero/one/at-most-three-surface branches, approximate/user matrices, InternalMass-aware fixing, `EnforcedReciprocity`, 401st-iteration and fatal paths, and all report side effects. Existing helpers and one fixture prove only bounded calculations and do not promote the routine |
 | `DataSurfaces::FrameDividerProperties` | `ep_model::WindowFrameAndDivider`, `ep_model::WindowFrameProperties`, `ep_model::WindowDividerProperties`, `ep_model::WindowRevealProperties` | complete bounded immutable user-input descriptors and an independent normalized namespace are typed; fenestration binding, geometry, WINDOW 5 synthesis, shading mutation, window physics, NFRC calculations, reporting, and runtime remain blocked |
 | `Construction::ConstructionProps::{Name, TotLayers, LayerPoint, isTCWindow, isTCMaster, TCMasterMatNum, TCLayerNum, TCGlassNum}` and construction/material CTF data | `ep_model::Construction`, optional immutable thermochromic master metadata, separate immutable thermochromic series/child projections, `ep_model::ModelGraph::construction_materials`, checked runtime direct-index construction/material lookup, and `ep_runtime::SurfaceCtfState` | ordinary input layers resolve into a bounded opaque/fenestration construction; every thermochromic parent contributes its first glazing state to the effective stack and only the final parent owns zero-based master metadata, while a sole SimpleGlazingSystem layer retains its original material identity and Fenestration kind. CP103 derives private ordered child snapshots without mutating the global construction/name/graph arenas or granting child ConstructionIds. Existing graph edges follow the effective or retained master IDs. The opaque runtime cache, static Regular/AirGap/IRT EIO evidence, diagnostic steady/no-mass coefficient seeding, and CTF histories do not enable thermochromic/window execution, multi-layer SimpleGlazing quirks, global child construction integration, mass-material coefficient generation, or broad face-temperature solving |
 | F/C-factor construction flags, source dimensions/factors, `NominalR`, and generated material layer points | `ep_model::ConstructionGroundFactor`, private generated entries in `TypedModel::materials`, and `ModelGraph::construction_materials` | exact bounded generation formulas, ordinary-then-F-then-C ordering, private names, raw ordinals, and two graph edges are retained; surface pairing, ground temperatures, CTF/runtime, reporting, and public attachment targeting remain blocked |
