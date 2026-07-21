@@ -64,6 +64,17 @@ listed routine is `family_gated` or `complete` in
 this rule. Full runtime compatibility remains locked until all EnergyPlus
 domains have complete inventories.
 
+The canonical heat-balance inventory now includes
+`set_pre_construction_input_parameters` immediately after the manager entry.
+Its EnergyPlus boundary is the unconditional
+`HeatBalanceManager::SetPreConstructionInputParameters` call from
+`SimulationManager.cc` line 216 and the implementation at
+`HeatBalanceManager.cc` lines 446-492. It remains `source_mapped` and required:
+the current Rust dynamic construction-layer vectors and separate ordinary and
+equivalent-layer limits do not implement the source's shared mutable maximum,
+raw-object scans, input-buffer side effects, downstream allocation contract,
+failure behavior, or lifecycle.
+
 The canonical heat-balance inventory includes `init_heat_balance` after the
 required input/view-factor/internal-gain routines and before
 `manage_surface_heat_balance`. Its EnergyPlus boundary is the unconditional
