@@ -186,7 +186,7 @@ matching report lifecycle, or additive failure/re-entry behavior.
 
 The inventory now also includes `compute_int_thermal_absorp_factors`
 immediately after `init_int_solar_distribution` and before
-`calc_heat_balance_outside_surf` in source-definition order. Its EnergyPlus
+`compute_int_sw_absorp_factors` in source-definition order. Its EnergyPlus
 boundary is the unconditional `ComputeIntThermalAbsorpFactors(state)` call
 inside `InitSurfaceHeatBalance` line 427, the declaration at
 `HeatBalanceSurfaceManager.hh` line 113, and the complete body at
@@ -199,8 +199,22 @@ window shade/blind/slat state, switchable glazing, frame/divider terms,
 representative-surface topology, raw reciprocal/nonfinite behavior, or
 matching failure and re-entry state.
 
+The inventory now also includes `compute_int_sw_absorp_factors` immediately
+after `compute_int_thermal_absorp_factors` and before
+`calc_heat_balance_outside_surf` in source-definition order. Its EnergyPlus
+boundary is the unconditional `ComputeIntSWAbsorpFactors(state)` call inside
+`InitSurfaceHeatBalance` line 433, the declaration at
+`HeatBalanceSurfaceManager.hh` line 115, and the complete body at
+`HeatBalanceSurfaceManager.cc` lines 4297-4471. It remains `source_mapped` and
+required: Rust has no Solar-enclosure multiplier or first-warning latch and no
+production derivation of `inside_shortwave_absorbed_w_per_m2`. The full Solar
+`radReCalc` gate and topology, active/base Construction and EQL split,
+shade/screen/blind/switchable optics, frame/divider terms, strict 0.01 bad-sum
+warning/zero branch, diagnostic side effects, and failure/re-entry lifecycle
+remain source-only.
+
 The inventory now also includes `calc_heat_balance_outside_surf` immediately
-after `compute_int_thermal_absorp_factors` in source-definition order. Its
+after `compute_int_sw_absorp_factors` in source-definition order. Its
 EnergyPlus boundary is the
 unconditional parent line-168 `CalcHeatBalanceOutsideSurf(state)` call, which
 omits the optional zone-resimulation argument, and the implementation at lines
