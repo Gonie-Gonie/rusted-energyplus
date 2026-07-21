@@ -150,7 +150,7 @@ setup and re-entry lifecycle.
 
 The inventory now also includes `init_thermal_and_flux_histories` immediately
 after `allocate_surface_heat_bal_arrays` and before
-`calc_heat_balance_outside_surf`. Its EnergyPlus boundary is the
+`init_solar_heat_gains`. Its EnergyPlus boundary is the
 `InitSurfaceHeatBalance` line-383 call inside the lines-379-384 BeginEnvrn
 branch; the declaration is at `HeatBalanceSurfaceManager.hh` line 103 and the
 implementation is at `HeatBalanceSurfaceManager.cc` lines 2208-2447. It
@@ -160,8 +160,20 @@ typed boundary temperature, steady-`1/R` flux, and variable-length prior
 histories, not the complete Zone/Space, fixed/master/source-history,
 cavity/Kiva/OSCM, selective-reset, failure, or re-entry lifecycle.
 
+The inventory now also includes `init_solar_heat_gains` immediately after
+`init_thermal_and_flux_histories` and before
+`calc_heat_balance_outside_surf`. Its EnergyPlus boundary is the unconditional
+`InitSolarHeatGains(state)` call inside `InitSurfaceHeatBalance` line 457, the
+declaration at `HeatBalanceSurfaceManager.hh` line 109, and the complete body
+at `HeatBalanceSurfaceManager.cc` lines 2515-3776. It remains `source_mapped`
+and required: Rust's incident-solar forcing diagnostic and bounded opaque
+absorption do not implement the source's previous-solar latch and selective
+reset lifecycle, enclosure/interzone distribution, scheduled/reflected solar,
+window-model layers and shades, TDD/shelf/frame/divider paths, representative
+averaging, reports/energy, or partial-failure and re-entry behavior.
+
 The inventory now also includes `calc_heat_balance_outside_surf` immediately
-after `init_thermal_and_flux_histories`. Its EnergyPlus boundary is the
+after `init_solar_heat_gains`. Its EnergyPlus boundary is the
 unconditional parent line-168 `CalcHeatBalanceOutsideSurf(state)` call, which
 omits the optional zone-resimulation argument, and the implementation at lines
 6951-7721. It remains `source_mapped` and required. Existing Rust
