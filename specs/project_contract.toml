@@ -52,6 +52,7 @@ required_routines = [
   "init_int_solar_distribution",
   "compute_int_thermal_absorp_factors",
   "compute_int_sw_absorp_factors",
+  "compute_dif_sol_exc_zones_wiz_windows",
   "calc_heat_balance_outside_surf",
   "calc_heat_balance_inside_surf",
   "calc_heat_balance_inside_surf_2_ctf_only",
