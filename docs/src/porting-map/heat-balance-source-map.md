@@ -101,6 +101,7 @@ claim.
 | heat-balance record keeping | unconditional `RecKeepHeatBalance(state)` at `ManageHeatBalance` line 211, declared at `HeatBalanceManager.hh` line 134 and implemented at `HeatBalanceManager.cc` lines 2971-3057 | CP137 adds required `routine.rec_keep_heat_balance`. It records Zone extrema and two-sample histories, optionally emits detailed warmup EIO, snapshots movable-insulation presence, and unconditionally updates non-BSDF Window face-temperature reports. Existing Rust execution-plan metadata remains scaffolding only. |
 | heat-balance reporting | unconditional `ReportHeatBalance(state)` at `ManageHeatBalance` line 217, declared at `HeatBalanceManager.hh` line 142 and implemented at `HeatBalanceManager.cc` lines 3321-3418 | CP138 adds required `routine.report_heat_balance`. Schedule reporting always runs before the mutually exclusive normal, warmup-reporting, external-interface fallback, or no-output paths. Existing Rust report-stage, composite-plan, prebinding, and bounded result-store metadata remain scaffolding only. |
 | post-zone-reporting EMS calling point | unconditional `ManageEMS(state, EndZoneTimestepAfterZoneReporting, anyRan, absent)` at `ManageHeatBalance` line 219 | CP139 reuses non-required `routine.manage_ems`. The generic routine overwrites the same caller-owned `anyRan`; any entered actuator commit occurs only after CP138 reporting and cannot retroactively alter that already emitted output. No duplicate routine, source, project-contract, Rust/state, support, count, or conformance claim is added. |
+| EMS trend-variable history update | unconditional `UpdateEMSTrendVariables(state)` at `ManageHeatBalance` line 221, declared at `EMSManager.hh` line 122 and implemented at `EMSManager.cc` lines 1444-1479 | CP140 adds non-required `routine.update_ems_trend_variables`. After two quick-return gates, valid positive pointer/depth entries shift their 1-based histories newest-first in declaration order. Input allocation, setup diagnostics, time arrays, and environment reset remain source-only dependencies. |
 | zone air updates | `ManageZoneAirUpdates` | diagnostic shell only |
 | zone air correction | `correctZoneAirTemps` | mapped-not-ported |
 | internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
@@ -112,7 +113,7 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry, CP112 maps/defers only the line-186 one-time flag clear without claiming persistent Rust lifecycle parity, CP113 source-maps the canonical generic `ManageEMS` routine at the unconditional `BeginZoneTimestepBeforeInitHeatBalance` caller checkpoint without adding a Rust target, CP114 makes the following unconditional `InitHeatBalance` call a required source mapping without promoting existing Rust initialization state, CP115 maps the second unconditional `ManageEMS` caller checkpoint at `BeginZoneTimestepAfterInitHeatBalance` by reusing `routine.manage_ems` without a new row, CP116 expands the existing required `routine.manage_surface_heat_balance` row for the unconditional line-209 call and complete source parent order, CP117 maps the inline first-time `Initializing Surfaces` display guard at `HeatBalanceSurfaceManager.cc` lines 158-160 without a synthetic routine, and CP118 adds the following unconditional line-161 `InitSurfaceHeatBalance(state)` call and lines 272-621 implementation as a new required source-mapped routine/project entry; CP119 maps the following first-time `Calculate Outside Surface Heat Balance` display guard at lines 165-167 without a synthetic routine; CP120 adds the unconditional line-168 `CalcHeatBalanceOutsideSurf(state)` call and lines 6951-7721 implementation as a new required source-mapped routine/project entry; CP121 maps the first-time inside-balance display at lines 169-171 without a synthetic routine; CP122 adds the unconditional line-172 `CalcHeatBalanceInsideSurf(state)` call and lines 7738-7813 canonical wrapper as a required source-mapped routine/project entry; CP123 maps the first-time air-balance display at lines 176-178 without a synthetic routine; CP124 maps the unconditional line-179 `ManageAirHeatBalance(state)` call by reusing the existing required routine; CP125 adds the unconditional line-184 `UpdateFinalSurfaceHeatBalance(state)` call and lines 5176-5219 implementation as a required source-mapped routine/project entry; CP126 adds the parent lines 186-189 `AnyCTF || AnyEMPD`-guarded `UpdateThermalHistories(state)` call and lines 5221-5581 implementation as a required source-mapped routine/project entry; CP127 adds the independent parent lines 191-206 `AnyCondFD` complete-Surface filtered moisture-update block and inline `SurfaceDataFD::UpdateMoistureBalance` helper as a non-required source-mapped routine; CP128 adds the unconditional line-208 `ManageThermalComfort(state, false)` call and `ThermalComfort.cc` lines 105-164 implementation as a non-required source-mapped routine; CP129 adds the unconditional line-210 `ReportSurfaceHeatBalance(state)` call and `HeatBalanceSurfaceManager.cc` lines 6605-6891 implementation as a required source-mapped routine/project entry; CP130 adds the lines 211-213 `ZoneSizingCalc`-guarded `GatherComponentLoadsSurface(state)` call and `OutputReportTabular.cc` lines 15064-15132 implementation as a non-required source-mapped routine; CP131 adds the unconditional line-215 `CalcThermalResilience(state)` call and `HeatBalanceSurfaceManager.cc` lines 5707-5799 implementation as a non-required source-mapped routine; CP132 adds the lines 217-219 `displayThermalResilienceSummary`-guarded `ReportThermalResilience(state)` call and lines 5801-6388 implementation as a non-required source-mapped routine; CP133 maps the lines 221-223 `displayCO2ResilienceSummary`-guarded `ReportCO2Resilience(state)` call; CP134 maps the lines 225-227 `displayVisualResilienceSummary`-guarded `ReportVisualResilience(state)` call; CP135 maps the parent-tail line-229 `ManageSurfaceHeatBalancefirstTime = false` assignment without a synthetic routine; CP136 maps the `HeatBalanceManager.cc` line-210 unconditional `EndZoneTimestepBeforeZoneReporting` `ManageEMS` call by reusing `routine.manage_ems`; CP137 maps the line-211 `RecKeepHeatBalance(state)` call as a required routine, declared at `HeatBalanceManager.hh` line 134 and implemented at `HeatBalanceManager.cc` lines 2971-3057; CP138 maps the line-217 unconditional `ReportHeatBalance(state)` call as a required routine, declared at header line 142 and implemented at source lines 3321-3418; CP139 maps the line-219 unconditional `EndZoneTimestepAfterZoneReporting` `ManageEMS` call by reusing `routine.manage_ems`; the line-221 unconditional `UpdateEMSTrendVariables(state)` call is the next CP140 checkpoint before the plugin update at line 222
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry, CP112 maps/defers only the line-186 one-time flag clear without claiming persistent Rust lifecycle parity, CP113 source-maps the canonical generic `ManageEMS` routine at the unconditional `BeginZoneTimestepBeforeInitHeatBalance` caller checkpoint without adding a Rust target, CP114 makes the following unconditional `InitHeatBalance` call a required source mapping without promoting existing Rust initialization state, CP115 maps the second unconditional `ManageEMS` caller checkpoint at `BeginZoneTimestepAfterInitHeatBalance` by reusing `routine.manage_ems` without a new row, CP116 expands the existing required `routine.manage_surface_heat_balance` row for the unconditional line-209 call and complete source parent order, CP117 maps the inline first-time `Initializing Surfaces` display guard at `HeatBalanceSurfaceManager.cc` lines 158-160 without a synthetic routine, and CP118 adds the following unconditional line-161 `InitSurfaceHeatBalance(state)` call and lines 272-621 implementation as a new required source-mapped routine/project entry; CP119 maps the following first-time `Calculate Outside Surface Heat Balance` display guard at lines 165-167 without a synthetic routine; CP120 adds the unconditional line-168 `CalcHeatBalanceOutsideSurf(state)` call and lines 6951-7721 implementation as a new required source-mapped routine/project entry; CP121 maps the first-time inside-balance display at lines 169-171 without a synthetic routine; CP122 adds the unconditional line-172 `CalcHeatBalanceInsideSurf(state)` call and lines 7738-7813 canonical wrapper as a required source-mapped routine/project entry; CP123 maps the first-time air-balance display at lines 176-178 without a synthetic routine; CP124 maps the unconditional line-179 `ManageAirHeatBalance(state)` call by reusing the existing required routine; CP125 adds the unconditional line-184 `UpdateFinalSurfaceHeatBalance(state)` call and lines 5176-5219 implementation as a required source-mapped routine/project entry; CP126 adds the parent lines 186-189 `AnyCTF || AnyEMPD`-guarded `UpdateThermalHistories(state)` call and lines 5221-5581 implementation as a required source-mapped routine/project entry; CP127 adds the independent parent lines 191-206 `AnyCondFD` complete-Surface filtered moisture-update block and inline `SurfaceDataFD::UpdateMoistureBalance` helper as a non-required source-mapped routine; CP128 adds the unconditional line-208 `ManageThermalComfort(state, false)` call and `ThermalComfort.cc` lines 105-164 implementation as a non-required source-mapped routine; CP129 adds the unconditional line-210 `ReportSurfaceHeatBalance(state)` call and `HeatBalanceSurfaceManager.cc` lines 6605-6891 implementation as a required source-mapped routine/project entry; CP130 adds the lines 211-213 `ZoneSizingCalc`-guarded `GatherComponentLoadsSurface(state)` call and `OutputReportTabular.cc` lines 15064-15132 implementation as a non-required source-mapped routine; CP131 adds the unconditional line-215 `CalcThermalResilience(state)` call and `HeatBalanceSurfaceManager.cc` lines 5707-5799 implementation as a non-required source-mapped routine; CP132 adds the lines 217-219 `displayThermalResilienceSummary`-guarded `ReportThermalResilience(state)` call and lines 5801-6388 implementation as a non-required source-mapped routine; CP133 maps the lines 221-223 `displayCO2ResilienceSummary`-guarded `ReportCO2Resilience(state)` call; CP134 maps the lines 225-227 `displayVisualResilienceSummary`-guarded `ReportVisualResilience(state)` call; CP135 maps the parent-tail line-229 `ManageSurfaceHeatBalancefirstTime = false` assignment without a synthetic routine; CP136 maps the `HeatBalanceManager.cc` line-210 unconditional `EndZoneTimestepBeforeZoneReporting` `ManageEMS` call by reusing `routine.manage_ems`; CP137 maps the line-211 `RecKeepHeatBalance(state)` call as a required routine, declared at `HeatBalanceManager.hh` line 134 and implemented at `HeatBalanceManager.cc` lines 2971-3057; CP138 maps the line-217 unconditional `ReportHeatBalance(state)` call as a required routine, declared at header line 142 and implemented at source lines 3321-3418; CP139 maps the line-219 unconditional `EndZoneTimestepAfterZoneReporting` `ManageEMS` call by reusing `routine.manage_ems`; CP140 maps the line-221 unconditional `UpdateEMSTrendVariables(state)` call as non-required, declared at `EMSManager.hh` line 122 and implemented at `EMSManager.cc` lines 1444-1479; the line-222 unconditional plugin-value update is the next CP141 checkpoint
 3. unconditional `ManageEMS(state, EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance, anyRan, absent)`
 4. `InitHeatBalance`
 5. unconditional `ManageEMS(state, EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, anyRan, absent)`
@@ -121,7 +122,8 @@ unless the deviation is documented in a case-specific waiver:
 8. as mapped by CP137, unconditional `RecKeepHeatBalance(state)` at line 211, declared at `HeatBalanceManager.hh` line 134 and implemented at `HeatBalanceManager.cc` lines 2971-3057
 9. as mapped by CP138, unconditional `ReportHeatBalance(state)` at line 217, declared at `HeatBalanceManager.hh` line 142 and implemented at `HeatBalanceManager.cc` lines 3321-3418
 10. as mapped by CP139, unconditional `ManageEMS(state, EMSCallFrom::EndZoneTimestepAfterZoneReporting, anyRan, absent)` at line 219
-11. at the next CP140 checkpoint, unconditional `UpdateEMSTrendVariables(state)` at line 221, before the plugin-value update at line 222
+11. as mapped by CP140, unconditional `UpdateEMSTrendVariables(state)` at line 221, declared at `EMSManager.hh` line 122 and implemented at `EMSManager.cc` lines 1444-1479
+12. at the next CP141 checkpoint, unconditional `PluginManagement::PluginManager::updatePluginValues(state)` at line 222
 
 ## Current Blocker Ledger
 
@@ -201,7 +203,8 @@ EnergyPlus 26.1.0 ownership boundaries explicit:
   `EndZoneTimestepBeforeZoneReporting` EMS calling point, then CP137-mapped
   `RecKeepHeatBalance`, then CP138-mapped `ReportHeatBalance`, then the
   CP139-mapped `EndZoneTimestepAfterZoneReporting` EMS calling point, then
-  CP140-next `UpdateEMSTrendVariables`. Warmup convergence is checked
+  CP140-mapped `UpdateEMSTrendVariables`, then CP141-next plugin-value update.
+  Warmup convergence is checked
   only at end-of-day after reporting, and `DayOfSim` is reset to `0` when the
   run-period warmup converges.
 - `HeatBalanceSurfaceManager.cc::ManageSurfaceHeatBalance` calls
@@ -1560,7 +1563,8 @@ existing generic routine without a row or count change. CP137 adds
 `RecKeepHeatBalance` as a required source mapping; CP138 adds
 `ReportHeatBalance` as a required source mapping; CP139 maps the
 `EndZoneTimestepAfterZoneReporting` EMS calling point by reusing the generic
-routine; CP140 next maps `UpdateEMSTrendVariables`.
+routine; CP140 adds non-required `UpdateEMSTrendVariables`; CP141 next maps the
+plugin-value update.
 
 ### CP109 inline sizing Space heat-balance mode map
 
@@ -1833,7 +1837,8 @@ existing generic routine without a row or count change. CP137 adds
 `RecKeepHeatBalance` as a required source mapping; CP138 adds
 `ReportHeatBalance` as a required source mapping; CP139 maps the
 `EndZoneTimestepAfterZoneReporting` EMS calling point by reusing the generic
-routine; CP140 next maps `UpdateEMSTrendVariables`.
+routine; CP140 adds non-required `UpdateEMSTrendVariables`; CP141 next maps the
+plugin-value update.
 
 ### CP114 `InitHeatBalance` source map
 
@@ -1911,7 +1916,8 @@ existing generic routine without a row or count change. CP137 adds
 `RecKeepHeatBalance` as a required source mapping; CP138 adds
 `ReportHeatBalance` as a required source mapping; CP139 maps the
 `EndZoneTimestepAfterZoneReporting` EMS calling point by reusing the generic
-routine; CP140 next maps `UpdateEMSTrendVariables`.
+routine; CP140 adds non-required `UpdateEMSTrendVariables`; CP141 next maps the
+plugin-value update.
 
 ### CP115 post-`InitHeatBalance` EMS calling-point map
 
@@ -2337,7 +2343,8 @@ point by reusing the existing generic routine without a row or count change.
 CP137 adds `RecKeepHeatBalance` as a required source mapping, CP138 adds
 `ReportHeatBalance` as a required source mapping, CP139 maps the
 `EndZoneTimestepAfterZoneReporting` EMS calling point by reusing the generic
-routine, and CP140 next maps `UpdateEMSTrendVariables`.
+routine, CP140 adds non-required `UpdateEMSTrendVariables`, and CP141 next maps
+the plugin-value update.
 
 ### CP122 `CalcHeatBalanceInsideSurf` source map
 
@@ -3859,9 +3866,86 @@ entry, Rust target or code, mapped Rust state, capability, support-gate
 admission, manifest, comparator, proof variable, result, output, numerical,
 performance, or conformance promotion. The inventory remains 32 algorithms
 and 150 routines, split into 58 `state_mapped` and 92 `source_mapped` routines;
-the required-routine total remains 50. CP140 next maps the unconditional
-`UpdateEMSTrendVariables(state)` call at `HeatBalanceManager.cc` line 221,
-before the plugin-value update at line 222.
+the required-routine total remains 50. The following CP140 section maps the
+unconditional `UpdateEMSTrendVariables(state)` call at
+`HeatBalanceManager.cc` line 221, declared at `EMSManager.hh` line 122 and
+implemented at `EMSManager.cc` lines 1444-1479.
+
+### CP140 `UpdateEMSTrendVariables` source map
+
+After the CP139 post-reporting EMS call successfully returns,
+`ManageHeatBalance` line 221 unconditionally calls
+`EMSManager::UpdateEMSTrendVariables(state)`. A successful call reaches the
+unconditional `PluginManagement::PluginManager::updatePluginValues(state)`
+call at line 222. The parent adds no warmup, sizing, output, or environment
+guard around either call. `UpdateEMSTrendVariables` is declared at
+`EMSManager.hh` line 122 and implemented at `EMSManager.cc` lines 1444-1479.
+
+The implementation first returns immediately when
+`AnyEnergyManagementSystemInModel` is false and then returns when
+`NumErlTrendVariables == 0`. Otherwise it visits trend variables in their
+1-based declaration order. For each entry it reads `ErlVariablePointer` and
+`LogDepth`; a pointer at most zero or depth at most zero silently skips that
+entry without affecting later declarations.
+
+For each positive pointer/depth pair, the routine reads
+`ErlVariable(ErlVariablePointer).Value.Number` without inspecting the Value
+type, copies the complete `TrendValARR` into `tempTrendARR`, writes that
+current number at `TrendValARR(1)`, and copies old indices
+`1..LogDepth-1` into new indices `2..LogDepth`. For `LogDepth == 1` that tail
+slice is empty, so only index 1 is overwritten. The newest value is therefore
+always at 1 and the oldest retained value falls off the end. The body locally
+validates neither an upper bound on `ErlVariablePointer` nor that `LogDepth`
+fits the allocated arrays; it relies on prior setup invariants.
+
+Trend-object input processing owns the declaration count/order and Erl
+variable resolution. It floors the numeric requested depth into `LogDepth`
+and then requires that stored depth to be greater than zero, so a request of
+`0.5` fails rather than allocating a zero-depth history. It allocates
+equal-depth `TrendValARR`, `tempTrendARR`, and `TimeARR` arrays, zeroes both
+value arrays, and fills each fixed time entry as `-n * TimeStepZone` for
+1-based history index `n`. All input/setup diagnostics are emitted there
+rather than by CP140.
+
+EMS BeginEnvrn initialization clears `TrendValARR` only. It does not clear
+`tempTrendARR`, but CP140 overwrites that complete temporary array from the
+current history before using it; the fixed `TimeARR` is not rebuilt. There is
+no separate BeginDay or warmup-completion reset. Because the parent call is
+unconditional, warmup and sizing invocations that reach line 221 advance the
+same environment history. CP140 itself neither allocates nor validates trend
+storage, mutates `TimeARR`, nor owns an environment reset.
+
+CP140 samples whatever numeric Erl-variable state exists after CP139. A CP139
+callback, plugin, or matching Erl program may have changed such state before
+this sample, but CP140 does not attribute a value to a particular producer.
+The separate plugin-value update at line 222 is later in source order and
+cannot retroactively change the sample just pushed; CP140 makes no claim about
+when that later update becomes visible to any future EMS execution.
+
+The body emits no direct warning, recurring warning, severe, fatal, or output
+message. Invalid positive pointers, inconsistent positive depths, allocation
+failures, and any failure to return are governed by setup/runtime dependencies;
+a non-return prevents the line-222 plugin update. No dependency receives a
+child routine row or added source at this checkpoint.
+
+Existing Rust composite heat-balance stage metadata includes the surrounding
+post-report EMS checkpoint and later warmup-convergence checkpoint but has no
+trend-update stage or EMS trend-history implementation. Existing execution
+plan, prebinding, reporting, and result-store scaffolds do not implement this
+routine's input ownership, current Erl-value dereference, 1-based history
+shift, lifecycle, diagnostics, failure behavior, or source order, and are not
+listed as a ledger Rust target.
+
+CP140 adds non-required `source_mapped`
+`routine.update_ems_trend_variables`. `EMSManager.cc` is already in the
+Heat Balance Manager algorithm source inventory, so it adds no source file,
+project-contract requirement, Rust target or code, mapped Rust state,
+capability, support-gate admission, manifest, comparator, proof variable,
+result, output, numerical, performance, or conformance promotion. The
+inventory becomes 32 algorithms and 151 routines, split into 58
+`state_mapped` and 93 `source_mapped` routines; the required-routine total
+remains 50. CP141 next maps the unconditional plugin-value update at
+`HeatBalanceManager.cc` line 222.
 
 ### `CheckValidSimulationObjects` state contract
 
