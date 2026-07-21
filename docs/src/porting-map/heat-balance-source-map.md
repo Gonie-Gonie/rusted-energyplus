@@ -76,6 +76,7 @@ claim.
 | one-time heat-balance input-flag clear | inline `ManageHeatBalanceGetInputFlag = false` at `ManageHeatBalance` line 186 | CP112 maps and defers this inline lifecycle boundary without a synthetic routine or Rust target. The source flag defaults and resets to true, remains true through the once-only input tail, and is cleared only after successful reach past the computed-geometry loop; Rust owns no persistent equivalent flag or re-entry behavior. |
 | pre-initialization EMS calling point | unconditional `ManageEMS(state, BeginZoneTimestepBeforeInitHeatBalance, anyRan, absent)` at `ManageHeatBalance` lines 189-194 | CP113 source-maps the canonical generic `ManageEMS` routine, not required for the full domain, with no Rust target. EMS setup, language execution, callbacks, optional manager selection, run flags, side effects, runtime behavior, and conformance remain deferred. |
 | heat-balance initialization | unconditional `InitHeatBalance(state)` at `ManageHeatBalance` line 198, implemented at lines 2594-2821 | CP114 source-maps this canonical routine and makes it required for the full heat-balance domain. Existing Rust source-order metadata, identity wrapper, and bounded state construction do not implement the complete flag-driven EnergyPlus initialization lifecycle. |
+| post-initialization EMS calling point | unconditional `ManageEMS(state, BeginZoneTimestepAfterInitHeatBalance, anyRan, absent)` at `ManageHeatBalance` lines 199-200 | CP115 reuses the existing generic `routine.manage_ems` source mapping. The same caller-owned `anyRan` is passed again and overwritten; no routine, project-contract, Rust-state, support, or conformance entry is added. |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
 | inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
 | zone air updates | `ManageZoneAirUpdates` | diagnostic shell only |
@@ -89,7 +90,7 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry, CP112 maps/defers only the line-186 one-time flag clear without claiming persistent Rust lifecycle parity, CP113 source-maps the canonical generic `ManageEMS` routine at the unconditional `BeginZoneTimestepBeforeInitHeatBalance` caller checkpoint without adding a Rust target, and CP114 makes the following unconditional `InitHeatBalance` call a required source mapping without promoting existing Rust initialization state; the second unconditional `ManageEMS` call at `BeginZoneTimestepAfterInitHeatBalance` is the next CP115 checkpoint
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry, CP112 maps/defers only the line-186 one-time flag clear without claiming persistent Rust lifecycle parity, CP113 source-maps the canonical generic `ManageEMS` routine at the unconditional `BeginZoneTimestepBeforeInitHeatBalance` caller checkpoint without adding a Rust target, CP114 makes the following unconditional `InitHeatBalance` call a required source mapping without promoting existing Rust initialization state, and CP115 maps the second unconditional `ManageEMS` caller checkpoint at `BeginZoneTimestepAfterInitHeatBalance` by reusing `routine.manage_ems` without a new row; the unconditional `ManageSurfaceHeatBalance(state)` call at line 209 is the next CP116 checkpoint
 3. unconditional `ManageEMS(state, EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance, anyRan, absent)`
 4. `InitHeatBalance`
 5. unconditional `ManageEMS(state, EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, anyRan, absent)`
@@ -1498,8 +1499,9 @@ routine row. CP110 source-maps the following conditional surface-octree
 initialization, CP111 state-maps the following bounded computed-geometry
 slice, CP112 maps the one-time input-flag clear, and CP113 source-maps the
 following generic EMS dispatch. CP114 makes the unconditional
-`InitHeatBalance` call a required source mapping; the post-initialization EMS
-calling point is the next CP115 checkpoint.
+`InitHeatBalance` call a required source mapping, and CP115 maps the
+post-initialization EMS caller by reusing the generic row. The unconditional
+`ManageSurfaceHeatBalance` call is the next CP116 checkpoint.
 
 ### CP109 inline sizing Space heat-balance mode map
 
@@ -1744,8 +1746,9 @@ exact execution order inside `ManageEMS`; other EMS calling points; repeated
 calls, sizing or simulation environments, timestep and warmup lifecycle,
 runtime numerics and performance, output behavior, and conformance all remain
 deferred. CP114 source-maps the following unconditional
-`InitHeatBalance(state)` call at `HeatBalanceManager.cc` line 198; the
-post-initialization EMS calling point is the next CP115 checkpoint.
+`InitHeatBalance(state)` call at `HeatBalanceManager.cc` line 198, and CP115
+maps the post-initialization EMS caller by reusing this same generic
+`routine.manage_ems` row. `ManageSurfaceHeatBalance` is next.
 
 ### CP114 `InitHeatBalance` source map
 
@@ -1794,10 +1797,49 @@ window optical/storm-window, ground and Kiva state; local-environment and EMS
 coupling; every initialization child call and its exact ordering, re-entry,
 partial side effects, and error behavior; progress messages, files, diagnostics
 and reporting; runtime numerical behavior, performance, and conformance remain
-deferred. The next CP115 checkpoint is the unconditional
+deferred. CP115 maps the following unconditional
 `ManageEMS(state, BeginZoneTimestepAfterInitHeatBalance, anyRan, absent)` call
-at lines 199-200. It reuses the generic `routine.manage_ems` source mapping and
-requires no second routine row.
+at lines 199-200 by reusing the generic `routine.manage_ems` source mapping.
+The line-209 Surface manager call is the next CP116 checkpoint.
+
+### CP115 post-`InitHeatBalance` EMS calling-point map
+
+Immediately after CP114's unconditional `InitHeatBalance(state)` return,
+`ManageHeatBalance` lines 199-200 unconditionally call
+`EMSManager::ManageEMS(state,
+EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, anyRan,
+ObjexxFCL::Optional_int_const())`. The fourth argument is again an explicitly
+absent optional program-manager index. Every `ManageHeatBalance` invocation
+that reaches this point makes the call, including later invocations whose
+once-only input block was skipped.
+
+The caller reuses the same `anyRan` variable declared at line 189 and passed
+to the CP113 pre-initialization call. `ManageEMS` writes that referenced
+result anew for the post-initialization calling point, so the earlier call's
+value is overwritten rather than combined by `ManageHeatBalance`. CP115 maps
+only that caller identity, order, argument, and overwrite boundary. It makes no
+claim about which EMS programs, plugins, or callbacks run before or after
+initialization, or about how they observe or mutate the state initialized by
+CP114.
+
+The canonical `routine.manage_ems` row added by CP113 covers the generic
+source routine, so CP115 adds no second routine row, source file,
+project-contract entry, Rust target or wrapper, model/runtime state,
+capability, support-gate admission, manifest, comparator, proof variable,
+result, count, or conformance promotion.
+
+Complete EMS input/setup, Erl programs and program-call managers, sensors,
+actuators, internal variables, trends, plugins, registered callbacks, and
+external interfaces; calling-point gates and optional-index behavior; exact
+`anyRan` or internal run-flag values; the semantic relationship between the
+pre- and post-initialization calls; observation or mutation of initialized
+state; actuator/reporting side effects, diagnostics and exact execution order;
+other calling points, repeated-call/environment/timestep/warmup lifecycle,
+runtime numerics, performance, output behavior, and conformance remain
+deferred. The next CP116 checkpoint is the unconditional
+`HeatBalanceSurfaceManager::ManageSurfaceHeatBalance(state)` call at line 209,
+which will expand the existing required `routine.manage_surface_heat_balance`
+mapping rather than create a duplicate row.
 
 ### `CheckValidSimulationObjects` state contract
 
