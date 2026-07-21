@@ -137,7 +137,8 @@ surface algorithm's target list, and do not implement or promote the complete
 source routine, state, lifecycle, output, or numerical behavior.
 
 The inventory now also includes `allocate_surface_heat_bal_arrays` immediately
-after `init_surface_heat_balance` and before `calc_heat_balance_outside_surf`.
+after `init_surface_heat_balance` and before
+`init_thermal_and_flux_histories`.
 Its EnergyPlus boundary is the `InitSurfaceHeatBalance` line-350 call under the
 lines-349-355 BeginSim branch, after the caller weather refresh and before the
 `InterZoneWindow` reduction; the declaration is at
@@ -147,8 +148,20 @@ required: Rust has no complete six-owner Surface allocation, CTF/master/source
 history state, exact defaults and conditional preservation, or 78-site output
 setup and re-entry lifecycle.
 
+The inventory now also includes `init_thermal_and_flux_histories` immediately
+after `allocate_surface_heat_bal_arrays` and before
+`calc_heat_balance_outside_surf`. Its EnergyPlus boundary is the
+`InitSurfaceHeatBalance` line-383 call inside the lines-379-384 BeginEnvrn
+branch; the declaration is at `HeatBalanceSurfaceManager.hh` line 103 and the
+implementation is at `HeatBalanceSurfaceManager.cc` lines 2208-2447. It
+remains `source_mapped` and required: Rust's optional
+`EnergyPlusSurfInitial` policy covers only configurable initial temperature,
+typed boundary temperature, steady-`1/R` flux, and variable-length prior
+histories, not the complete Zone/Space, fixed/master/source-history,
+cavity/Kiva/OSCM, selective-reset, failure, or re-entry lifecycle.
+
 The inventory now also includes `calc_heat_balance_outside_surf` immediately
-after `allocate_surface_heat_bal_arrays`. Its EnergyPlus boundary is the
+after `init_thermal_and_flux_histories`. Its EnergyPlus boundary is the
 unconditional parent line-168 `CalcHeatBalanceOutsideSurf(state)` call, which
 omits the optional zone-resimulation argument, and the implementation at lines
 6951-7721. It remains `source_mapped` and required. Existing Rust

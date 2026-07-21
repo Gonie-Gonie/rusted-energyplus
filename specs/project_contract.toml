@@ -47,6 +47,7 @@ required_routines = [
   "manage_surface_heat_balance",
   "init_surface_heat_balance",
   "allocate_surface_heat_bal_arrays",
+  "init_thermal_and_flux_histories",
   "calc_heat_balance_outside_surf",
   "calc_heat_balance_inside_surf",
   "calc_heat_balance_inside_surf_2_ctf_only",
