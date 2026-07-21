@@ -103,6 +103,16 @@ current Rust allocation and initialization shells do not implement the source
 fallback bundle, exact Zone/Space and enclosure state, order, defaults,
 partial-failure behavior, destructive re-entry, or clear/retry lifecycle.
 
+The inventory now also includes `allocate_heat_bal_arrays` immediately after
+`allocate_zone_heat_bal_arrays`. Its EnergyPlus boundary is the
+`InitHeatBalance` BeginSim-only call at lines 2617-2618, the declaration at
+`HeatBalanceManager.hh` line 132, and the implementation at
+`HeatBalanceManager.cc` lines 2855-2963. It remains `source_mapped` and
+required: Rust has no parent-routine analog for its ordered FanSystem,
+contaminant, warmup-convergence, resilience, and report-array allocations,
+defaults, conditional preservation, partial-failure state, or re-entry
+semantics.
+
 The inventory now also includes `init_surface_heat_balance` immediately after
 `manage_surface_heat_balance`. Its EnergyPlus boundary is the unconditional
 `HeatBalanceSurfaceManager::InitSurfaceHeatBalance` call at parent line 161
