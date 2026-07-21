@@ -65,6 +65,8 @@ claim.
 | positive construction-use evidence | `CheckUsedConstructions` immediately after the no-Zone gate | CP105 state-maps only monotonic positive evidence. Rust resolves retained typed-surface ConstructionIds plus the six source-ordered raw reference families, stores sorted/deduplicated known-used IDs, and separately stores sorted/deduplicated known-CTF-used IDs only for non-window GroundHeatExchanger and EMS references. Missing, blank, wrong-type, and unresolved raw references stay silent. Absence remains unknown: no `IsUsed=false`/`IsUsedCTF=false`, unused count/name/warning, `DisplayExtraWarnings`, CTF/CondFD selection, runtime, or support claim is added. |
 | input-completion fatal barrier | inline `GetHeatBalanceInput` `ErrorsFound` check immediately after `CheckUsedConstructions` | mapped and deferred without a synthetic routine entry. EnergyPlus terminates immediately at source lines 311-313 before enclosure or internal-gain initialization. A failed Rust compile eventually returns `model = None`, which is a coarse fail-closed outcome, not exact parity for this short-circuit point, accumulated-diagnostic order, fatal text, or side effects. |
 | solar enclosure view-factor initialization | `HeatBalanceIntRadExchange::InitSolarViewFactors` at the parent call on `HeatBalanceManager.cc` line 316 | source-mapped and required for the full domain. It depends on the `ViewFactorInfo` report option and EIO/debug writers, aligned user view factors, complete Solar enclosure and Space heat-transfer-surface lists, AirBoundary merging/exclusion, Surface pointers and global report order, area/azimuth/tilt/inside-solar-absorptance state, zero- and one-surface branches, approximate or user matrices, InternalMass detection, `FixViewFactors`, and warning/fatal/report side effects. Existing Rust approximate/fix helpers and 1Zone EIO evidence do not promote this routine. |
+| internal-gain manager | `ManageInternalHeatGains(state, true)` at the parent call on `HeatBalanceManager.cc` line 320 | source-mapped and required for the full domain. CP107 does not implement the persistent one-time input flag, general `InitOnly` behavior, the non-init recurring branches, full internal-gain input, daylighting/reporting setup, or runtime gain updates. |
+| bounded internal-gain input | `GetInternalHeatGainsInput` reached by the init-only manager call | CP107 state-maps only the direct-Zone People then OtherEquipment family slice. The wrapper returns on a pre-existing Error, but a People diagnostic created inside the pass does not prevent the OtherEquipment scan. The existing typed arenas and name maps are the only mapped state; all other families, target expansion, derived occupant/design-level state, reporting, runtime, and conformance remain deferred. |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
 | inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
@@ -79,7 +81,7 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 324-325; CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, and CP106 source-maps the fatal barrier plus `InitSolarViewFactors`; internal-gain acquisition and Kiva setup are the next deferred checkpoints and receive no new routine rows here
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 324-325; CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, and CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice; conditional Kiva setup is the next deferred checkpoint
 3. `InitHeatBalance`
 4. outside opaque surface balance
 5. inside opaque surface balance
@@ -1359,12 +1361,86 @@ the zero/one/at-most-three-surface branches and warnings,
 and debug side effects. The routine is therefore `source_mapped` and remains
 required for full-domain support.
 
-The source-order tail recorded by this checkpoint continues through
-`ManageInternalHeatGains(state, true)` at line 320, which ensures Lights input
-precedes daylighting input, and conditional
+The source-order tail recorded by CP106 continues through
+`ManageInternalHeatGains(state, true)` at line 320 and conditional
 `kivaManager.setupKivaInstances(state)` at lines 324-325 when `AnyKiva` is
-true. Both are deferred next checkpoints; CP106 adds no routine-ledger row or
-Rust support claim for either call.
+true. CP107 maps the first call as described below; conditional Kiva setup
+remains the next deferred checkpoint.
+
+### CP107 bounded internal-gain input map
+
+`ManageInternalHeatGains(state, true)` is the next parent call after solar
+view-factor initialization. In `InternalHeatGains.cc`, the manager's one-time
+input branch calls `GetInternalHeatGainsInput`; because this parent call passes
+`InitOnly=true`, the source returns after input acquisition. Other manager
+entries may bypass input once the persistent flag is clear or continue into
+recurring radiation, convection, latent, contaminant, reporting, and
+daylighting work. CP107 therefore records `ManageInternalHeatGains` as required
+but only `source_mapped`.
+
+Within `GetInternalHeatGainsInput`, the source scans People first, then Lights,
+ElectricEquipment, GasEquipment, HotWaterEquipment, SteamEquipment,
+OtherEquipment, ElectricEquipment:ITE:AirCooled,
+ZoneBaseboard:OutdoorTemperatureControlled, and
+ZoneContaminantSourceAndSink:CarbonDioxide before later setup and registration.
+The bounded Rust wrapper preserves only two monotonic family points from that
+sequence: direct-Zone People first and direct-Zone OtherEquipment second. It
+returns without invoking either existing parser when any Error was already
+present on entry. Once admitted, it deliberately performs both scans; an Error
+added by People does not suppress OtherEquipment, matching the source's
+accumulating input-error behavior within this bounded slice.
+
+The mapped state is exactly the existing `TypedModel::people` plus
+`people_names` and `TypedModel::other_equipment` plus
+`other_equipment_names` declaration state. No new model identity, public-object
+count, name map, graph edge, capability, manifest, proof variable, runtime
+history, or conformance evidence is introduced. Direct typed Zone resolution
+is the complete target boundary here. ZoneList, Space, and SpaceList expansion,
+source-generated instances, declaration order parity, Space and Zone occupant
+totals, `setupIHGZonesAndSpaces`, `setDesignLevel`, floor-area/person-derived
+design levels, schedule-minimum validation, nominal min/max arrays, all omitted
+families, reporting/output variables/EIO/meters, contaminant coupling, EMS,
+component-load reporting, runtime gain updates, persistent input flags,
+re-entry behavior, and exact global compiler short-circuit behavior after an
+Error created inside this pass remain unclaimed.
+
+### `GetInternalHeatGainsInput` state contract
+
+<!-- routine-state-contract:v1 begin get_internal_heat_gains_input -->
+GetInternalHeatGainsInput
+
+read_state:
+- the line-320 `ManageInternalHeatGains(state, true)` parent call after `InitSolarViewFactors`; bounded Rust invokes `Compiler::parse_bounded_internal_heat_gains_input` after the CP105 construction-use collector, returns before either family when an Error already exists on entry, otherwise scans People before OtherEquipment, and continues into OtherEquipment even when People adds an Error
+- every `People` definition whose required `zone_or_zonelist_or_space_or_spacelist_name` resolves directly to an existing typed Zone; an optional number-of-people schedule resolves through the existing typed schedule namespace, the calculation method defaults to People and accepts People, People/Area or PeoplePerArea, and Area/Person or AreaPerPerson, and the three finite sizing scalars default to zero and must be nonnegative
+- every `OtherEquipment` definition whose same target field resolves directly to an existing typed Zone; an optional schedule resolves through the existing typed schedule namespace, fuel type defaults to normalized None, design-level method defaults to EquipmentLevel and accepts the bounded Watts/Area, Power/Area, WattsPerZoneFloorArea, Watts/Person, Power/Person, or WattsPerPerson aliases, and all existing finite numeric/default/range validation remains in force
+- OtherEquipment retains finite design level and carbon-dioxide generation rate with zero defaults, nonnegative power-per-floor-area and power-per-person with zero defaults, and latent, radiant, and lost fractions each in [0,1] with zero defaults; a sum above one emits the existing blocking typed diagnostic without suppressing later definitions
+
+write_state:
+- the existing deterministic People arena and normalized people name map, with dense InternalGainId, normalized name, direct ZoneId, optional ScheduleId, calculation-method enum, number of people, people per floor area, and floor area per person
+- the existing deterministic OtherEquipment arena and normalized other-equipment name map, with dense InternalGainId, normalized name and fuel type, direct ZoneId, optional ScheduleId, design-level-method enum, design level, power-per-floor-area, power-per-person, latent/radiant/lost fractions, and carbon-dioxide generation rate
+- family-level diagnostic projection ordered People before OtherEquipment for an error-free entry; validation remains definition-local, so a malformed People object does not prevent the bounded OtherEquipment family from being scanned in the same wrapper invocation
+
+history_state_ownership:
+- TypedModel owns immutable bounded People and OtherEquipment declaration state already used by downstream Rust paths; CP107 adds no mutable EnergyPlus internal-gain history, one-time input flag, runtime rate, schedule sample, meter, output, or EMS state
+
+unsupported_state:
+- Lights, ElectricEquipment, GasEquipment, HotWaterEquipment, SteamEquipment, ElectricEquipment:ITE:AirCooled, ZoneBaseboard:OutdoorTemperatureControlled, and ZoneContaminantSourceAndSink:CarbonDioxide source-family input and all of their dependent state
+- ZoneList, Space, and SpaceList target expansion; source-generated gain instances and declaration order; Space and Zone occupant totals; `setupIHGZonesAndSpaces`, `setDesignLevel`, floor-area/person-derived design-level materialization, schedule-minimum checks, nominal min/max gain arrays, and Space heat-balance topology
+- ManageInternalHeatGains runtime branches and recurring summation/update behavior, daylighting order beyond the mapped parent call, reporting variables, EIO, meters, contaminant coupling, EMS actuators/internal variables, component-load reporting, and all numerical runtime state
+
+inactive_branches:
+- any compile Error present on wrapper entry suppresses both bounded family scans and publishes no additional People or OtherEquipment state from this pass
+- when neither bounded family is present, the wrapper is an empty no-op and adds no identity, count, capability, runtime state, or diagnostic
+- a missing optional schedule reference retains no ScheduleId; absent optional/defaulted numeric, fuel, and method fields retain their existing typed defaults without creating schedule or derived design-level state
+
+unsupported_active_branches:
+- a People Error created after entry does not suppress the OtherEquipment scan, but no claim follows for exact source recovery state, complete diagnostic ordering, or arbitrary compiler passes after this bounded wrapper
+- a valid direct-Zone People or OtherEquipment definition retains its pre-existing typed support and downstream bounded uses only; CP107 does not promote full internal-gain runtime execution or any omitted family
+
+not_claimed_branches:
+- complete `ManageInternalHeatGains` or `GetInternalHeatGainsInput` parity, source `GetInputFlag` persistence and re-entry behavior, `InitOnly` control beyond this compile-time projection, exact object/declaration ordering within either family, partial-allocation recovery, exact diagnostics/text/severity/order/multiplicity, or exact global compiler short-circuit behavior after Errors created inside the pass
+- ZoneList/Space/SpaceList expansion, generated instances, Space/Zone occupant totals, every omitted internal-gain family, setup and design-level derivation, schedule minima, reporting, meters, EMS, runtime gains, numerical parity, capability expansion, object-count or graph expansion, and conformance
+<!-- routine-state-contract:v1 end get_internal_heat_gains_input -->
 
 ### `CheckValidSimulationObjects` state contract
 
