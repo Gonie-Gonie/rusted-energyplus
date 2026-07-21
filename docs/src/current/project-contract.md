@@ -64,6 +64,14 @@ listed routine is `family_gated` or `complete` in
 this rule. Full runtime compatibility remains locked until all EnergyPlus
 domains have complete inventories.
 
+The canonical heat-balance inventory includes `init_heat_balance` after the
+required input/view-factor/internal-gain routines and before
+`manage_surface_heat_balance`. Its EnergyPlus boundary is the unconditional
+`HeatBalanceManager::InitHeatBalance` call at line 198 and the flag-driven
+implementation at lines 2594-2821. It remains `source_mapped` and required:
+the current Rust execution-plan stage, identity wrapper, and separately
+bounded initialization state do not complete or promote this routine.
+
 The canonical time-domain inventory includes `get_project_data`,
 `process_schedule_input`, `process_interval_fields`,
 `day_schedule_populate_from_minute_vals`, and
