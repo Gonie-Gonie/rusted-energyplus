@@ -92,6 +92,22 @@ bounded retained opaque CTF/environmental balance and report terms do not
 implement or promote the complete Zone/Space/Surface traversal, exterior
 boundary switch, child-call order, state, error behavior, or numerics.
 
+The inventory now also includes `calc_heat_balance_inside_surf` immediately
+after `calc_heat_balance_outside_surf` and before the distinct optimized
+`calc_heat_balance_inside_surf_2_ctf_only` child. Its EnergyPlus boundary is
+the unconditional parent line-172 `CalcHeatBalanceInsideSurf(state)` call,
+which omits the optional Zone-resimulation argument, and the canonical wrapper
+at lines 7738-7813. It remains `source_mapped` and required. That wrapper owns
+first-call and BeginEnvrn lifecycle, radiant-HVAC aggregation, complete versus
+partial and AllCTF versus general dispatch, MRT calculation, and intermediate
+result updates; its dependencies own the complete general iteration,
+surface/window/moisture/Kiva topology, non-local partial-resimulation side
+effects, errors, and the pass-by-value warmup-counter reachability boundary.
+Existing Rust inside-balance stage metadata, its identity wrapper, bounded
+surface passes, and the separate CTF-only routine mapping do not implement or
+promote this complete canonical routine, state, lifecycle, dispatch, error
+behavior, or numerics.
+
 The canonical time-domain inventory includes `get_project_data`,
 `process_schedule_input`, `process_interval_fields`,
 `day_schedule_populate_from_minute_vals`, and
