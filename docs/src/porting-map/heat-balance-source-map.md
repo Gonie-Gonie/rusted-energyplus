@@ -131,7 +131,7 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry, CP112 maps/defers only the line-186 one-time flag clear without claiming persistent Rust lifecycle parity, CP113 source-maps the canonical generic `ManageEMS` routine at the unconditional `BeginZoneTimestepBeforeInitHeatBalance` caller checkpoint without adding a Rust target, CP114 makes the following unconditional `InitHeatBalance` call a required source mapping without promoting existing Rust initialization state, CP115 maps the second unconditional `ManageEMS` caller checkpoint at `BeginZoneTimestepAfterInitHeatBalance` by reusing `routine.manage_ems` without a new row, CP116 expands the existing required `routine.manage_surface_heat_balance` row for the unconditional line-209 call and complete source parent order, CP117 maps the inline first-time `Initializing Surfaces` display guard at `HeatBalanceSurfaceManager.cc` lines 158-160 without a synthetic routine, and CP118 adds the following unconditional line-161 `InitSurfaceHeatBalance(state)` call and lines 272-621 implementation as a new required source-mapped routine/project entry; CP119 maps the following first-time `Calculate Outside Surface Heat Balance` display guard at lines 165-167 without a synthetic routine; CP120 adds the unconditional line-168 `CalcHeatBalanceOutsideSurf(state)` call and lines 6951-7721 implementation as a new required source-mapped routine/project entry; CP121 maps the first-time inside-balance display at lines 169-171 without a synthetic routine; CP122 adds the unconditional line-172 `CalcHeatBalanceInsideSurf(state)` call and lines 7738-7813 canonical wrapper as a required source-mapped routine/project entry; CP123 maps the first-time air-balance display at lines 176-178 without a synthetic routine; CP124 maps the unconditional line-179 `ManageAirHeatBalance(state)` call by reusing the existing required routine; CP125 adds the unconditional line-184 `UpdateFinalSurfaceHeatBalance(state)` call and lines 5176-5219 implementation as a required source-mapped routine/project entry; CP126 adds the parent lines 186-189 `AnyCTF || AnyEMPD`-guarded `UpdateThermalHistories(state)` call and lines 5221-5581 implementation as a required source-mapped routine/project entry; CP127 adds the independent parent lines 191-206 `AnyCondFD` complete-Surface filtered moisture-update block and inline `SurfaceDataFD::UpdateMoistureBalance` helper as a non-required source-mapped routine; CP128 adds the unconditional line-208 `ManageThermalComfort(state, false)` call and `ThermalComfort.cc` lines 105-164 implementation as a non-required source-mapped routine; CP129 adds the unconditional line-210 `ReportSurfaceHeatBalance(state)` call and `HeatBalanceSurfaceManager.cc` lines 6605-6891 implementation as a required source-mapped routine/project entry; CP130 adds the lines 211-213 `ZoneSizingCalc`-guarded `GatherComponentLoadsSurface(state)` call and `OutputReportTabular.cc` lines 15064-15132 implementation as a non-required source-mapped routine; CP131 adds the unconditional line-215 `CalcThermalResilience(state)` call and `HeatBalanceSurfaceManager.cc` lines 5707-5799 implementation as a non-required source-mapped routine; CP132 adds the lines 217-219 `displayThermalResilienceSummary`-guarded `ReportThermalResilience(state)` call and lines 5801-6388 implementation as a non-required source-mapped routine; CP133 maps the lines 221-223 `displayCO2ResilienceSummary`-guarded `ReportCO2Resilience(state)` call; CP134 maps the lines 225-227 `displayVisualResilienceSummary`-guarded `ReportVisualResilience(state)` call; CP135 maps the parent-tail line-229 `ManageSurfaceHeatBalancefirstTime = false` assignment without a synthetic routine; CP136 maps the `HeatBalanceManager.cc` line-210 unconditional `EndZoneTimestepBeforeZoneReporting` `ManageEMS` call by reusing `routine.manage_ems`; CP137 maps the line-211 `RecKeepHeatBalance(state)` call as a required routine, declared at `HeatBalanceManager.hh` line 134 and implemented at `HeatBalanceManager.cc` lines 2971-3057; CP138 maps the line-217 unconditional `ReportHeatBalance(state)` call as a required routine, declared at header line 142 and implemented at source lines 3321-3418; CP139 maps the line-219 unconditional `EndZoneTimestepAfterZoneReporting` `ManageEMS` call by reusing `routine.manage_ems`; CP140 maps the line-221 unconditional `UpdateEMSTrendVariables(state)` call as non-required, declared at `EMSManager.hh` line 122 and implemented at `EMSManager.cc` lines 1444-1479; CP141 maps the line-222 unconditional `PluginManagement::PluginManager::updatePluginValues(state)` call as non-required, declared at `PluginManager.hh` line 198 and implemented at `PluginManager.cc` lines 1458-1467; CP142 maps the required outer `WarmupFlag && EndDayFlag` block at lines 224-226 and its `CheckWarmupConvergence(state)` call, declared at `HeatBalanceManager.hh` line 136 and implemented at `HeatBalanceManager.cc` lines 3059-3226; CP143 maps the inner line-227 `!WarmupFlag` branch and ordered line-228/229 `DayOfSim = 0` then `DayOfSimChr = "0"` mutations; CP144 maps the line-231 in-branch `ManageEMS(state, BeginNewEnvironmentAfterWarmUp, anyRan, absent)` call by reusing `routine.manage_ems`; CP145 maps the required lines 235-237 guarded `ReportWarmupConvergence(state)` call, declared at `HeatBalanceManager.hh` line 138 and implemented at `HeatBalanceManager.cc` lines 3228-3301; after `ManageHeatBalance` ends at line 238, CP146 maps required `SetPreConstructionInputParameters`, declared at header line 96, called unconditionally from `SimulationManager.cc` line 216, and implemented at source lines 446-492; CP147 maps required `GetSiteAtmosphereData`, declared at header line 100, called from `GetHeatBalanceInput` line 264 between project controls and spectral input, and implemented at source lines 1252-1317; CP148 maps required `AllocateZoneHeatBalArrays`, declared at header line 130, implemented at source lines 2824-2854, and called first by `AllocateHeatBalArrays` at line 2863 from the `InitHeatBalance` BeginSim chain; CP149 maps required `AllocateHeatBalArrays`, declared at header line 132 and implemented at source lines 2855-2963; CP150 maps required `UpdateWindowFaceTempsNonBSDFWin`, declared at header line 140, implemented at source lines 3303-3313, and called by `RecKeepHeatBalance` at line 3056; CP151 maps non-required `OpenShadingFile`, declared at header line 144, implemented at source lines 3422-3438, and called by `InitHeatBalance` at lines 2696-2698; CP152 maps non-required `SetStormWindowControl`, declared at header line 156, implemented at source lines 4595-4644, and called by `InitHeatBalance` at line 2669 under `TotStormWin > 0 && BeginDayFlag`; CP153 maps required `InitConductionTransferFunctions`, declared at header line 180, implemented at source lines 6153-6202, and called by `InitHeatBalance` at line 2621 under `BeginSimFlag && (AnyCTF || AnyEMPD)`; CP154 adds non-required `GatherForPredefinedReport`, declared at `HeatBalanceSurfaceManager.hh` line 99, implemented at `HeatBalanceSurfaceManager.cc` lines 623-1404, and called by `InitSurfaceHeatBalance` at line 481 under `BeginSimFlag`; CP155 adds required `AllocateSurfaceHeatBalArrays`, declared at header line 101, implemented at source lines 1406-2206, whose sole production `src/` call is `InitSurfaceHeatBalance` line 350 under its lines-349-355 BeginSim block; CP156 adds required `InitThermalAndFluxHistories`, declared at header line 103, implemented at source lines 2208-2447, whose sole production `src/` call is `InitSurfaceHeatBalance` line 383 inside its lines-379-384 BeginEnvrn block; CP157 adds non-required `EvalOutsideMovableInsulation`, declared at header line 105, implemented at source lines 2449-2481, whose sole production `src/` call is `InitSurfaceHeatBalance` line 388 as the first child of its lines-387-390 `AnyMovableInsulation` block; CP158 adds non-required `EvalInsideMovableInsulation`, declared at header line 107, implemented at source lines 2483-2513, whose sole production `src/` call is `InitSurfaceHeatBalance` line 389 as the second child of its lines-387-390 `AnyMovableInsulation` block; CP159 adds required source-mapped `routine.init_solar_heat_gains` and its project-contract entry immediately after `init_thermal_and_flux_histories` and before `calc_heat_balance_outside_surf`. It is declared at `HeatBalanceSurfaceManager.hh` line 109, implemented at `HeatBalanceSurfaceManager.cc` lines 2515-3776, and called only as unconditional `InitSolarHeatGains(state)` inside `InitSurfaceHeatBalance` line 457; the caller first-time flag gates only its preceding progress text, a CP159 failure blocks daylighting/internal gains/CP160, and only the successful caller tail clears that flag. Exactly four direct calls occur in three unit-test contexts: the incident-multiplier fixture calls twice under positive solar and checks only exact half-versus-whole transmitted solar, WindowFrameTest exercises BeginEnvironment reset with zero solar and asserts only a downstream heat-loss relation, and the CFS fixture calls under positive solar before mutating back-surface state/rerunning distribution and asserts only downstream beam absorption. Every call unconditionally zeros Zone window/opaque conduction rate and energy reports, every enclosure initial-diffuse-reflection term, stored opaque-range conduction/absorbed/report fields, stored Window-range frame/divider/shade/convection/gain/energy fields, and `SurfWinQRadSWwinAbs` through `CFSMAXNL + 1`. While first-time remains true it seeds both ground-reflection factors from each Surface ground view factor. It defines positive solar by `SunIsUp && signed beam+ground+diffuse > 0`, derives sunset and sun-up/no-radiation plus BeginEnvironment reset, then commits `PreviousSolRadPositive` before any broad reset; NaN makes the comparison false, and a failed sunset-only reset loses its edge on retry while the other two reset causes persist. Positive-or-reset calls clear all-Surface inside-beam/incident/reflection and sky/ground arrays, enclosure transmitted reports/energies, stored-Window shade/transmission/reveal/BSDF/absorbed-layer fields; reset-only calls additionally clear only `EnclSolQD`/`EnclSolQDforDaylight`, TDD transmittances and selected dome rate/layer fields, optional three reflection factors, and selected all-Surface reports/profile/system optics. They do not clear `EnclSolQSDifSol`, either complex-window ground split, `SurfSkyDiffReflFacGnd`, positive-only `IncSolMultiplier`, custom-only `GndReflSolarRad`, `AbsDiffWin*`, scheduled-mutated `SurfWinA`, external-library total energy, or all TDD dome W/energy state. The positive branch asserts reflection-table dimensions even when reflection calculation is disabled, computes `max(beam*SOLCOS(3)+diffuse,0)` with the expression first so NaN persists, samples/stores one multiplier for every numeric Surface using same-index request alignment, computes sky and ground incidence, and, when enabled, writes the complex ground split before interpolating the beam ground factor, then interpolates obstruction/ground factors and rebuilds main sky/ground incidence. It calls profile angles, optional reveal reflection, then either the external-library simplified opaque plus interior distribution path or ordinary interior distribution. It forms daylight and normal enclosure diffuse power, copies daylight power into `EnclSolQSDifSol`, adds only flagged off-diagonal interzone contributions, then applies diagonal fraction and `solVMULT`. Shading-range reports omit obstruction additions; stored AllExt reports add them; TDD diffuser overrides use active diffuser `TransDiff` and dome angle/sunlit while retaining earlier ground-component reports; shelf ground overrides happen after incident totals and do not refresh them. Opaque absorption uses base Construction and the first exact scheduled Surface/base-Construction pair, with unscheduled beam scaling but scheduled bare `SurfOpaqAI`; duplicate opaque ranges overwrite outside/report assignments but repeat inside `+=`. The Window loop dereferences SurfaceWindow before its solar/TDD guard and uses active Construction except base EQL layer count; Detailed optics cover shade/screen/blind horizontal sky-ground splitting and switchable interpolation, BSDF uses the first exact scheduled Surface/active-Construction pair and mutates `SurfWinA`, EQL uses base-system count with active optics, and external-library layers never write total energy. Shaded-construction array/member ownership differs unchecked. Common frame/divider work preserves projection, reveal, switchable, suspended-divider, ExtBlind/ExtShade/ExtScreen formulas; between-glass enters alternate incidence but no final absorber case. A zeroed local beam array is populated by earlier lists/overrides and consumed later, so malformed list/range alignment can yield zero beam; repeated windows reset Detailed/EQL totals locally but can accumulate BSDF/external totals. Final TDD dome absorption uses base Construction and writes energy inside its layer loop. Representative averaging uses raw constituent-area divides with no zero/topology guard, can consume earlier representatives in traversal order, uses active representative `TotGlassLayers` regardless model, and overwrites only per-area opaque/window-layer/frame/divider fields without recomputing Window layer W, totals, energy, or reports. CP159 emits no direct diagnostic and has no validation, catch, rollback, or cleanup; dimension/material assertions, unchecked blind casts, indices, TDD/area/reflection denominators, trig/nonfinite inputs, child failures, or allocation can leave an ordered prefix. Six mutated owners require coordinated clear: HeatBalance, HeatBalSurf, Surfaces, Environment, DaylightingDevices placement-new reconstruction plus `HeatBalSurfMgr::clear_state`; the latter rearms first-time and recreates scratch arrays, Environment restores the previous-solar latch false, and dependency-owner clears alone do not replay CP159. Rust incident-solar forcing diagnostics and bounded opaque absorption, plus run-blocked multiplier/scheduled-inside declarations, are not this latch/distribution/window/report lifecycle. CP159 adds no EnergyPlus source inventory, Rust target/code/state, test, support, capability, output, numerical, performance, or conformance promotion; the inventory becomes 32 algorithms and 168 routines, split 58 state-mapped plus 110 source-mapped, with 61 required. CP160 next maps `InitIntSolarDistribution`, declared at header line 111, implemented at source lines 3778-4177, and called unconditionally by `InitSurfaceHeatBalance` line 468
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry, CP112 maps/defers only the line-186 one-time flag clear without claiming persistent Rust lifecycle parity, CP113 source-maps the canonical generic `ManageEMS` routine at the unconditional `BeginZoneTimestepBeforeInitHeatBalance` caller checkpoint without adding a Rust target, CP114 makes the following unconditional `InitHeatBalance` call a required source mapping without promoting existing Rust initialization state, CP115 maps the second unconditional `ManageEMS` caller checkpoint at `BeginZoneTimestepAfterInitHeatBalance` by reusing `routine.manage_ems` without a new row, CP116 expands the existing required `routine.manage_surface_heat_balance` row for the unconditional line-209 call and complete source parent order, CP117 maps the inline first-time `Initializing Surfaces` display guard at `HeatBalanceSurfaceManager.cc` lines 158-160 without a synthetic routine, and CP118 adds the following unconditional line-161 `InitSurfaceHeatBalance(state)` call and lines 272-621 implementation as a new required source-mapped routine/project entry; CP119 maps the following first-time `Calculate Outside Surface Heat Balance` display guard at lines 165-167 without a synthetic routine; CP120 adds the unconditional line-168 `CalcHeatBalanceOutsideSurf(state)` call and lines 6951-7721 implementation as a new required source-mapped routine/project entry; CP121 maps the first-time inside-balance display at lines 169-171 without a synthetic routine; CP122 adds the unconditional line-172 `CalcHeatBalanceInsideSurf(state)` call and lines 7738-7813 canonical wrapper as a required source-mapped routine/project entry; CP123 maps the first-time air-balance display at lines 176-178 without a synthetic routine; CP124 maps the unconditional line-179 `ManageAirHeatBalance(state)` call by reusing the existing required routine; CP125 adds the unconditional line-184 `UpdateFinalSurfaceHeatBalance(state)` call and lines 5176-5219 implementation as a required source-mapped routine/project entry; CP126 adds the parent lines 186-189 `AnyCTF || AnyEMPD`-guarded `UpdateThermalHistories(state)` call and lines 5221-5581 implementation as a required source-mapped routine/project entry; CP127 adds the independent parent lines 191-206 `AnyCondFD` complete-Surface filtered moisture-update block and inline `SurfaceDataFD::UpdateMoistureBalance` helper as a non-required source-mapped routine; CP128 adds the unconditional line-208 `ManageThermalComfort(state, false)` call and `ThermalComfort.cc` lines 105-164 implementation as a non-required source-mapped routine; CP129 adds the unconditional line-210 `ReportSurfaceHeatBalance(state)` call and `HeatBalanceSurfaceManager.cc` lines 6605-6891 implementation as a required source-mapped routine/project entry; CP130 adds the lines 211-213 `ZoneSizingCalc`-guarded `GatherComponentLoadsSurface(state)` call and `OutputReportTabular.cc` lines 15064-15132 implementation as a non-required source-mapped routine; CP131 adds the unconditional line-215 `CalcThermalResilience(state)` call and `HeatBalanceSurfaceManager.cc` lines 5707-5799 implementation as a non-required source-mapped routine; CP132 adds the lines 217-219 `displayThermalResilienceSummary`-guarded `ReportThermalResilience(state)` call and lines 5801-6388 implementation as a non-required source-mapped routine; CP133 maps the lines 221-223 `displayCO2ResilienceSummary`-guarded `ReportCO2Resilience(state)` call; CP134 maps the lines 225-227 `displayVisualResilienceSummary`-guarded `ReportVisualResilience(state)` call; CP135 maps the parent-tail line-229 `ManageSurfaceHeatBalancefirstTime = false` assignment without a synthetic routine; CP136 maps the `HeatBalanceManager.cc` line-210 unconditional `EndZoneTimestepBeforeZoneReporting` `ManageEMS` call by reusing `routine.manage_ems`; CP137 maps the line-211 `RecKeepHeatBalance(state)` call as a required routine, declared at `HeatBalanceManager.hh` line 134 and implemented at `HeatBalanceManager.cc` lines 2971-3057; CP138 maps the line-217 unconditional `ReportHeatBalance(state)` call as a required routine, declared at header line 142 and implemented at source lines 3321-3418; CP139 maps the line-219 unconditional `EndZoneTimestepAfterZoneReporting` `ManageEMS` call by reusing `routine.manage_ems`; CP140 maps the line-221 unconditional `UpdateEMSTrendVariables(state)` call as non-required, declared at `EMSManager.hh` line 122 and implemented at `EMSManager.cc` lines 1444-1479; CP141 maps the line-222 unconditional `PluginManagement::PluginManager::updatePluginValues(state)` call as non-required, declared at `PluginManager.hh` line 198 and implemented at `PluginManager.cc` lines 1458-1467; CP142 maps the required outer `WarmupFlag && EndDayFlag` block at lines 224-226 and its `CheckWarmupConvergence(state)` call, declared at `HeatBalanceManager.hh` line 136 and implemented at `HeatBalanceManager.cc` lines 3059-3226; CP143 maps the inner line-227 `!WarmupFlag` branch and ordered line-228/229 `DayOfSim = 0` then `DayOfSimChr = "0"` mutations; CP144 maps the line-231 in-branch `ManageEMS(state, BeginNewEnvironmentAfterWarmUp, anyRan, absent)` call by reusing `routine.manage_ems`; CP145 maps the required lines 235-237 guarded `ReportWarmupConvergence(state)` call, declared at `HeatBalanceManager.hh` line 138 and implemented at `HeatBalanceManager.cc` lines 3228-3301; after `ManageHeatBalance` ends at line 238, CP146 maps required `SetPreConstructionInputParameters`, declared at header line 96, called unconditionally from `SimulationManager.cc` line 216, and implemented at source lines 446-492; CP147 maps required `GetSiteAtmosphereData`, declared at header line 100, called from `GetHeatBalanceInput` line 264 between project controls and spectral input, and implemented at source lines 1252-1317; CP148 maps required `AllocateZoneHeatBalArrays`, declared at header line 130, implemented at source lines 2824-2854, and called first by `AllocateHeatBalArrays` at line 2863 from the `InitHeatBalance` BeginSim chain; CP149 maps required `AllocateHeatBalArrays`, declared at header line 132 and implemented at source lines 2855-2963; CP150 maps required `UpdateWindowFaceTempsNonBSDFWin`, declared at header line 140, implemented at source lines 3303-3313, and called by `RecKeepHeatBalance` at line 3056; CP151 maps non-required `OpenShadingFile`, declared at header line 144, implemented at source lines 3422-3438, and called by `InitHeatBalance` at lines 2696-2698; CP152 maps non-required `SetStormWindowControl`, declared at header line 156, implemented at source lines 4595-4644, and called by `InitHeatBalance` at line 2669 under `TotStormWin > 0 && BeginDayFlag`; CP153 maps required `InitConductionTransferFunctions`, declared at header line 180, implemented at source lines 6153-6202, and called by `InitHeatBalance` at line 2621 under `BeginSimFlag && (AnyCTF || AnyEMPD)`; CP154 adds non-required `GatherForPredefinedReport`, declared at `HeatBalanceSurfaceManager.hh` line 99, implemented at `HeatBalanceSurfaceManager.cc` lines 623-1404, and called by `InitSurfaceHeatBalance` at line 481 under `BeginSimFlag`; CP155 adds required `AllocateSurfaceHeatBalArrays`, declared at header line 101, implemented at source lines 1406-2206, whose sole production `src/` call is `InitSurfaceHeatBalance` line 350 under its lines-349-355 BeginSim block; CP156 adds required `InitThermalAndFluxHistories`, declared at header line 103, implemented at source lines 2208-2447, whose sole production `src/` call is `InitSurfaceHeatBalance` line 383 inside its lines-379-384 BeginEnvrn block; CP157 adds non-required `EvalOutsideMovableInsulation`, declared at header line 105, implemented at source lines 2449-2481, whose sole production `src/` call is `InitSurfaceHeatBalance` line 388 as the first child of its lines-387-390 `AnyMovableInsulation` block; CP158 adds non-required `EvalInsideMovableInsulation`, declared at header line 107, implemented at source lines 2483-2513, whose sole production `src/` call is `InitSurfaceHeatBalance` line 389 as the second child of its lines-387-390 `AnyMovableInsulation` block; CP159 adds required source-mapped `routine.init_solar_heat_gains` and its project-contract entry immediately after `init_thermal_and_flux_histories` and before `calc_heat_balance_outside_surf`. It is declared at `HeatBalanceSurfaceManager.hh` line 109, implemented at `HeatBalanceSurfaceManager.cc` lines 2515-3776, and called only as unconditional `InitSolarHeatGains(state)` inside `InitSurfaceHeatBalance` line 457; the caller first-time flag gates only its preceding progress text, a CP159 failure blocks daylighting/internal gains/CP160, and only the successful caller tail clears that flag. Exactly four direct calls occur in three unit-test contexts: the incident-multiplier fixture calls twice under positive solar and checks only exact half-versus-whole transmitted solar, WindowFrameTest exercises BeginEnvironment reset with zero solar and asserts only a downstream heat-loss relation, and the CFS fixture calls under positive solar before mutating back-surface state/rerunning distribution and asserts only downstream beam absorption. Every call unconditionally zeros Zone window/opaque conduction rate and energy reports, every enclosure initial-diffuse-reflection term, stored opaque-range conduction/absorbed/report fields, stored Window-range frame/divider/shade/convection/gain/energy fields, and `SurfWinQRadSWwinAbs` through `CFSMAXNL + 1`. While first-time remains true it seeds both ground-reflection factors from each Surface ground view factor. It defines positive solar by `SunIsUp && signed beam+ground+diffuse > 0`, derives sunset and sun-up/no-radiation plus BeginEnvironment reset, then commits `PreviousSolRadPositive` before any broad reset; NaN makes the comparison false, and a failed sunset-only reset loses its edge on retry while the other two reset causes persist. Positive-or-reset calls clear all-Surface inside-beam/incident/reflection and sky/ground arrays, enclosure transmitted reports/energies, stored-Window shade/transmission/reveal/BSDF/absorbed-layer fields; reset-only calls additionally clear only `EnclSolQD`/`EnclSolQDforDaylight`, TDD transmittances and selected dome rate/layer fields, optional three reflection factors, and selected all-Surface reports/profile/system optics. They do not clear `EnclSolQSDifSol`, either complex-window ground split, `SurfSkyDiffReflFacGnd`, positive-only `IncSolMultiplier`, custom-only `GndReflSolarRad`, `AbsDiffWin*`, scheduled-mutated `SurfWinA`, external-library total energy, or all TDD dome W/energy state. The positive branch asserts reflection-table dimensions even when reflection calculation is disabled, computes `max(beam*SOLCOS(3)+diffuse,0)` with the expression first so NaN persists, samples/stores one multiplier for every numeric Surface using same-index request alignment, computes sky and ground incidence, and, when enabled, writes the complex ground split before interpolating the beam ground factor, then interpolates obstruction/ground factors and rebuilds main sky/ground incidence. It calls profile angles, optional reveal reflection, then either the external-library simplified opaque plus interior distribution path or ordinary interior distribution. It forms daylight and normal enclosure diffuse power, copies daylight power into `EnclSolQSDifSol`, adds only flagged off-diagonal interzone contributions, then applies diagonal fraction and `solVMULT`. Shading-range reports omit obstruction additions; stored AllExt reports add them; TDD diffuser overrides use active diffuser `TransDiff` and dome angle/sunlit while retaining earlier ground-component reports; shelf ground overrides happen after incident totals and do not refresh them. Opaque absorption uses base Construction and the first exact scheduled Surface/base-Construction pair, with unscheduled beam scaling but scheduled bare `SurfOpaqAI`; duplicate opaque ranges overwrite outside/report assignments but repeat inside `+=`. The Window loop dereferences SurfaceWindow before its solar/TDD guard and uses active Construction except base EQL layer count; Detailed optics cover shade/screen/blind horizontal sky-ground splitting and switchable interpolation, BSDF uses the first exact scheduled Surface/active-Construction pair and mutates `SurfWinA`, EQL uses base-system count with active optics, and external-library layers never write total energy. Shaded-construction array/member ownership differs unchecked. Common frame/divider work preserves projection, reveal, switchable, suspended-divider, ExtBlind/ExtShade/ExtScreen formulas; between-glass enters alternate incidence but no final absorber case. A zeroed local beam array is populated by earlier lists/overrides and consumed later, so malformed list/range alignment can yield zero beam; repeated windows reset Detailed/EQL totals locally but can accumulate BSDF/external totals. Final TDD dome absorption uses base Construction and writes energy inside its layer loop. Representative averaging uses raw constituent-area divides with no zero/topology guard, can consume earlier representatives in traversal order, uses active representative `TotGlassLayers` regardless model, and overwrites only per-area opaque/window-layer/frame/divider fields without recomputing Window layer W, totals, energy, or reports. CP159 emits no direct diagnostic and has no validation, catch, rollback, or cleanup; dimension/material assertions, unchecked blind casts, indices, TDD/area/reflection denominators, trig/nonfinite inputs, child failures, or allocation can leave an ordered prefix. Six mutated owners require coordinated clear: HeatBalance, HeatBalSurf, Surfaces, Environment, DaylightingDevices placement-new reconstruction plus `HeatBalSurfMgr::clear_state`; the latter rearms first-time and recreates scratch arrays, Environment restores the previous-solar latch false, and dependency-owner clears alone do not replay CP159. Rust incident-solar forcing diagnostics and bounded opaque absorption, plus run-blocked multiplier/scheduled-inside declarations, are not this latch/distribution/window/report lifecycle. CP159 adds no EnergyPlus source inventory, Rust target/code/state, test, support, capability, output, numerical, performance, or conformance promotion; the inventory becomes 32 algorithms and 168 routines, split 58 state-mapped plus 110 source-mapped, with 61 required. CP160 adds required source-mapped `routine.init_int_solar_distribution` and its project-contract entry immediately after `init_solar_heat_gains` and before `calc_heat_balance_outside_surf`. It is declared at `HeatBalanceSurfaceManager.hh` line 111, implemented at `HeatBalanceSurfaceManager.cc` lines 3778-4177, and called only as unconditional `InitIntSolarDistribution(state)` inside `InitSurfaceHeatBalance` line 468; the first-time flag gates only preceding progress text, and a CP160 failure blocks interior convection and the successful parent-tail flag clear. The only direct unit context calls twice: with InterZone disabled and beam report 10 W, the night call observes an already-zero report remain zero, while the sun-up call checks only 10/6 = 1.666667 W/m2. SunIsUp gates only that AllHT, non-Shading beam-report traversal; at night CP160 still distributes internal short wave and leaves prior beam intensity/amount/energy untouched. Every call assigns each Solar enclosure raw `EnclSolQD + sum(space QLTSW)` and lights-only `sum(QLTSW)`; an InterZoneWindow receiver/source double loop requires both receive flags, excludes the diagonal, recomputes source QLTSW, adds raw matrix-weighted total/lights/diffuse power, and overwrites diffuse-report energy after each qualifying source while a no-source receiver gets no energy write. The enclosure values are then multiplied by `solVMULT` and, only for InterZoneWindow, the diagonal fraction; there is no normalization or range/finite guard. Sun-up beam reporting divides Zone beam W by raw enclosure total area, then multiplies by Surface area plus divider area and timestep seconds. Zone/stored-Space traversal visits inclusive opaque then Window ranges without sorting, deduplication, class checks, or bound validation. Opaque total short-wave absorption uses current `SurfAbsSolarInt`, lights-only absorption uses base Construction `InsideAbsorpSolar`, and initial diffuse is added last. Under global movable insulation, every reached opaque record marked present first writes `SurfQRadSWOutMvIns = prior outside absorption * current exterior absorptance / base outside-material absorptance`, then overwrites outside absorption through an optional `MaterialFen.Trans` and a second division by current absorptance; a failed cast supplies zero transmittance and both denominators are unchecked. Direct retry feeds the overwritten outside value back, while a false global/present gate leaves that value and `SurfQRadSWOutMvIns` stale. Every Window dereferences current SurfaceWindow, radiant/Solar enclosures, and active Construction with no exterior-solar or class gate. Both EQL and non-EQL overwrite Window internal radiant gain from enclosure long wave, `radThermAbsMult`, and current thermal absorptance; a load-component pulse adds exactly 0.01 times radiant-enclosure floor area, but common frame/divider formulas keep the unpulsed value plus HVAC radiation. Non-EQL has no separate external-library branch and uses active conventional optics: unshaded layers add back diffuse absorption; shade/screen layers use shaded back optics; only IntBlind/ExtBlind interpolate pane absorption with unclamped `Interp`, so BGBlind skips pane addition while still receiving the later any-blind shade absorption. Only interior shade/blind writes shade long-wave absorption; exterior shade/blind/screen scales shade short wave by glazed fraction. Switchable layers use `InterpSw`, which clamps ordered factors including infinities to [0,1] but propagates NaN, and dereferences the shaded Construction without a zero-index guard. Zero-index or conditional/invalid shading can skip main layer work and later fail in the Detailed initial-diffuse tail. Positive frame/divider areas add Solar-enclosure short wave plus unpulsed internal/HVAC long wave with raw projection corrections; suspended dividers assert a last-layer MaterialGlass and use an unchecked multiple-reflection denominator, while IntShade asserts MaterialFen and IntBlind applies current solar/IR transmission. EQL uses active EQL NL and back diffuse optics and omits frame/divider work. For every positive adjacent link, a conventional target uses the current/source active layer count but adjacent base `AbsDiff`; an EQL target uses adjacent base EQL NL but current/source active `AbsDiffFrontEQL`. The final Detailed/BSDF/EQL tail adds prior initial-diffuse layer values, and Detailed shade/screen/blind also adds initial shade absorption. All CP160 Window additions mutate only per-area `SurfWinQRadSWwinAbs` and never refresh CP159 layer W, total W, or total energy; frame/divider additions likewise have no separate W/energy derivation here. The unconditional final TDD child is declared at `DaylightingDevices.hh` line 95, implemented at `DaylightingDevices.cc` lines 1506-1559, called only by CP160 line 4176, and has no direct unit-test call. It uses diffuser base `TransDiff`, stale CP159 diffuser total W, normally prior CP159/dependency dome layer one, and newly CP160-mutated diffuser layer one; its raw formula applies diffuser area even to the dome term and divides by `TransDiff`. Zero-first `max(0, rawGain)` maps negative, negative infinity, and NaN report values to zero while retaining positive infinity, but transition-zone gains use unclamped signed/nonfinite rawGain times length divided by unchecked total length. The current pipe report is committed before its transition loop, so failure can retain that report and a partial current `TZoneHeatGain` prefix after complete earlier pipes. Preceding `ManageInternalHeatGains`/`FigureTDDZoneGains` can zero current transition gains on BeginEnvironment but not the pipe report, and its current internal-gain update completes before CP160 writes new transition values. CP160 has no direct diagnostic, validation, return status, catch, rollback, or cleanup; only the suspended-divider and IntShade casts assert, while invalid topology, arrays, indices, layer mismatches, denominators, and nonfinite inputs can leave an ordered prefix. Re-entry mixes assigned enclosure/radiant/TDD state with additive Zone diffuse, opaque, layer, adjacency, frame/divider, and shade state; Sun-down, no-source, existing no-longer-reached range members, reduced transition-zone counts, and changed gates can preserve stale values, and normal parent order merely relies on preceding CP159 resets. Four directly mutated owners clear by placement-new: HeatBalance, HeatBalSurf, Surfaces, and DaylightingDevices; HeatBalSurfMgr clear only rearms the caller display flag. Rust separately consumes initialized/supplied opaque inside-short-wave state and has a bounded positive typed-Zone radiant-gain distributor, but no CP160 Solar-enclosure/interzone, Window/shade/frame/divider, adjacency, movable-insulation, TDD, report, failure, or re-entry state machine. CP160 adds no EnergyPlus source inventory, Rust target/code/state, test, support, capability, output, numerical, performance, or conformance promotion; the inventory becomes 32 algorithms and 169 routines, split 58 state-mapped plus 111 source-mapped, with 62 required. CP161 next in source-definition order maps `ComputeIntThermalAbsorpFactors`, declared at header line 113 and implemented at source lines 4179-4295; its sole production call is unconditional `InitSurfaceHeatBalance` line 427, which executes before CP159 and CP160.
 3. unconditional `ManageEMS(state, EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance, anyRan, absent)`
 4. `InitHeatBalance`
 5. unconditional `ManageEMS(state, EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, anyRan, absent)`
@@ -160,7 +160,8 @@ unless the deviation is documented in a case-specific waiver:
 28. as mapped by CP157, `EvalOutsideMovableInsulation(state)`, declared at `HeatBalanceSurfaceManager.hh` line 105, implemented at `HeatBalanceSurfaceManager.cc` lines 2449-2481, whose sole production `src/` call is `InitSurfaceHeatBalance` line 388 as the first child of its lines-387-390 `AnyMovableInsulation` block
 29. as mapped by CP158, `EvalInsideMovableInsulation(state)`, declared at `HeatBalanceSurfaceManager.hh` line 107, implemented at `HeatBalanceSurfaceManager.cc` lines 2483-2513, whose sole production `src/` call is `InitSurfaceHeatBalance` line 389 as the second child of its lines-387-390 `AnyMovableInsulation` block
 30. as mapped by CP159, required `InitSolarHeatGains(state)`, declared at `HeatBalanceSurfaceManager.hh` line 109, implemented at `HeatBalanceSurfaceManager.cc` lines 2515-3776, and called unconditionally by `InitSurfaceHeatBalance` line 457
-31. CP160 next maps `InitIntSolarDistribution`, declared at `HeatBalanceSurfaceManager.hh` line 111, implemented at `HeatBalanceSurfaceManager.cc` lines 3778-4177, and called unconditionally by `InitSurfaceHeatBalance` line 468
+31. as mapped by CP160, required `InitIntSolarDistribution(state)`, declared at `HeatBalanceSurfaceManager.hh` line 111, implemented at `HeatBalanceSurfaceManager.cc` lines 3778-4177, and called unconditionally by `InitSurfaceHeatBalance` line 468
+32. CP161 next in source-definition order maps `ComputeIntThermalAbsorpFactors`, declared at `HeatBalanceSurfaceManager.hh` line 113 and implemented at `HeatBalanceSurfaceManager.cc` lines 4179-4295; its sole production call is unconditional `InitSurfaceHeatBalance` line 427, which executes before CP159 and CP160
 
 ## Current Blocker Ledger
 
@@ -248,7 +249,7 @@ EnergyPlus 26.1.0 ownership boundaries explicit:
   `SetPreConstructionInputParameters` call and its shared maximum-layer bound.
   CP147 additionally maps required `GetSiteAtmosphereData` at the project-input
   head. CP148 additionally maps required `AllocateZoneHeatBalArrays` in the
-  BeginSim allocation chain. CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 adds non-required `GatherForPredefinedReport`; CP155 adds required `AllocateSurfaceHeatBalArrays`; CP156 adds required `InitThermalAndFluxHistories`; CP157 adds non-required `EvalOutsideMovableInsulation`; CP158 adds non-required `EvalInsideMovableInsulation`; CP159 adds required `InitSolarHeatGains`; CP160 next maps `InitIntSolarDistribution`.
+  BeginSim allocation chain. CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 adds non-required `GatherForPredefinedReport`; CP155 adds required `AllocateSurfaceHeatBalArrays`; CP156 adds required `InitThermalAndFluxHistories`; CP157 adds non-required `EvalOutsideMovableInsulation`; CP158 adds non-required `EvalInsideMovableInsulation`; CP159 adds required `InitSolarHeatGains`; CP160 adds required `InitIntSolarDistribution`; CP161 next in source-definition order maps `ComputeIntThermalAbsorpFactors`.
   Warmup convergence is checked only at end-of-day.
 - `HeatBalanceSurfaceManager.cc::ManageSurfaceHeatBalance` calls
   `InitSurfaceHeatBalance`, `CalcHeatBalanceOutsideSurf`,
@@ -1613,7 +1614,7 @@ the in-branch post-warmup EMS call; CP145 adds required
 `ReportWarmupConvergence`; CP146 adds required
 `SetPreConstructionInputParameters`; CP147 adds required
 `GetSiteAtmosphereData`; CP148 adds required `AllocateZoneHeatBalArrays`;
-CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 adds non-required `GatherForPredefinedReport`; CP155 adds required `AllocateSurfaceHeatBalArrays`; CP156 adds required `InitThermalAndFluxHistories`; CP157 adds non-required `EvalOutsideMovableInsulation`; CP158 adds non-required `EvalInsideMovableInsulation`; CP159 adds required `InitSolarHeatGains`; CP160 next maps `InitIntSolarDistribution`.
+CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 adds non-required `GatherForPredefinedReport`; CP155 adds required `AllocateSurfaceHeatBalArrays`; CP156 adds required `InitThermalAndFluxHistories`; CP157 adds non-required `EvalOutsideMovableInsulation`; CP158 adds non-required `EvalInsideMovableInsulation`; CP159 adds required `InitSolarHeatGains`; CP160 adds required `InitIntSolarDistribution`; CP161 next in source-definition order maps `ComputeIntThermalAbsorpFactors`.
 
 ### CP109 inline sizing Space heat-balance mode map
 
@@ -1893,7 +1894,7 @@ the in-branch post-warmup EMS call; CP145 adds required
 `ReportWarmupConvergence`; CP146 adds required
 `SetPreConstructionInputParameters`; CP147 adds required
 `GetSiteAtmosphereData`; CP148 adds required `AllocateZoneHeatBalArrays`;
-CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 adds non-required `GatherForPredefinedReport`; CP155 adds required `AllocateSurfaceHeatBalArrays`; CP156 adds required `InitThermalAndFluxHistories`; CP157 adds non-required `EvalOutsideMovableInsulation`; CP158 adds non-required `EvalInsideMovableInsulation`; CP159 adds required `InitSolarHeatGains`; CP160 next maps `InitIntSolarDistribution`.
+CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 adds non-required `GatherForPredefinedReport`; CP155 adds required `AllocateSurfaceHeatBalArrays`; CP156 adds required `InitThermalAndFluxHistories`; CP157 adds non-required `EvalOutsideMovableInsulation`; CP158 adds non-required `EvalInsideMovableInsulation`; CP159 adds required `InitSolarHeatGains`; CP160 adds required `InitIntSolarDistribution`; CP161 next in source-definition order maps `ComputeIntThermalAbsorpFactors`.
 
 ### CP114 `InitHeatBalance` source map
 
@@ -1978,7 +1979,7 @@ the in-branch post-warmup EMS call; CP145 adds required
 `ReportWarmupConvergence`; CP146 adds required
 `SetPreConstructionInputParameters`; CP147 adds required
 `GetSiteAtmosphereData`; CP148 adds required `AllocateZoneHeatBalArrays`;
-CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 adds non-required `GatherForPredefinedReport`; CP155 adds required `AllocateSurfaceHeatBalArrays`; CP156 adds required `InitThermalAndFluxHistories`; CP157 adds non-required `EvalOutsideMovableInsulation`; CP158 adds non-required `EvalInsideMovableInsulation`; CP159 adds required `InitSolarHeatGains`; CP160 next maps `InitIntSolarDistribution`.
+CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 adds non-required `GatherForPredefinedReport`; CP155 adds required `AllocateSurfaceHeatBalArrays`; CP156 adds required `InitThermalAndFluxHistories`; CP157 adds non-required `EvalOutsideMovableInsulation`; CP158 adds non-required `EvalInsideMovableInsulation`; CP159 adds required `InitSolarHeatGains`; CP160 adds required `InitIntSolarDistribution`; CP161 next in source-definition order maps `ComputeIntThermalAbsorpFactors`.
 
 ### CP115 post-`InitHeatBalance` EMS calling-point map
 
@@ -2411,7 +2412,7 @@ the in-branch post-warmup EMS call, CP145 adds required
 `ReportWarmupConvergence`, CP146 adds required
 `SetPreConstructionInputParameters`, CP147 adds required
 `GetSiteAtmosphereData`, CP148 adds required `AllocateZoneHeatBalArrays`, and
-CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 adds non-required `GatherForPredefinedReport`; CP155 adds required `AllocateSurfaceHeatBalArrays`; CP156 adds required `InitThermalAndFluxHistories`; CP157 adds non-required `EvalOutsideMovableInsulation`; CP158 adds non-required `EvalInsideMovableInsulation`; CP159 adds required `InitSolarHeatGains`; CP160 next maps `InitIntSolarDistribution`.
+CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 adds non-required `GatherForPredefinedReport`; CP155 adds required `AllocateSurfaceHeatBalArrays`; CP156 adds required `InitThermalAndFluxHistories`; CP157 adds non-required `EvalOutsideMovableInsulation`; CP158 adds non-required `EvalInsideMovableInsulation`; CP159 adds required `InitSolarHeatGains`; CP160 adds required `InitIntSolarDistribution`; CP161 next in source-definition order maps `ComputeIntThermalAbsorpFactors`.
 
 ### CP122 `CalcHeatBalanceInsideSurf` source map
 
@@ -6558,10 +6559,357 @@ requirement immediately after `init_thermal_and_flux_histories` and before
 target/code/state, test, support, capability, output, numerical, performance,
 or conformance promotion. The inventory becomes 32 algorithms and 168
 routines, split into 58 `state_mapped` and 110 `source_mapped`, with 61
-required. CP160 next maps `InitIntSolarDistribution`, declared at
-`HeatBalanceSurfaceManager.hh` line 111, implemented at
-`HeatBalanceSurfaceManager.cc` lines 3778-4177, and called unconditionally by
-`InitSurfaceHeatBalance` line 468.
+required.
+
+### CP160 `InitIntSolarDistribution` source map
+
+The canonical declaration is `HeatBalanceSurfaceManager.hh` line 111 and the
+complete implementation is `HeatBalanceSurfaceManager.cc` lines 3778-4177.
+Its sole production `src/` call is unconditional
+`InitIntSolarDistribution(state)` inside `InitSurfaceHeatBalance` line 468.
+The caller's lines-465-467 `InitSurfaceHeatBalancefirstTime` guard controls
+only exact progress text `Initializing Interior Solar Distribution`; it does
+not gate CP160. Runtime order is CP159, daylighting, internal-gain management,
+then CP160. A CP160 non-return therefore preserves all completed predecessor
+and CP160 mutations, blocks `InitIntConvCoeff` line 473 and the caller
+remainder, and prevents the successful line-620 first-time-flag clear.
+
+There are exactly two direct unit-test calls, both in
+`HeatBalanceSurfaceManager_TestInitHBInterzoneWindow`. After two full
+`InitSurfaceHeatBalance` calls establish a one-enclosure, six-square-metre
+fixture, the test disables `InterZoneWindow`, sets
+`ZoneBmSolFrIntWinsRep(1) = 10 W`, and calls CP160 at line 4880 with
+`SunIsUp = false`. It observes only that an already-zero
+`SurfIntBmIncInsSurfIntensRep(1)` remains zero. It then sets
+`SunIsUp = true`, calls again at line 4883, and checks only
+`10 / 6 = 1.666667 W/m2` within tolerance. The night call does not bypass
+the routine: only the interior-window beam-report block is gated by
+`SunIsUp`; all enclosure, internal-short-wave, opaque, window, and TDD work
+still executes. No direct test covers nonzero `QLTSW`, off-diagonal
+interzone transfer, absorbed opaque or window flux, shading, movable
+insulation, adjacency, EQL/BSDF/external-window optics, TDDs, nonfinite or
+invalid state, failure prefixes, or additive re-entry.
+
+Every call first rebuilds two Solar-enclosure working fluxes without a sun
+gate. For each numeric enclosure, CP160 visits stored
+`EnclSolInfo(enclosure).spaceNums` in order and sums each
+`spaceIntGain(space).QLTSW`. It assigns
+
+`EnclSolQSWRad = EnclSolQD + sum(QLTSW)`
+
+and
+
+`EnclSolQSWRadLights = sum(QLTSW)`.
+
+Those inputs are powers in W. Empty membership gives a zero lights sum;
+duplicates count repeatedly. The two targets are assigned, not accumulated,
+at this stage.
+
+When `InterZoneWindow` is true, each receiver whose
+`EnclSolRecDifShortFromZ(receiver)` flag is true scans every different
+enclosure whose same flag is also true. The source `QLTSW` sum is recomputed
+for every qualifying receiver/source pair. In matrix index order CP160 adds
+
+- `ZoneFractDifShortZtoZ(receiver, source) * (source.EnclSolQD +
+  source.sumQLTSW)` to receiver `EnclSolQSWRad`;
+- the same fraction times `source.sumQLTSW` to receiver
+  `EnclSolQSWRadLights`; and
+- the same fraction times `source.EnclSolQD` to
+  `ZoneDifSolFrIntWinsRep(receiver)`.
+
+Immediately after each qualifying source, not after the complete source loop,
+it assigns `ZoneDifSolFrIntWinsRepEnergy = cumulative report *
+TimeStepZoneSec`. CP160 does not reset either Zone diffuse report. A receiver
+with no qualifying source receives no report-energy write, and there is no
+fraction normalization, range check, or solar-state gate.
+
+Only when `SunIsUp` is true does CP160 visit stored
+`AllHTSurfaceList` order for beam reporting. It skips only a Surface whose
+current class is `Shading`. For every other entry it uses the Surface Solar
+enclosure to assign
+
+- intensity = `ZoneBmSolFrIntWinsRep / EnclSolInfo.TotalSurfArea` in W/m2;
+- amount = intensity times `(Surface.Area + SurfWinDividerArea)` in W; and
+- energy = amount times `TimeStepZoneSec` in J.
+
+Sun-down leaves all three prior values untouched rather than zeroing them.
+The total-area division is unchecked.
+
+CP160 next converts each enclosure's just-built powers to absorbed flux
+density. With interzone windows, both working values are multiplied by the
+diagonal `ZoneFractDifShortZtoZ(enclosure, enclosure)` and
+`solVMULT`; otherwise they are multiplied only by `solVMULT`.
+`solVMULT` is the precomputed reciprocal of summed
+inside-area-times-absorptance, so the resulting
+`EnclSolQSWRad` and lights-only value are W/m2. This scaling does not alter
+the Zone diffuse report or the earlier beam report.
+
+Radiant absorption then traverses numeric Zones, each stored
+`Zone.spaceIndexes`, and each Space's inclusive opaque/IntMass range followed
+by its inclusive Window range. CP160 does not sort, deduplicate, validate
+first/last bounds, or recheck membership or class; repeated or overlapping
+ranges repeat mutations.
+
+For every opaque/IntMass entry CP160 resolves the base
+`Surface.Construction`. It adds enclosure total flux times the current
+`SurfAbsSolarInt` to `SurfOpaqQRadSWInAbs`, but adds lights-only flux times
+the base Construction's `InsideAbsorpSolar` to
+`SurfQdotRadLightsInPerArea`. Thus an earlier inside movable-insulation
+absorptance can affect total short wave while the lights-only path continues
+to use the base Construction value.
+
+Under global `AnyMovableInsulation`, every reached opaque entry also
+dereferences `extMovInsuls(SurfNum)`, regardless of exterior-list membership.
+If that record is present, let `M` be the base Construction's first-layer
+material and `Aext` the current `SurfAbsSolarExt`. The exact ordered
+overwrite is
+
+`SurfQRadSWOutMvIns = SurfOpaqQRadSWOutAbs * Aext / M.AbsorpSolar`
+
+then
+
+`SurfOpaqQRadSWOutAbs = Tmov * SurfQRadSWOutMvIns *
+((M.AbsorpSolar / Aext) + (1 - M.AbsorpSolar))`.
+
+`Tmov` is the movable material's `MaterialFen.Trans` when that dynamic cast
+succeeds and zero otherwise. Both divisions are raw and zero-prone; the
+nullable cast is not asserted. This can overwrite CP159's exterior absorbed
+solar after the two inside additions. A direct retry feeds that overwritten
+outside value back into the next `SurfQRadSWOutMvIns` calculation. A false
+global gate or no-longer-present record skips both assignments and can leave
+the prior `SurfQRadSWOutMvIns` and transformed outside value stale.
+Regardless of that gate, CP160 next adds `SurfOpaqInitialDifSolInAbs` to the
+opaque inside absorbed flux; when the movable path is reached, this addition
+occurs only after it returns.
+
+Each Window entry immediately dereferences `Surface`, `SurfaceWindow`,
+its radiant and Solar enclosure indices, and its current
+`SurfActiveConstruction`; there is no exterior-solar or class gate. The
+`WindowModel` enum has Detailed, BSDF, and EQL values. CP160 has no separate
+external-window-library branch: any such window represented as Detailed
+follows the same conventional path. An invalid enum also satisfies the
+non-EQL test but misses the later model-specific initial-diffuse tail.
+
+Both the non-EQL and EQL paths overwrite
+`SurfQdotRadIntGainsInPerArea`. Normally the value is
+`radQThermalRad * radThermAbsMult * SurfAbsThermalInt`. During
+`doLoadComponentPulseNow`, CP160 first adds
+`0.01 * EnclRadInfo.FloorArea` to raw `radQThermalRad`, then applies the
+same multiplier and absorptance. This duplicate calculation follows
+`ManageInternalHeatGains`; it is not additive. Frame and divider formulas
+below still use the unpulsed `radQThermalRad`.
+
+For a non-EQL window, the active Construction supplies
+`TotGlassLayers` and unshaded optics, while
+`SurfWinActiveShadedConstruction` supplies the shaded Construction index:
+
+- `NoShade` or `ShadeOff` adds
+  `EnclSolQSWRad * active.AbsDiffBack(layer)` to every active glass layer.
+- With a nonzero shaded Construction and any other nonswitchable flag,
+  shade/screen flags add its `AbsDiffBack` to each shaded glass layer.
+  `IntBlind` and `ExtBlind` instead linearly interpolate the low/high slat
+  layer back-diffuse absorptances using raw, unclamped
+  `slatAngInterpFac`. `BGBlind` is not included in this glass-layer blind
+  condition.
+- `IntShade` assigns interior-shade long-wave absorption from unpulsed
+  `radQThermalRad * ShadeAbsorpThermal * radThermAbsMult`; `IntBlind`
+  assigns the analogous value using `effShadeEmi`. Other shade positions do
+  not assign that long-wave field.
+- Any shade/screen assigns
+  `SurfWinIntSWAbsByShade = EnclSolQSWRad * AbsDiffBackShade`; any blind,
+  including `BGBlind`, assigns it from the raw low/high slat interpolation of
+  back diffuse blind absorption. Exterior shade/blind/screen then multiplies
+  that value by `SurfaceWindow.glazedFrac`; between-glass and interior
+  devices do not.
+- Switchable glazing dereferences its shaded Construction even when the index
+  is zero and adds `EnclSolQSWRad * InterpSw(switching factor,
+  active.AbsDiffBack, shaded.AbsDiffBack)` over the active layer count.
+  `InterpSw` uses `std::clamp`: ordered values, including infinities, clamp
+  to [0,1], while NaN survives and propagates. Blind `Interp` has no clamp.
+
+A nonswitchable shaded or conditional/invalid flag with a zero shaded index
+performs no main glass/shade addition. With a nonzero index, flags that match
+none of the explicit shade/screen or Int/ExtBlind predicates can still enter
+the branch while doing no layer work. Common frame/divider work nevertheless
+continues.
+
+For positive frame area, CP160 adds
+
+`(QS * frameSolarAbs + (radQ * radThermAbsMult + HVAC) * frameEmissivity) *
+(1 + 0.5 * insideFrameProjectionCorrection)`
+
+to the CP159-initialized inside frame absorbed flux. For positive divider
+area it begins with divider solar absorptance and emissivity. A suspended
+divider dynamic-casts the active Construction's last layer to
+`MaterialGlass`, asserts success, replaces thermal absorptance with back
+thermal absorptance, and replaces solar absorptance by
+
+`AbsGlass + TransGlass * (AbsDivider + ReflDivider * AbsGlass) /
+(1 - ReflDivider * ReflGlass)`.
+
+An interior shade then asserts a last-layer `MaterialFen` and multiplies
+solar and thermal divider absorptance by its solar and thermal transmittance.
+An interior blind instead multiplies them by current back diffuse solar and
+infrared transmittance. No exterior or between-glass device applies this
+correction. The resulting divider addition is
+
+`(QS * dividerSolarAbs + (radQ * radThermAbsMult + HVAC) *
+dividerThermalAbs) * (1 + insideDividerProjectionCorrection)`.
+
+Those frame/divider updates are `+=`, use raw projection factors, and are not
+part of the load-component pulse. EQL windows execute neither frame nor
+divider work.
+
+For an EQL window, the active Construction's `EQLConsPtr` selects
+`CFS(EQLNum).NL`. Each layer receives
+`EnclSolQSWRad * active.AbsDiffBackEQL(layer)` after the duplicated thermal
+radiant-source overwrite. There is no EQL frame implementation here.
+
+After its own model branch, every Window whose `ExtBoundCond > 0` adds
+current-enclosure short wave to the corresponding adjacent Window:
+
+- when the adjacent Window is non-EQL, the loop count is the current/source
+  active Construction's `TotGlassLayers`, but absorptance comes from the
+  adjacent Surface's base Construction `AbsDiff(layer)`; and
+- when the adjacent Window is EQL, the loop count comes from the adjacent
+  base Construction's EQL system, but absorptance is the current/source active
+  Construction's `AbsDiffFrontEQL(layer)`.
+
+These deliberate front-incidence formulas are also topology asymmetries:
+neither branch reconciles source and target layer counts, active/base identity,
+or model compatibility. CP160 does not validate positive links as reciprocal
+Window links, and every transfer is additive.
+
+The current Window then receives initial diffuse absorption calculated by an
+earlier distribution dependency. Detailed no-shade and switchable cases add
+`SurfWinInitialDifSolwinAbs` over the active layer count. Other Detailed
+shading flags dereference the shaded Construction and use its layer count;
+shade/screen/blind flags also add
+`SurfWinInitialDifSolAbsByShade` to the shade field. Thus a zero shaded index
+that skipped the main nonswitchable branch can still fail here. BSDF uses the
+active glass-layer count, EQL uses the active EQL system's `NL`, and an
+invalid model receives no initial-diffuse addition.
+
+All own-window, adjacent-window, and initial-diffuse layer mutations update
+only per-area `SurfWinQRadSWwinAbs`. CP160 never recomputes CP159's
+`SurfWinQRadSWwinAbsLayer` W values, all-layer
+`SurfWinQRadSWwinAbsTot`, or `SurfWinQRadSWwinAbsTotEnergy`. Frame and
+divider additions also remain only in their per-area absorbed-flux fields,
+with no corresponding W/energy derivation here. The Window layer W/energy
+reports can therefore disagree with the final CP160-augmented per-area state.
+
+The final action is unconditional
+`Dayltg::DistributeTDDAbsorbedSolar(state)` at line 4176. That child is
+declared at `DaylightingDevices.hh` line 95, implemented completely at
+`DaylightingDevices.cc` lines 1506-1559, has this sole production `src/`
+call, and has no direct unit-test call. For every stored TDD pipe it uses the
+diffuser's base Construction `TransDiff`, not an active Construction. Let
+`A` be diffuser area and define the exact raw reflection term
+
+`QRefl = (SurfQRadSWOutIncident(diffuser) -
+SurfWinQRadSWwinAbsTot(diffuser)) * A - SurfWinTransSolar(diffuser)
++ EnclSolQSWRad(diffuser enclosure) * A * TransDiff`.
+
+The declared units are asymmetric in that subtraction:
+`SurfQRadSWOutIncident` is W/m2 while the stale CP159
+`SurfWinQRadSWwinAbsTot` is W. Under normal topology CP160 has augmented the
+diffuser per-area layer value but not that total; the TDD dome is outside
+stored Zone Window ranges, so its layer-one value remains CP159/dependency
+state unless malformed topology reaches it through another path. The child
+then computes
+
+`rawGain = SurfWinTransSolar(dome) -
+SurfQRadSWOutIncident(diffuser) * A +
+QRefl * (1 - TransSolIso / TransDiff) +
+SurfWinQRadSWwinAbs(dome, 1) * A / 2 +
+SurfWinQRadSWwinAbs(diffuser, 1) * A / 2`.
+
+The diffuser term consumes the newly CP160-mutated per-area value, while the
+dome term normally consumes its prior CP159/dependency value; both, including
+the dome term, are multiplied by diffuser area. The report
+`PipeAbsorbedSolar = max(0, rawGain)` uses zero as the first operand, mapping
+negative finite values, negative infinity, and NaN to zero while retaining
+positive infinity. Each transition-zone `TZoneHeatGain`, however, receives
+the unclamped signed/nonfinite
+`rawGain * TZoneLength / TotLength`. `TransDiff` and `TotLength`
+divisions are unchecked.
+
+CP160 has no return value, direct diagnostic, local validation, catch,
+rollback, or cleanup. It assumes valid enclosure/Space/range topology,
+matrices and flags, Surface and Construction links, material types, active and
+shaded layer counts, EQL systems, adjacency, TDD arrays, and all target
+allocations. Its only local assertions are the suspended-divider glass and
+interior-shade material casts. Unchecked total-area, movable-material,
+suspended-divider, TDD-transmittance, and TDD-length denominators; unchecked
+indices and nullable state; invalid ranges or layer mismatches; and raw
+nonfinite inputs can propagate NaN/infinity, assert, terminate, or produce
+undefined behavior after an ordered mutation prefix. The final TDD
+child can fail only after all preceding enclosure, opaque, and Window changes,
+and can leave completed earlier pipes. Within the current pipe its report is
+assigned before transition-zone traversal, so a later failure leaves the
+current `PipeAbsorbedSolar` plus only the completed `TZoneHeatGain` prefix.
+
+Re-entry is additive and selective rather than transactional. Each call
+reassigns then rescales the two enclosure working fluxes and overwrites Window
+thermal-radiant source terms, but Zone diffuse reports, opaque absorbed terms,
+Window layers, adjacent transfers, frame/divider fields, and many shade paths
+use `+=`. The main shade short-wave field is assigned before its
+initial-diffuse addition; TDD fields are assigned for reached pipes. A
+sun-down call preserves prior beam reports, no eligible interzone source
+preserves report energy, and existing no-longer-reached
+enclosures/Surfaces/range members retain state. Reducing a pipe's
+`NumOfTZones` preserves unvisited `TZoneHeatGain` tail slots. Normal parent
+order relies on CP159 to clear many, but not all, inputs and targets before
+CP160; CP160 has no independent reset guarantee. A direct retry repeats
+additions and the movable outside-value feedback, while a parent retry also
+repeats predecessor calls and keeps the first-time display flag true until the
+complete parent tail succeeds. Newly false shade/model/positive-area gates
+likewise preserve their CP160 direct-call targets until CP159 or an owner clear
+resets them.
+
+The caller's preceding `ManageInternalHeatGains` reaches
+`FigureTDDZoneGains`. On the first BeginEnvironment call guarded by its own
+`MyEnvrnFlag`, that helper zeros current `TZoneHeatGain` arrays but not
+`PipeAbsorbedSolar`. Its current `UpdateInternalGainValues` pass has already
+occurred before CP160 writes the new transition-zone values, so these new
+values are not part of that already-completed internal-gain update.
+
+Four directly mutated owners define the body clear boundary:
+`HeatBalanceData::clear_state`, `HeatBalSurfData::clear_state`,
+`SurfacesData::clear_state`, and
+`DataDaylightingDevicesData::clear_state` each reconstruct their record by
+placement-new. `HeatBalSurfMgr::clear_state` does not own CP160 numerical
+state; it only rearms the caller's shared first-time display lifecycle.
+ViewFactor, Construction, Material, WindowEquivalentLayer, Environment,
+Global, internal-gain, and daylighting setup state are read dependencies whose
+separate clears do not replay CP160. The ordinary operational reset is the
+preceding source-order initialization, not any CP160-local clear.
+
+Rust has no `InitIntSolarDistribution` target or state machine.
+`inside_shortwave_absorbed_w_per_m2` is initialized or explicitly supplied
+and consumed by the inside-face balance, but no runtime path derives it from
+Solar enclosures. The bounded internal-gain schedule helper distributes only
+positive typed-Zone radiant gain using nonnegative thermal absorptance, and
+the incident-solar helper remains an exterior forcing diagnostic. They do not
+implement `QLTSW`, Solar/radiant enclosure multipliers, interzone matrices
+and reports, night-stale beam reporting, movable exterior transforms, Window
+layers/shades/frames/dividers, adjacent-window transfer, initial diffuse
+addition, TDD transition-zone gains, report inconsistency, or CP160
+failure/re-entry semantics.
+
+CP160 adds required `source_mapped`
+`routine.init_int_solar_distribution` under the existing Surface-manager
+algorithm and the matching project-contract requirement immediately after
+`init_solar_heat_gains` and before `calc_heat_balance_outside_surf`. It
+adds no EnergyPlus source inventory, Rust target/code/state, test, support,
+capability, output, numerical, performance, or conformance promotion. The
+inventory becomes 32 algorithms and 169 routines, split into 58
+`state_mapped` and 111 `source_mapped`, with 62 required. CP161 next in
+source-definition order maps `ComputeIntThermalAbsorpFactors`, declared at
+`HeatBalanceSurfaceManager.hh` line 113 and implemented at
+`HeatBalanceSurfaceManager.cc` lines 4179-4295. Its sole production call is
+unconditional `InitSurfaceHeatBalance` line 427, which executes before CP159
+and CP160 rather than after them.
 
 ### `CheckValidSimulationObjects` state contract
 

@@ -162,7 +162,7 @@ cavity/Kiva/OSCM, selective-reset, failure, or re-entry lifecycle.
 
 The inventory now also includes `init_solar_heat_gains` immediately after
 `init_thermal_and_flux_histories` and before
-`calc_heat_balance_outside_surf`. Its EnergyPlus boundary is the unconditional
+`init_int_solar_distribution`. Its EnergyPlus boundary is the unconditional
 `InitSolarHeatGains(state)` call inside `InitSurfaceHeatBalance` line 457, the
 declaration at `HeatBalanceSurfaceManager.hh` line 109, and the complete body
 at `HeatBalanceSurfaceManager.cc` lines 2515-3776. It remains `source_mapped`
@@ -172,8 +172,19 @@ reset lifecycle, enclosure/interzone distribution, scheduled/reflected solar,
 window-model layers and shades, TDD/shelf/frame/divider paths, representative
 averaging, reports/energy, or partial-failure and re-entry behavior.
 
+The inventory now also includes `init_int_solar_distribution` immediately
+after `init_solar_heat_gains` and before
+`calc_heat_balance_outside_surf`. Its EnergyPlus boundary is the unconditional
+`InitIntSolarDistribution(state)` call inside `InitSurfaceHeatBalance` line
+468, the declaration at `HeatBalanceSurfaceManager.hh` line 111, and the
+complete body at `HeatBalanceSurfaceManager.cc` lines 3778-4177. It remains
+`source_mapped` and required: Rust has no Solar-enclosure/interzone
+short-wave distribution, window/shade/frame/divider or movable-insulation
+coupling, adjacent-window layer transfer, TDD transition-zone distribution,
+matching report lifecycle, or additive failure/re-entry behavior.
+
 The inventory now also includes `calc_heat_balance_outside_surf` immediately
-after `init_solar_heat_gains`. Its EnergyPlus boundary is the
+after `init_int_solar_distribution`. Its EnergyPlus boundary is the
 unconditional parent line-168 `CalcHeatBalanceOutsideSurf(state)` call, which
 omits the optional zone-resimulation argument, and the implementation at lines
 6951-7721. It remains `source_mapped` and required. Existing Rust
