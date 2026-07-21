@@ -41,6 +41,7 @@ required_routines = [
   "init_solar_view_factors",
   "manage_internal_heat_gains",
   "init_heat_balance",
+  "allocate_zone_heat_bal_arrays",
   "manage_surface_heat_balance",
   "init_surface_heat_balance",
   "calc_heat_balance_outside_surf",
