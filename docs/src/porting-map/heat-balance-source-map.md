@@ -68,6 +68,7 @@ claim.
 | internal-gain manager | `ManageInternalHeatGains(state, true)` at the parent call on `HeatBalanceManager.cc` line 320 | source-mapped and required for the full domain. CP107 does not implement the persistent one-time input flag, general `InitOnly` behavior, the non-init recurring branches, full internal-gain input, daylighting/reporting setup, or runtime gain updates. |
 | bounded internal-gain input | `GetInternalHeatGainsInput` reached by the init-only manager call | CP107 state-maps only the direct-Zone People then OtherEquipment family slice. The wrapper returns on a pre-existing Error, but a People diagnostic created inside the pass does not prevent the OtherEquipment scan. The existing typed arenas and name maps are the only mapped state; all other families, target expansion, derived occupant/design-level state, reporting, runtime, and conformance remain deferred. |
 | conditional Kiva instance setup | `if (AnyKiva) kivaManager.setupKivaInstances(state)` at `HeatBalanceManager.cc` lines 322-325 | CP108 source-maps the conditional call and its ignored boolean result only; it is not required for the full domain and has no Rust target. Foundation input, geometry, instance ownership, weather/ground algorithms, diagnostics, outputs, runtime, and conformance remain deferred. |
+| sizing Space heat-balance mode override | inline `if (DoingSizing) doSpaceHeatBalance = doSpaceHeatBalanceSizing` at `ManageHeatBalance` lines 169-171 after `GetHeatBalanceInput` returns | CP109 maps and defers this caller branch without a synthetic routine or Rust helper. Input ownership, the sizing lifecycle, mutable mode/flag state, Space heat-balance consumers, and runtime remain unclaimed. |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
 | inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
@@ -82,7 +83,7 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, and CP108 source-maps only the conditional `setupKivaInstances` call; the caller's conditional sizing override is the next deferred checkpoint
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, and CP109 maps/defers only the inline sizing override; conditional surface-octree initialization is the next checkpoint
 3. `InitHeatBalance`
 4. outside opaque surface balance
 5. inside opaque surface balance
@@ -1368,7 +1369,8 @@ The source-order tail recorded by CP106 continues through
 true. CP107 maps the first call as described below, and CP108 source-maps the
 conditional Kiva call. After `GetHeatBalanceInput` returns, the caller's
 `DoingSizing` assignment from `doSpaceHeatBalanceSizing` into
-`doSpaceHeatBalance` is the next deferred checkpoint.
+`doSpaceHeatBalance` is mapped/deferred by CP109; conditional surface-octree
+initialization is next.
 
 ### CP107 bounded internal-gain input map
 
@@ -1481,8 +1483,41 @@ support-gate repair is mixed into CP108.
 
 On return from `GetHeatBalanceInput`, `ManageHeatBalance` next conditionally
 copies `doSpaceHeatBalanceSizing` into `doSpaceHeatBalance` when `DoingSizing`
-is true. That inline sizing override remains the next source-order checkpoint;
-CP108 does not invent a routine row for it.
+is true. CP109 maps that inline sizing override below without inventing a
+routine row; conditional surface-octree initialization is the next checkpoint.
+
+### CP109 inline sizing Space heat-balance mode map
+
+After the once-only `GetHeatBalanceInput(state)` call returns,
+`ManageHeatBalance` lines 169-171 test `state.dataGlobal->DoingSizing`. Only
+when that flag is true does the caller copy
+`state.dataHeatBal->doSpaceHeatBalanceSizing` into the mutable active
+`state.dataHeatBal->doSpaceHeatBalance` mode. CP109 records this exact
+conditional assignment as an inline mapped/deferred barrier. It creates no
+synthetic routine-ledger row, Rust helper, model field, or executable claim.
+
+The branch is nested inside the outer
+`ManageHeatBalanceGetInputFlag` one-time-input block. That outer flag is still
+true during the sizing assignment, the following conditional surface-octree
+setup, and the complete Surface `set_computed_geometry` loop; EnergyPlus clears
+it only later at line 186. CP109 does not map that clear, persistence across
+calls, or re-entry behavior. Conditional surface-octree initialization is the
+next source-order checkpoint.
+
+`doSpaceHeatBalanceSizing` originates in `GetProjectControlData`, where
+`ZoneAirHeatBalanceAlgorithm` alpha field 2 selects Space heat balance during
+sizing and retains its false default when blank or absent. This origin is a
+source dependency only: CP109 does not add or widen object typing, defaults,
+Yes/No parsing, invalid-input recovery, diagnostics, or EIO reporting. The
+separate `SimulationManager` post-sizing assignment that later copies
+`doSpaceHeatBalanceSimulation` into `doSpaceHeatBalance` is not this checkpoint
+and receives no claim here.
+
+Sizing-environment lifecycle, mutable active-mode ownership and consumption,
+outer-flag clearing/re-entry, Space heat-balance arrays and allocation, Zone or
+Space loads, HVAC sizing and results, the following surface octree and computed
+geometry state, EMS calling points, runtime heat-balance numerics, reporting,
+and conformance all remain deferred.
 
 ### `CheckValidSimulationObjects` state contract
 
