@@ -72,6 +72,7 @@ claim.
 | sizing Space heat-balance mode override | inline `if (DoingSizing) doSpaceHeatBalance = doSpaceHeatBalanceSizing` at `ManageHeatBalance` lines 169-171 after `GetHeatBalanceInput` returns | CP109 maps and defers this caller branch without a synthetic routine or Rust helper. Input ownership, the sizing lifecycle, mutable mode/flag state, Space heat-balance consumers, and runtime remain unclaimed. |
 | conditional Surface octree initialization | nested `TotSurfaces >= 100` and raw `Daylighting:Controls` count guards at `ManageHeatBalance` lines 173-180, then `SurfaceOctreeCube::init` | CP110 source-maps the complete-Surface call and octree structure only; it is not required for the full domain and has no Rust target. Complete surface identity/order, daylighting typing, mutable transparency, traversal, computed geometry, runtime, performance, and conformance remain deferred. |
 | bounded per-Surface computed geometry | complete global Surface loop at `ManageHeatBalance` lines 182-184, then `SurfaceData::set_computed_geometry` | CP111 state-maps an error-free retained `BuildingSurface:Detailed` subset through `Compiler::set_bounded_surface_computed_geometry`: finite, coplanar, nondegenerate Triangles and conservative source-recognized Rectangles only. Derived shape category, Newell plane, axis projection, bounds, wrap edges, and rectangle side squares attach to each retained Surface without adding identity, count, graph, support, runtime, or conformance claims. |
+| one-time heat-balance input-flag clear | inline `ManageHeatBalanceGetInputFlag = false` at `ManageHeatBalance` line 186 | CP112 maps and defers this inline lifecycle boundary without a synthetic routine or Rust target. The source flag defaults and resets to true, remains true through the once-only input tail, and is cleared only after successful reach past the computed-geometry loop; Rust owns no persistent equivalent flag or re-entry behavior. |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
 | inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
@@ -86,7 +87,7 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, and CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry; the line-186 one-time flag clear is the next CP112 checkpoint
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry, and CP112 maps/defers only the line-186 one-time flag clear without claiming persistent Rust lifecycle parity; the following unconditional `ManageEMS` call at `BeginZoneTimestepBeforeInitHeatBalance` is the next CP113 checkpoint
 3. `InitHeatBalance`
 4. outside opaque surface balance
 5. inside opaque surface balance
@@ -1490,8 +1491,9 @@ On return from `GetHeatBalanceInput`, `ManageHeatBalance` next conditionally
 copies `doSpaceHeatBalanceSizing` into `doSpaceHeatBalance` when `DoingSizing`
 is true. CP109 maps that inline sizing override below without inventing a
 routine row. CP110 source-maps the following conditional surface-octree
-initialization, and CP111 state-maps the following bounded computed-geometry
-slice. The one-time input-flag clear is next.
+initialization, CP111 state-maps the following bounded computed-geometry
+slice, and CP112 maps the one-time input-flag clear. The unconditional EMS
+calling point before `InitHeatBalance` is next.
 
 ### CP109 inline sizing Space heat-balance mode map
 
@@ -1509,8 +1511,8 @@ true during the sizing assignment, the following conditional surface-octree
 setup, and the complete Surface `set_computed_geometry` loop; EnergyPlus clears
 it only later at line 186. CP109 does not map that clear, persistence across
 calls, or re-entry behavior. CP110 maps the conditional surface-octree call
-below, and CP111 maps the bounded computed-geometry slice after it; the flag
-clear remains the next source-order checkpoint.
+below, CP111 maps the bounded computed-geometry slice after it, and CP112 maps
+the flag clear below without adding persistent Rust state.
 
 `doSpaceHeatBalanceSizing` originates in `GetProjectControlData`, where
 `ZoneAirHeatBalanceAlgorithm` alpha field 2 selects Space heat balance during
@@ -1561,7 +1563,7 @@ performance/scaling, or conformance. Existing daylighting run-blocking and
 typed opaque detailed surfaces do not promote the complete guards or octree,
 and CP110 adds no object support, identity, graph edge, capability, runtime
 admission, manifest, comparator, or proof variable. CP111 state-maps the next
-bounded computed-geometry slice below; the line-186 flag clear remains next.
+bounded computed-geometry slice below, and CP112 maps the line-186 flag clear.
 
 ### CP111 bounded per-Surface computed geometry map
 
@@ -1571,8 +1573,8 @@ and calls `SurfaceData::set_computed_geometry` for every entry. The source
 method skips surfaces with fewer than three vertices; for every other entry it
 sets `shapeCat`, then the Newell `plane`, then `surface2d` in that order.
 EnergyPlus clears `ManageHeatBalanceGetInputFlag` only after this loop at line
-186. CP111 state-maps the bounded computation; that flag clear is the next
-CP112 checkpoint.
+186. CP111 state-maps the bounded computation, and CP112 maps that following
+inline lifecycle boundary below.
 
 Bounded Rust invokes
 `Compiler::set_bounded_surface_computed_geometry` after the CP107 internal-gain
@@ -1669,6 +1671,39 @@ not_claimed_branches:
 - complete `SurfaceData::set_computed_geometry`, `computed_shapeCat`, `computed_plane`, `computed_surface2d`, `Surface2D` construction, `GetVertices`, `ProcessSurfaceVertices`, `CheckConvexity`, or `isRectangle` parity; source invalid-input recovery, partial mutation/default retention, exact diagnostic text/severity/order/multiplicity, or one-time flag clearing and re-entry
 - Convex/Nonconvex and slab state, complete Surface families/order, octree/PierceSurface and every computed-geometry consumer, exact cross-language floating-point behavior, runtime numerical behavior or performance, output/report serialization, capability/support expansion, conformance cases, or numerical conformance
 <!-- routine-state-contract:v1 end set_computed_geometry -->
+
+### CP112 inline one-time heat-balance input-flag clear map
+
+The outer input block in `ManageHeatBalance` begins only while
+`state.dataHeatBalMgr->ManageHeatBalanceGetInputFlag` is true. The owning
+`HeatBalanceMgrData` member defaults to true, and its `clear_state()` reset also
+restores true. That value remains true through `GetHeatBalanceInput`, the CP109
+sizing-mode branch, the CP110 conditional octree setup, and the CP111 complete
+Surface computed-geometry loop. Only after those steps successfully reach
+`HeatBalanceManager.cc` line 186 does EnergyPlus assign the flag false and exit
+the block. Later `ManageHeatBalance` calls with the same state therefore skip
+that entire input tail.
+
+CP112 maps and defers only this inline assignment and source-order lifecycle
+boundary. It intentionally adds no synthetic routine-ledger row, Rust helper,
+model field, capability, support-gate admission, manifest, comparator, proof
+variable, result, or conformance claim. The Rust compiler's ordinary single
+execution and its final `model = None` failure result are not persistent
+per-state input-flag ownership or re-entry parity.
+
+The source's exact flag ownership, construction default, `clear_state()` reset,
+subsequent-call suppression, and successful-path position are recorded here as
+dependencies, not executable Rust state. If an earlier EnergyPlus fatal or
+abnormal path prevents control from reaching line 186, this assignment does
+not occur; CP112 does not claim exact fatal/exception behavior, partially
+completed side effects, diagnostic order/text/multiplicity, or recovery.
+Sizing and simulation-environment transitions, repeated calls and explicit
+state resets, the exact side effects and ordering of the skipped input tail,
+the following EMS calling point, `InitHeatBalance`, timestep/warmup/runtime
+behavior, reporting, numerical parity, performance, and conformance all remain
+deferred. The next CP113 checkpoint is the unconditional
+`ManageEMS(..., EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance, anyRan)`
+call immediately after this once-only block and before `InitHeatBalance`.
 
 ### `CheckValidSimulationObjects` state contract
 
