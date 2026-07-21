@@ -136,10 +136,21 @@ a limited outside-balance closure, remain intentionally absent from the
 surface algorithm's target list, and do not implement or promote the complete
 source routine, state, lifecycle, output, or numerical behavior.
 
+The inventory now also includes `allocate_surface_heat_bal_arrays` immediately
+after `init_surface_heat_balance` and before `calc_heat_balance_outside_surf`.
+Its EnergyPlus boundary is the `InitSurfaceHeatBalance` line-350 call under the
+lines-349-355 BeginSim branch, after the caller weather refresh and before the
+`InterZoneWindow` reduction; the declaration is at
+`HeatBalanceSurfaceManager.hh` line 101 and the implementation is at
+`HeatBalanceSurfaceManager.cc` lines 1406-2206. It remains `source_mapped` and
+required: Rust has no complete six-owner Surface allocation, CTF/master/source
+history state, exact defaults and conditional preservation, or 78-site output
+setup and re-entry lifecycle.
+
 The inventory now also includes `calc_heat_balance_outside_surf` immediately
-after `init_surface_heat_balance`. Its EnergyPlus boundary is the unconditional
-parent line-168 `CalcHeatBalanceOutsideSurf(state)` call, which omits the
-optional zone-resimulation argument, and the implementation at lines
+after `allocate_surface_heat_bal_arrays`. Its EnergyPlus boundary is the
+unconditional parent line-168 `CalcHeatBalanceOutsideSurf(state)` call, which
+omits the optional zone-resimulation argument, and the implementation at lines
 6951-7721. It remains `source_mapped` and required. Existing Rust
 `calc_heat_balance_outside_surf_stage` metadata, the identity wrapper, and
 bounded retained opaque CTF/environmental balance and report terms do not

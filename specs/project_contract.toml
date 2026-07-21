@@ -46,6 +46,7 @@ required_routines = [
   "init_conduction_transfer_functions",
   "manage_surface_heat_balance",
   "init_surface_heat_balance",
+  "allocate_surface_heat_bal_arrays",
   "calc_heat_balance_outside_surf",
   "calc_heat_balance_inside_surf",
   "calc_heat_balance_inside_surf_2_ctf_only",
