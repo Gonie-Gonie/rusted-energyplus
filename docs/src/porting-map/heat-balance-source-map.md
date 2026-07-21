@@ -59,6 +59,8 @@ claim.
 | variable-absorptance surface selection | `DataSurfaces::GetVariableAbsorptanceSurfaceList` immediately after `GetBuildingData` | CP98 state-maps the bounded retained `BuildingSurface:Detailed` subset: dense-order Outdoors surfaces whose construction outside layer owns a typed overlay receive immutable `VariableAbsorptanceSurfaceBinding` identities; non-Outdoors outside-layer uses warn without binding, followed by occurrence-local warnings for every typed construction layer after layer 1. Every overlay remains runtime-blocking. Full `AllHTSurfaceList` membership/reorder parity, other surface families, exact warning text/order/multiplicity outside typed arenas, `UpdateVariableAbsorptances`, runtime numerics, and conformance remain deferred. |
 | incident-solar multiplier input | `GetIncidentSolarMultiplier` immediately after `DataSurfaces::GetVariableAbsorptanceSurfaceList` | CP99 types only immutable `SurfaceProperty:IncidentSolarMultiplier` request snapshots: dense typed ID, nonsemantic normalized declaration key, unresolved normalized window target, inclusive-[0,1] multiplier defaulting to 1.0, and optional resolved ScheduleId. Missing schedules and duplicate normalized targets fail closed, no source order is claimed, and every request run-blocks. The routine remains source-mapped because fenestration-surface identity, Window/exterior/construction/shade validation, per-surface mutation, source duplicate overwrite semantics, schedule evaluation, runtime, and conformance remain deferred. |
 | scheduled surface gains input | `GetScheduledSurfaceGains` immediately after `GetIncidentSolarMultiplier` | CP100 types the first `SurfaceProperty:SolarIncidentInside` phase as immutable `SurfaceSolarIncident` records with a semantic normalized name, typed detailed-opaque SurfaceId, any typed ConstructionId, and required ScheduleId. CP101 types the following `ComplexFenestrationProperty:SolarAbsorbedLayers` phase as immutable requests with a semantic normalized name, unresolved fenestration target, complex-fenestration ConstructionId, and ordered ScheduleIds matching its solid optical layers. Both families allow duplicate names, fail closed on repeated resolved target/construction pairs because no source order is claimed, and run-block every definition. CP102 state-maps only a diagnostic tail slice of `CheckScheduledSurfaceGains`: an error-free Zone warns nonblockingly when its retained typed opaque subset already contains both an exact current-construction pair match and a miss. Empty, all-matched, and all-unmatched subsets stay silent. `GetScheduledSurfaceGains`, representative-surface mutation, full completeness, `SurfaceScheduledSolarInc`, `WindowScheduledSolarAbs`, schedule sampling, runtime, and conformance remain source-mapped or unsupported. |
+| representative-surface assignment output barrier | inline `GetHeatBalanceInput` block immediately after `GetScheduledSurfaceGains` | mapped and deferred without a synthetic routine entry: when representative calculations are enabled, EnergyPlus writes one EIO header even for zero surfaces, then visits the complete global Surface array in order and writes only non-self representative assignments. Rust lacks the controlling project flag, complete Surface arena/order, representative/constituent mutation, and EIO writer needed for a truthful partial implementation. |
+| thermochromic child construction projection | `CreateTCConstructions` immediately after the representative-surface EIO block | CP103 state-maps a bounded immutable series/child projection from CP85 master metadata and ordered thermochromic states. Master ConstructionId order, state order including the first state, effective-layer cloning, final-master-layer substitution, initial temperature, and source-shaped generated names are retained in separate arenas. Main ConstructionIds/names/counts/graph state, WINDOW5-relative global append order, deep-copy state, active switching, reporting, and runtime remain deferred. |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
 | inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
@@ -73,7 +75,7 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, and `GetScheduledSurfaceGains`; CP100 and CP101 type that final routine's two public input families in source order while leaving its wrapper source-mapped
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, and `CreateTCConstructions`; CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, and CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred
 3. `InitHeatBalance`
 4. outside opaque surface balance
 5. inside opaque surface balance
@@ -287,7 +289,10 @@ state, while the final parent encountered owns the source-shaped zero-based
 master metadata. Effective model-graph edges follow the substituted glazing
 IDs. Checked direct-index construction/material and opaque-cache lookups are
 structural hardening only; the existing thermochromic parent capability keeps
-all such definitions runtime-blocked, and no window execution is promoted.
+all such definitions runtime-blocked, and no window execution is promoted. The
+later CP103 `CreateTCConstructions` slice derives separate immutable series and
+child snapshots from this metadata without changing this parent routine's
+ConstructionIds, names, graph, or runtime boundary.
 
 CP86 also accepts the intended whole-system SimpleGlazing form only when it is
 the sole ordinary-`Construction` layer. The original SimpleGlazing material ID
@@ -365,18 +370,18 @@ unsupported_state:
 - `SetPreConstructionInputParameters` maximum-layer projection, `CheckAndFixCFSLayer`, `FinalizeCFS`, `SetEquivalentLayerWindowProperties`, ASHWAT optical and thermal calculations, nominal equivalent-layer resistance, U-factor/SHGC/rating state, and every equivalent-layer surface or window consumer
 - `SearchWindow5DataFile` path lookup and fatal behavior, Unicode/header/EOF and entry matching, one- or two-glazing-system parsing, W5 glass/gas material and construction generation, nominal resistance and U state, angular optical arrays and polynomial fits, frame/divider and mullion synthesis, source collision behavior, and every generated surface, reporting, or runtime consumer
 - the global `AnyInternalHeatSourceInInput` and `SimpleCTFOnly` flags, resistance-layer merging and source-node remapping, CTF/QTF generation and histories, source/sink heat fluxes and interior temperatures, radiant-system, ventilated-slab, surface-ground-heat-exchanger, representative-surface, and other downstream consumers
-- `CreateTCConstructions` child allocation and copying, source-formatted child names, surface-active construction switching, temperature-driven state selection, fenestration binding, optics, thermal calculations, daylighting, shading, nominal-U adjustment, EIO or other construction reporting, and runtime or conformance behavior
+- `CreateTCConstructions` global child allocation and deep copying, ConstructionId/name/count/graph integration, surface-active construction switching, temperature-driven state selection, fenestration binding, optics, thermal calculations, daylighting, shading, nominal-U adjustment, EIO or other construction reporting, and runtime or conformance behavior; CP103's separate immutable projection is covered by its later dedicated contract
 
 inactive_branches:
 - ordinary constructions without a thermochromic parent retain their existing effective material stacks and bounded opaque/fenestration classification; for these records the input and effective stacks are identical
 - a sole-layer SimpleGlazingSystem construction retains its one source material ID and has no thermochromic metadata; no multi-layer source quirk is materialized
-- when more than one thermochromic parent is present, every parent is first-state substituted but only the final parent owns the zero-based master metadata, preserving the source overwrite behavior without generating child constructions
+- when more than one thermochromic parent is present, every parent is first-state substituted but only the final parent owns the zero-based master metadata; the later CP103 projection varies only that final retained parent while earlier occurrences stay at their first states
 - when no valid `ConstructionProperty:InternalHeatSource` targets an ordinary opaque construction, every construction retains absent internal-source metadata; a retained nonzero perpendicular position on a 1-D declaration has no active consumer
 - when no `Construction:WindowEquivalentLayer` definition exists, the construction arena and graph gain no equivalent-layer state; when definitions exist, any one-to-eleven-layer contiguous family-only pack remains declaration data without topology repair or an executable window consumer
 - when no `Construction:WindowDataFile` request exists, the request arena is empty; missing or blank file names retain the default selector, and explicit names remain inert retain-case text even when the referenced file does not exist
 
 unsupported_active_branches:
-- every typed thermochromic parent remains an all-definition runtime blocker through its existing parent-material capability rule, including an unused parent and a parent consumed by a valid ordinary `Construction`; direct-index structural lookup does not weaken that block
+- every typed thermochromic parent remains an all-definition runtime blocker through its existing parent-material capability rule, including an unused parent and a parent consumed by a valid ordinary `Construction`; direct-index structural lookup and the later immutable child projection do not weaken that block
 - every typed SimpleGlazingSystem definition remains an all-definition runtime blocker, including an unused definition and one consumed by a valid sole-layer ordinary `Construction`
 - valid bounded fenestration constructions remain typed graph state only and do not enter the opaque runtime thermal cache or acquire window execution
 - every valid `ConstructionProperty:InternalHeatSource` definition, including one attached only to an otherwise unused construction, is reported as `UnsupportedSurfaceBoundary` and `RunBlocked` with `RuntimeClass::None`; a `BuildingSurface:Detailed` may retain the still-ordinary opaque target identity, but no partial or compatibility runtime is admitted
@@ -384,7 +389,7 @@ unsupported_active_branches:
 - every valid `Construction:WindowDataFile` request, including every unused, defaulted, or missing-file request, is reported as `UnsupportedSurfaceBoundary` and `RunBlocked` with `RuntimeClass::None` before file I/O; no synthesized construction identity or partial runtime is admitted
 
 not_claimed_branches:
-- complete `GetConstructData` parity, source case-collision and exact duplicate-key behavior, invalid-object and mark-used side effects, exact diagnostics/order/multiplicity, multi-layer or shaded SimpleGlazingSystem source quirks, thermochromic child generation/naming/state selection, `SearchWindow5DataFile` external-file expansion and generated state, broad InternalHeatSource target and recovery quirks, equivalent-layer topology repair and ASHWAT consumers, global flags, CTF/QTF calculations, nominal-U, EIO/SQLite and other reporting, window, air-boundary, ground, radiant, or source/sink physics, runtime numerics, and conformance
+- complete `GetConstructData` parity, source case-collision and exact duplicate-key behavior, invalid-object and mark-used side effects, exact diagnostics/order/multiplicity, multi-layer or shaded SimpleGlazingSystem source quirks, thermochromic global child ConstructionId/name/count/graph integration and active-state selection beyond CP103's private projection, `SearchWindow5DataFile` external-file expansion and generated state, broad InternalHeatSource target and recovery quirks, equivalent-layer topology repair and ASHWAT consumers, global flags, CTF/QTF calculations, nominal-U, EIO/SQLite and other reporting, window, air-boundary, ground, radiant, or source/sink physics, runtime numerics, and conformance
 <!-- routine-state-contract:v1 end get_construct_data -->
 
 ## Bounded F/C-Factor Construction Generation Notes
@@ -1135,6 +1140,99 @@ not_claimed_branches:
 - exact EnergyPlus warning severity text, continuation text, surface text, order, punctuation, or multiplicity; pair-lookup routines, schedule evaluation, runtime numerics, reporting, graph edges, manifests, comparators, proof variables, and conformance
 <!-- routine-state-contract:v1 end check_scheduled_surface_gains -->
 
+### CP103 representative-output barrier and thermochromic child projection
+
+After `GetScheduledSurfaceGains` returns, EnergyPlus evaluates the inline
+representative-surface assignment output block before calling
+`CreateTCConstructions`. This block is output-only but is not safely separable:
+when `UseRepresentativeSurfaceCalculations` is true it writes the EIO header
+once even when `TotSurfaces` is zero, visits the complete global Surface array
+in numeric order, and writes a row only when a surface's
+`RepresentativeCalcSurfNum` is not itself. Those identities include the
+representative/constituent mutation performed during full surface processing,
+including scheduled-gain-driven constituent removal. Rust has neither the
+`PerformancePrecisionTradeoffs` control, the complete ordered Surface arena,
+the representative/constituent relationship, nor the applicable EIO writer.
+CP103 therefore records this exact inline barrier as mapped and deferred and
+does not invent a routine-ledger entry for it.
+
+The following EnergyPlus `CreateTCConstructions` pass first counts every state
+of every thermochromic master in the pre-existing Construction range, expands
+the global construction and nominal-property arrays, then visits the original
+master range again. It uses the first state for the master specification
+temperature and creates one child for every ordered state, including the first.
+Each child is a deep copy with the final retained thermochromic parent layer
+replaced by that state's glazing. The bounded name helper follows the shape of
+EnergyPlus's custom `{:.0R}` formatter rather than generic Rust decimal
+rounding and pins `40 -> 40`, `-999.5 -> -1000`, either signed zero to `0`,
+`0.05 -> 5E-002`, and finite-limit guards. Exhaustive fmt 8.0.1 versus Rust
+finite-`f64` serialization equivalence remains unclaimed.
+
+CP103 state-maps only an immutable structural projection in
+`Compiler::create_thermochromic_construction_projections`. One series record is
+emitted for each CP85 master in dense `ConstructionId` order and addresses a
+contiguous child range. Children retain dense projection-only identities,
+master identity, zero-based input-state index, the EnergyPlus-formatted name,
+specification temperature, outside layer, and the cloned effective stack with
+only the final master's retained layer slot changed. Earlier thermochromic
+parents remain fixed at their already substituted first states. Duplicate
+temperatures, glazing references, and generated names are neither sorted,
+deduplicated, nor rejected; an unused parent group produces no series, while a
+group used by multiple masters produces one independent series per master.
+
+These projections deliberately do not enter `TypedModel::constructions`, the
+shared construction name map, object counts, or model-graph edges. EnergyPlus
+can synthesize WINDOW5 constructions inside `GetConstructData` before this
+later append, so assigning global `ConstructionId`s without that deferred
+expansion would assert a false source order. Full `ConstructionProps` deep
+copies, `TotConstructs`, nominal R/U and adjustment arrays, generated-name
+lookup/collision behavior, master child-index mutation, surface-active
+construction switching, nearest-temperature selection, optics, thermal
+calculations, daylighting, shading, EIO/reporting, runtime, and conformance
+remain deferred. The existing all-definition thermochromic parent blocker is
+unchanged, and this derived state adds no object, capability, manifest,
+comparator, proof variable, or numerical claim.
+
+### `CreateTCConstructions` state contract
+
+<!-- routine-state-contract:v1 begin create_tc_constructions -->
+CreateTCConstructions
+
+read_state:
+- EnergyPlus calls this routine immediately after the inline representative-surface EIO assignment block; bounded Rust enters after the CP102 scheduled-gain check and reads only immutable typed-model state, while the intervening output block remains mapped and deferred
+- every existing typed Construction is visited once in dense ConstructionId order; only records with CP85 `ConstructionThermochromicMaster` metadata are selected, and that descriptor's parent MaterialId plus zero-based layer index address the final thermochromic parent and its slot in the already first-state-substituted effective stack
+- each selected parent resolves to a typed `WindowGlazingThermochromicGroupMaterial` and its nonempty contiguous state-arena slice; every ordered state, including the first, supplies its retained optical-data temperature and resolved glazing MaterialId without sorting, deduplication, or duplicate rejection
+
+write_state:
+- one immutable `ConstructionThermochromicSeries` per selected master retains the master ConstructionId, the first state's initial specification temperature, and a contiguous first-child/count descriptor
+- one immutable `ConstructionThermochromicChild` per ordered state retains a dense projection-only child ID, master ConstructionId, zero-based state index, source-shaped `{:.0R}` normalized name with the pinned 40, -999.5, signed-zero, 0.05, and finite-limit boundaries, specification temperature, outside layer, and cloned effective layer stack with only the final master's retained layer slot replaced by that state's glazing MaterialId
+- output order is master ConstructionId then input state; earlier thermochromic parents in a multiple-parent construction remain fixed at their first states, layer-zero replacement also updates the child outside layer, duplicate temperatures/materials/names are preserved, and a shared group produces a separate series for each master
+- both projection arenas are built transactionally and published together only after every selected parent descriptor, state range, effective first-state layer, finite temperature, layer index, and dense child range validates; prior compiler errors suppress the pass rather than publishing projections from partial upstream arenas
+- the main Construction arena and name map, ConstructionIds, object counts, material arena, model-graph edges, surfaces, and runtime state are unchanged
+
+history_state_ownership:
+- TypedModel owns only immutable thermochromic series and child projection arenas; no master mutation, active-state pointer, temperature history, surface state, optical/thermal cache, or mutable simulation history is allocated
+
+unsupported_state:
+- appending deep-copied children to the global Construction arena, assigning source-global ConstructionIds after any WINDOW5-generated constructions, updating `TotConstructs`, and extending construction names, object counts, or construction/material graph edges
+- full `ConstructionProps` deep copy, master `TCChildConstrs` allocation, child-to-master global construction links, and nominal R/U, pre-adjusted U, or coefficient-adjustment arrays
+- source linear lookup and first-match behavior for generated-name collisions, including collisions between rounded temperatures, different masters, existing constructions, or deferred WINDOW5 children
+- active surface-construction mutation, nearest-temperature state selection and history, fenestration binding, window optics and thermal calculations, daylighting, shading, ratings, EIO/SQLite or other reporting, and runtime behavior
+
+inactive_branches:
+- with no retained thermochromic master construction, both projection arenas remain empty; an otherwise valid but unused thermochromic group produces no series or child
+- reusing one thermochromic group from multiple masters produces an independent series and child range for each master without sharing projection identities
+- the first state always produces a child even though its layers equal the master's already first-state-substituted effective stack; duplicate temperatures, glazing references, and formatted names remain distinct children in input order
+
+unsupported_active_branches:
+- every typed thermochromic parent remains `UnsupportedSurfaceBoundary` and `RunBlocked`, including an unused parent and one used by one or more projected master constructions; projection materialization never admits partial runtime
+- series and child identities are private derived state, not public ConstructionIds or object definitions, and do not change object, unsupported-object, capability, manifest, comparator, proof-variable, or conformance counts
+
+not_claimed_branches:
+- complete source ordering relative to WINDOW5-synthesized constructions, source-global child identity and name lookup, exhaustive fmt 8.0.1 versus Rust generated-name equivalence for arbitrary finite `f64` values beyond the pinned boundaries, invalid-upstream partial allocation or assertion behavior, exact `ErrorsFound` side effects, and full deep-copy field parity
+- representative-surface assignment output, construction/surface mutation, thermochromic state selection, optics, thermal calculations, daylighting, shading, ratings, EIO/SQLite or other reporting, runtime numerics, exact diagnostics/order/multiplicity, and conformance
+<!-- routine-state-contract:v1 end create_tc_constructions -->
+
 ### `ProcessZoneData` state contract
 
 <!-- routine-state-contract:v1 begin process_zone_data -->
@@ -1188,8 +1286,10 @@ not_claimed_branches:
 | `SurfaceProperty:SolarIncidentInside` first-phase `SurfaceSolarIncident::{Name, SurfPtr, ConstrPtr, sched}` state | `TypedModel::surface_solar_incidents`, `ep_model::SurfaceSolarIncidentId`, and `ep_model::SurfaceSolarIncident` | each dense record retains a normalized semantic name without a name map plus one typed detailed-opaque SurfaceId, any typed ConstructionId, and required ScheduleId. Duplicate names and construction-mismatched surface pairs remain valid, repeated resolved pairs fail closed, and no source order is claimed. CP101 separately types the following complex-fenestration request family, while representative-surface mutation, full completeness, pair lookup, schedule sampling, solar replacement, runtime, reporting, and conformance remain deferred. CP102 only emits a nonblocking monotonic warning when the retained typed opaque subset is already mixed by exact current-construction pair matching; every definition run-blocks and no graph edge is added |
 | `ComplexFenestrationProperty:SolarAbsorbedLayers` second-phase `FenestrationSolarAbsorbed::{Name, SurfPtr, ConstrPtr, NumOfSched, scheds}` request state | `TypedModel::fenestration_solar_absorbed_requests`, `ep_model::FenestrationSolarAbsorbedRequestId`, and `ep_model::FenestrationSolarAbsorbedRequest` | each dense request retains a normalized semantic name without a name map, unresolved normalized fenestration target, typed complex-fenestration ConstructionId, and outside-to-inside ScheduleIds whose count exactly matches `complex_fenestration.optical_layers`. Duplicate names remain valid and duplicate target/construction pairs fail closed because no source order is claimed. Source `NumAlpha`/trailing-blank positional parity, source indexing defects, fenestration binding, full completeness, pair lookup, schedule sampling and value/type limits, BSDF layer absorption, runtime, reporting, and conformance remain deferred; every request run-blocks and no graph edge is added |
 | `CheckScheduledSurfaceGains` per-Zone `ZoneScheduled`/`ZoneUnscheduled` diagnostic state | `Compiler::check_scheduled_surface_gains_typed_subset` and compile warnings only | after error-free final Space assignment, a Zone warns nonblockingly only when retained typed detailed opaque surfaces already include both an exact current SurfaceId/ConstructionId pair match and a miss; only known misses are named. Empty, all-matched, and all-unmatched subsets are silent. No model state is added; full surface completeness, windows, other surface families, active constructions, pair lookups, exact diagnostics, and runtime remain deferred |
+| inline representative-surface EIO header and assignment rows | mapped/deferred barrier only | the exact condition, unconditional-when-enabled header, complete global Surface order, non-self assignment filter, and representative-name payload are documented without adding a synthetic routine or Rust output state; the project flag, full Surface population/order, representative/constituent mutation, and EIO writer remain absent |
+| `CreateTCConstructions` master `specTemp`/`TCChildConstrs` and child layer/name/temperature projection | `TypedModel::construction_thermochromic_series`, `TypedModel::construction_thermochromic_children`, `ep_model::ConstructionThermochromicSeries`, `ep_model::ConstructionThermochromicChild`, and `ep_model::ThermochromicConstructionChildId` | dense master-ConstructionId then ordered-state projection retains the initial first-state temperature and one child per state, including the first; each child clones the effective stack, replaces only the final retained TC layer, derives the outside layer, and uses source-shaped `{:.0R}` naming with pinned boundary examples. Projection IDs are not ConstructionIds; arbitrary-finite exact formatter equivalence, global append/count/name/graph state, WINDOW5-relative ordering, deep-copy fields, collision lookup, switching, reporting, and runtime remain deferred |
 | `DataSurfaces::FrameDividerProperties` | `ep_model::WindowFrameAndDivider`, `ep_model::WindowFrameProperties`, `ep_model::WindowDividerProperties`, `ep_model::WindowRevealProperties` | complete bounded immutable user-input descriptors and an independent normalized namespace are typed; fenestration binding, geometry, WINDOW 5 synthesis, shading mutation, window physics, NFRC calculations, reporting, and runtime remain blocked |
-| `Construction::ConstructionProps::{Name, TotLayers, LayerPoint, isTCWindow, isTCMaster, TCMasterMatNum, TCLayerNum, TCGlassNum}` and construction/material CTF data | `ep_model::Construction`, optional immutable thermochromic master metadata, `ep_model::ModelGraph::construction_materials`, checked runtime direct-index construction/material lookup, and `ep_runtime::SurfaceCtfState` | ordinary input layers resolve into a bounded opaque/fenestration construction; every thermochromic parent contributes its first glazing state to the effective stack and only the final parent owns zero-based master metadata, while a sole SimpleGlazingSystem layer retains its original material identity and Fenestration kind. Graph edges follow the effective or retained IDs. The opaque runtime cache, static Regular/AirGap/IRT EIO evidence, diagnostic steady/no-mass coefficient seeding, and CTF histories do not enable thermochromic/window execution, multi-layer SimpleGlazing quirks, child construction generation, mass-material coefficient generation, or broad face-temperature solving |
+| `Construction::ConstructionProps::{Name, TotLayers, LayerPoint, isTCWindow, isTCMaster, TCMasterMatNum, TCLayerNum, TCGlassNum}` and construction/material CTF data | `ep_model::Construction`, optional immutable thermochromic master metadata, separate immutable thermochromic series/child projections, `ep_model::ModelGraph::construction_materials`, checked runtime direct-index construction/material lookup, and `ep_runtime::SurfaceCtfState` | ordinary input layers resolve into a bounded opaque/fenestration construction; every thermochromic parent contributes its first glazing state to the effective stack and only the final parent owns zero-based master metadata, while a sole SimpleGlazingSystem layer retains its original material identity and Fenestration kind. CP103 derives private ordered child snapshots without mutating the global construction/name/graph arenas or granting child ConstructionIds. Existing graph edges follow the effective or retained master IDs. The opaque runtime cache, static Regular/AirGap/IRT EIO evidence, diagnostic steady/no-mass coefficient seeding, and CTF histories do not enable thermochromic/window execution, multi-layer SimpleGlazing quirks, global child construction integration, mass-material coefficient generation, or broad face-temperature solving |
 | F/C-factor construction flags, source dimensions/factors, `NominalR`, and generated material layer points | `ep_model::ConstructionGroundFactor`, private generated entries in `TypedModel::materials`, and `ModelGraph::construction_materials` | exact bounded generation formulas, ordinary-then-F-then-C ordering, private names, raw ordinals, and two graph edges are retained; surface pairing, ground temperatures, CTF/runtime, reporting, and public attachment targeting remain blocked |
 | `ConstructionProps::{TypeIsAirBoundary, TypeIsAirBoundaryMixing, AirBoundaryACH, AirBoundaryMixingSched}` with zero `TotLayers` | `ep_model::ConstructionKind::AirBoundary`, `ConstructionAirBoundary`, `AirBoundaryAirExchange`, and `AirBoundaryMixingSchedule` | lexical-order zero-layer descriptors retain `None` or `SimpleMixing` input state with an optional typed schedule identity or explicit always-on selector and emit no construction/material edge; surface pairing, enclosure remapping, generated cross-mixing, schedule sampling, reporting, and runtime remain blocked |
 | `ConstructionProps::BSDFInput`, complex-state layer points, `WindowThermalModel:Params`, and `Matrix:TwoDimension` snapshots | `ep_model::ConstructionKind::ComplexFenestration`, `ConstructionComplexFenestrationState`, `WindowThermalModelParameters`, `ComplexFenestrationMatrix`, `ComplexFenestrationOpticalLayer`, and `ModelGraph::construction_materials` | the bounded LBNLWINDOW/None declaration state retains normalized helper identities, original matrix spelling, derived basis length, dimension-checked global/solid optical snapshots, an alternating SpectralAverage-or-ComplexShade/Gap layer pack, and every ordered graph edge; helper families remain raw-only, while surfaces, BSDF/TARCOG/WCE calculations, reporting, runtime, and conformance remain blocked |

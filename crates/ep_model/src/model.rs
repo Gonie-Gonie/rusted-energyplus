@@ -3,12 +3,13 @@
 use crate::{
     AirLoopHvac, AvailabilityManagerComponent, BoilerHotWater, BranchId, BranchListId, Building,
     ChillerElectricEir, CoilComponent, ComponentId, ConnectorId, ConnectorListId, Construction,
-    ConstructionId, ConstructionWindowDataFileRequest, DayScheduleId,
-    DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId,
-    ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
-    ExternalInterfaceSchedule, FanComponent, FenestrationSolarAbsorbedRequest, GlazingSpectralData,
-    GlazingSpectralDataId, GlobalGeometryRules, IdealLoadsAirSystem, IdealLoadsAirSystemId,
-    InternalGainId, LoopId, Material, MaterialHeatAndMoistureTransferDiffusion,
+    ConstructionId, ConstructionThermochromicChild, ConstructionThermochromicSeries,
+    ConstructionWindowDataFileRequest, DayScheduleId, DesignSpecificationOutdoorAir,
+    DesignSpecificationOutdoorAirId, ExternalInterfaceFmuExportSchedule,
+    ExternalInterfaceFmuImportSchedule, ExternalInterfaceSchedule, FanComponent,
+    FenestrationSolarAbsorbedRequest, GlazingSpectralData, GlazingSpectralDataId,
+    GlobalGeometryRules, IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId, LoopId,
+    Material, MaterialHeatAndMoistureTransferDiffusion,
     MaterialHeatAndMoistureTransferRedistribution, MaterialHeatAndMoistureTransferSettings,
     MaterialHeatAndMoistureTransferSorptionIsotherm, MaterialHeatAndMoistureTransferSuction,
     MaterialHeatAndMoistureTransferThermalConductivity, MaterialId,
@@ -99,6 +100,10 @@ pub struct TypedModel {
     pub constructions: Vec<Construction>,
     /// Construction names.
     pub construction_names: NameMap<ConstructionId>,
+    /// Source-order series descriptors for thermochromic master constructions.
+    pub construction_thermochromic_series: Vec<ConstructionThermochromicSeries>,
+    /// Immutable thermochromic child projections in master-ID then source-state order.
+    pub construction_thermochromic_children: Vec<ConstructionThermochromicChild>,
     /// Requests to synthesize constructions from legacy WINDOW5 data files.
     pub construction_window_data_file_requests: Vec<ConstructionWindowDataFileRequest>,
     /// Schedule type limits.
@@ -310,6 +315,8 @@ impl Default for TypedModel {
             window_glazing_thermochromic_state_arena: Vec::new(),
             constructions: Vec::new(),
             construction_names: NameMap::default(),
+            construction_thermochromic_series: Vec::new(),
+            construction_thermochromic_children: Vec::new(),
             construction_window_data_file_requests: Vec::new(),
             schedule_type_limits: Vec::new(),
             schedule_type_limit_names: NameMap::default(),
@@ -416,6 +423,21 @@ impl TypedModel {
         let end = first_state.checked_add(state_count)?;
         self.window_glazing_thermochromic_state_arena
             .get(first_state..end)
+    }
+
+    /// Returns the source-ordered child slice described by a thermochromic series.
+    ///
+    /// Returns `None` when the descriptor overflows or lies outside the derived child arena.
+    #[must_use]
+    pub fn construction_thermochromic_children(
+        &self,
+        series: ConstructionThermochromicSeries,
+    ) -> Option<&[ConstructionThermochromicChild]> {
+        let first_child = usize::try_from(series.first_child.0).ok()?;
+        let child_count = usize::try_from(series.child_count).ok()?;
+        let end = first_child.checked_add(child_count)?;
+        self.construction_thermochromic_children
+            .get(first_child..end)
     }
 
     /// Number of typed object instances in the current subset.

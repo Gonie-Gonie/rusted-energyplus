@@ -2,7 +2,9 @@
 
 use std::sync::Arc;
 
-use crate::{ConstructionId, MaterialId, NormalizedName, ScheduleId};
+use crate::{
+    ConstructionId, MaterialId, NormalizedName, ScheduleId, ThermochromicConstructionChildId,
+};
 
 /// Consumer family for an ordered construction layer stack.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -327,6 +329,44 @@ pub struct ConstructionThermochromicMaster {
     pub layer_index: u32,
     /// Zero-based source glass-layer ordinal (EnergyPlus `TCGlassNum` is one-based).
     pub glazing_layer_index: u32,
+}
+
+/// Immutable descriptor for the generated children of one thermochromic master construction.
+///
+/// The series is a derived projection, not a public [`Construction`] identity. Its range points
+/// into [`TypedModel::construction_thermochromic_children`](crate::TypedModel::construction_thermochromic_children).
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ConstructionThermochromicSeries {
+    /// Existing construction whose last thermochromic parent supplies the state series.
+    pub master_construction: ConstructionId,
+    /// First-state temperature assigned to the source master construction by EnergyPlus.
+    pub initial_specification_temperature_c: f64,
+    /// Dense ID of the first child in the model's derived child arena.
+    pub first_child: ThermochromicConstructionChildId,
+    /// Number of source-ordered children, including the first state.
+    pub child_count: u32,
+}
+
+/// One immutable thermochromic child-construction projection.
+///
+/// Child IDs are local to the derived arena. They intentionally do not consume the global
+/// [`ConstructionId`] space or participate in the public construction-name namespace.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ConstructionThermochromicChild {
+    /// Dense projection ID in the derived child arena.
+    pub id: ThermochromicConstructionChildId,
+    /// Existing thermochromic master construction.
+    pub master_construction: ConstructionId,
+    /// Zero-based source-order state index within the parent's glazing group.
+    pub state_index: u32,
+    /// Source-style generated name, retained without uniqueness enforcement.
+    pub name: NormalizedName,
+    /// State specification temperature in degrees Celsius.
+    pub specification_temperature_c: f64,
+    /// Effective outside material for this child stack.
+    pub outside_layer: MaterialId,
+    /// Effective outside-to-inside material stack.
+    pub layers: Vec<MaterialId>,
 }
 
 /// Construction resolved to an ordered, effective material layer stack.

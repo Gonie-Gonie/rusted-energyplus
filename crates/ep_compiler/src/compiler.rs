@@ -10,6 +10,7 @@ mod space;
 mod surface_incident_solar_multiplier;
 mod surface_solar_incident;
 mod surface_space;
+mod thermochromic_construction;
 mod variable_absorptance_surface;
 mod zone;
 mod zone_collections;
@@ -707,6 +708,7 @@ impl<'a> Compiler<'a> {
         self.parse_surface_solar_incidents(&mut model);
         self.parse_fenestration_solar_absorbed_requests(&mut model);
         self.check_scheduled_surface_gains_typed_subset(&model, diagnostics_before_surfaces);
+        self.create_thermochromic_construction_projections(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
         self.parse_zone_humidistats(&mut model);
@@ -17610,6 +17612,7 @@ mod tests {
     mod surface_properties_vapor_coefficients;
     mod surface_solar_incident;
     mod surface_space;
+    mod thermochromic_construction;
     mod variable_absorptance_surface;
     mod window_material_blind;
     mod window_material_blind_equivalent_layer;

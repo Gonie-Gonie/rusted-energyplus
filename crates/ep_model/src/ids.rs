@@ -22,6 +22,7 @@ typed_id!(SurfaceSolarIncidentId);
 typed_id!(SurfaceVaporCoefficientsId);
 typed_id!(WindowFrameAndDividerId);
 typed_id!(ConstructionId);
+typed_id!(ThermochromicConstructionChildId);
 typed_id!(MaterialId);
 typed_id!(GlazingSpectralDataId);
 typed_id!(MaterialVariableAbsorptanceId);
