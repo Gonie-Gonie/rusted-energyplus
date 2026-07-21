@@ -58,7 +58,7 @@ claim.
 | building/zone/space input | `GetBuildingData` -> `GetZoneData` -> `ProcessZoneData` / `GetZoneLocalEnvData` / `GetSpaceData` / `GetGeneralSpaceTypeNum` -> `SetupZoneGeometry` / `GetHTSurfaceData` / `CreateMissingSpaces` | the HeatBalanceManager wrappers plus `SetupZoneGeometry`, `GetSurfaceData`, and full `GetHTSurfaceData` remain source-mapped; bounded declaration state continues through Space/SpaceList/default-Space creation, then a CP97 composite bounds the GetHT-owned typed detailed-surface Space lookup and same-Zone validation before state-mapped `CreateMissingSpaces` consumes preclassified assignments, creates mixed-assignment remainders, and applies final fallback SpaceIds. Collections, local environments, authored Spaces, SpaceLists, and generated remainders run-block; sole whole-zone defaults remain inactive when no remainder is needed, including when every valid detailed surface explicitly references the default. Other surface families, opposite-surface generation, reordering, Space surface lists, geometry realization, list consumers, outputs, and runtime convection remain deferred. |
 | variable-absorptance surface selection | `DataSurfaces::GetVariableAbsorptanceSurfaceList` immediately after `GetBuildingData` | CP98 state-maps the bounded retained `BuildingSurface:Detailed` subset: dense-order Outdoors surfaces whose construction outside layer owns a typed overlay receive immutable `VariableAbsorptanceSurfaceBinding` identities; non-Outdoors outside-layer uses warn without binding, followed by occurrence-local warnings for every typed construction layer after layer 1. Every overlay remains runtime-blocking. Full `AllHTSurfaceList` membership/reorder parity, other surface families, exact warning text/order/multiplicity outside typed arenas, `UpdateVariableAbsorptances`, runtime numerics, and conformance remain deferred. |
 | incident-solar multiplier input | `GetIncidentSolarMultiplier` immediately after `DataSurfaces::GetVariableAbsorptanceSurfaceList` | CP99 types only immutable `SurfaceProperty:IncidentSolarMultiplier` request snapshots: dense typed ID, nonsemantic normalized declaration key, unresolved normalized window target, inclusive-[0,1] multiplier defaulting to 1.0, and optional resolved ScheduleId. Missing schedules and duplicate normalized targets fail closed, no source order is claimed, and every request run-blocks. The routine remains source-mapped because fenestration-surface identity, Window/exterior/construction/shade validation, per-surface mutation, source duplicate overwrite semantics, schedule evaluation, runtime, and conformance remain deferred. |
-| scheduled surface gains input | `GetScheduledSurfaceGains` immediately after `GetIncidentSolarMultiplier` | CP100 types the first `SurfaceProperty:SolarIncidentInside` phase as immutable `SurfaceSolarIncident` records with a semantic normalized name, typed detailed-opaque SurfaceId, any typed ConstructionId, and required ScheduleId. CP101 types the following `ComplexFenestrationProperty:SolarAbsorbedLayers` phase as immutable requests with a semantic normalized name, unresolved fenestration target, complex-fenestration ConstructionId, and ordered ScheduleIds matching its solid optical layers. Both families allow duplicate names, fail closed on repeated resolved target/construction pairs because no source order is claimed, and run-block every definition. The routine remains source-mapped because representative-surface mutation, completeness warnings, both scheduled-pair lookups, schedule sampling, runtime, and conformance remain deferred. |
+| scheduled surface gains input | `GetScheduledSurfaceGains` immediately after `GetIncidentSolarMultiplier` | CP100 types the first `SurfaceProperty:SolarIncidentInside` phase as immutable `SurfaceSolarIncident` records with a semantic normalized name, typed detailed-opaque SurfaceId, any typed ConstructionId, and required ScheduleId. CP101 types the following `ComplexFenestrationProperty:SolarAbsorbedLayers` phase as immutable requests with a semantic normalized name, unresolved fenestration target, complex-fenestration ConstructionId, and ordered ScheduleIds matching its solid optical layers. Both families allow duplicate names, fail closed on repeated resolved target/construction pairs because no source order is claimed, and run-block every definition. CP102 state-maps only a diagnostic tail slice of `CheckScheduledSurfaceGains`: an error-free Zone warns nonblockingly when its retained typed opaque subset already contains both an exact current-construction pair match and a miss. Empty, all-matched, and all-unmatched subsets stay silent. `GetScheduledSurfaceGains`, representative-surface mutation, full completeness, `SurfaceScheduledSolarInc`, `WindowScheduledSolarAbs`, schedule sampling, runtime, and conformance remain source-mapped or unsupported. |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
 | inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
@@ -979,8 +979,10 @@ processing can remove a targeted surface from its representative's constituent
 list and reset it to represent itself. CP100 performs no representative or
 constituent-list mutation. CP100 itself leaves the complex-fenestration second
 phase deferred; CP101 below types its bounded request state but not
-fenestration-surface binding or `CheckScheduledSurfaceGains` mixed-zone
-completeness warnings.
+fenestration-surface binding or full `CheckScheduledSurfaceGains` mixed-zone
+completeness. CP102 adds only a nonblocking monotonic warning when the retained
+typed opaque subset already contains both an exact current-construction pair
+match and a miss; it writes no model state.
 Runtime pair lookup, schedule sampling, inside-face incident-solar replacement,
 window-layer absorption, exact diagnostics/order/multiplicity, reports,
 numerical behavior, and conformance are unclaimed. Every typed first-phase
@@ -1037,13 +1039,101 @@ final `ErrorsFound` termination, whereas any CP101 diagnostic prevents the
 transactional request arena from being published.
 
 Fenestration identity and eligibility, surface/current-state construction
-pairing, `CheckScheduledSurfaceGains` completeness warnings,
+pairing, full `CheckScheduledSurfaceGains` completeness,
 `WindowScheduledSolarAbs` lookup, schedule sampling, BSDF layer absorption,
 transmitted-solar replacement, exact diagnostics/order/multiplicity,
 reporting, runtime numerics, and conformance remain deferred. Every request,
 including an otherwise unused one, is `UnsupportedSurfaceBoundary`,
 `RunBlocked`, and `RuntimeClass::None`; no model graph edge, manifest,
-comparator, or proof variable is added.
+comparator, or proof variable is added. CP102's bounded warning observes only
+current-construction pairs on retained typed opaque surfaces; it cannot consume
+these unresolved complex-fenestration requests.
+
+### CP102 `CheckScheduledSurfaceGains` monotonic typed-subset warning
+
+`CheckScheduledSurfaceGains` is the diagnostic tail helper inside
+`GetScheduledSurfaceGains` in `HeatBalanceManager.cc`. EnergyPlus calls it in
+Zone order only when at least one of the two scheduled-gain input families is
+present. The helper walks each Zone's `spaceIndexes`, each Space's inclusive
+heat-transfer-surface range, and each surface's current Construction. Windows
+query `WindowScheduledSolarAbs`; every other surface queries
+`SurfaceScheduledSolarInc`. The source warns when that complete set contains
+both a scheduled and an unscheduled surface, then emits a continuation for
+every unscheduled surface. After the parent returns, the next top-level
+`GetHeatBalanceInput` block writes representative-surface assignments to EIO
+when representative calculations are enabled.
+
+CP102 state-maps only a diagnostic subset in
+`Compiler::check_scheduled_surface_gains_typed_subset`. It runs after final
+Space assignments and both CP100/CP101 parsers, and only when the relevant
+surface and scheduled-input phases added no error. Zone membership comes from
+final `Zone::spaces` plus each retained `BuildingSurface:Detailed` record's
+final SpaceId; this is not a claim that source Space surface ranges or lists
+have been reproduced. Each retained opaque surface is matched against the
+CP100 arena by its exact SurfaceId and its current resolved ConstructionId.
+CP101 targets remain unresolved fenestration names and therefore cannot match
+this subset.
+
+A Zone receives one nonblocking compiler warning only if its retained typed
+opaque subset already contains at least one exact-pair match and at least one
+miss. This predicate is monotonic: adding any missing heat-transfer surfaces
+cannot make an already mixed set uniformly matched or uniformly unmatched.
+The diagnostic names only the known unmatched retained surfaces. An empty,
+all-matched, or all-unmatched typed subset is deliberately silent because
+omitted surfaces could make the complete source set mixed; a Zone with no
+typed surfaces is also silent rather than reproducing the source's
+`firstZoneSurface` empty-Zone flag quirk.
+
+This pass writes no model, graph, schedule, surface, or lookup state. Windows,
+other fenestration, legacy detailed surfaces, `InternalMass`, generated
+opposite surfaces, representative/constituent surfaces, source reordering,
+active-construction behavior, and complete Zone/Space heat-transfer-surface
+membership remain deferred. Exact warning text, continuation structure,
+ordering, punctuation, and multiplicity are unclaimed. The parent
+`GetScheduledSurfaceGains` remains `source_mapped`; `SurfaceScheduledSolarInc`
+and `WindowScheduledSolarAbs` lookup/consumption remain source-mapped or
+unsupported, as do schedule sampling, solar replacement, BSDF absorption,
+reporting, and runtime. The warning does not weaken either input family's
+all-definition `UnsupportedSurfaceBoundary` / `RunBlocked` boundary and adds
+no object, capability, manifest, comparator, proof variable, or conformance
+claim.
+
+### `CheckScheduledSurfaceGains` state contract
+
+<!-- routine-state-contract:v1 begin check_scheduled_surface_gains -->
+CheckScheduledSurfaceGains
+
+read_state:
+- the internal tail helper called by `GetScheduledSurfaceGains` for every EnergyPlus Zone only when either scheduled-gain input family has at least one source record; the enclosing routine remains source-mapped, and its next top-level sibling is the representative-surface EIO assignment block
+- only the error-free retained typed `BuildingSurface:Detailed` subset after final Space assignment: deterministic `Zone::spaces`, each retained surface's final SpaceId and current resolved ConstructionId, and the immutable `SurfaceSolarIncident` exact SurfaceId/ConstructionId pairs
+- for each retained typed opaque surface, a pair is scheduled only when its current construction exactly matches one typed first-family record; complex-fenestration requests remain unresolved and cannot match this subset
+
+write_state:
+- no model state is written; a Zone receives one nonblocking compile warning only when its retained typed opaque subset already contains both at least one exact-pair match and at least one miss
+- the bounded diagnostic identifies the Zone and lists only the known retained typed surface names whose current SurfaceId/ConstructionId pair is unscheduled; it does not invent names or outcomes for deferred surfaces
+- the warning predicate is monotonic under completion of the full EnergyPlus heat-transfer surface set: once a retained subset contains both a match and a miss, adding omitted surfaces cannot make the full set uniformly scheduled or uniformly unscheduled
+- any relevant typed surface-input or scheduled-surface-gain input error suppresses the entire check so diagnostics are not inferred from partial compiler arenas
+
+history_state_ownership:
+- the compiler owns no new persistent state for this diagnostic-only pass; it allocates only local match/miss observations and warning text, with no schedule values, surface flags, lookup cache, or runtime history
+
+unsupported_state:
+- the complete EnergyPlus heat-transfer surface population: windows and other fenestration, legacy detailed surface families, InternalMass, generated opposite surfaces, source surface reordering, and representative/constituent-surface mutation
+- EnergyPlus `WindowScheduledSolarAbs` matching, complex-fenestration current or active construction selection, `SurfaceScheduledSolarInc` and `WindowScheduledSolarAbs` runtime consumers, schedule sampling, solar replacement, BSDF absorption, and reporting
+
+inactive_branches:
+- an empty retained subset, an all-matched retained subset, or an all-unmatched retained subset emits no warning because omitted full-domain surfaces could change those classifications; this also avoids claiming the source empty-Zone flag quirk
+- a Zone with no typed detailed opaque surfaces emits no warning, and unresolved CP101 fenestration requests cannot create a typed-subset match
+- surface or scheduled-input errors suppress the pass rather than emitting warnings from partially published state
+
+unsupported_active_branches:
+- the bounded warning is diagnostic-only and nonblocking; it does not weaken the all-definition `UnsupportedSurfaceBoundary` and `RunBlocked` boundary for either scheduled-gain object family
+- Zones whose full source surface set is mixed but whose retained typed subset is empty, all matched, or all unmatched intentionally receive no warning until full completeness is available
+
+not_claimed_branches:
+- complete Zone/Space heat-transfer surface membership, windows, legacy/InternalMass/generated/representative surfaces, active-construction semantics, full scheduled-gain completeness, or the EnergyPlus empty-Zone behavior
+- exact EnergyPlus warning severity text, continuation text, surface text, order, punctuation, or multiplicity; pair-lookup routines, schedule evaluation, runtime numerics, reporting, graph edges, manifests, comparators, proof variables, and conformance
+<!-- routine-state-contract:v1 end check_scheduled_surface_gains -->
 
 ### `ProcessZoneData` state contract
 
@@ -1095,8 +1185,9 @@ not_claimed_branches:
 | `DataSurface::SurfaceData::{Zone, spaceNum}` | `ep_model::Surface::{zone, space}` and `ep_model::SpaceOrigin` | the typed detailed opaque subset resolves optional Space names through the full pre-remainder arena with same-Zone validation, retains explicit targets, assigns all-implicit Zones to their existing last Space, and redirects mixed implicit surfaces to a Zone-order remainder; other surface families, opposite-surface generation, reordering, per-Space surface lists, geometry, and runtime consumers remain deferred |
 | `DataSurface::AllVaryAbsOpaqSurfaceList` selected by `GetVariableAbsorptanceSurfaceList` | `TypedModel::variable_absorptance_surface_bindings` and `ep_model::VariableAbsorptanceSurfaceBinding` | after the retained detailed-surface pass, dense-order Outdoors surfaces whose construction outside layer owns a typed overlay retain a SurfaceId-to-MaterialVariableAbsorptanceId binding; non-Outdoors outside-layer uses and each typed inside-layer occurrence produce bounded warnings only. Full `AllHTSurfaceList` membership/reorder parity, other surface families, runtime updates, exact warning text/order/multiplicity, numerics, and conformance remain deferred, and every overlay still run-blocks |
 | `SurfaceProperty:IncidentSolarMultiplier` request fields before `Surface::hasIncSolMultiplier` and `SurfIncSolMultiplier` mutation | `TypedModel::surface_incident_solar_multiplier_requests`, `ep_model::SurfaceIncidentSolarMultiplierRequestId`, and `ep_model::SurfaceIncidentSolarMultiplierRequest` | a dense request arena retains the nonsemantic normalized declaration key, unresolved normalized window target, inclusive-[0,1] default-1 multiplier, and optional resolved ScheduleId without creating or mutating a SurfaceId. Duplicate targets and missing schedules fail closed; source order, fenestration lookup and eligibility, construction/shade checks, per-surface overwrite state, schedule evaluation, runtime, reporting, and conformance remain deferred, and every request run-blocks |
-| `SurfaceProperty:SolarIncidentInside` first-phase `SurfaceSolarIncident::{Name, SurfPtr, ConstrPtr, sched}` state | `TypedModel::surface_solar_incidents`, `ep_model::SurfaceSolarIncidentId`, and `ep_model::SurfaceSolarIncident` | each dense record retains a normalized semantic name without a name map plus one typed detailed-opaque SurfaceId, any typed ConstructionId, and required ScheduleId. Duplicate names and construction-mismatched surface pairs remain valid, repeated resolved pairs fail closed, and no source order is claimed. CP101 separately types the following complex-fenestration request family, while representative-surface mutation, completeness warnings, pair lookup, schedule sampling, solar replacement, runtime, reporting, and conformance remain deferred; every definition run-blocks and no graph edge is added |
-| `ComplexFenestrationProperty:SolarAbsorbedLayers` second-phase `FenestrationSolarAbsorbed::{Name, SurfPtr, ConstrPtr, NumOfSched, scheds}` request state | `TypedModel::fenestration_solar_absorbed_requests`, `ep_model::FenestrationSolarAbsorbedRequestId`, and `ep_model::FenestrationSolarAbsorbedRequest` | each dense request retains a normalized semantic name without a name map, unresolved normalized fenestration target, typed complex-fenestration ConstructionId, and outside-to-inside ScheduleIds whose count exactly matches `complex_fenestration.optical_layers`. Duplicate names remain valid and duplicate target/construction pairs fail closed because no source order is claimed. Source `NumAlpha`/trailing-blank positional parity, source indexing defects, fenestration binding, completeness warnings, pair lookup, schedule sampling and value/type limits, BSDF layer absorption, runtime, reporting, and conformance remain deferred; every request run-blocks and no graph edge is added |
+| `SurfaceProperty:SolarIncidentInside` first-phase `SurfaceSolarIncident::{Name, SurfPtr, ConstrPtr, sched}` state | `TypedModel::surface_solar_incidents`, `ep_model::SurfaceSolarIncidentId`, and `ep_model::SurfaceSolarIncident` | each dense record retains a normalized semantic name without a name map plus one typed detailed-opaque SurfaceId, any typed ConstructionId, and required ScheduleId. Duplicate names and construction-mismatched surface pairs remain valid, repeated resolved pairs fail closed, and no source order is claimed. CP101 separately types the following complex-fenestration request family, while representative-surface mutation, full completeness, pair lookup, schedule sampling, solar replacement, runtime, reporting, and conformance remain deferred. CP102 only emits a nonblocking monotonic warning when the retained typed opaque subset is already mixed by exact current-construction pair matching; every definition run-blocks and no graph edge is added |
+| `ComplexFenestrationProperty:SolarAbsorbedLayers` second-phase `FenestrationSolarAbsorbed::{Name, SurfPtr, ConstrPtr, NumOfSched, scheds}` request state | `TypedModel::fenestration_solar_absorbed_requests`, `ep_model::FenestrationSolarAbsorbedRequestId`, and `ep_model::FenestrationSolarAbsorbedRequest` | each dense request retains a normalized semantic name without a name map, unresolved normalized fenestration target, typed complex-fenestration ConstructionId, and outside-to-inside ScheduleIds whose count exactly matches `complex_fenestration.optical_layers`. Duplicate names remain valid and duplicate target/construction pairs fail closed because no source order is claimed. Source `NumAlpha`/trailing-blank positional parity, source indexing defects, fenestration binding, full completeness, pair lookup, schedule sampling and value/type limits, BSDF layer absorption, runtime, reporting, and conformance remain deferred; every request run-blocks and no graph edge is added |
+| `CheckScheduledSurfaceGains` per-Zone `ZoneScheduled`/`ZoneUnscheduled` diagnostic state | `Compiler::check_scheduled_surface_gains_typed_subset` and compile warnings only | after error-free final Space assignment, a Zone warns nonblockingly only when retained typed detailed opaque surfaces already include both an exact current SurfaceId/ConstructionId pair match and a miss; only known misses are named. Empty, all-matched, and all-unmatched subsets are silent. No model state is added; full surface completeness, windows, other surface families, active constructions, pair lookups, exact diagnostics, and runtime remain deferred |
 | `DataSurfaces::FrameDividerProperties` | `ep_model::WindowFrameAndDivider`, `ep_model::WindowFrameProperties`, `ep_model::WindowDividerProperties`, `ep_model::WindowRevealProperties` | complete bounded immutable user-input descriptors and an independent normalized namespace are typed; fenestration binding, geometry, WINDOW 5 synthesis, shading mutation, window physics, NFRC calculations, reporting, and runtime remain blocked |
 | `Construction::ConstructionProps::{Name, TotLayers, LayerPoint, isTCWindow, isTCMaster, TCMasterMatNum, TCLayerNum, TCGlassNum}` and construction/material CTF data | `ep_model::Construction`, optional immutable thermochromic master metadata, `ep_model::ModelGraph::construction_materials`, checked runtime direct-index construction/material lookup, and `ep_runtime::SurfaceCtfState` | ordinary input layers resolve into a bounded opaque/fenestration construction; every thermochromic parent contributes its first glazing state to the effective stack and only the final parent owns zero-based master metadata, while a sole SimpleGlazingSystem layer retains its original material identity and Fenestration kind. Graph edges follow the effective or retained IDs. The opaque runtime cache, static Regular/AirGap/IRT EIO evidence, diagnostic steady/no-mass coefficient seeding, and CTF histories do not enable thermochromic/window execution, multi-layer SimpleGlazing quirks, child construction generation, mass-material coefficient generation, or broad face-temperature solving |
 | F/C-factor construction flags, source dimensions/factors, `NominalR`, and generated material layer points | `ep_model::ConstructionGroundFactor`, private generated entries in `TypedModel::materials`, and `ModelGraph::construction_materials` | exact bounded generation formulas, ordinary-then-F-then-C ordering, private names, raw ordinals, and two graph edges are retained; surface pairing, ground temperatures, CTF/runtime, reporting, and public attachment targeting remain blocked |
