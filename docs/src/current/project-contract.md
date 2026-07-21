@@ -82,6 +82,16 @@ a limited outside-balance closure, remain intentionally absent from the
 surface algorithm's target list, and do not implement or promote the complete
 source routine, state, lifecycle, output, or numerical behavior.
 
+The inventory now also includes `calc_heat_balance_outside_surf` immediately
+after `init_surface_heat_balance`. Its EnergyPlus boundary is the unconditional
+parent line-168 `CalcHeatBalanceOutsideSurf(state)` call, which omits the
+optional zone-resimulation argument, and the implementation at lines
+6951-7721. It remains `source_mapped` and required. Existing Rust
+`calc_heat_balance_outside_surf_stage` metadata, the identity wrapper, and
+bounded retained opaque CTF/environmental balance and report terms do not
+implement or promote the complete Zone/Space/Surface traversal, exterior
+boundary switch, child-call order, state, error behavior, or numerics.
+
 The canonical time-domain inventory includes `get_project_data`,
 `process_schedule_input`, `process_interval_fields`,
 `day_schedule_populate_from_minute_vals`, and
