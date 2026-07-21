@@ -56,6 +56,7 @@ required_routines = [
   "calc_heat_balance_outside_surf",
   "get_qdot_conv_out_per_area",
   "calc_heat_balance_inside_surf",
+  "sum_surf_qdot_rad_hvac",
   "calc_heat_balance_inside_surf_2",
   "calc_heat_balance_inside_surf_2_ctf_only",
   "calculate_zone_mrt",

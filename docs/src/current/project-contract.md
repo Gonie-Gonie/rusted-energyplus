@@ -256,14 +256,17 @@ complete parent traversal and skips, caller-owned store, or failure/re-entry
 lifecycle, so no support or conformance promotion follows.
 
 The inventory now also includes `calc_heat_balance_inside_surf` immediately
-after `get_qdot_conv_out_per_area` and before the separately mapped general
+after `get_qdot_conv_out_per_area` and before the CP173-mapped aggregation
+helper, which in turn precedes the separately mapped general
 `calc_heat_balance_inside_surf_2` child. Its EnergyPlus boundary is the
 unconditional parent line-172 `CalcHeatBalanceInsideSurf(state)` call, which
 omits the optional Zone-resimulation argument, and the canonical wrapper at
 lines 7738-7813. It remains `source_mapped` and required. That wrapper owns
-first-call and BeginEnvrn lifecycle, radiant-HVAC aggregation, complete versus
-partial and AllCTF versus general dispatch, MRT calculation, and intermediate
-result updates. CP172 now owns the complete general iteration and its
+first-call and BeginEnvrn lifecycle, the CP173-mapped radiant-HVAC aggregation
+call, complete versus partial and AllCTF versus general dispatch, MRT
+calculation, and intermediate result updates. CP173 now owns the helper's
+complete global-list aggregation and failure/re-entry boundary; CP172 owns the
+complete general iteration and its
 surface/window/moisture/Kiva topology, non-local partial-resimulation effects,
 errors, and failure/re-entry behavior; the pass-by-value warmup-counter
 reachability boundary remains shared with the distinct optimized child.
@@ -272,8 +275,35 @@ surface passes, and the separate child mappings do not implement or promote
 this complete canonical wrapper, state, lifecycle, dispatch, error behavior,
 or numerics.
 
-The required inventory places `calc_heat_balance_inside_surf_2` immediately
-after `calc_heat_balance_inside_surf` and before the distinct optimized
+The required inventory now places `sum_surf_qdot_rad_hvac` immediately after
+`calc_heat_balance_inside_surf` and before
+`calc_heat_balance_inside_surf_2`, matching its wrapper execution before any
+full, optimized, or partial solve dispatch. Its EnergyPlus boundary is the
+header declaration at line 171, body at source lines 9277-9285, and sole
+production call at wrapper line 7788. Every call traverses the complete raw
+`allGetsRadiantHeatSurfaceList`, including optional-Zone resimulation, and
+overwrites each listed `SurfQdotRadHVACInPerArea` with the exact
+left-associated high-temperature radiant, hot-water baseboard, steam
+baseboard, electric baseboard, and cooling-panel component sum. The five input
+paths append without deduplication: an empty list and unlisted targets preserve
+stale values, while duplicate entries repeat the overwrite rather than adding
+the target again. All five literal wrapper calls in `HeatBalanceSurfaceManager.unit.cc` leave the
+list default-empty and therefore exercise only CP173's no-op path. Four
+`SizingManager.unit.cc` fixtures beginning at lines 2465, 2929, 3393, and 3818
+include electric radiant baseboard input, populate the list, and indirectly
+execute CP173 through `ManageSimulation`, but assert only downstream sizing.
+No test calls CP173 directly, observes the aggregate, or isolates arithmetic,
+order, duplicates, failure, or lifecycle. Raw indices, IEEE arithmetic, source lookup,
+right-hand-side completion, later target lookup, failure prefixes, and retry
+remain unchecked with no rollback. Failure at wrapper line 7788 blocks solver
+dispatch, MRT, and intermediate results while already-cleared first-time or
+BeginEnvironment flags can persist into parent retry. Rust has the bounded
+`inside_radiant_hvac_w_per_m2` destination and consumers but no matching
+five-source producer or global list lifecycle, so no support or conformance
+promotion follows.
+
+The required inventory places `calc_heat_balance_inside_surf_2` after
+`sum_surf_qdot_rad_hvac` and before the distinct optimized
 `calc_heat_balance_inside_surf_2_ctf_only`. Its EnergyPlus boundary is the
 header declaration at lines 179-184, body at source lines 7815-8656, and the
 wrapper's only two general calls at lines 7797 and 7809. An absent optional
