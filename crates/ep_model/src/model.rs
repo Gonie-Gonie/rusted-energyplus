@@ -2037,6 +2037,7 @@ mod tests {
             wind_exposure: WindExposure::WindExposed,
             view_factor_to_ground: AutoOrNumber::AutoCalculate,
             vertices: Vec::new(),
+            computed_geometry: None,
         });
 
         let graph = ModelGraph::from_typed(&model);

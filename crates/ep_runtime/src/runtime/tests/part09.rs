@@ -328,6 +328,7 @@
             wind_exposure: ep_model::WindExposure::WindExposed,
             view_factor_to_ground: AutoOrNumber::AutoCalculate,
             vertices: vertices.to_vec(),
+            computed_geometry: None,
         }
     }
 
@@ -351,6 +352,7 @@
             wind_exposure: ep_model::WindExposure::NoWind,
             view_factor_to_ground: AutoOrNumber::AutoCalculate,
             vertices: vertices.to_vec(),
+            computed_geometry: None,
         }
     }
 

@@ -37,6 +37,7 @@ claim.
 | surface heat balance | `src/EnergyPlus/HeatBalanceSurfaceManager.cc` | `ep_runtime::surface_balance` |
 | surface heat-balance declarations | `src/EnergyPlus/HeatBalanceSurfaceManager.hh` | `ep_runtime::surface_balance` |
 | surface/material selection state | `src/EnergyPlus/DataSurfaces.cc::GetVariableAbsorptanceSurfaceList` | `ep_model::VariableAbsorptanceSurfaceBinding`, `ep_compiler` |
+| per-Surface computed geometry | `src/EnergyPlus/DataSurfaces.cc::SurfaceData::set_computed_geometry` | `ep_model::SurfaceComputedGeometry`, `ep_compiler` |
 | incident-solar multiplier request front end | `src/EnergyPlus/HeatBalanceManager.cc::GetIncidentSolarMultiplier` | `ep_model::SurfaceIncidentSolarMultiplierRequest`, `ep_compiler` |
 | scheduled inside-solar input first phase | `src/EnergyPlus/HeatBalanceManager.cc::GetScheduledSurfaceGains` | `ep_model::SurfaceSolarIncident`, `ep_compiler` |
 | scheduled complex-fenestration layer input second phase | `src/EnergyPlus/HeatBalanceManager.cc::GetScheduledSurfaceGains` | `ep_model::FenestrationSolarAbsorbedRequest`, `ep_compiler` |
@@ -70,6 +71,7 @@ claim.
 | conditional Kiva instance setup | `if (AnyKiva) kivaManager.setupKivaInstances(state)` at `HeatBalanceManager.cc` lines 322-325 | CP108 source-maps the conditional call and its ignored boolean result only; it is not required for the full domain and has no Rust target. Foundation input, geometry, instance ownership, weather/ground algorithms, diagnostics, outputs, runtime, and conformance remain deferred. |
 | sizing Space heat-balance mode override | inline `if (DoingSizing) doSpaceHeatBalance = doSpaceHeatBalanceSizing` at `ManageHeatBalance` lines 169-171 after `GetHeatBalanceInput` returns | CP109 maps and defers this caller branch without a synthetic routine or Rust helper. Input ownership, the sizing lifecycle, mutable mode/flag state, Space heat-balance consumers, and runtime remain unclaimed. |
 | conditional Surface octree initialization | nested `TotSurfaces >= 100` and raw `Daylighting:Controls` count guards at `ManageHeatBalance` lines 173-180, then `SurfaceOctreeCube::init` | CP110 source-maps the complete-Surface call and octree structure only; it is not required for the full domain and has no Rust target. Complete surface identity/order, daylighting typing, mutable transparency, traversal, computed geometry, runtime, performance, and conformance remain deferred. |
+| bounded per-Surface computed geometry | complete global Surface loop at `ManageHeatBalance` lines 182-184, then `SurfaceData::set_computed_geometry` | CP111 state-maps an error-free retained `BuildingSurface:Detailed` subset through `Compiler::set_bounded_surface_computed_geometry`: finite, coplanar, nondegenerate Triangles and conservative source-recognized Rectangles only. Derived shape category, Newell plane, axis projection, bounds, wrap edges, and rectangle side squares attach to each retained Surface without adding identity, count, graph, support, runtime, or conformance claims. |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
 | inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
@@ -84,7 +86,7 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171 and conditionally initializes the Surface octree at lines 173-180. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, and CP110 source-maps only the guarded `SurfaceOctreeCube::init`; the complete Surface `set_computed_geometry` loop is the next CP111 checkpoint
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, and CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry; the line-186 one-time flag clear is the next CP112 checkpoint
 3. `InitHeatBalance`
 4. outside opaque surface balance
 5. inside opaque surface balance
@@ -1371,8 +1373,9 @@ true. CP107 maps the first call as described below, and CP108 source-maps the
 conditional Kiva call. After `GetHeatBalanceInput` returns, the caller's
 `DoingSizing` assignment from `doSpaceHeatBalanceSizing` into
 `doSpaceHeatBalance` is mapped/deferred by CP109. CP110 source-maps the
-following conditional surface-octree initialization; the complete Surface
-computed-geometry loop is next.
+following conditional surface-octree initialization. CP111 then state-maps a
+bounded retained detailed-opaque slice of the complete Surface
+computed-geometry loop; the one-time input-flag clear is next.
 
 ### CP107 bounded internal-gain input map
 
@@ -1487,7 +1490,8 @@ On return from `GetHeatBalanceInput`, `ManageHeatBalance` next conditionally
 copies `doSpaceHeatBalanceSizing` into `doSpaceHeatBalance` when `DoingSizing`
 is true. CP109 maps that inline sizing override below without inventing a
 routine row. CP110 source-maps the following conditional surface-octree
-initialization; the complete Surface computed-geometry loop is next.
+initialization, and CP111 state-maps the following bounded computed-geometry
+slice. The one-time input-flag clear is next.
 
 ### CP109 inline sizing Space heat-balance mode map
 
@@ -1505,7 +1509,8 @@ true during the sizing assignment, the following conditional surface-octree
 setup, and the complete Surface `set_computed_geometry` loop; EnergyPlus clears
 it only later at line 186. CP109 does not map that clear, persistence across
 calls, or re-entry behavior. CP110 maps the conditional surface-octree call
-below; computed geometry is the next source-order checkpoint.
+below, and CP111 maps the bounded computed-geometry slice after it; the flag
+clear remains the next source-order checkpoint.
 
 `doSpaceHeatBalanceSizing` originates in `GetProjectControlData`, where
 `ZoneAirHeatBalanceAlgorithm` alpha field 2 selects Space heat balance during
@@ -1549,13 +1554,121 @@ or generated surfaces; `Daylighting:Controls` typing or semantics; transparent
 surface schedules or EMS/plugin mutation of transparency; octree ownership,
 clear/rebuild timing, pointer/reference validity, or repeated calls; traversal,
 line/cube or ray/surface intersections, obstruction queries, or
-`PierceSurface`; the following `set_computed_geometry` loop; daylighting,
+`PierceSurface`; complete computed geometry outside the following bounded
+CP111 slice; daylighting,
 shading, reflection, or solar algorithms; runtime numerical behavior,
 performance/scaling, or conformance. Existing daylighting run-blocking and
 typed opaque detailed surfaces do not promote the complete guards or octree,
 and CP110 adds no object support, identity, graph edge, capability, runtime
-admission, manifest, comparator, or proof variable. The complete Surface
-computed-geometry loop is the next CP111 checkpoint.
+admission, manifest, comparator, or proof variable. CP111 state-maps the next
+bounded computed-geometry slice below; the line-186 flag clear remains next.
+
+### CP111 bounded per-Surface computed geometry map
+
+Immediately after the conditional octree block, `ManageHeatBalance` lines
+182-184 visits the complete mutable source Surface array in its current order
+and calls `SurfaceData::set_computed_geometry` for every entry. The source
+method skips surfaces with fewer than three vertices; for every other entry it
+sets `shapeCat`, then the Newell `plane`, then `surface2d` in that order.
+EnergyPlus clears `ManageHeatBalanceGetInputFlag` only after this loop at line
+186. CP111 state-maps the bounded computation; that flag clear is the next
+CP112 checkpoint.
+
+Bounded Rust invokes
+`Compiler::set_bounded_surface_computed_geometry` after the CP107 internal-gain
+input slice, with the intervening CP108 Kiva, CP109 sizing-mode, and CP110
+octree checkpoints remaining mapped or deferred. Any compile Error already
+present on entry suppresses the entire pass, matching the source fact that the
+earlier `GetHeatBalanceInput` fatal barrier prevents this caller loop from
+being reached. Otherwise each retained `BuildingSurface:Detailed` is handled
+independently and receives derived state only for a finite, coplanar,
+nondegenerate three-vertex Triangle or a four-vertex Rectangle that also
+passes the conservative source predicate. An excluded surface remains
+`computed_geometry = None` without a new diagnostic and does not suppress
+eligible later surfaces.
+
+The input vertices are the already canonicalized world vertices stored on the
+typed Surface. `SurfaceGeometry.cc::GetVertices` world-coordinate assignment,
+`ProcessSurfaceVertices` shape assignment, and
+`SurfaceGeometry.cc::isRectangle` are source dependencies, not separately
+promoted routines. Rust preserves the source diagonal-difference threshold
+`abs(d1 - d2) < 0.020` and inclusive adjacent-unit-edge test
+`abs(dot) <= cos(89 degrees)`, while additionally requiring every wrap edge to
+have positive finite length. It requires a finite nonzero Newell normal, a
+finite nonzero projected signed area, and conservative coplanarity at distance
+`1.0e-9 * max(1, max(abs(world coordinate)))`. These extra rejection gates
+avoid publishing source-looking state without the omitted upstream geometry
+validation and recovery lifecycle.
+
+For each admitted surface, the Newell coefficients follow source vertex and
+wrap order, and `d` uses the accumulated vertex center divided by the vertex
+count; the plane is not normalized. The projection removes the largest
+absolute normal component, with X winning any tie that includes X and Y
+winning the remaining Y/Z tie. X projects `(y,z)`, Y projects `(x,z)`, and Z
+projects `(x,y)`. Bounds span the projected input vertices. A negative
+twice-signed area reverses only projected vertices 2 through N, retaining the
+first vertex; wrap edges are then formed from that stored order. Triangles
+retain zero rectangle side squares, while Rectangles store the squared lengths
+of projected edges 1 and 4 in the source-shaped side-1 and side-3 fields.
+
+The complete result attaches to `Surface::computed_geometry` as
+`Option<SurfaceComputedGeometry>`. It retains `SurfaceShapeCategory`, the
+four-coefficient `plane`, `SurfaceProjectionAxis`, projected vertices/bounds
+and wrap edges as `SurfaceProjectedPoint`, and
+`rectangle_side_1_squared_m2`/`rectangle_side_3_squared_m2`. This is derived
+Surface state only: no object identity, name map, public object count, model
+graph edge, capability, support-gate admission, runtime consumer, comparator,
+proof variable, numerical-conformance claim, or external result is added.
+
+Complete Surface array identity/order and all omitted or generated families;
+fenestration, shading, InternalMass, and other no-vertex surfaces; source
+Convex/Nonconvex category and `IsConvex`; nonrectangular quadrilaterals,
+polygons, slab construction, and the `n >= 20` path; full `GetVertices`,
+`CheckConvexity`, collinear/coincident deletion, planarity diagnostics,
+`ProcessSurfaceVertices`, and `isRectangle` recovery semantics; exact source
+partial mutation/default state; octree, `PierceSurface`, intersection and all
+other consumers; runtime numerics, performance, reporting, and conformance
+remain deferred.
+
+### `set_computed_geometry` state contract
+
+<!-- routine-state-contract:v1 begin set_computed_geometry -->
+set_computed_geometry
+
+read_state:
+- the complete source loop at `ManageHeatBalance` lines 182-184, after sizing-mode and octree work but before the line-186 one-time flag clear; bounded Rust invokes `Compiler::set_bounded_surface_computed_geometry` after the CP107 executable slice while CP108-CP110 remain mapped or deferred, and returns without mutation when any compile Error already exists
+- every retained typed `BuildingSurface:Detailed` Surface in dense typed order, reading only its already canonicalized world-coordinate `Point3` vertices; source `SurfaceGeometry.cc::GetVertices` world-coordinate assignment plus `ProcessSurfaceVertices` shape assignment and `isRectangle` are dependencies rather than promoted routines
+- a positive-only candidate gate accepting exactly three or four vertices, all finite; a finite nonzero source-ordered Newell normal and finite plane; finite nonzero projected twice-signed area; and conservative coplanarity whose point-to-plane distance is at most `1.0e-9 * max(1, max(abs(world coordinate)))`
+- for four-vertex candidates only, positive finite length for every wrap edge, source diagonal lengths 1-3 and 2-4 differing by strictly less than 0.020 m, and the absolute dot product of normalized source edges 3-2 and 2-1 no greater than `cos(89 degrees)`; three-vertex candidates map directly to `SurfaceShapeCategory::Triangular`, while admitted four-vertex candidates map to `Rectangular`
+- source-ordered Newell accumulation without normal normalization; projection-axis selection from the largest absolute plane-normal component with X-over-all and then Y-over-Z tie precedence; X-to-(y,z), Y-to-(x,z), or Z-to-(x,y) projection; projected bounds; strict negative-area reversal of vertices 2 through N only; then wrap-edge construction and Rectangle-only projected edge-1/edge-4 squared lengths
+
+write_state:
+- each admitted Surface receives `Some(SurfaceComputedGeometry)` containing its `SurfaceShapeCategory`, source-shaped four-element plane, `SurfaceProjectionAxis`, ordered `projected_vertices`, `projected_lower_bound`, `projected_upper_bound`, ordered `projected_edges`, and `rectangle_side_1_squared_m2` plus `rectangle_side_3_squared_m2`
+- a negative projected signed area reverses only the copied projected tail before edges are written and never mutates the source 3D vertices or plane orientation; a Triangle stores exact zero for both rectangle side-square fields
+- every excluded retained Surface receives `computed_geometry = None` without a diagnostic, identity, name-map entry, object-count increment, graph edge, support/capability change, manifest, comparator, proof variable, or runtime state; exclusion of one Surface does not suppress eligible later entries
+
+history_state_ownership:
+- `TypedModel::surfaces` owns immutable compile-time derived `Surface::computed_geometry` attachments only; CP111 allocates no mutable source input flag, octree pointer, intersection cache, Surface history, timestep state, reporting state, or runtime geometry consumer
+
+unsupported_state:
+- the complete EnergyPlus Surface array and its source order, all generated/opposite surfaces, FenestrationSurface:Detailed, shading, InternalMass, doors/windows, overhangs/fins, and every other omitted Surface family or source shape
+- source `Shape`, `IsConvex`, Convex and Nonconvex categories, nonrectangular quadrilaterals, polygons, `Surface2DSlab`, unique slab-Y state, inverse edge slopes, and the convex `n >= 20` slab switch
+- complete `GetVertices` canonicalization and recovery, `CheckConvexity`, coincident/collinear deletion, planarity checking and diagnostics, `ProcessSurfaceVertices`, full `isRectangle` lifecycle, source partial writes/default objects, one-time flag ownership and clearing, octree/PierceSurface/intersection consumers, runtime, reporting, performance, and numerical conformance
+
+inactive_branches:
+- any compile Error present on pass entry preserves the pre-pass computed-geometry state for every retained Surface and emits no CP111 diagnostic
+- an empty Surface arena is a no-op; a retained Surface with a vertex count other than three or four, any nonfinite or overflow-derived value, a zero Newell normal or signed projected area, conservative noncoplanarity, or a rejected four-vertex rectangle remains `None` and does not affect another Surface
+- strict source boundaries are retained for rectangle diagonal difference below 0.020 m, the inclusive cosine threshold, X-then-Y projection ties, and signed-area reversal only below zero; no tolerance is added to those branch comparisons beyond the separately declared conservative coplanarity gate
+
+unsupported_active_branches:
+- valid computed geometry remains metadata only and grants no new object support, runtime admission, daylighting, shading, solar, octree, ray-intersection, or heat-balance behavior
+- a four-vertex input that source local `isRectangle` could accept only through zero-vector normalization is deliberately rejected, as are finite source inputs whose derived state overflows or whose missing upstream validation cannot be conservatively established
+- typed Surface order is preserved for the bounded pass, but this does not claim complete global Surface count/order, generated-family placement, source reordering, or exact loop side effects outside the retained arena
+
+not_claimed_branches:
+- complete `SurfaceData::set_computed_geometry`, `computed_shapeCat`, `computed_plane`, `computed_surface2d`, `Surface2D` construction, `GetVertices`, `ProcessSurfaceVertices`, `CheckConvexity`, or `isRectangle` parity; source invalid-input recovery, partial mutation/default retention, exact diagnostic text/severity/order/multiplicity, or one-time flag clearing and re-entry
+- Convex/Nonconvex and slab state, complete Surface families/order, octree/PierceSurface and every computed-geometry consumer, exact cross-language floating-point behavior, runtime numerical behavior or performance, output/report serialization, capability/support expansion, conformance cases, or numerical conformance
+<!-- routine-state-contract:v1 end set_computed_geometry -->
 
 ### `CheckValidSimulationObjects` state contract
 

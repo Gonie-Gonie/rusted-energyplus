@@ -110,6 +110,58 @@ pub enum WindExposure {
     WindExposed,
 }
 
+/// Source-recognized shape category for bounded computed surface geometry.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum SurfaceShapeCategory {
+    /// Three-vertex surface.
+    Triangular,
+    /// Four-vertex surface admitted by the bounded rectangle predicate.
+    Rectangular,
+}
+
+/// Axis removed when projecting surface vertices into two dimensions.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum SurfaceProjectionAxis {
+    /// Remove X and retain Y/Z coordinates.
+    X,
+    /// Remove Y and retain X/Z coordinates.
+    Y,
+    /// Remove Z and retain X/Y coordinates.
+    Z,
+}
+
+/// Point or vector in the source-shaped two-dimensional surface projection.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct SurfaceProjectedPoint {
+    /// First projected coordinate in meters.
+    pub x_m: f64,
+    /// Second projected coordinate in meters.
+    pub y_m: f64,
+}
+
+/// Immutable geometry derived from one admitted detailed surface.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SurfaceComputedGeometry {
+    /// Source-recognized bounded shape category.
+    pub shape_category: SurfaceShapeCategory,
+    /// Unnormalized Newell plane coefficients `[a, b, c, d]`.
+    pub plane: [f64; 4],
+    /// Axis removed from the three-dimensional vertices.
+    pub projection_axis: SurfaceProjectionAxis,
+    /// Counter-clockwise projected vertices; only vertices 2 through N may be reversed.
+    pub projected_vertices: Vec<SurfaceProjectedPoint>,
+    /// Lower corner of the projected bounding box.
+    pub projected_lower_bound: SurfaceProjectedPoint,
+    /// Upper corner of the projected bounding box.
+    pub projected_upper_bound: SurfaceProjectedPoint,
+    /// Wraparound edge vectors in projected-vertex order.
+    pub projected_edges: Vec<SurfaceProjectedPoint>,
+    /// Squared first-side length for rectangles, or zero for triangles.
+    pub rectangle_side_1_squared_m2: f64,
+    /// Squared fourth-side length for rectangles, or zero for triangles.
+    pub rectangle_side_3_squared_m2: f64,
+}
+
 /// Detailed building surface.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Surface {
@@ -137,4 +189,9 @@ pub struct Surface {
     pub view_factor_to_ground: AutoOrNumber,
     /// Surface vertices.
     pub vertices: Vec<Point3>,
+    /// Bounded source-order computed geometry, when the surface is admitted.
+    ///
+    /// This derived attachment is not a typed input object and does not change
+    /// object identity, object counts, or model-graph edges.
+    pub computed_geometry: Option<SurfaceComputedGeometry>,
 }

@@ -1026,6 +1026,7 @@ mod tests {
                     z_m: 0.0,
                 },
             ],
+            computed_geometry: None,
         });
         let model = SimulationModel::from_typed(typed);
 

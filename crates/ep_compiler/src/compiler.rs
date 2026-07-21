@@ -9,6 +9,7 @@ mod fenestration_solar_absorbed;
 mod internal_heat_gains;
 mod scheduled_surface_gains_check;
 mod space;
+mod surface_computed_geometry;
 mod surface_incident_solar_multiplier;
 mod surface_solar_incident;
 mod surface_space;
@@ -715,6 +716,10 @@ impl<'a> Compiler<'a> {
         self.check_valid_simulation_objects_bounded(&model);
         self.collect_known_construction_use_evidence(&mut model);
         self.parse_bounded_internal_heat_gains_input(&mut model);
+        // Source-order barriers CP108 (conditional Kiva setup), CP109 (sizing
+        // mode override), and CP110 (conditional surface octree initialization)
+        // remain source-mapped or deferred in this bounded compiler.
+        self.set_bounded_surface_computed_geometry(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
         self.parse_zone_humidistats(&mut model);
@@ -13991,6 +13996,7 @@ impl<'a> Compiler<'a> {
                     "Autocalculate",
                 ),
                 vertices,
+                computed_geometry: None,
             });
             explicit_space_assignments.push((id, explicitly_assigned));
         }
@@ -17614,6 +17620,7 @@ mod tests {
     mod schedule_year;
     mod scheduled_surface_gains_check;
     mod space;
+    mod surface_computed_geometry;
     mod surface_incident_solar_multiplier;
     mod surface_properties_vapor_coefficients;
     mod surface_solar_incident;
