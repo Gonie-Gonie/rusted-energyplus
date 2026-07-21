@@ -50,6 +50,7 @@ required_routines = [
   "update_thermal_histories",
   "report_surface_heat_balance",
   "rec_keep_heat_balance",
+  "report_heat_balance",
 ]
 
 [[domain_claim]]

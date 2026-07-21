@@ -169,6 +169,20 @@ It remains `source_mapped` and required. Existing Rust
 scaffolding only and do not implement or promote the complete state,
 lifecycle, reporting, or window-history behavior.
 
+The canonical heat-balance inventory now also includes
+`report_heat_balance`, immediately after `rec_keep_heat_balance` and before
+the post-reporting EMS calling point. Its EnergyPlus boundary is the
+unconditional parent line-217 `ReportHeatBalance(state)` call and the
+implementation at lines 3321-3418. Schedule reporting always runs first; the
+remaining work selects the normal non-warmup output path, the requested
+warmup-reporting path, the external-interface warmup fallback, or no further
+reporting. The entered paths own Zone-step output, conditional node and HVAC
+sizing-log updates, and, only on the normal path, tabular and utility reports.
+It remains `source_mapped` and required. Existing Rust report-stage,
+composite-plan, prebinding, and bounded result-store metadata are scaffolding
+only and do not implement or promote the complete source branching, output
+state, dependencies, failure behavior, or numerics.
+
 The canonical time-domain inventory includes `get_project_data`,
 `process_schedule_input`, `process_interval_fields`,
 `day_schedule_populate_from_minute_vals`, and
