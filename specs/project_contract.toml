@@ -54,6 +54,7 @@ required_routines = [
   "compute_int_sw_absorp_factors",
   "compute_dif_sol_exc_zones_wiz_windows",
   "calc_heat_balance_outside_surf",
+  "calc_outside_surf_temp",
   "get_qdot_conv_out_per_area",
   "calc_heat_balance_inside_surf",
   "sum_surf_qdot_rad_hvac",

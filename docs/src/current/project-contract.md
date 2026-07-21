@@ -238,9 +238,40 @@ bounded retained opaque CTF/environmental balance and report terms do not
 implement or promote the complete Zone/Space/Surface traversal, exterior
 boundary switch, child-call order, state, error behavior, or numerics.
 
-The required inventory now also places `get_qdot_conv_out_per_area`
-immediately after `calc_heat_balance_outside_surf` and before
-`calc_heat_balance_inside_surf`. Its EnergyPlus boundary is the declaration at
+The required inventory now places `calc_outside_surf_temp` after
+`calc_heat_balance_outside_surf` and before `get_qdot_conv_out_per_area`,
+matching its nesting in three exterior CTF/EMPD-or-TDD routes before the
+parent common-tail convection store. Its EnergyPlus boundary is the
+declaration at `HeatBalanceSurfaceManager.hh` lines 195-202, implementation
+at `HeatBalanceSurfaceManager.cc` lines 9470-9763, and direct production
+calls at lines 7355, 7419, and 7626. The parent retains complete and
+optional-Zone traversal, boundary/algorithm gates, arguments, and the
+immediate fatal check; CP175 owns the outside-temperature equations,
+radiant-report write, source coefficients, and delayed ErrorFlag behavior.
+
+CP175 preserves strict positive movable-insulation and strict
+`CTFCross[0] > 0.01` quick-conduction decisions, surrounding-schedule then
+ground-property temperature precedence, TDD coupling, no-OSCM and OSCM
+slow/quick equations, and movable-insulation equations. A nonzero raw OSCM
+pointer is indexed, the quick no-OSCM source branch omits the inside source
+term, and the radiant-system divisor duplicates the surrounding coefficient.
+Invalid source-plus-movable state commits outside history and radiation
+reporting before four diagnostics, the final true flag, and a parent fatal
+before CP171. Successful calls preserve a preexisting true flag, non-source
+calls preserve old radiant coefficients, and no rollback repairs partial
+writes.
+
+The sole direct fixture proves only the invalid movable/source diagnostic
+path. Four direct CTF parent fixtures execute CP175 incidentally without
+isolating its outputs; a CondFD parent fixture skips it. Rust’s bounded
+exterior CTF helpers do not cover the complete topology, branch set,
+ownership, ErrorFlag/fatal order, or failure/re-entry semantics, so
+`calc_outside_surf_temp` remains required and `source_mapped` without support
+or conformance promotion.
+
+The required inventory now also places `get_qdot_conv_out_per_area` after
+`calc_outside_surf_temp` and before `calc_heat_balance_inside_surf`.
+Its EnergyPlus boundary is the declaration at
 `HeatBalanceSurfaceManager.hh` line 173, the implementation at
 `HeatBalanceSurfaceManager.cc` lines 7723-7736, and the sole production call on
 the right-hand side of the common-tail assignment in
