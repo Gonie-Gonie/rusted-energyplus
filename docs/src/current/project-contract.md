@@ -183,6 +183,19 @@ composite-plan, prebinding, and bounded result-store metadata are scaffolding
 only and do not implement or promote the complete source branching, output
 state, dependencies, failure behavior, or numerics.
 
+The canonical heat-balance inventory now also includes
+`check_warmup_convergence`, after `report_heat_balance` and the intervening
+non-required EMS, EMS-trend, and plugin-history checkpoints. Its EnergyPlus
+boundary is the `WarmupFlag && EndDayFlag` outer guard at
+`HeatBalanceManager.cc` lines 224-226 and the required
+`CheckWarmupConvergence` body at lines 3059-3226, declared at header line 136.
+It remains `source_mapped` and required. Existing Rust source-order metadata
+and its separate temperature-only diagnostic warmup loop do not implement or
+promote the canonical four-test Zone state, load normalization, lifecycle,
+diagnostics, latches, maximum-day behavior, or parent gating. The inner
+`!WarmupFlag` branch and `DayOfSim`/`DayOfSimChr` resets at lines 227-229 are
+reserved for CP143.
+
 The canonical time-domain inventory includes `get_project_data`,
 `process_schedule_input`, `process_interval_fields`,
 `day_schedule_populate_from_minute_vals`, and

@@ -51,6 +51,7 @@ required_routines = [
   "report_surface_heat_balance",
   "rec_keep_heat_balance",
   "report_heat_balance",
+  "check_warmup_convergence",
 ]
 
 [[domain_claim]]
