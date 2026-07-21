@@ -67,6 +67,7 @@ claim.
 | solar enclosure view-factor initialization | `HeatBalanceIntRadExchange::InitSolarViewFactors` at the parent call on `HeatBalanceManager.cc` line 316 | source-mapped and required for the full domain. It depends on the `ViewFactorInfo` report option and EIO/debug writers, aligned user view factors, complete Solar enclosure and Space heat-transfer-surface lists, AirBoundary merging/exclusion, Surface pointers and global report order, area/azimuth/tilt/inside-solar-absorptance state, zero- and one-surface branches, approximate or user matrices, InternalMass detection, `FixViewFactors`, and warning/fatal/report side effects. Existing Rust approximate/fix helpers and 1Zone EIO evidence do not promote this routine. |
 | internal-gain manager | `ManageInternalHeatGains(state, true)` at the parent call on `HeatBalanceManager.cc` line 320 | source-mapped and required for the full domain. CP107 does not implement the persistent one-time input flag, general `InitOnly` behavior, the non-init recurring branches, full internal-gain input, daylighting/reporting setup, or runtime gain updates. |
 | bounded internal-gain input | `GetInternalHeatGainsInput` reached by the init-only manager call | CP107 state-maps only the direct-Zone People then OtherEquipment family slice. The wrapper returns on a pre-existing Error, but a People diagnostic created inside the pass does not prevent the OtherEquipment scan. The existing typed arenas and name maps are the only mapped state; all other families, target expansion, derived occupant/design-level state, reporting, runtime, and conformance remain deferred. |
+| conditional Kiva instance setup | `if (AnyKiva) kivaManager.setupKivaInstances(state)` at `HeatBalanceManager.cc` lines 322-325 | CP108 source-maps the conditional call and its ignored boolean result only; it is not required for the full domain and has no Rust target. Foundation input, geometry, instance ownership, weather/ground algorithms, diagnostics, outputs, runtime, and conformance remain deferred. |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
 | inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
@@ -81,7 +82,7 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 324-325; CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, and CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice; conditional Kiva setup is the next deferred checkpoint
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, and CP108 source-maps only the conditional `setupKivaInstances` call; the caller's conditional sizing override is the next deferred checkpoint
 3. `InitHeatBalance`
 4. outside opaque surface balance
 5. inside opaque surface balance
@@ -1363,9 +1364,11 @@ required for full-domain support.
 
 The source-order tail recorded by CP106 continues through
 `ManageInternalHeatGains(state, true)` at line 320 and conditional
-`kivaManager.setupKivaInstances(state)` at lines 324-325 when `AnyKiva` is
-true. CP107 maps the first call as described below; conditional Kiva setup
-remains the next deferred checkpoint.
+`kivaManager.setupKivaInstances(state)` at lines 322-325 when `AnyKiva` is
+true. CP107 maps the first call as described below, and CP108 source-maps the
+conditional Kiva call. After `GetHeatBalanceInput` returns, the caller's
+`DoingSizing` assignment from `doSpaceHeatBalanceSizing` into
+`doSpaceHeatBalance` is the next deferred checkpoint.
 
 ### CP107 bounded internal-gain input map
 
@@ -1441,6 +1444,45 @@ not_claimed_branches:
 - complete `ManageInternalHeatGains` or `GetInternalHeatGainsInput` parity, source `GetInputFlag` persistence and re-entry behavior, `InitOnly` control beyond this compile-time projection, exact object/declaration ordering within either family, partial-allocation recovery, exact diagnostics/text/severity/order/multiplicity, or exact global compiler short-circuit behavior after Errors created inside the pass
 - ZoneList/Space/SpaceList expansion, generated instances, Space/Zone occupant totals, every omitted internal-gain family, setup and design-level derivation, schedule minima, reporting, meters, EMS, runtime gains, numerical parity, capability expansion, object-count or graph expansion, and conformance
 <!-- routine-state-contract:v1 end get_internal_heat_gains_input -->
+
+### CP108 conditional Kiva setup map
+
+At `HeatBalanceManager.cc` lines 322-325, immediately after
+`ManageInternalHeatGains(state, true)`, EnergyPlus tests
+`state.dataHeatBal->AnyKiva` and conditionally calls
+`state.dataSurfaceGeometry->kivaManager.setupKivaInstances(state)`. The setup
+routine returns its local `ErrorsFound` boolean, but this caller does not store,
+test, or otherwise consume the result. CP108 records only that guard, call, and
+ignored return boundary. `setupKivaInstances` is `source_mapped`, is not
+required for the full domain, and has no Rust implementation target.
+
+The source routine installs Kiva diagnostic callbacks, conditionally acquires
+Zone air setpoints, reads weather state, and consumes the complete Surface,
+Construction, regular-material, Zone, and Foundation inputs. It selects Kiva
+floor surfaces and associated walls, requires
+`SurfaceProperty:ExposedFoundationPerimeter`, walks detailed vertices and wall
+heights/construction groupings, materializes `Foundation:Kiva` and
+`Foundation:Kiva:Settings`-derived layers/blocks and deep-ground state, and
+owns Kiva instances, floor/wall aggregators, surface maps, mesh state, and EIO
+foundation rows. Those are dependency observations only, not mapped Rust
+state.
+
+CP108 claims no `Foundation:Kiva` or settings/material input support, complete
+Foundation outside-boundary topology, exposed-perimeter or coplanar geometry,
+Kiva instance/aggregator/surface-map ownership, ground/weather/site boundary
+processing, inside/outside convection-algorithm coupling, Zone setpoint or
+thermal-comfort interaction, mesh/solver initialization, EIO/output variables,
+EMS behavior, diagnostic callback text/order/multiplicity, early-return or
+returned-error parity, subsequent initialization/calculation/reporting, runtime
+numerics, or conformance. Existing typed
+`OutsideBoundaryCondition::Foundation` state and ground-like Rust runtime
+handling are not Kiva instance setup and do not promote this routine; no
+support-gate repair is mixed into CP108.
+
+On return from `GetHeatBalanceInput`, `ManageHeatBalance` next conditionally
+copies `doSpaceHeatBalanceSizing` into `doSpaceHeatBalance` when `DoingSizing`
+is true. That inline sizing override remains the next source-order checkpoint;
+CP108 does not invent a routine row for it.
 
 ### `CheckValidSimulationObjects` state contract
 
