@@ -78,6 +78,7 @@ claim.
 | heat-balance initialization | unconditional `InitHeatBalance(state)` at `ManageHeatBalance` line 198, implemented at lines 2594-2821 | CP114 source-maps this canonical routine and makes it required for the full heat-balance domain. Existing Rust source-order metadata, identity wrapper, and bounded state construction do not implement the complete flag-driven EnergyPlus initialization lifecycle. |
 | post-initialization EMS calling point | unconditional `ManageEMS(state, BeginZoneTimestepAfterInitHeatBalance, anyRan, absent)` at `ManageHeatBalance` lines 199-200 | CP115 reuses the existing generic `routine.manage_ems` source mapping. The same caller-owned `anyRan` is passed again and overwritten; no routine, project-contract, Rust-state, support, or conformance entry is added. |
 | surface heat-balance manager | unconditional `HeatBalanceSurfaceManager::ManageSurfaceHeatBalance(state)` at `ManageHeatBalance` line 209, implemented at `HeatBalanceSurfaceManager.cc` lines 145-230 | CP116 expands the existing required `routine.manage_surface_heat_balance` source mapping without a new row. The complete parent-driver order and gates are mapped, but the current Rust stage metadata, identity wrapper, and limited runtime path do not implement or match that complete order. |
+| first-time surface initialization display | inline `if (ManageSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Surfaces")` at `ManageSurfaceHeatBalance` lines 158-160 | CP117 maps this inline lifecycle/output guard without a synthetic routine. The flag defaults and resets to true in `HeatBalanceSurfaceManager.hh`, remains true through all four progress guards, and is cleared only at the successfully reached parent tail; Rust owns no equivalent persistent flag or progress output. |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
 | inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
 | zone air updates | `ManageZoneAirUpdates` | diagnostic shell only |
@@ -91,11 +92,11 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry, CP112 maps/defers only the line-186 one-time flag clear without claiming persistent Rust lifecycle parity, CP113 source-maps the canonical generic `ManageEMS` routine at the unconditional `BeginZoneTimestepBeforeInitHeatBalance` caller checkpoint without adding a Rust target, CP114 makes the following unconditional `InitHeatBalance` call a required source mapping without promoting existing Rust initialization state, CP115 maps the second unconditional `ManageEMS` caller checkpoint at `BeginZoneTimestepAfterInitHeatBalance` by reusing `routine.manage_ems` without a new row, and CP116 expands the existing required `routine.manage_surface_heat_balance` row for the unconditional line-209 call and complete source parent order; the inline first-time `Initializing Surfaces` display guard at `HeatBalanceSurfaceManager.cc` lines 158-160 is the next CP117 checkpoint
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry, CP112 maps/defers only the line-186 one-time flag clear without claiming persistent Rust lifecycle parity, CP113 source-maps the canonical generic `ManageEMS` routine at the unconditional `BeginZoneTimestepBeforeInitHeatBalance` caller checkpoint without adding a Rust target, CP114 makes the following unconditional `InitHeatBalance` call a required source mapping without promoting existing Rust initialization state, CP115 maps the second unconditional `ManageEMS` caller checkpoint at `BeginZoneTimestepAfterInitHeatBalance` by reusing `routine.manage_ems` without a new row, CP116 expands the existing required `routine.manage_surface_heat_balance` row for the unconditional line-209 call and complete source parent order, and CP117 maps the inline first-time `Initializing Surfaces` display guard at `HeatBalanceSurfaceManager.cc` lines 158-160 without a synthetic routine; the unconditional `InitSurfaceHeatBalance(state)` call at line 161 is the next CP118 checkpoint and is planned as a new required routine/project entry
 3. unconditional `ManageEMS(state, EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance, anyRan, absent)`
 4. `InitHeatBalance`
 5. unconditional `ManageEMS(state, EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, anyRan, absent)`
-6. unconditional `ManageSurfaceHeatBalance(state)`, whose lines 145-230 parent body orders the first-time initialization display, `InitSurfaceHeatBalance`, first-time outside display, `CalcHeatBalanceOutsideSurf`, first-time inside display, `CalcHeatBalanceInsideSurf`, first-time air display, `ManageAirHeatBalance`, `UpdateFinalSurfaceHeatBalance`, the `AnyCTF || AnyEMPD`-guarded `UpdateThermalHistories`, the `AnyCondFD`-guarded complete-Surface filtered moisture updates, `ManageThermalComfort(state, false)`, `ReportSurfaceHeatBalance`, the `ZoneSizingCalc`-guarded `GatherComponentLoadsSurface`, `CalcThermalResilience`, the three independently guarded resilience reports, and the final first-time-flag clear
+6. unconditional `ManageSurfaceHeatBalance(state)`, whose lines 145-230 parent body orders the CP117-mapped inline first-time initialization display, the next CP118 unconditional `InitSurfaceHeatBalance` call, first-time outside display, `CalcHeatBalanceOutsideSurf`, first-time inside display, `CalcHeatBalanceInsideSurf`, first-time air display, `ManageAirHeatBalance`, `UpdateFinalSurfaceHeatBalance`, the `AnyCTF || AnyEMPD`-guarded `UpdateThermalHistories`, the `AnyCondFD`-guarded complete-Surface filtered moisture updates, `ManageThermalComfort(state, false)`, `ReportSurfaceHeatBalance`, the `ZoneSizingCalc`-guarded `GatherComponentLoadsSurface`, `CalcThermalResilience`, the three independently guarded resilience reports, and the final first-time-flag clear
 
 ## Current Blocker Ledger
 
@@ -1504,8 +1505,9 @@ following generic EMS dispatch. CP114 makes the unconditional
 `InitHeatBalance` call a required source mapping, and CP115 maps the
 post-initialization EMS caller by reusing the generic row. CP116 expands the
 existing required `routine.manage_surface_heat_balance` row for the following
-unconditional parent call and its complete driver order. The parent's inline
-first-time `Initializing Surfaces` display guard is the next CP117 checkpoint.
+unconditional parent call and its complete driver order. CP117 maps the
+parent's inline first-time `Initializing Surfaces` display guard; the
+unconditional `InitSurfaceHeatBalance(state)` call is next for CP118.
 
 ### CP109 inline sizing Space heat-balance mode map
 
@@ -1753,8 +1755,9 @@ deferred. CP114 source-maps the following unconditional
 `InitHeatBalance(state)` call at `HeatBalanceManager.cc` line 198, and CP115
 maps the post-initialization EMS caller by reusing this same generic
 `routine.manage_ems` row. CP116 maps the following `ManageSurfaceHeatBalance`
-caller and source parent body; its first-time initialization display guard is
-next for CP117.
+caller and source parent body, and CP117 maps its first-time initialization
+display guard. The unconditional `InitSurfaceHeatBalance` call is next for
+CP118.
 
 ### CP114 `InitHeatBalance` source map
 
@@ -1807,7 +1810,8 @@ deferred. CP115 maps the following unconditional
 `ManageEMS(state, BeginZoneTimestepAfterInitHeatBalance, anyRan, absent)` call
 at lines 199-200 by reusing the generic `routine.manage_ems` source mapping.
 CP116 maps the line-209 Surface manager call and complete source parent body.
-Its inline first-time initialization display guard is next for CP117.
+CP117 maps its inline first-time initialization display guard; the following
+unconditional `InitSurfaceHeatBalance` call is next for CP118.
 
 ### CP115 post-`InitHeatBalance` EMS calling-point map
 
@@ -1908,9 +1912,50 @@ complete Surface, Construction, CTF, EMPD, CondFD, finite-difference moisture,
 window, and heat-transfer-algorithm state; thermal comfort, surface reporting,
 component-load gathering, resilience calculation/reporting, exact side
 effects and error behavior, runtime numerics, performance, outputs, and broad
-conformance remain deferred. The next CP117 checkpoint is the inline
+conformance remain deferred. CP117 maps the following inline
 `ManageSurfaceHeatBalancefirstTime`-guarded `Initializing Surfaces` display at
-lines 158-160; it will not require a synthetic routine row.
+lines 158-160 without a synthetic routine row.
+
+### CP117 first-time `Initializing Surfaces` display map
+
+At `HeatBalanceSurfaceManager.cc` lines 158-160,
+`ManageSurfaceHeatBalance` tests
+`state.dataHeatBalSurfMgr->ManageSurfaceHeatBalancefirstTime` and, only when
+it is true, calls `DisplayString(state, "Initializing Surfaces")`. The guard
+and output are inline parent behavior rather than a separately named source
+routine. The unconditional `InitSurfaceHeatBalance(state)` call follows
+immediately at line 161 whether or not this message was displayed.
+
+`HeatBalanceSurfaceManager.hh` owns the lifecycle state: the
+`ManageSurfaceHeatBalancefirstTime` member defaults to true at line 239 and
+`clear_state()` resets it to true at line 291. The same flag remains true
+through the parent's initialization, outside-balance, inside-balance, and
+air-balance progress guards. None of those guards clears it. Only successful
+reach of the parent tail at line 229 writes it false, so normal later parent
+invocations skip all four messages. An abnormal exit before that tail can
+leave the flag true, allowing this message and the other subsequently reached
+first-time messages to repeat if the same state is invoked again.
+
+Rust has no equivalent persistent `ManageSurfaceHeatBalancefirstTime` field,
+reset lifecycle, or `DisplayString` progress output. The current
+`manage_surface_heat_balance_source_order_path` identity wrapper executes its
+closure without owning persistent first-time state; its limited one-closure
+invocation and current nesting therefore are not parity for the source guard,
+four-message lifetime, successful-tail clear, abnormal-exit behavior, or
+re-entry. Adding `HeatBalanceSurfaceManager.hh` to the surface-manager
+algorithm's EnergyPlus source list records only the declaration/reset owner.
+
+CP117 adds no synthetic routine row, project-contract routine, Rust helper or
+target, model/runtime state, capability, support-gate admission, manifest,
+comparator, proof variable, result, count, output implementation, or
+conformance promotion. Exact `DisplayString` stream routing, formatting,
+buffering, callback behavior, message visibility and ordering outside the
+mapped parent sequence; lifecycle behavior after fatal, exception, or other
+abnormal control flow; the other three first-time guards and messages; child
+routine effects, runtime numerics, performance, outputs, and broad
+conformance remain deferred. The next CP118 checkpoint is the unconditional
+`InitSurfaceHeatBalance(state)` call at line 161, planned as a new required
+routine and project-contract entry.
 
 ### `CheckValidSimulationObjects` state contract
 
