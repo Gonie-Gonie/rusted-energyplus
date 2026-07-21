@@ -254,6 +254,23 @@ surface passes, and the separate CTF-only routine mapping do not implement or
 promote this complete canonical routine, state, lifecycle, dispatch, error
 behavior, or numerics.
 
+The required inventory now places
+`update_intermediate_surface_heat_balance_results` after the optimized
+`calc_heat_balance_inside_surf_2_ctf_only` child and before
+`manage_air_heat_balance`, preserving the canonical inside-balance
+parent/optimized-child/tail grouping before the Air subtree. Its EnergyPlus
+boundary is the sole production call after `CalculateZoneMRT` at
+`CalcHeatBalanceInsideSurf` line 7812, the declaration at
+`HeatBalanceSurfaceManager.hh` line 132, and the complete body at
+`HeatBalanceSurfaceManager.cc` lines 4951-5020. It remains `source_mapped` and
+required. Optional-zone bounds, additive exterior-Window Zone gain and
+sign-selected reports, representative-surface child projection, inside
+convection and solar-minus-lights assignments, the optional-zone-independent
+global Kiva flux pass, nonfinite arithmetic, stale opposite-sign reports,
+failure prefixes, and re-entry remain source-only. Rust's separate bounded
+inside-convection report formula does not implement this orchestration,
+report-state, representative-surface, or Kiva lifecycle.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `manage_zone_air_updates`, preserving the completion of the Air subtree before
 the Surface manager's final update. Its EnergyPlus boundary is the
