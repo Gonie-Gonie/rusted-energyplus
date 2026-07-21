@@ -108,6 +108,20 @@ surface passes, and the separate CTF-only routine mapping do not implement or
 promote this complete canonical routine, state, lifecycle, dispatch, error
 behavior, or numerics.
 
+The inventory now also includes `update_final_surface_heat_balance` after
+`manage_zone_air_updates`, preserving the completion of the Air subtree before
+the Surface manager's final update. Its EnergyPlus boundary is the
+unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
+the implementation at lines 5176-5219. The routine always invokes seven
+averaged radiant, baseboard, cooling-panel, and swimming-pool source updaters;
+if any child reports an active averaged source, it reruns the complete-building
+outside balance and then inside balance, without rerunning initialization, Air
+balance, or histories. It remains `source_mapped` and required. The existing
+Rust `update_final_surface_heat_balance_stage`, now listed as a Surface-manager
+algorithm target, and its bounded adiabatic synchronization/snapshot wrapper
+do not implement the seven equipment-source updates or conditional full
+two-pass replay and do not promote state, support, or conformance.
+
 The canonical time-domain inventory includes `get_project_data`,
 `process_schedule_input`, `process_interval_fields`,
 `day_schedule_populate_from_minute_vals`, and
