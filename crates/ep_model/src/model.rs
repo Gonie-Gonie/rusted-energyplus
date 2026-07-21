@@ -100,6 +100,14 @@ pub struct TypedModel {
     pub constructions: Vec<Construction>,
     /// Construction names.
     pub construction_names: NameMap<ConstructionId>,
+    /// Constructions proved used by a retained surface or a bounded raw source reference.
+    ///
+    /// This is positive-only evidence: absence does not mean that a construction is unused.
+    pub known_used_constructions: Vec<ConstructionId>,
+    /// Constructions positively source-marked for CTF consideration by a bounded raw reference.
+    ///
+    /// This is positive-only evidence: absence does not mean that CTF state is unnecessary.
+    pub known_ctf_used_constructions: Vec<ConstructionId>,
     /// Source-order series descriptors for thermochromic master constructions.
     pub construction_thermochromic_series: Vec<ConstructionThermochromicSeries>,
     /// Immutable thermochromic child projections in master-ID then source-state order.
@@ -315,6 +323,8 @@ impl Default for TypedModel {
             window_glazing_thermochromic_state_arena: Vec::new(),
             constructions: Vec::new(),
             construction_names: NameMap::default(),
+            known_used_constructions: Vec::new(),
+            known_ctf_used_constructions: Vec::new(),
             construction_thermochromic_series: Vec::new(),
             construction_thermochromic_children: Vec::new(),
             construction_window_data_file_requests: Vec::new(),

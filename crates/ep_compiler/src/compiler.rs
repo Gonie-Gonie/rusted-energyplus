@@ -2,6 +2,7 @@
 
 mod complex_fenestration;
 mod construction_internal_heat_source;
+mod construction_use;
 mod construction_window_data_file;
 mod construction_window_equivalent_layer;
 mod fenestration_solar_absorbed;
@@ -711,6 +712,7 @@ impl<'a> Compiler<'a> {
         self.check_scheduled_surface_gains_typed_subset(&model, diagnostics_before_surfaces);
         self.create_thermochromic_construction_projections(&mut model);
         self.check_valid_simulation_objects_bounded(&model);
+        self.collect_known_construction_use_evidence(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
         self.parse_zone_humidistats(&mut model);
@@ -17580,6 +17582,7 @@ mod tests {
     mod construction_complex_fenestration_state;
     mod construction_ground_factor;
     mod construction_property_internal_heat_source;
+    mod construction_use;
     mod construction_window_data_file;
     mod construction_window_equivalent_layer;
     mod fenestration_solar_absorbed;
