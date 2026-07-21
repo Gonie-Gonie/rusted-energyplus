@@ -153,6 +153,22 @@ the canonical parent nesting, complete topology, dependencies, report flags,
 sizing arrays, or accumulator cadence and do not promote support or
 conformance.
 
+The canonical heat-balance inventory now also includes
+`rec_keep_heat_balance`, directly after `report_surface_heat_balance` and
+before `report_heat_balance`. Its EnergyPlus boundary is the unconditional
+parent line-211 `RecKeepHeatBalance(state)` call and the implementation at
+lines 2971-3057. The routine records Zone load and temperature extrema; shifts
+the two-sample temperature and combined-load histories; and, under
+`!WarmupFlag && DayOfSim == 1 && (!DoingSizing || DoPureLoadCalc)`, stores
+warmup-convergence differences through the Zone-1-owned shared point counter
+and optionally writes the detailed EIO header and Zone rows. It also snapshots
+movable-insulation presence and unconditionally refreshes non-BSDF window-face
+temperatures through `UpdateWindowFaceTempsNonBSDFWin` at lines 3303-3313.
+It remains `source_mapped` and required. Existing Rust
+`rec_keep_heat_balance_stage` source-order and execution-plan metadata are
+scaffolding only and do not implement or promote the complete state,
+lifecycle, reporting, or window-history behavior.
+
 The canonical time-domain inventory includes `get_project_data`,
 `process_schedule_input`, `process_interval_fields`,
 `day_schedule_populate_from_minute_vals`, and
