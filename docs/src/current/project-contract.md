@@ -72,6 +72,16 @@ implementation at lines 2594-2821. It remains `source_mapped` and required:
 the current Rust execution-plan stage, identity wrapper, and separately
 bounded initialization state do not complete or promote this routine.
 
+The inventory now also includes `init_surface_heat_balance` immediately after
+`manage_surface_heat_balance`. Its EnergyPlus boundary is the unconditional
+`HeatBalanceSurfaceManager::InitSurfaceHeatBalance` call at parent line 161
+and the flag-driven implementation at lines 272-621. It remains
+`source_mapped` and required. The existing Rust
+`init_surface_heat_balance_stage` metadata and identity wrapper surround only
+a limited outside-balance closure, remain intentionally absent from the
+surface algorithm's target list, and do not implement or promote the complete
+source routine, state, lifecycle, output, or numerical behavior.
+
 The canonical time-domain inventory includes `get_project_data`,
 `process_schedule_input`, `process_interval_fields`,
 `day_schedule_populate_from_minute_vals`, and
