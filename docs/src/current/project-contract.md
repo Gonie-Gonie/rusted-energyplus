@@ -254,9 +254,24 @@ surface passes, and the separate CTF-only routine mapping do not implement or
 promote this complete canonical routine, state, lifecycle, dispatch, error
 behavior, or numerics.
 
-The required inventory now places
-`update_intermediate_surface_heat_balance_results` after the optimized
+The required inventory now places `calculate_zone_mrt` after the optimized
 `calc_heat_balance_inside_surf_2_ctf_only` child and before
+`update_intermediate_surface_heat_balance_results`, preserving the canonical
+inside-wrapper tail order. Its EnergyPlus boundary is the sole production call
+at `CalcHeatBalanceInsideSurf` line 7811, the declaration at
+`HeatBalanceSurfaceManager.hh` lines 140-141, and the complete body at
+`HeatBalanceSurfaceManager.cc` lines 5583-5699. It remains `source_mapped` and
+required. First-call area-times-inside-absorptance caches, optional-Zone
+selection, monotonic enclosure recalculation flags, Zone and radiant-enclosure
+MRT weighting and MAT fallbacks, warning and partial-failure behavior, and
+re-entry remain source-only. Rust has bounded Surface area, inside thermal
+absorptance, temperature, and radiant helpers but no Zone, Space, or enclosure
+MRT state, cached weighting topology, fallback lifecycle, or equivalent
+routine.
+
+The following required inventory entry places
+`update_intermediate_surface_heat_balance_results` after `calculate_zone_mrt`
+and before
 `manage_air_heat_balance`, preserving the canonical inside-balance
 parent/optimized-child/tail grouping before the Air subtree. Its EnergyPlus
 boundary is the sole production call after `CalculateZoneMRT` at
