@@ -61,6 +61,8 @@ claim.
 | scheduled surface gains input | `GetScheduledSurfaceGains` immediately after `GetIncidentSolarMultiplier` | CP100 types the first `SurfaceProperty:SolarIncidentInside` phase as immutable `SurfaceSolarIncident` records with a semantic normalized name, typed detailed-opaque SurfaceId, any typed ConstructionId, and required ScheduleId. CP101 types the following `ComplexFenestrationProperty:SolarAbsorbedLayers` phase as immutable requests with a semantic normalized name, unresolved fenestration target, complex-fenestration ConstructionId, and ordered ScheduleIds matching its solid optical layers. Both families allow duplicate names, fail closed on repeated resolved target/construction pairs because no source order is claimed, and run-block every definition. CP102 state-maps only a diagnostic tail slice of `CheckScheduledSurfaceGains`: an error-free Zone warns nonblockingly when its retained typed opaque subset already contains both an exact current-construction pair match and a miss. Empty, all-matched, and all-unmatched subsets stay silent. `GetScheduledSurfaceGains`, representative-surface mutation, full completeness, `SurfaceScheduledSolarInc`, `WindowScheduledSolarAbs`, schedule sampling, runtime, and conformance remain source-mapped or unsupported. |
 | representative-surface assignment output barrier | inline `GetHeatBalanceInput` block immediately after `GetScheduledSurfaceGains` | mapped and deferred without a synthetic routine entry: when representative calculations are enabled, EnergyPlus writes one EIO header even for zero surfaces, then visits the complete global Surface array in order and writes only non-self representative assignments. Rust lacks the controlling project flag, complete Surface arena/order, representative/constituent mutation, and EIO writer needed for a truthful partial implementation. |
 | thermochromic child construction projection | `CreateTCConstructions` immediately after the representative-surface EIO block | CP103 state-maps a bounded immutable series/child projection from CP85 master metadata and ordered thermochromic states. Master ConstructionId order, state order including the first state, effective-layer cloning, final-master-layer substitution, initial temperature, and source-shaped generated names are retained in separate arenas. Main ConstructionIds/names/counts/graph state, WINDOW5-relative global append order, deep-copy state, active switching, reporting, and runtime remain deferred. |
+| no-Zone simulation validity diagnostic | inline `TotSurfaces > 0 && NumOfZones == 0` gate and `CheckValidSimulationObjects` immediately after `CreateTCConstructions` | CP104 state-maps a bounded diagnostic-only positive witness: absent prior Errors, an empty typed Zone arena plus raw `Shading:Site:Detailed` or `Shading:Building:Detailed` presence emits `InvalidSimulationWithoutZones` unless any one of the source's eight allowed collector/generator families is present in raw input. No model state is written. Full `TotSurfaces` parity, all other surface families, exact diagnostics/fatal sequencing, and collector/generator typing or runtime remain deferred. |
+| construction-use audit barrier | `CheckUsedConstructions` immediately after the no-Zone gate | source-mapped only: EnergyPlus scans six raw reference families, mutates global `IsUsed` and selected non-window `IsUsedCTF` flags, then emits summary or detailed unused-construction warnings. Rust makes no code/state claim until the complete post-WINDOW5/post-thermochromic global Construction arena and downstream CTF/CondFD consumers exist. |
 | heat-balance initialization | `InitHeatBalance` | diagnostic shell only |
 | outside surface balance | `CalcHeatBalanceOutsideSurf` | CTF environmental balance helper exists; full call order not ported |
 | inside surface balance | `CalcHeatBalanceInsideSurf` | CTF inside-face helper exists; full iteration/call order not ported |
@@ -75,7 +77,7 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, and `CreateTCConstructions`; CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, and CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, and `CheckUsedConstructions`; CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, and CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate and construction-use scan source-mapped
 3. `InitHeatBalance`
 4. outside opaque surface balance
 5. inside opaque surface balance
@@ -1233,6 +1235,93 @@ not_claimed_branches:
 - representative-surface assignment output, construction/surface mutation, thermochromic state selection, optics, thermal calculations, daylighting, shading, ratings, EIO/SQLite or other reporting, runtime numerics, exact diagnostics/order/multiplicity, and conformance
 <!-- routine-state-contract:v1 end create_tc_constructions -->
 
+### CP104 bounded no-Zone validity diagnostic and construction-use barrier
+
+Immediately after `CreateTCConstructions`, EnergyPlus evaluates the inline
+`TotSurfaces > 0 && NumOfZones == 0` condition. Only inside that gate does it
+call `CheckValidSimulationObjects`; a false return emits a severe
+`GetHeatBalanceInput` diagnostic and sets the caller's `ErrorsFound` flag. The
+source helper returns true when raw input contains any one of, in order,
+`SolarCollector:FlatPlate:Water`, `Generator:Photovoltaic`,
+`Generator:InternalCombustionEngine`, `Generator:CombustionTurbine`,
+`Generator:FuelCell`, `Generator:MicroCHP`, `Generator:MicroTurbine`, or
+`Generator:WindTurbine`. These are input-object count checks, not field,
+reference, or executability checks. The caller next runs
+`CheckUsedConstructions`, then terminates fatally if `ErrorsFound` is set.
+
+CP104 invokes
+`Compiler::check_valid_simulation_objects_bounded` immediately after the CP103
+projection but state-maps only a monotonic positive diagnostic slice. Any
+prior compile Error suppresses it. Otherwise, the typed Zone arena must be
+empty and raw `Shading:Site:Detailed` or `Shading:Building:Detailed` presence
+must positively witness a source Surface. If all eight allowed raw families
+are absent, Rust emits one blocking `InvalidSimulationWithoutZones` Error on
+object type `GetHeatBalanceInput`, without a name or field and without writing
+model state. Either detailed shading family is sufficient; absence of both is
+inconclusive and stays silent. Legacy rectangular `Shading:Site` and
+`Shading:Building`, Zone shading, heat-transfer/fenestration families, and
+generated surfaces are deliberately not used for negative inference. Adding
+any omitted surface cannot invalidate an already positive `TotSurfaces`
+witness.
+
+Presence of any one allowed family suppresses only this bounded diagnostic.
+It does not type, validate, run-enable, or otherwise support that collector or
+generator object. Exact full-surface and invalid-input recovery behavior,
+source severe/fatal text and sequencing, and the complete parent
+`GetHeatBalanceInput` condition remain source-mapped.
+
+The following `CheckUsedConstructions` routine is also only source-mapped. It
+reads `construction_name` from `Pipe:Indoor`, `Pipe:Outdoor`,
+`Pipe:Underground`, and `GroundHeatExchanger:Surface`; `construction_name`
+from alpha field 4 of `DaylightingDevice:Tubular`; and
+`construction_object_name` from
+`EnergyManagementSystem:ConstructionIndexVariable`. A resolved reference sets
+the global Construction's `IsUsed`. GroundHeatExchanger and EMS references
+also set `IsUsedCTF` when the resolved construction is not a window. The source
+then counts every global construction still not used and emits either a
+summary plus the `DisplayExtraWarnings` instruction or the summary followed by
+each unused construction name. Truthful Rust state would require the complete
+post-WINDOW5, post-thermochromic global Construction identities and every
+other use-marking path, plus downstream CTF/CondFD selection. CP104 therefore
+adds no use flag, warning, target, or code claim for this routine.
+
+### `CheckValidSimulationObjects` state contract
+
+<!-- routine-state-contract:v1 begin check_valid_simulation_objects -->
+CheckValidSimulationObjects
+
+read_state:
+- the inline `GetHeatBalanceInput` gate immediately after `CreateTCConstructions`: EnergyPlus calls `CheckValidSimulationObjects` only when `TotSurfaces > 0 && NumOfZones == 0`, then calls `CheckUsedConstructions`; the parent routine and exact gate remain source-mapped
+- bounded Rust enters immediately after the CP103 projection, suppresses the check after any prior compile Error, requires an empty typed Zone arena, and accepts only raw `Shading:Site:Detailed` or `Shading:Building:Detailed` presence as a monotonic positive witness that at least one source Surface exists
+- validity is raw presence only across EnergyPlus's ordered eight-family test: `SolarCollector:FlatPlate:Water`, `Generator:Photovoltaic`, `Generator:InternalCombustionEngine`, `Generator:CombustionTurbine`, `Generator:FuelCell`, `Generator:MicroCHP`, `Generator:MicroTurbine`, or `Generator:WindTurbine`; fields, names, references, typing, and runtime support are not inspected by this check
+
+write_state:
+- no model state is written; when the bounded surface witness exists, the typed Zone arena is empty, no prior Error exists, and all eight allowed raw families are absent, the compiler emits one blocking `InvalidSimulationWithoutZones` Error attached to object type `GetHeatBalanceInput` with no object name or field
+- a prior Error, any typed Zone, absence of both bounded surface witnesses, or presence of any one allowed raw family suppresses this diagnostic without publishing a flag, identity, graph edge, capability, manifest, comparator, proof variable, or runtime state
+- allowed-family presence affects only this bounded validity diagnostic and never promotes that family to typed input support or runtime execution
+
+history_state_ownership:
+- the compiler owns no new persistent state for this diagnostic-only check; it reads immutable typed and raw input snapshots and may append one compile Error, with no surface, Zone, generator, collector, or runtime history
+
+unsupported_state:
+- the complete EnergyPlus `TotSurfaces` population and order, including legacy rectangular shading, Zone shading, heat-transfer and fenestration surfaces, generated opposite or multiplier surfaces, and every other surface family omitted from the two bounded positive witnesses
+- input parsing, field/reference validation, simulation state, electrical or thermal behavior, and runtime support for every allowed collector/generator family; raw count presence is not a support claim
+- the caller's mutable `ErrorsFound` flag, later fatal termination, full input-processor recovery behavior, and interaction with diagnostics or state outside the bounded compiler pass
+
+inactive_branches:
+- any prior compile Error suppresses the check so a diagnostic is not inferred from partially published typed arenas
+- a nonempty typed Zone arena or no raw detailed Site/Building shading witness is silent; the latter is inconclusive rather than proof that EnergyPlus `TotSurfaces` is zero
+- presence of any one of the eight raw allowed families is silent regardless of whether that family has typed or executable Rust support
+
+unsupported_active_branches:
+- an allowed raw collector/generator witness only suppresses `InvalidSimulationWithoutZones`; its own unsupported-object, malformed-input, or run-blocking treatment remains independent and unchanged
+- a detected no-Zone invalid-simulation witness is compile-blocking and adds no partial runtime admission or simulation state
+
+not_claimed_branches:
+- exact parity for `TotSurfaces > 0 && NumOfZones == 0`, negative inference from absent detailed Site/Building shading, any other surface family, legacy `Shading:Site` or `Shading:Building`, generated surfaces, or invalid/raw Zone recovery
+- exact EnergyPlus severe/fatal text, punctuation, severity mapping, order, multiplicity, `ErrorsFound` timing, or downstream termination; `CheckUsedConstructions`, construction-use flags and warnings, collector/generator semantics, runtime, reporting, and conformance
+<!-- routine-state-contract:v1 end check_valid_simulation_objects -->
+
 ### `ProcessZoneData` state contract
 
 <!-- routine-state-contract:v1 begin process_zone_data -->
@@ -1288,6 +1377,8 @@ not_claimed_branches:
 | `CheckScheduledSurfaceGains` per-Zone `ZoneScheduled`/`ZoneUnscheduled` diagnostic state | `Compiler::check_scheduled_surface_gains_typed_subset` and compile warnings only | after error-free final Space assignment, a Zone warns nonblockingly only when retained typed detailed opaque surfaces already include both an exact current SurfaceId/ConstructionId pair match and a miss; only known misses are named. Empty, all-matched, and all-unmatched subsets are silent. No model state is added; full surface completeness, windows, other surface families, active constructions, pair lookups, exact diagnostics, and runtime remain deferred |
 | inline representative-surface EIO header and assignment rows | mapped/deferred barrier only | the exact condition, unconditional-when-enabled header, complete global Surface order, non-self assignment filter, and representative-name payload are documented without adding a synthetic routine or Rust output state; the project flag, full Surface population/order, representative/constituent mutation, and EIO writer remain absent |
 | `CreateTCConstructions` master `specTemp`/`TCChildConstrs` and child layer/name/temperature projection | `TypedModel::construction_thermochromic_series`, `TypedModel::construction_thermochromic_children`, `ep_model::ConstructionThermochromicSeries`, `ep_model::ConstructionThermochromicChild`, and `ep_model::ThermochromicConstructionChildId` | dense master-ConstructionId then ordered-state projection retains the initial first-state temperature and one child per state, including the first; each child clones the effective stack, replaces only the final retained TC layer, derives the outside layer, and uses source-shaped `{:.0R}` naming with pinned boundary examples. Projection IDs are not ConstructionIds; arbitrary-finite exact formatter equivalence, global append/count/name/graph state, WINDOW5-relative ordering, deep-copy fields, collision lookup, switching, reporting, and runtime remain deferred |
+| inline no-Zone gate and `CheckValidSimulationObjects` return consumed as caller diagnostics | `Compiler::check_valid_simulation_objects_bounded` and compile diagnostics only | after the CP103 projection and absent prior Errors, an empty typed Zone arena plus raw detailed Site/Building shading presence is a positive Surface witness; absence of all eight raw allowed collector/generator families emits one blocking `InvalidSimulationWithoutZones` Error. No model state is added. Full `TotSurfaces` parity, other surface families, exact severe/fatal behavior, allowed-family semantics, runtime, and conformance remain deferred; raw allowed presence is not a typing or support claim |
+| `CheckUsedConstructions` six-family reference scan, `ConstructionProps::{IsUsed, IsUsedCTF}`, and unused-construction warnings | mapped/deferred barrier only | source fields and mutations are recorded, including the non-window `IsUsedCTF` marks for GroundHeatExchanger and EMS references and the `DisplayExtraWarnings` detail branch. Rust adds no flags or warnings until full generated/WINDOW5/thermochromic global Construction identities, all other use paths, and CTF/CondFD consumers can be preserved |
 | `DataSurfaces::FrameDividerProperties` | `ep_model::WindowFrameAndDivider`, `ep_model::WindowFrameProperties`, `ep_model::WindowDividerProperties`, `ep_model::WindowRevealProperties` | complete bounded immutable user-input descriptors and an independent normalized namespace are typed; fenestration binding, geometry, WINDOW 5 synthesis, shading mutation, window physics, NFRC calculations, reporting, and runtime remain blocked |
 | `Construction::ConstructionProps::{Name, TotLayers, LayerPoint, isTCWindow, isTCMaster, TCMasterMatNum, TCLayerNum, TCGlassNum}` and construction/material CTF data | `ep_model::Construction`, optional immutable thermochromic master metadata, separate immutable thermochromic series/child projections, `ep_model::ModelGraph::construction_materials`, checked runtime direct-index construction/material lookup, and `ep_runtime::SurfaceCtfState` | ordinary input layers resolve into a bounded opaque/fenestration construction; every thermochromic parent contributes its first glazing state to the effective stack and only the final parent owns zero-based master metadata, while a sole SimpleGlazingSystem layer retains its original material identity and Fenestration kind. CP103 derives private ordered child snapshots without mutating the global construction/name/graph arenas or granting child ConstructionIds. Existing graph edges follow the effective or retained master IDs. The opaque runtime cache, static Regular/AirGap/IRT EIO evidence, diagnostic steady/no-mass coefficient seeding, and CTF histories do not enable thermochromic/window execution, multi-layer SimpleGlazing quirks, global child construction integration, mass-material coefficient generation, or broad face-temperature solving |
 | F/C-factor construction flags, source dimensions/factors, `NominalR`, and generated material layer points | `ep_model::ConstructionGroundFactor`, private generated entries in `TypedModel::materials`, and `ModelGraph::construction_materials` | exact bounded generation formulas, ordinary-then-F-then-C ordering, private names, raw ordinals, and two graph edges are retained; surface pairing, ground temperatures, CTF/runtime, reporting, and public attachment targeting remain blocked |
