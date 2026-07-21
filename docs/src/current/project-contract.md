@@ -268,8 +268,9 @@ calculation, and intermediate result updates. CP173 now owns the helper's
 complete global-list aggregation and failure/re-entry boundary; CP172 owns the
 complete general iteration and its
 surface/window/moisture/Kiva topology, non-local partial-resimulation effects,
-errors, and failure/re-entry behavior; the pass-by-value warmup-counter
-reachability boundary remains shared with the distinct optimized child.
+errors, and failure/re-entry behavior. CP174 now owns the shared checker's full
+safety/diagnostic contract; this wrapper retains only the pass-by-value
+warmup-counter reachability boundary shared with the distinct optimized child.
 Existing Rust inside-balance stage metadata, its identity wrapper, bounded
 surface passes, and the separate child mappings do not implement or promote
 this complete canonical wrapper, state, lifecycle, dispatch, error behavior,
@@ -332,8 +333,42 @@ Kiva, or moisture lifecycle, 501-pass behavior, or matching failure/re-entry
 semantics,
 so no support or conformance promotion follows.
 
-The required inventory now places `calculate_zone_mrt` after the optimized
-`calc_heat_balance_inside_surf_2_ctf_only` child and before
+The required inventory now places
+`test_surf_temp_calc_heat_balance_inside_surf` after both inside-solver rows
+and before `calculate_zone_mrt`, matching its nesting inside either solver
+before the canonical wrapper tail. Its EnergyPlus boundary is the declaration
+at `HeatBalanceSurfaceManager.hh` lines 192-193, implementation at
+`HeatBalanceSurfaceManager.cc` lines 9287-9468, and sole production calls from
+the CP172 general child at line 8481 and the optimized CTF-only child at lines
+9194-9195. It remains `source_mapped` and required.
+
+Both callers first apply the strict live-upper or fixed -100 C ordinary gate.
+CP174 copies the raw Surface name, repeats that gate, and outside warmup emits
+initial or recurring low/high diagnostics with a shared one-shot Zone-detail
+latch. Zone details branch on floor area, AFN control, and controlled status.
+The stored warmup counter is passed and incremented only by value: its zero
+default and resets mean production reaches local one during warmup and zero
+otherwise, leaving the coded enforced-reciprocity `> 3` and ordinary `> 10`
+count fatals unreachable. Extra warnings can expose diagnostics but cannot
+make those thresholds true.
+
+The later strict live-upper-before-fatal or fixed -250 C gate fatals outside
+warmup after an ordered diagnostic prefix; during warmup only values strictly
+beyond +/-10000 C fatal. The extreme no-floor diagnostic preserves the source
+division by `FloorArea`. All boundaries are strict, NaN fails the comparisons,
+and failure can retain output, recurring-index, Zone-latch, and fatal prefixes
+without rollback. The direct five-call unit fixture covers only in-range
+warmup silence plus initial high/low positive-floor, default-AFN, controlled
+diagnostics and already-latched Zone-detail suppression. It resets recurring
+indices to zero and does not cover the true recurring-only, production-gate,
+warmup-count, extreme, AFN-active, no-floor, uncontrolled, reciprocity,
+nonfinite, malformed-index, failure, or retry paths. Rust has inside-face
+temperature and iteration state but no matching checker, threshold/latch/
+recurring lifecycle, fatal policy, or re-entry behavior, so no support or
+conformance promotion follows.
+
+The required inventory now places `calculate_zone_mrt` after
+`test_surf_temp_calc_heat_balance_inside_surf` and before
 `update_intermediate_surface_heat_balance_results`, preserving the canonical
 inside-wrapper tail order. Its EnergyPlus boundary is the sole production call
 at `CalcHeatBalanceInsideSurf` line 7811, the declaration at
