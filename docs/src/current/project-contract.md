@@ -75,6 +75,16 @@ equivalent-layer limits do not implement the source's shared mutable maximum,
 raw-object scans, input-buffer side effects, downstream allocation contract,
 failure behavior, or lifecycle.
 
+The canonical heat-balance inventory now also includes
+`get_site_atmosphere_data` after the pre-construction-bound entry. Its
+EnergyPlus boundary is the `GetHeatBalanceInput` line-264 call between project
+controls and spectral/material input, the declaration at
+`HeatBalanceManager.hh` line 100, and the implementation at
+`HeatBalanceManager.cc` lines 1252-1317. It remains `source_mapped` and
+required: Rust's Terrain-derived wind helper and fixed temperature-gradient
+helper do not implement `Site:HeightVariation` intake, shared environment
+mutation, diagnostics, EIO output, dependency side effects, or lifecycle.
+
 The canonical heat-balance inventory includes `init_heat_balance` after the
 required input/view-factor/internal-gain routines and before
 `manage_surface_heat_balance`. Its EnergyPlus boundary is the unconditional

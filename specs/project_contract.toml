@@ -34,6 +34,7 @@ routine_inventory_complete = false
 required_routines = [
   "manage_heat_balance",
   "set_pre_construction_input_parameters",
+  "get_site_atmosphere_data",
   "get_construct_data",
   "get_building_data",
   "get_zone_data",
