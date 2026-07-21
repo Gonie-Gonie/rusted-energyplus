@@ -216,7 +216,7 @@ remain source-only.
 
 The inventory now also includes `compute_dif_sol_exc_zones_wiz_windows`
 immediately after `compute_int_sw_absorp_factors` and before
-`calc_heat_balance_outside_surf` in source-definition order. Its EnergyPlus
+`calc_heat_balance_outside_surf` in required-routine order. Its EnergyPlus
 boundary is the `InterZoneWindow`-guarded
 `ComputeDifSolExcZonesWIZWindows(state)` call inside
 `InitSurfaceHeatBalance` line 439, the declaration at
@@ -228,7 +228,7 @@ fixed two-through-four-edge simple-path expansion, kickoff-reset lifecycle,
 or matching failure and re-entry state.
 
 The inventory now also includes `calc_heat_balance_outside_surf` immediately
-after `compute_dif_sol_exc_zones_wiz_windows` in source-definition order. Its
+after `compute_dif_sol_exc_zones_wiz_windows` in required-routine order. Its
 EnergyPlus boundary is the
 unconditional parent line-168 `CalcHeatBalanceOutsideSurf(state)` call, which
 omits the optional zone-resimulation argument, and the implementation at lines
