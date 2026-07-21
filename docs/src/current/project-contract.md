@@ -137,6 +137,22 @@ wrapper, and bounded vector-history push do not implement the complete parent
 gate, topology, first-time/master state, interpolation cadence, current report
 terms, or internal-source histories and do not promote support or conformance.
 
+The next required inventory entry is `report_surface_heat_balance`, directly
+after `update_thermal_histories`; the intervening CP127 CondFD moisture helper
+and CP128 thermal-comfort manager remain non-required and are intentionally
+absent from this required list. Its EnergyPlus boundary is the unconditional
+parent line-210 `ReportSurfaceHeatBalance(state)` call and the canonical body
+at lines 6605-6891. That body orders shading and representative-surface
+projection; opaque-or-Window, Window, movable-insulation, and two-pass opaque
+report state; the guarded heat-emission summary and sizing component loads;
+and advanced Zone accumulation that depends on prior initialization. It
+remains `source_mapped` and required. The existing Rust
+`report_surface_heat_balance_stage`, identity wrapper, bounded run-period
+Surface report/trace path, and limited result-store outputs do not implement
+the canonical parent nesting, complete topology, dependencies, report flags,
+sizing arrays, or accumulator cadence and do not promote support or
+conformance.
+
 The canonical time-domain inventory includes `get_project_data`,
 `process_schedule_input`, `process_interval_fields`,
 `day_schedule_populate_from_minute_vals`, and
