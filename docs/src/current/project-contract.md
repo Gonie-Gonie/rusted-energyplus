@@ -192,9 +192,21 @@ boundary is the `WarmupFlag && EndDayFlag` outer guard at
 It remains `source_mapped` and required. Existing Rust source-order metadata
 and its separate temperature-only diagnostic warmup loop do not implement or
 promote the canonical four-test Zone state, load normalization, lifecycle,
-diagnostics, latches, maximum-day behavior, or parent gating. The inner
-`!WarmupFlag` branch and `DayOfSim`/`DayOfSimChr` resets at lines 227-229 are
-reserved for CP143.
+diagnostics, latches, maximum-day behavior, or parent gating. CP143 separately
+maps the inner `!WarmupFlag` branch and `DayOfSim`/`DayOfSimChr` resets at
+lines 227-229, while CP144 reuses the non-required generic EMS row for the
+following post-warmup calling point.
+
+The required inventory now also includes `report_warmup_convergence` after
+`check_warmup_convergence` and the intervening inline reset and non-required
+post-warmup EMS checkpoint. Its caller is the
+`!WarmupFlag && EndDayFlag && DayOfSim == 1 && !DoingSizing` guard at
+`HeatBalanceManager.cc` lines 235-237; the routine is declared at header line
+138 and implemented at source lines 3228-3301. It remains `source_mapped` and
+required. Existing Rust warmup options, execution metadata, summaries, and
+diagnostic temperature-only loop do not implement or promote the canonical
+sample ownership, in-place load normalization, EIO lifecycle, Zone rows,
+parent gate, outputs, or repeated-call behavior.
 
 The canonical time-domain inventory includes `get_project_data`,
 `process_schedule_input`, `process_interval_fields`,
