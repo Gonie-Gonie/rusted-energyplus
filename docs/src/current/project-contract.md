@@ -113,6 +113,19 @@ contaminant, warmup-convergence, resilience, and report-array allocations,
 defaults, conditional preservation, partial-failure state, or re-entry
 semantics.
 
+The inventory now also includes `init_conduction_transfer_functions`
+immediately after the two allocation entries and before
+`manage_surface_heat_balance`. Its EnergyPlus boundary is the
+`InitHeatBalance` BeginSim branch at lines 2617-2622, which completes
+`AllocateHeatBalArrays`, then under `AnyCTF || AnyEMPD` emits the initialization
+display and calls the routine at line 2621; the canonical declaration is at
+`HeatBalanceManager.hh` line 180 and the wrapper implementation is at
+`HeatBalanceManager.cc` lines 6153-6202. It remains `source_mapped` and
+required: Rust can consume EIO-seeded coefficients or a steady no-history
+fallback, but has no native CTF/QTF generator, adaptive history/timestep
+calculation, full Construction traversal and reporting, error lifecycle, or
+re-entry semantics.
+
 The inventory now also includes `init_surface_heat_balance` immediately after
 `manage_surface_heat_balance`. Its EnergyPlus boundary is the unconditional
 `HeatBalanceSurfaceManager::InitSurfaceHeatBalance` call at parent line 161

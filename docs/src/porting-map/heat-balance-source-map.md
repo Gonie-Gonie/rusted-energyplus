@@ -80,6 +80,7 @@ claim.
 | heat-balance initialization | unconditional `InitHeatBalance(state)` at `ManageHeatBalance` line 198, implemented at lines 2594-2821 | CP114 source-maps this canonical routine and makes it required for the full heat-balance domain. Existing Rust source-order metadata, identity wrapper, and bounded state construction do not implement the complete flag-driven EnergyPlus initialization lifecycle. |
 | Zone/Space heat-balance core allocation | `AllocateZoneHeatBalArrays`, first action of `AllocateHeatBalArrays` and reached from the `InitHeatBalance` BeginSim branch | CP148 adds required `routine.allocate_zone_heat_bal_arrays` as source-mapped only. It conditionally backfills the internal-gain bundle, unconditionally reconstructs Zone/Space heat-balance records, and allocates/zeros eight solar-enclosure arrays. Existing Rust vectors and initialization shells do not implement this allocation order, defaults, partial-failure state, destructive re-entry, or lifecycle. |
 | complete heat-balance array allocation | `AllocateHeatBalArrays`, reached from the `InitHeatBalance` BeginSim branch | CP149 adds required `routine.allocate_heat_bal_arrays` as source-mapped only. After the separate CP148 child, it dimensions FanSystem accumulators and warmup history, conditionally dimensions contaminant state, and allocates resilience/report matrices in exact source order. Existing Rust initialization shells do not implement the complete state, conditional preservation, defaults, partial-failure state, or re-entry semantics. |
+| conduction transfer-function initialization | `InitConductionTransferFunctions`, reached after `AllocateHeatBalArrays` under `BeginSimFlag && (AnyCTF || AnyEMPD)` | CP153 adds required `routine.init_conduction_transfer_functions` as source-mapped only. The wrapper resets/calculates every Construction in array order, derives global simple/max state, performs used-only layer and optional detailed CTF/QTF reporting, and fatals last on accumulated errors. Rust consumes EIO-seeded coefficients or a steady no-history fallback but has no native generator. |
 | post-initialization EMS calling point | unconditional `ManageEMS(state, BeginZoneTimestepAfterInitHeatBalance, anyRan, absent)` at `ManageHeatBalance` lines 199-200 | CP115 reuses the existing generic `routine.manage_ems` source mapping. The same caller-owned `anyRan` is passed again and overwritten; no routine, project-contract, Rust-state, support, or conformance entry is added. |
 | surface heat-balance manager | unconditional `HeatBalanceSurfaceManager::ManageSurfaceHeatBalance(state)` at `ManageHeatBalance` line 209, implemented at `HeatBalanceSurfaceManager.cc` lines 145-230 | CP116 expands the existing required `routine.manage_surface_heat_balance` source mapping without a new row. The complete parent-driver order and gates are mapped, but the current Rust stage metadata, identity wrapper, and limited runtime path do not implement or match that complete order. |
 | first-time surface initialization display | inline `if (ManageSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Surfaces")` at `ManageSurfaceHeatBalance` lines 158-160 | CP117 maps this inline lifecycle/output guard without a synthetic routine. The flag defaults and resets to true in `HeatBalanceSurfaceManager.hh`, remains true through all four progress guards, and is cleared only at the successfully reached parent tail; Rust owns no equivalent persistent flag or progress output. |
@@ -125,7 +126,7 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry, CP112 maps/defers only the line-186 one-time flag clear without claiming persistent Rust lifecycle parity, CP113 source-maps the canonical generic `ManageEMS` routine at the unconditional `BeginZoneTimestepBeforeInitHeatBalance` caller checkpoint without adding a Rust target, CP114 makes the following unconditional `InitHeatBalance` call a required source mapping without promoting existing Rust initialization state, CP115 maps the second unconditional `ManageEMS` caller checkpoint at `BeginZoneTimestepAfterInitHeatBalance` by reusing `routine.manage_ems` without a new row, CP116 expands the existing required `routine.manage_surface_heat_balance` row for the unconditional line-209 call and complete source parent order, CP117 maps the inline first-time `Initializing Surfaces` display guard at `HeatBalanceSurfaceManager.cc` lines 158-160 without a synthetic routine, and CP118 adds the following unconditional line-161 `InitSurfaceHeatBalance(state)` call and lines 272-621 implementation as a new required source-mapped routine/project entry; CP119 maps the following first-time `Calculate Outside Surface Heat Balance` display guard at lines 165-167 without a synthetic routine; CP120 adds the unconditional line-168 `CalcHeatBalanceOutsideSurf(state)` call and lines 6951-7721 implementation as a new required source-mapped routine/project entry; CP121 maps the first-time inside-balance display at lines 169-171 without a synthetic routine; CP122 adds the unconditional line-172 `CalcHeatBalanceInsideSurf(state)` call and lines 7738-7813 canonical wrapper as a required source-mapped routine/project entry; CP123 maps the first-time air-balance display at lines 176-178 without a synthetic routine; CP124 maps the unconditional line-179 `ManageAirHeatBalance(state)` call by reusing the existing required routine; CP125 adds the unconditional line-184 `UpdateFinalSurfaceHeatBalance(state)` call and lines 5176-5219 implementation as a required source-mapped routine/project entry; CP126 adds the parent lines 186-189 `AnyCTF || AnyEMPD`-guarded `UpdateThermalHistories(state)` call and lines 5221-5581 implementation as a required source-mapped routine/project entry; CP127 adds the independent parent lines 191-206 `AnyCondFD` complete-Surface filtered moisture-update block and inline `SurfaceDataFD::UpdateMoistureBalance` helper as a non-required source-mapped routine; CP128 adds the unconditional line-208 `ManageThermalComfort(state, false)` call and `ThermalComfort.cc` lines 105-164 implementation as a non-required source-mapped routine; CP129 adds the unconditional line-210 `ReportSurfaceHeatBalance(state)` call and `HeatBalanceSurfaceManager.cc` lines 6605-6891 implementation as a required source-mapped routine/project entry; CP130 adds the lines 211-213 `ZoneSizingCalc`-guarded `GatherComponentLoadsSurface(state)` call and `OutputReportTabular.cc` lines 15064-15132 implementation as a non-required source-mapped routine; CP131 adds the unconditional line-215 `CalcThermalResilience(state)` call and `HeatBalanceSurfaceManager.cc` lines 5707-5799 implementation as a non-required source-mapped routine; CP132 adds the lines 217-219 `displayThermalResilienceSummary`-guarded `ReportThermalResilience(state)` call and lines 5801-6388 implementation as a non-required source-mapped routine; CP133 maps the lines 221-223 `displayCO2ResilienceSummary`-guarded `ReportCO2Resilience(state)` call; CP134 maps the lines 225-227 `displayVisualResilienceSummary`-guarded `ReportVisualResilience(state)` call; CP135 maps the parent-tail line-229 `ManageSurfaceHeatBalancefirstTime = false` assignment without a synthetic routine; CP136 maps the `HeatBalanceManager.cc` line-210 unconditional `EndZoneTimestepBeforeZoneReporting` `ManageEMS` call by reusing `routine.manage_ems`; CP137 maps the line-211 `RecKeepHeatBalance(state)` call as a required routine, declared at `HeatBalanceManager.hh` line 134 and implemented at `HeatBalanceManager.cc` lines 2971-3057; CP138 maps the line-217 unconditional `ReportHeatBalance(state)` call as a required routine, declared at header line 142 and implemented at source lines 3321-3418; CP139 maps the line-219 unconditional `EndZoneTimestepAfterZoneReporting` `ManageEMS` call by reusing `routine.manage_ems`; CP140 maps the line-221 unconditional `UpdateEMSTrendVariables(state)` call as non-required, declared at `EMSManager.hh` line 122 and implemented at `EMSManager.cc` lines 1444-1479; CP141 maps the line-222 unconditional `PluginManagement::PluginManager::updatePluginValues(state)` call as non-required, declared at `PluginManager.hh` line 198 and implemented at `PluginManager.cc` lines 1458-1467; CP142 maps the required outer `WarmupFlag && EndDayFlag` block at lines 224-226 and its `CheckWarmupConvergence(state)` call, declared at `HeatBalanceManager.hh` line 136 and implemented at `HeatBalanceManager.cc` lines 3059-3226; CP143 maps the inner line-227 `!WarmupFlag` branch and ordered line-228/229 `DayOfSim = 0` then `DayOfSimChr = "0"` mutations; CP144 maps the line-231 in-branch `ManageEMS(state, BeginNewEnvironmentAfterWarmUp, anyRan, absent)` call by reusing `routine.manage_ems`; CP145 maps the required lines 235-237 guarded `ReportWarmupConvergence(state)` call, declared at `HeatBalanceManager.hh` line 138 and implemented at `HeatBalanceManager.cc` lines 3228-3301; after `ManageHeatBalance` ends at line 238, CP146 maps required `SetPreConstructionInputParameters`, declared at header line 96, called unconditionally from `SimulationManager.cc` line 216, and implemented at source lines 446-492; CP147 maps required `GetSiteAtmosphereData`, declared at header line 100, called from `GetHeatBalanceInput` line 264 between project controls and spectral input, and implemented at source lines 1252-1317; CP148 maps required `AllocateZoneHeatBalArrays`, declared at header line 130, implemented at source lines 2824-2854, and called first by `AllocateHeatBalArrays` at line 2863 from the `InitHeatBalance` BeginSim chain; CP149 maps required `AllocateHeatBalArrays`, declared at header line 132 and implemented at source lines 2855-2963; CP150 maps required `UpdateWindowFaceTempsNonBSDFWin`, declared at header line 140, implemented at source lines 3303-3313, and called by `RecKeepHeatBalance` at line 3056; CP151 maps non-required `OpenShadingFile`, declared at header line 144, implemented at source lines 3422-3438, and called by `InitHeatBalance` at lines 2696-2698; CP152 maps non-required `SetStormWindowControl`, declared at header line 156, implemented at source lines 4595-4644, and called by `InitHeatBalance` at line 2669 under `TotStormWin > 0 && BeginDayFlag`; CP153 next maps `InitConductionTransferFunctions`, declared at header line 180, implemented at source lines 6153-6202, and called by `InitHeatBalance` at line 2621 under `BeginSimFlag && (AnyCTF || AnyEMPD)`
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry, CP112 maps/defers only the line-186 one-time flag clear without claiming persistent Rust lifecycle parity, CP113 source-maps the canonical generic `ManageEMS` routine at the unconditional `BeginZoneTimestepBeforeInitHeatBalance` caller checkpoint without adding a Rust target, CP114 makes the following unconditional `InitHeatBalance` call a required source mapping without promoting existing Rust initialization state, CP115 maps the second unconditional `ManageEMS` caller checkpoint at `BeginZoneTimestepAfterInitHeatBalance` by reusing `routine.manage_ems` without a new row, CP116 expands the existing required `routine.manage_surface_heat_balance` row for the unconditional line-209 call and complete source parent order, CP117 maps the inline first-time `Initializing Surfaces` display guard at `HeatBalanceSurfaceManager.cc` lines 158-160 without a synthetic routine, and CP118 adds the following unconditional line-161 `InitSurfaceHeatBalance(state)` call and lines 272-621 implementation as a new required source-mapped routine/project entry; CP119 maps the following first-time `Calculate Outside Surface Heat Balance` display guard at lines 165-167 without a synthetic routine; CP120 adds the unconditional line-168 `CalcHeatBalanceOutsideSurf(state)` call and lines 6951-7721 implementation as a new required source-mapped routine/project entry; CP121 maps the first-time inside-balance display at lines 169-171 without a synthetic routine; CP122 adds the unconditional line-172 `CalcHeatBalanceInsideSurf(state)` call and lines 7738-7813 canonical wrapper as a required source-mapped routine/project entry; CP123 maps the first-time air-balance display at lines 176-178 without a synthetic routine; CP124 maps the unconditional line-179 `ManageAirHeatBalance(state)` call by reusing the existing required routine; CP125 adds the unconditional line-184 `UpdateFinalSurfaceHeatBalance(state)` call and lines 5176-5219 implementation as a required source-mapped routine/project entry; CP126 adds the parent lines 186-189 `AnyCTF || AnyEMPD`-guarded `UpdateThermalHistories(state)` call and lines 5221-5581 implementation as a required source-mapped routine/project entry; CP127 adds the independent parent lines 191-206 `AnyCondFD` complete-Surface filtered moisture-update block and inline `SurfaceDataFD::UpdateMoistureBalance` helper as a non-required source-mapped routine; CP128 adds the unconditional line-208 `ManageThermalComfort(state, false)` call and `ThermalComfort.cc` lines 105-164 implementation as a non-required source-mapped routine; CP129 adds the unconditional line-210 `ReportSurfaceHeatBalance(state)` call and `HeatBalanceSurfaceManager.cc` lines 6605-6891 implementation as a required source-mapped routine/project entry; CP130 adds the lines 211-213 `ZoneSizingCalc`-guarded `GatherComponentLoadsSurface(state)` call and `OutputReportTabular.cc` lines 15064-15132 implementation as a non-required source-mapped routine; CP131 adds the unconditional line-215 `CalcThermalResilience(state)` call and `HeatBalanceSurfaceManager.cc` lines 5707-5799 implementation as a non-required source-mapped routine; CP132 adds the lines 217-219 `displayThermalResilienceSummary`-guarded `ReportThermalResilience(state)` call and lines 5801-6388 implementation as a non-required source-mapped routine; CP133 maps the lines 221-223 `displayCO2ResilienceSummary`-guarded `ReportCO2Resilience(state)` call; CP134 maps the lines 225-227 `displayVisualResilienceSummary`-guarded `ReportVisualResilience(state)` call; CP135 maps the parent-tail line-229 `ManageSurfaceHeatBalancefirstTime = false` assignment without a synthetic routine; CP136 maps the `HeatBalanceManager.cc` line-210 unconditional `EndZoneTimestepBeforeZoneReporting` `ManageEMS` call by reusing `routine.manage_ems`; CP137 maps the line-211 `RecKeepHeatBalance(state)` call as a required routine, declared at `HeatBalanceManager.hh` line 134 and implemented at `HeatBalanceManager.cc` lines 2971-3057; CP138 maps the line-217 unconditional `ReportHeatBalance(state)` call as a required routine, declared at header line 142 and implemented at source lines 3321-3418; CP139 maps the line-219 unconditional `EndZoneTimestepAfterZoneReporting` `ManageEMS` call by reusing `routine.manage_ems`; CP140 maps the line-221 unconditional `UpdateEMSTrendVariables(state)` call as non-required, declared at `EMSManager.hh` line 122 and implemented at `EMSManager.cc` lines 1444-1479; CP141 maps the line-222 unconditional `PluginManagement::PluginManager::updatePluginValues(state)` call as non-required, declared at `PluginManager.hh` line 198 and implemented at `PluginManager.cc` lines 1458-1467; CP142 maps the required outer `WarmupFlag && EndDayFlag` block at lines 224-226 and its `CheckWarmupConvergence(state)` call, declared at `HeatBalanceManager.hh` line 136 and implemented at `HeatBalanceManager.cc` lines 3059-3226; CP143 maps the inner line-227 `!WarmupFlag` branch and ordered line-228/229 `DayOfSim = 0` then `DayOfSimChr = "0"` mutations; CP144 maps the line-231 in-branch `ManageEMS(state, BeginNewEnvironmentAfterWarmUp, anyRan, absent)` call by reusing `routine.manage_ems`; CP145 maps the required lines 235-237 guarded `ReportWarmupConvergence(state)` call, declared at `HeatBalanceManager.hh` line 138 and implemented at `HeatBalanceManager.cc` lines 3228-3301; after `ManageHeatBalance` ends at line 238, CP146 maps required `SetPreConstructionInputParameters`, declared at header line 96, called unconditionally from `SimulationManager.cc` line 216, and implemented at source lines 446-492; CP147 maps required `GetSiteAtmosphereData`, declared at header line 100, called from `GetHeatBalanceInput` line 264 between project controls and spectral input, and implemented at source lines 1252-1317; CP148 maps required `AllocateZoneHeatBalArrays`, declared at header line 130, implemented at source lines 2824-2854, and called first by `AllocateHeatBalArrays` at line 2863 from the `InitHeatBalance` BeginSim chain; CP149 maps required `AllocateHeatBalArrays`, declared at header line 132 and implemented at source lines 2855-2963; CP150 maps required `UpdateWindowFaceTempsNonBSDFWin`, declared at header line 140, implemented at source lines 3303-3313, and called by `RecKeepHeatBalance` at line 3056; CP151 maps non-required `OpenShadingFile`, declared at header line 144, implemented at source lines 3422-3438, and called by `InitHeatBalance` at lines 2696-2698; CP152 maps non-required `SetStormWindowControl`, declared at header line 156, implemented at source lines 4595-4644, and called by `InitHeatBalance` at line 2669 under `TotStormWin > 0 && BeginDayFlag`; CP153 maps required `InitConductionTransferFunctions`, declared at header line 180, implemented at source lines 6153-6202, and called by `InitHeatBalance` at line 2621 under `BeginSimFlag && (AnyCTF || AnyEMPD)`; CP154 next maps `GatherForPredefinedReport`, declared at `HeatBalanceSurfaceManager.hh` line 99, implemented at `HeatBalanceSurfaceManager.cc` lines 623-1404, and called by `InitSurfaceHeatBalance` at line 481 under `BeginSimFlag`
 3. unconditional `ManageEMS(state, EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance, anyRan, absent)`
 4. `InitHeatBalance`
 5. unconditional `ManageEMS(state, EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, anyRan, absent)`
@@ -147,7 +148,8 @@ unless the deviation is documented in a case-specific waiver:
 21. as mapped by CP150, `UpdateWindowFaceTempsNonBSDFWin(state)`, declared at `HeatBalanceManager.hh` line 140, implemented at `HeatBalanceManager.cc` lines 3303-3313, and called as the last executable `RecKeepHeatBalance` action at line 3056
 22. as mapped by CP151, `OpenShadingFile(state)`, declared at `HeatBalanceManager.hh` line 144, implemented at `HeatBalanceManager.cc` lines 3422-3438, and called by `InitHeatBalance` at lines 2696-2698 under `BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac`
 23. as mapped by CP152, `SetStormWindowControl(state)`, declared at `HeatBalanceManager.hh` line 156, implemented at `HeatBalanceManager.cc` lines 4595-4644, and called by `InitHeatBalance` at line 2669 under `TotStormWin > 0 && BeginDayFlag`
-24. CP153 next maps `InitConductionTransferFunctions`, declared at `HeatBalanceManager.hh` line 180, implemented at `HeatBalanceManager.cc` lines 6153-6202, and called by `InitHeatBalance` at line 2621 under `BeginSimFlag && (AnyCTF || AnyEMPD)`
+24. as mapped by CP153, `InitConductionTransferFunctions(state)`, declared at `HeatBalanceManager.hh` line 180, implemented at `HeatBalanceManager.cc` lines 6153-6202, and called by `InitHeatBalance` at line 2621 under `BeginSimFlag && (AnyCTF || AnyEMPD)`
+25. CP154 next maps `GatherForPredefinedReport`, declared at `HeatBalanceSurfaceManager.hh` line 99, implemented at `HeatBalanceSurfaceManager.cc` lines 623-1404, and called by `InitSurfaceHeatBalance` at line 481 under `BeginSimFlag`
 
 ## Current Blocker Ledger
 
@@ -235,7 +237,7 @@ EnergyPlus 26.1.0 ownership boundaries explicit:
   `SetPreConstructionInputParameters` call and its shared maximum-layer bound.
   CP147 additionally maps required `GetSiteAtmosphereData` at the project-input
   head. CP148 additionally maps required `AllocateZoneHeatBalArrays` in the
-  BeginSim allocation chain. CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 next maps `InitConductionTransferFunctions`.
+  BeginSim allocation chain. CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 next maps `GatherForPredefinedReport`.
   Warmup convergence is checked only at end-of-day.
 - `HeatBalanceSurfaceManager.cc::ManageSurfaceHeatBalance` calls
   `InitSurfaceHeatBalance`, `CalcHeatBalanceOutsideSurf`,
@@ -1600,7 +1602,7 @@ the in-branch post-warmup EMS call; CP145 adds required
 `ReportWarmupConvergence`; CP146 adds required
 `SetPreConstructionInputParameters`; CP147 adds required
 `GetSiteAtmosphereData`; CP148 adds required `AllocateZoneHeatBalArrays`;
-CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 next maps `InitConductionTransferFunctions`.
+CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 next maps `GatherForPredefinedReport`.
 
 ### CP109 inline sizing Space heat-balance mode map
 
@@ -1880,7 +1882,7 @@ the in-branch post-warmup EMS call; CP145 adds required
 `ReportWarmupConvergence`; CP146 adds required
 `SetPreConstructionInputParameters`; CP147 adds required
 `GetSiteAtmosphereData`; CP148 adds required `AllocateZoneHeatBalArrays`;
-CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 next maps `InitConductionTransferFunctions`.
+CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 next maps `GatherForPredefinedReport`.
 
 ### CP114 `InitHeatBalance` source map
 
@@ -1965,7 +1967,7 @@ the in-branch post-warmup EMS call; CP145 adds required
 `ReportWarmupConvergence`; CP146 adds required
 `SetPreConstructionInputParameters`; CP147 adds required
 `GetSiteAtmosphereData`; CP148 adds required `AllocateZoneHeatBalArrays`;
-CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 next maps `InitConductionTransferFunctions`.
+CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 next maps `GatherForPredefinedReport`.
 
 ### CP115 post-`InitHeatBalance` EMS calling-point map
 
@@ -2398,7 +2400,7 @@ the in-branch post-warmup EMS call, CP145 adds required
 `ReportWarmupConvergence`, CP146 adds required
 `SetPreConstructionInputParameters`, CP147 adds required
 `GetSiteAtmosphereData`, CP148 adds required `AllocateZoneHeatBalArrays`, and
-CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 next maps `InitConductionTransferFunctions`.
+CP149 adds required `AllocateHeatBalArrays`; CP150 adds required `UpdateWindowFaceTempsNonBSDFWin`; CP151 adds non-required `OpenShadingFile`; CP152 adds non-required `SetStormWindowControl`; CP153 adds required `InitConductionTransferFunctions`; CP154 next maps `GatherForPredefinedReport`.
 
 ### CP122 `CalcHeatBalanceInsideSurf` source map
 
@@ -5153,11 +5155,169 @@ CP152 adds non-required `source_mapped`
 body, so CP152 adds no project-contract requirement, source inventory, Rust
 target/code/state, test, support, capability, output, numerical, performance,
 or conformance claim. The inventory becomes 32 algorithms and 161 routines,
-split into 58 `state_mapped` and 103 `source_mapped`, with 57 required. CP153
-next maps `InitConductionTransferFunctions`, declared at
+split into 58 `state_mapped` and 103 `source_mapped`, with 57 required. The
+following CP153 section maps `InitConductionTransferFunctions`, declared at
 `HeatBalanceManager.hh` line 180, implemented at `HeatBalanceManager.cc` lines
 6153-6202, and called by `InitHeatBalance` at line 2621 under
 `BeginSimFlag && (AnyCTF || AnyEMPD)`.
+
+### CP153 `InitConductionTransferFunctions` source map
+
+`InitHeatBalance` lines 2617-2622 contain the sole production `src/` call. A
+false `BeginSimFlag` skips the allocation and CP153 chain completely. When it
+is true, line 2618 must first return from `AllocateHeatBalArrays`; the caller
+then enters CP153 only when `AnyCTF || AnyEMPD`, emits exact progress text
+`Initializing Response Factors`, and calls the routine at line 2621. Thus an
+EMPD model uses this same thermal CTF generator even though its moisture state
+is owned elsewhere. A false inner condition skips both display and call. A
+successful CP153 return reaches `InitSurfacePropertyViewFactors` and the rest
+of BeginSim initialization; any non-return prevents those later effects.
+
+The wrapper starts local `ErrorsFound` and `DoCTFErrorReport` as false, then
+performs these ordered passes:
+
+1. visit every entry of `dataConstruction->Construct` in array order, including
+   entries not used by CTF, and call its `calculateTransferFunction` method;
+2. after each returned child, set shared `SimpleCTFOnly = false` when that
+   construction's `NumHistories > 1`, and raise shared `MaxCTFTerms` only when
+   its `NumCTFTerms` exceeds the retained maximum;
+3. after the complete first pass, independently set `SimpleCTFOnly = false`
+   when `AnyInternalHeatSourceInInput` is true;
+4. make a second complete Construction pass, skipping only `!IsUsedCTF`, and
+   call `reportLayers` for each survivor;
+5. call `ScanForReports(state, "Constructions", InitCTFDoReport,
+   "Constructions")`; when the request is present or a child forced
+   `DoCTFErrorReport`, write the four Construction/material/CTF EIO headers,
+   increment a one-based `cCounter` for every Construction including skipped
+   ones, and call `reportTransferFunction` only for `IsUsedCTF` entries; and
+6. after all reachable reporting, fatal on accumulated errors with exact text
+   `Program terminated for reasons listed (InitConductionTransferFunctions)`.
+
+`ConstructionProps::calculateTransferFunction` in `Construction.cc` lines
+59-1103 is child dependency context rather than a CP153 routine row. On every
+entry it zero-fills the fixed regular CTF arrays (`Outside`, `Cross`, `Inside`,
+and `Flux`), source/sink QTF arrays, source-location and user-location
+temperature-QTF arrays, and resets `CTFTimeStep`, `NumHistories`,
+`NumCTFTerms`, and `UValue` to zero. An unused Construction returns only after
+that destructive reset, so stale coefficients on a newly unused entry are not
+preserved.
+
+Each used child starts its timestep at `TimeStepZone`, reads every declared
+layer's material pointer in layer order, and classifies resistance-only layers.
+For a source/sink Construction, a too-thin or too-diffusive material can emit a
+one-material-lifetime severe/continuation diagnostic and set
+`WarnedForHighDiffusivity`, but that branch does not set the shared error flag.
+Thickness above 3 m and resistance below `1.0e-3 m2-K/W` do set
+`ErrorsFound`. Valid boundary resistance-only layers, and any resistive layer
+whose material is not `ROnly`, are converted to equivalent air properties;
+interior `ROnly` layers instead retain exact massless treatment. The child
+scans the full layer list, then returns before all generation whenever the
+shared `ErrorsFound` is already true. Consequently one earlier Construction
+error makes each later used child reset and scan its layers but leave its
+generation outputs zero, even when that later Construction has no own error.
+
+Before generation, adjacent interior massless layers are merged in local work
+arrays. Every successful merge reduces the local layer/resistance counts and,
+when a source is present, also decrements the Construction's persistent
+`SourceAfterLayer` and `TempAfterLayer` fields. The routine then converts its
+work properties to the legacy English-unit calculation basis, sums series
+resistance, and derives conductance. This merge mutation is not restored at
+return and is therefore relevant to re-entry.
+
+The child next selects one of three branches:
+
+- An all-resistance Construction uses `TimeStepZone`, one history, and one CTF
+  term. Its current outside, cross, and inside coefficients and `UValue` become
+  the inverse total resistance, while history/flux terms are zero. A source or
+  sink on this branch emits a severe error and sets `ErrorsFound`, but the
+  steady coefficients are still copied before the child returns.
+- A source-free Construction whose declared layer pointers exactly reverse an
+  earlier array entry with the same layer count can reuse that entry only when
+  the earlier Construction is `IsUsedCTF`. It copies timestep and counts,
+  swaps inside/outside coefficients, retains cross and nonzero-index flux
+  coefficients, and derives its own `UValue`; source-bearing constructions
+  never take this shortcut.
+- Every other massive Construction creates a finite-difference node grid:
+  interior resistance-only layers use one node, massive/equivalent boundary
+  layers clamp to the source minimum/maximum node rules, optional 2-D geometry
+  expands the grid, and source and requested-temperature nodes are mapped.
+  The adaptive loop builds the 1-D or 2-D state matrices, emits
+  `Calculating CTFs for "<name>"` on every attempt, then calls
+  `calculateExponentialMatrix`, `calculateInverseMatrix`, `calculateGammas`,
+  and `calculateFinalCoefficients` in that exact order.
+
+The final-coefficient dependency stops its term series when the absolute last
+to first flux ratio is below `1.0e-13` or its first flux term is zero, and
+symmetrizes paired cross terms. Back in the adaptive loop, more than 18 terms
+or a greater-than-1% mismatch between absolute outside/cross/inside series sums
+increments `NumHistories`, adds one `TimeStepZone` to `CTFTimeStep`, and retries
+the complete matrix/coefficient sequence. A zero largest series sum fatals
+immediately with `Illegal construction definition, no CTFs calculated for
+<name>`. Any attempt reaching a CTF timestep of at least 7 hours emits the
+ordered convergence/material guidance, forces the Construction report, sets
+the shared error, and breaks. Singular, overflow, and nonfinite matrix results
+have no separate local validation contract. A normally returning new-massive
+path copies current/history CTFs and all applicable QTFs back to fixed storage,
+sets `UValue`, and deallocates its matrix work arrays.
+
+`reportLayers` at `Construction.cc` lines 1973-1984 writes each used
+Construction's material names to already-created predefined columns only when
+that column vector is nonempty. If detailed reporting is selected,
+`reportTransferFunction` at lines 1908-1971 writes the Construction summary
+with the gap-preserving all-Construction `cCounter`, then one material-summary
+record per declared layer, regular CTF terms from highest index down through
+zero, and, when
+applicable, source/sink plus source-location and user-location QTF series. These
+child calculations and report writers remain dependency context; CP153 adds no
+separate row or `Construction.cc`/`.hh` source-inventory entry.
+
+All effects are sequential and nontransactional. A child convergence error can
+leave earlier Constructions fully generated, the failing Construction's latest
+coefficients, and later used Constructions reset to zero; wrapper layer reports
+and a forced or requested detailed report still run before the final fatal.
+Ordinary accumulated errors that do not set `DoCTFErrorReport` produce detailed
+CTF output only when independently requested. An immediate zero-series or
+resistance-merge fatal, a material/assert/matrix dependency failure, or an
+output failure bypasses the remaining passes and wrapper fatal while retaining
+the completed prefix. There is no rollback, status result, or cleanup of
+already published Construction/global/report state.
+
+Successful direct re-entry resets and recomputes each Construction's coefficient
+bundle, and reverse reuse sees the freshly processed earlier entry in the same
+pass. The wrapper does not first restore `SimpleCTFOnly = true` or
+`MaxCTFTerms = 0`; it can only turn the former false and raise the latter, so a
+simpler mutated model can retain stale global state. Its two local error/report
+flags restart false, while material high-diffusivity warning latches persist
+and successful reports append again. Repeated adjacent-resistance merging can
+decrement persistent `SourceAfterLayer`/`TempAfterLayer` again, making that
+source-bearing path non-idempotent. `ConstructionData`, `HeatBalanceData`, and
+`MaterialData` owner clears respectively reconstruct coefficient/Construction
+state, `SimpleCTFOnly`/`MaxCTFTerms` and related flags, and the material
+`WarnedForHighDiffusivity` latch/material state. BeginEnvironment alone does
+not rerun CP153.
+
+Rust's `ConstructionThermalDataCache` can label coefficients
+`EnergyPlusEioSeeded` and feed them into bounded CTF histories, balances,
+updates, and reports. Without imported rows, `RustGeneratedSteady` supplies only
+the no-history `Outside0 = Cross0 = Inside0 = 1/R` fallback. Rust has no native
+finite-difference grid, SI/English conversion path, reverse reuse, matrix
+exponential/inversion/gamma/final-coefficient generator, adaptive timestep and
+history loop, QTF generation, exact diagnostics/report lifecycle, global
+simple/max mutation, or re-entry behavior. Oracle-seeded limited conformance
+therefore does not prove a native CP153 implementation.
+
+CP153 adds required `source_mapped`
+`routine.init_conduction_transfer_functions` and its heat-balance
+project-contract requirement immediately after the two allocation children and
+before `manage_surface_heat_balance`. `HeatBalanceManager.cc` already covers
+the canonical wrapper; all Construction methods remain dependencies. CP153
+adds no source inventory, Rust target/code/state, test, support, capability,
+output, numerical, performance, or conformance promotion. The inventory
+becomes 32 algorithms and 162 routines, split into 58 `state_mapped` and 104
+`source_mapped`, with 58 required. CP154 next maps
+`GatherForPredefinedReport`, declared at `HeatBalanceSurfaceManager.hh` line
+99, implemented at `HeatBalanceSurfaceManager.cc` lines 623-1404, and called by
+`InitSurfaceHeatBalance` at line 481 under `BeginSimFlag`.
 
 ### `CheckValidSimulationObjects` state contract
 

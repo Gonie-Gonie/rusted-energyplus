@@ -43,6 +43,7 @@ required_routines = [
   "init_heat_balance",
   "allocate_zone_heat_bal_arrays",
   "allocate_heat_bal_arrays",
+  "init_conduction_transfer_functions",
   "manage_surface_heat_balance",
   "init_surface_heat_balance",
   "calc_heat_balance_outside_surf",
