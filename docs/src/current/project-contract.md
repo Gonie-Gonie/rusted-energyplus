@@ -174,7 +174,8 @@ averaging, reports/energy, or partial-failure and re-entry behavior.
 
 The inventory now also includes `init_int_solar_distribution` immediately
 after `init_solar_heat_gains` and before
-`calc_heat_balance_outside_surf`. Its EnergyPlus boundary is the unconditional
+`compute_int_thermal_absorp_factors` in source-definition order. Its
+EnergyPlus boundary is the unconditional
 `InitIntSolarDistribution(state)` call inside `InitSurfaceHeatBalance` line
 468, the declaration at `HeatBalanceSurfaceManager.hh` line 111, and the
 complete body at `HeatBalanceSurfaceManager.cc` lines 3778-4177. It remains
@@ -183,8 +184,24 @@ short-wave distribution, window/shade/frame/divider or movable-insulation
 coupling, adjacent-window layer transfer, TDD transition-zone distribution,
 matching report lifecycle, or additive failure/re-entry behavior.
 
+The inventory now also includes `compute_int_thermal_absorp_factors`
+immediately after `init_int_solar_distribution` and before
+`calc_heat_balance_outside_surf` in source-definition order. Its EnergyPlus
+boundary is the unconditional `ComputeIntThermalAbsorpFactors(state)` call
+inside `InitSurfaceHeatBalance` line 427, the declaration at
+`HeatBalanceSurfaceManager.hh` line 113, and the complete body at
+`HeatBalanceSurfaceManager.cc` lines 4179-4295. The runtime call executes
+before both solar routines despite the definition-order inventory. It remains
+`source_mapped` and required: Rust's bounded typed-Zone thermal-radiant-gain
+distribution has ordered `<= 0` gates that admit NaN and does not implement
+radiant-enclosure recalculation gates,
+window shade/blind/slat state, switchable glazing, frame/divider terms,
+representative-surface topology, raw reciprocal/nonfinite behavior, or
+matching failure and re-entry state.
+
 The inventory now also includes `calc_heat_balance_outside_surf` immediately
-after `init_int_solar_distribution`. Its EnergyPlus boundary is the
+after `compute_int_thermal_absorp_factors` in source-definition order. Its
+EnergyPlus boundary is the
 unconditional parent line-168 `CalcHeatBalanceOutsideSurf(state)` call, which
 omits the optional zone-resimulation argument, and the implementation at lines
 6951-7721. It remains `source_mapped` and required. Existing Rust

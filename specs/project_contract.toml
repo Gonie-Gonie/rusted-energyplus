@@ -50,6 +50,7 @@ required_routines = [
   "init_thermal_and_flux_histories",
   "init_solar_heat_gains",
   "init_int_solar_distribution",
+  "compute_int_thermal_absorp_factors",
   "calc_heat_balance_outside_surf",
   "calc_heat_balance_inside_surf",
   "calc_heat_balance_inside_surf_2_ctf_only",
