@@ -238,8 +238,25 @@ bounded retained opaque CTF/environmental balance and report terms do not
 implement or promote the complete Zone/Space/Surface traversal, exterior
 boundary switch, child-call order, state, error behavior, or numerics.
 
+The required inventory now also places `get_qdot_conv_out_per_area`
+immediately after `calc_heat_balance_outside_surf` and before
+`calc_heat_balance_inside_surf`. Its EnergyPlus boundary is the declaration at
+`HeatBalanceSurfaceManager.hh` line 173, the implementation at
+`HeatBalanceSurfaceManager.cc` lines 7723-7736, and the sole production call on
+the right-hand side of the common-tail assignment in
+`CalcHeatBalanceOutsideSurf` line 7717. It remains `source_mapped` and required.
+A strictly positive `OSCMPtr` selects the modeled-other-side `HConv` and
+`TConv` before rain is considered; otherwise rain selects the wet-bulb
+reference and no rain selects dry bulb, both with `SurfHConvExt` and outside
+temperature history term 1. The direct unit fixture covers only the default
+zero-pointer wet and dry formulas. Rust's bounded exterior report helper shares
+the final `-h * (surface - reference)` algebra and typed wet-weather context,
+but it does not implement the raw OSCM-pointer precedence, exact history slot,
+complete parent traversal and skips, caller-owned store, or failure/re-entry
+lifecycle, so no support or conformance promotion follows.
+
 The inventory now also includes `calc_heat_balance_inside_surf` immediately
-after `calc_heat_balance_outside_surf` and before the distinct optimized
+after `get_qdot_conv_out_per_area` and before the distinct optimized
 `calc_heat_balance_inside_surf_2_ctf_only` child. Its EnergyPlus boundary is
 the unconditional parent line-172 `CalcHeatBalanceInsideSurf(state)` call,
 which omits the optional Zone-resimulation argument, and the canonical wrapper
