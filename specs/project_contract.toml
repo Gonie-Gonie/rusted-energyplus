@@ -54,6 +54,7 @@ required_routines = [
   "update_thermal_histories",
   "report_surface_heat_balance",
   "rec_keep_heat_balance",
+  "update_window_face_temps_non_bsdf_win",
   "report_heat_balance",
   "check_warmup_convergence",
   "report_warmup_convergence",

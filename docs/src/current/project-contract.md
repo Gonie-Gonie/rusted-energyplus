@@ -211,8 +211,21 @@ scaffolding only and do not implement or promote the complete state,
 lifecycle, reporting, or window-history behavior.
 
 The canonical heat-balance inventory now also includes
-`report_heat_balance`, immediately after `rec_keep_heat_balance` and before
-the post-reporting EMS calling point. Its EnergyPlus boundary is the
+`update_window_face_temps_non_bsdf_win`, immediately after
+`rec_keep_heat_balance` and before `report_heat_balance`. Its EnergyPlus
+boundary is the last executable `RecKeepHeatBalance` action at line 3056, the
+declaration at `HeatBalanceManager.hh` line 140, and the implementation at
+`HeatBalanceManager.cc` lines 3303-3313. It remains `source_mapped` and
+required: Rust has no analog for the stored-order, current
+`Surface.Construction`-driven copy from outside/inside history term 1 into the
+non-BSDF window report
+array endpoints, including its unchecked indices, partial effects, and retained
+state lifecycle.
+
+The canonical heat-balance inventory now also includes
+`report_heat_balance`, immediately after
+`update_window_face_temps_non_bsdf_win` and before the post-reporting EMS
+calling point. Its EnergyPlus boundary is the
 unconditional parent line-217 `ReportHeatBalance(state)` call and the
 implementation at lines 3321-3418. Schedule reporting always runs first; the
 remaining work selects the normal non-warmup output path, the requested
