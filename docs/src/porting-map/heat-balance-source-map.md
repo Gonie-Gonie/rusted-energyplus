@@ -92,6 +92,7 @@ claim.
 | thermal-comfort manager | unconditional `ThermalComfort::ManageThermalComfort(state, false)` at `ManageSurfaceHeatBalance` line 208, implemented at `ThermalComfort.cc` lines 105-164 | CP128 adds non-required `routine.manage_thermal_comfort`. The false argument disables the initialization-only early return, so after shared first-time setup and six-AM temperature maintenance the non-sizing/non-warmup comfort children run under their exact source gates. No Rust/state/support/conformance claim is added. |
 | Surface heat-balance reporting | unconditional `ReportSurfaceHeatBalance(state)` at `ManageSurfaceHeatBalance` line 210, implemented at `HeatBalanceSurfaceManager.cc` lines 6605-6891 | CP129 adds required `routine.report_surface_heat_balance`. The source orders shading and representative projection, surface/window/opaque reporting, optional heat-emission and movable-insulation work, component-load snapshots, and advanced Zone accumulation. Existing Rust reporting stages remain bounded scaffolds; no support or conformance claim is promoted. |
 | sizing Surface component-load gathering | `ZoneSizingCalc`-guarded `OutputReportTabular::GatherComponentLoadsSurface(state)` at `ManageSurfaceHeatBalance` lines 211-213, implemented at `OutputReportTabular.cc` lines 15064-15132 | CP130 adds non-required `routine.gather_component_loads_surface`. Entered calls still do work only when a component-load report is requested and pulse sizing is false; the routine resets and accumulates only the instantaneous fenestration-conduction sequences. No Rust/state/support/conformance claim is added. |
+| thermal-resilience timestep calculation | unconditional `CalcThermalResilience(state)` at `ManageSurfaceHeatBalance` line 215, implemented at `HeatBalanceSurfaceManager.cc` lines 5707-5799 | CP131 adds non-required `routine.calc_thermal_resilience`. Shared first-time output setup and exact-request discovery precede independently gated Heat Index and Humidex calculations; inactive values are retained. No Rust/state/support/conformance claim is added. |
 | zone air updates | `ManageZoneAirUpdates` | diagnostic shell only |
 | zone air correction | `correctZoneAirTemps` | mapped-not-ported |
 | internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
@@ -103,11 +104,11 @@ The first v0.8 heat-balance candidate must preserve this source-derived order
 unless the deviation is documented in a case-specific waiver:
 
 1. `ManageHeatBalance`
-2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry, CP112 maps/defers only the line-186 one-time flag clear without claiming persistent Rust lifecycle parity, CP113 source-maps the canonical generic `ManageEMS` routine at the unconditional `BeginZoneTimestepBeforeInitHeatBalance` caller checkpoint without adding a Rust target, CP114 makes the following unconditional `InitHeatBalance` call a required source mapping without promoting existing Rust initialization state, CP115 maps the second unconditional `ManageEMS` caller checkpoint at `BeginZoneTimestepAfterInitHeatBalance` by reusing `routine.manage_ems` without a new row, CP116 expands the existing required `routine.manage_surface_heat_balance` row for the unconditional line-209 call and complete source parent order, CP117 maps the inline first-time `Initializing Surfaces` display guard at `HeatBalanceSurfaceManager.cc` lines 158-160 without a synthetic routine, and CP118 adds the following unconditional line-161 `InitSurfaceHeatBalance(state)` call and lines 272-621 implementation as a new required source-mapped routine/project entry; CP119 maps the following first-time `Calculate Outside Surface Heat Balance` display guard at lines 165-167 without a synthetic routine; CP120 adds the unconditional line-168 `CalcHeatBalanceOutsideSurf(state)` call and lines 6951-7721 implementation as a new required source-mapped routine/project entry; CP121 maps the first-time inside-balance display at lines 169-171 without a synthetic routine; CP122 adds the unconditional line-172 `CalcHeatBalanceInsideSurf(state)` call and lines 7738-7813 canonical wrapper as a required source-mapped routine/project entry; CP123 maps the first-time air-balance display at lines 176-178 without a synthetic routine; CP124 maps the unconditional line-179 `ManageAirHeatBalance(state)` call by reusing the existing required routine; CP125 adds the unconditional line-184 `UpdateFinalSurfaceHeatBalance(state)` call and lines 5176-5219 implementation as a required source-mapped routine/project entry; CP126 adds the parent lines 186-189 `AnyCTF || AnyEMPD`-guarded `UpdateThermalHistories(state)` call and lines 5221-5581 implementation as a required source-mapped routine/project entry; CP127 adds the independent parent lines 191-206 `AnyCondFD` complete-Surface filtered moisture-update block and inline `SurfaceDataFD::UpdateMoistureBalance` helper as a non-required source-mapped routine; CP128 adds the unconditional line-208 `ManageThermalComfort(state, false)` call and `ThermalComfort.cc` lines 105-164 implementation as a non-required source-mapped routine; CP129 adds the unconditional line-210 `ReportSurfaceHeatBalance(state)` call and `HeatBalanceSurfaceManager.cc` lines 6605-6891 implementation as a required source-mapped routine/project entry; CP130 adds the lines 211-213 `ZoneSizingCalc`-guarded `GatherComponentLoadsSurface(state)` call and `OutputReportTabular.cc` lines 15064-15132 implementation as a non-required source-mapped routine; the unconditional line-215 `CalcThermalResilience(state)` call is the next CP131 checkpoint
+2. input acquisition through project controls, materials, frame-and-divider properties, constructions, then `GetBuildingData` in its `GetShadowingInput` -> `GetZoneData` -> `SetupZoneGeometry` order, followed by `DataSurfaces::GetVariableAbsorptanceSurfaceList`, `GetIncidentSolarMultiplier`, `GetScheduledSurfaceGains`, the inline representative-surface EIO assignment barrier, `CreateTCConstructions`, the inline no-Zone validity gate with `CheckValidSimulationObjects`, `CheckUsedConstructions`, the immediate inline fatal barrier, `HeatBalanceIntRadExchange::InitSolarViewFactors` at line 316, `ManageInternalHeatGains(state, true)` at line 320, and conditional Kiva setup at lines 322-325; after `GetHeatBalanceInput` returns, the caller conditionally applies the sizing Space heat-balance mode at lines 169-171, conditionally initializes the Surface octree at lines 173-180, then visits the complete Surface array at lines 182-184 for `set_computed_geometry` before clearing `ManageHeatBalanceGetInputFlag` at line 186. CP100 and CP101 type the scheduled-gain routine's two public input families, CP102 bounds its diagnostic tail, CP103 bounds only an immutable thermochromic child projection while the intervening output block remains deferred, CP104 bounds only positive no-Zone invalidity witnesses while leaving the exact parent gate source-mapped, CP105 collects only sorted/deduplicated positive construction-use evidence without inferring any unused state, CP106 source-maps the fatal barrier plus `InitSolarViewFactors`, CP107 source-maps `ManageInternalHeatGains` while preserving only the bounded direct-Zone People-before-OtherEquipment input slice, CP108 source-maps only the conditional `setupKivaInstances` call, CP109 maps/defers only the inline sizing override, CP110 source-maps only the guarded `SurfaceOctreeCube::init`, CP111 state-maps only bounded retained detailed-opaque Triangle and conservative Rectangle computed geometry, CP112 maps/defers only the line-186 one-time flag clear without claiming persistent Rust lifecycle parity, CP113 source-maps the canonical generic `ManageEMS` routine at the unconditional `BeginZoneTimestepBeforeInitHeatBalance` caller checkpoint without adding a Rust target, CP114 makes the following unconditional `InitHeatBalance` call a required source mapping without promoting existing Rust initialization state, CP115 maps the second unconditional `ManageEMS` caller checkpoint at `BeginZoneTimestepAfterInitHeatBalance` by reusing `routine.manage_ems` without a new row, CP116 expands the existing required `routine.manage_surface_heat_balance` row for the unconditional line-209 call and complete source parent order, CP117 maps the inline first-time `Initializing Surfaces` display guard at `HeatBalanceSurfaceManager.cc` lines 158-160 without a synthetic routine, and CP118 adds the following unconditional line-161 `InitSurfaceHeatBalance(state)` call and lines 272-621 implementation as a new required source-mapped routine/project entry; CP119 maps the following first-time `Calculate Outside Surface Heat Balance` display guard at lines 165-167 without a synthetic routine; CP120 adds the unconditional line-168 `CalcHeatBalanceOutsideSurf(state)` call and lines 6951-7721 implementation as a new required source-mapped routine/project entry; CP121 maps the first-time inside-balance display at lines 169-171 without a synthetic routine; CP122 adds the unconditional line-172 `CalcHeatBalanceInsideSurf(state)` call and lines 7738-7813 canonical wrapper as a required source-mapped routine/project entry; CP123 maps the first-time air-balance display at lines 176-178 without a synthetic routine; CP124 maps the unconditional line-179 `ManageAirHeatBalance(state)` call by reusing the existing required routine; CP125 adds the unconditional line-184 `UpdateFinalSurfaceHeatBalance(state)` call and lines 5176-5219 implementation as a required source-mapped routine/project entry; CP126 adds the parent lines 186-189 `AnyCTF || AnyEMPD`-guarded `UpdateThermalHistories(state)` call and lines 5221-5581 implementation as a required source-mapped routine/project entry; CP127 adds the independent parent lines 191-206 `AnyCondFD` complete-Surface filtered moisture-update block and inline `SurfaceDataFD::UpdateMoistureBalance` helper as a non-required source-mapped routine; CP128 adds the unconditional line-208 `ManageThermalComfort(state, false)` call and `ThermalComfort.cc` lines 105-164 implementation as a non-required source-mapped routine; CP129 adds the unconditional line-210 `ReportSurfaceHeatBalance(state)` call and `HeatBalanceSurfaceManager.cc` lines 6605-6891 implementation as a required source-mapped routine/project entry; CP130 adds the lines 211-213 `ZoneSizingCalc`-guarded `GatherComponentLoadsSurface(state)` call and `OutputReportTabular.cc` lines 15064-15132 implementation as a non-required source-mapped routine; CP131 adds the unconditional line-215 `CalcThermalResilience(state)` call and `HeatBalanceSurfaceManager.cc` lines 5707-5799 implementation as a non-required source-mapped routine; the lines 217-219 `displayThermalResilienceSummary`-guarded `ReportThermalResilience(state)` call is the next CP132 checkpoint
 3. unconditional `ManageEMS(state, EMSCallFrom::BeginZoneTimestepBeforeInitHeatBalance, anyRan, absent)`
 4. `InitHeatBalance`
 5. unconditional `ManageEMS(state, EMSCallFrom::BeginZoneTimestepAfterInitHeatBalance, anyRan, absent)`
-6. unconditional `ManageSurfaceHeatBalance(state)`, whose lines 145-230 parent body orders the CP117-mapped inline first-time initialization display, the CP118-mapped unconditional `InitSurfaceHeatBalance` call, the CP119-mapped first-time outside display, the CP120-mapped unconditional `CalcHeatBalanceOutsideSurf` call, the CP121-mapped first-time inside display, the CP122-mapped unconditional `CalcHeatBalanceInsideSurf`, the CP123-mapped first-time air display, the CP124-mapped `ManageAirHeatBalance`, the CP125-mapped `UpdateFinalSurfaceHeatBalance`, the CP126-mapped `AnyCTF || AnyEMPD`-guarded `UpdateThermalHistories`, the CP127-mapped `AnyCondFD`-guarded complete-Surface filtered moisture updates, the CP128-mapped unconditional `ManageThermalComfort(state, false)` call, the CP129-mapped unconditional `ReportSurfaceHeatBalance` call, the CP130-mapped `ZoneSizingCalc`-guarded `GatherComponentLoadsSurface`, the next CP131 unconditional `CalcThermalResilience`, the three independently guarded resilience reports, and the final first-time-flag clear
+6. unconditional `ManageSurfaceHeatBalance(state)`, whose lines 145-230 parent body orders the CP117-mapped inline first-time initialization display, the CP118-mapped unconditional `InitSurfaceHeatBalance` call, the CP119-mapped first-time outside display, the CP120-mapped unconditional `CalcHeatBalanceOutsideSurf` call, the CP121-mapped first-time inside display, the CP122-mapped unconditional `CalcHeatBalanceInsideSurf`, the CP123-mapped first-time air display, the CP124-mapped `ManageAirHeatBalance`, the CP125-mapped `UpdateFinalSurfaceHeatBalance`, the CP126-mapped `AnyCTF || AnyEMPD`-guarded `UpdateThermalHistories`, the CP127-mapped `AnyCondFD`-guarded complete-Surface filtered moisture updates, the CP128-mapped unconditional `ManageThermalComfort(state, false)` call, the CP129-mapped unconditional `ReportSurfaceHeatBalance` call, the CP130-mapped `ZoneSizingCalc`-guarded `GatherComponentLoadsSurface`, the CP131-mapped unconditional `CalcThermalResilience`, the next CP132 thermal-summary-guarded `ReportThermalResilience`, the independently guarded CO2 and visual resilience reports, and the final first-time-flag clear
 
 ## Current Blocker Ledger
 
@@ -1531,8 +1532,9 @@ guarded thermal-history update as a required source mapping. CP127 adds the
 inline CondFD moisture-history helper as a non-required source mapping. CP128
 adds the unconditional ThermalComfort call as a non-required source mapping.
 CP129 adds Surface reporting as a required source mapping. CP130 adds the
-sizing-only component-load gathering call as a non-required source mapping;
-CP131 next maps the following unconditional thermal-resilience calculation.
+sizing-only component-load gathering call as a non-required source mapping.
+CP131 adds the unconditional thermal-resilience calculation as a non-required
+source mapping; CP132 next maps its independently guarded summary report.
 
 ### CP109 inline sizing Space heat-balance mode map
 
@@ -1793,8 +1795,9 @@ guarded thermal-history update as a required source mapping. CP127 adds the
 inline CondFD moisture-history helper as a non-required source mapping. CP128
 adds the unconditional ThermalComfort call as a non-required source mapping.
 CP129 adds Surface reporting as a required source mapping. CP130 adds the
-sizing-only component-load gathering call as a non-required source mapping;
-CP131 next maps the following unconditional thermal-resilience calculation.
+sizing-only component-load gathering call as a non-required source mapping.
+CP131 adds the unconditional thermal-resilience calculation as a non-required
+source mapping; CP132 next maps its independently guarded summary report.
 
 ### CP114 `InitHeatBalance` source map
 
@@ -1860,8 +1863,9 @@ thermal-history update as a required source mapping. CP127 adds the inline
 CondFD moisture-history helper as a non-required source mapping. CP128 adds
 the ThermalComfort manager as a non-required source mapping. CP129 adds the
 Surface reporting routine as a required source mapping. CP130 adds the
-sizing-only component-load gathering call as a non-required source mapping;
-CP131 next maps the following unconditional thermal-resilience calculation.
+sizing-only component-load gathering call as a non-required source mapping.
+CP131 adds the unconditional thermal-resilience calculation as a non-required
+source mapping; CP132 next maps its independently guarded summary report.
 
 ### CP115 post-`InitHeatBalance` EMS calling-point map
 
@@ -1936,11 +1940,13 @@ following parent-driver order:
 13. as mapped by CP129, call `ReportSurfaceHeatBalance(state)`;
 14. as mapped by CP130, when `ZoneSizingCalc` is true, call
     `OutputReportTabular::GatherComponentLoadsSurface(state)`;
-15. at the next CP131 checkpoint, call `CalcThermalResilience(state)`;
-16. independently call `ReportThermalResilience`, `ReportCO2Resilience`, and
-    `ReportVisualResilience` when their respective thermal-, CO2-, and
-    visual-resilience summary display flags are true; and
-17. set `ManageSurfaceHeatBalancefirstTime = false`.
+15. as mapped by CP131, call `CalcThermalResilience(state)`;
+16. at the next CP132 checkpoint, when `displayThermalResilienceSummary` is
+    true, call `ReportThermalResilience(state)`;
+17. independently call `ReportCO2Resilience` and `ReportVisualResilience` when
+    their respective CO2- and visual-resilience summary display flags are
+    true; and
+18. set `ManageSurfaceHeatBalancefirstTime = false`.
 
 Rust already publishes `manage_surface_heat_balance_stage` as execution-plan
 metadata and `manage_surface_heat_balance_source_order_path` as an identity
@@ -2273,8 +2279,9 @@ CP127 adds the inline CondFD moisture-history helper as a non-required source
 mapping. CP128 adds the ThermalComfort manager as a non-required source
 mapping. CP129 adds the Surface reporting routine as a required source
 mapping. CP130 adds the sizing-only component-load gathering call as a
-non-required source mapping, and CP131 next maps the unconditional
-thermal-resilience calculation.
+non-required source mapping. CP131 adds the unconditional thermal-resilience
+calculation as a non-required source mapping, and CP132 next maps its
+independently guarded summary report.
 
 ### CP122 `CalcHeatBalanceInsideSurf` source map
 
@@ -3072,9 +3079,126 @@ project-contract entry, Rust target or code, mapped state, capability,
 support-gate admission, manifest, comparator, proof variable, result, output,
 numerical, performance, or conformance promotion. The inventory becomes 32
 algorithms and 144 routines, split into 58 `state_mapped` and 86
-`source_mapped` routines; the required-routine total remains 48. CP131 next
-maps the unconditional parent line-215 `CalcThermalResilience(state)` call and
-its `HeatBalanceSurfaceManager.cc` lines 5707-5799 implementation.
+`source_mapped` routines; the required-routine total remains 48. The following
+CP131 section maps the unconditional parent line-215
+`CalcThermalResilience(state)` call and its `HeatBalanceSurfaceManager.cc`
+lines 5707-5799 implementation.
+
+### CP131 `CalcThermalResilience` source map
+
+After the CP130 branch closes, whether or not that branch called or performed
+component-load work, `HeatBalanceSurfaceManager.cc::ManageSurfaceHeatBalance`
+line 215 unconditionally calls `CalcThermalResilience(state)`. The canonical
+body spans lines 5707-5799 and is declared at
+`HeatBalanceSurfaceManager.hh` line 155. There is no parent or routine-wide
+warmup, sizing, environment, occupancy, or reporting-request guard.
+
+The routine shares the parent Surface manager's first-time lifecycle rather
+than owning a separate flag. `ManageSurfaceHeatBalancefirstTime` defaults true
+at `HeatBalanceSurfaceManager.hh` line 239 and is restored true by
+`clear_state()` at line 291; `reportVarHeatIndex` and `reportVarHumidex`
+default false at lines 244-245 and are restored false at lines 296-297. While
+the shared flag is true, CP131 registers `Zone Heat Index` with units C and
+`Zone Humidity Index` with units None as Zone-timestep Average variables for
+every Zone, regardless of whether either variable was requested.
+
+It then scans the complete `dataOutputProcessor->reqVars` list. Exact name
+equality with `Zone Heat Index` sets `reportVarHeatIndex` true; the mutually
+exclusive `else if` exact match with `Zone Humidity Index` sets
+`reportVarHumidex` true. CP131 does not clear the shared first-time flag. Only
+the successfully reached `ManageSurfaceHeatBalance` tail at line 229 writes it
+false. Consequently, an abnormal exit after this routine is reached but
+before that tail can cause same-state re-entry to repeat both output
+registration and request scanning.
+
+The Zone `Resilience` array is dependency-owned rather than allocated here.
+`HeatBalanceManager.cc` lines 1853-1856 always allocate it with
+`NumOfZones` during Zone input because the two output variables require the
+structure; its Heat Index and Humidex values have zero defaults. CP131 does
+not allocate or globally reset the array and overwrites only whichever
+calculation is active. An inactive calculation therefore retains its prior or
+default value.
+
+Heat Index has the independent gate
+`reportVarHeatIndex || displayThermalResilienceSummary`. For every Zone it
+reads ordinary Zone-average `ZTAV` and `airHumRatAvg`, not the comfort-only
+state, computes relative humidity as
+`PsyRhFnTdbWPb(ZoneT, ZoneW, OutBaroPress) * 100`, and converts temperature to
+`ZoneTF = ZoneT * 9 / 5 + 32`. When `heatIndexMethod == Simplified`, a
+Fahrenheit temperature below 80 uses exactly
+
+```text
+HI_F = 0.5 * (ZoneTF + 61
+              + 1.2 * (ZoneTF - 68)
+              + 0.094 * ZoneRH)
+```
+
+At 80 F or above it uses the nine-term Rothfusz expression
+
+```text
+HI_F = -42.379
+       + 2.04901523 * T
+       + 10.14333127 * RH
+       - 0.22475541 * T * RH
+       - 0.00683783 * T^2
+       - 0.05481717 * RH^2
+       + 0.00122874 * T^2 * RH
+       + 0.00085282 * T * RH^2
+       - 0.00000199 * T^2 * RH^2
+```
+
+and then subtracts `(13 - RH) / 4 * sqrt((17 - abs(T - 95)) / 17)` when
+`RH < 13 && T < 112`; only the `else if` case `RH > 85 && T < 87` adds
+`(RH - 85) / 10 * (87 - T) / 5`. Both simplified branches finally convert
+with `(HI_F - 32) * 5 / 9` and store `ZoneHeatIndex` in C.
+
+The source tests only equality with `Simplified`, so every other enum value
+takes the extended path. That path calls
+`ExtendedHI::heatindex(state, ZoneT + Kelvin, ZoneRH / 100) - Kelvin`, using
+Kelvin temperature and fractional relative humidity. The
+`ExtendedHeatIndex.cc` lines 538-557 dependency temporarily replaces the
+global root algorithm with `ShortBisectionThenRegulaFalsi`, performs its
+extended calculations and root solves, and restores the saved algorithm
+before returning. It is dependency context rather than another CP131 routine
+or source entry.
+
+Humidex has its own independent gate
+`reportVarHumidex || displayThermalResilienceSummary`. For every Zone it uses
+the same ordinary `airHumRatAvg`, `ZTAV`, and outdoor barometric pressure and
+computes exactly
+
+```text
+TDewPointK = PsyTdpFnWPb(ZoneW, OutBaroPress) + Kelvin
+e = 6.11 * exp(5417.7530 * (1 / 273.16 - 1 / TDewPointK))
+h = 5 / 9 * (e - 10)
+ZoneHumidex = ZoneT + h
+```
+
+Although this result is temperature-based, its registered `Zone Humidity
+Index` unit is exactly None. Enabling `displayThermalResilienceSummary`
+activates both the Heat Index and Humidex passes even when neither output
+variable was requested; otherwise each false request/summary gate leaves that
+quantity unchanged.
+
+`CalcThermalResilience` contains no direct warning, severe, fatal, or display
+diagnostic statement. Output registration, Psychrometrics, ExtendedHI, and
+the root solver remain dependencies. The psychrometric functions bound very
+small humidity ratios and relative humidity, and diagnostic-enabled
+psychrometric paths can report large range errors; ExtendedHI does not return
+its root-solver flags through CP131. These deeper behaviors add no routine row
+or source inventory entry for ExtendedHI, Psychrometrics, or DataHeatBalance.
+
+CP131 adds non-required `source_mapped`
+`routine.calc_thermal_resilience`. Its implementation and lifecycle header are
+already in the Surface-manager source inventory, so it adds no EnergyPlus
+source, project-contract entry, Rust target or code, mapped state, capability,
+support-gate admission, manifest, comparator, proof variable, result, output,
+numerical, performance, or conformance promotion. The inventory becomes 32
+algorithms and 145 routines, split into 58 `state_mapped` and 87
+`source_mapped` routines; the required-routine total remains 48. CP132 next
+maps the parent lines 217-219 `displayThermalResilienceSummary` guard and its
+`ReportThermalResilience(state)` call, whose canonical body spans
+`HeatBalanceSurfaceManager.cc` lines 5801-6388.
 
 ### `CheckValidSimulationObjects` state contract
 
