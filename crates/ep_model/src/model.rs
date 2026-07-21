@@ -23,9 +23,9 @@ use crate::{
     ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
     Space, SpaceId, SpaceList, SpaceListId, SpaceOrigin, SpaceTypeId, Surface,
     SurfaceConvectionAlgorithms, SurfaceId, SurfaceIncidentSolarMultiplierRequest,
-    SurfaceVaporCoefficients, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
-    VariableAbsorptanceSurfaceBinding, Version, WeekScheduleId, WindowFrameAndDivider,
-    WindowFrameAndDividerId, WindowGlazingThermochromicGroupMaterial,
+    SurfaceSolarIncident, SurfaceVaporCoefficients, ThermostatDualSetpoint, ThermostatSetpointId,
+    TimestepConfig, VariableAbsorptanceSurfaceBinding, Version, WeekScheduleId,
+    WindowFrameAndDivider, WindowFrameAndDividerId, WindowGlazingThermochromicGroupMaterial,
     WindowGlazingThermochromicState, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
     ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneGroup, ZoneGroupId, ZoneHumidistat,
     ZoneHumidistatId, ZoneId, ZoneList, ZoneListId, ZoneLocalEnvironment, ZoneLocalEnvironmentId,
@@ -265,6 +265,8 @@ pub struct TypedModel {
     pub variable_absorptance_surface_bindings: Vec<VariableAbsorptanceSurfaceBinding>,
     /// Validated incident-solar declarations awaiting fenestration-surface resolution.
     pub surface_incident_solar_multiplier_requests: Vec<SurfaceIncidentSolarMultiplierRequest>,
+    /// Scheduled inside-surface incident-solar declarations.
+    pub surface_solar_incidents: Vec<SurfaceSolarIncident>,
     /// Constant exterior/interior vapor-transfer coefficient attachments.
     pub surface_vapor_coefficients: Vec<SurfaceVaporCoefficients>,
     /// User-declared window frame, divider, and reveal property records.
@@ -389,6 +391,7 @@ impl Default for TypedModel {
             surface_names: NameMap::default(),
             variable_absorptance_surface_bindings: Vec::new(),
             surface_incident_solar_multiplier_requests: Vec::new(),
+            surface_solar_incidents: Vec::new(),
             surface_vapor_coefficients: Vec::new(),
             window_frame_and_dividers: Vec::new(),
             window_frame_and_divider_names: NameMap::default(),
@@ -499,6 +502,7 @@ impl TypedModel {
             + self.space_lists.len()
             + self.surfaces.len()
             + self.surface_incident_solar_multiplier_requests.len()
+            + self.surface_solar_incidents.len()
             + self.surface_vapor_coefficients.len()
             + self.window_frame_and_dividers.len()
     }

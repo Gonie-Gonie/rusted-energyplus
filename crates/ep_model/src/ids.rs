@@ -17,6 +17,7 @@ typed_id!(SpaceListId);
 typed_id!(SpaceTypeId);
 typed_id!(SurfaceId);
 typed_id!(SurfaceIncidentSolarMultiplierRequestId);
+typed_id!(SurfaceSolarIncidentId);
 typed_id!(SurfaceVaporCoefficientsId);
 typed_id!(WindowFrameAndDividerId);
 typed_id!(ConstructionId);

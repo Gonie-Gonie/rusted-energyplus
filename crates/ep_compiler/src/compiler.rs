@@ -6,6 +6,7 @@ mod construction_window_data_file;
 mod construction_window_equivalent_layer;
 mod space;
 mod surface_incident_solar_multiplier;
+mod surface_solar_incident;
 mod surface_space;
 mod variable_absorptance_surface;
 mod zone;
@@ -585,6 +586,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
     "Zone",
     "BuildingSurface:Detailed",
     "SurfaceProperty:IncidentSolarMultiplier",
+    "SurfaceProperty:SolarIncidentInside",
     "SurfaceProperties:VaporCoefficients",
 ];
 
@@ -699,6 +701,7 @@ impl<'a> Compiler<'a> {
         self.parse_surfaces(&mut model);
         self.build_variable_absorptance_surface_list(&mut model, diagnostics_before_surfaces);
         self.parse_surface_incident_solar_multiplier_requests(&mut model);
+        self.parse_surface_solar_incidents(&mut model);
         self.parse_thermostat_dual_setpoints(&mut model);
         self.parse_zone_thermostats(&mut model);
         self.parse_zone_humidistats(&mut model);
@@ -17598,6 +17601,7 @@ mod tests {
     mod space;
     mod surface_incident_solar_multiplier;
     mod surface_properties_vapor_coefficients;
+    mod surface_solar_incident;
     mod surface_space;
     mod variable_absorptance_surface;
     mod window_material_blind;
