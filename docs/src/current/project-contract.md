@@ -256,20 +256,51 @@ complete parent traversal and skips, caller-owned store, or failure/re-entry
 lifecycle, so no support or conformance promotion follows.
 
 The inventory now also includes `calc_heat_balance_inside_surf` immediately
-after `get_qdot_conv_out_per_area` and before the distinct optimized
-`calc_heat_balance_inside_surf_2_ctf_only` child. Its EnergyPlus boundary is
-the unconditional parent line-172 `CalcHeatBalanceInsideSurf(state)` call,
-which omits the optional Zone-resimulation argument, and the canonical wrapper
-at lines 7738-7813. It remains `source_mapped` and required. That wrapper owns
+after `get_qdot_conv_out_per_area` and before the separately mapped general
+`calc_heat_balance_inside_surf_2` child. Its EnergyPlus boundary is the
+unconditional parent line-172 `CalcHeatBalanceInsideSurf(state)` call, which
+omits the optional Zone-resimulation argument, and the canonical wrapper at
+lines 7738-7813. It remains `source_mapped` and required. That wrapper owns
 first-call and BeginEnvrn lifecycle, radiant-HVAC aggregation, complete versus
 partial and AllCTF versus general dispatch, MRT calculation, and intermediate
-result updates; its dependencies own the complete general iteration,
-surface/window/moisture/Kiva topology, non-local partial-resimulation side
-effects, errors, and the pass-by-value warmup-counter reachability boundary.
+result updates. CP172 now owns the complete general iteration and its
+surface/window/moisture/Kiva topology, non-local partial-resimulation effects,
+errors, and failure/re-entry behavior; the pass-by-value warmup-counter
+reachability boundary remains shared with the distinct optimized child.
 Existing Rust inside-balance stage metadata, its identity wrapper, bounded
-surface passes, and the separate CTF-only routine mapping do not implement or
-promote this complete canonical routine, state, lifecycle, dispatch, error
-behavior, or numerics.
+surface passes, and the separate child mappings do not implement or promote
+this complete canonical wrapper, state, lifecycle, dispatch, error behavior,
+or numerics.
+
+The required inventory places `calc_heat_balance_inside_surf_2` immediately
+after `calc_heat_balance_inside_surf` and before the distinct optimized
+`calc_heat_balance_inside_surf_2_ctf_only`. Its EnergyPlus boundary is the
+header declaration at lines 179-184, body at source lines 7815-8656, and the
+wrapper's only two general calls at lines 7797 and 7809. An absent optional
+Zone reaches it only when cached `AllCTF` is false; a present Zone always
+reaches it. The four supplied Surface vectors independently define reference-
+air/history, interzone, non-window, and Window work, while the optional Zone is
+forwarded only to the radiation and convection children. The source zeros
+exactly 13 selected Window fields, resets the global iteration count, samples
+the global scheduled-source list, and can advance all Kiva instances before
+its at-least-one-pass solve. Each pass snapshots the complete temperature
+array, temporarily substitutes and restores all Kiva radiant temperatures,
+executes the general opaque/Window/moisture branches, and commits histories
+and interzone pairing. Regular Windows run only on pass one, TDD diffusers run
+every pass, convection refreshes at pre-increment counts 30 through 480 on a
+maximum-length run, and the strict post-increment limit breaks after 501
+passes, warning outside warmup even if pass 501 first converged. The EMPD/HAMT
+tail globally zeros every Zone moisture sum before rebuilding only the
+supplied non-window subset. All five literal wrapper unit calls omit Zone and
+retain cached `AllCTF = true`, including the Kiva-named fixture, so they select
+the CTF-only child; CP172 has no direct or known exercised unit path. Raw list,
+index, arithmetic, map-insertion, child-failure, diagnostic, and partial-state
+semantics remain unchecked and have no rollback; retry resets only early
+selected fields and the iteration count while inheriting other partial state.
+Rust has no general solver, four-list/partial topology, non-CTF, Window,
+Kiva, or moisture lifecycle, 501-pass behavior, or matching failure/re-entry
+semantics,
+so no support or conformance promotion follows.
 
 The required inventory now places `calculate_zone_mrt` after the optimized
 `calc_heat_balance_inside_surf_2_ctf_only` child and before
@@ -290,8 +321,8 @@ The following required inventory entry places
 `update_intermediate_surface_heat_balance_results` after `calculate_zone_mrt`
 and before
 `manage_air_heat_balance`, preserving the canonical inside-balance
-parent/optimized-child/tail grouping before the Air subtree. Its EnergyPlus
-boundary is the sole production call after `CalculateZoneMRT` at
+parent/general-or-optimized-child/tail grouping before the Air subtree. Its
+EnergyPlus boundary is the sole production call after `CalculateZoneMRT` at
 `CalcHeatBalanceInsideSurf` line 7812, the declaration at
 `HeatBalanceSurfaceManager.hh` line 132, and the complete body at
 `HeatBalanceSurfaceManager.cc` lines 4951-5020. It remains `source_mapped` and
