@@ -6,9 +6,9 @@ use crate::{
     ConstructionId, ConstructionWindowDataFileRequest, DayScheduleId,
     DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId,
     ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
-    ExternalInterfaceSchedule, FanComponent, GlazingSpectralData, GlazingSpectralDataId,
-    GlobalGeometryRules, IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId, LoopId,
-    Material, MaterialHeatAndMoistureTransferDiffusion,
+    ExternalInterfaceSchedule, FanComponent, FenestrationSolarAbsorbedRequest, GlazingSpectralData,
+    GlazingSpectralDataId, GlobalGeometryRules, IdealLoadsAirSystem, IdealLoadsAirSystemId,
+    InternalGainId, LoopId, Material, MaterialHeatAndMoistureTransferDiffusion,
     MaterialHeatAndMoistureTransferRedistribution, MaterialHeatAndMoistureTransferSettings,
     MaterialHeatAndMoistureTransferSorptionIsotherm, MaterialHeatAndMoistureTransferSuction,
     MaterialHeatAndMoistureTransferThermalConductivity, MaterialId,
@@ -267,6 +267,8 @@ pub struct TypedModel {
     pub surface_incident_solar_multiplier_requests: Vec<SurfaceIncidentSolarMultiplierRequest>,
     /// Scheduled inside-surface incident-solar declarations.
     pub surface_solar_incidents: Vec<SurfaceSolarIncident>,
+    /// Scheduled absorbed-solar requests for unresolved fenestration surfaces.
+    pub fenestration_solar_absorbed_requests: Vec<FenestrationSolarAbsorbedRequest>,
     /// Constant exterior/interior vapor-transfer coefficient attachments.
     pub surface_vapor_coefficients: Vec<SurfaceVaporCoefficients>,
     /// User-declared window frame, divider, and reveal property records.
@@ -392,6 +394,7 @@ impl Default for TypedModel {
             variable_absorptance_surface_bindings: Vec::new(),
             surface_incident_solar_multiplier_requests: Vec::new(),
             surface_solar_incidents: Vec::new(),
+            fenestration_solar_absorbed_requests: Vec::new(),
             surface_vapor_coefficients: Vec::new(),
             window_frame_and_dividers: Vec::new(),
             window_frame_and_divider_names: NameMap::default(),
@@ -503,6 +506,7 @@ impl TypedModel {
             + self.surfaces.len()
             + self.surface_incident_solar_multiplier_requests.len()
             + self.surface_solar_incidents.len()
+            + self.fenestration_solar_absorbed_requests.len()
             + self.surface_vapor_coefficients.len()
             + self.window_frame_and_dividers.len()
     }

@@ -644,6 +644,13 @@ pub(super) fn assess_typed_runtime_boundaries(
         registry,
         unsupported_objects,
         diagnostics,
+        "ComplexFenestrationProperty:SolarAbsorbedLayers",
+        typed_model.fenestration_solar_absorbed_requests.len(),
+    );
+    push_typed_unsupported_object(
+        registry,
+        unsupported_objects,
+        diagnostics,
         "Construction:FfactorGroundFloor",
         typed_model
             .constructions

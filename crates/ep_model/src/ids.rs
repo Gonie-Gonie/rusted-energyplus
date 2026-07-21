@@ -15,6 +15,7 @@ typed_id!(ZoneLocalEnvironmentId);
 typed_id!(SpaceId);
 typed_id!(SpaceListId);
 typed_id!(SpaceTypeId);
+typed_id!(FenestrationSolarAbsorbedRequestId);
 typed_id!(SurfaceId);
 typed_id!(SurfaceIncidentSolarMultiplierRequestId);
 typed_id!(SurfaceSolarIncidentId);

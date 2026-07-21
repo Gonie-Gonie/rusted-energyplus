@@ -3,6 +3,7 @@ use crate::{PartialRunPolicy, RunMode, RunOutputFormat, TraceLevel};
 use ep_compiler::compile_raw_model;
 use ep_raw_model::parse_epjson_str;
 
+mod complex_fenestration_solar_absorbed_layers;
 mod construction_air_boundary;
 mod construction_complex_fenestration_state;
 mod construction_ground_factor;
