@@ -122,6 +122,21 @@ algorithm target, and its bounded adiabatic synchronization/snapshot wrapper
 do not implement the seven equipment-source updates or conditional full
 two-pass replay and do not promote state, support, or conformance.
 
+The next required inventory entry is `update_thermal_histories`, after
+`update_final_surface_heat_balance`; together with the existing preceding
+`manage_air_heat_balance` and nested `manage_zone_air_updates` entries, this
+preserves completion of the Air subtree before the Surface manager's final and
+history stages. The EnergyPlus parent calls the routine at lines 186-189 only
+when `AnyCTF || AnyEMPD`, and the canonical body spans lines 5221-5581. It owns
+one-time scratch allocation, current CTF/EMPD flux and report updates, the
+`SimpleCTFOnly && !AnyConstrOverridesInModel` fast shift, and the normal
+first-sample capture, per-surface history counter, master rollover or
+interpolation, and embedded-source history paths. It remains `source_mapped`
+and required. The existing Rust `update_thermal_histories_stage`, identity
+wrapper, and bounded vector-history push do not implement the complete parent
+gate, topology, first-time/master state, interpolation cadence, current report
+terms, or internal-source histories and do not promote support or conformance.
+
 The canonical time-domain inventory includes `get_project_data`,
 `process_schedule_input`, `process_interval_fields`,
 `day_schedule_populate_from_minute_vals`, and

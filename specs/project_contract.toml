@@ -47,6 +47,7 @@ required_routines = [
   "manage_air_heat_balance",
   "manage_zone_air_updates",
   "update_final_surface_heat_balance",
+  "update_thermal_histories",
 ]
 
 [[domain_claim]]
