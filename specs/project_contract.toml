@@ -91,6 +91,7 @@ required_routines = [
   "zone_space_heat_balance_push_system_timestep_history",
   "revert_zone_timestep_histories",
   "zone_space_heat_balance_revert_zone_timestep_history",
+  "zone_space_heat_balance_correct_hum_rat",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",

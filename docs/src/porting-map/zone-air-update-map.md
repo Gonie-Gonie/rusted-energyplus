@@ -35,6 +35,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | Zone/Space record-level system-timestep history commit | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::pushSystemTimestepHistory` | no singular helper; nearest paths rebuild or locally shift three-slot Zone histories | CP211 required source-mapped four-slot record commit plus conditional RoomAir/AFN and non-ThirdOrder state; no exact Rust record, Space, cadence, or auxiliary-state parity |
 | Zone/Space Zone-timestep history revert dispatch | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::RevertZoneTimestepHistories` | per-Zone compat current-state reset in the local adaptive count-greater-than-one path | CP212 required source-mapped dormant global Zone-first/Space dispatch; no built-in source request or exact Rust timing, topology, child-state, or selector parity |
 | Zone/Space record-level Zone-timestep history revert | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::revertZoneTimestepHistory` | no singular helper; nearest Rust paths push three-slot Zone or local system histories in the opposite direction | CP213 required source-mapped four-slot forward copy plus exact-Zone RoomAir/AFN branches and the literal mixed-level slot anomaly; no built-in reach or Rust record parity |
+| Zone/Space record-level humidity correction | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::correctHumRat` | history-only Zone humidity passes plus a separate bounded no-OA ThirdOrder IdealLoads helper | CP214 required source-mapped airflow/coefficient solve, clamps, RoomAir/hybrid/node/latent-sizing effects, and failure transaction; no exact Rust Zone/Space record parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -3435,10 +3436,291 @@ numerical, performance, or conformance promotion is added. The inventory
 becomes 32 algorithms and 221 routines, split 58 `state_mapped` plus 163
 `source_mapped`, with 98 required; the heat-balance project list becomes 67.
 
-CP214 next maps
+### CP214 `ZoneSpaceHeatBalanceData::correctHumRat` source map
+
 `ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int zoneNum,
-int spaceNum = 0)`, declared at `ZoneTempPredictorCorrector.hh` line 241 and
+int spaceNum = 0)` is declared at `ZoneTempPredictorCorrector.hh` line 241 and
 implemented at `ZoneTempPredictorCorrector.cc` lines 4433-4619.
+
+Its sole production direct call expression is CP207 `correctAirTemp` line
+4128. Before entry, that parent has selected histories, solved temperature,
+written `MAT = ZT`, and reported sensible demand. Only after CP214 returns
+does CP207 commit `airHumRat = airHumRatTemp`, calculate relative humidity,
+classify temperature change, and return. A CP214 non-return therefore leaves
+the parent record's committed humidity and RH old even when earlier CP214
+effects survive.
+
+The ordinary HVAC path reaches CP214 through
+`ManageZoneAirUpdates(CorrectStep)` -> CP206 `correctZoneAirTemps` -> CP207.
+The initial correction follows Predict and `SimHVAC`. If adaptive shortening
+selects strict `TimeStepSys < TimeStepZone`, every fine step repeats Predict,
+`SimHVAC`, correction, contaminant correction, and system-history push.
+Within each correction pass CP206 calls every Zone first and then only stored
+Spaces satisfying
+`doSpaceHeatBalanceSimulation && !DoingSizing`. CP214 therefore executes once
+per selected record, not as a standalone global traversal.
+
+#### Flow collection and coefficient order
+
+CP214 debug-asserts only `zoneNum > 0`, initializes local moisture and dry-air
+mass flows to zero, aliases the parent Zone, calculates
+`ZoneMult = Multiplier * ListMultiplier`, and snapshots controlled,
+return-plenum, and supply-plenum flags. Exactly one primary branch runs, in
+this priority:
+
+| Branch | Ordered contribution |
+|---|---|
+| controlled Zone | every configured inlet node contributes `MassFlowRate * HumRat / ZoneMult` and `MassFlowRate / ZoneMult` |
+| return plenum | every plenum inlet, then every ADU's upstream leak followed by downstream leak, contributes the corresponding node humidity and leak flow divided by `ZoneMult` |
+| supply plenum | the one plenum inlet contributes its flow and humidity divided by `ZoneMult` |
+| none | both primary-flow locals remain zero |
+
+Parallel-PIU leakage is independent of that branch. A nonempty
+`leakageParallelPIUNums` vector causes an ordinal loop from one through the
+vector size. The literal implementation indexes global `PIU(piuNum)` instead
+of reading the PIU identities stored in the vector. Thus stored identities
+such as `[7, 12]` select `PIU(1)` and `PIU(2)`; each selected positive
+`leakFlow` uses its primary-inlet humidity. CP214 maps this source behavior
+without normalizing it.
+
+Next it constructs:
+
+```text
+LatentGain =
+    record latentGain
+  + SumLatentHTRadSys(zoneNum)
+  + SumLatentPool(zoneNum)
+
+B =
+    LatentGain / H2OHtOfVap
+  + (OAMFL + VAMFL + CTMFL) * OutHumRat
+  + EAMFLxHumRat
+  + MoistureMassFlowRate
+  + SumHmARaW
+  + MixingMassFlowXHumRat
+  + MDotOA * OutHumRat
+
+A =
+    ZoneMassFlowRate
+  + OAMFL + VAMFL + EAMFL + CTMFL
+  + SumHmARa + MixingMassFlowZone + MDotOA
+
+C =
+    PsyRhoAirFnPbTdbW(OutBaroPress, ZT, airHumRat)
+  * parent Zone.Volume
+  * parent Zone.ZoneVolCapMultpMoist
+  / TimeStepSysSec
+```
+
+Density is evaluated before water-vapor enthalpy, and default `B` is assigned
+before `A`. When AFN is always multizone-simulated, or its control is
+distribution-only-during-fan-operation with the fan active, CP214 replaces
+rather than augments those default `A/B` values:
+
+```text
+B =
+    LatentGain / H2OHtOfVap
+  + exchange.SumMHrW + exchange.SumMMHrW
+  + MoistureMassFlowRate + SumHmARaW
+
+A =
+    ZoneMassFlowRate
+  + exchange.SumMHr + exchange.SumMMHr
+  + SumHmARa
+```
+
+After `C` is calculated, independent AFN-distribution and duct-loss flags add
+`exchange.TotalLat` and then `ZoneLat(zoneNum)` to `B`. These additions do not
+depend on whether the multizone replacement ran.
+
+A positive Space call still uses the parent Zone's equipment/plenum/PIU
+topology, multiplier, radiant and pool gains, AFN exchange, duct loss, volume,
+and moisture-capacitance multiplier. Only record fields addressed through
+`this`, the final Space node, and the Space latent-sizing demand owner are
+Space-specific. In particular, Space `C` does not use Space volume.
+
+#### Solver, clamps, and RoomAir override
+
+The solution switch writes `airHumRatTemp` as follows:
+
+| Solution enum | Calculation |
+|---|---|
+| `ThirdOrder` | `(B + C * (3*WPrev[0] - 1.5*WPrev[1] + WPrev[2]/3)) / ((11/6)*C + A)` |
+| `AnalyticalSolution`, exact `A == 0` | `W1 + B/C`; the source comment says `B=0`, but the code neither tests nor forces that |
+| `AnalyticalSolution`, nonzero `A` | `(W1 - B/A) * exp(min(700, -A/C)) + B/A` |
+| `EulerMethod` | `(C*W1 + B) / (C + A)` |
+| any unmatched value | no assignment; the previous `airHumRatTemp` continues |
+
+There is no denominator, finite, or enum diagnostic. CP214 first changes a
+strictly negative result to literal zero, calculates saturation humidity at
+`ZT` and outdoor barometric pressure, and caps a strictly higher result.
+Comparison-detected values alone are clamped: zero survives, and NaN can pass
+both tests.
+
+An exact parent-Zone RoomAir `AirflowNetwork` enum then overwrites
+`airHumRatTemp` from the Zone control-air node. This test has no exact-Zone,
+global nonmixing, RoomAir-active, or AFN-activity gate, so a positive Space
+record receives the same Zone control-node humidity. Because the overwrite is
+after both clamps and has no second clamp, it can restore a negative,
+supersaturated, or nonfinite value.
+
+The density helper floors only its local working humidity to `1e-5`; it does
+not change the record. The node-enthalpy helper likewise uses its own
+psychrometric handling. Consequently an AFN-supplied negative node
+`HumRat` can coexist with enthalpy calculated from a locally floored humidity.
+
+#### Hybrid, node, and latent-sizing effects
+
+Hybrid humidity work requires exact `spaceNum == 0`, the global hybrid flag,
+either humidity infiltration or people inference, and both non-warmup and
+non-sizing state. People inference alone builds
+`latentGainExceptPeople`. The child always samples measured humidity and, after the optional date-window
+block, always shifts measured-humidity history on successful return. Within
+the date window it may mutate Zone `airHumRat`, measured supply fields, and
+infiltration/people inference outputs; inference additionally requires
+Zone-timestep history. The child does not update `airHumRatTemp`; on a normal
+return CP207 later overwrites its temporary measured `airHumRat` with the
+solved value.
+
+Node selection starts from the parent Zone system node. Only a positive
+`spaceNum` selects the Space system node; any nonpositive identity uses the
+Zone node. A strictly positive node number causes `Node.HumRat` to be written
+before `Node.Enthalpy`. Controlled or plenum status is not part of the actual
+write gate despite the source comment.
+
+When `DoLatentSizing` is true, CP214 computes saturation pressure at `ZT`,
+dewpoint from `airHumRatTemp` at standard barometric pressure, and vapor
+pressure difference. A positive Space selects its sensible and moisture
+demand records; otherwise the parent Zone records are used. The report child
+receives the raw `LatentGain`, the already reported sensible heat-plus-cool
+rate, and vapor-pressure difference. It writes latent heating/cooling rates,
+energies, sensible heat ratio, and vapor-pressure difference. AFN and duct
+terms added to solver `B` are not added to this raw report argument.
+
+A malformed negative `spaceNum` is not rejected. It skips only the exact-Zone
+hybrid branch while otherwise using parent-Zone node, demand, topology, and
+capacity state; the RoomAir AFN override still runs.
+
+#### Failure, retry, and reset
+
+Beyond the debug assertion, CP214 validates no Zone upper bound, Space sign,
+record kind or membership, multiplier, volume, timestep, pressure, flow,
+denominator, solution enum, allocation, node, plenum, ADU, PIU, AFN, hybrid,
+demand topology, or finite result. It returns void and owns no status, catch,
+cleanup, completion marker, transaction, or rollback. Psychrometric children
+can also mutate diagnostic or cache state.
+
+A topology or early psychrometric non-return can precede any record write.
+Failure during saturation retains a newly solved or lower-clamped
+`airHumRatTemp`. Later failures can retain RoomAir or hybrid effects, a new
+node humidity with stale enthalpy, or partial latent-sizing demand reports.
+The parent `MAT` write and sensible report already precede every CP214 call.
+Any non-return blocks CP207's final humidity/RH commit and returned delta,
+then blocks the remaining CP206 record traversal.
+
+Retry recomputes from live nodes, the current record humidity, AFN, schedules,
+and demand state. It can resample hybrid schedules, shift measured histories
+again, repeat reports and diagnostics, or use humidity committed by an earlier
+successful CP207 call. `ZoneTempPredictorCorrectorData::clear_state` rebuilds
+only its predictor/corrector records; clean replay also requires coordinated
+reset of nodes, Zone/Space and equipment topology, AFN/RoomAir, hybrid state,
+demands, HVAC/environment state, and psychrometric diagnostics/cache.
+
+#### C++ reach
+
+There are ten direct unit-test call expressions. The
+`ZoneTempPredictorCorrector_CorrectZoneHumRatTest` fixture calls CP214 six
+times under Euler: five uncontrolled/no-plenum calls followed by one
+controlled call. Its six assertions inspect only the Zone system node humidity
+at `0.008`. `HybridModel_correctZoneAirTempsTest` directly calls CP214 four
+times for two humidity-infiltration and two humidity-people cases; its four
+assertions inspect only inferred infiltration or people results.
+
+The same hybrid fixture calls CP206 five times. With one Zone and inactive
+Space-HB flags, each transitively enters CP214 once while humidity hybrid modes
+are off; those assertions target temperature-hybrid effects. Focused normal
+dynamic entry is therefore ten direct plus five indirect calls. There is no
+focused assertion for a direct Space, return/supply plenum, ADU/PIU, AFN,
+duct, negative or saturation clamp, ThirdOrder or Analytical formula,
+latent-sizing report, node enthalpy, unknown enum, failure, retry, or reset.
+
+Of 57 active `ManageSimulation` expressions, one expected EMS fatal stops
+before correction and one zero-Zone case executes no record. The remaining 55
+configurations reach Zone CP214. Their static one-correction-pass topology is
+81 Zone plus three active simulation-Space records, for 84 record calls split
+74 ThirdOrder, ten Analytical, and zero Euler. Warmup, run periods, the initial
+correction, and any adaptive fine steps make actual runtime counts larger;
+84 is a configuration census, not an execution total.
+
+Those 84 records split into 55 controlled Zones and 29 records with no
+controlled primary flow: 26 Zones plus the three active Spaces. The corpus has
+no return/supply-plenum or parallel-PIU leakage topology. AFN multizone
+replacement can reach five Zone identities, its distribution `TotalLat`
+addition three, and duct latent addition three. No active full simulation has
+RoomAir AFN or HybridModel Zone humidity. One latent-sizing configuration can
+reach the Zone moisture-report branch, while positive-Space latent reporting
+has zero corpus reach. Existing assertions do not isolate any of those
+coefficient, override, or report effects, CP214's branch order, or its failure
+transaction.
+
+#### Rust boundary
+
+Rust has no source-shaped singular `correct_hum_rat` helper, wrapper, or
+Zone/Space record transaction. The main heat-balance path instead calls
+`correct_zone_air_humidity_ratios_from_current_state` once after a complete
+all-Zone temperature pass. It writes every Zone's current humidity directly
+from either a three-slot history term divided by `11/6` or history slot zero.
+The adaptive count-greater-than-one path separately invokes
+`correct_single_zone_air_humidity_ratio_from_history` inside each Zone-local
+fine-step loop.
+
+Those helpers have no moisture `A/B/C`, volume/capacitance term, latent or
+supply flow, plenum/PIU/leak, outdoor/mixing/surface-moisture, AFN/duct,
+Analytical/Euler, RoomAir, hybrid, node, RH, Space, or latent-sizing report.
+They clamp to saturation, then enforce a `1e-5` minimum, and replace a nonpositive
+timestep or nonfinite output with `0.008`; these guards differ from CP214's raw
+math and literal-zero allowance. Neither helper has a direct test, and the
+focused adaptive test takes count one and bypasses the per-substep helper.
+
+A separate public IdealLoads helper,
+`correct_no_oa_third_order_humidity_ratio_compat`, is an explicit bounded
+analogue. For one aggregated purchased-air supply it validates inputs, builds
+density and vapor enthalpy, uses
+`C = rho * volume * moistureMultiplier / timestep`,
+`B = latent/Hvap + supplyMass * supplyHumidity`, `A = supplyMass`, applies the
+exact ThirdOrder equation, and clamps negative and saturated results. It
+returns corrected humidity plus `A/B` through `Option`.
+
+That helper omits every other CP214 source term and lifecycle effect, all
+plenum/leak/AFN/duct and alternate-solver branches, Space state, RoomAir,
+hybrid, node/RH commit, and latent-sizing reporting. Its closed-loop
+IdealLoads owner atomically replaces two independent three-slot histories
+after PurchasedAir succeeds. Two direct tests check the formula and saturation,
+and one humidistat test makes an independent helper call; none proves the
+heat-balance transaction. Existing official dynamic and no-OA IdealLoads
+humidity claims remain at their declared case boundaries and are not widened
+or reattributed to full CP214 parity.
+
+CP214 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.zone_space_heat_balance_correct_hum_rat`
+immediately after
+`routine.zone_space_heat_balance_revert_zone_timestep_history`. The
+heat-balance project contract adds
+`zone_space_heat_balance_correct_hum_rat` after
+`zone_space_heat_balance_revert_zone_timestep_history` and before
+`update_final_surface_heat_balance`. The algorithm remains a `scaffold` with
+`claim_level = none`. No EnergyPlus source inventory, Rust target, code,
+mapped state, test, support, capability, output implementation, comparator,
+manifest, numerical, performance, or conformance promotion is added. The
+inventory becomes 32 algorithms and 222 routines, split 58 `state_mapped`
+plus 164 `source_mapped`, with 99 required; the heat-balance project list
+becomes 68.
+
+CP215 next maps the first scalar-output
+`DownInterpolate4HistoryValues(Real64 OldTimeStep, Real64 NewTimeStep, ...)`
+overload, declared at `ZoneTempPredictorCorrector.hh` lines 299-308 and
+implemented at `ZoneTempPredictorCorrector.cc` lines 4621-4702. The array
+overload begins at line 4704.
 
 ## Promotion Requirements
 

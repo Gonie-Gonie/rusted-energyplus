@@ -1772,13 +1772,85 @@ support, output, numerical, or conformance claim. The inventory becomes 32
 algorithms and 221 routines, split 58 `state_mapped` plus 163
 `source_mapped`, with 98 required; the heat-balance project list becomes 67.
 
-CP214 next maps
+The following required record definition entry is
+`zone_space_heat_balance_correct_hum_rat`, after
+`zone_space_heat_balance_revert_zone_timestep_history` and before
+`update_final_surface_heat_balance`. Its source boundary is
 `ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int zoneNum,
 int spaceNum = 0)`, declared at `ZoneTempPredictorCorrector.hh` line 241 and
 implemented at `ZoneTempPredictorCorrector.cc` lines 4433-4619.
 
+Its sole production call is CP207 line 4128. The parent has already solved
+temperature, written `MAT`, and reported sensible demand. Only a successful
+return commits record humidity and RH and produces the correction delta.
+Initial HVAC correction and every selected adaptive fine step repeat this
+record transaction. Each pass visits every Zone and only active non-sizing
+simulation Spaces. The current corpus therefore has an 84-record static
+one-pass topology: 81 Zones plus three Spaces, split 74 ThirdOrder and ten
+Analytical, with no Euler. This is not a runtime call total. The records split
+55 controlled versus 29 without controlled primary flow; plenum and
+parallel-PIU paths have zero corpus reach. AFN multizone replacement can reach
+five Zone identities, AFN distribution latent addition three, and duct latent
+addition three, but no assertion isolates those coefficient effects.
+
+CP214 collects primary moisture/mass flow from exactly one controlled,
+return-plenum, supply-plenum, or empty branch, then independently adds
+parallel-PIU leakage. The literal PIU loop indexes global PIUs one through the
+stored list size rather than reading the list's identities. It builds latent
+gain, density, vapor enthalpy, and default `A/B`; an active AFN multizone
+condition replaces `A/B`, while AFN distribution and duct latent terms are
+added independently. `C` always uses parent-Zone volume and moisture capacity,
+including for Space records.
+
+ThirdOrder, Analytical, and Euler equations write `airHumRatTemp`; an
+unmatched enum retains its old value. A strict negative-to-zero clamp and
+saturation cap precede a parent-Zone RoomAir AFN control-node overwrite that
+also applies to Space records and is not reclamped. Exact-Zone hybrid humidity
+inference follows, then a positive selected node receives humidity before
+enthalpy. Optional latent sizing finally reports raw latent gain with the
+already reported sensible load to the selected Zone or Space moisture-demand
+owner.
+
+A positive Space uses its record, node, and latent-sizing demand but retains
+parent-Zone equipment, multiplier, capacity, AFN/duct, radiant/pool, and
+RoomAir context. A malformed negative Space identity uses Zone node and demand
+state and skips only the exact-Zone hybrid branch. CP214 has only a debug
+positive-Zone assertion and no bounds, membership, topology, allocation,
+multiplier, timestep, pressure, denominator, enum, or finite validation. It
+has no status, catch, transaction, cleanup, or rollback. Failure can retain
+temporary humidity, hybrid, node, or demand prefixes after the parent's prior
+`MAT` and sensible writes while blocking final humidity/RH and later record
+traversal. Retry can resample hybrid schedules and repeat histories, reports,
+and diagnostics.
+
+Ten direct C++ calls and five indirect focused calls cover only Euler node
+humidity and bounded hybrid-inference slices. No focused assertion establishes
+Space, plenum/ADU/PIU, AFN/duct, alternate solver, clamp, enthalpy,
+latent-sizing, failure, retry, or reset behavior.
+
+Rust has no singular Zone/Space helper. Main heat-balance humidity correction
+uses only three-slot history, writes current Zone humidity directly, enforces
+a `1e-5` floor and `0.008` invalid fallback, and omits the source `A/B/C`
+moisture transaction and all Space/lifecycle effects. A separate guarded
+IdealLoads helper implements one no-OA ThirdOrder purchased-air subset and
+returns corrected humidity plus `A/B`, but omits the other source terms,
+solvers, topology, node/RH/hybrid/sizing effects, and partial-failure
+semantics. Existing official dynamic and no-OA IdealLoads humidity claims
+remain at their declared case boundaries.
+
+CP214 remains required `source_mapped` and adds no Rust target, mapped state,
+support, output, numerical, or conformance claim. The inventory becomes 32
+algorithms and 222 routines, split 58 `state_mapped` plus 164
+`source_mapped`, with 99 required; the heat-balance project list becomes 68.
+
+CP215 next maps the first scalar-output
+`DownInterpolate4HistoryValues(Real64 OldTimeStep, Real64 NewTimeStep, ...)`
+overload, declared at `ZoneTempPredictorCorrector.hh` lines 299-308 and
+implemented at `ZoneTempPredictorCorrector.cc` lines 4621-4702. The array
+overload begins at line 4704.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`zone_space_heat_balance_revert_zone_timestep_history`, preserving the
+`zone_space_heat_balance_correct_hum_rat`, preserving the
 completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
@@ -1808,7 +1880,8 @@ The next required inventory entry is `update_thermal_histories`, after
 `push_system_timestep_histories` /
 `zone_space_heat_balance_push_system_timestep_history` /
 `revert_zone_timestep_histories` /
-`zone_space_heat_balance_revert_zone_timestep_history` entries, this
+`zone_space_heat_balance_revert_zone_timestep_history` /
+`zone_space_heat_balance_correct_hum_rat` entries, this
 preserves completion of the Air subtree before the Surface manager's final and
 history stages. The EnergyPlus parent calls the routine at lines 186-189 only
 when `AnyCTF || AnyEMPD`, and the canonical body spans lines 5221-5581. It owns
