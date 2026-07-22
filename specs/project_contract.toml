@@ -97,6 +97,7 @@ required_routines = [
   "process_inverse_model_multp_hm",
   "inverse_model_humidity",
   "zone_space_heat_balance_calc_zone_or_space_sums",
+  "zone_heat_balance_calc_sum_hat",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",
