@@ -120,6 +120,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `DataSizing::calcDesignSpecificationOutdoorAir` | `src/EnergyPlus/DataSizing.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air/dcv.rs::occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s` |
 | `ZoneEquipmentManager::ManageZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ideal_loads_zone_equipment_stages`; `validate_ideal_loads_zone_equipment_dispatch`; `crates/ep_runtime/src/execution_plan.rs::ExecutionPlan` |
 | `ZoneEquipmentManager::GetZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent eager typed equipment lists/connections and `TimestepConfig` only |
+| `ZoneEquipmentManager::InitZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent `ZoneSysEnergyDemand`, diagnostic node state, and time-axis begin-environment metadata only |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
 | `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand` |
 
@@ -1190,9 +1191,230 @@ The inventory becomes 32 algorithms and 243 routines, split 58 `state_mapped`
 plus 185 `source_mapped`, with 120 required; the heat-balance and HVAC project
 lists become 88 and 9.
 
-CP239 next maps `ZoneEquipmentManager::InitZoneEquipment`, declared at
-`ZoneEquipmentManager.hh` line 90 and implemented at
-`ZoneEquipmentManager.cc` lines 199-316.
+## CP239 `InitZoneEquipment` Multi-Cadence Initializer
+
+CP239 adds required `routine.init_zone_equipment` after
+`routine.get_zone_equipment` and before `routine.sim_zone_equipment`, plus the
+same ordered HVAC project item. `InitZoneEquipment` is declared at
+`ZoneEquipmentManager.hh` line 90 and its complete implementation is
+`ZoneEquipmentManager.cc` lines 199-316. The algorithm already cites
+`ZoneEquipmentManager.cc`, so no algorithm-level source or Rust target changes.
+
+### Caller and cadence regions
+
+The sole direct production call expression is the unconditional
+`InitZoneEquipment(state, FirstHVACIteration)` at `ManageZoneEquipment` line
+155. It runs before that parent tests `ZoneSizingCalc`, so both sizing and
+ordinary simulation traverse CP239. It is not called by `GetZoneEquipment`,
+does not acquire input itself, and any abnormal exit suppresses the parent's
+Size-or-Sim child, Update child, and final `SimZone = false`. The `unused 1208`
+comments beside the declaration and definition are stale.
+
+The body has three ordered cadence regions:
+
+1. an `InitZoneEquipmentOneTimeFlag` allocation block;
+2. an `InitZoneEquipmentEnvrnFlag && BeginEnvrnFlag` environment block,
+   followed by the independent false-BeginEnvironment rearm; and
+3. an every-call HVAC-timestep and primary-air-loop reset suffix.
+
+### One-time demand and sizing storage
+
+When `InitZoneEquipmentOneTimeFlag` is true, line 210 clears it before any
+allocation. Line 211 then allocates `ZoneEqSizing` to `NumOfZones`, replacing
+all entries with default sizing records. The ascending Zone loop from one
+through `NumOfZones` skips an uncontrolled configuration and independently
+skips a controlled configuration whose `EquipListIndex` is zero.
+
+For every retained Zone, CP239 reads
+`ZoneEquipList(EquipListIndex).NumOfEquipTypes` and performs this exact order:
+
+1. write sensible `NumZoneEquipment`;
+2. allocate sensible `SequencedOutputRequired`,
+   `SequencedOutputRequiredToHeatingSP`, then
+   `SequencedOutputRequiredToCoolingSP`;
+3. write moisture `NumZoneEquipment`;
+4. allocate moisture `SequencedOutputRequired`,
+   `SequencedOutputRequiredToHumidSP`, then
+   `SequencedOutputRequiredToDehumidSP`; and
+5. allocate `ZoneEqSizing(Zone).SizingMethod` to
+   `HVAC::NumOfSizingTypes`, which is 35, then fill it with zero.
+
+The six `EPVector` allocations provide zero-valued elements, but CP239
+populates no load sequence. Uncontrolled and zero-list-pointer Zones retain
+only their default outer sizing record and receive none of the selected-Zone
+demand writes.
+
+If either `doSpaceHeatBalanceSimulation` or
+`doSpaceHeatBalanceSizing` is true, CP239 then visits that selected parent
+Zone's stored `spaceIndexes` without testing the corresponding Space
+configuration's controlled flag. Each member Space receives the same equipment
+count and the same six sensible-then-moisture sequence allocations. It receives
+no Space sizing-method array. This stored-membership traversal differs from the
+later full Space-configuration traversals.
+
+### Environment availability and node state
+
+The begin-environment block first assigns every current `ZoneEquipAvail` entry,
+including uncontrolled slots, to `Avail::Status::NoAction`. If `ZoneComp` is
+allocated, CP239 visits exactly component types 1 through
+`NumValidSysAvailZoneComponents`, which is 14. For each type with an allocated
+`ZoneCompAvailMgrs` array, it visits component indexes one through
+`TotalNumComp` and resets only `availStatus`, `StartTime`, and `StopTime` to
+NoAction/zero/zero. Names, manager lists, Zone identity, input/count state, and
+other fields remain unchanged.
+
+CP239 next range-visits the complete Zone configuration array and calls
+`EquipConfiguration::beginEnvirnInit` only for controlled records. Only when
+`doSpaceHeatBalanceSimulation` is true, not for sizing alone, it similarly
+visits the complete Space configuration array and calls the same child for
+controlled records. The child is declared at `DataZoneEquipment.hh` line 375
+and implemented at `DataZoneEquipment.cc` lines 2234-2301; it remains dependency
+context rather than a new ledger row.
+
+For each configuration the child visits its Zone node, then inlet nodes, then
+exhaust nodes, and finally return nodes only when `NumReturnNodes > 0`. Every
+visited node receives temperature 20 C, mass flow zero, quality one, current
+outdoor barometric pressure and humidity ratio, and enthalpy from
+`PsyHFnTdbW(20, OutHumRat)`. It copies outdoor CO2 and generic contaminant only
+when each simulation flag is active, so disabled contaminant fields are left
+unchanged. It does not reset every node member or the flow-availability bounds.
+
+Only after all availability and node work returns does line 283 clear
+`InitZoneEquipmentEnvrnFlag`. A later reached CP239 call while
+`BeginEnvrnFlag` is false sets that flag true. Thus repeated calls during one
+still-true BeginEnvironment interval skip successful environment work, but a
+new environment is recognized only if CP239 ran during an intervening false
+interval.
+
+### Every-call HVAC and air-loop reset
+
+Every CP239 call range-visits all Zone configurations and invokes
+`EquipConfiguration::hvacTimeStepInit` on controlled records. Space
+configurations receive the same call only during Space heat-balance simulation.
+This child is declared at `DataZoneEquipment.hh` line 377 and implemented at
+`DataZoneEquipment.cc` lines 2303-2327.
+
+The child first accesses its configuration Zone node and always sets
+configuration `ExcessZoneExh = 0`. Only when `FirstHVACIteration` is true does
+it visit exhaust nodes, copy Zone-node temperature, humidity ratio, enthalpy,
+pressure, and quality, zero `MassFlowRate`, `MassFlowRateMaxAvail`, and
+`MassFlowRateMinAvail`, and conditionally copy active contaminants. It does not
+touch inlet or return nodes, absolute max/min flows, or every node field.
+`FirstHVACIteration` affects no other CP239 branch.
+
+Finally the ascending loop over one through `NumPrimaryAirSys` zeros exactly
+six `AirLoopFlow` aggregates in order: `SupFlow`, `ZoneRetFlow`, `SysRetFlow`,
+`RecircFlow`, `LeakFlow`, and `ExcessZoneExhFlow`. Design, outdoor-air,
+previous-flow, ratio, fan, and other air-loop fields remain intact.
+
+### Failure, replay, and reset
+
+Both manager latches default true and manager `clear_state()` reconstructs
+them. The one-time latch never naturally rearms. The environment latch rearms
+only through a reached CP239 call with `BeginEnvrnFlag` false. Sizing, demand,
+equipment, availability, node, contaminant, and air-loop state are owned and
+cleared separately, so resetting the manager alone neither undoes CP239's
+writes nor restores a coordinated initial state.
+
+CP239 has no local topology, membership, count, bounds, allocation, node,
+finite-value, or cross-owner validation and no assertion, diagnostic, status,
+catch, cleanup, transaction, or rollback. It assumes the input/configuration,
+demand, sizing, availability, node, and air-loop arenas agree.
+
+Because the one-time latch clears first, failure from the outer sizing
+allocation onward leaves an ordered partial prefix and same-state retry skips
+all unfinished one-time work. Environment failure before line 283 leaves its
+latch true, so retry repeats availability and earlier node overwrites. Failure
+in the every-call suffix after line 283 leaves the environment latch false, so
+retry during that same BeginEnvironment interval does not replay environment
+initialization. On a false-BeginEnvironment call, rearm precedes the timestep
+suffix and survives a later failure.
+
+A configuration-child failure suppresses later configurations and all air-loop
+resets. Air-loop failure leaves earlier loops zero and later loops stale.
+Retries repeat earlier configuration mutations. Even successful calls are not
+globally pure: every call clears excess exhaust and six air-loop aggregates,
+first-iteration calls overwrite exhaust nodes from current configuration node
+state, and manually rearming the one-time latch reallocates stored demand and
+sizing data. Traversals neither sort nor deduplicate, so malformed shared
+identities can be visited repeatedly.
+
+### C++ and active-corpus evidence
+
+No C++ unit test directly calls `InitZoneEquipment`,
+`EquipConfiguration::beginEnvirnInit`, or
+`EquipConfiguration::hvacTimeStepInit`. Nine non-sizing direct
+`ManageZoneEquipment` calls across eight tests enter CP239 indirectly. Eight
+pass `FirstHVACIteration = true`; the later UnitHeater call passes false after
+an earlier full simulation. The PTHP/plenum test contains two calls under the
+same true BeginEnvironment value, but its assertions target descendant
+equipment/plenum behavior.
+
+Across those eight contexts there are zero assertions on either CP239 latch,
+`ZoneEqSizing`, equipment counts or sequence storage, availability status or
+times, excess exhaust, or the six reset air-loop fields. Node and equipment
+assertions occur only after descendants have run and do not isolate CP239's
+node-reset order. There is no failure, retry, rearm, reset, sizing-branch,
+Space-allocation, or zero-Zone focused test.
+
+The broader active unit corpus contains 115 call expressions in five ancestor
+categories across 95 unique test contexts: direct parent, `ManageSizing`,
+`SetupSimulation`, `ManageHeatBalance`, and `ManageSimulation`. Categories
+overlap and are not runtime-call counts. One plant-only `ManageSizing`
+expression does not itself reach CP239 but its later `SetupSimulation` does.
+The intentional EMS-fatal `ManageSimulation` expression stops before HVAC and
+is the sole context that never reaches CP239 by any path.
+
+The other 56 active full simulations reach CP239 at least once: 55 contain
+Zones and one WeatherManager fixture is a zero-Zone run whose fresh one-time
+block still allocates zero-length `ZoneEqSizing`. Thirty-four first reach CP239
+during requested Zone sizing and the other 22 first reach it during setup; the
+one-time block completes exactly once per fresh successful state.
+
+Twenty-one of those configurations also request system sizing.
+`ManageSystemSizingAdjustments` forces `BeginEnvrnFlag` true, reaches CP239,
+then sets the global flag false without another CP239 call. CP239's environment
+latch therefore remains false, so the next setup environment's first true-Begin
+call suppresses environment initialization; a later false-Begin call rearms it.
+This source-order edge is unasserted.
+
+Seven sizing-Space configurations statically reach one-time sequence allocation
+for 21 Space identities under the simulation-or-sizing condition. The sole
+simulation-Space configuration has three uncontrolled Spaces, so the active
+corpus yields zero controlled Space `beginEnvirnInit` or `hvacTimeStepInit`
+child entries. Exact warmup, multi-environment, system-timestep, later
+HVAC-iteration, equipment-list, and air-loop multiplicity remains
+uninstrumented, and no full-simulation assertion isolates CP239-owned state.
+
+### Rust boundary and status
+
+Rust's typed equipment lists, connections, and graph edges provide immutable
+IdealLoads-only identities and sequences, not CP239 storage or lifecycle.
+Rust `ZoneSysEnergyDemand` is a copied four-scalar sensible/moisture snapshot;
+it has no equipment count, sequenced arrays, Zone moisture arena, Space
+counterpart, or `ZoneEqSizing`. `NodeStateStore` is explicitly diagnostic and
+stores only typed identity, temperature, humidity ratio, mass flow, and
+temperature setpoint; it has no role-specific environment/timestep protocol,
+pressure, quality, enthalpy, contaminants, or flow-availability bounds.
+
+The Rust time axis precomputes `begin_environment` metadata but owns no mutable
+rearm latch. `IdealLoadsInitFlags` mirrors `InitPurchasedAir`, not
+`InitZoneEquipment`. Availability-manager identities have no runtime
+status/start/stop lifecycle, and static AirLoopHVAC graph state has no six
+aggregate-flow fields. Existing psychrometric helpers are not wired into this
+node-reset path. Stage metadata also omits CP239.
+
+CP239 adds no algorithm-level EnergyPlus source, Rust target, executable code,
+mapped state, test, object support, capability, output implementation,
+comparator, case, manifest, numerical, performance, or conformance promotion.
+The algorithm remains `scaffold` with claim level `none`. The inventory becomes
+32 algorithms and 244 routines, split 58 `state_mapped` plus 186
+`source_mapped`, with 121 required; the heat-balance and HVAC project lists
+become 88 and 10.
+
+CP240 next maps `ZoneEquipmentManager::sizeZoneSpaceEquipmentPart1`, declared
+at `ZoneEquipmentManager.hh` lines 92-99 and implemented at
+`ZoneEquipmentManager.cc` lines 317-597.
 
 ## Claim Requirements
 

@@ -8890,9 +8890,73 @@ performance, or conformance promotion. The inventory becomes 32 algorithms
 and 243 routines, split 58 `state_mapped` plus 185 `source_mapped`, with 120
 required; the heat-balance project list remains 88 and the HVAC list becomes 9.
 
-CP239 next maps `ZoneEquipmentManager::InitZoneEquipment`, declared at
+CP239 adds canonical required `routine.init_zone_equipment` after
+`get_zone_equipment` and before `sim_zone_equipment`, plus the matching HVAC
+project item. `ZoneEquipmentManager::InitZoneEquipment` is declared at
 `ZoneEquipmentManager.hh` line 90 and implemented at
-`ZoneEquipmentManager.cc` lines 199-316.
+`ZoneEquipmentManager.cc` lines 199-316. Its sole direct production call is the
+unconditional `ManageZoneEquipment` line-155 child before that parent's
+sizing-versus-simulation branch; it does not acquire equipment input.
+
+A true one-time flag clears itself before any allocation, allocates
+`ZoneEqSizing` to `NumOfZones`, and then visits ascending controlled Zone
+indexes with nonzero equipment-list pointers. It publishes each selected
+list's equipment count into sensible and moisture demand state, allocates six
+sequenced-demand vectors, and allocates and zeroes the 35-entry sizing-method
+array. Space demand vectors receive the parent Zone count only when Space heat
+balance simulation or sizing is active. This allocation path uses each Zone's
+stored Space membership, while the later Space initialization paths use the
+full Space configuration array.
+
+The independent begin-environment gate resets the Zone availability array and
+the status/start/stop fields of allocated managers for the 14 valid component
+types, then calls the separate `EquipConfiguration::beginEnvirnInit` dependency
+for every controlled Zone and, only during Space simulation, controlled Space.
+Those children reset selected Zone/inlet/exhaust/return node fields from fixed
+20 C and current outdoor conditions. The environment flag clears only after
+that whole block returns and rearms only on a reached call with
+`BeginEnvrnFlag = false`.
+
+Every invocation then calls `EquipConfiguration::hvacTimeStepInit` for
+controlled Zones and optional simulation-time Spaces. It always clears each
+configuration's excess exhaust; only `FirstHVACIteration` copies its Zone node
+state to exhaust nodes and zeroes their flow availability. Finally CP239 zeros
+exactly `SupFlow`, `ZoneRetFlow`, `SysRetFlow`, `RecircFlow`, `LeakFlow`, and
+`ExcessZoneExhFlow` for every primary air loop.
+
+There is no local topology, bounds, allocation, node, or finite-value
+validation and no diagnostic, status, catch, cleanup, transaction, or rollback.
+Failure after the early one-time-flag clear leaves unfinished storage that
+retry skips. Environment failure before its late flag clear replays the prefix,
+whereas timestep or air-loop failure after that clear retries without the
+environment block during the same BeginEnvironment interval. Manager-only
+reset restores the two flags but not the separately owned mutated state.
+
+No C++ unit test directly calls CP239 or either delegated configuration method.
+Nine non-sizing `ManageZoneEquipment` expressions across eight tests enter it
+indirectly, but zero assertions target its latches, storage, availability,
+node-reset protocol, excess exhaust, or six air-loop fields. Fifty-six active
+full simulations provide only a lower bound of one CP239 entry each: 55 have
+Zones and the WeatherManager fixture has zero Zones. The remaining intentional
+EMS-fatal expression stops before HVAC. Exact sizing, warmup, environment, and
+HVAC-iteration multiplicity is uninstrumented.
+
+Rust has adjacent immutable IdealLoads equipment graphs, a four-scalar
+`ZoneSysEnergyDemand`, diagnostic node state, and precomputed
+begin-environment time-axis metadata. It has no equipment-count/sequenced
+demand arenas, separate Zone moisture-demand arena or Space demand state, `ZoneEqSizing`,
+availability-manager lifecycle, complete role-specific node state, persistent
+one-time/environment latches, or primary-air-loop aggregate-flow state.
+`IdealLoadsInitFlags` belongs to `InitPurchasedAir` and is not CP239. CP239 adds
+no algorithm-level source, Rust target/code/state, test, support, capability,
+output, numerical, performance, or conformance promotion. The inventory
+becomes 32 algorithms and 244 routines, split 58 `state_mapped` plus 186
+`source_mapped`, with 121 required; the heat-balance project list remains 88
+and the HVAC list becomes 10.
+
+CP240 next maps `ZoneEquipmentManager::sizeZoneSpaceEquipmentPart1`, declared
+at `ZoneEquipmentManager.hh` lines 92-99 and implemented at
+`ZoneEquipmentManager.cc` lines 317-597.
 
 ## Promotion Requirements
 
