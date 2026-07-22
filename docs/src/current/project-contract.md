@@ -2937,7 +2937,8 @@ temperature and flatten the residual. Child air-velocity diagnostics can
 advance once per trial, including duplicated endpoints and warmup. An
 unmatched People identity leaves the freshly zeroed PMV result at both
 endpoints rather than indexing the requested record. SurfaceWeighted MRT
-first-use also clears latches and initializes Surface `AE`/`enclAESum`; with
+first-use also updates its first-use/error latches and initializes Surface
+`AE`/`enclAESum`; with
 a bad sum, its first trial warns and returns the Space-MAT/surface average
 while later trials return zero, so repeated endpoints can invalidate the
 initial bracket and make `-2` reachable.
