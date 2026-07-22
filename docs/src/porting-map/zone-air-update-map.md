@@ -40,6 +40,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | hybrid inverse temperature inference | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::InverseModelTemperature` | no typed `HybridModel:Zone` object or inverse-model state/runtime path | CP217 required source-mapped measured-temperature override, infiltration/internal-mass/people inverse branches, and unconditional measured-history shift; no Rust parser, state, output, test, or execution parity |
 | hybrid thermal-mass multiplier postprocessing | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::processInverseModelMultpHM` | no inferred multiplier, aggregate, or per-Zone recurring-warning state | CP218 required source-mapped lower clamp, uncapped over-limit diagnostics, persistent sum/count/average update, and caller transaction; no Rust parser, state, output, diagnostic, test, or execution parity |
 | hybrid humidity inverse inference | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::InverseModelHumidity` | no typed `HybridModel:Zone`, measured humidity history, inverse state, or exact outputs | CP219 required source-mapped unconditional sampling/history shift plus date/history-gated infiltration and People inversion; no Rust parser, state, output, test, or execution parity |
+| Zone/Space heat-balance sum assembly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums` | adjacent Zone-only opaque-surface hA/hAT helper, OtherEquipment convection subset, and zero-initialized flow fields | CP220 required source-mapped internal/non-system/system/surface transaction with parent-Zone AFN/equipment/plenum/PIU context and uncontrolled-Space system allocation; no exact Rust routine, Space topology, airflow writer, lifecycle, test, or execution parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -4811,9 +4812,276 @@ numerical, performance, or conformance promotion. The inventory becomes 32
 algorithms and 226 routines, split 58 `state_mapped` plus 168 `source_mapped`,
 with 103 required; the heat-balance project list becomes 72.
 
-CP220 next maps `ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums`, declared at
-`ZoneTempPredictorCorrector.hh` lines 226-230 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 5133-5281.
+### CP220 `ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums` source map
+
+CP220 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.zone_space_heat_balance_calc_zone_or_space_sums`
+immediately after `routine.inverse_model_humidity`. The heat-balance project
+contract adds `zone_space_heat_balance_calc_zone_or_space_sums` after
+`inverse_model_humidity` and before `update_final_surface_heat_balance`. The
+member is declared at `ZoneTempPredictorCorrector.hh` lines 226-230 and
+implemented at `ZoneTempPredictorCorrector.cc` lines 5133-5281.
+
+The receiver is the selected Zone or Space heat-balance record. The required
+positive `zoneNum`, optional `spaceNum`, and `CorrectorFlag` determine which
+global topology is read, but the member returns no status. Its output is an
+ordered in-place reconstruction of internal, non-system-air, system-air, and
+surface-convection sums.
+
+#### Ordered coefficient transaction
+
+After a debug-only positive-Zone assertion, CP220 writes these five fields to
+zero in exact source order:
+
+```text
+SumHA
+SumHATsurf
+SumHATref
+SumSysMCp
+SumSysMCpT
+```
+
+It does not first clear `SumIntGain`, `SumMCp`, or `SumMCpT`. When
+`spaceNum == 0`, it assigns `SumIntGain` from all Zone internal convection
+gains. Every nonzero `spaceNum`, including a malformed negative value, instead
+takes the Space internal-gain path. It then adds the parent Zone's complete
+`SumConvHTRadSys + SumConvPool` to either record. Every Space-path call
+therefore receives the full Zone radiant-system and pool convection terms
+rather than a Space allocation.
+
+After a second positive-Zone assertion and parent-Zone alias, the
+`NoHeatToReturnAir` branch likewise uses the Zone return-gain helper only for
+exact zero and the Space helper for every nonzero `spaceNum`, with return-node
+argument zero. The later CP220 control and allocation gates use `spaceNum > 0`; the
+derived Space virtual dependency separately asserts a positive identity. CP220 then overwrites the two
+non-system airflow coefficients:
+
+```text
+SumMCp =
+    MCPI + MCPV + MCPM + MCPE + MCPC + MDotCPOA
+
+SumMCpT =
+    MCPTI + MCPTV + MCPTM + MCPTE + MCPTC
+    + MDotCPOA * Zone.OutDryBulbTemp
+```
+
+When AirflowNetwork control is always multizone, or is
+multizone-with-distribution-only-during-fan-operation while the AFN fan is
+active, these are replaced, not incremented:
+
+```text
+SumMCp =
+    exchangeData(zoneNum).SumMCp + SumMVCp + SumMMCp
+
+SumMCpT =
+    exchangeData(zoneNum).SumMCpT + SumMVCpT + SumMMCpT
+```
+
+A Space receiver still consumes the parent Zone AFN exchange record. Neither
+the ordinary nor AFN non-system coefficients are volume-allocated later.
+
+CP220 evaluates
+`spaceNum > 0 && spaceEquipConfig(spaceNum).IsControlled` before testing
+`CorrectorFlag`; a false predictor call with a positive Space identity still
+requires allocated Space equipment configuration. `CorrectorFlag == false`
+leaves both system-air sums at their entry zeros, but all preceding work, the
+later Space allocation gate, and the virtual surface-convection dependency
+still run.
+
+With `CorrectorFlag == true`, primary system-air work chooses one mutually
+exclusive parent-Zone branch:
+
+1. A controlled parent Zone uses the controlled Space equipment configuration
+   only when the selected Space is itself controlled; otherwise it uses the
+   parent Zone configuration. It visits inlet nodes in stored 1-based order
+   and accumulates mass flow times `PsyCpAirFnW(this->airHumRat)`, then that
+   product times node temperature. Node humidity ratio is not used.
+2. A return-plenum Zone visits its stored inlet nodes, then stored air
+   distribution unit identities. Enabled upstream and downstream leakage adds
+   the respective leak flow and inlet or outlet temperature with the
+   receiver's humidity-ratio heat capacity; there is no positive-flow guard.
+3. A supply-plenum Zone consumes its single inlet node with the same
+   receiver-humidity heat capacity.
+4. Any other Zone contributes no primary system flow.
+
+The independent parallel-PIU tail then forms
+`Zone.Multiplier * Zone.ListMultiplier`. If
+`leakageParallelPIUNums` is nonempty, the loop ignores the identities stored in
+that container and instead reads global PIU ordinals one through the
+container's size. This literal source anomaly is part of CP220. Only positive
+leak flow contributes. A positive parent `SystemZoneNodeNumber` routes the
+leak into system sums; otherwise it adds only the leak contribution divided by the Zone multiplier
+product to the otherwise unscaled non-system sums. CP220 finally divides both complete
+system sums by that product without a zero, sign, overflow, or finite guard.
+
+For a positive Space that is not itself controlled, CP220 then multiplies only
+`SumSysMCp` and `SumSysMCpT` by `space.fracZoneVolume`. A controlled Space is
+not volume-scaled. Internal gains, ordinary/AFN non-system coefficients, and
+the later surface sums are never scaled here. A Space marked controlled while
+its parent Zone is not controlled also cannot enter the controlled parent
+branch.
+
+#### Virtual surface dependency and commit
+
+CP220 always calls the receiver's virtual
+`calcSumHAT(state, zoneNum, spaceNum)` after coefficient assembly. Only after
+that call returns does it add the returned internal-gain term and assign
+`SumHA`, `SumHATsurf`, and `SumHATref` in that order.
+
+The immediately following definitions belong to CP221 and later checkpoints,
+but their dependency behavior constrains CP220. The Zone override at
+`ZoneTempPredictorCorrector.cc` lines 5283-5298 visits every stored
+`Zone.spaceIndexes` identity in container order without testing
+`doSpaceHeatBalance`, calls the Space override, and folds all four returned
+fields. A Zone CP220 call therefore traverses all of its Space surfaces even
+when no explicit Space record calculation is enabled; a later explicit Space
+CP220 call can traverse those surfaces again.
+
+The Space override's `ZoneSupplyAirTemp` reference branch always reads the
+parent `zoneHeatBalance(zoneNum).SumSysMCp` and `SumSysMCpT`, not the selected
+Space record's system sums. Production Zone-first traversal makes the current
+Zone correction coefficients visible. Predictor mode has just zeroed them, so
+that branch falls back to `SumHA`. The child also owns Window convection and
+report mutations. In the airflow-Window plus `NoHeatToReturnAir` path it can
+add return heat to `SurfWinHeatGain` and update gain/loss/transfer reports.
+Those external Surface-owner effects can repeat across Zone-plus-Space
+traversal or replay even though the CP220 record fields are overwritten.
+
+#### Caller ownership and cadence
+
+There are exactly two production call expressions. Line 3175 inside
+`ZoneSpaceHeatBalanceData::predictSystemLoad` passes literal false after
+temperature/history update and `AirPowerCap`, before hybrid except-People
+state, coefficient writes, and load solving. Line 3918 inside
+`ZoneSpaceHeatBalanceData::correctAirTemp` passes literal true after selected
+history and capacitance work and exact-Zone RoomAir management, before hybrid
+except-People state, coefficient writes, temperature solving, node and demand
+writes, and humidity correction.
+
+The prediction wrapper visits Zones first and stored Spaces under the aggregate
+`doSpaceHeatBalance` flag. The correction wrapper visits every Zone first and
+only active, non-sizing simulation Spaces. Normal HVAC performs an initial
+prediction and correction; adaptive shortening can repeat both for each fine
+step. Demand-manager resimulation adds a prediction without a matching
+correction. `CorrectorFlag` therefore gates only the system/PIU assembly, not
+internal gains, non-system/AFN replacement, Space configuration lookup,
+virtual surface work, or its external effects.
+
+#### Validation, failure, retry, and reset
+
+Besides its duplicated debug positive-Zone assertions, CP220 has no upper
+bound, Space sign/membership/record-kind, equipment, node, plenum, ADU, PIU,
+AFN topology, multiplier, volume-fraction, or finite validation. It owns no
+diagnostic, status, catch, cleanup, completion marker, transaction, rollback,
+or recovery path. The virtual child can assert, diagnose, or fail, but CP220 does not translate
+that result. `PsyCpAirFnW` performs no validation or diagnostic; it only
+updates its process-static last-input/result cache.
+
+An abnormal non-return preserves the exact committed prefix. The five entry
+zeros can coexist with an old `SumIntGain`, `SumMCp`, or `SumMCpT` if failure
+prevents those later assignments. Later failures can retain assigned gains,
+ordinary or AFN coefficients, partial system/plenum/PIU sums, multiplier
+division, or Space allocation. If `calcSumHAT` does not return, the four local
+results are not committed: the record surface sums remain at their entry
+zeros, while earlier coefficient writes and completed child Surface effects
+remain. A later interruption can expose only an ordered prefix of the final
+gain/HA/HAT assignments.
+
+On stable side-effect-free dependencies, a completed replay deterministically
+reconstructs the receiver sums. It is not generally idempotent because
+`calcSumHAT` can increment external Window report state; retry after abnormal
+exit observes and can repeat only the child prefix that actually committed.
+`beginEnvironmentInit` does not reset any of these CP220 sums. Predictor/
+corrector data `clear_state` placement-news the records, but does not reset the
+process-static `PsyCpAirFnW` cache; that cache changes evaluation reuse, not the
+sequential numerical result. A clean recovery also requires coordinated
+restoration of internal-gain, AFN, equipment, node, Surface-report, and
+topology owners.
+
+#### C++ test and corpus boundary
+
+`ZoneTempPredictorCorrector_calcZoneOrSpaceSums_SurfConvectionTest` is the sole
+direct fixture. It makes five exact-Zone receiver calls and has 12 assertions:
+two true calls check three `SumHA`/`SumHATsurf`/`SumHATref` supply-reference
+and fallback results; a third true call checks two system sums for inlet flows
+0.1 and 0.2 kg/s; one false call checks both system sums are zero; and a final
+true call adds PIU ordinal 1 leakage and checks two system sums. Its controlled
+Zone has multiplier one, two inlets, one stored Space, and three non-Window
+surfaces spanning the three reference-air modes. The fixture's inlet-node
+humidity differs from the receiver humidity used in expected system sums, so
+it indirectly reflects the latter ownership, but the one-element PIU list
+cannot expose the identity bug.
+
+Five indirect `correctZoneAirTemps` calls in the HybridModel fixture each pass
+through one true Zone CP220 call, but assert only hybrid multiplier,
+infiltration, and People outputs. Two predictor fixtures make 16 wrapper calls
+with zero Zones and reach CP220 zero times. No focused test directly calls a
+Space receiver or isolates internal/return-air gains, ordinary non-system
+flows, AFN replacement, controlled-Space behavior, volume allocation, either
+plenum, PIU identity, multiplier edges, Window side effects, malformed state,
+failure, retry, or reset.
+
+Of 57 active full-simulation `ManageSimulation` expressions, one expected EMS
+fatal stops before CP220 and one Weather fixture has zero Zones. The remaining
+55 configurations contain 81 Zone identities. A static single prediction-pass
+census is 81 Zones plus 24 eligible Spaces, or 105 calls. A static single
+correction-pass census is 81 Zones plus three active simulation Spaces, or 84
+calls. Their combined 189-call configuration census is not a runtime total;
+warmup, run-period, adaptive, and demand-resimulation cadence makes actual
+execution larger.
+
+The correction topology contains 55 controlled Zones, 26 uncontrolled Zones,
+and three uncontrolled Spaces, with zero controlled Space, return-plenum,
+supply-plenum, or parallel-PIU identity. AFN multizone replacement is
+potentially reachable for five Zone identities, but no corpus assertion
+isolates its coefficients. Dynamic `NoHeatToReturnAir`, exact
+surface-reference and Window subbranches, duplicate child effects, and
+adaptive/demand multiplicity are not established by a corpus oracle.
+
+#### Rust boundary
+
+A crate-wide search finds no `calcZoneOrSpaceSums`,
+`calc_zone_or_space_sums`, `calcSumHAT`, or direct test. The nearest
+`zone_surface_convection_sums_for_indices` visits retained opaque surfaces for
+one Zone and computes only hA and hA times inside temperature, with
+`SumHATref` hard-coded to zero. It has no additional returned internal gain,
+Space or Window topology, frame/divider work, or reference-air branches.
+
+`ZoneHeatBalanceState` stores adjacent HA/HAT fields and four airflow
+coefficient fields. The airflow fields are only zero-initialized in production;
+the crate has no source-equivalent assembly writer, although isolated tests can
+supply them manually to coefficient algebra. Runtime surface indexes preserve
+Zone identity only, discard the compiler Surface's Space identity, and own no
+Space heat-balance record or `fracZoneVolume` allocation. Typed Space volume
+and nominal Zone-control metadata are not consumed by heat-balance sum
+assembly.
+
+Rust internal gains cover a direct-Zone OtherEquipment convection subset.
+People activity/latent ownership, return-air gains, radiant-system and pool
+terms, ordinary infiltration/ventilation/mixing coefficients, AFN exchange,
+controlled inlet assembly, plenums, ADUs, parallel PIUs, and their state are
+absent or run-blocking. Equipment connection/node projection remains legacy
+diagnostic state rather than a writer of these sums. Runtime reports expose
+internal and opaque-surface convection, while Outdoor Air Transfer is a
+literal zero vector; an offline comparator can reconstruct selected HA/HAT
+series, but it is not a runtime CP220 implementation.
+
+The official one-Zone candidate has one Zone, six opaque surfaces, no authored
+`Space` object, and no airflow, AFN, AirLoop, or ZoneHVAC topology. Rust has no
+runtime Space heat-balance topology, and equal/opposite OtherEquipment inputs
+make relevant internal and outdoor-transfer evidence zero-only. Existing variable-level limited conformance therefore
+does not establish CP220.
+
+CP220 adds no EnergyPlus source inventory beyond this routine row, Rust target,
+code, mapped state, test, support, capability, output implementation,
+comparator, manifest, numerical, performance, or conformance promotion. The
+inventory becomes 32 algorithms and 227 routines, split 58 `state_mapped` plus
+169 `source_mapped`, with 104 required; the heat-balance project list becomes
+73.
+
+CP221 next maps `ZoneHeatBalanceData::calcSumHAT`, declared at
+`ZoneTempPredictorCorrector.hh` line 254 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5283-5298.
 
 ## Promotion Requirements
 

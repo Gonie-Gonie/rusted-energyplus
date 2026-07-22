@@ -2108,12 +2108,79 @@ support, output, numerical, or conformance claim. The inventory becomes 32
 algorithms and 226 routines, split 58 `state_mapped` plus 168 `source_mapped`,
 with 103 required; the heat-balance project list becomes 72.
 
-CP220 next maps `ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums`, declared at
+CP220 adds required `zone_space_heat_balance_calc_zone_or_space_sums`
+immediately after `inverse_model_humidity` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is
+`ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums`, declared at
 `ZoneTempPredictorCorrector.hh` lines 226-230 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 5133-5281.
 
+Every call first zeros the three surface sums and two system-air sums, assigns
+Zone- or Space-owned internal convection gains, and adds the parent Zone's
+complete radiant-system and pool convection terms. `NoHeatToReturnAir`
+optionally adds Zone- or Space-owned return-air gains. It then overwrites the
+ordinary infiltration/ventilation/mixing/earth-tube/cooltower/outdoor-air coefficients or replaces
+them with parent-Zone AFN multizone exchange values.
+
+Only `CorrectorFlag` true assembles controlled-inlet, return-plenum, or
+supply-plenum system airflow and the independent parallel-PIU leakage tail.
+All heat capacities use the receiver's humidity ratio rather than node
+humidity. The PIU loop ignores the identities stored in
+`leakageParallelPIUNums` and instead reads global ordinals one through its
+size. System sums are divided by the unguarded parent Zone multiplier product;
+an uncontrolled Space then volume-scales only those two system fields.
+Internal, ordinary/AFN non-system, and surface terms are not Space-scaled.
+
+The routine always dispatches virtual `calcSumHAT` after coefficient assembly
+and commits its four returned values only after the child returns. The
+following Zone override, mapped by CP221, traverses every stored Space without
+testing `doSpaceHeatBalance`, so Zone-first work can already visit child
+surfaces before an explicit Space pass. Its Space dependency reads parent-Zone
+system sums for supply-air reference temperature and can increment external
+Window report state. Completed replay is therefore deterministic only when
+those child dependencies are side-effect-free.
+
+The two production expressions are the false predictor call inside
+`predictSystemLoad` and the true correction call inside `correctAirTemp`.
+Initial and adaptive HVAC work can repeat both; demand resimulation adds only
+prediction. The false flag gates system/PIU assembly only: Space equipment
+lookup, internal/non-system work, AFN replacement, and surface dispatch still
+run.
+
+CP220 has two debug positive-Zone assertions but no complete identity,
+topology, multiplier, allocation, finite, status, diagnostic, transaction, or
+rollback boundary. Failure can leave the entry-zeroed fields alongside stale
+not-yet-assigned fields, or retain later gain, airflow, allocation, and child
+Surface prefixes. `beginEnvironmentInit` does not reset these sums; coordinated
+owner reset is required for clean recovery.
+
+One direct C++ fixture makes five Zone calls and 12 assertions over surface
+reference modes, system flow, false-flag zeros, and one PIU leak. It does not
+exercise a Space receiver, AFN, plenums, PIU identity, volume allocation,
+Window side effects, malformed state, failure, retry, or reset. The 55
+nonzero-Zone corpus configurations provide a static one-prediction census of
+105 Zone/Space calls and one-correction census of 84, not a runtime-call total;
+controlled Space, plenum, and PIU topology are absent and AFN coefficients are
+not isolated.
+
+Rust has no matching routine or Space heat-balance record. Its nearest
+Zone-only opaque-surface hA/hAT helper, OtherEquipment convection subset, and
+zero-initialized airflow fields omit return-air, ordinary airflow/AFN
+assembly, controlled/plenum/PIU topology, Space allocation, Window/reference
+branches, and source lifecycle. Existing one-Zone evidence has no such
+topology and is zero-only for the relevant gain/transfer boundary.
+
+CP220 remains required `source_mapped` and adds no Rust target, mapped state,
+support, output, numerical, or conformance claim. The inventory becomes 32
+algorithms and 227 routines, split 58 `state_mapped` plus 169 `source_mapped`,
+with 104 required; the heat-balance project list becomes 73.
+
+CP221 next maps `ZoneHeatBalanceData::calcSumHAT`, declared at
+`ZoneTempPredictorCorrector.hh` line 254 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5283-5298.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`inverse_model_humidity`, preserving the
+`zone_space_heat_balance_calc_zone_or_space_sums`, preserving the
 completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
