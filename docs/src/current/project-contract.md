@@ -704,6 +704,65 @@ work, failure lifecycle, or source call topology. CP193 remains `source_mapped`
 and required without Rust state, support, output implementation, numerical, or
 conformance promotion.
 
+The final required Air-subtree definition entry is `calc_mean_air_temps`,
+after `report_zone_mean_air_temp` and before `manage_zone_air_updates`. Its
+EnergyPlus boundary is `HeatBalanceAirManager.hh` lines 87-92 and
+`HeatBalanceAirManager.cc` lines 4689-4728, after which the namespace and file
+end. CP193 is its only caller: line 4678 supplies each Zone's averaged air
+temperature, averaged humidity ratio, MRT, report record, and Zone number;
+lines 4682-4683 do the same for each active stored Space membership while
+deliberately retaining the owning Zone number for control metadata.
+
+Every entry first overwrites `MeanAirTemp` with the supplied `ZTAV` rather than
+an instantaneous MAT, copies the raw averaged humidity ratio, writes the
+ordinary 50/50 mean-air/MRT operative temperature, and then evaluates dew
+point from that humidity and current outdoor barometric pressure. The
+dew-point child floors only its local humidity input to `1e-5`, so
+`MeanAirHumRat` remains unmodified. These four report fields update on every
+normally returned call.
+
+`ThermOperativeTemp` updates only when `AnyOpTempControl` is true, the owning
+Zone is controlled, and its referenced control mode is not `None`. The Zone's
+control index is read before the controlled guard, but the control array is
+indexed only after that guard succeeds. Exact `Scheduled` mode reads the
+schedule's current value, including an active EMS override; every other
+non-`None` mode takes `FixedRadiativeFraction`. The routine performs no local
+index, pointer, finite-value, or `[0,1]` fraction check, redundantly restores
+the ordinary 50/50 operative value, and applies
+`(1-f) * ZTAV + f * MRT` without clamping. A false guard leaves the
+thermostat-operative field at its prior or default value.
+
+Only `ReportWBGT = true` evaluates the W-input wet-bulb psychrometric child and
+writes `WetbulbGlobeTemp` as 70 percent wet bulb plus 30 percent the ordinary
+50/50 `OperativeTemp`. It uses the raw averaged humidity ratio and never the
+thermostat-weighted operative value. A false report flag preserves the
+previous/default WBGT. The default EnergyPlus build routes saturation and
+wet-bulb work through quantized caches and can also update raw memo, warning,
+and recurring-error state. Those dependencies can clamp or iterate and still
+return a value, so the helper has no diagnostic-to-status conversion and its
+numeric overwrite behavior is not a claim of pure whole-routine idempotence
+or cold retry.
+
+CP194 owns no allocation, bounds or null validation, status, latch, catch,
+cleanup, rollback, or transaction. A dew-point non-return retains the first
+three new writes; a schedule/index failure retains the first four; a wet-bulb
+non-return retains all preceding reached writes while the old/default WBGT
+survives. Normal repeat resamples schedule/EMS state and overwrites the first
+four fields, while false conditional guards make the thermostat-operative and
+WBGT fields sticky. Clean replay spans separately owned HeatBalance report
+arenas, predictor/corrector averages, Zone controls, environment pressure, and
+psychrometric/cache state.
+
+No C++ unit test directly calls CP194 or CP193 or asserts any of the target
+report fields. Focused dew-point and wet-bulb tests do not cover this report
+composition, control guards, Space topology, partial effects, repeat, or
+reset. Rust has no `calc_mean_air_temps` alias, integrated Air-report record,
+MRT/operative/control/WBGT state, Space report path, or W-input cached
+wet-bulb counterpart. Its isolated dew-point projection and RH-input outdoor
+wet-bulb helper are not connected to this source call topology. CP194 remains
+`source_mapped` and required without Rust state, support, output
+implementation, numerical, or conformance promotion.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `manage_zone_air_updates`, preserving the completion of the Air subtree before
 the Surface manager's final update. Its EnergyPlus boundary is the

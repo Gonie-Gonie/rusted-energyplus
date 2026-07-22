@@ -73,6 +73,7 @@ required_routines = [
   "init_simple_mixing_convective_heat_gains",
   "calc_heat_balance_air",
   "report_zone_mean_air_temp",
+  "calc_mean_air_temps",
   "manage_zone_air_updates",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
