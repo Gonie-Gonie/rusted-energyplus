@@ -1520,14 +1520,70 @@ support, output, numerical, or conformance claim. The inventory becomes 32
 algorithms and 216 routines, split 58 `state_mapped` plus 158
 `source_mapped`, with 93 required; the heat-balance project list becomes 62.
 
-CP209 next maps
+The following required predictor/corrector definition entry is
+`zone_space_heat_balance_push_zone_timestep_history`, after
+`push_zone_timestep_histories` and before
+`update_final_surface_heat_balance`. Its source boundary is
 `ZoneSpaceHeatBalanceData::pushZoneTimestepHistory(EnergyPlusData &state,
 int zoneNum, int spaceNum = 0)`, declared at
 `ZoneTempPredictorCorrector.hh` line 245 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 4187-4275.
 
+The only production expressions are CP208's Zone and Space child calls. After
+a positive-Zone assertion and unconditional parent AirModel alias, CP209
+interleaves descending four-slot temperature and humidity shifts, inserts the
+Zone-timestep averages, saves current `ZT` to `XMPT`, commits temporary
+humidity to current and previous-system state, and computes percent relative
+humidity from current temperature, committed humidity, and barometric
+pressure. The psychrometric helper can floor only its local humidity and clamp
+an out-of-range result; CP209 does not repair the stored humidity or add a
+finite/range guard.
+
+Exact Zone identity alone advances three-node displacement or UFAD Floor,
+occupied, and mixed four-slot temperatures, or every RoomAir AFN node's
+temperature and humidity histories. Every solution enum except exact
+ThirdOrder then advances record `TM2/TMX` and `WM2/WMX` from the averages.
+For exact Zones it also advances applicable stratified M2/MX or AFN T2/TX
+pairs. Spaces receive the common and non-ThirdOrder record writes but no shared
+RoomAir work. Invalid or unmatched solution enums enter the non-ThirdOrder
+branch.
+
+CP209 has no upper-bound, Space identity, membership, record-kind, allocation,
+enum, topology, pressure, or finite validation and no local diagnostic beyond
+the psychrometric dependency, status, catch, cleanup, transaction, or rollback.
+A late non-return can preserve common record and RoomAir prefixes. Retry shifts
+already shifted histories again; the later revert helper is not a full inverse,
+so clean replay requires coordinated record, RoomAir/AFN, psychrometric,
+topology, environment, and caller reset.
+
+No C++ test directly calls CP209 or asserts a destination. Fifty-five
+completing nonzero-Zone configurations collectively span 105 static record
+identities: 95 ThirdOrder and ten Analytical, with no Euler. The common path
+reaches all 105, the non-ThirdOrder scalar branch reaches ten, and special
+RoomAir/AFN branches reach zero because all 81 Zones are Mixing and the 24
+Spaces skip shared RoomAir. Tracked official hourly outputs remain indirect
+downstream sensitivity, not record-commit proof.
+
+Rust has no singular record helper or direct test. Its nearest live code shifts
+only three Zone temperature and humidity slots at Predict entry, conditionally
+selects average versus current input, and has no Space arena, fourth slot,
+`XMPT`, temporary/previous-system humidity scalars, stored RH,
+non-ThirdOrder scalar state, RoomAir, or AFN histories. A uniform history
+assertion cannot identify this shift; separate system-step, psychrometric
+formula, and IdealLoads history tests do not compose CP209.
+
+CP209 remains required `source_mapped` and adds no Rust target, mapped state,
+support, output, numerical, or conformance claim. The inventory becomes 32
+algorithms and 217 routines, split 58 `state_mapped` plus 159
+`source_mapped`, with 94 required; the heat-balance project list becomes 63.
+
+CP210 next maps `PushSystemTimestepHistories(EnergyPlusData &state)`, declared
+at `ZoneTempPredictorCorrector.hh` line 295 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4277-4295.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`push_zone_timestep_histories`, preserving the completed
+`zone_space_heat_balance_push_zone_timestep_history`, preserving the
+completed
 predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
@@ -1552,7 +1608,8 @@ The next required inventory entry is `update_thermal_histories`, after
 `zone_space_heat_balance_calc_predicted_humidity_ratio` /
 `correct_zone_air_temps` /
 `zone_space_heat_balance_correct_air_temp` /
-`push_zone_timestep_histories` entries, this
+`push_zone_timestep_histories` /
+`zone_space_heat_balance_push_zone_timestep_history` entries, this
 preserves completion of the Air subtree before the Surface manager's final and
 history stages. The EnergyPlus parent calls the routine at lines 186-189 only
 when `AnyCTF || AnyEMPD`, and the canonical body spans lines 5221-5581. It owns
