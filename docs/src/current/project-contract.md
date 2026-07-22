@@ -578,6 +578,36 @@ flags, node topology, validation, dispatch, or EIO; all room-air inputs remain
 run-blocking. The routine remains `source_mapped` and required without support
 or conformance promotion.
 
+The next required Air-subtree entry is `init_air_heat_balance`, after
+`get_room_air_model_parameters` and before `manage_zone_air_updates`. Its
+source boundary is `HeatBalanceAirManager.hh` line 77 and
+`HeatBalanceAirManager.cc` lines 4494-4507. The wrapper has exactly one
+executable statement: every entry passes the unchanged state once to
+`InitSimpleMixingConvectiveHeatGains`. It owns no branch, persistent state,
+status, diagnostic, output, catch, cleanup, or latch. The child remains CP190;
+notably, its enforced mass-balance fractions use a global raw-`DesignLevel`
+Mixing prefix rather than Zone receiving pointers or schedule/EMS-scaled flow.
+
+Two production callers reach that wrapper. `ManageAirHeatBalance` line 154
+calls it every ordinary Air-manager pass after the optional input block and
+before Air calculation and reporting. If CP189 does not return, those later
+children are skipped; the input latch is already false, so a same-state parent
+retry skips input and calls CP189 again. `SimulationManager::Resimulate` line
+2908 calls it only when `ResimHB` is true, after three Surface operations and
+before refrigeration-rack work, the heat-balance iteration increment, and
+forcing HVAC resimulation. That path can repeat without advancing simulation
+time and deliberately bypasses the Air-manager input and calculation/report
+siblings.
+
+Five direct unit calls use CP189 only as setup for later airflow and
+mass-balance assertions. None isolates delegation count, caller order,
+resimulation, failure, retry, or reset; four child-direct calls bypass CP189.
+Rust's `init_air_heat_balance_compat` is an identity closure whose sole call
+passes an empty body. It has no simple-mixing initializer, associated flow
+state, or demand-manager resimulation path. CP189 therefore remains
+`source_mapped` and required without Rust state, support, output, numerical, or
+conformance promotion.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `manage_zone_air_updates`, preserving the completion of the Air subtree before
 the Surface manager's final update. Its EnergyPlus boundary is the
