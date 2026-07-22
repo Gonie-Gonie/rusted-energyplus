@@ -181,6 +181,7 @@ claim.
 | EMS air-temperature setpoint override | `OverrideAirSetPointsforEMSCntrl`, declared at `ZoneTempPredictorCorrector.hh` line 374, implemented at `ZoneTempPredictorCorrector.cc` lines 6460-6555, and called unconditionally as the final action in `CalcZoneAirTempSetPoints` | CP232 adds required `routine.override_air_set_points_for_ems_cntrl` as source-mapped only. Ordinary-then-comfort traversal, heating-before-cooling writes, live type dispatch, collisions, actuator bindings, downstream replacement, and reset/replay remain source-only; Rust has no EMS engine, actuator state, mutable setpoint triple, comfort control, exact helper, live caller, or active test. |
 | thermostat-setpoint predefined LEED table | `FillPredefinedTableOnThermostatSetpoints`, declared at `ZoneTempPredictorCorrector.hh` line 376, implemented at `ZoneTempPredictorCorrector.cc` lines 6558-6672, and called only by `FillRemainingPredefinedEntries` line 6998 | CP233 adds required `routine.fill_predefined_table_on_thermostat_setpoints` as source-mapped only. Global schedule-ID first-wins traversal, seasonal Wednesday value/count queries, split synthetic rows, append-only table mutation, final-report cadence, and failure/retry remain source-only; Rust has no four-family arena, exact seasonal query, predefined table store, helper, caller, or focused test. |
 | thermostat-schedule predefined System Summary table | `FillPredefinedTableOnThermostatSchedules`, declared at `ZoneTempPredictorCorrector.hh` line 378, implemented at `ZoneTempPredictorCorrector.cc` lines 6674-6766, and called only by `FillRemainingPredefinedEntries` line 6999 | CP234 adds required `routine.fill_predefined_table_on_thermostat_schedules` as source-mapped only. Stored ordinary-Zone traversal, fixed-slot inclusion, tuple sort, independently filtered joins, append-only table mutation, final-report cadence, and failure/retry/reset remain source-only; Rust has no complete control arena, predefined System Summary store, helper, caller, serializer, or focused table comparator. |
+| Zone/Space predictor temperature-history preparation | `ZoneSpaceHeatBalanceData::updateTemperatures`, declared at `ZoneTempPredictorCorrector.hh` lines 233-234, implemented at `ZoneTempPredictorCorrector.cc` lines 6768-6833, and called only as the first child of `predictSystemLoad` line 3155 | CP235 adds required `routine.zone_space_heat_balance_update_temperatures` as source-mapped only. Unconditional four-slot working-history selection, shortened Zone/Space node rollback, count-change helper order, RoomAir topology, partial failure, cadence, replay, and reset remain source-only; Rust has only Zone three-slot adaptive history without the exact wrapper or topology. |
 | internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
 | space internal convective gains | `spaceSumAllInternalConvectionGains` | mapped-not-ported |
 
@@ -20511,9 +20512,226 @@ The inventory becomes 32 algorithms and 240 routines, split 58
 `state_mapped` plus 182 `source_mapped`, with 117 required; the heat-balance
 project list becomes 86.
 
-CP235 next maps `ZoneSpaceHeatBalanceData::updateTemperatures`, declared at
-`ZoneTempPredictorCorrector.hh` lines 233-234 and implemented at
+### CP235 `ZoneSpaceHeatBalanceData::updateTemperatures` source map
+
+CP235 adds canonical required
+`routine.zone_space_heat_balance_update_temperatures` and the
+project-contract item `zone_space_heat_balance_update_temperatures`
+immediately after CP234
+`fill_predefined_table_on_thermostat_schedules`. The member declaration is
+`ZoneTempPredictorCorrector.hh` lines 233-234, and the complete definition is
 `ZoneTempPredictorCorrector.cc` lines 6768-6833.
+
+The sole production call expression is the first executable child of CP203
+`ZoneSpaceHeatBalanceData::predictSystemLoad` at line 3155. CP203 already owns
+the parent traversal and later load transaction, while CP216 owns the
+`DownInterpolate4HistoryValues` arithmetic and generic alias behavior. CP235
+owns the node rollback, helper-call conditions and topology, returned-current
+assignments, and final working-history selection without promoting either
+dependency.
+
+#### Entry and unconditional working-history selection
+
+The only local identity check is debug `assert(zoneNum > 0)`. On every normal
+return, regardless of shortening, the routine performs two ordered whole-array
+assignments:
+
+| `UseZoneTimeStepHistory` | first `ZTM` source | second `WPrevZoneTSTemp` source |
+|---|---|---|
+| true | four-slot `XMAT` | four-slot `WPrevZoneTS` |
+| false | four-slot `DSXMAT` | four-slot `DSWPrevZoneTS` |
+
+This selector does not itself change `MAT` or `airHumRat`. A false shortening
+flag with false history selection therefore copies preexisting downstepped
+arrays while leaving both current record values untouched. Conversely, a
+shortened count-change call can populate downstepped state and current values,
+then select the Zone-timestep arrays when the independent history flag is
+true. The fourth slot is copied even though later ThirdOrder equations use
+only the first three.
+
+#### Shortened Zone and Space node rollback
+
+Only `ShortenTimeStepSys` enters rollback. Exact `spaceNum == 0` reads the
+Zone's `SystemZoneNodeNumber`; every nonzero value, including malformed
+negative identities in a release build, indexes the Space arena. A node number
+must be strictly positive, but CP235 applies no upper-bound check.
+
+A surviving node is overwritten in this order:
+
+1. node `Temp = XMAT[0]`;
+2. shared parent-Zone `TempTstatAir(zoneNum) = XMAT[0]`;
+3. node `HumRat = WPrevZoneTS[0]`;
+4. node `Enthalpy = PsyHFnTdbW(XMAT[0], WPrevZoneTS[0])`.
+
+The inline enthalpy helper writes no state and floors only its humidity
+operand through `max(dW, 1.0e-5)`. A negative history therefore remains
+negative in node `HumRat` while the associated enthalpy uses `1.0e-5`.
+Nonfinite values otherwise follow native floating behavior.
+
+A Space call still writes the parent Zone's shared `TempTstatAir`. Under
+CP202's Zone-first then stored-Space traversal, the last reached positive-node
+Space can therefore replace the earlier Zone or Space value. Repeated node
+identities likewise resolve by last reached writer. Rollback occurs on every
+shortened call even when the current and previous system-step counts match and
+independently of the final history selector.
+
+#### Count-change interpolation transaction
+
+After node rollback, CP235 compares
+`NumOfSysTimeSteps` with `NumOfSysTimeStepsLastZoneTimeStep`. Equality performs
+no interpolation and leaves `DSXMAT`, `DSWPrevZoneTS`, `MAT`, `airHumRat`, and
+all RoomAir current/downstepped fields unchanged. The routine still reaches
+the final selector.
+
+On inequality it reads `TimeStepSys` and calls the CP216 array helper in this
+fixed order:
+
+1. record `XMAT -> DSXMAT`, then assign the returned `XMAT[0]` to `MAT`;
+2. record `WPrevZoneTS -> DSWPrevZoneTS`, then assign the returned
+   `WPrevZoneTS[0]` to `airHumRat`;
+3. for an exact Zone under global `anyNonMixingRoomAirModel`, conditionally
+   interpolate Floor, occupied, then mixed temperature histories when the
+   Zone is three-node displacement ventilation or UFAD;
+4. under the same exact-Zone/global gate but an independent branch, an
+   `AirflowNetwork` RoomAir enum visits stored AFN nodes and interpolates each
+   node's temperature then humidity histories.
+
+The RoomAir AFN branch does not test `AFNZoneInfo.IsUsed`. A false global
+non-Mixing flag suppresses it even if malformed state sets the Zone enum
+directly. If malformed state makes a stratified predicate and the AFN enum
+simultaneously true, both ordered branches run. Space records receive only
+the two base calls and never touch shared RoomAir history.
+
+Every normal production helper call passes distinct fixed arrays, so CP216's
+generic same-array alias behavior is not a normal CP235 path. CP235 adds no
+new formula, tolerance, or timestep validation: zero, negative, noninteger,
+infinite, or NaN ratios and helper write-prefix behavior remain CP216's
+source-only dependency boundary.
+
+#### Caller traversal and HVAC cadence
+
+CP202 visits Zones in ascending identity order. After each Zone it invokes
+CP203 and CP235 for stored Spaces only while `doSpaceHeatBalance` is true. With
+Space heat balance off, no Space CP235 call occurs; only the parent shortened
+fallback mirrors the already updated Zone `MAT` and `airHumRat` into its
+Spaces.
+
+At each Zone timestep `HVACManager` initializes `ShortenTimeStepSys = false`,
+`UseZoneTimeStepHistory = true`, and `NumOfSysTimeSteps = 1`. The initial
+prediction therefore skips rollback/interpolation and selects Zone-timestep
+histories. A sufficiently large correction can set shortening true and
+history selection false. The first fine-step prediction then rolls nodes back,
+interpolates only if the new count differs from the prior Zone timestep, and
+selects downstepped histories. `HVACManager` clears shortening after that
+fine-step correction while leaving history selection false, so later fine-step
+predictions select the existing downstepped arrays without another rollback.
+
+The Zone-timestep tail stores the final count for the next timestep. A repeated
+count can therefore make the next first shortened prediction roll nodes back
+but reuse prior downstepped state. `SimulationManager::Resimulate` passes
+literal false shortening and only performs the current history selection.
+
+#### Validation, failure, replay, and reset
+
+Beyond the debug assertion, CP235 validates no Zone or Space upper bound,
+record-to-identity correspondence, Space membership, node upper bound,
+shared-node topology, RoomAir/AFN shape or use flag, step-count positivity,
+count/time consistency, timestep sign or finiteness, or history values. With
+shortening false, a release build can complete the member-array copies without
+using a malformed `zoneNum`. With shortening true, every invalid indexed owner
+can fail before later work.
+
+There is no status, diagnostic, allocation, latch, catch, cleanup,
+transaction, rollback, or locally owned reset. A node enthalpy abnormal
+non-return can preserve the preceding temperature, shared thermostat, and
+humidity writes. Each CP216 helper writes its destination before returning the
+scalar that CP235 assigns to the matching current value, so a floating trap or
+other abnormal exit can retain a destination prefix without `MAT`,
+`airHumRat`, or the RoomAir current scalar.
+
+Failure preserves the reached sequence: node rollback; base temperature; base
+humidity; Floor, occupied, and mixed histories; then each AFN node temperature
+and humidity. The final `ZTM` and `WPrevZoneTSTemp` assignments occur only
+after all shortened work returns. A CP235 non-return blocks every later CP203
+capacity, sum, coefficient, and demand effect but retains CP235 and earlier
+record prefixes.
+
+For valid stable topology, histories, timesteps, and counts, all production
+arrays are distinct and a complete repeated CP235 call overwrites the same
+values deterministically. It is not a transaction-wide retry guarantee:
+changed counts can reuse partial downstepped state, shared-node traversal
+changes the last writer, and CP203's later children own independent
+non-idempotent state.
+
+CP200 `beginEnvironmentInit` resets `ZTM`, `WPrevZoneTS`, `DSWPrevZoneTS`,
+and `WPrevZoneTSTemp` but not `XMAT`, `DSXMAT`, `MAT`, or `airHumRat`.
+History push/revert routines, HVAC counters, loop nodes, HeatBalFanSys, and
+RoomAir/AFN state have separate owners. Clean replay therefore requires
+coordinated reconstruction or reset across all of them.
+
+#### C++ tests, full-simulation census, and stock candidates
+
+No C++ test calls `updateTemperatures` or `predictSystemLoad` directly. Two
+focused `PredictSystemLoads` fixtures make 16 wrapper calls and 24 setpoint
+assertions, including four shortened wrapper calls, but both retain
+`NumOfZones = 0`; focused CP235 reach and CP235-owned assertions are zero.
+The CP216 array-helper test makes one ratio-two call with nine assertions but
+does not compose this wrapper.
+
+Of 57 active full-simulation expressions, one expected EMS fatal stops before
+prediction and one successful case has zero Zones. The other 55 configurations
+transitively reach CP235. Across one initial PredictStep per configuration,
+their aggregate topology is 81 Zone plus 24 active Space records, or 105 CP235
+calls. That gives 105 complete `ZTM` selections and 105 complete humidity
+working-history selections. No assertion isolates either assignment.
+
+Actual adaptive shortening is not instrumented and is conservatively bounded
+from zero through all 55 configurations. Across one hypothetical first
+shortened pass, at most 76 records have positive system nodes: 55 controlled
+Zones plus 21 automatically created sizing-Space nodes. Those provide at most
+76 node rollback transactions and 76 shared `TempTstatAir` writes. A
+count-change pass has at most 210 base interpolation calls across the 105
+records.
+
+All 81 corpus Zones use the Mixing RoomAir model, so displacement/UFAD and
+RoomAir-AFN additions have zero corpus potential. No focused or full-simulation
+assertion covers a false/true shortening pair, either history selector,
+positive/absent Zone or Space node, equal/different step counts, special
+RoomAir topology, malformed state, failure prefix, replay, or reset.
+
+Installed files offer future branch candidates: `RoomAirflowNetwork.idf` has
+six RoomAir AFN nodes; four `DisplacementVent_*.idf` files select a three-node
+Zone; `5ZoneSupRetPlenVSATU.idf` selects five UFAD Zones; and two
+`5ZoneAirCooledWithSpace*` files enable Space heat balance. None is referenced
+by repository comparison/smoke scripts, and an ordinary stock run does not
+prove that adaptive shortening or a count change occurred.
+
+#### Rust boundary
+
+Rust has Zone-only three-slot Zone/system temperature and humidity histories,
+a `use_zone_timestep_history` flag, an adaptive system-step count, and the
+CP216-adjacent by-value interpolation helper. Its local adaptive correction
+chooses a count from MAT change, reuses or rebuilds three-slot histories,
+copies slot zero into current Zone state only on a count change, runs its own
+fine-step correction/average loop, and commits the final local histories.
+
+It has no fourth slot, CP235 working `ZTM`/`WPrevZoneTSTemp` selection
+transaction, Space heat-balance record, Zone or Space system-node rollback,
+shared `TempTstatAir`, node enthalpy update, stratified RoomAir state, AFN
+nodes, global HVAC count/cadence, exact wrapper, source failure/retry shape, or
+composed test. Its helper rejects nonpositive timesteps, unlike the source
+dependency. State flags and diagnostic traces are adjacent metadata, not
+output or execution parity.
+
+CP235 adds no algorithm-level source, Rust target, code, mapped state, test,
+support, capability, output implementation, comparator, case, manifest,
+numerical, performance, or conformance promotion. The inventory becomes 32
+algorithms and 241 routines, split 58 `state_mapped` plus 183
+`source_mapped`, with 118 required; the heat-balance project list becomes 87.
+
+CP236 next maps `ZoneSpaceHeatBalanceData::calcPredictedSystemLoad`, declared
+at `ZoneTempPredictorCorrector.hh` line 224 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 6835-7243.
 
 ### `CheckValidSimulationObjects` state contract
 

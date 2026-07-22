@@ -110,6 +110,7 @@ required_routines = [
   "override_air_set_points_for_ems_cntrl",
   "fill_predefined_table_on_thermostat_setpoints",
   "fill_predefined_table_on_thermostat_schedules",
+  "zone_space_heat_balance_update_temperatures",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",

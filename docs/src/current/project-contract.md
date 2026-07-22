@@ -3373,12 +3373,89 @@ numerical, performance, or conformance promotion. The inventory becomes 32
 algorithms and 240 routines, split 58 `state_mapped` plus 182
 `source_mapped`, with 117 required; the heat-balance project list becomes 86.
 
-CP235 next maps `ZoneSpaceHeatBalanceData::updateTemperatures`, declared at
+CP235 adds required `zone_space_heat_balance_update_temperatures`
+immediately after `fill_predefined_table_on_thermostat_schedules` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is
+`ZoneSpaceHeatBalanceData::updateTemperatures`, declared at
 `ZoneTempPredictorCorrector.hh` lines 233-234 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 6768-6833.
 
+The sole production expression is the first child of CP203
+`predictSystemLoad`. CP202 supplies Zone-first then active stored-Space
+traversal. CP203 already owns that parent transaction, and CP216 owns the
+down-interpolation formulas; CP235 separately owns rollback, helper
+conditions/order, current-value commits, and working-history selection.
+
+On every normal return CP235 copies all four slots of either `XMAT` or
+`DSXMAT` into `ZTM`, followed by all four slots of the corresponding humidity
+history into `WPrevZoneTSTemp`. This selection is independent of shortening
+and does not itself change `MAT` or `airHumRat`. A non-shortened call can
+therefore select existing downstepped state, while a shortened count-change
+call can populate downstepped arrays and then select Zone histories.
+
+Shortening first selects a Zone system node only for exact `spaceNum == 0`;
+every nonzero identity selects a Space node. A positive node receives
+temperature, parent-Zone `TempTstatAir`, raw humidity, then enthalpy from the
+first Zone-timestep history values. The enthalpy formula floors negative
+humidity at `1e-5` without changing node `HumRat`. Space calls overwrite the
+shared parent-Zone thermostat value, so the last reached positive-node Space
+can win.
+
+Only a current/last system-step count mismatch invokes CP216: record
+temperature then humidity, followed for exact Zones under the global
+non-Mixing gate by Floor/occupied/mixed histories and independently every
+RoomAir AFN node's temperature then humidity. Spaces get only the two base
+calls. A matching count still rolls nodes back but leaves downstepped/current
+state untouched before the final selector. The AFN branch does not test
+`IsUsed`.
+
+`HVACManager` begins a Zone timestep unshortened with Zone-history selection.
+Adaptive entry makes only the first fine-step prediction shortened; later
+fine predictions keep downstepped selection but skip rollback. A repeated
+system-step count reuses prior downstepped arrays.
+`SimulationManager::Resimulate` always passes false shortening.
+
+CP235 has only the debug positive-Zone assertion and no identity, membership,
+upper-bound, topology, count, timestep, finite-value, or history validation.
+It owns no status, diagnostic, latch, transaction, rollback, cleanup, or
+reset. Failure preserves ordered node and helper prefixes before suppressing
+the final selector and every later CP203 effect. Stable complete replay is
+deterministic overwrite behavior because production source/destination arrays
+are distinct; changed counts/topology and the surrounding parent transaction
+do not inherit that property.
+
+No C++ test calls CP235 or CP203 directly. Sixteen focused CP202 calls with 24
+setpoint assertions retain zero Zones, and the nine-assertion CP216 helper
+test does not compose the wrapper. Of 57 active full simulations, one expected
+fatal stops before prediction and one has zero Zones. Across one initial
+prediction sweep of the other 55 configurations, the aggregate is 81 Zones
+plus 24 active Spaces, or 105 CP235 calls and 105 pairs of complete working
+history selections.
+
+Actual shortened entry remains unobserved and is bounded at zero through 55
+configurations. One hypothetical shortened sweep has at most 76 positive-node
+records and, on count change, 210 base helper calls. All 81 Zones are Mixing,
+so the special RoomAir calls have zero corpus potential. No assertion isolates
+CP235 state. Installed RoomAir-AFN, displacement/UFAD, and Space-heat-balance
+files are unadopted candidates only.
+
+Rust owns adjacent Zone-only three-slot histories, flags, adaptive count logic,
+and a by-value helper that rejects nonpositive timesteps. Its correction path
+has no fourth slot or CP235 working-history transaction, Space record,
+Zone/Space node or shared thermostat rollback, enthalpy update, RoomAir/AFN
+topology, source HVAC cadence, exact wrapper, failure shape, or composed test.
+CP235 remains required `source_mapped` and adds no algorithm-level source,
+Rust/state/support/output/numerical/performance/conformance promotion. The
+inventory becomes 32 algorithms and 241 routines, split 58 `state_mapped`
+plus 183 `source_mapped`, with 118 required; the heat-balance project list
+becomes 87.
+
+CP236 next maps `ZoneSpaceHeatBalanceData::calcPredictedSystemLoad`, declared
+at `ZoneTempPredictorCorrector.hh` line 224 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 6835-7243.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`fill_predefined_table_on_thermostat_schedules`,
+`zone_space_heat_balance_update_temperatures`,
 preserving the completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
