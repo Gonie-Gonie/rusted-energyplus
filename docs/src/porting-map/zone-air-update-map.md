@@ -41,7 +41,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | hybrid thermal-mass multiplier postprocessing | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::processInverseModelMultpHM` | no inferred multiplier, aggregate, or per-Zone recurring-warning state | CP218 required source-mapped lower clamp, uncapped over-limit diagnostics, persistent sum/count/average update, and caller transaction; no Rust parser, state, output, diagnostic, test, or execution parity |
 | hybrid humidity inverse inference | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::InverseModelHumidity` | no typed `HybridModel:Zone`, measured humidity history, inverse state, or exact outputs | CP219 required source-mapped unconditional sampling/history shift plus date/history-gated infiltration and People inversion; no Rust parser, state, output, test, or execution parity |
 | Zone/Space heat-balance sum assembly | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums` | adjacent Zone-only opaque-surface hA/hAT helper, OtherEquipment convection subset, and zero-initialized flow fields | CP220 required source-mapped internal/non-system/system/surface transaction with parent-Zone AFN/equipment/plenum/PIU context and uncontrolled-Space system allocation; no exact Rust routine, Space topology, airflow writer, lifecycle, test, or execution parity |
-| Zone heat-balance stored-Space result fold | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneHeatBalanceData::calcSumHAT` | direct Zone opaque-Surface index fold returning only HA/HATsurf/HATref=0 | CP221 required source-mapped four-field stored-Space child aggregation; no exact Rust Space record, dispatch/order, internal-gain return, child-side-effect, failure, test, or execution parity |
+| Zone/Space heat-balance surface result family | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneHeatBalanceData::calcSumHAT` and `SpaceHeatBalanceData::calcSumHAT` | direct Zone opaque-Surface index fold returning only HA/HATsurf/HATref=0 | CP221 maps the Zone stored-Space child fold; CP222 expands the same required source-mapped routine to the Space inclusive Surface range, Window/report terms, reference-air dispatch, and failure effects. No exact Rust Space/Window/result or execution parity. |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -5213,7 +5213,7 @@ The 99 comprise one baseline Space per Zone, 16 additional identities across
 eight one-Zone/three-Space sizing configurations, one additional identity in
 the two-Zone/three-Space `HeatBalanceAirManager_GetMixingAndCrossMixing`
 configuration, and one additional identity in the separate two-Zone/three-Space
-`Standard621SimplifiedProcedure::SimplifiedProcedureTest3` configuration.
+`SimplifiedProcedureTest3` configuration in `Standard621SimplifiedProcedure.unit.cc`.
 
 A static single prediction pass is therefore 81 CP221 calls dispatching 99
 nested CP222 children. A static single correction pass has the same CP221 and
@@ -5270,9 +5270,255 @@ conformance promotion. The inventory becomes 32 algorithms and 228 routines,
 split 58 `state_mapped` plus 170 `source_mapped`, with 105 required; the
 heat-balance project list becomes 74.
 
-CP222 next maps `SpaceHeatBalanceData::calcSumHAT`, declared at
+### CP222 `SpaceHeatBalanceData::calcSumHAT` source map
+
+CP222 expands the existing required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.zone_heat_balance_calc_sum_hat`
+mapping to the independent Space override. It adds no second routine row or
+heat-balance project-contract item because both C++ definitions share the
+unqualified source identifier `calcSumHAT`. The project list retains
+`zone_heat_balance_calc_sum_hat` before
+`update_final_surface_heat_balance`. The Space override is declared at
 `ZoneTempPredictorCorrector.hh` line 259 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 5300-5413.
+`ZoneTempPredictorCorrector.cc` lines 5300-5413. The four-field
+`SumHATOutput` return type remains the header lines 93-100 boundary.
+
+#### Entry and unfiltered inclusive Surface range
+
+CP222 performs debug-only assertions in this exact order:
+
+```text
+zoneNum > 0
+spaceNum > 0
+```
+
+It then aliases the predictor/corrector owner, parent `Zone(zoneNum)`, and
+selected `space(spaceNum)`, and default-constructs `results`. Member
+initializers set `sumIntGain`, `sumHA`, `sumHATsurf`, and `sumHATref` to exact
+zero. The body never reads or writes receiver `this`; production constructs
+align the receiver with `spaceNum`, but CP222 does not enforce that alignment.
+
+The routine walks every integer from the selected Space's `HTSurfaceFirst`
+through `HTSurfaceLast`, inclusive and ascending. An inverted range returns the
+four exact zeros. CP222 does not test `HeatTransSurf`, Surface class before
+entry, stored count, Zone or Space membership, bounds ownership, or overlap
+with another Space range. A foreign identity inside malformed numeric bounds
+is processed at its integer position; repeated visits arise only from
+overlapping ranges or later calls, not within one ascending range.
+
+For each identity, CP222 initializes local `HA` to zero and local `Area` from
+`Surface(SurfNum).Area`. For a Window this is the glazing area. Every Surface,
+including a non-Window and a `GlassDoor`, eventually receives the base terms:
+
+```text
+HA                 += SurfHConvInt * Area
+results.sumHATsurf += SurfHConvInt * Area * SurfTempInTmp
+```
+
+#### Ordered Window gains and convection terms
+
+Only exact `SurfaceClass::Window` enters the special branch. CP222 reads its
+shading flag and applies these operations in source order:
+
+1. An interior shade or blind adds divider area to local `Area` and adds
+   `SurfWinDividerHeatGain` to `sumIntGain`.
+2. A referenced construction with `WindowTypeEQL` adds
+   `SurfWinOtherConvHeatGain`, independently of shading.
+3. An interior shade or blind adds `SurfWinConvHeatFlowNatural`.
+4. Strictly positive `SurfWinAirflowThisTS` adds
+   `SurfWinConvHeatGainToZoneAir`.
+5. Under that airflow gate, parent-Zone `NoHeatToReturnAir` additionally adds
+   `SurfWinRetHeatGainToZoneAir` to the local result and mutates
+   `SurfWinHeatGain += SurfWinRetHeatGainToZoneAir`.
+
+After the persistent `SurfWinHeatGain` addition, a nonnegative accumulated
+rate overwrites only `SurfWinHeatGainRep` and its zone-timestep energy. Any
+other comparison outcome, including a negative or NaN rate, overwrites only
+`SurfWinHeatLossRep` with the negated rate and its energy. Neither branch
+clears the opposite rate/energy pair, so an earlier value can remain stale.
+CP222 then overwrites signed `SurfWinHeatTransferRepEnergy` as the accumulated
+heat gain times `TimeStepZoneSec`.
+
+A strictly positive frame area contributes:
+
+```text
+HA_surf = SurfHConvInt * SurfWinFrameArea * (1 + SurfWinProjCorrFrIn)
+sumHATsurf += HA_surf * SurfWinFrameTempIn
+HA         += HA_surf
+```
+
+A strictly positive divider area contributes separately only without an
+interior shade or blind:
+
+```text
+HA_surf = SurfHConvInt * SurfWinDividerArea * (1 + 2 * SurfWinProjCorrDivIn)
+sumHATsurf += HA_surf * SurfWinDividerTempIn
+HA         += HA_surf
+```
+
+The later base terms use glazing area for an unshaded Window and
+glazing-plus-divider area for an interior-shaded Window. Ordinary equipment
+internal gains are assembled by CP220; CP222's `sumIntGain` contains only the
+Window additions above.
+
+#### Reference-air dispatch
+
+Each Surface reaches the reference-air switch only after its Window and base
+HATsurf work:
+
+- `ZoneMeanAirTemp` adds local HA to `sumHA`.
+- `AdjacentAirTemp` adds HA times `SurfTempEffBulkAir` to `sumHATref`.
+- `ZoneSupplyAirTemp` first requires the parent Zone to be controlled. An
+  uncontrolled Zone calls `ShowFatalError` with
+  `Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone {}`,
+  formatted with the parent Zone name. The following source `return results`
+  is unreachable on the normal fatal path.
+- A controlled supply-air Surface uses parent
+  `zoneHeatBalance(zoneNum).SumSysMCp` and `SumSysMCpT`, never the selected
+  Space record. Strictly positive `SumSysMCp` adds
+  `HA * SumSysMCpT / SumSysMCp` to `sumHATref`; zero, negative, or NaN
+  `SumSysMCp` adds HA to `sumHA` without reading a mean-air temperature.
+- The default branch, including an invalid reference-air sentinel, silently
+  adds HA to `sumHA` despite the source comment that a warning should exist.
+
+On prediction CP220 has zeroed the parent Zone system sums before nested CP222
+dispatch, so supply-air references take the HA fallback. Correction CP220
+assembles the parent Zone system sums before CP221, and both nested and later
+explicit Space visits can observe those Zone-level values.
+
+#### Caller ownership and cadence
+
+CP222 has two production ingress shapes. Every Zone CP220 call dispatches
+CP221, which calls CP222 once for each stored Space regardless of the explicit
+Space scheduling gate. Separately, the prediction and correction wrappers call
+CP220 on eligible explicit Space receivers; virtual dispatch enters CP222
+directly without CP221. Zone work precedes those explicit Space calls, so a
+stored Space may be processed once nested and again explicitly in the same
+pass.
+
+The corrected 55-configuration nonzero-Zone corpus has 99 stored Space
+identities. A static single prediction pass therefore contains 99 nested plus
+24 explicit CP222 calls, or 123. A static single correction pass contains 99
+nested plus three explicit calls, or 102. The combined configuration census is
+225, not a runtime total. Initial and adaptive fine-step work can repeat
+prediction and correction, while demand resimulation adds prediction without
+a matching correction.
+
+CP220 commits the returned `sumIntGain` only after adding it to its earlier
+internal gains, then assigns HA, HATsurf, and HATref. A nested result is first
+folded into CP221's local Zone result; a direct result is committed to its
+Space receiver.
+
+#### Validation, failure, retry, and reset
+
+Beyond two debug assertions, CP222 has no release identity check, upper bound,
+Zone/Space membership test, allocation or range validation, construction
+validation, Surface-class compatibility check, reference-enum validation,
+finite-value check, timestep check, or finite numerator/ratio validation beyond
+the strict-positive supply denominator gate. Array and construction access is
+unchecked, and all arithmetic accepts nonfinite input.
+
+The airflow/no-return Window writes occur before reference dispatch. A later
+uncontrolled supply-air Surface can therefore terminate after current and
+earlier Window reports have mutated. The local four-field result does not
+return, later surfaces are skipped, a containing CP221 aggregate does not
+return, and CP220's post-call surface commit does not execute. CP220's
+entry-zeroed surface fields and its earlier gain/airflow coefficient work
+remain, as do external Window writes and fatal diagnostics.
+
+Retry creates a fresh local zero result and restarts at `HTSurfaceFirst`; it
+does not resume or roll back. Stable side-effect-free inputs reproduce the
+same ordered return, but `SurfWinHeatGain +=` makes the general Window path
+non-idempotent. The changed accumulated sign can overwrite a different report
+side while stale opposite fields survive. Nested CP221 and later explicit
+Space visits can create the same repetition without a failure.
+
+CP222 owns no persistent receiver state, completion marker, status, catch,
+transaction, cleanup, recovery path, or reset hook. Clean replay requires
+coordinated restoration of Surface reports, topology, temperatures,
+constructions, convection coefficients, timestep state, and parent-Zone
+system sums.
+
+#### C++ test and corpus boundary
+
+No C++ test directly calls either `calcSumHAT` override. The focused
+`ZoneTempPredictorCorrector_calcZoneOrSpaceSums_SurfConvectionTest` calls Zone
+CP220 five times with one Space and three non-Window surfaces. CP221 reaches
+that CP222 child on every call. The first two calls assert HA, HATsurf, and
+HATref, six aggregate assertions total; the remaining three assert only CP220
+system sums.
+
+The three surfaces select ZoneMean, Adjacent, and ZoneSupply reference modes.
+The first two calls provide bounded positive supply-flow and fallback
+coverage, but no assertion isolates `sumIntGain`. The fixture does not cover a
+Window, default reference, uncontrolled fatal, receiver/Space mismatch, empty,
+Window-bearing, overlapping, foreign, inverted, or otherwise malformed range,
+nonfinite input, partial external effect, failure, retry, or reset. Five HybridModel
+correction calls also reach CP222 through empty child ranges, but assert only
+hybrid state.
+
+Within the 55 completing full-simulation configurations, 19 contain 36 exact
+Window-class identities; two additional GlassDoor identities take only the
+generic path. Five Windows are equivalent-layer types. No configuration
+provides an airflow-control object, active frame/divider reference, or active
+airflow/no-return mutation. One configuration attaches interior blinds to
+eight Windows, but its permission schedule is constant zero, so the active
+interior-blind path has no corpus potential.
+
+All corpus reference-air selections remain ZoneMean; Adjacent, ZoneSupply,
+fatal, and default branches have zero full-simulation potential. Window
+configurations do not overlap the explicit-Space scheduler configurations, so
+the one-pass structural Window visit count is 36 prediction and 36
+correction, with five equivalent-layer entries per pass. No oracle isolates
+CP222's returned fields, Window branch, report side effects, range order, or
+failure transaction.
+
+#### Rust boundary
+
+A crate-wide search finds no `calcSumHAT`, `calc_sum_hat`, `SumHATOutput`, or
+the CP222 Window and reference-air symbols. The nearest
+`zone_surface_convection_sums_for_indices` takes a Zone-owned Surface index
+slice, silently skips an invalid index through `filter_map`, folds only
+h-times-area and h-times-area-times-inside-temperature, and returns
+`(sumHA, sumHATsurf, 0.0)`. It has no `sumIntGain`, Space range, Window,
+reference-air switch, supply ratio, fatal, or side effect.
+
+`SurfaceHeatBalanceState` owns a `ZoneId` but no `SpaceId`. The runtime boundary
+blocks authored and generated-remainder Space topology, discards the compiler's
+Surface Space identity, and builds Zone-only opaque-surface indexes. Its
+surface loop always writes the owning Zone temperature into
+`inside_reference_air_temperature_c`; a reporting helper can consume that
+snapshot, but the convection-sum helper still hard-codes HATref to zero.
+
+The compiler types Space relationships and several fenestration materials and
+constructions, but the heat-balance runtime rejects fenestration construction
+use and owns no `FenestrationSurface:Detailed` or Window report state. Its
+fenestration index vectors remain empty. Zone system sums are initialized to
+zero without a production supply-state assembly matching CP222.
+
+Rust `part03` checks one-Zone initial HA/HATsurf/HATref values, `part04` checks
+a direct Zone opaque-Surface sum with HATref zero, and `part05` only seeds
+fields for downstream reporting. None creates a Space result, Window state,
+reference mode, or failure/retry case.
+
+The official candidate has one Zone, six opaque surfaces, no authored Space,
+Window, AirLoop, or ZoneHVAC object. The compiler creates one default Space,
+but runtime discards its identity. Its 8760-sample Zone surface-convection-rate
+artifact remains within maximum absolute difference 0.085845581243 W and RMSE
+0.005357748923 W. That is bounded downstream ZoneMean opaque-Surface evidence,
+not CP222 Space range/order, four-field result, Window, reference dispatch, or
+side-effect proof.
+
+CP222 expands the same required `source_mapped` routine and adds no second
+routine, project-contract item, Rust target, code, mapped state, test, support,
+capability, output implementation, comparator, manifest, numerical,
+performance, or conformance promotion. Counts remain 32 algorithms and 228
+routines, split 58 `state_mapped` plus 170 `source_mapped`, with 105 required;
+the heat-balance project list remains 74.
+
+CP223 next maps `CalcZoneComponentLoadSums`, declared at
+`ZoneTempPredictorCorrector.hh` lines 345-348 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5414-5677.
 
 ## Promotion Requirements
 

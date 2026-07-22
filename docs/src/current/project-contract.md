@@ -2224,9 +2224,62 @@ support, output, numerical, or conformance claim. The inventory becomes 32
 algorithms and 228 routines, split 58 `state_mapped` plus 170 `source_mapped`,
 with 105 required; the heat-balance project list becomes 74.
 
-CP222 next maps `SpaceHeatBalanceData::calcSumHAT`, declared at
+CP222 expands the existing required `zone_heat_balance_calc_sum_hat` source
+mapping to its independent Space override. It adds no second routine or
+project-contract item because both C++ definitions share the unqualified
+source identifier `calcSumHAT`; project order remains
+`zone_heat_balance_calc_sum_hat` immediately before
+`update_final_surface_heat_balance`. The added EnergyPlus boundary is
+`SpaceHeatBalanceData::calcSumHAT`, declared at
 `ZoneTempPredictorCorrector.hh` line 259 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 5300-5413.
+
+The Space override debug-asserts positive Zone then Space identities,
+zero-initializes a four-field local result, and walks the selected Space's
+inclusive `HTSurfaceFirst..HTSurfaceLast` integer range. It neither reads the
+receiver nor filters by class or membership nor validates bounds or ownership;
+an inverted range returns four zeros.
+
+Each Window contributes shade/blind, equivalent-layer, airflow, frame, divider,
+and glazing terms in source order. The airflow/no-return-air path also mutates
+`SurfWinHeatGain` with `+=`, updates the gain side for a nonnegative comparison
+and otherwise the loss side, including for NaN, leaves the opposite gain/loss
+pair stale, and overwrites signed transfer energy. All Surface classes then
+contribute base HA and HATsurf.
+
+Zone-mean reference air adds HA, adjacent air adds HA times effective bulk-air
+temperature, and supply air uses the parent Zone's system-weighted temperature
+only for a strictly positive parent `SumSysMCp`. Zero, negative, or NaN flow
+falls back to HA. An uncontrolled Zone is fatal; an invalid/default reference
+silently falls back to HA. CP222 does not use a Space record's system sums.
+
+CP222 is reached both through every CP221 stored-Space child and directly from
+explicit Space CP220 receivers. The corrected static corpus census is 123
+prediction calls, 99 nested plus 24 explicit, and 102 correction calls, 99
+nested plus three explicit, or 225 combined. These are configuration counts,
+not runtime totals; warmup, adaptive steps, and demand resimulation can repeat
+them, and nested plus explicit visits can repeat the same child.
+
+No test calls CP222 directly. One CP220 fixture reaches one three-surface,
+non-Window child five times; only its first two calls assert six
+HA/HATsurf/HATref values. It gives bounded ZoneMean, Adjacent, and ZoneSupply
+positive-flow/fallback coverage, but no Window, `sumIntGain`, fatal, default,
+failure, retry, or reset coverage.
+
+Rust has no matching four-field result, Space heat-balance arena, Window
+runtime, or reference-air switch. Its nearest Zone-only opaque-Surface helper
+returns HA, HATsurf, and a fixed-zero HATref while silently skipping invalid
+indexes. Existing one-Zone opaque-surface evidence does not establish CP222.
+
+CP222 expands the same required `source_mapped` routine and adds no new routine,
+project-contract item, Rust target, mapped state, support, output, numerical,
+or conformance claim. Counts remain 32 algorithms and 228 routines, split 58
+`state_mapped` plus 170 `source_mapped`, with 105 required; the heat-balance
+project list remains 74.
+
+CP223 next maps `CalcZoneComponentLoadSums`, declared at
+`ZoneTempPredictorCorrector.hh` lines 345-348 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5414-5677.
 
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_heat_balance_calc_sum_hat`, preserving the
