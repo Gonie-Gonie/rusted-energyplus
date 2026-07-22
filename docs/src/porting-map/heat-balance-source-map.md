@@ -178,6 +178,7 @@ claim.
 | thermal-comfort Zone air setpoint calculation | `CalcZoneAirComfortSetPoints`, declared at `ZoneTempPredictorCorrector.hh` line 360, implemented at `ZoneTempPredictorCorrector.cc` lines 5966-6329, and called only by the guarded `CalcZoneAirTempSetPoints` expression | CP229 adds required `routine.calc_zone_air_comfort_set_points` as source-mapped only. First-use initialization, PMV dispatch, NO/SPE/OBJ/PEO averaging, cross-Zone accumulator anomalies, dry-bulb clamps and writes, diagnostics, ordinary/comfort/EMS precedence, and failure/reset remain source-only; Rust has no comfort objects, Fanger state, inverse child, outputs, live caller, or test. |
 | thermal-comfort PMV-to-dry-bulb inversion | `GetComfortSetPoints`, declared at `ZoneTempPredictorCorrector.hh` lines 362-367, implemented at `ZoneTempPredictorCorrector.cc` lines 6331-6415, and called only by 12 expressions inside `CalcZoneAirComfortSetPoints` | CP230 adds required `routine.get_comfort_set_points` as source-mapped only. Strict endpoint/no-write dispatch, configurable root solving, repeated impure Fanger state, shared diagnostics, caller multiplicity, and failure/retry remain source-only; Rust has no comfort types, PMV/Fanger state, generic solver, live caller, or composed test. |
 | temperature-and-humidity cooling-setpoint overcool | `AdjustCoolingSetPointforTempAndHumidityControl`, declared at `ZoneTempPredictorCorrector.hh` lines 369-372, implemented at `ZoneTempPredictorCorrector.cc` lines 6417-6458, and called only by SingleCool and Dual expressions in `CalcZoneAirTempSetPoints` | CP231 adds required `routine.adjust_cooling_set_point_for_temp_and_humidity_control` as source-mapped only. Pre-guard indexed aliases, global/exact-None guards, range/gap/RH-ratio caps, high-only mutation, mixed-record null dependency, parent precedence, and replay remain source-only; Rust has no typed modifier, matching setpoint state, exact helper, live caller, or test. |
+| EMS air-temperature setpoint override | `OverrideAirSetPointsforEMSCntrl`, declared at `ZoneTempPredictorCorrector.hh` line 374, implemented at `ZoneTempPredictorCorrector.cc` lines 6460-6555, and called unconditionally as the final action in `CalcZoneAirTempSetPoints` | CP232 adds required `routine.override_air_set_points_for_ems_cntrl` as source-mapped only. Ordinary-then-comfort traversal, heating-before-cooling writes, live type dispatch, collisions, actuator bindings, downstream replacement, and reset/replay remain source-only; Rust has no EMS engine, actuator state, mutable setpoint triple, comfort control, exact helper, live caller, or active test. |
 | internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
 | space internal convective gains | `spaceSumAllInternalConvectionGains` | mapped-not-ported |
 
@@ -19931,9 +19932,228 @@ The inventory becomes 32 algorithms and 237 routines, split 58
 `state_mapped` plus 179 `source_mapped`, with 114 required; the heat-balance
 project list becomes 83.
 
-CP232 next maps `OverrideAirSetPointsforEMSCntrl`, declared at
-`ZoneTempPredictorCorrector.hh` line 374 and implemented at
+### CP232 `OverrideAirSetPointsforEMSCntrl` source map
+
+CP232 adds canonical required
+`routine.override_air_set_points_for_ems_cntrl` and the project-contract item
+`override_air_set_points_for_ems_cntrl` immediately after CP231
+`adjust_cooling_set_point_for_temp_and_humidity_control`. The pinned declaration
+is `ZoneTempPredictorCorrector.hh` line 374, and the complete definition is
 `ZoneTempPredictorCorrector.cc` lines 6460-6555.
+
+The routine copies current EMS actuator values into the live Zone thermostat
+setpoint triple. It is a source boundary only. No Rust implementation, typed
+EMS input, state promotion, or conformance claim is inferred.
+
+#### Traversal, flag gates, and assignment matrix
+
+The body first aliases the HeatBalFanSys owner, then traverses every ordinary
+`TempControlledZone` in ascending 1-based record order, followed by every
+`ComfortControlledZone` in ascending order. Each record is aliased before
+either flag is tested. A count larger than its allocated arena can therefore
+fail even when every override flag would have been false. Zero or negative
+counts skip their respective loop.
+
+Heating and cooling are independent `if` blocks, always in that order. An
+active block reads `ActualZoneNum`, aliases `zoneTstatSetpts(ZoneNum)`, and only
+then dispatches on the live per-Zone control type. Thus an active flag with a
+bad Zone index can fail before an unsupported control type would select the
+silent default branch. A valid but wrong Zone index writes that other Zone;
+CP232 performs no record-to-Zone identity check.
+
+For ordinary records dispatch uses `TempControlType(ZoneNum)`. For comfort
+records it uses `ComfortControlType(ZoneNum)`; the explicit cast around the
+comfort cooling switch is redundant because the stored value already has the
+same enum type. The four writes are:
+
+| live control type | active heating flag | active cooling flag |
+| --- | --- | --- |
+| `SingleHeat` | scalar `setpt`, then low `setptLo` receive the heating value | no write |
+| `SingleCool` | no write | scalar `setpt`, then high `setptHi` receive the cooling value |
+| `SingleHeatCool` | scalar, then low receive heating | scalar, then high receive cooling |
+| `DualHeatCool` | low receives heating; scalar is preserved | high receives cooling; scalar is preserved |
+| every other value | no write | no write |
+
+The chained assignments are right-associative: scalar is assigned before its
+low or high companion. With both flags active on `SingleHeatCool`, heating
+first leaves scalar/low at the heating value, then cooling replaces scalar and
+high. The final triple is therefore scalar=cooling, low=heating,
+high=cooling. On Dual, both bounds change and scalar remains whatever earlier
+work left there. Opposite single-mode flags are silently ignored.
+
+The constructor defaults both ordinary and comfort flags to false and both
+values to zero. CP232 itself has no `AnyEnergyManagementSystemInModel`,
+environment, warmup, sizing, kickoff, occupancy, availability, finite-value,
+range, unit, deadband, or monotonicity guard. NaN, infinities, signed zero,
+reversed bounds, and arbitrary Celsius-like values are copied literally. It
+emits no warning or status and changes no actuator field, raw thermostat
+snapshot, control type/report code, PMV/Fanger state, or adaptive state.
+
+#### Live type dispatch and shared-Zone precedence
+
+CP229 comfort calculation runs before CP232 and writes its selected comfort
+family into ordinary `TempControlType`. Consequently the ordinary actuator
+loop dispatches on that final live type, not necessarily on the ordinary
+record's authored setpoint family. The comfort loop then dispatches separately
+on `ComfortControlType`.
+
+There is no duplicate-target or cross-family validation. Multiple ordinary
+records targeting one Zone resolve in record order, with the later record
+winning only the fields it writes. After all ordinary records, comfort records
+can overwrite the same scalar or bound, so comfort is final for overlapping
+fields. Nonoverlapping fields survive and can form a mixed triple from several
+records or families. Both loops consult shared per-Zone type arrays rather than
+record-local types.
+
+#### EMS registration, timing, and unit anomaly
+
+`EMSManager::SetupThermostatActuators` registers two real actuators for each
+ordinary record:
+
+- component `Zone Temperature Control`;
+- unique key `TempControlledZone.ZoneName`;
+- controls `Heating Setpoint` and `Cooling Setpoint`;
+- units `[C]`.
+
+It requests the same two controls for each comfort record under component
+`Zone Comfort Control` and `ComfortControlledZone.ZoneName`, but reports units
+`[]`. Each unique component/name/control tuple points directly to the
+corresponding CP232 boolean and value field. With unique Zone names, these
+families contribute
+`2 * NumTempControlledZones + 2 * NumComfortControlledZones` available
+actuators, excluding the separate humidity controls. `SetupEMSActuator`
+uppercases its tuple key and suppresses a duplicate, retaining the first
+binding even though CP232 still traverses every record.
+
+The comfort values are nominally registered as dimensionless, yet CP232 copies
+them without PMV inversion or unit conversion into the Celsius-backed live
+thermostat fields. That unit mismatch is pinned source behavior, not a Rust
+design recommendation.
+
+The usual built-in order in `HVACManager` calls `ManageEMS` at
+`BeginTimestepBeforePredictor`, then requests `GetZoneSetPoints`. EMS programs,
+plugins, callbacks, external interfaces, or API clients can therefore update
+the bound flags and values before CP232 consumes them. CP232 does not execute
+EMS or verify that the current values came from a program.
+
+#### Parent order, consumers, and later replacement
+
+There is one production call expression: line 3459 is the unconditional final
+action of CP204 `CalcZoneAirTempSetPoints`. Before it, ordinary schedule
+sampling, adaptive and operative conversion, optional optimum start,
+temperature-and-humidity overcool, and thermostat-fault offsets have run.
+Optional CP229 comfort control runs next and can replace ordinary types and
+setpoints. CP232 then gives ordinary EMS records followed by comfort EMS
+records final precedence inside that parent.
+
+The already registered system-timestep outputs
+`Zone Thermostat Heating Setpoint Temperature` and
+`Zone Thermostat Cooling Setpoint Temperature` reference low and high.
+CP232 registers no output and scalar has no matching thermostat-setpoint output
+here. Load prediction consumes scalar for SingleHeat, SingleCool, and
+SingleHeatCool, but consumes low and high for Dual. Therefore cooling wins the
+actual SingleHeatCool scalar load when both flags are active, while the
+heating low can remain observable in the output. Dual consumes both overridden
+bounds and ignores the preserved scalar.
+
+CP232 is not necessarily the final writer before load calculation. A separate
+staged-control record targeting the same Zone can replace low/high at the
+start of `PredictSystemLoads`. More commonly, any positive ordinary thermostat
+cutout difference rebuilds SingleHeat scalar/low, SingleCool scalar/high, or
+Dual low/high from raw ordinary schedule snapshots captured before adaptive,
+operative, overcool, fault, comfort, and EMS work. There is no
+SingleHeatCool cutout switch case. A comfort-derived live type combined with
+stale ordinary snapshots can therefore erase or mismatch CP232 values.
+Dual cutout alone performs the later fatal low-greater-than-or-equal-high
+check; CP232 performs none.
+
+The ordinary built-in path reaches CP232 once per Zone-timestep setpoint sweep,
+after the usual EMS calling point and before HVAC system substeps.
+Demand-manager `ResimHVAC` can repeat `GetZoneSetPoints` at the same simulation
+time without first rerunning that EMS calling point, reapplying retained
+flags/values. The external-HVAC path bypasses the built-in sweep.
+
+#### Failure, replay, and reset
+
+Writes occur as each flag is processed. If a later flag, record, Zone lookup,
+or type-array lookup fails, every earlier scalar/bound assignment remains.
+There is no catch, transaction, rollback, cleanup, completion status, or
+latch. A successful duplicate call with unchanged records, types, flags, and
+values is overwrite-idempotent because every write is absolute. Changed state
+or a retry after partial failure can produce a different mixed result, while
+the successful prefix is simply replayed.
+
+DataZoneControls constructors initialize flags false and values zero.
+`BeginEnvrnInitializeRuntimeLanguage` clears and zeroes actuator state for
+used EMS actuators at `BeginNewEnvironment`; it does not establish a reset
+contract for manually populated or otherwise unregistered record fields.
+`InitZoneAirSetPoints` separately zeroes the live setpoint triple and resets
+ordinary control type at begin environment, while comfort calculation rebuilds
+its live type during each parent call. CP232 owns no reset. Clean isolated
+replay therefore spans DataZoneControls records, EMS RuntimeLanguage actuator
+bindings and values, HeatBalFanSys type/setpoint arrays, comfort state, the
+parent modifiers, and any downstream staged/cutout state.
+
+#### C++ tests, active corpus, and oracle inventory
+
+One direct C++ test, `ZoneTempPredictorCorrector_EMSOverrideSetpointTest`, calls
+CP232 twice. The first call gives one ordinary Dual record both flags with
+23/26 and asserts low/high. The second disables the ordinary count, gives one
+comfort Dual record 22/25, and asserts low/high. Those four assertions do not
+cover scalar, single modes, defaults, duplicate or cross-family collisions,
+bad indexes/types, nonfinite/deadband values, parent order, downstream cutout,
+failure, replay, or reset. No test directly isolates actuator registration.
+
+Separate unit fixtures make 21 direct `CalcZoneAirTempSetPoints` calls. They
+enter CP232 21 times and visit 35 ordinary records, producing 70 default-false
+flag checks, zero comfort visits, and zero CP232 writes. Their assertions cover
+sibling parent behavior.
+
+The unit tree contains 57 active full-simulation expressions. One expected EMS
+fatal ends before setpoint acquisition. The remaining 56 reach the setpoint
+sweep; across 38 configurations they contain 52 ordinary thermostat records.
+A one-sweep static census therefore gives 52 ordinary record visits and 104
+false flag checks, with zero comfort visits and zero active override writes.
+This is not a fixed total across warmup, timesteps, and resimulation. None of
+the active inputs contains either exact CP232 actuator component key.
+
+The installed EnergyPlus 26.1 testfiles and related scripts also contain no
+actuator whose exact component is `Zone Temperature Control` or
+`Zone Comfort Control`. Two `Zone Comfort Control` text occurrences in
+`FurnaceWithDXSystemComfortControl.idf` are schedule names/comments, not
+`EnergyManagementSystem:Actuator` objects. There is therefore no stock exact
+actuator-active ExampleFile candidate for CP232; output sensors and actuators
+for other components are not evidence.
+
+#### Rust boundary
+
+Authored Rust contains no exact CP232 routine or snake-case target, no four
+ordinary/comfort EMS override fields, no actuator registry or Erl execution
+engine, no comfort thermostat/type, and no mutable scalar/low/high setpoint
+record. The typed thermostat graph retains only direct-Zone DualSetpoint
+schedule identities, control schedule, and cutout metadata. The live
+setpoint-compatibility wrapper still receives an empty closure, while the
+IdealLoads diagnostic path repeats the first DualSetpoint's raw schedule
+values rather than consuming a mutable source-order setpoint triple.
+
+Every `EnergyManagementSystem:*` object is RawOnly and run-blocked with no
+partial-support exception. The existing negative arbitrary-run test uses an
+EMS Program only to prove blocking before runtime; it does not exercise
+actuation. Four EMS execution-plan stages are labels and identity metadata,
+not an actuator registry, runtime engine, state arena, callback application,
+or CP232 caller. Repository conformance inputs contain only unrelated raw EMS
+construction-index evidence and no actuator object.
+
+CP232 therefore adds no algorithm-level `energyplus_source` entry, Rust
+target, code, mapped state, test, support, capability, output implementation,
+comparator, case, manifest, numerical, performance, or conformance promotion.
+The inventory becomes 32 algorithms and 238 routines, split 58
+`state_mapped` plus 180 `source_mapped`, with 115 required; the heat-balance
+project list becomes 84.
+
+CP233 next maps `FillPredefinedTableOnThermostatSetpoints`, declared at
+`ZoneTempPredictorCorrector.hh` line 376 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 6558-6672.
 
 ### `CheckValidSimulationObjects` state contract
 

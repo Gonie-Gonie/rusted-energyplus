@@ -3137,12 +3137,96 @@ performance, or conformance promotion. The inventory becomes 32 algorithms
 and 237 routines, split 58 `state_mapped` plus 179 `source_mapped`, with 114
 required; the heat-balance project list becomes 83.
 
-CP232 next maps `OverrideAirSetPointsforEMSCntrl`, declared at
+CP232 adds required `override_air_set_points_for_ems_cntrl` immediately after
+`adjust_cooling_set_point_for_temp_and_humidity_control` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is
+`OverrideAirSetPointsforEMSCntrl(EnergyPlusData &)`, declared at
 `ZoneTempPredictorCorrector.hh` line 374 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 6460-6555.
 
+The routine traverses all ordinary temperature-control records in ascending
+order, then all comfort-control records. Each record is aliased before its two
+flags are tested; heating is always processed before the independent cooling
+flag. An active flag reads `ActualZoneNum` and aliases the live thermostat
+setpoint before switching on `TempControlType` for ordinary records or
+`ComfortControlType` for comfort records. Bad counts or indexes can therefore
+fail even when an eventual type would make no write. There is no identity,
+duplicate-target, range, finite, unit, deadband, or monotonicity validation.
+
+SingleHeat heating and SingleCool cooling copy the value to scalar plus their
+matching low/high bound. SingleHeatCool heating writes scalar/low before
+cooling writes scalar/high, so both flags leave scalar=cooling, low=heating,
+and high=cooling. Dual writes only low and high and preserves scalar. Opposite
+single-mode flags and unsupported types silently do nothing. Chained
+assignments write scalar before the bound. NaN, infinity, signed zero, reversed
+deadband, and arbitrary values are copied literally without diagnostics.
+
+CP229 comfort processing precedes CP232 and can replace live ordinary
+`TempControlType`. The ordinary EMS loop therefore dispatches on that final
+live type rather than necessarily the record's authored family. Multiple
+records targeting one Zone resolve field-by-field in record order, and the
+later comfort loop has final precedence for overlapping fields. Unwritten
+fields can survive from earlier records, producing a mixed triple.
+
+`EMSManager::SetupThermostatActuators` registers ordinary controls under
+`Zone Temperature Control` with `[C]` units and comfort controls under
+`Zone Comfort Control` with `[]` units. Each unique actuator key binds directly
+to its record's boolean/value fields; uppercase duplicate keys are suppressed
+and retain the first binding even though CP232 still visits every record. The
+comfort dimensionless registration is copied without PMV inversion or unit
+conversion into Celsius-backed live setpoints; that mismatch is pinned source
+behavior. CP232 neither runs EMS nor checks the global EMS-present flag.
+
+The sole production call is the unconditional final action of
+`CalcZoneAirTempSetPoints`, after ordinary schedules and modifiers, fault
+offsets, and optional comfort calculation. The normal HVAC path runs the
+`BeginTimestepBeforePredictor` EMS calling point earlier in the same setup,
+before the setpoint sweep. Demand resimulation can repeat the sweep without rerunning
+that calling point, while external HVAC bypasses it.
+
+The existing heating/cooling thermostat outputs expose low/high. SingleHeat,
+SingleCool, and SingleHeatCool load prediction consume scalar; Dual consumes
+low/high. Thus cooling wins a both-active SingleHeatCool load even though both
+bounds remain visible. A later staged-control update can replace low/high, and
+positive cutout control rebuilds SingleHeat, SingleCool, or Dual fields from
+pre-modifier ordinary snapshots, potentially erasing CP232 before load
+calculation and output sampling. CP232 registers no output or status.
+
+Failure after earlier records leaves prefix writes. There is no catch,
+transaction, rollback, cleanup, or latch. Exact unchanged duplicate calls are
+overwrite-idempotent, while changed inputs or partial retries can produce new
+mixed results. Constructors default both flags false and values zero.
+Begin-environment RuntimeLanguage initialization clears used actuator
+flags/values, and setpoint initialization separately zeroes the live triple,
+but CP232 owns no reset and manually populated/unregistered records are outside
+that actuator reset guarantee.
+
+One direct C++ test calls CP232 twice and asserts only ordinary Dual low/high
+23/26 followed by comfort Dual low/high 22/25. Twenty-one direct parent calls
+visit 35 ordinary records and make 70 false flag checks with zero writes. Of
+57 active full-simulation expressions, one expected EMS fatal stops before
+setpoint acquisition; a one-sweep census across the other 56 visits 52
+ordinary records and makes 104 false flag checks, with zero comfort visits or
+active writes. Installed 26.1 testfiles contain no exact actuator-active
+ExampleFile for either CP232 component key.
+
+Rust has no actuator registry or EMS engine, override fields, comfort-control
+state, mutable setpoint triple, exact helper, or live caller. Its ordinary
+typed graph is bounded to direct-Zone DualSetpoint schedules, the compatibility
+setpoint wrapper has an empty live closure, and IdealLoads diagnostics sample
+raw schedules separately. All `EnergyManagementSystem:*` input run-blocks;
+existing EMS stages are execution-plan metadata only. CP232 remains required
+`source_mapped` and adds no Rust, state, support, output, numerical,
+performance, or conformance promotion. The inventory becomes 32 algorithms
+and 238 routines, split 58 `state_mapped` plus 180 `source_mapped`, with 115
+required; the heat-balance project list becomes 84.
+
+CP233 next maps `FillPredefinedTableOnThermostatSetpoints`, declared at
+`ZoneTempPredictorCorrector.hh` line 376 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 6558-6672.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`adjust_cooling_set_point_for_temp_and_humidity_control`,
+`override_air_set_points_for_ems_cntrl`,
 preserving the completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
