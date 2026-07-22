@@ -175,6 +175,7 @@ claim.
 | Zone-temperature oscillation detection | `DetectOscillatingZoneTemp`, declared at `ZoneTempPredictorCorrector.hh` line 354, implemented at `ZoneTempPredictorCorrector.cc` lines 5715-5861, and called only by `HVACManager::ManageHVAC` line 431 | CP226 adds required `routine.detect_oscillating_zone_temp` as source-mapped only. One-time output setup, request/performance activation, zero-seeded four-slot history, strict alternating `0.15 C` detector, occupancy/deadband and Facility/annual aggregation, system-step cadence, and retry/reset state remain source-only; Rust has no exact helper, state, output, caller, or test. |
 | operative-temperature air-setpoint conversion | `AdjustAirSetPointsforOpTempCntrl`, declared at `ZoneTempPredictorCorrector.hh` line 356, implemented at `ZoneTempPredictorCorrector.cc` lines 5863-5897, and called only by five `CalcZoneAirTempSetPoints` expressions | CP227 adds required `routine.adjust_air_set_points_for_op_temp_cntrl` as source-mapped only. Global/per-record guards, fixed/scheduled fraction binding, Zone MRT inversion, caller overwrite order, Zone-step/demand-resimulation cadence, IEEE behavior, and retry remain source-only; Rust has no operative object, Zone MRT, exact helper, live caller, or test. |
 | adaptive-comfort operative setpoint selection | `AdjustOperativeSetPointsforAdapComfort`, declared at `ZoneTempPredictorCorrector.hh` line 358, implemented at `ZoneTempPredictorCorrector.cc` lines 5899-5964, and called only by three guarded `CalcZoneAirTempSetPoints` expressions | CP228 adds required `routine.adjust_operative_set_points_for_adap_comfort` as source-mapped only. Seven-model daily/design-day lookup, integer-truncated baseline selection, pre-CP227 output snapshot, cadence, failure, and reset remain source-only; Rust has no operative object, adaptive state, exact helper, output, live caller, or test. |
+| thermal-comfort Zone air setpoint calculation | `CalcZoneAirComfortSetPoints`, declared at `ZoneTempPredictorCorrector.hh` line 360, implemented at `ZoneTempPredictorCorrector.cc` lines 5966-6329, and called only by the guarded `CalcZoneAirTempSetPoints` expression | CP229 adds required `routine.calc_zone_air_comfort_set_points` as source-mapped only. First-use initialization, PMV dispatch, NO/SPE/OBJ/PEO averaging, cross-Zone accumulator anomalies, dry-bulb clamps and writes, diagnostics, ordinary/comfort/EMS precedence, and failure/reset remain source-only; Rust has no comfort objects, Fanger state, inverse child, outputs, live caller, or test. |
 | internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
 | space internal convective gains | `spaceSumAllInternalConvectionGains` | mapped-not-ported |
 
@@ -19025,9 +19026,287 @@ inventory becomes 32 algorithms and 234 routines, split 58 `state_mapped`
 plus 176 `source_mapped`, with 111 required; the heat-balance project list
 becomes 80.
 
-CP229 next maps `CalcZoneAirComfortSetPoints`, declared at
+### CP229 `CalcZoneAirComfortSetPoints` source map
+
+CP229 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.calc_zone_air_comfort_set_points`
+and heat-balance project item `calc_zone_air_comfort_set_points` immediately
+after `adjust_operative_set_points_for_adap_comfort` and before
+`update_final_surface_heat_balance`. The nonmember
+`void CalcZoneAirComfortSetPoints(EnergyPlusData &state)` is declared at
 `ZoneTempPredictorCorrector.hh` line 360 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 5966-6329.
+
+#### First-entry prefix and control-type sampling
+
+Five locals are initialized once per function invocation, before the
+comfort-Zone loop: `SetPointLo = 0`, `SetPointHi = 0`, `Tset = 0`,
+`ObjectCount = 0`, and `PeopleCount = 0`. The two counts and `Tset` are not
+reset at each Zone. This function-scope lifetime is observable in the later
+OBJ and PEO branches.
+
+When `CalcZoneAirComfortSetPointsFirstTimeFlag` is true, CP229 first calls
+`ThermalComfort::ManageThermalComfort(state, true)` and clears its own flag
+only after normal return. The child independently calls
+`InitThermalComfort` under its own first-time latch, allocating People comfort
+state and registering requested comfort outputs. Even with
+`InitializeOnly = true`, it updates `TemporarySixAMTemperature`: day one
+before hour 7 writes the literal 1.868132, and timestep one of hour 7 samples
+outdoor dry-bulb. It then returns before the ordinary thermal-comfort
+calculation block. CP229 does not read the comfort-control input here; CP196
+has already created those records.
+
+After first-use work, CP229 assigns the entire `ComfortControlType` array to
+Uncontrolled. It does not reset `ComfortControlTypeRpt`, Fanger records,
+setpoints, or diagnostic indexes. A direct zero-comfort-Zone call therefore
+can still initialize ThermalComfort and perform this array reset. The
+production parent instead calls CP229 only when
+`NumComfortControlledZones > 0`.
+
+For each stored comfort record in ascending relative order, CP229 aliases the
+record, its `ActualZoneNum`, the actual Zone, `zoneTstatSetpts`, and
+`ZoneComfortControlsFanger`. It samples `setptTypeSched`, converts the
+`Real64` to `HVAC::SetptType`, writes the actual-Zone control array, and copies
+its integer value to `ComfortControlTypeRpt`. Normal input validates only the
+schedule extrema in inclusive `[0,4]`; it does not impose an integer-valued
+runtime sample. A finite fractional value follows the floating-to-underlying
+integer conversion, while a nonfinite or unrepresentable value enters
+undefined conversion territory before either switch.
+
+#### PMV control dispatch and diagnostics
+
+The first control-type switch updates PMV/Fanger state as follows:
+
+| Control type | Fanger state and schedule work |
+|---|---|
+| Uncontrolled | writes `LowPMV = HighPMV = -999` but leaves `FangerType` stale |
+| SingleHeat | writes type 1, samples the heating PMV schedule into `LowPMV`, and writes `HighPMV = -999` |
+| SingleCool | writes type 2, writes `LowPMV = -999`, and samples the cooling PMV schedule into `HighPMV` |
+| SingleHeatCool | writes type 3 and samples its cooling pointer once into both PMV fields; CP196 binds both pointers to the same schedule |
+| DualHeatCool | writes type 4 and samples heating then cooling PMV schedules |
+| default | emits a Severe whose text incorrectly names `CalcZoneAirTempSetpoints`, leaves prior PMV/Fanger state in place, and continues |
+
+For Dual control, strict `LowPMV > HighPMV` increments the persistent
+`DualPMVErrCount`. Count one emits an immediate warning, continuation, and
+timestamp; later counts call the recurring warning through
+`DualPMVErrIndex`. Both recurring numeric arguments are the pre-correction
+low value. CP229 then assigns `LowPMV = HighPMV`; equality is accepted.
+Normal CP196 input validates active PMV schedule extrema within `[-3,3]`.
+
+An invalid control value does not set a local error flag or stop the record.
+It can therefore run the averaging switch with stale PMV fields and later
+reach a second Severe in the assignment switch.
+
+#### People selection and averaging
+
+`AverageMethod::NO` and `SPE` have identical runtime code. Both use
+`SpecificObjectNum`; SingleCool passes `HighPMV` to the child and every other
+control value passes `LowPMV` into `SetPointLo`. Dual makes a second call with
+`HighPMV` into `SetPointHi`. CP196 assigns NO automatically when exactly one
+People object belongs to the Zone. With multiple objects, SPE resolves its
+name against the complete People arena but does not verify that the selected
+People record belongs to the controlled Zone.
+
+OBJ resets only the two sums. It scans every People record whose `ZonePtr`
+matches the actual Zone, increments the function-scope `ObjectCount`, calls
+`GetComfortSetPoints` with `LowPMV`, and accumulates `Tset`; Dual additionally
+calls and accumulates the high result. It then divides the Zone-local
+numerators by the cumulative object count. Consequently a later OBJ Zone is
+biased by objects visited in prior Zones or prior PEO fallbacks. Unlike
+NO/SPE, OBJ has no SingleCool special case and passes its `LowPMV = -999`
+sentinel, normally selecting the minimum dry-bulb bound instead of the
+cooling PMV.
+
+PEO also resets only the sums. For each matching People record it computes
+
+`int NumberOccupants = NumberOfPeople * current_people_schedule`
+
+with toward-zero conversion, adds that integer to the function-scope
+`Real64 PeopleCount`, calls the child even for zero occupants, and accumulates
+the low result weighted by the integer. Dual repeats the call and weighting
+for the high result. PEO also lacks the SingleCool special case and therefore
+uses `LowPMV = -999`.
+
+A positive cumulative `PeopleCount` divides the current Zone's numerators by
+all occupant integers seen earlier in the invocation. A prior occupied Zone
+can therefore suppress the warning and fallback for a currently empty Zone
+and yield zero from a zero numerator. When the cumulative count is not
+positive, CP229 emits first/recurring zero-People diagnostics and re-runs the
+Zone as an object average. That fallback calls each child a second time and
+uses the same non-reset `ObjectCount`, so prior OBJ or fallback Zones also
+bias its denominator.
+
+For a Zone with `N` People records, NO/SPE make one child call, or two for
+Dual. OBJ and positive PEO make `N`, or `2N` for Dual. A nonpositive PEO
+weighted pass plus fallback makes `2N`, or `4N` for Dual. Uncontrolled still
+executes the selected averaging method with sentinel PMV and discards the
+temperature in its final branch. An invalid averaging enum performs no work,
+so an active final control branch can consume function-scope values left by a
+prior Zone.
+
+CP230 `GetComfortSetPoints` owns the PMV-to-dry-bulb inverse. Relevant to
+CP229's reference lifetime, its comparisons are strict: exact equality with
+the PMV at either dry-bulb bound, NaN, or other states making all comparisons
+false leave the supplied output reference untouched. Thus `SetPointLo`,
+`SetPointHi`, or shared `Tset` can retain zero or a result from an earlier
+People object or Zone. The child also updates Fanger/People comfort scratch
+and report state on its endpoint and root trials; CP229 is not a pure
+selector. CP230's full root-solver and diagnostic boundary remains the next
+checkpoint.
+
+#### Dry-bulb assignment and ordinary-control overwrite
+
+The final switch uses the calculated locals as follows:
+
+| Control type | Clamp, write, and retained state |
+|---|---|
+| Uncontrolled | if ordinary `TempControlType` is SingleHeat, clears only `setptHi`; if SingleCool, clears only `setptLo`; otherwise writes nothing and preserves the ordinary type/report |
+| SingleHeat | clamps only below `TdbMinSetPoint`, writes scalar `setpt` and `setptLo`, leaves `setptHi` stale, and overwrites ordinary type/report with SingleHeat |
+| SingleCool | clamps only above `TdbMaxSetPoint`, writes scalar `setpt` and `setptHi`, leaves `setptLo` stale, and overwrites type/report with SingleCool |
+| SingleHeatCool | forces equality when min equals max, then clamps high and low, writes scalar plus both bounds, and overwrites type/report |
+| DualHeatCool | clamps low only below min and high only above max, writes both bounds, leaves scalar `setpt` stale, and overwrites type/report with Dual |
+| default | emits a second Severe, now naming `CalcZoneAirComfortSetpoints`, and performs no assignment |
+
+SingleHeat's immediate-warning gate is literally `TdbMinErrIndex < 2`, unlike
+the other zero-index tests; every violation also calls its recurring warning
+with the already clamped minimum as both numeric arguments. SingleCool is
+analogous at the maximum with a zero-index immediate gate. The
+SingleHeatCool range diagnostic is checked only after both clamps, so it is
+unreachable for ordinary finite ordered bounds. Dual owns separate low and
+high first/recurring diagnostic indexes, but the high recurring call
+mistakenly supplies `SetPointLo` as both numeric arguments.
+
+SingleHeat has no upper clamp, SingleCool has no lower clamp, and Dual neither
+clamps low downward from above max nor high upward from below min. CP229 never
+rechecks `SetPointLo <= SetPointHi` after independent PMV inversion and
+clamping. NaN can bypass all comparison-based clamps.
+
+#### Input lifecycle, parent order, outputs, and cadence
+
+CP196 requires at least one People object for every expanded comfort Zone and
+rejects duplicate comfort control of a Zone. It validates each dry-bulb bound
+within `[0,50]`, rejects min greater than max, checks the control schedule
+range `[0,4]`, and checks PMV schedules within `[-3,3]`; accumulated input
+errors reach its fatal tail. Equal dry-bulb bounds emit a Severe in the shown
+branch without setting its local `ErrorsFound`, and CP229 can proceed if no
+other error exists. With multiple People, CP196 selects SPE, OBJ, or PEO from
+input; with one People it forces NO regardless of the authored averaging
+field. Normal validation removes many malformed zero-object paths but does
+not remove fractional control samples, SPE cross-Zone selection, cross-Zone
+counter carry, or child endpoint equality.
+
+There is exactly one production call expression, in
+`CalcZoneAirTempSetPoints` after all ordinary control branches, CP228/CP227,
+optimum-start and humidity adjustments, and ordinary thermostat fault
+offsets. Active comfort control can overwrite those ordinary temperature
+setpoints and `TempControlType`. The parent then unconditionally calls
+`OverrideAirSetPointsforEMSCntrl`, which has final setpoint precedence. The
+earlier CP199 initialization also performs comfort demand-manager processing
+before this runtime calculation.
+
+CP199 allocates the comfort arrays and registers three Zone-timestep average
+outputs for each comfort-controlled Zone:
+
+- `Zone Thermal Comfort Control Type`;
+- `Zone Thermal Comfort Control Fanger Low Setpoint PMV`; and
+- `Zone Thermal Comfort Control Fanger High Setpoint PMV`.
+
+CP229 refreshes the type/report and PMV fields only for records it visits.
+Ordinary HVAC execution reaches the parent through
+`ManageZoneAirUpdates(GetZoneSetPoints)` once per Zone timestep before system
+substeps. DemandManager resimulation can add same-time passes; external HVAC
+bypasses the built-in caller. CP229 itself has no warmup, sizing, kickoff,
+occupancy, environment, or current-zone-condition guard.
+
+#### Failure, retry, and reset
+
+CP229 returns no status and owns no catch, cleanup, transaction, or rollback.
+The authored invalid-control path emits Severe messages but continues.
+Invalid pointers, identities, arrays, People state, schedules, psychrometric
+state, or a failing child can stop after some type, PMV, diagnostic, Fanger,
+People, or setpoint writes.
+
+If first-use `ManageThermalComfort` does not return, CP229's latch remains
+true; the child may already have partial allocations or output registrations
+and its separately placed flag can have changed. After a successful child
+return, the CP229 latch is false before the global control-type reset and Zone
+loop. A later-Zone failure therefore leaves earlier Zone setpoints and
+comfort state committed, the failing Zone at an arbitrary prefix, and
+unvisited `ComfortControlType` entries Uncontrolled while their report and
+Fanger fields can remain stale.
+
+Same-state retry after successful first-use work skips that work, recreates
+all five locals, and resets the control-type array again. Cross-Zone count
+bias therefore restarts at zero on each invocation rather than accumulating
+between calls, while persistent warning counts/indexes, Fanger/People trial
+state, report fields, and stale setpoint fields survive and can advance or be
+overwritten again. Begin-environment initialization clears ordinary setpoint
+and control fields but does not rearm the CP229 latch or all comfort warnings.
+A clean replay requires coordinated reconstruction of the
+ZoneTempPredictorCorrector, HeatBalFanSys, DataZoneControls, ThermalComfort,
+People/schedule, output, and dependent environment owners.
+
+#### C++ and corpus evidence
+
+No C++ unit test calls CP229 or CP230 by name. Four fixtures make 21 direct
+`CalcZoneAirTempSetPoints` calls, but none creates comfort-control state and
+all 21 skip the `NumComfortControlledZones > 0` guard. A separate EMS fixture
+manually sets the comfort count to one but calls only
+`OverrideAirSetPointsforEMSCntrl`, asserting its low/high override.
+
+Only two unit-tree IDF setup fixtures contain thermal-comfort input. Each has
+one comfort thermostat with SingleHeating and SingleCooling objects, but one
+stops after `GetHeatBalanceInput` and the other performs input, geometry, and
+Surface setup; neither calls CP196, the setpoint parent, or CP229. Separate
+ThermalComfort tests numerically exercise the forward Fanger model, not the
+comfort thermostat, PMV inverse, averaging, clamps, assignment, or
+ordinary-comfort-EMS order.
+
+The unit tree has 57 active full-simulation expressions after excluding five
+commented calls. None contains a thermal-comfort thermostat or setpoint
+object, so every full-simulation configuration has zero CP229 entries and
+zero CP230 child reach. The installed oracle has one executable ExampleFile,
+`FurnaceWithDXSystemComfortControl.idf`, with control values 0-4 and all four
+Fanger setpoint families. Its Zone has one People record, so CP196 forces NO
+despite the authored PeopleAverage field. No repository case or script adopts
+that file; it is an unexecuted candidate, not Rust evidence. OBJ, SPE, PEO,
+invalid controls, counter carry, clamps, diagnostics, failure, retry, and
+reset remain uncovered.
+
+#### Rust boundary
+
+Crate-wide authored Rust code contains no CP229 or CP230 implementation,
+thermal-comfort thermostat/setpoint type, PMV/Fanger record, averaging method,
+dry-bulb comfort bounds, first-use latch, three comfort outputs, diagnostic
+state, or live caller. `ThermostatControlObjectType` and the compiler retain
+only ordinary direct-Zone DualSetpoint controls. The setpoint compatibility
+wrapper's only heat-balance call receives an empty closure, and
+`EvaluateZoneThermostat` remains planning metadata.
+
+Rust's typed `People` record retains only Zone identity, design-count fields,
+and an optional number schedule. Its current consumers use occupancy for
+OtherEquipment sizing and bounded IdealLoads outdoor-air/DCV work, not
+activity, work efficiency, clothing, air velocity, Fanger inversion, object
+averaging, or CP229's integer occupant weighting. The ordinary control
+schedule is not evaluated by the heat-balance runtime.
+
+`ZoneControl:Thermostat:ThermalComfort` and all four
+`ThermostatSetpoint:ThermalComfort:Fanger:*` families remain RawOnly without a
+partial-support rule. Active input becomes a generic unsupported object and
+run-blocks before Rust runtime. Existing source-mapped
+`routine.manage_thermal_comfort`, forward-adjacent People/schedule state, and
+ordinary thermostat graph evidence do not promote CP229.
+
+CP229 therefore adds no algorithm-level `energyplus_source` entry, Rust
+target, code, mapped state, test, support, capability, output implementation,
+comparator, manifest, numerical, performance, or conformance promotion. The
+inventory becomes 32 algorithms and 235 routines, split 58 `state_mapped`
+plus 177 `source_mapped`, with 112 required; the heat-balance project list
+becomes 81.
+
+CP230 next maps `GetComfortSetPoints`, declared at
+`ZoneTempPredictorCorrector.hh` lines 362-367 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 6331-6415.
 
 ### `CheckValidSimulationObjects` state contract
 

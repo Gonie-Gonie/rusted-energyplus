@@ -104,6 +104,7 @@ required_routines = [
   "detect_oscillating_zone_temp",
   "adjust_air_set_points_for_op_temp_cntrl",
   "adjust_operative_set_points_for_adap_comfort",
+  "calc_zone_air_comfort_set_points",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",
