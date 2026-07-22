@@ -169,6 +169,7 @@ claim.
 | HybridModel humidity inverse inference | `InverseModelHumidity`, declared at `ZoneTempPredictorCorrector.hh` lines 335-343, implemented at `ZoneTempPredictorCorrector.cc` lines 4993-5131, and called only by `ZoneSpaceHeatBalanceData::correctHumRat` line 4589 | CP219 adds required `routine.inverse_model_humidity` as source-mapped only. Unconditional measured sampling/history shift, date/history-gated infiltration and People equations, the local activity-130 anomaly, transient humidity write, output ownership, and failure/retry/reset behavior remain source-only; Rust has no typed HybridModel object, inverse state, exact output, runtime path, or focused test. |
 | Zone/Space heat-balance sum assembly | `ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums`, declared at `ZoneTempPredictorCorrector.hh` lines 226-230, implemented at `ZoneTempPredictorCorrector.cc` lines 5133-5281, and called by record-level prediction line 3175 and correction line 3918 | CP220 adds required `routine.zone_space_heat_balance_calc_zone_or_space_sums` as source-mapped only. Internal/non-system/system assembly, parent-Zone AFN/equipment/plenum/PIU context, uncontrolled-Space system allocation, virtual surface dispatch, and failure/retry/reset behavior remain source-only; Rust has no exact routine, Space record, airflow writer, topology, or focused test. |
 | Zone/Space heat-balance surface result family | `ZoneHeatBalanceData::calcSumHAT` at `ZoneTempPredictorCorrector.cc` lines 5283-5298 plus `SpaceHeatBalanceData::calcSumHAT` at lines 5300-5413, both reached through CP220 virtual dispatch line 5276 | CP221 adds required logical `routine.zone_heat_balance_calc_sum_hat` for the Zone fold; CP222 expands the same source-mapped routine to the independent Space override. Stored-Space ordering, Window/reference-air work, four-field results, side effects, and failure remain source-only; Rust has only a direct Zone opaque-Surface fold. |
+| Zone/Space component-load reporting | `CalcZoneComponentLoadSums`, declared at `ZoneTempPredictorCorrector.hh` lines 345-348, implemented at `ZoneTempPredictorCorrector.cc` lines 5414-5677, and called only at the correction wrapper lines 3853 and 3856 | CP223 adds required `routine.calc_zone_component_load_sums` as source-mapped only. The ten-field report reset and assembly, parent-Zone airflow/equipment and whole-Zone Surface topology, repeated Space-report traversal, ADU and imbalance-warning side effects, output ownership, and failure/retry behavior remain source-only; Rust has only separate bounded Zone report helpers. |
 | internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
 | space internal convective gains | `spaceSumAllInternalConvectionGains` | mapped-not-ported |
 
@@ -17681,9 +17682,381 @@ performance, or conformance promotion. Counts remain 32 algorithms and 228
 routines, split 58 `state_mapped` plus 170 `source_mapped`, with 105 required;
 the heat-balance project list remains 74.
 
-CP223 next maps `CalcZoneComponentLoadSums`, declared at
+### CP223 `CalcZoneComponentLoadSums` source map
+
+CP223 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.calc_zone_component_load_sums`
+and heat-balance project item `calc_zone_component_load_sums` immediately
+after `zone_heat_balance_calc_sum_hat` and before
+`update_final_surface_heat_balance`. The nonmember routine is declared at
 `ZoneTempPredictorCorrector.hh` lines 345-348 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 5414-5677.
+`ZoneTempPredictorCorrector.cc` lines 5414-5677. It has one implementation and
+one unqualified source identifier, so unlike CP222 it receives a new routine
+row and project item.
+
+#### Purpose, target ownership, and entry reset
+
+The source describes CP223 as reporting and diagnostic work only. Its component
+rates are current state at the end of the last system timestep, are not
+necessarily Zone-timestep averages, are not multiplied by Zone multipliers,
+and are expressed in Watts. The two phase-change fields are raw enthalpy sums
+registered separately in J/kg.
+
+The signature receives a parent `ZoneNum`, a pointer to either a Zone or Space
+`ZoneSpaceHeatBalanceData`, and a reference to the target `AirReportVars`. It
+does not receive `spaceNum`. Before validating or dereferencing any other
+argument, it overwrites these ten target fields with exact zero in source
+order:
+
+```text
+SumIntGains
+SumHADTsurfs
+SumMCpDTzones
+SumMCpDtInfil
+SumMCpDTsystem
+SumNonAirSystem
+CzdTdt
+imBalance
+SumEnthalpyM
+SumEnthalpyH
+```
+
+It then aliases `Zone(ZoneNum)` and snapshots `TimeStepSysSec`. A Space target
+therefore selects receiver MAT, humidity, airflow coefficients, non-air
+response, temperature coefficients, and histories, but it does not select a
+Space-only topology.
+
+#### Internal, interzone, outdoor, and AFN terms
+
+`SumIntGains` is always
+`zoneSumAllInternalConvectionGains(state, ZoneNum)`. Parent-Zone
+`NoHeatToReturnAir` additionally calls
+`zoneSumAllReturnAirConvectionGains(state, ZoneNum, 0)`. Both helpers remain
+Zone-wide for a Space report.
+
+The default interzone expression is:
+
+```text
+thisHB.MCPTM - thisHB.MCPM * thisHB.MAT
+```
+
+The outdoor/infiltration expression retains this exact source grouping and
+order:
+
+```text
+(thisHB.MCPTI - thisHB.MCPI * thisHB.MAT)
++ (thisHB.MCPTV - thisHB.MCPV * thisHB.MAT)
++ (thisHB.MCPTE - thisHB.MCPE * thisHB.MAT)
++ (thisHB.MCPTC - thisHB.MCPC * thisHB.MAT)
++ (thisHB.MDotCPOA * Zone.OutDryBulbTemp
+   - thisHB.MDotCPOA * thisHB.MAT)
+```
+
+Thermal-chimney fields are not part of this report expression.
+
+When AFN is always multizone-simulated, or when the control type is
+`MultizoneWithDistributionOnlyDuringFanOperation` and the AFN fan is active,
+CP223 replaces both prior results from parent-Zone `exchangeData(ZoneNum)`:
+
+```text
+SumMCpDtInfil =
+    SumMCpT + SumMVCpT - (SumMCp + SumMVCp) * thisHB.MAT
+SumMCpDTzones =
+    SumMMCpT - SumMMCp * thisHB.MAT
+```
+
+A Space report consequently reuses Zone AFN exchange state while applying its
+own receiver MAT.
+
+#### Parent-Zone system topology and shared ADU writes
+
+CP223 initializes local `QSensRate` to zero, then chooses one mutually
+exclusive primary branch from the parent Zone:
+
+1. A controlled Zone visits every `ZoneEquipConfig(ZoneNum)` inlet.
+2. A return plenum visits all plenum inlets, then each stored ADU index and its
+   independently flagged upstream and downstream leak.
+3. A supply plenum visits its single inlet.
+4. Any other Zone contributes no primary system term.
+
+Each branch uses `calcZoneSensibleOutput`. A strictly positive mass flow
+returns mass flow times
+`PsyDeltaHSenFnTdb2Tdb1W(supply temperature, thisHB.MAT,
+thisHB.airHumRat)`; zero, negative, or NaN mass flow returns exact zero.
+
+For every controlled inlet whose `InletNodeADUNum` is positive, CP223 also
+recalculates sensible output from that ADU's outlet node and overwrites four
+shared ADU report fields:
+
+```text
+HeatRate = max(0, outlet sensible output)
+CoolRate = abs(min(0, outlet sensible output))
+HeatGain = HeatRate * TimeStepSysSec
+CoolGain = CoolRate * TimeStepSysSec
+```
+
+The outlet result is not separately added to `SumMCpDTsystem`; the inlet
+result already owns that report term. Zone and later Space reports can
+overwrite the same ADU fields with different receiver MAT and humidity, so the
+last stored Space report can remain visible after a complete Zone traversal.
+
+The independent parallel-PIU tail repeats the CP214/CP220 ordinal anomaly.
+A nonempty `leakageParallelPIUNums` list supplies only its size; CP223 reads
+global `PIU(1)` through `PIU(size)` instead of the stored identities. Only a
+strictly positive `leakFlow` contributes. A positive parent
+`SystemZoneNodeNumber` routes the sensible result to the system term;
+otherwise it routes it to the interzone term. CP223 performs no Zone multiplier
+division.
+
+`SumNonAirSystem` is then assigned from receiver
+`NonAirSystemResponse` plus parent-Zone `SumConvHTRadSys(ZoneNum)` and
+`SumConvPool(ZoneNum)`.
+
+#### Whole-Zone Surface rewalk and reference-air dependency
+
+Every CP223 call traverses every identity in
+`Zone(ZoneNum).spaceIndexes`, then every integer in each Space's inclusive
+`HTSurfaceFirst..HTSurfaceLast` range. There is no selected-Space argument,
+heat-transfer flag, bounds, membership, class, sorting, overlap, or duplicate
+check. For a Zone with N stored Spaces, its Zone report walks N ranges and its
+N Space reports each walk the same N ranges, yielding N plus N-squared range
+walks when Space reporting is active.
+
+For each Surface, CP223 reads the base area and calls
+`Surface::getInsideAirTemperature` before any Window contribution. That
+dependency first aliases the heat-balance record of the Surface's own
+`spaceNum`, not the CP223 receiver:
+
+- `ZoneMeanAirTemp` returns the owning Space MAT.
+- `AdjacentAirTemp` returns `SurfTempEffBulkAir`.
+- `ZoneSupplyAirTemp` is fatal when `Zone(Surface.Zone)` is uncontrolled.
+  Otherwise it uses the owning Space equipment inlet list when aggregate
+  `doSpaceHeatBalance` is true, or the Surface Zone inlet list otherwise. It
+  computes each inlet heat capacity from the owning Space humidity ratio and
+  returns a weighted temperature only for a strictly positive total
+  mass-flow-times-heat-capacity; all other totals fall back to owning Space
+  MAT.
+- The default branch silently returns owning Space MAT.
+
+The exact uncontrolled supply-reference fatal text is:
+
+```text
+Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone {}
+```
+
+It is formatted with `Zone(Surface.Zone).Name`. A malformed Surface can
+therefore make caller `ZoneNum`, Surface Zone ownership, receiver HB, and
+reference-air Space ownership disagree.
+
+Only exact `SurfaceClass::Window` enters the special branch, in this order:
+
+1. An interior shade or blind adds divider area to local area and adds
+   `SurfWinDividerHeatGain` to internal gains.
+2. An equivalent-layer construction independently adds
+   `SurfWinOtherConvHeatGain`.
+3. An interior shade or blind independently adds
+   `SurfWinConvHeatFlowNatural`.
+4. Strictly positive window airflow adds
+   `SurfWinConvHeatGainToZoneAir`; parent caller-Zone
+   `NoHeatToReturnAir` also adds `SurfWinRetHeatGainToZoneAir`.
+5. Strictly positive frame area adds its projected
+   `h * area * (frame temperature - reference)` term.
+6. Strictly positive divider area without an interior shade/blind adds its
+   projected `h * area * (divider temperature - reference)` term.
+
+Unlike CP222, CP223 does not mutate `SurfWinHeatGain` or Window gain/loss
+report energies. Every Surface then adds:
+
+```text
+SurfHConvInt * effective area * (SurfTempInTmp - RefAirTemp)
+```
+
+to `SumHADTsurfs`. An exact CondFD Surface additionally adds
+`SurfaceFD.EnthalpyM` to `SumEnthalpyM` and `SurfaceFD.EnthalpyF` to
+`SumEnthalpyH`, without area weighting. Zone and all Space reports for the
+same parent therefore rewalk the same Surface set and use each Surface's
+owning-Space reference state.
+
+#### Air storage and imbalance diagnostics
+
+CP223 evaluates `PsyCpAirFnW(thisHB.airHumRat)` and
+`PsyRhoAirFnPbTdbW(OutBaroPress, thisHB.MAT, thisHB.airHumRat)`. Both use a
+`1.0e-5` humidity floor in their numerical formulas. `PsyCpAirFnW` also owns a
+process-static last-input/result cache. With EnergyPlus psychrometric errors
+enabled, a strictly negative density delegates to a severe/continuation/
+unknown-caller timestamp/fatal path; zero and NaN do not satisfy that check.
+
+The global Zone-air solution selector then assigns one storage formula:
+
+- ThirdOrder multiplies density, heat capacity, parent Zone volume, parent
+  `ZoneVolCapMultpSens`, and
+  `(thisHB.MAT - thisHB.ZTM[0]) / TimeStepSysSec` in source order.
+- Analytical assigns
+  `thisHB.TempIndCoef - thisHB.TempDepCoef * thisHB.MAT`.
+- Euler assigns `thisHB.AirPowerCap * (thisHB.MAT - thisHB.T1)`.
+- The default branch leaves the entry zero without a diagnostic.
+
+A Space report still uses full parent-Zone volume and capacitance multiplier.
+
+Only `DisplayZoneAirHeatBalanceOffBalance` true assigns `imBalance` as the
+six gain/transfer terms minus storage and computes a threshold equal to 20
+percent of the square root of the seven squared components. A warning requires
+strict `abs(imBalance) > Threshold`, plus both non-warmup and non-sizing state.
+NaN comparisons suppress the warning.
+
+When the parent Zone's `AirHBimBalanceErrIndex` is zero, the first event emits
+the Zone-named warning, a one-decimal threshold continuation, an optional
+night-cycle continuation when `TurnFansOn`, and occurrence timestamp. Every
+event then calls the recurring-warning helper with
+`abs(imBalance) - Threshold` as both max- and min-tracked values; the optional sum-tracked argument is omitted. Zone and
+Space reports share the same parent Zone name and index, so multiple reports
+in one correction can update one recurring stream.
+
+#### Caller order, output registration, and cadence
+
+The only production expressions are at the end of
+`correctZoneAirTemps`. For each Zone, the wrapper:
+
+1. completes the Zone record correction;
+2. corrects each eligible simulation Space or mirrors Zone state and any
+   sizing node state into it;
+3. folds the Zone and Space temperature changes;
+4. calls CP223 for `ZnAirRpt(zoneNum)`;
+5. when `doSpaceHeatBalanceSimulation` is true, calls CP223 once for every
+   stored `spaceAirRpt(spaceNum)`;
+6. advances to the next Zone.
+
+The Space report gate does not test `DoingSizing`. The dispatcher reaches this
+wrapper only for `CorrectStep`. Initial HVAC correction and each selected
+adaptive fine-step correction can repeat it; demand resimulation performs
+prediction without a matching CP223 correction.
+
+`AirReportVars::setUpOutputVars` registers internal, surface, interzone,
+outdoor, system-air, system-convective, and air-storage rates as
+`System/Average`. It registers deviation only when advanced report variables
+are enabled. `ZnAirRpt` always exists for all Zones. `spaceAirRpt` is allocated
+for sizing or simulation Space heat balance, but Space report variables are
+registered only for simulation Space heat balance. Advanced melting and
+freezing enthalpy outputs are registered as `Zone/Average` only from
+`ZnAirRpt`; CP223 still computes the otherwise unregistered Space fields.
+
+#### Validation, failure, retry, and reset
+
+CP223 has no local assertion, null check, positive or upper identity check,
+allocation, range, topology, membership, finite, enum, pressure, volume,
+timestep, or denominator validation. It owns no return status, catch,
+completion marker, cleanup, transaction, or rollback. A zero system timestep
+can divide in the ThirdOrder expression. Array access and dependent
+construction, node, equipment, plenum, PIU, Surface, and finite-difference
+state remain unchecked.
+
+The ten report zeros always commit first. A later failure can retain a
+partially rebuilt report, shared ADU overwrites, dependency cache updates, and
+earlier Surface sums. An uncontrolled supply reference fails before the
+current Surface's Window/base/enthalpy contributions but after all earlier
+flow, ADU, non-air, and Surface work. A negative-density fatal occurs after
+the complete Surface loop while storage and imbalance remain zero. A Zone
+report failure suppresses its Space reports and all later Zones; a Space
+failure retains the Zone and earlier Space reports and suppresses the rest.
+
+Retry starts by wiping the same ten target fields and restarts from the first
+operation. Stable ordinary arithmetic reconstructs the target report and ADU
+assignments deterministically, but shared `AirHBimBalanceErrIndex` and global
+recurring-warning history are not reset here: a retry can skip the first
+message and add another recurrence. Repeated Zone/Space calls can also
+overwrite shared ADU state with different receiver conditions. A clean reset
+requires coordinated report, Zone, ADU, node, Surface/CondFD, AFN,
+psychrometric-diagnostic, and predictor/corrector owner restoration.
+
+#### C++ test and corpus boundary
+
+No C++ test calls CP223 directly. The focused
+`HybridModel_correctZoneAirTempsTest` calls the wrapper five times. Each call
+has one Zone, inactive Space reporting, an empty `0..-1` stored-Space Surface
+range, no inlet nodes, default ThirdOrder selection, and the imbalance display
+off. It therefore reaches five Zone-only CP223 calls, but all five immediate
+assertions inspect HybridModel multiplier, infiltration, or People results.
+No assertion targets a CP223 report or ADU field. Separate SimulationManager
+tests inspect only the imbalance-display input flag.
+
+Of 57 active full-simulation `ManageSimulation` expressions, one expected EMS
+fatal stops before CP223 and one Weather fixture has zero Zones. The remaining
+55 configurations contain 81 Zones. Their static one-correction-pass census is
+81 Zone reports plus three active simulation-Space reports, or 84 CP223 calls,
+split 74 ThirdOrder and ten Analytical with no Euler. This is configuration
+topology, not a runtime total.
+
+The 81 Zone reports walk 99 stored-Space ranges. The active two-Zone,
+three-Space configuration has per-Zone Space counts two and one, so its three
+Space reports add two-squared plus one-squared, or five, repeated range walks.
+The static total is therefore 104. Parent topology contains 55 controlled
+records and 29 other records, with no return plenum, supply plenum, or
+parallel-PIU reach; AFN replacement has potential in five Zone reports without
+an isolating assertion.
+
+Nineteen completing configurations contain 36 exact Window identities,
+including five equivalent-layer Windows. These do not overlap the active
+Space-report configuration, so the one-pass Window visit count remains 36.
+Two GlassDoor identities use only the generic Surface path. No active
+airflow-window or frame/divider object exists, and eight blind-controlled
+Windows have a constant-zero permission schedule, so the active
+shade/blind paths have no corpus reach. Every reference-air selection is
+ZoneMean. One CondFD Surface reaches the enthalpy accumulation once, but its
+fixture asserts only construction override. No completing configuration
+enables imbalance display, and no full-simulation assertion isolates the
+complete reporting update sequence, ADU effect, diagnostic, failure, retry, or reset.
+
+#### Rust and numerical-evidence boundary
+
+A crate-wide search finds no `CalcZoneComponentLoadSums`,
+`calc_zone_component_load_sums`, ten-field report record, Space report arena,
+ADU/PIU/plenum report state, shared imbalance index, or PCM enthalpy report.
+`ZoneHeatBalanceState` owns only adjacent Zone fields: current/history air
+state, internal gain, opaque-Surface HA/HAT values, zero-initialized
+non-system/system coefficients, temperature coefficients, and optional
+averaged surface/storage reports. No production writer fills its airflow
+coefficient fields with CP223 topology.
+
+The run-period report path separately samples a three-value Zone tuple:
+`convective_internal_gain_w`, a selectable opaque-Surface convection helper,
+and a guarded storage helper. The ResultStore publishes those three series and
+a fourth outdoor-air transfer series whose vector is hard-coded zero. It
+publishes no interzone, system-air, system-convective, deviation, enthalpy, or
+Space series.
+
+The nearest Surface helpers either silently skip invalid indexes and return
+opaque `HA/HATsurf/HATref=0`, directly sum retained Surface
+`hA * (Tsurf - stored reference)`, or substitute `storage - internal` as a
+diagnostic balance probe. They implement no Window, owning-Space reference,
+or side effect. The storage helper selects ThirdOrder only through runtime
+configuration, returns zero for a nonpositive timestep, and otherwise collapses
+to the Analytical expression; it has no exact Euler/default switch.
+
+Rust unit tests cover isolated Analytical/ThirdOrder/optional-capacity/
+nonpositive-timestep storage results, weather capacity, alternative Surface
+report formulas, and average-versus-last sampling. They do not construct the
+ten-field CP223 update sequence, Space topology, equipment/ADU, Window/PCM, AFN,
+diagnostic, or failure lifecycle.
+
+The official one-Zone candidate contains one uncontrolled Zone, six opaque
+ZoneMean Surfaces, and no authored Space, Window, AirLoop, ZoneHVAC, AFN, or
+Space simulation. Its 8760 samples have exact-zero internal-gain and
+outdoor-transfer differences. Surface convection has maximum absolute
+difference 0.085845581243 W and RMSE 0.005357748923 W; air storage has maximum
+absolute difference 0.076879349871 W and RMSE 0.005076386180 W. Those are four
+existing bounded output-variable claims assembled by separate Rust paths, not
+proof of positive internal/outdoor terms, the other report fields, or the
+complete CP223 update sequence.
+
+CP223 adds no algorithm-level `energyplus_source` entry, Rust target, code, mapped state,
+test, support, capability, output implementation, comparator, manifest,
+numerical, performance, or conformance promotion. The inventory becomes 32
+algorithms and 229 routines, split 58 `state_mapped` plus 171 `source_mapped`,
+with 106 required; the heat-balance project list becomes 75.
+
+CP224 next maps `VerifyThermostatInZone`, declared at
+`ZoneTempPredictorCorrector.hh` line 350 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5679-5700.
 
 ### `CheckValidSimulationObjects` state contract
 

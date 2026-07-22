@@ -2277,12 +2277,102 @@ or conformance claim. Counts remain 32 algorithms and 228 routines, split 58
 `state_mapped` plus 170 `source_mapped`, with 105 required; the heat-balance
 project list remains 74.
 
-CP223 next maps `CalcZoneComponentLoadSums`, declared at
-`ZoneTempPredictorCorrector.hh` lines 345-348 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 5414-5677.
+CP223 adds required `calc_zone_component_load_sums` immediately after
+`zone_heat_balance_calc_sum_hat` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is the nonmember
+`CalcZoneComponentLoadSums`, declared at `ZoneTempPredictorCorrector.hh` lines
+345-348 and implemented at `ZoneTempPredictorCorrector.cc` lines 5414-5677.
+
+The routine is a correction-only reporting update sequence. It first overwrites,
+in order, internal gain, surface convection, interzone, outdoor, system-air,
+non-air-system, air-storage, imbalance, melting-enthalpy, and
+freezing-enthalpy fields with zero. It then rebuilds the first six component
+rates from the current receiver heat-balance record plus parent-Zone state.
+Space report calls still use Zone-wide internal gains and return-air gains,
+parent-Zone AFN exchange and equipment/plenum/PIU topology, Zone radiant and
+pool convection, and parent-Zone volume.
+
+Controlled-Zone inlet work calculates sensible transfer using receiver MAT and
+humidity ratio. A mapped ADU independently receives overwritten heating and
+cooling rates plus system-timestep energies from its outlet node. A return plenum follows its inlet and stored-ADU leak paths; a supply
+plenum follows its single inlet. The independent
+parallel-PIU tail uses only the stored list size and reads global PIU ordinals
+one through that size rather than the stored identities. No Zone multiplier
+is applied.
+
+Every call then walks all stored Spaces of the parent Zone and each raw
+inclusive heat-transfer-Surface range. There is no selected-Space argument, so
+each Space report repeats the complete parent-Zone Surface topology. Reference
+air is recomputed through `Surface::getInsideAirTemperature` from the Surface's
+owning Space record: ZoneMean uses that Space MAT, Adjacent uses effective
+bulk-air temperature, and ZoneSupply uses owning-Space inlets when aggregate
+Space heat balance is active or Zone inlets otherwise. An uncontrolled
+ZoneSupply Surface is fatal.
+
+The Window path adds interior shade/blind, equivalent-layer, natural-gap,
+airflow, frame, divider, and base convection terms without CP222's Window
+report mutations. Exact CondFD Surfaces add raw melting and freezing enthalpy
+fields. ThirdOrder storage uses current receiver MAT, humidity, and first
+history with parent-Zone volume and sensible capacitance multiplier;
+Analytical and Euler use their respective receiver coefficients. An unknown
+solution enum retains the entry zero.
+
+Only `DisplayZoneAirHeatBalanceOffBalance` computes imbalance and its
+20-percent quadrature threshold. A strict excess outside warmup and sizing
+uses the parent Zone name and shared `AirHBimBalanceErrIndex`; Zone and every
+Space report can therefore update the same recurring-warning state. The
+routine has no local validation, status, catch, transaction, or rollback.
+Failure retains the initial report reset, any later component prefix, ADU
+overwrites, earlier Surface sums, and dependency diagnostics. Retry resets the
+target report again but can repeat shared recurring warnings; repeated Space
+calls can leave the last Space calculation on shared ADU report fields.
+
+Its only production expressions are the Zone report call and conditional
+simulation-Space report loop at the end of `correctZoneAirTemps`, after all
+Zone/Space correction or mirroring for that Zone. Initial correction and each
+adaptive fine-step correction can repeat CP223. Demand resimulation adds
+prediction only and does not. The Space report gate does not test
+`DoingSizing`.
+
+No C++ test calls CP223 directly. Five HybridModel wrapper calls reach one
+Zone-only report each through an empty Surface range, but every immediate
+assertion targets unrelated hybrid state. The 55 completing nonzero-Zone
+full-simulation configurations provide a static one-correction census of 81
+Zone plus three active simulation-Space reports, or 84 calls. Those calls
+perform 104 stored-Space range walks and split 74 ThirdOrder versus ten
+Analytical records, with no Euler. Full-simulation imbalance-warning reach is
+zero, and no assertion isolates a CP223 field, ADU effect, failure, retry, or
+reset.
+
+Rust has no ten-field `AirReportVars` analog, Space report arena, or singular
+CP223 update sequence. Its run-period path separately samples Zone internal gain,
+one of several opaque-Surface convection helpers, and a guarded
+ThirdOrder-or-Analytical storage helper, then publishes those three series plus
+a hard-coded zero outdoor-transfer series. It has no complete interzone,
+system-air, non-air, deviation, PCM, Window, AFN, plenum, PIU, ADU, or shared
+diagnostic ownership.
+
+The official one-Zone candidate has one uncontrolled Zone, six opaque
+ZoneMean-reference Surfaces, and no Space simulation, Window, airflow, or HVAC
+topology. Across 8760 rows its internal and outdoor reports are exact zero;
+surface convection has maximum absolute difference 0.085845581243 W and RMSE
+0.005357748923 W, while air storage has 0.076879349871 W and
+0.005076386180 W. Those four existing bounded output claims do not establish
+the complete CP223 routine.
+
+CP223 remains required `source_mapped` and adds no algorithm-level `energyplus_source` entry,
+Rust target, code, mapped state, test, support, capability, output
+implementation, comparator, manifest, numerical, performance, or conformance
+promotion. The inventory becomes 32 algorithms and 229 routines, split 58
+`state_mapped` plus 171 `source_mapped`, with 106 required; the heat-balance
+project list becomes 75.
+
+CP224 next maps `VerifyThermostatInZone`, declared at
+`ZoneTempPredictorCorrector.hh` line 350 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5679-5700.
 
 The inventory now also includes `update_final_surface_heat_balance` after
-`zone_heat_balance_calc_sum_hat`, preserving the
+`calc_zone_component_load_sums`, preserving the
 completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
