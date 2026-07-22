@@ -508,6 +508,41 @@ typed ZoneMixing graph, endpoint flags, solver, or adjusted mixing consumer.
 The routine remains `source_mapped` and required without support or
 conformance promotion.
 
+The next required Air-subtree entry is `get_simple_air_model_inputs`,
+definition-ordered after `set_zone_mass_conservation_flag` and before
+`manage_zone_air_updates`. Its source boundary is
+`HeatBalanceAirManager.hh` line 73 and `HeatBalanceAirManager.cc` lines
+235-4244; CP185 calls it unconditionally at line 207 immediately after setting
+`AirFlowFlag` true. The routine allocates Zone plus sizing-or-simulation Space
+reporting state, registers Zone plus simulation-only Space airflow outputs,
+sizes shared parser buffers, and processes
+exactly nine direct object schemas in order: Zone outdoor-air balance; three
+infiltration families; two ventilation families; Mixing; CrossMixing; and
+refrigeration-door Mixing. It expands count-driven records, creates
+MassConservation and `ZoneReOrder` topology from Mixing, appends
+AirBoundary-generated records to CrossMixing, registers output and EMS state,
+writes nominal EIO rows, and stores per-Zone nominal and enforced-balance
+state.
+
+The passed error reference is transparent and monotonic: CP187 neither resets
+nor tests it, and all later phases still run when it enters true. Two source
+paths emit severe diagnostics without raising it—a blank induced-air schedule
+for `ZoneAirBalance:OutdoorAir` and a source-only Mixing Zone lacking
+Infiltration under enforced balance—while malformed continuation can instead
+fail before return. There is no local latch, final barrier, rollback, or
+repeat-safe cleanup. A same-state retry can meet already allocated arrays and
+repeat registrations or EIO; manager-only or heat-balance-only clearing leaves
+other owners stale, so whole-state reset plus normal reinitialization is the
+clean domain-state boundary; output-clean replay additionally requires a fresh
+or reset EIO stream. Fifteen direct unit calls cover selected infiltration,
+design-flow ventilation, explicit CrossMixing, Mixing mass-balance, one
+`ZoneReOrder` result, and output ordering, but do not directly cover
+ZoneAirBalance, WindAndStack ventilation, refrigeration-door or generated
+AirBoundary CrossMixing, either unflagged severe, exact nominal EIO, or
+retry/reset behavior. Rust has none of the nine typed families, count/arena
+state, topology, outputs, EMS, EIO, or consumers. The routine remains
+`source_mapped` and required without support or conformance promotion.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `manage_zone_air_updates`, preserving the completion of the Air subtree before
 the Surface manager's final update. Its EnergyPlus boundary is the
