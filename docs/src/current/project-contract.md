@@ -430,6 +430,32 @@ failure prefixes, and re-entry remain source-only. Rust's separate bounded
 inside-convection report formula does not implement this orchestration,
 report-state, representative-surface, or Kiva lifecycle.
 
+The Air subtree now places required `get_air_heat_balance_input` immediately
+after `manage_air_heat_balance` and before `manage_zone_air_updates`.
+Its EnergyPlus boundary is the declaration at `HeatBalanceAirManager.hh` line
+67, the implementation at `HeatBalanceAirManager.cc` lines 163-189, and the
+sole production call under the manager-owned input latch at line 150. Every
+entry resets a local aggregate false and calls `GetAirFlowFlag`,
+`SetZoneMassConservationFlag`, and `GetRoomAirModelParameters` in order before
+one final fatal decision. A returned first-child error does not skip later
+children, the room-air child can only add an error, and the exact terminal
+message is `GetAirHeatBalanceInput: Errors found in getting Air inputs`.
+
+The parent clears its latch only after normal return. Thus final fatal or an
+earlier child non-return leaves the latch true, blocks initialization,
+calculation, and reporting on that attempt, and permits a same-state retry
+with already committed child allocations, flags, registrations, diagnostics,
+and EIO prefixes. Successful return makes later manager calls skip only this
+input wrapper; direct calls do not alter the latch. CP184 itself owns no
+persistent state, validation, catch, rollback, or transaction. One direct
+PTAC setup call and broad integration paths exercise successful input, and
+separate tests cover individual children, but no test proves aggregate child
+continuation, fatal text, parent-latch transition, partial failure, or retry.
+Rust's matching compatibility alias is only an identity closure around an
+unrelated per-Zone coefficient calculation and owns neither the three-child
+topology nor the latch. The routine remains `source_mapped` and required
+without support or conformance promotion.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `manage_zone_air_updates`, preserving the completion of the Air subtree before
 the Surface manager's final update. Its EnergyPlus boundary is the

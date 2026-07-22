@@ -64,6 +64,7 @@ required_routines = [
   "calculate_zone_mrt",
   "update_intermediate_surface_heat_balance_results",
   "manage_air_heat_balance",
+  "get_air_heat_balance_input",
   "manage_zone_air_updates",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
