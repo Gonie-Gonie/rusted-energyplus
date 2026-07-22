@@ -179,6 +179,7 @@ claim.
 | thermal-comfort PMV-to-dry-bulb inversion | `GetComfortSetPoints`, declared at `ZoneTempPredictorCorrector.hh` lines 362-367, implemented at `ZoneTempPredictorCorrector.cc` lines 6331-6415, and called only by 12 expressions inside `CalcZoneAirComfortSetPoints` | CP230 adds required `routine.get_comfort_set_points` as source-mapped only. Strict endpoint/no-write dispatch, configurable root solving, repeated impure Fanger state, shared diagnostics, caller multiplicity, and failure/retry remain source-only; Rust has no comfort types, PMV/Fanger state, generic solver, live caller, or composed test. |
 | temperature-and-humidity cooling-setpoint overcool | `AdjustCoolingSetPointforTempAndHumidityControl`, declared at `ZoneTempPredictorCorrector.hh` lines 369-372, implemented at `ZoneTempPredictorCorrector.cc` lines 6417-6458, and called only by SingleCool and Dual expressions in `CalcZoneAirTempSetPoints` | CP231 adds required `routine.adjust_cooling_set_point_for_temp_and_humidity_control` as source-mapped only. Pre-guard indexed aliases, global/exact-None guards, range/gap/RH-ratio caps, high-only mutation, mixed-record null dependency, parent precedence, and replay remain source-only; Rust has no typed modifier, matching setpoint state, exact helper, live caller, or test. |
 | EMS air-temperature setpoint override | `OverrideAirSetPointsforEMSCntrl`, declared at `ZoneTempPredictorCorrector.hh` line 374, implemented at `ZoneTempPredictorCorrector.cc` lines 6460-6555, and called unconditionally as the final action in `CalcZoneAirTempSetPoints` | CP232 adds required `routine.override_air_set_points_for_ems_cntrl` as source-mapped only. Ordinary-then-comfort traversal, heating-before-cooling writes, live type dispatch, collisions, actuator bindings, downstream replacement, and reset/replay remain source-only; Rust has no EMS engine, actuator state, mutable setpoint triple, comfort control, exact helper, live caller, or active test. |
+| thermostat-setpoint predefined LEED table | `FillPredefinedTableOnThermostatSetpoints`, declared at `ZoneTempPredictorCorrector.hh` line 376, implemented at `ZoneTempPredictorCorrector.cc` lines 6558-6672, and called only by `FillRemainingPredefinedEntries` line 6998 | CP233 adds required `routine.fill_predefined_table_on_thermostat_setpoints` as source-mapped only. Global schedule-ID first-wins traversal, seasonal Wednesday value/count queries, split synthetic rows, append-only table mutation, final-report cadence, and failure/retry remain source-only; Rust has no four-family arena, exact seasonal query, predefined table store, helper, caller, or focused test. |
 | internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
 | space internal convective gains | `spaceSumAllInternalConvectionGains` | mapped-not-ported |
 
@@ -20151,9 +20152,200 @@ The inventory becomes 32 algorithms and 238 routines, split 58
 `state_mapped` plus 180 `source_mapped`, with 115 required; the heat-balance
 project list becomes 84.
 
-CP233 next maps `FillPredefinedTableOnThermostatSetpoints`, declared at
-`ZoneTempPredictorCorrector.hh` line 376 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 6558-6672.
+### CP233 `FillPredefinedTableOnThermostatSetpoints` source map
+
+CP233 adds canonical required
+`routine.fill_predefined_table_on_thermostat_setpoints` and the
+project-contract item `fill_predefined_table_on_thermostat_setpoints`
+immediately after CP232 `override_air_set_points_for_ems_cntrl`. The pinned
+declaration is `ZoneTempPredictorCorrector.hh` line 376, and the complete
+definition is `ZoneTempPredictorCorrector.cc` lines 6558-6672.
+
+The routine builds entries for the LEED
+`Schedules-SetPoints (Schedule Type=Temperature)` predefined subtable. It is a
+source boundary only. No Rust implementation, typed report promotion, or
+conformance claim is inferred.
+
+#### Input arenas, traversal, and first-occurrence ownership
+
+CP196 `GetZoneAirSetPoints` populates four `ZoneSetptScheds` arenas from every
+authored ordinary setpoint definition, whether or not a
+`ZoneControl:Thermostat` references it. Each record stores the definition name
+plus heating/cooling schedule pointers, and SingleHeatingOrCooling binds both
+pointers to the same schedule. CP233 never reads the independent comfort
+setpoint arenas.
+
+Traversal is fixed by family and then input order:
+
+1. every SingleHeating definition;
+2. every SingleCooling definition;
+3. every SingleHeatingOrCooling definition; and
+4. every DualSetpoint definition, heating side before cooling side.
+
+A local `uniqSch` vector spans all four loops. Each candidate dereferences its
+schedule pointer and linearly searches by numeric `Schedule::Num`; a first
+occurrence inserts the number before any report query or cell write, and every
+later occurrence is skipped completely. Deduplication is therefore by source
+schedule identity, not name, pointer, role, season, value, or actual Zone use.
+A schedule first encountered as heating never receives a later cooling/summer
+representation. A Dual record with the same schedule on both sides keeps its
+winter heating representation because heating inserts first.
+
+`NumTempControls` contributes only to the initial vector-capacity sum; the
+allocated arrays control traversal. Corrupted counts can under-reserve, or a
+negative/huge converted capacity can fail allocation, without limiting which
+records would otherwise be visited. Null pointers fail on the pre-dedup
+`Num` dereference. CP233 performs no sorting, usage filtering, schedule-type
+check, pointer validation, or comfort-family merge.
+
+#### Row and cell matrix
+
+The six predefined columns are `First Object Used`, `Month Assumed`,
+`11am First Wednesday [C]`, `Days with Same 11am Value`,
+`11pm First Wednesday [C]`, and `Days with Same 11pm Value`.
+
+| first surviving role | season query | exact row layout | appended cells |
+| --- | --- | --- | ---: |
+| SingleHeating | winter | all six columns under the base schedule name | 6 |
+| SingleCooling | summer | all six columns under the base schedule name | 6 |
+| SingleHeatingOrCooling | summer, then winter | first object plus combined months under the base name; four value/count cells under each `<name> (summer)` and `<name> (winter)` | 10 |
+| Dual heating, then cooling | winter for heat, summer for cool | six base-name columns for each side not already deduplicated | 6 per surviving side |
+
+`First Object Used` is the first setpoint definition encountered, not the
+first Zone or thermostat reference. For the combined family the base row is
+sparse, and both synthetic numeric rows lack first-object and month cells.
+The month cell concatenates summer first and winter second with ` and `.
+
+Deduplication uses numeric IDs, while predefined rows use exact,
+case-sensitive schedule-name strings. Normal input uppercases schedule names,
+whereas CP233 appends literal lowercase suffixes, so valid parsed names do not
+collide. Manually constructed or corrupted mixed-case state can still merge a
+real `X (summer)` or `X (winter)` row with the synthetic row for `X`; append
+order can then combine first-object/month cells from one schedule with sampled
+cells from another.
+
+#### Seasonal Wednesday query
+
+For a detailed schedule, `Schedule::getValAndCountOnDay` chooses July for
+summer and January for winter when `Latitude > 0`; southern and exactly zero
+latitude reverse those months. It derives the first Wednesday from
+`RunPeriodStartDayOfWeek` and leap-year state, without holiday adjustment.
+The selected date's one `DSTIndex` shifts hour 11 or 23, and the query reads
+only timestep 1 of that shifted hour rather than an hourly average.
+
+The reference comes from the selected Julian date's week schedule and its
+Wednesday day profile. The matching count then walks every one of the 365 or
+366 Julian dates, selects each date's week schedule and that week's Wednesday
+profile, and inspects the same fixed shifted-hour/timestep index. Identical
+week-schedule or day-schedule pointers count immediately; other profiles use
+exact floating equality. The result is a count of annual calendar-day rules
+whose Wednesday profile matches, not a count of actual Wednesdays or hourly
+occurrences. The selected first Wednesday's DST shift is reused for every
+comparison date.
+
+A constant schedule ignores weekday and hour, returns all 365/366 days, and
+reports its end-of-run `currentVal`. `UpdateScheduleVals` can place an active
+EMS value in that field, so constant reporting can reflect final EMS
+actuation. Detailed reporting reads definition `tsVals` directly and ignores
+the schedule's EMS override state. CP233 adds no finite, bounds, type-limit,
+calendar-shape, DST-index, or table-format validation.
+
+#### Caller, visibility, and table mutation
+
+There is one production call expression:
+`OutputReportTabular.cc` line 6998 inside
+`FillRemainingPredefinedEntries`, immediately followed by CP234 at line 6999.
+`SimulationManager` reaches top-level `WriteTabularReports` after the
+environment loop, tariff work, final EMS checks, and final meter reporting.
+`WriteTabularReports` calls `FillRemainingPredefinedEntries` before testing
+`WriteTabularFiles`; CP233 therefore appends predefined state even when no
+tabular/JSON/SQLite table will be emitted. Actual rendering still depends on
+the LEED report show flag.
+
+Each real, integer, or string `PreDefTableEntry` call increments the global
+entry count and appends a cell. It does not upsert or reject a duplicate
+row/column pair. The renderer scans append order and later duplicate cells
+overwrite earlier table-body assignments. In contrast,
+`RetrievePreDefTableEntry` scans from the beginning and returns the earliest
+match.
+
+CP233 has no local once guard. Repeated unchanged calls are not state
+idempotent: the local dedup vector starts empty and a full duplicate set is
+appended. Changed retry state can make last-wins rendering disagree with
+first-wins retrieval. Multiyear `ResetTabularReports` does not clear
+predefined entries; only full owning-data reconstruction establishes a clean
+table store.
+
+#### Failure, retry, and reset
+
+All writes are immediate. A capacity allocation failure, null or malformed
+schedule graph, bad calendar/DST/timestep index, report-entry allocation
+failure, or later helper failure leaves every earlier cell committed. There
+is no catch, status, transaction, rollback, cleanup, diagnostic, or completion
+latch. A retry recreates only `uniqSch`, replays its prefix, and appends new
+cells beside the retained partial attempt.
+
+Normal input processing diagnoses missing schedule references and can fatal
+before final reporting, but CP233 does not call that loader or repeat its
+checks. `ZoneTempPredictorCorrectorData::clear_state` reconstructs counts and
+setpoint arenas, while predefined-report data owns its separate entry store.
+CP233 owns neither reset. Clean isolated replay therefore spans both owners
+plus ScheduleManager calendar, DST, current/EMS, week/day, and timestep state.
+
+#### C++ tests, full-simulation census, and stock candidates
+
+No C++ test calls CP233 or references its six predefined column handles or
+display strings. The closest `temperatureAndCountInSch_test` calls the
+schedule helper nine times and makes 21 assertions for hemisphere/month
+selection plus constant, seasonal, count, and hour-dependent values. It does
+not compose family traversal, global deduplication, synthetic rows,
+`PreDefTableEntry`, caller timing, visibility, failure, or retry.
+
+The established unit-tree census has 57 active full-simulation expressions.
+One expected EMS fatal stops before final reporting. Across the other 56
+successful CP233 calls, 18 configurations have empty arenas and 38 provide 47
+definitions: six SingleHeating, six SingleCooling, zero
+SingleHeatingOrCooling, and 35 DualSetpoint. Per-configuration deduplication
+leaves 76 ordinary schedule rows, producing a static one-finalization total
+of 152 helper calls and 456 appended cells. Three VRF configurations reach
+the Dual duplicate-skip branch after earlier SingleHeating/SingleCooling
+definitions reuse the same schedules. None asserts a CP233 row or cell.
+
+Among installed 26.1 files, `5ZoneAirCooled.idf` requests
+AllSummaryAndSizingPeriod and offers a clear cross-family dedup candidate,
+while `TermRhSingleHeatCoolNoDB.idf` requests AllSummary and exercises the
+combined-family split-row shape. They are not adopted repository cases and
+supply no focused comparator. Repository conformance inputs contain 30
+thermostat IDFs, all DualSetpoint; none combines a relevant summary request
+with a CP233 assertion. The only repository summary-report input is an
+unrelated plant diagnostic.
+
+#### Rust boundary
+
+Rust has adjacent normalized DualSetpoint graph records with heating/cooling
+`ScheduleId`s, calendar-aware schedule-series evaluation, and a separate
+constant-schedule IdealLoads diagnostic stream. It has no typed SingleHeating,
+SingleCooling, or SingleHeatingOrCooling arena, complete source record order,
+numeric source schedule-ID deduplication, seasonal Wednesday value/count/month
+query, predefined LEED table store, string cells, column identities, exact
+helper, end-report caller, or composed test.
+
+Generic `RuntimeOutputRegistry` and `ResultStore` own numeric time series, not
+predefined append-order cells. `Output:Table:SummaryReports` remains a RawOnly
+ignored reporting object, and the DualSetpoint coverage declaration remains
+graph wiring rather than HVAC or tabular conformance. Calendar schedule tests
+and IdealLoads raw-schedule outputs are adjacent evidence only.
+
+CP233 therefore adds no algorithm-level `energyplus_source` entry, Rust
+target, code, mapped state, test, support, capability, output implementation,
+comparator, case, manifest, numerical, performance, or conformance promotion.
+The inventory becomes 32 algorithms and 239 routines, split 58
+`state_mapped` plus 181 `source_mapped`, with 116 required; the heat-balance
+project list becomes 85.
+
+CP234 next maps `FillPredefinedTableOnThermostatSchedules`, declared at
+`ZoneTempPredictorCorrector.hh` line 378 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 6674-6766.
 
 ### `CheckValidSimulationObjects` state contract
 

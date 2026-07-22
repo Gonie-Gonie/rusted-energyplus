@@ -3221,12 +3221,95 @@ performance, or conformance promotion. The inventory becomes 32 algorithms
 and 238 routines, split 58 `state_mapped` plus 180 `source_mapped`, with 115
 required; the heat-balance project list becomes 84.
 
-CP233 next maps `FillPredefinedTableOnThermostatSetpoints`, declared at
+CP233 adds required `fill_predefined_table_on_thermostat_setpoints`
+immediately after `override_air_set_points_for_ems_cntrl` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is
+`FillPredefinedTableOnThermostatSetpoints(EnergyPlusData &)`, declared at
 `ZoneTempPredictorCorrector.hh` line 376 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 6558-6672.
 
+The routine reads every authored ordinary thermostat-setpoint definition, not
+only definitions referenced by a Zone. It visits SingleHeating,
+SingleCooling, SingleHeatingOrCooling, then DualSetpoint in input order. One
+invocation-wide vector suppresses every schedule after the first occurrence
+of its numeric `Schedule::Num`; the winning occurrence fixes its object name,
+heating/cooling role, and winter/summer treatment. Dual processes heating
+before cooling, so the heating interpretation wins when both sides share one
+schedule. Counts only reserve vector capacity; the allocated arrays determine
+iteration.
+
+SingleHeating and Dual heating write winter samples under the base schedule
+name; SingleCooling and Dual cooling write summer samples there. Each surviving
+normal schedule appends six cells: first setpoint object, assumed month, 11:00
+value/count, and 23:00 value/count. SingleHeatingOrCooling instead appends ten
+cells: first object and combined months on the base row, with four numeric
+cells each on synthetic `<name> (summer)` and `<name> (winter)` rows. An
+unused setpoint definition can therefore become `First Object Used`. Normal
+input uppercases schedule names while CP233's literal suffixes are lowercase,
+so valid parsed names do not collide; only manually constructed or corrupted
+mixed-case schedule state can merge with a synthetic row.
+
+`ScheduleDetailed::getValAndCountOnDay` chooses July as summer and January as
+winter only for latitude strictly above zero; southern and zero latitude use
+the reverse. It derives the first Wednesday from run-period start weekday and
+leap-year state, applies that selected date's DST shift once, and reads the
+first timestep of hours 11 and 23 without holiday adjustment or averaging.
+The count walks all 365/366 Julian dates, tests each date's Wednesday profile
+at that same fixed shifted-hour index, short-circuits identical week/day
+pointers, and otherwise uses exact floating equality. It counts calendar-day
+rules, not actual Wednesdays. Constant schedules ignore weekday/hour and
+return their end-of-run `currentVal` with every day; that value can include an
+EMS override, while detailed schedules read definition `tsVals` and ignore
+EMS actuation.
+
+The sole production call is `OutputReportTabular.cc` line 6998 inside
+`FillRemainingPredefinedEntries`, immediately before CP234. Top-level
+`WriteTabularReports` reaches it once after the environment loop and before
+the later `WriteTabularFiles` guard, so predefined state is populated even
+when no table file is emitted. The routine neither loads Zone setpoint input
+nor checks report visibility, schedule type, pointer validity, or calendar
+shape, and it owns no once latch.
+
+Every real, integer, and string `PreDefTableEntry` call appends rather than
+upserting. Failure leaves all earlier cells, and retry creates a fresh local
+dedup vector and appends them again. Later duplicate cells win while rendered
+tables are assembled, but `RetrievePreDefTableEntry` returns the earliest
+match; changed retry state can therefore make the two views disagree.
+Multiyear tabular reset does not clear these entries. CP233 owns no
+transaction, rollback, cleanup, diagnostic, or reset.
+
+No C++ test calls CP233 or references its six column handles/text. The closest
+fixture calls `getValAndCountOnDay` nine times with 21 assertions for
+hemisphere, month, value, hour, and matching-day behavior, but it does not
+exercise family order, deduplication, row keys, or table mutation. Of 57
+active full-simulation expressions, one expected fatal stops before
+finalization. A static one-finalization census of the other 56 gives 18 empty
+and 38 nonempty calls, 47 setpoint definitions (6 SingleHeating, 6
+SingleCooling, 0 SingleHeatingOrCooling, and 35 DualSetpoint), 76 surviving
+schedule rows, 152 helper calls, and 456 appended cells. None asserts CP233
+output. Installed files provide `5ZoneAirCooled.idf` as a cross-family
+deduplication candidate and `TermRhSingleHeatCoolNoDB.idf` as a split-row
+candidate, but neither is adopted as focused repository evidence.
+
+Rust retains only adjacent normalized DualSetpoint graph state,
+calendar-aware schedule-series evaluation, and constant-schedule IdealLoads
+diagnostics. It has no four-family setpoint arena, source numeric schedule-ID
+deduplication, seasonal representative query, predefined LEED table store or
+column identities, exact helper, tabular caller, or composed test.
+`Output:Table:SummaryReports` remains a RawOnly ignored reporting object. The
+30 repository thermostat cases are all DualSetpoint and none composes a
+summary request with a CP233 comparator. CP233 remains required
+`source_mapped` and adds no algorithm-level source, Rust, state, support,
+output, numerical, performance, or conformance promotion. The inventory
+becomes 32 algorithms and 239 routines, split 58 `state_mapped` plus 181
+`source_mapped`, with 116 required; the heat-balance project list becomes 85.
+
+CP234 next maps `FillPredefinedTableOnThermostatSchedules`, declared at
+`ZoneTempPredictorCorrector.hh` line 378 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 6674-6766.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`override_air_set_points_for_ems_cntrl`,
+`fill_predefined_table_on_thermostat_setpoints`,
 preserving the completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
