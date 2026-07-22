@@ -639,6 +639,36 @@ mixing records, fraction topology, or door state; the CP189 closure is empty,
 run-blocked. CP190 remains `source_mapped` and required without Rust state,
 support, output, numerical, or conformance promotion.
 
+The next required Air-subtree entry is `calc_heat_balance_air`, after
+`init_simple_mixing_convective_heat_gains` and before
+`manage_zone_air_updates`. Its EnergyPlus boundary is
+`HeatBalanceAirManager.hh` line 83 and `HeatBalanceAirManager.cc` lines
+4590-4604; `ManageAirHeatBalance` line 158 is its sole production call, after
+CP189 returns and before `ReportZoneMeanAirTemp`.
+
+Every entry selects exactly one manager path. A configured
+`externalHVACManager` first calls `initializeForExternalHVACManager` when
+`externalHVACManagerInitialized` is false and then invokes the callback with
+`&state`; a true flag skips only that initializer. With no callback, the flag
+is irrelevant and CP191 calls `HVACManager::ManageHVAC`. The external route
+therefore bypasses the standard HVAC manager. Neither CP191, its initializer,
+nor runtime callback registration writes the initialized flag true, so the
+default false value repeats the initializer call on each external-mode entry
+unless outside code changes it. The child's separate one-time latch may skip
+only its internal one-time block.
+
+CP191 performs no direct mutation, validation, diagnostic, output, status,
+catch, or rollback. Initializer failure prevents the callback; failure or
+non-return from either branch preserves child effects and suppresses the
+parent report and later Surface-manager work. `DataGlobal::clear_state` removes
+the callback and resets the flag false, while Air-manager-local clear does
+neither. No direct C++ test covers CP191, its initializer, or the external
+callback API. Rust's `calc_heat_balance_air_compat` is an identity closure
+around a bounded predictor/zone-temperature shell, not external-versus-standard
+HVAC dispatch, and has no full `ManageHVAC` topology. CP191 remains
+`source_mapped` and required without Rust state, support, output, numerical, or
+conformance promotion.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `manage_zone_air_updates`, preserving the completion of the Air subtree before
 the Surface manager's final update. Its EnergyPlus boundary is the
