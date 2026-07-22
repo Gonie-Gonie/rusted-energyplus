@@ -17,6 +17,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | EnergyPlus area | Source anchor | Rust target | Current status |
 |---|---|---|---|
 | zone predictor/corrector driver | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ManageZoneAirUpdates` | `manage_zone_air_updates_stage`; `advance_heat_balance_state_one_timestep` successor | CP195 required source-mapped dispatcher; Rust metadata and selector-ignoring closures remain scaffold |
+| Zone setpoint and control input | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::GetZoneAirSetPoints` | bounded compiler thermostat/humidistat subset; `get_zone_air_set_points_compat` identity closure | CP196 required source-mapped 16-family transaction; no whole-routine Rust parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -157,9 +158,185 @@ adjacent result evidence, not dispatcher/lifecycle parity. The inventory stays
 at 32 algorithms and 203 routines, split 58 `state_mapped` plus 145
 `source_mapped`, with 82 required; the heat-balance project list stays 51.
 
-CP196 next maps `GetZoneAirSetPoints`, declared at
+### CP196 `GetZoneAirSetPoints` source map
+
+`GetZoneAirSetPoints(EnergyPlusData &state)` is declared at
 `ZoneTempPredictorCorrector.hh` line 272 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 246-2174.
+`ZoneTempPredictorCorrector.cc` lines 246-2174. It has no return value,
+explicit `return`, status argument, or internal latch. The local
+`ErrorsFound` starts false at line 274; most input errors accumulate while
+later phases continue, and only lines 2171-2172 convert that aggregate into a
+fatal. The routine itself never reads or clears
+`GetZoneAirStatsInputFlag`.
+
+This is one fall-through input transaction, not a single thermostat reader.
+The direct body selects 15 InputProcessor object families in 18
+`getObjectItem` passes, while its unconditional HybridModel child owns the
+sixteenth family:
+
+| Ordered phase | Source lines | Principal work |
+|---|---|---|
+| ordinary thermostat pre-scan and expansion | 324-520 | counts `ZoneControl:Thermostat` objects, resolves Zone or ZoneList targets, allocates expanded controlled-Zone state, binds the control-type schedule and up to four setpoint-type/name pairs, and records cutout delta |
+| four ordinary setpoint families | 521-671 | reads SingleHeating, SingleCooling, SingleHeatingOrCooling, and DualSetpoint names and schedule pointers |
+| ordinary reference and schedule validation | 673-808 | links named setpoint records, validates control types required by schedules, and contains an effectively inert missing-type warning pass |
+| humidity control | 809-873 | reads `ZoneControl:Humidistat`, binds the Zone and humidifying/dehumidifying schedules, and writes the Zone inverse index |
+| thermal-comfort thermostat | 874-1164 | expands Zone/ZoneList targets, validates People inputs and averaging, dry-bulb bounds, the comfort control schedule, and up to four comfort-type/name pairs |
+| four Fanger setpoint families | 1166-1330 | binds `[-3,3]` PMV schedules for the four comfort control types |
+| comfort reference and schedule validation | 1332-1447 | links comfort heat/cool schedules and checks schedule/type consistency |
+| Hybrid Model input | 1449-1450 | unconditionally calls `HybridModel::GetHybridModelZone(state)` even when the local aggregate already holds errors |
+| Zone capacitance multipliers | 1452-1566 | assigns sensible, moisture, CO2, and generic-contaminant multipliers and always writes their averaged EIO row |
+| operative temperature and adaptive comfort | 1568-1757 | applies Constant or Scheduled radiative fractions, conditionally builds adaptive schedules through CP197 and CP198, and registers operative-temperature outputs |
+| temperature-and-humidity overcool | 1758-1918 | binds dehumidification, overcool mode/range, and control-ratio state through parent-thermostat or expanded-Zone paths |
+| staged dual setpoint | 1919-2169 | expands staged controls, binds base schedules, stage counts, throttling ranges, ordered offsets, and `StageZoneLogic` |
+| terminal decision | 2171-2174 | fatals on the accumulated local flag or falls through normally |
+
+The ordinary thermostat pre-scan stores `TStatObjects` and the expanded
+count. Any invalid Zone/ZoneList name zeros the complete
+`NumTempControlledZones` at lines 372-376, suppressing even otherwise-valid
+second-pass entries. A successful second pass rejects duplicate Zone
+assignment, writes `Zone(...).TempControlledZoneIndex`, checks the control
+schedule only over `[0,4]`, and accepts up to four type/name pairs. Repeating a
+type overwrites its earlier name. A positive cutout delta increments
+`NumOnOffCtrZone`; its combination with SingleHeatingOrCooling warns but
+returns. The four setpoint families bind schedule pointers but impose no local
+temperature-value bounds. Missing referenced objects and schedule-required
+types become terminal errors. A control schedule that is always zero emits a
+severe message without setting `ErrorsFound`. The final ordinary
+`MustHave`/`DidHave` warning pass has no producer for either flag in this
+routine and is effectively inert.
+
+Humidistat input allocates its own arena and uniqueness set, resolves direct
+Zones, writes `humidityControlZoneIndex`, and requires the humidifying
+schedule. A blank dehumidifying field aliases the humidifying pointer at lines
+865-867; no relative-humidity schedule value range is checked here.
+
+Thermal-comfort input repeats Zone/ZoneList expansion, requires a People
+object for every valid controlled Zone, and checks activity `[72,909]`,
+work-efficiency `[0,1]`, clothing `[0,2]`, air-velocity presence, dry-bulb
+bounds `[0,50]`, and a `[0,4]` control schedule. SpecificObject validates only
+global People-name presence, not same-Zone ownership. The activity-range
+severe and equal dry-bulb min/max severe do not set the local fatal flag.
+Comfort keyword diagnostics pass the field name rather than the invalid value,
+and the later reference link indexes the `FindItem` result without a local
+zero guard. The comfort `DidHave` path mirrors declared types rather than
+actual schedule values, so its final missing-type warning is likewise
+effectively inert.
+
+`HybridModel::GetHybridModelZone` can fatal before all later phases and before
+CP196's aggregate decision. The capacitance phase writes 1.0 to every Zone
+when no object exists. With objects, a blank target updates the rolling default
+and later occurrences win; named Zone or ZoneList records mark customized
+Zones, and remaining Zones receive the final default. The ZoneList loop at
+lines 1511-1518 uses `ZonePtrNum < NumOfZones` and therefore omits the final
+member. The four arithmetic inputs receive no local range or finite check.
+Even with prior accumulated errors, lines 1565-1566 append the averaged
+multiplier EIO header and row.
+
+Operative-temperature input sets `AnyOpTempControl` from object presence and
+accepts a parent thermostat name, expanding it across all member Zones, or one
+expanded controlled-Zone name. Constant and Scheduled are the only valid
+modes; fixed and scheduled radiative fractions are constrained to
+`[0,0.9)`. A non-None adaptive model can call CP197
+`CalculateMonthlyRunningAverageDryBulb` and CP198
+`CalculateAdaptiveComfortSetPointSchl` once under the shared
+`AdapComfortDailySetPointSchedule.initialized` guard; only CP198 sets that
+flag true. A missing weather file fatals immediately in CP197. Output registration
+differs by branch: the parent-name path registers every expanded Zone even
+after an invalid mode, while the direct-name path registers only for a valid
+Constant or Scheduled mode.
+
+Temperature-and-humidity input also has distinct direct-expanded-Zone and
+parent-thermostat branches. Both bind dehumidification and constrain scheduled
+overcool range to `[0,3]`, constant range to `[0,3]`, and control ratio only
+from below. The direct Scheduled branch does not store the input control
+ratio, whereas the parent branch always stores and checks it. Diagnostics are
+generally emitted only for the first Zone of a parent expansion.
+
+The staged pre-scan does not use a staged-local error flag. Lines 1971-1974
+test the routine-wide `ErrorsFound`, so any earlier fatal-target error adds the
+staged invalid-name diagnostic, zeros `NumStageCtrZone`, and suppresses the
+entire staged second pass. In the ZoneList branch the start pointer is written
+to `TempControlledZoneStartPtr` instead of
+`StageControlledZoneStartPtr`. Stage counts are assigned from real inputs to
+integers before the original `[1,4]` values are range-checked. Heating offsets
+must be nonpositive and strictly decrease; cooling offsets must be nonnegative
+and strictly increase. The heating throttling-range check reads numeric field
+1 instead of the stored field 2. An unresolved staged Zone leaves
+`ActualZoneNum` at zero, but line 2020 still attempts
+`StageZoneLogic(0) = true` before continuing. Missing all four compatible
+unitary or
+one-stage setpoint-manager families produces only a warning.
+
+There are three literal production call sites. CP195
+`ManageZoneAirUpdates` lines 215-217,
+`KivaManager::setupKivaInstances` at
+`HeatBalanceKivaManager.cc` lines 672-674, and
+`VerifyThermostatInZone` lines 5689-5691 all test the same
+`GetZoneAirStatsInputFlag` and clear it only after CP196 returns. The first
+successful caller owns the one-time transaction; the other two then skip it.
+`VerifyThermostatInZone` is reached from `ZoneEquipmentManager.cc` line 812.
+CP196 itself neither knows which caller won nor clears the latch.
+
+Most validation failures retain allocated arenas, linked schedules, Zone
+indices, flags, multiplier writes, output registrations, EIO and diagnostic
+prefixes before the terminal fatal. A Hybrid or adaptive helper fatal exits
+earlier with only the reached prefix. There is no catch, cleanup, rollback, or
+same-state retry guard. Because every production wrapper leaves the latch true
+on non-return, a caught failure re-enters CP196 against its partially allocated
+state and is not idempotent. `DataZoneControlsData::clear_state` resets the
+latch and its control arenas, while
+`ZoneTempPredictorCorrectorData::clear_state` separately reconstructs counts,
+schedule arrays, uniqueness and adaptive state. Clean replay also requires
+Zone, HybridModel/RoomAir, OutputProcessor, InputProcessor, schedule, weather,
+file/output, and diagnostic owners to be reset and reconstructed.
+
+The EnergyPlus unit tree directly calls CP196 nine times across six files.
+Six calls principally prepare Kiva, heat-pump, availability, or unitary
+fixtures. `ZoneTempPredictorCorrector_ReportingTest` covers valid ordinary
+control families through later setpoint/load assertions;
+`ZoneTempPredictorCorrector_WrongControlTypeSchedule` asserts the terminal
+schedule mismatch plus the coupled staged diagnostic; and
+`GetZoneAirSetPoints_Test` asserts the missing setpoint-reference failure.
+No direct test covers repeat/retry, shared-latch timing, partial state after
+failure, reset, a valid staged path, overcool input, positive ZoneList
+expansion, capacitance EIO, or the complete operative/comfort transaction.
+CP197 has no direct unit call; its later schedule helper is tested separately
+and does not establish CP196 topology.
+
+Rust's `get_zone_air_set_points_compat` at
+`zone_predictor_corrector.rs` lines 62-65 only executes an arbitrary closure.
+Its one live use at `heat_balance/timestep.rs` lines 302-306 manually nests
+the Init and Calc identity wrappers; no test calls the alias directly.
+`ExecutionStep::EvaluateZoneThermostat` is planning metadata inside the broader
+zone-update stage, not a CP196 input step.
+
+The compiler provides adjacent typed subsets at `compiler.rs` lines
+12161-12372 for `ThermostatSetpoint:DualSetpoint`, direct-Zone
+`ZoneControl:Thermostat`, and `ZoneControl:Humidistat`. It accepts only the
+DualSetpoint control type, cannot expand ZoneLists, requires both humidistat
+schedules instead of source aliasing, rejects duplicate names rather than
+preserving source lookup behavior, and omits source counts, inverse Zone
+indices, schedule-domain/type checks, all other input families, Hybrid and
+adaptive work, EIO/output registration, ordered diagnostics, partial state,
+latch, retry, and reset. The CLI's bounded IdealLoads consumer selects the
+first dual control and ignores the control-type schedule. Parser, graph, and
+execution-plan tests plus a non-conformance thermostat smoke case therefore
+remain adjacent evidence only.
+
+CP196 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.get_zone_air_set_points`
+immediately after `routine.manage_zone_air_updates` and adds
+`get_zone_air_set_points` at the same project-contract boundary. The algorithm
+remains a `scaffold` with `claim_level = none`. This checkpoint adds no new
+EnergyPlus source inventory, Rust target, code, mapped state, support,
+capability, output implementation, comparator, manifest, numerical,
+performance, or conformance promotion. The inventory becomes 32 algorithms
+and 204 routines, split 58 `state_mapped` plus 146 `source_mapped`, with 83
+required; the heat-balance project list becomes 52.
+
+CP197 next maps `CalculateMonthlyRunningAverageDryBulb`, declared at
+`ZoneTempPredictorCorrector.hh` line 284 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 2176-2275.
 
 ## Promotion Requirements
 

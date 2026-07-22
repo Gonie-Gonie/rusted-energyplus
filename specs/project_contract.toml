@@ -75,6 +75,7 @@ required_routines = [
   "report_zone_mean_air_temp",
   "calc_mean_air_temps",
   "manage_zone_air_updates",
+  "get_zone_air_set_points",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",

@@ -763,8 +763,50 @@ wet-bulb helper are not connected to this source call topology. CP194 remains
 `source_mapped` and required without Rust state, support, output
 implementation, numerical, or conformance promotion.
 
+The predictor/corrector definition inventory now adds required
+`get_zone_air_set_points` immediately after `manage_zone_air_updates` and
+before `update_final_surface_heat_balance`. Its EnergyPlus boundary is the
+declaration at `ZoneTempPredictorCorrector.hh` line 272 and the single
+fall-through implementation at `ZoneTempPredictorCorrector.cc` lines
+246-2174.
+
+The routine orders ordinary thermostat and four temperature-setpoint
+families; humidistat; thermal-comfort thermostat and four Fanger setpoint
+families; unconditional HybridModel input; Zone capacitance assignment and
+average EIO; operative/adaptive comfort; temperature-and-humidity overcool;
+and staged-dual input before its accumulated-error fatal. It expands
+ZoneLists, allocates and links control and schedule arenas, writes inverse
+Zone indices and four capacitance multipliers, registers operative-temperature
+outputs, and can invoke the following adaptive-comfort helpers. Several severe
+paths deliberately do not set the local fatal flag, helper fatals can stop the
+transaction early, the capacitance ZoneList loop omits its final member, and
+the staged precheck consumes errors from every earlier phase.
+
+`ManageZoneAirUpdates`, conditional Kiva setup, and
+`VerifyThermostatInZone` are the three production call sites. Each tests the
+same `GetZoneAirStatsInputFlag` and clears it only after normal return, so the
+first successful caller owns input acquisition. A non-return preserves the
+ordered allocation, mutation, output, EIO, and diagnostic prefix plus the true
+latch. The routine has no status, catch, cleanup, rollback, or safe same-state
+retry; clean replay requires coordinated ZoneControls, predictor, Zone,
+Hybrid/RoomAir, input, schedule, weather, output, file, and diagnostic reset.
+
+Nine direct C++ unit calls cover selected ordinary control values, downstream
+fixture setup, a schedule/control mismatch fatal, and a missing setpoint
+reference fatal. They do not cover the complete family order, latch timing,
+valid staged, overcool, positive ZoneList, capacitance-output, partial-failure,
+retry, or reset paths. Rust's same-purpose identity closure only executes an
+arbitrary caller body. Its compiler types a bounded direct-Zone subset of
+DualSetpoint thermostat and humidistat state, with different ZoneList,
+humidistat-default, validation, diagnostic, and failure semantics. That
+adjacent subset, execution-plan metadata, and IdealLoads consumer do not
+implement CP196. The routine remains `source_mapped` and required without a
+new Rust target, mapped state, support, output, numerical, or conformance
+promotion.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`manage_zone_air_updates`, preserving the completion of the Air subtree before
+`get_zone_air_set_points`, preserving the completed predictor/corrector
+definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
 the implementation at lines 5176-5219. The routine always invokes seven
@@ -779,7 +821,8 @@ two-pass replay and do not promote state, support, or conformance.
 
 The next required inventory entry is `update_thermal_histories`, after
 `update_final_surface_heat_balance`; together with the existing preceding
-`manage_air_heat_balance` and nested `manage_zone_air_updates` entries, this
+`manage_air_heat_balance` and nested `manage_zone_air_updates` /
+`get_zone_air_set_points` entries, this
 preserves completion of the Air subtree before the Surface manager's final and
 history stages. The EnergyPlus parent calls the routine at lines 186-189 only
 when `AnyCTF || AnyEMPD`, and the canonical body spans lines 5221-5581. It owns
