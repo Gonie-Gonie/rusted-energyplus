@@ -1883,10 +1883,53 @@ support, output, numerical, or conformance claim. The inventory becomes 32
 algorithms and 223 routines, split 58 `state_mapped` plus 165
 `source_mapped`, with 100 required; the heat-balance project list becomes 69.
 
-CP216 next expands the same logical routine mapping to the array-return
-`DownInterpolate4HistoryValues` overload, declared at
+CP216 completes the current logical
+`down_interpolate_4_history_values` evidence boundary by mapping its
+independent array-return overload, declared at
 `ZoneTempPredictorCorrector.hh` lines 310-311 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 4704-4736.
+`ZoneTempPredictorCorrector.cc` lines 4704-4736. It computes the raw old/new
+timestep ratio, writes four array elements in ordered ratio-two, ratio-three,
+or fallback branches, then returns `oldVals[0]`. The last input
+element is never read, while the third is used only for the ratio-two final
+output.
+
+The helper validates no positive or finite timestep, shortening direction,
+integer ratio, history value, or distinct input/output arrays. Its const input
+reference can alias its mutable output reference, making later reads observe
+earlier writes. Distinct-array replay is deterministic overwrite-idempotent;
+same-array replay generally is not. It owns no status, diagnostic,
+transaction, rollback, or reset.
+
+Seven production expressions live in
+`ZoneSpaceHeatBalanceData::updateTemperatures`: two base temperature/humidity
+calls per eligible Zone or active Space, three exact-Zone displacement/UFAD
+temperature calls, and two calls per exact-Zone AFN node. Entry requires
+shortening plus a system-step count different from the previous Zone
+timestep. Normal HVAC timing permits only the first shortened fine-step
+prediction, and a matching count reuses existing downstepped state.
+
+One direct C++ ratio-two call has nine post-call assertions for the return,
+four outputs, and four unchanged distinct inputs. Focused wrapper tests have
+zero Zones. The 55 nonzero-Zone completing corpus configurations leave actual
+adaptive entry unobserved; their conditional one-pass topology is 81 Zones
+plus 24 eligible Spaces, or 210 base calls, with no stratified or AFN
+potential because all Zones are Mixing.
+
+Rust's nearest helper returns only three values by value, rejects nonpositive
+timesteps, and has two Zone-only compatibility-path calls plus ratio-two,
+ratio-three, and ratio-four tests. It has no fourth array output, separate
+scalar return, Space/RoomAir/AFN topology, node rollback, alias transaction, or
+invalid-input parity.
+
+CP216 expands the same required `source_mapped` routine and adds no new
+routine, project-contract item, Rust target, mapped state, support, output,
+numerical, or conformance claim. Counts remain 32 algorithms and 223 routines,
+split 58 `state_mapped` plus 165 `source_mapped`, with 100 required; the
+heat-balance project list remains 69.
+
+CP217 next maps `InverseModelTemperature`, declared at
+`ZoneTempPredictorCorrector.hh` lines 313-325 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4737-4951.
 
 The inventory now also includes `update_final_surface_heat_balance` after
 `down_interpolate_4_history_values`, preserving the

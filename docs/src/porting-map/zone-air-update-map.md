@@ -36,7 +36,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | Zone/Space Zone-timestep history revert dispatch | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::RevertZoneTimestepHistories` | per-Zone compat current-state reset in the local adaptive count-greater-than-one path | CP212 required source-mapped dormant global Zone-first/Space dispatch; no built-in source request or exact Rust timing, topology, child-state, or selector parity |
 | Zone/Space record-level Zone-timestep history revert | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::revertZoneTimestepHistory` | no singular helper; nearest Rust paths push three-slot Zone or local system histories in the opposite direction | CP213 required source-mapped four-slot forward copy plus exact-Zone RoomAir/AFN branches and the literal mixed-level slot anomaly; no built-in reach or Rust record parity |
 | Zone/Space record-level humidity correction | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::correctHumRat` | history-only Zone humidity passes plus a separate bounded no-OA ThirdOrder IdealLoads helper | CP214 required source-mapped airflow/coefficient solve, clamps, RoomAir/hybrid/node/latent-sizing effects, and failure transaction; no exact Rust Zone/Space record parity |
-| scalar five-output history down-interpolation | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::DownInterpolate4HistoryValues` scalar-output overload | three-output thermal Zone history helper only | CP215 required source-mapped contaminant-owned five-reference interpolation and adaptive count-change cadence; no exact Rust output width, ownership, invalid-input, alias, or lifecycle parity |
+| history down-interpolation overload family | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::DownInterpolate4HistoryValues` scalar-output and array-return overloads | three-output thermal Zone history helper only | CP215 maps the contaminant-owned five-reference overload; CP216 expands the same required source-mapped routine to the thermal four-slot array/returned-current overload, with no exact Rust width, topology, invalid-input, alias, or lifecycle parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -3868,10 +3868,196 @@ performance, or conformance promotion is added. The inventory becomes 32
 algorithms and 223 routines, split 58 `state_mapped` plus 165
 `source_mapped`, with 100 required; the heat-balance project list becomes 69.
 
-CP216 next expands the same logical routine mapping to the array-return
-`DownInterpolate4HistoryValues` overload, declared at
+### CP216 array-return `DownInterpolate4HistoryValues` source map
+
+CP216 expands the existing logical
+`routine.down_interpolate_4_history_values` mapping to its second overload.
+This independent definition returns a scalar and fills a four-element array; it
+does not call the CP215 scalar-output overload. It is declared at
 `ZoneTempPredictorCorrector.hh` lines 310-311 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 4704-4736.
+
+For `a = oldVals[0]`, `b = oldVals[1]`, `c = oldVals[2]`, and
+`r = OldTimeStep / NewTimeStep`, the function calculates `r` before any output
+and then writes `newVals[0] = a`. The remaining ordered behavior is:
+
+| Ordered gate | Remaining writes |
+|---|---|
+| `abs(r - 2.0) < 0.01` | `newVals[1] = (a + b) / 2`; `newVals[2] = b`; `newVals[3] = (b + c) / 2` |
+| otherwise, `abs(r - 3.0) < 0.01` | `d = (b - a) / 3`; `newVals[1] = a + d`; `newVals[2] = newVals[1] + d`; `newVals[3] = b` |
+| every other ratio | `d = (b - a) / r`; `newVals[1] = a + d`; `newVals[2] = newVals[1] + d`; `newVals[3] = newVals[2] + d` |
+
+Only after all four writes does the helper return `oldVals[0]`. Ratio-two
+averages use sum-before-division, while ratio-three and fallback outputs use
+the just-written prior value. Those evaluation orders, including their
+rounding and overflow behavior, are part of the source boundary.
+`oldVals[3]` is never read. `oldVals[2]` contributes only to the ratio-two
+final output.
+
+The strict ratio-two test precedes the strict ratio-three test. Despite the
+fallback comment saying four or more, every other represented ratio reaches
+it, including ratios below one, negative and noninteger ratios, strict
+tolerance-edge values, zero, infinity, and NaN. CP216 validates no positive or
+finite timestep, shortening direction, integer ratio, or finite history
+value. The fixed `std::array<Real64, 4>` type supplies shape at the call
+boundary, but the helper performs no separate object or alias check. Under
+ordinary masked IEEE behavior, zero and nonfinite division or arithmetic
+propagates without a diagnostic; floating traps can instead stop the ordered
+write prefix.
+
+Unlike CP215's by-value scalar inputs, `oldVals` is a live const reference.
+The const input and mutable output references may name the same array. With
+initial input `[a, b, c, x]`, same-array aliasing changes ratio-two output to
+`[a, m, m, m]`, where `m = (a + b) / 2`, because later reads observe earlier
+writes. Ratio three becomes `[a, a + d, a + 2d, a + d]`. The fallback's first
+same-array result matches the distinct-array recurrence because `d` is
+captured before writes, but it still destroys the next call's inputs.
+Production and the direct C++ test use distinct arrays.
+
+#### Production ownership and cadence
+
+All seven production call expressions are inside
+`ZoneSpaceHeatBalanceData::updateTemperatures`, implemented at
+`ZoneTempPredictorCorrector.cc` lines 6768-6833:
+
+| Source order | Input to output array; returned-current owner |
+|---|---|
+| line 6800 | `XMAT` to `DSXMAT`; return to `MAT` |
+| line 6801 | `WPrevZoneTS` to `DSWPrevZoneTS`; return to `airHumRat` |
+| lines 6806, 6808, and 6810 | exact-Zone Floor, occupied, then mixed RoomAir temperature histories; returns to `MATFloor`, `MATOC`, then `MATMX` |
+| lines 6815 and 6817 | each stored exact-Zone AFN node's temperature then humidity histories; returns to `AirTemp` then `HumRat` |
+
+`ZoneSpaceHeatBalanceData::predictSystemLoad` calls `updateTemperatures` first
+at line 3155. CP202 `PredictSystemLoads` visits Zones in ascending identity
+order and, after each Zone, visits its stored Spaces when
+`doSpaceHeatBalance` is true. A positive Space therefore receives the two
+record-level calls but skips all shared RoomAir branches. If Space heat
+balance is inactive, a shortened predictor merely mirrors the already updated
+Zone `MAT` and `airHumRat` into each Space and does not call CP216 for that
+Space.
+
+Before interpolation, a positive exact Zone or Space system node can have
+temperature, thermostat air temperature, humidity, and enthalpy rolled back
+from the first Zone-timestep histories. CP216 then requires both
+`ShortenTimeStepSys` and
+`NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep`. The history selector
+is not a helper gate: after the block, `UseZoneTimeStepHistory` chooses either
+the Zone-timestep arrays or the downstepped arrays for `ZTM` and
+`WPrevZoneTSTemp`.
+
+Every eligible Zone or active Space has two base calls. Only exact Zones can
+add three calls when the global non-Mixing flag is set and that Zone is
+displacement-ventilation or UFAD. Within that same global-gated exact-Zone
+block, an independent AirflowNetwork enum branch adds two calls per stored AFN
+node. Thus one eligible prediction has:
+
+```text
+2 * (eligible Zone records + eligible Space records)
++ 3 * eligible displacement/UFAD Zones
++ 2 * eligible AFN nodes
+```
+
+`HVACManager` begins with a full Zone timestep and shortening false, so its
+initial prediction cannot enter CP216. If the initial correction selects a
+strictly shorter adaptive timestep, the first fine-step prediction can enter;
+the manager clears shortening after that fine-step simulation, preventing
+later fine steps from entering. A matching previous Zone-timestep system-step
+count reuses existing downstepped arrays instead. The minimum system-timestep
+clamp can also make the raw old/new ratio differ from the selected integer
+count. `SimulationManager::Resimulate` passes literal false shortening and
+cannot enter CP216.
+
+#### Failure, retry, and reset
+
+CP216 has no status, assertion, diagnostic, callback, allocation, catch,
+cleanup, transaction, cache, static state, or rollback. In ordinary masked
+IEEE operation its body completes. A floating trap can occur before
+`newVals[0]` during ratio calculation or after an output prefix during branch
+arithmetic. The caller's scalar assignment happens only after a completed
+return, so an abnormal interruption can retain an array prefix without the
+matching `MAT`, humidity, or RoomAir/AFN current-value assignment.
+
+The base temperature call precedes the base humidity call, followed by
+stratified and AFN calls in the table order. A later abnormal non-return
+therefore preserves earlier completed helper transactions, the preceding node
+rollback, and every earlier Zone or Space. It blocks later interpolation and
+the following predicted-load work.
+
+With stable timesteps, immutable input arrays, and distinct output arrays, a
+complete retry deterministically overwrites the same four outputs and returned
+scalar. A same-array retry is generally non-idempotent because the first call
+mutates the next call's live inputs. Changed histories, topology, counts, or
+timesteps can likewise change replay. CP216 owns no reset; recovery belongs to
+the Zone/Space record, RoomAir/AFN histories, node state, and surrounding
+predictor/HVAC owners.
+
+#### C++ reach and corpus boundary
+
+`DownInterpolate4HistoryValues_Test` calls the array overload once at
+`ZoneTempPredictorCorrector.unit.cc` line 1790 with
+`0.25 / 0.125 = 2`. Nine post-call assertions inspect the returned scalar,
+all four output elements, and all four unchanged elements of the distinct
+input array. The earlier scalar call and five destination assertions in the
+same fixture belong to CP215.
+
+The two focused `PredictSystemLoads` fixtures make 16 wrapper calls, including
+four shortened calls, but both retain `NumOfZones = 0`; they invoke no
+`predictSystemLoad` or `updateTemperatures` child. There is no direct child,
+test-side `ManageZoneAirUpdates`, or `ManageHVAC` call. Focused indirect CP216
+reach is therefore zero. No C++ test covers ratio three, the fallback,
+tolerance boundaries, invalid or nonfinite inputs, same-array aliasing,
+partial failure, retry, or reset.
+
+Of 57 active full-simulation `ManageSimulation` expressions, one expected EMS
+fatal stops before prediction and one has zero Zones. The remaining 55
+configurations conservatively bound actual adaptive count-change entry at zero
+through 55 because no test observes that runtime gate. Their conditional
+one-pass topology contains 81 Zones plus 24 eligible Spaces, or 105 records
+and 210 base temperature/humidity calls if each crossed the gate once. All 81
+Zones are Mixing, so the three stratified calls and AFN-node calls have zero
+corpus potential. This is a static conditional census, not observed execution;
+downstream timestep and output assertions do not isolate CP216.
+
+#### Rust boundary
+
+The nearest Rust helper,
+`energyplus_down_interpolate_three_history_values`, takes and returns
+three-element arrays by value. For ordinary positive timesteps it reproduces
+source `newVals[0]` through `newVals[2]` with the same branch order, strict
+tolerance, sum-before-division, and sequential additions. It has no fourth
+output, separate `oldVals[0]` scalar return, fourth input shape, or reference
+alias behavior; its third input is never used. Unlike CP216, it returns the
+original array immediately when either timestep is nonpositive.
+
+Rust has two lexical production calls, for Zone temperature and humidity.
+They run in the compatibility-enabled adaptive path only when the local
+integer system-step count is greater than one and differs from the previous
+count, before the Zone-local fine-step loop. A later compat closure copies
+returned element zero into current Zone temperature and humidity. Rust has no
+Space record, stratified RoomAir, AFN node, or source node-rollback
+transaction.
+
+One Rust test calls the helper three times and has three array-equality
+assertions for ratios two, three, and four. Its focused adaptive parent test
+selects count one and never calls the helper. No Rust test establishes the
+missing fourth output and separate scalar return, source topology/cadence,
+tolerance edge, invalid/nonfinite behavior, aliasing, partial failure, retry,
+or reset.
+
+CP216 expands the evidence boundary of the already required
+`source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.down_interpolate_4_history_values`.
+It adds no second routine or heat-balance project-contract item. The algorithm
+remains a `scaffold` with `claim_level = none`; no EnergyPlus source inventory,
+Rust target, code, mapped state, test, support, capability, output
+implementation, comparator, manifest, numerical, performance, or conformance
+promotion is added. Counts remain 32 algorithms and 223 routines, split 58
+`state_mapped` plus 165 `source_mapped`, with 100 required; the heat-balance
+project list remains 69.
+
+CP217 next maps `InverseModelTemperature`, declared at
+`ZoneTempPredictorCorrector.hh` lines 313-325 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4737-4951.
 
 ## Promotion Requirements
 
