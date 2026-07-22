@@ -170,6 +170,7 @@ claim.
 | Zone/Space heat-balance sum assembly | `ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums`, declared at `ZoneTempPredictorCorrector.hh` lines 226-230, implemented at `ZoneTempPredictorCorrector.cc` lines 5133-5281, and called by record-level prediction line 3175 and correction line 3918 | CP220 adds required `routine.zone_space_heat_balance_calc_zone_or_space_sums` as source-mapped only. Internal/non-system/system assembly, parent-Zone AFN/equipment/plenum/PIU context, uncontrolled-Space system allocation, virtual surface dispatch, and failure/retry/reset behavior remain source-only; Rust has no exact routine, Space record, airflow writer, topology, or focused test. |
 | Zone/Space heat-balance surface result family | `ZoneHeatBalanceData::calcSumHAT` at `ZoneTempPredictorCorrector.cc` lines 5283-5298 plus `SpaceHeatBalanceData::calcSumHAT` at lines 5300-5413, both reached through CP220 virtual dispatch line 5276 | CP221 adds required logical `routine.zone_heat_balance_calc_sum_hat` for the Zone fold; CP222 expands the same source-mapped routine to the independent Space override. Stored-Space ordering, Window/reference-air work, four-field results, side effects, and failure remain source-only; Rust has only a direct Zone opaque-Surface fold. |
 | Zone/Space component-load reporting | `CalcZoneComponentLoadSums`, declared at `ZoneTempPredictorCorrector.hh` lines 345-348, implemented at `ZoneTempPredictorCorrector.cc` lines 5414-5677, and called only at the correction wrapper lines 3853 and 3856 | CP223 adds required `routine.calc_zone_component_load_sums` as source-mapped only. The ten-field report reset and assembly, parent-Zone airflow/equipment and whole-Zone Surface topology, repeated Space-report traversal, ADU and imbalance-warning side effects, output ownership, and failure/retry behavior remain source-only; Rust has only separate bounded Zone report helpers. |
+| thermostat presence verification | `VerifyThermostatInZone`, declared at `ZoneTempPredictorCorrector.hh` line 350, implemented at `ZoneTempPredictorCorrector.cc` lines 5679-5700, and called only by `SetUpZoneSizingArrays` line 812 | CP224 adds required `routine.verify_thermostat_in_zone` as source-mapped only. Lazy CP196 acquisition, the shared latch, exact full-arena name lookup, sizing cadence, caller warning, and failure/retry behavior remain source-only; Rust has only normalized typed thermostat edges, an IdealLoads check, and planning metadata. |
 | internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
 | space internal convective gains | `spaceSumAllInternalConvectionGains` | mapped-not-ported |
 
@@ -18054,9 +18055,143 @@ numerical, performance, or conformance promotion. The inventory becomes 32
 algorithms and 229 routines, split 58 `state_mapped` plus 171 `source_mapped`,
 with 106 required; the heat-balance project list becomes 75.
 
-CP224 next maps `VerifyThermostatInZone`, declared at
+### CP224 `VerifyThermostatInZone` source map
+
+CP224 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.verify_thermostat_in_zone`
+and heat-balance project item `verify_thermostat_in_zone` immediately after
+`calc_zone_component_load_sums` and before
+`update_final_surface_heat_balance`. The nonmember routine is declared at
 `ZoneTempPredictorCorrector.hh` line 350 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 5679-5700.
+
+#### Lazy input acquisition and exact membership
+
+The signature receives mutable `EnergyPlusData` plus a constant `ZoneName`
+reference and returns only a boolean. In exact source order it:
+
+1. tests `DataZoneControlsData::GetZoneAirStatsInputFlag`;
+2. when true, calls CP196 `GetZoneAirSetPoints(state)`;
+3. clears that shared flag only after the loader returns normally;
+4. tests `NumTempControlledZones > 0`;
+5. if positive, calls `FindItemInList` over
+   `TempControlledZone` and the `ZoneTempControls::ZoneName` member;
+6. returns true only for a positive one-based match index, otherwise false.
+
+The member-pointer `FindItemInList` overload uses the array's full `isize()`,
+not `NumTempControlledZones`, and compares `ZoneName == stored member`
+directly. The count is therefore only a zero/nonzero gate. CP224 performs no
+case conversion, trimming, Zone-name-map resolution, count/allocation
+consistency check, or identity validation. It does not search comfort
+controls, humidistats, staged controls, or zone-equipment connections.
+Ordinary CP196 thermostat input expands a ZoneList into individual
+`TempControlledZone.ZoneName` records before this predicate runs.
+
+CP224 itself emits no diagnostic and registers no output. Its only direct
+write is the successful lazy-input latch clear; every other mutation, output
+registration, EIO row, or diagnostic reached through the first call belongs
+to CP196.
+
+#### Production caller and cadence
+
+The sole production expression is
+`ZoneEquipmentManager::SetUpZoneSizingArrays` line 812. That routine loops
+`ZoneSizingInput` in stored order. CP224 is reachable only inside a global
+`any_of(ZoneEquipConfig.IsControlled)` branch and only when the current
+sizing record's cooling or heating airflow method is exactly
+`AirflowSizingMethod::FromDDCalc`. `DesignDayWithLimit` is a different enum
+and does not satisfy this comparison. When both heating and cooling match,
+the `||` guard still calls CP224 once.
+
+The caller first tries to match the sizing Zone in `ZoneEquipConfig`, but a
+missing current match only warns; the later CP224 expression still runs while
+some other equipment configuration is controlled. A false predicate produces,
+except during pulse sizing, this caller-owned warning:
+
+```text
+SetUpZoneSizingArrays: Requested Sizing for Zone="{}", Zone has no thermostat (ref: ZoneControl:Thermostat, et al)
+```
+
+That warning does not set `ErrorsFound` and does not stop setup. CP224 cannot
+distinguish a blank/mismatched name, an empty thermostat set, or a name
+present only in another control arena; each normal lookup is false.
+
+`ManageZoneEquipment` enters `SizeZoneEquipment` only during
+`ZoneSizingCalc`. Its default-true `SizeZoneEquipmentOneTimeFlag` calls
+`SetUpZoneSizingArrays` once and clears only after normal return. Normal
+simulation cadence is therefore one CP224 lookup per eligible sizing record
+during first setup, not one per HVAC timestep. Direct callers may invoke the
+predicate independently.
+
+#### Failure, retry, and reset
+
+A normal false lookup is not an error. After the shared input flag is already
+false, CP224 is read-only, stable-state replay returns the same boolean, and
+there is no separate error status, catch, cleanup, cache, allocation, transaction, or
+rollback.
+
+A CP196 fatal or other abnormal non-return occurs before CP224's latch clear
+and before its boolean return. CP196's completed allocation, Zone/control
+mutation, output, EIO, and diagnostic prefix survives while
+`GetZoneAirStatsInputFlag` remains true. In the production chain,
+`SizeZoneEquipmentOneTimeFlag` also remains true because its clear follows
+the setup return. A caught same-state retry can therefore re-enter the
+non-idempotent full input loader. Clean replay requires coordinated reset of
+CP196's owners, `DataZoneControlsData`, and the zone-equipment-manager sizing
+latch.
+
+#### C++ and corpus evidence
+
+There is no direct C++ call or assertion for CP224. The focused
+`AirTerminalSingleDuctMixer_GetInputDOASpecs` fixture creates two direct
+DesignDay sizing Zones and two controlled equipment connections but no
+thermostat. Its direct `SetUpZoneSizingArrays` call reaches CP224 twice: the
+first call acquires empty thermostat input and returns false, and the second
+is lookup-only and false. Assertions inspect only two outdoor-air pointers,
+not the predicate or its warnings. Two other direct setup fixtures have no
+eligible sizing/controlled topology and do not reach CP224.
+
+Among 57 active `ManageSimulation` expressions, 34 completing configurations
+request Zone sizing and contain 48 uncommented, direct-Zone `Sizing:Zone`
+records. Every one uses `DesignDay` for both airflow methods and has exact
+matching `ZoneControl:Thermostat` and
+`ZoneHVAC:EquipmentConnections` names; none targets a ZoneList. Their static
+first-setup census is therefore 48 true CP224 calls. This is configuration
+and one-time topology evidence, not an isolated assertion. No test directly
+covers exact-case mismatch, inconsistent count/arena state, a false-result
+warning, pulse suppression, lazy-load failure, retry, or reset.
+
+#### Rust boundary
+
+A crate-wide search finds no `VerifyThermostatInZone`,
+`verify_thermostat_in_zone`, source-shaped boolean helper, shared
+`GetZoneAirStatsInputFlag`, or executable `Sizing:Zone` setup. Rust eagerly
+parses a bounded direct-Zone `ZoneControl:Thermostat` subset into
+`ZoneThermostat`: only resolved ZoneIds and
+`ThermostatSetpoint:DualSetpoint` controls are retained. Names are trimmed and
+ASCII-uppercased, unlike CP224's exact stored-string comparison.
+
+`ModelGraph` builds ZoneId/thermostat and thermostat/setpoint edges, and the
+execution plan emits `EvaluateZoneThermostat` metadata before `SolveZone`.
+A separate IdealLoads diagnostic uses a normalized ZoneId edge and returns
+an error when no thermostat is found; it is not CP224's boolean or sizing
+caller.
+The adjacent `get_zone_air_set_points_compat` merely invokes an arbitrary
+closure and owns no input latch. Compiler/graph/plan tests prove one typed
+edge and reject unsupported control types, but none implements CP224's lazy
+full CP196 arena, sizing caller, exact-name result, warning ownership, or
+failure/retry lifecycle. Existing IdealLoads thermostat outputs remain
+case-bounded runtime evidence and do not promote this predicate.
+
+CP224 adds no algorithm-level `energyplus_source` entry, Rust target, code,
+mapped state, test, support, capability, output implementation, comparator,
+manifest, numerical, performance, or conformance promotion. The inventory
+becomes 32 algorithms and 230 routines, split 58 `state_mapped` plus 172
+`source_mapped`, with 107 required; the heat-balance project list becomes 76.
+
+CP225 next maps `VerifyControlledZoneForThermostat`, declared at
+`ZoneTempPredictorCorrector.hh` line 352 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5702-5713.
 
 ### `CheckValidSimulationObjects` state contract
 

@@ -2367,12 +2367,77 @@ promotion. The inventory becomes 32 algorithms and 229 routines, split 58
 `state_mapped` plus 171 `source_mapped`, with 106 required; the heat-balance
 project list becomes 75.
 
-CP224 next maps `VerifyThermostatInZone`, declared at
-`ZoneTempPredictorCorrector.hh` line 350 and implemented at
+CP224 adds required `verify_thermostat_in_zone` immediately after
+`calc_zone_component_load_sums` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is the nonmember
+`VerifyThermostatInZone(EnergyPlusData &state, std::string const &ZoneName)`,
+declared at `ZoneTempPredictorCorrector.hh` line 350 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 5679-5700.
 
+The routine first tests the shared `GetZoneAirStatsInputFlag`. When true, it
+calls CP196 `GetZoneAirSetPoints` and clears the flag only after normal return.
+It then uses `NumTempControlledZones > 0` solely as a gate and exact-string
+searches the full allocated `TempControlledZone` arena through the
+`ZoneTempControls::ZoneName` member. A positive one-based first-match index
+returns true; no match, a nonpositive count, or an empty arena returns false.
+The lookup does not normalize case or whitespace, resolve an actual Zone,
+validate count-versus-allocation consistency, or inspect comfort, humidity, or
+equipment controls.
+
+The sole production call is `SetUpZoneSizingArrays` line 812. Once any
+`ZoneEquipConfig` is controlled, each `ZoneSizingInput` whose cooling or
+heating airflow method is exactly `FromDDCalc` calls CP224 once, even when both
+methods match and even when that sizing Zone was not found in the controlled
+equipment list. A false result makes the caller emit the non-pulse
+missing-thermostat warning but does not set its `ErrorsFound` flag. Normal
+`SizeZoneEquipmentOneTimeFlag` ownership limits this to first zone-sizing
+setup rather than every HVAC iteration.
+
+CP224 owns no diagnostic, output, allocation, cache, or mutation after input
+acquisition. A CP196 fatal prevents the latch clear and boolean return, retains
+the parser's allocated, output, and diagnostic prefix, and also prevents the
+production sizing one-time flag from clearing. Same-state retry can therefore
+re-enter the non-idempotent full input loader. After successful acquisition,
+stable repeated CP224 lookup is read-only and deterministic. Clean replay
+requires the CP196 owners plus both Zone-controls and Zone-equipment-manager
+latches to be reset.
+
+No C++ test calls CP224 directly. The
+`AirTerminalSingleDuctMixer_GetInputDOASpecs` fixture reaches two false
+lookups for two DesignDay sizing Zones with controlled equipment and no
+thermostat, but asserts only outdoor-air pointer results. Of 57 active
+full-simulation expressions, 34 completing configurations contain 48 direct
+`Sizing:Zone` records. Every record uses DesignDay for both airflow methods
+and has matching direct thermostat and equipment-connection names, yielding a
+static first-setup census of 48 true calls. No assertion isolates CP224's
+boolean, exact-name mismatch, lazy-latch timing, missing-thermostat warning,
+failure, retry, or reset behavior.
+
+Rust has no `VerifyThermostatInZone`, `verify_thermostat_in_zone`, equivalent
+runtime predicate, or executable `Sizing:Zone` setup. Its compiler eagerly
+creates only a bounded direct-Zone DualSetpoint `ZoneThermostat` subset,
+normalizes names, builds ZoneId/thermostat graph edges, and emits
+`EvaluateZoneThermostat` planning metadata. A separate
+IdealLoads diagnostic consumes a normalized ZoneId edge and errors when the
+thermostat is missing rather than returning CP224's boolean. The adjacent
+`get_zone_air_set_points_compat` is an identity closure without the shared
+input latch. Those typed records can support a project-specific membership
+query but do not implement CP224's full CP196 acquisition, exact-string arena
+lookup, caller warning, or failure lifecycle.
+
+CP224 remains required `source_mapped` and adds no algorithm-level
+`energyplus_source` entry, Rust target, code, mapped state, test, support,
+capability, output implementation, comparator, manifest, numerical,
+performance, or conformance promotion. The inventory becomes 32 algorithms
+and 230 routines, split 58 `state_mapped` plus 172 `source_mapped`, with 107
+required; the heat-balance project list becomes 76.
+
+CP225 next maps `VerifyControlledZoneForThermostat`, declared at
+`ZoneTempPredictorCorrector.hh` line 352 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5702-5713.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`calc_zone_component_load_sums`, preserving the
+`verify_thermostat_in_zone`, preserving the
 completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
