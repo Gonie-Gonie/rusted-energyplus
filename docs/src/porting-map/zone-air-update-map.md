@@ -39,6 +39,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | history down-interpolation overload family | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::DownInterpolate4HistoryValues` scalar-output and array-return overloads | three-output thermal Zone history helper only | CP215 maps the contaminant-owned five-reference overload; CP216 expands the same required source-mapped routine to the thermal four-slot array/returned-current overload, with no exact Rust width, topology, invalid-input, alias, or lifecycle parity |
 | hybrid inverse temperature inference | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::InverseModelTemperature` | no typed `HybridModel:Zone` object or inverse-model state/runtime path | CP217 required source-mapped measured-temperature override, infiltration/internal-mass/people inverse branches, and unconditional measured-history shift; no Rust parser, state, output, test, or execution parity |
 | hybrid thermal-mass multiplier postprocessing | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::processInverseModelMultpHM` | no inferred multiplier, aggregate, or per-Zone recurring-warning state | CP218 required source-mapped lower clamp, uncapped over-limit diagnostics, persistent sum/count/average update, and caller transaction; no Rust parser, state, output, diagnostic, test, or execution parity |
+| hybrid humidity inverse inference | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::InverseModelHumidity` | no typed `HybridModel:Zone`, measured humidity history, inverse state, or exact outputs | CP219 required source-mapped unconditional sampling/history shift plus date/history-gated infiltration and People inversion; no Rust parser, state, output, test, or execution parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -4532,9 +4533,287 @@ numerical, performance, or conformance promotion. The inventory becomes 32
 algorithms and 225 routines, split 58 `state_mapped` plus 167 `source_mapped`,
 with 102 required; the heat-balance project list becomes 71.
 
-CP219 next maps `InverseModelHumidity`, declared at
+### CP219 `InverseModelHumidity` source map
+
+CP219 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.inverse_model_humidity`
+immediately after `routine.process_inverse_model_multp_hm`. The heat-balance
+project contract adds `inverse_model_humidity` after
+`process_inverse_model_multp_hm` and before
+`update_final_surface_heat_balance`. `InverseModelHumidity` is declared at
 `ZoneTempPredictorCorrector.hh` lines 335-343 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 4993-5131.
+
+The routine accepts state and Zone identity plus latent gain, latent gain
+excluding People, Zone mass flow, Zone moisture mass flow, vaporization
+enthalpy, and moist-air density by value. It snapshots
+`TimeStepSysSec`, then aliases the selected Zone, HybridModel Zone, and Zone
+heat-balance record. It owns no Space identity or return status.
+
+#### Entry, date, and history transaction
+
+Every call unconditionally dereferences `measuredHumRatSched`, samples it once,
+and writes `ZoneMeasuredHumidityRatio` before testing the date. The active
+window is inclusive at both
+`DayOfYear >= HybridStartDayOfYear` and
+`DayOfYear <= HybridEndDayOfYear`. Inside that window CP219 first overwrites
+the record's `airHumRat`, not `airHumRatTemp`, with the measured value. It then
+tests two independent infiltration and People branches in source order; a
+malformed direct state with both flags true runs both.
+
+Each inverse calculation additionally requires the global
+`state.dataHVACGlobal->UseZoneTimeStepHistory`. CP219 does not receive or read
+the enclosing `correctAirTemp` history argument directly. After the date
+block, every normally returning call performs this unconditional ordered
+shift:
+
+```text
+PreviousMeasuredHumRat3 = PreviousMeasuredHumRat2
+PreviousMeasuredHumRat2 = PreviousMeasuredHumRat1
+PreviousMeasuredHumRat1 = ZoneMeasuredHumidityRatio
+```
+
+Consequently an outside-window call still samples the measured schedule and
+advances all three histories, but does not overwrite `airHumRat` or inference
+outputs. An active-window call with global system history selected still
+performs the temporary measured write and history shift while skipping both
+inverse calculations. The required measured schedule has no nullable fallback.
+
+#### Humidity-derived infiltration
+
+The infiltration branch requires
+`InfiltrationCalc_H && UseZoneTimeStepHistory`. With system-supply parameters
+enabled, CP219 unconditionally samples mass-flow then humidity-ratio schedules,
+stores both raw values, and includes their product. Using `Wo = OutHumRat`, its
+two coefficient paths are:
+
+```text
+with measured supply:
+AA = Ms + VAMFL + EAMFL + CTMFL + SumHmARa
+     + MixingMassFlowZone + MDotOA
+BB = Ms*Ws + LatentGain/H2OHtOfVap
+     + (VAMFL + CTMFL)*Wo + EAMFLxHumRat
+     + SumHmARaW + MixingMassFlowXHumRat + MDotOA*Wo
+
+without measured supply:
+AA = VAMFL + EAMFL + CTMFL + SumHmARa
+     + MixingMassFlowZone + MDotOA
+BB = LatentGain/H2OHtOfVap
+     + (VAMFL + CTMFL)*Wo + EAMFLxHumRat
+     + SumHmARaW + MixingMassFlowXHumRat + MDotOA*Wo
+```
+
+Both paths deliberately omit `OAMFL` and ignore the passed
+`ZoneMassFlowRate` and `MoistureMassFlowRate`. The storage and history terms
+are:
+
+```text
+CC = RhoAir * Volume * ZoneVolCapMultpMoist / TimeStepSysSec
+DD = 3*PreviousMeasuredHumRat1
+     - 1.5*PreviousMeasuredHumRat2
+     + (1/3)*PreviousMeasuredHumRat3
+delta_HR = ZoneMeasuredHumidityRatio - OutHumRat
+```
+
+`RhoAir` is the caller's density at current Zone temperature and committed
+humidity. CP219 separately recomputes outdoor `AirDensity` from outdoor
+barometric pressure, the Zone outdoor dry-bulb temperature, and outdoor
+humidity ratio. Raw mass flow remains zero unless the strict
+`abs(delta_HR) > 1.0e-7` test passes. When it does:
+
+```text
+M_inf =
+    (CC*DD + BB - ((11/6)*CC + AA)*ZoneMeasuredHumidityRatio)
+    / delta_HR
+```
+
+The exact `1.0e-7` boundary therefore produces zero. CP219 converts the raw
+mass flow to air changes per hour, applies the literal nested clamp
+`max(0, min(10, ACH))`, reconstructs mass flow from the clamped ACH, outdoor
+density, and Zone volume, then writes `MCPIHM` followed by
+`InfilOAAirChangeRateHM`. Despite its name, `MCPIHM` receives kg/s mass flow,
+not a heat-capacity product. The local `delta_HR` never updates the existing
+Zone `delta_HumRat` field.
+
+#### Humidity-derived People count
+
+The People branch requires
+`PeopleCountCalc_H && UseZoneTimeStepHistory`. It nullable-samples activity,
+sensible-fraction, and radiant-fraction schedules in that order, storing zero
+for an absent schedule. The stored sensible fraction is copied locally and
+defaults to 0.6 only when it is less than or equal to zero. The radiant
+fraction is stored but never consumed.
+
+The local `ActivityLevel` was initialized to zero at routine entry and is
+never assigned from either the sampled activity or
+`ZonePeopleActivityLevel`. Its `<= 0` fallback therefore always chooses
+130 W/person in ordinary execution, even when the raw activity schedule is
+positive or nonfinite. This source anomaly is part of the CP219 boundary.
+
+With measured supply enabled, the People branch again unconditionally samples
+and stores supply mass flow then humidity ratio, and ignores both passed flow
+arguments:
+
+```text
+AA = Ms + OAMFL + VAMFL + EAMFL + CTMFL + SumHmARa
+     + MixingMassFlowZone + MDotOA
+BB = Ms*Ws + LatentGainExceptPeople/H2OHtOfVap
+     + (OAMFL + VAMFL + CTMFL)*Wo + EAMFLxHumRat
+     + SumHmARaW + MixingMassFlowXHumRat + MDotOA*Wo
+```
+
+Without measured supply, it instead consumes both passed flows:
+
+```text
+AA = ZoneMassFlowRate
+     + OAMFL + VAMFL + EAMFL + CTMFL + SumHmARa
+     + MixingMassFlowZone + MDotOA
+BB = LatentGainExceptPeople/H2OHtOfVap
+     + (OAMFL + VAMFL + CTMFL)*Wo + EAMFLxHumRat
+     + MoistureMassFlowRate + SumHmARaW
+     + MixingMassFlowXHumRat + MDotOA*Wo
+```
+
+Using the same `CC` and `DD`, CP219 computes:
+
+```text
+LatentGainPeople =
+    (((11/6)*CC + AA)*ZoneMeasuredHumidityRatio - BB - CC*DD)
+    * H2OHtOfVap
+
+denominator = 130 * (1 - FractionSensible)
+UpperBound = max(0, LatentGain / denominator)
+NumPeople =
+    min(UpperBound, max(0, LatentGainPeople / denominator))
+```
+
+It rounds half-up to two decimal places with
+`floor(NumPeople*100 + 0.5)/100`, then changes only values strictly below
+0.05 to zero before writing `NumOccHM`. Exactly 0.05 survives. There is no
+upper bound on the sampled sensible fraction and no denominator or finite
+guard.
+
+#### Caller ownership and cadence
+
+The sole production call expression is line 4589 inside
+`ZoneSpaceHeatBalanceData::correctHumRat`. Its parent gate requires exact
+`spaceNum == 0`, global HybridModel enablement, at least one humidity
+infiltration or People flag, and both non-warmup and non-sizing state. The
+caller constructs total latent gain from record latent gain plus radiant-system
+and pool terms. It constructs `LatentGainExceptPeople` from the analogous
+record field only when People inference is enabled. Normal input validation
+makes the humidity infiltration and People unknowns exclusive, but CP219
+itself does not enforce that invariant.
+
+The call occurs after the forward humidity solve, negative and saturation
+clamps, and optional RoomAir AirflowNetwork control-node override. CP219's
+active-window measured write targets only `airHumRat`; the following node
+humidity, node enthalpy, and latent-sizing work all use the unchanged
+`airHumRatTemp`. After `correctHumRat` returns, `correctAirTemp` line 4130
+unconditionally replaces `airHumRat` with `airHumRatTemp` and computes RH.
+Thus the measured write is normally transient in production, although it can
+remain visible when an abnormal non-return prevents the outer overwrite. The
+inverse equations and measured history still use
+`ZoneMeasuredHumidityRatio`.
+
+Normal HVAC begins with Zone-timestep history, so an eligible initial
+correction can infer one output and shift history. If adaptive shortening is
+selected, each fine correction re-enters CP219 while global history is false:
+it resamples the schedule, repeats the active-window transient write, skips the
+two calculations, and shifts measured history again. Demand-manager
+resimulation has no correction step. Positive Spaces never enter CP219.
+
+The HybridModel input transaction, not CP219, registers Zone-timestep Average
+outputs named `Zone Infiltration Hybrid Model Air Change Rate`,
+`Zone Infiltration Hybrid Model Mass Flow Rate`, and
+`Zone Hybrid Model People Count`. CP219 registers no output itself.
+
+#### Validation, failure, retry, and reset
+
+CP219 has no Zone assertion, upper-bound or allocation check, date validation,
+schedule-pointer check, finite check, direct diagnostic, status, catch,
+cleanup, completion marker, transaction, rollback, or recovery path. It does
+not validate timestep seconds, volume, moisture capacitance multiplier,
+vaporization enthalpy, either density, pressure, humidity, history, sensible
+fraction, or People denominator. The outdoor-density psychrometric dependency
+can diagnose or fail, but CP219 owns no translation.
+
+An abnormal non-return can retain this ordered prefix: sampled measured
+humidity; active `airHumRat`; infiltration supply fields; infiltration mass
+flow and ACH; People raw fields; People supply fields; People count; and only
+then the three history writes. With both malformed mode flags, a People-path
+failure can therefore preserve completed infiltration outputs. A same-state replay after a normal return resamples schedules, consumes
+histories already shifted by the completed call, overwrites outputs again, and
+shifts histories again, so it is generally non-idempotent. After an abnormal
+non-return, retry observes only the ordered prefix that actually committed,
+including any partial final-history writes.
+
+The three measured histories are allocated as zero during one-time setup and
+reset to zero at begin environment. CP219 does not reset its measured, supply,
+raw People, infiltration, or People-count fields on entry, outside the date
+window, with system history selected, or at begin environment. Skipped
+inference outputs can therefore remain stale until another owner overwrites
+them.
+
+#### C++ test and corpus boundary
+
+No C++ test directly calls `InverseModelHumidity`. Four calls to
+`correctHumRat` inside `HybridModel_correctZoneAirTempsTest` reach it
+indirectly:
+
+| Case | Supply mode | Assertion |
+|---|---|---|
+| humidity infiltration, lines 242-269 | excluded | ACH approximately 0.5 |
+| humidity People, lines 299-327 | excluded | People approximately 4 |
+| humidity infiltration, lines 362-392 | included | ACH approximately 0.5 |
+| humidity People, lines 432-467 | included | People approximately 4 |
+
+All four use Day 1 inside the inclusive 1-2 window, exact Zone identity, and
+Zone history. The final case supplies activity 120 and radiant fraction 0.3,
+but its loose downstream People assertion does not isolate the unused activity
+or radiant behavior. No assertion covers the measured sample, raw fields,
+history shift, transient/final humidity distinction, mass-flow output, exact
+thresholds, clamp edges, rounding, stale output, false-history or
+outside-window paths, combined flags, invalid/nonfinite state, failure, retry,
+reset, or output registration.
+
+All 57 active full-simulation `ManageSimulation` expressions configure no
+`HybridModel:Zone` and no manual HybridModel flag. Actual CP219 reach and
+hybrid output-oracle count are therefore zero.
+
+#### Rust boundary
+
+A crate-wide search finds no `InverseModelHumidity`,
+`ZoneMeasuredHumidityRatio`, measured-humidity history, humidity inverse flags,
+`MCPIHM`, `InfilOAAirChangeRateHM`, `NumOccHM`, or exact HybridModel humidity
+output identity. `HybridModel:Zone` is absent from the typed compiler list,
+becomes `RawOnly`, has no partial capability rule, and run-blocks through the
+generic `UnsupportedObject` boundary.
+
+Rust `ZoneHeatBalanceState` owns forward current/average humidity and two
+three-slot solved histories, not a measured schedule binding or measured
+history. Its main humidity correction reconstructs forward humidity, applies
+project-specific clamps/fallbacks, and shifts no measured state. The separate
+no-outdoor-air ThirdOrder IdealLoads moisture helper is also a forward,
+single-Zone purchased-air subset, not inverse inference.
+
+Rust has no typed infiltration record. Typed `People` retains design count and
+an occupancy schedule only; it has no activity, sensible-fraction,
+radiant-fraction, or inferred-count state. The nearest ordinary
+`Zone Mean Air Humidity Ratio` report exposes forward state, while all three
+HybridModel output names have no registry, case, or test match. Existing
+forward humidity, IdealLoads, People, and generic diagnostic tests establish
+none of CP219.
+
+CP219 adds no EnergyPlus source inventory, Rust target, code, mapped state,
+test, support, capability, output implementation, comparator, manifest,
+numerical, performance, or conformance promotion. The inventory becomes 32
+algorithms and 226 routines, split 58 `state_mapped` plus 168 `source_mapped`,
+with 103 required; the heat-balance project list becomes 72.
+
+CP220 next maps `ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums`, declared at
+`ZoneTempPredictorCorrector.hh` lines 226-230 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5133-5281.
 
 ## Promotion Requirements
 

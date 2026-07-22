@@ -2046,12 +2046,74 @@ support, output, numerical, or conformance claim. The inventory becomes 32
 algorithms and 225 routines, split 58 `state_mapped` plus 167 `source_mapped`,
 with 102 required; the heat-balance project list becomes 71.
 
-CP219 next maps `InverseModelHumidity`, declared at
-`ZoneTempPredictorCorrector.hh` lines 335-343 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 4993-5131.
+CP219 adds required `inverse_model_humidity` immediately after
+`process_inverse_model_multp_hm` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is
+`InverseModelHumidity`, declared at `ZoneTempPredictorCorrector.hh` lines
+335-343 and implemented at `ZoneTempPredictorCorrector.cc` lines 4993-5131.
+
+Every call unconditionally dereferences and samples the measured-humidity
+schedule before the inclusive hybrid date-window test. An active window writes
+the measurement to `airHumRat`, then independently runs infiltration followed
+by People inverse branches only when global Zone-timestep history is selected.
+Every normal return shifts the three measured-humidity histories even outside
+the date window or when system history skips both calculations.
+
+The infiltration branch optionally substitutes unguarded measured supply mass
+flow and humidity. Both paths omit `OAMFL` and ignore the caller's Zone and
+moisture flow inputs. It solves only for strict measured/outdoor humidity
+difference above `1.0e-7`, clamps ACH to `[0, 10]`, reconstructs kg/s mass
+flow, and writes mass flow before ACH.
+
+The People branch stores nullable activity, sensible, and radiant schedule
+values. Sensible fraction defaults to 0.6 only when nonpositive and radiant
+fraction is unused. A source anomaly leaves local activity initialized to zero
+and never assigns the sampled value, so calculation always defaults to
+130 W/person. The result is bounded by total latent gain, rounded half-up to
+two decimals, then zeroed only when strictly below 0.05.
+
+The sole production call is the exact-Zone HybridModel gate inside
+`ZoneSpaceHeatBalanceData::correctHumRat`, after forward humidity solving,
+clamps, and RoomAir override but before node and latent-sizing work. CP219
+changes `airHumRat`, not `airHumRatTemp`; the following node and sizing work
+uses the forward temporary, and `correctAirTemp` overwrites the measured record
+write with that temporary after return. Adaptive fine corrections still
+resample, transiently overwrite, and shift histories while global system
+history skips inference. Demand resimulation adds no correction call.
+
+CP219 has no local pointer, date, bounds, finite, denominator, psychrometric,
+or lifecycle validation and no direct diagnostic, status, transaction,
+rollback, or reset. An abnormal non-return can retain sampled, transient, supply, or inferred
+prefixes while blocking all or part of the final history shift. A same-state
+replay after a normal return consumes already shifted histories and is
+non-idempotent; retry after an abnormal non-return observes only the ordered
+prefix that actually committed. Begin-environment setup resets
+only the three histories; skipped inference outputs can remain stale.
+
+Four indirect C++ calls assert only two approximately 0.5 ACH results and two
+approximately 4 People results. There is no direct CP219 test, and no assertion
+isolates the activity-130 anomaly, history, transient overwrite, threshold,
+rounding, failure, retry, reset, or output registration. All 57 active full
+simulations configure no HybridModel, so actual corpus reach and hybrid output
+oracles are zero.
+
+Rust has no typed `HybridModel:Zone`, measured-humidity schedule/history,
+humidity inverse state, typed infiltration, inferred People state, exact
+HybridModel output, runtime path, capability, or focused test. Its forward
+Zone humidity histories and no-OA IdealLoads helper do not implement this
+inverse transaction; the raw HybridModel object remains run-blocking.
+
+CP219 remains required `source_mapped` and adds no Rust target, mapped state,
+support, output, numerical, or conformance claim. The inventory becomes 32
+algorithms and 226 routines, split 58 `state_mapped` plus 168 `source_mapped`,
+with 103 required; the heat-balance project list becomes 72.
+
+CP220 next maps `ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums`, declared at
+`ZoneTempPredictorCorrector.hh` lines 226-230 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5133-5281.
 
 The inventory now also includes `update_final_surface_heat_balance` after
-`process_inverse_model_multp_hm`, preserving the
+`inverse_model_humidity`, preserving the
 completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
