@@ -31,6 +31,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | Zone/Space record-level air correction | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::correctAirTemp` | surface-driven Zone-only coefficient, ThirdOrder, and Analytical helpers plus a separate history-only humidity pass | CP207 required source-mapped history/capacitance, controlled/uncontrolled solve, RoomAir/node/demand/hybrid/humidity order, and returned delta; no exact Rust Zone/Space lifecycle or numerical parity |
 | Zone/Space Zone-timestep history dispatch | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::PushZoneTimestepHistories` | `push_zone_timestep_histories_compat` identity closure around an earlier three-slot Zone-only shift and predictor work | CP208 required source-mapped Zone-first and aggregate-flag Space dispatch; no exact Rust timing, topology, or record-child parity |
 | Zone/Space record-level Zone-timestep history commit | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::pushZoneTimestepHistory` | adjacent inline three-slot Zone-only temperature/humidity shift | CP209 required source-mapped four-slot record, psychrometric, non-ThirdOrder, and Zone-only RoomAir/AFN transaction; no exact Rust record or lifecycle parity |
+| Zone/Space system-timestep history dispatch | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::PushSystemTimestepHistories` | per-Zone named compat synchronization and adaptive local-history loop | CP210 required source-mapped strict fine-step global Zone-first/Space dispatch; no exact Rust gate, cadence, topology, or record-child parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -2760,9 +2761,176 @@ numerical, performance, or conformance promotion is added. The inventory
 becomes 32 algorithms and 217 routines, split 58 `state_mapped` plus 159
 `source_mapped`, with 94 required; the heat-balance project list becomes 63.
 
-CP210 next maps `PushSystemTimestepHistories(EnergyPlusData &state)`, declared
-at `ZoneTempPredictorCorrector.hh` line 295 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 4277-4295.
+### CP210 `PushSystemTimestepHistories` source map
+
+`PushSystemTimestepHistories(EnergyPlusData &state)` is declared at
+`ZoneTempPredictorCorrector.hh` line 295 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4277-4295. Its only built-in direct call
+is the CP195 `ManageZoneAirUpdates` selector arm at lines 238-240. The
+dispatcher first performs optional setpoint-input acquisition and unconditional
+setpoint initialization. This arm ignores `ShortenTimeStepSys`,
+`UseZoneTimeStepHistory`, and `PriorTimeStep` and leaves caller-owned
+`ZoneTempChange` unchanged.
+
+#### Production placement and gate
+
+The sole built-in selector request is `HVACManager::ManageHVAC` lines 388-393.
+At entry the parent resets `TimeStepSys = TimeStepZone`,
+`UseZoneTimeStepHistory = true`, and `NumOfSysTimeSteps = 1`. After an initial
+Predict/HVAC/Correct pass, it selects adaptive downstepping only when
+`ZoneTempChange > MaxZoneTempDiff && !KickOffSimulation`. Even then, the
+per-iteration strict `TimeStepSys < TimeStepZone` comparison is the actual
+CP210 gate.
+
+For every entered fine-system-step branch, the parent orders:
+
+1. fine-step Predict and HVAC simulation;
+2. `ShortenTimeStepSys = false`;
+3. thermal Correct, then optional contaminant Correct;
+4. CP210 thermal system-history dispatch;
+5. the separate contaminant system-history dispatch;
+6. `PreviousTimeStep = TimeStepSys`;
+7. current-step Zone and all-Space average accumulation.
+
+Thus CP210 runs once after each selected global fine-step correction and before
+the current result contributes to `ZTAV` and `airHumRatAvg`. Equal
+system/Zone-step and kickoff paths do not request it. At every built-in request,
+`ShortenTimeStepSys` is already false and the adaptive branch left
+`UseZoneTimeStepHistory` false, but CP210 does not inspect either value.
+
+A `stopSimulation` value present at loop entry breaks before the request. If it
+becomes true during a fine-step body, there is no second check before CP210, so
+the current push still runs if preceding work returns. An external HVAC
+callback bypasses this built-in request. The following contaminant selector is
+a different namespace routine, not a second CP210 call.
+
+#### Zone and Space dispatch
+
+CP210 aliases `state.dataZoneTempPredictorCorrector` and visits
+`zoneNum = 1..NumOfZones` in ascending order. For every reached Zone it:
+
+1. indexes the Zone heat-balance record and calls the following CP211
+   `pushSystemTimestepHistory` child with default zero Space identity;
+2. reads the current aggregate `doSpaceHeatBalance` flag;
+3. when true, visits that Zone's stored `spaceIndexes` in container order;
+4. indexes each Space heat-balance record and calls CP211 with the parent Zone
+   and stored Space identities before advancing to the next Space or Zone.
+
+It does not independently scan all Spaces, sort, deduplicate, or validate
+membership, counts, bounds, arena shape, allocation, or identity consistency.
+Missing membership is skipped; duplicate or cross-Zone membership is replayed
+as stored. Target indexing precedes the child's positive-Zone assertion, and a
+nonpositive `NumOfZones` is a silent no-op. The aggregate flag is reread after
+each Zone child; CP210 does not inspect its sizing/simulation constituent flags.
+
+The wrapper directly reads only traversal state and selected identities. It
+writes no record, history, or numerical state. CP211 owns every
+`DSXMAT`/`DSWPrevZoneTS` shift, current-value insertion, optional RoomAir/AFN
+downstep history, and non-ThirdOrder scalar mutation and remains uncredited
+here.
+
+#### Failure, retry, and reset
+
+CP210 is void and exposes no completion count. It has no local assertion,
+diagnostic, status, latch, catch, cleanup, transaction, or rollback. A Zone
+child abnormal non-return retains earlier Zones and the failing child's prefix
+while suppressing that Zone's Spaces and all later Zones. A Space child
+abnormal non-return retains its Zone and earlier Spaces while suppressing later
+traversal.
+
+A CP210 abnormal non-return also prevents the parent from performing the
+following contaminant push, `PreviousTimeStep` commit, and current-step average
+accumulation. If CP210 completes but the contaminant push does not return, its
+history effects remain while the time and average commits stay pending.
+
+Same-state retry starts again at Zone one and destructively advances every
+already completed system history. The later Zone-timestep revert routine does
+not restore CP211 downstepped histories. Clean replay therefore requires
+coordinated Zone/Space record, RoomAir/AFN, topology, aggregate-flag,
+HVAC-clock, dispatcher, dependency, and diagnostic restoration.
+
+#### C++ test and oracle boundary
+
+The C++ unit tree contains zero direct CP210 calls, zero direct CP211 calls,
+zero uses of the PushSystem selector, and zero test-side `ManageZoneAirUpdates`
+or `ManageHVAC` calls. No assertion names a CP211 destination.
+
+Of 57 active `ManageSimulation` call expressions, one expected EMS fatal stops
+before CP210 and one has zero Zones. The other 55 configurations provide only a
+static potential census of 81 Zone identities and 24 eligible Spaces across
+eight configurations. Actual CP210 entry is conservatively bounded at zero to
+55 configurations because the numerical adaptive decision and exact timestep
+comparison are not observed. No test asserts `NumOfSysTimeSteps`, the strict
+comparison, `UseZoneTimeStepHistory = false`, or a push count.
+
+If one pass were selected for every potential record, the corpus split would be
+95 ThirdOrder and ten Analytical identities, with no Euler. All 81 Zones use
+Mixing RoomAir and positive Space identities skip shared RoomAir, so special
+RoomAir/AFN child branches have zero potential in this corpus. These are
+conditional topology counts, not execution evidence.
+
+The tracked one-Zone family has seven unique inputs, no `ConvergenceLimits`,
+Space, RoomAir, AFN, or explicit solution algorithm, and only hourly
+downstream Zone/surface outputs. Six inputs use four Zone timesteps per hour;
+the varied fixture uses six, but remains planned-not-claimed with an empty gate
+script. Changing the Zone timestep does not force or prove the adaptive system
+gate. IdealLoads evidence explicitly excludes adaptive system-timestep
+behavior. No test or oracle covers a partial prefix, retry, or reset.
+
+#### Rust boundary
+
+Rust defines the PushSystem selector name plus one source-order wrapper and one
+compat wrapper. The source-order wrapper has no production call outside the
+compat alias. Production has exactly three lexical compat sites: adaptive count
+one, adaptive count greater than one, and adaptive feature disabled. The
+feature-disabled site is exclusive with the adaptive helper. With adaptive
+correction enabled, each Zone independently selects the count-one or
+count-greater-than-one site, so both adaptive sites can execute in one
+multi-Zone timestep; exactly one site executes per Zone. Production never calls
+`manage_zone_air_updates_compat` with the PushSystem selector, and that
+dispatcher ignores its selector argument.
+
+The count-one and feature-disabled paths rebuild three system-history slots as
+`[current, zone_history[0], zone_history[1]]` and set the stored count to one.
+They do not shift prior system histories, and the feature-disabled path runs
+even for a full Zone step where source CP210 is absent.
+
+For an adaptive count greater than one, Rust chooses a count independently for
+each Zone, performs every local correction and three-slot local shift for that
+Zone, then invokes the named wrapper once to commit the final histories,
+averages, count, and report fields. Source instead selects one global count and
+runs CP210 after every global fine step, completing all eligible Zones and
+Spaces before the next fine step. The named Rust boundary therefore has
+different gating, cadence, cross-Zone order, and ownership.
+
+Rust heat-balance state has no Space record arena, Zone membership traversal,
+aggregate flag, fourth system-history slot, singular child boundary,
+`airHumRatTemp`, `TM2/TMX/WM2/WMX`, RoomAir stratification, or AFN node
+histories. The source-order wrapper has one direct test that checks only its
+call label and order; the compat wrapper and PushSystem selector dispatch have
+zero direct tests. One focused count-one test reaches the compat site indirectly
+through the adaptive helper and proves Rust's nonuniform three-slot rebuild and
+average writes, not CP210 global traversal, source child shifts, or adaptive
+cadence; there is no explicit adaptive-count-greater-than-one commit test.
+
+CP210 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.push_system_timestep_histories`
+immediately after
+`routine.zone_space_heat_balance_push_zone_timestep_history`. The heat-balance
+project contract adds `push_system_timestep_histories` after
+`zone_space_heat_balance_push_zone_timestep_history` and before
+`update_final_surface_heat_balance`. The algorithm remains a `scaffold` with
+`claim_level = none`. No EnergyPlus source inventory, Rust target, code, mapped
+state, test, support, capability, output implementation, comparator, manifest,
+numerical, performance, or conformance promotion is added. The inventory
+becomes 32 algorithms and 218 routines, split 58 `state_mapped` plus 160
+`source_mapped`, with 95 required; the heat-balance project list becomes 64.
+
+CP211 next maps
+`ZoneSpaceHeatBalanceData::pushSystemTimestepHistory(EnergyPlusData &state,
+int zoneNum, int spaceNum = 0)`, declared at
+`ZoneTempPredictorCorrector.hh` line 247 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4297-4370.
 
 ## Promotion Requirements
 

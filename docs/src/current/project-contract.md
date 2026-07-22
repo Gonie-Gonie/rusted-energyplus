@@ -1577,13 +1577,67 @@ support, output, numerical, or conformance claim. The inventory becomes 32
 algorithms and 217 routines, split 58 `state_mapped` plus 159
 `source_mapped`, with 94 required; the heat-balance project list becomes 63.
 
-CP210 next maps `PushSystemTimestepHistories(EnergyPlusData &state)`, declared
-at `ZoneTempPredictorCorrector.hh` line 295 and implemented at
+The following required predictor/corrector definition entry is
+`push_system_timestep_histories`, after
+`zone_space_heat_balance_push_zone_timestep_history` and before
+`update_final_surface_heat_balance`. Its source boundary is
+`PushSystemTimestepHistories(EnergyPlusData &state)`, declared at
+`ZoneTempPredictorCorrector.hh` line 295 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 4277-4295.
 
+Its only direct source call is the CP195 dispatcher arm, and its only built-in
+request is `HVACManager` lines 388-393. The request occurs after each selected
+global fine-step Predict/HVAC/Correct sequence under the strict
+`TimeStepSys < TimeStepZone` gate and before contaminant history,
+`PreviousTimeStep`, and current-step average commits. Equal-step and kickoff
+paths skip it. The dispatcher prefix still runs, but CP210 ignores its
+shortening, history-selection, and prior-step arguments and preserves
+`ZoneTempChange`.
+
+CP210 visits Zones in ascending order, calls the Zone record child first, then
+visits stored Spaces in container order only under the current aggregate
+`doSpaceHeatBalance` flag. It has no independent all-Space scan, sorting,
+deduplication, membership/count/arena validation, or direct state write. CP211
+owns all downstepped record and RoomAir/AFN history mutations.
+
+An abnormal child non-return preserves completed and failing prefixes, blocks
+later traversal and the parent's following contaminant/time/average work, and
+makes same-state retry destructive. Zone-timestep revert does not restore the
+downstepped histories, so clean replay requires coordinated record,
+RoomAir/AFN, topology, aggregate-flag, HVAC-clock, dispatcher, and dependency
+reset.
+
+No C++ test directly calls CP210 or CP211, and no assertion or tracked oracle
+proves the numerical adaptive gate. Fifty-five completing nonzero-Zone
+configurations provide only potential topology of 81 Zones and 24 eligible
+Spaces. The tracked varied-timestep fixture changes the Zone timestep but is
+planned-not-claimed and does not prove a system-step push.
+
+Rust exposes the selector and generic wrappers but never dispatches the
+PushSystem selector in production. Production has three lexical compat sites.
+The feature-disabled site is exclusive with adaptive correction; each enabled
+Zone independently takes count one or greater than one, so both adaptive sites
+may execute in a multi-Zone timestep, but exactly one site executes per Zone.
+Each site either rebuilds three slots at a full Zone step or commits only after
+all locally chosen adaptive substeps. Rust has no source global cadence, Space
+arena, fourth slot, singular child, or CP211 RoomAir/AFN and auxiliary state.
+The source-order wrapper has one direct label/order test; the compat wrapper and
+selector dispatch have none. One indirect count-one three-slot synchronization
+test does not establish CP210 parity.
+
+CP210 remains required `source_mapped` and adds no Rust target, mapped state,
+support, output, numerical, or conformance claim. The inventory becomes 32
+algorithms and 218 routines, split 58 `state_mapped` plus 160
+`source_mapped`, with 95 required; the heat-balance project list becomes 64.
+
+CP211 next maps
+`ZoneSpaceHeatBalanceData::pushSystemTimestepHistory(EnergyPlusData &state,
+int zoneNum, int spaceNum = 0)`, declared at
+`ZoneTempPredictorCorrector.hh` line 247 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4297-4370.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`zone_space_heat_balance_push_zone_timestep_history`, preserving the
-completed
+`push_system_timestep_histories`, preserving the completed
 predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
@@ -1609,7 +1663,8 @@ The next required inventory entry is `update_thermal_histories`, after
 `correct_zone_air_temps` /
 `zone_space_heat_balance_correct_air_temp` /
 `push_zone_timestep_histories` /
-`zone_space_heat_balance_push_zone_timestep_history` entries, this
+`zone_space_heat_balance_push_zone_timestep_history` /
+`push_system_timestep_histories` entries, this
 preserves completion of the Air subtree before the Surface manager's final and
 history stages. The EnergyPlus parent calls the routine at lines 186-189 only
 when `AnyCTF || AnyEMPD`, and the canonical body spans lines 5221-5581. It owns

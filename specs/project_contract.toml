@@ -87,6 +87,7 @@ required_routines = [
   "zone_space_heat_balance_correct_air_temp",
   "push_zone_timestep_histories",
   "zone_space_heat_balance_push_zone_timestep_history",
+  "push_system_timestep_histories",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",
