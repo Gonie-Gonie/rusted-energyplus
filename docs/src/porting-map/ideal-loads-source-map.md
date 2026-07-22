@@ -121,6 +121,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `ZoneEquipmentManager::ManageZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ideal_loads_zone_equipment_stages`; `validate_ideal_loads_zone_equipment_dispatch`; `crates/ep_runtime/src/execution_plan.rs::ExecutionPlan` |
 | `ZoneEquipmentManager::GetZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent eager typed equipment lists/connections and `TimestepConfig` only |
 | `ZoneEquipmentManager::InitZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent `ZoneSysEnergyDemand`, diagnostic node state, and time-axis begin-environment metadata only |
+| `ZoneEquipmentManager::sizeZoneSpaceEquipmentPart1` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent fixed-option `ZoneSysEnergyDemand` snapshot, IdealLoads design supply limits, psychrometric helpers, and narrow node updates only |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
 | `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand` |
 
@@ -141,12 +142,18 @@ the IdealLoads component through the zone equipment manager:
 ```text
 ZoneEquipmentManager::ManageZoneEquipment
   -> InitZoneEquipment
-  -> SimZoneEquipment
-  -> PurchasedAirManager::SimPurchasedAir
-  -> PurchasedAirManager::InitPurchasedAir
-  -> PurchasedAirManager::CalcPurchAirLoads
-  -> PurchasedAirManager::UpdatePurchasedAir
-  -> PurchasedAirManager::ReportPurchasedAir
+  -> if ZoneSizingCalc
+       -> SizeZoneEquipment
+            -> sizeZoneSpaceEquipmentPart1 (Zone, then optional Spaces)
+     else
+       -> SimZoneEquipment
+            -> PurchasedAirManager::SimPurchasedAir
+            -> PurchasedAirManager::InitPurchasedAir
+            -> PurchasedAirManager::CalcPurchAirLoads
+            -> PurchasedAirManager::UpdatePurchasedAir
+            -> PurchasedAirManager::ReportPurchasedAir
+       -> ZoneEquipSimulatedOnce = true
+  -> UpdateZoneEquipment
 ```
 
 This is the canonical source dependency order, not an implemented Rust parent
@@ -1412,9 +1419,273 @@ The algorithm remains `scaffold` with claim level `none`. The inventory becomes
 `source_mapped`, with 121 required; the heat-balance and HVAC project lists
 become 88 and 10.
 
-CP240 next maps `ZoneEquipmentManager::sizeZoneSpaceEquipmentPart1`, declared
-at `ZoneEquipmentManager.hh` lines 92-99 and implemented at
-`ZoneEquipmentManager.cc` lines 317-597.
+## CP240 `sizeZoneSpaceEquipmentPart1` Sizing Load Projection
+
+CP240 adds canonical required
+`routine.size_zone_space_equipment_part1` after
+`routine.init_zone_equipment` and before `routine.sim_zone_equipment`, plus the
+same ordered HVAC project item. The exact lowercase routine is declared at
+`ZoneEquipmentManager.hh` lines 92-99 and implemented at
+`ZoneEquipmentManager.cc` lines 317-597. The algorithm already cites that
+source file, so no algorithm-level source or Rust target changes.
+
+### Parent traversal and argument identity
+
+The only two production call expressions are inside
+`SizeZoneEquipment`: the Zone call at line 660 and the Space-loop call at lines
+663-670. `ManageZoneEquipment` selects that parent only when
+`ZoneSizingCalc` is true. The normal sizing path is therefore
+`HVACManager::SimHVAC` lines 826-833 to `ManageZoneEquipment`, then CP239 Init,
+then `SizeZoneEquipment`, then CP240. The separate post-Zone-sizing
+`ManageZoneEquipment` calls in `SizingManager` occur after
+`ZoneSizingCalc = false` and do not enter CP240.
+
+`SizeZoneEquipment` first calls `SetUpZoneSizingArrays` under its own one-time
+flag and clears that flag only after setup returns. It then visits Zone indexes
+ascending, skips configurations whose `IsControlled` is false, calls CP240 once
+for the Zone, and, when the current aggregate `doSpaceHeatBalance` flag is
+true, calls CP240 for every stored `Zone.spaceIndexes` member without checking
+the Space configuration's controlled flag. During sizing,
+`HeatBalanceManager` assigns that aggregate flag from
+`doSpaceHeatBalanceSizing`.
+
+Only after every Zone and Space CP240 call returns does the parent call
+`CalcZoneMassBalance(state, true)`, then
+`CalcZoneLeavingConditions(state, true)`, and then perform its separate
+Zone/Space Part2 pass. A CP240 abnormal non-return suppresses that entire
+suffix and the remainder of the current traversal.
+
+The Zone call binds Zone configuration, `CalcZoneSizing`, Zone sensible and
+moisture demand, parent `ZoneData`, and the default `spaceNum = 0`. A Space call
+binds Space configuration, `CalcSpaceSizing`, Space demand, Space heat-balance
+records, and the Space system node. It nevertheless still passes the parent
+`ZoneData` as `zoneOrSpace` and the parent `zoneNum`. Thus Space calls use
+parent-Zone deadband, cooling ITE adjustment, multipliers, and
+`CalcFinalZoneSizing(zoneNum).MinOA`; replacing that argument with `SpaceData`
+would change the source behavior.
+
+### Demand reset and no-DOAS snapshots
+
+Every call selects Zone or Space `NonAirSystemResponse` and `SysDepZoneLoads`
+by `spaceNum > 0`, zeros both, selects the corresponding system Zone node, and
+then calls
+
+```text
+initOutputRequired(state, zoneNum, energy, moisture, true, false, spaceNum)
+```
+
+The child resets twelve remaining/unadjusted sensible and moisture scalars from
+their total and setpoint outputs. In the production sizing path, allocated
+sequence arrays are filled with the six full demands because
+`ZoneSizingCalc = true`; CP240 does not allocate them and passes
+`ResetSimOrder = false`. Every Zone and Space entry also restores shared
+`CurDeadBandOrSetback(zoneNum)` from original
+`DeadBandOrSetback(zoneNum)`.
+
+After the child returns, CP240 snapshots sensible and latent remaining outputs
+before any DOAS effect. Original `DeadBandOrSetback(zoneNum)` forces only the
+sensible no-DOAS snapshot to zero. The latent no-DOAS snapshot survives only
+when the original humidifying and dehumidifying setpoint outputs are both
+strictly positive or both strictly negative; zero, mixed-sign, or
+opposite-side values force it to zero.
+
+### Dedicated-outdoor-air prefix
+
+When `AccountForDOAS` is true, at least one inlet is mandatory. Two or more
+inlets select inlet 1 for DOAS and inlet 2 for the residual sizing load; exactly
+one selects inlet 1 for DOAS and leaves the residual destination at zero. A
+nonpositive inlet count emits a severe plus continuation and then fatal before
+any DOAS psychrometric calculation.
+
+CP240 computes 90-percent-RH humidity ratios at the configured high and low
+setpoints using standard barometric pressure, then sets
+
+```text
+DOAS mass = CalcFinalZoneSizing(zoneNum).MinOA * StdRhoAir
+sensible  = mass * PsyCpAirFnW(supply W) * (supply T - selected-node T)
+total     = mass * (PsyHFnTdbW(supply) - PsyHFnTdbW(selected node))
+latent    = mass * (supply W - selected-node W), only for latent sizing
+```
+
+`CalcDOASSupCondsForSizing` owns the control-strategy selection and remains a
+separate dependency. CP240 passes the DOAS sensible and optional latent mass
+outputs to `updateSystemOutputRequired`, then writes only temperature, humidity
+ratio, mass flow, and enthalpy to inlet 1. It records sensible heat addition,
+total-minus-sensible latent addition, supply state, and raw positive-heat versus
+nonpositive-cooling load fields; exactly zero sensible output takes the
+cooling/else branch. `DOASLatAdd` is written even when latent sizing is off.
+
+When `AccountForDOAS` is false, the residual sizing load uses inlet 1 when
+present and otherwise uses the non-air path. CP240 does not clear any of the
+eight DOAS sizing fields on this branch, so values from an earlier call can
+remain stale. In a one-inlet DOAS call, inlet 1 receives DOAS while the residual
+load deliberately follows the non-air path.
+
+### Sensible and latent sizing calculations
+
+The main sensible calculation runs only when the original Zone deadband flag is
+false and the absolute remaining load exceeds `HVAC::SmallLoad`, 1 W. Cooling
+chooses configured supply temperature or a negative absolute design
+temperature difference. Only cooling can use adjusted ITE return temperature,
+and only after `BeginSimFlag` clears: the explicit-temperature method changes
+the denominator delta while retaining configured supply temperature, whereas
+the temperature-difference method changes the resulting supply temperature.
+Heating uses the analogous configured temperature or positive absolute
+difference without ITE adjustment.
+
+CP240 computes supply enthalpy and specific heat, and when the absolute
+temperature delta exceeds `HVAC::SmallTempDiff`, 1e-5 C, sets mass flow to the
+nonnegative load-over-`Cp*DeltaT` quotient. A
+`SupplyAirAdjustFactor` multiplies it only when strictly greater than one. A
+deadband, small-load, or too-small-delta path instead retains zero main output
+or mass flow as applicable. Heat and cooling load/mass fields are overwritten
+by sign, and both heating and cooling Zone/outdoor temperature and humidity
+snapshots are always written.
+
+Latent work is independently gated by `zoneLatentSizing`. It uses the original
+humidifying/dehumidifying setpoint outputs' strict same-sign test to select the
+current remaining moisture load. Cooling and heating choose configured supply
+humidity ratios or authored signed differences; no absolute-value normalization
+is applied. Only an absolute humidity-ratio difference exceeding
+`HVAC::VerySmallMassFlow`, 1e-30, yields a nonnegative latent mass flow.
+
+If sensible mass flow is positive, CP240 recomputes supply humidity ratio,
+specific heat, temperature, and enthalpy so the same flow serves both loads. If
+sensible flow is zero but latent flow is positive, it retains the current
+temperature and recomputes humidity ratio and enthalpy. It promotes latent flow
+to the main flow only when that flow also exceeds
+`HVAC::VerySmallMassFlow`, 1e-30, and otherwise sets the main flow to zero. It
+then writes four sign-selected latent load/mass fields and
+four no-DOAS sensible/latent load fields. When latent sizing is false, all eight
+of those fields remain untouched rather than being reset.
+
+The invoked psychrometric dependencies also remain part of the exact boundary:
+`PsyHFnTdbW` and `PsyCpAirFnW` floor humidity ratio at 1e-5, the latter uses
+its source one-value cache, and `PsyHgAirFnWTdb` ignores its humidity-ratio
+argument and evaluates `2500940 + 1858.95 * T`.
+
+### Node, non-air, Space, and demand commits
+
+A positive residual supply-node identity receives only temperature, humidity
+ratio, enthalpy, and mass flow; all other node members remain unchanged. With
+no residual node, CP240 assigns `NonAirSystemResponse = SysOutputProvided`.
+For latent sizing it adds latent watts divided by the integer product of the
+parent Zone multipliers to the selected record's `latentGain`.
+
+For a Zone call with no residual node and active Space heat balance, CP240 also
+overwrites each stored Space `NonAirSystemResponse` by its volume fraction and
+adds the corresponding latent fraction. The immediately following Space CP240
+call starts by zeroing that Space response, so the Zone distribution is
+overwritten at Space-call entry. That call then routes its result to its
+residual node, or writes its own non-air result only when no residual node
+exists. In that no-residual case, latent gain is additive and can receive both
+the Zone-distribution and Space additions.
+
+The final operation calls `updateSystemOutputRequired` with the main sensible
+and latent outputs. A DOAS call therefore invokes that child twice, once before
+DOAS node/sizing writes and once after the residual result. With default
+priority `-1`, an uncontrolled `ZoneData` or controlled Sequential scheme
+subtracts outputs and updates current deadband state, controlled Uniform/PLR
+schemes do no update, and an invalid scheme is fatal. CP240's own calculation
+continues to read the original `DeadBandOrSetback` array, not the child's
+`CurDeadBandOrSetback` result.
+
+### Failure, replay, and stale state
+
+CP240 has no local latch, allocation, topology, membership, bounds, node,
+multiplier, denominator, enum, finite-value, or cross-owner validation and no
+assertion, status, catch, cleanup, transaction, or rollback. Besides dependency
+failures, explicit fatal paths include DOAS with a nonpositive inlet count, an
+invalid DOAS control strategy, and an invalid load-distribution scheme.
+
+A nonpositive-inlet DOAS fatal occurs after selected responses and demand state
+were reset. Failure after the first DOAS demand update can retain changed demands
+without the later node, sizing, or final-update suffix. Failure after a node or
+non-air write retains that output. Parent traversal failure retains earlier
+Zones and Spaces and suppresses later records, mass balance, leaving
+conditions, Part2, and the outer manager suffix.
+
+If one-time sizing setup succeeded, its parent flag is already false when a
+later CP240 failure occurs. Same-state retry therefore skips setup, restarts the
+ascending Zone traversal, resets many scalar fields again, and overwrites most
+node/sizing outputs. It is not generally idempotent: `latentGain` uses `+=`,
+earlier Space distribution can be followed by another Space addition, and
+branch-disabled DOAS or latent fields can retain older values. Setup failure is
+different because the parent clears its flag only after setup returns.
+
+### C++ and active-corpus evidence
+
+No C++ test directly calls CP240. Six direct `SizeZoneEquipment` expressions
+across three tests produce seven Zone CP240 entries and zero Space entries: one
+two-Zone DOAS heating/cooling call, three no-sensible-load then humidification
+and dehumidification calls, and two DOAS-load calls. Their 88 assertion lines
+span CP240, Part2, `UpdateZoneSizing`, and fixture inputs, so they do not isolate
+the complete CP240 transaction.
+
+All three direct wrapper tests force `SizeZoneEquipmentOneTimeFlag = false` and
+leave `doSpaceHeatBalance` false. They set
+`ZoneEquipConfig.IsControlled = true` while `ZoneData.IsControlled` remains its
+default false, so the demand-update child takes its uncontrolled branch rather
+than coherent production controlled-Zone distribution. They cover no Space,
+cooling ITE, one-inlet DOAS residual, zero-inlet fatal, non-air Zone output,
+adjustment factor above one, invalid strategy/scheme, failure, retry, or reset.
+Seven standalone `CalcDOASSupCondsForSizing` calls cover that child's strategy
+selection but not its CP240 composition.
+
+Among 57 active full `ManageSimulation` contexts, 56 complete and one
+intentionally fails in EMS before HVAC. Exactly 34 completing configurations
+request Zone sizing and reach CP240; their active static first-sweep topology is
+48 controlled Zone identities. The other 22 completing configurations and the
+EMS-fatal context never reach CP240.
+
+Seven of those sizing configurations enable Space sizing. Each has one
+controlled parent Zone and three stored Spaces, giving 21 Space CP240 identities
+per complete sizing sweep. They have no `SpaceHVAC:EquipmentConnections`, so
+the Space configurations are uncontrolled and have zero inlet nodes; CP240
+still calls them, with DOAS disabled, through the non-air Space path. Their
+tests assert final Space sizing results, not helper order or argument identity.
+
+Across the resulting 69 static roles, one Zone enables DOAS, four roles enable
+latent sizing, 43 have a usable residual supply node, and 26 use non-air output:
+five Zones plus all 21 Spaces. The five Zone non-air roles comprise four
+blank-inlet cases and the one-inlet DOAS case whose inlet is consumed by DOAS.
+No active role can enter cooling ITE adjustment or an adjustment factor above
+one. These are per-sweep static branch identities, not dynamic runtime counts;
+exact design-day, warmup, timestep, retry, and repeated sizing-sweep
+multiplicity remains uninstrumented.
+
+### Rust boundary and status
+
+Rust contains one raw `Sizing:Zone` epJSON fixture, but that test expects
+`UnsupportedSizing` before runtime; the active IDF corpus contains no
+`Sizing:Zone`. Rust has no typed or executable `Sizing:Zone`,
+`CalcZoneSizing`, `ZoneSystemMoistureDemand`, Space sizing-demand arena,
+`NonAirSystemResponse`, `SysDepZoneLoads`, or source-shaped
+`initOutputRequired`/`updateSystemOutputRequired` transaction.
+`ZoneSysEnergyDemand` is a four-setpoint-scalar snapshot constructed from
+compatibility fixed options (neutral zeros by default), while unit tests can
+inject literals. It lacks the total, unadjusted, sequenced, mutable
+distribution, and Space state CP240 uses.
+
+Rust does have adjacent exact psychrometric helpers, IdealLoads maximum/minimum
+supply limits, selected no-OA load/flow formulas, a narrow purchased-air supply
+node update, and diagnostic `NodeStateStore`. Those pieces are neither composed
+through the sizing parent nor owners of DOAS sizing, two-inlet routing,
+Zone/Space demand reset, ITE adjustment, non-air/latent distribution, stale
+branch fields, or failure/replay lifecycle. Existing sizing-like fixture values
+and final IdealLoads outputs do not implement CP240.
+
+CP240 adds no algorithm-level EnergyPlus source, Rust target, executable code,
+mapped state, test, object support, capability, output implementation,
+comparator, case, manifest, numerical, performance, or conformance promotion.
+The algorithm remains `scaffold` with claim level `none`. The inventory becomes
+32 algorithms and 245 routines, split 58 `state_mapped` plus 187
+`source_mapped`, with 122 required; the heat-balance and HVAC project lists
+become 88 and 11.
+
+CP241 next maps `ZoneEquipmentManager::sizeZoneSpaceEquipmentPart2`, declared
+at `ZoneEquipmentManager.hh` lines 101-105 and implemented at
+`ZoneEquipmentManager.cc` lines 599-625.
 
 ## Claim Requirements
 
