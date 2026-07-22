@@ -1927,12 +1927,74 @@ numerical, or conformance claim. Counts remain 32 algorithms and 223 routines,
 split 58 `state_mapped` plus 165 `source_mapped`, with 100 required; the
 heat-balance project list remains 69.
 
-CP217 next maps `InverseModelTemperature`, declared at
-`ZoneTempPredictorCorrector.hh` lines 313-325 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 4737-4951.
+CP217 adds required `inverse_model_temperature` immediately after
+`down_interpolate_4_history_values` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is
+`InverseModelTemperature`, declared at `ZoneTempPredictorCorrector.hh` lines
+313-325 and implemented at `ZoneTempPredictorCorrector.cc` lines 4737-4951.
+
+Every call first samples the measured-temperature schedule or zero and resets
+the current thermal-mass multiplier to one. An inclusive hybrid date window
+then overwrites `ZT` with measured temperature before three independent,
+source-ordered infiltration, internal-mass, and people inverse branches. The
+branches require global Zone-timestep history. The final three-slot measured
+history shift is unconditional on both the date window and history selection,
+so an outside-window call inserts ordinary solved `ZT`, while adaptive
+fine-step calls repeat the measured override and shift without recalculating
+the inverse outputs.
+
+The infiltration branch optionally substitutes measured supply temperature,
+mass flow, and humidity, solves mass flow only for strict
+`abs(Tmeasured - Tout) > 0.5`, clamps air changes per hour to `[0, 10]`, and
+reconstructs mass flow. The internal-mass branch requires exact zero
+`SumSysMCpT` and a changed measured temperature, adds AFN sensible exchange and
+the literal duct `ZoneLat` term, analytically inverts air capacity, derives a
+multiplier only above a strict 0.05 K change, and delegates clamp/warning and
+aggregate ownership to the next routine. The people branch re-samples measured
+temperature, samples activity twice, stores raw schedule values while applying
+local 130/0.6/0.7 defaults, and bounds inferred people by the current summed
+convective internal gain before zeroing values below 0.05.
+
+The only production expression is the exact-Zone HybridModel gate inside
+`ZoneSpaceHeatBalanceData::correctAirTemp`, after the forward temperature and
+load work but before `MAT`, reporting, and humidity correction. Initial normal
+HVAC correction can calculate with Zone history. If adaptive shortening is
+then selected, every fine correction still re-enters CP217 with system history:
+the three calculations skip, but schedule sampling, multiplier reset,
+active-window `ZT` replacement, and history shift repeat. Demand resimulation
+adds no correction call.
+
+CP217 has no local configuration, bounds, finite, schedule, denominator,
+psychrometric, or lifecycle validation and no status, transaction, rollback,
+or reset. A same-state retry can consume already shifted histories and
+double-add the next helper's statistics/warnings. Begin-environment setup resets
+only the three measured histories, so skipped inference outputs can remain
+stale.
+
+One C++ fixture reaches CP217 indirectly five times and asserts only an
+approximately 15.13 internal-mass multiplier, approximately 0.2444 and 0.49
+infiltration rates, and two zero people counts. There is no direct CP217 test.
+All 57 active full-simulation expressions configure no HybridModel, so actual
+corpus reach and hybrid output-oracle count are zero.
+
+Rust has no typed `HybridModel:Zone`, inverse configuration, measured history,
+inferred-result state, exact hybrid output names, runtime path, or focused
+test. Its three-slot Zone histories and temperature coefficients feed a
+guarded forward solve; typed People data supports design-count consumers, not
+temperature inverse inference. `HybridModel:Zone` remains RawOnly and
+run-blocking.
+
+CP217 remains required `source_mapped` and adds no Rust target, mapped state,
+support, output, numerical, or conformance claim. The inventory becomes 32
+algorithms and 224 routines, split 58 `state_mapped` plus 166 `source_mapped`,
+with 101 required; the heat-balance project list becomes 70.
+
+CP218 next maps `processInverseModelMultpHM`, declared at
+`ZoneTempPredictorCorrector.hh` lines 327-333 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4953-4991.
 
 The inventory now also includes `update_final_surface_heat_balance` after
-`down_interpolate_4_history_values`, preserving the
+`inverse_model_temperature`, preserving the
 completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and

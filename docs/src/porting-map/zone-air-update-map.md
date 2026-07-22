@@ -37,6 +37,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | Zone/Space record-level Zone-timestep history revert | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::revertZoneTimestepHistory` | no singular helper; nearest Rust paths push three-slot Zone or local system histories in the opposite direction | CP213 required source-mapped four-slot forward copy plus exact-Zone RoomAir/AFN branches and the literal mixed-level slot anomaly; no built-in reach or Rust record parity |
 | Zone/Space record-level humidity correction | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::correctHumRat` | history-only Zone humidity passes plus a separate bounded no-OA ThirdOrder IdealLoads helper | CP214 required source-mapped airflow/coefficient solve, clamps, RoomAir/hybrid/node/latent-sizing effects, and failure transaction; no exact Rust Zone/Space record parity |
 | history down-interpolation overload family | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::DownInterpolate4HistoryValues` scalar-output and array-return overloads | three-output thermal Zone history helper only | CP215 maps the contaminant-owned five-reference overload; CP216 expands the same required source-mapped routine to the thermal four-slot array/returned-current overload, with no exact Rust width, topology, invalid-input, alias, or lifecycle parity |
+| hybrid inverse temperature inference | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::InverseModelTemperature` | no typed `HybridModel:Zone` object or inverse-model state/runtime path | CP217 required source-mapped measured-temperature override, infiltration/internal-mass/people inverse branches, and unconditional measured-history shift; no Rust parser, state, output, test, or execution parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -4055,9 +4056,280 @@ promotion is added. Counts remain 32 algorithms and 223 routines, split 58
 `state_mapped` plus 165 `source_mapped`, with 100 required; the heat-balance
 project list remains 69.
 
-CP217 next maps `InverseModelTemperature`, declared at
+### CP217 `InverseModelTemperature` source map
+
+CP217 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.inverse_model_temperature`
+immediately after `routine.down_interpolate_4_history_values`. The heat-balance
+project contract adds `inverse_model_temperature` after
+`down_interpolate_4_history_values` and before
+`update_final_surface_heat_balance`. `InverseModelTemperature` is declared at
 `ZoneTempPredictorCorrector.hh` lines 313-325 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 4737-4951.
+
+The routine aliases the selected Zone, its HybridModel record, and its
+Zone heat-balance record. It stores
+`ZoneMult = zone.Multiplier * zone.ListMultiplier` in an integer, samples the
+measured-temperature schedule or uses zero when that pointer is null, writes
+the sample to `ZoneMeasuredTemperature`, and unconditionally resets the current
+`ZoneVolCapMultpSensHM` to one. Only the inclusive
+`DayOfYear >= HybridStartDayOfYear && DayOfYear <= HybridEndDayOfYear` window
+enters the main body. That body first overwrites `ZT` with the sampled measured
+temperature and then evaluates three independent branches in source order:
+infiltration, internal thermal mass, and people count. Valid input normally
+selects only one unknown, but the routine itself uses three separate `if`
+statements and can execute more than one branch for malformed or directly
+constructed state.
+
+All three numerical branches also require the global
+`state.dataHVACGlobal->UseZoneTimeStepHistory`; the similarly named boolean
+passed into the surrounding correction wrapper is not CP217's gate. Regardless
+of the date window or that global history flag, a normally returned call then
+shifts `PreviousMeasuredZT3 <- PreviousMeasuredZT2`,
+`PreviousMeasuredZT2 <- PreviousMeasuredZT1`, and
+`PreviousMeasuredZT1 <- ZT`. Outside the date window, `ZT` was not replaced, so
+the shifted value is the ordinary solved Zone temperature rather than the
+schedule sample. Inside the date window with system-timestep history selected,
+the measured-temperature overwrite and final shift still occur while every
+inverse calculation is skipped.
+
+#### Infiltration-temperature branch
+
+The infiltration branch runs when `InfiltrationCalc_T` and Zone-timestep
+history are both true. With `IncludeSystemSupplyParameters`, it dereferences
+the measured supply-temperature schedule, treats missing mass-flow and
+humidity schedules as zero, evaluates moist-air specific heat from the measured
+supply humidity, and builds measured `SumSysMCp_HM` and `SumSysMCpT_HM`.
+Without that option it does not use the incoming `SumSysMCp` or `SumSysMCpT`.
+The two paths assemble:
+
+| Path | `AA` | `BB` |
+|---|---|---|
+| measured supply | `SumSysMCp_HM + SumHA + MCPV + MCPM + MCPE + MCPC + MDotCPOA` | `SumSysMCpT_HM + SumIntGain + SumHATsurf - SumHATref + MCPTV + MCPTM + MCPTE + MCPTC + MDotCPOA * OutDryBulbTemp + NonAirSystemResponse / ZoneMult + SysDepZoneLoadsLagged` |
+| no measured supply | `SumHA + MCPV + MCPM + MCPE + MCPC + MDotCPOA` | `SumIntGain + SumHATsurf - SumHATref + MCPTV + MCPTM + MCPTE + MCPTC + MDotCPOA * OutDryBulbTemp` |
+
+It then sets `CC = AirCap`,
+`DD = 3 * PreviousMeasuredZT1 - 1.5 * PreviousMeasuredZT2 +
+PreviousMeasuredZT3 / 3`, stores
+`delta_T = ZoneMeasuredTemperature - zone.OutDryBulbTemp`, and evaluates
+outdoor-air specific heat from `OutHumRat` and density from
+`OutBaroPress`, the Zone-local outdoor dry-bulb temperature, and `OutHumRat`.
+Raw infiltration mass flow stays zero unless the strict
+`abs(delta_T) > 0.5` gate succeeds, in which case it is:
+
+```text
+(BB + CC * DD - ((11 / 6) * CC + AA) * ZoneMeasuredTemperature)
+/
+(PsyCpAirFnW(OutHumRat) * delta_T)
+```
+
+The source converts that result to air changes per hour, clamps it with the
+literal nested `max(0, min(10, candidate))`, reconstructs mass flow from the
+clamped rate, density, and Zone volume, and writes `MCPIHM` and
+`InfilOAAirChangeRateHM`. Equality at either `+0.5` or `-0.5` produces zero.
+There is no local finite, density, heat-capacity, volume, or denominator check;
+native floating and Objexx min/max behavior remains part of the source
+boundary.
+
+#### Internal-thermal-mass branch
+
+The internal-mass branch has the exact combined gate
+`InternalThermalMassCalc_T && SumSysMCpT == 0 &&
+ZT != PreviousMeasuredZT1 && UseZoneTimeStepHistory`. It forms:
+
+```text
+TempDepCoef = SumHA + SumMCp + SumSysMCp
+TempIndCoef = SumIntGain + SumHATsurf - SumHATref
+            + SumMCpT + SumSysMCpT
+            + NonAirSystemResponse / ZoneMult
+            + SysDepZoneLoadsLagged
+```
+
+AirflowNetwork distribution adds `exchangeData(zoneNum).TotalSen`. Duct-loss
+simulation then adds the literal `ZoneLat(zoneNum)`, not `ZoneSen`. With a
+zero dependent coefficient, inferred air capacity is
+`TempIndCoef / (ZT - PreviousMeasuredZT1)`. Otherwise the routine sets the
+temperature ratio to zero on exact
+`TempIndCoef == TempDepCoef * ZT`, or computes:
+
+```text
+(TempIndCoef - TempDepCoef * PreviousMeasuredZT1)
+/
+(TempIndCoef - TempDepCoef * ZT)
+```
+
+A strictly positive ratio other than exactly one selects
+`AirCapHM = TempDepCoef / log(ratio)`; every other ratio falls back to
+`TempIndCoef / (ZT - PreviousMeasuredZT1)`. Only strict
+`abs(ZT - PreviousMeasuredZT1) > 0.05` derives the multiplier:
+
+```text
+AirCapHM
+/
+(zone.Volume * PsyRhoAirFnPbTdbW(OutBaroPress, ZT, airHumRat)
+ * PsyCpAirFnW(airHumRat))
+*
+(TimeStepZone * 3600)
+```
+
+Otherwise it uses one. CP217 passes that value and the running sum, count,
+average, and Zone identity by reference to the next lexical routine,
+`processInverseModelMultpHM`, then stores the returned/mutated value in
+`ZoneVolCapMultpSensHM`. The child owns its clamp, warning, and aggregate
+mutations. In particular, its values above 30 are warned but not clamped and
+still contribute to the aggregate; mapping that child body is deferred to
+CP218.
+
+#### People-count branch
+
+The people branch runs when `PeopleCountCalc_T` and Zone-timestep history are
+true. It dereferences and re-samples the measured-temperature schedule, even
+though entry already performed a null-safe sample. It stores raw activity,
+sensible-fraction, and radiant-fraction schedule values, using zero for a
+missing schedule. The activity schedule is sampled a second time for the local
+calculation. Local-only defaults replace a nonpositive activity with 130, a
+nonpositive sensible fraction with 0.6, and a nonpositive radiant fraction
+with convection fraction 0.7; otherwise convection fraction is
+`1 - radiantFraction` without clamping. The raw stored fields retain their
+sampled zero values when those defaults are used.
+
+With measured supply enabled, this branch again requires the supply-temperature
+schedule, treats missing mass-flow and humidity schedules as zero, and forms:
+
+```text
+AA = SumSysMCp_HM + SumHA + SumMCp
+BB = SumSysMCpT_HM + SumIntGainExceptPeople
+   + SumHATsurf - SumHATref + SumMCpT
+   + NonAirSystemResponse / ZoneMult + SysDepZoneLoadsLagged
+```
+
+Without measured supply, `AA = SumHA + SumMCp` and
+`BB = SumIntGainExceptPeople + SumHATsurf - SumHATref + SumMCpT`.
+Using the same `CC` and three-history `DD`, the inferred sensible people gain
+is `((11 / 6) * CC + AA) * ZoneMeasuredTemperature - BB - CC * DD`.
+The denominator is activity times sensible fraction times convection fraction.
+The upper bound is `max(0, SumIntGain / denominator)`, and the count is
+`min(upperBound, max(0, inferredGain / denominator))`; a strict result below
+0.05 is changed to zero before `NumOccHM` is written. CP217 does not validate
+the denominator, fractions, schedules, or finite result.
+
+#### Production ownership and cadence
+
+The sole production call expression is inside
+`ZoneSpaceHeatBalanceData::correctAirTemp` at
+`ZoneTempPredictorCorrector.cc` lines 4103-4114. It requires exact Zone identity
+(`spaceNum == 0`), the global `FlagHybridModel`, at least one of the three
+temperature-inference flags, and both `!WarmupFlag` and `!DoingSizing`. It runs
+after the forward temperature solve, system-node and thermostat writes, load
+correction, and `SNLoad` calculation, but before `MAT = ZT`, sensible reporting,
+humidity correction, final humidity/relative-humidity commits, and the returned
+temperature delta. `correctZoneAirTemps` visits Zones in ascending order before
+its Space traversal, but CP217 never runs for a Space.
+
+`HVACManager` begins a normal Zone timestep with global
+`UseZoneTimeStepHistory = true`, so the initial correction can run one full
+inverse calculation. When adaptive shortening is selected afterward, the
+manager sets that flag false and calls the correction again on every fine
+step. Each fine-step CP217 entry still samples schedules, resets the current
+thermal-mass multiplier to one, overwrites active-window `ZT`, and shifts the
+three measured histories, while all three inference calculations skip.
+Consequently the provisional internal-mass multiplier can be lost on the first
+fine correction, infiltration and people outputs can remain stale, and measured
+histories can advance `1 + N` times in one shortened Zone timestep. The demand
+manager's HVAC resimulation route has no correction step and adds no CP217 call.
+
+#### Failure, retry, and reset
+
+CP217 owns no assertion, bounds check, configuration validation, status,
+completion marker, diagnostic, catch, cleanup, transaction, or rollback.
+Upstream HybridModel input normally rejects combined temperature unknowns and
+requires measured-temperature and complete measured-supply schedule groups
+where needed, but direct state construction can bypass those protections. The
+entry tolerates a null measured-temperature schedule by sampling zero; the
+people branch later dereferences that pointer. Both measured-supply branches
+dereference supply temperature while only mass flow and humidity are nullable.
+Psychrometric, schedule, indexing, logarithm, and the CP218 child remain
+external dependencies.
+
+An abnormal non-return retains the reached ordered prefix: entry samples and
+reset, active-window `ZT`, infiltration fields, internal child aggregates and
+diagnostics, or people fields. A failure before the tail leaves measured
+histories unshifted; otherwise the three assignments themselves are ordered.
+A same-state retry re-samples schedules, resets the current multiplier, consumes
+already shifted histories, and can repeat CP218 accumulation and warnings, so
+it is generally non-idempotent. Begin-environment initialization zeros only
+`PreviousMeasuredZT1`, `PreviousMeasuredZT2`, and `PreviousMeasuredZT3`.
+CP217 does not reset infiltration, people, running aggregate, or diagnostic
+state, and skipped branches can preserve stale outputs.
+
+#### C++ reach and corpus boundary
+
+No C++ test calls `InverseModelTemperature` directly. One
+`HybridModel.unit.cc` fixture reaches it through `correctZoneAirTemps` exactly
+five times, all on day 1 inside a day-1-through-day-2 window, with one fully
+mixed Zone, no AFN or duct contribution, one inference mode at a time, and
+Zone-timestep history selected:
+
+| Focused path | Asserted output |
+|---|---|
+| internal thermal mass, no measured supply, null measured-temperature schedule | current multiplier approximately 15.13 |
+| infiltration, no measured supply, null measured-temperature schedule | air-change rate approximately 0.2444 |
+| people count, no measured supply | people count zero |
+| infiltration with measured supply | air-change rate approximately 0.49 |
+| people count with measured supply | people count zero |
+
+Those are the only five CP217 assertions. They do not inspect the `ZT`
+override, raw schedule fields, measured-history tail, aggregate state,
+diagnostics, thresholds, outside-window or false-history paths, nonzero people,
+AFN/duct additions, combined flags, invalid/nonfinite inputs, partial failure,
+retry, or reset. The separate direct
+`HybridModel_processInverseModelMultpHMTest` belongs to CP218, not CP217.
+
+All 57 active full-simulation `ManageSimulation` expressions declare no
+`HybridModel:Zone` input or manual hybrid flag. Actual CP217 reach and output
+oracle count are therefore zero. The 55 completing nonzero-Zone configurations
+contain 81 exact-Zone correction records only as counterfactual topology; the
+global flag blocks all of them, and the three active Space records are
+independently excluded by `spaceNum == 0`.
+
+#### Rust boundary
+
+A crate-wide search finds no `HybridModel`, `InverseModelTemperature`,
+`PreviousMeasuredZT`, `ZoneMeasuredTemperature`, `InfilOAAirChangeRateHM`,
+`NumOccHM`, or `ZoneVolCapMultpSensHM` symbol. `HybridModel:Zone` is absent from
+the typed compiler list, becomes `RawOnly`, has no partial capability rule, and
+therefore run-blocks as unsupported. The typed Zone and People records own no
+inverse dates, flags, measured/supply/people schedules, inferred results, or
+hybrid output identities, and Rust has no typed Zone infiltration model.
+
+The nearest runtime state owns ordinary current/average temperature, three
+Zone/system temperature histories, adaptive counters, volume, forward air
+capacity, gains, and coefficients. Its predictor assembles related forward
+coefficients and the same third-order history combination, then solves
+temperature forward with Rust-specific denominator and capacity guards.
+Adaptive correction is Zone-only and down-interpolates three history slots.
+None of those paths samples a measured Zone temperature, overwrites the solved
+temperature for inverse inference, shifts measured histories, infers
+infiltration/mass/people, or calls a multiplier aggregate child.
+
+Typed People state supplies only design occupant count and a number schedule
+for Watts-per-person and IdealLoads outdoor-air consumers; the runtime
+convective/radiant internal-gain pass currently covers OtherEquipment rather
+than inverse people estimation. The result store and output registry expose
+ordinary Zone mean air temperature and humidity only. The four EnergyPlus
+hybrid output names have no Rust registry, variable-coverage, case, or test
+match. Existing forward-solver, adaptive-history, People parser, and ordinary
+MAT/humidity output tests establish none of CP217.
+
+CP217 adds no EnergyPlus source inventory, Rust target, code, mapped state,
+test, support, capability, output implementation, comparator, manifest,
+numerical, performance, or conformance promotion. The inventory becomes 32
+algorithms and 224 routines, split 58 `state_mapped` plus 166 `source_mapped`,
+with 101 required; the heat-balance project list becomes 70.
+
+CP218 next maps `processInverseModelMultpHM`, declared at
+`ZoneTempPredictorCorrector.hh` lines 327-333 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4953-4991.
 
 ## Promotion Requirements
 
