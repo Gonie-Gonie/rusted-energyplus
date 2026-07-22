@@ -1235,8 +1235,8 @@ algorithms and 212 routines, split 58 `state_mapped` plus 154
 
 The following required predictor/corrector definition entry is
 `zone_space_heat_balance_calc_predicted_humidity_ratio`, after
-`calc_zone_air_temp_set_points` and before
-`update_final_surface_heat_balance`. Its source boundary is
+`calc_zone_air_temp_set_points` and before `correct_zone_air_temps`. Its
+source boundary is
 `ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
 Real64 RAFNFrac, int zoneNum, int spaceNum = 0)`, declared at
 `ZoneTempPredictorCorrector.hh` line 243 and implemented at
@@ -1304,14 +1304,87 @@ support, output, numerical, or conformance claim. The inventory becomes 32
 algorithms and 213 routines, split 58 `state_mapped` plus 155
 `source_mapped`, with 90 required; the heat-balance project list becomes 59.
 
-CP206 next maps
-`correctZoneAirTemps(EnergyPlusData &state, bool useZoneTimeStepHistory)`,
-declared at `ZoneTempPredictorCorrector.hh` lines 289-291 and implemented at
+The following required predictor/corrector definition entry is
+`correct_zone_air_temps`, after
+`zone_space_heat_balance_calc_predicted_humidity_ratio` and before
+`update_final_surface_heat_balance`. Its source boundary is
+`correctZoneAirTemps(EnergyPlusData &state,
+bool useZoneTimeStepHistory)`, declared at
+`ZoneTempPredictorCorrector.hh` lines 289-291 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 3817-3861.
 
+Its only production direct call is CP195 line 230. The `CorrectStep` arm
+assigns the returned maximum to caller-owned `ZoneTempChange` only after
+CP206 returns. Initial HVAC Get/Predict/simulation precedes Correct. The caller
+selects adaptive downstepping only when that first maximum exceeds
+`MaxZoneTempDiff` and `KickOffSimulation` is false; otherwise it uses one
+system step and Zone-timestep history. Fine steps repeat Predict, HVAC
+simulation, Correct, contaminant correction, and system-history push without
+reselecting their count from later returns. Demand resimulation does not call
+Correct.
+
+CP206 starts its maximum at zero. For each Zone it calls the Zone
+`correctAirTemp` child first and saves its result, then visits every stored
+Space. Simulation Space HB outside sizing calls the Space child and folds its
+delta immediately. Every other case optionally copies controlled sizing Zone
+node temperature, humidity ratio, and enthalpy to the Space node, then always
+copies Zone `ZT`, `ZTM`, `MAT`, `airHumRat`, and `airRelHum` to the
+Space record. The Zone delta is folded only after its Spaces.
+
+The wrapper then always calls `CalcZoneComponentLoadSums` for the Zone and,
+when simulation Space HB is enabled, calls it for every Space even during
+sizing. The wrapper owns only the optional three node and five Space-record
+writes; the correction and report equations remain child dependencies.
+Starting from zero and passing each child value as the second `std::max`
+argument ignores negative and NaN candidates and can retain positive infinity.
+A nonpositive Zone count returns zero.
+
+CP206 has no local assertion, validation, diagnostic, status, latch, catch,
+cleanup, transaction, or rollback. Zone or Space child failure retains its
+completed prefix and suppresses the remaining traversal; mirror and report
+failure can retain direct-write or report prefixes. A failure loses the local
+maximum and leaves the caller's old `ZoneTempChange` because CP195's
+assignment did not complete. Retry restarts from Zone one and repeats all
+children, copies, and reports. Clean replay requires coordinated
+predictor/corrector, Zone/Space heat balance, nodes, topology, RoomAir, HVAC,
+report, diagnostics, and child reset.
+
+One HybridModel fixture makes five direct calls with Zone history true, one
+Zone, one stored Space, and false Space-HB flags. It reaches Zone correction
+and Space record mirroring, but its five assertions inspect only child-owned
+hybrid effects. Of 57 active full simulations, one expected EMS fatal stops
+before CP206, one zero-Zone case reaches the zero return, and 55 correct at
+least one Zone. One Analytical configuration reaches active Space correction
+and reporting for two Zones and three Spaces. Seven sizing configurations
+reach controlled node and record mirroring for one Zone and three Spaces each.
+Their assertions are downstream; no test isolates the maximum, fold order,
+adaptive selection, component-report dispatch, failure, retry, or reset.
+
+Rust's `correct_zone_air_temps_compat` is an identity alias with one live call
+and no direct test. Its unit-returning closure performs an all-Zone temperature
+pass, then an all-Zone humidity pass, then project-specific per-Zone adaptive
+correction or local history synchronization. Rust has no Space HB or Space
+node owner, AirReportVars, source component-report child, functional history
+selector, or returned global maximum. Its independent per-Zone substep choice
+does not reproduce the source global maximum or full Predict-HVAC-Correct
+retry. Adjacent temperature formulas and bounded `1ZoneUncontrolled` output
+evidence belong to the delegated child and case-specific results, not CP206
+wrapper parity; Space execution and sizing remain run-blocked.
+
+CP206 remains required `source_mapped` and adds no Rust target, state, test,
+support, output, numerical, or conformance claim. The inventory becomes 32
+algorithms and 214 routines, split 58 `state_mapped` plus 156
+`source_mapped`, with 91 required; the heat-balance project list becomes 60.
+
+CP207 next maps
+`ZoneSpaceHeatBalanceData::correctAirTemp(EnergyPlusData &state,
+bool useZoneTimeStepHistory, int zoneNum, int spaceNum = 0)`, declared at
+`ZoneTempPredictorCorrector.hh` lines 236-239 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 3863-4165.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`zone_space_heat_balance_calc_predicted_humidity_ratio`, preserving the
-completed predictor/corrector definition slice before
+`correct_zone_air_temps`, preserving the completed predictor/corrector
+definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
 the implementation at lines 5176-5219. The routine always invokes seven
@@ -1332,7 +1405,8 @@ The next required inventory entry is `update_thermal_histories`, after
 `zone_space_heat_balance_set_up_output_vars` / `predict_system_loads` /
 `zone_space_heat_balance_predict_system_load` /
 `calc_zone_air_temp_set_points` /
-`zone_space_heat_balance_calc_predicted_humidity_ratio` entries, this
+`zone_space_heat_balance_calc_predicted_humidity_ratio` /
+`correct_zone_air_temps` entries, this
 preserves completion of the Air subtree before the Surface manager's final and
 history stages. The EnergyPlus parent calls the routine at lines 186-189 only
 when `AnyCTF || AnyEMPD`, and the canonical body spans lines 5221-5581. It owns
