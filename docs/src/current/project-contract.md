@@ -1726,15 +1726,60 @@ support, output, numerical, or conformance claim. The inventory becomes 32
 algorithms and 220 routines, split 58 `state_mapped` plus 162
 `source_mapped`, with 97 required; the heat-balance project list becomes 66.
 
-CP213 next maps
+The following required record definition entry is
+`zone_space_heat_balance_revert_zone_timestep_history`, after
+`revert_zone_timestep_histories` and before
+`update_final_surface_heat_balance`. Its source boundary is
 `ZoneSpaceHeatBalanceData::revertZoneTimestepHistory(EnergyPlusData &state,
 int zoneNum, int spaceNum = 0)`, declared at
 `ZoneTempPredictorCorrector.hh` line 249 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 4391-4431.
 
+Its only callers are the CP212 Zone and Space children. Because the parent
+Revert selector has no built-in request, all 57 active `ManageSimulation`
+expressions execute CP213 zero times. The 81 Zone plus 24 eligible Space
+records bound only 105 maximum counterfactual once-requested common-path identities when CP212 is injected
+in each configuration's corresponding active sizing or simulation phase. The
+24 Spaces split into three simulation and 21 sizing identities across eight
+configurations; special RoomAir/AFN corpus potential is zero.
+
+After a debug-only positive-Zone assertion, CP213 forward-copies four-slot
+`XMAT` and `WPrevZoneTS` histories from slots one through three into zero
+through two for every reached record. Exact zero Space identity enables
+RoomAir handling: the corresponding exact stratified enum copies Floor/occupied histories, while exact `AirflowNetwork`
+copies each stored node's temperature/humidity histories. These enum branches
+are mutually exclusive in normal state. The literal mixed-level code leaves
+slot two unchanged and self-assigns slot three, yielding
+`[old1, old2, old2, old3]`; this potential source typo is mapped, not
+normalized.
+
+CP213 changes no current value, downstepped history, non-ThirdOrder scalar, or
+solution state and is not a full inverse of CP209. It has no upper-bound,
+Space-sign, record-kind, membership, topology, allocation, enum, or finite
+validation and no diagnostic, status, catch, cleanup, transaction, or rollback.
+A late non-return retains ordered prefixes, while same-state retry collapses
+histories again.
+
+Rust has no singular helper, Space arena, fourth slot, RoomAir/AFN state, or
+production Zone-history forward copy. Its nearest predictor and adaptive paths
+push three-slot Zone or local system histories in the opposite direction, and
+the plural Revert compat site conditionally resets only current Zone
+temperature and humidity. Existing label, count-one, interpolation, and
+uniform-history tests do not establish CP213.
+
+CP213 remains required `source_mapped` and adds no Rust target, mapped state,
+support, output, numerical, or conformance claim. The inventory becomes 32
+algorithms and 221 routines, split 58 `state_mapped` plus 163
+`source_mapped`, with 98 required; the heat-balance project list becomes 67.
+
+CP214 next maps
+`ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int zoneNum,
+int spaceNum = 0)`, declared at `ZoneTempPredictorCorrector.hh` line 241 and
+implemented at `ZoneTempPredictorCorrector.cc` lines 4433-4619.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`revert_zone_timestep_histories`, preserving the completed
-predictor/corrector definition slice before
+`zone_space_heat_balance_revert_zone_timestep_history`, preserving the
+completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
 the implementation at lines 5176-5219. The routine always invokes seven
@@ -1762,7 +1807,8 @@ The next required inventory entry is `update_thermal_histories`, after
 `zone_space_heat_balance_push_zone_timestep_history` /
 `push_system_timestep_histories` /
 `zone_space_heat_balance_push_system_timestep_history` /
-`revert_zone_timestep_histories` entries, this
+`revert_zone_timestep_histories` /
+`zone_space_heat_balance_revert_zone_timestep_history` entries, this
 preserves completion of the Air subtree before the Surface manager's final and
 history stages. The EnergyPlus parent calls the routine at lines 186-189 only
 when `AnyCTF || AnyEMPD`, and the canonical body spans lines 5221-5581. It owns

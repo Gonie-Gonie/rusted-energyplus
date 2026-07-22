@@ -34,6 +34,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | Zone/Space system-timestep history dispatch | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::PushSystemTimestepHistories` | per-Zone named compat synchronization and adaptive local-history loop | CP210 required source-mapped strict fine-step global Zone-first/Space dispatch; no exact Rust gate, cadence, topology, or record-child parity |
 | Zone/Space record-level system-timestep history commit | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::pushSystemTimestepHistory` | no singular helper; nearest paths rebuild or locally shift three-slot Zone histories | CP211 required source-mapped four-slot record commit plus conditional RoomAir/AFN and non-ThirdOrder state; no exact Rust record, Space, cadence, or auxiliary-state parity |
 | Zone/Space Zone-timestep history revert dispatch | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::RevertZoneTimestepHistories` | per-Zone compat current-state reset in the local adaptive count-greater-than-one path | CP212 required source-mapped dormant global Zone-first/Space dispatch; no built-in source request or exact Rust timing, topology, child-state, or selector parity |
+| Zone/Space record-level Zone-timestep history revert | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::revertZoneTimestepHistory` | no singular helper; nearest Rust paths push three-slot Zone or local system histories in the opposite direction | CP213 required source-mapped four-slot forward copy plus exact-Zone RoomAir/AFN branches and the literal mixed-level slot anomaly; no built-in reach or Rust record parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -3264,6 +3265,180 @@ CP213 next maps
 int zoneNum, int spaceNum = 0)`, declared at
 `ZoneTempPredictorCorrector.hh` line 249 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 4391-4431.
+
+### CP213 `ZoneSpaceHeatBalanceData::revertZoneTimestepHistory` source map
+
+`ZoneSpaceHeatBalanceData::revertZoneTimestepHistory(EnergyPlusData &state,
+int zoneNum, int spaceNum = 0)` is declared at
+`ZoneTempPredictorCorrector.hh` line 249 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4391-4431. Its only production call
+expressions are the dormant CP212 Zone child at line 4382 with default zero
+Space identity and stored-Space child at line 4385 with both identities. CP212
+owns Zone-first traversal, the current aggregate `doSpaceHeatBalance` gate,
+stored membership order, and dynamic multiplicity; CP213 does not discover
+records or inspect that flag.
+
+Because no built-in caller requests CP212's Revert selector, EnergyPlus 26.1
+has zero built-in CP213 executions. The behavior below is reachable only
+through an external CP212 request or a direct external child call in the
+in-tree call graph.
+
+#### Common four-slot forward copy
+
+After a debug-only `assert(zoneNum > 0)`, CP213 loops
+`iHistory = 0, 1, 2` in ascending order. At each index it first copies
+`XMAT[iHistory + 1]` to `XMAT[iHistory]`, then copies
+`WPrevZoneTS[iHistory + 1]` to `WPrevZoneTS[iHistory]`. For either history,
+`[old0, old1, old2, old3]` becomes
+`[old1, old2, old3, old3]`: old slot zero is discarded and old slot three is
+duplicated.
+
+This common prefix runs for every reached Zone and Space and for every
+solution algorithm. It copies finite, infinite, or NaN values verbatim and
+performs no calculation or finite/range repair. It does not modify current
+`MAT` or `airHumRat`, `ZT`, `XMPT`, `WTimeMinusP`, `airRelHum`,
+`DSXMAT`/`DSWPrevZoneTS`, `TM2/TMX`, `WM2/WMX`, Zone-timestep averages,
+or diagnostic state.
+
+CP213 is therefore not a byte-for-byte inverse of CP209. If CP209 changes
+`[old0, old1, old2, old3]` to `[new, old0, old1, old2]`, one CP213 call
+produces `[old0, old1, old2, old2]`; the original oldest slot is not restored.
+
+#### Exact-Zone RoomAir and literal mixed-level anomaly
+
+Only exact `spaceNum == 0` enables shared RoomAir work. Any positive Space or
+malformed negative Space identity receives the common record copy and skips
+all RoomAir branches. Like CP209 but unlike CP211, CP213 does not read the global
+`anyNonMixingRoomAirModel` flag.
+
+When the exact per-Zone AirModel enum is `DispVent3Node`, `UFADInt`, or
+`UFADExt`, CP213 first forward-copies `XMATFloor` slots one through three
+into zero through two, then does the same for `XMATOC`. Each becomes
+`[old1, old2, old3, old3]`.
+
+The immediately following mixed-level code is deliberately recorded literally:
+
+1. `XMATMX[0] = XMATMX[1]`;
+2. `XMATMX[1] = XMATMX[2]`;
+3. `XMATMX[3] = XMATMX[3]`.
+
+It never writes slot two, and the slot-three assignment is a no-op. Therefore
+`[old0, old1, old2, old3]` becomes
+`[old1, old2, old2, old3]` rather than the Floor/occupied result. This
+asymmetry is consistent with a possible source typo, but the source map does
+not normalize or silently correct it.
+
+An independent exact `AirflowNetwork` enum test then visits every stored
+`AFNZoneInfo(zoneNum).Node` in container order. For each node it forward-copies
+`AirTempX` slots one through three into zero through two, then does the same
+for `HumRatX`. The stratified and AFN tests are separate `if` statements but
+a normal single enum value cannot select both. Mixing, UserDefined,
+DispVent1Node, CrossVent, Invalid, Num, or an unmatched stored value receives
+only the common record copy.
+
+#### Validation, failure, retry, and reset
+
+The positive-Zone assertion can compile out. CP213 has no Zone upper-bound,
+Space sign or upper-bound, membership, record-kind, arena-shape, RoomAir
+allocation/topology, enum-validity, or finite validation. The caller selects
+`this` before entry and `spaceNum` is only an exact-zero classifier, so a
+malformed direct call can apply Zone RoomAir semantics to a Space record or
+suppress them for a Zone record.
+
+CP213 is void and has no diagnostic, status, latch, catch, cleanup,
+transaction, or rollback. Assertion failure precedes mutation. A later
+RoomAir access failure retains the complete common record prefix and can retain
+partial Floor, occupied, mixed, or earlier AFN-node histories. CP212 then
+cannot reach later Spaces or Zones.
+
+Same-state retry applies the forward copy again. A normal history becomes
+`[old2, old3, old3, old3]` after two calls; the anomalous mixed-level history
+becomes `[old2, old2, old2, old3]`. The operation is destructive and
+non-idempotent unless the relevant slots are already equal. Clean replay
+requires coordinated Zone/Space `XMAT`/`WPrevZoneTS`, RoomAir/AFN histories,
+topology, aggregate traversal state, caller state, dependencies, and
+diagnostics. CP211 downstepped histories and non-ThirdOrder scalar state
+require separate restoration.
+
+#### C++ test and oracle boundary
+
+The C++ unit tree contains zero direct CP213 or CP212 calls, zero Revert
+selector uses, and zero test-side `ManageZoneAirUpdates` or `ManageHVAC`
+calls. It also contains zero assertions or occurrences naming `XMAT`,
+`WPrevZoneTS`, `XMATFloor`, `XMATOC`, `XMATMX`, `AirTempX`, or
+`HumRatX` destinations. No test detects the mixed-level anomaly or covers
+partial failure, retry, reset, or record identity.
+
+All 57 active `ManageSimulation` call expressions execute CP213 exactly zero
+times. If one external CP212 request were injected in each configuration's
+corresponding active sizing or simulation phase, the maximum counterfactual
+one-pass topology would be 81 Zone plus 24 eligible Space records, 105 common
+copies total. CP213 is solution-algorithm independent, so the ThirdOrder versus
+Analytical census does not split this path. All 81 Zones are Mixing and every
+Space skips shared RoomAir, leaving stratified and RoomAir-AFN potential at
+zero. The 24 Spaces comprise three simulation and 21 sizing identities across
+eight configurations.
+
+Tracked one-Zone manifests request no history or revert variable and cannot
+execute source CP213. Hourly MAT and humidity outputs are downstream-only and
+cannot prove a dormant record transaction or expose the mixed-level anomaly.
+
+#### Rust boundary
+
+Rust has zero singular `revert_zone_timestep_history` definitions, calls, or
+tests. Only the CP212 plural source-order and compat identity wrappers exist.
+Production never dispatches the Revert selector, and
+`manage_zone_air_updates_compat` ignores its selector argument.
+
+The nearest Rust Zone-history mutation is the opposite direction. The
+predictor closure pushes three-slot `previous_mean_air_temperatures_c` and
+`previous_air_humidity_ratios` as `[new, old0, old1]`. There is no production
+forward copy of either Zone history.
+
+The plural Revert compat site runs only on the adaptive count-greater-than-one
+path. A count match reuses prior local system histories and its closure is a
+no-op. A count mismatch down-interpolates the already-pushed three-slot Zone
+histories, preserving slot zero, then overwrites only current
+`mean_air_temperature_c` and `air_humidity_ratio` from local slot zero. Each
+fine step later pushes temporary local system arrays as
+`[current, old0, old1]`, and the plural PushSystem wrapper commits them once
+after the Zone-local loop. Count one and the feature-disabled path instead
+rebuild three-slot system histories. None performs CP213's unconditional
+Zone-record forward copy.
+
+Rust heat-balance state has Zone and Surface arenas only. Its Zone record owns
+three-slot Zone/system temperature and humidity arrays but no fourth slot,
+Space heat-balance arena or membership, aggregate Space flag, Floor/occupied/
+mixed RoomAir histories, RoomAir enum, or AFN node histories. Uniform weather initialization resets the same Rust Zone humidity state
+uniformly rather than forward-copying; separate IdealLoads humidity pushes use
+different state and the opposite direction.
+
+One parent source-order label test has no state assertion. The focused
+single-system-timestep test takes count one and never reaches the Revert site;
+the pure interpolation test does not compose it. A full-timestep assertion
+uses uniform three-slot temperature history and no humidity assertion, so it
+cannot distinguish direction. There is no direct singular, compat, or selector
+test; count-greater-than-one match/mismatch test; nonuniform forward-copy or
+fourth-slot assertion; Space, mixed-level anomaly, RoomAir, AFN, failure,
+retry, or reset evidence.
+
+CP213 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.zone_space_heat_balance_revert_zone_timestep_history`
+immediately after `routine.revert_zone_timestep_histories`. The heat-balance
+project contract adds
+`zone_space_heat_balance_revert_zone_timestep_history` after
+`revert_zone_timestep_histories` and before
+`update_final_surface_heat_balance`. The algorithm remains a `scaffold` with
+`claim_level = none`. No EnergyPlus source inventory, Rust target, code, mapped
+state, test, support, capability, output implementation, comparator, manifest,
+numerical, performance, or conformance promotion is added. The inventory
+becomes 32 algorithms and 221 routines, split 58 `state_mapped` plus 163
+`source_mapped`, with 98 required; the heat-balance project list becomes 67.
+
+CP214 next maps
+`ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int zoneNum,
+int spaceNum = 0)`, declared at `ZoneTempPredictorCorrector.hh` line 241 and
+implemented at `ZoneTempPredictorCorrector.cc` lines 4433-4619.
 
 ## Promotion Requirements
 
