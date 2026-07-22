@@ -94,6 +94,7 @@ required_routines = [
   "zone_space_heat_balance_correct_hum_rat",
   "down_interpolate_4_history_values",
   "inverse_model_temperature",
+  "process_inverse_model_multp_hm",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",

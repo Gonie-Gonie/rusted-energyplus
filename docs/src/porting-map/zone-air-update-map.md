@@ -38,6 +38,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | Zone/Space record-level humidity correction | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::correctHumRat` | history-only Zone humidity passes plus a separate bounded no-OA ThirdOrder IdealLoads helper | CP214 required source-mapped airflow/coefficient solve, clamps, RoomAir/hybrid/node/latent-sizing effects, and failure transaction; no exact Rust Zone/Space record parity |
 | history down-interpolation overload family | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::DownInterpolate4HistoryValues` scalar-output and array-return overloads | three-output thermal Zone history helper only | CP215 maps the contaminant-owned five-reference overload; CP216 expands the same required source-mapped routine to the thermal four-slot array/returned-current overload, with no exact Rust width, topology, invalid-input, alias, or lifecycle parity |
 | hybrid inverse temperature inference | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::InverseModelTemperature` | no typed `HybridModel:Zone` object or inverse-model state/runtime path | CP217 required source-mapped measured-temperature override, infiltration/internal-mass/people inverse branches, and unconditional measured-history shift; no Rust parser, state, output, test, or execution parity |
+| hybrid thermal-mass multiplier postprocessing | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::processInverseModelMultpHM` | no inferred multiplier, aggregate, or per-Zone recurring-warning state | CP218 required source-mapped lower clamp, uncapped over-limit diagnostics, persistent sum/count/average update, and caller transaction; no Rust parser, state, output, diagnostic, test, or execution parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -4327,9 +4328,213 @@ numerical, performance, or conformance promotion. The inventory becomes 32
 algorithms and 224 routines, split 58 `state_mapped` plus 166 `source_mapped`,
 with 101 required; the heat-balance project list becomes 70.
 
-CP218 next maps `processInverseModelMultpHM`, declared at
+### CP218 `processInverseModelMultpHM` source map
+
+CP218 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.process_inverse_model_multp_hm`
+immediately after `routine.inverse_model_temperature`. The heat-balance project
+contract adds `process_inverse_model_multp_hm` after
+`inverse_model_temperature` and before `update_final_surface_heat_balance`.
+`processInverseModelMultpHM` is declared at
 `ZoneTempPredictorCorrector.hh` lines 327-333 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 4953-4991.
+
+The helper accepts state, four mutable `Real64` references for the current
+multiplier, accumulated sum, sample count, and average, plus a Zone identity by
+value. It first obtains the named `Zone(zoneNum)` and
+`zoneHeatBalance(zoneNum)` records. It owns no date, HybridModel mode, history,
+warmup, sizing, or output gate of its own.
+
+Two constants define the comparison boundaries:
+`minHMMultValue = 1.0` and `maxHMMultValue = 30.0`. The exact ordered behavior
+is:
+
+| Input multiplier class | Current multiplier after limiting | Immediate/recurring diagnostic | Statistics |
+|---|---|---|---|
+| `< 1.0` | overwritten with exactly 1.0 | none | excluded |
+| `== 1.0` | unchanged | none | excluded |
+| `> 1.0 && <= 30.0` | unchanged | none | added |
+| `> 30.0` | unchanged; never capped | over-limit diagnostics | added |
+
+The strict lower branch precedes the strict upper branch. After it, every
+multiplier strictly greater than one executes
+`multSumHM += multiplierHM` and then increments the `Real64` count with
+`countSumHM++`. A resulting or preexisting count greater than or equal to one
+then overwrites `multAvgHM = multSumHM / countSumHM`; a count below one leaves
+the incoming average unchanged. Consequently exactly 30 is accepted and added
+without warning, while a value above 30 is warned but still added. The source
+comment saying valid statistics are not higher than the maximum does not match
+the executable predicate, which checks only `multiplierHM > 1.0`.
+
+#### Diagnostic ownership
+
+For the first multiplier above 30 while
+`hmThermalMassMultErrIndex == 0`, CP218 emits one warning using the Zone name
+and two continuation lines:
+
+```text
+Hybrid model thermal mass multiplier higher than the limit for {Zone name}
+This means that the ratio of the zone air heat capacity for the current time step to the
+zone air heat storage is higher than the maximum limit of 30.0.
+```
+
+Every above-30 occurrence then calls `ShowRecurringWarningErrorAtEnd` with the
+per-Zone heat-balance-record index by reference and the recurring identity:
+
+```text
+Hybrid model thermal mass multiplier limit exceeded in zone {Zone name}
+```
+
+The first recurring call assigns a nonzero index; later calls suppress the
+immediate three-line warning but continue updating the recurring record. CP218
+passes no current multiplier to recurring min/max/sum reporting. Diagnostic
+work completes before numerical aggregation, the routine returns no status,
+and no high value is corrected.
+
+#### Floating-point, malformed-state, and alias boundary
+
+CP218 performs no finite, overflow, count-integrality, sign, bounds,
+allocation, denominator, or distinct-reference validation. Under ordinary
+masked IEEE behavior, negative infinity enters the lower clamp, positive
+infinity is warned and accumulated into an infinite sum/average, and every
+comparison with a NaN multiplier is false. A NaN multiplier is therefore not
+clamped, warned, or added, although an existing count at least one still causes
+the old sum/count to rewrite the average.
+
+The count is not an integer type; fractional, negative, infinite, and NaN
+incoming counts retain native comparison, increment, and division behavior.
+The four mutable references may alias one another. A write to the multiplier,
+sum, count, or average can then change a later operand or the final current
+multiplier observed by the caller. The sole production call and direct fixture
+use distinct storage, but CP218 itself establishes no such precondition.
+
+#### Production ownership and cadence
+
+The sole production call expression is inside CP217
+`InverseModelTemperature` at `ZoneTempPredictorCorrector.cc` lines 4879-4880.
+The caller passes local `MultpHM` and the Zone-owned
+`ZoneVolCapMultpSensHMSum`, `ZoneVolCapMultpSensHMCountSum`, and
+`ZoneVolCapMultpSensHMAverage`. CP218 runs only after CP217's internal-mass
+branch has inferred a multiplier under this exact child gate:
+
+```text
+InternalThermalMassCalc_T
+&& SumSysMCpT == 0
+&& ZT != PreviousMeasuredZT1
+&& UseZoneTimeStepHistory
+```
+
+All parent conditions also apply: exact Zone identity, the global HybridModel
+gate, non-warmup and non-sizing correction, inclusive hybrid date window, and
+the measured-temperature override. After CP218 returns, CP217 separately
+writes the possibly lower-clamped local value to
+`ZoneVolCapMultpSensHM`; CP218 does not write that current output field itself.
+
+Normal HVAC starts a Zone timestep with Zone-timestep history selected, so an
+eligible initial correction can contribute one sample. If adaptive shortening
+is selected afterward, its fine corrections set global history false and do
+not call CP218, even though CP217's surrounding prefix and history tail repeat.
+Demand-manager HVAC resimulation has no correction step. An external or
+same-state repeated CP217 call that again satisfies the gate contributes
+another sample.
+
+`ZoneVolCapMultpSensHMSum` and `ZoneVolCapMultpSensHMCountSum` default to zero,
+while `ZoneVolCapMultpSensHMAverage` defaults to one. The average is consumed
+for every Zone in the `Hybrid Model: Internal Thermal Mass` tabular subtable
+when global `FlagHybridModel_TM` is true; the individual Zone flag controls
+only its adjacent Yes/No column. The current multiplier is registered by the
+upstream HybridModel input transaction. CP218 itself registers no output.
+
+#### Failure, retry, and reset
+
+An invalid or unallocated Zone or heat-balance record fails during the initial
+record access before numerical mutation. An abnormal diagnostic non-return can
+preserve an immediate-warning or recurring-index prefix while preventing the
+following sum, count, and average updates. Later arithmetic or aliased-state
+failure can preserve a sum or count prefix. CP218 owns no assertion, catch,
+cleanup, completion marker, transaction, rollback, or recovery status.
+
+Repeating an unchanged multiplier above one is non-idempotent: the same value
+is added and counted again. Repeating an above-30 value also updates recurring
+occurrence state again, while the already nonzero index normally suppresses
+the immediate warning. A below-one call mutates its referenced value to one;
+replaying that same storage remains excluded. Even an excluded sample can
+rewrite the average when a prior count is at least one.
+
+The Zone aggregate defaults are declared in `DataHeatBalance`, and the
+per-Zone warning index defaults to zero in `ZoneSpaceHeatBalanceData`.
+CP217 resets only the current multiplier on entry. Neither CP218 nor the
+Zone/Space begin-environment initializer resets the sum, count, average, or
+warning index, so they persist across ordinary environment boundaries. Clean
+reset requires reconstruction or clear of their respective state owners.
+
+#### C++ test and corpus boundary
+
+`HybridModel_processInverseModelMultpHMTest` directly calls CP218 five times at
+`ZoneTempPredictorCorrector.unit.cc` lines 1827, 1840, 1853, 1866, and 1886.
+Its 20 numeric assertions, five warning-index assertions, and one error-stream
+assertion establish these sequential states with tolerance 0.001:
+
+| Input | Expected `(multiplier, sum, count, average)` | Warning evidence |
+|---|---|---|
+| 0.5 | `(1, 0, 0, 0)` | index remains zero |
+| 1.0 | `(1, 0, 0, 0)` | index remains zero |
+| 10.0 | `(10, 10, 1, 10)` | index remains zero |
+| 50.0 | `(50, 60, 2, 30)` | index becomes nonzero; immediate warning text checked |
+| 0.5 | `(1, 60, 2, 30)` | index remains nonzero |
+
+The fixture uses local sum, count, and average references initialized to zero
+rather than the production Zone fields, whose average default is one. The
+50-input case directly proves the over-limit value is neither capped nor
+excluded. The final low-input comment says no error message, but no post-call
+error-stream assertion proves that statement.
+
+The five `correctZoneAirTemps` calls in `HybridModel.unit.cc` provide only one
+indirect CP218 execution: the first case enables internal thermal mass and
+asserts the downstream current multiplier is approximately 15.13. The other
+four cases disable that mode. No indirect assertion inspects the production
+sum, count, average, warning index, tabular output, or diagnostics.
+
+No C++ test covers exactly 30, nonfinite values, fractional or malformed
+counts, reference aliasing, a repeated above-30 occurrence, recurring-summary
+output/count, production-default average behavior, environment persistence,
+invalid state, partial failure, or valid-sample retry. All 57 active
+full-simulation `ManageSimulation` expressions configure no HybridModel, so
+actual CP218 reach, hybrid output oracle count, and hybrid tabular oracle count
+are zero.
+
+#### Rust boundary
+
+A crate-wide search finds no `processInverseModelMultpHM`, `HybridModel`,
+`ZoneVolCapMultpSensHM`, `hmThermalMassMultErrIndex`, or exact HybridModel
+thermal-mass output. `HybridModel:Zone` is absent from the typed compiler list,
+becomes `RawOnly`, has no partial capability rule, and run-blocks with the
+generic `UnsupportedObject` boundary.
+
+Rust `ZoneHeatBalanceState` has no inferred multiplier, persistent sum, count,
+average, or per-Zone recurring-warning index. Its nearest
+`air_heat_capacity_j_per_k` is initialized and weather-refreshed from Zone
+volume and psychrometric properties for the forward solver; it is not inverse
+thermal-mass state. Generic Rust runtime diagnostics retain encountered
+messages but provide no equivalent per-Zone recurring index or at-end
+aggregation transaction.
+
+Rust reports diagnostic physical air capacity/power-capacity values, not the
+current HybridModel multiplier or its tabular average. It has no parser,
+runtime consumer, report table, capability, focused test, or support evidence
+for CP218. Forward capacity and generic diagnostic tests establish none of the
+strict thresholds, uncapped high values, ordered references, warning lifecycle,
+persistent aggregates, or caller cadence.
+
+CP218 adds no EnergyPlus source inventory, Rust target, code, mapped state,
+test, support, capability, output implementation, comparator, manifest,
+numerical, performance, or conformance promotion. The inventory becomes 32
+algorithms and 225 routines, split 58 `state_mapped` plus 167 `source_mapped`,
+with 102 required; the heat-balance project list becomes 71.
+
+CP219 next maps `InverseModelHumidity`, declared at
+`ZoneTempPredictorCorrector.hh` lines 335-343 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4993-5131.
 
 ## Promotion Requirements
 

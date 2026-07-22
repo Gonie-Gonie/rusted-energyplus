@@ -1989,12 +1989,69 @@ support, output, numerical, or conformance claim. The inventory becomes 32
 algorithms and 224 routines, split 58 `state_mapped` plus 166 `source_mapped`,
 with 101 required; the heat-balance project list becomes 70.
 
-CP218 next maps `processInverseModelMultpHM`, declared at
+CP218 adds required `process_inverse_model_multp_hm` immediately after
+`inverse_model_temperature` and before `update_final_surface_heat_balance`.
+Its EnergyPlus boundary is `processInverseModelMultpHM`, declared at
 `ZoneTempPredictorCorrector.hh` lines 327-333 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 4953-4991.
 
+The helper first accesses the selected Zone and heat-balance record. A
+multiplier strictly below one is overwritten with one and excluded from
+statistics. Exactly one is unchanged and excluded. Every value strictly above
+one is added to the `Real64` sum and increments the `Real64` count, after which
+any count at least one recomputes the average. The exact value 30 is accepted
+without warning. A value above 30 emits first-occurrence and recurring
+diagnostics but is neither capped nor excluded; this executable predicate
+contradicts the source comment that statistics stop at the maximum.
+
+The sole production call is CP217's internal-mass branch. It passes local
+multiplier state plus the Zone-owned sum, count, and average, then CP217 writes
+the returned/lower-clamped current multiplier. All CP217 exact-Zone, date,
+hybrid, history, non-warmup, non-sizing, and correction-cadence gates therefore
+apply. Initial Zone-timestep correction can add one sample; adaptive fine
+corrections use system history and skip CP218.
+
+The first value above 30 writes one immediate warning with two continuation
+lines when the per-Zone error index is zero, then every such value updates an
+at-end recurring record and its index. Diagnostics precede statistics. The
+Zone sum/count default to zero, average defaults to one, and the heat-balance
+warning index defaults to zero. No ordinary begin-environment path resets any
+of them; the average feeds the Hybrid Model internal-thermal-mass tabular
+subtable, while CP218 registers no output itself.
+
+CP218 validates no finite value, overflow, count shape, denominator, reference
+distinctness, Zone bound, or allocation. NaN is not clamped, warned, or added;
+positive infinity is warned and added; negative infinity clamps to one. Its
+four mutable references can alias. There is no status, catch, transaction, or
+rollback. Repeating a value above one adds it again, and repeating an
+above-30 value also updates recurring state again.
+
+One direct C++ fixture makes five calls and has 26 assertions. It proves
+`0.5 -> 1` without aggregation, exact one exclusion, 10 aggregation,
+uncapped-and-aggregated 50 with warning, and a later low sample preserving
+prior statistics. It uses local aggregate references initialized to zero,
+does not prove the production average default, and does not test exact 30,
+nonfinite/alias/malformed state, repeated-high recurring behavior, failure,
+retry, or reset. One indirect internal-mass case asserts only the downstream
+current multiplier near 15.13. All 57 active full simulations configure no
+HybridModel, so CP218 and its output/report oracles have zero corpus reach.
+
+Rust has no typed `HybridModel:Zone`, inferred multiplier, aggregate fields,
+per-Zone recurring index, exact output, report table, runtime path, capability,
+or focused test. Its physical air-capacity state serves the forward solver.
+The raw HybridModel object remains run-blocking.
+
+CP218 remains required `source_mapped` and adds no Rust target, mapped state,
+support, output, numerical, or conformance claim. The inventory becomes 32
+algorithms and 225 routines, split 58 `state_mapped` plus 167 `source_mapped`,
+with 102 required; the heat-balance project list becomes 71.
+
+CP219 next maps `InverseModelHumidity`, declared at
+`ZoneTempPredictorCorrector.hh` lines 335-343 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4993-5131.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`inverse_model_temperature`, preserving the
+`process_inverse_model_multp_hm`, preserving the
 completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
