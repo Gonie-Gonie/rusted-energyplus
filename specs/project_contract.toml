@@ -106,6 +106,7 @@ required_routines = [
   "adjust_operative_set_points_for_adap_comfort",
   "calc_zone_air_comfort_set_points",
   "get_comfort_set_points",
+  "adjust_cooling_set_point_for_temp_and_humidity_control",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",

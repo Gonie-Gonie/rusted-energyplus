@@ -2994,13 +2994,156 @@ performance, or conformance promotion. The inventory becomes 32 algorithms
 and 236 routines, split 58 `state_mapped` plus 178 `source_mapped`, with 113
 required; the heat-balance project list becomes 82.
 
-CP231 next maps `AdjustCoolingSetPointforTempAndHumidityControl`, declared at
+CP231 adds required `adjust_cooling_set_point_for_temp_and_humidity_control`
+immediately after `get_comfort_set_points` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is
+`AdjustCoolingSetPointforTempAndHumidityControl(EnergyPlusData &,
+int TempControlledZoneID, int ActualZoneNum)`, declared at
 `ZoneTempPredictorCorrector.hh` lines 369-372 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 6417-6458.
 
+The routine aliases the selected `TempControlledZone` and the actual Zone's
+thermostat-setpoint record before testing either guard. A false global
+`AnyZoneTempAndHumidityControl` therefore does not protect bad indexes. It
+then returns on that false flag or on exact per-record `OvercoolCtrl == None`.
+The record default is `Invalid`, which follows the constant-range path rather
+than returning. There is no assertion that both indexes identify the same
+Zone, so mode, range, ratio, and schedules from one record can be combined
+with another Zone's setpoints and relative humidity.
+
+After the guards, Scheduled mode samples its range schedule; every other mode
+uses the stored constant. The code copies the percent-RH-per-kelvin ratio,
+caps the range by `setptHi - setptLo` only when that gap is strictly positive,
+then always samples the independent dehumidifying schedule and subtracts it
+from the Zone `airRelHum`. Only strict positive humidity excess and ratio
+enter the final cap `min(range, excess / ratio)`, followed by the routine's
+sole write, `setptHi -= range`. It does not change scalar `setpt`, `setptLo`,
+the thermostat record's raw setpoint snapshots, an output registration,
+status, or diagnostics.
+
+The positive-gap rule is applied to SingleCool as well as Dual despite the
+source comment. SingleCool has just refreshed scalar and high but not low, so
+a stale or default low participates in its cap. A zero, reversed, NaN, or
+negative-infinite gap skips the cap. The ObjexxFCL double `min` chooses its
+second argument on equality or an unordered comparison, which makes NaN
+behavior argument-order-dependent. The strict humidity and ratio gates reject
+zero, negative, and NaN values but accept positive infinity. Malformed
+negative range raises the cooling setpoint, and a zero range still reaches a
+zero-subtraction assignment when both gates pass.
+
+CP196 sets the global flag from raw object count before validating any
+`ZoneControl:Thermostat:TemperatureAndHumidity` record, and the flag persists
+until the DataZoneControls owner is cleared. In the ordinary thermostat-object
+branch, Constant input can bind the dehumidifying schedule, range, and ratio.
+The Scheduled branch asks for alpha slot 6 although the schema's range
+schedule is A5. The documented selective-Zone fallback instead parses A3
+`Overcool` against the None/Constant/Scheduled enum, making valid Overcool
+invalid. Its Severe incorrectly reports A4's field and value instead of A3,
+and a malformed Scheduled value can leave the ratio at its default zero.
+Those pinned producer anomalies remain source behavior, not Rust validation
+guidance.
+
+A second lifecycle anomaly follows from the global flag. Untargeted
+temperature-control records retain default `Invalid` and null schedule
+pointers. Once any temperature-and-humidity object raises the flag, a
+SingleCool or Dual record without its own modifier can pass the exact-None
+guard, choose constant zero, and dereference its null dehumidifying schedule.
+Even a globally present object configured as None does not prove all other
+records are safe. The Constant producer path validates range within `[0,3]`
+inclusive. A Scheduled branch that obtains a schedule pointer attempts the
+same all-values check, while ratio has only a zero lower bound. CP231 does not
+revalidate live schedule values, RH, finite values, or pointers.
+
+Its only two production expressions are in CP204
+`CalcZoneAirTempSetPoints`. SingleCool orders raw cooling schedule, adaptive
+selection, operative conversion, copy of scalar to high, then CP231. Dual
+orders cooling and heating schedule work plus operative conversion, lets
+optimum start replace both bounds, then calls CP231 once. SingleHeatCool never
+calls it. The ordinary thermostat-fault offset follows, CP229 comfort control
+can overwrite ordinary results, and CP232 EMS override has final setpoint
+precedence inside the parent.
+
+The scalar/high asymmetry is observable: ordinary SingleCool load prediction
+uses scalar `setpt`, so CP231's high-only reduction does not drive that load,
+whereas Dual prediction consumes `setptHi`. The already registered
+`Zone Thermostat Cooling Setpoint Temperature` output is backed by high, but
+CP231 registers nothing itself. In the later prediction phase, any positive
+cutout-difference control rebuilds SingleCool or Dual high from the earlier
+raw thermostat snapshot, potentially discarding CP231 before load prediction
+and reporting.
+
+Built-in cadence is once per matching SingleCool or Dual record during the
+Zone-timestep setpoint sweep before system substeps. Demand-manager HVAC
+resimulation can repeat the whole parent at the same simulation time, while
+the external-HVAC path bypasses it. CP231 has no local warmup, sizing,
+kickoff, environment, occupancy, or control-availability guard.
+
+Every potentially failing lookup or schedule read precedes the sole write, so
+a non-return before line 6456 leaves no CP231-owned partial mutation while
+retaining all earlier parent work. There is no catch, rollback, latch, or
+retry status. A direct duplicate successful call is generally
+non-idempotent: it subtracts again from the already reduced high, and if the
+first call reaches low exactly, the next zero gap skips the protective cap
+and can cross below low. A full-parent retry normally reloads SingleCool
+scalar/high or Dual high/low but repeats schedules and all earlier/later
+modifiers. Clean replay spans
+DataZoneControls records and flag, HeatBalFanSys setpoints,
+ZoneTempPredictorCorrector RH state, schedules, optimum-start, fault, comfort,
+EMS, and environment owners. Begin-environment initialization zeroes the
+live thermostat setpoints and Zone RH, but it does not clear the
+DataZoneControls global flag, mode, range, ratio, or schedule pointers.
+
+No C++ unit test calls CP231 or contains the exact temperature-and-humidity
+object. Four fixtures make 21 direct parent calls and produce 20 indirect
+CP231 expression entries: three optimum-start Dual entries, seven reporting
+entries, and five entries in each of two cutout fixtures. Every one returns
+at the false global guard, and no assertion isolates range, RH, ratio, or the
+high-only mutation.
+
+Of 57 active full-simulation expressions, one expected EMS fatal stops before
+setpoint acquisition and 56 reach it. Thirty-eight configurations contain 52
+ordinary thermostat records: 49 Dual and three SingleHeat/SingleCool
+schedule-switching records. Aggregating one reached sweep per configuration
+yields 49 guaranteed CP231 call-expression entries and at most 52, not a fixed
+runtime total across
+warmup and resimulation. None of the 57 inputs has the temperature-and-humidity
+modifier, so all entries return globally and active-body corpus reach is zero.
+
+The installed
+`AirflowNetwork_MultiZone_House_OvercoolDehumid.idf` is the sole exact
+ExampleFile candidate. It uses one Dual thermostat, a 45 percent RH schedule,
+constant 1.7 K range, and 3 percent/K ratio. Upstream
+`testfiles/CMakeLists.txt` registers it as a Miami-EPW
+`add_simulation_test`, so it is full-model Constant-path regression evidence,
+but it does not request the adjusted cooling-setpoint output, directly assert
+CP231, or cover Scheduled mode. This repository adopts neither its input nor
+a script. The 85 separate Humidistat ExampleFiles do not activate CP231 and
+are not evidence for it.
+
+Rust has no typed temperature-and-humidity thermostat modifier, overcool
+mode/range/schedule/ratio, percent-RH setpoint input, mutable scalar/low/high
+setpoint record, exact helper, or live caller. Its thermostat graph is
+bounded to ordinary direct-Zone DualSetpoint state, and the compatibility
+setpoint wrapper still receives an empty live closure. The raw modifier has
+no partial-support rule and run-blocks.
+
+Typed `ZoneControl:Humidistat`, psychrometric RH primitives, and IdealLoads
+moisture-demand logic are separate adjacent paths. They neither lower an
+ordinary cooling `setptHi` nor reproduce CP231's guards, caps, producer bugs,
+caller order, or lifecycle. CP231 therefore adds no algorithm-level
+`energyplus_source` entry, Rust target, code, mapped state, test, support,
+capability, output implementation, comparator, case, manifest, numerical,
+performance, or conformance promotion. The inventory becomes 32 algorithms
+and 237 routines, split 58 `state_mapped` plus 179 `source_mapped`, with 114
+required; the heat-balance project list becomes 83.
+
+CP232 next maps `OverrideAirSetPointsforEMSCntrl`, declared at
+`ZoneTempPredictorCorrector.hh` line 374 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 6460-6555.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`get_comfort_set_points`, preserving the completed
-predictor/corrector definition slice before
+`adjust_cooling_set_point_for_temp_and_humidity_control`,
+preserving the completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
 the implementation at lines 5176-5219. The routine always invokes seven
