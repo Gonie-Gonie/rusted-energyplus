@@ -118,7 +118,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `PurchasedAirManager::UpdatePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/update.rs::supply_node_update_from_result` |
 | `PurchasedAirManager::ReportPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/report.rs::IdealLoadsReportSnapshot`; `crates/ep_runtime/src/output/meter_registry.rs::meter_rate_to_energy_j` |
 | `DataSizing::calcDesignSpecificationOutdoorAir` | `src/EnergyPlus/DataSizing.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air/dcv.rs::occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s` |
-| `ZoneEquipmentManager::ManageZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ideal_loads_zone_equipment_stages` |
+| `ZoneEquipmentManager::ManageZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ideal_loads_zone_equipment_stages`; `validate_ideal_loads_zone_equipment_dispatch`; `crates/ep_runtime/src/execution_plan.rs::ExecutionPlan` |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
 | `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand` |
 
@@ -137,9 +137,12 @@ ZoneEquipmentManager::ManageZoneEquipment
   -> PurchasedAirManager::ReportPurchasedAir
 ```
 
-The Rust compatibility path preserves this ordering for the promoted
-no-OA/no-limit sensible boundary and must be extended before any excluded
-feature is promoted.
+This is the canonical source dependency order, not an implemented Rust parent
+driver. Rust records selected stage labels and validates typed IdealLoads graph
+edges, while its compatibility runtime enters prebound PurchasedAir systems
+directly. It does not execute the exact `ManageZoneEquipment`
+Init/Size-or-Sim/Update protocol, so this ordering alone promotes no broader
+IdealLoads or HVAC behavior.
 
 `GetPurchasedAir` name lookup is represented as compile-stage typed binding in
 Rust. Conformance reports expose `ideal_loads_runtime_binding_source` as
@@ -914,6 +917,133 @@ and hourly/monthly/run-period facility meters; fully owned moisture-history
 closure without EnergyPlus trace state, return-node and zone-air-node humidity
 proof rows, annual meter rows, other broader meter frequencies, outdoor-air,
 economizer, heat-recovery, and broad HVAC behavior remain outside the claim.
+
+## CP237 `ManageZoneEquipment` Parent Contract
+
+CP237 expands the already required `routine.manage_zone_equipment` entry; it
+does not add a routine, source file, or HVAC project item.
+`ManageZoneEquipment` is declared at `ZoneEquipmentManager.hh` lines 82-86 and
+implemented completely at `ZoneEquipmentManager.cc` lines 141-167. Its mutable
+interface takes `FirstHVACIteration` by value and caller-owned `SimZone` and
+`SimAir` booleans by reference.
+
+### Exact order, branch, and writes
+
+Every reached invocation performs this order:
+
+1. call `InitZoneEquipment(state, FirstHVACIteration)`;
+2. read the current global `ZoneSizingCalc`;
+3. when true, call `SizeZoneEquipment(state)`;
+4. otherwise call
+   `SimZoneEquipment(state, FirstHVACIteration, SimAir)` and only after that
+   returns set shared `ZoneEquipSimulatedOnce = true`;
+5. call `UpdateZoneEquipment(state, SimAir)`; and
+6. only after Update returns set the caller's `SimZone = false`.
+
+Incoming `SimZone` is never read, so false input does not suppress any work.
+`FirstHVACIteration` reaches Init and only the non-sizing Sim child. The parent
+never clears or otherwise assigns `SimAir`: the non-sizing branch passes it
+through Sim and then Update, while the sizing branch passes it only to Update.
+The children may raise it when air-loop interface state requires another
+simulation, and an already true value remains true.
+
+The direct children remain separate source boundaries. Init owns one-time
+Zone/Space demand-sequence allocation, begin-environment resets, every-call
+HVAC-timestep initialization, and air-loop aggregate clearing. Size owns its
+one-time sizing arrays and ordered Zone/Space sizing, mass-balance, and leaving
+conditions. Sim owns supply paths, simple airflow, mixers, ordered Zone
+equipment and residual loads, reverse paths, exhaust/mass/leaving/duct/return
+work. Update walks return interfaces and passes `SimAir` by reference into
+their convergence update. CP237 maps only the parent orchestration and does
+not promote those complete child implementations.
+
+### Failure, replay, and reset
+
+The wrapper performs no local input, allocation, count, availability, or flag
+validation and has no diagnostic, status result, catch, cleanup, transaction,
+or rollback. Failure in Init prevents the branch, Update, and final flag
+write. Failure in Size prevents Update and the final write. Failure in Sim
+prevents the simulated-once assignment, Update, and the final write. A
+non-sizing Update failure occurs after `ZoneEquipSimulatedOnce` has become
+true but before `SimZone` becomes false; a sizing Update failure similarly
+preserves the caller's prior `SimZone`.
+
+Retry is unconditional because neither incoming `SimZone` nor
+`ZoneEquipSimulatedOnce` gates entry. Init clears its one-time flag before its
+first allocation, so abnormal exit can leave partial initialization that a
+same-state retry skips. Its environment flag clears only after the complete
+environment block and rearms while `BeginEnvrnFlag` is false. Size clears its
+one-time flag only after setup returns, and Sim clears its first-pass flag late
+in its body. The parent is not generally idempotent because the children reset
+timestep fields, simulate equipment and residual demand, update histories and
+nodes, and accumulate or overwrite child-owned state.
+`ZoneEquipSimulatedOnce` defaults false, is written here only on a completed
+non-sizing Sim child, is not reset per environment, and returns to false only
+when the owning `DataZoneEquipment` state is reconstructed. The manager's own
+one-time flags default true and are restored by its full state clear.
+
+### Production callers and evidence
+
+There are seven production call expressions. `HVACManager::SimHVAC` invokes
+the parent in its `ZoneSizingCalc` path. `HVACManager::SimSelectedEquipment`
+has a begin-environment prepass, the unconditional first-HVAC-iteration call,
+and its later `SimZoneEquipment`-guarded iteration call. `SizingManager` has
+two `ManageSizing` calls plus one system-sizing-adjustment call that
+temporarily establishes its environment state. The wrapper itself never calls
+`GetZoneEquipment`; that is the next separate source routine.
+
+Nine direct C++ invocations occur across eight tests: four PurchasedAir
+fixtures, two `HVACUnitaryBypassVAV` fixtures, one packaged-terminal
+heat-pump fixture that calls twice, and one UnitHeater fixture. Eight pass
+`FirstHVACIteration = true` and one passes false. All retain
+`ZoneSizingCalc = false`, so none composes the sizing branch. Their assertions
+cover descendant equipment, plenum, node, capacity, or residual-load effects,
+not exact parent order, `SimZone`, `SimAir`, `ZoneEquipSimulatedOnce`,
+failure, replay, or reset. Separate direct child coverage has six Size calls
+across three tests and four Sim calls across two tests, but no direct Init or
+Update call and no composition of the CP237 parent contract.
+
+The active full-simulation corpus has 57 `ManageSimulation` expressions. One
+expected EMS fatal stops before HVAC. Each of the other 56 successful
+expressions reaches at least one CP237 production call, establishing a
+conservative lower bound of 56 executions. The eight sizing-only
+`SizingManager_ZoneSizing_*` fixtures reach the `SimHVAC`
+`ZoneSizingCalc` expression. Begin-environment prepasses, per-expression
+repetition, HVAC iterations, warmup/timesteps, and additional sizing calls can
+increase the dynamic count and are not instrumented.
+
+Across the corpus, 34 completing configurations, including the eight
+sizing-only fixtures, contain 50 `Sizing:Zone` definitions and provide static
+sizing-branch potential; the dynamic Size call count remains uninstrumented. The 55 zoned successful configurations contain 81 Zone
+identities, 55 controlled and 26 uncontrolled. That is child-topology context,
+not 81 parent calls. No active full-simulation assertion isolates the
+wrapper-owned protocol.
+
+### Rust boundary and status
+
+`ideal_loads_zone_equipment_stages()` returns three constant metadata records
+for Manage, SimZone, and SimPurchasedAir. The typed validator checks only the
+IdealLoads equipment graph, connections, nodes, and sequence. `ExecutionPlan`
+emits Manage and Sim labels for Zones that own IdealLoads and groups later
+PurchasedAir stages. The compatibility runtime then loops prebound systems,
+validates each, creates a demand snapshot, and invokes PurchasedAir wrappers
+directly.
+
+Rust therefore has no exact CP237 parent, `FirstHVACIteration` lifecycle,
+`ZoneSizingCalc` switch, Size branch, Init/Update orchestration, caller-owned
+`SimZone`/`SimAir` protocol, `ZoneEquipSimulatedOnce` lifecycle, complete
+multi-family Zone equipment dispatch, failure-prefix behavior, or reset/retry
+test. Its validator and execution-plan tests prove graph and metadata
+properties, not this routine. CP237 adds no Rust target, code, mapped state,
+test, support, capability, output implementation, comparator, case, manifest,
+numerical, performance, or conformance promotion. The inventory remains 32
+algorithms and 242 routines, split 58 `state_mapped` plus 184
+`source_mapped`, with 119 required; the heat-balance and HVAC project lists
+remain 88 and 8.
+
+CP238 next maps `ZoneEquipmentManager::GetZoneEquipment`, declared at
+`ZoneEquipmentManager.hh` line 88 and implemented at
+`ZoneEquipmentManager.cc` lines 169-197.
 
 ## Claim Requirements
 

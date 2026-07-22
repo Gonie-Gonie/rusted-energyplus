@@ -20974,9 +20974,42 @@ numerical, performance, or conformance promotion. The inventory becomes 32
 algorithms and 242 routines, split 58 `state_mapped` plus 184
 `source_mapped`, with 119 required; the heat-balance project list becomes 88.
 
-CP237 next expands `ZoneEquipmentManager::ManageZoneEquipment`, declared at
+CP237 expands the existing required `routine.manage_zone_equipment` mapping for
+`ZoneEquipmentManager::ManageZoneEquipment`, declared at
 `ZoneEquipmentManager.hh` lines 82-86 and implemented at
-`ZoneEquipmentManager.cc` lines 141-167.
+`ZoneEquipmentManager.cc` lines 141-167. It adds no routine or project item.
+Every entry ignores the incoming `SimZone`, calls `InitZoneEquipment`, selects
+`SizeZoneEquipment` only while `ZoneSizingCalc` is true or otherwise calls
+`SimZoneEquipment` and then sets `ZoneEquipSimulatedOnce = true`, calls
+`UpdateZoneEquipment`, and clears `SimZone` only after that child returns.
+`FirstHVACIteration` reaches Init and the non-sizing Sim child; `SimAir` is
+never cleared locally and is passed by reference through Sim when selected and
+then Update.
+
+The wrapper has no local validation, status, catch, cleanup, transaction, or
+rollback. A failing child preserves its completed prefix. In particular, a
+non-sizing Update failure occurs after the one-way simulated-once write but
+before the caller's `SimZone` is cleared. Re-entry always repeats the children
+because incoming `SimZone` and the latch are not gates. Nine direct C++ calls
+across eight tests all use the non-sizing branch and assert descendant
+equipment, node, or load effects rather than the parent protocol. Of 57 active
+full-simulation expressions, one expected EMS fatal stops before HVAC and the
+other 56 establish only a lower bound of 56 parent executions; repeated HVAC,
+warmup, and sizing calls are not instrumented.
+
+Existing Rust three-stage metadata, the typed IdealLoads graph validator,
+execution-plan labels, and the direct PurchasedAir compatibility loop do not
+implement the exact Init/Size-or-Sim/Update parent, its reference flags, latch,
+failure prefixes, replay, reset, multi-family dispatch, or broad HVAC
+behavior. CP237 therefore changes no Rust code, mapped state, support,
+capability, output, numerical, performance, or conformance claim. The
+inventory remains 32 algorithms and 242 routines, split 58 `state_mapped`
+plus 184 `source_mapped`, with 119 required; the heat-balance and HVAC project
+lists remain 88 and 8.
+
+CP238 next maps `ZoneEquipmentManager::GetZoneEquipment`, declared at
+`ZoneEquipmentManager.hh` line 88 and implemented at
+`ZoneEquipmentManager.cc` lines 169-197.
 
 ### `CheckValidSimulationObjects` state contract
 
