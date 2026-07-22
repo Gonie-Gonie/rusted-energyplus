@@ -22,6 +22,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | adaptive-comfort setpoint schedule | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::CalculateAdaptiveComfortSetPointSchl` | none | CP198 non-required source-mapped strict ASH/CEN design-day and daily schedule writer; no Rust adaptive-control parity |
 | Zone setpoint runtime initialization | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::InitZoneAirSetPoints` | `init_zone_air_set_points_compat` identity closure only | CP199 required source-mapped one-time allocation/output, environment reset, validation, and demand-limiting transaction; no whole-routine Rust parity |
 | Zone/Space begin-environment history initialization | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::beginEnvironmentInit` | Zone-only run initialization and later bounded history state | CP200 required source-mapped 26-write four-slot environment reset; no exact Rust Zone/Space lifecycle parity |
+| Zone/Space heat-balance output registration | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::setUpOutputVars` | adjacent Zone mean-air ResultStore series only | CP201 required source-mapped four-row Zone and simulation-Space OutputProcessor binding; no exact Rust identity, field, timestep, pointer, or lifecycle parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -638,9 +639,9 @@ surface emits nothing.
 
 Output setup then preserves several distinct boundaries:
 
-- `ZoneSpaceHeatBalanceData::setUpOutputVars` registers four heat-balance
-  variables for every Zone and, only during Space simulation, every stored
-  Space.
+- CP201 `ZoneSpaceHeatBalanceData::setUpOutputVars` registers four
+  heat-balance variables for every Zone and, only during Space simulation,
+  every stored Space.
 - Each Zone sensible-demand child registers ten variables plus one when staged;
   each moisture child registers six plus six more under `DoLatentSizing`.
   Space simulation registers the same bundles for Spaces.
@@ -837,9 +838,10 @@ runs again.
 There are zero direct CP200 unit calls and zero direct assertions of its
 targets. The four direct CP199 fixture calls all keep `BeginEnvrnFlag` false
 and never enter CP200. Of 57 active `ManageSimulation` unit calls, the
-`EMSManager.unit.cc` line-1123 case exits in the preceding EMS callback; the
-other 56 transitively reach Zone CP200. Seven `SizingManager.unit.cc` cases
-also exercise sizing-Space state.
+`EMSManager.unit.cc` line-1123 case exits in the preceding EMS callback. The
+other 56 reach CP199, but `WeatherManager_SetRainFlag` has zero Zones, so only
+55 execute a Zone CP200 call. Seven `SizingManager.unit.cc` cases also exercise
+sizing-Space state.
 `HeatBalanceAirManager_GetMixingAndCrossMixing` enables simulation-Space heat
 balance and calls `ManageSimulation` at line 864, so it exercises that Space
 path as well. Their assertions remain downstream or no-throw evidence rather
@@ -866,7 +868,8 @@ CP200 adds required `source_mapped`
 `zone_temp_predictor_corrector_source_order.routine.zone_space_heat_balance_begin_environment_init`
 immediately after `routine.init_zone_air_set_points`. The heat-balance project
 contract adds `zone_space_heat_balance_begin_environment_init` after
-`init_zone_air_set_points` and before `update_final_surface_heat_balance`. The
+`init_zone_air_set_points`. CP201 now follows that entry before
+`update_final_surface_heat_balance`. The
 algorithm remains a `scaffold` with `claim_level = none`. No EnergyPlus source
 inventory, Rust target, code, mapped state, support, capability, output
 implementation, comparator, manifest, numerical, performance, or conformance
@@ -874,9 +877,150 @@ promotion is added. The inventory becomes 32 algorithms and 208 routines,
 split 58 `state_mapped` plus 150 `source_mapped`, with 85 required; the
 heat-balance project list becomes 54.
 
-CP201 next maps `ZoneSpaceHeatBalanceData::setUpOutputVars`, declared at
+### CP201 `ZoneSpaceHeatBalanceData::setUpOutputVars` source map
+
+`ZoneSpaceHeatBalanceData::setUpOutputVars(EnergyPlusData &state,
+std::string_view prefix, std::string const &name)` is declared at
 `ZoneTempPredictorCorrector.hh` line 215 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 2838-2868.
+`ZoneTempPredictorCorrector.cc` lines 2838-2868. It is a shared Zone/Space
+record member, but it receives only a prefix and key and owns no record
+identity, count, mode, membership, or lifecycle guard.
+
+Its only production call expressions are inside CP199's one-time Zone loop:
+
+1. line 2443 calls every `zoneHeatBalance(zoneNum)` for
+   `zoneNum = 1..NumOfZones` with prefix `Zone` and that Zone's stored name;
+2. lines 2444-2448 immediately walk the current Zone's `spaceIndexes` and call
+   `spaceHeatBalance(spaceNum)` with prefix `Space` and that Space's stored name
+   only when `doSpaceHeatBalanceSimulation` is true.
+
+The order is therefore Zone 1, its stored Spaces, the remaining Zone 1 output
+bundles, Zone 2, and so on. It is not CP200's all-Zones-then-all-Spaces order.
+Duplicate Space membership, invalid indices, repeated or blank names, and
+prefix/key consistency are trusted. Sizing-only `doSpaceHeatBalance` does not
+open the Space path. If `N` Zones are visited and `S` nested Space memberships
+are reached, CP201 runs for `R = N + S` records and makes exactly `4R` child
+setup calls.
+
+Each record uses this fixed registration sequence:
+
+| Sequence | Formatted name | Member address | Units | timestep | store |
+|---|---|---|---|---|---|
+| 1 | `{prefix} Air Temperature` | `ZT` | C | System | Average |
+| 2 | `{prefix} Air Humidity Ratio` | `airHumRat` | None | System | Average |
+| 3 | `{prefix} Air Relative Humidity` | `airRelHum` | percent | System | Average |
+| 4 | `{prefix} Mean Radiant Temperature` | `MRT` | C | Zone | Average |
+
+The supplied stored name is the key for all four rows. Production prefixes are
+the constants `zonePrefix = "Zone"` and `spacePrefix = "Space"`. CP201 leaves
+the `SetupOutputVariable` optional arguments at their defaults: resource,
+group, and end use are Invalid; end-use subcategory, meter Zone, space type,
+and custom unit are empty; both multipliers are one; `indexGroupKey` is -999;
+and report frequency is Hour. A matching `Output:Variable` request can replace
+that Hour value with its requested frequency and schedule on the concrete
+output entry. These calls never attach meters and do not increment Sum or
+meter counters.
+
+CP201 does not read, validate, normalize, or assign `ZT`, `airHumRat`,
+`airRelHum`, or `MRT`. It passes a mutable address for each member to
+OutputProcessor. On first use, `SetupOutputVariable` can initialize global
+output state and parse requested-variable input. It then checks matching
+requests and the DataOutputs variable list, calls `AddDDOutVar`, increments
+`NumOfRVariable_Setup`, and increments `NumTotalRVariable` by at least one for
+every CP201 row.
+
+`AddDDOutVar` keys its dictionary map by uppercase variable name and reuses an
+entry only when units also match. It does not compare the supplied key,
+timestep, store, or variable type. Zone records consequently share four
+dictionary names, and reached Space records share four distinct prefixed names.
+With neither a report request nor a variable-list match, setup returns after
+the dictionary and counter effects without creating an `OutVarReal`. A
+variable-list-only match appends one dummy keyed entry, dictionary link, report
+identifier, and `Which = &member` pointer, but leaves `Report` false and skips
+report-dictionary sinks. Each distinct frequency/schedule report request
+appends a reporting entry with the same link, identifier, pointer, and metadata
+and writes the applicable ESO, SQL, and ResultsFramework dictionary records.
+Duplicate matching requests within one call are collapsed only by
+frequency/schedule identity; prior Used state does not suppress a later helper
+call.
+
+There is no local idempotence, status, catch, cleanup, or rollback. The four
+format operations and four child registrations are sequential. Formatting,
+OutputProcessor initialization, requested-variable parsing, allocation, or a
+dictionary sink can fail after any completed prefix of dictionary, counter,
+link, pointer, identifier, or external-output side effects. CP199 clears
+`InitZoneAirSetPointsOneTimeFlag` only at line 2618, after all Zone, Space,
+demand, thermostat, comfort, ZoneList, and ZoneGroup setup returns. A non-return
+therefore leaves the parent latch true and can cause a same-state retry to
+attempt the one-time phase again.
+
+A direct complete replay reuses same-name/unit dictionary entries but advances
+setup and total counters again. With neither a request nor a DataOutputs-list
+match, it repeats only those counter effects. A list match also duplicates a
+dummy or reporting keyed `OutVarReal`, dictionary link, and report identifier;
+a report request additionally duplicates the report flag and emitted
+dictionary rows. The raw `Which` pointers remain valid only while the
+registered Zone/Space storage stays stable. Predictor/corrector `clear_state`
+placement-news the record owner and rearms its latch without clearing
+OutputProcessor, so using it alone can leave dangling pointers.
+OutputProcessor `clear_state` deletes output and DD arenas and resets most
+registry state but does not rebuild the records, cannot retract emitted rows,
+and does not explicitly reset `NumOfRVariable` or `NumOfIVariable`. A clean
+replay needs coordinated fresh ownership rather than either reset alone.
+
+Search finds zero direct CP201 unit calls and zero positive assertions of its
+registered name, unit, key, timestep, store, or member binding. The four direct CP199
+fixtures at `HVACUnitaryBypassVAV.unit.cc` lines 659 and 1668 and
+`SystemReports.unit.cc` lines 204 and 365 indirectly run Zone CP201 with
+simulation-Space false, but assert unrelated outputs. Of 57 active
+`ManageSimulation` unit calls, `EMSManager.unit.cc` line 1123 terminates before
+CP199. The other 56 reach CP199, but `WeatherManager_SetRainFlag` has zero
+Zones, so only 55 execute a Zone CP201 registration. Only
+`HeatBalanceAirManager_GetMixingAndCrossMixing` enables simulation-Space,
+visits three stored Spaces, and asserts later geometry/mixing behavior. The
+seven `SizingManager.unit.cc` cases that reach CP200's sizing-Space reset keep
+simulation-Space off and do not reach CP201 Space setup.
+
+Two exact-name test literals are not positive coverage. The
+`ThermalChimney.unit.cc` `Zone Air Temperature` string is an EMS input in a
+test that does not call CP199. The API data-transfer test asks for a
+`Zone Mean Radiant Temperature` handle in synthetic state without CP201 setup
+and expects -1.
+
+Rust's `RuntimeOutputRegistry::register_model_outputs` registers
+`Zone Mean Air Temperature` with C/Hourly metadata for each typed Zone, not
+`Zone Air Temperature`. The heat-balance ResultStore separately emits
+`Zone Mean Air Temperature` and `Zone Mean Air Humidity Ratio` from trace
+series and infers Average storage, but represents neither CP201's exact names
+and members nor its System-versus-Zone timestep distinction. Rust has no
+`Zone Air Relative Humidity`, `Zone Mean Radiant Temperature`, any of the four
+Space names, distinct `ZT`/`airHumRat`/`airRelHum`/`MRT` output bindings,
+Space heat-balance record, or OutputProcessor pointer/latch lifecycle.
+
+The compiler test literal `Zone Air Temperature` only demonstrates typed
+`Output:Variable` request intake. The IdealLoads CLI constants `Zone Air
+Temperature` and `Zone Air Humidity Ratio` are ESO oracle input identities;
+the humidity name also labels a closed-loop diagnostic comparison. Neither is
+a RuntimeOutputRegistry or ResultStore production definition. Adjacent Zone
+mean-air state, registry, ResultStore, and generic Average-store inference
+therefore do not establish CP201 parity.
+
+CP201 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.zone_space_heat_balance_set_up_output_vars`
+immediately after
+`routine.zone_space_heat_balance_begin_environment_init`. The heat-balance
+project contract adds `zone_space_heat_balance_set_up_output_vars` after
+`zone_space_heat_balance_begin_environment_init` and before
+`update_final_surface_heat_balance`. The algorithm remains a `scaffold` with
+`claim_level = none`. No EnergyPlus source inventory, Rust target, code, mapped
+state, support, capability, output implementation, comparator, manifest,
+numerical, performance, or conformance promotion is added. The inventory
+becomes 32 algorithms and 209 routines, split 58 `state_mapped` plus 151
+`source_mapped`, with 86 required; the heat-balance project list becomes 55.
+
+CP202 next maps `PredictSystemLoads`, declared at
+`ZoneTempPredictorCorrector.hh` lines 276-280 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 2870-3145.
 
 ## Promotion Requirements
 

@@ -886,10 +886,11 @@ only CP199's outer latch limits normal environment execution. A Space mode
 enabled after that latch clears in the same uninterrupted environment interval
 does not replay skipped Space records.
 
-No C++ unit test calls CP200 directly or asserts one of its targets. Fifty-six
-active full-simulation tests transitively exercise the Zone path; seven
-`SizingManager` tests reach sizing-Space and one `HeatBalanceAirManager` test
-reaches simulation-Space, but their assertions are downstream.
+No C++ unit test calls CP200 directly or asserts one of its targets. Of 56
+active full-simulation tests that reach CP199, 55 execute at least one Zone
+CP200 call; `WeatherManager_SetRainFlag` has zero Zones and executes none.
+Seven `SizingManager` tests reach sizing-Space and one `HeatBalanceAirManager`
+test reaches simulation-Space, but their assertions are downstream.
 
 Rust constructs only Zone run state with different three-slot histories. When
 weather data exists, it seeds current and averaged humidity plus both histories
@@ -901,8 +902,75 @@ path. These adjacent histories and coefficients are not this member
 implementation. CP200 remains `source_mapped` and required without new Rust
 state, support, output implementation, numerical, or conformance promotion.
 
+The following required predictor/corrector definition entry is
+`zone_space_heat_balance_set_up_output_vars`, after
+`zone_space_heat_balance_begin_environment_init` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is
+`ZoneSpaceHeatBalanceData::setUpOutputVars(EnergyPlusData &state,
+std::string_view prefix, std::string const &name)`, declared at
+`ZoneTempPredictorCorrector.hh` line 215 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 2838-2868.
+
+CP199's one-time Zone loop is the only production caller. It invokes CP201 for
+every Zone, then for that Zone's stored Spaces only when
+`doSpaceHeatBalanceSimulation` is true, before continuing with the rest of that
+Zone's demand and thermostat outputs. Sizing-only Space mode does not call
+CP201. Production prefixes are `Zone` and `Space`, and keys are the
+corresponding stored names.
+
+Each call registers four values in fixed order: air temperature binds `ZT`
+with C/System/Average metadata; air humidity ratio binds `airHumRat` with
+Units::None/System/Average; air relative humidity binds `airRelHum` with
+percent/System/Average; and mean radiant temperature binds `MRT` with
+C/Zone/Average. The formatted names are the prefix followed by `Air
+Temperature`, `Air Humidity Ratio`, `Air Relative Humidity`, or `Mean Radiant
+Temperature`. Meter metadata stays invalid or empty, multipliers stay one, the
+SQL index stays -999, and Hour is only the default report-frequency argument;
+a matching request can replace the concrete output entry's frequency and
+schedule.
+
+CP201 does not change those numeric members. It hands their addresses to
+OutputProcessor, which initializes output state when necessary, parses
+requests, creates or reuses dictionary entries, and advances setup/total
+counters. A row with neither a report request nor a DataOutputs variable-list
+match retains its dictionary entry but creates no `OutVarReal`. A list-only
+match creates a keyed dummy pointer, link, and report identifier without a
+dictionary-sink write; a report request additionally marks the entry for
+reporting and emits the applicable rows. Dictionary reuse is case-insensitive
+name-plus-units only. The helper has no re-entry guard, so repeated calls can
+duplicate whichever counter, dummy or requested entry, link, identifier, and
+sink effects the same match state selects.
+
+There is no local identity, membership, prefix, key, shape, lifecycle, status,
+catch, cleanup, or rollback. A formatting, initialization, request-input,
+allocation, or report-write non-return can retain an arbitrary completed
+prefix, while CP199 does not clear its one-time latch until its entire output
+phase returns. Predictor/corrector reset alone can invalidate stored member
+pointers without clearing OutputProcessor; OutputProcessor reset alone does
+not reconstruct the owner records or parent latch. Clean replay therefore
+requires coordinated ownership reset, and already emitted external rows are
+not transactional.
+
+No unit test calls CP201 directly or positively asserts a registered name,
+unit, key, timestep, store, or field binding. Four direct CP199 fixtures and 55
+active full-simulation tests execute at least one Zone setup indirectly. One
+additional no-Zone `WeatherManager_SetRainFlag` simulation reaches CP199 but
+executes no CP201 call. Only
+`HeatBalanceAirManager_GetMixingAndCrossMixing` reaches simulation-Space setup,
+for three Spaces; seven sizing-Space tests do not enter CP201. Rust's runtime
+registry exposes `Zone Mean Air Temperature`, and its heat-balance ResultStore
+also carries adjacent `Zone Mean Air Temperature` and `Zone Mean Air Humidity
+Ratio` series. Those are different identities and bindings. Rust has no exact
+CP201 Zone/Space output set, relative-humidity or MRT registration, Space
+heat-balance state, System-versus-Zone timestep distinction, or this pointer
+and lifecycle contract. The IdealLoads CLI's exact `Zone Air Temperature` and
+`Zone Air Humidity Ratio` names are ESO input identities; the humidity name
+also labels a diagnostic comparison, but neither is a Rust production output.
+CP201 remains `source_mapped` and required without new Rust
+state, support, output implementation, numerical, or conformance promotion.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`zone_space_heat_balance_begin_environment_init`, preserving the completed
+`zone_space_heat_balance_set_up_output_vars`, preserving the completed
 predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
@@ -920,7 +988,8 @@ The next required inventory entry is `update_thermal_histories`, after
 `update_final_surface_heat_balance`; together with the existing preceding
 `manage_air_heat_balance` and nested `manage_zone_air_updates` /
 `get_zone_air_set_points` / `init_zone_air_set_points` /
-`zone_space_heat_balance_begin_environment_init` entries, this
+`zone_space_heat_balance_begin_environment_init` /
+`zone_space_heat_balance_set_up_output_vars` entries, this
 preserves completion of the Air subtree before the Surface manager's final and
 history stages. The EnergyPlus parent calls the routine at lines 186-189 only
 when `AnyCTF || AnyEMPD`, and the canonical body spans lines 5221-5581. It owns
