@@ -1062,7 +1062,7 @@ conformance promotion.
 
 The following required predictor/corrector definition entry is
 `zone_space_heat_balance_predict_system_load`, after `predict_system_loads`
-and before `update_final_surface_heat_balance`. Its source boundary is
+and before `calc_zone_air_temp_set_points`. Its source boundary is
 `ZoneSpaceHeatBalanceData::predictSystemLoad(EnergyPlusData &state, bool
 shortenTimeStepSys, bool useZoneTimeStepHistory, Real64 priorTimeStep, int
 zoneNum, int spaceNum)`, declared at `ZoneTempPredictorCorrector.hh` lines
@@ -1148,12 +1148,98 @@ conformance claim. The inventory becomes 32 algorithms and 211 routines,
 split 58 `state_mapped` plus 153 `source_mapped`, with 88 required; the
 heat-balance project list becomes 57.
 
-CP204 next maps `CalcZoneAirTempSetPoints`, declared at
+The following required predictor/corrector definition entry is
+`calc_zone_air_temp_set_points`, after
+`zone_space_heat_balance_predict_system_load` and before
+`update_final_surface_heat_balance`. Its source boundary is
+`CalcZoneAirTempSetPoints(EnergyPlusData &state)`, declared at
 `ZoneTempPredictorCorrector.hh` line 282 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 3259-3460.
 
+CP195 line 224 is the only direct production call expression and selects it
+only for `GetZoneSetPoints`. The ordinary `HVACManager` timestep entrance and
+`SimulationManager::Resimulate` both reach CP204 after CP196 input and CP199
+initialization. The routine has no Space, timestep, history, or
+`ZoneTempChange` argument.
+
+Every call resets the complete `TempControlType` array to Uncontrolled,
+allocates the occupied heating/cooling arrays only if absent, and fills their
+existing entries with zero and 100 respectively. It does not resize those
+arrays or globally clear `TempControlTypeRpt` or thermostat setpoint members.
+The local `DeltaT` is assigned zero but never read. Each stored ordinary
+temperature-control record then samples and casts its control-type schedule,
+writes the enum and integer report for the trusted actual Zone, and dispatches
+its setpoint family.
+
+Uncontrolled preserves prior setpoint fields. SingleHeat alone checks
+`isUsed`, snapshots the raw heating value, applies operative control, and
+writes generic plus low setpoints while preserving high. SingleCool snapshots
+the raw cooling value, optionally applies and snapshots adaptive comfort,
+applies operative control, writes generic plus high, and then invokes
+temperature-and-humidity overcool while preserving low. SingleHeatCool applies
+adaptive and operative adjustment to its heat schedule and writes both bounds.
+Its optimum-start branch samples the `SingleHeat` day array at
+`(ceil(OccStartTime) + 1) * TimeStepsInHour` into generic setpoint, then an
+independent flag may copy it to both bounds. DualHeatCool processes cooling
+and adaptive/operative adjustment before heating and operative adjustment,
+optionally replaces both bounds from globally reset occupied day-array values,
+then invokes overcool. It does not directly refresh generic setpoint.
+
+An invalid control value emits Severe and continues. After every ordinary
+record, the enabled thermostat-fault scan stops at the first name match even
+when its availability is off; an active match subtracts severity times offset
+from generic, low, and high values. This can repeatedly offset fields not
+rewritten by the selected branch. After all ordinary records, comfort
+calculation can overwrite their results, and the unconditional EMS override
+has final source precedence. All helper formulas, diagnostics, latches, and
+actuator state remain dependency behavior rather than CP204 implementation.
+
+CP204 trusts counts, array shapes, Zone identities, pointers, casts, schedule
+and setpoint-family consistency, optimum-start topology/indexes, fault state,
+and numeric values. It has no local latch, status, catch, cleanup, rollback,
+or allocation reconciliation. Any non-return retains the completed reset,
+allocation, record, fault, comfort, or EMS prefix. Same-state retry resamples
+schedules and repeats helpers and diagnostics; it is not generally idempotent
+because several branch fields remain stale across fault subtraction. Clean
+replay requires coordinated reset of ZoneControls, HeatBalFanSys
+control/report/setpoint state, schedules, Availability optimum-start,
+FaultsManager, environment/weather and Zone MRT/RH inputs, thermal comfort,
+EMS, diagnostics, and child owners.
+
+Four C++ fixtures contain 21 direct calls and 33 thermostat-field assertions:
+one/two in the optimum-start fixture, four/seven in the reporting fixture, and
+eight/twelve in each of two CP202-composed cutout fixtures. Only the first two
+assertions follow CP204 without a later load-prediction child. Helper-only
+tests exercise adaptive adjustment and EMS override, while operative
+adjustment, overcool, and comfort calculation have no direct helper call.
+Fifty-six of 57 active full simulations reach CP204, 38 contain thermostat
+declarations by static evidence, and none directly asserts CP204 output or
+contains positive comfort, operative-temperature, overcool, optimum-start, or
+thermostat-fault input.
+
+Rust's `calc_zone_air_temp_set_points_compat` is an untested identity closure
+around an empty body. Its sole live call is incorrectly nested in a hard-coded
+Predict scaffold rather than the source `GetZoneSetPoints` selector. Rust
+retains only direct-Zone DualSetpoint thermostat input. A separate IdealLoads
+diagnostic helper ignores the control-type schedule and repeats the first
+control's constant heat/cool values; it is not a heat-balance evaluator. Rust
+has no CP204 setpoint/control state, Single branches, schedule selection,
+operative/adaptive or thermal comfort, overcool, optimum start, fault, EMS
+override, partial-effect, or lifecycle implementation.
+
+CP204 remains required `source_mapped` and adds no Rust target, state, test,
+support, output, numerical, or conformance claim. The inventory becomes 32
+algorithms and 212 routines, split 58 `state_mapped` plus 154
+`source_mapped`, with 89 required; the heat-balance project list becomes 58.
+
+CP205 next maps
+`ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
+Real64 RAFNFrac, int zoneNum, int spaceNum = 0)`, declared at
+`ZoneTempPredictorCorrector.hh` line 243 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 3462-3815.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`zone_space_heat_balance_predict_system_load`, preserving the completed
+`calc_zone_air_temp_set_points`, preserving the completed
 predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
@@ -1173,7 +1259,8 @@ The next required inventory entry is `update_thermal_histories`, after
 `get_zone_air_set_points` / `init_zone_air_set_points` /
 `zone_space_heat_balance_begin_environment_init` /
 `zone_space_heat_balance_set_up_output_vars` / `predict_system_loads` /
-`zone_space_heat_balance_predict_system_load` entries,
+`zone_space_heat_balance_predict_system_load` /
+`calc_zone_air_temp_set_points` entries,
 this
 preserves completion of the Air subtree before the Surface manager's final and
 history stages. The EnergyPlus parent calls the routine at lines 186-189 only

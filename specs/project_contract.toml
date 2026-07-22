@@ -81,6 +81,7 @@ required_routines = [
   "zone_space_heat_balance_set_up_output_vars",
   "predict_system_loads",
   "zone_space_heat_balance_predict_system_load",
+  "calc_zone_air_temp_set_points",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",

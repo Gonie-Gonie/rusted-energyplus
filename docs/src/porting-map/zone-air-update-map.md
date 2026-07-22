@@ -25,6 +25,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | Zone/Space heat-balance output registration | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::setUpOutputVars` | adjacent Zone mean-air ResultStore series only | CP201 required source-mapped four-row Zone and simulation-Space OutputProcessor binding; no exact Rust identity, field, timestep, pointer, or lifecycle parity |
 | Zone/Space system-load prediction dispatch | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::PredictSystemLoads` | `predict_system_loads_compat` identity closure around an adjacent Zone-only temperature/history update | CP202 required source-mapped staged/on-off control, Zone/Space child dispatch, and final mode memory; no exact Rust load or lifecycle parity |
 | Zone/Space record-level load prediction | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::predictSystemLoad` | adjacent guarded Zone-only coefficient/capacitance/history helpers and a separate no-OA ThirdOrder humidity subset | CP203 required source-mapped coefficient, AFN/history, and sensible-then-moisture dispatch transaction; no exact Rust Zone/Space lifecycle or demand parity |
+| Zone thermostat setpoint calculation | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::CalcZoneAirTempSetPoints` | `calc_zone_air_temp_set_points_compat` identity closure plus a constant-DualSetpoint IdealLoads diagnostic series | CP204 required source-mapped schedule/control branch, optimum-start, fault, comfort, and final EMS transaction; no heat-balance Rust implementation |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -70,7 +71,7 @@ Every entry executes the same ordered prefix before inspecting `UpdateType`:
 The direct child boundaries are CP196 `GetZoneAirSetPoints` at lines 246-2174,
 `InitZoneAirSetPoints` at lines 2350-2816, CP202 `PredictSystemLoads` at lines
 2870-3145, CP203 `ZoneSpaceHeatBalanceData::predictSystemLoad` at lines
-3146-3257, `CalcZoneAirTempSetPoints` at lines 3259-3460,
+3146-3257, CP204 `CalcZoneAirTempSetPoints` at lines 3259-3460,
 `correctZoneAirTemps` at lines 3817-3861,
 `PushZoneTimestepHistories` at lines 4167-4185,
 `PushSystemTimestepHistories` at lines 4277-4295, and
@@ -1448,7 +1449,7 @@ CP203 adds required `source_mapped`
 `zone_temp_predictor_corrector_source_order.routine.zone_space_heat_balance_predict_system_load`
 immediately after `routine.predict_system_loads`. The heat-balance project
 contract adds `zone_space_heat_balance_predict_system_load` after
-`predict_system_loads` and before `update_final_surface_heat_balance`. The
+`predict_system_loads` and before `calc_zone_air_temp_set_points`. The
 algorithm remains a `scaffold` with `claim_level = none`. No EnergyPlus source
 inventory, Rust target, code, mapped state, test, support, capability, output
 implementation, comparator, manifest, numerical, performance, or conformance
@@ -1456,9 +1457,230 @@ promotion is added. The inventory becomes 32 algorithms and 211 routines,
 split 58 `state_mapped` plus 153 `source_mapped`, with 88 required; the
 heat-balance project list becomes 57.
 
-CP204 next maps `CalcZoneAirTempSetPoints`, declared at
+### CP204 `CalcZoneAirTempSetPoints` source map
+
+`CalcZoneAirTempSetPoints(EnergyPlusData &state)` is declared at
 `ZoneTempPredictorCorrector.hh` line 282 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 3259-3460.
+`ZoneTempPredictorCorrector.cc` lines 3259-3460. Its only production call
+expression is CP195 `ManageZoneAirUpdates` line 224, selected only by
+`PredictorCorrectorCtrl::GetZoneSetPoints`. `HVACManager::ManageHVAC` enters
+that wrapper at lines 224-229 after its
+`BeginTimestepBeforePredictor` EMS call, outdoor-air node update, and
+refrigerated-case-rack update, and before contaminant, hybrid-ventilation,
+airflow, AirflowNetwork, lagged-load, gain, and CP202 prediction work.
+`SimulationManager::Resimulate` supplies the second production entrance at
+lines 2917-2922 under `ResimHVAC`. CP196 input and CP199 initialization must
+return before either entrance reaches CP204.
+
+The routine takes no timestep, shortening, history, or caller-owned
+`ZoneTempChange` argument. It traverses only ordinary
+`TempControlledZone` records. There is no Space record path.
+
+#### Entry reset and record traversal
+
+Every entry performs this ordered prefix:
+
+1. Assign the complete allocated `TempControlType` array to
+   `HVAC::SetptType::Uncontrolled`.
+2. Allocate `OccRoomTSetPointHeat(NumOfZones)` only when it is absent.
+3. Allocate `OccRoomTSetPointCool(NumOfZones)` only when it is absent.
+4. Fill every existing occupied-heating entry with `0.0` and every existing
+   occupied-cooling entry with `100.0`.
+5. Assign local `DeltaT = 0.0`; the value is never read.
+
+Already allocated occupied arrays are not resized when `NumOfZones` changes.
+The routine does not globally clear `TempControlTypeRpt` or any member of
+`zoneTstatSetpts`. If the second allocation does not return, the first array
+can remain newly allocated after the type-array reset.
+
+For `RelativeZoneNum = 1..NumTempControlledZones`, CP204 trusts the stored
+record and its `ActualZoneNum`. It samples
+`tempZone.setptTypeSched->getCurrentVal()`, directly casts the result to
+`HVAC::SetptType`, writes that enum to `TempControlType(ActualZoneNum)`, and
+writes its integer form to `TempControlTypeRpt(ActualZoneNum)`. It then aliases
+`zoneTstatSetpts(ActualZoneNum)` and dispatches on the sampled type. The local
+routine does not verify that the schedule value is finite, integral, within
+the enum, or consistent with an available setpoint family.
+
+#### Setpoint branch matrix
+
+| Control type | Source-ordered direct and child effects | Intentionally retained fields |
+|---|---|---|
+| `Uncontrolled` | no thermostat-setpoint write | `setpt`, `setptLo`, `setptHi`, raw low/high, and adaptive snapshot all retain prior values |
+| `SingleHeat` | only when `setpts[SingleHeat].isUsed`: sample heat into `setpt`, copy the raw value to `ZoneThermostatSetPointLo`, call `AdjustAirSetPointsforOpTempCntrl` on `setpt`, then copy it to `setptLo` | `setptHi` and adaptive cool remain untouched; a false `isUsed` writes none of the setpoint fields |
+| `SingleCool` | sample cool into `setpt` without an `isUsed` guard, copy the raw value to `ZoneThermostatSetPointHi`, optionally adaptive-adjust `setpt` and copy it to `setptAdapComfortCool`, operative-adjust `setpt`, copy it to `setptHi`, then call the humidity-overcool helper | `setptLo` remains untouched; a false adaptive flag leaves its earlier adaptive snapshot |
+| `SingleHeatCool` | sample that family's heat schedule into `setpt`, optionally adaptive-adjust and snapshot it, operative-adjust it, then assign both `setptLo` and `setptHi` | raw low/high are not refreshed; optimum-start can subsequently diverge generic and bound values |
+| `DualHeatCool` | sample cool into `setptHi` and raw high, optionally adaptive-adjust and snapshot high, operative-adjust high, then sample heat into `setptLo` and raw low and operative-adjust low; optimum-start follows, then humidity overcool runs last | generic `setpt` is never directly written by this switch arm |
+
+Adaptive comfort is applied only to cooling values in `SingleCool` and
+`DualHeatCool`, and to the shared value in `SingleHeatCool`. The raw
+`ZoneThermostatSetPointLo/Hi` snapshots are taken before adaptive, operative,
+optimum-start, humidity-overcool, fault, comfort, or EMS changes. CP204 owns
+the call order and copies but not the math, diagnostics, recurrence state, or
+lifecycle inside the later-defined helpers:
+
+- `AdjustAirSetPointsforOpTempCntrl` at lines 5863-5897;
+- `AdjustOperativeSetPointsforAdapComfort` at lines 5899-5964;
+- `CalcZoneAirComfortSetPoints` at lines 5966-6329;
+- `AdjustCoolingSetPointforTempAndHumidityControl` at lines 6417-6458;
+- `OverrideAirSetPointsforEMSCntrl` at lines 6460-6555.
+
+#### Optimum-start and thermostat-fault order
+
+`SingleHeatCool` tests only whether the global `OptStart` array is allocated.
+When `OptStart(ActualZoneNum).ActualZoneNum == ActualZoneNum`, it computes
+`OccStartTime = ceil(OccStartTime) + 1` and samples
+
+```text
+setpts[SingleHeat].heatSetptSched
+    .getDayVals(state)[OccStartTime * TimeStepsInHour]
+```
+
+into generic `setpt`. This deliberately reads the `SingleHeat` family rather
+than the currently selected `SingleHeatCool` family. An independent
+`OptStartFlag` test then copies the current generic value to both bounds.
+Consequently, a matching identity with a false flag can leave generic
+`setpt` at the occupied value while both bounds retain the normal adjusted
+value; a true flag with a mismatched identity copies the normal current value.
+
+`DualHeatCool` uses the same rounded-plus-one time and array index. A matching
+identity samples the dual cooling and heating day arrays into the global
+occupied cool/heat entries. The independent flag then copies those entries to
+high and low before humidity overcool. Because both occupied arrays were
+globally reset at entry, a malformed mismatched identity with a true flag can
+write the default `100.0` high and `0.0` low. CP204 performs no hour or array
+index validation.
+
+After each ordinary switch, the thermostat-fault block runs only when
+`NumFaultyThermostat > 0` and warmup, sizing, and kickoff are all false. It
+scans fault definitions in stored order and stops at the first
+case-insensitive match with the controlled-thermostat name, even if that
+fault's availability schedule is nonpositive. For an available match, severity
+defaults to one or is sampled from its optional schedule; CP204 subtracts
+`severity * Offset` from `setpt`, `setptLo`, and `setptHi`. It does not change
+the raw low/high snapshots or `setptAdapComfortCool`.
+
+The unconditional three-field subtraction is branch-independent. It may
+therefore offset stale fields and can accumulate across a same-state retry:
+all three fields after Uncontrolled, all three after an unused SingleHeat,
+high after SingleHeat, low after SingleCool, and generic after Dual can lack a
+fresh switch write.
+
+#### Comfort and EMS final precedence
+
+Only after every ordinary record and fault block has finished does CP204 test
+`NumComfortControlledZones > 0` and call
+`CalcZoneAirComfortSetPoints(state)`. Comfort processing can revisit a Zone
+and replace ordinary schedule, adjustment, and fault results. CP204 then calls
+`OverrideAirSetPointsforEMSCntrl(state)` unconditionally. The EMS child owns
+the final source precedence over reached ordinary and comfort thermostat
+values. Neither child's internal control-family equations, diagnostics,
+outputs, latches, or actuator state count as CP204 implementation.
+
+#### Validation, failure, retry, and reset
+
+Counts, array allocation and shape, `ActualZoneNum`, schedule pointers, control
+casts, `isUsed` consistency, setpoint-family pointers, optimum-start identity
+and time topology, `TimeStepsInHour`, fault arrays and pointers, and all
+numeric values are trusted. An invalid switch value emits one Severe message
+containing the Zone, sampled value, and schedule name, but sets no local error
+flag and does not fatal; the routine proceeds through fault handling, later
+records, comfort, and EMS.
+
+There is no local latch, status, catch, cleanup, or rollback. A schedule,
+allocation, formatting, diagnostic, or child non-return preserves every
+completed reset, allocation, record, raw snapshot, adjustment, optimum-start,
+fault, comfort, or EMS prefix and suppresses the remaining suffix. The comfort
+child also owns first-time state that CP204 does not reset.
+
+Complete repeat resamples every reached schedule, resets both occupied arrays,
+and repeats helpers and diagnostics. It is not generally idempotent because
+the switch does not overwrite every fault-adjusted field, and helper warning,
+recurrence, comfort, or actuator state can advance. CP199's selected
+begin-environment initialization is not a complete replay reset. Clean replay
+requires reconstruction or coordinated reset of ZoneControls,
+HeatBalFanSys control/report and setpoint arrays, Availability optimum-start,
+the schedule manager, globals and environment/weather, FaultsManager, Zone
+heat-balance MRT/RH inputs, People and thermal-comfort state, EMS overrides and
+actuators, diagnostics, and every called helper owner.
+
+#### C++ and Rust evidence boundary
+
+Four C++ fixtures contain 21 direct call expressions and 33 thermostat-field
+post-call assertions:
+
+| Fixture | Calls | Thermostat-field assertions | Composition boundary |
+|---|---:|---:|---|
+| `SysAvailManager_OptimumStart` | 1 | 2 | the two low/high checks follow CP204 directly, but the asserted values are the unoccupied dual values rather than an active optimum-start override |
+| `ZoneTempPredictorCorrector_ReportingTest` | 4 | 7 | exercises records whose schedules select all five nominal switch values, then composes the state with `calcPredictedSystemLoad` |
+| `SetPointWithCutoutDeltaT_test` | 8 | 12 | every CP204 call is followed by CP202 before its low/high assertions |
+| `TempAtPrevTimeStepWithCutoutDeltaT_test` | 8 | 12 | every CP204 call is followed by CP202 before its low/high assertions |
+
+A helper-only adaptive fixture makes four direct
+`AdjustOperativeSetPointsforAdapComfort` calls with four assertions, and an
+EMS fixture makes two direct `OverrideAirSetPointsforEMSCntrl` calls with four
+assertions. There is no direct test of
+`AdjustAirSetPointsforOpTempCntrl`,
+`AdjustCoolingSetPointforTempAndHumidityControl`, or
+`CalcZoneAirComfortSetPoints`. No composed CP204 fixture covers active
+adaptive or operative control, humidity overcool, active optimum-start
+override, fault offset, comfort overwrite, EMS overwrite, invalid control,
+partial failure, retry, or reset.
+
+Of 57 active C++ `ManageSimulation` call sites, one expected EMS fatal stops in
+the `BeginTimestepBeforePredictor` callback before CP204. The other 56 reach
+the routine; one zero-Zone weather fixture still executes the global
+reset/allocation and final EMS child but has no record loop. Static enclosing
+input evidence finds thermostat declarations in 38 of those 56 configurations
+and none in 18. The 38 include 35 Dual, six SingleHeat, and six SingleCool
+declarations with overlap, but no positive comfort, operative-temperature,
+temperature-and-humidity overcool, optimum-start, or thermostat-fault object.
+No full-simulation assertion directly checks CP204 setpoint or control state.
+
+Rust defines `calc_zone_air_temp_set_points_compat<T>` only as
+`execute()` and calls it once around an empty closure in
+`heat_balance/timestep.rs`. That call is nested inside a hard-coded
+`PredictStep` wrapper, whereas the source invokes CP204 only for
+`GetZoneSetPoints`; the Rust enum value exists but has no live dispatch use.
+There is no direct wrapper test and the heat-balance state has no thermostat
+setpoint, control/report, comfort, optimum-start, or fault owner.
+
+The compiler retains only direct-Zone `ZoneControl:Thermostat` records pointing
+to `ThermostatSetpoint:DualSetpoint` plus their control-type schedule and
+cutout delta. It rejects SingleHeating and does not evaluate the control-type
+schedule at runtime. A CLI IdealLoads diagnostic helper selects the first
+control, ignores that schedule, and repeats two `Schedule:Constant` hourly
+values as observed series; it is not called by the heat-balance runtime.
+Compiler tests cover graph retention, a missing schedule, and rejection of
+SingleHeating, while the runtime test checks only that an
+`EvaluateZoneThermostat` plan label precedes `SolveZone`. These inputs and
+metadata do not implement CP204's branch transaction.
+
+Rust has no runtime implementation of SingleHeat, SingleCool,
+SingleHeatCool, staged control, operative/adaptive comfort, thermal-comfort
+setpoints, temperature-and-humidity overcool, optimum start, EMS thermostat
+override, or thermostat faults. Parsed cutout delta is unused. Adjacent
+humidistat/IdealLoads moisture code and adaptive system-timestep code have
+different ownership and receive no CP204 credit.
+
+CP204 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.calc_zone_air_temp_set_points`
+immediately after
+`routine.zone_space_heat_balance_predict_system_load`. The heat-balance
+project contract adds `calc_zone_air_temp_set_points` after
+`zone_space_heat_balance_predict_system_load` and before
+`update_final_surface_heat_balance`. The algorithm remains a `scaffold` with
+`claim_level = none`. No EnergyPlus source inventory, Rust target, code, mapped
+state, test, support, capability, output implementation, comparator, manifest,
+numerical, performance, or conformance promotion is added. The inventory
+becomes 32 algorithms and 212 routines, split 58 `state_mapped` plus 154
+`source_mapped`, with 89 required; the heat-balance project list becomes 58.
+
+CP205 next maps
+`ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
+Real64 RAFNFrac, int zoneNum, int spaceNum = 0)`, declared at
+`ZoneTempPredictorCorrector.hh` line 243 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 3462-3815.
 
 ## Promotion Requirements
 
