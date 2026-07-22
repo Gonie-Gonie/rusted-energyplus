@@ -18,6 +18,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 |---|---|---|---|
 | zone predictor/corrector driver | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ManageZoneAirUpdates` | `manage_zone_air_updates_stage`; `advance_heat_balance_state_one_timestep` successor | CP195 required source-mapped dispatcher; Rust metadata and selector-ignoring closures remain scaffold |
 | Zone setpoint and control input | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::GetZoneAirSetPoints` | bounded compiler thermostat/humidistat subset; `get_zone_air_set_points_compat` identity closure | CP196 required source-mapped 16-family transaction; no whole-routine Rust parity |
+| adaptive-comfort weather running averages | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::CalculateMonthlyRunningAverageDryBulb` | typed EPW parser and hourly dry-bulb series only | CP197 non-required source-mapped raw-file helper; no Rust rolling-average or adaptive-control parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -334,9 +335,118 @@ performance, or conformance promotion. The inventory becomes 32 algorithms
 and 204 routines, split 58 `state_mapped` plus 146 `source_mapped`, with 83
 required; the heat-balance project list becomes 52.
 
-CP197 next maps `CalculateMonthlyRunningAverageDryBulb`, declared at
-`ZoneTempPredictorCorrector.hh` line 284 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 2176-2275.
+### CP197 `CalculateMonthlyRunningAverageDryBulb` source map
+
+`CalculateMonthlyRunningAverageDryBulb(EnergyPlusData &state,
+Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN)` is
+declared at `ZoneTempPredictorCorrector.hh` line 284 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 2176-2275. It returns `void`, trusts
+both caller arrays to be one-based and at least `NumDaysInYear` long, and has
+no status, error argument, internal initialized flag, array clearing, bounds
+validation, catch, or rollback.
+
+The body is a fixed positional file transaction:
+
+| Ordered phase | Source lines | Principal work |
+|---|---|---|
+| local allocation | 2193-2200 | allocates zeroed `adaptiveTemp` and `dailyDryTemp` arrays of `NumDaysInYear`; `adaptiveTemp` is never used |
+| path check, open, and fixed skip | 2202-2207 | checks `inputWeatherFilePath`, opens a transient input stream as `CalcThermalComfortAdaptive`, and discards nine lines |
+| hourly extraction and daily buckets | 2208-2222 | reads exactly `NumDaysInYear * 24` more lines, removes six comma fields, converts field 7 through `StrToReal`, adds one twenty-fourth to a positional daily bucket, and closes the stream |
+| ASH running outputs | 2224-2249 | fills the caller-owned nominal 30-day array with separate wrapped and non-wrapped loops |
+| CEN running outputs | 2251-2268 | fills the caller-owned nominal 7-day array with separate wrapped and non-wrapped loops |
+| missing-path terminal | 2270-2275 | emits a fatal for a nonexistent weather path or falls through normally |
+
+There are exactly two production call occurrences, both inside CP196
+`GetZoneAirSetPoints` while reading
+`ZoneControl:Thermostat:OperativeTemperature`. The expanded thermostat branch
+at lines 1658-1662 calls CP197 at line 1661, and the direct controlled-Zone
+branch at lines 1727-1732 calls it at line 1731. Each site requires a valid
+non-None adaptive model and the shared
+`AdapComfortDailySetPointSchedule.initialized` flag to be false, creates fresh
+zero-filled ASH and CEN arrays, calls CP197, and immediately passes both arrays
+to CP198 `CalculateAdaptiveComfortSetPointSchl`. CP197 neither reads nor writes
+that flag; only CP198 sets it true at line 2347. Once CP198 returns, later
+operative-control objects skip both helpers.
+
+The routine does not use WeatherManager's decoded records or calendar. It
+assumes 24 rows per day, ignores record dates, hours, data periods,
+records-per-hour, leap metadata, and all `readLine` EOF/good flags. EnergyPlus
+v26.1's canonical EPW readers identify eight header records, but CP197
+unconditionally consumes nine. With an ordinary EPW, daily bucket `d` for
+`1..N-1` therefore contains day `d` hours 2-24 plus day `d+1` hour 1. Bucket
+`N` contains its final 23 hours plus one empty EOF read. `StrToReal` returns
+`-99999.0` for empty or invalid text without a CP197 diagnostic, so that last
+bucket is corrupt; neither running loop ever references bucket `N`. Missing
+commas, truncated data, invalid numeric text, EPW missing-value sentinels,
+extra rows, and a state/file day-count mismatch likewise receive no local
+validation.
+
+The running-window arithmetic is also source-specific rather than a clean
+30-day/7-day mean:
+
+- For ASH output day `d <= 31`, the wrapped path adds days `1..d-1` and
+  `N+d-31..N-1`, giving 30 values and excluding bucket `N`, then divides by 30.
+- For `d >= 32`, it adds `d-31..d-1` inclusively, giving 31 values, and still
+  divides by 30.
+- For CEN output day `d <= 8`, the wrapped path adds days `1..d-1` and
+  `N+d-8..N-1`, giving 7 values and excluding bucket `N`, then divides by 7.
+- For `d >= 9`, it adds `d-8..d-1` inclusively, giving 8 values, and still
+  divides by 7.
+
+ASH day 31 and CEN day 8 have the intended sample count and consecutive
+bucket-index range, but those buckets still reflect the one-hour EPW shift;
+the transition on the following day changes the sample count. Each output cell
+self-accumulates as `x = x + avgDryBulb` and then uses `/=`. Production
+callers avoid retained input only by allocating fresh zeros, while a direct
+call that reuses either output array is non-idempotent.
+
+A nonexistent path fatals at lines 2271-2273 before either output array is
+touched. An existing but unreadable path fatals from the open helper at the
+same pre-output phase. A readable malformed or short file normally completes
+with sentinel-contaminated values; CP198 can then allocate and commit adaptive
+schedules and set the shared flag, suppressing ordinary recalculation. A CP197
+fatal prevents CP198, leaves that flag false, and propagates through CP196; the
+production wrapper also leaves `GetZoneAirStatsInputFlag` true because it
+clears only after CP196 returns. CP197 owns no persistent reset state itself.
+Standalone replay needs a restored readable file plus fresh or cleared caller
+arrays. Replay through CP196 additionally needs the already documented
+ZoneControls/input prefix reset, and committed adaptive state is reset only by
+full `ZoneTempPredictorCorrectorData::clear_state` reconstruction.
+
+No EnergyPlus unit test directly or indirectly executes CP197. The
+`ZoneTempPredictorCorrector_AdaptiveThermostat` fixture calls CP198 three times
+with synthetic constant arrays, so it proves neither file extraction nor any
+running-window branch. The nine direct CP196 fixture calls do not reach an
+adaptive operative-control branch. Missing/open failure, nine-line skip,
+malformed fields, EOF, day-count mismatch, wrapped and regular arithmetic,
+reused arrays, guard timing, retry, and reset are all uncovered.
+
+Rust has no adaptive-comfort or ASH/CEN running-average implementation, state,
+or operative-temperature control type. `weather.rs` lines 10, 144-190, and 1060-1213 provide typed EPW records, a
+`DATA PERIODS`-aware rich parser, a fixed-eight-header legacy dry-bulb loader,
+and numeric conversion errors; `WeatherTimestepSeries` lines 257-458 retains
+hourly dry bulb and builds interpolated timestep samples. Focused tests at
+`runtime/tests/part02.rs` lines 521-568 prove two dry-bulb values after eight
+headers. These APIs preserve different parsing and failure semantics and never
+form CP197's positional daily buckets, cyclic windows, sentinels, output-array
+mutation, or shared adaptive lifecycle. Execution-plan thermostat metadata and
+the compiler's direct-Zone DualSetpoint/humidistat subset add no adjacent
+adaptive implementation.
+
+CP197 adds non-required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.calculate_monthly_running_average_dry_bulb`
+immediately after `routine.get_zone_air_set_points`. The heat-balance project
+contract remains unchanged because this is an optional adaptive-comfort child.
+The algorithm remains a `scaffold` with `claim_level = none`. This checkpoint
+adds no new EnergyPlus source inventory, Rust target, code, mapped state,
+support, capability, output implementation, comparator, manifest, numerical,
+performance, or conformance promotion. The inventory becomes 32 algorithms
+and 205 routines, split 58 `state_mapped` plus 147 `source_mapped`, with 83
+required; the heat-balance project list remains 52.
+
+CP198 next maps `CalculateAdaptiveComfortSetPointSchl`, declared at
+`ZoneTempPredictorCorrector.hh` lines 286-287 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 2277-2348.
 
 ## Promotion Requirements
 
