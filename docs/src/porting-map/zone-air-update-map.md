@@ -23,6 +23,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | Zone setpoint runtime initialization | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::InitZoneAirSetPoints` | `init_zone_air_set_points_compat` identity closure only | CP199 required source-mapped one-time allocation/output, environment reset, validation, and demand-limiting transaction; no whole-routine Rust parity |
 | Zone/Space begin-environment history initialization | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::beginEnvironmentInit` | Zone-only run initialization and later bounded history state | CP200 required source-mapped 26-write four-slot environment reset; no exact Rust Zone/Space lifecycle parity |
 | Zone/Space heat-balance output registration | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::setUpOutputVars` | adjacent Zone mean-air ResultStore series only | CP201 required source-mapped four-row Zone and simulation-Space OutputProcessor binding; no exact Rust identity, field, timestep, pointer, or lifecycle parity |
+| Zone/Space system-load prediction dispatch | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::PredictSystemLoads` | `predict_system_loads_compat` identity closure around an adjacent Zone-only temperature/history update | CP202 required source-mapped staged/on-off control, Zone/Space child dispatch, and final mode memory; no exact Rust load or lifecycle parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -66,7 +67,7 @@ Every entry executes the same ordered prefix before inspecting `UpdateType`:
 | `Invalid`, `Num`, or an out-of-range cast | no branch child | silently returns after the common input/init prefix and preserves `ZoneTempChange` |
 
 The direct child boundaries are CP196 `GetZoneAirSetPoints` at lines 246-2174,
-`InitZoneAirSetPoints` at lines 2350-2816, `PredictSystemLoads` at lines
+`InitZoneAirSetPoints` at lines 2350-2816, CP202 `PredictSystemLoads` at lines
 2870-3145, `CalcZoneAirTempSetPoints` at lines 3259-3460,
 `correctZoneAirTemps` at lines 3817-3861,
 `PushZoneTimestepHistories` at lines 4167-4185,
@@ -1010,17 +1011,201 @@ CP201 adds required `source_mapped`
 immediately after
 `routine.zone_space_heat_balance_begin_environment_init`. The heat-balance
 project contract adds `zone_space_heat_balance_set_up_output_vars` after
-`zone_space_heat_balance_begin_environment_init` and before
-`update_final_surface_heat_balance`. The algorithm remains a `scaffold` with
+`zone_space_heat_balance_begin_environment_init`. CP202 now follows that entry
+before `update_final_surface_heat_balance`. The algorithm remains a `scaffold`
+with
 `claim_level = none`. No EnergyPlus source inventory, Rust target, code, mapped
 state, support, capability, output implementation, comparator, manifest,
 numerical, performance, or conformance promotion is added. The inventory
 becomes 32 algorithms and 209 routines, split 58 `state_mapped` plus 151
 `source_mapped`, with 86 required; the heat-balance project list becomes 55.
 
-CP202 next maps `PredictSystemLoads`, declared at
+### CP202 `PredictSystemLoads` source map
+
+`PredictSystemLoads(EnergyPlusData &state, bool ShortenTimeStepSys,
+bool UseZoneTimeStepHistory, Real64 PriorTimeStep)` is declared at
 `ZoneTempPredictorCorrector.hh` lines 276-280 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 2870-3145.
+`ZoneTempPredictorCorrector.cc` lines 2870-3145. Its only production call
+expression is CP195 `ManageZoneAirUpdates` line 227 under the `PredictStep`
+selector. It is reached only after the wrapper's optional CP196 input and
+unconditional CP199 initialization return, receives all three timestep
+arguments unchanged, and never receives or alters caller-owned
+`ZoneTempChange`.
+
+Three production PredictStep entrances share that expression:
+
+| Entrance | Immediate source order and arguments |
+|---|---|
+| `HVACManager` lines 262-267 | after setpoint acquisition, airflow/AFN, lagged dependent loads, indoor-green, and internal-gain updates; before `SimHVAC`; the initial path has `ShortenTimeStepSys = false`, `UseZoneTimeStepHistory = true`, and `PriorTimeStep = TimeStepZone` |
+| `HVACManager` lines 346-351 | only inside `TimeStepSys < TimeStepZone` substeps; adaptive downstepping makes the first call shortened with Zone history disabled, then line 372 clears shortening so later substeps can call with false/false while retaining the prior Zone timestep |
+| `SimulationManager::Resimulate` lines 2929-2930 | under `ResimHVAC`, after Get setpoints and simple airflow and before `SimHVAC`; passes false shortening, the current history selector, and zero prior timestep |
+
+CP202 then executes four ordered phases.
+
+#### Staged thermostat phase
+
+When `NumStageCtrZone > 0`, lines 2915-2992 walk exactly that many
+`StageControlledZone` records in stored order. Each record trusts
+`ActualZoneNum`, both schedule pointers, the stage counts and offset arrays,
+Zone/Space membership, and all destination arrays. It samples both base
+schedules on every call and overwrites `HeatSetPoint` and `CoolSetPoint`.
+`ZoneT` is the Zone record's `MAT`, replaced by `XMPT` only when shortening.
+
+If sampled heating is greater than or equal to cooling, CP202 increments
+`StageErrCount`. The first occurrence emits a warning, continuation, and
+timestamp; every later occurrence updates a recurring warning using
+`StageErrIndex` and the sampled heating value as both tracked extrema. It then
+sets heating to cooling minus 0.1 C and performs no second validity check.
+
+| Mode selection | `StageNum` and thermostat setpoint writes |
+|---|---|
+| strict `CoolSetPoint < ZoneT` | offset is `ZoneT - CoolSetPoint`; the last index whose offset is greater than or equal to `CoolTOffset(I)` wins as negative `-I`; both high and low become cooling minus half `CoolThroRange` when offset reaches that half range, otherwise cooling plus that half range |
+| otherwise strict `HeatSetPoint > ZoneT` | offset is `ZoneT - HeatSetPoint`; the last index whose absolute offset reaches the absolute `HeatTOffset(I)` wins as positive `I`; both low and high become heating plus or minus half `HeatThroRange` |
+| otherwise | high becomes cooling plus half `CoolThroRange`, low becomes heating minus half `HeatThroRange`, and `StageNum = 0` |
+
+The heating half-range decision at line 2973 intentionally compares the
+absolute offset with half `CoolThroRange`, not `HeatThroRange`, although the
+assigned displacement uses `HeatThroRange`. This source-literal asymmetry is
+part of the map. After each staged Zone, `doSpaceHeatBalance` copies its final
+`StageNum` to every stored Space demand membership; simulation and sizing modes
+both qualify.
+
+#### On/off cutout prefix
+
+`NumOnOffCtrZone > 0` is only an outer gate. Lines 2999-3111 still scan all
+`NumTempControlledZones` and process every record whose `DeltaTCutSet > 0`.
+A shortened call restores `HeatModeLast` and `CoolModeLast` from their saved
+values; a nonshortened call first saves the current values. It then clears both
+off flags. ThirdOrder selects `MAT`, or `XMPT` when shortened, as `Tprev`;
+Analytical, Euler, and every other algorithm use `T1` regardless of shortening.
+
+The fixed tolerance is 0.02 C, and the implementation preserves its literal
+strict comparisons:
+
+| Control type | Revision and mode-memory override |
+|---|---|
+| `SingleHeat` | initialize generic and low setpoints to base low; write base low plus delta when `Tprev < low + 0.02` or when `Tprev > low && Tprev < low + delta - 0.02`, otherwise set `HeatOffFlag`; prior heat mode with `Tprev > low` overrides back to base and sets the off flag |
+| `SingleCool` | initialize generic and high setpoints to base high; write base high minus delta when `Tprev > high - 0.02` or when `Tprev < high && Tprev > high - delta + 0.02`, otherwise set `CoolOffFlag`; prior cool mode with `Tprev < high` overrides back to base and sets the off flag |
+| `DualHeatCool` | initialize high and low separately, run the same cooling logic first and heating logic second, and do not write the generic `setpt` member |
+| `SingleHeatCool`, Uncontrolled, and every other value | no switch-owned setpoint write; the preceding save/restore and off-flag clears still persist |
+
+After both DualHeatCool halves, an inclusive `setptLo >= setptHi` test emits a
+severe diagnostic, a timestamp naming the Zone, two formatted setpoint
+continuations, and a fatal. The diagnostic occurs after all already reached
+staged and on/off mutations and before any Zone load child.
+
+#### Zone and Space child dispatch
+
+Lines 3114-3126 always visit `zoneNum = 1..NumOfZones`. Each Zone first calls
+the next source definition, CP203
+`ZoneSpaceHeatBalanceData::predictSystemLoad`, with the three original
+timestep arguments and `zoneNum`. Its temperature/history update, coefficient,
+sensible demand, and moisture demand calculations remain CP203 dependency
+behavior rather than CP202 implementation credit.
+
+The current Zone's `spaceIndexes` are then visited in stored order:
+
+| Space condition | CP202 action |
+|---|---|
+| `doSpaceHeatBalance` | call CP203 on `spaceHeatBalance(spaceNum)` with the same arguments plus `zoneNum` and `spaceNum` |
+| inactive Space heat balance and shortened call | copy only the already processed Zone `MAT` and `airHumRat` to that Space record |
+| inactive Space heat balance and nonshortened call | leave the Space record unchanged |
+
+Zone and Space work is interleaved per Zone. `UseZoneTimeStepHistory` and
+`PriorTimeStep` are not otherwise read by CP202. Counts, indices, duplicate
+memberships, array shape, and identity consistency are not locally reconciled.
+
+#### Final on/off memory phase
+
+Only after every reached child returns do lines 3127-3144 rescan positive
+cutout controls. Cooling last-mode memory becomes exactly
+`CoolOffFlag && TotalOutputRequired >= 0`; heating becomes exactly
+`HeatOffFlag && TotalOutputRequired <= 0`. The inclusive tests allow both to
+be true at zero when both off flags are true. A NaN load makes both comparisons
+false. Controls skipped by the positive-delta predicate retain their prior
+mode fields.
+
+CP202 owns no latch, status result, finite/sign/range validation, catch,
+cleanup, or rollback. NaN schedule or temperature comparisons follow native
+false branches, can select staged deadband or off flags, and can bypass the
+dual collision; infinities and unusual ranges propagate through arithmetic.
+Null schedules, invalid actual Zone numbers, short stage arrays, malformed
+demand arrays, and bad Space memberships reach unchecked dependency or
+container behavior.
+
+A dual fatal retains the complete staged phase plus the reached on/off
+save/restore, off-flag, and setpoint prefix, and suppresses every child and the
+final mode pass. A Zone or Space child non-return retains all earlier
+Zone/Space effects and fallback copies and likewise suppresses the remaining
+tail. Same-state retry samples schedules again, increments staged error state
+again, may replace saved mode state, and repeats child effects. A clean replay
+requires coordinated reconstruction of predictor counts and Zone/Space
+records, ZoneControls staged and temperature records, HeatBalFanSys setpoints
+and control types, ZoneEnergyDemand stages and loads, HeatBalance topology,
+HVAC timestep/history state, diagnostic recurrence state, and CP203's
+dependencies. Clearing only one owner can leave stale counts, indices, or
+state in another.
+
+Search finds exactly 16 direct CP202 calls in two fixtures:
+
+- `SetPointWithCutoutDeltaT_test` makes eight nonshortened Euler calls.
+- `TempAtPrevTimeStepWithCutoutDeltaT_test` makes four normal and four
+  shortened ThirdOrder calls, using `MAT` versus `XMPT` and saved last modes.
+- Together they assert 24 low/high setpoint values across two SingleHeat, two
+  SingleCool, one SingleHeatCool, and three DualHeatCool calls per fixture.
+
+Both fixtures pass false `UseZoneTimeStepHistory` and 0.01 prior time and leave
+global `NumOfZones` at zero. They therefore execute the on/off prefix and final
+mode loop but no Zone/Space CP203 child. They assert no off flags, saved or
+final modes, staged thresholds or diagnostics, exact 0.02 boundaries, dual
+fatal, argument forwarding, Space branch, partial failure, retry, or reset.
+
+Of 57 active C++ `ManageSimulation` calls, one EMS callback test fatals before
+CP202. The other 56 reach CP202; the no-Zone
+`WeatherManager_SetRainFlag` case executes no Zone child, while 55 execute at
+least one. `HeatBalanceAirManager_GetMixingAndCrossMixing` enables
+simulation-Space heat balance for three Spaces, and seven Space-sizing tests
+also enable three Space children each. Their assertions concern downstream
+mixing or sizing reports. None of the full simulations supplies a staged
+thermostat or positive cutout delta, so they do not positively cover either
+control phase.
+
+Rust's `predict_system_loads_compat` calls
+`predict_step_source_order_path`, and both are identity closures. The enclosing
+bounded timestep loop shifts Zone histories, assembles gains and surface terms,
+and directly updates MAT; it does not execute CP202 thermostat or load
+dispatch. The parsed
+`temperature_difference_between_cutout_and_setpoint_delta_c` field has no
+runtime consumer. `EvaluateZoneThermostat` is execution-plan metadata, and the
+IdealLoads setpoint helper samples only the first DualSetpoint's constant
+schedules while ignoring the control-type schedule and cutout delta.
+
+Rust has no staged thermostat record, `StageNum`, source
+`zoneTstatSetpts` arena, heat/cool last/save/off flags, sensible
+`ZoneSysEnergyDemand::TotalOutputRequired`, Space heat-balance record, Space
+demand, or CP203
+Zone/Space dispatch. Its `ZoneSysEnergyDemand` carries only oracle-fed remaining
+heat/cool and moisture snapshots for IdealLoads. Coefficient and zone-air
+algorithm tests exercise adjacent bounded MAT/history math, not this wrapper.
+There is no direct `predict_system_loads_compat` test; one pass-through test
+asserts only the string `PredictStep` in a wrapper order.
+
+CP202 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.predict_system_loads`
+immediately after
+`routine.zone_space_heat_balance_set_up_output_vars`. The heat-balance project
+contract adds `predict_system_loads` after
+`zone_space_heat_balance_set_up_output_vars` and before
+`update_final_surface_heat_balance`. The algorithm remains a `scaffold` with
+`claim_level = none`. No EnergyPlus source inventory, Rust target, code, mapped
+state, test, support, capability, output implementation, comparator, manifest,
+numerical, performance, or conformance promotion is added. The inventory
+becomes 32 algorithms and 210 routines, split 58 `state_mapped` plus 152
+`source_mapped`, with 87 required; the heat-balance project list becomes 56.
+
+CP203 next maps `ZoneSpaceHeatBalanceData::predictSystemLoad`, declared at
+`ZoneTempPredictorCorrector.hh` lines 217-222 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 3146-3257.
 
 ## Promotion Requirements
 
