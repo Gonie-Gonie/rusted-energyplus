@@ -102,6 +102,7 @@ required_routines = [
   "verify_thermostat_in_zone",
   "verify_controlled_zone_for_thermostat",
   "detect_oscillating_zone_temp",
+  "adjust_air_set_points_for_op_temp_cntrl",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",

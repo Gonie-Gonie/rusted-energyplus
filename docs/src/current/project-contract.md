@@ -2583,12 +2583,98 @@ performance, or conformance promotion. The inventory becomes 32 algorithms
 and 232 routines, split 58 `state_mapped` plus 174 `source_mapped`, with 109
 required; the heat-balance project list becomes 78.
 
-CP227 next maps `AdjustAirSetPointsforOpTempCntrl`, declared at
-`ZoneTempPredictorCorrector.hh` line 356 and implemented at
+CP227 adds required `adjust_air_set_points_for_op_temp_cntrl` immediately
+after `detect_oscillating_zone_temp` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is the nonmember
+`AdjustAirSetPointsforOpTempCntrl(EnergyPlusData &state,
+int TempControlledZoneID, int ActualZoneNum, Real64 &ZoneAirSetPoint)`,
+declared at `ZoneTempPredictorCorrector.hh` line 356 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 5863-5897.
 
+A false global `AnyOpTempControl` returns before either identity is accessed.
+Otherwise CP227 reads the selected temperature-control record and returns only
+for exact `OpTempCtrl::None`. Scheduled mode samples
+`opTempRadiativeFractionSched`; every other enum uses
+`FixedRadiativeFraction`. It then copies the selected actual Zone's MRT and
+overwrites the referenced setpoint with
+`(setpoint - fraction * MRT) / (1 - fraction)`.
+
+Normal input sets the global flag when any
+`ZoneControl:Thermostat:OperativeTemperature` exists and validates constant or
+scheduled fractions to `[0.0, 0.9)`, including schedule existence and range.
+CP227 itself repeats none of those checks. The record default is instead
+`OpTempCtrl::Invalid` with fixed fraction zero. Parsed None is assigned only
+on an invalid-input path that cannot complete normally; when another Zone
+activates the global flag, an untargeted record
+therefore takes the fixed-zero calculation rather than its per-record return.
+That is an identity for finite MRT, but `0 * Inf` or `0 * NaN` still propagates
+NaN. Direct or corrupted state can also expose zero denominators and other
+nonfinite results.
+
+All five production expressions are inside `CalcZoneAirTempSetPoints`.
+SingleHeat, SingleCool, and SingleHeatCool use one call, while DualHeatCool
+converts cooling then heating and Uncontrolled uses none. Cooling paths apply
+adaptive comfort before CP227. Optimum start can later replace the converted
+high/low values with raw occupied schedules; humidity overcooling, thermostat
+fault offsets, comfort control, and EMS overrides can also modify or replace
+the intermediate result. SingleHeat, SingleCool, and Dual branches separately
+preserve their raw targets before CP227; SingleHeatCool does not write those
+record fields.
+
+The normal `ManageHVAC` path reaches the parent once per Zone timestep before
+the system-substep loop, so shortening alone does not repeat CP227. Demand
+resimulation can add same-time `GetZoneSetPoints` passes; a full parent replay
+reloads raw schedules before converting and therefore does not compound a
+stable result. Directly calling CP227 twice on the already converted reference
+is generally non-idempotent. The external-HVAC route bypasses the built-in
+caller.
+
+CP227 owns no persistent state, output registration, diagnostic, clamp,
+status, catch, or rollback. Invalid record or MRT indexes, or a null scheduled pointer, can fail
+before the sole final assignment and leave the referenced setpoint unchanged.
+A later-Zone failure in the parent retains earlier converted outputs. Full
+parent retry reloads its schedule prefix; direct routine retry after a normal
+write transforms the result again. There is no independent reset lifecycle.
+
+No C++ test calls CP227 by name. Four fixtures make 21 direct parent calls and
+46 CP227 entries, all returning at the false global gate; their 33 thermostat
+assertions do not exercise fixed, scheduled, MRT, or formula behavior. The
+only four raw operative-temperature objects in the unit tree are Constant
+with zero fraction in an adaptive-comfort fixture that calls neither the
+operative parser nor CP227. There is no scheduled fixture.
+
+None of 57 active full-simulation expressions contains a
+`ZoneControl:Thermostat:OperativeTemperature` object. Of the 56 configurations
+reaching normal HVAC setup, 38
+contain 52 ordinary thermostat records: 49 Dual-only plus three
+SingleHeat/SingleCool-switching records. One active setpoint sweep therefore
+has 101 static CP227 entry opportunities, all global-gate no-ops; the
+record-specific modes, MRT read, and transformation have zero corpus reach.
+Runtime entry totals remain timestep-, schedule-, warmup-, and
+resimulation-dependent.
+
+Rust retains a bounded direct-Zone DualSetpoint graph and raw-schedule
+IdealLoads evidence, but no typed operative-temperature object, global or
+per-record operative-control state, fixed/scheduled MRT-fraction binding,
+Zone MRT, in-place conversion, exact caller lifecycle, or focused test. Its
+setpoint compatibility wrapper is an identity around an empty PredictStep
+closure, and its thermostat execution step is planning metadata. Raw
+`ZoneControl:Thermostat:OperativeTemperature` is outside typed/capability
+coverage and run-blocks.
+
+CP227 remains required `source_mapped` and adds no algorithm-level
+`energyplus_source` entry, Rust target, code, mapped state, test, support,
+capability, output implementation, comparator, manifest, numerical,
+performance, or conformance promotion. The inventory becomes 32 algorithms
+and 233 routines, split 58 `state_mapped` plus 175 `source_mapped`, with 110
+required; the heat-balance project list becomes 79.
+
+CP228 next maps `AdjustOperativeSetPointsforAdapComfort`, declared at
+`ZoneTempPredictorCorrector.hh` line 358 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5899-5964.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`detect_oscillating_zone_temp`, preserving the completed
+`adjust_air_set_points_for_op_temp_cntrl`, preserving the completed
 predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and

@@ -46,6 +46,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | thermostat presence verification | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::VerifyThermostatInZone` | bounded direct-Zone DualSetpoint records, ZoneId graph/IdealLoads lookups, and planning metadata only | CP224 required source-mapped shared-latch exact-name sizing predicate; no exact Rust lazy-input, sizing-caller, lookup, or failure parity |
 | thermostat-to-controlled-Zone verification | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::VerifyControlledZoneForThermostat` | normalized raw controlled marker, independent typed ZoneId thermostat/equipment records, and an IdealLoads-only dispatch validator | CP225 required source-mapped full-arena exact-name predicate plus ordinary/comfort caller latch and fatal lifecycle; no exact Rust helper, cross-family validation, or failure parity |
 | Zone-temperature oscillation detection | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::DetectOscillatingZoneTemp` | adjacent three-slot MAT histories, adaptive `0.3 C` step count, IdealLoads-only occupancy/deadband concepts, and hourly MAT/debug output | CP226 required source-mapped one-time activation plus zero-seeded four-slot strict `0.15 C` detector, Zone/Facility duration outputs, annual/perflog aggregation, and system-step lifecycle; no exact Rust helper, state, caller, output, or test |
+| operative-temperature air-setpoint conversion | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::AdjustAirSetPointsforOpTempCntrl` | bounded direct-Zone DualSetpoint graph and raw-schedule IdealLoads output only | CP227 required source-mapped global/per-record guards plus fixed/scheduled fraction and Zone-MRT inverse, caller overwrite order, resimulation, IEEE, and replay lifecycle; operative input run-blocks and no exact Rust state, helper, live caller, or test exists |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -6401,9 +6402,214 @@ manifest, numerical, performance, or conformance promotion. The inventory
 becomes 32 algorithms and 232 routines, split 58 `state_mapped` plus 174
 `source_mapped`, with 109 required; the heat-balance project list becomes 78.
 
-CP227 next maps `AdjustAirSetPointsforOpTempCntrl`, declared at
+### CP227 `AdjustAirSetPointsforOpTempCntrl` source map
+
+CP227 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.adjust_air_set_points_for_op_temp_cntrl`
+and heat-balance project item `adjust_air_set_points_for_op_temp_cntrl`
+immediately after `detect_oscillating_zone_temp` and before
+`update_final_surface_heat_balance`. The nonmember routine is declared at
 `ZoneTempPredictorCorrector.hh` line 356 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 5863-5897.
+
+#### Guards, inputs, and exact inverse
+
+The signature receives mutable state, separate one-based temperature-control
+and actual-Zone identities, and a mutable setpoint reference. A false
+`AnyOpTempControl` returns immediately without touching either identity,
+schedule state, MRT, or output. When true, CP227 indexes
+`TempControlledZone(TempControlledZoneID)`. Exact `OpTempCtrl::None` then
+returns before the actual-Zone identity or output is used.
+
+For every non-None record, Scheduled mode dereferences
+`opTempRadiativeFractionSched` and samples its current value. Constant,
+Invalid, and every other enum value use `FixedRadiativeFraction`. CP227 next
+copies `zoneHeatBalance(ActualZoneNum).MRT`. It does not cross-check that the
+control record's `ActualZoneNum` equals the supplied actual-Zone identity.
+
+With local fraction `f`, local MRT `Tr`, and the referenced input target `Top`,
+the sole write is:
+
+```text
+ZoneAirSetPoint = (Top - f * Tr) / (1.0 - f)
+```
+
+This is the direct inverse of `Top = (1-f) * Tair + f * Tr`. CP227 writes no
+other record, output, diagnostic, cache, flag, or status. The fraction and MRT
+are local snapshots before the assignment, so even a nonproduction alias of
+the output reference to one of those source fields uses the copied RHS values.
+
+#### Parser guarantees and default-mode anomaly
+
+`GetZoneAirSetPoints` counts
+`ZoneControl:Thermostat:OperativeTemperature` objects and sets
+`AnyOpTempControl = true` when the count is positive. Each valid target selects
+Constant or Scheduled mode. Constant input validates
+`0.0 <= FixedRadiativeFraction < 0.9`; Scheduled input requires a schedule and
+checks every schedule value over the same inclusive-lower/exclusive-upper
+range. A normal error-free runtime therefore has
+`0.1 < 1-f <= 1.0`.
+
+Those checks belong to input acquisition. CP227 does not validate identities,
+allocation, record membership, mode, schedule pointer, current fraction,
+MRT, setpoint, denominator, finiteness, or output range, and it does not clamp.
+Direct state construction or later mutation can violate every parser
+invariant.
+
+`ZoneTempControls::OpTempCtrl` defaults to Invalid and its fixed fraction
+defaults to zero. Only the operative-object parser assigns this field. It can
+assign a parsed None value, but immediately marks that key invalid and the
+input error prevents normal completion. Consequently, an error-free parsed
+runtime retains no None record. Once any target sets the global flag, another
+controlled Zone with no operative object does not take CP227's per-record None
+return. It takes the Invalid/fixed-zero path,
+reads that Zone's MRT, and evaluates the formula. This preserves a finite
+setpoint for finite MRT, but IEEE `0 * Inf` and `0 * NaN` can make even that
+nominal identity produce NaN.
+
+For invalid direct state, `f == 1` exposes division by zero; NaN and infinity
+propagate according to the build's floating-point behavior, and large finite
+operands can overflow or lose precision. The routine has no special equality,
+negative-fraction, nonfinite, or exception path.
+
+#### Caller branch order and result lifetime
+
+A source-wide search finds five production call expressions, all inside
+`CalcZoneAirTempSetPoints`:
+
+1. SingleHeat calls once after its used heating schedule is loaded;
+2. SingleCool calls once;
+3. SingleHeatCool calls once;
+4. DualHeatCool calls first for cooling and then for heating;
+5. Uncontrolled calls zero times.
+
+The caller samples its control-type schedule for every temperature-controlled
+Zone on each pass. SingleHeat, SingleCool, and Dual branches store raw source
+targets in `TempControlledZone.ZoneThermostatSetPointHi/Lo` before CP227;
+SingleHeatCool does not write those record fields. CP227 mutates only the
+corresponding `zoneTstatSetpts` reference.
+
+SingleCool, SingleHeatCool, and Dual cooling can run CP228 adaptive-comfort
+selection before CP227, making that operative target the conversion input.
+SingleHeatCool and Dual optimum-start handling occurs later and can overwrite
+the converted high/low setpoints with raw occupied schedule values. Cooling
+humidity adjustment follows CP227 for SingleCool and after optimum-start for
+Dual. Thermostat-fault offsets then modify generic, low, and high setpoints.
+Comfort-control calculation and EMS overrides run after the complete ordinary
+control loop. CP227's value is therefore an intermediate air target, not an
+unconditionally final reported or demand target.
+
+`ManageZoneAirUpdates(GetZoneSetPoints)` is the only production parent path to
+`CalcZoneAirTempSetPoints`. Built-in `ManageHVAC` calls it once per Zone
+timestep before entering the system-timestep loop, so system-step shortening
+alone does not repeat CP227. A DemandManager HVAC resimulation can invoke
+another GetZoneSetPoints/predict/correct sequence at the same simulation time.
+The full parent reloads raw setpoint schedules before CP227, so stable
+schedule, adaptive target, fraction, and MRT inputs reproduce rather than
+compound the result. An HVAC-only resimulation reuses the existing MRT; a
+heat-balance resimulation can recalculate MRT first. The external-HVAC-manager
+route bypasses built-in `ManageHVAC` and CP227.
+
+There is no CP227 warmup, kickoff, sizing, environment, timestep, or
+resimulation gate. Entry count depends on Zone timesteps, dynamic
+control-type schedules, and demand resimulation, not the number of shortened
+system substeps.
+
+#### Failure, retry, reset, and direct replay
+
+With the global flag false, malformed identities and pointers remain
+unobserved. With it true, the control arena and identity must be valid. None
+mode still protects the actual-Zone identity. Scheduled mode requires a
+nonnull schedule pointer before MRT lookup; all active paths require a valid
+Zone heat-balance identity. The routine performs its only write after all
+these reads, so an abnormal non-return before assignment leaves the referenced
+setpoint unchanged, aside from any dependency-internal behavior.
+
+The parent loop is not transactional. A failure on one later record retains
+raw and converted setpoint writes for earlier records plus the current
+caller's pre-CP227 schedule/adaptive prefix, and prevents downstream optimum,
+humidity, fault, comfort, and EMS work. A caught full-parent retry reloads
+each reached raw schedule before conversion. CP227 alone, however, accepts its
+already transformed output as the next input; repeated direct calls are
+generally non-idempotent and double-transform unless a special value such as a
+finite fixed-zero fraction makes the operation an identity.
+
+CP227 owns no persistent state or independent reset. Normal parent passes
+overwrite their setpoint targets. Clean recovery from parent failure requires
+the owning control, schedule, heat-balance, setpoint, and downstream managers
+to be restored consistently.
+
+#### C++ and corpus evidence
+
+No C++ test calls `AdjustAirSetPointsforOpTempCntrl` directly. Four fixtures
+make 21 direct `CalcZoneAirTempSetPoints` calls which expand to 46 CP227
+entries: six in `SysAvailManager_OptimumStart`, 18 in the reporting fixture,
+and 11 in each of two cutout fixtures. Every entry has
+`AnyOpTempControl = false` and returns at the first guard. Thirty-three
+downstream thermostat assertions exercise broader parent behavior but isolate
+neither active mode nor MRT conversion.
+
+The only four raw operative-temperature objects in the complete unit tree are
+Constant with fixed fraction zero in the adaptive-thermostat fixture. That
+fixture invokes neither `GetZoneAirSetPoints`,
+`CalcZoneAirTempSetPoints`, nor CP227; it manually constructs adaptive state
+and tests CP228 instead. There is no Scheduled fixture, nonzero fixed fraction,
+or active CP227 formula assertion.
+
+None of the 57 active `ManageSimulation` expressions contains
+`ZoneControl:Thermostat:OperativeTemperature`; the one expected EMS fatal
+stops before GetZoneSetPoints and the other 56 configurations retain
+`AnyOpTempControl = false`. Thirty-eight configurations contain 52 ordinary
+thermostat records. Their linked control topology is 49 Dual-only records plus
+three SingleHeat/SingleCool-switching records, so one active setpoint sweep has
+`49 * 2 + 3 * 1 = 101` static CP227 entry opportunities. Every one returns at
+the global guard. Constant, Scheduled, default-Invalid fixed-zero, MRT, and
+formula body reach are all zero.
+
+These are configuration and direct-parent counts, not accumulated runtime
+calls. Warmup, ordinary Zone timesteps, schedule switching, and demand
+resimulation can repeat entry. No test covers the active global gate,
+per-record None, another Zone's Invalid/fixed-zero behavior, fixed or
+scheduled nonzero fraction, invalid pointer or identity, mismatched identities,
+nonfinite arithmetic, downstream overwrite ordering, direct replay, failure,
+or reset.
+
+#### Rust boundary
+
+A crate-wide search finds no `AdjustAirSetPointsforOpTempCntrl`,
+`adjust_air_set_points_for_op_temp_cntrl`, operative-temperature control,
+Zone MRT, radiative-fraction binding, or inverse setpoint formula.
+
+Rust types only a bounded direct-Zone DualSetpoint thermostat graph: it retains
+heating/cooling schedule IDs, a control-type schedule, and cutout delta.
+`ZoneControl:Thermostat:OperativeTemperature` is absent from typed object,
+capability, and object-coverage registries, has no partial-support rule, and
+therefore run-blocks as raw unsupported input. Zone heat-balance state has MAT
+and history but no MRT; similarly named equivalent-radiant state belongs only
+to outside-Surface diagnostics.
+
+The adjacent `get_zone_air_set_points_compat` wrapper is an identity call
+around an empty closure under a hard-coded PredictStep, not a live
+GetZoneSetPoints evaluator. `EvaluateZoneThermostat` is execution-plan
+metadata. The CLI IdealLoads path reads the first typed DualSetpoint and
+repeats raw constant schedule values for thermostat outputs without operative
+adjustment. Existing object and variable claims explicitly remain graph- or
+case-bounded and do not establish control parity.
+
+No Rust test covers an operative object, fixed/scheduled fraction, Zone MRT,
+in-place conversion, caller order, or lifecycle. Generic schedules, surface
+radiant fields, DualSetpoint graph wiring, and raw thermostat output evidence
+do not implement CP227.
+
+CP227 adds no algorithm-level `energyplus_source` entry, Rust target, code,
+mapped state, test, support, capability, output implementation, comparator,
+manifest, numerical, performance, or conformance promotion. The inventory
+becomes 32 algorithms and 233 routines, split 58 `state_mapped` plus 175
+`source_mapped`, with 110 required; the heat-balance project list becomes 79.
+
+CP228 next maps `AdjustOperativeSetPointsforAdapComfort`, declared at
+`ZoneTempPredictorCorrector.hh` line 358 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5899-5964.
 
 ## Promotion Requirements
 
