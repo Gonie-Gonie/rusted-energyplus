@@ -1151,7 +1151,8 @@ heat-balance project list becomes 57.
 The following required predictor/corrector definition entry is
 `calc_zone_air_temp_set_points`, after
 `zone_space_heat_balance_predict_system_load` and before
-`update_final_surface_heat_balance`. Its source boundary is
+`zone_space_heat_balance_calc_predicted_humidity_ratio`. Its source boundary
+is
 `CalcZoneAirTempSetPoints(EnergyPlusData &state)`, declared at
 `ZoneTempPredictorCorrector.hh` line 282 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 3259-3460.
@@ -1232,15 +1233,85 @@ support, output, numerical, or conformance claim. The inventory becomes 32
 algorithms and 212 routines, split 58 `state_mapped` plus 154
 `source_mapped`, with 89 required; the heat-balance project list becomes 58.
 
-CP205 next maps
+The following required predictor/corrector definition entry is
+`zone_space_heat_balance_calc_predicted_humidity_ratio`, after
+`calc_zone_air_temp_set_points` and before
+`update_final_surface_heat_balance`. Its source boundary is
 `ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
 Real64 RAFNFrac, int zoneNum, int spaceNum = 0)`, declared at
 `ZoneTempPredictorCorrector.hh` line 243 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 3462-3815.
 
+Its only production call is CP203 line 3256, after sensible-load prediction.
+CP202/CP203 therefore run it for each Zone and each active Space. The routine
+selects Zone-keyed humidifying and dehumidifying RH schedules, then applies
+the two EMS overrides. Outside warmup, sizing, and kickoff it stops at the
+first matching humidistat fault. Independent faults subtract their available
+severity-scaled offset and clamp RH; thermostat-dependent faults locate the
+referenced thermostat fault and, only for a nonzero available offset, transform
+both RH values through humidity ratio at this record's offset `MAT` before
+clamping. A missing referenced thermostat fatals. Reversed RH values warn
+through the control-owned recurrence index and are collapsed to the
+dehumidifying value.
+
+Without a humidistat, latent sizing examines only the first controlled Zone
+equipment configuration, does not match it to `zoneNum`, and uses its matching
+`Sizing:Zone` input or the first sizing input as fallback. When latent sizing
+is enabled there, that one selection can control every otherwise uncontrolled
+Zone and Space invocation.
+
+Controlled calculation combines record latent gain with Zone radiant and pool
+latent gains, forms moisture coefficients from the active ordinary-airflow or
+AirflowNetwork path, and uses Space volume only for a positive `spaceNum`.
+A parent Zone RoomAir AirflowNetwork model replaces those coefficients from
+its control node without CP203's nonmixing or node-use guards, including for a
+Space call. ThirdOrder uses three humidity-history values; Analytical uses its
+exact-zero or exponential branch; Euler uses the one-step balance. A positive
+`RAFNFrac` divides each load. Exact-equal setpoints select humidifying load;
+otherwise the signed humidifying/dehumidifying matrix selects humidification,
+dehumidification, or zero and fatals on every remaining combination.
+
+Controlled output selects Zone or Space moisture demand and delegates to
+`reportMoistLoadsZoneMultiplier`, which stores raw predicted values, Zone-
+multiplied public demand, and conditionally sequenced equipment demand.
+Uncontrolled output zeros only the three public demand fields, leaving raw,
+sequenced, remaining, unadjusted, and report state stale. There is no local
+validation, latch, status, catch, cleanup, or rollback beyond one debug
+assertion. A diagnostic, psychrometric, allocation, or report-child failure
+can preserve warnings, recurrence state, or a partial demand prefix; Zone
+demand can commit before a later Space failure. Retry resamples schedules and
+faults and repeats all writes.
+
+No C++ test calls CP205 directly. One report-helper fixture covers only Zone
+raw and multiplied values. Fifty-five active full simulations execute Zone
+CP205 and eight also execute Space CP205, but none supplies a humidistat,
+humidistat fault/EMS override, or RoomAir AFN. Only one ThirdOrder
+latent-sizing case enters controlled equations, with downstream assertions;
+six Analytical cases remain uncontrolled and no Euler case is reached.
+
+Rust has no heat-balance CP205 wrapper, call site, Zone/Space moisture-demand
+owner, or runtime mutation. The separate
+`calc_no_oa_third_order_moisture_demand_compat` and fixed-one-step IdealLoads
+Humidistat loop cover a guarded Zone-only, no-outdoor-air, `A = 0` ThirdOrder
+subset. They reject invalid input, always clamp RH, and return only multiplied
+loads. They omit the source schedules, EMS, faults, sizing selection,
+radiant/pool and airflow terms, AFN/RoomAir/RAFN, Space, Analytical/Euler,
+diagnostics and partial effects, raw predicted values, uncontrolled writes,
+and sequenced demand.
+
+CP205 remains required `source_mapped` and adds no Rust target, state, test,
+support, output, numerical, or conformance claim. The inventory becomes 32
+algorithms and 213 routines, split 58 `state_mapped` plus 155
+`source_mapped`, with 90 required; the heat-balance project list becomes 59.
+
+CP206 next maps
+`correctZoneAirTemps(EnergyPlusData &state, bool useZoneTimeStepHistory)`,
+declared at `ZoneTempPredictorCorrector.hh` lines 289-291 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 3817-3861.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`calc_zone_air_temp_set_points`, preserving the completed
-predictor/corrector definition slice before
+`zone_space_heat_balance_calc_predicted_humidity_ratio`, preserving the
+completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
 the implementation at lines 5176-5219. The routine always invokes seven
@@ -1260,8 +1331,8 @@ The next required inventory entry is `update_thermal_histories`, after
 `zone_space_heat_balance_begin_environment_init` /
 `zone_space_heat_balance_set_up_output_vars` / `predict_system_loads` /
 `zone_space_heat_balance_predict_system_load` /
-`calc_zone_air_temp_set_points` entries,
-this
+`calc_zone_air_temp_set_points` /
+`zone_space_heat_balance_calc_predicted_humidity_ratio` entries, this
 preserves completion of the Air subtree before the Surface manager's final and
 history stages. The EnergyPlus parent calls the routine at lines 186-189 only
 when `AnyCTF || AnyEMPD`, and the canonical body spans lines 5221-5581. It owns
