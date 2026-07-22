@@ -3450,12 +3450,84 @@ inventory becomes 32 algorithms and 241 routines, split 58 `state_mapped`
 plus 183 `source_mapped`, with 118 required; the heat-balance project list
 becomes 87.
 
-CP236 next maps `ZoneSpaceHeatBalanceData::calcPredictedSystemLoad`, declared
-at `ZoneTempPredictorCorrector.hh` line 224 and implemented at
+CP236 adds required `zone_space_heat_balance_calc_predicted_system_load`
+immediately after `zone_space_heat_balance_update_temperatures` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is
+`ZoneSpaceHeatBalanceData::calcPredictedSystemLoad`, declared at
+`ZoneTempPredictorCorrector.hh` line 224 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 6835-7243.
 
+The sole production expression is CP203 `predictSystemLoad` line 3253, after
+history, capacitance, sums, coefficients, and RoomAir preparation and before
+predicted humidity. CP202 supplies Zone-first then active stored-Space
+traversal. Exact positive `spaceNum` selects Space node, stage, record, and
+demand state; all control, setpoint, ITE, multiplier, staged gate, and
+diagnostic context still comes from the parent Zone.
+
+ThirdOrder uses `D * S - I`. Analytical uses
+`C * (S - T1) - I` only for exact `D == 0`, otherwise
+`D * (S - T1 * exp(min(700, -D / C))) /
+(1 - exp(min(700, -D / C))) - I`; Euler uses
+`C * (S - T1) + D * S - I`. CP236 adds no local capacity, denominator,
+finite-value, or enum validation.
+
+Uncontrolled, SingleHeat, SingleCool, SingleHeatCool, and DualHeatCool select
+the total and heating/cooling-setpoint loads. Only strictly positive RAFN
+fractions scale loads. SingleCool contains the source defect that divides the
+still-zero heating local instead of cooling. ITE then replaces cooling only
+with an unscaled ThirdOrder-shaped expression for SingleCool and both combined
+controls. Combined inconsistent or unclassified loads fatal before staged
+logic.
+
+The staged override reads Zone or Space `StageNum` before its gates. Zero stage
+sets zero load and deadband but, without a node, retains the ordinary branch's
+setpoint. Negative and positive stages recompute cooling at high or heating at
+low respectively; magnitude is ignored, RAFN/ITE are not reapplied, and the
+ordinary deadband flag is never cleared.
+
+Normal completion writes selected node setpoint, shared Zone Setback using the
+record's prior `setPointLast`, that record's new last setpoint, shared scalar
+thermostat setpoint, both shared deadband flags, then the selected Zone/Space
+demand. Reporting applies load correction, Zone and list multipliers, and
+optional equipment-sequence overwrites. Space traversal can therefore make
+the last Space win shared Zone state while comparing against its own prior
+record.
+
+Fatal combined-control paths preserve diagnostics and old final state; later
+node/report failures preserve an ordered prefix and block humidity. There is
+no transaction or rollback. Stable replay can change Setback after updating
+`setPointLast`. Environment initialization does not reset `setPointLast`,
+Setback, CurDeadBand, StageNum, or every sensible-demand field.
+
+One C++ fixture makes seven direct calls with 19 related assertions across
+Uncontrolled, both SingleHeat signs, SingleCool cooling, SingleHeatCool
+cooling, and Dual heating/cooling. It is Zone-only, ThirdOrder, unit-scaled,
+and covers no node, Space, ITE, staged, defect, failure, or replay path.
+Focused CP202 fixtures have zero Zones. A separate report-helper test is not
+composed.
+
+Across one initial sweep of 55 applicable active configurations, 81 Zones plus
+24 active Spaces yield 105 calls: 95 ThirdOrder and 10 Analytical, with zero
+Euler. The corpus has no staged object, adjusted-return ITE object, or
+non-Mixing RoomAir model. No full-simulation assertion isolates CP236.
+
+Rust has adjacent guarded Zone-only coefficient helpers, a bounded
+DualSetpoint graph, node setpoint storage, oracle-fed IdealLoads demand, and
+Zone multipliers, but no exact CP236 dispatcher, Space binding, five-way
+control, Euler/load selection, RAFN/ITE/staged behavior, `setPointLast`,
+shared flags, or composed sensible-demand report helper. CP236 remains
+required `source_mapped` and adds no algorithm-level source, Rust/state/test,
+support, output, numerical, performance, or conformance promotion. The
+inventory becomes 32 algorithms and 242 routines, split 58 `state_mapped`
+plus 184 `source_mapped`, with 119 required; the heat-balance project list
+becomes 88.
+
+CP237 next expands `ZoneEquipmentManager::ManageZoneEquipment`, declared at
+`ZoneEquipmentManager.hh` lines 82-86 and implemented at
+`ZoneEquipmentManager.cc` lines 141-167.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`zone_space_heat_balance_update_temperatures`,
+`zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and

@@ -111,6 +111,7 @@ required_routines = [
   "fill_predefined_table_on_thermostat_setpoints",
   "fill_predefined_table_on_thermostat_schedules",
   "zone_space_heat_balance_update_temperatures",
+  "zone_space_heat_balance_calc_predicted_system_load",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",

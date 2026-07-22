@@ -55,6 +55,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | thermostat-setpoint predefined LEED table | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::FillPredefinedTableOnThermostatSetpoints` | normalized DualSetpoint graph, calendar-aware schedule series, and separate constant-schedule IdealLoads diagnostics only | CP233 required source-mapped four-family first-schedule-ID-wins traversal, winter/summer Wednesday samples and counts, base/synthetic row keys, append-only predefined cells, final-report cadence, and failure/retry lifecycle; reporting input stays ignored and no exact Rust arena, seasonal query, table store, helper, caller, or test exists |
 | thermostat-schedule predefined System Summary table | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::FillPredefinedTableOnThermostatSchedules` | direct-Zone DualSetpoint graph and IdealLoads schedule resolution only | CP234 required source-mapped stored ordinary-Zone traversal, nonempty-name slot selection, tuple sort, independently filtered string joins, four-to-six append-only cells, final-report cadence, and failure/retry/reset lifecycle; reporting input stays ignored and no complete Rust arena, predefined table store, helper, caller, serializer, or comparator exists |
 | Zone/Space predictor temperature-history preparation | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::updateTemperatures` | Zone-only three-slot adaptive temperature/humidity histories and helper | CP235 required source-mapped unconditional four-slot working-history selection plus shortened Zone/Space node rollback and count-change RoomAir interpolation orchestration; no exact Rust Space/node/thermostat/enthalpy/RoomAir topology, source cadence, wrapper, or test exists |
+| Zone/Space predicted sensible system load | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::calcPredictedSystemLoad` | adjacent guarded Zone-only coefficient helpers, bounded DualSetpoint graph, node setpoint storage, oracle-fed IdealLoads demand, and Zone multipliers only | CP236 required source-mapped five-way/three-algorithm load selection plus RAFN/ITE asymmetries, staged override, shared Zone writes, and selected Zone/Space reporting; no exact Rust dispatcher, Space binding, live demand synthesis, or composed test exists |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -8564,9 +8565,253 @@ numerical, performance, or conformance promotion. The inventory becomes 32
 algorithms and 241 routines, split 58 `state_mapped` plus 183
 `source_mapped`, with 118 required; the heat-balance project list becomes 87.
 
-CP236 next maps `ZoneSpaceHeatBalanceData::calcPredictedSystemLoad`, declared
-at `ZoneTempPredictorCorrector.hh` line 224 and implemented at
+### CP236 `ZoneSpaceHeatBalanceData::calcPredictedSystemLoad` source map
+
+CP236 adds canonical required
+`routine.zone_space_heat_balance_calc_predicted_system_load` and the
+project-contract item `zone_space_heat_balance_calc_predicted_system_load`
+immediately after CP235
+`zone_space_heat_balance_update_temperatures`. The member is declared at
+`ZoneTempPredictorCorrector.hh` line 224 and its complete definition is
 `ZoneTempPredictorCorrector.cc` lines 6835-7243.
+
+The sole production call expression is CP203
+`ZoneSpaceHeatBalanceData::predictSystemLoad` line 3253, after CP235 history
+selection and the parent's capacitance, sum, coefficient, RoomAir-AFN, and
+non-ThirdOrder preparation, and before the predicted-humidity child at line
+3256. CP202 supplies Zone-first then stored active-Space traversal. CP236 owns
+the five-way temperature-control dispatch, sensible-load selection, staged
+override, final thermostat/deadband writes, and selected demand reporting; it
+does not promote its parent or reporting helper.
+
+#### Identity and inherited predictor state
+
+The only local identity check is debug `assert(zoneNum > 0)`. Every call reads
+the parent Zone, that Zone's thermostat setpoint triple, solution algorithm,
+temperature-control type, staged-control gate, and ITE state. Exact
+`spaceNum > 0` selects a Space system node, `StageNum`, heat-balance record,
+and sensible-demand destination; zero or a malformed negative identity selects
+the Zone path. This differs from CP235, where every nonzero identity selects a
+Space during shortened rollback.
+
+A Space calculation still uses its parent Zone's control type, setpoint triple,
+ITE adjustment, load-correction factor, multipliers, staged-control flag, and
+diagnostic name. Only the record coefficients/history, selected node,
+`StageNum`, `setPointLast`, and final demand record vary. CP203's active
+RoomAir-AFN coefficient block has no Space guard, so it can replace even a
+Space record's `tempDepLoad` and `tempIndLoad` from the Zone control node and
+control fraction before CP236.
+
+#### Three load equations
+
+Let `D = tempDepLoad`, `I = tempIndLoad`, `C = AirPowerCap`,
+`T1 = T1`, and `S` be the selected setpoint. Each ordinary or nonzero staged
+branch repeats one of three source equations:
+
+| Solution algorithm | Predicted load |
+|---|---|
+| `ThirdOrder` | `D * S - I` |
+| `AnalyticalSolution`, exact `D == 0.0` | `C * (S - T1) - I` |
+| `AnalyticalSolution`, otherwise | with `e = exp(min(700.0, -D / C))`, `D * (S - T1 * e) / (1 - e) - I` |
+| `EulerMethod` | `C * (S - T1) + D * S - I` |
+
+There is no local positive-capacitance, denominator, overflow, or finite-value
+guard. The exponential cap inherits ObjexxFCL `min` behavior, including its
+second-argument result when comparison is unordered. An invalid solution enum
+only debug-asserts; a release build retains the branch-local value already in
+the load variable. CP203 retains its history/capacitance-expanded `D` and `I`
+for ThirdOrder, but resets them to `TempDepCoef` and `TempIndCoef` before
+Analytical or Euler entry.
+
+#### Ordinary control dispatch
+
+All three load locals and `ZoneSetPoint` start at zero, and the local deadband
+flag starts false.
+
+| Zone control type | Source selection and persistent local result |
+|---|---|
+| `Uncontrolled` | leaves both setpoint loads, total load, setpoint, and deadband at zero/false |
+| `SingleHeat` | calculates the scalar setpoint load, divides it by a strictly positive RAFN fraction, copies it to total and cooling-setpoint load, publishes the scalar setpoint, and marks deadband for `total <= 0` |
+| `SingleCool` | calculates the scalar cooling load, applies the source RAFN defect described below, optionally replaces cooling from ITE, copies it to total and heating-setpoint load, publishes the scalar setpoint, and marks deadband for `total >= 0` |
+| `SingleHeatCool` | calculates both loads at the scalar setpoint, scales both for positive RAFN, optionally replaces cooling from ITE, publishes the scalar setpoint, then chooses heating when both are positive, cooling when both are negative, or zero/deadband when they straddle zero |
+| `DualHeatCool` | calculates heating at `setptLo` and cooling at `setptHi`, scales both for positive RAFN, optionally replaces cooling from ITE, then publishes low for heating, high for cooling, or zero/deadband with a node-clamped target when they straddle zero |
+
+For either combined control, `heating > cooling` emits the source diagnostic
+sequence and fatals before staged control can rescue it. If neither both-sign
+nor straddling predicate matches, including common NaN shapes, the separate
+unanticipated-combination diagnostics also fatal. In a deadband branch a
+positive selected node clamps its current temperature to `[setptLo, setptHi]`.
+Without a positive node, Dual leaves `ZoneSetPoint` at its initial zero;
+SingleHeatCool retains the scalar setpoint assigned before classification.
+
+The default/invalid control type silently preserves the initial zero locals,
+unless a later staged branch overwrites them. Single-mode nonfinite results can
+reach the final writes because their sign test merely remains false.
+
+#### RAFN and ITE asymmetries
+
+RAFN scaling occurs only when `RAFNFrac > 0.0`; zero, negative, and NaN values
+skip it, while values above one, infinity, and arbitrarily small positive
+fractions are accepted. `SingleCool` lines 6926-6928 divide the still-zero
+heating-load local instead of the calculated cooling load, so its cooling
+demand is not RAFN-scaled. The other controlled branches divide their intended
+load or loads.
+
+When the parent Zone has `HasAdjustedReturnTempByITE` and `BeginSimFlag` is
+false, SingleCool, SingleHeatCool, and Dual overwrite only cooling with
+`D * AdjustedReturnTempByITE - I`. This is a ThirdOrder-shaped expression
+regardless of the selected solution algorithm, occurs after RAFN division, and
+therefore discards cooling scaling. It applies to Space records through the
+parent Zone and can create the combined-control fatal ordering. SingleHeat and
+Uncontrolled have no ITE branch.
+
+#### Staged override
+
+CP236 unconditionally reads a selected `StageNum` and node before checking the
+global staged-zone count or per-Zone `StageZoneLogic`. A Space reads its own
+demand record and only debug-asserts equality with the Zone `StageNum`; a
+release build can use divergent Space state. Sensible-demand environment
+initialization does not reset `StageNum`, so the pre-gate read can observe
+retained state even when staged logic is inactive.
+
+When both staged gates are true, only the sign of `StageNum` matters:
+
+- zero sets all loads to zero and deadband true; a positive node clamps its
+  temperature into the deadband, while an absent node leaves the ordinary
+  branch's `ZoneSetPoint` rather than forcing zero;
+- negative recomputes cooling at `setptHi`, copies it to total and heating,
+  selects high, and marks deadband if the resulting total is nonnegative;
+- positive recomputes heating at `setptLo`, copies it to total and cooling,
+  selects low, and marks deadband if the resulting total is nonpositive.
+
+Stage magnitude is ignored. The recomputation neither reapplies RAFN nor ITE,
+and it does not clear a deadband flag set by the ordinary branch. Thus a valid
+stage load can retain a prior true flag, while a wrong-sign stage load is
+retained and marked deadband. With an invalid solution enum in release mode,
+the negative or positive stage can reuse the corresponding ordinary-branch
+load rather than compute a new one.
+
+#### Final shared state and demand reporting
+
+Every normal return commits this exact order:
+
+1. write the selected positive Zone or Space node `TempSetPoint`;
+2. set shared parent-Zone `Setback` from
+   `ZoneSetPoint > this->setPointLast`;
+3. overwrite this record's `setPointLast`;
+4. overwrite shared parent-Zone scalar thermostat `setpt`;
+5. overwrite shared `DeadBandOrSetback`;
+6. overwrite shared `CurDeadBandOrSetback`;
+7. report into the selected Zone or Space sensible-demand record.
+
+The report helper at `DataZoneEnergyDemands.cc` lines 330-351 first multiplies
+raw total/heating/cooling loads by the parent Zone `LoadCorrectionFactor` into
+the three predicted rates. It then multiplies by Zone `Multiplier *
+ListMultiplier` into total and heating/cooling-setpoint required output. For a
+controlled Zone with positive `NumZoneEquipment`, it overwrites all three
+sequenced-demand arrays with those final values.
+
+Space node and demand destinations are distinct, but the scalar thermostat,
+Setback, and both deadband flags are shared by the parent Zone.
+`setPointLast` is per record, so CP202's Zone-first then Space traversal can
+make the last Space win the shared flags and scalar while comparing against
+that Space's own prior target. The shared scalar can also be read by a later
+Space call through the same setpoint record, making traversal order observable.
+
+#### Validation, failure, replay, and reset
+
+CP236 validates no Zone or Space upper bound, Space membership or ownership,
+record/arena alignment, node upper bound, coefficient or setpoint ordering,
+algorithm/control enum, RAFN or multiplier range/finiteness, staged-state
+range, demand-array shape, or equipment-sequence allocation consistency. The
+combined-control fatal diagnostics occur before any CP236 final persistent
+writes; their diagnostic effects remain while previously stored thermostat,
+deadband, demand, and record state survives. A later node or report failure
+retains the ordered commit prefix and blocks the humidity child and later
+records; earlier Zone/Space calls from the parent traversal remain committed.
+
+There is no catch, status, cleanup, transaction, rollback, or once latch.
+Complete replay is not generally idempotent: the first call changes
+`setPointLast`, so a second stable call can change Setback from true to false;
+shared thermostat/deadband state is traversal-sensitive; and diagnostics and
+sequenced-demand overwrites have their own lifecycle.
+
+`setPointLast` defaults to zero but CP200 `beginEnvironmentInit` does not reset
+it. CP199 resets the thermostat setpoint arrays and load correction factor,
+initializes demand records, and clears `DeadBandOrSetback`, but not `Setback`
+or `CurDeadBandOrSetback`. Sensible-demand initialization clears remaining
+total, sequenced, air-system, and predicted-rate fields, but retains
+`StageNum`, unadjusted/heat/cool remaining fields, supply-air adjustment, and
+the total heating/cooling-setpoint required outputs. Full state clearing
+reconstructs the owning records.
+
+#### Tests, active corpus, and future candidates
+
+One C++ reporting fixture calls CP236 directly seven times at unit-source lines
+498, 518, 552, 560, 568, 577, and 594. Its 19 related assertions cover one
+uncontrolled call; negative and positive SingleHeat; one SingleCool cooling
+case; one SingleHeatCool cooling case; and Dual heating then cooling. All calls
+are Zone-only with default ThirdOrder, unit correction/multipliers, no positive
+system node, Space, ITE, staged logic, failure, replay, or reset. The six
+controlled calls pass literal `RAFNFrac = 1.0`, so division is numerically
+invisible and the SingleCool defect is not tested.
+
+The 16 focused CP202 wrapper calls and 24 setpoint assertions retain zero
+Zones, so focused CP236 reach is zero even where a fixture selects Euler.
+A separate sensible-demand helper test makes five direct report calls with 27
+assertions for correction/multiplier behavior, but it does not compose CP236.
+
+Of 57 active full-simulation expressions, one expected EMS fatal stops before
+prediction and one has zero Zones. One initial prediction census across the
+other 55 configurations yields 81 Zone plus 24 active Space records, or 105
+CP236 calls. The records partition into 95 ThirdOrder and 10 Analytical calls
+across 49 and six configurations respectively; Euler has zero active-corpus
+reach, and the Analytical exact-zero versus exponential split is not
+instrumented.
+
+The 52 expanded ordinary thermostat records contain 49 fixed Dual controls and
+three seasonal SingleHeat/SingleCool records, with no comfort or staged
+thermostat. Across Zone/Space calls the identity mix is 32 Uncontrolled, 70
+fixed Dual, and three seasonal records. Twenty-one sizing Spaces inherit Dual
+control; three simulation Spaces are Uncontrolled Analytical. There are no
+staged objects, adjusted-return ITE objects, or non-Mixing RoomAir models, so
+staged, ITE, and nonunit production RAFN paths have zero active potential.
+No full-simulation assertion isolates CP236-owned state.
+
+Installed but unadopted candidates include
+`MultiSpeedHP_StagedThermostat.idf`,
+`SmOffPSZ_OnOffStagedControl.idf`, five DataCenter files with adjusted return
+temperature, and `RoomAirflowNetwork.idf`. They are source-discovery
+candidates only and add no repository evidence.
+
+#### Rust boundary
+
+Rust has no `calcPredictedSystemLoad` analog, `setPointLast`, five-way live
+temperature-control dispatch, RAFN/ITE/staged override, shared
+deadband/Setback transaction, or source sensible-demand reporting behavior.
+Its Zone-air coefficient helpers cover bounded Zone-only ThirdOrder and
+Analytical calculations but not Euler or a load-to-thermostat-setpoint
+dispatcher; they also guard nonpositive capacitance/timestep inputs that the
+source routine does not.
+
+Rust owns no Space predictor/demand/control/node binding. Its typed thermostat
+graph represents a bounded direct-Zone DualSetpoint subset rather than the live
+mutable five-way setpoint triple. Node `TempSetPoint` storage is adjacent but
+not wired here. Rust `ZoneSysEnergyDemand` carries oracle-fed remaining
+heating/cooling/moisture values for IdealLoads, without predicted/total
+heating/cooling-setpoint rates, staged state, equipment sequences, or the
+source multiplier helper. Zone multipliers are adjacent input state, not a
+composed CP236 report path.
+
+CP236 adds no algorithm-level source, Rust target, code, mapped state, test,
+support, capability, output implementation, comparator, case, manifest,
+numerical, performance, or conformance promotion. The inventory becomes 32
+algorithms and 242 routines, split 58 `state_mapped` plus 184
+`source_mapped`, with 119 required; the heat-balance project list becomes 88.
+
+CP237 next expands `ZoneEquipmentManager::ManageZoneEquipment`, declared at
+`ZoneEquipmentManager.hh` lines 82-86 and implemented at
+`ZoneEquipmentManager.cc` lines 141-167.
 
 ## Promotion Requirements
 
