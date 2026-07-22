@@ -19,6 +19,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | zone predictor/corrector driver | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ManageZoneAirUpdates` | `manage_zone_air_updates_stage`; `advance_heat_balance_state_one_timestep` successor | CP195 required source-mapped dispatcher; Rust metadata and selector-ignoring closures remain scaffold |
 | Zone setpoint and control input | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::GetZoneAirSetPoints` | bounded compiler thermostat/humidistat subset; `get_zone_air_set_points_compat` identity closure | CP196 required source-mapped 16-family transaction; no whole-routine Rust parity |
 | adaptive-comfort weather running averages | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::CalculateMonthlyRunningAverageDryBulb` | typed EPW parser and hourly dry-bulb series only | CP197 non-required source-mapped raw-file helper; no Rust rolling-average or adaptive-control parity |
+| adaptive-comfort setpoint schedule | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::CalculateAdaptiveComfortSetPointSchl` | none | CP198 non-required source-mapped strict ASH/CEN design-day and daily schedule writer; no Rust adaptive-control parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -444,9 +445,139 @@ performance, or conformance promotion. The inventory becomes 32 algorithms
 and 205 routines, split 58 `state_mapped` plus 147 `source_mapped`, with 83
 required; the heat-balance project list remains 52.
 
-CP198 next maps `CalculateAdaptiveComfortSetPointSchl`, declared at
+### CP198 `CalculateAdaptiveComfortSetPointSchl` source map
+
+`CalculateAdaptiveComfortSetPointSchl(EnergyPlusData &state,
+Array1D<Real64> const &runningAverageASH,
+Array1D<Real64> const &runningAverageCEN)` is declared at
 `ZoneTempPredictorCorrector.hh` lines 286-287 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 2277-2348.
+`ZoneTempPredictorCorrector.cc` lines 2277-2348. It returns `void`, leaves
+both const caller arrays untouched, trusts them to be one-based and at least
+`NumDaysInYear` long, and owns no status, error argument, diagnostic, file I/O,
+catch, cleanup, or rollback.
+
+The body preserves this fixed order:
+
+| Ordered phase | Source lines | Principal work |
+|---|---|---|
+| locals and state alias | 2288-2291 | fixes summer design-day type index 9, zeros the local gross temperature, and aliases predictor/corrector state |
+| shared design-day vector | 2293-2314 | scans every stored design day and conditionally writes ASH slots 0-2 and CEN slots 3-6 |
+| daily allocation | 2316-2322 | allocates three ASH arrays followed by four CEN arrays, each sized to `NumDaysInYear` |
+| daily values | 2325-2346 | visits days `1..NumDaysInYear` and writes the three ASH cells before the four CEN cells |
+| commit flag | 2347 | sets `AdapComfortDailySetPointSchedule.initialized = true` only after all prior work returns |
+
+There are exactly two production call occurrences, both inside CP196
+`GetZoneAirSetPoints` operative-temperature input branches. Lines 1661-1662
+call CP197 then CP198 for an expanded thermostat target, and lines 1731-1732
+do the same for a direct controlled Zone. Each site first requires a valid
+non-None adaptive model and the shared initialized flag to be false, and
+allocates fresh zeroed running-average arrays before CP197 fills them. CP198
+has no local guard and therefore runs on a direct call even when the flag is
+already true. A design-day-only adaptive case still enters CP197 first and
+therefore still requires its weather file.
+
+For a summer design day, the gross approximate dry bulb is `(MaxDryBulb + (MaxDryBulb - DailyDBRange)) / 2 = MaxDryBulb - DailyDBRange / 2`.
+
+Only `DayType == 9` participates. Strict `10 < T < 33.5` writes the ASH
+central, 90-percent upper, and 80-percent upper slots 0-2 as
+`0.31 * T + 17.8`, `0.31 * T + 20.3`, and `0.31 * T + 21.3`. Strict
+`10 < T < 30` independently writes CEN central and categories I-III slots 3-6
+as `0.33 * T + 18.8`, `+20.8`, `+21.8`, and `+22.8`. The three standalone
+semicolons among the CEN assignments are inert.
+
+The vector is shared across all summer design days rather than stored per day.
+The scan has no break or invalid branch, so the last qualifying design day wins
+independently for each family. ASH and CEN can consequently retain values from
+different design days; for example, exact 30 rewrites ASH while CEN retains an
+earlier/default group. Nonsummer, out-of-range, and nonfinite design values
+perform no write. The member declaration
+`std::array<Real64, 7> AdapComfortSetPointSummerDesDay = {-1}` uses C++
+aggregate initialization, yielding `[-1, 0, 0, 0, 0, 0, 0]` rather than seven
+`-1` sentinels. Full predictor/corrector owner reconstruction is the only
+local reset.
+
+The daily schedule uses the same formulas but has explicit invalid branches:
+
+| Family | Open valid range | Written values in fixed order | Otherwise |
+|---|---|---|---|
+| ASH | `10 < runningAverageASH(day) < 33.5` | `0.31*T + 17.8`, `+20.3`, `+21.3` | all three `-1` |
+| CEN | `10 < runningAverageCEN(day) < 30` | `0.33*T + 18.8`, `+20.8`, `+21.8`, `+22.8` | all four `-1` |
+
+Thus exact 10, exact 30 for CEN, exact 33.5 for ASH, NaN, and either infinity
+take their family's `-1` branch. Longer input tails are ignored. A complete
+pass overwrites every daily cell; design slots remain sticky where no
+qualifying write occurs. The final initialized assignment is the only
+source-authored commit boundary.
+
+Although CP198 emits no authored error, a low-level allocation failure, invalid
+owner state, or undersized input can prevent return. Design slots are reached
+before any daily allocation, allocations are sequential, and each daily
+iteration writes ASH before CEN. Such a non-return can retain a design prefix,
+an allocation prefix, and daily writes while leaving the production flag
+false. There is no rollback. On a direct failed repeat, the flag can instead
+remain true from a prior success alongside partial new state because CP198
+does not clear it at entry.
+
+CP198 also precedes CP196's overcool, staged-dual, and accumulated-error fatal
+tail. If CP198 succeeds and CP196 later fatals, the schedules and true flag
+remain committed while the outer `GetZoneAirStatsInputFlag` remains true.
+Same-state retry reruns CP196 but skips CP197 and CP198. A clean replay needs
+the broader CP196 owners reset plus the placement-new
+`ZoneTempPredictorCorrectorData::clear_state` reconstruction at header lines
+441-443.
+
+The only production consumer of the committed arrays and design vector is
+`AdjustOperativeSetPointsforAdapComfort` at lines 5899-5964. It is called from
+`CalcZoneAirTempSetPoints` for SingleCool line 3331, SingleHeatCool line 3347,
+and the high/cooling half of DualHeatCool line 3379. Run-period environments
+select one daily array by adaptive model and `DayOfYear`. DesignDay and
+HVACSizeDesignDay environments use the shared vector only when the current
+design day is type 9; model indices 2-8 map to slots 0-6.
+
+That downstream consumer first truncates the incoming `Real64` baseline into
+an `int`. After choosing a candidate, it restores that integer when the
+candidate is lower and then when it equals `-1`. Consequently an invalid
+schedule normally restores a truncated baseline, a valid candidate between
+the truncated and original values can lower the original, and NaN passes both
+tests. These are consumer semantics, not CP198 validation. The result feeds
+`setptAdapComfortCool` before operative-to-air conversion and the registered
+`Zone Adaptive Comfort Operative Temperature Set Point` output.
+
+`ZoneTempPredictorCorrector_AdaptiveThermostat` is the only C++ fixture that
+calls CP198. It invokes the routine three times on the same owner despite the
+first successful call setting the flag: uniform zero and 40 arrays assert
+seven day-1 `-1` values, then uniform 25 arrays assert the seven day-1 formulas
+and the true flag. One summer design day with maximum 30 and range 10 produces
+gross 25, but the test asserts only design slots 0 and 3. Its four downstream
+consumer calls cover central ASH, central CEN, a manually forced `-1` fallback,
+and one dual-setpoint case. Days 2 through N, leap years, zero/short/long input
+shape, strict thresholds, mixed and nonfinite inputs, five design outputs,
+no/multiple/nonsummer design days, asymmetric defaults, independent
+last-writer retention, partial failure, CP197 integration, production guard,
+retry, and reset remain uncovered.
+
+Rust contains no adaptive-comfort, ASH55/CEN15251, operative-temperature
+thermostat, CP198 formula, state, or output implementation. Its typed
+thermostat/compiler boundary covers only direct-Zone DualSetpoint and
+humidistat subsets. `EvaluateZoneThermostat` is execution-plan metadata and
+the pipeline occurrence formats a trace label; neither is a schedule
+calculation or consumer.
+
+CP198 adds non-required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.calculate_adaptive_comfort_set_point_schl`
+immediately after `routine.calculate_monthly_running_average_dry_bulb`. The
+heat-balance project contract remains unchanged because this helper is reached
+only by optional adaptive operative-temperature input. The algorithm remains
+a `scaffold` with `claim_level = none`. This checkpoint adds no EnergyPlus
+source inventory, Rust target, code, mapped state, support, capability, output
+implementation, comparator, manifest, numerical, performance, or conformance
+promotion. The inventory becomes 32 algorithms and 206 routines, split 58
+`state_mapped` plus 148 `source_mapped`, with 83 required; the heat-balance
+project list remains 52.
+
+CP199 next maps `InitZoneAirSetPoints`, declared at
+`ZoneTempPredictorCorrector.hh` line 274 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 2350-2816.
 
 ## Promotion Requirements
 
