@@ -2206,8 +2206,8 @@ Window paths are not generally idempotent. Release builds ignore the asserted
 No test calls CP221 directly. One focused CP220 fixture reaches it five times
 with one Space; only its first two calls assert six aggregate surface values.
 The 55 nonzero-Zone corpus configurations provide a static one-pass census of
-81 CP221 calls and 98 nested Space children for prediction and the same for
-correction. The combined 162/196 census is structural, not a runtime total;
+81 CP221 calls and 99 nested Space children for prediction and the same for
+correction. The combined 162/198 census is structural, not a runtime total;
 outer explicit Space CP220 calls can repeat 24 prediction and three correction
 children.
 

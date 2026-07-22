@@ -5208,15 +5208,17 @@ reach CP221.
 
 Of 57 active full-simulation `ManageSimulation` expressions, one expected EMS
 fatal stops before CP221 and one Weather fixture has zero Zones. The remaining
-55 configurations contain 81 Zone identities and 98 stored Space identities.
-The 98 comprise one baseline Space per Zone, 16 additional identities across
-eight one-Zone/three-Space sizing configurations, and one additional identity
-in a two-Zone/three-Space active configuration.
+55 configurations contain 81 Zone identities and 99 stored Space identities.
+The 99 comprise one baseline Space per Zone, 16 additional identities across
+eight one-Zone/three-Space sizing configurations, one additional identity in
+the two-Zone/three-Space `HeatBalanceAirManager_GetMixingAndCrossMixing`
+configuration, and one additional identity in the separate two-Zone/three-Space
+`Standard621SimplifiedProcedure::SimplifiedProcedureTest3` configuration.
 
-A static single prediction pass is therefore 81 CP221 calls dispatching 98
+A static single prediction pass is therefore 81 CP221 calls dispatching 99
 nested CP222 children. A static single correction pass has the same CP221 and
 nested-child counts because CP221 ignores the explicit-Space scheduling gate.
-The combined configuration census is 162 CP221 calls and 196 nested CP222
+The combined configuration census is 162 CP221 calls and 198 nested CP222
 calls, not a runtime total. The outer CP220 wrappers separately schedule 24
 explicit prediction Space records and three explicit correction Space records,
 which go directly to CP222 and can repeat children already visited by CP221.
