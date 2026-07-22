@@ -456,6 +456,33 @@ unrelated per-Zone coefficient calculation and owns neither the three-child
 topology nor the latch. The routine remains `source_mapped` and required
 without support or conformance promotion.
 
+The next required Air-subtree entry is `get_air_flow_flag`, immediately after
+`get_air_heat_balance_input` and before `manage_zone_air_updates`. Its source
+boundary is `HeatBalanceAirManager.hh` line 69,
+`HeatBalanceAirManager.cc` lines 191-214, and the sole production call as the
+input wrapper's unconditional first child at line 179. It first overwrites
+`AirFlowFlag` true, delegates complete simple-air-model parsing without
+resetting or testing the shared error reference, then on normal child return
+sums the five infiltration, ventilation, mixing, cross-mixing, and
+refrigeration-door counts. A strictly positive total appends the exact
+two-line `AirFlow Model, Simple` EIO summary even when the shared error is
+true; a zero total writes no summary but still leaves the selector true.
+
+The flag defaults false, CP185 is its sole source writer, and only
+`HeatBalanceData::clear_state` restores it. It gates the later simple-mixing
+initializer and `CalcAirFlowSimple` path, while the delegated parser owns the
+Zone/Space reports, nine input families, counts, arrays, registrations,
+diagnostics, and detailed EIO. A child non-return preserves the true flag and
+its parser prefix; a later wrapper fatal leaves the parent latch true, so
+same-state retry revisits non-transactional parser and output state. One
+direct error fixture checks only the shared boolean, and one indirect
+five-infiltration fixture asserts only later HVAC results; no test isolates
+the flag write, exact EIO branch, error-plus-output behavior, or reset/retry.
+Rust has no selector, parser, five totals, simple-airflow arenas, or matching
+EIO. AirBoundary metadata remains run-blocked and Ideal Loads outdoor air is
+a separate subsystem. The routine remains `source_mapped` and required
+without support or conformance promotion.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `manage_zone_air_updates`, preserving the completion of the Air subtree before
 the Surface manager's final update. Its EnergyPlus boundary is the

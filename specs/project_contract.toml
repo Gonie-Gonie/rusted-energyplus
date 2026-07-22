@@ -65,6 +65,7 @@ required_routines = [
   "update_intermediate_surface_heat_balance_results",
   "manage_air_heat_balance",
   "get_air_heat_balance_input",
+  "get_air_flow_flag",
   "manage_zone_air_updates",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
