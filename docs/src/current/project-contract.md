@@ -1307,7 +1307,7 @@ algorithms and 213 routines, split 58 `state_mapped` plus 155
 The following required predictor/corrector definition entry is
 `correct_zone_air_temps`, after
 `zone_space_heat_balance_calc_predicted_humidity_ratio` and before
-`update_final_surface_heat_balance`. Its source boundary is
+`zone_space_heat_balance_correct_air_temp`. Its source boundary is
 `correctZoneAirTemps(EnergyPlusData &state,
 bool useZoneTimeStepHistory)`, declared at
 `ZoneTempPredictorCorrector.hh` lines 289-291 and implemented at
@@ -1376,15 +1376,102 @@ support, output, numerical, or conformance claim. The inventory becomes 32
 algorithms and 214 routines, split 58 `state_mapped` plus 156
 `source_mapped`, with 91 required; the heat-balance project list becomes 60.
 
-CP207 next maps
+The following required predictor/corrector definition entry is
+`zone_space_heat_balance_correct_air_temp`, after
+`correct_zone_air_temps` and before `update_final_surface_heat_balance`. Its
+source boundary is
 `ZoneSpaceHeatBalanceData::correctAirTemp(EnergyPlusData &state,
 bool useZoneTimeStepHistory, int zoneNum, int spaceNum = 0)`, declared at
 `ZoneTempPredictorCorrector.hh` lines 236-239 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 3863-4165.
 
+Its only production expressions are CP206 lines 3825 and 3831. The first calls
+every Zone with default zero Space identity; the second calls positive active
+Spaces only outside sizing. Each call selects complete Zone- or system-step
+temperature and humidity histories, computes `AirPowerCap` from positive Space
+or fallback Zone volume, the parent sensible-capacitance multiplier,
+pre-correction `MAT`/humidity, pressure, and unguarded system seconds, calls
+RoomAir only for exact Zone identity, then runs correction-step sum assembly.
+`FlagHybridModel_PC` can write the parent Zone's except-People aggregate into
+a Space record because there is no Space gate.
+
+A positive selected system node, not `Zone.IsControlled`, chooses the
+controlled coefficients. They include system flow, divided non-air response,
+lagged system load, and optional Zone-indexed AFN and duct additions.
+Uncontrolled coefficients omit the system, non-air, and lagged terms but retain
+those optional additions. Both paths use unguarded ThirdOrder, exact-zero
+Analytical, or Euler equations; an unknown enum retains stale `ZT` and
+continues.
+
+Controlled mixed paths update the selected node, Zone-only thermostat, and
+Zone-shared load correction. Displacement, UFAD, UserDefined, and one-node
+displacement paths can instead derive a [-3,3] correction factor from supply
+and existing-node temperatures; AirflowNetwork can replace `ZT` from the
+parent control node. An active Space uses its own node with parent RoomAir
+flags and can overwrite the Zone-shared correction factor without writing the
+thermostat. The controlled sensible load uses the selected node, Zone
+multiplier, non-air response, and lagged load; uncontrolled load stays zero.
+
+An enabled exact-Zone hybrid inverse runs after node and sensible-load
+calculation and can replace `ZT` with measured temperature. CP207 then writes
+`MAT`, reports Zone or positive-Space sensible demand, calls
+`correctHumRat`, commits `airHumRatTemp`, computes relative humidity, and only
+then returns a temperature delta. ThirdOrder compares against selected
+three-step history; Analytical/Euler compare against `T1`. Only unmixed
+three-node displacement or UFAD Zone calls use their two RoomAir deltas. An
+unknown enum returns zero. Ordered `std::max` calls suppress a NaN outer
+candidate and retain positive infinity.
+
+The only local validation is a debug positive-Zone assertion. A malformed
+negative Space identity mixes Zone volume/node/demand selection with skipped
+exact-Zone RoomAir, thermostat, hybrid, AFN override, and nonmixed-delta
+behavior, although production never supplies it. CP207 has no local
+upper-bound, topology, enum, denominator, timestep, multiplier, or finite
+validation, diagnostic, latch, status, catch, cleanup, transaction, or
+rollback. Failure can retain any ordered prefix through histories, capacity,
+sums, coefficients, node/control, hybrid, `MAT`, sensible demand, humidity, or
+RH; a non-return prevents CP206 from folding the delta. Retry recomputes from
+already-mutated shared state and clean replay requires coordinated record,
+node, RoomAir, AFN, duct, hybrid, demand, HVAC/environment, diagnostic, and
+child reset.
+
+No C++ test calls CP207 directly. The HybridModel fixture reaches its
+controlled fully mixed ThirdOrder Zone path five times with history true and
+asserts only hybrid child effects. Of 57 active full simulations, one fatal
+stops before CP207 and one has zero Zones; the other 55 reach a static
+one-pass inventory of 81 Zone records, split 55 controlled and 26
+uncontrolled. Forty-nine configurations use ThirdOrder, six use Analytical,
+and none uses Euler. One Analytical configuration reaches two uncontrolled
+Zones and three uncontrolled Spaces; AFN-distribution and duct configurations
+reach their additions without asserting them. No full simulation declares a
+RoomAir or HybridModel input, and no test isolates solver output, false
+history, node/control writes, sensible demand, RH, returned delta, failure,
+retry, or reset.
+
+Rust has no named CP207 wrapper or direct test. Its all-Zone surface-driven
+temperature helper has four non-test calls, and its adaptive single-Zone helper
+has one; neither has a direct test. The live closure performs all Zones'
+temperature work, then all Zones' separate humidity approximation, then
+project-specific adaptive/history work. Limited coefficient, ThirdOrder, and
+Analytical helpers have focused formula tests, but Rust has no controlled-node
+decision, Space state, source sum child, non-air/lagged/AFN/duct inputs, nodes,
+RoomAir, thermostat/correction factor, sensible demand, hybrid inverse,
+distinct `ZT`/`MAT`/`T1`, relative humidity, Euler path, or returned delta.
+Its capacity and solver guards also differ from source raw division and exact
+tests. Existing official MAT evidence remains bounded case evidence.
+
+CP207 remains required `source_mapped` and adds no Rust target, state, test,
+support, output, numerical, or conformance claim. The inventory becomes 32
+algorithms and 215 routines, split 58 `state_mapped` plus 157
+`source_mapped`, with 92 required; the heat-balance project list becomes 61.
+
+CP208 next maps `PushZoneTimestepHistories(EnergyPlusData &state)`, declared at
+`ZoneTempPredictorCorrector.hh` line 293 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4167-4185.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`correct_zone_air_temps`, preserving the completed predictor/corrector
-definition slice before
+`zone_space_heat_balance_correct_air_temp`, preserving the completed
+predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
 the implementation at lines 5176-5219. The routine always invokes seven
@@ -1406,7 +1493,8 @@ The next required inventory entry is `update_thermal_histories`, after
 `zone_space_heat_balance_predict_system_load` /
 `calc_zone_air_temp_set_points` /
 `zone_space_heat_balance_calc_predicted_humidity_ratio` /
-`correct_zone_air_temps` entries, this
+`correct_zone_air_temps` /
+`zone_space_heat_balance_correct_air_temp` entries, this
 preserves completion of the Air subtree before the Surface manager's final and
 history stages. The EnergyPlus parent calls the routine at lines 186-189 only
 when `AnyCTF || AnyEMPD`, and the canonical body spans lines 5221-5581. It owns
