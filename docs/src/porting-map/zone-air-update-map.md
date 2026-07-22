@@ -24,6 +24,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | Zone/Space begin-environment history initialization | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::beginEnvironmentInit` | Zone-only run initialization and later bounded history state | CP200 required source-mapped 26-write four-slot environment reset; no exact Rust Zone/Space lifecycle parity |
 | Zone/Space heat-balance output registration | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::setUpOutputVars` | adjacent Zone mean-air ResultStore series only | CP201 required source-mapped four-row Zone and simulation-Space OutputProcessor binding; no exact Rust identity, field, timestep, pointer, or lifecycle parity |
 | Zone/Space system-load prediction dispatch | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::PredictSystemLoads` | `predict_system_loads_compat` identity closure around an adjacent Zone-only temperature/history update | CP202 required source-mapped staged/on-off control, Zone/Space child dispatch, and final mode memory; no exact Rust load or lifecycle parity |
+| Zone/Space record-level load prediction | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::predictSystemLoad` | adjacent guarded Zone-only coefficient/capacitance/history helpers and a separate no-OA ThirdOrder humidity subset | CP203 required source-mapped coefficient, AFN/history, and sensible-then-moisture dispatch transaction; no exact Rust Zone/Space lifecycle or demand parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -68,7 +69,8 @@ Every entry executes the same ordered prefix before inspecting `UpdateType`:
 
 The direct child boundaries are CP196 `GetZoneAirSetPoints` at lines 246-2174,
 `InitZoneAirSetPoints` at lines 2350-2816, CP202 `PredictSystemLoads` at lines
-2870-3145, `CalcZoneAirTempSetPoints` at lines 3259-3460,
+2870-3145, CP203 `ZoneSpaceHeatBalanceData::predictSystemLoad` at lines
+3146-3257, `CalcZoneAirTempSetPoints` at lines 3259-3460,
 `correctZoneAirTemps` at lines 3817-3861,
 `PushZoneTimestepHistories` at lines 4167-4185,
 `PushSystemTimestepHistories` at lines 4277-4295, and
@@ -1195,17 +1197,268 @@ CP202 adds required `source_mapped`
 immediately after
 `routine.zone_space_heat_balance_set_up_output_vars`. The heat-balance project
 contract adds `predict_system_loads` after
-`zone_space_heat_balance_set_up_output_vars` and before
-`update_final_surface_heat_balance`. The algorithm remains a `scaffold` with
+`zone_space_heat_balance_set_up_output_vars`. CP203 now follows that entry
+before `update_final_surface_heat_balance`. The algorithm remains a `scaffold`
+with
 `claim_level = none`. No EnergyPlus source inventory, Rust target, code, mapped
 state, test, support, capability, output implementation, comparator, manifest,
 numerical, performance, or conformance promotion is added. The inventory
 becomes 32 algorithms and 210 routines, split 58 `state_mapped` plus 152
 `source_mapped`, with 87 required; the heat-balance project list becomes 56.
 
-CP203 next maps `ZoneSpaceHeatBalanceData::predictSystemLoad`, declared at
+### CP203 `ZoneSpaceHeatBalanceData::predictSystemLoad` source map
+
+`ZoneSpaceHeatBalanceData::predictSystemLoad(EnergyPlusData &state,
+bool shortenTimeStepSys, bool useZoneTimeStepHistory, Real64 priorTimeStep,
+int zoneNum, int spaceNum = 0)` is declared at
 `ZoneTempPredictorCorrector.hh` lines 217-222 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 3146-3257.
+`ZoneTempPredictorCorrector.cc` lines 3146-3257. The only production call
+expressions are its CP202 parent: line 3116 invokes the member on every Zone
+record, then lines 3119-3120 invoke it on every stored Space membership only
+when `doSpaceHeatBalance` is true. Zone work therefore precedes that Zone's
+stored-order Space work, and the parent forwards all three timestep/history
+arguments unchanged.
+
+CP203 owns no traversal count or mode gate. Its only local identity check is the
+debug `assert(zoneNum > 0)` at line 3154; release builds may compile that check
+out. The default `spaceNum = 0` denotes the Zone record. Production supplies
+only zero or positive Space identities.
+
+#### Ordered coefficient and hybrid path
+
+The first executable child is
+`updateTemperatures(state, shortenTimeStepSys, useZoneTimeStepHistory,
+priorTimeStep, zoneNum, spaceNum)`. Its shortened-step rollback,
+down-interpolation, node history, and selected `ZTM`/humidity history behavior
+remain a later child boundary. CP203 reads `TimeStepSys` and
+`TimeStepSysSec` only after that child returns. `useZoneTimeStepHistory` and
+`priorTimeStep` have no later direct use in CP203.
+
+Volume selection and the first direct write are literal:
+
+| `spaceNum` | Selected volume | Sensible capacitance multiplier |
+|---|---|---|
+| positive | `space(spaceNum).Volume` | parent `Zone(zoneNum).ZoneVolCapMultpSens` |
+| zero | `Zone(zoneNum).Volume` | that Zone's `ZoneVolCapMultpSens` |
+
+```text
+AirPowerCap =
+    volume * ZoneVolCapMultpSens
+    * PsyRhoAirFnPbTdbW(OutBaroPress, MAT, airHumRat)
+    * PsyCpAirFnW(airHumRat)
+    / TimeStepSysSec
+```
+
+A Space therefore uses its own volume and record `MAT`/`airHumRat` but still
+uses its parent Zone's sensible capacitance multiplier. `TimeStepSys` and
+`TimeStepSysSec` are independent source inputs: the former later controls a
+history branch, while only the latter divides capacity.
+
+CP203 initializes local `RAFNFrac = 0` and calls
+`calcZoneOrSpaceSums(state, false, zoneNum, spaceNum)`. The false corrector flag
+builds predictor sums; source comments explicitly note that `SumSysMCp` and
+`SumSysMCpT` are unused in this prediction step. Only a Zone record
+(`spaceNum == 0`) under `FlagHybridModel_PC` enters the hybrid branch. It first
+writes `SumIntGainExceptPeople = 0` and then assigns the result of
+`SumAllInternalConvectionGainsExceptPeople(state, zoneNum)`; a non-return from
+that child can therefore retain the explicit zero.
+
+After those children return, five ordered direct equations establish the base
+ThirdOrder-shaped state:
+
+```text
+TempDepCoef  = SumHA + SumMCp
+TempIndCoef  = SumIntGain + SumHATsurf - SumHATref
+             + SumMCpT + SysDepZoneLoadsLagged
+TempHistoryTerm = AirPowerCap
+                * (3 * ZTM[0] - 1.5 * ZTM[1] + ZTM[2] / 3)
+tempDepLoad  = (11 / 6) * AirPowerCap + TempDepCoef
+tempIndLoad  = TempHistoryTerm + TempIndCoef
+```
+
+Only `ZTM[0]` through `ZTM[2]` participate; the fourth fixed history slot is not
+read by these equations. The lagged system-dependent load is included, while
+the two system-air sums remain excluded through the predictor-sum child.
+
+#### RoomAir AirflowNetwork override
+
+The base values survive unless all three source gates are true:
+`anyNonMixingRoomAirModel`, the parent Zone's `AirModel == AirflowNetwork`,
+and `AFNZoneInfo(zoneNum).IsUsed`. CP203 then gets
+`ControlAirNodeID`, calls
+`LoadPredictionRoomAirModelAFN(state, zoneNum, RoomAirNode)`, and only after
+that child returns overwrites:
+
+- `TempDepCoef` from control-node `SumHA + SumLinkMCp`;
+- `TempIndCoef` from control-node internal, surface, reference-air, link, and
+  lagged load terms;
+- `AirPowerCap` from control-node volume, the parent Zone multiplier, node
+  `RhoAir` and `CpAir`, divided by `TimeStepSysSec`;
+- `TempHistoryTerm` from that capacity and this Zone/Space record's three
+  `ZTM` values;
+- `tempDepLoad` and `tempIndLoad` from the same ThirdOrder formulas.
+
+When the control node has assigned HVAC, `HVAC(1).SupplyFraction` replaces the
+local `RAFNFrac`; otherwise it remains zero. The fraction is not range- or
+finite-checked here. This entire override is keyed by `zoneNum` and has no
+`spaceNum` gate. An active Space invocation can therefore rerun the Zone AFN
+load predictor and replace its Space-specific base sums and capacity with the
+same control-node coefficients and node volume, while retaining that Space
+record's `ZTM` in the history term.
+
+#### Solution-algorithm history path
+
+Line 3212 unconditionally writes shared
+`HVACGlobal.ShortenTimeStepSysRoomAir = false` before inspecting the solution
+algorithm. The shared value is reset on every Zone and active Space invocation.
+
+| Solution and timestep condition | Direct record and AFN-node writes |
+|---|---|
+| `ThirdOrder` | leave `T1`, `W1`, and AFN-node T1 histories untouched; retain the capacity/history-bearing load scalars and the shared false flag |
+| non-ThirdOrder, `shortenTimeStepSys && TimeStepSys < TimeStepZone`, and shared `PreviousTimeStep < TimeStepZone` | copy `TM2`/`WM2` to `T1`/`W1`; copy every AFN node's T2 temperature/humidity to T1; set the shared flag true |
+| same shortened condition, but the shared previous-timestep comparison is false | copy `TMX`/`WMX` and every AFN node's TX histories; set the shared flag true |
+| every other non-ThirdOrder path | copy current `ZT`/`airHumRat` and every AFN node's current temperature/humidity to T1; leave the shared flag false |
+
+The shortened choice reads global `PreviousTimeStep`, not the
+`priorTimeStep` argument already forwarded to `updateTemperatures`. NaN
+comparisons naturally select false branches. These later AFN-node loops test
+only `AirModel(zoneNum).AirModel == AirflowNetwork`; they do not repeat the
+earlier `anyNonMixingRoomAirModel` or `AFNZoneInfo.IsUsed` gates. After any
+non-ThirdOrder branch, CP203 overwrites `tempDepLoad = TempDepCoef` and
+`tempIndLoad = TempIndCoef`, deliberately removing the capacity and history
+terms from the load scalars while leaving `AirPowerCap` and
+`TempHistoryTerm` stored.
+
+Because the shared shortening flag is cleared and possibly reset on every
+record call, an abnormal exit can expose the value from the last reached
+record. A completely successful CP202 traversal leaves the value produced by
+its last Zone or active Space CP203 invocation.
+
+#### Ordered demand children and ownership
+
+The final calls are strictly ordered:
+
+1. `calcPredictedSystemLoad(state, RAFNFrac, zoneNum, spaceNum)`;
+2. `calcPredictedHumidityRatio(state, RAFNFrac, zoneNum, spaceNum)`.
+
+CP203 owns this ordering and the arguments but does not own either child's
+control-type/setpoint equations, sensible `ZoneSysEnergyDemand` or node writes,
+`setPointLast`/setback state, humidity-control equations, moisture demand,
+warnings, fatals, or report fields. The same dependency boundary applies to
+`updateTemperatures`, `calcZoneOrSpaceSums`, both psychrometric helpers, hybrid
+gain collection, and RoomAir AFN load prediction.
+
+Its direct record writes are `AirPowerCap`, optional
+`SumIntGainExceptPeople`, `TempDepCoef`, `TempIndCoef`,
+`TempHistoryTerm`, `tempDepLoad`, `tempIndLoad`, and, only outside
+ThirdOrder, `T1` and `W1`. Direct external writes are the shared
+`ShortenTimeStepSysRoomAir` flag and the non-ThirdOrder AFN-node
+`AirTempT1`/`HumRatT1` histories. All other mutations belong to called
+dependencies.
+
+#### Validation, failure, retry, and reset
+
+Apart from the debug assertion, CP203 does not validate upper bounds, Space
+membership, record-array shape, volume, multiplier, pressure, temperature,
+humidity, timestep, histories, AFN control-node/HVAC topology, supply fraction,
+or finite values. A zero, negative, infinite, or NaN `TimeStepSysSec` and
+unusual volume, capacitance, or psychrometric inputs flow through native
+floating-point arithmetic. Invalid `spaceNum < 0` is internally inconsistent:
+the first child treats nonzero as Space and may index Space state before the
+capacity branch later selects Zone volume and the hybrid branch skips Zone-only
+work. Production never supplies that value.
+
+There is no local diagnostic, latch, status result, catch, cleanup, or
+rollback. Failure boundaries preserve ordered prefixes:
+
+- a non-return from `updateTemperatures` suppresses every local write but keeps
+  that child's reached history effects;
+- capacity precedes predictor sums, whose effects precede the hybrid clear and
+  refresh;
+- base coefficients precede the optional AFN child and its overwrite prefix;
+- the shared flag, record histories, and AFN-node histories precede both demand
+  children;
+- sensible demand commits before a moisture-child warning or fatal can stop
+  the call.
+
+Same-state retry reruns every dependency and direct write. It is not a general
+idempotent transaction: among later child effects,
+`calcPredictedSystemLoad` compares with and then overwrites per-record
+`setPointLast`, so retry can change setback state even with otherwise unchanged
+inputs, while warning/recurrence state can advance. CP200
+`beginEnvironmentInit` resets only a subset and is not a complete retry reset.
+Clean replay requires reconstruction or coordinated clearing of predictor
+Zone/Space records, HVAC timestep and shared flag state, HeatBalFanSys and loop
+nodes, HeatBalance topology and volumes, RoomAir/AFN node state,
+HybridModel/internal gains, surface/airflow sums, environment and
+psychrometric diagnostics, Zone/Space sensible and moisture demand, and every
+child-owned warning and history owner.
+
+#### C++ and Rust evidence boundary
+
+No C++ test calls `predictSystemLoad` directly. CP202's two focused fixtures
+make 16 wrapper calls and 24 setpoint assertions, but both retain
+`NumOfZones = 0` and therefore enter CP203 zero times. Dependency-only tests
+call `calcPredictedSystemLoad` seven times with 19 post-call assertions,
+`calcZoneOrSpaceSums` five times with 12 assertions, and the two
+`DownInterpolate4HistoryValues` overloads once each with 14 assertions. They do
+not compose CP203 or directly cover `updateTemperatures`,
+`calcPredictedHumidityRatio`, `LoadPredictionRoomAirModelAFN`, the coefficient
+write sequence, shared shortening flag, Space path, failure prefix, retry, or
+reset.
+
+Of 57 active C++ `ManageSimulation` call sites, one expected EMS fatal stops
+before CP202. The other 56 reach CP202. `WeatherManager_SetRainFlag` has zero
+Zones, leaving 55 configurations that execute at least one Zone CP203.
+`HeatBalanceAirManager_GetMixingAndCrossMixing` enables simulation-Space heat
+balance, and seven sizing fixtures enable sizing-Space heat balance, for eight
+Space-enabled configurations. Their assertions concern downstream mixing or
+sizing. Six configurations explicitly select AnalyticalSolution, none selects
+Euler, and no active full-simulation block configures or manually assigns the
+RoomAir AirflowNetwork model. This is transitive execution evidence, not a
+focused CP203 oracle.
+
+Rust's `predict_system_loads_compat` and
+`predict_step_source_order_path` are identity closures. The enclosing
+heat-balance timestep loop forces its main Predict record shortening field
+false, shifts three-slot Zone histories, assembles a bounded gain/surface
+subset, and directly updates `MAT`. It has no semantic CP203 wrapper test.
+
+`energyplus_zone_air_temperature_coefficients` and one direct test reproduce
+six adjacent algebraic quantities, but the helper omits
+`SysDepZoneLoadsLagged`, guards nonpositive capacity/timestep to zero, and its
+runtime callers add `sum_sys_mcp` and `sum_sys_mcp_t` even though CP203's
+predictor sums exclude those system-air terms. Rust's moist-air capacity helper
+covers unit-multiplier `volume * rho * Cp`, but has no Zone capacitance
+multiplier or Space state and is refreshed in a different CorrectStep order.
+Its down-interpolation helper owns three histories rather than CP203's full
+temperature, humidity, node, and RoomAir history transaction.
+
+A separate IdealLoads
+`calc_no_oa_third_order_moisture_demand_compat` implements a bounded,
+fixed-timestep, no-outdoor-air ThirdOrder humidity subset with validation and
+transactional `Option` failure. It is not called from the heat-balance CP203
+path and does not supply CP203's ordered sensible child, schedule/EMS/fault,
+airflow, Analytical/Euler, RAFN, Space, warning, or partial-effect behavior.
+Rust has no CP203-equivalent heat-balance sensible-load producer, Space heat-balance/demand record,
+RoomAir/AFN or hybrid state, `RAFNFrac`, shared
+`ShortenTimeStepSysRoomAir`, or exact `T1`/`W1` and AFN-node history path.
+
+CP203 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.zone_space_heat_balance_predict_system_load`
+immediately after `routine.predict_system_loads`. The heat-balance project
+contract adds `zone_space_heat_balance_predict_system_load` after
+`predict_system_loads` and before `update_final_surface_heat_balance`. The
+algorithm remains a `scaffold` with `claim_level = none`. No EnergyPlus source
+inventory, Rust target, code, mapped state, test, support, capability, output
+implementation, comparator, manifest, numerical, performance, or conformance
+promotion is added. The inventory becomes 32 algorithms and 211 routines,
+split 58 `state_mapped` plus 153 `source_mapped`, with 88 required; the
+heat-balance project list becomes 57.
+
+CP204 next maps `CalcZoneAirTempSetPoints`, declared at
+`ZoneTempPredictorCorrector.hh` line 282 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 3259-3460.
 
 ## Promotion Requirements
 
