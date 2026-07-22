@@ -109,6 +109,7 @@ required_routines = [
   "adjust_cooling_set_point_for_temp_and_humidity_control",
   "override_air_set_points_for_ems_cntrl",
   "fill_predefined_table_on_thermostat_setpoints",
+  "fill_predefined_table_on_thermostat_schedules",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",

@@ -180,6 +180,7 @@ claim.
 | temperature-and-humidity cooling-setpoint overcool | `AdjustCoolingSetPointforTempAndHumidityControl`, declared at `ZoneTempPredictorCorrector.hh` lines 369-372, implemented at `ZoneTempPredictorCorrector.cc` lines 6417-6458, and called only by SingleCool and Dual expressions in `CalcZoneAirTempSetPoints` | CP231 adds required `routine.adjust_cooling_set_point_for_temp_and_humidity_control` as source-mapped only. Pre-guard indexed aliases, global/exact-None guards, range/gap/RH-ratio caps, high-only mutation, mixed-record null dependency, parent precedence, and replay remain source-only; Rust has no typed modifier, matching setpoint state, exact helper, live caller, or test. |
 | EMS air-temperature setpoint override | `OverrideAirSetPointsforEMSCntrl`, declared at `ZoneTempPredictorCorrector.hh` line 374, implemented at `ZoneTempPredictorCorrector.cc` lines 6460-6555, and called unconditionally as the final action in `CalcZoneAirTempSetPoints` | CP232 adds required `routine.override_air_set_points_for_ems_cntrl` as source-mapped only. Ordinary-then-comfort traversal, heating-before-cooling writes, live type dispatch, collisions, actuator bindings, downstream replacement, and reset/replay remain source-only; Rust has no EMS engine, actuator state, mutable setpoint triple, comfort control, exact helper, live caller, or active test. |
 | thermostat-setpoint predefined LEED table | `FillPredefinedTableOnThermostatSetpoints`, declared at `ZoneTempPredictorCorrector.hh` line 376, implemented at `ZoneTempPredictorCorrector.cc` lines 6558-6672, and called only by `FillRemainingPredefinedEntries` line 6998 | CP233 adds required `routine.fill_predefined_table_on_thermostat_setpoints` as source-mapped only. Global schedule-ID first-wins traversal, seasonal Wednesday value/count queries, split synthetic rows, append-only table mutation, final-report cadence, and failure/retry remain source-only; Rust has no four-family arena, exact seasonal query, predefined table store, helper, caller, or focused test. |
+| thermostat-schedule predefined System Summary table | `FillPredefinedTableOnThermostatSchedules`, declared at `ZoneTempPredictorCorrector.hh` line 378, implemented at `ZoneTempPredictorCorrector.cc` lines 6674-6766, and called only by `FillRemainingPredefinedEntries` line 6999 | CP234 adds required `routine.fill_predefined_table_on_thermostat_schedules` as source-mapped only. Stored ordinary-Zone traversal, fixed-slot inclusion, tuple sort, independently filtered joins, append-only table mutation, final-report cadence, and failure/retry/reset remain source-only; Rust has no complete control arena, predefined System Summary store, helper, caller, serializer, or focused table comparator. |
 | internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
 | space internal convective gains | `spaceSumAllInternalConvectionGains` | mapped-not-ported |
 
@@ -20343,9 +20344,176 @@ The inventory becomes 32 algorithms and 239 routines, split 58
 `state_mapped` plus 181 `source_mapped`, with 116 required; the heat-balance
 project list becomes 85.
 
-CP234 next maps `FillPredefinedTableOnThermostatSchedules`, declared at
-`ZoneTempPredictorCorrector.hh` line 378 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 6674-6766.
+### CP234 `FillPredefinedTableOnThermostatSchedules` source map
+
+CP234 adds canonical required
+`routine.fill_predefined_table_on_thermostat_schedules` and the
+project-contract item `fill_predefined_table_on_thermostat_schedules`
+immediately after CP233 `fill_predefined_table_on_thermostat_setpoints`. The
+pinned declaration is `ZoneTempPredictorCorrector.hh` line 378, and the
+complete definition is `ZoneTempPredictorCorrector.cc` lines 6674-6766.
+
+The routine populates the System Summary `Thermostat Schedules` predefined
+subtable with thermostat, control-object, and schedule names. It reports
+references only: it does not sample schedule values, determine the active
+control type, read setpoint temperatures, inspect EMS state or calendar data,
+or merge comfort, staged, or humidity controls. This is a source boundary
+only, with no Rust table or conformance promotion.
+
+#### Materialized arena and traversal
+
+CP234 visits `TempControlledZone(1..NumTempControlledZones)` in ascending
+stored order. CP196 input processing has already expanded ZoneList controls
+into individual Zone records, collapsed authored field sets into the fixed
+per-type `setpts` slots, and resolved schedule pointers. A repeated authored
+field set of the same control type overwrites its earlier slot. Normal input
+also rejects assigning one Zone more than once, but CP234 itself neither
+rechecks uniqueness nor validates the count against the allocated array.
+
+Every predefined cell uses exact `tcz.ZoneName` as its row key. For each
+record CP234 first appends `tcz.Name` to `Thermostat Name 1`, then dereferences
+`tcz.setptTypeSched` and appends its name to `Control Type Schedule`. It next
+visits the four fixed `HVAC::controlledSetptTypes`: SingleHeating,
+SingleCooling, SingleHeatingOrCooling, and DualSetpoint. `Uncontrolled` is
+never represented, even when the control-type schedule selects zero.
+
+A slot participates solely when `setpt.Name` is nonempty; `setpt.isUsed` is
+not consulted. A participating DualSetpoint or
+SingleHeatingOrCooling slot dereferences cooling before heating, while
+SingleCooling dereferences only cooling and SingleHeating only heating. CP234
+does not validate pointer presence, schedule type, Zone membership, name
+uniqueness, or whether any referenced control is currently selected.
+
+#### Move construction, sorting, and joins
+
+The local `infos` vector is first resized to `HVAC::SetptType::Num`, producing
+five blank records. Each participating indexed record is populated and then
+move-appended to the same vector, leaving the indexed source record
+moved-from. The vector therefore contains five original or moved-from slots
+plus one appended record per participating type before sorting. Observed
+standard-library behavior leaves the moved-from strings empty, so the join
+filter suppresses them; the C++ standard guarantees only a valid unspecified
+moved-from string state, making absence of duplicate remnants a
+portability-sensitive source behavior.
+
+All records are lexicographically sorted by the tuple
+`(thermostatType, controlTypeName, heatSchName, coolSchName)`. In normal
+multi-type state the primary display order is therefore
+`DualSetPointWithDeadBand`, `SingleCooling`, `SingleHeatCool`, then
+`SingleHeating`, independent of authored field-set order and the fixed
+enumeration traversal.
+
+Each column is joined separately with `, ` after copying and dropping exact
+empty strings. There is no deduplication, escaping, quoting, or positional
+placeholder. Consequently type and control-name lists include every
+participating slot, the heating list omits SingleCooling, and the cooling list
+omits SingleHeating. The heat/cool lists preserve their own filtered sorted
+order but cannot be positionally zipped with the type list.
+
+#### Row and cell matrix
+
+The six columns, created under System Summary at
+`OutputReportPredefined.cc` lines 1098-1104, are `Thermostat Name 1`,
+`Control Type Schedule`, `Control Type`, `Control Type Name`,
+`Heating Schedule`, and `Cooling Schedule`.
+
+Four cells are appended for every visited Zone record: thermostat name,
+control-type schedule, the joined type list, and the joined control-object
+name list. The last two are appended even when their joined strings are
+empty. Heating and cooling cells are conditional on a nonempty joined value,
+so a record contributes four through six cells. Reused names remain repeated.
+Repeated or corrupted `ZoneName` keys create duplicate row/column cells rather
+than a merged or rejected record.
+
+#### Caller, visibility, and table mutation
+
+The sole production call expression is `OutputReportTabular.cc` line 6999
+inside `FillRemainingPredefinedEntries`, immediately after CP233 at line
+6998. Top-level `WriteTabularReports` reaches this path after the environment
+loop and calls it before the later `WriteTabularFiles` guard. CP234 therefore
+appends predefined state even when no tabular file is emitted; rendering the
+subtable still requires System Summary or an encompassing summary request.
+
+`PreDefTableEntry` is append-only. It increments the global entry count and
+never upserts or rejects a duplicate row/column pair. Render assembly scans
+append order and later duplicates overwrite earlier table-body assignments,
+whereas `RetrievePreDefTableEntry` scans from the beginning and returns the
+earliest match. CP234 has no local once guard, status, diagnostic, transaction,
+rollback, or cleanup.
+
+Repeated unchanged calls append a complete duplicate set. Changed state or a
+partial retry can make last-wins rendered output disagree with first-wins
+retrieval. Multiyear `ResetTabularReports` does not clear predefined entries;
+full `OutputReportPredefinedData::clear_state` reconstructs the table store,
+while `DataZoneControlsData::clear_state` separately deallocates thermostat
+records. CP234 owns neither reset.
+
+#### Failure and retry boundary
+
+A null `setptTypeSched` fails after the thermostat-name cell has committed. A
+null participating heat or cool pointer fails after both leading cells; Dual
+and SingleHeatingOrCooling fail on cooling before heating. Count/allocation
+mismatch, vector allocation, sort/join/formatting, or predefined-entry growth
+can fail after prior Zones or the current prefix have committed. There is no
+bounds defense or compensating action. A retry starts a new local vector and
+duplicates the retained prefix before continuing.
+
+#### C++ tests, corpus reach, and stock candidates
+
+One active direct C++ test calls CP234 once and makes 24 assertions across
+four Zones. It covers one SingleHeating, SingleCooling,
+SingleHeatingOrCooling, and DualSetpoint slot apiece, all six columns, and
+absence of the inapplicable heat/cool cell. It intentionally succeeds with
+the participating `isUsed` flags left false. It does not cover multiple types
+in one Zone, tuple order, filtered-list alignment, moved-from slots, blank
+names, duplicate row keys, nulls, failure, retry, reset, or serialization.
+
+A second intended multi-control test is disabled behind `#ifdef GET_OUT` and
+uses obsolete fields. Its four-record loop contains six assertion statements
+and is not compiled evidence.
+
+Of 57 active full-simulation expressions, one expected EMS fatal stops before
+final reporting. The other 56 CP234 calls comprise 18 empty and 38 nonempty
+configurations. The nonempty calls contain 52 expanded Zone records, 49 with
+DualSetpoint only and three with both SingleHeating and SingleCooling. Collectively, those finalizations visit 208 slots, retain 55 populated
+slots, and append 312 cells. The three switching records exercise a two-item lexical join, but no
+full-simulation assertion reads this subtable.
+
+Among installed 26.1 ExampleFiles, 639 contain `ZoneControl:Thermostat` and
+606 of those request System Summary or an encompassing summary.
+`5ZoneAirCooled.idf` is a strong multi-type order/join candidate,
+`TermRhSingleHeatCoolNoDB.idf` covers SingleHeatingOrCooling, and
+`FurnaceWithDXSystemComfortControl.idf` demonstrates that CP234 reports the
+ordinary thermostat rather than comfort control. None is adopted as a
+repository row oracle. The 30 repository conformance thermostat IDFs all use
+DualSetpoint, none requests a summary table, and no comparator asserts any of
+the six cells.
+
+#### Rust boundary
+
+Rust retains a normalized direct-Zone `ZoneThermostat` graph with
+DualSetpoint control edges and heating/cooling `ScheduleId`s, execution-plan
+metadata, and an IdealLoads first-control constant-schedule resolver. It has
+no typed SingleHeating, SingleCooling, or SingleHeatingOrCooling records,
+ZoneList expansion into source `TempControlledZone` order, fixed four-slot
+layout, exact tuple sort and independent filtered joins, predefined System
+Summary table store, six column identities, append/retry/reset lifecycle,
+final-report caller, serializer, or comparator.
+
+`Output:Table:SummaryReports` remains ignored through the `Output:*`
+capability boundary. Adjacent DualSetpoint graph wiring and schedule
+evaluation do not implement CP234. No algorithm-level source, Rust target,
+code, mapped state, test, support, capability, output implementation,
+comparator, case, manifest, numerical, performance, or conformance promotion
+is added.
+
+The inventory becomes 32 algorithms and 240 routines, split 58
+`state_mapped` plus 182 `source_mapped`, with 117 required; the heat-balance
+project list becomes 86.
+
+CP235 next maps `ZoneSpaceHeatBalanceData::updateTemperatures`, declared at
+`ZoneTempPredictorCorrector.hh` lines 233-234 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 6768-6833.
 
 ### `CheckValidSimulationObjects` state contract
 
