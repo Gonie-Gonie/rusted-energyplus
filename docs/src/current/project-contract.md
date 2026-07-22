@@ -2512,13 +2512,84 @@ performance, or conformance promotion. The inventory becomes 32 algorithms
 and 231 routines, split 58 `state_mapped` plus 173 `source_mapped`, with 108
 required; the heat-balance project list becomes 77.
 
-CP226 next maps `DetectOscillatingZoneTemp`, declared at
+CP226 adds required `detect_oscillating_zone_temp` immediately after
+`verify_controlled_zone_for_thermostat` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is the nonmember
+`DetectOscillatingZoneTemp(EnergyPlusData &state)`, declared at
 `ZoneTempPredictorCorrector.hh` line 354 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 5715-5861.
 
+The first reached call allocates and zero-seeds a four-by-Zone temperature
+history plus three per-Zone duration arrays. It registers three System/Sum
+hour outputs for every Zone and three matching Facility-any-Zone outputs,
+then queries the six variable names and permanently latches calculation on
+when any is requested. A valid `PerformancePrecisionTradeoffs` object also
+sets the same calculation flag before this setup. Registration and allocation
+still occur when calculation remains disabled, while a request added after
+successful setup is never rescanned.
+
+When enabled, every call shifts each Zone's four samples newest-first from
+the current `ZT`. Oscillation requires the strict difference sequence
+`> +0.15 C`, `< -0.15 C`, `> +0.15 C`, or the exact opposite signs.
+Equality, NaN comparisons, and nonalternating swings fail. There is no valid
+sample count, timestep normalization, or history-mode gate, so the
+zero-seeded fourth slot can participate on the third enabled call.
+
+An oscillating Zone receives `TimeStepSys` hours; its occupancy duration
+requires an allocated ASH55 record whose Zone slot is occupied, and its
+deadband duration requires `CurDeadBandOrSetback`. The three Facility values
+are each `TimeStepSys` when any Zone qualifies, not a sum across Zones, and
+are added once to three state-lifetime annual/perflog scalars. Occupancy and
+deadband classifications are independent and may overlap.
+
+The sole production call is `HVACManager::ManageHVAC` line 431, once after
+Zone averaging for every accepted system timestep that reaches it and before
+system reporting. It has no warmup, sizing, kickoff, output-reporting, or
+environment gate; shortened timesteps therefore contribute separately, while
+the external-HVAC route bypasses it. A stopped or earlier-failed loop skips
+the call.
+
+Setup clears its latch only after normal completion. Failure can retain
+allocated arrays or partial registrations for a retry. Failure during the
+Zone loop can retain a shifted prefix and stale Facility/annual values.
+Normal duplicate enabled calls are non-idempotent because they shift again and
+can add duration again. No day, environment, or annual reset exists; only the
+owner's placement-new `clear_state()` restores empty arrays, zero scalars,
+setup true, and calculation false.
+
+No C++ test directly or indirectly names CP226 state or outputs. Of 57 active
+full-simulation expressions, one expected fatal stops before `ManageHVAC`;
+the other 56 reach first setup, including one zero-Zone configuration. Their
+static topology registers 243 Zone plus 168 Facility variables, 411 total,
+and allocates 324 history slots plus three 81-entry result arrays. None of
+those enclosing tests requests any of the six variables, the oscillation
+monthly report, or a performance-tradeoff object, so all 56 leave calculation
+disabled and provide no threshold, history, occupancy, deadband, Facility, or
+annual execution evidence.
+
+Rust has adjacent current MAT and separate three-slot Zone/system histories,
+a `0.3 C` adaptive step-count path, typed People and IdealLoads-only occupancy
+inputs, IdealLoads-local deadband modes, hourly MAT/debug reporting, and broad
+predictor/corrector planning metadata. It has no CP226 helper or HVAC-manager
+caller, independent zero-seeded four-sample system-timestep history, strict
+alternating `0.15 C` predicate, setup/request latch, six System/Sum output-name families,
+ASH55/deadband classification, Facility-any/annual/perflog state, or focused
+parity test.
+
+CP226 remains required `source_mapped` and adds no algorithm-level
+`energyplus_source` entry, Rust target, code, mapped state, test, support,
+capability, output implementation, comparator, manifest, numerical,
+performance, or conformance promotion. The inventory becomes 32 algorithms
+and 232 routines, split 58 `state_mapped` plus 174 `source_mapped`, with 109
+required; the heat-balance project list becomes 78.
+
+CP227 next maps `AdjustAirSetPointsforOpTempCntrl`, declared at
+`ZoneTempPredictorCorrector.hh` line 356 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5863-5897.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`verify_controlled_zone_for_thermostat`, preserving the
-completed predictor/corrector definition slice before
+`detect_oscillating_zone_temp`, preserving the completed
+predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
 the implementation at lines 5176-5219. The routine always invokes seven

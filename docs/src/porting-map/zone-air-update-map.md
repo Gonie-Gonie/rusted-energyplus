@@ -45,6 +45,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | Zone/Space component-load reporting | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::CalcZoneComponentLoadSums` | separate Zone-only internal-gain, opaque-Surface convection, and air-storage helpers plus a hard-coded zero outdoor-transfer report | CP223 required source-mapped correction-only ten-field reporting update sequence with parent-Zone topology, whole-Zone Surface rewalks for Zone and Space reports, ADU and imbalance-warning side effects, and no complete Rust reporting parity |
 | thermostat presence verification | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::VerifyThermostatInZone` | bounded direct-Zone DualSetpoint records, ZoneId graph/IdealLoads lookups, and planning metadata only | CP224 required source-mapped shared-latch exact-name sizing predicate; no exact Rust lazy-input, sizing-caller, lookup, or failure parity |
 | thermostat-to-controlled-Zone verification | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::VerifyControlledZoneForThermostat` | normalized raw controlled marker, independent typed ZoneId thermostat/equipment records, and an IdealLoads-only dispatch validator | CP225 required source-mapped full-arena exact-name predicate plus ordinary/comfort caller latch and fatal lifecycle; no exact Rust helper, cross-family validation, or failure parity |
+| Zone-temperature oscillation detection | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::DetectOscillatingZoneTemp` | adjacent three-slot MAT histories, adaptive `0.3 C` step count, IdealLoads-only occupancy/deadband concepts, and hourly MAT/debug output | CP226 required source-mapped one-time activation plus zero-seeded four-slot strict `0.15 C` detector, Zone/Facility duration outputs, annual/perflog aggregation, and system-step lifecycle; no exact Rust helper, state, caller, output, or test |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -6191,9 +6192,218 @@ manifest, numerical, performance, or conformance promotion. The inventory
 becomes 32 algorithms and 231 routines, split 58 `state_mapped` plus 173
 `source_mapped`, with 108 required; the heat-balance project list becomes 77.
 
-CP226 next maps `DetectOscillatingZoneTemp`, declared at
+### CP226 `DetectOscillatingZoneTemp` source map
+
+CP226 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.detect_oscillating_zone_temp`
+and heat-balance project item `detect_oscillating_zone_temp` immediately after
+`verify_controlled_zone_for_thermostat` and before
+`update_final_surface_heat_balance`. The nonmember routine is declared at
 `ZoneTempPredictorCorrector.hh` line 354 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 5715-5861.
+
+#### One-time allocation, registration, and activation
+
+The state owner starts with `SetupOscillationOutputFlag = true`,
+`OscillationVariablesNeeded = false`, six Facility and annual scalar values at
+zero, and unallocated history/result arrays. On the first reached call, the
+setup branch allocates `ZoneTempHist(4, NumOfZones)` and fills it with zero,
+then dimensions and zeroes `ZoneTempOscillate`,
+`ZoneTempOscillateDuringOccupancy`, and
+`ZoneTempOscillateInDeadband` to `NumOfZones`.
+
+For each one-based Zone in stored order, setup reads `Zone(iZone).Name` and
+registers these three values under that key:
+
+- `Zone Oscillating Temperatures Time`;
+- `Zone Oscillating Temperatures During Occupancy Time`;
+- `Zone Oscillating Temperatures in Deadband Time`.
+
+It then registers the matching three `Facility Any Zone ...` values under the
+`Facility` key. All six definitions use hours, System timestep, and Sum
+storage. Registration count is therefore `3 * NumOfZones + 3`, including the
+three Facility registrations for a zero-Zone model.
+
+Only after registration does setup call `ReportingThisVariable` for the six
+names in Zone-first then Facility order. That helper uppercases the requested
+name and exact-matches the output-request arena, with a secondary active-meter
+check. Any true result sets `OscillationVariablesNeeded = true`; setup does not
+write false. The predefined
+`ZoneTemperatureOscillationReportMonthly` requests the first Zone value when
+that monthly report is selected.
+
+An independently parsed valid `PerformancePrecisionTradeoffs` object sets
+`OscillationVariablesNeeded = true` at `SimulationManager.cc` line 1226 before
+normal runtime and also enables the performance log. Thus either an applicable
+output request or that object activates calculation. Allocation and all output
+registrations still occur when neither route activates it. The setup flag is
+cleared only after all allocation, registration, and request checks return
+normally. A request added later is not rescanned.
+
+#### Four-sample detector and duration classification
+
+Every invocation snapshots `TimeStepSys`, but the complete numerical path is
+guarded by `OscillationVariablesNeeded`. When false, histories never advance,
+per-Zone and Facility values remain at their initialized values, and annual
+scalars do not accumulate.
+
+When true, each Zone is processed in numeric order. The history shifts
+`4 <- 3`, `3 <- 2`, `2 <- 1`, then writes current
+`zoneHeatBalance(iZone).ZT` into slot 1. Slots one through four are therefore
+newest through oldest. The routine computes:
+
+```text
+Diff12 = T1 - T2
+Diff23 = T2 - T3
+Diff34 = T3 - T4
+```
+
+The exact positive-first predicate is strict
+`Diff12 > 0.15 && Diff23 < -0.15 && Diff34 > 0.15`; the negative-first
+predicate uses the strict opposite signs. `HVAC::OscillateMagnitude` owns the
+positive `0.15 C` constant and the routine precomputes only its negative.
+Equality at either boundary is false. NaN comparisons are false. There is no
+absolute-magnitude alternative, finite check, elapsed-time scaling,
+uniform-timestep validation, `UseZoneTimeStepHistory` branch, shortened-step
+rollback, or valid-sample counter.
+
+The history is zero-seeded rather than initialized from Zone temperature.
+The first two active calls cannot satisfy all three strict differences because
+an untouched adjacent pair remains zero. The third can classify a swing using
+the initial zero as its oldest sample.
+
+Before classification output, the routine clears every Zone's occupancy and
+deadband duration for this call. An oscillating Zone gets
+`ZoneTempOscillate = TimeStepSys`. Its occupancy duration is set to the same
+value only when the complete `ThermalComfortInASH55` array is allocated and
+that Zone slot has `ZoneIsOccupied = true`. There is no size check. Its
+deadband duration is set when the unguarded
+`CurDeadBandOrSetback(iZone)` lookup is true. A nonoscillating Zone explicitly
+gets zero base duration.
+
+Three local booleans OR these classifications across all Zones. Each Facility
+value becomes `TimeStepSys` when any Zone qualifies in its category and zero
+otherwise, so it measures time with at least one qualifying Zone rather than
+Zone-hours. Occupancy and deadband categories are independent and can overlap.
+The routine then adds each Facility value once to its corresponding
+`AnnualAnyZoneTempOscillate...` scalar.
+
+#### Caller cadence and downstream consumers
+
+A source-wide search finds one production call expression:
+`HVACManager::ManageHVAC` line 431. It is inside the system-timestep loop,
+after any shortened-step predictor, corrector, and system-history push and
+after Zone/Space average temperature and humidity accumulation. It runs before
+Zone-list loads, storage/water/electric updates, the end-system-timestep EMS
+checkpoint, and System output processing.
+
+Accordingly CP226 runs once per accepted system timestep that reaches this
+point: once for an unshortened Zone step or once for each shortened substep.
+The tentative full Zone-step work used to decide shortening is not separately
+inserted into this history. A `stopSimulation` break at the loop head or any
+earlier non-return skips it. The routine itself has no `WarmupFlag`, kickoff,
+sizing, `ZoneSizingCalc`, `DoOutputReporting`, environment, or history-mode
+gate, so enabled state advances during every standard caller pass that reaches
+it. The external-HVAC-manager path bypasses `ManageHVAC` and CP226 entirely.
+
+The registered Zone and Facility backing values are available to the subsequent System-step
+output update. The three annual Facility scalars are separate unregistered
+state read by `OutputReportTabular.cc` lines 7909-7917 for two-decimal
+performance-log fields. Exact-field search finds no environment/day/run-period
+reset, so these raw accumulators span every enabled caller pass until the
+whole owner is cleared.
+
+#### Failure, replay, and reset
+
+CP226 is void and owns no explicit diagnostic, validation, status, catch,
+cleanup, transaction, or rollback. A non-return during setup leaves its clear
+commit unreached but may retain arrays or a partial output registry. A caught
+same-state retry re-enters allocation and registration and can encounter or
+repeat those effects.
+
+A non-return during the Zone loop can retain shifted histories and output
+values for an earlier Zone prefix while later Zones remain untouched; Facility
+values and annual scalars are not recomputed until the loop completes. Retry
+then shifts the retained prefix again. Even normal duplicate enabled calls are
+generally non-idempotent because history advances again and a qualifying
+duration can be accumulated twice.
+
+`ZoneTempPredictorCorrectorData::clear_state()` placement-news the complete
+owner, restoring the setup and calculation defaults, zero scalars, and empty
+arrays. There is no narrower CP226, begin-environment, begin-day, or annual
+reset.
+
+#### C++ and corpus evidence
+
+No exact CP226 routine, setup flag, calculation flag, history, Zone/Facility
+duration, or annual-field reference exists anywhere under the C++ test tree.
+There is no direct test, focused wrapper, or destination assertion.
+
+Among 57 active `ManageSimulation` expressions, one expected EMS fatal stops
+at the begin-timestep EMS checkpoint before `ManageHVAC`. The other 56
+configurations reach first setup; one is a zero-Zone weather fixture and the
+55 nonzero-Zone configurations contain 81 Zones. Static first-setup topology
+therefore yields 243 Zone plus 168 Facility output registrations, 411 total,
+324 history slots, and three 81-entry result arrays.
+
+The 57 enclosing test blocks contain none of the six exact output names,
+`ZoneTemperatureOscillationReportMonthly`, `AllMonthly`,
+`AllSummaryAndMonthly`, or `PerformancePrecisionTradeoffs`. No monthly request
+is injected on their paths. All 56 reached setups therefore retain
+`OscillationVariablesNeeded = false`; their strict detector, history shifts,
+occupancy/deadband reads, Facility values, and annual accumulation have zero
+execution evidence. Nineteen configurations contain 33 raw People objects and
+38 contain 52 thermostat objects, but those static objects cannot establish
+runtime occupancy or deadband classification, especially while the guarded
+body is disabled.
+
+These are configuration and first-setup counts, not runtime timestep totals.
+The sole caller can repeat through warmup, design periods, ordinary timesteps,
+and adaptive substeps. No assertion isolates allocation, registration,
+activation, zero-seed startup, strict boundaries, any-Zone collapse, output,
+performance log, failure, retry, or reset.
+
+#### Rust boundary
+
+A crate-wide search finds no `DetectOscillatingZoneTemp`,
+`detect_oscillating_zone_temp`, `OscillateMagnitude`, any of the six output
+names, `AnnualAnyZoneTempOscillate`, matching performance-log state,
+`ThermalComfortInASH55.ZoneIsOccupied`, or
+`CurDeadBandOrSetback`.
+
+Rust retains current MAT plus separate three-slot Zone and system temperature
+histories, both seeded from initial temperature. Its nearest threshold is the
+`0.3 C` maximum-Zone-temperature-difference constant used only to select
+adaptive step count. Adaptive correction mutates a local three-slot history
+without an oscillation callback. Neither path is CP226's independent
+zero-seeded four-slot system-timestep history or three-difference strict
+alternating predicate.
+
+Typed People and a CLI IdealLoads DCV diagnostic provide unrelated numeric
+occupancy inputs; arbitrary runtime supplies no current people count. An
+IdealLoads-local `Deadband` result enum is neither persistent Zone
+`CurDeadBandOrSetback` state nor detector input. The output registry supports
+hourly Zone MAT and debug series and rejects unavailable requested variables;
+it has none of CP226's three Zone plus three Facility System/Sum output-name families,
+setup/request latch, any-Zone values, annual accumulators, or performance-log
+writer.
+
+Predictor/corrector control, execution-plan, and source-order metadata contain
+no Detect stage or `HVACManager` call position. The nearest tests cover
+three-slot adaptive synchronization, an IdealLoads-local Deadband result, and
+direct numeric OA-DCV people input. None covers the four-sample predicate,
+strict `0.15 C` boundaries, activation, classifications, Facility OR, annual
+sum, output, or lifecycle.
+
+CP226 adds no algorithm-level `energyplus_source` entry, Rust target, code,
+mapped state, test, support, capability, output implementation, comparator,
+manifest, numerical, performance, or conformance promotion. The inventory
+becomes 32 algorithms and 232 routines, split 58 `state_mapped` plus 174
+`source_mapped`, with 109 required; the heat-balance project list becomes 78.
+
+CP227 next maps `AdjustAirSetPointsforOpTempCntrl`, declared at
+`ZoneTempPredictorCorrector.hh` line 356 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5863-5897.
 
 ## Promotion Requirements
 

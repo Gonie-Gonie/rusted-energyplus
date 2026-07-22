@@ -101,6 +101,7 @@ required_routines = [
   "calc_zone_component_load_sums",
   "verify_thermostat_in_zone",
   "verify_controlled_zone_for_thermostat",
+  "detect_oscillating_zone_temp",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",
