@@ -92,6 +92,7 @@ required_routines = [
   "revert_zone_timestep_histories",
   "zone_space_heat_balance_revert_zone_timestep_history",
   "zone_space_heat_balance_correct_hum_rat",
+  "down_interpolate_4_history_values",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",

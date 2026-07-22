@@ -1843,14 +1843,53 @@ support, output, numerical, or conformance claim. The inventory becomes 32
 algorithms and 222 routines, split 58 `state_mapped` plus 164
 `source_mapped`, with 99 required; the heat-balance project list becomes 68.
 
-CP215 next maps the first scalar-output
-`DownInterpolate4HistoryValues(Real64 OldTimeStep, Real64 NewTimeStep, ...)`
-overload, declared at `ZoneTempPredictorCorrector.hh` lines 299-308 and
-implemented at `ZoneTempPredictorCorrector.cc` lines 4621-4702. The array
-overload begins at line 4704.
+The following required logical routine entry is
+`down_interpolate_4_history_values`, after
+`zone_space_heat_balance_correct_hum_rat` and before
+`update_final_surface_heat_balance`. CP215 maps only its first, void
+scalar-output overload, declared at `ZoneTempPredictorCorrector.hh` lines
+299-308 and implemented at `ZoneTempPredictorCorrector.cc` lines 4621-4702.
+
+The helper computes the raw old/new timestep ratio before any output, writes
+`newVal0` through `newVal4` in order, selects strict `0.01` ratio-two then
+ratio-three bands, and sends every other ratio through a sequential
+interpolation recurrence. It validates no positive or finite timestep,
+shortening direction, integer ratio, history value, or output aliasing.
+Inputs are copied by value; shared output storage is last-write-wins. It has no
+status, diagnostic, transaction, rollback, or reset owner.
+
+Its only production expressions interpolate CO2 then generic-contaminant
+histories per Zone in `PredictZoneContaminants`. Entry requires contaminant
+simulation, `PredictStep`, shortening, a system-step count different from the
+previous Zone timestep, and the matching species flag. Normal HVAC timing can
+enter only on the first shortened adaptive fine-step prediction. A stable
+distinct-output retry is overwrite-idempotent; changed or aliased caller state
+is not.
+
+One direct C++ ratio-two call has five destination assertions. Three focused
+contaminant predictor fixtures keep shortening false, and all 57 active
+full-simulation expressions have contaminant simulation disabled, so both
+focused indirect and full-corpus reach are zero.
+
+Rust's nearest helper produces only the first three analogous values for
+thermal Zone temperature and humidity histories and returns its old values for
+a nonpositive timestep. Its two compatibility-only production call sites
+run only when a local adaptive count greater than one changes, and one test
+covers ratios two, three, and four. Rust has no source contaminant ownership, final two outputs,
+reference-alias transaction, or invalid-input parity.
+
+CP215 remains required `source_mapped` and adds no Rust target, mapped state,
+support, output, numerical, or conformance claim. The inventory becomes 32
+algorithms and 223 routines, split 58 `state_mapped` plus 165
+`source_mapped`, with 100 required; the heat-balance project list becomes 69.
+
+CP216 next expands the same logical routine mapping to the array-return
+`DownInterpolate4HistoryValues` overload, declared at
+`ZoneTempPredictorCorrector.hh` lines 310-311 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4704-4736.
 
 The inventory now also includes `update_final_surface_heat_balance` after
-`zone_space_heat_balance_correct_hum_rat`, preserving the
+`down_interpolate_4_history_values`, preserving the
 completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
@@ -1881,7 +1920,8 @@ The next required inventory entry is `update_thermal_histories`, after
 `zone_space_heat_balance_push_system_timestep_history` /
 `revert_zone_timestep_histories` /
 `zone_space_heat_balance_revert_zone_timestep_history` /
-`zone_space_heat_balance_correct_hum_rat` entries, this
+`zone_space_heat_balance_correct_hum_rat` /
+`down_interpolate_4_history_values` entries, this
 preserves completion of the Air subtree before the Surface manager's final and
 history stages. The EnergyPlus parent calls the routine at lines 186-189 only
 when `AnyCTF || AnyEMPD`, and the canonical body spans lines 5221-5581. It owns

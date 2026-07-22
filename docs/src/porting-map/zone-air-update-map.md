@@ -36,6 +36,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | Zone/Space Zone-timestep history revert dispatch | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::RevertZoneTimestepHistories` | per-Zone compat current-state reset in the local adaptive count-greater-than-one path | CP212 required source-mapped dormant global Zone-first/Space dispatch; no built-in source request or exact Rust timing, topology, child-state, or selector parity |
 | Zone/Space record-level Zone-timestep history revert | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::revertZoneTimestepHistory` | no singular helper; nearest Rust paths push three-slot Zone or local system histories in the opposite direction | CP213 required source-mapped four-slot forward copy plus exact-Zone RoomAir/AFN branches and the literal mixed-level slot anomaly; no built-in reach or Rust record parity |
 | Zone/Space record-level humidity correction | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::correctHumRat` | history-only Zone humidity passes plus a separate bounded no-OA ThirdOrder IdealLoads helper | CP214 required source-mapped airflow/coefficient solve, clamps, RoomAir/hybrid/node/latent-sizing effects, and failure transaction; no exact Rust Zone/Space record parity |
+| scalar five-output history down-interpolation | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::DownInterpolate4HistoryValues` scalar-output overload | three-output thermal Zone history helper only | CP215 required source-mapped contaminant-owned five-reference interpolation and adaptive count-change cadence; no exact Rust output width, ownership, invalid-input, alias, or lifecycle parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -3716,11 +3717,161 @@ inventory becomes 32 algorithms and 222 routines, split 58 `state_mapped`
 plus 164 `source_mapped`, with 99 required; the heat-balance project list
 becomes 68.
 
-CP215 next maps the first scalar-output
-`DownInterpolate4HistoryValues(Real64 OldTimeStep, Real64 NewTimeStep, ...)`
-overload, declared at `ZoneTempPredictorCorrector.hh` lines 299-308 and
-implemented at `ZoneTempPredictorCorrector.cc` lines 4621-4702. The array
-overload begins at line 4704.
+### CP215 scalar-output `DownInterpolate4HistoryValues` source map
+
+CP215 maps only the void overload that snapshots three scalar history values
+and writes five scalar outputs by reference. It is declared at
+`ZoneTempPredictorCorrector.hh` lines 299-308 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4621-4702. The following array-return
+overload is a separate definition and does not call this one.
+
+The source calculates `DSRatio = OldTimeStep / NewTimeStep` before writing any
+output, then writes `newVal0 = oldVal0`. Branch selection is ordered and uses
+strict floating comparisons:
+
+| Gate | Remaining ordered writes |
+|---|---|
+| `abs(DSRatio - 2.0) < 0.01` | `newVal1 = (oldVal0 + oldVal1) / 2`; `newVal2 = oldVal1`; `newVal3 = (oldVal1 + oldVal2) / 2`; `newVal4 = oldVal2` |
+| otherwise, `abs(DSRatio - 3.0) < 0.01` | `delta = (oldVal1 - oldVal0) / 3`; `newVal1 = oldVal0 + delta`; `newVal2 = newVal1 + delta`; `newVal3 = oldVal1`; `newVal4 = oldVal1 + (oldVal2 - oldVal1) / 3` |
+| every other ratio | `delta = (oldVal1 - oldVal0) / DSRatio`; then `newVal1` through `newVal4` are formed by four sequential additions of `delta` |
+
+The ratio-two averages use sum-before-division, and the ratio-three and
+fallback branches read the just-written preceding output rather than using
+independent closed forms. Their rounding and overflow behavior therefore
+belongs to the contract. Despite the fallback comment saying “4 or more,” its
+actual domain includes ratios below one, negative values, values merely
+outside either tolerance band, zero, infinity, and NaN. Exact decimal-looking
+tolerance edges remain subject to their represented binary values.
+
+CP215 validates no positive or finite timestep, shortening direction, integer
+ratio, finite history value, or distinct output storage. Under ordinary IEEE
+floating behavior, division by zero and nonfinite arithmetic propagate rather
+than reporting a diagnostic. A nonzero old timestep divided by zero normally
+selects the fallback with an infinite ratio and zero-like increments; zero
+divided by zero or a NaN timestep reaches the fallback with NaN increments.
+An old timestep of zero produces a zero ratio and can create infinite or NaN
+increments. `oldVal2` is unused in the fallback branch.
+
+The three old values are copied before the body executes, so a first call
+whose output aliases caller input still reads the entry snapshots. The five
+output references are not checked for mutual aliasing: assignments occur in
+`newVal0` through `newVal4` order, and the last write to shared storage wins.
+Production and focused-test callers pass distinct input and output locations.
+
+#### Production ownership and cadence
+
+The only production expressions are in
+`ZoneContaminantPredictorCorrector::PredictZoneContaminants`, inside its
+ascending Zone loop:
+
+1. lines 1588-1597 interpolate CO2 history into `ZoneAirCO2` followed by
+   `DSCO2ZoneTimeMinus1` through `DSCO2ZoneTimeMinus4`;
+2. lines 1600-1609 interpolate generic-contaminant history into `ZoneAirGC`
+   followed by `DSGCZoneTimeMinus1` through `DSGCZoneTimeMinus4`.
+
+The manager must first pass its `SimulateContaminants` early return and select
+`PredictStep`. Within each Zone, CP215 additionally requires
+`ShortenTimeStepSys`, a current `NumOfSysTimeSteps` different from
+`NumOfSysTimeStepsLastZoneTimeStep`, and the corresponding CO2 or generic
+simulation flag. A positive system Zone node controls only the preceding node
+rollback and is not a helper gate. `UseZoneTimeStepHistory` likewise does not
+gate the writes; it controls which histories the caller copies afterward.
+
+For one eligible predictor call, the dynamic count is the number of Zones
+multiplied by the number of enabled contaminant species, with CO2 preceding
+generic contaminant for each Zone. `HVACManager` starts the initial prediction
+with shortening false. If the initial correction selects a shorter adaptive
+system timestep, the first strict-shorter fine-step prediction can enter
+CP215. The manager clears shortening after that fine-step simulation, so later
+fine-step predictions do not enter it. If the system-step count matches the
+previous Zone timestep's count, the caller instead reuses existing
+downstepped histories. On the normal adaptive path,
+`UseZoneTimeStepHistory` is false and the completed downstepped slots one
+through three immediately become the working contaminant histories.
+
+#### Failure, retry, and reset
+
+CP215 is void and owns no status, assertion, diagnostic, callback, allocation,
+catch, cleanup, transaction, cache, static state, or rollback. Caller argument
+indexing fails before function entry. In the ordinary IEEE environment the
+body has no normal non-return path and overwrites all five destinations.
+With explicitly enabled floating traps or an external abnormal interruption,
+the ratio division can fail before `newVal0`, or later arithmetic can retain
+the already written prefix.
+
+The CO2 call precedes the generic call, so a later caller failure can retain a
+complete CO2 interpolation and no or partial generic interpolation. A
+complete direct retry with stable by-value inputs and five distinct outputs
+is deterministic overwrite-idempotent. Input/output aliasing, caller-mutated
+histories, or changed timesteps can make retry observe different input
+snapshots. The helper has no reset owner; restoration belongs to the
+contaminant histories and the surrounding HVAC state.
+
+#### C++ reach
+
+`DownInterpolate4HistoryValues_Test` calls this scalar overload once with
+`0.25 / 0.125`, exercising only the ratio-two branch. Five post-call
+assertions inspect `newVal0` and the four downstepped values. Its later call
+and nine further assertions target the independent array overload, not CP215.
+
+The three focused `PredictZoneContaminants` fixtures call at source lines 230,
+547, and 736 with `ShortenTimeStepSys` false, so indirect focused CP215 reach
+is zero. No test-side contaminant-manager `PredictStep` or `ManageHVAC` call
+adds another route. Ratio three, the fallback, tolerance boundaries,
+nonpositive or nonfinite timesteps and values, aliasing, partial failure,
+retry, and reset have no scalar C++ test.
+
+All 57 active full-simulation `ManageSimulation` expressions execute CP215
+zero times. The only such unit input containing
+`ZoneAirContaminantBalance` sets CO2 simulation to `No`, generic contaminant
+simulation is absent, and no full-simulation fixture programmatically enables
+either flag. The corpus therefore supplies neither adaptive-gate reach nor a
+contaminant interpolation oracle.
+
+#### Rust boundary
+
+The nearest Rust function is
+`energyplus_down_interpolate_three_history_values` in
+`crates/ep_runtime/src/heat_balance/zone_air_correction.rs`. For ordinary
+positive timesteps it reproduces only source outputs `newVal0` through
+`newVal2` for the ratio-two, ratio-three, and fallback formulas. It returns a
+three-element value array, never produces source `newVal3` or `newVal4`, never
+uses its third old value, and has no reference-alias behavior. Unlike CP215,
+it returns the original three values immediately when either timestep is
+nonpositive.
+
+Production has two lexical Rust calls, one for Zone temperature histories and
+one for Zone humidity histories. Their enclosing adaptive path is enabled by
+the compatibility configuration and disabled by the ordinary diagnostic
+configuration. They run per Zone only after the project selects an adaptive
+system-step count greater than one and only when that integer count differs
+from the prior count. This is local thermal
+heat-balance ownership, not the source's CO2/generic-contaminant transaction;
+Rust has no corresponding contaminant arena or predictor call.
+
+One Rust test calls the helper three times and uses three array equality
+assertions for ratios two, three, and four. It does not establish the two
+missing outputs, old-value-three use, tolerance edges, invalid-input behavior,
+aliasing, source production cadence, failure, retry, or reset.
+
+CP215 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.down_interpolate_4_history_values`
+after `routine.zone_space_heat_balance_correct_hum_rat`. The heat-balance
+project contract adds `down_interpolate_4_history_values` after
+`zone_space_heat_balance_correct_hum_rat` and before
+`update_final_surface_heat_balance`. This is one logical overloaded-routine
+entry, but its CP215 evidence boundary covers only the scalar-output
+definition. The algorithm remains a `scaffold` with `claim_level = none`. No
+EnergyPlus source inventory, Rust target, code, mapped state, test, support,
+capability, output implementation, comparator, manifest, numerical,
+performance, or conformance promotion is added. The inventory becomes 32
+algorithms and 223 routines, split 58 `state_mapped` plus 165
+`source_mapped`, with 100 required; the heat-balance project list becomes 69.
+
+CP216 next expands the same logical routine mapping to the array-return
+`DownInterpolate4HistoryValues` overload, declared at
+`ZoneTempPredictorCorrector.hh` lines 310-311 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4704-4736.
 
 ## Promotion Requirements
 
