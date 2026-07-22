@@ -2834,9 +2834,10 @@ When cumulative PeopleCount is nonpositive, PEO warns and repeats the Zone as
 an object average using the same non-reset ObjectCount. A prior occupied Zone
 can instead suppress that fallback and divide the current zero numerator by a
 prior denominator. Thus later Zones are order-dependent. Invalid averaging
-state can consume stale low/high locals. CP230's strict endpoint comparisons
-can also leave an output reference untouched when PMV equals a bound, so
-shared `Tset` or a setpoint can retain zero or an earlier People/Zone result.
+state can consume stale low/high locals. With ordered or equal endpoint PMVs,
+CP230 can leave an output reference untouched when PMV equals a bound, so
+shared `Tset` or a setpoint can retain zero or an earlier People/Zone result;
+reversed endpoint equality can instead select the opposite temperature bound.
 
 The final branch preserves ordinary control for Uncontrolled while clearing
 only the unused opposite bound for ordinary SingleHeat or SingleCool.
@@ -2880,7 +2881,8 @@ Surface setup, and a comfort-count EMS fixture calls only the final override.
 None of 57 active full simulations contains comfort input. Separate Fanger
 tests cover only the forward model. The installed
 `FurnaceWithDXSystemComfortControl.idf` is an unadopted oracle candidate; its
-single People record makes the runtime averaging method NO.
+comfort-controlled EAST Zone has one People record, making the runtime
+averaging method NO.
 
 Rust has no comfort thermostat/setpoint types, PMV/Fanger state, inverse
 child, averaging, comfort bounds, outputs, diagnostics, or live caller. Its
@@ -2893,12 +2895,110 @@ inventory becomes 32 algorithms and 235 routines, split 58 `state_mapped`
 plus 177 `source_mapped`, with 112 required; the heat-balance project list
 becomes 81.
 
-CP230 next maps `GetComfortSetPoints`, declared at
+CP230 adds required `get_comfort_set_points` immediately after
+`calc_zone_air_comfort_set_points` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is
+`GetComfortSetPoints(EnergyPlusData &, int PeopleNum, int ComfortControlNum,
+Real64 PMVSet, Real64 &Tset)`, declared at
 `ZoneTempPredictorCorrector.hh` lines 362-367 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 6331-6415.
 
+The routine snapshots the selected comfort record's minimum and maximum
+dry-bulb bounds, then unconditionally evaluates Fanger at the minimum followed
+by the maximum. Only strict `PMVMin < PMVSet < PMVMax` enters root solving.
+A target below or above writes the corresponding temperature bound. With
+ordered or equal endpoint PMVs, exact endpoint equality leaves the output
+untouched; a NaN target or any case in which all three comparisons fail does
+the same. Reversed endpoint equality can instead select the opposite
+temperature bound. Bounds and endpoint PMVs are neither validated nor
+reordered.
+Consequently a lower clamp returns the minimum while transitive report state
+still reflects the last maximum-temperature evaluation, and equal/reversed
+or nonfinite endpoints follow literal branch order.
+
+The interior branch calls configurable `General::SolveRoot` with a
+`PMVSet - PMV(candidate)` callback, absolute PMV tolerance 0.001, and maximum
+500. The solver reads global root-algorithm state and repeats both endpoint
+evaluations before generating candidates. Its strict post-evaluation limit
+permits a 501st candidate to converge; an iterated `-1` retains that last
+candidate, while a pre-candidate narrow-width `-1` retains the seeded minimum.
+Same-sign `-2` also returns the minimum, although stable finite ascending
+endpoint results make that flag normally inconsistent with the
+preceding strict bracket. A clamp/no-write path therefore makes two Fanger
+calls, a `-2` or zero-candidate width failure makes four, and a normal-width
+interior path makes five through 505.
+
+Fanger evaluation is impure. Every endpoint and candidate can resample
+People activity, work, clothing, and air velocity; read Zone humidity,
+pressure, MRT, radiant-person and room-air state; and overwrite shared
+ThermalComfort scratch, People temperature/RH, PMV/PPD, MRT, operative and
+clothing reports. Nonmixing room-air modes can replace the candidate
+temperature and flatten the residual. Child air-velocity diagnostics can
+advance once per trial, including duplicated endpoints and warmup. An
+unmatched People identity leaves the freshly zeroed PMV result at both
+endpoints rather than indexing the requested record. SurfaceWeighted MRT
+first-use also clears latches and initializes Surface `AE`/`enclAESum`; with
+a bad sum, its first trial warns and returns the Space-MAT/surface average
+while later trials return zero, so repeated endpoints can invalidate the
+initial bracket and make `-2` reachable.
+
+Outside warmup, solver `-1` and `-2` advance separate first/recurring
+ZoneTempPredictorCorrector counter/index pairs. They are global across all
+comfort Zones and People and have no environment reset; recurring values use
+the returned temperature twice. Warmup still solves and applies the result
+but suppresses only CP230's two diagnostic families, not transitive Fanger
+warnings or state writes. CP230 owns no output registration.
+
+All 12 production expressions are inside CP229. NO/SPE make one call, or two
+for Dual; OBJ and positive PEO make `N` or `2N`; nonpositive PEO plus fallback
+makes `2N` or `4N`. Uncontrolled and malformed controls can still enter the
+child through an averaging branch. With ordered or equal endpoint PMVs,
+equality can carry a prior shared temperature into a later People/Zone sum;
+reversed equality can instead select the opposite bound. Normal built-in
+cadence is the
+parent's Zone-timestep call before system substeps, with possible
+demand-resimulation repeats and external-HVAC bypass.
+
+There is no status, catch, transaction, rollback, or latch. Failure can retain
+partial Fanger, People, report, radiant, diagnostic, and output-reference
+state; retry repeats all reached trials and can advance warnings. Clean replay
+also spans RootFinding, ThermalComfort, People/HeatBalance, HeatBalFanSys,
+Surface, Construction, ViewFactor, HeatBalSurf, Zone-controls, RoomAir,
+schedules, environment/psychrometric, output, and diagnostic owners.
+
+No C++ test calls or reaches CP230. Twenty-one direct setpoint-parent calls
+skip comfort, two raw comfort fixtures stop in setup, and all 57 active full
+simulations have zero comfort input and zero CP230 reach. Separate tests make
+six direct forward-Fanger calls, but the sole call supplying optional
+`PeopleNum` does not assert its PMV result; ten generic SolveRoot calls cover
+successes and `-1` without a Fanger composition or `-2` assertion.
+
+A manual stock-26.1 run of
+`FurnaceWithDXSystemComfortControl.idf` completed with no Warning or Severe.
+Its comfort-controlled EAST Zone has one People record and therefore forces
+NO averaging. Schedule/cadence arithmetic over two DesignDays, each with six
+warmup days and one reported day at six
+timesteps per hour, gives 2,226 CP230 calls; the 318 reported-day calls include
+168 sentinel and 150 active-target calls. This is an uninstrumented manual
+oracle diagnostic, not a checked-in repository case, Rust comparison, or
+conformance claim.
+
+Rust has no comfort types, PMV/Fanger state, inverse callback, configurable
+generic solver, diagnostic state, output effects, or live caller. Its narrow
+People fields and ordinary DualSetpoint graph do not cover the boundary, and
+an unrelated private IdealLoads psychrometric bisection has different
+semantics. Raw comfort objects still run-block. CP230 remains required
+`source_mapped` and adds no Rust, state, support, output, numerical,
+performance, or conformance promotion. The inventory becomes 32 algorithms
+and 236 routines, split 58 `state_mapped` plus 178 `source_mapped`, with 113
+required; the heat-balance project list becomes 82.
+
+CP231 next maps `AdjustCoolingSetPointforTempAndHumidityControl`, declared at
+`ZoneTempPredictorCorrector.hh` lines 369-372 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 6417-6458.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`calc_zone_air_comfort_set_points`, preserving the completed
+`get_comfort_set_points`, preserving the completed
 predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and

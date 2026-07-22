@@ -49,6 +49,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | operative-temperature air-setpoint conversion | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::AdjustAirSetPointsforOpTempCntrl` | bounded direct-Zone DualSetpoint graph and raw-schedule IdealLoads output only | CP227 required source-mapped global/per-record guards plus fixed/scheduled fraction and Zone-MRT inverse, caller overwrite order, resimulation, IEEE, and replay lifecycle; operative input run-blocks and no exact Rust state, helper, live caller, or test exists |
 | adaptive-comfort operative setpoint selection | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::AdjustOperativeSetPointsforAdapComfort` | weather-run-period day-of-year state plus a bounded direct-Zone DualSetpoint graph and schedule references only | CP228 required source-mapped seven-model daily/design-day selector, toward-zero integer baseline/lower-bound and exact `-1` fallback, pre-CP227 snapshot, cadence, and failure lifecycle; operative input run-blocks and no exact Rust adaptive state, helper, output, caller, or test exists |
 | thermal-comfort Zone air setpoint calculation | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::CalcZoneAirComfortSetPoints` | ordinary DualSetpoint thermostat and narrow People count/schedule state only | CP229 required source-mapped first-use comfort initialization, PMV control dispatch, four People averaging modes, dry-bulb assignment/clamps, ordinary-to-comfort overwrite and final EMS precedence, cross-Zone accumulator anomalies, diagnostics, and retry lifecycle; comfort objects run-block and no exact Rust Fanger state, inverse child, outputs, caller, or test exists |
+| thermal-comfort PMV-to-dry-bulb inversion | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::GetComfortSetPoints` | narrow People count/schedule state plus an unrelated private IdealLoads psychrometric bisection | CP230 required source-mapped strict endpoint dispatch and configurable `SolveRoot` inverse with duplicated impure Fanger trials, shared diagnostics, stale-output/report asymmetries, and failure/retry lifecycle; comfort objects run-block and no exact Rust PMV/Fanger state, generic root solver, live caller, or composed test exists |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -6980,9 +6981,11 @@ so an active final control branch can consume function-scope values left by a
 prior Zone.
 
 CP230 `GetComfortSetPoints` owns the PMV-to-dry-bulb inverse. Relevant to
-CP229's reference lifetime, its comparisons are strict: exact equality with
-the PMV at either dry-bulb bound, NaN, or other states making all comparisons
-false leave the supplied output reference untouched. Thus `SetPointLo`,
+CP229's reference lifetime, its comparisons are strict: with ordered or equal
+endpoint PMVs, exact equality preserves the output; a NaN target or any other
+state making all three comparisons false also leaves it untouched. Reversed
+endpoint equality can instead select the opposite temperature bound. Thus
+`SetPointLo`,
 `SetPointHi`, or shared `Tset` can retain zero or a result from an earlier
 People object or Zone. The child also updates Fanger/People comfort scratch
 and report state on its endpoint and root trials; CP229 is not a pure
@@ -7102,8 +7105,9 @@ commented calls. None contains a thermal-comfort thermostat or setpoint
 object, so every full-simulation configuration has zero CP229 entries and
 zero CP230 child reach. The installed oracle has one executable ExampleFile,
 `FurnaceWithDXSystemComfortControl.idf`, with control values 0-4 and all four
-Fanger setpoint families. Its Zone has one People record, so CP196 forces NO
-despite the authored PeopleAverage field. No repository case or script adopts
+Fanger setpoint families. Its comfort-controlled EAST Zone has one People
+record, so CP196 forces NO despite the authored PeopleAverage field. No
+repository case or script adopts
 that file; it is an unexecuted candidate, not Rust evidence. OBJ, SPE, PEO,
 invalid controls, counter carry, clamps, diagnostics, failure, retry, and
 reset remain uncovered.
@@ -7139,9 +7143,327 @@ inventory becomes 32 algorithms and 235 routines, split 58 `state_mapped`
 plus 177 `source_mapped`, with 112 required; the heat-balance project list
 becomes 81.
 
-CP230 next maps `GetComfortSetPoints`, declared at
+### CP230 `GetComfortSetPoints` source map
+
+CP230 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.get_comfort_set_points`
+and heat-balance project item `get_comfort_set_points` immediately after
+`calc_zone_air_comfort_set_points` and before
+`update_final_surface_heat_balance`. The nonmember
+`void GetComfortSetPoints(EnergyPlusData &state, int PeopleNum,
+int ComfortControlNum, Real64 PMVSet, Real64 &Tset)` is declared at
 `ZoneTempPredictorCorrector.hh` lines 362-367 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 6331-6415.
+
+#### Endpoint evaluation and strict dispatch
+
+`PeopleNum`, `ComfortControlNum`, and `PMVSet` are copied arguments; only
+`Tset` is a writable reference. CP230 initializes `PMVResult = 0`, indexes
+`ComfortControlledZone(ComfortControlNum)`, and snapshots its
+`TdbMinSetPoint` and `TdbMaxSetPoint` as `Tmin` and `Tmax`. It then calls
+`CalcThermalComfortFanger(PeopleNum, Tmin, PMVResult)`, copies `PMVMin`,
+calls the child again at `Tmax`, and copies `PMVMax`. Both forward
+evaluations therefore occur before every clamp, root, or no-write result.
+
+The branch order is literal and strict:
+
+- only `PMVSet > PMVMin && PMVSet < PMVMax` enters the root solver;
+- otherwise `PMVSet < PMVMin` writes `Tset = Tmin`;
+- otherwise `PMVSet > PMVMax` writes `Tset = Tmax`;
+- every remaining case returns without writing `Tset`.
+
+With ordered or equal endpoint PMVs, exact equality with either endpoint
+preserves the incoming reference. With reversed PMVs, equality to the
+numerically higher `PMVMin` can select `Tmax`, while equality to the lower
+`PMVMax` can select `Tmin` through the later branches. A NaN target makes all
+three comparisons false. With ordinary finite endpoints, positive infinity
+selects `Tmax` and negative infinity selects `Tmin`. An endpoint NaN makes
+only comparisons involving that value unordered, so an earlier finite
+lower-bound comparison can still select `Tmin`.
+
+CP230 assumes PMV rises from the lower to the upper dry-bulb bound but does
+not validate or reorder temperatures or PMVs. Reversed or equal endpoints
+therefore follow the shown branch precedence rather than a mathematical
+inverse contract. CP196 can let equal dry-bulb bounds proceed after its
+non-sticky Severe branch; deterministic equal endpoint PMVs then make a
+target below or above select the same temperature, while exact equality
+preserves stale `Tset`. The source comment describing a returned 0/1/2
+solution classification is stale: this `void` routine returns or records no
+such result.
+
+The last unconditional endpoint evaluation is at `Tmax`. A lower clamp can
+therefore return `Tmin` while transitive People/Fanger report state still
+describes `Tmax`; the upper clamp matches that last endpoint, while ordered-
+endpoint equality and other no-write cases leave both a stale caller value
+and the `Tmax`-side child state.
+
+#### Root-solver contract and forward-call multiplicity
+
+The interior branch constructs a callback returning
+`PMVSet - PMV(candidate)` and calls
+`General::SolveRoot(state, 0.001, 500, SolFla, Tset, callback, Tmin, Tmax)`.
+The tolerance is an absolute PMV residual, not a temperature tolerance.
+CP230 does not select a root method: `SolveRoot` reads
+`state.dataRootFinder->rootAlgo`. Its default is Regula Falsi, and the
+`HVACSystemRootFindingAlgorithm` input can choose Regula Falsi, Bisection,
+Regula Falsi then Bisection, Bisection then Regula Falsi, or Alternation.
+`RootAlgo` also has an internal short-Bisection-then-Regula-Falsi value used
+by other source paths; CP230 honors it if that shared state is present. The
+global configured iteration-switch count affects the two ordered hybrids and
+Alternation. The internal short mode instead fixes its first three candidates
+to Bisection. CP230's maximum remains the literal 500.
+
+Before each method choice, the solver computes `DY = Y0 - Y1`. If
+`abs(DY) < 1e-10`, it replaces that value with positive `1e-10` without
+preserving the original sign. Regula Falsi estimates are not clamped to the
+current interval, so tiny residual separation or malformed state can produce
+an outside-bracket candidate.
+
+`SolveRoot` calls the callback at `Tmin` and `Tmax` again before iteration.
+Thus an interior attempt has four forward Fanger evaluations before its first
+candidate. Same-sign endpoint residual product greater than zero returns
+flag `-2` with `Tset = Tmin`. Otherwise the solver seeds the result with
+`Tmin`, generates candidates according to the configured method, and tests
+strict `abs(residual) < 0.001`.
+
+Each candidate is evaluated before the counter is incremented; convergence is
+checked before `NIte > MaxIte`, and the limit comparison is strict. A 501st
+candidate can therefore succeed with positive flag 501; if it does not,
+flag `-1` retains that last evaluated candidate. An interval initially narrower than
+`1e-10` exits with `-1` before any candidate and retains the seeded `Tmin`.
+The routine consequently performs:
+
+- two Fanger evaluations for a clamp, equality, or no-write path;
+- four for a solver `-2` or a zero-candidate narrow-interval failure;
+- `4 + k` for a normal-width interior attempt with `1 <= k <= 501`, hence
+  five through 505 total evaluations.
+
+For deterministic finite ascending endpoint values, the strict interior
+precheck implies opposite residual signs, so `-2` is normally unreachable.
+Repeated-evaluation side effects, malformed or nonfinite state, and direct
+misuse keep it part of the observable contract. Endpoint residuals are not
+accepted as roots before the candidate loop. Overflow, underflow, or NaN in
+the residual product can also alter bracketing behavior.
+
+A positive solver flag is accepted silently. An iterated `-1` leaves the last
+evaluated candidate in `Tset`; a zero-candidate width `-1` and flag `-2`
+leave `Tmin`. On a normal successful or iterated `-1` path, child report
+state normally reflects the returned last candidate. On `-2`, or a
+zero-candidate width exit, the solver's last forward call was at `Tmax` while
+the returned reference is `Tmin`.
+
+#### Transitive Fanger state and dependencies
+
+The optional-`PeopleNum` call mode of `CalcThermalComfortFanger` is an
+impure evaluator, not a numerical callback. Each invocation loops the full
+People arena, skips nonmatching records without an early break, and evaluates
+the matching record regardless of its ordinary `Fanger` reporting flag. The
+shared ThermalComfort `PeopleNum` is itself the loop counter, so normal return
+leaves it at `TotPeople + 1`, or one for an empty arena, even when no record
+matches. A match copies that People record's Zone identity and samples
+activity, work efficiency, clothing, and air-velocity schedules on every
+endpoint or candidate.
+
+In the ordinary mixed-air path, the trial value supplies air temperature.
+Displacement ventilation and UFAD instead replace it with `TCMF`; Cross
+Ventilation Jet and the literal Recirculation branch use `ZTJET`. These
+room-air overrides can ignore the trial, make endpoint PMVs equal, or flatten
+the root response. Relative humidity for comfort-control evaluation is
+calculated from the Zone MAT rather than the candidate temperature, together
+with `airHumRatAvgComf` and barometric pressure. The child also reads mean
+radiant temperature and radiant-to-person state.
+
+SurfaceWeighted MRT adds a stateful endpoint anomaly. Its first call clears
+`FirstTimeSurfaceWeightedFlag`, rearms `FirstTimeError`, initializes every
+radiant-enclosure Surface `AE` and every excluded-surface `enclAESum`, and a
+true enclosure `radReCalc` can rewrite the selected sum and member `AE`
+values again. If the selected `enclAESum <= 0.01`, that first call warns,
+clears `FirstTimeError`, seeds MRT from the Space MAT, and then applies the
+default half-surface-temperature average; later calls on the same bad sum
+return the local zero instead. Outer and solver-repeated endpoints can
+therefore observe different MRT/PMV state, providing a concrete path to `-2`
+after an initially valid strict bracket.
+
+Every successful forward evaluation can overwrite:
+
+- shared ThermalComfort scratch for selected People/Zone identity,
+  air/radiant temperature, relative humidity, schedules, Fanger coefficients,
+  losses, clothing iteration, and PMV intermediates;
+- selected People `TemperatureInZone` and `RelativeHumidityInZone`;
+- selected `ThermalComfortData` Fanger PMV, PPD, MRT, operative temperature,
+  clothing-surface temperature, and clothing value;
+- `HeatBalFanSys::ZoneQdotRadHVACToPerson` through the MRT calculation;
+- Surface `AE`/`enclAESum` plus ThermalComfort first-use/error latches in the
+  SurfaceWeighted path;
+- per-People air-velocity diagnostic state and other transitive diagnostics.
+
+An air-velocity sample outside the child's accepted range can warn or advance
+its recurring index once per forward evaluation, including duplicated
+endpoints, every root candidate, and warmup. Clothing and psychrometric work
+can also diagnose. CP230's warmup guard does not suppress any of these child
+effects.
+
+An unmatched `PeopleNum` does not directly index that number: the child scans
+the arena, selects nothing, and leaves CP230's freshly zeroed `PMVResult`
+unchanged at each endpoint. Both PMV bounds then become zero, so a negative
+target chooses `Tmin`, a positive target chooses `Tmax`, and zero preserves
+the incoming reference. A direct call before the required ThermalComfort and
+People arrays exist can fail earlier. Normal SPE input can select a globally
+named People record from another Zone, so comfort bounds and diagnostic name
+come from `ComfortControlNum` while the forward conditions come from that
+People record's Zone.
+
+#### Solver diagnostics and persistent ownership
+
+After `SolveRoot` returns, CP230 handles only flags `-1` and `-2`. Outside
+warmup, `-1` increments global
+`ZoneTempPredictorCorrectorData::IterLimitExceededNum1`. Count one emits an
+immediate iteration-limit warning using the selected comfort-control record
+`Name`; later counts use the shared `IterLimitErrIndex1` recurring warning
+with `Tset` as both numeric arguments. Flag `-2` analogously uses
+`IterLimitExceededNum2` and `IterLimitErrIndex2` and says the minimum
+temperature setpoint was used. There is no timestamp continuation.
+
+The immediate and recurring text is not normalized. The `-1` recurring text
+drops `Fanger` and preserves two spaces after the record-name colon. The `-2`
+recurring text omits the minimum-setpoint-used clause and preserves two spaces
+both after the colon and between `in` and `calculating`. Exact diagnostic
+parity must retain those literal differences.
+
+These four fields are shared across every comfort Zone and People record,
+not stored per comfort record. Later Zones can therefore inherit the
+first-occurrence state and aggregate under one recurring identity. During
+warmup, CP230 still performs all forward/root work and returns the selected
+or failed `Tset`, but it neither increments these counters nor emits these
+two diagnostic families. The fields have no environment reset and return to
+zero only when the ZoneTempPredictorCorrector owner is reconstructed or
+cleared. CP230 registers no output variable of its own.
+
+#### Parent order, call cardinality, and cadence
+
+All 12 production call expressions are inside CP229
+`CalcZoneAirComfortSetPoints`; no other production routine calls CP230.
+NO and SPE each call the selected People record once for a non-Dual control
+and low then high for Dual. OBJ visits matching People in ascending global
+order and calls low, then high per People for Dual. PEO has the same order and
+cardinality even when the integer occupant weight is zero. Its nonpositive
+cumulative-weight fallback repeats the complete object-average pass.
+
+For a Zone with `N` matching People records, runtime call counts are therefore
+one or two for NO/SPE, `N` or `2N` for OBJ and positive PEO, and `2N` or
+`4N` for PEO plus fallback. Each of those calls can itself perform two, four,
+or five through 505 forward Fanger evaluations. NO/SPE SingleCool passes
+`HighPMV`
+into its low output; OBJ and PEO pass the `LowPMV = -999` sentinel. An
+Uncontrolled or malformed control value can still call CP230 when the
+averaging enum chooses a branch. With ordered or equal endpoint PMVs,
+endpoint equality preserves NO/SPE output locals or the shared OBJ/PEO
+`Tset`, allowing prior People or Zone values to be accumulated; reversed
+equality can instead select the opposite temperature bound.
+
+The parent runs after ordinary thermostat selection, operative/adaptive,
+optimum-start, humidity, and fault work and before the final EMS override.
+Built-in execution normally reaches it once per Zone timestep before HVAC
+system substeps. Demand-manager resimulation can repeat the setpoint parent at
+the same time; external HVAC can bypass it. CP230 has no independent cadence,
+environment, sizing, warmup, occupancy, or control-type guard.
+
+#### Malformed state, aliasing, failure, and retry
+
+CP230 has no identity, range, finite, allocation, pointer, or alias checks.
+An invalid comfort-record index fails before the endpoint work. The writable
+reference can alias arbitrary `Real64` state in a direct call. CP230 snapshots
+both bounds and receives PMV by value before its own writes, but forward
+children can mutate other aliased state; normal CP229 calls pass only local
+temperatures.
+
+NaN generated inside `SolveRoot` bypasses ordinary same-sign and convergence
+comparisons and can propagate through the configured algorithm until `-1`,
+possibly leaving a NaN result. A failed first solver endpoint callback occurs
+before the solver seeds `Tset`; failure during later candidate work occurs
+after it has seeded `Tmin`. More generally, CP230 is `void` and owns no
+status, catch, cleanup, transaction, rollback, or one-time latch. A non-return
+can leave any prefix of Fanger scratch, People/report fields, radiant state,
+or diagnostics, with either the incoming output, `Tmin`, or a last candidate.
+
+Same-state retry repeats both outer endpoints and every reached solver
+evaluation. It can advance per-People child warnings and, outside warmup,
+CP230's global failure counters. A deterministic retry normally recalculates
+from the snapshotted bounds, but schedules, dynamic clothing, room-air state,
+diagnostics, and reports already mutated by the first attempt remain inputs or
+persistent effects. An ordered-endpoint equality/no-write retry also preserves
+whatever `Tset` the caller now supplies. Clean replay requires coordinated
+reconstruction of ZoneTempPredictorCorrector, DataZoneControls, RootFinding,
+ThermalComfort, HeatBalance/People, HeatBalFanSys, Surface, Construction,
+ViewFactor, HeatBalSurf, RoomAir, schedules, environment/psychrometric,
+output, and diagnostic owners.
+
+#### C++ tests, corpus, and oracle evidence
+
+No C++ unit test calls CP230 directly or reaches it indirectly. The four
+parent fixtures make 21 direct `CalcZoneAirTempSetPoints` calls, all with the
+comfort guard false. Two raw thermal-comfort setup fixtures stop before CP196
+or the setpoint parent. The 57 active full-simulation configurations contain
+no thermal-comfort thermostat or Fanger setpoint object, so their production
+CP230 reach is zero.
+
+Forward-model and generic-solver evidence remains separate. Six direct
+`CalcThermalComfortFanger` test expressions include five ordinary calls that
+assert selected PMV/PPD or averaged conditions. The sole call supplying optional `PeopleNum` as CP230 does asserts only
+clothing value, not the returned
+PMV. Two lower-level `CalcFangerPMV` cases are numeric. Ten direct generic
+`SolveRoot` test calls cover successes and `-1`; none asserts `-2`, and none
+composes the solver with Fanger or CP230.
+
+A manual stock-26.1 oracle run of the installed
+`FurnaceWithDXSystemComfortControl.idf` completed its winter and summer
+DesignDays at six timesteps per hour with zero Warning and zero Severe. Its
+comfort-controlled EAST Zone has one People record and therefore forces NO
+averaging despite the authored PeopleAverage choice. Under its six warmup
+days plus one reported day per environment,
+schedule/cadence arithmetic gives 2,226 CP230 calls: 1,176 Uncontrolled,
+210 each for control types 1, 2, and 3, and 420 Dual child calls. The reported
+days account for 318 calls, including 168 sentinel and 150 active-target
+calls. Reported active setpoints stayed inside the authored `[12.8,40]`
+bounds and no CP230 solver warning appeared.
+
+That count is source-and-schedule arithmetic for the completed run, not an
+instrumented function counter or per-call iteration trace. The ExampleFile is
+not copied into a repository case or script, and no Rust result is compared
+with it. It is manual diagnostic evidence only, not checked-in test,
+numerical-conformance, or runtime-support evidence.
+
+#### Rust boundary
+
+Crate-wide authored Rust code contains no CP230 routine, comfort thermostat
+or Fanger setpoint type, PMV/Fanger state, activity/work/clothing/air-velocity
+comfort inputs, inverse residual callback, configurable generic root solver,
+solver flags, four diagnostic counters/indexes, report side effects, or live
+caller. The setpoint compatibility wrapper still receives an empty closure.
+
+Rust's typed People state retains Zone identity, design-count fields, and an
+optional number schedule for sizing and bounded IdealLoads outdoor-air/DCV
+work. Ordinary thermostat support is limited to direct-Zone DualSetpoint
+state. Thermal-comfort control and Fanger setpoint families remain RawOnly
+without a partial-support rule and run-block before runtime.
+
+The private fixed-bracket bisection used by one IdealLoads outdoor-air
+psychrometric helper has different bounds, iteration policy, callback/state,
+status, and diagnostics. It is not evidence for CP230 or the configurable
+EnergyPlus root solver. Existing forward-adjacent People/schedule state,
+ordinary thermostat graph evidence, and source-mapped ThermalComfort parent
+also do not promote this inverse.
+
+CP230 therefore adds no algorithm-level `energyplus_source` entry, Rust
+target, code, mapped state, test, support, capability, output implementation,
+comparator, manifest, numerical, performance, or conformance promotion. The
+inventory becomes 32 algorithms and 236 routines, split 58 `state_mapped`
+plus 178 `source_mapped`, with 113 required; the heat-balance project list
+becomes 82.
+
+CP231 next maps `AdjustCoolingSetPointforTempAndHumidityControl`, declared at
+`ZoneTempPredictorCorrector.hh` lines 369-372 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 6417-6458.
 
 ## Promotion Requirements
 
