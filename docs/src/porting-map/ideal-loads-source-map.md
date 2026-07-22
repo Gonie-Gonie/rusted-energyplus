@@ -119,12 +119,23 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `PurchasedAirManager::ReportPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/report.rs::IdealLoadsReportSnapshot`; `crates/ep_runtime/src/output/meter_registry.rs::meter_rate_to_energy_j` |
 | `DataSizing::calcDesignSpecificationOutdoorAir` | `src/EnergyPlus/DataSizing.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air/dcv.rs::occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s` |
 | `ZoneEquipmentManager::ManageZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ideal_loads_zone_equipment_stages`; `validate_ideal_loads_zone_equipment_dispatch`; `crates/ep_runtime/src/execution_plan.rs::ExecutionPlan` |
+| `ZoneEquipmentManager::GetZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent eager typed equipment lists/connections and `TimestepConfig` only |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
 | `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand` |
 
 ## Runtime Order
 
-EnergyPlus calls the IdealLoads component through the zone equipment manager:
+Zone equipment input is acquired earlier and independently of the simulation
+driver:
+
+```text
+SurfaceGeometry::SetupZoneGeometry
+  -> ZoneEquipmentManager::GetZoneEquipment
+  -> DataZoneEquipment::GetZoneEquipmentData
+```
+
+`ManageZoneEquipment` does not call that input wrapper. EnergyPlus later calls
+the IdealLoads component through the zone equipment manager:
 
 ```text
 ZoneEquipmentManager::ManageZoneEquipment
@@ -1014,7 +1025,8 @@ increase the dynamic count and are not instrumented.
 
 Across the corpus, 34 completing configurations, including the eight
 sizing-only fixtures, contain 50 `Sizing:Zone` definitions and provide static
-sizing-branch potential; the dynamic Size call count remains uninstrumented. The 55 zoned successful configurations contain 81 Zone
+sizing-branch potential; the dynamic Size call count remains uninstrumented.
+The 55 zoned successful configurations contain 81 Zone
 identities, 55 controlled and 26 uncontrolled. That is child-topology context,
 not 81 parent calls. No active full-simulation assertion isolates the
 wrapper-owned protocol.
@@ -1041,9 +1053,146 @@ algorithms and 242 routines, split 58 `state_mapped` plus 184
 `source_mapped`, with 119 required; the heat-balance and HVAC project lists
 remain 88 and 8.
 
-CP238 next maps `ZoneEquipmentManager::GetZoneEquipment`, declared at
-`ZoneEquipmentManager.hh` line 88 and implemented at
-`ZoneEquipmentManager.cc` lines 169-197.
+## CP238 `GetZoneEquipment` One-Time Input Barrier
+
+CP238 adds `routine.get_zone_equipment` as required and `source_mapped` after
+`manage_zone_equipment` and before `sim_zone_equipment`. The HVAC project list
+gets the same ordered item. The algorithm already cites
+`ZoneEquipmentManager.cc`, so no algorithm-level source or Rust target changes.
+`GetZoneEquipment` is declared at `ZoneEquipmentManager.hh` line 88 and its
+complete body is `ZoneEquipmentManager.cc` lines 169-197.
+
+### Exact gate, order, and stored state
+
+`GetZoneEquipmentInputFlag` guards every body operation. False input returns
+without calling a child, reading current timestep or Zone counts, validating
+state, or changing any stored value. A true entry performs this exact order:
+
+1. call `DataZoneEquipment::GetZoneEquipmentData(state)`;
+2. set manager-owned `GetZoneEquipmentInputFlag = false`;
+3. set separately owned `ZoneEquipInputsFilled = true`;
+4. set `NumOfTimeStepInDay` to integer
+   `TimeStepsInHour * Constant::iHoursInDay`;
+5. initialize local `MaxNumOfEquipTypes = 0`;
+6. scan Zone indexes one through `NumOfZones`, skip each configuration whose
+   `IsControlled` is false, and take the maximum same-index
+   `ZoneEquipList(Counter).NumOfEquipTypes`; and
+7. allocate `PrioritySimOrder` to that maximum.
+
+`Constant::iHoursInDay` is 24 and all three arithmetic values are integers.
+Normal input validation constrains `TimeStepsInHour`, but CP238 performs no
+local positivity, divisor, range, or overflow check and direct state can retain
+literal invalid values. The result is a one-time snapshot: later changes to
+`TimeStepsInHour` do not update it.
+
+For valid source input, the child allocates both Zone configuration and
+equipment-list arrays by `NumOfZones` and stores each parsed list at its actual
+Zone index, so the same-index maximum scan is intentional. Only controlled
+Zones contribute. Zero controlled Zones or zero equipment produces a maximum
+of zero and the source still calls the allocation API with extent zero.
+Allocated `SimulationOrder` elements default to empty names, Invalid equipment
+type, and zero pointer/priorities. CP238 does not populate or sort them; later
+`SetZoneEquipSimOrder` fills leading entries for the active Zone and clears
+unused-tail names, equipment type, and pointer; unused-tail priorities remain
+untouched.
+
+### Dependency, caller, and lifecycle
+
+`DataZoneEquipment::GetZoneEquipmentData`, separately declared at
+`DataZoneEquipment.hh` line 558 and implemented at
+`DataZoneEquipment.cc` lines 167-812, remains dependency context rather than a
+new mapped routine. It owns the full Zone/Space equipment connection and list,
+node, schedule, supply/return path, splitter/mixer, allocation, duplicate, and
+fatal-input behavior. Its final sticky-error fatal occurs before CP238 can
+clear its guard or publish readiness.
+
+There is exactly one production call expression, at
+`SurfaceGeometry.cc` line 298 inside `SetupZoneGeometry`. It follows
+`GetSurfaceData`; if `ErrorsFound` is true after that call, lines 292-296 return
+and suppress CP238. A reached call precedes window-gap airflow and storm-window
+input. The transitive input chain comes from
+`HeatBalanceManager::GetBuildingData`, not HVAC simulation:
+`GetZoneData -> SetupZoneGeometry -> GetZoneEquipment`.
+`ManageZoneEquipment` does not call it, and the old HVACManager comment that
+the manager call forces input acquisition is explicitly marked incorrect in
+the source.
+
+Manager state defaults to day count zero, guard true, and an empty priority
+array. DataZoneEquipment separately defaults readiness and its input-error
+latch false. Neither flag rearms per environment. The manager clear
+reconstructs the former state, while the DataZoneEquipment clear reconstructs
+the latter; resetting only one owner can create a true guard with stale
+readiness/data or a false guard with cleared readiness. Full state clear
+restores the coordinated initial pair.
+
+### Failure, replay, and evidence
+
+The wrapper owns no input, range, arena, allocation, or consistency validation,
+no `ErrorsFound` parameter or status result, and no local diagnostic, catch,
+cleanup, transaction, or rollback. If the child fatals, the manager guard
+remains true; readiness, day count, and priority state remain at their entry
+values (readiness is false on a fresh-state entry). The child can still retain
+partial allocations, node/schedule mutations, input-used markers, diagnostics,
+and its sticky error flag. A caught retry is therefore not a clean parse.
+
+After the child returns, line 182 clears the guard before readiness, arithmetic,
+the scan, and allocation. Failure in that suffix preserves the completed
+prefix. In particular, failure after line 183 can advertise readiness while
+the day count or priority scratch remains incomplete; every later call then
+silently no-ops and cannot repair it. A successful replay is narrowly
+idempotent only because it performs no work and never revalidates, recomputes,
+or resizes.
+
+Twenty-three direct C++ calls occur across 22 tests. Twenty-one tests use one
+call as downstream setup. The focused
+`ZoneEquipmentManager_GetZoneEquipmentTest` calls twice: it proves the
+default-true guard, a normal first return with guard false and populated
+configuration/Zone node, `TimeStepsInHour = 1` producing a stored day count of
+24, then a second no-op after changing the source value to 2 while 24 remains.
+It does not assert `ZoneEquipInputsFilled`, priority extent or default content,
+zero-Zone behavior, validation/failure prefixes, retry, or coordinated reset.
+A UnitHeater full simulation later checks two priority entries only after the
+later ordering routine has populated them, so it does not isolate CP238
+allocation.
+
+All 57 active `ManageSimulation` expressions traverse the input chain and
+complete CP238 once on their fresh state. This includes the intentional EMS
+fatal fixture: its zero-equipment child returns normally and CP238 commits
+before the later first EMS calling point. Fifty-six expressions subsequently
+complete the simulation. The static corpus spans controlled, uncontrolled,
+and zero-Zone input topology, but no active assertion isolates CP238's guard,
+readiness publication, day snapshot, maximum extent, failure, or reset.
+
+### Rust boundary and status
+
+Rust owns an eager immutable compiler subset for
+`ZoneHVAC:EquipmentList` and `ZoneHVAC:EquipmentConnections`, but its equipment
+entry enum supports only `ZoneHVAC:IdealLoadsAirSystem`. It normalizes typed
+identities, validates references and sequences, projects IdealLoads graph
+edges, and builds execution labels at compile/plan time. That timing, state,
+family coverage, and failure model do not implement the lazy source wrapper or
+the full child parser.
+
+Rust `TimestepConfig` and time-axis construction separately perform adjacent
+24-times-timesteps-per-hour arithmetic using guarded unsigned operations.
+They do not own the equipment-manager day snapshot or its second-call freeze.
+The typed graph's static edge sort is not source `PrioritySimOrder`; CP238 only
+allocates that scratch, and later source demand-dependent ordering fills it.
+Rust has no `GetZoneEquipmentInputFlag`, `ZoneEquipInputsFilled`, coordinated
+one-shot owners, full Zone/Space configuration, controlled-Zone maximum scan,
+`SimulationOrder` scratch defaults/allocation, exact partial-failure prefix, or
+retry/reset test.
+
+CP238 adds no algorithm-level EnergyPlus source, Rust target, executable code,
+mapped state, test, object support, capability, output implementation,
+comparator, case, manifest, numerical, performance, or conformance promotion.
+The inventory becomes 32 algorithms and 243 routines, split 58 `state_mapped`
+plus 185 `source_mapped`, with 120 required; the heat-balance and HVAC project
+lists become 88 and 9.
+
+CP239 next maps `ZoneEquipmentManager::InitZoneEquipment`, declared at
+`ZoneEquipmentManager.hh` line 90 and implemented at
+`ZoneEquipmentManager.cc` lines 199-316.
 
 ## Claim Requirements
 

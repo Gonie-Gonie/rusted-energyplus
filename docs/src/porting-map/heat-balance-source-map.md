@@ -21007,9 +21007,57 @@ inventory remains 32 algorithms and 242 routines, split 58 `state_mapped`
 plus 184 `source_mapped`, with 119 required; the heat-balance and HVAC project
 lists remain 88 and 8.
 
-CP238 next maps `ZoneEquipmentManager::GetZoneEquipment`, declared at
+CP238 adds canonical required `routine.get_zone_equipment` after
+`manage_zone_equipment` and before `sim_zone_equipment`, plus the matching HVAC
+project item. `ZoneEquipmentManager::GetZoneEquipment` is declared at
 `ZoneEquipmentManager.hh` line 88 and implemented at
-`ZoneEquipmentManager.cc` lines 169-197.
+`ZoneEquipmentManager.cc` lines 169-197. Its sole one-time guard encloses every
+operation. A true entry calls the separate full `GetZoneEquipmentData`
+dependency, clears `GetZoneEquipmentInputFlag`, sets
+`ZoneEquipInputsFilled = true`, snapshots `NumOfTimeStepInDay` as the raw
+integer `TimeStepsInHour * 24`, scans controlled Zone indexes for the maximum
+same-index equipment-list count, and allocates but does not populate or sort
+`PrioritySimOrder` to that extent. A false entry is a complete no-op.
+
+The wrapper has no local range, allocation, count, arena, or consistency
+validation and no status, diagnostic, catch, cleanup, transaction, or rollback.
+A child fatal leaves the wrapper guard true and does not modify readiness
+(false on a fresh-state entry), but can retain the child's partial input state
+and sticky errors. Once the child returns, the guard commits false before
+readiness, arithmetic, scanning, and allocation;
+a later failure can therefore leave a false guard and true readiness with
+unfinished derived state, and retry silently does nothing. There is no
+per-environment rearm. The manager and data-owner clear paths reconstruct their
+flags separately, so only coordinated full-state reset restores the normal
+pair.
+
+The only production expression is `SurfaceGeometry::SetupZoneGeometry` after
+successful `GetSurfaceData` and before window-gap and storm-window input; CP237
+`ManageZoneEquipment` never calls this routine. Twenty-three direct C++ calls
+span 22 tests. The focused two-call test proves the default-true guard, first
+snapshot `1 * 24 = 24`, populated Zone configuration, and a second-call no-op
+after changing `TimeStepsInHour` to 2, but it does not assert readiness,
+priority extent/content, failure, retry, or reset. Source-order tracing shows
+all 57 active `ManageSimulation` expressions complete the one-time wrapper
+during input setup, including the case that later fatals in EMS; 56 later
+complete the simulation. No full-simulation assertion isolates CP238-owned
+state.
+
+Rust eagerly compiles immutable, IdealLoads-only typed equipment
+lists/connections and separately derives time-axis sizes. It has no lazy
+`GetZoneEquipment`, input/readiness latches, equipment-manager day snapshot,
+full Zone/Space configuration, controlled-Zone maximum scan,
+`SimulationOrder` scratch allocation, or source failure/retry/reset lifecycle.
+Its graph sort and execution labels are not `PrioritySimOrder`, which CP238
+only allocates and a later source routine fills. CP238 adds no algorithm-level
+source, Rust target/code/state, support, capability, output, numerical,
+performance, or conformance promotion. The inventory becomes 32 algorithms
+and 243 routines, split 58 `state_mapped` plus 185 `source_mapped`, with 120
+required; the heat-balance project list remains 88 and the HVAC list becomes 9.
+
+CP239 next maps `ZoneEquipmentManager::InitZoneEquipment`, declared at
+`ZoneEquipmentManager.hh` line 90 and implemented at
+`ZoneEquipmentManager.cc` lines 199-316.
 
 ### `CheckValidSimulationObjects` state contract
 

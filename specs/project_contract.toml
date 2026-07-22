@@ -128,6 +128,7 @@ claim_key = "hvac_compatibility"
 routine_inventory_complete = false
 required_routines = [
   "manage_zone_equipment",
+  "get_zone_equipment",
   "sim_zone_equipment",
   "sim_purchased_air",
   "get_purchased_air",
