@@ -2669,12 +2669,139 @@ performance, or conformance promotion. The inventory becomes 32 algorithms
 and 233 routines, split 58 `state_mapped` plus 175 `source_mapped`, with 110
 required; the heat-balance project list becomes 79.
 
-CP228 next maps `AdjustOperativeSetPointsforAdapComfort`, declared at
+CP228 adds required `adjust_operative_set_points_for_adap_comfort`
+immediately after `adjust_air_set_points_for_op_temp_cntrl` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is the nonmember
+`AdjustOperativeSetPointsforAdapComfort(EnergyPlusData &state,
+int TempControlledZoneID, Real64 &ZoneAirSetPoint)`, declared at
 `ZoneTempPredictorCorrector.hh` line 358 and implemented at
 `ZoneTempPredictorCorrector.cc` lines 5899-5964.
 
+CP228 indexes the selected temperature-control record, aliases the shared daily
+adaptive schedules, truncates the incoming `Real64` setpoint toward zero into
+an `int`, and copies the adaptive model index before checking
+`AdaptiveComfortTempControl`. A false flag therefore leaves a finite,
+int-representable reference unchanged but does not protect invalid record
+state or an undefined nonfinite/out-of-range floating-to-integer conversion.
+The routine owns no state write other than the referenced setpoint.
+
+Every environment except exact `DesignDay` and `HVACSizeDesignDay` selects one
+of seven one-based daily arrays by model index 2-8 and `DayOfYear`: ASH55
+central, 90-percent upper, and 80-percent upper, followed by CEN15251 central
+and categories I-III. An unrecognized or corrupted integer index takes the
+switch default and makes no candidate write; unknown input model text instead
+accumulates a Severe error and reaches CP196's fatal tail before normal
+runtime. The two design-day kinds resolve the current `DesignDayNum`; only
+`DayType == 9` reads the shared seven-slot summer vector at `model_index - 2`.
+CP228 checks neither model bounds nor schedule initialization/allocation,
+`DayOfYear`, `Envrn`, or `DesignDayNum` bounds, nor whether the shared vector
+was populated from the current design day.
+
+After selection, CP228 first replaces a candidate lower than the truncated
+baseline with that integer and then separately assigns the same integer when
+the current value is exact `-1`; the result can remain `-1` when that integer
+is also `-1`. This is not `max(candidate, original Real64)`. For example,
+baseline 26.8 and candidate 26.5 yields 26.5, while candidate 25 or `-1`
+yields 26.0. A no-candidate path normally preserves a positive baseline but
+can raise a negative fractional baseline to its truncated integer. Candidate
+NaN survives both comparisons, positive infinity survives, and negative
+infinity falls back; a nonfinite or non-representable original has already
+entered undefined conversion territory.
+
+CP196 creates adaptive state only for a Constant or Scheduled
+`ZoneControl:Thermostat:OperativeTemperature` record with a nonblank,
+recognized, non-None model. The record defaults are false and index zero, and
+the parser only sets active state; a later repeated target with None or blank
+does not explicitly clear an earlier selection. The first active record calls
+CP197 and CP198 under the shared initialized latch. CP198 provides strict
+ASH `10 < T < 33.5` and CEN `10 < T < 30` daily candidates or `-1`, plus a
+single model-indexed summer-design-day vector shared across all design days.
+That vector starts as `[-1,0,0,0,0,0,0]`, retains earlier values when a later
+day is invalid, and lets the last qualifying day win independently per
+family. CP228 only consumes this committed state.
+
+The three production expressions are all in `CalcZoneAirTempSetPoints` and
+are additionally guarded by the same adaptive flag. SingleCool and
+SingleHeatCool adjust their cooling/shared target; DualHeatCool adjusts only
+the cooling high target, never the heating low target. Each caller saves
+`setptAdapComfortCool` immediately after CP228 and before CP227 converts the
+operative target to an MRT-weighted air target. SingleCool and Dual preserve
+their raw high targets first; SingleHeatCool does not preserve raw low/high
+record fields.
+
+`setptAdapComfortCool` backs the Zone-timestep
+`Zone Adaptive Comfort Operative Temperature Set Point` output. It is reset
+to zero at begin-environment, but a later Uncontrolled or SingleHeat
+control-type branch does not refresh it, so a prior adaptive value can remain
+visible. A false adaptive flag likewise skips refresh in direct or malformed
+state. CP227, optimum start, humidity overcooling, thermostat faults,
+comfort control, and EMS do not revise that snapshot.
+
+The built-in parent runs once per Zone timestep before system substeps, with
+additional same-time passes possible through demand resimulation. A full
+parent replay reloads the raw thermostat schedule before CP228; ordinary
+positive finite candidates or `-1` therefore do not accumulate. Direct
+malformed replay can still expose truncation changes or undefined conversion.
+External HVAC bypasses the caller. CP228 has no warmup, sizing, kickoff,
+occupancy, window-opening, or current-zone-condition gate beyond its
+environment and per-record branches.
+
+There is no authored diagnostic, clamp, status, catch, cleanup, or rollback.
+Invalid record, environment, design-day, daily-array, or day state can fail
+before a candidate assignment, as can an invalid model index specifically in
+the summer design-day vector branch, and leave the reference unchanged; the
+initial integer conversion can already be undefined. A later
+Zone failure retains earlier parent outputs. CP228 has no independent reset;
+the daily/design state resets only with full predictor/corrector owner
+reconstruction, while the reported snapshot has the parent begin-environment
+reset.
+
+One C++ fixture calls CP228 directly four times, all in a run-period
+environment with manually allocated active records. It proves ASH central
+`0 -> 25.55`, CEN central `0 -> 27.05`, and two `-1` candidates restored to 0
+and 26 by the earlier lower-than-integer-baseline test. The later exact
+`== -1` true branch is therefore not isolated, and the fourth call still does
+not test a valid candidate below the baseline. The fixture's four raw
+operative objects are not parser or production integration evidence: it calls
+neither CP196 nor the parent setpoint routine, then freshly allocates and
+manually activates all four control records.
+
+Four other fixtures make 21 direct parent calls and evaluate the outer
+adaptive guard 26 times, but every flag is default false and CP228 is entered
+zero times. None of 57 active full simulations contains an
+operative-temperature object; one expected EMS fatal stops before setpoint
+acquisition and the other 56 retain false adaptive flags. Thus the full corpus
+has zero
+CP228 entries and zero selector-body reach. Five upper-model selections, the
+false internal guard, default switch, both design-day kinds, integer
+truncation, independent exact-sentinel comparison, caller snapshot/order,
+failure, retry, and reset remain
+uncovered.
+
+Rust has no exact routine, adaptive flag/model, seven daily arrays, summer
+design-day vector, environment dispatch, truncating selector, adaptive output,
+or live caller. Its thermostat type and compiler cover only bounded
+direct-Zone DualSetpoint controls, the only live setpoint-wrapper call passes
+an empty closure, and the narrow IdealLoads diagnostic repeats only a
+referenced `Schedule:Constant` value. The operative-temperature object is
+RawOnly without a partial rule, becomes an unsupported object, and run-blocks.
+A day-of-year field in the Rust time axis does not provide the missing
+design-day environments or adaptive state, and no Rust test exercises this
+behavior.
+
+CP228 remains required `source_mapped` and adds no algorithm-level
+`energyplus_source` entry, Rust target, code, mapped state, test, support,
+capability, output implementation, comparator, manifest, numerical,
+performance, or conformance promotion. The inventory becomes 32 algorithms
+and 234 routines, split 58 `state_mapped` plus 176 `source_mapped`, with 111
+required; the heat-balance project list becomes 80.
+
+CP229 next maps `CalcZoneAirComfortSetPoints`, declared at
+`ZoneTempPredictorCorrector.hh` line 360 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5966-6329.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`adjust_air_set_points_for_op_temp_cntrl`, preserving the completed
+`adjust_operative_set_points_for_adap_comfort`, preserving the completed
 predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
