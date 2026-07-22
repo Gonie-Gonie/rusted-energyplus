@@ -16,7 +16,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 
 | EnergyPlus area | Source anchor | Rust target | Current status |
 |---|---|---|---|
-| zone predictor/corrector driver | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ManageZoneAirUpdates` | `manage_zone_air_updates_stage`; `advance_heat_balance_state_one_timestep` successor | source-order barrier plus scalar shell; routine semantics not complete |
+| zone predictor/corrector driver | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ManageZoneAirUpdates` | `manage_zone_air_updates_stage`; `advance_heat_balance_state_one_timestep` successor | CP195 required source-mapped dispatcher; Rust metadata and selector-ignoring closures remain scaffold |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -27,6 +27,139 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 prediction, and correction. It is a predictor/corrector orchestration routine,
 not a direct child of the `ManageHeatBalance` -> `ManageSurfaceHeatBalance` ->
 `ManageAirHeatBalance` call chain.
+
+### CP195 `ManageZoneAirUpdates` source map
+
+`ManageZoneAirUpdates(EnergyPlusData &state,
+DataHeatBalFanSys::PredictorCorrectorCtrl const UpdateType,
+Real64 &ZoneTempChange, bool const ShortenTimeStepSys,
+bool const UseZoneTimeStepHistory, Real64 const PriorTimeStep)` is declared at
+`ZoneTempPredictorCorrector.hh` lines 264-270 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 195-244. The selector enum is defined at
+`DataHeatBalFanSys.hh` lines 70-80. Although the declaration comment mentions
+only setpoint, prediction, and correction, the implementation accepts six
+named work selectors plus a silent default.
+
+Every entry executes the same ordered prefix before inspecting `UpdateType`:
+
+1. When `DataZoneControlsData::GetZoneAirStatsInputFlag` is true, lines
+   215-216 call CP196 `GetZoneAirSetPoints`.
+2. Line 217 clears that shared latch only after CP196 returns.
+3. Line 220 calls `InitZoneAirSetPoints` unconditionally, including for
+   history and invalid/default selectors.
+4. Lines 222-243 then dispatch at most one branch child.
+
+| Selector | Selected child and forwarded arguments | Direct wrapper/output effect |
+|---|---|---|
+| `GetZoneSetPoints` | `CalcZoneAirTempSetPoints(state)` | leaves `ZoneTempChange` unchanged |
+| `PredictStep` | `PredictSystemLoads(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep)` | forwards all three timestep inputs and leaves `ZoneTempChange` unchanged |
+| `CorrectStep` | `correctZoneAirTemps(state, UseZoneTimeStepHistory)` | assigns the returned maximum temperature change to caller-owned `ZoneTempChange` only after the child returns |
+| `RevertZoneTimestepHistories` | `RevertZoneTimestepHistories(state)` | leaves `ZoneTempChange` unchanged |
+| `PushZoneTimestepHistories` | `PushZoneTimestepHistories(state)` | leaves `ZoneTempChange` unchanged |
+| `PushSystemTimestepHistories` | `PushSystemTimestepHistories(state)` | leaves `ZoneTempChange` unchanged |
+| `Invalid`, `Num`, or an out-of-range cast | no branch child | silently returns after the common input/init prefix and preserves `ZoneTempChange` |
+
+The direct child boundaries are CP196 `GetZoneAirSetPoints` at lines 246-2174,
+`InitZoneAirSetPoints` at lines 2350-2816, `PredictSystemLoads` at lines
+2870-3145, `CalcZoneAirTempSetPoints` at lines 3259-3460,
+`correctZoneAirTemps` at lines 3817-3861,
+`PushZoneTimestepHistories` at lines 4167-4185,
+`PushSystemTimestepHistories` at lines 4277-4295, and
+`RevertZoneTimestepHistories` at lines 4372-4389. CP195 does not normalize
+their differing Zone/Space guards or state ownership. In particular, prediction
+and history children generally use `doSpaceHeatBalance`, while the correction
+wrapper's active Space correction requires
+`doSpaceHeatBalanceSimulation && !DoingSizing`.
+
+There are nine literal production calls in two parent routines.
+`HVACManager::ManageHVAC` owns seven: Get at lines 224-229, initial Predict at
+262-267, initial Correct at 294-299, shortened-system-step Predict at 346-351,
+Correct at 374-379, PushSystem at 388-393, and the end-of-Zone-step PushZone at
+579-584. Thus an adaptive Zone timestep can repeat the stateful
+Predict/Correct/PushSystem sequence before one final Zone-history push.
+`SimulationManager::Resimulate` lines 2915-2937 conditionally performs only
+Get at 2917-2922 and Predict at 2929-2930 before `SimHVAC`; it supplies false
+shortening, the current history selector, and zero prior timestep. No literal
+production caller selects Revert. CP195 is therefore HVAC timestep and
+resimulation orchestration, not a direct child of
+`ManageHeatBalance -> ManageSurfaceHeatBalance -> ManageAirHeatBalance`. The
+standard CP191 branch reaches the ordinary HVAC parent; an external HVAC
+callback bypasses that parent unless external code invokes equivalent work.
+
+CP195's only direct persistent state write is the shared input latch. Every
+other mutation belongs to a child, except the caller-owned
+`ZoneTempChange` assignment after a returned Correct child.
+`correctZoneAirTemps` initializes a nonnegative maximum, corrects Zones and
+eligible Spaces, and returns the maximum reached change; CP195 performs no
+additional computation or range check. The other five named selectors and the
+default leave the reference exactly as supplied.
+
+A CP196 non-return preserves its parser/diagnostic prefix and the true input
+latch, suppressing Init and dispatch; same-state retry enters CP196 again. An
+Init non-return occurs after a successful latch clear, preserves its own
+prefix, and suppresses dispatch; retry skips CP196 but reruns Init. A branch
+non-return preserves both common phases plus the branch prefix. In the Correct
+case the outer assignment has not completed, so the old `ZoneTempChange`
+survives. Warnings and recurring diagnostics inside children can return
+normally and are not translated by CP195. The wrapper has no selector
+validation, error/status argument, catch, cleanup, rollback, or transaction.
+
+After successful one-time input, normal repeat skips CP196 but always reruns
+Init and the selected child. Prediction, correction, and all history operations
+are stateful; push and revert calls in particular are not idempotent.
+`GetZoneAirStatsInputFlag` is owned at `DataZoneControls.hh` line 287 and reset
+true by `DataZoneControlsData::clear_state` at lines 304-325.
+`ZoneTempPredictorCorrectorData::clear_state` placement-news the predictor
+latches, errors, histories, and Zone/Space arenas at
+`ZoneTempPredictorCorrector.hh` lines 441-444. Clearing only the control owner
+rearms input over possibly retained predictor/output state, while clearing only
+the predictor owner leaves input skipped. A clean replay also requires the
+relevant HeatBalFanSys, ZoneEnergyDemand, HeatBalance, RoomAir, LoopNode,
+OutputProcessor, schedule, environment, and child-specific owners to be reset
+and reconstructed.
+
+The C++ unit tree contains zero direct CP195 calls and no test names a
+`PredictorCorrectorCtrl` selector. Direct child calls total nine Get, four
+Init, 21 setpoint calculation, 16 Predict, and five Correct calls, with zero
+calls to any of the three history children. Those fixtures cover selected
+thermostat/setpoint values, Get failure diagnostics, shortened Predict inputs,
+and bounded hybrid-model correction state. They do not cover the wrapper's
+common-prefix order, successful latch clear, exactly-one-child dispatch,
+invalid/default path, `ZoneTempChange` preservation or overwrite, production
+caller sequence, history semantics, partial failure, retry, or coordinated
+reset.
+
+Rust's `manage_zone_air_updates_stage` at
+`zone_predictor_corrector.rs` lines 40-46 is metadata.
+`manage_zone_air_updates_compat` at lines 55-60 ignores its
+`_update_type` and passes one arbitrary closure through an identity source-order
+wrapper. The Rust selector enum omits Invalid and Num, and the wrapper has no
+shared input latch, unconditional Init call, switch/default behavior,
+`ZoneTempChange` reference, selector validation, status, or rollback. Live
+timestep code invokes only Predict and Correct selector shells. The Predict
+closure manually nests empty Get/Init/Calc wrappers and a Zone-history push
+around bounded coefficient/load work; the Correct closure performs bounded
+temperature/humidity work and optional history synchronization. These
+caller-assembled closures are not CP195's six-way dispatch topology. Rust tests assert
+metadata/prebinding, arbitrary identity-wrapper ordering, one bounded adaptive
+history result, and isolated coefficient/analytical/third-order numerics, but
+none calls the selector wrapper or proves latch, dispatch, failure, retry, or
+reset parity.
+
+CP195 therefore keeps the existing
+`zone_temp_predictor_corrector_source_order.routine.manage_zone_air_updates`
+required and `source_mapped`, while the algorithm remains `scaffold` with
+`claim_level = none`. It adds no routine or project entry, EnergyPlus source
+inventory, Rust target, code, state, test, support, capability, output
+implementation, comparator, manifest, numerical, performance, or conformance
+promotion. Existing promoted MAT and related bounded output evidence remains
+adjacent result evidence, not dispatcher/lifecycle parity. The inventory stays
+at 32 algorithms and 203 routines, split 58 `state_mapped` plus 145
+`source_mapped`, with 82 required; the heat-balance project list stays 51.
+
+CP196 next maps `GetZoneAirSetPoints`, declared at
+`ZoneTempPredictorCorrector.hh` line 272 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 246-2174.
 
 ## Promotion Requirements
 
