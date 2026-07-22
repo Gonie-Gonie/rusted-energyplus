@@ -806,7 +806,7 @@ promotion.
 
 The next required predictor/corrector definition entry is
 `init_zone_air_set_points`, after `get_zone_air_set_points` and before
-`update_final_surface_heat_balance`. Its EnergyPlus boundary is the declaration
+`zone_space_heat_balance_begin_environment_init`. Its EnergyPlus boundary is the declaration
 at `ZoneTempPredictorCorrector.hh` line 274 and implementation at
 `ZoneTempPredictorCorrector.cc` lines 2350-2816. Required
 `ManageZoneAirUpdates` calls it at line 220 for every selector after optional
@@ -859,9 +859,51 @@ environment, verification, demand-limiting, failure, or source caller
 topology. CP199 remains `source_mapped` and required without new Rust state,
 support, output implementation, numerical, or conformance promotion.
 
+The following required predictor/corrector definition entry is
+`zone_space_heat_balance_begin_environment_init`, after
+`init_zone_air_set_points` and before `update_final_surface_heat_balance`.
+Its EnergyPlus boundary is
+`ZoneSpaceHeatBalanceData::beginEnvironmentInit(EnergyPlusData &state)`,
+declared at `ZoneTempPredictorCorrector.hh` line 213 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 2818-2836.
+
+CP199 calls the member only inside its begin-environment gate: every stored
+Zone record runs first, followed by every stored Space record only when current
+`doSpaceHeatBalance` is true. For each fixed index 0 through 3, CP200 zeros
+`ZTM` and `WPrevZoneTSTemp` while copying current `OutHumRat` into
+`WPrevZoneTS` and `DSWPrevZoneTS`. It next copies that humidity into
+`WTimeMinusP`, `W1`, `WMX`, and `WM2`, then zeros `airHumRatTemp`,
+`tempIndLoad`, `tempDepLoad`, `airRelHum`, `AirPowerCap`, and `T1`. These 26
+overwrites leave all unlisted record fields unchanged.
+
+All indexed targets are fixed four-element arrays. Outdoor humidity is copied
+without finite, sign, range, or consistency validation, so negative and
+nonfinite values propagate to the 12 humidity targets without a diagnostic.
+The helper owns no latch, allocation, checked access, child call, status,
+catch, cleanup, or rollback and has no ordinary catchable failure path for
+valid state. Repeating with unchanged outdoor humidity is overwrite-idempotent;
+only CP199's outer latch limits normal environment execution. A Space mode
+enabled after that latch clears in the same uninterrupted environment interval
+does not replay skipped Space records.
+
+No C++ unit test calls CP200 directly or asserts one of its targets. Fifty-six
+active full-simulation tests transitively exercise the Zone path; seven
+`SizingManager` tests reach sizing-Space and one `HeatBalanceAirManager` test
+reaches simulation-Space, but their assertions are downstream.
+
+Rust constructs only Zone run state with different three-slot histories. When
+weather data exists, it seeds current and averaged humidity plus both histories
+once from the first weather sample. That is not CP200's current-`OutHumRat`
+four-slot per-environment Zone/Space reset and touches a different field set.
+Rust has no Space record, exact 26-field boundary, or environment gate, and its
+coefficient representation is computed through a different initialization
+path. These adjacent histories and coefficients are not this member
+implementation. CP200 remains `source_mapped` and required without new Rust
+state, support, output implementation, numerical, or conformance promotion.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`init_zone_air_set_points`, preserving the completed predictor/corrector
-definition slice before
+`zone_space_heat_balance_begin_environment_init`, preserving the completed
+predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
 the implementation at lines 5176-5219. The routine always invokes seven
@@ -877,7 +919,8 @@ two-pass replay and do not promote state, support, or conformance.
 The next required inventory entry is `update_thermal_histories`, after
 `update_final_surface_heat_balance`; together with the existing preceding
 `manage_air_heat_balance` and nested `manage_zone_air_updates` /
-`get_zone_air_set_points` / `init_zone_air_set_points` entries, this
+`get_zone_air_set_points` / `init_zone_air_set_points` /
+`zone_space_heat_balance_begin_environment_init` entries, this
 preserves completion of the Air subtree before the Surface manager's final and
 history stages. The EnergyPlus parent calls the routine at lines 186-189 only
 when `AnyCTF || AnyEMPD`, and the canonical body spans lines 5221-5581. It owns

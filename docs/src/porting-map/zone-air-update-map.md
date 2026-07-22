@@ -21,6 +21,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | adaptive-comfort weather running averages | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::CalculateMonthlyRunningAverageDryBulb` | typed EPW parser and hourly dry-bulb series only | CP197 non-required source-mapped raw-file helper; no Rust rolling-average or adaptive-control parity |
 | adaptive-comfort setpoint schedule | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::CalculateAdaptiveComfortSetPointSchl` | none | CP198 non-required source-mapped strict ASH/CEN design-day and daily schedule writer; no Rust adaptive-control parity |
 | Zone setpoint runtime initialization | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::InitZoneAirSetPoints` | `init_zone_air_set_points_compat` identity closure only | CP199 required source-mapped one-time allocation/output, environment reset, validation, and demand-limiting transaction; no whole-routine Rust parity |
+| Zone/Space begin-environment history initialization | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::beginEnvironmentInit` | Zone-only run initialization and later bounded history state | CP200 required source-mapped 26-write four-slot environment reset; no exact Rust Zone/Space lifecycle parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -674,8 +675,8 @@ The source does not directly reset `setptLoAver` or `setptHiAver`,
 `TempControlTypeRpt`, comfort type/report/Fanger state, `Setback`,
 `CurDeadBandOrSetback`, or ZoneList/ZoneGroup load totals in this phase. CP200
 separately seeds its humidity histories from current outdoor humidity and
-zeros selected temperature/load fields; that child is the next source-order
-checkpoint rather than a CP199 implementation claim. `MyEnvrnFlag` becomes
+zeros selected temperature/load fields; CP200 maps that child separately
+below rather than treating it as a CP199 implementation claim. `MyEnvrnFlag` becomes
 false only after the complete reset. It is rearmed only on a call observing
 `BeginEnvrnFlag == false`.
 
@@ -769,9 +770,113 @@ promotion. The inventory becomes 32 algorithms and 207 routines, split 58
 `state_mapped` plus 149 `source_mapped`, with 84 required; the heat-balance
 project list becomes 53.
 
-CP200 next maps `ZoneSpaceHeatBalanceData::beginEnvironmentInit`, declared at
-`ZoneTempPredictorCorrector.hh` line 213 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 2818-2836.
+### CP200 `ZoneSpaceHeatBalanceData::beginEnvironmentInit` source map
+
+`ZoneSpaceHeatBalanceData::beginEnvironmentInit(EnergyPlusData &state)` is
+declared at `ZoneTempPredictorCorrector.hh` line 213 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 2818-2836. It is a shared member of the
+Zone and Space heat-balance record base and has no record identity, count,
+mode test, or latch of its own.
+
+The only two direct call expressions are inside CP199's
+`MyEnvrnFlag && BeginEnvrnFlag` block:
+
+1. lines 2623-2625 visit every stored `zoneHeatBalance` record;
+2. lines 2626-2630 then visit every stored `spaceHeatBalance` record only when
+   current `doSpaceHeatBalance` is true.
+
+The parent therefore completes all Zone calls before any Space call. The
+range loops follow stored vector elements rather than logical Zone or Space
+counts. CP195 can reach the parent from every update selector, while CP192 can
+reach it through external-HVAC initialization, but CP199's environment latch
+limits normal CP200 execution.
+
+CP200 performs this exact write sequence:
+
+| Sequence | Targets | Assigned value |
+|---|---|---|
+| for each `i = 0..3` | `ZTM[i]` | `0.0` |
+| same iteration | `WPrevZoneTS[i]` | current `OutHumRat` |
+| same iteration | `DSWPrevZoneTS[i]` | current `OutHumRat` |
+| same iteration | `WPrevZoneTSTemp[i]` | `0.0` |
+| after the loop | `WTimeMinusP`, `W1`, `WMX`, `WM2`, in that order | current `OutHumRat` |
+| final scalar tail | `airHumRatTemp`, `tempIndLoad`, `tempDepLoad`, `airRelHum`, `AirPowerCap`, `T1`, in that order | `0.0` |
+
+The total is 26 overwrites: 12 outdoor-humidity values and 14 zeros. No target
+value is read before replacement. In particular CP200 does not write
+`airHumRat`, `airHumRatAvg`, `airHumRatAvgComf`, MAT/MRT/ZT/XMAT/DSXMAT/TMX/TM2,
+the main temperature/load coefficients other than the listed load scalars, or
+any other unlisted `ZoneSpaceHeatBalanceData` field.
+
+`ZTM`, `WPrevZoneTS`, `DSWPrevZoneTS`, and `WPrevZoneTSTemp` are fixed
+`std::array<Real64, 4>` fields, so literal indices 0 through 3 have no dynamic
+shape dependency. `OutHumRat` is copied without arithmetic, finite/sign/range
+validation, clamp, or diagnostic. Negative, infinite, and quiet-NaN input
+therefore reaches every one of the 12 humidity targets. The source contains 12
+RHS uses, but a non-volatile scalar does not establish an observable physical
+load count; concurrent mutation would be a data race rather than a supported
+mixed snapshot.
+
+The helper is not marked `noexcept`, but valid-state execution contains no
+allocation, checked index, formatting, diagnostic, virtual child, or other
+ordinary catchable failure source. It returns no status and owns no catch,
+cleanup, or rollback. Null or dangling owner access is undefined behavior, not
+a modeled recoverable error path. A complete repeat with an unchanged stable
+`OutHumRat` is overwrite-idempotent; if outdoor humidity changes, the 12
+humidity targets become the last-call value.
+
+Only CP199 supplies lifecycle control. Its environment latch becomes false
+after every parent reset completes and is rearmed only by a later call that
+observes `BeginEnvrnFlag == false`. If Space heat balance is false at the first
+environment entry, CP200 skips all Space records and the parent still clears
+the latch; enabling Space later in the same uninterrupted true interval does
+not replay them. Predictor/corrector owner reconstruction discards the record
+vectors, and newly allocated records regain declaration defaults until CP200
+runs again.
+
+There are zero direct CP200 unit calls and zero direct assertions of its
+targets. The four direct CP199 fixture calls all keep `BeginEnvrnFlag` false
+and never enter CP200. Of 57 active `ManageSimulation` unit calls, the
+`EMSManager.unit.cc` line-1123 case exits in the preceding EMS callback; the
+other 56 transitively reach Zone CP200. Seven `SizingManager.unit.cc` cases
+also exercise sizing-Space state.
+`HeatBalanceAirManager_GetMixingAndCrossMixing` enables simulation-Space heat
+balance and calls `ManageSimulation` at line 864, so it exercises that Space
+path as well. Their assertions remain downstream or no-throw evidence rather
+than this reset contract.
+
+Rust has no CP200 function or environment-gated Zone/Space reset. Heat-balance
+construction creates Zone-only state with configurable three-element
+temperature histories and three-element humidity histories seeded from a
+fixed default. When a weather series exists,
+`seed_zone_air_humidity_ratios_from_weather_series` then overwrites current and
+averaged Zone humidity plus both three-slot histories once from the first
+weather sample. That seed touches fields CP200 retains and is not a
+per-environment member call.
+
+Rust has no exact four-slot `ZTM`, `WPrevZoneTS`, `DSWPrevZoneTS`, and
+`WPrevZoneTSTemp` set, Space heat-balance records, 26-field
+touched-versus-retained boundary, or outer environment gate. Its coefficient
+representation begins from a zero value but is computed again before
+initialization returns, rather than reproducing CP200's field-level reset.
+Later bounded predictor/corrector history and coefficient work does not
+establish CP200 parity.
+
+CP200 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.zone_space_heat_balance_begin_environment_init`
+immediately after `routine.init_zone_air_set_points`. The heat-balance project
+contract adds `zone_space_heat_balance_begin_environment_init` after
+`init_zone_air_set_points` and before `update_final_surface_heat_balance`. The
+algorithm remains a `scaffold` with `claim_level = none`. No EnergyPlus source
+inventory, Rust target, code, mapped state, support, capability, output
+implementation, comparator, manifest, numerical, performance, or conformance
+promotion is added. The inventory becomes 32 algorithms and 208 routines,
+split 58 `state_mapped` plus 150 `source_mapped`, with 85 required; the
+heat-balance project list becomes 54.
+
+CP201 next maps `ZoneSpaceHeatBalanceData::setUpOutputVars`, declared at
+`ZoneTempPredictorCorrector.hh` line 215 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 2838-2868.
 
 ## Promotion Requirements
 

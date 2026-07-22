@@ -77,6 +77,7 @@ required_routines = [
   "manage_zone_air_updates",
   "get_zone_air_set_points",
   "init_zone_air_set_points",
+  "zone_space_heat_balance_begin_environment_init",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",
