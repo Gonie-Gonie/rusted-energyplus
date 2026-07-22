@@ -669,6 +669,41 @@ HVAC dispatch, and has no full `ManageHVAC` topology. CP191 remains
 `source_mapped` and required without Rust state, support, output, numerical, or
 conformance promotion.
 
+The next required Air-subtree entry is `report_zone_mean_air_temp`, after
+`calc_heat_balance_air` and before `manage_zone_air_updates`. Its EnergyPlus
+boundary is `HeatBalanceAirManager.hh` line 85 and
+`HeatBalanceAirManager.cc` lines 4615-4687; `ManageAirHeatBalance` line 160 is
+its sole production caller and reaches it unconditionally after CP191 returns.
+
+On the first completely returned call, CP193 scans the actual output-request
+vector and numeric EMS sensor range for exact Zone or Space Wetbulb Globe
+Temperature names. Stored empty Output:Variable keys fan out over the declared
+Zone or, when Space simulation is active, Space count; nonempty keys use
+literal name lookup. EMS keys are not uppercased here. Matches only set
+`ReportWBGT` true, and the one-time latch clears after both scans. Every call
+then visits Zones by `NumOfZones` and active Spaces by each Zone's stored
+`spaceIndexes`, invoking the next source routine `calcMeanAirTemps` with the
+owning Zone number for both Zone and Space operative-control metadata.
+
+The child refreshes the ordinary mean-temperature, humidity, operative, and
+dew-point fields, while thermostat-operative and WBGT values update only under
+their own guards and otherwise remain retained. CP193 directly emits no output
+stream and validates none of its counts, vectors, memberships, or report
+arenas. A discovery non-return leaves a true-flag prefix and the latch true; a
+later non-return leaves the latch false plus a completed Zone/Space and child
+write prefix. Its report arrays, averaged inputs, requests, sensors, controls,
+pressure, and scan latch have separate owners, so clean replay requires
+coordinated reset and reconstruction.
+
+No C++ unit test calls CP193 or its child directly or targets the WBGT discovery
+fields. Rust's `report_zone_mean_air_temp_compat` is only an identity closure
+around one bounded Zone MAT sample during run-period aggregation. Separate MAT
+and humidity series plus a CLI trace label do not implement the one-time
+request/EMS scan, Space traversal, report bundle, operative/dew-point/WBGT
+work, failure lifecycle, or source call topology. CP193 remains `source_mapped`
+and required without Rust state, support, output implementation, numerical, or
+conformance promotion.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `manage_zone_air_updates`, preserving the completion of the Air subtree before
 the Surface manager's final update. Its EnergyPlus boundary is the
