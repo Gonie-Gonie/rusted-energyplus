@@ -608,6 +608,37 @@ state, or demand-manager resimulation path. CP189 therefore remains
 `source_mapped` and required without Rust state, support, output, numerical, or
 conformance promotion.
 
+The following required Air-subtree entry is
+`init_simple_mixing_convective_heat_gains`, after `init_air_heat_balance` and
+before `manage_zone_air_updates`. Its EnergyPlus boundary is
+`HeatBalanceAirManager.hh` line 79 and `HeatBalanceAirManager.cc` lines
+4509-4588; CP189 line 4506 is its sole production call. `AirFlowFlag = false`
+preserves all targets. A true flag orders actual-vector Mixing schedule and
+object-EMS refresh with a saved baseline, optional mass-conservation fraction
+rebuild, actual-vector CrossMixing refresh without a saved baseline, and
+Zone-indexed refrigeration-door zero/EMS initialization.
+
+The fraction phase deliberately ignores each Zone's receiving pointers. It
+uses that record's count `N` to zero fractions and normalize the global raw
+`Mixing(1..N).DesignLevel` prefix only when its sum is strictly positive;
+scheduled or EMS-overridden flow does not participate. `TotMixing` and
+`TotCrossMixing` do not control their vector traversals, while
+`TotRefDoorMixing` is only a positive gate. CP190 performs no infiltration,
+ventilation, physical door-flow, heat-gain, allocation, validation,
+diagnostic, output, or rollback work. Failures can retain an ordered prefix,
+and repeat refreshes reached state while false or shortened gates preserve
+untouched values.
+
+Four direct calls in two fixtures cover only fraction no-op/zero/positive
+cases and downstream CrossMixing effects. Mixing desired/saved values,
+schedule and object EMS behavior, count/vector mismatches, the pointer quirk,
+nonfinite arithmetic, every refrigeration-door branch, failure, repeat,
+resimulation, and reset remain untested. Rust has no CP190 alias, typed simple
+mixing records, fraction topology, or door state; the CP189 closure is empty,
+`sum_mcp*` remains producerless here, and AirBoundary SimpleMixing metadata is
+run-blocked. CP190 remains `source_mapped` and required without Rust state,
+support, output, numerical, or conformance promotion.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `manage_zone_air_updates`, preserving the completion of the Air subtree before
 the Surface manager's final update. Its EnergyPlus boundary is the
