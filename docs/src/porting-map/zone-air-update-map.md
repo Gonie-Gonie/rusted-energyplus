@@ -20,6 +20,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | Zone setpoint and control input | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::GetZoneAirSetPoints` | bounded compiler thermostat/humidistat subset; `get_zone_air_set_points_compat` identity closure | CP196 required source-mapped 16-family transaction; no whole-routine Rust parity |
 | adaptive-comfort weather running averages | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::CalculateMonthlyRunningAverageDryBulb` | typed EPW parser and hourly dry-bulb series only | CP197 non-required source-mapped raw-file helper; no Rust rolling-average or adaptive-control parity |
 | adaptive-comfort setpoint schedule | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::CalculateAdaptiveComfortSetPointSchl` | none | CP198 non-required source-mapped strict ASH/CEN design-day and daily schedule writer; no Rust adaptive-control parity |
+| Zone setpoint runtime initialization | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::InitZoneAirSetPoints` | `init_zone_air_set_points_compat` identity closure only | CP199 required source-mapped one-time allocation/output, environment reset, validation, and demand-limiting transaction; no whole-routine Rust parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -575,9 +576,202 @@ promotion. The inventory becomes 32 algorithms and 206 routines, split 58
 `state_mapped` plus 148 `source_mapped`, with 83 required; the heat-balance
 project list remains 52.
 
-CP199 next maps `InitZoneAirSetPoints`, declared at
+### CP199 `InitZoneAirSetPoints` source map
+
+`InitZoneAirSetPoints(EnergyPlusData &state)` is declared at
 `ZoneTempPredictorCorrector.hh` line 274 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 2350-2816.
+`ZoneTempPredictorCorrector.cc` lines 2350-2816. It returns `void` and combines
+one-time allocation and output binding, environment/day lifecycle, controlled
+Zone verification, demand-limit mutation, and fatal handling without a status
+argument, catch, cleanup, rollback, or transaction.
+
+The body preserves these source-ordered phases:
+
+| Ordered phase | Source lines | Principal work and commit |
+|---|---|---|
+| aliases and counts | 2367-2376 | binds predictor/corrector and HeatBalFanSys state plus the current Zone count |
+| one-time arrays and outputs | 2378-2618 | allocates/dimensions cross-owner state, warning-checks surface reference-air consistency, registers output bundles, then clears `InitZoneAirSetPointsOneTimeFlag` |
+| begin-environment reset | 2622-2665 | resets selected Zone/Space heat-balance, setpoint, demand, deadband, return-air, and hybrid state, then clears `MyEnvrnFlag` |
+| environment rearm | 2668-2670 | sets `MyEnvrnFlag` true whenever `BeginEnvrnFlag` is false |
+| begin-day latch | 2672-2679 | toggles `MyDayFlag` without initializing any other data |
+| ordinary temperature controls | 2681-2741 | optionally verifies equipment configuration and applies strict demand clamps |
+| comfort controls | 2743-2807 | optionally verifies configuration and applies inclusive demand clamps after the ordinary loop |
+| sticky fatal and checked tail | 2809-2815 | fatals on retained `ErrorsFound`; otherwise marks controls checked when equipment input is ready |
+
+There are two literal production call occurrences. CP195
+`ManageZoneAirUpdates` line 220 invokes CP199 unconditionally after its
+optional CP196 input/latch phase and before every update-type dispatch.
+HVACManager therefore reaches CP199 on Get, Predict, Correct, shortened-step
+Predict/Correct/PushSystem repeats, and final PushZone calls. DemandManager
+updates thermostat demand flags after the first HVAC simulation pass, so the
+following Correct call can be the first CP199 entry that applies those clamps.
+
+CP192 `initializeForExternalHVACManager` line 4612 is the other caller. It
+jumps directly to CP199 when an external callback exists and the separate
+global initialized flag is false; it does not acquire Zone setpoint input
+first. The external initializer also does not set that global flag, so CP199
+can be called before each callback while its own completed one-time phase
+remains suppressed. CP199 does not reconcile later changes in Zone/control
+counts after that one-time commit.
+
+The default-true one-time block first allocates or dimensions:
+
+- one `ZoneTstatSetpt` per Zone;
+- `LoadCorrectionFactor` at zero, ordinary control type at Uncontrolled, and
+  ordinary control report at zero;
+- comfort control type/report and Fanger records only when at least one comfort
+  Zone is already declared;
+- `Setback`, `DeadBandOrSetback`, and `CurDeadBandOrSetback` at false;
+- four zero ZoneList and four zero ZoneGroup sensible heat/cool energy/rate
+  arrays;
+- six zero previous measured temperature/humidity arrays for hybrid modeling;
+- Zone sensible and moisture demand objects; and
+- Space sensible and moisture demand objects when either Space heat-balance
+  simulation or sizing is active.
+
+For each Zone, the routine walks stored Space membership and each Space's
+inclusive heat-transfer-surface range. The first reached surface chooses a
+reference-air type; every later mismatch emits the source warning, including
+repeated mismatches, but does not set `ErrorsFound`. A Zone with no reached
+surface emits nothing.
+
+Output setup then preserves several distinct boundaries:
+
+- `ZoneSpaceHeatBalanceData::setUpOutputVars` registers four heat-balance
+  variables for every Zone and, only during Space simulation, every stored
+  Space.
+- Each Zone sensible-demand child registers ten variables plus one when staged;
+  each moisture child registers six plus six more under `DoLatentSizing`.
+  Space simulation registers the same bundles for Spaces.
+- Sensible heating/cooling energy meters attach to Zones when Space simulation
+  is off and to Spaces when it is on.
+- CP199 directly registers six Zone values: thermostat air temperature,
+  control type, heating setpoint, cooling setpoint, adaptive-comfort setpoint,
+  and load correction factor.
+- It adds three variables per comfort-control entry and four each per ZoneList
+  and ZoneGroup.
+
+The staged flag is read from `StageZoneLogic` only when that array is
+allocated. Zone and Space names, multipliers, membership, demand and
+heat-balance arenas, surface ranges/reference types, and OutputProcessor state
+are trusted without local shape or consistency validation. Only after every
+allocation, warning scan, child setup, and direct registration returns does
+line 2618 clear the one-time latch.
+
+When `MyEnvrnFlag && BeginEnvrnFlag` is true, CP199 calls CP200
+`ZoneSpaceHeatBalanceData::beginEnvironmentInit` for every Zone heat-balance
+record and, under current `doSpaceHeatBalance`, every Space record. It then:
+
+- zeros `setpt`, `setptAdapComfortCool`, `setptLo`, and `setptHi`;
+- sets every load correction factor to one and ordinary control type to
+  Uncontrolled;
+- invokes begin-environment helpers for all Zone demand records and current
+  active-Space demand records;
+- clears `DeadBandOrSetback` and every Zone's `NoHeatToReturnAir`; and
+- zeros all six hybrid measured-history arrays.
+
+The source does not directly reset `setptLoAver` or `setptHiAver`,
+`TempControlTypeRpt`, comfort type/report/Fanger state, `Setback`,
+`CurDeadBandOrSetback`, or ZoneList/ZoneGroup load totals in this phase. CP200
+separately seeds its humidity histories from current outdoor humidity and
+zeros selected temperature/load fields; that child is the next source-order
+checkpoint rather than a CP199 implementation claim. `MyEnvrnFlag` becomes
+false only after the complete reset. It is rearmed only on a call observing
+`BeginEnvrnFlag == false`.
+
+The begin-day phase has no data initialization. A true `MyDayFlag` with
+`BeginDayFlag` true only clears the latch, and any call with the global flag
+false rearms it.
+
+After lifecycle work, CP199 loops all ordinary temperature-control entries and
+then all comfort-control entries. If Zone-equipment input is filled and
+`ControlledZonesChecked` is false, it calls
+`VerifyControlledZoneForThermostat`, which performs a Zone-name lookup in
+`ZoneEquipConfig`. A missing match emits one Severe and one Continue diagnostic
+per reached entry and sets the persistent `ErrorsFound` true. Verification is
+deferred while equipment input is not ready.
+
+Demand limiting is independent of that verification condition and uses each
+record's unchecked `ActualZoneNum`. Each family switch is reached only when
+that control record's `ManageDemand` is true:
+
+| Control family and selector | Trigger | Reached writes |
+|---|---|---|
+| ordinary SingleHeat | `setpt > HeatingResetLimit` | `setptLo = setpt = HeatingResetLimit` |
+| ordinary SingleCool | `setpt < CoolingResetLimit` | `setptHi = setpt = CoolingResetLimit` |
+| ordinary SingleHeatCool | `setpt > HeatingResetLimit || setpt < CoolingResetLimit` | ordinary type/report become Dual, low/high seed from `setpt`, then strict low/high clamps |
+| ordinary DualHeatCool | independent `setptLo > HeatingResetLimit` and `setptHi < CoolingResetLimit` | only reached low/high clamps; type/report are retained |
+| comfort SingleHeat | `setpt >= HeatingResetLimit` | low/current setpoint clamp plus ordinary type/report SingleHeat |
+| comfort SingleCool | `setpt <= CoolingResetLimit` | high/current setpoint clamp plus ordinary type/report SingleCool |
+| comfort SingleHeatCool | `setpt >= HeatingResetLimit || setpt <= CoolingResetLimit` | ordinary type/report become Dual, low/high seed from `setpt`, then inclusive low/high clamps |
+| comfort DualHeatCool | always enters selector body; clamps use inclusive low/high tests | ordinary type/report always become Dual plus any reached clamps |
+| either default selector | none | no write |
+
+The routine performs no local finite-value, reset-limit-order, enum, index, or
+array-shape validation. NaN comparisons are false. Because the comfort loop
+runs second, a Zone represented in both families can finish with comfort-loop
+ordinary type/report and setpoint writes.
+
+After both loops, any retained `ErrorsFound` causes the fatal at lines
+2809-2811. This member defaults false, is written only by CP199, and is never
+cleared at entry, environment boundaries, or successful paths. Demand clamps
+and all earlier one-time/environment effects therefore precede the fatal.
+Only normal passage beyond it can set `ControlledZonesChecked = true` when
+Zone-equipment input is filled. With a missing configuration, the checked flag
+stays false; a caught same-state retry can repeat diagnostics and clamps before
+the sticky fatal.
+
+Failure location controls retry behavior. A non-return before line 2618 can
+leave allocation or output-registration prefixes while the one-time latch
+remains true, so retry attempts that phase again. A later failure skips a
+successfully committed one-time phase. A begin-environment non-return before
+line 2665 retains its latch true and can repeat a partial reset. There is no
+rollback. Predictor/corrector placement-new restores its five local flags to
+true/true/true/false/false, but HeatBalFanSys, ZoneEnergyDemand, HeatBalance,
+ZoneControls, ZoneEquipment, Surface, environment, and OutputProcessor owners
+hold the arrays, inputs, histories, and registrations, so clean replay requires
+coordinated reset.
+
+Exactly four C++ unit calls invoke CP199 directly:
+`HVACUnitaryBypassVAV.unit.cc` lines 659 and 1668 and
+`SystemReports.unit.cc` lines 204 and 365. All four use it only as fixture
+setup with begin-environment, comfort/demand, and controlled-Zone validation
+inactive; none asserts a CP199 field, output registration, or latch. Exactly
+56 active `ManageSimulation` unit tests reach CP199 transitively and assert only
+downstream or no-throw outcomes; `EMSManager.unit.cc` line 1123 terminates
+in the preceding EMS call and does not reach CP199. No focused test covers
+reference-air warnings, staged or
+Space outputs, environment omissions, begin-day behavior, ordinary/comfort
+selector boundaries, sticky fatal, external-HVAC ordering, partial effects,
+retry, or reset.
+
+Rust defines `init_zone_air_set_points_compat` only as an identity closure.
+Its sole live use manually nests Get -> Init -> empty Calc inside the Predict
+shell; its Correct shell omits Init, unlike CP195's selector-independent source
+call. Rust separately exposes the exact heating and cooling thermostat output
+names by repeating the first DualSetpoint's constant schedules into CLI
+`ObservedSeries`. Its `ZoneSysEnergyDemand` is a limited Copy snapshot holding
+a Zone ID and four demand values and is reconstructed by bounded IdealLoads
+paths. Neither adjacency provides CP199's allocations, sequenced demand state,
+environment reset, output registration/time-step/store/meter contract,
+verification, demand-limit mutations, flags, failure semantics, or callers.
+
+CP199 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.init_zone_air_set_points`
+immediately after `routine.calculate_adaptive_comfort_set_point_schl`. The
+heat-balance project contract adds `init_zone_air_set_points` after
+`get_zone_air_set_points` and before `update_final_surface_heat_balance`
+because required CP195 calls it for every selector. The algorithm remains a
+`scaffold` with `claim_level = none`. This checkpoint adds no EnergyPlus source
+inventory, Rust target, code, mapped state, support, capability, output
+implementation, comparator, manifest, numerical, performance, or conformance
+promotion. The inventory becomes 32 algorithms and 207 routines, split 58
+`state_mapped` plus 149 `source_mapped`, with 84 required; the heat-balance
+project list becomes 53.
+
+CP200 next maps `ZoneSpaceHeatBalanceData::beginEnvironmentInit`, declared at
+`ZoneTempPredictorCorrector.hh` line 213 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 2818-2836.
 
 ## Promotion Requirements
 

@@ -765,7 +765,7 @@ implementation, numerical, or conformance promotion.
 
 The predictor/corrector definition inventory now adds required
 `get_zone_air_set_points` immediately after `manage_zone_air_updates` and
-before `update_final_surface_heat_balance`. Its EnergyPlus boundary is the
+before `init_zone_air_set_points`. Its EnergyPlus boundary is the
 declaration at `ZoneTempPredictorCorrector.hh` line 272 and the single
 fall-through implementation at `ZoneTempPredictorCorrector.cc` lines
 246-2174.
@@ -804,8 +804,63 @@ implement CP196. The routine remains `source_mapped` and required without a
 new Rust target, mapped state, support, output, numerical, or conformance
 promotion.
 
+The next required predictor/corrector definition entry is
+`init_zone_air_set_points`, after `get_zone_air_set_points` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is the declaration
+at `ZoneTempPredictorCorrector.hh` line 274 and implementation at
+`ZoneTempPredictorCorrector.cc` lines 2350-2816. Required
+`ManageZoneAirUpdates` calls it at line 220 for every selector after optional
+input acquisition and before dispatch. The external-HVAC initializer also
+calls it directly at `HeatBalanceAirManager.cc` line 4612 without that input
+prefix.
+
+The default-true one-time block sizes thermostat/control/report, optional
+comfort/Fanger, deadband/setback, ZoneList/ZoneGroup, hybrid-history, and Zone
+plus conditional Space demand state. It warning-checks each Zone's surface
+reference-air consistency, registers Zone/Space heat-balance and
+sensible/moisture demand bundles, direct thermostat/correction, comfort,
+ZoneList, and ZoneGroup outputs, and clears its latch only after every setup
+returns. Output identities, staged/latent branches, meter attachment,
+multipliers, Space membership, surface ranges, and cross-owner array shape are
+trusted source dependencies.
+
+The begin-environment gate invokes the following
+`ZoneSpaceHeatBalanceData::beginEnvironmentInit` child for all Zones and active
+Spaces, resets four current thermostat setpoints, load correction, ordinary
+control type, demand helpers, `DeadBandOrSetback`, `NoHeatToReturnAir`, and
+hybrid histories, then clears its latch. It does not directly reset averaged
+setpoints, ordinary control report, comfort state, `Setback`,
+`CurDeadBandOrSetback`, or ZoneList/ZoneGroup totals. The begin-day phase
+changes only its own latch.
+
+Every call then verifies ordinary temperature controls followed by comfort
+controls once Zone-equipment input is ready, and independently applies
+demand-limit setpoint changes. Ordinary branches use strict `>`/`<`
+comparisons; comfort branches use inclusive `>=`/`<=` comparisons and can
+rewrite the ordinary control type/report after the ordinary loop. Missing Zone
+equipment configuration sets a routine-owned sticky error after Severe and
+Continue diagnostics. Its fatal follows both loops and all reached clamp
+writes, while `ControlledZonesChecked` is committed only after that fatal point
+on normal input-filled return.
+
+A failure can therefore retain allocation/output, environment-reset,
+diagnostic, or demand-clamp prefixes with different one-time/environment latch
+states. `ErrorsFound` is never cleared locally, and no catch, cleanup, rollback,
+or safe isolated retry exists. Clean replay spans predictor/corrector,
+HeatBalFanSys, ZoneEnergyDemand, HeatBalance, ZoneControls, ZoneEquipment,
+Surface, environment, and OutputProcessor owners.
+
+Four direct C++ calls use the routine only as setup and assert none of these
+states or latches. Rust's `init_zone_air_set_points_compat` passes one closure
+through only in its Predict scaffold; the Correct shell omits it. Separately
+constructed constant-DualSetpoint heating/cooling output series and limited
+`ZoneSysEnergyDemand` snapshots do not implement this allocation, registration,
+environment, verification, demand-limiting, failure, or source caller
+topology. CP199 remains `source_mapped` and required without new Rust state,
+support, output implementation, numerical, or conformance promotion.
+
 The inventory now also includes `update_final_surface_heat_balance` after
-`get_zone_air_set_points`, preserving the completed predictor/corrector
+`init_zone_air_set_points`, preserving the completed predictor/corrector
 definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
@@ -822,7 +877,7 @@ two-pass replay and do not promote state, support, or conformance.
 The next required inventory entry is `update_thermal_histories`, after
 `update_final_surface_heat_balance`; together with the existing preceding
 `manage_air_heat_balance` and nested `manage_zone_air_updates` /
-`get_zone_air_set_points` entries, this
+`get_zone_air_set_points` / `init_zone_air_set_points` entries, this
 preserves completion of the Air subtree before the Surface manager's final and
 history stages. The EnergyPlus parent calls the routine at lines 186-189 only
 when `AnyCTF || AnyEMPD`, and the canonical body spans lines 5221-5581. It owns
