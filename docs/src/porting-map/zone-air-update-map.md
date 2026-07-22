@@ -32,6 +32,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | Zone/Space Zone-timestep history dispatch | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::PushZoneTimestepHistories` | `push_zone_timestep_histories_compat` identity closure around an earlier three-slot Zone-only shift and predictor work | CP208 required source-mapped Zone-first and aggregate-flag Space dispatch; no exact Rust timing, topology, or record-child parity |
 | Zone/Space record-level Zone-timestep history commit | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::pushZoneTimestepHistory` | adjacent inline three-slot Zone-only temperature/humidity shift | CP209 required source-mapped four-slot record, psychrometric, non-ThirdOrder, and Zone-only RoomAir/AFN transaction; no exact Rust record or lifecycle parity |
 | Zone/Space system-timestep history dispatch | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::PushSystemTimestepHistories` | per-Zone named compat synchronization and adaptive local-history loop | CP210 required source-mapped strict fine-step global Zone-first/Space dispatch; no exact Rust gate, cadence, topology, or record-child parity |
+| Zone/Space record-level system-timestep history commit | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::pushSystemTimestepHistory` | no singular helper; nearest paths rebuild or locally shift three-slot Zone histories | CP211 required source-mapped four-slot record commit plus conditional RoomAir/AFN and non-ThirdOrder state; no exact Rust record, Space, cadence, or auxiliary-state parity |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -2926,11 +2927,196 @@ numerical, performance, or conformance promotion is added. The inventory
 becomes 32 algorithms and 218 routines, split 58 `state_mapped` plus 160
 `source_mapped`, with 95 required; the heat-balance project list becomes 64.
 
-CP211 next maps
+### CP211 `ZoneSpaceHeatBalanceData::pushSystemTimestepHistory` source map
+
 `ZoneSpaceHeatBalanceData::pushSystemTimestepHistory(EnergyPlusData &state,
-int zoneNum, int spaceNum = 0)`, declared at
+int zoneNum, int spaceNum = 0)` is declared at
 `ZoneTempPredictorCorrector.hh` line 247 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 4297-4370.
+`ZoneTempPredictorCorrector.cc` lines 4297-4370. Its only production call
+expressions are the CP210 Zone child at line 4288 with default zero Space
+identity and the stored-Space child at line 4291 with both identities. CP210
+owns Zone-first traversal, the current aggregate `doSpaceHeatBalance` gate,
+stored membership order, and dynamic multiplicity; CP211 does not inspect that
+flag or discover records independently.
+
+#### Common record history transaction
+
+After a debug-only `assert(zoneNum > 0)`, CP211 loops
+`iHistory = 3, 2, 1`. At each index it first copies
+`DSXMAT[iHistory - 1]` to `DSXMAT[iHistory]`, then copies
+`DSWPrevZoneTS[iHistory - 1]` to `DSWPrevZoneTS[iHistory]`. It next writes
+`DSXMAT[0] = MAT` and `DSWPrevZoneTS[0] = airHumRat`. The resulting arrays
+are `[current, old0, old1, old2]` and the old slot three is discarded.
+
+This common prefix runs for every reached Zone and Space and every solution
+algorithm. It copies finite, infinite, or NaN values verbatim and performs no
+psychrometric call or caller-side finite/range repair. It does not modify
+`MAT`, `airHumRat`, `ZT`, `XMAT`, `WPrevZoneTS`, Zone-timestep averages,
+relative humidity, or diagnostic state.
+
+#### Exact-Zone RoomAir and non-ThirdOrder stages
+
+The first RoomAir stage requires both exact `spaceNum == 0` and the global
+`anyNonMixingRoomAirModel` flag. A positive Space or malformed negative Space
+identity short-circuits this entire stage.
+
+When `IsZoneDispVent3Node(zoneNum) || IsZoneUFAD(zoneNum)` is true, CP211
+processes Floor, occupied, then mixed levels. Each four-slot
+`DSXMATFloor`, `DSXMATOC`, or `DSXMATMX` history shifts downward and slot
+zero receives current `MATFloor`, `MATOC`, or `MATMX`. Independently, when
+the exact per-Zone AirModel enum is `AirflowNetwork`, CP211 visits every
+stored node in container order, shifts its four-slot `AirTempDSX` and inserts
+`AirTemp`, then shifts `HumRatDSX` and inserts `HumRat`. The stratified
+predicates and AFN enum are separate tests, so malformed inconsistent state can
+run both. There is no `SimAirModel` check, and a false global nonmixing flag
+suppresses both even if the per-Zone state says otherwise.
+
+Every `ZoneAirSolutionAlgo` value other than exact `ThirdOrder` enters the
+final stage, including `Analytical`, `Euler`, source `Invalid`/`Num`, or an
+unmatched stored value. Every reached Zone or Space record receives these
+ordered writes:
+
+1. `TM2 =` old `TMX`;
+2. `TMX = MAT`;
+3. `WM2 =` old `WMX`;
+4. `WMX = airHumRatTemp`.
+
+Thus the common humidity history inserts `airHumRat` while the non-ThirdOrder
+scalar history deliberately reads the distinct temporary
+`airHumRatTemp`.
+
+For exact Zone identity, exact `DispVent3Node`, `UFADInt`, or `UFADExt`
+then advances Floor, occupied, and mixed `ZoneM2*` from old `ZoneMX*` and
+`ZoneMX*` from current `ZT*`. Exact `AirflowNetwork` advances each indexed
+node's `AirTempT2/AirTempTX` and then `HumRatT2/HumRatTX` pairs. This final
+AFN loop trusts `NumOfAirNodes` and indexes
+`Node(1..NumOfAirNodes)`, unlike the earlier range-based pass over the stored
+container; a count/container mismatch can skip stored nodes or index beyond
+them. It does not test the global nonmixing flag.
+
+Exact ThirdOrder skips this entire final stage but still receives the common
+record shifts and any applicable first RoomAir/AFN four-slot work. A Space
+receives common and non-ThirdOrder record writes but skips both shared RoomAir
+blocks.
+
+#### Validation, failure, retry, and reset
+
+The positive-Zone assertion can compile out. CP211 has no Zone upper-bound,
+Space sign or upper-bound, membership, record-kind, arena-shape, allocation,
+RoomAir topology, AFN count/container consistency, solution-enum, or finite
+validation. The caller selects `this` before entry and `spaceNum` is only an
+exact-zero classifier, so malformed direct calls can apply Zone RoomAir
+semantics to a Space record, suppress them for a Zone record, or run common and
+non-ThirdOrder writes with a negative Space identity.
+
+CP211 is void and has no local diagnostic, status, latch, catch, cleanup,
+transaction, or rollback. Assertion failure precedes mutation. An abnormal
+non-return in the first RoomAir stage retains the complete common record prefix
+and can retain partial Floor/occupied/mixed or AFN-node histories. A later
+non-ThirdOrder RoomAir/AFN failure occurs after all four record scalar writes.
+CP210 then cannot reach later Spaces or Zones, and the parent cannot reach the
+following contaminant push, `PreviousTimeStep` commit, or current-step average
+accumulation.
+
+Same-state retry advances completed `DSXMAT`, `DSWPrevZoneTS`, and applicable
+RoomAir/AFN four-slot histories again, discarding another oldest value.
+Non-ThirdOrder retry also advances already-mutated `TM2/TMX`, `WM2/WMX`, and
+applicable RoomAir/AFN two-slot state again. The following CP212 Zone-timestep
+revert changes Zone-timestep histories, not CP211 downstepped histories or
+scalar/shared state. Clean replay therefore requires coordinated Zone/Space
+record, RoomAir/AFN, topology/count, solution, HVAC-clock, caller, dependency,
+and diagnostic restoration.
+
+#### C++ test and oracle boundary
+
+The C++ unit tree contains zero direct CP211 calls, zero direct CP210 calls,
+zero uses of the PushSystem selector, and zero test-side
+`ManageZoneAirUpdates` or `ManageHVAC` calls. No assertion names a CP211
+destination. No failure, partial-prefix, retry, or reset test exists.
+
+Of 57 active `ManageSimulation` call expressions, one expected EMS fatal stops
+before CP211 and one has zero Zones. The other 55 configurations bound actual
+CP211-entering configurations at zero to 55 because no test observes the
+adaptive gate. If one CP210 pass were selected for each, their conditional
+one-pass potential is 105 record identities:
+
+- 74 Zone plus 21 Space records use ThirdOrder, for 95 total;
+- seven Zone plus three Space records use Analytical, for ten total;
+- zero records use Euler.
+
+The common record path therefore has 105 potential identities and the
+non-ThirdOrder scalar path has ten, but these are not observed calls. All 81
+Zones are Mixing and 24 Spaces skip shared RoomAir, so the stratified and AFN
+destinations have zero corpus potential.
+
+The tracked one-Zone family has eight members over seven unique inputs. Six use
+`Timestep,4` and the varied fixture uses six, but none declares
+`ConvergenceLimits`, an explicit Zone-air algorithm, Space, RoomAir, or AFN.
+The varied fixture is planned-not-claimed with no gate. Shared oracle outputs
+are hourly downstream variables and expose no system-history slot or push
+count, so they do not prove CP211.
+
+#### Rust boundary
+
+Rust has zero singular `push_system_timestep_history` definitions, calls, or
+tests. Its only named boundary is the CP210 plural source-order/compat identity
+pair. The source-order wrapper has no external production call; the compat
+wrapper contains its only source-order call.
+
+Production has three lexical compat sites. The feature-disabled site is
+exclusive with the adaptive helper; with adaptive correction enabled, each
+Zone independently chooses the count-one or count-greater-than-one site, so
+both adaptive sites can run in one multi-Zone timestep. Exactly one compat site
+executes per Zone.
+
+The nearest record helper, `synchronize_single_system_timestep_history`, is
+called only by the count-one and feature-disabled sites. It rebuilds three
+temperature and humidity slots as
+`[current, zone_history[0], zone_history[1]]`, discards the prior system
+history, and sets a project-specific count to one. Both paths can run at a full
+Zone step where source CP210 and CP211 are absent.
+
+For adaptive count greater than one, Rust optionally initializes local
+three-slot arrays by interpolation, then after each Zone-local correction
+shifts them inline as `[current, local_old0, local_old1]`. Those CP211-like
+assignments bypass the named wrapper. Only after all local substeps does the
+plural wrapper commit the final arrays together with averages, count, and
+report fields. Source instead calls CP211 after each global fine-step Correct
+for all eligible Zones and Spaces before the next fine step.
+
+Rust heat-balance state has only Zone and Surface arenas and three-slot Zone
+temperature/humidity histories. It has no Space heat-balance record,
+`spaceIndexes` traversal, aggregate flag, fourth slot, singular child,
+`airHumRatTemp` distinction, `TM2/TMX/WM2/WMX`, stratified RoomAir, or AFN
+node histories. Its boolean ThirdOrder-versus-approximate-Analytical choice is
+not passed to either system-history helper, and there is no Euler or source
+non-ThirdOrder CP211 history branch.
+
+One direct source-order-wrapper test checks only a label and larger call order.
+The compat wrapper and PushSystem selector dispatch have zero direct tests. One
+focused count-one test indirectly reaches the helper, seeds nonuniform prior
+system histories, and proves Rust discards them in favor of current plus Zone
+history; it therefore proves divergence from, not parity with, the source
+shift. There is no adaptive-count-greater-than-one final-commit test,
+solution-branch test, Space/RoomAir/AFN test, or fourth-slot assertion. A pure
+three-slot interpolation test does not compose CP211.
+
+CP211 adds required `source_mapped`
+`zone_temp_predictor_corrector_source_order.routine.zone_space_heat_balance_push_system_timestep_history`
+immediately after `routine.push_system_timestep_histories`. The heat-balance
+project contract adds
+`zone_space_heat_balance_push_system_timestep_history` after
+`push_system_timestep_histories` and before
+`update_final_surface_heat_balance`. The algorithm remains a `scaffold` with
+`claim_level = none`. No EnergyPlus source inventory, Rust target, code, mapped
+state, test, support, capability, output implementation, comparator, manifest,
+numerical, performance, or conformance promotion is added. The inventory
+becomes 32 algorithms and 219 routines, split 58 `state_mapped` plus 161
+`source_mapped`, with 96 required; the heat-balance project list becomes 65.
+
+CP212 next maps `RevertZoneTimestepHistories(EnergyPlusData &state)`, declared
+at `ZoneTempPredictorCorrector.hh` line 297 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 4372-4389.
 
 ## Promotion Requirements
 
