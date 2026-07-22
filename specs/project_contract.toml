@@ -66,6 +66,7 @@ required_routines = [
   "manage_air_heat_balance",
   "get_air_heat_balance_input",
   "get_air_flow_flag",
+  "set_zone_mass_conservation_flag",
   "manage_zone_air_updates",
   "update_final_surface_heat_balance",
   "update_thermal_histories",

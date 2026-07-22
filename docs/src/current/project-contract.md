@@ -483,6 +483,31 @@ EIO. AirBoundary metadata remains run-blocked and Ideal Loads outdoor air is
 a separate subsystem. The routine remains `source_mapped` and required
 without support or conformance promotion.
 
+The following required Air-subtree entry is
+`set_zone_mass_conservation_flag`, after `get_air_flow_flag` and before
+`manage_zone_air_updates`. Its source boundary is
+`HeatBalanceAirManager.hh` line 71 and `HeatBalanceAirManager.cc` lines
+216-233; CP184 calls it unconditionally at line 181 after CP185 returns and
+before room-air input. A false mass-balance-enforcement control or exact
+`NoAdjustReturnAndMixing` mode writes nothing. Otherwise the routine visits
+only `ZoneMixing` records and sets each receiving Zone flag true before its
+source Zone flag, never clearing a prior value or considering cross-mixing,
+AirBoundary, refrigeration-door, infiltration, or ventilation records.
+
+The flags begin false after normal heat-balance allocation and feed the
+Zone mass-balance solver plus adjusted `CalcAirFlowSimple` mixing branches.
+The routine owns no validation, error status, diagnostic, output, reset, or
+rollback. In direct or externally mutated state, a malformed source endpoint
+can retain the current receiving write, while repeated or disabled topology
+can preserve stale true flags until the separate fan-system owner is cleared
+and reallocated. Seven
+direct fixtures call it, but none directly asserts the flag array; one covers
+the enforced/no-adjust no-op, five exercise active downstream mass balance,
+and one checks only parser-owned state. Rust has no mass-conservation controls,
+typed ZoneMixing graph, endpoint flags, solver, or adjusted mixing consumer.
+The routine remains `source_mapped` and required without support or
+conformance promotion.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `manage_zone_air_updates`, preserving the completion of the Air subtree before
 the Surface manager's final update. Its EnergyPlus boundary is the
