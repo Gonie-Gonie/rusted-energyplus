@@ -543,6 +543,41 @@ retry/reset behavior. Rust has none of the nine typed families, count/arena
 state, topology, outputs, EMS, EIO, or consumers. The routine remains
 `source_mapped` and required without support or conformance promotion.
 
+The following required Air-subtree entry is `get_room_air_model_parameters`,
+after `get_simple_air_model_inputs` and before `manage_zone_air_updates`. Its
+source boundary is `HeatBalanceAirManager.hh` line 75 and
+`HeatBalanceAirManager.cc` lines 4246-4492; CP184 calls it unconditionally at
+line 184 as its third and final input child. It creates one default
+Mixing/Direct/non-simulated room-air record per Zone even when no
+`RoomAirModelType` object exists, then parses that sole direct schema's eight
+model choices and Direct/Indirect coupling. Five model choices validate only
+the matching Zone-name presence of their `RoomAirSettings:*` companion, while
+AirflowNetwork checks only for `AirflowNetwork:SimulationControl`. Detailed
+settings, RoomAir nodes and patterns, and intrazone AFN topology are later
+dependencies.
+
+The clean-entry duplicate check is ineffective because authored names are not
+stored until the post-loop synthetic naming pass. Same-Zone declarations
+therefore overwrite model and coupling in order while prior true simulation
+and global-use flags can stick; the authored object name and `ZonePtr` are
+never retained. Invalid model or coupling keys warn and fall back to Mixing or
+Direct. Explicit input errors and non-Mixing Space-heat-balance conflicts
+accumulate locally, but every normally reached path first writes a RoomAir EIO
+header and one row per Zone; only afterward does CP188 emit its summary severe
+and raise the shared flag. It never reads or clears an incoming true value.
+
+Two direct unit calls cover missing and valid AirflowNetwork control cases, but
+not default Mixing state/EIO, duplicate overwrite, other models, Indirect
+coupling, Space incompatibility, state fields, repeat, or reset. Direct repeat
+rebuilds Zone records but repeats EIO and preserves monotonic flags.
+RoomAir-local clearing does not rearm all downstream room-air latches, the
+parent latch is separate, and whole-state clearing does not reset EIO, so
+end-to-end clean replay needs explicitly fresh/rearmed lifecycle and output
+state. Rust has no typed room-air selector, companion settings, coupling,
+flags, node topology, validation, dispatch, or EIO; all room-air inputs remain
+run-blocking. The routine remains `source_mapped` and required without support
+or conformance promotion.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `manage_zone_air_updates`, preserving the completion of the Air subtree before
 the Surface manager's final update. Its EnergyPlus boundary is the
