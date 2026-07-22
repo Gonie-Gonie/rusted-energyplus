@@ -85,6 +85,7 @@ required_routines = [
   "zone_space_heat_balance_calc_predicted_humidity_ratio",
   "correct_zone_air_temps",
   "zone_space_heat_balance_correct_air_temp",
+  "push_zone_timestep_histories",
   "update_final_surface_heat_balance",
   "update_thermal_histories",
   "report_surface_heat_balance",
