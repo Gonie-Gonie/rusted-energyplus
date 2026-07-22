@@ -2432,12 +2432,92 @@ performance, or conformance promotion. The inventory becomes 32 algorithms
 and 230 routines, split 58 `state_mapped` plus 172 `source_mapped`, with 107
 required; the heat-balance project list becomes 76.
 
-CP225 next maps `VerifyControlledZoneForThermostat`, declared at
-`ZoneTempPredictorCorrector.hh` line 352 and implemented at
-`ZoneTempPredictorCorrector.cc` lines 5702-5713.
+CP225 adds required `verify_controlled_zone_for_thermostat` immediately after
+`verify_thermostat_in_zone` and before
+`update_final_surface_heat_balance`. Its EnergyPlus boundary is the nonmember
+`VerifyControlledZoneForThermostat(EnergyPlusData &state, std::string const &ZoneName)`,
+declared at `ZoneTempPredictorCorrector.hh` line 352 and
+implemented at `ZoneTempPredictorCorrector.cc` lines 5702-5713.
+
+The sole body expression exact-string searches the full allocated
+`ZoneEquipConfig` arena through the `EquipConfiguration::ZoneName` member and
+returns whether the first-match index is positive. It does not load input,
+normalize the argument, inspect `IsControlled` or the equipment list, resolve a
+Zone identity, consult a controlled-Zone count, or search `spaceEquipConfig`.
+It owns no write, diagnostic, output, separate status state, cache, or rollback.
+
+Normal `GetZoneEquipmentData` setup allocates one configuration per Zone and
+stores each valid equipment-connection name at its actual Zone index.
+Uncontrolled slots retain the mixed-case sentinel `Uncontrolled Zone` with
+`IsControlled == false`. Because CP225 ignores that flag, a direct argument
+exactly equal to the sentinel or any manually corrupted uncontrolled-slot name
+can return true. Standard parsed Zone names are uppercased, so an ordinary
+input Zone written with that spelling does not collide with the mixed-case
+sentinel.
+
+The only direct production expressions are inside CP199
+`InitZoneAirSetPoints`: ordinary temperature controls at line 2684 are checked
+first, then comfort controls at line 2746. Each loop calls CP225 once per record
+only while `ZoneEquipInputsFilled` is true and `ControlledZonesChecked` is
+false. A false result makes the caller emit its family-specific Severe and
+Continue diagnostics and set persistent `ErrorsFound`. Both loops finish
+before that sticky error causes the line-2810 fatal. Only a normal input-filled
+return reaches the state-lifetime `ControlledZonesChecked = true` commit.
+
+CP199 is entered before every `ManageZoneAirUpdates` selector and also by the
+external-HVAC initializer. Verification is deferred until the first invocation
+that observes completed Zone-equipment input; the standard equipment manager
+sets `ZoneEquipInputsFilled` only after its loader returns normally. A
+successful pass prevents later rechecking even if the arena changes. An
+input-filled state with no ordinary or comfort records performs no CP225 call
+but still commits the checked latch.
+
+CP225 itself is read-only, deterministic, and idempotent for stable state.
+Caller failure is not a clean retry: the CP199 one-time initialization latch
+has already cleared, diagnostics and other initialization effects persist,
+`ErrorsFound` remains true, and `ControlledZonesChecked` remains false. A
+caught retry repeats the scans and any missing-zone diagnostics, then fatals
+again even if every later lookup succeeds unless the owning state is reset.
+
+No C++ test calls CP225 directly. Four direct `InitZoneAirSetPoints` fixture
+calls run before Zone-equipment input is marked filled and therefore reach it
+zero times. Among 57 active full-simulation expressions, 38 completing
+configurations contain 52 active direct-Zone ordinary thermostat records and
+no comfort thermostat record. Every ordinary name exactly matches a
+`ZoneHVAC:EquipmentConnections` name, yielding a static first-ready-check
+census of 52 true calls and zero false calls. No assertion isolates CP225,
+the comfort path, the sentinel case, a mismatch diagnostic, sticky failure,
+retry, post-success mutation, or reset.
+
+Rust has no `VerifyControlledZoneForThermostat`,
+`verify_controlled_zone_for_thermostat`, preserved-name lookup arena, or
+ordinary/comfort cross-validation lifecycle. The compiler first marks
+`Zone::is_nominal_controlled` from nonblank raw equipment-connection Zone names
+using trimmed ASCII-uppercase comparison, before full connection parsing; even
+an incomplete connection can set this marker, and production code does not
+consume it. It later parses bounded direct-Zone DualSetpoint thermostats and
+typed equipment connections independently to `ZoneId`. Connection parsing
+requires Zone, equipment-list, and Zone-air-node fields, resolves the first two
+to typed IDs, and rejects missing required fields, unresolved Zone/list
+references, and duplicate Zone connections, but does not
+reject a valid thermostat whose Zone has no connection. Typed connections
+discard the original Zone string. An IdealLoads-only dispatch validator checks
+typed system-dispatch prerequisites and returns Rust issues, not this
+thermostat-to-equipment predicate or caller diagnostics.
+
+CP225 remains required `source_mapped` and adds no algorithm-level
+`energyplus_source` entry, Rust target, code, mapped state, test, support,
+capability, output implementation, comparator, manifest, numerical,
+performance, or conformance promotion. The inventory becomes 32 algorithms
+and 231 routines, split 58 `state_mapped` plus 173 `source_mapped`, with 108
+required; the heat-balance project list becomes 77.
+
+CP226 next maps `DetectOscillatingZoneTemp`, declared at
+`ZoneTempPredictorCorrector.hh` line 354 and implemented at
+`ZoneTempPredictorCorrector.cc` lines 5715-5861.
 
 The inventory now also includes `update_final_surface_heat_balance` after
-`verify_thermostat_in_zone`, preserving the
+`verify_controlled_zone_for_thermostat`, preserving the
 completed predictor/corrector definition slice before
 the Surface manager's final update. Its EnergyPlus boundary is the
 unconditional parent line-184 `UpdateFinalSurfaceHeatBalance(state)` call and
