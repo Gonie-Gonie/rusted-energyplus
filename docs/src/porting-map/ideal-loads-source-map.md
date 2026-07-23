@@ -7130,6 +7130,394 @@ CP258 next maps
 `ZoneEquipmentManager.hh` lines 173-175 and implemented completely at
 `ZoneEquipmentManager.cc` lines 2844-2865. Calc7 begins at line 2867.
 
+## CP258 `updateZoneSizingEndZoneSizingCalc6` Daily and Final User-Sequence Projection
+
+CP258 adds canonical required
+`routine.update_zone_sizing_end_zone_sizing_calc6` immediately after
+`update_zone_sizing_end_zone_sizing_calc5` and before `sim_zone_equipment`.
+The source boundary is the declaration at `ZoneEquipmentManager.hh` lines
+173-175 and the complete definition at `ZoneEquipmentManager.cc` lines
+2844-2865:
+
+```cpp
+void updateZoneSizingEndZoneSizingCalc6(
+    DataSizing::ZoneSizingData &zsSizing,
+    DataSizing::ZoneSizingData const &zsCalcSizing,
+    int const numTimeStepsInDay);
+```
+
+The leaf owns no `EnergyPlusData`, Zone/Space identity, day identity,
+extent, status, or diagnostic argument. It receives one mutable user sizing
+record, one const calculated record, and an integer loop bound.
+
+### Parent placement and four-call topology
+
+The EndZoneSizingCalc parent completes the full Calc4 daily scalar sweep at
+lines 3459-3466 and the full Calc5 final scalar sweep at lines 3468-3475
+before entering Calc6. The nonpulse guard ended at line 3455, so the four
+sole production call sites all execute on pulse and normal entries:
+
+| Phase | Receiver | Source | Parent lines |
+|---|---|---|---:|
+| Daily Zone | `ZoneSizing(day, zone)` | `CalcZoneSizing(day, zone)` | 3482-3484 |
+| Daily Space | `SpaceSizing(day, space)` | `CalcSpaceSizing(day, space)` | 3487-3489 |
+| Final Zone | `FinalZoneSizing(zone)` | `CalcFinalZoneSizing(zone)` | 3500-3502 |
+| Final Space | `FinalSpaceSizing(space)` | `CalcFinalSpaceSizing(space)` | 3505-3507 |
+
+The complete daily sweep precedes the complete final sweep. Daily traversal
+orders design/run-design day ascending, then Zone number ascending, skips
+uncontrolled Zones, calls the Zone leaf, and visits that Zone's stored
+`spaceIndexes` in list order when Space sizing is enabled. Only after every
+day completes does the final traversal repeat controlled Zone then stored
+Space order. Calc7 lines 3511-3531 cannot begin until both sweeps finish.
+
+Define:
+
+- `D = TotDesDays + TotRunDesPersDays` and `E = max(D, 0)`;
+- `Z = max(NumOfZones, 0)`;
+- `C` as the number of controlled Zones among `1..Z`;
+- `M` as the number of stored Space-index occurrences under those Zones;
+- `U` as the number of unique valid Space identities among those
+  occurrences;
+- `I` as one when `doSpaceHeatBalanceSizing` is true, otherwise zero;
+- `T = numTimeStepsInDay` and `Q = max(T, 0)`.
+
+For valid topology, the parent dispatches
+
+`K = (E + 1) * (C + I*M)`
+
+leaves: `E*(C+I*M)` daily plus `C+I*M` final. It addresses
+`(E+1)*(C+I*U)` distinct records and issues
+`(E+1)*I*(M-U)` duplicate calls. Duplicate entries within one list and
+cross-list Space occurrences count independently. There is no per-Space
+control, owner, deduplication, latent method, name, or identity check.
+
+Calc6 is therefore not a dense counterpart of Calc4/5. An uncontrolled
+Zone and an unreferenced or orphan Space can receive Calc4/5 scalar fields
+but retain earlier sequence contents. The leaf comment at line 2848 says
+it is called for all daily/final arrays for Zones and Spaces; literal
+parent topology is only controlled Zones and their stored membership
+occurrences. The daily sweep trusts global day/Zone coordinates, and the
+final sweep trusts controlled Zone numbers, rather than deriving bounds
+from destination container sizes.
+
+### Exact 14-sequence projection
+
+For every one-based `TimeStepIndex` from 1 through `T`, the leaf performs
+these unconditional assignments in exact source order:
+
+| # | Destination and const source member | Container | Unit/meaning | Calc7 access |
+|---:|---|---|---|---|
+| 1 | `HeatFlowSeq(t) <- HeatFlowSeq(t)` | `Array1D<Real64>` | heating mass flow, kg/s | final/daily write-capable |
+| 2 | `HeatLoadSeq(t) <- HeatLoadSeq(t)` | `Array1D<Real64>` | heating load, W | final/daily write-capable |
+| 3 | `CoolFlowSeq(t) <- CoolFlowSeq(t)` | `Array1D<Real64>` | cooling mass flow, kg/s | final/daily write-capable |
+| 4 | `CoolLoadSeq(t) <- CoolLoadSeq(t)` | `Array1D<Real64>` | cooling load, W | final/daily write-capable |
+| 5 | `HeatZoneTempSeq(t) <- HeatZoneTempSeq(t)` | `EPVector<Real64>` | heating Zone temperature, C | daily read-only |
+| 6 | `HeatOutTempSeq(t) <- HeatOutTempSeq(t)` | `Array1D<Real64>` | heating outdoor temperature, C | daily read-only |
+| 7 | `HeatZoneRetTempSeq(t) <- HeatZoneRetTempSeq(t)` | `Array1D<Real64>` | heating return temperature, C | none |
+| 8 | `HeatZoneHumRatSeq(t) <- HeatZoneHumRatSeq(t)` | `Array1D<Real64>` | heating Zone humidity ratio, kg/kg | daily read-only |
+| 9 | `HeatOutHumRatSeq(t) <- HeatOutHumRatSeq(t)` | `Array1D<Real64>` | heating outdoor humidity ratio, kg/kg | daily read-only |
+| 10 | `CoolZoneTempSeq(t) <- CoolZoneTempSeq(t)` | `EPVector<Real64>` | cooling Zone temperature, C | daily read-only |
+| 11 | `CoolOutTempSeq(t) <- CoolOutTempSeq(t)` | `Array1D<Real64>` | cooling outdoor temperature, C | daily read-only |
+| 12 | `CoolZoneRetTempSeq(t) <- CoolZoneRetTempSeq(t)` | `Array1D<Real64>` | cooling return temperature, C | none |
+| 13 | `CoolZoneHumRatSeq(t) <- CoolZoneHumRatSeq(t)` | `Array1D<Real64>` | cooling Zone humidity ratio, kg/kg | daily read-only |
+| 14 | `CoolOutHumRatSeq(t) <- CoolOutHumRatSeq(t)` | `Array1D<Real64>` | cooling outdoor humidity ratio, kg/kg | daily read-only |
+
+The body has 14 static assignment sites, 14 unique destination names, 14
+unique right-hand-side names, and no cross-field fan-out. Each timestep
+performs 14 reads plus 14 writes. All values are `Real64`; there is no
+predicate, arithmetic, unit conversion, clamp, finite/range check,
+allocation, state access, child call, status, or diagnostic.
+
+`ZoneSizingData::allocateMemberArrays` at `DataSizing.cc` lines 280-318
+normally dimensions all 36 sequence families to
+`NumOfTimeStepInDay = TimeStepsInHour*24`. Calc6 copies only 14. Its 22
+omissions are:
+
+- `HeatFlowSeqNoOA` and `CoolFlowSeqNoOA`;
+- `DesHeatSetPtSeq`, `DesCoolSetPtSeq`, `HeatTstatTempSeq`, and
+  `CoolTstatTempSeq`;
+- the eight `DOAS*Seq` families;
+- `HeatLoadNoDOASSeq` and `CoolLoadNoDOASSeq`;
+- `LatentHeatLoadSeq` and `LatentCoolLoadSeq`;
+- `HeatLatentLoadNoDOASSeq` and `CoolLatentLoadNoDOASSeq`;
+- `LatentHeatFlowSeq` and `LatentCoolFlowSeq`.
+
+### Calc3 carry-forward and Calc7 overwrite boundary
+
+Calc4 and Calc5 copy no sequences and have zero member-name intersection
+with Calc6. CP255 Calc3 intersects at exactly two names:
+`HeatFlowSeq` and `CoolFlowSeq`.
+
+When a CP255 cooling or heating latent branch wins, it assigns the
+corresponding `Latent*FlowSeq` into the ordinary-name flow sequence of the
+calculated-final record. When the selected design-day number is positive,
+it also assigns that latent flow sequence into the selected calculated
+daily record. CP255 deliberately does not substitute either latent load
+sequence. Calc6 then copies:
+
+- the possibly selected latent-origin ordinary flow sequence;
+- the still-ordinary `HeatLoadSeq` or `CoolLoadSeq`;
+- none of the original latent flow or load sequence families.
+
+The resulting user daily/final record can therefore combine selected
+latent-flow history with ordinary sensible-load history. Only the selected
+daily day can carry the CP255 mutation; other daily records remain their
+ordinary calculated sources.
+
+Calc7 starts after both Calc6 sweeps. Static source analysis finds 12 of
+the 14 names:
+
+- the four flow/load sequences are write-capable in final and selected
+  daily records through sizing-factor multiplication, with later flow
+  minimum/OA clamps;
+- eight daily `ZoneTemp`, `OutTemp`, `ZoneHumRat`, and `OutHumRat`
+  sequences are read in the cooling/heating zero-load fallback paths;
+- `HeatZoneRetTempSeq` and `CoolZoneRetTempSeq` are untouched.
+
+The environmental sequence copies in final records are not those fallback
+readers; Calc7 reads the selected daily record. A post-Calc7 value or
+derived scalar is therefore composite evidence. An identity oracle must
+call Calc6 directly or observe its destination before Calc7.
+
+### Output and retry ordering
+
+The CP254 ZSZ/SPSZ writer closes before CP255, Calc4, Calc5, and Calc6.
+Current-attempt Calc6 writes only user arrays and cannot retroactively
+change those artifact bytes.
+
+A retry has a separate source-history trap. CP255 mutates calculated
+ordinary flow sequences in place. If a later Calc6 element fails, that
+selected mutation remains. On a nonpulse whole-parent retry, CP254 executes
+before CP255 and can observe the retained selected calculated sequence, so
+a rebuilt ZSZ/SPSZ artifact can differ even though Calc6 itself never writes
+an output stream.
+
+Calc6 has no `EnergyPlusData` or EMS call. None of its 14 sequences is one
+of the eight registered Final-Zone scalar internal variables or one of the
+six calculated-final actuators. At retry entry EMS can observe a completed
+Calc5 scalar prefix, but it cannot observe a partial Calc6 sequence prefix
+through those registrations.
+
+A normal retry can then repeat any gated CP252 work, CP253, CP254, any
+gated CP255 work, Calc4, and Calc5 before reaching Calc6. Scalar EMS/CP252
+changes can indirectly change CP255 mode selection and the two calculated
+flow-sequence sources. Pulse skips CP252-255 but still reruns EMS, Calc4,
+and Calc5 before copying the retained sequence sources.
+
+### Loop bound, extent, and identity assumptions
+
+The leaf trusts the caller's integer `T` independently of every source and
+destination sequence extent:
+
+- `T <= 0` executes no assignment and reports success;
+- `0 < T < extent` copies only indexes `1..T` and leaves destination tails
+  untouched;
+- `T` beyond any accessed extent eventually fails or enters undefined
+  behavior;
+- unequal source/destination extents are neither compared nor diagnosed.
+
+Twelve families use Objexx `Array1D::operator()`. Asserted builds require
+the one-based index to be contained; violation assert-terminates. Release
+access is unchecked and invalid access has undefined behavior.
+
+The two Zone-temperature families use `EPVector::operator()`, which maps
+the one-based index through `operator[]`. Debug `operator[]` calls
+`std::vector::at`, so an out-of-range source or destination can throw.
+Release uses unchecked vector subscripting. At a recoverable debug
+exception in assignment 5, all earlier timesteps and assignments 1-4 of
+the current timestep remain. A failure in assignment 10 additionally
+retains assignments 5-9. The current failed assignment is not completed.
+
+The parent independently trusts daily `Array2D` day/Zone coordinates,
+stored Space indexes, and final `EPVector` Zone/Space indexes. A malformed
+receiver/source coordinate can fail while preparing arguments, before
+Calc6 enters. A bad Space occurrence also prevents every later membership,
+final sweep, Calc7 call, facility-sizing update, and run-done latch.
+
+There is no local status, catch, diagnostic, transaction, cleanup, or
+rollback. Valid `Real64` element reads/writes allocate nothing and do not
+throw. Completed daily/final leaves and element prefixes survive any
+recoverable later failure.
+
+A stable distinct-source retry restarts at timestep 1, overwrites the
+prefix, and becomes value-idempotent after completion. Passing the same
+record as mutable destination and const source is legal: every operation is
+a same-member, same-index self-copy. Exact alias is a value no-op but still
+performs all extent checks, accesses, and work. Stable duplicate Space
+membership converges to the same values but repeats the complete loop.
+
+### Operation and storage bounds
+
+For `Q = max(T,0)` and `K = (E+1)*(C+I*M)`, a completing valid parent
+entry executes:
+
+- `14QK` `Real64` assignment statements;
+- `28QK` sequence-member accesses;
+- `Theta((E+1)*(Z+1) + K*(Q+1))` total parent-slice time;
+- constant leaf-local and parent-loop storage.
+
+The first time term retains the design-day and full Zone-control scans even
+when no leaf copies an element; the second retains leaf-call/membership
+overhead at `Q = 0` and element copying otherwise. The routine allocates no
+scratch array. Complexity does not depend on sequence value magnitudes,
+latent method, or pulse state. It does depend on global Zone scans,
+duplicate membership multiplicity, and the caller-supplied loop bound
+rather than the actual shortest sequence extent.
+
+### C++ test execution census
+
+There is no direct Calc6 leaf call in the C++ unit tree. The completing
+high-level corpus has the same 59 EndZone parent entries audited for
+Calc5: 51 normal entries, six additional component-load pulse entries, and
+two bare pulse parent calls at `ZoneEquipmentManager.unit.cc` lines 4576
+and 4877.
+
+The parent day-count histogram is:
+
+`E=1:12, 2:46, 3:1`.
+
+The independent timestep-loop histogram is:
+
+`Q=144:29, 96:26, 24:2, 1:2`.
+
+Their joint distribution is:
+
+| `E` | `Q` | Parent entries |
+|---:|---:|---:|
+| 1 | 144 | 7 |
+| 1 | 96 | 3 |
+| 1 | 1 | 2 |
+| 2 | 144 | 21 |
+| 2 | 96 | 23 |
+| 2 | 24 | 2 |
+| 3 | 144 | 1 |
+
+Leaf roles split as follows:
+
+| Role | Normal | Additional pulse | Bare parent | Total |
+|---|---:|---:|---:|---:|
+| Daily Zone | 135 | 18 | 2 | 155 |
+| Daily Space | 42 | 0 | 0 | 42 |
+| Final Zone | 72 | 9 | 2 | 83 |
+| Final Space | 21 | 0 | 0 | 21 |
+| **Total** | **270** | **27** | **4** | **301** |
+
+Thus the corpus executes 197 daily and 104 final leaves, or 238 Zone and
+63 Space leaves. It performs:
+
+- 33,336 normal, 2,376 pulse, and four bare-parent timestep-loop
+  iterations;
+- 35,716 timestep-loop iterations total;
+- `14*35,716 = 500,024` dynamic `Real64` assignments;
+- `28*35,716 = 1,000,048` source-plus-destination member accesses.
+
+There are 274 distinct test-local target records: 270 normal plus four
+bare-parent records. The 27 pulse leaves revisit normal targets, giving
+247 records executed once and 27 twice. All 301 invocations are controlled
+Zone or controlled-owner Space contexts. The seven Space-enabled contexts
+each own three unique Spaces under one controlled Zone, so no duplicate or
+cross-listed Space occurrence executes.
+
+Thirty-nine leaves have latent sizing enabled, all normal at
+`E=2,Q=144`: 27 `Sensible` and 12 `SensibleAndLatent`. Exact `Latent` has
+zero execution; the other 262 leaves are latent-off. Calc6 does not inspect
+the flag or method, so every category runs the same loop.
+
+### C++ assertion, Calc7, and reset evidence
+
+The two bare parent tests execute two daily Zone and two final Zone leaves,
+for 56 assignments at `Q=1`, but assert no sequence element. Across the
+full corpus there is no source-to-destination identity comparison and no
+assertion that isolates assignment order.
+
+Exactly four genuine downstream scalar sites cover only two daily
+destination families:
+
+- `ZoneEquipmentManager.unit.cc` lines 4588-4589;
+- the same file's lines 4885-4886.
+
+Calc7 reads copied `CoolZoneTempSeq` and `HeatZoneTempSeq` from the daily
+user record at source lines 3047 and 3196 to derive calculated-final peak
+temperatures. These four sites execute after Calc7 and do not prove direct
+copy identity. No final-record sequence copy has downstream proof.
+
+Calc7's static field intersection is 12/14. The four flow/load families
+are write-capable; the eight Zone/outdoor temperature and humidity
+families are daily read-only; both return-temperature families are
+untouched. A later flow/load value cannot be attributed solely to Calc6,
+and the environmental scalar descendants cover only two of the eight
+read-only names.
+
+`ZoneSizingData::zeroMemberData` resets all 14 Calc6 families when its
+`DOASSupMassFlowSeq` sentinel is allocated. `RezeroZoneSizingArrays`
+dispatches that reset over daily calculated/user and final calculated/user
+records, with Space paths when enabled.
+
+The focused `ZoneEquipmentManager_RezeroZoneSizingArrays` test uses 15
+days, five Zones, and four timesteps. It has 28 static Calc6-name assertion
+sites: 14 user-daily plus 14 calculated-daily. Dynamic execution is
+`28*15*5*4 = 8,400` checks. It never calls Calc6, so it proves reset
+coverage rather than calculated-to-user copying. Ten final calculated/user
+records quick-return because the sentinel arrays are unallocated; no final
+or Space sequence assertion executes.
+
+Calc6 has no attributable report assertion. `writeZszSpsz` precedes Calc6
+and reads calculated arrays. Component-load table tests seed and consume
+`CalcFinal*` sources directly through `OutputReportTabular.cc` lines
+16421-16423, 16440-16462, and 16492-16514, bypassing Calc6 destinations.
+
+The suite therefore leaves direct identity and order for all 14 families,
+12 families beyond the two temperature descendants, both return-temperature
+families, every final copy, nonpositive/short/long loop bounds, malformed
+record shapes and identities, exact alias, partial failure, retry, and
+duplicate/cross-listed Space topology unisolated.
+
+### Rust, data, and claim boundary
+
+The Rust/data audit covers 721 UTF-8-readable current-worktree files
+returned by `rg --files crates data`. Exact and mechanical-snake searches
+find no:
+
+- Calc6 canonical key or helper;
+- `ZoneSizingData`, daily/final Zone/Space sizing arena, or calculated/user
+  pairing;
+- any of the 14 exact sequence member names;
+- any of their 14 mechanical snake-case projections.
+
+Rust does own adjacent current-timestep `ZoneSysEnergyDemand`, operational
+IdealLoads sensible/latent rates and supply temperature/humidity/mass flow,
+typed `AutosizeOrNumber` limits, and density, outdoor-air, node, report, and
+design-day label state. Those are input, timestep, or report concepts, not
+a 14-family calculated-to-user daily/final sequence projection.
+
+The active data census contains 61 `SimulationControl` objects, all with
+Zone sizing disabled, and five raw `SizingPeriod:DesignDay` objects. It
+contains no active `Sizing:Zone`, `Sizing:Parameters`, authored `Space`, or
+`SpaceList`, and no corresponding epJSON keys. SimulationControl and design
+days remain ignored partial inputs rather than sizing execution. Sizing and
+authored-Space object families remain run-blocked; the sole autosizing
+fixture expects `UnsupportedSizing`.
+
+CP258 therefore adds only one canonical required `source_mapped` row and
+the matching ordered HVAC project-contract requirement. It adds no Rust
+target, state mapping, support declaration, test, capability, output
+implementation, comparator, case, manifest evidence, numerical claim,
+performance claim, or conformance promotion.
+
+The inventory becomes 32 algorithms and 263 routines, split 58
+`state_mapped` plus 205 `source_mapped`, with 140 required. Domain-required
+counts are heat-balance 88, HVAC 29, plant 1, and time/schedule 22. The
+`ideal_loads_zone_equipment_purchased_air_source_order` parent now owns 29
+rows but remains `scaffold` at claim level `none`; HVAC readiness remains
+`0/29`.
+
+CP259 next maps
+`ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc7`, declared at
+`ZoneEquipmentManager.hh` lines 177-182 and implemented completely at
+`ZoneEquipmentManager.cc` lines 2867-3221. The next parent
+`UpdateZoneSizing` definition begins at line 3223.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

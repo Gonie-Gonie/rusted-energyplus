@@ -5884,6 +5884,196 @@ CP258 next maps
 `ZoneEquipmentManager.hh` lines 173-175 and implemented completely at
 `ZoneEquipmentManager.cc` lines 2844-2865. Calc7 begins at line 2867.
 
+## CP258 `updateZoneSizingEndZoneSizingCalc6` Daily and Final User-Sequence Projection
+
+CP258 adds canonical required
+`routine.update_zone_sizing_end_zone_sizing_calc6` immediately after Calc5
+and before `sim_zone_equipment`. It is declared at
+`ZoneEquipmentManager.hh` lines 173-175 and implemented completely at
+`ZoneEquipmentManager.cc` lines 2844-2865:
+
+```cpp
+void updateZoneSizingEndZoneSizingCalc6(
+    DataSizing::ZoneSizingData &zsSizing,
+    DataSizing::ZoneSizingData const &zsCalcSizing,
+    int const numTimeStepsInDay);
+```
+
+The EndZone parent starts CP258 only after the complete CP256 daily and
+CP257 final scalar/string sweeps. The four call sites at lines 3482, 3487,
+3500, and 3505 are outside the nonpulse guard, so Calc6 executes on pulse
+and normal passes. It first completes every daily record before touching a
+final record:
+
+1. design/run-design day ascending;
+2. controlled Zone number ascending;
+3. the Zone leaf, then that Zone's stored `spaceIndexes` in list order;
+4. after all days, controlled final Zone ascending, followed by its stored
+   Spaces.
+
+Let `E = max(TotDesDays + TotRunDesPersDays, 0)`, `C` be the controlled
+Zone count, `M` the number of stored Space-index occurrences under those
+Zones, and `I` be one when Space sizing is enabled. The parent dispatches
+
+`K = (E + 1) * (C + I*M)`
+
+leaves. With `U` unique valid referenced Spaces, it addresses
+`(E + 1)*(C + I*U)` distinct records and repeats
+`(E + 1)*I*(M-U)` leaves. Duplicate or cross-list memberships count.
+There is no per-Space control, owner, deduplication, latent, name, or
+identity gate.
+
+This is not a dense counterpart of Calc4/5. Uncontrolled Zone records and
+unreferenced/orphan Space records can receive CP256/257 scalar fields but
+retain prior sequence state. The source comment saying Calc6 is called for
+all Zone/Space daily and final arrays therefore overstates literal parent
+coverage. The daily loop is driven by global day and Zone counts plus
+membership identities, while the final loop is driven by controlled Zone
+numbers, not destination extents. Array shapes, indexes, and corresponding
+source identities are assumed rather than compared.
+
+For `Q = max(numTimeStepsInDay, 0)`, each valid leaf executes 14
+same-name, same-index `Real64` copies at every one-based timestep, in exact
+source order:
+
+- `HeatFlowSeq`, `HeatLoadSeq`, `CoolFlowSeq`, and `CoolLoadSeq`;
+- heating `HeatZoneTempSeq`, `HeatOutTempSeq`, `HeatZoneRetTempSeq`,
+  `HeatZoneHumRatSeq`, and `HeatOutHumRatSeq`;
+- cooling `CoolZoneTempSeq`, `CoolOutTempSeq`, `CoolZoneRetTempSeq`,
+  `CoolZoneHumRatSeq`, and `CoolOutHumRatSeq`.
+
+The leaf therefore has 14 assignment sites, 14 unique destination names,
+14 unique right-hand-side names, and 28 member accesses per timestep.
+Twelve containers are `Array1D<Real64>`; `HeatZoneTempSeq` and
+`CoolZoneTempSeq` are `EPVector<Real64>`. Normal setup dimensions all of
+them to `TimeStepsInHour*24`. Values are copied without arithmetic, unit
+conversion, clamping, finite/range checks, allocation, state access, child
+calls, or diagnostics.
+
+`ZoneSizingData::allocateMemberArrays` dimensions 36 sequence families.
+Calc6 copies only these 14. It omits both no-OA flow sequences, both design
+setpoint and thermostat sequences, eight DOAS sequences, both no-DOAS load
+sequences, both latent load sequences, both latent no-DOAS load sequences,
+and both latent flow sequences.
+
+CP255 intersects Calc6 only at `HeatFlowSeq` and `CoolFlowSeq`. A selected
+latent branch substitutes a latent flow sequence into calculated-final and,
+for a positive selected day, calculated-daily ordinary flow. Calc6 carries
+those two ordinary-name sequences but still copies ordinary
+`HeatLoadSeq`/`CoolLoadSeq`; it can therefore project a selected latent-flow
+plus ordinary-load hybrid. The latent sequence families themselves remain
+untouched. Calc4 and Calc5 have zero member-name overlap.
+
+Calc7 waits for both Calc6 sweeps and accesses 12 of the 14 names. It can
+rewrite the four flow/load sequences in final and selected daily records,
+and it reads eight daily Zone/outdoor temperature and humidity sequences in
+zero-load fallback paths. Only the two Zone return-temperature sequences
+have no Calc7 access. Any later evidence is therefore composite except for
+an isolated pre-Calc7 copy check.
+
+`Q = 0` is a silent no-op. A smaller loop bound copies a prefix and leaves
+both source-independent destination tails untouched. A larger bound or
+malformed record shape eventually indexes outside one of 28 sequence
+containers. The 12 Objexx arrays assert containment in asserted builds and
+are unchecked in release. The two `EPVector` destinations/sources use
+debug `vector::at` and release unchecked subscripting. A recoverable debug
+exception at the fifth assignment leaves assignments 1-4 for the current
+timestep; one at the tenth leaves assignments 1-9. All prior timesteps and
+leaves remain committed.
+
+There is no local status, catch, transaction, cleanup, or rollback. A
+record-access failure can occur before leaf entry; a leaf failure suppresses
+later Calc6 leaves, Calc7, facility sizing, and the run-done latch. Valid
+scalar copies allocate nothing and do not throw. Stable distinct-source
+completion and replay are value-idempotent. Exact record alias is 14
+same-member self-copies per timestep: a value no-op that still performs
+indexing and work. Stable duplicate Space calls converge but repeat work.
+
+Calc6 owns no EMS call, and none of its sequence fields is one of the eight
+registered Final-Zone scalar inputs or six calculated-final actuators. A
+whole-parent retry can expose the already completed Calc5 scalar prefix to
+EMS, but not a partial Calc6 sequence prefix directly. A normal retry can
+then rebuild CP252 state and repeat CP253, CP254, CP255, Calc4, and Calc5;
+that work can change the two selected calculated flow-sequence sources.
+Pulse skips CP252-255 and copies retained sequence sources after EMS and
+Calc4/5.
+
+The CP254 writer has already closed before Calc6, so current-attempt Calc6
+cannot alter ZSZ/SPSZ bytes. On a nonpulse whole retry, however, CP254 runs
+before CP255. A prior retained CP255 flow-sequence selection can therefore
+be visible to the rebuilt artifact even though Calc6 itself writes only
+user arrays.
+
+The completing C++ corpus has the same 59 parent entries: 51 normal, six
+additional pulse, and two direct-parent pulse calls. It executes 301 Calc6
+leaves:
+
+- 197 daily: 155 Zone and 42 Space;
+- 104 final: 83 Zone and 21 Space;
+- equivalently, 270 normal, 27 pulse, and four direct-parent leaves.
+
+The day-count histogram is `E=1:12, 2:46, 3:1`; the timestep histogram is
+`Q=144:29, 96:26, 24:2, 1:2`. Together they execute 35,716 timestep-loop
+iterations, exactly 500,024 `Real64` assignments and 1,000,048 member
+accesses. There are 274 distinct test-local records: 247 execute once and
+27 normal targets are revisited by pulse. All 301 are controlled Zone or
+controlled-owner Space contexts. The seven Space contexts each use one
+controlled Zone with three unique Spaces, so duplicate/cross-list Space
+coverage is zero.
+
+Thirty-nine leaves have latent sizing enabled: 27 `Sensible` and 12
+`SensibleAndLatent`; exact `Latent` is absent. The other 262 are latent-off.
+Calc6 reads none of those method/flag fields and performs the same loop.
+
+No C++ test calls Calc6 directly, compares a source sequence with its
+destination, or asserts a copied sequence element. The two direct parent
+tests execute four leaves and 56 assignments at `E=C=Q=1` but assert no
+sequence. Exactly four genuine downstream scalar sites cover only
+`HeatZoneTempSeq` and `CoolZoneTempSeq`; Calc7 reads those daily user
+destinations to derive calculated-final peak temperatures. No final-record
+copy has downstream proof.
+
+The Rezero implementation resets all 14 names, but its focused test checks
+only daily Zone and calculated-daily arrays: 28 static sites and 8,400
+dynamic checks over 15 days, five Zones, and four timesteps. It never calls
+Calc6 and is a reset oracle, not a copy oracle. Ten final records
+quick-return because their sentinel array is unallocated; final and Space
+sequence resets are unasserted.
+
+Calc6 has zero attributable report assertion. CP254 writes before Calc6
+from calculated arrays. The component-load table path also reads
+calculated-final sources directly, bypassing copied user destinations.
+Direct identity/order for all 14 fields, 12 fields beyond the two
+temperature descendants, both return-temperature sequences, final copying,
+nonpositive/short/long bounds, malformed shapes, alias, partial failure,
+replay, and duplicate Space topology remain unisolated.
+
+The Rust/data audit covers 721 UTF-8-readable current-worktree files
+returned by `rg --files crates data`. It finds no Calc6 key/helper, daily or
+final Zone/Space sizing sequence arena, any of the 14 exact member names,
+or any of their 14 mechanical snake-case forms. Adjacent current-step
+`ZoneSysEnergyDemand`, operational IdealLoads state, typed limits,
+density/OA/node/report fields, and design-day labels are not this
+calculated-to-user sequence projection.
+
+All 61 active `SimulationControl` objects disable Zone sizing. Active data
+contain five raw design days but no `Sizing:Zone`, `Sizing:Parameters`,
+authored `Space`, or `SpaceList`, and no corresponding epJSON keys. Sizing
+and authored-Space fixtures remain run-blocked.
+
+CP258 adds no Rust target/state, support declaration, test, capability,
+output implementation, comparator, case, manifest evidence, numerical or
+performance claim, or conformance promotion. Counts become 32 algorithms
+and 263 routines, split 58 `state_mapped` plus 205 `source_mapped`, with 140
+required; heat-balance/HVAC lists become 88/29 and HVAC readiness remains
+`0/29`. The parent stays `scaffold` with claim level `none`.
+
+CP259 next maps
+`ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc7`, declared at
+`ZoneEquipmentManager.hh` lines 177-182 and implemented completely at
+`ZoneEquipmentManager.cc` lines 2867-3221. `UpdateZoneSizing` begins at
+line 3223.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before

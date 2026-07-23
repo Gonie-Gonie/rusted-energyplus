@@ -148,6 +148,7 @@ required_routines = [
   "update_zone_sizing_end_zone_sizing_calc3",
   "update_zone_sizing_end_zone_sizing_calc4",
   "update_zone_sizing_end_zone_sizing_calc5",
+  "update_zone_sizing_end_zone_sizing_calc6",
   "sim_zone_equipment",
   "sim_purchased_air",
   "get_purchased_air",
