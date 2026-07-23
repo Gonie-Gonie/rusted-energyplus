@@ -5078,7 +5078,7 @@ unique stored Spaces:
 
 - five are Coincident and return immediately;
 - two are NonCoincident, latent false, and complete the body;
-- the sole latent-true call is one of the five Coincident returns.
+- three of the five Coincident returns are latent true; both NonCoincident bodies are latent false.
 
 The two body completions contribute six Space-loop visits and 1,440 explicit
 timestep-loop iterations. Their eight ordinary `max_element` calls scan 1,152
@@ -5136,12 +5136,370 @@ algorithms and 257 routines, split 58 `state_mapped` plus 199
 88 and 23. HVAC readiness remains `0/23`, the inventory is incomplete, and
 all 23 required routines remain below `family_gated`.
 
-CP253 next maps
-`ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc2`, declared at
-`ZoneEquipmentManager.hh` line 153 and implemented completely at
-`ZoneEquipmentManager.cc` lines 2280-2387, together with its
-`sizingPeakTimeStamp` dependency declared at header line 162 and defined at
-source lines 2389-2399.
+## CP253 `updateZoneSizingEndZoneSizingCalc2` Supply-Delta Diagnostics and Peak Timestamps
+
+CP253 adds canonical required
+`routine.update_zone_sizing_end_zone_sizing_calc2` immediately after
+`update_zone_sizing_end_zone_sizing_calc1` and before `sim_zone_equipment`.
+The physical declaration sequence is CP252 at `ZoneEquipmentManager.hh` line
+151, CP253 at line 153, and physical-next CP254 `writeZszSpsz` at lines
+155-160. The complete CP253 leaf is `ZoneEquipmentManager.cc` lines
+2280-2387:
+
+```cpp
+void updateZoneSizingEndZoneSizingCalc2(
+    EnergyPlusData &state,
+    DataSizing::ZoneSizingData &zsCalcSizing);
+```
+
+Its header-visible bundled formatting dependency is declared at header line 162 and
+implemented at source lines 2389-2399:
+
+```cpp
+std::string sizingPeakTimeStamp(
+    EnergyPlusData const &state,
+    int timeStepIndex);
+```
+
+The child is part of the CP253 implementation boundary rather than a second
+ledger row. The public leaf returns `void`, takes a mutable calculated-final
+Zone-or-Space sizing record by reference, and has no entry guard, latent gate,
+loop, status, `ErrorsFound`, catch, rollback, or cleanup.
+
+### Production traversal and topology
+
+The sole production selector is `SizingManager.cc` line 391. Its
+`UpdateZoneSizing(EndZoneSizingCalc)` parent performs this source order:
+
+1. run Zone-sizing EMS and independently apply each of six Zone volume, mass,
+   and load overrides when EMS exists, that actuator flag is set, and the
+   preoverride target is strictly positive;
+2. only under `!isPulseZoneSizing`, optionally complete the entire CP252
+   controlled-Zone noncoincident aggregation sweep;
+3. visit every controlled Zone in ascending numeric order and call CP253 on
+   `CalcFinalZoneSizing`;
+4. immediately after each Zone, when Space sizing is enabled, visit every
+   stored `Zone.spaceIndexes` occurrence and call CP253 on
+   `CalcFinalSpaceSizing`;
+5. only after all selected Zone and Space records complete, choose and write
+   ZSZ/SPSZ;
+6. then run Calc3 latent selection for latent-enabled controlled Zones and
+   their stored Spaces;
+7. outside the pulse block, run Calc4-7 copies and later final reports.
+
+The two production call expressions are therefore
+`ZoneEquipmentManager.cc` lines 3394 and 3397. Unlike CP252, this traversal
+does not skip a Zone with exactly one Space. With:
+
+```text
+C = number of controlled Zone indexes visited by the parent
+M = number of stored Space membership occurrences under those Zones
+```
+
+a normally completing call dispatches:
+
+```text
+H = C + (doSpaceHeatBalanceSizing ? M : 0)
+```
+
+CP253 leaves. The parent provides the control and Space-sizing gates, but the
+leaf validates no role, controlled status, Zone/Space identity, topology,
+membership parent, duplicate, cross-listing, index, allocation, or extent.
+Stored order and multiplicity are authoritative. Repeated or cross-listed
+Space indexes repeat diagnostics and overwrite the same record strings once
+per occurrence.
+
+Pulse EndZone processing skips CP252, the complete CP253 traversal, ZSZ/SPSZ,
+and Calc3. Calc4-7 still run afterward, so pulse behavior is preservation plus
+downstream copying rather than a CP253 reset. Direct leaf calls can bypass all
+parent gates.
+
+### Exact record boundary and source order
+
+The leaf accesses 29 unique `ZoneSizingData` member names. Twenty-five are
+read and only four timestamp strings are written:
+
+| role | members |
+|---|---|
+| identity and loads | `ZoneName`, `DesCoolLoad`, `DesHeatLoad` |
+| cooling supply inputs and diagnostics | `ZnCoolDgnSAMethod`, `CoolDesTemp`, `CoolDesTempDiff`, `ZoneTempAtCoolPeak`, `CoolTstatTemp`, `DesCoolVolFlow`, `DesCoolMassFlow` |
+| heating supply inputs and diagnostics | `ZnHeatDgnSAMethod`, `HeatDesTemp`, `HeatDesTempDiff`, `ZoneTempAtHeatPeak`, `HeatTstatTemp`, `DesHeatVolFlow`, `DesHeatMassFlow` |
+| date/index inputs | `cHeatDDDate`, `TimeStepNumAtHeatMax`, `cCoolDDDate`, `TimeStepNumAtCoolMax`, `cLatentHeatDDDate`, `TimeStepNumAtLatentHeatMax`, `cLatentCoolDDDate`, `TimeStepNumAtLatentCoolMax` |
+| only writes | `HeatPeakDateHrMin`, `CoolPeakDateHrMin`, `LatHeatPeakDateHrMin`, `LatCoolPeakDateHrMin` |
+
+The exact operation sequence is:
+
+1. test cooling load for the zero-load warning;
+2. independently test heating load for its zero-load warning;
+3. resolve and diagnose cooling only when its absolute load exceeds the
+   zero-load threshold;
+4. resolve and diagnose heating only when its absolute load exceeds the
+   threshold;
+5. assign the four peak strings in Heat, Cool, LatHeat, LatCool order.
+
+The `ShowContinueError` records emitted after a warning or severe are
+diagnostic continuations, not C++ control-flow `continue` operations. No
+diagnostic path returns; the timestamp tail remains unconditional.
+
+### Load threshold and supply-temperature resolution
+
+Cooling and heating use the same exact load partition:
+
+| `L = abs(Des*Load)` | behavior |
+|---|---|
+| `L <= 1e-8` | emit one zero-load warning and one continuation; skip that mode's supply analysis |
+| `L > 1e-8` | skip the zero warning and enter that mode's supply analysis |
+| neither comparison, as for NaN | emit neither zero warning nor mode analysis |
+
+This includes both signed zero values and exact `+/-1e-8` in the warning
+branch. A negative load whose magnitude exceeds the threshold is analyzed just
+like a positive load. Infinity enters analysis.
+
+For either mode, exact integer equality with `SupplyAirTemperature` selects
+the supplied design temperature. Every other method value, including the
+intended temperature-difference method and an invalid enum integer, takes the
+fallback path:
+
+| mode | exact supplied-temperature method | every other method value |
+|---|---|---|
+| cooling | `SupplyTemp = CoolDesTemp`; `DeltaTemp = SupplyTemp - ZoneTempAtCoolPeak` | `DeltaTemp = -abs(CoolDesTempDiff)`; `SupplyTemp = ZoneTempAtCoolPeak + DeltaTemp` |
+| heating | `SupplyTemp = HeatDesTemp`; `DeltaTemp = SupplyTemp - ZoneTempAtHeatPeak` | `DeltaTemp = HeatDesTempDiff`; `SupplyTemp = ZoneTempAtHeatPeak + DeltaTemp` |
+
+Cooling therefore forces its fallback delta nonpositive, while heating
+preserves the raw sign. There is no method validity, finite-value, unit, or
+direction check before these calculations.
+
+### Delta thresholds and diagnostic event shapes
+
+Let `D = abs(DeltaTemp)` and
+`HVAC::SmallTempDiff = 1e-5`. Cooling's wrong direction is
+`SupplyTemp > ZoneTempAtCoolPeak`; heating's is
+`SupplyTemp < ZoneTempAtHeatPeak`. The source partition is:
+
+| exact condition | primary event | fixed continuations | optional continuation |
+|---|---|---:|---|
+| `1e-5 < D < 2` | severe near-delta | 9 | one wrong-direction note |
+| `2 <= D < 5` | warning near-delta | 9 | one wrong-direction note |
+| outside `D < 5 && D > 1e-5`, then `D > 1e-5` and wrong direction | severe direction error | 7 | none |
+| all other cases | none | 0 | none |
+
+The outer direction branch is an `else if`; for ordinary finite values it is
+therefore reachable at `D >= 5`, not after a near-delta event. Exact
+`D = 1e-5` is silent, exact `D = 2` is a warning, and exact `D = 5` reaches
+the outer severe only when direction is wrong. A near-delta warning or severe
+can still append its wrong-direction note.
+
+Across both modes the source contains four `ShowWarningError`, four
+`ShowSevereError`, and 36 `ShowContinueError` call sites. A receiver whose
+cooling and heating modes both take the near-delta path with wrong direction
+executes 22 `Show*` calls, the per-receiver maximum. Heat and cooling are
+independent, so one mode's zero warning, severity, or malformed values do not
+suppress the other mode.
+
+A NaN load reaches neither load arm. A NaN delta reaches neither delta arm.
+Infinite or otherwise extreme inputs follow raw IEEE comparisons and
+formatting; no local diagnostic escalation, termination, or normalization is
+added.
+
+### Unconditional timestamp finalization
+
+After all diagnostics, CP253 always assigns:
+
+```text
+HeatPeakDateHrMin =
+    cHeatDDDate + " " + sizingPeakTimeStamp(TimeStepNumAtHeatMax)
+CoolPeakDateHrMin =
+    cCoolDDDate + " " + sizingPeakTimeStamp(TimeStepNumAtCoolMax)
+LatHeatPeakDateHrMin =
+    cLatentHeatDDDate + " " + sizingPeakTimeStamp(TimeStepNumAtLatentHeatMax)
+LatCoolPeakDateHrMin =
+    cLatentCoolDDDate + " " + sizingPeakTimeStamp(TimeStepNumAtLatentCoolMax)
+```
+
+The four calls occur even when latent sizing is false. No date validity or
+emptiness check precedes concatenation. An empty date therefore yields a raw
+leading space before the time.
+
+`sizingPeakTimeStamp` initializes hour/minute/second outputs, then evaluates:
+
+```text
+timeInSeconds =
+    timeStepIndex * MinutesInTimeStep * 60
+```
+
+The three operands are signed integers during multiplication; conversion to
+`Real64` occurs only after the product. A sufficiently large product therefore
+has C++ signed-integer overflow undefined behavior before `ParseTime`.
+Otherwise the child calls `General::ParseTime`, ignores the returned seconds,
+and formats only hour and minute through
+`PeakHrMinFmt = "{:02}:{:02}:00"`.
+
+The child does not inspect `TimeStepsInHour`, the number of timesteps in a day,
+the source record's day, or the latent flag. It validates no zero, negative,
+out-of-day, inconsistent-cadence, or finite range and does not clamp or wrap.
+A normal last timestep can format as `24:00:00`; zero, negative, and
+greater-than-day indexes are passed through mechanically. The literal seconds
+field remains `00`.
+
+### Downstream ownership and replay
+
+`writeZszSpsz` follows only after every CP253 receiver completes, but does not
+consume these four strings. Calc3 then conditionally selects latent sizing. It
+can replace ordinary heating/cooling peak fields, including the sensible peak
+strings, with latent values. CP253 diagnostics therefore always describe the
+prelatent sensible fields, while a later predefined report can display a
+latent-selected sensible string. Calc4-7 do not copy these strings.
+`reportZoneSizing` reads the calculated-final sensible strings only when the
+corresponding final volume flow is positive; otherwise it emits literal
+`N/A`.
+
+CP253 has observable output side effects before state finalization and no
+transaction boundary:
+
+- diagnostic output commits in source order before any of the four strings;
+- each string assignment commits before the next child call or allocation;
+- a failure preserves all earlier diagnostics and assignments;
+- later Zone/Space receivers, sizing-file output, Calc3, copies, and reports
+  are suppressed by propagation.
+
+A failing invocation can therefore preserve no new string, Heat only,
+Heat/Cool only, or Heat/Cool/LatHeat while retaining all earlier diagnostic
+records. Stable direct replay overwrites the same four destinations and
+reconstructs their strings, but repeats every diagnostic side effect.
+Whole-parent replay is not necessarily observationally identical: a prior
+successful Calc3 may already have replaced sensible fields that the next
+CP253 diagnostic pass reads. Invalid record indices and helper integer
+overflow have no defined local recovery.
+
+### C++ evidence
+
+No C++ test directly calls `updateZoneSizingEndZoneSizingCalc2` or
+`sizingPeakTimeStamp`. The two direct `ZoneEquipmentManager` EndZone parent
+tests set pulse sizing true immediately before their calls, so both dispatch
+zero CP253 leaves.
+
+A fresh completing production-style census finds 57 EndZone parent entries:
+
+```text
+direct ManageSizing:     19 = 17 normal + 2 pulse
+full ManageSimulation:   38 = 34 normal + 4 pulse
+combined:                57 = 51 normal + 6 pulse
+```
+
+The 51 normal parents dispatch 93 CP253 leaves:
+
+```text
+Zone receivers:   72
+Space receivers:  21
+total:            93
+```
+
+Each leaf unconditionally calls the child four times, for 372
+`sizingPeakTimeStamp` and `General::ParseTime` calls. This is 186 ordinary
+heat/cool formats plus 186 latent heat/cool formats. Only 13 receivers are
+latent-enabled, split four Zone plus nine Space. Consequently, 26 latent
+formats occur on latent-enabled receivers and another 160 occur on 80
+latent-disabled receivers.
+
+Eight `SizingManager` Zone-sizing simulations contain 58 predefined
+peak-time table assertions. Eight heating `N/A` cells belong to
+`reportZoneSizing`'s later nonpositive-flow branch, not CP253. The remaining
+50 non-N/A values are composite CP253 timestamp descendants:
+
+```text
+Space descendants: 36
+Zone descendants:  14
+total:             50 of 372 formatted outputs
+```
+
+All 21 Space receivers are exactly the seven Space-sizing runs, so their 42
+heat/cool report paths are represented: six become no-flow `N/A` and 36
+retain CP253 descendants. The same suite covers only eight of 72 Zone
+receivers, with two no-flow cells and 14 descendants.
+
+The 50 expected strings are distributed as:
+
+| count | expected report value |
+|---:|---|
+| 13 | `7/21 16:00:00` |
+| 11 | `1/21 08:00:00` |
+| 10 | `1/21 12:00:00` |
+| 6 | `7/21 19:00:00` |
+| 5 | `7/21 17:30:00` |
+| 2 | `7/21 12:00:00` |
+| 1 | `8/21 16:00:00` |
+| 1 | `9/21 20:00:00` |
+| 1 | `16:00:00` |
+
+The time-only value descends from an empty cooling date and a raw leading
+space; `RetrievePreDefTableEntry` trims it downstream. Of the 50 descendants,
+49 are sensible strings. Exactly one `7/21 12:00:00` cooling assertion is a
+latent-cooling string selected by Calc3 after
+`TimeStepNumAtLatentCoolMax = 72`. No latent-heating string is asserted.
+
+The two NonCoincident simulations execute eight zero-heating
+warning/continuation pairs, proven by their asserted zero calculated heating
+loads across Zone and Space records. Their common 12 C cooling and 50 C
+heating supply inputs keep all positive-load deltas correctly directed and
+outside the near-delta interval. A separate
+`BaseSizer_SupplyAirTempLessThanZoneTStatTest` full call proves a positive
+heating load with a 12 C supply, 17.08 C peak, and therefore at least one
+wrong-direction heating severe event. No test asserts diagnostic text,
+severity count, continuation count, or output ordering.
+
+`General_ParseTime` unit coverage exercises 16 second inputs and 48 parsed
+components. A separate `SizingManager` `TimeIndexToHrMinString` test asserts
+14 strings for 15- and 3-minute timesteps. Neither directly exercises the
+CP253 wrapper, its integer multiplication, its fixed seconds, or date
+concatenation. The 50 downstream descendants cover only six times of day at a
+10-minute cadence.
+
+Unisolated branches include direct member writes, raw leading-space state,
+latent heating, latent-disabled unconditional latent writes, exact load and
+delta boundaries, near-delta warning/severe and optional notes, cooling wrong
+direction, fallback and invalid method integers, combined heat/cool severity,
+Space records labeled as `zone`, negative/NaN/infinite values, zero/24-hour/
+out-of-day/negative/overflow time inputs, nonstandard minutes, duplicate and
+cross-listed topology, malformed indexes, pulse stale-string preservation,
+diagnostic or assignment failure prefixes, direct replay, and whole-parent
+retry. No exact EIO diagnostic, ZSZ row, or SPSZ row assertion isolates CP253.
+
+### Rust boundary and governance
+
+A fresh exact search across 721 `crates` and `data` files finds zero main or
+child helper names and zero canonical-key occurrences. Rust has no
+`ZoneSizingData`, calculated-final Zone/Space sizing arena,
+`SupplyAirTemperature` sizing method, `PeakHrMinFmt`,
+`MinutesInTimeStep`, CP253 diagnostic literal, or ZSZ/SPSZ/ERR artifact
+counterpart. None of the 29 exact member tokens appears. Twenty-eight
+snake-case counterparts are also absent; the generic `zone_name` appears only
+in unrelated structures and does not supply this boundary.
+
+Thermostat and IdealLoads operational supply constraints, the separate
+`0.001` mass-flow delta guard, schedule `minutes_per_timestep`, and normalized
+ESO date/time labels are adjacent only. They provide no Zone-sizing
+diagnostic traversal, calculated-final peak state, source severity partition,
+or four-string finalizer.
+
+All 61 active-data `SimulationControl` objects set Zone sizing to `No`.
+Active data contain no `Sizing:Zone`, `Sizing:Parameters`,
+`NonCoincident`, authored `Space`, or `SpaceList`. Five design-day objects
+exist only in inactive/raw fixtures. The sole autosizing fixture expects
+`UnsupportedSizing` before runtime, while Space fixtures expect
+`UnsupportedSpacePartitioning`.
+
+CP253 therefore adds no algorithm-level EnergyPlus source, Rust target/code/
+state, test, object support, capability, output implementation, comparator,
+case, manifest, numerical, performance, or conformance promotion. The parent
+algorithm remains `scaffold` with claim level `none`. Inventory becomes 32
+algorithms and 258 routines, split 58 `state_mapped` plus 200
+`source_mapped`, with 135 required; heat-balance and HVAC project lists become
+88 and 24. HVAC readiness remains `0/24`, the inventory is incomplete, and
+all 24 required routines remain below `family_gated`.
+
+CP254 next maps `ZoneEquipmentManager::writeZszSpsz`, declared at
+`ZoneEquipmentManager.hh` lines 155-160 and implemented completely at
+`ZoneEquipmentManager.cc` lines 2401-2644.
 
 ## Claim Requirements
 
