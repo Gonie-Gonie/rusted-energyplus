@@ -13848,15 +13848,318 @@ required. Domain-required counts become heat-balance 88, HVAC 38, plant 1,
 and time/schedule 22, with readiness `0/88`, `0/38`, `0/1`, and `0/22`.
 The IdealLoads parent remains `scaffold` at claim level `none`.
 
-CP269 next adds required source-mapped
-`routine.calc_zone_mass_balance` immediately after
-`routine.adjust_system_output_required` and before
-`routine.sim_purchased_air`. `CalcZoneMassBalance` is declared at
-`ZoneEquipmentManager.hh` line 221 and implemented completely at
-`ZoneEquipmentManager.cc` lines 4933-5283. The header has
-`bool FirstHVACIteration`, while the definition adds function-type-neutral
-top-level `const`. `CalcZoneInfiltrationFlows` begins at source line 5285
-and is declared at header lines 223-226.
+## CP269 `CalcZoneMassBalance` Iterative Zone/Air-Loop Flow Solver
+
+CP269 adds canonical required `routine.calc_zone_mass_balance` immediately
+after `routine.adjust_system_output_required` and before
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+item. `CalcZoneMassBalance` is declared at `ZoneEquipmentManager.hh` line
+221 and implemented completely at `ZoneEquipmentManager.cc` lines 4933-5283:
+
+```cpp
+void CalcZoneMassBalance(
+    EnergyPlusData &state,
+    bool FirstHVACIteration);
+```
+
+The definition adds top-level `const` to the by-value Boolean, which does not
+change the C++ function type. There is no default argument, result status, or
+`noexcept`. `state` supplies every mutable Zone, Space, node, air-loop, mixing,
+infiltration, environment, sizing, and diagnostic dependency.
+
+There are exactly two production call expressions:
+
+- `SizeZoneEquipment` calls it unconditionally at
+  `ZoneEquipmentManager.cc` line 675 with `true`, after the complete
+  controlled-Zone and optional-Space Part1 sizing sweep and before
+  `CalcZoneLeavingConditions(state, true)` at line 677 and every Part2 entry;
+  and
+- `SimZoneEquipment` calls it at line 4186 with its incoming
+  `FirstHVACIteration`, after Zone exhaust controls and exhaust-system
+  simulation at lines 4182-4184 and before leaving conditions, whole-system
+  duct loss, and return-path simulation at lines 4188-4192.
+
+`ManageZoneEquipment` selects sizing or simulation at lines 157-161. Neither
+parent adds a mass-balance-specific guard, so sizing reaches CP269 even when
+there is no controlled Zone.
+
+The body defines `IterMax=25` and `ConvergenceTolerance=1.0e-5`. Its first
+persistent write clears `ZoneMassBalanceHVACReSim`. Before entering the
+iterative body it performs two complete source-ordered passes:
+
+1. every `AirDistUnit` whose `AirLoopNum` is positive additively contributes
+   `MassFlowRateSup` to `SupFlow`, `MassFlowRatePlenInd` to `RecircFlow`, and
+   three leakage terms to `LeakFlow`; these targets are not cleared locally,
+   and the source comment relies on prior `InitZoneEquipment`; then
+2. every primary air loop marked `isAllOA` receives `MaxOutAir=SupFlow`,
+   `OAFlow=SupFlow`, and `OAFrac=1`.
+
+The `do/while` body at lines 4979-5277 executes the following ordered
+building pass:
+
+- When `EnforceZoneMassBalance` is true, it first clears each air loop's
+  `ZoneRetFlow`, `SysRetFlow`, and `ExcessZoneExhFlow`. For every controlled
+  Zone it clears `ZoneInfiltrationFlag`,
+  `IncludeInfilToZoneMassBal`, mass-conservation `RetMassFlowRate`, and Zone
+  `ExcessZoneExh`; with Space heat balance enabled it also clears
+  `ExcessZoneExh` for controlled stored Spaces.
+- It snapshots the prior building mixing and return totals and zeros the
+  current local totals.
+- The main Zone pass uses numeric order without enforcement and
+  `ZoneReOrder(ZoneNum1)` with enforcement. Uncontrolled Zones are skipped.
+  The reorder array is trusted without local range, uniqueness, or ownership
+  validation.
+- Each controlled Zone clears `TotExhaustAirMassFlowRate` and calls its
+  `setTotalInletFlows`. Under `doSpaceHeatBalance`, controlled stored Spaces
+  call their own inlet-flow child, while uncontrolled Spaces receive
+  `scaleInletFlows` from the Zone node to the Space system node using raw
+  `fracZoneVolume`. The source explicitly leaves mass balance at Zone level.
+- Exhaust-node mass flow is accumulated only when the global
+  `AirflowNetworkNumOfExhFan` is zero. Any nonzero global AFN exhaust-fan
+  count suppresses that direct node summation for every Zone.
+- If `ZoneMassBalanceFlag(ZoneNum)` is true, the routine sums return-node
+  flows for positive node identities. Iteration zero, `AdjustReturnOnly`,
+  and `AdjustReturnThenMixing` start from the stored incoming mixing flow;
+  later mixing-first passes instead derive
+  `max(0, return + exhaust - inlet + source mixing)`. It then calls
+  `CalcZoneMixingFlowRateOfReceivingZone` and forms net mixing as receiving
+  minus source mass flow.
+- Standard return flow is
+  `inlet + net mixing - (exhaust - balanced exhaust)`. Without enforcement,
+  a negative value becomes positive `ExcessZoneExh` and the return target is
+  clamped to zero; a nonnegative value clears the excess. With enforcement,
+  excess is always zero and the target is clamped nonnegative.
+- `calcReturnFlows` is then called once for every controlled Zone visit.
+  Under enforcement, inlet and exhaust mass-conservation fields are
+  overwritten and the selected adjustment mode adds work as follows:
+
+| Adjustment | Extra receiving-mixing calls | Extra return-flow calls | Infiltration child |
+|---|---:|---:|---:|
+| `AdjustMixingOnly` | 0 | 0 | once |
+| `AdjustMixingThenReturn` | 0 | 1 | once |
+| `AdjustReturnOnly` | 0 | 1 | once |
+| `AdjustReturnThenMixing` | 1 | 2 | once |
+| any other value | 0 | 0 | once |
+
+The table excludes the conditional initial receiving-mixing call and the
+unconditional first return-flow call. Every enforced controlled-Zone visit
+reaches exactly one of the three static `CalcZoneInfiltrationFlows` call
+sites. Each return-derived adjustment uses
+`max(0, inlet - exhaust + net mixing)` and, only outside `DoingSizing`,
+applies raw `min(..., AirLoopDesSupply)` before delegating return allocation.
+
+For any other adjustment value, enforcement has already zeroed the
+mass-conservation `RetMassFlowRate`. Local `ZoneReturnAirMassFlowRate` also
+starts at zero, but an independently true `ZoneMassBalanceFlag` first adds
+current flows from positive return-node identities. The unconditional baseline
+`calcReturnFlows` result is not copied into either value, so the building
+return total adds zero. In ordinary freshly initialized
+`NoAdjustReturnAndMixing` topology, `SetZoneMassConservationFlag` leaves the
+Zone flag unset and the fallback infiltration child receives zero; an
+inconsistent true flag plus an unrecognized adjustment can pass the pre-summed
+return-node flow instead.
+
+After each controlled Zone calculation, the routine accumulates building
+mixing and return totals. Every positive return-air-loop identity receives
+that node flow in `ZoneRetFlow`; when `TotAvailAirLoopOA > 0`, it also receives
+the Zone excess exhaust in proportion to
+`MaxOutAir / TotAvailAirLoopOA`.
+
+The next primary-air-loop pass computes
+`adjusted=max(0, ZoneRetFlow-ExcessZoneExhFlow)`. A strictly positive
+`ZoneRetFlow` produces `ZoneRetFlowRatio=adjusted/ZoneRetFlow`; otherwise the
+ratio is one. It then clears `ZoneRetFlow` for reconstruction. A second Zone
+pass always uses numeric Zone order, skips uncontrolled Zones, and multiplies
+the flow at each return node whose identity is positive by its air-loop ratio
+when that air-loop identity is positive. It then rebuilds air-loop plus per-Zone
+return totals. Aliased or
+repeated node identities are neither deduplicated nor validated.
+
+The imbalance-warning path runs only when all of these are true:
+
+- Zone mass-balance enforcement is false;
+- ordinary sizing and HVAC sizing simulation are both false;
+- warmup is false;
+- `FirstHVACIteration` is false; and
+- the Zone's sticky `FlowError` latch is false.
+
+It first applies the strict `HVAC::SmallMassFlow` threshold to unbalanced
+system outflow. Only when that passes does it subtract outdoor-air,
+ventilation, and incoming-mixing mass flow and require a second strict
+`unbalancedFlow > HVAC::SmallMassFlow` comparison. Only then does it convert
+the remaining imbalance to volume using the current psychrometric Zone
+density and `StdRhoAir` and apply the strict `HVAC::SmallAirVolFlow`
+threshold. A reported imbalance emits one warning,
+one timestamp, and four continuation messages before setting
+`FlowError=true`, so later calls suppress the warning for that Zone.
+
+From `Iteration > 0`, convergence is the sum of absolute changes in building
+mixing and return flow. Strict residual `< 1.0e-5` clears
+`ZoneMassBalanceHVACReSim` and breaks; equality does not converge, while any
+failed comparison sets the flag true. Non-enforced execution breaks after
+one building pass. Enforced execution therefore performs between two and 25
+passes; exhaustion or a NaN residual leaves the re-simulation request true.
+After loop exit every primary air loop receives the unclamped
+`SysRetFlow = ZoneRetFlow - RecircFlow + LeakFlow`.
+
+`FirstHVACIteration` affects only warning suppression. It changes no solver,
+iteration, airflow, mixing, infiltration, return, excess, or convergence
+arithmetic.
+
+The function contains 37 direct persistent mutation sites over 21 normalized
+state-path families: 29 plain assignments, seven `+=` sites, and one `*=`
+site. Those families cover the re-simulation flag; air-loop supply,
+recirculation, leakage, outdoor-air, return, excess, ratio, and system-return
+state; Zone infiltration and mass-conservation state; Zone/Space equipment
+excess and Zone exhaust totals; return-node flow; and the warning latch.
+Mutations inside the inlet, scaling, mixing, return, infiltration,
+psychrometric, and diagnostic children are additional.
+
+Lexically the body has 38 `if` tokens, seven `else` tokens including one
+`else if`, 14 `for` loops split 12 indexed plus two range loops, one
+`do/while`, two `break`, and four `continue`. Thus there are 15 loop
+constructs in total. There is no switch, ternary, explicit return, result
+status, or catch.
+
+Under the established non-accessor convention, its 19 operational/service
+call sites are two `setTotalInletFlows`, one `scaleInletFlows`, two receiving
+mixing, four return-flow, three infiltration, one density, and six diagnostic
+calls. Nine `max`, three `min`, two `abs`, and four formatting sites are
+counted separately.
+
+The routine performs no complete up-front validation of reorder, extent,
+Zone/Space ownership, node or air-loop identity, aliasing, density, finite
+arithmetic, or child state. It has no checkpoint, cleanup, transaction,
+catch, rollback, or retry repair. Failure retains every completed ordered
+prefix: the initial re-simulation clear, partial AirDistUnit additions,
+all-OA overwrites, enforcement resets, completed Zone/Space and air-loop
+passes, return-node scaling, child mutations, and any diagnostics.
+
+A warning failure occurs before `FlowError=true`, so retry can repeat a
+partial message sequence; successful completion makes the latch sticky. A
+failure before the final system-return loop suppresses that tail, while a
+failure within it preserves the completed air-loop prefix.
+
+Same-state replay is generally non-idempotent. The AirDistUnit prefix adds
+again, non-enforced excess/return aggregation can reuse prior air-loop state,
+return nodes are multiplied in place, mixing and infiltration children own
+additional state, and warning output is sticky. Normal parent flow calls
+`InitZoneEquipment` first and externally zeros six air-loop aggregates, but
+that is not CP269-local recovery. Enforced per-pass resets repair only a
+selected subset and cannot roll back an interrupted call.
+
+The C++ unit sources contain exactly 19 literal direct calls, all with
+`FirstHVACIteration=false`: three warning-threshold calls in
+`ZoneEquipmentManager_CalcZoneMassBalanceTest`, two return-basis calls in
+`CalcZoneMassBalanceTest3`, one enforced no-adjust call in
+`HeatBalanceManager_ZoneAirMassFlowConservationData2`, three calls each for
+`AdjustMixingOnly`, `AdjustReturnOnly`, `AdjustReturnThenMixing`, and
+`AdjustMixingThenReturn`, plus one additional source-and-receiving-Zone
+`AdjustMixingOnly` call.
+
+Those direct calls split into five non-enforced and 14 enforced entries. The
+enforced modes are one no-adjust, four mixing-only, three return-only, three
+return-then-mixing, and three mixing-then-return.
+
+The 19 direct calls have 204 post-call `EXPECT` or `ASSERT` macros. All six
+`AdjustReturnThenMixing` and `AdjustMixingThenReturn` calls immediately run
+`CalcAirFlowSimple` before their 89 macros, split 47 plus 42, so those
+outcomes are not CP269-isolated. Remaining assertions cover warning presence
+but not exact text or the `FlowError` latch, return-node flow, conservation,
+mixing state, and infiltration.
+The enforced tests consume stored `ZoneReOrder` values, but each fixture
+exercises only one ordering and no test perturbs or compares permutations.
+
+The exact bounded route-representative unit census is 72 CP269 route
+entries, not 72 literal dynamic function invocations:
+
+- 19 direct leaf calls;
+- six direct `SizeZoneEquipment` parents;
+- 13 directly attributable `SimZoneEquipment` parents; and
+- 17 effective `ManageSizing` contexts, each contributing one representative
+  sizing route and one representative later simulation route.
+
+The unit sources contain 18 lexical `ManageSizing` calls. The
+`WaterToWaterSimple` call at source line 1538 performs plant sizing only and
+reaches no CP269 route. In each of the other 17 contexts, the Zone-sizing
+route can repeat inside design-day and timestep `ManageHeatBalance` cadence.
+The bounded representative total is 51 true and 21 false
+`FirstHVACIteration` routes, 14 enforced and 58 non-enforced; none activates
+Space heat balance. Beyond that bound, 56 completing `ManageSimulation`
+contexts include 55 with Zones and 34 that also perform Zone sizing, but
+environment, design-day, timestep, and HVAC convergence cadence prevents an
+exact dynamic invocation count.
+
+Coverage omits a direct iteration-count or re-simulation-flag assertion,
+exact tolerance equality, 25-pass exhaustion, nonconvergence and NaN,
+`FirstHVACIteration=true` warning suppression, the `DoingSizing` supply-cap
+bypass, AirDistUnit prefix, uncontrolled-Zone and controlled/uncontrolled
+Space variants, AFN exhaust suppression, all-OA setup, positive-available-OA
+excess allocation and `ZoneRetFlowRatio`, final `SysRetFlow`, and
+`Add`, `No`, or `MixingSourceZonesOnly` infiltration modes. Every direct
+enforced call uses `Adjust` plus `AllZones`; input-only enum tests do not call
+CP269. Malformed topology, failure/rollback, and unchanged-input replay are
+also uncovered.
+
+Rust has no exact or snake-case CP269 function, re-simulation flag,
+`ZoneRetFlowRatio`, excess-exhaust allocation, mass-conservation arena,
+`ZoneReOrder`, or flow-adjustment enum. The compatibility runtime instead
+iterates prebound IdealLoads systems directly, constructs a fresh four-value
+by-copy `ZoneSysEnergyDemand`, and calls PurchasedAir. Its execution plan
+contains metadata labels for `SimZoneEquipment` and `SimPurchasedAir`, but no
+mass-balance execution step.
+
+The diagnostic `simulate_ideal_loads_node_state_projection` is a superficially
+similar but explicitly non-parity path. It seeds a design/default supply flow
+and assigns that same fixed flow to Zone-air and return-node records; it owns
+no inlet/exhaust/mixing/infiltration or AirLoop aggregates, adjustment mode,
+iteration, convergence, re-simulation latch, first-iteration warning gate, or
+return allocation.
+
+The Rust demand record, diagnostic `NodeStateStore`, and static AirLoop graph
+skeleton therefore do not supply a shared mutable CP269 solver. Rust lacks
+operational `AirLoopFlow` and AirDistUnit aggregates, Zone equipment flow
+topology, Space heat-balance allocation, and the mass-balance lifecycle.
+
+Across 120 unique data models, the census includes 30 equipment
+lists, 30 equipment connections, and 30 IdealLoads systems. Every list is
+one-entry `SequentialLoad` at heating/cooling sequence `1/1` with blank
+fraction schedules. The census has zero `ZoneAirMassFlowConservation`,
+air-distribution-unit, air-terminal, mixing, cross-mixing, infiltration, ventilation,
+AirflowNetwork, duct-loss, `Sizing:Zone`, Space, SpaceList, or SpaceHVAC objects, and all 61
+SimulationControl records disable Zone sizing. Three AirLoopHVAC skeletons
+exist only in diagnostic/nonclaim, run-blocked cases; they are not CP269
+execution.
+
+All 30 IdealLoads equipment connections do have one nonblank inlet and one
+nonblank return node, with blank exhaust. Their EnergyPlus oracle runs CP269's
+ordinary non-enforced one-pass inlet-to-return bookkeeping during simulation;
+the 61 sizing-disabled controls remove only the separate sizing parent call.
+Rust dispatch validates list edges and inlet nodes but does not consume return
+or exhaust topology, then invokes PurchasedAir directly. Existing System Node
+Mass Flow Rate coverage is supply-node-only and explicitly excludes broad HVAC
+flow balancing, so that oracle activity is not Rust parity evidence.
+
+The roadmap still requires Rust-owned shared node and air-loop flow state,
+Zone/Space equipment topology, simple-airflow and mass-conservation arenas,
+ordered mixing/return/infiltration adjustment, convergence, lifecycle, and
+diagnostic parity. Static graph metadata and isolated node mass-flow fields
+cannot establish this iterative transaction.
+
+CP269 changes no Rust target or state, support declaration, test, capability,
+output, comparator, case, manifest, numerical claim, performance claim, or
+conformance status. Counts become 32 algorithms and 273 routines, split 58
+`state_mapped` plus 215 `source_mapped`, with 150 required. Domain-required
+counts become heat-balance 88, HVAC 39, plant 1, and time/schedule 22, with
+readiness `0/88`, `0/39`, `0/1`, and `0/22`. The IdealLoads parent remains
+`scaffold` at claim level `none`.
+
+CP270 next adds required source-mapped
+`routine.calc_zone_infiltration_flows` immediately after
+`routine.calc_zone_mass_balance` and before `routine.sim_purchased_air`.
+`CalcZoneInfiltrationFlows` is declared at `ZoneEquipmentManager.hh` lines
+223-226 and implemented completely at `ZoneEquipmentManager.cc` lines
+5285-5340. `CalcZoneLeavingConditions` begins at source line 5342.
 
 ## Promotion Requirements
 
