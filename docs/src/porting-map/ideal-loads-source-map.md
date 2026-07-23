@@ -7517,6 +7517,631 @@ CP259 next maps
 `ZoneEquipmentManager.hh` lines 177-182 and implemented completely at
 `ZoneEquipmentManager.cc` lines 2867-3221. The next parent
 `UpdateZoneSizing` definition begins at line 3223.
+## CP259 `updateZoneSizingEndZoneSizingCalc7` Final Sizing Adjustment
+
+CP259 adds canonical required
+`routine.update_zone_sizing_end_zone_sizing_calc7` immediately after Calc6
+and before `sim_zone_equipment`. The declaration is
+`ZoneEquipmentManager.hh` lines 177-182 and the complete definition is
+`ZoneEquipmentManager.cc` lines 2867-3221:
+
+```cpp
+void updateZoneSizingEndZoneSizingCalc7(
+    EnergyPlusData &state,
+    DataSizing::ZoneSizingData &zsFinalSizing,
+    DataSizing::ZoneSizingData &zsCalcFinalSizing,
+    Array2D<DataSizing::ZoneSizingData> &zsSizing,
+    Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,
+    int const zoneOrSpaceNum);
+```
+
+### Parent order and addressed records
+
+The EndZone parent reaches Calc7 only after the complete CP256 Calc4,
+CP257 Calc5, and both CP258 Calc6 sweeps. The Calc7 loop at lines
+3511-3531 is after the nonpulse guard closed at line 3455. Normal and pulse
+entries therefore use the same order:
+
+1. scan Zone numbers from one through `NumOfZones`;
+2. skip an uncontrolled equipment Zone;
+3. complete that Zone's final-record Calc7 leaf;
+4. when Space sizing is active, complete every stored `spaceIndexes`
+   occurrence for that Zone in list order;
+5. only after the entire leaf returns, advance to the next Zone.
+
+Let `Z=max(NumOfZones,0)`, `C` be the controlled Zone count, `M` the number
+of stored Space-index occurrences below controlled Zones, `U` the unique
+valid referenced Space count, and `I` be one when Space sizing is active.
+The parent makes
+
+`L = C + I*M`
+
+leaf calls over `C+I*U` distinct final identities and repeats
+`I*(M-U)` leaves. The Zone scan contributes `Theta(Z+1)` even when no leaf
+runs. There is no per-Space controlled/owner/name/identity check, no
+latent or sizing-method filter, and no deduplication. Duplicate or
+cross-listed Space identities execute the entire mutating body repeatedly
+without an intervening Calc4-6 baseline copy. Uncontrolled Zones,
+unreferenced/orphan Spaces, and dense final-array entries outside this
+topology receive Calc4-5 copies and may retain prior Calc6 state, but
+receive no Calc7 adjustment.
+
+Unlike Calc6, the parent passes only final records. Each leaf itself scans
+the daily arrays for the same raw `zoneOrSpaceNum`. The caller selects
+Zone or Space final and daily arenas consistently, but the signature and
+body do not verify target kind, corresponding identities, dimensions, or
+aliasing.
+
+### Mutable state and static body inventory
+
+The six arguments have these literal roles:
+
+| Input | Source behavior |
+|---|---|
+| `state` | reads total design/run-design days, global timesteps per day, design-day weather, and diagnostic services |
+| `zsFinalSizing` | mutable user-final record and primary branch/denominator state |
+| `zsCalcFinalSizing` | calculated-final source, but also mutated by exact-zero day/time defaults and six peak/return fields |
+| `zsSizing` | mutable daily user array; all daily rescaling, no-OA snapshots, and OA floors land here |
+| `zsCalcSizing` | syntactically mutable calculated-daily array, but the body reads only ten ordinary flow/load scalar or sequence fields |
+| `zoneOrSpaceNum` | unchecked raw second-dimension index and zero-load selected-record identity |
+
+Across those records the body touches 76 unique `ZoneSizingData` member
+names. Per alias:
+
+| Alias | Unique touched | Unique written | Record LHS sites |
+|---|---:|---:|---:|
+| user final | 64 | 44 | 61 |
+| calculated final | 22 | 10 | 10 |
+| daily user aliases combined | 44 | 20 | 41 |
+| calculated daily aliases | 10 | 0 | 0 |
+| **union/body total** | **76** | **44** | **112** |
+
+The 44 user-final write-capable names cover four `NonAirSys` fields;
+ordinary volume, mass, load, and flow/load/no-OA sequence state; coil inlet
+state; zero-load day/time/day-name and user/calculated peak state; two
+derived volume limits; and two conditional supply temperatures. Daily
+writes cover ordinary volume/mass/load, flow/load sequences, no-OA
+flow/scalars, and coil inlet state. Calculated-final writes are exactly the
+two day numbers, two peak timesteps, and Zone temperature/humidity/return
+temperature for cooling and heating.
+
+The body has 18 explicit `for` sites and 34 `if` sites. A
+comment/string-stripped lexical census has 55 comparisons, five `&&`
+operators, 181 assignment/initializer tokens including four `*=`, and
+four `abs`, four `min`, 12 `max`, three `min_element`, and one
+`max_element` call. These are source-shape counts rather than semantic
+operation totals inside helpers or array assignment.
+
+### Cooling factor and positive-flow projection
+
+Cooling is fully ordered before any heating mutation. Lines 2875-2877
+first execute, without a guard:
+
+```text
+NonAirSysDesCoolLoad    *= CoolSizingFactor
+NonAirSysDesCoolVolFlow *= CoolSizingFactor
+```
+
+The local multiplier `Mc` is then:
+
+```text
+if InpDesCoolAirFlow > 0
+   and CoolAirDesMethod == InpDesAirFlow
+   and current DesCoolVolFlow > 0:
+    Mc = (InpDesCoolAirFlow / current DesCoolVolFlow)
+         * CoolSizingFactor
+else:
+    Mc = CoolSizingFactor
+```
+
+The source comment says the input design flow is used, but the executable
+formula still multiplies the input-derived ratio by the sizing factor.
+Only `abs(Mc-1) > 1e-5` enters the rescaling branch. Equality at the
+tolerance, unordered comparisons from NaN, and other false comparisons
+take the no-rescale branch.
+
+When the current user-final cooling volume is strictly positive, Calc7
+rebuilds user-final volume, mass, and load from calculated-final values
+times `Mc`. A zero-based loop bounded only by destination
+`CoolFlowSeq.size()` then rebuilds destination flow and load sequences
+while independently indexing calculated flow/load sequences. It computes
+
+```text
+OAFrac = clamp(MinOA / newly rebuilt DesCoolVolFlow, 0, 1)
+coil inlet = OAFrac * design-day weather at the stored peak
+             + (1-OAFrac) * user-final Zone peak state
+```
+
+The positivity guard applies to the old user value. The new calculated
+flow times `Mc` is not checked before division, so zero, NaN, or infinity
+can reach the OA fraction and coil inlet path. Design day and peak timestep
+are also used without positive/range validation.
+
+A nonpositive old final flow writes only `InpDesCoolAirFlow` and its
+density-derived mass. It does not rebuild load, sequences, or coil state.
+
+Every design/run-design day then takes the same positive-current-flow or
+input-flow fallback against that daily user record. Positive daily flow
+rebuilds volume/mass/load and the two sequences from the corresponding
+calculated daily record, and recomputes coil inlet from that day's weather.
+Regardless of the daily subbranch, it snapshots:
+
+- whole `CoolFlowSeq` into `CoolFlowSeqNoOA`;
+- `DesCoolVolFlow` into `DesCoolVolFlowNoOA`;
+- `DesCoolMassFlow` into `DesCoolMassFlowNoOA`.
+
+When `abs(Mc-1) <= 1e-5` or the comparison is false, Calc7 skips all
+rescaling/fallback work but still performs those three no-OA snapshots for
+every day. Thus an input-flow fallback can be bypassed when the global
+multiplier lies within tolerance.
+
+### Cooling no-OA and including-OA floors
+
+The final no-OA phase initializes a zero minimum. Only exact
+`DesAirFlowWithLim` changes it to
+
+`max(DesCoolMinAirFlow, DesCoolMinAirFlow2)`.
+
+It snapshots current final volume and mass, raises those no-OA scalars when
+the minimum is strictly greater, copies each ordinary final cooling-flow
+timestep into `CoolFlowSeqNoOA`, and raises only the no-OA flow element
+when the density-derived minimum mass is greater. Load and coil state are
+not adjusted.
+
+Daily behavior is source-asymmetric. Each day resnapshots the no-OA
+scalars, then lines 2969-2970 literally use
+
+```text
+max(DesCoolMinAirFlow, DesCoolMinAirFlow)
+```
+
+with no method guard. The first minimum is duplicated and
+`DesCoolMinAirFlow2` is ignored. The subsequent timestep loop changes a
+no-OA element only when that mass floor exceeds the ordinary
+`CoolFlowSeq`; otherwise the earlier whole-array snapshot remains.
+
+The including-OA final phase uses:
+
+```text
+if method == DesAirFlowWithLim:
+    min volume = max(min1, min2, MinOA)
+else:
+    min volume = MinOA
+```
+
+It raises ordinary final volume/mass and each `CoolFlowSeq` element, again
+without changing load, load sequence, or coil inlet state. Every daily
+record instead evaluates `max(min1, min1, MinOA)` without any method guard,
+repeating the same omitted-second-minimum source behavior.
+
+### Cooling exact-zero-load fallback
+
+The comment at line 3017 says cooling flow is zero, but the executable
+gate is exact `zsFinalSizing.DesCoolLoad == 0`. A MinOA or authored flow
+floor can therefore coexist with entry into this branch.
+
+Only exact-zero calculated-final `CoolDDNum` or
+`TimeStepNumAtCoolMax` values are changed to one. Negative and oversized
+values pass through. Calc7 copies calculated timestep, day number, and day
+name to user-final, then indexes that daily user record.
+
+An empty `DesCoolSetPtSeq` emits the routine-specific Severe diagnostic
+and the shared noreturn Fatal. Otherwise the user-final Zone peak
+temperature becomes the whole setpoint-sequence minimum. Outdoor
+temperature becomes the whole `CoolOutTempSeq` minimum with no empty
+guard, rather than the value at the selected peak. Outdoor humidity is
+the selected `CoolOutHumRatSeq` element, and user-final Zone humidity is
+the daily scalar `CoolDesHumRat`.
+
+Calculated-final Zone temperature and humidity instead come from
+`CoolZoneTempSeq` and `CoolZoneHumRatSeq` at the selected timestep, and
+its return temperature becomes that calculated Zone temperature.
+User-final coil inlet and return state are set from the user-final Zone
+peak state. The user and calculated records therefore intentionally retain
+different temperature/humidity sources.
+
+### Heating factor, cap, and projection
+
+Heating begins only after the complete cooling path returns. It
+unconditionally executes:
+
+```text
+NonAirSysDesHeatLoad    *= HeatSizingFactor
+NonAirSysDesHeatVolFlow *= HeatSizingFactor
+```
+
+The local multiplier `Mh` follows three branches:
+
+```text
+if InpDesHeatAirFlow > 0
+   and HeatAirDesMethod == InpDesAirFlow
+   and current DesHeatVolFlow > 0:
+    Mh = (InpDesHeatAirFlow / current DesHeatVolFlow)
+         * HeatSizingFactor
+else if HeatAirDesMethod == DesAirFlowWithLim
+        and current DesHeatVolFlow > 0:
+    Hmax = max(DesHeatMaxAirFlow,
+               DesHeatMaxAirFlow2,
+               already adjusted DesCoolVolFlow
+                 * DesHeatMaxAirFlowFrac)
+    if Hmax < current DesHeatVolFlow:
+        Mh = (Hmax / current DesHeatVolFlow) * HeatSizingFactor
+    else:
+        Mh = HeatSizingFactor
+else:
+    Mh = HeatSizingFactor
+```
+
+Thus cooling OA floors and other cooling changes precede and can affect
+the heating limit formula. The explicit-flow formula and limited-flow
+ratio both retain the sizing factor, despite the source comment that an
+input flow overrides it. A cap equal to or above the current heating flow
+does not form a ratio.
+
+Only `abs(Mh-1) > 1e-5` enters heating rescaling. Positive final and daily
+heating flows rebuild volume, mass, load, flow sequence, and load sequence
+from calculated state times `Mh`, then recompute OA-mixed coil inlet state.
+The old flow is the positivity guard, while the denominator for OA
+fraction is the unchecked newly rebuilt flow. Nonpositive old flows
+receive input volume plus density-derived mass only.
+
+Every daily record snapshots whole `HeatFlowSeq` and its current
+volume/mass into no-OA state after the scale-or-fallback branch. The
+no-rescale alternative still makes those daily snapshots.
+
+Heating then snapshots final current volume/mass and copies each final
+`HeatFlowSeq` element into `HeatFlowSeqNoOA`. Unlike cooling, this no-OA
+phase applies neither `DesHeatMaxAirFlow` nor
+`DesHeatMaxAirFlow2`; the maximums affect only the multiplier branch and
+the final derived field.
+
+The following phase floors ordinary final heating volume/mass and every
+final heating-flow element against density-derived `MinOA`. It repeats the
+same `MinOA`-only floor for every daily record. Loads, load sequences, and
+coil inlet state again retain their pre-floor values.
+
+### Heating exact-zero-load fallback and derived tail
+
+The heating comment describes zero flow, but the executable gate is exact
+`zsFinalSizing.DesHeatLoad == 0`. Exact-zero calculated-final `HeatDDNum`
+and `TimeStepNumAtHeatMax` become one; negative and oversized values are
+not corrected. User-final then receives the calculated day/timestep/day
+name and selects that daily user record.
+
+An empty `DesHeatSetPtSeq` emits Severe then noreturn Fatal. Otherwise
+user-final Zone peak temperature becomes the whole setpoint-sequence
+maximum. The source still takes the whole `HeatOutTempSeq` minimum, not a
+maximum or selected-peak outdoor temperature, and does so without an empty
+guard. Outdoor humidity uses the selected timestep, while user-final Zone
+humidity uses daily scalar `HeatDesHumRat`.
+
+Calculated-final Zone temperature/humidity come from the daily heating
+Zone sequences at the selected timestep and its return temperature becomes
+that calculated Zone temperature. User-final coil inlet and return fields
+use the separate user-final Zone peak state.
+
+After both modes complete, the tail unconditionally derives:
+
+```text
+DesCoolVolFlowMin =
+    max(DesCoolMinAirFlow,
+        DesCoolMinAirFlow2,
+        DesCoolVolFlow * DesCoolMinAirFlowFrac)
+
+DesHeatVolFlowMax =
+    max(DesHeatMaxAirFlow,
+        DesHeatMaxAirFlow2,
+        max(DesCoolVolFlow, DesHeatVolFlow)
+          * DesHeatMaxAirFlowFrac)
+```
+
+The source comment immediately above the cooling result says its own
+minimum-flow description appears incorrect. These final derived values are
+not projected to daily records.
+
+When `ZnCoolDgnSAMethod` equals the unscoped integer constant
+`TemperatureDifference` (`2`), Calc7 overwrites `CoolDesTemp` with
+`ZoneTempAtCoolPeak - abs(CoolDesTempDiff)`. The analogous heating method
+writes `ZoneTempAtHeatPeak + abs(HeatDesTempDiff)`. Other integers,
+including invalid values, leave existing temperatures unchanged.
+
+### Extents, indexing, and complexity
+
+Let `D=max(TotDesDays+TotRunDesPersDays,0)` for ordinary valid global
+state and `T=max(NumOfTimeStepInDay,0)`. Each leaf necessarily chooses one
+cooling scale-or-snapshot day sweep and one heating
+scale-or-snapshot day sweep, then performs three more full day sweeps:
+cooling no-OA minima, cooling including-OA minima, and heating including-OA
+floors. It therefore visits `5D` daily records before any optional
+zero-load selected-day access.
+
+Four final loops and three loops per daily record use one-based `1..T`
+Objexx indexing. Their explicit baseline is:
+
+`T * (4 + 3D)`
+
+iterations per leaf. Conditional cooling/heating scaling instead uses
+zero-based `[]`, bounded solely by the destination `FlowSeq.size()`, while
+also indexing destination `LoadSeq` and both calculated peers. Whole
+daily no-OA sequence assignments copy according to Objexx array assignment
+semantics rather than global `T`.
+
+For normal conformable equal-length records, time is
+`Theta((D+1)*(T+1))` per leaf and
+`Theta((Z+1)+L*(D+1)*(T+1))` at the parent. Exact work depends on flow
+signs, multiplier tolerance, sequence sizes, zero-load branches, and
+setpoint/outdoor reduction lengths. Scratch storage is scalar only, but
+whole-array copies can allocate or redimension an unallocated destination
+and can fail.
+
+`T <= 0` is not a leaf no-op. It skips only the seven explicit
+one-based loop sites; four NonAir multiplications, scalar projection and
+floors, zero-based size-driven scaling, whole-array daily snapshots,
+zero-load sequence reductions, and tail derivation still run. `D <= 0`
+skips the five daily sweeps, but exact-zero load can default day number to
+one and immediately index an absent daily/weather record.
+
+The routine independently assumes:
+
+- final and daily flow/load sequence extents match their calculated peers;
+- no-OA sequences accept whole-array copies and at least `T` one-based
+  elements;
+- daily Array2D first and second coordinates exist;
+- final and daily design day/timestep identities address weather and
+  selected sequences;
+- setpoint and outdoor temperature sequences are nonempty;
+- outdoor/Zone humidity and Zone temperature sequences contain the
+  selected peak timestep.
+
+Only setpoint emptiness receives an explicit check. An empty outdoor
+temperature sequence reaches a dereferenced `min_element` result.
+Objexx asserted indexing can terminate; unchecked release access can be
+undefined behavior; the two daily Zone-temperature `EPVector` accesses
+can throw in debug. Allocation or string assignment can also throw.
+
+### Failure, alias, and replay semantics
+
+There is no local status, catch, transaction, cleanup, or rollback.
+Cooling is ordered first. A cooling failure preserves its NonAir
+multiplication, any scalar/sequence prefixes, completed days, no-OA/OA
+floors, and calculated-final defaults, then blocks all heating and the
+tail. A heating failure preserves the entire cooling result plus the
+heating prefix. Earlier Zone/Space leaves in the parent remain committed.
+Failure prevents later leaves, `UpdateZoneSizing` completion, and the
+later `UpdateFacilitySizing`/`ZoneSizingRunDone` actions at
+`SizingManager.cc` lines 391-393.
+
+The two guarded setpoint failures emit one Severe and then one noreturn
+Fatal each. Other invalid record/weather/sequence coordinates fail without
+Calc7 diagnostics. A weather failure in a positive-flow branch occurs
+after volume, mass, load, and sequence writes. A zero-load failure can
+occur after changing calculated-final day/time identities and copying them
+to user-final.
+
+Direct valid replay is not generally value-idempotent:
+
+- four `NonAirSys` fields multiply in place on every entry;
+- an explicit-input multiplier divides by the current mutable user flow;
+- daily user arrays may already contain prior scaling/floors;
+- zero-load fallback mutates calculated-final day/time and peak state;
+- strict comparisons and tolerance gates can choose a different branch
+  after earlier mutation.
+
+Same-parent duplicate Space membership repeats the leaf with no baseline
+restore and can compound. Stable `zsFinalSizing` /
+`zsCalcFinalSizing` alias makes positive projection in-place. The
+zero-load branch first writes user peak state and then calculated peak
+state; exact alias lets the latter overwrite the former before coil and
+return writes. Aliased daily user/calculated arrays likewise turn daily
+source projection into in-place scaling.
+
+A whole-parent replay is different from direct leaf replay. It reruns EMS;
+on a normal entry it also reruns CP252-255 and the writer; every entry then
+reruns Calc4-6 before Calc7. Calc4/5 restore only their listed user fields,
+and Calc6 restores only its 14 sequences. Calculated-final day/time/peak
+mutations from an earlier zero-load Calc7 and calculated state retained
+from Calc3 survive unless an earlier stage happens to replace them.
+Consequently a valid whole replay is not guaranteed to reproduce the first
+entry.
+
+Calc7 owns no EMS call. The parent EMS calling point is earlier than
+Calc4/5. Eight Final-Zone scalars are registered as EMS internal
+variables; Calc7 can later mutate the six flow/load members but not the two
+densities. The six calculated-final actuators are applied before the
+nonpulse work, and Calc7's calculated-final writes affect different
+day/time/peak fields. No analogous Space EMS registration is established
+by this routine.
+
+On a normal nonpulse entry, CP254 has already closed current-attempt
+ZSZ/SPSZ streams before Calc7, so the current leaf cannot retroactively
+change those bytes. On a later nonpulse whole replay, CP254 reads
+calculated-final cooling/heating design
+day identities at `writeZszSpsz` lines 2513 and 2521 and can observe
+Calc7's retained zero defaults; it can also observe retained Calc3
+sequence selections. Pulse replay skips CP252-255 and the writer but still
+repeats EMS and Calc4-7.
+
+### C++ execution census
+
+No C++ test calls the Calc7 leaf directly. The completing high-level corpus
+has the same 59 EndZone parent entries audited for Calc5-6: 51 normal
+entries, six additional component-load pulse entries, and two bare pulse
+parent calls at `ZoneEquipmentManager.unit.cc` lines 4576 and 4877.
+
+Calc7 leaf roles are:
+
+| Role | Normal | Additional pulse | Bare parent | Total |
+|---|---:|---:|---:|---:|
+| final Zone | 72 | 9 | 2 | 83 |
+| final Space | 21 | 0 | 0 | 21 |
+| **Total** | **93** | **9** | **2** | **104** |
+
+There are 95 distinct final targets. Eighty-six execute once; nine normal
+Zone targets are revisited by pulse, giving `86 + 9*2 = 104`. The seven
+Space-enabled contexts each own three unique Spaces under one controlled
+Zone, so the completing corpus has no duplicate or cross-listed Space
+execution.
+
+The parent-entry timestep distribution weighted by final leaves is:
+
+| `T` | Calc7 leaves | Final-leaf timestep units |
+|---:|---:|---:|
+| 144 | 55 | 7,920 |
+| 96 | 45 | 4,320 |
+| 24 | 2 | 48 |
+| 1 | 2 | 2 |
+| **Total** | **104** | **12,290** |
+
+The same leaves make 197 aggregate daily-record visits. Weighted by their
+parent timestep count, those daily visits contribute 23,426
+daily-record/timestep units. The four unconditional final timestep loops
+plus three unconditional daily timestep loops therefore execute
+
+`4*12,290 + 3*23,426 = 119,438`
+
+iterations. The five unconditional day sweeps make `5*197 = 985` record
+visits. These totals exclude conditional sequence-rescaling loops,
+whole-array no-OA copies, scalar work, and zero-load reductions. Under the
+audited conformable extents, the optional positive-flow rescaling loops
+can add at most 7,392 iterations across both modes.
+
+Thirteen final targets have latent sizing enabled: nine `Sensible` and
+four `SensibleAndLatent`; exact `Latent` is absent. The other 91 are
+latent-off. Calc7 reads none of those flags or methods.
+
+### C++ branch and assertion evidence
+
+Production inputs choose cooling `FromDDCalc` for 95 leaves and
+`DesAirFlowWithLim` for seven; the two bare records retain default/invalid
+method state. Heating uses `FromDDCalc` for all 102 production leaves and
+default/invalid state for the two bare records. No production or bare
+record selects `InpDesAirFlow`, so both explicit user-flow multiplier
+formulas have zero coverage. Neither final supply-air
+`TemperatureDifference` branch executes.
+
+Eleven normal Zone leaves use nonunit cooling and heating sizing factors
+and necessarily enter both outer multiplier gates: two AirLoop DOAS leaves
+at 1.2, three FourPipeBeam leaves at 1.33, two OA-preheat leaves at 1.3,
+one PIU leaf at cooling 1.15/heating 1.25, two WSHP leaves at 1.2, and one
+UnitHeater leaf at 1.5. The other 93 leaves use unit factors. Exact
+positive/nonpositive flow subbranch counts across all production
+simulations are not statically recoverable from input alone.
+
+The two bare parent tests provably enter both exact-zero-load fallbacks,
+have initialized setpoint/outdoor/Zone sequences, and avoid both fatal
+paths. Six post-call assertions cover four peak-state identities:
+
+- calculated-final `ZoneTempAtHeatPeak` and `ZoneTempAtCoolPeak` at lines
+  4588-4589 and 4885-4886;
+- user-final `ZoneTempAtHeatPeak` and `ZoneTempAtCoolPeak` at lines
+  4592-4593.
+
+They directly prove the calculated 23/23 versus user 22/24 split in one
+case and calculated 23.9/23.9 state in the other. They do not isolate the
+outdoor minimum, humidity, return, coil, day/time default, or diagnostic
+rules.
+
+The BaseClassSizing completion test reads calculated/user heating peak
+temperature, final zero heating volume/mass, and final positive load after
+Calc7. Two WindowAC completion tests read final cooling volume. These are
+useful descendants but combine Calc5, Calc6, Calc7, and later sizing
+consumers rather than serving as Calc7 formula or ordering oracles.
+
+A bounded 300 post-Calc7 report assertions comprise 290 heating/cooling
+sizing cells across 29 SizingManager roles plus ten WindowAC zero-heating
+cells. Relevant user branches and gates consume final design volume,
+load, and flow values, while calculated cells consume calculated-final
+state. They witness retained composite state but do not isolate
+multiplier, daily floor, sequence, OA mixing, or zero-load projection.
+CP254 ZSZ/SPSZ assertions cannot witness same-attempt nonpulse Calc7
+because that writer precedes the leaf; pulse entries skip it.
+Component-load tables seed and read
+calculated-final rather than Calc7 user destinations.
+
+Calc7 writes 44 distinct user-final field names. `zeroMemberData` clears
+34 and retains ten: the four `NonAirSys` fields, cooling/heating no-OA
+volume and mass scalars, and `CoolDesTemp`/`HeatDesTemp`. All ten
+calculated-final peak/index destinations are reset when member arrays are
+allocated. Of the 20 daily destination names, 16 are cleared and the four
+no-OA volume/mass scalars are retained.
+
+`RezeroZoneSizingArrays` calls that reset for controlled Zone and
+controlled-owner Space daily/final records, but `zeroMemberData`
+quick-returns when `DOASSupMassFlowSeq` is unallocated. The sole focused
+Rezero test allocates, seeds, and asserts daily arrays; final member arrays
+remain unallocated, so final calls quick-return. It is reset evidence, not
+a direct final/Space Calc7 oracle.
+
+There is no direct test for:
+
+- either explicit-input multiplier or heating limited-flow multiplier;
+- the 1e-5 tolerance edge, nonpositive flow fallback, or post-overwrite
+  zero denominator;
+- daily cooling's duplicated first minimum and missing method guard;
+- no-OA versus including-OA scalar/sequence identity;
+- load/coil inconsistency after flow floors;
+- either empty-setpoint fatal, unguarded empty outdoor sequence, or invalid
+  day/timestep;
+- supply-temperature-difference tails;
+- any Space destination field, duplicate membership, alias, partial
+  failure, or replay.
+
+### Rust, data, and claim boundary
+
+The Rust/data audit covers all 721 current-worktree files returned by
+`rg --files crates data`; strict UTF-8 decoding fails for zero files.
+Exact searches find no camel/snake Calc7 helper or routine key and no
+Zone/Space daily/final sizing arena.
+
+All 76 exact C++ member tokens have zero matches. Mechanical snake-case
+tokens are also absent except generic `zone_name`: the exact token occurs
+321 times in 62 files, while the raw substring occurs 350 times in 66
+files because four more files contain plural or longer identifiers.
+Those uses are ordinary typed input/model/report Zone identities, not
+Calc7 sizing state. Raw `MinOA` appears five times in four files only as a
+substring of `CalcPurchAirMinOAMassFlow`; exact token `MinOA` is absent.
+
+A separate exact-token census of 44 sizing arena, lifecycle, method, enum,
+and local-alias identifiers finds zero matches. This includes
+`ZoneSizingData`, all Zone/Space calculated/user daily/final arena names,
+`ZoneSizingCalc`, `ZoneSizingRunDone`, `AirflowSizingMethod`,
+`FromDDCalc`, `InpDesAirFlow`, `DesAirFlowWithLim`,
+`SupplyAirTemperature`, and `TemperatureDifference`. Longer operational
+IdealLoads field names containing supply-air or temperature-difference
+phrases are not counterparts.
+
+Comment-stripped active IDF data contain 61 `SimulationControl` objects in
+61 files, and field one disables Zone sizing in all 61. Five
+`SizingPeriod:DesignDay` objects occur in four files. Active IDF objects
+and all 12 epJSON documents contain zero `Sizing:Zone`,
+`Sizing:Parameters`, authored `Space`, or `SpaceList` objects/keys.
+
+The sole raw `Sizing:Zone` in `crates data` is the
+`AUTOSIZING_EPJSON` arbitrary-run test fixture. Its test requires
+`UnsupportedSizing` and the message that sizing workflows are not ported.
+Capabilities keep `Sizing:*`/`ZoneSizing*` and Space partitioning
+run-blocked; SimulationControl and design days remain inactive/unused
+partial inputs. No execution or support claim follows.
+
+CP259 therefore adds only one canonical required `source_mapped` row and
+the matching ordered HVAC project-contract requirement. It adds no Rust
+target, state mapping, support declaration, test, capability, output
+implementation, comparator, case, manifest evidence, numerical claim,
+performance claim, or conformance promotion.
+
+The inventory becomes 32 algorithms and 264 routines, split 58
+`state_mapped` plus 206 `source_mapped`, with 141 required. Domain-required
+counts are heat-balance 88, HVAC 30, plant 1, and time/schedule 22. The
+`ideal_loads_zone_equipment_purchased_air_source_order` parent now owns 30
+rows but remains `scaffold` at claim level `none`; HVAC readiness remains
+`0/30`.
+
+CP260 next maps the complete
+`ZoneEquipmentManager::UpdateZoneSizing` parent, declared at
+`ZoneEquipmentManager.hh` line 130 and implemented at
+`ZoneEquipmentManager.cc` lines 3223-3536. The following
+`SimZoneEquipment` definition begins at line 3538 and is declared at
+header line 184.
 
 ## Claim Requirements
 
