@@ -164,6 +164,7 @@ required_routines = [
   "calc_zone_leaving_conditions",
   "update_zone_equipment",
   "calc_air_flow_simple",
+  "get_stand_alone_erv_nodes",
   "sim_purchased_air",
   "get_purchased_air",
   "init_purchased_air",

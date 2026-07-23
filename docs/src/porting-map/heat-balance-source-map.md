@@ -27306,13 +27306,166 @@ time/schedule 22, with readiness `0/88`, `0/43`, `0/1`, and
 `0/22`. The IdealLoads parent remains `scaffold` at claim level
 `none`.
 
-CP274 next adds required source-mapped
-`routine.get_stand_alone_erv_nodes` immediately after
-`routine.calc_air_flow_simple` and before
-`routine.sim_purchased_air`. `GetStandAloneERVNodes` is declared at
+## CP274 `GetStandAloneERVNodes` One-Time ERV Node Discovery
+
+CP274 adds canonical required `routine.get_stand_alone_erv_nodes`
+immediately after `routine.calc_air_flow_simple` and before
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+requirement. It changes no EnergyPlus source inventory.
+
+`GetStandAloneERVNodes(EnergyPlusData &,
+DataHeatBalance::ZoneAirBalanceData &)` is declared at
 `ZoneEquipmentManager.hh` line 234 and implemented completely at
-`ZoneEquipmentManager.cc` lines 6912-6950.
-`CalcZoneMixingFlowRateOfReceivingZone` begins at source line 6952.
+`ZoneEquipmentManager.cc` lines 6912-6950. Both arguments are mutable
+references. There is no default argument, return status, `const`, or
+exception specification. CP273 ends at source line 6910; CP275
+`CalcZoneMixingFlowRateOfReceivingZone` starts at line 6952.
+
+There is exactly one executable production call expression. CP273 visits
+every stored `ZoneAirBalance` record at source line 6874 and calls CP274
+at line 6877 only when its balance method is Quadrature and
+`OneTimeFlag=false`. Thus one full CP273 execution invokes CP274 once per
+record satisfying both conditions. A non-Quadrature or already-latched
+record makes zero calls.
+
+An unallocated `ZoneEquipList` makes CP274 a complete no-op and leaves
+`OneTimeFlag=false`, so a later CP273 visit tries again. With an allocated
+list, the routine reads `ZonePtr` and immediately sets
+`OneTimeFlag=true` before it indexes the Zone equipment list or performs
+discovery.
+
+When `NumOfEquipTypes > 0`, a first 1-based, stored-order pass increments
+the existing `NumOfERVs` once for each exact
+`EnergyRecoveryVentilator` equipment type. It does not reset the count.
+A positive resulting count allocates `ERVInletNode` first and
+`ERVExhaustNode` second, each to that accumulated extent.
+
+A second stored-order pass again skips every non-ERV entry. For each ERV it
+passes the stored `EquipIndex` to
+`GetStandAloneERVOutAirNode`, stores the result at the next inlet slot,
+then calls `GetStandAloneERVReturnAirNode`, stores the result at the same
+exhaust slot, and increments its local slot cursor. Duplicate list
+occurrences are retained in order; there is no deduplication.
+
+The two child getters are implemented at
+`HVACStandAloneERV.cc` lines 1608-1627 and 1650-1669. Either can lazily
+run StandAloneERV input when its shared input flag is true. A valid 1-based
+ERV index returns `SupplyAirInletNode` or
+`ExhaustAirInletNode`; an invalid index silently returns zero. CP274
+stores zero, duplicate, and aliased node results unchanged.
+
+The stripped body has five `if` statements and two indexed loops, with
+no else, explicit return, switch, break, continue, while, or ternary. It has
+four direct persistent mutation sites across four state paths: three plain
+assignments for the latch and two node elements, plus one persistent
+`++NumOfERVs` site. Array and child mutations are additional.
+
+Under the established call convention, there are four operational sites:
+two allocations and two node getters. One allocation predicate and 13
+indexed accessors bring the call/accessor census to 18. With valid
+zero-initialized state, an allocated list of `N` entries and `E`
+ERV occurrences performs one flag write, `E` count increments, two
+allocations when `E > 0`, and `2E` child calls plus `2E` node
+writes across the two full list passes.
+
+CP274 validates neither `ZonePtr`, list allocation extents,
+`NumOfEquipTypes`, the initial ERV count, equipment indices, returned
+node identities, duplicates, aliases, nor prior array allocation. It emits no
+diagnostic and has no status, checkpoint, catch, rollback, cleanup, or repair
+protocol.
+
+The latch commits before any risky indexed work. A bad Zone identity can
+therefore fail after latching. The count pass can leave a partial increment
+prefix; inlet allocation can succeed before exhaust allocation fails; and
+population can retain completed pairs or one inlet whose matching exhaust
+was never written. A child input failure can also retain its global input
+prefix. The ordinary CP273 caller then sees the true latch and suppresses
+retry.
+
+Production therefore relies on at-most-once gating rather than intrinsic
+idempotence. Direct replay or an external latch reset increments the retained
+count again and attempts allocation over existing arrays. It can fail,
+overallocate, or leave an unfilled tail. A pre-existing negative count can
+underallocate or skip allocation; a positive count can allocate even with no
+ERV occurrence. An allocated but not-yet-populated equipment list can cache
+a zero-ERV result permanently. Only the unallocated-list path is a repeatable
+no-op.
+
+No C++ unit calls CP274 directly. The existing 26 literal CP273 expressions
+make 34 direct executions across nine tests, but all have no
+`ZoneAirBalance` record and therefore make zero CP274 calls. The broader
+unit corpus likewise has zero dynamic CP274 executions.
+
+The sole unit source containing `ZoneAirBalance:OutdoorAir` defines two
+same-Zone Quadrature objects, calls only `GetZoneData` and
+`GetAirFlowFlag`, and asserts the accumulated input error. It never
+calls CP273 or CP274 and provides no valid runtime oracle. Conversely, one
+full-simulation AirflowNetwork test owns an ERV equipment-list entry and ERV
+object but no ZoneAirBalance; its
+`MultizoneWithoutDistribution` mode also returns from CP273 before
+discovery. Its assertions concern AirflowNetwork, fan state, allocation, and
+no-throw behavior.
+
+No unit proves the allocated or unallocated list paths, zero, one, multiple,
+mixed, or duplicate ERVs, list order, cardinality, node pairs, non-Quadrature
+or prelatched gating, invalid Zone or equipment identity, zero/aliased child
+nodes, lazy child input, partial failure, or replay. No downstream test proves
+positive ERV exhaust-minus-inlet flow or the nonpositive difference filter in
+CP273.
+
+Rust has no exact or snake-case routine, ZoneAirBalance arena, ERV object,
+one-time latch, ERV count, paired node arrays, child getters, or discovery
+transition. Its typed `ZoneEquipmentObjectType` has only
+`IdealLoadsAirSystem`; each list entry hardwires an
+`IdealLoadsAirSystemId`, and the compiler accepts only
+`ZoneHVAC:IdealLoadsAirSystem`. The
+`unsupported_hvac_zone_equipment` capability rule blocks other
+`ZoneHVAC:*` equipment.
+
+The exact 120-model data census, split 108 IDF and 12 epJSON models, contains
+zero `ZoneHVAC:EnergyRecoveryVentilator`,
+`ZoneAirBalance:OutdoorAir`, ERV equipment-list entries, or ERV heat
+exchangers. All 30 equipment lists contain exactly one IdealLoads entry.
+Twelve OutdoorAir:Node objects belong to the separate PurchasedAir topology
+and cannot supply CP274 node pairs.
+
+Every repository model therefore makes zero EnergyPlus CP274 calls. Rust has
+no corresponding route. A valid Quadrature input would register 14
+`Zone Combined Outdoor Air` variables: six sensible/latent/total
+gain/loss energies, two volume-flow rates, two volumes, mass, mass-flow rate,
+air changes per hour, and fan electricity. The 140 case manifests request
+zero of those variables and zero ERV or heat-exchanger outputs.
+
+The sole adjacent conformance row,
+`Zone Air Heat Balance Outdoor Air Transfer Rate`, has 8,760 all-zero
+oracle and Rust samples for a no-topology fixture. Rust constructs the series
+as a hard-coded zero vector, and its declared coverage boundary excludes
+broad infiltration, ventilation, mixing, and air-balance compatibility. It
+does not prove CP274 discovery, positive/nonpositive ERV flow differences,
+or downstream quadrature flow.
+
+The roadmap still requires typed standalone-ERV equipment and children,
+Zone equipment-list membership and source order, ZoneAirBalance ownership,
+paired node identity, latch/count/allocation lifecycle, CP273 quadrature
+consumption, input failure, partial effects, and replay semantics.
+
+CP274 changes no Rust target or state, support declaration, test, capability,
+output, comparator, case, manifest, numerical claim, performance claim, or
+conformance status. Counts become 32 algorithms and 278 routines, split 58
+`state_mapped` plus 220 `source_mapped`, with 155 required.
+Domain-required counts become heat-balance 88, HVAC 44, plant 1, and
+time/schedule 22, with readiness `0/88`, `0/44`, `0/1`, and
+`0/22`. The IdealLoads parent remains `scaffold` at claim level
+`none`.
+
+CP275 next adds required source-mapped
+`routine.calc_zone_mixing_flow_rate_of_receiving_zone` immediately after
+`routine.get_stand_alone_erv_nodes` and before
+`routine.sim_purchased_air`.
+`CalcZoneMixingFlowRateOfReceivingZone` is declared at
+`ZoneEquipmentManager.hh` line 236 and implemented completely at
+`ZoneEquipmentManager.cc` lines 6952-6977.
+`CalcZoneMixingFlowRateOfSourceZone` begins at source line 6979.
 
 ### `CheckValidSimulationObjects` state contract
 
