@@ -129,6 +129,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `ZoneEquipmentManager::calcSizingOA` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent typed Zone/Space/People, schedules, individual DSOA, and PurchasedAir OA helpers do not implement the mutable sizing, effectiveness, SpaceList-validation, report, or design-day fanout contract |
 | `ZoneEquipmentManager::fillZoneSizingFromInput` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent typed identities, schedules, Humidistat, individual DSOA, IdealLoads operational limits, and time-axis metadata do not implement `Sizing:Zone` field projection or sequence allocation |
 | `ZoneEquipmentManager::RezeroZoneSizingArrays` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; Rust has no Zone/Space sizing records, sentinel-selective reset, component-load pulse lifecycle, or sizing reset latch |
+| `ZoneEquipmentManager::updateZoneSizingBeginDay` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent run-period timing, design-day schedule labels, and standard-density IdealLoads limits do not implement current-day calculated sizing metadata |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
 | `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand` |
 
@@ -3506,9 +3507,206 @@ algorithms and 252 routines, split 58 `state_mapped` plus 194
 `source_mapped`, with 129 required; heat-balance and HVAC project lists become
 88 and 18.
 
-CP248 next maps `ZoneEquipmentManager::updateZoneSizingBeginDay`, declared
-at `ZoneEquipmentManager.hh` line 132 and implemented completely at
-`ZoneEquipmentManager.cc` lines 1431-1453.
+## CP248 `updateZoneSizingBeginDay` Calculated Daily Metadata Seed
+
+CP248 adds canonical required `routine.update_zone_sizing_begin_day` after
+`rezero_zone_sizing_arrays` and before `sim_zone_equipment`. That is the
+physical source-definition order. The exact public helper is declared at
+`ZoneEquipmentManager.hh` line 132 and implemented completely at
+`ZoneEquipmentManager.cc` lines 1431-1453:
+
+```cpp
+void updateZoneSizingBeginDay(
+    EnergyPlusData const &state,
+    DataSizing::ZoneSizingData &zsCalcSizing);
+```
+
+The helper is role-agnostic. Its sole mutable argument may be any
+`ZoneSizingData`, although production supplies only current-day calculated
+Zone or Space records.
+
+### Production cadence and parent traversal
+
+The only helper call expressions are in the `UpdateZoneSizing` `BeginDay` arm
+at `ZoneEquipmentManager.cc` lines 3240-3255. The sole production expression
+that selects that parent arm is `SizingManager.cc` line 307. For each Zone
+sizing iteration, `SizingManager` resets `CurOverallSimDay` to zero, skips
+`RunPeriodWeather` environments, advances the index for each retained sizing
+day, and calls the parent once on every non-warmup day before Facility
+begin-day handling and the hour, weather, and heat-balance loops. Warmup days
+do not call CP248.
+
+A component-load report makes the complete Zone sizing calculation run first
+as a pulse and then normally. Both iterations start the overall-day index
+again at zero, so they target the same daily records. CP247 runs between those
+iterations under its own latch; the next normal `BeginDay` calls CP248 again.
+
+Within one parent call, traversal is:
+
+1. scan global Zone indexes from one through `NumOfZones`;
+2. read the same-index `ZoneEquipConfig` and skip an uncontrolled Zone;
+3. update `CalcZoneSizing(CurOverallSimDay, zone)` first;
+4. only when `doSpaceHeatBalanceSizing` is true, visit that Zone's stored
+   `spaceIndexes` in container order and update
+   `CalcSpaceSizing(CurOverallSimDay, space)`.
+
+This is Zone-then-its-Spaces interleaving, not CP247's all-Zones then global
+Space traversal. There is no Space-local control check, parent-membership
+validation, sort, deduplication, or global Space scan. Duplicate or
+cross-listed stored indexes cause repeated writes. If `C` is the controlled
+Zone count and `M` is the number of stored Space membership occurrences under
+those Zones, one completed valid-state parent call dispatches:
+
+```text
+C + (doSpaceHeatBalanceSizing ? M : 0)
+```
+
+helpers. It touches calculated daily records only. Normal daily, final, and
+calculated-final records are not selected. A nonpositive Zone count or all
+uncontrolled Zones produces zero dispatches even when Spaces exist.
+
+The parent's old numeric comment says BeginDay zeroes result arrays, but the
+authoritative enum selects this metadata helper and neither the arm nor CP248
+zeros an array. Other `CallIndicator` arms call separate helpers, while
+invalid, system-sizing-end, and default values do not reach CP248.
+
+### Exact 20-write transaction
+
+There is no branch, child call, local snapshot, explicit allocation, or return
+value. The source performs exactly these ordered groups:
+
+```text
+1-2   CoolDesDay, HeatDesDay
+      <- EnvironmentName
+3-4   DesHeatDens, DesCoolDens
+      <- StdRhoAir
+5-6   HeatDDNum, CoolDDNum
+      <- CurOverallSimDay
+7-12  CoolNoDOASDesDay, HeatNoDOASDesDay,
+      LatCoolDesDay, LatHeatDesDay,
+      LatCoolNoDOASDesDay, LatHeatNoDOASDesDay
+      <- EnvironmentName
+13-18 CoolNoDOASDDNum, HeatNoDOASDDNum,
+      LatentCoolDDNum, LatentHeatDDNum,
+      LatentCoolNoDOASDDNum, LatentHeatNoDOASDDNum
+      <- CurOverallSimDay
+19    CoolSizingType <- "Cooling"
+20    HeatSizingType <- "Heating"
+```
+
+The totals are ten string assignments, two `Real64` assignments, and eight
+integer assignments. `EnvironmentName` is read eight times, `StdRhoAir` twice,
+and `CurOverallSimDay` eight times rather than being snapshotted. The helper
+therefore accepts and copies an empty or long environment name, a negative or
+non-finite density, and an arbitrary day integer on a direct call. It neither
+validates role identity nor normalizes any value.
+
+Outside the 20 named metadata members, no sequence,
+load/flow/condition peak value, peak timestep/date-string field, thermostat
+state, OA/DOAS load state, latent calculation state, input setting, pointer,
+EMS flag, identity, extent, or allocation state is changed. CP247's guard-passing reset clears 16 of these 20 fields between
+pulse and normal passes: the eight environment-name fields, both densities,
+the sensible Heat/Cool day numbers, and four latent day numbers. It preserves
+`CoolNoDOASDDNum`, `HeatNoDOASDDNum`, and both sizing-type strings. CP248
+nevertheless overwrites all 20 on the following normal day.
+
+### Failure prefix and replay
+
+The helper has no local bounds, allocation-state, topology, finite-value, day,
+or old-state validation. It emits no output or diagnostic, changes no error
+status or latch, and owns no catch, checkpoint, cleanup, transaction, or
+rollback.
+
+A parent configuration or current-record index failure occurs before the
+current helper entry. A malformed Space index occurs after its Zone and
+earlier stored Spaces have completed but before that Space receives a write.
+If a string assignment fails, earlier statements remain committed and the
+suffix remains stale; the ordinary numeric copies add no rollback boundary.
+A failure inside one helper likewise preserves all earlier Zone and Space
+records.
+
+There is one mutable record output and no ordinary output-output alias.
+Production source values reside in shared environment and sizing state.
+A completed replay with unchanged sources deterministically overwrites the
+same 20 fields and is idempotent over that subset while every omitted field
+persists. Changed source values replace the subset. Duplicate stored Space
+occurrences simply replay identical current global values. A retry after
+failure restarts at statement one and can repair the stale suffix if the
+cause is removed.
+
+### C++ evidence
+
+No C++ test calls the helper directly. Two unit tests call the parent
+`UpdateZoneSizing(BeginDay)` directly:
+
+- `ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest`;
+- `ZoneEquipmentManager_SizeZoneEquipment_DOASLoadTest`.
+
+Each dispatches one controlled Zone, no Space, and day index one. Both use an
+empty environment name; the standard density is the default zero in the first
+and `1.20` in the second. Neither seeds dirty CP248 fields nor asserts any of
+the 20 writes, immediately or later.
+
+A static fresh-state census of production-style active tests finds:
+
+- 17 of 18 direct `ManageSizing` expressions reach Zone sizing: 33 parent
+  begin-day calls and 51 Zone helper dispatches, split 43 normal and eight
+  pulse;
+- 34 of 57 full simulations reach sizing: 72 parent calls and 144 helper
+  dispatches, comprising 102 Zone and 42 Space records;
+- combined, 105 parent calls dispatch 195 helpers: 153 Zone plus 42 Space,
+  split into 135 normal Zone, 42 normal Space, and 18 pulse Zone writes.
+
+Every counted sizing period is a `SizingPeriod:DesignDay`; the census has no
+warmup or run-period-design-day CP248 dispatch. The only active production
+assertion that directly names a derived member is
+`BaseSizer_SupplyAirTempLessThanZoneTStatTest` on final
+`CalcFinalZoneSizing.HeatDesDay`, after normal sizing, end-day peak selection,
+and end-of-sizing propagation. Eight `SizingManager_ZoneSizing_*` simulations
+have 58 Zone/Space design-day predefined-table assertions, and two WindowAC
+tests have `N/A` design-day table assertions, but all are composite
+peak/report descendants rather than immediate CP248 oracles.
+
+There is no independent assertion for the two density copies, eight day
+indexes, two sizing-type literals, or the six no-DOAS/latent name families.
+Mixed control, exact stored-Space order and duplicate/malformed membership,
+raw invalid values, dirty overwrite, run-period multi-day cadence, explicit
+warmup exclusion, pulse/normal count, failure prefix, retry, and stable replay
+also remain unproved.
+
+### Rust boundary and governance
+
+Exact `crates` and `data` searches find no `updateZoneSizingBeginDay`,
+`update_zone_sizing_begin_day`, `CurOverallSimDay`, either design density,
+the design-day provenance field family, either sizing-type field, or
+`ZoneSizingData`. Rust owns no current-overall-day indexed Zone/Space
+calculated sizing arena, `UpdateZoneSizing` dispatcher, exact 20-field seed,
+stored-Space sizing traversal, or downstream peak/report transaction.
+
+`ep_runtime::TimeAxis` carries run-period environment and begin-day timing,
+but its environment kind is only `WeatherRunPeriod`; design/sizing
+environments are explicitly outside that runtime and its reported design-day
+sample count is zero. Design-day schedule labels, parsed oracle EIO
+environment rows, standard-density-derived IdealLoads limits, Zone/Space
+identities, and the equipment graph are adjacent only.
+
+Four active-case IDFs contain raw `SizingPeriod:DesignDay` declarations, but
+each disables Zone sizing and the compatibility runtime warns and ignores the
+design-day and simulation-control objects. The raw `Sizing:Zone` fixture still
+expects `UnsupportedSizing`. There is therefore no executable design-day and
+Zone-sizing case, and sizing remains run-blocked.
+
+CP248 adds no algorithm-level EnergyPlus source, Rust target/code/state, test,
+object support, capability, output implementation, comparator, case,
+manifest, numerical, performance, or conformance promotion. The parent
+algorithm remains `scaffold` with claim level `none`. Inventory becomes 32
+algorithms and 253 routines, split 58 `state_mapped` plus 195
+`source_mapped`, with 130 required; heat-balance and HVAC project lists become
+88 and 19.
+
+CP249 next maps `ZoneEquipmentManager::updateZoneSizingDuringDay`, declared at
+`ZoneEquipmentManager.hh` lines 134-141 and implemented completely at
+`ZoneEquipmentManager.cc` lines 1455-1506.
 
 ## Claim Requirements
 
