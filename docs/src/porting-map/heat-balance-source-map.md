@@ -27845,9 +27845,255 @@ Domain-required counts become heat-balance 88, HVAC 46, plant 1, and
 time/schedule 22, with readiness `0/88`, `0/46`, `0/1`, and `0/22`.
 The IdealLoads parent remains `scaffold` at claim level `none`.
 
-CP277 next audits the physical source definition
-`AutoCalcDOASControlStrategy`, declared at `ZoneEquipmentManager.hh` line
-256 and beginning at `ZoneEquipmentManager.cc` line 7006.
+## CP277 `AutoCalcDOASControlStrategy` DOAS Setpoint Resolver
+
+CP277 adds canonical required
+`routine.auto_calc_doas_control_strategy` immediately after
+`routine.calc_zone_mixing_flow_rate_of_source_zone` and before
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+requirement. It changes no EnergyPlus source inventory.
+
+The routine is declared at `ZoneEquipmentManager.hh` line 256 and
+implemented completely at `ZoneEquipmentManager.cc` lines 7006-7079. Its
+source interface is
+
+`void AutoCalcDOASControlStrategy(EnergyPlusData &state);`
+
+State is a mutable reference. There is no return value, explicit status,
+default argument, exception specification, caller-owned error flag, or retry
+token. CP276 ends at source line 7004. The next physical definition is CP278
+`ReportZoneSizingDOASInputs` at source lines 7081-7116, declared at header
+lines 260-265. The intervening header declaration
+`ReportInfiltrations` is not a ZoneEquipmentManager definition or call; the
+distinct implementation belongs to `HVACManager.cc`.
+
+There is exactly one executable production call expression. CP244
+`SetUpZoneSizingArrays` calls CP277 unconditionally at source line 828 after
+its first input-validation loop and before the sizing-array allocations. The
+call is not guarded by CP244's already accumulated `ErrorsFound` state.
+CP244 itself is reached by `SizeZoneEquipment` only while the default-true
+one-time setup flag remains set; that flag is cleared only after CP244 returns
+normally. CP277 therefore can issue its own fatal before CP244 reaches its
+later error barrier, and an intercepted abnormal exit leaves the parent latch
+true.
+
+CP277 initializes routine-local `headerAlreadyPrinted = false` and
+`ErrorsFound = false`. It then walks the live inclusive range
+`ZoneSizIndex = 1..NumZoneSizingInput` without snapshotting the bound. The
+first indexed access tests `AccountForDOAS`. A false record is otherwise
+untouched: it is not rebound for calculation, autosized, reported, or
+validated. A true record causes a second indexed access and binds that
+`ZoneSizingInput` element for the remaining work.
+
+The routine recognizes exactly three strategy enum values. Its autosizing
+matrix is:
+
+| Strategy | Both endpoints `AutoSize` | Low only `AutoSize` with high `> 0` | High only `AutoSize` with low `> 0` | EIO label |
+|---|---:|---:|---:|---|
+| `NeutralSup` | `21.1 / 23.9 C` | `low = high - 2.8 C` | `high = low + 2.8 C` | `NeutralSupplyAir` |
+| `NeutralDehumSup` | `14.4 / 22.2 C` | `low = 14.4 C` | `high = 22.2 C` | `NeutralDehumidifiedSupplyAir` |
+| `CoolSup` | `12.2 / 14.4 C` | `low = high - 2.2 C` | `high = low + 2.2 C` | `ColdSupplyAir` |
+
+`AutoSize` is the exact `DataSizing.hh` sentinel `-99999.0`. Other negative
+values are ordinary values, not approximate autosize requests. For each
+recognized strategy the both-auto arm wins first, then the low-only arm, then
+the high-only arm; a fixed/fixed pair or a one-sided sentinel whose partner
+is not strictly positive remains unchanged. The partner-positivity tests are
+branch guards only, not range validation.
+
+Each recognized branch always calls CP278 with the resolved or retained
+setpoints before CP277 performs its ordering check. An invalid, numeric, or
+otherwise unrecognized enum receives no autosizing and no CP278 call, but it
+still reaches that ordering check.
+Every `AccountForDOAS = true` record, including an unrecognized strategy,
+is checked with strict `DOASLowSetpoint > DOASHighSetpoint`. Equality passes
+CP277. Each inversion emits one severe line
+`For Sizing:Zone = {ZoneName}` and the exact continuation
+`... Dedicated Outside Air Low Setpoint for Design must be less than the High Setpoint`,
+sets the local error flag, and continues through all remaining records. After the loop, any such
+error produces exactly one no-return fatal:
+`Errors found in DOAS sizing input. Program terminates.`
+
+The earlier `SizingManager.cc` input parser separately rejects a
+both-positive pair when `low >= high`. CP277's strict-greater check is
+therefore still material for autosize-derived, nonpositive, directly
+constructed, or corrupted state, and its equality acceptance is narrower than
+that upstream input rule.
+
+CP278 receives `headerAlreadyPrinted` by mutable reference. On the first
+recognized active record of each CP277 invocation it appends the exact Zone
+sizing DOAS EIO header and flips that local flag. Every recognized active
+record then appends one input-index-order row with the strategy label and both
+setpoints written through the source's exact `{:.3R}` fields. The local header
+flag resets on every CP277 entry. An invocation with no recognized active
+record produces no CP277-owned EIO line.
+
+The CP277 body has one indexed `for` loop; 15 conditional nodes, comprising
+seven initial or standalone `if` heads and eight `else if` heads; zero bare
+`else`; and nine logical-AND operators. It has no `switch`, `while`, ternary,
+`return`, `break`, `continue`, or exception handler. There are two indexed
+`ZoneSizingInput` accessor sites and one live count-bound read.
+
+There are seven explicit call-expression sites: three CP278 sites,
+`ShowSevereError`, the diagnostic `format` call, `ShowContinueError`, and
+`ShowFatalError`. Six are effectful child or diagnostic service sites and the
+seventh is formatting. Three are direct diagnostic sites. The source has 12
+direct persistent setpoint-assignment sites, six low and six high, distributed
+over nine autosize arms. A recognized record dynamically makes zero, one, or
+two model writes. The local error assignment is not persistent model state;
+CP278's mutable header update and EIO append are observable child effects.
+
+For an invocation with `Z` total declared records, `A`
+`AccountForDOAS` records, `R` recognized active records, and `B` inverted
+active records, CP277 performs `Z` first accessor probes and `A` second
+accesses. It calls CP278 `R` times, emits one header exactly when `R > 0`,
+and emits `R` data rows. It emits `B` severe/continuation pairs and one final
+fatal exactly when `B > 0`. Setpoint-write count depends on the recognized
+strategy and sentinel/partner predicates; the static upper bound is two per
+recognized record.
+
+A nonpositive `NumZoneSizingInput` skips cleanly without output or fatal.
+A positive count with an unallocated or shorter array is unchecked and can
+fail before completion; an allocated tail beyond the count is ignored.
+A true record with an invalid enum is still eligible for the ordering
+diagnostic but cannot print the DOAS row that would identify its strategy.
+The source does not clamp or otherwise validate sign, magnitude, or finiteness.
+For example, Neutral and Cool strategies can derive a negative low setpoint
+from a positive high value of `1 C` and still satisfy the local ordering rule.
+A non-auto low at or below zero paired with a positive high can remain
+unchanged and be reported. One-sided NeutralDehum defaults can themselves
+produce an inverted pair, which is already written and reported before the
+later diagnostic.
+
+NaN makes sentinel equality, partner positivity, and low-greater-than-high
+comparisons false, so it can bypass both autosizing and the ordering error
+while still being printed for a recognized strategy. Infinities and arbitrary
+negative manual values are not categorically validated; some combinations are
+caught only when they satisfy the strict inversion check. No minimum span is required,
+and equality is locally valid.
+
+CP277 provides no transaction, checkpoint, rollback, catch, cleanup, or
+recovery protocol. Setpoint writes precede the CP278 child and the ordering
+validation. Recognized inverted records therefore have already changed model
+state and appended EIO output when their diagnostics are emitted. Processing
+continues after every inversion, so later records' writes and rows also occur
+before the single deferred fatal.
+
+If that fatal is intercepted, all completed setpoint changes, EIO rows, and
+diagnostic prefix remain. An abnormal exit from CP278, formatting, or either
+diagnostic service stops immediately with the earlier ordered prefix and can
+bypass the final fatal. Unchecked native invalid access has no promised
+postcondition.
+
+A successful fixed-state replay resamples the live count and records. Once a
+valid recognized pair has consumed its `AutoSize` sentinels, the next ordinary
+call normally makes zero model writes and leaves the resolved setpoints fixed.
+That is model-state idempotence only: the local header flag resets, so the
+header and every recognized row are appended again. A fixed recognized inverted
+state repeats its row, diagnostics, and fatal; an unrecognized inverted state
+repeats only the diagnostics and fatal. Any changed strategy, sentinel,
+setpoint, count, or arena state is resampled.
+
+The local `ErrorsFound` flag also resets on every entry; no error status is
+retained for a caller. CP244's separate earlier error flag is neither read nor
+updated by CP277. Because the enclosing `SizeZoneEquipment` one-time flag is
+cleared only after CP244 returns, an intercepted CP277 fatal or dependency
+failure permits a same-state parent retry that re-enters CP277 and appends its
+observable output again.
+The exact C++ source-plus-test symbol census is 17 occurrences: one
+declaration, one definition, one production expression, and 14 direct unit
+calls across three tests. Twelve calls in the dedicated DOAS autosizing test
+cover every strategy with both-auto, low-auto, high-auto, and ordered
+fixed/fixed inputs. The fixture reconstructs input state before every call;
+it does not exercise replay. Each call also visits one
+`AccountForDOAS = false` sibling, but that sibling's retained state is not
+asserted.
+
+Those 12 calls have 24 post-call low/high assertions: 20
+`EXPECT_DOUBLE_EQ` and four `EXPECT_NEAR` checks. Two separate SizingManager
+defaulting tests add two direct calls and four `ASSERT_EQ` post-call setpoint
+checks. They prove that blank and omitted Neutral-supply setpoints enter CP277
+as `AutoSize` and resolve to `21.1 / 23.9 C`. The same tests also assert two
+strategy enums, four pre-call sentinels, and two input counts. The exact
+post-call low/high oracle total is therefore 28.
+
+No unit test contains or asserts the exact CP278 EIO header/data row, the
+low-greater-than-high severe text, or the CP277 fatal text. No direct test
+covers an unrecognized enum, inversion, equality, nonpositive/manual
+one-sided pair, nonfinite value, malformed count/extent, dependency failure,
+same-state retry, or successful replay.
+
+Established parent-route evidence adds three direct CP244 calls: one visits
+two inactive records and the other two visit zero records. Seventeen direct
+`ManageSizing` contexts execute CP277 once each and collectively visit 24
+inactive records. Thirty-four unit full-simulation sizing configurations
+execute it once each and visit 48 records, split six active recognized and 42
+inactive.
+
+Among those full simulations, `HeatRecoveryHXOnMainBranch` contributes five
+manually fixed Cool-supply records in one invocation, and the
+`OutputReportTabular` DOAS-direct-to-Zone configuration contributes one blank
+Neutral-supply record that is autosized. These are the only full-simulation
+active records. The five-row invocation is the only audited multiple-active
+same-call route, but neither single-header suppression nor row order is
+asserted.
+
+Six direct `SizeZoneEquipment` expressions force the one-time latch false and
+therefore execute CP277 zero times. Nine direct `ManageZoneEquipment`
+expressions leave `ZoneSizingCalc` false and also execute it zero times; they
+are excluded from the reached-execution total.
+
+Across the bounded unit corpus, CP277 executes exactly 68 times: 14 direct,
+three through CP244, 17 through ManageSizing, and 34 through full simulation.
+Those executions make exactly 100 record visits, comprising 20 active
+recognized and 80 inactive records. The active strategy distribution is
+seven Neutral, four NeutralDehum, and nine Cool records.
+
+The exact dynamic setpoint-write total is 18: ten Neutral, four NeutralDehum,
+and four Cool assignments. The EIO effect is 20 data rows and 16 headers.
+Twelve dedicated direct calls, two SizingManager calls, and two active
+full-simulation invocations each print a fresh header. The remaining reached
+calls contain no recognized active record.
+The exact repository model census remains 120 files, split 108 IDF and 12
+epJSON. It contains zero `Sizing:Zone` objects and zero DOAS-account,
+strategy, setpoint, or strategy-label fields. Sixty-one models explicitly set
+`Do Zone Sizing Calculation = No`; the other 59 omit the control and inherit
+the false source default. Production fixture execution of CP277 is therefore
+zero across all 120 models.
+
+All 140 `case.toml` manifests contain zero Sizing:Zone, Zone-sizing, DOAS,
+dedicated-air, strategy-label, or exact `Zone Sizing DOAS Inputs` evidence.
+No manifest requests or compares this input EIO table, and no case supplies a
+CP277 runtime topology.
+
+Rust has no exact or snake-case CP277 routine, `ZoneSizingInput` arena or
+count, `AccountForDOAS` flag, strategy enum, low/high setpoint state, strategy
+labels, output writer, or equivalent transition. The only crate-wide lowercase
+DOAS match is an unrelated psychrometric test. The sole Rust
+`Sizing:Zone` occurrence is an inline arbitrary-run epJSON fixture;
+`unsupported_sizing` rejects `Sizing:*` and `ZoneSizing*` objects, and the
+test asserts `UnsupportedSizing` before runtime. Typed
+`DesignSpecification:OutdoorAir` and IdealLoads outdoor-air handling are
+adjacent capabilities, not DOAS sizing-control implementation.
+
+There is no Rust EIO comparator, coverage declaration, case, or manifest that
+could promote this routine. The roadmap still requires typed Zone-sizing
+input/state ownership, exact enum/default parsing, the autosizing matrix,
+source-order EIO output, deferred diagnostic/fatal behavior, parent-latch and
+failure/replay semantics, and direct malformed-state and output oracles.
+
+CP277 changes no Rust target or state, support declaration, test, capability,
+output, comparator, case, manifest, numerical claim, performance claim, or
+conformance status. Counts become 32 algorithms and 281 routines, split 58
+`state_mapped` plus 223 `source_mapped`, with 158 required.
+Domain-required counts become heat-balance 88, HVAC 47, plant 1, and
+time/schedule 22, with readiness `0/88`, `0/47`, `0/1`, and `0/22`.
+The IdealLoads parent remains `scaffold` at claim level `none`.
+
+CP278 next audits the physical source definition
+`ReportZoneSizingDOASInputs`, declared at `ZoneEquipmentManager.hh` lines
+260-265 and implemented at `ZoneEquipmentManager.cc` lines 7081-7116.
+
 
 ### `CheckValidSimulationObjects` state contract
 

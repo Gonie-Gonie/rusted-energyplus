@@ -167,6 +167,7 @@ required_routines = [
   "get_stand_alone_erv_nodes",
   "calc_zone_mixing_flow_rate_of_receiving_zone",
   "calc_zone_mixing_flow_rate_of_source_zone",
+  "auto_calc_doas_control_strategy",
   "sim_purchased_air",
   "get_purchased_air",
   "init_purchased_air",
