@@ -9606,10 +9606,13 @@ there is no CP245-style `+=` or `*=` accumulation. CP246 is not a full-record
 reset, however. Omitted fields and all unrelated computed/EMS/OA/peak sizing
 scalars survive. Same-extent parent replay can therefore preserve stale
 normal-daily latent values and other untouched state even as CP246 resets its
-sequences. `RezeroZoneSizingArrays` clears computed data and sequences but
-preserves CP246 identity/static input fields, while manager `clear_state()`
-does not own the DataSizing stores. Clean replay still requires coordinated
-owner reset.
+sequences. The separate `RezeroZoneSizingArrays` wrapper delegates
+`zeroMemberData`, which returns without changing that record unless
+`DOASSupMassFlowSeq` is allocated. When that guard passes, the helper
+zero-fills the current extents of 36 sequences and resets only 104 selected
+members while preserving CP246 identity/static input fields. `ZoneEquipmentManager` state
+reset does not own the DataSizing stores. Clean replay still requires
+coordinated owner reset.
 
 No C++ test calls CP246 directly or immediately asserts a CP246-owned write.
 Static fresh-state reachability is 95 calls: two direct-CP244 Zone roles, 24
@@ -9645,9 +9648,134 @@ algorithms and 251 routines, split 58 `state_mapped` plus 193
 `source_mapped`, with 128 required; the heat-balance project list remains 88
 and the HVAC list becomes 17.
 
-CP247 next maps `ZoneEquipmentManager::RezeroZoneSizingArrays`, declared at
-`ZoneEquipmentManager.hh` line 128 and implemented at
-`ZoneEquipmentManager.cc` lines 1401-1430.
+## CP247 `RezeroZoneSizingArrays` Pulse-to-Normal Selective Sizing Reset
+
+CP247 adds canonical required `routine.rezero_zone_sizing_arrays` after
+`fill_zone_sizing_from_input` and before `sim_zone_equipment`, plus the
+matching HVAC project item. The exact wrapper is declared at
+`ZoneEquipmentManager.hh` line 128 and implemented completely at
+`ZoneEquipmentManager.cc` lines 1401-1430. Its reset dependency is
+`ZoneSizingData::zeroMemberData`, declared at `DataSizing.hh` line 646 and
+implemented at `DataSizing.cc` lines 131-278.
+
+The sole production expression is `SizingManager.cc` lines 400-402 after a
+Zone sizing iteration's end-of-calculation updates. When an accepted
+component-load report is requested and `DoZoneSizing`, at least one Zone
+sizing input, and sizing periods are present, the caller selects two Zone
+sizing iterations and makes the first a pulse pass. When
+`isPulseZoneSizing && runZeroingOnce`, the caller invokes CP247 and clears
+`runZeroingOnce` only after normal return. The latch defaults true and
+`SizingManagerData::clear_state()` rearms it. There is no `ErrorsFound` gate,
+so the condition can also be evaluated after the no-sizing-period severe
+path. CP247 itself changes neither pulse/report flags, the latch,
+`ZoneSizingRunDone`, nor component-load pulse/decay storage.
+
+The wrapper first unconditionally emits
+`Re-zeroing zone sizing arrays`. It then traverses global Zone indexes in
+ascending order, reads same-index `ZoneEquipConfig`, and skips uncontrolled
+Zones. For every selected Zone and each
+`D = TotDesDays + TotRunDesPersDays`, it resets normal daily then calculated
+daily records. After all days it resets calculated-final before final. Only
+after all Zones, `doSpaceHeatBalanceSizing` gates an ascending traversal of
+all global Space indexes. A Space is selected solely when its stored parent
+Zone's equipment configuration is controlled; no Space-local control flag or
+parent `spaceIndexes` membership is checked. Space record order is likewise
+normal daily, calculated daily, calculated-final, then final.
+
+A nonpositive `D` skips daily records but not either final record. With
+`Cz` controlled Zones and `Cs` global Spaces whose parent is controlled, a
+completed valid-state wrapper dispatches
+
+```text
+(Cz + (doSpaceHeatBalanceSizing ? Cs : 0))
+    * (2 * max(D, 0) + 2)
+```
+
+`zeroMemberData` calls. Each record independently applies one sentinel guard:
+if `DOASSupMassFlowSeq` is not allocated, the whole helper returns silently
+without changing that record. This sequence is allocation step 25 of 36 in
+CP246, so a partial allocation before it can leave earlier arrays and every
+member untouched. A passing guard zero-fills the current, independently
+retained extents of exactly 36 sequence fields; it neither allocates,
+redimensions, nor normalizes heterogeneous extents.
+
+All 36 sequence fills precede exactly 104 selected member assignments:
+12 strings become empty, 80 `Real64` values become `0.0`, and 12 integers
+become zero. No bool, enum, pointer, or allocation state is assigned. The
+strings cover eight sensible/latent with/without-DOAS design-day names and
+four sensible/latent peak dates. The integers cover sensible/latent peak
+timestep and design-day indexes. Reals cover selected design flows, loads,
+densities, coil-inlet states, current sensible/latent/DOAS state, and
+sensible/latent peak conditions.
+
+This is not a blanket `ZoneSizingData` clear. It preserves CP246 identity,
+input methods, temperatures/humidity targets, flows and factors, DOAS
+configuration, concurrence, indexes/effectiveness, latent RH pointers and
+methods, and heat-coil sizing fields. It also preserves EMS flags/values,
+OA/People/area aggregates, non-air and several no-OA results,
+`ZonePeakOccupancy`, scalar `DOASHeatAdd`/`DOASLatAdd`, selected no-DOAS and
+latent peak metadata, and all other unlisted state. Component-load arrays
+outside these records are untouched so the later decay/report pipeline keeps
+its pulse evidence.
+
+There is no local allocation, bounds, topology, extent, day-count, or old
+state validation. Apart from the progress output, it emits no
+warning/severe/fatal and mutates no error state; it owns no status, catch,
+checkpoint, cleanup, transaction, or rollback. Output is committed before the first indexed read. Failure retains
+source-order prefixes: earlier Zones; normal before calculated within a day;
+calculated-final before final; every Zone before any Space; and earlier
+Spaces. A malformed Space parent fails before the current Space record.
+Within a guard-passing helper, all sequence fills precede the 104-member
+assignment prefix. Ordinary owning records are distinct; every reset write is
+zero or an empty string, and completed direct replay is idempotent over the
+touched subset, but
+it repeats the progress line and never repairs guard-skipped or unlisted
+state. Production abnormal return leaves `runZeroingOnce` true and a partial
+reset for a retry; successful return makes later same-state caller entries
+skip CP247 until the sizing-manager state is cleared.
+
+The focused C++ unit calls CP247 once with five controlled Zones, 12 design
+days, three run-period design days, four timesteps, and no Spaces. It
+dispatches 150 daily records whose sentinel is allocated and ten unseeded
+final records whose guard returns. For both daily kinds, active checks cover
+only 58 of 104 reset members and 28 of 36 sequences; 172 assertion source
+lines execute 25,500 checks. The eight missing sequence oracles are the two
+no-DOAS sensible, four latent/no-DOAS load, and two latent-flow sequences.
+Another 46 reset members are not seeded or asserted. Seventy-five seeded
+preserved members have no active preservation assertion; 154 expectation
+lines are commented out. Final mutation, guard no-op, Space and uncontrolled
+selection, display, latch, failure, and replay are not proved.
+
+Exactly six fresh production contexts reach CP247: two direct
+`ManageSizing` tests and four full simulations, all through
+`AllSummaryAndSizingPeriod`. Their aggregate is nine controlled Zones, no
+Spaces, two design days per role, and no run-period design day: 36 daily plus
+18 final guard-passing records. Six records have extent 24 and 48 have extent
+96, for 171,072 statically zero-filled sequence slots. Downstream checks
+cover selected component-load reports, final sizing, and OA results only
+after the following normal pass; none isolates the intermediate reset,
+message, call count, flags, or latch transition.
+
+Rust contains no exact `RezeroZoneSizingArrays`, `zeroMemberData`,
+`runZeroingOnce`, `isPulseZoneSizing`, `ZoneSizingData`, Zone/Space sizing
+record arena, or component-load pulse/reset/decay orchestration. Typed
+Zone/Space identities, equipment graphs, IdealLoads scalar demand and limits,
+OA helpers, time metadata, and a `sizing_checked` flag are adjacent only.
+The raw `Sizing:Zone` fixture expects `UnsupportedSizing`, active cases have
+neither executable sizing input nor component-load-summary requests, and
+sizing remains run-blocked.
+
+CP247 adds no algorithm-level EnergyPlus source, Rust target/code/state,
+test, object support, capability, output implementation, comparator, case,
+manifest, numerical, performance, or conformance promotion. The parent
+algorithm remains `scaffold` with claim level `none`. Inventory becomes 32
+algorithms and 252 routines, split 58 `state_mapped` plus 194
+`source_mapped`, with 129 required; the heat-balance project list remains 88
+and the HVAC list becomes 18.
+
+CP248 next maps `ZoneEquipmentManager::updateZoneSizingBeginDay`, declared
+at `ZoneEquipmentManager.hh` line 132 and implemented completely at
+`ZoneEquipmentManager.cc` lines 1431-1453.
 
 ## Promotion Requirements
 
