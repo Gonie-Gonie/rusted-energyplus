@@ -4106,9 +4106,125 @@ algorithms and 249 routines, split 58 `state_mapped` plus 191
 `source_mapped`, with 126 required; the heat-balance project list remains 88
 and the HVAC list becomes 15.
 
-CP245 next maps `ZoneEquipmentManager::calcSizingOA`, declared at
-`ZoneEquipmentManager.hh` lines 111-117 and implemented at
-`ZoneEquipmentManager.cc` lines 1084-1206.
+## CP245 `calcSizingOA` Zone/Space Outdoor-Air Sizing Mutator
+
+CP245 adds canonical required `routine.calc_sizing_oa` immediately after
+`set_up_zone_sizing_arrays` and before `sim_zone_equipment`, plus the matching
+HVAC project item. The exact routine is declared at
+`ZoneEquipmentManager.hh` lines 111-117 and implemented completely at
+`ZoneEquipmentManager.cc` lines 1084-1206. It returns `void`, mutates separate
+final and calculated-final sizing records plus shared module state, reads the
+non-const `dsoaError` reference without assigning it, and only raises
+`ErrorsFound` on a cross-Zone DSOA SpaceList member. It validates neither
+record aliasing, bool aliasing, indexes, allocation, nor a Space's parent Zone.
+
+The only production call expressions are CP244's controlled-Zone call at line
+1032 and optional controlled-parent Space call at line 1042. CP244 visits all
+controlled Zones first, then globally indexed Spaces in ascending order, and
+shares the same two error flags across the whole pass. CP245 snapshots the
+final record's `ZoneDesignSpecOAIndex`, reads the Zone's signed integer
+`Multiplier * ListMultiplier`, and selects Zone or Space floor area. Only a
+positive DSOA pointer with false `dsoaError` is dereferenced. A DSOA SpaceList
+then checks every positive member against `zoneNum`; each mismatch emits one
+severe plus two continuation messages and sets `ErrorsFound`, but does not
+break, remove the member, set `dsoaError`, or stop later calculation. Zero
+member indexes are skipped locally. The same guarded block writes only the
+final record's per-person and per-area design OA rates; an existing value is
+retained when the guard is false.
+
+CP245 scans the complete People arena. Zone roles select `People.ZonePtr`,
+while Space roles select `People.spaceIndex`; each matching design count is
+multiplied by the Zone multiplier. Peak occupancy is accumulated with `+=`.
+A strictly positive schedule maximum scales the contribution, whereas zero,
+negative, or NaN maxima fall back to the full design count. Minimum occupancy
+always uses the schedule minimum without a clamp. Null schedules, inconsistent
+Zone/Space ownership, negative values, and non-finite values have no local
+protection, and schedule extrema are lazily cached by the child accessors.
+
+The final record then receives multiplied floor area, total design People,
+and per-person and per-area OA totals. Minimum breathing-zone OA for the
+predefined report uses minimum scheduled occupancy and
+`std::min(ZoneADEffCooling, ZoneADEffHeating)`, replacing either signed zero
+with one; negative and NaN values otherwise flow through. Only a Zone role
+publishes `ZonePreDefRep.VozMin`; a Space role computes and discards that
+report value. The selected Zone or Space equipment configuration always
+stores the DSOA and air-distribution indexes, including when `dsoaError` is
+already true.
+
+With false `dsoaError`, CP245 delegates
+`calcDesignSpecificationOutdoorAir` using four false control flags, the
+current role, and the default-enabled IAQ-method path. The child owns DSOA
+method arithmetic, SpaceList selection, multiplier application,
+contaminant-state dependencies, diagnostics, fatals, and persistent warning
+flags. CP245 does not multiply its returned OA again. The local accumulator
+stays zero when the child is suppressed; otherwise it receives the child
+result, which CP245 writes to both `MinOA` records, then, if either final air-distribution effectiveness
+is positive, divides by unqualified ObjexxFCL `min` and copies the final
+answer back to calculated-final. This second minimum chooses the heating
+operand on a tie, differs from the earlier `std::min` for NaN operands, and
+can divide by zero or a negative/NaN operand; no finite or nonnegative clamp
+exists and calculated-final effectiveness is ignored.
+
+Per-area cooling and heating limits are freshly derived from role floor area
+and Zone multiplier. Four final/calculated-final input-flow fields are then
+scaled in place with `*=`, so direct same-state replay compounds any nonunit
+multiplier. Every design or run-period design day finally receives exactly
+five final and calculated Zone-array fields: `MinOA`,
+`DesCoolMinAirFlow2`, `DesCoolMinAirFlow`, `DesHeatMaxAirFlow2`, and
+`DesHeatMaxAirFlow`. Space roles do not write the corresponding Space daily
+arrays; they overwrite the parent Zone's daily column, so under CP244 order
+the highest global Space index belonging to a Zone supplies the last values.
+
+The routine owns no status, catch, checkpoint, cleanup, transaction, or
+rollback. Any failure preserves its completed prefix. In particular, an OA
+child failure occurs after aggregates, `VozMin`, and equipment indexes but
+before the new `MinOA`; an interrupted daily loop preserves earlier days and
+earlier fields. Direct retry is non-idempotent because peak occupancy and the
+four multiplier-scaled flows accumulate, diagnostics can repeat, and schedule
+or OA-child caches and flags can change behavior. Aliasing the two sizing
+records applies the four `*=` operations twice; aliasing the two bool
+references lets a cross-Zone error suppress the same call's OA child. A full
+CP244 replay zero-fills and refills final records, avoiding those two direct
+record accumulations, but remains non-idempotent through DSOA indexes,
+diagnostics, and child state. `RezeroZoneSizingArrays` and manager
+`clear_state()` do not constitute a coordinated reset of all CP245 owners.
+
+No C++ test calls CP245 directly or immediately asserts a CP245-owned field.
+Static corpus reachability is 95 calls: 74 Zone and 21 Space roles. All enter with false
+`dsoaError` and reach the OA child; 94 have positive DSOA pointers and one PIU
+role has zero. The positive set contains 93 individual DSOA roles and one
+valid two-member SpaceList role. OA methods are 34 Sum, 54 Flow/Person, and
+six Flow/Zone plus the pointer-zero role. Forty-one calls match one People
+object with a positive schedule maximum, while 54 match none. All 95 use
+1.0/1.0 effectiveness; 67 roles use unit multipliers and 28 use 10. Existing
+Beam, OccupantDiversity, OutputReportTabular, and Standard621 assertions are
+downstream composition oracles, not isolated checks. No test covers the
+owned scalar and daily writes, `VozMin`, equipment indexes, true
+`dsoaError`, malformed or cross-Zone topology, schedule fallback, multiple or
+null-schedule People, nonunit/IEEE effectiveness, Maximum OA, aliasing,
+partial failure, direct retry, reset, or Space overwrite.
+
+Rust has no exact `calcSizingOA` routine or Zone/Space sizing and design-day
+arrays, shared `dsoaError`/`ErrorsFound` protocol, DSOA SpaceList cross-Zone
+validation, mutable equipment OA/air-distribution indexes, air-distribution
+effectiveness, per-People schedule-extrema accumulation,
+multiplier-applied occupancy/floor-area state, `ZonePreDefRep.VozMin`,
+in-place sizing-flow scaling, or design-day fanout. Typed Zone, Space, People,
+schedules, IdealLoads equipment, and individual DSOA plus the PurchasedAir OA
+design-flow helper are adjacent subsets only; authored Space/SpaceList, zone
+grouping, and sizing remain run-blocked.
+
+CP245 adds no algorithm-level EnergyPlus source, Rust target/code/state, test,
+object support, capability, output implementation, comparator, case,
+manifest, numerical, performance, or conformance promotion. The algorithm
+remains `scaffold` with claim level `none`. The inventory becomes 32
+algorithms and 250 routines, split 58 `state_mapped` plus 192
+`source_mapped`, with 127 required; the heat-balance project list remains 88
+and the HVAC list becomes 16.
+
+CP246 next maps `ZoneEquipmentManager::fillZoneSizingFromInput`, declared at
+`ZoneEquipmentManager.hh` lines 119-126 and implemented at
+`ZoneEquipmentManager.cc` lines 1208-1400.
 
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
