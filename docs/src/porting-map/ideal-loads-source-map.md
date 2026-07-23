@@ -9772,6 +9772,302 @@ CP265 next adds required source-mapped
 `ZoneEquipmentManager.cc` lines 4390-4419. Its leaf
 `distributeOutputRequired` begins at source line 4421.
 
+## CP265 `DistributeSystemOutputRequired` Gate and Zone/Space Dispatcher
+
+CP265 adds canonical required
+`routine.distribute_system_output_required` immediately after
+`routine.init_output_required` and before `routine.sim_purchased_air`,
+plus the same ordered HVAC project-contract item. The wrapper is declared
+at `ZoneEquipmentManager.hh` line 198 and implemented completely at
+`ZoneEquipmentManager.cc` lines 4390-4419:
+
+```cpp
+void DistributeSystemOutputRequired(
+    EnergyPlusData &state,
+    int const ZoneNum,
+    bool const FirstHVACIteration);
+```
+
+The header has no default argument and spells the two by-value parameters
+without top-level `const`; the definition adds function-type-neutral
+top-level `const` to both. There is no Space-number parameter. `ZoneNum`
+selects the Zone and equipment-list priority, capacity, and fraction
+context. CP266 separately consumes manager-global `PrioritySimOrder`
+scratch whose correspondence to that Zone is an unchecked upstream
+invariant.
+
+The gate order is exact:
+
+1. read `Zone(ZoneNum).IsControlled` and return when false;
+2. read `ZoneSizingCalc` and return when true;
+3. on the first HVAC iteration, return unless the Zone equipment-list
+   scheme is Uniform or Sequential;
+4. call lowercase `distributeOutputRequired` for the Zone sensible and
+   moisture demand records; and
+5. after that Zone child returns, read `doSpaceHeatBalance`, visit every
+   stored `Zone(ZoneNum).spaceIndexes` occurrence in order, and call the
+   same child for each Space demand pair.
+
+Short-circuit evaluation matters. A later iteration performs no
+wrapper-level equipment-list lookup. A first-iteration Uniform call reads
+the list once because the first inequality is false. Sequential reads it
+twice, first rejecting Uniform and then accepting Sequential. UniformPLR,
+SequentialUniformPLR, Invalid, `Num`, and arbitrary other enum casts also
+read it twice and return silently. The scheme is not cached in a local
+snapshot.
+
+This preserves the CP264 protocol. First-iteration Sequential and Uniform
+calls enter CP266 and redistribute CP264 predictor broadcasts.
+First-iteration UniformPLR and SequentialUniformPLR return so CP264's
+design-load sequence seeds remain available for capacity discovery. An
+unknown first-iteration scheme also returns, while CP264 has no matching
+sequence-write branch, so prior sequence state can survive without a
+diagnostic. Later iterations pass every scheme to CP266; its invalid
+default is fatal. Uncontrolled and Zone-sizing calls likewise leave the
+CP264 result untouched.
+
+Define
+
+```text
+G = IsControlled
+    && !ZoneSizingCalc
+    && (!FirstHVACIteration
+        || scheme == Uniform
+        || scheme == Sequential)
+```
+
+For current Space flag `I` and `M` stored Space occurrences, a fully
+successful wrapper call dispatches
+
+```text
+G * (1 + I*M)
+```
+
+lower-leaf executions. The Zone always precedes every Space. Duplicate or
+cross-listed Space identities are not deduplicated, so the same demand
+record can be revisited. A Space child receives its own demand records but
+the unchanged parent `ZoneNum`; it therefore reuses the parent equipment
+list with its priorities, learned capacities, and fraction schedules, plus
+the current manager-global priority scratch and shared duct-loss state.
+Scratch-to-parent correspondence is not validated. The flag is
+`doSpaceHeatBalance`, not the narrower simulation-only flag. No Space
+control, ownership, identity, or membership validation exists.
+
+The wrapper has four `if` statements, one range-for, three `return`
+statements, two `&&` tokens, and no `else`, switch, case, break, continue,
+catch, diagnostic, or assignment operator. It has two lower-leaf call
+sites and ten syntactic calls/accessors: those two children, two Zone
+lookups, two equipment-list lookups, and four Zone/Space demand lookups.
+There is no direct persistent mutation, result status, local recovery,
+cleanup, checkpoint, transaction, or rollback.
+
+All successful writes belong to CP266. In dependency context, that leaf
+targets 12 demand families per selected record: six sequence vectors and
+six adjusted remaining-demand scalars. It does not rewrite predictor
+totals, unadjusted demand, CP264 deadband state, equipment-list data,
+learned capacities, or priority scratch.
+
+CP265 performs no allocation or extent check. Sequential CP266 needs
+priority slot one in scratch corresponding to the current Zone, a valid
+equipment pointer, and slot one in all six sequences. Nonsequential paths
+need compatible list priority/capacity extents and demand-vector coverage
+through the active equipment range;
+their common tail reads slot one. CP264's sole main-sequence allocation
+test governs only CP264's own writes and does not make CP265 safe.
+
+The only production call expression is CP263
+`InitSystemOutputRequired` at `ZoneEquipmentManager.cc` line 4289, after
+the Zone initializer and every `doSpaceHeatBalance`-selected stored
+Space-occurrence initializer return. A normal `SimZoneEquipment` pass
+reaches CP265 once for each `ZoneEquipConfig.IsControlled` Zone before
+equipment and again for each such Zone with a return node during leaving
+conditions. CP265 independently gates on `Zone(ZoneNum).IsControlled`;
+ordinary input processing aligns the two flags, but the wrapper does not
+validate that invariant. With upstream-controlled count `C`, return-node
+upstream-controlled count `K`, Space flag `I`, their stored occurrence
+counts `M` and `M_K`, this is nominally `C+K` wrapper calls. A later
+valid-scheme, control-aligned pass can dispatch
+
+```text
+C + K + I*(M + M_K)
+```
+
+lower leaves. A first pass includes only the Sequential/Uniform subsets.
+Sizing Part1 calls CP264 directly and never CP265. Sizing can later reach
+CP265 through the `K` leaving-condition wrappers, but `ZoneSizingCalc`
+makes every one return before a lower Zone or Space call.
+
+The audited C++ unit corpus executes the public wrapper exactly 92 times:
+75 through CP263 and 17 through direct public call expressions. The 75
+comprise 24 explicit CP263 calls plus 51 named-parent executions. Sixteen
+direct calls immediately repeat the CP263 child; the seventeenth follows
+CP263 plus an explicit `SetZoneEquipSimOrder`. No unit test calls lowercase
+`distributeOutputRequired` directly.
+
+The 92 public calls divide as follows:
+
+- 55 first-iteration and 37 later-iteration calls;
+- 60 Sequential, eight Uniform, eight UniformPLR, and 16
+  SequentialUniformPLR schemes;
+- 31 positive, 48 negative, and 13 exact-zero total sensible loads; and
+- one unallocated main sequence, 48 length-one, two length-two, 36
+  length-three, and five length-four shapes at public entry.
+
+Ninety-one calls are controlled; the lone unallocated public entry is
+uncontrolled. All 92 are outside Zone sizing, Zone-level, and have
+`doSpaceHeatBalance=false`. Thus the corpus executes the uncontrolled
+return once, never executes the sizing return, and dispatches no Space
+child.
+
+Eight first-iteration PLR calls return at the scheme gate: four CP263
+children and their four direct repeats, covering heating/cooling
+UniformPLR and SequentialUniformPLR cases. One additional first-iteration
+call returns at the uncontrolled gate. The other 83 calls dispatch the
+Zone leaf. Those lower calls divide into 46 first and 37 later calls, with
+59 Sequential, eight Uniform, four UniformPLR, and 12
+SequentialUniformPLR schemes. Their entry shapes are 48 length-one, two
+length-two, 28 length-three, and five length-four records. Every later PLR
+case computes a positive PLR; no `plr <= 0` no-write branch runs.
+
+The lone unallocated public entry occurs in
+`CZoeEquipmentManager_CalcZoneLeavingConditions_Test`.
+`ZoneEquipConfig.IsControlled` is true, but
+`Zone(1).IsControlled` remains default false, so CP265 returns at its first
+gate before reading the scheme or reaching CP266. Its assertions read
+return temperature, not CP265 demand preservation. It is an unasserted
+uncontrolled-gate execution, not an unallocated lower-leaf dispatch.
+
+Six explicit distribution tests contain exactly 222 sensible sequence
+endpoint assertions:
+
+- Sequential: 36;
+- Uniform: 36;
+- UniformPLR: 36;
+- SequentialUniformPLR: 72;
+- mixed Sequential equipment: 24; and
+- mixed Sequential equipment with fractions: 18.
+
+They strongly cover sensible formulas, both load signs, Uniform active
+heating/cooling counts, UniformPLR capacities, and
+SequentialUniformPLR selection of one, two, or three heating units and one
+or two cooling units. The four first-PLR scenarios contribute 36
+no-op-gate assertions: the positive heating or negative cooling CP264
+design seeds survive both the internal CP265 call and its direct repeat.
+
+The mixed-fraction test is the clearest Sequential mutation evidence. Its
+positive heating fraction 0.4 scales slot one while the first-call tails
+remain at full demand; a later update applies the second equipment's 0.6
+fraction. A cooling fraction 0.3 is configured but no negative
+mixed-fraction call exercises it.
+
+Sixteen scenarios contain exactly 48 assertions for the three adjusted
+sensible `Remaining*` fields. Twelve nonsequential scenarios reflect
+CP265 slot-one distribution. Two basic Sequential later cases are
+indistinguishable from CP264 because their fraction is one, and two mixed
+later cases are observed only after `updateSystemOutputRequired`.
+
+There are zero moisture-sequence assertions. Only three moisture
+`Remaining*` assertions exist, all reading zero, and every CP265 input has
+zero moisture predictor demand. The 51 named-parent executions have no
+direct CP265 destination assertion; their host tests check downstream
+equipment, airflow, and return behavior.
+
+Repeated direct calls make the positive distribution evidence less
+isolated. Uniform and later-PLR assertions follow a second deterministic
+distribution, so they prove the aggregate replay-stable result but cannot
+identify which invocation repaired a destination. All four repeated direct
+first-PLR calls are no-ops. The corpus contains 13 direct distributing
+replays and 26 leaving-condition wrapper replays (25 dispatching and one
+returning as uncontrolled), but no test corrupts all six sequence vectors
+plus all six adjusted Remaining destinations between calls.
+
+The single uncontrolled return has no demand-state no-op oracle, and
+coverage omits a `ZoneSizingCalc` return oracle, every Space traversal and
+duplicate-membership case, nonzero moisture, every moisture sequence
+ratio, and duct loss. Uniform has no zero-available
+fallback case. PLR paths omit zero or wrong-sign capacity, `plr <= 0`,
+zero total, NaN/Inf, inconsistent priority/capacity, and malformed active
+counts. Sequential fraction coverage omits cooling, out-of-range,
+negative, NaN, and schedule-failure fractions.
+
+Tests also omit an invalid first-iteration silent return, a later invalid
+fatal, allocated-zero-length or mismatched companion arrays, an active
+missing-priority-scratch failure oracle, invalid Zone/Space identity,
+isolated partial failure, rollback, and replay after changed scheme,
+capacities, priorities, fractions, allocation, or Space topology. The one
+unallocated uncontrolled call returns before sequence and priority
+prerequisites are needed; without a demand sentinel it proves neither
+no-op preservation nor active malformed-state behavior.
+
+Gate returns occur before any wrapper-owned mutation and carry no result
+status. For an active call, both Zone demand accessor arguments must be
+evaluated before the Zone child begins, but their relative evaluation
+order is not specified by the call syntax. A Zone-child failure prevents
+the Space flag and membership traversal and retains the child's mutation
+prefix. Failure while acquiring the membership after a completed Zone
+child retains the complete Zone result. A Space accessor or lower-child
+failure retains the Zone, every completed prior occurrence, and any
+current-leaf prefix; later occurrences are skipped.
+
+The first-iteration invalid-scheme path is silent. The corresponding later
+path reaches CP266 `ShowFatalError`. CP265 has no catch, local diagnostic,
+checkpoint, cleanup, recovery, or rollback around either case.
+
+With scheme, priorities, capacities, fractions, demands, duct state, and
+membership fixed, successful active replay is overwrite-idempotent for the
+destinations CP266 rewrites. Sequential duct additions do not accumulate
+because the child assigns before adding, and duplicate Space occurrences
+repeat the same fixed calculation. This is not canonical whole-state
+repair: wrapper skip paths, lower nonpositive-PLR no-write paths, and
+sequence tails outside the active range retain history. Control and sizing
+flags, first-iteration state, scheme, priorities, capacities, fractions,
+demand, duct state, Space flag, and membership are all resampled on every
+call.
+
+Rust has no exact or snake-case CP265 wrapper or CP266 leaf. It lacks
+source total/unadjusted/sequenced sensible and moisture state, Zone/Space
+demand arenas, `PrioritySimOrder`, heating/cooling list priorities,
+available-equipment counts, learned capacity caches, and operational
+first-iteration, sizing, Space-HB, or duct-loss state.
+
+Rust parses all four load-distribution enums plus heating/cooling sequences
+and optional Sequential fraction schedules. The active runtime reads none
+of the schemes or fraction schedules. Sequence values serve static graph
+validation and binding order, while runtime visits each independently
+bound IdealLoads system with a fresh four-setpoint-value demand snapshot.
+Per-system maximum capacity limits are component caps, not the source
+equipment-list learned capacities used by PLR distribution.
+
+Active data contain 30 equipment lists, 30 connections, and 30 IdealLoads
+systems. Every list has one SequentialLoad entry at heating/cooling
+sequence `1/1` with blank fraction schedules. There are zero Space or
+SpaceList objects, multi-equipment lists, non-Sequential schemes, active
+fraction schedules, Sizing:Zone objects, or duct-loss cases. All 61 active
+SimulationControl objects disable Zone sizing. These fixtures expose only
+the trivial single-equipment topology and cannot establish CP265 parity.
+
+The roadmap still requires real `FirstHVACIteration` semantics, multiple
+ZoneHVAC equipment load distribution, equipment-list order and sequences,
+availability, residual-load updates, and shared adaptive system-timestep
+state. CP265 is source-only dependency evidence for that work, not an
+implementation checkpoint.
+
+CP265 changes no Rust target/state, support declaration, test, capability,
+output, comparator, case, manifest, numerical claim, performance claim, or
+conformance status. Counts become 32 algorithms and 269 routines, split 58
+`state_mapped` plus 211 `source_mapped`, with 146 required.
+Domain-required counts become heat-balance 88, HVAC 35, plant 1, and
+time/schedule 22, with readiness `0/88`, `0/35`, `0/1`, and `0/22`. The
+IdealLoads parent remains `scaffold` at claim level `none`.
+
+CP266 next adds required source-mapped
+`routine.distribute_output_required` immediately after
+`routine.distribute_system_output_required` and before
+`routine.sim_purchased_air`. Lowercase `distributeOutputRequired` is
+declared at `ZoneEquipmentManager.hh` lines 200-203 and implemented
+completely at `ZoneEquipmentManager.cc` lines 4421-4715.
+`updateSystemOutputRequired` begins at source line 4717.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

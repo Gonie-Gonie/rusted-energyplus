@@ -155,6 +155,7 @@ required_routines = [
   "set_zone_equip_sim_order",
   "init_system_output_required",
   "init_output_required",
+  "distribute_system_output_required",
   "sim_purchased_air",
   "get_purchased_air",
   "init_purchased_air",
