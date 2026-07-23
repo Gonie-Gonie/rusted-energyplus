@@ -131,6 +131,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `ZoneEquipmentManager::RezeroZoneSizingArrays` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; Rust has no Zone/Space sizing records, sentinel-selective reset, component-load pulse lifecycle, or sizing reset latch |
 | `ZoneEquipmentManager::updateZoneSizingBeginDay` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent run-period timing, design-day schedule labels, and standard-density IdealLoads limits do not implement current-day calculated sizing metadata |
 | `ZoneEquipmentManager::updateZoneSizingDuringDay` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent thermostat schedules, system-timestep heat-balance averaging, demand snapshots, and IdealLoads rate timing do not implement Zone/Space sizing sequence accumulation |
+| `ZoneEquipmentManager::updateZoneSizingEndDayMovingAvg` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent adaptive heat-balance weighting, schedule averages, output-frequency classification, and run-period time state do not implement circular Zone/Space sizing-day smoothing |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
 | `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand` |
 
@@ -4052,9 +4053,389 @@ algorithms and 254 routines, split 58 `state_mapped` plus 196
 `source_mapped`, with 131 required; heat-balance and HVAC project lists become
 88 and 20.
 
-CP250 next maps `ZoneEquipmentManager::updateZoneSizingEndDayMovingAvg`,
-declared at `ZoneEquipmentManager.hh` line 143 and implemented completely at
-`ZoneEquipmentManager.cc` lines 1508-1529.
+## CP250 `updateZoneSizingEndDayMovingAvg` Circular End-Day Smoothing
+
+CP250 adds canonical required
+`routine.update_zone_sizing_end_day_moving_avg` after
+`update_zone_sizing_during_day` and before `sim_zone_equipment`. The exact
+source-definition sequence is CP249 at `ZoneEquipmentManager.hh` lines
+134-141, CP250 at line 143, and CP251 at lines 145-149; the corresponding
+implementations are CP249 lines 1455-1506, CP250 lines 1508-1529, and CP251
+lines 1531-1944. CP250's public signature is:
+
+```cpp
+void updateZoneSizingEndDayMovingAvg(
+    DataSizing::ZoneSizingData &zsCalcSizing,
+    int const numTimeStepsInAvg);
+```
+
+The complete wrapper has one `if`, no direct assignment or return value, and
+at most 16 ordered `General::MovingAvg` child expressions. That child is
+declared at `General.hh` line 107 and implemented at `General.cc` lines
+374-393.
+
+### Exact selected sequence set
+
+The first 12 child calls are unconditional and target the supplied calculated
+daily sizing record in this exact order:
+
+```text
+CoolFlowSeq
+CoolLoadSeq
+HeatFlowSeq
+HeatLoadSeq
+CoolZoneRetTempSeq
+HeatZoneRetTempSeq
+DOASHeatAddSeq
+DOASLatAddSeq
+CoolLatentLoadNoDOASSeq
+HeatLatentLoadNoDOASSeq
+CoolLoadNoDOASSeq
+HeatLoadNoDOASSeq
+```
+
+There is no `AccountForDOAS` gate. All four no-DOAS load fields are in the
+unconditional set even though CP249 accumulates them only inside its
+`zoneLatentSizing` gate. A latent-false record can therefore have existing,
+dirty, or malformed-call values in those fields smoothed rather than
+preserved.
+
+Only when `zsCalcSizing.zoneLatentSizing` is true, four more calls follow:
+
+```text
+LatentHeatLoadSeq
+LatentHeatFlowSeq
+LatentCoolLoadSeq
+LatentCoolFlowSeq
+```
+
+Thus a latent-false helper dispatches 12 children and a latent-true helper 16.
+Each successful non-no-op child replaces every element of one target array.
+The wrapper writes no scalar, flag, topology, diagnostic, normal-daily record,
+or final record.
+
+Of CP249's 30 calculated-daily destinations, CP250 smooths at most 16. It
+leaves these 14 untouched:
+
+```text
+HeatZoneTempSeq
+HeatOutTempSeq
+HeatZoneHumRatSeq
+HeatOutHumRatSeq
+CoolZoneTempSeq
+CoolOutTempSeq
+CoolZoneHumRatSeq
+CoolOutHumRatSeq
+DOASHeatLoadSeq
+DOASCoolLoadSeq
+DOASSupMassFlowSeq
+DOASSupTempSeq
+DOASSupHumRatSeq
+DOASTotCoolLoadSeq
+```
+
+It also leaves CP249's four normal-daily thermostat sequences and the separate
+`HeatFlowSeqNoOA` and `CoolFlowSeqNoOA` fields untouched.
+
+### Source-actual circular trailing mean
+
+Let `L = DataIn.size()` and `N = NumItemsInAvg`. The complete
+`General::MovingAvg` child first applies:
+
+```text
+if N <= 1:
+    return
+```
+
+That return occurs before querying the extent, allocating scratch storage, or
+accessing the array. Negative, zero, and one are therefore exact no-ops for a
+direct call.
+
+For `N > 1`, the child allocates a `2 * L` scratch array. Its first loop
+copies each original `x(i)` into scratch positions `i` and `L + i`, then
+assigns `x(i) = 0.0`. Only after every original element has been copied and
+zeroed does the second loop evaluate, in ascending `i` and then ascending
+`j` order:
+
+```text
+x(i) += scratch(L - N + i + j),  j = 1..N
+x(i) /= N
+```
+
+For `2 <= N <= L`, this is an inclusive circular trailing window: output
+position `i` averages its original value and the preceding `N - 1` values.
+The duplicated scratch halves make the first positions wrap through the last
+positions of the same day. Every output uses the complete pre-call snapshot;
+the in-place writes do not recursively feed later outputs.
+
+`N = L` averages the whole day at every position, although rotated addition
+order can still change floating-point rounding. `N = L + 1` remains within
+the two scratch halves but includes every original value and the current value
+a second time. When `L = 0`, both loops skip even for `N > 1`.
+
+For positive `L` and `N > L + 1`, the earliest expression underflows through
+the mixed unsigned-size arithmetic before ObjexxFCL indexing.
+`Array1::operator()(int)` checks `assert(contains(i))` before returning raw
+storage, so an invalid index terminates in an assert-enabled build and has
+undefined behavior when assertions are disabled. The loops also hard-code
+indexes `1..size`, so a directly constructed non-one-based array is not
+supported. The child validates neither allocation, lower bound, window against
+extent, nor scratch-size arithmetic.
+
+Production sizing arrays have:
+
+```text
+L = 24 * TimeStepsInHour
+```
+
+The `Sizing:Parameters` averaging-window field is integer, has minimum one,
+and has no maximum. Blank, absent, and source nonpositive fallback paths set
+`NumTimeStepsInAvg = TimeStepsInHour`; fast-mode override does the same.
+Sizing input warns when the window is shorter than one hour but never clamps
+an oversized window to the daily extent. The fresh data-state default is zero.
+A direct helper, or each CP250 child actually reached by an otherwise-valid
+parent, therefore takes the no-op path. The EndDay parent itself is not a
+no-op: after its first sweep completes it continues to CP251, while invalid
+record or topology access can stop it before a child is reached.
+
+Additions and division use raw floating-point values with no finite, range, or
+sign check on array elements. NaN, infinity, mixed-sign infinity, overflow,
+signed zero, and rounding follow the ordered source arithmetic. In exact
+arithmetic the circular filter preserves the total; for finite floating-point
+data, bitwise results can depend on summation order.
+
+### EndDay parent routing and CP251 barrier
+
+The only two helper expressions are in the `UpdateZoneSizing` `EndDay` arm at
+`ZoneEquipmentManager.cc` lines 3293-3307. Its first complete sweep:
+
+1. scans global Zone indexes ascending;
+2. skips an uncontrolled Zone;
+3. smooths that Zone's
+   `CalcZoneSizing(CurOverallSimDay, CtrlZoneNum)`;
+4. when Space sizing is enabled, smooths each stored
+   `Zone(CtrlZoneNum).spaceIndexes` entry in container order through
+   `CalcSpaceSizing(CurOverallSimDay, spaceNum)`.
+
+The parent performs no Space-local control check, global Space scan, sorting,
+deduplication, stored-membership validation, parent-Zone validation, or
+topology snapshot. It passes the same global `NumTimeStepsInAvg` by value to
+every role.
+
+With `C` controlled Zones, `M` stored Space membership occurrences, and `R`
+latent-true role occurrences, one completed valid-state parent has:
+
+```text
+H = C + (doSpaceHeatBalanceSizing ? M : 0)
+CP250 helper calls = H
+General::MovingAvg calls = 12 * H + 4 * R
+```
+
+A duplicate Space occurrence applies the filter repeatedly to the same
+calculated record. Cross-listing under multiple controlled Zones has the same
+compounding effect; there is no parent thermostat input in CP250 to
+differentiate those calls. Heterogeneous target-array extents are processed
+independently without an equality check.
+
+Critically, the parent finishes this whole CP250 traversal before starting a
+second complete Zone/Space traversal for CP251
+`updateZoneSizingEndDay`. No role's peak selection begins while another
+role still awaits smoothing. A duplicate record is therefore fully
+multiply-smoothed before the first CP251 call.
+
+CP251 selects sensible and latent peaks from the smoothed load arrays and
+reads paired smoothed flow and return-temperature arrays. It also processes
+the four smoothed no-DOAS load arrays. At the selected smoothed-load
+timestep, however, it samples Zone/outdoor temperature and humidity arrays
+that CP250 deliberately left unsmoothed. `DOASHeatAddSeq` and
+`DOASLatAddSeq` are transformed but are not consumed by CP251. CP250 itself
+writes no peak time, load, flow, name, or final result.
+
+### Production cadence and pulse boundary
+
+The sole production `UpdateZoneSizing(EndDay)` expression is
+`SizingManager.cc` line 374. It executes only after all hours and zone
+timesteps have completed for a non-warmup sizing day, and before
+`UpdateFacilitySizing(EndDay)` or any `CurOverallSimDay` increment. An
+abnormal stop before that point suppresses CP250 for the day. Unlike CP249,
+there is no adaptive system-substep multiplier: each completed accepted
+sizing day reaches the parent once.
+
+The `UpdateZoneSizing` parent has no local warmup, sizing, end-day, or
+current-day validity guard. Direct callers can invoke the enum arm at any
+time. Its legacy comment labels EndDay as three, while the authoritative
+`CallIndicator::EndDay` enum value is two.
+
+When a component-load report is requested, the first Zone-sizing iteration is
+a pulse pass and CP250 smooths every completed pulse day before pulse peak
+selection and end-of-sizing propagation. Only after that whole sizing
+iteration does SizingManager invoke CP247. Under consistent production
+topology, a completed guard-passing CP247 zeroes every CP250 target before
+the later normal pass. CP247 globally scans Space parent identities, while
+CP250 follows stored Zone membership; a malformed cross-listed Space whose
+actual parent is uncontrolled can be CP250-smoothed yet CP247-skipped.
+
+Within either the pulse or normal iteration, each sizing day uses its own
+`CurOverallSimDay` calculated record. The normal iteration then reuses the
+same day indexes after CP247 resets the pulse sequences. The circular filter
+wraps within one daily record; it does not intentionally blend different day
+indexes.
+
+### Failure prefix, retry, and identity reuse
+
+CP250 has no diagnostic, status, catch, checkpoint, cleanup, transaction, or
+rollback. Each child owns a temporary scratch array, but prior record
+mutations are already committed.
+
+A scratch-construction `std::bad_alloc` occurs before the current target is
+touched; prior child arrays and prior Zone/Space roles remain transformed.
+Once scratch construction succeeds, the copy-and-zero and averaging loops have
+no source-defined recoverable exception path. Invalid indexing terminates at
+an enabled assertion or has undefined behavior without assertions, so the
+source guarantees neither a post-failure array state nor same-state retry.
+
+Only as a source-statement-order model, a hypothetical external interruption
+during the copy loop could expose an ordered zeroed prefix. Interruption during
+the averaging loop could expose completed outputs, a partial current output,
+and later zeros after the whole target was zeroed. Later fields and roles would
+remain untouched. Those prefixes describe write order, not a recoverable C++
+failure guarantee.
+
+For defined execution, every `N <= 1` child is an exact no-op. A successfully
+completed filter with `N > 1` generally composes with itself and is
+non-idempotent. Mathematically constant vectors and exact whole-day means are
+fixed cases, but raw floating-point resummation does not guarantee bitwise
+replay stability. Re-entry after a caught scratch-allocation failure restarts
+at the first Zone and first selected array: the failed current target was
+untouched, while earlier completed arrays are processed again.
+
+If scratch allocation prevents the first parent sweep from returning, the
+parent has made zero CP251 calls. A later CP251 non-return occurs after every
+CP250 role is fully committed. Any defined parent re-entry begins CP250 again
+before retrying peak selection; invalid-index assertion or undefined behavior
+provides no defined continuation.
+
+The public helper has only one record reference and an integer by value, so it
+has no two-record or output-reference alias channel. Production
+`Array1D` members are distinct, and each child snapshots its own target before
+writing. Duplicate or cross-listed Space identity is the material
+same-record alias/replay route in the parent.
+
+### C++ evidence
+
+No C++ test calls `updateZoneSizingEndDayMovingAvg` directly. Two unit tests
+call `UpdateZoneSizing(EndDay)` directly:
+
+- `ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest`;
+- `ZoneEquipmentManager_SizeZoneEquipment_DOASLoadTest`.
+
+Each provides one controlled Zone, no Space, latent sizing false, extent one,
+and `NumTimeStepsInAvg = 1`. Each therefore dispatches 12 child expressions,
+all of which return before touching the array. No post-call assertion reads
+any of the 16 CP250 sequence families. Later load, temperature, peak, and
+final assertions combine CP249, CP250's no-op, CP251, end-of-sizing
+propagation, and other sizing producers.
+
+The only focused child test is `General_MovingAvg`. It builds a 12-element
+quadratic sequence and checks:
+
+- all 12 values unchanged for `N = 1`;
+- all 12 exact circular trailing results for `N = 2`;
+- all 12 near-equal circular trailing results for `N = 4`.
+
+Those 36 dynamic checks across seven source assertion statements prove the
+generic child for three ordinary windows. They do not prove CP250's selected
+fields, call order, latent gate, parent record identity, or barrier.
+
+A fresh completed production-style census finds:
+
+- 17 of 18 direct `ManageSizing` expressions: 33 parent calls and 51 Zone
+  helpers, split 43 normal and eight pulse;
+- 34 of 57 full simulations: 72 parent calls and 144 helpers, split 102 Zone
+  plus 42 Space;
+- combined: 105 parent calls and 195 helpers, comprising 153 Zone plus 42
+  Space and 177 normal plus 18 pulse.
+
+The exact parent window distribution is `N = 1/4/6` in counts `4/49/52`.
+The exact helper distribution is `4/87/104`. The four `N = 1` helpers are
+BaseSizer normal/pulse no-ops; the remaining 191 helpers execute smoothing.
+The latent gate is true for 26 helpers, split eight Zone plus 18 Space, all at
+`N = 6`; it is false for 169.
+
+The resulting child-call census is:
+
+```text
+N = 1:    4 * 12                         =   48 no-op calls
+N = 4:   87 * 12                         = 1,044 transformations
+N = 6:   78 * 12 + 26 * 16               = 1,352 transformations
+total                                      2,444 child calls
+```
+
+The two direct parent unit calls add two parents, two helpers, and 24 more
+`N = 1` no-op children if combined with, rather than kept separate from, the
+production-style census.
+
+`ZoneEquipmentManager_RezeroZoneSizingArrays` has 16 source `EXPECT_EQ`
+statements producing 4,800 dynamic reset checks over eight CP250-overlapping
+sequence fields in normal and calculated records. That test calls CP247,
+never CP250. The four unconditional no-DOAS targets and four conditional
+latent targets have no direct sequence assertion anywhere in the test tree.
+
+Eight `SizingManager` production runs use `N = 6` and assert exact Zone/Space
+design load, flow, design-day, and peak-time report cells. One latent run
+asserts final Space latent-cooling peak timestep 72. These are valuable
+end-to-end descendants but combine CP249 accumulation, generic MovingAvg,
+CP250 routing, CP251 maximum selection and companion sampling, final
+propagation, and reporting. `SizingManager_OverrideAvgWindowInSizing` proves
+only that fast-mode override sets the window to one; it never calls CP250.
+
+There is no helper-level proof of all 16 fields or their order, no immediate
+parent `N > 1` before/after array oracle, and no latent-false dirty-sentinel or
+latent-true exact-vector oracle. Mixed control, duplicate/cross-listed or
+malformed Space topology, `N <= 0`, `N = L`, `N = L + 1`, oversized windows,
+empty/unallocated or non-one-based arrays, unequal extents, NaN/infinity,
+overflow, rounding, scratch-allocation failure, invalid-access termination or
+undefined behavior, hypothetical statement-prefix interruption, defined
+re-entry, and non-idempotent replay remain unproved.
+
+### Rust boundary and governance
+
+Exact `crates` and `data` searches find zero occurrences of
+`updateZoneSizingEndDayMovingAvg`,
+`update_zone_sizing_end_day_moving_avg`, `MovingAvg`, `moving_avg`,
+`NumTimeStepsInAvg`, `num_time_steps_in_avg`, `Sizing:Parameters`,
+`ZoneSizingData`, `zoneLatentSizing`, or any of the 16 selected sequence
+fields. Rust owns no calculated Zone/Space sizing-day arena, global sizing
+window, circular trailing filter transaction, `UpdateZoneSizing` EndDay
+dispatcher, stored-Space sizing traversal, or CP251 peak-selection handoff.
+
+The adaptive heat-balance runtime does maintain weighted system-substep
+temperature, humidity, and report averages. Schedule code computes fixed
+interval or hourly averages, output storage classifies report variables as
+`Average`, and `TimeAxis` carries run-period state. None uses CP250's source
+record, daily circular wrap, selected field set, caller order, or
+failure/replay lifecycle. `TimeAxis` supports only `WeatherRunPeriod` and
+reports zero design-day samples.
+
+No active conformance case contains `Sizing:Zone` or `Sizing:Parameters`.
+Four active-case files contain five raw `SizingPeriod:DesignDay` objects, but
+every case sets Zone, System, and Plant sizing to `No`; the runtime records
+those objects only as ignored unsupported algorithms. The sole raw
+`Sizing:Zone` fixture expects `UnsupportedSizing` before runtime. Sizing,
+`ZoneSizing*`, and authored Space/SpaceList workflows remain run-blocked.
+
+CP250 adds no algorithm-level EnergyPlus source, Rust target/code/state, test,
+object support, capability, output implementation, comparator, case,
+manifest, numerical, performance, or conformance promotion. The parent
+algorithm remains `scaffold` with claim level `none`. Inventory becomes 32
+algorithms and 255 routines, split 58 `state_mapped` plus 197
+`source_mapped`, with 132 required; heat-balance and HVAC project lists become
+88 and 21. HVAC readiness remains `0/21`, the inventory is incomplete, and
+all 21 required routines remain below `family_gated`.
+
+CP251 next maps `ZoneEquipmentManager::updateZoneSizingEndDay`, declared at
+`ZoneEquipmentManager.hh` lines 145-149 and implemented completely at
+`ZoneEquipmentManager.cc` lines 1531-1944.
 
 ## Claim Requirements
 

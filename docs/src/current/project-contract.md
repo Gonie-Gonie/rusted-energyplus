@@ -4687,9 +4687,180 @@ and 254 routines, split 58 `state_mapped` plus 196 `source_mapped`, with 131
 required; the heat-balance project list remains 88 and the HVAC list becomes
 20.
 
-CP250 next maps `ZoneEquipmentManager::updateZoneSizingEndDayMovingAvg`,
-declared at `ZoneEquipmentManager.hh` line 143 and implemented completely at
-`ZoneEquipmentManager.cc` lines 1508-1529.
+## CP250 `updateZoneSizingEndDayMovingAvg` Circular End-Day Smoothing
+
+CP250 adds canonical required
+`routine.update_zone_sizing_end_day_moving_avg` after
+`update_zone_sizing_during_day` and before `sim_zone_equipment`, plus the
+matching HVAC project item. This is the physical source-definition order. The
+public helper is declared at `ZoneEquipmentManager.hh` line 143 and its
+complete wrapper is `ZoneEquipmentManager.cc` lines 1508-1529:
+
+```cpp
+void updateZoneSizingEndDayMovingAvg(
+    DataSizing::ZoneSizingData &zsCalcSizing,
+    int const numTimeStepsInAvg);
+```
+
+The body has one `if`, no direct assignment, and at most 16 ordered
+`General::MovingAvg` child calls. Twelve calculated-daily sequences are
+unconditional:
+
+```text
+CoolFlowSeq
+CoolLoadSeq
+HeatFlowSeq
+HeatLoadSeq
+CoolZoneRetTempSeq
+HeatZoneRetTempSeq
+DOASHeatAddSeq
+DOASLatAddSeq
+CoolLatentLoadNoDOASSeq
+HeatLatentLoadNoDOASSeq
+CoolLoadNoDOASSeq
+HeatLoadNoDOASSeq
+```
+
+There is no `AccountForDOAS` gate, and all four no-DOAS fields remain in this
+unconditional set. Only when `zoneLatentSizing` is true does the wrapper then
+smooth `LatentHeatLoadSeq`, `LatentHeatFlowSeq`, `LatentCoolLoadSeq`, and
+`LatentCoolFlowSeq`, in that order. It targets only the current calculated
+Zone/Space daily record. It does not touch normal-daily thermostat sequences,
+final records, any scalar, either no-OA flow sequence, or CP249's remaining
+14 calculated temperature, humidity, DOAS-load, and DOAS-supply sequences.
+
+`General::MovingAvg` is declared at `General.hh` line 107 and implemented at
+`General.cc` lines 374-393. For `N <= 1` it returns before inspecting or
+allocating the array. For `N > 1` and extent `L`, it allocates `2L` scratch
+elements, duplicates the original array into both halves while zeroing the
+target, then evaluates:
+
+```text
+out(i) = sum(j = 1..N, scratch(L - N + i + j)) / N
+```
+
+For `2 <= N <= L`, this is a circular trailing mean of the current element
+and the preceding `N - 1`, so early-day outputs wrap through end-of-day
+samples. `N = L` is a whole-day mean. `N = L + 1` is still in bounds but
+weights the current element twice; an empty array skips both loops. For a
+positive extent and `N > L + 1`, unsigned index arithmetic reaches an invalid
+element. ObjexxFCL asserts membership before raw storage access, so that
+invalid index terminates with assertions enabled and has undefined behavior
+otherwise; it is not a recoverable throw. Non-one-based arrays are likewise
+unsupported by the hard-coded `1..size` traversal. No local guard normalizes
+the window to the extent.
+
+Production sequence extent is `24 * TimeStepsInHour`. The
+`Sizing:Parameters` averaging-window field is an integer with minimum one and
+no upper maximum. Blank, absent, nonpositive source fallback, and fast-mode
+override paths select `TimeStepsInHour`; the only range warning is for a
+window shorter than one hour. There is no upper clamp. Raw ordered additions
+and division have no finite-value guard, so NaN, infinity, overflow, and
+rounding behavior propagate. Each child snapshots its own entire target
+before output, but a second completed call generally smooths the already
+smoothed result and is not idempotent.
+
+The `UpdateZoneSizing(EndDay)` parent first completes one entire smoothing
+sweep: controlled Zones in ascending index order, each Zone first and then
+its stored `spaceIndexes` when Space sizing is enabled. It passes only
+`CalcZoneSizing(CurOverallSimDay, zone)` or
+`CalcSpaceSizing(CurOverallSimDay, space)` and the one global window. There is
+no Space-local control check, global Space scan, sort, deduplication,
+membership validation, or parent validation. With `C` controlled Zones, `M`
+stored membership occurrences, and `R` latent-true role occurrences, a
+completed valid-state parent dispatches:
+
+```text
+H = C + (doSpaceHeatBalanceSizing ? M : 0)
+helper calls = H
+MovingAvg calls = 12 * H + 4 * R
+```
+
+Duplicate or cross-listed Space indexes therefore smooth the same calculated
+record repeatedly. Only after the full CP250 sweep completes does the parent
+start its analogous CP251 `updateZoneSizingEndDay` peak-selection sweep.
+CP251 sees every role's fully smoothed arrays, including any compounded
+duplicate. It selects peaks from smoothed load fields and reads paired
+smoothed flow/return-temperature fields, but samples unsmoothed Zone/outdoor
+temperature and humidity companions at those selected timesteps. CP250 writes
+no peak or final scalar.
+
+The sole production parent expression is `SizingManager.cc` line 374, after
+all hourly/timestep work for a completed non-warmup sizing day and before
+facility end-day processing or the current-overall-day increment. The parent
+has no equivalent local guard, so direct calls bypass that cadence. A
+load-component pulse pass also reaches CP250. After a successful pulse sizing
+iteration, a guard-passing CP247 clears the selected arrays before the normal
+pass under consistent topology. Because CP247 globally scans Spaces while
+CP250 follows stored membership, malformed cross-listing can evade that reset.
+
+CP250 has no status, diagnostic, catch, checkpoint, transaction, cleanup, or
+rollback. Scratch construction `std::bad_alloc` leaves the current target
+untouched but retains earlier child and role results. Once scratch exists, the
+loops have no source-defined recoverable exception path. Invalid indexing
+assert-terminates or has undefined behavior, so no post-failure state or retry
+is guaranteed. Only as a hypothetical statement-order interruption model, the
+copy loop could expose a zeroed prefix and the averaging loop could expose
+completed outputs, a partial current element, and later zeros; this is not a
+recoverable C++ guarantee. Defined re-entry after a completed call or caught
+allocation failure starts at the first role and smooths prior completed arrays
+again. Scratch-allocation non-return suppresses every CP251 call; a later
+CP251 non-return occurs after all CP250 mutations are committed. Production
+array members are distinct, so duplicate/cross-listed record identity is the
+material same-record replay route.
+
+No C++ test calls CP250 directly. Two unit tests call the EndDay parent
+directly with one Zone, no Space, latent sizing false, extent one, and
+`N = 1`; all 12 child calls return immediately and no assertion reads a CP250
+target. The independent `General_MovingAvg` test uses a 12-element quadratic
+array and checks all 12 outputs for `N = 1`, `N = 2`, and `N = 4`. It proves
+the child algorithm, not CP250's field set, order, gate, or parent routing.
+
+A fresh completing production-style census finds 105 parent calls and 195
+helpers: 153 Zone plus 42 Space, split 177 normal and 18 pulse. Helper windows
+are exactly `N = 1/4/6` in counts `4/87/104`; the 191 `N > 1` helpers perform
+real smoothing. The latent gate is true for 26 helpers, all at `N = 6`, and
+false for 169. Thus the corpus dispatches exactly 2,444 child calls: 48 no-op
+calls at `N = 1`, 1,044 transformations at `N = 4`, and 1,352 at `N = 6`.
+Unlike CP249, there is no adaptive-system-substep multiplier.
+
+Eight `SizingManager` production runs assert exact downstream Zone/Space
+design load, flow, design-day, and peak-time report values at `N = 6`,
+including one final Space latent-cooling peak timestep. Those are composite
+results after CP249 accumulation, CP250 smoothing, CP251 selection, final
+propagation, and reporting. The reset test asserts eight overlapping
+sequences but never calls CP250. No focused oracle covers all 16 targets,
+parent `N > 1` before/after values, either latent-gate branch with sentinels,
+duplicate topology, invalid windows/extents, IEEE-special values, scratch
+allocation failure, invalid-access termination or undefined behavior,
+hypothetical statement-order interruption, defined re-entry, or replay.
+
+Exact `crates` and `data` searches find no CP250 helper or canonical key,
+`MovingAvg`/`moving_avg`, `NumTimeStepsInAvg`, `Sizing:Parameters`,
+`ZoneSizingData`, `zoneLatentSizing`, or any of the 16 target sequences. Rust
+has no Zone/Space sizing-day arena, circular trailing-window transaction,
+EndDay dispatcher, stored-Space sizing traversal, or peak-selection handoff.
+Adaptive heat-balance weighted averages, schedule averages, report-frequency
+`Average` classification, and run-period time state are adjacent only and do
+not implement this design-day mutation.
+
+No active case contains `Sizing:Zone` or `Sizing:Parameters`. Four active-case
+files contain five raw `SizingPeriod:DesignDay` objects, but all disable Zone,
+System, and Plant sizing and are ignored by the compatibility runtime. The
+raw `Sizing:Zone` fixture expects `UnsupportedSizing`; sizing and authored
+Space/SpaceList workflows remain run-blocked.
+
+CP250 adds no algorithm-level EnergyPlus source, Rust target/code/state, test,
+object support, capability, output implementation, comparator, case,
+manifest, numerical, performance, or conformance promotion. The parent
+algorithm remains `scaffold` with claim level `none`. Inventory becomes 32
+algorithms and 255 routines, split 58 `state_mapped` plus 197
+`source_mapped`, with 132 required; the heat-balance project list remains 88
+and the HVAC list becomes 21.
+
+CP251 next maps `ZoneEquipmentManager::updateZoneSizingEndDay`, declared at
+`ZoneEquipmentManager.hh` lines 145-149 and implemented completely at
+`ZoneEquipmentManager.cc` lines 1531-1944.
 
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
