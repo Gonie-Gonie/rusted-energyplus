@@ -5274,9 +5274,155 @@ algorithms and 258 routines, split 58 `state_mapped` plus 200 `source_mapped`,
 with 135 required; heat-balance/HVAC lists become 88/24 and HVAC readiness
 remains `0/24`. The parent stays `scaffold` with claim level `none`.
 
-CP254 next maps `ZoneEquipmentManager::writeZszSpsz`, declared at
-`ZoneEquipmentManager.hh` lines 155-160 and implemented completely at
-`ZoneEquipmentManager.cc` lines 2401-2644.
+## CP254 `writeZszSpsz` Zone/Space Sizing-Series File Writer
+
+CP254 adds canonical required `routine.write_zsz_spsz` after
+`update_zone_sizing_end_zone_sizing_calc2` and before `sim_zone_equipment`.
+The routine is declared at `ZoneEquipmentManager.hh` lines 155-160 and
+implemented completely at `ZoneEquipmentManager.cc` lines 2401-2644. It takes
+the raw role count, immutable calculated-final and design-day sizing arrays, a
+mutable output handle, and `forSpaces`; it returns `void`, mutates no sizing
+record, incrementally writes the stream, and closes that stream only at its
+normal tail.
+
+The sole upstream selector remains `SizingManager.cc` lines 390-393 after at
+least one sizing period. Within nonpulse EndZone processing, the parent
+completes EMS overrides, CP252, and every CP253 Zone/Space call before CP254.
+It selects comma `.csv`, tab `.tab`, or otherwise `.txt`, ensures ZSZ open,
+and always calls the Zone writer. Under Space sizing it then selects, opens,
+and calls SPSZ. Only after both writers return does Calc3 perform latent
+selection; Calc4-7 follow outside the pulse guard. Pulse sizing skips both
+files and Calc3 but still runs Calc4-7.
+
+`ensure_open` reuses an already-good stream even after the parent changes its
+path; only a not-good handle is replaced by a truncating real stream when
+enabled or a null stream when disabled. False output control therefore retains
+any already-good sink but never skips CP254's loops or psychrometric work.
+Open failure for a requested real stream is a parent-side fatal.
+The leaf snapshots the raw separator and unconditionally closes even a
+caller-supplied stream on normal completion.
+
+Each of four receiver traversals uses `i = 1..numSpacesOrZones`. Zone mode
+uses owner `i`; Space mode first reads global `space(i).zoneNum`. Eligibility
+is `Zone(owner).IsControlled`, not the earlier
+`ZoneEquipConfig(owner).IsControlled`. SPSZ consequently visits every global
+Space once in global order and does not follow stored `Zone.spaceIndexes`;
+duplicate/cross-listed memberships that repeat CP253 do not repeat SPSZ.
+There is no role, owner, control-flag-consistency, membership, index, array,
+or extent validation.
+
+For each eligible receiver the writer emits `Time` plus 16 raw, unquoted
+header fields. Every header is
+`ZoneName:design-day-string:suffix`; separator, colon, and newline characters
+are not escaped. The aligned columns are:
+
+| columns | time-row values | `Peak` values | `Peak Vol Flow (m3/s)` values |
+|---|---|---|---|
+| 1-4 | sensible heat/cool load and mass-flow sequences | sensible design loads and mass flows | blanks, blanks, sensible heat/cool volume flows |
+| 5-8 | latent heat/cool load and mass-flow sequences | latent design loads and mass flows | blanks, blanks, latent heat/cool volume flows |
+| 9-12 | sensible heat/cool and latent heat/cool no-DOAS load sequences | four no-DOAS design loads | blanks |
+| 13-16 | heating temperature/RH and cooling temperature/RH | four blanks | four blanks |
+
+All 16 time values use `{:12.6E}`. Peak contains 12 scalars and four trailing
+blank fields. The volume-flow row deliberately places four volume values
+under the corresponding mass-flow headers and leaves the other 12 fields
+blank. A literal leading newline before that row creates one blank physical
+line.
+
+The time loop runs 24 hours by raw `TimeStepsInHour`. It increments one
+`TimeStepIndex`, adds `MinutesInTimeStep`, and resets minutes only on exact
+equality with 60. Labels use `{:02}:{:02}:00`; normal cadence ends at
+`24:00:00`, while inconsistent cadence can repeat, move backward, or print
+minutes above 60. It neither calls CP253's `sizingPeakTimeStamp` nor checks
+`NumOfTimeStepInDay`, range, cadence, or integer overflow.
+
+Twelve final-sizing sequences are indexed and printed for every eligible
+receiver/timestep regardless of latent sizing, DOAS, or sizing method. Only
+positive sensible `HeatDDNum` and `CoolDDNum` gate the last four fields.
+A positive day selects the corresponding daily temperature/humidity-ratio
+sequences and computes
+`100 * PsyRhFnTdbWPb(state, T, W, current OutBaroPress)`; a nonpositive day
+leaves that mode's temperature and RH at zero. Positive out-of-range day
+numbers are unchecked. The already-mapped psychrometric child owns humidity
+ratio flooring, saturation/cache behavior, out-of-range RH clamping, and
+optional diagnostics. CP254 omits `CalledFrom` and adds no local validation.
+
+The leaf reads 39 unique calculated-final members and four daily members,
+43 unique sizing-record member names in total. It does not read CP253 peak
+timestamp strings, the latent flag, `AccountForDOAS`, a sizing-method enum, or
+latent/no-DOAS design-day numbers. All latent and no-DOAS columns are emitted
+unconditionally, and Space headers still say Zone Temperature and Zone
+Relative Humidity.
+
+For stable state, let `N` be the nonnegative candidate count, `K` eligible
+receivers, `R = 24 * max(TimeStepsInHour, 0)`, and `P_H`/`P_C` eligible
+records with positive heat/cool day numbers. One call performs
+`N(R+3)` candidate filter visits, `K(R+3)` eligible receiver formats,
+`(R+3)(K+2)` dynamic print calls, `12RK` final sequence reads,
+`3R(P_H+P_C)` daily reads, and `R(P_H+P_C)` psychrometric calls. It emits
+`16K(R+1)` numeric fields and issues `R+4` structural LF literals; raw
+separator/name/day line breaks can create additional physical lines. Runtime is
+`Theta(N(R+3) + formatted byte length)` without a size guard.
+
+CP254 has no status, catch, transaction, rollback, cleanup guard, or stream
+result check. Bad topology or array state can fail after an output prefix.
+Psychrometric side effects occur after a time label and before its record
+bytes. A non-return before the tail leaves the stream open; ordinary iostream
+bad/fail state can instead be silently retained, followed by close and
+downstream execution with truncated output. ZSZ failure suppresses SPSZ and
+all later parent work; SPSZ failure preserves the completed closed ZSZ but
+suppresses Calc3 and later work.
+
+After successful close, a production retry with the corresponding output flag
+enabled reopens with truncation and rebuilds stable bytes; with the flag false
+it installs a null sink and leaves any prior physical file untouched. Both
+repeat psychrometric cache/diagnostic effects. After an exception leaves a
+still-good stream open, retry reuses it and appends a second header/prefix. A
+not-good ordinary sink follows the same current-flag choice; the special bad
+dev-null sink is treated as good and reused.
+A whole-parent replay after a prior Calc3 completion can write different
+bytes because Calc3 already mutated calculated-final sensible state.
+
+No C++ test calls CP254 directly. Two direct EndZone parent tests set pulse
+true and write nothing. A fresh completing production-style census has 58
+writer calls: 51 ZSZ and seven SPSZ. They select 93 records, 72 Zone plus 21
+Space. Calls at one, four, and six timesteps per hour number 1, 21, and 36,
+producing 7,224 time lines, 11,496 eligible time-record blocks, 11,775 total
+eligible receiver formats, 13,251 candidate visits, 26,571 dynamic prints,
+7,456 physical lines, and 185,424 numeric fields. Exact positive-day counts
+are not asserted, so psychrometric execution remains expressed by the
+`P_H`/`P_C` formula.
+
+Thirteen selected records are latent-enabled and 80 are disabled, yet all
+format latent columns. Six known Zone roles enable DOAS, yet no-DOAS columns
+remain unconditional. Tests provide upstream field variation but no writer
+byte oracle. The unit fixture merely preopens ZSZ/SPSZ stringstreams that the
+writer closes, and the output-control test checks only booleans. No test
+asserts path, separator, header, column order, precision, blank fields,
+timestamp, row count, bytes, close state, output error, or tracked golden
+artifact. Tab/text routing, malformed input, nonfinite values, partial output,
+silent badbit, replay, and retry remain unisolated.
+
+Exact Rust/data searches find no main helper or canonical key, ZSZ/SPSZ
+artifact/path/schema/format literal, calculated sizing arena, cadence/
+separator/pressure integration, or counterpart for any of the 43 exact sizing
+members; only unrelated generic `zone_name` resembles one snake form. Rust's
+nearby ordinary-finite psychrometric projection has no writer integration.
+All 61 active `SimulationControl` objects disable Zone sizing; active data
+contain no `Sizing:Zone`, `Sizing:Parameters`, authored `Space`, or
+`SpaceList`. Existing sizing and Space fixtures remain run-blocked.
+
+CP254 adds no Rust target/state, test, support, output implementation,
+comparator, case, numerical, performance, or conformance promotion. Counts
+become 32 algorithms and 259 routines, split 58 `state_mapped` plus 201
+`source_mapped`, with 136 required; heat-balance/HVAC lists become 88/25 and
+HVAC readiness remains `0/25`. The parent stays `scaffold` with claim level
+`none`.
+
+CP255 next maps
+`ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc3`, declared at
+`ZoneEquipmentManager.hh` lines 164-167 and implemented completely at
+`ZoneEquipmentManager.cc` lines 2646-2764.
 
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
