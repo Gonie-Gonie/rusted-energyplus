@@ -6987,6 +6987,255 @@ immediately after `routine.init_system_output_required` and before
 `ZoneEquipmentManager.cc` lines 4292-4388.
 `DistributeSystemOutputRequired` begins at source line 4390.
 
+## CP264 `initOutputRequired` Demand and Sequence Reset Leaf
+
+CP264 adds canonical required `routine.init_output_required` immediately
+after `routine.init_system_output_required` and before
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+item. The lowercase leaf is declared at `ZoneEquipmentManager.hh` lines
+190-196 and implemented completely at `ZoneEquipmentManager.cc` lines
+4292-4388:
+
+```cpp
+void initOutputRequired(
+    EnergyPlusData &state,
+    int const ZoneNum,
+    DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+    DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+    bool const FirstHVACIteration,
+    bool const ResetSimOrder,
+    int spaceNum);
+```
+
+Only the header supplies `spaceNum = 0`. The two demand arguments are
+mutable references and can identify a Zone pair, a Space pair, or arbitrary
+caller-owned records. `ZoneNum` still controls every shared Zone lookup.
+`spaceNum` is otherwise unused: zero permits the reset-order child, while
+any nonzero value, including malformed negative input, suppresses it.
+
+The exact source order begins with 12 unconditional scalar restores. The
+six sensible writes are:
+
+- `RemainingOutputRequired` and `UnadjRemainingOutputRequired` from
+  `TotalOutputRequired`;
+- `RemainingOutputReqToHeatSP` and its unadjusted counterpart from
+  `OutputRequiredToHeatingSP`; and
+- `RemainingOutputReqToCoolSP` and its unadjusted counterpart from
+  `OutputRequiredToCoolingSP`.
+
+The six moisture writes repeat the same pattern for total,
+humidifying-setpoint, and dehumidifying-setpoint demand. No clamp,
+finite-value check, sign normalization, multiplier, or unit conversion is
+performed.
+
+If `ResetSimOrder && spaceNum == 0`, CP264 then calls CP262
+`SetZoneEquipSimOrder(state, ZoneNum)`. The normal CP263 Zone call passes
+the same state demand record as `energy`, so the preceding total-to-
+remaining copy determines CP262's cooling-versus-heating sign. An arbitrary
+direct caller can pass a different sensible record; CP262 still reads the
+state-owned Zone demand, and no identity check ties the two together.
+
+Every sequence mutation is then gated only by
+
+```cpp
+allocated(energy.SequencedOutputRequired)
+```
+
+The other two sensible and all three moisture sequences are assumed to
+exist, and a zero-length allocated main vector still passes. The gate does
+not check companion allocation, nonempty slot one, equal extents, active
+equipment count, or the correspondence between Zone/Space demand and
+`ZoneNum`.
+
+For an uncontrolled Zone or while `ZoneSizingCalc` is true, the leaf
+broadcasts predictor totals across all six independent destination
+extents: sensible total, heating setpoint, cooling setpoint, moisture total,
+humidifying setpoint, and dehumidifying setpoint. This branch ignores
+`FirstHVACIteration`, load-distribution scheme, design load, duct loss, and
+`spaceNum`.
+
+For a controlled, nonsizing first HVAC iteration, the source reads the
+parent Zone equipment-list scheme once:
+
+- Sequential and Uniform perform the same six predictor-value broadcasts.
+- UniformPLR and SequentialUniformPLR broadcast a design value into each of
+  the three sensible sequences and predictor values into the three moisture
+  sequences.
+- Invalid, `Num`, or any other cast value matches neither branch and writes
+  no sequence element.
+
+Each of the three PLR sensible broadcasts independently tests only
+`energy.TotalOutputRequired >= 0.0`. A nonnegative total, including positive
+or negative zero, selects the parent
+`FinalZoneSizing(ZoneNum).DesHeatLoad`; a negative total selects
+`-DesCoolLoad`. NaN makes the comparison false and therefore selects
+negative cooling design load. Heating- and cooling-setpoint sequence seeds
+do not use their own setpoint-demand signs or magnitudes.
+
+A Space call uses the passed Space demand sign but still reads the parent
+Zone's controlled flag, equipment-list scheme, `FinalZoneSizing`, and
+deadband, plus shared duct-loss state. It never reads `FinalSpaceSizing`.
+Full broadcasts
+fill each vector's own complete extent, including any tail beyond an active
+equipment prefix.
+
+For a controlled, nonsizing later HVAC iteration, scheme is not read. The
+leaf writes only index one of all six sequences from the predictor totals
+and setpoint totals. When `DuctLossSimu` is true, it then adds the same
+`SysSen` value to the three sensible cells and the same `SysLat` value to
+the three moisture cells. The additions are raw: no finite, sign, or
+magnitude guard exists. Every sequence element above one retains its prior
+value.
+
+Finally, after all sequence handling, CP264 always writes
+
+```cpp
+CurDeadBandOrSetback(ZoneNum) = DeadBandOrSetback(ZoneNum);
+```
+
+This is a Zone-level destination even when the demand references identify a
+Space. Repeated or duplicate Space calls therefore rewrite the same parent
+Zone flag; there is no per-Space deadband state in this leaf.
+
+The body has 11 `if` tokens, including two `else if`, six `else` tokens,
+and no loop, switch, return, break, continue, diagnostic, catch, cleanup,
+transaction, or rollback. It contains 46 direct persistent mutation sites:
+40 plain assignments and six compound additions. One separate local initialization establishes the distribution-scheme
+value. Its 24 syntactic
+calls/accessors comprise CP262, `allocated`, the Zone and equipment-list
+lookups, six final-sizing accesses, 12 index-one sequence accesses, and two
+deadband accesses.
+
+Those sites address 19 direct destination families: 12 scalar demand
+fields, six sequence vectors, and one Zone deadband field. Baseline
+successful work executes 13 assignments. An allocated recognized
+full-initialization path executes six more statements, for 19. A later
+duct-off path also executes 19; duct-on executes 25 because each of the six
+slot-one cells is written and then incremented. An invalid first-iteration
+scheme or unallocated main gate remains at 13.
+
+Let `L` be the sum of the six independent vector extents. A full broadcast
+performs `L` sequence-element writes in six statements, for `13+L` direct
+destination writes overall. Later duct-off touches six sequence cells;
+duct-on performs 12 operations on those same six cells. If CP262 runs, its
+`2N + 4U + 6S` scratch-mutation count is additional.
+
+There are exactly three production call expressions. Sizing
+`sizeZoneSpaceEquipmentPart1` line 339 passes first iteration true, reset
+false, and the current Zone or Space demand pair. CP263 calls the leaf once
+for the Zone and once per stored Space occurrence. The latter wrapper
+forwards its first/reset flags and uses reset true at both executable
+production call sites.
+
+Let `I` indicate Space heat balance, `C` be controlled Zones, `M` their
+stored Space occurrences, `K` be controlled Zones with return nodes, and
+`M_K` their stored Space occurrences. A normal or sizing manager pass
+therefore reaches
+
+`C + K + I*(M + M_K)`
+
+CP264 calls. Normal simulation gets `C+I*M` through CP263 before equipment
+and `K+I*M_K` through leaving conditions afterward; all wrapper calls pass
+reset true, so CP262 runs for the `C+K` Zone children. Sizing gets the first
+group directly through Part1 with reset false, then the return-node group
+through CP263; only its `K` valid Zone children run CP262. `ZoneSizingCalc`
+selects full sequence broadcasts only when the main sensible sequence is
+allocated, and the following distributor returns.
+
+No C++ test calls the lowercase leaf directly. The audited lower-helper
+census finds 82 executions: 75 through CP263 and seven through sizing
+Part1. Fifty-six are first-iteration and 26 later; 58 pass reset true and
+24 false. Total sensible signs are 23 positive, 43 negative, and 16 exact
+zero. Sequence shapes are eight unallocated, 48 length-one, two
+length-two, 20 length-three, and four length-four cases. The allocated
+schemes comprise 58 Sequential, four Uniform, four UniformPLR, and eight
+SequentialUniformPLR executions.
+
+The 24 explicit wrapper calls strongly assert all three sensible sequence
+families across four schemes, both load signs, and first/later behavior.
+First-iteration PLR tests directly preserve and verify positive heating or
+negative cooling design-load seeds. Seventeen reset-false calls explicitly
+run distribution again, so many end-state assertions cannot isolate CP264.
+The tests containing the 51 named-parent executions assert downstream
+equipment, airflow, and return results rather than the leaf's immediate
+destinations. The tests containing the seven sizing executions likewise
+assert downstream load, DOAS, and node behavior.
+
+Across all 82 audited executions, no Space-HB child runs and duct loss is
+always disabled. Eight unallocated cases execute the gate but have no
+sentinel oracle. There are zero assertions for the three sensible
+unadjusted fields, moisture unadjusted fields, any moisture sequence, or
+`CurDeadBandOrSetback`. Only three moisture remaining assertions read
+zero-valued defaults. The sizing calls include nonzero moisture and five
+true deadband sources, but only downstream descendants observe them and
+the destination copy is never asserted.
+
+Tests also omit an uncontrolled or sizing call with allocated arrays, an
+invalid scheme, the zero/NaN PLR sign boundary, mixed total-versus-setpoint
+signs, empty or mismatched companions, invalid Zone/Space identity, missing
+final sizing, partial failure, rollback, and deliberate replay
+reconstruction. Twenty-six leaving-condition replay executions occur (20
+first-iteration and six later-iteration), but none deliberately corrupts
+all destinations first or distinguishes repaired fields from retained
+tails.
+
+There is no up-front validation, result status, diagnostic, catch,
+checkpoint, cleanup, transaction, or rollback. A failure after entry
+retains the 12 restored scalars. CP262 failure retains that scalar prefix
+and any scratch prefix already mutated; sequence or final-sizing failure
+additionally retains completed CP262 work and any prior sequence writes. A final deadband lookup failure follows every earlier
+mutation. Malformed later companion vectors can fail partway through the
+six slot-one writes. An allocated zero-length main vector reaches that
+later indexing path, which can throw under bounds checking or be undefined
+without it.
+
+With all mutable dependencies fixed, successful replay overwrites every
+destination it rewrites. Duct-loss additions do not accumulate because
+slot one is restored before `+=`. Full broadcasts can repair current
+vector extents, while later, unallocated, and invalid-first paths preserve
+some or all sequence tails. CP262's upper priority tail also remains
+history-dependent. Allocation/extents, Zone control, sizing flag, scheme,
+demand, design loads, duct state, and deadband are resampled on every call,
+so the leaf has no canonical whole-state repair protocol.
+
+Rust contains no exact or snake-case CP264 leaf, total/unadjusted demand,
+six sequenced arrays, Zone/Space demand arenas, predictor/current deadband,
+final Zone sizing design loads, duct-loss state, or operational
+first-iteration, reset-order, or Zone-sizing flags. Exact source-name hits are confined to metadata/comments for selected
+remaining and predictor-output fields; none implements CP264 state.
+
+Rust `ZoneSysEnergyDemand` owns only a Zone ID and four heating, cooling,
+humidifying, and dehumidifying setpoint-remaining scalars. The moisture
+predictor can compute total and setpoint loads, but only two setpoint loads
+enter this snapshot. `Deadband` is an IdealLoads calculation-result mode,
+not the source predictor/current deadband pair, and
+`hvac_iteration_count` is initialized and report-copied rather than used as
+this branch discriminator.
+
+The active runtime creates a fresh independent demand snapshot for each
+IdealLoads system and calls prebound PurchasedAir directly. It never reads
+the stored load-distribution scheme. Active data contain 30 equipment
+lists, 30 connections, and 30 IdealLoads systems, with zero Space,
+SpaceList, SpaceHVAC, Sizing:Zone, or duct-loss object. Every list is
+one-entry SequentialLoad at sequence `1/1`, and all 61 active
+SimulationControl objects disable Zone sizing.
+
+CP264 changes no Rust target/state, support declaration, test, capability,
+output, comparator, case, manifest, numerical claim, performance claim, or
+conformance status. Counts become 32 algorithms and 268 routines, split 58
+`state_mapped` plus 210 `source_mapped`, with 145 required. Domain-required
+counts become heat-balance 88, HVAC 34, plant 1, and time/schedule 22, with
+readiness `0/88`, `0/34`, `0/1`, and `0/22`. The IdealLoads parent remains
+`scaffold` at claim level `none`.
+
+CP265 next adds required source-mapped
+`routine.distribute_system_output_required` immediately after
+`routine.init_output_required` and before `routine.sim_purchased_air`.
+`DistributeSystemOutputRequired` is declared at
+`ZoneEquipmentManager.hh` line 198 and implemented completely at
+`ZoneEquipmentManager.cc` lines 4390-4419. Its leaf
+`distributeOutputRequired` begins at source line 4421.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before
