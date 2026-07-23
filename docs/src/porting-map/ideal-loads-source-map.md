@@ -133,6 +133,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `ZoneEquipmentManager::updateZoneSizingDuringDay` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent thermostat schedules, system-timestep heat-balance averaging, demand snapshots, and IdealLoads rate timing do not implement Zone/Space sizing sequence accumulation |
 | `ZoneEquipmentManager::updateZoneSizingEndDayMovingAvg` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent adaptive heat-balance weighting, schedule averages, output-frequency classification, and run-period time state do not implement circular Zone/Space sizing-day smoothing |
 | `ZoneEquipmentManager::updateZoneSizingEndDay` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; current-timestep demand, IdealLoads limits/OA mixing, warmup extrema, and sizing-name detection do not implement persistent Zone/Space daily peak and cross-period final reduction |
+| `ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc1` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; compile-time Zone/Space topology, demand snapshots, equipment load sequences, and sizing-name detection do not implement noncoincident calculated-final Space-to-Zone aggregation |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
 | `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand` |
 
@@ -4769,10 +4770,378 @@ algorithms and 256 routines, split 58 `state_mapped` plus 198
 88 and 22. HVAC readiness remains `0/22`, the inventory is incomplete, and
 all 22 required routines remain below `family_gated`.
 
-CP252 next maps
-`ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc1`, declared at
-`ZoneEquipmentManager.hh` line 151 and implemented completely at
-`ZoneEquipmentManager.cc` lines 1946-2278.
+## CP252 `updateZoneSizingEndZoneSizingCalc1` Noncoincident Space Aggregation
+
+CP252 adds canonical required
+`routine.update_zone_sizing_end_zone_sizing_calc1` after
+`update_zone_sizing_end_day` and before `sim_zone_equipment`. The physical
+declaration sequence is CP251 at `ZoneEquipmentManager.hh` lines 145-149,
+CP252 at line 151, and CP253 `updateZoneSizingEndZoneSizingCalc2` at line 153.
+The complete CP252 body is `ZoneEquipmentManager.cc` lines 1946-2278:
+
+```cpp
+void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state,
+                                        int const zoneNum);
+```
+
+The leaf has no EnergyPlus child, diagnostic, output, status, catch, or return
+value. It writes 92 distinct calculated-final Zone members: 54 can be touched
+outside latent processing and 38 more are latent-gated. Its first-Space and
+per-Space source union is also 92 members. Including the two target-only gate
+members and source-only `ZoneHeatLatentMassFlow`, the routine accesses 95
+unique sizing-record member names. It has six explicit `for` loops, four
+unconditional `std::max_element` scans, and four more maximum scans under the
+Zone latent flag.
+
+### Parent order and the exact concurrence gate
+
+The sole production selector is `SizingManager.cc` line 391, which calls
+`UpdateZoneSizing(EndZoneSizingCalc)` only after at least one sizing period
+has completed. Inside that parent, source order is:
+
+1. call Zone-sizing EMS, then independently apply each of six Zone
+   calculated-final volume, mass, and load overrides only when EMS is
+   present, that actuator's flag is on, and its preoverride target is strictly
+   positive;
+2. enter the following block only when `isPulseZoneSizing` is false;
+3. when Space sizing is enabled, visit controlled Zones in ascending index
+   order;
+4. skip exactly a Zone whose stored `numSpaces == 1`;
+5. call CP252 for every other selected Zone;
+6. only after the entire CP252 traversal completes, visit every controlled
+   Zone and optional stored Space through physical-next CP253;
+7. write ZSZ/SPSZ, perform later latent selection, and eventually run the
+   calculated-to-user final-copy helpers.
+
+CP252 binds `CalcFinalZoneSizing(zoneNum)` before its only leaf guard:
+
+```text
+if F.spaceConcurrence == Coincident:
+    return without mutation
+otherwise:
+    rebuild the mapped subset, including for Invalid or malformed enum values
+```
+
+Thus a normally completing eligible NonCoincident Zone resets and rebuilds
+all six EMS-adjustable Zone volume, mass, and load fields from Space records,
+replacing any override that was actually applied. Coincident and
+exactly-one-Space paths preserve them. The leaf itself checks none of the
+parent conditions: no Zone bound, controlled status, pulse state, Space-sizing
+flag, `numSpaces`, list length, membership parent, duplicate, cross-listing,
+Space latent flag, or record extent is validated.
+
+The parent tests `Zone.numSpaces`, but CP252 later indexes
+`Zone(zoneNum).spaceIndexes[0]`. A malformed zero-Space or inconsistent Zone
+is therefore not protected by the `numSpaces == 1` skip. Stored list order and
+multiplicity are authoritative: duplicates contribute repeatedly and a
+cross-listed Space contributes to every Zone that stores it. The local
+`numSpaces` counter increments once per occurrence but is never consumed.
+
+For the remaining description:
+
+```text
+F = CalcFinalZoneSizing(zoneNum)
+S = stored Space membership occurrences
+T = NumOfTimeStepInDay
+L = 1 when F.zoneLatentSizing is true, otherwise 0
+```
+
+### Ordered reset prefix
+
+After the Coincident return, CP252 zeroes this exact target subset before
+reading the first Space:
+
+| group | unconditional reset | additional reset when `F.zoneLatentSizing` |
+|---|---|---|
+| simple scalar sums | eight heat/cool volume, load, mass, and no-DOAS load fields | eight latent heat/cool volume, mass, load, and no-DOAS load fields |
+| scalar weighted numerators | 16: density, five peak conditions, and two coil-inlet values for sensible heat and cool | ten latent Zone/return peak and coil-inlet values |
+| per-timestep arrays over `1..T` | 16: flow, load, no-DOAS load, and five condition arrays for heat and cool | six latent load, flow, and no-DOAS load arrays |
+
+This is not a whole-record reset. Thermostat values, sizing
+labels/configuration, latent outdoor peak temperature and humidity,
+`ZoneHeatLatentMassFlow`, `ZoneCoolLatentMassFlow`, DOAS state, EMS
+flags/values, identity/input fields, and many other members retain their
+pre-CP252 Zone values.
+
+### First-Space metadata seed
+
+Only after that numeric prefix does CP252 take the first stored Space without
+an emptiness check. The first Space unconditionally seeds 11 fields:
+
+- sensible heat day, DD number, date, and timestep;
+- sensible heat no-DOAS DD number, day, and timestep;
+- sensible cooling day, DD number, date, and timestep.
+
+The latent block seeds another 17 fields: four latent-heating peak fields,
+three latent-heating no-DOAS fields, four latent-cooling peak fields, three
+latent-cooling no-DOAS fields, and, anomalously, the three *ordinary sensible*
+cooling no-DOAS fields. Consequently, when Zone latent sizing is false,
+`CoolNoDOASDDNum` and `CoolNoDOASDesDay` are not initialized from the first
+Space. Their later consensus begins from incoming Zone state. All copied
+timestep fields are overwritten by maximum scans if the normal tail is
+reached; the copies remain observable only in an interrupted prefix.
+
+### Stored-Space fold
+
+The Space loop includes the first Space again. For every occurrence, CP252
+performs these source-ordered reductions:
+
+| group | exact operation |
+|---|---|
+| sensible simple sums | add heat/cool volume, load, mass, and no-DOAS load: eight scalars |
+| sensible scalar numerators | add each Space density, five peak companions, and two coil inputs multiplied by that Space's corresponding design mass flow: 16 products |
+| sensible timestep sums | add heat/cool flow, load, and no-DOAS load arrays: six additions per timestep |
+| sensible timestep numerators | add five heat conditions times Space heat flow and five cool conditions times Space cool flow: ten products per timestep |
+| ordinary metadata | reconcile heat, heat no-DOAS, cool, and cool no-DOAS DD groups |
+| latent simple sums | under `L`, add eight volume/mass/load/no-DOAS fields |
+| latent scalar numerators | under `L`, add five latent-heat and five latent-cool peak/coil products |
+| latent metadata | under `L`, reconcile four latent DD groups |
+| latent timestep sums | under `L`, add six load/flow/no-DOAS arrays per timestep |
+
+The latent scalar formulas preserve two important asymmetries:
+
+```text
+F.DesLatentHeatMassFlow =
+    sum(Space.ZoneHeatLatentMassFlow)
+
+latent-heat numerator(x) =
+    sum(Space.x * Space.ZoneHeatLatentMassFlow)
+
+F.DesLatentCoolMassFlow =
+    sum(Space.DesLatentCoolMassFlow)
+
+latent-cool numerator(x) =
+    sum(Space.x * Space.DesLatentCoolVolFlow)
+```
+
+The five latent-cooling Zone/return peak and coil-inlet numerators therefore
+use Space volume flow, while the later denominator is summed Space mass flow.
+
+### Design-day consensus is a one-way latch
+
+Each of four ordinary and four latent checks compares only a DD number.
+Names, dates, and copied timesteps are never compared independently. A check
+runs only while the current Zone DD is nonzero and clears on the first
+different Space DD:
+
+- ordinary or latent peak groups become day `"N/A"`, DD `0`, and date `""`;
+- no-DOAS groups become DD `0` and day `"N/A"`.
+
+Once zero, all later mismatches are ignored. If the first Space DD is already
+zero, disagreement from every later Space is also ignored, so first-Space
+names or dates can coexist with a zero DD. The nonlatent sensible-cooling
+no-DOAS anomaly is stronger: its result can depend entirely on the incoming
+Zone DD/name rather than the first Space.
+
+### Normalization and raw denominator behavior
+
+After every Space occurrence has been folded, CP252 normalizes in this order:
+
+1. if summed sensible heating mass is strictly positive, divide the eight
+   heating density/peak/coil numerators by that mass;
+2. do the symmetric eight cooling divisions only for strictly positive
+   cooling mass;
+3. for each `t = 1..T`, divide five heat condition arrays by summed heat flow
+   only when that flow is positive, then do the same for cooling;
+4. compute the four ordinary peak indexes described below;
+5. under `L`, divide five latent-heating numerators by summed
+   `ZoneHeatLatentMassFlow`;
+6. divide five latent-cooling *volume-weighted* numerators by summed latent
+   cooling *mass* when that mass is positive;
+7. compute the four latent peak indexes described below.
+
+Loads, flows, and no-DOAS arrays remain sums. Zero, either signed zero,
+negative, and NaN denominators skip their division, leaving the raw weighted
+numerator rather than an average. Positive infinity enters division. There is
+no finite, sign, unit, or cancellation validation on any Space operand or
+accumulator.
+
+### Eight full-extent peak-index scans
+
+The four ordinary scans run before latent normalization, and the four
+latent-gated scans run after it. Each replaces copied timestep metadata with a
+one-based index:
+
+```text
+1 + distance(array.begin(), max_element(array.begin(), array.end()))
+```
+
+The four ordinary scans and four latent-gated scans use:
+
+| result | scanned target array |
+|---|---|
+| `TimeStepNumAtHeatMax` | `HeatLoadSeq` |
+| `TimeStepNumAtHeatNoDOASMax` | `HeatLoadNoDOASSeq` |
+| `TimeStepNumAtCoolMax` | `CoolLoadSeq` |
+| `TimeStepNumAtCoolNoDOASMax` | `CoolLoadNoDOASSeq` |
+| `TimeStepNumAtLatentHeatMax` | `LatentHeatFlowSeq`, notably flow rather than load |
+| `TimeStepNumAtLatentHeatNoDOASMax` | `HeatLatentLoadNoDOASSeq` |
+| `TimeStepNumAtLatentCoolMax` | `LatentCoolLoadSeq` |
+| `TimeStepNumAtLatentCoolNoDOASMax` | `CoolLatentLoadNoDOASSeq` |
+
+Every scan covers that array's complete allocated extent, not `1..T`.
+Ordinary finite ties retain the first maximum, and a nonempty all-zero array
+selects index one. Floating NaN violates the strict-order requirement used by
+the standard algorithm, so no portable NaN selection rule is claimed.
+
+The summed scalar noncoincident loads and flows remain sums of independent
+Space peaks. CP252 does not replace them with maxima of the aggregated
+sequences. The recomputed timestep can therefore describe a different
+coincident sequence peak, while DD metadata describes consensus among
+independent Space scalar peaks.
+
+For positive `T`, the six explicit loops execute:
+
+```text
+S + T * (2 + L + S * (1 + L))
+```
+
+loop bodies, before the `4 + 4L` hidden linear maximum scans over their
+independent full extents. This includes the `S` outer Space iterations.
+
+### Preserved hybrid state and downstream ownership
+
+A successful NonCoincident call can combine:
+
+- summed Space scalar peaks;
+- mass/flow-weighted Space peak conditions;
+- full-extent maxima of aggregate sequences;
+- consensus, zeroed, or stale day metadata;
+- untouched pre-CP252 Zone fields.
+
+CP252 mutates only the calculated-final Zone record. It does not change any
+Space record, user-final Zone record, report, or output stream. CP253 later
+checks every controlled Zone and stored Space, emits its own diagnostics, and
+formats peak timestamps. ZSZ/SPSZ output and the later calculated-to-user
+copies are separate owners. Those stages can overwrite or transform
+descendants, so their report values are not all isolated CP252 fields.
+
+### Invalid state, failure, retry, and pulse behavior
+
+CP252 has no validation, transaction, rollback, or cleanup:
+
+- `T <= 0` skips every timestep reset, fold, and normalization loop, but
+  scalar reset/fold, metadata mutation, and full-array maximum scans still
+  execute;
+- if `T` is smaller than a target extent, untouched target tail values can
+  win a maximum;
+- if `T` exceeds any target or Space extent, indexed access triggers an
+  assertion when enabled or has undefined behavior in an unchecked build after
+  the ordered prefix;
+- empty or unallocated iterator ranges have no locally validated result
+  contract;
+- floating additions and multiplications preserve source order, so NaN,
+  infinity, overflow, cancellation, and duplicate-order effects propagate;
+- an empty membership list reaches unchecked `[0]` only after numeric reset.
+
+First-Space strings and mismatch labels can allocate. An exception preserves
+every earlier reset, sum, copy, and consensus mutation. Every no-DOAS mismatch
+arm assigns DD `0` before assigning `"N/A"`, so failure in that later string
+assignment leaves a torn label during the failing invocation. On retry, heat
+no-DOAS and both latent no-DOAS groups are reseeded from the first Space before
+their comparisons. Only ordinary cooling no-DOAS with latent sizing false
+lacks that reseed, so its retained zero latch can skip the unfinished label
+repair.
+
+With stable valid topology and matching extents, a completed replay normally
+resets and reconstructs the touched numerical subset rather than compounding
+it. It is not a full repair boundary: untouched fields, target tails, and the
+nonlatent ordinary cooling no-DOAS torn-label state can persist. Production
+owns separate Zone and Space arenas, so the direct
+record-reference alias accepted by CP251 is unavailable here; duplicate and
+cross-listed Space identities are the material alias-like cases.
+
+The whole CP252/CP253/report block is skipped during pulse EndZone processing.
+The parent still runs EMS and later calculated-to-user helpers on that pulse
+entry. After CP247 zeroing, the normal EndZone pass can run CP252, and any
+Space state omitted by the reset remains eligible to enter its aggregation.
+Direct callers can bypass the pulse and Space-sizing gates.
+
+### C++ evidence
+
+No C++ test calls CP252 directly. The two direct
+`ZoneEquipmentManager` EndZone parent tests set pulse sizing true immediately
+before the call, so both dispatch zero CP252 helpers.
+
+A fresh completing production-style census finds 57 EndZone parent entries:
+
+```text
+direct ManageSizing: 19 = 17 normal + 2 pulse
+full ManageSimulation: 38 = 34 normal + 4 pulse
+combined: 51 normal + 6 pulse
+```
+
+The direct contexts have no Space sizing. Among the 48 normal full-simulation
+controlled-Zone roles, exactly seven enable Space sizing with more than one
+Space. All seven call CP252 with `T = 144`, one controlled Zone, and three
+unique stored Spaces:
+
+- five are Coincident and return immediately;
+- two are NonCoincident, latent false, and complete the body;
+- the sole latent-true call is one of the five Coincident returns.
+
+The two body completions contribute six Space-loop visits and 1,440 explicit
+timestep-loop iterations. Their eight ordinary `max_element` calls scan 1,152
+elements and make 1,144 ordinary comparisons.
+
+`SizingManager_ZoneSizing_NonCoincident1` uses one design day. Its downstream
+Zone calculated cooling load and volume are the three Space sums; the common
+day remains named while the aggregate sequence peak formats as
+`7/21 16:00:00`. `SizingManager_ZoneSizing_NonCoincident2` gives the three
+Spaces different design days. It asserts the summed Zone load/volume, a Zone
+day of `"N/A"`, and a time-only `16:00:00`. These are strong full-chain
+descendants of CP252 sums, DD consensus, and maximum selection. Five
+Coincident tests retain Zone calculated values distinct from Space sums,
+providing descendant evidence of the early return.
+
+The two body tests have zero positive heating, no latent sizing, DOAS, EMS, or
+pulse. No immediate test inspects the CP252 target. Weighted density and
+condition fields, mass sums, individual arrays, all no-DOAS fields, the
+latent volume/mass denominator mismatch, latent-flow heat maximum, EMS
+override loss, one-Space guard, malformed/duplicate/cross-listed topology,
+mixed control, invalid concurrence, extent mismatch, IEEE-special values,
+failure prefixes, completed replay, and failure retry remain unisolated.
+The asserted zero-heating load/flow and N/A day/time cells come from
+`reportZoneSizing`'s no-flow branch. Helper 7 separately owns the unasserted
+calculated-final zero-heating Zone peak conditions, so neither provides an
+isolated CP252 oracle.
+
+### Rust boundary and governance
+
+Exact `crates` and `data` searches find no CP252 helper or canonical key, no
+`SizingConcurrence`, `spaceConcurrence`, `NonCoincident`,
+`CalcFinalZoneSizing`, or `CalcFinalSpaceSizing`, and no counterpart for any
+of the 95 unique sizing-record member names in exact-token or snake-case
+form.
+
+Rust typed `Zone.spaces` and `Space` arenas are compile-time topology only.
+`ZoneSysEnergyDemand`, equipment-list load sequences, design-day report
+counters, `AutosizeOrNumber`, and the retained ZoneHVAC sizing-object name are
+adjacent but do not provide a production Space sizing consumer,
+calculated-final Zone/Space arena, concurrence gate, weighted reducer, or
+peak metadata consensus.
+
+Active data contain no `Sizing:Zone`, `Sizing:Parameters`, authored Space or
+SpaceList, `NonCoincident`, Space-sizing enablement, or Zone-sizing-enabled
+`SimulationControl`. `unsupported_sizing` and
+`unsupported_space_partitioning` remain `run_blocked`; the raw autosizing
+fixture still expects `UnsupportedSizing` before runtime.
+
+CP252 adds no algorithm-level EnergyPlus source, Rust target/code/state, test,
+object support, capability, output implementation, comparator, case,
+manifest, numerical, performance, or conformance promotion. The parent
+algorithm remains `scaffold` with claim level `none`. Inventory becomes 32
+algorithms and 257 routines, split 58 `state_mapped` plus 199
+`source_mapped`, with 134 required; heat-balance and HVAC project lists become
+88 and 23. HVAC readiness remains `0/23`, the inventory is incomplete, and
+all 23 required routines remain below `family_gated`.
+
+CP253 next maps
+`ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc2`, declared at
+`ZoneEquipmentManager.hh` line 153 and implemented completely at
+`ZoneEquipmentManager.cc` lines 2280-2387, together with its
+`sizingPeakTimeStamp` dependency declared at header line 162 and defined at
+source lines 2389-2399.
 
 ## Claim Requirements
 

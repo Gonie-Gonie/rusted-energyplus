@@ -22452,10 +22452,148 @@ algorithms and 256 routines, split 58 `state_mapped` plus 198
 HVAC readiness remains `0/22`. The parent stays `scaffold` with claim level
 `none`.
 
-CP252 next maps
-`ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc1`, declared at
-`ZoneEquipmentManager.hh` line 151 and implemented completely at
-`ZoneEquipmentManager.cc` lines 1946-2278.
+## CP252 `updateZoneSizingEndZoneSizingCalc1` Noncoincident Space Aggregation
+
+CP252 adds canonical required
+`routine.update_zone_sizing_end_zone_sizing_calc1` after
+`update_zone_sizing_end_day` and before `sim_zone_equipment`. Its complete
+source is `ZoneEquipmentManager.hh` line 151 and
+`ZoneEquipmentManager.cc` lines 1946-2278:
+
+```cpp
+void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state,
+                                        int const zoneNum);
+```
+
+The leaf has no EnergyPlus child, diagnostic, output, status, catch, or return
+value. It writes 92 calculated-final Zone members and accesses 95 unique
+sizing-record member names across the Zone target and Space sources. It has
+six explicit loops plus four ordinary and four latent-gated
+`std::max_element` scans.
+
+The sole production parent reaches EndZone sizing from `SizingManager` only
+after at least one sizing period. It first runs Zone-sizing EMS, then
+independently applies each of six Zone volume/mass/load overrides only when
+EMS is present, that actuator's flag is on, and its preoverride target is
+strictly positive. Only inside the non-pulse block, Space
+sizing then visits controlled Zones ascending, skips exactly
+`Zone.numSpaces == 1`, and calls CP252. The leaf binds the calculated-final
+Zone record and returns unchanged only for exact `Coincident`; NonCoincident
+and Invalid values rebuild. A normally completing non-Coincident call
+therefore resets and rebuilds all
+six EMS-adjustable fields from Space aggregates, including any applied
+override.
+
+The leaf does not recheck pulse, Space sizing, control, Zone bounds,
+`numSpaces`, list length, membership parent, duplicates, cross-listing, Space
+latent flags, or extents. It indexes `spaceIndexes[0]` after its numeric reset,
+so malformed empty topology fails after that prefix. Stored order and
+multiplicity are authoritative. A local Space counter increments but is
+unused.
+
+For target `F`, raw timestep count `T`, and latent gate `L`, reset and fold are:
+
+| phase | sensible/unconditional | latent-gated |
+|---|---|---|
+| reset scalars | eight volume/load/mass/no-DOAS sums and 16 density/peak/coil numerators | eight latent sums and ten latent peak/coil numerators |
+| reset arrays over `1..T` | 16 flow/load/no-DOAS/condition arrays | six latent load/flow/no-DOAS arrays |
+| first-Space seed | 11 heat, heat-no-DOAS, and cool day/DD/date/timestep fields | 14 latent fields plus the three *ordinary* cool-no-DOAS fields |
+| each Space | eight scalar sums; 16 peak products weighted by sensible design mass; six sequence sums; ten condition products weighted by timestep flow | eight latent sums; ten peak products; four DD checks; six sequence sums |
+
+The ordinary cool-no-DOAS first-Space seed being inside `L` means a nonlatent
+call begins that DD/name consensus from incoming Zone state. The first-Space
+timestep copies are later replaced by maximum scans on normal completion.
+
+Every ordinary or latent consensus compares only DD numbers. While the
+current DD is nonzero, the first mismatch changes a primary day/DD/date to
+`"N/A"/0/""` or a no-DOAS DD/day to `0/"N/A"`. Zero then latches off all
+later comparisons. A first DD of zero suppresses mismatch detection from the
+start; names, dates, and timesteps are never compared independently.
+
+Sensible peak companions are divided by summed design mass only when it is
+strictly positive. Timestep condition numerators are divided by summed
+timestep flow only when positive. The four ordinary maximum scans then run.
+Only afterward, under `L`, latent heat uses summed Space
+`ZoneHeatLatentMassFlow` for both numerator weight and denominator, while
+latent cool weights five peak/coil numerators by Space
+`DesLatentCoolVolFlow` but divides by summed `DesLatentCoolMassFlow`; four
+latent maximum scans follow. Nonpositive or NaN denominators leave raw
+weighted sums; positive infinity enters division.
+
+Each maximum scan recomputes a one-based timestep from its full allocated
+array extent, not `1..T`:
+
+- sensible heat/cool and their no-DOAS fields use their load arrays;
+- latent heat uses `LatentHeatFlowSeq`, while latent cool uses its load array;
+- latent no-DOAS fields use their corresponding no-DOAS load arrays.
+
+Finite ties retain the first maximum; a portable NaN selection rule is not
+claimed. Scalar loads/flows remain sums of independent Space peaks, so the
+aggregate-sequence timestep can describe a different coincident peak.
+Untouched tails can win when `T` is smaller than an extent.
+
+CP252 is a subset rebuild. Thermostats, sizing configuration/labels, latent
+outdoor peaks, Zone latent mass fields, DOAS state, EMS flags/values, and many
+identity/input fields remain from the pre-call Zone record. The result can
+therefore mix Space sums, weighted Space conditions, sequence maxima,
+consensus/stale metadata, and untouched Zone state.
+
+`T <= 0` skips timestep reset/fold/normalization but not scalar work,
+metadata, or full-array scans. Excess `T`, invalid indexes, or malformed
+extents assertion-terminate or have undefined unchecked behavior after an
+ordered prefix. Floating sums/products preserve raw source-order IEEE
+effects. String copies can allocate. Every no-DOAS mismatch arm sets DD
+zero before
+`"N/A"`, so a failure can leave a torn label in that invocation. Heat and
+latent no-DOAS fields are reseeded from the first Space on retry; only
+ordinary cool-no-DOAS under latent false lacks that reseed and can retain the
+zero latch while skipping label repair. Stable valid replay normally
+reconstructs the touched numerical subset, but it does not repair untouched
+fields, tails, or that nonlatent cool-no-DOAS state.
+
+Pulse EndZone skips CP252 entirely; the normal pass can later aggregate
+pulse-preserved Space omissions. CP253 runs for all controlled Zones and
+stored Spaces only after the complete CP252 Zone sweep, then owns diagnostics
+and peak timestamp strings. Reporting and calculated-to-user copies remain
+downstream.
+
+No C++ test calls CP252 directly; two direct parent tests are pulse-gated and
+dispatch none. Across 57 completing production-style EndZone parent entries,
+only seven normal full simulations call CP252: five Coincident returns and
+two NonCoincident bodies. Each call has one Zone, three Spaces, and `T = 144`;
+the bodies are latent false and total six Space visits, 1,440 explicit
+timestep-loop iterations, and eight maximum scans over 1,152 elements.
+
+The two `SizingManager_ZoneSizing_NonCoincident*` tests strongly assert
+downstream cooling load/volume Space sums. The common-day case retains the
+day and reports `7/21 16:00:00`; the different-day case reports day `"N/A"`
+and time-only `16:00:00`. Five Coincident tests retain Zone values distinct
+from Space sums. There is no executed latent, positive-heating, no-DOAS,
+DOAS, EMS, pulse, weighted-field, malformed-topology, IEEE, failure, replay,
+or retry oracle.
+
+Exact Rust/data searches find no helper/key, concurrence type/value,
+calculated-final Zone/Space arena, or any of the 95 sizing members in token or
+snake-case form. Typed Zone/Space topology, demand, equipment sequences,
+autosize wrappers, counters, and sizing-object names are adjacent only.
+Active data contain no `Sizing:Zone`, `Sizing:Parameters`, authored
+`Space`/`SpaceList`, `NonCoincident`, Space-sizing enablement, or
+Zone-sizing-enabled `SimulationControl`; sizing and Space partitioning remain
+run-blocked.
+
+CP252 adds no EnergyPlus algorithm source, Rust target/state, support, output,
+case, numerical, performance, or conformance promotion. Counts become 32
+algorithms and 257 routines, split 58 `state_mapped` plus 199
+`source_mapped`, with 134 required; heat-balance/HVAC lists become 88/23 and
+HVAC readiness remains `0/23`. The parent stays `scaffold` with claim level
+`none`.
+
+CP253 next maps
+`ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc2`, declared at
+`ZoneEquipmentManager.hh` line 153 and implemented completely at
+`ZoneEquipmentManager.cc` lines 2280-2387, together with its
+`sizingPeakTimeStamp` dependency declared at header line 162 and defined at
+source lines 2389-2399.
 
 ### `CheckValidSimulationObjects` state contract
 
