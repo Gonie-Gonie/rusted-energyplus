@@ -26319,12 +26319,260 @@ counts become heat-balance 88, HVAC 39, plant 1, and time/schedule 22, with
 readiness `0/88`, `0/39`, `0/1`, and `0/22`. The IdealLoads parent remains
 `scaffold` at claim level `none`.
 
-CP270 next adds required source-mapped
-`routine.calc_zone_infiltration_flows` immediately after
-`routine.calc_zone_mass_balance` and before `routine.sim_purchased_air`.
-`CalcZoneInfiltrationFlows` is declared at `ZoneEquipmentManager.hh` lines
-223-226 and implemented completely at `ZoneEquipmentManager.cc` lines
-5285-5340. `CalcZoneLeavingConditions` begins at source line 5342.
+## CP270 `CalcZoneInfiltrationFlows` Mass-Conservation Infiltration Leaf
+
+CP270 adds canonical required `routine.calc_zone_infiltration_flows`
+immediately after `routine.calc_zone_mass_balance` and before
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+requirement. It changes no EnergyPlus source inventory.
+
+The canonical declaration is `ZoneEquipmentManager.hh` lines 223-226 and the
+complete definition is `ZoneEquipmentManager.cc` lines 5285-5340. CP269 ends
+at source line 5283 and line 5284 is blank. The exact interface is:
+
+```cpp
+void CalcZoneInfiltrationFlows(
+    EnergyPlusData &state,
+    int const ZoneNum,
+    Real64 const &ZoneReturnAirMassFlowRate);
+```
+
+The function returns no status. `state` is the only mutable aggregate;
+`ZoneNum` is a const by-value identity and the passed total return flow is a
+const reference. There is no Space identity, first-iteration argument,
+sizing argument, default, result object, or `noexcept` boundary.
+
+There are exactly three production call expressions, all inside CP269 after
+its `EnforceZoneMassBalance` guard:
+
+- line 5118 serves `AdjustMixingOnly` and `AdjustMixingThenReturn`;
+- line 5154 serves `AdjustReturnOnly` and `AdjustReturnThenMixing`; and
+- line 5158 serves every remaining return/mixing adjustment value.
+
+Exactly one site executes for every controlled Zone visit in every enforced
+CP269 solver pass. Non-enforced CP269 never invokes CP270. Before each
+enforced pass, CP269 clears that Zone's `ZoneInfiltrationFlag` and
+`IncludeInfilToZoneMassBal`, but it does not clear mass-conservation
+`InfiltrationMassFlowRate` or the selected infiltration object's
+`MassFlowRate`. Its two-to-25-pass solver can therefore repeat CP270 two to 25
+times per controlled Zone.
+
+CP269 does not consume a CP270 result status or include infiltration state in
+its building mixing/return convergence residual. The leaf's state is instead
+available to the later simple-airflow calculation. The passed return-flow
+value already reflects the selected CP269 return/mixing adjustment branch.
+
+For an eligible Zone the local signed residual is computed in this exact
+order:
+
+```text
+R = MixingSourceMassFlowRate - MixingMassFlowRate
+  + TotExhaustAirMassFlowRate + ZoneReturnAirMassFlowRate
+  - TotInletAirMassFlowRate
+```
+
+The leaf uses `ConvergenceTolerance = 0.000010`. Every threshold is strict;
+no branch uses an inclusive comparison.
+
+The outer branch matrix is source-ordered as follows:
+
+- Exact `InfiltrationFlow::No` performs no persistent write after acquiring
+  `MassConservation(ZoneNum)`.
+- For any other treatment, `InfiltrationPtr <= 0` writes only conservation
+  `InfiltrationMassFlowRate = 0`.
+- With a positive pointer, eligibility is exactly `IsOnlySourceZone` or
+  `InfiltrationForZones == AllZones`.
+- Eligible `Adjust` with `abs(R) > 1.0e-5` sets the Zone infiltration flag,
+  stores signed `R` in conservation state, sets the include marker to one,
+  writes `R` to the infiltration object, and then clamps only that object to
+  `max(0, R)`.
+- Eligible `Adjust` when the comparison fails zeros conservation and object
+  mass flow, but does not locally clear the flag or include marker.
+- Eligible `Add` with `R > 1.0e-5` sets the same flag, conservation value, and
+  include marker, then performs `object.MassFlowRate += R` without a clamp.
+- Eligible `Add` when the comparison fails zeros only conservation mass flow;
+  the object, flag, and include marker are retained locally.
+- An ineligible `Adjust` Zone copies the current infiltration-object flow into
+  conservation state, while an ineligible `Add` Zone zeros conservation flow.
+- With a positive pointer, an invalid or otherwise unmatched non-`No`
+  treatment reaches no treatment-specific persistent write.
+
+Under `MixingSourceZonesOnly`, only exact `IsOnlySourceZone` qualifies. A Zone
+that is both a source and a receiver does not qualify through a separate
+source-and-receiving flag. `AllZones` makes the classification irrelevant.
+
+The body contains two syntactic inner `else if (... == No)` arms. Both are
+unreachable because the unchanged treatment already passed the outer
+`... != No` guard. A nonpositive pointer is handled before this inner dispatch,
+so even an unmatched non-`No` enum zeros conservation flow on that path.
+
+`Adjust` deliberately separates signed conservation state from the physical
+object. A residual below `-1.0e-5` sets the flag and include marker, retains the
+negative value in conservation state, briefly writes it to the object, and
+then clamps only the object to zero. `Add` accepts only a strictly positive
+residual and can accumulate onto any preexisting finite or nonfinite object
+value.
+
+Exact positive or negative tolerance equality takes the comparison-false
+branch. A NaN also fails both ordered comparisons: `Adjust` zeros conservation
+and object flow, whereas `Add` zeros conservation only. Neither path emits a
+diagnostic. Positive or negative infinity is not rejected; it follows the
+corresponding strict-comparison and arithmetic path.
+
+The function contains 17 direct persistent mutation sites over four normalized
+state-path families: 16 plain assignments and one `+=`. Two of the plain
+assignments are the unreachable inner-`No` sites. The families are:
+
+- per-Zone `ZoneInfiltrationFlag` at two sites;
+- mass-conservation `InfiltrationMassFlowRate` at nine sites;
+- mass-conservation `IncludeInfilToZoneMassBal` at two sites; and
+- selected infiltration-object `MassFlowRate` at three assignments plus one
+  compound addition.
+
+Lexically the body has 11 `if` tokens and eight `else` tokens, including four
+`else if` tokens. It has no loop, switch, ternary, explicit return statement,
+`break`, `continue`, diagnostic, result status, or catch. Under the established
+non-accessor convention it has zero operational child or service calls. One
+`std::abs` and one `max` mathematical site are counted separately.
+
+The indexed accessor census is one `MassConservation`, two `ZoneEquipConfig`,
+two `ZoneInfiltrationFlag`, and six `Infiltration` sites. The leaf performs no
+density, volume-flow, schedule, psychrometric, node, or air-loop update.
+
+There is no complete validation of `ZoneNum`, allocation, pointer upper bound,
+Zone/object ownership, enum validity, aliasing, or finite arithmetic. The
+`MassConservation(ZoneNum)` reference is acquired before the outer treatment
+guard, so an invalid Zone identity can fail even for treatment `No`. A positive
+`InfiltrationPtr` is trusted without checking its allocated upper bound.
+
+The routine has no checkpoint, cleanup, transaction, rollback, retry repair,
+or local failure diagnostic. An abnormal exit retains every completed ordered
+write. On the active `Adjust` path, flag, signed conservation flow, and include
+state commit before the first object write; interruption after the raw object
+write and before the clamp can expose a negative object flow. Its zero path can
+clear conservation before a failing object access.
+
+The active `Add` path likewise commits flag, conservation flow, and include
+state before its final object `+=`. Failure there retains that prefix; failure
+later in CP269 after a successful addition can cause a parent replay to add the
+same residual again.
+
+For fixed dependencies, a successful active `Adjust` replay overwrites the
+fields it reaches. It is not canonical whole-state repair: treatment `No`,
+comparison-false, pointerless, ineligible, and invalid-enum paths intentionally
+leave selected flag, include, conservation, or object values untouched.
+Positive `Add` replay is directly non-idempotent because it compounds object
+flow, including across CP269 solver passes.
+
+CP269's per-pass flag/include clear is external setup rather than CP270-local
+recovery. It does not clear conservation or object infiltration flow. Direct
+leaf calls, malformed lifecycles, and abnormal parent re-entry can therefore
+observe state that the ordinary parent sequence would have reset only in part.
+
+The C++ unit sources contain zero direct calls to the leaf. The established
+72-entry bounded CP269 route-representative census has only 14 entries that
+enable enforcement and can reach CP270; all are direct `CalcZoneMassBalance`
+test calls with `FirstHVACIteration=false`. The other 58 routes are
+non-enforced and skip all three CP270 call sites.
+
+The 14 enforced parent entries split into one no-return/mixing-adjustment
+case, four mixing-only, three return-only, three return-then-mixing, and three
+mixing-then-return cases. Every one configures infiltration treatment
+`Adjust` and Zone selection `AllZones`.
+
+Across one solver pass their controlled-Zone footprint is 29 visits:
+
+- two visits from the no-adjustment parent;
+- nine from mixing-only parents;
+- six from return-only parents;
+- six from return-then-mixing parents; and
+- six from mixing-then-return parents.
+
+Twenty-seven visits have a positive infiltration pointer and two have zero.
+The topology split is 14 source-only, one source-and-receiving, and 14
+receiving-only Zones. CP269's guaranteed two-to-25 enforced passes bound these
+successful test executions between 58 and 725 literal CP270 calls. The exact
+iteration total is not instrumented.
+
+The tests contain 28 post-parent infiltration assertions. Twenty-seven read
+mass-conservation `InfiltrationMassFlowRate`, split six positive and 21 zero;
+one reads an infiltration object's positive `MassFlowRate`. They contain zero
+assertions on `ZoneInfiltrationFlag` or `IncludeInfilToZoneMassBal`, and zero
+assertions on object zeroing or the negative-residual clamp.
+
+Six return/mixing parent calls execute
+`CalcAirFlowSimple(state, 0, true, true)` after CP269 and before 12 of those
+conservation assertions. That child consumes CP270 flag/object state without
+overwriting the conservation scalar, so the scalar checks remain observable
+but the surrounding outcome is integration-level rather than leaf-isolated.
+The two zero-pointer visits are also incidental and are not isolated from
+other parent branches.
+
+Behavioral coverage therefore omits direct leaf entry, `Add`, outer `No`, and
+`MixingSourceZonesOnly`; the latter modes have input-enum tests only. It also
+omits source-and-receiving exclusion under source-only scope, negative active
+`Adjust`, exact positive and negative tolerance equality, near-zero clearing,
+NaN, infinity, invalid modes, and an oversized positive pointer.
+
+No test isolates flag/include lifetime, underlying-object clearing, additive
+iteration accumulation, fixed-input replay, malformed Zone or object identity,
+partial failure, rollback, or retry. The positive `Add` `+=` path and the
+outer-`No` stale-state no-op have no runtime oracle.
+
+Rust has no exact or snake-case CP270 function, typed
+`ZoneAirMassFlowConservation`, mass-conservation arena, infiltration object
+flow, `InfiltrationFlow`, `InfiltrationZoneType`, eligibility classification,
+pointer, flag, or include-marker lifecycle. It also has no runtime residual
+that combines mixing, exhaust, return, and inlet mass flow.
+
+Typed `ZoneEquipmentConnection` metadata retains Zone-air, inlet, exhaust, and
+return names, but compatibility dispatch validates and consumes only the
+equipment-list edge and inlet before calling PurchasedAir with a fresh demand
+snapshot. The diagnostic `NodeStateStore` projection assigns a fixed supply
+flow to supply, Zone-air, and return records; it ignores exhaust and owns no
+infiltration-balance transition.
+
+`DesignSpecification:OutdoorAir` and demand-controlled-ventilation state are
+PurchasedAir outdoor-air inputs, not mass-conservation infiltration state.
+Run-blocked AirBoundary mixing metadata and the hard-coded zero
+Zone outdoor-air-transfer report are also not CP270 implementations. Raw
+`ZoneAirMassFlowConservation`, infiltration, mixing, cross-mixing, ventilation,
+and AirflowNetwork inputs remain unsupported or run-blocked for arbitrary
+runtime.
+
+Across 120 unique data models, split 108 IDF and 12 epJSON, the census contains
+zero `ZoneAirMassFlowConservation`, all three infiltration families, mixing,
+cross-mixing, both ventilation families, and AirflowNetwork topology. Thirty
+models contain one IdealLoads system, list, and equipment connection. Every
+connection has nonblank inlet and return names and a blank exhaust name.
+
+All 61 `SimulationControl` records disable Zone sizing, including all 30
+IdealLoads models. More importantly, no model enables Zone mass-balance
+enforcement. EnergyPlus therefore executes ordinary non-enforced CP269
+bookkeeping during those simulations and reaches CP270 zero times. Rust's
+direct PurchasedAir route supplies no alternative evidence.
+
+The roadmap still requires Rust-owned Zone and infiltration identities,
+mass-conservation state, mixing/exhaust/return/inlet aggregates, treatment and
+Zone-selection enums, threshold behavior, additive lifecycle, and
+failure/replay semantics. Static node metadata cannot establish this mutable
+leaf.
+
+CP270 changes no Rust target or state, support declaration, test, capability,
+output, comparator, case, manifest, numerical claim, performance claim, or
+conformance status. Counts become 32 algorithms and 274 routines, split 58
+`state_mapped` plus 216 `source_mapped`, with 151 required. Domain-required
+counts become heat-balance 88, HVAC 40, plant 1, and time/schedule 22, with
+readiness `0/88`, `0/40`, `0/1`, and `0/22`. The IdealLoads parent remains
+`scaffold` at claim level `none`.
+
+CP271 next adds required source-mapped
+`routine.calc_zone_leaving_conditions` immediately after
+`routine.calc_zone_infiltration_flows` and before
+`routine.sim_purchased_air`. `CalcZoneLeavingConditions` is declared at
+`ZoneEquipmentManager.hh` line 240 and implemented completely at
+`ZoneEquipmentManager.cc` lines 5342-5543. `UpdateZoneEquipment` begins at
+source line 5545.
 
 ### `CheckValidSimulationObjects` state contract
 
