@@ -23885,6 +23885,183 @@ at `ZoneEquipmentManager.hh` line 184 and implemented completely at
 `ZoneEquipmentManager.cc` lines 3538-4193. `SetZoneEquipSimOrder` begins at
 line 4195.
 
+## CP261 `SimZoneEquipment` Zone-Equipment Dispatcher
+
+CP261 expands the already-existing required
+`routine.sim_zone_equipment` source boundary in place. It adds neither a
+duplicate routine nor another HVAC project-contract item. The declaration
+is `ZoneEquipmentManager.hh` line 184 and the complete definition is
+`ZoneEquipmentManager.cc` lines 3538-4193:
+
+```cpp
+void SimZoneEquipment(
+    EnergyPlusData &state,
+    bool const FirstHVACIteration,
+    bool &SimAir);
+```
+
+The header omits the definition's top-level `const` on the by-value Boolean;
+the C++ function type is unchanged. `state` is the mutable simulation graph.
+`FirstHVACIteration` reaches airflow and equipment-child arguments, selects
+capacity caching, and reaches the iteration-aware exhaust-system,
+mass-balance, and leaving-condition tail children. `SimAir` is never read
+or cleared here: only a completed reverse supply path reporting an inlet
+change assigns it `true`, so a false result preserves the caller's incoming
+value rather than writing false.
+
+The exact normal source order is:
+
+1. traverse every supply path and its components forward, simulating
+   splitters unless both AirflowNetwork fan activation and distribution
+   simulation are true, always simulating supply plenums, and fatally
+   rejecting every other component type;
+2. optionally calculate simple airflow for enforced Zone mass balance, then
+   under active non-sizing SpaceHVAC set every equipment mixer's outlet
+   conditions;
+3. scan all Zones, skip uncontrolled configurations, reset Zone and optional
+   Space response/exhaust state, and call `InitSystemOutputRequired` with
+   `ResetSimOrder=true`;
+4. traverse each controlled Zone's priority order, reset per-slot globals
+   and outputs, perform the first-pass 18-field sizing reset, apply the
+   availability-manager result, optionally adjust Space loads, dispatch the
+   equipment type, reconcile exhaust/capacity/Space-or-Zone output, and
+   update remaining sensible and moisture demand;
+5. set SpaceHVAC mixer inlet flows, clear `CurZoneEqNum`, and clear the
+   first-pass latch;
+6. traverse each supply path again in reverse component order, optionally
+   apply per-splitter supply duct loss, and monotonically set `SimAir`; then
+7. run Zone HVAC exhaust controls, the exhaust-air system, Zone mass balance,
+   Zone leaving conditions, whole-system duct loss, and the return-air path
+   in that fixed order.
+
+`FirstCall` is true for the complete forward pass and false for the complete
+reverse pass; it is not a first-component marker. Forward
+`SupPathInletChanged` is neither reset per path nor consumed. The reverse
+pass resets it per path and is the only pass that can affect `SimAir`.
+Supply-path defaults emit severe, continue, then fatal diagnostics, whereas
+the equipment switch default is a silent no-op followed by the ordinary
+zero-output reconciliation.
+
+The equipment loop selects the real list entry through
+`PrioritySimOrder(EquipTypeNum).EquipPtr`. Its switch has 33 explicit type
+labels grouped into 27 simulator bodies: ADU, VRF, window AC, four shared
+packaged/unitary types, DX dehumidifier, fan coil, unit ventilator, unit
+heater, PurchasedAir, six water/steam/electric baseboard or cooling-panel
+families, high- and three low-temperature radiant types, exhaust fan, heat
+exchanger, ERV, two heat-pump water-heater types, ventilated slab, outdoor
+air unit, refrigeration chiller set, user-defined forced air, evaporative
+cooler, and hybrid evaporative cooler. PurchasedAir is only one branch.
+Non-air families copy or retain their sensible output according to their
+source branch; the dehumidifier instead accumulates sensible output into
+`SysDepZoneLoads` and then zeros the common sensible result.
+
+Every slot first clears fan commands, three exhaust/plenum globals, three
+local outputs, and `DataCoolCoilCap`. While
+`FirstPassZoneEquipFlag` remains true, every slot also clears the same 18
+`ZoneEqSizing` fields; the latch is cleared only after the entire Zone
+sweep. Availability eligibility tests only that the integer equipment type
+is at most 14, with no local lower-bound test. The shared `ErrorFlag` is
+initialized once, passed by reference, and never inspected or reset here.
+`CycleOn` and `ForceOff` rewrite the fan command pair.
+
+Common reconciliation adds three flow accumulators for every slot. On the
+first HVAC iteration of a non-sequential list, positive sensible output
+overwrites only that slot's heating capacity; zero or negative output
+overwrites only cooling capacity, leaving the opposite cell intact. A
+Space splitter receives output when enabled; otherwise non-air output is
+added to the Zone heat-balance response. Every completed slot calls
+`updateSystemOutputRequired` and resets `CurTermUnitSizingNum`.
+
+Let `X/Y` be splitter/plenum components, `A` be one unless the two
+AirflowNetwork suppression flags are both true, `B` indicate enforced mass
+balance, `H` indicate active non-sizing SpaceHVAC, `M` be the mixer count,
+`C` controlled Zones, `Q` equipment slots, `V` availability-eligible slots,
+`T` Space-splitter slots, `R` explicitly handled slots, `G` lazy exhaust-fan
+index lookups, and `D` the duct-loss flag. A successful call performs
+
+`2*(A*X+Y)+B+2*H*M+C+V+2*T+R+G+Q+A*D*X+6`
+
+principal child/service invocations, excluding diagnostics and nested child
+work. The body has nine loops, 25 `if` tokens including one `else if`, three
+switches, 37 case labels, three defaults, two continues, and no explicit
+return. Its 48 operational call sites become 54 with six diagnostic calls
+and 58 with four diagnostic formatting calls. It has 55 direct persistent
+assignment sites over 41 normalized lvalue families including `SimAir`;
+excluding that in/out flag gives 54 state-graph sites over 40 families.
+
+There is no comprehensive up-front validation, local result status, catch,
+cleanup guard, checkpoint, transaction, rollback, or replay repair. A forward or
+equipment failure retains all completed child and direct-write prefixes.
+Failure before the normal post-Zone cleanup can leave `CurZoneEqNum`
+nonzero and the first-pass latch true. Failure after a child simulator but
+before common reconciliation retains the child's state while skipping
+exhaust accumulation, demand update, and the terminal-sizing reset. A
+reverse failure occurs after the two normal cleanup writes but before the
+fixed tail; a tail failure retains its earlier tail prefix.
+
+Successful replay is deliberately iterative rather than idempotent:
+supply components, availability, equipment, demand reconciliation, and
+tail children run again; the first-pass sizing reset disappears once an
+invocation reaches the post-Zone latch clear; an exhaust-fan index can stay
+cached; capacity replay rewrites only one sign-selected cell per eligible
+slot; and `SimAir` is monotonic within this routine.
+`ManageZoneEquipment` sets `ZoneEquipSimulatedOnce`, calls
+`UpdateZoneEquipment`, and clears its caller's `SimZone` only after this
+routine returns.
+
+The C++ test census finds four direct calls across two tests and nine
+wrapper calls across eight tests, for 13 directly attributable successful
+invocations: 11 first-iteration and two later-iteration. Seventeen further
+direct `ManageSizing` contexts reach this routine once after their sizing
+gate clears. Across those 30 statically attributable calls, 65 handled
+equipment slots dispatch: 36 ADU, 18 PTAC, four PurchasedAir, three unitary
+systems, two unit heaters, and two window ACs. They make 26 availability
+calls, 34 splitter simulations, two plenum simulations, 65 demand updates,
+and 30 executions of each fixed-tail child.
+
+Those tests cover selected node/flow propagation, PTAC fan-cycle flags,
+PurchasedAir outputs, and one ADU-before-unit-heater priority result. Every
+list is sequential. None covers the non-sequential capacity cache,
+SpaceHVAC mixers/splitters, enforced mass balance, a supply-path fatal, the
+silent equipment default, `ForceOff`, a direct `SimAir=true` assertion,
+failure prefixes, or retry semantics. Fifty-six full `ManageSimulation`
+tests complete and exercise repeated HVAC passes, but warmup, environments,
+timesteps, and convergence make an exact dynamic call count unavailable
+without tracing; the one EMS-fatal test stops before this boundary.
+
+Rust has only the three-label reporting metadata, two execution-plan labels
+placed together in one `ZoneEquipmentManager` stage, and IdealLoads graph
+validation/order tests. The plan's
+`ExecutionStep::SimZoneEquipment(ZoneEquipmentListId)` is not interpreted
+by the active pipeline; that pipeline calls the prebound PurchasedAir
+compatibility runtime directly and does not execute this mutable parent
+protocol. `ZoneEquipmentObjectType` supports only
+IdealLoads, and the active typed lane has 30 equipment connections, 30
+equipment lists, and 30 IdealLoads objects, each list containing one
+`SequentialLoad` entry at cooling/heating sequence one. It has no active
+supply-path, SpaceHVAC mixer/splitter, plenum, or Zone exhaust-fan topology.
+
+No Rust state implements the priority array, first-pass latch, supply-path
+change protocol, fan commands, Zone/Space response and exhaust accumulators,
+capacity cache, mass-balance gate, 32 other equipment families, or fixed
+six-call tail. Stage names and execution-plan ordering are descriptive
+evidence, not execution of the C++ body.
+
+CP261 changes no routine metadata, algorithm count, Rust target/state,
+support declaration, test, capability, output, comparator, case, manifest,
+numerical/performance claim, or conformance status. Counts remain 32
+algorithms and 265 routines, split 58 `state_mapped` plus 207
+`source_mapped`, with 142 required; heat-balance/HVAC lists remain 88/31
+and HVAC readiness remains `0/31`. The parent stays `scaffold` at claim
+level `none`.
+
+CP262 next adds required source-mapped `routine.set_zone_equip_sim_order`
+after `routine.sim_zone_equipment` and before `routine.sim_purchased_air`.
+`SetZoneEquipSimOrder` is declared at
+`ZoneEquipmentManager.hh` line 186 and implemented completely at
+`ZoneEquipmentManager.cc` lines 4195-4255. `InitSystemOutputRequired`
+begins at line 4257 and is declared at header line 188.
+
 ### `CheckValidSimulationObjects` state contract
 
 <!-- routine-state-contract:v1 begin check_valid_simulation_objects -->
