@@ -6368,6 +6368,362 @@ CP256 next maps
 `ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc4`, declared at
 `ZoneEquipmentManager.hh` line 169 and implemented completely at
 `ZoneEquipmentManager.cc` lines 2765-2799.
+## CP256 `updateZoneSizingEndZoneSizingCalc4` Daily User-Array Projection
+
+CP256 adds canonical required
+`routine.update_zone_sizing_end_zone_sizing_calc4` immediately after
+`update_zone_sizing_end_zone_sizing_calc3` and before `sim_zone_equipment`.
+The source boundary is the declaration at `ZoneEquipmentManager.hh` line 169
+and the complete definition at `ZoneEquipmentManager.cc` lines 2765-2799:
+
+```cpp
+void updateZoneSizingEndZoneSizingCalc4(
+    DataSizing::ZoneSizingData &zsSizing,
+    DataSizing::ZoneSizingData const &zsCalcSizing);
+```
+
+The leaf owns no `EnergyPlusData`, day/Zone/Space index, extent, or status
+argument. It receives one mutable user daily record and one const calculated
+daily record. The source comment calls this movement from calculated arrays
+to user-modified arrays.
+
+### Parent placement and dispatch topology
+
+The sole production parent call sites are the EndZoneSizingCalc loops at
+`ZoneEquipmentManager.cc` lines 3459-3466. On a normal pass they follow the
+complete CP255 controlled/latent Zone-and-Space sweep. The closing brace at
+line 3455 ends the nonpulse guard, so a pulse pass skips CP252-255 and both
+sizing-file writers but still enters CP256. Calc5 starts only after every
+Calc4 call completes; Calc6, Calc7, facility sizing, and the Zone-sizing
+run-done latch are later still.
+
+The parent uses zero-based linear subscripting:
+
+```cpp
+for (std::size_t i = 0; i < ZoneSizing.size(); ++i) {
+    Calc4(ZoneSizing[i], CalcZoneSizing[i]);
+    if (doSpaceHeatBalanceSizing) {
+        for (std::size_t j = 0; j < SpaceSizing.size(); ++j) {
+            Calc4(SpaceSizing[j], CalcSpaceSizing[j]);
+        }
+    }
+}
+```
+
+For each Zone target `i`, that Zone record is copied first. With Space sizing
+enabled, the complete Space target array is then copied before the next Zone
+target. There is no `ZoneEquipConfig.IsControlled`, `zoneLatentSizing`,
+Zone-owner, `Zone.spaceIndexes`, global-Space identity, design-day identity,
+or corresponding-day filter. Unlike CP255, duplicate/cross-listed membership
+cannot affect topology because membership lists are never read; the
+structural repetition comes from the nested full-array sweep itself.
+
+Let
+
+- `Z = ZoneSizing.size()`,
+- `S = SpaceSizing.size()`, and
+- `I = 1` when `doSpaceHeatBalanceSizing` is true, otherwise zero.
+
+One parent entry dispatches
+
+`L = Z * (1 + I*S)`
+
+leaves. It writes `Z` distinct Zone targets once and, only for `Z > 0` and
+`I = 1`, writes `S` distinct Space targets `Z` times each. If `Z = 0`, the
+inner loop is unreachable even with allocated Space targets. If `I = 0`,
+all Space targets retain their prior values.
+
+Normal setup at lines 830-838 allocates the arrays as
+
+- `ZoneSizing` and `CalcZoneSizing`: `(D, N)`;
+- `SpaceSizing` and `CalcSpaceSizing`: `(D, P)` when Space sizing is enabled;
+
+where `D = TotDesDays + TotRunDesPersDays`, `N = NumOfZones`, and
+`P = numSpaces`. Therefore `Z = D*N`, `S = D*P`, and the normal dispatch
+count is
+
+`D*N + I*D*D*N*P`.
+
+Objexx `Array2::operator()` computes `(i1 * z2_) + i2`, while `operator[]`
+uses the resulting zero-based flat storage directly. With normal allocation,
+flat order is day-major and the Zone/Space second index varies fastest within
+each day. The CP256 nesting does not pair a Zone-day with same-day Spaces:
+after each individual Zone-day it replays every day and every Space.
+
+### Extent and shape assumptions
+
+Each loop is bounded only by its mutable destination array. The corresponding
+calculated source size and both 2D shapes are never compared:
+
+- a longer calculated source has an ignored tail;
+- equal flat sizes with different 2D shapes silently pair different semantic
+  day/role coordinates at the same linear index;
+- a shorter calculated source can trip the Objexx assertion in an asserted
+  build or become invalid access in a release build;
+- an unallocated/empty Zone destination suppresses all Space work;
+- source/destination overlap is not rejected.
+
+An invalid source access occurs while preparing a call, before that leaf has
+begun its field assignments. CP256 supplies no diagnostic, status, catch, or
+defined recovery for such an access.
+
+### Exact 29-field projection
+
+The body is branchless. Every assignment has `zsSizing.<member>` on the
+left and `zsCalcSizing.<same member>` on the right. The complete statement
+order is:
+
+| Order | Source line | Member | Type | Meaning / unit |
+|---:|---:|---|---|---|
+| 1 | 2768 | `CoolDesDay` | `std::string` | Cooling design-day name |
+| 2 | 2769 | `HeatDesDay` | `std::string` | Heating design-day name |
+| 3 | 2770 | `DesHeatDens` | `Real64` | Heating design air density, kg/m3 |
+| 4 | 2771 | `DesCoolDens` | `Real64` | Cooling design air density, kg/m3 |
+| 5 | 2772 | `HeatDDNum` | `int` | Heating design-day index |
+| 6 | 2773 | `CoolDDNum` | `int` | Cooling design-day index |
+| 7 | 2775 | `DesHeatLoad` | `Real64` | Heating design load, W |
+| 8 | 2776 | `DesHeatMassFlow` | `Real64` | Heating mass flow, kg/s |
+| 9 | 2777 | `ZoneTempAtHeatPeak` | `Real64` | Zone temperature at heating peak, C |
+| 10 | 2778 | `OutTempAtHeatPeak` | `Real64` | Outdoor temperature at heating peak, C |
+| 11 | 2779 | `ZoneRetTempAtHeatPeak` | `Real64` | Return temperature at heating peak, C |
+| 12 | 2780 | `ZoneHumRatAtHeatPeak` | `Real64` | Zone humidity ratio at heating peak, kg/kg |
+| 13 | 2781 | `OutHumRatAtHeatPeak` | `Real64` | Outdoor humidity ratio at heating peak, kg/kg |
+| 14 | 2782 | `TimeStepNumAtHeatMax` | `int` | Heating peak timestep index |
+| 15 | 2783 | `DesHeatVolFlow` | `Real64` | Heating volume flow, m3/s |
+| 16 | 2784 | `DesHeatCoilInTemp` | `Real64` | Heating coil-in temperature, C |
+| 17 | 2785 | `DesHeatCoilInHumRat` | `Real64` | Heating coil-in humidity ratio, kg/kg |
+| 18 | 2786 | `CoolDesHumRat` | `Real64` | Cooling design supply humidity ratio, kg/kg |
+| 19 | 2788 | `DesCoolLoad` | `Real64` | Cooling design load, W |
+| 20 | 2789 | `DesCoolMassFlow` | `Real64` | Cooling mass flow, kg/s |
+| 21 | 2790 | `ZoneTempAtCoolPeak` | `Real64` | Zone temperature at cooling peak, C |
+| 22 | 2791 | `OutTempAtCoolPeak` | `Real64` | Outdoor temperature at cooling peak, C |
+| 23 | 2792 | `ZoneRetTempAtCoolPeak` | `Real64` | Return temperature at cooling peak, C |
+| 24 | 2793 | `ZoneHumRatAtCoolPeak` | `Real64` | Zone humidity ratio at cooling peak, kg/kg |
+| 25 | 2794 | `OutHumRatAtCoolPeak` | `Real64` | Outdoor humidity ratio at cooling peak, kg/kg |
+| 26 | 2795 | `TimeStepNumAtCoolMax` | `int` | Cooling peak timestep index |
+| 27 | 2796 | `DesCoolVolFlow` | `Real64` | Cooling volume flow, m3/s |
+| 28 | 2797 | `DesCoolCoilInTemp` | `Real64` | Cooling coil-in temperature, C |
+| 29 | 2798 | `DesCoolCoilInHumRat` | `Real64` | Cooling coil-in humidity ratio, kg/kg |
+
+This is exactly two strings, four integers, and 23 `Real64` values: 29
+unique member names, 29 destination writes, 29 source reads, and 58 member
+accesses. The apparent grouping is two names, two densities, two day
+indexes, 11 heating values, the isolated cooling design humidity ratio, and
+11 cooling values. `CoolDesHumRat` appears between the heating and cooling
+groups; the adjacent `HeatDesHumRat` member is not copied.
+
+There is no predicate, branch, loop, arithmetic, unit conversion, clamp,
+finite/range check, psychrometric call, allocation of member arrays, child
+call, or diagnostic. Raw negative, NaN, and infinite `Real64` values
+propagate as ordinary assignments. Invalid design-day or timestep integers
+are copied without dereference in this leaf and can become downstream user
+state.
+
+### CP255 carry-forward and omissions
+
+Across its selected cooling and heating daily projections, CP255 can write
+30 unique calculated-daily destinations. CP256 carries only 23:
+
+- cooling carries 12 of 15 and omits `cCoolDDDate`, `CoolFlowSeq`, and
+  `CoolPeakDateHrMin`;
+- heating carries 11 of 15 and omits `cHeatDDDate`, `HeatFlowSeq`,
+  `HeatPeakDateHrMin`, and `HeatDesHumRat`.
+
+The other six Calc4 destinations are `DesHeatDens`, `DesCoolDens`,
+`OutTempAtHeatPeak`, `OutHumRatAtHeatPeak`, `OutTempAtCoolPeak`, and
+`OutHumRatAtCoolPeak`; CP255 does not mutate them. Calc4 also copies no
+latent-source member, load sequence, sizing-type label, no-DOAS field,
+thermostat field, method enum, or shared latent flag.
+
+`fillZoneSizingFromInput` initializes user-daily `HeatDesHumRat` separately
+from the calculated daily record. CP255 can later replace calculated
+`HeatDesHumRat` for selected latent heating, but CP256 leaves the user field
+untouched while copying cooling design humidity ratio. A user daily record
+can therefore combine the new heating peak/load/flow/coil fields with its
+prior/input heating design humidity ratio. This is source behavior, not a
+symmetric-projection inference.
+
+Calc6 later copies the ordinary flow and load sequences plus condition
+sequences. That later work does not make those arrays part of Calc4, and
+Calc4 failure prevents Calc6 from starting. The CP254 ZSZ/SPSZ writer has
+already closed its output before CP255 and CP256 and consumes calculated
+rather than user arrays, so CP256 cannot retroactively alter those bytes.
+
+### Operation and storage bounds
+
+For `L = Z*(1 + I*S)` leaves, CP256 executes exactly
+
+- `29L` assignment statements,
+- `2L` potentially allocation-bearing string assignments, and
+- `27L` scalar assignments.
+
+Its local work is `Theta(L + B)`, where `B` is the sum of the two copied
+design-day-name lengths over every invocation, including redundant Space
+invocations. Local auxiliary state is constant; destination strings may
+reuse capacity or allocate according to their library state. No sequence
+length contributes because no sequence is touched.
+
+The number of distinct targets in one parent entry is
+`Z + I*S` only when `Z > 0`; the number of writes is larger by
+`29*I*S*(Z-1)` whenever Space sizing is enabled and `Z > 1`. Those extra
+writes have no different source index or field transformation.
+
+### Failure, replay, and alias boundary
+
+There is no local validation, status, catch, transaction, cleanup, or
+rollback. `CoolDesDay` and `HeatDesDay` are the first two statements and the
+only assignment sites that can allocate for otherwise valid live records:
+
+- if the first string copy throws, no CP256 statement has completed;
+- if the second throws, the completed cooling name remains and no scalar has
+  been written;
+- after both strings complete, the remaining 27 built-in scalar assignments
+  are nonthrowing for valid live records.
+
+The failing string object's state follows the `std::string` operation's own
+guarantee; Calc4 adds none. Invalid references, assertion termination, or
+release invalid access have no defined local recovery and must not be
+described as an exception-safe continuation.
+
+Parent mutation order is Zone `i`, then all Space `j`, then Zone `i+1`. A
+defined string-copy failure in a Space leaf preserves the current completed
+Zone, every earlier Zone, all earlier Space copies, and any earlier repeated
+copy of the same Space target. It suppresses later Space/Zone work and all
+following Calc5-7, facility-sizing, and run-done work. The `SizingManager`
+caller invokes EndZone `UpdateZoneSizing`, then facility sizing, then sets
+`ZoneSizingRunDone`; CP256 abnormal exit therefore blocks both later steps.
+
+A later successful direct retry always starts again at `CoolDesDay` and
+re-executes all 29 fields. For a stable distinct source it repairs a torn
+destination and completed replay is value-idempotent. The redundant Space
+sweeps likewise converge to the same values only while their source is
+stable; allocation behavior and work still repeat.
+
+The signature permits a valid exact alias between source and destination.
+Because every assignment is same-name, exact alias becomes 29 self-copies
+and causes no cross-field transformation. The const source reference does
+not assert disjointness, and there is no overlap check. Equal-sized
+production state arrays are distinct by construction, but direct callers
+receive no such enforcement from the leaf.
+
+Whole-parent replay is broader. On a nonpulse retry the parent reruns EMS
+and any gated CP252 work, then CP253, the CP254 writer, and any gated CP255
+work before reaching Calc4 again. Those stages observe the fully retained
+calculated/final state established before the Calc4 failure; their replay can
+then change the calculated daily source. A later completed Calc4 retry can
+therefore overwrite its earlier user-array prefix with different source
+values. CP254 also reruns before CP255/Calc4, so rebuilt sizing artifacts can
+differ from the first attempt. Pulse retry skips that upstream nonpulse
+block and projects the retained calculated arrays directly.
+
+### C++ test reachability census
+
+There is no direct Calc4 call in the C++ unit corpus. Excluding two direct
+parent tests, completing high-level sizing paths contain 51 normal EndZone
+entries plus six additional pulse entries:
+
+- normal Zone target-size histogram:
+  `Z=1:10`, `2:22`, `3:1`, `4:11`, `6:4`, `10:1`, `12:2`,
+  producing 159 Zone leaves;
+- pulse histogram: `Z=2:3`, `4:1`, `6:2`, producing 22 more Zone leaves;
+- seven normal Space-enabled contexts have `(Z,S)=(2,6)` five times,
+  `(1,3)` once, and `(3,9)` once, producing
+  `5*2*6 + 1*1*3 + 1*3*9 = 90` Space leaves;
+- no pulse entry has a Space leaf.
+
+Those high-level paths execute 271 Calc4 leaves. The two bare
+`UpdateZoneSizing(EndZoneSizingCalc)` tests at
+`ZoneEquipmentManager.unit.cc` lines 4576 and 4877 are pulse entries with
+`Z=1`, `S=0`; each adds one Zone leaf. The complete related corpus therefore
+contains 59 parent entries, 273 leaf invocations, and
+
+`273 * 29 = 7,917`
+
+assignment-statement executions: 546 string plus 7,371 scalar assignments.
+
+There are 203 distinct test-local targets. Production owns 159 distinct
+Zone targets and 42 distinct Space targets; the two direct tests add two.
+The 22 pulse-capable production Zone targets are each revisited by their
+normal entry. Space multiplicity is three targets once, 30 twice, and nine
+three times. Overall target multiplicity is therefore 142 once, 52 twice,
+and nine three times. The 42 Space targets receive 90 calls, so 48 calls are
+structurally redundant re-copies.
+
+The production Zone leaves include 153 controlled and 28 uncontrolled
+records. All 90 Space calls occur in seven controlled-Zone contexts, and
+both direct-parent leaves are controlled. Of the 271 production leaves, 44
+have latent sizing enabled: 30 use `Sensible`, 14 use
+`SensibleAndLatent`, and none uses exact `Latent`; 227 are latent-off.
+Because Calc4 reads none of those gates or methods, every category executes
+the same 29 assignments. Exercised flat Zone sizes are
+`{1,2,3,4,6,10,12}` and Space sizes are `{0,3,6,9}`.
+
+All 29 assignment sites execute on every leaf, but execution is not an
+identity oracle. No test calls the leaf directly, no Calc4-executing test
+asserts a `SpaceSizing` destination, and no such test asserts any of the 29
+`ZoneSizing` destination members. The direct parent tests inspect
+`CalcZoneSizing`, `CalcFinalZoneSizing`, or `FinalZoneSizing` instead.
+
+There are 803 static post-call gtest assertion sites plus one
+invocation-site `EXPECT_NO_THROW` around `ManageSizing`. None compares a
+Calc4 source member with its target. Sizing-table assertions consume
+calculated-final/final state, and the only daily user-array reads identified
+in that table path are `CoolTstatTempSeq` and `HeatTstatTempSeq`, both
+outside the 29-field projection.
+Calc7 later accesses a 19-member subset of Calc4 destinations: 13
+right-hand-side reads and six conditional left-hand-side rewrites. Reported
+results nevertheless combine Calc5/Calc7 state and provide no uniquely
+attributable Calc4 copy oracle. No exact nondefault source-field census can
+be inferred without a target read or sentinel.
+
+The separate Rezero unit test aliases `ZoneSizing` and asserts reset behavior
+for 28 of the 29 Calc4 fields; `CoolDesHumRat` is commented out. That test
+never dispatches EndZone or Calc4, so it proves adjacent reset behavior, not
+calculated-to-user copy identity or statement order. Nested repetition,
+mismatched shape/extent, alias, raw IEEE/invalid indexes, string failure,
+partial parent state, and replay remain unisolated.
+
+### Rust, data, and claim boundary
+
+The Rust/data audit covers 721 current-worktree files under `crates` and
+`data`: 406 Git-indexed plus 315 untracked. It finds no exact or snake-case
+Calc4 key/helper, no `ZoneSizingData`, `CalcZoneSizing`, `SpaceSizing`, or
+daily calculated/user arena counterpart, and zero occurrences of all 29
+exact member names and all 29 mechanical snake-case projections in that
+scope.
+
+This does not mean Rust has no adjacent HVAC state. It owns current-timestep
+`ZoneSysEnergyDemand`, operational IdealLoads supply/rate/mass-flow/humidity
+results, typed IdealLoads limits, and density, outdoor-air, node, reporting,
+and design-day schedule-label state. Those are input, timestep, or report
+concepts rather than a calculated-daily to user-daily Zone/Space sizing
+record projection.
+
+The active data census contains 61 `SimulationControl` objects, all with
+Zone sizing disabled, and five raw `SizingPeriod:DesignDay` objects. It
+contains no active `Sizing:Zone`, `Sizing:Parameters`, authored `Space`, or
+`SpaceList`, and no corresponding epJSON keys. SimulationControl and design
+days are ignored partial inputs rather than sizing execution. Sizing and
+authored-Space object families remain explicit runtime blockers; the sole
+autosizing fixture is expected to fail with `UnsupportedSizing`.
+
+CP256 therefore adds only one canonical required `source_mapped` row and the
+matching ordered HVAC project-contract requirement. It adds no Rust target,
+state mapping, support declaration, test, capability, output implementation,
+comparator, case, manifest evidence, numerical claim, performance claim, or
+conformance promotion.
+
+The inventory becomes 32 algorithms and 261 routines, split 58
+`state_mapped` plus 203 `source_mapped`, with 138 required. Domain-required
+counts are heat-balance 88, HVAC 27, plant 1, and time/schedule 22. The
+`ideal_loads_zone_equipment_purchased_air_source_order` parent now owns 27
+rows but remains `scaffold` at claim level `none`; HVAC readiness remains
+`0/27`.
+
+CP257 next maps
+`ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc5`, declared at
+`ZoneEquipmentManager.hh` line 171 and implemented completely at
+`ZoneEquipmentManager.cc` lines 2801-2842. Calc6 begins at line 2844.
 
 ## Claim Requirements
 
