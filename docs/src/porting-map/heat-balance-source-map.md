@@ -21278,9 +21278,84 @@ conformance promotion. The inventory becomes 32 algorithms and 246 routines,
 split 58 `state_mapped` plus 188 `source_mapped`, with 123 required; the
 heat-balance project list remains 88 and the HVAC list becomes 12.
 
-CP242 next maps `ZoneEquipmentManager::SizeZoneEquipment`, declared at
-`ZoneEquipmentManager.hh` line 107 and implemented at
+CP242 adds canonical required `routine.size_zone_equipment` after Part2 and
+before `sim_zone_equipment`, plus the matching HVAC project item. The exact
+capitalized `ZoneEquipmentManager::SizeZoneEquipment` is declared at
+`ZoneEquipmentManager.hh` line 107 and implemented completely at
 `ZoneEquipmentManager.cc` lines 627-694.
+
+Its sole production call expression is `ManageZoneEquipment` line 158, after
+CP239 Init and only when the current `ZoneSizingCalc` is true. CP242 itself
+accepts only `state`, does not inspect that selector, and can be called
+directly. The manager's `FirstHVACIteration` argument is not forwarded.
+
+The manager-data latch `SizeZoneEquipmentOneTimeFlag` defaults true. A true
+entry delegates the still-separate `SetUpZoneSizingArrays` dependency and
+clears the latch only after normal return. Setup failure therefore retains a
+true latch and any child prefix; success followed by later failure leaves the
+latch false, so retry skips setup. Begin-environment transitions do not rearm
+it. Manager `clear_state()` reconstructs the default-true latch but does not
+undo independently owned child state. External `RezeroZoneSizingArrays` is
+not a CP242 per-call reset and does not change the latch.
+
+After setup, CP242 completes an ascending controlled-Zone Part1 pass. Each
+Zone call precedes its stored-order Spaces when the current
+`doSpaceHeatBalance` is true; no Space-controlled check, sort, deduplication,
+or cross-pass membership snapshot exists. Space Part1 uses Space
+configuration, sizing, and demand state but the parent Zone record. The
+parent then unconditionally calls `CalcZoneMassBalance(state, true)` and
+`CalcZoneLeavingConditions(state, true)`, even with no controlled Zone.
+Only after both return does a second ascending pass call Part2 for each Zone
+then its gated Spaces; Space Part2 deliberately reuses the parent Zone
+configuration.
+
+Apart from clearing its setup latch, CP242 owns no output assignment,
+validation, diagnostic, status, catch, cleanup, transaction, or rollback.
+Child or indexed-access failure preserves completed prefixes plus any
+partial effects of the failing child: setup, earlier Part1 roles, mass
+balance, leaving conditions, and earlier Part2 roles as applicable. Later
+roles and the outer manager update are suppressed. Same-state retry restarts
+the traversal; delegated additive Part1 and mass-balance effects make the
+parent generally non-idempotent.
+
+Six direct C++ calls across three tests produce six complete wrapper
+invocations, seven Zone Part1/Part2 role pairs, six mass-balance calls, six
+leaving-condition calls, and zero Spaces. All three tests force the setup
+latch false, and their 88 assertion lines inspect descendant or downstream
+results rather than the latch, either global barrier, exact call trace, or
+failure prefix. Within these direct wrappers, setup-true,
+uncontrolled/zero-Zone, Space, malformed-topology, child failure, and retry
+recovery are absent.
+
+Across one parent invocation in each of the 17 reaching among 18 direct
+`ManageSizing` contexts, the static aggregate is 24 Zones and zero Spaces;
+the plant-only context does not enter CP242. Across one parent invocation in
+each of the 34 reaching among 56 completing active `ManageSimulation`
+contexts, the static aggregate is 48 Zones plus 21 Spaces. Each context
+contributes only its subset. Fresh successful sizing states necessarily
+cross the default-true setup route once, but no assertion isolates its call
+count or latch transition. Exact design-day, warmup, timestep, HVAC-iteration,
+and repeated-parent invocation counts remain uninstrumented.
+
+Rust contains no CP242 symbol, snake-case counterpart, Zone/Space sizing
+arena, mass-balance or leaving-condition parent, or one-time sizing latch.
+Its three zone-equipment stage labels are only Manage, Sim, and
+SimPurchasedAir; graph validation, a four-scalar demand snapshot,
+psychrometrics, node projection, and direct prebound IdealLoads execution are
+adjacent rather than this setup-plus-two-pass transaction. `Sizing:*` remains
+run-blocked, the sole raw `Sizing:Zone` fixture fails before runtime, and the
+active data-model corpus contains no `Sizing:Zone`.
+
+CP242 adds no algorithm-level source, Rust target/code/state, test, support,
+capability, output, comparator, case, manifest, numerical, performance, or
+conformance promotion. The algorithm remains `scaffold` with claim level
+`none`. The inventory becomes 32 algorithms and 247 routines, split 58
+`state_mapped` plus 189 `source_mapped`, with 124 required; the heat-balance
+project list remains 88 and the HVAC list becomes 13.
+
+CP243 next maps `ZoneEquipmentManager::CalcDOASSupCondsForSizing`, declared at
+`ZoneEquipmentManager.hh` lines 244-254 and implemented at
+`ZoneEquipmentManager.cc` lines 696-765.
 
 ### `CheckValidSimulationObjects` state contract
 

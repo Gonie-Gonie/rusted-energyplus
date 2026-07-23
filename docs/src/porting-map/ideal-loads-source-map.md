@@ -123,6 +123,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `ZoneEquipmentManager::InitZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent `ZoneSysEnergyDemand`, diagnostic node state, and time-axis begin-environment metadata only |
 | `ZoneEquipmentManager::sizeZoneSpaceEquipmentPart1` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent fixed-option `ZoneSysEnergyDemand` snapshot, IdealLoads design supply limits, psychrometric helpers, and narrow node updates only |
 | `ZoneEquipmentManager::sizeZoneSpaceEquipmentPart2` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent typed return-node identities, diagnostic node temperatures, and constant thermostat schedule reports only |
+| `ZoneEquipmentManager::SizeZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; existing three-label stage metadata skips the sizing parent and Rust blocks `Sizing:Zone` before runtime |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
 | `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand` |
 
@@ -145,6 +146,9 @@ ZoneEquipmentManager::ManageZoneEquipment
   -> InitZoneEquipment
   -> if ZoneSizingCalc
        -> SizeZoneEquipment
+            -> if SizeZoneEquipmentOneTimeFlag
+                 -> SetUpZoneSizingArrays
+                 -> SizeZoneEquipmentOneTimeFlag = false
             -> sizeZoneSpaceEquipmentPart1 (complete Zone/optional-Space pass)
             -> CalcZoneMassBalance
             -> CalcZoneLeavingConditions
@@ -1916,9 +1920,229 @@ The algorithm remains `scaffold` with claim level `none`. The inventory becomes
 `source_mapped`, with 123 required; the heat-balance and HVAC project lists
 become 88 and 12.
 
-CP242 next maps `ZoneEquipmentManager::SizeZoneEquipment`, declared at
-`ZoneEquipmentManager.hh` line 107 and implemented at
-`ZoneEquipmentManager.cc` lines 627-694.
+## CP242 `SizeZoneEquipment` Two-Pass Sizing Parent
+
+CP242 adds canonical required `routine.size_zone_equipment` immediately after
+Part2 and before `routine.sim_zone_equipment`, plus the same ordered HVAC
+project item. The exact capitalized routine is declared at
+`ZoneEquipmentManager.hh` line 107 and implemented completely at
+`ZoneEquipmentManager.cc` lines 627-694. The algorithm already cites that
+source file, so no algorithm-level source or Rust target changes.
+
+### Entry selection and one-time setup
+
+The sole production call expression is `ManageZoneEquipment` line 158. That
+parent first completes CP239 Init, then selects CP242 only while the current
+global `ZoneSizingCalc` is true. Its non-sizing branch calls
+`SimZoneEquipment` instead. `SizeZoneEquipment` itself accepts only `state`,
+does not read `ZoneSizingCalc`, and therefore remains directly callable
+outside that manager gate.
+
+`ManageZoneEquipment` does not forward `FirstHVACIteration` into CP242. The
+sizing parent later passes the literal `true` independently to its mass- and
+leaving-condition children on every invocation.
+
+`ZoneEquipmentManagerData::SizeZoneEquipmentOneTimeFlag` defaults true at
+`ZoneEquipmentManager.hh` line 275. The entry prefix is exactly:
+
+```text
+if SizeZoneEquipmentOneTimeFlag:
+    SetUpZoneSizingArrays(state)
+    SizeZoneEquipmentOneTimeFlag = false
+```
+
+The clear occurs only after normal child return. A setup abnormal non-return
+therefore retains the true latch and any partial `SetUpZoneSizingArrays`
+effects. Once setup returns, the latch is false before any Zone traversal;
+failure anywhere later leaves it false and a same-state retry skips setup.
+No begin-environment branch rearms it. Manager `clear_state()` placement-new
+reconstructs the default-true manager data, but does not retroactively clear
+independently owned `dataSize` sizing arrays, nodes, demands, air-loop state,
+or other child-owned effects. External `RezeroZoneSizingArrays` is a
+pulse-to-normal sizing reset, not a CP242 per-call reset; it does not change
+the latch or undo every child effect. CP242 maps the parent call boundary,
+not the still-separate complete setup body.
+
+### Exact two-pass order and bindings
+
+After the optional setup prefix, every invocation executes this source order:
+
+```text
+for zoneNum = 1 .. NumOfZones:
+    zoneEquipConfig = ZoneEquipConfig(zoneNum)
+    if not zoneEquipConfig.IsControlled:
+        continue
+    Part1(zone)
+    if doSpaceHeatBalance:
+        for spaceNum in Zone(zoneNum).spaceIndexes:
+            Part1(space)
+
+CalcZoneMassBalance(state, true)
+CalcZoneLeavingConditions(state, true)
+
+for zoneNum = 1 .. NumOfZones:
+    zoneEquipConfig = ZoneEquipConfig(zoneNum)
+    if not zoneEquipConfig.IsControlled:
+        continue
+    Part2(zone)
+    if doSpaceHeatBalance:
+        for spaceNum in Zone(zoneNum).spaceIndexes:
+            Part2(space)
+```
+
+Both loops visit numeric Zone indexes ascending and fetch
+`ZoneEquipConfig(zoneNum)` before applying `IsControlled`. An uncontrolled
+Zone therefore skips its Zone and Space sizing roles, but still requires the
+configuration arena access to succeed. For a controlled Zone, Part1 binds
+`CalcZoneSizing(CurOverallSimDay, zoneNum)`, Zone sensible and moisture
+demands, and the parent Zone record before entering CP240.
+
+A gated Space Part1 call follows its parent Zone in the stored
+`Zone.spaceIndexes` order. It binds `spaceEquipConfig(spaceNum)`,
+`CalcSpaceSizing(CurOverallSimDay, spaceNum)`, and Space sensible and moisture
+demands, but still passes the parent Zone record and parent `zoneNum`.
+There is no Space `IsControlled` check.
+
+The full first pass must return before the two global barriers. Mass balance
+always precedes leaving conditions, and both receive literal
+`FirstHVACIteration = true`; they run even when `NumOfZones` is zero or every
+configuration is uncontrolled. Only after both return does the complete
+second pass begin.
+
+A Zone Part2 call binds the current Zone configuration and sizing record.
+A Space Part2 call binds its Space sizing record and positive `spaceNum`, but
+deliberately reuses the parent `zoneEquipConfig` rather than
+`spaceEquipConfig`. Thus CP242 preserves the asymmetric CP240/CP241 Space
+contracts instead of normalizing them.
+
+The two loops read `doSpaceHeatBalance` and each parent `spaceIndexes` list
+again. CP242 does not snapshot, compare, sort, filter, or deduplicate Space
+membership across the passes. It also does not snapshot `NumOfZones`,
+`CurOverallSimDay`, or any child-owned state. Normal callers keep this
+topology stable, but source parity must not invent a local invariant.
+
+### State ownership, failure prefixes, and replay
+
+Apart from the successful setup-latch clear, CP242 performs no direct output,
+node, demand, sizing-record, or equipment-configuration assignment. All
+allocation and numerical mutation belongs to `SetUpZoneSizingArrays`, CP240,
+mass balance, leaving conditions, or CP241. The parent has no local topology
+validation, diagnostic, assertion, return status, catch, cleanup,
+checkpoint, transaction, or rollback.
+
+An indexed failure while fetching a Zone configuration can occur before its
+control filter. For a controlled role, current-day sizing, demand, Zone,
+Space, configuration, and node accesses add further child failure points.
+The resulting abnormal prefixes are ordered:
+
+- setup failure keeps the latch true, retains any partial setup effects, and
+  suppresses every sizing pass;
+- first-pass failure keeps a false post-setup latch, retains completed earlier
+  CP240 roles plus any partial current CP240 effects, and suppresses both
+  global barriers and all Part2 work;
+- mass-balance failure retains the complete Part1 pass plus any partial
+  mass-balance effects and suppresses leaving conditions and Part2;
+- leaving-condition failure retains setup, Part1, mass-balance, and any
+  partial leaving-condition effects but suppresses Part2;
+- second-pass failure retains the complete earlier prefix and preceding
+  CP241 records. CP241's indexed failures occur before its current-record
+  assignments; later roles and the outer manager update remain suppressed.
+
+A same-state retry begins again at the setup test and then the first Zone
+pass. After prior successful setup it skips that child, but replays every
+other reached child from the beginning. CP240 can repeat additive latent
+effects, and mass balance can add air-distribution flow into aggregates that
+production Init normally zeros before CP242. Therefore the complete parent is
+not an idempotent or transactional retry boundary even though many selected
+scalar assignments overwrite stable inputs.
+
+### C++ and active-corpus evidence
+
+The source tree has six direct test call expressions across three tests:
+
+- `DOASEffectOnZoneSizing_SizeZoneEquipment` calls once for two controlled
+  Zones;
+- `ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest` calls three times for
+  one controlled Zone;
+- `ZoneEquipmentManager_SizeZoneEquipment_DOASLoadTest` calls twice for one
+  controlled Zone.
+
+Together they execute six complete parents, seven Zone Part1/Part2 role
+pairs, six mass-balance calls, six leaving-condition calls, and no Space
+role. Each test explicitly sets `SizeZoneEquipmentOneTimeFlag = false` before
+its first call, while `doSpaceHeatBalance` remains false. Direct tests
+therefore bypass both the manager selector and the setup-true branch.
+
+The three tests contain 22, 45, and 21 assertion lines, respectively. Their
+88 assertions observe CP240/CP241 descendant state or later
+`UpdateZoneSizing` results. None isolates mass balance or leaving conditions,
+asserts CP242's only direct latch write, records an exact child trace,
+distinguishes the two complete passes, or injects a failure. Repeated calls
+in the latter two tests are ordinary same-state descendant calculations,
+not failure/recovery evidence.
+
+Eighteen direct `ManageSizing` contexts exist. The plant-only
+`WWHP_AutosizeTest1` has no `Sizing:Zone` or equipment connection and does
+not enter CP242. Across one parent invocation in each of the other 17, the
+static aggregate is 24 controlled Zones and no Spaces; each context
+contributes only its subset. Their fresh default latch enters setup on the
+first successful parent, but no assertion observes the transition or exact
+repeated sizing cadence.
+
+Among 57 active full `ManageSimulation` contexts, 56 complete and one
+intentionally stops in EMS before HVAC. Exactly 34 completing configurations
+perform Zone sizing. Across one parent invocation in each of those 34
+configurations, the static aggregate is 48 controlled Zones and 21 stored
+Spaces: 69 Part1 and 69 Part2 role calls. Individual configurations own only
+their respective subset. The other 22 completing configurations and the
+fatal context do not enter CP242.
+
+Seven full Space-sizing tests exercise the 21 Space roles without explicit
+`SpaceHVAC:EquipmentConnections`, so CP242 reaches the source path that
+ignores the Space configuration's false `IsControlled` value as a traversal
+filter. No focused assertion isolates that traversal choice or its binding
+semantics. No test covers setup failure, a
+post-setup failure with a false latch, uncontrolled-only or zero-Zone
+execution of the global barriers, a changing Space gate/list between passes,
+malformed current-day sizing indexes, a mass-versus-leaving failure prefix,
+or retry/reset recovery. Exact design-day, warmup, timestep,
+HVAC-iteration, pulse, and total dynamic parent invocation counts are not
+instrumented; the corpus figures above are static topology, not call counts.
+
+### Rust boundary and status
+
+Exact Rust-code searches find no `SizeZoneEquipment`,
+`size_zone_equipment`, Zone/Space sizing arena, `CalcZoneMassBalance`,
+`CalcZoneLeavingConditions`, `doSpaceHeatBalance`, current overall sizing
+day, or one-time sizing latch. The existing
+`ideal_loads_zone_equipment_stages()` array contains only three labels:
+ManageZoneEquipment, SimZoneEquipment, and SimPurchasedAir. Its tests verify
+metadata/graph order, not CP242.
+
+Rust directly traverses typed IdealLoads equipment and invokes
+`sim_purchased_air_compat*` with a prebound four-scalar
+`ZoneSysEnergyDemand`. Equipment graph validation, psychrometrics,
+diagnostic node projection, and narrow supply-node updates are adjacent
+components, not the source setup, complete first pass, fixed-true global
+barriers, complete second pass, or failure/replay transaction.
+
+`Sizing:*` and `ZoneSizing*` remain run-blocked in the capability contract.
+The sole raw `Sizing:Zone` epJSON fixture expects `UnsupportedSizing` before
+runtime, and the active data-model IDF corpus contains no `Sizing:Zone`.
+Existing sizing-like fixture values and final IdealLoads outputs therefore
+provide no CP242 execution evidence.
+
+CP242 adds no algorithm-level EnergyPlus source, Rust target, executable
+code, mapped state, test, object support, capability, output implementation,
+comparator, case, manifest, numerical, performance, or conformance
+promotion. The algorithm remains `scaffold` with claim level `none`. The
+inventory becomes 32 algorithms and 247 routines, split 58 `state_mapped`
+plus 189 `source_mapped`, with 124 required; the heat-balance and HVAC
+project lists become 88 and 13.
+
+CP243 next maps `ZoneEquipmentManager::CalcDOASSupCondsForSizing`, declared at
+`ZoneEquipmentManager.hh` lines 244-254 and implemented at
+`ZoneEquipmentManager.cc` lines 696-765.
 
 ## Claim Requirements
 

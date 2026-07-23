@@ -132,6 +132,7 @@ required_routines = [
   "init_zone_equipment",
   "size_zone_space_equipment_part1",
   "size_zone_space_equipment_part2",
+  "size_zone_equipment",
   "sim_zone_equipment",
   "sim_purchased_air",
   "get_purchased_air",
