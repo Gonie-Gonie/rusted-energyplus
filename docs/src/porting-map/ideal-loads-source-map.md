@@ -122,6 +122,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `ZoneEquipmentManager::GetZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent eager typed equipment lists/connections and `TimestepConfig` only |
 | `ZoneEquipmentManager::InitZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent `ZoneSysEnergyDemand`, diagnostic node state, and time-axis begin-environment metadata only |
 | `ZoneEquipmentManager::sizeZoneSpaceEquipmentPart1` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent fixed-option `ZoneSysEnergyDemand` snapshot, IdealLoads design supply limits, psychrometric helpers, and narrow node updates only |
+| `ZoneEquipmentManager::sizeZoneSpaceEquipmentPart2` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent typed return-node identities, diagnostic node temperatures, and constant thermostat schedule reports only |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
 | `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand` |
 
@@ -144,7 +145,10 @@ ZoneEquipmentManager::ManageZoneEquipment
   -> InitZoneEquipment
   -> if ZoneSizingCalc
        -> SizeZoneEquipment
-            -> sizeZoneSpaceEquipmentPart1 (Zone, then optional Spaces)
+            -> sizeZoneSpaceEquipmentPart1 (complete Zone/optional-Space pass)
+            -> CalcZoneMassBalance
+            -> CalcZoneLeavingConditions
+            -> sizeZoneSpaceEquipmentPart2 (complete Zone/optional-Space pass)
      else
        -> SimZoneEquipment
             -> PurchasedAirManager::SimPurchasedAir
@@ -1683,9 +1687,238 @@ The algorithm remains `scaffold` with claim level `none`. The inventory becomes
 `source_mapped`, with 122 required; the heat-balance and HVAC project lists
 become 88 and 11.
 
-CP241 next maps `ZoneEquipmentManager::sizeZoneSpaceEquipmentPart2`, declared
-at `ZoneEquipmentManager.hh` lines 101-105 and implemented at
-`ZoneEquipmentManager.cc` lines 599-625.
+## CP241 `sizeZoneSpaceEquipmentPart2` Return and Thermostat Snapshot
+
+CP241 adds canonical required
+`routine.size_zone_space_equipment_part2` immediately after Part1 and before
+`routine.sim_zone_equipment`, plus the same ordered HVAC project item. The
+exact lowercase routine is declared at `ZoneEquipmentManager.hh` lines 101-105
+and implemented completely at `ZoneEquipmentManager.cc` lines 599-625. The
+algorithm already cites that source file, so no algorithm-level source or Rust
+target changes.
+
+### Parent order and asymmetric Space binding
+
+The only two production call expressions are inside `SizeZoneEquipment`:
+the Zone call at lines 685-686 and the Space-loop call at lines 689-690. The
+normal route remains `HVACManager::SimHVAC` to `ManageZoneEquipment` with
+`ZoneSizingCalc = true`, then CP239 Init and the sizing parent. The separate
+post-Zone-sizing `SizingManager` calls occur after that flag is false and do not
+enter this parent through `ManageZoneEquipment`.
+
+CP241 is not interleaved with CP240. The sizing parent first completes its
+entire ascending controlled-Zone Part1 pass, including each stored Space when
+the current `doSpaceHeatBalance` flag is true. It then calls
+`CalcZoneMassBalance(state, true)` and
+`CalcZoneLeavingConditions(state, true)`. Only after both return does a second
+ascending controlled-Zone pass call CP241 for the Zone and then every stored
+Space, again without testing a Space configuration's controlled flag. Any
+abnormal non-return in that prefix suppresses every CP241 call.
+
+The Zone call binds parent `zoneEquipConfig`,
+`CalcZoneSizing(CurOverallSimDay, zoneNum)`, parent `zoneNum`, and default
+`spaceNum = 0`. The Space call binds
+`CalcSpaceSizing(CurOverallSimDay, spaceNum)`, parent `zoneNum`, and positive
+`spaceNum`, but critically passes the same parent Zone `zoneEquipConfig`
+instead of `spaceEquipConfig(spaceNum)`. A port that substitutes the Space
+configuration changes source behavior.
+
+Consequently, a Space call uses the parent Zone return-node count and first
+return identity, and it reads the parent Zone thermostat triplet. Only the
+fallback system node and destination sizing record are Space-specific. Any
+Space-owned inlet, return, equipment-control, or thermostat-like configuration
+is irrelevant to this routine.
+
+### Return-temperature selector
+
+Every entry evaluates:
+
+```text
+returnNodeNum =
+    zoneEquipConfig.NumReturnNodes > 0
+      ? zoneEquipConfig.ReturnNode(1)
+      : 0
+
+zoneNodeNum =
+    spaceNum > 0
+      ? Space(spaceNum).SystemZoneNodeNumber
+      : Zone(zoneNum).SystemZoneNodeNumber
+
+RetTemp =
+    returnNodeNum > 0
+      ? Node(returnNodeNum).Temp
+      : Node(zoneNodeNum).Temp
+```
+
+Thus a positive count is not enough: a nonpositive first return identity still
+falls back to the selected system node. A zero or negative count also falls
+back. Only return entry 1 is observed; every later return is ignored. The
+Zone/Space record is still read to form `zoneNodeNum` before the final node
+choice. Any nonpositive `spaceNum` selects the Zone record; only a positive
+value selects Space. CP241 reads only node temperature and performs no node
+write. Because the parent has just completed `CalcZoneLeavingConditions`, a
+positive return path snapshots that dependency's current return temperature.
+
+### Strict load and thermostat branches
+
+The routine then references the parent Zone
+`zoneTstatSetpts(zoneNum)` and applies this exact order:
+
+```text
+if HeatLoad > 0:
+    HeatZoneRetTemp = RetTemp
+    HeatTstatTemp = setpt if setpt > 0 else setptLo
+    CoolTstatTemp = setptHi
+else if CoolLoad > 0:
+    CoolZoneRetTemp = RetTemp
+    CoolTstatTemp = setpt if setpt > 0 else setptHi
+    HeatTstatTemp = setptLo
+else:
+    CoolZoneRetTemp = RetTemp
+    HeatTstatTemp = setptLo
+    CoolTstatTemp = setptHi
+```
+
+Both load comparisons and the central-setpoint comparison are strict and have
+no epsilon. Heating wins when both loads are positive. Zero, negative, or NaN
+heat does not select heating; if cooling is not strictly positive either, the
+catch-all branch runs. A zero, negative, or NaN central `setpt` uses the
+branch-specific low or high fallback. Values are copied without finite, range,
+ordering, or control-mode checks.
+
+Every successful entry overwrites both thermostat snapshot fields and exactly
+one return-temperature field. The heating branch leaves `CoolZoneRetTemp`
+untouched. Cooling and catch-all leave `HeatZoneRetTemp` untouched. Therefore
+a branch transition can retain the inactive return snapshot from an earlier
+sizing timestep or sweep. CP241 writes no load, sequence array, node, demand,
+global thermostat state, or configuration field and performs no allocation.
+
+The later `UpdateZoneSizing` consumer nevertheless accumulates both heating
+and cooling return snapshots into their sequences on every sizing timestep,
+then averages and selects peak/no-load values. It also sequences both
+thermostat snapshots. The inactive stale return value is therefore
+downstream-visible rather than dead state.
+
+Under the production parent, CP240 has just rewritten `HeatLoad` and
+`CoolLoad` as mutually exclusive positive-magnitude fields or zeros. The
+heating-precedence behavior nevertheless remains part of the callable routine
+for malformed or direct states in which both are positive.
+
+### Failure, replay, and reset boundary
+
+CP241 has no child call and no local latch, allocation, topology validation,
+diagnostic, assertion, status, catch, cleanup, transaction, or rollback. Its
+potentially failing indexed accesses occur before any branch assignment:
+conditional `ReturnNode(1)`, selected Zone/Space heat-balance record, selected
+node, and parent thermostat record. A bounds or invalid-node failure in those
+reads therefore leaves the current sizing record without a new CP241 write.
+
+Failure in an earlier CP240 call, mass balance, or leaving conditions prevents
+the second pass entirely. Failure on a later CP241 record retains the complete
+Part1/mass/leaving prefix and all earlier Part2 record writes, suppresses later
+Zone/Space records, and prevents the outer manager's update suffix. The parent
+one-time setup flag is already false by this point.
+
+On same-state retry, `SizeZoneEquipment` starts its Part1 pass again, repeats
+mass balance and leaving conditions, and then restarts CP241 from the first
+controlled Zone. CP241's selected three scalar assignments are overwrite-stable
+for unchanged inputs, but the inactive return snapshot remains stale and the
+whole parent replay is not idempotent because CP240 can repeat additive latent
+effects. Manager `clear_state()` reconstructs its setup latch but does not
+retroactively clear independently owned sizing records, nodes, thermostat
+state, or prior parent effects. The external
+`ZoneSizingData::zeroMemberData` reset can zero all four CP241 scalars only
+after its sequence-allocation guard passes, and production pulse-to-normal
+reset is owned by `RezeroZoneSizingArrays`; CP241 itself has no per-call reset.
+
+### C++ and active-corpus evidence
+
+No C++ test directly calls CP241. Six direct `SizeZoneEquipment` expressions
+across three tests produce seven Zone entries and zero Space entries. Their
+branch distribution is one heating, one cooling, and five catch-all entries;
+all seven have zero return-node count and use the Zone system node. The two
+heat/cool entries have central `setpt = 0`, so they use low/high fallbacks, but
+none of their CP241 fields is asserted.
+
+Across the existing 88 mixed wrapper assertion lines, only four directly name
+CP241-owned fields: the no-load test at lines 4583-4584 and the DOAS-load test
+at lines 4882-4883 assert the two thermostat snapshots after catch-all calls.
+No wrapper assertion names `HeatZoneRetTemp` or `CoolZoneRetTemp`. The separate
+`RezeroZoneSizingArrays` test asserts all four fields reset to zero in two
+arrays but never invokes CP241, so it is reset evidence rather than execution
+evidence.
+
+Eighteen direct `ManageSizing` contexts exist. The plant-only
+`WWHP_AutosizeTest1` does not reach Zone sizing; the other 17 complete CP241
+for 24 static Zone roles and no Spaces. All 24 have exactly one positive return
+node, but no assertion names a CP241-owned field.
+
+Among 57 active full `ManageSimulation` contexts, 56 complete and one
+intentionally fails in EMS before HVAC. Exactly 34 completing Zone-sizing
+configurations reach CP241; the other 22 completing contexts and the fatal
+context do not. One complete sizing sweep across those 34 configurations has
+48 Zone plus 21 Space roles.
+
+The return selector splits those 69 static roles into 56 first-return reads and
+13 system-node fallbacks. Zones split 44/4. All 44 positive Zone roles resolve
+exactly one return node; no active role has multiple returns. Spaces split
+12/9: four Space-sizing parent configurations give their three Spaces the same
+parent first return, while the other three give each Space its own system-node
+fallback. CP241 routing is independent of CP240 residual-supply routing; for
+example, the one-inlet DOAS Zone uses CP240 non-air residual output but still
+uses a first return in CP241.
+
+One full-corpus downstream assertion,
+`BaseSizer_SupplyAirTempLessThanZoneTStatTest`, observes final
+`CalcFinalZoneSizing.HeatTstatTemp = 21` after `ManageSimulation`; it does not
+isolate CP241 call order, source node, or intermediate field ownership. No test
+covers a valid positive return temperature directly, first-of-multiple return
+selection, the Space parent-configuration alias, branch transitions and stale
+inactive fields, a strict threshold, malformed topology, partial prefix,
+retry, or manager reset.
+
+The exact full-corpus heat/cool/catch-all distribution and central-`setpt`
+selector distribution depend on each sizing timestep's CP240 results and
+thermostat state. Design-day, warmup, timestep, retry, and repeated-sweep
+invocation counts and branch sequences are uninstrumented; the static role
+counts above are not dynamic execution counts.
+
+### Rust boundary and status
+
+Exact Rust searches find no CP241 symbol or snake-case counterpart, no
+`CalcZoneSizing` or `ZoneSizingData`, and none of the four CP241 sizing fields.
+Rust does retain typed `ZoneHVAC:EquipmentConnections` return node or NodeList
+identities. Its diagnostic node projection expands return identities into
+`NodeStateStore` rows initialized from default Zone-air state, rather than
+running source mass/leaving conditions and selecting only the first return.
+
+The finite-limit IdealLoads CLI recirculation helper may select an authored
+exhaust node first and otherwise resolve the first Zone return/list node. That
+oracle/diagnostic helper is not the CP241 parent or sizing record transaction.
+Rust also types dual-setpoint schedule identities and emits thermostat report
+series directly from currently required constant schedules. It has no mutable
+source-shaped `setpt`/`setptLo`/`setptHi` triplet, strict load/setpoint branch,
+or stale return-snapshot lifecycle.
+
+Rust has no SpaceHVAC connection or Space system-node counterpart for this
+path, no post-leaving Zone/Space sizing sweep, no parent-configuration Space
+alias, and no Part2 failure/replay test. The sole raw `Sizing:Zone` epJSON
+fixture expects a pre-runtime unsupported-sizing block; active IDFs contain no
+`Sizing:Zone`. Existing return-node graph tests, node diagnostics, thermostat
+output conformance, and IdealLoads final results are adjacency, not CP241
+execution evidence.
+
+CP241 adds no algorithm-level EnergyPlus source, Rust target, executable code,
+mapped state, test, object support, capability, output implementation,
+comparator, case, manifest, numerical, performance, or conformance promotion.
+The algorithm remains `scaffold` with claim level `none`. The inventory becomes
+32 algorithms and 246 routines, split 58 `state_mapped` plus 188
+`source_mapped`, with 123 required; the heat-balance and HVAC project lists
+become 88 and 12.
+
+CP242 next maps `ZoneEquipmentManager::SizeZoneEquipment`, declared at
+`ZoneEquipmentManager.hh` line 107 and implemented at
+`ZoneEquipmentManager.cc` lines 627-694.
 
 ## Claim Requirements
 
