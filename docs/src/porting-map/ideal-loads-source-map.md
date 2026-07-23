@@ -132,6 +132,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `ZoneEquipmentManager::updateZoneSizingBeginDay` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent run-period timing, design-day schedule labels, and standard-density IdealLoads limits do not implement current-day calculated sizing metadata |
 | `ZoneEquipmentManager::updateZoneSizingDuringDay` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent thermostat schedules, system-timestep heat-balance averaging, demand snapshots, and IdealLoads rate timing do not implement Zone/Space sizing sequence accumulation |
 | `ZoneEquipmentManager::updateZoneSizingEndDayMovingAvg` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent adaptive heat-balance weighting, schedule averages, output-frequency classification, and run-period time state do not implement circular Zone/Space sizing-day smoothing |
+| `ZoneEquipmentManager::updateZoneSizingEndDay` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; current-timestep demand, IdealLoads limits/OA mixing, warmup extrema, and sizing-name detection do not implement persistent Zone/Space daily peak and cross-period final reduction |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
 | `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand` |
 
@@ -4433,9 +4434,345 @@ algorithms and 255 routines, split 58 `state_mapped` plus 197
 88 and 21. HVAC readiness remains `0/21`, the inventory is incomplete, and
 all 21 required routines remain below `family_gated`.
 
-CP251 next maps `ZoneEquipmentManager::updateZoneSizingEndDay`, declared at
-`ZoneEquipmentManager.hh` lines 145-149 and implemented completely at
-`ZoneEquipmentManager.cc` lines 1531-1944.
+## CP251 `updateZoneSizingEndDay` Daily Peak and Final-Period Reduction
+
+CP251 adds canonical required `routine.update_zone_sizing_end_day` after
+`update_zone_sizing_end_day_moving_avg` and before `sim_zone_equipment`. The
+physical declaration order is CP250 at `ZoneEquipmentManager.hh` line 143,
+CP251 at lines 145-149, and CP252
+`updateZoneSizingEndZoneSizingCalc1` at line 151. Their implementations are
+CP250 at `ZoneEquipmentManager.cc` lines 1508-1529, CP251 at lines 1531-1944,
+and CP252 beginning at line 1946. CP251's public signature is:
+
+```cpp
+void updateZoneSizingEndDay(
+    DataSizing::ZoneSizingData &zsCalcSizing,
+    DataSizing::ZoneSizingData &zsCalcFinalSizing,
+    int const numTimeStepInDay,
+    DataSizing::DesDayWeathData const &desDayWeath,
+    Real64 const stdRhoAir);
+```
+
+The complete leaf has no EnergyPlus child routine, state argument, diagnostic,
+status, or return value. It reads or writes 99 members of the current-day
+calculated record and 100 members of the all-period calculated-final record,
+with a 103-member union. It also reads only `Temp(index)`, `HumRat(index)`,
+and `DateString` from the supplied design-day weather record. For the
+description below:
+
+```text
+A = zsCalcSizing
+F = zsCalcFinalSizing
+T = numTimeStepInDay
+W = desDayWeath
+```
+
+### Ordered current-day peak reducers
+
+Before any scan, CP251 unconditionally assigns `F.CoolSizingType` and then
+`F.HeatSizingType` from A. Those strings therefore describe the latest
+successfully reached call rather than necessarily the design period that owns
+a final load or flow peak.
+
+The daily reduction then proceeds in this exact order:
+
+1. scan sensible heating;
+2. optionally scan latent heating;
+3. scan all four no-DOAS loads in one loop;
+4. derive sensible and optional latent heating volume/coil inputs;
+5. scan sensible cooling;
+6. optionally scan latent cooling;
+7. derive sensible and optional latent cooling volume/coil inputs.
+
+Every load comparison is strict `candidate > incumbent`:
+
+| reducer | gate and candidate | writes when the candidate wins |
+|---|---|---|
+| sensible heat | unconditional `HeatLoadSeq(t)` | load, `HeatFlowSeq(t)` mass, Zone/outdoor/return temperature, Zone/outdoor humidity ratio, and timestep: eight fields |
+| latent heat | `A.zoneLatentSizing`; `LatentHeatLoadSeq(t)` | load, both `DesLatentHeatMassFlow` and `ZoneHeatLatentMassFlow` from the same flow, latent Zone/outdoor temperature and humidity, return temperature, and timestep: nine fields |
+| no-DOAS | unconditional, in heat, latent-heat, cool, latent-cool order | each winning load plus its timestep; neither `AccountForDOAS` nor the latent flag gates these eight writes |
+| sensible cool | unconditional `CoolLoadSeq(t)` | the cooling counterparts of the eight sensible-heat fields |
+| latent cool | `A.zoneLatentSizing`; `LatentCoolLoadSeq(t)` | load, `DesLatentCoolMassFlow`, latent Zone/outdoor temperature and humidity, return temperature, and timestep: eight fields; it does not write `ZoneCoolLatentMassFlow` |
+
+With a reset zero incumbent, only a strictly positive value wins. Ascending
+timestep ties retain the first winner. A NaN candidate never wins, while a NaN
+incumbent prevents every later ordinary candidate from winning. Positive
+infinity can win; negative infinity does not beat a zero incumbent.
+
+CP250 has already smoothed sensible load, flow, and return-temperature arrays,
+all four no-DOAS loads, and the enabled latent load/flow arrays. CP251 selects
+those smoothed loads and pairs them with smoothed flow/return values, but it
+samples the unsmoothed Zone/outdoor temperature and humidity arrays at the
+selected timestep. It reads no `DOAS*Seq` field. In particular,
+`DOASHeatAddSeq` and `DOASLatAddSeq`, which CP250 smooths, are not consumed.
+
+### Volume flow and coil-inlet mixtures
+
+A positive sensible heating mass flow executes:
+
+```text
+A.DesHeatVolFlow = A.DesHeatMassFlow / A.DesHeatDens
+f = clamp(A.MinOA / max(A.DesHeatVolFlow, 0.001), 0, 1)
+coil = f * W(heat-peak timestep) + (1 - f) * sensible Zone peak
+```
+
+Temperature and humidity use the same fraction and their corresponding
+weather/Zone values. Sensible cooling is symmetric with the cooling fields.
+
+The latent paths are asymmetric. Their volume flow divides
+latent mass by the supplied `stdRhoAir`, but their OA fractions divide
+`A.MinOA` by the corresponding *sensible* `DesHeatVolFlow` or
+`DesCoolVolFlow`. Weather is sampled at the latent peak timestep, while the
+Zone-side mixture uses the *sensible* `ZoneTempAtHeat/CoolPeak` and
+`ZoneHumRatAtHeat/CoolPeak`, not the latent peak fields.
+
+Source `max(a,b)` returns `b` only when `a < b`; `min(a,b)` returns `a` only
+when `a < b`. A NaN first volume operand survives the first `max`, but a NaN
+OA division result is the second operand of `max(0, raw)` and becomes zero,
+so the nested clamp selects zero. Arithmetic does not short-circuit:
+`0 * NaN` or `0 * infinity` can still make a coil result NaN. Density,
+`stdRhoAir`, minimum OA, weather, and peak fields have no finite, sign, or
+zero validation. A positive stored mass with a zero or stale peak index can
+reach an invalid weather access.
+
+### Cross-period calculated-final reducers
+
+The current-day scalars are next folded into F. Ordinary flow, load, and
+no-DOAS comparisons are all strict, so equal cross-day candidates retain the
+prior winner. The final record is not a single atomic winning-day snapshot:
+
+| family | primary volume winner | non-winning-volume load path |
+|---|---|---|
+| sensible heat | strict larger volume copies 22 fields: volume, load, mass, day, density, seven sequences, five peak companions, DD/date/time, and two coil inputs; it does not copy `HeatTstatTemp` | every `else` first overwrites `F.DesHeatDens = stdRhoAir`; a strict larger load then copies 19 more fields including the thermostat and six sequences but not volume, mass, or `HeatFlowSeq` |
+| sensible cool | the symmetric 22-field copy, without `CoolTstatTemp` | the symmetric unconditional density overwrite plus 19-field load copy, excluding volume, mass, and `CoolFlowSeq` |
+| latent heat | under `A.zoneLatentSizing`, strict larger volume copies 14 fields; final mass comes from `A.ZoneHeatLatentMassFlow`, and no outdoor latent peak is copied | strict larger load copies only load, date, DD number, timestep, load sequence, and flow sequence; it omits `LatHeatDesDay`, peaks, coil inputs, mass, and volume |
+| latent cool | under `A.zoneLatentSizing`, strict larger volume copies 14 fields; mass comes from `A.DesLatentCoolMassFlow`, and no outdoor latent peak is copied | strict larger load copies load, date, DD number, `LatCoolDesDay`, timestep, and load sequence; unlike latent heat it omits the flow sequence |
+| four no-DOAS loads | each strict larger load copies scalar, whole sequence, DD number, day name, and timestep | there is no alternate branch and no `c*DDDate` copy |
+
+A larger-volume day can therefore replace an earlier larger load with a
+smaller associated load. Conversely, a lower or equal volume day with a
+larger load replaces most load companions while retaining the earlier
+volume, mass, and flow sequence. The result can be a source-permitted hybrid of
+multiple periods. Even when the load also loses, merely taking a sensible
+volume `else` overwrites the prior winning density with the current
+`stdRhoAir`.
+
+There is no `AccountForDOAS` branch. The adjusted sensible arrays and the four
+no-DOAS arrays are reduced independently. Dirty no-DOAS values can win even
+when latent sizing and DOAS accounting are false.
+
+### Exact zero-load fallbacks
+
+After every ordinary final reducer, CP251 applies four separate fallbacks:
+
+| guard | current-day selection | cross-period decision and final writes |
+|---|---|---|
+| `F.DesHeatLoad == 0` | a local `FirstIteration` forces timestep one, then strict lower `HeatZoneTempSeq` wins; ties retain the first timestep | inclusive paired outdoor `A.OutTempAtHeatPeak <= F.OutTempAtHeatPeak`; a win copies day, five companion sequences, five peaks, DD/date/time, two coil fields, and thermostat, but no load/flow sequence |
+| `F.zoneLatentSizing && F.DesLatentHeatLoad == 0` | strict lower heating Zone temperature after a forced first sample writes only A latent Zone temperature and paired outdoor temperature/humidity | an independent test of every `HeatOutTempSeq(t) <= F.OutTempAtLatentHeatPeak` writes only F outdoor temperature/humidity, latent day/DD/date, and the stale or prior `A.TimeStepNumAtLatentHeatMax`, not `t`; no final latent Zone peak or sequence is copied |
+| `F.DesCoolLoad == 0` | forced-first then strict higher `CoolZoneTempSeq`; ties retain the first timestep | strict paired outdoor `A.OutTempAtCoolPeak > F.OutTempAtCoolPeak`; a win copies the same 17-field shape as sensible heat |
+| `F.zoneLatentSizing && F.DesLatentCoolLoad == 0` | a running strict maximum Zone temperature writes only A latent Zone temperature and paired outdoor temperature/humidity | every timestep tests that running paired outdoor value `>= F.OutTempAtLatentCoolPeak`, but a win writes only latent day/DD/date and the stale or prior `A.TimeStepNumAtLatentCoolMax`; CP251 never updates F's latent-cool outdoor threshold, so this is not a maximum reducer |
+
+The sensible heat cross-day comparison is inclusive, so a later equal
+outdoor condition replaces an earlier one; sensible cooling is strict and
+keeps the earlier tie. The latent-heating outdoor scan is inclusive and later
+equal samples win. The latent-cooling threshold remains its prior/default
+value while qualifying metadata can be overwritten repeatedly. Default final
+outdoor thresholds are zero unless earlier setup or mutation changes them.
+
+Both signed zeros satisfy each `== 0` guard. A forced first temperature sample
+is accepted even when NaN and then freezes the strict within-day comparison.
+Any final comparison involving NaN is false. When `T <= 0`, all nine possible
+loops skip, but the string, derived-scalar, final-reducer, and stale-scalar
+fallback logic still executes; the helper is not a no-op.
+
+### Parent routing, cadence, and downstream boundary
+
+The only parent expressions are in `UpdateZoneSizing(EndDay)` at
+`ZoneEquipmentManager.cc` lines 3317-3328. Only after the entire CP250
+smoothing traversal returns does the parent start a second traversal:
+
+1. scan Zone indexes ascending;
+2. skip an uncontrolled Zone;
+3. pass current-day `CalcZoneSizing(day, zone)` and the persistent
+   `CalcFinalZoneSizing(zone)`;
+4. when Space sizing is enabled, visit that Zone's stored `spaceIndexes` in
+   container order and pass the analogous current-day/final Space pair;
+5. pass the common `NumOfTimeStepInDay`, current `DesDayWeath`, and
+   `StdRhoAir` to every role.
+
+There is no Space-local control check, global Space scan, sorting,
+deduplication, membership validation, parent validation, or topology
+snapshot. With `C` controlled Zones and `M` stored Space membership
+occurrences:
+
+```text
+H = C + (doSpaceHeatBalanceSizing ? M : 0)
+CP251 helper calls per completed EndDay parent = H
+```
+
+Duplicate or cross-listed Space identity reduces the same current-day and
+final records repeatedly. All duplicate CP250 smoothing has already completed
+before the first CP251 call, so the first CP251 call observes the fully
+multiply-smoothed arrays. The second CP251 call can then take the successful
+replay density-overwrite path.
+
+The sole production parent call is `SizingManager.cc` line 374. It is reached
+once after all timestep work for each completed non-warmup sizing day, before
+facility EndDay processing and before the current-overall-day increment.
+`UpdateZoneSizing` itself has no local warmup, sizing, EndDay, or day-validity
+guard, so direct callers can bypass that cadence.
+
+At the end of all periods, `UpdateZoneSizing(EndZoneSizingCalc)` first runs
+EMS and applies Zone final overrides. Inside the non-pulse block, Space sizing
+makes the parent visit controlled Zones and skip exactly `numSpaces == 1`
+before calling physical-next CP252. CP252 returns for Coincident concurrence;
+otherwise it rebuilds the Zone final from stored Spaces. A malformed
+zero-Space Zone is not excluded by the parent. Later EndZone helpers,
+reporting, and calculated-to-user final copies remain separate downstream
+owners; CP251 itself writes no report or user-final record.
+
+### Pulse reset, failure, retry, and aliasing
+
+A component-load request runs CP251 during the pulse sizing iteration. A
+successfully returned pulse iteration later reaches CP247 before the normal
+iteration reuses the same day indexes. Under valid allocated topology CP247
+clears most CP251 state, but `ZoneSizingData::zeroMemberData` does not clear
+these CP251-written fields in daily or final records:
+
+- `TimeStepNumAtHeatNoDOASMax` and `TimeStepNumAtCoolNoDOASMax` in both
+  daily and final records, plus `HeatNoDOASDDNum` and `CoolNoDOASDDNum` in
+  final records (CP251 reads the daily DD numbers and writes the final ones);
+- latent heat/cool Zone peak temperature and Zone peak humidity;
+- sizing-type strings, which normal CP248/CP251 overwrite.
+
+Consequently, a normal path with no new winner can retain pulse metadata.
+The latent zero-load fallbacks repair neither all latent companions nor their
+timestep. No current test has a latent pulse role. CP247 globally selects
+Spaces by their actual parent identity, while CP251 follows stored
+membership; malformed cross-listing under a controlled Zone can therefore
+reach CP251 yet evade the reset.
+
+CP251 has no validation, diagnostic, status, catch, checkpoint, cleanup,
+transaction, or rollback. `T` can disagree with every independently sized
+array. Out-of-range sequence or weather access assert-terminates when
+assertions are enabled and has undefined behavior otherwise, so it provides
+no defined post-failure continuation. `T <= 0` can still expose stale positive
+mass and a stale peak index to weather.
+
+String and whole-array copies can allocate. A final winner installs its
+strict decisive volume, load, or no-DOAS scalar before later strings and
+arrays. If a later allocation throws, a defined retry sees equality and can
+skip the unfinished companion copy permanently. The sensible cooling
+zero-load path similarly installs its strict outdoor threshold before its
+date string; a later allocation failure can make replay skip the rest. Heat's
+inclusive fallback remains replay-eligible, as do latent heat's inclusive
+threshold and latent cool's never-written threshold.
+
+Even a fully successful repeated direct call is not generally idempotent. A
+first sensible volume winner copies A's density; the repeated equal volume
+takes the `else` and overwrites F density with `stdRhoAir`. Parent re-entry
+first reruns CP250, so its smoothing can also compose before CP251 starts.
+
+The two record references are not required to be distinct. If A and F alias,
+all ordinary final strict comparisons become self-comparisons and fail,
+sensible density is overwritten with `stdRhoAir`, and final/no-DOAS winner
+copies collapse. The heat zero-load `<=` self-test can pass, the cool `>`
+self-test fails, and latent fallback reads and writes interact inside the same
+loop. Production supplies distinct records; malformed direct aliasing is an
+unvalidated in-place hybrid.
+
+### C++ evidence
+
+No C++ test calls `updateZoneSizingEndDay` directly. Two
+`ZoneEquipmentManager` unit tests call `UpdateZoneSizing(EndDay)` directly,
+each with one Zone, no Space, `T = 1`, averaging window one, and latent sizing
+false. Their four apparent calculated-final sensible peak assertions occur
+only after `EndZoneSizingCalc`; later helper 7 rewrites both calculated-final
+peaks. They prove parent reach and an integrated no-load outcome, not an
+isolated CP251 destination.
+
+Stronger successful-path evidence includes:
+
+- `BaseSizer_SupplyAirTempLessThanZoneTStatTest`, whose full simulation
+  produces positive heating load with zero design flow and pins the
+  CP251 load-fallback-owned calculated-final thermostat, design day, and
+  positive load; zero volume/mass establish the zero-flow context, while
+  helper 7 later owns the asserted Zone peak;
+- the latent Space sizing test, which pins
+  `CalcFinalSpaceSizing.TimeStepNumAtLatentCoolMax == 72`; downstream latent
+  mapping reads but does not overwrite that latent index;
+- seven Space-heat-balance sizing simulations whose exact Space load, flow,
+  design-day, and peak-time report assertions cover the integrated
+  CP249/CP250/CP251 and later EndZone/report chain.
+
+A fresh completing production-style census finds:
+
+```text
+direct ManageSizing contexts: 33 parents, 51 Zone helpers
+full ManageSimulation contexts: 72 parents, 102 Zone + 42 Space helpers
+combined: 105 parents, 195 helpers
+role split: 153 Zone + 42 Space; 177 normal + 18 pulse
+```
+
+Helper counts at `TimeStepsInHour = 1/4/6` are `4/87/104`, giving extents
+`24/96/144` and 23,424 role-timepoints. The 26 latent-true helpers, split
+eight Zone plus 18 Space, all have extent 144 and add 3,744 latent
+role-timepoints. Before any zero-load fallback, the fixed five daily scans
+therefore execute 77,760 loop-body iterations and 148,032 load comparisons.
+The two direct parent tests add two helpers and 12 ordinary comparisons if
+combined rather than kept separate.
+
+Six unique DOAS-enabled production Zones contribute 14 CP251 helper calls,
+all latent false. CP251 has no DOAS gate and reads no DOAS sequence; those
+tests assert distant DOAS/heat-recovery descendants. Because CP249's four
+no-DOAS producers are inside the latent gate, these DOAS cases do not exercise
+a positive no-DOAS winner. No test asserts a CP251 final no-DOAS field.
+
+There is no focused oracle for all daily/final branch shapes or source order.
+Equal peaks, NaN/infinity, density zero, latent heating, either zero-load
+latent fallback, lower-flow/higher-load hybrid records, density clobber,
+latent coil asymmetry, dirty no-DOAS values, duplicate/cross-listed topology,
+mismatched extents, stale weather indexes, record aliasing, allocation
+failure, torn winner state, defined retry, and parent re-entry remain
+unproved. The reset test does not seed or assert the omitted pulse fields.
+
+### Rust boundary and governance
+
+Exact `crates` and `data` searches find no CP251 helper or canonical key, no
+Zone/Space calculated daily/final sizing record, no EndDay peak reducer, and
+no exact counterpart for any of the 103 accessed members. Searches for all
+103 member tokens and their snake-case candidates are zero; the only `MinOA`
+substring hits belong to unrelated `CalcPurchAirMinOAMassFlow` names.
+
+Rust `ZoneSysEnergyDemand` is a current-timestep four-scalar snapshot.
+IdealLoads limits and outdoor-air mixing are current-timestep equipment
+logic. Warmup tracks a separate Zone temperature extremum, and the retained
+`DesignSpecification:ZoneHVAC:Sizing` name only detects unsupported
+autosizing. Radiation/CLI `.max_by` uses, report-frequency peak labels, and
+PurchasedAir rate outputs do not implement CP251's persistent design-day
+reducers or output descendants.
+
+Active conformance has zero `Sizing:Zone`, `Sizing:Parameters`, authored
+Space, or authored SpaceList objects. Four files contain five design-day
+objects, but all set Zone, System, and Plant sizing to `No`; 74 active
+`SimulationControl` declarations likewise have Zone sizing `No` and none
+has `Yes`. The sole raw `Sizing:Zone` fixture expects `UnsupportedSizing`
+before runtime. Sizing, `ZoneSizing*`, authored Space/SpaceList, and their
+reports remain run-blocked.
+
+CP251 adds no algorithm-level EnergyPlus source, Rust target/code/state, test,
+object support, capability, output implementation, comparator, case,
+manifest, numerical, performance, or conformance promotion. The parent
+algorithm remains `scaffold` with claim level `none`. Inventory becomes 32
+algorithms and 256 routines, split 58 `state_mapped` plus 198
+`source_mapped`, with 133 required; heat-balance and HVAC project lists become
+88 and 22. HVAC readiness remains `0/22`, the inventory is incomplete, and
+all 22 required routines remain below `family_gated`.
+
+CP252 next maps
+`ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc1`, declared at
+`ZoneEquipmentManager.hh` line 151 and implemented completely at
+`ZoneEquipmentManager.cc` lines 1946-2278.
 
 ## Claim Requirements
 

@@ -141,6 +141,7 @@ required_routines = [
   "update_zone_sizing_begin_day",
   "update_zone_sizing_during_day",
   "update_zone_sizing_end_day_moving_avg",
+  "update_zone_sizing_end_day",
   "sim_zone_equipment",
   "sim_purchased_air",
   "get_purchased_air",
