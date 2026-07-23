@@ -125,6 +125,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `ZoneEquipmentManager::sizeZoneSpaceEquipmentPart2` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent typed return-node identities, diagnostic node temperatures, and constant thermostat schedule reports only |
 | `ZoneEquipmentManager::SizeZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; existing three-label stage metadata skips the sizing parent and Rust blocks `Sizing:Zone` before runtime |
 | `ZoneEquipmentManager::CalcDOASSupCondsForSizing` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent PurchasedAir outdoor-air supply logic and psychrometrics are not the `Sizing:Zone` DOAS selector |
+| `ZoneEquipmentManager::SetUpZoneSizingArrays` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent typed Zone, Space, thermostat, equipment, individual DSOA, and ordinary SpaceList structures do not implement the `Sizing:Zone` setup transaction |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
 | `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand` |
 
@@ -149,6 +150,13 @@ ZoneEquipmentManager::ManageZoneEquipment
        -> SizeZoneEquipment
             -> if SizeZoneEquipmentOneTimeFlag
                  -> SetUpZoneSizingArrays
+                      -> conditional AllocateIntGains
+                      -> validate Sizing:Zone and VerifyThermostatInZone
+                      -> AutoCalcDOASControlStrategy
+                      -> allocate/fill Zone and optional Space sizing plus EMS
+                      -> populate DSOA SpaceList indexes
+                      -> calcSizingOA for controlled Zone/Space roles
+                      -> sizing-factor EIO and late accumulated-error fatal
                  -> SizeZoneEquipmentOneTimeFlag = false
             -> sizeZoneSpaceEquipmentPart1 (complete Zone/optional-Space pass)
                  -> per role if AccountForDOAS
@@ -2323,9 +2331,362 @@ inventory becomes 32 algorithms and 248 routines, split 58 `state_mapped`
 plus 190 `source_mapped`, with 125 required; the heat-balance and HVAC
 project lists become 88 and 14.
 
-CP244 next maps `ZoneEquipmentManager::SetUpZoneSizingArrays`, declared at
-`ZoneEquipmentManager.hh` line 109 and implemented at
-`ZoneEquipmentManager.cc` lines 767-1082.
+## CP244 `SetUpZoneSizingArrays` One-Time Sizing-State Constructor
+
+CP244 adds canonical required `routine.set_up_zone_sizing_arrays`
+immediately after `routine.calc_doas_sup_conds_for_sizing` and before
+`routine.sim_zone_equipment`, plus the same ordered HVAC project item. The
+exact routine is declared at `ZoneEquipmentManager.hh` line 109 and
+implemented completely at `ZoneEquipmentManager.cc` lines 767-1082. The
+algorithm already cites that source file, so no algorithm-level source or
+Rust target changes.
+
+### Production gate and ownership
+
+The signature accepts only mutable `EnergyPlusData &state`; it has no return
+value or output argument. Its sole production call expression is
+`SizeZoneEquipment` line 644:
+
+```text
+if SizeZoneEquipmentOneTimeFlag:
+    SetUpZoneSizingArrays(state)
+    SizeZoneEquipmentOneTimeFlag = false
+```
+
+The manager-data latch defaults true and is cleared at line 645 only after
+CP244 returns normally. Direct CP244 calls neither inspect nor mutate it.
+The normal production path therefore executes setup once at the first
+reached sizing-parent entry in a fresh state, not once per design-day
+timestep. Later sizing-parent entries skip it. A setup abnormal non-return
+retains the true latch and its partial effects; a failure after successful
+setup sees a false latch and skips CP244 on parent retry.
+
+No begin-environment transition rearms this latch. Manager `clear_state()`
+placement-news manager-owned data and restores true, but does not coordinate
+resets of `dataSize`, HeatBalance, ZoneControls, ZoneEquipment, EMS, output,
+diagnostic, or OA-requirement state. Direct callers bypass the lifecycle
+contract entirely.
+
+### Conditional internal-gain allocation
+
+CP244 initializes local `ErrorsFound = false`. It checks only whether
+`dataHeatBal->ZoneIntGain` is allocated. When false it calls
+`DataHeatBalance::AllocateIntGains`, which allocates Zone and Space internal
+gain storage, Space gain-device storage, and daylight Space power-reduction
+state. The parent does not independently inspect those other arrays.
+
+This is a narrow readiness guard, not a transactional allocation barrier. If
+the child abnormally leaves `ZoneIntGain` allocated before finishing the
+other arrays, a same-state retry skips the child and cannot repair that
+partial prefix.
+
+### Ordered `Sizing:Zone` validation
+
+For each `ZoneSizingInput` in one-based stored order, CP244 performs this
+logic:
+
+1. It exact-name searches the HeatBalance Zone arena. A miss emits a severe
+   and sets local `ErrorsFound`, but does not stop the loop.
+2. It recomputes `any_of(ZoneEquipConfig.IsControlled)` for the current
+   record. With no controlled configuration anywhere, it emits a severe and
+   sets `ErrorsFound` once per sizing input.
+3. When any controlled configuration exists, it exact-name searches the
+   full equipment-configuration arena. A match writes that one-based
+   configuration index to `ZoneSizingInput.ZoneNum`; the matched record is
+   not itself rechecked for `IsControlled`. A miss is warning-only and is
+   silent during pulse sizing.
+4. Independently of that configuration-match result, if cooling or heating
+   `AirflowSizingMethod` is exactly `FromDDCalc`, CP224
+   `VerifyThermostatInZone` runs. A false result owns a second warning that
+   is also silent during pulse sizing.
+
+An empty sizing-input arena skips the entire loop, including the
+no-controlled-equipment severe. Pulse sizing suppresses only the two warning
+classes here; it does not suppress unknown-Zone or no-equipment severe
+errors. CP224 can lazily acquire Zone air controls and has its own
+shared-latch failure lifecycle.
+
+### DOAS auto-calculation before bulk allocation
+
+`AutoCalcDOASControlStrategy` runs unconditionally after the validation loop,
+even if CP244's local `ErrorsFound` is already true. That still-separate
+child can overwrite enabled DOAS low/high setpoints and emit DOAS EIO rows.
+An inverted result invokes its own earlier fatal:
+
+```text
+Errors found in DOAS sizing input. Program terminates.
+```
+
+That child fatal prevents all CP244 bulk allocations and suffix work, but
+retains the internal-gain, validation, ZoneNum, thermostat-input, DOAS
+setpoint, report, and diagnostic prefix already reached. Its local error flag
+is separate from CP244's accumulated flag.
+
+### Exact allocation order and extents
+
+After normal DOAS-child return, CP244 allocates the following storage even
+when its own accumulated error is already true. Let
+`D = TotDesDays + TotRunDesPersDays`,
+`Z = NumOfZones`, `S = numSpaces`, `A = NumAirTerminalUnits`,
+`T = NumOfTimeStepInDay`, and `H = TimeStepsInHour * 24`.
+
+The exact outer order is `ZoneSizing`, `FinalZoneSizing`, `CalcZoneSizing`,
+`CalcFinalZoneSizing`; then, under the Space gate, `SpaceSizing`,
+`FinalSpaceSizing`, `CalcSpaceSizing`, `CalcFinalSpaceSizing`; then
+`TermUnitFinalZoneSizing` and its member loop, the `DesDayWeath` outer
+container, `AvgData`, and finally each weather record's `Temp`, `HumRat`, and
+`Press` allocation and zeroing.
+
+| Storage | Extent and initialization |
+|---|---|
+| `ZoneSizing` | `D x Z` |
+| `FinalZoneSizing` | `Z`; `EPVector::allocate` zero-initializes every record |
+| `CalcZoneSizing` | `D x Z` |
+| `CalcFinalZoneSizing` | `Z`; `EPVector::allocate` zero-initializes every record |
+| optional `SpaceSizing` | `D x S` when `doSpaceHeatBalanceSizing` |
+| optional `FinalSpaceSizing` | `S` under the same gate; every record is zero-initialized |
+| optional `CalcSpaceSizing` | `D x S` under the same gate |
+| optional `CalcFinalSpaceSizing` | `S` under the same gate; every record is zero-initialized |
+| `TermUnitFinalZoneSizing` | `A`; each record dimensions eight member sequences to `T` and zeroes them |
+| `DesDayWeath` | `D` outer records; after `AvgData`, each record dimensions and zeroes `Temp`, `HumRat`, and `Press` to `H` |
+| manager `AvgData` | `T`, before the weather-member loop |
+
+These are unconditional `allocate` or member-`dimension` operations, not
+shape checks. The four `Final*` EPVectors are filled with `T{}` even at an
+unchanged extent; same-extent ObjexxFCL sizing arrays do not receive that
+blanket reset here. CP244 does not validate negative/inconsistent extents,
+preexisting allocations, the relationship between `T` and live
+`TimeStepsInHour`, or prior contents.
+
+### Controlled-Zone fill, Space reuse, and EMS registration
+
+CP244 then visits numeric Zone indexes ascending and obtains
+`ZoneEquipConfig(zone)` before its `IsControlled` filter. For each controlled
+Zone it exact-name searches `ZoneSizingInput`. A match selects that record.
+A miss warns outside pulse sizing and unguardedly selects
+`ZoneSizingInput(1)` as the fallback; an empty input arena is therefore an
+indexed failure rather than a local diagnostic.
+
+The separate `fillZoneSizingFromInput` child fills the Zone design-day,
+calculation, final, and calculation-final records from the selected input.
+When `doSpaceHeatBalanceSizing` is true, CP244 visits the parent Zone's
+stored `spaceIndexes` order and invokes the same child once per Space with
+the same selected Zone input and the Space name/identity. It does not sort,
+deduplicate, validate membership, or consult a Space-controlled flag.
+
+If `AnyEnergyManagementSystemInModel` is true, each controlled Zone then
+registers exactly 17 internal variables and six actuators over final and
+intermediate heating/cooling mass flow, load, density, volume flow, and
+outdoor-air fields. Spaces receive no analogous registrations. Registration
+failure or duplicate behavior belongs to the EMS dependencies; CP244 has no
+local status or cleanup.
+
+### DSOA SpaceList population and OA child order
+
+A single local `dsoaError` starts false. CP244 scans every
+`OARequirements` record, and records with positive `numDSOA` scan each stored
+Space name in order. A valid exact-name Space index is appended to persistent
+`dsoaSpaceIndexes`; the vector is not cleared first. A missing Space emits a
+severe plus continue diagnostic and sets both `dsoaError` and
+`ErrorsFound`. The duplicate loop then runs after either lookup branch and
+compares `thisSpaceNum` with every earlier persistent index. A successful
+duplicate is already appended; it emits another severe/continue pair, sets
+both flags, and remains appended. A missing lookup supplies zero and normally
+matches nothing because CP244 itself appends only positive indexes.
+
+Consequently the check detects duplicates within one declaration and
+duplicates introduced by direct replay. One bad SpaceList sets the shared
+`dsoaError` for all later work, not just that requirement.
+
+CP244 next calls the still-separate `calcSizingOA` child for controlled Zones
+in ascending order. Under `doSpaceHeatBalanceSizing`, it then scans every
+global Space index ascending, reads its parent Zone, and calls the child when
+that parent's equipment configuration is controlled. This second topology
+source is the global Space arena, unlike the earlier per-Zone
+`spaceIndexes` fill traversal.
+
+The shared `dsoaError` suppresses each child's DSOA dereference and
+`calcDesignSpecificationOutdoorAir` call, leaving the local OA-volume
+accumulator at `0.0`. The later air-distribution-efficiency branch still
+runs, so final `MinOA` is not guaranteed to remain positive zero. The child
+continues other People, area, equipment, and sizing mutations. Cross-Zone
+SpaceList membership is diagnosed by the child through shared `ErrorsFound`
+but does not set `dsoaError`, so calculation continues. CP245 will map the
+child's arithmetic and its exact state anomalies separately.
+
+For parent transaction purposes, each Space child accumulates its People
+contributions into its zero-initialized final-Space peak-occupancy field; a
+full CP244 replay zero-initializes that record again. Its design-day suffix
+nevertheless overwrites a subset of the owning Zone's design-day sizing
+fields rather than the Space design-day arrays.
+
+### EIO suffix and late fatal
+
+After all reached OA child calls, CP244 writes this EIO order once:
+
+1. averaging-window header and `NumTimeStepsInAvg`;
+2. heating-factor header and global factor;
+3. one row for each controlled Zone whose heating factor is not exactly
+   `1.0`;
+4. cooling-factor header and global factor; and
+5. one row for each controlled Zone whose cooling factor is not exactly
+   `1.0`.
+
+There are no per-Space sizing-factor rows. The raw `!= 1.0` test has no
+epsilon. Only after all these writes does the parent inspect
+`ErrorsFound`. A true value issues this exact fatal:
+
+```text
+SetUpZoneSizingArrays: Errors found in Sizing:Zone input
+```
+
+The main accumulated flag covers an unknown HeatBalance Zone, globally
+absent controlled equipment for a nonempty sizing-input arena, missing or
+duplicate DSOA Space members, and cross-Zone DSOA membership reported by the
+OA child. Configuration miss, thermostat miss, and first-input fallback are
+warning-only. Allocation, indexing, dependency, registration, or file-output
+failures can abnormally stop at their own earlier point.
+
+### Failure prefixes, replay, and reset
+
+CP244 owns no return status, catch, cleanup, checkpoint, transaction, or
+rollback. An early AutoCalc fatal preserves its prefix and suppresses bulk
+allocation. A bulk allocation/fill/EMS failure preserves each earlier
+allocation and mutation. A DSOA or OA failure preserves all earlier sizing
+state plus appended indexes. The normal accumulated-error path deliberately
+preserves every allocation, fill, OA mutation, EIO row, and diagnostic before
+its tail fatal. Production failure also leaves the caller latch true.
+
+Same-state replay is neither idempotent nor a repair boundary:
+
+- DSOA indexes append again and a formerly valid list can become duplicate
+  input that sets the late fatal;
+- the four `Final*` EPVectors are zero-filled on every allocation, so
+  `calcSizingOA` rebuilds rather than carries peak occupancy across a full
+  replay, while OA, equipment, and daily sizing writes still repeat;
+- DOAS and main EIO rows and diagnostics can repeat;
+- EMS internal-variable registration attempts can diagnose duplicates while
+  actuator attempts are dependency-owned no-ops;
+- terminal and weather member sequences are reset, while same-extent
+  ObjexxFCL Zone/Space sizing arrays and `AvgData` can retain untouched prior
+  fields; and
+- the single `ZoneIntGain` guard can skip repair of a partial child
+  allocation.
+
+`RezeroZoneSizingArrays` resets selected computed Zone/Space sizing data but
+does not clear the setup latch, DSOA indexes, EMS registry, output, every
+allocation, or every child-owned field. Manager `clear_state()` rearms the
+latch and resets manager-owned data only. A clean replay requires a
+coordinated full-state reset across all owners.
+
+### Direct C++ evidence
+
+Exactly three tests call CP244 directly:
+
+- `AirTerminalSingleDuctMixer_GetInputDOASpecs` supplies two matching
+  `ZoneSizingInput` records and two controlled Zones. Both design-day airflow
+  records reach false thermostat verification and unasserted warnings. The
+  later blank-mixer lookup supplies one CP244-dependent OA-pointer assertion.
+- The DataSizing SpaceList test has no sizing input or controlled Zone and
+  maps four valid unique DSOA Space members. One later OA-sum assertion
+  depends on those Space indexes.
+- The MixedAir mechanical-ventilation test also has no sizing input or
+  controlled Zone and maps six valid unique DSOA Space members. Three later
+  mechanical-OA assertions depend on those indexes.
+
+No assertion immediately inspects a CP244-owned allocation, `ZoneNum`,
+copied sizing field, `MinOA`, EIO row, EMS binding, or latch. The three
+direct calls provide five descendant oracles only. All omit Space sizing,
+EMS registration, and enabled DOAS. The two SpaceList fixtures plus the later
+full-simulation fixture cover three lists and 12 members, all valid and
+unique.
+
+Six direct `SizeZoneEquipment` call expressions explicitly force the setup
+latch false before their first call and execute CP244 zero times.
+
+### Sizing and active-simulation census
+
+Eighteen direct `ManageSizing` expressions exist. The plant-only context
+does not enter the sizing parent. Each of the other 17 starts with a fresh
+true latch and completes exactly one CP244 call. Across those states the
+static aggregate is:
+
+- 24 sizing inputs, 24 controlled Zones, 24 successful thermostat checks,
+  24 Zone fills, and 24 Zone `calcSizingOA` calls;
+- heating `FromDDCalc` in all 24 records, with cooling `FromDDCalc` in 17 and
+  `DesignDayWithLimit` in seven;
+- 23 Zone roles linked to an individual DSOA and one PIU role without OA;
+- no Space sizing, enabled DOAS, EMS, or DSOA SpaceList; and
+- 30 design-day weather records across the 17 independent states.
+
+These are per-state aggregates; no single context contains all records.
+
+Among 57 active `ManageSimulation` expressions, 56 complete and one stops
+in EMS before HVAC. Thirty-four completing configurations perform Zone
+sizing, begin with fresh latches, and each complete CP244 exactly once. Their
+static aggregate is:
+
+- 48 matching sizing inputs, controlled Zones, successful thermostat checks,
+  Zone fills, and Zone OA-child calls;
+- 48 records with both airflow methods `FromDDCalc`;
+- seven Space-sizing configurations with three Spaces each, producing 21
+  Space fills and OA-child calls;
+- one enabled-DOAS Zone and no enabled-DOAS Space;
+- one valid unique two-member DSOA SpaceList configuration;
+- no explicit EMS, ExternalInterface, or PythonPlugin object and therefore
+  no EMS-registration branch; and
+- 64 design-day weather records across the 34 independent states.
+
+The remaining 22 completing configurations and the pre-HVAC fatal context
+do not enter CP244. Repeated `SizeZoneEquipment` calls after the first setup
+see the false latch, so the figures are setup calls rather than sizing
+timestep or design-day iteration counts.
+
+No test covers an unknown sizing Zone, a nonempty sizing input with no
+controlled equipment, a controlled-list miss, first-input fallback, pulse
+warning suppression, a missing/duplicate/cross-Zone Space member, shared
+`dsoaError`, direct Space-sizing array or overwrite assertions, EMS
+registration, a nondefault per-Zone sizing-factor EIO row, exact terminal,
+weather, or averaging extents, child failure, late-fatal prefix, replay, or
+coordinated reset.
+
+### Rust boundary and status
+
+Crate-wide exact searches find no `SetUpZoneSizingArrays`,
+`set_up_zone_sizing_arrays`, `ZoneSizingInput`, `FinalZoneSizing`,
+`CalcZoneSizing`, `TermUnitFinalZoneSizing`, `DesDayWeath`, `calcSizingOA`,
+`fillZoneSizingFromInput`, `AutoCalcDOASControlStrategy`,
+`NumTimeStepsInAvg`, or global sizing-factor state.
+
+Rust does type normalized Zones, Spaces, ordinary building `SpaceList`
+records, bounded direct-Zone thermostats, equipment connections, and
+individual `DesignSpecification:OutdoorAir` records. It also has
+IdealLoads-only OA calculations and time-axis structures. These are adjacent
+typed or limited-runtime subsets. Authored `Space` and ordinary `SpaceList`
+remain run-blocked, and the latter is not
+`DesignSpecification:OutdoorAir:SpaceList`; Rust has no typed DSOA
+SpaceList, Zone/Space sizing arena, one-time setup latch, source validation
+and fallback order, design-day weather sizing storage, EMS sizing registry,
+EIO writer, or late-fatal/replay transaction.
+
+`Sizing:*` and `ZoneSizing*` remain run-blocked in the capability contract,
+and EMS/Python/Airflow modifiers are independently run-blocked. The sole raw
+`Sizing:Zone` fixture expects `UnsupportedSizing` before runtime, while the
+active data-model corpus contains no `Sizing:Zone`. Existing typed graph,
+thermostat, OA, schedule, output, and IdealLoads evidence therefore cannot
+promote CP244.
+
+CP244 adds no algorithm-level EnergyPlus source, Rust target, executable
+code, mapped state, test, object support, capability, output implementation,
+comparator, case, manifest, numerical, performance, or conformance
+promotion. The algorithm remains `scaffold` with claim level `none`. The
+inventory becomes 32 algorithms and 249 routines, split 58 `state_mapped`
+plus 191 `source_mapped`, with 126 required; the heat-balance and HVAC
+project lists become 88 and 15.
+
+CP245 next maps `ZoneEquipmentManager::calcSizingOA`, declared at
+`ZoneEquipmentManager.hh` lines 111-117 and implemented at
+`ZoneEquipmentManager.cc` lines 1084-1206.
 
 ## Claim Requirements
 
