@@ -9860,9 +9860,123 @@ and 253 routines, split 58 `state_mapped` plus 195 `source_mapped`, with 130
 required; the heat-balance project list remains 88 and the HVAC list becomes
 19.
 
-CP249 next maps `ZoneEquipmentManager::updateZoneSizingDuringDay`, declared at
+## CP249 `updateZoneSizingDuringDay` System-Substep Sizing Accumulation
+
+CP249 adds canonical required `routine.update_zone_sizing_during_day` after
+`update_zone_sizing_begin_day` and before `sim_zone_equipment`, plus the
+matching HVAC project item. The exact helper is declared at
 `ZoneEquipmentManager.hh` lines 134-141 and implemented completely at
 `ZoneEquipmentManager.cc` lines 1455-1506.
+
+The only helper expressions are in the `UpdateZoneSizing` `DuringDay` arm.
+The sole production parent expression is `HVACManager.cc` line 475, inside
+the accepted `SysTimestepLoop` and under both `!WarmupFlag` and
+`ZoneSizingCalc`. The full-zone trial and optional optimized-condenser HVAC
+repeats have no separate CP249 expression: a no-downstep result is accumulated
+once by the one-iteration loop, while adaptive downstepping recalculates and
+accumulates once per smaller accepted system substep. Each call uses
+`FracTimeStepZone = TimeStepSys / TimeStepZone` and one zone-timestep slot
+computed from hour, timesteps per hour, and current timestep. All substeps of
+that zone timestep share the slot.
+
+The parent scans controlled Zones ascending. For each it passes current-day
+normal and calculated Zone records, the Zone thermostat pair, and that Zone's
+final high/low extrema, then conditionally visits stored Spaces in container
+order. Space calls use Space normal/calculated records but reuse their parent
+Zone's thermostat values and the same parent final extrema; there is no
+`FinalSpaceSizing` target, Space-local control check, global scan, sort,
+deduplication, or membership validation. One parent call dispatches
+`C + (doSpaceHeatBalanceSizing ? M : 0)` helpers for controlled Zone count
+`C` and stored membership occurrence count `M`.
+
+The helper first applies two raw strict conditions. Positive `tstatHi` replaces
+`sizTstatHi` only when greater. Positive `tstatLo` then replaces
+`sizTstatLo` only when less than the possibly updated **high**. It never reads
+the old low, whose declaration default is `1000.0`; low is the last eligible
+positive value below current high, not a running minimum. NaN comparisons are
+false, and equal, zero, or negative inputs do not update. Both possible
+extrema writes are unweighted and occur before sequence access. Valid Space
+calls cannot raise high after their preceding Zone call with identical input.
+
+Next, CP249 unconditionally overwrites four normal-daily slots in exact order:
+heating design setpoint, heating calculated thermostat temperature, cooling
+design setpoint, and cooling calculated thermostat temperature. These copy
+raw values without fraction weighting, so the last completed system substep
+wins.
+
+It then applies 22 unconditional calculated-daily
+`destination += source * fracTimeStepZone` statements: seven heating
+flow/load/Zone/outdoor/return/humidity fields, the analogous seven cooling
+fields, and eight DOAS load/addition/supply fields. There is no
+`AccountForDOAS` gate. When `zoneLatentSizing` is true, eight more weighted
+additions follow: latent heating/cooling load and flow, four no-DOAS load
+fields, including sensible `CoolLoadNoDOASSeq` and `HeatLoadNoDOASSeq` inside
+the latent gate. A false gate preserves those eight elements.
+`HeatFlowSeqNoOA` and `CoolFlowSeqNoOA` are never CP249 targets.
+
+Thus one latent-false helper mutates 26 sequence elements and a latent-true
+helper 34, plus zero to two extrema scalars. The four normal fields overwrite;
+the 22 or 30 calculated fields accumulate. The fraction and the 22/30
+additive source scalars are neither checked nor normalized; negative,
+greater-than-one, zero, NaN, and infinite values follow raw IEEE arithmetic.
+A zero fraction can still create NaN from infinity, and accumulation order can
+change rounding.
+
+CP246 provides initial array allocation/zeros. Under consistent production
+topology, a completed guard-passing CP247 clears every sequence CP249 touches
+between pulse and normal passes, but does not clear the two final extrema;
+pulse extrema carry into normal. The different CP247 global-Space and CP249
+stored-membership traversals do not guarantee that reset for malformed
+topology. CP248 updates disjoint calculated-record metadata and is not a
+prerequisite for a direct CP249 call. CP249 has no local reset, latch, allocation, bounds, extent,
+timestep, fraction, topology, finite-value, role, diagnostic, status, catch,
+checkpoint, cleanup, transaction, or rollback.
+
+Possible extrema changes precede the first of 34 independent sequence
+accesses. Failure retains that scalar and array-statement prefix. Retry
+overwrites the four normal slots but repeats already committed `+=`
+contributions, so stable replay is generally non-idempotent. Duplicate Space
+membership also double-adds. Parent argument lookup failure occurs before
+helper entry, with argument evaluation order unspecified. Production storage
+is distinct, but direct callers can alias the two records, high/low refs, or a
+scalar ref with record state and thereby alter later reads; no alias guard
+exists.
+
+No C++ test calls the helper directly. Two direct parent tests each use one
+Zone, no Space, one slot, unit fraction, latent false, and positive thermostat
+pairs. Both extrema conditions succeed, but neither extrema nor any sequence
+element is asserted. The only test expectations naming the 26 unconditional
+sequence fields belong to CP247's manually seeded reset test, which never
+calls DuringDay; the eight latent-gated sequences and both extrema have no
+direct oracle.
+
+Adaptive traces are absent, so production-style active-test calls are not
+exactly measured. Their one-system-substep nominal floor is 12,288 parent
+calls and 23,424 helpers: 17,376 Zone plus 6,048 Space, with 21,840 normal and
+1,584 pulse helpers. The latent gate is true for a nominal 3,744 and false for
+19,680. Adaptive downsteps can increase those counts. Later final
+thermostat/peak and sizing-table assertions are composite evidence after
+moving average, peak selection, final propagation, and reporting, not
+isolating CP249.
+
+Rust has no exact helper, fraction, extrema, sequence family,
+normal/calculated Zone/Space sizing records, dispatcher, or accumulation
+transaction. Thermostat links, diagnostic setpoint series, demand snapshots,
+IdealLoads timing, and adaptive run-period heat-balance averages are adjacent
+only. No active case has `Sizing:Zone`; raw design days disable sizing and are
+ignored, while the raw sizing fixture remains run-blocked.
+
+CP249 adds no algorithm-level source, Rust target/code/state, test, object
+support, capability, output implementation, comparator, case, manifest,
+numerical, performance, or conformance promotion. The parent algorithm
+remains `scaffold` with claim level `none`. Inventory becomes 32 algorithms
+and 254 routines, split 58 `state_mapped` plus 196 `source_mapped`, with 131
+required; the heat-balance project list remains 88 and the HVAC list becomes
+20.
+
+CP250 next maps `ZoneEquipmentManager::updateZoneSizingEndDayMovingAvg`,
+declared at `ZoneEquipmentManager.hh` line 143 and implemented completely at
+`ZoneEquipmentManager.cc` lines 1508-1529.
 
 ## Promotion Requirements
 

@@ -139,6 +139,7 @@ required_routines = [
   "fill_zone_sizing_from_input",
   "rezero_zone_sizing_arrays",
   "update_zone_sizing_begin_day",
+  "update_zone_sizing_during_day",
   "sim_zone_equipment",
   "sim_purchased_air",
   "get_purchased_air",
