@@ -12542,14 +12542,202 @@ time/schedule 22, with readiness `0/88`, `0/44`, `0/1`, and
 `0/22`. The IdealLoads parent remains `scaffold` at claim level
 `none`.
 
-CP275 next adds required source-mapped
+## CP275 `CalcZoneMixingFlowRateOfReceivingZone` Mixing Distributor
+
+CP275 adds canonical required
 `routine.calc_zone_mixing_flow_rate_of_receiving_zone` immediately after
 `routine.get_stand_alone_erv_nodes` and before
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+requirement. It changes no EnergyPlus source inventory.
+
+The routine is declared at `ZoneEquipmentManager.hh` line 236 and
+implemented completely at `ZoneEquipmentManager.cc` lines 6952-6977.
+Its source interface is
+
+`void CalcZoneMixingFlowRateOfReceivingZone(
+    EnergyPlusData &state,
+    int const ZoneNum,
+    Real64 &ZoneMixingMassFlowRate);`
+
+The header uses the parameter name `ZoneMixingAirMassFlowRate`; parameter
+names are not part of the function type. The definition adds only top-level
+`const` to the by-value Zone identity. The final argument is a mutable
+input/output reference. There is no default, result status, or exception
+specification. CP274 ends at source line 6950; CP276
+`CalcZoneMixingFlowRateOfSourceZone` starts at line 6979.
+
+There are exactly two executable production call expressions, both inside
+CP269 `CalcZoneMassBalance`. The first is Zone-mass-balance-flagged; the
+second has an independent enforced adjustment guard.
+
+- The line-5073 expression runs once per such Zone on every CP269 building
+  pass. Iteration zero, AdjustReturnOnly, and AdjustReturnThenMixing pass the
+  retained Zone incoming-mixing total. Later mixing-first paths instead pass
+  `max(0, return + exhaust - inlet + source mixing)`.
+- The line-5138 expression runs independently under enforced
+  AdjustReturnThenMixing after CP269 has adjusted return flow. When line 5073
+  also ran, this is the second call. It passes the newly recomputed
+  nonnegative residual before CP269 recalculates return flow again.
+
+CP275 first binds `MassConservation(ZoneNum)`, initializes a local
+accumulator to zero, and snapshots
+`NumReceivingZonesMixingObject`. A positive count drives one 1-based
+pass. For each stored occurrence it reads
+`ZoneMixingReceivingPtr(Loop)`, then writes
+
+`Mixing(MixingNum).MixingMassFlowRate =
+    ZoneMixingReceivingFr(Loop) * ZoneMixingMassFlowRate;`
+
+It immediately adds that stored object value to the local accumulator and
+calls CP276 with the object's `FromZone`. CP276 recalculates that source
+Zone's aggregate from its source-pointer list and the current Mixing object
+flows. Because the child runs after every object write, an intermediate
+source aggregate can combine the new prefix with retained values for
+not-yet-visited objects.
+
+The consumed pointer arrays come from earlier HeatBalanceAirManager topology
+state. When `AirFlowFlag` and enforcement reach CP190, the producer first
+zeros all `N` fraction slots. Only a strictly positive global-prefix
+`Mixing(Loop).DesignLevel` sum causes it to normalize that prefix instead of
+the `Mixing(ZoneMixingReceivingPtr(Loop))` objects; schedule- or EMS-adjusted
+`DesiredAirFlowRate` is ignored. A zero, negative, or NaN sum leaves all
+fractions zero. A disjoint/non-prefix receiver list can therefore carry
+weights from different Mixing objects into CP275. This is precomputed
+dependency state, not a CP275-local correction.
+
+After the loop, CP275 writes the accumulated total to the receiver's
+`MassConservation.MixingMassFlowRate` and overwrites the caller-owned
+input/output reference with the same value. A zero or negative stored count
+still performs both final writes with zero, but it calls no child and clears
+neither Mixing objects nor any source-Zone aggregate.
+
+The body has one `if`, one indexed loop, one CP276 call site, and six
+indexed-accessor sites, or seven call/accessor expressions in total. It has
+three direct persistent mutation sites across three paths: the selected
+Mixing object flow, the receiver aggregate, and the mutable reference.
+The local accumulator addition and all CP276 mutations are additional.
+
+For a positive count `R`, dynamic work is `R` fraction/object
+assignments, `R` accumulator reads/additions, `R` CP276 calls, and
+two final writes. CP276's nested source-pointer and total-Mixing scans are
+separate work.
+
+CP275 validates neither Zone identity, count or array extent, Mixing pointer
+or `FromZone` identity/ownership, fraction range, sum, or finiteness,
+input flow sign or finiteness, duplicates, aliases, nor topology
+consistency. It emits no diagnostic and has no status, checkpoint, catch,
+rollback, cleanup, or retry protocol.
+
+A failed pointer, fraction, object, or child access retains every completed
+object write and CP276 source-aggregate update. The current object write and
+local addition precede its child, so child failure retains that object too.
+The receiver aggregate and caller reference normally remain at their
+pre-call/input values because their two writes occur only after every child
+returns. There is no cleanup of this torn state.
+
+Duplicate receiver pointers are counted once per stored slot in the local
+total even though the shared Mixing object retains only its last write.
+Fractions need not sum to one, so the returned total can differ from the
+requested input. Negative, greater-than-one, infinite, and NaN fractions or
+input flow propagate without a local clamp. Malformed source lists can make
+the per-object CP276 updates disagree with the receiver total.
+
+With fixed valid topology, a nonaliased input flow freshly restored to the
+same value, and successful children, replay overwrites object/source and
+receiver state and can repair a partial prefix. Reusing the same mutable
+reference after success is different: the first call replaces input `Q`
+with the stored-order fraction sum of `Q * f[i]`, and the next call uses
+that result as its new input. Repeated direct calls therefore compound that
+scale and are idempotent only in special cases such as an exact unit fraction
+sum or zero flow. Production line 5138 recomputes its local desired flow
+before this independent call. Aliasing the reference to a selected Mixing
+flow or a source aggregate that CP276 overwrites can make the in-loop input
+order-dependent. A fraction or receiver-destination alias is instead mutated
+at the tail and changes resulting state or later replay. Production passes a
+local scalar.
+
+No C++ unit calls CP275 directly. Of 19 literal direct CP269 calls across
+eight tests, 13 calls in five mixing/mass-conservation tests activate CP275:
+three each for AdjustMixingOnly, AdjustReturnOnly,
+AdjustReturnThenMixing, and AdjustMixingThenReturn, plus one three-Zone
+source-and-receiver chain. The other six direct parents execute no CP275
+route. Indirect parent fixtures have no active mixing/mass-conservation
+topology.
+
+For an enforced CP269 parent with `P` solver passes,
+`C_flagged` flagged controlled Zones, and `C_controlled` total controlled
+Zones, the first site contributes `P*C_flagged` calls.
+AdjustReturnThenMixing independently contributes
+`P*C_controlled`. Since `P` ranges from two through 25 and all applicable
+controlled Zones are mixing participants in the active tests, the four
+one-Mixing two-Zone suites bound each parent expression at 4-50 calls, except
+return-then-mixing at 8-100. The three-Zone
+chain bounds its one expression at 6-75. Across the 13 active direct parents,
+the unit CP275 execution bound is 66-825; their receiver-occurrence footprint
+separately bounds CP276 child calls at 34-425. No test exposes or asserts the
+actual pass count.
+
+Those tests make 54 final MassConservation assertions, split 27 receiver
+`MixingMassFlowRate` and 27 child-owned `MixingSourceMassFlowRate`
+checks, plus 11 `zoneHeatBalance.MixingMassFlowZone` assertions. Every
+active receiver has one stored Mixing occurrence with effective fraction
+one, so none distinguishes fraction iteration from a direct copy. Six Zone
+values are asserted after a post-parent CP273 call, while five observe the
+retained pre-parent CP273 value. They are composite CP269/CP273 evidence rather than
+isolated CP275 oracles.
+One separate no-adjust parent asserts that a Mixing object remains 0.1 on a
+route that never executes CP275.
+
+Coverage omits the mutable-reference result, zero/negative receiver count,
+one versus multiple unequal fractions, non-unit sums, duplicates and order,
+invalid extents, pointers and source Zones, aliases, negative/nonfinite
+values, a child failure prefix, fixed-input repair, same-reference replay,
+and isolation of the first versus second AdjustReturnThenMixing call.
+
+Rust has no exact or snake-case routine, Zone mixing arena,
+MassConservation records, receiver pointer/fraction arrays, source aggregate,
+flow-adjustment mode, CP276 child, or shared mutable input/output flow. Typed
+`Construction:AirBoundary` remains run-blocked metadata and explicitly
+defers generated ZoneCrossMixing and runtime mixing. Rust Zone equipment
+lists accept only IdealLoads entries, and compatibility execution calls
+PurchasedAir directly.
+
+The exact 120-model data census has zero ZoneMixing, ZoneCrossMixing, or
+ZoneAirMassFlowConservation objects. All 30 active equipment lists contain
+one IdealLoads entry and no mixing topology, so both EnergyPlus and Rust
+fixture lanes execute CP275 zero times. With enforcement enabled,
+non-NoAdjust mass-balance input, and a positive combined receiving/source
+count, EnergyPlus registers `Zone Air Mass Balance Mixing Receiving Mass Flow
+Rate` against CP275 state and the paired Source variable against CP276.
+All 140 case manifests request zero of both exact variables and zero generic
+Zone Mixing or Cross Mixing flow, volume, mass, sensible, latent, or
+contaminant output. The sole C++ mass-balance report-variable test requests
+only exhaust mass flow and owns no Mixing object, so it registers or asserts
+neither CP275/CP276 row. Existing outdoor-air and node rows cannot prove this
+distribution protocol.
+
+The roadmap still requires typed receiving/source mixing ownership,
+MassConservation pointer and fraction state, ordered object-flow
+distribution, source aggregate recomputation, CP269 adjustment/iteration
+integration, outputs, and failure/replay semantics.
+
+CP275 changes no Rust target or state, support declaration, test, capability,
+output, comparator, case, manifest, numerical claim, performance claim, or
+conformance status. Counts become 32 algorithms and 279 routines, split 58
+`state_mapped` plus 221 `source_mapped`, with 156 required.
+Domain-required counts become heat-balance 88, HVAC 45, plant 1, and
+time/schedule 22, with readiness `0/88`, `0/45`, `0/1`, and
+`0/22`. The IdealLoads parent remains `scaffold` at claim level
+`none`.
+
+CP276 next adds required source-mapped
+`routine.calc_zone_mixing_flow_rate_of_source_zone` immediately after
+`routine.calc_zone_mixing_flow_rate_of_receiving_zone` and before
 `routine.sim_purchased_air`.
-`CalcZoneMixingFlowRateOfReceivingZone` is declared at
-`ZoneEquipmentManager.hh` line 236 and implemented completely at
-`ZoneEquipmentManager.cc` lines 6952-6977.
-`CalcZoneMixingFlowRateOfSourceZone` begins at source line 6979.
+`CalcZoneMixingFlowRateOfSourceZone` is declared at
+`ZoneEquipmentManager.hh` line 238 and implemented completely at
+`ZoneEquipmentManager.cc` lines 6979-7004.
+`AutoCalcDOASControlStrategy` begins at source line 7006.
 
 ## Claim Requirements
 
