@@ -5941,10 +5941,433 @@ required domains become heat balance 88, HVAC 25, plant 1, and time 22. HVAC
 readiness remains `0/25`; the inventory is incomplete and all 25 required
 HVAC routines remain below `family_gated`.
 
-CP255 next maps
-`ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc3`, declared at
-`ZoneEquipmentManager.hh` lines 164-167 and implemented completely at
-`ZoneEquipmentManager.cc` lines 2646-2764.
+## CP255 `updateZoneSizingEndZoneSizingCalc3` Latent Peak Selection
+
+CP255 adds canonical required
+`routine.update_zone_sizing_end_zone_sizing_calc3` immediately after
+`write_zsz_spsz` and before `sim_zone_equipment`. The physical declaration is
+`ZoneEquipmentManager.hh` lines 164-167, and the complete body is
+`ZoneEquipmentManager.cc` lines 2646-2764:
+
+```cpp
+void updateZoneSizingEndZoneSizingCalc3(
+    DataSizing::ZoneSizingData &zsCalcFinalSizing,
+    Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,
+    bool &anyLatentLoad,
+    int const zoneOrSpaceNum);
+```
+
+The leaf receives one mutable calculated-final record, a mutable daily sizing
+matrix for the same role family, a shared mutable boolean, and an unchecked
+Zone-or-Space index. It returns `void`, emits no direct output or diagnostic,
+and has no EnergyPlus state argument. Its only work is conditional in-place
+selection of latent peaks into ordinary sensible-named fields.
+
+### Parent gate, roles, and downstream order
+
+The sole production calls are the two sites at
+`ZoneEquipmentManager.cc` lines 3444-3451. They remain inside the nonpulse
+EndZone block and occur after every CP253 receiver and after CP254 has selected,
+opened, written, and closed ZSZ plus optional SPSZ. CP254 therefore serializes
+pre-CP255 state. The parent then executes:
+
+```text
+for zoneNum = 1..NumOfZones:
+    skip unless ZoneEquipConfig(zoneNum).IsControlled
+    skip unless CalcFinalZoneSizing(zoneNum).zoneLatentSizing
+    Calc3(CalcFinalZoneSizing(zoneNum), CalcZoneSizing,
+          shared isAnyLatentLoad, zoneNum)
+    if doSpaceHeatBalanceSizing:
+        for spaceNum in Zone(zoneNum).spaceIndexes:
+            Calc3(CalcFinalSpaceSizing(spaceNum), CalcSpaceSizing,
+                  shared isAnyLatentLoad, spaceNum)
+```
+
+The Zone calculated-final `zoneLatentSizing` flag gates both that Zone and
+all of its stored Spaces. There is no Space-local latent flag check, Space
+control check, owner lookup, deduplication, membership validation, or
+comparison between Zone and Space methods. A stored duplicate or cross-list
+entry repeats the same Space record in source container order. A direct leaf
+caller bypasses every parent gate and can pass either role or arbitrary
+storage.
+
+Pulse sizing skips CP255 entirely. After every selected Zone and stored Space
+returns, the parent exits the pulse guard and starts CP256 Calc4 at lines
+3459-3464, then Calc5-7. Those routines copy or consume the ordinary fields
+that CP255 may have replaced. A CP255 non-return preserves the already-closed
+preselection ZSZ/SPSZ artifacts but suppresses the remaining Calc3 roles,
+Calc4-7, facility sizing, and the final `ZoneSizingRunDone` latch.
+
+Let `Q` be controlled Zones whose calculated-final Zone latent flag is true
+and `M` be stored Space-membership occurrences beneath those Zones when Space
+sizing is enabled. A normal parent entry dispatches `Q + M` leaves. A
+false Zone flag can suppress a Space whose own record requests latent sizing;
+a true Zone flag can dispatch a `Sensible`, `SensibleOnly`, `Invalid`, or
+otherwise inconsistent Space record that then performs no selection.
+
+### Independent cooling and heating predicates
+
+Cooling is evaluated first, and heating is evaluated afterward even when
+cooling completed. Their exact predicates are:
+
+| mode | `ZoneSizing::Latent` | `ZoneSizing::SensibleAndLatent` | other methods |
+|---|---|---|---|
+| cooling | `DesLatentCoolVolFlow > 0.0` | `DesLatentCoolLoad > DesCoolLoad` | false |
+| heating | `DesLatentHeatVolFlow > 0.0` | `DesLatentHeatLoad > DesHeatLoad` | false |
+
+The source comment says combined sensible-and-latent selection uses the larger
+volume flow, but the executable code compares loads. Exact `Latent` ignores
+the load comparison and can select a smaller or negative latent load when its
+volume flow is positive. Exact `SensibleAndLatent` ignores latent volume and
+can select zero or negative volume when its latent load wins. All comparisons
+are strict and raw: ties and NaN are false, infinities follow ordinary IEEE
+comparison, and companion NaN/Inf/negative fields propagate after a branch is
+selected.
+
+`Sensible`, `SensibleOnly`, `Invalid`, and out-of-range enum values satisfy
+neither explicit equality. The method can be read once or twice in each ordered
+condition: a successful `Latent` conjunct short-circuits the second access;
+otherwise the `SensibleAndLatent` conjunct reads it again. There is no
+consistency check against the parent `zoneLatentSizing` gate.
+
+Cooling's first statement is `anyLatentLoad = true`. No statement resets that
+reference, and the heating branch never writes it. Across Zone and Space
+calls it is therefore a monotonic, cooling-only latch: a selected heating-only
+case can leave it false, while a prior selected cooling case leaves it true
+for every later role and replay.
+
+### Calculated-final projection
+
+A selected mode writes exactly 16 calculated-final destinations in statement
+order. Cooling and heating use the following symmetric projection:
+
+| destination concept | cooling source | heating source |
+|---|---|---|
+| sizing type | literal `Latent Cooling` | literal `Latent Heating` |
+| design volume flow | `DesLatentCoolVolFlow` | `DesLatentHeatVolFlow` |
+| design mass flow | `DesLatentCoolMassFlow` | `DesLatentHeatMassFlow` |
+| design load | `DesLatentCoolLoad` | `DesLatentHeatLoad` |
+| design-day name | `LatCoolDesDay` | `LatHeatDesDay` |
+| design-day date string | `cLatentCoolDDDate` | `cLatentHeatDDDate` |
+| design-day number | `LatentCoolDDNum` | `LatentHeatDDNum` |
+| peak timestep | `TimeStepNumAtLatentCoolMax` | `TimeStepNumAtLatentHeatMax` |
+| ordinary flow sequence | `LatentCoolFlowSeq` | `LatentHeatFlowSeq` |
+| coil-in temperature | `DesLatentCoolCoilInTemp` | `DesLatentHeatCoilInTemp` |
+| coil-in humidity ratio | `DesLatentCoolCoilInHumRat` | `DesLatentHeatCoilInHumRat` |
+| return temperature at peak | `ZoneRetTempAtLatentCoolPeak` | `ZoneRetTempAtLatentHeatPeak` |
+| Zone temperature at peak | `ZoneTempAtLatentCoolPeak` | `ZoneTempAtLatentHeatPeak` |
+| Zone humidity ratio at peak | `ZoneHumRatAtLatentCoolPeak` | `ZoneHumRatAtLatentHeatPeak` |
+| peak date/time string | `LatCoolPeakDateHrMin` | `LatHeatPeakDateHrMin` |
+| design supply humidity ratio | mode-specific formula | mode-specific formula |
+
+The ordinary destinations are respectively `CoolSizingType` or
+`HeatSizingType`, `DesCool*` or `DesHeat*`, `CoolDesDay` or `HeatDesDay`,
+`cCoolDDDate` or `cHeatDDDate`, `CoolDDNum` or `HeatDDNum`,
+`TimeStepNumAtCoolMax` or `TimeStepNumAtHeatMax`, `CoolFlowSeq` or
+`HeatFlowSeq`, the corresponding ordinary coil/Zone/return fields,
+`CoolPeakDateHrMin` or `HeatPeakDateHrMin`, and `CoolDesHumRat` or
+`HeatDesHumRat`.
+
+The sequence assignment copies the entire current latent flow sequence into
+the ordinary flow sequence. CP255 does not copy `LatentCoolLoadSeq` or
+`LatentHeatLoadSeq` into the ordinary load sequences. It also leaves outdoor
+peak state, densities, thermostat values, no-DOAS state, all latent source
+fields, and every other ordinary field outside this 16-member destination set
+untouched.
+
+The calculated-final humidity assignment is:
+
+```text
+if ZnLatCoolDgnSAMethod == SupplyAirHumidityRatio:
+    CoolDesHumRat = LatentCoolDesHumRat
+else:
+    CoolDesHumRat =
+        ZoneHumRatAtLatentCoolPeak - CoolDesHumRatDiff
+
+if ZnLatHeatDgnSAMethod == SupplyAirHumidityRatio:
+    HeatDesHumRat = LatentHeatDesHumRat
+else:
+    HeatDesHumRat =
+        ZoneHumRatAtLatentHeatPeak + HeatDesHumRatDiff
+```
+
+`SupplyAirHumidityRatio` is exact raw integer value 3. Every other integer,
+including the expected difference method, zero, negative, or invalid values,
+takes the `else` formula. Neither formula calls psychrometrics or applies
+clamp, saturation, nonnegativity, finite, or physical-range validation.
+
+### Selected daily projection
+
+Only after all 16 final assignments for a mode, CP255 tests the final record's
+unchanged latent day source:
+
+```text
+if final.LatentCoolDDNum > 0:
+    daily = zsCalcSizing(final.LatentCoolDDNum, zoneOrSpaceNum)
+if final.LatentHeatDDNum > 0:
+    daily = zsCalcSizing(final.LatentHeatDDNum, zoneOrSpaceNum)
+```
+
+Zero or negative latent day numbers skip daily mutation even though the final
+ordinary fields, including ordinary day number, were already replaced.
+Positive values receive no upper-bound check. `zoneOrSpaceNum` is not checked,
+and the matrix role, allocation, dimensions, and selected record identity are
+not validated. Invalid positive state can therefore fail only after the final
+record has a complete selected-mode prefix.
+
+The selected daily record receives 15 assignments: the same projection as
+the final record except that no sizing-type field is written. Most right-hand
+sides come from that daily record's own latent fields. Three identity details
+are deliberately asymmetric:
+
+- lookup uses the *final* record's positive latent day number;
+- ordinary daily `CoolDDNum`/`HeatDDNum` receives the selected daily record's
+  own `LatentCoolDDNum`/`LatentHeatDDNum`, which may differ from the lookup
+  day;
+- ordinary daily `cCoolDDDate`/`cHeatDDDate` and
+  `CoolPeakDateHrMin`/`HeatPeakDateHrMin` receive the *final* record's latent
+  date and peak strings rather than the daily record's corresponding latent
+  strings.
+
+The daily `ZnLatCoolDgnSAMethod` or `ZnLatHeatDgnSAMethod` and daily humidity
+inputs choose the same direct-versus-difference formula independently of the
+final record. Inconsistent final/daily state can therefore mix lookup day,
+stored day number, date string, peak string, and humidity method in one
+selected daily record.
+
+Only one design-day record per selected mode is considered. All other daily
+records remain preselection state. The final and daily arguments are not
+declared disjoint; a direct caller can bind the final reference to an element
+of the supplied matrix, collapsing the two logical roles without any alias
+check.
+
+### Member and assignment boundary
+
+Exact token census finds 67 unique `ZoneSizingData` member names across the
+body. The final record reads or writes all 67; selected daily records use a
+60-member subset. Of those names, 32 are distinct final destinations—16
+cooling and 16 heating—and 30 are distinct daily destinations. The other 35
+members are source-only within CP255.
+
+The source contains 66 record-assignment sites and one shared-bool assignment
+site. Four record destinations have mutually exclusive humidity
+`if`/`else` assignment sites, so at most 62 record assignments execute in one
+leaf. Let `C` and `H` be zero/one cooling and heating selection indicators,
+and let `d_C` and `d_H` indicate that the selected mode's final latent day
+number is positive. The exact executed counts are:
+
+| operation | count |
+|---|---:|
+| final record assignments | `16(C + H)` |
+| daily record assignments | `15(C*d_C + H*d_H)` |
+| shared flag assignments | `C` |
+| whole flow-sequence copies | `C + H + C*d_C + H*d_H` |
+| daily matrix element selections | `C*d_C + H*d_H` |
+
+The maximum is 62 record assignments, one bool assignment, four sequence
+copies, and two daily element selections. Runtime is constant apart from the
+lengths and allocation behavior of copied strings and flow sequences; there
+is no size guard.
+
+### Invalid state and partial mutation
+
+CP255 has no preflight over either mode or record family. There is no local
+validation, diagnostic, return status, catch, transaction, cleanup guard, or
+rollback. Each branch is a sequence of ordinary assignments.
+
+For cooling, `anyLatentLoad = true` commits before `CoolSizingType` and every
+record assignment. A string or flow-sequence allocation/assignment failure can
+therefore leave the flag and an arbitrary final-field prefix. Daily matrix
+lookup occurs after the final humidity assignment, so an invalid positive
+day/role index leaves the final cooling record fully selected before any daily
+write. Cooling non-return prevents the independent heating predicate.
+
+Heating starts only after cooling returns. A heating failure retains every
+completed cooling effect and an ordered heating prefix. A failure in a Space
+retains the Zone and prior stored-Space results; later Space occurrences,
+later Zones, and Calc4-7 are skipped. CP254 artifacts remain closed and
+unchanged because they were written before this leaf.
+
+Zero or negative selected latent day numbers are not errors. They deliberately
+leave a complete selected final record paired with entirely unchanged daily
+records. An invalid role or unallocated matrix can remain latent and
+unobserved when neither selected mode has a positive day. Positive malformed
+indices can assert, throw, or enter undefined behavior according to the
+container/build boundary; CP255 establishes no defined recovery.
+
+Raw method values, comparisons, date strings, vector extents, and IEEE values
+are trusted. Once a branch selects, NaN/Inf/negative companion loads, flows,
+temperatures, humidity ratios, and differences copy or combine without a
+diagnostic. Final and daily humidity methods can disagree, and no invariant
+requires a selected daily record's latent day number to equal its matrix
+index.
+
+### Replay and duplicate behavior
+
+The two selection methods have different replay behavior:
+
+- Under exact `ZoneSizing::Latent`, the positive latent volume-flow source is
+  not modified. A replay normally re-enters that mode, reapplies the prefix,
+  and can repair later fields if the original abnormal condition has been
+  removed. A persistent bad day/index fails again.
+- Under exact `ZoneSizing::SensibleAndLatent`, the branch writes
+  `DesCoolLoad = DesLatentCoolLoad` or
+  `DesHeatLoad = DesLatentHeatLoad` near the start. Any replay after that
+  statement sees equality in the strict load predicate and skips the whole
+  mode. A failure in the later final tail, humidity assignment, daily lookup,
+  or daily tail can therefore create a torn state that direct leaf retry
+  cannot repair.
+
+The same equality conversion makes a completed `SensibleAndLatent` branch
+one-shot under duplicate stored Space membership: the first call selects and
+the next call normally skips. Exact `Latent` duplicates repeat assignments.
+If an external caller clears `anyLatentLoad` after a partial or completed
+combined-method cooling selection, replay can skip cooling and leave that
+latch false despite retained selected fields.
+
+A direct caller may alias `zsCalcFinalSizing` with the selected daily array
+element. The source performs all final assignments before acquiring the daily
+reference and has no alias barrier, so final and daily roles collapse into a
+single record and later assignments overwrite the same ordinary destinations.
+There is likewise no protection against aliasing inside string or sequence
+storage beyond the underlying assignment types.
+
+Whole-parent replay has a broader non-idempotence boundary. Before CP255 it
+reruns EMS/CP252/CP253 and CP254. CP253 and the writer can observe a partially
+or fully latent-selected ordinary record left by the first attempt; a reopened
+ZSZ/SPSZ can therefore contain different peak-load, flow, design-day-header,
+and ordinary-day-selector-dependent condition bytes than the first preselection
+file. CP254's fixed time labels do not change, and it consumes none of the four
+CP253 peak timestamp strings. Later Calc4-7 copies can also see a mixed record
+even when the combined-method branch now skips.
+
+### Parent failure propagation
+
+The parent ordering distinguishes three failure prefixes:
+
+- a Zone cooling or heating non-return suppresses all of its Spaces, later
+  Zones, Calc4-7, facility sizing, and the run-done latch;
+- a Space non-return preserves its completed parent Zone and earlier Spaces
+  but suppresses the remaining traversal and same downstream work;
+- a normally returning no-op role changes nothing and permits all downstream
+  copies.
+
+Because cooling sets the shared flag first, a later failure can expose
+`isAnyLatentLoad = true` with no complete selected record. Heating-only
+selection can expose the opposite asymmetry: fully selected heating state with
+the shared flag still false. Nothing in CP255 resets either record fields or
+the flag on a later parent entry.
+
+### C++ evidence
+
+No C++ test calls `updateZoneSizingEndZoneSizingCalc3` directly. The two
+direct EndZone parent calls in `ZoneEquipmentManager.unit.cc`, near lines
+4576 and 4877, set `isPulseZoneSizing = true` immediately beforehand and
+dispatch zero CP255 leaves.
+
+A fresh completing production-style census contains 51 normal and six pulse
+EndZone entries. Normal entries visit 72 controlled Zone roles at the CP255
+parent gate: four calculated-final Zone records have `zoneLatentSizing = true`
+and 68 are false. Only four `SizingManager.unit.cc` simulations dispatch the
+leaf:
+
+| parent call site | dispatched roles |
+|---:|---|
+| near line 2874 | one Zone plus three Spaces |
+| near line 3338 | one Zone plus three Spaces |
+| near line 3802 | one Zone; Space heat balance disabled |
+| near line 4246 | one Zone plus three Spaces |
+
+The total is 13 leaves: four Zone and nine Space. The other 47 normal parent
+entries and all six pulse entries dispatch none.
+
+The first three dispatching inputs use exact `Sensible`, producing nine leaf
+no-ops. The last uses `SensibleAndLatent` for one Zone and three Spaces.
+Within those four calls, cooling load comparison is true only for Space 1 and
+false for the other three; heating comparison is false for all four. The
+complete outcome distribution is therefore:
+
+| outcome | calls |
+|---|---:|
+| no selected branch | 12 |
+| cooling only | 1 |
+| heating only | 0 |
+| cooling and heating | 0 |
+| exact `Latent` volume predicate | 0 |
+
+The selected Space 1 has final `LatentCoolDDNum = 2`, a 144-timestep flow
+sequence, and `HumidityRatioDifference` at both final and daily levels. It
+executes 16 final plus 15 daily record assignments, two difference-formula
+arms, two whole flow-sequence copies, and the bool assignment. That is 31
+record-assignment statements plus one flag statement. Treating each
+144-element sequence projection as element writes gives 317 record
+scalar/elements plus the flag, 318 writes total.
+
+No assertion directly targets an ordinary CP255 destination, selected daily
+record, sizing-type literal, humidity ratio, or shared flag. The assertion
+near `SizingManager.unit.cc` line 4250 checks source member
+`TimeStepNumAtLatentCoolMax == 72`, not the ordinary destination. Five
+downstream table assertions near lines 4258-4263 cover the selected Space's
+cooling load, calculated and user flow, design day, and peak timestamp.
+
+Across the 13 roles, the four dispatching simulations assert 130 composite
+table cells. The five positive-selection descendants above are the strongest
+CP255 evidence; the other 125 are no-op/pass-through descendants and do not
+prove exact copy ownership. No test isolates assignment order or daily
+identity.
+
+Direct gaps include exact `Latent` selection, every heating selection, both
+direct-humidity branches, nonpositive final latent days, invalid day/role/
+extent state, final-versus-daily method or day mismatch, type/date labels,
+shared-latch asymmetry, ties, NaN/Inf/negative companion values, aliasing,
+duplicate/cross-list topology, partial failure, direct retry, and whole-parent
+replay.
+
+### Rust and active-data boundary
+
+An exhaustive audit of 721 Rust-crate and active-data files finds no exact or
+snake-case CP255 symbol, `zoneSizingMethod`, `anyLatentLoad`,
+`SensibleAndLatent`, or exact `SupplyAirHumidityRatio`. All 67 C++ member
+spellings and all 67 mechanical snake-case projections are absent. Rust owns
+no calculated-final/daily Zone or Space sizing arena on which this projection
+could operate.
+
+Rust does contain nearby `supply_air_humidity_ratio` fields and operational
+IdealLoads latent calculation, outdoor-air, node, and reporting code. Those
+implement bounded runtime IdealLoads behavior and output labels, not the
+EnergyPlus `ZoneSizingData` method enum, latent-versus-sensible peak selector,
+final/daily mutation set, or shared system-sizing latch. CP255 therefore must
+not be described as absence of all latent functionality, but none of that
+adjacent functionality is its counterpart.
+
+All 61 active-data `SimulationControl` objects disable Zone sizing. Five raw
+design-day objects exist, but active data contain no `Sizing:Zone`,
+`Sizing:Parameters`, authored `Space`, or `SpaceList`, nor corresponding
+active epJSON keys. The sole Rust autosizing fixture expects
+`UnsupportedSizing` and the sizing-not-ported diagnostic; capabilities
+continue to block `Sizing:*` and `ZoneSizing*`. Typed Space support exists
+only behind authored-Space fail-closed behavior, and active data exercise none.
+
+### Governance
+
+CP255 adds only required `source_mapped`
+`routine.update_zone_sizing_end_zone_sizing_calc3`. It adds no Rust target or
+state, support declaration, C++ or Rust test, capability, output
+implementation, comparator, case, manifest evidence, numerical or performance
+claim, or conformance promotion. The parent
+`algorithm.ideal_loads_zone_equipment_purchased_air_source_order` remains
+`scaffold` with claim level `none`.
+
+The generated inventory becomes 32 algorithms and 260 routines: 58
+`state_mapped` plus 202 `source_mapped`, with 137 required. Project-contract
+required domains become heat balance 88, HVAC 26, plant 1, and time 22. HVAC
+readiness remains `0/26`; the inventory is incomplete and all 26 required
+HVAC routines remain below `family_gated`.
+
+CP256 next maps
+`ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc4`, declared at
+`ZoneEquipmentManager.hh` line 169 and implemented completely at
+`ZoneEquipmentManager.cc` lines 2765-2799.
 
 ## Claim Requirements
 

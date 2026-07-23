@@ -10706,10 +10706,143 @@ become 32 algorithms and 259 routines, split 58 `state_mapped` plus 201
 HVAC readiness remains `0/25`. The parent stays `scaffold` with claim level
 `none`.
 
-CP255 next maps
-`ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc3`, declared at
+## CP255 `updateZoneSizingEndZoneSizingCalc3` Latent Peak Selection
+
+CP255 adds canonical required
+`routine.update_zone_sizing_end_zone_sizing_calc3` immediately after
+`write_zsz_spsz` and before `sim_zone_equipment`. It is declared at
 `ZoneEquipmentManager.hh` lines 164-167 and implemented completely at
-`ZoneEquipmentManager.cc` lines 2646-2764.
+`ZoneEquipmentManager.cc` lines 2646-2764:
+
+```cpp
+void updateZoneSizingEndZoneSizingCalc3(
+    DataSizing::ZoneSizingData &zsCalcFinalSizing,
+    Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,
+    bool &anyLatentLoad,
+    int const zoneOrSpaceNum);
+```
+
+The nonpulse EndZone parent reaches CP255 only after CP254 has closed ZSZ and,
+when enabled, SPSZ, so those files preserve preselection sizing state. It
+traverses ascending controlled `ZoneEquipConfig` Zones, skips a whole Zone
+unless that Zone's calculated-final `zoneLatentSizing` is true, calls the Zone
+record first, then under Space sizing calls every stored
+`Zone.spaceIndexes` occurrence. Space control, owner, membership consistency,
+and Space-local latent flags are not checked. Pulse sizing skips CP255.
+Calc4-7 start only after the complete CP255 sweep and consume its mutations.
+
+Cooling and heating are independent ordered branches. For each mode, exact
+`ZoneSizing::Latent` selects only when latent volume flow is strictly positive.
+Exact `ZoneSizing::SensibleAndLatent` instead selects when latent load is
+strictly greater than the current sensible load, despite the source comment
+describing a volume-flow comparison. `Sensible`, `SensibleOnly`, `Invalid`,
+other enum values, equality, and NaN comparisons select neither corresponding
+branch. Cooling executes first and alone sets shared `anyLatentLoad = true`;
+heating never sets or clears it. The flag is therefore a monotonic,
+cooling-only cross-role latch.
+
+A selected mode performs 16 calculated-final assignments:
+
+- set the sizing-type literal to `Latent Cooling` or `Latent Heating`;
+- replace ordinary volume flow, mass flow, and load with latent scalars;
+- replace ordinary design-day name/date/number, peak timestep, and entire
+  `CoolFlowSeq` or `HeatFlowSeq`;
+- replace coil-in temperature/humidity ratio and return/Zone
+  temperature/humidity ratio at the peak;
+- replace the ordinary peak timestamp;
+- replace design supply humidity ratio.
+
+Only after all 16 final writes, a strictly positive final
+`LatentCoolDDNum` or `LatentHeatDDNum` selects
+`zsCalcSizing(finalLatentDay, zoneOrSpaceNum)` without upper-bound, role, or
+extent validation. That daily record receives the same 15 assignments except
+for the absent sizing-type literal. Its ordinary day number comes from its
+own latent day number, while its ordinary date and peak timestamp come from
+the final record's latent strings. Its humidity method and other latent values
+are also read independently, so final and daily records can choose different
+formulas or retain inconsistent day identity. A nonpositive final day skips
+daily mutation after the final record is already replaced.
+
+For both final and daily humidity, exact integer
+`SupplyAirHumidityRatio` copies `Latent*DesHumRat`; every other integer uses
+`ZoneHumRatAtLatentCoolPeak - CoolDesHumRatDiff` for cooling or
+`ZoneHumRatAtLatentHeatPeak + HeatDesHumRatDiff` for heating. There is no
+clamp, psychrometric call, finite check, or range validation. The routine
+copies latent flow sequences but never latent load sequences and leaves
+outdoor peak conditions, thermostat/density/no-DOAS fields, latent-source
+fields, and all unselected design days untouched.
+
+The body touches 67 unique `ZoneSizingData` member names: all 67 on the final
+record and a 60-member subset on selected daily records. There are 32 unique
+final destinations, 30 unique daily destinations, 66 static record-assignment
+sites, and one shared-bool site. Let `C` and `H` indicate cooling/heating
+selection and `d_C`/`d_H` indicate positive final latent day numbers. One leaf
+executes
+
+`16(C+H) + 15(C*d_C + H*d_H)`
+
+record assignments, plus `C` flag assignment and
+`C+H+C*d_C+H*d_H` whole-sequence copies. The maximum is 62 record assignments,
+one flag assignment, and four sequence copies. Runtime is constant apart from
+copied string and sequence lengths.
+
+There is no local validation, diagnostic, status, catch, transaction,
+cleanup, or rollback. Cooling latches the flag before its first record write.
+String/sequence allocation or invalid positive daily lookup preserves every
+prior assignment; cooling failure suppresses heating, while heating failure
+preserves completed cooling. A final reference can alias a selected daily
+array element, and stored duplicate/cross-listed Spaces repeat in source
+order.
+
+Once a partial or completed `SensibleAndLatent` selection reaches the
+ordinary-load assignment, it overwrites ordinary load with latent load. On
+replay the strict greater-than predicate becomes equality and skips that branch,
+so any failure after the load assignment can strand a torn tail that direct leaf
+retry cannot repair. Exact `Latent` with positive
+latent volume flow re-enters. Whole-parent retry first replays CP253 and CP254
+against the retained ordinary/latent mixture, so rebuilt file bytes and later
+copies can differ.
+
+No C++ test calls CP255 directly. Two direct EndZone tests set pulse true and
+dispatch nothing. Across 51 normal and six pulse production-style EndZone
+entries, only four `SizingManager` simulations dispatch CP255: 13 leaves,
+four Zone plus nine Space. Nine are `Sensible` no-ops. Four are
+`SensibleAndLatent`; only one Space selects cooling, uses positive final day
+2, and executes both difference-humidity arms. Heating and exact `Latent`
+never select. That one call performs 31 record assignments plus the flag;
+with two 144-element flow-sequence copies, its scalar/element projection is
+318 writes including the flag.
+
+There is no direct assertion for a CP255 destination, daily record, sizing
+label, humidity ratio, or shared flag. One assertion pins the selected
+Space's latent-cooling source timestep, and five downstream table assertions
+cover its selected load, two flow values, day, and peak time. The four
+dispatching simulations contain 130 composite role/table assertions, of which
+the other 125 are no-op/pass-through descendants rather than exact copy
+oracles. Latent-volume selection, every heating branch, direct humidity
+selection, nonpositive/invalid day state, mismatched final/daily state,
+aliasing, duplicate topology, IEEE edges, failure, and replay remain
+unisolated.
+
+Rust contains adjacent `supply_air_humidity_ratio` and operational IdealLoads
+latent calculation/reporting, but no calculated Zone/Space sizing arena,
+Calc3 helper/key, sizing method, shared any-latent latch, or counterpart for
+any of the 67 exact or mechanical snake-case members. All 61 active
+`SimulationControl` objects disable Zone sizing; active data contain no
+`Sizing:Zone`, `Sizing:Parameters`, authored `Space`, or `SpaceList`.
+Existing sizing and authored-Space fixtures remain run-blocked.
+
+CP255 adds no Rust target/state, support declaration, test, capability,
+output implementation, comparator, case, manifest evidence, numerical or
+performance claim, or conformance promotion. Counts become 32 algorithms and
+260 routines, split 58 `state_mapped` plus 202 `source_mapped`, with 137
+required; heat-balance/HVAC lists become 88/26 and HVAC readiness remains
+`0/26`. The parent stays `scaffold` with claim level `none`.
+
+CP256 next maps
+`ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc4`, declared at
+`ZoneEquipmentManager.hh` line 169 and implemented completely at
+`ZoneEquipmentManager.cc` lines 2765-2799.
 
 ## Promotion Requirements
 
