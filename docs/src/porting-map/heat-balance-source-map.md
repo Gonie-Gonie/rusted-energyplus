@@ -23710,6 +23710,181 @@ CP260 next maps the complete parent
 `ZoneEquipmentManager.cc` lines 3223-3536. `SimZoneEquipment` begins at
 line 3538.
 
+## CP260 `UpdateZoneSizing` Four-Phase Sizing Dispatcher
+
+CP260 adds canonical required `routine.update_zone_sizing` immediately
+after Calc7 and before the existing `sim_zone_equipment` row. It is
+declared at `ZoneEquipmentManager.hh` line 130 and implemented completely
+at `ZoneEquipmentManager.cc` lines 3223-3536:
+
+```cpp
+void UpdateZoneSizing(
+    EnergyPlusData &state,
+    Constant::CallIndicator const CallIndicator);
+```
+
+The header omits the definition's top-level `const` on the by-value
+indicator; that does not change the C++ function type. The authoritative
+`CallIndicator` values are `Invalid=-1`, `BeginDay=0`,
+`DuringDay=1`, `EndDay=2`, `EndZoneSizingCalc=3`,
+`EndSysSizingCalc=4`, and `Num=5`. The parent comments label the four
+handled stages as 1 through 4, so they are off by one. The switch has
+explicit BeginDay, DuringDay, EndDay, and EndZoneSizingCalc cases.
+`Invalid`, `EndSysSizingCalc`, `Num`, and arbitrary cast values reach the
+default and silently do nothing. The BeginDay comment also promises to
+zero result arrays, but its child only stamps calculated metadata and
+clears no sequence arrays.
+
+Production gates live outside this routine. SizingManager calls BeginDay
+on non-warmup sizing days, EndDay at a non-warmup day end, and EndZone only
+after at least one sizing period. HVACManager calls DuringDay under its
+non-warmup Zone-sizing gate for each accepted system substep. Direct
+callers can bypass every lifecycle condition.
+
+Let `Z=max(NumOfZones,0)`, `C` be the controlled Zone count, `I` be one
+when Space sizing is active, `M` be stored Space-index occurrences under
+controlled Zones, `U` be their unique valid identities, and
+`H=C+I*M`. BeginDay visits controlled Zones ascending, runs the Zone child,
+then stored Spaces in list order, dispatching `H` metadata seeds over
+`C+I*U` distinct records.
+
+DuringDay computes signed integer
+
+`(HourOfDay-1)*TimeStepsInHour+TimeStep`
+
+and snapshots `FracTimeStepZone`, then uses the same `H` traversal. Space
+records receive the referring Zone's thermostat values and references to
+that Zone's final thermostat extrema, never FinalSpace extrema.
+Duplicate/cross-listed Space identities can therefore receive repeated
+additions and different parent parameters.
+
+EndDay completes the entire `H` moving-average sweep before starting the
+entire `H` daily-peak/final reduction sweep. It dispatches `2H` leaves and
+forms a real barrier: failure during smoothing prevents every reducer;
+failure during reduction retains all completed smoothing.
+
+EndZone order is exact:
+
+1. call Zone-sizing `ManageEMS` unconditionally and ignore `anyEMSRan`;
+2. when any EMS exists, scan all `Z` calculated-final Zone records without
+   a controlled-Zone gate and conditionally apply six overrides;
+3. only when nonpulse, optionally run noncoincident Calc1, then Calc2,
+   ZSZ and optional SPSZ routing/writers, then latent-selection Calc3;
+4. on both pulse and normal entries, complete dense Calc4, dense Calc5,
+   daily then final Calc6, and final Calc7 barriers.
+
+The six inline overrides are independent and ordered heating mass, cooling
+mass, heating load, cooling load, heating volume, and cooling volume. Each
+requires its flag and the current target to be strictly positive, then
+copies the raw EMS value without finite, sign, or consistency validation.
+The scan includes uncontrolled Zones and never overrides a Space. A
+nonpositive or NaN EMS result can make the same override fail its current-
+target gate on replay. Noncoincident Calc1 can later rebuild the six Zone
+fields from Spaces.
+
+The parent directly persists only those six calculated-final fields plus
+two output paths. Comma selects CSV, tab selects TAB, and every other
+separator selects TXT. ZSZ is routed, opened, written, and closed before
+optional SPSZ. Current files contain post-EMS/Calc2 but pre-Calc3/Calc4-7
+calculated state. The writer uses dense Zone/global-Space traversal and
+filters the Space owner with HeatBalance `Zone.IsControlled`, not this
+parent's equipment-control or membership topology. A successful replay
+reopens a closed not-good handle and truncates/rebuilds it; failure before
+close can leave a partial good stream that a retry may reuse and append.
+
+For EndZone cardinality, let `N` be controlled Zones whose declared
+`numSpaces` is not exactly one; `L` be controlled Zones whose
+calculated-final latent flag is true; `M_L` be their stored Space
+occurrences; `K=L+I*M_L`; `A/B` be flat Zone/Space daily target sizes;
+`F/G` be flat Zone/Space final target sizes; and
+`D=max(TotDesDays+TotRunDesPersDays,0)`.
+
+A normal entry dispatches Calc1 `I*N`, Calc2 `H`, writers `1+I`, Calc3
+`K`, Calc4 `A*(1+I*B)`, Calc5 `F*(1+I*G)`, Calc6 `(D+1)*H`, and Calc7
+`H`, plus one EMS call. Its mapped-child total is
+
+`2+I+I*N+K+A*(1+I*B)+F*(1+I*G)+(D+3)*H`,
+
+with a further `1+I` `ensure_open` service calls. Pulse skips Calc1/2,
+both writers, Calc3, and every file open, but still runs EMS and Calc4-7;
+its mapped-child total is
+
+`1+A*(1+I*B)+F*(1+I*G)+(D+2)*H`.
+
+Normal allocation makes Calc4
+`D*Z + I*D^2*Z*S` and Calc5 `Z + I*Z*S`, where `S` is the global Space
+count. Those literal Cartesian Space re-copies have no control, owner,
+membership, or paired-day filter; Calc6/7 return to controlled stored
+membership.
+The source body has 25 `for`, 43 `if`, four explicit cases plus default,
+12 `continue`, and 26 mapped child-call sites, including the one
+`ManageEMS` and two writer sites. It adds two `ensure_open` sites. Child
+routines own the numerical work already mapped in CP248-259; the parent
+owns their cross-case gates, barriers, topology changes, and side effects.
+
+There is no local validation, status, catch, checkpoint, cleanup, or
+rollback. Any lookup, child, allocation, diagnostic fatal, or output-open/
+write failure retains all earlier child and inline effects and suppresses
+the remaining barriers. EndZone failure prevents Facility EndZone,
+`ZoneSizingRunDone=true`, and, on a pulse pass, the later Rezero call in
+SizingManager.
+
+Replay semantics depend on the selected case. BeginDay re-stamps metadata
+without zeroing sequences; DuringDay repeats weighted additions; EndDay
+repeats smoothing and peak selection; EndZone repeats EMS callbacks,
+diagnostics, writers, dense copies, latent selection, and factor/floor
+adjustment. Duplicate Space
+memberships add further re-entry. No whole-parent idempotence or repair
+boundary exists.
+
+The completing C++ census has 107 BeginDay and 107 EndDay parent calls,
+including two direct calls of each. Their child counts are 197 BeginDay
+leaves and 197 leaves in each EndDay sweep. DuringDay has a nominal
+one-accepted-system-substep floor of 12,290 parent calls and 23,426 child
+leaves; adaptive downsteps can increase both. EndZone has 59 calls: 51
+nonpulse and eight pulse, including the two direct pulse calls.
+
+Across EndZone, the mapped child matrix is: `ManageEMS` 59, Calc1 7,
+Calc2 93, writers 58, Calc3 13, Calc4 273, Calc5 118, Calc6 301, and Calc7
+104. Calc4 reaches 28 uncontrolled daily Zone records and Calc5 reaches 14
+uncontrolled final Zone records. All 58 writers take the default comma
+route; tab and text have zero completion coverage. Each of the two direct
+tests calls every handled indicator once, for eight expressions total, but
+uses one controlled Zone, no Space or EMS, and pulse EndZone.
+
+There is no test of default/EndSys/invalid dispatch, an EMS override,
+tab/text routing, output failure, mixed control, duplicate/cross-listed
+membership, malformed indexes/extents, parent failure prefix, or replay.
+Direct assertions are downstream composites of child stages rather than
+oracles for the complete switch and barrier structure.
+
+The Rust/data audit covers the same 721 strict-UTF-8 files. It finds no
+`UpdateZoneSizing` key/helper, CallIndicator sizing dispatcher, handled
+stage names, Zone-sizing run-done lifecycle, Zone/Space sizing arenas,
+pulse/Space-sizing flags, calculated-final EMS override state, ZSZ/SPSZ
+artifact, or Facility-sizing handoff. Adjacent run-period time, thermostat,
+IdealLoads, equipment graph, generic output, and unsupported-EMS concepts
+are not this design-sizing dispatcher.
+
+All 61 active `SimulationControl` objects disable Zone sizing. Active data
+contain five raw design days but no `Sizing:Zone`, `Sizing:Parameters`,
+authored `Space`, or `SpaceList`, and no corresponding epJSON keys. The
+sole raw Sizing:Zone test fixture expects `UnsupportedSizing`; sizing and
+Space partitioning remain run-blocked.
+
+CP260 adds no Rust target/state, support declaration, test, capability,
+output implementation, comparator, case, manifest evidence, numerical or
+performance claim, or conformance promotion. Counts become 32 algorithms
+and 265 routines, split 58 `state_mapped` plus 207 `source_mapped`, with 142
+required; heat-balance/HVAC lists become 88/31 and HVAC readiness remains
+`0/31`. The parent stays `scaffold` with claim level `none`.
+
+CP261 next expands the existing required `routine.sim_zone_equipment`
+boundary rather than adding a duplicate row. `SimZoneEquipment` is declared
+at `ZoneEquipmentManager.hh` line 184 and implemented completely at
+`ZoneEquipmentManager.cc` lines 3538-4193. `SetZoneEquipSimOrder` begins at
+line 4195.
+
 ### `CheckValidSimulationObjects` state contract
 
 <!-- routine-state-contract:v1 begin check_valid_simulation_objects -->
