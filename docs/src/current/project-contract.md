@@ -6610,6 +6610,176 @@ after `routine.sim_zone_equipment` and before `routine.sim_purchased_air`.
 `ZoneEquipmentManager.cc` lines 4195-4255. `InitSystemOutputRequired`
 begins at line 4257 and is declared at header line 188.
 
+## CP262 `SetZoneEquipSimOrder` Shared Priority-Scratch Rebuilder
+
+CP262 adds canonical required `routine.set_zone_equip_sim_order`
+immediately after `routine.sim_zone_equipment` and before
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+item. The routine is declared at `ZoneEquipmentManager.hh` line 186 and
+implemented completely at `ZoneEquipmentManager.cc` lines 4195-4255:
+
+```cpp
+void SetZoneEquipSimOrder(
+    EnergyPlusData &state,
+    int const ControlledZoneNum);
+```
+
+The declaration omits the definition's top-level `const` on the by-value
+integer; the C++ function type is unchanged. `ControlledZoneNum` is the
+actual Zone index, not an ordinal within the controlled-Zone subset. The
+routine returns `void` and writes the manager-global `PrioritySimOrder`
+scratch array while reading the canonical equipment list and current Zone
+sensible demand.
+
+The exact source order is:
+
+1. alias `ZoneEquipList(ControlledZoneNum)`, read its `NumOfEquipTypes` as
+   `N`, and copy each active list row into scratch positions `1..N`;
+2. copy six fields per row: equipment type name, equipment name, enum type,
+   cooling priority, heating priority, and the original list ordinal as
+   `EquipPtr`;
+3. visit scratch positions `N+1..U`, where `U` is the scratch upper bound,
+   clearing the two names, setting the enum to `Invalid`, and setting
+   `EquipPtr` to zero, while leaving both priority integers untouched; then
+4. for each active position `i`, compare it with every position `j=i..N`
+   and immediately exchange all six fields whenever the selected candidate
+   has a smaller priority, refreshing both current-priority locals after
+   every exchange.
+
+This is an in-place exchange-selection pass, not a conventional selection
+sort that finds one minimum before one swap. Negative
+`RemainingOutputRequired` selects ascending cooling priority. Zero or
+positive demand selects ascending heating/no-load priority; both positive
+and negative zero therefore use heating. A NaN demand satisfies neither
+sign comparison and leaves the freshly copied source order unchanged.
+The routine does not read `LoadDistScheme`, availability counts, capacity
+caches, schedules, `FirstHVACIteration`, or Space demand.
+
+Source input parsing rejects values below zero or above `N`, so zero is
+accepted despite the diagnostic text saying priorities must be positive.
+It rejects duplicate positive priorities and warns about missing positive
+sequence numbers; multiple zeros can remain. CP262 itself neither skips
+zero nor consults `NumAvailHeatEquip` or `NumAvailCoolEquip`, so a selected
+zero sorts before every positive value. The comparison is strict, which
+prevents a direct equal-key exchange, but the immediate-exchange algorithm
+is not globally stable if malformed equal priorities reach it because an
+intervening smaller row can reverse equal-key rows.
+
+All six fields move as one logical record. In particular, `EquipPtr`
+continues to identify the original list row after sorting, and the
+unselected priority dimension travels with that row rather than being
+recomputed. Names, enum, and pointer above `N` are scrubbed, but the two priority fields
+there preserve their pre-existing bytes: allocation defaults until written,
+then values from whichever prior larger Zone populated them.
+`PrioritySimOrder` is allocated by `GetZoneEquipment` to the maximum
+equipment-list count and shared across Zones, so the last caller wins; it
+is not a per-Zone cache.
+
+For valid `0 <= N <= U`, let `S` be the number of successful exchanges.
+The copy performs `6N` field writes, upper cleanup performs `4(U-N)`
+mutations, and the nested loops visit exactly `N(N+1)/2` pairs, including
+self-pairs. Each exchange has six swap calls and twelve destination-field
+endpoints, with `0 <= S <= N(N-1)/2`. Dynamic persistent mutation-statement
+count is
+
+`6N + 4(U-N) + 6S = 2N + 4U + 6S`;
+
+counting the two endpoints of every swap separately gives
+`2N + 4U + 12S`. Exactly `2(U-N)` upper priority cells are not written.
+The body has four `for` loops and one `if`, with no `else`, switch, return,
+break, or continue. It has eight direct persistent assignment sites and
+eight mutating call sites: two string clears, two string swaps, and four
+scalar `std::swap` calls. It allocates no local scratch array and calls no
+EnergyPlus child, service, or diagnostic routine.
+
+The only direct production caller is `initOutputRequired` line 4315, gated
+by `ResetSimOrder && spaceNum == 0`. That child first restores the selected
+Zone's `RemainingOutputRequired` from `TotalOutputRequired`, so ordinary
+runtime sorting uses total Zone-load sign rather than a prior equipment
+residual. `InitSystemOutputRequired` initializes the Zone first and may then
+initialize its Spaces with nonzero `spaceNum`; those Space calls do not
+reorder, even when a Space load sign differs from the Zone sign.
+
+CP261 `SimZoneEquipment` invokes the reset-true wrapper once before
+dispatch for every controlled Zone. Its tail
+`CalcZoneLeavingConditions` invokes it a second time only for controlled
+Zones with at least one return node. A successful CP261 call therefore
+sorts `C+K` times for `C` controlled Zones and `K` such Zones with return
+nodes. The sizing path can reach the same return-node call without the
+front dispatch call. The second normal-runtime sort occurs after equipment
+effects and overwrites the same shared scratch; it does not preserve a
+Zone-specific result.
+
+There is no comprehensive up-front validation, local status, diagnostic,
+catch, cleanup guard, checkpoint, transaction, or rollback. An invalid Zone
+identity, missing demand/list state, short canonical field array, or
+unallocated or undersized scratch can fail before completion; depending on
+the failing access, it can leave no new write or retain an already copied
+or cleared prefix. A string-copy allocation failure can similarly leave
+mixed old and new active rows. No rollback restores prior scratch bytes,
+and a tail failure in CP261 also retains all earlier equipment and
+mass-balance effects.
+
+A successful replay with unchanged canonical list and load sign is
+active-prefix idempotent: all six fields are recopied before sorting, so it
+reconstructs a prior torn or permuted active prefix. The untouched upper
+priority cells remain history-dependent. A sign change deliberately
+rebuilds from canonical order and selects the other priority dimension;
+it does not incrementally sort the previous result.
+
+The direct unit census finds one explicit `SetZoneEquipSimOrder` call and
+seven reset-true `InitSystemOutputRequired` calls. Four use `N=3` and four
+use `N=4`, for 28 copied rows and 64 pair visits, but all heating and
+cooling priorities are already `1..N`, so no exchange occurs. Named
+parent-level unit paths bring the statically attributable total to 59
+successful executions, yet every nonempty list is already ordered and no
+exchange executes. Four UnitHeater assertions read slots one and two
+`EquipTypeName`/`EquipName` fields and prove only the already-ordered
+ADU-before-UnitHeater tuple. Nearby parsed data with different cooling
+order never calls the routine.
+
+The tests therefore do not prove an unsorted heating or cooling result,
+different orders across load signs, exact-zero or NaN selection, zero or
+gapped priorities, full-record tuple integrity, `U>N` cleanup and retained
+priority tails, Space non-reordering, shared-scratch overwrite, successful
+replay, invalid extents, or partial-failure state. Uniform, UniformPLR, and
+SequentialUniformPLR distribution tests call initialization with
+`ResetSimOrder=false`; only Sequential paths exercise this boundary.
+
+Rust contains no exact or snake-case occurrence of the routine, scratch,
+remaining-demand discriminator, two priority fields, or equipment pointer.
+It parses all four distribution-scheme names but the three nonsequential
+variants have no active runtime consumer. Compiler input requires positive
+`u32` sequences and rejects duplicate cooling or heating priorities,
+whereas the source accepts zero. `ModelGraph` performs a one-time static
+sort by `(zone, heating, cooling, ideal_loads_id)`, and node projection uses
+a similar heating-first minimum. Neither can express source cooling-first
+ordering under negative demand or a runtime sign change.
+
+The active compatibility runtime does not interpret the
+`SimZoneEquipment` execution step or graph order; it directly iterates
+prebound IdealLoads systems. All 30 active equipment lists contain exactly
+one SequentialLoad IdealLoads entry at cooling/heating sequence `1/1`, with
+both fraction schedules blank. Thus the current Rust lane makes sorting a
+one-record no-op and owns no dynamic priority scratch, upper-tail policy,
+record exchange, replay behavior, or list capacity cache.
+
+CP262 changes no Rust target/state, support declaration, test, capability,
+output, comparator, case, manifest, numerical claim, performance claim, or
+conformance status. Counts become 32 algorithms and 266 routines, split 58
+`state_mapped` plus 208 `source_mapped`, with 143 required. Domain-required
+counts become heat-balance 88, HVAC 32, plant 1, and time/schedule 22, with
+readiness `0/88`, `0/32`, `0/1`, and `0/22`. The IdealLoads parent remains
+`scaffold` at claim level `none`.
+
+CP263 next adds required source-mapped
+`routine.init_system_output_required` immediately after
+`routine.set_zone_equip_sim_order` and before
+`routine.sim_purchased_air`. `InitSystemOutputRequired` is declared at
+`ZoneEquipmentManager.hh` line 188 and implemented completely at
+`ZoneEquipmentManager.cc` lines 4257-4290. Its child
+`initOutputRequired` begins at source line 4292.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before
