@@ -161,6 +161,7 @@ required_routines = [
   "adjust_system_output_required",
   "calc_zone_mass_balance",
   "calc_zone_infiltration_flows",
+  "calc_zone_leaving_conditions",
   "sim_purchased_air",
   "get_purchased_air",
   "init_purchased_air",

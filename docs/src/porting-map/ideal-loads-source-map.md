@@ -11650,13 +11650,261 @@ counts become heat-balance 88, HVAC 40, plant 1, and time/schedule 22, with
 readiness `0/88`, `0/40`, `0/1`, and `0/22`. The IdealLoads parent remains
 `scaffold` at claim level `none`.
 
-CP271 next adds required source-mapped
-`routine.calc_zone_leaving_conditions` immediately after
-`routine.calc_zone_infiltration_flows` and before
-`routine.sim_purchased_air`. `CalcZoneLeavingConditions` is declared at
-`ZoneEquipmentManager.hh` line 240 and implemented completely at
-`ZoneEquipmentManager.cc` lines 5342-5543. `UpdateZoneEquipment` begins at
-source line 5545.
+## CP271 `CalcZoneLeavingConditions` Return-Node State Projection
+
+CP271 adds canonical required `routine.calc_zone_leaving_conditions`
+immediately after `routine.calc_zone_infiltration_flows` and before
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+requirement. It changes no EnergyPlus source inventory.
+
+`CalcZoneLeavingConditions(EnergyPlusData &, bool FirstHVACIteration)` is
+declared at `ZoneEquipmentManager.hh` line 240 and implemented completely at
+`ZoneEquipmentManager.cc` lines 5342-5543. The definition adds only
+function-type-neutral top-level `const` to the by-value Boolean. It has no
+default argument, status result, or exception specification. CP270 ends at
+source line 5340; CP272 `UpdateZoneEquipment` starts at line 5545.
+
+There are exactly two executable production call expressions:
+
+- `SizeZoneEquipment` calls the leaf unconditionally at line 677 with `true`,
+  after the complete Part1 sizing sweep and CP269 mass balance and before any
+  Part2 sizing entry; and
+- `SimZoneEquipment` calls it unconditionally at line 4188 with its incoming
+  `FirstHVACIteration`, after Zone exhaust controls, exhaust-system simulation,
+  and CP269 and before whole-system duct loss and return-path simulation.
+
+`ManageZoneEquipment` selects one of those parents. Neither caller adds a
+controlled-Zone or return-topology guard. `FirstHVACIteration` is not sampled
+by the leaving-state arithmetic; its only body use is forwarding the value to
+the final demand-initialization child.
+
+Before the numeric Zone pass, the leaf tests
+`doSpaceHeatBalanceSimulation && !DoingSizing`. When true, it range-visits
+every stored `zoneReturnMixer`, without filtering by controlled Zone or return
+node, and invokes these three methods in order for each occurrence:
+
+1. `setInletFlows`;
+2. `setInletConditions`; and
+3. `setOutletConditions`.
+
+The following numeric Zone loop skips every uncontrolled configuration and
+every controlled configuration with zero return nodes. A skipped Zone also
+skips the final demand initializer. For each entered Zone, `ZoneMult` is the
+product of `Multiplier` and `ListMultiplier`. Each return-node visit forms
+`MassFlowRA` from return-node mass flow divided by `ZoneMult`, then adds the
+full mapped exhaust-node mass flow only when the exhaust identity and its flow
+are positive. The exhaust contribution is not divided by the multiplier.
+
+The return-air base temperature is selected in this precedence order:
+
+1. the already-written return-node temperature when Space heat-balance
+   simulation is active, sizing is inactive, and
+   `returnNodeSpaceMixerIndex > -1`;
+2. allocated, active room-air-pattern `Tleaving` when `!BeginEnvrnFlag`; or
+3. the Zone node temperature.
+
+Every return-node visit first calls the sensible return-air convection-gain
+sum. When the Zone reports an airflow-window return, the same visit then scans
+all stored Zone Space identities and every Surface in each Space's inclusive
+heat-transfer range. A Surface contributes only for positive current gap flow
+and return-air destination. Its mass is
+`rho(OutBaroPress, gap-outlet temperature, Zone-node humidity ratio)` times
+current gap flow and Surface width; mass and mass-times-temperature are
+accumulated to form a positive-flow mixture temperature.
+
+That complete Zone-level airflow-window scan is inside the return-node loop.
+Multiple return nodes therefore recompute and apply the same unpartitioned
+aggregate once per node. There is no per-return-node window ownership, fraction, or filter, and no
+sorting or deduplication. Density also uses Zone-node humidity even
+when the base temperature came from a Space mixer or room-air pattern.
+
+With `NoHeatToReturnAir=false`, the leaf computes moist-air specific heat from
+Zone-node humidity. Positive `MassFlowRA` follows this ordered sensible path:
+
+- positive airflow-window mass is blended with the selected base temperature
+  when return mass is at least the window mass;
+- when window mass exceeds return mass, return temperature becomes the window
+  mixture and the excess window sensible term is added to
+  `SysDepZoneLoads`;
+- sensible return-air gain is divided by return mass and specific heat and
+  added to the working return temperature;
+- the return node is clamped to `HVAC::RetTempMin` and `HVAC::RetTempMax`;
+  outside `ZoneSizingCalc`, but not during it, the clipped energy is added to
+  `SysDepZoneLoads`; and
+- with a positive mapped exhaust flow and positive sensible return gain, an
+  exact `Shared` configuration adds only the gain temperature rise to the
+  existing exhaust temperature, while every other configuration overwrites
+  exhaust temperature with the unclamped working return temperature.
+
+Nonpositive or NaN `MassFlowRA` takes the other branch. Positive window mass
+contributes its signed sensible term, positive sensible return gain moves to
+`SysDepZoneLoads`, and return
+temperature is forced to Zone-node temperature rather than the selected Space
+or room-air base. With `NoHeatToReturnAir=true`, return temperature is also
+forced to the Zone value, but the locally computed sensible return gain and
+window heat are not transferred by this branch.
+
+Only exhaust-node temperature is changed. Exhaust pressure, humidity,
+enthalpy, CO2, and generic contaminant are not synchronized. Return pressure
+always copies Zone-node pressure, regardless of the heat branch.
+
+Humidity handling follows temperature work. With heat-to-return enabled and
+positive return mass, the leaf calls the node-specific latent return-gain sum,
+computes water-vapor enthalpy, and sets return humidity ratio to Zone humidity
+plus latent gain divided by vapor enthalpy and mass. Every other path copies
+Zone humidity, adds the Zone's full `LatCaseCreditToHVAC` to
+`LatCaseCreditToZone` without clearing the HVAC credit, calls the same latent
+sum, and adds that result to the Zone heat-balance `latentGain`. These Zone
+additions repeat for every return node.
+
+The leaf always recomputes return enthalpy from final temperature and humidity.
+It conditionally copies Zone-node CO2 and generic contaminant when their global
+simulations are active. After all return nodes complete, it calls
+`InitSystemOutputRequired(state, ZoneNum, FirstHVACIteration, true)` exactly
+once for that entered Zone. The explicit final `true` requests simulation-order
+reset; this child is the only consumer of `FirstHVACIteration` in CP271.
+
+The body has 26 `if` tokens, 11 `else` tokens including two `else if` tokens,
+three indexed and two range loops, and two `continue` statements. It has no
+`while`, `switch`, ternary, explicit return, `break`, diagnostic, status,
+checkpoint, catch, transaction, rollback, or cleanup.
+
+There are 23 direct persistent mutation sites over nine normalized state
+families: 13 plain assignments and ten compound additions. The families are
+five `SysDepZoneLoads` additions; seven node-temperature sites across return
+and exhaust roles; one return-pressure site; three return-humidity sites; two
+refrigeration Zone-credit additions; two Zone latent-gain additions; and one
+each for return enthalpy, CO2, and generic contaminant. Mixer and demand-child
+mutations are additional.
+
+Under the established census convention, the leaf owns 12 operational service
+call sites: three mixer methods, four internal-gain queries, four
+psychrometric functions, and one demand initializer. One allocation predicate
+and 67 indexed accessors bring the complete syntactic call/accessor expression
+count to 80.
+
+No complete Zone, return, exhaust, mixer, Space, Surface, ownership, alias,
+array-extent, finite-value, multiplier, or denominator validation precedes
+mutation. A mixer failure retains completed methods and mixers and prevents
+all Zone work. A Zone or return-node failure retains earlier Zones, nodes, and
+the current-node prefix; temperature and load writes may survive without the
+later humidity, enthalpy, or contaminant writes. A final demand-child failure
+retains every leaving-node write for that Zone plus the reached child prefix.
+There is no local repair protocol.
+
+Same-state replay is generally non-idempotent. Ten `+=` sites can compound
+system-dependent load, shared exhaust temperature, refrigeration Zone credit,
+and Zone latent gain. `LatCaseCreditToHVAC` is not cleared after transfer, and multiple return nodes
+can repeat the same Zone-level credit and
+unpartitioned airflow-window aggregate. Repeated or aliased return, exhaust,
+Space, and Surface identities are order-dependent. Plain node fields may
+reconstruct some fixed paths, but optional exhaust and contaminant branches can
+leave old values when disabled. Mixer and demand children add their own replay
+semantics. The earlier `SimZoneEquipment` clear of `SysDepZoneLoads` is parent
+setup, not CP271-local recovery.
+
+The bounded C++ route-representative census contains 54 leaf entries: one
+direct call, 23 sizing routes, and 30 simulation routes. It is composed of six
+direct `SizeZoneEquipment` parents, 13 directly attributable simulation routes,
+and 34 size/simulation projections from 17 effective `ManageSizing` contexts.
+The 18th lexical sizing context is plant-only and does not reach Zone sizing.
+The flags split 52 true and two false; both false entries are simulation
+routes. Fifty-six completing `ManageSimulation` tests have runtime-dependent
+HVAC cadence, so this bounded census does not invent an exact dynamic call
+count.
+
+All six direct sizing parents configure zero return nodes. They call CP271 but
+skip its node and final-demand work. Other parent tests can contain return
+nodes, availability, air-terminal mixer, or plenum behavior, but none owns a
+CP271-specific complete return-node-state oracle. Their results are confounded
+with equipment and parent simulation.
+
+The C++ unit sources contain exactly one literal direct leaf call, in
+`CZoeEquipmentManager_CalcZoneLeavingConditions_Test` at
+`ZoneEquipmentManager.unit.cc` line 4480. It uses one controlled equipment
+configuration, two positive-flow return nodes, one shared positive-flow
+exhaust node, `NoHeatToReturnAir=false`, and 50 W then 100 W sensible return
+gains. A non-Shared write followed by a `Shared` addition is checked with five
+post-call expectations: preserved Zone temperature, two return temperatures,
+one exhaust temperature, and a relation between the two return rises and the
+exhaust rise.
+
+That test does not activate a Space return mixer, room-air pattern,
+airflow-window return, no/negative flow, clamp, refrigeration latent gain,
+contaminant, or `NoHeatToReturnAir=true` branch. It asserts no return pressure,
+humidity, enthalpy, latent state, system-dependent load, or demand reset. Its
+`Zone.IsControlled` field remains false, so the final distribution wrapper
+returns at its first gate; the meaningful first/later-iteration tail difference
+is not isolated. No test covers malformed state, aliasing, partial failure,
+rollback, replay, or repair.
+
+Rust has no exact or snake-case CP271 function. Active compatibility classes
+validate a connection and construct a fresh four-value sensible/moisture demand
+snapshot before calling PurchasedAir directly. They never execute the leaving
+projection or its reset-true demand tail and own no total, unadjusted, six-way
+sequence, deadband, or Zone/Space demand arena.
+
+Typed `ZoneEquipmentConnection` records retain inlet, exhaust, Zone-air,
+return, return-fraction schedule, and return-basis names, and the compiler
+registers those node references. Active dispatch resolves and consumes only
+the supply/inlet edge. It does not use return/exhaust pairing, return basis or
+schedule, Shared/Multi configuration, Space mixer identity, or Zone
+multipliers for CP271 arithmetic.
+
+`IdealLoadsNodeStateProjection` is a separate explicitly diagnostic,
+non-parity path. Its `AirNodeState` contains temperature, humidity ratio, mass
+flow, and optional temperature setpoint, but no pressure, enthalpy, CO2, or
+generic contaminant. The projection copies design/default supply flow to Zone
+and return records and assigns fixed default Zone temperature and humidity to
+returns. It implements no exhaust, gain, airflow-window, room-air/mixer, clamp,
+latent/refrigeration, contaminant, or demand-reset behavior. Active System Node
+result output covers the supply node rather than a CP271-computed return node.
+
+The CLI finite-limit and humidity evidence instead reads EnergyPlus same-call
+return temperature and humidity and injects that oracle recirculation state
+into the Rust case path. Across manifests that reference the 30 IdealLoads IDF
+models, the broader return-node output census is 35 rows in 17 cases: 17
+temperature, 17 humidity-ratio, and one mass-flow row. Three are baseline and
+32 are diagnostic; zero is conformance-level. Those rows therefore do not
+establish Rust CP271 numerics.
+
+Across 120 unique data models, split 108 IDF and 12 epJSON, 30 models contain
+one IdealLoads system, equipment list, and connection. Every connection has a
+nonblank inlet and direct return and a blank exhaust. The corpus has no
+`Sizing:Zone`, Space or SpaceList, SpaceHVAC return mixer, room-air model,
+airflow window, Lights, refrigeration case/walk-in/air-chiller, return path,
+or AirflowNetwork topology.
+
+Ordinary EnergyPlus simulation enters CP271 for the controlled Zone and return
+node in all 30 IdealLoads models, with no sizing route. The zonal-only setup
+selects `NoHeatToReturnAir=true`, so the represented branch copies Zone
+return temperature, humidity, and pressure, recomputes enthalpy, sees zero
+return gain, and runs the demand tail. One CO2-DCV model also enables return
+CO2 copying, but has no return-CO2 conformance output. Dynamic HVAC invocation
+counts are not instrumented. Rust's direct PurchasedAir route and oracle
+recirculation input supply no equivalent transition evidence.
+
+The roadmap still requires Rust-owned return/exhaust node state including
+pressure, enthalpy, and contaminants; Space and room-air topology; airflow
+window and gain ownership; multiplier, clamp, latent, refrigeration, exhaust,
+and demand-reset semantics; and complete failure/replay behavior. Static
+connection names and diagnostic projection state cannot establish this mutable
+leaf.
+
+CP271 changes no Rust target or state, support declaration, test, capability,
+output, comparator, case, manifest, numerical claim, performance claim, or
+conformance status. Counts become 32 algorithms and 275 routines, split 58
+`state_mapped` plus 217 `source_mapped`, with 152 required. Domain-required
+counts become heat-balance 88, HVAC 41, plant 1, and time/schedule 22, with
+readiness `0/88`, `0/41`, `0/1`, and `0/22`. The IdealLoads parent remains
+`scaffold` at claim level `none`.
+
+CP272 next adds required source-mapped `routine.update_zone_equipment`
+immediately after `routine.calc_zone_leaving_conditions` and before
+`routine.sim_purchased_air`. `UpdateZoneEquipment` is declared at
+`ZoneEquipmentManager.hh` line 242 and implemented completely at
+`ZoneEquipmentManager.cc` lines 5545-5568. `CalcAirFlowSimple` begins at
+source line 5570.
 
 ## Claim Requirements
 
