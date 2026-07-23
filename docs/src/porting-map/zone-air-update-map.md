@@ -15925,9 +15925,229 @@ Domain-required counts become heat-balance 88, HVAC 47, plant 1, and
 time/schedule 22, with readiness `0/88`, `0/47`, `0/1`, and `0/22`.
 The IdealLoads parent remains `scaffold` at claim level `none`.
 
-CP278 next audits the physical source definition
-`ReportZoneSizingDOASInputs`, declared at `ZoneEquipmentManager.hh` lines
-260-265 and implemented at `ZoneEquipmentManager.cc` lines 7081-7116.
+## CP278 `ReportZoneSizingDOASInputs` EIO Writer
+
+CP278 adds canonical required
+`routine.report_zone_sizing_doas_inputs` immediately after
+`routine.auto_calc_doas_control_strategy` and before
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+requirement. It changes no EnergyPlus source inventory.
+
+The routine is declared at `ZoneEquipmentManager.hh` lines 260-265 and
+implemented completely at `ZoneEquipmentManager.cc` lines 7081-7116. Its
+source interface is
+
+`void ReportZoneSizingDOASInputs(EnergyPlusData &state,
+                                std::string const &ZoneName,
+                                std::string const &DOASCtrlStrategy,
+                                Real64 DOASLowTemp,
+                                Real64 DOASHighTemp,
+                                bool &headerAlreadyPrinted);`
+
+The two strings are read-only references, the temperatures are by-value
+snapshots, and the header flag is a mutable caller-owned reference. The
+definition adds only top-level `const` to each by-value temperature; the
+function type is unchanged. There is no return value, status, default
+argument, exception specification, diagnostic channel, or retry token.
+
+CP278 is the final physical function definition in
+`ZoneEquipmentManager.cc`; the EnergyPlus::ZoneEquipmentManager namespace
+closes at line 7118. Its declaration is likewise the final routine declaration
+before the header's ZoneEquipmentManager namespace closes at line 267 and the
+module-state structure begins.
+
+There are exactly three executable production call expressions, all in CP277.
+The Neutral, NeutralDehum, and Cool branches call CP278 at source lines 7032,
+7047, and 7062 respectively. Exactly one site executes for each recognized
+active record, after that branch's autosizing writes and before CP277's common
+low-greater-than-high validation. Inactive and unrecognized-strategy records
+never call CP278.
+
+CP277 passes its routine-local `headerAlreadyPrinted`, initialized false on
+every parent invocation, plus the post-autosizing Zone name, source label, and
+setpoints. Because both numeric arguments are by value and both strings are
+const references, CP278 cannot change the Zone-sizing record or its strategy.
+It can change only the supplied flag and the EIO stream.
+CP278 owns two immutable static format strings. With a false incoming flag it
+first writes the exact header text
+
+`! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature {C}, DOAS Design High Setpoint Temperature {C} `
+
+followed by a newline. The header literal retains one trailing space before
+that newline. Only after the header `print` call returns does CP278 set
+`headerAlreadyPrinted = true`.
+
+The routine then unconditionally writes one data row through the exact
+template
+
+` Zone Sizing DOAS Inputs, {}, {}, {:.3R}, {:.3R}
+`
+
+The row begins with one space. Fields are emitted in Zone-name, strategy,
+low-temperature, high-temperature order with literal comma-space separators.
+The two numeric fields use EnergyPlus's `R` formatter, which reproduces the
+RoundSigDigits-style precision and selects fixed or three-digit-exponent
+scientific notation by magnitude. Ordinary CP277 temperatures use three fixed
+decimals, such as `21.100` and `23.900`; small nonzero magnitudes can use
+forms such as `4.715E-002`, and negative zero normalizes to `0.000`. The
+generic OutputFiles unit suite has 30 active exact `{:.3R}` examples,
+including `23.989999... -> 23.990` and a large fixed-form value, but those
+are formatter tests rather than CP278 row tests.
+
+Zone and strategy strings use raw default string formatting. CP278 performs no
+CSV quoting, comma or newline escaping, trimming, normalization, blank check,
+or semantic label validation. A direct caller can therefore create empty,
+extra-field, or extra-line-looking EIO content. Numeric sign, ordering, and
+magnitude are likewise delegated without local validation. NaN and infinity
+reach custom-formatter paths for which CP278 establishes no portable output
+contract.
+
+A true incoming flag skips the header without checking that the EIO stream
+actually contains one, then attempts the row. A false incoming flag makes two
+`print` calls and changes the flag once when the header call returns; on a
+healthy persistent stream those calls produce two logical lines. A true
+incoming flag makes one row-print call and does not mutate the flag; on a
+healthy persistent stream it produces one logical line. Every normally
+reached call attempts exactly one data row.
+
+The body has one `if` and unary negation, no `else`, loop, logical AND or OR,
+`switch`, ternary, `return`, `break`, `continue`, diagnostic, or exception
+handler. It has two explicit call-expression sites, both EIO `print`
+services, two `state.files.eio` member accesses, and one direct mutation site:
+the caller-owned false-to-true header flag. The static format objects are
+immutable initialization, not runtime mutation. No field reached through
+`state` is written, and the sole production caller supplies a stack-local flag.
+CP278 does not open, ensure, flush, inspect, or repair the EIO stream. Ordinary
+production opens that file earlier. When EIO output is disabled, the
+InputOutputFile layer routes the calls to its null sink; CP278 still flips a
+false flag and returns normally even though no physical lines persist. If the
+stream is absent and is not configured for standard output or a null sink,
+the print path asserts in debug builds and has an unchecked null-stream
+dereference when assertions are removed.
+
+Each EnergyPlus `print` first formats the complete record into a memory buffer
+and then performs one `ostream::write`. A formatting error is converted to
+`EnergyPlus::FatalError`. Formatting allocation errors and
+exception-enabled stream failures can propagate; under the default stream
+exception mask, an ordinary write failure can instead set fail/bad state and
+return silently because CP278 never checks `good()`.
+
+There is no transaction, checkpoint, rollback, catch, cleanup, flush, or
+recovery protocol. If the header print exits abnormally before returning, the
+flag remains false and the row is not attempted, although a stream write can
+already have committed a partial physical prefix. Once the header call
+returns, including after a silent stream failure, CP278 sets the flag true
+before it begins row formatting. A row exception can therefore leave a
+header-only prefix and a true flag. With a true incoming flag, a row failure
+leaves that flag true.
+
+Within CP277, the selected strategy's setpoint writes precede CP278. A CP278
+abnormal exit therefore retains those model changes and bypasses CP277's
+later ordering diagnostic and deferred fatal path. A silent EIO failure can
+instead let CP277 continue while the output is missing.
+
+After a successful false-flag call, replay with the same retained flag
+suppresses another header but appends another row. Replay with a fresh false
+flag appends both header and row again. Retry after a header-only row failure
+with the same flag attempts only the row; retry after an abnormal or partial
+header write whose flag stayed false can duplicate any already committed
+header prefix. The flag converges to true, but successful stream behavior is
+append-only and externally non-idempotent.
+
+CP277 creates a fresh false flag on every entry, so a successful parent replay
+prints a fresh header plus every recognized row. If CP277 later fatals for an
+inverted recognized pair, that row already exists; an intercepted parent
+retry writes it again.
+
+A direct caller may pass any mutable bool, including shared state unrelated to
+DOAS reporting. Multiple calls sharing one flag coordinate only through that
+unsynchronized bit; separate false flags targeting the same stream each print
+a header. The stream and flag have no concurrency protection. The ordinary
+CP277 caller uses one stack-local flag and executes serially.
+The exact C++ source-plus-test symbol census is five occurrences: one
+declaration, one definition, and the three mutually exclusive CP277
+production expressions. No unit test calls CP278 directly.
+
+Replaying the established CP277 bounded census yields exactly 20 CP278
+executions. Fourteen come from the 14 direct CP277 calls: 12 in the dedicated
+autosizing test and two in SizingManager defaulting tests. Six more come from
+two full-simulation invocations: five fixed Cool rows in
+`HeatRecoveryHXOnMainBranch` and one autosized Neutral row in the
+`OutputReportTabular` DOAS-direct-to-Zone configuration. All other reached
+CP277 contexts have no recognized active record and make no CP278 call.
+
+The dynamic strategy distribution is seven `NeutralSupplyAir` rows, four
+`NeutralDehumidifiedSupplyAir` rows, and nine `ColdSupplyAir` rows. Sixteen
+distinct parent invocations call CP278 at least once, so the false incoming
+flag path executes 16 times. The remaining four calls are the second through
+fifth rows of the five-row HeatRecovery invocation and execute with the flag
+already true.
+
+The bounded unit effect is therefore exactly 16 header prints, 20 row prints,
+16 false-to-true flag assignments, and 36 CP278-owned EIO lines. For a general
+serial sequence of `N > 0` normal calls sharing one initially false flag, the
+routine makes `N + 1` print calls, one flag assignment, one header, and `N`
+rows.
+
+No test contains or asserts the exact DOAS table header or data-row literal.
+The 28 CP277 post-call setpoint assertions prove values supplied to the child,
+not their serialized form. The five-row full simulation reaches same-call
+header suppression and row ordering, but neither output property is asserted.
+The generic OutputFiles formatter tests validate independent `{:.3R}`
+examples only; they do not validate CP278's field order, labels, whitespace,
+flag protocol, or stream target.
+
+Coverage omits direct false- and true-flag calls, pre-true headerless output,
+shared versus separate flags, empty/comma/newline strings, wrong strategy
+labels, negative zero, negative/nonfinite/extreme temperatures, exact normal
+rows, disabled or unopened EIO, silent and throwing stream failure, partial
+writes, fixed-state replay, intercepted CP277 fatal/retry, and concurrency.
+The exact repository model census remains 120 files, split 108 IDF and 12
+epJSON. It contains zero `Sizing:Zone` objects and zero DOAS, dedicated-air,
+account, strategy, setpoint, or table-label matches. Sixty-one models
+explicitly set SimulationControl Zone sizing to `No` and the other 59 omit
+it. Production fixture execution of CP277 and CP278 is therefore zero across
+all 120 models.
+
+All 140 `case.toml` manifests contain zero Sizing:Zone, Zone-sizing, DOAS,
+dedicated-air, strategy-label, or exact `Zone Sizing DOAS Inputs` evidence.
+No manifest requests or compares the CP278 EIO table.
+
+Rust has no exact or snake-case CP278 routine, target header or row fields,
+Zone-sizing arena/count, DOAS-account flag, three strategy labels,
+caller-owned header flag, or exact table writer. The sole Rust
+`Sizing:Zone` occurrence is the arbitrary-run fixture rejected by
+`unsupported_sizing` as run-blocked `UnsupportedSizing` before runtime; the
+only lowercase `doas` hit is an unrelated psychrometric test name. A private
+positive-only RoundSigDigits helper used by window material comparison rejects
+zero, negative, and nonfinite values and neither writes nor parses this table;
+it is not a CP278 implementation.
+
+General EIO reader and comparison infrastructure exists, but Rust owns no
+CP278-specific row type, parser, serializer, CLI comparison, coverage
+declaration, case, or manifest. Reading an EnergyPlus-produced EIO baseline
+would not implement this writer.
+
+The roadmap still requires a Rust-owned Zone-sizing/DOAS state path, exact
+header and row serialization, RoundSigDigits-compatible finite formatting and
+an explicit nonfinite boundary, caller-scoped header ownership, disabled/error stream
+behavior, parent ordering, and direct output, failure, and replay oracles.
+
+CP278 changes no Rust target or state, support declaration, test, capability,
+output, comparator, case, manifest, numerical claim, performance claim, or
+conformance status. Counts become 32 algorithms and 282 routines, split 58
+`state_mapped` plus 224 `source_mapped`, with 159 required.
+Domain-required counts become heat-balance 88, HVAC 48, plant 1, and
+time/schedule 22, with readiness `0/88`, `0/48`, `0/1`, and `0/22`.
+The IdealLoads parent remains `scaffold` at claim level `none`.
+
+CP278 completes the ZoneEquipmentManager definition slice. The declared
+IdealLoads/HVAC source-order inventory then resumes at its existing required
+`routine.sim_purchased_air` row. CP279 next refreshes
+`PurchasedAirManager::SimPurchasedAir`, declared at
+`PurchasedAirManager.hh` lines 331-337 and implemented at
+`PurchasedAirManager.cc` lines 146-208.
+
 
 
 ## Promotion Requirements
