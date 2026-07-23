@@ -14650,12 +14650,181 @@ counts become heat-balance 88, HVAC 41, plant 1, and time/schedule 22, with
 readiness `0/88`, `0/41`, `0/1`, and `0/22`. The IdealLoads parent remains
 `scaffold` at claim level `none`.
 
-CP272 next adds required source-mapped `routine.update_zone_equipment`
-immediately after `routine.calc_zone_leaving_conditions` and before
-`routine.sim_purchased_air`. `UpdateZoneEquipment` is declared at
+## CP272 `UpdateZoneEquipment` Air-Loop Return Interface Wrapper
+
+CP272 adds canonical required `routine.update_zone_equipment` immediately
+after `routine.calc_zone_leaving_conditions` and before
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+requirement. It changes no EnergyPlus source inventory.
+
+`UpdateZoneEquipment(EnergyPlusData &, bool &SimAir)` is declared at
 `ZoneEquipmentManager.hh` line 242 and implemented completely at
-`ZoneEquipmentManager.cc` lines 5545-5568. `CalcAirFlowSimple` begins at
-source line 5570.
+`ZoneEquipmentManager.cc` lines 5545-5568. `SimAir` is a mutable reference.
+The routine has no default argument, return status, `const`, or exception
+specification. CP271 ends at source line 5543; CP273 `CalcAirFlowSimple`
+starts at line 5570.
+
+There is exactly one executable production call expression.
+`ManageZoneEquipment` calls CP272 unconditionally at line 164 after either the
+Zone-sizing child or the non-sizing simulation child and its one-way
+`ZoneEquipSimulatedOnce=true` write. Only after CP272 returns does the parent
+clear its caller's `SimZone`. CP272 neither receives nor samples
+`FirstHVACIteration`.
+
+The wrapper has two numeric loops. It visits primary air systems in ascending
+`ZoneGroupNum` order from one through `NumPrimaryAirSys`. Within each system it
+visits stored return mappings in ascending `RetAirPathNum` order from one
+through that system's `NumReturnNodes`. Every occurrence calls
+`HVACInterfaceManager::UpdateHVACInterface` with this fixed tuple:
+
+- the current primary-air-system number;
+- `CalledFrom::AirSystemDemandSide`;
+- the mapped Zone-equipment return node as outlet/source;
+- the mapped air-loop return node as inlet/destination; and
+- the caller-owned `SimAir` reference.
+
+For return-count sequence `R[g]`, the wrapper therefore makes
+`sum(R[g])` child calls over `g = 1..NumPrimaryAirSys`. A zero or negative outer
+or inner count skips its corresponding loop. There is no Zone-control, sizing,
+node-validity, ownership, alias, duplicate, or topology filter, and no sorting
+or deduplication beyond the stored numeric order.
+
+The body has two indexed `for` loops, one operational child-call site, and five
+indexed accessor sites: three `AirToZoneNodeInfo` plus one each for
+`ZoneEquipReturnNodeNum` and `AirLoopReturnNodeNum`. That is six syntactic
+call/accessor expressions under the established convention. It has zero
+`if`, `else`, `switch`, ternary, explicit return, `break`, or `continue`
+statements; zero direct persistent mutation sites; and zero direct `SimAir`
+assignments. Its two loop initializations and increments are local only. It has
+no local diagnostic, validation, status, checkpoint, catch, transaction,
+rollback, cleanup, or retry logic.
+
+All persistent effects belong to the delegated interface child. With a positive
+source-node identity on this demand-side route, that child compares source and
+destination mass flow, humidity ratio, temperature, approximate energy,
+enthalpy, pressure, and enabled CO2 and generic contaminant values. It shifts
+the corresponding convergence histories, resets and may raise detailed
+demand-side nonconvergence flags, and can only set the shared `SimAir` value to
+true when a tolerance is exceeded. Neither CP272 nor the child clears an
+already-true `SimAir`.
+
+After those comparisons, the positive-source child overwrites destination
+node temperature, mass flow, minimum and maximum available flow, quality,
+pressure, enthalpy, and humidity ratio. Enabled CO2 and generic contaminant
+values are copied conditionally. Disabled contaminant paths leave their prior
+destination fields untouched.
+
+A zero mapped source selects the child's no-return-path special case. It sums
+mass flow and minimum/maximum available flow across every demand-side supply
+node for that air loop, checks only the aggregate mass-flow difference, writes
+those three destination fields, and returns without the ordinary
+thermodynamic, quality, or contaminant copy. A negative or otherwise invalid
+identity has no CP272 guard.
+
+When one air loop has multiple positive-source mappings, each child resets the
+same demand-side convergence booleans and shifts the same field histories.
+Detailed booleans can therefore end with the last positive mapping's result.
+A zero-source child instead clears only the mass, humidity, temperature, and
+energy booleans, shifts only flow history, leaves contaminant booleans and
+non-flow histories untouched, and returns. Mapping kinds and order therefore
+govern the final detailed state, while sticky `SimAir=true` preserves a
+violation found by any earlier mapping. The wrapper does not stop after the
+flag rises.
+
+Failure before or inside a child retains every earlier air-loop/mapping result
+and the reached current-child convergence, flag, node-copy, and `SimAir`
+prefix. Later mappings do not run. The production parent then does not reach
+its final `SimZone=false`; on the simulation route, its earlier
+`ZoneEquipSimulatedOnce=true` remains committed. No local repair is attempted.
+
+Same-state replay is not generally idempotent. Convergence histories shift
+again, and a prior successful node copy means a fixed source commonly compares
+equal to its destination on replay and clears the detailed flags that reported
+the first difference. A previously raised `SimAir` remains true. Optional
+contaminants can retain stale values, and repeated or aliased mappings remain
+order-dependent. Only the ordinary destination-node overwrite is idempotent
+under fixed, valid, noninterfering source mappings.
+
+No C++ unit source calls CP272 directly. Nine direct `ManageZoneEquipment`
+expressions across eight tests complete the parent and therefore reach the
+wrapper once each. Their upstream flags are eight first and one later
+iteration, while the caller-owned `SimAir` variables start six false and three
+true; CP272 itself has no first-iteration argument. Six direct sizing-parent
+and four direct simulation-parent call expressions bypass
+`ManageZoneEquipment` and do not reach CP272.
+
+Under the established route-representative method, the bounded unit census is
+43 wrapper entries: nine direct parent simulations plus one sizing and one
+post-sizing simulation projection from each of 17 effective `ManageSizing`
+contexts. That is 17 sizing and 26 simulation routes. The upstream flags split
+42 first and one later iteration, without changing CP272 control flow. The
+18th lexical sizing context is plant-only. Fifty-six completing
+`ManageSimulation` tests have runtime-dependent HVAC cadence, so their exact
+dynamic wrapper count is not inferred; the EMS-fatal case stops before this
+boundary.
+
+Only three of the nine direct parent entries own a positive return-interface
+child topology: two PackagedTerminalHeatPump wrapper calls and one UnitHeater
+call. All three enter with `SimAir` already true, so no false-to-true
+transition is tested. The two UnitaryBypassVAV entries occur before
+`GetAirPathData`; four PurchasedAir entries have no primary air loop. The reached child behavior is
+confounded with equipment, plenum, mass-balance, coil, and demand work. No
+parent test attributes an air-loop return-node copy, convergence history, or
+`SimAir` transition to CP272.
+
+The separate `UpdateHVACInterface_Test` makes six literal child calls: two
+demand-side and two for each supply deck. Its first demand-side pair has equal
+ordinary and contaminant values and asserts false out-of-tolerance and
+contaminant flags; its second changes CO2 and generic contaminant and asserts
+true. It does not exercise the CP272 loops or mapping order, the zero-source
+special case, ordinary node-copy fields, partial failure, or replay.
+
+Rust contains no exact or snake-case wrapper or child, demand-side discriminator,
+`AirToZoneNodeInfo`, Zone-return-to-air-loop-return pairing, air-loop
+convergence history, or `SimAir` resimulation latch. Typed
+`ZoneEquipmentConnection` retains a Zone return identity, but active
+compatibility dispatch calls PurchasedAir directly. Its diagnostic node
+projection has only temperature, humidity, mass flow, and setpoint state and
+independently writes a Zone return record; it does not project to an air-loop
+return node or own pressure, enthalpy, quality, contaminants, tolerances, or
+resimulation state. Static `AirLoopGraph` state is explicitly skeleton-only,
+and `AirLoopHVAC` remains runtime-unsupported.
+
+The model census contains 30 unique IdealLoads IDF models and three unique
+AirLoopHVAC epJSON skeleton models, with zero intersection. Every ordinary
+IdealLoads EnergyPlus path reaches the CP272 wrapper through
+`ManageZoneEquipment`, but `NumPrimaryAirSys=0`, so all 30 make zero interface
+child calls. The fan-only, coil-only, and reduced five-Zone AirLoop models are
+C-tier diagnostics with `conformance_claim=false`, baseline-only outputs, no
+IdealLoads, and no Zone-return/air-loop-return interface pair.
+
+The broader manifest census still has 35 return-key rows in 17 cases: 17
+System Node Temperature, 17 Humidity Ratio, and one Mass Flow row, split three
+baseline and 32 diagnostic with zero conformance. Their IdealLoads models have
+no air loop, so they cannot prove CP272 transfer or convergence. The three
+AirLoop skeleton manifests report component nodes and equipment rates only at
+baseline level and likewise do not establish the interface.
+
+The roadmap still requires Rust-owned air-loop return topology, full node
+state, pairwise projection, demand-side tolerances and histories, sticky
+resimulation state, multiple-return ordering, zero-source aggregation, and
+failure/replay semantics. Zone return names, diagnostic projection, and static
+AirLoop graph metadata cannot establish this wrapper and child protocol.
+
+CP272 changes no Rust target or state, support declaration, test, capability,
+output, comparator, case, manifest, numerical claim, performance claim, or
+conformance status. Counts become 32 algorithms and 276 routines, split 58
+`state_mapped` plus 218 `source_mapped`, with 153 required. Domain-required
+counts become heat-balance 88, HVAC 42, plant 1, and time/schedule 22, with
+readiness `0/88`, `0/42`, `0/1`, and `0/22`. The IdealLoads parent remains
+`scaffold` at claim level `none`.
+
+CP273 next adds required source-mapped `routine.calc_air_flow_simple`
+immediately after `routine.update_zone_equipment` and before
+`routine.sim_purchased_air`. `CalcAirFlowSimple` is declared at
+`ZoneEquipmentManager.hh` lines 228-232 with defaults `0`, `false`, and
+`false`, and implemented completely at `ZoneEquipmentManager.cc` lines
+5570-6910. `GetStandAloneERVNodes` begins at source line 6912.
 
 ## Promotion Requirements
 
