@@ -11419,12 +11419,375 @@ with 159 required. Domain-required counts remain heat-balance 88, HVAC 48,
 plant 1, and time/schedule 22, with readiness `0/88`, `0/48`, `0/1`, and
 `0/22`. The IdealLoads parent remains `scaffold` at claim level `none`.
 
-CP281 next refreshes existing required `routine.init_purchased_air`.
+## CP281 `InitPurchasedAir` Lifecycle, Topology, and Diagnostics
+
 `PurchasedAirManager::InitPurchasedAir(EnergyPlusData &state,
 int const PurchAirNum, int const ControlledZoneNum)` is declared at
 `PurchasedAirManager.hh` line 341 and implemented completely at
-`PurchasedAirManager.cc` lines 1054-1324. `SizePurchasedAir` begins at source
-line 1326.
+`PurchasedAirManager.cc` lines 1054-1324, a 271-line body. The two integer
+selectors are passed by value and the simulation graph is mutable. The routine
+has no return value, caller-owned error flag, status, retry token, default
+argument, or local exception handler.
+
+The sole production call is CP279 `SimPurchasedAir` line 201. It follows the
+optional CP280 input load and component name/index resolution, then precedes
+`CalcPurchAirLoads`, `UpdatePurchasedAir`, and `ReportPurchasedAir`
+unconditionally. The exact source-plus-test `InitPurchasedAir(` census is
+eight: one header declaration, one definition, that one production expression,
+and five literal calls in `PurchasedAirManager.unit.cc` at lines 861, 959,
+1121, 1293, and 1502.
+
+The normal source order is:
+
+1. on the module's first Init call, allocate three `NumPurchAir`-sized flag
+   arrays, initialize environment and sizing flags true and per-unit one-time
+   flags false, then clear the module one-time flag;
+2. once Zone equipment input is filled, latch the global equipment-list check
+   before scanning every PurchasedAir unit, resolving any return-plenum link
+   and then checking membership in any Zone equipment list;
+3. latch the selected unit before validating its supply/exhaust topology,
+   selecting an exhaust or return recirculation node, and checking the
+   outdoor-air/economizer limit combination;
+4. when not inside `SysSizingCalc` and the selected sizing latch is true, call
+   `SizePurchasedAir` and clear that latch only after normal return;
+5. on a latched begin-environment entry, derive both maximum mass-flow values
+   from standard density and stored volume flow, then clear the environment
+   latch; any non-begin-environment call rearms it;
+6. on every invocation, compare supply-temperature limits with the selected
+   Zone thermostat setpoints and, when both relevant schedules are nominally
+   on, update recurring cooling or heating severe diagnostics.
+
+The module latches default in `PurchasedAirManagerData` at header lines
+398-402. `clear_state()` restores the scalar one-time and equipment-list
+latches and deallocates the three per-unit flag arrays at lines 422-426. The
+first call for any unit therefore establishes flag storage for all counted
+units. The three allocations and array fills precede the scalar one-time
+clear, so an abnormal exit can leave a partial allocation/fill prefix while
+the scalar still requests another first-time pass.
+
+The equipment-list pass is deliberately late. If
+`ZoneEquipInputsFilled` is false, it does nothing and preserves its latch for a
+future call. Once the input flag is true, line 1086 sets
+`InitPurchasedAirZoneEquipmentListChecked=true` before the `1..NumPurchAir`
+loop. Each unit with a positive `PlenumExhaustAirNodeNum` first calls
+`GetReturnPlenumIndex`. A positive result is stored in `ReturnPlenumIndex`,
+`GetReturnPlenumName` writes the name by reference, and
+`InitializePlenumArrays` mutates the shared plenum aggregate. A miss emits a
+Severe saying the unit will not be simulated, but no active flag is cleared
+and no return or fatal follows.
+
+Plenum handling precedes `CheckZoneEquipmentList`. A unit absent from every
+Zone equipment list therefore can be inserted into the plenum aggregate before
+the later Severe is emitted. That second message also says the unit will not
+be simulated, but CP281 performs no disabling mutation and continues into the
+selected-unit, sizing, environment, and diagnostic work when dependencies
+return normally.
+
+The plenum child exposes a stronger hidden invariant. `GetReturnPlenumIndex`
+returns the actual 1-based `ZoneHVAC:ReturnPlenum` index.
+`InitializePlenumArrays` at lines 3268-3473 instead packs only plenums
+discovered by IdealLoads into a compact discovery-order array. Later
+`UpdatePurchasedAir` lines 2966-2972 directly indexes that compact storage by
+the actual `ReturnPlenumIndex`. Correct operation therefore assumes actual
+plenum indices and discovered slots coincide; for example, a first IdealLoads
+connection to only actual plenum 2 can leave extent one followed by index two.
+CP281 does not validate that invariant.
+
+Reset also is incomplete at this child boundary. `clear_state()` sets
+`NumPlenumArrays=0` and deallocates `TempPurchAirPlenumArrays`, but does not
+deallocate the main `PurchAirPlenumArrays` at header lines 414-427. A later
+same-state rebuild can therefore see allocated stale aggregate storage while
+the count is zero. No current Rust or C++ test closes either the compressed-
+index invariant or this reset path.
+
+After the global sweep, CP281 binds a reference to
+`PurchAir(PurchAirNum)`. It tests and sets
+`InitPurchasedAirOneTimeUnitInitsDone(PurchAirNum)` before any topology
+validation. A positive supply node must appear in the passed
+`ControlledZoneNum` inlet list. A miss emits one Severe and two Continue
+messages, then calls Fatal. A zero supply node bypasses this local check.
+
+A positive exhaust node is searched in that same Zone's exhaust list. A match
+sets `ZoneRecircAirNodeNum` to the exhaust node. A miss emits a Severe and three
+Continue messages, then falls back to Zone return nodes. Blank exhaust also
+takes that fallback silently.
+
+The return-node branches are source-significant:
+
+- exactly one return node stores `ReturnNode(1)`;
+- more than one emits a warning saying the first return node is used, but the
+  body performs no assignment at all; a fresh record therefore keeps its
+  constructor-zero recirculation node and a retained record keeps its prior
+  value;
+- a nonpositive return-node count reaches `ShowFatalError` immediately at line 1174.
+  `ShowFatalError` is `[[noreturn]]`, so the following explanatory Continue
+  and second Fatal at lines 1175-1178 are unreachable in normal execution.
+
+The topology check never verifies that `ControlledZoneNum` agrees with the
+unit's CP280 `ZonePtr`. A first call with a wrong but internally valid Zone can
+latch bindings from that Zone permanently. Later calls can use a different
+Zone for thermostat state and message identity while the per-unit topology
+block remains skipped.
+
+Still inside the per-unit one-time block, active OA plus any economizer other
+than `NoEconomizer` is checked against the cooling limit. `None` or
+`Capacity` emits one Severe and three Continue messages saying simulation
+will proceed without an outdoor-air flow limit. CP281 neither repairs the
+limit nor disables the economizer and has no deferred local fatal for this
+condition.
+
+The sizing gate is `!SysSizingCalc && InitPurchasedAirMySizeFlag(PurchAirNum)`.
+It calls the 579-line `SizePurchasedAir` child and clears the per-unit flag
+only after normal return. A sizing exception or fatal therefore leaves the
+flag true for retry but preserves any child state, diagnostics, and report
+prefix already produced. While `SysSizingCalc` is true the flag remains armed;
+the first later ordinary call performs sizing.
+
+Begin-environment initialization is per unit. For heating and cooling
+independently, `FlowRate` and `FlowRateAndCapacity` write
+`StdRhoAir * Max*VolFlowRate`; `None` and `Capacity` write zero. The heating
+write precedes cooling, and only after both does the environment flag clear.
+CP281 locally validates neither density nor volume-flow sign, finiteness, or
+an unresolved autosize sentinel. A call while `BeginEnvrnFlag` is false sets
+the flag true. If no Init call occurs during the false interval between
+environments, the next true interval cannot rearm itself and can retain the
+previous mass-flow values.
+
+Every invocation then aliases
+`zoneTstatSetpts(ControlledZoneNum)`. Cooling diagnostics require all of:
+
+- `MinCoolSuppAirTemp > setptHi`;
+- nonzero `setptHi`;
+- `CoolingLimit == None`;
+- overall availability and cooling availability schedule values both greater
+  than zero.
+
+Heating is symmetric with `MaxHeatSuppAirTemp < setptLo`,
+`HeatingLimit == None`, and overall plus heating availability. The common
+availability schedule can be read twice when both outer predicates hold;
+there is no cached `UnitOn` across branches. Strict equality is accepted,
+zero setpoint suppresses a branch, and NaN schedule values are treated as on
+because `NaN <= 0` is false. A null schedule is dereferenced only after the
+corresponding temperature mismatch reaches that branch.
+
+On the first active cooling violation, `CoolErrIndex==0` emits the detailed
+Severe/Continue/timestamp group. Every active violation calls
+`ShowRecurringSevereErrorAtEnd` and passes the error index by reference, so
+the service updates it. Heating uses `HeatErrIndex` and `ShowSevereMessage`
+for its first group. Both recurring calls pass the same supply temperature as
+their minimum and maximum numeric values rather than a setpoint difference.
+The commented warmup/fatal block at lines 1321-1323 is inactive; warmup does
+not suppress these diagnostics and no CP281 tail fatal exists.
+
+The complete body has 29 ordinary `if` heads plus one `else if`, six bare
+`else` blocks, one loop, one `continue`, ten logical ANDs, and three logical
+ORs. It has no explicit return, break, while, switch, ternary, try, or catch.
+There are three module-array allocation sites, 16 direct persistent
+assignments over nine normalized destinations, and three further by-reference
+destinations: return-plenum name and the two recurring indices. Service sites
+include three return-plenum operations, one equipment-list check, two integer
+node-list searches, one sizing child, and four schedule-value reads.
+
+The direct diagnostic-site census is six `ShowSevereError`, one
+`ShowSevereMessage`, one `ShowWarningError`, 21 `ShowContinueError`, two
+timestamp calls, and two recurring-severe calls. There are three executable
+Fatal spellings: the supply-node Fatal and two in the nonpositive-return-count branch, of
+which the latter second is unreachable after the first `[[noreturn]]` call.
+A fourth Fatal spelling at line 1322 is commented out.
+
+CP281 has no transaction, rollback, cleanup guard, or catch. Its latch timing
+creates distinct failure classes:
+
+- module allocation failure occurs before the scalar one-time clear and can
+  request the allocation sequence again against partial storage;
+- equipment-list and per-unit latches are set before their work, so an
+  abnormal plenum scan, supply-node Fatal, or nonpositive-return-count Fatal suppresses the
+  unfinished scan or topology validation on an intercepted retry;
+- sizing and environment latches clear after their work, so those branches
+  retry, but repeat against retained child or ordered mass-flow prefixes;
+- recurring diagnostic services intentionally mutate retained registry/count
+  state on every active violation.
+
+Normal replay is also conditional rather than pure. It can perform a deferred
+equipment sweep when Zone equipment input becomes ready, one pending sizing
+pass after sizing calculation ends, begin-environment reinitialization after
+a false-flag rearm, or another recurring diagnostic. A stable ordinary call
+after all one-time work still reads selected Zone setpoints and can read
+schedules.
+
+CP281 does not test `GetPurchAirInputFlag` and therefore does not prevent a
+public direct call before CP280 has allocated `PurchAir`. It locally validates
+neither selector range, the flag-array or object-arena extents, Zone ownership,
+count/array agreement for inlet/exhaust/return nodes, node identity, schedule
+pointer, enum range, nor the cross-manager plenum indices. Native invalid
+access has no routine-defined postcondition. Invalid limit enums silently
+bypass the thermostat diagnostic because both indexed name sites are dominated
+by exact `LimitType::None` guards.
+
+The selected `PurchAir` reference aliases shared module storage. The two
+integer selectors cannot alias each other, but the same unit can be called
+with different Zones and different units can share nodes or a return plenum.
+All latches, plenum aggregates, records, recurring registries, sizing state,
+and schedule services are unsynchronized. Concurrent same-state calls can
+both enter a scalar or per-unit gate, race allocation and topology writes,
+duplicate plenum membership, run sizing twice, lose environment writes, or
+interleave diagnostics. Separate simulation states avoid this routine's
+direct member sharing; deeper service/global thread safety is not established.
+
+The PurchasedAir unit file executes CP281 exactly nine times across eight test
+states. Four `ManageZoneEquipment` calls at lines 413, 540, 671, and 949 reach
+the production wrapper once each. Five direct calls add five more executions;
+the NoCapacity line-959 call is a normal replay after its line-949 production
+call.
+
+Across those eight fresh states, module allocation, selected-unit one-time
+binding, and the sizing child each run eight times. Four Manage states perform
+the equipment-list sweep; four direct-only states retain
+`ZoneEquipInputsFilled=false` and defer it. All eight one-time topologies use
+one valid supply node and one explicit valid exhaust node. Only the Plenum
+case has a positive system inlet and runs return-plenum lookup/array
+initialization. `SysSizingCalc` and `BeginEnvrnFlag` are false, so the
+begin-environment conversion runs zero times and the false-flag rearm executes
+on all nine calls.
+
+The fixture setpoints are 23.9 C cooling and 23.0 C heating, while every object
+uses 13 C minimum cooling supply and 50 C maximum heating supply. Neither
+thermostat mismatch predicate is true, so the nine calls evaluate no schedule
+or recurring-diagnostic branch. Eight post-load test groups own 62 assertions,
+split 10/7/5/2/2/5/7/24. The only assertion directly identifying CP281-owned
+state is `ReturnPlenumIndex == 1` in the Plenum case. The remaining node,
+fuel, load, EMS, and supply assertions are composite effects of Get, Init,
+Calc, Update, Report, or children.
+
+No test asserts a flag transition, recirculation binding, maximum environment
+mass flow, equipment-list or topology diagnostic, recurring index, or exact
+message. Three tests explicitly overwrite `ZoneRecircAirNodeNum` after Init
+before their calculation. The NoCapacity replay's two assertions concern Calc
+output, not replayed Init state. Two separate direct `SizePurchasedAir` tests
+have eight sizing assertions but do not test CP281's gate, latch clear,
+failure, or retry.
+
+One active BaseClassSizing full-simulation test adds at least 336 dynamic
+production Init calls and 11 post-run sizing assertions, none specific to
+CP281 lifecycle. Four SizingManager sizing-only tests disable simulation
+periods and execute CP281 zero times. Thus unit coverage demonstrates a
+successful one-unit path, one simple actual-index-one plenum link, and repeated
+steady execution, but not missing equipment or plenum, supply Fatal, invalid
+exhaust fallback, zero/multiple return nodes, economizer advisory, environment
+conversion/rearm, thermostat diagnostics, wrong-Zone binding, partial failure,
+retry, reset, multi-unit ordering, or concurrency.
+
+The project model census remains 120, split 108 IDF and 12 epJSON.
+Exactly 30 IDFs and no epJSON contain IdealLoads. Each has one Zone, one
+`ZoneHVAC:EquipmentConnections`, one equipment list containing one entry, and
+one IdealLoads unit. Every supply node is valid. All 30 omit exhaust and system
+inlet, expose exactly one return node, and have no return plenum, so their
+fresh one-time route exercises the normal single-return fallback that the
+isolated unit tests do not.
+
+All 30 leave overall, heating, and cooling availability schedules blank and
+use the source 50/13 C supply-temperature bounds. They have no ZoneHVAC sizing
+object or autosized value. Heating and cooling limits move together: 27 models
+use NoLimit, one Capacity, one Flow, and one Flow+Capacity. The two flow-bearing
+models use 0.02 m3/s and are the only unique fixtures whose environment branch
+produces positive density-derived maximum mass flows; every other mode writes
+zero.
+
+Eighteen models omit OA and 12 activate it. Economizer modes are 28
+NoEconomizer plus one DifferentialDryBulb and one DifferentialEnthalpy. Both
+economizer fixtures lack a flow-bearing cooling limit, so their first per-unit
+Init reaches the nonfatal OA/economizer Severe advisory. Four manifest routes
+reference those two models, but no comparison script asserts the diagnostic
+text, count, ordering, or continued-state behavior.
+
+Thermostat schedules use 21/24 C in 21 files, 18/20 C in five, and 24/35 C in
+four. Every range lies within the 13/50 C supply bounds, so no corpus route
+activates the recurring thermostat errors. The corpus also has no invalid
+supply/exhaust/list topology, zero/multiple return, plenum, wrong-Zone,
+multi-unit, reset, failure-prefix, or retry fixture.
+
+At four Zone timesteps per hour, the 25 one-day and five 365-day unique models
+provide a lower bound of exactly 177,600 successful Init calls when each source
+model is run once. HVAC iteration/downstep behavior can only increase the
+dynamic count, so no exact total is claimed. One-time topology occurs once per
+fresh process, environment conversion depends on each environment boundary,
+and repeated steady calls largely exercise only thermostat predicate reads.
+
+Fifty-two of 140 manifests reference the 30 models. Forty-eight routes request
+869 exact IdealLoads output rows, split 418 conformance, 447 diagnostic, and
+four baseline, while 21 manifests add 62 facility-meter rows. None exposes an
+Init flag, recirculation binding, environment maximum mass flow, recurring
+index, or diagnostic registry. Twenty-eight comparison scripts assert the
+five descriptive PurchasedAir stage labels and prebound typed lookup policy,
+but have zero semantic CP281 state-transition assertion.
+
+Rust represents CP281 only as an immutable compatibility snapshot and stage
+metadata. `crates/ep_runtime/src/ideal_loads/init.rs` lines 3-35 defines five
+booleans: `one_time_checked`, `environment_initialized`, `sizing_checked`,
+`equipment_list_checked`, and `return_plenum_inactive`. Both constructors
+return all five true. `dispatch.rs` line 235 and `outdoor_air.rs` line 167
+construct a new all-true value for every supported wrapper call; no later
+branch consumes a flag to gate behavior.
+
+The direct Rust evidence is correspondingly narrow. One dispatch test asserts
+only `one_time_checked`. One outdoor-air wrapper test compares the snapshot
+with the same all-true constructor. A dispatch test locks the five source
+routine strings, and an execution-plan test locks the Init stage position.
+`init.rs` has no transition test. First, repeated, sizing, environment,
+failure, and retry calls are therefore indistinguishable in current Rust
+state.
+
+The execution plan labels the stage as reading `purchased_air_input_state` and
+`schedule_series` and writing `purchased_air_state`, but that is dependency
+metadata rather than a state machine. Adjacent typed Zone/equipment-list
+binding and up-front validation fail closed instead of reproducing the source
+Severe-but-continue sweep. A bounded CLI recirculation helper chooses an
+explicit exhaust or the first return node, conditionally and without retained
+lifecycle state; that behavior is not the source's multi-return warning-without-
+assignment defect.
+
+Finite-flow Rust calculations multiply a selected volume limit by a supplied
+standard-air-density context at calculation time. They do not cache
+`MaxHeatMassFlowRate` or `MaxCoolMassFlowRate` behind a begin-environment
+latch. Repository code owns no source module/per-unit/environment/sizing/list
+latch arrays, `ReturnPlenumIndex` or compact plenum graph, persistent
+`ZoneRecircAirNodeNum`, `CoolErrIndex`, `HeatErrIndex`, or exact CP281
+diagnostic/fatal text. It has no distinct overall/heating/cooling schedule
+reads for the thermostat warning gate.
+
+This alternate architecture preserves only descriptive source order and
+bounded calculation preconditions. It does not implement CP281's allocation,
+late equipment sweep, prevalidation latches, node membership and fallback,
+plenum aggregation, sizing lifecycle, environment rearm, thermostat
+diagnostics, partial effects, replay, or concurrency behavior. Existing
+IdealLoads calculation/output/meter conformance remains attributable to its
+declared bounded branches and proof variables, not exact
+`InitPurchasedAir` conformance.
+
+The remaining roadmap requires a persistent per-system runtime state,
+Controlled-Zone and node/plenum graph validation, exact list and lifecycle
+latches, sizing and begin-environment transitions, schedule-aware recurring
+diagnostics, and direct multi-unit, multi-return, malformed, wrong-Zone,
+environment-cycle, failure-prefix, retry, reset, and concurrency oracles before
+CP281 can advance beyond `source_mapped`.
+
+CP281 changes no routine metadata, project-contract item, Rust target or state,
+support declaration, test, capability, output, comparator, case, manifest,
+numerical claim, performance claim, readiness, or conformance status. Counts
+remain 32 algorithms and 282 routines, split 58 `state_mapped` plus 224
+`source_mapped`, with 159 required. Domain-required counts remain heat-balance
+88, HVAC 48, plant 1, and time/schedule 22, with readiness `0/88`, `0/48`,
+`0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at claim level
+`none`.
+
+CP282 next adds the currently unlisted canonical required
+`routine.size_purchased_air`.
+`PurchasedAirManager::SizePurchasedAir(EnergyPlusData &state,
+int const PurchAirNum)` is declared at `PurchasedAirManager.hh` line 343 and
+implemented completely at `PurchasedAirManager.cc` lines 1326-1904.
+`CalcPurchAirLoads` begins at source line 1906.
+
+
 
 
 
