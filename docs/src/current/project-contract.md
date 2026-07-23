@@ -6780,6 +6780,213 @@ CP263 next adds required source-mapped
 `ZoneEquipmentManager.cc` lines 4257-4290. Its child
 `initOutputRequired` begins at source line 4292.
 
+## CP263 `InitSystemOutputRequired` Zone/Space Demand-Initialization Wrapper
+
+CP263 adds canonical required `routine.init_system_output_required`
+immediately after `routine.set_zone_equip_sim_order` and before
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+item. The public wrapper is declared at `ZoneEquipmentManager.hh` line 188
+and implemented completely at `ZoneEquipmentManager.cc` lines 4257-4290:
+
+```cpp
+void InitSystemOutputRequired(
+    EnergyPlusData &state,
+    int const ZoneNum,
+    bool const FirstHVACIteration,
+    bool const ResetSimOrder);
+```
+
+The header omits the definition's top-level `const` on all three by-value
+parameters; the C++ function type is unchanged. Only the header supplies
+`ResetSimOrder = false`. `ZoneNum` is an actual parent Zone index,
+`FirstHVACIteration` is forwarded to initialization and distribution, and
+`ResetSimOrder` is forwarded only to the initializers.
+
+The exact wrapper order is:
+
+1. call `initOutputRequired` for
+   `ZoneSysEnergyDemand(ZoneNum)` and
+   `ZoneSysMoistureDemand(ZoneNum)`;
+2. when `doSpaceHeatBalance` is true, visit every occurrence in
+   `Zone(ZoneNum).spaceIndexes` in stored order and call the same child for
+   the selected Space sensible/moisture pair, passing both the unchanged
+   parent `ZoneNum` and explicit `spaceNum`, which is nonzero for a valid
+   Space identity; then
+3. after every initializer returns, call
+   `DistributeSystemOutputRequired(state, ZoneNum,
+   FirstHVACIteration)` exactly once.
+
+The wrapper owns no controlled-Zone, `ZoneSizingCalc`, `DoingSizing`,
+simulation-only Space, per-Space control, owner, uniqueness, or validity
+gate. Its Space flag is `doSpaceHeatBalance`, not the narrower
+`doSpaceHeatBalanceSimulation` used by parts of CP261. Duplicate or
+cross-listed Space identities therefore repeat, and every occurrence uses
+the referring parent Zone's equipment-list, sizing, control, and deadband
+context. The wrapper does not deduplicate or verify Zone membership.
+
+The Zone initializer receives references to the Zone demand pair. Space
+initializers receive references into the separate Space demand arenas but
+still receive the parent `ZoneNum`; a duplicated identity revisits the same
+Space records. Each successful child unconditionally copies
+six sensible and six moisture remaining/unadjusted scalars from predictor
+totals and setpoint totals, and finally copies
+`DeadBandOrSetback(ZoneNum)` into the same
+`CurDeadBandOrSetback(ZoneNum)` cell. Thus Space traversal repeats that one
+Zone deadband write rather than owning a per-Space flag.
+
+`ResetSimOrder` reaches every initializer unchanged, but CP262
+`SetZoneEquipSimOrder` runs only from the Zone child because the child gate
+also requires `spaceNum == 0`. Valid Space calls never select their own
+priority order; all share the Zone-selected manager-global scratch. The
+Zone child performs its 12 scalar demand copies before CP262, so sorting
+uses the newly restored Zone `RemainingOutputRequired` sign.
+
+After those base writes, `initOutputRequired` conditionally initializes
+sequenced arrays. It tests allocation of only the main sensible sequence
+before assuming that the other two sensible and all three moisture arrays
+are conformable. Uncontrolled or Zone-sizing entries bulk-fill all six
+sequences from predictor totals. On a controlled, nonsizing first HVAC
+iteration, Sequential and Uniform do the same, whereas UniformPLR and
+SequentialUniformPLR seed all three sensible arrays from the sign-selected
+final design load and copy moisture totals. A later entry writes only
+sequence slot one from predictor totals and may add current sensible and
+latent duct loss, leaving higher slots untouched at that phase. CP264 maps
+that complete child separately.
+
+`DistributeSystemOutputRequired` is called even when it will return
+immediately. Its current source expands into one Zone and the same stored
+Space occurrences only when
+
+```text
+G = Zone.IsControlled
+    && !ZoneSizingCalc
+    && !(FirstHVACIteration
+         && LoadDistScheme != Uniform
+         && LoadDistScheme != Sequential)
+```
+
+so first-iteration UniformPLR and SequentialUniformPLR, uncontrolled, and
+Zone-sizing calls retain initialization-only state. Later iterations of all
+valid schemes can distribute. CP265 maps the distributor and its leaf
+separately; CP263 records this parent ordering and gate interaction without
+promoting those children.
+
+Let `I` be one when Space heat balance is enabled and `M` the number of
+stored Space-index occurrences. Then `H = 1 + I*M` initializers run and the
+wrapper makes exactly `H+1 = 2+I*M` direct child calls. When `G` is true,
+the distributor expands into another `H` distribution leaves. A successful
+reset-true call also reaches CP262 exactly once. The fully expanded
+principal count is therefore
+
+`H + 1 + G*H + R`,
+
+where `R` is one for reset-true and zero otherwise. Successful initializer
+base work contributes `12H` demand-scalar assignments before conditional
+sequence writes plus `H` deadband assignments afterward, `13H` total.
+
+The wrapper body itself has one `if`, one range `for`, no `else`, switch,
+return, break, or continue, and zero direct assignment or persistent-write
+sites. It has eight syntactic call expressions when five Zone/Space array
+accessors are counted with the two initializer sites and one distributor.
+It performs no direct arithmetic, allocation, diagnostic, or cleanup.
+
+There are exactly two executable production call sites, and both explicitly
+pass `ResetSimOrder=true`. CP261 `SimZoneEquipment` calls the wrapper once
+before equipment dispatch for every controlled Zone.
+`CalcZoneLeavingConditions` calls it once, not once per return node, for
+each controlled Zone having at least one return node. The latter parent is
+reached from normal CP261 and from `SizeZoneEquipment` with
+`FirstHVACIteration=true`.
+
+A normal successful equipment pass therefore invokes CP263 `C+K` times for
+`C` controlled Zones and `K` controlled Zones with return nodes. The second
+call for a return-node Zone occurs after equipment, mass-balance, and
+leaving-condition effects and restores predictor demand again. A controlled
+Zone without return nodes receives only the front reset and can finish with
+post-equipment residual demand. The sizing path reaches only the return-node
+call, and its distributor returns immediately because `ZoneSizingCalc` is
+true.
+
+There is no local validation, result status, diagnostic, catch, cleanup
+guard, checkpoint, transaction, or rollback. Invalid Zone or top-level
+demand identity can fail before child entry. A Zone-child failure blocks
+every Space and distribution. CP262 failure occurs after the 12 Zone scalar
+copies but before sequenced-array and deadband completion. Sequence shape
+failure can preserve a partial bulk-write prefix.
+
+Failure resolving or initializing Space occurrence `k` retains the
+completed Zone and prior-Space prefixes and prevents all later Spaces and
+distribution. A distribution failure retains every initialization effect;
+failure in a later distribution leaf additionally retains the Zone and
+earlier-Space distribution prefix. No wrapper action restores any of those
+states.
+
+With every mutable dependency fixed, an immediate successful replay is
+overwrite-idempotent on fields actually rewritten. It is not a canonical
+whole-state repair: later Sequential initialization leaves sequence slots
+above one, upper priority fields retain history, and reset-false calls can
+consume another Zone's shared order. Capacities, fraction schedules, duct
+loss, load sign, Space membership, and control flags are resampled, while
+duplicate Space occurrences are replayed independently.
+
+The direct C++ census finds 24 wrapper expressions across six tests and all
+four distribution schemes. Ten use the first HVAC iteration and 14 a later
+iteration; seven pass reset true and 17 use the header default false. Basic
+Sequential and each of Uniform and UniformPLR contribute four calls,
+SequentialUniformPLR contributes eight, and two mixed-equipment Sequential
+tests contribute two each. Every direct call uses one controlled,
+nonsizing Zone with allocated sequences and no Space traversal.
+
+Those tests strongly assert sensible sequence arrays for heating and
+cooling, first and later iterations, active-equipment counts, design-load
+PLR seeding, learned-capacity PLR distribution, and sequential fraction
+schedules. However, every one of the 17 reset-false calls is followed by a
+separate explicit distributor call; the mixed test also inserts a direct
+priority reset. Their end-state assertions therefore do not isolate
+CP263's final child. Only the seven reset-true Sequential calls exercise
+the wrapper end to end without a duplicate distribution.
+
+Named parent paths add 51 statically attributable wrapper executions, for
+an audited total of 75: 58 reset true versus 17 false and 49 first versus
+26 later iterations. None enables Space heat balance, so zero Space-demand
+children are tested. No assertion proves any of the six unadjusted scalars,
+a meaningful current-deadband copy, a nonzero moisture sequence, duct-loss
+addition, Space traversal, uncontrolled or sizing behavior, an invalid
+scheme, mismatched allocation, failure prefix, or replay repair. Three
+moisture remaining assertions use zero inputs/defaults, and both sides of
+the observed deadband copy are false.
+
+Rust contains no exact or snake-case wrapper, child, distributor,
+`FirstHVACIteration`, `ResetSimOrder`, `doSpaceHeatBalance`, or matching
+reset-field implementation. Its `ZoneSysEnergyDemand` subset owns only a
+Zone ID plus four heating/cooling/humidifying/dehumidifying
+setpoint-remaining values. It has no total or unadjusted predictor fields,
+six sequenced arrays, Zone/Space demand arenas, deadband state, shared
+priority scratch, or distribution lifecycle.
+
+The active compatibility runtime constructs one fresh four-field demand
+snapshot per IdealLoads system from options and calls the prebound
+PurchasedAir path directly. Execution-plan Zone-equipment labels are not
+interpreted as CP263. The active data census has 30 equipment lists,
+30 connections, and 30 IdealLoads systems but no Space, SpaceList, or
+SpaceHVAC object. Every list is one-entry SequentialLoad at cooling/heating
+sequence `1/1`, so current fixtures expose only the trivial `M=0` topology.
+
+CP263 changes no Rust target/state, support declaration, test, capability,
+output, comparator, case, manifest, numerical claim, performance claim, or
+conformance status. Counts become 32 algorithms and 267 routines, split 58
+`state_mapped` plus 209 `source_mapped`, with 144 required. Domain-required
+counts become heat-balance 88, HVAC 33, plant 1, and time/schedule 22, with
+readiness `0/88`, `0/33`, `0/1`, and `0/22`. The IdealLoads parent remains
+`scaffold` at claim level `none`.
+
+CP264 next adds required source-mapped `routine.init_output_required`
+immediately after `routine.init_system_output_required` and before
+`routine.sim_purchased_air`. `initOutputRequired` is declared at
+`ZoneEquipmentManager.hh` lines 190-196 and implemented completely at
+`ZoneEquipmentManager.cc` lines 4292-4388.
+`DistributeSystemOutputRequired` begins at source line 4390.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before
