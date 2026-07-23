@@ -133,6 +133,7 @@ required_routines = [
   "size_zone_space_equipment_part1",
   "size_zone_space_equipment_part2",
   "size_zone_equipment",
+  "calc_doas_sup_conds_for_sizing",
   "sim_zone_equipment",
   "sim_purchased_air",
   "get_purchased_air",

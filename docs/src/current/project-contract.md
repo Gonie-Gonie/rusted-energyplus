@@ -3901,9 +3901,96 @@ conformance promotion. The algorithm remains `scaffold` with claim level
 `state_mapped` plus 189 `source_mapped`, with 124 required; the heat-balance
 project list remains 88 and the HVAC list becomes 13.
 
-CP243 next maps `ZoneEquipmentManager::CalcDOASSupCondsForSizing`, declared at
-`ZoneEquipmentManager.hh` lines 244-254 and implemented at
-`ZoneEquipmentManager.cc` lines 696-765.
+## CP243 `CalcDOASSupCondsForSizing` DOAS Supply Selector
+
+CP243 adds canonical required
+`routine.calc_doas_sup_conds_for_sizing` after `size_zone_equipment` and
+before `sim_zone_equipment`, plus the matching HVAC project item. The exact
+routine is declared at `ZoneEquipmentManager.hh` lines 244-254 and implemented
+completely at `ZoneEquipmentManager.cc` lines 696-765. Its sole production
+call expression is CP240 `sizeZoneSpaceEquipmentPart1` line 387, reached only
+for a current Zone or Space sizing role whose `AccountForDOAS` is true.
+
+The helper first writes `DOASSupTemp = 0.0` and then `DOASSupHR = 0.0`.
+`NeutralSup` clamps temperature below Low or above High, using outdoor
+humidity below Low and `min(OutHR, W90H)` above High; its middle branch passes
+through both outdoor values. `NeutralDehumSup` always selects High
+temperature, using outdoor humidity below Low and `min(OutHR, W90L)`
+otherwise. `CoolSup` selects High temperature plus outdoor humidity below
+Low, otherwise Low temperature plus `min(OutHR, W90L)`. Comparisons are raw
+strict `<` and `>` with no epsilon, threshold-order check, finite check,
+nonnegative-humidity check, or clamp beyond those explicit branches.
+
+The unqualified `min` is ObjexxFCL's `a < b ? a : b`, not `std::fmin`.
+Ordinary values select the numeric minimum, but ties select the second
+`W90*` operand, including its signed-zero bit. A NaN first operand therefore
+selects a finite second operand, while a NaN second operand is selected after
+a finite first operand. Raw IEEE comparisons also send `OutDB = NaN` to the
+`NeutralSup` pass-through branch and to the other strategies' else branches.
+With inverted thresholds, the first `OutDB < Low` test owns the overlapping
+`NeutralSup` range.
+
+`Invalid`, `Num`, and cast enum values outside the three valid enumerators
+retain the two zero writes and then fatal with
+`CalcDOASSupCondsForSizing:illegal DOAS design control strategy`. Valid paths
+do not read or mutate `state`; only the fatal path uses it for diagnostics.
+There is no local latch, allocation, numeric-input validation beyond enum
+dispatch, status, catch, cleanup, checkpoint, transaction, or rollback.
+Output-reference aliasing is unchecked: temperature is written first and
+humidity second, so the final shared value is the humidity result. All
+scalar/control calculation inputs other than `state` are passed by value.
+
+CP240 has already reset current response state, rebuilt demands, snapshotted
+pre-DOAS loads, validated inlet count, calculated the two 90%-RH values, and
+calculated DOAS mass flow before calling CP243. Only a normal return permits
+its heat-capacity, enthalpy, load, demand, inlet-node, and sizing-record
+suffix. An invalid-control fatal therefore retains the completed model-state
+prefix, writes only stack-local outputs to zero without publishing them to
+node or sizing state, and suppresses the current suffix, later Part1 roles,
+mass/leaving barriers, all Part2 roles, and the production manager suffix.
+A valid direct repeat deterministically overwrites its two outputs; an
+invalid repeat can zero again and repeat the fatal diagnostic. A CP242
+retry remains generally non-idempotent because it replays the wider Part1
+transaction.
+
+The direct helper test makes seven calls and has 14 output assertions:
+three `NeutralSup`, two `NeutralDehumSup`, and two `CoolSup` calls cover every
+valid branch. Its finite ordered inputs test only cap-selected min branches.
+It does not cover equality, inverted thresholds, IEEE specials, signed zero,
+invalid enum, output aliasing, failure, or retry. Six direct
+`SizeZoneEquipment` wrapper calls across three tests cause only three CP243
+executions: two `CoolSup` else/cap executions and one `NeutralSup`
+high/non-cap execution. Six stored-output assertions observe those results;
+the other four wrapper calls have DOAS disabled.
+
+Across one parent invocation in each of the 17 reaching direct
+`ManageSizing` contexts, all 24 Zone roles have `AccountForDOAS` false, so
+CP243 is not reached. Across one parent invocation in each of the 34 reaching
+among 56 completing active full simulations, the static aggregate is 48
+Zones plus 21 Spaces and exactly one Zone role, no Space role, enables DOAS.
+That fixture defaults to `NeutralSup` and supplies high- and low-side
+summer/winter design conditions; only downstream table loads are asserted.
+Exact repeated sizing and dynamic call counts remain uninstrumented; each
+context contributes only its own subset.
+
+Rust has no exact CP243 symbol, snake-case counterpart, `DOASControl`,
+`AccountForDOAS`, or DOAS sizing-output field. Its PurchasedAir outdoor-air
+supply path, IdealLoads supply limits, and psychrometric helpers are adjacent
+runtime behavior, not the `Sizing:Zone` DOAS selector. `Sizing:*` and
+`ZoneSizing*` remain run-blocked, the sole raw `Sizing:Zone` fixture fails
+before runtime, and the active data-model corpus contains no `Sizing:Zone`.
+
+CP243 adds no algorithm-level EnergyPlus source, Rust target/code/state,
+test, object support, capability, output implementation, comparator, case,
+manifest, numerical, performance, or conformance promotion. The algorithm
+remains `scaffold` with claim level `none`. The inventory becomes 32
+algorithms and 248 routines, split 58 `state_mapped` plus 190
+`source_mapped`, with 125 required; the heat-balance project list remains 88
+and the HVAC list becomes 14.
+
+CP244 next maps `ZoneEquipmentManager::SetUpZoneSizingArrays`, declared at
+`ZoneEquipmentManager.hh` line 109 and implemented at
+`ZoneEquipmentManager.cc` lines 767-1082.
 
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,

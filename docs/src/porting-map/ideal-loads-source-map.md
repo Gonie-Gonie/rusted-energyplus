@@ -124,6 +124,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `ZoneEquipmentManager::sizeZoneSpaceEquipmentPart1` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent fixed-option `ZoneSysEnergyDemand` snapshot, IdealLoads design supply limits, psychrometric helpers, and narrow node updates only |
 | `ZoneEquipmentManager::sizeZoneSpaceEquipmentPart2` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent typed return-node identities, diagnostic node temperatures, and constant thermostat schedule reports only |
 | `ZoneEquipmentManager::SizeZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; existing three-label stage metadata skips the sizing parent and Rust blocks `Sizing:Zone` before runtime |
+| `ZoneEquipmentManager::CalcDOASSupCondsForSizing` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent PurchasedAir outdoor-air supply logic and psychrometrics are not the `Sizing:Zone` DOAS selector |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
 | `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand` |
 
@@ -150,6 +151,8 @@ ZoneEquipmentManager::ManageZoneEquipment
                  -> SetUpZoneSizingArrays
                  -> SizeZoneEquipmentOneTimeFlag = false
             -> sizeZoneSpaceEquipmentPart1 (complete Zone/optional-Space pass)
+                 -> per role if AccountForDOAS
+                      -> CalcDOASSupCondsForSizing
             -> CalcZoneMassBalance
             -> CalcZoneLeavingConditions
             -> sizeZoneSpaceEquipmentPart2 (complete Zone/optional-Space pass)
@@ -2140,9 +2143,189 @@ inventory becomes 32 algorithms and 247 routines, split 58 `state_mapped`
 plus 189 `source_mapped`, with 124 required; the heat-balance and HVAC
 project lists become 88 and 13.
 
-CP243 next maps `ZoneEquipmentManager::CalcDOASSupCondsForSizing`, declared at
-`ZoneEquipmentManager.hh` lines 244-254 and implemented at
-`ZoneEquipmentManager.cc` lines 696-765.
+## CP243 `CalcDOASSupCondsForSizing` DOAS Supply Selector
+
+CP243 adds canonical required
+`routine.calc_doas_sup_conds_for_sizing` immediately after
+`routine.size_zone_equipment` and before `routine.sim_zone_equipment`, plus
+the same ordered HVAC project item. The exact routine is declared at
+`ZoneEquipmentManager.hh` lines 244-254 and implemented completely at
+`ZoneEquipmentManager.cc` lines 696-765. The algorithm already cites that
+source file, so no algorithm-level source or Rust target changes.
+
+### Production call and input/output contract
+
+The sole production call expression is CP240
+`sizeZoneSpaceEquipmentPart1` line 387. It is reached only for the current
+Zone or Space sizing role when selected `zsCalcSizing.AccountForDOAS` is
+true (`CalcZoneSizing` for Zone and `CalcSpaceSizing` for Space).
+The helper receives the outdoor dry-bulb and humidity ratio, low and high
+DOAS temperature limits, humidity ratios at 90% RH at each limit, and a
+`DataSizing::DOASControl` by value. Its two result scalars are mutable
+references.
+
+Every entry first performs these ordered writes:
+
+```text
+DOASSupTemp = 0.0
+DOASSupHR   = 0.0
+```
+
+It then implements this complete strategy table:
+
+| `DOASControl` | Condition | `DOASSupTemp` | `DOASSupHR` |
+|---|---|---:|---:|
+| `NeutralSup` | `OutDB < DOASLowTemp` | `DOASLowTemp` | `OutHR` |
+| `NeutralSup` | otherwise and `OutDB > DOASHighTemp` | `DOASHighTemp` | `min(OutHR, W90H)` |
+| `NeutralSup` | otherwise | `OutDB` | `OutHR` |
+| `NeutralDehumSup` | `OutDB < DOASLowTemp` | `DOASHighTemp` | `OutHR` |
+| `NeutralDehumSup` | otherwise | `DOASHighTemp` | `min(OutHR, W90L)` |
+| `CoolSup` | `OutDB < DOASLowTemp` | `DOASHighTemp` | `OutHR` |
+| `CoolSup` | otherwise | `DOASLowTemp` | `min(OutHR, W90L)` |
+
+The enum values are `Invalid = -1`, `NeutralSup = 0`,
+`NeutralDehumSup = 1`, `CoolSup = 2`, and sentinel `Num = 3`.
+`W90H` is read only by the `NeutralSup` high branch; `W90L` is read only by
+the other two strategies' else branches.
+
+### Boundaries and Objexx minimum semantics
+
+All temperature tests are raw strict `<` or `>` comparisons with no epsilon.
+For ordinary ordered Low and High limits, `NeutralSup` equality at either
+limit enters its pass-through branch. `NeutralDehumSup` and `CoolSup`
+equality at Low enter their else branches. CP243 does not validate Low versus
+High ordering: when Low exceeds High, the first `OutDB < Low` test owns the
+overlapping `NeutralSup` range. It also does not reject or clamp negative
+humidity, non-finite values, or otherwise inconsistent inputs.
+
+The unqualified `min` is the ObjexxFCL double overload imported by
+`EnergyPlus.hh`, whose body is exactly `a < b ? a : b`; it is not
+`std::fmin`. Therefore:
+
+- ordinary comparable values produce the numerical minimum;
+- a tie selects the second `W90*` operand, including its signed-zero bit;
+- NaN `OutHR` with finite `W90*` selects the finite second operand;
+- finite `OutHR` with NaN `W90*` selects that second NaN;
+- two NaNs select the second NaN; and
+- infinities follow the ordinary raw comparison.
+
+The branch comparisons have the same raw IEEE behavior. `OutDB = NaN` makes
+both comparisons false, so `NeutralSup` returns `(NaN, OutHR)` while
+`NeutralDehumSup` and `CoolSup` take their min-bearing else branches. A NaN
+Low makes every `< Low` false; a NaN High makes the `NeutralSup` `> High`
+test false. Temperature or humidity special values can consequently pass
+through to the selected result without a local diagnostic.
+
+### Invalid strategy, aliasing, and failure prefix
+
+`Invalid`, `Num`, and any cast enum value outside the three valid enumerators fall through after the
+two zero writes and issue this exact fatal:
+
+```text
+CalcDOASSupCondsForSizing:illegal DOAS design control strategy
+```
+
+`ShowFatalError` does not return. A direct harness that catches the fatal
+therefore observes the two-zero output prefix and the diagnostic state.
+Valid strategies do not read or mutate `state`; it is used only to emit this
+invalid-strategy fatal.
+
+The two output references may alias. CP243 performs no alias check and every
+valid branch writes temperature before humidity, so one shared location ends
+with the humidity result. All scalar/control calculation inputs other than
+`state` are passed by value, so overlapping caller storage cannot change the
+entry snapshots used by the calculation.
+
+CP243 has no local latch, allocation, assertion, return status, catch,
+cleanup, checkpoint, transaction, or rollback. Before its call, CP240 has
+already reset the selected non-air/system-dependent response, called
+`initOutputRequired`, snapshotted pre-DOAS sensible and optional latent
+loads, validated inlet count, calculated `W90H` and `W90L`, and calculated
+DOAS mass flow. Only a normal CP243 return permits the later heat-capacity,
+enthalpy, load, demand, inlet-node, and sizing-record writes.
+
+An invalid-strategy fatal retains that completed CP240 model-state prefix,
+writes only its stack-local outputs to zero without publishing them to node
+or sizing state, and suppresses the current CP240 suffix, all later Part1
+roles, mass balance, leaving conditions, all Part2 roles, and the production
+`ManageZoneEquipment` update suffix. A valid direct repeat deterministically
+overwrites both outputs for stable value inputs. An invalid repeat can zero
+them again and repeat the fatal diagnostic. Retry through CP242 remains
+generally non-idempotent because the wider Part1 traversal and its child
+effects are replayed.
+
+### C++ and active-corpus evidence
+
+The direct
+`DOASEffectOnZoneSizing_CalcDOASSupCondsForSizing` test has seven helper
+calls and 14 temperature/humidity assertions:
+
+- `NeutralSup` covers below-Low, above-High, and pass-through once each;
+- `NeutralDehumSup` covers below-Low and else once each; and
+- `CoolSup` covers below-Low and else once each.
+
+All inputs are finite with ordinary Low-below-High ordering. Every direct min
+case has `OutHR > W90*`, so only cap selection is proven there. The test does
+not cover either equality, `OutHR <= W90*` within a cap branch, inverted
+limits, NaN, infinity, signed zero, invalid enum, aliasing, failure, or retry.
+
+Six direct `SizeZoneEquipment` call expressions across three wrapper tests
+produce only three CP243 executions. The two-Zone
+`DOASEffectOnZoneSizing_SizeZoneEquipment` call reaches two `CoolSup`
+else/cap roles. Of five one-Zone calls in the two
+`ZoneEquipmentManager` sizing tests, only the second DOAS-load call enables
+DOAS and reaches a `NeutralSup` high branch whose `OutHR` remains below the
+cap; the three no-load calls and first DOAS-load call do not reach CP243.
+Four stored-output assertions in the two-Zone test and two in the DOAS-load
+test observe the resulting supply values. Separate node-copy assertions are
+not counted as direct CP243 output oracles. No wrapper injects an invalid
+strategy or a CP243 failure.
+
+Eighteen direct `ManageSizing` contexts exist. The plant-only context does
+not reach the sizing parent; across one parent invocation in each of the
+other 17, all 24 Zone roles have `AccountForDOAS` false, so CP243 is reached
+zero times regardless of later dynamic sizing repetitions.
+
+Among 57 active full `ManageSimulation` contexts, 56 complete and one stops
+in EMS before HVAC. Across one parent invocation in each of the 34 completing
+configurations that perform Zone sizing, the static aggregate is 48 Zone
+plus 21 Space roles. Exactly one Zone role and no Space role enable DOAS; the
+other 68 roles do not. That sole fixture omits its strategy field and
+therefore uses the IDD default `NeutralSupplyAir`/`NeutralSup`. Its summer and
+winter design-day inputs provide high- and low-side outdoor conditions,
+respectively, but assertions inspect only downstream DOAS table loads rather
+than CP243 supply outputs. Exact repeated sizing, design-day iteration, and
+total dynamic CP243 call counts remain uninstrumented. Each context
+contributes only its own topology subset.
+
+### Rust boundary and status
+
+Exact Rust searches find no `CalcDOASSupCondsForSizing`,
+`calc_doas_sup_conds_for_sizing`, `DOASControl`, `AccountForDOAS`,
+`DOASSupTemp`, or `DOASSupHR`. A downstream psychrometric sensible-enthalpy
+test uses DOAS wording, and the typed PurchasedAir outdoor-air graph,
+mixed-air supply calculation, IdealLoads supply limits, and psychrometric
+helpers are adjacent. They implement operational
+`ZoneHVAC:IdealLoadsAirSystem` behavior, not this `Sizing:Zone` low/high/90%-RH
+DOAS selector.
+
+`Sizing:*` and `ZoneSizing*` remain run-blocked in the capability contract.
+The sole raw `Sizing:Zone` fixture expects `UnsupportedSizing` before
+runtime, and the active data-model corpus contains no `Sizing:Zone`.
+Consequently no existing result, output, or conformance case provides CP243
+execution evidence.
+
+CP243 adds no algorithm-level EnergyPlus source, Rust target, executable
+code, mapped state, test, object support, capability, output implementation,
+comparator, case, manifest, numerical, performance, or conformance
+promotion. The algorithm remains `scaffold` with claim level `none`. The
+inventory becomes 32 algorithms and 248 routines, split 58 `state_mapped`
+plus 190 `source_mapped`, with 125 required; the heat-balance and HVAC
+project lists become 88 and 14.
+
+CP244 next maps `ZoneEquipmentManager::SetUpZoneSizingArrays`, declared at
+`ZoneEquipmentManager.hh` line 109 and implemented at
+`ZoneEquipmentManager.cc` lines 767-1082.
 
 ## Claim Requirements
 
