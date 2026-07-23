@@ -7992,14 +7992,363 @@ Domain-required counts become heat-balance 88, HVAC 36, plant 1, and
 time/schedule 22, with readiness `0/88`, `0/36`, `0/1`, and `0/22`. The
 IdealLoads parent remains `scaffold` at claim level `none`.
 
-CP267 next adds required source-mapped
+## CP267 `updateSystemOutputRequired` System Residual Update Leaf
+
+CP267 adds canonical required
 `routine.update_system_output_required` immediately after
 `routine.distribute_output_required` and before
-`routine.sim_purchased_air`. `updateSystemOutputRequired` is declared at
-`ZoneEquipmentManager.hh` lines 205-212, where
-`EquipPriorityNum = -1` is the only default, and implemented completely at
-`ZoneEquipmentManager.cc` lines 4717-4908.
-`adjustSystemOutputRequired` begins at source line 4910.
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+item. The leaf is declared at `ZoneEquipmentManager.hh` lines 205-212 and
+implemented completely at `ZoneEquipmentManager.cc` lines 4717-4908:
+
+```cpp
+void updateSystemOutputRequired(
+    EnergyPlusData &state,
+    int const ZoneNum,
+    Real64 const SysOutputProvided,
+    Real64 const LatOutputProvided,
+    DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+    DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+    int const EquipPriorityNum = -1);
+```
+
+The default appears only in the header. There is no `FirstHVACIteration`,
+Space identity, sizing, or duct-loss argument. The mutable demand references
+may designate either Zone or Space records, while `ZoneNum` always selects
+the control type and, for a controlled call, the parent Zone equipment-list
+context.
+
+Let
+
+```text
+S, L       = provided sensible and latent output
+U, UH, UC  = sensible unadjusted total, heating-SP, and cooling-SP residuals
+R, RH, RC  = corresponding sensible adjusted residuals
+V, VH, VD  = moisture unadjusted total, humidifying-SP, and dehumidifying-SP residuals
+M, MH, MD  = corresponding moisture adjusted residuals
+P          = EquipPriorityNum
+Z          = energy.NumZoneEquipment
+N          = selected Zone equipment list NumOfEquipTypes
+q          = P + 1
+HP(P),CP(P)= manager-global heating and cooling priorities at scratch slot P
+```
+
+For an uncontrolled Zone, the routine applies these mutations in exact
+source order:
+
+```text
+U  -= S; R  = U
+UH -= S; RH = UH
+UC -= S; RC = UC
+V  -= L; M  = V
+VH -= L; MH = VH
+VD -= L; MD = VD
+```
+
+It then recomputes the parent Zone's `CurDeadBandOrSetback` according to
+`TempControlType(ZoneNum)`:
+
+- Uncontrolled writes false;
+- SingleHeat writes `R < 1.0` through the source expression
+  `(R - 1.0) < 0.0`;
+- SingleCool writes `R > -1.0` through `(R + 1.0) > 0.0`;
+- SingleHeatCool and DualHeatCool write `RH < 0.0 && RC > 0.0`; and
+- an unknown control type retains the prior flag.
+
+All comparisons are strict, so the SingleHeat boundary `R == 1.0`, the
+SingleCool boundary `R == -1.0`, and either dual-setpoint zero boundary are
+outside deadband. A NaN comparison is false; the dual expression also
+retains C++ short-circuit order.
+
+Only when `P >= 0`, the uncontrolled path attempts three independently
+gated sequence-pair writes. The total sensible/moisture pair uses slot
+`q` when `q <= Z`. The heating/humidifying pair uses slot `HP(P)+1` when
+that value is at most `Z`, and the cooling/dehumidifying pair analogously
+uses `CP(P)+1`. The sole `return` follows these writes. The gates impose no
+lower bound, scratch bound, vector-extent check, or moisture-side equipment
+count check.
+
+For a controlled Zone with Sequential distribution, the leaf first
+subtracts `S` from all three sensible unadjusted residuals and `L` from all
+three moisture unadjusted residuals. If
+
+```text
+P >= 0 && P < N
+```
+
+it treats `q=P+1` as the next priority slot, reads
+`PrioritySimOrder(q).EquipPtr`, and lazily evaluates exactly one fraction:
+
+```text
+r = energy.TotalOutputRequired >= 0.0
+      ? SequentialHeatingFraction(state, nextSystem)
+      : SequentialCoolingFraction(state, nextSystem)
+```
+
+Unlike CP266, the unselected getter is not called. The discriminator is
+the original predictor total, not any updated residual or provided output.
+Positive and negative zero select heating, while NaN selects cooling. The
+raw fraction is neither clamped nor checked for finiteness, range, schedule
+validity, or consistency with the selected equipment.
+
+The valid-next branch writes
+
+```text
+R  = r*U;  RH = r*UH; RC = r*UC
+M  = r*V;  MH = r*VH; MD = r*VD
+```
+
+and then copies those six adjusted values into the six sensible/moisture
+sequence families at slot `q`. It does not check `q` against `Z` or any
+sequence extent. If the valid-next predicate is false, it instead copies
+the six updated unadjusted residuals directly into their adjusted partners
+and writes no sequence slot. Both Sequential paths then run the same
+thermostat/deadband switch described above.
+
+Sequential ignores duct-loss state, available-equipment counts, learned
+capacities, list priority values other than the manager scratch lookup,
+and every nonselected fraction. Its next-equipment test uses only raw `N`;
+it does not establish allocation, extent, or identity agreement among the
+six sequence vectors, `energy`, `moisture`, the selected Zone list, and the
+manager-global scratch arena.
+
+The three controlled non-Sequential schemes—Uniform, UniformPLR, and
+SequentialUniformPLR—share one body. They ignore `S` and `L` completely.
+When `P < 0`, the body is a no-op. Otherwise it independently copies at
+most three sequence pairs into the six adjusted residuals:
+
+```text
+q <= Z:
+    R = sensible total sequence(q)
+    M = moisture total sequence(q)
+HP(P)+1 <= Z:
+    RH = sensible heating sequence(HP(P)+1)
+    MH = moisture humidifying sequence(HP(P)+1)
+CP(P)+1 <= Z:
+    RC = sensible cooling sequence(CP(P)+1)
+    MD = moisture dehumidifying sequence(CP(P)+1)
+```
+
+This body does not mutate unadjusted residuals, sequence vectors, or the
+deadband flag. A skipped pair retains its historical adjusted values. It
+again uses only upper-bound tests: `P=0` can complete the total slot-one
+pair and then fail at scratch slot zero, a negative priority plus one can
+pass the upper check, and signed `+1` overflow is not guarded.
+
+Any other controlled load-distribution value calls
+
+```cpp
+ShowFatalError(
+    state,
+    "UpdateSystemOutputRequired: Illegal load distribution scheme type.");
+```
+
+before a direct demand mutation. Under the fatal helper contract, no
+mutation follows.
+NaN or infinity in `S` or `L` propagates through the subtracting
+uncontrolled and Sequential paths but is ignored by the controlled
+non-Sequential body. A selected NaN or infinite fraction propagates through
+all six valid-next products. The routine performs no division. Deadband
+comparisons against NaN produce false results; an unknown thermostat type
+preserves history rather than normalizing it.
+
+With `d=1` for a recognized thermostat case and zero otherwise, and with
+`t`, `h`, and `c` denoting successful total, heating, and cooling pair
+gates, the successful dynamic direct-mutation counts are
+
+```text
+uncontrolled:                 12 + d + 2(t+h+c)
+controlled Sequential next:  18 + d
+controlled Sequential tail:  12 + d
+controlled non-Sequential:    2(t+h+c)
+```
+
+The static body contains 58 direct persistent mutation sites over 19
+families:
+
+- 12 sites for six unadjusted residual families, each appearing in the
+  uncontrolled and controlled-Sequential branches;
+- 24 sites for six adjusted residual families, each appearing in four
+  branch locations;
+- 12 sites for six sequence families, each appearing in two branch
+  locations; and
+- ten deadband assignments across the two thermostat switches.
+
+Those sites divide into 12 compound subtractions and 46 plain assignments.
+By branch location, 23 are uncontrolled, 29 are controlled Sequential, and
+six are in the shared non-Sequential body. The complete body has ten `if`
+tokens, one `else`, three switches, 14 cases, three defaults, 15 breaks,
+one return, one ternary, five `&&` tokens, no `||`, no loop, and one unary
+`!`. Its 49 plain `=` tokens comprise the 46 persistent assignments and
+three local initializations.
+
+Under the established audit convention that counts Objexx indexing as a
+syntactic accessor, the body has 48 calls/accessors: one Zone lookup, two
+temperature-control lookups, ten deadband accesses, one Zone equipment-list
+lookup, 13 priority-scratch accesses, two fraction getters, 18 sequence
+vector accesses, and one fatal call.
+
+The leaf assumes a valid `ZoneNum`, a matching controlled equipment list,
+valid `P`/`q` scratch positions, a valid next `EquipPtr`, a valid selected
+fraction array and schedule value, and independently valid indices in all
+six sequence vectors. `energy.NumZoneEquipment` is the only count used to
+authorize moisture-vector access. Controlled Sequential instead trusts
+list `N` to authorize all six slot-`q` writes and never compares it with
+`Z`. The demand references may belong to a different Zone or Space, and a
+Space call deliberately reuses its parent Zone's control type, equipment
+list, priority scratch, and deadband destination.
+
+There is no result status, local validation, catch, checkpoint, cleanup,
+transaction, or rollback. A Zone lookup failure precedes all work. On the
+uncontrolled path, a thermostat lookup or switch failure follows the 12
+ordered residual mutations. Later failures can retain that prefix, a
+new deadband value, and completed total, heating, then cooling sequence
+pairs. `P=0` can write the total pair before failing on scratch slot zero.
+
+For a controlled call, the list lookup precedes mutation. A Sequential
+scratch or fraction failure follows the six unadjusted subtractions;
+adjusted and sequence failures retain their source-ordered prefixes, and
+the thermostat/deadband work occurs last. The shared non-Sequential body
+can retain the total pair, then heating pair, then cooling-pair prefix.
+The invalid-scheme fatal performs no direct demand write.
+
+Uncontrolled and controlled Sequential calls are intrinsically
+non-idempotent because they subtract the provided output on every replay.
+For fixed `S` and `L`, after `k` successful subtracting calls,
+
+```text
+U_k = U_0 - k*S
+V_k = V_0 - k*L
+```
+
+with analogous setpoint fields. Retrying after a partial failure therefore
+cannot reconstruct the intended one-call state without an external reset.
+The non-Sequential branch is overwrite-idempotent only for the adjusted
+pairs whose fixed gates succeed; skipped fields retain history, and it
+never repairs unadjusted demand, sequences, or deadband state. Every replay
+can resample scheme, list counts, scratch identities and priorities,
+fraction values, predictor sign, provided outputs, sequence contents and
+extents, and Zone/Space membership.
+
+There are four direct production call expressions:
+
+- `sizeZoneSpaceEquipmentPart1` calls the leaf after each optional DOAS
+  prefix at `ZoneEquipmentManager.cc` line 404, using the default `P=-1`;
+- the same sizing helper calls it at its final tail at line 596, again with
+  default priority;
+- `SimZoneEquipment` calls it after each dispatched equipment slot at lines
+  4108-4114 with explicit priority; and
+- `ZoneEquipmentSplitter::distributeOutput` calls it for each Space at
+  `DataZoneEquipment.cc` lines 2224-2230 with the parent Zone number,
+  Space demand references, and explicit priority.
+
+The splitter call can overwrite the parent Zone's
+`CurDeadBandOrSetback(ZoneNum)` from a Space residual. It does not verify
+that the Space belongs to that Zone or that the parent scratch/list state
+matches the supplied demand records. Repeated Space occurrences repeat the
+same cumulative subtraction.
+The bounded, statically attributable C++ unit corpus executes the leaf 80
+times. This count excludes unbounded repeated passes hidden inside complete
+`ManageSimulation` runs:
+
+- 65 calls follow individual `SimZoneEquipment` Zone slots;
+- two tests call the lowercase leaf directly;
+- three calls come from the splitter for Space demand; and
+- ten sizing calls comprise seven final-tail calls plus three DOAS-prefix
+  calls.
+
+All ten sizing calls see an uncontrolled Zone and default `P=-1`. The other
+70 calls are controlled Sequential calls with explicit priority. Of those,
+18 take the valid-next branch—16 equipment-slot calls plus both direct
+calls—and 52 take the fallback—49 last equipment slots plus the three
+splitter calls whose selected list count is zero. No controlled Uniform,
+UniformPLR, SequentialUniformPLR, or invalid-default execution occurs.
+With recognized thermostat cases, the corpus therefore performs exactly
+
+```text
+10*13 + 18*19 + 52*13 = 1148
+```
+
+direct mutation-statement executions in this leaf.
+
+The two direct unit calls are positive-heating, `P=1`, `N=4` cases. One
+selects fraction one and the mixed-fraction case selects heating fraction
+0.6. Together they make 18 sensible sequence assertions and six adjusted
+sensible `Remaining*` assertions. Only six sequence assertions target the
+three slot-two values freshly written by the two CP267 calls; the other 12
+prove retention of other slots. There is no direct assertion for any
+unadjusted field, moisture sequence or adjusted moisture field, or
+`CurDeadBandOrSetback`.
+
+The three splitter executions subtract nonzero Space sensible outputs but
+assert no Space demand destination. Sizing tests inspect downstream sizing
+results rather than the immediate residual fields. The named-parent
+UnitHeater case adds one final sensible `RemainingOutputRequired == 0`
+observation after two equipment slots, but it does not isolate CP267 from
+its callers and equipment calculations.
+
+Coverage therefore omits every non-Sequential branch, the invalid-scheme
+fatal, unknown thermostat retention, direct deadband boundaries at `R=1`,
+`R=-1`, and dual zero, meaningful latent output assertions, cooling
+fraction selection, negative/out-of-range/NaN/infinite fractions, and
+NaN/infinite provided output. It also omits `P=0`, `P<-1`, oversized or
+overflowing priority, negative scratch priorities, mismatched Zone/demand
+identity, allocated-empty or inconsistent sequence extents, Space-demand
+destination assertions, partial failure, rollback, and a direct cumulative
+replay/drift oracle.
+
+Rust has no exact or snake-case CP267 function. Its copied
+`ZoneSysEnergyDemand` snapshot contains a Zone identity plus only four
+heating, cooling, humidifying, and dehumidifying setpoint-remaining values.
+It owns no total or unadjusted demand, six sequence vectors,
+`NumZoneEquipment`, `PrioritySimOrder`, temperature-control array, shared
+`CurDeadBandOrSetback`, or mutable Zone/Space demand arenas.
+
+The compatibility runtime constructs a fresh complete demand snapshot for
+each compiled IdealLoads system from fixed run options, passes that snapshot
+by value, and discards it after dispatch. Equipment sensible and latent
+outputs are never subtracted from a shared residual and never feed the next
+system. Humidistat logic changes only a local copied moisture snapshot; its
+local deadband enum is not the source's shared Zone deadband flag.
+
+Rust parses all four load-distribution enums, positive unique heating and
+cooling sequence numbers, and optional heating/cooling fraction schedule
+identities, but runtime consumes none of those distribution or fraction
+fields. A multi-equipment topology is marked diagnostic-only yet remains
+dispatchable, with every system receiving the same full input snapshot
+rather than a sequenced residual. Rust's authored IdealLoads capacity limits
+are not the source manager's signed learned capacity state.
+
+The active fixture census remains 30 equipment lists, 30 equipment
+connections, and 30 IdealLoads systems. Every list has one SequentialLoad
+entry at heating/cooling sequence `1/1` with both fraction schedules blank.
+There are no active Space, SpaceList, SpaceHVAC, multi-equipment,
+non-Sequential, `Sizing:Zone`, or duct-loss objects, and all 61 active
+SimulationControl records disable Zone sizing.
+
+Even that one-equipment topology requires source CP267: the sole equipment
+is the last Sequential slot, so the fallback subtracts `S` and `L`, copies
+all six updated residuals, and recomputes deadband. Rust still omits that
+transition. The roadmap continues to require Rust-owned Zone system demand,
+removal of oracle demand injection, operational first-iteration and adaptive
+system-timestep state, multiple-equipment distribution, list ordering and
+availability, and residual-load feedback.
+
+CP267 changes no Rust target or state, support declaration, test,
+capability, output, comparator, case, manifest, numerical claim,
+performance claim, or conformance status. Counts become 32 algorithms and
+271 routines, split 58 `state_mapped` plus 213 `source_mapped`, with 148
+required. Domain-required counts become heat-balance 88, HVAC 37, plant 1,
+and time/schedule 22, with readiness `0/88`, `0/37`, `0/1`, and `0/22`.
+The IdealLoads parent remains `scaffold` at claim level `none`.
+
+CP268 next adds required source-mapped
+`routine.adjust_system_output_required` immediately after
+`routine.update_system_output_required` and before
+`routine.sim_purchased_air`. `adjustSystemOutputRequired` is declared at
+`ZoneEquipmentManager.hh` lines 214-219 and implemented completely at
+`ZoneEquipmentManager.cc` lines 4910-4931. `CalcZoneMassBalance` begins at
+source line 4933.
 
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,

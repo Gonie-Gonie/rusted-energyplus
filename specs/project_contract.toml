@@ -157,6 +157,7 @@ required_routines = [
   "init_output_required",
   "distribute_system_output_required",
   "distribute_output_required",
+  "update_system_output_required",
   "sim_purchased_air",
   "get_purchased_air",
   "init_purchased_air",
