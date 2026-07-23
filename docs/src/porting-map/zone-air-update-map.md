@@ -16415,11 +16415,303 @@ with 159 required. Domain-required counts remain heat-balance 88, HVAC 48,
 plant 1, and time/schedule 22, with readiness `0/88`, `0/48`, `0/1`, and
 `0/22`. The IdealLoads parent remains `scaffold` at claim level `none`.
 
-CP280 next refreshes existing required `routine.get_purchased_air`.
+CP280 refreshes the already-existing required `routine.get_purchased_air`
+source boundary in place. It adds neither a duplicate routine nor another HVAC
+project-contract item, and it changes no EnergyPlus source inventory.
+
+## CP280 `GetPurchasedAir` Input, Node, and Registry Loader
+
 `PurchasedAirManager::GetPurchasedAir(EnergyPlusData &state)` is declared at
 `PurchasedAirManager.hh` line 339 and implemented completely at
-`PurchasedAirManager.cc` lines 210-1052. `InitPurchasedAir` begins at source
-line 1054.
+`PurchasedAirManager.cc` lines 210-1052, an 843-line body. Its only public
+argument is the mutable simulation graph. It has no return value, caller-owned
+error flag, status, retry token, default argument, or explicit exception
+contract. The next physical definition is `InitPurchasedAir` at source lines
+1054-1324, declared at header line 341; CP281 next refreshes that existing
+required routine.
+
+CP280 does not read or write `GetPurchAirInputFlag`. Eight production
+expressions own the same external lazy protocol: test the shared flag, call
+Get, then clear the flag only after normal return. They are CP279
+`SimPurchasedAir` at lines 168-170 and seven query helpers at lines 3115-3117,
+3134-3136, 3159-3161, 3174-3176, 3204-3206, 3228-3230, and 3252-3254. Those
+helpers expose outdoor-air flow, inlet/return nodes, case-insensitive name
+index, mixed-air state, and return-plenum membership. The first normally
+returning caller after default/reset therefore becomes the loader; a query can
+load before simulation. An abnormal Get exit leaves the flag true, and a
+direct Get call never consumes it.
+
+The exact C++ source-plus-test `GetPurchasedAir(` census is 16: one declaration,
+one definition, eight guarded production expressions, and six literal unit-
+test expressions.
+
+The normal physical order is:
+
+1. bind shared input-processor shortcut state, set the current module object to
+   `ZoneHVAC:IdealLoadsAirSystem`, count objects, and store `NumPurchAir`;
+2. allocate the module arrays, including consecutive duplicate allocations of
+   both `CheckEquipName` and `PurchAirNumericFields`, assigning every name latch
+   true after each allocation pair;
+3. when the epJSON object family exists, open one global unique-node context,
+   enumerate instances in container order with a 1-based counter, populate
+   each record and numeric-field-name array, then close the context;
+4. independently traverse `1..NumPurchAir` and eagerly register every output
+   plus conditional EMS actuators even when ordinary parse errors accumulated;
+5. after all registrations, issue the sole local deferred fatal if the sticky
+   invocation-wide `ErrorsFound` is true.
+
+`PurchAir` has one module allocation. `CheckEquipName` and
+`PurchAirNumericFields` each have two identical module allocation sites, and
+per-record numeric `FieldNames` adds the sixth static allocation site. On a
+cold record, nearly all scalar, report, and runtime values begin at zero,
+enums at `Invalid`, schedules at null, EMS overrides false, and fuel types at
+district heating water and district cooling. Get contains 46 explicit
+assignment sites over 35 distinct per-unit fields, but it is not a
+comprehensive reset of every record member.
+
+Each source object contributes its key name plus 20 alpha and 11 numeric field
+sites: 32 user inputs. The record keeps an uppercase object name and a copy of
+the processed numeric field labels. Its per-object order is source-significant:
+
+- A blank overall availability schedule becomes AlwaysOn; a missing named
+  schedule records a severe error and leaves a null pointer.
+- The supply node is resolved as an Outlet and uniqueness-checked. An optional
+  exhaust node is an Inlet when system inlet is blank, but an Outlet when a
+  system inlet exists; the system inlet is separately an Inlet. Exhaust is
+  uniqueness-checked, while system inlet has no explicit unique-name check in
+  CP280.
+- Four supply temperature/humidity limits precede heating limit, maximum flow,
+  and sensible capacity, then cooling limit, maximum flow, and total capacity.
+- Blank heating and cooling availability schedules independently become
+  AlwaysOn. Dehumidification enum and cooling SHR precede humidification enum.
+- A nonblank `DesignSpecification:OutdoorAir` name is looked up exactly. On a
+  cold record, a hit sets `OutdoorAir=true`; a miss records an error and leaves
+  it false, while blank leaves the cold defaults. CP280 does not reset
+  `OutdoorAir` or `OARequirementsPtr` before this branch, so retained re-entry
+  can preserve a prior active-OA state across a blank or now-missing reference
+  and still enter the OA branch.
+- For active OA, a blank inlet-node field synthesizes a name from the uppercase
+  system name, truncating a long prefix. CP280 registers that node, checks or
+  adds it to the outdoor-air-node registry, and uniqueness-checks it before
+  reading DCV, economizer, and heat-recovery enums. CO2-setpoint DCV without
+  active CO2 simulation is repaired to `None` with warnings rather than made
+  fatal.
+- Without active OA, CP280 forcibly normalizes DCV, economizer, and heat
+  recovery to `None`, `NoEconomizer`, and `None`, regardless of inactive input
+  field values. Sensible and latent recovery effectiveness are read in either
+  branch.
+- Controlled-Zone discovery scans every controlled Zone and every inlet node.
+  A match writes `ZonePtr` and breaks only the inner loop, so a later Zone with
+  the same inlet overwrites an earlier match. No-match is silent, and CP280
+  does not reset `ZonePtr` before the scan, so retained re-entry can preserve a
+  prior owner.
+- After resetting `HVACSizingIndex` to zero, a nonblank
+  `DesignSpecification:ZoneHVAC:Sizing` name is looked up exactly. Heating and
+  cooling fuel-efficiency schedules then use the same blank-to-AlwaysOn rule,
+  followed by their fuel enums.
+
+The object loop has five named-schedule lookup sites and five AlwaysOn fallback
+sites, five static single-node-resolution sites, three unique-name-check sites,
+and two exact object-list lookups. Maximum dynamic node resolution per object
+is four because the two exhaust call sites are mutually exclusive. CP280 sets
+only the plenum exhaust node identity. Despite an unused
+`GetReturnPlenumIndex` using-declaration, return-plenum lookup and
+`InitializePlenumArrays` are deferred to Init at lines 1090-1095.
+
+The complete body has 27 ordinary `if` heads plus five `else if` heads, four
+bare `else` blocks, and four loops: object enumeration, controlled Zones,
+inlet nodes, and output registration. It has one logical AND, no logical OR,
+one `continue`, one `break`, and no while, switch, ternary, explicit return,
+try, or catch. There are 20 alpha reads, 11 real reads, nine enum conversions,
+six allocation sites, and seven direct missing-item severe sites.
+
+For every counted record, including records associated with accumulated input
+errors, the second loop makes exactly 67 unique `SetupOutputVariable` calls.
+All use the System timestep. The split is 28 energy variables with Sum storage,
+28 rate variables with Average storage, two active-time Sum variables, one
+Average availability status, four Average flow variables, and four Average
+temperature/humidity variables: 30 Sum plus 37 Average registrations. Only the
+supply total heating- and cooling-fuel energy registrations attach resource,
+HVAC group, and heating/cooling end-use metadata. If
+`AnyEnergyManagementSystemInModel` is true, each record additionally registers
+four actuators for supply mass flow, outdoor-air mass flow, supply temperature,
+and supply humidity ratio.
+
+The seven direct `ShowSevereItemNotFound` sites cover the five schedules,
+`DesignSpecification:OutdoorAir`, and `DesignSpecification:ZoneHVAC:Sizing`.
+Node resolution and unique-name services can also set the shared local error
+bit. These ordinary errors are sticky but deferred, so later objects and all
+output/EMS registrations still run when dependencies return normally.
+
+Three warning/repair families are nonfatal. Active OA with a blank node name
+can emit an extra-warning group while synthesizing the node. A synthesized or
+supplied OA node absent from `OutdoorAir:Node` or `OutdoorAir:NodeList` is added and can emit
+another extra-warning group. CO2-setpoint DCV without CO2 simulation always
+warns and resets DCV to None. After the unique-node context closes and registry
+work completes, the sole direct fatal uses the exact text
+
+`GetPurchasedAir: Errors found in input. Preceding conditions cause termination.`
+
+The unique-node begin/end services can fatal separately if their shared context
+is malformed. CP280 has no transaction, rollback, cleanup guard, or catch.
+An early abnormal exit retains the object count, allocations, input-scratch
+state, parsed-record prefix, node/connection/OA-node changes, and diagnostics.
+An exit after unique-node begin but before its end can leave the shared context
+open, making a caught retry fail at context initialization. The ordinary final
+fatal closes that context first but retains complete parsed arrays and every
+output/EMS registry effect. Its lazy caller never reaches the flag-clear line,
+so an intercepted retry repeats setup.
+
+Output or EMS failure retains the preceding registration prefix. A successful
+production load is one-shot only because its caller clears the external flag.
+Direct re-entry or manual flag reset recounts and reinvokes the module-array
+allocation/dimension operations; changed extents or replaced storage can
+reallocate those arrays. It relatches every `CheckEquipName`, repeats node and
+registry services, and has no idempotence or binding-repair protocol.
+Existing output/EMS registrations hold
+references into `PurchAir`; replay-driven reallocation can stale those bindings
+while adding another registration attempt. Fixed-input replay is therefore
+neither a pure state transformation nor proven registry-idempotent.
+
+CP280 relies heavily on upstream schema and manager invariants. It does not
+locally validate agreement between `NumPurchAir` and epJSON instance
+count/order, the 1-based instance counter against array extent, or the
+`getObjectItem` status stored in `IOStat`. It assumes coherent Zone,
+`ZoneEquipConfig`, inlet-node, OA-requirements, and ZoneHVACSizing state; it
+neither requires a successful `ZonePtr` match nor checks system-inlet
+uniqueness. Duplicate/blank identity, enum validity, numeric finiteness and
+range, supply-limit ordering, capacity sign, and recovery effectiveness are
+not locally closed. An invalid enum can be stored as `Invalid` without setting
+`ErrorsFound`; malformed fuel enums can then reach indexed resource mapping
+during output registration before the deferred fatal.
+
+There is only one public reference argument, so no ordinary cross-argument
+alias pair exists. The important lifetime alias is registry-held references
+into the reallocatable per-unit array. The two static locals are immutable
+`constexpr` strings, but all meaningful state is shared and unsynchronized.
+Same-state calls race on allocations, input shortcuts, name latches, nodes,
+OA and uniqueness registries, output/EMS registries, and records. Two lazy
+callers can both observe the flag true and duplicate the load. Separate state
+objects avoid this routine's direct sharing; deeper service/global thread
+safety is not established.
+
+Of six literal Get expressions in `PurchasedAirManager.unit.cc`, exactly five
+execute. The expression after the NoCapacity test's successful CP279 load is
+skipped because the caller-owned flag is already false. Four literal
+`ManageZoneEquipment` tests load indirectly through CP279, so that file has
+exactly nine successful CP280 executions: five direct and four indirect. One
+active BaseClassSizing full simulation adds one lazy load; four Zone-sizing-
+only SizingManager simulations add zero. The bounded active unit/full-
+simulation total is therefore exactly ten CP280 executions, regardless of the
+hundreds of later CP279 system-timestep calls.
+
+Across those ten loads CP280 makes exactly 670 output-variable registrations
+and 16 EMS-actuator registrations. The nine PurchasedAir tests own 76 post-load
+assertions, split 14/10/7/5/2/2/5/7/24 by test. Only the dedicated GetInput
+case's 14 assertions are a focused parser-state oracle: one record and uppercase
+name, four supply limits, two limit enums, two humidity-control enums, and both
+default fuel-efficiency schedules and their 1.0 values. The other 62 assertions
+mix parsed names, nodes, and fuels with CP279, Init, Calc, Update, Report, or EMS
+effects. The full simulation adds 11 sizing assertions, none parser-specific.
+No test asserts exact output/EMS registry names or counts, calls any of the
+seven query loaders directly, or checks a CP280 warning, severe, final fatal,
+failure prefix, or retry.
+
+The nine PurchasedAir unit loads are valid single-object cases: eight no-OA
+and one OA. The OA case leaves its OA node blank, exercising short-name
+synthesis and automatic node addition with extra warnings disabled. Node
+combinations are one with neither exhaust nor system inlet, seven exhaust-only,
+and one with both. All availability schedules are blank; eight objects use
+NoLimit and one uses heating LimitCapacity; two use custom fuel-efficiency
+schedules and Electricity; four loads register EMS actuators. There is no
+malformed, multi-unit, duplicate-name, uniqueness-error, missing-reference, or
+explicit replay fixture.
+
+The exact project census remains 120 models, 108 IDF plus 12 epJSON. Exactly
+30 IDFs and no epJSON contain IdealLoads, each with one system, one Zone, and
+one equipment list. Eighteen are no-OA and 12 have valid OA. Every OA model
+supplies a valid OA specification and a listed OA node, so project fixtures do
+not exercise node synthesis or its warnings. All 30 omit overall/heating/
+cooling availability schedules, exhaust and system-inlet nodes,
+`DesignSpecification:ZoneHVAC:Sizing`, EMS, and autosizing.
+
+Their limit modes split 27 NoLimit plus one each Capacity, Flow, and
+Flow+Capacity. Dehumidification is 20 ConstantSensibleHeatRatio, six None, two
+Humidistat, and two ConstantSupplyHumidityRatio; humidification is 26 None,
+two Humidistat, and two ConstantSupplyHumidityRatio. DCV is 28 None, one
+CO2Setpoint with contaminant simulation enabled, and one OccupancySchedule.
+Economizer is 28 NoEconomizer plus one each DifferentialDryBulb and
+DifferentialEnthalpy; heat recovery is 28 None plus one Enthalpy and one
+Sensible. Two models name fuel-efficiency schedules; the other 28 are blank,
+and all use district heating-water/cooling resources.
+
+One successful EnergyPlus run per unique model would therefore perform exactly
+30 CP280 loads and 2,010 output registrations, with no EMS actuator
+registration. Fifty-two of 140 manifests reference those models, so running
+each route in a fresh process would conditionally perform 52 loads. Forty-eight
+routes request 869 exact IdealLoads output rows spanning 46 of CP280's 67
+names: 418 conformance, 447 diagnostic, and four baseline. The other 21
+registered names are unrequested. Twenty-one manifests add 62 facility-meter
+rows, split 31 district heating-water and 31 district cooling. This is valid
+single-object integration and downstream output evidence, not an isolated
+parser, registration-order, alternate-resource, diagnostic, partial-state, or
+retry oracle. Twenty-eight comparison scripts check the five PurchasedAir
+stage labels and all 28 check prebound typed lookup; both are report metadata,
+not CP280 lifecycle parity.
+
+Rust has broad structural input typing but not CP280's loader transaction.
+`Compiler::parse_ideal_loads_air_systems` eagerly creates a typed
+`IdealLoadsAirSystem` with an internal ID plus counterparts for the source
+name, 20 alpha fields, and 11 numeric fields: structural coverage is 32/32.
+It provides normalized identity, a required supply-node name, typed schedule
+IDs, enum defaults, the source numeric defaults such as 50/13 C,
+0.0156/0.0077 humidity ratio, 0.7 SHR, and 0.7/0.65 recovery effectiveness,
+and explicit enum/range and duplicate-name diagnostics.
+
+That compile-time vector is an intentional alternate architecture. Rust owns
+no lazy input flag, duplicate module allocations, numeric field-name array,
+per-index name latch, global unique-node context, exact inlet/outlet connection
+roles, blank-OA-node synthesis, OutdoorAir-node auto-add, or controlled-Zone
+inlet scan and later-match overwrite. It does not force inactive-OA DCV,
+economizer, and heat recovery fields back to the source None values or perform
+the source CO2-disabled warning/reset. Availability, heating/cooling
+availability schedules, and system inlet are not consumed by the current
+runtime; ZoneHVAC sizing remains only a stored name; fuel-efficiency schedules
+are consumed only on bounded CLI paths. Missing OA references and other
+compiler diagnostics do not reproduce the source's severe/deferred-fatal
+ordering, partial global side effects, or retry state. The all-true immutable
+`IdealLoadsInitFlags` snapshot is not this Get lifecycle.
+
+Rust and `variable_coverage.toml` expose exact source names for 46 of the 67
+outputs through request-driven result/CLI registries, not eager per-object
+OutputProcessor registration. The 21 absent names are four supply sensible/
+latent energy variables, four Zone sensible/latent energy variables, six OA
+energy variables, six heat-recovery energy variables, and Hybrid Ventilation
+Available Status. None of the four source EMS actuators is implemented, and
+EMS remains capability-forbidden. Existing selected calculation, output, and
+meter conformance can remain attributed to its declared 46-name boundary; it
+is not exact `GetPurchasedAir` conformance.
+
+The remaining roadmap requires exact lazy ownership and reset behavior,
+source-ordered input and node roles, OA synthesis/repair and controlled-Zone
+binding, output/resource/EMS registry semantics, deferred diagnostics, and
+direct zero/multi-object, malformed, failure-prefix, retry, replay, and
+concurrency oracles before CP280 can advance.
+
+CP280 changes no routine metadata, project-contract item, Rust target or state,
+support declaration, test, capability, output, comparator, case, manifest,
+numerical claim, performance claim, or conformance status. Counts remain 32
+algorithms and 282 routines, split 58 `state_mapped` plus 224 `source_mapped`,
+with 159 required. Domain-required counts remain heat-balance 88, HVAC 48,
+plant 1, and time/schedule 22, with readiness `0/88`, `0/48`, `0/1`, and
+`0/22`. The IdealLoads parent remains `scaffold` at claim level `none`.
+
+CP281 next refreshes existing required `routine.init_purchased_air`.
+`PurchasedAirManager::InitPurchasedAir(EnergyPlusData &state,
+int const PurchAirNum, int const ControlledZoneNum)` is declared at
+`PurchasedAirManager.hh` line 341 and implemented completely at
+`PurchasedAirManager.cc` lines 1054-1324. `SizePurchasedAir` begins at source
+line 1326.
 
 
 
