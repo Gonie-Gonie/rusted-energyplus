@@ -14819,12 +14819,335 @@ counts become heat-balance 88, HVAC 42, plant 1, and time/schedule 22, with
 readiness `0/88`, `0/42`, `0/1`, and `0/22`. The IdealLoads parent remains
 `scaffold` at claim level `none`.
 
-CP273 next adds required source-mapped `routine.calc_air_flow_simple`
-immediately after `routine.update_zone_equipment` and before
-`routine.sim_purchased_air`. `CalcAirFlowSimple` is declared at
-`ZoneEquipmentManager.hh` lines 228-232 with defaults `0`, `false`, and
-`false`, and implemented completely at `ZoneEquipmentManager.cc` lines
-5570-6910. `GetStandAloneERVNodes` begins at source line 6912.
+## CP273 `CalcAirFlowSimple` Simple Zone Airflow Coordinator
+
+CP273 adds canonical required `routine.calc_air_flow_simple` immediately
+after `routine.update_zone_equipment` and before
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+requirement. It changes no EnergyPlus source inventory.
+
+`CalcAirFlowSimple(EnergyPlusData &, int SysTimestepLoop,
+bool AdjustZoneMixingFlowFlag, bool AdjustZoneInfiltrationFlowFlag)` is
+declared at `ZoneEquipmentManager.hh` lines 228-232 and implemented
+completely at `ZoneEquipmentManager.cc` lines 5570-6910. The header
+defaults the three by-value arguments to `0`, `false`, and `false`;
+the definition adds only function-type-neutral top-level `const`. There is
+no return status or exception specification. CP272 ends at source line 5568;
+CP274 `GetStandAloneERVNodes` starts at line 6912.
+
+There are exactly five executable production call expressions:
+
+- `ManageHVAC` calls CP273 at line 240 with all defaults after Zone and
+  contaminant setpoint updates and hybrid-ventilation control. AirflowNetwork
+  balance, the heat-to-return flag, and predictor work follow.
+- The same parent calls it at line 338 for each shortened system-timestep
+  iteration only when `TimeStepSys < TimeStepZone`. It passes
+  `SysTimestepLoop` and leaves both adjustment flags false; a prior
+  `stopSimulation` break can prevent the call.
+- `SimulationManager::Resimulate` calls it at lines 2927-2928 only under
+  `ResimHVAC`, passing timestep zero and both stored mass-conservation
+  adjustment flags before predictor and HVAC resimulation.
+- Enforced-mass-balance `SimZoneEquipment` calls it at line 3629 on the
+  first HVAC iteration with timestep zero and both flags false.
+- The same guard calls it at lines 3631-3632 on later iterations with
+  timestep zero and both stored adjustment flags. Both expressions follow
+  supply-air-path component simulation and precede Space mixers and
+  Zone-equipment dispatch.
+
+The routine first range-resets these 15 fields in every stored Zone heat
+balance record: `MCPM`, `MCPTM`, `MCPTI`, `MCPI`, `OAMFL`,
+`MCPTV`, `MCPV`, `VAMFL`, `MDotCPOA`, `MDotOA`,
+`MCPThermChim`, `ThermChimAMFL`, `MCPTThermChim`,
+`MixingMassFlowZone`, and `MixingMassFlowXHumRat`. When
+`doSpaceHeatBalance` is true it performs the same 15 resets for every
+Space record. Enabled CO2 or generic-contaminant simulation separately zeros
+its whole mixing-flow array when any Mixing, CrossMixing, or
+Refrigeration:DoorMixing object exists.
+
+Those writes commit before either early return. `AirFlowFlag=false`
+returns after the reset prefix. A second guard returns unless AirflowNetwork
+control is `NoMultizoneOrDistribution` or
+`MultizoneWithDistributionOnlyDuringFanOperation`. A full path then calls
+`ManageEarthTube`, `ManageCoolTower`, and `ManageThermalChimney` in
+that exact order.
+
+Next, every Zone and optional Space copies `MAT` and `airHumRat` into
+`MixingMAT` and `MixingHumRat`. Only `SysTimestepLoop == 1` replaces
+those snapshots with `XMPT` and `WTimeMinusP`. Only when `TotZoneAirBalance > 0`, every stored
+`ZoneAirBalance` record resets `BalMassFlowRate`,
+`InfMassFlowRate`, `NatMassFlowRate`, `ExhMassFlowRate`,
+`IntMassFlowRate`, and `ERVMassFlowRate`. Any ventilation input also
+zeros `VentilFanElec` for every Zone report record.
+
+Ventilation objects are visited in numeric input order. Each visit selects
+Zone or Space indoor state, Zone-local outdoor dry bulb, wind speed and
+direction, and linked-outdoor-node humidity/enthalpy when present.
+Standard density uses `StdRhoAir`; Indoor density uses indoor
+`MixingMAT/MixingHumRat`; Outdoor/default density uses
+`TempExt/HumRatExt`. Specific heat always uses `HumRatExt`.
+Hybrid-control Close and Global modes,
+availability, and minimum/maximum indoor, outdoor, and delta-temperature
+schedules can suppress the object unless EMS forces it; invalid schedule
+limits advance warning and recurring-warning state.
+
+`ZoneVentilation:DesignFlowRate` uses scheduled or EMS volume flow,
+clamps negative coefficient products, and either contributes a direct
+`MCPV/VAMFL/MCPTV` triplet or a fan-type mass term to the Zone outdoor-air
+quadrature record. Intake, exhaust, natural, and balanced fan types select
+the accumulation route. Positive fan efficiency computes fan power, and
+balanced flow doubles it. Intake or balanced flow with positive fan power
+adds heat. AirflowNetwork mode, kickoff state, Zone-equipment availability,
+and the AirflowNetwork Zone flag gate only the electricity-report path.
+
+`ZoneVentilation:WindandStackOpenArea` derives or accepts opening
+effectiveness and discharge coefficient, combines wind and stack flow
+terms in quadrature, accepts an EMS override, clamps negative flow, and
+either adds the Natural quadrature term or the direct heat-balance
+coefficients. Both models finally add their direct coefficients to the
+owning Zone and optional Space.
+
+The source then visits one-way Mixing objects in numeric order. It clears each
+report flag, applies hybrid Close/Global and indoor, source, outdoor, and
+delta-temperature schedule limits, and computes density and specific heat
+from the average source/receiver state. A negative TD activates only for a
+sufficiently cooler source, a positive TD only for a sufficiently warmer
+source, and zero TD unconditionally; NaN activates none. Each active branch
+restores desired flow, then may substitute the pre-existing positive
+`MixingMassFlowRate/AirDensity` only when the receiver's mass-balance
+flag and `AdjustZoneMixingFlowFlag` are both true.
+
+An active one-way object writes its mass flow, sensible and moisture
+coefficients, enabled contaminant transfers, and report flag. It accumulates
+only into the receiver Zone and optional receiver Space. The negative-TD
+branch forms `thisMCPTM` from receiver `TZN`; positive
+and zero branches use source `TZM`.
+
+CrossMixing likewise starts with a false report flag, but a negative or NaN
+TD is inert. A nonnegative TD enters the schedule-limit checks and performs
+symmetric transfer when TD is zero or the source-minus-receiver difference
+meets TD. Average density and specific heat drive equal bidirectional mass,
+sensible, moisture, and optional contaminant terms. Explicit source and
+receiver Spaces receive direct terms; without a source Space, the source
+Zone contribution is distributed across all of its Spaces by stored Zone
+volume fractions.
+
+Refrigeration-door mixing loops Zone A from one through `NumOfZones-1`,
+then each flagged pair and stored connection. It chooses Zone or Space
+temperature and humidity, density and specific heat, then uses either an EMS
+volume-flow value or the scheduled door-area, protection, density, and
+buoyancy formula. A zero schedule skips the connection. The ordinary
+temperature factor is 0.8 above an 11 C absolute difference and 1.1
+otherwise. Only the ordinary path overwrites report volume flow; both
+paths add symmetric mass, temperature, moisture, and optional contaminant
+contributions. Absent explicit Spaces,
+Zone terms are allocated by Space volume fractions.
+
+Infiltration objects are also visited once in input order. Each selects
+Zone/Space indoor state, Zone-local outdoor conditions, linked-node humidity,
+density basis, and external-humidity specific heat. A positive schedule
+dispatches `DesignFlowRate`, Sherman-Grimsrud effective leakage area, or
+AIM2 flow-coefficient equations and clamps negative results. A nonpositive
+schedule zeros volume and local heat-capacity flow. An unknown positive-
+schedule model leaves stored volume unchanged while local heat-capacity flow
+remains zero.
+
+When `AdjustZoneInfiltrationFlowFlag` and the Zone infiltration flag are
+both true, Adjust can replace volume from the object's existing mass flow;
+DesignFlowRate explicitly permits a signed value. Add instead adds the
+mass-conservation infiltration flow divided by density. The routine then
+writes object mass flow. A later EMS override clamps and recomputes only the
+local heat-capacity flow, leaving the already-written volume and mass
+unsynchronized. Quadrature Zones accumulate `InfMassFlowRate`; ordinary
+Zones write object `MCpI_temp` and add `MCPI/OAMFL/MCPTI` to the
+Zone and optional Space.
+
+After all infiltration objects, every Zone and optional Space adds its three
+thermal-chimney fields into the infiltration totals. Each Quadrature
+`ZoneAirBalance` record then lazily calls CP274 when `OneTimeFlag` is
+false, sums only positive ERV exhaust-minus-inlet node flow, and converts
+that aggregate by outdoor density. It writes
+
+`MDotOA = sqrt(Nat^2 + Int^2 + Exh^2 + ERV^2 + Inf^2
+                 + (rho * InducedRate * schedule)^2) + Bal`
+
+and then `MDotCPOA = MDotOA * CpAir`, using linked-node or global outdoor
+humidity.
+
+Several source quirks are part of the mapping boundary:
+
+- An invalid ventilation outdoor-temperature range advances the outdoor
+  warning state but assigns
+  `MinIndoorTemperature = MaxIndoorTemperature` at source line 5818.
+- Wind-and-stack ventilation samples its opening-area schedule twice.
+- The negative-TD Mixing branch uses receiver temperature as described
+  above.
+- A CrossMixing outdoor-limit diagnostic formats `Mixing(j).Name`, not
+  the CrossMixing object's name.
+- Refrigeration-door `CpAirZoneB` is computed before an optional
+  source-Space humidity override.
+- The refrigeration source-Space branch tests receiver `spaceIndex > 0`
+  before reading `fromSpaceIndex`.
+- Infiltration EMS flow does not synchronize stored volume or mass flow.
+
+The stripped body contains 189 `if` tokens, 42 `else` tokens including
+four else-if forms, 19 loops split 12 range and seven indexed, four switches,
+11 cases, four defaults, two returns, 13 continues, and 15 switch breaks. It
+has no while/do loop, ternary, or goto. There are 196 direct persistent
+mutation sites across 51 normalized field paths, grouped into ten storage
+families: 92 plain assignments, 94 additions, two multiplications, and eight
+persistent increments.
+
+Those sites split Zone heat balance 50, Space heat balance 60, contaminant
+arrays 16, ZoneAirBalance 14, Zone reports four, Ventilation 22, Mixing 16,
+CrossMixing five, refrigeration-door state one, and Infiltration eight.
+Child, schedule, psychrometric, and diagnostic mutations are additional.
+Under the established call convention, the body has 81 operational/service
+sites: four children, 25 schedule reads, 20 psychrometric calls, and 32
+diagnostic calls. Eight formatting, 31 math, and 137 indexed-accessor sites
+bring the expression census to 257.
+
+A reset-only return performs 15 writes per Zone record, optionally 15 per
+Space record, plus up to two whole contaminant-array fills. A full path adds
+the three leading managers, two mixing-snapshot writes per Zone/Space and two
+more for exact timestep one, six writes per ZoneAirBalance record only
+when `TotZoneAirBalance > 0`, and one
+ventilation-electric reset per Zone report when applicable. It visits every
+Ventilation, Mixing, CrossMixing, and Infiltration object once, every enabled
+refrigeration Zone/connection, every final ZoneAirBalance/ERV connection, and
+each source-Zone Space needed for allocation. Exact work thereafter depends
+on schedules, flags, branches, and topology.
+
+The source performs no complete validation of counts, allocation, Zone,
+Space, node, master/follower, or ERV identities, ownership, aliasing,
+schedule pointers, enum values, density or specific-heat divisors, geometry,
+volume fractions, or finite values. Local negative-flow clamps and schedule
+limit corrections are not transaction-level validation. There is no status,
+checkpoint, catch, rollback, cleanup, or retry protocol.
+
+An abnormal exit therefore retains the reset, child, prior-object,
+current-object, diagnostic, and accumulator prefix reached before failure.
+The two deliberate early returns retain the reset prefix. CP274 can set
+`OneTimeFlag=true` before ERV discovery completes, so a failure can also
+suppress discovery on replay. Many heat-balance destinations are reset and
+rebuilt, but whole-routine replay is not generally idempotent: the three
+leading managers, warning counters and recurring diagnostics, one-time ERV
+discovery, unknown-model retained fields, mutable mass-balance inputs,
+aliases, duplicates, and source quirks preserve history.
+
+No unit calls `ManageHVAC` or `Resimulate` directly. The C++ unit
+corpus has 26 literal CP273 expressions across nine tests and 34 dynamic
+executions because one wind-and-stack call is inside a nine-row loop. The
+dynamic arguments split 32 timestep-zero and two timestep-two executions,
+with 28 false/false and six true/true adjustment pairs. There is no mixed
+flag pair or timestep-one direct execution.
+
+The direct coverage consists of:
+
+- one infiltration reporting execution spanning DesignFlowRate, effective
+  leakage area, and flow-coefficient objects;
+- one five-object CrossMixing execution checking sensible, mass, and moisture
+  terms;
+- 19 mass-balance-test expressions, mostly confounded with a following
+  `CalcZoneMassBalance`, including six explicit true/true replays that
+  check receiver mixing adjustment;
+- one two-Zone refrigeration-door execution checking four CO2 and generic
+  contaminant terms; and
+- 12 wind-and-stack executions checking 12 wind-coefficient
+  cases across nine unique directions.
+
+There is no direct Space-heat-balance, ordinary scheduled DesignFlow
+ventilation, EarthTube, CoolTower, ThermalChimney, ZoneAirBalance quadrature,
+or ERV oracle. No direct test isolates `AirFlowFlag=false`, the
+AirflowNetwork return, a mixed adjustment pair, timestep-one history,
+one-way-Mixing temperature branches, failure, or same-state repair.
+
+Nine direct `ManageZoneEquipment` and four direct `SimZoneEquipment`
+expressions have no enforced Zone mass-balance input, so the internal
+`SimZoneEquipment` guard contributes zero CP273 calls. Six direct sizing
+calls also bypass it. Under the established route-representative method, 17
+effective `ManageSizing` contexts add one sizing and one post-sizing
+`ManageHVAC` route each. Together with the 26 direct expressions, the
+bounded census is 60 route representatives, or 68 loop-expanded route
+representatives after expanding the known wind-direction loop. The 18th
+sizing context is plant-only. Only the 34 direct unit executions are an
+exact dynamic count; sizing cadence is not inferred.
+
+Fifty-six completing `ManageSimulation` contexts have
+timestep-, adaptive-, and demand-resimulation-dependent call counts, so no
+exact dynamic total is inferred. Seven contain 12
+`ZoneInfiltration:DesignFlowRate` definitions, but their assertions are
+downstream HVAC, sizing, or tabular observations rather than CP273 fields.
+One input-manager context expands to five Mixing and five CrossMixing
+instances but asserts only parsed topology.
+
+Two more completing contexts select an incompatible AirflowNetwork mode and
+smoke the reset-and-return path; one also declares a suppressed
+`ZoneVentilation:DesignFlowRate`. Their assertions are AirflowNetwork or
+no-throw checks. Seven sizing-manager contexts enable Space heat balance for
+sizing but contain no simple-airflow topology. The EMS expected-fatal case
+stops at `BeginTimestepBeforePredictor` before the ordinary line-240 call.
+
+Rust has no exact or snake-case routine, runtime call, AirFlowFlag,
+mass-conservation adjustment flags, simple-airflow object arenas, CP273
+aggregate producer, mixing snapshots, contaminant mixing arrays, quadrature
+balance state, warning counters, or ERV discovery protocol. Its closest
+`ZoneHeatBalanceState` fields, `sum_mcp_w_per_k` and
+`sum_mcp_t_w`, are initialized to zero and only copied or consumed;
+repository-wide assignment evidence finds no airflow producer. They are
+zero-only coefficient plumbing, not CP273 state or behavior. Typed
+`Construction:AirBoundary` is run-blocked declaration metadata whose
+boundary explicitly defers generated ZoneCrossMixing, schedule sampling,
+mixing calculation, and output. IdealLoads
+`DesignSpecification:OutdoorAir` and demand-controlled ventilation
+belong to the separate PurchasedAir subsystem and do not implement CP273.
+
+The exact 120-model data census, split 108 IDF and 12 epJSON models, contains
+zero objects from all CP273 topology families: the three ZoneInfiltration
+models, both ZoneVentilation models, ZoneMixing, ZoneCrossMixing,
+Refrigeration:DoorMixing, ZoneAirBalance:OutdoorAir, ZoneEarthtube,
+ZoneCoolTower:Shower, ZoneThermalChimney, AirflowNetwork simulation control,
+and ZoneAirMassFlowConservation. It also contains no authored Space or
+Construction:AirBoundary object. Twelve IdealLoads outdoor-air models own an
+OutdoorAir:Node, but no CP273 object consumes it.
+
+All 30 active IdealLoads models therefore make the EnergyPlus call through
+`ManageHVAC`, reset Zone state, pass the default simple-AirflowNetwork
+gate, invoke the three no-input leading managers, and traverse empty
+Ventilation, Mixing, CrossMixing, door, Infiltration, and ZoneAirBalance
+collections. That is empty-topology lifecycle evidence, not numerical
+airflow evidence. Rust compatibility execution instead reaches PurchasedAir
+directly and has no corresponding reset or coordinator transition.
+
+One manifest declares conformance for
+`Zone Air Heat Balance Outdoor Air Transfer Rate` in the official
+uncontrolled 1Zone dynamic candidate. That fixture owns no CP273 topology,
+and Rust creates the output as an exact zero vector. Its variable-coverage
+boundary expressly leaves broad infiltration, ventilation, mixing, and
+air-balance compatibility outside the claim. It cannot establish CP273
+numerics, topology, adjustment, ordering, failure, or replay behavior.
+
+The roadmap still requires typed simple-airflow inputs and ownership,
+Zone/Space heat-balance and contaminant state, schedules and local weather,
+psychrometrics, hybrid control, the five airflow families and three leading
+managers, mass-balance adjustment, quadrature/ERV topology, warning and
+source-quirk behavior, outputs, and failure/replay semantics.
+
+CP273 changes no Rust target or state, support declaration, test, capability,
+output, comparator, case, manifest, numerical claim, performance claim, or
+conformance status. Counts become 32 algorithms and 277 routines, split 58
+`state_mapped` plus 219 `source_mapped`, with 154 required.
+Domain-required counts become heat-balance 88, HVAC 43, plant 1, and
+time/schedule 22, with readiness `0/88`, `0/43`, `0/1`, and
+`0/22`. The IdealLoads parent remains `scaffold` at claim level
+`none`.
+
+CP274 next adds required source-mapped
+`routine.get_stand_alone_erv_nodes` immediately after
+`routine.calc_air_flow_simple` and before
+`routine.sim_purchased_air`. `GetStandAloneERVNodes` is declared at
+`ZoneEquipmentManager.hh` line 234 and implemented completely at
+`ZoneEquipmentManager.cc` lines 6912-6950.
+`CalcZoneMixingFlowRateOfReceivingZone` begins at source line 6952.
 
 ## Promotion Requirements
 
