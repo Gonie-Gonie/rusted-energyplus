@@ -8342,13 +8342,234 @@ required. Domain-required counts become heat-balance 88, HVAC 37, plant 1,
 and time/schedule 22, with readiness `0/88`, `0/37`, `0/1`, and `0/22`.
 The IdealLoads parent remains `scaffold` at claim level `none`.
 
-CP268 next adds required source-mapped
+## CP268 `adjustSystemOutputRequired` Zone/Sequence Ratio Leaf
+
+CP268 adds canonical required
 `routine.adjust_system_output_required` immediately after
 `routine.update_system_output_required` and before
-`routine.sim_purchased_air`. `adjustSystemOutputRequired` is declared at
-`ZoneEquipmentManager.hh` lines 214-219 and implemented completely at
-`ZoneEquipmentManager.cc` lines 4910-4931. `CalcZoneMassBalance` begins at
-source line 4933.
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+item. The leaf is declared at `ZoneEquipmentManager.hh` lines 214-219 and
+implemented completely at `ZoneEquipmentManager.cc` lines 4910-4931:
+
+```cpp
+void adjustSystemOutputRequired(
+    Real64 const sensibleRatio,
+    Real64 const latentRatio,
+    DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+    DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+    int const equipPriorityNum);
+```
+
+The header and definition agree. All three scalar inputs are top-level
+`const` by value, while the two demand records are mutable lvalue
+references. There is no `EnergyPlusData`, Zone or Space identity, default
+argument, `FirstHVACIteration`, or `noexcept` qualifier.
+
+Let `s=sensibleRatio`, `l=latentRatio`, and `p=equipPriorityNum`. The body
+contains exactly these 12 mutations in source order:
+
+```text
+energy.RemainingOutputRequired                  *= s
+energy.RemainingOutputReqToHeatSP               *= s
+energy.RemainingOutputReqToCoolSP               *= s
+moisture.RemainingOutputRequired                *= l
+moisture.RemainingOutputReqToHumidSP            *= l
+moisture.RemainingOutputReqToDehumidSP          *= l
+energy.SequencedOutputRequired(p)                *= s
+energy.SequencedOutputRequiredToHeatingSP(p)     *= s
+energy.SequencedOutputRequiredToCoolingSP(p)     *= s
+moisture.SequencedOutputRequired(p)              *= l
+moisture.SequencedOutputRequiredToHumidSP(p)     *= l
+moisture.SequencedOutputRequiredToDehumidSP(p)   *= l
+```
+
+Thus `s` scales three adjusted sensible residuals and the matching three
+sensible sequence cells, while `l` independently scales the three adjusted
+moisture residuals and matching moisture sequence cells. The routine does
+not touch predictor totals, any unadjusted residual, another sequence slot,
+`NumZoneEquipment`, list or priority scratch, capacities, fractions,
+deadband state, node state, or a saved demand copy.
+
+The static and successful dynamic mutation counts are both 12, spanning 12
+families. Every mutation is `*=`; there is no plain assignment, other
+compound assignment, increment, local variable, branch, switch, loop,
+ternary, logical operator, break, or explicit return. Each compound
+assignment reads and writes its destination once. Under the established
+audit convention, the only six calls/accessors are the six sequence-vector
+indexing expressions.
+
+The leaf uses raw `p` for every sequence vector. It performs no `+1`
+conversion and consults no equipment count. It assumes all six vectors are
+allocated and independently contain the same index, and does not validate
+the index lower or upper bound, vector extent agreement, demand ownership,
+or Zone/Space identity. A nonpositive or oversized index is not rejected;
+a zero ratio does not skip indexing.
+
+Ratios are likewise used raw, without sign, range, or finiteness checks,
+clamping, division, or diagnostics. A negative ratio reverses signs. A
+finite value times positive or negative zero becomes signed zero; repeated
+negative-zero scaling can alternate a zero sign. NaN propagates through
+that ratio's six destinations. Infinity can produce signed infinity, while
+zero times infinity can produce NaN. Finite multiplication preserves the
+platform's ordinary rounding, overflow, and underflow behavior. Because
+both ratios are captured by value, earlier demand mutations cannot change
+the later multiplier.
+
+There is no local validation, result status, diagnostic, catch, checkpoint,
+cleanup, transaction, or rollback. All six adjusted scalar multiplications
+complete before the first indexed sequence access. An invalid first
+sequence access therefore leaves those six scalar mutations. A later
+malformed vector retains the same scalar prefix plus every sequence
+multiplication already completed in the documented order. Under ordinary
+IEEE behavior, NaN and infinity propagate as values rather than failures;
+a trap-enabled environment can expose an earlier numeric prefix.
+
+For fixed ratios, a fixed priority index, and successful calls, replay
+compounds rather than reconstructing state. In ideal real arithmetic, after `k` calls each
+sensible destination is its initial value times `s^k`, and each moisture
+destination is its initial value times `l^k`. A retry after partial failure
+therefore scales the retained prefix again and cannot recover the intended
+one-call state. Unity ratios and some zero/NaN fixed points are incidental
+special cases, not a replay guarantee.
+The only direct production call expression is in
+`ZoneEquipmentSplitter::adjustLoads` at `DataZoneEquipment.cc` lines
+2180-2184. The transitive production entry is the `SimZoneEquipment`
+equipment loop at `ZoneEquipmentManager.cc` lines 3740-3743. It calls
+`adjustLoads` only when Space heat-balance simulation is active, sizing is
+false, and the current equipment owns a nonnegative splitter index. The
+priority-loop value `EquipTypeNum` is passed unchanged as `p`.
+
+The caller initializes `s=l=1` and selects its ratio protocol from the
+splitter thermostat-control enum:
+
+- Ideal returns before saving demand or calling CP268;
+- SingleSpace, when its configured control-Space fraction is positive,
+  independently sets each ratio to
+  `(selected Space total Remaining / Zone total Remaining) / fraction`
+  when the corresponding Zone total Remaining is nonzero;
+- Maximum scans stored Spaces in order for the greatest strictly positive
+  value of `max(setptLo-T1, T1-setptHi)`, then applies the same independent
+  total-Remaining ratios when the winning index and fraction are positive;
+  and
+- an unknown/default enum retains unity ratios and still calls CP268.
+
+Neither total-derived ratio distinguishes the setpoint residuals that it
+subsequently scales. The caller does not clamp or validate finiteness,
+ratio sign, or magnitude. SingleSpace trusts its control-space ordinal and
+identity. Maximum's strict comparison retains the first winner and leaves
+unity ratios when no Space has a positive deviation.
+
+Immediately before the leaf, `adjustLoads` copies the complete Zone sensible
+and moisture demand records into splitter save storage. A later successful
+`distributeOutput` call restores those copies before each Space update for
+non-Ideal control. That is an external caller protocol, not CP268 recovery:
+`adjustLoads` has no catch, and a failure in this leaf leaves both the saved
+copy and the torn live demand state.
+
+The bounded C++ unit corpus executes CP268 exactly twice, both through
+`SpaceHVACSplitterTest` in `ZoneEquipmentManager.unit.cc`. Its three direct
+`adjustLoads` calls classify as follows:
+
+- line 5057 uses Ideal control and returns above the leaf;
+- line 5074 uses SingleSpace control with `p=1`, `s=-0.2`, and `l=1`; and
+- line 5153 uses Maximum control with `p=1`, `s=-0.9`, and `l=1`.
+
+For SingleSpace, the configured second splitter entry has fraction 0.5 and
+refers to Space index 3, whose total sensible Remaining is `+10`, while the
+Zone total is `-100`:
+
+```text
+s = 10 / (-100 * 0.5) = -0.2
+```
+
+The Zone moisture total is zero, so the guarded latent calculation leaves
+`l=1`. This execution reverses the six sensible destination signs. Lines
+5076-5081 assert all three adjusted sensible residuals and all three
+sensible slot-one sequence values.
+
+The intervening `distributeOutput` restores the saved original Zone demand
+before each Space update, but it also passes each Space demand through
+`updateSystemOutputRequired`. In this test the Zone equipment list retains
+its default `NumOfEquipTypes=0`, every Space's unadjusted sensible fields
+retain zero, `sysOutputProvided=-90`, and the Sequential valid-next guard
+fails for `p=1`. The fallback therefore overwrites all three sensible
+Remaining fields for Space indices 1, 3, and 2 with `+18`, `+45`, and `+27`,
+respectively, from `0 - (-90 * fraction)`. Latent values remain zero because
+`latOutputProvided=0`.
+
+For Maximum, Space index 2 wins with `T1=16` and fraction 0.3. Its total
+sensible Remaining is now `+27`, not the originally seeded `-40`, producing
+
+```text
+s = 27 / (-100 * 0.3) = -0.9
+```
+
+The Zone moisture denominator is still zero, so `l=1`. Lines 5154-5159
+assert the same six sensible destinations after this second sign-reversing
+scale.
+Together the two calls execute 24 leaf mutation statements and have 12
+immediate sensible assertions.
+
+All moisture scalars and sequences remain zero and are unasserted. The six
+Ideal-case assertions prove only the caller's early return. Six later
+restoration assertions prove the surrounding `distributeOutput` protocol,
+not CP268 replay. No named `SimZoneEquipment` unit path activates a
+SpaceHVAC splitter, so there is no other statically attributable leaf
+execution.
+
+Coverage omits a direct lowercase call, an observable nonunit latent ratio,
+priority other than one, multi-slot isolation, positive nonunit, zero, or
+unity sensible scaling, signed zero, NaN, infinity, and malformed or
+mismatched sequence
+vectors. It also omits caller fallbacks for zero Zone demand, nonpositive
+fraction, Maximum ties or no positive deviation, the invalid enum, partial
+failure, rollback, and a fixed-ratio compounding replay oracle.
+Rust has no exact or snake-case CP268 function. It has no SpaceHVAC
+splitter, splitter thermostat-control enum, control-Space ratio protocol,
+mutable Zone/Space demand arena, six sequence vectors, or equipment-priority
+indexed demand state. Its copied `ZoneSysEnergyDemand` contains a Zone
+identity plus only four heating, cooling, humidifying, and dehumidifying
+setpoint-remaining values; it has neither total adjusted residuals nor the
+six sequenced destinations that CP268 scales.
+
+The compatibility runtime constructs a fresh demand snapshot for each
+compiled IdealLoads system from fixed run options and passes it by value.
+It neither scales a shared Zone demand before equipment dispatch nor
+restores a splitter-owned snapshot afterward. Humidistat code mutates only
+a local copied demand. Static sequence numbers and parsed distribution
+metadata therefore do not supply this runtime transition.
+
+The active fixture census remains 30 equipment lists, 30 equipment
+connections, and 30 IdealLoads systems. Every list has one SequentialLoad
+entry at heating/cooling sequence `1/1` with blank fraction schedules.
+There are no active Space, SpaceList, SpaceHVAC, multi-equipment,
+non-Sequential, `Sizing:Zone`, or duct-loss objects, and all 61 active
+SimulationControl records disable Zone sizing. The production guard for
+CP268 is therefore inactive throughout the Rust fixture lane.
+
+The roadmap still requires Rust-owned Zone and Space system demand,
+SpaceHVAC topology and thermostat-control semantics, operational equipment
+priority and sequence state, shared residual-load mutation, and removal of
+oracle demand injection. A four-value by-value snapshot cannot establish
+parity for this 12-destination in-place ratio leaf.
+
+CP268 changes no Rust target or state, support declaration, test,
+capability, output, comparator, case, manifest, numerical claim,
+performance claim, or conformance status. Counts become 32 algorithms and
+272 routines, split 58 `state_mapped` plus 214 `source_mapped`, with 149
+required. Domain-required counts become heat-balance 88, HVAC 38, plant 1,
+and time/schedule 22, with readiness `0/88`, `0/38`, `0/1`, and `0/22`.
+The IdealLoads parent remains `scaffold` at claim level `none`.
+
+CP269 next adds required source-mapped
+`routine.calc_zone_mass_balance` immediately after
+`routine.adjust_system_output_required` and before
+`routine.sim_purchased_air`. `CalcZoneMassBalance` is declared at
+`ZoneEquipmentManager.hh` line 221 and implemented completely at
+`ZoneEquipmentManager.cc` lines 4933-5283. The header has
+`bool FirstHVACIteration`, while the definition adds function-type-neutral
+top-level `const`. `CalcZoneInfiltrationFlows` begins at source line 5285
+and is declared at header lines 223-226.
 
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
