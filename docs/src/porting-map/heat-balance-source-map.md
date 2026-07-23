@@ -24976,13 +24976,482 @@ Domain-required counts become heat-balance 88, HVAC 35, plant 1, and
 time/schedule 22, with readiness `0/88`, `0/35`, `0/1`, and `0/22`. The
 IdealLoads parent remains `scaffold` at claim level `none`.
 
-CP266 next adds required source-mapped
-`routine.distribute_output_required` immediately after
-`routine.distribute_system_output_required` and before
-`routine.sim_purchased_air`. Lowercase `distributeOutputRequired` is
-declared at `ZoneEquipmentManager.hh` lines 200-203 and implemented
-completely at `ZoneEquipmentManager.cc` lines 4421-4715.
-`updateSystemOutputRequired` begins at source line 4717.
+## CP266 `distributeOutputRequired` Equipment Load Distribution Leaf
+
+CP266 adds canonical required `routine.distribute_output_required`
+immediately after `routine.distribute_system_output_required` and before
+`routine.sim_purchased_air`, plus the same ordered HVAC project-contract
+item. Lowercase `distributeOutputRequired` is declared at
+`ZoneEquipmentManager.hh` lines 200-203 and implemented completely at
+`ZoneEquipmentManager.cc` lines 4421-4715:
+
+```cpp
+void distributeOutputRequired(
+    EnergyPlusData &state,
+    int const ZoneNum,
+    DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+    DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture);
+```
+
+There is no default argument. `state`, `energy`, and `moisture` are mutable
+references; `ZoneNum` is a const by-value selector. The leaf receives
+neither `FirstHVACIteration` nor a Space identity. CP265 has already
+selected whether to call it and may pass either a Zone demand pair or a
+Space demand pair, but CP266 always reads equipment-list context through
+the unchanged parent `ZoneNum`.
+
+The leaf first binds `ZoneEquipList(ZoneNum)` and switches on its
+`LoadDistScheme`. For the formulas below, define:
+
+```text
+Q, QH, QC = sensible predictor total, heating-setpoint, cooling-setpoint
+W, WH, WC = moisture predictor total, humidifying-setpoint,
+            dehumidifying-setpoint
+N         = NumOfEquipTypes
+E         = max(N, 0), the number of loop iterations
+D         = duct-loss flag
+SS, SL    = manager-global sensible and latent system duct loss
+```
+
+CP266 directly mutates only 12 persistent demand families: the three
+sensible and three moisture sequence vectors, plus the six adjusted
+`Remaining*` scalars corresponding to their slot-one values. It does not
+write predictor totals, unadjusted Remaining demand, deadband/setback
+state, list priorities, available counts, learned capacities, fraction
+schedules, or manager-global priority scratch.
+
+The exact four scheme branches are Sequential, Uniform, UniformPLR, and
+SequentialUniformPLR.
+
+### Sequential
+
+Sequential ignores `N`, available-equipment counts, list priority values,
+and learned capacities. It reads
+`PrioritySimOrder(1).EquipPtr`, then unconditionally evaluates both that
+equipment's heating and cooling fraction schedule getters before choosing
+one result:
+
+```text
+rh = SequentialHeatingFraction(state, EquipPtr)
+rc = SequentialCoolingFraction(state, EquipPtr)
+r  = Q >= 0 ? rh : rc
+```
+
+Both schedule pointers therefore must be valid even though only one
+sampled value is used. Positive zero and negative zero select heating;
+NaN makes the comparison false and selects cooling. No finite, sign,
+range, or clamp check is applied to either fraction.
+
+The branch first assigns sensible slot one from the chosen raw fraction,
+then conditionally adds sensible duct loss with the same fraction:
+
+```text
+energy.total[1] = r*Q
+energy.heat[1]  = r*QH
+energy.cool[1]  = r*QC
+
+if D:
+    energy.total[1] += r*SS
+    energy.heat[1]  += r*SS
+    energy.cool[1]  += r*SS
+```
+
+It copies those three values to the adjusted sensible Remaining fields,
+then performs the analogous moisture writes and copies:
+
+```text
+moisture.total[1] = r*W
+moisture.humid[1] = r*WH
+moisture.dehum[1] = r*WC
+
+if D:
+    moisture.total[1] += r*SL
+    moisture.humid[1] += r*SL
+    moisture.dehum[1] += r*SL
+```
+
+Equivalently, each final slot-one value is
+`r*(predictor + D*duct_loss)`. Assignment precedes addition, so a fixed
+successful replay does not accumulate duct loss. Exactly the six
+slot-one sequences and six adjusted Remaining fields are touched; every
+higher sequence slot survives. The dynamic persistent mutation count is
+`12 + 6D`.
+
+### Uniform
+
+Uniform computes both ratios before selecting a load sign:
+
+```text
+rh = NumAvailHeatEquip > 0 ? 1 / NumAvailHeatEquip : 1
+rc = NumAvailCoolEquip > 0 ? 1 / NumAvailCoolEquip : 1
+```
+
+For every raw equipment index `1..N`, nonnegative `Q` selects the heating
+priority and `rh`; negative or NaN `Q` selects the cooling priority and
+`rc`. A selected priority greater than zero receives the corresponding
+ratio times each of `Q`, `QH`, `QC`, `W`, `WH`, and `WC`. A nonpositive
+priority receives six zeroes. The available count is not checked against
+the number of positive priorities, so zero or negative counts use ratio
+one and inconsistent positive counts simply over- or under-distribute.
+
+Uniform does not read capacity, fractions, priority scratch, or duct
+loss. After the loop, the shared non-Sequential tail copies the six
+slot-one sequences into adjusted Remaining. Thus its dynamic persistent
+mutation count is `6E + 6`. When `N <= 0`, the loop is empty but the common
+tail still requires slot one in all six vectors.
+
+### UniformPLR
+
+UniformPLR uses the sign of sensible total demand only. For nonnegative
+`Q`, it sums `HeatingCapacity(i)` for entries whose heating priority is
+positive; for negative or NaN `Q`, it sums `CoolingCapacity(i)` for
+entries whose cooling priority is positive:
+
+```text
+A = sum(active signed capacity)
+p = Q/A
+```
+
+The division occurs only when the aggregate has the expected sign:
+`A > 0` for heating and `A < 0` for cooling. Otherwise `p` remains zero.
+There is no per-slot capacity-sign validation, finite check, or clamp to
+one.
+
+When `p <= 0`, the branch breaks from the switch without changing any
+sequence. The common non-Sequential tail still copies the historical
+slot-one values into all six adjusted Remaining fields, so the source
+comment's no-change behavior applies only to sequences. This path performs
+six persistent writes. A NaN `p` does not satisfy `p <= 0` and therefore
+takes the full-write path.
+
+On the full path, every index `1..N` is written. A nonpositive selected
+priority gets six zeroes. For an active entry with selected capacity `C`,
+all three sensible sequences receive the same value:
+
+```text
+energy.total[i] = C*p
+energy.heat[i]  = C*p
+energy.cool[i]  = C*p
+```
+
+The moisture direction follows the sensible sign rather than the moisture
+load sign. In heating mode:
+
+```text
+if QH != 0:
+    moisture.total[i] = W  * C*p/QH
+    moisture.humid[i] = WH * C*p/QH
+else:
+    moisture.total[i] = W*p
+    moisture.humid[i] = WH*p
+moisture.dehum[i] = 0
+```
+
+Cooling is symmetric with denominator `QC`, values `W` and `WC`, and
+`moisture.humid[i] = 0`. Only exact zero selects the fallback; NaN or
+infinite denominators enter ordinary division. The full dynamic mutation
+count, including the common slot-one copy, is `6E + 6`.
+
+`Q=+0` or `Q=-0` selects heating but yields `p=0`, so sequences remain
+unchanged and only the common tail writes. `Q=NaN` selects cooling. If the
+cooling aggregate is negative, `p` becomes NaN and the full path can
+write NaNs; if the aggregate fails its sign gate, `p=0` and only the
+common tail runs.
+
+### SequentialUniformPLR
+
+SequentialUniformPLR also selects heating for nonnegative `Q` and cooling
+otherwise, then scans every raw index `1..N` without early termination.
+A heating entry is a candidate when `HeatingCapacity(i) > 0 && A < Q`; a
+cooling entry is a candidate when
+`CoolingCapacity(i) < 0 && A > Q`.
+
+For every candidate, capacity contributes to `A` only when the matching
+priority is positive, but `numOperating` increments regardless of that
+priority. Consequently the count is neither necessarily the number of
+capacity contributors nor the last candidate's raw index. The subsequent
+distribution does not replay the candidate positions: it treats the raw
+prefix `1..numOperating` as operating. Wrong-sign or inactive entries can
+therefore make the scan set differ from the distributed prefix.
+
+If the final aggregate has the expected sign, `p=Q/A`; otherwise
+`p=0` and `numOperating=0`. There is again no clamp. When `p <= 0`, no
+sequence changes and the common tail still performs six Remaining writes.
+On the full path, the raw operating prefix uses exactly the UniformPLR
+energy and moisture formulas, including its active-priority test and
+exact-zero denominator fallback. Every index after the prefix through
+`N` is explicitly zeroed in all six sequences. The scan visits `E`
+indices and the distribution-plus-zero pass visits another `E`; the
+full dynamic persistent mutation count remains `6E + 6`.
+
+For signed zero, the heating threshold `A < Q` is initially false and the
+branch takes its sequence no-write path. For NaN, the cooling threshold
+`A > Q` is always false, so it also takes the no-write path. This differs
+from UniformPLR's possible full NaN write. SequentialUniformPLR reads
+neither available counts, fraction schedules, priority scratch, nor duct
+loss.
+
+### Fatal default and shared tail
+
+The default calls:
+
+```cpp
+ShowFatalError(
+    state,
+    "DistributeSystemOutputRequired: Illegal load distribution scheme type.");
+```
+
+Under normal fatal semantics it terminates before demand mutation. The
+following `break` is nominally unreachable; if the fatal helper ever
+returned, execution would continue to the shared tail.
+
+Sequential performs its six Remaining copies inside its case and skips
+the shared tail. Every other case, including either PLR sequence no-write
+path, reaches a six-assignment tail in this exact order: sensible total,
+moisture total, sensible heating, moisture humidifying, sensible cooling,
+and moisture dehumidifying. Each value is read from sequence slot one.
+No unadjusted field is changed.
+
+The complete leaf has 32 `if` tokens, 21 `else` tokens and no
+`else if`, eight `for` loops, one switch, four cases, one default, seven
+breaks, no return, two `&&` tokens, and one ternary. Its 136 plain
+assignment tokens divide into 104 direct persistent writes and 32 local
+writes. Ten `+=` tokens divide into six persistent Sequential duct
+additions and four local capacity sums; ten `++` tokens are local loop or
+operating-count increments.
+
+There are 110 direct persistent mutation sites across the 12 destination
+families: Sequential contributes 12 assignments plus six additions,
+Uniform contributes 24 assignments, UniformPLR contributes 28,
+SequentialUniformPLR contributes 34, and the shared tail contributes six.
+The 151 syntactic calls/accessors comprise 110 sequence-vector accesses,
+26 capacity accesses, ten priority accesses, two fraction getters, and one
+each for `ZoneEquipList`, `PrioritySimOrder`, and `ShowFatalError`.
+
+There is no up-front validation that:
+
+- `ZoneNum` owns a list;
+- priority and capacity arrays cover `1..N`;
+- the six sequence vectors have mutually compatible extents;
+- every non-Sequential vector owns slot one even when `N <= 0`;
+- Sequential priority scratch slot one belongs to this Zone and holds a
+  valid equipment pointer;
+- both Sequential fraction-schedule arrays cover the equipment pointer and
+  both referenced schedule pointers are valid;
+- available counts match active priorities; or
+- capacity signs, totals, ratios, and schedule values are finite.
+
+Depending on build and container behavior, a malformed access can assert,
+throw, or become undefined behavior. CP266 has no result status, catch,
+local diagnostic except the fatal default, checkpoint, cleanup,
+transaction, rollback, or recovery.
+
+The only production lowercase call sites are CP265's Zone call at
+`ZoneEquipmentManager.cc` lines 4408-4409 and stored-Space call at
+lines 4413-4416. No C++ unit expression calls lowercase
+`distributeOutputRequired` directly. A Space execution receives its own
+mutable demand pair but still uses the parent Zone's list, priority arrays,
+learned capacities, available counts, fraction schedules, and the same
+manager-global priority scratch and duct-loss state. Demand identity and
+`ZoneNum` correspondence are unchecked, and duplicate Space occurrences
+can overwrite the same record repeatedly.
+
+Failure preserves the exact prefix already written. A list lookup failure
+precedes all persistent mutation. Sequential scratch or fraction sampling
+also precedes mutation, but a later vector access can preserve a prefix of
+sensible base assignments, sensible duct additions, sensible Remaining
+copies, moisture base assignments, moisture duct additions, and moisture
+Remaining copies. Uniform can retain all prior equipment plus the current
+equipment's energy-then-moisture prefix. PLR capacity-scan failure occurs
+before sequence writes; its sequence no-write path can still fail partway
+through the six shared-tail copies. A PLR full-path failure preserves all
+prior equipment and a current assignment prefix. SequentialUniformPLR can
+also preserve a completed operating prefix followed by only part of the
+zeroed tail. CP265 adds the already-completed Zone and prior-Space prefixes
+around those leaf-local effects.
+
+With every mutable dependency fixed, a successful full-write replay is
+overwrite-idempotent on the destinations it rewrites. Sequential duct
+loss does not accumulate because base assignment precedes addition. This
+is not canonical whole-state repair: a PLR nonpositive path preserves all
+old sequences, Sequential preserves every slot above one, and other
+full-write paths preserve slots above `N`. Scheme, sign, totals, priorities,
+available counts, learned capacities, fraction current values, priority
+scratch, duct state, extents, and parent Zone/Space membership are
+resampled on every parent call.
+
+The audited C++ corpus executes CP266 exactly 83 times: 20 leaves from 24
+explicit CP263 calls after four first-PLR gates, 13 direct-public
+distributing replays, and 50 named-parent leaves from 51 public executions
+after one uncontrolled return. Although the leaf receives no iteration
+flag, its parent context divides those calls into 46 first and 37 later
+iterations.
+
+The scheme census is 59 Sequential, eight Uniform, four UniformPLR, and
+12 SequentialUniformPLR. Total sensible signs are 27 positive, 44
+negative, and 12 exact zero. By scheme they are:
+
+- Sequential: 15 positive, 32 negative, and 12 zero;
+- Uniform: four positive and four negative;
+- UniformPLR: two positive and two negative; and
+- SequentialUniformPLR: six positive and six negative.
+
+All 83 calls use Zone demand records, `doSpaceHeatBalance=false`, valid
+list/scratch prerequisites, duct loss disabled, and zero moisture
+predictors. Their compatible sequence/list shapes are 48 one-entry, two
+two-entry, 28 three-entry, and five four-entry records. There is no
+unallocated, empty, mismatched, malformed, uncontrolled, or active Space
+leaf execution.
+
+Of the 59 Sequential leaves, 57 sample a selected fraction of one. Exactly
+two positive leaves in the mixed-equipment fraction scenario select the
+first equipment's heating fraction 0.4. A configured cooling fraction 0.3
+is never selected, while the second equipment's heating fraction 0.6 is
+consumed later by CP267 rather than CP266. Duct additions never execute.
+
+All eight Uniform leaves have `N=3`. Four positive calls divide by three
+available heating entries and write all three slots. Four negative calls
+divide by two available cooling entries, write slots one and two, and
+zero inactive slot three. Both positive-count ratio branches execute on
+every call; neither ratio-one fallback does. Across 24 loop iterations,
+12 are active heating, eight active cooling, and four inactive cooling.
+
+The four later UniformPLR leaves also have `N=3` and all compute a
+positive PLR. Heating runs twice with capacities `[2000, 1000, 500]`,
+aggregate 3500, load 1000, and `p=2/7`. Cooling runs twice with capacities
+`[-1200, -800, -500]`, only the first two priorities active, aggregate
+-2000, load -1000, and `p=0.5`; the third slot is zeroed. The 12
+assignment iterations comprise six active heating, four active cooling,
+and two inactive cooling. No aggregate-sign failure or sequence no-write
+path executes.
+
+The 12 later SequentialUniformPLR leaves cover each of six scenarios
+twice:
+
+```text
+Q =  1000: numOperating=1, A= 2000, p=0.5
+Q =  2100: numOperating=2, A= 3000, p=0.7
+Q =  3600: numOperating=3, A= 3500, p=36/35
+Q = -1000: numOperating=1, A=-1200, p=5/6
+Q = -1500: numOperating=2, A=-2000, p=0.75
+Q = -2500: numOperating=3, A=-2000, p=1.25
+```
+
+The final negative scenario increments `numOperating` for the third
+priority-zero candidate without adding its capacity, then processes that
+raw third prefix slot as inactive and writes zero. It is direct evidence
+for the unconditional operating-count increment. Across all 36 scans,
+the operating loops perform 24 iterations, 22 active and two inactive,
+and the remaining-tail loops perform 12 iterations. One-, two-, and
+three-unit operating counts each occur four times. Four executions exceed
+PLR one and confirm the absence of a clamp; every execution still avoids
+the nonpositive-PLR branch.
+
+The six explicit distribution blocks contain 222 sensible sequence
+assertions, but only 186 follow an actual CP266 leaf: 78 Sequential, 36
+Uniform, 18 later-UniformPLR, and 54 later-SequentialUniformPLR. The other
+36 assert CP264 design seeds after first-PLR CP265 gate returns. Each of
+the three sensible sequence families therefore has 62 post-CP266
+assertions.
+
+There are 48 assertions over the three adjusted sensible Remaining
+fields. Twelve non-Sequential scenarios directly reflect CP266 slot one;
+two fraction-one Sequential later cases are indistinguishable from the
+CP264 value; and two mixed later cases are observed only after CP267 has
+already updated the residual. No test asserts a moisture sequence.
+Exactly three adjusted moisture Remaining assertions exist, all zero
+after later cooling UniformPLR calls with zero moisture inputs.
+
+The 50 named-parent leaves have no immediate CP266 destination assertion.
+Thirteen direct distributing calls and 25 leaving-condition calls form 38
+actual distributing replays, but none corrupts all 12 destinations
+between invocations. The assertions therefore demonstrate many successful
+aggregate formulas without isolating rollback, canonical repair, or
+history-dependent tails.
+
+Coverage omits the fatal default, active malformed identity or extent,
+zero equipment, allocated-empty vectors, companion-vector mismatch,
+priority/capacity mismatch, aliasing, partial failure, and rollback. It
+also omits every Space leaf, duplicate or cross-Zone Space membership,
+partial Zone/Space failure, duct loss, and meaningful moisture.
+
+Uniform never exercises a nonpositive available-count fallback. PLR tests
+omit zero or wrong-sign aggregate capacity, a nonpositive PLR, NaN or
+infinite load, wrong-sign or extreme per-slot capacity, exact-zero
+sensible-setpoint denominator fallback,
+inconsistent active count, and capacity mutation between replays.
+Sequential tests omit negative, out-of-range, or NaN fractions, selected
+cooling fraction, either schedule failure, and fraction-scaled duct loss.
+The 12 Sequential exact-zero leaves select heating, including two
+UnitHeater contexts with nonzero setpoint loads, but no direct CP266 demand
+oracle isolates that edge.
+
+Tests also omit dependency mutation between retries, failure retry,
+sentinel preservation on every no-write branch, and canonical repair of
+retained sequence tails. The lower leaf's absence of a
+`FirstHVACIteration` parameter means the first/later census proves only
+parent-selected entry context, not a CP266-owned iteration decision.
+
+Rust has no exact or snake-case CP266 leaf. Its by-value
+`ZoneSysEnergyDemand` snapshot contains only four combined sensible and
+moisture setpoint Remaining scalars. It owns no source-shaped Zone/Space sensible or
+moisture arena, predictor totals, unadjusted or total adjusted Remaining
+fields, six sequence vectors, manager-global priority scratch,
+heating/cooling priority arrays, available-equipment counts, signed
+first-iteration learned capacity caches, or duct-loss state.
+
+The adjacent third-order moisture predictor can compute a transient
+moisture total, but closed-loop and CLI paths copy only humidifying and
+dehumidifying setpoint loads into the PurchasedAir snapshot. That value
+is neither a persistent source-shaped moisture demand record nor CP266
+distribution state.
+
+Rust parses all four load-distribution enums and both optional Sequential
+fraction schedule identifiers, but runtime reads neither the scheme nor
+the fractions. Non-Sequential variants stop at parser arms. The compiler
+requires positive unique heating/cooling sequence numbers, whereas source
+CP266 treats nonpositive priorities as inactive and does not reject
+duplicates. Graph helpers use static heating-first order, and active
+compatibility execution visits each typed IdealLoads system with a fresh
+full demand snapshot rather than shared residual demand. A multi-equipment
+list is only marked diagnostic-only and remains dispatchable, so each
+system would independently receive the full snapshot. Component maximum
+capacities are authored caps, not the source list's signed learned
+capacity arrays.
+
+The active corpus remains 30 equipment lists, 30 connections, and 30
+IdealLoads systems. Every list has one `SequentialLoad` entry at
+heating/cooling sequence `1/1` with blank fraction schedules. It contains
+zero Space, SpaceList, SpaceHVAC, multi-equipment, non-Sequential,
+active-fraction, `Sizing:Zone`, or `Duct:Loss:*` cases. All 61
+SimulationControl objects disable Zone sizing. This topology would reduce
+source CP266 to a one-slot, fraction-one, duct-off Sequential transition,
+but Rust still owns neither that slot nor its total/remaining distribution
+state.
+
+The roadmap still requires Rust-owned `ZoneSysEnergyDemand`, removal of
+oracle demand injection, real first-iteration and adaptive system-timestep
+state, multiple-equipment distribution, equipment-list order and
+availability, residual-load updates, and shared lifecycle state. CP266 is
+source-only dependency evidence for that work, not an implementation
+checkpoint.
+
+CP266 changes no Rust target/state, support declaration, test, capability,
+output, comparator, case, manifest, numerical claim, performance claim,
+or conformance status. Counts become 32 algorithms and 270 routines,
+split 58 `state_mapped` plus 212 `source_mapped`, with 147 required.
+Domain-required counts become heat-balance 88, HVAC 36, plant 1, and
+time/schedule 22, with readiness `0/88`, `0/36`, `0/1`, and `0/22`. The
+IdealLoads parent remains `scaffold` at claim level `none`.
+
+CP267 next adds required source-mapped
+`routine.update_system_output_required` immediately after
+`routine.distribute_output_required` and before
+`routine.sim_purchased_air`. `updateSystemOutputRequired` is declared at
+`ZoneEquipmentManager.hh` lines 205-212, where
+`EquipPriorityNum = -1` is the only default, and implemented completely at
+`ZoneEquipmentManager.cc` lines 4717-4908.
+`adjustSystemOutputRequired` begins at source line 4910.
 
 ### `CheckValidSimulationObjects` state contract
 
