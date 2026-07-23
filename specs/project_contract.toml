@@ -136,6 +136,7 @@ required_routines = [
   "calc_doas_sup_conds_for_sizing",
   "set_up_zone_sizing_arrays",
   "calc_sizing_oa",
+  "fill_zone_sizing_from_input",
   "sim_zone_equipment",
   "sim_purchased_air",
   "get_purchased_air",

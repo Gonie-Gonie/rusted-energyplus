@@ -127,6 +127,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `ZoneEquipmentManager::CalcDOASSupCondsForSizing` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent PurchasedAir outdoor-air supply logic and psychrometrics are not the `Sizing:Zone` DOAS selector |
 | `ZoneEquipmentManager::SetUpZoneSizingArrays` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent typed Zone, Space, thermostat, equipment, individual DSOA, and ordinary SpaceList structures do not implement the `Sizing:Zone` setup transaction |
 | `ZoneEquipmentManager::calcSizingOA` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent typed Zone/Space/People, schedules, individual DSOA, and PurchasedAir OA helpers do not implement the mutable sizing, effectiveness, SpaceList-validation, report, or design-day fanout contract |
+| `ZoneEquipmentManager::fillZoneSizingFromInput` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent typed identities, schedules, Humidistat, individual DSOA, IdealLoads operational limits, and time-axis metadata do not implement `Sizing:Zone` field projection or sequence allocation |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
 | `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand` |
 
@@ -154,7 +155,11 @@ ZoneEquipmentManager::ManageZoneEquipment
                       -> conditional AllocateIntGains
                       -> validate Sizing:Zone and VerifyThermostatInZone
                       -> AutoCalcDOASControlStrategy
-                      -> allocate/fill Zone and optional Space sizing plus EMS
+                      -> allocate Zone and optional Space sizing stores
+                      -> per controlled Zone, fillZoneSizingFromInput for Zone then stored Spaces
+                           -> project asymmetric input subsets into daily/final records
+                           -> dimension and zero 36 timestep sequences per destination
+                      -> optionally register controlled-Zone EMS bindings
                       -> populate DSOA SpaceList indexes
                       -> calcSizingOA for controlled Zone/Space roles
                            -> validate positive DSOA/SpaceList membership and derive OA rates
@@ -1670,9 +1675,10 @@ the Space configurations are uncontrolled and have zero inlet nodes; CP240
 still calls them, with DOAS disabled, through the non-air Space path. Their
 tests assert final Space sizing results, not helper order or argument identity.
 
-Across the resulting 69 static roles, one Zone enables DOAS, four roles enable
-latent sizing, 43 have a usable residual supply node, and 26 use non-air output:
-five Zones plus all 21 Spaces. The five Zone non-air roles comprise four
+Across the resulting 69 static roles, six Zones and no Space enable DOAS;
+13 roles (four Zones and nine Spaces) enable latent sizing. Forty-three have a
+usable residual supply node, and 26 use non-air output: five Zones plus all 21
+Spaces. The five Zone non-air roles comprise four
 blank-inlet cases and the one-inlet DOAS case whose inlet is consumed by DOAS.
 No active role can enter cooling ITE adjustment or an adjustment factor above
 one. These are per-sweep static branch identities, not dynamic runtime counts;
@@ -2303,12 +2309,11 @@ zero times regardless of later dynamic sizing repetitions.
 Among 57 active full `ManageSimulation` contexts, 56 complete and one stops
 in EMS before HVAC. Across one parent invocation in each of the 34 completing
 configurations that perform Zone sizing, the static aggregate is 48 Zone
-plus 21 Space roles. Exactly one Zone role and no Space role enable DOAS; the
-other 68 roles do not. That sole fixture omits its strategy field and
-therefore uses the IDD default `NeutralSupplyAir`/`NeutralSup`. Its summer and
-winter design-day inputs provide high- and low-side outdoor conditions,
-respectively, but assertions inspect only downstream DOAS table loads rather
-than CP243 supply outputs. Exact repeated sizing, design-day iteration, and
+plus 21 Space roles. Exactly six Zone roles and no Space role enable DOAS;
+the other 63 roles do not. Five HeatRecovery Zones use fixed
+`ColdSupplyAir`/`CoolSup` at 12.8/15.6 C, while one OutputReportTabular Zone
+defaults to auto-resolved `NeutralSupplyAir`/`NeutralSup`. Assertions inspect
+only downstream results rather than these CP243 supply outputs. Exact repeated sizing, design-day iteration, and
 total dynamic CP243 call counts remain uninstrumented. Each context
 contributes only its own topology subset.
 
@@ -2637,7 +2642,7 @@ static aggregate is:
 - 48 records with both airflow methods `FromDDCalc`;
 - seven Space-sizing configurations with three Spaces each, producing 21
   Space fills and OA-child calls;
-- one enabled-DOAS Zone and no enabled-DOAS Space;
+- six enabled-DOAS Zones and no enabled-DOAS Space;
 - one valid unique two-member DSOA SpaceList configuration;
 - no explicit EMS, ExternalInterface, or PythonPlugin object and therefore
   no EMS-registration branch; and
@@ -2900,9 +2905,250 @@ or conformance promotion. The algorithm remains `scaffold` with claim level
 `state_mapped` plus 192 `source_mapped`, with 127 required; heat-balance and
 HVAC project lists become 88 and 16.
 
-CP246 next maps `ZoneEquipmentManager::fillZoneSizingFromInput`, declared at
-`ZoneEquipmentManager.hh` lines 119-126 and implemented at
+## CP246 `fillZoneSizingFromInput` Sizing-Input Projection and Sequence Allocation
+
+CP246 adds canonical required `routine.fill_zone_sizing_from_input` after
+`calc_sizing_oa` and before `sim_zone_equipment`. That is source-definition
+inventory order; production executes CP246 earlier as a CP244 child before
+CP245. The exact boundary is the declaration at
+`ZoneEquipmentManager.hh` lines 119-126 and complete definition at
 `ZoneEquipmentManager.cc` lines 1208-1400.
+
+```cpp
+void fillZoneSizingFromInput(
+    EnergyPlusData &state,
+    ZoneSizingInputData const &zoneSizingInput,
+    Array2D<ZoneSizingData> &zsSizing,
+    Array2D<ZoneSizingData> &zsCalcSizing,
+    ZoneSizingData &zsFinalSizing,
+    ZoneSizingData &zsCalcFinalSizing,
+    std::string_view const zoneOrSpaceName,
+    int const zoneOrSpaceNum);
+```
+
+The input is const. Mutable outputs are two daily arrays and two final
+records. Module-state reads are limited to the sum of design and run-period
+design days and manager `NumOfTimeStepInDay`.
+
+### Production role order
+
+The only production expressions are CP244 lines 876-883 for a Zone and
+886-893 for a Space. CP244 visits controlled Zones ascending. For each Zone,
+it selects the exact-name `ZoneSizingInput` or input 1 fallback and fills the
+Zone. When `doSpaceHeatBalanceSizing` is true, it then fills the Zone's
+`spaceIndexes` in stored order from that same parent input. This differs from
+CP245's later all-Zones-then-global-Spaces order.
+
+CP246 has no role flag and performs no Zone or Space lookup. Its caller
+chooses the target stores and supplies identity. A Space role writes
+`SpaceSizing(day, spaceNum)`, `CalcSpaceSizing`, and final Space records, but
+the inherited field named `ZoneNum` receives the Space index. Input
+`ZoneName` and `ZoneNum` are ignored, as are its object-name strings.
+Space-parent consistency is not checked.
+
+### Exact operation order
+
+For each day in
+`1..TotDesDays + TotRunDesPersDays`, CP246 performs:
+
+1. obtain `zsSizing(day, zoneOrSpaceNum)`;
+2. obtain `zsCalcSizing(day, zoneOrSpaceNum)`;
+3. write normal name and numeric identity;
+4. write calculated name and numeric identity;
+5. write 35 normal input fields;
+6. write the calculated common fields plus four latent humidity fields;
+7. call normal `allocateMemberArrays`;
+8. call calculated `allocateMemberArrays`.
+
+Only after all days finish does it perform:
+
+1. write final name/index;
+2. write calculated-final name/index;
+3. write the complete final input subset;
+4. write the calculated-final subset;
+5. allocate/zero final member arrays;
+6. allocate/zero calculated-final member arrays.
+
+A nonpositive summed day count skips every daily operation but does not skip
+either final projection or allocation.
+
+### Member-projection contract
+
+All four destination kinds receive 37 member assignments: caller name/index
+plus 35 raw input fields. The common input set comprises:
+
+- sensible cooling/heating design supply-air methods, temperatures,
+  temperature differences, and humidity ratios;
+- cooling/heating airflow sizing enums, input flow, per-area constraint,
+  absolute constraint, and fraction;
+- heating/cooling sizing factors;
+- DOAS enable, strategy, and low/high setpoints;
+- Space concurrence and Zone sizing method;
+- latent-sizing enable, RH setpoints, two shallow schedule-pointer copies,
+  and latent design method integers; and
+- heat-coil sizing method and maximum heating-to-cooling sizing ratio.
+
+The destination `InpDesCoolAirFlow` and `InpDesHeatAirFlow` names receive
+input `DesCoolAirFlow` and `DesHeatAirFlow`. No multiplier or calculation is
+applied. `AutoCalcDOASControlStrategy` has already run at CP244 line 828, so
+production copies its current DOAS strategy/setpoint state.
+
+The destination-specific differences are exact:
+
+| Destination | Writes | Suffix beyond common 37 |
+|---|---:|---|
+| normal daily | 37 | none |
+| calculated daily | 41 | `LatentCoolDesHumRat`, `CoolDesHumRatDiff`, `LatentHeatDesHumRat`, `HeatDesHumRatDiff` |
+| final | 47 | latent four; `ZoneAirDistributionIndex`; `ZoneDesignSpecOAIndex`; `ZoneADEffCooling`; `ZoneADEffHeating`; `ZoneSecondaryRecirculation`; `ZoneVentilationEff` |
+| calculated-final | 45 | latent four; both indexes; both air-distribution effectiveness values |
+
+Consequences follow directly from omission rather than explicit clearing:
+
+- normal daily records can retain old latent humidity values/differences;
+- neither daily record receives indexes or air-distribution effectiveness;
+- only final receives secondary recirculation and ventilation efficiency;
+- calculated-final can retain old values in those two fields; and
+- only resolved OA/air-distribution indexes are copied, not the two input
+  object-name strings.
+
+Every enum and method is copied as stored. CP246 does not switch on
+`AirflowSizingMethod`, `DOASControl`, `SizingConcurrence`, `ZoneSizing`, or
+`HeatCoilSizMethod`; it also does not interpret the sensible/latent integer
+methods. Invalid enums, out-of-range integers, negative or non-finite
+numbers, and arbitrary schedule pointers have no local guard.
+
+### Sequence allocation
+
+Each destination projection is followed by
+`ZoneSizingData::allocateMemberArrays(NumOfTimeStepInDay)`.
+`DataSizing.cc` lines 280-318 dimension exactly 36 sequences to `0.0`, ordered
+from `HeatFlowSeq` through `LatentHeatFlowSeq`. They cover sensible flow/load,
+Zone/return/thermostat/outdoor temperature and humidity, DOAS, no-DOAS, and
+latent flow/load histories.
+
+ObjexxFCL `Array1D::dimension(range, value)` calls `assign(value)` when the
+existing extent already matches, so this is also a zeroing operation on
+re-entry. Each completed CP246 role invokes the helper
+`2 * max(day_count, 0) + 2` times and performs 36 dimension calls per helper
+invocation. Members outside the
+projection are not initialized by this child.
+
+### Validation, failure prefix, and aliasing
+
+The day loop is the only local guard. CP246 has no bounds, allocation,
+identity, topology, record-distinctness, enum, finite/nonnegative, timestep,
+or old-state validation. It issues no warning, severe, fatal, or error flag
+and owns no status, catch, checkpoint, transaction, cleanup, or rollback.
+An already-true CP244 error therefore does not suppress projection.
+
+For a day, both array references are obtained before the first write. Failure
+obtaining the calculated reference leaves the current day untouched but
+preserves prior completed days. Subsequent failure can preserve a normal
+member-assignment prefix, a complete normal projection plus a calculated
+member-assignment prefix, or a partially dimensioned normal/calculated
+36-sequence prefix.
+
+After the day loop, both final identities are written before final member
+projection starts. Both final member-assignment blocks complete before the first
+final sequence helper. A final allocation failure can therefore retain both
+projected records and only a prefix of zeroed sequences. No child effect is rolled
+back. A CP246 abnormal exit stops the CP244 role loop and prevents later EMS
+bindings, DSOA list population, CP245 OA work, sizing-factor EIO, and the
+successful setup-latch clear.
+
+Mutable destination distinctness is not enforced:
+
+- if daily arrays alias, the later calculated projection adds its latent four
+  to the common union and the same 36 sequences are zeroed twice;
+- if final references alias, the later calculated-final block does not erase
+  final-only secondary recirculation or ventilation efficiency, and sequences
+  are zeroed twice; and
+- if a final reference aliases a daily element, the final suffix overwrites
+  that record after all daily work.
+
+Production passes separate Zone or Space stores. The caller's string view is
+also not validated for lifetime or identity consistency.
+
+### Replay and reset
+
+With stable arguments and nonaliased valid stores, completed re-entry is
+idempotent over the touched subset: assigned members overwrite deterministically
+and all sequences become zero. Unlike CP245, there is no additive or
+multiplicative accumulation. Re-entry after downstream sizing has populated
+sequences is destructive because those histories are zeroed again.
+
+CP246 is not a blanket record reset. It preserves every unlisted member,
+including calculated-final secondary/ventilation fields and normal-daily
+latent values, plus unrelated EMS, peak, OA, and calculated sizing results.
+On a CP244 replay, final EPVectors are zero-filled before refilling, but
+same-extent daily ObjexxFCL arrays can retain untouched members. CP246 resets
+only its sequences and copied subset.
+
+`RezeroZoneSizingArrays` uses `zeroMemberData`: it clears computed results and
+the sequence arrays when allocated but preserves CP246 identity and static
+input projection. Manager `clear_state()` does not own the DataSizing stores.
+After a partial member-array allocation, `zeroMemberData` can also return
+immediately when `DOASSupMassFlowSeq` was not reached. A clean replay
+therefore requires coordinated state-owner reset.
+
+### C++ evidence
+
+No C++ test calls CP246 directly, and the productive direct CP244 fixture has
+no immediate assertion on a CP246-owned field. Static fresh-state role counts
+are:
+
+- two Zone roles from the AirTerminal direct CP244 fixture;
+- 24 Zone roles from 17 direct `ManageSizing` contexts; and
+- 48 Zone plus 21 Space roles from 34 sizing-active full simulations.
+
+This is 95 total calls, split 74 Zone and 21 Space. The DataSizing and
+MixedAir direct CP244 fixtures have no controlled role, and six direct
+`SizeZoneEquipment` wrappers force setup false, so all eight contexts execute
+CP246 zero times.
+
+Normal input variation is narrow. `AccountForDOAS` is false in 89 roles.
+Five HeatRecovery Zones use fixed `CoolSup` at 12.8/15.6 C, and one
+OutputReportTabular Zone uses auto-resolved `NeutralSup` at 21.1/23.9 C.
+Zone sizing methods are 82 `SensibleOnly`, nine `Sensible`, and four
+`SensibleAndLatent`, so latent sizing is active in 13 roles. Both latent
+methods are `HumidityRatioDifference` and both sizing RH schedule pointers
+are null in all 95 roles. Downstream equipment, OA, diversity, tabular, and
+Standard 62.1 assertions compose over CP246 but do not isolate it.
+
+No test proves the four member-assignment sets, 36-array order/zeros, Space index in
+`ZoneNum`, parent-input reuse, omitted-field persistence, zero-day final-only
+path, invalid values/enums, nonnull schedule pointers, malformed extents,
+aliasing, allocation failure, exact failure prefix, direct replay,
+same-extent staleness, or coordinated reset.
+
+### Rust boundary and governance
+
+Exact crate/data searches find no `fillZoneSizingFromInput`,
+`fill_zone_sizing_from_input`, `ZoneSizingInputData`, `ZoneSizingData`,
+`allocateMemberArrays`, CP246 design-air/flow/latent/air-distribution field
+families, or typed daily/final sizing stores. The sole raw `Sizing:Zone`
+fixture expects `UnsupportedSizing`; active cases contain none.
+`Sizing:*`/`ZoneSizing*` remain run-blocked.
+
+Typed Zone/Space identity and floor area, schedules, Humidistat controls,
+individual DSOA, IdealLoads operational supply temperature/humidity/flow
+limits, equipment graph, sizing-checked flags, and time-axis metadata are
+adjacent subsets only. IdealLoads supply limits are not `Sizing:Zone` inputs,
+Autosize is rejected, and no consumer projects those fields into sizing
+records. Authored Space/SpaceList, ZoneList/ZoneGroup, sizing/autosizing, and
+broad HVAC remain blocked.
+
+CP246 adds no algorithm-level EnergyPlus source, Rust target/code/state, test,
+object support, capability, output implementation, comparator, case,
+manifest, numerical, performance, or conformance promotion. The parent
+algorithm remains `scaffold` with claim level `none`. Inventory becomes 32
+algorithms and 251 routines, split 58 `state_mapped` plus 193
+`source_mapped`, with 128 required; heat-balance and HVAC project lists become
+88 and 17.
+
+CP247 next maps `ZoneEquipmentManager::RezeroZoneSizingArrays`, declared at
+`ZoneEquipmentManager.hh` line 128 and implemented at
+`ZoneEquipmentManager.cc` lines 1401-1430.
 
 ## Claim Requirements
 
