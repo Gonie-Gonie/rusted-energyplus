@@ -10856,10 +10856,283 @@ The IdealLoads parent remains `scaffold` at claim level `none`.
 
 CP278 completes the ZoneEquipmentManager definition slice. The declared
 IdealLoads/HVAC source-order inventory then resumes at its existing required
-`routine.sim_purchased_air` row. CP279 next refreshes
-`PurchasedAirManager::SimPurchasedAir`, declared at
-`PurchasedAirManager.hh` lines 331-337 and implemented at
-`PurchasedAirManager.cc` lines 146-208.
+`routine.sim_purchased_air` row. CP279 refreshes the already-existing required
+`routine.sim_purchased_air` source boundary in place. It adds neither a
+duplicate routine nor another HVAC project-contract item, and it changes no
+EnergyPlus source inventory.
+
+## CP279 `SimPurchasedAir` Name/Index Cache and Simulation Wrapper
+
+`PurchasedAirManager::SimPurchasedAir` is declared at
+`PurchasedAirManager.hh` lines 331-337 and implemented completely at
+`PurchasedAirManager.cc` lines 146-208:
+
+```cpp
+void SimPurchasedAir(EnergyPlusData &state,
+                     std::string const &PurchAirName,
+                     Real64 &SysOutputProvided,
+                     Real64 &MoistOutputProvided,
+                     bool FirstHVACIteration,
+                     int ControlledZoneNum,
+                     int &CompIndex);
+```
+
+The definition adds top-level `const` to the by-value Boolean and Zone index;
+the C++ function type is unchanged. The name is a read-only reference, both
+load outputs and the component cache are mutable caller-owned references, and
+there is no return value, status, default argument, exception specification,
+or retry token. The next physical definition is
+`GetPurchasedAir(EnergyPlusData &state)` at source lines 210-1052; its next
+header declaration is line 339. CP280 next maps that complete input routine.
+
+There is exactly one executable production call expression, in the
+`ZoneEquipType::PurchasedAir` branch of
+`ZoneEquipmentManager::SimZoneEquipment` at lines 3870-3878. The parent walks
+controlled Zones and their priority-ordered equipment, zeros distinct local
+`SysOutputProvided`, `LatOutputProvided`, and `NonAirSysOutput` scalars before
+each dispatch, and passes the equipment name, the first two distinct locals,
+`FirstHVACIteration`, the current controlled-Zone index, and the mutable
+`EquipIndex(EquipPtr)` slot. The returned sensible and moisture values feed
+available-capacity storage, Space distribution, and Zone load accounting at
+lines 4091-4114. This is a system-timestep route; the sizing-only parent branch
+does not call CP279.
+
+The successful wrapper order is exact and strictly sequential:
+
+1. when shared `GetPurchAirInputFlag` is true, call `GetPurchasedAir` and
+   clear the flag only after that child returns normally;
+2. resolve a zero `CompIndex` by exact name lookup, or validate a nonzero
+   cached index and, while its name-check latch is true, validate the name;
+3. call `InitPurchasedAir(state, PurchAirNum, ControlledZoneNum)`;
+4. call `CalcPurchAirLoads` with the resolved index, both output references,
+   and `ControlledZoneNum`;
+5. call `UpdatePurchasedAir` with the resolved index and
+   `FirstHVACIteration`;
+6. call `ReportPurchasedAir` with the resolved index.
+
+The child bodies are `GetPurchasedAir` lines 210-1052,
+`InitPurchasedAir` lines 1054-1324, `CalcPurchAirLoads` lines 1906-2760,
+`UpdatePurchasedAir` lines 2941-2984, and `ReportPurchasedAir` lines
+2986-3097. Name and `CompIndex` are wrapper-only. `ControlledZoneNum` reaches
+Init and Calc only, the load references reach Calc only,
+`FirstHVACIteration` reaches Update only, and Report receives only state and
+the resolved index.
+
+`PurchasedAirManagerData` defaults `NumPurchAir` to zero and
+`GetPurchAirInputFlag` to true; `CheckEquipName` is a separate per-unit array.
+`clear_state()` resets both counts and the flag; it deallocates
+`CheckEquipName`, `PurchAir`, `PurchAirNumericFields`, the three per-unit Init
+arrays, and `TempPurchAirPlenumArrays`, but notably does not deallocate
+`PurchAirPlenumArrays`.
+Get counts objects, allocates `PurchAir` and `CheckEquipName`, and initializes
+every name latch true before its deferred input-error fatal. Several public
+query helpers consume the same lazy flag, so CP279 need not be the first input
+loader. A successful Get followed by later wrapper failure leaves the flag
+false; a failure inside Get leaves it true even though Get's partial state may
+already persist.
+
+The component identity protocol is deliberately asymmetric:
+
+- With `CompIndex == 0`, `FindItemInList` performs an exact, case-sensitive,
+  first-match comparison against stored names. A miss fatals. A hit writes the
+  discovered 1-based index to caller `CompIndex`, but this branch neither
+  rechecks it against `NumPurchAir` nor clears `CheckEquipName`.
+- With `CompIndex != 0`, the accepted numeric range is exactly
+  `1..NumPurchAir`. Only after that check does the wrapper inspect
+  `CheckEquipName(index)`. While true, a direct exact string mismatch fatals;
+  a match clears the latch. Once false, the supplied name is never examined
+  again while the numeric index stays valid.
+
+A normal zero-cache sequence therefore performs lookup and cache write on its
+first call, cached bounds/name validation and latch clear on its second call,
+and cached bounds validation without any name check thereafter. Resetting the
+cache to zero repeats lookup but does not consume the name latch. This exact
+comparison differs from the separate case-insensitive
+`getPurchasedAirIndex` helper.
+
+CP279 owns three mutually exclusive direct fatal routes: zero-cache name miss
+(`SimPurchasedAir: Unit not found=`), nonzero index outside the accepted
+range, and first cached-name mismatch while the latch is true. The invalid
+index message preserves the source's two spaces after the colon in
+`SimPurchasedAir:  Invalid CompIndex passed=`. Each uses one formatting call
+and `ShowFatalError`, which is `[[noreturn]]`; no simulation child follows a
+direct validation fatal. The wrapper itself emits no severe, continue,
+warning, or recurring diagnostic.
+
+The complete 63-line body has six `if` heads, one bare `else`, one logical OR,
+no logical AND, loop, switch, ternary, explicit return, break, continue,
+`try`, or `catch`. Its 12 named call-expression sites are one Get, one lookup,
+three format/fatal pairs, and the four simulation children. Four explicit
+Objexx indexed accesses split two name-latch and two purchased-air-record
+accesses. The three direct persistent/reference writes are input-flag false,
+caller cache assignment, and name-latch false; CP279 itself never writes the
+two load outputs. A warm validated call invokes exactly the four simulation
+children. A zero-cache warm call adds the lookup, and an input-cold call adds
+Get. Exclusive identity branches mean a successful call commits at most two
+of the wrapper's three direct writes.
+
+There is no transaction, rollback, cleanup guard, or exception handler.
+Failure preserves the already-completed prefix:
+
+- Get failure leaves the shared flag true but may retain partial allocations,
+  registrations, and parsed input; Get success followed by another fatal
+  leaves the flag false and loaded state intact.
+- A lookup miss leaves zero cache unchanged. An invalid cached index remains
+  invalid. A cached-name mismatch retains the valid index and true latch.
+  Successful lookup commits the cache before Init; successful cached-name
+  validation clears its latch before Init. Later child failure does not undo
+  either write.
+- Init failure skips Calc, Update, and Report. Calc failure retains Init and
+  any output/state prefix, then skips Update and Report. Update failure
+  retains Init/Calc and returned outputs, then skips Report. Report failure
+  retains every earlier model effect plus any partial reporting prefix.
+
+On a coherent Calc entry the child zeros sensible then moisture outputs at
+lines 1980-1981, and its active tail later writes sensible then moisture at
+2647-2648. Failure before the zeroing can leave caller entry values; failure
+afterward can expose zero or a partially updated pair. Init's per-unit
+one-time latch is set at lines 1116-1117 before node validation that can fatal,
+so an externally caught retry can skip that block. Its sizing latch is safer
+only in the narrower sense that it clears after `SizePurchasedAir` returns.
+
+Successful replay is stateful rather than pure. Input loading normally becomes
+one-shot; lookup becomes a cached index; name validation becomes one-shot per
+unit; Init advances module, unit, sizing, and environment latches; Calc
+overwrites outputs, nodes, and operating fields; Update coordinates shared
+return-plenum `IsSimulated` flags and can re-run a sole or last plenum; Report
+recomputes rate and energy fields. Retry after a child abnormal exit resumes
+from the surviving cache, latch, output, node, plenum, and report prefix rather
+than reconstructing entry state.
+
+The wrapper does not validate `ControlledZoneNum`, allocated-array coherence,
+actual extents, duplicate names, blank names, or child preconditions. Cached
+bounds use `NumPurchAir`, not array extents; zero-cache lookup uses the
+allocated container and has no following count assertion. Zero configured
+units cause either lookup-miss or cached-range fatal. After a name latch is
+false, arbitrary or stale names and later stored-name mutation are invisible
+to CP279.
+
+The API also supplies no non-aliasing contract. If both `Real64 &` outputs
+alias, Calc's moisture write overwrites the earlier sensible write before the
+child copies sensible output into stored state. Production avoids this with
+distinct stack locals. A caller can also alias `CompIndex`, name storage, or an
+output with state mutated by Get or a child; the production route's separate
+priority name, equipment-index slot, and stack outputs avoid those cases.
+
+CP279 has only one automatic local and no mutable function-static, but this
+does not make it thread-safe. Calls sharing one `EnergyPlusData` race on the
+lazy flag, allocations, name latches, Init latches, unit/node/report state,
+and plenum aggregation; shared caller references add ordinary data races. The
+one-shot name latch also makes a wrong-name result order-dependent: it can
+fatal before another call clears the latch and pass afterward. Separate state
+objects and disjoint references avoid the wrapper-owned sharing, while deep
+child thread safety remains unproved.
+
+The exact C++ source-plus-test `SimPurchasedAir(` census is three: one
+header declaration, one definition, and the sole production expression. No
+unit test calls CP279 directly. Four literal `ManageZoneEquipment` calls in
+`PurchasedAirManager.unit.cc` each own one controlled Zone, one equipment-list
+entry, one IdealLoads unit, and a false `ZoneSizingCalc`, so they execute CP279
+exactly four times. All pass `FirstHVACIteration=true` and make their first and
+only wrapper pass, exercising lazy Get plus zero-index lookup/cache but never
+the cached-index branch. The first connects its IdealLoads system to a return plenum and reaches
+Update's positive-plenum/all-simulated path. The next two contain disconnected
+ReturnPlenum objects with blank system inlet, so their units have no positive
+return-plenum index; the fourth contains no plenum. Exactly 20 immediate post-wrapper assertions cover selected names,
+node identities, and flow or node-output relationships, not CP279's lifecycle.
+
+The same unit corpus contains six direct Get, five direct Init, five direct
+Calc, zero direct Update, and one direct Report expressions. Those are child
+evidence, not wrapper order or cache evidence. Four Zone-sizing full tests do
+not enter CP279 because they disable simulation periods. One active two-design-
+day, one-timestep-per-hour full simulation has a conservative configured lower
+bound of 336 CP279 calls from six warmup days plus one run day per design day;
+its 11 post-run assertions concern sizing results. Thus the bounded unit suite
+has four exact direct-parent executions plus at least 336 active full-simulation
+executions, but no exact dynamic total because HVAC convergence controls
+additional calls.
+
+Coverage has no assertion for the input flag, cached index, name latch, exact
+child order/count, missing name, index below one or above count, cached-name
+mismatch, exact fatal text, false first-iteration routing, isolated wrapper
+outputs, multiple Zones or units, stale name after latch clear, injected child
+failure, caught retry, or explicit same-state replay. Repeated full simulations
+naturally exercise caches but do not make those lifecycle properties oracles.
+
+The exact project model census remains 120 files, 108 IDF plus 12 epJSON.
+Thirty IDFs each contain exactly one Zone, one equipment list, and one
+`ZoneHVAC:IdealLoadsAirSystem`; 18 omit outdoor air and 12 use it. The other 90
+models have no CP279 route. The 30 configured models use four Zone timesteps
+per hour, one RunPeriod, no sizing, and weather-file simulation; 25 cover one
+day and five cover 365 days. One successful run of every model therefore
+contains at least 177,600 nominal run-period CP279 dispatches, excluding
+warmup, system-timestep subdivision, and HVAC re-iteration. This establishes
+heavy success-route exposure, not an exact measured call count.
+
+Fifty-two of 140 manifests reference those 30 models: 30 no-OA/other routes
+and 22 OA routes, split 31 claim-bearing and 21 non-claim. Their 1,130 output
+declarations comprise 463 conformance, 650 diagnostic, and 17 baseline rows.
+They include 869 `Zone Ideal Loads ...` rows, 141 `System Node ...` rows, 52
+thermostat-proof rows, and 68 Zone-demand-proof rows. Sixty-two meter
+declarations split 40 conformance and 22 diagnostic, all on no-OA routes.
+These are composite Calc/Update/Report, node, demand, and meter evidence; none
+isolates wrapper identity, cache transitions, child order, or failure prefixes.
+
+Twenty-eight comparison scripts check five source-order stage labels and all 28
+check a prebound-name policy. Those checks validate report metadata for the
+Rust execution route, not execution semantics of the C++ wrapper. Dynamic
+calls cannot be derived exactly from static fixture counts because warmup,
+system timesteps, and HVAC convergence are runtime-dependent.
+
+Rust owns a deliberately narrower compatibility facade, not CP279's manager
+state machine. `purchased_air_source_order_stages()` exposes five descriptive
+Get, Init, Calc, Update, and Report labels.
+`sim_purchased_air_compat[_with_branch_flags]` receives a prebound typed
+`IdealLoadsAirSystemId`, classifies its supported branch, builds an all-true
+immutable init snapshot, executes a selected finite/no-limit calculation, and
+returns immutable supply-node update and report payloads. The active `ep_run`
+route calls that facade directly instead of the C++ Zone-equipment dispatcher.
+
+`IdealLoadsInitFlags` is reconstructed with true values on every call rather
+than advancing source latches, and the update helper assembles a payload rather
+than mutating EnergyPlus node state. Typed equipment-list, connection, and node
+graph validation is useful adjacent topology evidence, but Rust intentionally
+uses prebound identities. It owns no lazy input flag, runtime name lookup,
+1-based mutable component cache, per-index one-shot name latch, exact three-way
+fatal protocol, `ControlledZoneNum` or first-iteration forwarding contract,
+mutable paired output references, return-plenum aggregation, or complete
+Init/Calc/Update/Report child effects. Exact Rust/test/manifest matches for
+`GetPurchAirInputFlag`, `CheckEquipName`, `CompIndex`, `Unit not found`, and
+`Invalid CompIndex` are zero.
+
+One Rust test asserts only the five stage strings. Four dispatch tests call the
+facade directly: three supported no-OA calls and one rejected OA attempt. OA
+helper tests execute the OA facade 21 times. They
+cover supported calculation and payload subsets, not name/index caching,
+first-iteration and Zone forwarding, mutable-output aliasing, child failure
+prefixes, retry, or replay. Existing numerical conformance remains attributable
+only to each manifest's declared bounded Calc, node, report, and meter outputs;
+it does not promote the manager wrapper.
+
+The remaining roadmap requires a Rust-owned lazy input lifecycle, exact
+identity/cache/name-latch protocol and diagnostics, full child ordering and
+state mutation, distinct output semantics, plenum/report effects, malformed-
+state and alias policy, plus direct success, failure-prefix, retry, replay, and
+concurrency oracles before CP279 can advance.
+
+CP279 changes no routine metadata, project-contract item, Rust target or state,
+support declaration, test, capability, output, comparator, case, manifest,
+numerical claim, performance claim, or conformance status. Counts remain 32
+algorithms and 282 routines, split 58 `state_mapped` plus 224 `source_mapped`,
+with 159 required. Domain-required counts remain heat-balance 88, HVAC 48,
+plant 1, and time/schedule 22, with readiness `0/88`, `0/48`, `0/1`, and
+`0/22`. The IdealLoads parent remains `scaffold` at claim level `none`.
+
+CP280 next refreshes existing required `routine.get_purchased_air`.
+`PurchasedAirManager::GetPurchasedAir(EnergyPlusData &state)` is declared at
+`PurchasedAirManager.hh` line 339 and implemented completely at
+`PurchasedAirManager.cc` lines 210-1052. `InitPurchasedAir` begins at source
+line 1054.
 
 
 
