@@ -13411,14 +13411,199 @@ heat-balance 88, HVAC 51, plant 1, and time/schedule 22. Readiness remains
 `0/88`, `0/51`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
 claim level `none`.
 
-CP288 next adds canonical required source-mapped
-`routine.get_purchased_air_out_air_mass_flow` and the matching HVAC
-project-contract item. `GetPurchasedAirOutAirMassFlow` is declared at
-`PurchasedAirManager.hh` line 371 and implemented at
-`PurchasedAirManager.cc` lines 3099-3120; the following definition,
-`GetPurchasedAirZoneInletAirNode`, begins at source line 3122. Its exact
-source-plus-test symbol census is three: declaration, definition, and the sole
-qualified production call from `SystemReports.cc` line 4065.
+## CP288 `GetPurchasedAirOutAirMassFlow` Lazy Reporting Getter Boundary
+
+`PurchasedAirManager::GetPurchasedAirOutAirMassFlow(EnergyPlusData &state,
+int const PurchAirNum)` is declared at `PurchasedAirManager.hh` line 371 and
+implemented at `PurchasedAirManager.cc` lines 3099-3120 inclusive. The body is
+22 physical lines, 18 nonblank lines, and eight nonblank, non-comment lines.
+The next physical definition, `GetPurchasedAirZoneInletAirNode`, begins at
+source line 3122.
+
+The exact source-plus-test `GetPurchasedAirOutAirMassFlow(` census is three:
+the header declaration, the definition, and the sole qualified production call
+from `SystemReports.cc` line 4065. There is no direct C++ test call. The caller
+is the PurchasedAir arm of `ReportVentilationLoads`, where the Zone equipment
+index is copied into CP288 and the returned value is unconditionally added to
+the Zone forced-air outdoor-air accumulator.
+
+CP288 reads the shared `GetPurchAirInputFlag`. If it is true, the getter calls
+CP280 `GetPurchasedAir` and assigns the flag false only after that child returns
+normally. It then performs an unchecked one-based access to
+`PurchAir(PurchAirNum).OutdoorAirMassFlowRate` and returns that `Real64` by
+value. It neither calculates nor refreshes the flow itself.
+
+With comments stripped, the getter has one `if`, one child call, one Array1D
+record accessor, one persistent flag assignment, one field read, and one
+return. It has no else, loop, switch, case, logical operator, local scalar,
+arithmetic, clamp, conversion, fallback, assertion, diagnostic, status,
+transaction, rollback, try, or catch. Its structural McCabe count is two. The
+formal index is const by value and there is no public output reference.
+
+The input latch defaults true at `PurchasedAirManager.hh` line 393.
+`clear_state()` restores it to true while deallocating the main PurchasedAir
+arrays. Eight source wrappers share the same load-then-clear pattern: the
+simulation wrapper and seven following public getters or checks. The input
+routine itself does not clear the latch, so a direct public `GetPurchasedAir`
+call followed by CP288 without an external clear invokes the loader again.
+
+Within the sole SystemReports PurchasedAir arm, CP288 is the first of five
+getter calls. It is followed by the Zone inlet node, mixed-air temperature,
+mixed-air humidity ratio, and return-air node getters. If ventilation reporting
+is the first entrant after reset, CP288 therefore owns the one-time load and the
+later getters observe a false latch. In normal simulated order,
+`SimPurchasedAir` has usually loaded the records earlier and CP288 takes the
+flag-false read path.
+
+A clean lazy call executes CP280's complete mutable input load: counting and
+allocation, object parsing, node and Schedule binding, 67 output registrations
+per unit, and optional EMS actuator registration. A newly constructed
+`OutdoorAirMassFlowRate` defaults to 0.0, and input loading does not calculate
+it. CP283 `CalcPurchAirLoads` line 2750 is the sole normal dynamic writer. Thus
+a first clean CP288 call before calculation loads all input, clears the latch,
+and normally returns the new record's zero value rather than a design or
+minimum outdoor-air flow.
+
+The same mutable field is registered by CP280 as `Zone Ideal Loads Outdoor Air
+Mass Flow Rate`. CP283 writes it, CP288 reads it for SystemReports, and
+OutputProcessor separately samples it for the direct IdealLoads output. These
+consumers share a cell but have different reporting boundaries: CP288 is a
+lookup for the cross-equipment mechanical-ventilation aggregation, not the
+registration or emission of the direct IdealLoads variable.
+
+If CP280 fatals or otherwise exits abnormally, CP288 never reaches its false
+assignment. The latch remains true, while any completed child allocation,
+parser, node, Schedule, diagnostic, output-registration, or EMS-registration
+prefix can survive. Retry re-enters the loader against that partial state; the
+load is neither allocation- nor registry-idempotent and CP288 supplies no
+cleanup.
+
+If the child returns normally, the false assignment is sequenced before the
+record access. An invalid manager, deallocated arena, zero or out-of-range
+`PurchAirNum`, or concurrent reallocation then reaches unchecked native access.
+The source-order checkpoint has already executed the clear, but the subsequent
+undefined access provides no portable whole-call postcondition. A retry from
+ordinary observed state would skip loading and repeat the invalid access. The
+next source getter is deliberately different: it explicitly checks
+`PurchAirNum > 0 && PurchAirNum <= NumPurchAir` and returns zero outside that
+range.
+
+With a false latch, stable allocated arena, valid index, and no writer, CP288 is
+a deterministic raw read and replay is value-idempotent. It owns no cached
+result: a later CP283 calculation or EMS-influenced calculation changes the
+next returned value. The first lazy success is stateful even when its returned
+flow is zero. `clear_state()` re-arms that lifecycle and removes the record
+arena.
+
+CP288 performs no floating-point operation and returns finite negatives, both
+signed zeros, NaN, positive infinity, and negative infinity unchanged. The
+caller does not apply the positive flow clamp used for the adjacent supply-node
+mass flow. It adds the raw value to `ZFAUOutAirFlow`, later adds primary-system
+outdoor air, writes Zone `OAMassFlow`, multiplies by the system timestep for
+mass, divides by standard density for volume flow, and derives volume, air
+changes, timing, and facility aggregates. Negative CP288 values subtract from
+other equipment and nonfinite values or overflow propagate. CP288 emits no
+warning for any such state.
+
+The getter's value does not directly enter the adjacent PurchasedAir
+ventilation-load enthalpy expression. That expression separately uses a
+positive-clamped Zone inlet-node flow, mixed-air state, and a valid return node.
+CP288 instead influences the Zone and facility mechanical-ventilation flow,
+mass, volume, air-change, and target-timing reporting chain through the shared
+outdoor-air sum.
+
+CP288 has no synchronization. Two first entrants can race on the shared latch,
+input allocation and population, node and output registries, and the false
+write. A flag-false read can race with CP283's field write, reset or
+reallocation, or another loader. Native races have no defined postcondition and
+there is no atomic publication. Read/read access is safe only after stable
+completed loading with no writers. Different unit indices still share the
+latch and arena lifecycle; separate complete EnergyPlus states are the evident
+isolation boundary, subject to deeper services.
+
+The only CP288-exercising C++ fixture is
+`ReportVentilationLoads_ZoneEquip` at `SystemReports.unit.cc` lines 189-342. It
+forces the latch false, allocates one record at index one, and seeds the field
+with 60,000.0. One reporter call then combines nine contributors:
+0.1 + 2 + 30 + 400 + 5,000 + 60,000 + 700,000 + 8,000,000 + 90,000,000,
+producing the asserted 98,765,432.1 Zone `OAMassFlow`.
+
+The fixture has two post-call assertions. `TargetVentilationFlowVoz` is
+unrelated to CP288; the aggregate `OAMassFlow` assertion is CP288-sensitive but
+does not isolate the standalone getter and could mask offsetting contributor
+errors. Direct CP288 calls and assertions are therefore 0/0, while indirect
+executions and sensitive composite assertions are 1/1. The tolerance is tight
+enough that simply omitting the 60,000 contribution fails.
+
+No C++ test covers the true-latch branch, successful or failed input loading,
+retry, invalid index or arena, zero, negative, or nonfinite flow, multiple
+PurchasedAir units or Zones, combination with primary-air flow, repeated or
+mutated replay, reset, downstream mass, volume, air-change or timing fields, or
+concurrency. Other `ReportVentilationLoads` unit calls do not include a
+PurchasedAir entry.
+
+Production reachability is conditional on reporting lifecycle rather than on a
+requested direct IdealLoads variable. Simulation setup allocates the ventilation
+report structure only under output reporting. At non-warmup system timesteps,
+HVACManager calls `ReportVentilationLoads` under `DoOutputReporting`; that
+routine also requires its structure-created and enabled guards, with the enable
+flag defaulting true. Static full-run reachability exists, but neither the C++
+unit corpus nor the project corpus instruments an exact dynamic CP288 entry
+count.
+
+Rust contains no `GetPurchasedAirOutAirMassFlow`, SystemReports,
+`ReportVentilationLoads`, `ZoneVentRepVars`, or `Zone Mechanical Ventilation`
+output implementation. CP288-specific getter implementation and tests are 0/0,
+and cross-equipment outdoor-air aggregation implementation and tests are 0/0.
+There is no shared lazy input latch, mutable one-based PurchasedAir arena, load
+failure prefix, raw-index behavior, or reporting consumer equivalent.
+
+Adjacent Rust state is not CP288 implementation. The immutable outdoor-air
+calculation result carries `outdoor_air_mass_flow_rate_kg_per_s`; the generic
+outdoor-air runtime writes that result directly as the IdealLoads OA mass-flow
+output, and the CLI has another direct mapping. Five assertions across three
+focused tests inspect the adjacent calculation field: one zero-flow assertion
+in the DCV test module and two economizer tests with two relations each. None
+invokes the generic
+writer or proves a lazy getter, current mutable record read, cross-equipment
+sum, failure, replay, or concurrency behavior.
+
+The audited corpus has 120 model inputs, split 108 IDF and 12 epJSON, 142
+`*case.toml` manifests, and 47 IdealLoads comparison scripts. Thirty models
+contain an IdealLoads system. The direct `Zone Ideal Loads Outdoor Air Mass
+Flow Rate` and standard-density volume-flow names each appear in exactly 12
+models, 22 manifests, and 22 scripts. Those routes compare the CP283/Rust
+calculated field directly and do not exercise a CP288/SystemReports boundary.
+
+All 15 CP288-sensitive SystemReports output names have zero model, manifest,
+and script coverage. This includes seven Zone mechanical-ventilation mass,
+flow, standard- or current-density volume, and air-change variables, four Zone
+ventilation timing variables, and four Facility timing variables. The corpus
+therefore supplies static IdealLoads topology and potential reporting
+reachability but zero requested or compared proof of the cross-equipment CP288
+aggregation.
+
+CP288 adds canonical required `source_mapped`
+`routine.get_purchased_air_out_air_mass_flow` immediately after
+`routine.report_purchased_air`, plus the matching HVAC project-contract item.
+It adds no algorithm-level source, Rust target or state, support declaration,
+test, capability, output, comparator, case, manifest, numerical claim,
+performance claim, or conformance promotion.
+
+The inventory becomes 32 algorithms and 286 routines, split 58 `state_mapped`
+plus 228 `source_mapped`, with 163 required. Domain-required counts become
+heat-balance 88, HVAC 52, plant 1, and time/schedule 22. Readiness remains
+`0/88`, `0/52`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
+claim level `none`.
+
+CP289 next adds canonical required source-mapped
+`routine.get_purchased_air_zone_inlet_air_node` and the matching HVAC
+project-contract item. `GetPurchasedAirZoneInletAirNode` is declared at
+`PurchasedAirManager.hh` line 373 and implemented at
+`PurchasedAirManager.cc` lines 3122-3145; the following definition,
+`GetPurchasedAirReturnAirNode`, begins at source line 3147. Its exact
+parenthesized source-plus-test symbol census is three: declaration, definition,
+and the sole qualified production call from `SystemReports.cc` line 4066.
 
 
 

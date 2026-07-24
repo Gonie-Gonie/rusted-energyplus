@@ -178,6 +178,7 @@ required_routines = [
   "calc_purch_air_mixed_air",
   "update_purchased_air",
   "report_purchased_air",
+  "get_purchased_air_out_air_mass_flow",
 ]
 
 [[domain_claim]]
