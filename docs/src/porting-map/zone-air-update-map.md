@@ -18280,12 +18280,195 @@ counts remain heat-balance 88, plant 1, and time/schedule 22, while HVAC becomes
 51. Readiness remains `0/88`, `0/51`, `0/1`, and `0/22`. The IdealLoads parent
 remains `scaffold` at claim level `none`.
 
-CP286 next refreshes existing required `routine.update_purchased_air` in place.
-`UpdatePurchasedAir` is declared at `PurchasedAirManager.hh` line 367 and
-implemented at `PurchasedAirManager.cc` lines 2941-2984. The following physical
-definition, `ReportPurchasedAir`, begins at source line 2986 and is declared at
-header line 369. CP286 therefore adds no routine row, project-contract item, or
-inventory count.
+## CP286 `UpdatePurchasedAir` Return-Plenum Quorum Boundary
+
+`PurchasedAirManager::UpdatePurchasedAir(EnergyPlusData &state,
+int const PurchAirNum, bool const FirstHVACIteration)` is declared at
+`PurchasedAirManager.hh` line 367 and implemented at
+`PurchasedAirManager.cc` lines 2941-2984 inclusive. The body is 44 physical
+lines, 35 nonblank lines, and 22 nonblank, non-comment lines. The next physical
+definition, `ReportPurchasedAir`, begins at source line 2986.
+
+The exact source-plus-test `UpdatePurchasedAir(` census is three: the header
+declaration, the sole production call from `SimPurchasedAir` at source line
+205, and the definition. There is no direct C++ test call. The production
+wrapper calls CP281 Init at line 201, CP283 Calc at line 203, CP286 Update at
+line 205, and Report at line 207. No availability, UnitOn, flow, or
+`FirstHVACIteration` guard intervenes, so CP286 is reached after every normally
+returning calculation and before every normally reached report, including for
+connected or unconnected UnitOff and zero-flow units.
+
+The source purpose comment says that CP286 updates IdealLoads node data, but the
+executable body performs no supply-node temperature, humidity-ratio, enthalpy,
+or mass-flow write. Those node writes belong to CP283
+`CalcPurchAirLoads`, including its UnitOn, UnitOff, and plenum/recirculation
+paths at source lines 2706-2759. CP286 instead coordinates when a shared return
+plenum is simulated. The distinction is source-significant and prevents a
+node-update payload from counting as partial CP286 implementation evidence.
+
+Each call creates `FirstCall = true` and `SupPathInletChanged = false`, then
+aliases `PurchAir(PurchAirNum)`. A nonpositive `ReturnPlenumIndex` exits through
+the outer guard with no persistent CP286 write and no child call. A positive
+index first sets
+`PurchAirPlenumArrays(ReturnPlenumIndex).IsSimulated(PurchAirArrayIndex)` to
+true. If `all` elements of that selected Boolean vector are then true, CP286
+calls `SimAirZonePlenum` for `ReturnPlenum`, passing the stored plenum name, the
+same index by reference, the caller's `FirstHVACIteration`, and the two fresh
+local Booleans. Only after the child returns normally does CP286 assign false
+to the entire selected `IsSimulated` vector.
+
+For this hard-coded return-plenum child branch, `SimAirZonePlenum` uses the
+positive component index to select and validate a return plenum, checks the
+name only while its one-shot `checkEquipName` latch remains true, then runs its
+return-plenum initialize, calculate, and update children. It does not read
+`FirstHVACIteration`, `FirstCall`, or `SupPathInletChanged`; those optional
+arguments are used by the separate supply-plenum branch. CP286 discards both
+local Booleans after the child regardless. The apparent iteration inputs
+therefore do not create a CP286 generation or completion epoch.
+
+With comments stripped, CP286 has two nested `if` heads and no else, loop,
+switch, case, return, break, continue, logical AND or OR, assertion, try, catch,
+or direct diagnostic call. Its structural McCabe count is three. Seven
+operational call/accessor expressions comprise five indexed PurchAir or
+plenum-array accesses, `all`, and `SimAirZonePlenum`. The two direct persistent
+write sites are the one selected flag set true and the whole-vector reset
+false; all other mutation is delegated to the plenum child.
+
+CP286 trusts a topology assembled by CP281 without checking it. The initializer
+stores only connected plenums in a dense `PurchAirPlenumArrays` sequence and
+records each row's actual `ReturnPlenumIndex`; its own comment explicitly allows
+dense row 1 to represent return plenum 4. CP286 nevertheless uses the actual
+`PurchAir.ReturnPlenumIndex` directly as the dense outer subscript instead of
+searching the recorded row index. Noncontiguous or discovery-order-mismatched
+plenum identities can therefore select the wrong quorum or exceed the dense
+array. CP286 also does not verify the selected row's recorded plenum identity,
+`PurchAirArrayIndex`, membership list, Boolean-vector extent, uniqueness, or
+allocation.
+
+There is no unit identity, arena extent, positive-index consistency, name/index
+agreement, topology-generation, quorum-size, duplicate-membership, iteration,
+or lifecycle validation in CP286. It has no local diagnostic, status,
+transaction, rollback, exception boundary, recovery, timeout, or completion
+counter. Child validation can fatal on an invalid plenum index or a first-use
+name mismatch and can mutate the plenum name-check latch, plenum state, nodes,
+and diagnostics before returning or failing.
+
+An invalid `PurchAirNum` reaches its first unchecked PurchAir access before any
+source-level flag assignment, while a bad dense outer or member index reaches
+unchecked access at the first mark. Unchecked native invalid access has no
+defined postcondition. After a valid mark commits and the vector is all true, a
+defined child fatal or abnormal exit can retain the all-true vector plus any
+plenum, node, latch, and diagnostic prefix, skip the whole-vector reset, and
+prevent the wrapper's following Report call. If evaluating or executing the
+final reset itself encounters invalid access, native code again has no defined
+postcondition. CP286 provides no owned status that separates an observable
+child prefix from normal pending-quorum state.
+
+Replay is stateful and cyclic. Repeating a nonfinal unit only leaves its same
+bit true. The call that observes every bit true runs the child and clears the
+whole vector; replaying that same unit after success immediately begins a new
+cycle. A single-unit plenum therefore invokes the child on every successful
+call. A retry after an all-true child failure re-enters the child immediately,
+while a missing unit can leave sibling flags true across later HVAC iterations
+because the vector has no iteration identifier or stale-mark cleanup. The
+non-plenum branch alone is a CP286 no-op under stable valid state.
+
+Both formal scalar inputs are const-by-value snapshots and CP286 exposes no
+public output reference; internal mutable state and the child remain its alias
+boundary.
+
+CP286 has no synchronization. Absent an external serialized equipment loop,
+same-state calls can race on element marks, the all-vector read, child effects,
+and the whole-vector reset. Interleavings can duplicate or suppress plenum
+simulation, erase a next-cycle mark, or combine flags from different logical
+iterations; native data races have no defined C++ postcondition. Repeated
+unsnapshotted reads of `ReturnPlenumIndex` can also observe a changing topology.
+Duplicate valid `PurchAirArrayIndex` values make systems share a bit, while
+other malformed values reach unchecked access; the whole-vector reset
+overwrites every shared bit at once. Separate complete
+EnergyPlus states remain the evident isolation boundary, subject to deeper
+services.
+
+The bounded PurchasedAir C++ unit corpus reaches the production wrapper four
+times, through `ManageZoneEquipment` at unit-test lines 413, 540, 671, and 949.
+All four pass `FirstHVACIteration = true`; false forwarding has no test. Only
+`IdealLoads_PlenumTest` configures a positive return-plenum index. It has actual
+index 1 and exactly one attached IdealLoads unit, so its one wrapper call marks
+the sole bit, immediately satisfies `all`, runs the child, and resets the bit.
+The other three wrappers take the guard-false no-op path.
+
+That active test has ten post-wrapper assertions covering the unit name,
+plenum index, exhaust/supply topology, positive supply flow, and three node
+mass-flow equalities. None observes `IsSimulated`, the mark/all/reset sequence,
+child call count, false `FirstHVACIteration`, either local Boolean, or state
+before and after a second call. The mass-flow values are composite results and
+the supply-node writes originate in CP283. Multi-unit quorum order, dense-index
+mismatch, stale flags, child failure, retry, alias, and concurrency have zero
+isolated C++ assertions. CP286-owned assertions are therefore zero.
+
+Five separate IdealLoads full-simulation fixtures provide five static
+`ManageSimulation` sites and 171 post-simulation assertions. Every one has a
+blank IdealLoads system-inlet field and no `AirLoopHVAC:ReturnPlenum`, so every
+dynamically reached CP286 call is restricted to the no-op branch. No
+instrumentation records its actual system-timestep or HVAC-iteration entry
+count; neither five sites nor 171 downstream assertions is a dynamic CP286
+execution total.
+
+The current corpus has 120 model files, split 108 IDF and 12 epJSON. Thirty
+unique IdealLoads IDFs contain 30 systems, all with blank `System Inlet Air
+Node Name`, and the whole corpus contains zero `AirLoopHVAC:ReturnPlenum`
+objects. The 142 manifests contain 52 IdealLoads routes and the 47 IdealLoads
+comparison processes contain zero active-plenum route or script. Existing node
+and Zone IdealLoads supply temperature, humidity, mass-flow, and volume series
+exercise downstream calculation/report payloads; no model, manifest, or script
+compares supply-node enthalpy or exposes CP286's private quorum vector. The
+corpus supplies no active CP286 conformance evidence.
+
+Rust's `ep_runtime::ideal_loads::update::supply_node_update_from_result` is one
+pure constructor from an immutable calculation result to
+`IdealLoadsSupplyNodeUpdate`. It copies a node identity plus supply temperature,
+humidity ratio, mass flow, and enthalpy into a value; it does not mutate a node
+arena. It owns no return-plenum identity, membership vector, simulated flag,
+quorum check, plenum child, caller iteration Boolean, local Boolean lifecycle,
+whole-vector reset, diagnostic prefix, failure state, replay cycle, or
+synchronization.
+
+Existing Rust comments and source mappings in the node module, IdealLoads
+dispatch/outdoor-air/runtime path, execution-plan dependency, and generated CLI
+node-output attribution label that payload as `UpdatePurchasedAir`. Source
+shows that this is CP283 node-write evidence instead. One wrapper test makes
+five payload-related assertions and the outdoor-air wrapper checks only the
+payload node identity; the helper has zero direct tests. These assertions can
+support the immutable CP283-adjacent payload relationship but do not implement
+or test CP286's active branch.
+
+The Rust execution plan serializes an `UpdateIdealLoadsAirSystem` stage and has
+two Update-specific metadata assertions, but there is no interpreter for that
+step. The repository has no typed or runtime `AirLoopHVAC:ReturnPlenum`
+representation; the unsupported `AirLoopHVAC*` capability rule blocks such an
+input. Active CP286 implementation paths and tests are therefore both zero.
+Source-order labels, a pure node payload, and fail-closed exclusion do not
+promote the mutable return-plenum barrier.
+
+CP286 refreshes existing required `source_mapped`
+`routine.update_purchased_air` in place after
+`routine.calc_purch_air_mixed_air` and before
+`routine.report_purchased_air`. It adds no routine or project-contract row,
+algorithm-level source, Rust target or state, support declaration, test,
+capability, output, comparator, case, manifest, numerical claim, performance
+claim, readiness change, or conformance promotion.
+
+The inventory remains 32 algorithms and 285 routines, split 58 `state_mapped`
+plus 227 `source_mapped`, with 162 required. Domain-required counts remain
+heat-balance 88, HVAC 51, plant 1, and time/schedule 22. Readiness remains
+`0/88`, `0/51`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
+claim level `none`.
+
+CP287 next refreshes existing required `routine.report_purchased_air` in place.
+`ReportPurchasedAir` is declared at `PurchasedAirManager.hh` line 369 and
+implemented at `PurchasedAirManager.cc` lines 2986-3097. The following physical
+definition, `GetPurchasedAirOutAirMassFlow`, begins at source line 3099. CP287
+therefore adds no routine row, project-contract item, or inventory count.
 
 
 
