@@ -183,6 +183,7 @@ required_routines = [
   "get_purchased_air_return_air_node",
   "get_purchased_air_index",
   "get_purchased_air_mixed_air_temp",
+  "get_purchased_air_mixed_air_hum_rat",
 ]
 
 [[domain_claim]]

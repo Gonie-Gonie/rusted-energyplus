@@ -31895,16 +31895,252 @@ heat-balance 88, HVAC 56, plant 1, and time/schedule 22. Readiness remains
 `0/88`, `0/56`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
 claim level `none`.
 
-CP293 next adds canonical required source-mapped
-`routine.get_purchased_air_mixed_air_hum_rat` and the matching HVAC
-project-contract item. `GetPurchasedAirMixedAirHumRat` is declared at
-`PurchasedAirManager.hh` line 381 and implemented at
-`PurchasedAirManager.cc` lines 3212-3234; the following definition,
-`CheckPurchasedAirForReturnPlenum`, begins at source line 3236. Its body is 23
-physical lines, 18 nonblank lines, and eight nonblank, non-comment lines. The
-exact parenthesized and bare source-plus-test censuses are each three:
-declaration, definition, and the sole qualified production call from
-`SystemReports.cc` line 4071; there is no direct C++ test call.
+## CP293 `GetPurchasedAirMixedAirHumRat` Raw Mixed-Air Humidity-Ratio Getter Boundary
+
+`PurchasedAirManager::GetPurchasedAirMixedAirHumRat(EnergyPlusData &state,
+int const PurchAirNum)` is declared at `PurchasedAirManager.hh` line 381 and
+implemented at `PurchasedAirManager.cc` lines 3212-3234 inclusive. The body is
+23 physical lines, 18 nonblank lines, and eight nonblank, non-comment lines.
+The next physical definition, `CheckPurchasedAirForReturnPlenum`, begins at
+source line 3236.
+
+The exact parenthesized source-plus-test `GetPurchasedAirMixedAirHumRat(`
+census is three: the header declaration, the definition, and the sole qualified
+production call from `SystemReports.cc` line 4071. Its bare identifier census
+is also three. There is no direct C++ test call.
+
+CP293 reads the shared `GetPurchAirInputFlag`. If true, it calls CP280
+`GetPurchasedAir` and assigns the latch false only after that child returns
+normally. It then performs an unchecked one-based access to
+`PurchAir(PurchAirNum).MixedAirHumRat` and returns the stored `Real64` by value.
+It neither calculates nor refreshes the mixed-air humidity ratio itself.
+
+With comments stripped, the getter has one `if`, one direct child call, one
+syntactic Array1D record accessor, one persistent latch assignment, one field
+read, and one return. It has no comparison, logical operator, local scalar,
+else, loop, switch, case, arithmetic, clamp, conversion, fallback, assertion,
+diagnostic, status, transaction, rollback, try, catch, or synchronization. Its
+structural McCabe count is two. The formal index is const by value and there is
+no public output reference.
+
+The source methodology comment at lines 3224-3226 says that the routine gets
+"the actual mass flow of outdoor air," although the implementation and purpose
+line return mixed-air humidity ratio. CP293 preserves that source-visible
+copy/paste anomaly as documentation evidence; it does not reinterpret the
+field as mass flow.
+
+`MixedAirHumRat` is declared at `PurchasedAirManager.hh` line 262 and defaults
+to 0.0 in the record constructor at line 299. CP280 registers that cell
+directly as `Zone Ideal Loads Mixed Air Humidity Ratio` at
+`PurchasedAirManager.cc` lines 1008-1015. OutputProcessor therefore samples the
+raw field without calling CP293 or applying the later SystemReports
+psychrometric floor.
+
+CP283 `CalcPurchAirLoads` owns normal dynamic state production. Its cooling and
+heating/deadband branches each pass `PurchAir.MixedAirHumRat` by reference to
+CP285 `CalcPurchAirMixedAir` at lines 2171-2178 and 2454-2461. CP285 assigns the
+weighted value or selected outdoor/recirculation value at lines 2915-2934.
+Positive supply flow retains that result. A UnitOn path reduced to zero supply
+later overwrites the field from the recirculation Node humidity ratio at line
+2696, and UnitOff performs the same overwrite at line 2745 without calling
+CP285. CP293 only observes whichever writer ran most recently.
+
+A clean direct first call executes CP280's mutable input load, then clears the
+latch, but does not run CP283 calculation or CP285 mixing. Since input
+processing does not calculate the field, that path normally returns the newly
+constructed 0.0 rather than a design or current humidity ratio. A later
+calculation or direct record mutation can change the value returned by replay.
+
+If CP280 fatals or otherwise exits abnormally, CP293 never reaches its false
+assignment. The latch remains true while completed allocation, parser, node,
+Schedule, diagnostic, output-registration, or EMS-registration prefixes can
+survive. Retry re-enters the non-idempotent loader against partial state, and
+CP293 supplies neither cleanup nor rollback.
+
+If CP280 returns normally, the false assignment is sequenced before the record
+access. CP293 never reads `NumPurchAir` and performs no range check. Zero,
+negative, or above-count indices, or a deallocated or shorter arena, can reach
+unchecked native Array1D access. Conversely, an arena longer than the logical
+count allows a positive slot outside `NumPurchAir` to be read. Any invalid
+access has no portable postcondition even though the source-order latch clear
+has already executed.
+
+With a false latch, stable allocated arena, valid index, and no writer, replay
+is an O(1), deterministic, value-idempotent current-cell read. There is no
+cached result. Calculation, direct mutation, reset, or arena replacement can
+change the next result. `clear_state()` re-arms the latch and deallocates the
+PurchasedAir arena.
+
+CP293 performs no floating-point operation and returns finite values, negative
+values, both signed zeros, NaN, positive infinity, and negative infinity
+unchanged. It has no physical-range or finiteness validation and emits no
+warning for malformed stored state. Any floor applied by the sole caller is a
+downstream psychrometric behavior, not getter behavior.
+
+The getter has no atomic publication or locking. Two first entrants can race on
+the shared latch and CP280's mutable loader. A loaded read can race with CP283
+or CP285 writes, reset, deallocation, reallocation, or direct record mutation.
+Native races have no defined postcondition. Read/read access is safe only for a
+stable, fully loaded state with no concurrent writer.
+
+Production reachability is through `SystemReports::ReportVentilationLoads`,
+declared at `SystemReports.hh` line 323 and implemented from
+`SystemReports.cc` line 3829. `HVACManager.cc` lines 450-465 call it only for a
+non-warmup system timestep with `DoOutputReporting`. The routine then requires
+its report-structure-created and ventilation-load-report-enabled guards at
+lines 3849-3854 before entering the controlled-Zone and Zone-equipment loops.
+These gates establish static reachability, not a measured CP293 entry count.
+
+The PurchasedAir arm at `SystemReports.cc` lines 4064-4081 calls CP288's raw
+outdoor-air mass-flow getter at line 4065, CP289's inlet-node getter at line
+4066, CP292's mixed-air temperature getter at line 4070, CP293 at line 4071,
+and CP290's return-node getter at line 4072. CP288 is therefore the first shared
+latch consumer and also performs an unchecked record access before CP293. In
+ordinary sequential reporter use, CP293 sees the latch already false; a bad
+common equipment index can fail in CP288 or CP292 first. CP293's own lazy
+branch remains a separately reachable direct-use or first-entry behavior.
+
+CP293 executes unconditionally for every reached PurchasedAir arm, regardless
+of the inlet and return getter results. A positive inlet node causes the caller
+to replace `ZFAUFlowRate` with `max(Node.MassFlowRate, 0.0)`. Only when retained
+`ZFAUFlowRate > 0.0` and CP290 returns a positive node does the caller combine
+CP292 temperature and CP293 humidity ratio through `PsyHFnTdbW`, calculate the
+return enthalpy, and add
+`flow * (mixed_enthalpy - return_enthalpy) * TimeStepSysSec` to the Zone
+forced-air ventilation load. Otherwise the returned humidity ratio is read and
+discarded. CP293 owns none of this psychrometric or load arithmetic.
+
+`PsyHFnTdbW` applies `max(W, 1.0e-5)`. Finite CP293 values below 1.0e-5,
+including negative values and both signed zeros, are therefore replaced by the
+floor in this caller; negative infinity is floored as well. Finite values at or
+above the floor enter the formula unchanged. NaN and positive infinity survive
+the max operation and can make mixed enthalpy and the combined ventilation load
+nonfinite when the flow/return gate is open. Temperature, return state,
+timestep, and prior aggregate state also participate, so these are conditional
+consumer paths rather than CP293-only results. The direct IdealLoads humidity-
+ratio output does not pass through this floor.
+
+`ZFAUFlowRate` is initialized once per Zone at `SystemReports.cc` line 3911,
+not once per Zone-equipment iteration. CP289 updates it only for a positive
+inlet node. A later PurchasedAir record with a nonpositive inlet can therefore
+retain flow from preceding equipment and combine that stale value with the
+current CP292/CP293 mixed-air state when CP290 supplies a positive return node.
+CP293 neither creates, detects, nor clears that caller-owned stale-flow path.
+
+The forced-air contribution joins primary-air ventilation load at source line
+4370. After the numeric 0.1 `SmallLoad` threshold, its sign relative to the Zone
+load can feed eight registered `Zone Mechanical Ventilation ... Energy` fields:
+No Load Heat Removal, Cooling Load Increase, Cooling Load Increase Due to
+Overheating, Cooling Load Decrease, No Load Heat Addition, Heating Load
+Increase, Heating Load Increase Due to Overcooling, and Heating Load Decrease.
+This is only a potential paired humidity/temperature consumer. CP293 does not
+calculate the Zone classification and does not affect CP288's separate outdoor-
+air mass, volume, air-change, or timing aggregation.
+
+The sole bounded indirect C++ evidence is
+`ReportVentilationLoads_ZoneEquip` at `SystemReports.unit.cc` lines 189-342.
+Its setup selects PurchasedAir, forces the latch false, sets count one,
+allocates one default record, and seeds only `OutdoorAirMassFlowRate` with
+60,000.0. CP293 executes once with valid index one and returns the constructor
+0.0. The inlet and return fields also remain zero, so the caller never invokes
+`PsyHFnTdbW` with that value and does not use it in the load expression.
+
+The fixture's two post-call assertions inspect
+`TargetVentilationFlowVoz` and the nine-equipment outdoor-air mass-flow sum.
+Neither changes with CP293's value. Direct getter calls/assertions are therefore
+`0/0`, and bounded indirect executions/CP293-sensitive assertions are `1/0`.
+Other `ReportVentilationLoads` tests do not enter the PurchasedAir arm. Five
+broader IdealLoads simulation fixtures and their 171 post-simulation assertions
+contain no mixed-humidity getter entry counter or mechanical-ventilation load
+assertion, so they do not establish a dynamic CP293 count.
+
+Two adjacent C++ assertions prove writer state but bypass the getter. The
+`IdealLoads_IntermediateOutputVarsTest` calls CP285 directly and checks
+`MixedAirHumRat` at `PurchasedAirManager.unit.cc` line 716. The
+`IdealLoads_Fix_SA_HumRat_Test` runs CP283 and checks a 0.012 field value at
+line 1531. Neither assertion exercises CP293's latch, raw index, return,
+psychrometric floor, or SystemReports consumer.
+
+No C++ test covers the true-latch path, successful or failed loading, retry,
+invalid count/index/arena combinations, a computed nonzero humidity ratio
+through the reporter, values around the 1.0e-5 floor, negative or nonfinite
+stored values, multiple PurchasedAir units or Zones, the stale-flow case,
+repeated or mutated replay, reset, or concurrency.
+
+Rust has no exact `GetPurchasedAirMixedAirHumRat` or
+`get_purchased_air_mixed_air_hum_rat` getter, shared lazy PurchasedAir latch,
+mutable one-based record arena, or SystemReports mechanical-ventilation load
+consumer. CP293-specific Rust implementation, test, and assertion counts are
+therefore `0/0/0`.
+
+The adjacent Rust outdoor-air calculation is real but has a different boundary.
+Private pure helper `mixed_air_state` at
+`crates/ep_runtime/src/ideal_loads/outdoor_air/mixed_air.rs` lines 31-168
+returns `mixed_air_humidity_ratio`; the outdoor-air result retains that scalar,
+and the calculator assembles it without a lazy mutable lookup. The helper uses
+its selected or weighted humidity ratio directly and has no CP293/SystemReports
+1.0e-5 consumer floor. It also returns recirculation humidity when outdoor-air
+flow or supply flow is nonpositive, whereas C++ CP285 with positive outdoor-air
+flow and nonpositive supply selects the after-heat-recovery outdoor-air value.
+Rust reconstructs adjacent moist-air enthalpy from temperature and raw humidity;
+C++ CP285 can consume stored Node enthalpy, and SystemReports separately
+reconstructs with the 1.0e-5 floor. These producer and consumer differences
+further prevent the Rust helper from standing in for CP293. The runtime
+publishes
+`Zone Ideal Loads Mixed Air Humidity Ratio` directly from the immutable result
+at `runtime.rs` lines 552-559, while the CLI projects the same named sample at
+`ideal_loads.rs` lines 2586-2593. Like the C++ output registration, these paths
+bypass a CP293 getter and its SystemReports consumer.
+
+Three explicit humidity-sensitive Rust assertions across three focused
+calculation tests appear at `outdoor_air_tests.rs` lines 119-122, 165-168, and
+315. They check producer and supply/mixed-air relationships. One wrapper test
+also compares a complete result to an expected value produced by calling the
+same calculation again; that self-derived composite equality structurally
+contains the field but is not an independent humidity oracle or CP293-specific
+assertion. None tests lazy loading, raw one-based indexing, mutable replay,
+reporter gating, the psychrometric floor, failure, reset, or concurrency.
+
+The audited corpus contains 120 model inputs, split 108 IDF and 12 epJSON, 142
+`*case.toml` manifests, and 47 IdealLoads comparison scripts. Thirty models
+contain an IdealLoads system, with 52 manifest routes. Exact
+`Zone Ideal Loads Mixed Air Humidity Ratio` coverage is 12 models, 22
+manifests, and 22 scripts; the manifests split 12 conformance and ten
+diagnostic-only. Every one of those routes reads the directly registered field
+rather than calling CP293, so the coverage proves bounded producer/output
+behavior only.
+
+All eight CP293-sensitive `Zone Mechanical Ventilation ... Energy` names have
+exact model/manifest/script coverage `0/0/0`. The corpus has no exact getter
+entry instrumentation. It therefore supplies no requested or compared proof of
+the CP293-to-SystemReports consumer chain, including the 1.0e-5 floor, nonzero
+use, nonfinite propagation, or the cross-equipment stale-flow case.
+
+CP293 adds canonical required `source_mapped`
+`routine.get_purchased_air_mixed_air_hum_rat` immediately after
+`routine.get_purchased_air_mixed_air_temp`, plus the matching HVAC
+project-contract item. It adds no algorithm-level source, Rust target or state,
+support declaration, test, capability, output, comparator, case, manifest,
+numerical claim, performance claim, readiness promotion, or conformance
+promotion.
+
+The inventory becomes 32 algorithms and 291 routines, split 58 `state_mapped`
+plus 233 `source_mapped`, with 168 required. Domain-required counts become
+heat-balance 88, HVAC 57, plant 1, and time/schedule 22. Readiness remains
+`0/88`, `0/57`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
+claim level `none`.
+
+CP294 next adds canonical required source-mapped
+`routine.check_purchased_air_for_return_plenum` and the matching HVAC
+project-contract item. `CheckPurchasedAirForReturnPlenum` is declared at
+`PurchasedAirManager.hh` line 383 and implemented at
+`PurchasedAirManager.cc` lines 3236-3266; the following definition,
+`InitializePlenumArrays`, begins at source line 3268. Its body is 31 physical
+lines, 24 nonblank lines, and 17 nonblank, non-comment lines. The exact
+parenthesized source-plus-test census is four: declaration, definition, and the
+two production calls from `GeneralRoutines.cc` line 1531 and `ZonePlenum.cc`
+line 401. Its bare census is nine because the body-local result name and a
+`using` declaration add five occurrences. There is no direct C++ test call.
 
 
 
