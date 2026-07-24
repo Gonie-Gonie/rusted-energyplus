@@ -13177,11 +13177,248 @@ heat-balance 88, HVAC 51, plant 1, and time/schedule 22. Readiness remains
 `0/88`, `0/51`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
 claim level `none`.
 
-CP287 next refreshes existing required `routine.report_purchased_air` in place.
-`ReportPurchasedAir` is declared at `PurchasedAirManager.hh` line 369 and
-implemented at `PurchasedAirManager.cc` lines 2986-3097. The following physical
-definition, `GetPurchasedAirOutAirMassFlow`, begins at source line 3099. CP287
-therefore adds no routine row, project-contract item, or inventory count.
+## CP287 `ReportPurchasedAir` Rate, Energy, and Fuel Boundary
+
+`PurchasedAirManager::ReportPurchasedAir(EnergyPlusData &state,
+int const PurchAirNum)` is declared at `PurchasedAirManager.hh` line 369 and
+implemented at `PurchasedAirManager.cc` lines 2986-3097 inclusive. The body is
+112 physical lines, 97 nonblank lines, and 85 nonblank, non-comment lines. The
+next physical definition, `GetPurchasedAirOutAirMassFlow`, begins at source
+line 3099.
+
+The exact source-plus-test `ReportPurchasedAir(` census is four: the header
+declaration, the sole production call from `SimPurchasedAir` at source line
+207, the definition, and one direct unit-test call at
+`PurchasedAirManager.unit.cc` line 1543. The two actual direct call sites are
+both unqualified. Production orders CP281 Init at line 201, CP283 Calc at line
+203, CP286 Update at line 205, and CP287 Report at line 207. Report is therefore
+the unconditional final child only after every predecessor returns normally;
+a CP286 return-plenum child failure prevents it from being reached.
+
+CP287 first snapshots `TimeStepSysSec`, then aliases the selected PurchasedAir
+record. It next overwrites six supply or coil rates in source order: positive
+sensible and latent loads become heating rates, absolute negative parts become
+cooling rates, and the two heating and two cooling components are added into
+separate totals. It repeats the same six-field split and total construction for
+`SenOutputToZone` and `LatOutputToZone`. Sensible and latent signs are
+independent, so a single record can legitimately publish nonzero heating and
+cooling totals at the same time.
+
+The six outdoor-air report rates are not ordinary sign splits. A strict
+positive `SenCoilLoad` alone enables the absolute negative part of
+`OASenOutput` as outdoor-air sensible heating; a strict negative coil load
+alone enables its positive part as outdoor-air sensible cooling. The latent
+pair uses the same strict positive and negative guards on `LatCoilLoad` before
+reading the corresponding sign of `OALatOutput`. Every inactive branch writes
+zero, after which CP287 adds the sensible and latent fields into outdoor-air
+heating and cooling totals. Exact-zero or NaN parent coil loads make both
+related guards false. There is no local `OutdoorAir`, UnitOn, availability, or
+flow guard.
+
+CP287 then unconditionally sign-splits `HtRecSenOutput` and `HtRecLatOutput`
+into four heat-recovery component rates and two totals. It does not inspect the
+heat-recovery type, active time, availability, or current operating mode.
+Consequently, the CP283 UnitOff path can leave heat-recovery outputs retained
+from an earlier call and CP287 can turn that stale state into current rates and
+energies even while current coil, Zone, and outdoor-air loads are zero.
+
+The heating-efficiency schedule is sampled once. A sampled value less than or
+equal to zero is replaced only in a local scalar by 1.0, with no diagnostic or
+schedule writeback. CP287 then writes supply total heating fuel rate first and
+Zone total heating fuel rate second as the corresponding total divided by that
+scalar. It separately samples the cooling-efficiency schedule, applies the same
+fallback, and writes Zone total cooling fuel rate before supply total cooling
+fuel rate. The two getter calls remain distinct; under stable single-thread state an
+aliased Schedule yields the same current value, while concurrent mutation is a
+native data race with no defined postcondition.
+
+The final 28 writes are energies. Their exact block order is six supply, six
+Zone, six outdoor-air, six heat-recovery, then Zone heating fuel, Zone cooling
+fuel, supply heating fuel, and supply cooling fuel. Every energy is its already
+stored corresponding rate multiplied by the entry-snapshotted
+`TimeStepSysSec`. Total energy is recomputed from total rate rather than from
+component energies, and fuel energy is computed from the already divided fuel
+rate. The routine performs no local accumulation; OutputProcessor later applies
+Sum aggregation to these energy variables and Average aggregation to their
+rate partners.
+
+CP287 has six `if` heads and four else branches, with no loop, switch, case,
+return, break, continue, logical AND or OR, assertion, try, catch, or direct
+diagnostic. Its structural McCabe count is seven. Twenty-seven operational
+call or accessor expressions comprise one PurchasedAir accessor, eight
+`max`, eight `min`, eight `std::abs`, and two schedule reads. The source has 66
+lexical assignment sites: one record-reference initialization, five local
+scalar initialization or assignment sites, and 60 persistent assignment sites.
+Those 60 sites target 56 unique PurchasedAir fields because each of four
+outdoor-air component fields has both an active and an else write. Every valid,
+normally completing path executes exactly one write to each of the 56 unique
+destinations. Arithmetic comprises eight additions, four divisions, and 28
+multiplications.
+
+Those 56 destinations correspond one-for-one to 56 of the 67 output variables
+registered for each unit by CP280: 28 Sum energy variables registered at source
+lines 531-728 and 28 Average rate variables registered at lines 735-926. CP287
+itself neither registers nor emits an OutputProcessor sample. Other registered
+node state, flow, and active-time variables are owned by earlier calculation
+and node state, not by this report routine.
+
+Successful CP280 input normally supplies AlwaysOn for a blank efficiency field
+or a valid named Schedule pointer; a missing named schedule is fatal before
+normal production reaches CP287. CP287 itself performs no lazy-input, state,
+unit-index, arena-extent, pointer, fuel-type, mode, flag, field-consistency,
+finiteness, timestep-sign, or efficiency-upper-bound validation. It has no
+status, transaction, rollback, completion flag, cleanup, or diagnostic. Invalid
+state globals, an invalid `PurchAirNum`, null or dangling schedule pointers,
+concurrent arena reallocation, and native data races are unchecked native
+access with no defined postcondition.
+
+Under valid allocated single-thread state, the concrete schedule getters are
+inline reads with no diagnostic, counter, or mutation and ordinary floating
+operations provide no recoverable failure route. Textually, 24 nonfuel rates
+precede the heating schedule access, two heating fuel rates precede the cooling
+schedule access, the two cooling fuel rates follow, and then all 28 energies
+are written. These checkpoints describe source order only; they are not a
+guaranteed retained prefix after undefined pointer or index access. There is no
+whole-record commit that would hide an intermediate prefix from another reader.
+
+The two-argument Objexx `max` and `min` ordering is source-significant.
+`max(a, 0)` retains a first-argument NaN, whereas `min(a, 0)` selects zero when
+that first argument is NaN. An ordinary supply, Zone, or heat-recovery NaN load
+therefore produces NaN on its heating side but zero on its cooling side. A NaN
+outdoor-air parent load disables both strict gates; with an active finite gate,
+a NaN outdoor-air output can propagate through the cooling `max` but becomes
+zero through the heating `min`. Negative zero can survive a heating-side
+`max`.
+
+Both signed zeros, finite negatives, and negative infinity in an efficiency
+sample fall back to 1.0. NaN bypasses the `<= 0` test, positive infinity and an
+arbitrarily small positive value survive, and division or multiplication can
+overflow, underflow, or propagate NaN, infinity, and signed zero. A negative
+timestep makes finite energies negative, a zero timestep makes finite energies
+zero, and zero multiplied by infinity or NaN can be NaN. CP287 neither clamps
+nor reports any of these conditions.
+
+With fixed valid input fields, fixed schedule samples, a fixed timestep, and no
+concurrency, CP287 deterministically overwrites all 56 fields and replay is
+value-idempotent rather than cumulative. Changed CP283 inputs, retained
+heat-recovery outputs, EMS or current schedule values, or timestep state change
+replay results. `PurchAirNum` is const by value and there are no public output
+references, but the record fields and schedule objects remain shared mutable
+state.
+
+CP287 has no synchronization. Concurrent calls for the same unit can race
+across repeated load reads, intermediate rate writes and reads, separated
+schedule samples, and all 56 destinations. A reader or writer can observe a
+torn record whose totals or energies were derived from different generations;
+the native C++ data race itself has no defined postcondition. Different units
+have disjoint report fields only while the shared arena, timestep, and schedule
+lifecycle remain stable. Separate complete EnergyPlus states are the evident
+isolation boundary, subject to deeper shared services.
+
+The bounded PurchasedAir unit corpus executes CP287 five times: four times
+through `ManageZoneEquipment` wrappers at unit-test lines 413, 540, 671, and
+949, plus the direct call at line 1543. The four wrapper tests have 20 immediate
+post-wrapper assertions covering topology, nodes, flow, schedules, and supply
+state, but zero assertion on a CP287-written field.
+
+The direct `IdealLoads_Fix_SA_HumRat_Test` makes 12 post-call assertions. Four
+inspect configuration, including a duplicated `heatingFuelType` check that
+leaves `coolingFuelType` unasserted. Exactly eight assert CP287 destinations:
+supply and Zone total heating and cooling rates plus their four fuel rates. The
+fixture combines sensible cooling with latent heating and uses heating and
+cooling efficiencies of two and three. Direct coverage is therefore 8 of 56
+unique fields. No component, outdoor-air, heat-recovery, or energy field is
+directly asserted, and there is no fallback-efficiency, malformed-state,
+timestep, UnitOff-stale-state, failure, replay, alias, or concurrency oracle.
+
+Five full-simulation static sites have 171 downstream sizing assertions and no
+CP287 field or entry instrumentation. One BaseClass sizing fixture supplies a
+conservative lower bound of 336 normally reached wrapper and Report entries
+across two design days and minimum warmup, but HVAC convergence prevents an
+exact dynamic total; the other four sizing fixtures disable simulation periods.
+Neither five source sites nor 171 downstream assertions is an exact CP287 call
+or field-coverage count.
+
+The current corpus contains 120 models, split 108 IDF and 12 epJSON. Thirty IDFs
+contain one IdealLoads system each. Across the exact 56 CP287 output names, the
+models cover 36 names in 454 file-variable pairs, 142 manifests cover 36 names
+in 646 pairs, and 47 IdealLoads comparison scripts cover 30 names in 356 pairs.
+Models and manifests include every rate but only eight energies. They omit 20
+energies: eight supply or Zone sensible-or-latent component energies and 12
+outdoor-air or heat-recovery sensible, latent, or total energies. Scripts omit
+those same 20 plus six fuel energy or fuel-rate variables. These are
+request and comparison surfaces, not proof that one Rust path computes the
+complete CP287 record.
+
+Rust's `ep_runtime::ideal_loads::report::IdealLoadsReportSnapshot` has 16
+fields: an operating mode, 12 already calculated supply and Zone rates, and
+three CP283-adjacent supply state values. Its `From<IdealLoadsSensibleResult>`
+implementation is a pure copy. It does not perform source sign splitting,
+outdoor-air or heat-recovery reporting, schedule sampling, fuel division,
+timestep multiplication, or mutable 56-field lifecycle. The direct report test
+uses one whole-structure equality to cover all 16 copied values, only 12 of
+which are CP287 rate fields. A dispatch wrapper test isolates four CP287 copy
+relationships; its other report comparisons are CP283 supply-state or node
+relationships.
+
+The separate private outdoor-air diagnostic helper has six direct test calls.
+Four tests make 15 assertions over all six outdoor-air rates and five of six
+heat-recovery rates, while two economizer tests call it without asserting a
+report rate. It hard-codes both outdoor-air latent component rates to zero and
+gates outdoor-air sensible fields with an inferred mode rather than the source
+actual sensible and latent coil-load signs. Heat-recovery sign splitting lives
+in another immutable mixed-air helper. This mutually separate subset is useful
+bounded evidence but not the CP287 record or source lifecycle.
+
+The generic non-outdoor-air runtime writer emits 12 supply and Zone rates plus
+only four total energies. It multiplies by a fixed 3,600 seconds and replicates
+a constant series, rather than using the current adaptive `TimeStepSysSec` on
+each Report entry. The mutually exclusive outdoor-air path emits six
+outdoor-air and six heat-recovery rates plus separate state and active-time
+values, but no base rates, fuel fields, or energy fields. No generic runtime
+path emits all 56 CP287 destinations.
+
+The CLI trace-comparison helper is broader but consumes oracle trace values. It
+writes 12 base rates, four nonfuel total energies, four fuel rates, and four
+fuel energies using timestamp-derived per-sample intervals. Its blank and
+bounded Constant or hour-only Compact schedule handling supplies meaningful
+case evidence, but it rejects nonfinite or nonpositive efficiency values where
+C++ silently substitutes 1.0 for values at or below zero and propagates NaN.
+It also rejects calendar-varying Compact fuel schedules. There is no direct
+positive fuel-formula, fallback-boundary, malformed numeric, failure, replay,
+or concurrency test. The generic rate-to-energy helper has one arithmetic
+assertion.
+
+Rust report semantics metadata accurately describes Report-after-Update and
+rate-times-timestep order, but metadata is not execution. Node-module metadata
+attributes supply-node finalization to UpdatePurchasedAir and purchased-air
+plus node-output reporting to ReportPurchasedAir. Both node attributions are
+source-misaligned: CP283 writes node state, CP286 only coordinates the return
+plenum, and global OutputProcessor later samples registered node variables.
+Existing output-name bindings and diagnostic or candidate policies do not fill
+the missing numerical and lifecycle behavior.
+
+CP287 refreshes existing required `source_mapped`
+`routine.report_purchased_air` in place after
+`routine.update_purchased_air`. It adds no routine or project-contract row,
+algorithm-level source, Rust target or state, support declaration, test,
+capability, output, comparator, case, manifest, numerical claim, performance
+claim, readiness change, or conformance promotion.
+
+The inventory remains 32 algorithms and 285 routines, split 58 `state_mapped`
+plus 227 `source_mapped`, with 162 required. Domain-required counts remain
+heat-balance 88, HVAC 51, plant 1, and time/schedule 22. Readiness remains
+`0/88`, `0/51`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
+claim level `none`.
+
+CP288 next adds canonical required source-mapped
+`routine.get_purchased_air_out_air_mass_flow` and the matching HVAC
+project-contract item. `GetPurchasedAirOutAirMassFlow` is declared at
+`PurchasedAirManager.hh` line 371 and implemented at
+`PurchasedAirManager.cc` lines 3099-3120; the following definition,
+`GetPurchasedAirZoneInletAirNode`, begins at source line 3122. Its exact
+source-plus-test symbol census is three: declaration, definition, and the sole
+qualified production call from `SystemReports.cc` line 4065.
 
 
 
