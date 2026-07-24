@@ -55,7 +55,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | thermostat-setpoint predefined LEED table | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::FillPredefinedTableOnThermostatSetpoints` | normalized DualSetpoint graph, calendar-aware schedule series, and separate constant-schedule IdealLoads diagnostics only | CP233 required source-mapped four-family first-schedule-ID-wins traversal, winter/summer Wednesday samples and counts, base/synthetic row keys, append-only predefined cells, final-report cadence, and failure/retry lifecycle; reporting input stays ignored and no exact Rust arena, seasonal query, table store, helper, caller, or test exists |
 | thermostat-schedule predefined System Summary table | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::FillPredefinedTableOnThermostatSchedules` | direct-Zone DualSetpoint graph and IdealLoads schedule resolution only | CP234 required source-mapped stored ordinary-Zone traversal, nonempty-name slot selection, tuple sort, independently filtered string joins, four-to-six append-only cells, final-report cadence, and failure/retry/reset lifecycle; reporting input stays ignored and no complete Rust arena, predefined table store, helper, caller, serializer, or comparator exists |
 | Zone/Space predictor temperature-history preparation | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::updateTemperatures` | Zone-only three-slot adaptive temperature/humidity histories and helper | CP235 required source-mapped unconditional four-slot working-history selection plus shortened Zone/Space node rollback and count-change RoomAir interpolation orchestration; no exact Rust Space/node/thermostat/enthalpy/RoomAir topology, source cadence, wrapper, or test exists |
-| Zone/Space predicted sensible system load | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::calcPredictedSystemLoad` | adjacent guarded Zone-only coefficient helpers, bounded DualSetpoint graph, node setpoint storage, oracle-fed IdealLoads demand, and Zone multipliers only | CP236 required source-mapped five-way/three-algorithm load selection plus RAFN/ITE asymmetries, staged override, shared Zone writes, and selected Zone/Space reporting; no exact Rust dispatcher, Space binding, live demand synthesis, or composed test exists |
+| Zone/Space predicted sensible system load | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::calcPredictedSystemLoad` | CP296 `calc_predicted_system_load_dual_setpoint_third_order` pure snapshot plus adjacent coefficient, node, oracle-demand, and multiplier scaffolds | CP236 remains required/source-mapped. CP296 implements only finite direct-Zone DualSetpoint/ThirdOrder raw-load selection and correction/Zone/List scaling; no full dispatcher, Space/RAFN/ITE/staged branch, state mutation, live demand synthesis, or runtime caller exists |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -20421,6 +20421,89 @@ CP295 exhausts `PurchasedAirManager.cc`, the second and final source listed by
 CP296 routine to infer. A later checkpoint must explicitly declare and audit
 its next EnergyPlus source family rather than silently extending this
 IdealLoads family across a translation-unit boundary.
+## CP296 Bounded Dual-Setpoint Third-Order Predicted-Load Kernel
+
+CP296 returns to Roadmap Section 12's first implementation item after the
+CP195-CP236 predictor/corrector source audit and the completed CP237-CP295
+PurchasedAir source audit. It adds one pure Rust prerequisite for replacing
+oracle-fed Zone sensible demand; it does not close that roadmap item.
+
+The bounded source slice is direct-Zone
+`ZoneSpaceHeatBalanceData::calcPredictedSystemLoad` at
+`ZoneTempPredictorCorrector.cc` lines 6835-7243, restricted to the
+`DualHeatCool`/`ThirdOrder` branch at lines 7034-7126, with RAFN fraction fixed
+to one, no adjusted ITE return temperature, no staged control, and a present
+system-node temperature when deadband is selected. The called
+`ZoneSystemSensibleDemand::reportSensibleLoadsZoneMultiplier` arithmetic at
+`DataZoneEnergyDemands.cc` lines 330-351 is retained only as an immutable
+three-value scaling snapshot; controlled-equipment sequenced arrays and all
+report/state mutation remain deferred.
+
+`calc_predicted_system_load_dual_setpoint_third_order` receives predictor-time
+raw `tempDepLoad = D` and `tempIndLoad = I`; it intentionally does not consume
+the current Rust correction coefficient snapshot. The source equations and
+strict branches are:
+
+```text
+Qh = D * heating_setpoint - I
+Qc = D * cooling_setpoint - I
+Qh > Qc                  -> fail closed
+Qh > 0 and Qc > 0        -> total = Qh, Heating
+Qh < 0 and Qc < 0        -> total = Qc, Cooling
+Qh <= 0 and Qc >= 0      -> total = 0, Deadband
+```
+
+Deadband reads the current Zone node temperature only in that branch and
+applies source order `max(node, heating_setpoint)` then
+`min(result, cooling_setpoint)`. The result retains `ZoneId`, mode, selected
+setpoint, deadband flag, and raw total/heating/cooling loads. It then computes
+`predicted* = raw* * LoadCorrectionFactor`, followed by
+`ZoneMultFac = ZoneMultiplier * ZoneListMultiplier` and
+`output_required* = predicted* * ZoneMultFac`, preserving the source
+multiplication order. The typed boundary imposes no positive-`D` precondition:
+finite `D`, `I`, and setpoints reach the source ordering/sign logic, including
+`D = 0`; it requires an inclusive finite
+`LoadCorrectionFactor` in the source-produced `[-3,3]` range; and takes the
+Rust model's positive integer Zone and ZoneList multipliers, revalidates each
+against EnergyPlus's signed-int range, and checks their signed-int product before
+conversion to `f64`, and every computed load remains
+finite. The node temperature is conditionally validated only when the deadband
+branch reads it. Raw-load calculation and the `Qh > Qc` trap occur before
+correction/multiplier validation, matching source failure order. Inverted
+effective setpoints, invalid typed multipliers, or arithmetic overflow fail
+closed without partial output.
+
+Ten focused Rust tests lock the two EnergyPlus fixture vectors
+`(D=125,I=0,20/24) -> (2500,3000,total=2500)` and
+`(D=40,I=3500,20/25) -> (-2700,-2500,total=-2500)`; deadband
+`(-200,+200,0)`; node clamps `18->20`, `22->22`, and `26->24`; both separate
+zero boundaries plus simultaneous `Qh = Qc = 0`; `D = 0` heating/cooling/
+deadband behavior; inclusive negative/zero/positive correction factors and
+out-of-range rejection; bit-exact non-associative correction-then-integer-
+multiplier grouping; `ZoneId` retention; inverted-setpoint error precedence;
+conditionally used nonfinite inputs; zero/overflowing multipliers; and
+raw/intermediate overflow rejection.
+
+The new snapshot is deliberately not `ZoneSysEnergyDemand`: CP236 owns raw
+`TotalOutputRequired`/heating-SP/cooling-SP values, while later Zone equipment
+initialization owns Remaining-demand state. There is no CP296 adapter, runtime
+caller, thermostat/node/history mutation, `ep_run` or `ep_cli` change, and no
+oracle/default-demand removal. In particular,
+`ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE` remains
+`source-order-oracle-demand-input`. A future coupling checkpoint must construct
+`D/I` at predictor timing and preserve the raw dual thresholds; feeding a
+positive raw cooling-setpoint load through the current no-OA `abs()` consumer
+would incorrectly select cooling during heating or deadband.
+
+The parent `zone_temp_predictor_corrector_source_order` remains `scaffold` at
+claim level `none`, and
+`routine.zone_space_heat_balance_calc_predicted_system_load` remains
+`source_mapped`: Uncontrolled, SingleHeat, SingleCool, SingleHeatCool,
+Analytical, Euler, RAFN, Space, ITE, staged, selected-state writes, sequenced
+demand, failure/replay, and live PurchasedAir coupling are still unsupported.
+CP296 adds a bounded Rust target and port-ticket mapping only. Algorithm/routine
+counts, required counts, readiness `0/88`, `0/59`, `0/1`, `0/22`, capabilities,
+outputs, manifests, comparators, performance, and conformance do not change.
 
 
 

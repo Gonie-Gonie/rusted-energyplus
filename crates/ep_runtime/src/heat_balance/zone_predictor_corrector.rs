@@ -3,6 +3,11 @@
 use super::state::ZoneAirTemperatureCoefficients;
 use crate::execution_plan::{EnergyPlusCompatibilityStage, ExecutionStageKind};
 
+// Crate-private, intentionally dormant until the later live-demand coupling checkpoint.
+#[allow(dead_code)]
+#[path = "predicted_system_load.rs"]
+pub(crate) mod predicted_system_load;
+
 /// EnergyPlus `ZoneTempPredictorCorrector` update dispatch selector.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum PredictorCorrectorCtrl {
