@@ -12689,11 +12689,317 @@ counts remain heat-balance 88, plant 1, and time/schedule 22, while HVAC becomes
 50. Readiness remains `0/88`, `0/50`, `0/1`, and `0/22`. The IdealLoads parent
 remains `scaffold` at claim level `none`.
 
-CP285 next adds canonical required `routine.calc_purch_air_mixed_air` after
-CP284 and before `routine.update_purchased_air`. `CalcPurchAirMixedAir` is
-declared at `PurchasedAirManager.hh` lines 357-365 and implemented at
-`PurchasedAirManager.cc` lines 2812-2939. The following physical definition,
+## CP285 `CalcPurchAirMixedAir` Mixed-Air and Heat-Recovery Boundary
+
+`PurchasedAirManager::CalcPurchAirMixedAir(EnergyPlusData &state,
+int const PurchAirNum, Real64 const OAMassFlowRate,
+Real64 const SupplyMassFlowRate, Real64 &MixedAirTemp,
+Real64 &MixedAirHumRat, Real64 &MixedAirEnthalpy,
+OpMode const OperatingMode)` is declared at `PurchasedAirManager.hh` lines
+357-365 and implemented at `PurchasedAirManager.cc` lines 2812-2939
+inclusive. The body is 128 physical lines, 117 nonblank lines, and 102
+nonblank, non-comment lines. The next physical definition,
 `UpdatePurchasedAir`, begins at source line 2941.
+
+The exact source-plus-test `CalcPurchAirMixedAir(` census is five: the header
+declaration, mutually exclusive production sites in the cooling branch at
+source line 2171 and the heating/deadband branch at line 2454, the definition,
+and one direct unit call at `PurchasedAirManager.unit.cc` line 695. A bare-name
+census is six because the body also defines its `RoutineName` string. Both
+production sites are inside CP283 UnitOn and precede that branch's positive-
+versus-zero-supply handling, so every normally reached UnitOn calls CP285 once,
+even when its selected supply flow is zero. UnitOff calls neither site.
+Production passes distinct persistent `PurchAir.MixedAirTemp` and
+`MixedAirHumRat` references, a distinct stack-local enthalpy reference, and
+Cool or Heat/DeadBand mode; it never passes Off.
+
+CP285 first aliases `PurchAir`, copies the outdoor-air and recirculation node
+numbers, initializes its local recirculation mass to zero, and snapshots the
+recirculation node's temperature, humidity ratio, and enthalpy in that order.
+When `PurchAir.OutdoorAir` is true it next snapshots the outdoor-air node's
+same three fields and initializes the after-recovery locals from them. This OA
+node access occurs before testing mass flow, so a true flag with zero,
+negative, or NaN OA flow still dereferences that node. A false flag instead
+zero-fills all six OA inlet and after-recovery locals, although the later
+fallback ignores them. `HeatRecOn` then starts false.
+
+The main active condition is exact `PurchAir.OutdoorAir &&
+OAMassFlowRate > 0.0`. Sensible recovery becomes beneficial only for Heat with
+recirculation temperature strictly above OA temperature or Cool with
+recirculation temperature strictly below it. Enthalpy recovery instead uses
+the corresponding strict stored-node enthalpy comparisons. Equality, None,
+DeadBand, Off, and unmatched heat-recovery or operating-mode enums leave
+recovery inactive. These tests use the entry snapshots; there is no schedule,
+minimum-flow, or effectiveness test in the benefit decision.
+
+When recovery is beneficial CP285 first persists
+`PurchAir.TimeHtRecActive = TimeStepSys`, even when the configured effectiveness
+is zero or otherwise malformed. Both recovery types calculate
+`T2 = Toa + HtRecSenEff * (Trec - Toa)`. Enthalpy recovery alone also
+calculates `W2 = Woa + HtRecLatEff * (Wrec - Woa)`; Sensible recovery retains
+inlet OA humidity ratio. It then computes `H2 = PsyHFnTdbW(T2, W2)`.
+
+The supersaturation correction evaluates
+`PsyTsatFnHPb(state, H2, OutBaroPress, RoutineName)` in a strict
+`Tsat > T2` guard. A true guard deliberately calls that same routine a second
+time with the same inputs to assign `T2`, then calls
+`PsyWFnTdbH(state, T2, H2, RoutineName)` to replace `W2` at constant enthalpy.
+The source does not recompute `H2` afterward. The humidity child itself can
+floor a negative result to `1.0e-5`; CP285 does not reconcile that clamp with
+the retained enthalpy.
+
+Active OA then tests strict `SupplyMassFlowRate > OAMassFlowRate`. On the true
+path it sets `Mrec = Msup - Moa`, calculates
+`Hmix = (Mrec * Hrec + Moa * H2) / Msup` and
+`Wmix = (Mrec * Wrec + Moa * W2) / Msup`, and derives
+`Tmix = PsyTdbFnHW(Hmix, Wmix)`. The formulas deliberately re-read the
+recirculation node's enthalpy and humidity ratio instead of using both entry
+snapshots. For finite ordered inputs the enclosing guards imply
+`Msup > Moa > 0`, so this local division cannot have a zero denominator.
+
+When supply is equal to or below positive OA, or when supply is NaN and the
+strict comparison is false, CP285 sets the unused local recirculation mass to
+zero and copies after-recovery OA enthalpy, humidity ratio, and temperature as
+100% mixed air. It does so regardless of an inconsistent zero or negative
+supply magnitude. Active OA finally evaluates specific heat at inlet OA
+humidity and writes
+`HtRecSenOutput = Moa * Cp(Woa) * (T2 - Toa)` followed by
+`HtRecLatOutput = Moa * (H2 - Hoa) - HtRecSenOutput`. These formulas run even
+when recovery remained inactive; ordinary unchanged finite OA makes both zero,
+while malformed `infinity * 0` shapes can yield NaN.
+
+If OutdoorAir is false or OA does not compare greater than zero, CP285 assigns
+the recirculation temperature, humidity ratio, and enthalpy snapshots to the
+three output references and explicitly zeros both heat-recovery outputs. It
+does not clear `TimeHtRecActive`. CP283 pre-clears that field before either
+production site, but a public direct call can retain an active time from an
+earlier invocation.
+
+With comments stripped, CP285 has 12 `if` heads, three bare `else` blocks, and
+five logical ANDs. It has no else-if, logical OR, loop, switch, case, default,
+return, break, continue, ternary, assertion, try, catch, or direct diagnostic
+call. Its structural McCabe count is 13, or 18 when short-circuit atoms are
+also counted. Fifteen operational call/accessor expressions comprise eight
+`Node(...)` accesses, one `PurchAir(...)` access, two saturation-temperature
+calls, and one each of the four other psychrometric calls.
+
+The three output references each have three static assignment sites.
+`TimeHtRecActive` has one conditional assignment, while
+`HtRecSenOutput` and `HtRecLatOutput` each have an active formula and a fallback
+zero site, for 14 direct persistent/reference assignment sites in all. CP285
+directly writes no node. Active mixed-output order is enthalpy, humidity ratio,
+temperature, sensible recovery, then latent recovery; fallback order is
+temperature, humidity ratio, enthalpy, sensible zero, then latent zero. Active
+time, when selected, is earlier than every psychrometric and output write.
+
+The entry `RecircMassFlowRate = 0`, the pure-OA zero, and the fallback supply-
+mass assignment are dead before any read. No-OutdoorAir OA zero fills are also
+not consumed. CP285 performs no lifecycle, arena, unit identity, node extent,
+node-role agreement, OutdoorAir/node consistency, heat-recovery enum,
+operating-mode enum, mass-flow order, sign, finiteness, effectiveness,
+barometric-pressure, node thermodynamic consistency, or output-alias
+validation. It has no `[0,1]` effectiveness clamp, final mixed-air saturation
+check, nonnegative-humidity check, transaction, rollback, status, or recovery.
+
+OA NaN fails the active comparison and falls back to recirculation. With active
+finite positive OA, supply NaN selects 100% OA. Positive infinities can reach
+`infinity / infinity` or `infinity * 0`; negative or above-one effectiveness
+can reverse or overshoot the intended recovery state. NaN benefit and
+saturation comparisons are false. Enthalpy-mode decisions use stored node
+enthalpies, active mixing uses stored and late-re-read enthalpy/humidity, and
+mixed temperature is derived rather than directly averaged, so inconsistent
+node T/W/H remains observable. Latent recovery also uses stored inlet OA
+enthalpy while sensible recovery uses specific heat at inlet OA humidity.
+
+CP285 owns no direct diagnostic or counter, but supplies `RoutineName` to its
+stateful psychrometric children. Default configurations can mutate the
+per-state saturation cache; malformed/extreme inputs can produce warning,
+recurring-warning, or severe diagnostic prefixes, and the humidity child can
+clamp and conditionally warn. The duplicate saturation call is source
+significant. CP285 neither consumes a child status nor catches or cleans up a
+child failure.
+
+The PurchAir lookup and recirculation snapshots precede every persistent write;
+when OutdoorAir is true, all three OA snapshots also precede writes. Once
+recovery activates, however, the new active time is committed before recovery
+arithmetic, cache access, or other psychrometric work. With production's
+distinct output references, or direct output storage that does not alias the
+active-time or recovery destinations, an abnormal child exit can therefore
+expose new time beside old mixed references and old heat-recovery fields, plus
+the child cache or diagnostic prefix. CP283 resets time
+but not the adjacent mixed or heat-recovery fields before production entry, so
+those older values can remain visible on such a failure.
+
+On the weighted path CP285 writes mixed enthalpy, then evaluates and writes
+mixed humidity, then derives and writes mixed temperature from those output
+references. With production's three distinct output references, a later
+accessor or psychrometric failure can therefore expose an enthalpy-only or
+enthalpy-plus-humidity prefix. All mixed references precede
+the report formulas, and sensible recovery precedes latent recovery. The
+fallback has the different temperature, humidity, enthalpy, sensible-zero,
+latent-zero order. No completion count or status describes any prefix, and
+there is no exception boundary, rollback, cleanup, or whole-record commit.
+Unchecked native invalid access has no defined postcondition.
+
+Production supplies distinct output storage, but the public references permit
+a direct caller to alias them to each other or to reachable Real64 state. If
+mixed enthalpy and humidity alias on the weighted path, the humidity assignment
+overwrites enthalpy and `PsyTdbFnHW` receives that aliased humidity value for
+both arguments. When all three alias one otherwise independent scalar, the
+active branch ends with temperature, whereas fallback ends with enthalpy
+because their assignment orders differ. An additional alias to a destination
+written later in that branch lets that later persistent write determine the
+final value instead. Inputs are const-by-value snapshots, so aliasing an input
+argument to an output
+does not alter the local mass values after entry.
+
+State aliases remain more dangerous. An enthalpy output aliased to the
+recirculation node humidity can replace the late-re-read humidity before the
+following weighted calculation. Aliases to active time or either recovery
+field can be overwritten by later persistent writes. The early recirculation
+T/W/H snapshots, later H/W re-reads, and optional OA snapshots also make
+concurrent node mutation observable as a torn benefit/mixing state. CP285 has
+no alias agreement or synchronization check.
+
+For fixed finite inputs, distinct non-state output storage, stable nodes, and
+deterministic psychrometric children, CP285 overwrites mixed and recovery
+outputs deterministically. An inactive direct replay still preserves whatever
+active time existed, while production relies on CP283's preceding reset.
+General replay is not pure or observationally idempotent because saturation
+cache/statistics and diagnostic indices can mutate, recurring diagnostics
+change, stale inactive time is history-dependent, and output aliases can feed
+later reads. Same-unit calls race on active/recovery fields and output refs;
+different units can still share nodes and the state-wide psychrometric cache
+and diagnostics. Separate complete EnergyPlus states are the evident isolation
+boundary, subject to deeper services.
+
+The bounded PurchasedAir C++ corpus enters CP285 ten times across eight
+scenarios: the one direct helper call plus nine CP283 parent calls, split five
+direct `CalcPurchAirLoads` and four indirect `ManageZoneEquipment` executions.
+All nine parent entries take fallback: eight have `OutdoorAir=false`, while the
+one configured-OA fixture resolves design flow to zero and has
+`OutdoorAir=true` with zero OA mass. The direct helper call alone enters active
+OA with `Moa=10`, `Msup=11`, and weighted mixing. Although its object is
+configured for Sensible recovery, Cool mode with recirculation 24 C and OA 3 C
+fails the strict cooling-benefit test, so recovery remains inactive.
+
+That direct oracle asserts only mixed temperature and humidity ratio at unit
+lines 715-716. `IdealLoads_Fix_SA_HumRat_Test` adds two indirect no-OA
+`MixedAirTemp` and `MixedAirHumRat` field assertions at lines 1530-1531. Mixed
+enthalpy, active time, both signed recovery outputs, active Sensible or
+Enthalpy recovery, saturation repair, the active `Msup <= Moa` copy, strict
+benefit equality, malformed inputs, alias, partial failure, retry, and
+concurrency have zero C++ assertions. Parent supply or report assertions are
+composite downstream evidence rather than an isolated CP285 oracle.
+
+Five separate IdealLoads `ManageSimulation` fixtures contain 171 post-simulation
+assertions. Their DSOA, OA-node, economizer, and heat-recovery fields are all
+blank, so an available unit provides only static no-OA fallback potential.
+None asserts mixed-air, recovery, or active-time state, and no instrumentation
+counts CP285's actual system-timestep and HVAC-iteration entries. Static fixture
+presence therefore does not establish a dynamic execution total.
+
+The current model corpus has 120 files, split 108 IDF and 12 epJSON. Thirty
+unique IdealLoads IDFs contain one unit each; 12 configure active OA and 18 do
+not. Their effective economizer split is 28 NoEconomizer, one
+DifferentialDryBulb, and one DifferentialEnthalpy. Their heat-recovery split is
+28 None, one Sensible, and one Enthalpy. All four nondefault economizer or
+recovery models use OA and carry 0.7 sensible plus 0.65 latent effectiveness,
+although only the two recovery models activate those fields.
+
+The 142 manifests contain 52 IdealLoads routes, split 22 active-OA and 30 no-OA.
+Economizer routing is 48 NoEconomizer plus two DifferentialDryBulb and two
+DifferentialEnthalpy; heat-recovery routing is 48 None plus two Sensible and two
+Enthalpy. Each nondefault source model has a diagnostic and a conformance route.
+The 47 IdealLoads comparison processes accordingly include eight nondefault
+scripts: four economizer and four heat-recovery scripts, each again split
+diagnostic/conformance.
+
+Those eight paths compare 22 declared series, including mixed temperature and
+humidity, recovery active time, and the six split recovery rate rows. The
+economizer pairs establish their active timestep and raised OA flow while
+exercising CP285 with recovery inactive. The Sensible pair requires active
+recovery and nonzero sensible heating; the Enthalpy pair requires active
+recovery plus nonzero sensible and latent heating. These are end-to-end
+composite results after CP283 and Report rather than direct signed-field or
+mixed-enthalpy observations. The claims are explicitly fixture- and variable-
+bounded, and the Enthalpy manifests exclude general saturation-limit parity.
+No case instruments CP285 call count, failure prefixes, stale time, or alias.
+
+Rust implements private value-returning
+`ep_runtime::ideal_loads::outdoor_air::mixed_air::mixed_air_state` behind the
+composite outdoor-air calculation. For ordinary consistent finite inputs it
+uses the same strict Sensible/Enthalpy benefit predicates, effectiveness
+interpolation, `Msup <= Moa` all-OA selection, mass-weighted enthalpy and
+humidity mixing, dry-bulb recovery, inlet-humidity specific heat, and signed
+sensible/latent residual formulas. It also derives heating/cooling/total
+recovery rates that source Report owns later and returns active time as a
+value.
+
+The Rust boundary is intentionally narrower and not source-state equivalent.
+It returns recirculation and zero recovery whenever either OA or supply flow is
+nonpositive, whereas direct source CP285 with positive OA and nonpositive
+supply still calculates recovery and copies 100% after-recovery OA. Rust has no
+separate `OutdoorAir` flag gate. It reconstructs both node enthalpies from T/W
+rather than consuming stored enthalpy, and has no source late node re-read, so
+inconsistent node thermodynamics and torn reads cannot match. Active time is
+`system_timestep_hours.max(0.0)` rather than a conditional persistent write.
+
+Rust's saturation helper uses a bounded `[-100, 200]` bisection, fails soft on
+nonfinite enthalpy or invalid pressure, floors repaired humidity, and
+recomputes enthalpy after adjustment. It is not the source psychrometric cache,
+approximation, duplicate-call, diagnostic, or failure contract. The immutable
+result exposes mixed temperature and humidity but not the mutable mixed-
+enthalpy output. It owns no `TimeHtRecActive`, signed PurchAir recovery fields,
+caller-reset lifecycle, output aliases, node arena/identity validation,
+transaction, diagnostic prefix, rollback, retry state, or synchronization.
+Compiler range validation and case routing further narrow malformed direct-call
+behavior without completing CP285.
+
+No Rust test calls the private helper directly. Six outdoor-air calculation
+tests and one zero-OA DCV test exercise it, while six of seven wrapper-test
+functions supply 16 additional source-inferred successful helper entries; the
+first wrapper test includes its separate expected-calculation call, and the
+error-only function returns before calculation. The bounded total is therefore
+23 inferred helper entries, not an instrumented runtime counter. Evidence
+covers positive weighted heating/cooling mixtures, all-OA mixtures, zero-OA
+fallback, both economizers, and active Sensible and Enthalpy heating.
+It lacks direct recovery-cooling, inactive/equality predicate matrices,
+saturation-adjust execution, malformed or nonfinite state, stored-enthalpy
+inconsistency, output alias, persistent failure prefix, replay, and concurrency
+tests.
+
+The arbitrary runtime calculates once from default state, supplies no OA
+schedule, current-occupancy, or CO2 evaluator, uses a one-hour timestep, and
+replicates the resulting samples. The conformance CLI instead recalculates from
+each EnergyPlus proof row using baseline Zone, recirculation, and OA T/W,
+thermal demands, pressure, and any declared DCV inputs. Existing branch
+agreement is therefore trace-driven and declared-variable/fixture bounded; it
+is not standalone adaptive runtime or complete mutable CP285 state parity.
+
+CP285 adds canonical required `source_mapped`
+`routine.calc_purch_air_mixed_air` immediately after
+`routine.calc_purch_air_min_oa_mass_flow` and before
+`routine.update_purchased_air`, plus the matching HVAC project-contract item.
+It adds no algorithm-level source, Rust target or state, support declaration,
+test, capability, output, comparator, case, manifest, numerical claim,
+performance claim, or conformance promotion. Existing mixed-air and heat-
+recovery claims remain limited to their already declared cases and do not make
+the complete mutable source routine family-gated or complete.
+
+The inventory becomes 32 algorithms and 285 routines, split 58
+`state_mapped` plus 227 `source_mapped`, with 162 required. Domain-required
+counts remain heat-balance 88, plant 1, and time/schedule 22, while HVAC becomes
+51. Readiness remains `0/88`, `0/51`, `0/1`, and `0/22`. The IdealLoads parent
+remains `scaffold` at claim level `none`.
+
+CP286 next refreshes existing required `routine.update_purchased_air` in place.
+`UpdatePurchasedAir` is declared at `PurchasedAirManager.hh` line 367 and
+implemented at `PurchasedAirManager.cc` lines 2941-2984. The following physical
+definition, `ReportPurchasedAir`, begins at source line 2986 and is declared at
+header line 369. CP286 therefore adds no routine row, project-contract item, or
+inventory count.
+
 
 
 

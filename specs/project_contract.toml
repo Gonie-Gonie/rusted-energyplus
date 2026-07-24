@@ -175,6 +175,7 @@ required_routines = [
   "size_purchased_air",
   "calc_purch_air_loads",
   "calc_purch_air_min_oa_mass_flow",
+  "calc_purch_air_mixed_air",
   "update_purchased_air",
   "report_purchased_air",
 ]
