@@ -12379,7 +12379,7 @@ dynamic execution counts cannot be inferred from static call sites because
 warmup, timesteps, and HVAC resimulation are variable.
 
 The checked data corpus has 120 models, of which exactly 30 IDFs and no epJSON
-model contain one IdealLoads unit. The 140 manifests contain 52 routes to
+model contain one IdealLoads unit. The 142 manifests contain 52 routes to
 those 30 unique sources: 22 outdoor-air, 12 humidity-selected, two constant
 SHR, six finite-limit, and ten other no-OA routes. The 47
 `compare-ideal-loads*.ps1` scripts split 22 outdoor-air, nine humidity, two
@@ -12464,12 +12464,236 @@ counts remain heat-balance 88, HVAC 49, plant 1, and time/schedule 22.
 Readiness remains `0/88`, `0/49`, `0/1`, and `0/22`. The IdealLoads parent
 remains `scaffold` at claim level `none`.
 
-CP284 next adds canonical required
-`routine.calc_purch_air_min_oa_mass_flow` after CP283 and before
-`routine.update_purchased_air`. `CalcPurchAirMinOAMassFlow` is declared at
-`PurchasedAirManager.hh` lines 351-355 and implemented at
-`PurchasedAirManager.cc` lines 2762-2810. The following physical definition,
-`CalcPurchAirMixedAir`, begins at source line 2812.
+## CP284 `CalcPurchAirMinOAMassFlow` Minimum Outdoor-Air State Boundary
+
+`PurchasedAirManager::CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
+int const PurchAirNum, int const ZoneNum, Real64 &OAMassFlowRate)` is declared
+at `PurchasedAirManager.hh` lines 351-355 and implemented at
+`PurchasedAirManager.cc` lines 2762-2810 inclusive. The body is 49 physical
+lines, 39 nonblank lines, and 29 nonblank, non-comment lines. The next physical
+definition, `CalcPurchAirMixedAir`, begins at source line 2812.
+
+The exact source-plus-test symbol census is three: one header declaration, the
+sole production call in CP283 `CalcPurchAirLoads` line 2025, and the definition.
+There is no direct C++ test call or function reference. Production reaches
+CP284 only inside CP283's UnitOn branch, after the parent has zeroed its local
+OA flow and retained minimum-OA field and before the parent applies an EMS OA
+mass-flow override. The value retained by CP284 is therefore the pre-EMS
+minimum, not necessarily the OA flow later consumed by Calc.
+
+CP284 first fixes `UseMinOASchFlag=true` and aliases
+`PurchAir(PurchAirNum)`. With `PurchAir.OutdoorAir=false`, it writes zero to the
+caller reference and then copies that zero to `PurchAir.MinOAMassFlowRate`.
+This path reads no Zone, OA-requirement, density, occupancy, or contaminant-
+demand state after the initial PurchasedAir access.
+
+With outdoor air enabled, only exact `DCV::OccupancySchedule` selects
+`UseOccSchFlag=true`; every other selector, including `None`, `CO2SetPoint`,
+and malformed enum values, selects design occupancy. CP284 then calls
+`DataSizing::calcDesignSpecificationOutdoorAir` exactly once with the retained
+OA-requirement pointer, caller Zone number, that occupancy flag, and
+`UseMinOASchFlag=true`.
+
+The child's omitted arguments take exact defaults
+`PerPersonNotSet=false`, `MaxOAVolFlowFlag=false`, `spaceNum=0`, and
+`calcIAQMethods=true`. Thus the request includes per-person OA, uses current
+rather than maximum occupancy where scheduled occupancy was selected,
+aggregates the whole Zone or a retained DSOA space list, applies the minimum-OA
+schedule, and leaves the child's IAQ and proportional-control methods active.
+Zone multipliers are not applied locally; CP284 trusts the child's volume-flow
+result and its deeper Zone, Space, people, schedule, and method semantics.
+
+CP284 multiplies the returned m3/s by `StdRhoAir`. Only exact
+`DCV::CO2SetPoint` then replaces that base mass flow with the ObjexxFCL maximum
+of the base and `ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP`. The CO2
+demand is already a mass flow and is not density-converted. The final
+`OAMassFlowRate <= HVAC::VerySmallMassFlow` comparison, with the threshold
+exactly `1.0E-30` kg/s, writes zero; equality is included. A finite successful
+result is consequently either exactly zero or strictly above the threshold,
+and there is no upper cap.
+
+A zero OA-requirement pointer is accepted by the child and returns zero. In a
+CO2SetPoint path the contaminant demand can still raise that zero to a positive
+minimum. Invalid positive pointers, a Zone mismatch, and missing or malformed
+arenas remain unchecked locally.
+
+The unconditional final statement copies the caller reference into
+`PurchAir.MinOAMassFlowRate`. Direct persistent destinations are exactly the
+mutable reference, with four static assignment sites, and that one retained
+tail field. CP284 directly writes no node, output registry, schedule, warning
+counter, or diagnostic. Its one algorithm child is the DSOA calculator; the
+other operational expressions are the PurchasedAir accessor, the Zone
+contaminant-demand accessor, and ObjexxFCL `max`.
+
+The routine has four `if` heads, two bare `else` blocks, and structural McCabe
+count five. It has no `else if`, logical AND or OR, loop, switch, case,
+default, return, break, continue, ternary, assertion, try, catch, or direct
+`Show*` call. It returns `void`, exposes no status or caller error flag, and has
+no early return or retry token.
+
+CP284 performs no local sign, range, positive-density, or finiteness check on
+the child volume, standard density, CO2 demand, or their product. Finite
+negative and at-or-below-threshold results become zero. Positive infinity
+survives, and NaN survives because the final `<=` comparison is false. The
+ObjexxFCL maximum is source-order `a < b ? b : a`: a NaN base mass is retained,
+whereas a finite base with a NaN CO2 demand retains the finite base. Those
+malformed-numeric outcomes differ from a defensive finite/nonnegative clamp.
+
+There is no local check that CO2 simulation is active before the CO2SetPoint
+arena access. Normal Get input repairs that selector when CO2 simulation is
+disabled, but a direct malformed state remains exposed. Invalid or sentinel
+DCV selectors silently use design occupancy and skip the CO2 maximum; there is
+no default diagnostic.
+
+The DSOA child is not necessarily pure. A simple object delegates to
+`OARequirementsData::calcOAFlowRate`, while a space list visits its stored
+children. With IAQ methods enabled, those deeper paths can update retained
+per-DSOA environment latches and diagnostic counters or indices and can emit
+Severe, Fatal, and recurring diagnostics. CP284 has no catch, transaction,
+rollback, or cleanup around that call.
+
+The PurchasedAir lookup occurs before any direct output write. With outdoor air
+enabled, the DSOA child completes before CP284 first assigns the caller
+reference. With the production or another nonaliased output reference, a child
+failure therefore retains the old reference and old retained minimum while
+preserving any child state or diagnostic prefix; in production the parent had
+already zeroed both. With that same nonaliased shape, a later invalid CO2-demand
+access occurs after the density-product assignment but before the retained tail,
+exposing a new caller value alongside the old `MinOAMassFlowRate`. A direct
+caller that instead aliases the output to `MinOAMassFlowRate` has already updated
+that retained field through the density-product assignment before this later
+failure. No status describes either partial completion.
+
+Production passes a distinct stack local, but a public direct caller can alias
+the output reference to reachable `Real64` state. Aliasing it to the CO2 demand
+makes the density-product write replace that demand before `max` reads it.
+Aliasing it to `StdRhoAir` reads the old density on the right-hand side and then
+overwrites density, so replay can compound by the DSOA volume. Aliasing it to
+the retained minimum makes the tail a self-assignment. Aliasing any deeper
+child input can likewise feed the output into a later call.
+
+With fixed valid nonaliased inputs and a non-state-changing child route, normal
+numeric replay is a deterministic overwrite and does not read the old output.
+General replay is not pure or observationally idempotent because schedules,
+occupancy, and CO2 demand are temporal, child latches and diagnostics persist,
+and aliases can feed prior output back into input state. There is no
+synchronization. Same-unit calls race on the retained minimum; different units
+can still race through shared Zone, DSOA, schedule, and child diagnostic state.
+Separate complete EnergyPlus state graphs are the only locally evident
+isolation boundary, subject to deeper services.
+
+The bounded `PurchasedAirManager.unit.cc` corpus reaches CP284 nine times
+through the eight CP283 scenarios: five direct Calc calls and four indirect
+Manage calls, with NoCapacity contributing one of each. All nine units are on.
+Only the IntermediateOutputVars Manage path has `OutdoorAir=true`; the other
+eight calls take the no-OA zero branch. No assertion reads
+`MinOAMassFlowRate`, the OA reference, or a CP284-local result. The three
+immediate assertions after that sole OA call inspect only the PurchasedAir name
+and supply temperature and humidity ratio.
+
+Separate tests exercise the shared DSOA child rather than CP284. Two
+`DataSizing.unit.cc` calls own two result assertions for a four-method space-
+list aggregation and Sum. Four `DataZoneEquipment.unit.cc` calls own four
+result assertions for proportional occupancy control, proportional design
+occupancy, and IAQ procedure cases. Those six calls use false occupancy and
+false minimum-schedule flags, so they do not establish CP284's exact
+`UseMinOASchFlag=true` call shape, its density/CO2/threshold tail, retained
+write, or failure prefix.
+
+One BaseClass sizing simulation and four earlier SizingManager simulations
+contain one IdealLoads unit apiece and can reach CP284 repeatedly during
+sizing timesteps. All five models leave the DSOA reference and OA inlet node
+blank, so they exercise only the no-OA branch. Their 171 post-simulation
+assertions inspect sizing and report structures rather than CP284. Warmup,
+timestep, and HVAC iteration counts prevent an exact dynamic entry census from
+static source. Two commented OutputReportTabular candidates provide no
+execution evidence.
+
+The checked repository has 120 models, including 30 unique one-unit IdealLoads
+IDFs. Twelve configure active outdoor air and 18 do not. The 12 OA models use
+Flow/Zone five times, Flow/Person three, and AirChanges/Hour, Flow/Area,
+Maximum, and Sum once each. Ten select no DCV, one CO2Setpoint, and one
+OccupancySchedule. All 12 have an OA inlet node, and all 12 leave the DSOA
+minimum-OA schedule blank.
+
+The 142 manifests contain 52 IdealLoads routes: 22 active-OA and 30 no-OA.
+The OA routes split Flow/Zone ten, Flow/Person four, and two each for
+AirChanges/Hour, Flow/Area, Maximum, and Sum; DCV splits 20 none, one CO2, and
+one occupancy. These route counts include reuse of the 12 unique OA sources
+and are not routine-entry counts.
+
+Of 47 `compare-ideal-loads*.ps1` scripts, 22 are OA routes and 25 are no-OA.
+The OA group contains ten diagnostic and 12 conformance scripts. All 22 handle
+the OA mass-flow and standard-density volume-flow output names; the 12
+conformance scripts also assert the exact five-stage PurchasedAir order. Each
+baseline process can enter CP284 at every relevant system timestep and HVAC
+iteration, but no script instruments those entries or the retained pre-EMS
+minimum directly.
+
+Rust owns an explicit bounded counterpart in
+`ideal_loads/outdoor_air/minimum_flow.rs`. The outdoor-air wrapper calls
+`resolve_minimum_outdoor_air_compat` only for an available unit, returns an
+immutable design/selected/DCV/final-flow snapshot, and feeds the final minimum
+to its separate OA Calc path. An unavailable unit skips resolution and carries
+no minimum result. There is no mutable output reference or persistent
+PurchasedAir field with the source write order.
+
+The resolver supports the six basic DSOA methods: Flow/Person, Flow/Area,
+Flow/Zone, AirChanges/Hour, Sum, and Maximum. It substitutes current people for
+OccupancySchedule DCV, applies a normalized OA schedule and standard density,
+takes the CO2-demand maximum, and implements a finite, strictly-greater-than-
+`1.0E-30` final cutoff. Typed errors cover unsupported methods, negative or
+nonfinite density, and missing schedule, occupancy, or CO2 runtime signals.
+
+This is intentionally safer and narrower than the C++ source. Rust clamps
+nonfinite or negative design inputs to zero and its schedule multiplier to
+`[0,1]`; CP284 itself performs no such local normalization. Rust rejects the
+three IAQ/proportional methods that the source child can execute, has no DSOA
+SpaceList or complete Zone/Space multiplier and child-latch graph, and converts
+source NaN or positive-infinity propagation into an error or zero. Its typed
+`Result` is transactional relative to the immutable result and does not model
+the source child's diagnostic prefix, the caller-reference/retained-tail split,
+or alias feedback.
+
+A conservative CP284-focused Rust census contains 16 tests: five basic design
+or minimum-flow tests in `outdoor_air_tests.rs`, four DCV helper tests, and
+seven source-order outdoor-air wrapper tests. They directly select four of the
+six supported methods—Flow/Person, Flow/Zone, Sum, and Maximum—while the Sum
+oracle exercises area and ACH contributions; direct Flow/Area and
+AirChanges/Hour selector tests are absent. They also cover occupancy
+substitution, schedule-to-density conversion, CO2 maximum, threshold
+normalization, typed missing-input and density errors, and the unavailable-unit
+distinction. They do not cover the advanced methods,
+space lists, source child mutation, direct alias, partial failure, retry,
+concurrency, or source malformed-numeric behavior.
+
+The arbitrary runtime supplies `None` for OA schedule, current people, and CO2
+evaluators, so an active requirement for any of those signals returns a typed
+error there. Bounded conformance report paths can supply proof-series DCV
+values, but all 12 unique OA models have a blank OA schedule, and end-to-end
+output agreement does not establish source state mutation or adaptive entry
+count. Existing OA numerical and output evidence therefore remains limited to
+its declared cases and does not promote the complete CP284 routine.
+
+CP284 adds canonical required `source_mapped`
+`routine.calc_purch_air_min_oa_mass_flow` immediately after
+`routine.calc_purch_air_loads` and before `routine.update_purchased_air`, plus
+the matching HVAC project-contract item. It adds no algorithm-level source,
+Rust target or state, support declaration, test, capability, output,
+comparator, case, manifest, numerical claim, performance claim, or conformance
+promotion.
+
+The inventory becomes 32 algorithms and 284 routines, split 58
+`state_mapped` plus 226 `source_mapped`, with 161 required. Domain-required
+counts remain heat-balance 88, plant 1, and time/schedule 22, while HVAC becomes
+50. Readiness remains `0/88`, `0/50`, `0/1`, and `0/22`. The IdealLoads parent
+remains `scaffold` at claim level `none`.
+
+CP285 next adds canonical required `routine.calc_purch_air_mixed_air` after
+CP284 and before `routine.update_purchased_air`. `CalcPurchAirMixedAir` is
+declared at `PurchasedAirManager.hh` lines 357-365 and implemented at
+`PurchasedAirManager.cc` lines 2812-2939. The following physical definition,
+`UpdatePurchasedAir`, begins at source line 2941.
 
 
 
