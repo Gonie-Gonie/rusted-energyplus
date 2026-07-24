@@ -16132,14 +16132,201 @@ heat-balance 88, HVAC 52, plant 1, and time/schedule 22. Readiness remains
 `0/88`, `0/52`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
 claim level `none`.
 
-CP289 next adds canonical required source-mapped
-`routine.get_purchased_air_zone_inlet_air_node` and the matching HVAC
-project-contract item. `GetPurchasedAirZoneInletAirNode` is declared at
-`PurchasedAirManager.hh` line 373 and implemented at
-`PurchasedAirManager.cc` lines 3122-3145; the following definition,
-`GetPurchasedAirReturnAirNode`, begins at source line 3147. Its exact
-parenthesized source-plus-test symbol census is three: declaration, definition,
-and the sole qualified production call from `SystemReports.cc` line 4066.
+## CP289 `GetPurchasedAirZoneInletAirNode` Guarded Topology Getter Boundary
+
+`PurchasedAirManager::GetPurchasedAirZoneInletAirNode(EnergyPlusData &state,
+int const PurchAirNum)` is declared at `PurchasedAirManager.hh` line 373 and
+implemented at `PurchasedAirManager.cc` lines 3122-3145 inclusive. The body is
+24 physical lines, 19 nonblank lines, and 12 nonblank, non-comment lines. The
+next physical definition, `GetPurchasedAirReturnAirNode`, begins at source line
+3147.
+
+The exact parenthesized source-plus-test
+`GetPurchasedAirZoneInletAirNode(` census is three: the header declaration, the
+definition, and the sole qualified production call from `SystemReports.cc`
+line 4066. The bare identifier census is six because a local result variable
+uses the function name at source lines 3139, 3141, and 3144. There is no direct
+C++ test call.
+
+CP289 first checks the same shared `GetPurchAirInputFlag` as CP288. If true, it
+calls CP280 `GetPurchasedAir` and assigns the latch false only after normal
+child return. It then initializes a local integer result to zero. A left-to-right
+short-circuit guard requires `PurchAirNum > 0` and
+`PurchAirNum <= NumPurchAir`; only then does it copy the selected record's
+`ZoneSupplyAirNodeNum`. Every nonpositive or above-count index returns the zero
+sentinel.
+
+With comments stripped, the getter has two `if` heads, one logical AND, one
+child call, one Array1D record accessor, two integer comparisons, three lexical
+assignments, and one return. The assignments are the persistent latch clear,
+local zero initialization, and valid-range local overwrite. It has no else,
+loop, switch, case, arithmetic, node access, clamp, diagnostic, status,
+transaction, rollback, assertion, try, or catch. Its structural McCabe count is
+three by decision heads or four when the short-circuit atom is counted.
+
+The guard is deliberately more defensive than CP288's raw record access. A
+nonpositive index short-circuits before reading `NumPurchAir` or the record
+arena. A positive index above the declared count reads the count but not the
+arena. A zero returned from a valid record is indistinguishable from either
+invalid-index case. The initial latch read still requires a valid manager even
+for a negative index.
+
+The range check does not prove arena safety. A positive index at or below a
+stale or corrupt `NumPurchAir` can still exceed a deallocated or shorter
+PurchasedAir array and reach unchecked native access. CP289 also does not
+validate whether a copied node identity is positive, allocated in the global
+Node arena, unique, an air node, still connected to the selected unit, or
+current for the active topology. Those conditions are left to input processing
+and the caller.
+
+The supply-node field defaults to zero and CP280 populates it with
+`GetOnlySingleNode` while parsing the `Zone Supply Air Node Name`. A clean first
+lazy CP289 call therefore performs CP280's complete mutable allocation, parser,
+node, Schedule, output-registration, and optional EMS-registration work, clears
+the latch, and returns the configured node identity. Ordinary input errors are
+collected and fatal before a normal getter return.
+
+In CP289's sole production caller, CP288 is invoked immediately first at
+`SystemReports.cc` line 4065. On every stable sequential path where CP288
+returns normally, it has already loaded and cleared the shared latch or observed
+it false. CP289 at line 4066 therefore takes its flag-false path. If CP288's
+load fails, CP289 is not reached. CP289's own true-latch branch remains
+reachable through direct public use or a different ordering, but it is not the
+normal branch at the sole production site.
+
+If a direct CP289 lazy load fatals or otherwise exits abnormally, the false
+assignment is skipped and the latch remains true, while any completed CP280
+allocation, parser, node, Schedule, diagnostic, output, or EMS prefix can
+survive. Retry invokes the non-idempotent loader again. After a clean child
+return, even an invalid component index leaves the latch false and returns the
+defined zero sentinel; unlike CP288, there is no invalid-index access on that
+path. A valid-looking index with inconsistent count and arena can still invoke
+undefined native access and has no portable postcondition.
+
+With a false latch, stable count and arena, and no mutation, every call
+reinitializes the local zero and deterministically returns either the current
+stored node ID or zero. Replay is value-idempotent and owns no cached identity.
+A later test or external mutation of `NumPurchAir` or
+`ZoneSupplyAirNodeNum` changes the next result. A first lazy success is stateful,
+and `clear_state()` re-arms the latch while removing the arena.
+
+Both index and result are by value. The caller's Zone-equipment `EquipIndex`
+reference is copied into CP289, and the returned integer is only a topology
+handle, not a Node reference or state snapshot. CP289 performs no identity,
+alias, ownership, or generation check. The configured field has no normal
+dynamic writer after CP280, but tests, reset, reload, and corrupt external state
+remain mutation boundaries.
+
+CP289 has no synchronization. Direct first entrants can race on the latch and
+the entire input loader. Loaded reads can race with reset, reload, reallocation,
+count mutation, or external node-ID mutation. Native races have no defined
+postcondition. Stable read/read access after completed input is safe, but
+different unit indices still share the latch, count, and record arena. The
+caller's following Node-state read has its own separate race boundary.
+
+SystemReports stores the returned ID in `ZoneInletAirNode`. Only a positive
+value triggers `Node(id).MassFlowRate`; finite negative mass flow is clamped to
+zero before assignment to `ZFAUFlowRate`. A positive but invalid Node ID reaches unchecked caller access, which has no
+portable postcondition; CP289 itself does not validate it. CP289 does not affect
+CP288's Zone forced-air outdoor-air mass accumulator.
+
+The caller has no else for a nonpositive CP289 result. `ZFAUFlowRate` is
+initialized once per controlled Zone at source line 3911, outside the Zone
+equipment loop, rather than once per equipment. A zero or negative returned ID
+therefore skips assignment without clearing a flow retained from a preceding
+equipment. If the later PurchasedAir return-node getter is positive, that stale
+flow can enter the PurchasedAir ventilation-load expression despite CP289
+returning no inlet node.
+
+With a positive node and flow plus a positive return node, SystemReports uses
+the flow with separately obtained mixed-air and return-air enthalpies and
+`TimeStepSysSec`. The Zone forced-air ventilation load then joins the primary-air
+load, passes a 0.1 J small-load threshold, and can feed eight `Zone Mechanical
+Ventilation ... Energy` heating, cooling, no-load, met-load, and overconditioning
+classifications. This consumer chain is outside the getter and is not a claim
+that CP289 calculates node state or ventilation load.
+
+The sole indirect CP289 execution is in
+`ReportVentilationLoads_ZoneEquip` at `SystemReports.unit.cc` lines 189-342. The
+fixture forces the latch false, declares one PurchasedAir record, and passes
+component index one. It leaves `ZoneSupplyAirNodeNum` at its constructor default
+zero. CP289's component range guard succeeds, reads that stored zero, and the
+caller skips the Node access. This is a valid-index zero-field path, not an
+invalid-index sentinel path.
+
+Neither of the fixture's two post-call assertions depends on CP289:
+`TargetVentilationFlowVoz` tests the ventilation target, while `OAMassFlow`
+tests CP288's nine-equipment outdoor-air sum. Direct calls and assertions are
+0/0; indirect executions and CP289-sensitive assertions are 1/0. No test covers
+the getter's lazy branch, configured positive node return, either index bound,
+count/arena mismatch, invalid positive Node ID, stale-flow behavior, child
+failure and retry, reset, replay mutation, or concurrency.
+
+Adjacent C++ topology evidence bypasses CP289. PurchasedAir tests contain one
+direct field-identity assertion for `ZoneSupplyAirNodeNum` and four more
+assertions that merely use the field as an index while checking CP283
+calculation and node projection. They do not call this getter or exercise the
+SystemReports consumer.
+
+Rust has no `GetPurchasedAirZoneInletAirNode`, shared lazy one-based arena,
+zero-sentinel getter, SystemReports ventilation-load consumer, or
+cross-equipment load aggregation. CP289-specific implementation and tests are
+0/0. Rust therefore owns none of the source latch, range/sentinel, partial-load,
+caller-scratch, failure, replay, or concurrency lifecycle.
+
+Adjacent Rust topology is eager and typed. `IdealLoadsSupplyNodeEdge` resolves
+supply identities in the immutable graph; Zone-equipment dispatch validation
+requires at least one edge and checks every supply node against the Zone inlet
+list, while the arbitrary runtime selects the first validated node. The
+PurchasedAir wrapper receives that `NodeId` directly and
+`supply_node_update_from_result` copies it into an immutable node-update
+payload. This avoids a public integer lookup but does not implement CP289's
+shared mutable getter or its SystemReports use.
+
+The node-update helper has no direct test. Wrapper-level tests contain exactly
+two node-identity assertions, one for no-outdoor-air `NodeId(3)` and one for
+outdoor-air `NodeId(9)`. Dispatch validation separately has one positive
+resolved-node assertion and one mismatch diagnostic test. Two focused
+diagnostic node-state projection tests explicitly do not claim algorithm
+parity. These are useful topology and payload evidence, not CP289 execution.
+
+The audited corpus contains 120 models, 142 `*case.toml` manifests, and 47
+IdealLoads comparison scripts. All 30 IdealLoads models have a nonblank supply
+node. Supply-key manifest coverage is 21 files and 21 blocks for each of
+`System Node Mass Flow Rate`, `System Node Temperature`, and
+`System Node Humidity Ratio`; those direct node outputs bypass CP289 and
+SystemReports.
+
+Across IdealLoads routes, the broader exact output-name file coverage for
+models, manifests, and scripts is respectively 17/21/15 for System Node Mass
+Flow Rate, 29/22/11 for System Node Temperature, and 29/21/16 for System Node
+Humidity Ratio. All eight CP289-sensitive mechanical-ventilation energy outputs
+have exact 0/0/0 model, manifest, and script coverage. The corpus proves typed
+supply topology and direct node-state surfaces but provides no requested or
+compared CP289/SystemReports ventilation-load result and no dynamic getter
+entry count.
+
+CP289 adds canonical required `source_mapped`
+`routine.get_purchased_air_zone_inlet_air_node` immediately after
+`routine.get_purchased_air_out_air_mass_flow`, plus the matching HVAC
+project-contract item. It adds no algorithm-level source, Rust target or state,
+support declaration, test, capability, output, comparator, case, manifest,
+numerical claim, performance claim, or conformance promotion.
+
+The inventory becomes 32 algorithms and 287 routines, split 58 `state_mapped`
+plus 229 `source_mapped`, with 164 required. Domain-required counts become
+heat-balance 88, HVAC 53, plant 1, and time/schedule 22. Readiness remains
+`0/88`, `0/53`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
+claim level `none`.
+
+CP290 next adds canonical required source-mapped
+`routine.get_purchased_air_return_air_node` and the matching HVAC
+project-contract item. `GetPurchasedAirReturnAirNode` is declared at
+`PurchasedAirManager.hh` line 375 and implemented at
+`PurchasedAirManager.cc` lines 3147-3170; the following definition,
+`getPurchasedAirIndex`, begins at source line 3172. Its exact parenthesized
+source-plus-test symbol census is three: declaration, definition, and the sole
+qualified production call from `SystemReports.cc` line 4072.
 
 
 
