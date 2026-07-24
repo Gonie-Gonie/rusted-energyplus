@@ -12132,11 +12132,344 @@ Domain-required counts remain heat-balance 88, plant 1, and time/schedule 22,
 while HVAC becomes 49. Readiness remains `0/88`, `0/49`, `0/1`, and
 `0/22`. The IdealLoads parent remains `scaffold` at claim level `none`.
 
-CP283 next refreshes existing required `routine.calc_purch_air_loads`.
-`PurchasedAirManager::CalcPurchAirLoads` is declared at
+## CP283 `CalcPurchAirLoads` Runtime Load, Node, and Diagnostic Boundary
+
+`PurchasedAirManager::CalcPurchAirLoads(EnergyPlusData &state,
+int const PurchAirNum, Real64 &SysOutputProvided,
+Real64 &MoistOutputProvided, int const ControlledZoneNum)` is declared at
 `PurchasedAirManager.hh` lines 345-349 and implemented at
-`PurchasedAirManager.cc` lines 1906-2760. The next physical definition,
+`PurchasedAirManager.cc` lines 1906-2760 inclusive. The 855 physical source
+lines comprise 655 nonblank, non-comment lines. The next physical definition,
 `CalcPurchAirMinOAMassFlow`, begins at source line 2762.
+
+The exact source-plus-test `CalcPurchAirLoads(` census is eight: one header
+declaration, one definition, the sole production call in `SimPurchasedAir`
+line 203, and five direct calls in `PurchasedAirManager.unit.cc` at lines 865,
+963, 1132, 1304, and 1522. The production wrapper calls CP283 after
+`InitPurchasedAir` and before `UpdatePurchasedAir` and `ReportPurchasedAir`,
+with distinct local sensible and moisture output references.
+
+CP283 accepts mutable global state and two mutable output references, returns
+`void`, exposes no status, and has no early return. A direct caller can alias
+the two output references to each other or to reachable state even though the
+production wrapper does not. It can also supply a `ControlledZoneNum` that
+disagrees with `PurchAir.ZonePtr` and the object's retained node topology.
+There is no local identity or agreement check.
+
+The routine first aliases `PurchAir(PurchAirNum)`, resolves the supply, Zone,
+outdoor-air, and recirculation nodes, and only then starts its reset prefix.
+It zeros local supply and outdoor-air flows, the retained minimum-OA flow,
+economizer and heat-recovery active time, both caller output references, and
+local load accumulators. It reads the current heating and cooling setpoint
+demands, but does not comprehensively clear all PurchasedAir report fields,
+heat-recovery child outputs, or node state at entry.
+
+Availability is resolved in source order. If Zone-component availability
+state is allocated, CP283 writes the selected manager record's Zone number,
+copies its status into `PurchAir.availStatus`, and forces the unit off only for
+`ForceOff`. The main availability schedule can then turn the unit off.
+Heating and cooling availability schedules independently gate branch
+candidates and final sensible or latent coil components. Operating mode is
+selected later from current-OA sensible effect and thermostat type; schedule
+pointers and values are assumed valid and finite.
+
+For an available unit, CP283 calls `CalcPurchAirMinOAMassFlow` exactly once,
+then applies an optional EMS outdoor-air mass-flow override. When outdoor air
+is configured it calculates sensible and latent effects from that current
+nominal-minimum or EMS-overridden flow. The latent result `MinOALatOutput` is
+assigned but never consumed. Cooling is selected when the current-OA
+sensible effect is greater than or equal to the cooling setpoint demand and
+the thermostat is not single-heating; heating is selected when it is strictly
+below the heating setpoint demand and the thermostat is not single-cooling.
+Everything else enters DeadBand. Those comparison boundaries and thermostat
+exclusions are source-significant.
+
+In Cooling, an outdoor-air flow above the configured cooling-flow maximum
+emits the cooling-OA warning state machine, clamps OA to that maximum, and
+skips the economizer branch. Otherwise a configured differential dry-bulb or
+differential enthalpy economizer can raise OA from its current pre-economizer
+flow toward that needed for the cooling setpoint, subject to its own source
+checks and maximum.
+A successful increase records one system timestep in `TimeEconoActive`. The
+local `EconoOn` flag is written but never read.
+
+CP283 next derives separate sensible-cooling, dehumidification, and optional
+humidification candidate mass flows. A zero cooling capacity suppresses all
+three non-OA candidates. It selects the maximum of zero, OA, and those
+candidates, applies the EMS supply-mass-flow override, replaces OA with the
+minimum of its current value and the overridden supply flow, then applies the
+cooling-flow maximum only when that retained maximum is strictly positive.
+Consequently an active numeric zero flow maximum does not itself clamp a
+positive non-OA candidate. Values at or below `VerySmallMassFlow` are set to
+zero.
+
+CP283 calls `CalcPurchAirMixedAir` for cooling even when the selected flow is
+zero. The following positive-flow path calculates a supply temperature for
+sensible demand, applies the minimum cooling supply temperature and mixed-air
+bounds, and performs an early cooling-capacity check. Its dehumidification
+switch covers `None`, `ConstantSensibleHeatRatio`, `Humidistat`, and
+`ConstantSupplyHumidityRatio`; the default copies the mixed-air humidity ratio
+and breaks. Constant SHR divides by `CoolSHR` without a local zero or
+finiteness guard. Optional cross-mode humidification follows, then a
+saturation clamp and a final capacity adjustment whose exact branch depends
+on whether the result is dehumidifying. The preliminary maximum-cooling
+calculation at source line 2197 deliberately uses an enthalpy difference
+despite its sensible-oriented
+name and comment. Exact `>=` versus `>` capacity comparisons must be
+preserved. A zero cooling flow instead copies the mixed-air state and zeros
+the local cooling outputs.
+
+Heating and DeadBand share the second major path. CP283 first emits and clamps
+through the separate heating-OA warning state machine when OA exceeds a
+configured heating-flow maximum. It derives heating, dehumidification, and
+humidification candidate flows under their corresponding thermal-availability
+and humidity-control gates. A zero heating capacity suppresses all three
+non-OA candidates. Their maximum then passes through the EMS mass-flow
+override, which also replaces OA with the minimum of its current value and
+the overridden supply flow. Supply then passes through the positive-only
+heating-flow maximum and the same very-small-flow cutoff before the second
+static `CalcPurchAirMixedAir` call site.
+
+With positive flow, actual sensible heating and its capacity limit apply only
+when both the heating schedule and Heat mode are active. The humidity switch
+covers no control, Humidistat, and constant supply humidity ratio, including
+cross-mode cooling/dehumidification in Heat or DeadBand, followed by a
+saturation clamp. The later Humidistat dehumidification capacity block
+computes `LatOutput` as total minus sensible, which is negative for ordinary
+dehumidification, but compares it with `LatOutput > MaxCoolTotCap` against a
+normally positive cooling capacity at lines 2548-2555. That source comparison
+therefore normally cannot limit dehumidification and would set a positive
+latent output if it did fire. A compatibility port must treat this as observed
+source behavior rather than silently repair the sign. A zero heating/deadband
+flow again copies mixed-air state and zeros the local heating result.
+
+The common positive-flow tail applies optional EMS supply-temperature and
+supply-humidity-ratio overrides only after the earlier temperature, humidity,
+capacity, and saturation enforcement. It recomputes enthalpy, then uses exact
+floating-point equality of supply and mixed-air temperature and humidity to
+select zero-load, enthalpy-difference, or sensible-plus-total coil-load
+formulas. Heating or cooling unavailability can zero the corresponding coil
+component and reset only its associated supply temperature or humidity ratio.
+Enthalpy is recomputed after those changes.
+
+A final supersaturation test owns the third warning state machine. It reports
+but does not repair the supply state, so an EMS override can leave a
+supersaturated, nonfinite, or otherwise out-of-limit final node. The same
+late override can bypass capacity and supply-temperature/humidity limits.
+Negative EMS mass flow is reduced to zero for supply flow by the later cutoff,
+but the source `min(OAMassFlowRate, SupplyMassFlowRate)` update can retain a
+negative outdoor-air flow and publish it to the OA node. There is no local
+nonnegative or finiteness validation for any EMS value.
+
+On a normal positive-flow completion, CP283 writes both caller outputs;
+PurchasedAir sensible and latent coil load, Zone output, and outdoor-air
+output fields; and inlet-node temperature, humidity ratio, enthalpy, and mass
+flow. Enabled CO2 and generic-contaminant simulations additionally write the
+inlet-node concentrations from the mixed streams. When a contaminant
+simulation is disabled, the corresponding node member is not cleared here.
+
+The UnitOn zero-flow subpath zeros the caller outputs, coil and Zone outputs,
+and OA outputs, sets mixed air to the recirculation state, and copies Zone
+contaminants when enabled. It then writes the inlet and OA node flow fields.
+The UnitOff path separately zeros both references, supply and OA flow, the
+inlet-node thermodynamic state from the Zone node, selected sensible/cooling
+report rates, coil and Zone/OA outputs, and inlet/OA mass flow. It copies the
+recirculation state to mixed and the inlet state to supply.
+
+UnitOff does not call `CalcPurchAirMixedAir` and does not directly clear
+`HtRecSenOutput` or `HtRecLatOutput`. The later `ReportPurchasedAir` routine
+consumes those fields, so heat-recovery report values can survive from an
+earlier call even though CP283 reset `TimeHtRecActive`. UnitOff also clears
+only `SenHeatRate`, `SenCoolRate`, and `TotCoolRate` among adjacent report-rate
+members. The normal wrapper's following Report call overwrites more of that
+state, but a direct CP283 observer can see the partial stale record.
+
+The unconditional tail writes outdoor-air and supply mass and
+standard-density volume flows, dividing by `StdRhoAir` without a local
+nonzero or finiteness guard. A positive plenum-exhaust node receives the
+supply mass flow, and the recirculation node always receives it. Aliased node
+numbers therefore make the source-ordered writes observable and can overwrite
+earlier values.
+
+`CalcPurchAirMinOAMassFlow` is called at one static site and writes the retained
+minimum-OA flow. `CalcPurchAirMixedAir` is called at two mutually exclusive
+static sites and can write mixed-air temperature and humidity ratio,
+`TimeHtRecActive`, and sensible and latent heat-recovery outputs. CP283 itself
+has no loop, return, continue, ternary, try, or catch. With comments stripped,
+its structural census is 92 `if` heads, including one `else if`, 22 `else`
+blocks, three switches, 11 case labels, three defaults, 13 breaks, 23 logical
+ANDs, and 21 logical ORs. The stated structural McCabe count is 104 when case
+labels are counted, or 148 when short-circuit atoms are also counted.
+
+Direct persistent destinations include both output references; the availability
+manager Zone number and `PurchAir.availStatus`; minimum OA, economizer, and
+heat-recovery timing; supply and mixed thermodynamic state; coil, Zone, and OA
+loads; warning counts and recurring-warning indices; selected UnitOff report
+rates; mass and standard-density volume rates; inlet-node thermodynamic and
+contaminant state; and OA, plenum-exhaust, and recirculation node flows. Child
+calls add minimum-OA and heat-recovery state. The routine makes these writes
+in place rather than staging an atomic result.
+
+There are exactly three recoverable diagnostic state machines and no direct
+Severe or Fatal site: cooling OA above its maximum, heating OA above its
+maximum, and final supersaturation. A first occurrence increments a retained
+counter and emits Warning, Continue, and timestamp context; later occurrences
+call the recurring-warning service and mutate a retained index. The two OA
+warnings clamp and continue. The saturation warning continues without a
+clamp. Diagnostic state makes same-state replay observably non-idempotent even
+when numerical inputs are otherwise unchanged.
+
+CP283 does not validate the input lifecycle, PurchasedAir index, controlled
+Zone index, Zone-equipment configuration extent, node indices or aliasing,
+Zone-demand and thermostat arenas, schedule pointers, availability-manager
+arenas, enum selectors, flow and capacity limits, `CoolSHR`, standard air
+density, psychrometric arguments, EMS values, or numeric finiteness. It relies
+on the wrapper and earlier Get/Init/Size phases for those prerequisites, but
+direct calls remain public test practice.
+
+There is no transaction, rollback, cleanup guard, or exception boundary. A
+fault after the initial reset exposes zero caller outputs plus whatever
+PurchasedAir, warning, child, and node prefix was already committed. A child
+or diagnostic failure adds its own prefix. Fixed valid replay can reproduce
+numeric fields only when prior state is not fed back through aliases,
+diagnostics, heat-recovery state, schedules, or node inputs. Output-reference
+aliasing is sequential, so the moisture write can overwrite the sensible
+value. Same-unit calls sharing one `EnergyPlusData` race on the PurchasedAir,
+Zone, node, availability, and warning state; there is no synchronization.
+Separate complete EnergyPlus state graphs are the only locally evident
+isolation boundary, subject to deeper psychrometric service internals.
+
+The bounded PurchasedAir C++ unit corpus reaches CP283 through eight configured
+scenarios and nine executions. Five calls are direct and four pass through
+`ManageZoneEquipment`; `IdealLoads_NoCapacityTest` alone performs one of each.
+The scenario-level post-boundary assertion groups contain 62 assertions:
+10 plenum, seven exhaust-node, five intermediate-output, two legacy EMS, two
+zero-capacity, five revised EMS, seven revised-EMS zero-flow, and 24 supply-
+humidity-fix assertions. The last two intermediate assertions follow a
+separate direct `CalcPurchAirMixedAir` call, and the last 12 fix assertions
+follow `ReportPurchasedAir`, leaving 48 assertions after Calc/Manage and before
+those later helpers. Several of those 48 establish only names, topology, or
+fuel schedules rather than isolated CP283 values.
+
+The actual focused branch evidence is narrower. NoCapacity fixes zero heating
+capacity to zero sensible output and supply flow. The revised EMS case fixes a
+nonzero mass-flow override plus final 18 C and 0.01 humidity-ratio node state;
+its zero-flow companion proves that temperature and humidity overrides do not
+revive a zero-flow result. The supply-humidity regression fixes 12 Calc values
+for one no-OA cooling, Humidistat-dehumidification, EMS-mass-flow combination.
+The legacy EMS case asserts only stored zero actuator values. Plenum and
+exhaust cases give composite no-OA/no-limit node-flow evidence. The
+intermediate OA plus sensible-heat-recovery scenario asserts only supply state
+and node agreement before its separate mixed-air child oracle.
+
+No bounded C++ test isolates a positive flow limit, positive combined limit,
+latent-inclusive total-cooling-capacity recheck, UnitOff or hybrid
+availability, separate heating/cooling availability schedule, OA maximum
+warning or recurrence, DCV, economizer, heat-recovery result, final saturation
+warning, negative or nonfinite EMS value, contaminant projection, alias,
+failure, retry, replay, or concurrency behavior.
+
+One `BaseClassSizing.unit.cc` simulation and four earlier
+`SizingManager.unit.cc` simulations each include one IdealLoads unit and can
+execute CP283 repeatedly through sizing/design-day timesteps and HVAC
+iterations. Their 11 and 160 post-simulation assertions respectively inspect
+Zone sizing and report structures, not the Calc call count or direct CP283
+result. Four later SizingManager simulations contain no IdealLoads unit. Exact
+dynamic execution counts cannot be inferred from static call sites because
+warmup, timesteps, and HVAC resimulation are variable.
+
+The checked data corpus has 120 models, of which exactly 30 IDFs and no epJSON
+model contain one IdealLoads unit. The 140 manifests contain 52 routes to
+those 30 unique sources: 22 outdoor-air, 12 humidity-selected, two constant
+SHR, six finite-limit, and ten other no-OA routes. The 47
+`compare-ideal-loads*.ps1` scripts split 22 outdoor-air, nine humidity, two
+constant-SHR, six finite-limit, and eight other routes; 28 assert the five
+PurchasedAir stage names and order.
+
+Those model, route, script, and baseline-process counts are not CP283 execution
+counts. EnergyPlus invokes Calc for each system timestep and again during HVAC
+iteration or resimulation, including warmup. The current scripts do not
+instrument routine entry. They can prove selected end-to-end outputs for their
+bounded inputs, but they cannot establish a static whole-corpus call count or
+full branch/state parity.
+
+Rust exposes ten descriptive `IdealLoadsPurchasedAirBranch` variants: no-OA
+no-limit; finite capacity, flow, and combined limits; Constant SHR;
+constant-supply-humidity cooling and heating; Humidistat dehumidification and
+humidification; and outdoor-air selected. The generic
+`sim_purchased_air_compat_with_branch_flags` nevertheless has only two actual
+calculation dispatches. The three finite variants call
+`calc_no_oa_sensible_with_limits_and_recirculation_compat`; every other
+supported no-OA variant calls
+`calc_no_oa_no_limit_sensible_with_recirculation_context_compat` and lets the
+system selectors shape that helper.
+
+The generic wrapper rejects `OutdoorAirSelected` through its unsupported-
+feature classifier. `ideal_loads/runtime.rs` special-cases outdoor air before
+that wrapper and calls the separate `sim_purchased_air_outdoor_air_compat`
+path. Thus the enum and five-stage metadata describe a source-order
+compatibility boundary, not one unified Rust implementation of the C++
+routine. Execution-plan dependencies similarly declare
+`zone_state,purchased_air_state -> purchased_air_loads_state`; they are
+metadata and do not supply missing source state or lifecycle.
+
+The Rust no-OA calculation suite has 18 tests spanning sensible heating and
+cooling, Constant SHR, constant-supply humidity, Humidistat control,
+unavailable-unit behavior, standard density, and finite limits. Five focused
+finite-limit tests own 20 result assertions for heating flow, heating capacity,
+cooling flow, cooling capacity, and zero heating capacity. Five moisture-
+predictor/corrector tests and seven Humidistat closed-loop tests exercise
+separate helpers. Outdoor-air calculation, DCV, and wrapper modules have 23
+tests. Seven dispatch tests establish stage order, feature/branch labels, one
+no-limit node/report projection, one finite branch label, OA rejection, and a
+constant-supply-humidity label.
+
+Those tests support bounded formulas, not the complete mutable routine. The
+arbitrary runtime computes one result per IdealLoads system and expands it as
+`vec![value; sample_count]`; it does not reproduce EnergyPlus timestep and HVAC
+iteration recalculation. Its ordinary demand input is sensible-only, so the
+separate moisture predictor/corrector helpers are not evidence that generic
+arbitrary execution supplies the source latent demand lifecycle.
+
+Rust has no equivalent for the full main/heating/cooling availability matrix,
+Zone-component hybrid availability, EMS OA/mass/temperature/humidity override
+state, OA maximum warning/recurrence, final saturation warning counters,
+source-exact output-reference and node alias behavior, contaminant writes,
+plenum/exhaust projection, partial UnitOff report state, stale heat-recovery
+outputs, diagnostic replay, failure prefix, or concurrent shared-state
+semantics. Its outdoor-air path is separate, with active timestep OA schedule,
+occupancy, and CO2 evaluators absent from the generic context; unsupported
+active inputs fail typed checks. Autosized or missing active limits are also
+rejected before calculation.
+
+The Rust cooling-capacity helper contains bounded sensible adjustment but not
+the complete source latent-inclusive recheck and its exact anomalous
+comparisons. EMS is explicitly outside current capabilities. Existing
+IdealLoads numerical, output, meter, and family evidence remains narrowed to
+its declared cases and does not promote the complete CP283 routine, broad
+feature combinations, or adaptive lifecycle to state-mapped or conformance
+status.
+
+CP283 refreshes existing required `source_mapped`
+`routine.calc_purch_air_loads` in place after
+`routine.size_purchased_air` and before `routine.update_purchased_air`. It
+adds no routine or project-contract row, algorithm-level source, Rust target
+or state, support declaration, test, capability, output, comparator, case,
+manifest, numerical claim, performance claim, readiness change, or
+conformance promotion.
+
+The inventory remains 32 algorithms and 283 routines, split 58
+`state_mapped` plus 225 `source_mapped`, with 160 required. Domain-required
+counts remain heat-balance 88, HVAC 49, plant 1, and time/schedule 22.
+Readiness remains `0/88`, `0/49`, `0/1`, and `0/22`. The IdealLoads parent
+remains `scaffold` at claim level `none`.
+
+CP284 next adds canonical required
+`routine.calc_purch_air_min_oa_mass_flow` after CP283 and before
+`routine.update_purchased_air`. `CalcPurchAirMinOAMassFlow` is declared at
+`PurchasedAirManager.hh` lines 351-355 and implemented at
+`PurchasedAirManager.cc` lines 2762-2810. The following physical definition,
+`CalcPurchAirMixedAir`, begins at source line 2812.
 
 
 
