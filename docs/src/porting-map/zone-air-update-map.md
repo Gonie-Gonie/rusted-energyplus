@@ -17067,12 +17067,363 @@ remain 32 algorithms and 282 routines, split 58 `state_mapped` plus 224
 `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at claim level
 `none`.
 
-CP282 next adds the currently unlisted canonical required
-`routine.size_purchased_air`.
+## CP282 `SizePurchasedAir` Sizing Branch and Reporting Boundary
+
 `PurchasedAirManager::SizePurchasedAir(EnergyPlusData &state,
 int const PurchAirNum)` is declared at `PurchasedAirManager.hh` line 343 and
-implemented completely at `PurchasedAirManager.cc` lines 1326-1904.
-`CalcPurchAirLoads` begins at source line 1906.
+implemented completely at `PurchasedAirManager.cc` lines 1326-1904, a
+579-line body. The selected PurchasedAir index is passed by value and the
+simulation graph is mutable. The routine has no return value, caller-owned
+error flag, status, retry token, default argument, or local exception handler.
+The next physical definition is CP283 `CalcPurchAirLoads` at source lines
+1906-2760.
+
+The exact source-plus-test `SizePurchasedAir(` census is five: one header
+declaration, one definition, the sole production expression in CP281
+`InitPurchasedAir` line 1196, and two direct calls in
+`PurchasedAirManager.unit.cc` at lines 191 and 247. Production reaches CP282
+only through `!SysSizingCalc && InitPurchasedAirMySizeFlag(PurchAirNum)`.
+CP281 clears that per-unit flag only after CP282 returns normally.
+
+CP282 first aliases `PurchAir(PurchAirNum)`, zeros eight local design/user
+report values, starts the local heating and cooling design flows at zero,
+clears both shared heating-only and cooling-only fan flags, and copies the
+component type and name. The `PurchAir` lookup occurs before any current-zone
+equipment guard. `TempSize` is declared without initialization.
+
+All remaining sizing work is guarded by `CurZoneEqNum > 0`. A nonpositive
+current equipment number therefore returns normally after the two shared fan
+clears and local copies. CP281 then treats that normal return as completed
+sizing and clears its per-unit latch, so a premature production call can
+permanently suppress a later valid sizing pass for that state.
+
+A positive current equipment number aliases
+`ZoneEqSizing(CurZoneEqNum)`, creates one local `ErrorsFound=false`, and
+selects one of two mutually exclusive routes:
+
+1. a positive `HVACSizingIndex` consumes the referenced
+   `DesignSpecification:ZoneHVAC:Sizing` record and shared scalable-sizing
+   scratch;
+2. a zero index sizes the four direct IdealLoads maximum flow/capacity fields
+   against `ZoneSizingRunDone` and `FinalZoneSizing`.
+
+The routine itself owns only selection, floor-area multiplication, zero or
+small-load clamping, relative hard-size comparisons, selected
+`ZoneEqSizing`/shared-scratch writes, and report/warning orchestration. The
+flow and capacity equations are delegated to
+`HeatingAirFlowSizer`, `CoolingAirFlowSizer`,
+`HeatingCapacitySizer`, and `CoolingCapacitySizer`.
+
+The custom-sizing route first writes `DataZoneNumber=PurchAir.ZonePtr` and
+uses the referenced `ZoneHVACSizing` record. Heating work is wholly gated by
+a strictly positive `HeatingSAFMethod`; even the heating-capacity method and
+capacity sizer are nested inside that airflow-method gate. It sets
+`SizingMethod=HeatingAirflowSizing`, marks the heating-only fan, records the
+SAF method, and then dispatches in source order:
+
+- `SupplyAirFlowRate` calls the heating airflow sizer for an `AutoSize`
+  value only when the PurchasedAir heating limit includes flow. Otherwise it
+  calls the sizer for any strictly positive hard value.
+- `FlowPerFloorArea` multiplies the sizing-record value by the selected
+  Zone floor area, stores `SystemAirFlow` and `AirVolFlow`, enables
+  `DataScalableSizingON`, and always calls the airflow sizer.
+- `FractionOfAutosizedHeatingAirflow` stores the fraction but calls its
+  sizer only when that same sizing-record value equals `AutoSize` and the
+  limit includes flow.
+- `FlowPerHeatingCapacity` likewise performs its capacity-then-flow sizing
+  sequence only when the ratio field itself equals `AutoSize` and the limit
+  includes flow.
+
+The last two gates are source-significant defects. The
+`DesignSpecification:ZoneHVAC:Sizing` input path requires ordinary positive
+fraction or flow-per-capacity values for those methods and rejects
+`AutoSize`. A valid configured fraction or ratio therefore normally skips
+the child call, leaves the initialized design flow at zero, and reaches the
+unconditional `max(0.0, HeatingAirVolFlowDes)` overwrite of
+`PurchAir.MaxHeatVolFlowRate`. That tail also clears the heating-only fan.
+
+Still inside the positive heating-SAF gate, CP282 records
+`HeatingCapMethod`. `HeatingDesignCapacity` can seed an explicit design
+load and `TempSize`; `CapacityPerFloorArea` writes the area-scaled design
+load and enables scalable sizing but does not assign `TempSize`;
+`FractionOfAutosizedHeatingCapacity` writes the shared heating fraction and
+sets `TempSize=AutoSize`. A recognized or unrecognized method then reaches a
+heating capacity sizer with an empty sizing label and reporting disabled.
+
+Consequently the per-floor-area path can pass a retained or indeterminate
+`TempSize`, depending on the preceding airflow path. The sizer result is
+clamped below `SmallLoad` and can be compared with a positive hard input,
+but the custom route never assigns the calculated heating capacity back to
+`PurchAir.MaxHeatSensCap`. Its shared `ZoneEqSizing` and scalable-sizing
+writes can remain live for later children or callers.
+
+Cooling is independently gated by a positive `CoolingSAFMethod`, with its
+capacity work nested under the same gate. Before the cooling dispatch, the
+source does not set `SizingMethod=CoolingAirflowSizing`. Line 1549 indexes
+`ZoneEqSizing.SizingMethod(SizingMethod)` using
+`HeatingCapacitySizing` when the heating branch completed, or an
+indeterminate local when it did not. This can write the cooling SAF method to
+the wrong slot or perform an invalid native index access.
+
+The source also never loads numeric field 7 into the custom route's
+`SizingString`. A cooling `SupplyAirFlowRate` call can therefore receive
+the earlier heating-field label or the blank label left by heating capacity.
+Several other cooling paths construct an explicit IDF/epJSON cooling-flow
+override, but the pre-flow capacity call in `FlowPerCoolingCapacity` still
+uses the stale string.
+
+Cooling `SupplyAirFlowRate` accepts `AutoSize` when the cooling limit
+includes flow or active outdoor-air economizer operation requires it, and
+otherwise sizes a positive hard value. `FlowPerFloorArea` multiplies by
+floor area and calls the cooling airflow sizer. As on heating,
+`FractionOfAutosizedCoolingAirflow` and `FlowPerCoolingCapacity` call
+their child sequence only when the normally positive fraction or ratio equals
+`AutoSize`. Valid positive inputs can therefore leave the local design flow
+zero. The route then unconditionally clamps and overwrites
+`PurchAir.MaxCoolVolFlowRate`, clears the cooling-only fan, and resets
+`DataScalableSizingON=false`.
+
+The cooling-capacity method follows, but contains three further exact source
+anomalies. `FractionOfAutosizedCoolingCapacity` writes
+`DataFracOfAutosizedHeatingCapacity` instead of the cooling field.
+`CapacityPerFloorArea` can re-enable `DataScalableSizingON` after the
+cooling-flow reset, with no final cleanup. Finally line 1662 unconditionally
+replaces any method-selected `TempSize` with
+`PurchAir.MaxCoolTotCap` before invoking the cooling capacity sizer. The
+calculated result is small-load clamped and may be hard-size compared, but is
+not assigned back to `PurchAir.MaxCoolTotCap` in this custom route.
+
+Both custom capacity routes therefore use sizing-record methods and shared
+scratch for child behavior and reporting without guaranteeing that the
+PurchasedAir capacity fields acquire the resulting design values. Heating and
+cooling work are each skipped completely when their SAF method is zero,
+regardless of a positive capacity method.
+
+The zero-`HVACSizingIndex` route processes direct IdealLoads values in
+heating flow, heating capacity, cooling flow, cooling capacity order. A field
+is classified autosized only when its value is the exact `AutoSize` sentinel
+and its active limit requires that quantity. Cooling flow additionally treats
+active outdoor-air economizer operation as a flow requirement.
+
+For each flow, a non-autosized call before any Zone sizing run invokes the
+corresponding sizer only for a positive hard value. Otherwise the route marks
+the matching heating-only or cooling-only fan, sizes from the direct value,
+writes the result back to `PurchAir`, and clears the fan flag. In an
+autosized call the child selects
+`FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow` or `DesCoolVolFlow` through
+those fan flags.
+
+For each capacity, the full sizing branch first writes
+`ZoneEqSizing.OAVolFlow=FinalZoneSizing(CurZoneEqNum).MinOA`. The heating
+child forms a mixed inlet condition and, in the ordinary IdealLoads case,
+sizes approximately as the nonnegative product of design heating mass flow,
+air heat capacity, and the design supply-minus-inlet temperature, followed by
+the shared heat-size ratio and autosized-heating-capacity fraction. The cooling
+child limits the design outlet temperature and humidity ratio, applies the
+design cooling mass flow to the inlet-minus-outlet enthalpy difference, adds
+design fan heat, and then applies the autosized-cooling-capacity fraction.
+
+Capacity results below `SmallLoad` become zero. Autosized results overwrite
+the respective PurchasedAir capacity and receive a design-size report.
+Positive hard inputs can receive paired design/user reports and optional
+relative-mismatch diagnostics. When outdoor air is active and `MinOA` is
+zero, an autosized capacity emits a warning plus three continuation lines.
+The heating warning is mislabeled `InitPurchasedAir:`; the cooling warning
+uses `SizePurchasedAir:`.
+
+Both direct capacity sizing strings append `[m3/s]` to fields whose actual
+unit is watts. The no-sizing-run hard branches are also asymmetric: heating
+capacity keeps the child result only in the local design value, while cooling
+capacity writes the child result directly back to
+`PurchAir.MaxCoolTotCap` and leaves its local design value zero. Custom
+cooling lines 1644 and 1654 place `DesCoolMassFlow` in
+`DataFlowUsedForSizing`, although that shared slot is documented as
+volumetric `[m3/s]`.
+
+The body contains 22 static sizer construction sites: seven heating-flow,
+four heating-capacity, seven cooling-flow, and four cooling-capacity. Every
+site calls `overrideSizingString`, `initializeWithinEP`, and `size`
+exactly once. Child initialization reads and then zeros shared
+`DataConstantUsedForSizing` and `DataFractionUsedForSizing`; a single
+custom CP282 call can execute as many as six sizers, so later children and
+later equipment can observe call-order-dependent scratch.
+
+CP282 has 59 ordinary `if` heads plus ten `else if` heads, 12 bare
+`else` blocks, 24 logical ANDs, and 22 logical ORs. It has no loop, explicit
+return, break, continue, while, switch, ternary, try, or catch. There are 65
+direct persistent assignment sites over 25 normalized destinations.
+
+Direct reporting sites comprise six
+`BaseSizer::reportSizerOutput` calls, four `ShowMessage`, two
+`ShowWarningError`, and 22 `ShowContinueError`. Four hard-size comparisons
+use `std::abs` and the shared `AutoVsHardSizingThreshold`. CP282 itself
+has no direct Severe or Fatal site, although child sizers can terminate on
+missing sizing prerequisites.
+
+Airflow children normally report through EIO, predefined component-sizing
+tables, and optional SQLite records when `PrintFlag` is true. Flow-per-
+capacity precursor capacity calls and final custom capacity design calls
+generally suppress their child print, while CP282's own capacity report sites
+remain possible. EIO/table/SQL and diagnostic writes are all outside a
+transaction.
+
+The same local `ErrorsFound` reference is passed to all 22 possible child
+sites, but the tail never checks it. A child that merely sets the flag and
+returns therefore lets CP282 return normally and lets CP281 clear its sizing
+latch. No status communicates that incomplete sizing to the wrapper.
+
+There is no transaction, rollback, cleanup guard, or canonical scratch restore.
+A first-child abnormal exit can retain entry fan changes and earlier shared
+sizing writes. A later failure can additionally retain PurchasedAir flow
+overwrites, `ZoneEqSizing` flags and loads, fractions, sizing-method slots,
+`DataScalableSizingON`, report rows, database records, and diagnostic
+prefixes. A throwing or Fatal child leaves CP281's size latch armed for retry,
+but retry starts on top of that surviving prefix.
+
+Successful direct replay is not a pure operation either. In the legacy route,
+an `AutoSize` sentinel overwritten by a numeric result is classified as a
+hard value on a later call, changing report and OA-warning behavior. Custom
+replay can consume retained system-flow, capacity, fraction, method-slot, and
+scalable-sizing scratch. Report rows append again. Stable numeric results do
+not make the surrounding state or registry effects idempotent.
+
+CP282 does not validate input loading, `PurchAirNum`, `CurZoneEqNum`,
+`HVACSizingIndex`, `ZonePtr`, any corresponding arena extent, the
+`SizingMethod` array extent, the minimum eight numeric field names, method
+or limit enums, selector agreement, finite/physical floor area, design flow,
+mass flow, temperature, humidity ratio, or the availability of a completed
+Zone sizing run. Native invalid access has no routine-defined postcondition.
+
+The custom route takes floor area from `Zone(ZonePtr)`, while capacity
+children consume `FinalZoneSizing(CurZoneEqNum)`. If those selectors denote
+different Zones, one result can mix two Zones' sizing state without a
+diagnostic. Entry clears only the two fan flags; it does not clear scalable,
+flow, capacity, fraction, OA, method, or Zone-number scratch.
+
+`PurchAir`, `ZoneEqSizing`, every sizing scratch field, and all report
+registries are mutable shared state without synchronization. Concurrent calls
+on one simulation state can race object overwrites, method indexing, child
+scratch resets, and report streams. Independent simulation states avoid this
+routine's direct member sharing; deeper service/global thread safety is not
+established.
+
+The bounded C++ test execution census is exactly 11 CP282 calls, all in the
+zero-`HVACSizingIndex` legacy route. Two focused tests call CP282 directly.
+Both set `CurZoneEqNum=1`, `ZoneSizingRunDone=true`, both limits to
+`FlowRateAndCapacity`, and all four direct fields to `AutoSize`. Each
+invokes four sizers and owns four exact result assertions:
+
+- `SizePurchasedAirTest_Test1` uses `MinOA=0` and expects heating flow
+  1.0 m3/s, heating capacity 50,985.58 W, cooling flow 2.0 m3/s, and cooling
+  capacity 30,844.14 W;
+- Test2 uses `MinOA=0.5` plus a higher cooling inlet temperature and expects
+  the same flows, heating capacity 63,731.97 W, and cooling capacity
+  41,078.43 W.
+
+Those two tests provide the complete isolated CP282 oracle: eight assertions.
+They do not exercise a custom sizing record, hard sizing, no-sizing-run
+behavior, warnings, errors, failure, or replay.
+
+Eight additional first Init passes across eight
+`PurchasedAirManager.unit.cc` states reach CP282 once each: four through
+`ManageZoneEquipment` and four through direct Init. The NoCapacity test's
+second Init occurs after the size latch cleared and adds no call. Those eight
+test groups own 62 post-load assertions, but none directly checks a
+PurchasedAir sized field; their node, load, fuel, EMS, and report values are
+composite downstream effects.
+
+One `BaseClassSizing.unit.cc` full simulation adds one successful size pass.
+Its 11 post-run assertions inspect Zone sizing arrays, not PurchasedAir sized
+fields. Four separate `SizingManager.unit.cc` IdealLoads sizing-only
+simulations keep `SysSizingCalc` true and have no weather simulation, so they
+execute CP282 zero times.
+
+No C++ test reaches any `HVACSizingIndex>0` method. There is also no focused
+oracle for `CurZoneEqNum<=0`, hard-size/no-sizing-run asymmetry, selector or
+extent failure, an epJSON sizing label, exact EIO/predefined/SQL output, the
+zero-OA warning text, ignored `ErrorsFound`, partial failure, retry, replay,
+reset, multi-unit scratch pollution, or concurrency.
+
+The project model census remains 120, split 108 IDF and 12 epJSON. Exactly 30
+IDFs and no epJSON contain IdealLoads, with one unit in every such model. All
+30 disable every sizing phase in `SimulationControl`, contain no
+`Sizing:Zone`, `DesignSpecification:ZoneHVAC:Sizing`, or design-day
+object, and contain no literal `Autosize`.
+
+Heating and cooling have the same limit distribution: 27 `NoLimit` models
+and one each for capacity, flow, and flow-plus-capacity. The two flow-bearing
+models use hard 0.02 m3/s values on both sides; the two capacity-bearing models
+use hard 120 W values; inactive fields are blank. A fresh successful
+EnergyPlus process therefore enters CP282 once per model. Running all 30
+unique models once would make 30 CP282 calls and eight child-sizer calls:
+two for the capacity-only model, two for flow-only, and four for the combined
+model.
+
+The 140 case manifests contain 52 routes to those 30 models, split 46
+no-limit routes plus two routes for each finite-limit shape. One fresh process
+per route would make 52 CP282 calls and 16 child-sizer calls. The 47
+`compare-ideal-loads*.ps1` scripts each start one EnergyPlus baseline
+process, so one successful pass across them would make 47 CP282 calls; their
+finite-limit routes likewise total 16 child-sizer calls.
+
+Twenty-eight comparison scripts assert five PurchasedAir stage labels and the
+prebound lookup policy, but the labels are only Get, Init, Calc, Update, and
+Report. They contain no Size state or result assertion. The IdealLoads family
+contract explicitly leaves autosizing/Size parity outside the claim and
+restricts arbitrary-run compatibility to numeric or no-limit inputs. Current
+runtime output and meter evidence therefore does not establish CP282 sizing,
+reporting, or lifecycle parity.
+
+Rust preserves the four direct limit values as
+`Option<AutosizeOrNumber>` and preserves the optional normalized sizing-
+object name. The compiler accepts blank, nonnegative numeric, or `Autosize`
+values. Its focused parser test checks one autosized heating-flow field and
+one numeric cooling-flow field, but not all four fields or a sizing-object
+reference.
+
+`IdealLoadsFeatureFlags` detects any retained autosize value, and one
+dispatch test checks only `has_autosize=true`. For an active limit,
+`ideal_loads/input.rs` classifies an autosized or missing required quantity
+as `UnresolvedHeatingLimit` or `UnresolvedCoolingLimit`. The declared
+`IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` explicitly says arbitrary-run
+autosizing is blocked and conformance cases must reach Calc with resolved
+numeric or no-limit inputs.
+
+Rust Init creates a new descriptive snapshot with `sizing_checked=true`; it
+does not own a persistent transition or calculation. Limit extraction treats
+`Autosize` and absence as no numeric value. Five finite-limit calculation
+tests own 20 assertions for already resolved numeric clamp/cap/zero behavior,
+and one wrapper test checks a selected branch label. Those are not sizing
+oracles. The arbitrary-run `UnsupportedSizing` test blocks a generic
+`Sizing:Zone` fixture, not an IdealLoads autosize limit.
+
+There is no Rust `SizePurchasedAir` routine, Zone sizing arena, design-day
+state, sizer class, custom sizing-method graph, persistent size latch,
+PurchasedAir autosize writeback, hard/design report comparison, zero-OA
+warning, EIO component-sizing writer, child-error propagation, shared sizing
+scratch, or failure/replay/reset/concurrency behavior. Existing resolved-limit
+calculation, output, and meter conformance cannot promote CP282. The roadmap
+item to implement `SizePurchasedAir` remains open.
+
+CP282 adds canonical required `source_mapped`
+`routine.size_purchased_air` immediately after
+`routine.init_purchased_air` and before
+`routine.calc_purch_air_loads`, plus the matching HVAC project-contract
+item. It adds no algorithm-level source, Rust target or state, support
+declaration, test, capability, output, comparator, case, manifest, numerical
+claim, performance claim, or conformance promotion.
+
+The inventory becomes 32 algorithms and 283 routines, split 58
+`state_mapped` plus 225 `source_mapped`, with 160 required.
+Domain-required counts remain heat-balance 88, plant 1, and time/schedule 22,
+while HVAC becomes 49. Readiness remains `0/88`, `0/49`, `0/1`, and
+`0/22`. The IdealLoads parent remains `scaffold` at claim level `none`.
+
+CP283 next refreshes existing required `routine.calc_purch_air_loads`.
+`PurchasedAirManager::CalcPurchAirLoads` is declared at
+`PurchasedAirManager.hh` lines 345-349 and implemented at
+`PurchasedAirManager.cc` lines 1906-2760. The next physical definition,
+`CalcPurchAirMinOAMassFlow`, begins at source line 2762.
 
 
 
