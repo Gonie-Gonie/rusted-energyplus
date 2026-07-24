@@ -32130,17 +32130,222 @@ heat-balance 88, HVAC 57, plant 1, and time/schedule 22. Readiness remains
 `0/88`, `0/57`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
 claim level `none`.
 
-CP294 next adds canonical required source-mapped
-`routine.check_purchased_air_for_return_plenum` and the matching HVAC
+CP294 adds canonical required `source_mapped`
+`routine.check_purchased_air_for_return_plenum` immediately after
+`routine.get_purchased_air_mixed_air_hum_rat`, plus the matching HVAC
 project-contract item. `CheckPurchasedAirForReturnPlenum` is declared at
 `PurchasedAirManager.hh` line 383 and implemented at
-`PurchasedAirManager.cc` lines 3236-3266; the following definition,
-`InitializePlenumArrays`, begins at source line 3268. Its body is 31 physical
-lines, 24 nonblank lines, and 17 nonblank, non-comment lines. The exact
-parenthesized source-plus-test census is four: declaration, definition, and the
-two production calls from `GeneralRoutines.cc` line 1531 and `ZonePlenum.cc`
-line 401. Its bare census is nine because the body-local result name and a
-`using` declaration add five occurrences. There is no direct C++ test call.
+`PurchasedAirManager.cc` lines 3236-3266. The following and final source
+routine, `InitializePlenumArrays`, begins at line 3268.
+
+The complete CP294 body is 31 physical lines, 24 nonblank lines, and 17
+nonblank, non-comment lines. Its exact parenthesized source-plus-test census is
+four: the declaration, definition, and production calls from
+`GeneralRoutines.cc` line 1531 and `ZonePlenum.cc` line 401. Its bare census is
+nine: those four plus the local Boolean declaration, two assignments, return,
+and the `using` declaration at `ZonePlenum.cc` line 227. The test tree contains
+no callable or bare occurrence, so direct C++ calls/assertions are `0/0`.
+
+CP294 first reads the shared `GetPurchAirInputFlag`. If true, it calls CP280
+`GetPurchasedAir` and clears the latch only after that child returns normally.
+It then initializes a local result false and scans every one-based PurchasedAir
+record from one through inclusive `NumPurchAir`. An exact integer equality
+between the query and a record's `ReturnPlenumIndex` sets the result true. The
+loop deliberately has no early break, so a later mismatch does not clear a
+prior match and every remaining declared slot is still accessed. The final
+Boolean is returned by value.
+
+With comments stripped, the body has two `if` heads, one `for`, two integer
+comparisons, four assignments including loop initialization and the shared
+latch write, one increment, one `continue`, one child call, one syntactic
+Array1D record accessor, and one return. It has no logical operator, `else`,
+`switch`, `case`, `break`, recursion, node access, diagnostic, status,
+transaction, rollback, assertion, exception handling, or synchronization. Its
+structural McCabe count is four.
+
+The query itself is not checked against
+`state.dataZonePlenum->NumZoneReturnPlenums`, and CP294 compares no plenum name,
+outlet node, induced node, ownership, or topology. Both production callers
+supply positive one-based plenum indices, but a direct zero query matches any
+fresh default record and a negative query can match directly injected negative
+state. A match therefore means only that one declared PurchasedAir record
+currently stores the same integer.
+
+`ZonePurchasedAir::ReturnPlenumIndex` is declared at
+`PurchasedAirManager.hh` line 138 and defaults to zero in the constructor at
+line 278. CP280 input loading does not assign it. CP281 `InitPurchasedAir` owns
+the sole normal assignment at `PurchasedAirManager.cc` line 1092, after
+resolving a positive `PlenumExhaustAirNodeNum` through
+`ZonePlenum::GetReturnPlenumIndex`; a positive result then reaches CP295
+initialization. Direct mutation and reset remain possible state changes, but
+CP294 owns no writer.
+
+A clean direct first call runs CP280, clears the latch, and scans the newly
+loaded records. Because CP280 leaves the field at its zero default, a positive
+query normally returns false, while query zero returns true whenever at least
+one record was loaded. Later CP281 initialization can change the result of the
+same positive query. CP294 neither forces nor verifies that initialization has
+run.
+
+If CP280 fatals or exits abnormally, the false latch assignment is not reached.
+The latch remains true while any completed allocation, parser, node, Schedule,
+diagnostic, output-registration, or EMS-registration prefix can survive.
+Retry re-enters the non-idempotent loader against partial state. CP294 provides
+no cleanup, completion marker, or rollback.
+
+If CP280 returns normally, the latch is false before scanning. A logical count
+at or below zero returns false without touching the arena. A count below the
+allocated length hides tail matches; a count above a short or deallocated
+arena can reach unchecked native Array1D access. An arena longer than the count
+also hides its tail. With an extreme corrupt count and a sufficiently large
+arena, the terminal integer increment can overflow. Because the loop never
+breaks, even a match in an early valid slot does not protect a later corrupt
+slot. These malformed native-state cases have no portable postcondition.
+
+With a false latch, stable count and arena, and no writer, replay is a
+deterministic O(`NumPurchAir`) current-state scan and is value-idempotent. It
+is not a cached answer. CP281 assignment, direct mutation, count or arena
+replacement, or `clear_state()` can change the next result; reset re-arms the
+latch and deallocates the PurchasedAir arena.
+
+CP294 has no atomic publication or locking. Two first entrants can race on the
+shared latch and CP280's mutable loader. A loaded scan can race with CP281,
+reset, deallocation, reallocation, count mutation, or direct field mutation.
+Native data races have no defined postcondition. Read/read replay is safe only
+for stable, fully loaded state with no concurrent writer.
+
+The first direct production caller is
+`GeneralRoutines::TestReturnAirPathIntegrity`, implemented from
+`GeneralRoutines.cc` line 1204. It dimensions `FoundReturnPlenum` false, scans
+every declared `AirLoopHVAC:ReturnPath` component for each return plenum, and
+records ordinary path membership or duplicate-entry diagnostics. At line 1531
+it then calls CP294 once per `NumZoneReturnPlenums`; a true result sets that
+plenum's found bit true.
+
+A CP294 true result can therefore let an IdealLoads-linked return plenum avoid
+the later lines 1578-1587 severe message that it was not found on any
+`AirLoopHVAC:ReturnPath`. It does not add a path name, populate
+`ValRetAPaths`, clear a duplicate diagnostic or existing `ErrFound`, or prove
+node connectivity. The missing-plenum message block itself does not assign
+`ErrFound`; CP294 changes that diagnostic reach, not a direct Boolean terminal
+flag write.
+
+`GeneralRoutines::TestAirPathIntegrity` calls the return-path checker at line
+873. Ordinary setup reaches the parent from `SimulationManager.cc` line 307
+after the simulation input/setup kickoff, and fatal final processing can call
+it again from `UtilityRoutines.cc` line 389 against partially prepared state.
+The nested loops make CP294's full scan repeat once per return plenum, for a
+PurchasedAir contribution proportional to the product of the two declared
+counts. CP294 itself owns neither caller scheduling nor error finalization.
+
+The second direct production caller is `ZonePlenum::GetZonePlenumInput`. For
+each valid induced-air node in a return plenum's node or NodeList, source line
+401 asks CP294 about the current positive `ZonePlenumNum`. False runs both
+`CheckUniqueNodeNumbers` and `PoweredInductionUnits::PIUInducesPlenumAir`;
+true skips that entire block. A duplicate-node result can set the caller's
+`ErrorsFound`, while the PIU child lazily loads PIUs and, on a matching
+secondary inlet node, writes `InducesPlenumAir = true` and `plenumIndex` at
+`PoweredInductionUnits.cc` lines 2672-2681.
+
+CP294 compares only the return-plenum index, not the current induced node. One
+matching PurchasedAir record consequently returns true for every induced node
+of that plenum and suppresses both unique-node checking and all corresponding
+PIU marking calls. A false result invokes the PIU child even after a detected
+unique-node error. A blank induced-air field creates no node-loop iteration and
+therefore no CP294 call.
+
+The clean first-load order has an important cycle. CP281 calls
+`ZonePlenum::GetReturnPlenumIndex` before assigning the resulting index at
+`PurchasedAirManager.cc` line 1092. That accessor lazily enters
+`GetZonePlenumInput` at `ZonePlenum.cc` lines 1226-1228, where CP294 runs while
+the source-populated positive PurchasedAir index is still unavailable. Thus a
+clean initial parser call with positive `ZonePlenumNum` normally returns false;
+a true result there requires preseeded state, re-entry, or direct mutation.
+After the parser returns, CP281 can assign the index, and the later General
+integrity caller can observe it. CP294 does not resolve this circular ordering.
+
+The bounded C++ audit finds five indirect CP294 executions and no true result.
+`PTACDrawAirfromReturnNodeAndPlenum_Test` in
+`PackagedTerminalHeatPump.unit.cc` lines 1345-4084 creates the return plenum and
+a three-node induced NodeList at lines 3742-3764, so input parsing reaches the
+ZonePlenum caller three times with no PurchasedAir records. The same file's
+`PTAC_ZoneEquipment_NodeInputTest`, lines 4086-4372, defines one induced node at
+lines 4285-4292 and explicitly calls `GetZonePlenumInput` at line 4304, adding
+one false execution.
+
+`PIU_InducedAir_Plenums` in `PoweredInductionUnits.unit.cc` lines 836-2005
+adds the fifth false execution through its one induced node at lines 1894-1900
+and high-level `ManageSizing` call at line 1998. That false path participates
+in the PIU child's induced-air writes. The fixture subsequently checks only
+that sizing does not throw and that a two-line progress stream matches at lines
+1998-2004; it does not independently read the CP294 Boolean or both PIU fields,
+so this is composite non-isolated evidence rather than a CP294-sensitive
+assertion.
+
+Accordingly, direct calls/assertions are `0/0`, bounded indirect true/false
+executions are `0/5`, and explicit CP294-result-sensitive true/false assertions
+are `0/0`. The PurchasedAir `IdealLoads_PlenumTest` does establish an adjacent
+`ReturnPlenumIndex == 1`, but its induced-air field is blank and it does not
+call return-path integrity, so it executes CP294 zero times. Two direct
+`TestAirPathIntegrity` HVACFourPipeBeam fixtures declare no return plenum and
+also execute the CP294 loop zero times.
+
+No C++ test covers a true match, query zero or a negative query, multiple or
+duplicate matches, proof that the scan continues after a match, a low or high
+logical count, an absent or short arena, lazy child failure and retry, the
+clean circular first-load timing, later General-caller suppression, reset,
+mutated replay, repeated finalization, or concurrency.
+
+Rust has no exact CP294 predicate, typed return-plenum arena, lazy PurchasedAir
+record arena, General return-path checker, ZonePlenum parser caller, or PIU
+marking consumer. CP294-specific Rust implementation, test, and assertion
+counts are therefore `0/0/0`. No Rust source defines the exact
+`AirLoopHVAC:ReturnPlenum` or `ZoneHVAC:ReturnPlenum` object token.
+
+The adjacent `IdealLoadsInitFlags` in
+`crates/ep_runtime/src/ideal_loads/init.rs` lines 5-27 declares
+`return_plenum_inactive` at line 15 and hard-codes it true at line 27. That
+immutable marker describes a deliberately inactive boundary; it neither scans
+records nor represents a plenum identity or either production caller.
+`outdoor_air_wrapper_tests.rs` lines 45-48 compare the complete flags value to
+another call of the same `source_order_candidate()` constructor, so the marker
+is structurally included but has no independent literal assertion.
+`dispatch.rs` line 466 asserts only the adjacent `one_time_checked` flag. These
+are scaffold evidence, not CP294 behavior.
+
+The audited corpus contains 120 model inputs, split 108 IDF and 12 epJSON, 142
+`*case.toml` manifests, and 47 IdealLoads comparison scripts. Thirty models
+contain IdealLoads systems, with 52 manifest routes. Exact
+`AirLoopHVAC:ReturnPlenum` model/manifest/script coverage is `0/0/0`; the
+source-diagnostic spelling `ZoneHVAC:ReturnPlenum` is also `0/0/0`. All 30
+IdealLoads models leave the System Inlet Air Node Name blank, so none requests
+the CP281 link that could make a later CP294 positive.
+
+The corpus consequently has no active return-plenum topology, CP294 entry
+counter, Boolean output, or downstream assertion capable of distinguishing
+its true and false branches. Existing IdealLoads output comparisons bypass the
+predicate and do not establish General-path diagnostic suppression,
+ZonePlenum unique-node behavior, or PIU induced-air marking.
+
+CP294 adds no algorithm-level source, Rust target or state, support declaration,
+test, capability, output, comparator, case, manifest, numerical claim,
+performance claim, readiness promotion, or conformance promotion. The
+inventory becomes 32 algorithms and 292 routines, split 58 `state_mapped` plus
+234 `source_mapped`, with 169 required. Domain-required counts become
+heat-balance 88, HVAC 58, plant 1, and time/schedule 22. Readiness remains
+`0/88`, `0/58`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
+claim level `none`.
+
+CP295 next adds canonical required source-mapped
+`routine.initialize_plenum_arrays` and the matching HVAC project-contract
+item. `InitializePlenumArrays` is declared at `PurchasedAirManager.hh` line
+385, called once from CP281 at `PurchasedAirManager.cc` line 1095, and occupies
+terminal source lines 3268-3473; the namespace closes at line 3475, so there is
+no following routine definition. Its body is 206 physical lines, 185 nonblank
+lines, and 88 nonblank, non-comment lines. Parenthesized and bare
+source-plus-test censuses are both three, direct C++ calls/assertions are
+`0/0`, and one bounded `IdealLoads_PlenumTest` execution has zero
+CP295-owned-state assertions.
 
 
 
