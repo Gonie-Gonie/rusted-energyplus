@@ -182,7 +182,7 @@ claim.
 | thermostat-setpoint predefined LEED table | `FillPredefinedTableOnThermostatSetpoints`, declared at `ZoneTempPredictorCorrector.hh` line 376, implemented at `ZoneTempPredictorCorrector.cc` lines 6558-6672, and called only by `FillRemainingPredefinedEntries` line 6998 | CP233 adds required `routine.fill_predefined_table_on_thermostat_setpoints` as source-mapped only. Global schedule-ID first-wins traversal, seasonal Wednesday value/count queries, split synthetic rows, append-only table mutation, final-report cadence, and failure/retry remain source-only; Rust has no four-family arena, exact seasonal query, predefined table store, helper, caller, or focused test. |
 | thermostat-schedule predefined System Summary table | `FillPredefinedTableOnThermostatSchedules`, declared at `ZoneTempPredictorCorrector.hh` line 378, implemented at `ZoneTempPredictorCorrector.cc` lines 6674-6766, and called only by `FillRemainingPredefinedEntries` line 6999 | CP234 adds required `routine.fill_predefined_table_on_thermostat_schedules` as source-mapped only. Stored ordinary-Zone traversal, fixed-slot inclusion, tuple sort, independently filtered joins, append-only table mutation, final-report cadence, and failure/retry/reset remain source-only; Rust has no complete control arena, predefined System Summary store, helper, caller, serializer, or focused table comparator. |
 | Zone/Space predictor temperature-history preparation | `ZoneSpaceHeatBalanceData::updateTemperatures`, declared at `ZoneTempPredictorCorrector.hh` lines 233-234, implemented at `ZoneTempPredictorCorrector.cc` lines 6768-6833, and called only as the first child of `predictSystemLoad` line 3155 | CP235 adds required `routine.zone_space_heat_balance_update_temperatures` as source-mapped only. Unconditional four-slot working-history selection, shortened Zone/Space node rollback, count-change helper order, RoomAir topology, partial failure, cadence, replay, and reset remain source-only; Rust has only Zone three-slot adaptive history without the exact wrapper or topology. |
-| Zone/Space predicted sensible system load | `ZoneSpaceHeatBalanceData::calcPredictedSystemLoad`, declared at `ZoneTempPredictorCorrector.hh` line 224, implemented at `ZoneTempPredictorCorrector.cc` lines 6835-7243, and called only by `predictSystemLoad` line 3253 | CP236 remains required/source-mapped. CP296 adds only the pure direct-Zone DualSetpoint/ThirdOrder raw-load and correction/Zone/List scaling snapshot. Five-way control, other algorithms, RAFN/ITE/Space/staged branches, shared state writes, sequenced demand, live demand synthesis, runtime caller, failure/replay, and reset remain unsupported. |
+| Zone/Space predicted sensible system load | `ZoneSpaceHeatBalanceData::calcPredictedSystemLoad`, declared at `ZoneTempPredictorCorrector.hh` line 224, implemented at `ZoneTempPredictorCorrector.cc` lines 6835-7243, and called only by `predictSystemLoad` line 3253 | CP236 remains required/source-mapped. CP296 adds only the pure direct-Zone DualSetpoint/ThirdOrder raw-load and correction/Zone/List scaling snapshot. CP298 separately exposes named ThirdOrder predictor-term slots with no dedicated system-air-sum fields and one `SysDepZoneLoadsLagged` slot, but it validates neither scalar provenance nor a live state owner/caller. Five-way control, other algorithms, RAFN/ITE/Space/staged branches, shared state writes, sequenced demand, live demand synthesis, runtime caller, failure/replay, and reset remain unsupported. |
 | internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
 | space internal convective gains | `spaceSumAllInternalConvectionGains` | mapped-not-ported |
 
@@ -32868,6 +32868,75 @@ The `zone_temp_predictor_corrector_source_order` and
 required counts, readiness `0/88`, `0/59`, `0/1`, `0/22`, capabilities,
 outputs, manifests, comparators, performance, and conformance claims do not
 change.
+
+## CP298 Bounded Predictor-Time Third-Order Load-Term Assembly
+
+CP298 adds the next pure prerequisite for Roadmap Section 12's first item; it
+does not connect the release IdealLoads path or complete oracle/default-demand
+removal. The bounded source slice is direct-Zone, fully mixed, ThirdOrder
+`ZoneSpaceHeatBalanceData::predictSystemLoad` at
+`ZoneTempPredictorCorrector.cc` lines 3146-3256, specifically `AirPowerCap` at
+lines 3167-3169 and the coefficient/load-term assignments at lines 3183-3187
+around predictor-time `calcZoneOrSpaceSums`. Space, RoomAir AFN, and
+non-ThirdOrder branches remain outside this arithmetic boundary and are not
+validated by the new DTO.
+
+`assemble_predictor_third_order_load_terms` takes named scalar slots intended
+for predictor-side `SumHA`, non-system `SumMCp`, `SumIntGain`, `SumHATsurf`,
+`SumHATref`, non-system `SumMCpT`, `SysDepZoneLoadsLagged`, moist-air heat
+capacity, a caller-supplied system timestep, and a three-value `ZTM` history.
+The input type exposes no dedicated `SumSysMCp` or `SumSysMCpT` fields because
+the source states that those system-air sums are not used in prediction. The
+plain `f64` slots do not validate provenance, predictor timing, topology, or
+fixed-timestep ownership; those remain caller obligations. The source
+assignment order and equations are:
+
+```text
+AirPowerCap = air_heat_capacity / timestep_seconds
+TempDepCoef = SumHA + SumMCp
+TempIndCoef = SumIntGain + SumHATsurf - SumHATref
+            + SumMCpT + SysDepZoneLoadsLagged
+TempHistoryTerm = AirPowerCap * (3 * ZTM[0] - 3/2 * ZTM[1] + 1/3 * ZTM[2])
+tempDepLoad = 11/6 * AirPowerCap + TempDepCoef
+tempIndLoad = TempHistoryTerm + TempIndCoef
+```
+
+Every scalar and history input must be finite, the caller-supplied system
+timestep must be strictly positive, and each computed source-ordered term must
+remain finite. Finite zero or negative air heat capacity is not silently
+rewritten; it reaches the equations if the results remain finite. Rejection is
+transactional because the pure function returns no partial snapshot. The
+output retains both coefficients, `AirPowerCap`, the history term, and final
+`tempDepLoad` and `tempIndLoad` values so a later caller can feed CP296 without
+using the current correction-time diagnostic coefficient snapshot.
+
+Four focused Rust tests lock the complete arithmetic vector, including one
+7 W lagged load and unchanged finite negative heat capacity; prove that
+changing `SysDepZoneLoadsLagged` changes only `TempIndCoef` and `tempIndLoad`,
+exactly once; compose assembled `(tempDepLoad,tempIndLoad)=(125,0)` into
+CP296's heating fixture; and reject a nonfinite lagged input,
+positive-timestep invariant violations including signed zero, and capacity or
+coefficient overflow while preserving `AirPowerCap`-first error precedence.
+The API exposes no dedicated system-air-sum fields, but a caller could still
+fold arbitrary values into the named scalars, so provenance remains unproved.
+
+This is not a live predictor-state owner. Rust `ZoneHeatBalanceState` still has
+no `SysDepZoneLoadsLagged` field, its existing correction paths still combine
+system sums at correction timing, and no heat-balance timestep calls CP298 or
+CP296. Thermostat schedule sampling, control-type validation, setpoint/node
+state, history mutation, adaptive timestep, equipment sequencing, routing
+CP298/CP296 output through the existing generic PurchasedAir runtime, supply
+feedback, and a combined heat-balance/IdealLoads loop remain unsupported. The
+release IdealLoads path still constructs a fixed compatibility demand and
+repeats one result across samples, and `ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE`
+remains unchanged.
+
+The `zone_temp_predictor_corrector_source_order` parent remains `scaffold` at
+claim level `none`, and `predictSystemLoad` plus `calcPredictedSystemLoad`
+remain `source_mapped`. CP298 adds one Rust target and bounded unit evidence
+only. Algorithm/routine counts, required counts, readiness, capabilities,
+outputs, manifests, comparators, performance, and conformance claims do not
+change; Roadmap Section 12's first checkbox remains open.
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

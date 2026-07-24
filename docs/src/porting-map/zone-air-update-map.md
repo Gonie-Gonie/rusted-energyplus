@@ -55,7 +55,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | thermostat-setpoint predefined LEED table | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::FillPredefinedTableOnThermostatSetpoints` | normalized DualSetpoint graph, calendar-aware schedule series, and separate constant-schedule IdealLoads diagnostics only | CP233 required source-mapped four-family first-schedule-ID-wins traversal, winter/summer Wednesday samples and counts, base/synthetic row keys, append-only predefined cells, final-report cadence, and failure/retry lifecycle; reporting input stays ignored and no exact Rust arena, seasonal query, table store, helper, caller, or test exists |
 | thermostat-schedule predefined System Summary table | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::FillPredefinedTableOnThermostatSchedules` | direct-Zone DualSetpoint graph and IdealLoads schedule resolution only | CP234 required source-mapped stored ordinary-Zone traversal, nonempty-name slot selection, tuple sort, independently filtered string joins, four-to-six append-only cells, final-report cadence, and failure/retry/reset lifecycle; reporting input stays ignored and no complete Rust arena, predefined table store, helper, caller, serializer, or comparator exists |
 | Zone/Space predictor temperature-history preparation | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::updateTemperatures` | Zone-only three-slot adaptive temperature/humidity histories and helper | CP235 required source-mapped unconditional four-slot working-history selection plus shortened Zone/Space node rollback and count-change RoomAir interpolation orchestration; no exact Rust Space/node/thermostat/enthalpy/RoomAir topology, source cadence, wrapper, or test exists |
-| Zone/Space predicted sensible system load | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::calcPredictedSystemLoad` | CP296 `calc_predicted_system_load_dual_setpoint_third_order` pure snapshot plus adjacent coefficient, node, oracle-demand, and multiplier scaffolds | CP236 remains required/source-mapped. CP296 implements only finite direct-Zone DualSetpoint/ThirdOrder raw-load selection and correction/Zone/List scaling; no full dispatcher, Space/RAFN/ITE/staged branch, state mutation, live demand synthesis, or runtime caller exists |
+| Zone/Space predicted sensible system load | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::calcPredictedSystemLoad` | CP296 `calc_predicted_system_load_dual_setpoint_third_order` plus CP298 `assemble_predictor_third_order_load_terms` pure snapshots and adjacent node, oracle-demand, and multiplier scaffolds | CP236 remains required/source-mapped. CP298 exposes named ThirdOrder predictor-term slots with no dedicated system-air-sum fields and one `SysDepZoneLoadsLagged` slot, but it validates neither scalar provenance nor a live state owner/caller; no full dispatcher, Space/RAFN/ITE/staged branch, state mutation, live demand synthesis, or runtime caller exists |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -20585,6 +20585,75 @@ The `zone_temp_predictor_corrector_source_order` and
 required counts, readiness `0/88`, `0/59`, `0/1`, `0/22`, capabilities,
 outputs, manifests, comparators, performance, and conformance claims do not
 change.
+
+## CP298 Bounded Predictor-Time Third-Order Load-Term Assembly
+
+CP298 adds the next pure prerequisite for Roadmap Section 12's first item; it
+does not connect the release IdealLoads path or complete oracle/default-demand
+removal. The bounded source slice is direct-Zone, fully mixed, ThirdOrder
+`ZoneSpaceHeatBalanceData::predictSystemLoad` at
+`ZoneTempPredictorCorrector.cc` lines 3146-3256, specifically `AirPowerCap` at
+lines 3167-3169 and the coefficient/load-term assignments at lines 3183-3187
+around predictor-time `calcZoneOrSpaceSums`. Space, RoomAir AFN, and
+non-ThirdOrder branches remain outside this arithmetic boundary and are not
+validated by the new DTO.
+
+`assemble_predictor_third_order_load_terms` takes named scalar slots intended
+for predictor-side `SumHA`, non-system `SumMCp`, `SumIntGain`, `SumHATsurf`,
+`SumHATref`, non-system `SumMCpT`, `SysDepZoneLoadsLagged`, moist-air heat
+capacity, a caller-supplied system timestep, and a three-value `ZTM` history.
+The input type exposes no dedicated `SumSysMCp` or `SumSysMCpT` fields because
+the source states that those system-air sums are not used in prediction. The
+plain `f64` slots do not validate provenance, predictor timing, topology, or
+fixed-timestep ownership; those remain caller obligations. The source
+assignment order and equations are:
+
+```text
+AirPowerCap = air_heat_capacity / timestep_seconds
+TempDepCoef = SumHA + SumMCp
+TempIndCoef = SumIntGain + SumHATsurf - SumHATref
+            + SumMCpT + SysDepZoneLoadsLagged
+TempHistoryTerm = AirPowerCap * (3 * ZTM[0] - 3/2 * ZTM[1] + 1/3 * ZTM[2])
+tempDepLoad = 11/6 * AirPowerCap + TempDepCoef
+tempIndLoad = TempHistoryTerm + TempIndCoef
+```
+
+Every scalar and history input must be finite, the caller-supplied system
+timestep must be strictly positive, and each computed source-ordered term must
+remain finite. Finite zero or negative air heat capacity is not silently
+rewritten; it reaches the equations if the results remain finite. Rejection is
+transactional because the pure function returns no partial snapshot. The
+output retains both coefficients, `AirPowerCap`, the history term, and final
+`tempDepLoad` and `tempIndLoad` values so a later caller can feed CP296 without
+using the current correction-time diagnostic coefficient snapshot.
+
+Four focused Rust tests lock the complete arithmetic vector, including one
+7 W lagged load and unchanged finite negative heat capacity; prove that
+changing `SysDepZoneLoadsLagged` changes only `TempIndCoef` and `tempIndLoad`,
+exactly once; compose assembled `(tempDepLoad,tempIndLoad)=(125,0)` into
+CP296's heating fixture; and reject a nonfinite lagged input,
+positive-timestep invariant violations including signed zero, and capacity or
+coefficient overflow while preserving `AirPowerCap`-first error precedence.
+The API exposes no dedicated system-air-sum fields, but a caller could still
+fold arbitrary values into the named scalars, so provenance remains unproved.
+
+This is not a live predictor-state owner. Rust `ZoneHeatBalanceState` still has
+no `SysDepZoneLoadsLagged` field, its existing correction paths still combine
+system sums at correction timing, and no heat-balance timestep calls CP298 or
+CP296. Thermostat schedule sampling, control-type validation, setpoint/node
+state, history mutation, adaptive timestep, equipment sequencing, routing
+CP298/CP296 output through the existing generic PurchasedAir runtime, supply
+feedback, and a combined heat-balance/IdealLoads loop remain unsupported. The
+release IdealLoads path still constructs a fixed compatibility demand and
+repeats one result across samples, and `ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE`
+remains unchanged.
+
+The `zone_temp_predictor_corrector_source_order` parent remains `scaffold` at
+claim level `none`, and `predictSystemLoad` plus `calcPredictedSystemLoad`
+remain `source_mapped`. CP298 adds one Rust target and bounded unit evidence
+only. Algorithm/routine counts, required counts, readiness, capabilities,
+outputs, manifests, comparators, performance, and conformance claims do not
+change; Roadmap Section 12's first checkbox remains open.
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:
