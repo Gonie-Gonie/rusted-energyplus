@@ -185,6 +185,7 @@ required_routines = [
   "get_purchased_air_mixed_air_temp",
   "get_purchased_air_mixed_air_hum_rat",
   "check_purchased_air_for_return_plenum",
+  "initialize_plenum_arrays",
 ]
 
 [[domain_claim]]

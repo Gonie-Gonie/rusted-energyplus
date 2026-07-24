@@ -20171,16 +20171,256 @@ heat-balance 88, HVAC 58, plant 1, and time/schedule 22. Readiness remains
 `0/88`, `0/58`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
 claim level `none`.
 
-CP295 next adds canonical required source-mapped
-`routine.initialize_plenum_arrays` and the matching HVAC project-contract
-item. `InitializePlenumArrays` is declared at `PurchasedAirManager.hh` line
-385, called once from CP281 at `PurchasedAirManager.cc` line 1095, and occupies
-terminal source lines 3268-3473; the namespace closes at line 3475, so there is
-no following routine definition. Its body is 206 physical lines, 185 nonblank
-lines, and 88 nonblank, non-comment lines. Parenthesized and bare
-source-plus-test censuses are both three, direct C++ calls/assertions are
-`0/0`, and one bounded `IdealLoads_PlenumTest` execution has zero
-CP295-owned-state assertions.
+CP295 adds canonical required `source_mapped`
+`routine.initialize_plenum_arrays` immediately after
+`routine.check_purchased_air_for_return_plenum`, plus the matching HVAC
+project-contract item. `InitializePlenumArrays` is declared at
+`PurchasedAirManager.hh` line 385, has its sole production call at
+`PurchasedAirManager.cc` line 1095, and occupies terminal source lines
+3268-3473. Line 3474 is blank and the namespace closes at line 3475, so there
+is no following routine definition in this translation unit.
+
+The complete body is 206 physical lines, 185 nonblank lines, and 88 nonblank,
+non-comment lines. Parenthesized and bare source-plus-test censuses are both
+three: declaration, sole production call, and definition. The test tree has no
+symbol occurrence, so direct C++ calls/assertions are `0/0`.
+
+With comments stripped, CP295 has three `if` heads, one `else`, five `for`
+loops, six integer comparisons, 31 simple assignments, two compound `+=`
+assignments, five increments, one `continue`, one `break`, 15 syntactic
+`allocate` calls, four `deallocate` calls, and one `allocated` query. It has no
+explicit return, floating-point operation, clamp, tolerance, output reference,
+diagnostic, status, transaction, rollback, exception boundary, or child
+EnergyPlus routine. Its structural McCabe count is nine.
+
+The four function-scope locals are a copied integer `ReturnPlenumIndex`, a true
+`PlenumNotFound` sentinel, and temporary integer-membership and Boolean-state
+arrays. CP295 reads the selected `PurchAir(PurchAirNum).ReturnPlenumIndex`
+through an unchecked one-based access before choosing a branch. The formal
+unit index is const by value, the function returns void, and all observable
+results are mutable manager state.
+
+The relevant record shape is declared at `PurchasedAirManager.hh` lines
+315-327. Each compact `PurchAirPlenumArrayData` row owns a logical member count,
+the actual Zone return-plenum index, a `PurchAirArray` list of PurchasedAir unit
+indices, and a parallel `IsSimulated` Boolean vector. The manager owns
+`NumPlenumArrays`, the primary row arena, and a manager-resident temporary row
+arena at header lines 392, 397, and 403-404. Each PurchasedAir unit owns its
+actual `ReturnPlenumIndex` and only an inner `PurchAirArrayIndex` at header
+lines 138-139.
+
+If the primary row arena is unallocated, source lines 3347-3368 force the
+selected unit's inner index and the outer logical count to one, allocate one
+row, set its member count to one and actual-plenum key to the copied value,
+allocate one-element membership and Boolean arrays, and store
+`{PurchAirNum, false}`. The branch is selected by physical allocatedness, not
+by `NumPlenumArrays`.
+
+If the primary arena is already allocated, lines 3373-3413 scan compact rows
+one through inclusive `NumPlenumArrays`. The first exact stored-plenum-key
+match snapshots both member arrays into the two local temporaries, increments
+the row member count, publishes the selected unit's new last inner index,
+reallocates both row arrays to that exact new count, restores every old member
+and old simulation bit, appends `{PurchAirNum, false}`, clears the not-found
+sentinel, and breaks. Later duplicate row keys are not visited.
+
+If no visible row matches, lines 3416-3470 increment the outer logical count
+before allocation, allocate the manager-owned temporary outer arena, and deep-
+copy every visible old row's scalar fields, member list, and simulation bits.
+They then deallocate and recreate the primary arena, preallocate the old child
+arrays, assign the temporary topology back, and deallocate the manager scratch.
+The new last row receives member count one, the actual-plenum key, and
+`{PurchAirNum, false}`, while the selected unit receives inner index one.
+
+Normal group order is therefore first encounter of each distinct actual plenum
+index, and membership order is CP295 call order. Expanding an existing group or
+adding a group preserves all copied prior `IsSimulated` bits and gives only the
+new member a false bit. CP295 performs no sorting, deduplication, removal,
+capacity reservation, generation tagging, or validation of a unit, key, count,
+extent, membership, or bit.
+
+`NumPlenumArrays`, each stored group key, each row member count, and
+`PurchAirArray` have no production reader outside CP295; `clear_state()` only
+writes the outer logical count back to zero. CP286
+`UpdatePurchasedAir` is the actual runtime consumer of the Boolean barrier. It
+uses the unit's `PurchAirArrayIndex` to mark a bit, runs `all`, calls
+`SimAirZonePlenum` on quorum, and resets the selected whole bit vector at
+`PurchasedAirManager.cc` lines 2966-2983. CP295 itself writes no node,
+thermodynamic value, report field, output, or meter.
+
+There is a source-visible outer-index inconsistency. CP295 constructs only a
+compact row ordinal and stores the actual return-plenum index as a row key, but
+it stores no compact outer ordinal on the unit. The comments at source lines
+3281-3288 explicitly illustrate actual plenum one unused, actual plenum two in
+compact row one, and actual plenum three in compact row two. Lines 3292-3300
+then describe a per-unit `PlenumArrayIndex` that does not exist in the record;
+only the actual `ReturnPlenumIndex` and inner `PurchAirArrayIndex` exist.
+
+CP286 nevertheless indexes the outer compact arena directly with
+`PurchAir.ReturnPlenumIndex` at source lines 2969, 2972, and 2981 instead of
+searching CP295's stored key. Correct access consequently requires every
+first-seen compact group ordinal to equal its actual Zone return-plenum index,
+an invariant CP295 neither establishes nor checks. A skipped earlier plenum or
+reordered first encounter can select the wrong group or exceed the compact
+arena.
+
+If the wrong group exists, its unrelated inner extent may still reject the
+unit's stored member index. If both accesses happen to be valid, another
+group's bits can delay or prematurely satisfy `all`; CP286 can then simulate
+the current unit's actual named/indexed plenum based on those unrelated bits
+and reset the wrong vector. CP295's otherwise retained member list and stored
+actual key are not consumed to detect or repair that mismatch.
+
+The sole normal caller is inside CP281 `InitPurchasedAir`. `SimPurchasedAir`
+ensures input loading, then orders Init, Calc, Update, and Report at source
+lines 201, 203, 205, and 207. Once `ZoneEquipInputsFilled` is true, CP281 sets
+`InitPurchasedAirZoneEquipmentListChecked = true` before traversing every
+PurchasedAir record in input order at lines 1085-1088. For each record with a
+positive `PlenumExhaustAirNodeNum`, it resolves and stores the actual plenum
+index, requires that result positive, obtains the name, and calls CP295 at
+lines 1090-1095.
+
+That first eligible Init call therefore builds all linked groups before the
+current unit reaches Calc and CP286 Update. If Zone equipment inputs are not
+yet filled, the build is deferred; the current unit retains default zero
+`ReturnPlenumIndex`, so its following CP286 call skips the plenum branch. A
+later eligible Init can perform the one-time build.
+
+`CheckZoneEquipmentList` runs only after CP295 at source lines 1104-1110. A
+linked IdealLoads unit that is subsequently diagnosed as absent from every
+Zone equipment list has already been appended with a false bit. Because that
+unit is said not to simulate, the bit can remain false and prevent valid
+siblings from ever satisfying a correctly addressed quorum. CP295 neither
+filters nor removes it.
+
+Normal successful caller use does not replay CP295 before reset because the
+pre-loop checked latch is already true. Direct use, manual latch rearming, or
+partial-state manipulation is not idempotent. Calling CP295 again for the same
+unit and plenum appends a duplicate and updates only the unit's inner index to
+the new last slot; the old false duplicate can make `all` permanently
+unreachable. Changing a unit's plenum appends it to a new group without
+removing its old membership.
+
+The caller's checked latch is committed before any group work and has no catch
+or rollback. If CP295 fails partway through the all-unit loop, earlier groups
+and the failing prefix survive, later units are skipped, and ordinary same-
+state re-entry sees the true latch and does not retry the loop. The Boolean name
+therefore records that checking began, not that topology construction
+completed successfully.
+
+CP295 itself is also nontransactional. Its first branch publishes the selected
+inner index and outer count before primary allocations. The matched-group
+branch increments the row count and unit index before destructively
+reallocating the child arrays. The new-group branch increments the outer count
+before allocating its manager scratch and later deallocates the primary arena
+before the replacement is complete. Allocation, copy, or access failure can
+leave count/extent mismatches, lost or partial members, a missing or partial
+primary arena, an allocated manager scratch prefix, and a caller latch that
+prevents repair. There is no owned error result or completion marker.
+
+`clear_state()` resets `NumPlenumArrays` to zero, rearms the CP281 latch,
+deallocates `PurchAir` and the manager temporary, but does not deallocate the
+primary `PurchAirPlenumArrays` arena at `PurchasedAirManager.hh` lines 414-428.
+After reset, a first newly linked unit sees primary allocated with logical count
+zero, enters the no-match rebuild path, increments zero to one, and eventually
+drops the stale primary. If no new linked unit arrives, stale primary storage
+remains physically allocated behind logical count zero. This is not a clean
+arena reset.
+
+The selected unit index and arena extent are unchecked, and the routine does
+not consult manager `NumPurchAir`. An unallocated primary with a corrupt
+nonzero outer count still takes the first branch and overwrites that count with
+one. An allocated primary with a low positive count hides tail rows; a no-match
+resize copies only the visible prefix and discards the hidden tail, while an
+early visible match leaves the physical tail untouched. A high count can scan
+or copy beyond a short arena unless an early match breaks first.
+
+Nonpositive or extreme outer counts can reach empty or invalid allocation,
+invalid final indexing, or signed overflow on `+= 1`. A direct call accepts
+zero or negative plenum keys. The first duplicate group key wins. A matched row
+trusts its logical member count and both child extents independently: a low
+count truncates hidden members during exact-size reallocation, while a high
+count, a short or deallocated child, or mismatched integer/Boolean extents can
+fail during snapshot or restore. An extreme member count can overflow on its
+increment. Malformed native-state cases have no portable postcondition.
+
+Every same-group append allocates and copies proportional to the existing group
+size. Every distinct-group addition scans and reconstructs all visible prior
+groups and memberships. Sequential construction therefore has source-shaped
+worst-case O(N squared) cumulative work, O(N) transient storage, and no spare
+capacity. These are operation/space bounds from the implementation, not a wall-
+clock performance claim.
+
+CP295 has no synchronization. Concurrent first calls race on the primary
+allocatedness, count, and allocation; same-group calls race through exact-size
+rewrites; distinct-group calls also share the manager-resident temporary.
+CP286 marking/read/reset, direct mutation, and reset can race with construction.
+Native data races have no defined postcondition. Separate, nonaliased
+EnergyPlus states remain the evident isolation boundary.
+
+The sole bounded indirect C++ execution is
+`ZoneIdealLoadsTest.IdealLoads_PlenumTest` at
+`PurchasedAirManager.unit.cc` lines 312-435. One IdealLoads system names
+`Plenum Outlet Node` at line 344, one return plenum is declared at lines
+384-390, and `ManageZoneEquipment` at lines 413-416 reaches CP281 and exactly
+one CP295 call. It exercises only the unallocated one-group/one-member branch,
+with actual plenum index one coincidentally equal to compact row one.
+
+The fixture has a name assertion plus nine adjacent topology and flow
+assertions. Line 420 checks CP281's actual index, lines 422-428 check parsed and
+equipment/plenum topology, and lines 430 and 432-434 check calculation/node
+flow. The system-inlet/return-plenum-outlet mass flow at line 434 was already
+written by CP283 at source lines 2756-2757. No assertion reads CP295's outer
+count, group key,
+member count/list, selected inner index, Boolean bit, manager scratch, or
+branch trace. Bounded indirect executions/CP295-owned assertions are therefore
+`1/0`.
+
+No C++ test exercises same-plenum expansion, a distinct second group, preserved
+true bits, duplicate or changed-unit replay, an unlisted linked unit, a gap or
+reordered actual index, wrong-group quorum, corrupt counts or extents,
+allocation/copy failure, caller retry suppression, reset reconstruction,
+complexity growth, or concurrency.
+
+Rust retains the input's optional System Inlet Air Node Name only as an
+`Option<NormalizedName>` at
+`crates/ep_model/src/objects/ideal_loads.rs` lines 163-164. The compiler parses,
+generically registers, normalizes, and stores that node name at
+`crates/ep_compiler/src/compiler.rs` lines 12512-12522 and 12563. There is no
+later read site, typed return-plenum binding, compact group arena or count,
+member index/list, simulation-bit barrier, append/reallocation builder, or
+plenum simulation consumer. Nine Rust fixture constructions set the field to
+`None`; none supplies `Some`.
+
+The adjacent `IdealLoadsInitFlags` marker at
+`crates/ep_runtime/src/ideal_loads/init.rs` lines 14-15 and 27 hard-codes
+`return_plenum_inactive = true`. A whole-flags equality at
+`outdoor_air_wrapper_tests.rs` lines 45-48 derives its expected value from the
+same constructor. Neither path implements or independently proves CP295.
+Rust CP295 implementation/test/assertion counts are `0/0/0`.
+
+The frozen audit corpus contains 120 model inputs, split 108 IDF and 12 epJSON,
+142 manifests, and 47 IdealLoads comparison scripts. It has 30 exact
+IdealLoads definitions in 30 models and 52 manifest routes. All 30 System Inlet
+Air Node Name fields are blank, and exact `AirLoopHVAC:ReturnPlenum`
+model/manifest/script coverage is `0/0/0`. Thus active CP295 linkage, each of
+its three construction branches, the downstream Boolean barrier, and every
+CP295-specific compared output have zero corpus evidence.
+
+CP295 adds no algorithm-level source, Rust target or state, support declaration,
+test, capability, output, comparator, case, manifest, numerical claim,
+performance claim, readiness promotion, or conformance promotion. The
+inventory becomes 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Domain-required counts become
+heat-balance 88, HVAC 59, plant 1, and time/schedule 22. Readiness remains
+`0/88`, `0/59`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
+claim level `none`.
+
+CP295 exhausts `PurchasedAirManager.cc`, the second and final source listed by
+`ideal_loads_zone_equipment_purchased_air_source_order`. There is no same-file
+CP296 routine to infer. A later checkpoint must explicitly declare and audit
+its next EnergyPlus source family rather than silently extending this
+IdealLoads family across a translation-unit boundary.
 
 
 
