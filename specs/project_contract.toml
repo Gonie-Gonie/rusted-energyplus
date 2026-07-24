@@ -181,6 +181,7 @@ required_routines = [
   "get_purchased_air_out_air_mass_flow",
   "get_purchased_air_zone_inlet_air_node",
   "get_purchased_air_return_air_node",
+  "get_purchased_air_index",
 ]
 
 [[domain_claim]]

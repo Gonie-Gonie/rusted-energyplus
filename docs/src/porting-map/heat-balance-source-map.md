@@ -31463,13 +31463,226 @@ heat-balance 88, HVAC 54, plant 1, and time/schedule 22. Readiness remains
 `0/88`, `0/54`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
 claim level `none`.
 
-CP291 next adds canonical required source-mapped
-`routine.get_purchased_air_index` and the matching HVAC project-contract item.
-Lowercase `getPurchasedAirIndex` is declared at `PurchasedAirManager.hh` line
-377 and implemented at `PurchasedAirManager.cc` lines 3172-3186; the following
-definition, `GetPurchasedAirMixedAirTemp`, begins at source line 3188. Its exact
-parenthesized source-plus-test symbol census is three: declaration, definition,
-and the sole qualified production call from `RoomAirModelManager.cc` line 2901.
+## CP291 `getPurchasedAirIndex` Lazy First-Match Name Lookup Boundary
+
+`PurchasedAirManager::getPurchasedAirIndex(EnergyPlusData &state,
+std::string_view PurchAirName)` is declared at `PurchasedAirManager.hh` line
+377 and implemented at `PurchasedAirManager.cc` lines 3172-3186 inclusive. The
+body is 15 physical lines, 13 nonblank lines, and 13 nonblank, non-comment
+lines. The next physical definition, `GetPurchasedAirMixedAirTemp`, begins at
+source line 3188.
+
+The exact parenthesized source-plus-test `getPurchasedAirIndex(` census is
+three: the header declaration, the definition, and the sole qualified
+production call from `RoomAirModelManager.cc` line 2901. Its bare identifier
+census is also three. There is no direct C++ test call.
+
+CP291 first reads the shared `GetPurchAirInputFlag`. If true, it calls CP280
+`GetPurchasedAir` and assigns the latch false only after normal child return.
+It then initializes a one-based loop index to one, scans through the inclusive
+`NumPurchAir` bound in ascending arena order, and returns immediately on the
+first `Util::SameString` name match. Exhausting the loop returns the integer
+zero sentinel.
+
+With comments stripped, the routine has two `if` heads, one `for` loop, two
+direct calls, one syntactic Array1D record accessor, one lexical integer
+comparison, two lexical assignments, one increment, and two returns. The
+assignments are the persistent latch clear and loop-index initialization. It
+has no logical short-circuit operator, else, switch, case, arithmetic beyond
+loop increment, clamp, node-state access, diagnostic, status, transaction,
+rollback, assertion, try, or catch. Its structural McCabe count is four.
+
+`Util::SameString` delegates to the case-insensitive `equali` comparison at
+`UtilityRoutines.hh` lines 630-634. CP280 stores each parsed record name through
+`Util::makeUPPER` at `PurchasedAirManager.cc` line 284, while CP291 neither
+uppercases nor trims its argument. Consequently case variants compare equal,
+but leading or trailing whitespace remains significant. Whatever duplicate
+case-insensitive names survive upstream or are injected into mutable state,
+the lowest one-based arena position wins; CP291 reports neither ambiguity nor
+duplicate status.
+
+A zero or negative `NumPurchAir` performs no record access and returns zero. A
+count smaller than the allocated record set hides every tail record. A positive
+count larger than a deallocated or shorter arena can take unchecked native
+Array1D access before returning, with no portable postcondition. A corrupt
+empty stored name can match an empty argument. The result is only a component
+index: CP291 does not validate the selected record's node identities, Zone,
+equipment-list membership, ownership, generation, or active topology.
+
+If CP280 fatals or otherwise exits abnormally, CP291 never reaches its false
+assignment. The latch remains true while any completed allocation, parsing,
+node, Schedule, diagnostic, output, or EMS prefix can survive, so retry can
+invoke the non-idempotent loader over partial state. A clean load clears the
+latch before scanning; an ordinary miss therefore does not trigger an automatic
+reload on the next call. An extreme corrupt `INT_MAX` count with no match also
+exposes signed loop-increment overflow after any preceding arena accesses.
+
+With a false latch and stable count, names, and arena, replay is deterministic
+and value-idempotent but remains linear in `NumPurchAir`; there is no cached
+index. Name, count, arena, or reset mutation can change the next result.
+`clear_state()` re-arms the latch and deallocates the record arena. CP291 has no
+synchronization: first entrants can race through the loader, and loaded scans
+can race with reset, reload, reallocation, count mutation, or name mutation.
+The borrowed `string_view` also relies on caller-owned storage remaining valid
+and unmodified for the call. Native data and lifetime races have no defined
+postcondition.
+
+The sole production caller is `RoomAir::CheckEquipName`, declared at
+`RoomAirModelManager.hh` line 88 and implemented at
+`RoomAirModelManager.cc` lines 2752-3030. Its entry initializes `EquipFind` to
+false and both numeric node locals to zero, but clears only `SupplyNodeName`.
+It does not clear the caller-owned `ReturnNodeName` before an early return.
+
+In the PurchasedAir arm at source lines 2900-2907, an index-zero CP291 result
+returns false immediately. Supply is then blank, while a previously populated
+return string can escape stale; the ordinary production record is freshly
+allocated and normally starts empty, but the helper API does not establish that
+postcondition. A positive result reads the selected record's
+`ZoneExhaustAirNodeNum` as its return candidate and `ZoneSupplyAirNodeNum` as
+its supply candidate. It does not use CP290's `ZoneRecircAirNodeNum`.
+
+The common tail at lines 3021-3030 makes a positive supply node the sole
+condition for `EquipFind = true` and resolves that integer through unchecked
+`NodeID` access. A positive exhaust node is independently resolved into the
+return string; zero or negative exhaust clears it. Thus a CP291 hit can still
+return false when supply is nonpositive, and can nevertheless populate a
+positive return name. Any positive but invalid supply or exhaust ID can reach
+unchecked NodeID access with no portable postcondition.
+
+`GetRoomAirflowNetworkData` parses
+`RoomAir:Node:AirflowNetwork:HVACEquipment` at source lines 1618-1717. The
+ordinary manager route reaches this parser on the `ManageAirModel` first-input
+branch at lines 141-144, where `GetAirModelDatas` calls it unconditionally at
+line 223. The parser returns at lines 1293-1297 when no
+`RoomAirSettings:AirflowNetwork` object exists. Each control's Zone name must
+resolve and its selected `AirModel` must already be
+`RoomAirModel::AirflowNetwork`; lines 1322-1338 diagnose and continue for an
+unknown Zone or another room-air model before AFN-node allocation. Even with
+that control, an HVAC list name must match a RoomAir AFN node's
+`NodeHVACListName`; lines 1650-1655
+continue past a nonmatch. Only a PurchasedAir entry in the matched list reaches
+CP291, so an IdealLoads object alone is insufficient. The parser has already
+stored each record's type, name, and supply/return fractions when it
+calls `CheckEquipName` at lines 1700-1701. A false result emits severe and
+continuation diagnostics at lines 1703-1710, retains the partial input record,
+and contributes to the later aggregate input fatal. The immediately preceding
+Zone equipment-list loop can break on a match but neither stores nor gates its
+result, so CP291 remains a global PurchasedAir-name scan rather than
+validating membership in the current Zone.
+
+The parent's miss diagnostic has two source-visible anomalies: the displayed
+field-name expression and displayed value expression use different extensible
+indices, and the final text says that an internal gain did not match. CP291
+itself owns none of this diagnostic behavior. It also does not own the caller's
+input fatal, partial-record lifecycle, or earlier RoomAir model-control gates.
+
+Later RoomAir AirflowNetwork initialization at
+`RoomAirModelAirflowNetwork.cc` lines 270-359 matches the HVAC record against
+the Zone equipment list, resolves the stored supply name, verifies an inlet,
+and either derives the matching Zone return when the return name is blank or
+resolves the explicit exhaust name. It registers
+`RoomAirflowNetwork Node HVAC Supply Fraction` and
+`RoomAirflowNetwork Node HVAC Return Fraction` from user-entered fractions.
+Subsequent return-node state updates and supply-system sums consume that bound
+topology. These name resolution, validation, state, flow, and reporting effects
+are downstream of CP291; the index getter calculates none of them.
+
+The sole bounded indirect C++ evidence is
+`RoomAirflowNetwork_CheckEquipName_Test` at
+`RoomAirflowNetwork.unit.cc` lines 613-839. Its PurchasedAir setup forces the
+latch false, allocates one record, sets `NumPurchAir = 1`, stores the exact
+`ZoneEquip` name, and assigns positive supply and exhaust node IDs. Calls at
+lines 807, 821, and 835 each execute CP291's first-record hit and are followed
+by true, supply-name, and return-name assertions, for direct calls/assertions
+`0/0` and indirect executions/composite CP291-sensitive assertions `3/9`.
+
+The latter two blocks populate HybridUnitary and heat-pump water-heater arenas,
+but leave `zoneEquipType` as PurchasedAir. They therefore replay the same
+PurchasedAir lookup while only the global NodeID strings change. The nine
+assertions depend on a successful lookup and caller mapping but do not isolate
+CP291 from `CheckEquipName`.
+
+No C++ test covers the true-latch load, miss, case variant, whitespace,
+empty name, duplicate or later-record ordering, zero/negative count, count/arena
+mismatch, extreme increment, zero supply, blank exhaust, stale return string,
+child failure and retry, reset, mutation replay, or concurrency. EnergyPlus
+test fixtures containing RoomAir AirflowNetwork HVAC object tokens have no
+IdealLoads object co-occurrence; the three explicit enum calls are the only
+test reachability found.
+
+Rust contains no `getPurchasedAirIndex` or `get_purchased_air_index` analogue,
+no shared lazy one-based PurchasedAir arena, no integer-zero miss sentinel, and
+no typed or runtime RoomAir AirflowNetwork HVAC-equipment consumer. CP291-specific
+implementation and test counts are therefore `0/0`.
+
+The adjacent Rust design binds IdealLoads names eagerly. `TypedModel` owns
+`ideal_loads_air_system_names: NameMap<IdealLoadsAirSystemId>`; `NameMap`
+normalizes by trimming and ASCII-uppercasing, maps through a `BTreeMap`, and
+returns an existing typed ID on duplicate insertion. The compiler reserves a
+zero-based `IdealLoadsAirSystemId`, inserts its name, emits `DuplicateName` and
+skips a duplicate, and ultimately withholds the typed model when compile errors
+exist. It resolves each `ZoneHVAC:EquipmentList` name through that map and
+stores the typed ID before runtime dispatch.
+
+That is an adjacent topology analogue, not source implementation. Rust lookup
+trims whitespace where CP291 does not, rejects normalized duplicates instead
+of silently selecting the first retained record, uses zero as a valid typed ID
+rather than a miss sentinel, reports a missing equipment reference during
+compile, and passes a prebound ID to dispatch rather than scanning mutable
+strings at runtime. It has no CP291 latch, partial-load retry, global first-match,
+stale-output, or concurrent arena lifecycle.
+
+One Rust model test verifies that a generic `NameMap` resolves a trimmed,
+case-varied spelling and retains one entry. Compiler tests separately prove an
+exact-name IdealLoads equipment-list graph binding, fail closed on a missing
+IdealLoads equipment reference, and sort multiple prebound equipment edges.
+Four runtime dispatch-validator tests receive already typed IDs. None covers an
+IdealLoads case-fold or whitespace reference, normalized duplicate, lazy scan,
+RoomAir AirflowNetwork caller, or CP291 result, so all remain adjacent evidence
+only.
+
+The audited repository corpus contains 120 models, comprising 108 IDF and 12
+epJSON files, 142 `*case.toml` manifests, and 47 IdealLoads comparison scripts.
+Thirty unique models contain `ZoneHVAC:IdealLoadsAirSystem`, with 52 manifests
+resolving to those models. Exact
+`RoomAirSettings:AirflowNetwork`, `RoomAir:Node:AirflowNetwork`, and
+`RoomAir:Node:AirflowNetwork:HVACEquipment` occurrence is zero throughout the
+model set; their overlap with IdealLoads is consequently zero models, zero
+associated manifests, and zero comparison scripts. The production CP291 route
+therefore has zero corpus reachability even though the adjacent eager Rust
+IdealLoads name binding is exercised elsewhere.
+
+All nine inspected downstream RoomAir AirflowNetwork output names have exact
+model/manifest/script coverage `0/0/0`: Node Temperature, Humidity Ratio, and
+Relative Humidity; NonAirSystemResponse, SysDepZoneLoadsLagged,
+SumIntSensibleGain, and SumIntLatentGain; plus HVAC Supply Fraction and HVAC
+Return Fraction. The two HVAC fraction outputs would expose user-entered
+fractions, not proof that CP291 selected the right global component. No dynamic
+getter-entry count is instrumented.
+
+CP291 adds canonical required `source_mapped`
+`routine.get_purchased_air_index` immediately after
+`routine.get_purchased_air_return_air_node`, plus the matching HVAC
+project-contract item. It adds no algorithm-level source, Rust target or state,
+support declaration, test, capability, output, comparator, case, manifest,
+numerical claim, performance claim, or conformance promotion.
+
+The inventory becomes 32 algorithms and 289 routines, split 58 `state_mapped`
+plus 231 `source_mapped`, with 166 required. Domain-required counts become
+heat-balance 88, HVAC 55, plant 1, and time/schedule 22. Readiness remains
+`0/88`, `0/55`, `0/1`, and `0/22`. The IdealLoads parent remains `scaffold` at
+claim level `none`.
+
+CP292 next adds canonical required source-mapped
+`routine.get_purchased_air_mixed_air_temp` and the matching HVAC
+project-contract item. `GetPurchasedAirMixedAirTemp` is declared at
+`PurchasedAirManager.hh` line 379 and implemented at
+`PurchasedAirManager.cc` lines 3188-3210; the following definition,
+`GetPurchasedAirMixedAirHumRat`, begins at source line 3212. Its body is 23
+physical lines, 18 nonblank lines, and eight nonblank, non-comment lines. The
+exact parenthesized and bare source-plus-test censuses are each three:
+declaration, definition, and the sole qualified production call from
+`SystemReports.cc` line 4070; there is no direct C++ test call.
 
 
 
