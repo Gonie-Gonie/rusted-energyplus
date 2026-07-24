@@ -371,6 +371,13 @@ fn supports_no_oa_humidity_selected_branch_with_flags(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{
+        heat_balance::zone_predictor_corrector::predicted_system_load::{
+            DualSetpointThirdOrderSystemLoadInput,
+            calc_predicted_system_load_dual_setpoint_third_order,
+        },
+        ideal_loads::IdealLoadsSensibleMode,
+    };
     use ep_model::{
         AutosizeOrNumber, DemandControlledVentilationType, HeatRecoveryType, IdealLoadsFuelType,
         IdealLoadsLimit, NormalizedName, OutdoorAirEconomizerType, ZoneId,
@@ -384,6 +391,146 @@ mod tests {
         assert_eq!(stages[2].source_routine, "CalcPurchAirLoads");
         assert_eq!(stages[3].source_routine, "UpdatePurchasedAir");
         assert_eq!(stages[4].source_routine, "ReportPurchasedAir");
+    }
+
+    #[test]
+    fn predicted_dual_setpoint_loads_feed_generic_purchased_air_without_threshold_sign_loss() {
+        let system = test_system();
+        let zone_state = IdealLoadsZoneState {
+            air_temperature_c: 22.0,
+            air_humidity_ratio: 0.008,
+        };
+        let cases = [
+            (
+                DualSetpointThirdOrderSystemLoadInput {
+                    zone: ZoneId(0),
+                    temp_dependent_load_w_per_k: 125.0,
+                    temp_independent_load_w: 0.0,
+                    heating_setpoint_c: 20.0,
+                    cooling_setpoint_c: 24.0,
+                    zone_air_temperature_c: f64::NAN,
+                    load_correction_factor: 1.0,
+                    zone_multiplier: 1,
+                    zone_list_multiplier: 1,
+                },
+                IdealLoadsSensibleMode::Heating,
+                2_500.0,
+                0.0,
+            ),
+            (
+                DualSetpointThirdOrderSystemLoadInput {
+                    zone: ZoneId(0),
+                    temp_dependent_load_w_per_k: 40.0,
+                    temp_independent_load_w: 3_500.0,
+                    heating_setpoint_c: 20.0,
+                    cooling_setpoint_c: 25.0,
+                    zone_air_temperature_c: f64::INFINITY,
+                    load_correction_factor: 1.0,
+                    zone_multiplier: 1,
+                    zone_list_multiplier: 1,
+                },
+                IdealLoadsSensibleMode::Cooling,
+                0.0,
+                2_500.0,
+            ),
+            (
+                DualSetpointThirdOrderSystemLoadInput {
+                    zone: ZoneId(0),
+                    temp_dependent_load_w_per_k: 100.0,
+                    temp_independent_load_w: 2_200.0,
+                    heating_setpoint_c: 20.0,
+                    cooling_setpoint_c: 24.0,
+                    zone_air_temperature_c: 22.0,
+                    load_correction_factor: 1.0,
+                    zone_multiplier: 1,
+                    zone_list_multiplier: 1,
+                },
+                IdealLoadsSensibleMode::Deadband,
+                0.0,
+                0.0,
+            ),
+            (
+                DualSetpointThirdOrderSystemLoadInput {
+                    zone: ZoneId(7),
+                    temp_dependent_load_w_per_k: 100.0,
+                    temp_independent_load_w: 1_500.0,
+                    heating_setpoint_c: 20.0,
+                    cooling_setpoint_c: 24.0,
+                    zone_air_temperature_c: f64::NAN,
+                    load_correction_factor: 0.8,
+                    zone_multiplier: 2,
+                    zone_list_multiplier: 3,
+                },
+                IdealLoadsSensibleMode::Heating,
+                2_400.0,
+                0.0,
+            ),
+            (
+                DualSetpointThirdOrderSystemLoadInput {
+                    zone: ZoneId(8),
+                    temp_dependent_load_w_per_k: 100.0,
+                    temp_independent_load_w: 2_400.0,
+                    heating_setpoint_c: 20.0,
+                    cooling_setpoint_c: 24.0,
+                    zone_air_temperature_c: 22.0,
+                    load_correction_factor: -1.0,
+                    zone_multiplier: 1,
+                    zone_list_multiplier: 1,
+                },
+                IdealLoadsSensibleMode::Cooling,
+                0.0,
+                0.0,
+            ),
+        ];
+
+        for (input, expected_mode, expected_heating_w, expected_cooling_w) in cases {
+            let predicted = calc_predicted_system_load_dual_setpoint_third_order(input)
+                .expect("bounded predictor input");
+            assert_eq!(
+                predicted.total_output_required_w,
+                expected_heating_w - expected_cooling_w
+            );
+
+            let demand = ZoneSysEnergyDemand::from_output_required_setpoint_loads(
+                predicted.zone,
+                predicted.output_required_to_heating_setpoint_w,
+                predicted.output_required_to_cooling_setpoint_w,
+            );
+            assert_eq!(demand.zone, predicted.zone);
+            assert_eq!(
+                demand.sensible_input_kind,
+                crate::zone_equipment::ZoneSensibleDemandInputKind::SourceSetpointThresholds
+            );
+            assert_eq!(
+                demand.remaining_output_req_to_heat_sp_w,
+                predicted.output_required_to_heating_setpoint_w
+            );
+            assert_eq!(
+                demand.remaining_output_req_to_cool_sp_w,
+                predicted.output_required_to_cooling_setpoint_w
+            );
+
+            let output = sim_purchased_air_compat(SimPurchasedAirCompatInput {
+                system: &system,
+                supply_node: NodeId(3),
+                zone_state,
+                recirculation_state: zone_state,
+                demand,
+                unit_available: true,
+                limit_context: IdealLoadsSensibleLimitContext::default(),
+            })
+            .expect("supported no-OA/no-limit branch");
+
+            assert_eq!(output.calculation.mode, expected_mode);
+            assert!(
+                (output.calculation.zone_sensible_heating_rate_w - expected_heating_w).abs()
+                    < 1.0e-9
+            );
+            assert!(
+                (output.calculation.zone_sensible_cooling_rate_w - expected_cooling_w).abs()
+                    < 1.0e-9
+            );
+        }
     }
 
     #[test]

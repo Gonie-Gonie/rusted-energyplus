@@ -1,6 +1,9 @@
 //! No-OA IdealLoads sensible load calculation.
 
-use crate::{energyplus_moist_air_specific_heat_j_per_kg_k, zone_equipment::ZoneSysEnergyDemand};
+use crate::{
+    energyplus_moist_air_specific_heat_j_per_kg_k,
+    zone_equipment::{ZoneSensibleDemandInputKind, ZoneSysEnergyDemand},
+};
 use ep_model::{HumidificationControlType, IdealLoadsAirSystem};
 
 use super::humidity::{
@@ -18,6 +21,20 @@ use super::mass_flow::{
 };
 use super::psychrometrics::{moist_air_enthalpy_j_per_kg, nearly_equal_humidity};
 use super::types::{IdealLoadsSensibleMode, IdealLoadsSensibleResult, IdealLoadsZoneState};
+
+// The source threshold lane preserves the inclusive no-OA `0 >= QCoolSP`
+// priority. Oracle/default active-split fixtures retain zero as inactive until
+// their upstream injection is removed.
+fn source_selects_no_oa_cooling(demand: ZoneSysEnergyDemand) -> bool {
+    match demand.sensible_input_kind {
+        ZoneSensibleDemandInputKind::ActiveLoadSplitCompatibility => {
+            0.0 > demand.remaining_output_req_to_cool_sp_w
+        }
+        ZoneSensibleDemandInputKind::SourceSetpointThresholds => {
+            0.0 >= demand.remaining_output_req_to_cool_sp_w
+        }
+    }
+}
 
 /// Calculates the no-outdoor-air, no-limit, sensible-only IdealLoads branch.
 ///
@@ -85,7 +102,8 @@ pub fn calc_no_oa_no_limit_sensible_with_recirculation_context_compat(
     }
 
     let heating_load_w = demand.remaining_output_req_to_heat_sp_w.max(0.0);
-    let cooling_load_w = demand.remaining_output_req_to_cool_sp_w.abs().max(0.0);
+    let cooling_threshold_selected = source_selects_no_oa_cooling(demand);
+    let cooling_load_w = (-demand.remaining_output_req_to_cool_sp_w).max(0.0);
 
     let heating_delta_t =
         system.maximum_heating_supply_air_temperature_c - zone_state.air_temperature_c;
@@ -115,18 +133,27 @@ pub fn calc_no_oa_no_limit_sensible_with_recirculation_context_compat(
         humidistat_dehumidification_mass_flow_rate_kg_per_s(system, zone_state, demand),
     );
 
-    if cooling_load_w > 0.0 && cooling_mass_flow_rate_kg_per_s > 0.0 {
-        cooling_result_with_limits(
-            system,
-            zone_state,
-            recirculation_state,
-            cp_air_j_per_kg_k,
-            supply_humidity_ratio,
-            cooling_load_w,
-            cooling_mass_flow_rate_kg_per_s,
-            demand,
-            context,
-        )
+    if cooling_threshold_selected {
+        if cooling_mass_flow_rate_kg_per_s > 0.0 {
+            cooling_result_with_limits(
+                system,
+                zone_state,
+                recirculation_state,
+                cp_air_j_per_kg_k,
+                supply_humidity_ratio,
+                cooling_load_w,
+                cooling_mass_flow_rate_kg_per_s,
+                demand,
+                context,
+            )
+        } else {
+            zero_result(
+                IdealLoadsSensibleMode::Cooling,
+                cp_air_j_per_kg_k,
+                zone_state.air_temperature_c,
+                supply_humidity_ratio,
+            )
+        }
     } else if heating_load_w > 0.0 && heating_mass_flow_rate_kg_per_s > 0.0 {
         heating_result_with_limits(
             system,
@@ -226,7 +253,8 @@ pub fn calc_no_oa_sensible_with_limits_and_recirculation_compat(
     }
 
     let heating_load_w = demand.remaining_output_req_to_heat_sp_w.max(0.0);
-    let cooling_load_w = demand.remaining_output_req_to_cool_sp_w.abs().max(0.0);
+    let cooling_threshold_selected = source_selects_no_oa_cooling(demand);
+    let cooling_load_w = (-demand.remaining_output_req_to_cool_sp_w).max(0.0);
 
     let heating_mass_flow_rate_kg_per_s = limited_heating_mass_flow_rate_kg_per_s(
         system,
@@ -277,18 +305,27 @@ pub fn calc_no_oa_sensible_with_limits_and_recirculation_compat(
         cooling_mass_flow_rate_kg_per_s = 0.0;
     }
 
-    if cooling_load_w > 0.0 && cooling_mass_flow_rate_kg_per_s > 0.0 {
-        cooling_result_with_limits(
-            system,
-            zone_state,
-            recirculation_state,
-            cp_air_j_per_kg_k,
-            supply_humidity_ratio,
-            cooling_load_w,
-            cooling_mass_flow_rate_kg_per_s,
-            demand,
-            limit_context,
-        )
+    if cooling_threshold_selected {
+        if cooling_mass_flow_rate_kg_per_s > 0.0 {
+            cooling_result_with_limits(
+                system,
+                zone_state,
+                recirculation_state,
+                cp_air_j_per_kg_k,
+                supply_humidity_ratio,
+                cooling_load_w,
+                cooling_mass_flow_rate_kg_per_s,
+                demand,
+                limit_context,
+            )
+        } else {
+            zero_result(
+                IdealLoadsSensibleMode::Cooling,
+                cp_air_j_per_kg_k,
+                zone_state.air_temperature_c,
+                supply_humidity_ratio,
+            )
+        }
     } else if heating_load_w > 0.0 && heating_mass_flow_rate_kg_per_s > 0.0 {
         heating_result_with_limits(
             system,

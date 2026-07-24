@@ -346,13 +346,13 @@ fn standard_air_density_uses_energyplus_elevation_formula() {
 }
 
 #[test]
-fn limit_aware_helper_matches_no_limit_heating_result() {
+fn positive_cooling_threshold_preserves_heating_in_both_no_oa_paths() {
     let system = test_system();
     let zone_state = IdealLoadsZoneState {
         air_temperature_c: 20.0,
         air_humidity_ratio: 0.008,
     };
-    let demand = ZoneSysEnergyDemand::sensible_only(ZoneId(0), 3000.0, 0.0);
+    let demand = ZoneSysEnergyDemand::sensible_only(ZoneId(0), 3000.0, 4000.0);
 
     let expected = calc_no_oa_no_limit_sensible_compat(&system, zone_state, demand, true);
     let actual = calc_no_oa_sensible_with_limits_compat(
@@ -363,6 +363,7 @@ fn limit_aware_helper_matches_no_limit_heating_result() {
         IdealLoadsSensibleLimitContext::default(),
     );
 
+    assert_eq!(expected.mode, IdealLoadsSensibleMode::Heating);
     assert_eq!(actual.mode, expected.mode);
     assert_close(
         actual.supply_temperature_c,
@@ -379,6 +380,31 @@ fn limit_aware_helper_matches_no_limit_heating_result() {
         expected.zone_total_heating_rate_w,
         1.0e-9,
     );
+}
+
+#[test]
+fn source_zero_cooling_threshold_preempts_positive_heating_in_both_no_oa_paths() {
+    let system = test_system();
+    let zone_state = IdealLoadsZoneState {
+        air_temperature_c: 20.0,
+        air_humidity_ratio: 0.008,
+    };
+    let demand = ZoneSysEnergyDemand::from_output_required_setpoint_loads(ZoneId(0), 3000.0, 0.0);
+    let no_limit = calc_no_oa_no_limit_sensible_compat(&system, zone_state, demand, true);
+    let finite_helper = calc_no_oa_sensible_with_limits_compat(
+        &system,
+        zone_state,
+        demand,
+        true,
+        IdealLoadsSensibleLimitContext::default(),
+    );
+
+    for result in [no_limit, finite_helper] {
+        assert_eq!(result.mode, IdealLoadsSensibleMode::Cooling);
+        assert_eq!(result.supply_mass_flow_rate_kg_per_s, 0.0);
+        assert_eq!(result.zone_sensible_heating_rate_w, 0.0);
+        assert_eq!(result.zone_sensible_cooling_rate_w, 0.0);
+    }
 }
 
 #[test]

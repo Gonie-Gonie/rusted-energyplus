@@ -17759,6 +17759,81 @@ outputs, manifests, comparators, performance, and conformance do not change.
 
 
 
+## CP297 Bounded Predicted-Demand Projection into Generic PurchasedAir
+
+CP297 advances Roadmap Section 12's first item with a bounded scalar
+composition seam; it does not complete release-path oracle demand removal.
+EnergyPlus 26.1.0 `initOutputRequired` copies
+`OutputRequiredToHeatingSP` and `OutputRequiredToCoolingSP` unchanged into
+`RemainingOutputReqToHeatSP` and `RemainingOutputReqToCoolSP` at
+`ZoneEquipmentManager.cc` lines 4302-4305. Under the explicitly assumed outer
+reduction of one direct controlled Zone with DualSetpoint/ThirdOrder sensible
+prediction, one `Sequential` IdealLoads entry, heating and cooling fractions one,
+and no duct loss, lines 4442-4457 preserve
+those thresholds. The Rust scalar constructor neither constructs nor validates
+that topology. Total, unadjusted, sequenced-array, residual, first-iteration,
+reset-order, moisture, and persistent demand mutation remain deferred.
+
+`ZoneSysEnergyDemand::from_output_required_setpoint_loads` neutrally copies two
+finalized sensible setpoint-load scalars, retains `ZoneId`, zeros the out-of-scope
+moisture subset, and marks the pair `SourceSetpointThresholds`. It does not
+validate predictor provenance, correction or multiplier history, controlled-Zone
+identity, or equipment distribution. The focused composition test obtains its
+inputs from CP296 and verifies that the adapter copies both finalized fields
+exactly once rather than rebuilding an active split from total load or mode.
+`ZoneSysEnergyDemand::sensible_only` separately marks existing oracle/default
+fixtures `ActiveLoadSplitCompatibility`, where exact zero remains an inactive
+split sentinel. Neither constructor adds a live `ep_run` or `ep_cli` caller.
+
+`CalcPurchAirLoads` reads the two Remaining fields directly at
+`PurchasedAirManager.cc` lines 1992-1993. In the no-outdoor-air slice,
+`MinOASensOutput` is zero; source cooling is selected by inclusive
+`0 >= QCoolSP` at line 2046 before the later heating test at line 2348. The
+bounded DualSetpoint assumption fixes the companion not-SingleHeat and
+not-SingleCool guards true; the Rust DTO does not carry or validate them. Both
+Rust no-OA calculation paths compute cooling magnitude as
+`(-QCoolSP).max(0.0)` instead of `abs(QCoolSP)`. For
+`SourceSetpointThresholds`, they also retain the inclusive zero branch priority:
+`QCoolSP == 0` returns Cooling with zero flow and zero sensible output and
+suppresses a simultaneous positive heating threshold. For
+`ActiveLoadSplitCompatibility`, zero stays inactive until the oracle/default
+injection lane is removed. A positive cooling threshold remains inactive and
+can coexist with an active heating request.
+
+Five focused composition vectors feed CP296 outputs through the neutral adapter
+and existing `sim_purchased_air_compat`: `(H,C)=(2500,3000)` produces Heating at
+2500 W, `(-2700,-2500)` produces Cooling at 2500 W, and `(-200,200)` produces
+nonzero-threshold Deadband at 0 W. A scaling-stress vector starts from raw
+`(500,900)`, applies correction 0.8 and Zone/List multipliers 2 by 3 in CP296,
+and verifies that final `(2400,4320)` reaches PurchasedAir without a second
+scale. An exact-zero sign-stress vector starts from raw `(-400,0)`, applies
+correction -1, copies final `(400,-0)`, and requires source-priority Cooling at
+0 W rather than Heating. Separate regressions execute both the no-limit and
+finite-limit helpers: compatibility `(3000,4000)` requires Heating, while source
+`(3000,0)` requires Cooling with zero flow and zero sensible output.
+
+This is test-scoped arithmetic evidence, not a constructed live topology. The
+direct controlled Zone, DualSetpoint/ThirdOrder, exactly-one-IdealLoads,
+`Sequential` fractions-one, no-duct-loss, no-outdoor-air, sensible-only, and
+fixed-system-timestep conditions
+are outer reduction assumptions and are not checked by the DTO; the 0.8 and -1
+correction vectors stress bounded scaling/sign behavior only. Thermostat schedule
+and predictor-time D/I construction, complete `ZoneSysEnergyDemand` ownership,
+multiple-equipment sequencing and residual decrement, HVAC iteration, adaptive
+timestep, Space/RAFN/ITE/staged branches, supply feedback into zone correction,
+and a release runtime caller remain unsupported. CP297 makes no live room-air or
+fully-mixed-topology claim. `ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE` remains
+`source-order-oracle-demand-input`.
+
+The `zone_temp_predictor_corrector_source_order` and
+`ideal_loads_zone_equipment_purchased_air_source_order` parents remain
+`scaffold` at claim level `none`. `calcPredictedSystemLoad`,
+`InitSystemOutputRequired`, `initOutputRequired`,
+`DistributeSystemOutputRequired`, and `CalcPurchAirLoads` remain
+`source_mapped`; CP297 adds no routine promotion. Algorithm/routine counts,
+required counts, readiness `0/88`, `0/59`, `0/1`, `0/22`, capabilities,
+outputs, manifests, comparators, performance, and conformance claims do not
+change.
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:
