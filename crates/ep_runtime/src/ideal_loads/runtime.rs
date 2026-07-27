@@ -1,4 +1,4 @@
-//! Arbitrary-run IdealLoads compatibility runtime.
+//! Diagnostic IdealLoads adapter with explicit fixed state and demand inputs.
 
 use std::fmt::{Display, Formatter};
 
@@ -64,7 +64,11 @@ const DEFAULT_HEATING_DEMAND_W: f64 = 0.0;
 const DEFAULT_COOLING_DEMAND_W: f64 = 0.0;
 const SECONDS_PER_HOUR: f64 = 3600.0;
 
-/// Options for the source-order IdealLoads compatibility runtime.
+/// Provenance label for the adapter's fixed active-load-split demand.
+pub const IDEAL_LOADS_FIXTURE_DEMAND_DIAGNOSTIC_SOURCE: &str =
+    "rust-diagnostic-default-active-load-split";
+
+/// Options for the source-order IdealLoads diagnostic adapter.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct IdealLoadsCompatibilityOptions {
     /// Number of hourly samples to write.
@@ -81,7 +85,7 @@ pub struct IdealLoadsCompatibilityOptions {
     pub default_heating_demand_w: f64,
     /// Source-order cooling demand snapshot in W.
     pub default_cooling_demand_w: f64,
-    /// Availability schedule result for the current compatibility path.
+    /// Availability schedule result for the fixed-demand diagnostic adapter.
     pub unit_available: bool,
 }
 
@@ -102,7 +106,7 @@ impl IdealLoadsCompatibilityOptions {
     }
 }
 
-/// One IdealLoads system executed by the compatibility runtime.
+/// One IdealLoads system executed by the fixed-demand diagnostic adapter.
 #[derive(Clone, Debug, PartialEq)]
 pub struct IdealLoadsCompatibilitySystemSummary {
     /// IdealLoads object name.
@@ -113,7 +117,7 @@ pub struct IdealLoadsCompatibilitySystemSummary {
     pub supply_node_name: String,
 }
 
-/// Summary for the arbitrary-run IdealLoads compatibility runtime.
+/// Summary for the fixed-demand IdealLoads diagnostic adapter.
 #[derive(Clone, Debug, PartialEq)]
 pub struct IdealLoadsCompatibilitySummary {
     /// Hourly output sample count.
@@ -122,9 +126,13 @@ pub struct IdealLoadsCompatibilitySummary {
     pub system_count: usize,
     /// Per-system source-order dispatch summary.
     pub systems: Vec<IdealLoadsCompatibilitySystemSummary>,
+    /// Provenance of the demand passed to every system.
+    pub zone_demand_source: &'static str,
+    /// Whether the active-load-split fixture/default constructor was used.
+    pub fixture_demand_injection_used: bool,
 }
 
-/// Result of the source-order IdealLoads compatibility runtime.
+/// Result of the source-order IdealLoads diagnostic adapter.
 #[derive(Clone, Debug, PartialEq)]
 pub struct IdealLoadsCompatibilitySimulation {
     /// Native output results.
@@ -138,7 +146,7 @@ struct IdealLoadsRuntimeSystem<'a> {
     branch_flags: IdealLoadsCompiledBranchFlags,
 }
 
-/// Runtime error for the IdealLoads compatibility path.
+/// Runtime error for the IdealLoads diagnostic adapter.
 #[derive(Clone, Debug, PartialEq)]
 pub enum IdealLoadsCompatibilityRuntimeError {
     /// No IdealLoads systems were available to execute.
@@ -172,7 +180,7 @@ pub enum IdealLoadsCompatibilityRuntimeError {
         /// Error returned by the outdoor-air source-order wrapper.
         error: SimPurchasedAirOutdoorAirCompatError,
     },
-    /// The selected PurchasedAir branch is not inside the compatibility subset.
+    /// The selected PurchasedAir branch is not inside the adapter subset.
     UnsupportedPurchasedAirBranch {
         /// Error returned by `sim_purchased_air_compat`.
         error: SimPurchasedAirCompatError,
@@ -184,7 +192,7 @@ impl Display for IdealLoadsCompatibilityRuntimeError {
         match self {
             Self::NoIdealLoadsSystems => write!(
                 formatter,
-                "IdealLoads compatibility runtime requires at least one ZoneHVAC:IdealLoadsAirSystem"
+                "IdealLoads fixed-demand diagnostic requires at least one ZoneHVAC:IdealLoadsAirSystem"
             ),
             Self::DispatchNotSupported {
                 system_name,
@@ -221,7 +229,11 @@ impl Display for IdealLoadsCompatibilityRuntimeError {
 impl std::error::Error for IdealLoadsCompatibilityRuntimeError {}
 
 /// Executes supported IdealLoads systems through the source-order
-/// ZoneEquipmentManager -> PurchasedAirManager compatibility path.
+/// ZoneEquipmentManager -> PurchasedAirManager diagnostic adapter.
+///
+/// This function deliberately uses caller-provided fixed state and active-split
+/// demand. Release compatibility selection must use the state-backed direct
+/// coupling instead.
 pub fn simulate_ideal_loads_purchased_air_compat(
     model: &SimulationModel,
     options: IdealLoadsCompatibilityOptions,
@@ -348,6 +360,8 @@ pub fn simulate_ideal_loads_purchased_air_compat(
             samples: options.sample_count,
             system_count: systems.len(),
             systems,
+            zone_demand_source: IDEAL_LOADS_FIXTURE_DEMAND_DIAGNOSTIC_SOURCE,
+            fixture_demand_injection_used: true,
         },
         results,
     })
@@ -387,7 +401,7 @@ fn simulate_outdoor_air_purchased_air_system(
         minimum_outdoor_air: IdealLoadsMinimumOutdoorAirCompatInput {
             specification,
             context,
-            // The arbitrary-run compatibility path has no timestep OA schedule,
+            // The fixed-demand diagnostic adapter has no timestep OA schedule,
             // occupancy, or contaminant evaluator yet. `None` deliberately
             // produces a typed wrapper error when any of those signals is active.
             outdoor_air_schedule_value: None,

@@ -782,7 +782,7 @@ fn dry_run_skips_runtime_oracle_and_compare() -> Result<(), Box<dyn std::error::
 }
 
 #[test]
-fn ideal_loads_diagnostic_run_uses_branch_compatibility_runtime_class()
+fn ideal_loads_diagnostic_mode_keeps_exact_direct_model_on_release_runtime()
 -> Result<(), Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir("ideal-loads-diagnostic")?;
     let input_path = case_dir.join("ideal-loads.epJSON");
@@ -839,6 +839,10 @@ fn ideal_loads_diagnostic_run_uses_branch_compatibility_runtime_class()
         summary["rust_runtime"]["zone_demand_source"],
         "rust-predictor-source-setpoint-thresholds"
     );
+    assert_eq!(
+        summary["rust_runtime"]["fixture_demand_injection_used"],
+        false
+    );
     assert_eq!(summary["rust_runtime"]["samples"], 1);
     assert_eq!(summary["source_order_gate"]["matches"], true);
     assert!(
@@ -868,7 +872,7 @@ fn ideal_loads_diagnostic_run_uses_branch_compatibility_runtime_class()
 }
 
 #[test]
-fn ideal_loads_compatibility_mode_runs_declared_branch_runtime()
+fn ideal_loads_compatibility_mode_runs_state_backed_direct_runtime()
 -> Result<(), Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir("ideal-loads-compatibility")?;
     let input_path = case_dir.join("ideal-loads.epJSON");
@@ -920,6 +924,10 @@ fn ideal_loads_compatibility_mode_runs_declared_branch_runtime()
     assert_eq!(
         summary["rust_runtime"]["zone_demand_source"],
         "rust-predictor-source-setpoint-thresholds"
+    );
+    assert_eq!(
+        summary["rust_runtime"]["fixture_demand_injection_used"],
+        false
     );
     assert_eq!(summary["source_order_gate"]["matches"], true);
     assert_output_layout(&output_dir, true)?;

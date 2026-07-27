@@ -15,15 +15,15 @@ use ep_model::{SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, load_epjson_file, load_epjson_file_with_idf_order};
 use ep_runtime::{
-    DirectZonePurchasedAirCoupledOptions, ExecutionPlan, ExecutionStep,
-    HeatBalanceSimulationOptions, IdealLoadsCompatibilityOptions, NodeStateProjectionOptions,
-    ResultStore, RuntimePrecomputedData, ScheduleCacheProfile, ScheduleSeriesCache,
-    ScheduleSeriesIndexKind, TimeAxis, WeatherTimestepSeries,
-    build_environment_time_axes_with_weather_metadata, build_hourly_time_axis,
-    build_hourly_time_axis_with_weather_metadata, load_epw_weather_file, precompute_runtime_data,
-    precompute_schedule_cache_for_environment_time_axis, precompute_schedule_cache_for_time_axis,
-    precompute_weather_timestep_series, select_epw_environment_weather,
-    simulate_direct_zone_purchased_air_coupled_heat_balance,
+    DIRECT_ZONE_PURCHASED_AIR_DEMAND_SOURCE, DirectZonePurchasedAirCoupledOptions, ExecutionPlan,
+    ExecutionStep, HeatBalanceSimulationOptions, IDEAL_LOADS_FIXTURE_DEMAND_DIAGNOSTIC_SOURCE,
+    IdealLoadsCompatibilityOptions, NodeStateProjectionOptions, ResultStore,
+    RuntimePrecomputedData, ScheduleCacheProfile, ScheduleSeriesCache, ScheduleSeriesIndexKind,
+    TimeAxis, WeatherTimestepSeries, build_environment_time_axes_with_weather_metadata,
+    build_hourly_time_axis, build_hourly_time_axis_with_weather_metadata, load_epw_weather_file,
+    precompute_runtime_data, precompute_schedule_cache_for_environment_time_axis,
+    precompute_schedule_cache_for_time_axis, precompute_weather_timestep_series,
+    select_epw_environment_weather, simulate_direct_zone_purchased_air_coupled_heat_balance,
     simulate_heat_balance_zone_air_temperatures_with_weather_series,
     simulate_ideal_loads_node_state_projection, simulate_ideal_loads_purchased_air_compat,
 };
@@ -137,6 +137,7 @@ struct RustRuntimeResult {
     schedule_cache_profile: ScheduleCacheProfile,
     source_order_gate: SourceOrderGateSummary,
     zone_demand_source: Option<String>,
+    fixture_demand_injection_used: Option<bool>,
     purchased_air_branch: Option<String>,
     recirculation_node: Option<String>,
     recirculation_state_source: Option<String>,
@@ -482,12 +483,19 @@ pub fn run_arbitrary_idf(config: &RunConfig) -> Result<RunOutcome, RunError> {
         );
 
         let runtime_start = Instant::now();
-        match execute_rust_runtime(
-            simulation_model.as_ref(),
-            assessment.runtime_class,
-            source_order_gate,
-            &runtime_inputs,
-        ) {
+        match validate_runtime_selection(assessment.run_result_state, assessment.runtime_class)
+            .and_then(|()| {
+                execute_rust_runtime(
+                    simulation_model.as_ref(),
+                    assessment.runtime_class,
+                    source_order_gate,
+                    &runtime_inputs,
+                )
+            })
+            .and_then(|result| {
+                validate_runtime_demand_provenance(assessment.run_result_state, &result)?;
+                Ok(result)
+            }) {
             Ok(result) => {
                 timing.push(
                     "rust_runtime",
@@ -812,6 +820,7 @@ fn finish_successful_summary(
             ),
             "source_order_stages": result.source_order_gate.actual_executed_source_order_stages.clone(),
             "zone_demand_source": result.zone_demand_source.as_deref(),
+            "fixture_demand_injection_used": result.fixture_demand_injection_used,
             "purchased_air_branch": result.purchased_air_branch.as_deref(),
             "recirculation_node": result.recirculation_node.as_deref(),
             "recirculation_state_source": result.recirculation_state_source.as_deref(),
@@ -1696,6 +1705,7 @@ fn execute_rust_runtime(
                 schedule_cache_profile,
                 source_order_gate,
                 zone_demand_source: None,
+                fixture_demand_injection_used: None,
                 purchased_air_branch: None,
                 recirculation_node: None,
                 recirculation_state_source: None,
@@ -1723,6 +1733,8 @@ fn execute_rust_runtime(
             )
             .map_err(|error| error.to_string())?;
             let zone_demand_source = Some(simulation.summary.zone_demand_source.to_string());
+            let fixture_demand_injection_used =
+                Some(simulation.summary.fixture_demand_injection_used);
             let purchased_air_branch = Some(simulation.summary.branch.label().to_string());
             let recirculation_node = Some(simulation.summary.return_node_name.clone());
             let recirculation_state_source =
@@ -1743,18 +1755,14 @@ fn execute_rust_runtime(
                 schedule_cache_profile,
                 source_order_gate,
                 zone_demand_source,
+                fixture_demand_injection_used,
                 purchased_air_branch,
                 recirculation_node,
                 recirculation_state_source,
                 actual_coupled_source_order,
             })
         }
-        RuntimeClass::IdealLoadsNoOaSensibleCompatibility
-        | RuntimeClass::IdealLoadsFiniteLimitCompatibility
-        | RuntimeClass::IdealLoadsConstantShrCompatibility
-        | RuntimeClass::IdealLoadsHumiditySelectedBranchesCompatibility
-        | RuntimeClass::IdealLoadsOutdoorAirSelectedBranchesCompatibility
-        | RuntimeClass::IdealLoadsMixedDeclaredCompatibility => {
+        RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
             let simulation = simulate_ideal_loads_purchased_air_compat(
                 model,
                 IdealLoadsCompatibilityOptions::hourly_samples(sample_count),
@@ -1767,7 +1775,10 @@ fn execute_rust_runtime(
                 schedule_cache_sample_count,
                 schedule_cache_profile,
                 source_order_gate,
-                zone_demand_source: None,
+                zone_demand_source: Some(simulation.summary.zone_demand_source.to_string()),
+                fixture_demand_injection_used: Some(
+                    simulation.summary.fixture_demand_injection_used,
+                ),
                 purchased_air_branch: None,
                 recirculation_node: None,
                 recirculation_state_source: None,
@@ -1788,6 +1799,7 @@ fn execute_rust_runtime(
                 schedule_cache_profile,
                 source_order_gate,
                 zone_demand_source: None,
+                fixture_demand_injection_used: None,
                 purchased_air_branch: None,
                 recirculation_node: None,
                 recirculation_state_source: None,
@@ -1796,6 +1808,55 @@ fn execute_rust_runtime(
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
     }
+}
+
+fn validate_runtime_demand_provenance(
+    run_result_state: RunResultState,
+    result: &RustRuntimeResult,
+) -> Result<(), String> {
+    if result.runtime_class == RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+        && (result.zone_demand_source.as_deref() != Some(DIRECT_ZONE_PURCHASED_AIR_DEMAND_SOURCE)
+            || result.fixture_demand_injection_used != Some(false))
+    {
+        return Err(
+            "direct-zone IdealLoads runtime did not prove state-backed source-setpoint demand"
+                .to_string(),
+        );
+    }
+    if result.runtime_class == RuntimeClass::IdealLoadsFixtureDemandDiagnostic
+        && (result.zone_demand_source.as_deref()
+            != Some(IDEAL_LOADS_FIXTURE_DEMAND_DIAGNOSTIC_SOURCE)
+            || result.fixture_demand_injection_used != Some(true))
+    {
+        return Err(
+            "IdealLoads fixture-demand diagnostic did not expose its active-split provenance"
+                .to_string(),
+        );
+    }
+    if run_result_state == RunResultState::SupportedCompatibilityRun
+        && result.fixture_demand_injection_used == Some(true)
+    {
+        return Err(
+            "fixture/default IdealLoads demand cannot execute in a release compatibility run"
+                .to_string(),
+        );
+    }
+    Ok(())
+}
+
+fn validate_runtime_selection(
+    run_result_state: RunResultState,
+    runtime_class: RuntimeClass,
+) -> Result<(), String> {
+    if run_result_state == RunResultState::SupportedCompatibilityRun
+        && !runtime_class.conformance_promotion_allowed()
+    {
+        return Err(format!(
+            "diagnostic runtime '{}' cannot execute as a release compatibility run",
+            runtime_class.id()
+        ));
+    }
+    Ok(())
 }
 
 fn runtime_class_requires_weather(runtime_class: RuntimeClass) -> bool {
@@ -2096,6 +2157,7 @@ mod tests {
         full_surface_trace_opt_in, input_error_diagnostic_code, runtime_class_requires_weather,
         schedule_cache_json, selected_trace_enabled, source_order_gate_summary,
         source_order_stage_state_snapshots, trace_level_enables_stage_snapshots, typed_counts,
+        validate_runtime_selection,
     };
     use ep_compiler::compile_raw_model;
     use ep_model::{
@@ -2109,7 +2171,7 @@ mod tests {
         ExecutionStep, ScheduleCacheProfile, ScheduleSeriesIndexKind, build_hourly_time_axis,
     };
 
-    use crate::{RuntimeClass, TraceLevel, TraceSelection};
+    use crate::{RunResultState, RuntimeClass, TraceLevel, TraceSelection};
 
     #[test]
     fn direct_zone_coupled_runtime_requires_weather_axis() {
@@ -2117,8 +2179,33 @@ mod tests {
             RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
         ));
         assert!(!runtime_class_requires_weather(
-            RuntimeClass::IdealLoadsNoOaSensibleCompatibility
+            RuntimeClass::IdealLoadsFixtureDemandDiagnostic
         ));
+    }
+
+    #[test]
+    fn release_compatibility_rejects_diagnostic_runtime_before_execution() {
+        assert!(
+            validate_runtime_selection(
+                RunResultState::SupportedCompatibilityRun,
+                RuntimeClass::IdealLoadsFixtureDemandDiagnostic,
+            )
+            .is_err()
+        );
+        assert!(
+            validate_runtime_selection(
+                RunResultState::SupportedCompatibilityRun,
+                RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility,
+            )
+            .is_ok()
+        );
+        assert!(
+            validate_runtime_selection(
+                RunResultState::PartialSupportedRun,
+                RuntimeClass::IdealLoadsFixtureDemandDiagnostic,
+            )
+            .is_ok()
+        );
     }
 
     #[test]

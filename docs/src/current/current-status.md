@@ -114,13 +114,26 @@ requires diagnostic mode with partial execution allowed, uses a diagnostic-only
 runtime class, and keeps `conformance_claim=false`.
 
 The current compatibility-mode arbitrary runtime covers the official
-`1ZoneUncontrolled` heat-balance path and the declared IdealLoads
-ZoneEquipmentManager -> PurchasedAirManager no-OA sensible, numeric
-finite-limit, ConstantSensibleHeatRatio, and selected no-OA humidity-control
-branches. IdealLoads outdoor-air, economizer, heat-recovery, finite-limit
-humidity combinations, simultaneous humidification/dehumidification, and broad
-HVAC branches remain outside arbitrary-run compatibility unless separately
-promoted through the release conformance manifests.
+`1ZoneUncontrolled` heat-balance path and only the exact CP303 direct-Zone
+IdealLoads binding: no-OA sensible no limit, hard-sized finite capacity,
+hard-sized finite flow, and combined hard-sized flow plus capacity, all driven
+by Rust `SourceSetpointThresholds` demand. Every otherwise valid declared
+IdealLoads fallback outside that binding is classified as the single
+diagnostic-only `ideal-loads-fixture-demand-diagnostic` runtime; models with
+blocking typed, raw, topology, or feature errors remain
+`Unsupported`/`RuntimeClass::None`. Compatibility mode blocks the diagnostic
+class; only explicit diagnostic mode with partial execution allowed may run
+its fixed active-load-split adapter. Run summaries expose
+`rust-predictor-source-setpoint-thresholds` with
+`fixture_demand_injection_used=false` for the release class, or
+`rust-diagnostic-default-active-load-split` with
+`fixture_demand_injection_used=true` for the diagnostic adapter.
+ConstantSensibleHeatRatio, selected humidity, finite-limit humidity
+combinations, simultaneous humidification/dehumidification, mixed systems,
+and broad HVAC branches therefore remain outside arbitrary-run release
+compatibility even where separate case-level conformance evidence exists.
+IdealLoads outdoor-air, economizer, heat-recovery branches remain outside
+arbitrary-run compatibility.
 
 ## Current Launcher State
 

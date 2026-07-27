@@ -18182,6 +18182,57 @@ a new conformance promotion. Both parent algorithms remain `scaffold` at claim
 level `none`; no routine or inventory status changes. Roadmap Section 12's
 first checkbox remains open.
 
+## CP304 Release IdealLoads Demand-Provenance Firewall
+
+CP304 supersedes the legacy release-selection statements above without
+widening the CP303 physics boundary. `runtime_status_for_typed_model` returns
+IdealLoads `SupportedCompatibility` only after the exact direct-Zone binder
+proves one of the four CP303 no-OA sensible branches. Every binder miss,
+among otherwise valid declared fallbacks, including out-of-topology no-limit
+or finite-limit input, Constant SHR, selected humidity, outdoor-air, and mixed
+systems, is routed to the single `IdealLoadsFixtureDemandDiagnostic` class
+rather than to a branch-named compatibility class. Blocking typed, raw,
+topology, or feature errors still select `Unsupported` and
+`RuntimeClass::None`; this diagnostic fallback does not recover them.
+
+The consolidated class is `SupportedDiagnosticOnly`. Compatibility mode
+therefore reaches `run_blocked` before the runtime loop. Only
+`mode=diagnostic` together with partial execution allowed may invoke the
+retained `simulate_ideal_loads_purchased_air_compat` fixed active-load-split
+adapter. That diagnostic summary exposes
+`rust-diagnostic-default-active-load-split` and
+`fixture_demand_injection_used = true`; the CP303 live class exposes
+`rust-predictor-source-setpoint-thresholds` and
+`fixture_demand_injection_used = false`. A pipeline provenance invariant
+rejects either mislabeled class and independently forbids a true fixture flag
+in a supported compatibility run.
+
+The existing generic calculations do not justify reopening those release
+branches. Constant SHR and constant-supply-humidity arithmetic can consume live
+sensible demand, but the release heat-balance humidity corrector does not yet
+consume PurchasedAir supply mass flow and humidity. Humidistat calculation has
+a separate seeded fixed-timestep moisture loop rather than fully owned
+`HeatBalanceState`, schedule, latent-gain, and history state. The
+`OutdoorAirSelected` calculation remains a separate wrapper and lacks the
+complete live weather, OA schedule, occupancy/DCV, node, and same-step feedback
+binding required by the generic source-order loop.
+
+The no-OA and finite capability boundaries now state that only the exact CP303
+binding is arbitrary release compatibility. Constant SHR, selected humidity,
+and outdoor-air capability rows retain their declared case-level evidence but
+use `partial_supported_run` for arbitrary execution and describe that path as
+diagnostic-only.
+
+This closes only Roadmap Section 12's first explicit release condition:
+fixture/default `ZoneSysEnergyDemand` no longer executes in a release
+compatibility path. The stronger requirement that the whole IdealLoads family
+pass without oracle demand remains open, as do all-branch generic dispatch,
+live moisture and OA closure, `InitPurchasedAir`, `SizePurchasedAir`,
+NodeStateStore lifecycle, adaptive/first-iteration behavior, multiple
+equipment, rollback, and broader conformance. Both parent algorithms remain
+`scaffold`/`none`; CP304 promotes no source routine, inventory, performance, or
+conformance claim.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

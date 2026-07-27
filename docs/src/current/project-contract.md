@@ -15183,6 +15183,40 @@ full-timestep rollback, or a new conformance promotion. Both parent algorithms
 remain `scaffold` at claim level `none`, routine/inventory status is unchanged,
 and Roadmap Section 12's first checkbox remains open.
 
+## CP304 Release IdealLoads Demand-Provenance Firewall
+
+CP304 makes the CP303 demand boundary exhaustive for arbitrary release
+selection. A model receives `SupportedCompatibility` for IdealLoads only when
+`bind_direct_zone_purchased_air_model` proves the exact CP303 direct-Zone
+topology and one of its four no-OA sensible branches. For an otherwise valid
+declared fallback whose binder misses, all former legacy no-limit,
+finite-limit, ConstantSensibleHeatRatio, selected humidity, outdoor-air, and
+mixed default-demand runtime classes are replaced by the single
+`IdealLoadsFixtureDemandDiagnostic` class. Models with blocking typed, raw,
+topology, or feature errors remain `Unsupported` with `RuntimeClass::None`;
+the diagnostic class does not bypass those gates.
+
+That class is `SupportedDiagnosticOnly`: compatibility mode blocks it before
+runtime, while only explicit diagnostic mode with partial execution allowed
+may call the retained fixed active-load-split adapter. Its run summary reports
+`zone_demand_source = rust-diagnostic-default-active-load-split` and
+`fixture_demand_injection_used = true`. The direct coupled class continues to
+report `rust-predictor-source-setpoint-thresholds` and
+`fixture_demand_injection_used = false`. The pipeline validates these paired
+values and rejects any fixture/default-demand result presented as a supported
+compatibility run.
+
+This satisfies Roadmap Section 12's first narrow completion condition:
+fixture/default `ZoneSysEnergyDemand` is no longer consumed by any release
+compatibility path. The oracle-driven CLI fixtures and the diagnostic adapter
+remain explicitly non-release evidence. This does not satisfy the broader
+root-cause condition that the entire IdealLoads family pass without oracle
+inputs, and it does not implement live moisture demand, Zone humidity
+feedback, outdoor-air/weather/schedule/DCV coupling, all
+`CalcPurchAirLoads` branches, `InitPurchasedAir`, `SizePurchasedAir`, or the
+remaining lifecycle. Both parent algorithms remain `scaffold` at claim level
+`none`; no routine, inventory, performance, or conformance status is promoted.
+
 
 
 

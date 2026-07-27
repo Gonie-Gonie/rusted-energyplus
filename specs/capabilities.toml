@@ -77,7 +77,7 @@ evidence_cases = [
   "ideal_loads_no_oa_sensible_conformance_001",
   "ideal_loads_non_constant_fuel_efficiency_conformance_candidate_001",
 ]
-claim_boundary = "No-OA/no-limit sensible branch only for declared case variables."
+claim_boundary = "Arbitrary release compatibility is limited to the CP303 exact direct-Zone binding: one fully mixed Zone, zero-hysteresis DualSetpoint, one sequence-one SequentialLoad IdealLoads system, one distinct supply/Zone-air/return topology, no OA or humidity control, and state-backed SourceSetpointThresholds demand. No-OA/no-limit conformance evidence remains limited to declared case variables; every otherwise-valid out-of-binding fixed-demand adapter is diagnostic-only, while blocking models remain unsupported."
 
 [[capability]]
 id = "ideal_loads_finite_limits"
@@ -107,13 +107,13 @@ evidence_cases = [
   "ideal_loads_flow_capacity_limit_conformance_001",
   "ideal_loads_flow_limit_conformance_001",
 ]
-claim_boundary = "Numeric capacity, flow, and flow+capacity limits only for declared IdealLoads finite-limit cases."
+claim_boundary = "Arbitrary release compatibility is limited to explicit finite nonnegative hard sizes inside the CP303 exact direct-Zone binding and its state-backed SourceSetpointThresholds loop. Numeric capacity, flow, and flow+capacity conformance evidence remains limited to declared cases; Autosize or unresolved sizes remain unsupported when they trigger blocking validation, while otherwise-valid out-of-binding fixed-demand adapters are diagnostic-only."
 
 [[capability]]
 id = "ideal_loads_constant_shr"
 domain = "ideal_loads"
 support_level = "compatibility"
-run_state = "supported_compatibility_run"
+run_state = "partial_supported_run"
 required_objects = [
   "ZoneHVAC:IdealLoadsAirSystem",
   "ZoneHVAC:EquipmentConnections",
@@ -135,13 +135,13 @@ algorithms = [
 evidence_cases = [
   "ideal_loads_constant_shr_conformance_001",
 ]
-claim_boundary = "ConstantSensibleHeatRatio branch only where declared and gated."
+claim_boundary = "ConstantSensibleHeatRatio conformance evidence remains limited to the declared gated case. Arbitrary execution uses only the diagnostic fixed-demand adapter, requires diagnostic mode with partial execution allowed, and cannot become release compatibility or conformance evidence."
 
 [[capability]]
 id = "ideal_loads_humidity_selected_branches"
 domain = "ideal_loads"
 support_level = "compatibility"
-run_state = "supported_compatibility_run"
+run_state = "partial_supported_run"
 required_objects = [
   "ZoneHVAC:IdealLoadsAirSystem",
   "ZoneControl:Thermostat",
@@ -171,13 +171,13 @@ evidence_cases = [
   "ideal_loads_humidistat_humidification_annual_meter_conformance_candidate_001",
   "ideal_loads_humidistat_humidification_conformance_candidate_001",
 ]
-claim_boundary = "Only declared humidity-control candidate branches; broad humidity control remains outside the claim."
+claim_boundary = "Only declared humidity-control candidate rows retain their case-level evidence. Arbitrary execution uses only the diagnostic fixed-demand adapter, requires diagnostic mode with partial execution allowed, and does not own live moisture demand, Zone humidity feedback, or release compatibility; broad humidity control remains outside the claim."
 
 [[capability]]
 id = "ideal_loads_outdoor_air_selected_branches"
 domain = "ideal_loads"
 support_level = "compatibility"
-run_state = "supported_compatibility_run"
+run_state = "partial_supported_run"
 required_objects = [
   "ZoneHVAC:IdealLoadsAirSystem",
   "DesignSpecification:OutdoorAir",
@@ -206,7 +206,7 @@ evidence_cases = [
   "ideal_loads_outdoor_air_sensible_heat_recovery_conformance_candidate_001",
   "ideal_loads_outdoor_air_sum_conformance_candidate_001",
 ]
-claim_boundary = "Only declared IdealLoads outdoor-air/economizer/heat-recovery branch candidates."
+claim_boundary = "Only declared IdealLoads outdoor-air/economizer/heat-recovery branch candidates retain their case-level evidence. Arbitrary execution uses only the diagnostic fixed-demand adapter, requires diagnostic mode with partial execution allowed, and does not claim live OA/weather/schedule/DCV feedback or release compatibility."
 
 [[unsupported_rule]]
 id = "unsupported_hvac_air_loop"

@@ -1,5 +1,3 @@
-use std::collections::BTreeSet;
-
 use ep_model::{
     ConstructionGroundFactor, DehumidificationControlType, HumidificationControlType, MaterialKind,
     SimulationModel, TypedModel,
@@ -65,30 +63,14 @@ pub(super) fn runtime_status_for_typed_model(
             );
         }
 
-        let mut capability_ids = BTreeSet::new();
-        let mut selected_runtime_class = None;
-        for system in &typed_model.ideal_loads_air_systems {
-            let branch = select_purchased_air_branch(system);
-            capability_ids.insert(ideal_loads_capability_id_for_branch(branch).to_string());
-            let branch_runtime_class = ideal_loads_runtime_class_for_branch(branch);
-            selected_runtime_class = Some(match selected_runtime_class {
-                Some(existing) => merge_ideal_loads_runtime_class(existing, branch_runtime_class),
-                None => branch_runtime_class,
-            });
-        }
-
-        let runtime_class =
-            selected_runtime_class.unwrap_or(RuntimeClass::IdealLoadsNodeStateProjection);
-        let status = if runtime_class == RuntimeClass::IdealLoadsNodeStateProjection {
-            SupportStatus::SupportedDiagnosticOnly
-        } else {
-            SupportStatus::SupportedCompatibility
-        };
-        return runtime_selection_from_registry(
-            status,
-            runtime_class,
-            registry,
-            capability_ids.into_iter().collect::<Vec<_>>(),
+        // Branch-level capability evidence does not prove this model's
+        // arbitrary-run topology or demand provenance. Keep the fallback
+        // unmatched and diagnostic-only.
+        return (
+            SupportStatus::SupportedDiagnosticOnly,
+            RuntimeClass::IdealLoadsFixtureDemandDiagnostic,
+            Vec::new(),
+            Vec::new(),
         );
     }
 
@@ -145,59 +127,6 @@ const fn ideal_loads_capability_id_for_branch(
             "ideal_loads_outdoor_air_selected_branches"
         }
     }
-}
-
-const fn ideal_loads_runtime_class_for_branch(
-    branch: IdealLoadsPurchasedAirBranch,
-) -> RuntimeClass {
-    match branch {
-        IdealLoadsPurchasedAirBranch::NoOaNoLimitSensible => {
-            RuntimeClass::IdealLoadsNoOaSensibleCompatibility
-        }
-        IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity
-        | IdealLoadsPurchasedAirBranch::NoOaFiniteFlow
-        | IdealLoadsPurchasedAirBranch::NoOaFiniteFlowAndCapacity => {
-            RuntimeClass::IdealLoadsFiniteLimitCompatibility
-        }
-        IdealLoadsPurchasedAirBranch::NoOaConstantSensibleHeatRatioCooling => {
-            RuntimeClass::IdealLoadsConstantShrCompatibility
-        }
-        IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityCooling
-        | IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityHeating
-        | IdealLoadsPurchasedAirBranch::NoOaHumidistatDehumidification
-        | IdealLoadsPurchasedAirBranch::NoOaHumidistatHumidification => {
-            RuntimeClass::IdealLoadsHumiditySelectedBranchesCompatibility
-        }
-        IdealLoadsPurchasedAirBranch::OutdoorAirSelected => {
-            RuntimeClass::IdealLoadsOutdoorAirSelectedBranchesCompatibility
-        }
-    }
-}
-
-fn merge_ideal_loads_runtime_class(existing: RuntimeClass, next: RuntimeClass) -> RuntimeClass {
-    if existing == next {
-        return existing;
-    }
-    if is_declared_ideal_loads_compatibility(existing)
-        && is_declared_ideal_loads_compatibility(next)
-    {
-        RuntimeClass::IdealLoadsMixedDeclaredCompatibility
-    } else {
-        RuntimeClass::IdealLoadsNodeStateProjection
-    }
-}
-
-fn is_declared_ideal_loads_compatibility(runtime_class: RuntimeClass) -> bool {
-    matches!(
-        runtime_class,
-        RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
-            | RuntimeClass::IdealLoadsNoOaSensibleCompatibility
-            | RuntimeClass::IdealLoadsFiniteLimitCompatibility
-            | RuntimeClass::IdealLoadsConstantShrCompatibility
-            | RuntimeClass::IdealLoadsHumiditySelectedBranchesCompatibility
-            | RuntimeClass::IdealLoadsOutdoorAirSelectedBranchesCompatibility
-            | RuntimeClass::IdealLoadsMixedDeclaredCompatibility
-    )
 }
 
 fn unsupported_features_for_selected_branch(
@@ -807,6 +736,15 @@ pub(super) fn assess_typed_runtime_boundaries(
                 "UnsupportedTopology",
                 "support",
                 "IdealLoads systems require zone equipment connections and resolvable supply nodes",
+            );
+        }
+        if let Err(error) = bind_direct_zone_purchased_air_model(&simulation_model) {
+            diagnostics.warning(
+                "IdealLoadsFixtureDemandDiagnosticOnly",
+                "support",
+                format!(
+                    "the model is outside the state-backed direct-Zone IdealLoads boundary ({error:?}); the fixed-demand adapter is diagnostic-only and requires mode=diagnostic with partial_policy=allow"
+                ),
             );
         }
 

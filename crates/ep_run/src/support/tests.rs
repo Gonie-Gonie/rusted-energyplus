@@ -738,12 +738,11 @@ fn runtime_class_reports_selected_algorithm_lane_metadata() {
     assert!(!heat_balance_compat.diagnostic_probe_used);
     assert!(heat_balance_compat.conformance_promotion_allowed);
 
-    let ideal_loads_compat = SelectedAlgorithmLane::from_runtime_class(
-        RuntimeClass::IdealLoadsHumiditySelectedBranchesCompatibility,
-    );
-    assert_eq!(ideal_loads_compat.id, "compatibility-source-order");
-    assert!(!ideal_loads_compat.diagnostic_probe_used);
-    assert!(ideal_loads_compat.conformance_promotion_allowed);
+    let ideal_loads_fixture_diagnostic =
+        SelectedAlgorithmLane::from_runtime_class(RuntimeClass::IdealLoadsFixtureDemandDiagnostic);
+    assert_eq!(ideal_loads_fixture_diagnostic.id, "diagnostic-probe");
+    assert!(ideal_loads_fixture_diagnostic.diagnostic_probe_used);
+    assert!(!ideal_loads_fixture_diagnostic.conformance_promotion_allowed);
 
     let direct_zone_coupled = SelectedAlgorithmLane::from_runtime_class(
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility,
@@ -891,7 +890,7 @@ fn hvac_air_loop_uses_unsupported_rule_from_registry() -> Result<(), Box<dyn std
 }
 
 #[test]
-fn direct_zone_ideal_loads_binding_selects_coupled_runtime_before_legacy_branch()
+fn direct_zone_ideal_loads_binding_selects_coupled_runtime_before_diagnostic_fallback()
 -> Result<(), Box<dyn std::error::Error>> {
     let fixture = r#"{
                 "Version": {"Version 1": {"version_identifier": "26.1"}},
@@ -1004,14 +1003,58 @@ fn direct_zone_ideal_loads_binding_selects_coupled_runtime_before_legacy_branch(
         RunOutputFormat::RustNative,
         TraceLevel::Normal,
     );
+    assert_eq!(assessment.status, SupportStatus::SupportedDiagnosticOnly);
+    assert_eq!(assessment.run_result_state, RunResultState::RunBlocked);
     assert_eq!(
         assessment.runtime_class,
-        RuntimeClass::IdealLoadsFiniteLimitCompatibility,
-        "finite models outside the zero-hysteresis direct binding remain on the legacy path"
+        RuntimeClass::IdealLoadsFixtureDemandDiagnostic,
+        "finite models outside the state-backed direct binding must not use a release compatibility path"
+    );
+    assert!(assessment.matched_capability_ids.is_empty());
+    assert!(assessment.failed_capability_ids.is_empty());
+    assert!(
+        assessment
+            .diagnostics
+            .diagnostics
+            .iter()
+            .any(|diagnostic| { diagnostic.code == "IdealLoadsFixtureDemandDiagnosticOnly" })
+    );
+    assert!(
+        assessment
+            .diagnostics
+            .diagnostics
+            .iter()
+            .any(|diagnostic| { diagnostic.code == "DiagnosticOnlyRuntimeBlocked" })
+    );
+
+    let diagnostic_assessment = assess_support(
+        &raw,
+        &result.report,
+        result.model.as_ref(),
+        RunMode::Diagnostic,
+        PartialRunPolicy::Allow,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
     );
     assert_eq!(
-        assessment.matched_capability_ids,
-        vec!["ideal_loads_finite_limits"]
+        diagnostic_assessment.status,
+        SupportStatus::SupportedDiagnosticOnly
+    );
+    assert_eq!(
+        diagnostic_assessment.run_result_state,
+        RunResultState::PartialSupportedRun
+    );
+    assert_eq!(
+        diagnostic_assessment.runtime_class,
+        RuntimeClass::IdealLoadsFixtureDemandDiagnostic
+    );
+    assert!(diagnostic_assessment.matched_capability_ids.is_empty());
+    assert!(
+        !diagnostic_assessment
+            .diagnostics
+            .diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.code == "DiagnosticOnlyRuntimeBlocked")
     );
     Ok(())
 }
@@ -1121,7 +1164,7 @@ fn ideal_loads_no_oa_branch_matches_registry_capability() -> Result<(), Box<dyn 
 }
 
 #[test]
-fn ideal_loads_constant_supply_humidity_branch_matches_registry_capability()
+fn ideal_loads_constant_supply_humidity_branch_is_fixture_demand_diagnostic_only()
 -> Result<(), Box<dyn std::error::Error>> {
     let raw = parse_epjson_str(
         r#"{
@@ -1193,19 +1236,13 @@ fn ideal_loads_constant_supply_humidity_branch_matches_registry_capability()
         TraceLevel::Normal,
     );
 
-    assert_eq!(assessment.status, SupportStatus::SupportedCompatibility);
-    assert_eq!(
-        assessment.run_result_state,
-        RunResultState::SupportedCompatibilityRun
-    );
+    assert_eq!(assessment.status, SupportStatus::SupportedDiagnosticOnly);
+    assert_eq!(assessment.run_result_state, RunResultState::RunBlocked);
     assert_eq!(
         assessment.runtime_class,
-        RuntimeClass::IdealLoadsHumiditySelectedBranchesCompatibility
+        RuntimeClass::IdealLoadsFixtureDemandDiagnostic
     );
-    assert_eq!(
-        assessment.matched_capability_ids,
-        vec!["ideal_loads_humidity_selected_branches"]
-    );
+    assert!(assessment.matched_capability_ids.is_empty());
     assert_eq!(
         assessment.active_ideal_loads_branches,
         vec!["constant_supply_humidity_cooling"]
@@ -1215,11 +1252,45 @@ fn ideal_loads_constant_supply_humidity_branch_matches_registry_capability()
             .inactive_ideal_loads_branches
             .contains(&"humidistat_dehumidification".to_string())
     );
-    assert_eq!(assessment.matched_capabilities[0].domain, "ideal_loads");
-    assert!(assessment.matched_capabilities[0].evidence_cases.contains(
-        &"ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001".to_string()
-    ));
+    assert!(assessment.matched_capabilities.is_empty());
     assert!(assessment.failed_capability_ids.is_empty());
+    assert!(
+        assessment
+            .diagnostics
+            .diagnostics
+            .iter()
+            .any(|diagnostic| { diagnostic.code == "IdealLoadsFixtureDemandDiagnosticOnly" })
+    );
+    assert!(
+        assessment
+            .diagnostics
+            .diagnostics
+            .iter()
+            .any(|diagnostic| { diagnostic.code == "DiagnosticOnlyRuntimeBlocked" })
+    );
+
+    let diagnostic_assessment = assess_support(
+        &raw,
+        &result.report,
+        result.model.as_ref(),
+        RunMode::Diagnostic,
+        PartialRunPolicy::Allow,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+    );
+    assert_eq!(
+        diagnostic_assessment.status,
+        SupportStatus::SupportedDiagnosticOnly
+    );
+    assert_eq!(
+        diagnostic_assessment.run_result_state,
+        RunResultState::PartialSupportedRun
+    );
+    assert_eq!(
+        diagnostic_assessment.runtime_class,
+        RuntimeClass::IdealLoadsFixtureDemandDiagnostic
+    );
+    assert!(diagnostic_assessment.matched_capability_ids.is_empty());
     Ok(())
 }
 #[test]

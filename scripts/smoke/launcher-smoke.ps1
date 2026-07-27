@@ -569,13 +569,15 @@ Assert-File -Path (Join-Path $oneZoneOutput "results\result-store.json") -Descri
 $idealLoadsOutput = Join-Path $smokeRoot "ideal-loads-output"
 $idealLoadsSummary = Invoke-LauncherCliRun `
     -Description "supported IdealLoads fixture" `
-    -Arguments @("run", $idealLoadsPath, "-d", $idealLoadsOutput, "--mode", "compatibility", "--partial", "deny", "--format", "rust-native", "--trace-level", "normal", "--overwrite") `
+    -Arguments @("run", $idealLoadsPath, "-w", $weatherPath, "-d", $idealLoadsOutput, "--mode", "compatibility", "--partial", "deny", "--format", "rust-native", "--trace-level", "normal", "--overwrite") `
     -ExpectedExitCode 0 `
     -OutputDir $idealLoadsOutput
 Assert-LauncherRunSummary -Summary $idealLoadsSummary -ExpectedStatus "success" -ExpectedExitCode 0 -ExpectedRunResultState "supported_compatibility_run" -Description "supported IdealLoads"
 Assert-LauncherArtifactSchema -Summary $idealLoadsSummary -OutputDir $idealLoadsOutput -Description "supported IdealLoads"
 Assert-ContainsValue -Values @($idealLoadsSummary.support.matched_capability_ids) -Expected "ideal_loads_no_oa_sensible" -Description "supported IdealLoads matched capability"
-Assert-Equal -Actual $idealLoadsSummary.support.runtime_class -Expected "ideal-loads-no-oa-sensible-compatibility" -Description "supported IdealLoads runtime class"
+Assert-Equal -Actual $idealLoadsSummary.support.runtime_class -Expected "ideal-loads-direct-zone-coupled-compatibility" -Description "supported IdealLoads runtime class"
+Assert-Equal -Actual $idealLoadsSummary.rust_runtime.zone_demand_source -Expected "rust-predictor-source-setpoint-thresholds" -Description "supported IdealLoads demand source"
+Assert-Equal -Actual $idealLoadsSummary.rust_runtime.fixture_demand_injection_used -Expected $false -Description "supported IdealLoads fixture demand flag"
 
 $airLoopOutput = Join-Path $smokeRoot "air-loop-output"
 $airLoopSummary = Invoke-LauncherCliRun `

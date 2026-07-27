@@ -20922,6 +20922,41 @@ humidity/OA/DCV/economizer/heat-recovery/EMS paths, warmup, adaptive or
 rollback, or new conformance promotion. Both parents remain
 `scaffold`/`none`, and Roadmap Section 12's first checkbox remains open.
 
+## CP304 Release IdealLoads Demand-Provenance Firewall
+
+CP304 makes the state-backed CP299 demand producer mandatory for every
+IdealLoads release-compatible zone-air loop. Only a successful CP303
+direct-Zone binding selects `IdealLoadsDirectZoneCoupledCompatibility`;
+every otherwise valid declared fallback whose binding misses is consolidated
+as `IdealLoadsFixtureDemandDiagnostic` with `SupportedDiagnosticOnly`. Blocking
+typed, raw, topology, or feature errors continue to select
+`Unsupported`/`RuntimeClass::None`. The diagnostic class is blocked in
+compatibility mode and may execute only under explicit diagnostic mode with
+partial execution allowed.
+
+The direct loop reports `rust-predictor-source-setpoint-thresholds` and
+`fixture_demand_injection_used = false`. The retained diagnostic adapter
+reports `rust-diagnostic-default-active-load-split` and
+`fixture_demand_injection_used = true`. The pipeline validates those pairs and
+rejects any fixture/default demand in a supported compatibility run. CP304
+therefore supersedes the prior statement that out-of-topology finite paths
+remain compatibility/default-demand runs.
+
+Humidity and OA branches are not silently admitted. Constant SHR and constant
+supply humidity can reuse portions of PurchasedAir arithmetic, but the current
+zone humidity corrector does not consume the resulting supply mass flow and
+humidity. Humidistat moisture histories remain separately seeded, and the OA
+wrapper lacks complete live weather, schedule/DCV, node, and same-step
+feedback ownership. Those inputs stay diagnostic or blocked until their
+predictor/corrector state is integrated.
+
+This satisfies Roadmap Section 12's first narrow completion condition for the
+release path only. It does not prove the whole IdealLoads family oracle-free,
+complete moisture demand, generic all-branch dispatch, `InitPurchasedAir`,
+`SizePurchasedAir`, adaptive/first-iteration behavior, multiple equipment,
+full rollback, or broader conformance. Both parent algorithms remain
+`scaffold` at claim level `none`; no routine or inventory status is promoted.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

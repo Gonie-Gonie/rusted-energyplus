@@ -15,17 +15,19 @@ pub const ZONE_SYS_ENERGY_DEMAND_HEATING_SIGN_CONVENTION: &str =
     "positive W requests heating; non-positive means no active heating request";
 /// Rust/EnergyPlus sign convention for the cooling sensible demand field.
 pub const ZONE_SYS_ENERGY_DEMAND_COOLING_SIGN_CONVENTION: &str = "negative W requests cooling; positive means no active cooling request; exact zero priority depends on the demand input kind";
-/// Current conformance fixture source for zone demand input values.
+/// Current diagnostic/conformance fixture source for zone demand input values.
 pub const ZONE_SYS_ENERGY_DEMAND_INPUT_SOURCE: &str = "EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs";
 /// Mismatch classification used when the upstream zone demand input diverges.
 pub const ZONE_SYS_ENERGY_DEMAND_MISMATCH_CLASSIFICATION: &str = "upstream_zone_heat_balance_input";
-/// Current IdealLoads fixture lane for zone demand.
+/// Diagnostic/conformance IdealLoads fixture lane for zone demand.
+///
+/// This provenance is not eligible for arbitrary-run release compatibility.
 pub const ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE: &str = "source-order-oracle-demand-input";
 
 /// Interpretation of the two sensible setpoint fields at the compatibility boundary.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum ZoneSensibleDemandInputKind {
-    /// Oracle/default fixtures use zero as the inactive side of an active split.
+    /// Diagnostic oracle/default fixtures use zero as the inactive side of an active split.
     ActiveLoadSplitCompatibility,
     /// Source `OutputRequiredTo*Setpoint` values retain both thresholds and zero priority.
     SourceSetpointThresholds,

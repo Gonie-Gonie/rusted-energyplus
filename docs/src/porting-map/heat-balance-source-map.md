@@ -33219,6 +33219,41 @@ full-timestep rollback, or a new conformance promotion. Both parent algorithms
 remain `scaffold` at claim level `none`; routine and inventory statuses do not
 change, and Roadmap Section 12's first checkbox remains open.
 
+## CP304 Release IdealLoads Demand-Provenance Firewall
+
+CP304 makes the CP303 demand source the only IdealLoads release-compatible
+heat-balance coupling. A successful exact direct-Zone binding still selects
+`IdealLoadsDirectZoneCoupledCompatibility` and must report
+`rust-predictor-source-setpoint-thresholds` with
+`fixture_demand_injection_used = false`. Every otherwise valid declared
+fallback whose binding misses is consolidated under
+`IdealLoadsFixtureDemandDiagnostic`, returns `SupportedDiagnosticOnly`, and is
+blocked in compatibility mode. Blocking typed, raw, topology, or feature
+errors continue to select `Unsupported`/`RuntimeClass::None`.
+
+Only explicit diagnostic mode with partial execution allowed may run the
+retained fixed active-load-split adapter. That adapter reports
+`rust-diagnostic-default-active-load-split` and
+`fixture_demand_injection_used = true`; a pipeline invariant prevents that
+provenance from being accepted as a supported compatibility result. This
+supersedes CP302/CP303 statements that out-of-topology finite or other legacy
+IdealLoads models retain compatibility/default demand.
+
+The boundary is intentionally fail-closed instead of attaching live sensible
+demand to incomplete humidity or outdoor-air loops. Current heat-balance
+humidity correction does not consume PurchasedAir supply mass flow/humidity,
+the Humidistat helper owns only separately seeded fixed-timestep histories, and
+the OA wrapper lacks complete live weather/schedule/DCV/node feedback binding.
+
+Roadmap Section 12's first narrow release condition is therefore satisfied:
+no release compatibility path consumes fixture/default
+`ZoneSysEnergyDemand`. Whole-family oracle-free tolerance, moisture/OA
+closure, all `CalcPurchAirLoads` branches, `InitPurchasedAir`,
+`SizePurchasedAir`, return-node storage, adaptive/first-iteration semantics,
+multiple equipment, rollback, and broader conformance remain incomplete. Both
+parent algorithms stay `scaffold`/`none`, and no routine, inventory,
+performance, or conformance status changes.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

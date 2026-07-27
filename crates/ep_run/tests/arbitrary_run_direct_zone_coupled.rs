@@ -145,6 +145,10 @@ fn direct_zone_predictor_purchased_air_runs_in_release_order()
         ZONE_DEMAND_SOURCE
     );
     assert_eq!(
+        summary["rust_runtime"]["fixture_demand_injection_used"],
+        false
+    );
+    assert_eq!(
         summary["rust_runtime"]["purchased_air_branch"],
         "no_oa_sensible"
     );
@@ -252,6 +256,10 @@ fn all_hard_sized_finite_limit_branches_use_the_live_coupled_runtime()
         assert_eq!(
             summary["rust_runtime"]["zone_demand_source"],
             ZONE_DEMAND_SOURCE
+        );
+        assert_eq!(
+            summary["rust_runtime"]["fixture_demand_injection_used"], false,
+            "{name}"
         );
         assert_eq!(
             summary["rust_runtime"]["purchased_air_branch"],

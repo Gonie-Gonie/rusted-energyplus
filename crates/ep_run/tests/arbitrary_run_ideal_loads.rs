@@ -26,7 +26,7 @@ use output_manifest::{SUPPORTED_RUNTIME_MANIFEST, assert_output_manifest};
 #[test]
 fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
 -> Result<(), Box<dyn std::error::Error>> {
-    let summary = assert_ideal_loads_fixture_runs(
+    let summary = assert_direct_ideal_loads_fixture_runs(
         "ideal-loads-no-oa",
         IDEAL_LOADS_EPJSON,
         "ideal-loads-direct-zone-coupled-compatibility",
@@ -37,6 +37,10 @@ fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
     assert_eq!(
         summary["rust_runtime"]["zone_demand_source"],
         "rust-predictor-source-setpoint-thresholds"
+    );
+    assert_eq!(
+        summary["rust_runtime"]["fixture_demand_injection_used"],
+        false
     );
     assert_eq!(
         summary["rust_runtime"]["recirculation_state_source"],
@@ -53,36 +57,139 @@ fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
 }
 
 #[test]
-fn ideal_loads_constant_shr_branch_runs_declared_compatibility_runtime()
+fn ideal_loads_fixture_demand_fallbacks_fail_closed_in_compatibility_mode()
 -> Result<(), Box<dyn std::error::Error>> {
-    let summary = assert_ideal_loads_fixture_runs(
-        "ideal-loads-constant-shr",
-        IDEAL_LOADS_CONSTANT_SHR_EPJSON,
-        "ideal-loads-constant-shr-compatibility",
-        "ideal_loads_constant_shr",
-    )?;
+    for (name, fixture) in [
+        (
+            "ideal-loads-constant-shr",
+            IDEAL_LOADS_CONSTANT_SHR_EPJSON.to_string(),
+        ),
+        (
+            "ideal-loads-constant-supply-humidity",
+            IDEAL_LOADS_CONSTANT_SUPPLY_HUMIDITY_EPJSON.to_string(),
+        ),
+        (
+            "ideal-loads-outdoor-air",
+            IDEAL_LOADS_OUTDOOR_AIR_EPJSON.to_string(),
+        ),
+        (
+            "ideal-loads-mixed",
+            IDEAL_LOADS_MIXED_BRANCH_EPJSON.to_string(),
+        ),
+        (
+            "ideal-loads-finite-hysteresis",
+            finite_limit_hysteresis_fixture(),
+        ),
+    ] {
+        let case_dir = unique_case_dir(name)?;
+        let input_path = case_dir.join("ideal-loads.epJSON");
+        let output_dir = case_dir.join("out");
+        write_text(&input_path, &fixture)?;
 
-    assert_eq!(
-        summary["support"]["matched_capabilities"][0]["evidence_cases"][0],
-        "ideal_loads_constant_shr_conformance_001"
-    );
+        let outcome = run_arbitrary_idf(&RunConfig {
+            input_path,
+            weather_path: None,
+            output_dir: output_dir.clone(),
+            mode: RunMode::Compatibility,
+            partial_policy: PartialRunPolicy::Deny,
+            output_format: RunOutputFormat::RustNative,
+            overwrite: true,
+            keep_intermediate: true,
+            trace_level: TraceLevel::Normal,
+            trace_selection: TraceSelection::default(),
+            fail_on_warning: false,
+            dry_run: false,
+            oracle_baseline: false,
+            compare_oracle: false,
+            json_stdout: false,
+            oracle_root: None,
+            hours: Some(1),
+        })?;
+
+        assert_eq!(outcome.exit_code, RunExitCode::Unsupported, "{name}");
+        assert_eq!(
+            outcome.support_status,
+            SupportStatus::SupportedDiagnosticOnly,
+            "{name}"
+        );
+        assert_eq!(
+            outcome.run_result_state,
+            RunResultState::RunBlocked,
+            "{name}"
+        );
+
+        let summary = read_json(&output_dir.join("run-summary.json"))?;
+        assert_eq!(summary["status"], "unsupported", "{name}");
+        assert_eq!(
+            summary["support"]["status"], "supported-diagnostic-only",
+            "{name}"
+        );
+        assert_eq!(
+            summary["support"]["run_result_state"], "run_blocked",
+            "{name}"
+        );
+        assert_eq!(
+            summary["support"]["runtime_class"], "ideal-loads-fixture-demand-diagnostic",
+            "{name}"
+        );
+        assert_eq!(
+            summary["support"]["matched_capability_ids"]
+                .as_array()
+                .expect("matched capability ids should be an array")
+                .len(),
+            0,
+            "{name}"
+        );
+        assert_eq!(
+            summary["support"]["selected_algorithm_lane"]["id"], "diagnostic-probe",
+            "{name}"
+        );
+        assert_eq!(
+            summary["support"]["selected_algorithm_lane"]["conformance_promotion_allowed"], false,
+            "{name}"
+        );
+        assert!(summary["rust_runtime"].is_null(), "{name}");
+        assert!(
+            !output_dir
+                .join("results")
+                .join("result-store.json")
+                .exists(),
+            "{name}"
+        );
+        let diagnostics = read_json(&output_dir.join("diagnostics.json"))?;
+        let diagnostic_entries = diagnostics["diagnostics"]
+            .as_array()
+            .expect("diagnostics should be an array");
+        assert!(
+            diagnostic_entries.iter().any(|diagnostic| {
+                diagnostic["code"] == "IdealLoadsFixtureDemandDiagnosticOnly"
+            }),
+            "{name}"
+        );
+        assert!(
+            diagnostic_entries
+                .iter()
+                .any(|diagnostic| diagnostic["code"] == "DiagnosticOnlyRuntimeBlocked"),
+            "{name}"
+        );
+    }
     Ok(())
 }
 
 #[test]
-fn mixed_declared_ideal_loads_runs_compatibility_runtime() -> Result<(), Box<dyn std::error::Error>>
-{
-    let case_dir = unique_case_dir("mixed-ideal-loads-compatibility")?;
-    let input_path = case_dir.join("mixed-ideal-loads.epJSON");
+fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
+-> Result<(), Box<dyn std::error::Error>> {
+    let case_dir = unique_case_dir("ideal-loads-fixture-demand-diagnostic")?;
+    let input_path = case_dir.join("ideal-loads-constant-shr.epJSON");
     let output_dir = case_dir.join("out");
-    write_text(&input_path, IDEAL_LOADS_MIXED_BRANCH_EPJSON)?;
+    write_text(&input_path, IDEAL_LOADS_CONSTANT_SHR_EPJSON)?;
 
     let outcome = run_arbitrary_idf(&RunConfig {
         input_path,
         weather_path: None,
         output_dir: output_dir.clone(),
-        mode: RunMode::Compatibility,
-        partial_policy: PartialRunPolicy::Deny,
+        mode: RunMode::Diagnostic,
+        partial_policy: PartialRunPolicy::Allow,
         output_format: RunOutputFormat::RustNative,
         overwrite: true,
         keep_intermediate: true,
@@ -100,130 +207,59 @@ fn mixed_declared_ideal_loads_runs_compatibility_runtime() -> Result<(), Box<dyn
     assert_eq!(outcome.exit_code, RunExitCode::Success);
     assert_eq!(
         outcome.support_status,
-        SupportStatus::SupportedCompatibility
+        SupportStatus::SupportedDiagnosticOnly
     );
     assert_eq!(
         outcome.run_result_state,
-        RunResultState::SupportedCompatibilityRun
+        RunResultState::PartialSupportedRun
     );
 
     let summary = read_json(&output_dir.join("run-summary.json"))?;
     assert_eq!(summary["status"], "success");
-    assert_eq!(summary["support"]["status"], "supported-compatibility");
+    assert_eq!(summary["support"]["status"], "supported-diagnostic-only");
     assert_eq!(
         summary["support"]["run_result_state"],
-        "supported_compatibility_run"
+        "partial_supported_run"
     );
     assert_eq!(
         summary["support"]["runtime_class"],
-        "ideal-loads-mixed-declared-compatibility"
-    );
-    let capability_ids = summary["support"]["matched_capability_ids"]
-        .as_array()
-        .expect("matched capability ids should be an array");
-    assert!(
-        capability_ids
-            .iter()
-            .any(|id| id == "ideal_loads_no_oa_sensible")
-    );
-    assert!(
-        capability_ids
-            .iter()
-            .any(|id| id == "ideal_loads_finite_limits")
+        "ideal-loads-fixture-demand-diagnostic"
     );
     assert_eq!(
-        summary["support"]["failed_capability_ids"]
+        summary["support"]["matched_capability_ids"]
             .as_array()
-            .expect("failed capability ids should be an array")
+            .expect("matched capability ids should be an array")
             .len(),
         0
     );
     assert_eq!(summary["support"]["conformance_claim"], false);
-    assert!(
-        summary["support"]["runtime_selection_note"]
-            .as_str()
-            .unwrap()
-            .contains("selected runtime")
+    assert_eq!(
+        summary["support"]["selected_algorithm_lane"]["id"],
+        "diagnostic-probe"
+    );
+    assert_eq!(
+        summary["support"]["selected_algorithm_lane"]["diagnostic_probe_used"],
+        true
+    );
+    assert_eq!(
+        summary["support"]["selected_algorithm_lane"]["conformance_promotion_allowed"],
+        false
     );
     assert_eq!(
         summary["rust_runtime"]["runtime_class"],
-        "ideal-loads-mixed-declared-compatibility"
-    );
-    assert_eq!(summary["source_order_gate"]["matches"], true);
-    assert_output_manifest(&output_dir, SUPPORTED_RUNTIME_MANIFEST)?;
-    Ok(())
-}
-
-#[test]
-fn ideal_loads_humidity_selected_branch_runs_declared_compatibility_runtime()
--> Result<(), Box<dyn std::error::Error>> {
-    let case_dir = unique_case_dir("ideal-loads-humidity-selected")?;
-    let input_path = case_dir.join("ideal-loads-humidity.epJSON");
-    let output_dir = case_dir.join("out");
-    write_text(&input_path, IDEAL_LOADS_CONSTANT_SUPPLY_HUMIDITY_EPJSON)?;
-
-    let outcome = run_arbitrary_idf(&RunConfig {
-        input_path,
-        weather_path: None,
-        output_dir: output_dir.clone(),
-        mode: RunMode::Compatibility,
-        partial_policy: PartialRunPolicy::Deny,
-        output_format: RunOutputFormat::RustNative,
-        overwrite: true,
-        keep_intermediate: true,
-        trace_level: TraceLevel::Normal,
-        trace_selection: TraceSelection::default(),
-        fail_on_warning: false,
-        dry_run: false,
-        oracle_baseline: false,
-        compare_oracle: false,
-        json_stdout: false,
-        oracle_root: None,
-        hours: Some(1),
-    })?;
-
-    assert_eq!(outcome.exit_code, RunExitCode::Success);
-    assert_eq!(
-        outcome.support_status,
-        SupportStatus::SupportedCompatibility
+        "ideal-loads-fixture-demand-diagnostic"
     );
     assert_eq!(
-        outcome.run_result_state,
-        RunResultState::SupportedCompatibilityRun
-    );
-
-    let summary = read_json(&output_dir.join("run-summary.json"))?;
-    assert_eq!(summary["status"], "success");
-    assert_eq!(summary["support"]["status"], "supported-compatibility");
-    assert_eq!(
-        summary["support"]["runtime_class"],
-        "ideal-loads-humidity-selected-branches-compatibility"
+        summary["rust_runtime"]["zone_demand_source"],
+        "rust-diagnostic-default-active-load-split"
     );
     assert_eq!(
-        summary["support"]["matched_capability_ids"][0],
-        "ideal_loads_humidity_selected_branches"
-    );
-    assert!(
-        summary["support"]["matched_capabilities"][0]["evidence_cases"]
-            .as_array()
-            .expect("evidence cases should be an array")
-            .iter()
-            .any(|case_id| case_id
-                == "ideal_loads_constant_supply_humidity_cooling_conformance_candidate_001")
-    );
-    assert_eq!(
-        summary["support"]["failed_capability_ids"]
-            .as_array()
-            .expect("failed capability ids should be an array")
-            .len(),
-        0
-    );
-    assert_eq!(
-        summary["rust_runtime"]["runtime_class"],
-        "ideal-loads-humidity-selected-branches-compatibility"
+        summary["rust_runtime"]["fixture_demand_injection_used"],
+        true
     );
     assert_eq!(summary["rust_runtime"]["samples"], 1);
     assert_eq!(summary["source_order_gate"]["matches"], true);
+    assert_output_manifest(&output_dir, SUPPORTED_RUNTIME_MANIFEST)?;
     assert!(
         summary["rust_runtime"]["source_order_stages"]
             .as_array()
@@ -233,24 +269,6 @@ fn ideal_loads_humidity_selected_branch_runs_declared_compatibility_runtime()
     );
     let results = std::fs::read_to_string(output_dir.join("results").join("result-store.json"))?;
     assert!(results.contains("System Node Humidity Ratio"));
-    assert_output_manifest(&output_dir, SUPPORTED_RUNTIME_MANIFEST)?;
-    Ok(())
-}
-
-#[test]
-fn ideal_loads_outdoor_air_selected_branch_runs_declared_compatibility_runtime()
--> Result<(), Box<dyn std::error::Error>> {
-    let summary = assert_ideal_loads_fixture_runs(
-        "ideal-loads-outdoor-air-selected",
-        IDEAL_LOADS_OUTDOOR_AIR_EPJSON,
-        "ideal-loads-outdoor-air-selected-branches-compatibility",
-        "ideal_loads_outdoor_air_selected_branches",
-    )?;
-
-    assert_eq!(
-        summary["support"]["matched_capabilities"][0]["required_objects"][1],
-        "DesignSpecification:OutdoorAir"
-    );
     Ok(())
 }
 
@@ -272,7 +290,26 @@ fn write_text(path: &Path, contents: &str) -> Result<(), Box<dyn std::error::Err
     Ok(())
 }
 
-fn assert_ideal_loads_fixture_runs(
+fn finite_limit_hysteresis_fixture() -> String {
+    IDEAL_LOADS_EPJSON
+        .replace(
+            r#""control_1_name": "Dual Setpoints""#,
+            r#""control_1_name": "Dual Setpoints",
+      "temperature_difference_between_cutout_and_setpoint": 0.5"#,
+        )
+        .replace(
+            r#""zone_supply_air_node_name": "Zone Inlets","#,
+            r#""zone_supply_air_node_name": "Zone Inlets",
+      "heating_limit": "LimitFlowRateAndCapacity",
+      "maximum_heating_air_flow_rate": 0.01,
+      "maximum_sensible_heating_capacity": 300.0,
+      "cooling_limit": "LimitFlowRateAndCapacity",
+      "maximum_cooling_air_flow_rate": 0.01,
+      "maximum_total_cooling_capacity": 300.0,"#,
+        )
+}
+
+fn assert_direct_ideal_loads_fixture_runs(
     name: &str,
     fixture: &str,
     expected_runtime_class: &str,

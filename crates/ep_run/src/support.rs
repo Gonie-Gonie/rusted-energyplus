@@ -128,18 +128,8 @@ pub enum RuntimeClass {
     HeatBalanceZoneAirDiagnostic,
     /// Direct-zone HeatBalance/PurchasedAir coupled compatibility runtime.
     IdealLoadsDirectZoneCoupledCompatibility,
-    /// IdealLoads no-OA/no-limit sensible compatibility runtime.
-    IdealLoadsNoOaSensibleCompatibility,
-    /// IdealLoads no-OA numeric finite-limit compatibility runtime.
-    IdealLoadsFiniteLimitCompatibility,
-    /// IdealLoads no-OA ConstantSensibleHeatRatio compatibility runtime.
-    IdealLoadsConstantShrCompatibility,
-    /// IdealLoads no-OA selected humidity-control compatibility runtime.
-    IdealLoadsHumiditySelectedBranchesCompatibility,
-    /// IdealLoads selected outdoor-air branch compatibility runtime.
-    IdealLoadsOutdoorAirSelectedBranchesCompatibility,
-    /// Mixed declared IdealLoads PurchasedAir compatibility runtime.
-    IdealLoadsMixedDeclaredCompatibility,
+    /// Legacy IdealLoads fixed-demand adapter, available only as a diagnostic probe.
+    IdealLoadsFixtureDemandDiagnostic,
     /// Legacy broad IdealLoads node-state diagnostic projection runtime.
     IdealLoadsNodeStateProjection,
 }
@@ -155,18 +145,7 @@ impl RuntimeClass {
             Self::IdealLoadsDirectZoneCoupledCompatibility => {
                 "ideal-loads-direct-zone-coupled-compatibility"
             }
-            Self::IdealLoadsNoOaSensibleCompatibility => "ideal-loads-no-oa-sensible-compatibility",
-            Self::IdealLoadsFiniteLimitCompatibility => "ideal-loads-finite-limit-compatibility",
-            Self::IdealLoadsConstantShrCompatibility => "ideal-loads-constant-shr-compatibility",
-            Self::IdealLoadsHumiditySelectedBranchesCompatibility => {
-                "ideal-loads-humidity-selected-branches-compatibility"
-            }
-            Self::IdealLoadsOutdoorAirSelectedBranchesCompatibility => {
-                "ideal-loads-outdoor-air-selected-branches-compatibility"
-            }
-            Self::IdealLoadsMixedDeclaredCompatibility => {
-                "ideal-loads-mixed-declared-compatibility"
-            }
+            Self::IdealLoadsFixtureDemandDiagnostic => "ideal-loads-fixture-demand-diagnostic",
             Self::IdealLoadsNodeStateProjection => "ideal-loads-node-state-projection",
         }
     }
@@ -176,16 +155,10 @@ impl RuntimeClass {
     pub const fn selected_algorithm_lane_id(self) -> &'static str {
         match self {
             Self::OneZoneHeatBalanceCompatibility
-            | Self::IdealLoadsDirectZoneCoupledCompatibility
-            | Self::IdealLoadsNoOaSensibleCompatibility
-            | Self::IdealLoadsFiniteLimitCompatibility
-            | Self::IdealLoadsConstantShrCompatibility
-            | Self::IdealLoadsHumiditySelectedBranchesCompatibility
-            | Self::IdealLoadsOutdoorAirSelectedBranchesCompatibility
-            | Self::IdealLoadsMixedDeclaredCompatibility => "compatibility-source-order",
-            Self::HeatBalanceZoneAirDiagnostic | Self::IdealLoadsNodeStateProjection => {
-                "diagnostic-probe"
-            }
+            | Self::IdealLoadsDirectZoneCoupledCompatibility => "compatibility-source-order",
+            Self::HeatBalanceZoneAirDiagnostic
+            | Self::IdealLoadsFixtureDemandDiagnostic
+            | Self::IdealLoadsNodeStateProjection => "diagnostic-probe",
             Self::None => "none",
         }
     }
@@ -195,7 +168,9 @@ impl RuntimeClass {
     pub const fn diagnostic_probe_used(self) -> bool {
         matches!(
             self,
-            Self::HeatBalanceZoneAirDiagnostic | Self::IdealLoadsNodeStateProjection
+            Self::HeatBalanceZoneAirDiagnostic
+                | Self::IdealLoadsFixtureDemandDiagnostic
+                | Self::IdealLoadsNodeStateProjection
         )
     }
 
@@ -204,14 +179,7 @@ impl RuntimeClass {
     pub const fn conformance_promotion_allowed(self) -> bool {
         matches!(
             self,
-            Self::OneZoneHeatBalanceCompatibility
-                | Self::IdealLoadsDirectZoneCoupledCompatibility
-                | Self::IdealLoadsNoOaSensibleCompatibility
-                | Self::IdealLoadsFiniteLimitCompatibility
-                | Self::IdealLoadsConstantShrCompatibility
-                | Self::IdealLoadsHumiditySelectedBranchesCompatibility
-                | Self::IdealLoadsOutdoorAirSelectedBranchesCompatibility
-                | Self::IdealLoadsMixedDeclaredCompatibility
+            Self::OneZoneHeatBalanceCompatibility | Self::IdealLoadsDirectZoneCoupledCompatibility
         )
     }
 }
@@ -360,7 +328,7 @@ fn runtime_selection_note(
             runtime_class.id()
         ),
         RunResultState::PartialSupportedRun => format!(
-            "matched capabilities require diagnostic/ad-hoc execution through '{}'; matched capability metadata does not create a compatibility claim for this run",
+            "the selected model boundary requires diagnostic/ad-hoc execution through '{}'; diagnostic metadata does not create a compatibility claim for this run",
             runtime_class.id()
         ),
         RunResultState::RunBlocked if status == SupportStatus::SupportedDiagnosticOnly => format!(
