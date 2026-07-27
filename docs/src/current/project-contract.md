@@ -15728,8 +15728,8 @@ The two selected-flow routes read CP311 `OAMassFlowRate=+0.0` and the
 initialized nonnegative maximum, so the strict comparison and
 maximum-flow body-entry count remain false and zero throughout exact release.
 
-The binder executes CP313 after CP312 and before the pre-existing numerical
-Calc. Per-step validation checks provenance, predecessor linkage, the
+The binder executes CP313 after CP312 and before CP314 and the pre-existing
+numerical Calc. Per-step validation checks provenance, predecessor linkage, the
 limit-specific short-circuit shape, `+0.0` OA input, and zero body entry.
 Final lifecycle validation reconciles one transition per CP312 transition;
 source executions with CP312 Cooling and numerical Cooling counts;
@@ -15741,21 +15741,109 @@ limit-shape firewalls, publishes
 `purchased_air_calc_cooling_oa_max_flow_gate_lifecycle`, and rejects
 disconnected or non-direct evidence.
 
-The lexical first executable outside CP313 is line 2058. A true condition
-would next calculate `OAVolFlowRate`, mutate first-or-recurring warning state,
-emit diagnostics, and clamp OA at line 2078. A false condition reaches the
-`else` delimiter at line 2080 and the next executable economizer test at line
-2082. None of those statements is implemented by this guard-only lifecycle.
-The warning text and registry, density/volume conversion, OA mutation,
-economizer and `TimeEconoActive`, all later cooling mass-flow, mixed-air,
-humidity and capacity work, Heat/DeadBand selection at line 2348, malformed
-source limit sentinels, partial effects, failure, retry, reset, and concurrency
-remain excluded.
+At the CP313 boundary, the lexical first executable outside CP313 is line
+2058. A true condition would next calculate `OAVolFlowRate`, mutate
+first-or-recurring warning state, emit diagnostics, and clamp OA at line 2078.
+A false condition reaches the `else` delimiter at line 2080 and the next
+executable economizer test at line 2082. None of those statements is
+implemented by the CP313 guard-only lifecycle. The warning text and registry,
+density/volume conversion, OA mutation, economizer and `TimeEconoActive`, all
+later cooling mass-flow, mixed-air, humidity and capacity work, Heat/DeadBand
+selection at line 2348, malformed source limit sentinels, partial effects,
+failure, retry, reset, and concurrency remain excluded at that boundary.
 
 Both parents stay `scaffold`/`none`; `routine.calc_purch_air_loads` stays
 `source_mapped`; no routine row, inventory/readiness count, support level,
 required or forbidden feature, evidence case, numerical conformance, or
 Roadmap state is promoted.
+
+## CP314 Source-Ordered Cooling OA Maximum-Flow True Body
+
+CP314 maps only EnergyPlus 26.1 `PurchasedAirManager.cc` lines 2058-2078,
+the true body of the CP313 condition. CP310 UnitOff, CP312 non-cooling,
+CP313 selector fallthrough, and a selected-flow strict comparison that is
+false skip every CP314 site.
+
+An entered body preserves this source order:
+
+1. divide the CP313 outdoor-air mass flow by `StdRhoAir` and retain the
+   resulting `OAVolFlowRate`;
+2. read `OAFlowMaxCoolOutputError` and compare it with one;
+3. on the first route, preincrement the counter, call one primary Warning with
+   `OAVolFlowRate`, call one Continue with retained `MaxCoolVolFlowRate`, and
+   call one timestamp detail in that order;
+4. on the recurring route, call the recurring Warning with the retained
+   `OAFlowMaxCoolOutputIndex` and `OAVolFlowRate`; and
+5. after either branch, overwrite local `OAMassFlowRate` with
+   `MaxCoolMassFlowRate`.
+
+The source `PurchasedAir` constructor initializes both warning fields to zero.
+Consequently the first entered body changes the error counter from zero to
+one, characterizes the three first-message call sites, and leaves the
+recurring index at zero. The second entered body reaches the recurring call,
+whose zero index is allocated; later calls reuse it. Each entered body
+characterizes one warning-total increment. The recurring overload receives
+`OAVolFlowRate` only as `ReportMaxOf`, so it retains a maximum value with an
+empty units string. It receives no `ReportMinOf` or `ReportSumOf` argument.
+That max-only child behavior is read from `UtilityRoutines.cc` lines
+1146-1194 and `StoreRecurringErrorMessage` lines 1293-1379; CP314 does not map
+the complete utility routine or add a routine-ledger row.
+
+The bounded model owns structured source-order evidence, not the EnergyPlus
+error service. Relative recurring identities, call counts, and the maximum
+reported volume flow avoid an unbounded event log; they do not claim
+process-global index allocation, message search/deduplication, ERR, SQLite,
+callback, console, or end-of-simulation report parity. The primary/Continue
+text and timestamp are represented only by their ordered call sites, not by
+exact rendered strings or output.
+
+`calc/cooling_oa_max_flow_body.rs` owns
+`PurchasedAirCalcCoolingOaMaxFlowBodySnapshot`,
+`PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState`, and
+`PurchasedAirCalcCoolingOaMaxFlowBodyLifecycleSummary`.
+`calc/cooling_oa_max_flow_body/release.rs` owns
+`PurchasedAirCalcCoolingOaMaxFlowBodyError` and
+`advance_direct_no_oa_calc_cooling_oa_max_flow_body`; the parent module owns
+`purchased_air_calc_cooling_oa_max_flow_body_lifecycle_summary`.
+
+Direct characterization admits a parent snapshot whose CP313 body-entry flag
+is true and then demonstrates the volume conversion, first-versus-recurring
+state, and final mass-flow clamp. The public exact release transition requires
+the linked CP313 snapshot and retained initialization/cache identities before
+mutation. On the current no-OA lane `NoLimit` and `LimitCapacity` short-circuit
+at CP313's selector before the maximum-flow scalar read and strict comparison;
+`LimitFlowRate` and `LimitFlowRateAndCapacity` compare `+0.0` with a finite
+nonnegative maximum and are false. Therefore CP314 executes no mapped site,
+reads no `StdRhoAir` or warning state, performs no division or clamp, allocates
+no index, and leaves every warning/body counter at zero.
+
+The binder executes CP314 after CP313 and before the pre-existing numerical
+Calc. Per-step validation checks source provenance, one-for-one predecessor
+order, the complete skipped shape on release, and zero warning/clamp effects.
+Final lifecycle and `ep_run` validation reconcile one transition per CP313
+transition, parent-body versus skip partitions, first/recurring branch and
+call-site counts, retained warning identity/value state, and zero exact-release
+execution. Direct-only JSON publishes
+`purchased_air_calc_cooling_oa_max_flow_body_lifecycle`, while non-direct or
+disconnected evidence is rejected.
+
+Line 2080 is only the sibling `else` delimiter and line 2081 is a comment.
+The lexical first executable outside CP314 is therefore the false-path
+economizer guard at line 2082. That guard is dynamically reached only after a
+false CP313 result inside an entered CP312 cooling body. A true CP314 execution
+completes at line 2078, skips the entire sibling `else`, and next reaches the
+unconditional `SupplyMassFlowRateForCool = 0.0` at line 2109. Neither
+continuation is mapped. Economizer and `TimeEconoActive`, supply-flow
+calculation, every later cooling/mixed-air/humidity/capacity statement,
+Heat/DeadBand selection at line 2348, actual warning output, OA support,
+partial error-service effects, failure, retry, reset, concurrency, and
+CP314 OA-clamp-enabled release numerics or any new finite-limit conformance
+remain excluded.
+
+Both parents remain `scaffold`/`none`; `routine.calc_purch_air_loads` remains
+`source_mapped`; no routine row, inventory/readiness count, support level,
+run state, required or forbidden feature, evidence case, numerical
+conformance, or Roadmap state is promoted.
 
 
 

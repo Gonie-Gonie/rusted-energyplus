@@ -33470,8 +33470,8 @@ evidence, conformance, and Roadmap state remain unchanged.
 
 The direct-Zone order is now predictor -> persistent Init -> CP310 Calc entry
 -> CP311 minimum-OA prefix -> CP312 cooling-entry gate -> CP313 cooling OA
-maximum-flow guard -> existing bounded Calc -> update/report -> same-step
-Zone-air corrector. CP312 covers only
+maximum-flow guard -> CP314 true-body lifecycle -> existing bounded Calc ->
+update/report -> same-step Zone-air corrector. CP312 covers only
 `CalcPurchAirLoads` lines 2046-2047. It consumes the retained CP310 demand and
 CP311 minimum-OA output, applies the inclusive comparison, conditionally
 records the Zone temperature-control-type read, excludes exact SingleHeat, and
@@ -33510,12 +33510,42 @@ Cooling, numerical Cooling, UnitOff, and non-cooling counts and exposes
 direct-only JSON evidence.
 
 This adds no heat-balance or predictor equation, OA/economizer state,
-diagnostic sink, flow mutation, or numerical limit claim. Line 2058 is the
-first excluded executable; warning and OA-clamp work through line 2078,
-false-path economizer execution beginning at line 2082, all later cooling
-calculations, and Heat/DeadBand selection at line 2348 remain excluded.
-Parent/routine status, inventory/readiness counts, support, forbidden features,
-evidence, numerical conformance, and Roadmap state remain unchanged.
+diagnostic sink, flow mutation, or numerical limit claim. At the CP313
+boundary, line 2058 is the first excluded executable; warning and OA-clamp
+work through line 2078, false-path economizer execution beginning at line
+2082, all later cooling calculations, and Heat/DeadBand selection at line
+2348 remain excluded. Parent/routine status, inventory/readiness counts,
+support, forbidden features, evidence, numerical conformance, and Roadmap
+state remain unchanged.
+
+## CP314 Cooling OA Maximum-Flow True Body Inside the Heat-Balance Loop
+
+CP314 maps only the CP313-true body at `CalcPurchAirLoads` lines 2058-2078.
+An entered body converts outdoor-air mass flow to volume flow with
+`StdRhoAir`, chooses first-versus-recurring warning state from the retained
+zero-initialized counter, and clamps local outdoor-air mass flow to the cached
+maximum after either warning branch. The first event increments the counter
+and records primary Warning, Continue, and timestamp sites. The second event
+allocates a relative recurring identity; later events reuse it and update
+only the maximum supplied volume-flow value with empty units.
+
+This active behavior is direct characterization only. The exact heat-balance
+release loop remains no-OA: `NoLimit` and `LimitCapacity` short-circuit at
+CP313's selector before the maximum-flow scalar read and strict comparison,
+while `LimitFlowRate` and `LimitFlowRateAndCapacity` compare `+0.0` with a
+finite nonnegative maximum and are false. None enters CP314. Its lifecycle
+therefore reconciles one complete CP314 skip per CP313 transition and zero
+density reads, conversions, warning calls/increments/indices, clamps, and body
+executions. The existing bounded numerical result remains a distinct DTO.
+
+The lexical first excluded executable is line 2082 in CP313's sibling
+false-path economizer branch. It is dynamically reached only when CP312
+entered cooling and the CP313 guard was false. A true CP314 body instead skips
+that `else` and next reaches line 2109. Neither continuation is mapped. This
+adds no heat-balance or predictor equation, warning sink, OA/economizer state,
+flow-limit calculation, or conformance claim. Parent/routine status,
+inventory/readiness counts, support, forbidden features, evidence, numerical
+conformance, and Roadmap state remain unchanged.
 
 ## Data Structure Map
 

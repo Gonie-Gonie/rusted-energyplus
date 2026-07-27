@@ -5,6 +5,8 @@ use crate::{
         DirectZonePurchasedAirBindingFeature, IdealLoadsSensibleLimitContext,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE, PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
@@ -40,6 +42,25 @@ const ZONE_KEY: &str = "ZONE ONE";
 const SUPPLY_NODE_KEY: &str = "SUPPLY";
 const RETURN_NODE_KEY: &str = "RETURN";
 const ABS_TOLERANCE: f64 = 1.0e-9;
+
+#[test]
+fn cooling_oa_max_flow_body_partition_overflow_fails_closed() {
+    let error = super::cooling_oa_max_flow_body_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingOaMaxFlowBodyLifecycleInvariant {
+            field: "test_partition_overflow",
+            expected: 1,
+            actual: usize::MAX,
+        }
+    ));
+}
 
 #[test]
 fn cooling_entry_mode_reconciliation_rejects_forged_numerical_modes() {
@@ -387,6 +408,50 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
     let latest_cooling_oa = cooling_oa_gate.state.latest.expect("latest CP313 snapshot");
     assert!(latest_cooling_oa.non_cooling_skipped);
     assert!(!latest_cooling_oa.cooling_limit_flow_rate_read);
+    let cooling_oa_body = simulation.summary.calc_cooling_oa_max_flow_body_lifecycle;
+    assert_eq!(
+        cooling_oa_body.source,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_SOURCE
+    );
+    assert_eq!(
+        cooling_oa_body.first_excluded_source,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(cooling_oa_body.state.transition_count, required_steps);
+    assert_eq!(cooling_oa_body.state.body_entry_count, 0);
+    assert_eq!(cooling_oa_body.state.body_skip_count, required_steps);
+    assert_eq!(cooling_oa_body.state.unit_off_skip_count, 0);
+    assert_eq!(cooling_oa_body.state.non_cooling_skip_count, required_steps);
+    assert_eq!(
+        cooling_oa_body
+            .state
+            .active_guard_false_economizer_fallthrough_count,
+        0
+    );
+    assert_eq!(
+        cooling_oa_body.state.outdoor_air_mass_flow_rate_read_count,
+        0
+    );
+    assert_eq!(cooling_oa_body.state.standard_air_density_read_count, 0);
+    assert_eq!(cooling_oa_body.state.warning_counter_read_count, 0);
+    assert_eq!(
+        cooling_oa_body
+            .state
+            .characterized_total_warning_error_increment_count,
+        0
+    );
+    assert_eq!(
+        cooling_oa_body
+            .state
+            .outdoor_air_mass_flow_clamp_assignment_count,
+        0
+    );
+    let latest_cooling_oa_body = cooling_oa_body.state.latest.expect("latest CP314 snapshot");
+    assert!(latest_cooling_oa_body.body_skipped);
+    assert!(latest_cooling_oa_body.non_cooling_skipped);
+    assert!(!latest_cooling_oa_body.active_guard_false_economizer_fallthrough);
+    assert!(!latest_cooling_oa_body.warning_counter_read);
+    assert!(!latest_cooling_oa_body.outdoor_air_mass_flow_clamp_assignment_performed);
 
     let zone = simulation.state.zones.first().expect("bound Zone state");
     assert_eq!(simulation.state.timestep_index, required_steps);
@@ -542,6 +607,35 @@ fn all_hard_sized_finite_limit_branches_run_with_source_threshold_demand() {
             cooling_oa_gate.state.maximum_cooling_flow_body_entry_count,
             0
         );
+        let cooling_oa_body = simulation.summary.calc_cooling_oa_max_flow_body_lifecycle;
+        assert_eq!(cooling_oa_body.state.transition_count, required_steps);
+        assert_eq!(cooling_oa_body.state.body_entry_count, 0);
+        assert_eq!(cooling_oa_body.state.body_skip_count, required_steps);
+        assert_eq!(cooling_oa_body.state.unit_off_skip_count, 0);
+        assert_eq!(cooling_oa_body.state.non_cooling_skip_count, required_steps);
+        assert_eq!(
+            cooling_oa_body
+                .state
+                .active_guard_false_economizer_fallthrough_count,
+            0
+        );
+        assert_eq!(
+            cooling_oa_body.state.outdoor_air_mass_flow_rate_read_count,
+            0
+        );
+        assert_eq!(cooling_oa_body.state.warning_counter_read_count, 0);
+        assert_eq!(
+            cooling_oa_body
+                .state
+                .outdoor_air_mass_flow_clamp_assignment_count,
+            0
+        );
+        let latest_cooling_oa_body = cooling_oa_body
+            .state
+            .latest
+            .expect("latest finite CP314 snapshot");
+        assert!(latest_cooling_oa_body.body_skipped);
+        assert!(latest_cooling_oa_body.non_cooling_skipped);
         let density = lifecycle
             .standard_air_density_kg_per_m3
             .expect("initialized standard density");
@@ -686,6 +780,38 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
             assert_eq!(latest.outdoor_air_mass_flow_rate_kg_per_s, None);
         }
         assert!(!latest.maximum_cooling_flow_body_entered);
+        let body_lifecycle = simulation.summary.calc_cooling_oa_max_flow_body_lifecycle;
+        let body_state = body_lifecycle.state;
+        assert_eq!(body_state.transition_count, 1, "{limit:?}");
+        assert_eq!(body_state.body_entry_count, 0, "{limit:?}");
+        assert_eq!(body_state.body_skip_count, 1, "{limit:?}");
+        assert_eq!(body_state.unit_off_skip_count, 0, "{limit:?}");
+        assert_eq!(body_state.non_cooling_skip_count, 0, "{limit:?}");
+        assert_eq!(
+            body_state.active_guard_false_economizer_fallthrough_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(body_state.outdoor_air_mass_flow_rate_read_count, 0);
+        assert_eq!(body_state.standard_air_density_read_count, 0);
+        assert_eq!(body_state.outdoor_air_volume_flow_calculation_count, 0);
+        assert_eq!(body_state.warning_counter_read_count, 0);
+        assert_eq!(
+            body_state.outdoor_air_flow_max_cooling_output_error_count,
+            0
+        );
+        assert_eq!(body_state.outdoor_air_flow_max_cooling_output_index, 0);
+        assert_eq!(
+            body_state.characterized_total_warning_error_increment_count,
+            0
+        );
+        assert_eq!(body_state.outdoor_air_mass_flow_clamp_assignment_count, 0);
+        let latest_body = body_state.latest.expect("latest CP314 skip snapshot");
+        assert!(latest_body.body_skipped);
+        assert!(latest_body.active_guard_false_economizer_fallthrough);
+        assert!(!latest_body.unit_off_skipped);
+        assert!(!latest_body.non_cooling_skipped);
+        assert!(!latest_body.warning_counter_read);
+        assert!(!latest_body.outdoor_air_mass_flow_clamp_assignment_performed);
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation

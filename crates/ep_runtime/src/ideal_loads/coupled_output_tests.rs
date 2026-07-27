@@ -8,16 +8,21 @@ use crate::{
         IdealLoadsZoneState, PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE_ORDER,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_RECURRING_WARNING_CHILD_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_SOURCE_ORDER,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE_ORDER, PURCHASED_AIR_CALC_ENTRY_SOURCE,
         PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER, PurchasedAirAvailabilityStatus,
-        PurchasedAirCalcCoolingEntryGateSnapshot, PurchasedAirCalcCoolingOaMaxFlowGateSnapshot,
-        PurchasedAirCalcEntryDemandSnapshot, PurchasedAirCalcEntryResetSnapshot,
-        PurchasedAirCalcEntrySnapshot, PurchasedAirCalcMinimumOaPrefixSnapshot,
-        PurchasedAirInitSnapshot, PurchasedAirInitTransition, PurchasedAirRecirculationSource,
+        PurchasedAirCalcCoolingEntryGateSnapshot, PurchasedAirCalcCoolingOaMaxFlowBodySnapshot,
+        PurchasedAirCalcCoolingOaMaxFlowGateSnapshot, PurchasedAirCalcEntryDemandSnapshot,
+        PurchasedAirCalcEntryResetSnapshot, PurchasedAirCalcEntrySnapshot,
+        PurchasedAirCalcMinimumOaPrefixSnapshot, PurchasedAirInitSnapshot,
+        PurchasedAirInitTransition, PurchasedAirRecirculationSource,
         PurchasedAirTemperatureControlType, couple_direct_zone_predicted_demand_to_purchased_air,
     },
 };
@@ -442,6 +447,11 @@ fn scaled_output(
             sample_index,
             coupling,
         ),
+        calculation_cooling_oa_max_flow_body: calculation_cooling_oa_max_flow_body_snapshot(
+            system,
+            sample_index,
+            coupling,
+        ),
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;
@@ -514,6 +524,67 @@ fn calculation_cooling_oa_max_flow_gate_snapshot(
         strict_mass_flow_comparison_evaluated: cooling && flow_active,
         outdoor_air_mass_flow_above_maximum: (cooling && flow_active).then_some(false),
         maximum_cooling_flow_body_entered: false,
+    }
+}
+
+fn calculation_cooling_oa_max_flow_body_snapshot(
+    system: &IdealLoadsAirSystem,
+    sample_index: usize,
+    coupling: DirectZonePurchasedAirCouplingOutput,
+) -> PurchasedAirCalcCoolingOaMaxFlowBodySnapshot {
+    let predecessor = calculation_cooling_oa_max_flow_gate_snapshot(system, sample_index, coupling);
+    let unit_off_skipped = !predecessor.unit_body_entered;
+    let non_cooling_skipped =
+        predecessor.unit_body_entered && !predecessor.predecessor_cooling_body_entered;
+    let active_guard_false_economizer_fallthrough =
+        predecessor.unit_body_entered && predecessor.predecessor_cooling_body_entered;
+    PurchasedAirCalcCoolingOaMaxFlowBodySnapshot {
+        source: PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_SOURCE,
+        first_excluded_source: PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_FIRST_EXCLUDED_SOURCE,
+        recurring_warning_child_source:
+            PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_RECURRING_WARNING_CHILD_SOURCE,
+        system: system.id,
+        parent_call_ordinal: sample_index + 1,
+        source_order: PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_SOURCE_ORDER,
+        controlled_zone: ZoneId(0),
+        unit_body_entered: predecessor.unit_body_entered,
+        predecessor_cooling_body_entered: predecessor.predecessor_cooling_body_entered,
+        predecessor_maximum_cooling_flow_body_entered: false,
+        body_skipped: true,
+        unit_off_skipped,
+        non_cooling_skipped,
+        active_guard_false_economizer_fallthrough,
+        outdoor_air_mass_flow_rate_read: false,
+        outdoor_air_mass_flow_rate_before_clamp_kg_per_s: None,
+        standard_air_density_read: false,
+        standard_air_density_kg_per_m3: None,
+        outdoor_air_volume_flow_rate_calculated: false,
+        outdoor_air_volume_flow_rate_m3_per_s: None,
+        warning_counter_read: false,
+        warning_counter_before: None,
+        first_warning_predicate_satisfied: None,
+        first_warning_branch_entered: false,
+        warning_counter_incremented: false,
+        warning_counter_after: None,
+        first_warning_call_site_reached: false,
+        maximum_cooling_air_volume_flow_rate_read: false,
+        maximum_cooling_air_volume_flow_rate_m3_per_s: None,
+        continue_warning_call_site_reached: false,
+        continue_warning_timestamp_call_site_reached: false,
+        recurring_warning_branch_entered: false,
+        recurring_warning_call_site_reached: false,
+        recurring_warning_report_maximum_input_m3_per_s: None,
+        characterized_recurring_warning_index_allocated_on_call: false,
+        characterized_recurring_warning_index_reused_on_call: false,
+        characterized_recurring_warning_index_before: None,
+        characterized_recurring_warning_index_after: None,
+        characterized_recurring_warning_occurrence_ordinal: None,
+        characterized_recurring_warning_report_maximum_m3_per_s: None,
+        characterized_total_warning_error_incremented: false,
+        maximum_cooling_air_mass_flow_rate_read: false,
+        maximum_cooling_air_mass_flow_rate_kg_per_s: None,
+        outdoor_air_mass_flow_clamp_assignment_performed: false,
+        outdoor_air_mass_flow_rate_after_clamp_kg_per_s: None,
     }
 }
 

@@ -329,15 +329,61 @@ separately retains strict equality and signed-zero fallthrough, NaN
 fallthrough, and positive over-limit body selection without admitting those
 inputs or executing the excluded body in release.
 
-The binder now orders CP313 after CP312 and before the existing numerical
-Calc. Per-step, lifecycle, and pipeline firewalls reconcile CP312
+The binder now orders CP313 after CP312 and before CP314 and the existing
+numerical Calc. Per-step, lifecycle, and pipeline firewalls reconcile CP312
 Cooling/UnitOff/non-cooling partitions, the two selector comparisons, their
 short-circuited flow reads, strict comparisons, and zero release body entries;
 publish `purchased_air_calc_cooling_oa_max_flow_gate_lifecycle`; and reject
 disconnected or non-direct evidence. This is guard-only lifecycle evidence.
-The line-2058 volume-flow calculation, warning and recurring-diagnostic state,
-line-2078 OA clamp, false-path economizer work beginning at line 2082,
-Heat/DeadBand selection at line 2348, and every later Calc behavior remain
+At the CP313 boundary, the line-2058 volume-flow calculation, warning and
+recurring-diagnostic state, line-2078 OA clamp, false-path economizer work
+beginning at line 2082, Heat/DeadBand selection at line 2348, and every later
+Calc behavior remain open. Parent/routine status, inventory/readiness counts,
+support level, forbidden features, evidence cases, numerical conformance, and
+Roadmap state remain unchanged.
+
+CP314 maps only the CP313-true body at `CalcPurchAirLoads` lines 2058-2078.
+It first divides the already-read outdoor-air mass flow by `StdRhoAir` to
+characterize `OAVolFlowRate`, then reads the retained
+`OAFlowMaxCoolOutputError` counter. The source constructor initializes that
+counter and `OAFlowMaxCoolOutputIndex` to zero. A first true event increments
+the counter to one and records one primary Warning using `OAVolFlowRate`, one
+Continue using retained `MaxCoolVolFlowRate`, and one timestamp call while
+leaving the recurring index zero. A second or later true event skips those
+first-message sites, records one recurring Warning, and allocates or reuses its
+retained relative index. The recurring call increments the warning total and
+tracks only the maximum supplied `OAVolFlowRate`; its maximum units are empty,
+and no minimum or sum argument is supplied. Both branches finally overwrite
+the local outdoor-air mass flow with the cached maximum cooling mass flow.
+
+Those active routes are bounded direct characterization only. They retain
+structured counter, call-site, relative-index, maximum-value, conversion, and
+clamp evidence without writing an ERR/SQLite/callback sink or claiming
+EnergyPlus process-global warning identity. On the exact no-OA release lane,
+CP313 never enters the body, so CP314 reads no density or warning state,
+performs no division or clamp, and retains zero first/recurring calls, warning
+increments, index allocation, and body execution.
+
+`calc/cooling_oa_max_flow_body.rs` owns
+`PurchasedAirCalcCoolingOaMaxFlowBodySnapshot`,
+`PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState`, and
+`PurchasedAirCalcCoolingOaMaxFlowBodyLifecycleSummary`; its release boundary
+owns `PurchasedAirCalcCoolingOaMaxFlowBodyError` and
+`advance_direct_no_oa_calc_cooling_oa_max_flow_body`. The parent module owns
+`purchased_air_calc_cooling_oa_max_flow_body_lifecycle_summary`.
+
+The binder orders CP314 after CP313 and before the existing numerical Calc.
+Per-step, lifecycle, and pipeline firewalls reconcile its parent skip/body
+partition, source-site counts, warning-state shape, and zero release effects,
+publish `purchased_air_calc_cooling_oa_max_flow_body_lifecycle`, and reject
+disconnected or non-direct evidence. The lexical first executable outside
+CP314 is the sibling false-path economizer guard at line 2082; it is
+dynamically reached only when CP312 entered cooling and the CP313 condition is
+false. After a CP314 true body completes at line 2078, control skips that
+`else` and next reaches the unconditional line-2109 cooling-flow reset. Both
+continuations, every economizer and later cooling calculation, exact message
+text and timestamp rendering, real warning sinks, OA support, CP314
+OA-clamp-enabled release numerics, and any new finite-limit conformance remain
 open. Parent/routine status, inventory/readiness counts, support level,
 forbidden features, evidence cases, numerical conformance, and Roadmap state
 remain unchanged.

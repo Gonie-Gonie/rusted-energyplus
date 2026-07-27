@@ -37,6 +37,8 @@ use super::{
     IdealLoadsPurchasedAirBranch, IdealLoadsSensibleMode, PURCHASED_AIR_CALC_ENTRY_SOURCE,
     PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PurchasedAirAvailabilityStatus,
     PurchasedAirCalcCoolingEntryGateError, PurchasedAirCalcCoolingEntryGateLifecycleSummary,
+    PurchasedAirCalcCoolingOaMaxFlowBodyError,
+    PurchasedAirCalcCoolingOaMaxFlowBodyLifecycleSummary,
     PurchasedAirCalcCoolingOaMaxFlowGateError,
     PurchasedAirCalcCoolingOaMaxFlowGateLifecycleSummary, PurchasedAirCalcEntryError,
     PurchasedAirCalcEntryLifecycleSummary, PurchasedAirCalcEntrySnapshot,
@@ -45,12 +47,14 @@ use super::{
     PurchasedAirRecirculationSource, PurchasedAirRuntimeState, PurchasedAirSizedLimits,
     append_direct_zone_purchased_air_hourly_output_series, bind_direct_zone_purchased_air_model,
     purchased_air_calc_cooling_entry_gate_lifecycle_summary,
+    purchased_air_calc_cooling_oa_max_flow_body_lifecycle_summary,
     purchased_air_calc_cooling_oa_max_flow_gate_lifecycle_summary,
     purchased_air_calc_entry_lifecycle_summary,
     purchased_air_calc_minimum_oa_prefix_lifecycle_summary, purchased_air_init_lifecycle_summary,
 };
 
 mod cooling_entry_validation;
+mod cooling_oa_max_flow_body_validation;
 mod cooling_oa_max_flow_validation;
 mod minimum_oa_validation;
 
@@ -134,6 +138,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded cooling OA maximum-flow gate lifecycle report.
     pub calc_cooling_oa_max_flow_gate_lifecycle:
         PurchasedAirCalcCoolingOaMaxFlowGateLifecycleSummary,
+    /// Persistent bounded cooling OA maximum-flow warning-and-clamp body lifecycle report.
+    pub calc_cooling_oa_max_flow_body_lifecycle:
+        PurchasedAirCalcCoolingOaMaxFlowBodyLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -179,6 +186,8 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     CalcCoolingEntryGateLifecycle(PurchasedAirCalcCoolingEntryGateError),
     /// Final cooling OA maximum-flow gate summary could not resolve the bound unit.
     CalcCoolingOaMaxFlowGateLifecycle(PurchasedAirCalcCoolingOaMaxFlowGateError),
+    /// Final cooling OA maximum-flow body summary could not resolve the bound unit.
+    CalcCoolingOaMaxFlowBodyLifecycle(PurchasedAirCalcCoolingOaMaxFlowBodyError),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
         /// Stable invariant field.
@@ -224,6 +233,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A cooling OA maximum-flow body lifecycle invariant did not match the run.
+    CalcCoolingOaMaxFlowBodyLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -246,6 +264,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     },
     /// A cooling OA maximum-flow gate snapshot did not match its bound release call.
     UnexpectedCalculationCoolingOaMaxFlowGate {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
+    /// A cooling OA maximum-flow body snapshot did not match its bound release call.
+    UnexpectedCalculationCoolingOaMaxFlowBody {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
@@ -318,6 +341,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir cooling OA maximum-flow gate lifecycle summary failed: {error:?}"
             ),
+            Self::CalcCoolingOaMaxFlowBodyLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir cooling OA maximum-flow body lifecycle summary failed: {error:?}"
+            ),
             Self::InitLifecycleInvariant {
                 field,
                 expected,
@@ -358,6 +385,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir cooling OA maximum-flow gate lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingOaMaxFlowBodyLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir cooling OA maximum-flow body lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -377,6 +412,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::UnexpectedCalculationCoolingOaMaxFlowGate { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling OA maximum-flow gate"
+            ),
+            Self::UnexpectedCalculationCoolingOaMaxFlowBody { timestep_index } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling OA maximum-flow body"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -576,6 +615,17 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
                 },
             );
         }
+        if !cooling_oa_max_flow_body_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::UnexpectedCalculationCoolingOaMaxFlowBody {
+                    timestep_index,
+                },
+            );
+        }
         if !output.initialization.flags.state_machine_used
             || output.coupling.purchased_air.init_flags != output.initialization.flags
         {
@@ -680,6 +730,19 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_oa_max_flow_body_lifecycle =
+        purchased_air_calc_cooling_oa_max_flow_body_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingOaMaxFlowBodyLifecycle)?;
+    cooling_oa_max_flow_body_validation::validate_lifecycle(
+        &calc_cooling_oa_max_flow_body_lifecycle,
+        &calc_cooling_oa_max_flow_gate_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -746,6 +809,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_minimum_oa_prefix_lifecycle,
             calc_cooling_entry_gate_lifecycle,
             calc_cooling_oa_max_flow_gate_lifecycle,
+            calc_cooling_oa_max_flow_body_lifecycle,
         },
         state,
         results,

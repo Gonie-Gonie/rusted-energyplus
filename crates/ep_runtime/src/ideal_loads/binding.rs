@@ -22,6 +22,7 @@ use super::{
     DirectZonePurchasedAirCouplingOutput, IdealLoadsPurchasedAirBranch,
     IdealLoadsSensibleLimitContext, PurchasedAirAvailabilityStatus,
     PurchasedAirCalcCoolingEntryGateError, PurchasedAirCalcCoolingEntryGateSnapshot,
+    PurchasedAirCalcCoolingOaMaxFlowBodyError, PurchasedAirCalcCoolingOaMaxFlowBodySnapshot,
     PurchasedAirCalcCoolingOaMaxFlowGateError, PurchasedAirCalcCoolingOaMaxFlowGateSnapshot,
     PurchasedAirCalcEntryContext, PurchasedAirCalcEntryError, PurchasedAirCalcEntrySnapshot,
     PurchasedAirCalcMinimumOaPrefixError, PurchasedAirCalcMinimumOaPrefixSnapshot,
@@ -29,6 +30,7 @@ use super::{
     PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanError, PurchasedAirInitSnapshot,
     PurchasedAirInitTopologyPlan, PurchasedAirInitTopologyPlanError, PurchasedAirRuntimeState,
     PurchasedAirTemperatureControlType, advance_direct_no_oa_calc_cooling_entry_gate,
+    advance_direct_no_oa_calc_cooling_oa_max_flow_body,
     advance_direct_no_oa_calc_cooling_oa_max_flow_gate,
     advance_direct_no_oa_calc_minimum_oa_prefix, advance_purchased_air_calc_entry,
     classify_no_oa_sensible_subset, complete_direct_zone_purchased_air_coupling,
@@ -577,6 +579,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingEntryGate(PurchasedAirCalcCoolingEntryGateError),
     /// The bounded cooling OA maximum-flow gate rejected its release state.
     CalculationCoolingOaMaxFlowGate(PurchasedAirCalcCoolingOaMaxFlowGateError),
+    /// The bounded cooling OA maximum-flow warning-and-clamp body rejected its release state.
+    CalculationCoolingOaMaxFlowBody(PurchasedAirCalcCoolingOaMaxFlowBodyError),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -654,6 +658,8 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     pub calculation_cooling_entry_gate: PurchasedAirCalcCoolingEntryGateSnapshot,
     /// Source-ordered cooling OA maximum-flow gate snapshot.
     pub calculation_cooling_oa_max_flow_gate: PurchasedAirCalcCoolingOaMaxFlowGateSnapshot,
+    /// Source-ordered cooling OA maximum-flow warning-and-clamp body snapshot.
+    pub calculation_cooling_oa_max_flow_body: PurchasedAirCalcCoolingOaMaxFlowBodySnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
@@ -804,6 +810,13 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_entry_gate,
     )
     .map_err(DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingOaMaxFlowGate)?;
+    let calculation_cooling_oa_max_flow_body = advance_direct_no_oa_calc_cooling_oa_max_flow_body(
+        input.purchased_air_runtime_state,
+        binding.system,
+        initialization,
+        calculation_cooling_oa_max_flow_gate,
+    )
+    .map_err(DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingOaMaxFlowBody)?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -845,6 +858,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_minimum_outdoor_air,
         calculation_cooling_entry_gate,
         calculation_cooling_oa_max_flow_gate,
+        calculation_cooling_oa_max_flow_body,
         coupling,
     })
 }

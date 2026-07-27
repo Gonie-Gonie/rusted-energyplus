@@ -120,7 +120,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP305-CP309 bounded release slice: `crates/ep_runtime/src/ideal_loads/init/manager_plan.rs::PurchasedAirInitManagerPlan` eagerly resolves the immutable declaration-order membership plan; `topology_plan.rs::PurchasedAirInitTopologyPlan` resolves selected-unit topology; `state.rs::PurchasedAirRuntimeState` retains manager, per-unit lifecycle, the four-field sizing overlay, and the bounded global diagnostic registry; `topology_transition.rs::advance_selected_unit_topology`, `transition.rs::init_purchased_air_runtime`, and `supply_temperature_diagnostic.rs::advance_supply_temperature_diagnostics` execute the ordered persistent transitions through the hard-size child, BeginEnvrn, and supply-temperature suffix; and `summary.rs::PurchasedAirInitLifecycleSummary` plus `transition.rs::purchased_air_init_lifecycle_summary` report manager, selected-unit, sizing, and diagnostic evidence for JSON projection. Diagnostic adapters retain `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` only. |
 | `DataZoneEquipment::CheckZoneEquipmentList` | `src/EnergyPlus/DataZoneEquipment.cc` | CP306 `PurchasedAirInitManagerPlan::from_model` eagerly resolves bounded membership in retained Zone order through each Zone's EquipmentConnection and referenced list entries, ignoring unreferenced lists. The matched-list ID is Rust diagnostic evidence; this `InitPurchasedAir` call observes only the Boolean return and does not request optional `CtrlZoneNum`. Runtime Init defers only latch and outcome recording. |
 | `PurchasedAirManager::SizePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP308 `crates/ep_runtime/src/ideal_loads/sizing.rs::size_purchased_air_direct_hard_sized_legacy_route` and `PurchasedAirHardSizeLegacyOutcome` map only the direct hard-sized/no-Zone-sizing-run legacy route; `crates/ep_runtime/src/ideal_loads/dispatch.rs::IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` continues to block Autosize and broader sizing. |
-| `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | CP310 `crates/ep_runtime/src/ideal_loads/calc/lifecycle.rs::{advance_purchased_air_calc_entry,purchased_air_calc_entry_lifecycle_summary}` maps the line-1967 alias plus lines 1971-2022 entry prefix. CP311 `crates/ep_runtime/src/ideal_loads/calc/minimum_oa_prefix.rs::{advance_direct_no_oa_calc_minimum_oa_prefix,purchased_air_calc_minimum_oa_prefix_lifecycle_summary}` maps the lines 2023-2040 parent prefix only for the no-OA/no-EMS release route. CP312 `crates/ep_runtime/src/ideal_loads/calc/cooling_entry_gate/release.rs::advance_direct_no_oa_calc_cooling_entry_gate` plus `calc/cooling_entry_gate.rs::purchased_air_calc_cooling_entry_gate_lifecycle_summary` maps only the lines 2046-2047 cooling-entry gate. CP313 `crates/ep_runtime/src/ideal_loads/calc/cooling_oa_max_flow_gate/release.rs::advance_direct_no_oa_calc_cooling_oa_max_flow_gate` plus `calc/cooling_oa_max_flow_gate.rs::purchased_air_calc_cooling_oa_max_flow_gate_lifecycle_summary` maps only the lines 2056-2057 cooling OA maximum-flow guard. Existing `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` owns the later bounded no-OA sensible calculation and remains a distinct numerical DTO. |
+| `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | CP310 `crates/ep_runtime/src/ideal_loads/calc/lifecycle.rs::{advance_purchased_air_calc_entry,purchased_air_calc_entry_lifecycle_summary}` maps the line-1967 alias plus lines 1971-2022 entry prefix. CP311 `crates/ep_runtime/src/ideal_loads/calc/minimum_oa_prefix.rs::{advance_direct_no_oa_calc_minimum_oa_prefix,purchased_air_calc_minimum_oa_prefix_lifecycle_summary}` maps the lines 2023-2040 parent prefix only for the no-OA/no-EMS release route. CP312 `crates/ep_runtime/src/ideal_loads/calc/cooling_entry_gate/release.rs::advance_direct_no_oa_calc_cooling_entry_gate` plus `calc/cooling_entry_gate.rs::purchased_air_calc_cooling_entry_gate_lifecycle_summary` maps only the lines 2046-2047 cooling-entry gate. CP313 `crates/ep_runtime/src/ideal_loads/calc/cooling_oa_max_flow_gate/release.rs::advance_direct_no_oa_calc_cooling_oa_max_flow_gate` plus `calc/cooling_oa_max_flow_gate.rs::purchased_air_calc_cooling_oa_max_flow_gate_lifecycle_summary` maps only the lines 2056-2057 cooling OA maximum-flow guard. CP314 `crates/ep_runtime/src/ideal_loads/calc/cooling_oa_max_flow_body/release.rs::advance_direct_no_oa_calc_cooling_oa_max_flow_body` plus `calc/cooling_oa_max_flow_body.rs::purchased_air_calc_cooling_oa_max_flow_body_lifecycle_summary` maps only the lines 2058-2078 true-body lifecycle. Existing `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` owns the later bounded no-OA sensible calculation and remains a distinct numerical DTO. |
 | `PurchasedAirManager::CalcPurchAirMinOAMassFlow` | `src/EnergyPlus/PurchasedAirManager.cc` | CP311 reaches the child from its source parent and maps only the no-OA lines 2781, 2783, 2785, and 2806-2809 retained-zero route in `calc/minimum_oa_prefix.rs`; the separate diagnostic `crates/ep_runtime/src/ideal_loads/outdoor_air/minimum_flow.rs::resolve_minimum_outdoor_air_compat`, orchestrated by `sim_purchased_air_outdoor_air_compat`, remains immutable and is not full child lifecycle parity. |
 | `PurchasedAirManager::UpdatePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/update.rs::supply_node_update_from_result`; CP300 `DirectZonePurchasedAirSystemFeedback` consumes that immutable payload for a bounded one-inlet correction projection, not the full source node/plenum lifecycle |
 | `PurchasedAirManager::ReportPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/report.rs::IdealLoadsReportSnapshot`; `crates/ep_runtime/src/output/meter_registry.rs::meter_rate_to_energy_j`; CP302 `coupled_output.rs::append_direct_zone_purchased_air_hourly_output_series` averages fixed-step rate/node values and sums rate-times-step energy only for the bounded coupled runtime |
@@ -18589,23 +18589,77 @@ maximum-flow body is never entered. Internal characterization preserves strict
 equality/signed-zero and NaN fallthrough plus artificial positive-over-limit
 selection without executing the excluded body or widening release.
 
-The binder orders CP313 after CP312 and before the existing numerical Calc.
-Per-step and final firewalls reconcile transition, Cooling/UnitOff/non-cooling,
-selector short-circuit, conditional flow-read, strict-comparison, and zero
-body-entry counts. Direct-only JSON publishes
+The binder orders CP313 after CP312 and before CP314 and the existing numerical
+Calc. Per-step and final firewalls reconcile transition,
+Cooling/UnitOff/non-cooling, selector short-circuit, conditional flow-read,
+strict-comparison, and zero body-entry counts. Direct-only JSON publishes
 `purchased_air_calc_cooling_oa_max_flow_gate_lifecycle`; non-direct or
 disconnected evidence is rejected.
 
 This is source-order guard lifecycle evidence, not OA support, a warning
 state machine, an economizer implementation, or a cooling-flow numerical
-claim. The first excluded executable is line 2058. The true path's
-volume-flow conversion, first/recurring warning state and OA clamp through
-line 2078; the false path's first executable economizer test at line 2082;
-all later cooling calculations; and Heat/DeadBand selection at line 2348
-remain excluded. Both parents stay `scaffold`/`none`,
+claim. At the CP313 boundary, the first excluded executable is line 2058.
+The true path's volume-flow conversion, first/recurring warning state and OA
+clamp through line 2078; the false path's first executable economizer test at
+line 2082; all later cooling calculations; and Heat/DeadBand selection at
+line 2348 remain excluded. Both parents stay `scaffold`/`none`,
 `routine.calc_purch_air_loads` stays `source_mapped`, and inventory/readiness,
 support, forbidden features, evidence cases, numerical conformance, and
 Roadmap state remain unchanged.
+
+## CP314 Cooling OA Maximum-Flow True Body
+
+CP314 maps only lines 2058-2078 after a true CP313 guard. It converts the
+already-read outdoor-air mass flow to `OAVolFlowRate` with `StdRhoAir`, reads
+the retained warning counter, chooses the first or recurring warning route,
+and then clamps the local outdoor-air mass flow to
+`MaxCoolMassFlowRate`. Every CP313 skip or false result skips the complete
+CP314 slice.
+
+The source constructor initializes `OAFlowMaxCoolOutputError` and
+`OAFlowMaxCoolOutputIndex` to zero. The first entered body increments the
+counter to one and reaches primary Warning, Continue, and timestamp sites,
+with the primary site consuming `OAVolFlowRate` and the Continue site consuming
+retained `MaxCoolVolFlowRate`, while leaving the recurring index zero. A second
+entered body reaches the recurring Warning and allocates the zero-sentinel
+index; later events reuse it. The recurring call tracks only maximum
+`OAVolFlowRate` with empty maximum units. It supplies no minimum or sum
+argument. This child behavior comes from `UtilityRoutines.cc` lines 1146-1194
+and 1293-1379 without mapping the complete utility routine. Both branches
+reach the same line-2078 mass-flow overwrite.
+
+The Rust representation is bounded structured characterization rather than an
+error sink: it retains aggregate branch/call counts, relative index state,
+maximum reported volume flow, and only the latest source snapshot. Exact text,
+timestamp rendering, message search and deduplication, process-global index
+allocation, ERR/SQLite/callback/console writes, and end-of-run reporting are
+not claimed.
+
+`calc/cooling_oa_max_flow_body.rs` owns the snapshot, runtime state, lifecycle
+summary, and summary accessor. Its release submodule owns
+`PurchasedAirCalcCoolingOaMaxFlowBodyError` and
+`advance_direct_no_oa_calc_cooling_oa_max_flow_body`.
+
+The exact release binder orders CP314 after CP313 and before the existing
+numerical Calc. Its no-OA `+0.0` parent never enters the CP313 body, so CP314
+records only a complete skip: no density or warning read, division, first or
+recurring call, index allocation, warning increment, or flow clamp. Per-step,
+lifecycle, and pipeline firewalls reconcile that zero-effect shape with the
+CP313 predecessor and expose
+`purchased_air_calc_cooling_oa_max_flow_body_lifecycle` in direct-only JSON;
+non-direct or disconnected evidence is rejected.
+
+The lexical first excluded executable is the sibling false-path economizer
+guard at line 2082; lines 2080-2081 are a delimiter and comment. It is
+dynamically next only for a false CP313 result inside an entered CP312 cooling
+body. After a true CP314 body, control skips the sibling `else` and next
+executes the unconditional cooling-flow reset at line 2109. Both continuations,
+economizer and `TimeEconoActive`, later cooling/mixed-air/humidity/capacity
+work, and Heat/DeadBand selection at line 2348 remain excluded. This adds no
+OA, warning-sink, economizer, or numerical support. Both parents and the Calc
+routine retain their existing status; inventory/readiness, capabilities,
+forbidden features, evidence cases, conformance, and Roadmap state do not
+change.
 
 ## Claim Requirements
 

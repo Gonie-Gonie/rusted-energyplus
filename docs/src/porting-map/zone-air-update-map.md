@@ -21191,7 +21191,7 @@ features, evidence, conformance, and Roadmap state stay unchanged.
 
 ## CP313 Cooling OA Maximum-Flow Guard Placement
 
-CP313 runs after CP312 Cooling entry and before the existing bounded
+CP313 runs after CP312 Cooling entry, before CP314 and the existing bounded
 PurchasedAir numerical calculation. It maps only lines 2056-2057: compare the
 cooling limit with FlowRate, conditionally compare FlowRateAndCapacity, and
 only then compare outdoor-air mass flow with the maximum cooling mass flow
@@ -21205,8 +21205,38 @@ selector/read, Cooling/UnitOff/non-cooling, strict-comparison, and zero-body
 counts and expose the lifecycle only on the direct runtime.
 
 This adds no Zone-air equation, demand or feedback term, OA support, warning
-sink, economizer, flow clamp, or numerical capability. Line 2058 and the true
-warning/clamp body, the false path's line-2082 economizer test, all later
+sink, economizer, flow clamp, or numerical capability. At the CP313 boundary,
+line 2058 and the true warning/clamp body, the false path's line-2082
+economizer test, all later cooling calculations, Heat/DeadBand selection at
+line 2348, node/report writes, equipment residuals, adaptive iteration, and
+full Calc/Init lifecycle parity remain outside the slice. Parent/routine
+status, counts, support, forbidden features, evidence, numerical conformance,
+and Roadmap state stay unchanged.
+
+## CP314 Cooling OA Maximum-Flow True-Body Placement
+
+CP314 executes after a true CP313 guard and before the existing bounded
+PurchasedAir numerical calculation. It maps only lines 2058-2078: convert the
+parent outdoor-air mass flow with `StdRhoAir`, characterize zero-initialized
+first/recurring warning state, and overwrite the local outdoor-air mass flow
+with the cached maximum after either warning route. The first route increments
+the counter and reaches primary Warning, Continue, and timestamp sites. The
+recurring route allocates or reuses a relative index and retains only maximum
+reported volume flow with empty units.
+
+The exact no-OA runtime never enters CP314. `NoLimit` and `LimitCapacity`
+short-circuit at CP313's selector before the maximum-flow scalar read and
+strict comparison; `LimitFlowRate` and `LimitFlowRateAndCapacity` compare
+`+0.0` with a finite nonnegative maximum and are false. Per-step and final
+firewalls therefore prove a complete skip and zero density reads, division,
+warning calls/increments, index allocation, clamp, or body mutation before the
+unchanged numerical DTO and Zone-air corrector run.
+
+This adds no Zone-air equation, demand or feedback term, OA support, warning
+sink, economizer, clamp-enabled release path, or numerical capability. The
+lexical first excluded executable is line 2082, dynamically next only on the
+CP313-false path inside an entered CP312 cooling body; a CP314-true route skips
+that sibling `else` and next reaches line 2109. Both continuations, later
 cooling calculations, Heat/DeadBand selection at line 2348, node/report
 writes, equipment residuals, adaptive iteration, and full Calc/Init lifecycle
 parity remain outside the slice. Parent/routine status, counts, support,
