@@ -17718,7 +17718,8 @@ iteration recalculation. Its ordinary demand input is sensible-only, so the
 separate moisture predictor/corrector helpers are not evidence that generic
 arbitrary execution supplies the source latent demand lifecycle.
 
-Rust has no equivalent for the full main/heating/cooling availability matrix,
+CP310 maps only the entry-prefix scalar availability decisions. Rust still has
+no live main/heating/cooling schedule-service matrix,
 Zone-component hybrid availability, EMS OA/mass/temperature/humidity override
 state, OA maximum warning/recurrence, final saturation warning counters,
 source-exact output-reference and node alias behavior, contaminant writes,
@@ -21098,6 +21099,34 @@ registry numbering/deduplication, warmup/sizing counters, null schedules,
 broader multi-unit release execution, reset/concurrency, Autosizing, and full
 Init/Size parity remain outside this slice. Parent/routine status, counts,
 conformance evidence, and the Roadmap checkbox stay unchanged.
+
+## CP310 Calc-Entry Placement Before PurchasedAir Feedback
+
+The fixed direct-Zone path now executes predictor demand -> persistent
+`InitPurchasedAir` -> CP310 `CalcPurchAirLoads` entry prefix -> existing
+bounded Calc/update/report -> same-step Zone-air correction. The CP310 source
+slice is alias line 1967, executable lines 1971-2021, and line 2022 only as
+the active-body gate. Zone heat-balance access at line 2023 and the minimum-OA
+call at line 2025 are not included.
+
+For every accepted step, Rust records the caller-supplied resolved node
+identities, the exact 12-target zero-result snapshot,
+heating-then-cooling Remaining demand, optional ZoneComp ordering, read-site
+evidence from pre-sampled overall/heating/cooling availability, independent
+mode flags, and the `UnitOn` gate. Only the three retained PurchasedAir reset
+fields are actually cleared; the nine call-local/reference targets are
+represented in the snapshot. The release lane represents the normally
+preallocated ZoneComp entry as `NoAction` and uses mode values of one. Each
+per-step snapshot is checked against predictor demand and bound topology;
+aggregate state requires one manager visit, Zone write, and status copy per
+coupling with zero `ForceOff`, and the latest snapshot is reconciled with
+coupling count and exposed in direct-runtime JSON only.
+
+This adds no Zone-air equation or capability. Actual schedule and availability
+manager services, the line-2023-and-later Calc body, OA/EMS/mode and mixed-air
+work, node/report writes, equipment residuals, adaptive iteration, and full
+Calc/Init lifecycle parity remain outside the slice. Parent/routine status,
+counts, evidence, conformance, and Roadmap state stay unchanged.
 
 ## Promotion Requirements
 

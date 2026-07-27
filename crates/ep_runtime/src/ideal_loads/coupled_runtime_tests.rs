@@ -112,6 +112,56 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
     assert_eq!(lifecycle.environment_rearm_count, 1);
     assert_close(lifecycle.maximum_heating_air_mass_flow_rate_kg_per_s, 0.0);
     assert_close(lifecycle.maximum_cooling_air_mass_flow_rate_kg_per_s, 0.0);
+    let calc_lifecycle = simulation.summary.calc_entry_lifecycle;
+    assert_eq!(calc_lifecycle.source, PURCHASED_AIR_CALC_ENTRY_SOURCE);
+    assert_eq!(calc_lifecycle.state.call_count, required_steps);
+    assert_eq!(calc_lifecycle.state.reset_count, required_steps);
+    assert_eq!(calc_lifecycle.state.demand_read_count, required_steps);
+    assert_eq!(
+        calc_lifecycle.state.overall_availability_read_count,
+        required_steps
+    );
+    assert_eq!(
+        calc_lifecycle.state.heating_availability_read_count,
+        required_steps
+    );
+    assert_eq!(
+        calc_lifecycle.state.cooling_availability_read_count,
+        required_steps
+    );
+    assert_eq!(
+        calc_lifecycle.state.availability_manager_read_count,
+        required_steps
+    );
+    assert_eq!(
+        calc_lifecycle.state.availability_manager_zone_write_count,
+        required_steps
+    );
+    assert_eq!(
+        calc_lifecycle.state.availability_status_copy_count,
+        required_steps
+    );
+    assert_eq!(
+        calc_lifecycle.state.availability_manager_zone,
+        Some(ZoneId(0))
+    );
+    assert_eq!(calc_lifecycle.state.force_off_count, 0);
+    assert_eq!(calc_lifecycle.state.heating_on_count, required_steps);
+    assert_eq!(calc_lifecycle.state.cooling_on_count, required_steps);
+    let latest_calc = calc_lifecycle
+        .state
+        .latest
+        .expect("latest Calc-entry lifecycle snapshot");
+    assert_eq!(latest_calc.call_ordinal, required_steps);
+    assert_eq!(latest_calc.controlled_zone, ZoneId(0));
+    assert_eq!(latest_calc.supply_node, NodeId(0));
+    assert_eq!(latest_calc.zone_node, NodeId(1));
+    assert_eq!(latest_calc.outdoor_air_node, None);
+    assert_eq!(latest_calc.recirculation_node, NodeId(2));
+    assert!(latest_calc.reset.all_zero());
+    assert!(latest_calc.unit_on);
+    assert!(latest_calc.heating_on);
+    assert!(latest_calc.cooling_on);
 
     let zone = simulation.state.zones.first().expect("bound Zone state");
     assert_eq!(simulation.state.timestep_index, required_steps);
@@ -218,6 +268,15 @@ fn all_hard_sized_finite_limit_branches_run_with_source_threshold_demand() {
         assert_eq!(lifecycle.init_call_count, required_steps);
         assert_eq!(lifecycle.environment_initialization_count, 1);
         assert_eq!(lifecycle.environment_rearm_count, 1);
+        let calc_lifecycle = simulation.summary.calc_entry_lifecycle;
+        assert_eq!(calc_lifecycle.state.call_count, required_steps);
+        assert_eq!(calc_lifecycle.state.reset_count, required_steps);
+        assert_eq!(calc_lifecycle.state.heating_on_count, required_steps);
+        assert_eq!(calc_lifecycle.state.cooling_on_count, required_steps);
+        assert_eq!(
+            calc_lifecycle.state.availability_manager_read_count,
+            required_steps
+        );
         let density = lifecycle
             .standard_air_density_kg_per_m3
             .expect("initialized standard density");

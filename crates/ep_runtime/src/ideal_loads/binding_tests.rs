@@ -2,7 +2,8 @@ use super::*;
 use crate::{
     heat_balance::state::ZoneAirTemperatureCoefficients,
     ideal_loads::{
-        IdealLoadsSensibleMode, IdealLoadsZoneState, purchased_air_init_lifecycle_summary,
+        IdealLoadsSensibleMode, IdealLoadsZoneState, PurchasedAirCalcEntryIdentityRelation,
+        purchased_air_calc_entry_lifecycle_summary, purchased_air_init_lifecycle_summary,
     },
     schedules::{ScheduleSeriesCache, precompute_schedule_cache},
 };
@@ -124,6 +125,15 @@ fn scheduled_binding_preserves_negative_cooling_threshold() {
             .remaining_output_req_to_cool_sp_w,
         -600.0
     );
+    assert_eq!(
+        output
+            .calculation_entry
+            .demand
+            .remaining_output_req_to_cool_sp_w,
+        -600.0
+    );
+    assert_eq!(output.calculation_entry.call_ordinal, 1);
+    assert!(output.calculation_entry.unit_body_entered);
     assert!(state.sum_sys_mcp_w_per_k > 0.0);
 }
 
@@ -137,6 +147,10 @@ fn overall_availability_off_clears_stale_feedback_without_changing_other_state()
     let output = couple(&binding, &cache, &mut state, 0).expect("scheduled off coupling");
 
     assert!(!output.schedules.unit_available);
+    assert!(!output.calculation_entry.unit_on);
+    assert!(output.calculation_entry.heating_on);
+    assert!(output.calculation_entry.cooling_on);
+    assert!(output.calculation_entry.reset.all_zero());
     assert_eq!(
         output.coupling.purchased_air.calculation.mode,
         IdealLoadsSensibleMode::Off
@@ -717,6 +731,146 @@ fn post_init_calc_failure_retains_init_but_preserves_zone_state() {
     assert_eq!(lifecycle.topology_completion_count, 1);
     assert!(lifecycle.flags.topology_ready);
     assert_eq!(lifecycle.environment_initialization_count, 1);
+    let calc_lifecycle = purchased_air_calc_entry_lifecycle_summary(
+        &purchased_air_runtime_state,
+        binding.ideal_loads_air_system,
+    )
+    .expect("successful Calc-entry prefix must remain reportable");
+    assert_eq!(calc_lifecycle.state.call_count, 1);
+    assert_eq!(calc_lifecycle.state.reset_count, 1);
+    assert_eq!(calc_lifecycle.state.demand_read_count, 1);
+    assert_eq!(
+        calc_lifecycle
+            .state
+            .latest
+            .expect("retained Calc-entry snapshot")
+            .demand
+            .zone,
+        binding.zone
+    );
+}
+
+#[test]
+fn public_calc_entry_replay_and_identity_errors_do_not_mutate_lifecycle() {
+    let (model, cache) = fixture(|_| {});
+    let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
+    let mut zone_state = zone_state_for_temp_independent_load(0.0);
+    let mut runtime = PurchasedAirRuntimeState::default();
+    let output = couple_model_bound_direct_zone_purchased_air(
+        DirectZonePurchasedAirScheduledCouplingInput {
+            binding: &binding,
+            schedule_cache: &cache,
+            schedule_sample_index: 0,
+            zone_state: &mut zone_state,
+            purchased_air_runtime_state: &mut runtime,
+            begin_environment: true,
+            barometric_pressure_pa: binding.limit_context.barometric_pressure_pa,
+            system_timestep_seconds: binding.nominal_system_timestep_seconds,
+        },
+    )
+    .expect("first source-ordered coupling");
+    let base_context = PurchasedAirCalcEntryContext {
+        controlled_zone: binding.zone,
+        supply_node: binding.supply_node,
+        zone_node: binding.zone_air_node,
+        outdoor_air_node: None,
+        recirculation_node: binding.return_node,
+        demand: output.coupling.prediction.zone_demand,
+        zone_component_availability: Some(PurchasedAirAvailabilityStatus::NoAction),
+        overall_availability: output.schedules.overall_availability,
+        heating_availability: 1.0,
+        cooling_availability: 1.0,
+    };
+
+    let before_replay = runtime.clone();
+    assert_eq!(
+        advance_purchased_air_calc_entry(
+            &mut runtime,
+            binding.ideal_loads_air_system,
+            base_context
+        ),
+        Err(PurchasedAirCalcEntryError::InitializationCallOrder {
+            system: binding.ideal_loads_air_system,
+            init_call_count: 1,
+            calc_call_count: 1,
+        })
+    );
+    assert_eq!(runtime, before_replay);
+
+    init_purchased_air_runtime(
+        &mut runtime,
+        &binding.init_manager_plan,
+        &binding.init_topology_plan,
+        binding.system,
+        PurchasedAirInitCallContext {
+            zone_equipment_inputs_filled: true,
+            system_sizing_calculation: false,
+            sizing: PurchasedAirHardSizeLegacyContext {
+                current_zone_equipment_index: 1,
+                zone_sizing_run_done: false,
+            },
+            begin_environment: false,
+            standard_air_density_kg_per_m3: binding.limit_context.standard_air_density_kg_per_m3,
+            heating_setpoint_c: output.schedules.heating_setpoint_c,
+            cooling_setpoint_c: output.schedules.cooling_setpoint_c,
+            overall_availability: output.schedules.overall_availability,
+            heating_availability: 1.0,
+            cooling_availability: 1.0,
+        },
+    )
+    .expect("second initialization prefix");
+
+    for (context, relation) in [
+        (
+            PurchasedAirCalcEntryContext {
+                controlled_zone: ZoneId(99),
+                ..base_context
+            },
+            PurchasedAirCalcEntryIdentityRelation::ControlledZone,
+        ),
+        (
+            PurchasedAirCalcEntryContext {
+                supply_node: NodeId(99),
+                ..base_context
+            },
+            PurchasedAirCalcEntryIdentityRelation::SupplyNode,
+        ),
+        (
+            PurchasedAirCalcEntryContext {
+                recirculation_node: NodeId(99),
+                ..base_context
+            },
+            PurchasedAirCalcEntryIdentityRelation::RecirculationNode,
+        ),
+        (
+            PurchasedAirCalcEntryContext {
+                demand: crate::zone_equipment::ZoneSysEnergyDemand {
+                    zone: ZoneId(99),
+                    ..base_context.demand
+                },
+                ..base_context
+            },
+            PurchasedAirCalcEntryIdentityRelation::DemandZone,
+        ),
+    ] {
+        let before_error = runtime.clone();
+        assert_eq!(
+            advance_purchased_air_calc_entry(&mut runtime, binding.ideal_loads_air_system, context),
+            Err(PurchasedAirCalcEntryError::IdentityMismatch {
+                system: binding.ideal_loads_air_system,
+                relation,
+            })
+        );
+        assert_eq!(runtime, before_error);
+    }
+
+    let second = advance_purchased_air_calc_entry(
+        &mut runtime,
+        binding.ideal_loads_air_system,
+        base_context,
+    )
+    .expect("valid second Calc-entry prefix");
+    assert_eq!(second.call_ordinal, 2);
 }
 
 #[test]

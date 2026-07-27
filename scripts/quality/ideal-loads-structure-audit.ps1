@@ -65,7 +65,41 @@ function Assert-LineLimit {
     }
 }
 
+function Assert-ExactStringArray {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$Name,
+        [Parameter(Mandatory = $true)][string[]]$Expected,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    $text = Read-RepoText -Path $Path
+    $namePattern = [regex]::Escape($Name)
+    $arrayMatch = [regex]::Match(
+        $text,
+        "(?s)pub const\s+$namePattern\s*:\s*&\[\&str\]\s*=\s*&\[(?<body>.*?)\];"
+    )
+    if (-not $arrayMatch.Success) {
+        throw "$Description declaration missing in $Path"
+    }
+
+    [string[]]$actual = @(
+        [regex]::Matches($arrayMatch.Groups["body"].Value, '"(?<value>[^"]+)"') |
+            ForEach-Object { $_.Groups["value"].Value }
+    )
+    if ($actual.Count -ne $Expected.Count) {
+        throw "$Description expected $($Expected.Count) entries, found $($actual.Count) in $Path"
+    }
+    for ($index = 0; $index -lt $Expected.Count; $index += 1) {
+        if ($actual[$index] -cne $Expected[$index]) {
+            throw "$Description entry $($index + 1) expected '$($Expected[$index])', found '$($actual[$index])' in $Path"
+        }
+    }
+}
+
 $calcRoot = "crates\ep_runtime\src\ideal_loads\calc.rs"
+$calcLifecycle = "crates\ep_runtime\src\ideal_loads\calc\lifecycle.rs"
+$calcLifecycleTests = "crates\ep_runtime\src\ideal_loads\calc\lifecycle_tests.rs"
 $calcHumidity = "crates\ep_runtime\src\ideal_loads\calc\humidity.rs"
 $calcLimits = "crates\ep_runtime\src\ideal_loads\calc\limits.rs"
 $calcMassFlow = "crates\ep_runtime\src\ideal_loads\calc\mass_flow.rs"
@@ -155,6 +189,8 @@ $zoneEquipmentDispatch = "crates\ep_runtime\src\zone_equipment\dispatch.rs"
 $zoneEquipmentTests = "crates\ep_runtime\src\zone_equipment\tests.rs"
 
 Assert-FileExists -Path $calcRoot -Description "IdealLoads calc module root"
+Assert-FileExists -Path $calcLifecycle -Description "PurchasedAir Calc-entry lifecycle module"
+Assert-FileExists -Path $calcLifecycleTests -Description "PurchasedAir Calc-entry lifecycle tests"
 Assert-FileExists -Path $calcHumidity -Description "IdealLoads calc humidity module"
 Assert-FileExists -Path $calcLimits -Description "IdealLoads calc limits module"
 Assert-FileExists -Path $calcMassFlow -Description "IdealLoads calc mass-flow module"
@@ -239,6 +275,8 @@ Assert-FileExists -Path $zoneEquipmentDispatch -Description "Zone equipment disp
 Assert-FileExists -Path $zoneEquipmentTests -Description "Zone equipment tests module"
 
 Assert-LineLimit -Path $calcRoot -Limit 80 -Description "IdealLoads calc module root"
+Assert-LineLimit -Path $calcLifecycle -Limit 520 -Description "PurchasedAir Calc-entry lifecycle module"
+Assert-LineLimit -Path $calcLifecycleTests -Limit 240 -Description "PurchasedAir Calc-entry lifecycle tests"
 Assert-LineLimit -Path $calcHumidity -Limit 220 -Description "IdealLoads calc humidity module"
 Assert-LineLimit -Path $calcLimits -Limit 180 -Description "IdealLoads calc limits module"
 Assert-LineLimit -Path $calcMassFlow -Limit 150 -Description "IdealLoads calc mass-flow module"
@@ -303,6 +341,9 @@ Assert-LineLimit -Path $zoneEquipmentTests -Limit 320 -Description "Zone equipme
 Assert-LineLimit -Path $resultStore -Limit 220 -Description "Runtime result store"
 
 Assert-Contains -Path $calcRoot -Pattern 'mod humidity;' -Description "IdealLoads calc humidity submodule declaration"
+Assert-Contains -Path $calcRoot -Pattern 'mod lifecycle;' -Description "PurchasedAir Calc-entry lifecycle submodule declaration"
+Assert-Contains -Path $calcRoot -Pattern 'mod lifecycle_tests;' -Description "PurchasedAir Calc-entry lifecycle test module declaration"
+Assert-Contains -Path $calcRoot -Pattern 'pub use lifecycle::\*;' -Description "PurchasedAir Calc-entry lifecycle public re-export"
 Assert-Contains -Path $calcRoot -Pattern 'mod limits;' -Description "IdealLoads calc limits submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod mass_flow;' -Description "IdealLoads calc mass-flow submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod no_oa;' -Description "no-OA calc submodule declaration"
@@ -375,6 +416,67 @@ Assert-NotContains -Path $noOaCalc -Pattern 'fn flow_limit_kg_per_s\s*\(' -Descr
 Assert-NotContains -Path $noOaCalc -Pattern 'fn capacity_limit_w\s*\(' -Description "capacity limit helper in no-OA calc module"
 Assert-Contains -Path $noOaTests -Pattern '#\[test\]' -Description "unit tests in no-OA test module"
 
+Assert-Contains -Path $calcLifecycle -Pattern 'pub const PURCHASED_AIR_CALC_ENTRY_SOURCE' -Description "Calc-entry EnergyPlus source provenance"
+Assert-Contains -Path $calcLifecycle -Pattern 'pub const PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER' -Description "Calc-entry exact source order"
+Assert-Contains -Path $calcLifecycle -Pattern 'pub const PURCHASED_AIR_CALC_ENTRY_RESET_TARGETS' -Description "Calc-entry 12-target reset evidence"
+Assert-Contains -Path $calcLifecycle -Pattern 'PurchasedAirManager\.cc:1967,1971-2022' -Description "Calc-entry alias and executable-prefix provenance"
+Assert-ExactStringArray -Path $calcLifecycle -Name "PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER" -Expected @(
+    "resolve-supply-node",
+    "resolve-zone-node",
+    "resolve-outdoor-air-node",
+    "resolve-recirculation-node",
+    "reset-12-entry-values",
+    "default-unit-on",
+    "default-economizer-off",
+    "read-heating-setpoint-demand",
+    "read-cooling-setpoint-demand",
+    "availability-manager-zone-write-if-allocated",
+    "availability-manager-status-copy-if-allocated",
+    "availability-manager-force-off-check-if-allocated",
+    "read-overall-availability",
+    "default-heating-on",
+    "read-heating-availability",
+    "default-cooling-on",
+    "read-cooling-availability",
+    "gate-unit-body"
+) -Description "Calc-entry exact 18-step source order"
+Assert-ExactStringArray -Path $calcLifecycle -Name "PURCHASED_AIR_CALC_ENTRY_RESET_TARGETS" -Expected @(
+    "SupplyMassFlowRate",
+    "OAMassFlowRate",
+    "PurchAir.MinOAMassFlowRate",
+    "PurchAir.TimeEconoActive",
+    "PurchAir.TimeHtRecActive",
+    "SysOutputProvided",
+    "MoistOutputProvided",
+    "CoolSensOutput",
+    "CoolLatOutput",
+    "CoolTotOutput",
+    "HeatSensOutput",
+    "LatOutput"
+) -Description "Calc-entry exact ordered 12-target reset snapshot"
+Assert-NotContains -Path $calcLifecycle -Pattern '"SensOutput"' -Description "non-source bare SensOutput reset target"
+Assert-Contains -Path $calcLifecycle -Pattern 'PurchAir\.MinOAMassFlowRate' -Description "Calc-entry retained minimum OA reset target"
+Assert-Contains -Path $calcLifecycle -Pattern 'PurchAir\.TimeEconoActive' -Description "Calc-entry retained economizer-time reset target"
+Assert-Contains -Path $calcLifecycle -Pattern 'PurchAir\.TimeHtRecActive' -Description "Calc-entry retained heat-recovery-time reset target"
+Assert-Contains -Path $calcLifecycle -Pattern 'pub enum PurchasedAirAvailabilityStatus' -Description "Calc-entry source availability status"
+Assert-Contains -Path $calcLifecycle -Pattern 'pub struct PurchasedAirCalcEntryDemandSnapshot' -Description "Calc-entry narrow sensible-demand snapshot"
+Assert-Contains -Path $calcLifecycle -Pattern 'pub struct PurchasedAirCalcEntryContext' -Description "Calc-entry call context"
+Assert-Contains -Path $calcLifecycle -Pattern 'pub struct PurchasedAirCalcEntrySnapshot' -Description "Calc-entry source-ordered snapshot"
+Assert-Contains -Path $calcLifecycle -Pattern 'pub struct PurchasedAirCalcEntryRuntimeState' -Description "Calc-entry bounded persistent state"
+Assert-Contains -Path $calcLifecycle -Pattern 'pub struct PurchasedAirCalcEntryLifecycleSummary' -Description "Calc-entry lifecycle summary"
+Assert-Contains -Path $calcLifecycle -Pattern 'pub enum PurchasedAirCalcEntryError' -Description "Calc-entry fail-closed error"
+Assert-Contains -Path $calcLifecycle -Pattern 'pub fn advance_purchased_air_calc_entry\s*\(' -Description "Calc-entry persistent transition"
+Assert-Contains -Path $calcLifecycle -Pattern 'pub fn purchased_air_calc_entry_lifecycle_summary\s*\(' -Description "Calc-entry persistent summary"
+Assert-Contains -Path $calcLifecycle -Pattern 'checked_add\(1\) != Some\(unit\.init_call_count\)' -Description "Init-to-Calc entry lockstep guard"
+Assert-Contains -Path $calcLifecycle -Pattern 'state\.minimum_outdoor_air_mass_flow_rate_kg_per_s = 0\.0' -Description "retained minimum OA reset mutation"
+Assert-Contains -Path $calcLifecycle -Pattern 'state\.economizer_active_time_hours = 0\.0' -Description "retained economizer-time reset mutation"
+Assert-Contains -Path $calcLifecycle -Pattern 'state\.heat_recovery_active_time_hours = 0\.0' -Description "retained heat-recovery-time reset mutation"
+Assert-Contains -Path $calcLifecycle -Pattern 'value > 0\.0 \|\| value\.is_nan\(\)' -Description "source <=0 off and NaN-on predicate"
+Assert-Contains -Path $calcLifecycleTests -Pattern 'entry_resets_then_reads_demand_manager_and_all_schedules' -Description "Calc-entry reset, demand, manager, and schedule regression"
+Assert-Contains -Path $calcLifecycleTests -Pattern 'schedule_gates_are_independent_and_nan_is_nominally_on' -Description "Calc-entry independent gates and NaN regression"
+Assert-Contains -Path $calcLifecycleTests -Pattern 'direct_entry_retains_mismatched_zone_and_aliased_nodes_without_validation' -Description "Calc-entry direct source-characterization regression"
+Assert-Contains -Path $calcLifecycleTests -Pattern 'unknown_public_unit_rejects_advance_and_summary_without_mutation' -Description "Calc-entry unknown-unit transaction regression"
+
 Assert-Contains -Path $idealLoadsInit -Pattern 'pub struct IdealLoadsInitFlags' -Description "IdealLoads init flags type"
 Assert-Contains -Path $idealLoadsInit -Pattern 'mod manager_plan;' -Description "IdealLoads immutable manager-plan module"
 Assert-Contains -Path $idealLoadsInit -Pattern 'mod manager_plan_tests;' -Description "IdealLoads manager-plan test module"
@@ -422,6 +524,7 @@ Assert-Contains -Path $idealLoadsInitState -Pattern 'pub one_time_latched: bool'
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub topology_completed: bool' -Description "selected-unit topology completion state"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub topology_plan: Option<PurchasedAirInitTopologyPlan>' -Description "retained immutable selected-unit topology plan"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub recirculation_source: Option<PurchasedAirRecirculationSource>' -Description "retained PurchasedAir recirculation branch"
+Assert-Contains -Path $idealLoadsInitState -Pattern 'pub calc_entry: PurchasedAirCalcEntryRuntimeState' -Description "retained bounded Calc-entry state"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub topology_diagnostics: Vec<PurchasedAirInitTopologyDiagnostic>' -Description "retained ordered topology diagnostics"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub topology_failure: Option<PurchasedAirInitTopologyError>' -Description "retained fatal topology outcome"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub topology_completion_count: usize' -Description "historical topology completion count"
@@ -521,10 +624,26 @@ Assert-Contains -Path $idealLoadsCouplingValidation -Pattern 'with_purchased_air
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\coupling.rs" -Pattern 'calc_uses_the_persistent_sizing_overlay_after_model_values_change' -Description "Calc retained sizing-overlay regression"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding_tests.rs" -Pattern 'predictor_failure_precedes_and_preserves_purchased_air_initialization' -Description "predictor-before-Init observable regression"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding_tests.rs" -Pattern 'initialization_failure_precedes_calc_only_input_validation' -Description "Init-before-Calc error precedence regression"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding_tests.rs" -Pattern 'public_calc_entry_replay_and_identity_errors_do_not_mutate_lifecycle' -Description "Calc-entry public replay and identity transaction regression"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'zone_component_availability:\s*Some\(PurchasedAirAvailabilityStatus::NoAction\)' -Description "release allocated ZoneComp NoAction visit"
+$bindingText = Read-RepoText -Path "crates\ep_runtime\src\ideal_loads\binding.rs"
+$bindingInitIndex = $bindingText.IndexOf("let initialization = init_purchased_air_runtime(")
+$bindingCalcEntryIndex = $bindingText.IndexOf("let calculation_entry = advance_purchased_air_calc_entry(")
+$bindingCalcIndex = $bindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
+if ($bindingInitIndex -lt 0 -or $bindingCalcEntryIndex -le $bindingInitIndex -or $bindingCalcIndex -le $bindingCalcEntryIndex) {
+    throw "InitPurchasedAir must precede the Calc-entry prefix and bounded Calc coupling"
+}
 Assert-Contains -Path $calcLimits -Pattern 'initialized_heating_air_mass_flow_limit_kg_per_s' -Description "initialized heating flow cache input"
 Assert-Contains -Path $calcLimits -Pattern 'initialized_cooling_air_mass_flow_limit_kg_per_s' -Description "initialized cooling flow cache input"
 Assert-Contains -Path $calcLimits -Pattern 'purchased_air_sized_limits' -Description "Calc four-field PurchasedAir sizing overlay"
 Assert-Contains -Path $runPipeline -Pattern 'purchased_air_init_lifecycle' -Description "release lifecycle JSON evidence"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'pub calc_entry_lifecycle: PurchasedAirCalcEntryLifecycleSummary' -Description "coupled runtime Calc-entry summary"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'calc_entry_snapshot_matches_release' -Description "per-timestep Calc-entry reconciliation"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'validate_calc_entry_lifecycle' -Description "final Calc-entry lifecycle reconciliation"
+Assert-Contains -Path $runPipeline -Pattern 'purchased_air_calc_entry_lifecycle' -Description "release Calc-entry lifecycle JSON evidence"
+Assert-Contains -Path $runPipeline -Pattern 'validate_direct_purchased_air_calc_entry_lifecycle' -Description "release Calc-entry lifecycle firewall"
+Assert-Contains -Path $runPipeline -Pattern 'persistent PurchasedAir lifecycle evidence was attached to a non-direct runtime' -Description "non-direct Calc-entry evidence rejection"
+Assert-Contains -Path $runDirectZoneCoupledTests -Pattern 'purchased_air_calc_entry_lifecycle' -Description "direct run Calc-entry lifecycle JSON assertion"
 Assert-Contains -Path $runPipeline -Pattern 'topology_ready' -Description "release topology-ready JSON and validation evidence"
 Assert-Contains -Path $runPipeline -Pattern 'topology_diagnostics' -Description "release ordered topology diagnostic evidence"
 Assert-Contains -Path $runPipeline -Pattern 'topology_failure' -Description "release retained topology failure evidence"

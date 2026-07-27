@@ -224,6 +224,39 @@ counters, null schedules, or reset/concurrency parity. Autosizing and the
 remaining Init/Size branches are still open, and no parent, routine,
 inventory, capability, conformance, or Roadmap status is promoted.
 
+CP310 begins the bounded `CalcPurchAirLoads` runtime body with the
+EnergyPlus 26.1 alias at line 1967, executable entry prefix at lines
+1971-2021, and line 2022 only as the `UnitOn` active-body decision. The Rust
+transition records caller-supplied resolved supply, Zone-air, optional OA, and
+recirculation identities; characterizes the exact 12-target zero-result
+snapshot while actually clearing the three retained PurchasedAir fields;
+defaults `UnitOn=true` and `EconoOn=false`; copies heating then cooling
+Remaining demand; conditionally records the allocated Zone-component manager
+Zone write, status copy, and exact `ForceOff`; then records unconditional
+overall, heating, and cooling read-site evidence from pre-sampled scalar
+inputs in source order before the body gate.
+
+The direct release loop executes this prefix after each successful
+`InitPurchasedAir` call and before the existing bounded calculation. Its
+current release inputs represent the normally preallocated ZoneComp entry with
+a `NoAction` status, use the already-sampled overall availability value, and
+use heating/cooling availability values of one. Every call therefore records
+its Zone write and status copy without applying `ForceOff`. Per-step snapshots
+plus bounded totals/latest state prove
+call/reset/demand/read-site order and node identity; the coupled runtime and
+`ep_run` reconcile those values, expose
+`purchased_air_calc_entry_lifecycle` in run-summary JSON, and reject the
+evidence on non-direct runtime lanes.
+
+This does not implement the active body beginning at line 2023 or
+`CalcPurchAirMinOAMassFlow` at line 2025. Actual schedule-service and
+Zone-component-manager ownership, OA, EMS, operating-mode selection,
+psychrometrics, flow/capacity and mixed-air work, UnitOff behavior, node and
+report writes, output-reference aliasing, partial failure, reset/concurrency,
+and full Calc parity remain open. The parent stays `scaffold`/`none`,
+`routine.calc_purch_air_loads` stays `source_mapped`, and inventory,
+readiness, capability, evidence, conformance, and Roadmap state do not change.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

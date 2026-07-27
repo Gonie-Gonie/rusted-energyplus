@@ -29883,7 +29883,8 @@ iteration recalculation. Its ordinary demand input is sensible-only, so the
 separate moisture predictor/corrector helpers are not evidence that generic
 arbitrary execution supplies the source latent demand lifecycle.
 
-Rust has no equivalent for the full main/heating/cooling availability matrix,
+CP310 maps only the entry-prefix scalar availability decisions. Rust still has
+no live main/heating/cooling schedule-service matrix,
 Zone-component hybrid availability, EMS OA/mass/temperature/humidity override
 state, OA maximum warning/recurrence, final saturation warning counters,
 source-exact output-reference and node alias behavior, contaminant writes,
@@ -33403,6 +33404,35 @@ sizing counters, null schedules, broader multi-unit release execution,
 reset/concurrency, Autosizing, and full Init/Size parity remain excluded.
 Parent/routine status, counts, capabilities, conformance, and the Roadmap
 checkbox remain unchanged.
+
+## CP310 PurchasedAir Calc Entry Inside the Heat-Balance Loop
+
+The direct-Zone order is now predictor -> persistent Init -> CP310
+`CalcPurchAirLoads` entry prefix -> bounded calculation -> update/report ->
+same-step Zone-air corrector. CP310 covers the `PurchAir` alias at line 1967,
+executable lines 1971-2021, and only the line-2022 `UnitOn` body gate.
+Line 2023 Zone heat-balance access and line 2025 minimum-OA call remain outside
+the slice.
+
+Each accepted timestep records caller-supplied resolved nodes, the exact
+12-target zero-result snapshot, heating then cooling source-setpoint demand,
+optional manager order, read-site evidence from all three pre-sampled
+availability values, independent heating/cooling gates, and the body decision.
+Only the three retained PurchasedAir reset fields are actually cleared; the
+nine call-local/reference targets are represented in the snapshot. The release
+lane represents the normally preallocated ZoneComp entry as `NoAction`, uses
+its already sampled overall availability, and uses both mode values as one.
+Per-step and final validators require one manager visit, Zone write, and status
+copy per coupling with zero `ForceOff`, then reconcile this evidence with the
+predictor, Init topology, and coupling count; the pipeline publishes it only
+for the direct runtime.
+
+No heat-balance, predictor, surface, or Zone-air corrector equation is added or
+promoted. The line-2023-and-later Calc body, actual schedule/ZoneComp services,
+OA/EMS/modes/psychrometrics/limits/mixed air, node/report writes, adaptive
+iteration, and full lifecycle parity remain excluded. Parent/routine status,
+counts, capabilities, evidence, conformance, and Roadmap state remain
+unchanged.
 
 ## Data Structure Map
 

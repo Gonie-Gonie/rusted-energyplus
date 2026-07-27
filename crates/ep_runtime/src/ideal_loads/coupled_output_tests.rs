@@ -3,9 +3,12 @@ use super::*;
 use crate::{
     heat_balance::state::{ZoneAirTemperatureCoefficients, ZoneHeatBalanceState},
     ideal_loads::{
-        DirectZonePurchasedAirCouplingInput, DirectZonePurchasedAirScheduleSnapshot,
-        IdealLoadsInitFlags, IdealLoadsZoneState, PurchasedAirInitSnapshot,
-        PurchasedAirInitTransition, PurchasedAirRecirculationSource,
+        DirectZonePurchasedAirCouplingInput, DirectZonePurchasedAirCouplingOutput,
+        DirectZonePurchasedAirScheduleSnapshot, IdealLoadsInitFlags, IdealLoadsZoneState,
+        PURCHASED_AIR_CALC_ENTRY_SOURCE, PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER,
+        PurchasedAirAvailabilityStatus, PurchasedAirCalcEntryDemandSnapshot,
+        PurchasedAirCalcEntryResetSnapshot, PurchasedAirCalcEntrySnapshot,
+        PurchasedAirInitSnapshot, PurchasedAirInitTransition, PurchasedAirRecirculationSource,
         couple_direct_zone_predicted_demand_to_purchased_air,
     },
 };
@@ -414,6 +417,7 @@ fn scaled_output(
             unit_available: true,
         },
         initialization: initialized_snapshot(system),
+        calculation_entry: calculation_entry_snapshot(system, sample_index, coupling),
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;
@@ -442,6 +446,42 @@ fn scaled_output(
     demand.remaining_output_req_to_heat_sp_w = 19.0 * scale;
     demand.remaining_output_req_to_cool_sp_w = -20.0 * scale;
     output
+}
+
+fn calculation_entry_snapshot(
+    system: &IdealLoadsAirSystem,
+    sample_index: usize,
+    coupling: DirectZonePurchasedAirCouplingOutput,
+) -> PurchasedAirCalcEntrySnapshot {
+    PurchasedAirCalcEntrySnapshot {
+        source: PURCHASED_AIR_CALC_ENTRY_SOURCE,
+        system: system.id,
+        call_ordinal: sample_index + 1,
+        source_order: PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER,
+        controlled_zone: coupling.prediction.zone_demand.zone,
+        supply_node: SUPPLY_NODE,
+        zone_node: NodeId(2),
+        outdoor_air_node: None,
+        recirculation_node: NodeId(4),
+        reset: PurchasedAirCalcEntryResetSnapshot::default(),
+        demand: PurchasedAirCalcEntryDemandSnapshot::from(coupling.prediction.zone_demand),
+        unit_defaulted_on: true,
+        economizer_defaulted_on: false,
+        availability_manager_read_site_visited: true,
+        availability_manager_zone_written: true,
+        copied_availability_status: Some(PurchasedAirAvailabilityStatus::NoAction),
+        force_off_applied: false,
+        overall_availability_read_site_visited: true,
+        heating_availability_read_site_visited: true,
+        cooling_availability_read_site_visited: true,
+        overall_availability: 1.0,
+        heating_availability: 1.0,
+        cooling_availability: 1.0,
+        unit_on: true,
+        heating_on: true,
+        cooling_on: true,
+        unit_body_entered: true,
+    }
 }
 
 fn initialized_snapshot(system: &IdealLoadsAirSystem) -> PurchasedAirInitSnapshot {

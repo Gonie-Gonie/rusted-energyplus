@@ -20,12 +20,14 @@ use ep_model::{
 use super::{
     DirectZonePurchasedAirCouplingError, DirectZonePurchasedAirCouplingInput,
     DirectZonePurchasedAirCouplingOutput, IdealLoadsPurchasedAirBranch,
-    IdealLoadsSensibleLimitContext, PurchasedAirHardSizeLegacyContext, PurchasedAirInitCallContext,
-    PurchasedAirInitError, PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanError,
-    PurchasedAirInitSnapshot, PurchasedAirInitTopologyPlan, PurchasedAirInitTopologyPlanError,
-    PurchasedAirRuntimeState, classify_no_oa_sensible_subset,
-    complete_direct_zone_purchased_air_coupling, init_purchased_air_runtime,
-    predict_direct_zone_demand_for_purchased_air, select_purchased_air_branch,
+    IdealLoadsSensibleLimitContext, PurchasedAirAvailabilityStatus, PurchasedAirCalcEntryContext,
+    PurchasedAirCalcEntryError, PurchasedAirCalcEntrySnapshot, PurchasedAirHardSizeLegacyContext,
+    PurchasedAirInitCallContext, PurchasedAirInitError, PurchasedAirInitManagerPlan,
+    PurchasedAirInitManagerPlanError, PurchasedAirInitSnapshot, PurchasedAirInitTopologyPlan,
+    PurchasedAirInitTopologyPlanError, PurchasedAirRuntimeState, advance_purchased_air_calc_entry,
+    classify_no_oa_sensible_subset, complete_direct_zone_purchased_air_coupling,
+    init_purchased_air_runtime, predict_direct_zone_demand_for_purchased_air,
+    select_purchased_air_branch,
 };
 
 /// One-to-one relation required by the bounded direct-Zone binding.
@@ -561,6 +563,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     },
     /// Persistent `InitPurchasedAir` rejected the bounded lifecycle state.
     Initialization(PurchasedAirInitError),
+    /// The bounded `CalcPurchAirLoads` entry prefix could not resolve its unit.
+    CalculationEntry(PurchasedAirCalcEntryError),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -630,6 +634,8 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     pub schedules: DirectZonePurchasedAirScheduleSnapshot,
     /// Persistent initialization snapshot consumed by this Calc call.
     pub initialization: PurchasedAirInitSnapshot,
+    /// Source-ordered `CalcPurchAirLoads` entry-prefix snapshot.
+    pub calculation_entry: PurchasedAirCalcEntrySnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
@@ -702,15 +708,6 @@ pub fn couple_model_bound_direct_zone_purchased_air(
     } else {
         1.0
     };
-    let unit_available = overall_availability > 0.0;
-    let schedules = DirectZonePurchasedAirScheduleSnapshot {
-        sample_index,
-        control_type,
-        heating_setpoint_c,
-        cooling_setpoint_c,
-        overall_availability,
-        unit_available,
-    };
     let zone_node_temperature_c = input.zone_state.mean_air_temperature_c;
     let recirculation_state = crate::ideal_loads::IdealLoadsZoneState {
         air_temperature_c: zone_node_temperature_c,
@@ -750,6 +747,32 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         },
     )
     .map_err(DirectZonePurchasedAirScheduledCouplingError::Initialization)?;
+    let calculation_entry = advance_purchased_air_calc_entry(
+        input.purchased_air_runtime_state,
+        binding.ideal_loads_air_system,
+        PurchasedAirCalcEntryContext {
+            controlled_zone: binding.zone,
+            supply_node: binding.supply_node,
+            zone_node: binding.zone_air_node,
+            outdoor_air_node: None,
+            recirculation_node: binding.return_node,
+            demand: prediction.zone_demand,
+            zone_component_availability: Some(PurchasedAirAvailabilityStatus::NoAction),
+            overall_availability,
+            heating_availability: 1.0,
+            cooling_availability: 1.0,
+        },
+    )
+    .map_err(DirectZonePurchasedAirScheduledCouplingError::CalculationEntry)?;
+    let unit_available = calculation_entry.unit_on;
+    let schedules = DirectZonePurchasedAirScheduleSnapshot {
+        sample_index,
+        control_type,
+        heating_setpoint_c,
+        cooling_setpoint_c,
+        overall_availability,
+        unit_available,
+    };
 
     let coupling = complete_direct_zone_purchased_air_coupling(
         DirectZonePurchasedAirCouplingInput {
@@ -778,6 +801,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
     Ok(DirectZonePurchasedAirScheduledCouplingOutput {
         schedules,
         initialization,
+        calculation_entry,
         coupling,
     })
 }

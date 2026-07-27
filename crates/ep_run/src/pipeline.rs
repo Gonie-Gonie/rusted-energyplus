@@ -18,18 +18,21 @@ use ep_runtime::{
     DIRECT_ZONE_PURCHASED_AIR_DEMAND_SOURCE, DirectZonePurchasedAirCoupledOptions, ExecutionPlan,
     ExecutionStep, HeatBalanceSimulationOptions, IDEAL_LOADS_FIXTURE_DEMAND_DIAGNOSTIC_SOURCE,
     IdealLoadsCompatibilityOptions, NodeStateProjectionOptions,
-    PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirHardSizeField,
-    PurchasedAirHardSizeLegacyRoute, PurchasedAirInitDiagnosticKind,
+    PURCHASED_AIR_CALC_ENTRY_RESET_TARGETS, PURCHASED_AIR_CALC_ENTRY_SOURCE,
+    PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
+    PurchasedAirAvailabilityStatus, PurchasedAirCalcEntryLifecycleSummary,
+    PurchasedAirHardSizeField, PurchasedAirHardSizeLegacyRoute, PurchasedAirInitDiagnosticKind,
     PurchasedAirInitLifecycleSummary, PurchasedAirInitTopologyDiagnosticKind,
     PurchasedAirInitTopologyDiagnosticSeverity, PurchasedAirInitTopologyError,
     PurchasedAirRecirculationSource, PurchasedAirSupplyTemperatureDiagnosticKind,
     PurchasedAirSupplyTemperatureInitialMessageApi, ResultStore, RuntimePrecomputedData,
     ScheduleCacheProfile, ScheduleSeriesCache, ScheduleSeriesIndexKind, TimeAxis,
-    WeatherTimestepSeries, build_environment_time_axes_with_weather_metadata,
-    build_hourly_time_axis, build_hourly_time_axis_with_weather_metadata, load_epw_weather_file,
-    precompute_runtime_data, precompute_schedule_cache_for_environment_time_axis,
-    precompute_schedule_cache_for_time_axis, precompute_weather_timestep_series,
-    select_epw_environment_weather, simulate_direct_zone_purchased_air_coupled_heat_balance,
+    WeatherTimestepSeries, ZoneSensibleDemandInputKind,
+    build_environment_time_axes_with_weather_metadata, build_hourly_time_axis,
+    build_hourly_time_axis_with_weather_metadata, load_epw_weather_file, precompute_runtime_data,
+    precompute_schedule_cache_for_environment_time_axis, precompute_schedule_cache_for_time_axis,
+    precompute_weather_timestep_series, select_epw_environment_weather,
+    simulate_direct_zone_purchased_air_coupled_heat_balance,
     simulate_heat_balance_zone_air_temperatures_with_weather_series,
     simulate_ideal_loads_node_state_projection, simulate_ideal_loads_purchased_air_compat,
 };
@@ -150,6 +153,7 @@ struct RustRuntimeResult {
     actual_coupled_source_order: Option<Vec<String>>,
     purchased_air_coupling_call_count: Option<usize>,
     purchased_air_init_lifecycle: Option<PurchasedAirInitLifecycleSummary>,
+    purchased_air_calc_entry_lifecycle: Option<PurchasedAirCalcEntryLifecycleSummary>,
 }
 
 struct PreparedRuntimeInputs {
@@ -973,6 +977,101 @@ fn purchased_air_init_lifecycle_json(lifecycle: &PurchasedAirInitLifecycleSummar
     value
 }
 
+fn purchased_air_calc_entry_lifecycle_json(
+    lifecycle: &PurchasedAirCalcEntryLifecycleSummary,
+) -> Value {
+    let availability_status = |status| match status {
+        PurchasedAirAvailabilityStatus::Invalid => "invalid",
+        PurchasedAirAvailabilityStatus::NoAction => "no_action",
+        PurchasedAirAvailabilityStatus::ForceOff => "force_off",
+        PurchasedAirAvailabilityStatus::CycleOn => "cycle_on",
+        PurchasedAirAvailabilityStatus::CycleOnZoneFansOnly => "cycle_on_zone_fans_only",
+    };
+    let demand_kind = |kind| match kind {
+        ZoneSensibleDemandInputKind::ActiveLoadSplitCompatibility => {
+            "active_load_split_compatibility"
+        }
+        ZoneSensibleDemandInputKind::SourceSetpointThresholds => "source_setpoint_thresholds",
+    };
+    let latest = lifecycle.state.latest.map(|snapshot| {
+        json!({
+            "source": snapshot.source,
+            "system": snapshot.system.0,
+            "call_ordinal": snapshot.call_ordinal,
+            "source_order": snapshot.source_order,
+            "controlled_zone": snapshot.controlled_zone.0,
+            "supply_node": snapshot.supply_node.0,
+            "zone_node": snapshot.zone_node.0,
+            "outdoor_air_node": snapshot.outdoor_air_node.map(|node| node.0),
+            "recirculation_node": snapshot.recirculation_node.0,
+            "reset": {
+                "targets": PURCHASED_AIR_CALC_ENTRY_RESET_TARGETS,
+                "field_count": PURCHASED_AIR_CALC_ENTRY_RESET_TARGETS.len(),
+                "all_zero": snapshot.reset.all_zero(),
+                "supply_mass_flow_rate_kg_per_s": snapshot.reset.supply_mass_flow_rate_kg_per_s,
+                "outdoor_air_mass_flow_rate_kg_per_s": snapshot.reset.outdoor_air_mass_flow_rate_kg_per_s,
+                "minimum_outdoor_air_mass_flow_rate_kg_per_s": snapshot.reset.minimum_outdoor_air_mass_flow_rate_kg_per_s,
+                "economizer_active_time_hours": snapshot.reset.economizer_active_time_hours,
+                "heat_recovery_active_time_hours": snapshot.reset.heat_recovery_active_time_hours,
+                "system_output_provided_w": snapshot.reset.system_output_provided_w,
+                "moisture_output_provided_kg_per_s": snapshot.reset.moisture_output_provided_kg_per_s,
+                "cooling_sensible_output_w": snapshot.reset.cooling_sensible_output_w,
+                "cooling_latent_output_w": snapshot.reset.cooling_latent_output_w,
+                "cooling_total_output_w": snapshot.reset.cooling_total_output_w,
+                "heating_sensible_output_w": snapshot.reset.heating_sensible_output_w,
+                "latent_output_w": snapshot.reset.latent_output_w,
+            },
+            "demand": {
+                "zone": snapshot.demand.zone.0,
+                "sensible_input_kind": demand_kind(snapshot.demand.sensible_input_kind),
+                "remaining_output_req_to_heat_sp_w": snapshot.demand.remaining_output_req_to_heat_sp_w,
+                "remaining_output_req_to_cool_sp_w": snapshot.demand.remaining_output_req_to_cool_sp_w,
+            },
+            "unit_defaulted_on": snapshot.unit_defaulted_on,
+            "economizer_defaulted_on": snapshot.economizer_defaulted_on,
+            "availability_manager_read_site_visited": snapshot.availability_manager_read_site_visited,
+            "availability_manager_zone_written": snapshot.availability_manager_zone_written,
+            "copied_availability_status": snapshot.copied_availability_status.map(availability_status),
+            "force_off_applied": snapshot.force_off_applied,
+            "overall_availability_read_site_visited": snapshot.overall_availability_read_site_visited,
+            "heating_availability_read_site_visited": snapshot.heating_availability_read_site_visited,
+            "cooling_availability_read_site_visited": snapshot.cooling_availability_read_site_visited,
+            "overall_availability": snapshot.overall_availability,
+            "heating_availability": snapshot.heating_availability,
+            "cooling_availability": snapshot.cooling_availability,
+            "unit_on": snapshot.unit_on,
+            "heating_on": snapshot.heating_on,
+            "cooling_on": snapshot.cooling_on,
+            "unit_body_entered": snapshot.unit_body_entered,
+        })
+    });
+    json!({
+        "source": lifecycle.source,
+        "system": lifecycle.state.system.0,
+        "call_count": lifecycle.state.call_count,
+        "reset_count": lifecycle.state.reset_count,
+        "demand_read_count": lifecycle.state.demand_read_count,
+        "availability_manager_read_count": lifecycle.state.availability_manager_read_count,
+        "availability_manager_zone_write_count": lifecycle.state.availability_manager_zone_write_count,
+        "availability_status_copy_count": lifecycle.state.availability_status_copy_count,
+        "overall_availability_read_count": lifecycle.state.overall_availability_read_count,
+        "heating_availability_read_count": lifecycle.state.heating_availability_read_count,
+        "cooling_availability_read_count": lifecycle.state.cooling_availability_read_count,
+        "force_off_count": lifecycle.state.force_off_count,
+        "overall_schedule_off_count": lifecycle.state.overall_schedule_off_count,
+        "unit_body_entry_count": lifecycle.state.unit_body_entry_count,
+        "unit_off_count": lifecycle.state.unit_off_count,
+        "heating_on_count": lifecycle.state.heating_on_count,
+        "cooling_on_count": lifecycle.state.cooling_on_count,
+        "availability_manager_zone": lifecycle.state.availability_manager_zone.map(|zone| zone.0),
+        "availability_status": availability_status(lifecycle.state.availability_status),
+        "minimum_outdoor_air_mass_flow_rate_kg_per_s": lifecycle.state.minimum_outdoor_air_mass_flow_rate_kg_per_s,
+        "economizer_active_time_hours": lifecycle.state.economizer_active_time_hours,
+        "heat_recovery_active_time_hours": lifecycle.state.heat_recovery_active_time_hours,
+        "latest": latest,
+    })
+}
+
 #[allow(clippy::too_many_arguments)]
 fn finish_successful_summary(
     config: &RunConfig,
@@ -1088,6 +1187,9 @@ fn finish_successful_summary(
             "purchased_air_init_lifecycle": result.purchased_air_init_lifecycle
                 .as_ref()
                 .map(purchased_air_init_lifecycle_json),
+            "purchased_air_calc_entry_lifecycle": result.purchased_air_calc_entry_lifecycle
+                .as_ref()
+                .map(purchased_air_calc_entry_lifecycle_json),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
@@ -1975,6 +2077,7 @@ fn execute_rust_runtime(
                 actual_coupled_source_order: None,
                 purchased_air_coupling_call_count: None,
                 purchased_air_init_lifecycle: None,
+                purchased_air_calc_entry_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
@@ -2014,6 +2117,7 @@ fn execute_rust_runtime(
             );
             let purchased_air_coupling_call_count = Some(simulation.summary.coupling_call_count);
             let purchased_air_init_lifecycle = Some(simulation.summary.init_lifecycle);
+            let purchased_air_calc_entry_lifecycle = Some(simulation.summary.calc_entry_lifecycle);
             Ok(RustRuntimeResult {
                 results: simulation.results,
                 runtime_class,
@@ -2029,6 +2133,7 @@ fn execute_rust_runtime(
                 actual_coupled_source_order,
                 purchased_air_coupling_call_count,
                 purchased_air_init_lifecycle,
+                purchased_air_calc_entry_lifecycle,
             })
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
@@ -2054,6 +2159,7 @@ fn execute_rust_runtime(
                 actual_coupled_source_order: None,
                 purchased_air_coupling_call_count: None,
                 purchased_air_init_lifecycle: None,
+                purchased_air_calc_entry_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
@@ -2077,6 +2183,7 @@ fn execute_rust_runtime(
                 actual_coupled_source_order: None,
                 purchased_air_coupling_call_count: None,
                 purchased_air_init_lifecycle: None,
+                purchased_air_calc_entry_lifecycle: None,
             })
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
@@ -2097,15 +2204,22 @@ fn validate_runtime_demand_provenance(
         );
     }
     if result.runtime_class == RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility {
+        let init_lifecycle = result.purchased_air_init_lifecycle.as_ref();
         validate_direct_purchased_air_init_lifecycle(
-            result.purchased_air_init_lifecycle.as_ref(),
+            init_lifecycle,
+            result.purchased_air_coupling_call_count,
+        )?;
+        validate_direct_purchased_air_calc_entry_lifecycle(
+            result.purchased_air_calc_entry_lifecycle.as_ref(),
+            init_lifecycle,
             result.purchased_air_coupling_call_count,
         )?;
     } else if result.purchased_air_init_lifecycle.is_some()
+        || result.purchased_air_calc_entry_lifecycle.is_some()
         || result.purchased_air_coupling_call_count.is_some()
     {
         return Err(
-            "persistent PurchasedAir initialization evidence was attached to a non-direct runtime"
+            "persistent PurchasedAir lifecycle evidence was attached to a non-direct runtime"
                 .to_string(),
         );
     }
@@ -2302,6 +2416,134 @@ fn validate_direct_purchased_air_init_lifecycle(
     if !density_valid || !flow_caches_valid {
         return Err(
             "direct-zone IdealLoads begin-environment initialization cache is invalid".to_string(),
+        );
+    }
+    Ok(())
+}
+
+fn validate_direct_purchased_air_calc_entry_lifecycle(
+    lifecycle: Option<&PurchasedAirCalcEntryLifecycleSummary>,
+    init_lifecycle: Option<&PurchasedAirInitLifecycleSummary>,
+    coupling_call_count: Option<usize>,
+) -> Result<(), String> {
+    let lifecycle = lifecycle.ok_or_else(|| {
+        "direct-zone IdealLoads runtime did not expose persistent Calc-entry evidence".to_string()
+    })?;
+    let init_lifecycle = init_lifecycle.ok_or_else(|| {
+        "direct-zone IdealLoads Calc-entry evidence has no initialization evidence".to_string()
+    })?;
+    let coupling_call_count = coupling_call_count.ok_or_else(|| {
+        "direct-zone IdealLoads Calc-entry evidence has no coupling call count".to_string()
+    })?;
+    let state = &lifecycle.state;
+    if lifecycle.source != PURCHASED_AIR_CALC_ENTRY_SOURCE
+        || coupling_call_count == 0
+        || state.call_count != coupling_call_count
+    {
+        return Err(
+            "direct-zone IdealLoads Calc-entry provenance or call count is invalid".to_string(),
+        );
+    }
+    for (field, actual) in [
+        ("reset_count", state.reset_count),
+        ("demand_read_count", state.demand_read_count),
+        (
+            "overall_availability_read_count",
+            state.overall_availability_read_count,
+        ),
+        (
+            "heating_availability_read_count",
+            state.heating_availability_read_count,
+        ),
+        (
+            "cooling_availability_read_count",
+            state.cooling_availability_read_count,
+        ),
+        (
+            "availability_manager_read_count",
+            state.availability_manager_read_count,
+        ),
+        (
+            "availability_manager_zone_write_count",
+            state.availability_manager_zone_write_count,
+        ),
+        (
+            "availability_status_copy_count",
+            state.availability_status_copy_count,
+        ),
+        ("heating_on_count", state.heating_on_count),
+        ("cooling_on_count", state.cooling_on_count),
+    ] {
+        if actual != coupling_call_count {
+            return Err(format!(
+                "direct-zone IdealLoads Calc-entry invariant {field} expected {coupling_call_count}, got {actual}"
+            ));
+        }
+    }
+    let manager_ready = state.force_off_count == 0
+        && state.availability_manager_zone == init_lifecycle.controlled_zone
+        && state.availability_status == PurchasedAirAvailabilityStatus::NoAction;
+    let partitions_reconcile = state
+        .unit_body_entry_count
+        .checked_add(state.unit_off_count)
+        == Some(coupling_call_count)
+        && state
+            .unit_body_entry_count
+            .checked_add(state.overall_schedule_off_count)
+            == Some(coupling_call_count);
+    let retained_resets_clear = state.minimum_outdoor_air_mass_flow_rate_kg_per_s == 0.0
+        && state.economizer_active_time_hours == 0.0
+        && state.heat_recovery_active_time_hours == 0.0;
+    if !manager_ready || !partitions_reconcile || !retained_resets_clear {
+        return Err(
+            "direct-zone IdealLoads Calc-entry aggregate state is not release-ready".to_string(),
+        );
+    }
+    let latest = state.latest.as_ref().ok_or_else(|| {
+        "direct-zone IdealLoads Calc-entry evidence has no latest snapshot".to_string()
+    })?;
+    let expected_system = init_lifecycle
+        .declared_system_order
+        .first()
+        .copied()
+        .ok_or_else(|| {
+            "direct-zone IdealLoads Calc-entry evidence has no declared system".to_string()
+        })?;
+    let latest_ready = latest.source == PURCHASED_AIR_CALC_ENTRY_SOURCE
+        && latest.source_order == PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER
+        && PURCHASED_AIR_CALC_ENTRY_RESET_TARGETS.len() == 12
+        && latest.reset.all_zero()
+        && state.system == expected_system
+        && latest.system == expected_system
+        && latest.call_ordinal == coupling_call_count
+        && Some(latest.controlled_zone) == init_lifecycle.controlled_zone
+        && latest.demand.zone == latest.controlled_zone
+        && latest.demand.sensible_input_kind
+            == ZoneSensibleDemandInputKind::SourceSetpointThresholds
+        && latest.demand.remaining_output_req_to_heat_sp_w.is_finite()
+        && latest.demand.remaining_output_req_to_cool_sp_w.is_finite()
+        && Some(latest.supply_node) == init_lifecycle.supply_node
+        && Some(latest.recirculation_node) == init_lifecycle.recirculation_node
+        && latest.outdoor_air_node.is_none()
+        && latest.unit_defaulted_on
+        && !latest.economizer_defaulted_on
+        && latest.availability_manager_read_site_visited
+        && latest.availability_manager_zone_written
+        && latest.copied_availability_status == Some(PurchasedAirAvailabilityStatus::NoAction)
+        && !latest.force_off_applied
+        && latest.overall_availability_read_site_visited
+        && latest.heating_availability_read_site_visited
+        && latest.cooling_availability_read_site_visited
+        && latest.overall_availability.is_finite()
+        && latest.heating_availability == 1.0
+        && latest.cooling_availability == 1.0
+        && latest.unit_on == (latest.overall_availability > 0.0)
+        && latest.heating_on
+        && latest.cooling_on
+        && latest.unit_body_entered == latest.unit_on;
+    if !latest_ready {
+        return Err(
+            "direct-zone IdealLoads latest Calc-entry snapshot is not release-ready".to_string(),
         );
     }
     Ok(())
@@ -2617,28 +2859,35 @@ mod tests {
 
     use super::{
         artifact_map, ctf_split_trace_enabled, execution_stage_snapshots,
-        full_surface_trace_opt_in, input_error_diagnostic_code, purchased_air_init_lifecycle_json,
+        full_surface_trace_opt_in, input_error_diagnostic_code,
+        purchased_air_calc_entry_lifecycle_json, purchased_air_init_lifecycle_json,
         runtime_class_requires_weather, schedule_cache_json, selected_trace_enabled,
         source_order_gate_summary, source_order_stage_state_snapshots,
         trace_level_enables_stage_snapshots, typed_counts,
+        validate_direct_purchased_air_calc_entry_lifecycle,
         validate_direct_purchased_air_init_lifecycle, validate_runtime_selection,
     };
     use ep_compiler::compile_raw_model;
     use ep_model::{
         ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
-        ExternalInterfaceSchedule, IdealLoadsAirSystemId, NormalizedName, ScheduleFileShading,
-        ScheduleFileShadingColumn, ScheduleId, TypedModel, ZoneEquipmentListId,
+        ExternalInterfaceSchedule, IdealLoadsAirSystemId, NodeId, NormalizedName,
+        ScheduleFileShading, ScheduleFileShadingColumn, ScheduleId, TypedModel,
+        ZoneEquipmentListId, ZoneId,
     };
     use ep_raw_model::parse_epjson_str_with_idf_order;
     use ep_runtime::{
         DayType, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
-        ExecutionStep, IdealLoadsInitFlags, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
+        ExecutionStep, IdealLoadsInitFlags, PURCHASED_AIR_CALC_ENTRY_SOURCE,
+        PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
+        PurchasedAirAvailabilityStatus, PurchasedAirCalcEntryDemandSnapshot,
+        PurchasedAirCalcEntryLifecycleSummary, PurchasedAirCalcEntryResetSnapshot,
+        PurchasedAirCalcEntryRuntimeState, PurchasedAirCalcEntrySnapshot,
         PurchasedAirHardSizeField, PurchasedAirHardSizeFieldOutcome,
         PurchasedAirHardSizeLegacyOutcome, PurchasedAirHardSizeLegacyRoute,
         PurchasedAirInitLifecycleSummary, PurchasedAirRecirculationSource, PurchasedAirSizedLimits,
         PurchasedAirSupplyTemperatureDiagnostic, PurchasedAirSupplyTemperatureDiagnosticKind,
         PurchasedAirSupplyTemperatureInitialMessageApi, ScheduleCacheProfile,
-        ScheduleSeriesIndexKind, build_hourly_time_axis,
+        ScheduleSeriesIndexKind, ZoneSensibleDemandInputKind, build_hourly_time_axis,
     };
 
     use crate::{RunResultState, RuntimeClass, TraceLevel, TraceSelection};
@@ -2782,6 +3031,94 @@ mod tests {
     }
 
     #[test]
+    fn direct_release_calc_entry_validation_rejects_disconnected_evidence() {
+        let init = valid_init_lifecycle(2);
+        let valid = valid_calc_entry_lifecycle(2);
+        assert!(
+            validate_direct_purchased_air_calc_entry_lifecycle(Some(&valid), Some(&init), Some(2))
+                .is_ok()
+        );
+        assert!(
+            validate_direct_purchased_air_calc_entry_lifecycle(None, Some(&init), Some(2)).is_err()
+        );
+        assert!(
+            validate_direct_purchased_air_calc_entry_lifecycle(Some(&valid), Some(&init), Some(3))
+                .is_err()
+        );
+
+        let mut wrong_source = valid.clone();
+        wrong_source.source = "diagnostic-calc-entry-marker";
+        assert!(
+            validate_direct_purchased_air_calc_entry_lifecycle(
+                Some(&wrong_source),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+        let mut wrong_manager_count = valid.clone();
+        wrong_manager_count.state.availability_manager_read_count = 1;
+        assert!(
+            validate_direct_purchased_air_calc_entry_lifecycle(
+                Some(&wrong_manager_count),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+        let mut wrong_mode_count = valid.clone();
+        wrong_mode_count.state.heating_on_count = 1;
+        assert!(
+            validate_direct_purchased_air_calc_entry_lifecycle(
+                Some(&wrong_mode_count),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+        let mut wrong_identity = valid;
+        wrong_identity
+            .state
+            .latest
+            .as_mut()
+            .expect("valid latest snapshot")
+            .supply_node = NodeId(99);
+        assert!(
+            validate_direct_purchased_air_calc_entry_lifecycle(
+                Some(&wrong_identity),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn direct_release_calc_entry_json_exposes_reset_demand_and_gates() {
+        let lifecycle = valid_calc_entry_lifecycle(2);
+        let value = purchased_air_calc_entry_lifecycle_json(&lifecycle);
+
+        assert_eq!(value["source"], PURCHASED_AIR_CALC_ENTRY_SOURCE);
+        assert_eq!(value["call_count"], 2);
+        assert_eq!(value["reset_count"], 2);
+        assert_eq!(value["availability_manager_read_count"], 2);
+        assert_eq!(value["availability_manager_zone_write_count"], 2);
+        assert_eq!(value["availability_status_copy_count"], 2);
+        assert_eq!(value["availability_manager_zone"], 0);
+        assert_eq!(value["availability_status"], "no_action");
+        assert_eq!(value["latest"]["call_ordinal"], 2);
+        assert_eq!(value["latest"]["reset"]["field_count"], 12);
+        assert_eq!(value["latest"]["reset"]["all_zero"], true);
+        assert_eq!(
+            value["latest"]["demand"]["sensible_input_kind"],
+            "source_setpoint_thresholds"
+        );
+        assert_eq!(value["latest"]["heating_availability"], 1.0);
+        assert_eq!(value["latest"]["cooling_availability"], 1.0);
+        assert_eq!(value["latest"]["unit_body_entered"], true);
+    }
+
+    #[test]
     fn lifecycle_json_serializes_structured_supply_temperature_diagnostics() {
         let mut lifecycle = valid_init_lifecycle(1);
         lifecycle.supply_temperature_registered_recurring_diagnostic_count = 1;
@@ -2836,6 +3173,66 @@ mod tests {
             5
         );
         assert_eq!(registry["identities"][0]["temperature_unit"], "C");
+    }
+
+    fn valid_calc_entry_lifecycle(call_count: usize) -> PurchasedAirCalcEntryLifecycleSummary {
+        let system = IdealLoadsAirSystemId(0);
+        let mut state = PurchasedAirCalcEntryRuntimeState::new(system);
+        state.call_count = call_count;
+        state.reset_count = call_count;
+        state.demand_read_count = call_count;
+        state.overall_availability_read_count = call_count;
+        state.heating_availability_read_count = call_count;
+        state.cooling_availability_read_count = call_count;
+        state.availability_manager_read_count = call_count;
+        state.availability_manager_zone_write_count = call_count;
+        state.availability_status_copy_count = call_count;
+        state.availability_manager_zone = Some(ZoneId(0));
+        state.unit_body_entry_count = call_count;
+        state.heating_on_count = call_count;
+        state.cooling_on_count = call_count;
+        state.latest = Some(PurchasedAirCalcEntrySnapshot {
+            source: PURCHASED_AIR_CALC_ENTRY_SOURCE,
+            system,
+            call_ordinal: call_count,
+            source_order: PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER,
+            controlled_zone: ZoneId(0),
+            supply_node: NodeId(3),
+            zone_node: NodeId(5),
+            outdoor_air_node: None,
+            recirculation_node: NodeId(4),
+            reset: PurchasedAirCalcEntryResetSnapshot::default(),
+            demand: PurchasedAirCalcEntryDemandSnapshot {
+                zone: ZoneId(0),
+                sensible_input_kind: ZoneSensibleDemandInputKind::SourceSetpointThresholds,
+                remaining_output_req_to_heat_sp_w: 100.0,
+                remaining_output_req_to_cool_sp_w: -50.0,
+            },
+            unit_defaulted_on: true,
+            economizer_defaulted_on: false,
+            availability_manager_read_site_visited: true,
+            availability_manager_zone_written: true,
+            copied_availability_status: Some(PurchasedAirAvailabilityStatus::NoAction),
+            force_off_applied: false,
+            overall_availability_read_site_visited: true,
+            heating_availability_read_site_visited: true,
+            cooling_availability_read_site_visited: true,
+            overall_availability: 1.0,
+            heating_availability: 1.0,
+            cooling_availability: 1.0,
+            unit_on: true,
+            heating_on: true,
+            cooling_on: true,
+            unit_body_entered: true,
+        });
+        assert_eq!(
+            state.availability_status,
+            PurchasedAirAvailabilityStatus::NoAction
+        );
+        PurchasedAirCalcEntryLifecycleSummary {
+            source: PURCHASED_AIR_CALC_ENTRY_SOURCE,
+            state,
+        }
     }
 
     fn valid_init_lifecycle(call_count: usize) -> PurchasedAirInitLifecycleSummary {

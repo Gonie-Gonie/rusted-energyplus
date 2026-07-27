@@ -12431,7 +12431,8 @@ iteration recalculation. Its ordinary demand input is sensible-only, so the
 separate moisture predictor/corrector helpers are not evidence that generic
 arbitrary execution supplies the source latent demand lifecycle.
 
-Rust has no equivalent for the full main/heating/cooling availability matrix,
+CP310 maps only the entry-prefix scalar availability decisions. Rust still has
+no live main/heating/cooling schedule-service matrix,
 Zone-component hybrid availability, EMS OA/mass/temperature/humidity override
 state, OA maximum warning/recurrence, final saturation warning counters,
 source-exact output-reference and node alias behavior, contaminant writes,
@@ -15463,6 +15464,77 @@ state, broader multi-unit release execution, reset/concurrency, and complete
 `SizePurchasedAir` routes also remain open. Both parent algorithms stay
 `scaffold`/`none`; Init and Size remain `source_mapped`; inventory/readiness,
 capabilities, conformance, and the external Roadmap checkbox do not change.
+
+## CP310 Source-Ordered `CalcPurchAirLoads` Entry Prefix
+
+CP310 maps the EnergyPlus 26.1 `CalcPurchAirLoads` alias at
+`PurchasedAirManager.cc` line 1967, executable lines 1971-2021, and line 2022
+only as the `UnitOn` active-body decision. The next source checkpoint starts
+with the Zone heat-balance reference at line 2023; the
+`CalcPurchAirMinOAMassFlow` call at line 2025 is not part of CP310.
+
+The bounded transition preserves this order:
+
+1. record caller-supplied resolved supply, controlled-Zone air, optional OA,
+   and recirculation node identities;
+2. characterize the zero result for local supply/OA flow, retained
+   `PurchAir.MinOAMassFlowRate`, `PurchAir.TimeEconoActive`,
+   `PurchAir.TimeHtRecActive`, both output references, and the five local
+   output accumulators; the transition actually clears the three retained
+   fields and represents the nine call-local/reference targets in the exact
+   zero snapshot;
+3. default `UnitOn=true` and `EconoOn=false`;
+4. copy `RemainingOutputReqToHeatSP` and then
+   `RemainingOutputReqToCoolSP`;
+5. when Zone-component availability is allocated, write its Zone, copy its
+   status, and let only exact `ForceOff` clear `UnitOn`;
+6. record the unconditional read sites for caller-supplied pre-sampled overall
+   availability, default/read heating availability, then default/read cooling
+   availability; and
+7. retain the line-2022 active-body gate decision.
+
+All three schedule sites remain reached after manager `ForceOff` or
+overall-off. Heating and cooling gates are independent from `UnitOn`; both can
+be false while the active-body gate is true. The source predicate is
+`value <= 0` for off, so NaN remains nominally on. When the Zone-component
+arena is absent, a previously retained status is neither cleared nor consulted.
+The direct source-characterization helper also retains mismatched demand Zone
+IDs and aliased nodes because this prefix performs no local validation; the
+public release transition separately requires Init/Calc lockstep and bound
+controlled-Zone, supply, recirculation, and demand identities before mutation.
+
+`calc/lifecycle.rs` owns `PurchasedAirCalcEntryRuntimeState`, the narrow
+two-field sensible-demand snapshot, exact reset-target evidence, public
+transition, and bounded lifecycle summary. It actually clears the three
+retained PurchasedAir fields and retains aggregate counters plus only the
+latest snapshot. `binding.rs` executes the prefix after successful persistent
+Init and before the existing calculation, then projects its `unit_on` result
+into that calculation. Each successful scheduled output carries the exact
+entry snapshot. `coupled_runtime.rs` reconciles every call ordinal, demand,
+node, reset, availability, and gate result, then checks aggregate counts and
+latest-state equality. `ep_run` repeats the release firewall, emits
+`purchased_air_calc_entry_lifecycle`, and rejects lifecycle evidence attached
+to any non-direct runtime.
+
+The exact release lane represents the normally preallocated ZoneComp entry as
+`zone_component_availability=Some(NoAction)`, supplies its sampled overall
+value, and supplies heating/cooling values of one. It requires one reset,
+demand read group, read-site group, availability-manager visit, Zone write,
+and status copy per coupling; zero `ForceOff` events; heating/cooling on counts
+equal to the call count; reconciled on/off partitions; and exact latest
+identities.
+
+The body at line 2023 and later remains excluded, including minimum OA,
+EMS overrides, OA loads, operating-mode selection, economizer and heat
+recovery, humidity, psychrometrics, flow/capacity and mixed-air calculations,
+UnitOff tail, node updates, and report writes. Actual schedule-service and
+ZoneComp allocation/manager lifecycles, output-reference aliasing, invalid
+selectors, partial failure/reset/concurrency parity, and full Calc parity are
+also excluded. The deferred custom `SizePurchasedAir` branch at lines
+1395-1696 remains a separate earlier physical gap. Both parents stay
+`scaffold`/`none`; `routine.calc_purch_air_loads` stays `source_mapped`; no
+inventory, readiness, capability, evidence, conformance, or Roadmap state is
+promoted.
 
 
 

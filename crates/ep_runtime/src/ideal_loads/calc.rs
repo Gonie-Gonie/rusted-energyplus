@@ -1,6 +1,7 @@
 //! IdealLoads `CalcPurchAirLoads` compatibility calculations.
 
 mod humidity;
+mod lifecycle;
 mod limits;
 mod mass_flow;
 mod moisture_demand;
@@ -9,10 +10,13 @@ mod psychrometrics;
 mod types;
 
 #[cfg(test)]
+mod lifecycle_tests;
+#[cfg(test)]
 mod moisture_demand_tests;
 #[cfg(test)]
 mod no_oa_tests;
 
+pub use lifecycle::*;
 pub use limits::IdealLoadsSensibleLimitContext;
 pub use moisture_demand::{
     NoOaThirdOrderHumidityCorrector, NoOaThirdOrderHumidityCorrectorInput,

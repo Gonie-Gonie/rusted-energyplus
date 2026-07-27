@@ -23,6 +23,7 @@ const ZONE_DEMAND_SOURCE: &str = "rust-predictor-source-setpoint-thresholds";
 const RECIRCULATION_SOURCE: &str = "rust-direct-zone-return-projection";
 const RECIRCULATION_NODE: &str = "ZONE ONE RETURN";
 const INIT_LIFECYCLE_SOURCE: &str = "rust-persistent-init-purchased-air";
+const CALC_ENTRY_LIFECYCLE_SOURCE: &str = "EnergyPlus 26.1 PurchasedAirManager.cc:1967,1971-2022";
 const COUPLED_SOURCE_ORDER: [&str; 6] = [
     "predict-system-loads",
     "init-purchased-air",
@@ -417,6 +418,73 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
             .map(Vec::len),
         Some(0)
     );
+
+    let calc_lifecycle = &runtime["purchased_air_calc_entry_lifecycle"];
+    assert_eq!(calc_lifecycle["source"], CALC_ENTRY_LIFECYCLE_SOURCE);
+    assert_eq!(calc_lifecycle["call_count"], expected_calls);
+    assert_eq!(calc_lifecycle["reset_count"], expected_calls);
+    assert_eq!(calc_lifecycle["demand_read_count"], expected_calls);
+    assert_eq!(
+        calc_lifecycle["overall_availability_read_count"],
+        expected_calls
+    );
+    assert_eq!(
+        calc_lifecycle["heating_availability_read_count"],
+        expected_calls
+    );
+    assert_eq!(
+        calc_lifecycle["cooling_availability_read_count"],
+        expected_calls
+    );
+    assert_eq!(
+        calc_lifecycle["availability_manager_read_count"],
+        expected_calls
+    );
+    assert_eq!(
+        calc_lifecycle["availability_manager_zone_write_count"],
+        expected_calls
+    );
+    assert_eq!(
+        calc_lifecycle["availability_status_copy_count"],
+        expected_calls
+    );
+    assert_eq!(calc_lifecycle["availability_status"], "no_action");
+    assert_eq!(
+        calc_lifecycle["availability_manager_zone"],
+        lifecycle["controlled_zone"]
+    );
+    assert_eq!(calc_lifecycle["force_off_count"], 0);
+    assert_eq!(calc_lifecycle["heating_on_count"], expected_calls);
+    assert_eq!(calc_lifecycle["cooling_on_count"], expected_calls);
+    let latest = &calc_lifecycle["latest"];
+    assert_eq!(latest["source"], CALC_ENTRY_LIFECYCLE_SOURCE);
+    assert_eq!(latest["call_ordinal"], expected_calls);
+    assert_eq!(latest["controlled_zone"], lifecycle["controlled_zone"]);
+    assert_eq!(latest["supply_node"], lifecycle["supply_node"]);
+    assert_eq!(
+        latest["recirculation_node"],
+        lifecycle["recirculation_node"]
+    );
+    assert!(latest["outdoor_air_node"].is_null());
+    assert_eq!(latest["reset"]["field_count"], 12);
+    assert_eq!(
+        latest["reset"]["targets"].as_array().map(Vec::len),
+        Some(12)
+    );
+    assert_eq!(latest["reset"]["all_zero"], true);
+    assert_eq!(
+        latest["demand"]["sensible_input_kind"],
+        "source_setpoint_thresholds"
+    );
+    assert_eq!(latest["demand"]["zone"], latest["controlled_zone"]);
+    assert_eq!(latest["availability_manager_read_site_visited"], true);
+    assert_eq!(latest["availability_manager_zone_written"], true);
+    assert_eq!(latest["copied_availability_status"], "no_action");
+    assert_eq!(latest["heating_availability"], 1.0);
+    assert_eq!(latest["cooling_availability"], 1.0);
+    assert_eq!(latest["heating_on"], true);
+    assert_eq!(latest["cooling_on"], true);
+    assert_eq!(latest["unit_body_entered"], latest["unit_on"]);
 }
 
 #[test]

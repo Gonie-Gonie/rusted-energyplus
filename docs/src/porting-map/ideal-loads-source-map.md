@@ -120,7 +120,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP305-CP309 bounded release slice: `crates/ep_runtime/src/ideal_loads/init/manager_plan.rs::PurchasedAirInitManagerPlan` eagerly resolves the immutable declaration-order membership plan; `topology_plan.rs::PurchasedAirInitTopologyPlan` resolves selected-unit topology; `state.rs::PurchasedAirRuntimeState` retains manager, per-unit lifecycle, the four-field sizing overlay, and the bounded global diagnostic registry; `topology_transition.rs::advance_selected_unit_topology`, `transition.rs::init_purchased_air_runtime`, and `supply_temperature_diagnostic.rs::advance_supply_temperature_diagnostics` execute the ordered persistent transitions through the hard-size child, BeginEnvrn, and supply-temperature suffix; and `summary.rs::PurchasedAirInitLifecycleSummary` plus `transition.rs::purchased_air_init_lifecycle_summary` report manager, selected-unit, sizing, and diagnostic evidence for JSON projection. Diagnostic adapters retain `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` only. |
 | `DataZoneEquipment::CheckZoneEquipmentList` | `src/EnergyPlus/DataZoneEquipment.cc` | CP306 `PurchasedAirInitManagerPlan::from_model` eagerly resolves bounded membership in retained Zone order through each Zone's EquipmentConnection and referenced list entries, ignoring unreferenced lists. The matched-list ID is Rust diagnostic evidence; this `InitPurchasedAir` call observes only the Boolean return and does not request optional `CtrlZoneNum`. Runtime Init defers only latch and outcome recording. |
 | `PurchasedAirManager::SizePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP308 `crates/ep_runtime/src/ideal_loads/sizing.rs::size_purchased_air_direct_hard_sized_legacy_route` and `PurchasedAirHardSizeLegacyOutcome` map only the direct hard-sized/no-Zone-sizing-run legacy route; `crates/ep_runtime/src/ideal_loads/dispatch.rs::IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` continues to block Autosize and broader sizing. |
-| `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` |
+| `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | CP310 `crates/ep_runtime/src/ideal_loads/calc/lifecycle.rs::{advance_purchased_air_calc_entry,purchased_air_calc_entry_lifecycle_summary}` maps only the line-1967 alias plus lines 1971-2022 entry prefix; existing `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` owns the bounded no-OA sensible calculation. |
 | `PurchasedAirManager::CalcPurchAirMinOAMassFlow` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air/minimum_flow.rs::resolve_minimum_outdoor_air_compat`, orchestrated by `sim_purchased_air_outdoor_air_compat` |
 | `PurchasedAirManager::UpdatePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/update.rs::supply_node_update_from_result`; CP300 `DirectZonePurchasedAirSystemFeedback` consumes that immutable payload for a bounded one-inlet correction projection, not the full source node/plenum lifecycle |
 | `PurchasedAirManager::ReportPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/report.rs::IdealLoadsReportSnapshot`; `crates/ep_runtime/src/output/meter_registry.rs::meter_rate_to_energy_j`; CP302 `coupled_output.rs::append_direct_zone_purchased_air_hourly_output_series` averages fixed-step rate/node values and sums rate-times-step energy only for the bounded coupled runtime |
@@ -14974,7 +14974,8 @@ iteration recalculation. Its ordinary demand input is sensible-only, so the
 separate moisture predictor/corrector helpers are not evidence that generic
 arbitrary execution supplies the source latent demand lifecycle.
 
-Rust has no equivalent for the full main/heating/cooling availability matrix,
+CP310 maps only the entry-prefix scalar availability decisions. Rust still has
+no live main/heating/cooling schedule-service matrix,
 Zone-component hybrid availability, EMS OA/mass/temperature/humidity override
 state, OA maximum warning/recurrence, final saturation warning counters,
 source-exact output-reference and node alias behavior, contaminant writes,
@@ -18445,6 +18446,51 @@ excluded. The commented fatal at lines 1321-1323 is inert. Autosizing and the
 remaining sizing routes remain open. Parent/routine status,
 inventory/readiness counts, capabilities, conformance, and the full-lifecycle
 Roadmap checkbox do not change.
+
+## CP310 `CalcPurchAirLoads` Entry Reset, Demand, and Availability Prefix
+
+The CP310 source boundary is the `PurchAir` alias at line 1967, executable
+lines 1971-2021, and line 2022 only as the `UnitOn` active-body decision.
+Line 2023 first accesses Zone heat-balance state, and line 2025 calls
+`CalcPurchAirMinOAMassFlow`; both begin later work.
+
+The exact mapped order records caller-supplied resolved
+supply/Zone/OA/recirculation identities; the 12-target zero-result snapshot;
+`UnitOn=true`; `EconoOn=false`; heating then cooling Remaining-demand copies;
+optional ZoneComp Zone write, availability-status copy, and exact-`ForceOff`
+test; unconditional read-site evidence from pre-sampled overall availability;
+heating default/read; cooling default/read; and the body gate. The transition
+actually clears retained `MinOAMassFlowRate`, `TimeEconoActive`, and
+`TimeHtRecActive`; its exact snapshot represents those fields plus the nine
+call-local flow, output-reference, and output-accumulator targets.
+
+`PurchasedAirCalcEntryRuntimeState` stores bounded totals, those three retained
+scalars, retained manager Zone/status, and only the latest
+`PurchasedAirCalcEntrySnapshot`. `advance_purchased_air_calc_entry` requires
+one successful Init call per next Calc-entry call and matching release-owned
+identities before it mutates state. The internal direct characterization
+preserves source-local quirks: manager absence ignores a stale retained
+`ForceOff`; only exact `ForceOff` forces the unit off; every schedule site is
+visited even after an earlier off decision; heating and cooling are independent
+from `UnitOn`; and `<=0` is off while NaN is nominally on.
+
+The release binder calls this transition after Init and before the existing
+bounded Calc. It represents the normally preallocated ZoneComp entry as
+`NoAction`, supplies the sampled overall availability, and supplies mode
+availability values of one. Per-step snapshots are reconciled against
+predictor demand and bound nodes; final runtime and pipeline firewalls require
+call/reset/demand/read-site counts plus manager visits, Zone writes, and status
+copies to equal coupling count, zero `ForceOff` activity, both mode-on counts
+to equal calls, reconciled unit partitions, exact latest state, and run-summary
+JSON evidence. Non-direct runtime lanes reject this lifecycle evidence.
+
+This checkpoint excludes the line-2023 active body, minimum OA, OA/EMS,
+operating-mode selection, economizer/heat recovery, humidity, psychrometrics,
+limits and mixed-air behavior, UnitOff tail, node/report writes, actual
+schedule and ZoneComp service effects, output-reference aliasing, failure and
+concurrency parity, and full Calc parity. Custom/autosized Size work remains
+separately deferred. Parent/routine status, inventory/readiness, capabilities,
+evidence cases, conformance, and Roadmap state remain unchanged.
 
 ## Claim Requirements
 

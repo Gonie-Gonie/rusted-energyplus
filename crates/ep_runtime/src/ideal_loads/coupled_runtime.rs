@@ -34,10 +34,14 @@ use crate::{ResultStore, ZoneSensibleDemandInputKind};
 use super::{
     DirectZonePurchasedAirBindingError, DirectZonePurchasedAirHourlyOutputError,
     DirectZonePurchasedAirModelBinding, DirectZonePurchasedAirRuntimeStepError,
-    IdealLoadsPurchasedAirBranch, PurchasedAirHardSizeLegacyRoute, PurchasedAirInitError,
+    IdealLoadsPurchasedAirBranch, PURCHASED_AIR_CALC_ENTRY_SOURCE,
+    PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PurchasedAirAvailabilityStatus,
+    PurchasedAirCalcEntryError, PurchasedAirCalcEntryLifecycleSummary,
+    PurchasedAirCalcEntrySnapshot, PurchasedAirHardSizeLegacyRoute, PurchasedAirInitError,
     PurchasedAirInitLifecycleSummary, PurchasedAirRecirculationSource, PurchasedAirRuntimeState,
     PurchasedAirSizedLimits, append_direct_zone_purchased_air_hourly_output_series,
-    bind_direct_zone_purchased_air_model, purchased_air_init_lifecycle_summary,
+    bind_direct_zone_purchased_air_model, purchased_air_calc_entry_lifecycle_summary,
+    purchased_air_init_lifecycle_summary,
 };
 
 const SECONDS_PER_HOUR: f64 = 3_600.0;
@@ -111,6 +115,8 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     pub actual_coupled_source_order: &'static [&'static str],
     /// Persistent bounded `InitPurchasedAir` lifecycle report.
     pub init_lifecycle: PurchasedAirInitLifecycleSummary,
+    /// Persistent bounded `CalcPurchAirLoads` entry-prefix lifecycle report.
+    pub calc_entry_lifecycle: PurchasedAirCalcEntryLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -148,6 +154,8 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     RuntimeStep(DirectZonePurchasedAirRuntimeStepError),
     /// Final lifecycle summary could not resolve the bound unit.
     InitLifecycle(PurchasedAirInitError),
+    /// Final Calc-entry lifecycle summary could not resolve the bound unit.
+    CalcEntryLifecycle(PurchasedAirCalcEntryError),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
         /// Stable invariant field.
@@ -157,8 +165,22 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A Calc-entry lifecycle transition did not match the executed run.
+    CalcEntryLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
+    /// A Calc-entry prefix snapshot did not match its bound release call.
+    UnexpectedCalculationEntry {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
@@ -215,6 +237,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir lifecycle summary failed: {error:?}"
             ),
+            Self::CalcEntryLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir Calc-entry lifecycle summary failed: {error:?}"
+            ),
             Self::InitLifecycleInvariant {
                 field,
                 expected,
@@ -223,9 +249,21 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcEntryLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir Calc-entry lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
+            ),
+            Self::UnexpectedCalculationEntry { timestep_index } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its bound Calc-entry prefix"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -392,6 +430,13 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
     )?;
 
     for (timestep_index, output) in timestep_outputs.iter().enumerate() {
+        if !calc_entry_snapshot_matches_release(output, timestep_index + 1, &binding) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::UnexpectedCalculationEntry {
+                    timestep_index,
+                },
+            );
+        }
         if !output.initialization.flags.state_machine_used
             || output.coupling.purchased_air.init_flags != output.initialization.flags
         {
@@ -432,6 +477,24 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
     )
     .map_err(DirectZonePurchasedAirCoupledRuntimeError::InitLifecycle)?;
     validate_init_lifecycle(&init_lifecycle, timestep_outputs.len(), &binding)?;
+    let calc_entry_lifecycle = purchased_air_calc_entry_lifecycle_summary(
+        &purchased_air_runtime_state,
+        binding.ideal_loads_air_system,
+    )
+    .map_err(DirectZonePurchasedAirCoupledRuntimeError::CalcEntryLifecycle)?;
+    let latest_output = timestep_outputs.last().ok_or(
+        DirectZonePurchasedAirCoupledRuntimeError::CalcEntryLifecycleInvariant {
+            field: "latest_output_present",
+            expected: 1,
+            actual: 0,
+        },
+    )?;
+    validate_calc_entry_lifecycle(
+        &calc_entry_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -494,11 +557,145 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             recirculation_state_source: DIRECT_ZONE_PURCHASED_AIR_RECIRCULATION_SOURCE,
             actual_coupled_source_order: DIRECT_ZONE_PURCHASED_AIR_COUPLED_SOURCE_ORDER,
             init_lifecycle,
+            calc_entry_lifecycle,
         },
         state,
         results,
         internal_gain_schedule_cache_profile,
     })
+}
+
+fn validate_calc_entry_lifecycle(
+    lifecycle: &PurchasedAirCalcEntryLifecycleSummary,
+    timestep_count: usize,
+    latest_output: &super::DirectZonePurchasedAirScheduledCouplingOutput,
+    binding: &DirectZonePurchasedAirModelBinding<'_>,
+) -> Result<(), DirectZonePurchasedAirCoupledRuntimeError> {
+    let state = &lifecycle.state;
+    for (field, expected, actual) in [
+        ("call_count", timestep_count, state.call_count),
+        ("reset_count", timestep_count, state.reset_count),
+        ("demand_read_count", timestep_count, state.demand_read_count),
+        (
+            "overall_availability_read_count",
+            timestep_count,
+            state.overall_availability_read_count,
+        ),
+        (
+            "heating_availability_read_count",
+            timestep_count,
+            state.heating_availability_read_count,
+        ),
+        (
+            "cooling_availability_read_count",
+            timestep_count,
+            state.cooling_availability_read_count,
+        ),
+        (
+            "availability_manager_read_count",
+            timestep_count,
+            state.availability_manager_read_count,
+        ),
+        (
+            "availability_manager_zone_write_count",
+            timestep_count,
+            state.availability_manager_zone_write_count,
+        ),
+        (
+            "availability_status_copy_count",
+            timestep_count,
+            state.availability_status_copy_count,
+        ),
+        ("force_off_count", 0, state.force_off_count),
+        ("heating_on_count", timestep_count, state.heating_on_count),
+        ("cooling_on_count", timestep_count, state.cooling_on_count),
+        (
+            "unit_on_off_partition",
+            timestep_count,
+            state.unit_body_entry_count + state.unit_off_count,
+        ),
+        (
+            "overall_gate_partition",
+            timestep_count,
+            state.unit_body_entry_count + state.overall_schedule_off_count,
+        ),
+    ] {
+        if actual != expected {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::CalcEntryLifecycleInvariant {
+                    field,
+                    expected,
+                    actual,
+                },
+            );
+        }
+    }
+    let latest = state.latest.as_ref().ok_or(
+        DirectZonePurchasedAirCoupledRuntimeError::CalcEntryLifecycleInvariant {
+            field: "latest_snapshot_present",
+            expected: 1,
+            actual: 0,
+        },
+    )?;
+    let ready = lifecycle.source == PURCHASED_AIR_CALC_ENTRY_SOURCE
+        && state.system == binding.ideal_loads_air_system
+        && state.availability_manager_zone == Some(binding.zone)
+        && state.availability_status == PurchasedAirAvailabilityStatus::NoAction
+        && state.minimum_outdoor_air_mass_flow_rate_kg_per_s == 0.0
+        && state.economizer_active_time_hours == 0.0
+        && state.heat_recovery_active_time_hours == 0.0
+        && latest == &latest_output.calculation_entry;
+    if !ready {
+        return Err(
+            DirectZonePurchasedAirCoupledRuntimeError::CalcEntryLifecycleInvariant {
+                field: "latest_release_snapshot_ready",
+                expected: 1,
+                actual: 0,
+            },
+        );
+    }
+    Ok(())
+}
+
+fn calc_entry_snapshot_matches_release(
+    output: &super::DirectZonePurchasedAirScheduledCouplingOutput,
+    call_ordinal: usize,
+    binding: &DirectZonePurchasedAirModelBinding<'_>,
+) -> bool {
+    let entry: PurchasedAirCalcEntrySnapshot = output.calculation_entry;
+    let demand = output.coupling.prediction.zone_demand;
+    entry.source == PURCHASED_AIR_CALC_ENTRY_SOURCE
+        && entry.source_order == PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER
+        && entry.system == binding.ideal_loads_air_system
+        && entry.call_ordinal == call_ordinal
+        && entry.controlled_zone == binding.zone
+        && entry.supply_node == binding.supply_node
+        && entry.zone_node == binding.zone_air_node
+        && entry.outdoor_air_node.is_none()
+        && entry.recirculation_node == binding.return_node
+        && entry.reset.all_zero()
+        && entry.demand.zone == demand.zone
+        && entry.demand.sensible_input_kind == demand.sensible_input_kind
+        && entry.demand.remaining_output_req_to_heat_sp_w
+            == demand.remaining_output_req_to_heat_sp_w
+        && entry.demand.remaining_output_req_to_cool_sp_w
+            == demand.remaining_output_req_to_cool_sp_w
+        && entry.unit_defaulted_on
+        && !entry.economizer_defaulted_on
+        && entry.availability_manager_read_site_visited
+        && entry.availability_manager_zone_written
+        && entry.copied_availability_status == Some(PurchasedAirAvailabilityStatus::NoAction)
+        && !entry.force_off_applied
+        && entry.overall_availability_read_site_visited
+        && entry.heating_availability_read_site_visited
+        && entry.cooling_availability_read_site_visited
+        && entry.overall_availability == output.schedules.overall_availability
+        && entry.heating_availability == 1.0
+        && entry.cooling_availability == 1.0
+        && entry.unit_on == output.schedules.unit_available
+        && entry.heating_on
+        && entry.cooling_on
+        && entry.unit_body_entered == entry.unit_on
 }
 
 fn validate_init_lifecycle(

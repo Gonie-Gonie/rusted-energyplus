@@ -4,7 +4,9 @@ use std::collections::BTreeMap;
 
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
-use super::super::{PurchasedAirHardSizeLegacyOutcome, PurchasedAirSizedLimits};
+use super::super::{
+    PurchasedAirCalcEntryRuntimeState, PurchasedAirHardSizeLegacyOutcome, PurchasedAirSizedLimits,
+};
 use super::{
     IdealLoadsInitFlags, PurchasedAirInitTopologyDiagnostic, PurchasedAirInitTopologyError,
     PurchasedAirInitTopologyPlan, PurchasedAirRecirculationSource,
@@ -83,6 +85,8 @@ pub struct PurchasedAirUnitRuntimeState {
     pub recirculation_node: Option<NodeId>,
     /// Source branch that selected or left recirculation unassigned.
     pub recirculation_source: Option<PurchasedAirRecirculationSource>,
+    /// Persistent bounded `CalcPurchAirLoads` entry-prefix state.
+    pub calc_entry: PurchasedAirCalcEntryRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -155,6 +159,7 @@ impl PurchasedAirUnitRuntimeState {
             supply_node: None,
             recirculation_node: None,
             recirculation_source: None,
+            calc_entry: PurchasedAirCalcEntryRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,
