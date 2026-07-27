@@ -34,6 +34,11 @@ use crate::heat_balance::zone_predictor_corrector::{
     energyplus_zone_air_temperature_coefficients, step_zone_air_temperature,
 };
 use crate::heat_balance::{air_manager, manager, surface_manager, zone_predictor_corrector};
+use crate::ideal_loads::{
+    DirectZonePurchasedAirModelBinding, DirectZonePurchasedAirRuntimeStepError,
+    DirectZonePurchasedAirScheduledCouplingInput, DirectZonePurchasedAirScheduledCouplingOutput,
+    couple_model_bound_direct_zone_purchased_air,
+};
 use crate::schedules::{
     InternalGainSchedulePhaseOperations, ScheduleSeriesCache, convective_internal_gain_w,
     convective_internal_gain_w_from_cache, convective_internal_gain_w_from_cache_profiled,
@@ -45,6 +50,7 @@ use crate::schedules::{
 use crate::weather::HeatBalanceWeatherContext;
 use ep_model::{OutsideBoundaryCondition, TypedModel};
 use std::collections::BTreeMap;
+use std::convert::Infallible;
 /// Advances the heat-balance state by one timestep without making a
 /// conformance claim.
 ///
@@ -146,6 +152,75 @@ pub(crate) fn advance_heat_balance_state_one_timestep_internal_with_schedule_cac
     );
 }
 
+/// Advances one fixed ThirdOrder timestep with CP301 inserted inside
+/// `PredictSystemLoads` before the existing surface/corrector tail.
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn advance_heat_balance_state_one_timestep_with_direct_zone_purchased_air(
+    model: &TypedModel,
+    internal_gain_schedule_cache: &ScheduleSeriesCache,
+    internal_gain_schedule_operations: &mut InternalGainSchedulePhaseOperations,
+    state: &mut HeatBalanceState,
+    input: HeatBalanceStepInput,
+    weather_context: Option<HeatBalanceWeatherContext<'_>>,
+    runtime_config: HeatBalanceRuntimeConfig,
+    surface_iteration_count: u32,
+    inside_hconv_reevaluation_interval: Option<u32>,
+    surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
+    binding: &DirectZonePurchasedAirModelBinding<'_>,
+    coupling_schedule_cache: &ScheduleSeriesCache,
+    coupling_schedule_sample_index: usize,
+) -> Result<DirectZonePurchasedAirScheduledCouplingOutput, DirectZonePurchasedAirRuntimeStepError> {
+    manager::manage_heat_balance_source_order_path(|| {
+        advance_heat_balance_state_one_timestep_source_order_path(
+            model,
+            Some(internal_gain_schedule_cache),
+            Some(internal_gain_schedule_operations),
+            state,
+            input,
+            weather_context,
+            runtime_config,
+            surface_iteration_count,
+            inside_hconv_reevaluation_interval,
+            surface_loop_zone_air_correction,
+            |state| {
+                // CP299 consumes current non-system predictor terms. Materialize
+                // them after history/internal-gain preparation, without
+                // correcting MAT, before CP301 writes the system-air terms.
+                correct_zone_air_temperatures_from_current_surfaces(
+                    &state.surfaces,
+                    &state.surface_indexes,
+                    &mut state.zones,
+                    input.timestep_seconds,
+                    weather_context,
+                    input.outdoor_dry_bulb_c,
+                    false,
+                    true,
+                    runtime_config.use_inside_ctf_outside_temperature_for_conduction_report,
+                );
+                let zone_state = state
+                    .zones
+                    .iter_mut()
+                    .find(|zone| zone.zone_id == binding.zone)
+                    .ok_or(
+                        DirectZonePurchasedAirRuntimeStepError::MissingBoundZoneState {
+                            zone: binding.zone,
+                        },
+                    )?;
+                couple_model_bound_direct_zone_purchased_air(
+                    DirectZonePurchasedAirScheduledCouplingInput {
+                        binding,
+                        schedule_cache: coupling_schedule_cache,
+                        schedule_sample_index: coupling_schedule_sample_index,
+                        zone_state,
+                        system_timestep_seconds: input.timestep_seconds,
+                    },
+                )
+                .map_err(DirectZonePurchasedAirRuntimeStepError::ScheduledCoupling)
+            },
+        )
+    })
+}
+
 #[cfg(test)]
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn advance_heat_balance_state_one_timestep_internal_with_live_schedule_profiled(
@@ -186,7 +261,7 @@ fn advance_heat_balance_state_one_timestep_internal_with_optional_schedule_cache
     inside_hconv_reevaluation_interval: Option<u32>,
     surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
 ) {
-    manager::manage_heat_balance_source_order_path(|| {
+    let result = manager::manage_heat_balance_source_order_path(|| {
         advance_heat_balance_state_one_timestep_source_order_path(
             model,
             schedule_cache,
@@ -198,11 +273,16 @@ fn advance_heat_balance_state_one_timestep_internal_with_optional_schedule_cache
             surface_iteration_count,
             inside_hconv_reevaluation_interval,
             surface_loop_zone_air_correction,
-        );
+            |_state| Ok::<(), Infallible>(()),
+        )
     });
+    match result {
+        Ok(()) => {}
+        Err(error) => match error {},
+    }
 }
 
-fn advance_heat_balance_state_one_timestep_source_order_path(
+fn advance_heat_balance_state_one_timestep_source_order_path<PredictorHook, Output, Error>(
     model: &TypedModel,
     schedule_cache: Option<&ScheduleSeriesCache>,
     mut schedule_operations: Option<&mut InternalGainSchedulePhaseOperations>,
@@ -213,7 +293,11 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
     surface_iteration_count: u32,
     inside_hconv_reevaluation_interval: Option<u32>,
     surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
-) {
+    predictor_hook: PredictorHook,
+) -> Result<Output, Error>
+where
+    PredictorHook: FnOnce(&mut HeatBalanceState) -> Result<Output, Error>,
+{
     let hour_ending = input.hour_ending.clamp(1, 24);
     let previous_zone_temperatures = state
         .zones
@@ -293,7 +377,7 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
             });
         });
     });
-    air_manager::manage_air_heat_balance_compat(|| {
+    let predictor_output = air_manager::manage_air_heat_balance_compat(|| {
         air_manager::init_air_heat_balance_compat(|| {});
         air_manager::calc_heat_balance_air_compat(|| {
             zone_predictor_corrector::manage_zone_air_updates_compat(
@@ -459,12 +543,13 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
                                     }
                                 };
                             }
-                        });
-                    });
+                            predictor_hook(state)
+                        })
+                    })
                 },
-            );
-        });
-    });
+            )
+        })
+    })?;
     match (schedule_cache, schedule_operations) {
         (Some(schedule_cache), Some(operations)) => {
             update_surface_radiant_internal_gain_source_terms_from_cache_profiled(
@@ -786,4 +871,5 @@ fn advance_heat_balance_state_one_timestep_source_order_path(
             .as_ref()
             .and_then(|result| result.max_delta_surface_name.clone());
     state.timestep_index += 1;
+    Ok(predictor_output)
 }

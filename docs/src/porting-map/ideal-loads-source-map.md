@@ -109,14 +109,14 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 
 | EnergyPlus function | Source file | Rust target |
 |---|---|---|
-| `PurchasedAirManager::SimPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `ep_runtime::ideal_loads::sim_purchased_air_compat`; `ep_runtime::ideal_loads::sim_purchased_air_outdoor_air_compat`; CP300 `crates/ep_runtime/src/ideal_loads/coupling.rs::couple_direct_zone_predicted_demand_to_purchased_air` calls the generic no-OA wrapper with state-backed demand |
+| `PurchasedAirManager::SimPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `ep_runtime::ideal_loads::sim_purchased_air_compat`; `ep_runtime::ideal_loads::sim_purchased_air_outdoor_air_compat`; CP300 `crates/ep_runtime/src/ideal_loads/coupling.rs::couple_direct_zone_predicted_demand_to_purchased_air` calls the generic no-OA wrapper with state-backed demand; CP302 `simulate_direct_zone_purchased_air_coupled_heat_balance` release-calls that bounded composition from `ep_run` for the exact CP301 topology |
 | `PurchasedAirManager::GetPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `ep_compiler::objects::ideal_loads`; `ep_model::objects::ideal_loads` |
 | `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` |
 | `PurchasedAirManager::SizePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/dispatch.rs::IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` |
 | `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` |
 | `PurchasedAirManager::CalcPurchAirMinOAMassFlow` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air/minimum_flow.rs::resolve_minimum_outdoor_air_compat`, orchestrated by `sim_purchased_air_outdoor_air_compat` |
 | `PurchasedAirManager::UpdatePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/update.rs::supply_node_update_from_result`; CP300 `DirectZonePurchasedAirSystemFeedback` consumes that immutable payload for a bounded one-inlet correction projection, not the full source node/plenum lifecycle |
-| `PurchasedAirManager::ReportPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/report.rs::IdealLoadsReportSnapshot`; `crates/ep_runtime/src/output/meter_registry.rs::meter_rate_to_energy_j` |
+| `PurchasedAirManager::ReportPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/report.rs::IdealLoadsReportSnapshot`; `crates/ep_runtime/src/output/meter_registry.rs::meter_rate_to_energy_j`; CP302 `coupled_output.rs::append_direct_zone_purchased_air_hourly_output_series` averages fixed-step rate/node values and sums rate-times-step energy only for the bounded coupled runtime |
 | `DataSizing::calcDesignSpecificationOutdoorAir` | `src/EnergyPlus/DataSizing.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air/dcv.rs::occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s` |
 | `ZoneEquipmentManager::ManageZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ideal_loads_zone_equipment_stages`; `validate_ideal_loads_zone_equipment_dispatch`; `crates/ep_runtime/src/execution_plan.rs::ExecutionPlan` |
 | `ZoneEquipmentManager::GetZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; adjacent eager typed equipment lists/connections and `TimestepConfig` only |
@@ -135,7 +135,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `ZoneEquipmentManager::updateZoneSizingEndDay` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; current-timestep demand, IdealLoads limits/OA mixing, warmup extrema, and sizing-name detection do not implement persistent Zone/Space daily peak and cross-period final reduction |
 | `ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc1` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; compile-time Zone/Space topology, demand snapshots, equipment load sequences, and sizing-name detection do not implement noncoincident calculated-final Space-to-Zone aggregation |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
-| `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | CP299 projects state-backed direct-Zone ThirdOrder thresholds into `ZoneSysEnergyDemand`; CP300 composes that producer with generic PurchasedAir and bounded `SumSysMCp`/`SumSysMCpT` feedback; CP301 `binding.rs` resolves one exact typed Zone/thermostat/equipment/node topology plus bound schedule IDs and fixed timestep, then samples caller-selected cache values before calling CP300, but same-model cache provenance remains a caller precondition and there is still no release-loop caller |
+| `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | CP299 projects state-backed direct-Zone ThirdOrder thresholds into `ZoneSysEnergyDemand`; CP300 composes that producer with generic PurchasedAir and bounded `SumSysMCp`/`SumSysMCpT` feedback; CP301 binds one exact typed Zone/thermostat/equipment/node topology and its schedules; CP302 `simulate_direct_zone_purchased_air_coupled_heat_balance` is the first `ep_run` release caller, with a same-model environment zone-timestep cache, fixed nonadaptive predictor placement, same-step correction feedback, and asserted source-threshold rather than fixture/default demand |
 
 ## Runtime Order
 
@@ -17946,15 +17946,12 @@ cooling, nonzero deadband, and both exact-zero threshold boundaries; and
 stage-specific error wrapping with the borrowed state unchanged. A separate
 runtime initialization regression locks the new lagged field at zero.
 
-This is a callable production seam, not a live simulation loop. No runtime
-owner writes the lagged HVAC load after initialization, no thermostat schedule
-or system node populates the caller-owned inputs, and no heat-balance timestep,
-`ep_run`, `ep_cli`, or `sim_purchased_air_compat` caller invokes CP299. The
-release IdealLoads path therefore continues to construct compatibility demand,
-and `ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE` remains
-`source-order-oracle-demand-input`. Multiple-equipment sequencing and residual
-updates, adaptive timestep integration, history mutation, supply feedback, and
-the combined heat-balance/IdealLoads iteration remain unsupported.
+At the CP299 checkpoint this was a callable production seam without a live
+simulation-loop owner. CP302 below now invokes it for one exact direct-Zone
+class. The lagged HVAC load still has no writer, and broader legacy IdealLoads
+paths continue to construct compatibility demand. Multiple-equipment
+sequencing, residual updates, adaptive timestep integration, and broader
+heat-balance/IdealLoads iteration remain unsupported.
 
 The `zone_temp_predictor_corrector_source_order` and
 `ideal_loads_zone_equipment_purchased_air_source_order` parents remain
@@ -18013,12 +18010,13 @@ unsupported branch selection; every error leaves the complete Zone state
 unchanged. The returned supply-node payload and every committed feedback
 scalar are validated before the two-field commit.
 
-This remains a callable seam rather than a release simulation path. Thermostat
+At the CP300 checkpoint this remained a callable seam rather than a release
+simulation path. CP302 below now composes it in one exact class. Thermostat
 schedule resolution, topology proof, NodeStateStore writes and reads, a
-combined heat-balance/IdealLoads timestep loop, corrector iteration, equipment
+general combined heat-balance/IdealLoads timestep loop, adaptive corrector iteration, equipment
 sequencing and residual updates, current/lagged system-dependent-load
 ownership, Space/RAFN/ITE/plenum/PIU branches, adaptive system timesteps, and
-oracle/default-demand removal remain unsupported.
+broader oracle/default-demand removal remain unsupported.
 
 The `zone_temp_predictor_corrector_source_order` and
 `ideal_loads_zone_equipment_purchased_air_source_order` parents remain
@@ -18063,19 +18061,68 @@ return topology, mode-specific availability, unsupported PurchasedAir
 branches, missing/out-of-range/nonfinite schedules, cooling-before-heating
 failure precedence, reversed setpoints, and fixed-timestep state guards.
 
-This remains a callable production seam rather than an `ep_run` or
-heat-balance release path. ThirdOrder and fully mixed provenance are caller
-preconditions because those algorithm/room-air selectors are not yet typed.
-`ScheduleSeriesCache` retains no model identity, so a cache generated from the
-bound typed model is an explicit caller precondition. Environment
-schedule-cache construction and ownership, predict/HVAC/correct placement,
-warmup and adaptive iteration, NodeStateStore, equipment residuals, output
-aggregation, and oracle/default-demand removal remain open.
+At the CP301 checkpoint this remained a callable production seam rather than
+an `ep_run` or heat-balance release path. ThirdOrder, fully mixed provenance,
+same-model environment-cache construction, sample indexing, and exact
+predict/HVAC/correct placement were caller preconditions. CP302 below now owns
+those conditions only for one distinct exact-subset runtime class; CP301
+remains the reusable binding and scheduled coupling seam.
 
 Both parent algorithms remain `scaffold` at claim level `none`; CP301 promotes
 no source routine and changes no inventory, readiness, capability, output,
 manifest, comparator, performance, or conformance count. Roadmap Section 12's
 first checkbox remains open.
+
+## CP302 First Release-Called Direct-Zone Predictor/PurchasedAir Loop
+
+CP302 adds
+`crates/ep_runtime/src/ideal_loads/coupled_runtime.rs::simulate_direct_zone_purchased_air_coupled_heat_balance`
+and the distinct `ep_run` class
+`ideal-loads-direct-zone-coupled-compatibility`. Support selection tries the
+CP301 binder before legacy branch classification and chooses this class only
+for one standard nominally controlled, fully mixed direct Zone with one
+zero-hysteresis DualSetpoint thermostat, one SequentialLoad sequence-one
+IdealLoads entry, the no-OA/no-limit sensible branch, one direct supply/inlet,
+and one distinct Zone-air node. Models outside that binding retain their
+existing legacy IdealLoads classification and compatibility-demand behavior.
+
+Weather is mandatory for the new class. `prepare_runtime_inputs` uses the same
+`SimulationModel` and EPW calendar metadata to build the first
+`EnvironmentTimeAxis`, then precomputes a zone-timestep
+`ScheduleSeriesCache`; requested hours are constrained to the weather-aware
+hourly axis. The coupled runtime binds once and runs a fixed nominal
+system/Zone timestep with system-history ThirdOrder correction and adaptive
+system-timestep correction disabled.
+
+CP301 is called once per nominal step inside `PredictSystemLoads`, after
+history/internal-gain preparation and refresh of the current non-system
+predictor sums and air capacitance. CP299 produces the
+`SourceSetpointThresholds` `ZoneSysEnergyDemand`, generic
+`sim_purchased_air_compat` consumes that exact snapshot, CP300 commits
+`SumSysMCp`/`SumSysMCpT`, and the existing Zone-air corrector consumes the
+feedback in the same step. The runtime exposes the actual order
+`predict-system-loads`, `sim-purchased-air`,
+`correct-zone-air-temps`.
+
+The coupled output adapter averages fixed-step rate, demand, and supply-node
+temperature/humidity/flow values into hourly samples and sums rate multiplied
+by step duration for hourly energy. It appends unique output handles after the
+heat-balance series. Runtime validation rejects any demand kind other than
+`SourceSetpointThresholds`; the summary records
+`rust-predictor-source-setpoint-thresholds` and
+`fixture_demand_injection_used = false`. This removes fixture/default demand
+only from the new exact class. Broader no-OA finite, humidity, outdoor-air,
+mixed, and legacy compatibility classes continue to use their existing
+default/compatibility demand path.
+
+CP302 does not claim warmup, adaptive shortening/iteration, NodeStateStore
+lifecycle, equipment residuals, multiple equipment, broader
+Zone/Space/RAFN/ITE/plenum/PIU topology, or full-timestep rollback. CP300's
+two-field commit remains transactional, but an integrated-step failure does
+not undo history, gain, or predictor preparation that already occurred. Both
+parent algorithms remain `scaffold` at claim level `none`; no routine status,
+inventory count, readiness, capability, performance, or conformance claim is
+promoted. Roadmap Section 12 remains open.
 
 ## Claim Requirements
 

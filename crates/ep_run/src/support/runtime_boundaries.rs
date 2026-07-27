@@ -6,7 +6,8 @@ use ep_model::{
 };
 use ep_raw_model::RawModel;
 use ep_runtime::{
-    IdealLoadsPurchasedAirBranch, IdealLoadsUnsupportedFeature, classify_no_oa_sensible_subset,
+    IdealLoadsPurchasedAirBranch, IdealLoadsUnsupportedFeature,
+    bind_direct_zone_purchased_air_model, classify_no_oa_sensible_subset,
     select_purchased_air_branch, validate_ideal_loads_zone_equipment_dispatch,
 };
 
@@ -54,6 +55,16 @@ pub(super) fn runtime_status_for_typed_model(
     };
 
     if !typed_model.ideal_loads_air_systems.is_empty() {
+        let simulation_model = SimulationModel::from_typed(typed_model.clone());
+        if bind_direct_zone_purchased_air_model(&simulation_model).is_ok() {
+            return runtime_selection_from_registry(
+                SupportStatus::SupportedCompatibility,
+                RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility,
+                registry,
+                vec!["ideal_loads_no_oa_sensible".to_string()],
+            );
+        }
+
         let mut capability_ids = BTreeSet::new();
         let mut selected_runtime_class = None;
         for system in &typed_model.ideal_loads_air_systems {
@@ -179,7 +190,8 @@ fn merge_ideal_loads_runtime_class(existing: RuntimeClass, next: RuntimeClass) -
 fn is_declared_ideal_loads_compatibility(runtime_class: RuntimeClass) -> bool {
     matches!(
         runtime_class,
-        RuntimeClass::IdealLoadsNoOaSensibleCompatibility
+        RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+            | RuntimeClass::IdealLoadsNoOaSensibleCompatibility
             | RuntimeClass::IdealLoadsFiniteLimitCompatibility
             | RuntimeClass::IdealLoadsConstantShrCompatibility
             | RuntimeClass::IdealLoadsHumiditySelectedBranchesCompatibility

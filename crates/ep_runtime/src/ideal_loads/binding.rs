@@ -485,6 +485,20 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     Coupling(DirectZonePurchasedAirCouplingError),
 }
 
+/// Error while placing one CP301 call inside the live fixed-timestep
+/// predictor/corrector loop.
+#[derive(Clone, Debug, PartialEq)]
+pub enum DirectZonePurchasedAirRuntimeStepError {
+    /// The heat-balance state initialized from the bound model did not retain
+    /// the bound Zone.
+    MissingBoundZoneState {
+        /// Zone required by the immutable model binding.
+        zone: ZoneId,
+    },
+    /// CP301 rejected the active schedule sample or dynamic state.
+    ScheduledCoupling(DirectZonePurchasedAirScheduledCouplingError),
+}
+
 /// Values sampled before one model-bound CP300 call.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct DirectZonePurchasedAirScheduleSnapshot {

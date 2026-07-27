@@ -182,7 +182,7 @@ claim.
 | thermostat-setpoint predefined LEED table | `FillPredefinedTableOnThermostatSetpoints`, declared at `ZoneTempPredictorCorrector.hh` line 376, implemented at `ZoneTempPredictorCorrector.cc` lines 6558-6672, and called only by `FillRemainingPredefinedEntries` line 6998 | CP233 adds required `routine.fill_predefined_table_on_thermostat_setpoints` as source-mapped only. Global schedule-ID first-wins traversal, seasonal Wednesday value/count queries, split synthetic rows, append-only table mutation, final-report cadence, and failure/retry remain source-only; Rust has no four-family arena, exact seasonal query, predefined table store, helper, caller, or focused test. |
 | thermostat-schedule predefined System Summary table | `FillPredefinedTableOnThermostatSchedules`, declared at `ZoneTempPredictorCorrector.hh` line 378, implemented at `ZoneTempPredictorCorrector.cc` lines 6674-6766, and called only by `FillRemainingPredefinedEntries` line 6999 | CP234 adds required `routine.fill_predefined_table_on_thermostat_schedules` as source-mapped only. Stored ordinary-Zone traversal, fixed-slot inclusion, tuple sort, independently filtered joins, append-only table mutation, final-report cadence, and failure/retry/reset remain source-only; Rust has no complete control arena, predefined System Summary store, helper, caller, serializer, or focused table comparator. |
 | Zone/Space predictor temperature-history preparation | `ZoneSpaceHeatBalanceData::updateTemperatures`, declared at `ZoneTempPredictorCorrector.hh` lines 233-234, implemented at `ZoneTempPredictorCorrector.cc` lines 6768-6833, and called only as the first child of `predictSystemLoad` line 3155 | CP235 adds required `routine.zone_space_heat_balance_update_temperatures` as source-mapped only. Unconditional four-slot working-history selection, shortened Zone/Space node rollback, count-change helper order, RoomAir topology, partial failure, cadence, replay, and reset remain source-only; Rust has only Zone three-slot adaptive history without the exact wrapper or topology. |
-| Zone/Space predicted sensible system load | `ZoneSpaceHeatBalanceData::calcPredictedSystemLoad`, declared at `ZoneTempPredictorCorrector.hh` line 224, implemented at `ZoneTempPredictorCorrector.cc` lines 6835-7243, and called only by `predictSystemLoad` line 3253 | CP236 remains required/source-mapped. CP296 and CP298 provide pure direct-Zone DualSetpoint/ThirdOrder load stages; CP299 produces state-backed `ZoneSysEnergyDemand`; CP300 composes it with generic PurchasedAir and bounded correction feedback. CP301 `bind_direct_zone_purchased_air_model` and `couple_model_bound_direct_zone_purchased_air` now resolve the exact one-Zone thermostat/equipment/node identities, bound schedule IDs, multipliers, site context, and fixed model timestep, then sample caller-selected cache values before calling CP300. Same-model cache provenance, ThirdOrder/fully-mixed provenance, and the actual predictor/HVAC/corrector call position remain outer contracts, the lagged field has no runtime writer, and no heat-balance or IdealLoads release loop calls the composition. Five-way control, other algorithms, RAFN/ITE/Space/staged branches, equipment sequencing/residuals, full node lifecycle, failure/replay, and reset remain unsupported. |
+| Zone/Space predicted sensible system load | `ZoneSpaceHeatBalanceData::calcPredictedSystemLoad`, declared at `ZoneTempPredictorCorrector.hh` line 224, implemented at `ZoneTempPredictorCorrector.cc` lines 6835-7243, and called only by `predictSystemLoad` line 3253 | CP236 remains required/source-mapped. CP296 and CP298 provide pure direct-Zone DualSetpoint/ThirdOrder load stages; CP299 produces state-backed `ZoneSysEnergyDemand`; CP300 composes it with generic PurchasedAir and bounded correction feedback; CP301 resolves the exact model topology and schedules. CP302 `simulate_direct_zone_purchased_air_coupled_heat_balance` is the first `ep_run` release caller: it owns a same-model environment zone-timestep cache, fixed nonadaptive ThirdOrder selection, CP301 placement inside `PredictSystemLoads`, and same-step corrector consumption of committed `SumSysMCp`/`SumSysMCpT`. This is only one fully mixed direct Zone with zero-hysteresis DualSetpoint and sequence-one no-OA/no-limit sensible IdealLoads. The lagged field has no runtime writer, and five-way control, other algorithms, RAFN/ITE/Space/staged branches, multiple equipment, residuals, node lifecycle, warmup/adaptive iteration, whole-timestep rollback, and broader topology remain unsupported. |
 | internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
 | space internal convective gains | `spaceSumAllInternalConvectionGains` | mapped-not-ported |
 
@@ -32980,15 +32980,12 @@ cooling, nonzero deadband, and both exact-zero threshold boundaries; and
 stage-specific error wrapping with the borrowed state unchanged. A separate
 runtime initialization regression locks the new lagged field at zero.
 
-This is a callable production seam, not a live simulation loop. No runtime
-owner writes the lagged HVAC load after initialization, no thermostat schedule
-or system node populates the caller-owned inputs, and no heat-balance timestep,
-`ep_run`, `ep_cli`, or `sim_purchased_air_compat` caller invokes CP299. The
-release IdealLoads path therefore continues to construct compatibility demand,
-and `ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE` remains
-`source-order-oracle-demand-input`. Multiple-equipment sequencing and residual
-updates, adaptive timestep integration, history mutation, supply feedback, and
-the combined heat-balance/IdealLoads iteration remain unsupported.
+At the CP299 checkpoint this was a callable production seam without a live
+simulation-loop owner. CP302 below now invokes it for one exact direct-Zone
+class. The lagged HVAC load still has no writer, and broader legacy IdealLoads
+paths continue to construct compatibility demand. Multiple-equipment
+sequencing, residual updates, adaptive timestep integration, and broader
+heat-balance/IdealLoads iteration remain unsupported.
 
 The `zone_temp_predictor_corrector_source_order` and
 `ideal_loads_zone_equipment_purchased_air_source_order` parents remain
@@ -33047,12 +33044,13 @@ unsupported branch selection; every error leaves the complete Zone state
 unchanged. The returned supply-node payload and every committed feedback
 scalar are validated before the two-field commit.
 
-This remains a callable seam rather than a release simulation path. Thermostat
+At the CP300 checkpoint this remained a callable seam rather than a release
+simulation path. CP302 below now composes it in one exact class. Thermostat
 schedule resolution, topology proof, NodeStateStore writes and reads, a
-combined heat-balance/IdealLoads timestep loop, corrector iteration, equipment
+general combined heat-balance/IdealLoads timestep loop, adaptive corrector iteration, equipment
 sequencing and residual updates, current/lagged system-dependent-load
 ownership, Space/RAFN/ITE/plenum/PIU branches, adaptive system timesteps, and
-oracle/default-demand removal remain unsupported.
+broader oracle/default-demand removal remain unsupported.
 
 The `zone_temp_predictor_corrector_source_order` and
 `ideal_loads_zone_equipment_purchased_air_source_order` parents remain
@@ -33103,17 +33101,12 @@ return topology, mode-availability rejection, unsupported branch selection,
 schedule error classes and cooling-before-heating failure precedence,
 setpoint validation, and fixed-timestep guards.
 
-This is a production-compiled model-bound caller, not a release-loop caller.
-The model has no typed `ZoneAirHeatBalanceAlgorithm` or general room-air model
-marker, so ThirdOrder and fully mixed execution remain documented caller
-preconditions until the heat-balance source-order loop owns this binding.
-`ScheduleSeriesCache` retains no model identity, so supplying a cache generated
-from this binding's typed model is also an explicit caller precondition.
-Schedule-cache construction and ownership for the active environment, the
-exact predict/HVAC/correct placement, warmup and adaptive iteration,
-NodeStateStore, equipment residual sequencing, output aggregation, and
-`ep_run` routing remain open. The legacy IdealLoads runtime and CLI
-oracle/default-demand paths are unchanged.
+At the CP301 checkpoint this was a production-compiled model-bound caller, not
+a release-loop caller. ThirdOrder, fully mixed execution, same-model cache
+construction, schedule indexing, and exact predictor/HVAC/corrector placement
+were explicit outer preconditions. CP302 below now owns those conditions only
+for one distinct exact-subset `ep_run` runtime class; CP301 remains the
+reusable model binding and scheduled coupling seam.
 
 The `zone_temp_predictor_corrector_source_order` and
 `ideal_loads_zone_equipment_purchased_air_source_order` parents remain
@@ -33121,6 +33114,59 @@ The `zone_temp_predictor_corrector_source_order` and
 routine counts, required counts, readiness, capabilities, outputs, manifests,
 comparators, performance, and conformance claims do not change. Roadmap
 Section 12's first checkbox remains open.
+
+## CP302 First Release-Called Direct-Zone Predictor/PurchasedAir Loop
+
+CP302 adds the public
+`crates/ep_runtime/src/ideal_loads/coupled_runtime.rs::simulate_direct_zone_purchased_air_coupled_heat_balance`
+runtime and routes it from `ep_run::execute_rust_runtime` through the distinct
+`ideal-loads-direct-zone-coupled-compatibility` class. Binder-first support
+selection limits that class to one standard nominally controlled, fully mixed
+direct Zone; one zero-hysteresis DualSetpoint thermostat; one SequentialLoad
+sequence-one IdealLoads system on the no-OA/no-limit sensible branch; one
+direct supply/inlet; and one distinct Zone-air node. A binding miss falls
+through to existing legacy IdealLoads branch classification rather than
+widening or silently substituting the coupled runtime.
+
+The new class requires an EPW weather path and constrains requested hours to
+the weather-aware hourly axis. From the same `SimulationModel`,
+`prepare_runtime_inputs` builds the first
+`build_environment_time_axes_with_weather_metadata` axis and precomputes the
+zone-timestep schedule cache consumed by CP301. This closes the same-model
+cache and active sample-index ownership gap only for this path. The dedicated
+runtime configuration fixes nominal Zone and system timestep duration, selects
+system-timestep history and ThirdOrder correction, and disables EnergyPlus
+adaptive system-timestep correction.
+
+`advance_heat_balance_state_one_timestep_with_direct_zone_purchased_air`
+installs CP301 as the predictor hook. After history/internal-gain preparation,
+it refreshes current non-system surface sums and weather-dependent air
+capacitance, then calls CP301 inside `PredictSystemLoads`. CP299 therefore
+produces `ZoneSysEnergyDemand` from source setpoint thresholds; generic
+PurchasedAir consumes that exact demand; CP300 writes `SumSysMCp` and
+`SumSysMCpT`; and the existing corrector consumes those fields in the same
+timestep. The runtime records the actual nested order as
+`predict-system-loads`, `sim-purchased-air`, and
+`correct-zone-air-temps`.
+
+Every fixed-step coupling result is retained through completion. The output
+adapter appends collision-free hourly series after the heat-balance handles:
+rate, demand, and node values are fixed-step arithmetic averages, while energy
+is the exact sum of rate times step duration. It rejects a non-source-threshold
+demand and reports `rust-predictor-source-setpoint-thresholds` with
+`fixture_demand_injection_used = false`. Fixture/default demand is therefore
+absent in this class, but legacy no-OA, finite, humidity, outdoor-air, and mixed
+classes continue to use their existing compatibility-demand runtime.
+
+This does not implement warmup, adaptive shortening or iteration, a
+NodeStateStore lifecycle, equipment residuals or multiple-equipment sequencing,
+Space/RAFN/ITE/plenum/PIU paths, broader topology, or full-timestep rollback.
+Only CP300's two feedback writes retain their transactional boundary; an error
+after history, gain, or predictor preparation can leave that earlier timestep
+work advanced. Both parent algorithms remain `scaffold`/`none`; no routine
+status, algorithm/routine count, readiness, capability, output claim,
+performance claim, or conformance claim is promoted. Roadmap Section 12
+remains open.
 
 ## Data Structure Map
 
@@ -33150,7 +33196,7 @@ Section 12's first checkbox remains open.
 | `ConstructionProps::{SourceSinkPresent, SourceAfterLayer, TempAfterLayer, SolutionDimensions, ThicknessPerpend, userTemperatureLocationPerpendicular}` | optional `ep_model::ConstructionInternalHeatSource` metadata on `ep_model::Construction` | lexical epJSON overlay state is validated before attaching to one ordinary opaque construction with at least two layers; it retains the normalized diagnostic source name, strict one-based interfaces, dimension selector, authored spacing, derived half-spacing, and perpendicular temperature position without changing construction/material identity, layers, or graph edges. Source recovery, broader targets, global flags, CTF/QTF state, runtime consumers, reporting, and conformance remain blocked |
 | equivalent-layer `ConstructionProps::{WindowTypeEQL, EQLConsPtr, TotLayers, LayerPoint}` | `ep_model::ConstructionKind::WindowEquivalentLayer`, `ConstructionWindowEquivalentLayer`, and `ModelGraph::construction_materials` | a staged-IDF-ordered or native-epJSON-lexical declaration retains one to eleven contiguous EquivalentLayer-family material identities, every graph edge, and a zero-based source ordinal; downstream topology repair, ASHWAT state, surfaces, reporting, runtime, ratings, and conformance remain blocked |
 | `Construction:WindowDataFile` request name/file selector before `SearchWindow5DataFile` | `ep_model::ConstructionWindowDataFileRequest` and `WindowDataFileSource` | staged-IDF or native-epJSON order, normalized search name, default-versus-explicit retain-case file source, and zero-based request ordinal are retained without creating a construction/material/frame/graph identity; all external parsing, synthesized state, surfaces, reporting, runtime, and conformance remain blocked |
-| zone predictor histories, sums, and coefficients such as `MAT`, `XMAT`, `DSXMAT`, `SumHA`, `SumHATsurf`, `SumHATref`, `TempDepCoef`, `TempIndCoef`, `AirPowerCap`, and `TempHistoryTerm` | `ep_runtime::ZoneHeatBalanceState`, `ep_runtime::ZoneAirTemperatureCoefficients`, and future `ep_runtime::zone_air` histories | diagnostic shell keeps MAT history, stores surface convection sums, and snapshots EnergyPlus-shaped zone-air coefficients for future predictor wiring; full predictor/corrector equations are not ported |
+| zone predictor histories, sums, and coefficients such as `MAT`, `XMAT`, `DSXMAT`, `SumHA`, `SumHATsurf`, `SumHATref`, `TempDepCoef`, `TempIndCoef`, `AirPowerCap`, and `TempHistoryTerm` | `ep_runtime::ZoneHeatBalanceState`, `ep_runtime::ZoneAirTemperatureCoefficients`, CP299 `predict_direct_zone_dual_setpoint_third_order_demand`, and CP302 `advance_heat_balance_state_one_timestep_with_direct_zone_purchased_air` | CP302 release-wires the fixed nonadaptive ThirdOrder predictor and same-step system-air correction only for the exact one-Zone CP301 topology. General predictor/corrector algorithms, four-slot/Space/room-air histories, adaptive iteration, warmup, and lagged-system-load ownership remain unported |
 | internal gain sums such as `SumIntGain` | `simulate_zone_internal_convective_gains` and future state fields | convective trace conformance only for declared v0.26 case |
 
 ## CTF Porting Notes

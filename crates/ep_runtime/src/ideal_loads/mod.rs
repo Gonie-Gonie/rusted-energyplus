@@ -4,6 +4,8 @@
 
 mod binding;
 mod calc;
+mod coupled_output;
+mod coupled_runtime;
 mod coupling;
 mod dispatch;
 mod humidistat;
@@ -17,6 +19,13 @@ mod update;
 
 pub use binding::*;
 pub use calc::*;
+pub(crate) use coupled_output::append_direct_zone_purchased_air_hourly_output_series;
+pub use coupled_output::{
+    DirectZonePurchasedAirHourlyOutputError,
+    ZONE_SYSTEM_PREDICTED_SENSIBLE_LOAD_TO_COOLING_SETPOINT_RATE,
+    ZONE_SYSTEM_PREDICTED_SENSIBLE_LOAD_TO_HEATING_SETPOINT_RATE,
+};
+pub use coupled_runtime::*;
 pub use coupling::*;
 pub use dispatch::*;
 pub use humidistat::*;

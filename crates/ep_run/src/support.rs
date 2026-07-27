@@ -126,6 +126,8 @@ pub enum RuntimeClass {
     OneZoneHeatBalanceCompatibility,
     /// Legacy heat-balance zone-air diagnostic runtime.
     HeatBalanceZoneAirDiagnostic,
+    /// Direct-zone HeatBalance/PurchasedAir coupled compatibility runtime.
+    IdealLoadsDirectZoneCoupledCompatibility,
     /// IdealLoads no-OA/no-limit sensible compatibility runtime.
     IdealLoadsNoOaSensibleCompatibility,
     /// IdealLoads no-OA numeric finite-limit compatibility runtime.
@@ -150,6 +152,9 @@ impl RuntimeClass {
             Self::None => "none",
             Self::OneZoneHeatBalanceCompatibility => "one-zone-heat-balance-compatibility",
             Self::HeatBalanceZoneAirDiagnostic => "heat-balance-zone-air-diagnostic",
+            Self::IdealLoadsDirectZoneCoupledCompatibility => {
+                "ideal-loads-direct-zone-coupled-compatibility"
+            }
             Self::IdealLoadsNoOaSensibleCompatibility => "ideal-loads-no-oa-sensible-compatibility",
             Self::IdealLoadsFiniteLimitCompatibility => "ideal-loads-finite-limit-compatibility",
             Self::IdealLoadsConstantShrCompatibility => "ideal-loads-constant-shr-compatibility",
@@ -171,6 +176,7 @@ impl RuntimeClass {
     pub const fn selected_algorithm_lane_id(self) -> &'static str {
         match self {
             Self::OneZoneHeatBalanceCompatibility
+            | Self::IdealLoadsDirectZoneCoupledCompatibility
             | Self::IdealLoadsNoOaSensibleCompatibility
             | Self::IdealLoadsFiniteLimitCompatibility
             | Self::IdealLoadsConstantShrCompatibility
@@ -199,6 +205,7 @@ impl RuntimeClass {
         matches!(
             self,
             Self::OneZoneHeatBalanceCompatibility
+                | Self::IdealLoadsDirectZoneCoupledCompatibility
                 | Self::IdealLoadsNoOaSensibleCompatibility
                 | Self::IdealLoadsFiniteLimitCompatibility
                 | Self::IdealLoadsConstantShrCompatibility

@@ -60,6 +60,23 @@ impl CompatibilityHeatBalanceAlgorithm {
     }
 }
 
+/// Fixed-system-timestep ThirdOrder runtime choices for the bounded
+/// direct-Zone IdealLoads/PurchasedAir coupling.
+///
+/// This is deliberately separate from the opaque one-Zone compatibility
+/// selector: that lane owns adaptive system-timestep correction, while the
+/// first model-bound PurchasedAir caller requires one nominal system step and
+/// system-timestep history on every call.
+#[must_use]
+pub(crate) const fn direct_zone_purchased_air_fixed_step_runtime_config() -> HeatBalanceRuntimeConfig
+{
+    let mut config =
+        CompatibilityHeatBalanceAlgorithm::SourceOrder1ZoneOpaqueCompat.runtime_config();
+    config.use_energyplus_adaptive_system_timestep_zone_air_correction = false;
+    config.report_zone_timestep_averages = false;
+    config
+}
+
 /// Classification for heat-balance zone-air algorithms in reports and gates.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum HeatBalanceAlgorithmLane {
@@ -184,5 +201,14 @@ mod tests {
         assert!(config.freeze_outside_balance_for_surface_iterations);
         assert!(config.freeze_inside_ctf_outside_temperature_for_surface_iterations);
         assert!(config.use_surface_reference_air_surface_convection_report);
+
+        let coupled_config = super::direct_zone_purchased_air_fixed_step_runtime_config();
+        assert_eq!(
+            coupled_config.zone_air_update,
+            HeatBalanceZoneAirUpdate::Deferred
+        );
+        assert!(coupled_config.use_third_order_zone_air_correction);
+        assert!(!coupled_config.use_energyplus_adaptive_system_timestep_zone_air_correction);
+        assert!(!coupled_config.report_zone_timestep_averages);
     }
 }

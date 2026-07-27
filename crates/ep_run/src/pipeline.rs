@@ -15,12 +15,15 @@ use ep_model::{SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, load_epjson_file, load_epjson_file_with_idf_order};
 use ep_runtime::{
-    ExecutionPlan, ExecutionStep, HeatBalanceSimulationOptions, IdealLoadsCompatibilityOptions,
-    NodeStateProjectionOptions, ResultStore, RuntimePrecomputedData, ScheduleCacheProfile,
-    ScheduleSeriesCache, ScheduleSeriesIndexKind, TimeAxis, WeatherTimestepSeries,
-    build_hourly_time_axis, build_hourly_time_axis_with_weather_metadata, load_epw_weather_file,
-    precompute_runtime_data, precompute_schedule_cache_for_time_axis,
+    DirectZonePurchasedAirCoupledOptions, ExecutionPlan, ExecutionStep,
+    HeatBalanceSimulationOptions, IdealLoadsCompatibilityOptions, NodeStateProjectionOptions,
+    ResultStore, RuntimePrecomputedData, ScheduleCacheProfile, ScheduleSeriesCache,
+    ScheduleSeriesIndexKind, TimeAxis, WeatherTimestepSeries,
+    build_environment_time_axes_with_weather_metadata, build_hourly_time_axis,
+    build_hourly_time_axis_with_weather_metadata, load_epw_weather_file, precompute_runtime_data,
+    precompute_schedule_cache_for_environment_time_axis, precompute_schedule_cache_for_time_axis,
     precompute_weather_timestep_series, select_epw_environment_weather,
+    simulate_direct_zone_purchased_air_coupled_heat_balance,
     simulate_heat_balance_zone_air_temperatures_with_weather_series,
     simulate_ideal_loads_node_state_projection, simulate_ideal_loads_purchased_air_compat,
 };
@@ -133,12 +136,15 @@ struct RustRuntimeResult {
     schedule_cache_sample_count: usize,
     schedule_cache_profile: ScheduleCacheProfile,
     source_order_gate: SourceOrderGateSummary,
+    zone_demand_source: Option<String>,
+    actual_coupled_source_order: Option<Vec<String>>,
 }
 
 struct PreparedRuntimeInputs {
     sample_count: usize,
     time_axis: TimeAxis,
     schedule_cache: ScheduleSeriesCache,
+    zone_timestep_schedule_cache: Option<ScheduleSeriesCache>,
     weather_series: Option<WeatherTimestepSeries>,
 }
 
@@ -802,6 +808,8 @@ fn finish_successful_summary(
                 result.schedule_cache_profile,
             ),
             "source_order_stages": result.source_order_gate.actual_executed_source_order_stages.clone(),
+            "zone_demand_source": result.zone_demand_source.as_deref(),
+            "actual_coupled_source_order": result.actual_coupled_source_order.as_deref(),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
@@ -1582,32 +1590,57 @@ fn prepare_runtime_inputs(
     runtime_class: RuntimeClass,
 ) -> Result<PreparedRuntimeInputs, String> {
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
-    let (time_axis, weather_series) = if runtime_class_requires_weather(runtime_class) {
-        let weather_path = config
-            .weather_path
-            .as_ref()
-            .ok_or_else(|| "weather path is required for heat-balance runtime".to_string())?;
-        let weather_file = load_epw_weather_file(weather_path)
-            .map_err(|error| format!("failed to load EPW weather: {error}"))?;
-        let time_axis = build_hourly_time_axis_with_weather_metadata(
-            &model.typed,
-            &weather_file.calendar_metadata,
-        )
-        .map_err(|error| format!("failed to build weather-aware time axis: {error}"))?;
-        let environment_weather = select_epw_environment_weather(&weather_file, &time_axis)
-            .map_err(|error| format!("failed to select EPW environment records: {error}"))?;
-        let weather_series = precompute_weather_timestep_series(
-            environment_weather.hourly_records(),
-            time_axis.zone_timestep.timesteps_per_hour,
-            time_axis.first_hour_interpolation_starting_values,
-        );
-        (time_axis, Some(weather_series))
-    } else {
-        (
-            build_hourly_time_axis(&model.typed).map_err(|error| error.to_string())?,
-            None,
-        )
-    };
+    let (time_axis, weather_series, zone_timestep_schedule_cache) =
+        if runtime_class_requires_weather(runtime_class) {
+            let weather_path = config
+                .weather_path
+                .as_ref()
+                .ok_or_else(|| "weather path is required for heat-balance runtime".to_string())?;
+            let weather_file = load_epw_weather_file(weather_path)
+                .map_err(|error| format!("failed to load EPW weather: {error}"))?;
+            let time_axis = build_hourly_time_axis_with_weather_metadata(
+                &model.typed,
+                &weather_file.calendar_metadata,
+            )
+            .map_err(|error| format!("failed to build weather-aware time axis: {error}"))?;
+            let environment_weather = select_epw_environment_weather(&weather_file, &time_axis)
+                .map_err(|error| format!("failed to select EPW environment records: {error}"))?;
+            let weather_series = precompute_weather_timestep_series(
+                environment_weather.hourly_records(),
+                time_axis.zone_timestep.timesteps_per_hour,
+                time_axis.first_hour_interpolation_starting_values,
+            );
+            let zone_timestep_schedule_cache =
+                if runtime_class == RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility {
+                    let environment_axis = build_environment_time_axes_with_weather_metadata(
+                        &model.typed,
+                        &weather_file.calendar_metadata,
+                    )
+                    .map_err(|error| {
+                        format!("failed to build zone-timestep environment axis: {error}")
+                    })?
+                    .into_iter()
+                    .next()
+                    .ok_or_else(|| "no zone-timestep environment axis was available".to_string())?;
+                    Some(precompute_schedule_cache_for_environment_time_axis(
+                        &model.typed,
+                        &environment_axis,
+                    ))
+                } else {
+                    None
+                };
+            (
+                time_axis,
+                Some(weather_series),
+                zone_timestep_schedule_cache,
+            )
+        } else {
+            (
+                build_hourly_time_axis(&model.typed).map_err(|error| error.to_string())?,
+                None,
+                None,
+            )
+        };
     let sample_count = runtime_sample_count(
         config,
         &time_axis,
@@ -1619,6 +1652,7 @@ fn prepare_runtime_inputs(
         sample_count,
         time_axis,
         schedule_cache,
+        zone_timestep_schedule_cache,
         weather_series,
     })
 }
@@ -1655,6 +1689,48 @@ fn execute_rust_runtime(
                 schedule_cache_sample_count,
                 schedule_cache_profile,
                 source_order_gate,
+                zone_demand_source: None,
+                actual_coupled_source_order: None,
+            })
+        }
+        RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
+            let weather_series = runtime_inputs.weather_series.as_ref().ok_or_else(|| {
+                "weather records are required for direct-zone coupled runtime".to_string()
+            })?;
+            let schedule_cache = runtime_inputs
+                .zone_timestep_schedule_cache
+                .as_ref()
+                .ok_or_else(|| {
+                    "zone-timestep schedule cache is required for direct-zone coupled runtime"
+                        .to_string()
+                })?;
+            let schedule_cache_sample_count = schedule_cache.sample_count();
+            let schedule_cache_profile = schedule_cache.profile();
+            let simulation = simulate_direct_zone_purchased_air_coupled_heat_balance(
+                model,
+                weather_series,
+                schedule_cache,
+                DirectZonePurchasedAirCoupledOptions::hourly_samples(sample_count),
+            )
+            .map_err(|error| error.to_string())?;
+            let zone_demand_source = Some(simulation.summary.zone_demand_source.to_string());
+            let actual_coupled_source_order = Some(
+                simulation
+                    .summary
+                    .actual_coupled_source_order
+                    .iter()
+                    .map(|stage| (*stage).to_string())
+                    .collect(),
+            );
+            Ok(RustRuntimeResult {
+                results: simulation.results,
+                runtime_class,
+                sample_count,
+                schedule_cache_sample_count,
+                schedule_cache_profile,
+                source_order_gate,
+                zone_demand_source,
+                actual_coupled_source_order,
             })
         }
         RuntimeClass::IdealLoadsNoOaSensibleCompatibility
@@ -1675,6 +1751,8 @@ fn execute_rust_runtime(
                 schedule_cache_sample_count,
                 schedule_cache_profile,
                 source_order_gate,
+                zone_demand_source: None,
+                actual_coupled_source_order: None,
             })
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
@@ -1690,6 +1768,8 @@ fn execute_rust_runtime(
                 schedule_cache_sample_count,
                 schedule_cache_profile,
                 source_order_gate,
+                zone_demand_source: None,
+                actual_coupled_source_order: None,
             })
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
@@ -1699,7 +1779,9 @@ fn execute_rust_runtime(
 fn runtime_class_requires_weather(runtime_class: RuntimeClass) -> bool {
     matches!(
         runtime_class,
-        RuntimeClass::OneZoneHeatBalanceCompatibility | RuntimeClass::HeatBalanceZoneAirDiagnostic
+        RuntimeClass::OneZoneHeatBalanceCompatibility
+            | RuntimeClass::HeatBalanceZoneAirDiagnostic
+            | RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
     )
 }
 
@@ -1989,9 +2071,9 @@ mod tests {
 
     use super::{
         artifact_map, ctf_split_trace_enabled, execution_stage_snapshots,
-        full_surface_trace_opt_in, input_error_diagnostic_code, schedule_cache_json,
-        selected_trace_enabled, source_order_gate_summary, source_order_stage_state_snapshots,
-        trace_level_enables_stage_snapshots, typed_counts,
+        full_surface_trace_opt_in, input_error_diagnostic_code, runtime_class_requires_weather,
+        schedule_cache_json, selected_trace_enabled, source_order_gate_summary,
+        source_order_stage_state_snapshots, trace_level_enables_stage_snapshots, typed_counts,
     };
     use ep_compiler::compile_raw_model;
     use ep_model::{
@@ -2005,7 +2087,17 @@ mod tests {
         ExecutionStep, ScheduleCacheProfile, ScheduleSeriesIndexKind, build_hourly_time_axis,
     };
 
-    use crate::{TraceLevel, TraceSelection};
+    use crate::{RuntimeClass, TraceLevel, TraceSelection};
+
+    #[test]
+    fn direct_zone_coupled_runtime_requires_weather_axis() {
+        assert!(runtime_class_requires_weather(
+            RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+        ));
+        assert!(!runtime_class_requires_weather(
+            RuntimeClass::IdealLoadsNoOaSensibleCompatibility
+        ));
+    }
 
     #[test]
     fn input_error_diagnostic_code_preserves_converter_failures() {

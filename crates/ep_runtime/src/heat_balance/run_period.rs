@@ -63,7 +63,8 @@ use crate::psychrometrics::{
 };
 use crate::schedules::{InternalGainSchedulePhaseOperations, ScheduleSeriesCache};
 use crate::weather::{
-    EpwRecord, WeatherTimestepSeries, energyplus_weather_atmospheric_pressure_for_context,
+    EpwRecord, HeatBalanceWeatherContext, WeatherTimestepSeries,
+    energyplus_weather_atmospheric_pressure_for_context,
     energyplus_weather_dry_bulb_at_timestep_with_starting_values,
     energyplus_weather_horizontal_infrared_for_context,
     energyplus_weather_wind_direction_for_context, energyplus_weather_wind_speed_for_context,
@@ -71,6 +72,7 @@ use crate::weather::{
 };
 use ep_model::{FirstHourInterpolationStartingValues, SimulationModel};
 use std::collections::BTreeMap;
+use std::convert::Infallible;
 
 pub(crate) fn sample_heat_balance_run_period(
     model: &SimulationModel,
@@ -86,6 +88,70 @@ pub(crate) fn sample_heat_balance_run_period(
     seconds_per_timestep: f64,
     first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
 ) -> HeatBalanceRunPeriodSamples {
+    let sampled = sample_heat_balance_run_period_with_step_driver(
+        model,
+        state,
+        weather_dry_bulb_c,
+        weather_records,
+        weather_series,
+        options,
+        runtime_config,
+        zone_steps_per_hour,
+        seconds_per_timestep,
+        first_hour_interpolation_starting_values,
+        |state, input, weather_context, _hour_index, _substep| {
+            advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled(
+                &model.typed,
+                schedule_cache,
+                schedule_operations,
+                state,
+                input,
+                weather_context,
+                runtime_config,
+                options.surface_iteration_count,
+                options.inside_hconv_reevaluation_interval,
+                options.surface_loop_zone_air_correction,
+            );
+            Ok::<(), Infallible>(())
+        },
+    );
+    match sampled {
+        Ok((samples, _)) => samples,
+        Err(error) => match error {},
+    }
+}
+
+/// Samples the shared heat-balance run-period loop while delegating exactly
+/// one source-order timestep advance to the caller.
+///
+/// The returned step outputs remain in `(hour, zone timestep)` order, allowing
+/// a coupled HVAC owner to aggregate rates and energies without modifying the
+/// heat-balance reporting loop.
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn sample_heat_balance_run_period_with_step_driver<StepDriver, StepOutput, StepError>(
+    model: &SimulationModel,
+    state: &mut HeatBalanceState,
+    weather_dry_bulb_c: &[f64],
+    weather_records: Option<&[EpwRecord]>,
+    weather_series: Option<&WeatherTimestepSeries>,
+    options: HeatBalanceSimulationOptions,
+    runtime_config: HeatBalanceRuntimeConfig,
+    zone_steps_per_hour: u32,
+    seconds_per_timestep: f64,
+    first_hour_interpolation_starting_values: FirstHourInterpolationStartingValues,
+    mut step_driver: StepDriver,
+) -> Result<(HeatBalanceRunPeriodSamples, Vec<StepOutput>), StepError>
+where
+    StepDriver: for<'weather> FnMut(
+        &mut HeatBalanceState,
+        HeatBalanceStepInput,
+        Option<HeatBalanceWeatherContext<'weather>>,
+        usize,
+        u32,
+    ) -> Result<StepOutput, StepError>,
+{
+    let mut timestep_outputs =
+        Vec::with_capacity(options.sample_count * zone_steps_per_hour.max(1) as usize);
     let mut zone_temperatures = zone_scalar_trace_series_from_state(state, options.sample_count);
     let mut zone_humidity_ratios = zone_scalar_trace_series_from_state(state, options.sample_count);
     let mut zone_conduction_rates = zone_conduction_traces_from_state(state, options.sample_count);
@@ -210,10 +276,7 @@ pub(crate) fn sample_heat_balance_run_period(
                     if is_raining { 1.0 } else { 0.0 }
                 })
                 .unwrap_or(0.0);
-            advance_heat_balance_state_one_timestep_internal_with_schedule_cache_profiled(
-                &model.typed,
-                schedule_cache,
-                schedule_operations,
+            let timestep_output = step_driver(
                 &mut *state,
                 HeatBalanceStepInput {
                     outdoor_dry_bulb_c: timestep_outdoor_dry_bulb_c,
@@ -221,11 +284,10 @@ pub(crate) fn sample_heat_balance_run_period(
                     timestep_seconds: seconds_per_timestep,
                 },
                 weather_context,
-                runtime_config,
-                options.surface_iteration_count,
-                options.inside_hconv_reevaluation_interval,
-                options.surface_loop_zone_air_correction,
-            );
+                hour_index,
+                substep,
+            )?;
+            timestep_outputs.push(timestep_output);
 
             for sample in &state.last_ctf_history_slot_terms {
                 hourly_ctf_history_slot_accumulators
@@ -888,25 +950,28 @@ pub(crate) fn sample_heat_balance_run_period(
         rain_statuses.push(rain_status_sum / divisor);
     }
 
-    HeatBalanceRunPeriodSamples {
-        zone_temperatures,
-        zone_humidity_ratios,
-        zone_conduction_rates,
-        inside_surface_iteration_counts,
-        zone_air_heat_balance_rates,
-        zone_air_debug_traces,
-        surface_temperatures,
-        outdoor_temperatures,
-        outdoor_wet_bulb_temperatures,
-        sky_temperatures,
-        horizontal_infrared_radiation_rates,
-        rain_statuses,
-        first_sample_ctf_history_slot_accumulators,
-        hourly_ctf_history_slots,
-        hourly_ctf_history_slots_after_advance,
-        surface_first_sample_trace,
-        zone_air_first_sample_trace,
-        surface_iteration_first_sample_trace,
-        surface_iteration_sample_trace,
-    }
+    Ok((
+        HeatBalanceRunPeriodSamples {
+            zone_temperatures,
+            zone_humidity_ratios,
+            zone_conduction_rates,
+            inside_surface_iteration_counts,
+            zone_air_heat_balance_rates,
+            zone_air_debug_traces,
+            surface_temperatures,
+            outdoor_temperatures,
+            outdoor_wet_bulb_temperatures,
+            sky_temperatures,
+            horizontal_infrared_radiation_rates,
+            rain_statuses,
+            first_sample_ctf_history_slot_accumulators,
+            hourly_ctf_history_slots,
+            hourly_ctf_history_slots_after_advance,
+            surface_first_sample_trace,
+            zone_air_first_sample_trace,
+            surface_iteration_first_sample_trace,
+            surface_iteration_sample_trace,
+        },
+        timestep_outputs,
+    ))
 }

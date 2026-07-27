@@ -745,6 +745,13 @@ fn runtime_class_reports_selected_algorithm_lane_metadata() {
     assert!(!ideal_loads_compat.diagnostic_probe_used);
     assert!(ideal_loads_compat.conformance_promotion_allowed);
 
+    let direct_zone_coupled = SelectedAlgorithmLane::from_runtime_class(
+        RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility,
+    );
+    assert_eq!(direct_zone_coupled.id, "compatibility-source-order");
+    assert!(!direct_zone_coupled.diagnostic_probe_used);
+    assert!(direct_zone_coupled.conformance_promotion_allowed);
+
     let heat_balance_diagnostic =
         SelectedAlgorithmLane::from_runtime_class(RuntimeClass::HeatBalanceZoneAirDiagnostic);
     assert_eq!(heat_balance_diagnostic.id, "diagnostic-probe");
@@ -880,6 +887,93 @@ fn hvac_air_loop_uses_unsupported_rule_from_registry() -> Result<(), Box<dyn std
         diagnostic.code == "UnsupportedHVACObject"
             && diagnostic.object_type.as_deref() == Some("AirLoopHVAC")
     }));
+    Ok(())
+}
+
+#[test]
+fn direct_zone_ideal_loads_binding_selects_coupled_runtime_before_legacy_branch()
+-> Result<(), Box<dyn std::error::Error>> {
+    let raw = parse_epjson_str(
+        r#"{
+                "Version": {"Version 1": {"version_identifier": "26.1"}},
+                "Zone": {"Zone One": {"volume": 100}},
+                "Schedule:Constant": {
+                    "Control Type": {"hourly_value": 4},
+                    "Heating Setpoint": {"hourly_value": 21},
+                    "Cooling Setpoint": {"hourly_value": 24}
+                },
+                "ThermostatSetpoint:DualSetpoint": {
+                    "Dual Setpoints": {
+                        "heating_setpoint_temperature_schedule_name": "Heating Setpoint",
+                        "cooling_setpoint_temperature_schedule_name": "Cooling Setpoint"
+                    }
+                },
+                "ZoneControl:Thermostat": {
+                    "Zone Thermostat": {
+                        "zone_or_zonelist_name": "Zone One",
+                        "control_type_schedule_name": "Control Type",
+                        "control_1_object_type": "ThermostatSetpoint:DualSetpoint",
+                        "control_1_name": "Dual Setpoints"
+                    }
+                },
+                "NodeList": {
+                    "Zone Inlets": {
+                        "nodes": [{"node_name": "Zone One Inlet"}]
+                    }
+                },
+                "ZoneHVAC:IdealLoadsAirSystem": {
+                    "Zone Ideal Loads": {
+                        "zone_supply_air_node_name": "Zone Inlets",
+                        "dehumidification_control_type": "None",
+                        "humidification_control_type": "None"
+                    }
+                },
+                "ZoneHVAC:EquipmentList": {
+                    "Zone Equipment": {
+                        "equipment": [
+                            {
+                                "zone_equipment_object_type": "ZoneHVAC:IdealLoadsAirSystem",
+                                "zone_equipment_name": "Zone Ideal Loads",
+                                "zone_equipment_cooling_sequence": 1,
+                                "zone_equipment_heating_or_no_load_sequence": 1
+                            }
+                        ]
+                    }
+                },
+                "ZoneHVAC:EquipmentConnections": {
+                    "Zone One": {
+                        "zone_name": "Zone One",
+                        "zone_conditioning_equipment_list_name": "Zone Equipment",
+                        "zone_air_inlet_node_or_nodelist_name": "Zone Inlets",
+                        "zone_air_node_name": "Zone One Air Node"
+                    }
+                }
+            }"#,
+    )?;
+    let result = compile_raw_model(&raw);
+    let assessment = assess_support(
+        &raw,
+        &result.report,
+        result.model.as_ref(),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+    );
+
+    assert_eq!(assessment.status, SupportStatus::SupportedCompatibility);
+    assert_eq!(
+        assessment.runtime_class,
+        RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+    );
+    assert_eq!(
+        assessment.runtime_class.id(),
+        "ideal-loads-direct-zone-coupled-compatibility"
+    );
+    assert_eq!(
+        assessment.matched_capability_ids,
+        vec!["ideal_loads_no_oa_sensible"]
+    );
     Ok(())
 }
 
