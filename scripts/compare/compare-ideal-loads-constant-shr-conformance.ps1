@@ -363,7 +363,7 @@ Assert-Contains -Text $reportText -Pattern "zone_demand_synthetic_rc_model: fals
 Assert-Contains -Text $reportText -Pattern "zone_demand_source: EnergyPlus Zone System Predicted Sensible Load to Setpoint output split into active heat/cool ZoneSysEnergyDemand inputs" -Description "markdown ZoneSysEnergyDemand source"
 Assert-Contains -Text $reportText -Pattern "zone_demand_struct_source: src/EnergyPlus/DataZoneEnergyDemands.hh::ZoneSysEnergyDemand" -Description "markdown ZoneSysEnergyDemand source struct"
 Assert-Contains -Text $reportText -Pattern "zone_demand_heating_sign_convention: positive W requests heating; non-positive means no active heating request" -Description "markdown heating demand sign"
-Assert-Contains -Text $reportText -Pattern "zone_demand_cooling_sign_convention: negative W requests cooling; non-negative means no active cooling request" -Description "markdown cooling demand sign"
+Assert-Contains -Text $reportText -Pattern "zone_demand_cooling_sign_convention: negative W requests cooling; positive means no active cooling request; exact zero priority depends on the demand input kind" -Description "markdown cooling demand sign"
 Assert-Contains -Text $reportText -Pattern "zone_demand_mismatch_classification: upstream_zone_heat_balance_input" -Description "markdown demand mismatch classification"
 Assert-Contains -Text $reportText -Pattern "zone_demand_fixture_mode: source-order-oracle-demand-input" -Description "markdown demand fixture mode"
 Assert-Contains -Text $reportText -Pattern "source_order_wrapper: ep_runtime::ideal_loads::sim_purchased_air_compat" -Description "markdown source-order wrapper"
