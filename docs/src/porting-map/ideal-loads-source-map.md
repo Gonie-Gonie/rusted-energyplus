@@ -111,7 +111,8 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 |---|---|---|
 | `PurchasedAirManager::SimPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `ep_runtime::ideal_loads::sim_purchased_air_compat`; `ep_runtime::ideal_loads::sim_purchased_air_outdoor_air_compat`; CP300 `crates/ep_runtime/src/ideal_loads/coupling.rs::couple_direct_zone_predicted_demand_to_purchased_air` calls the generic no-OA wrapper with state-backed demand; CP302 `simulate_direct_zone_purchased_air_coupled_heat_balance` release-calls that bounded composition from `ep_run` for the exact CP301 topology |
 | `PurchasedAirManager::GetPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `ep_compiler::objects::ideal_loads`; `ep_model::objects::ideal_loads` |
-| `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP305 bounded release slice: `crates/ep_runtime/src/ideal_loads/init/state.rs::PurchasedAirRuntimeState`, `crates/ep_runtime/src/ideal_loads/init/transition.rs::init_purchased_air_runtime`, and `purchased_air_init_lifecycle_summary`; diagnostic adapters retain `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` only |
+| `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP305-CP306 bounded release slice: `crates/ep_runtime/src/ideal_loads/init/manager_plan.rs::PurchasedAirInitManagerPlan` eagerly resolves the immutable declaration-order membership plan, `crates/ep_runtime/src/ideal_loads/init/state.rs::PurchasedAirRuntimeState` retains manager and per-unit lifecycle state, and `crates/ep_runtime/src/ideal_loads/init/transition.rs::init_purchased_air_runtime` plus `purchased_air_init_lifecycle_summary` execute/report the deferred latch and outcome replay before selected-unit work; diagnostic adapters retain `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` only |
+| `DataZoneEquipment::CheckZoneEquipmentList` | `src/EnergyPlus/DataZoneEquipment.cc` | CP306 `PurchasedAirInitManagerPlan::from_model` eagerly resolves bounded membership in retained Zone order through each Zone's EquipmentConnection and referenced list entries, ignoring unreferenced lists. The matched-list ID is Rust diagnostic evidence; this `InitPurchasedAir` call observes only the Boolean return and does not request optional `CtrlZoneNum`. Runtime Init defers only latch and outcome recording. |
 | `PurchasedAirManager::SizePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/dispatch.rs::IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` |
 | `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` |
 | `PurchasedAirManager::CalcPurchAirMinOAMassFlow` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air/minimum_flow.rs::resolve_minimum_outdoor_air_compat`, orchestrated by `sim_purchased_air_outdoor_air_compat` |
@@ -18260,6 +18261,43 @@ multiple environments, warmup/adaptive/`FirstHVACIteration`, or coordinated
 reset/failure/retry/concurrency behavior. The parent stays `scaffold`/`none`,
 `routine.init_purchased_air` stays `source_mapped`, and the full lifecycle
 roadmap item remains open.
+
+## CP306 Late Global PurchasedAir Equipment-List Sweep
+
+CP306 adds
+`crates/ep_runtime/src/ideal_loads/init/manager_plan.rs::PurchasedAirInitManagerPlan`
+as the immutable manager input to the CP305 transition. `from_model` retains
+typed IdealLoads systems in `TypedModel` declaration order and, for each
+system, eagerly walks retained Zone declaration order, resolves that Zone's
+`ZoneEquipmentConnection`, and visits only the referenced list's retained
+entries. Unreferenced equipment-list objects are invisible. The matched-list
+ID is Rust diagnostic evidence derived from the matching connection; this
+`InitPurchasedAir` call observes only the Boolean return from
+`CheckZoneEquipmentList` and does not request optional `CtrlZoneNum`. Duplicate
+system identities and any active return-plenum path are rejected during plan
+construction, before the plan reaches mutable `PurchasedAirRuntimeState`.
+
+`init_purchased_air_runtime` allocates the manager arena from that plan but
+defers only the global latch and outcome recording while
+`ZoneEquipInputsFilled` is false. On the first ready call it validates the
+complete arena, sets the checked latch, and then performs one infallible replay
+of every pre-resolved plan row. State and summary evidence in `init/state.rs`
+retain declared and replayed system order, one-based ordinals, membership
+Booleans, the Rust-derived matched-list diagnostic, aggregate counts, and
+ordered missing-membership diagnostics. A missing row does not fail fast or
+suppress later rows. Only after the replay does the selected unit enter its
+existing one-time topology, hard-size, environment, and warning work.
+
+Every replay validates that declaration order and planned first matches are
+unchanged before selected-unit mutation; a completed recording pass is
+immutable and is not repeated. These multi-row semantics are direct
+manager-lifecycle tests, not multi-unit release support. Production release
+selection remains the exact one-unit direct-Zone binding and separately
+requires the selected unit's membership. Active plenum arrays/barriers,
+full `SizePurchasedAir`/Autosize, multi-unit dispatch/residual/results, exact
+message registry/text, and reset/concurrency remain outside CP306. The parent
+stays `scaffold`/`none`, `routine.init_purchased_air` stays `source_mapped`,
+and the external Roadmap full-lifecycle checkbox remains open.
 
 ## Claim Requirements
 

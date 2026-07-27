@@ -15245,6 +15245,40 @@ design or multiple environments, warmup/adaptive iteration,
 Section 12's full lifecycle item remains open, both parent algorithms remain
 `scaffold`/`none`, and `routine.init_purchased_air` remains `source_mapped`.
 
+## CP306 Late Global PurchasedAir Equipment-List Sweep
+
+CP306 extends only the manager-wide prefix of the bounded CP305 Init state.
+`PurchasedAirInitManagerPlan::from_model` snapshots every typed IdealLoads
+system in retained `TypedModel` declaration order. It eagerly resolves
+membership in retained Zone declaration order through each Zone's
+`ZoneEquipmentConnection` and only that connection's referenced equipment-list
+entry order; unreferenced list objects are invisible. The retained matched-list
+ID is Rust diagnostic evidence; this `InitPurchasedAir` call observes only the
+Boolean return from `CheckZoneEquipmentList` and does not request optional
+`CtrlZoneNum`. Plan construction rejects an active return-plenum path before
+the mutable runtime state is passed to `init_purchased_air_runtime`; CP306 does
+not construct the source plenum arrays or barrier.
+
+The source `ZoneEquipInputsFilled` gate remains deferred only for runtime
+latching and outcome evidence: a false call leaves both untouched. On the
+first ready call, manager-arena validation completes before the latch is set;
+the latch is then committed before one infallible all-unit outcome replay.
+That replay records declaration order, one-based ordinals, membership results,
+the Rust-derived matched-list diagnostic, and ordered missing-membership
+diagnostics without fail-fast. The selected unit's one-time topology, sizing,
+environment, and warning work follows the replay. Replays require the same
+declaration order and eagerly resolved membership plan before any selected-unit
+mutation and never repeat the completed global recording pass.
+
+Multi-row manager tests are lifecycle evidence only. The release binding
+remains the exact CP303/CP305 one-unit direct-Zone topology and requires its
+selected unit to have membership. Active plenum arrays/barriers,
+exhaust/multiple-return quirks, `SizePurchasedAir`/Autosize, multi-unit release
+dispatch/residual/results, exact diagnostic text and registry behavior, and
+reset/concurrency remain outside CP306. The external Roadmap full-lifecycle
+checkbox remains open, both parent algorithms stay `scaffold`/`none`, and
+`routine.init_purchased_air` stays `source_mapped`.
+
 
 
 

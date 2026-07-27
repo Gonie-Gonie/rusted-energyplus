@@ -665,8 +665,9 @@ fn initialization_failure_precedes_calc_only_input_validation() {
     assert_eq!(
         error,
         DirectZonePurchasedAirScheduledCouplingError::Initialization(
-            PurchasedAirInitError::UnknownSystem {
-                system: binding.ideal_loads_air_system,
+            PurchasedAirInitError::DeclaredSystemOrderChanged {
+                expected: Vec::new(),
+                actual: vec![binding.ideal_loads_air_system],
             }
         )
     );

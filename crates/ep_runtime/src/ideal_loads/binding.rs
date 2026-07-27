@@ -21,10 +21,10 @@ use super::{
     DirectZonePurchasedAirCouplingError, DirectZonePurchasedAirCouplingInput,
     DirectZonePurchasedAirCouplingOutput, IdealLoadsPurchasedAirBranch,
     IdealLoadsSensibleLimitContext, PurchasedAirInitBoundTopology, PurchasedAirInitCallContext,
-    PurchasedAirInitError, PurchasedAirInitSnapshot, PurchasedAirRuntimeState,
-    classify_no_oa_sensible_subset, complete_direct_zone_purchased_air_coupling,
-    init_purchased_air_runtime, predict_direct_zone_demand_for_purchased_air,
-    select_purchased_air_branch,
+    PurchasedAirInitError, PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanError,
+    PurchasedAirInitSnapshot, PurchasedAirRuntimeState, classify_no_oa_sensible_subset,
+    complete_direct_zone_purchased_air_coupling, init_purchased_air_runtime,
+    predict_direct_zone_demand_for_purchased_air, select_purchased_air_branch,
 };
 
 /// One-to-one relation required by the bounded direct-Zone binding.
@@ -148,6 +148,11 @@ pub enum DirectZonePurchasedAirBindingError {
         /// Selected branch.
         branch: IdealLoadsPurchasedAirBranch,
     },
+    /// The manager-wide initialization plan failed its pre-mutation checks.
+    InitManagerPlan {
+        /// Invalid source-order manager plan.
+        error: PurchasedAirInitManagerPlanError,
+    },
 }
 
 /// Immutable production binding for one direct fully mixed Zone.
@@ -155,7 +160,7 @@ pub enum DirectZonePurchasedAirBindingError {
 /// The binding owns no runtime state. It retains typed identities and the
 /// already-resolved IdealLoads object so that per-sample execution performs no
 /// string or topology lookup.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub struct DirectZonePurchasedAirModelBinding<'model> {
     /// Sole controlled Zone.
     pub zone: ZoneId,
@@ -193,6 +198,8 @@ pub struct DirectZonePurchasedAirModelBinding<'model> {
     pub limit_context: IdealLoadsSensibleLimitContext,
     /// Prebound typed IdealLoads system.
     pub system: &'model IdealLoadsAirSystem,
+    /// Immutable source-declaration-order manager initialization plan.
+    pub init_manager_plan: PurchasedAirInitManagerPlan,
 }
 
 /// Resolves and validates the static model topology used by CP300.
@@ -444,6 +451,8 @@ pub fn bind_direct_zone_purchased_air_model(
         .as_ref()
         .and_then(|site| IdealLoadsSensibleLimitContext::from_site_elevation_m(site.elevation_m))
         .unwrap_or_default();
+    let init_manager_plan = PurchasedAirInitManagerPlan::from_model(typed)
+        .map_err(|error| DirectZonePurchasedAirBindingError::InitManagerPlan { error })?;
 
     Ok(DirectZonePurchasedAirModelBinding {
         zone: zone.id,
@@ -464,6 +473,7 @@ pub fn bind_direct_zone_purchased_air_model(
         branch,
         limit_context,
         system,
+        init_manager_plan,
     })
 }
 
@@ -709,15 +719,13 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         .map_err(DirectZonePurchasedAirScheduledCouplingError::Coupling)?;
     let initialization = init_purchased_air_runtime(
         input.purchased_air_runtime_state,
-        &[binding.ideal_loads_air_system],
+        &binding.init_manager_plan,
         PurchasedAirInitBoundTopology {
             system: binding.ideal_loads_air_system,
             controlled_zone: binding.zone,
             equipment_list: binding.equipment_list,
             supply_node: binding.supply_node,
             recirculation_node: binding.return_node,
-            equipment_list_membership_verified: true,
-            return_plenum_active: false,
         },
         binding.system,
         PurchasedAirInitCallContext {

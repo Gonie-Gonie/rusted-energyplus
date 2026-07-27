@@ -1,13 +1,19 @@
 //! Persistent `InitPurchasedAir` lifecycle state.
 
+mod manager_plan;
 mod state;
 mod transition;
 
+pub use manager_plan::*;
 pub use state::*;
 pub use transition::*;
 
 #[cfg(test)]
 mod lifecycle_tests;
+#[cfg(test)]
+mod manager_plan_tests;
+#[cfg(test)]
+mod manager_scan_tests;
 #[cfg(test)]
 mod warning_tests;
 

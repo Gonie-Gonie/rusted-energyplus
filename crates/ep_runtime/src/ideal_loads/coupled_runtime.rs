@@ -517,6 +517,26 @@ fn validate_init_lifecycle(
             lifecycle.equipment_list_check_count,
         ),
         (
+            "declared_system_count",
+            1,
+            lifecycle.declared_system_order.len(),
+        ),
+        (
+            "equipment_list_scanned_unit_count",
+            1,
+            lifecycle.equipment_list_scanned_unit_count,
+        ),
+        (
+            "equipment_list_missing_unit_count",
+            0,
+            lifecycle.equipment_list_missing_unit_count,
+        ),
+        (
+            "equipment_list_diagnostic_count",
+            0,
+            lifecycle.equipment_list_diagnostics.len(),
+        ),
+        (
             "one_time_initialization_count",
             1,
             lifecycle.one_time_initialization_count,
@@ -550,6 +570,10 @@ fn validate_init_lifecycle(
         && flags.sizing_checked
         && flags.equipment_list_checked
         && flags.return_plenum_inactive
+        && lifecycle.equipment_list_scan_order == lifecycle.declared_system_order
+        && lifecycle.equipment_list_scan_ordinal == Some(1)
+        && lifecycle.first_matching_equipment_list.is_some()
+        && lifecycle.equipment_list_membership_found == Some(true)
         && flags.environment_initialization_needed == (timestep_count > 1);
     if !ready {
         return Err(

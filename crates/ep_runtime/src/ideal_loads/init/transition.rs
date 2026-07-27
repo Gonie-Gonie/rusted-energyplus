@@ -6,7 +6,8 @@ use ep_model::{
 };
 
 use super::{
-    PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirInitLifecycleSummary,
+    PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirInitDiagnostic,
+    PurchasedAirInitDiagnosticKind, PurchasedAirInitLifecycleSummary, PurchasedAirInitManagerPlan,
     PurchasedAirRuntimeState, PurchasedAirUnitRuntimeState,
 };
 
@@ -23,10 +24,6 @@ pub struct PurchasedAirInitBoundTopology {
     pub supply_node: NodeId,
     /// Exhaust-or-return node selected for recirculation.
     pub recirculation_node: NodeId,
-    /// Whether the system belongs to the selected equipment list.
-    pub equipment_list_membership_verified: bool,
-    /// Whether an unsupported return-plenum/system-inlet route is active.
-    pub return_plenum_active: bool,
 }
 
 /// Dynamic values visible to one `InitPurchasedAir` call.
@@ -59,6 +56,10 @@ pub struct PurchasedAirInitTransition {
     pub module_initialized: bool,
     /// Global equipment-list check latched on this call.
     pub equipment_list_checked: bool,
+    /// Units visited by the global equipment-list sweep on this call.
+    pub equipment_list_units_scanned: usize,
+    /// Missing memberships diagnosed by the global sweep on this call.
+    pub equipment_list_membership_missing: usize,
     /// Per-unit topology latched on this call.
     pub one_time_initialized: bool,
     /// Hard-size/sizing gate completed on this call.
@@ -99,22 +100,31 @@ pub struct PurchasedAirInitSnapshot {
 /// Fail-closed error for the bounded persistent initialization lifecycle.
 #[derive(Clone, Debug, PartialEq)]
 pub enum PurchasedAirInitError {
-    /// The declared system arena contains a repeated typed ID.
-    DuplicateSystemId {
-        /// Repeated typed system.
+    /// The selected system is absent from the immutable manager plan.
+    SelectedSystemMissingFromManagerPlan {
+        /// Missing typed system.
         system: IdealLoadsAirSystemId,
     },
-    /// The bounded lifecycle was asked to allocate more or fewer than one unit.
-    UnsupportedDeclaredSystemCount {
-        /// Rejected declared-system count.
-        actual: usize,
+    /// A replay attempted to change the source declaration order.
+    DeclaredSystemOrderChanged {
+        /// Order retained by the allocated manager arena.
+        expected: Vec<IdealLoadsAirSystemId>,
+        /// Order supplied by the replay plan.
+        actual: Vec<IdealLoadsAirSystemId>,
     },
-    /// The sole declared system does not match the initialized typed object.
-    DeclaredSystemIdentityMismatch {
-        /// System being initialized.
-        expected: IdealLoadsAirSystemId,
-        /// Sole declared system.
-        actual: IdealLoadsAirSystemId,
+    /// A replay attempted to change a retained first-match result.
+    ManagerPlanMembershipChanged {
+        /// System whose immutable lookup result changed.
+        system: IdealLoadsAirSystemId,
+        /// First match retained by the allocated arena.
+        expected: Option<ZoneEquipmentListId>,
+        /// First match supplied by the replay plan.
+        actual: Option<ZoneEquipmentListId>,
+    },
+    /// The allocated manager arena is internally missing a declared unit.
+    ManagerArenaMissingSystem {
+        /// Missing typed system.
+        system: IdealLoadsAirSystemId,
     },
     /// The selected system is absent from the allocated arena.
     UnknownSystem {
@@ -127,16 +137,6 @@ pub enum PurchasedAirInitError {
         expected: IdealLoadsAirSystemId,
         /// Bound topology identity.
         actual: IdealLoadsAirSystemId,
-    },
-    /// Equipment-list membership was not proven.
-    EquipmentListMembershipNotVerified {
-        /// Unverified typed system.
-        system: IdealLoadsAirSystemId,
-    },
-    /// Return-plenum/system-inlet topology is not typed by this runtime.
-    ReturnPlenumUnsupported {
-        /// System selecting a plenum path.
-        system: IdealLoadsAirSystemId,
     },
     /// A replay attempted to change a latched topology identity.
     LatchedTopologyChanged {
@@ -167,7 +167,7 @@ pub enum PurchasedAirInitError {
 /// Advances the persistent source-order initialization lifecycle for one unit.
 pub fn init_purchased_air_runtime(
     state: &mut PurchasedAirRuntimeState,
-    declared_systems: &[IdealLoadsAirSystemId],
+    manager_plan: &PurchasedAirInitManagerPlan,
     topology: PurchasedAirInitBoundTopology,
     system: &IdealLoadsAirSystem,
     context: PurchasedAirInitCallContext,
@@ -179,25 +179,66 @@ pub fn init_purchased_air_runtime(
             actual: topology.system,
         });
     }
-    validate_single_declared_system(declared_systems, system.id)?;
+    if !manager_plan
+        .rows()
+        .iter()
+        .any(|row| row.system == system.id)
+    {
+        return Err(
+            PurchasedAirInitError::SelectedSystemMissingFromManagerPlan { system: system.id },
+        );
+    }
+    if state.module_initialized {
+        validate_replayed_manager_plan(state, manager_plan)?;
+    }
     if !state.module_initialized {
-        allocate_unit_state(state, declared_systems)?;
+        allocate_unit_state(state, manager_plan);
         transition.module_initialized = true;
     }
     if !state.equipment_list_checked && context.zone_equipment_inputs_filled {
+        validate_manager_arena_complete(state, manager_plan)?;
         state.equipment_list_checked = true;
         state.equipment_list_check_count += 1;
         transition.equipment_list_checked = true;
-    }
-    if state.equipment_list_checked && !topology.equipment_list_membership_verified {
-        return Err(PurchasedAirInitError::EquipmentListMembershipNotVerified {
-            system: system.id,
-        });
-    }
-    if topology.return_plenum_active {
-        return Err(PurchasedAirInitError::ReturnPlenumUnsupported { system: system.id });
+        for (index, row) in manager_plan.rows().iter().enumerate() {
+            let scan_ordinal = index + 1;
+            let membership_found = row.first_matching_equipment_list.is_some();
+            state.equipment_list_scan_order.push(row.system);
+            state.equipment_list_scanned_unit_count += 1;
+            transition.equipment_list_units_scanned += 1;
+            let unit = state
+                .units
+                .get_mut(&row.system)
+                .ok_or(PurchasedAirInitError::ManagerArenaMissingSystem { system: row.system })?;
+            unit.equipment_list_scan_ordinal = Some(scan_ordinal);
+            unit.first_matching_equipment_list = row.first_matching_equipment_list;
+            unit.equipment_list_membership_found = Some(membership_found);
+            if !membership_found {
+                state.equipment_list_missing_unit_count += 1;
+                transition.equipment_list_membership_missing += 1;
+                state
+                    .equipment_list_diagnostics
+                    .push(PurchasedAirInitDiagnostic {
+                        system: row.system,
+                        scan_ordinal,
+                        kind: PurchasedAirInitDiagnosticKind::EquipmentListMembershipMissing,
+                    });
+            }
+        }
     }
 
+    let existing_unit = state
+        .units
+        .get(&system.id)
+        .ok_or(PurchasedAirInitError::UnknownSystem { system: system.id })?;
+    if existing_unit.one_time_initialized
+        && (existing_unit.controlled_zone != Some(topology.controlled_zone)
+            || existing_unit.equipment_list != Some(topology.equipment_list)
+            || existing_unit.supply_node != Some(topology.supply_node)
+            || existing_unit.recirculation_node != Some(topology.recirculation_node))
+    {
+        return Err(PurchasedAirInitError::LatchedTopologyChanged { system: system.id });
+    }
     let unit = state
         .units
         .get_mut(&system.id)
@@ -211,12 +252,6 @@ pub fn init_purchased_air_runtime(
         unit.one_time_initialized = true;
         unit.one_time_initialization_count += 1;
         transition.one_time_initialized = true;
-    } else if unit.controlled_zone != Some(topology.controlled_zone)
-        || unit.equipment_list != Some(topology.equipment_list)
-        || unit.supply_node != Some(topology.supply_node)
-        || unit.recirculation_node != Some(topology.recirculation_node)
-    {
-        return Err(PurchasedAirInitError::LatchedTopologyChanged { system: system.id });
     }
 
     if !context.system_sizing_calculation && unit.sizing_needed {
@@ -276,6 +311,14 @@ pub fn purchased_air_init_lifecycle_summary(
         flags: unit.flags(state.equipment_list_checked),
         module_initialization_count: state.module_initialization_count,
         equipment_list_check_count: state.equipment_list_check_count,
+        declared_system_order: state.declared_system_order.clone(),
+        equipment_list_scan_order: state.equipment_list_scan_order.clone(),
+        equipment_list_scanned_unit_count: state.equipment_list_scanned_unit_count,
+        equipment_list_missing_unit_count: state.equipment_list_missing_unit_count,
+        equipment_list_diagnostics: state.equipment_list_diagnostics.clone(),
+        equipment_list_scan_ordinal: unit.equipment_list_scan_ordinal,
+        first_matching_equipment_list: unit.first_matching_equipment_list,
+        equipment_list_membership_found: unit.equipment_list_membership_found,
         init_call_count: unit.init_call_count,
         one_time_initialization_count: unit.one_time_initialization_count,
         sizing_check_count: unit.sizing_check_count,
@@ -291,40 +334,58 @@ pub fn purchased_air_init_lifecycle_summary(
     })
 }
 
-fn validate_single_declared_system(
-    declared_systems: &[IdealLoadsAirSystemId],
-    expected: IdealLoadsAirSystemId,
+fn allocate_unit_state(
+    state: &mut PurchasedAirRuntimeState,
+    manager_plan: &PurchasedAirInitManagerPlan,
+) {
+    state.declared_system_order = manager_plan.system_order().collect();
+    for row in manager_plan.rows() {
+        state.units.insert(
+            row.system,
+            PurchasedAirUnitRuntimeState::new(row.system, row.first_matching_equipment_list),
+        );
+    }
+    state.module_initialized = true;
+    state.module_initialization_count += 1;
+}
+
+fn validate_replayed_manager_plan(
+    state: &PurchasedAirRuntimeState,
+    manager_plan: &PurchasedAirInitManagerPlan,
 ) -> Result<(), PurchasedAirInitError> {
-    if declared_systems.len() != 1 {
-        return Err(PurchasedAirInitError::UnsupportedDeclaredSystemCount {
-            actual: declared_systems.len(),
+    let actual_order: Vec<_> = manager_plan.system_order().collect();
+    if actual_order != state.declared_system_order {
+        return Err(PurchasedAirInitError::DeclaredSystemOrderChanged {
+            expected: state.declared_system_order.clone(),
+            actual: actual_order,
         });
     }
-    if declared_systems[0] != expected {
-        return Err(PurchasedAirInitError::DeclaredSystemIdentityMismatch {
-            expected,
-            actual: declared_systems[0],
-        });
+    validate_manager_arena_complete(state, manager_plan)?;
+    for row in manager_plan.rows() {
+        let unit = state
+            .units
+            .get(&row.system)
+            .ok_or(PurchasedAirInitError::ManagerArenaMissingSystem { system: row.system })?;
+        if unit.planned_first_matching_equipment_list != row.first_matching_equipment_list {
+            return Err(PurchasedAirInitError::ManagerPlanMembershipChanged {
+                system: row.system,
+                expected: unit.planned_first_matching_equipment_list,
+                actual: row.first_matching_equipment_list,
+            });
+        }
     }
     Ok(())
 }
 
-fn allocate_unit_state(
-    state: &mut PurchasedAirRuntimeState,
-    declared_systems: &[IdealLoadsAirSystemId],
+fn validate_manager_arena_complete(
+    state: &PurchasedAirRuntimeState,
+    manager_plan: &PurchasedAirInitManagerPlan,
 ) -> Result<(), PurchasedAirInitError> {
-    for system in declared_systems {
-        if state
-            .units
-            .insert(*system, PurchasedAirUnitRuntimeState::new(*system))
-            .is_some()
-        {
-            state.units.clear();
-            return Err(PurchasedAirInitError::DuplicateSystemId { system: *system });
+    for row in manager_plan.rows() {
+        if !state.units.contains_key(&row.system) {
+            return Err(PurchasedAirInitError::ManagerArenaMissingSystem { system: row.system });
         }
     }
-    state.module_initialized = true;
-    state.module_initialization_count += 1;
     Ok(())
 }
 

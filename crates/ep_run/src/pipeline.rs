@@ -18,13 +18,14 @@ use ep_runtime::{
     DIRECT_ZONE_PURCHASED_AIR_DEMAND_SOURCE, DirectZonePurchasedAirCoupledOptions, ExecutionPlan,
     ExecutionStep, HeatBalanceSimulationOptions, IDEAL_LOADS_FIXTURE_DEMAND_DIAGNOSTIC_SOURCE,
     IdealLoadsCompatibilityOptions, NodeStateProjectionOptions,
-    PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirInitLifecycleSummary, ResultStore,
-    RuntimePrecomputedData, ScheduleCacheProfile, ScheduleSeriesCache, ScheduleSeriesIndexKind,
-    TimeAxis, WeatherTimestepSeries, build_environment_time_axes_with_weather_metadata,
-    build_hourly_time_axis, build_hourly_time_axis_with_weather_metadata, load_epw_weather_file,
-    precompute_runtime_data, precompute_schedule_cache_for_environment_time_axis,
-    precompute_schedule_cache_for_time_axis, precompute_weather_timestep_series,
-    select_epw_environment_weather, simulate_direct_zone_purchased_air_coupled_heat_balance,
+    PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirInitDiagnosticKind,
+    PurchasedAirInitLifecycleSummary, ResultStore, RuntimePrecomputedData, ScheduleCacheProfile,
+    ScheduleSeriesCache, ScheduleSeriesIndexKind, TimeAxis, WeatherTimestepSeries,
+    build_environment_time_axes_with_weather_metadata, build_hourly_time_axis,
+    build_hourly_time_axis_with_weather_metadata, load_epw_weather_file, precompute_runtime_data,
+    precompute_schedule_cache_for_environment_time_axis, precompute_schedule_cache_for_time_axis,
+    precompute_weather_timestep_series, select_epw_environment_weather,
+    simulate_direct_zone_purchased_air_coupled_heat_balance,
     simulate_heat_balance_zone_air_temperatures_with_weather_series,
     simulate_ideal_loads_node_state_projection, simulate_ideal_loads_purchased_air_compat,
 };
@@ -718,6 +719,32 @@ fn schedule_cache_json(sample_count: usize, profile: ScheduleCacheProfile) -> Va
 }
 
 fn purchased_air_init_lifecycle_json(lifecycle: &PurchasedAirInitLifecycleSummary) -> Value {
+    let declared_system_order: Vec<_> = lifecycle
+        .declared_system_order
+        .iter()
+        .map(|system| system.0)
+        .collect();
+    let equipment_list_scan_order: Vec<_> = lifecycle
+        .equipment_list_scan_order
+        .iter()
+        .map(|system| system.0)
+        .collect();
+    let equipment_list_diagnostics: Vec<_> = lifecycle
+        .equipment_list_diagnostics
+        .iter()
+        .map(|diagnostic| {
+            let kind = match diagnostic.kind {
+                PurchasedAirInitDiagnosticKind::EquipmentListMembershipMissing => {
+                    "equipment_list_membership_missing"
+                }
+            };
+            json!({
+                "system": diagnostic.system.0,
+                "scan_ordinal": diagnostic.scan_ordinal,
+                "kind": kind,
+            })
+        })
+        .collect();
     json!({
         "source": lifecycle.source,
         "flags": {
@@ -731,6 +758,14 @@ fn purchased_air_init_lifecycle_json(lifecycle: &PurchasedAirInitLifecycleSummar
         },
         "module_initialization_count": lifecycle.module_initialization_count,
         "equipment_list_check_count": lifecycle.equipment_list_check_count,
+        "declared_system_order": declared_system_order,
+        "equipment_list_scan_order": equipment_list_scan_order,
+        "equipment_list_scanned_unit_count": lifecycle.equipment_list_scanned_unit_count,
+        "equipment_list_missing_unit_count": lifecycle.equipment_list_missing_unit_count,
+        "equipment_list_diagnostics": equipment_list_diagnostics,
+        "equipment_list_scan_ordinal": lifecycle.equipment_list_scan_ordinal,
+        "first_matching_equipment_list": lifecycle.first_matching_equipment_list.map(|list| list.0),
+        "equipment_list_membership_found": lifecycle.equipment_list_membership_found,
         "init_call_count": lifecycle.init_call_count,
         "one_time_initialization_count": lifecycle.one_time_initialization_count,
         "sizing_check_count": lifecycle.sizing_check_count,
@@ -1921,6 +1956,20 @@ fn validate_direct_purchased_air_init_lifecycle(
                 .to_string(),
         );
     }
+    let manager_sweep_ready = lifecycle.declared_system_order.len() == 1
+        && lifecycle.equipment_list_scan_order == lifecycle.declared_system_order
+        && lifecycle.equipment_list_scanned_unit_count == 1
+        && lifecycle.equipment_list_missing_unit_count == 0
+        && lifecycle.equipment_list_diagnostics.is_empty()
+        && lifecycle.equipment_list_scan_ordinal == Some(1)
+        && lifecycle.first_matching_equipment_list.is_some()
+        && lifecycle.equipment_list_membership_found == Some(true);
+    if !manager_sweep_ready {
+        return Err(
+            "direct-zone IdealLoads manager-wide equipment-list sweep is not release-ready"
+                .to_string(),
+        );
+    }
     for (field, expected, actual) in [
         (
             "module_initialization_count",
@@ -2306,8 +2355,8 @@ mod tests {
     use ep_compiler::compile_raw_model;
     use ep_model::{
         ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
-        ExternalInterfaceSchedule, NormalizedName, ScheduleFileShading, ScheduleFileShadingColumn,
-        ScheduleId, TypedModel,
+        ExternalInterfaceSchedule, IdealLoadsAirSystemId, NormalizedName, ScheduleFileShading,
+        ScheduleFileShadingColumn, ScheduleId, TypedModel, ZoneEquipmentListId,
     };
     use ep_raw_model::parse_epjson_str_with_idf_order;
     use ep_runtime::{
@@ -2363,7 +2412,7 @@ mod tests {
         assert!(validate_direct_purchased_air_init_lifecycle(Some(&valid), Some(0)).is_err());
         assert!(validate_direct_purchased_air_init_lifecycle(Some(&valid), Some(3)).is_err());
 
-        let mut wrong_source = valid;
+        let mut wrong_source = valid.clone();
         wrong_source.source = "diagnostic-init-marker";
         assert!(
             validate_direct_purchased_air_init_lifecycle(Some(&wrong_source), Some(2)).is_err()
@@ -2389,6 +2438,14 @@ mod tests {
             },
             module_initialization_count: 1,
             equipment_list_check_count: 1,
+            declared_system_order: vec![IdealLoadsAirSystemId(0)],
+            equipment_list_scan_order: vec![IdealLoadsAirSystemId(0)],
+            equipment_list_scanned_unit_count: 1,
+            equipment_list_missing_unit_count: 0,
+            equipment_list_diagnostics: Vec::new(),
+            equipment_list_scan_ordinal: Some(1),
+            first_matching_equipment_list: Some(ZoneEquipmentListId(0)),
+            equipment_list_membership_found: Some(true),
             init_call_count: call_count,
             one_time_initialization_count: 1,
             sizing_check_count: 1,

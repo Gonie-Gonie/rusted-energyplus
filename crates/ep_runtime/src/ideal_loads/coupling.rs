@@ -339,7 +339,8 @@ mod tests {
         heat_balance::state::ZoneAirTemperatureCoefficients,
         ideal_loads::{
             IdealLoadsSensibleMode, IdealLoadsUnsupportedFeature, PurchasedAirInitBoundTopology,
-            PurchasedAirInitCallContext, PurchasedAirRuntimeState, init_purchased_air_runtime,
+            PurchasedAirInitCallContext, PurchasedAirInitManagerPlan,
+            PurchasedAirInitManagerPlanRow, PurchasedAirRuntimeState, init_purchased_air_runtime,
             select_purchased_air_branch,
         },
     };
@@ -1039,17 +1040,22 @@ mod tests {
     fn initialized_snapshot(system: &IdealLoadsAirSystem) -> PurchasedAirInitSnapshot {
         let limit_context = IdealLoadsSensibleLimitContext::default();
         let mut state = PurchasedAirRuntimeState::default();
+        let manager_plan =
+            PurchasedAirInitManagerPlan::try_from_rows(vec![PurchasedAirInitManagerPlanRow {
+                system: system.id,
+                first_matching_equipment_list: Some(ZoneEquipmentListId(0)),
+                return_plenum_active: false,
+            }])
+            .expect("test manager plan must be valid");
         init_purchased_air_runtime(
             &mut state,
-            &[system.id],
+            &manager_plan,
             PurchasedAirInitBoundTopology {
                 system: system.id,
                 controlled_zone: ZoneId(0),
                 equipment_list: ZoneEquipmentListId(0),
                 supply_node: NodeId(3),
                 recirculation_node: NodeId(4),
-                equipment_list_membership_verified: true,
-                return_plenum_active: false,
             },
             system,
             PurchasedAirInitCallContext {

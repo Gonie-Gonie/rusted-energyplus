@@ -33272,6 +33272,43 @@ Autosize, multiple/design environments, warmup/adaptive iteration,
 `FirstHVACIteration`, and retry/reset/concurrency remain unimplemented; parent
 and routine claim statuses do not change.
 
+## CP306 Late Global PurchasedAir Equipment-List Sweep
+
+The heat-balance-owned direct loop now passes an immutable
+`PurchasedAirInitManagerPlan` into the existing CP305 Init transition. The plan
+comes from the same `TypedModel`, preserves PurchasedAir declaration order,
+and eagerly resolves membership for every declared system in retained Zone
+order through each Zone's EquipmentConnection and referenced list entries;
+unreferenced list objects are invisible. Its retained matched-list ID is Rust
+diagnostic evidence rather than source state. Active plenum topology is
+rejected before the mutable Init state is entered, so the heat-balance timestep
+never observes a partially installed manager plan.
+
+The mapped evidence is
+`crates/ep_runtime/src/ideal_loads/init/manager_plan.rs::PurchasedAirInitManagerPlan`,
+`crates/ep_runtime/src/ideal_loads/init/state.rs::PurchasedAirRuntimeState`,
+and `crates/ep_runtime/src/ideal_loads/init/transition.rs` through
+`init_purchased_air_runtime` and `purchased_air_init_lifecycle_summary`.
+
+When `ZoneEquipInputsFilled` is false, only the already-bounded selected call
+continues and the manager-wide equipment-list latch and outcome recording
+remain pending. The first ready call validates the arena, commits the latch,
+and completes one infallible all-unit replay of eagerly resolved outcomes
+before any selected-unit one-time, sizing, environment, warning, Calc, update,
+report, or corrector work. Ordered replay identity, ordinals, membership
+results, the Rust-derived matched-list
+diagnostic, missing-membership diagnostics, and counts are retained in
+`PurchasedAirRuntimeState` and
+`PurchasedAirInitLifecycleSummary`; replay rejects a changed manager plan and
+does not repeat the recording pass.
+
+This ordering evidence does not widen the runtime class: the release path
+still binds exactly one direct-Zone unit. Active plenum arrays/barriers,
+exhaust/multiple-return behavior, `SizePurchasedAir`/Autosize, multi-unit
+release dispatch/residual/results, exact diagnostic registry/text, and
+reset/concurrency remain unimplemented. Parent and routine statuses, plus the
+external Roadmap full-lifecycle checkbox, remain unchanged.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

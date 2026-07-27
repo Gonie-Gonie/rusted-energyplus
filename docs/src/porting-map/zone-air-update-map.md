@@ -20977,6 +20977,44 @@ Autosize/full sizing, multiple/design environments, warmup/adaptive and
 `FirstHVACIteration`, and coordinated failure/retry/reset. The parent and
 routine statuses and full-lifecycle roadmap checkbox remain unchanged.
 
+## CP306 Late Global PurchasedAir Equipment-List Sweep
+
+CP306 maps the source's late manager-wide equipment-list boundary to a
+deferred outcome replay inside the bounded Init stage without moving the
+surrounding predictor, Calc,
+update/report, or same-step Zone corrector barriers. An immutable
+`PurchasedAirInitManagerPlan` derives all typed IdealLoads systems in retained
+declaration order and eagerly resolves membership in retained Zone order
+through each Zone's EquipmentConnection and referenced equipment-list entries;
+unreferenced lists are invisible. The retained matched-list ID is Rust
+diagnostic evidence; this `InitPurchasedAir` call observes only the Boolean
+return from `CheckZoneEquipmentList` and does not request optional
+`CtrlZoneNum`. Any active plenum path is rejected before runtime-state mutation.
+
+The mapped evidence is
+`crates/ep_runtime/src/ideal_loads/init/manager_plan.rs::PurchasedAirInitManagerPlan`,
+`crates/ep_runtime/src/ideal_loads/init/state.rs::PurchasedAirRuntimeState`,
+and `crates/ep_runtime/src/ideal_loads/init/transition.rs` through
+`init_purchased_air_runtime` and `purchased_air_init_lifecycle_summary`.
+
+Only the runtime latch and outcome recording remain deferred until
+`ZoneEquipInputsFilled`. On the first ready call, manager-arena validation
+precedes the checked-latch commit, and that latch precedes one infallible replay
+of every eagerly resolved plan row. The persistent state records ordered
+ordinals and membership; absent membership appends an ordered diagnostic and
+replay continues. Selected-unit topology, sizing, environment, and warning
+transitions occur only after the global recording pass. Replay requires the
+same declaration order and membership plan before any selected-unit mutation
+and cannot repeat the completed pass.
+
+The multi-row plan and transition tests prove manager lifecycle only. Release
+support remains one exact direct-Zone unit, with active plenum arrays/barriers,
+exhaust/multiple-return quirks, `SizePurchasedAir`/Autosize, multi-unit release
+dispatch/residual/results, exact message registry/text, and reset/concurrency
+still excluded. Both parents remain `scaffold`/`none`,
+`routine.init_purchased_air` remains `source_mapped`, and the external Roadmap
+full-lifecycle checkbox stays open.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

@@ -2,7 +2,7 @@ use ep_model::{IdealLoadsAirSystem, IdealLoadsLimit};
 
 use super::{
     PurchasedAirInitCallContext, PurchasedAirRuntimeState, init_purchased_air_runtime,
-    lifecycle_tests::{SYSTEM, context, finite_flow_system, topology},
+    lifecycle_tests::{SYSTEM, context, finite_flow_system, single_manager_plan, topology},
     purchased_air_init_lifecycle_summary,
 };
 
@@ -10,9 +10,9 @@ use super::{
 fn warning_predicates_preserve_strict_setpoint_limit_and_availability_gates() {
     let evaluate = |system: &IdealLoadsAirSystem, context: PurchasedAirInitCallContext| {
         let mut state = PurchasedAirRuntimeState::default();
-        let snapshot =
-            init_purchased_air_runtime(&mut state, &[SYSTEM], topology(), system, context)
-                .expect("warning predicate initialization");
+        let plan = single_manager_plan();
+        let snapshot = init_purchased_air_runtime(&mut state, &plan, topology(), system, context)
+            .expect("warning predicate initialization");
         let summary = purchased_air_init_lifecycle_summary(&state, SYSTEM)
             .expect("warning predicate lifecycle");
         (
@@ -67,10 +67,11 @@ fn warning_predicates_preserve_strict_setpoint_limit_and_availability_gates() {
     assert_eq!(evaluate(&limited, context(true)), (false, false, 0, 0));
 
     let mut repeated_state = PurchasedAirRuntimeState::default();
+    let repeated_plan = single_manager_plan();
     for _ in 0..2 {
         init_purchased_air_runtime(
             &mut repeated_state,
-            &[SYSTEM],
+            &repeated_plan,
             topology(),
             &warning_system,
             context(true),

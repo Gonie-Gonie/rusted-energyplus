@@ -343,6 +343,25 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
     assert_eq!(lifecycle["flags"]["return_plenum_inactive"], true);
     assert_eq!(lifecycle["module_initialization_count"], 1);
     assert_eq!(lifecycle["equipment_list_check_count"], 1);
+    assert_eq!(
+        lifecycle["declared_system_order"],
+        lifecycle["equipment_list_scan_order"]
+    );
+    assert_eq!(
+        lifecycle["declared_system_order"].as_array().map(Vec::len),
+        Some(1)
+    );
+    assert_eq!(lifecycle["equipment_list_scanned_unit_count"], 1);
+    assert_eq!(lifecycle["equipment_list_missing_unit_count"], 0);
+    assert_eq!(
+        lifecycle["equipment_list_diagnostics"]
+            .as_array()
+            .map(Vec::len),
+        Some(0)
+    );
+    assert_eq!(lifecycle["equipment_list_scan_ordinal"], 1);
+    assert!(lifecycle["first_matching_equipment_list"].is_u64());
+    assert_eq!(lifecycle["equipment_list_membership_found"], true);
     assert_eq!(lifecycle["init_call_count"], expected_calls);
     assert_eq!(lifecycle["one_time_initialization_count"], 1);
     assert_eq!(lifecycle["sizing_check_count"], 1);

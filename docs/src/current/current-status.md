@@ -144,6 +144,23 @@ transition counts and cache; diagnostic adapters report no lifecycle and keep
 `state_machine_used=false`. Full multi-unit, plenum/exhaust, Autosize,
 multi-environment, warmup/adaptive, and retry/reset lifecycle remains open.
 
+CP306 now supplies the same bounded Init state with an immutable
+`TypedModel` declaration-order manager plan. Active plenum topology is rejected
+before runtime-state mutation. The plan eagerly resolves membership in Zone
+declaration order through each Zone's EquipmentConnection and referenced list
+entries, ignoring unreferenced list objects. Once `ZoneEquipInputsFilled` is
+true, the global equipment-list latch commits before one infallible all-unit
+outcome replay; only this latch and recording pass are deferred. The lifecycle
+summary retains replay order, ordinals, membership results, a Rust-derived
+matched-list diagnostic, and ordered missing-membership diagnostics without
+fail-fast. Replay requires the identical plan and the selected unit's work
+remains after the recording pass. This is manager-lifecycle evidence only:
+supported release execution is still the exact one-unit direct-Zone lane.
+Plenum arrays/barriers, exhaust/multiple-return behavior,
+`SizePurchasedAir`/Autosize, multi-unit release dispatch/residual/results,
+exact message-registry parity, and reset/concurrency remain open; no parent,
+routine, or external Roadmap status is promoted.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

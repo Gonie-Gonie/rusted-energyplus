@@ -6,6 +6,24 @@ use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
 use super::IdealLoadsInitFlags;
 
+/// Structured diagnostic emitted by the manager-wide equipment-list sweep.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct PurchasedAirInitDiagnostic {
+    /// Unit visited by the manager sweep.
+    pub system: IdealLoadsAirSystemId,
+    /// One-based declaration-order visit ordinal.
+    pub scan_ordinal: usize,
+    /// Source-shaped diagnostic category.
+    pub kind: PurchasedAirInitDiagnosticKind,
+}
+
+/// Diagnostic categories retained by the bounded manager-wide sweep.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum PurchasedAirInitDiagnosticKind {
+    /// `CheckZoneEquipmentList` found no matching entry in any equipment list.
+    EquipmentListMembershipMissing,
+}
+
 /// Mutable state retained across PurchasedAir initialization calls.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct PurchasedAirRuntimeState {
@@ -13,12 +31,22 @@ pub struct PurchasedAirRuntimeState {
     pub module_initialized: bool,
     /// Whether Zone equipment-list membership has been checked.
     pub equipment_list_checked: bool,
+    /// IdealLoads systems in immutable typed declaration order.
+    pub declared_system_order: Vec<IdealLoadsAirSystemId>,
+    /// Systems visited by the one manager-wide equipment-list sweep.
+    pub equipment_list_scan_order: Vec<IdealLoadsAirSystemId>,
+    /// Ordered source-shaped severe diagnostics emitted by the sweep.
+    pub equipment_list_diagnostics: Vec<PurchasedAirInitDiagnostic>,
     /// Per-system lifecycle state in typed-ID order.
     pub units: BTreeMap<IdealLoadsAirSystemId, PurchasedAirUnitRuntimeState>,
     /// Number of module arena allocations.
     pub module_initialization_count: usize,
     /// Number of completed global equipment-list checks.
     pub equipment_list_check_count: usize,
+    /// Total units visited by the manager-wide equipment-list sweep.
+    pub equipment_list_scanned_unit_count: usize,
+    /// Units missing from every Zone equipment list during the sweep.
+    pub equipment_list_missing_unit_count: usize,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -40,6 +68,14 @@ pub struct PurchasedAirUnitRuntimeState {
     pub supply_node: Option<NodeId>,
     /// Exhaust-or-return recirculation node captured by the one-time pass.
     pub recirculation_node: Option<NodeId>,
+    /// Immutable first-match result captured when the manager arena is allocated.
+    pub planned_first_matching_equipment_list: Option<ZoneEquipmentListId>,
+    /// One-based manager sweep ordinal, once Zone equipment input is ready.
+    pub equipment_list_scan_ordinal: Option<usize>,
+    /// First controlled-Zone-referenced equipment list containing this unit.
+    pub first_matching_equipment_list: Option<ZoneEquipmentListId>,
+    /// Whether the manager sweep found this unit in any equipment list.
+    pub equipment_list_membership_found: Option<bool>,
     /// Cached maximum heating air mass flow from begin-environment initialization.
     pub maximum_heating_air_mass_flow_rate_kg_per_s: f64,
     /// Cached maximum cooling air mass flow from begin-environment initialization.
@@ -63,7 +99,10 @@ pub struct PurchasedAirUnitRuntimeState {
 }
 
 impl PurchasedAirUnitRuntimeState {
-    pub(super) const fn new(system: IdealLoadsAirSystemId) -> Self {
+    pub(super) const fn new(
+        system: IdealLoadsAirSystemId,
+        planned_first_matching_equipment_list: Option<ZoneEquipmentListId>,
+    ) -> Self {
         Self {
             system,
             one_time_initialized: false,
@@ -73,6 +112,10 @@ impl PurchasedAirUnitRuntimeState {
             equipment_list: None,
             supply_node: None,
             recirculation_node: None,
+            planned_first_matching_equipment_list,
+            equipment_list_scan_ordinal: None,
+            first_matching_equipment_list: None,
+            equipment_list_membership_found: None,
             maximum_heating_air_mass_flow_rate_kg_per_s: 0.0,
             maximum_cooling_air_mass_flow_rate_kg_per_s: 0.0,
             standard_air_density_kg_per_m3: None,
@@ -102,7 +145,7 @@ impl PurchasedAirUnitRuntimeState {
 }
 
 /// Final lifecycle counters reported by the direct release runtime.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct PurchasedAirInitLifecycleSummary {
     /// Persistent state-machine provenance.
     pub source: &'static str,
@@ -112,6 +155,22 @@ pub struct PurchasedAirInitLifecycleSummary {
     pub module_initialization_count: usize,
     /// Global equipment-list check count.
     pub equipment_list_check_count: usize,
+    /// IdealLoads systems in immutable typed declaration order.
+    pub declared_system_order: Vec<IdealLoadsAirSystemId>,
+    /// Systems visited by the manager-wide equipment-list sweep.
+    pub equipment_list_scan_order: Vec<IdealLoadsAirSystemId>,
+    /// Total units visited by the manager-wide equipment-list sweep.
+    pub equipment_list_scanned_unit_count: usize,
+    /// Units missing from every equipment list.
+    pub equipment_list_missing_unit_count: usize,
+    /// Ordered diagnostics retained from the sweep.
+    pub equipment_list_diagnostics: Vec<PurchasedAirInitDiagnostic>,
+    /// Selected unit's one-based manager sweep ordinal.
+    pub equipment_list_scan_ordinal: Option<usize>,
+    /// First controlled-Zone-referenced equipment list containing the selected unit.
+    pub first_matching_equipment_list: Option<ZoneEquipmentListId>,
+    /// Whether the selected unit was found in an equipment list.
+    pub equipment_list_membership_found: Option<bool>,
     /// Per-unit call count.
     pub init_call_count: usize,
     /// Per-unit one-time topology count.
