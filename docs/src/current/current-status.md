@@ -372,8 +372,8 @@ owns `PurchasedAirCalcCoolingOaMaxFlowBodyError` and
 `advance_direct_no_oa_calc_cooling_oa_max_flow_body`. The parent module owns
 `purchased_air_calc_cooling_oa_max_flow_body_lifecycle_summary`.
 
-The binder orders CP314 after CP313 and before CP315 and the existing numerical
-Calc.
+The binder orders CP314 after CP313 and before CP315, CP316, and the existing
+numerical Calc.
 Per-step, lifecycle, and pipeline firewalls reconcile its parent skip/body
 partition, source-site counts, warning-state shape, and zero release effects,
 publish `purchased_air_calc_cooling_oa_max_flow_body_lifecycle`, and reject
@@ -413,27 +413,62 @@ owns `PurchasedAirCalcCoolingEconomizerGuardError` and
 `advance_direct_no_oa_calc_cooling_economizer_guard`. The parent module owns
 `purchased_air_calc_cooling_economizer_guard_lifecycle_summary`.
 
-The binder orders CP315 after CP314 and before the existing numerical Calc.
+The binder orders CP315 after CP314 and before CP316.
 Per-step, lifecycle, and pipeline firewalls reconcile one CP315 transition per
 CP314 transition, the predecessor fallthrough/skip partition, enum reads,
-exact `!= NoEconomizer` comparisons, false release results, and zero inner-body entries;
+exact `!= NoEconomizer` comparisons, false release results, and zero CP316
+condition entries;
 publish `purchased_air_calc_cooling_economizer_guard_lifecycle`; and reject
 disconnected or non-direct evidence. Internal characterization may retain true
 outer-guard results for typed DifferentialDryBulb and DifferentialEnthalpy,
-but it stops before the inner condition and does not admit either route to the
-direct release binding.
+but CP315 itself stops before the inner condition and does not admit either
+route to the direct release binding.
 
-The lexical first executable outside CP315 is the inner economizer condition
-at line 2083. A true outer guard continues there; a false guard, including
-every exact release evaluation, continues at line 2109. The inner temperature
-and enthalpy selectors and node reads through line 2086, `CpAir`, `DeltaT`,
-supply- and outdoor-air flow calculation or mutation, `EconoOn`,
-`TimeEconoActive`, line 2109 itself, and all later Calc numerics remain open.
-This is guard-only lifecycle evidence and does not connect the existing
-separate outdoor-air economizer helper to the direct source-ordered binder.
-OA and Economizer stay forbidden for this release path. Parent/routine status,
-inventory/readiness counts, support level, evidence cases, numerical
-conformance, and Roadmap state remain unchanged.
+Line 2083 remains CP315's lexical first excluded executable, and CP316 now owns
+only that next condition slice. A true outer guard continues to CP316; a false
+guard, including every exact release evaluation, continues at line 2109.
+CP315 still owns no node read or inner comparison and does not connect the
+existing separate outdoor-air economizer helper.
+
+CP316 maps only the compound inner economizer condition at executable lines
+2083-2086. Internal characterization preserves the source's left-to-right
+short-circuit order: compare a first `EconomizerType` read with
+`DifferentialDryBulb`; only that selector reads the outdoor and recirculation
+node temperatures and applies strict `<`; only a false dry-bulb conjunction
+re-reads `EconomizerType` for `DifferentialEnthalpy`; and only that selector
+reads the two stored node enthalpies and applies strict `<`. A true disjunction
+would enter the first excluded executable at line 2089. A false disjunction
+continues at line 2109; lines 2087-2088 are non-executable whitespace and
+comment text.
+
+`calc/cooling_economizer_condition.rs` owns
+`PurchasedAirCalcCoolingEconomizerConditionSnapshot`,
+`PurchasedAirCalcCoolingEconomizerConditionRuntimeState`, and
+`PurchasedAirCalcCoolingEconomizerConditionLifecycleSummary`; its release
+boundary owns `PurchasedAirCalcCoolingEconomizerConditionError` and
+`advance_direct_no_oa_calc_cooling_economizer_condition`. The parent module
+owns `purchased_air_calc_cooling_economizer_condition_lifecycle_summary`.
+
+The binder orders CP316 after CP315 and before the existing numerical Calc.
+The exact no-OA release always arrives with CP315's false `NoEconomizer`
+result, so every CP316 transition is a complete source-site skip: zero
+dry-bulb and enthalpy selector reads, zero temperature or stored-enthalpy
+reads, zero strict comparisons, and zero line-2089 body entries. Per-step,
+lifecycle, and pipeline firewalls reconcile that one-for-one skip, publish
+`purchased_air_calc_cooling_economizer_condition_lifecycle` only for the
+direct release lane, and reject disconnected or non-direct evidence.
+Pre-sampled scalar inputs used by pure internal characterization do not grant
+live Node or outdoor-air service ownership.
+
+`PsyCpAirFnW`, `DeltaT`, supply- and outdoor-air flow calculation, limiting,
+or mutation, `EconoOn`, `TimeEconoActive`, line 2109 itself, and all later
+Calc numerics remain open. CP316 does not call or promote the separate
+outdoor-air economizer helper, which recomputes enthalpy and implements later
+effects outside this predicate-only slice. OA and Economizer stay forbidden
+for this release path. Both parents and the Calc routine retain their current
+status; algorithm/routine inventory and readiness counts, support level,
+required and forbidden features, evidence cases, numerical conformance, and
+Roadmap state remain unchanged.
 
 ## Current Launcher State
 

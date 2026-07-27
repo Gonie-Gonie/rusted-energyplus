@@ -1,6 +1,8 @@
 //! IdealLoads `CalcPurchAirLoads` compatibility calculations.
 
 mod cooling_economizer_guard;
+// CP316 follows the CP315 outer guard in source order.
+mod cooling_economizer_condition;
 mod cooling_entry_gate;
 mod cooling_oa_max_flow_body;
 mod cooling_oa_max_flow_gate;
@@ -16,6 +18,11 @@ mod types;
 
 #[cfg(test)]
 mod cooling_economizer_guard_tests;
+// CP316 tests follow the CP315 characterization module in source order.
+#[cfg(test)]
+mod cooling_economizer_condition_release_tests;
+#[cfg(test)]
+mod cooling_economizer_condition_tests;
 #[cfg(test)]
 mod cooling_entry_gate_tests;
 #[cfg(test)]
@@ -32,6 +39,8 @@ mod moisture_demand_tests;
 mod no_oa_tests;
 
 pub use cooling_economizer_guard::*;
+// CP316 exports follow the CP315 guard contract in source order.
+pub use cooling_economizer_condition::*;
 pub use cooling_entry_gate::*;
 pub use cooling_oa_max_flow_body::*;
 pub use cooling_oa_max_flow_gate::*;

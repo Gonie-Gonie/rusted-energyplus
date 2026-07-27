@@ -5,7 +5,10 @@ use crate::{
     ideal_loads::{
         DirectZonePurchasedAirCouplingInput, DirectZonePurchasedAirCouplingOutput,
         DirectZonePurchasedAirScheduleSnapshot, IdealLoadsInitFlags, IdealLoadsSensibleMode,
-        IdealLoadsZoneState, PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_FIRST_EXCLUDED_SOURCE,
+        IdealLoadsZoneState, PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_SOURCE_ORDER,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_SOURCE_ORDER,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
@@ -21,6 +24,7 @@ use crate::{
         PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER, PurchasedAirAvailabilityStatus,
+        PurchasedAirCalcCoolingEconomizerConditionSnapshot,
         PurchasedAirCalcCoolingEconomizerGuardSnapshot, PurchasedAirCalcCoolingEntryGateSnapshot,
         PurchasedAirCalcCoolingOaMaxFlowBodySnapshot, PurchasedAirCalcCoolingOaMaxFlowGateSnapshot,
         PurchasedAirCalcEntryDemandSnapshot, PurchasedAirCalcEntryResetSnapshot,
@@ -424,6 +428,10 @@ fn scaled_output(
             initialization: initialized_snapshot(system),
         })
         .expect("valid bounded coupling fixture");
+    let calculation_cooling_economizer_guard =
+        calculation_cooling_economizer_guard_snapshot(system, sample_index, coupling);
+    let calculation_cooling_economizer_condition =
+        calculation_cooling_economizer_condition_snapshot(calculation_cooling_economizer_guard);
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -455,11 +463,8 @@ fn scaled_output(
             sample_index,
             coupling,
         ),
-        calculation_cooling_economizer_guard: calculation_cooling_economizer_guard_snapshot(
-            system,
-            sample_index,
-            coupling,
-        ),
+        calculation_cooling_economizer_guard,
+        calculation_cooling_economizer_condition,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;
@@ -627,6 +632,58 @@ fn calculation_cooling_economizer_guard_snapshot(
         economizer_not_no_economizer: guard_evaluated.then_some(false),
         economizer_body_entered: false,
         no_economizer_fallthrough: guard_evaluated,
+    }
+}
+
+fn calculation_cooling_economizer_condition_snapshot(
+    predecessor: PurchasedAirCalcCoolingEconomizerGuardSnapshot,
+) -> PurchasedAirCalcCoolingEconomizerConditionSnapshot {
+    PurchasedAirCalcCoolingEconomizerConditionSnapshot {
+        source: PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_SOURCE,
+        first_excluded_source:
+            PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_FIRST_EXCLUDED_SOURCE,
+        system: predecessor.system,
+        parent_call_ordinal: predecessor.parent_call_ordinal,
+        source_order: PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_SOURCE_ORDER,
+        controlled_zone: predecessor.controlled_zone,
+        unit_body_entered: predecessor.unit_body_entered,
+        predecessor_cooling_body_entered: predecessor.predecessor_cooling_body_entered,
+        predecessor_maximum_cooling_flow_body_entered: predecessor
+            .predecessor_maximum_cooling_flow_body_entered,
+        predecessor_active_guard_false_economizer_fallthrough: predecessor
+            .predecessor_active_guard_false_economizer_fallthrough,
+        predecessor_economizer_guard_evaluated: predecessor.economizer_guard_evaluated,
+        predecessor_economizer_body_entered: predecessor.economizer_body_entered,
+        predecessor_no_economizer_fallthrough: predecessor.no_economizer_fallthrough,
+        unit_off_skipped: predecessor.unit_off_skipped,
+        non_cooling_skipped: predecessor.non_cooling_skipped,
+        maximum_cooling_flow_body_sibling_skipped: predecessor
+            .maximum_cooling_flow_body_sibling_skipped,
+        no_economizer_outer_guard_fallthrough_skipped: predecessor.no_economizer_fallthrough,
+        economizer_condition_evaluated: false,
+        differential_dry_bulb_economizer_type_read: false,
+        differential_dry_bulb_economizer_type: None,
+        differential_dry_bulb_selector_comparison_evaluated: false,
+        differential_dry_bulb_selector_matched: None,
+        outdoor_air_temperature_read: false,
+        outdoor_air_temperature_c: None,
+        recirculation_air_temperature_read: false,
+        recirculation_air_temperature_c: None,
+        dry_bulb_temperature_comparison_evaluated: false,
+        outdoor_air_temperature_below_recirculation_temperature: None,
+        differential_enthalpy_economizer_type_read: false,
+        differential_enthalpy_economizer_type: None,
+        differential_enthalpy_selector_comparison_evaluated: false,
+        differential_enthalpy_selector_matched: None,
+        outdoor_air_enthalpy_read: false,
+        outdoor_air_enthalpy_j_per_kg: None,
+        recirculation_air_enthalpy_read: false,
+        recirculation_air_enthalpy_j_per_kg: None,
+        enthalpy_comparison_evaluated: false,
+        outdoor_air_enthalpy_below_recirculation_enthalpy: None,
+        economizer_condition_satisfied: None,
+        economizer_calculation_body_entered: false,
+        economizer_condition_fallthrough: false,
     }
 }
 

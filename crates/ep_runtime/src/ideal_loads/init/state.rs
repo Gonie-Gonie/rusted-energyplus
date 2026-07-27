@@ -5,6 +5,8 @@ use std::collections::BTreeMap;
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
 use super::super::{
+    PurchasedAirCalcCoolingEconomizerConditionRuntimeState,
+    PurchasedAirCalcCoolingEconomizerConditionSnapshot,
     PurchasedAirCalcCoolingEconomizerGuardRuntimeState,
     PurchasedAirCalcCoolingEntryGateRuntimeState, PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState,
     PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState, PurchasedAirCalcEntryRuntimeState,
@@ -60,6 +62,28 @@ pub struct PurchasedAirRuntimeState {
     pub equipment_list_scanned_unit_count: usize,
     /// Units missing from every Zone equipment list during the sweep.
     pub equipment_list_missing_unit_count: usize,
+    cooling_economizer_condition_latest_witnesses:
+        BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingEconomizerConditionSnapshot>,
+}
+
+impl PurchasedAirRuntimeState {
+    pub(in crate::ideal_loads) fn cooling_economizer_condition_latest_witness(
+        &self,
+        system: IdealLoadsAirSystemId,
+    ) -> Option<PurchasedAirCalcCoolingEconomizerConditionSnapshot> {
+        self.cooling_economizer_condition_latest_witnesses
+            .get(&system)
+            .copied()
+    }
+
+    pub(in crate::ideal_loads) fn set_cooling_economizer_condition_latest_witness(
+        &mut self,
+        system: IdealLoadsAirSystemId,
+        snapshot: PurchasedAirCalcCoolingEconomizerConditionSnapshot,
+    ) {
+        self.cooling_economizer_condition_latest_witnesses
+            .insert(system, snapshot);
+    }
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -101,6 +125,8 @@ pub struct PurchasedAirUnitRuntimeState {
     pub calc_cooling_oa_max_flow_body: PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState,
     /// Persistent bounded cooling economizer outer-guard state.
     pub calc_cooling_economizer_guard: PurchasedAirCalcCoolingEconomizerGuardRuntimeState,
+    /// Persistent bounded cooling economizer inner-condition state.
+    pub calc_cooling_economizer_condition: PurchasedAirCalcCoolingEconomizerConditionRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -185,6 +211,8 @@ impl PurchasedAirUnitRuntimeState {
             calc_cooling_economizer_guard: PurchasedAirCalcCoolingEconomizerGuardRuntimeState::new(
                 system,
             ),
+            calc_cooling_economizer_condition:
+                PurchasedAirCalcCoolingEconomizerConditionRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

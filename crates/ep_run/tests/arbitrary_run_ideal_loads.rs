@@ -258,6 +258,11 @@ fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
         true
     );
     assert_eq!(summary["rust_runtime"]["samples"], 1);
+    let rust_runtime = summary["rust_runtime"]
+        .as_object()
+        .expect("diagnostic Rust runtime should be an object");
+    assert!(rust_runtime.contains_key("purchased_air_calc_cooling_economizer_condition_lifecycle"));
+    assert!(rust_runtime["purchased_air_calc_cooling_economizer_condition_lifecycle"].is_null());
     assert_eq!(summary["source_order_gate"]["matches"], true);
     assert_output_manifest(&output_dir, SUPPORTED_RUNTIME_MANIFEST)?;
     assert!(

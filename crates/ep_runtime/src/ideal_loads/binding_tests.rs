@@ -22,6 +22,10 @@ use ep_model::{
 
 type ModelMutationCase = (fn(&mut TypedModel), DirectZonePurchasedAirBindingFeature);
 
+#[path = "binding/cooling_economizer_condition_integrity_tests.rs"]
+mod cooling_economizer_condition_integrity_tests;
+#[path = "binding/cooling_economizer_condition_tests.rs"]
+mod cooling_economizer_condition_tests;
 #[path = "binding/cooling_economizer_guard_integrity_tests.rs"]
 mod cooling_economizer_guard_integrity_tests;
 #[path = "binding/cooling_economizer_guard_tests.rs"]
@@ -667,10 +671,8 @@ fn predictor_failure_precedes_and_preserves_purchased_air_initialization() {
     let mut state = zone_state_for_temp_independent_load(0.0);
     state.convective_internal_gain_w = f64::INFINITY;
     let original = state.clone();
-    let mut purchased_air_runtime_state = PurchasedAirRuntimeState {
-        module_initialized: true,
-        ..PurchasedAirRuntimeState::default()
-    };
+    let mut purchased_air_runtime_state = PurchasedAirRuntimeState::default();
+    purchased_air_runtime_state.module_initialized = true;
     let original_init_state = purchased_air_runtime_state.clone();
 
     let error = couple_model_bound_direct_zone_purchased_air(
@@ -703,10 +705,8 @@ fn initialization_failure_precedes_calc_only_input_validation() {
     let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
     let mut state = zone_state_for_temp_independent_load(0.0);
     state.air_humidity_ratio = -0.001;
-    let mut purchased_air_runtime_state = PurchasedAirRuntimeState {
-        module_initialized: true,
-        ..PurchasedAirRuntimeState::default()
-    };
+    let mut purchased_air_runtime_state = PurchasedAirRuntimeState::default();
+    purchased_air_runtime_state.module_initialized = true;
 
     let error = couple_model_bound_direct_zone_purchased_air(
         DirectZonePurchasedAirScheduledCouplingInput {

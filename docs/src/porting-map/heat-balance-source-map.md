@@ -33471,8 +33471,8 @@ evidence, conformance, and Roadmap state remain unchanged.
 The direct-Zone order is now predictor -> persistent Init -> CP310 Calc entry
 -> CP311 minimum-OA prefix -> CP312 cooling-entry gate -> CP313 cooling OA
 maximum-flow guard -> CP314 true-body lifecycle -> CP315 economizer outer
-guard -> existing bounded Calc -> update/report -> same-step Zone-air
-corrector. CP312 covers only
+guard -> CP316 economizer condition -> existing bounded Calc -> update/report
+-> same-step Zone-air corrector. CP312 covers only
 `CalcPurchAirLoads` lines 2046-2047. It consumes the retained CP310 demand and
 CP311 minimum-OA output, applies the inclusive comparison, conditionally
 records the Zone temperature-control-type read, excludes exact SingleHeat, and
@@ -33563,21 +33563,46 @@ partitions.
 The exact heat-balance release loop remains no-OA. EnergyPlus forces
 `NoEconomizer` on that input path, and the direct Rust binding requires the
 same typed enum. Every active release fallthrough therefore records one enum
-read and one false comparison, while the excluded inner condition has zero
-entries. Per-step and lifecycle firewalls reconcile those counts and the
+read and one false comparison, while CP316 has zero condition entries.
+Per-step and lifecycle firewalls reconcile those counts and the
 predecessor partitions before the unchanged bounded numerical result and
 same-step Zone-air corrector run.
 
-The lexical first excluded executable is line 2083. A true outer guard reaches
-the inner DifferentialDryBulb/DifferentialEnthalpy condition there; a false
-guard reaches line 2109. A CP314-true route also skips directly to line 2109.
-Those are next-dynamic-site labels only; CP315 executes neither site. Node
-temperature/enthalpy reads, `CpAir`, `DeltaT`, supply and outdoor-air
-flow calculation or mutation, `EconoOn`, `TimeEconoActive`, line 2109 and all
-later cooling work remain excluded. This guard-only lifecycle does not connect
-the separate outdoor-air economizer helper, add a heat-balance or predictor
-equation, or promote OA/economizer, numerical, or conformance support.
-Parent/routine status, inventory/readiness counts, forbidden features,
+Line 2083 remains CP315's lexical first excluded executable. A true outer
+guard reaches CP316 there; a false guard reaches line 2109. A CP314-true route
+also skips directly to line 2109. CP315 executes neither site and owns no node
+read or inner comparison.
+
+## CP316 Cooling Economizer Condition Inside the Heat-Balance Loop
+
+CP316 maps only `CalcPurchAirLoads` executable lines 2083-2086 after CP315.
+For an internally characterized true CP315 predecessor, it preserves the
+left-to-right `&&`/`||` shape: test `DifferentialDryBulb`, conditionally read
+the two node temperatures and compare strict `<`, then only after that
+conjunction is false re-read the enum for `DifferentialEnthalpy`,
+conditionally read the two stored Node enthalpies, and compare strict `<`.
+A satisfied dry-bulb branch short-circuits every enthalpy site. These are
+pre-sampled scalar characterization reads, not live heat-balance Node
+ownership, and stored enthalpy is not recomputed.
+
+The exact heat-balance release loop remains no-OA, so CP315 is false
+`NoEconomizer` on every active fallthrough. Every CP316 release transition
+therefore skips all mapped condition sites. Per-step and lifecycle firewalls
+reconcile one complete skip per CP315 transition and zero selector enum reads,
+node temperature or enthalpy reads, strict comparisons, satisfied
+comparisons, and economizer calculation-body entries before the unchanged
+bounded numerical result and same-step Zone-air corrector run.
+
+Lines 2087-2088 are non-executable, making line 2089 the lexical first
+excluded executable. A true condition reaches line 2089 and a false condition
+reaches line 2109. `PsyCpAirFnW`, `DeltaT`, supply and outdoor-air flow
+calculation, limiting or mutation, `EconoOn`, `TimeEconoActive`, line 2109 and
+all later cooling work remain excluded. CP316 neither calls nor connects the
+separate outdoor-air economizer helper. This condition-only lifecycle adds no
+heat-balance or predictor equation, live OA/economizer state, node service,
+numerical behavior, or conformance support. Both parents remain
+`scaffold`/`none`, the Calc routine remains `source_mapped`, and
+algorithm/routine counts, inventory/readiness, required or forbidden features,
 evidence, numerical conformance, and Roadmap state remain unchanged.
 
 ## Data Structure Map

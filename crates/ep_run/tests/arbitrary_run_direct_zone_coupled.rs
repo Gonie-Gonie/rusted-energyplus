@@ -42,6 +42,24 @@ const CALC_COOLING_OA_MAX_FLOW_BODY_RECURRING_WARNING_CHILD_SOURCE: &str =
 const CALC_COOLING_ECONOMIZER_GUARD_SOURCE: &str = "EnergyPlus 26.1 PurchasedAirManager.cc:2082";
 const CALC_COOLING_ECONOMIZER_GUARD_FIRST_EXCLUDED_SOURCE: &str =
     "EnergyPlus 26.1 PurchasedAirManager.cc:2083";
+const CALC_COOLING_ECONOMIZER_CONDITION_SOURCE: &str =
+    "EnergyPlus 26.1 PurchasedAirManager.cc:2083-2086";
+const CALC_COOLING_ECONOMIZER_CONDITION_FIRST_EXCLUDED_SOURCE: &str =
+    "EnergyPlus 26.1 PurchasedAirManager.cc:2089";
+const CALC_COOLING_ECONOMIZER_CONDITION_SOURCE_ORDER: [&str; 12] = [
+    "read-economizer-type-for-differential-dry-bulb",
+    "compare-economizer-type-equal-to-differential-dry-bulb",
+    "read-outdoor-air-node-temperature-after-dry-bulb-match",
+    "read-zone-recirculation-air-node-temperature-after-dry-bulb-match",
+    "compare-strict-outdoor-temperature-below-zone-recirculation-temperature",
+    "read-economizer-type-for-differential-enthalpy-after-dry-bulb-arm-false",
+    "compare-economizer-type-equal-to-differential-enthalpy",
+    "read-outdoor-air-node-enthalpy-after-enthalpy-match",
+    "read-zone-recirculation-air-node-enthalpy-after-enthalpy-match",
+    "compare-strict-outdoor-enthalpy-below-zone-recirculation-enthalpy",
+    "select-excluded-line-2089-if-compound-condition-satisfied",
+    "select-excluded-line-2109-if-compound-condition-false",
+];
 const COUPLED_SOURCE_ORDER: [&str; 6] = [
     "predict-system-loads",
     "init-purchased-air",
@@ -685,6 +703,7 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
     );
     assert_zero_effect_cooling_oa_max_flow_body(runtime, expected_calls, expected_calls, 0);
     assert_cooling_economizer_guard(runtime, expected_calls, expected_calls, 0);
+    assert_cooling_economizer_condition(runtime, expected_calls, expected_calls, 0);
 }
 
 fn assert_zero_effect_cooling_oa_max_flow_body(
@@ -875,6 +894,143 @@ fn assert_cooling_economizer_guard(
     }
 }
 
+fn assert_cooling_economizer_condition(
+    runtime: &Value,
+    expected_calls: u64,
+    expected_non_cooling_skips: u64,
+    expected_outer_false_skips: u64,
+) {
+    assert!(expected_calls > 0);
+    assert_eq!(
+        expected_non_cooling_skips + expected_outer_false_skips,
+        expected_calls,
+        "this helper only accepts homogeneous non-cooling or NoEconomizer runs"
+    );
+    let latest_non_cooling_skipped = expected_non_cooling_skips == expected_calls;
+    let latest_outer_false_skipped = expected_outer_false_skips == expected_calls;
+    assert_ne!(latest_non_cooling_skipped, latest_outer_false_skipped);
+
+    let condition = &runtime["purchased_air_calc_cooling_economizer_condition_lifecycle"];
+    assert!(
+        condition.is_object(),
+        "direct runtime must publish the CP316 key"
+    );
+    assert_eq!(
+        condition["source"],
+        CALC_COOLING_ECONOMIZER_CONDITION_SOURCE
+    );
+    assert_eq!(
+        condition["first_excluded_source"],
+        CALC_COOLING_ECONOMIZER_CONDITION_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(condition["system"], 0);
+    assert_eq!(condition["transition_count"], expected_calls);
+    assert_eq!(condition["condition_evaluation_count"], 0);
+    assert_eq!(condition["unit_off_skip_count"], 0);
+    assert_eq!(
+        condition["non_cooling_skip_count"],
+        expected_non_cooling_skips
+    );
+    assert_eq!(condition["maximum_cooling_flow_body_sibling_skip_count"], 0);
+    assert_eq!(
+        condition["no_economizer_outer_guard_fallthrough_skip_count"],
+        expected_outer_false_skips
+    );
+    for field in [
+        "differential_dry_bulb_economizer_type_read_count",
+        "differential_dry_bulb_selector_comparison_count",
+        "differential_dry_bulb_selector_match_count",
+        "outdoor_air_temperature_read_count",
+        "recirculation_air_temperature_read_count",
+        "dry_bulb_temperature_comparison_count",
+        "dry_bulb_temperature_comparison_satisfied_count",
+        "differential_enthalpy_economizer_type_read_count",
+        "differential_enthalpy_selector_comparison_count",
+        "differential_enthalpy_selector_match_count",
+        "outdoor_air_enthalpy_read_count",
+        "recirculation_air_enthalpy_read_count",
+        "enthalpy_comparison_count",
+        "enthalpy_comparison_satisfied_count",
+        "economizer_calculation_body_entry_count",
+        "economizer_condition_fallthrough_count",
+    ] {
+        assert_eq!(condition[field], 0, "{field}");
+    }
+
+    let latest = &condition["latest"];
+    assert_eq!(latest["source"], CALC_COOLING_ECONOMIZER_CONDITION_SOURCE);
+    assert_eq!(
+        latest["first_excluded_source"],
+        CALC_COOLING_ECONOMIZER_CONDITION_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(latest["system"], 0);
+    assert_eq!(latest["controlled_zone"], 0);
+    assert_eq!(latest["parent_call_ordinal"], expected_calls);
+    assert_eq!(
+        string_array(&latest["source_order"]),
+        CALC_COOLING_ECONOMIZER_CONDITION_SOURCE_ORDER
+    );
+    assert_eq!(latest["unit_body_entered"], true);
+    assert_eq!(
+        latest["predecessor_cooling_body_entered"],
+        latest_outer_false_skipped
+    );
+    assert_eq!(
+        latest["predecessor_maximum_cooling_flow_body_entered"],
+        false
+    );
+    assert_eq!(
+        latest["predecessor_active_guard_false_economizer_fallthrough"],
+        latest_outer_false_skipped
+    );
+    assert_eq!(
+        latest["predecessor_economizer_guard_evaluated"],
+        latest_outer_false_skipped
+    );
+    assert_eq!(latest["predecessor_economizer_body_entered"], false);
+    assert_eq!(
+        latest["predecessor_no_economizer_fallthrough"],
+        latest_outer_false_skipped
+    );
+    assert_eq!(latest["economizer_condition_evaluated"], false);
+    assert_eq!(latest["economizer_calculation_body_entered"], false);
+    assert_eq!(latest["economizer_condition_fallthrough"], false);
+    assert_eq!(
+        latest["no_economizer_outer_guard_fallthrough_skipped"],
+        latest_outer_false_skipped
+    );
+    assert_eq!(latest["non_cooling_skipped"], latest_non_cooling_skipped);
+    for field in [
+        "differential_dry_bulb_economizer_type_read",
+        "differential_dry_bulb_selector_comparison_evaluated",
+        "outdoor_air_temperature_read",
+        "recirculation_air_temperature_read",
+        "dry_bulb_temperature_comparison_evaluated",
+        "differential_enthalpy_economizer_type_read",
+        "differential_enthalpy_selector_comparison_evaluated",
+        "outdoor_air_enthalpy_read",
+        "recirculation_air_enthalpy_read",
+        "enthalpy_comparison_evaluated",
+    ] {
+        assert_eq!(latest[field], false, "{field}");
+    }
+    for field in [
+        "differential_dry_bulb_economizer_type",
+        "differential_dry_bulb_selector_matched",
+        "outdoor_air_temperature_c",
+        "recirculation_air_temperature_c",
+        "outdoor_air_temperature_below_recirculation_temperature",
+        "differential_enthalpy_economizer_type",
+        "differential_enthalpy_selector_matched",
+        "outdoor_air_enthalpy_j_per_kg",
+        "recirculation_air_enthalpy_j_per_kg",
+        "outdoor_air_enthalpy_below_recirculation_enthalpy",
+        "economizer_condition_satisfied",
+    ] {
+        assert!(latest[field].is_null(), "{field}");
+    }
+}
+
 #[test]
 fn all_hard_sized_finite_limit_branches_limit_live_cooling()
 -> Result<(), Box<dyn std::error::Error>> {
@@ -1026,6 +1182,7 @@ fn all_hard_sized_finite_limit_branches_limit_live_cooling()
         }
         assert_zero_effect_cooling_oa_max_flow_body(&summary["rust_runtime"], 2, 0, 2);
         assert_cooling_economizer_guard(&summary["rust_runtime"], 2, 0, 2);
+        assert_cooling_economizer_condition(&summary["rust_runtime"], 2, 0, 2);
 
         let results = read_json(&output_dir.join("results").join("result-store.json"))?;
         let cooling_rate = find_series(

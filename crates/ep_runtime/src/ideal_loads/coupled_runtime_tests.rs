@@ -3,6 +3,8 @@ use super::*;
 use crate::{
     ideal_loads::{
         DirectZonePurchasedAirBindingFeature, IdealLoadsSensibleLimitContext,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
@@ -44,6 +46,25 @@ const ZONE_KEY: &str = "ZONE ONE";
 const SUPPLY_NODE_KEY: &str = "SUPPLY";
 const RETURN_NODE_KEY: &str = "RETURN";
 const ABS_TOLERANCE: f64 = 1.0e-9;
+
+#[test]
+fn cooling_economizer_condition_partition_overflow_fails_closed() {
+    let error = super::cooling_economizer_condition_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingEconomizerConditionLifecycleInvariant {
+            field: "test_partition_overflow",
+            expected: 1,
+            actual: usize::MAX,
+        }
+    ));
+}
 
 #[test]
 fn cooling_economizer_guard_partition_overflow_fails_closed() {
@@ -507,6 +528,62 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
     assert!(!latest_economizer_guard.economizer_guard_evaluated);
     assert_eq!(latest_economizer_guard.economizer_type, None);
     assert!(!latest_economizer_guard.economizer_body_entered);
+    let economizer_condition = simulation
+        .summary
+        .calc_cooling_economizer_condition_lifecycle;
+    assert_eq!(
+        economizer_condition.source,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_SOURCE
+    );
+    assert_eq!(
+        economizer_condition.first_excluded_source,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_FIRST_EXCLUDED_SOURCE
+    );
+    let condition_state = economizer_condition.state;
+    assert_eq!(condition_state.transition_count, required_steps);
+    assert_eq!(condition_state.condition_evaluation_count, 0);
+    assert_eq!(condition_state.unit_off_skip_count, 0);
+    assert_eq!(condition_state.non_cooling_skip_count, required_steps);
+    assert_eq!(
+        condition_state.maximum_cooling_flow_body_sibling_skip_count,
+        0
+    );
+    assert_eq!(
+        condition_state.no_economizer_outer_guard_fallthrough_skip_count,
+        0
+    );
+    assert_eq!(
+        condition_state.differential_dry_bulb_economizer_type_read_count,
+        0
+    );
+    assert_eq!(
+        condition_state.differential_dry_bulb_selector_comparison_count,
+        0
+    );
+    assert_eq!(condition_state.outdoor_air_temperature_read_count, 0);
+    assert_eq!(condition_state.recirculation_air_temperature_read_count, 0);
+    assert_eq!(condition_state.dry_bulb_temperature_comparison_count, 0);
+    assert_eq!(
+        condition_state.differential_enthalpy_economizer_type_read_count,
+        0
+    );
+    assert_eq!(
+        condition_state.differential_enthalpy_selector_comparison_count,
+        0
+    );
+    assert_eq!(condition_state.outdoor_air_enthalpy_read_count, 0);
+    assert_eq!(condition_state.recirculation_air_enthalpy_read_count, 0);
+    assert_eq!(condition_state.enthalpy_comparison_count, 0);
+    assert_eq!(condition_state.economizer_calculation_body_entry_count, 0);
+    assert_eq!(condition_state.economizer_condition_fallthrough_count, 0);
+    let latest_condition = condition_state.latest.expect("latest CP316 snapshot");
+    assert!(latest_condition.non_cooling_skipped);
+    assert!(!latest_condition.economizer_condition_evaluated);
+    assert_eq!(latest_condition.differential_dry_bulb_economizer_type, None);
+    assert_eq!(latest_condition.differential_enthalpy_economizer_type, None);
+    assert_eq!(latest_condition.economizer_condition_satisfied, None);
+    assert!(!latest_condition.economizer_calculation_body_entered);
+    assert!(!latest_condition.economizer_condition_fallthrough);
 
     let zone = simulation.state.zones.first().expect("bound Zone state");
     assert_eq!(simulation.state.timestep_index, required_steps);
@@ -902,6 +979,75 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
         assert_eq!(latest_guard.economizer_not_no_economizer, Some(false));
         assert!(!latest_guard.economizer_body_entered);
         assert!(latest_guard.no_economizer_fallthrough);
+        let condition_lifecycle = simulation
+            .summary
+            .calc_cooling_economizer_condition_lifecycle;
+        assert_eq!(
+            condition_lifecycle.source,
+            PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_SOURCE
+        );
+        assert_eq!(
+            condition_lifecycle.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_FIRST_EXCLUDED_SOURCE
+        );
+        let condition_state = condition_lifecycle.state;
+        assert_eq!(condition_state.transition_count, 1, "{limit:?}");
+        assert_eq!(condition_state.condition_evaluation_count, 0, "{limit:?}");
+        assert_eq!(condition_state.unit_off_skip_count, 0, "{limit:?}");
+        assert_eq!(condition_state.non_cooling_skip_count, 0, "{limit:?}");
+        assert_eq!(
+            condition_state.maximum_cooling_flow_body_sibling_skip_count, 0,
+            "{limit:?}"
+        );
+        assert_eq!(
+            condition_state.no_economizer_outer_guard_fallthrough_skip_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            condition_state.differential_dry_bulb_economizer_type_read_count,
+            0
+        );
+        assert_eq!(
+            condition_state.differential_dry_bulb_selector_comparison_count,
+            0
+        );
+        assert_eq!(
+            condition_state.differential_dry_bulb_selector_match_count,
+            0
+        );
+        assert_eq!(condition_state.outdoor_air_temperature_read_count, 0);
+        assert_eq!(condition_state.recirculation_air_temperature_read_count, 0);
+        assert_eq!(condition_state.dry_bulb_temperature_comparison_count, 0);
+        assert_eq!(
+            condition_state.dry_bulb_temperature_comparison_satisfied_count,
+            0
+        );
+        assert_eq!(
+            condition_state.differential_enthalpy_economizer_type_read_count,
+            0
+        );
+        assert_eq!(
+            condition_state.differential_enthalpy_selector_comparison_count,
+            0
+        );
+        assert_eq!(
+            condition_state.differential_enthalpy_selector_match_count,
+            0
+        );
+        assert_eq!(condition_state.outdoor_air_enthalpy_read_count, 0);
+        assert_eq!(condition_state.recirculation_air_enthalpy_read_count, 0);
+        assert_eq!(condition_state.enthalpy_comparison_count, 0);
+        assert_eq!(condition_state.enthalpy_comparison_satisfied_count, 0);
+        assert_eq!(condition_state.economizer_calculation_body_entry_count, 0);
+        assert_eq!(condition_state.economizer_condition_fallthrough_count, 0);
+        let latest_condition = condition_state.latest.expect("latest CP316 skip snapshot");
+        assert!(latest_condition.predecessor_economizer_guard_evaluated);
+        assert!(latest_condition.predecessor_no_economizer_fallthrough);
+        assert!(latest_condition.no_economizer_outer_guard_fallthrough_skipped);
+        assert!(!latest_condition.economizer_condition_evaluated);
+        assert_eq!(latest_condition.economizer_condition_satisfied, None);
+        assert!(!latest_condition.economizer_calculation_body_entered);
+        assert!(!latest_condition.economizer_condition_fallthrough);
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation

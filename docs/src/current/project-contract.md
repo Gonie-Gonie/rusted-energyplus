@@ -15817,8 +15817,9 @@ nonnegative maximum and are false. Therefore CP314 executes no mapped site,
 reads no `StdRhoAir` or warning state, performs no division or clamp, allocates
 no index, and leaves every warning/body counter at zero.
 
-The binder executes CP314 after CP313 and before CP315 and the pre-existing
-numerical Calc. Per-step validation checks source provenance, one-for-one
+The binder executes CP314 after CP313 and before CP315, CP316, and the
+pre-existing numerical Calc. Per-step validation checks source provenance,
+one-for-one
 predecessor order, the complete skipped shape on release, and zero
 warning/clamp effects.
 Final lifecycle and `ep_run` validation reconcile one transition per CP313
@@ -15892,26 +15893,23 @@ and may produce a true outer-guard result for typed DifferentialDryBulb or
 DifferentialEnthalpy, but it stops before line 2083 and makes neither route
 release-admissible.
 
-The binder executes CP315 after CP314 and before the pre-existing numerical
-Calc. Per-step validation checks source provenance, the linked predecessor and
-latest-state identity, the complete skip versus active-fallthrough partition,
-the one-read/one-comparison active shape, and the exact false release result.
+The binder executes CP315 after CP314 and before CP316. Per-step validation
+checks source provenance, the linked predecessor and latest-state identity,
+the complete skip versus active-fallthrough partition, the
+one-read/one-comparison active shape, and the exact false release result.
 Final lifecycle and `ep_run` validation reconcile one transition per CP314
 transition, checked partitions and counts, retained latest enum/result state,
-zero release inner-body entries, and direct-only evidence. Direct JSON
+zero release CP316 condition entries, and direct-only evidence. Direct JSON
 publishes `purchased_air_calc_cooling_economizer_guard_lifecycle`, while
 non-direct or disconnected evidence is rejected.
 
-The lexical first executable outside CP315 is line 2083, the first comparison
-of the inner DifferentialDryBulb/DifferentialEnthalpy condition spanning lines
-2083-2086. A true CP315 guard continues to line 2083. A false guard continues
-to the unconditional `SupplyMassFlowRateForCool = 0.0` at line 2109; a
+Line 2083 remains CP315's lexical first excluded executable, the first
+comparison of the inner DifferentialDryBulb/DifferentialEnthalpy condition.
+A true CP315 guard continues to CP316 at line 2083. A false guard continues to
+the unconditional `SupplyMassFlowRateForCool = 0.0` at line 2109; a
 CP313-true/CP314-body route also skips the sibling `else` and reaches line
-2109. CP315 maps neither continuation. Outdoor and recirculation node
-temperature or enthalpy reads, `PsyCpAirFnW`, `DeltaT`, supply-flow limiting,
-outdoor-air flow mutation, `EconoOn`, `TimeEconoActive`, line 2109 and all
-later cooling/mixed-air/humidity/capacity work, Heat/DeadBand selection at line
-2348, partial effects, retry, reset, and concurrency remain excluded.
+2109. CP315 maps neither continuation and owns no node read or inner
+comparison.
 
 This remains guard-only lifecycle evidence. It does not connect or promote the
 separate outdoor-air economizer compatibility helper, and does not remove
@@ -15920,6 +15918,89 @@ Both parents remain `scaffold`/`none`; `routine.calc_purch_air_loads` remains
 `source_mapped`; no routine row, inventory/readiness count, capability level,
 run state, required or forbidden feature, evidence case, numerical
 conformance, or Roadmap state is promoted.
+
+## CP316 Source-Ordered Cooling Economizer Condition
+
+CP316 supersedes only CP315's line-2083 exclusion for EnergyPlus 26.1
+`PurchasedAirManager.cc` executable lines 2083-2086. It maps the compound
+inner condition beneath the line-2082 outer guard and no statement from its
+true body. A false CP315 predecessor skips the complete CP316 condition and
+continues at line 2109. A true predecessor evaluates the condition in this
+source order:
+
+1. read `EconomizerType` for the dry-bulb selector;
+2. compare it with `DifferentialDryBulb` using source `==`;
+3. only after a true dry-bulb selector, read outdoor-node temperature;
+4. read recirculation-node temperature;
+5. compare those temperatures using strict `<`;
+6. only after the dry-bulb conjunction is false, re-read `EconomizerType`;
+7. compare it with `DifferentialEnthalpy` using source `==`;
+8. only after a true enthalpy selector, read outdoor-node stored enthalpy;
+9. read recirculation-node stored enthalpy;
+10. compare those stored enthalpies using strict `<`;
+11. select the excluded line-2089 body when the disjunction is true; and
+12. select the excluded line-2109 continuation when the disjunction is false.
+
+The source `&&` and `||` short-circuit semantics are part of the boundary.
+A true dry-bulb conjunction performs no second enum read or enthalpy-node
+read. A false dry-bulb conjunction performs the second enum read, but reads
+enthalpy nodes only for `DifferentialEnthalpy`. The enthalpy values are the
+already stored Node fields, not values recomputed from temperature and
+humidity ratio. Pure characterization accepts pre-sampled scalar values to
+make this read order testable; it neither samples live Node state nor grants
+Node, outdoor-air, or economizer service ownership.
+
+`calc/cooling_economizer_condition.rs` owns
+`PurchasedAirCalcCoolingEconomizerConditionSnapshot`,
+`PurchasedAirCalcCoolingEconomizerConditionRuntimeState`, and
+`PurchasedAirCalcCoolingEconomizerConditionLifecycleSummary`.
+`calc/cooling_economizer_condition/release.rs` owns
+`PurchasedAirCalcCoolingEconomizerConditionError` and
+`advance_direct_no_oa_calc_cooling_economizer_condition`; the parent module
+owns
+`purchased_air_calc_cooling_economizer_condition_lifecycle_summary`.
+
+The public exact release transition requires the retained CP315 snapshot,
+initialization and selected-unit identities, one-for-one CP310-through-CP316
+order, the exact direct no-OA subset, and one exact UnitOff, non-cooling, or
+active CP315-false predecessor partition before mutation. Because that subset
+requires `NoEconomizer`, CP315 is false on every active evaluation. Therefore
+every public CP316 transition records a complete condition skip: zero
+dry-bulb-selector enum reads, zero temperature reads and comparisons, zero
+enthalpy-selector enum reads, zero stored-enthalpy reads and comparisons, and
+zero adjustment-body entries. Internal DifferentialDryBulb and
+DifferentialEnthalpy characterization remains non-release.
+
+The binder executes CP316 after CP315 and before the pre-existing numerical
+Calc. Per-step validation checks source provenance, retained predecessor and
+latest-state identity, exact predecessor shape, and the all-sites-skipped
+release snapshot. Final lifecycle and `ep_run` validation reconcile one
+transition per CP315 transition, checked complete-skip versus internal
+evaluation partitions, zero release read/comparison/body counts, and
+direct-only evidence. Direct JSON publishes
+`purchased_air_calc_cooling_economizer_condition_lifecycle`; non-direct or
+disconnected evidence is rejected.
+
+Lines 2087-2088 are non-executable whitespace and comment text. The lexical
+first excluded executable is therefore line 2089,
+`CpAir = PsyCpAirFnW(thisZoneHB.airHumRat)`. A true CP316 condition reaches
+line 2089; a false condition reaches the unconditional line-2109 cooling-flow
+reset. `PsyCpAirFnW`, `DeltaT`, supply-flow calculation and limiting,
+outdoor-air flow mutation, `EconoOn`, `TimeEconoActive`, line 2109 and all
+later cooling/mixed-air/humidity/capacity work, Heat/DeadBand selection at line
+2348, partial effects, retry, reset, and concurrency remain excluded.
+
+CP316 does not call, connect, or promote the separate
+`calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s` compatibility
+helper. That helper's enthalpy recomputation and later mass-flow effects are
+outside this stored-value predicate slice. This is condition-only lifecycle
+evidence, not live OA/economizer ownership or numerical support.
+`algorithm.zone_temp_predictor_corrector_source_order` and
+`algorithm.ideal_loads_zone_equipment_purchased_air_source_order` both remain
+`scaffold`/`none`; `routine.calc_purch_air_loads` remains `source_mapped`.
+The 32-algorithm and 293-routine inventory, readiness split, support levels,
+run state, required and forbidden features, evidence cases, numerical
+conformance, and Roadmap state remain unchanged.
 
 
 

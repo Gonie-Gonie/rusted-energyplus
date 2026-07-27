@@ -21,6 +21,8 @@ use super::{
     DirectZonePurchasedAirCouplingError, DirectZonePurchasedAirCouplingInput,
     DirectZonePurchasedAirCouplingOutput, IdealLoadsPurchasedAirBranch,
     IdealLoadsSensibleLimitContext, PurchasedAirAvailabilityStatus,
+    PurchasedAirCalcCoolingEconomizerConditionError,
+    PurchasedAirCalcCoolingEconomizerConditionSnapshot,
     PurchasedAirCalcCoolingEconomizerGuardError, PurchasedAirCalcCoolingEconomizerGuardSnapshot,
     PurchasedAirCalcCoolingEntryGateError, PurchasedAirCalcCoolingEntryGateSnapshot,
     PurchasedAirCalcCoolingOaMaxFlowBodyError, PurchasedAirCalcCoolingOaMaxFlowBodySnapshot,
@@ -30,7 +32,8 @@ use super::{
     PurchasedAirHardSizeLegacyContext, PurchasedAirInitCallContext, PurchasedAirInitError,
     PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanError, PurchasedAirInitSnapshot,
     PurchasedAirInitTopologyPlan, PurchasedAirInitTopologyPlanError, PurchasedAirRuntimeState,
-    PurchasedAirTemperatureControlType, advance_direct_no_oa_calc_cooling_economizer_guard,
+    PurchasedAirTemperatureControlType, advance_direct_no_oa_calc_cooling_economizer_condition,
+    advance_direct_no_oa_calc_cooling_economizer_guard,
     advance_direct_no_oa_calc_cooling_entry_gate,
     advance_direct_no_oa_calc_cooling_oa_max_flow_body,
     advance_direct_no_oa_calc_cooling_oa_max_flow_gate,
@@ -585,6 +588,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingOaMaxFlowBody(PurchasedAirCalcCoolingOaMaxFlowBodyError),
     /// The bounded cooling economizer guard rejected its release state.
     CalculationCoolingEconomizerGuard(PurchasedAirCalcCoolingEconomizerGuardError),
+    /// The bounded cooling economizer condition rejected its release state.
+    CalculationCoolingEconomizerCondition(PurchasedAirCalcCoolingEconomizerConditionError),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -666,6 +671,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     pub calculation_cooling_oa_max_flow_body: PurchasedAirCalcCoolingOaMaxFlowBodySnapshot,
     /// Source-ordered cooling economizer guard snapshot.
     pub calculation_cooling_economizer_guard: PurchasedAirCalcCoolingEconomizerGuardSnapshot,
+    /// Source-ordered cooling economizer differential condition snapshot.
+    pub calculation_cooling_economizer_condition:
+        PurchasedAirCalcCoolingEconomizerConditionSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
@@ -829,6 +837,15 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_oa_max_flow_body,
     )
     .map_err(DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingEconomizerGuard)?;
+    let calculation_cooling_economizer_condition =
+        advance_direct_no_oa_calc_cooling_economizer_condition(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_economizer_guard,
+        )
+        .map_err(
+            DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingEconomizerCondition,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -872,6 +889,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_oa_max_flow_gate,
         calculation_cooling_oa_max_flow_body,
         calculation_cooling_economizer_guard,
+        calculation_cooling_economizer_condition,
         coupling,
     })
 }
