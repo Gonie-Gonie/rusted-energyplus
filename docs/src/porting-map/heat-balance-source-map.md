@@ -30088,8 +30088,12 @@ Rust owns an explicit bounded counterpart in
 `resolve_minimum_outdoor_air_compat` only for an available unit, returns an
 immutable design/selected/DCV/final-flow snapshot, and feeds the final minimum
 to its separate OA Calc path. An unavailable unit skips resolution and carries
-no minimum result. There is no mutable output reference or persistent
-PurchasedAir field with the source write order.
+no minimum result. That diagnostic resolver remains immutable and separate
+from the persistent release lifecycle. CP311 later adds only the bounded
+parent call site and the no-OA child route that rewrites retained
+`MinOAMassFlowRate=0` in source order. It does not add the source mutable-output
+reference, the OA-true child graph, or complete child failure and partial-write
+order.
 
 The resolver supports the six basic DSOA methods: Flow/Person, Flow/Area,
 Flow/Zone, AirChanges/Hour, Sum, and Maximum. It substitutes current people for
@@ -33428,10 +33432,35 @@ predictor, Init topology, and coupling count; the pipeline publishes it only
 for the direct runtime.
 
 No heat-balance, predictor, surface, or Zone-air corrector equation is added or
-promoted. The line-2023-and-later Calc body, actual schedule/ZoneComp services,
+promoted. CP310 stops before line 2023. Actual schedule/ZoneComp services,
 OA/EMS/modes/psychrometrics/limits/mixed air, node/report writes, adaptive
-iteration, and full lifecycle parity remain excluded. Parent/routine status,
-counts, capabilities, evidence, conformance, and Roadmap state remain
+iteration, and full lifecycle parity remain outside that checkpoint.
+
+## CP311 PurchasedAir Minimum-OA Prefix Inside the Heat-Balance Loop
+
+The direct-Zone order is now predictor -> persistent Init -> CP310 Calc entry
+-> CP311 minimum-OA prefix -> existing bounded Calc -> update/report ->
+same-step Zone-air corrector. CP311 consumes CP310's retained `UnitOn` decision
+and maps parent lines 2023-2040, stopping before the first later executable
+mode-selection branch at line 2046.
+
+For each entered body, Rust records the line-2023 controlled-Zone
+heat-balance-reference binding without reading a heat-balance value, visits
+the line-2025 child, executes only its bounded no-OA retained-zero route,
+records false EMS and `OutdoorAir` predicates, and records zero sensible and
+moisture effects. A CP310 UnitOff result skips the complete prefix. HeatOn and
+CoolOn do not independently gate this placement. The release lifecycle
+reconciles one CP311 transition per CP310 call, active/UnitOff partitions,
+child and retained-write counts, zero OA/EMS/psychrometric activity, exact
+latest identities and values, and direct-only JSON evidence.
+
+No heat-balance alias ownership or equation, predictor input, surface value,
+or corrector calculation is added: the Zone heat-balance reference is
+reachability evidence only. The full minimum-OA child and its
+DSOA/DCV/schedule/density/CO2 behavior, OA-true psychrometrics and load
+formulas, EMS local-flow override, operating-mode work at line 2046 and later,
+and full PurchasedAir feedback lifecycle remain excluded. Parent/routine
+status, counts, support, evidence, conformance, and Roadmap state remain
 unchanged.
 
 ## Data Structure Map

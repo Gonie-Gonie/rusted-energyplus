@@ -6,8 +6,10 @@ use crate::{
         DirectZonePurchasedAirCouplingInput, DirectZonePurchasedAirCouplingOutput,
         DirectZonePurchasedAirScheduleSnapshot, IdealLoadsInitFlags, IdealLoadsZoneState,
         PURCHASED_AIR_CALC_ENTRY_SOURCE, PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER,
-        PurchasedAirAvailabilityStatus, PurchasedAirCalcEntryDemandSnapshot,
-        PurchasedAirCalcEntryResetSnapshot, PurchasedAirCalcEntrySnapshot,
+        PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE, PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
+        PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER, PurchasedAirAvailabilityStatus,
+        PurchasedAirCalcEntryDemandSnapshot, PurchasedAirCalcEntryResetSnapshot,
+        PurchasedAirCalcEntrySnapshot, PurchasedAirCalcMinimumOaPrefixSnapshot,
         PurchasedAirInitSnapshot, PurchasedAirInitTransition, PurchasedAirRecirculationSource,
         couple_direct_zone_predicted_demand_to_purchased_air,
     },
@@ -418,6 +420,11 @@ fn scaled_output(
         },
         initialization: initialized_snapshot(system),
         calculation_entry: calculation_entry_snapshot(system, sample_index, coupling),
+        calculation_minimum_outdoor_air: calculation_minimum_oa_snapshot(
+            system,
+            sample_index,
+            coupling,
+        ),
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;
@@ -446,6 +453,37 @@ fn scaled_output(
     demand.remaining_output_req_to_heat_sp_w = 19.0 * scale;
     demand.remaining_output_req_to_cool_sp_w = -20.0 * scale;
     output
+}
+
+fn calculation_minimum_oa_snapshot(
+    system: &IdealLoadsAirSystem,
+    sample_index: usize,
+    coupling: DirectZonePurchasedAirCouplingOutput,
+) -> PurchasedAirCalcMinimumOaPrefixSnapshot {
+    PurchasedAirCalcMinimumOaPrefixSnapshot {
+        source: PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
+        minimum_oa_child_source: PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE,
+        system: system.id,
+        parent_call_ordinal: sample_index + 1,
+        source_order: PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER,
+        controlled_zone: coupling.prediction.zone_demand.zone,
+        unit_body_entered: true,
+        zone_heat_balance_reference_bound: true,
+        minimum_oa_child_called: true,
+        minimum_oa_child_no_outdoor_air_route: true,
+        retained_minimum_outdoor_air_mass_flow_rate_kg_per_s: Some(0.0),
+        retained_minimum_outdoor_air_write_performed: true,
+        ems_override_flag_read: true,
+        ems_override_enabled: Some(false),
+        ems_override_applied: false,
+        working_outdoor_air_mass_flow_rate_kg_per_s: Some(0.0),
+        outdoor_air_flag_read: true,
+        outdoor_air_enabled: Some(false),
+        no_outdoor_air_zero_branch_entered: true,
+        psychrometric_call_count: 0,
+        minimum_outdoor_air_sensible_output_w: Some(0.0),
+        minimum_outdoor_air_moisture_output_kg_per_s: Some(0.0),
+    }
 }
 
 fn calculation_entry_snapshot(

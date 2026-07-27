@@ -3,7 +3,9 @@ use crate::{
     heat_balance::state::ZoneAirTemperatureCoefficients,
     ideal_loads::{
         IdealLoadsSensibleMode, IdealLoadsZoneState, PurchasedAirCalcEntryIdentityRelation,
-        purchased_air_calc_entry_lifecycle_summary, purchased_air_init_lifecycle_summary,
+        purchased_air_calc_entry_lifecycle_summary,
+        purchased_air_calc_minimum_oa_prefix_lifecycle_summary,
+        purchased_air_init_lifecycle_summary,
     },
     schedules::{ScheduleSeriesCache, precompute_schedule_cache},
 };
@@ -19,6 +21,9 @@ use ep_model::{
 };
 
 type ModelMutationCase = (fn(&mut TypedModel), DirectZonePurchasedAirBindingFeature);
+
+#[path = "binding/minimum_oa_prefix_tests.rs"]
+mod minimum_oa_prefix_tests;
 
 #[test]
 fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
@@ -134,6 +139,24 @@ fn scheduled_binding_preserves_negative_cooling_threshold() {
     );
     assert_eq!(output.calculation_entry.call_ordinal, 1);
     assert!(output.calculation_entry.unit_body_entered);
+    let minimum_oa = output.calculation_minimum_outdoor_air;
+    assert_eq!(minimum_oa.parent_call_ordinal, 1);
+    assert!(minimum_oa.zone_heat_balance_reference_bound);
+    assert!(minimum_oa.minimum_oa_child_called);
+    assert!(minimum_oa.minimum_oa_child_no_outdoor_air_route);
+    assert_eq!(
+        minimum_oa.retained_minimum_outdoor_air_mass_flow_rate_kg_per_s,
+        Some(0.0)
+    );
+    assert_eq!(
+        minimum_oa.working_outdoor_air_mass_flow_rate_kg_per_s,
+        Some(0.0)
+    );
+    assert_eq!(minimum_oa.minimum_outdoor_air_sensible_output_w, Some(0.0));
+    assert_eq!(
+        minimum_oa.minimum_outdoor_air_moisture_output_kg_per_s,
+        Some(0.0)
+    );
     assert!(state.sum_sys_mcp_w_per_k > 0.0);
 }
 
@@ -151,6 +174,17 @@ fn overall_availability_off_clears_stale_feedback_without_changing_other_state()
     assert!(output.calculation_entry.heating_on);
     assert!(output.calculation_entry.cooling_on);
     assert!(output.calculation_entry.reset.all_zero());
+    let minimum_oa = output.calculation_minimum_outdoor_air;
+    assert!(!minimum_oa.unit_body_entered);
+    assert!(!minimum_oa.zone_heat_balance_reference_bound);
+    assert!(!minimum_oa.minimum_oa_child_called);
+    assert!(!minimum_oa.ems_override_flag_read);
+    assert!(!minimum_oa.outdoor_air_flag_read);
+    assert_eq!(
+        minimum_oa.retained_minimum_outdoor_air_mass_flow_rate_kg_per_s,
+        None
+    );
+    assert_eq!(minimum_oa.minimum_outdoor_air_sensible_output_w, None);
     assert_eq!(
         output.coupling.purchased_air.calculation.mode,
         IdealLoadsSensibleMode::Off
@@ -769,6 +803,22 @@ fn public_calc_entry_replay_and_identity_errors_do_not_mutate_lifecycle() {
         },
     )
     .expect("first source-ordered coupling");
+    let before_prefix_replay = runtime.clone();
+    assert_eq!(
+        advance_direct_no_oa_calc_minimum_oa_prefix(
+            &mut runtime,
+            binding.system,
+            output.calculation_entry,
+        ),
+        Err(
+            PurchasedAirCalcMinimumOaPrefixError::CalculationEntryCallOrder {
+                system: binding.ideal_loads_air_system,
+                calculation_entry_call_count: 1,
+                minimum_oa_prefix_transition_count: 1,
+            }
+        )
+    );
+    assert_eq!(runtime, before_prefix_replay);
     let base_context = PurchasedAirCalcEntryContext {
         controlled_zone: binding.zone,
         supply_node: binding.supply_node,

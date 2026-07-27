@@ -37,12 +37,16 @@ use super::{
     IdealLoadsPurchasedAirBranch, PURCHASED_AIR_CALC_ENTRY_SOURCE,
     PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PurchasedAirAvailabilityStatus,
     PurchasedAirCalcEntryError, PurchasedAirCalcEntryLifecycleSummary,
-    PurchasedAirCalcEntrySnapshot, PurchasedAirHardSizeLegacyRoute, PurchasedAirInitError,
-    PurchasedAirInitLifecycleSummary, PurchasedAirRecirculationSource, PurchasedAirRuntimeState,
-    PurchasedAirSizedLimits, append_direct_zone_purchased_air_hourly_output_series,
-    bind_direct_zone_purchased_air_model, purchased_air_calc_entry_lifecycle_summary,
-    purchased_air_init_lifecycle_summary,
+    PurchasedAirCalcEntrySnapshot, PurchasedAirCalcMinimumOaPrefixError,
+    PurchasedAirCalcMinimumOaPrefixLifecycleSummary, PurchasedAirHardSizeLegacyRoute,
+    PurchasedAirInitError, PurchasedAirInitLifecycleSummary, PurchasedAirRecirculationSource,
+    PurchasedAirRuntimeState, PurchasedAirSizedLimits,
+    append_direct_zone_purchased_air_hourly_output_series, bind_direct_zone_purchased_air_model,
+    purchased_air_calc_entry_lifecycle_summary,
+    purchased_air_calc_minimum_oa_prefix_lifecycle_summary, purchased_air_init_lifecycle_summary,
 };
+
+mod minimum_oa_validation;
 
 const SECONDS_PER_HOUR: f64 = 3_600.0;
 
@@ -117,6 +121,8 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     pub init_lifecycle: PurchasedAirInitLifecycleSummary,
     /// Persistent bounded `CalcPurchAirLoads` entry-prefix lifecycle report.
     pub calc_entry_lifecycle: PurchasedAirCalcEntryLifecycleSummary,
+    /// Persistent bounded minimum-outdoor-air prefix lifecycle report.
+    pub calc_minimum_oa_prefix_lifecycle: PurchasedAirCalcMinimumOaPrefixLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -156,6 +162,8 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     InitLifecycle(PurchasedAirInitError),
     /// Final Calc-entry lifecycle summary could not resolve the bound unit.
     CalcEntryLifecycle(PurchasedAirCalcEntryError),
+    /// Final minimum-outdoor-air prefix summary could not resolve the bound unit.
+    CalcMinimumOaPrefixLifecycle(PurchasedAirCalcMinimumOaPrefixError),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
         /// Stable invariant field.
@@ -174,6 +182,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A minimum-outdoor-air prefix lifecycle invariant did not match the run.
+    CalcMinimumOaPrefixLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -181,6 +198,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     },
     /// A Calc-entry prefix snapshot did not match its bound release call.
     UnexpectedCalculationEntry {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
+    /// A minimum-outdoor-air prefix snapshot did not match its bound release call.
+    UnexpectedCalculationMinimumOutdoorAir {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
@@ -241,6 +263,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir Calc-entry lifecycle summary failed: {error:?}"
             ),
+            Self::CalcMinimumOaPrefixLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir minimum-OA prefix lifecycle summary failed: {error:?}"
+            ),
             Self::InitLifecycleInvariant {
                 field,
                 expected,
@@ -257,6 +283,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir Calc-entry lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcMinimumOaPrefixLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir minimum-OA prefix lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -264,6 +298,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::UnexpectedCalculationEntry { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its bound Calc-entry prefix"
+            ),
+            Self::UnexpectedCalculationMinimumOutdoorAir { timestep_index } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its minimum-OA prefix"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -437,6 +475,13 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
                 },
             );
         }
+        if !minimum_oa_validation::snapshot_matches_release(output, timestep_index + 1, &binding) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::UnexpectedCalculationMinimumOutdoorAir {
+                    timestep_index,
+                },
+            );
+        }
         if !output.initialization.flags.state_machine_used
             || output.coupling.purchased_air.init_flags != output.initialization.flags
         {
@@ -490,6 +535,18 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         },
     )?;
     validate_calc_entry_lifecycle(
+        &calc_entry_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
+    let calc_minimum_oa_prefix_lifecycle = purchased_air_calc_minimum_oa_prefix_lifecycle_summary(
+        &purchased_air_runtime_state,
+        binding.ideal_loads_air_system,
+    )
+    .map_err(DirectZonePurchasedAirCoupledRuntimeError::CalcMinimumOaPrefixLifecycle)?;
+    minimum_oa_validation::validate_lifecycle(
+        &calc_minimum_oa_prefix_lifecycle,
         &calc_entry_lifecycle,
         timestep_outputs.len(),
         latest_output,
@@ -558,6 +615,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             actual_coupled_source_order: DIRECT_ZONE_PURCHASED_AIR_COUPLED_SOURCE_ORDER,
             init_lifecycle,
             calc_entry_lifecycle,
+            calc_minimum_oa_prefix_lifecycle,
         },
         state,
         results,

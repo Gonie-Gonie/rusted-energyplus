@@ -21,10 +21,12 @@ use super::{
     DirectZonePurchasedAirCouplingError, DirectZonePurchasedAirCouplingInput,
     DirectZonePurchasedAirCouplingOutput, IdealLoadsPurchasedAirBranch,
     IdealLoadsSensibleLimitContext, PurchasedAirAvailabilityStatus, PurchasedAirCalcEntryContext,
-    PurchasedAirCalcEntryError, PurchasedAirCalcEntrySnapshot, PurchasedAirHardSizeLegacyContext,
-    PurchasedAirInitCallContext, PurchasedAirInitError, PurchasedAirInitManagerPlan,
-    PurchasedAirInitManagerPlanError, PurchasedAirInitSnapshot, PurchasedAirInitTopologyPlan,
-    PurchasedAirInitTopologyPlanError, PurchasedAirRuntimeState, advance_purchased_air_calc_entry,
+    PurchasedAirCalcEntryError, PurchasedAirCalcEntrySnapshot,
+    PurchasedAirCalcMinimumOaPrefixError, PurchasedAirCalcMinimumOaPrefixSnapshot,
+    PurchasedAirHardSizeLegacyContext, PurchasedAirInitCallContext, PurchasedAirInitError,
+    PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanError, PurchasedAirInitSnapshot,
+    PurchasedAirInitTopologyPlan, PurchasedAirInitTopologyPlanError, PurchasedAirRuntimeState,
+    advance_direct_no_oa_calc_minimum_oa_prefix, advance_purchased_air_calc_entry,
     classify_no_oa_sensible_subset, complete_direct_zone_purchased_air_coupling,
     init_purchased_air_runtime, predict_direct_zone_demand_for_purchased_air,
     select_purchased_air_branch,
@@ -565,6 +567,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     Initialization(PurchasedAirInitError),
     /// The bounded `CalcPurchAirLoads` entry prefix could not resolve its unit.
     CalculationEntry(PurchasedAirCalcEntryError),
+    /// The bounded minimum-outdoor-air prefix rejected its release state.
+    CalculationMinimumOutdoorAir(PurchasedAirCalcMinimumOaPrefixError),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -636,6 +640,8 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     pub initialization: PurchasedAirInitSnapshot,
     /// Source-ordered `CalcPurchAirLoads` entry-prefix snapshot.
     pub calculation_entry: PurchasedAirCalcEntrySnapshot,
+    /// Source-ordered minimum-outdoor-air prefix snapshot.
+    pub calculation_minimum_outdoor_air: PurchasedAirCalcMinimumOaPrefixSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
@@ -764,6 +770,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         },
     )
     .map_err(DirectZonePurchasedAirScheduledCouplingError::CalculationEntry)?;
+    let calculation_minimum_outdoor_air = advance_direct_no_oa_calc_minimum_oa_prefix(
+        input.purchased_air_runtime_state,
+        binding.system,
+        calculation_entry,
+    )
+    .map_err(DirectZonePurchasedAirScheduledCouplingError::CalculationMinimumOutdoorAir)?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -802,6 +814,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         schedules,
         initialization,
         calculation_entry,
+        calculation_minimum_outdoor_air,
         coupling,
     })
 }

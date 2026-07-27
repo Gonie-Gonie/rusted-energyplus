@@ -248,14 +248,38 @@ call/reset/demand/read-site order and node identity; the coupled runtime and
 `purchased_air_calc_entry_lifecycle` in run-summary JSON, and reject the
 evidence on non-direct runtime lanes.
 
-This does not implement the active body beginning at line 2023 or
-`CalcPurchAirMinOAMassFlow` at line 2025. Actual schedule-service and
-Zone-component-manager ownership, OA, EMS, operating-mode selection,
-psychrometrics, flow/capacity and mixed-air work, UnitOff behavior, node and
-report writes, output-reference aliasing, partial failure, reset/concurrency,
-and full Calc parity remain open. The parent stays `scaffold`/`none`,
-`routine.calc_purch_air_loads` stays `source_mapped`, and inventory,
-readiness, capability, evidence, conformance, and Roadmap state do not change.
+CP310 itself stops before the active body at line 2023. Actual
+schedule-service and Zone-component-manager ownership, OA, EMS,
+operating-mode selection, psychrometrics, flow/capacity and mixed-air work,
+node and report writes, output-reference aliasing, partial failure,
+reset/concurrency, and full Calc parity remain open.
+
+CP311 extends the same release lane through the bounded
+`CalcPurchAirLoads` minimum-outdoor-air prefix at lines 2023-2040 and only the
+no-OA route of the line-2025 `CalcPurchAirMinOAMassFlow` child. The transition
+consumes the retained CP310 snapshot in one-for-one call order. When CP310
+entered the `UnitOn` body, it records the controlled-Zone heat-balance
+reference binding without reading a heat-balance value, visits the child,
+zeros the local OA flow and rewrites retained pre-EMS
+`MinOAMassFlowRate=0`, records the false EMS predicate, records the false
+`OutdoorAir` predicate, and sets both minimum-OA sensible and moisture effects
+to zero. When CP310 did not enter the body, every CP311 child, EMS, OA, and
+effect site is skipped. Heating and cooling availability do not independently
+gate this prefix.
+
+Release validation requires one CP311 transition per CP310 call, exact
+active/UnitOff reconciliation, one Zone-reference binding, child visit,
+retained write, EMS read, OA read, and no-OA zero group per active call, zero
+EMS applications, zero OA-effect and psychrometric calls, exact latest
+identity and zero values, and direct-only
+`purchased_air_calc_minimum_oa_prefix_lifecycle` JSON evidence. This remains a
+no-OA/no-EMS lifecycle extension: the full child DSOA, DCV, schedule, density,
+CO2, cutoff, and diagnostic work; OA-true psychrometrics and load equations;
+EMS override behavior; the operating-mode branch beginning at line 2046; and
+all later Calc behavior remain open. Both parents stay `scaffold`/`none`,
+`routine.calc_purch_air_loads` and
+`routine.calc_purch_air_min_oa_mass_flow` stay `source_mapped`, and inventory,
+readiness, support, evidence, conformance, and Roadmap state do not change.
 
 ## Current Launcher State
 

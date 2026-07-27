@@ -100,6 +100,8 @@ function Assert-ExactStringArray {
 $calcRoot = "crates\ep_runtime\src\ideal_loads\calc.rs"
 $calcLifecycle = "crates\ep_runtime\src\ideal_loads\calc\lifecycle.rs"
 $calcLifecycleTests = "crates\ep_runtime\src\ideal_loads\calc\lifecycle_tests.rs"
+$calcMinimumOaPrefix = "crates\ep_runtime\src\ideal_loads\calc\minimum_oa_prefix.rs"
+$calcMinimumOaPrefixTests = "crates\ep_runtime\src\ideal_loads\calc\minimum_oa_prefix_tests.rs"
 $calcHumidity = "crates\ep_runtime\src\ideal_loads\calc\humidity.rs"
 $calcLimits = "crates\ep_runtime\src\ideal_loads\calc\limits.rs"
 $calcMassFlow = "crates\ep_runtime\src\ideal_loads\calc\mass_flow.rs"
@@ -129,7 +131,9 @@ $idealLoadsInitTopologyTransitionTests = "crates\ep_runtime\src\ideal_loads\init
 $idealLoadsInitTransition = "crates\ep_runtime\src\ideal_loads\init\transition.rs"
 $idealLoadsInitTests = "crates\ep_runtime\src\ideal_loads\init\lifecycle_tests.rs"
 $idealLoadsInitWarningTests = "crates\ep_runtime\src\ideal_loads\init\warning_tests.rs"
+$idealLoadsBindingMinimumOaTests = "crates\ep_runtime\src\ideal_loads\binding\minimum_oa_prefix_tests.rs"
 $idealLoadsCoupledRuntime = "crates\ep_runtime\src\ideal_loads\coupled_runtime.rs"
+$idealLoadsCoupledMinimumOaValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\minimum_oa_validation.rs"
 $idealLoadsCouplingValidation = "crates\ep_runtime\src\ideal_loads\coupling\validation.rs"
 $idealLoadsInput = "crates\ep_runtime\src\ideal_loads\input.rs"
 $idealLoadsMeters = "crates\ep_runtime\src\ideal_loads\meters.rs"
@@ -172,6 +176,7 @@ $runtime = "crates\ep_runtime\src\runtime.rs"
 $executionPlan = "crates\ep_runtime\src\execution_plan.rs"
 $runSupport = "crates\ep_run\src\support.rs"
 $runPipeline = "crates\ep_run\src\pipeline.rs"
+$runPurchasedAirMinimumOa = "crates\ep_run\src\pipeline\purchased_air_minimum_oa.rs"
 $runDirectZoneCoupledTests = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled.rs"
 $runRuntimeBoundaries = "crates\ep_run\src\support\runtime_boundaries.rs"
 $runtimeOutputTests = "crates\ep_runtime\src\runtime\tests\part08.rs"
@@ -191,6 +196,8 @@ $zoneEquipmentTests = "crates\ep_runtime\src\zone_equipment\tests.rs"
 Assert-FileExists -Path $calcRoot -Description "IdealLoads calc module root"
 Assert-FileExists -Path $calcLifecycle -Description "PurchasedAir Calc-entry lifecycle module"
 Assert-FileExists -Path $calcLifecycleTests -Description "PurchasedAir Calc-entry lifecycle tests"
+Assert-FileExists -Path $calcMinimumOaPrefix -Description "PurchasedAir Calc minimum-OA prefix module"
+Assert-FileExists -Path $calcMinimumOaPrefixTests -Description "PurchasedAir Calc minimum-OA prefix tests"
 Assert-FileExists -Path $calcHumidity -Description "IdealLoads calc humidity module"
 Assert-FileExists -Path $calcLimits -Description "IdealLoads calc limits module"
 Assert-FileExists -Path $calcMassFlow -Description "IdealLoads calc mass-flow module"
@@ -220,7 +227,9 @@ Assert-FileExists -Path $idealLoadsInitTopologyTransitionTests -Description "Ide
 Assert-FileExists -Path $idealLoadsInitTransition -Description "IdealLoads initialization transitions"
 Assert-FileExists -Path $idealLoadsInitTests -Description "IdealLoads initialization tests"
 Assert-FileExists -Path $idealLoadsInitWarningTests -Description "IdealLoads initialization warning tests"
+Assert-FileExists -Path $idealLoadsBindingMinimumOaTests -Description "IdealLoads binding minimum-OA transaction tests"
 Assert-FileExists -Path $idealLoadsCoupledRuntime -Description "IdealLoads coupled release runtime"
+Assert-FileExists -Path $idealLoadsCoupledMinimumOaValidation -Description "IdealLoads minimum-OA release validator"
 Assert-FileExists -Path $idealLoadsCouplingValidation -Description "IdealLoads release coupling validation"
 Assert-FileExists -Path $idealLoadsInput -Description "IdealLoads input boundary module"
 Assert-FileExists -Path $idealLoadsMeters -Description "IdealLoads meter binding module"
@@ -258,6 +267,7 @@ Assert-FileExists -Path $runtime -Description "Runtime root"
 Assert-FileExists -Path $executionPlan -Description "Runtime execution plan"
 Assert-FileExists -Path $runSupport -Description "ep_run support assessment"
 Assert-FileExists -Path $runPipeline -Description "ep_run pipeline"
+Assert-FileExists -Path $runPurchasedAirMinimumOa -Description "ep_run PurchasedAir minimum-OA pipeline module"
 Assert-FileExists -Path $runDirectZoneCoupledTests -Description "ep_run direct-Zone coupled integration tests"
 Assert-FileExists -Path $runRuntimeBoundaries -Description "ep_run runtime boundary assessment"
 Assert-FileExists -Path $runtimeOutputTests -Description "Runtime output registry tests"
@@ -277,6 +287,8 @@ Assert-FileExists -Path $zoneEquipmentTests -Description "Zone equipment tests m
 Assert-LineLimit -Path $calcRoot -Limit 80 -Description "IdealLoads calc module root"
 Assert-LineLimit -Path $calcLifecycle -Limit 520 -Description "PurchasedAir Calc-entry lifecycle module"
 Assert-LineLimit -Path $calcLifecycleTests -Limit 240 -Description "PurchasedAir Calc-entry lifecycle tests"
+Assert-LineLimit -Path $calcMinimumOaPrefix -Limit 380 -Description "PurchasedAir Calc minimum-OA prefix module"
+Assert-LineLimit -Path $calcMinimumOaPrefixTests -Limit 220 -Description "PurchasedAir Calc minimum-OA prefix tests"
 Assert-LineLimit -Path $calcHumidity -Limit 220 -Description "IdealLoads calc humidity module"
 Assert-LineLimit -Path $calcLimits -Limit 180 -Description "IdealLoads calc limits module"
 Assert-LineLimit -Path $calcMassFlow -Limit 150 -Description "IdealLoads calc mass-flow module"
@@ -305,6 +317,8 @@ Assert-LineLimit -Path $idealLoadsInitTopologyTransitionTests -Limit 400 -Descri
 Assert-LineLimit -Path $idealLoadsInitTransition -Limit 540 -Description "IdealLoads initialization transitions"
 Assert-LineLimit -Path $idealLoadsInitTests -Limit 380 -Description "IdealLoads initialization tests"
 Assert-LineLimit -Path $idealLoadsInitWarningTests -Limit 100 -Description "IdealLoads initialization warning tests"
+Assert-LineLimit -Path $idealLoadsBindingMinimumOaTests -Limit 180 -Description "IdealLoads binding minimum-OA transaction tests"
+Assert-LineLimit -Path $idealLoadsCoupledMinimumOaValidation -Limit 240 -Description "IdealLoads minimum-OA release validator"
 Assert-LineLimit -Path $idealLoadsCouplingValidation -Limit 260 -Description "IdealLoads release coupling validation"
 Assert-LineLimit -Path $idealLoadsInput -Limit 260 -Description "IdealLoads input boundary module"
 Assert-LineLimit -Path $idealLoadsMeters -Limit 120 -Description "IdealLoads meter binding module"
@@ -339,11 +353,16 @@ Assert-LineLimit -Path $zoneEquipmentDemand -Limit 120 -Description "Zone equipm
 Assert-LineLimit -Path $zoneEquipmentDispatch -Limit 360 -Description "Zone equipment dispatch module"
 Assert-LineLimit -Path $zoneEquipmentTests -Limit 320 -Description "Zone equipment tests module"
 Assert-LineLimit -Path $resultStore -Limit 220 -Description "Runtime result store"
+Assert-LineLimit -Path $runPurchasedAirMinimumOa -Limit 300 -Description "ep_run PurchasedAir minimum-OA pipeline module"
 
 Assert-Contains -Path $calcRoot -Pattern 'mod humidity;' -Description "IdealLoads calc humidity submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod lifecycle;' -Description "PurchasedAir Calc-entry lifecycle submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod lifecycle_tests;' -Description "PurchasedAir Calc-entry lifecycle test module declaration"
 Assert-Contains -Path $calcRoot -Pattern 'pub use lifecycle::\*;' -Description "PurchasedAir Calc-entry lifecycle public re-export"
+Assert-Contains -Path $calcRoot -Pattern 'mod minimum_oa_prefix;' -Description "PurchasedAir Calc minimum-OA prefix submodule declaration"
+Assert-Contains -Path $calcRoot -Pattern 'mod minimum_oa_prefix_tests;' -Description "PurchasedAir Calc minimum-OA prefix test module declaration"
+Assert-Contains -Path $calcRoot -Pattern 'pub use minimum_oa_prefix::\*;' -Description "PurchasedAir Calc minimum-OA prefix public re-export"
+Assert-NotContains -Path $calcRoot -Pattern 'pub fn advance_direct_no_oa_calc_minimum_oa_prefix\s*\(' -Description "minimum-OA transition implementation in calc module root"
 Assert-Contains -Path $calcRoot -Pattern 'mod limits;' -Description "IdealLoads calc limits submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod mass_flow;' -Description "IdealLoads calc mass-flow submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod no_oa;' -Description "no-OA calc submodule declaration"
@@ -477,6 +496,65 @@ Assert-Contains -Path $calcLifecycleTests -Pattern 'schedule_gates_are_independe
 Assert-Contains -Path $calcLifecycleTests -Pattern 'direct_entry_retains_mismatched_zone_and_aliased_nodes_without_validation' -Description "Calc-entry direct source-characterization regression"
 Assert-Contains -Path $calcLifecycleTests -Pattern 'unknown_public_unit_rejects_advance_and_summary_without_mutation' -Description "Calc-entry unknown-unit transaction regression"
 
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'pub const PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE' -Description "Calc minimum-OA parent source provenance"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'pub const PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE' -Description "Calc minimum-OA child source provenance"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'pub const PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER' -Description "Calc minimum-OA exact source order"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'EnergyPlus 26\.1 PurchasedAirManager\.cc:2023-2040' -Description "Calc minimum-OA exact parent boundary"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'EnergyPlus 26\.1 PurchasedAirManager\.cc:2762-2810; bounded no-OA route 2781,2783,2785,2806-2809' -Description "Calc minimum-OA exact bounded child boundary"
+Assert-ExactStringArray -Path $calcMinimumOaPrefix -Name "PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER" -Expected @(
+    "resolve-zone-heat-balance-reference",
+    "call-calc-purch-air-min-oa-mass-flow",
+    "child-zero-no-outdoor-air-working-flow",
+    "child-write-retained-minimum-outdoor-air-flow",
+    "read-ems-outdoor-air-override-flag",
+    "apply-ems-outdoor-air-flow-if-enabled",
+    "read-outdoor-air-enabled",
+    "calculate-outdoor-air-specific-heat-if-enabled",
+    "calculate-or-zero-minimum-outdoor-air-sensible-output",
+    "calculate-or-zero-minimum-outdoor-air-moisture-output"
+) -Description "Calc minimum-OA exact 10-step parent and bounded-child source order"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'pub struct PurchasedAirCalcMinimumOaPrefixSnapshot' -Description "Calc minimum-OA source-ordered snapshot"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'pub struct PurchasedAirCalcMinimumOaPrefixRuntimeState' -Description "Calc minimum-OA bounded persistent state"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'pub struct PurchasedAirCalcMinimumOaPrefixLifecycleSummary' -Description "Calc minimum-OA lifecycle summary"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'pub enum PurchasedAirCalcMinimumOaPrefixError' -Description "Calc minimum-OA fail-closed error"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'pub fn advance_direct_no_oa_calc_minimum_oa_prefix\s*\(' -Description "Calc minimum-OA release transition"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'pub fn purchased_air_calc_minimum_oa_prefix_lifecycle_summary\s*\(' -Description "Calc minimum-OA lifecycle summary accessor"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'pub\(super\) fn advance_minimum_oa_prefix_state\s*\(' -Description "Calc minimum-OA direct characterization transition"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'CalculationEntryCallOrder' -Description "CP310-to-CP311 one-for-one source-order guard"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'CalculationEntrySnapshotMismatch' -Description "CP310-to-CP311 retained snapshot guard"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'calculation_entry_snapshots_bitwise_equal' -Description "CP310 NaN-compatible exact snapshot guard"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'OutdoorAirOutsideBoundedSubset' -Description "active outdoor-air release rejection"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'calculation_entry\.outdoor_air_node\.is_none\(\)' -Description "release absent outdoor-air node guard"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'design_specification_outdoor_air_object_name\s*\.is_none\(\)' -Description "release absent DSOA binding guard"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'outdoor_air_inlet_node_name\.is_none\(\)' -Description "release absent OA inlet declaration guard"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'ems_override_enabled: body_entered\.then_some\(false\)' -Description "release EMS override disabled snapshot"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'ems_override_applied: false' -Description "release EMS override application forbidden"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'outdoor_air_enabled: body_entered\.then_some\(false\)' -Description "release outdoor-air branch disabled snapshot"
+Assert-Contains -Path $calcMinimumOaPrefix -Pattern 'psychrometric_call_count: 0' -Description "release psychrometric branch not executed"
+Assert-Contains -Path $calcMinimumOaPrefixTests -Pattern 'active_no_oa_prefix_rewrites_retained_minimum_and_zeros_both_effects' -Description "Calc minimum-OA active no-OA regression"
+Assert-Contains -Path $calcMinimumOaPrefixTests -Pattern 'unit_off_skips_child_ems_predicate_and_outdoor_air_branch' -Description "Calc minimum-OA UnitOff skip regression"
+Assert-Contains -Path $calcMinimumOaPrefixTests -Pattern 'heat_and_cool_off_do_not_block_the_unit_on_prefix' -Description "Calc minimum-OA independent heat/cool gate regression"
+
+$minimumOaForbiddenBehaviorPatterns = @(
+    [pscustomobject]@{ Pattern = 'PurchasedAirManager\.cc:2046'; Description = "line-2046-and-later Calc provenance in minimum-OA boundary" },
+    [pscustomobject]@{ Pattern = 'IdealLoadsSensibleMode|OperatingMode|TempControlType|SingleHeat|SingleCool'; Description = "line-2046-and-later operating-mode behavior in minimum-OA boundary" },
+    [pscustomobject]@{ Pattern = 'CalcPurchAirMixedAir|calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s'; Description = "later Calc mixed-air or economizer behavior in minimum-OA boundary" },
+    [pscustomobject]@{ Pattern = 'resolve_minimum_outdoor_air_compat\s*\(|IdealLoadsMinimumOutdoorAirCompatInput|calcDesignSpecificationOutdoorAir'; Description = "active DSOA child execution in minimum-OA boundary" },
+    [pscustomobject]@{ Pattern = 'DemandControlledVentilationType|OccupancySchedule|Co2Setpoint|CO2Setpoint'; Description = "active DCV selector behavior in minimum-OA boundary" },
+    [pscustomobject]@{ Pattern = 'current_people_count|co2_setpoint_required_mass_flow_rate_kg_per_s'; Description = "active occupancy or CO2 signal consumption in minimum-OA boundary" },
+    [pscustomobject]@{ Pattern = 'PsyCpAirFnW\s*\(|energyplus_moist_air_specific_heat_j_per_kg_k\s*\('; Description = "active outdoor-air psychrometric calculation in minimum-OA boundary" }
+)
+foreach ($minimumOaBoundaryFile in @(
+        $calcMinimumOaPrefix,
+        $idealLoadsCoupledMinimumOaValidation,
+        $runPurchasedAirMinimumOa
+    )) {
+    foreach ($forbiddenBehavior in $minimumOaForbiddenBehaviorPatterns) {
+        Assert-NotContains -Path $minimumOaBoundaryFile -Pattern $forbiddenBehavior.Pattern -Description $forbiddenBehavior.Description
+    }
+}
+Assert-NotContains -Path $calcMinimumOaPrefix -Pattern 'state\.(ems_override_apply_count|outdoor_air_effect_count|psychrometric_call_count)\s*\+=' -Description "active OA or EMS counter mutation in no-OA release transition"
+
 Assert-Contains -Path $idealLoadsInit -Pattern 'pub struct IdealLoadsInitFlags' -Description "IdealLoads init flags type"
 Assert-Contains -Path $idealLoadsInit -Pattern 'mod manager_plan;' -Description "IdealLoads immutable manager-plan module"
 Assert-Contains -Path $idealLoadsInit -Pattern 'mod manager_plan_tests;' -Description "IdealLoads manager-plan test module"
@@ -525,6 +603,7 @@ Assert-Contains -Path $idealLoadsInitState -Pattern 'pub topology_completed: boo
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub topology_plan: Option<PurchasedAirInitTopologyPlan>' -Description "retained immutable selected-unit topology plan"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub recirculation_source: Option<PurchasedAirRecirculationSource>' -Description "retained PurchasedAir recirculation branch"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub calc_entry: PurchasedAirCalcEntryRuntimeState' -Description "retained bounded Calc-entry state"
+Assert-Contains -Path $idealLoadsInitState -Pattern 'pub calc_minimum_oa_prefix: PurchasedAirCalcMinimumOaPrefixRuntimeState' -Description "retained bounded Calc minimum-OA state"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub topology_diagnostics: Vec<PurchasedAirInitTopologyDiagnostic>' -Description "retained ordered topology diagnostics"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub topology_failure: Option<PurchasedAirInitTopologyError>' -Description "retained fatal topology outcome"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub topology_completion_count: usize' -Description "historical topology completion count"
@@ -625,13 +704,21 @@ Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\coupling.rs" -Pattern '
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding_tests.rs" -Pattern 'predictor_failure_precedes_and_preserves_purchased_air_initialization' -Description "predictor-before-Init observable regression"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding_tests.rs" -Pattern 'initialization_failure_precedes_calc_only_input_validation' -Description "Init-before-Calc error precedence regression"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding_tests.rs" -Pattern 'public_calc_entry_replay_and_identity_errors_do_not_mutate_lifecycle' -Description "Calc-entry public replay and identity transaction regression"
+Assert-Contains -Path $idealLoadsBindingMinimumOaTests -Pattern 'exact_nan_calc_entry_snapshot_advances_minimum_oa_prefix_transactionally' -Description "Calc minimum-OA exact-NaN snapshot transaction regression"
+Assert-Contains -Path $idealLoadsBindingMinimumOaTests -Pattern 'advance_direct_no_oa_calc_minimum_oa_prefix\s*\(' -Description "Calc minimum-OA replay transaction regression"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'zone_component_availability:\s*Some\(PurchasedAirAvailabilityStatus::NoAction\)' -Description "release allocated ZoneComp NoAction visit"
 $bindingText = Read-RepoText -Path "crates\ep_runtime\src\ideal_loads\binding.rs"
 $bindingInitIndex = $bindingText.IndexOf("let initialization = init_purchased_air_runtime(")
 $bindingCalcEntryIndex = $bindingText.IndexOf("let calculation_entry = advance_purchased_air_calc_entry(")
+$bindingMinimumOaIndex = $bindingText.IndexOf("let calculation_minimum_outdoor_air = advance_direct_no_oa_calc_minimum_oa_prefix(")
 $bindingCalcIndex = $bindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
-if ($bindingInitIndex -lt 0 -or $bindingCalcEntryIndex -le $bindingInitIndex -or $bindingCalcIndex -le $bindingCalcEntryIndex) {
-    throw "InitPurchasedAir must precede the Calc-entry prefix and bounded Calc coupling"
+if (
+    $bindingInitIndex -lt 0 -or
+    $bindingCalcEntryIndex -le $bindingInitIndex -or
+    $bindingMinimumOaIndex -le $bindingCalcEntryIndex -or
+    $bindingCalcIndex -le $bindingMinimumOaIndex
+) {
+    throw "InitPurchasedAir must precede the Calc-entry prefix, minimum-OA prefix, and bounded Calc coupling"
 }
 Assert-Contains -Path $calcLimits -Pattern 'initialized_heating_air_mass_flow_limit_kg_per_s' -Description "initialized heating flow cache input"
 Assert-Contains -Path $calcLimits -Pattern 'initialized_cooling_air_mass_flow_limit_kg_per_s' -Description "initialized cooling flow cache input"
@@ -644,6 +731,32 @@ Assert-Contains -Path $runPipeline -Pattern 'purchased_air_calc_entry_lifecycle'
 Assert-Contains -Path $runPipeline -Pattern 'validate_direct_purchased_air_calc_entry_lifecycle' -Description "release Calc-entry lifecycle firewall"
 Assert-Contains -Path $runPipeline -Pattern 'persistent PurchasedAir lifecycle evidence was attached to a non-direct runtime' -Description "non-direct Calc-entry evidence rejection"
 Assert-Contains -Path $runDirectZoneCoupledTests -Pattern 'purchased_air_calc_entry_lifecycle' -Description "direct run Calc-entry lifecycle JSON assertion"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'mod minimum_oa_validation;' -Description "coupled runtime minimum-OA validator submodule declaration"
+Assert-Contains -Path $idealLoadsCoupledMinimumOaValidation -Pattern 'pub\(super\) fn snapshot_matches_release\s*\(' -Description "per-timestep minimum-OA release validator"
+Assert-Contains -Path $idealLoadsCoupledMinimumOaValidation -Pattern 'pub\(super\) fn validate_lifecycle\s*\(' -Description "final minimum-OA lifecycle validator"
+Assert-Contains -Path $idealLoadsCoupledMinimumOaValidation -Pattern 'prefix\.source == PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE' -Description "coupled minimum-OA parent provenance validation"
+Assert-Contains -Path $idealLoadsCoupledMinimumOaValidation -Pattern 'prefix\.minimum_oa_child_source == PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE' -Description "coupled minimum-OA child provenance validation"
+Assert-Contains -Path $idealLoadsCoupledMinimumOaValidation -Pattern 'prefix\.source_order == PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER' -Description "coupled minimum-OA exact source-order validation"
+Assert-Contains -Path $idealLoadsCoupledMinimumOaValidation -Pattern 'prefix\.ems_override_enabled == Some\(false\)' -Description "coupled minimum-OA EMS-disabled release validation"
+Assert-Contains -Path $idealLoadsCoupledMinimumOaValidation -Pattern 'prefix\.outdoor_air_enabled == Some\(false\)' -Description "coupled minimum-OA no-OA release validation"
+Assert-Contains -Path $idealLoadsCoupledMinimumOaValidation -Pattern 'state\.outdoor_air_effect_count' -Description "coupled minimum-OA active-OA zero-count validation"
+Assert-Contains -Path $idealLoadsCoupledMinimumOaValidation -Pattern 'state\.psychrometric_call_count' -Description "coupled minimum-OA psychrometric zero-count validation"
+Assert-Contains -Path $idealLoadsCoupledMinimumOaValidation -Pattern '\.checked_add\(state\.unit_off_skip_count\)' -Description "coupled minimum-OA checked source/skip partition"
+Assert-NotContains -Path $idealLoadsCoupledRuntime -Pattern 'fn snapshot_matches_release\s*\(' -Description "minimum-OA validator implementation in coupled-runtime root"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'minimum_oa_validation::snapshot_matches_release' -Description "coupled runtime per-timestep minimum-OA validation"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'minimum_oa_validation::validate_lifecycle' -Description "coupled runtime final minimum-OA validation"
+Assert-Contains -Path $runPipeline -Pattern 'mod purchased_air_minimum_oa;' -Description "pipeline minimum-OA evidence submodule declaration"
+Assert-Contains -Path $runPurchasedAirMinimumOa -Pattern 'pub\(super\) fn lifecycle_json\s*\(' -Description "pipeline minimum-OA JSON ownership"
+Assert-Contains -Path $runPurchasedAirMinimumOa -Pattern 'pub\(super\) fn validate_direct_lifecycle\s*\(' -Description "pipeline minimum-OA firewall ownership"
+Assert-Contains -Path $runPurchasedAirMinimumOa -Pattern 'prefix\.source_order == PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER' -Description "pipeline minimum-OA exact source-order validation"
+Assert-Contains -Path $runPurchasedAirMinimumOa -Pattern 'prefix\.ems_override_enabled == Some\(false\)' -Description "pipeline minimum-OA EMS-disabled release validation"
+Assert-Contains -Path $runPurchasedAirMinimumOa -Pattern 'prefix\.outdoor_air_enabled == Some\(false\)' -Description "pipeline minimum-OA no-OA release validation"
+Assert-Contains -Path $runPurchasedAirMinimumOa -Pattern '\.checked_add\(state\.unit_off_skip_count\)' -Description "pipeline minimum-OA checked source/skip partition"
+Assert-NotContains -Path $runPipeline -Pattern 'fn latest_matches_release\s*\(' -Description "minimum-OA pipeline validator implementation in pipeline root"
+Assert-Contains -Path $runPipeline -Pattern 'purchased_air_calc_minimum_oa_prefix_lifecycle' -Description "release minimum-OA lifecycle JSON evidence"
+Assert-Contains -Path $runPipeline -Pattern 'purchased_air_minimum_oa::validate_direct_lifecycle' -Description "release minimum-OA pipeline firewall"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'pub calc_minimum_oa_prefix_lifecycle: PurchasedAirCalcMinimumOaPrefixLifecycleSummary' -Description "coupled runtime minimum-OA lifecycle summary"
+Assert-Contains -Path $runDirectZoneCoupledTests -Pattern 'purchased_air_calc_minimum_oa_prefix_lifecycle' -Description "direct run minimum-OA lifecycle JSON assertion"
 Assert-Contains -Path $runPipeline -Pattern 'topology_ready' -Description "release topology-ready JSON and validation evidence"
 Assert-Contains -Path $runPipeline -Pattern 'topology_diagnostics' -Description "release ordered topology diagnostic evidence"
 Assert-Contains -Path $runPipeline -Pattern 'topology_failure' -Description "release retained topology failure evidence"

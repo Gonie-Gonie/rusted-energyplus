@@ -12636,8 +12636,12 @@ Rust owns an explicit bounded counterpart in
 `resolve_minimum_outdoor_air_compat` only for an available unit, returns an
 immutable design/selected/DCV/final-flow snapshot, and feeds the final minimum
 to its separate OA Calc path. An unavailable unit skips resolution and carries
-no minimum result. There is no mutable output reference or persistent
-PurchasedAir field with the source write order.
+no minimum result. That diagnostic resolver remains immutable and separate
+from the persistent release lifecycle. CP311 later adds only the bounded
+parent call site and the no-OA child route that rewrites retained
+`MinOAMassFlowRate=0` in source order. It does not add the source mutable-output
+reference, the OA-true child graph, or complete child failure and partial-write
+order.
 
 The resolver supports the six basic DSOA methods: Flow/Person, Flow/Area,
 Flow/Zone, AirChanges/Hour, Sum, and Maximum. It substitutes current people for
@@ -15524,16 +15528,76 @@ and status copy per coupling; zero `ForceOff` events; heating/cooling on counts
 equal to the call count; reconciled on/off partitions; and exact latest
 identities.
 
-The body at line 2023 and later remains excluded, including minimum OA,
-EMS overrides, OA loads, operating-mode selection, economizer and heat
-recovery, humidity, psychrometrics, flow/capacity and mixed-air calculations,
-UnitOff tail, node updates, and report writes. Actual schedule-service and
-ZoneComp allocation/manager lifecycles, output-reference aliasing, invalid
-selectors, partial failure/reset/concurrency parity, and full Calc parity are
-also excluded. The deferred custom `SizePurchasedAir` branch at lines
-1395-1696 remains a separate earlier physical gap. Both parents stay
-`scaffold`/`none`; `routine.calc_purch_air_loads` stays `source_mapped`; no
-inventory, readiness, capability, evidence, conformance, or Roadmap state is
+CP310 itself stops before line 2023. Minimum-OA work, EMS overrides, OA loads,
+operating-mode selection, economizer and heat recovery, humidity,
+psychrometrics, flow/capacity and mixed-air calculations, UnitOff tail, node
+updates, and report writes are outside that checkpoint. Actual
+schedule-service and ZoneComp allocation/manager lifecycles,
+output-reference aliasing, invalid selectors, partial failure/reset/concurrency
+parity, and full Calc parity are also excluded.
+
+## CP311 Source-Ordered `CalcPurchAirLoads` Minimum-OA Prefix
+
+CP311 maps the next natural parent boundary at EnergyPlus 26.1
+`PurchasedAirManager.cc` lines 2023-2040. It consumes CP310's retained
+line-2022 `UnitOn` decision and stops before the first following executable
+operating-mode branch at line 2046. Lines 2041-2045 are comments. The child
+called at line 2025 is separately anchored to
+`CalcPurchAirMinOAMassFlow` lines 2762-2810, but the release transition maps
+only its no-OA route at lines 2781, 2783, 2785, and 2806-2809.
+
+For an entered `UnitOn` body the bounded transition preserves this order:
+
+1. bind the line-2023 controlled-Zone heat-balance reference as identity and
+   reachability evidence without reading a heat-balance field;
+2. visit the line-2025 child once;
+3. take the child's no-OA route, zero its local output flow, and rewrite
+   retained pre-EMS `PurchAir.MinOAMassFlowRate=0`;
+4. read the EMS OA-flow-override predicate and retain the release value false,
+   without applying an override;
+5. read `PurchAir.OutdoorAir` and retain the release value false; and
+6. execute the no-OA branch, setting the parent-local minimum-OA sensible
+   output to `0 W` and moisture output to `0 kg/s`.
+
+If CP310 did not enter the body, CP311 records one ordered transition but does
+not bind the Zone reference, call the child, read either predicate, or create
+minimum-OA output values. HeatOn and CoolOn do not gate CP311 independently:
+when `UnitOn=true`, the prefix is reached even when both mode flags are false.
+The public transition requires the exact latest CP310 snapshot, selected
+system and controlled-Zone identity, successful initialization, and one CP311
+transition for each CP310 call before mutating state. An OA node, DSOA object,
+or OA inlet configured on the selected unit fails closed as outside this
+bounded release subset.
+
+`calc/minimum_oa_prefix.rs` owns
+`PurchasedAirCalcMinimumOaPrefixRuntimeState`,
+`PurchasedAirCalcMinimumOaPrefixSnapshot`,
+`PurchasedAirCalcMinimumOaPrefixLifecycleSummary`,
+`advance_direct_no_oa_calc_minimum_oa_prefix`, and the lifecycle-summary
+function. The release binder runs it after CP310 and before the existing
+bounded calculation. Per-step output carries the exact CP311 snapshot;
+`coupled_runtime` reconciles transition, active/UnitOff, child, retained-write,
+predicate-read, no-OA zero, OA-effect, and psychrometric counts plus latest
+state. `ep_run` repeats the direct-runtime firewall and publishes
+`purchased_air_calc_minimum_oa_prefix_lifecycle` JSON.
+
+This is not full parent- or child-routine parity. In the full source child,
+OA-true DSOA/DCV/schedule/density/CO2 work and the `VerySmallMassFlow` cutoff
+produce the retained minimum before the parent EMS override; that override
+changes only the parent-local working flow. In the OA-true parent branch,
+specific heat uses OA-node humidity and the sensible/moisture differences use
+OA-node minus Zone-node values. CP311's release path executes none of those
+active services, override operations, psychrometric calls, or formulas.
+Output-reference aliasing, source NaN/infinity propagation, child partial
+effects and failure order, operating-mode selection at line 2046 and later,
+economizer, mixed-air, limit, humidity, node/report, UnitOff-tail, reset, and
+concurrency behavior remain excluded.
+
+The deferred custom `SizePurchasedAir` branch at lines 1395-1696 remains a
+separate earlier physical gap. Both parents stay `scaffold`/`none`;
+`routine.calc_purch_air_loads` and
+`routine.calc_purch_air_min_oa_mass_flow` stay `source_mapped`; no inventory,
+readiness, support level, evidence case, conformance, or Roadmap state is
 promoted.
 
 

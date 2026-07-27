@@ -21,7 +21,8 @@ use ep_runtime::{
     PURCHASED_AIR_CALC_ENTRY_RESET_TARGETS, PURCHASED_AIR_CALC_ENTRY_SOURCE,
     PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
     PurchasedAirAvailabilityStatus, PurchasedAirCalcEntryLifecycleSummary,
-    PurchasedAirHardSizeField, PurchasedAirHardSizeLegacyRoute, PurchasedAirInitDiagnosticKind,
+    PurchasedAirCalcMinimumOaPrefixLifecycleSummary, PurchasedAirHardSizeField,
+    PurchasedAirHardSizeLegacyRoute, PurchasedAirInitDiagnosticKind,
     PurchasedAirInitLifecycleSummary, PurchasedAirInitTopologyDiagnosticKind,
     PurchasedAirInitTopologyDiagnosticSeverity, PurchasedAirInitTopologyError,
     PurchasedAirRecirculationSource, PurchasedAirSupplyTemperatureDiagnosticKind,
@@ -52,6 +53,8 @@ use crate::{
     RuntimeClass, SelectedAlgorithmLane, SupportAssessment, SupportStatus, TraceLevel,
     TraceSelection, assess_support,
 };
+
+mod purchased_air_minimum_oa;
 
 /// Completed arbitrary-run outcome.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -154,6 +157,8 @@ struct RustRuntimeResult {
     purchased_air_coupling_call_count: Option<usize>,
     purchased_air_init_lifecycle: Option<PurchasedAirInitLifecycleSummary>,
     purchased_air_calc_entry_lifecycle: Option<PurchasedAirCalcEntryLifecycleSummary>,
+    purchased_air_calc_minimum_oa_prefix_lifecycle:
+        Option<PurchasedAirCalcMinimumOaPrefixLifecycleSummary>,
 }
 
 struct PreparedRuntimeInputs {
@@ -1190,6 +1195,10 @@ fn finish_successful_summary(
             "purchased_air_calc_entry_lifecycle": result.purchased_air_calc_entry_lifecycle
                 .as_ref()
                 .map(purchased_air_calc_entry_lifecycle_json),
+            "purchased_air_calc_minimum_oa_prefix_lifecycle": result
+                .purchased_air_calc_minimum_oa_prefix_lifecycle
+                .as_ref()
+                .map(purchased_air_minimum_oa::lifecycle_json),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
@@ -2078,6 +2087,7 @@ fn execute_rust_runtime(
                 purchased_air_coupling_call_count: None,
                 purchased_air_init_lifecycle: None,
                 purchased_air_calc_entry_lifecycle: None,
+                purchased_air_calc_minimum_oa_prefix_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
@@ -2118,6 +2128,8 @@ fn execute_rust_runtime(
             let purchased_air_coupling_call_count = Some(simulation.summary.coupling_call_count);
             let purchased_air_init_lifecycle = Some(simulation.summary.init_lifecycle);
             let purchased_air_calc_entry_lifecycle = Some(simulation.summary.calc_entry_lifecycle);
+            let purchased_air_calc_minimum_oa_prefix_lifecycle =
+                Some(simulation.summary.calc_minimum_oa_prefix_lifecycle);
             Ok(RustRuntimeResult {
                 results: simulation.results,
                 runtime_class,
@@ -2134,6 +2146,7 @@ fn execute_rust_runtime(
                 purchased_air_coupling_call_count,
                 purchased_air_init_lifecycle,
                 purchased_air_calc_entry_lifecycle,
+                purchased_air_calc_minimum_oa_prefix_lifecycle,
             })
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
@@ -2160,6 +2173,7 @@ fn execute_rust_runtime(
                 purchased_air_coupling_call_count: None,
                 purchased_air_init_lifecycle: None,
                 purchased_air_calc_entry_lifecycle: None,
+                purchased_air_calc_minimum_oa_prefix_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
@@ -2184,6 +2198,7 @@ fn execute_rust_runtime(
                 purchased_air_coupling_call_count: None,
                 purchased_air_init_lifecycle: None,
                 purchased_air_calc_entry_lifecycle: None,
+                purchased_air_calc_minimum_oa_prefix_lifecycle: None,
             })
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
@@ -2214,8 +2229,19 @@ fn validate_runtime_demand_provenance(
             init_lifecycle,
             result.purchased_air_coupling_call_count,
         )?;
+        purchased_air_minimum_oa::validate_direct_lifecycle(
+            result
+                .purchased_air_calc_minimum_oa_prefix_lifecycle
+                .as_ref(),
+            result.purchased_air_calc_entry_lifecycle.as_ref(),
+            init_lifecycle,
+            result.purchased_air_coupling_call_count,
+        )?;
     } else if result.purchased_air_init_lifecycle.is_some()
         || result.purchased_air_calc_entry_lifecycle.is_some()
+        || result
+            .purchased_air_calc_minimum_oa_prefix_lifecycle
+            .is_some()
         || result.purchased_air_coupling_call_count.is_some()
     {
         return Err(
@@ -2861,8 +2887,8 @@ mod tests {
         artifact_map, ctf_split_trace_enabled, execution_stage_snapshots,
         full_surface_trace_opt_in, input_error_diagnostic_code,
         purchased_air_calc_entry_lifecycle_json, purchased_air_init_lifecycle_json,
-        runtime_class_requires_weather, schedule_cache_json, selected_trace_enabled,
-        source_order_gate_summary, source_order_stage_state_snapshots,
+        purchased_air_minimum_oa, runtime_class_requires_weather, schedule_cache_json,
+        selected_trace_enabled, source_order_gate_summary, source_order_stage_state_snapshots,
         trace_level_enables_stage_snapshots, typed_counts,
         validate_direct_purchased_air_calc_entry_lifecycle,
         validate_direct_purchased_air_init_lifecycle, validate_runtime_selection,
@@ -2878,10 +2904,14 @@ mod tests {
     use ep_runtime::{
         DayType, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
         ExecutionStep, IdealLoadsInitFlags, PURCHASED_AIR_CALC_ENTRY_SOURCE,
-        PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
+        PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE,
+        PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
+        PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
         PurchasedAirAvailabilityStatus, PurchasedAirCalcEntryDemandSnapshot,
         PurchasedAirCalcEntryLifecycleSummary, PurchasedAirCalcEntryResetSnapshot,
         PurchasedAirCalcEntryRuntimeState, PurchasedAirCalcEntrySnapshot,
+        PurchasedAirCalcMinimumOaPrefixLifecycleSummary,
+        PurchasedAirCalcMinimumOaPrefixRuntimeState, PurchasedAirCalcMinimumOaPrefixSnapshot,
         PurchasedAirHardSizeField, PurchasedAirHardSizeFieldOutcome,
         PurchasedAirHardSizeLegacyOutcome, PurchasedAirHardSizeLegacyRoute,
         PurchasedAirInitLifecycleSummary, PurchasedAirRecirculationSource, PurchasedAirSizedLimits,
@@ -3119,6 +3149,108 @@ mod tests {
     }
 
     #[test]
+    fn direct_release_minimum_oa_prefix_validation_rejects_disconnected_evidence() {
+        let init = valid_init_lifecycle(2);
+        let entry = valid_calc_entry_lifecycle(2);
+        let valid = valid_minimum_oa_prefix_lifecycle(2);
+        assert!(
+            purchased_air_minimum_oa::validate_direct_lifecycle(
+                Some(&valid),
+                Some(&entry),
+                Some(&init),
+                Some(2)
+            )
+            .is_ok()
+        );
+        assert!(
+            purchased_air_minimum_oa::validate_direct_lifecycle(
+                None,
+                Some(&entry),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_child = valid.clone();
+        wrong_child.minimum_oa_child_source = "diagnostic-minimum-oa-child";
+        assert!(
+            purchased_air_minimum_oa::validate_direct_lifecycle(
+                Some(&wrong_child),
+                Some(&entry),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+        let mut overflowed_partition = valid.clone();
+        overflowed_partition.state.source_execution_count = usize::MAX;
+        overflowed_partition.state.unit_off_skip_count = 1;
+        assert!(
+            purchased_air_minimum_oa::validate_direct_lifecycle(
+                Some(&overflowed_partition),
+                Some(&entry),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+        let mut active_outdoor_air = valid;
+        active_outdoor_air.state.outdoor_air_effect_count = 1;
+        active_outdoor_air
+            .state
+            .latest
+            .as_mut()
+            .expect("valid latest minimum-OA prefix")
+            .outdoor_air_enabled = Some(true);
+        assert!(
+            purchased_air_minimum_oa::validate_direct_lifecycle(
+                Some(&active_outdoor_air),
+                Some(&entry),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn direct_release_minimum_oa_prefix_json_exposes_zero_no_oa_route() {
+        let lifecycle = valid_minimum_oa_prefix_lifecycle(2);
+        let value = purchased_air_minimum_oa::lifecycle_json(&lifecycle);
+
+        assert_eq!(value["source"], PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE);
+        assert_eq!(
+            value["minimum_oa_child_source"],
+            PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE
+        );
+        assert_eq!(value["transition_count"], 2);
+        assert_eq!(value["source_execution_count"], 2);
+        assert_eq!(value["ems_override_apply_count"], 0);
+        assert_eq!(value["outdoor_air_effect_count"], 0);
+        assert_eq!(value["no_outdoor_air_zero_branch_count"], 2);
+        assert_eq!(value["latest"]["parent_call_ordinal"], 2);
+        assert_eq!(value["latest"]["ems_override_enabled"], false);
+        assert_eq!(value["latest"]["outdoor_air_enabled"], false);
+        assert_eq!(
+            value["latest"]["retained_minimum_outdoor_air_mass_flow_rate_kg_per_s"],
+            0.0
+        );
+        assert_eq!(
+            value["latest"]["working_outdoor_air_mass_flow_rate_kg_per_s"],
+            0.0
+        );
+        assert_eq!(
+            value["latest"]["minimum_outdoor_air_sensible_output_w"],
+            0.0
+        );
+        assert_eq!(
+            value["latest"]["minimum_outdoor_air_moisture_output_kg_per_s"],
+            0.0
+        );
+    }
+
+    #[test]
     fn lifecycle_json_serializes_structured_supply_temperature_diagnostics() {
         let mut lifecycle = valid_init_lifecycle(1);
         lifecycle.supply_temperature_registered_recurring_diagnostic_count = 1;
@@ -3173,6 +3305,51 @@ mod tests {
             5
         );
         assert_eq!(registry["identities"][0]["temperature_unit"], "C");
+    }
+
+    fn valid_minimum_oa_prefix_lifecycle(
+        call_count: usize,
+    ) -> PurchasedAirCalcMinimumOaPrefixLifecycleSummary {
+        let system = IdealLoadsAirSystemId(0);
+        let mut state = PurchasedAirCalcMinimumOaPrefixRuntimeState::new(system);
+        state.transition_count = call_count;
+        state.source_execution_count = call_count;
+        state.zone_heat_balance_reference_count = call_count;
+        state.minimum_oa_child_call_count = call_count;
+        state.minimum_oa_child_no_outdoor_air_count = call_count;
+        state.retained_minimum_outdoor_air_write_count = call_count;
+        state.ems_override_flag_read_count = call_count;
+        state.outdoor_air_flag_read_count = call_count;
+        state.no_outdoor_air_zero_branch_count = call_count;
+        state.latest = Some(PurchasedAirCalcMinimumOaPrefixSnapshot {
+            source: PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
+            minimum_oa_child_source: PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE,
+            system,
+            parent_call_ordinal: call_count,
+            source_order: PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER,
+            controlled_zone: ZoneId(0),
+            unit_body_entered: true,
+            zone_heat_balance_reference_bound: true,
+            minimum_oa_child_called: true,
+            minimum_oa_child_no_outdoor_air_route: true,
+            retained_minimum_outdoor_air_mass_flow_rate_kg_per_s: Some(0.0),
+            retained_minimum_outdoor_air_write_performed: true,
+            ems_override_flag_read: true,
+            ems_override_enabled: Some(false),
+            ems_override_applied: false,
+            working_outdoor_air_mass_flow_rate_kg_per_s: Some(0.0),
+            outdoor_air_flag_read: true,
+            outdoor_air_enabled: Some(false),
+            no_outdoor_air_zero_branch_entered: true,
+            psychrometric_call_count: 0,
+            minimum_outdoor_air_sensible_output_w: Some(0.0),
+            minimum_outdoor_air_moisture_output_kg_per_s: Some(0.0),
+        });
+        PurchasedAirCalcMinimumOaPrefixLifecycleSummary {
+            source: PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
+            minimum_oa_child_source: PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE,
+            state,
+        }
     }
 
     fn valid_calc_entry_lifecycle(call_count: usize) -> PurchasedAirCalcEntryLifecycleSummary {

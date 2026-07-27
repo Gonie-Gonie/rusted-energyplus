@@ -120,8 +120,8 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP305-CP309 bounded release slice: `crates/ep_runtime/src/ideal_loads/init/manager_plan.rs::PurchasedAirInitManagerPlan` eagerly resolves the immutable declaration-order membership plan; `topology_plan.rs::PurchasedAirInitTopologyPlan` resolves selected-unit topology; `state.rs::PurchasedAirRuntimeState` retains manager, per-unit lifecycle, the four-field sizing overlay, and the bounded global diagnostic registry; `topology_transition.rs::advance_selected_unit_topology`, `transition.rs::init_purchased_air_runtime`, and `supply_temperature_diagnostic.rs::advance_supply_temperature_diagnostics` execute the ordered persistent transitions through the hard-size child, BeginEnvrn, and supply-temperature suffix; and `summary.rs::PurchasedAirInitLifecycleSummary` plus `transition.rs::purchased_air_init_lifecycle_summary` report manager, selected-unit, sizing, and diagnostic evidence for JSON projection. Diagnostic adapters retain `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` only. |
 | `DataZoneEquipment::CheckZoneEquipmentList` | `src/EnergyPlus/DataZoneEquipment.cc` | CP306 `PurchasedAirInitManagerPlan::from_model` eagerly resolves bounded membership in retained Zone order through each Zone's EquipmentConnection and referenced list entries, ignoring unreferenced lists. The matched-list ID is Rust diagnostic evidence; this `InitPurchasedAir` call observes only the Boolean return and does not request optional `CtrlZoneNum`. Runtime Init defers only latch and outcome recording. |
 | `PurchasedAirManager::SizePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP308 `crates/ep_runtime/src/ideal_loads/sizing.rs::size_purchased_air_direct_hard_sized_legacy_route` and `PurchasedAirHardSizeLegacyOutcome` map only the direct hard-sized/no-Zone-sizing-run legacy route; `crates/ep_runtime/src/ideal_loads/dispatch.rs::IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` continues to block Autosize and broader sizing. |
-| `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | CP310 `crates/ep_runtime/src/ideal_loads/calc/lifecycle.rs::{advance_purchased_air_calc_entry,purchased_air_calc_entry_lifecycle_summary}` maps only the line-1967 alias plus lines 1971-2022 entry prefix; existing `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` owns the bounded no-OA sensible calculation. |
-| `PurchasedAirManager::CalcPurchAirMinOAMassFlow` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air/minimum_flow.rs::resolve_minimum_outdoor_air_compat`, orchestrated by `sim_purchased_air_outdoor_air_compat` |
+| `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | CP310 `crates/ep_runtime/src/ideal_loads/calc/lifecycle.rs::{advance_purchased_air_calc_entry,purchased_air_calc_entry_lifecycle_summary}` maps the line-1967 alias plus lines 1971-2022 entry prefix. CP311 `crates/ep_runtime/src/ideal_loads/calc/minimum_oa_prefix.rs::{advance_direct_no_oa_calc_minimum_oa_prefix,purchased_air_calc_minimum_oa_prefix_lifecycle_summary}` maps the lines 2023-2040 parent prefix only for the no-OA/no-EMS release route. Existing `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` owns the later bounded no-OA sensible calculation. |
+| `PurchasedAirManager::CalcPurchAirMinOAMassFlow` | `src/EnergyPlus/PurchasedAirManager.cc` | CP311 reaches the child from its source parent and maps only the no-OA lines 2781, 2783, 2785, and 2806-2809 retained-zero route in `calc/minimum_oa_prefix.rs`; the separate diagnostic `crates/ep_runtime/src/ideal_loads/outdoor_air/minimum_flow.rs::resolve_minimum_outdoor_air_compat`, orchestrated by `sim_purchased_air_outdoor_air_compat`, remains immutable and is not full child lifecycle parity. |
 | `PurchasedAirManager::UpdatePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/update.rs::supply_node_update_from_result`; CP300 `DirectZonePurchasedAirSystemFeedback` consumes that immutable payload for a bounded one-inlet correction projection, not the full source node/plenum lifecycle |
 | `PurchasedAirManager::ReportPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/report.rs::IdealLoadsReportSnapshot`; `crates/ep_runtime/src/output/meter_registry.rs::meter_rate_to_energy_j`; CP302 `coupled_output.rs::append_direct_zone_purchased_air_hourly_output_series` averages fixed-step rate/node values and sums rate-times-step energy only for the bounded coupled runtime |
 | `DataSizing::calcDesignSpecificationOutdoorAir` | `src/EnergyPlus/DataSizing.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air/dcv.rs::occupancy_schedule_dcv_outdoor_air_volume_flow_components_m3_per_s` |
@@ -15179,8 +15179,12 @@ Rust owns an explicit bounded counterpart in
 `resolve_minimum_outdoor_air_compat` only for an available unit, returns an
 immutable design/selected/DCV/final-flow snapshot, and feeds the final minimum
 to its separate OA Calc path. An unavailable unit skips resolution and carries
-no minimum result. There is no mutable output reference or persistent
-PurchasedAir field with the source write order.
+no minimum result. That diagnostic resolver remains immutable and separate
+from the persistent release lifecycle. CP311 later adds only the bounded
+parent call site and the no-OA child route that rewrites retained
+`MinOAMassFlowRate=0` in source order. It does not add the source mutable-output
+reference, the OA-true child graph, or complete child failure and partial-write
+order.
 
 The resolver supports the six basic DSOA methods: Flow/Person, Flow/Area,
 Flow/Zone, AirChanges/Hour, Sum, and Maximum. It substitutes current people for
@@ -18484,13 +18488,48 @@ copies to equal coupling count, zero `ForceOff` activity, both mode-on counts
 to equal calls, reconciled unit partitions, exact latest state, and run-summary
 JSON evidence. Non-direct runtime lanes reject this lifecycle evidence.
 
-This checkpoint excludes the line-2023 active body, minimum OA, OA/EMS,
-operating-mode selection, economizer/heat recovery, humidity, psychrometrics,
-limits and mixed-air behavior, UnitOff tail, node/report writes, actual
-schedule and ZoneComp service effects, output-reference aliasing, failure and
-concurrency parity, and full Calc parity. Custom/autosized Size work remains
-separately deferred. Parent/routine status, inventory/readiness, capabilities,
-evidence cases, conformance, and Roadmap state remain unchanged.
+CP310 itself stops before line 2023. Minimum OA, OA/EMS, operating-mode
+selection, economizer/heat recovery, humidity, psychrometrics, limits and
+mixed-air behavior, UnitOff tail, node/report writes, actual schedule and
+ZoneComp service effects, output-reference aliasing, failure and concurrency
+parity, and full Calc parity are outside that checkpoint.
+
+## CP311 `CalcPurchAirLoads` Minimum-OA Parent Prefix
+
+CP311 maps the next complete parent slice at `PurchasedAirManager.cc` lines
+2023-2040 and stops before the operating-mode branch at line 2046. The
+line-2023 Zone heat-balance reference is binding evidence only; this slice
+reads no field from it. Line 2025 reaches the separately anchored
+`CalcPurchAirMinOAMassFlow` lines 2762-2810, but the release implementation
+executes only its no-OA lines 2781, 2783, 2785, and 2806-2809 route.
+
+`advance_direct_no_oa_calc_minimum_oa_prefix` consumes the exact latest CP310
+snapshot in one-for-one order. An entered `UnitOn` body binds the controlled
+Zone reference, visits the child once, zeros the child-local OA flow, rewrites
+retained pre-EMS `MinOAMassFlowRate=0`, reads the false EMS override predicate,
+reads the false `OutdoorAir` predicate, and sets the parent-local minimum-OA
+sensible and moisture effects to zero. A CP310 UnitOff result skips every one
+of those sites. HeatOn and CoolOn do not separately gate the prefix, so an
+entered body reaches it even when both are false.
+
+The release binder places CP311 after CP310 and before the existing bounded
+Calc. Per-step snapshots plus the persistent lifecycle summary reconcile
+transitions, source executions/UnitOff skips, Zone-reference bindings, child
+visits, retained writes, EMS and OA predicate reads, zero branches, inactive
+OA effects and psychrometric calls, exact identities, and latest values.
+`ep_run` publishes
+`purchased_air_calc_minimum_oa_prefix_lifecycle` only on the direct runtime and
+rejects disconnected or non-direct evidence.
+
+This does not promote the existing diagnostic OA resolver into release
+evidence. Full child DSOA/DCV/schedule/density/CO2 and cutoff work, OA-true
+specific heat and node-difference calculations, EMS replacement of only the
+post-child local flow, C++ mutable-output aliasing, NaN/infinity and partial
+failure order, line-2046-and-later mode selection, and every later Calc stage
+remain excluded. Custom/autosized Size work remains separately deferred.
+Both parents remain `scaffold`/`none`; Calc and minimum-OA child routines
+remain `source_mapped`; inventory/readiness, support, evidence cases,
+conformance, and Roadmap state remain unchanged.
 
 ## Claim Requirements
 

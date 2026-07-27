@@ -24,6 +24,8 @@ const RECIRCULATION_SOURCE: &str = "rust-direct-zone-return-projection";
 const RECIRCULATION_NODE: &str = "ZONE ONE RETURN";
 const INIT_LIFECYCLE_SOURCE: &str = "rust-persistent-init-purchased-air";
 const CALC_ENTRY_LIFECYCLE_SOURCE: &str = "EnergyPlus 26.1 PurchasedAirManager.cc:1967,1971-2022";
+const CALC_MINIMUM_OA_PREFIX_SOURCE: &str = "EnergyPlus 26.1 PurchasedAirManager.cc:2023-2040";
+const CALC_MINIMUM_OA_CHILD_SOURCE: &str = "EnergyPlus 26.1 PurchasedAirManager.cc:2762-2810; bounded no-OA route 2781,2783,2785,2806-2809";
 const COUPLED_SOURCE_ORDER: [&str; 6] = [
     "predict-system-loads",
     "init-purchased-air",
@@ -485,6 +487,71 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
     assert_eq!(latest["heating_on"], true);
     assert_eq!(latest["cooling_on"], true);
     assert_eq!(latest["unit_body_entered"], latest["unit_on"]);
+
+    let minimum_oa = &runtime["purchased_air_calc_minimum_oa_prefix_lifecycle"];
+    assert_eq!(minimum_oa["source"], CALC_MINIMUM_OA_PREFIX_SOURCE);
+    assert_eq!(
+        minimum_oa["minimum_oa_child_source"],
+        CALC_MINIMUM_OA_CHILD_SOURCE
+    );
+    assert_eq!(minimum_oa["transition_count"], expected_calls);
+    assert_eq!(minimum_oa["source_execution_count"], expected_calls);
+    assert_eq!(minimum_oa["unit_off_skip_count"], 0);
+    assert_eq!(
+        minimum_oa["zone_heat_balance_reference_count"],
+        expected_calls
+    );
+    assert_eq!(minimum_oa["minimum_oa_child_call_count"], expected_calls);
+    assert_eq!(
+        minimum_oa["minimum_oa_child_no_outdoor_air_count"],
+        expected_calls
+    );
+    assert_eq!(
+        minimum_oa["retained_minimum_outdoor_air_write_count"],
+        expected_calls
+    );
+    assert_eq!(minimum_oa["ems_override_flag_read_count"], expected_calls);
+    assert_eq!(minimum_oa["ems_override_apply_count"], 0);
+    assert_eq!(minimum_oa["outdoor_air_flag_read_count"], expected_calls);
+    assert_eq!(minimum_oa["outdoor_air_effect_count"], 0);
+    assert_eq!(
+        minimum_oa["no_outdoor_air_zero_branch_count"],
+        expected_calls
+    );
+    assert_eq!(minimum_oa["psychrometric_call_count"], 0);
+    let latest_minimum_oa = &minimum_oa["latest"];
+    assert_eq!(latest_minimum_oa["source"], CALC_MINIMUM_OA_PREFIX_SOURCE);
+    assert_eq!(
+        latest_minimum_oa["minimum_oa_child_source"],
+        CALC_MINIMUM_OA_CHILD_SOURCE
+    );
+    assert_eq!(latest_minimum_oa["parent_call_ordinal"], expected_calls);
+    assert_eq!(
+        latest_minimum_oa["controlled_zone"],
+        lifecycle["controlled_zone"]
+    );
+    assert_eq!(latest_minimum_oa["unit_body_entered"], true);
+    assert_eq!(latest_minimum_oa["zone_heat_balance_reference_bound"], true);
+    assert_eq!(latest_minimum_oa["minimum_oa_child_called"], true);
+    assert_eq!(latest_minimum_oa["ems_override_enabled"], false);
+    assert_eq!(latest_minimum_oa["ems_override_applied"], false);
+    assert_eq!(latest_minimum_oa["outdoor_air_enabled"], false);
+    assert_eq!(
+        latest_minimum_oa["retained_minimum_outdoor_air_mass_flow_rate_kg_per_s"],
+        0.0
+    );
+    assert_eq!(
+        latest_minimum_oa["working_outdoor_air_mass_flow_rate_kg_per_s"],
+        0.0
+    );
+    assert_eq!(
+        latest_minimum_oa["minimum_outdoor_air_sensible_output_w"],
+        0.0
+    );
+    assert_eq!(
+        latest_minimum_oa["minimum_outdoor_air_moisture_output_kg_per_s"],
+        0.0
+    );
 }
 
 #[test]

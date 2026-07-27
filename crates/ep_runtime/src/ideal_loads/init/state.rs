@@ -5,7 +5,8 @@ use std::collections::BTreeMap;
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
 use super::super::{
-    PurchasedAirCalcEntryRuntimeState, PurchasedAirHardSizeLegacyOutcome, PurchasedAirSizedLimits,
+    PurchasedAirCalcEntryRuntimeState, PurchasedAirCalcMinimumOaPrefixRuntimeState,
+    PurchasedAirHardSizeLegacyOutcome, PurchasedAirSizedLimits,
 };
 use super::{
     IdealLoadsInitFlags, PurchasedAirInitTopologyDiagnostic, PurchasedAirInitTopologyError,
@@ -87,6 +88,8 @@ pub struct PurchasedAirUnitRuntimeState {
     pub recirculation_source: Option<PurchasedAirRecirculationSource>,
     /// Persistent bounded `CalcPurchAirLoads` entry-prefix state.
     pub calc_entry: PurchasedAirCalcEntryRuntimeState,
+    /// Persistent bounded minimum-outdoor-air prefix state.
+    pub calc_minimum_oa_prefix: PurchasedAirCalcMinimumOaPrefixRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -160,6 +163,7 @@ impl PurchasedAirUnitRuntimeState {
             recirculation_node: None,
             recirculation_source: None,
             calc_entry: PurchasedAirCalcEntryRuntimeState::new(system),
+            calc_minimum_oa_prefix: PurchasedAirCalcMinimumOaPrefixRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,
