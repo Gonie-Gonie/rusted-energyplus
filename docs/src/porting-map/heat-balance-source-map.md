@@ -33168,6 +33168,57 @@ status, algorithm/routine count, readiness, capability, output claim,
 performance claim, or conformance claim is promoted. Roadmap Section 12
 remains open.
 
+## CP303 Source-Valid Return Projection and Hard-Sized Sensible Limits
+
+CP303 corrects CP302's direct-Zone topology assumption. EnergyPlus
+PurchasedAir falls back from a blank exhaust-node name to the controlled Zone
+return node for recirculation state, so a no-return model could not establish
+that source path. `bind_direct_zone_purchased_air_model` now requires one
+resolved return node, distinct from the supply and Zone-air nodes, and retains
+its typed identity. Return-flow fraction/basis controls, an IdealLoads exhaust
+node, system-inlet/plenum topology, a ZoneHVAC sizing object, and
+heating/cooling fuel-efficiency schedules still fail closed.
+
+The same release-called fixed ThirdOrder heat-balance loop now supports every
+hard-sized no-OA sensible limit shape: no limit, finite capacity, finite flow,
+and combined finite flow plus capacity. Active heating and cooling limits must
+resolve to explicit finite nonnegative numeric values; missing and `Autosize`
+values are rejected, as are humidity-control and outdoor-air branches. Generic
+PurchasedAir owns the finite-limit arithmetic, while the coupled runtime
+verifies that every returned branch equals the immutable binding.
+
+Hard-sized flow conversion retains the binding's Site-elevation `StdRhoAir`.
+At each live release timestep, only the saturation context's barometric
+pressure is replaced by the active interpolated EPW pressure. A regression
+with distinct Site and weather pressures locks that source-order split.
+
+The source positive-only flow clamp is unchanged: a hard-sized zero flow
+maximum alone does not clamp a positive candidate, while a combined selector
+can still apply its finite capacity.
+
+Rust does not yet maintain return-node `NodeStateStore` history. For this
+bounded fully mixed topology, the current direct-Zone temperature and humidity
+ratio are projected explicitly into the bound return role and passed as
+PurchasedAir recirculation state. The release summary records the return-node
+name, selected branch, and
+`recirculation_state_source = rust-direct-zone-return-projection`. CP299
+continues to produce `SourceSetpointThresholds` demand, and CP300 commits the
+final limited supply feedback for same-step correction. Out-of-topology legacy
+finite-limit models continue through compatibility/default demand.
+
+Focused tests cover all four branches, finite heating and cooling response,
+zero-capacity clearing, zero-flow source behavior, invalid hard-size rejection,
+return-node identity, live weather-pressure saturation, and release-summary
+demand/recirculation provenance.
+CP303 does not implement the
+persistent one-time/environment/sizing/equipment flags and caches of
+`InitPurchasedAir`, return-node lifecycle storage, `SizePurchasedAir` or
+autosizing, humidity/OA/DCV/economizer/heat recovery/EMS, warmup, adaptive
+system timesteps, `FirstHVACIteration`, multiple-equipment residuals,
+full-timestep rollback, or a new conformance promotion. Both parent algorithms
+remain `scaffold` at claim level `none`; routine and inventory statuses do not
+change, and Roadmap Section 12's first checkbox remains open.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

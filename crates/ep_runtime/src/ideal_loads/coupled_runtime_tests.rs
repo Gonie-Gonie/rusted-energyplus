@@ -2,8 +2,9 @@ use super::*;
 
 use crate::{
     ideal_loads::{
-        DirectZonePurchasedAirBindingFeature, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
-        ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
+        DirectZonePurchasedAirBindingFeature, IdealLoadsSensibleLimitContext,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO, ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE,
+        ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
         ZONE_SYSTEM_PREDICTED_SENSIBLE_LOAD_TO_COOLING_SETPOINT_RATE,
         ZONE_SYSTEM_PREDICTED_SENSIBLE_LOAD_TO_HEATING_SETPOINT_RATE,
     },
@@ -12,10 +13,10 @@ use crate::{
     weather::{EpwRecord, WeatherTimestepSeries},
 };
 use ep_model::{
-    AutoOrNumber, DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
-    HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsFuelType,
-    IdealLoadsLimit, LoadDistributionScheme, Node, NodeId, NormalizedName,
-    OutdoorAirEconomizerType, Point3, ScheduleConstant, ScheduleId, SimulationModel,
+    AutoOrNumber, AutosizeOrNumber, DehumidificationControlType, DemandControlledVentilationType,
+    HeatRecoveryType, HumidificationControlType, IdealLoadsAirSystem, IdealLoadsAirSystemId,
+    IdealLoadsFuelType, IdealLoadsLimit, LoadDistributionScheme, Node, NodeId, NormalizedName,
+    OutdoorAirEconomizerType, Point3, ScheduleConstant, ScheduleId, SimulationModel, SiteLocation,
     ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TypedModel, Zone,
     ZoneConvectionAlgorithm, ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
     ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId, ZoneThermostat,
@@ -30,6 +31,7 @@ const COOLING_SETPOINT_C: f64 = 35.0;
 const SYSTEM_KEY: &str = "ZONE IDEAL LOADS";
 const ZONE_KEY: &str = "ZONE ONE";
 const SUPPLY_NODE_KEY: &str = "SUPPLY";
+const RETURN_NODE_KEY: &str = "RETURN";
 const ABS_TOLERANCE: f64 = 1.0e-9;
 
 #[test]
@@ -60,6 +62,7 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
     );
     assert_eq!(simulation.summary.system_name, SYSTEM_KEY);
     assert_eq!(simulation.summary.supply_node_name, SUPPLY_NODE_KEY);
+    assert_eq!(simulation.summary.return_node_name, RETURN_NODE_KEY);
     assert_eq!(
         simulation.summary.branch,
         IdealLoadsPurchasedAirBranch::NoOaNoLimitSensible
@@ -69,6 +72,10 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
         DIRECT_ZONE_PURCHASED_AIR_DEMAND_SOURCE
     );
     assert!(!simulation.summary.fixture_demand_injection_used);
+    assert_eq!(
+        simulation.summary.recirculation_state_source,
+        DIRECT_ZONE_PURCHASED_AIR_RECIRCULATION_SOURCE
+    );
     assert_eq!(
         simulation.summary.actual_coupled_source_order,
         DIRECT_ZONE_PURCHASED_AIR_COUPLED_SOURCE_ORDER
@@ -119,6 +126,151 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
         assert_close(*energy_j, *rate_w * 3_600.0);
     }
     assert!(simulation.results.diagnostics().is_empty());
+}
+
+#[test]
+fn all_hard_sized_finite_limit_branches_run_with_source_threshold_demand() {
+    for (limit, expected_branch) in [
+        (
+            IdealLoadsLimit::LimitCapacity,
+            IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity,
+        ),
+        (
+            IdealLoadsLimit::LimitFlowRate,
+            IdealLoadsPurchasedAirBranch::NoOaFiniteFlow,
+        ),
+        (
+            IdealLoadsLimit::LimitFlowRateAndCapacity,
+            IdealLoadsPurchasedAirBranch::NoOaFiniteFlowAndCapacity,
+        ),
+    ] {
+        let mut typed = exact_model(STEPS_PER_HOUR).typed;
+        let system = &mut typed.ideal_loads_air_systems[0];
+        system.heating_limit = limit;
+        system.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.005));
+        system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(300.0));
+        system.cooling_limit = limit;
+        system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.005));
+        system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(300.0));
+        let model = SimulationModel::from_typed(typed);
+        let required_steps = STEPS_PER_HOUR as usize;
+        let schedule_cache =
+            precompute_schedule_cache(&model.typed, required_steps).expect("finite schedule cache");
+        let weather = weather_series(&model, 1);
+
+        let simulation = simulate_direct_zone_purchased_air_coupled_heat_balance(
+            &model,
+            &weather,
+            &schedule_cache,
+            DirectZonePurchasedAirCoupledOptions::hourly_samples(1),
+        )
+        .expect("hard-sized finite branch in the live coupled loop");
+
+        assert_eq!(simulation.summary.branch, expected_branch);
+        assert_eq!(simulation.summary.coupling_call_count, required_steps);
+        assert_eq!(
+            simulation.summary.zone_demand_source,
+            DIRECT_ZONE_PURCHASED_AIR_DEMAND_SOURCE
+        );
+        assert!(!simulation.summary.fixture_demand_injection_used);
+        assert_eq!(
+            simulation.summary.recirculation_state_source,
+            DIRECT_ZONE_PURCHASED_AIR_RECIRCULATION_SOURCE
+        );
+        assert_eq!(
+            simulation.summary.actual_coupled_source_order,
+            DIRECT_ZONE_PURCHASED_AIR_COUPLED_SOURCE_ORDER
+        );
+        assert_eq!(simulation.summary.return_node_name, RETURN_NODE_KEY);
+
+        let heating_rate = simulation
+            .results
+            .find_series(SYSTEM_KEY, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE)
+            .expect("finite hourly heating rate");
+        let heating_energy = simulation
+            .results
+            .find_series(SYSTEM_KEY, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY)
+            .expect("finite hourly heating energy");
+        let predicted_heating = simulation
+            .results
+            .find_series(
+                ZONE_KEY,
+                ZONE_SYSTEM_PREDICTED_SENSIBLE_LOAD_TO_HEATING_SETPOINT_RATE,
+            )
+            .expect("source heating threshold");
+        assert!(heating_rate.values[0] > 0.0);
+        assert!(
+            heating_rate.values[0] < predicted_heating.values[0],
+            "the deliberately small hard-sized limit must constrain the live predicted demand"
+        );
+        assert_close(heating_energy.values[0], heating_rate.values[0] * 3_600.0);
+    }
+}
+
+#[test]
+fn live_coupling_uses_weather_pressure_for_supply_saturation() {
+    const WEATHER_PRESSURE_PA: f64 = 101_325.0;
+    const SITE_ELEVATION_M: f64 = 3_000.0;
+
+    let mut typed = exact_model(1).typed;
+    typed.site = Some(SiteLocation {
+        name: NormalizedName::new("HIGH SITE"),
+        latitude_deg: 0.0,
+        longitude_deg: 0.0,
+        time_zone_hours: 0.0,
+        elevation_m: SITE_ELEVATION_M,
+    });
+    typed.schedules[1].hourly_value = 0.0;
+    typed.schedules[2].hourly_value = 15.0;
+    let system = &mut typed.ideal_loads_air_systems[0];
+    system.cooling_limit = IdealLoadsLimit::LimitCapacity;
+    system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(1.0e9));
+    let model = SimulationModel::from_typed(typed);
+    let schedule_cache =
+        precompute_schedule_cache(&model.typed, 1).expect("one-step cooling schedule cache");
+    let weather = weather_series_with_conditions(&model, 1, 30.0, 30.0, 100.0, WEATHER_PRESSURE_PA);
+    let mut options = DirectZonePurchasedAirCoupledOptions::hourly_samples(1);
+    options.initial_zone_air_temperature_c = INITIAL_ZONE_TEMPERATURE_C;
+
+    let simulation = simulate_direct_zone_purchased_air_coupled_heat_balance(
+        &model,
+        &weather,
+        &schedule_cache,
+        options,
+    )
+    .expect("live finite cooling with weather-derived saturation pressure");
+
+    let supply_temperature_c = simulation
+        .results
+        .find_series(SYSTEM_KEY, ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE)
+        .expect("supply temperature")
+        .values[0];
+    let supply_humidity_ratio = simulation
+        .results
+        .find_series(SYSTEM_KEY, ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO)
+        .expect("supply humidity ratio")
+        .values[0];
+    let expected_weather_saturation = crate::energyplus_psychrometric_humidity_ratio_from_rh(
+        supply_temperature_c,
+        1.0,
+        WEATHER_PRESSURE_PA,
+    )
+    .expect("weather-pressure saturation humidity ratio");
+    let site_pressure_pa = IdealLoadsSensibleLimitContext::from_site_elevation_m(SITE_ELEVATION_M)
+        .expect("site-derived context")
+        .barometric_pressure_pa;
+    let stale_site_saturation = crate::energyplus_psychrometric_humidity_ratio_from_rh(
+        supply_temperature_c,
+        1.0,
+        site_pressure_pa,
+    )
+    .expect("site-pressure saturation humidity ratio");
+
+    assert_close(supply_humidity_ratio, expected_weather_saturation);
+    assert!(
+        (supply_humidity_ratio - stale_site_saturation).abs() > 1.0e-3,
+        "the live clamp must not reuse site-derived standard pressure"
+    );
 }
 
 #[test]
@@ -283,7 +435,11 @@ fn exact_model(steps_per_hour: u32) -> SimulationModel {
         }],
         temperature_difference_between_cutout_and_setpoint_delta_c: 0.0,
     });
-    for (id, name) in [(NodeId(0), SUPPLY_NODE_KEY), (NodeId(1), "ZONE AIR")] {
+    for (id, name) in [
+        (NodeId(0), SUPPLY_NODE_KEY),
+        (NodeId(1), "ZONE AIR"),
+        (NodeId(2), RETURN_NODE_KEY),
+    ] {
         typed.nodes.push(Node {
             id,
             name: NormalizedName::new(name),
@@ -315,7 +471,7 @@ fn exact_model(steps_per_hour: u32) -> SimulationModel {
             zone_air_inlet_node_or_nodelist_name: Some(NormalizedName::new(SUPPLY_NODE_KEY)),
             zone_air_exhaust_node_or_nodelist_name: None,
             zone_air_node_name: NormalizedName::new("ZONE AIR"),
-            zone_return_air_node_or_nodelist_name: None,
+            zone_return_air_node_or_nodelist_name: Some(NormalizedName::new(RETURN_NODE_KEY)),
             zone_return_air_node_1_flow_rate_fraction_schedule: None,
             zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name: None,
         });
@@ -361,6 +517,17 @@ fn exact_ideal_loads_system() -> IdealLoadsAirSystem {
 }
 
 fn weather_series(model: &SimulationModel, hours: usize) -> WeatherTimestepSeries {
+    weather_series_with_conditions(model, hours, 5.0, 0.0, 50.0, 101_325.0)
+}
+
+fn weather_series_with_conditions(
+    model: &SimulationModel,
+    hours: usize,
+    dry_bulb_c: f64,
+    dew_point_c: f64,
+    relative_humidity_percent: f64,
+    atmospheric_pressure_pa: f64,
+) -> WeatherTimestepSeries {
     let records = (0..hours)
         .map(|hour_index| EpwRecord {
             year: 2013,
@@ -368,10 +535,10 @@ fn weather_series(model: &SimulationModel, hours: usize) -> WeatherTimestepSerie
             day: 1,
             hour: hour_index as u32 + 1,
             minute: 60,
-            dry_bulb_c: 5.0,
-            dew_point_c: 0.0,
-            relative_humidity_percent: 50.0,
-            atmospheric_pressure_pa: 101_325.0,
+            dry_bulb_c,
+            dew_point_c,
+            relative_humidity_percent,
+            atmospheric_pressure_pa,
             horizontal_infrared_radiation_wh_per_m2: 0.0,
             global_horizontal_radiation_wh_per_m2: 0.0,
             direct_normal_radiation_wh_per_m2: 0.0,

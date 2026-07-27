@@ -137,6 +137,9 @@ struct RustRuntimeResult {
     schedule_cache_profile: ScheduleCacheProfile,
     source_order_gate: SourceOrderGateSummary,
     zone_demand_source: Option<String>,
+    purchased_air_branch: Option<String>,
+    recirculation_node: Option<String>,
+    recirculation_state_source: Option<String>,
     actual_coupled_source_order: Option<Vec<String>>,
 }
 
@@ -809,6 +812,9 @@ fn finish_successful_summary(
             ),
             "source_order_stages": result.source_order_gate.actual_executed_source_order_stages.clone(),
             "zone_demand_source": result.zone_demand_source.as_deref(),
+            "purchased_air_branch": result.purchased_air_branch.as_deref(),
+            "recirculation_node": result.recirculation_node.as_deref(),
+            "recirculation_state_source": result.recirculation_state_source.as_deref(),
             "actual_coupled_source_order": result.actual_coupled_source_order.as_deref(),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
@@ -1690,6 +1696,9 @@ fn execute_rust_runtime(
                 schedule_cache_profile,
                 source_order_gate,
                 zone_demand_source: None,
+                purchased_air_branch: None,
+                recirculation_node: None,
+                recirculation_state_source: None,
                 actual_coupled_source_order: None,
             })
         }
@@ -1714,6 +1723,10 @@ fn execute_rust_runtime(
             )
             .map_err(|error| error.to_string())?;
             let zone_demand_source = Some(simulation.summary.zone_demand_source.to_string());
+            let purchased_air_branch = Some(simulation.summary.branch.label().to_string());
+            let recirculation_node = Some(simulation.summary.return_node_name.clone());
+            let recirculation_state_source =
+                Some(simulation.summary.recirculation_state_source.to_string());
             let actual_coupled_source_order = Some(
                 simulation
                     .summary
@@ -1730,6 +1743,9 @@ fn execute_rust_runtime(
                 schedule_cache_profile,
                 source_order_gate,
                 zone_demand_source,
+                purchased_air_branch,
+                recirculation_node,
+                recirculation_state_source,
                 actual_coupled_source_order,
             })
         }
@@ -1752,6 +1768,9 @@ fn execute_rust_runtime(
                 schedule_cache_profile,
                 source_order_gate,
                 zone_demand_source: None,
+                purchased_air_branch: None,
+                recirculation_node: None,
+                recirculation_state_source: None,
                 actual_coupled_source_order: None,
             })
         }
@@ -1769,6 +1788,9 @@ fn execute_rust_runtime(
                 schedule_cache_profile,
                 source_order_gate,
                 zone_demand_source: None,
+                purchased_air_branch: None,
+                recirculation_node: None,
+                recirculation_state_source: None,
                 actual_coupled_source_order: None,
             })
         }

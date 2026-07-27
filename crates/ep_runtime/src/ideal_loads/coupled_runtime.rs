@@ -39,9 +39,13 @@ use super::{
 
 const SECONDS_PER_HOUR: f64 = 3_600.0;
 
-/// Stable release-loop demand provenance for the CP302 bounded runtime.
+/// Stable release-loop demand provenance for the bounded direct-Zone runtime.
 pub const DIRECT_ZONE_PURCHASED_AIR_DEMAND_SOURCE: &str =
     "rust-predictor-source-setpoint-thresholds";
+
+/// Stable recirculation-state provenance for the source-valid single-return subset.
+pub const DIRECT_ZONE_PURCHASED_AIR_RECIRCULATION_SOURCE: &str =
+    "rust-direct-zone-return-projection";
 
 /// Actual coupled source-order stages executed once per nominal system step.
 pub const DIRECT_ZONE_PURCHASED_AIR_COUPLED_SOURCE_ORDER: &[&str] = &[
@@ -87,12 +91,16 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     pub system_name: String,
     /// Bound supply-node name.
     pub supply_node_name: String,
+    /// Bound Zone return-node name used by blank-exhaust PurchasedAir.
+    pub return_node_name: String,
     /// PurchasedAir branch enforced by the binding.
     pub branch: IdealLoadsPurchasedAirBranch,
     /// Zone-demand provenance used by every call.
     pub zone_demand_source: &'static str,
     /// Whether the oracle/default active-split constructor was used.
     pub fixture_demand_injection_used: bool,
+    /// Provenance of the state projected onto the bound direct return node.
+    pub recirculation_state_source: &'static str,
     /// Actual nested predictor/HVAC/corrector order.
     pub actual_coupled_source_order: &'static [&'static str],
 }
@@ -135,6 +143,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Unexpected demand kind.
         actual: ZoneSensibleDemandInputKind,
     },
+    /// A timestep dispatched a PurchasedAir branch different from the immutable binding.
+    UnexpectedPurchasedAirBranch {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+        /// Branch retained by the immutable binding.
+        expected: IdealLoadsPurchasedAirBranch,
+        /// Branch returned by the generic PurchasedAir wrapper.
+        actual: IdealLoadsPurchasedAirBranch,
+    },
     /// Hourly PurchasedAir aggregation rejected the collected outputs.
     HourlyOutput(DirectZonePurchasedAirHourlyOutputError),
 }
@@ -171,6 +188,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} produced unexpected demand input kind {actual:?}"
             ),
+            Self::UnexpectedPurchasedAirBranch {
+                timestep_index,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} dispatched branch {actual:?}, expected bound branch {expected:?}"
+            ),
             Self::HourlyOutput(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir hourly output aggregation failed: {error:?}"
@@ -181,8 +206,8 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
 
 impl std::error::Error for DirectZonePurchasedAirCoupledRuntimeError {}
 
-/// Executes the exact CP301 one-Zone/no-OA/no-limit subset through a shared
-/// fixed ThirdOrder heat-balance and PurchasedAir loop.
+/// Executes the exact one-Zone/no-OA sensible subset through a shared fixed
+/// ThirdOrder heat-balance and PurchasedAir loop.
 ///
 /// The caller must supply the zone-timestep schedule cache built from the same
 /// `SimulationModel` and active environment axis. Binding is performed once;
@@ -315,6 +340,16 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
     )?;
 
     for (timestep_index, output) in timestep_outputs.iter().enumerate() {
+        let actual_branch = output.coupling.purchased_air.branch;
+        if actual_branch != binding.branch {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::UnexpectedPurchasedAirBranch {
+                    timestep_index,
+                    expected: binding.branch,
+                    actual: actual_branch,
+                },
+            );
+        }
         let actual = output
             .coupling
             .purchased_air
@@ -361,6 +396,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         rain_statuses,
     });
     let supply_node_name = node_name(model, binding.supply_node);
+    let return_node_name = node_name(model, binding.return_node);
     let zone_name = zone_name(model, binding.zone);
     append_direct_zone_purchased_air_hourly_output_series(
         &mut results,
@@ -384,9 +420,11 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             coupling_call_count: timestep_outputs.len(),
             system_name: binding.system.name.0.clone(),
             supply_node_name,
-            branch: IdealLoadsPurchasedAirBranch::NoOaNoLimitSensible,
+            return_node_name,
+            branch: binding.branch,
             zone_demand_source: DIRECT_ZONE_PURCHASED_AIR_DEMAND_SOURCE,
             fixture_demand_injection_used: false,
+            recirculation_state_source: DIRECT_ZONE_PURCHASED_AIR_RECIRCULATION_SOURCE,
             actual_coupled_source_order: DIRECT_ZONE_PURCHASED_AIR_COUPLED_SOURCE_ORDER,
         },
         state,

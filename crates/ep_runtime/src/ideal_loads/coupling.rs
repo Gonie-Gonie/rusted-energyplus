@@ -8,7 +8,9 @@ use crate::heat_balance::{
         predict_direct_zone_dual_setpoint_third_order_demand,
     },
 };
-use ep_model::{IdealLoadsAirSystem, NodeId};
+use ep_model::{
+    DehumidificationControlType, HumidificationControlType, IdealLoadsAirSystem, NodeId,
+};
 
 use super::{
     IdealLoadsPurchasedAirBranch, IdealLoadsSensibleLimitContext, IdealLoadsZoneState,
@@ -20,8 +22,8 @@ use super::{
 ///
 /// The caller owns the prebound proof that `system`, `supply_node`, and
 /// `zone_state` describe the same single, fully mixed controlled Zone. This
-/// first production boundary accepts only the no-outdoor-air, no-limit,
-/// sensible-only PurchasedAir branch.
+/// production boundary accepts the no-outdoor-air sensible PurchasedAir
+/// branches with either no limit or resolved numeric flow/capacity limits.
 pub struct DirectZonePurchasedAirCouplingInput<'a> {
     /// Live heat-balance state read by CP299 and updated with correction feedback.
     pub zone_state: &'a mut ZoneHeatBalanceState,
@@ -31,6 +33,8 @@ pub struct DirectZonePurchasedAirCouplingInput<'a> {
     pub cooling_setpoint_c: f64,
     /// Current direct-Zone system-node temperature in degrees Celsius.
     pub zone_node_temperature_c: f64,
+    /// Bound blank-exhaust return-node state projected for recirculation.
+    pub recirculation_state: IdealLoadsZoneState,
     /// Fully mixed Zone load-correction factor, inclusive from -3 through 3.
     pub load_correction_factor: f64,
     /// Positive EnergyPlus Zone multiplier.
@@ -82,7 +86,7 @@ pub struct DirectZonePurchasedAirCouplingOutput {
 /// Fail-closed error for direct-Zone predictor-to-PurchasedAir coupling.
 #[derive(Clone, Debug, PartialEq)]
 pub enum DirectZonePurchasedAirCouplingError {
-    /// The typed IdealLoads system selected a branch outside this first coupling boundary.
+    /// The typed IdealLoads system selected a branch outside this coupling boundary.
     UnsupportedBranch {
         /// Branch selected from the typed IdealLoads inputs.
         branch: IdealLoadsPurchasedAirBranch,
@@ -135,7 +139,10 @@ pub fn couple_direct_zone_predicted_demand_to_purchased_air(
     input: DirectZonePurchasedAirCouplingInput<'_>,
 ) -> Result<DirectZonePurchasedAirCouplingOutput, DirectZonePurchasedAirCouplingError> {
     let branch = select_purchased_air_branch(input.system);
-    if branch != IdealLoadsPurchasedAirBranch::NoOaNoLimitSensible {
+    if !branch.is_no_oa_sensible_with_optional_limits()
+        || input.system.dehumidification_control_type != DehumidificationControlType::None
+        || input.system.humidification_control_type != HumidificationControlType::None
+    {
         return Err(DirectZonePurchasedAirCouplingError::UnsupportedBranch { branch });
     }
 
@@ -163,7 +170,7 @@ pub fn couple_direct_zone_predicted_demand_to_purchased_air(
         system: input.system,
         supply_node: input.supply_node,
         zone_state: purchased_air_zone_state,
-        recirculation_state: purchased_air_zone_state,
+        recirculation_state: input.recirculation_state,
         demand: prediction.zone_demand,
         unit_available: input.unit_available,
         limit_context: input.limit_context,
@@ -190,6 +197,14 @@ fn validate_coupling_inputs(
     input: &DirectZonePurchasedAirCouplingInput<'_>,
 ) -> Result<(), DirectZonePurchasedAirCouplingError> {
     require_finite_input(input.zone_node_temperature_c, "zone_node_temperature_c")?;
+    require_finite_input(
+        input.recirculation_state.air_temperature_c,
+        "recirculation_state.air_temperature_c",
+    )?;
+    require_nonnegative_input(
+        input.recirculation_state.air_humidity_ratio,
+        "recirculation_state.air_humidity_ratio",
+    )?;
     require_nonnegative_input(
         input.zone_state.air_humidity_ratio,
         "zone_state.air_humidity_ratio",
@@ -342,9 +357,8 @@ mod tests {
         ideal_loads::{IdealLoadsSensibleMode, IdealLoadsUnsupportedFeature},
     };
     use ep_model::{
-        AutosizeOrNumber, DehumidificationControlType, DemandControlledVentilationType,
-        HeatRecoveryType, HumidificationControlType, IdealLoadsAirSystemId, IdealLoadsFuelType,
-        IdealLoadsLimit, NormalizedName, OutdoorAirEconomizerType, ZoneId,
+        AutosizeOrNumber, DemandControlledVentilationType, HeatRecoveryType, IdealLoadsAirSystemId,
+        IdealLoadsFuelType, IdealLoadsLimit, NormalizedName, OutdoorAirEconomizerType, ZoneId,
     };
 
     const ABS_TOLERANCE: f64 = 1.0e-9;
@@ -416,6 +430,7 @@ mod tests {
         let system = test_system();
         let mut input = coupling_input(&mut state, &system, 1, 1);
         input.zone_node_temperature_c = 21.0;
+        input.recirculation_state.air_temperature_c = 21.0;
 
         let output = couple_direct_zone_predicted_demand_to_purchased_air(input)
             .expect("bounded heating coupling with distinct zone-node temperature");
@@ -637,6 +652,35 @@ mod tests {
     }
 
     #[test]
+    fn invalid_finite_hard_size_fails_at_the_generic_boundary_without_commit() {
+        for value in [-1.0, f64::NAN, f64::INFINITY] {
+            let mut state = zone_state_for_temp_independent_load(0.0);
+            state.sum_sys_mcp_w_per_k = 47.0;
+            state.sum_sys_mcp_t_w = 53.0;
+            let original = state.clone();
+            let mut system = test_system();
+            system.heating_limit = IdealLoadsLimit::LimitCapacity;
+            system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(value));
+
+            let error = couple_direct_zone_predicted_demand_to_purchased_air(coupling_input(
+                &mut state, &system, 1, 1,
+            ))
+            .expect_err("invalid hard size must fail inside generic PurchasedAir");
+
+            assert_eq!(
+                error,
+                DirectZonePurchasedAirCouplingError::PurchasedAir(SimPurchasedAirCompatError {
+                    system_id: system.id,
+                    unsupported_features: vec![
+                        IdealLoadsUnsupportedFeature::UnresolvedHeatingLimit
+                    ],
+                })
+            );
+            assert_eq!(state, original);
+        }
+    }
+
+    #[test]
     fn source_order_mcp_overflow_fails_before_multiplier_division_and_commit() {
         let mut state = zone_state_for_temp_independent_load(-2.5e298);
         state.sum_sys_mcp_w_per_k = 39.0;
@@ -660,27 +704,302 @@ mod tests {
     }
 
     #[test]
-    fn unsupported_branch_leaves_entire_zone_state_unchanged() {
+    fn finite_capacity_branch_uses_predicted_demand_and_commits_limited_feedback() {
+        let mut state = zone_state_for_temp_independent_load(0.0);
+        let mut system = test_system();
+        system.heating_limit = IdealLoadsLimit::LimitCapacity;
+        system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(1_000.0));
+
+        let output = couple_direct_zone_predicted_demand_to_purchased_air(coupling_input(
+            &mut state, &system, 1, 1,
+        ))
+        .expect("hard-sized finite-capacity branch");
+
+        assert_eq!(
+            output.purchased_air.branch,
+            IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity
+        );
+        assert_eq!(
+            output.prediction.zone_demand.sensible_input_kind,
+            crate::ZoneSensibleDemandInputKind::SourceSetpointThresholds
+        );
+        assert_close(
+            output.prediction.predicted_loads.total_output_required_w,
+            2_000.0,
+        );
+        assert_close(
+            output
+                .purchased_air
+                .calculation
+                .zone_sensible_heating_rate_w,
+            1_000.0,
+        );
+        assert_close(
+            state.sum_sys_mcp_w_per_k,
+            output.feedback.sum_sys_mcp_w_per_k,
+        );
+        assert_close(state.sum_sys_mcp_t_w, output.feedback.sum_sys_mcp_t_w);
+    }
+
+    #[test]
+    fn finite_capacity_uses_the_explicit_bound_return_projection() {
+        let mut state = zone_state_for_temp_independent_load(0.0);
+        let mut system = test_system();
+        system.heating_limit = IdealLoadsLimit::LimitCapacity;
+        system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(1_000.0));
+        let mut input = coupling_input(&mut state, &system, 1, 1);
+        input.zone_node_temperature_c = 21.0;
+        input.recirculation_state = IdealLoadsZoneState {
+            air_temperature_c: 18.0,
+            air_humidity_ratio: 0.006,
+        };
+
+        let output = couple_direct_zone_predicted_demand_to_purchased_air(input)
+            .expect("finite capacity with a distinct explicit return projection");
+
+        assert_eq!(
+            output.purchased_air.trace.zone_state.air_temperature_c,
+            21.0
+        );
+        assert_eq!(
+            output.purchased_air.trace.recirculation_state,
+            IdealLoadsZoneState {
+                air_temperature_c: 18.0,
+                air_humidity_ratio: 0.006,
+            }
+        );
+        let return_cp_air_j_per_kg_k = energyplus_moist_air_specific_heat_j_per_kg_k(0.006);
+        assert_close(
+            output.purchased_air.calculation.supply_temperature_c,
+            18.0 + 1_000.0
+                / (return_cp_air_j_per_kg_k
+                    * output
+                        .purchased_air
+                        .calculation
+                        .supply_mass_flow_rate_kg_per_s),
+        );
+        assert_close(
+            output.feedback.supply_temperature_c,
+            output.purchased_air.calculation.supply_temperature_c,
+        );
+    }
+
+    #[test]
+    fn finite_flow_and_combined_branches_commit_final_limited_supply_feedback() {
+        for (limit, expected_branch) in [
+            (
+                IdealLoadsLimit::LimitFlowRate,
+                IdealLoadsPurchasedAirBranch::NoOaFiniteFlow,
+            ),
+            (
+                IdealLoadsLimit::LimitFlowRateAndCapacity,
+                IdealLoadsPurchasedAirBranch::NoOaFiniteFlowAndCapacity,
+            ),
+        ] {
+            let mut state = zone_state_for_temp_independent_load(0.0);
+            let mut system = test_system();
+            system.heating_limit = limit;
+            system.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.01));
+            system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(100.0));
+
+            let output = couple_direct_zone_predicted_demand_to_purchased_air(coupling_input(
+                &mut state, &system, 1, 1,
+            ))
+            .expect("hard-sized finite-flow branch");
+
+            assert_eq!(output.purchased_air.branch, expected_branch);
+            assert_close(
+                output.feedback.multiplied_supply_mass_flow_rate_kg_per_s,
+                output
+                    .purchased_air
+                    .calculation
+                    .supply_mass_flow_rate_kg_per_s,
+            );
+            assert_close(
+                output.feedback.sum_sys_mcp_t_w,
+                output.feedback.sum_sys_mcp_w_per_k
+                    * output.purchased_air.calculation.supply_temperature_c,
+            );
+            assert!(
+                output
+                    .purchased_air
+                    .calculation
+                    .zone_sensible_heating_rate_w
+                    < output.prediction.predicted_loads.total_output_required_w
+            );
+        }
+    }
+
+    #[test]
+    fn all_finite_branches_limit_state_backed_cooling_and_commit_feedback() {
+        for (limit, expected_branch) in [
+            (
+                IdealLoadsLimit::LimitCapacity,
+                IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity,
+            ),
+            (
+                IdealLoadsLimit::LimitFlowRate,
+                IdealLoadsPurchasedAirBranch::NoOaFiniteFlow,
+            ),
+            (
+                IdealLoadsLimit::LimitFlowRateAndCapacity,
+                IdealLoadsPurchasedAirBranch::NoOaFiniteFlowAndCapacity,
+            ),
+        ] {
+            let mut state = zone_state_for_temp_independent_load(3_000.0);
+            let mut system = test_system();
+            system.cooling_limit = limit;
+            system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.005));
+            system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(200.0));
+
+            let output = couple_direct_zone_predicted_demand_to_purchased_air(coupling_input(
+                &mut state, &system, 1, 1,
+            ))
+            .expect("hard-sized finite cooling branch");
+
+            assert_eq!(output.purchased_air.branch, expected_branch);
+            assert_eq!(
+                output.purchased_air.calculation.mode,
+                IdealLoadsSensibleMode::Cooling
+            );
+            assert_close(
+                output
+                    .prediction
+                    .zone_demand
+                    .remaining_output_req_to_cool_sp_w,
+                -600.0,
+            );
+            assert!(
+                output
+                    .purchased_air
+                    .calculation
+                    .zone_sensible_cooling_rate_w
+                    > 0.0
+            );
+            assert!(
+                output
+                    .purchased_air
+                    .calculation
+                    .zone_sensible_cooling_rate_w
+                    < 600.0
+            );
+            assert_close(
+                output.feedback.sum_sys_mcp_t_w,
+                output.feedback.sum_sys_mcp_w_per_k
+                    * output.purchased_air.calculation.supply_temperature_c,
+            );
+            assert_close(
+                state.sum_sys_mcp_w_per_k,
+                output.feedback.sum_sys_mcp_w_per_k,
+            );
+        }
+    }
+
+    #[test]
+    fn zero_finite_capacity_clears_stale_system_air_feedback() {
+        let mut state = zone_state_for_temp_independent_load(0.0);
+        state.sum_sys_mcp_w_per_k = 41.0;
+        state.sum_sys_mcp_t_w = 43.0;
+        let mut system = test_system();
+        system.heating_limit = IdealLoadsLimit::LimitCapacity;
+        system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(0.0));
+
+        let output = couple_direct_zone_predicted_demand_to_purchased_air(coupling_input(
+            &mut state, &system, 1, 1,
+        ))
+        .expect("zero hard-sized capacity remains a supported finite branch");
+
+        assert_eq!(
+            output.purchased_air.branch,
+            IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity
+        );
+        assert_eq!(output.feedback.sum_sys_mcp_w_per_k, 0.0);
+        assert_eq!(output.feedback.sum_sys_mcp_t_w, 0.0);
+        assert_eq!(state.sum_sys_mcp_w_per_k, 0.0);
+        assert_eq!(state.sum_sys_mcp_t_w, 0.0);
+    }
+
+    #[test]
+    fn zero_flow_limit_preserves_the_source_positive_only_clamp() {
+        for (limit, capacity, expected_heating_rate_w) in [
+            (IdealLoadsLimit::LimitFlowRate, None, 2_000.0),
+            (
+                IdealLoadsLimit::LimitFlowRateAndCapacity,
+                Some(AutosizeOrNumber::Value(1_000.0)),
+                1_000.0,
+            ),
+        ] {
+            let mut state = zone_state_for_temp_independent_load(0.0);
+            let mut system = test_system();
+            system.heating_limit = limit;
+            system.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.0));
+            system.maximum_sensible_heating_capacity_w = capacity;
+
+            let output = couple_direct_zone_predicted_demand_to_purchased_air(coupling_input(
+                &mut state, &system, 1, 1,
+            ))
+            .expect("zero hard-sized flow retains the source positive-only clamp behavior");
+
+            assert!(
+                output
+                    .purchased_air
+                    .calculation
+                    .supply_mass_flow_rate_kg_per_s
+                    > 0.0,
+                "EnergyPlus applies the finite-flow clamp only when the maximum is positive"
+            );
+            assert_close(
+                output
+                    .purchased_air
+                    .calculation
+                    .zone_sensible_heating_rate_w,
+                expected_heating_rate_w,
+            );
+            assert!(output.feedback.sum_sys_mcp_w_per_k > 0.0);
+        }
+    }
+
+    #[test]
+    fn unsupported_humidity_branch_leaves_entire_zone_state_unchanged() {
         let mut state = zone_state_for_temp_independent_load(0.0);
         state.sum_sys_mcp_w_per_k = 41.0;
         state.sum_sys_mcp_t_w = 43.0;
         let original = state.clone();
         let mut system = test_system();
-        system.heating_limit = IdealLoadsLimit::LimitCapacity;
-        system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(1_000.0));
+        system.dehumidification_control_type =
+            DehumidificationControlType::ConstantSensibleHeatRatio;
 
         let error = couple_direct_zone_predicted_demand_to_purchased_air(coupling_input(
             &mut state, &system, 1, 1,
         ))
-        .expect_err("finite-limit branch is outside CP300");
+        .expect_err("humidity-selected branch remains outside direct coupling");
 
         assert_eq!(
             error,
             DirectZonePurchasedAirCouplingError::UnsupportedBranch {
-                branch: IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity
+                branch: IdealLoadsPurchasedAirBranch::NoOaConstantSensibleHeatRatioCooling,
             }
         );
         assert_eq!(state, original);
+
+        let mut finite_state = zone_state_for_temp_independent_load(0.0);
+        let finite_original = finite_state.clone();
+        system.heating_limit = IdealLoadsLimit::LimitCapacity;
+        system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(1_000.0));
+        let error = couple_direct_zone_predicted_demand_to_purchased_air(coupling_input(
+            &mut finite_state,
+            &system,
+            1,
+            1,
+        ))
+        .expect_err("finite branch selection must not hide humidity controls");
+        assert_eq!(
+            error,
+            DirectZonePurchasedAirCouplingError::UnsupportedBranch {
+                branch: IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity,
+            }
+        );
+        assert_eq!(finite_state, finite_original);
     }
 
     fn coupling_input<'a>(
@@ -689,11 +1008,16 @@ mod tests {
         zone_multiplier: u32,
         zone_list_multiplier: u32,
     ) -> DirectZonePurchasedAirCouplingInput<'a> {
+        let air_humidity_ratio = zone_state.air_humidity_ratio;
         DirectZonePurchasedAirCouplingInput {
             zone_state,
             heating_setpoint_c: 20.0,
             cooling_setpoint_c: 24.0,
             zone_node_temperature_c: 22.0,
+            recirculation_state: IdealLoadsZoneState {
+                air_temperature_c: 22.0,
+                air_humidity_ratio,
+            },
             load_correction_factor: 1.0,
             zone_multiplier,
             zone_list_multiplier,

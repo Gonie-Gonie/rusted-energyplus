@@ -786,12 +786,14 @@ fn ideal_loads_diagnostic_run_uses_branch_compatibility_runtime_class()
 -> Result<(), Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir("ideal-loads-diagnostic")?;
     let input_path = case_dir.join("ideal-loads.epJSON");
+    let weather_path = case_dir.join("weather.epw");
     let output_dir = case_dir.join("out");
     write_text(&input_path, IDEAL_LOADS_EPJSON)?;
+    write_text(&weather_path, ONE_DAY_EPW)?;
 
     let outcome = run_arbitrary_idf(&RunConfig {
         input_path,
-        weather_path: None,
+        weather_path: Some(weather_path),
         output_dir: output_dir.clone(),
         mode: RunMode::Diagnostic,
         partial_policy: PartialRunPolicy::Allow,
@@ -823,7 +825,7 @@ fn ideal_loads_diagnostic_run_uses_branch_compatibility_runtime_class()
     let summary = read_json(&output_dir.join("run-summary.json"))?;
     assert_eq!(
         summary["support"]["runtime_class"],
-        "ideal-loads-no-oa-sensible-compatibility"
+        "ideal-loads-direct-zone-coupled-compatibility"
     );
     assert_eq!(
         summary["support"]["matched_capability_ids"][0],
@@ -831,7 +833,11 @@ fn ideal_loads_diagnostic_run_uses_branch_compatibility_runtime_class()
     );
     assert_eq!(
         summary["rust_runtime"]["runtime_class"],
-        "ideal-loads-no-oa-sensible-compatibility"
+        "ideal-loads-direct-zone-coupled-compatibility"
+    );
+    assert_eq!(
+        summary["rust_runtime"]["zone_demand_source"],
+        "rust-predictor-source-setpoint-thresholds"
     );
     assert_eq!(summary["rust_runtime"]["samples"], 1);
     assert_eq!(summary["source_order_gate"]["matches"], true);
@@ -866,12 +872,14 @@ fn ideal_loads_compatibility_mode_runs_declared_branch_runtime()
 -> Result<(), Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir("ideal-loads-compatibility")?;
     let input_path = case_dir.join("ideal-loads.epJSON");
+    let weather_path = case_dir.join("weather.epw");
     let output_dir = case_dir.join("out");
     write_text(&input_path, IDEAL_LOADS_EPJSON)?;
+    write_text(&weather_path, ONE_DAY_EPW)?;
 
     let outcome = run_arbitrary_idf(&RunConfig {
         input_path,
-        weather_path: None,
+        weather_path: Some(weather_path),
         output_dir: output_dir.clone(),
         mode: RunMode::Compatibility,
         partial_policy: PartialRunPolicy::Deny,
@@ -903,11 +911,15 @@ fn ideal_loads_compatibility_mode_runs_declared_branch_runtime()
     assert_eq!(summary["status"], "success");
     assert_eq!(
         summary["support"]["runtime_class"],
-        "ideal-loads-no-oa-sensible-compatibility"
+        "ideal-loads-direct-zone-coupled-compatibility"
     );
     assert_eq!(
         summary["rust_runtime"]["runtime_class"],
-        "ideal-loads-no-oa-sensible-compatibility"
+        "ideal-loads-direct-zone-coupled-compatibility"
+    );
+    assert_eq!(
+        summary["rust_runtime"]["zone_demand_source"],
+        "rust-predictor-source-setpoint-thresholds"
     );
     assert_eq!(summary["source_order_gate"]["matches"], true);
     assert_output_layout(&output_dir, true)?;

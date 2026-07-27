@@ -85,9 +85,11 @@ pub enum IdealLoadsUnsupportedFeature {
     Humidification,
     /// Humidistat dehumidification branch is active.
     Dehumidification,
-    /// Heating limit is active but needs autosizing or a missing numeric field.
+    /// Heating limit is active but a required hard size is missing, autosized,
+    /// negative, or nonfinite.
     UnresolvedHeatingLimit,
-    /// Cooling limit is active but needs autosizing or a missing numeric field.
+    /// Cooling limit is active but a required hard size is missing, autosized,
+    /// negative, or nonfinite.
     UnresolvedCoolingLimit,
 }
 
@@ -199,7 +201,7 @@ fn limit_fields_are_numeric(
 }
 
 fn is_numeric(value: Option<AutosizeOrNumber>) -> bool {
-    matches!(value, Some(AutosizeOrNumber::Value(_)))
+    matches!(value, Some(AutosizeOrNumber::Value(value)) if value.is_finite() && value >= 0.0)
 }
 
 fn is_autosize(value: Option<AutosizeOrNumber>) -> bool {

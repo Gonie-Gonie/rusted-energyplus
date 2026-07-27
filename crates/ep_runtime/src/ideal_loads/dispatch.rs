@@ -56,6 +56,22 @@ impl IdealLoadsPurchasedAirBranch {
         }
     }
 
+    /// Returns whether this has the no-outdoor-air sensible branch shape with
+    /// either no limit or finite-limit selectors.
+    ///
+    /// Numeric hard-size resolution is validated separately by
+    /// `classify_no_oa_sensible_subset`.
+    #[must_use]
+    pub const fn is_no_oa_sensible_with_optional_limits(self) -> bool {
+        matches!(
+            self,
+            Self::NoOaNoLimitSensible
+                | Self::NoOaFiniteCapacity
+                | Self::NoOaFiniteFlow
+                | Self::NoOaFiniteFlowAndCapacity
+        )
+    }
+
     const fn uses_finite_limit_calc(self) -> bool {
         matches!(
             self,
@@ -232,7 +248,7 @@ pub fn sim_purchased_air_compat_with_branch_flags(
     }
 
     let branch = branch_flags.purchased_air_branch;
-    let init_flags = IdealLoadsInitFlags::no_oa_no_limit_candidate();
+    let init_flags = IdealLoadsInitFlags::source_order_candidate();
     let calculation = if branch.uses_finite_limit_calc() {
         calc_no_oa_sensible_with_limits_and_recirculation_compat(
             input.system,

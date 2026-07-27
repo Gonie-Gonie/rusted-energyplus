@@ -20,6 +20,8 @@ use fixtures::ONE_DAY_EPW;
 
 const DIRECT_ZONE_COUPLED_RUNTIME_CLASS: &str = "ideal-loads-direct-zone-coupled-compatibility";
 const ZONE_DEMAND_SOURCE: &str = "rust-predictor-source-setpoint-thresholds";
+const RECIRCULATION_SOURCE: &str = "rust-direct-zone-return-projection";
+const RECIRCULATION_NODE: &str = "ZONE ONE RETURN";
 const COUPLED_SOURCE_ORDER: [&str; 3] = [
     "predict-system-loads",
     "sim-purchased-air",
@@ -95,7 +97,8 @@ const DIRECT_ZONE_COUPLED_EPJSON: &str = r#"{
       "zone_name": "Zone One",
       "zone_conditioning_equipment_list_name": "Zone Equipment",
       "zone_air_inlet_node_or_nodelist_name": "Zone One Inlet",
-      "zone_air_node_name": "Zone One Air Node"
+      "zone_air_node_name": "Zone One Air Node",
+      "zone_return_air_node_or_nodelist_name": "Zone One Return"
     }
   }
 }"#;
@@ -140,6 +143,18 @@ fn direct_zone_predictor_purchased_air_runs_in_release_order()
     assert_eq!(
         summary["rust_runtime"]["zone_demand_source"],
         ZONE_DEMAND_SOURCE
+    );
+    assert_eq!(
+        summary["rust_runtime"]["purchased_air_branch"],
+        "no_oa_sensible"
+    );
+    assert_eq!(
+        summary["rust_runtime"]["recirculation_node"],
+        RECIRCULATION_NODE
+    );
+    assert_eq!(
+        summary["rust_runtime"]["recirculation_state_source"],
+        RECIRCULATION_SOURCE
     );
     assert_eq!(
         string_array(&summary["rust_runtime"]["actual_coupled_source_order"]),
@@ -195,6 +210,189 @@ fn direct_zone_predictor_purchased_air_runs_in_release_order()
 }
 
 #[test]
+fn all_hard_sized_finite_limit_branches_use_the_live_coupled_runtime()
+-> Result<(), Box<dyn std::error::Error>> {
+    for (name, limit, expected_branch) in [
+        ("finite-capacity", "LimitCapacity", "finite_capacity"),
+        ("finite-flow", "LimitFlowRate", "finite_flow"),
+        (
+            "finite-flow-capacity",
+            "LimitFlowRateAndCapacity",
+            "flow_and_capacity",
+        ),
+    ] {
+        let case_dir = unique_case_dir(name)?;
+        let input_path = case_dir.join("direct-zone-finite.epJSON");
+        let weather_path = case_dir.join("weather.epw");
+        let output_dir = case_dir.join("out");
+        let fixture = finite_limit_fixture(limit);
+        write_text(&input_path, &fixture)?;
+        write_text(&weather_path, ONE_DAY_EPW)?;
+
+        let outcome = run_arbitrary_idf(&run_config(
+            input_path,
+            Some(weather_path),
+            output_dir.clone(),
+        ))?;
+
+        assert_eq!(outcome.exit_code, RunExitCode::Success);
+        assert_eq!(
+            outcome.support_status,
+            SupportStatus::SupportedCompatibility
+        );
+        let summary = read_json(&output_dir.join("run-summary.json"))?;
+        assert_eq!(
+            summary["support"]["runtime_class"],
+            DIRECT_ZONE_COUPLED_RUNTIME_CLASS
+        );
+        assert_eq!(
+            summary["support"]["matched_capability_ids"][0],
+            "ideal_loads_finite_limits"
+        );
+        assert_eq!(
+            summary["rust_runtime"]["zone_demand_source"],
+            ZONE_DEMAND_SOURCE
+        );
+        assert_eq!(
+            summary["rust_runtime"]["purchased_air_branch"],
+            expected_branch
+        );
+        assert_eq!(
+            summary["rust_runtime"]["recirculation_node"],
+            RECIRCULATION_NODE
+        );
+        assert_eq!(
+            summary["rust_runtime"]["recirculation_state_source"],
+            RECIRCULATION_SOURCE
+        );
+        assert_eq!(
+            string_array(&summary["rust_runtime"]["actual_coupled_source_order"]),
+            COUPLED_SOURCE_ORDER
+        );
+
+        let results = read_json(&output_dir.join("results").join("result-store.json"))?;
+        let heating_rate = find_series(
+            &results,
+            "ZONE IDEAL LOADS",
+            "Zone Ideal Loads Zone Total Heating Rate",
+        );
+        let heating_energy = find_series(
+            &results,
+            "ZONE IDEAL LOADS",
+            "Zone Ideal Loads Zone Total Heating Energy",
+        );
+        let predicted_heating = find_series(
+            &results,
+            "ZONE ONE",
+            "Zone System Predicted Sensible Load to Heating Setpoint Heat Transfer Rate",
+        );
+        let rate_values = endpoint_values(heating_rate);
+        let energy_values = endpoint_values(heating_energy);
+        let predicted_values = endpoint_values(predicted_heating);
+        assert!(rate_values.iter().any(|value| *value > 0.0));
+        let mut constrained_positive_demand = false;
+        for ((rate_w, energy_j), predicted_w) in rate_values
+            .into_iter()
+            .zip(energy_values)
+            .zip(predicted_values)
+        {
+            assert_close(energy_j, rate_w * 3_600.0, 1.0e-9);
+            if predicted_w > 0.0 {
+                assert!(rate_w <= predicted_w);
+                constrained_positive_demand |= rate_w < predicted_w;
+            } else {
+                assert_eq!(rate_w, 0.0);
+            }
+        }
+        assert!(
+            constrained_positive_demand,
+            "the deliberately undersized {expected_branch} branch must limit positive predicted demand"
+        );
+    }
+    Ok(())
+}
+
+#[test]
+fn all_hard_sized_finite_limit_branches_limit_live_cooling()
+-> Result<(), Box<dyn std::error::Error>> {
+    for (name, limit) in [
+        ("finite-capacity-cooling", "LimitCapacity"),
+        ("finite-flow-cooling", "LimitFlowRate"),
+        ("finite-flow-capacity-cooling", "LimitFlowRateAndCapacity"),
+    ] {
+        let case_dir = unique_case_dir(name)?;
+        let input_path = case_dir.join("direct-zone-finite-cooling.epJSON");
+        let weather_path = case_dir.join("weather.epw");
+        let output_dir = case_dir.join("out");
+        let fixture = finite_limit_cooling_fixture(limit);
+        write_text(&input_path, &fixture)?;
+        write_text(&weather_path, ONE_DAY_EPW)?;
+
+        let outcome = run_arbitrary_idf(&run_config(
+            input_path,
+            Some(weather_path),
+            output_dir.clone(),
+        ))?;
+
+        assert_eq!(outcome.exit_code, RunExitCode::Success);
+        let summary = read_json(&output_dir.join("run-summary.json"))?;
+        assert_eq!(
+            summary["support"]["runtime_class"],
+            DIRECT_ZONE_COUPLED_RUNTIME_CLASS
+        );
+        assert_eq!(
+            summary["support"]["matched_capability_ids"][0],
+            "ideal_loads_finite_limits"
+        );
+        assert_eq!(
+            summary["rust_runtime"]["zone_demand_source"],
+            ZONE_DEMAND_SOURCE
+        );
+
+        let results = read_json(&output_dir.join("results").join("result-store.json"))?;
+        let cooling_rate = find_series(
+            &results,
+            "ZONE IDEAL LOADS",
+            "Zone Ideal Loads Zone Total Cooling Rate",
+        );
+        let cooling_energy = find_series(
+            &results,
+            "ZONE IDEAL LOADS",
+            "Zone Ideal Loads Zone Total Cooling Energy",
+        );
+        let predicted_cooling = find_series(
+            &results,
+            "ZONE ONE",
+            "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+        );
+        let rate_values = endpoint_values(cooling_rate);
+        let energy_values = endpoint_values(cooling_energy);
+        let predicted_values = endpoint_values(predicted_cooling);
+        assert!(rate_values.iter().any(|value| *value > 0.0));
+        let mut constrained_positive_demand = false;
+        for ((rate_w, energy_j), predicted_threshold_w) in rate_values
+            .into_iter()
+            .zip(energy_values)
+            .zip(predicted_values)
+        {
+            assert_close(energy_j, rate_w * 3_600.0, 1.0e-9);
+            let cooling_demand_w = (-predicted_threshold_w).max(0.0);
+            if cooling_demand_w > 0.0 {
+                assert!(rate_w <= cooling_demand_w);
+                constrained_positive_demand |= rate_w < cooling_demand_w;
+            } else {
+                assert_eq!(rate_w, 0.0);
+            }
+        }
+        assert!(
+            constrained_positive_demand,
+            "the deliberately undersized cooling branch {limit} must limit positive predicted demand"
+        );
+    }
+    Ok(())
+}
+
+#[test]
 fn direct_zone_coupled_runtime_requires_weather_before_execution()
 -> Result<(), Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir("direct-zone-coupled-missing-weather")?;
@@ -242,6 +440,27 @@ fn direct_zone_coupled_runtime_requires_weather_before_execution()
             })
     );
     Ok(())
+}
+
+fn finite_limit_fixture(limit: &str) -> String {
+    DIRECT_ZONE_COUPLED_EPJSON.replace(
+        "      \"heating_limit\": \"NoLimit\",\n      \"cooling_limit\": \"NoLimit\",",
+        &format!(
+            "      \"heating_limit\": \"{limit}\",\n      \"maximum_heating_air_flow_rate\": 0.005,\n      \"maximum_sensible_heating_capacity\": 300.0,\n      \"cooling_limit\": \"{limit}\",\n      \"maximum_cooling_air_flow_rate\": 0.005,\n      \"maximum_total_cooling_capacity\": 300.0,"
+        ),
+    )
+}
+
+fn finite_limit_cooling_fixture(limit: &str) -> String {
+    finite_limit_fixture(limit)
+        .replace(
+            "\"Heating Setpoint\": {\"hourly_value\": 30.0}",
+            "\"Heating Setpoint\": {\"hourly_value\": 10.0}",
+        )
+        .replace(
+            "\"Cooling Setpoint\": {\"hourly_value\": 35.0}",
+            "\"Cooling Setpoint\": {\"hourly_value\": 15.0}",
+        )
 }
 
 fn run_config(

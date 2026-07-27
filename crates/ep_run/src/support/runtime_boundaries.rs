@@ -56,12 +56,12 @@ pub(super) fn runtime_status_for_typed_model(
 
     if !typed_model.ideal_loads_air_systems.is_empty() {
         let simulation_model = SimulationModel::from_typed(typed_model.clone());
-        if bind_direct_zone_purchased_air_model(&simulation_model).is_ok() {
+        if let Ok(binding) = bind_direct_zone_purchased_air_model(&simulation_model) {
             return runtime_selection_from_registry(
                 SupportStatus::SupportedCompatibility,
                 RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility,
                 registry,
-                vec!["ideal_loads_no_oa_sensible".to_string()],
+                vec![ideal_loads_capability_id_for_branch(binding.branch).to_string()],
             );
         }
 

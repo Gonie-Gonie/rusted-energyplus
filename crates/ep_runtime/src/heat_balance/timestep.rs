@@ -47,7 +47,9 @@ use crate::schedules::{
     update_surface_radiant_internal_gain_source_terms_from_cache_profiled,
     update_surface_radiant_internal_gain_source_terms_live_profiled,
 };
-use crate::weather::HeatBalanceWeatherContext;
+use crate::weather::{
+    HeatBalanceWeatherContext, energyplus_weather_atmospheric_pressure_for_context,
+};
 use ep_model::{OutsideBoundaryCondition, TypedModel};
 use std::collections::BTreeMap;
 use std::convert::Infallible;
@@ -206,12 +208,25 @@ pub(crate) fn advance_heat_balance_state_one_timestep_with_direct_zone_purchased
                             zone: binding.zone,
                         },
                     )?;
+                let limit_context = weather_context
+                    .and_then(|context| {
+                        context.records.get(context.record_index).map(|record| {
+                            binding.limit_context.with_barometric_pressure_pa(
+                                energyplus_weather_atmospheric_pressure_for_context(
+                                    context,
+                                    record.atmospheric_pressure_pa,
+                                ),
+                            )
+                        })
+                    })
+                    .unwrap_or(binding.limit_context);
                 couple_model_bound_direct_zone_purchased_air(
                     DirectZonePurchasedAirScheduledCouplingInput {
                         binding,
                         schedule_cache: coupling_schedule_cache,
                         schedule_sample_index: coupling_schedule_sample_index,
                         zone_state,
+                        barometric_pressure_pa: limit_context.barometric_pressure_pa,
                         system_timestep_seconds: input.timestep_seconds,
                     },
                 )

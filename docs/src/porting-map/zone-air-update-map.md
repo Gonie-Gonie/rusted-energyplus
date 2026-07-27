@@ -20873,6 +20873,55 @@ not roll back the whole heat-balance timestep. The
 readiness, capability, performance, or conformance claim is promoted.
 Roadmap Section 12's first checkbox remains open.
 
+## CP303 Source-Valid Return Projection and Hard-Sized Sensible Limits
+
+CP303 corrects the CP302 topology proof and widens only the already coupled
+direct-Zone release class. A blank PurchasedAir exhaust-node name uses the
+controlled Zone return node as its EnergyPlus recirculation source, so the old
+no-return prerequisite was not source-valid. Binding now requires exactly one
+resolved return node distinct from the supply and Zone-air nodes and rejects
+return-flow fraction/basis controls, an explicit IdealLoads exhaust node, and
+system-inlet/plenum topology. A ZoneHVAC sizing object and heating/cooling
+fuel-efficiency schedules also fail closed because this release path does not
+own their lifecycle or fuel outputs.
+
+The predictor/corrector loop now admits no-OA sensible no-limit, finite
+capacity, finite flow, and combined flow-and-capacity PurchasedAir branches.
+Every active finite limit must be an explicit finite nonnegative hard-sized
+number; missing and `Autosize` limits fail closed. Humidity controls and every
+outdoor-air or other branch remain excluded. The selected branch is retained
+in the immutable model binding and checked against every generic PurchasedAir
+result before hourly output is accepted.
+
+Hard-sized flow conversion retains Site-elevation `StdRhoAir`, while the live
+predictor/PurchasedAir timestep replaces only the saturation context's
+barometric pressure with the active interpolated EPW pressure. A regression
+with deliberately different Site and weather pressures locks this split.
+
+The source positive-only flow clamp remains exact: an active hard-sized zero
+flow maximum does not clamp a positive candidate by itself, while a combined
+branch may still cap that candidate through its finite capacity.
+
+The bounded fully mixed path does not yet own return-node state. It explicitly
+projects the current Rust direct-Zone temperature and humidity ratio onto the
+bound return role, reports `rust-direct-zone-return-projection`, and continues
+to feed each branch only CP299 `SourceSetpointThresholds` demand. The runtime
+summary also exposes the return-node name and selected branch. Exact-topology
+finite-limit models therefore use the live predictor/PurchasedAir/corrector
+loop; out-of-topology legacy finite paths still use compatibility/default
+demand.
+
+Tests exercise all four release branches, finite heating/cooling limits,
+zero-capacity feedback clearing, zero-flow source behavior, invalid hard sizes,
+resolved return identity, source-threshold demand, live weather-pressure
+saturation, and runtime-summary provenance. CP303 does not
+implement persistent `InitPurchasedAir` flags or environment caches, a
+return-node `NodeStateStore` lifecycle, `SizePurchasedAir`/autosizing,
+humidity/OA/DCV/economizer/heat-recovery/EMS paths, warmup, adaptive or
+`FirstHVACIteration` semantics, multiple-equipment residuals, full-timestep
+rollback, or new conformance promotion. Both parents remain
+`scaffold`/`none`, and Roadmap Section 12's first checkbox remains open.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

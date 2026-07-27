@@ -4,7 +4,7 @@ use crate::{
     heat_balance::state::{ZoneAirTemperatureCoefficients, ZoneHeatBalanceState},
     ideal_loads::{
         DirectZonePurchasedAirCouplingInput, DirectZonePurchasedAirScheduleSnapshot,
-        couple_direct_zone_predicted_demand_to_purchased_air,
+        IdealLoadsZoneState, couple_direct_zone_predicted_demand_to_purchased_air,
     },
 };
 use ep_model::{
@@ -377,12 +377,17 @@ fn scaled_output(
     scale: f64,
 ) -> DirectZonePurchasedAirScheduledCouplingOutput {
     let mut state = zone_state();
+    let air_humidity_ratio = state.air_humidity_ratio;
     let coupling =
         couple_direct_zone_predicted_demand_to_purchased_air(DirectZonePurchasedAirCouplingInput {
             zone_state: &mut state,
             heating_setpoint_c: 20.0,
             cooling_setpoint_c: 24.0,
             zone_node_temperature_c: 22.0,
+            recirculation_state: IdealLoadsZoneState {
+                air_temperature_c: 22.0,
+                air_humidity_ratio,
+            },
             load_correction_factor: 1.0,
             zone_multiplier: 1,
             zone_list_multiplier: 1,

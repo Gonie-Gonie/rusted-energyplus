@@ -1,13 +1,13 @@
 use super::*;
 use crate::{
     heat_balance::state::ZoneAirTemperatureCoefficients,
-    ideal_loads::IdealLoadsSensibleMode,
+    ideal_loads::{IdealLoadsSensibleMode, IdealLoadsZoneState},
     schedules::{ScheduleSeriesCache, precompute_schedule_cache},
 };
 use ep_model::{
-    AutoOrNumber, DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
-    HumidificationControlType, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
-    LoadDistributionScheme, Node, NodeId, NodeList, NodeListId, NormalizedName,
+    AutoOrNumber, AutosizeOrNumber, DehumidificationControlType, DemandControlledVentilationType,
+    HeatRecoveryType, HumidificationControlType, IdealLoadsAirSystemId, IdealLoadsFuelType,
+    IdealLoadsLimit, LoadDistributionScheme, Node, NodeId, NodeList, NodeListId, NormalizedName,
     OutdoorAirEconomizerType, Point3, ScheduleConstant, ScheduleId, SimulationModel,
     ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TypedModel, Zone,
     ZoneConvectionAlgorithm, ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
@@ -34,6 +34,7 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
     assert_eq!(binding.ideal_loads_air_system, IdealLoadsAirSystemId(0));
     assert_eq!(binding.supply_node, NodeId(0));
     assert_eq!(binding.zone_air_node, NodeId(1));
+    assert_eq!(binding.return_node, NodeId(2));
     assert_eq!(binding.nominal_system_timestep_seconds, 600.0);
 }
 
@@ -84,6 +85,14 @@ fn scheduled_binding_samples_thermostat_and_drives_heating_feedback() {
             .zone_state
             .air_temperature_c,
         original.mean_air_temperature_c
+    );
+    assert_eq!(
+        output.coupling.purchased_air.trace.recirculation_state,
+        IdealLoadsZoneState {
+            air_temperature_c: original.mean_air_temperature_c,
+            air_humidity_ratio: original.air_humidity_ratio,
+        },
+        "the source-valid single return receives the bounded direct-Zone T/W projection"
     );
     assert_eq!(
         output.coupling.prediction.predicted_loads.predicted_rate_w,
@@ -214,14 +223,14 @@ fn binding_rejects_distribution_sequence_and_fraction_variants() {
 fn binding_rejects_multi_inlet_return_and_mode_availability_topology() {
     let (multi_inlet, _) = fixture(|typed| {
         typed.nodes.push(Node {
-            id: NodeId(2),
+            id: NodeId(3),
             name: NormalizedName::new("SECOND SUPPLY"),
         });
-        typed.node_names.insert("SECOND SUPPLY", NodeId(2));
+        typed.node_names.insert("SECOND SUPPLY", NodeId(3));
         typed.node_lists.push(NodeList {
             id: NodeListId(0),
             name: NormalizedName::new("INLETS"),
-            nodes: vec![NodeId(0), NodeId(2)],
+            nodes: vec![NodeId(0), NodeId(3)],
         });
         typed.node_list_names.insert("INLETS", NodeListId(0));
         typed.ideal_loads_air_systems[0].zone_supply_air_node_name = NormalizedName::new("INLETS");
@@ -237,13 +246,57 @@ fn binding_rejects_multi_inlet_return_and_mode_availability_topology() {
         }
     );
 
-    let cases: [ModelMutationCase; 3] = [
+    let (missing_return, _) = fixture(|typed| {
+        typed.zone_equipment_connections[0].zone_return_air_node_or_nodelist_name = None;
+    });
+    assert_eq!(
+        bind_direct_zone_purchased_air_model(&missing_return)
+            .expect_err("blank exhaust requires one Zone return node"),
+        DirectZonePurchasedAirBindingError::Cardinality {
+            relation: DirectZonePurchasedAirBindingRelation::ZoneReturnNode,
+            expected: 1,
+            actual: 0,
+        }
+    );
+    let (multiple_returns, _) = fixture(|typed| {
+        typed.nodes.push(Node {
+            id: NodeId(3),
+            name: NormalizedName::new("SECOND RETURN"),
+        });
+        typed.node_names.insert("SECOND RETURN", NodeId(3));
+        typed.node_lists.push(NodeList {
+            id: NodeListId(0),
+            name: NormalizedName::new("RETURNS"),
+            nodes: vec![NodeId(2), NodeId(3)],
+        });
+        typed.node_list_names.insert("RETURNS", NodeListId(0));
+        typed.zone_equipment_connections[0].zone_return_air_node_or_nodelist_name =
+            Some(NormalizedName::new("RETURNS"));
+    });
+    assert_eq!(
+        bind_direct_zone_purchased_air_model(&multiple_returns)
+            .expect_err("the bounded blank-exhaust fallback requires exactly one return"),
+        DirectZonePurchasedAirBindingError::Cardinality {
+            relation: DirectZonePurchasedAirBindingRelation::ZoneReturnNode,
+            expected: 1,
+            actual: 2,
+        }
+    );
+
+    let cases: [ModelMutationCase; 6] = [
         (
             (|typed: &mut TypedModel| {
                 typed.zone_equipment_connections[0].zone_return_air_node_or_nodelist_name =
                     Some(NormalizedName::new("ZONE AIR"));
             }) as fn(&mut TypedModel),
-            DirectZonePurchasedAirBindingFeature::NoZoneReturnTopology,
+            DirectZonePurchasedAirBindingFeature::DistinctZoneReturnNode,
+        ),
+        (
+            (|typed: &mut TypedModel| {
+                typed.zone_equipment_connections[0]
+                    .zone_return_air_node_1_flow_rate_fraction_schedule = Some(ScheduleId(3));
+            }) as fn(&mut TypedModel),
+            DirectZonePurchasedAirBindingFeature::NoZoneReturnFlowControl,
         ),
         (
             (|typed: &mut TypedModel| {
@@ -259,6 +312,20 @@ fn binding_rejects_multi_inlet_return_and_mode_availability_topology() {
             }) as fn(&mut TypedModel),
             DirectZonePurchasedAirBindingFeature::NoCoolingAvailabilitySchedule,
         ),
+        (
+            (|typed: &mut TypedModel| {
+                typed.ideal_loads_air_systems[0].design_specification_zonehvac_sizing_object_name =
+                    Some(NormalizedName::new("ZONE HVAC SIZING"));
+            }) as fn(&mut TypedModel),
+            DirectZonePurchasedAirBindingFeature::NoZoneHvacSizingObject,
+        ),
+        (
+            (|typed: &mut TypedModel| {
+                typed.ideal_loads_air_systems[0].heating_fuel_efficiency_schedule =
+                    Some(ScheduleId(3));
+            }) as fn(&mut TypedModel),
+            DirectZonePurchasedAirBindingFeature::NoFuelEfficiencySchedules,
+        ),
     ];
     for (mutate, expected_feature) in cases {
         let (model, _) = fixture(mutate);
@@ -273,18 +340,117 @@ fn binding_rejects_multi_inlet_return_and_mode_availability_topology() {
 }
 
 #[test]
-fn binding_rejects_unsupported_purchased_air_branch() {
+fn binding_accepts_all_resolved_numeric_finite_limit_branches() {
+    let cases = [
+        (
+            IdealLoadsLimit::LimitCapacity,
+            IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity,
+        ),
+        (
+            IdealLoadsLimit::LimitFlowRate,
+            IdealLoadsPurchasedAirBranch::NoOaFiniteFlow,
+        ),
+        (
+            IdealLoadsLimit::LimitFlowRateAndCapacity,
+            IdealLoadsPurchasedAirBranch::NoOaFiniteFlowAndCapacity,
+        ),
+    ];
+
+    for (limit, expected_branch) in cases {
+        let (model, _) = fixture(|typed| {
+            let system = &mut typed.ideal_loads_air_systems[0];
+            system.heating_limit = limit;
+            system.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.25));
+            system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(1_000.0));
+            system.cooling_limit = limit;
+            system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.20));
+            system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(900.0));
+        });
+
+        let binding =
+            bind_direct_zone_purchased_air_model(&model).expect("resolved finite-limit binding");
+        assert_eq!(binding.branch, expected_branch);
+    }
+}
+
+#[test]
+fn binding_rejects_autosized_or_missing_finite_limit_values() {
+    for mutate in [
+        (|typed: &mut TypedModel| {
+            let system = &mut typed.ideal_loads_air_systems[0];
+            system.heating_limit = IdealLoadsLimit::LimitFlowRate;
+            system.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Autosize);
+        }) as fn(&mut TypedModel),
+        (|typed: &mut TypedModel| {
+            typed.ideal_loads_air_systems[0].cooling_limit = IdealLoadsLimit::LimitCapacity;
+        }) as fn(&mut TypedModel),
+    ] {
+        let (model, _) = fixture(mutate);
+        assert_eq!(
+            bind_direct_zone_purchased_air_model(&model)
+                .expect_err("unresolved finite limits must fail closed"),
+            DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                feature: DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset,
+            }
+        );
+    }
+
+    let (negative, _) = fixture(|typed| {
+        let system = &mut typed.ideal_loads_air_systems[0];
+        system.heating_limit = IdealLoadsLimit::LimitCapacity;
+        system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(-1.0));
+    });
+    assert_eq!(
+        bind_direct_zone_purchased_air_model(&negative)
+            .expect_err("negative public TypedModel hard size must fail closed"),
+        DirectZonePurchasedAirBindingError::UnsupportedFeature {
+            feature: DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset,
+        }
+    );
+
+    for value in [f64::NAN, f64::INFINITY] {
+        let (nonfinite, _) = fixture(|typed| {
+            let system = &mut typed.ideal_loads_air_systems[0];
+            system.cooling_limit = IdealLoadsLimit::LimitFlowRate;
+            system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(value));
+        });
+        assert_eq!(
+            bind_direct_zone_purchased_air_model(&nonfinite)
+                .expect_err("nonfinite public TypedModel hard size must fail closed"),
+            DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                feature: DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset,
+            }
+        );
+    }
+}
+
+#[test]
+fn binding_still_rejects_non_sensible_purchased_air_branches() {
     let (model, _) = fixture(|typed| {
-        typed.ideal_loads_air_systems[0].heating_limit = IdealLoadsLimit::LimitCapacity;
-        typed.ideal_loads_air_systems[0].maximum_sensible_heating_capacity_w =
-            Some(ep_model::AutosizeOrNumber::Value(1_000.0));
+        typed.ideal_loads_air_systems[0].dehumidification_control_type =
+            DehumidificationControlType::ConstantSensibleHeatRatio;
     });
 
     assert_eq!(
         bind_direct_zone_purchased_air_model(&model)
-            .expect_err("finite-capacity branch is outside CP301"),
+            .expect_err("humidity-selected branch remains outside direct coupling"),
         DirectZonePurchasedAirBindingError::UnsupportedBranch {
-            branch: IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity,
+            branch: IdealLoadsPurchasedAirBranch::NoOaConstantSensibleHeatRatioCooling,
+        }
+    );
+
+    let (finite_constant_shr, _) = fixture(|typed| {
+        let system = &mut typed.ideal_loads_air_systems[0];
+        system.heating_limit = IdealLoadsLimit::LimitCapacity;
+        system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(1_000.0));
+        system.dehumidification_control_type =
+            DehumidificationControlType::ConstantSensibleHeatRatio;
+    });
+    assert_eq!(
+        bind_direct_zone_purchased_air_model(&finite_constant_shr)
+            .expect_err("finite-limit branch selection must not hide humidity controls"),
+        DirectZonePurchasedAirBindingError::UnsupportedFeature {
+            feature: DirectZonePurchasedAirBindingFeature::SensibleOnlyHumidityControlsInactive,
         }
     );
 }
@@ -304,7 +470,7 @@ fn binding_rejects_hysteresis_and_hidden_no_oa_feature_flags() {
                 typed.ideal_loads_air_systems[0].outdoor_air_economizer_type =
                     OutdoorAirEconomizerType::DifferentialDryBulb;
             }) as fn(&mut TypedModel),
-            DirectZonePurchasedAirBindingFeature::NoOaNoLimitSensibleSubset,
+            DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset,
         ),
     ];
 
@@ -494,6 +660,7 @@ fn fixed_timestep_state_guards_are_transactional() {
                 schedule_cache: &cache,
                 schedule_sample_index: 0,
                 zone_state: &mut wrong_step,
+                barometric_pressure_pa: binding.limit_context.barometric_pressure_pa,
                 system_timestep_seconds: 300.0,
             }
         )
@@ -598,7 +765,11 @@ fn base_typed_model() -> TypedModel {
         }],
         temperature_difference_between_cutout_and_setpoint_delta_c: 0.0,
     });
-    for (id, name) in [(NodeId(0), "SUPPLY"), (NodeId(1), "ZONE AIR")] {
+    for (id, name) in [
+        (NodeId(0), "SUPPLY"),
+        (NodeId(1), "ZONE AIR"),
+        (NodeId(2), "RETURN"),
+    ] {
         typed.nodes.push(Node {
             id,
             name: NormalizedName::new(name),
@@ -628,7 +799,7 @@ fn base_typed_model() -> TypedModel {
             zone_air_inlet_node_or_nodelist_name: Some(NormalizedName::new("SUPPLY")),
             zone_air_exhaust_node_or_nodelist_name: None,
             zone_air_node_name: NormalizedName::new("ZONE AIR"),
-            zone_return_air_node_or_nodelist_name: None,
+            zone_return_air_node_or_nodelist_name: Some(NormalizedName::new("RETURN")),
             zone_return_air_node_1_flow_rate_fraction_schedule: None,
             zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name: None,
         });
@@ -731,6 +902,7 @@ fn couple(
         schedule_cache: cache,
         schedule_sample_index: sample_index,
         zone_state: state,
+        barometric_pressure_pa: binding.limit_context.barometric_pressure_pa,
         system_timestep_seconds: 600.0,
     })
 }

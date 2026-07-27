@@ -15135,6 +15135,54 @@ CP296 routine to infer. A later checkpoint must explicitly declare and audit
 its next EnergyPlus source family rather than silently extending this
 IdealLoads family across a translation-unit boundary.
 
+## CP303 Direct-Zone Return and Hard-Sized Sensible Release Boundary
+
+CP303 supersedes the CP302 no-return topology assumption for the bounded
+`ideal-loads-direct-zone-coupled-compatibility` class. EnergyPlus
+PurchasedAir with a blank exhaust-node name uses the controlled Zone return
+node as its recirculation source. The Rust binder therefore requires exactly
+one resolved return node, distinct from the direct supply and Zone-air nodes,
+and rejects return-flow fraction/basis controls, an IdealLoads exhaust node,
+system-inlet/plenum topology, a ZoneHVAC sizing object, and heating/cooling
+fuel-efficiency schedules whose lifecycle and fuel outputs are not owned by
+this runtime.
+
+The same live release loop now accepts four no-outdoor-air sensible branches:
+no limit, finite capacity, finite flow, and combined flow plus capacity. Every
+active finite limit must be an explicit finite nonnegative hard-sized value;
+missing and `Autosize` limits fail closed. Humidity-control, outdoor-air, and
+all other branches remain outside this boundary. The runtime retains the
+selected branch in the immutable binding, checks each generic PurchasedAir
+result against it, and exposes that branch and the resolved return-node name in
+the run summary.
+
+The binding retains Site-elevation `StdRhoAir` for hard-sized volume-to-mass
+flow conversion, while each release timestep replaces only the saturation
+context's barometric pressure with the active interpolated EPW pressure. A
+regression with deliberately different Site and weather pressures locks this
+split context.
+
+The source positive-only flow clamp is preserved: an active hard-sized zero
+flow maximum does not clamp a positive candidate by itself, while a combined
+branch can still apply its finite capacity limit.
+
+Rust does not yet own a return-node `NodeStateStore` lifecycle. In the bounded
+fully mixed path, current direct-Zone temperature and humidity ratio are
+projected explicitly onto the return-node role and reported with
+`rust-direct-zone-return-projection` provenance. All admitted branches continue
+to consume Rust `SourceSetpointThresholds` demand and return final limited
+supply feedback to the same-step Zone-air corrector. Exact-topology finite
+models use this live path; legacy out-of-topology finite models retain
+compatibility/default demand.
+
+This boundary does not implement persistent `InitPurchasedAir` one-time,
+environment, sizing, or equipment flags/caches, `SizePurchasedAir` or
+autosizing, humidity/OA/DCV/economizer/heat-recovery/EMS branches, warmup,
+adaptive or `FirstHVACIteration` semantics, multiple-equipment residuals,
+full-timestep rollback, or a new conformance promotion. Both parent algorithms
+remain `scaffold` at claim level `none`, routine/inventory status is unchanged,
+and Roadmap Section 12's first checkbox remains open.
+
 
 
 

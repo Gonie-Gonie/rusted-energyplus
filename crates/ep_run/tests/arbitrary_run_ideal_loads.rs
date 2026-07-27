@@ -29,11 +29,19 @@ fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
     let summary = assert_ideal_loads_fixture_runs(
         "ideal-loads-no-oa",
         IDEAL_LOADS_EPJSON,
-        "ideal-loads-no-oa-sensible-compatibility",
+        "ideal-loads-direct-zone-coupled-compatibility",
         "ideal_loads_no_oa_sensible",
     )?;
 
     assert_eq!(summary["rust_runtime"]["samples"], 1);
+    assert_eq!(
+        summary["rust_runtime"]["zone_demand_source"],
+        "rust-predictor-source-setpoint-thresholds"
+    );
+    assert_eq!(
+        summary["rust_runtime"]["recirculation_state_source"],
+        "rust-direct-zone-return-projection"
+    );
     assert!(
         summary["rust_runtime"]["source_order_stages"]
             .as_array()
@@ -272,12 +280,20 @@ fn assert_ideal_loads_fixture_runs(
 ) -> Result<Value, Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir(name)?;
     let input_path = case_dir.join("ideal-loads.epJSON");
+    let weather_path = case_dir.join("weather.epw");
     let output_dir = case_dir.join("out");
     write_text(&input_path, fixture)?;
+    let weather_path = if expected_runtime_class == "ideal-loads-direct-zone-coupled-compatibility"
+    {
+        write_text(&weather_path, ONE_DAY_EPW)?;
+        Some(weather_path)
+    } else {
+        None
+    };
 
     let outcome = run_arbitrary_idf(&RunConfig {
         input_path,
-        weather_path: None,
+        weather_path,
         output_dir: output_dir.clone(),
         mode: RunMode::Compatibility,
         partial_policy: PartialRunPolicy::Deny,

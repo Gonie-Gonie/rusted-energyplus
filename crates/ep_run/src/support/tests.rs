@@ -893,8 +893,7 @@ fn hvac_air_loop_uses_unsupported_rule_from_registry() -> Result<(), Box<dyn std
 #[test]
 fn direct_zone_ideal_loads_binding_selects_coupled_runtime_before_legacy_branch()
 -> Result<(), Box<dyn std::error::Error>> {
-    let raw = parse_epjson_str(
-        r#"{
+    let fixture = r#"{
                 "Version": {"Version 1": {"version_identifier": "26.1"}},
                 "Zone": {"Zone One": {"volume": 100}},
                 "Schedule:Constant": {
@@ -945,11 +944,56 @@ fn direct_zone_ideal_loads_binding_selects_coupled_runtime_before_legacy_branch(
                         "zone_name": "Zone One",
                         "zone_conditioning_equipment_list_name": "Zone Equipment",
                         "zone_air_inlet_node_or_nodelist_name": "Zone Inlets",
-                        "zone_air_node_name": "Zone One Air Node"
+                        "zone_air_node_name": "Zone One Air Node",
+                        "zone_return_air_node_or_nodelist_name": "Zone One Return"
                     }
                 }
-            }"#,
-    )?;
+            }"#;
+    let finite_fixture = fixture.replace(
+        r#""zone_supply_air_node_name": "Zone Inlets","#,
+        r#""zone_supply_air_node_name": "Zone Inlets",
+                        "heating_limit": "LimitFlowRateAndCapacity",
+                        "maximum_heating_air_flow_rate": 0.01,
+                        "maximum_sensible_heating_capacity": 300.0,
+                        "cooling_limit": "LimitFlowRateAndCapacity",
+                        "maximum_cooling_air_flow_rate": 0.01,
+                        "maximum_total_cooling_capacity": 300.0,"#,
+    );
+
+    for (input, expected_capability) in [
+        (fixture.to_string(), "ideal_loads_no_oa_sensible"),
+        (finite_fixture.clone(), "ideal_loads_finite_limits"),
+    ] {
+        let raw = parse_epjson_str(&input)?;
+        let result = compile_raw_model(&raw);
+        let assessment = assess_support(
+            &raw,
+            &result.report,
+            result.model.as_ref(),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+        );
+
+        assert_eq!(assessment.status, SupportStatus::SupportedCompatibility);
+        assert_eq!(
+            assessment.runtime_class,
+            RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+        );
+        assert_eq!(
+            assessment.runtime_class.id(),
+            "ideal-loads-direct-zone-coupled-compatibility"
+        );
+        assert_eq!(assessment.matched_capability_ids, vec![expected_capability]);
+    }
+
+    let legacy_finite_fixture = finite_fixture.replace(
+        r#""control_1_name": "Dual Setpoints""#,
+        r#""control_1_name": "Dual Setpoints",
+                        "temperature_difference_between_cutout_and_setpoint": 0.5"#,
+    );
+    let raw = parse_epjson_str(&legacy_finite_fixture)?;
     let result = compile_raw_model(&raw);
     let assessment = assess_support(
         &raw,
@@ -960,19 +1004,14 @@ fn direct_zone_ideal_loads_binding_selects_coupled_runtime_before_legacy_branch(
         RunOutputFormat::RustNative,
         TraceLevel::Normal,
     );
-
-    assert_eq!(assessment.status, SupportStatus::SupportedCompatibility);
     assert_eq!(
         assessment.runtime_class,
-        RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
-    );
-    assert_eq!(
-        assessment.runtime_class.id(),
-        "ideal-loads-direct-zone-coupled-compatibility"
+        RuntimeClass::IdealLoadsFiniteLimitCompatibility,
+        "finite models outside the zero-hysteresis direct binding remain on the legacy path"
     );
     assert_eq!(
         assessment.matched_capability_ids,
-        vec!["ideal_loads_no_oa_sensible"]
+        vec!["ideal_loads_finite_limits"]
     );
     Ok(())
 }
@@ -1056,7 +1095,7 @@ fn ideal_loads_no_oa_branch_matches_registry_capability() -> Result<(), Box<dyn 
     );
     assert_eq!(
         assessment.runtime_class,
-        RuntimeClass::IdealLoadsNoOaSensibleCompatibility
+        RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
     );
     assert_eq!(
         assessment.matched_capability_ids,

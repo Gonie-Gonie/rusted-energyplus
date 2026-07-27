@@ -8,15 +8,16 @@ use crate::{
     },
 };
 use ep_model::{
-    IdealLoadsAirSystem, IdealLoadsAirSystemId, LoadDistributionScheme, NodeId, NormalizedName,
-    ScheduleId, SimulationModel, ThermostatSetpointId, ZoneEquipmentListId,
-    ZoneEquipmentObjectType, ZoneId, ZoneThermostatId,
+    DehumidificationControlType, HumidificationControlType, IdealLoadsAirSystem,
+    IdealLoadsAirSystemId, LoadDistributionScheme, NodeId, NormalizedName, ScheduleId,
+    SimulationModel, ThermostatSetpointId, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId,
+    ZoneThermostatId,
 };
 
 use super::{
     DirectZonePurchasedAirCouplingError, DirectZonePurchasedAirCouplingInput,
     DirectZonePurchasedAirCouplingOutput, IdealLoadsPurchasedAirBranch,
-    IdealLoadsSensibleLimitContext, classify_no_oa_no_limit_sensible_subset,
+    IdealLoadsSensibleLimitContext, classify_no_oa_sensible_subset,
     couple_direct_zone_predicted_demand_to_purchased_air, select_purchased_air_branch,
 };
 
@@ -51,6 +52,8 @@ pub enum DirectZonePurchasedAirBindingRelation {
     ZoneInletNode,
     /// One Zone-air-node graph edge.
     ZoneAirNode,
+    /// One resolved Zone return node used by blank-exhaust PurchasedAir.
+    ZoneReturnNode,
 }
 
 /// Static topology feature required by the bounded direct-Zone binding.
@@ -82,18 +85,27 @@ pub enum DirectZonePurchasedAirBindingFeature {
     DistinctZoneAirNode,
     /// The connection has no exhaust-node topology.
     NoZoneExhaustTopology,
-    /// The connection has no return-node topology.
-    NoZoneReturnTopology,
+    /// The resolved Zone return node is distinct from supply and Zone air.
+    DistinctZoneReturnNode,
+    /// Return-flow fraction/basis controls are absent.
+    NoZoneReturnFlowControl,
     /// The IdealLoads object has no exhaust node.
     NoIdealLoadsExhaustNode,
     /// The IdealLoads object has no system inlet or plenum node.
     NoIdealLoadsSystemInletNode,
+    /// A DesignSpecification:ZoneHVAC:Sizing object is not selected.
+    NoZoneHvacSizingObject,
+    /// Heating and cooling fuel-efficiency schedules are absent.
+    NoFuelEfficiencySchedules,
     /// Mode-specific heating availability is not configured.
     NoHeatingAvailabilitySchedule,
     /// Mode-specific cooling availability is not configured.
     NoCoolingAvailabilitySchedule,
-    /// The system is in the no-OA/no-limit sensible subset.
-    NoOaNoLimitSensibleSubset,
+    /// The system is in the no-OA sensible subset with no limit or resolved
+    /// numeric flow/capacity limits.
+    NoOaSensibleNumericLimitSubset,
+    /// Humidification and dehumidification controls are inactive.
+    SensibleOnlyHumidityControlsInactive,
     /// The model Zone timestep can produce a positive nominal step.
     PositiveNominalSystemTimestep,
 }
@@ -161,12 +173,16 @@ pub struct DirectZonePurchasedAirModelBinding<'model> {
     pub supply_node: NodeId,
     /// Sole direct Zone air node.
     pub zone_air_node: NodeId,
+    /// Sole direct Zone return node used as the blank-exhaust recirculation source.
+    pub return_node: NodeId,
     /// Positive Zone multiplier.
     pub zone_multiplier: u32,
     /// Positive ZoneList multiplier.
     pub zone_list_multiplier: u32,
     /// Fixed model Zone/system timestep for this first boundary.
     pub nominal_system_timestep_seconds: f64,
+    /// Preselected no-OA sensible PurchasedAir branch.
+    pub branch: IdealLoadsPurchasedAirBranch,
     /// Site-derived psychrometric context.
     pub limit_context: IdealLoadsSensibleLimitContext,
     /// Prebound typed IdealLoads system.
@@ -177,9 +193,9 @@ pub struct DirectZonePurchasedAirModelBinding<'model> {
 ///
 /// This first binding intentionally admits one standard, nominally controlled
 /// Zone; one zero-hysteresis DualSetpoint thermostat; and one sequence-one,
-/// no-OA/no-limit sensible IdealLoads system with one direct inlet. The
-/// function does not claim release-loop integration or non-mixing room-air
-/// support.
+/// no-OA sensible IdealLoads system with one direct inlet and either no limit
+/// or resolved numeric flow/capacity limits. The function does not claim
+/// non-mixing room-air, autosizing, or broader equipment topology support.
 pub fn bind_direct_zone_purchased_air_model(
     model: &SimulationModel,
 ) -> Result<DirectZonePurchasedAirModelBinding<'_>, DirectZonePurchasedAirBindingError> {
@@ -268,15 +284,14 @@ pub fn bind_direct_zone_purchased_air_model(
     if connection.zone_air_exhaust_node_or_nodelist_name.is_some() {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoZoneExhaustTopology);
     }
-    if connection.zone_return_air_node_or_nodelist_name.is_some()
-        || connection
-            .zone_return_air_node_1_flow_rate_fraction_schedule
-            .is_some()
+    if connection
+        .zone_return_air_node_1_flow_rate_fraction_schedule
+        .is_some()
         || connection
             .zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name
             .is_some()
     {
-        return unsupported(DirectZonePurchasedAirBindingFeature::NoZoneReturnTopology);
+        return unsupported(DirectZonePurchasedAirBindingFeature::NoZoneReturnFlowControl);
     }
 
     let equipment_list = require_one(
@@ -354,12 +369,39 @@ pub fn bind_direct_zone_purchased_air_model(
     if zone_air_edge.node == supply_edge.node {
         return unsupported(DirectZonePurchasedAirBindingFeature::DistinctZoneAirNode);
     }
+    let return_name = connection
+        .zone_return_air_node_or_nodelist_name
+        .as_ref()
+        .ok_or(DirectZonePurchasedAirBindingError::Cardinality {
+            relation: DirectZonePurchasedAirBindingRelation::ZoneReturnNode,
+            expected: 1,
+            actual: 0,
+        })?;
+    let return_nodes = resolve_node_or_nodelist(typed, return_name);
+    let return_node = require_one(
+        &return_nodes,
+        DirectZonePurchasedAirBindingRelation::ZoneReturnNode,
+    )?;
+    if *return_node == supply_edge.node || *return_node == zone_air_edge.node {
+        return unsupported(DirectZonePurchasedAirBindingFeature::DistinctZoneReturnNode);
+    }
 
     if system.zone_exhaust_air_node_name.is_some() {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoIdealLoadsExhaustNode);
     }
     if system.system_inlet_air_node_name.is_some() {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoIdealLoadsSystemInletNode);
+    }
+    if system
+        .design_specification_zonehvac_sizing_object_name
+        .is_some()
+    {
+        return unsupported(DirectZonePurchasedAirBindingFeature::NoZoneHvacSizingObject);
+    }
+    if system.heating_fuel_efficiency_schedule.is_some()
+        || system.cooling_fuel_efficiency_schedule.is_some()
+    {
+        return unsupported(DirectZonePurchasedAirBindingFeature::NoFuelEfficiencySchedules);
     }
     if system.heating_availability_schedule.is_some() {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoHeatingAvailabilitySchedule);
@@ -369,11 +411,18 @@ pub fn bind_direct_zone_purchased_air_model(
     }
 
     let branch = select_purchased_air_branch(system);
-    if branch != IdealLoadsPurchasedAirBranch::NoOaNoLimitSensible {
+    if !branch.is_no_oa_sensible_with_optional_limits() {
         return Err(DirectZonePurchasedAirBindingError::UnsupportedBranch { branch });
     }
-    if !classify_no_oa_no_limit_sensible_subset(system).is_supported() {
-        return unsupported(DirectZonePurchasedAirBindingFeature::NoOaNoLimitSensibleSubset);
+    if system.dehumidification_control_type != DehumidificationControlType::None
+        || system.humidification_control_type != HumidificationControlType::None
+    {
+        return unsupported(
+            DirectZonePurchasedAirBindingFeature::SensibleOnlyHumidityControlsInactive,
+        );
+    }
+    if !classify_no_oa_sensible_subset(system).is_supported() {
+        return unsupported(DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset);
     }
 
     let timesteps_per_hour = typed.timestep.number_of_timesteps_per_hour;
@@ -402,9 +451,11 @@ pub fn bind_direct_zone_purchased_air_model(
         ideal_loads_air_system: system.id,
         supply_node: supply_edge.node,
         zone_air_node: zone_air_edge.node,
+        return_node: *return_node,
         zone_multiplier: zone.multiplier,
         zone_list_multiplier: zone.list_multiplier,
         nominal_system_timestep_seconds,
+        branch,
         limit_context,
         system,
     })
@@ -530,6 +581,11 @@ pub struct DirectZonePurchasedAirScheduledCouplingInput<'a, 'model> {
     pub schedule_sample_index: usize,
     /// Live Zone heat-balance state.
     pub zone_state: &'a mut ZoneHeatBalanceState,
+    /// Active barometric pressure for supply-air saturation checks.
+    ///
+    /// The binding remains the sole owner of Site-derived standard air
+    /// density used by hard-sized volume-to-mass flow conversion.
+    pub barometric_pressure_pa: f64,
     /// Active system timestep in seconds.
     pub system_timestep_seconds: f64,
 }
@@ -621,6 +677,10 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         unit_available,
     };
     let zone_node_temperature_c = input.zone_state.mean_air_temperature_c;
+    let recirculation_state = crate::ideal_loads::IdealLoadsZoneState {
+        air_temperature_c: zone_node_temperature_c,
+        air_humidity_ratio: input.zone_state.air_humidity_ratio,
+    };
 
     let coupling =
         couple_direct_zone_predicted_demand_to_purchased_air(DirectZonePurchasedAirCouplingInput {
@@ -628,6 +688,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             heating_setpoint_c,
             cooling_setpoint_c,
             zone_node_temperature_c,
+            recirculation_state,
             load_correction_factor: 1.0,
             zone_multiplier: binding.zone_multiplier,
             zone_list_multiplier: binding.zone_list_multiplier,
@@ -635,7 +696,9 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             system: binding.system,
             supply_node: binding.supply_node,
             unit_available,
-            limit_context: binding.limit_context,
+            limit_context: binding
+                .limit_context
+                .with_barometric_pressure_pa(input.barometric_pressure_pa),
         })
         .map_err(DirectZonePurchasedAirScheduledCouplingError::Coupling)?;
 
