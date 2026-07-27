@@ -34,6 +34,10 @@
         assert!((state.zones[0].sum_ha_w_per_k - 18.456).abs() < 1.0e-12);
         assert!((state.zones[0].sum_hat_surf_w - 369.12).abs() < 1.0e-12);
         assert_eq!(state.zones[0].sum_hat_ref_w, 0.0);
+        assert_eq!(
+            state.zones[0].system_dependent_zone_loads_lagged_w,
+            0.0
+        );
         assert!(
             (state.zones[0]
                 .zone_air_temperature_coefficients

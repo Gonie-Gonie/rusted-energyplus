@@ -86,6 +86,7 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
             sum_mcp_t_w: 0.0,
             sum_sys_mcp_w_per_k: 0.0,
             sum_sys_mcp_t_w: 0.0,
+            system_dependent_zone_loads_lagged_w: 0.0,
             zone_air_temperature_coefficients: ZoneAirTemperatureCoefficients::ZERO,
             system_timestep_average_surface_convection_report_w: None,
             system_timestep_average_air_storage_report_w: None,

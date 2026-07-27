@@ -1,5 +1,7 @@
 //! Bounded `calcPredictedSystemLoad` arithmetic for the source-order port.
 
+use crate::heat_balance::state::ZoneHeatBalanceState;
+use crate::zone_equipment::ZoneSysEnergyDemand;
 use ep_model::ZoneId;
 
 /// Predictor-time inputs for the bounded direct-Zone ThirdOrder load-term assembly.
@@ -479,9 +481,122 @@ pub fn calc_predicted_system_load_dual_setpoint_third_order(
     })
 }
 
+/// State-backed inputs for the bounded direct-Zone, DualSetpoint, ThirdOrder demand producer.
+///
+/// The zone state owns the predictor heat-balance sums, active temperature
+/// history, air heat capacity, and lagged system-dependent load. The caller
+/// supplies thermostat, node, scaling, and system-timestep values that are not
+/// yet owned by the current heat-balance state shell.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct DirectZoneDualSetpointThirdOrderDemandInput<'a> {
+    /// Predictor-time state for one fully mixed direct Zone.
+    pub zone_state: &'a ZoneHeatBalanceState,
+    /// Active low thermostat setpoint in degrees Celsius.
+    pub heating_setpoint_c: f64,
+    /// Active high thermostat setpoint in degrees Celsius.
+    pub cooling_setpoint_c: f64,
+    /// Current direct-Zone system-node temperature, read only in deadband.
+    pub zone_node_temperature_c: f64,
+    /// EnergyPlus Zone load-correction factor, inclusive from -3 through 3.
+    pub load_correction_factor: f64,
+    /// Positive integer EnergyPlus Zone multiplier within the source signed-int range.
+    pub zone_multiplier: u32,
+    /// Positive integer EnergyPlus ZoneList multiplier within the source signed-int range.
+    pub zone_list_multiplier: u32,
+    /// Active system timestep in seconds.
+    pub system_timestep_seconds: f64,
+}
+
+/// Immutable result of the state-backed sensible-demand producer.
+///
+/// The snapshots retain each composition boundary: predictor terms, predicted
+/// and scaled loads, then the `ZoneSysEnergyDemand` thresholds consumed by zone
+/// equipment.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct DirectZoneDualSetpointThirdOrderDemand {
+    /// CP298 source-ordered predictor coefficients and load terms.
+    pub predictor_terms: PredictorThirdOrderLoadTerms,
+    /// CP296 dual-setpoint predicted and output-required sensible loads.
+    pub predicted_loads: PredictedZoneSensibleLoads,
+    /// CP297 zone-equipment demand projection.
+    pub zone_demand: ZoneSysEnergyDemand,
+}
+
+/// Fail-closed error from one of the bounded producer stages.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum DirectZoneDualSetpointThirdOrderDemandError {
+    /// CP298 predictor-term assembly rejected its state or timestep input.
+    PredictorTerms(PredictorThirdOrderLoadTermsError),
+    /// CP296 predicted-load calculation rejected thermostat, node, or scaling input.
+    PredictedLoad(PredictedSystemLoadError),
+}
+
+/// Produces direct-Zone ThirdOrder sensible demand from owned heat-balance state.
+///
+/// The composition preserves the bounded source order: CP298 assembles
+/// predictor terms from non-system heat-balance sums and
+/// `SysDepZoneLoadsLagged`; CP296 calculates and scales the DualSetpoint loads;
+/// CP297 projects the finalized heating/cooling thresholds into
+/// `ZoneSysEnergyDemand`. `SumSysMCp` and `SumSysMCpT` are deliberately not read
+/// during prediction. This function does not mutate histories or advance the
+/// lagged-load owner.
+pub fn predict_direct_zone_dual_setpoint_third_order_demand(
+    input: DirectZoneDualSetpointThirdOrderDemandInput<'_>,
+) -> Result<DirectZoneDualSetpointThirdOrderDemand, DirectZoneDualSetpointThirdOrderDemandError> {
+    let zone_state = input.zone_state;
+    let previous_mean_air_temperatures_c = if zone_state.use_zone_timestep_history {
+        zone_state.previous_mean_air_temperatures_c
+    } else {
+        zone_state.previous_system_mean_air_temperatures_c
+    };
+    let predictor_terms =
+        assemble_predictor_third_order_load_terms(PredictorThirdOrderLoadTermsInput {
+            sum_ha_w_per_k: zone_state.sum_ha_w_per_k,
+            sum_mcp_w_per_k: zone_state.sum_mcp_w_per_k,
+            sum_internal_gain_w: zone_state.convective_internal_gain_w,
+            sum_hat_surf_w: zone_state.sum_hat_surf_w,
+            sum_hat_ref_w: zone_state.sum_hat_ref_w,
+            sum_mcp_t_w: zone_state.sum_mcp_t_w,
+            system_dependent_zone_loads_lagged_w: zone_state.system_dependent_zone_loads_lagged_w,
+            air_heat_capacity_j_per_k: zone_state.air_heat_capacity_j_per_k,
+            timestep_seconds: input.system_timestep_seconds,
+            previous_mean_air_temperatures_c,
+        })
+        .map_err(DirectZoneDualSetpointThirdOrderDemandError::PredictorTerms)?;
+    let predicted_loads = calc_predicted_system_load_dual_setpoint_third_order(
+        DualSetpointThirdOrderSystemLoadInput {
+            zone: zone_state.zone_id,
+            temp_dependent_load_w_per_k: predictor_terms.temp_dependent_load_w_per_k,
+            temp_independent_load_w: predictor_terms.temp_independent_load_w,
+            heating_setpoint_c: input.heating_setpoint_c,
+            cooling_setpoint_c: input.cooling_setpoint_c,
+            zone_air_temperature_c: input.zone_node_temperature_c,
+            load_correction_factor: input.load_correction_factor,
+            zone_multiplier: input.zone_multiplier,
+            zone_list_multiplier: input.zone_list_multiplier,
+        },
+    )
+    .map_err(DirectZoneDualSetpointThirdOrderDemandError::PredictedLoad)?;
+    let zone_demand = ZoneSysEnergyDemand::from_output_required_setpoint_loads(
+        predicted_loads.zone,
+        predicted_loads.output_required_to_heating_setpoint_w,
+        predicted_loads.output_required_to_cooling_setpoint_w,
+    );
+
+    Ok(DirectZoneDualSetpointThirdOrderDemand {
+        predictor_terms,
+        predicted_loads,
+        zone_demand,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{
+        heat_balance::state::ZoneAirTemperatureCoefficients,
+        zone_equipment::ZoneSensibleDemandInputKind,
+    };
 
     fn predictor_terms_input() -> PredictorThirdOrderLoadTermsInput {
         PredictorThirdOrderLoadTermsInput {
@@ -496,6 +611,237 @@ mod tests {
             timestep_seconds: 600.0,
             previous_mean_air_temperatures_c: [20.0, 19.0, 18.0],
         }
+    }
+
+    fn zone_state() -> ZoneHeatBalanceState {
+        ZoneHeatBalanceState {
+            zone_id: ZoneId(7),
+            zone_name: "ZONE SEVEN".to_string(),
+            mean_air_temperature_c: 22.0,
+            zone_timestep_average_air_temperature_c: 22.0,
+            previous_mean_air_temperatures_c: [0.0; 3],
+            previous_system_mean_air_temperatures_c: [0.0; 3],
+            previous_system_timestep_count: 1,
+            air_humidity_ratio: 0.008,
+            zone_timestep_average_air_humidity_ratio: 0.008,
+            previous_air_humidity_ratios: [0.008; 3],
+            previous_system_air_humidity_ratios: [0.008; 3],
+            use_zone_timestep_history: true,
+            shorten_timestep_sys: false,
+            prior_timestep_seconds: 600.0,
+            volume_m3: 100.0,
+            air_heat_capacity_j_per_k: 0.0,
+            convective_internal_gain_w: 0.0,
+            opaque_surface_conductance_w_per_k: 0.0,
+            opaque_surface_heat_gain_w: 0.0,
+            opaque_surface_outside_conduction_w: 0.0,
+            sum_ha_w_per_k: 120.0,
+            sum_hat_surf_w: 0.0,
+            sum_hat_ref_w: 0.0,
+            sum_mcp_w_per_k: 5.0,
+            sum_mcp_t_w: 0.0,
+            sum_sys_mcp_w_per_k: f64::NAN,
+            sum_sys_mcp_t_w: f64::INFINITY,
+            system_dependent_zone_loads_lagged_w: 250.0,
+            zone_air_temperature_coefficients: ZoneAirTemperatureCoefficients::ZERO,
+            system_timestep_average_surface_convection_report_w: None,
+            system_timestep_average_air_storage_report_w: None,
+        }
+    }
+
+    fn state_backed_input(
+        zone_state: &ZoneHeatBalanceState,
+    ) -> DirectZoneDualSetpointThirdOrderDemandInput<'_> {
+        DirectZoneDualSetpointThirdOrderDemandInput {
+            zone_state,
+            heating_setpoint_c: 20.0,
+            cooling_setpoint_c: 24.0,
+            zone_node_temperature_c: f64::NAN,
+            load_correction_factor: 0.8,
+            zone_multiplier: 2,
+            zone_list_multiplier: 3,
+            system_timestep_seconds: 600.0,
+        }
+    }
+
+    #[test]
+    fn state_backed_producer_composes_predictor_load_and_demand_once() {
+        let state = zone_state();
+        let output =
+            predict_direct_zone_dual_setpoint_third_order_demand(state_backed_input(&state))
+                .expect("bounded state-backed heating demand");
+
+        assert_eq!(output.predictor_terms.temp_dependent_load_w_per_k, 125.0);
+        assert_eq!(output.predictor_terms.temp_independent_load_w, 250.0);
+        assert_eq!(
+            output.predicted_loads.mode,
+            PredictedZoneSensibleLoadMode::Heating
+        );
+        assert_eq!(output.predicted_loads.raw_heating_setpoint_load_w, 2_250.0);
+        assert_eq!(output.predicted_loads.raw_cooling_setpoint_load_w, 2_750.0);
+        assert_eq!(output.predicted_loads.predicted_rate_w, 1_800.0);
+        assert_eq!(output.predicted_loads.total_output_required_w, 10_800.0);
+        assert_eq!(output.predicted_loads.zone, state.zone_id);
+        assert_eq!(output.zone_demand.zone, state.zone_id);
+        assert_eq!(
+            output.zone_demand.sensible_input_kind,
+            ZoneSensibleDemandInputKind::SourceSetpointThresholds
+        );
+        assert_eq!(
+            output.zone_demand.remaining_output_req_to_heat_sp_w,
+            10_800.0
+        );
+        assert_eq!(
+            output.zone_demand.remaining_output_req_to_cool_sp_w,
+            13_200.0
+        );
+        assert!(output.zone_demand.has_inactive_moisture_demand());
+
+        let mut without_lagged = state.clone();
+        without_lagged.system_dependent_zone_loads_lagged_w = 0.0;
+        let without_lagged_output = predict_direct_zone_dual_setpoint_third_order_demand(
+            state_backed_input(&without_lagged),
+        )
+        .expect("same state without lagged system-dependent load");
+        assert_eq!(
+            output.predictor_terms.temp_independent_load_w
+                - without_lagged_output
+                    .predictor_terms
+                    .temp_independent_load_w,
+            250.0
+        );
+        assert_eq!(
+            without_lagged_output
+                .predicted_loads
+                .raw_heating_setpoint_load_w
+                - output.predicted_loads.raw_heating_setpoint_load_w,
+            250.0
+        );
+    }
+
+    #[test]
+    fn state_backed_producer_reads_only_the_active_temperature_history() {
+        let mut zone_history_state = zone_state();
+        zone_history_state.air_heat_capacity_j_per_k = 600.0;
+        zone_history_state.previous_mean_air_temperatures_c = [10.0, 9.0, 8.0];
+        zone_history_state.previous_system_mean_air_temperatures_c = [f64::NAN; 3];
+        let zone_history_output = predict_direct_zone_dual_setpoint_third_order_demand(
+            state_backed_input(&zone_history_state),
+        )
+        .expect("zone-timestep history is active");
+        assert!(
+            (zone_history_output
+                .predictor_terms
+                .temperature_history_term_w
+                - (3.0 * 10.0 - (3.0 / 2.0) * 9.0 + (1.0 / 3.0) * 8.0))
+                .abs()
+                < 1.0e-12
+        );
+
+        let mut system_history_state = zone_state();
+        system_history_state.use_zone_timestep_history = false;
+        system_history_state.air_heat_capacity_j_per_k = 600.0;
+        system_history_state.previous_mean_air_temperatures_c = [f64::NAN; 3];
+        system_history_state.previous_system_mean_air_temperatures_c = [20.0, 19.0, 18.0];
+        let system_history_output = predict_direct_zone_dual_setpoint_third_order_demand(
+            state_backed_input(&system_history_state),
+        )
+        .expect("system-timestep history is active");
+        assert!(
+            (system_history_output
+                .predictor_terms
+                .temperature_history_term_w
+                - (3.0 * 20.0 - (3.0 / 2.0) * 19.0 + (1.0 / 3.0) * 18.0))
+                .abs()
+                < 1.0e-12
+        );
+    }
+
+    #[test]
+    fn state_backed_producer_preserves_cooling_deadband_and_zero_thresholds() {
+        let cases = [
+            (
+                3_500.0,
+                PredictedZoneSensibleLoadMode::Cooling,
+                -1_500.0,
+                -1_100.0,
+            ),
+            (
+                2_200.0,
+                PredictedZoneSensibleLoadMode::Deadband,
+                -200.0,
+                200.0,
+            ),
+            (2_000.0, PredictedZoneSensibleLoadMode::Deadband, 0.0, 400.0),
+            (
+                2_400.0,
+                PredictedZoneSensibleLoadMode::Deadband,
+                -400.0,
+                0.0,
+            ),
+        ];
+
+        for (independent_load_w, expected_mode, expected_heating_w, expected_cooling_w) in cases {
+            let mut state = zone_state();
+            state.sum_ha_w_per_k = 100.0;
+            state.sum_mcp_w_per_k = 0.0;
+            state.convective_internal_gain_w = independent_load_w;
+            state.system_dependent_zone_loads_lagged_w = 0.0;
+            let mut input = state_backed_input(&state);
+            input.zone_node_temperature_c = 22.0;
+            input.load_correction_factor = 1.0;
+            input.zone_multiplier = 1;
+            input.zone_list_multiplier = 1;
+
+            let output = predict_direct_zone_dual_setpoint_third_order_demand(input)
+                .expect("bounded sign-branch fixture");
+            assert_eq!(output.predicted_loads.mode, expected_mode);
+            assert_eq!(
+                output.zone_demand.remaining_output_req_to_heat_sp_w,
+                expected_heating_w
+            );
+            assert_eq!(
+                output.zone_demand.remaining_output_req_to_cool_sp_w,
+                expected_cooling_w
+            );
+            assert_eq!(
+                output.zone_demand.sensible_input_kind,
+                ZoneSensibleDemandInputKind::SourceSetpointThresholds
+            );
+        }
+    }
+
+    #[test]
+    fn state_backed_producer_wraps_stage_errors_without_mutating_state() {
+        let mut state = zone_state();
+        state.sum_sys_mcp_w_per_k = 0.0;
+        state.sum_sys_mcp_t_w = 0.0;
+        let original = state.clone();
+
+        let mut invalid_timestep = state_backed_input(&state);
+        invalid_timestep.system_timestep_seconds = 0.0;
+        assert_eq!(
+            predict_direct_zone_dual_setpoint_third_order_demand(invalid_timestep),
+            Err(DirectZoneDualSetpointThirdOrderDemandError::PredictorTerms(
+                PredictorThirdOrderLoadTermsError::TimestepSecondsNotPositive { value: 0.0 }
+            ))
+        );
+        assert_eq!(state, original);
+
+        let mut invalid_correction = state_backed_input(&state);
+        invalid_correction.load_correction_factor = 4.0;
+        assert_eq!(
+            predict_direct_zone_dual_setpoint_third_order_demand(invalid_correction),
+            Err(DirectZoneDualSetpointThirdOrderDemandError::PredictedLoad(
+                PredictedSystemLoadError::InputOutsideInclusiveRange {
+                    field: "load_correction_factor",
+                    value: 4.0,
+                    minimum: -3.0,
+                    maximum: 3.0,
+                }
+            ))
+        );
+        assert_eq!(state, original);
     }
 
     #[test]

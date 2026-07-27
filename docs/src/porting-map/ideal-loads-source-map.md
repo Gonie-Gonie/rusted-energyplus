@@ -135,7 +135,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `ZoneEquipmentManager::updateZoneSizingEndDay` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; current-timestep demand, IdealLoads limits/OA mixing, warmup extrema, and sizing-name detection do not implement persistent Zone/Space daily peak and cross-period final reduction |
 | `ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc1` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; compile-time Zone/Space topology, demand snapshots, equipment load sequences, and sizing-name detection do not implement noncoincident calculated-final Space-to-Zone aggregation |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
-| `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | `crates/ep_runtime/src/zone_equipment/demand.rs::ZoneSysEnergyDemand` |
+| `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | CP299 `crates/ep_runtime/src/heat_balance/predicted_system_load.rs::predict_direct_zone_dual_setpoint_third_order_demand` projects state-backed direct-Zone ThirdOrder thresholds into `ZoneSysEnergyDemand`; no live PurchasedAir caller |
 
 ## Runtime Order
 
@@ -17903,6 +17903,68 @@ remain `source_mapped`. CP298 adds one Rust target and bounded unit evidence
 only. Algorithm/routine counts, required counts, readiness, capabilities,
 outputs, manifests, comparators, performance, and conformance claims do not
 change; Roadmap Section 12's first checkbox remains open.
+
+## CP299 State-Backed Direct-Zone Third-Order Demand Producer
+
+CP299 composes the three bounded arithmetic stages introduced by CP298, CP296,
+and CP297 into one public, production-compiled Rust API. It advances Roadmap
+Section 12's first item by replacing free predictor scalars at this seam with a
+borrowed `ZoneHeatBalanceState`; it does not add a release caller or complete
+oracle/default-demand removal. The source boundary remains the fully mixed
+direct-Zone ThirdOrder predictor at `ZoneTempPredictorCorrector.cc` lines
+3146-3256, the DualHeatCool/ThirdOrder load branch at lines 7034-7126, and the
+bounded Remaining-demand copy described by CP297. Space, RAFN, ITE, staged
+control, other thermostat modes, and other solution algorithms remain outside
+the producer.
+
+`ZoneHeatBalanceState` now owns
+`system_dependent_zone_loads_lagged_w`, initialized to zero with each Zone heat
+balance record. `predict_direct_zone_dual_setpoint_third_order_demand` reads
+that field exactly once with the state's `sum_ha_w_per_k`,
+`sum_mcp_w_per_k`, `convective_internal_gain_w`, `sum_hat_surf_w`,
+`sum_hat_ref_w`, `sum_mcp_t_w`, and `air_heat_capacity_j_per_k`. It selects
+`previous_mean_air_temperatures_c` when `use_zone_timestep_history` is true and
+`previous_system_mean_air_temperatures_c` otherwise. It deliberately does not
+read `sum_sys_mcp_w_per_k` or `sum_sys_mcp_t_w`, matching the prediction-time
+source exclusion of system-air sums.
+
+The caller still supplies the active heating and cooling setpoints, deadband
+node temperature, load-correction factor, Zone and ZoneList multipliers, and
+system-timestep seconds. The producer first calls CP298's
+`assemble_predictor_third_order_load_terms`, then CP296's
+`calc_predicted_system_load_dual_setpoint_third_order`, and finally
+`ZoneSysEnergyDemand::from_output_required_setpoint_loads`. Its immutable
+result retains the predictor terms, scaled predicted-load snapshot, and
+`SourceSetpointThresholds` demand with the moisture subset inactive. Errors
+are wrapped by stage and return before any state mutation.
+
+Four focused producer tests prove one heating composition with correction and
+Zone/List scaling applied once, direct propagation of the owned lagged load,
+and deliberate non-use of nonfinite system-air sums; exclusive selection of
+Zone- or system-timestep history while the inactive history is nonfinite;
+cooling, nonzero deadband, and both exact-zero threshold boundaries; and
+stage-specific error wrapping with the borrowed state unchanged. A separate
+runtime initialization regression locks the new lagged field at zero.
+
+This is a callable production seam, not a live simulation loop. No runtime
+owner writes the lagged HVAC load after initialization, no thermostat schedule
+or system node populates the caller-owned inputs, and no heat-balance timestep,
+`ep_run`, `ep_cli`, or `sim_purchased_air_compat` caller invokes CP299. The
+release IdealLoads path therefore continues to construct compatibility demand,
+and `ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE` remains
+`source-order-oracle-demand-input`. Multiple-equipment sequencing and residual
+updates, adaptive timestep integration, history mutation, supply feedback, and
+the combined heat-balance/IdealLoads iteration remain unsupported.
+
+The `zone_temp_predictor_corrector_source_order` and
+`ideal_loads_zone_equipment_purchased_air_source_order` parents remain
+`scaffold` at claim level `none`. `predictSystemLoad`,
+`calcPredictedSystemLoad`, `initOutputRequired`, and `CalcPurchAirLoads` remain
+`source_mapped`; CP299 promotes no routine. Algorithm/routine counts, required
+counts, readiness, capabilities, outputs, manifests, comparators, performance,
+and conformance claims do not change. Roadmap Section 12's first checkbox
+remains open.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

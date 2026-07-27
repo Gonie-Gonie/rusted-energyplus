@@ -55,7 +55,7 @@ must remain outside the claim until broader EnergyPlus zone-air parity exists.
 | thermostat-setpoint predefined LEED table | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::FillPredefinedTableOnThermostatSetpoints` | normalized DualSetpoint graph, calendar-aware schedule series, and separate constant-schedule IdealLoads diagnostics only | CP233 required source-mapped four-family first-schedule-ID-wins traversal, winter/summer Wednesday samples and counts, base/synthetic row keys, append-only predefined cells, final-report cadence, and failure/retry lifecycle; reporting input stays ignored and no exact Rust arena, seasonal query, table store, helper, caller, or test exists |
 | thermostat-schedule predefined System Summary table | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::FillPredefinedTableOnThermostatSchedules` | direct-Zone DualSetpoint graph and IdealLoads schedule resolution only | CP234 required source-mapped stored ordinary-Zone traversal, nonempty-name slot selection, tuple sort, independently filtered string joins, four-to-six append-only cells, final-report cadence, and failure/retry/reset lifecycle; reporting input stays ignored and no complete Rust arena, predefined table store, helper, caller, serializer, or comparator exists |
 | Zone/Space predictor temperature-history preparation | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::updateTemperatures` | Zone-only three-slot adaptive temperature/humidity histories and helper | CP235 required source-mapped unconditional four-slot working-history selection plus shortened Zone/Space node rollback and count-change RoomAir interpolation orchestration; no exact Rust Space/node/thermostat/enthalpy/RoomAir topology, source cadence, wrapper, or test exists |
-| Zone/Space predicted sensible system load | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::calcPredictedSystemLoad` | CP296 `calc_predicted_system_load_dual_setpoint_third_order` plus CP298 `assemble_predictor_third_order_load_terms` pure snapshots and adjacent node, oracle-demand, and multiplier scaffolds | CP236 remains required/source-mapped. CP298 exposes named ThirdOrder predictor-term slots with no dedicated system-air-sum fields and one `SysDepZoneLoadsLagged` slot, but it validates neither scalar provenance nor a live state owner/caller; no full dispatcher, Space/RAFN/ITE/staged branch, state mutation, live demand synthesis, or runtime caller exists |
+| Zone/Space predicted sensible system load | `src/EnergyPlus/ZoneTempPredictorCorrector.cc::ZoneSpaceHeatBalanceData::calcPredictedSystemLoad` | CP299 `predict_direct_zone_dual_setpoint_third_order_demand`, composing CP298 and CP296 from `ZoneHeatBalanceState` into `ZoneSysEnergyDemand` | CP236 remains required/source-mapped. CP299 owns the direct-Zone predictor sums, selected three-slot history, air capacitance, and `SysDepZoneLoadsLagged` read boundary, but thermostat/node/timestep and scaling values remain caller-owned. The lagged field has no writer and no heat-balance, IdealLoads, or PurchasedAir release caller exists; no full dispatcher, Space/RAFN/ITE/staged branch, source-state mutation, or live demand coupling is claimed |
 | mean air temperature histories | `MAT`, `XMAT`, `XM2T`, `XM3T`, `ZoneAirTemp` | `ZoneHeatBalanceState::previous_mean_air_temperatures_c` | placeholder history |
 | air capacitance | zone volume, multipliers, moist-air density and specific heat | `ZoneHeatBalanceState::air_heat_capacity_j_per_k` plus psychrometric helper shell | promoted candidate updates `AirPowerCap` from weather-context pressure/RH proxy for the declared case; owned `ZoneAirHumRat` still pending for broader claims |
 | internal convective gains | `InternalHeatGains.cc` | `simulate_zone_internal_convective_gains`, heat-balance gain input | convective gain case only |
@@ -20654,6 +20654,68 @@ remain `source_mapped`. CP298 adds one Rust target and bounded unit evidence
 only. Algorithm/routine counts, required counts, readiness, capabilities,
 outputs, manifests, comparators, performance, and conformance claims do not
 change; Roadmap Section 12's first checkbox remains open.
+
+## CP299 State-Backed Direct-Zone Third-Order Demand Producer
+
+CP299 composes the three bounded arithmetic stages introduced by CP298, CP296,
+and CP297 into one public, production-compiled Rust API. It advances Roadmap
+Section 12's first item by replacing free predictor scalars at this seam with a
+borrowed `ZoneHeatBalanceState`; it does not add a release caller or complete
+oracle/default-demand removal. The source boundary remains the fully mixed
+direct-Zone ThirdOrder predictor at `ZoneTempPredictorCorrector.cc` lines
+3146-3256, the DualHeatCool/ThirdOrder load branch at lines 7034-7126, and the
+bounded Remaining-demand copy described by CP297. Space, RAFN, ITE, staged
+control, other thermostat modes, and other solution algorithms remain outside
+the producer.
+
+`ZoneHeatBalanceState` now owns
+`system_dependent_zone_loads_lagged_w`, initialized to zero with each Zone heat
+balance record. `predict_direct_zone_dual_setpoint_third_order_demand` reads
+that field exactly once with the state's `sum_ha_w_per_k`,
+`sum_mcp_w_per_k`, `convective_internal_gain_w`, `sum_hat_surf_w`,
+`sum_hat_ref_w`, `sum_mcp_t_w`, and `air_heat_capacity_j_per_k`. It selects
+`previous_mean_air_temperatures_c` when `use_zone_timestep_history` is true and
+`previous_system_mean_air_temperatures_c` otherwise. It deliberately does not
+read `sum_sys_mcp_w_per_k` or `sum_sys_mcp_t_w`, matching the prediction-time
+source exclusion of system-air sums.
+
+The caller still supplies the active heating and cooling setpoints, deadband
+node temperature, load-correction factor, Zone and ZoneList multipliers, and
+system-timestep seconds. The producer first calls CP298's
+`assemble_predictor_third_order_load_terms`, then CP296's
+`calc_predicted_system_load_dual_setpoint_third_order`, and finally
+`ZoneSysEnergyDemand::from_output_required_setpoint_loads`. Its immutable
+result retains the predictor terms, scaled predicted-load snapshot, and
+`SourceSetpointThresholds` demand with the moisture subset inactive. Errors
+are wrapped by stage and return before any state mutation.
+
+Four focused producer tests prove one heating composition with correction and
+Zone/List scaling applied once, direct propagation of the owned lagged load,
+and deliberate non-use of nonfinite system-air sums; exclusive selection of
+Zone- or system-timestep history while the inactive history is nonfinite;
+cooling, nonzero deadband, and both exact-zero threshold boundaries; and
+stage-specific error wrapping with the borrowed state unchanged. A separate
+runtime initialization regression locks the new lagged field at zero.
+
+This is a callable production seam, not a live simulation loop. No runtime
+owner writes the lagged HVAC load after initialization, no thermostat schedule
+or system node populates the caller-owned inputs, and no heat-balance timestep,
+`ep_run`, `ep_cli`, or `sim_purchased_air_compat` caller invokes CP299. The
+release IdealLoads path therefore continues to construct compatibility demand,
+and `ZONE_SYS_ENERGY_DEMAND_FIXTURE_MODE` remains
+`source-order-oracle-demand-input`. Multiple-equipment sequencing and residual
+updates, adaptive timestep integration, history mutation, supply feedback, and
+the combined heat-balance/IdealLoads iteration remain unsupported.
+
+The `zone_temp_predictor_corrector_source_order` and
+`ideal_loads_zone_equipment_purchased_air_source_order` parents remain
+`scaffold` at claim level `none`. `predictSystemLoad`,
+`calcPredictedSystemLoad`, `initOutputRequired`, and `CalcPurchAirLoads` remain
+`source_mapped`; CP299 promotes no routine. Algorithm/routine counts, required
+counts, readiness, capabilities, outputs, manifests, comparators, performance,
+and conformance claims do not change. Roadmap Section 12's first checkbox
+remains open.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

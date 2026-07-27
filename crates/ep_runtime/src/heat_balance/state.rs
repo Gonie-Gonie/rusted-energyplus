@@ -235,6 +235,8 @@ pub struct ZoneHeatBalanceState {
     pub sum_sys_mcp_w_per_k: f64,
     /// EnergyPlus `SumSysMCpT`: system-air temperature sum in W.
     pub sum_sys_mcp_t_w: f64,
+    /// EnergyPlus predictor-time `SysDepZoneLoadsLagged` in W.
+    pub system_dependent_zone_loads_lagged_w: f64,
     /// EnergyPlus zone-air temperature coefficient snapshot for diagnostics.
     pub zone_air_temperature_coefficients: ZoneAirTemperatureCoefficients,
     /// Optional EnergyPlus system-timestep averaged surface convection report in W.
