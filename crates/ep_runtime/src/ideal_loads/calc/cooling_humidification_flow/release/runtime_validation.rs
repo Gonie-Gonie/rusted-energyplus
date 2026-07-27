@@ -59,7 +59,9 @@ pub(super) fn pending_humidification_flow_state_is_consistent(
         && direct_counter_relationships_are_consistent(state)
 }
 
-fn partition_is_consistent(state: &PurchasedAirCalcCoolingHumidificationFlowRuntimeState) -> bool {
+pub(super) fn partition_is_consistent(
+    state: &PurchasedAirCalcCoolingHumidificationFlowRuntimeState,
+) -> bool {
     state
         .unit_off_skip_count
         .checked_add(state.non_cooling_skip_count)
@@ -93,7 +95,7 @@ fn latest_is_valid(
     }
 }
 
-fn direct_counter_relationships_are_consistent(
+pub(super) fn direct_counter_relationships_are_consistent(
     state: &PurchasedAirCalcCoolingHumidificationFlowRuntimeState,
 ) -> bool {
     state.reset_assignment_count == state.cooling_body_entry_count

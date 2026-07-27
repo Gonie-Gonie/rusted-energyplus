@@ -18916,6 +18916,45 @@ unsupported. Both parents and the Calc routine retain their status; inventory,
 readiness, capability, evidence, numerical conformance, and Roadmap state do
 not change.
 
+## CP321 Cooling Capacity-Zero Flow Reset
+
+CP321 maps executable lines 2147-2152 and their exact ten source sites after
+CP320. UnitOff and non-cooling paths skip every site. Active Cooling reads
+`CoolingLimit` for `Capacity`; only a false comparison re-reads it for
+`FlowRateAndCapacity`. Only a selector match reads retained hard-sized
+`MaxCoolTotCap` and evaluates exact `== 0.0`. A true result enters the body
+and assigns positive zero in order to the cooling, dehumidification, and
+humidification flow candidates. All false paths retain the same-call CP318
+cooling, CP319 dehumidification, and CP320 humidification candidate bit
+patterns unchanged.
+
+The exact direct release consumes those three same-call candidate snapshots
+and cached model/Init hard-sized values. It requests no live sizing, schedule,
+Node, moisture, psychrometric, EMS, or diagnostic service. Capacity
+short-circuits the second selector read; FlowRateAndCapacity performs it;
+NoLimit and FlowRate read neither maximum nor body. Exact positive and
+negative zero match, while nonzero finite values, NaN, and infinities fall
+through in pure characterization. The pure transition uses no finite guard,
+normalization, maximum, or clamp and does not reuse
+`cooling_capacity_limit_is_zero`, whose `<= 0.0` predicate is broader.
+Existing public direct admission still rejects unresolved or nonfinite
+selected sized values before entering the transition.
+
+`calc/cooling_capacity_zero_flow_reset.rs` and its split modules own CP321
+state, transition, release, validation, and tests. The binder orders CP321
+between CP320 and the unchanged numerical DTO. Direct-only JSON publishes
+`purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle`; per-step,
+lifecycle, coupled, and pipeline firewalls reconcile the predecessor, all ten
+sites, lazy reads, exact equality, ordered positive-zero writes, and false-path
+bits. No CP321 candidate is reconciled with the numerical DTO.
+
+Line 2152 closes CP321 and line 2155 is the first excluded executable.
+Three-candidate maximum selection, EMS and flow clamps,
+mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection remain
+excluded. Finite-limit and Autosize support remain unchanged. Both parents and
+the Calc routine retain their status; inventory, readiness, capability,
+evidence, numerical conformance, and Roadmap state do not change.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

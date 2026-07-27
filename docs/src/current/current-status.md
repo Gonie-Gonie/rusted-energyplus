@@ -639,6 +639,36 @@ ownership, numerical conformance, capability level, both parent statuses, the
 Calc routine status, inventory/readiness counts, evidence cases, and Roadmap
 state remain unchanged.
 
+CP321 maps the complete Cooling capacity-zero flow reset at executable lines
+2147-2152 and its exact 10 source sites. UnitOff and non-cooling predecessors
+skip the whole slice. Active Cooling first reads `CoolingLimit` and compares
+`Capacity`; only a false result re-reads the selector and compares
+`FlowRateAndCapacity`. Only a matching selector reads retained hard-sized
+`MaxCoolTotCap` and compares it with exact `== 0.0`. A true comparison enters
+the body and assigns positive zero, in source order, to the cooling,
+dehumidification, and humidification supply-flow candidates. Every false path
+preserves all three predecessor candidate bit patterns.
+
+The exact direct lane consumes retained same-call CP318 cooling, CP319
+dehumidification, and CP320 humidification candidate snapshots plus the
+model/Init hard-sized maximum without requesting live sizing, schedule, Node,
+moisture, psychrometric, EMS, or diagnostic services. The pure source
+transition does not reuse `cooling_capacity_limit_is_zero`, whose broader
+`<= 0.0` predicate would change the source boundary, and performs no finite
+check, normalization, maximum, clamp, or numerical-DTO reconciliation.
+Existing direct admission still rejects unresolved or nonfinite selected
+sized values before that transition. The binder and lifecycle firewalls order
+CP321 after CP320 and before the unchanged numerical DTO and publish direct-only
+`purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle` evidence.
+
+Line 2152 closes CP321. The first excluded executable is line 2155, the
+three-candidate maximum. Maximum selection, EMS override, later clamps,
+mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection remain
+open. CP321 adds lifecycle evidence only: support and readiness, broad finite
+limit or autosizing support, numerical conformance, capability level, parent
+and routine statuses, inventory counts, evidence cases, and Roadmap state
+remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

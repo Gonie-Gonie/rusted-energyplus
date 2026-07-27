@@ -1,0 +1,122 @@
+//! Private latest-witness access for source-ordered calculation stages.
+
+use ep_model::IdealLoadsAirSystemId;
+
+use super::PurchasedAirRuntimeState;
+use crate::ideal_loads::{
+    PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot,
+    PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
+    PurchasedAirCalcCoolingEconomizerBodySnapshot,
+    PurchasedAirCalcCoolingEconomizerConditionSnapshot,
+    PurchasedAirCalcCoolingHumidificationFlowSnapshot, PurchasedAirCalcCoolingSensibleFlowSnapshot,
+};
+
+impl PurchasedAirRuntimeState {
+    pub(in crate::ideal_loads) fn cooling_economizer_condition_latest_witness(
+        &self,
+        system: IdealLoadsAirSystemId,
+    ) -> Option<PurchasedAirCalcCoolingEconomizerConditionSnapshot> {
+        self.cooling_economizer_condition_latest_witnesses
+            .get(&system)
+            .copied()
+    }
+
+    pub(in crate::ideal_loads) fn set_cooling_economizer_condition_latest_witness(
+        &mut self,
+        system: IdealLoadsAirSystemId,
+        snapshot: PurchasedAirCalcCoolingEconomizerConditionSnapshot,
+    ) {
+        self.cooling_economizer_condition_latest_witnesses
+            .insert(system, snapshot);
+    }
+
+    pub(in crate::ideal_loads) fn cooling_economizer_body_latest_witness(
+        &self,
+        system: IdealLoadsAirSystemId,
+    ) -> Option<PurchasedAirCalcCoolingEconomizerBodySnapshot> {
+        self.cooling_economizer_body_latest_witnesses
+            .get(&system)
+            .copied()
+    }
+
+    pub(in crate::ideal_loads) fn set_cooling_economizer_body_latest_witness(
+        &mut self,
+        system: IdealLoadsAirSystemId,
+        snapshot: PurchasedAirCalcCoolingEconomizerBodySnapshot,
+    ) {
+        self.cooling_economizer_body_latest_witnesses
+            .insert(system, snapshot);
+    }
+
+    pub(in crate::ideal_loads) fn cooling_sensible_flow_latest_witness(
+        &self,
+        system: IdealLoadsAirSystemId,
+    ) -> Option<PurchasedAirCalcCoolingSensibleFlowSnapshot> {
+        self.cooling_sensible_flow_latest_witnesses
+            .get(&system)
+            .copied()
+    }
+
+    pub(in crate::ideal_loads) fn set_cooling_sensible_flow_latest_witness(
+        &mut self,
+        system: IdealLoadsAirSystemId,
+        snapshot: PurchasedAirCalcCoolingSensibleFlowSnapshot,
+    ) {
+        self.cooling_sensible_flow_latest_witnesses
+            .insert(system, snapshot);
+    }
+
+    pub(in crate::ideal_loads) fn cooling_dehumidification_flow_latest_witness(
+        &self,
+        system: IdealLoadsAirSystemId,
+    ) -> Option<PurchasedAirCalcCoolingDehumidificationFlowSnapshot> {
+        self.cooling_dehumidification_flow_latest_witnesses
+            .get(&system)
+            .copied()
+    }
+
+    pub(in crate::ideal_loads) fn set_cooling_dehumidification_flow_latest_witness(
+        &mut self,
+        system: IdealLoadsAirSystemId,
+        snapshot: PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
+    ) {
+        self.cooling_dehumidification_flow_latest_witnesses
+            .insert(system, snapshot);
+    }
+
+    pub(in crate::ideal_loads) fn cooling_humidification_flow_latest_witness(
+        &self,
+        system: IdealLoadsAirSystemId,
+    ) -> Option<PurchasedAirCalcCoolingHumidificationFlowSnapshot> {
+        self.cooling_humidification_flow_latest_witnesses
+            .get(&system)
+            .copied()
+    }
+
+    pub(in crate::ideal_loads) fn set_cooling_humidification_flow_latest_witness(
+        &mut self,
+        system: IdealLoadsAirSystemId,
+        snapshot: PurchasedAirCalcCoolingHumidificationFlowSnapshot,
+    ) {
+        self.cooling_humidification_flow_latest_witnesses
+            .insert(system, snapshot);
+    }
+
+    pub(in crate::ideal_loads) fn cooling_capacity_zero_flow_reset_latest_witness(
+        &self,
+        system: IdealLoadsAirSystemId,
+    ) -> Option<PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot> {
+        self.cooling_capacity_zero_flow_reset_latest_witnesses
+            .get(&system)
+            .copied()
+    }
+
+    pub(in crate::ideal_loads) fn set_cooling_capacity_zero_flow_reset_latest_witness(
+        &mut self,
+        system: IdealLoadsAirSystemId,
+        snapshot: PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot,
+    ) {
+        self.cooling_capacity_zero_flow_reset_latest_witnesses
+            .insert(system, snapshot);
+    }
+}

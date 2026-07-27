@@ -21445,6 +21445,37 @@ numerical support, or capability support. Parent/routine status,
 inventory/readiness, evidence, conformance, and Roadmap state remain
 unchanged.
 
+## CP321 Cooling Capacity-Zero Reset Placement
+
+CP321 maps the complete ten-site lines-2147-2152 reset after CP320 and before
+the unchanged numerical DTO and Zone-air correction. UnitOff and non-cooling
+skip the slice. Active Cooling compares `CoolingLimit` with `Capacity`, only
+after a false result re-reads it for `FlowRateAndCapacity`, and only after a
+selector match reads retained hard-sized `MaxCoolTotCap`. Exact `== 0.0`
+enters the body and assigns positive zero in order to the cooling,
+dehumidification, and humidification candidates. False paths preserve all
+the retained same-call CP318 cooling, CP319 dehumidification, and CP320
+humidification candidate bit patterns.
+
+Direct release consumes those three candidate snapshots and retained
+model/Init state and adds no live Zone-air demand, Node, moisture,
+psychrometric, sizing, EMS, schedule, or diagnostic read. The pure transition
+preserves lazy order and exact equality without finite checks, normalization,
+maximum, clamp, or the broader `cooling_capacity_limit_is_zero` helper.
+Existing public direct admission still rejects unresolved or nonfinite
+selected sized values before the transition. Per-step, final, coupled-runtime,
+and pipeline validation reconcile direct-only lifecycle evidence before the
+existing numerical and corrector paths, without reconciling candidate values
+to the numerical DTO.
+
+Line 2152 closes CP321 and line 2155 is the first excluded executable.
+Candidate maximum, EMS and later clamps, mixed-air and final supply-state
+behavior, Heat/DeadBand selection, node/report writes, residuals, and adaptive
+iteration remain outside the slice. CP321 adds no Zone-air equation, demand
+or feedback term, finite-limit or Autosize support, numerical support, or
+capability support. Parent/routine status, inventory/readiness, evidence,
+conformance, and Roadmap state remain unchanged.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

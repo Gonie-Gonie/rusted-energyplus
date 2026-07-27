@@ -36,6 +36,8 @@ use super::{
     DirectZonePurchasedAirModelBinding, DirectZonePurchasedAirRuntimeStepError,
     IdealLoadsPurchasedAirBranch, IdealLoadsSensibleMode, PURCHASED_AIR_CALC_ENTRY_SOURCE,
     PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PurchasedAirAvailabilityStatus,
+    PurchasedAirCalcCoolingCapacityZeroFlowResetError,
+    PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary,
     PurchasedAirCalcCoolingDehumidificationFlowError,
     PurchasedAirCalcCoolingDehumidificationFlowLifecycleSummary,
     PurchasedAirCalcCoolingEconomizerBodyError,
@@ -57,6 +59,7 @@ use super::{
     PurchasedAirHardSizeLegacyRoute, PurchasedAirInitError, PurchasedAirInitLifecycleSummary,
     PurchasedAirRecirculationSource, PurchasedAirRuntimeState, PurchasedAirSizedLimits,
     append_direct_zone_purchased_air_hourly_output_series, bind_direct_zone_purchased_air_model,
+    purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle_summary,
     purchased_air_calc_cooling_dehumidification_flow_lifecycle_summary,
     purchased_air_calc_cooling_economizer_body_lifecycle_summary,
     purchased_air_calc_cooling_economizer_condition_lifecycle_summary,
@@ -70,6 +73,7 @@ use super::{
     purchased_air_calc_minimum_oa_prefix_lifecycle_summary, purchased_air_init_lifecycle_summary,
 };
 
+mod cooling_capacity_zero_flow_reset_validation;
 mod cooling_dehumidification_flow_validation;
 mod cooling_economizer_body_validation;
 mod cooling_economizer_condition_validation;
@@ -181,6 +185,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded cooling humidification-flow lifecycle report.
     pub calc_cooling_humidification_flow_lifecycle:
         PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary,
+    /// Persistent bounded cooling capacity-zero candidate-reset lifecycle report.
+    pub calc_cooling_capacity_zero_flow_reset_lifecycle:
+        PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -240,6 +247,8 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     CalcCoolingDehumidificationFlowLifecycle(PurchasedAirCalcCoolingDehumidificationFlowError),
     /// Final cooling humidification-flow summary could not resolve the bound unit.
     CalcCoolingHumidificationFlowLifecycle(PurchasedAirCalcCoolingHumidificationFlowError),
+    /// Final cooling capacity-zero reset summary could not resolve the bound unit.
+    CalcCoolingCapacityZeroFlowResetLifecycle(PurchasedAirCalcCoolingCapacityZeroFlowResetError),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
         /// Stable invariant field.
@@ -348,6 +357,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A cooling capacity-zero reset lifecycle invariant did not match the run.
+    CalcCoolingCapacityZeroFlowResetLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -405,6 +423,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     },
     /// A cooling humidification-flow snapshot did not match its bound release call.
     UnexpectedCalculationCoolingHumidificationFlow {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
+    /// A cooling capacity-zero reset snapshot did not match its bound release call.
+    UnexpectedCalculationCoolingCapacityZeroFlowReset {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
@@ -505,6 +528,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir cooling humidification-flow lifecycle summary failed: {error:?}"
             ),
+            Self::CalcCoolingCapacityZeroFlowResetLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir cooling capacity-zero reset lifecycle summary failed: {error:?}"
+            ),
             Self::InitLifecycleInvariant {
                 field,
                 expected,
@@ -601,6 +628,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir cooling humidification-flow lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingCapacityZeroFlowResetLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir cooling capacity-zero reset lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -648,6 +683,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::UnexpectedCalculationCoolingHumidificationFlow { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling humidification-flow calculation"
+            ),
+            Self::UnexpectedCalculationCoolingCapacityZeroFlowReset { timestep_index } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling capacity-zero reset"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -920,6 +959,16 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
                     UnexpectedCalculationCoolingHumidificationFlow { timestep_index },
             );
         }
+        if !cooling_capacity_zero_flow_reset_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingCapacityZeroFlowReset { timestep_index },
+            );
+        }
         if !output.initialization.flags.state_machine_used
             || output.coupling.purchased_air.init_flags != output.initialization.flags
         {
@@ -1125,6 +1174,22 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_capacity_zero_flow_reset_lifecycle =
+        purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingCapacityZeroFlowResetLifecycle,
+        )?;
+    cooling_capacity_zero_flow_reset_validation::validate_lifecycle(
+        &calc_cooling_capacity_zero_flow_reset_lifecycle,
+        &calc_cooling_humidification_flow_lifecycle,
+        timestep_outputs.len(),
+        numerical_cooling_count,
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -1198,6 +1263,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_sensible_flow_lifecycle,
             calc_cooling_dehumidification_flow_lifecycle,
             calc_cooling_humidification_flow_lifecycle,
+            calc_cooling_capacity_zero_flow_reset_lifecycle,
         },
         state,
         results,

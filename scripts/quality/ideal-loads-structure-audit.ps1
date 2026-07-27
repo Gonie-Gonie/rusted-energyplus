@@ -224,6 +224,7 @@ $idealLoadsInitManagerPlanTests = "crates\ep_runtime\src\ideal_loads\init\manage
 $idealLoadsInitManagerScanTests = "crates\ep_runtime\src\ideal_loads\init\manager_scan_tests.rs"
 $idealLoadsInitSummary = "crates\ep_runtime\src\ideal_loads\init\summary.rs"
 $idealLoadsInitState = "crates\ep_runtime\src\ideal_loads\init\state.rs"
+$idealLoadsInitWitnesses = "crates\ep_runtime\src\ideal_loads\init\state\witnesses.rs"
 $idealLoadsInitSupplyTemperatureDiagnostic = "crates\ep_runtime\src\ideal_loads\init\supply_temperature_diagnostic.rs"
 $idealLoadsInitSupplyTemperatureDiagnosticTests = "crates\ep_runtime\src\ideal_loads\init\supply_temperature_diagnostic_tests.rs"
 $idealLoadsInitTopologyPlan = "crates\ep_runtime\src\ideal_loads\init\topology_plan.rs"
@@ -450,6 +451,7 @@ Assert-FileExists -Path $idealLoadsInitManagerPlanTests -Description "IdealLoads
 Assert-FileExists -Path $idealLoadsInitManagerScanTests -Description "IdealLoads manager-wide initialization sweep tests"
 Assert-FileExists -Path $idealLoadsInitSummary -Description "IdealLoads initialization lifecycle summary"
 Assert-FileExists -Path $idealLoadsInitState -Description "IdealLoads persistent initialization state"
+Assert-FileExists -Path $idealLoadsInitWitnesses -Description "IdealLoads private calculation witness accessors"
 Assert-FileExists -Path $idealLoadsInitSupplyTemperatureDiagnostic -Description "IdealLoads supply-temperature diagnostic registry"
 Assert-FileExists -Path $idealLoadsInitSupplyTemperatureDiagnosticTests -Description "IdealLoads supply-temperature diagnostic tests"
 Assert-FileExists -Path $idealLoadsInitTopologyPlan -Description "IdealLoads immutable selected-unit topology plan"
@@ -670,6 +672,7 @@ Assert-LineLimit -Path $idealLoadsInitManagerPlanTests -Limit 250 -Description "
 Assert-LineLimit -Path $idealLoadsInitManagerScanTests -Limit 420 -Description "IdealLoads manager-wide initialization sweep tests"
 Assert-LineLimit -Path $idealLoadsInitSummary -Limit 100 -Description "IdealLoads initialization lifecycle summary"
 Assert-LineLimit -Path $idealLoadsInitState -Limit 360 -Description "IdealLoads persistent initialization state"
+Assert-LineLimit -Path $idealLoadsInitWitnesses -Limit 240 -Description "IdealLoads private calculation witness accessors"
 Assert-LineLimit -Path $idealLoadsInitSupplyTemperatureDiagnostic -Limit 340 -Description "IdealLoads supply-temperature diagnostic registry"
 Assert-LineLimit -Path $idealLoadsInitSupplyTemperatureDiagnosticTests -Limit 340 -Description "IdealLoads supply-temperature diagnostic tests"
 Assert-LineLimit -Path $idealLoadsInitTopologyPlan -Limit 480 -Description "IdealLoads immutable selected-unit topology plan"
@@ -1245,8 +1248,8 @@ Assert-Contains -Path $calcCoolingEconomizerGuard -Pattern 'pub economizer_body_
 Assert-Contains -Path $calcCoolingEconomizerGuard -Pattern 'pub no_economizer_fallthrough_count: usize' -Description "Calc cooling economizer false-result continuation counter"
 Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)#\[derive\(Clone, Debug, Default, PartialEq\)\]\s*pub struct PurchasedAirRuntimeState\s*\{.*?cooling_economizer_condition_latest_witnesses:\s*BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingEconomizerConditionSnapshot>,' -Description "runtime-root default-empty per-system CP316 witness map"
 Assert-NotContains -Path $idealLoadsInitState -Pattern '(?m)^\s*pub(?:\([^)]*\))?\s+cooling_economizer_condition_latest_witnesses:' -Description "public runtime-root CP316 witness map"
-Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)pub\(in crate::ideal_loads\) fn cooling_economizer_condition_latest_witness\s*\(\s*&self,\s*system:\s*IdealLoadsAirSystemId,\s*\)\s*->\s*Option<PurchasedAirCalcCoolingEconomizerConditionSnapshot>\s*\{\s*self\.cooling_economizer_condition_latest_witnesses\s*\.get\(&system\)\s*\.copied\(\)\s*\}' -Description "ideal_loads-scoped runtime-root CP316 witness getter"
-Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)pub\(in crate::ideal_loads\) fn set_cooling_economizer_condition_latest_witness\s*\(\s*&mut self,\s*system:\s*IdealLoadsAirSystemId,\s*snapshot:\s*PurchasedAirCalcCoolingEconomizerConditionSnapshot,\s*\)\s*\{\s*self\.cooling_economizer_condition_latest_witnesses\s*\.insert\(system, snapshot\);\s*\}' -Description "ideal_loads-scoped runtime-root CP316 witness setter"
+Assert-Contains -Path $idealLoadsInitWitnesses -Pattern '(?s)pub\(in crate::ideal_loads\) fn cooling_economizer_condition_latest_witness\s*\(\s*&self,\s*system:\s*IdealLoadsAirSystemId,\s*\)\s*->\s*Option<PurchasedAirCalcCoolingEconomizerConditionSnapshot>\s*\{\s*self\.cooling_economizer_condition_latest_witnesses\s*\.get\(&system\)\s*\.copied\(\)\s*\}' -Description "ideal_loads-scoped runtime-root CP316 witness getter"
+Assert-Contains -Path $idealLoadsInitWitnesses -Pattern '(?s)pub\(in crate::ideal_loads\) fn set_cooling_economizer_condition_latest_witness\s*\(\s*&mut self,\s*system:\s*IdealLoadsAirSystemId,\s*snapshot:\s*PurchasedAirCalcCoolingEconomizerConditionSnapshot,\s*\)\s*\{\s*self\.cooling_economizer_condition_latest_witnesses\s*\.insert\(system, snapshot\);\s*\}' -Description "ideal_loads-scoped runtime-root CP316 witness setter"
 Assert-NotContains -Path $calcCoolingEconomizerGuard -Pattern '\b(?:cooling_economizer_condition_latest_witness(?:es)?|condition_consumer_latest_witness|PurchasedAirCalcCoolingEconomizerConditionSnapshot)\b' -Description "CP316 witness ownership, accessor, setter, or snapshot import in CP315 guard state"
 Assert-NotContains -Path $calcCoolingEconomizerGuard -Pattern 'fn advance_cooling_economizer_guard_state\s*\(' -Description "cooling economizer transition implementation in module facade"
 Assert-NotContains -Path $calcCoolingEconomizerGuard -Pattern '#\[test\]' -Description "unit test body in cooling economizer guard facade"
@@ -1681,8 +1684,8 @@ Assert-NotContains -Path $calcCoolingEconomizerBody -Pattern '#\[test\]' -Descri
 
 Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)#\[derive\(Clone, Debug, Default, PartialEq\)\]\s*pub struct PurchasedAirRuntimeState\s*\{.*?cooling_economizer_body_latest_witnesses:\s*BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingEconomizerBodySnapshot>,' -Description "runtime-root default-empty per-system CP317 witness map"
 Assert-NotContains -Path $idealLoadsInitState -Pattern '(?m)^\s*pub(?:\([^)]*\))?\s+cooling_economizer_body_latest_witnesses:' -Description "public runtime-root CP317 witness map"
-Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)pub\(in crate::ideal_loads\) fn cooling_economizer_body_latest_witness\s*\(\s*&self,\s*system:\s*IdealLoadsAirSystemId,\s*\)\s*->\s*Option<PurchasedAirCalcCoolingEconomizerBodySnapshot>\s*\{\s*self\.cooling_economizer_body_latest_witnesses\s*\.get\(&system\)\s*\.copied\(\)\s*\}' -Description "ideal_loads-scoped runtime-root CP317 witness getter"
-Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)pub\(in crate::ideal_loads\) fn set_cooling_economizer_body_latest_witness\s*\(\s*&mut self,\s*system:\s*IdealLoadsAirSystemId,\s*snapshot:\s*PurchasedAirCalcCoolingEconomizerBodySnapshot,\s*\)\s*\{\s*self\.cooling_economizer_body_latest_witnesses\s*\.insert\(system, snapshot\);\s*\}' -Description "ideal_loads-scoped runtime-root CP317 witness setter"
+Assert-Contains -Path $idealLoadsInitWitnesses -Pattern '(?s)pub\(in crate::ideal_loads\) fn cooling_economizer_body_latest_witness\s*\(\s*&self,\s*system:\s*IdealLoadsAirSystemId,\s*\)\s*->\s*Option<PurchasedAirCalcCoolingEconomizerBodySnapshot>\s*\{\s*self\.cooling_economizer_body_latest_witnesses\s*\.get\(&system\)\s*\.copied\(\)\s*\}' -Description "ideal_loads-scoped runtime-root CP317 witness getter"
+Assert-Contains -Path $idealLoadsInitWitnesses -Pattern '(?s)pub\(in crate::ideal_loads\) fn set_cooling_economizer_body_latest_witness\s*\(\s*&mut self,\s*system:\s*IdealLoadsAirSystemId,\s*snapshot:\s*PurchasedAirCalcCoolingEconomizerBodySnapshot,\s*\)\s*\{\s*self\.cooling_economizer_body_latest_witnesses\s*\.insert\(system, snapshot\);\s*\}' -Description "ideal_loads-scoped runtime-root CP317 witness setter"
 Assert-NotContains -Path $calcCoolingEconomizerCondition -Pattern '\b(?:cooling_economizer_body_latest_witness(?:es)?|body_consumer_latest_witness|PurchasedAirCalcCoolingEconomizerBodySnapshot)\b' -Description "CP317 witness ownership, accessor, setter, or snapshot import in CP316 condition state"
 Assert-NotContains -Path $calcCoolingEconomizerConditionTransition -Pattern '\b(?:cooling_economizer_body_latest_witness(?:es)?|body_consumer_latest_witness)\b' -Description "CP316 transition mutation of the runtime-root CP317 witness"
 
@@ -1835,8 +1838,8 @@ Assert-NotContains -Path $calcCoolingSensibleFlowTransition -Pattern '\.(?:abs|c
 
 Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)cooling_sensible_flow_latest_witnesses:\s*BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingSensibleFlowSnapshot>' -Description "runtime-root default-empty per-system CP318 witness map"
 Assert-NotContains -Path $idealLoadsInitState -Pattern '(?m)^\s*pub(?:\([^)]*\))?\s+cooling_sensible_flow_latest_witnesses:' -Description "public runtime-root CP318 witness map"
-Assert-Contains -Path $idealLoadsInitState -Pattern 'pub\(in crate::ideal_loads\) fn cooling_sensible_flow_latest_witness\s*\(' -Description "ideal_loads-scoped runtime-root CP318 witness getter"
-Assert-Contains -Path $idealLoadsInitState -Pattern 'pub\(in crate::ideal_loads\) fn set_cooling_sensible_flow_latest_witness\s*\(' -Description "ideal_loads-scoped runtime-root CP318 witness setter"
+Assert-Contains -Path $idealLoadsInitWitnesses -Pattern 'pub\(in crate::ideal_loads\) fn cooling_sensible_flow_latest_witness\s*\(' -Description "ideal_loads-scoped runtime-root CP318 witness getter"
+Assert-Contains -Path $idealLoadsInitWitnesses -Pattern 'pub\(in crate::ideal_loads\) fn set_cooling_sensible_flow_latest_witness\s*\(' -Description "ideal_loads-scoped runtime-root CP318 witness setter"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub calc_cooling_sensible_flow: PurchasedAirCalcCoolingSensibleFlowRuntimeState' -Description "per-unit CP318 persistent state"
 Assert-Contains -Path $calcCoolingEconomizerBodyCompletedBodyValidation -Pattern 'pub\(super\) fn completed_body_state_is_consistent\s*\(' -Description "CP317 completed-state validator for CP318"
 Assert-Contains -Path $calcCoolingEconomizerBodyCompletedBodyValidation -Pattern 'body_consumer_latest_witness' -Description "CP317 exact consumer-witness validation"
@@ -1981,8 +1984,8 @@ Assert-NotContains -Path $calcCoolingDehumidificationFlowTransition -Pattern '\.
 
 Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)cooling_dehumidification_flow_latest_witnesses:\s*BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingDehumidificationFlowSnapshot>' -Description "runtime-root default-empty per-system CP319 witness map"
 Assert-NotContains -Path $idealLoadsInitState -Pattern '(?m)^\s*pub(?:\([^)]*\))?\s+cooling_dehumidification_flow_latest_witnesses:' -Description "public runtime-root CP319 witness map"
-Assert-Contains -Path $idealLoadsInitState -Pattern 'pub\(in crate::ideal_loads\) fn cooling_dehumidification_flow_latest_witness\s*\(' -Description "ideal_loads-scoped runtime-root CP319 witness getter"
-Assert-Contains -Path $idealLoadsInitState -Pattern 'pub\(in crate::ideal_loads\) fn set_cooling_dehumidification_flow_latest_witness\s*\(' -Description "ideal_loads-scoped runtime-root CP319 witness setter"
+Assert-Contains -Path $idealLoadsInitWitnesses -Pattern 'pub\(in crate::ideal_loads\) fn cooling_dehumidification_flow_latest_witness\s*\(' -Description "ideal_loads-scoped runtime-root CP319 witness getter"
+Assert-Contains -Path $idealLoadsInitWitnesses -Pattern 'pub\(in crate::ideal_loads\) fn set_cooling_dehumidification_flow_latest_witness\s*\(' -Description "ideal_loads-scoped runtime-root CP319 witness setter"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub calc_cooling_dehumidification_flow:\s*PurchasedAirCalcCoolingDehumidificationFlowRuntimeState' -Description "per-unit CP319 persistent state"
 Assert-Contains -Path $calcCoolingSensibleFlowCompletedStateValidation -Pattern 'pub\(super\) fn completed_sensible_flow_state_is_consistent\s*\(' -Description "CP318 completed-state validator for CP319"
 Assert-Contains -Path $calcCoolingSensibleFlowCompletedStateValidation -Pattern 'flow_consumer_latest_witness' -Description "CP318 exact CP319 consumer-witness validation"
@@ -2142,8 +2145,8 @@ Assert-NotContains -Path $calcCoolingHumidificationFlowTransition -Pattern 'inpu
 
 Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)cooling_humidification_flow_latest_witnesses:\s*BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidificationFlowSnapshot>' -Description "runtime-root default-empty per-system CP320 witness map"
 Assert-NotContains -Path $idealLoadsInitState -Pattern '(?m)^\s*pub(?:\([^)]*\))?\s+cooling_humidification_flow_latest_witnesses:' -Description "public runtime-root CP320 witness map"
-Assert-Contains -Path $idealLoadsInitState -Pattern 'pub\(in crate::ideal_loads\) fn cooling_humidification_flow_latest_witness\s*\(' -Description "ideal_loads-scoped runtime-root CP320 witness getter"
-Assert-Contains -Path $idealLoadsInitState -Pattern 'pub\(in crate::ideal_loads\) fn set_cooling_humidification_flow_latest_witness\s*\(' -Description "ideal_loads-scoped runtime-root CP320 witness setter"
+Assert-Contains -Path $idealLoadsInitWitnesses -Pattern 'pub\(in crate::ideal_loads\) fn cooling_humidification_flow_latest_witness\s*\(' -Description "ideal_loads-scoped runtime-root CP320 witness getter"
+Assert-Contains -Path $idealLoadsInitWitnesses -Pattern 'pub\(in crate::ideal_loads\) fn set_cooling_humidification_flow_latest_witness\s*\(' -Description "ideal_loads-scoped runtime-root CP320 witness setter"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub calc_cooling_humidification_flow:\s*PurchasedAirCalcCoolingHumidificationFlowRuntimeState' -Description "per-unit CP320 persistent state"
 Assert-Contains -Path $calcCoolingDehumidificationFlowCompletedStateValidation -Pattern 'pub\(super\) fn completed_dehumidification_flow_state_is_consistent\s*\(' -Description "CP319 completed-state validator for CP320"
 Assert-Contains -Path $calcCoolingDehumidificationFlowCompletedStateValidation -Pattern 'consumer_witness' -Description "CP319 exact CP320 consumer-witness validation"
@@ -2440,6 +2443,7 @@ $bindingCoolingEconomizerBodyIndex = $bindingText.IndexOf("let calculation_cooli
 $bindingCoolingSensibleFlowIndex = $bindingText.IndexOf("let calculation_cooling_sensible_flow =")
 $bindingCoolingDehumidificationFlowIndex = $bindingText.IndexOf("let calculation_cooling_dehumidification_flow =")
 $bindingCoolingHumidificationFlowIndex = $bindingText.IndexOf("let calculation_cooling_humidification_flow =")
+$bindingCoolingCapacityZeroFlowResetIndex = $bindingText.IndexOf("let calculation_cooling_capacity_zero_flow_reset =")
 $bindingCalcIndex = $bindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
 $bindingCoolingEconomizerConditionCall = [regex]::Match(
     $bindingText,
@@ -2461,6 +2465,10 @@ $bindingCoolingHumidificationFlowCall = [regex]::Match(
     $bindingText,
     '(?s)let calculation_cooling_humidification_flow =\s*advance_direct_no_oa_calc_cooling_humidification_flow\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_dehumidification_flow,\s*\)\s*\.map_err\(\s*DirectZonePurchasedAirScheduledCouplingError::\s*CalculationCoolingHumidificationFlow,?\s*\)\?;'
 )
+$bindingCoolingCapacityZeroFlowResetCall = [regex]::Match(
+    $bindingText,
+    '(?s)let calculation_cooling_capacity_zero_flow_reset =\s*advance_direct_no_oa_calc_cooling_capacity_zero_flow_reset\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_humidification_flow,\s*\)\s*\.map_err\(\s*DirectZonePurchasedAirScheduledCouplingError::\s*CalculationCoolingCapacityZeroFlowReset,?\s*\)\?;'
+)
 if (
     $bindingInitIndex -lt 0 -or
     $bindingCalcEntryIndex -le $bindingInitIndex -or
@@ -2474,9 +2482,10 @@ if (
     $bindingCoolingSensibleFlowIndex -le $bindingCoolingEconomizerBodyIndex -or
     $bindingCoolingDehumidificationFlowIndex -le $bindingCoolingSensibleFlowIndex -or
     $bindingCoolingHumidificationFlowIndex -le $bindingCoolingDehumidificationFlowIndex -or
-    $bindingCalcIndex -le $bindingCoolingHumidificationFlowIndex
+    $bindingCoolingCapacityZeroFlowResetIndex -le $bindingCoolingHumidificationFlowIndex -or
+    $bindingCalcIndex -le $bindingCoolingCapacityZeroFlowResetIndex
 ) {
-    throw "InitPurchasedAir must precede the Calc-entry prefix, minimum-OA prefix, cooling-entry gate, cooling OA maximum-flow gate, cooling OA maximum-flow true body, cooling economizer guard, cooling economizer condition, cooling economizer true body, cooling sensible flow, cooling dehumidification flow, cooling humidification flow, and bounded numerical Calc coupling"
+    throw "InitPurchasedAir must precede the Calc-entry prefix, minimum-OA prefix, cooling-entry gate, cooling OA maximum-flow gate, cooling OA maximum-flow true body, cooling economizer guard, cooling economizer condition, cooling economizer true body, cooling sensible flow, cooling dehumidification flow, cooling humidification flow, cooling capacity-zero flow reset, and bounded numerical Calc coupling"
 }
 if (-not $bindingCoolingEconomizerConditionCall.Success) {
     throw "CP316 binding must call the exact no-node release wrapper with only runtime, system, and CP315 predecessor"
@@ -2492,6 +2501,9 @@ if (-not $bindingCoolingDehumidificationFlowCall.Success) {
 }
 if (-not $bindingCoolingHumidificationFlowCall.Success) {
     throw "CP320 binding must call the exact no-service release wrapper with only runtime, system, and CP319 predecessor"
+}
+if (-not $bindingCoolingCapacityZeroFlowResetCall.Success) {
+    throw "CP321 binding must call the exact no-service release wrapper with only runtime, system, and CP320 predecessor"
 }
 $bindingCoolingEconomizerConditionCallEnd =
     $bindingCoolingEconomizerConditionCall.Index + $bindingCoolingEconomizerConditionCall.Length
@@ -2581,24 +2593,37 @@ if ($bindingPostCoolingDehumidificationFlowWindow -match '(?:\b[A-Za-z_][A-Za-z0
 $bindingCoolingHumidificationFlowCallEnd =
     $bindingCoolingHumidificationFlowCall.Index +
     $bindingCoolingHumidificationFlowCall.Length
-if ($bindingCalcIndex -le $bindingCoolingHumidificationFlowCallEnd) {
-    throw "CP320 exact release call must complete before the bounded numerical Calc coupling"
+if ($bindingCoolingCapacityZeroFlowResetIndex -lt $bindingCoolingHumidificationFlowCallEnd) {
+    throw "CP320 exact release call must complete before CP321"
 }
-$bindingCoolingHumidificationFlowToCalcWindow = $bindingText.Substring(
+$bindingCoolingHumidificationFlowToCapacityZeroWindow = $bindingText.Substring(
     $bindingCoolingHumidificationFlowCall.Index,
-    $bindingCalcIndex - $bindingCoolingHumidificationFlowCall.Index
+    $bindingCoolingCapacityZeroFlowResetIndex - $bindingCoolingHumidificationFlowCall.Index
 )
 foreach ($forbiddenBehavior in $coolingHumidificationFlowForbiddenBehaviorPatterns) {
-    if ($bindingCoolingHumidificationFlowToCalcWindow -match $forbiddenBehavior.Pattern) {
-        throw "$($forbiddenBehavior.Description) unexpectedly present between CP320 and bounded numerical Calc coupling"
+    if ($bindingCoolingHumidificationFlowToCapacityZeroWindow -match $forbiddenBehavior.Pattern) {
+        throw "$($forbiddenBehavior.Description) unexpectedly present between CP320 and CP321"
     }
 }
 $bindingPostCoolingHumidificationFlowWindow = $bindingText.Substring(
     $bindingCoolingHumidificationFlowCallEnd,
-    $bindingCalcIndex - $bindingCoolingHumidificationFlowCallEnd
+    $bindingCoolingCapacityZeroFlowResetIndex - $bindingCoolingHumidificationFlowCallEnd
 )
 if ($bindingPostCoolingHumidificationFlowWindow -match '(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)\s*\(') {
-    throw "No intermediary helper call may execute after CP320 and before the bounded numerical Calc coupling"
+    throw "No intermediary helper call may execute after CP320 and before CP321"
+}
+$bindingCoolingCapacityZeroFlowResetCallEnd =
+    $bindingCoolingCapacityZeroFlowResetCall.Index +
+    $bindingCoolingCapacityZeroFlowResetCall.Length
+if ($bindingCalcIndex -le $bindingCoolingCapacityZeroFlowResetCallEnd) {
+    throw "CP321 exact release call must complete before the bounded numerical Calc coupling"
+}
+$bindingPostCoolingCapacityZeroFlowResetWindow = $bindingText.Substring(
+    $bindingCoolingCapacityZeroFlowResetCallEnd,
+    $bindingCalcIndex - $bindingCoolingCapacityZeroFlowResetCallEnd
+)
+if ($bindingPostCoolingCapacityZeroFlowResetWindow -match '(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)\s*\(') {
+    throw "No intermediary helper call may execute after CP321 and before the bounded numerical Calc coupling"
 }
 Assert-Contains -Path $calcLimits -Pattern 'initialized_heating_air_mass_flow_limit_kg_per_s' -Description "initialized heating flow cache input"
 Assert-Contains -Path $calcLimits -Pattern 'initialized_cooling_air_mass_flow_limit_kg_per_s' -Description "initialized cooling flow cache input"
@@ -3842,6 +3867,219 @@ foreach ($idealLoadsCliPhysicsFile in $idealLoadsCliPhysicsBoundaryFiles) {
     foreach ($forbiddenPhysics in $cliForbiddenPhysicsPatterns) {
         Assert-NotContains -Path $idealLoadsCliPhysicsFile -Pattern $forbiddenPhysics.Pattern -Description $forbiddenPhysics.Description
     }
+}
+
+# CP321 maps only the exact cooling-capacity-zero flow reset at
+# PurchasedAirManager.cc lines 2147-2152.
+$calcCoolingCapacityZeroFlowReset = "crates\ep_runtime\src\ideal_loads\calc\cooling_capacity_zero_flow_reset.rs"
+$calcCoolingCapacityZeroFlowResetState = "crates\ep_runtime\src\ideal_loads\calc\cooling_capacity_zero_flow_reset\state.rs"
+$calcCoolingCapacityZeroFlowResetTransition = "crates\ep_runtime\src\ideal_loads\calc\cooling_capacity_zero_flow_reset\transition.rs"
+$calcCoolingCapacityZeroFlowResetRelease = "crates\ep_runtime\src\ideal_loads\calc\cooling_capacity_zero_flow_reset\release.rs"
+$calcCoolingCapacityZeroFlowResetPredecessorValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_capacity_zero_flow_reset\release\predecessor_validation.rs"
+$calcCoolingCapacityZeroFlowResetRuntimeValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_capacity_zero_flow_reset\release\runtime_validation.rs"
+$calcCoolingCapacityZeroFlowResetSnapshotValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_capacity_zero_flow_reset\release\snapshot_validation.rs"
+$calcCoolingCapacityZeroFlowResetTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_capacity_zero_flow_reset\tests\mod.rs"
+$idealLoadsBindingCoolingCapacityZeroFlowResetTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_capacity_zero_flow_reset_tests.rs"
+$idealLoadsCoupledCoolingCapacityZeroFlowResetValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_capacity_zero_flow_reset_validation.rs"
+$runPurchasedAirCoolingCapacityZeroFlowReset = "crates\ep_run\src\pipeline\purchased_air_cooling_capacity_zero_flow_reset.rs"
+$runPurchasedAirCoolingCapacityZeroFlowResetSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_capacity_zero_flow_reset\serialization.rs"
+$runPurchasedAirCoolingCapacityZeroFlowResetSnapshotSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_capacity_zero_flow_reset\serialization\snapshot.rs"
+$runPurchasedAirCoolingCapacityZeroFlowResetValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_capacity_zero_flow_reset\validation.rs"
+$runPurchasedAirCoolingCapacityZeroFlowResetSnapshotValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_capacity_zero_flow_reset\validation\snapshot.rs"
+
+foreach ($cp321RequiredFile in @(
+        $calcCoolingCapacityZeroFlowReset,
+        $calcCoolingCapacityZeroFlowResetState,
+        $calcCoolingCapacityZeroFlowResetTransition,
+        $calcCoolingCapacityZeroFlowResetRelease,
+        $calcCoolingCapacityZeroFlowResetPredecessorValidation,
+        $calcCoolingCapacityZeroFlowResetRuntimeValidation,
+        $calcCoolingCapacityZeroFlowResetSnapshotValidation,
+        $calcCoolingCapacityZeroFlowResetTests,
+        $idealLoadsBindingCoolingCapacityZeroFlowResetTests,
+        $idealLoadsCoupledCoolingCapacityZeroFlowResetValidation,
+        $runPurchasedAirCoolingCapacityZeroFlowReset,
+        $runPurchasedAirCoolingCapacityZeroFlowResetSerialization,
+        $runPurchasedAirCoolingCapacityZeroFlowResetSnapshotSerialization,
+        $runPurchasedAirCoolingCapacityZeroFlowResetValidation,
+        $runPurchasedAirCoolingCapacityZeroFlowResetSnapshotValidation
+    )) {
+    Assert-FileExists -Path $cp321RequiredFile -Description "CP321 cooling capacity-zero flow-reset structure"
+}
+
+Assert-Contains -Path $calcRoot -Pattern 'mod cooling_capacity_zero_flow_reset;' -Description "CP321 calc submodule declaration"
+Assert-Contains -Path $calcRoot -Pattern 'pub use cooling_capacity_zero_flow_reset::\*;' -Description "CP321 calc public re-export"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowReset -Pattern 'EnergyPlus 26\.1 PurchasedAirManager\.cc:2147-2152' -Description "CP321 exact source boundary"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowReset -Pattern 'EnergyPlus 26\.1 PurchasedAirManager\.cc:2155' -Description "CP321 first excluded executable"
+Assert-ExactStringArray -Path $calcCoolingCapacityZeroFlowReset -Name "PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE_ORDER" -Expected @(
+    "read-cooling-limit-for-capacity-comparison",
+    "compare-cooling-limit-equal-to-capacity",
+    "read-cooling-limit-for-flow-rate-and-capacity-comparison-after-first-false",
+    "compare-cooling-limit-equal-to-flow-rate-and-capacity",
+    "read-maximum-total-cooling-capacity-after-limit-condition-true",
+    "compare-maximum-total-cooling-capacity-equal-to-zero",
+    "enter-zero-cooling-capacity-body-if-compound-condition-satisfied",
+    "assign-supply-mass-flow-rate-for-cooling-zero",
+    "assign-supply-mass-flow-rate-for-dehumidification-zero",
+    "assign-supply-mass-flow-rate-for-humidification-zero"
+) -Description "CP321 exact ten source-order sites"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetState -Pattern 'pub struct PurchasedAirCalcCoolingCapacityZeroFlowResetRuntimeState' -Description "CP321 persistent public state"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowReset -Pattern 'pub struct PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary' -Description "CP321 public lifecycle summary"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowReset -Pattern 'pub fn purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle_summary\s*\(' -Description "CP321 lifecycle accessor"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetRelease -Pattern 'pub fn advance_direct_no_oa_calc_cooling_capacity_zero_flow_reset\s*\(' -Description "CP321 exact direct release wrapper"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTransition -Pattern 'pub\(in crate::ideal_loads::calc\) fn advance_cooling_capacity_zero_flow_reset_state\s*\(' -Description "CP321 pure transition"
+
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTransition -Pattern 'first_limit\.map\(\|limit\| limit == IdealLoadsLimit::LimitCapacity\)' -Description "CP321 first exact Capacity comparison"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTransition -Pattern 'if is_capacity == Some\(false\)' -Description "CP321 lazy second selector read"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTransition -Pattern 'second_limit\.map\(\|limit\| limit == IdealLoadsLimit::LimitFlowRateAndCapacity\)' -Description "CP321 second exact FlowRateAndCapacity comparison"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTransition -Pattern 'if limit_satisfied == Some\(true\)' -Description "CP321 lazy maximum-capacity read"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTransition -Pattern 'maximum_capacity\.map\(\|capacity\| capacity == 0\.0\)' -Description "CP321 exact zero equality"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTransition -Pattern '(?s)let assigned_cool = zero_body\.then_some\(0\.0_f64\);.*let assigned_dehumidification = zero_body\.then_some\(0\.0_f64\);.*let assigned_humidification = zero_body\.then_some\(0\.0_f64\);' -Description "CP321 ordered positive-zero assignment values"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTransition -Pattern 'assigned_supply_mass_flow_rate_for_cool_kg_per_s: assigned_cool' -Description "CP321 cooling candidate zero assignment"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTransition -Pattern 'assigned_supply_mass_flow_rate_for_dehumidification_kg_per_s: assigned_dehumidification' -Description "CP321 dehumidification candidate zero assignment"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTransition -Pattern 'assigned_supply_mass_flow_rate_for_humidification_kg_per_s: assigned_humidification' -Description "CP321 humidification candidate zero assignment"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTransition -Pattern 'assigned_(?:cool|dehumidification|humidification)\.unwrap_or\(prior\)' -Description "CP321 false-path candidate preservation"
+Assert-NotContains -Path $calcCoolingCapacityZeroFlowResetTransition -Pattern 'cooling_capacity_limit_is_zero|<=\s*0\.0|0\.0\s*>=' -Description "broader-than-source capacity-zero predicate in CP321 transition"
+Assert-NotContains -Path $calcCoolingCapacityZeroFlowResetTransition -Pattern '\.is_finite\(\)|\.(?:abs|clamp|min|max)\s*\(' -Description "CP321 normalization or clamp"
+Assert-NotContains -Path $calcCoolingCapacityZeroFlowResetTransition -Pattern '\.then_some\s*\(\s*input\.' -Description "eager conditional CP321 input read"
+
+$cp321TransitionText = Get-Content -LiteralPath $calcCoolingCapacityZeroFlowResetTransition -Raw
+$cp321CoolAssignmentIndex = $cp321TransitionText.IndexOf("supply_mass_flow_rate_for_cool_zero_assignment_count += 1")
+$cp321DehumidAssignmentIndex = $cp321TransitionText.IndexOf("supply_mass_flow_rate_for_dehumidification_zero_assignment_count += 1")
+$cp321HumidAssignmentIndex = $cp321TransitionText.IndexOf("supply_mass_flow_rate_for_humidification_zero_assignment_count += 1")
+if (
+    $cp321CoolAssignmentIndex -lt 0 -or
+    $cp321DehumidAssignmentIndex -le $cp321CoolAssignmentIndex -or
+    $cp321HumidAssignmentIndex -le $cp321DehumidAssignmentIndex
+) {
+    throw "CP321 must retain cooling, dehumidification, then humidification positive-zero assignment order"
+}
+
+Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)cooling_capacity_zero_flow_reset_latest_witnesses:\s*BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot>' -Description "runtime-root private CP321 witness map"
+Assert-NotContains -Path $idealLoadsInitState -Pattern '(?m)^\s*pub(?:\([^)]*\))?\s+cooling_capacity_zero_flow_reset_latest_witnesses:' -Description "public runtime-root CP321 witness map"
+Assert-Contains -Path $idealLoadsInitWitnesses -Pattern 'pub\(in crate::ideal_loads\) fn cooling_capacity_zero_flow_reset_latest_witness\s*\(' -Description "runtime-root CP321 witness getter"
+Assert-Contains -Path $idealLoadsInitWitnesses -Pattern 'pub\(in crate::ideal_loads\) fn set_cooling_capacity_zero_flow_reset_latest_witness\s*\(' -Description "runtime-root CP321 witness setter"
+Assert-Contains -Path $idealLoadsInitState -Pattern 'pub calc_cooling_capacity_zero_flow_reset:\s*[\r\n]+\s*PurchasedAirCalcCoolingCapacityZeroFlowResetRuntimeState' -Description "per-unit CP321 persistent state"
+Assert-Contains -Path $calcCoolingHumidificationFlowRelease -Pattern 'pub\(in crate::ideal_loads::calc\) fn completed_direct_cooling_humidification_flow_is_consistent\s*\(' -Description "CP320 narrow completed-state export for CP321"
+Assert-Contains -Path $calcCoolingHumidificationFlowRelease -Pattern 'mod completed_state_validation;' -Description "CP320 completed-state validator for CP321"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetPredecessorValidation -Pattern 'pub\(super\) fn predecessor_chain_and_candidates_are_consistent\s*\(' -Description "CP321 immediate predecessor chain validation"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetRelease -Pattern 'completed_direct_cooling_humidification_flow_is_consistent' -Description "CP321 consumes completed CP320 state"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetRelease -Pattern 'exact_direct_initialization_is_consistent' -Description "CP321 revalidates retained exact initialization before mutation"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetRelease -Pattern 'completed_direct_prefix_through_economizer_guard_is_consistent' -Description "CP321 revalidates the complete retained Calc prefix before mutation"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetRelease -Pattern '(?s)sized_limits != expected_sized_limits.*sizing_outcome.*outcome\.sized_limits != sized_limits' -Description "CP321 validates system, sizing overlay, and sizing outcome together"
+
+Assert-Contains -Path $idealLoadsBindingCoolingCapacityZeroFlowResetTests -Pattern 'scheduled_binding_covers_all_limit_routes_and_zero_or_positive_capacity' -Description "CP321 binding limit-route and capacity regression"
+Assert-Contains -Path $idealLoadsBindingCoolingCapacityZeroFlowResetTests -Pattern 'scheduled_binding_records_unit_off_and_non_cooling_skips' -Description "CP321 scheduled skip regression"
+Assert-Contains -Path $idealLoadsBindingCoolingCapacityZeroFlowResetTests -Pattern 'public_release_replay_and_corrupt_state_fail_without_mutation' -Description "CP321 replay and corruption transaction regression"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTests -Pattern 'source_boundary_and_exact_ten_sites_are_stable' -Description "CP321 exact ten-site regression"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTests -Pattern 'unit_off_and_non_cooling_skip_every_site' -Description "CP321 complete skip regression"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTests -Pattern 'capacity_limit_short_circuits_second_read_and_assigns_three_positive_zeros' -Description "CP321 Capacity short-circuit and signed-zero equality regression"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTests -Pattern 'input\(IdealLoadsLimit::LimitCapacity, -0\.0\)' -Description "CP321 exact negative-zero equality regression input"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTests -Pattern 'combined_limit_repeats_read_before_capacity_comparison' -Description "CP321 FlowRateAndCapacity lazy-read regression"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTests -Pattern 'rejected_limit_short_circuits_poisoned_capacity_and_preserves_candidate_bits' -Description "CP321 rejected-selector bit preservation regression"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTests -Pattern 'public_release_rejects_post_init_cooling_limit_selector_mutation_transactionally' -Description "CP321 post-init CoolingLimit mutation regression"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTests -Pattern 'public_release_rejects_coordinated_system_and_sized_overlay_mutation_transactionally' -Description "CP321 coordinated sizing-overlay mutation regression"
+Assert-Contains -Path $runPipeline -Pattern 'mixed_capacity_and_combined' -Description "CP321 pipeline mixed-selector history rejection regression"
+Assert-Contains -Path $runPipeline -Pattern 'latest_selector_disagrees_with_cumulative' -Description "CP321 pipeline latest-selector history rejection regression"
+Assert-Contains -Path $calcCoolingCapacityZeroFlowResetTests -Pattern 'every_nonzero_or_nonfinite_capacity_preserves_all_three_candidate_bits' -Description "CP321 nonzero and nonfinite false-path regression"
+
+$cp321BindingText = Get-Content -LiteralPath "crates\ep_runtime\src\ideal_loads\binding.rs" -Raw
+$cp320BindingIndex = $cp321BindingText.IndexOf("let calculation_cooling_humidification_flow =")
+$cp321BindingIndex = $cp321BindingText.IndexOf("let calculation_cooling_capacity_zero_flow_reset =")
+$numericalBindingIndex = $cp321BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
+if (
+    $cp320BindingIndex -lt 0 -or
+    $cp321BindingIndex -le $cp320BindingIndex -or
+    $numericalBindingIndex -le $cp321BindingIndex
+) {
+    throw "Binding must retain exact CP320 -> CP321 -> numerical Calc order"
+}
+$betweenCp320AndCp321 = $cp321BindingText.Substring(
+    $cp320BindingIndex,
+    $cp321BindingIndex - $cp320BindingIndex
+)
+$betweenCp321AndNumerical = $cp321BindingText.Substring(
+    $cp321BindingIndex,
+    $numericalBindingIndex - $cp321BindingIndex
+)
+foreach ($cp321Intermediary in @(
+        [pscustomobject]@{ Pattern = 'cooling_capacity_limit_is_zero'; Description = "broader capacity-zero helper" },
+        [pscustomobject]@{ Pattern = '\.(?:abs|clamp|min|max)\s*\('; Description = "normalization or clamp" },
+        [pscustomobject]@{ Pattern = '(?i)(?:ems|psychrometric|diagnostic|schedule_service|node_service)\s*\('; Description = "excluded live service" }
+    )) {
+    if ($betweenCp320AndCp321 -match $cp321Intermediary.Pattern) {
+        throw "$($cp321Intermediary.Description) unexpectedly present between CP320 and CP321"
+    }
+    if ($betweenCp321AndNumerical -match $cp321Intermediary.Pattern) {
+        throw "$($cp321Intermediary.Description) unexpectedly present between CP321 and numerical Calc"
+    }
+}
+
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'mod cooling_capacity_zero_flow_reset_validation;' -Description "coupled runtime CP321 validator declaration"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern '(?s)cooling_capacity_zero_flow_reset_validation::snapshot_matches_release\(\s*output,\s*timestep_index \+ 1,\s*&binding,\s*\)' -Description "coupled runtime per-timestep CP321 validation"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern '(?s)cooling_capacity_zero_flow_reset_validation::validate_lifecycle\(\s*&calc_cooling_capacity_zero_flow_reset_lifecycle,\s*&calc_cooling_humidification_flow_lifecycle,' -Description "coupled runtime final CP321 validation"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'pub calc_cooling_capacity_zero_flow_reset_lifecycle:\s*[\r\n]+\s*PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary' -Description "coupled runtime CP321 lifecycle"
+Assert-Contains -Path $idealLoadsCoupledCoolingCapacityZeroFlowResetValidation -Pattern 'cooling_capacity_zero_flow_reset_snapshot_is_exact_direct_release' -Description "coupled CP321 exact snapshot validator"
+
+Assert-Contains -Path $runPipeline -Pattern 'mod purchased_air_cooling_capacity_zero_flow_reset;' -Description "pipeline CP321 evidence module declaration"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowReset -Pattern 'mod serialization;' -Description "pipeline CP321 serializer submodule declaration"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowReset -Pattern 'mod validation;' -Description "pipeline CP321 validator submodule declaration"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowReset -Pattern 'pub\(super\) use serialization::lifecycle_json;' -Description "pipeline CP321 lifecycle serializer wiring"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowReset -Pattern 'pub\(super\) fn validate_direct_lifecycle\s*\(' -Description "pipeline CP321 direct validator entry"
+foreach ($cp321SourceOrderConstant in @(
+        'PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SOURCE_ORDER',
+        'PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_SOURCE_ORDER',
+        'PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER',
+        'PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE_ORDER'
+    )) {
+    Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowReset -Pattern $cp321SourceOrderConstant -Description "pipeline CP318-CP321 SOURCE_ORDER lineage"
+}
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowReset -Pattern '(?s)fn latest_matches_release\s*\(.*cp320: &PurchasedAirCalcCoolingHumidificationFlowSnapshot,.*cp319: &PurchasedAirCalcCoolingDehumidificationFlowSnapshot,.*cp318: &PurchasedAirCalcCoolingSensibleFlowSnapshot,' -Description "pipeline CP321 retained CP318-CP321 snapshot lineage"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowReset -Pattern '(?s)reset\.predecessor_supply_mass_flow_rate_for_cool_kg_per_s,\s*cp318\.resulting_supply_mass_flow_rate_for_cool_kg_per_s' -Description "pipeline CP321 cooling candidate lineage"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowReset -Pattern '(?s)reset\.predecessor_supply_mass_flow_rate_for_dehumidification_kg_per_s,\s*cp319\.resulting_supply_mass_flow_rate_for_dehumidification_kg_per_s' -Description "pipeline CP321 dehumidification candidate lineage"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowReset -Pattern '(?s)reset\.predecessor_supply_mass_flow_rate_for_humidification_kg_per_s,\s*cp320\.resulting_supply_mass_flow_rate_for_humidification_kg_per_s' -Description "pipeline CP321 humidification candidate lineage"
+
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetSerialization -Pattern 'mod snapshot;' -Description "pipeline CP321 snapshot serializer declaration"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetSerialization -Pattern 'pub\(in crate::pipeline\) fn lifecycle_json\s*\(' -Description "pipeline CP321 lifecycle JSON serializer"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetSerialization -Pattern '"latest": state\.latest\.map\(snapshot_json\)' -Description "pipeline CP321 latest snapshot serializer wiring"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetSnapshotSerialization -Pattern 'pub\(super\) fn snapshot_json\s*\(' -Description "pipeline CP321 snapshot JSON serializer"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetSnapshotSerialization -Pattern '"source_order": snapshot\.source_order' -Description "pipeline CP321 SOURCE_ORDER JSON evidence"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetSnapshotSerialization -Pattern '"resulting_supply_mass_flow_rate_for_cool_kg_per_s"' -Description "pipeline CP321 cooling-result JSON evidence"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetSnapshotSerialization -Pattern '"resulting_supply_mass_flow_rate_for_dehumidification_kg_per_s"' -Description "pipeline CP321 dehumidification-result JSON evidence"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetSnapshotSerialization -Pattern '"resulting_supply_mass_flow_rate_for_humidification_kg_per_s"' -Description "pipeline CP321 humidification-result JSON evidence"
+
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetValidation -Pattern 'mod snapshot;' -Description "pipeline CP321 snapshot validator declaration"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetValidation -Pattern 'pub\(super\) use snapshot::\{same_option, snapshot_shape\};' -Description "pipeline CP321 snapshot validator wiring"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetValidation -Pattern 'pub\(super\) fn validate_source_counters\s*\(' -Description "pipeline CP321 source-counter validator"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetSnapshotValidation -Pattern 'pub\(in crate::pipeline\) fn snapshot_shape\s*\(' -Description "pipeline CP321 direct snapshot shape validator"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetSnapshotValidation -Pattern 'limit == IdealLoadsLimit::LimitCapacity' -Description "pipeline CP321 Capacity selector validation"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetSnapshotValidation -Pattern 'limit == IdealLoadsLimit::LimitFlowRateAndCapacity' -Description "pipeline CP321 FlowRateAndCapacity selector validation"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetSnapshotValidation -Pattern 'let is_zero = capacity == 0\.0;' -Description "pipeline CP321 exact zero validation"
+Assert-Contains -Path $runPurchasedAirCoolingCapacityZeroFlowResetSnapshotValidation -Pattern 'left\.to_bits\(\) == right\.to_bits\(\)' -Description "pipeline CP321 bitwise candidate validation"
+
+Assert-Contains -Path $runPipeline -Pattern 'purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle' -Description "pipeline CP321 lifecycle JSON evidence"
+Assert-Contains -Path $runPipeline -Pattern 'purchased_air_cooling_capacity_zero_flow_reset::validate_direct_lifecycle' -Description "pipeline CP321 direct-only firewall"
+Assert-Contains -Path $runPipeline -Pattern '\.purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle\s*[\r\n]+\s*\.is_some\(\)' -Description "non-direct CP321 evidence rejection"
+Assert-Contains -Path $runPipeline -Pattern 'direct_release_cooling_capacity_zero_reset_rejects_malformed_evidence' -Description "pipeline CP321 malformed-evidence regression"
+Assert-Contains -Path $runPipeline -Pattern 'direct_release_cooling_capacity_zero_reset_json_exposes_all_source_sites' -Description "pipeline CP321 all-site JSON regression"
+
+Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern '"CP321 supersedes CP320' -Description "CP321 algorithm support-boundary addendum"
+Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_capacity_zero_flow_reset\.rs::PurchasedAirCalcCoolingCapacityZeroFlowResetRuntimeState' -Description "CP321 algorithm Rust state target"
+Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_capacity_zero_flow_reset\.rs::PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary' -Description "CP321 algorithm Rust lifecycle target"
+Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_capacity_zero_flow_reset/release\.rs::advance_direct_no_oa_calc_cooling_capacity_zero_flow_reset' -Description "CP321 algorithm Rust release target"
+Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_capacity_zero_flow_reset\.rs::purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle_summary' -Description "CP321 algorithm lifecycle accessor target"
+Assert-Contains -Path "specs\capabilities.toml" -Pattern '"CP321 additionally requires' -Description "CP321 capability claim-boundary addendum"
+Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP321 supersedes CP320' -Description "generated CP321 algorithm boundary"
+Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP321 additionally requires' -Description "generated CP321 capability boundary"
+foreach ($cp321Doc in @(
+        "docs\src\current\current-status.md",
+        "docs\src\current\project-contract.md",
+        "docs\src\porting-map\ideal-loads-source-map.md",
+        "docs\src\porting-map\heat-balance-source-map.md",
+        "docs\src\porting-map\zone-air-update-map.md"
+    )) {
+    Assert-Contains -Path $cp321Doc -Pattern 'CP321' -Description "CP321 documentation boundary"
+    Assert-Contains -Path $cp321Doc -Pattern '2155' -Description "CP321 first excluded executable documentation"
 }
 
 Write-Host "IdealLoads structure audit complete."

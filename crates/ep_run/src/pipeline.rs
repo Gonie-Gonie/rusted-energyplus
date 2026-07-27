@@ -20,7 +20,8 @@ use ep_runtime::{
     IdealLoadsCompatibilityOptions, NodeStateProjectionOptions,
     PURCHASED_AIR_CALC_ENTRY_RESET_TARGETS, PURCHASED_AIR_CALC_ENTRY_SOURCE,
     PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
-    PurchasedAirAvailabilityStatus, PurchasedAirCalcCoolingDehumidificationFlowLifecycleSummary,
+    PurchasedAirAvailabilityStatus, PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary,
+    PurchasedAirCalcCoolingDehumidificationFlowLifecycleSummary,
     PurchasedAirCalcCoolingEconomizerBodyLifecycleSummary,
     PurchasedAirCalcCoolingEconomizerConditionLifecycleSummary,
     PurchasedAirCalcCoolingEconomizerGuardLifecycleSummary,
@@ -62,6 +63,7 @@ use crate::{
     TraceSelection, assess_support,
 };
 
+mod purchased_air_cooling_capacity_zero_flow_reset;
 mod purchased_air_cooling_dehumidification_flow;
 mod purchased_air_cooling_economizer_body;
 mod purchased_air_cooling_economizer_condition;
@@ -194,6 +196,8 @@ struct RustRuntimeResult {
         Option<PurchasedAirCalcCoolingDehumidificationFlowLifecycleSummary>,
     purchased_air_calc_cooling_humidification_flow_lifecycle:
         Option<PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary>,
+    purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle:
+        Option<PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary>,
 }
 
 struct PreparedRuntimeInputs {
@@ -1270,6 +1274,10 @@ fn finish_successful_summary(
                 .purchased_air_calc_cooling_humidification_flow_lifecycle
                 .as_ref()
                 .map(purchased_air_cooling_humidification_flow::lifecycle_json),
+            "purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle": result
+                .purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle
+                .as_ref()
+                .map(purchased_air_cooling_capacity_zero_flow_reset::lifecycle_json),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
@@ -2168,6 +2176,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_sensible_flow_lifecycle: None,
                 purchased_air_calc_cooling_dehumidification_flow_lifecycle: None,
                 purchased_air_calc_cooling_humidification_flow_lifecycle: None,
+                purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
@@ -2237,6 +2246,11 @@ fn execute_rust_runtime(
                     .summary
                     .calc_cooling_humidification_flow_lifecycle,
             );
+            let purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle = Some(
+                simulation
+                    .summary
+                    .calc_cooling_capacity_zero_flow_reset_lifecycle,
+            );
             Ok(RustRuntimeResult {
                 results: simulation.results,
                 runtime_class,
@@ -2263,6 +2277,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_sensible_flow_lifecycle,
                 purchased_air_calc_cooling_dehumidification_flow_lifecycle,
                 purchased_air_calc_cooling_humidification_flow_lifecycle,
+                purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle,
             })
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
@@ -2299,6 +2314,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_sensible_flow_lifecycle: None,
                 purchased_air_calc_cooling_dehumidification_flow_lifecycle: None,
                 purchased_air_calc_cooling_humidification_flow_lifecycle: None,
+                purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
@@ -2333,6 +2349,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_sensible_flow_lifecycle: None,
                 purchased_air_calc_cooling_dehumidification_flow_lifecycle: None,
                 purchased_air_calc_cooling_humidification_flow_lifecycle: None,
+                purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle: None,
             })
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
@@ -2462,6 +2479,22 @@ fn validate_runtime_demand_provenance(
             init_lifecycle,
             result.purchased_air_coupling_call_count,
         )?;
+        purchased_air_cooling_capacity_zero_flow_reset::validate_direct_lifecycle(
+            result
+                .purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle
+                .as_ref(),
+            result
+                .purchased_air_calc_cooling_humidification_flow_lifecycle
+                .as_ref(),
+            result
+                .purchased_air_calc_cooling_dehumidification_flow_lifecycle
+                .as_ref(),
+            result
+                .purchased_air_calc_cooling_sensible_flow_lifecycle
+                .as_ref(),
+            init_lifecycle,
+            result.purchased_air_coupling_call_count,
+        )?;
     } else if result.purchased_air_init_lifecycle.is_some()
         || result.purchased_air_calc_entry_lifecycle.is_some()
         || result
@@ -2493,6 +2526,9 @@ fn validate_runtime_demand_provenance(
             .is_some()
         || result
             .purchased_air_calc_cooling_humidification_flow_lifecycle
+            .is_some()
+        || result
+            .purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle
             .is_some()
         || result.purchased_air_coupling_call_count.is_some()
     {
@@ -3138,14 +3174,14 @@ mod tests {
     use super::{
         RustRuntimeResult, SourceOrderGateSummary, artifact_map, ctf_split_trace_enabled,
         execution_stage_snapshots, full_surface_trace_opt_in, input_error_diagnostic_code,
-        purchased_air_calc_entry_lifecycle_json, purchased_air_cooling_dehumidification_flow,
-        purchased_air_cooling_economizer_body, purchased_air_cooling_economizer_condition,
-        purchased_air_cooling_economizer_guard, purchased_air_cooling_entry_gate,
-        purchased_air_cooling_humidification_flow, purchased_air_cooling_oa_max_flow,
-        purchased_air_cooling_oa_max_flow_body, purchased_air_cooling_sensible_flow,
-        purchased_air_init_lifecycle_json, purchased_air_minimum_oa,
-        runtime_class_requires_weather, schedule_cache_json, selected_trace_enabled,
-        source_order_gate_summary, source_order_stage_state_snapshots,
+        purchased_air_calc_entry_lifecycle_json, purchased_air_cooling_capacity_zero_flow_reset,
+        purchased_air_cooling_dehumidification_flow, purchased_air_cooling_economizer_body,
+        purchased_air_cooling_economizer_condition, purchased_air_cooling_economizer_guard,
+        purchased_air_cooling_entry_gate, purchased_air_cooling_humidification_flow,
+        purchased_air_cooling_oa_max_flow, purchased_air_cooling_oa_max_flow_body,
+        purchased_air_cooling_sensible_flow, purchased_air_init_lifecycle_json,
+        purchased_air_minimum_oa, runtime_class_requires_weather, schedule_cache_json,
+        selected_trace_enabled, source_order_gate_summary, source_order_stage_state_snapshots,
         trace_level_enables_stage_snapshots, typed_counts,
         validate_direct_purchased_air_calc_entry_lifecycle,
         validate_direct_purchased_air_init_lifecycle, validate_runtime_demand_provenance,
@@ -3164,6 +3200,9 @@ mod tests {
         DayType, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
         ExecutionStep, IDEAL_LOADS_FIXTURE_DEMAND_DIAGNOSTIC_SOURCE, IdealLoadsInitFlags,
         IdealLoadsSensibleMode,
+        PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE_ORDER,
         PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_SOURCE,
         PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_SOURCE_ORDER,
@@ -3196,6 +3235,9 @@ mod tests {
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
         PurchasedAirAvailabilityStatus,
+        PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary,
+        PurchasedAirCalcCoolingCapacityZeroFlowResetRuntimeState,
+        PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot,
         PurchasedAirCalcCoolingDehumidificationFlowLifecycleSummary,
         PurchasedAirCalcCoolingDehumidificationFlowRuntimeState,
         PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
@@ -4199,6 +4241,7 @@ mod tests {
             purchased_air_calc_cooling_sensible_flow_lifecycle: None,
             purchased_air_calc_cooling_dehumidification_flow_lifecycle: None,
             purchased_air_calc_cooling_humidification_flow_lifecycle: None,
+            purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle: None,
         };
         assert!(
             validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result)
@@ -5149,6 +5192,223 @@ mod tests {
     }
 
     #[test]
+    fn direct_release_cooling_capacity_zero_reset_rejects_malformed_evidence() {
+        let init = valid_init_lifecycle(2);
+        let cp318 = valid_cooling_sensible_flow_lifecycle(2);
+        let cp319 = valid_cooling_dehumidification_flow_lifecycle(2);
+        let cp320 = valid_cooling_humidification_flow_lifecycle(2);
+        let valid =
+            valid_cooling_capacity_zero_flow_reset_lifecycle(2, IdealLoadsLimit::NoLimit, None);
+        let validate =
+            |lifecycle: Option<&PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary>| {
+                purchased_air_cooling_capacity_zero_flow_reset::validate_direct_lifecycle(
+                    lifecycle,
+                    Some(&cp320),
+                    Some(&cp319),
+                    Some(&cp318),
+                    Some(&init),
+                    Some(2),
+                )
+            };
+        assert!(validate(Some(&valid)).is_ok());
+        assert!(validate(None).is_err());
+
+        let mut wrong_provenance = valid.clone();
+        wrong_provenance.first_excluded_source =
+            PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE;
+        assert!(validate(Some(&wrong_provenance)).is_err());
+
+        let mut wrong_selector_count = valid.clone();
+        wrong_selector_count.state.cooling_limit_rejected_count = 1;
+        assert!(validate(Some(&wrong_selector_count)).is_err());
+
+        let mut mixed_capacity_and_combined = valid_cooling_capacity_zero_flow_reset_lifecycle(
+            2,
+            IdealLoadsLimit::LimitCapacity,
+            Some(300.0),
+        );
+        mixed_capacity_and_combined
+            .state
+            .cooling_limit_capacity_count = 1;
+        mixed_capacity_and_combined
+            .state
+            .second_cooling_limit_read_count = 1;
+        mixed_capacity_and_combined
+            .state
+            .cooling_limit_flow_rate_and_capacity_count = 1;
+        assert!(validate(Some(&mixed_capacity_and_combined)).is_err());
+
+        let mut latest_selector_disagrees_with_cumulative =
+            valid_cooling_capacity_zero_flow_reset_lifecycle(
+                2,
+                IdealLoadsLimit::LimitCapacity,
+                Some(300.0),
+            );
+        latest_selector_disagrees_with_cumulative
+            .state
+            .cooling_limit_capacity_count = 0;
+        latest_selector_disagrees_with_cumulative
+            .state
+            .second_cooling_limit_read_count = 2;
+        latest_selector_disagrees_with_cumulative
+            .state
+            .cooling_limit_flow_rate_and_capacity_count = 2;
+        assert!(validate(Some(&latest_selector_disagrees_with_cumulative)).is_err());
+
+        let mut wrong_candidate_lineage = valid.clone();
+        wrong_candidate_lineage
+            .state
+            .latest
+            .as_mut()
+            .expect("valid CP321 latest snapshot")
+            .predecessor_supply_mass_flow_rate_for_cool_kg_per_s = Some(-0.0);
+        assert!(validate(Some(&wrong_candidate_lineage)).is_err());
+
+        let mut partial_candidate_lineage = valid.clone();
+        partial_candidate_lineage
+            .state
+            .latest
+            .as_mut()
+            .expect("valid CP321 latest snapshot")
+            .predecessor_supply_mass_flow_rate_for_dehumidification_kg_per_s = None;
+        assert!(validate(Some(&partial_candidate_lineage)).is_err());
+
+        let mut wrong_result = valid.clone();
+        wrong_result
+            .state
+            .latest
+            .as_mut()
+            .expect("valid CP321 latest snapshot")
+            .resulting_supply_mass_flow_rate_for_humidification_kg_per_s = Some(-0.0);
+        assert!(validate(Some(&wrong_result)).is_err());
+
+        let mut wrong_cp318 = cp318.clone();
+        wrong_cp318
+            .state
+            .latest
+            .as_mut()
+            .expect("valid CP318 latest snapshot")
+            .resulting_supply_mass_flow_rate_for_cool_kg_per_s = Some(-0.0);
+        assert!(
+            purchased_air_cooling_capacity_zero_flow_reset::validate_direct_lifecycle(
+                Some(&valid),
+                Some(&cp320),
+                Some(&cp319),
+                Some(&wrong_cp318),
+                Some(&init),
+                Some(2),
+            )
+            .is_err()
+        );
+
+        let mut wrong_cp319 = cp319.clone();
+        wrong_cp319
+            .state
+            .latest
+            .as_mut()
+            .expect("valid CP319 latest snapshot")
+            .resulting_supply_mass_flow_rate_for_dehumidification_kg_per_s = Some(-0.0);
+        assert!(
+            purchased_air_cooling_capacity_zero_flow_reset::validate_direct_lifecycle(
+                Some(&valid),
+                Some(&cp320),
+                Some(&wrong_cp319),
+                Some(&cp318),
+                Some(&init),
+                Some(2),
+            )
+            .is_err()
+        );
+
+        let mut wrong_cp320 = cp320.clone();
+        wrong_cp320
+            .state
+            .latest
+            .as_mut()
+            .expect("valid CP320 latest snapshot")
+            .resulting_supply_mass_flow_rate_for_humidification_kg_per_s = Some(-0.0);
+        assert!(
+            purchased_air_cooling_capacity_zero_flow_reset::validate_direct_lifecycle(
+                Some(&valid),
+                Some(&wrong_cp320),
+                Some(&cp319),
+                Some(&cp318),
+                Some(&init),
+                Some(2),
+            )
+            .is_err()
+        );
+
+        let mut overflowed_partition = valid;
+        overflowed_partition.state.unit_off_skip_count = usize::MAX;
+        overflowed_partition.state.non_cooling_skip_count = 1;
+        assert!(validate(Some(&overflowed_partition)).is_err());
+    }
+
+    #[test]
+    fn direct_release_cooling_capacity_zero_reset_json_exposes_all_source_sites() {
+        let lifecycle = valid_cooling_capacity_zero_flow_reset_lifecycle(
+            2,
+            IdealLoadsLimit::LimitCapacity,
+            Some(-0.0),
+        );
+        let value = purchased_air_cooling_capacity_zero_flow_reset::lifecycle_json(&lifecycle);
+        assert_eq!(
+            value["source"],
+            PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE
+        );
+        assert_eq!(
+            value["first_excluded_source"],
+            PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_FIRST_EXCLUDED_SOURCE
+        );
+        assert_eq!(value["transition_count"], 2);
+        assert_eq!(value["first_cooling_limit_read_count"], 2);
+        assert_eq!(value["cooling_limit_capacity_count"], 2);
+        assert_eq!(value["second_cooling_limit_read_count"], 0);
+        assert_eq!(value["maximum_total_cooling_capacity_read_count"], 2);
+        assert_eq!(value["maximum_total_cooling_capacity_zero_count"], 2);
+        assert_eq!(value["zero_cooling_capacity_body_entry_count"], 2);
+        assert_eq!(
+            value["supply_mass_flow_rate_for_cool_zero_assignment_count"],
+            2
+        );
+        assert_eq!(value.as_object().map(serde_json::Map::len), Some(21));
+
+        let latest = &value["latest"];
+        assert_eq!(
+            latest["source_order"],
+            serde_json::json!(PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE_ORDER)
+        );
+        assert_eq!(latest["source_order"].as_array().map(Vec::len), Some(10));
+        assert_eq!(latest["first_cooling_limit"], "LimitCapacity");
+        assert_eq!(latest["cooling_limit_capacity"], true);
+        assert_eq!(latest["second_cooling_limit_read"], false);
+        assert_eq!(
+            latest["maximum_total_cooling_capacity_w"]
+                .as_f64()
+                .map(f64::to_bits),
+            Some((-0.0_f64).to_bits())
+        );
+        assert_eq!(latest["maximum_total_cooling_capacity_equal_to_zero"], true);
+        assert_eq!(latest["zero_cooling_capacity_body_entered"], true);
+        for field in [
+            "assigned_supply_mass_flow_rate_for_cool_kg_per_s",
+            "assigned_supply_mass_flow_rate_for_dehumidification_kg_per_s",
+            "assigned_supply_mass_flow_rate_for_humidification_kg_per_s",
+            "resulting_supply_mass_flow_rate_for_cool_kg_per_s",
+            "resulting_supply_mass_flow_rate_for_dehumidification_kg_per_s",
+            "resulting_supply_mass_flow_rate_for_humidification_kg_per_s",
+        ] {
+            assert_eq!(
+                latest[field].as_f64().map(f64::to_bits),
+                Some(0.0_f64.to_bits()),
+                "{field}"
+            );
+        }
+        assert_eq!(latest.as_object().map(serde_json::Map::len), Some(35));
+    }
+
+    #[test]
     fn lifecycle_json_serializes_structured_supply_temperature_diagnostics() {
         let mut lifecycle = valid_init_lifecycle(1);
         lifecycle.supply_temperature_registered_recurring_diagnostic_count = 1;
@@ -5829,6 +6089,111 @@ mod tests {
             source: PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE,
             first_excluded_source:
                 PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE,
+            state,
+        }
+    }
+
+    fn valid_cooling_capacity_zero_flow_reset_lifecycle(
+        call_count: usize,
+        limit: IdealLoadsLimit,
+        selected_capacity_w: Option<f64>,
+    ) -> PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary {
+        let system = IdealLoadsAirSystemId(0);
+        let first_matched = limit == IdealLoadsLimit::LimitCapacity;
+        let second_executed = !first_matched;
+        let second_matched = limit == IdealLoadsLimit::LimitFlowRateAndCapacity;
+        let selected = first_matched || second_matched;
+        let capacity = if selected {
+            Some(selected_capacity_w.expect("selected CP321 limit needs a capacity"))
+        } else {
+            None
+        };
+        let zero_body = capacity.is_some_and(|value| value == 0.0);
+        let cp318 = valid_cooling_sensible_flow_lifecycle(call_count);
+        let prior_cool = cp318
+            .state
+            .latest
+            .expect("valid CP318 latest snapshot")
+            .resulting_supply_mass_flow_rate_for_cool_kg_per_s;
+        let prior_dehumidification = Some(0.0);
+        let prior_humidification = Some(0.0);
+        let assigned = zero_body.then_some(0.0_f64);
+        let resulting_cool = if zero_body { assigned } else { prior_cool };
+        let resulting_dehumidification = if zero_body {
+            assigned
+        } else {
+            prior_dehumidification
+        };
+        let resulting_humidification = if zero_body {
+            assigned
+        } else {
+            prior_humidification
+        };
+
+        let mut state = PurchasedAirCalcCoolingCapacityZeroFlowResetRuntimeState::new(system);
+        state.transition_count = call_count;
+        state.cooling_body_entry_count = call_count;
+        state.first_cooling_limit_read_count = call_count;
+        state.cooling_limit_capacity_count = usize::from(first_matched) * call_count;
+        state.second_cooling_limit_read_count = usize::from(second_executed) * call_count;
+        state.cooling_limit_flow_rate_and_capacity_count = usize::from(second_matched) * call_count;
+        state.cooling_limit_rejected_count =
+            usize::from(second_executed && !second_matched) * call_count;
+        state.maximum_total_cooling_capacity_read_count = usize::from(selected) * call_count;
+        state.maximum_total_cooling_capacity_comparison_count = usize::from(selected) * call_count;
+        state.maximum_total_cooling_capacity_zero_count = usize::from(zero_body) * call_count;
+        state.maximum_total_cooling_capacity_nonzero_count =
+            usize::from(selected && !zero_body) * call_count;
+        state.zero_cooling_capacity_body_entry_count = usize::from(zero_body) * call_count;
+        state.supply_mass_flow_rate_for_cool_zero_assignment_count =
+            usize::from(zero_body) * call_count;
+        state.supply_mass_flow_rate_for_dehumidification_zero_assignment_count =
+            usize::from(zero_body) * call_count;
+        state.supply_mass_flow_rate_for_humidification_zero_assignment_count =
+            usize::from(zero_body) * call_count;
+        state.latest = Some(PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot {
+            source: PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE,
+            first_excluded_source:
+                PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_FIRST_EXCLUDED_SOURCE,
+            source_order: PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE_ORDER,
+            system,
+            parent_call_ordinal: call_count,
+            controlled_zone: ZoneId(0),
+            unit_body_entered: true,
+            predecessor_cooling_body_entered: true,
+            unit_off_skipped: false,
+            non_cooling_skipped: false,
+            cooling_body_entered: true,
+            first_cooling_limit_read: true,
+            first_cooling_limit: Some(limit),
+            cooling_limit_capacity: Some(first_matched),
+            second_cooling_limit_read: second_executed,
+            second_cooling_limit: second_executed.then_some(limit),
+            cooling_limit_flow_rate_and_capacity: second_executed.then_some(second_matched),
+            cooling_limit_condition_satisfied: Some(selected),
+            maximum_total_cooling_capacity_read: selected,
+            maximum_total_cooling_capacity_w: capacity,
+            maximum_total_cooling_capacity_comparison_evaluated: selected,
+            maximum_total_cooling_capacity_equal_to_zero: selected.then_some(zero_body),
+            zero_cooling_capacity_body_entered: zero_body,
+            predecessor_supply_mass_flow_rate_for_cool_kg_per_s: prior_cool,
+            predecessor_supply_mass_flow_rate_for_dehumidification_kg_per_s: prior_dehumidification,
+            predecessor_supply_mass_flow_rate_for_humidification_kg_per_s: prior_humidification,
+            supply_mass_flow_rate_for_cool_zero_assigned: zero_body,
+            assigned_supply_mass_flow_rate_for_cool_kg_per_s: assigned,
+            supply_mass_flow_rate_for_dehumidification_zero_assigned: zero_body,
+            assigned_supply_mass_flow_rate_for_dehumidification_kg_per_s: assigned,
+            supply_mass_flow_rate_for_humidification_zero_assigned: zero_body,
+            assigned_supply_mass_flow_rate_for_humidification_kg_per_s: assigned,
+            resulting_supply_mass_flow_rate_for_cool_kg_per_s: resulting_cool,
+            resulting_supply_mass_flow_rate_for_dehumidification_kg_per_s:
+                resulting_dehumidification,
+            resulting_supply_mass_flow_rate_for_humidification_kg_per_s: resulting_humidification,
+        });
+        PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary {
+            source: PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE,
+            first_excluded_source:
+                PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_FIRST_EXCLUDED_SOURCE,
             state,
         }
     }

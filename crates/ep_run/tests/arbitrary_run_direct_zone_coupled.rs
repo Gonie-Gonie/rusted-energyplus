@@ -133,6 +133,22 @@ const CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER: [&str; 26] = [
     "calculate-zone-humidifying-setpoint-moisture-demand-divided-by-delta-humidity-ratio",
     "assign-supply-mass-flow-rate-for-humidification",
 ];
+const CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE: &str =
+    "EnergyPlus 26.1 PurchasedAirManager.cc:2147-2152";
+const CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_FIRST_EXCLUDED_SOURCE: &str =
+    "EnergyPlus 26.1 PurchasedAirManager.cc:2155";
+const CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE_ORDER: [&str; 10] = [
+    "read-cooling-limit-for-capacity-comparison",
+    "compare-cooling-limit-equal-to-capacity",
+    "read-cooling-limit-for-flow-rate-and-capacity-comparison-after-first-false",
+    "compare-cooling-limit-equal-to-flow-rate-and-capacity",
+    "read-maximum-total-cooling-capacity-after-limit-condition-true",
+    "compare-maximum-total-cooling-capacity-equal-to-zero",
+    "enter-zero-cooling-capacity-body-if-compound-condition-satisfied",
+    "assign-supply-mass-flow-rate-for-cooling-zero",
+    "assign-supply-mass-flow-rate-for-dehumidification-zero",
+    "assign-supply-mass-flow-rate-for-humidification-zero",
+];
 const CALC_COOLING_ECONOMIZER_BODY_SOURCE_ORDER: [&str; 37] = [
     "read-controlled-zone-humidity-ratio",
     "evaluate-psy-cp-air-fn-w",
@@ -834,6 +850,15 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
     assert_cooling_sensible_flow(runtime, expected_calls, expected_calls, 0);
     assert_cooling_dehumidification_flow(runtime, expected_calls, expected_calls, 0);
     assert_cooling_humidification_flow(runtime, expected_calls, expected_calls, 0);
+    assert_cooling_capacity_zero_flow_reset(
+        runtime,
+        expected_calls,
+        expected_calls,
+        0,
+        None,
+        None,
+        false,
+    );
 }
 
 fn assert_zero_effect_cooling_oa_max_flow_body(
@@ -2170,6 +2195,285 @@ fn assert_cooling_humidification_flow(
     assert!(latest["zone_humidifying_setpoint_moisture_demand_kg_per_s"].is_null());
 }
 
+fn assert_cooling_capacity_zero_flow_reset(
+    runtime: &Value,
+    expected_calls: u64,
+    expected_non_cooling_skips: u64,
+    expected_cooling_entries: u64,
+    expected_limit: Option<&str>,
+    expected_capacity_w: Option<f64>,
+    expected_zero_body: bool,
+) {
+    let lifecycle = &runtime["purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle"];
+    assert!(
+        lifecycle.is_object(),
+        "direct runtime must publish the CP321 key"
+    );
+    assert_exact_object_keys(
+        lifecycle,
+        &[
+            "source",
+            "first_excluded_source",
+            "system",
+            "transition_count",
+            "cooling_body_entry_count",
+            "unit_off_skip_count",
+            "non_cooling_skip_count",
+            "first_cooling_limit_read_count",
+            "cooling_limit_capacity_count",
+            "second_cooling_limit_read_count",
+            "cooling_limit_flow_rate_and_capacity_count",
+            "cooling_limit_rejected_count",
+            "maximum_total_cooling_capacity_read_count",
+            "maximum_total_cooling_capacity_comparison_count",
+            "maximum_total_cooling_capacity_zero_count",
+            "maximum_total_cooling_capacity_nonzero_count",
+            "zero_cooling_capacity_body_entry_count",
+            "supply_mass_flow_rate_for_cool_zero_assignment_count",
+            "supply_mass_flow_rate_for_dehumidification_zero_assignment_count",
+            "supply_mass_flow_rate_for_humidification_zero_assignment_count",
+            "latest",
+        ],
+    );
+    assert_eq!(
+        lifecycle["source"],
+        CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE
+    );
+    assert_eq!(
+        lifecycle["first_excluded_source"],
+        CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(lifecycle["transition_count"], expected_calls);
+    assert_eq!(
+        lifecycle["cooling_body_entry_count"],
+        expected_cooling_entries
+    );
+    assert_eq!(
+        lifecycle["non_cooling_skip_count"],
+        expected_non_cooling_skips
+    );
+    assert_eq!(lifecycle["unit_off_skip_count"], 0);
+
+    let active = expected_cooling_entries > 0;
+    let first_match = active && expected_limit == Some("LimitCapacity");
+    let second_read = active && !first_match;
+    let second_match = second_read && expected_limit == Some("LimitFlowRateAndCapacity");
+    let selected = first_match || second_match;
+    let zero_count = u64::from(expected_zero_body) * expected_cooling_entries;
+    let nonzero_count = u64::from(selected && !expected_zero_body) * expected_cooling_entries;
+    assert_eq!(
+        lifecycle["first_cooling_limit_read_count"],
+        expected_cooling_entries
+    );
+    assert_eq!(
+        lifecycle["cooling_limit_capacity_count"],
+        u64::from(first_match) * expected_cooling_entries
+    );
+    assert_eq!(
+        lifecycle["second_cooling_limit_read_count"],
+        u64::from(second_read) * expected_cooling_entries
+    );
+    assert_eq!(
+        lifecycle["cooling_limit_flow_rate_and_capacity_count"],
+        u64::from(second_match) * expected_cooling_entries
+    );
+    assert_eq!(
+        lifecycle["cooling_limit_rejected_count"],
+        u64::from(active && !selected) * expected_cooling_entries
+    );
+    for field in [
+        "maximum_total_cooling_capacity_read_count",
+        "maximum_total_cooling_capacity_comparison_count",
+    ] {
+        assert_eq!(
+            lifecycle[field],
+            u64::from(selected) * expected_cooling_entries,
+            "{field}"
+        );
+    }
+    assert_eq!(
+        lifecycle["maximum_total_cooling_capacity_zero_count"],
+        zero_count
+    );
+    assert_eq!(
+        lifecycle["maximum_total_cooling_capacity_nonzero_count"],
+        nonzero_count
+    );
+    for field in [
+        "zero_cooling_capacity_body_entry_count",
+        "supply_mass_flow_rate_for_cool_zero_assignment_count",
+        "supply_mass_flow_rate_for_dehumidification_zero_assignment_count",
+        "supply_mass_flow_rate_for_humidification_zero_assignment_count",
+    ] {
+        assert_eq!(lifecycle[field], zero_count, "{field}");
+    }
+
+    let latest = &lifecycle["latest"];
+    assert_exact_object_keys(
+        latest,
+        &[
+            "source",
+            "first_excluded_source",
+            "source_order",
+            "system",
+            "parent_call_ordinal",
+            "controlled_zone",
+            "unit_body_entered",
+            "predecessor_cooling_body_entered",
+            "unit_off_skipped",
+            "non_cooling_skipped",
+            "cooling_body_entered",
+            "first_cooling_limit_read",
+            "first_cooling_limit",
+            "cooling_limit_capacity",
+            "second_cooling_limit_read",
+            "second_cooling_limit",
+            "cooling_limit_flow_rate_and_capacity",
+            "cooling_limit_condition_satisfied",
+            "maximum_total_cooling_capacity_read",
+            "maximum_total_cooling_capacity_w",
+            "maximum_total_cooling_capacity_comparison_evaluated",
+            "maximum_total_cooling_capacity_equal_to_zero",
+            "zero_cooling_capacity_body_entered",
+            "predecessor_supply_mass_flow_rate_for_cool_kg_per_s",
+            "predecessor_supply_mass_flow_rate_for_dehumidification_kg_per_s",
+            "predecessor_supply_mass_flow_rate_for_humidification_kg_per_s",
+            "supply_mass_flow_rate_for_cool_zero_assigned",
+            "assigned_supply_mass_flow_rate_for_cool_kg_per_s",
+            "supply_mass_flow_rate_for_dehumidification_zero_assigned",
+            "assigned_supply_mass_flow_rate_for_dehumidification_kg_per_s",
+            "supply_mass_flow_rate_for_humidification_zero_assigned",
+            "assigned_supply_mass_flow_rate_for_humidification_kg_per_s",
+            "resulting_supply_mass_flow_rate_for_cool_kg_per_s",
+            "resulting_supply_mass_flow_rate_for_dehumidification_kg_per_s",
+            "resulting_supply_mass_flow_rate_for_humidification_kg_per_s",
+        ],
+    );
+    assert_eq!(
+        string_array(&latest["source_order"]),
+        CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE_ORDER
+    );
+    assert_eq!(
+        latest["source"],
+        CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE
+    );
+    assert_eq!(
+        latest["first_excluded_source"],
+        CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(latest["parent_call_ordinal"], expected_calls);
+    assert_eq!(latest["unit_body_entered"], true);
+    assert_eq!(latest["predecessor_cooling_body_entered"], active);
+    assert_eq!(latest["unit_off_skipped"], false);
+    assert_eq!(latest["non_cooling_skipped"], !active);
+    assert_eq!(latest["cooling_body_entered"], active);
+    assert_eq!(latest["first_cooling_limit_read"], active);
+    assert_eq!(
+        latest["first_cooling_limit"].as_str(),
+        if active { expected_limit } else { None }
+    );
+    assert_eq!(
+        latest["cooling_limit_capacity"].as_bool(),
+        active.then_some(first_match)
+    );
+    assert_eq!(latest["second_cooling_limit_read"], second_read);
+    assert_eq!(
+        latest["second_cooling_limit"].as_str(),
+        if second_read { expected_limit } else { None }
+    );
+    assert_eq!(
+        latest["cooling_limit_flow_rate_and_capacity"].as_bool(),
+        second_read.then_some(second_match)
+    );
+    assert_eq!(
+        latest["cooling_limit_condition_satisfied"].as_bool(),
+        active.then_some(selected)
+    );
+    assert_eq!(latest["maximum_total_cooling_capacity_read"], selected);
+    assert_eq!(
+        latest["maximum_total_cooling_capacity_comparison_evaluated"],
+        selected
+    );
+    assert_eq!(
+        latest["maximum_total_cooling_capacity_equal_to_zero"].as_bool(),
+        selected.then_some(expected_zero_body)
+    );
+    assert_eq!(
+        latest["zero_cooling_capacity_body_entered"],
+        expected_zero_body
+    );
+    assert_eq!(
+        latest["maximum_total_cooling_capacity_w"]
+            .as_f64()
+            .map(f64::to_bits),
+        expected_capacity_w.map(f64::to_bits)
+    );
+
+    let predecessor_fields = [
+        (
+            "predecessor_supply_mass_flow_rate_for_cool_kg_per_s",
+            &runtime["purchased_air_calc_cooling_sensible_flow_lifecycle"]["latest"]["resulting_supply_mass_flow_rate_for_cool_kg_per_s"],
+        ),
+        (
+            "predecessor_supply_mass_flow_rate_for_dehumidification_kg_per_s",
+            &runtime["purchased_air_calc_cooling_dehumidification_flow_lifecycle"]["latest"]["resulting_supply_mass_flow_rate_for_dehumidification_kg_per_s"],
+        ),
+        (
+            "predecessor_supply_mass_flow_rate_for_humidification_kg_per_s",
+            &runtime["purchased_air_calc_cooling_humidification_flow_lifecycle"]["latest"]["resulting_supply_mass_flow_rate_for_humidification_kg_per_s"],
+        ),
+    ];
+    for (field, predecessor) in predecessor_fields {
+        assert_eq!(
+            latest[field].as_f64().map(f64::to_bits),
+            predecessor.as_f64().map(f64::to_bits),
+            "{field} must preserve CP318/319/320 bitwise lineage"
+        );
+    }
+
+    for field in [
+        "supply_mass_flow_rate_for_cool_zero_assigned",
+        "supply_mass_flow_rate_for_dehumidification_zero_assigned",
+        "supply_mass_flow_rate_for_humidification_zero_assigned",
+    ] {
+        assert_eq!(latest[field], expected_zero_body, "{field}");
+    }
+    for field in [
+        "assigned_supply_mass_flow_rate_for_cool_kg_per_s",
+        "assigned_supply_mass_flow_rate_for_dehumidification_kg_per_s",
+        "assigned_supply_mass_flow_rate_for_humidification_kg_per_s",
+    ] {
+        if expected_zero_body {
+            assert_eq!(
+                latest[field].as_f64().map(f64::to_bits),
+                Some(0.0_f64.to_bits()),
+                "{field} must be positive zero"
+            );
+        } else {
+            assert!(latest[field].is_null(), "{field}");
+        }
+    }
+    for (result_field, (predecessor_field, _)) in [
+        "resulting_supply_mass_flow_rate_for_cool_kg_per_s",
+        "resulting_supply_mass_flow_rate_for_dehumidification_kg_per_s",
+        "resulting_supply_mass_flow_rate_for_humidification_kg_per_s",
+    ]
+    .into_iter()
+    .zip(predecessor_fields)
+    {
+        let expected_bits = if expected_zero_body {
+            Some(0.0_f64.to_bits())
+        } else {
+            latest[predecessor_field].as_f64().map(f64::to_bits)
+        };
+        assert_eq!(
+            latest[result_field].as_f64().map(f64::to_bits),
+            expected_bits,
+            "{result_field}"
+        );
+    }
+}
+
 fn assert_cp319_source_values_absent(latest: &Value) {
     for field in [
         "reset_supply_mass_flow_rate_for_dehumidification_kg_per_s",
@@ -2360,6 +2664,19 @@ fn all_hard_sized_finite_limit_branches_limit_live_cooling()
         assert_cooling_sensible_flow(&summary["rust_runtime"], 2, 0, 2);
         assert_cooling_dehumidification_flow(&summary["rust_runtime"], 2, 0, 2);
         assert_cooling_humidification_flow(&summary["rust_runtime"], 2, 0, 2);
+        assert_cooling_capacity_zero_flow_reset(
+            &summary["rust_runtime"],
+            2,
+            0,
+            2,
+            Some(limit),
+            if limit == "LimitFlowRate" {
+                None
+            } else {
+                Some(300.0)
+            },
+            false,
+        );
 
         let results = read_json(&output_dir.join("results").join("result-store.json"))?;
         let cooling_rate = find_series(
@@ -2399,6 +2716,41 @@ fn all_hard_sized_finite_limit_branches_limit_live_cooling()
         assert!(
             constrained_positive_demand,
             "the deliberately undersized cooling branch {limit} must limit positive predicted demand"
+        );
+    }
+    Ok(())
+}
+
+#[test]
+fn zero_capacity_finite_limit_run_resets_all_three_cooling_candidates()
+-> Result<(), Box<dyn std::error::Error>> {
+    for limit in ["LimitCapacity", "LimitFlowRateAndCapacity"] {
+        let case_dir = unique_case_dir(&format!("zero-capacity-{limit}"))?;
+        let input_path = case_dir.join("direct-zone-zero-capacity-cooling.epJSON");
+        let weather_path = case_dir.join("weather.epw");
+        let output_dir = case_dir.join("out");
+        write_text(&input_path, &zero_capacity_cooling_fixture(limit))?;
+        write_text(&weather_path, ONE_DAY_EPW)?;
+
+        let outcome = run_arbitrary_idf(&run_config(
+            input_path,
+            Some(weather_path),
+            output_dir.clone(),
+        ))?;
+        assert_eq!(outcome.exit_code, RunExitCode::Success);
+        let summary = read_json(&output_dir.join("run-summary.json"))?;
+        assert_eq!(
+            summary["support"]["runtime_class"],
+            DIRECT_ZONE_COUPLED_RUNTIME_CLASS
+        );
+        assert_cooling_capacity_zero_flow_reset(
+            &summary["rust_runtime"],
+            2,
+            0,
+            2,
+            Some(limit),
+            Some(-0.0),
+            true,
         );
     }
     Ok(())
@@ -2473,6 +2825,13 @@ fn finite_limit_cooling_fixture(limit: &str) -> String {
             "\"Cooling Setpoint\": {\"hourly_value\": 35.0}",
             "\"Cooling Setpoint\": {\"hourly_value\": 15.0}",
         )
+}
+
+fn zero_capacity_cooling_fixture(limit: &str) -> String {
+    finite_limit_cooling_fixture(limit).replace(
+        "\"maximum_total_cooling_capacity\": 300.0",
+        "\"maximum_total_cooling_capacity\": -0.0",
+    )
 }
 
 fn run_config(

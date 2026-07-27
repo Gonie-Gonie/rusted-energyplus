@@ -1,5 +1,6 @@
 //! IdealLoads `CalcPurchAirLoads` compatibility calculations.
 
+mod cooling_capacity_zero_flow_reset;
 mod cooling_dehumidification_flow;
 mod cooling_economizer_body;
 mod cooling_economizer_condition;
@@ -54,7 +55,7 @@ mod moisture_demand_tests;
 #[cfg(test)]
 mod no_oa_tests;
 
-pub(in crate::ideal_loads) use cooling_dehumidification_flow::release::cooling_dehumidification_flow_snapshot_is_exact_direct_release;
+pub use cooling_capacity_zero_flow_reset::*;
 pub use cooling_dehumidification_flow::*;
 pub(in crate::ideal_loads) use cooling_economizer_body::release::body_snapshot_is_exact_direct_release as cooling_economizer_body_snapshot_is_exact_direct_release;
 pub use cooling_economizer_body::*;
@@ -64,7 +65,6 @@ pub use cooling_entry_gate::*;
 pub use cooling_humidification_flow::*;
 pub use cooling_oa_max_flow_body::*;
 pub use cooling_oa_max_flow_gate::*;
-pub(in crate::ideal_loads) use cooling_sensible_flow::release::cooling_sensible_flow_snapshot_is_exact_direct_release;
 pub use cooling_sensible_flow::*;
 pub use lifecycle::*;
 pub use limits::IdealLoadsSensibleLimitContext;

@@ -1,5 +1,9 @@
 use super::*;
 
+#[path = "coupled_output_tests/assertions.rs"]
+mod assertions;
+#[path = "coupled_output_tests/cooling_capacity_zero_flow_reset_fixture.rs"]
+mod cooling_capacity_zero_flow_reset_fixture;
 #[path = "coupled_output_tests/cooling_humidification_flow_fixture.rs"]
 mod cooling_humidification_flow_fixture;
 
@@ -50,6 +54,8 @@ use crate::{
         PurchasedAirTemperatureControlType, couple_direct_zone_predicted_demand_to_purchased_air,
     },
 };
+use assertions::assert_values;
+use cooling_capacity_zero_flow_reset_fixture::calculation_cooling_capacity_zero_flow_reset_snapshot;
 use cooling_humidification_flow_fixture::calculation_cooling_humidification_flow_snapshot;
 use ep_model::{
     DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
@@ -61,7 +67,6 @@ const SYSTEM_KEY: &str = "ZONE ONE IDEAL LOADS";
 const ZONE_KEY: &str = "ZONE ONE";
 const SUPPLY_NODE_NAME: &str = "ZONE ONE INLET";
 const SUPPLY_NODE: NodeId = NodeId(3);
-const ABS_TOLERANCE: f64 = 1.0e-9;
 
 #[test]
 fn appends_all_no_oa_and_predictor_series_with_hourly_semantics() {
@@ -477,6 +482,12 @@ fn scaled_output(
         calculation_cooling_dehumidification_flow_snapshot(calculation_cooling_sensible_flow);
     let calculation_cooling_humidification_flow =
         calculation_cooling_humidification_flow_snapshot(calculation_cooling_dehumidification_flow);
+    let calculation_cooling_capacity_zero_flow_reset =
+        calculation_cooling_capacity_zero_flow_reset_snapshot(
+            calculation_cooling_sensible_flow,
+            calculation_cooling_dehumidification_flow,
+            calculation_cooling_humidification_flow,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -514,6 +525,7 @@ fn scaled_output(
         calculation_cooling_sensible_flow,
         calculation_cooling_dehumidification_flow,
         calculation_cooling_humidification_flow,
+        calculation_cooling_capacity_zero_flow_reset,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;
@@ -1216,16 +1228,5 @@ fn test_system() -> IdealLoadsAirSystem {
         heating_fuel_type: IdealLoadsFuelType::DistrictHeatingWater,
         cooling_fuel_efficiency_schedule: None,
         cooling_fuel_type: IdealLoadsFuelType::DistrictCooling,
-    }
-}
-
-fn assert_values(series: &OutputSeries, expected: &[f64]) {
-    assert_eq!(series.values.len(), expected.len());
-    for (actual, expected) in series.values.iter().zip(expected) {
-        assert!(
-            (actual - expected).abs() <= ABS_TOLERANCE,
-            "expected {expected}, got {actual} for {}",
-            series.variable_name
-        );
     }
 }

@@ -3,6 +3,8 @@ use super::*;
 use crate::{
     ideal_loads::{
         DirectZonePurchasedAirBindingFeature, IdealLoadsSensibleLimitContext,
+        PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE,
         PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE,
@@ -54,6 +56,26 @@ const ZONE_KEY: &str = "ZONE ONE";
 const SUPPLY_NODE_KEY: &str = "SUPPLY";
 const RETURN_NODE_KEY: &str = "RETURN";
 const ABS_TOLERANCE: f64 = 1.0e-9;
+
+#[test]
+fn cooling_capacity_zero_flow_reset_partition_overflow_fails_closed() {
+    let error = super::cooling_capacity_zero_flow_reset_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::
+            CalcCoolingCapacityZeroFlowResetLifecycleInvariant {
+                field: "test_partition_overflow",
+                expected: 1,
+                actual: usize::MAX,
+            }
+    ));
+}
 
 #[test]
 fn cooling_economizer_body_partition_overflow_fails_closed() {
@@ -1516,6 +1538,68 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
             0.0_f64.to_bits()
         );
         assert!(!latest_humidification_flow.zone_humidifying_setpoint_moisture_demand_read);
+        let capacity_reset = simulation
+            .summary
+            .calc_cooling_capacity_zero_flow_reset_lifecycle;
+        assert_eq!(
+            capacity_reset.source,
+            PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_SOURCE
+        );
+        assert_eq!(
+            capacity_reset.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_CAPACITY_ZERO_FLOW_RESET_FIRST_EXCLUDED_SOURCE
+        );
+        let capacity_reset_state = capacity_reset.state;
+        let capacity = limit == IdealLoadsLimit::LimitCapacity;
+        let capacity_selected = capacity || combined;
+        assert_eq!(capacity_reset_state.transition_count, 1, "{limit:?}");
+        assert_eq!(
+            capacity_reset_state.cooling_body_entry_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            capacity_reset_state.first_cooling_limit_read_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            capacity_reset_state.cooling_limit_capacity_count,
+            usize::from(capacity),
+            "{limit:?}"
+        );
+        assert_eq!(
+            capacity_reset_state.second_cooling_limit_read_count,
+            usize::from(!capacity),
+            "{limit:?}"
+        );
+        assert_eq!(
+            capacity_reset_state.cooling_limit_flow_rate_and_capacity_count,
+            usize::from(combined),
+            "{limit:?}"
+        );
+        assert_eq!(
+            capacity_reset_state.maximum_total_cooling_capacity_read_count,
+            usize::from(capacity_selected),
+            "{limit:?}"
+        );
+        assert_eq!(
+            capacity_reset_state.maximum_total_cooling_capacity_nonzero_count,
+            usize::from(capacity_selected),
+            "{limit:?}"
+        );
+        assert_eq!(
+            capacity_reset_state.zero_cooling_capacity_body_entry_count, 0,
+            "{limit:?}"
+        );
+        let latest_capacity_reset = capacity_reset_state
+            .latest
+            .expect("latest CP321 cooling snapshot");
+        assert!(latest_capacity_reset.cooling_body_entered);
+        assert_eq!(latest_capacity_reset.first_cooling_limit, Some(limit));
+        assert_eq!(
+            latest_capacity_reset.maximum_total_cooling_capacity_read,
+            capacity_selected
+        );
+        assert!(!latest_capacity_reset.zero_cooling_capacity_body_entered);
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation

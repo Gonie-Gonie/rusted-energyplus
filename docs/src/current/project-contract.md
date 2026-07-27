@@ -16354,6 +16354,60 @@ Heat/DeadBand work remain excluded. CP320 promotes no broad humidity control,
 live moisture-demand or Node service, numerical result, capability, status,
 inventory/readiness count, evidence case, conformance claim, or Roadmap item.
 
+## CP321 Source-Ordered Cooling Capacity-Zero Flow Reset
+
+CP321 supersedes only CP320's line-2147 exclusion for EnergyPlus 26.1
+`PurchasedAirManager.cc` executable lines 2147-2152. Its exact ten sites are:
+
+1. read `CoolingLimit` for the `Capacity` comparison;
+2. compare the read with `Capacity`;
+3. only after a false first comparison, re-read `CoolingLimit` for
+   `FlowRateAndCapacity`;
+4. compare the second read with `FlowRateAndCapacity`;
+5. only after either selector comparison matches, read `MaxCoolTotCap`;
+6. compare that value with exact `== 0.0`;
+7. enter the capacity-zero body only when the compound condition is true;
+8. assign positive zero to `SupplyMassFlowRateForCool`;
+9. assign positive zero to `SupplyMassFlowRateForDehum`; and
+10. assign positive zero to `SupplyMassFlowRateForHumid`.
+
+UnitOff and non-cooling predecessors skip all ten sites. NoLimit and FlowRate
+active routes stop after both selector reads and comparisons. Capacity
+short-circuits the second selector read; FlowRateAndCapacity performs it.
+Only either capacity-bearing selector reads the retained hard-sized maximum.
+Exact positive or negative zero enters the body; nonzero finite values, NaN,
+and infinities fall through. The three assignments are distinct, ordered
+source events. Every skipped or false route preserves the exact predecessor
+candidate bits, including signed zero and non-finite characterization values.
+
+`calc/cooling_capacity_zero_flow_reset.rs` and its split modules own the
+snapshot, persistent state, transition, release validation, and tests. The
+public exact-direct wrapper consumes the selected system and the retained
+same-call CP318 cooling, CP319 dehumidification, and CP320 humidification
+candidate snapshots. It obtains `CoolingLimit` and `MaxCoolTotCap` from the
+already validated model/Init hard-sized state; it does not invoke live sizing
+or accept duplicate caller scalars. The pure source transition must not reuse
+`cooling_capacity_limit_is_zero`, because that helper uses `<= 0.0` rather
+than the source's exact equality, and it performs no finite check, absolute
+value, min/max, clamp, normalization, or candidate reconciliation with the
+older numerical DTO. Existing public direct admission still rejects
+unresolved or nonfinite selected sized values before entering that transition.
+
+The binder executes CP321 after CP320 and before the unchanged numerical Calc
+DTO. Per-step, lifecycle, coupled-runtime, and pipeline validation reconcile
+one CP321 transition per CP320 transition, immediate predecessor identity,
+lazy selector and maximum reads, exact equality, ordered positive-zero
+assignments, and false-path bit preservation. Direct-only JSON uses
+`purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle`; non-direct
+or disconnected evidence is rejected.
+
+Line 2152 closes CP321 and line 2155 is the first excluded executable. The
+three-candidate maximum, EMS override, subsequent flow limiting, mixed-air and
+final supply-state behavior, and Heat/DeadBand work remain excluded. CP321
+promotes no finite-limit or autosizing route, broad humidity control, live
+service, numerical result, capability, status, inventory/readiness count,
+evidence case, conformance claim, or Roadmap item.
+
 
 
 

@@ -33744,6 +33744,38 @@ equation, live moisture-demand/Node ownership, numerical conformance, or
 capability promotion. Parent and routine statuses, inventory/readiness,
 evidence, and Roadmap state remain unchanged.
 
+## CP321 Capacity-Zero Reset Inside the Heat-Balance Loop
+
+CP321 executes immediately after CP320 and before the unchanged bounded
+PurchasedAir numerical calculation. It maps the complete ten-site condition
+and body at lines 2147-2152. UnitOff and non-cooling skip it. Active Cooling
+compares `CoolingLimit` with `Capacity`, lazily re-reads it for
+`FlowRateAndCapacity` only after the first comparison is false, and reads the
+retained hard-sized maximum only after a selector match. Exact
+`MaxCoolTotCap == 0.0` enters the body, which assigns positive zero in order
+to the cooling, dehumidification, and humidification candidates. Otherwise
+the retained same-call CP318 cooling, CP319 dehumidification, and CP320
+humidification candidate bits are preserved.
+
+The exact direct lane uses those three candidate snapshots and retained
+model/Init state without reading a live heat-balance, sizing, schedule, Node,
+moisture, psychrometric, EMS, or diagnostic service. The pure transition
+preserves exact equality and lazy ordering without finite checks,
+normalization, maximum, clamp, or reuse of the broader
+`cooling_capacity_limit_is_zero` helper. Existing public direct admission
+still rejects unresolved or nonfinite selected sized values first. Per-step,
+final, coupled-runtime, and pipeline validators place CP321 before the
+existing numerical DTO and same-step Zone-air corrector; the candidates are
+not reconciled with that DTO.
+
+Line 2152 closes CP321; line 2155 begins the excluded three-candidate maximum.
+Maximum selection, EMS and later clamps, mixed-air/capacity/supply-state
+behavior, Heat/DeadBand selection, and all later feedback remain excluded.
+CP321 adds no heat-balance or predictor equation, live service, finite-limit or
+Autosize support, numerical conformance, or capability promotion. Parent and
+routine statuses, inventory/readiness, evidence, and Roadmap state remain
+unchanged.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

@@ -20,6 +20,8 @@ use ep_model::{
     ZoneThermostatControl, ZoneThermostatId,
 };
 
+#[path = "binding/cooling_capacity_zero_flow_reset_tests.rs"]
+mod cooling_capacity_zero_flow_reset_tests;
 #[path = "binding/cooling_dehumidification_flow_tests.rs"]
 mod cooling_dehumidification_flow_tests;
 #[path = "binding/cooling_economizer_body_integrity_tests.rs"]
@@ -46,6 +48,8 @@ mod cooling_oa_max_flow_gate_tests;
 mod cooling_sensible_flow_tests;
 #[path = "binding/minimum_oa_prefix_tests.rs"]
 mod minimum_oa_prefix_tests;
+#[path = "binding/model_multiplier_tests.rs"]
+mod model_multiplier_tests;
 
 #[test]
 fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
@@ -1014,30 +1018,6 @@ fn fixed_timestep_state_guards_are_transactional() {
         }
     );
     assert_eq!(wrong_step, original);
-}
-
-#[test]
-fn model_multipliers_are_forwarded_and_removed_once_from_feedback() {
-    let (model, cache) = fixture(|typed| {
-        typed.zones[0].multiplier = 2;
-        typed.zones[0].list_multiplier = 3;
-    });
-    let binding = bind_direct_zone_purchased_air_model(&model).expect("multiplied binding");
-    let mut state = zone_state_for_temp_independent_load(0.0);
-
-    let output = couple(&binding, &cache, &mut state, 0).expect("multiplied coupling");
-
-    assert_eq!(binding.zone_multiplier, 2);
-    assert_eq!(binding.zone_list_multiplier, 3);
-    assert_eq!(output.coupling.feedback.multiplier_product, 6.0);
-    assert_eq!(
-        output.coupling.feedback.zone_supply_mass_flow_rate_kg_per_s,
-        output
-            .coupling
-            .feedback
-            .multiplied_supply_mass_flow_rate_kg_per_s
-            / 6.0
-    );
 }
 
 fn fixture(mutate: impl FnOnce(&mut TypedModel)) -> (SimulationModel, ScheduleSeriesCache) {

@@ -1,10 +1,14 @@
 //! Retained module and per-unit state for `InitPurchasedAir`.
 
+mod witnesses;
+
 use std::collections::BTreeMap;
 
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
 use super::super::{
+    PurchasedAirCalcCoolingCapacityZeroFlowResetRuntimeState,
+    PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot,
     PurchasedAirCalcCoolingDehumidificationFlowRuntimeState,
     PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
     PurchasedAirCalcCoolingEconomizerBodyRuntimeState,
@@ -80,98 +84,8 @@ pub struct PurchasedAirRuntimeState {
         BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingDehumidificationFlowSnapshot>,
     cooling_humidification_flow_latest_witnesses:
         BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidificationFlowSnapshot>,
-}
-
-impl PurchasedAirRuntimeState {
-    pub(in crate::ideal_loads) fn cooling_economizer_condition_latest_witness(
-        &self,
-        system: IdealLoadsAirSystemId,
-    ) -> Option<PurchasedAirCalcCoolingEconomizerConditionSnapshot> {
-        self.cooling_economizer_condition_latest_witnesses
-            .get(&system)
-            .copied()
-    }
-
-    pub(in crate::ideal_loads) fn set_cooling_economizer_condition_latest_witness(
-        &mut self,
-        system: IdealLoadsAirSystemId,
-        snapshot: PurchasedAirCalcCoolingEconomizerConditionSnapshot,
-    ) {
-        self.cooling_economizer_condition_latest_witnesses
-            .insert(system, snapshot);
-    }
-
-    pub(in crate::ideal_loads) fn cooling_economizer_body_latest_witness(
-        &self,
-        system: IdealLoadsAirSystemId,
-    ) -> Option<PurchasedAirCalcCoolingEconomizerBodySnapshot> {
-        self.cooling_economizer_body_latest_witnesses
-            .get(&system)
-            .copied()
-    }
-
-    pub(in crate::ideal_loads) fn set_cooling_economizer_body_latest_witness(
-        &mut self,
-        system: IdealLoadsAirSystemId,
-        snapshot: PurchasedAirCalcCoolingEconomizerBodySnapshot,
-    ) {
-        self.cooling_economizer_body_latest_witnesses
-            .insert(system, snapshot);
-    }
-
-    pub(in crate::ideal_loads) fn cooling_sensible_flow_latest_witness(
-        &self,
-        system: IdealLoadsAirSystemId,
-    ) -> Option<PurchasedAirCalcCoolingSensibleFlowSnapshot> {
-        self.cooling_sensible_flow_latest_witnesses
-            .get(&system)
-            .copied()
-    }
-
-    pub(in crate::ideal_loads) fn set_cooling_sensible_flow_latest_witness(
-        &mut self,
-        system: IdealLoadsAirSystemId,
-        snapshot: PurchasedAirCalcCoolingSensibleFlowSnapshot,
-    ) {
-        self.cooling_sensible_flow_latest_witnesses
-            .insert(system, snapshot);
-    }
-
-    pub(in crate::ideal_loads) fn cooling_dehumidification_flow_latest_witness(
-        &self,
-        system: IdealLoadsAirSystemId,
-    ) -> Option<PurchasedAirCalcCoolingDehumidificationFlowSnapshot> {
-        self.cooling_dehumidification_flow_latest_witnesses
-            .get(&system)
-            .copied()
-    }
-
-    pub(in crate::ideal_loads) fn set_cooling_dehumidification_flow_latest_witness(
-        &mut self,
-        system: IdealLoadsAirSystemId,
-        snapshot: PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
-    ) {
-        self.cooling_dehumidification_flow_latest_witnesses
-            .insert(system, snapshot);
-    }
-
-    pub(in crate::ideal_loads) fn cooling_humidification_flow_latest_witness(
-        &self,
-        system: IdealLoadsAirSystemId,
-    ) -> Option<PurchasedAirCalcCoolingHumidificationFlowSnapshot> {
-        self.cooling_humidification_flow_latest_witnesses
-            .get(&system)
-            .copied()
-    }
-
-    pub(in crate::ideal_loads) fn set_cooling_humidification_flow_latest_witness(
-        &mut self,
-        system: IdealLoadsAirSystemId,
-        snapshot: PurchasedAirCalcCoolingHumidificationFlowSnapshot,
-    ) {
-        self.cooling_humidification_flow_latest_witnesses
-            .insert(system, snapshot);
-    }
+    cooling_capacity_zero_flow_reset_latest_witnesses:
+        BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot>,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -223,6 +137,9 @@ pub struct PurchasedAirUnitRuntimeState {
     pub calc_cooling_dehumidification_flow: PurchasedAirCalcCoolingDehumidificationFlowRuntimeState,
     /// Persistent bounded cooling humidification-flow state.
     pub calc_cooling_humidification_flow: PurchasedAirCalcCoolingHumidificationFlowRuntimeState,
+    /// Persistent bounded cooling capacity-zero candidate-reset state.
+    pub calc_cooling_capacity_zero_flow_reset:
+        PurchasedAirCalcCoolingCapacityZeroFlowResetRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -319,6 +236,8 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingDehumidificationFlowRuntimeState::new(system),
             calc_cooling_humidification_flow:
                 PurchasedAirCalcCoolingHumidificationFlowRuntimeState::new(system),
+            calc_cooling_capacity_zero_flow_reset:
+                PurchasedAirCalcCoolingCapacityZeroFlowResetRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,
