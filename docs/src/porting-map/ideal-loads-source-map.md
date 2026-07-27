@@ -18793,6 +18793,48 @@ Calc routine remains `source_mapped`, and the 32-algorithm/293-routine
 inventory, readiness, required or forbidden features, evidence cases,
 conformance, and Roadmap state do not change.
 
+## CP318 Cooling Sensible-Flow Continuation
+
+CP318 maps executable lines 2109-2116 and their exact 19 source sites. This is
+the common continuation for every active Cooling predecessor: a CP313/CP314
+true route, a CP315 false route, and either outcome of CP317 reconverge before
+line 2109. UnitOff and non-cooling paths skip the whole slice, including the
+reset. Active Cooling first assigns positive zero to the cooling sensible-flow
+candidate. A false retained `CoolOn` stops there. A true retained `CoolOn`
+reads the bound Zone humidity ratio, evaluates canonical
+`energyplus_psy_cp_air_fn_w`, assigns `CpAir`, reads minimum cooling supply and
+Zone temperatures, subtracts and assigns `DeltaT`, and re-reads it for strict
+`DeltaT < -1.0e-5`. Only a true comparison reads retained `QZnCoolSP`, re-reads
+`CpAir`, performs the first division, re-reads `DeltaT`, performs the second
+division, and assigns the candidate.
+
+The direct release derives `CoolOn` and `QZnCoolSP` from retained CP310 and
+proves `CoolOn` true. Bound Zone state is identity- and finiteness-validated
+before mutation. The transition preserves raw IEEE behavior, strict comparison
+edge cases, signed zero, and source left association
+`(QZnCoolSP / CpAir) / DeltaT`. It reuses the canonical scalar helper while
+excluding the source static psychrometric cache, `-100.0` sentinel,
+cache-hit/miss and cross-slice identity, and concurrency lifecycle.
+
+`calc/cooling_sensible_flow.rs` and its split submodules own the CP318 snapshot,
+runtime state, transition, validation, release, and tests. The parent exposes
+the lifecycle summary. The binder orders CP318 after CP317 and before the
+unchanged bounded numerical DTO. Per-step, final, coupled, and pipeline
+firewalls reconcile all 19 sites and expose
+`purchased_air_calc_cooling_sensible_flow_lifecycle` only for direct release.
+The existing mass-flow/no-OA numerical helpers are neither reused nor bitwise
+reconciled because their threshold, normalization, expression grouping, and
+specific-heat contracts differ.
+
+Line 2116 closes CP318 and line 2119 is the first excluded executable.
+Dehumidification and humidity work, later reset/maximum/EMS/clamp behavior,
+mixed-air/capacity/supply-state work, and Heat/DeadBand selection remain
+excluded. This adds lifecycle evidence only; OA, Economizer, HumidityControl,
+and EMS remain unsupported for the direct binding. Both parents remain
+`scaffold`/`none`, the Calc routine remains `source_mapped`, and the
+32-algorithm/293-routine inventory, readiness, evidence, numerical conformance,
+capability support, and Roadmap state do not change.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

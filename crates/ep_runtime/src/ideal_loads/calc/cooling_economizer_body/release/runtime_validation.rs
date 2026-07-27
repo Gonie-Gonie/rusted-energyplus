@@ -354,7 +354,7 @@ fn body_sites_are_skipped(snapshot: PurchasedAirCalcCoolingEconomizerBodySnapsho
         && snapshot.assigned_economizer_active_time_hours.is_none()
 }
 
-fn body_source_counters_are_zero(
+pub(super) fn body_source_counters_are_zero(
     state: &PurchasedAirCalcCoolingEconomizerBodyRuntimeState,
 ) -> bool {
     state.zone_humidity_ratio_read_count == 0
@@ -404,7 +404,7 @@ fn body_source_counters_are_zero(
         && state.economizer_active_time_assignment_count == 0
 }
 
-fn body_snapshot_route(
+pub(super) fn body_snapshot_route(
     latest: PurchasedAirCalcCoolingEconomizerBodySnapshot,
 ) -> Option<PurchasedAirCalcCoolingEconomizerBodyRetainedRoute> {
     match (

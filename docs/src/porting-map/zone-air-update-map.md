@@ -21339,6 +21339,41 @@ OA/economizer or Node ownership, or numerical capability. Both parents remain
 32-algorithm/293-routine inventory, readiness, required or forbidden features,
 evidence, numerical conformance, and Roadmap state stay unchanged.
 
+## CP318 Cooling Sensible-Flow Placement
+
+CP318 executes after CP317 and before the unchanged bounded PurchasedAir
+numerical calculation. It maps executable lines 2109-2116 and 19 exact source
+sites. Every active Cooling predecessor reconverges at the line-2109 reset,
+whether CP317 entered its body or skipped it. UnitOff and non-cooling paths
+skip even that reset. Active Cooling assigns a positive-zero candidate; a
+false retained `CoolOn` then stops. A true retained `CoolOn` lazily reads the
+bound Zone humidity ratio, evaluates canonical `energyplus_psy_cp_air_fn_w`,
+assigns `CpAir`, reads minimum cooling supply and bound Zone temperatures,
+assigns `DeltaT`, and applies strict `DeltaT < -1.0e-5`. Only the true route
+reads retained `QZnCoolSP`, performs the source's two left-associated
+divisions, and assigns the candidate.
+
+The direct no-OA transition derives `CoolOn` and `QZnCoolSP` from CP310 and
+proves `CoolOn` true. It validates bound Zone identity and finite active inputs
+before mutation. Per-step, final, coupled, and pipeline firewalls reconcile all
+routes and sites before the existing numerical DTO and Zone-air corrector.
+Strict comparison edge cases, raw IEEE results, and signed zero are preserved.
+The scalar helper is canonical, but the source static psychrometric cache,
+`-100.0` sentinel, hit/miss or cross-slice identity, and concurrency are not
+mapped.
+
+Line 2116 closes CP318 and line 2119 is the first excluded executable.
+Dehumidification/humidification, later reset/maximum/EMS/clamp behavior,
+mixed-air/capacity/supply-state work, Heat/DeadBand selection, node/report
+writes, residuals, and adaptive iteration remain outside the slice. CP318 is
+lifecycle evidence only and is not bitwise reconciled with the unchanged
+numerical DTO. It adds no Zone-air equation, demand or feedback term, general
+live Node ownership, numerical support, or capability support. OA, Economizer,
+HumidityControl, and EMS remain unchanged. Both parents remain
+`scaffold`/`none`, the Calc routine remains `source_mapped`, and the
+32-algorithm/293-routine inventory, readiness, evidence, numerical conformance,
+and Roadmap state stay unchanged.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

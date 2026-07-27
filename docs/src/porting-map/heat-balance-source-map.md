@@ -33640,6 +33640,40 @@ Both parents remain `scaffold`/`none`, the Calc routine remains
 required or forbidden features, evidence, numerical conformance, and Roadmap
 state remain unchanged.
 
+## CP318 Cooling Sensible Flow Inside the Heat-Balance Loop
+
+CP318 maps `CalcPurchAirLoads` executable lines 2109-2116 after CP317 and
+before the unchanged bounded numerical calculation. All active Cooling
+predecessor partitions reconverge at line 2109; a CP317 body skip does not skip
+CP318. UnitOff and non-cooling paths execute none of its 19 source sites.
+Active Cooling assigns a positive-zero candidate, then reads retained
+`CoolOn`. Only a true value reads the bound Zone heat-balance humidity ratio,
+evaluates canonical `energyplus_psy_cp_air_fn_w`, assigns `CpAir`, reads
+minimum cooling supply temperature and bound Zone temperature, assigns their
+difference to `DeltaT`, and performs strict `DeltaT < -1.0e-5`. Only a true
+comparison reads retained `QZnCoolSP` and evaluates the two left-associated
+divisions before assigning the candidate.
+
+The exact direct release derives its mode/load inputs from CP310, proves
+`CoolOn` true, and validates the active bound Zone state before mutation.
+Per-step and lifecycle firewalls reconcile the source routes and all 19 sites
+before the existing numerical result and same-step Zone-air corrector. The
+strict comparison and `(QZnCoolSP / CpAir) / DeltaT` preserve raw IEEE and
+signed-zero behavior. The canonical scalar helper is reused, while its source
+static cache, `-100.0` sentinel, hit/miss identity, cross-slice identity, and
+concurrency remain outside the slice.
+
+Line 2116 closes CP318; line 2119 is the first excluded executable.
+Dehumidification/humidification, later reset/maximum/EMS/clamp work,
+mixed-air/capacity/supply-state work, and Heat/DeadBand selection remain
+excluded. CP318 is ordered before, but is not bitwise reconciled with, the
+pre-existing numerical DTO. It adds no heat-balance or predictor equation,
+general live Node service, capability, or numerical-conformance claim. OA,
+Economizer, HumidityControl, and EMS support stay unchanged. Both parents
+remain `scaffold`/`none`, the Calc routine remains `source_mapped`, and the
+32-algorithm/293-routine inventory, readiness, evidence, numerical conformance,
+and Roadmap state remain unchanged.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

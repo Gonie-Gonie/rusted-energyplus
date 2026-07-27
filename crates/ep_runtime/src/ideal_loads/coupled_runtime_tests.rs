@@ -15,6 +15,8 @@ use crate::{
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE, PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
         PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirTemperatureControlType,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO, ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE,
@@ -61,6 +63,25 @@ fn cooling_economizer_body_partition_overflow_fails_closed() {
     assert!(matches!(
         error,
         DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingEconomizerBodyLifecycleInvariant {
+            field: "test_partition_overflow",
+            expected: 1,
+            actual: usize::MAX,
+        }
+    ));
+}
+
+#[test]
+fn cooling_sensible_flow_partition_overflow_fails_closed() {
+    let error = super::cooling_sensible_flow_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingSensibleFlowLifecycleInvariant {
             field: "test_partition_overflow",
             expected: 1,
             actual: usize::MAX,
@@ -637,6 +658,35 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
     assert!(!latest_economizer_body.economizer_calculation_body_executed);
     assert!(!latest_economizer_body.psychrometric_cp_air_evaluated);
     assert!(!latest_economizer_body.economizer_on_assigned);
+    let sensible_flow = simulation.summary.calc_cooling_sensible_flow_lifecycle;
+    assert_eq!(
+        sensible_flow.source,
+        PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SOURCE
+    );
+    assert_eq!(
+        sensible_flow.first_excluded_source,
+        PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_FIRST_EXCLUDED_SOURCE
+    );
+    let sensible_flow_state = sensible_flow.state;
+    assert_eq!(sensible_flow_state.transition_count, required_steps);
+    assert_eq!(sensible_flow_state.cooling_body_entry_count, 0);
+    assert_eq!(sensible_flow_state.unit_off_skip_count, 0);
+    assert_eq!(sensible_flow_state.non_cooling_skip_count, required_steps);
+    assert_eq!(
+        sensible_flow_state.supply_mass_flow_rate_for_cool_reset_assignment_count,
+        0
+    );
+    assert_eq!(sensible_flow_state.cooling_on_read_count, 0);
+    assert_eq!(sensible_flow_state.delta_temperature_body_entry_count, 0);
+    assert_eq!(
+        sensible_flow_state.supply_mass_flow_rate_for_cool_assignment_count,
+        0
+    );
+    let latest_sensible_flow = sensible_flow_state
+        .latest
+        .expect("latest CP318 non-cooling snapshot");
+    assert!(latest_sensible_flow.non_cooling_skipped);
+    assert!(!latest_sensible_flow.cooling_body_entered);
 
     let zone = simulation.state.zones.first().expect("bound Zone state");
     assert_eq!(simulation.state.timestep_index, required_steps);
@@ -683,6 +733,47 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
         assert_close(*energy_j, *rate_w * 3_600.0);
     }
     assert!(simulation.results.diagnostics().is_empty());
+}
+
+#[test]
+fn cooling_sensible_flow_lifecycle_records_unit_off_without_source_execution() {
+    let mut typed = exact_model(1).typed;
+    typed.schedules[3].hourly_value = 0.0;
+    let model = SimulationModel::from_typed(typed);
+    let schedule_cache =
+        precompute_schedule_cache(&model.typed, 1).expect("one-step off schedule cache");
+    let weather = weather_series(&model, 1);
+    let mut options = DirectZonePurchasedAirCoupledOptions::hourly_samples(1);
+    options.initial_zone_air_temperature_c = INITIAL_ZONE_TEMPERATURE_C;
+
+    let simulation = simulate_direct_zone_purchased_air_coupled_heat_balance(
+        &model,
+        &weather,
+        &schedule_cache,
+        options,
+    )
+    .expect("one-step unit-off release");
+
+    let lifecycle = simulation.summary.calc_cooling_sensible_flow_lifecycle;
+    assert_eq!(
+        lifecycle.source,
+        PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SOURCE
+    );
+    assert_eq!(lifecycle.state.transition_count, 1);
+    assert_eq!(lifecycle.state.unit_off_skip_count, 1);
+    assert_eq!(lifecycle.state.non_cooling_skip_count, 0);
+    assert_eq!(lifecycle.state.cooling_body_entry_count, 0);
+    assert_eq!(
+        lifecycle
+            .state
+            .supply_mass_flow_rate_for_cool_reset_assignment_count,
+        0
+    );
+    assert_eq!(lifecycle.state.cooling_on_read_count, 0);
+    let latest = lifecycle.state.latest.expect("latest CP318 off snapshot");
+    assert!(latest.unit_off_skipped);
+    assert!(!latest.non_cooling_skipped);
+    assert!(!latest.cooling_body_entered);
 }
 
 #[test]
@@ -1132,6 +1223,47 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
         assert!(!latest_body.economizer_calculation_body_executed);
         assert!(!latest_body.psychrometric_cp_air_evaluated);
         assert!(!latest_body.economizer_on_assigned);
+        let sensible_flow = simulation.summary.calc_cooling_sensible_flow_lifecycle;
+        assert_eq!(
+            sensible_flow.source,
+            PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SOURCE
+        );
+        assert_eq!(
+            sensible_flow.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_FIRST_EXCLUDED_SOURCE
+        );
+        let sensible_flow_state = sensible_flow.state;
+        assert_eq!(sensible_flow_state.transition_count, 1, "{limit:?}");
+        assert_eq!(sensible_flow_state.cooling_body_entry_count, 1, "{limit:?}");
+        assert_eq!(sensible_flow_state.unit_off_skip_count, 0, "{limit:?}");
+        assert_eq!(sensible_flow_state.non_cooling_skip_count, 0, "{limit:?}");
+        assert_eq!(
+            sensible_flow_state.supply_mass_flow_rate_for_cool_reset_assignment_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(sensible_flow_state.cooling_on_read_count, 1, "{limit:?}");
+        assert_eq!(
+            sensible_flow_state.cooling_on_body_entry_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            sensible_flow_state.delta_temperature_comparison_satisfied_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            sensible_flow_state.delta_temperature_body_entry_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            sensible_flow_state.supply_mass_flow_rate_for_cool_assignment_count, 1,
+            "{limit:?}"
+        );
+        let latest_sensible_flow = sensible_flow_state
+            .latest
+            .expect("latest CP318 cooling snapshot");
+        assert!(latest_sensible_flow.cooling_body_entered);
+        assert!(!latest_sensible_flow.unit_off_skipped);
+        assert!(!latest_sensible_flow.non_cooling_skipped);
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation

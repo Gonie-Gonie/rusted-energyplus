@@ -50,6 +50,30 @@ const CALC_COOLING_ECONOMIZER_BODY_SOURCE: &str =
     "EnergyPlus 26.1 PurchasedAirManager.cc:2089-2101";
 const CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE: &str =
     "EnergyPlus 26.1 PurchasedAirManager.cc:2109";
+const CALC_COOLING_SENSIBLE_FLOW_SOURCE: &str = "EnergyPlus 26.1 PurchasedAirManager.cc:2109-2116";
+const CALC_COOLING_SENSIBLE_FLOW_FIRST_EXCLUDED_SOURCE: &str =
+    "EnergyPlus 26.1 PurchasedAirManager.cc:2119";
+const CALC_COOLING_SENSIBLE_FLOW_SOURCE_ORDER: [&str; 19] = [
+    "assign-supply-mass-flow-rate-for-cool-zero",
+    "read-cooling-on",
+    "enter-cooling-on-body-if-true",
+    "read-controlled-zone-humidity-ratio",
+    "evaluate-psy-cp-air-fn-w",
+    "assign-local-cp-air",
+    "read-minimum-cooling-supply-air-temperature",
+    "read-zone-node-temperature",
+    "subtract-zone-temperature-from-minimum-cooling-supply-air-temperature",
+    "assign-local-delta-temperature",
+    "read-delta-temperature-for-small-temperature-difference-gate",
+    "compare-strict-delta-temperature-below-negative-small-temperature-difference",
+    "enter-delta-temperature-body-if-satisfied",
+    "read-zone-cooling-setpoint-load-after-delta-temperature-match",
+    "read-local-cp-air-for-first-division",
+    "calculate-zone-cooling-setpoint-load-divided-by-cp-air",
+    "read-local-delta-temperature-for-second-division",
+    "calculate-first-division-intermediate-divided-by-delta-temperature",
+    "assign-supply-mass-flow-rate-for-cool",
+];
 const CALC_COOLING_ECONOMIZER_BODY_SOURCE_ORDER: [&str; 37] = [
     "read-controlled-zone-humidity-ratio",
     "evaluate-psy-cp-air-fn-w",
@@ -748,6 +772,7 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
     assert_cooling_economizer_guard(runtime, expected_calls, expected_calls, 0);
     assert_cooling_economizer_condition(runtime, expected_calls, expected_calls, 0);
     assert_cooling_economizer_body(runtime, expected_calls, expected_calls, 0);
+    assert_cooling_sensible_flow(runtime, expected_calls, expected_calls, 0);
 }
 
 fn assert_zero_effect_cooling_oa_max_flow_body(
@@ -1292,6 +1317,329 @@ fn assert_cooling_economizer_body(
     }
 }
 
+fn assert_cooling_sensible_flow(
+    runtime: &Value,
+    expected_calls: u64,
+    expected_non_cooling_skips: u64,
+    expected_cooling_entries: u64,
+) {
+    assert!(expected_calls > 0);
+    assert_eq!(
+        expected_non_cooling_skips + expected_cooling_entries,
+        expected_calls
+    );
+    let flow = &runtime["purchased_air_calc_cooling_sensible_flow_lifecycle"];
+    assert!(
+        flow.is_object(),
+        "direct runtime must publish the CP318 key"
+    );
+    assert_exact_object_keys(
+        flow,
+        &[
+            "source",
+            "first_excluded_source",
+            "system",
+            "transition_count",
+            "cooling_body_entry_count",
+            "unit_off_skip_count",
+            "non_cooling_skip_count",
+            "supply_mass_flow_rate_for_cool_reset_assignment_count",
+            "cooling_on_read_count",
+            "cooling_on_body_entry_count",
+            "cooling_on_fallthrough_count",
+            "zone_humidity_ratio_read_count",
+            "psychrometric_cp_air_evaluation_count",
+            "cp_air_assignment_count",
+            "minimum_cooling_supply_air_temperature_read_count",
+            "zone_temperature_read_count",
+            "delta_temperature_calculation_count",
+            "delta_temperature_assignment_count",
+            "delta_temperature_for_gate_read_count",
+            "delta_temperature_comparison_count",
+            "delta_temperature_comparison_satisfied_count",
+            "delta_temperature_body_entry_count",
+            "delta_temperature_fallthrough_count",
+            "zone_cooling_setpoint_load_read_count",
+            "cp_air_for_first_division_read_count",
+            "zone_cooling_setpoint_load_over_cp_air_calculation_count",
+            "delta_temperature_for_second_division_read_count",
+            "supply_mass_flow_rate_for_cool_calculation_count",
+            "supply_mass_flow_rate_for_cool_assignment_count",
+            "latest",
+        ],
+    );
+    assert_eq!(flow["source"], CALC_COOLING_SENSIBLE_FLOW_SOURCE);
+    assert_eq!(
+        flow["first_excluded_source"],
+        CALC_COOLING_SENSIBLE_FLOW_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(flow["system"], 0);
+    assert_eq!(flow["transition_count"], expected_calls);
+    assert_eq!(flow["cooling_body_entry_count"], expected_cooling_entries);
+    assert_eq!(flow["unit_off_skip_count"], 0);
+    assert_eq!(flow["non_cooling_skip_count"], expected_non_cooling_skips);
+    for field in [
+        "supply_mass_flow_rate_for_cool_reset_assignment_count",
+        "cooling_on_read_count",
+        "cooling_on_body_entry_count",
+        "zone_humidity_ratio_read_count",
+        "psychrometric_cp_air_evaluation_count",
+        "cp_air_assignment_count",
+        "minimum_cooling_supply_air_temperature_read_count",
+        "zone_temperature_read_count",
+        "delta_temperature_calculation_count",
+        "delta_temperature_assignment_count",
+        "delta_temperature_for_gate_read_count",
+        "delta_temperature_comparison_count",
+        "delta_temperature_comparison_satisfied_count",
+        "delta_temperature_body_entry_count",
+        "zone_cooling_setpoint_load_read_count",
+        "cp_air_for_first_division_read_count",
+        "zone_cooling_setpoint_load_over_cp_air_calculation_count",
+        "delta_temperature_for_second_division_read_count",
+        "supply_mass_flow_rate_for_cool_calculation_count",
+        "supply_mass_flow_rate_for_cool_assignment_count",
+    ] {
+        assert_eq!(flow[field], expected_cooling_entries, "{field}");
+    }
+    assert_eq!(flow["cooling_on_fallthrough_count"], 0);
+    assert_eq!(flow["delta_temperature_fallthrough_count"], 0);
+
+    let latest = &flow["latest"];
+    assert_exact_object_keys(
+        latest,
+        &[
+            "source",
+            "first_excluded_source",
+            "system",
+            "parent_call_ordinal",
+            "source_order",
+            "controlled_zone",
+            "unit_body_entered",
+            "predecessor_cooling_body_entered",
+            "predecessor_maximum_cooling_flow_body_sibling_skipped",
+            "predecessor_no_economizer_outer_guard_fallthrough_skipped",
+            "predecessor_economizer_condition_fallthrough_skipped",
+            "predecessor_economizer_calculation_body_executed",
+            "unit_off_skipped",
+            "non_cooling_skipped",
+            "cooling_body_entered",
+            "supply_mass_flow_rate_for_cool_reset_assigned",
+            "reset_supply_mass_flow_rate_for_cool_kg_per_s",
+            "cooling_on_read",
+            "cooling_on",
+            "cooling_on_body_entered",
+            "zone_humidity_ratio_read",
+            "zone_humidity_ratio",
+            "psychrometric_cp_air_evaluated",
+            "psychrometric_cp_air_result_j_per_kg_k",
+            "cp_air_assigned",
+            "cp_air_j_per_kg_k",
+            "minimum_cooling_supply_air_temperature_read",
+            "minimum_cooling_supply_air_temperature_c",
+            "zone_temperature_read",
+            "zone_temperature_c",
+            "delta_temperature_calculated",
+            "delta_temperature_c",
+            "delta_temperature_assigned",
+            "assigned_delta_temperature_c",
+            "delta_temperature_for_gate_read",
+            "delta_temperature_for_gate_c",
+            "delta_temperature_comparison_evaluated",
+            "delta_temperature_below_negative_small_temp_diff",
+            "delta_temperature_body_entered",
+            "zone_cooling_setpoint_load_read",
+            "zone_cooling_setpoint_load_w",
+            "cp_air_for_first_division_read",
+            "cp_air_for_first_division_j_per_kg_k",
+            "zone_cooling_setpoint_load_over_cp_air_calculated",
+            "zone_cooling_setpoint_load_over_cp_air_kg_k_per_s",
+            "delta_temperature_for_second_division_read",
+            "delta_temperature_for_second_division_c",
+            "supply_mass_flow_rate_for_cool_calculated",
+            "calculated_supply_mass_flow_rate_for_cool_kg_per_s",
+            "supply_mass_flow_rate_for_cool_assigned",
+            "assigned_supply_mass_flow_rate_for_cool_kg_per_s",
+            "resulting_supply_mass_flow_rate_for_cool_kg_per_s",
+        ],
+    );
+    assert_eq!(latest["source"], CALC_COOLING_SENSIBLE_FLOW_SOURCE);
+    assert_eq!(
+        latest["first_excluded_source"],
+        CALC_COOLING_SENSIBLE_FLOW_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(latest["system"], 0);
+    assert_eq!(latest["controlled_zone"], 0);
+    assert_eq!(latest["parent_call_ordinal"], expected_calls);
+    assert_eq!(
+        string_array(&latest["source_order"]),
+        CALC_COOLING_SENSIBLE_FLOW_SOURCE_ORDER
+    );
+    assert_eq!(latest["unit_body_entered"], true);
+    assert_eq!(
+        latest["predecessor_cooling_body_entered"],
+        expected_cooling_entries > 0
+    );
+    assert_eq!(
+        latest["predecessor_maximum_cooling_flow_body_sibling_skipped"],
+        false
+    );
+    assert_eq!(
+        latest["predecessor_no_economizer_outer_guard_fallthrough_skipped"],
+        expected_cooling_entries > 0
+    );
+    assert_eq!(
+        latest["predecessor_economizer_condition_fallthrough_skipped"],
+        false
+    );
+    assert_eq!(
+        latest["predecessor_economizer_calculation_body_executed"],
+        false
+    );
+    assert_eq!(latest["unit_off_skipped"], false);
+    assert_eq!(
+        latest["non_cooling_skipped"],
+        expected_non_cooling_skips > 0
+    );
+    assert_eq!(latest["cooling_body_entered"], expected_cooling_entries > 0);
+
+    if expected_cooling_entries == 0 {
+        for field in [
+            "supply_mass_flow_rate_for_cool_reset_assigned",
+            "cooling_on_read",
+            "cooling_on_body_entered",
+            "zone_humidity_ratio_read",
+            "psychrometric_cp_air_evaluated",
+            "cp_air_assigned",
+            "minimum_cooling_supply_air_temperature_read",
+            "zone_temperature_read",
+            "delta_temperature_calculated",
+            "delta_temperature_assigned",
+            "delta_temperature_for_gate_read",
+            "delta_temperature_comparison_evaluated",
+            "delta_temperature_body_entered",
+            "zone_cooling_setpoint_load_read",
+            "cp_air_for_first_division_read",
+            "zone_cooling_setpoint_load_over_cp_air_calculated",
+            "delta_temperature_for_second_division_read",
+            "supply_mass_flow_rate_for_cool_calculated",
+            "supply_mass_flow_rate_for_cool_assigned",
+        ] {
+            assert_eq!(latest[field], false, "{field}");
+        }
+        for field in [
+            "reset_supply_mass_flow_rate_for_cool_kg_per_s",
+            "cooling_on",
+            "zone_humidity_ratio",
+            "psychrometric_cp_air_result_j_per_kg_k",
+            "cp_air_j_per_kg_k",
+            "minimum_cooling_supply_air_temperature_c",
+            "zone_temperature_c",
+            "delta_temperature_c",
+            "assigned_delta_temperature_c",
+            "delta_temperature_for_gate_c",
+            "delta_temperature_below_negative_small_temp_diff",
+            "zone_cooling_setpoint_load_w",
+            "cp_air_for_first_division_j_per_kg_k",
+            "zone_cooling_setpoint_load_over_cp_air_kg_k_per_s",
+            "delta_temperature_for_second_division_c",
+            "calculated_supply_mass_flow_rate_for_cool_kg_per_s",
+            "assigned_supply_mass_flow_rate_for_cool_kg_per_s",
+            "resulting_supply_mass_flow_rate_for_cool_kg_per_s",
+        ] {
+            assert!(latest[field].is_null(), "{field}");
+        }
+        return;
+    }
+
+    for field in [
+        "supply_mass_flow_rate_for_cool_reset_assigned",
+        "cooling_on_read",
+        "cooling_on_body_entered",
+        "zone_humidity_ratio_read",
+        "psychrometric_cp_air_evaluated",
+        "cp_air_assigned",
+        "minimum_cooling_supply_air_temperature_read",
+        "zone_temperature_read",
+        "delta_temperature_calculated",
+        "delta_temperature_assigned",
+        "delta_temperature_for_gate_read",
+        "delta_temperature_comparison_evaluated",
+        "delta_temperature_body_entered",
+        "zone_cooling_setpoint_load_read",
+        "cp_air_for_first_division_read",
+        "zone_cooling_setpoint_load_over_cp_air_calculated",
+        "delta_temperature_for_second_division_read",
+        "supply_mass_flow_rate_for_cool_calculated",
+        "supply_mass_flow_rate_for_cool_assigned",
+    ] {
+        assert_eq!(latest[field], true, "{field}");
+    }
+    assert_eq!(latest["reset_supply_mass_flow_rate_for_cool_kg_per_s"], 0.0);
+    assert_eq!(latest["cooling_on"], true);
+    assert_eq!(
+        latest["delta_temperature_below_negative_small_temp_diff"],
+        true
+    );
+    let cp_air = latest["cp_air_j_per_kg_k"]
+        .as_f64()
+        .expect("CP318 CpAir must be numeric");
+    assert_eq!(
+        latest["psychrometric_cp_air_result_j_per_kg_k"].as_f64(),
+        Some(cp_air)
+    );
+    assert_eq!(
+        latest["cp_air_for_first_division_j_per_kg_k"].as_f64(),
+        Some(cp_air)
+    );
+    let minimum_supply = latest["minimum_cooling_supply_air_temperature_c"]
+        .as_f64()
+        .expect("CP318 minimum supply temperature must be numeric");
+    let zone_temperature = latest["zone_temperature_c"]
+        .as_f64()
+        .expect("CP318 Zone temperature must be numeric");
+    let delta_temperature = latest["delta_temperature_c"]
+        .as_f64()
+        .expect("CP318 DeltaT must be numeric");
+    assert_close(
+        delta_temperature,
+        minimum_supply - zone_temperature,
+        1.0e-12,
+    );
+    for field in [
+        "assigned_delta_temperature_c",
+        "delta_temperature_for_gate_c",
+        "delta_temperature_for_second_division_c",
+    ] {
+        assert_eq!(
+            latest[field].as_f64().map(f64::to_bits),
+            Some(delta_temperature.to_bits()),
+            "{field}"
+        );
+    }
+    let load = latest["zone_cooling_setpoint_load_w"]
+        .as_f64()
+        .expect("CP318 cooling load must be numeric");
+    let first_division = latest["zone_cooling_setpoint_load_over_cp_air_kg_k_per_s"]
+        .as_f64()
+        .expect("CP318 first division must be numeric");
+    assert_close(first_division, load / cp_air, 1.0e-12);
+    let calculated_flow = latest["calculated_supply_mass_flow_rate_for_cool_kg_per_s"]
+        .as_f64()
+        .expect("CP318 calculated flow must be numeric");
+    assert_close(calculated_flow, first_division / delta_temperature, 1.0e-12);
+    for field in [
+        "assigned_supply_mass_flow_rate_for_cool_kg_per_s",
+        "resulting_supply_mass_flow_rate_for_cool_kg_per_s",
+    ] {
+        assert_eq!(
+            latest[field].as_f64().map(f64::to_bits),
+            Some(calculated_flow.to_bits()),
+            "{field}"
+        );
+    }
+}
+
 #[test]
 fn all_hard_sized_finite_limit_branches_limit_live_cooling()
 -> Result<(), Box<dyn std::error::Error>> {
@@ -1445,6 +1793,7 @@ fn all_hard_sized_finite_limit_branches_limit_live_cooling()
         assert_cooling_economizer_guard(&summary["rust_runtime"], 2, 0, 2);
         assert_cooling_economizer_condition(&summary["rust_runtime"], 2, 0, 2);
         assert_cooling_economizer_body(&summary["rust_runtime"], 2, 0, 2);
+        assert_cooling_sensible_flow(&summary["rust_runtime"], 2, 0, 2);
 
         let results = read_json(&output_dir.join("results").join("result-store.json"))?;
         let cooling_rate = find_series(
@@ -1612,6 +1961,17 @@ fn assert_unique_output_handles(results: &Value) {
         series.len(),
         "every result series must have a unique output handle"
     );
+}
+
+fn assert_exact_object_keys(value: &Value, expected: &[&str]) {
+    let actual = value
+        .as_object()
+        .expect("value should be an object")
+        .keys()
+        .map(String::as_str)
+        .collect::<BTreeSet<_>>();
+    let expected = expected.iter().copied().collect::<BTreeSet<_>>();
+    assert_eq!(actual, expected);
 }
 
 fn assert_finite_endpoints(series: &Value) {

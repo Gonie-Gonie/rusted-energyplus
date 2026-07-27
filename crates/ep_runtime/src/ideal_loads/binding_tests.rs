@@ -40,6 +40,8 @@ mod cooling_entry_gate_tests;
 mod cooling_oa_max_flow_body_tests;
 #[path = "binding/cooling_oa_max_flow_gate_tests.rs"]
 mod cooling_oa_max_flow_gate_tests;
+#[path = "binding/cooling_sensible_flow_tests.rs"]
+mod cooling_sensible_flow_tests;
 #[path = "binding/minimum_oa_prefix_tests.rs"]
 mod minimum_oa_prefix_tests;
 

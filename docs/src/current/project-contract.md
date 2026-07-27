@@ -16109,6 +16109,95 @@ The 32-algorithm and 293-routine inventory, readiness split, support levels,
 run state, required and forbidden features, evidence cases, numerical
 conformance, and Roadmap state remain unchanged.
 
+## CP318 Source-Ordered Cooling Sensible Flow
+
+CP318 supersedes only CP317's line-2109 exclusion for EnergyPlus 26.1
+`PurchasedAirManager.cc` executable lines 2109-2116. It maps the common
+cooling continuation reached after all active Cooling predecessor partitions
+and stops before the line-2119 dehumidification reset. Its 19 source sites are:
+
+1. assign the cooling sensible-flow candidate to positive zero;
+2. read retained `CoolOn`;
+3. enter the `CoolOn` body only after a true read;
+4. read the bound Zone heat-balance humidity ratio;
+5. evaluate canonical `energyplus_psy_cp_air_fn_w`;
+6. assign local `CpAir`;
+7. read minimum cooling supply-air temperature;
+8. read the bound Zone-node temperature;
+9. subtract Zone temperature from minimum supply temperature;
+10. assign local `DeltaT`;
+11. re-read `DeltaT` for the temperature gate;
+12. compare `DeltaT < -1.0e-5` using source strict `<`;
+13. enter the delta-temperature body only after a true comparison;
+14. read retained `QZnCoolSP`;
+15. re-read local `CpAir`;
+16. calculate `QZnCoolSP / CpAir`;
+17. re-read local `DeltaT`;
+18. calculate `(QZnCoolSP / CpAir) / DeltaT`; and
+19. assign the cooling sensible-flow candidate.
+
+CP318 is a common reconvergence, not a child of only the CP317 true body. The
+CP313/CP314 true path, CP315 false path, and CP317 entered or skipped paths all
+reach line 2109 while Cooling remains active. UnitOff and non-cooling
+predecessors skip all 19 sites, including the positive-zero reset. Every active
+Cooling predecessor performs that reset. A false `CoolOn` performs only the
+reset and reads no humidity, temperatures, demand, `CpAir`, or `DeltaT`. A true
+`CoolOn` evaluates the psychrometric and temperature sites; only a true
+temperature comparison evaluates the load and division sites.
+
+The source constant is represented exactly as `1.0e-5`. Strict `<` makes
+equality, positive and negative zero, and NaN false while negative infinity is
+true. The source division is evaluated left-associatively as
+`(QZnCoolSP / CpAir) / DeltaT`, without denominator multiplication or positive
+load normalization. Raw IEEE NaN, infinities, and signed zero are retained.
+The canonical `energyplus_psy_cp_air_fn_w` scalar is reused. The source
+psychrometric function's static `dwSave`/`cpaSave` cache, initial `-100.0`
+sentinel, cache-hit/miss and cross-slice identity, and concurrency lifecycle
+remain excluded.
+
+`calc/cooling_sensible_flow.rs` owns
+`PurchasedAirCalcCoolingSensibleFlowSnapshot` and
+`PurchasedAirCalcCoolingSensibleFlowLifecycleSummary`; its split state,
+transition, release, validation, and test modules retain the exact route and
+site evidence. The release boundary owns
+`PurchasedAirCalcCoolingSensibleFlowError` and
+`advance_direct_no_oa_calc_cooling_sensible_flow`; the parent module owns
+`purchased_air_calc_cooling_sensible_flow_lifecycle_summary`.
+
+The public direct release requires an exact retained CP317 predecessor, linked
+CP310 demand/mode evidence, selected-unit and Zone identity, and finite active
+Zone inputs before any mutation. It derives `CoolOn` and `QZnCoolSP` from
+retained CP310 rather than accepting duplicate caller values. Exact no-OA
+release proves retained `CoolOn` true and consumes the bound
+`ZoneHeatBalanceState` humidity ratio and air temperature. Per-step validation
+checks exact source provenance, one-for-one call order, predecessor route,
+latest-state identity, all 19 source-site counts, and the released candidate.
+Coupled and final lifecycle validation reconcile every CP317-to-CP318
+transition. Direct JSON publishes
+`purchased_air_calc_cooling_sensible_flow_lifecycle`; non-direct or
+disconnected evidence is rejected.
+
+The binder executes CP318 after CP317 and before the existing bounded numerical
+Calc DTO. CP318 does not reuse `calc/mass_flow.rs` or `calc/no_oa.rs`: those
+numerical helpers use a different threshold, positive-load normalization,
+denominator-product grouping, and a different `CpAir` contract. This checkpoint
+does not bitwise reconcile CP318's lifecycle candidate with that DTO.
+
+Line 2116 closes the mapped slice. The lexical first excluded executable is
+line 2119, `SupplyMassFlowRateForDehum = 0.0`. Dehumidification at 2119-2128,
+humidification at 2133-2144, the zero-capacity reset at 2147-2152, the
+multi-argument maximum at 2155, EMS at 2157-2160, the flow clamp at 2161-2164,
+`VerySmallMassFlow`, mixed-air/capacity/supply-state behavior, and later
+Heat/DeadBand work remain excluded. CP318 grants no live schedule or general
+Node-service ownership and promotes no numerical or capability claim.
+`OutdoorAir`, `Economizer`, `HumidityControl`, and `EMS` support remain
+unchanged. `algorithm.zone_temp_predictor_corrector_source_order` and
+`algorithm.ideal_loads_zone_equipment_purchased_air_source_order` both remain
+`scaffold`/`none`; `routine.calc_purch_air_loads` remains `source_mapped`.
+The 32-algorithm and 293-routine inventory, readiness split, support levels,
+run state, required and forbidden features, evidence cases, numerical
+conformance, and Roadmap state remain unchanged.
+
 
 
 

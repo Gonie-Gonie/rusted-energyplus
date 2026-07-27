@@ -23,7 +23,11 @@ use crate::{
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_SOURCE_ORDER,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE,
-        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE_ORDER, PURCHASED_AIR_CALC_ENTRY_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE_ORDER,
+        PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SMALL_TEMP_DIFF_C,
+        PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SOURCE_ORDER, PURCHASED_AIR_CALC_ENTRY_SOURCE,
         PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER, PurchasedAirAvailabilityStatus,
@@ -31,9 +35,10 @@ use crate::{
         PurchasedAirCalcCoolingEconomizerConditionSnapshot,
         PurchasedAirCalcCoolingEconomizerGuardSnapshot, PurchasedAirCalcCoolingEntryGateSnapshot,
         PurchasedAirCalcCoolingOaMaxFlowBodySnapshot, PurchasedAirCalcCoolingOaMaxFlowGateSnapshot,
-        PurchasedAirCalcEntryDemandSnapshot, PurchasedAirCalcEntryResetSnapshot,
-        PurchasedAirCalcEntrySnapshot, PurchasedAirCalcMinimumOaPrefixSnapshot,
-        PurchasedAirInitSnapshot, PurchasedAirInitTransition, PurchasedAirRecirculationSource,
+        PurchasedAirCalcCoolingSensibleFlowSnapshot, PurchasedAirCalcEntryDemandSnapshot,
+        PurchasedAirCalcEntryResetSnapshot, PurchasedAirCalcEntrySnapshot,
+        PurchasedAirCalcMinimumOaPrefixSnapshot, PurchasedAirInitSnapshot,
+        PurchasedAirInitTransition, PurchasedAirRecirculationSource,
         PurchasedAirTemperatureControlType, couple_direct_zone_predicted_demand_to_purchased_air,
     },
 };
@@ -59,6 +64,11 @@ fn appends_all_no_oa_and_predictor_series_with_hourly_semantics() {
         assert_eq!(
             output.coupling.prediction.zone_demand.sensible_input_kind,
             ZoneSensibleDemandInputKind::SourceSetpointThresholds
+        );
+        assert!(
+            crate::ideal_loads::calc::cooling_sensible_flow_snapshot_is_exact_direct_release(
+                output.calculation_cooling_sensible_flow,
+            )
         );
     }
 
@@ -438,6 +448,11 @@ fn scaled_output(
         calculation_cooling_economizer_condition_snapshot(calculation_cooling_economizer_guard);
     let calculation_cooling_economizer_body =
         calculation_cooling_economizer_body_snapshot(calculation_cooling_economizer_condition);
+    let calculation_cooling_sensible_flow = calculation_cooling_sensible_flow_snapshot(
+        calculation_cooling_economizer_body,
+        system,
+        coupling,
+    );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -472,6 +487,7 @@ fn scaled_output(
         calculation_cooling_economizer_guard,
         calculation_cooling_economizer_condition,
         calculation_cooling_economizer_body,
+        calculation_cooling_sensible_flow,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;
@@ -797,6 +813,105 @@ fn calculation_cooling_economizer_body_snapshot(
         system_time_step_hours: None,
         economizer_active_time_assigned: false,
         assigned_economizer_active_time_hours: None,
+    }
+}
+
+fn calculation_cooling_sensible_flow_snapshot(
+    predecessor: PurchasedAirCalcCoolingEconomizerBodySnapshot,
+    system: &IdealLoadsAirSystem,
+    coupling: DirectZonePurchasedAirCouplingOutput,
+) -> PurchasedAirCalcCoolingSensibleFlowSnapshot {
+    let cooling_body_entered = predecessor.predecessor_cooling_body_entered;
+    let cooling_on_body_entered = cooling_body_entered;
+    let zone_humidity_ratio = cooling_on_body_entered.then_some(0.008);
+    let cp_air_j_per_kg_k =
+        zone_humidity_ratio.map(crate::psychrometrics::energyplus_psy_cp_air_fn_w);
+    let minimum_cooling_supply_air_temperature_c =
+        cooling_on_body_entered.then_some(system.minimum_cooling_supply_air_temperature_c);
+    let zone_temperature_c = cooling_on_body_entered.then_some(22.0);
+    let delta_temperature_c = minimum_cooling_supply_air_temperature_c
+        .zip(zone_temperature_c)
+        .map(|(minimum_supply, zone)| minimum_supply - zone);
+    let delta_temperature_body_entered = delta_temperature_c
+        .is_some_and(|delta| delta < -PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SMALL_TEMP_DIFF_C);
+    let zone_cooling_setpoint_load_w = delta_temperature_body_entered.then_some(
+        coupling
+            .prediction
+            .zone_demand
+            .remaining_output_req_to_cool_sp_w,
+    );
+    let cp_air_for_first_division_j_per_kg_k =
+        delta_temperature_body_entered.then_some(cp_air_j_per_kg_k.unwrap_or(f64::NAN));
+    let zone_cooling_setpoint_load_over_cp_air_kg_k_per_s = zone_cooling_setpoint_load_w
+        .zip(cp_air_for_first_division_j_per_kg_k)
+        .map(|(load, cp_air)| load / cp_air);
+    let delta_temperature_for_second_division_c =
+        delta_temperature_body_entered.then_some(delta_temperature_c.unwrap_or(f64::NAN));
+    let calculated_supply_mass_flow_rate_for_cool_kg_per_s =
+        zone_cooling_setpoint_load_over_cp_air_kg_k_per_s
+            .zip(delta_temperature_for_second_division_c)
+            .map(|(first_division, delta)| first_division / delta);
+
+    PurchasedAirCalcCoolingSensibleFlowSnapshot {
+        source: PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SOURCE,
+        first_excluded_source: PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_FIRST_EXCLUDED_SOURCE,
+        system: predecessor.system,
+        parent_call_ordinal: predecessor.parent_call_ordinal,
+        source_order: PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SOURCE_ORDER,
+        controlled_zone: predecessor.controlled_zone,
+        unit_body_entered: predecessor.unit_body_entered,
+        predecessor_cooling_body_entered: predecessor.predecessor_cooling_body_entered,
+        predecessor_maximum_cooling_flow_body_sibling_skipped: predecessor
+            .maximum_cooling_flow_body_sibling_skipped,
+        predecessor_no_economizer_outer_guard_fallthrough_skipped: predecessor
+            .no_economizer_outer_guard_fallthrough_skipped,
+        predecessor_economizer_condition_fallthrough_skipped: predecessor
+            .economizer_condition_fallthrough_skipped,
+        predecessor_economizer_calculation_body_executed: predecessor
+            .economizer_calculation_body_executed,
+        unit_off_skipped: predecessor.unit_off_skipped,
+        non_cooling_skipped: predecessor.non_cooling_skipped,
+        cooling_body_entered,
+        supply_mass_flow_rate_for_cool_reset_assigned: cooling_body_entered,
+        reset_supply_mass_flow_rate_for_cool_kg_per_s: cooling_body_entered.then_some(0.0),
+        cooling_on_read: cooling_body_entered,
+        cooling_on: cooling_body_entered.then_some(true),
+        cooling_on_body_entered,
+        zone_humidity_ratio_read: cooling_on_body_entered,
+        zone_humidity_ratio,
+        psychrometric_cp_air_evaluated: cooling_on_body_entered,
+        psychrometric_cp_air_result_j_per_kg_k: cp_air_j_per_kg_k,
+        cp_air_assigned: cooling_on_body_entered,
+        cp_air_j_per_kg_k,
+        minimum_cooling_supply_air_temperature_read: cooling_on_body_entered,
+        minimum_cooling_supply_air_temperature_c,
+        zone_temperature_read: cooling_on_body_entered,
+        zone_temperature_c,
+        delta_temperature_calculated: cooling_on_body_entered,
+        delta_temperature_c,
+        delta_temperature_assigned: cooling_on_body_entered,
+        assigned_delta_temperature_c: delta_temperature_c,
+        delta_temperature_for_gate_read: cooling_on_body_entered,
+        delta_temperature_for_gate_c: delta_temperature_c,
+        delta_temperature_comparison_evaluated: cooling_on_body_entered,
+        delta_temperature_below_negative_small_temp_diff: cooling_on_body_entered
+            .then_some(delta_temperature_body_entered),
+        delta_temperature_body_entered,
+        zone_cooling_setpoint_load_read: delta_temperature_body_entered,
+        zone_cooling_setpoint_load_w,
+        cp_air_for_first_division_read: delta_temperature_body_entered,
+        cp_air_for_first_division_j_per_kg_k,
+        zone_cooling_setpoint_load_over_cp_air_calculated: delta_temperature_body_entered,
+        zone_cooling_setpoint_load_over_cp_air_kg_k_per_s,
+        delta_temperature_for_second_division_read: delta_temperature_body_entered,
+        delta_temperature_for_second_division_c,
+        supply_mass_flow_rate_for_cool_calculated: delta_temperature_body_entered,
+        calculated_supply_mass_flow_rate_for_cool_kg_per_s,
+        supply_mass_flow_rate_for_cool_assigned: delta_temperature_body_entered,
+        assigned_supply_mass_flow_rate_for_cool_kg_per_s:
+            calculated_supply_mass_flow_rate_for_cool_kg_per_s,
+        resulting_supply_mass_flow_rate_for_cool_kg_per_s: cooling_body_entered
+            .then_some(calculated_supply_mass_flow_rate_for_cool_kg_per_s.unwrap_or(0.0)),
     }
 }
 

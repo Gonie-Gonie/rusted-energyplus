@@ -511,6 +511,54 @@ their current status; the 32-algorithm and 293-routine inventory, readiness
 counts, support level, required and forbidden features, evidence cases,
 numerical conformance, and Roadmap state remain unchanged.
 
+CP318 maps the common cooling sensible-flow continuation at executable lines
+2109-2116. Every active Cooling predecessor reconverges here: the CP313/CP314
+true body route, the CP315 false route, and both CP317 entered or skipped
+routes. A skipped CP317 body therefore does not skip CP318. UnitOff and
+non-cooling predecessors skip all 19 source sites, including the reset. Every
+active Cooling predecessor first assigns the local cooling sensible-flow
+candidate to positive zero. A false retained `CoolOn` then stops without
+reading psychrometric or temperature inputs. A true retained `CoolOn` reads the
+bound Zone heat-balance humidity ratio, evaluates canonical
+`energyplus_psy_cp_air_fn_w`, assigns `CpAir`, reads minimum cooling supply
+temperature and the bound Zone-node temperature, subtracts and assigns
+`DeltaT`, and re-reads it for strict `DeltaT < -1.0e-5`. Only a true comparison
+reads retained `QZnCoolSP`, re-reads `CpAir`, performs `QZnCoolSP / CpAir`,
+re-reads `DeltaT`, performs the second left-associated division, and assigns
+the cooling sensible-flow candidate.
+
+The direct no-OA release derives `CoolOn` and `QZnCoolSP` from retained CP310
+state and proves `CoolOn` true. It consumes live, identity-checked Zone
+heat-balance humidity ratio and temperature only after all fallible
+prevalidation, then publishes an exact CP318 snapshot. The strict comparison
+preserves equality, signed zero, infinities, and NaN behavior. The two divisions
+remain `(QZnCoolSP / CpAir) / DeltaT`, rather than a denominator-product
+rewrite, preserving raw IEEE results including signed zero. This slice reuses
+the canonical psychrometric scalar helper but does not map the source
+`PsyCpAirFnW` static `dwSave`/`cpaSave` cache, its `-100.0` sentinel,
+cache-hit/miss identity, or concurrent cache lifecycle.
+
+The binder orders CP318 after CP317 and before the unchanged bounded numerical
+Calc DTO. Per-step, lifecycle, coupled-runtime, and pipeline firewalls reconcile
+the exact 19-site partitions and expose
+`purchased_air_calc_cooling_sensible_flow_lifecycle` only for the direct
+release lane. They reject disconnected or non-direct evidence. The pre-existing
+`calc/mass_flow.rs` and `calc/no_oa.rs` numerical helpers are not reused or
+bitwise reconciled here because their thresholds, load normalization,
+calculation grouping, and psychrometric contract differ from this source-order
+slice.
+
+Line 2116 closes CP318. The first excluded executable is line 2119,
+`SupplyMassFlowRateForDehum = 0.0`; dehumidification, humidification,
+zero-capacity reset, multi-argument maximum, EMS override, later flow clamps,
+mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection remain
+open. CP318 adds lifecycle evidence only. OA, Economizer, HumidityControl, and
+EMS support remain unchanged and no numerical or capability claim is promoted.
+Both parents remain `scaffold`/`none`, the Calc routine remains
+`source_mapped`, and the 32-algorithm/293-routine inventory, readiness counts,
+support level, required and forbidden features, evidence cases, numerical
+conformance, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

@@ -59,10 +59,28 @@ def list_value(value: Any) -> str:
 def support_boundary_value(item: dict[str, Any]) -> str:
     return " ".join(
         value
-        for value in (
+        for value in [
             str(item.get("support_boundary", "")).strip(),
             str(item.get("support_boundary_addendum", "")).strip(),
-        )
+            *[
+                str(addendum).strip()
+                for addendum in item.get("support_boundary_addenda", [])
+            ],
+        ]
+        if value
+    )
+
+
+def claim_boundary_value(item: dict[str, Any]) -> str:
+    return " ".join(
+        value
+        for value in [
+            str(item.get("claim_boundary", "")).strip(),
+            *[
+                str(addendum).strip()
+                for addendum in item.get("claim_boundary_addenda", [])
+            ],
+        ]
         if value
     )
 
@@ -417,7 +435,7 @@ def capability_index(repo_root: Path) -> str:
                 inline_list([str(value) for value in item.get("forbidden_active_features", [])]),
                 inline_list([str(value) for value in item.get("algorithms", [])]),
                 inline_list([str(value) for value in item.get("evidence_cases", [])]),
-                str(item.get("claim_boundary", "")),
+                claim_boundary_value(item),
             ]
         )
 

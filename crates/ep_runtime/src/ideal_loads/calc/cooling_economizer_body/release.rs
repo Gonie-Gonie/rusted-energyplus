@@ -11,11 +11,13 @@ use crate::ideal_loads::{
     classify_no_oa_sensible_subset,
 };
 
+mod completed_body_validation;
 mod entry_prefix_validation;
 mod initialization_validation;
 mod predecessor_validation;
 mod runtime_validation;
 
+use completed_body_validation::completed_body_state_is_consistent;
 use entry_prefix_validation::completed_direct_prefix_through_economizer_guard_is_consistent;
 use initialization_validation::initialization_state_is_exact_direct_release;
 use predecessor_validation::economizer_condition_links_to_guard;
@@ -24,6 +26,20 @@ use runtime_validation::{
     calc_state_identities_match, call_order_is_pending_body,
     economizer_condition_snapshot_is_exact_direct_release, pending_body_state_is_consistent,
 };
+
+pub(in crate::ideal_loads::calc) fn completed_direct_cooling_economizer_body_is_consistent(
+    unit: &crate::ideal_loads::PurchasedAirUnitRuntimeState,
+    predecessor_condition: PurchasedAirCalcCoolingEconomizerConditionSnapshot,
+    predecessor_body: PurchasedAirCalcCoolingEconomizerBodySnapshot,
+    body_consumer_latest_witness: Option<PurchasedAirCalcCoolingEconomizerBodySnapshot>,
+) -> bool {
+    completed_body_state_is_consistent(
+        unit,
+        predecessor_condition,
+        predecessor_body,
+        body_consumer_latest_witness,
+    )
+}
 
 /// Fail-closed error before the bounded body mutates CP317 state.
 #[derive(Clone, Copy, Debug, PartialEq)]

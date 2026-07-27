@@ -11,9 +11,10 @@ use super::super::{
     PurchasedAirCalcCoolingEconomizerConditionSnapshot,
     PurchasedAirCalcCoolingEconomizerGuardRuntimeState,
     PurchasedAirCalcCoolingEntryGateRuntimeState, PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState,
-    PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState, PurchasedAirCalcEntryRuntimeState,
-    PurchasedAirCalcMinimumOaPrefixRuntimeState, PurchasedAirHardSizeLegacyOutcome,
-    PurchasedAirSizedLimits,
+    PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState,
+    PurchasedAirCalcCoolingSensibleFlowRuntimeState, PurchasedAirCalcCoolingSensibleFlowSnapshot,
+    PurchasedAirCalcEntryRuntimeState, PurchasedAirCalcMinimumOaPrefixRuntimeState,
+    PurchasedAirHardSizeLegacyOutcome, PurchasedAirSizedLimits,
 };
 use super::{
     IdealLoadsInitFlags, PurchasedAirInitTopologyDiagnostic, PurchasedAirInitTopologyError,
@@ -68,6 +69,8 @@ pub struct PurchasedAirRuntimeState {
         BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingEconomizerConditionSnapshot>,
     cooling_economizer_body_latest_witnesses:
         BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingEconomizerBodySnapshot>,
+    cooling_sensible_flow_latest_witnesses:
+        BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingSensibleFlowSnapshot>,
 }
 
 impl PurchasedAirRuntimeState {
@@ -104,6 +107,24 @@ impl PurchasedAirRuntimeState {
         snapshot: PurchasedAirCalcCoolingEconomizerBodySnapshot,
     ) {
         self.cooling_economizer_body_latest_witnesses
+            .insert(system, snapshot);
+    }
+
+    pub(in crate::ideal_loads) fn cooling_sensible_flow_latest_witness(
+        &self,
+        system: IdealLoadsAirSystemId,
+    ) -> Option<PurchasedAirCalcCoolingSensibleFlowSnapshot> {
+        self.cooling_sensible_flow_latest_witnesses
+            .get(&system)
+            .copied()
+    }
+
+    pub(in crate::ideal_loads) fn set_cooling_sensible_flow_latest_witness(
+        &mut self,
+        system: IdealLoadsAirSystemId,
+        snapshot: PurchasedAirCalcCoolingSensibleFlowSnapshot,
+    ) {
+        self.cooling_sensible_flow_latest_witnesses
             .insert(system, snapshot);
     }
 }
@@ -151,6 +172,8 @@ pub struct PurchasedAirUnitRuntimeState {
     pub calc_cooling_economizer_condition: PurchasedAirCalcCoolingEconomizerConditionRuntimeState,
     /// Persistent bounded cooling economizer true-body state.
     pub calc_cooling_economizer_body: PurchasedAirCalcCoolingEconomizerBodyRuntimeState,
+    /// Persistent bounded cooling sensible-flow state.
+    pub calc_cooling_sensible_flow: PurchasedAirCalcCoolingSensibleFlowRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -238,6 +261,9 @@ impl PurchasedAirUnitRuntimeState {
             calc_cooling_economizer_condition:
                 PurchasedAirCalcCoolingEconomizerConditionRuntimeState::new(system),
             calc_cooling_economizer_body: PurchasedAirCalcCoolingEconomizerBodyRuntimeState::new(
+                system,
+            ),
+            calc_cooling_sensible_flow: PurchasedAirCalcCoolingSensibleFlowRuntimeState::new(
                 system,
             ),
             rejected_exhaust_node: None,

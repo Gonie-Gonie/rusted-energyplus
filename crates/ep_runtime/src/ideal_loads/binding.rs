@@ -28,6 +28,7 @@ use super::{
     PurchasedAirCalcCoolingEntryGateError, PurchasedAirCalcCoolingEntryGateSnapshot,
     PurchasedAirCalcCoolingOaMaxFlowBodyError, PurchasedAirCalcCoolingOaMaxFlowBodySnapshot,
     PurchasedAirCalcCoolingOaMaxFlowGateError, PurchasedAirCalcCoolingOaMaxFlowGateSnapshot,
+    PurchasedAirCalcCoolingSensibleFlowError, PurchasedAirCalcCoolingSensibleFlowSnapshot,
     PurchasedAirCalcEntryContext, PurchasedAirCalcEntryError, PurchasedAirCalcEntrySnapshot,
     PurchasedAirCalcMinimumOaPrefixError, PurchasedAirCalcMinimumOaPrefixSnapshot,
     PurchasedAirHardSizeLegacyContext, PurchasedAirInitCallContext, PurchasedAirInitError,
@@ -39,10 +40,10 @@ use super::{
     advance_direct_no_oa_calc_cooling_entry_gate,
     advance_direct_no_oa_calc_cooling_oa_max_flow_body,
     advance_direct_no_oa_calc_cooling_oa_max_flow_gate,
-    advance_direct_no_oa_calc_minimum_oa_prefix, advance_purchased_air_calc_entry,
-    classify_no_oa_sensible_subset, complete_direct_zone_purchased_air_coupling,
-    init_purchased_air_runtime, predict_direct_zone_demand_for_purchased_air,
-    select_purchased_air_branch,
+    advance_direct_no_oa_calc_cooling_sensible_flow, advance_direct_no_oa_calc_minimum_oa_prefix,
+    advance_purchased_air_calc_entry, classify_no_oa_sensible_subset,
+    complete_direct_zone_purchased_air_coupling, init_purchased_air_runtime,
+    predict_direct_zone_demand_for_purchased_air, select_purchased_air_branch,
 };
 
 /// One-to-one relation required by the bounded direct-Zone binding.
@@ -594,6 +595,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingEconomizerCondition(PurchasedAirCalcCoolingEconomizerConditionError),
     /// The bounded cooling economizer true body rejected its release state.
     CalculationCoolingEconomizerBody(PurchasedAirCalcCoolingEconomizerBodyError),
+    /// The bounded cooling sensible-flow calculation rejected its release state.
+    CalculationCoolingSensibleFlow(PurchasedAirCalcCoolingSensibleFlowError),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -680,6 +683,8 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
         PurchasedAirCalcCoolingEconomizerConditionSnapshot,
     /// Source-ordered cooling economizer true-body snapshot.
     pub calculation_cooling_economizer_body: PurchasedAirCalcCoolingEconomizerBodySnapshot,
+    /// Source-ordered cooling sensible-flow snapshot.
+    pub calculation_cooling_sensible_flow: PurchasedAirCalcCoolingSensibleFlowSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
@@ -858,6 +863,13 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_economizer_condition,
     )
     .map_err(DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingEconomizerBody)?;
+    let calculation_cooling_sensible_flow = advance_direct_no_oa_calc_cooling_sensible_flow(
+        input.purchased_air_runtime_state,
+        binding.system,
+        calculation_cooling_economizer_body,
+        &*input.zone_state,
+    )
+    .map_err(DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingSensibleFlow)?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -903,6 +915,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_economizer_guard,
         calculation_cooling_economizer_condition,
         calculation_cooling_economizer_body,
+        calculation_cooling_sensible_flow,
         coupling,
     })
 }

@@ -5,6 +5,9 @@ mod cooling_economizer_guard;
 mod cooling_economizer_condition;
 // CP317 follows the CP316 condition in source order.
 mod cooling_economizer_body;
+// CP318 follows the CP317 economizer body in source order.
+mod cooling_sensible_flow;
+// Earlier compatibility helpers remain grouped below the bounded source slices.
 mod cooling_entry_gate;
 mod cooling_oa_max_flow_body;
 mod cooling_oa_max_flow_gate;
@@ -30,6 +33,12 @@ mod cooling_economizer_condition_tests;
 mod cooling_economizer_body_release_tests;
 #[cfg(test)]
 mod cooling_economizer_body_tests;
+// CP318 tests follow the CP317 characterization module in source order.
+#[cfg(test)]
+mod cooling_sensible_flow_release_tests;
+#[cfg(test)]
+mod cooling_sensible_flow_tests;
+// Earlier compatibility tests remain grouped below the bounded source slices.
 #[cfg(test)]
 mod cooling_entry_gate_tests;
 #[cfg(test)]
@@ -51,6 +60,10 @@ pub use cooling_economizer_condition::*;
 // CP317 exports follow the CP316 condition contract in source order.
 pub(in crate::ideal_loads) use cooling_economizer_body::release::body_snapshot_is_exact_direct_release as cooling_economizer_body_snapshot_is_exact_direct_release;
 pub use cooling_economizer_body::*;
+// CP318 exports follow the CP317 body contract in source order.
+pub(in crate::ideal_loads) use cooling_sensible_flow::release::cooling_sensible_flow_snapshot_is_exact_direct_release;
+pub use cooling_sensible_flow::*;
+// Earlier compatibility exports remain grouped below the bounded source slices.
 pub use cooling_entry_gate::*;
 pub use cooling_oa_max_flow_body::*;
 pub use cooling_oa_max_flow_gate::*;
