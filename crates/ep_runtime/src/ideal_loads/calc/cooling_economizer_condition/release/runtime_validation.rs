@@ -274,7 +274,7 @@ fn guard_history_is_consistent(
         && guard.no_economizer_fallthrough_count == guard.guard_evaluation_count
 }
 
-fn condition_snapshot_is_exact_direct_release(
+pub(super) fn condition_snapshot_is_exact_direct_release(
     snapshot: PurchasedAirCalcCoolingEconomizerConditionSnapshot,
 ) -> bool {
     let provenance = snapshot.source == PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_SOURCE
@@ -344,7 +344,7 @@ fn condition_snapshot_sites_are_skipped(
         && !snapshot.economizer_condition_fallthrough
 }
 
-fn condition_source_counters_are_zero(
+pub(super) fn condition_source_counters_are_zero(
     state: &PurchasedAirCalcCoolingEconomizerConditionRuntimeState,
 ) -> bool {
     state.differential_dry_bulb_economizer_type_read_count == 0
@@ -432,7 +432,7 @@ fn guard_latest_route_is_recorded(
     }
 }
 
-fn condition_snapshot_route(
+pub(super) fn condition_snapshot_route(
     latest: PurchasedAirCalcCoolingEconomizerConditionSnapshot,
 ) -> Option<PurchasedAirCalcCoolingEconomizerConditionRetainedRoute> {
     match (

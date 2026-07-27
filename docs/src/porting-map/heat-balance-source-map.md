@@ -33471,8 +33471,8 @@ evidence, conformance, and Roadmap state remain unchanged.
 The direct-Zone order is now predictor -> persistent Init -> CP310 Calc entry
 -> CP311 minimum-OA prefix -> CP312 cooling-entry gate -> CP313 cooling OA
 maximum-flow guard -> CP314 true-body lifecycle -> CP315 economizer outer
-guard -> CP316 economizer condition -> existing bounded Calc -> update/report
--> same-step Zone-air corrector. CP312 covers only
+guard -> CP316 economizer condition -> CP317 economizer true body -> existing
+bounded Calc -> update/report -> same-step Zone-air corrector. CP312 covers only
 `CalcPurchAirLoads` lines 2046-2047. It consumes the retained CP310 demand and
 CP311 minimum-OA output, applies the inclusive comparison, conditionally
 records the Zone temperature-control-type read, excludes exact SingleHeat, and
@@ -33594,16 +33594,51 @@ comparisons, and economizer calculation-body entries before the unchanged
 bounded numerical result and same-step Zone-air corrector run.
 
 Lines 2087-2088 are non-executable, making line 2089 the lexical first
-excluded executable. A true condition reaches line 2089 and a false condition
-reaches line 2109. `PsyCpAirFnW`, `DeltaT`, supply and outdoor-air flow
-calculation, limiting or mutation, `EconoOn`, `TimeEconoActive`, line 2109 and
-all later cooling work remain excluded. CP316 neither calls nor connects the
-separate outdoor-air economizer helper. This condition-only lifecycle adds no
-heat-balance or predictor equation, live OA/economizer state, node service,
-numerical behavior, or conformance support. Both parents remain
-`scaffold`/`none`, the Calc routine remains `source_mapped`, and
-algorithm/routine counts, inventory/readiness, required or forbidden features,
-evidence, numerical conformance, and Roadmap state remain unchanged.
+excluded executable. A true condition reaches CP317 at line 2089 and a false
+condition reaches line 2109. CP316 maps neither continuation and neither calls
+nor connects the separate outdoor-air economizer helper. This condition-only
+lifecycle adds no heat-balance or predictor equation, live OA/economizer
+state, node service, numerical behavior, or conformance support.
+
+## CP317 Cooling Economizer True Body Inside the Heat-Balance Loop
+
+CP317 maps only `CalcPurchAirLoads` lines 2089-2101 after CP316. Internal
+characterization reads the pre-sampled Zone humidity ratio, evaluates the
+canonical `energyplus_psy_cp_air_fn_w` scalar, assigns `CpAir`, reads the two
+temperatures, assigns outdoor-minus-Zone `DeltaT`, and re-reads it for the
+strict `DeltaT < -SmallTempDiff` gate. Only the true route reads `QZnCoolSP`,
+re-reads `CpAir` and `DeltaT` for the two left-associated divisions, and
+assigns initial supply mass flow. Repeated `CoolingLimit` reads preserve the
+`FlowRate` then conditionally `FlowRateAndCapacity` selector order. A matched
+selector reads the maximum for its positive guard; the clamp body re-reads
+supply flow and then the maximum upper bound before assigning clamped flow.
+The post-limit supply flow is read before outdoor-air mass flow for the strict
+`>` comparison. Only a satisfied comparison assigns `EconoOn`, re-reads
+supply flow for outdoor-air mass-flow assignment, and reads `TimeStepSys`
+before assigning `TimeEconoActive`. The scalar characterization excludes the
+source static `dwSave`/`cpaSave` cache, initial `-100.0` sentinel, cache-hit or
+cache-miss identity, and concurrent cache lifecycle.
+
+The exact heat-balance release loop remains no-OA, so CP315 is false and CP316
+never enters the mapped body. Every CP317 release transition therefore skips
+all source sites. Per-step and lifecycle firewalls reconcile one complete skip
+per CP316 transition and zero humidity/temperature reads, psychrometric calls,
+delta/load/flow calculations, selector/limit reads or comparisons, clamps,
+outdoor-air comparisons or assignments, economizer assignments, and timestep
+reads before the unchanged bounded numerical result and same-step Zone-air
+corrector run.
+
+Line 2100 is the last executable CP317 statement and line 2101 closes its
+innermost body. Lines 2102-2105 are closing delimiters and lines 2107-2108 are
+comments, so line 2109 is the lexical first excluded executable. The
+line-2109 cooling-flow reset and all later cooling work remain excluded. CP317
+neither calls nor connects the separate outdoor-air economizer helper.
+Pre-sampled characterization adds no heat-balance or predictor equation, live
+OA/economizer state, node service, numerical behavior, or conformance support.
+Both parents remain `scaffold`/`none`, the Calc routine remains
+`source_mapped`, and the 32-algorithm/293-routine inventory, readiness,
+required or forbidden features, evidence, numerical conformance, and Roadmap
+state remain unchanged.
 
 ## Data Structure Map
 

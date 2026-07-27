@@ -437,9 +437,9 @@ short-circuit order: compare a first `EconomizerType` read with
 node temperatures and applies strict `<`; only a false dry-bulb conjunction
 re-reads `EconomizerType` for `DifferentialEnthalpy`; and only that selector
 reads the two stored node enthalpies and applies strict `<`. A true disjunction
-would enter the first excluded executable at line 2089. A false disjunction
-continues at line 2109; lines 2087-2088 are non-executable whitespace and
-comment text.
+continues to CP317 at CP316's first excluded executable, line 2089. A false
+disjunction continues at line 2109; lines 2087-2088 are non-executable
+whitespace and comment text.
 
 `calc/cooling_economizer_condition.rs` owns
 `PurchasedAirCalcCoolingEconomizerConditionSnapshot`,
@@ -449,7 +449,7 @@ boundary owns `PurchasedAirCalcCoolingEconomizerConditionError` and
 `advance_direct_no_oa_calc_cooling_economizer_condition`. The parent module
 owns `purchased_air_calc_cooling_economizer_condition_lifecycle_summary`.
 
-The binder orders CP316 after CP315 and before the existing numerical Calc.
+The binder orders CP316 after CP315 and before CP317.
 The exact no-OA release always arrives with CP315's false `NoEconomizer`
 result, so every CP316 transition is a complete source-site skip: zero
 dry-bulb and enthalpy selector reads, zero temperature or stored-enthalpy
@@ -460,15 +460,56 @@ direct release lane, and reject disconnected or non-direct evidence.
 Pre-sampled scalar inputs used by pure internal characterization do not grant
 live Node or outdoor-air service ownership.
 
-`PsyCpAirFnW`, `DeltaT`, supply- and outdoor-air flow calculation, limiting,
-or mutation, `EconoOn`, `TimeEconoActive`, line 2109 itself, and all later
-Calc numerics remain open. CP316 does not call or promote the separate
-outdoor-air economizer helper, which recomputes enthalpy and implements later
-effects outside this predicate-only slice. OA and Economizer stay forbidden
-for this release path. Both parents and the Calc routine retain their current
-status; algorithm/routine inventory and readiness counts, support level,
-required and forbidden features, evidence cases, numerical conformance, and
-Roadmap state remain unchanged.
+CP317 maps the cooling-economizer true body at lines 2089-2101. Internal
+characterization reads the Zone humidity ratio, evaluates the canonical
+`energyplus_psy_cp_air_fn_w` scalar result, and assigns local `CpAir`; it then
+reads outdoor- and Zone-node temperatures, subtracts them, assigns local
+`DeltaT`, and re-reads `DeltaT` for the strict
+`DeltaT < -SmallTempDiff` gate. Only the true route reads `QZnCoolSP`, re-reads
+`CpAir`, performs the first division, re-reads `DeltaT`, performs the second
+division, and assigns initial `SupplyMassFlowRate`. The two `CoolingLimit`
+comparisons preserve repeated enum reads and source `||`/`&&` short-circuiting.
+Only a matched selector reads and tests `MaxCoolMassFlowRate`; only a positive
+maximum re-reads supply flow for the inner maximum, re-reads
+`MaxCoolMassFlowRate` as the outer-minimum upper bound, and assigns the clamped
+flow. The resulting supply flow is read before outdoor-air mass flow for the
+strict `>` comparison. Only a satisfied comparison assigns `EconoOn`, re-reads
+supply flow for the outdoor-air assignment, reads `TimeStepSys`, and assigns
+`TimeEconoActive`. This pure characterization locks the psychrometric scalar
+result only: the source static `dwSave`/`cpaSave` cache, initial `-100.0`
+sentinel, cache-hit/miss identity, and concurrent cache lifecycle remain
+excluded.
+
+`calc/cooling_economizer_body.rs` owns
+`PurchasedAirCalcCoolingEconomizerBodySnapshot` and
+`PurchasedAirCalcCoolingEconomizerBodyLifecycleSummary`;
+`calc/cooling_economizer_body/state.rs` owns
+`PurchasedAirCalcCoolingEconomizerBodyRuntimeState`; the release boundary
+owns `PurchasedAirCalcCoolingEconomizerBodyError` and
+`advance_direct_no_oa_calc_cooling_economizer_body`. The parent module owns
+`purchased_air_calc_cooling_economizer_body_lifecycle_summary`.
+
+The binder orders CP317 after CP316 and before the existing numerical Calc.
+The exact no-OA release always consumes a CP316 snapshot whose calculation
+body was not entered, so every CP317 transition is a complete source-site
+skip: zero humidity or temperature reads, psychrometric calls, delta/load/flow
+calculations, selector or limit reads and comparisons, clamps, outdoor-air
+comparisons or assignments, economizer assignments, and timestep reads.
+Per-step, lifecycle, and pipeline firewalls reconcile that one-for-one skip,
+publish `purchased_air_calc_cooling_economizer_body_lifecycle` only for the
+direct release lane, and reject disconnected or non-direct evidence.
+Pre-sampled scalar inputs used by pure internal characterization do not grant
+live Node, outdoor-air, or economizer service ownership.
+
+Line 2100 is CP317's last executable statement and line 2101 closes its
+innermost body. Lines 2102-2105 are closing delimiters and lines 2107-2108 are
+comments, so line 2109 is the first excluded executable. The line-2109
+cooling-flow reset and all later Calc numerics remain open. CP317 does not call
+or promote the separate outdoor-air economizer helper. OA and Economizer stay
+forbidden for this release path. Both parents and the Calc routine retain
+their current status; the 32-algorithm and 293-routine inventory, readiness
+counts, support level, required and forbidden features, evidence cases,
+numerical conformance, and Roadmap state remain unchanged.
 
 ## Current Launcher State
 

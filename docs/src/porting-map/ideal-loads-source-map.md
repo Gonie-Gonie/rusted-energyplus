@@ -120,7 +120,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP305-CP309 bounded release slice: `crates/ep_runtime/src/ideal_loads/init/manager_plan.rs::PurchasedAirInitManagerPlan` eagerly resolves the immutable declaration-order membership plan; `topology_plan.rs::PurchasedAirInitTopologyPlan` resolves selected-unit topology; `state.rs::PurchasedAirRuntimeState` retains manager, per-unit lifecycle, the four-field sizing overlay, and the bounded global diagnostic registry; `topology_transition.rs::advance_selected_unit_topology`, `transition.rs::init_purchased_air_runtime`, and `supply_temperature_diagnostic.rs::advance_supply_temperature_diagnostics` execute the ordered persistent transitions through the hard-size child, BeginEnvrn, and supply-temperature suffix; and `summary.rs::PurchasedAirInitLifecycleSummary` plus `transition.rs::purchased_air_init_lifecycle_summary` report manager, selected-unit, sizing, and diagnostic evidence for JSON projection. Diagnostic adapters retain `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` only. |
 | `DataZoneEquipment::CheckZoneEquipmentList` | `src/EnergyPlus/DataZoneEquipment.cc` | CP306 `PurchasedAirInitManagerPlan::from_model` eagerly resolves bounded membership in retained Zone order through each Zone's EquipmentConnection and referenced list entries, ignoring unreferenced lists. The matched-list ID is Rust diagnostic evidence; this `InitPurchasedAir` call observes only the Boolean return and does not request optional `CtrlZoneNum`. Runtime Init defers only latch and outcome recording. |
 | `PurchasedAirManager::SizePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP308 `crates/ep_runtime/src/ideal_loads/sizing.rs::size_purchased_air_direct_hard_sized_legacy_route` and `PurchasedAirHardSizeLegacyOutcome` map only the direct hard-sized/no-Zone-sizing-run legacy route; `crates/ep_runtime/src/ideal_loads/dispatch.rs::IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` continues to block Autosize and broader sizing. |
-| `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | CP310 `crates/ep_runtime/src/ideal_loads/calc/lifecycle.rs::{advance_purchased_air_calc_entry,purchased_air_calc_entry_lifecycle_summary}` maps the line-1967 alias plus lines 1971-2022 entry prefix. CP311 `crates/ep_runtime/src/ideal_loads/calc/minimum_oa_prefix.rs::{advance_direct_no_oa_calc_minimum_oa_prefix,purchased_air_calc_minimum_oa_prefix_lifecycle_summary}` maps the lines 2023-2040 parent prefix only for the no-OA/no-EMS release route. CP312 `crates/ep_runtime/src/ideal_loads/calc/cooling_entry_gate/release.rs::advance_direct_no_oa_calc_cooling_entry_gate` plus `calc/cooling_entry_gate.rs::purchased_air_calc_cooling_entry_gate_lifecycle_summary` maps only the lines 2046-2047 cooling-entry gate. CP313 `crates/ep_runtime/src/ideal_loads/calc/cooling_oa_max_flow_gate/release.rs::advance_direct_no_oa_calc_cooling_oa_max_flow_gate` plus `calc/cooling_oa_max_flow_gate.rs::purchased_air_calc_cooling_oa_max_flow_gate_lifecycle_summary` maps only the lines 2056-2057 cooling OA maximum-flow guard. CP314 `crates/ep_runtime/src/ideal_loads/calc/cooling_oa_max_flow_body/release.rs::advance_direct_no_oa_calc_cooling_oa_max_flow_body` plus `calc/cooling_oa_max_flow_body.rs::purchased_air_calc_cooling_oa_max_flow_body_lifecycle_summary` maps only the lines 2058-2078 true-body lifecycle. CP315 `crates/ep_runtime/src/ideal_loads/calc/cooling_economizer_guard/release.rs::advance_direct_no_oa_calc_cooling_economizer_guard` plus `calc/cooling_economizer_guard.rs::purchased_air_calc_cooling_economizer_guard_lifecycle_summary` maps only the executable line-2082 outer economizer guard. CP316 `crates/ep_runtime/src/ideal_loads/calc/cooling_economizer_condition/release.rs::advance_direct_no_oa_calc_cooling_economizer_condition` plus `calc/cooling_economizer_condition.rs::purchased_air_calc_cooling_economizer_condition_lifecycle_summary` maps only the executable lines 2083-2086 compound economizer condition. Existing `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` owns the later bounded no-OA sensible calculation and remains a distinct numerical DTO. |
+| `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | CP310 `crates/ep_runtime/src/ideal_loads/calc/lifecycle.rs::{advance_purchased_air_calc_entry,purchased_air_calc_entry_lifecycle_summary}` maps the line-1967 alias plus lines 1971-2022 entry prefix. CP311 `crates/ep_runtime/src/ideal_loads/calc/minimum_oa_prefix.rs::{advance_direct_no_oa_calc_minimum_oa_prefix,purchased_air_calc_minimum_oa_prefix_lifecycle_summary}` maps the lines 2023-2040 parent prefix only for the no-OA/no-EMS release route. CP312 `crates/ep_runtime/src/ideal_loads/calc/cooling_entry_gate/release.rs::advance_direct_no_oa_calc_cooling_entry_gate` plus `calc/cooling_entry_gate.rs::purchased_air_calc_cooling_entry_gate_lifecycle_summary` maps only the lines 2046-2047 cooling-entry gate. CP313 `crates/ep_runtime/src/ideal_loads/calc/cooling_oa_max_flow_gate/release.rs::advance_direct_no_oa_calc_cooling_oa_max_flow_gate` plus `calc/cooling_oa_max_flow_gate.rs::purchased_air_calc_cooling_oa_max_flow_gate_lifecycle_summary` maps only the lines 2056-2057 cooling OA maximum-flow guard. CP314 `crates/ep_runtime/src/ideal_loads/calc/cooling_oa_max_flow_body/release.rs::advance_direct_no_oa_calc_cooling_oa_max_flow_body` plus `calc/cooling_oa_max_flow_body.rs::purchased_air_calc_cooling_oa_max_flow_body_lifecycle_summary` maps only the lines 2058-2078 true-body lifecycle. CP315 `crates/ep_runtime/src/ideal_loads/calc/cooling_economizer_guard/release.rs::advance_direct_no_oa_calc_cooling_economizer_guard` plus `calc/cooling_economizer_guard.rs::purchased_air_calc_cooling_economizer_guard_lifecycle_summary` maps only the executable line-2082 outer economizer guard. CP316 `crates/ep_runtime/src/ideal_loads/calc/cooling_economizer_condition/release.rs::advance_direct_no_oa_calc_cooling_economizer_condition` plus `calc/cooling_economizer_condition.rs::purchased_air_calc_cooling_economizer_condition_lifecycle_summary` maps only the executable lines 2083-2086 compound economizer condition. CP317 `crates/ep_runtime/src/ideal_loads/calc/cooling_economizer_body/release.rs::advance_direct_no_oa_calc_cooling_economizer_body` plus `calc/cooling_economizer_body.rs::purchased_air_calc_cooling_economizer_body_lifecycle_summary` maps only the lines 2089-2101 true-body lifecycle. Existing `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` owns the later bounded no-OA sensible calculation and remains a distinct numerical DTO. |
 | `PurchasedAirManager::CalcPurchAirMinOAMassFlow` | `src/EnergyPlus/PurchasedAirManager.cc` | CP311 reaches the child from its source parent and maps only the no-OA lines 2781, 2783, 2785, and 2806-2809 retained-zero route in `calc/minimum_oa_prefix.rs`; the separate diagnostic `crates/ep_runtime/src/ideal_loads/outdoor_air/minimum_flow.rs::resolve_minimum_outdoor_air_compat`, orchestrated by `sim_purchased_air_outdoor_air_compat`, remains immutable and is not full child lifecycle parity. |
 | `PurchasedAirManager::UpdatePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/update.rs::supply_node_update_from_result`; CP300 `DirectZonePurchasedAirSystemFeedback` consumes that immutable payload for a bounded one-inlet correction projection, not the full source node/plenum lifecycle |
 | `PurchasedAirManager::ReportPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/report.rs::IdealLoadsReportSnapshot`; `crates/ep_runtime/src/output/meter_registry.rs::meter_rate_to_energy_j`; CP302 `coupled_output.rs::append_direct_zone_purchased_air_hourly_output_series` averages fixed-step rate/node values and sums rate-times-step energy only for the bounded coupled runtime |
@@ -18721,8 +18721,8 @@ lifecycle summary, and summary accessor. Its release submodule owns
 `PurchasedAirCalcCoolingEconomizerConditionError` and
 `advance_direct_no_oa_calc_cooling_economizer_condition`.
 
-The exact release binder orders CP316 after CP315 and before the existing
-numerical Calc. Exact no-OA release always consumes a false CP315
+The exact release binder orders CP316 after CP315 and before CP317. Exact
+no-OA release always consumes a false CP315
 `NoEconomizer` predecessor. Every CP316 transition is consequently a complete
 condition-site skip, with zero selector enum reads, node temperature or stored
 enthalpy reads, strict comparisons, satisfied comparisons, and economizer
@@ -18733,17 +18733,65 @@ JSON; and reject non-direct or disconnected evidence.
 
 Lines 2087-2088 are non-executable. The lexical first excluded executable is
 line 2089, `CpAir = PsyCpAirFnW(thisZoneHB.airHumRat)`. A true condition
-continues there, while a false condition continues at line 2109. CP316 maps
-neither continuation. `PsyCpAirFnW`, `DeltaT`, supply/OA flow calculation,
-limiting and mutation, `EconoOn`, `TimeEconoActive`, line 2109 and all later
-Calc behavior remain excluded. The separate outdoor-air economizer helper is
-not called or connected; its enthalpy recomputation and later flow effects are
-outside this stored-value predicate slice. This adds condition-only lifecycle
-evidence, not live OA/economizer ownership, numerical behavior, or capability
-support. Both parents remain `scaffold`/`none`, the Calc routine remains
-`source_mapped`, and algorithm/routine counts, inventory/readiness, required
-or forbidden features, evidence cases, conformance, and Roadmap state do not
-change.
+continues to CP317 there, while a false condition continues at line 2109.
+CP316 maps neither continuation. The separate outdoor-air economizer helper
+is not called or connected; its enthalpy recomputation and later flow effects
+are outside this stored-value predicate slice. This adds condition-only
+lifecycle evidence, not live OA/economizer ownership, numerical behavior, or
+capability support.
+
+## CP317 Cooling Economizer True Body
+
+CP317 maps only the true body at lines 2089-2101. Internal characterization
+reads the Zone humidity ratio, evaluates the canonical
+`energyplus_psy_cp_air_fn_w` scalar, and assigns local `CpAir`; it reads
+outdoor- and Zone-node temperatures, subtracts them, assigns local `DeltaT`,
+and re-reads that local for strict `DeltaT < -SmallTempDiff`. A satisfied
+comparison reads `QZnCoolSP`, re-reads `CpAir`, performs the first division,
+re-reads `DeltaT`, performs the second division, and assigns initial supply
+mass flow, preserving source left-associative division.
+
+The optional limit condition reads `CoolingLimit` first for `FlowRate` and
+re-reads it for `FlowRateAndCapacity` only after the first comparison is false.
+Only a selector match reads `MaxCoolMassFlowRate`; only a positive maximum
+re-reads supply flow for the inner maximum, re-reads the maximum as the
+outer-minimum upper bound, and assigns the clamped flow. After any
+true-`DeltaT` route, the resulting supply flow is read before outdoor-air mass
+flow and compared strictly `>` with it. Only a satisfied comparison sets
+`EconoOn`, re-reads supply flow for the outdoor-air assignment, reads
+`TimeStepSys`, and assigns `TimeEconoActive`. Pre-sampled scalar
+characterization preserves raw IEEE and short-circuit behavior without
+claiming live Node, heat-balance, or outdoor-air service access. It covers the
+psychrometric scalar result only; source static `dwSave`/`cpaSave` cache state,
+the initial `-100.0` sentinel, cache-hit/miss identity, and concurrent cache
+lifecycle remain excluded.
+
+`calc/cooling_economizer_body.rs` owns the snapshot, lifecycle summary, and
+summary accessor; `calc/cooling_economizer_body/state.rs` owns the runtime
+state. The release submodule owns
+`PurchasedAirCalcCoolingEconomizerBodyError` and
+`advance_direct_no_oa_calc_cooling_economizer_body`. The exact release binder
+orders CP317 after CP316 and before the existing numerical Calc. Exact no-OA
+release always consumes a CP316 predecessor whose calculation body was not
+entered. Every CP317 transition is consequently a complete body skip, with
+zero humidity or temperature reads, psychrometric calls, delta/load/flow
+calculations, selector or limit reads and comparisons, clamps, outdoor-air
+comparisons or assignments, economizer assignments, and timestep reads.
+Per-step, lifecycle, and pipeline firewalls reconcile that one-for-one
+CP316-to-CP317 skip; expose
+`purchased_air_calc_cooling_economizer_body_lifecycle` in direct-only JSON;
+and reject non-direct or disconnected evidence.
+
+Line 2100 is the last executable statement in the mapped body and line 2101
+closes its inner conditional. Lines 2102-2105 are closing delimiters and lines
+2107-2108 are comments, so line 2109 is the lexical first excluded executable.
+The line-2109 cooling-flow reset and all later Calc behavior remain excluded.
+The separate outdoor-air economizer helper remains disconnected. This adds
+source-ordered lifecycle evidence, not live OA/economizer ownership, numerical
+behavior, or capability support. Both parents remain `scaffold`/`none`, the
+Calc routine remains `source_mapped`, and the 32-algorithm/293-routine
+inventory, readiness, required or forbidden features, evidence cases,
+conformance, and Roadmap state do not change.
 
 ## Claim Requirements
 

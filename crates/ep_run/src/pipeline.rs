@@ -20,7 +20,8 @@ use ep_runtime::{
     IdealLoadsCompatibilityOptions, NodeStateProjectionOptions,
     PURCHASED_AIR_CALC_ENTRY_RESET_TARGETS, PURCHASED_AIR_CALC_ENTRY_SOURCE,
     PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
-    PurchasedAirAvailabilityStatus, PurchasedAirCalcCoolingEconomizerConditionLifecycleSummary,
+    PurchasedAirAvailabilityStatus, PurchasedAirCalcCoolingEconomizerBodyLifecycleSummary,
+    PurchasedAirCalcCoolingEconomizerConditionLifecycleSummary,
     PurchasedAirCalcCoolingEconomizerGuardLifecycleSummary,
     PurchasedAirCalcCoolingEntryGateLifecycleSummary,
     PurchasedAirCalcCoolingOaMaxFlowBodyLifecycleSummary,
@@ -58,6 +59,7 @@ use crate::{
     TraceSelection, assess_support,
 };
 
+mod purchased_air_cooling_economizer_body;
 mod purchased_air_cooling_economizer_condition;
 mod purchased_air_cooling_economizer_guard;
 mod purchased_air_cooling_entry_gate;
@@ -178,6 +180,8 @@ struct RustRuntimeResult {
         Option<PurchasedAirCalcCoolingEconomizerGuardLifecycleSummary>,
     purchased_air_calc_cooling_economizer_condition_lifecycle:
         Option<PurchasedAirCalcCoolingEconomizerConditionLifecycleSummary>,
+    purchased_air_calc_cooling_economizer_body_lifecycle:
+        Option<PurchasedAirCalcCoolingEconomizerBodyLifecycleSummary>,
 }
 
 struct PreparedRuntimeInputs {
@@ -1238,6 +1242,10 @@ fn finish_successful_summary(
                 .purchased_air_calc_cooling_economizer_condition_lifecycle
                 .as_ref()
                 .map(purchased_air_cooling_economizer_condition::lifecycle_json),
+            "purchased_air_calc_cooling_economizer_body_lifecycle": result
+                .purchased_air_calc_cooling_economizer_body_lifecycle
+                .as_ref()
+                .map(purchased_air_cooling_economizer_body::lifecycle_json),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
@@ -2132,6 +2140,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_oa_max_flow_body_lifecycle: None,
                 purchased_air_calc_cooling_economizer_guard_lifecycle: None,
                 purchased_air_calc_cooling_economizer_condition_lifecycle: None,
+                purchased_air_calc_cooling_economizer_body_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
@@ -2187,6 +2196,8 @@ fn execute_rust_runtime(
                     .summary
                     .calc_cooling_economizer_condition_lifecycle,
             );
+            let purchased_air_calc_cooling_economizer_body_lifecycle =
+                Some(simulation.summary.calc_cooling_economizer_body_lifecycle);
             Ok(RustRuntimeResult {
                 results: simulation.results,
                 runtime_class,
@@ -2209,6 +2220,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_oa_max_flow_body_lifecycle,
                 purchased_air_calc_cooling_economizer_guard_lifecycle,
                 purchased_air_calc_cooling_economizer_condition_lifecycle,
+                purchased_air_calc_cooling_economizer_body_lifecycle,
             })
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
@@ -2241,6 +2253,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_oa_max_flow_body_lifecycle: None,
                 purchased_air_calc_cooling_economizer_guard_lifecycle: None,
                 purchased_air_calc_cooling_economizer_condition_lifecycle: None,
+                purchased_air_calc_cooling_economizer_body_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
@@ -2271,6 +2284,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_oa_max_flow_body_lifecycle: None,
                 purchased_air_calc_cooling_economizer_guard_lifecycle: None,
                 purchased_air_calc_cooling_economizer_condition_lifecycle: None,
+                purchased_air_calc_cooling_economizer_body_lifecycle: None,
             })
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
@@ -2360,6 +2374,16 @@ fn validate_runtime_demand_provenance(
             init_lifecycle,
             result.purchased_air_coupling_call_count,
         )?;
+        purchased_air_cooling_economizer_body::validate_direct_lifecycle(
+            result
+                .purchased_air_calc_cooling_economizer_body_lifecycle
+                .as_ref(),
+            result
+                .purchased_air_calc_cooling_economizer_condition_lifecycle
+                .as_ref(),
+            init_lifecycle,
+            result.purchased_air_coupling_call_count,
+        )?;
     } else if result.purchased_air_init_lifecycle.is_some()
         || result.purchased_air_calc_entry_lifecycle.is_some()
         || result
@@ -2379,6 +2403,9 @@ fn validate_runtime_demand_provenance(
             .is_some()
         || result
             .purchased_air_calc_cooling_economizer_condition_lifecycle
+            .is_some()
+        || result
+            .purchased_air_calc_cooling_economizer_body_lifecycle
             .is_some()
         || result.purchased_air_coupling_call_count.is_some()
     {
@@ -3024,12 +3051,12 @@ mod tests {
     use super::{
         RustRuntimeResult, SourceOrderGateSummary, artifact_map, ctf_split_trace_enabled,
         execution_stage_snapshots, full_surface_trace_opt_in, input_error_diagnostic_code,
-        purchased_air_calc_entry_lifecycle_json, purchased_air_cooling_economizer_condition,
-        purchased_air_cooling_economizer_guard, purchased_air_cooling_entry_gate,
-        purchased_air_cooling_oa_max_flow, purchased_air_cooling_oa_max_flow_body,
-        purchased_air_init_lifecycle_json, purchased_air_minimum_oa,
-        runtime_class_requires_weather, schedule_cache_json, selected_trace_enabled,
-        source_order_gate_summary, source_order_stage_state_snapshots,
+        purchased_air_calc_entry_lifecycle_json, purchased_air_cooling_economizer_body,
+        purchased_air_cooling_economizer_condition, purchased_air_cooling_economizer_guard,
+        purchased_air_cooling_entry_gate, purchased_air_cooling_oa_max_flow,
+        purchased_air_cooling_oa_max_flow_body, purchased_air_init_lifecycle_json,
+        purchased_air_minimum_oa, runtime_class_requires_weather, schedule_cache_json,
+        selected_trace_enabled, source_order_gate_summary, source_order_stage_state_snapshots,
         trace_level_enables_stage_snapshots, typed_counts,
         validate_direct_purchased_air_calc_entry_lifecycle,
         validate_direct_purchased_air_init_lifecycle, validate_runtime_demand_provenance,
@@ -3046,7 +3073,9 @@ mod tests {
     use ep_runtime::{
         DayType, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
         ExecutionStep, IDEAL_LOADS_FIXTURE_DEMAND_DIAGNOSTIC_SOURCE, IdealLoadsInitFlags,
-        IdealLoadsSensibleMode,
+        IdealLoadsSensibleMode, PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE_ORDER,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_SOURCE_ORDER,
@@ -3066,7 +3095,10 @@ mod tests {
         PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
-        PurchasedAirAvailabilityStatus, PurchasedAirCalcCoolingEconomizerConditionLifecycleSummary,
+        PurchasedAirAvailabilityStatus, PurchasedAirCalcCoolingEconomizerBodyLifecycleSummary,
+        PurchasedAirCalcCoolingEconomizerBodyRuntimeState,
+        PurchasedAirCalcCoolingEconomizerBodySnapshot,
+        PurchasedAirCalcCoolingEconomizerConditionLifecycleSummary,
         PurchasedAirCalcCoolingEconomizerConditionRuntimeState,
         PurchasedAirCalcCoolingEconomizerConditionSnapshot,
         PurchasedAirCalcCoolingEconomizerGuardLifecycleSummary,
@@ -4053,6 +4085,7 @@ mod tests {
             purchased_air_calc_cooling_oa_max_flow_body_lifecycle: None,
             purchased_air_calc_cooling_economizer_guard_lifecycle: None,
             purchased_air_calc_cooling_economizer_condition_lifecycle: None,
+            purchased_air_calc_cooling_economizer_body_lifecycle: None,
         };
         assert!(
             validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result)
@@ -4061,6 +4094,17 @@ mod tests {
 
         result.purchased_air_calc_cooling_economizer_condition_lifecycle =
             Some(valid_cooling_economizer_condition_lifecycle(1));
+        assert_eq!(
+            validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result),
+            Err(
+                "persistent PurchasedAir lifecycle evidence was attached to a non-direct runtime"
+                    .to_string()
+            )
+        );
+
+        result.purchased_air_calc_cooling_economizer_condition_lifecycle = None;
+        result.purchased_air_calc_cooling_economizer_body_lifecycle =
+            Some(valid_cooling_economizer_body_lifecycle(1));
         assert_eq!(
             validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result),
             Err(
@@ -4151,6 +4195,313 @@ mod tests {
         assert!(latest["economizer_condition_satisfied"].is_null());
         assert_eq!(latest["economizer_calculation_body_entered"], false);
         assert_eq!(latest["economizer_condition_fallthrough"], false);
+    }
+
+    #[test]
+    fn direct_release_cooling_economizer_body_validation_rejects_malformed_evidence() {
+        let init = valid_init_lifecycle(2);
+        let predecessor = valid_cooling_economizer_condition_lifecycle(2);
+        let valid = valid_cooling_economizer_body_lifecycle(2);
+        assert!(
+            purchased_air_cooling_economizer_body::validate_direct_lifecycle(
+                Some(&valid),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_ok()
+        );
+        assert!(
+            purchased_air_cooling_economizer_body::validate_direct_lifecycle(
+                None,
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_provenance = valid.clone();
+        wrong_provenance.first_excluded_source = PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE;
+        assert!(
+            purchased_air_cooling_economizer_body::validate_direct_lifecycle(
+                Some(&wrong_provenance),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_count = valid.clone();
+        wrong_count.state.zone_humidity_ratio_read_count = 1;
+        assert!(
+            purchased_air_cooling_economizer_body::validate_direct_lifecycle(
+                Some(&wrong_count),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_expanded_count = valid.clone();
+        wrong_expanded_count
+            .state
+            .maximum_cooling_air_mass_flow_rate_clamp_upper_bound_read_count = 1;
+        assert!(
+            purchased_air_cooling_economizer_body::validate_direct_lifecycle(
+                Some(&wrong_expanded_count),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_latest = valid.clone();
+        wrong_latest
+            .state
+            .latest
+            .as_mut()
+            .expect("valid latest cooling economizer body")
+            .zone_humidity_ratio_read = true;
+        assert!(
+            purchased_air_cooling_economizer_body::validate_direct_lifecycle(
+                Some(&wrong_latest),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_expanded_latest = valid.clone();
+        wrong_expanded_latest
+            .state
+            .latest
+            .as_mut()
+            .expect("valid latest cooling economizer body")
+            .cp_air_assigned = true;
+        assert!(
+            purchased_air_cooling_economizer_body::validate_direct_lifecycle(
+                Some(&wrong_expanded_latest),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_expanded_value = valid.clone();
+        wrong_expanded_value
+            .state
+            .latest
+            .as_mut()
+            .expect("valid latest cooling economizer body")
+            .maximum_cooling_air_mass_flow_rate_clamp_upper_bound_kg_per_s = Some(1.0);
+        assert!(
+            purchased_air_cooling_economizer_body::validate_direct_lifecycle(
+                Some(&wrong_expanded_value),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_predecessor_link = valid.clone();
+        wrong_predecessor_link
+            .state
+            .latest
+            .as_mut()
+            .expect("valid latest cooling economizer body")
+            .predecessor_no_economizer_fallthrough = false;
+        assert!(
+            purchased_air_cooling_economizer_body::validate_direct_lifecycle(
+                Some(&wrong_predecessor_link),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut overflowed_partition = valid;
+        overflowed_partition.state.unit_off_skip_count = usize::MAX;
+        overflowed_partition.state.non_cooling_skip_count = 1;
+        assert!(
+            purchased_air_cooling_economizer_body::validate_direct_lifecycle(
+                Some(&overflowed_partition),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn direct_release_cooling_economizer_body_json_exposes_zero_evidence_skip() {
+        let lifecycle = valid_cooling_economizer_body_lifecycle(2);
+        let value = purchased_air_cooling_economizer_body::lifecycle_json(&lifecycle);
+
+        assert_eq!(
+            value["source"],
+            PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE
+        );
+        assert_eq!(
+            value["first_excluded_source"],
+            PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE
+        );
+        assert_eq!(value["system"], 0);
+        assert_eq!(value["transition_count"], 2);
+        assert_eq!(value["body_execution_count"], 0);
+        assert_eq!(value["no_economizer_outer_guard_fallthrough_skip_count"], 2);
+        for field in [
+            "economizer_condition_fallthrough_skip_count",
+            "zone_humidity_ratio_read_count",
+            "psychrometric_cp_air_evaluation_count",
+            "cp_air_assignment_count",
+            "outdoor_air_temperature_read_count",
+            "zone_temperature_read_count",
+            "delta_temperature_calculation_count",
+            "delta_temperature_assignment_count",
+            "delta_temperature_for_gate_read_count",
+            "delta_temperature_comparison_count",
+            "delta_temperature_comparison_satisfied_count",
+            "delta_temperature_body_entry_count",
+            "delta_temperature_fallthrough_count",
+            "zone_cooling_setpoint_load_read_count",
+            "cp_air_for_first_division_read_count",
+            "zone_cooling_setpoint_load_over_cp_air_calculation_count",
+            "delta_temperature_for_second_division_read_count",
+            "supply_mass_flow_rate_calculation_count",
+            "initial_supply_mass_flow_rate_assignment_count",
+            "cooling_limit_flow_rate_read_count",
+            "cooling_limit_flow_rate_comparison_count",
+            "cooling_limit_flow_rate_match_count",
+            "cooling_limit_flow_rate_and_capacity_read_count",
+            "cooling_limit_flow_rate_and_capacity_comparison_count",
+            "cooling_limit_flow_rate_and_capacity_match_count",
+            "maximum_cooling_air_mass_flow_rate_read_count",
+            "maximum_cooling_air_mass_flow_rate_positive_comparison_count",
+            "maximum_cooling_air_mass_flow_rate_positive_count",
+            "maximum_flow_clamp_body_entry_count",
+            "supply_mass_flow_rate_for_clamp_read_count",
+            "inner_max_evaluation_count",
+            "maximum_cooling_air_mass_flow_rate_clamp_upper_bound_read_count",
+            "outer_min_evaluation_count",
+            "supply_mass_flow_rate_clamp_count",
+            "clamped_supply_mass_flow_rate_assignment_count",
+            "resulting_supply_mass_flow_rate_read_count",
+            "outdoor_air_mass_flow_rate_read_count",
+            "supply_above_outdoor_air_mass_flow_comparison_count",
+            "supply_above_outdoor_air_mass_flow_comparison_satisfied_count",
+            "economizer_activation_body_entry_count",
+            "outdoor_air_mass_flow_comparison_fallthrough_count",
+            "economizer_on_assignment_count",
+            "supply_mass_flow_rate_for_outdoor_air_assignment_read_count",
+            "outdoor_air_mass_flow_rate_assignment_count",
+            "system_time_step_read_count",
+            "economizer_active_time_assignment_count",
+        ] {
+            assert_eq!(value[field], 0, "{field}");
+        }
+
+        let latest = &value["latest"];
+        assert_eq!(latest["system"], 0);
+        assert_eq!(latest["controlled_zone"], 0);
+        assert_eq!(
+            latest["source_order"],
+            serde_json::json!(PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE_ORDER)
+        );
+        assert_eq!(latest["predecessor_no_economizer_fallthrough"], true);
+        assert_eq!(
+            latest["no_economizer_outer_guard_fallthrough_skipped"],
+            true
+        );
+        assert_eq!(latest["economizer_calculation_body_executed"], false);
+        for field in [
+            "zone_humidity_ratio_read",
+            "psychrometric_cp_air_evaluated",
+            "cp_air_assigned",
+            "outdoor_air_temperature_read",
+            "zone_temperature_read",
+            "delta_temperature_calculated",
+            "delta_temperature_assigned",
+            "delta_temperature_for_gate_read",
+            "delta_temperature_comparison_evaluated",
+            "delta_temperature_body_entered",
+            "zone_cooling_setpoint_load_read",
+            "cp_air_for_first_division_read",
+            "zone_cooling_setpoint_load_over_cp_air_calculated",
+            "delta_temperature_for_second_division_read",
+            "supply_mass_flow_rate_calculated",
+            "initial_supply_mass_flow_rate_assigned",
+            "cooling_limit_flow_rate_comparison_evaluated",
+            "cooling_limit_flow_rate_read",
+            "cooling_limit_flow_rate_and_capacity_comparison_evaluated",
+            "cooling_limit_flow_rate_and_capacity_read",
+            "maximum_cooling_air_mass_flow_rate_read",
+            "maximum_cooling_air_mass_flow_rate_positive_comparison_evaluated",
+            "maximum_flow_clamp_body_entered",
+            "supply_mass_flow_rate_clamped",
+            "supply_mass_flow_rate_for_clamp_read",
+            "inner_max_evaluated",
+            "maximum_cooling_air_mass_flow_rate_clamp_upper_bound_read",
+            "outer_min_evaluated",
+            "clamped_supply_mass_flow_rate_assigned",
+            "resulting_supply_mass_flow_rate_read",
+            "outdoor_air_mass_flow_rate_read",
+            "supply_above_outdoor_air_mass_flow_comparison_evaluated",
+            "economizer_activation_body_entered",
+            "economizer_on_assigned",
+            "supply_mass_flow_rate_for_outdoor_air_assignment_read",
+            "outdoor_air_mass_flow_rate_assigned",
+            "system_time_step_read",
+            "economizer_active_time_assigned",
+        ] {
+            assert_eq!(latest[field], false, "{field}");
+        }
+        for field in [
+            "zone_humidity_ratio",
+            "psychrometric_cp_air_result_j_per_kg_k",
+            "cp_air_j_per_kg_k",
+            "outdoor_air_temperature_c",
+            "zone_temperature_c",
+            "delta_temperature_c",
+            "assigned_delta_temperature_c",
+            "delta_temperature_for_gate_c",
+            "delta_temperature_below_negative_small_temp_diff",
+            "zone_cooling_setpoint_load_w",
+            "cp_air_for_first_division_j_per_kg_k",
+            "zone_cooling_setpoint_load_over_cp_air_kg_k_per_s",
+            "delta_temperature_for_second_division_c",
+            "calculated_supply_mass_flow_rate_kg_per_s",
+            "initial_supply_mass_flow_rate_kg_per_s",
+            "cooling_limit_flow_rate_value",
+            "cooling_limit_flow_rate_comparison_satisfied",
+            "cooling_limit_flow_rate_and_capacity_value",
+            "cooling_limit_flow_rate_and_capacity_comparison_satisfied",
+            "cooling_flow_limit_active",
+            "maximum_cooling_air_mass_flow_rate_kg_per_s",
+            "maximum_cooling_air_mass_flow_rate_positive",
+            "supply_mass_flow_rate_for_clamp_kg_per_s",
+            "nonnegative_supply_mass_flow_rate_kg_per_s",
+            "maximum_cooling_air_mass_flow_rate_clamp_upper_bound_kg_per_s",
+            "clamped_supply_mass_flow_rate_kg_per_s",
+            "resulting_supply_mass_flow_rate_kg_per_s",
+            "outdoor_air_mass_flow_rate_kg_per_s",
+            "supply_mass_flow_above_outdoor_air_mass_flow",
+            "economizer_on",
+            "supply_mass_flow_rate_for_outdoor_air_assignment_kg_per_s",
+            "assigned_outdoor_air_mass_flow_rate_kg_per_s",
+            "system_time_step_hours",
+            "assigned_economizer_active_time_hours",
+        ] {
+            assert!(latest[field].is_null(), "{field}");
+        }
     }
 
     #[test]
@@ -4472,6 +4823,116 @@ mod tests {
             source: PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_SOURCE,
             first_excluded_source:
                 PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_FIRST_EXCLUDED_SOURCE,
+            state,
+        }
+    }
+
+    fn valid_cooling_economizer_body_lifecycle(
+        call_count: usize,
+    ) -> PurchasedAirCalcCoolingEconomizerBodyLifecycleSummary {
+        let system = IdealLoadsAirSystemId(0);
+        let mut state = PurchasedAirCalcCoolingEconomizerBodyRuntimeState::new(system);
+        state.transition_count = call_count;
+        state.no_economizer_outer_guard_fallthrough_skip_count = call_count;
+        state.latest = Some(PurchasedAirCalcCoolingEconomizerBodySnapshot {
+            source: PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE,
+            first_excluded_source: PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE,
+            system,
+            parent_call_ordinal: call_count,
+            source_order: PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE_ORDER,
+            controlled_zone: ZoneId(0),
+            unit_body_entered: true,
+            predecessor_cooling_body_entered: true,
+            predecessor_maximum_cooling_flow_body_entered: false,
+            predecessor_active_guard_false_economizer_fallthrough: true,
+            predecessor_economizer_guard_evaluated: true,
+            predecessor_economizer_body_entered: false,
+            predecessor_no_economizer_fallthrough: true,
+            predecessor_economizer_condition_evaluated: false,
+            predecessor_economizer_condition_satisfied: None,
+            predecessor_economizer_calculation_body_entered: false,
+            unit_off_skipped: false,
+            non_cooling_skipped: false,
+            maximum_cooling_flow_body_sibling_skipped: false,
+            no_economizer_outer_guard_fallthrough_skipped: true,
+            economizer_condition_fallthrough_skipped: false,
+            economizer_calculation_body_executed: false,
+            zone_humidity_ratio_read: false,
+            zone_humidity_ratio: None,
+            psychrometric_cp_air_evaluated: false,
+            psychrometric_cp_air_result_j_per_kg_k: None,
+            cp_air_assigned: false,
+            cp_air_j_per_kg_k: None,
+            outdoor_air_temperature_read: false,
+            outdoor_air_temperature_c: None,
+            zone_temperature_read: false,
+            zone_temperature_c: None,
+            delta_temperature_calculated: false,
+            delta_temperature_c: None,
+            delta_temperature_assigned: false,
+            assigned_delta_temperature_c: None,
+            delta_temperature_for_gate_read: false,
+            delta_temperature_for_gate_c: None,
+            delta_temperature_comparison_evaluated: false,
+            delta_temperature_below_negative_small_temp_diff: None,
+            delta_temperature_body_entered: false,
+            zone_cooling_setpoint_load_read: false,
+            zone_cooling_setpoint_load_w: None,
+            cp_air_for_first_division_read: false,
+            cp_air_for_first_division_j_per_kg_k: None,
+            zone_cooling_setpoint_load_over_cp_air_calculated: false,
+            zone_cooling_setpoint_load_over_cp_air_kg_k_per_s: None,
+            delta_temperature_for_second_division_read: false,
+            delta_temperature_for_second_division_c: None,
+            supply_mass_flow_rate_calculated: false,
+            calculated_supply_mass_flow_rate_kg_per_s: None,
+            initial_supply_mass_flow_rate_assigned: false,
+            initial_supply_mass_flow_rate_kg_per_s: None,
+            cooling_limit_flow_rate_comparison_evaluated: false,
+            cooling_limit_flow_rate_read: false,
+            cooling_limit_flow_rate_value: None,
+            cooling_limit_flow_rate_comparison_satisfied: None,
+            cooling_limit_flow_rate_and_capacity_comparison_evaluated: false,
+            cooling_limit_flow_rate_and_capacity_read: false,
+            cooling_limit_flow_rate_and_capacity_value: None,
+            cooling_limit_flow_rate_and_capacity_comparison_satisfied: None,
+            cooling_flow_limit_active: None,
+            maximum_cooling_air_mass_flow_rate_read: false,
+            maximum_cooling_air_mass_flow_rate_kg_per_s: None,
+            maximum_cooling_air_mass_flow_rate_positive_comparison_evaluated: false,
+            maximum_cooling_air_mass_flow_rate_positive: None,
+            maximum_flow_clamp_body_entered: false,
+            supply_mass_flow_rate_clamped: false,
+            supply_mass_flow_rate_for_clamp_read: false,
+            supply_mass_flow_rate_for_clamp_kg_per_s: None,
+            inner_max_evaluated: false,
+            nonnegative_supply_mass_flow_rate_kg_per_s: None,
+            maximum_cooling_air_mass_flow_rate_clamp_upper_bound_read: false,
+            maximum_cooling_air_mass_flow_rate_clamp_upper_bound_kg_per_s: None,
+            outer_min_evaluated: false,
+            clamped_supply_mass_flow_rate_kg_per_s: None,
+            clamped_supply_mass_flow_rate_assigned: false,
+            resulting_supply_mass_flow_rate_kg_per_s: None,
+            resulting_supply_mass_flow_rate_read: false,
+            outdoor_air_mass_flow_rate_read: false,
+            outdoor_air_mass_flow_rate_kg_per_s: None,
+            supply_above_outdoor_air_mass_flow_comparison_evaluated: false,
+            supply_mass_flow_above_outdoor_air_mass_flow: None,
+            economizer_activation_body_entered: false,
+            economizer_on_assigned: false,
+            economizer_on: None,
+            supply_mass_flow_rate_for_outdoor_air_assignment_read: false,
+            supply_mass_flow_rate_for_outdoor_air_assignment_kg_per_s: None,
+            outdoor_air_mass_flow_rate_assigned: false,
+            assigned_outdoor_air_mass_flow_rate_kg_per_s: None,
+            system_time_step_read: false,
+            system_time_step_hours: None,
+            economizer_active_time_assigned: false,
+            assigned_economizer_active_time_hours: None,
+        });
+        PurchasedAirCalcCoolingEconomizerBodyLifecycleSummary {
+            source: PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE,
+            first_excluded_source: PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE,
             state,
         }
     }

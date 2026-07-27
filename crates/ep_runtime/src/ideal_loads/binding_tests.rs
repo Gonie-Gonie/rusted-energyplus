@@ -22,6 +22,10 @@ use ep_model::{
 
 type ModelMutationCase = (fn(&mut TypedModel), DirectZonePurchasedAirBindingFeature);
 
+#[path = "binding/cooling_economizer_body_integrity_tests.rs"]
+mod cooling_economizer_body_integrity_tests;
+#[path = "binding/cooling_economizer_body_tests.rs"]
+mod cooling_economizer_body_tests;
 #[path = "binding/cooling_economizer_condition_integrity_tests.rs"]
 mod cooling_economizer_condition_integrity_tests;
 #[path = "binding/cooling_economizer_condition_tests.rs"]

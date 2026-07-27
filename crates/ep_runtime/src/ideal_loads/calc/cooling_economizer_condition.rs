@@ -8,6 +8,11 @@ mod release;
 mod transition;
 
 pub use release::*;
+pub(in crate::ideal_loads::calc) use release::{
+    completed_direct_economizer_condition_is_consistent,
+    completed_direct_prefix_through_economizer_guard_is_consistent,
+    exact_direct_initialization_is_consistent,
+};
 pub(super) use transition::advance_cooling_economizer_condition_state;
 
 /// EnergyPlus source slice represented by this bounded transition.

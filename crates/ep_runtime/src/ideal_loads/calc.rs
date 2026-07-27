@@ -3,6 +3,8 @@
 mod cooling_economizer_guard;
 // CP316 follows the CP315 outer guard in source order.
 mod cooling_economizer_condition;
+// CP317 follows the CP316 condition in source order.
+mod cooling_economizer_body;
 mod cooling_entry_gate;
 mod cooling_oa_max_flow_body;
 mod cooling_oa_max_flow_gate;
@@ -23,6 +25,11 @@ mod cooling_economizer_guard_tests;
 mod cooling_economizer_condition_release_tests;
 #[cfg(test)]
 mod cooling_economizer_condition_tests;
+// CP317 tests follow the CP316 characterization module in source order.
+#[cfg(test)]
+mod cooling_economizer_body_release_tests;
+#[cfg(test)]
+mod cooling_economizer_body_tests;
 #[cfg(test)]
 mod cooling_entry_gate_tests;
 #[cfg(test)]
@@ -41,6 +48,9 @@ mod no_oa_tests;
 pub use cooling_economizer_guard::*;
 // CP316 exports follow the CP315 guard contract in source order.
 pub use cooling_economizer_condition::*;
+// CP317 exports follow the CP316 condition contract in source order.
+pub(in crate::ideal_loads) use cooling_economizer_body::release::body_snapshot_is_exact_direct_release as cooling_economizer_body_snapshot_is_exact_direct_release;
+pub use cooling_economizer_body::*;
 pub use cooling_entry_gate::*;
 pub use cooling_oa_max_flow_body::*;
 pub use cooling_oa_max_flow_gate::*;

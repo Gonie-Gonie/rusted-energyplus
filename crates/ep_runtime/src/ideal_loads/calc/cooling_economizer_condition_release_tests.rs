@@ -134,7 +134,7 @@ fn public_condition_rejects_forgery_replay_overflow_and_prefix_corruption_transa
     assert_eq!(replay, before_replay);
 }
 
-fn release_fixture() -> (
+pub(super) fn release_fixture() -> (
     PurchasedAirRuntimeState,
     IdealLoadsAirSystem,
     PurchasedAirCalcCoolingEconomizerGuardSnapshot,
@@ -142,7 +142,7 @@ fn release_fixture() -> (
     release_fixture_with_cooling_demand(-1.0)
 }
 
-fn release_fixture_with_cooling_demand(
+pub(super) fn release_fixture_with_cooling_demand(
     cooling_demand_w: f64,
 ) -> (
     PurchasedAirRuntimeState,
@@ -156,7 +156,7 @@ fn release_fixture_with_cooling_demand(
     (runtime, system, guard)
 }
 
-fn advance_subsequent_fixture_call(
+pub(super) fn advance_subsequent_fixture_call(
     runtime: &mut PurchasedAirRuntimeState,
     system: &IdealLoadsAirSystem,
     cooling_demand_w: f64,

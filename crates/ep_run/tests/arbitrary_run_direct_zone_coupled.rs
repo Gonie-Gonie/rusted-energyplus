@@ -46,6 +46,49 @@ const CALC_COOLING_ECONOMIZER_CONDITION_SOURCE: &str =
     "EnergyPlus 26.1 PurchasedAirManager.cc:2083-2086";
 const CALC_COOLING_ECONOMIZER_CONDITION_FIRST_EXCLUDED_SOURCE: &str =
     "EnergyPlus 26.1 PurchasedAirManager.cc:2089";
+const CALC_COOLING_ECONOMIZER_BODY_SOURCE: &str =
+    "EnergyPlus 26.1 PurchasedAirManager.cc:2089-2101";
+const CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE: &str =
+    "EnergyPlus 26.1 PurchasedAirManager.cc:2109";
+const CALC_COOLING_ECONOMIZER_BODY_SOURCE_ORDER: [&str; 37] = [
+    "read-controlled-zone-humidity-ratio",
+    "evaluate-psy-cp-air-fn-w",
+    "assign-local-cp-air",
+    "read-outdoor-air-node-temperature",
+    "read-zone-node-temperature",
+    "subtract-zone-temperature-from-outdoor-air-temperature",
+    "assign-local-delta-temperature",
+    "read-delta-temperature-for-small-temperature-difference-gate",
+    "compare-strict-delta-temperature-below-negative-small-temperature-difference",
+    "enter-delta-temperature-body-if-satisfied",
+    "read-zone-cooling-setpoint-load-after-delta-temperature-match",
+    "read-local-cp-air-for-first-division",
+    "calculate-zone-cooling-setpoint-load-divided-by-cp-air",
+    "read-local-delta-temperature-for-second-division",
+    "calculate-first-division-intermediate-divided-by-delta-temperature",
+    "assign-initial-supply-mass-flow-rate",
+    "read-cooling-limit-for-flow-rate",
+    "compare-cooling-limit-equal-to-flow-rate",
+    "read-cooling-limit-for-flow-rate-and-capacity-after-short-circuit",
+    "compare-cooling-limit-equal-to-flow-rate-and-capacity",
+    "read-maximum-cooling-air-mass-flow-after-selector-match",
+    "compare-strict-maximum-cooling-air-mass-flow-above-zero",
+    "enter-maximum-flow-clamp-body-if-satisfied",
+    "read-supply-mass-flow-rate-for-inner-maximum",
+    "apply-source-shaped-maximum-with-zero",
+    "reread-maximum-cooling-air-mass-flow-as-clamp-upper-bound",
+    "apply-source-shaped-minimum-with-maximum-cooling-air-mass-flow",
+    "assign-clamped-supply-mass-flow-rate",
+    "read-resulting-supply-mass-flow-rate",
+    "read-current-outdoor-air-mass-flow-rate",
+    "compare-strict-supply-mass-flow-above-outdoor-air-mass-flow",
+    "enter-economizer-activation-body-if-satisfied",
+    "assign-economizer-on-true-after-mass-flow-match",
+    "reread-supply-mass-flow-for-outdoor-air-mass-flow-assignment",
+    "assign-outdoor-air-mass-flow-from-supply-mass-flow",
+    "read-system-time-step",
+    "assign-economizer-active-time",
+];
 const CALC_COOLING_ECONOMIZER_CONDITION_SOURCE_ORDER: [&str; 12] = [
     "read-economizer-type-for-differential-dry-bulb",
     "compare-economizer-type-equal-to-differential-dry-bulb",
@@ -704,6 +747,7 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
     assert_zero_effect_cooling_oa_max_flow_body(runtime, expected_calls, expected_calls, 0);
     assert_cooling_economizer_guard(runtime, expected_calls, expected_calls, 0);
     assert_cooling_economizer_condition(runtime, expected_calls, expected_calls, 0);
+    assert_cooling_economizer_body(runtime, expected_calls, expected_calls, 0);
 }
 
 fn assert_zero_effect_cooling_oa_max_flow_body(
@@ -1031,6 +1075,223 @@ fn assert_cooling_economizer_condition(
     }
 }
 
+fn assert_cooling_economizer_body(
+    runtime: &Value,
+    expected_calls: u64,
+    expected_non_cooling_skips: u64,
+    expected_outer_false_skips: u64,
+) {
+    assert!(expected_calls > 0);
+    assert_eq!(
+        expected_non_cooling_skips + expected_outer_false_skips,
+        expected_calls,
+        "this helper only accepts homogeneous non-cooling or NoEconomizer runs"
+    );
+    let latest_non_cooling_skipped = expected_non_cooling_skips == expected_calls;
+    let latest_outer_false_skipped = expected_outer_false_skips == expected_calls;
+    assert_ne!(latest_non_cooling_skipped, latest_outer_false_skipped);
+
+    let body = &runtime["purchased_air_calc_cooling_economizer_body_lifecycle"];
+    assert!(
+        body.is_object(),
+        "direct runtime must publish the CP317 key"
+    );
+    assert_eq!(body["source"], CALC_COOLING_ECONOMIZER_BODY_SOURCE);
+    assert_eq!(
+        body["first_excluded_source"],
+        CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(body["system"], 0);
+    assert_eq!(body["transition_count"], expected_calls);
+    assert_eq!(body["body_execution_count"], 0);
+    assert_eq!(body["unit_off_skip_count"], 0);
+    assert_eq!(body["non_cooling_skip_count"], expected_non_cooling_skips);
+    assert_eq!(body["maximum_cooling_flow_body_sibling_skip_count"], 0);
+    assert_eq!(
+        body["no_economizer_outer_guard_fallthrough_skip_count"],
+        expected_outer_false_skips
+    );
+    assert_eq!(body["economizer_condition_fallthrough_skip_count"], 0);
+    for field in [
+        "zone_humidity_ratio_read_count",
+        "psychrometric_cp_air_evaluation_count",
+        "cp_air_assignment_count",
+        "outdoor_air_temperature_read_count",
+        "zone_temperature_read_count",
+        "delta_temperature_calculation_count",
+        "delta_temperature_assignment_count",
+        "delta_temperature_for_gate_read_count",
+        "delta_temperature_comparison_count",
+        "delta_temperature_comparison_satisfied_count",
+        "delta_temperature_body_entry_count",
+        "delta_temperature_fallthrough_count",
+        "zone_cooling_setpoint_load_read_count",
+        "cp_air_for_first_division_read_count",
+        "zone_cooling_setpoint_load_over_cp_air_calculation_count",
+        "delta_temperature_for_second_division_read_count",
+        "supply_mass_flow_rate_calculation_count",
+        "initial_supply_mass_flow_rate_assignment_count",
+        "cooling_limit_flow_rate_read_count",
+        "cooling_limit_flow_rate_comparison_count",
+        "cooling_limit_flow_rate_match_count",
+        "cooling_limit_flow_rate_and_capacity_read_count",
+        "cooling_limit_flow_rate_and_capacity_comparison_count",
+        "cooling_limit_flow_rate_and_capacity_match_count",
+        "maximum_cooling_air_mass_flow_rate_read_count",
+        "maximum_cooling_air_mass_flow_rate_positive_comparison_count",
+        "maximum_cooling_air_mass_flow_rate_positive_count",
+        "maximum_flow_clamp_body_entry_count",
+        "supply_mass_flow_rate_for_clamp_read_count",
+        "inner_max_evaluation_count",
+        "maximum_cooling_air_mass_flow_rate_clamp_upper_bound_read_count",
+        "outer_min_evaluation_count",
+        "supply_mass_flow_rate_clamp_count",
+        "clamped_supply_mass_flow_rate_assignment_count",
+        "resulting_supply_mass_flow_rate_read_count",
+        "outdoor_air_mass_flow_rate_read_count",
+        "supply_above_outdoor_air_mass_flow_comparison_count",
+        "supply_above_outdoor_air_mass_flow_comparison_satisfied_count",
+        "economizer_activation_body_entry_count",
+        "outdoor_air_mass_flow_comparison_fallthrough_count",
+        "economizer_on_assignment_count",
+        "supply_mass_flow_rate_for_outdoor_air_assignment_read_count",
+        "outdoor_air_mass_flow_rate_assignment_count",
+        "system_time_step_read_count",
+        "economizer_active_time_assignment_count",
+    ] {
+        assert_eq!(body[field], 0, "{field}");
+    }
+
+    let latest = &body["latest"];
+    assert_eq!(latest["source"], CALC_COOLING_ECONOMIZER_BODY_SOURCE);
+    assert_eq!(
+        latest["first_excluded_source"],
+        CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(latest["system"], 0);
+    assert_eq!(latest["controlled_zone"], 0);
+    assert_eq!(latest["parent_call_ordinal"], expected_calls);
+    assert_eq!(
+        string_array(&latest["source_order"]),
+        CALC_COOLING_ECONOMIZER_BODY_SOURCE_ORDER
+    );
+    assert_eq!(latest["unit_body_entered"], true);
+    assert_eq!(
+        latest["predecessor_cooling_body_entered"],
+        latest_outer_false_skipped
+    );
+    assert_eq!(
+        latest["predecessor_maximum_cooling_flow_body_entered"],
+        false
+    );
+    assert_eq!(
+        latest["predecessor_active_guard_false_economizer_fallthrough"],
+        latest_outer_false_skipped
+    );
+    assert_eq!(
+        latest["predecessor_economizer_guard_evaluated"],
+        latest_outer_false_skipped
+    );
+    assert_eq!(latest["predecessor_economizer_body_entered"], false);
+    assert_eq!(
+        latest["predecessor_no_economizer_fallthrough"],
+        latest_outer_false_skipped
+    );
+    assert_eq!(latest["predecessor_economizer_condition_evaluated"], false);
+    assert!(latest["predecessor_economizer_condition_satisfied"].is_null());
+    assert_eq!(
+        latest["predecessor_economizer_calculation_body_entered"],
+        false
+    );
+    assert_eq!(latest["non_cooling_skipped"], latest_non_cooling_skipped);
+    assert_eq!(
+        latest["no_economizer_outer_guard_fallthrough_skipped"],
+        latest_outer_false_skipped
+    );
+    assert_eq!(latest["economizer_condition_fallthrough_skipped"], false);
+    assert_eq!(latest["economizer_calculation_body_executed"], false);
+    for field in [
+        "zone_humidity_ratio_read",
+        "psychrometric_cp_air_evaluated",
+        "cp_air_assigned",
+        "outdoor_air_temperature_read",
+        "zone_temperature_read",
+        "delta_temperature_calculated",
+        "delta_temperature_assigned",
+        "delta_temperature_for_gate_read",
+        "delta_temperature_comparison_evaluated",
+        "delta_temperature_body_entered",
+        "zone_cooling_setpoint_load_read",
+        "cp_air_for_first_division_read",
+        "zone_cooling_setpoint_load_over_cp_air_calculated",
+        "delta_temperature_for_second_division_read",
+        "supply_mass_flow_rate_calculated",
+        "initial_supply_mass_flow_rate_assigned",
+        "cooling_limit_flow_rate_comparison_evaluated",
+        "cooling_limit_flow_rate_read",
+        "cooling_limit_flow_rate_and_capacity_comparison_evaluated",
+        "cooling_limit_flow_rate_and_capacity_read",
+        "maximum_cooling_air_mass_flow_rate_read",
+        "maximum_cooling_air_mass_flow_rate_positive_comparison_evaluated",
+        "maximum_flow_clamp_body_entered",
+        "supply_mass_flow_rate_clamped",
+        "supply_mass_flow_rate_for_clamp_read",
+        "inner_max_evaluated",
+        "maximum_cooling_air_mass_flow_rate_clamp_upper_bound_read",
+        "outer_min_evaluated",
+        "clamped_supply_mass_flow_rate_assigned",
+        "resulting_supply_mass_flow_rate_read",
+        "outdoor_air_mass_flow_rate_read",
+        "supply_above_outdoor_air_mass_flow_comparison_evaluated",
+        "economizer_activation_body_entered",
+        "economizer_on_assigned",
+        "supply_mass_flow_rate_for_outdoor_air_assignment_read",
+        "outdoor_air_mass_flow_rate_assigned",
+        "system_time_step_read",
+        "economizer_active_time_assigned",
+    ] {
+        assert_eq!(latest[field], false, "{field}");
+    }
+    for field in [
+        "zone_humidity_ratio",
+        "psychrometric_cp_air_result_j_per_kg_k",
+        "cp_air_j_per_kg_k",
+        "outdoor_air_temperature_c",
+        "zone_temperature_c",
+        "delta_temperature_c",
+        "assigned_delta_temperature_c",
+        "delta_temperature_for_gate_c",
+        "delta_temperature_below_negative_small_temp_diff",
+        "zone_cooling_setpoint_load_w",
+        "cp_air_for_first_division_j_per_kg_k",
+        "zone_cooling_setpoint_load_over_cp_air_kg_k_per_s",
+        "delta_temperature_for_second_division_c",
+        "calculated_supply_mass_flow_rate_kg_per_s",
+        "initial_supply_mass_flow_rate_kg_per_s",
+        "cooling_limit_flow_rate_value",
+        "cooling_limit_flow_rate_comparison_satisfied",
+        "cooling_limit_flow_rate_and_capacity_value",
+        "cooling_limit_flow_rate_and_capacity_comparison_satisfied",
+        "cooling_flow_limit_active",
+        "maximum_cooling_air_mass_flow_rate_kg_per_s",
+        "maximum_cooling_air_mass_flow_rate_positive",
+        "supply_mass_flow_rate_for_clamp_kg_per_s",
+        "nonnegative_supply_mass_flow_rate_kg_per_s",
+        "maximum_cooling_air_mass_flow_rate_clamp_upper_bound_kg_per_s",
+        "clamped_supply_mass_flow_rate_kg_per_s",
+        "resulting_supply_mass_flow_rate_kg_per_s",
+        "outdoor_air_mass_flow_rate_kg_per_s",
+        "supply_mass_flow_above_outdoor_air_mass_flow",
+        "economizer_on",
+        "supply_mass_flow_rate_for_outdoor_air_assignment_kg_per_s",
+        "assigned_outdoor_air_mass_flow_rate_kg_per_s",
+        "system_time_step_hours",
+        "assigned_economizer_active_time_hours",
+    ] {
+        assert!(latest[field].is_null(), "{field}");
+    }
+}
+
 #[test]
 fn all_hard_sized_finite_limit_branches_limit_live_cooling()
 -> Result<(), Box<dyn std::error::Error>> {
@@ -1183,6 +1444,7 @@ fn all_hard_sized_finite_limit_branches_limit_live_cooling()
         assert_zero_effect_cooling_oa_max_flow_body(&summary["rust_runtime"], 2, 0, 2);
         assert_cooling_economizer_guard(&summary["rust_runtime"], 2, 0, 2);
         assert_cooling_economizer_condition(&summary["rust_runtime"], 2, 0, 2);
+        assert_cooling_economizer_body(&summary["rust_runtime"], 2, 0, 2);
 
         let results = read_json(&output_dir.join("results").join("result-store.json"))?;
         let cooling_rate = find_series(

@@ -21272,8 +21272,8 @@ continuation, a node read, nor an inner comparison.
 
 ## CP316 Cooling Economizer Condition Placement
 
-CP316 executes after CP315 and before the existing bounded PurchasedAir
-numerical calculation. It maps only executable lines 2083-2086. Internal
+CP316 executes after CP315 and before CP317. It maps only executable lines
+2083-2086. Internal
 characterization tests `DifferentialDryBulb`, conditionally reads the outdoor
 and recirculation temperatures and compares strict `<`, then only after that
 conjunction is false re-reads the enum for `DifferentialEnthalpy`,
@@ -21291,17 +21291,53 @@ that all-sites-skipped lifecycle and direct-only JSON before the unchanged
 numerical DTO and Zone-air corrector.
 
 Lines 2087-2088 are non-executable. The lexical first excluded executable is
-line 2089: a true condition continues there, while a false condition continues
-at line 2109. `PsyCpAirFnW`, `DeltaT`, supply/OA flow calculation, limiting and
-mutation, `EconoOn`, `TimeEconoActive`, line 2109 and later cooling work,
-Heat/DeadBand selection at line 2348, node/report writes, equipment residuals,
-adaptive iteration, and full Calc/Init lifecycle parity remain outside the
-slice. The separate outdoor-air economizer helper remains disconnected and
-unpromoted. This adds no Zone-air equation, demand or feedback term, live
+line 2089: a true condition continues to CP317 there, while a false condition
+continues at line 2109. CP316 owns neither continuation. The separate
+outdoor-air economizer helper remains disconnected and unpromoted. This adds
+no Zone-air equation, demand or feedback term, live OA/economizer or Node
+ownership, or numerical capability.
+
+## CP317 Cooling Economizer True-Body Placement
+
+CP317 executes after CP316 and before the existing bounded PurchasedAir
+numerical calculation. It maps only lines 2089-2101. Internal characterization
+reads the pre-sampled Zone humidity ratio, evaluates the canonical
+`energyplus_psy_cp_air_fn_w` scalar, assigns `CpAir`, reads outdoor- and
+Zone-node temperatures, assigns outdoor-minus-Zone `DeltaT`, and re-reads that
+local for the strict `DeltaT < -SmallTempDiff` gate. Only the true route reads
+cooling-setpoint demand, re-reads `CpAir` and `DeltaT` across the two
+left-associated divisions, and assigns initial supply mass flow. It preserves
+the repeated `CoolingLimit` reads and selector short-circuit. A selector match
+reads the maximum for its positive test; the clamp body re-reads supply flow
+and the maximum upper bound before assigning clamped flow. The resulting
+supply flow is read before outdoor-air flow for the strict `>` comparison.
+Only that comparison's true route assigns `EconoOn`, re-reads supply flow for
+the outdoor-air assignment, reads the system timestep, and assigns active
+time. The pure scalar characterization excludes the source static
+`dwSave`/`cpaSave` cache, initial `-100.0` sentinel, cache-hit/miss identity,
+and concurrent cache lifecycle.
+
+The exact no-OA direct transition consumes a CP316 predecessor whose
+calculation body was not entered. It records one complete CP317 skip per CP316
+transition and zero humidity or temperature reads, psychrometric calls,
+delta/load/flow calculations, selector or limit reads and comparisons, clamps,
+outdoor-air comparisons or assignments, economizer assignments, and timestep
+reads. Per-step, final, and pipeline firewalls reconcile that all-sites-skipped
+lifecycle and direct-only JSON before the unchanged numerical DTO and Zone-air
+corrector.
+
+Line 2100 is the last executable CP317 statement and line 2101 closes its
+innermost body. Lines 2102-2105 are closing delimiters and lines 2107-2108 are
+comments, making line 2109 the first excluded executable. The line-2109
+cooling-flow reset and later cooling work, Heat/DeadBand selection at line
+2348, node/report writes, equipment residuals, adaptive iteration, and full
+Calc/Init lifecycle parity remain outside the slice. The separate outdoor-air
+economizer helper remains disconnected and unpromoted. Pre-sampled
+characterization adds no Zone-air equation, demand or feedback term, live
 OA/economizer or Node ownership, or numerical capability. Both parents remain
-`scaffold`/`none`, the Calc routine remains `source_mapped`, and
-algorithm/routine counts, readiness, required or forbidden features, evidence,
-numerical conformance, and Roadmap state stay unchanged.
+`scaffold`/`none`, the Calc routine remains `source_mapped`, and the
+32-algorithm/293-routine inventory, readiness, required or forbidden features,
+evidence, numerical conformance, and Roadmap state stay unchanged.
 
 ## Promotion Requirements
 

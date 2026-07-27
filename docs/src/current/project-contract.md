@@ -15971,8 +15971,8 @@ enthalpy-selector enum reads, zero stored-enthalpy reads and comparisons, and
 zero adjustment-body entries. Internal DifferentialDryBulb and
 DifferentialEnthalpy characterization remains non-release.
 
-The binder executes CP316 after CP315 and before the pre-existing numerical
-Calc. Per-step validation checks source provenance, retained predecessor and
+The binder executes CP316 after CP315 and before CP317. Per-step validation
+checks source provenance, retained predecessor and
 latest-state identity, exact predecessor shape, and the all-sites-skipped
 release snapshot. Final lifecycle and `ep_run` validation reconcile one
 transition per CP315 transition, checked complete-skip versus internal
@@ -15984,17 +15984,124 @@ disconnected evidence is rejected.
 Lines 2087-2088 are non-executable whitespace and comment text. The lexical
 first excluded executable is therefore line 2089,
 `CpAir = PsyCpAirFnW(thisZoneHB.airHumRat)`. A true CP316 condition reaches
-line 2089; a false condition reaches the unconditional line-2109 cooling-flow
-reset. `PsyCpAirFnW`, `DeltaT`, supply-flow calculation and limiting,
-outdoor-air flow mutation, `EconoOn`, `TimeEconoActive`, line 2109 and all
-later cooling/mixed-air/humidity/capacity work, Heat/DeadBand selection at line
-2348, partial effects, retry, reset, and concurrency remain excluded.
+CP317 at line 2089; a false condition reaches the unconditional line-2109
+cooling-flow reset. CP316 still owns neither continuation.
 
 CP316 does not call, connect, or promote the separate
 `calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s` compatibility
 helper. That helper's enthalpy recomputation and later mass-flow effects are
 outside this stored-value predicate slice. This is condition-only lifecycle
 evidence, not live OA/economizer ownership or numerical support.
+`algorithm.zone_temp_predictor_corrector_source_order` and
+`algorithm.ideal_loads_zone_equipment_purchased_air_source_order` both remain
+`scaffold`/`none`; `routine.calc_purch_air_loads` remains `source_mapped`.
+The 32-algorithm and 293-routine inventory, readiness split, support levels,
+run state, required and forbidden features, evidence cases, numerical
+conformance, and Roadmap state remain unchanged.
+
+## CP317 Source-Ordered Cooling Economizer True Body
+
+CP317 supersedes only CP316's line-2089 exclusion for EnergyPlus 26.1
+`PurchasedAirManager.cc` lines 2089-2101. It maps the true body beneath the
+lines-2083 through-2086 condition and stops before the common line-2109
+continuation. An entered body executes these 37 source sites in order:
+
+1. read the controlled Zone heat-balance humidity ratio;
+2. evaluate the canonical `energyplus_psy_cp_air_fn_w` scalar;
+3. assign local `CpAir`;
+4. read outdoor-node temperature;
+5. read Zone-node temperature;
+6. subtract Zone temperature from outdoor temperature;
+7. assign local `DeltaT`;
+8. read local `DeltaT` for the small-temperature-difference gate;
+9. compare `DeltaT < -SmallTempDiff` using source strict `<`;
+10. enter the delta-temperature body only after a true comparison;
+11. read `QZnCoolSP`;
+12. read local `CpAir` for the first division;
+13. calculate `QZnCoolSP / CpAir`;
+14. re-read local `DeltaT` for the second division;
+15. calculate `(QZnCoolSP / CpAir) / DeltaT`;
+16. assign initial `SupplyMassFlowRate`;
+17. read `CoolingLimit` for `FlowRate`;
+18. compare it with `FlowRate`;
+19. only after that comparison is false, re-read `CoolingLimit`;
+20. compare the re-read value with `FlowRateAndCapacity`;
+21. only after either selector matches, read `MaxCoolMassFlowRate`;
+22. compare the maximum mass flow with `0.0` using source strict `>`;
+23. enter the clamp body only after a positive comparison;
+24. read `SupplyMassFlowRate` for the inner maximum;
+25. apply source-shaped `max(SupplyMassFlowRate, 0.0)`;
+26. re-read `MaxCoolMassFlowRate` as the clamp upper bound;
+27. apply the source-shaped outer minimum;
+28. assign clamped `SupplyMassFlowRate`;
+29. read the resulting supply mass flow;
+30. read current outdoor-air mass flow;
+31. compare supply mass flow strictly `>` with outdoor-air mass flow;
+32. enter the economizer-activation body only after a true comparison;
+33. assign `EconoOn = true`;
+34. re-read supply mass flow for the outdoor-air assignment;
+35. assign outdoor-air mass flow from supply mass flow;
+36. read `TimeStepSys`; and
+37. assign `TimeEconoActive = TimeStepSys`.
+
+The source `if`, `||`, and `&&` short-circuit semantics are part of the
+boundary. A false `DeltaT` comparison reaches none of the load, limit, clamp,
+or outdoor-air comparison sites. `CoolingLimit` is read twice only when the
+first selector comparison is false. An unmatched selector reads no maximum
+flow, and a nonpositive maximum performs no clamp. The outdoor-air comparison
+still executes after any true `DeltaT` route, whether or not the optional
+clamp ran. The source-shaped minimum/maximum operations preserve IEEE NaN,
+infinity, and signed-zero behavior rather than using Rust `f64::clamp`,
+`f64::min`, or `f64::max` substitutions.
+
+The pure characterization covers the canonical psychrometric scalar result
+only. It deliberately excludes the source `PsyCpAirFnW` static
+`dwSave`/`cpaSave` cache, its initial `dwSave == -100.0` sentinel, cache-hit
+versus cache-miss identity, and concurrent cache lifecycle.
+
+`calc/cooling_economizer_body.rs` owns
+`PurchasedAirCalcCoolingEconomizerBodySnapshot` and
+`PurchasedAirCalcCoolingEconomizerBodyLifecycleSummary`.
+`calc/cooling_economizer_body/state.rs` owns
+`PurchasedAirCalcCoolingEconomizerBodyRuntimeState`.
+`calc/cooling_economizer_body/release.rs` owns
+`PurchasedAirCalcCoolingEconomizerBodyError` and
+`advance_direct_no_oa_calc_cooling_economizer_body`; the parent module owns
+`purchased_air_calc_cooling_economizer_body_lifecycle_summary`.
+
+The public exact release transition requires the retained CP316 snapshot,
+initialization and selected-unit identities, one-for-one CP310-through-CP317
+order, the exact direct no-OA subset, and an exact retained predecessor
+partition before mutation. That subset requires `NoEconomizer`, so CP315 is
+false and CP316 never enters its condition or calculation body. Therefore
+every public CP317 transition records one complete body skip and zero humidity
+or temperature reads, psychrometric calls, delta/load/flow calculations,
+selector or maximum-flow reads and comparisons, clamps, outdoor-air
+comparisons or assignments, economizer assignments, and timestep reads.
+Internal body characterization over pre-sampled scalar inputs remains
+non-release and grants no live Node or heat-balance-state access.
+
+The binder executes CP317 after CP316 and before the pre-existing numerical
+Calc. Per-step validation checks source provenance, retained predecessor and
+latest-state identity, exact predecessor shape, and the all-sites-skipped
+release snapshot. Final lifecycle and `ep_run` validation reconcile one
+transition per CP316 transition, checked complete-skip versus internal body
+partitions, zero release source-site counts, and direct-only evidence. Direct
+JSON publishes
+`purchased_air_calc_cooling_economizer_body_lifecycle`; non-direct or
+disconnected evidence is rejected.
+
+Line 2100 is the final executable statement inside CP317 and line 2101 closes
+the innermost body. Lines 2102-2105 are closing delimiters and lines 2107-2108
+are comments. The lexical first excluded executable is therefore line 2109,
+`SupplyMassFlowRateForCool = 0.0`. That reset and all later
+cooling/mixed-air/humidity/capacity work, Heat/DeadBand selection at line 2348,
+partial effects, retry, reset, and concurrency remain excluded.
+
+CP317 does not call, connect, or promote the separate
+`calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s` compatibility
+helper. This is source-ordered lifecycle evidence, not live OA/economizer
+ownership or numerical support.
 `algorithm.zone_temp_predictor_corrector_source_order` and
 `algorithm.ideal_loads_zone_equipment_purchased_air_source_order` both remain
 `scaffold`/`none`; `routine.calc_purch_air_loads` remains `source_mapped`.

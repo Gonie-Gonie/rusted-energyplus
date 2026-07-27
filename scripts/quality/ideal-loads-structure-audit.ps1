@@ -142,6 +142,7 @@ $calcCoolingEconomizerCondition = "crates\ep_runtime\src\ideal_loads\calc\coolin
 $calcCoolingEconomizerConditionTransition = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_condition\transition.rs"
 $calcCoolingEconomizerConditionRelease = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_condition\release.rs"
 $calcCoolingEconomizerConditionEntryPrefixValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_condition\release\entry_prefix_validation.rs"
+$calcCoolingEconomizerConditionCompletedConditionValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_condition\release\completed_condition_validation.rs"
 $calcCoolingEconomizerConditionInitializationValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_condition\release\initialization_validation.rs"
 $calcCoolingEconomizerConditionPredecessorValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_condition\release\predecessor_validation.rs"
 $calcCoolingEconomizerConditionRuntimeValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_condition\release\runtime_validation.rs"
@@ -149,6 +150,22 @@ $calcCoolingEconomizerConditionTests = "crates\ep_runtime\src\ideal_loads\calc\c
 $calcCoolingEconomizerConditionReleaseTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_condition_release_tests.rs"
 $calcCoolingEconomizerConditionReleaseProvenanceTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_condition_release_tests\provenance_tests.rs"
 $calcCoolingEconomizerConditionReleaseCorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_condition_release_tests\corruption_tests.rs"
+$calcCoolingEconomizerBody = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body.rs"
+$calcCoolingEconomizerBodyState = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body\state.rs"
+$calcCoolingEconomizerBodyTransition = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body\transition.rs"
+$calcCoolingEconomizerBodyRelease = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body\release.rs"
+$calcCoolingEconomizerBodyEntryPrefixValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body\release\entry_prefix_validation.rs"
+$calcCoolingEconomizerBodyInitializationValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body\release\initialization_validation.rs"
+$calcCoolingEconomizerBodyPredecessorValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body\release\predecessor_validation.rs"
+$calcCoolingEconomizerBodyRuntimeValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body\release\runtime_validation.rs"
+$calcCoolingEconomizerBodyTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body_tests.rs"
+$calcCoolingEconomizerBodyGateAndAssignmentTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body_tests\gate_and_assignment_tests.rs"
+$calcCoolingEconomizerBodyIeeeTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body_tests\ieee_tests.rs"
+$calcCoolingEconomizerBodySkipTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body_tests\skip_tests.rs"
+$calcCoolingEconomizerBodySourceOrderTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body_tests\source_order_tests.rs"
+$calcCoolingEconomizerBodyReleaseTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body_release_tests.rs"
+$calcCoolingEconomizerBodyReleaseProvenanceTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body_release_tests\provenance_tests.rs"
+$calcCoolingEconomizerBodyReleaseCorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_economizer_body_release_tests\corruption_tests.rs"
 $calcHumidity = "crates\ep_runtime\src\ideal_loads\calc\humidity.rs"
 $calcLimits = "crates\ep_runtime\src\ideal_loads\calc\limits.rs"
 $calcMassFlow = "crates\ep_runtime\src\ideal_loads\calc\mass_flow.rs"
@@ -186,6 +203,8 @@ $idealLoadsBindingCoolingEconomizerGuardTests = "crates\ep_runtime\src\ideal_loa
 $idealLoadsBindingCoolingEconomizerGuardIntegrityTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_economizer_guard_integrity_tests.rs"
 $idealLoadsBindingCoolingEconomizerConditionTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_economizer_condition_tests.rs"
 $idealLoadsBindingCoolingEconomizerConditionIntegrityTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_economizer_condition_integrity_tests.rs"
+$idealLoadsBindingCoolingEconomizerBodyTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_economizer_body_tests.rs"
+$idealLoadsBindingCoolingEconomizerBodyIntegrityTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_economizer_body_integrity_tests.rs"
 $idealLoadsCoupledRuntime = "crates\ep_runtime\src\ideal_loads\coupled_runtime.rs"
 $idealLoadsCoupledMinimumOaValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\minimum_oa_validation.rs"
 $idealLoadsCoupledCoolingEntryValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_entry_validation.rs"
@@ -193,6 +212,7 @@ $idealLoadsCoupledCoolingOaMaxFlowValidation = "crates\ep_runtime\src\ideal_load
 $idealLoadsCoupledCoolingOaMaxFlowBodyValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_oa_max_flow_body_validation.rs"
 $idealLoadsCoupledCoolingEconomizerGuardValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_economizer_guard_validation.rs"
 $idealLoadsCoupledCoolingEconomizerConditionValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_economizer_condition_validation.rs"
+$idealLoadsCoupledCoolingEconomizerBodyValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_economizer_body_validation.rs"
 $idealLoadsCouplingValidation = "crates\ep_runtime\src\ideal_loads\coupling\validation.rs"
 $idealLoadsInput = "crates\ep_runtime\src\ideal_loads\input.rs"
 $idealLoadsMeters = "crates\ep_runtime\src\ideal_loads\meters.rs"
@@ -243,6 +263,10 @@ $runPurchasedAirCoolingOaMaxFlowBodySerialization = "crates\ep_run\src\pipeline\
 $runPurchasedAirCoolingEconomizerGuard = "crates\ep_run\src\pipeline\purchased_air_cooling_economizer_guard.rs"
 $runPurchasedAirCoolingEconomizerCondition = "crates\ep_run\src\pipeline\purchased_air_cooling_economizer_condition.rs"
 $runPurchasedAirCoolingEconomizerConditionSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_economizer_condition\serialization.rs"
+$runPurchasedAirCoolingEconomizerBody = "crates\ep_run\src\pipeline\purchased_air_cooling_economizer_body.rs"
+$runPurchasedAirCoolingEconomizerBodySerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_economizer_body\serialization.rs"
+$runPurchasedAirCoolingEconomizerBodySnapshotSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_economizer_body\serialization\snapshot.rs"
+$runPurchasedAirCoolingEconomizerBodyValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_economizer_body\validation.rs"
 $runDirectZoneCoupledTests = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled.rs"
 $runRuntimeBoundaries = "crates\ep_run\src\support\runtime_boundaries.rs"
 $runtimeOutputTests = "crates\ep_runtime\src\runtime\tests\part08.rs"
@@ -285,6 +309,7 @@ Assert-FileExists -Path $calcCoolingEconomizerCondition -Description "PurchasedA
 Assert-FileExists -Path $calcCoolingEconomizerConditionTransition -Description "PurchasedAir Calc cooling economizer condition transition"
 Assert-FileExists -Path $calcCoolingEconomizerConditionRelease -Description "PurchasedAir Calc cooling economizer condition release boundary"
 Assert-FileExists -Path $calcCoolingEconomizerConditionEntryPrefixValidation -Description "PurchasedAir Calc cooling economizer condition retained entry-prefix validation"
+Assert-FileExists -Path $calcCoolingEconomizerConditionCompletedConditionValidation -Description "PurchasedAir Calc cooling economizer completed-condition validation"
 Assert-FileExists -Path $calcCoolingEconomizerConditionInitializationValidation -Description "PurchasedAir Calc cooling economizer condition retained initialization validation"
 Assert-FileExists -Path $calcCoolingEconomizerConditionPredecessorValidation -Description "PurchasedAir Calc cooling economizer condition predecessor validation"
 Assert-FileExists -Path $calcCoolingEconomizerConditionRuntimeValidation -Description "PurchasedAir Calc cooling economizer condition runtime validation"
@@ -292,6 +317,22 @@ Assert-FileExists -Path $calcCoolingEconomizerConditionTests -Description "Purch
 Assert-FileExists -Path $calcCoolingEconomizerConditionReleaseTests -Description "PurchasedAir Calc cooling economizer condition public release tests"
 Assert-FileExists -Path $calcCoolingEconomizerConditionReleaseProvenanceTests -Description "PurchasedAir Calc cooling economizer condition provenance tests"
 Assert-FileExists -Path $calcCoolingEconomizerConditionReleaseCorruptionTests -Description "PurchasedAir Calc cooling economizer condition corruption tests"
+Assert-FileExists -Path $calcCoolingEconomizerBody -Description "PurchasedAir Calc cooling economizer true-body module"
+Assert-FileExists -Path $calcCoolingEconomizerBodyState -Description "PurchasedAir Calc cooling economizer true-body persistent state"
+Assert-FileExists -Path $calcCoolingEconomizerBodyTransition -Description "PurchasedAir Calc cooling economizer true-body transition"
+Assert-FileExists -Path $calcCoolingEconomizerBodyRelease -Description "PurchasedAir Calc cooling economizer true-body release boundary"
+Assert-FileExists -Path $calcCoolingEconomizerBodyEntryPrefixValidation -Description "PurchasedAir Calc cooling economizer true-body retained entry-prefix validation"
+Assert-FileExists -Path $calcCoolingEconomizerBodyInitializationValidation -Description "PurchasedAir Calc cooling economizer true-body retained initialization validation"
+Assert-FileExists -Path $calcCoolingEconomizerBodyPredecessorValidation -Description "PurchasedAir Calc cooling economizer true-body predecessor validation"
+Assert-FileExists -Path $calcCoolingEconomizerBodyRuntimeValidation -Description "PurchasedAir Calc cooling economizer true-body runtime validation"
+Assert-FileExists -Path $calcCoolingEconomizerBodyTests -Description "PurchasedAir Calc cooling economizer true-body characterization tests"
+Assert-FileExists -Path $calcCoolingEconomizerBodyGateAndAssignmentTests -Description "PurchasedAir Calc cooling economizer gate and assignment characterization tests"
+Assert-FileExists -Path $calcCoolingEconomizerBodyIeeeTests -Description "PurchasedAir Calc cooling economizer true-body IEEE characterization tests"
+Assert-FileExists -Path $calcCoolingEconomizerBodySkipTests -Description "PurchasedAir Calc cooling economizer true-body skip characterization tests"
+Assert-FileExists -Path $calcCoolingEconomizerBodySourceOrderTests -Description "PurchasedAir Calc cooling economizer true-body source-order characterization tests"
+Assert-FileExists -Path $calcCoolingEconomizerBodyReleaseTests -Description "PurchasedAir Calc cooling economizer true-body public release tests"
+Assert-FileExists -Path $calcCoolingEconomizerBodyReleaseProvenanceTests -Description "PurchasedAir Calc cooling economizer true-body provenance tests"
+Assert-FileExists -Path $calcCoolingEconomizerBodyReleaseCorruptionTests -Description "PurchasedAir Calc cooling economizer true-body corruption tests"
 Assert-FileExists -Path $calcHumidity -Description "IdealLoads calc humidity module"
 Assert-FileExists -Path $calcLimits -Description "IdealLoads calc limits module"
 Assert-FileExists -Path $calcMassFlow -Description "IdealLoads calc mass-flow module"
@@ -329,6 +370,8 @@ Assert-FileExists -Path $idealLoadsBindingCoolingEconomizerGuardTests -Descripti
 Assert-FileExists -Path $idealLoadsBindingCoolingEconomizerGuardIntegrityTests -Description "IdealLoads binding cooling economizer guard retained-state integrity tests"
 Assert-FileExists -Path $idealLoadsBindingCoolingEconomizerConditionTests -Description "IdealLoads binding cooling economizer condition transaction tests"
 Assert-FileExists -Path $idealLoadsBindingCoolingEconomizerConditionIntegrityTests -Description "IdealLoads binding cooling economizer condition retained-state integrity tests"
+Assert-FileExists -Path $idealLoadsBindingCoolingEconomizerBodyTests -Description "IdealLoads binding cooling economizer true-body transaction tests"
+Assert-FileExists -Path $idealLoadsBindingCoolingEconomizerBodyIntegrityTests -Description "IdealLoads binding cooling economizer true-body retained-state integrity tests"
 Assert-FileExists -Path $idealLoadsCoupledRuntime -Description "IdealLoads coupled release runtime"
 Assert-FileExists -Path $idealLoadsCoupledMinimumOaValidation -Description "IdealLoads minimum-OA release validator"
 Assert-FileExists -Path $idealLoadsCoupledCoolingEntryValidation -Description "IdealLoads cooling-entry release validator"
@@ -336,6 +379,7 @@ Assert-FileExists -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Descriptio
 Assert-FileExists -Path $idealLoadsCoupledCoolingOaMaxFlowBodyValidation -Description "IdealLoads cooling OA maximum-flow true-body release validator"
 Assert-FileExists -Path $idealLoadsCoupledCoolingEconomizerGuardValidation -Description "IdealLoads cooling economizer guard release validator"
 Assert-FileExists -Path $idealLoadsCoupledCoolingEconomizerConditionValidation -Description "IdealLoads cooling economizer condition release validator"
+Assert-FileExists -Path $idealLoadsCoupledCoolingEconomizerBodyValidation -Description "IdealLoads cooling economizer true-body release validator"
 Assert-FileExists -Path $idealLoadsCouplingValidation -Description "IdealLoads release coupling validation"
 Assert-FileExists -Path $idealLoadsInput -Description "IdealLoads input boundary module"
 Assert-FileExists -Path $idealLoadsMeters -Description "IdealLoads meter binding module"
@@ -381,6 +425,10 @@ Assert-FileExists -Path $runPurchasedAirCoolingOaMaxFlowBodySerialization -Descr
 Assert-FileExists -Path $runPurchasedAirCoolingEconomizerGuard -Description "ep_run PurchasedAir cooling economizer guard pipeline module"
 Assert-FileExists -Path $runPurchasedAirCoolingEconomizerCondition -Description "ep_run PurchasedAir cooling economizer condition pipeline module"
 Assert-FileExists -Path $runPurchasedAirCoolingEconomizerConditionSerialization -Description "ep_run PurchasedAir cooling economizer condition JSON serializer"
+Assert-FileExists -Path $runPurchasedAirCoolingEconomizerBody -Description "ep_run PurchasedAir cooling economizer true-body pipeline module"
+Assert-FileExists -Path $runPurchasedAirCoolingEconomizerBodySerialization -Description "ep_run PurchasedAir cooling economizer true-body JSON serializer"
+Assert-FileExists -Path $runPurchasedAirCoolingEconomizerBodySnapshotSerialization -Description "ep_run PurchasedAir cooling economizer true-body snapshot JSON serializer"
+Assert-FileExists -Path $runPurchasedAirCoolingEconomizerBodyValidation -Description "ep_run PurchasedAir cooling economizer true-body exact release validator"
 Assert-FileExists -Path $runDirectZoneCoupledTests -Description "ep_run direct-Zone coupled integration tests"
 Assert-FileExists -Path $runRuntimeBoundaries -Description "ep_run runtime boundary assessment"
 Assert-FileExists -Path $runtimeOutputTests -Description "Runtime output registry tests"
@@ -423,6 +471,7 @@ Assert-LineLimit -Path $calcCoolingEconomizerCondition -Limit 300 -Description "
 Assert-LineLimit -Path $calcCoolingEconomizerConditionTransition -Limit 240 -Description "PurchasedAir Calc cooling economizer condition transition"
 Assert-LineLimit -Path $calcCoolingEconomizerConditionRelease -Limit 260 -Description "PurchasedAir Calc cooling economizer condition release boundary"
 Assert-LineLimit -Path $calcCoolingEconomizerConditionEntryPrefixValidation -Limit 360 -Description "PurchasedAir Calc cooling economizer condition retained entry-prefix validation"
+Assert-LineLimit -Path $calcCoolingEconomizerConditionCompletedConditionValidation -Limit 100 -Description "PurchasedAir Calc cooling economizer completed-condition validation"
 Assert-LineLimit -Path $calcCoolingEconomizerConditionInitializationValidation -Limit 120 -Description "PurchasedAir Calc cooling economizer condition retained initialization validation"
 Assert-LineLimit -Path $calcCoolingEconomizerConditionPredecessorValidation -Limit 340 -Description "PurchasedAir Calc cooling economizer condition predecessor validation"
 Assert-LineLimit -Path $calcCoolingEconomizerConditionRuntimeValidation -Limit 480 -Description "PurchasedAir Calc cooling economizer condition runtime validation"
@@ -430,6 +479,22 @@ Assert-LineLimit -Path $calcCoolingEconomizerConditionTests -Limit 340 -Descript
 Assert-LineLimit -Path $calcCoolingEconomizerConditionReleaseTests -Limit 340 -Description "PurchasedAir Calc cooling economizer condition public release tests"
 Assert-LineLimit -Path $calcCoolingEconomizerConditionReleaseProvenanceTests -Limit 160 -Description "PurchasedAir Calc cooling economizer condition provenance tests"
 Assert-LineLimit -Path $calcCoolingEconomizerConditionReleaseCorruptionTests -Limit 260 -Description "PurchasedAir Calc cooling economizer condition corruption tests"
+Assert-LineLimit -Path $calcCoolingEconomizerBody -Limit 420 -Description "PurchasedAir Calc cooling economizer true-body module"
+Assert-LineLimit -Path $calcCoolingEconomizerBodyState -Limit 220 -Description "PurchasedAir Calc cooling economizer true-body persistent state"
+Assert-LineLimit -Path $calcCoolingEconomizerBodyTransition -Limit 400 -Description "PurchasedAir Calc cooling economizer true-body transition"
+Assert-LineLimit -Path $calcCoolingEconomizerBodyRelease -Limit 280 -Description "PurchasedAir Calc cooling economizer true-body release boundary"
+Assert-LineLimit -Path $calcCoolingEconomizerBodyEntryPrefixValidation -Limit 360 -Description "PurchasedAir Calc cooling economizer true-body retained entry-prefix validation"
+Assert-LineLimit -Path $calcCoolingEconomizerBodyInitializationValidation -Limit 120 -Description "PurchasedAir Calc cooling economizer true-body retained initialization validation"
+Assert-LineLimit -Path $calcCoolingEconomizerBodyPredecessorValidation -Limit 420 -Description "PurchasedAir Calc cooling economizer true-body predecessor validation"
+Assert-LineLimit -Path $calcCoolingEconomizerBodyRuntimeValidation -Limit 520 -Description "PurchasedAir Calc cooling economizer true-body runtime validation"
+Assert-LineLimit -Path $calcCoolingEconomizerBodyTests -Limit 400 -Description "PurchasedAir Calc cooling economizer true-body characterization tests"
+Assert-LineLimit -Path $calcCoolingEconomizerBodyGateAndAssignmentTests -Limit 220 -Description "PurchasedAir Calc cooling economizer gate and assignment characterization tests"
+Assert-LineLimit -Path $calcCoolingEconomizerBodyIeeeTests -Limit 160 -Description "PurchasedAir Calc cooling economizer true-body IEEE characterization tests"
+Assert-LineLimit -Path $calcCoolingEconomizerBodySkipTests -Limit 240 -Description "PurchasedAir Calc cooling economizer true-body skip characterization tests"
+Assert-LineLimit -Path $calcCoolingEconomizerBodySourceOrderTests -Limit 340 -Description "PurchasedAir Calc cooling economizer true-body source-order characterization tests"
+Assert-LineLimit -Path $calcCoolingEconomizerBodyReleaseTests -Limit 360 -Description "PurchasedAir Calc cooling economizer true-body public release tests"
+Assert-LineLimit -Path $calcCoolingEconomizerBodyReleaseProvenanceTests -Limit 200 -Description "PurchasedAir Calc cooling economizer true-body provenance tests"
+Assert-LineLimit -Path $calcCoolingEconomizerBodyReleaseCorruptionTests -Limit 280 -Description "PurchasedAir Calc cooling economizer true-body corruption tests"
 Assert-LineLimit -Path $calcHumidity -Limit 220 -Description "IdealLoads calc humidity module"
 Assert-LineLimit -Path $calcLimits -Limit 180 -Description "IdealLoads calc limits module"
 Assert-LineLimit -Path $calcMassFlow -Limit 150 -Description "IdealLoads calc mass-flow module"
@@ -448,7 +513,7 @@ Assert-LineLimit -Path $idealLoadsInitManagerPlan -Limit 140 -Description "Ideal
 Assert-LineLimit -Path $idealLoadsInitManagerPlanTests -Limit 250 -Description "IdealLoads initialization manager-plan tests"
 Assert-LineLimit -Path $idealLoadsInitManagerScanTests -Limit 420 -Description "IdealLoads manager-wide initialization sweep tests"
 Assert-LineLimit -Path $idealLoadsInitSummary -Limit 100 -Description "IdealLoads initialization lifecycle summary"
-Assert-LineLimit -Path $idealLoadsInitState -Limit 260 -Description "IdealLoads persistent initialization state"
+Assert-LineLimit -Path $idealLoadsInitState -Limit 320 -Description "IdealLoads persistent initialization state"
 Assert-LineLimit -Path $idealLoadsInitSupplyTemperatureDiagnostic -Limit 340 -Description "IdealLoads supply-temperature diagnostic registry"
 Assert-LineLimit -Path $idealLoadsInitSupplyTemperatureDiagnosticTests -Limit 340 -Description "IdealLoads supply-temperature diagnostic tests"
 Assert-LineLimit -Path $idealLoadsInitTopologyPlan -Limit 480 -Description "IdealLoads immutable selected-unit topology plan"
@@ -466,12 +531,15 @@ Assert-LineLimit -Path $idealLoadsBindingCoolingEconomizerGuardTests -Limit 280 
 Assert-LineLimit -Path $idealLoadsBindingCoolingEconomizerGuardIntegrityTests -Limit 220 -Description "IdealLoads binding cooling economizer guard retained-state integrity tests"
 Assert-LineLimit -Path $idealLoadsBindingCoolingEconomizerConditionTests -Limit 340 -Description "IdealLoads binding cooling economizer condition transaction tests"
 Assert-LineLimit -Path $idealLoadsBindingCoolingEconomizerConditionIntegrityTests -Limit 260 -Description "IdealLoads binding cooling economizer condition retained-state integrity tests"
+Assert-LineLimit -Path $idealLoadsBindingCoolingEconomizerBodyTests -Limit 280 -Description "IdealLoads binding cooling economizer true-body transaction tests"
+Assert-LineLimit -Path $idealLoadsBindingCoolingEconomizerBodyIntegrityTests -Limit 220 -Description "IdealLoads binding cooling economizer true-body retained-state integrity tests"
 Assert-LineLimit -Path $idealLoadsCoupledMinimumOaValidation -Limit 240 -Description "IdealLoads minimum-OA release validator"
 Assert-LineLimit -Path $idealLoadsCoupledCoolingEntryValidation -Limit 240 -Description "IdealLoads cooling-entry release validator"
 Assert-LineLimit -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Limit 280 -Description "IdealLoads cooling OA maximum-flow release validator"
 Assert-LineLimit -Path $idealLoadsCoupledCoolingOaMaxFlowBodyValidation -Limit 280 -Description "IdealLoads cooling OA maximum-flow true-body release validator"
 Assert-LineLimit -Path $idealLoadsCoupledCoolingEconomizerGuardValidation -Limit 240 -Description "IdealLoads cooling economizer guard release validator"
 Assert-LineLimit -Path $idealLoadsCoupledCoolingEconomizerConditionValidation -Limit 280 -Description "IdealLoads cooling economizer condition release validator"
+Assert-LineLimit -Path $idealLoadsCoupledCoolingEconomizerBodyValidation -Limit 320 -Description "IdealLoads cooling economizer true-body release validator"
 Assert-LineLimit -Path $idealLoadsCouplingValidation -Limit 260 -Description "IdealLoads release coupling validation"
 Assert-LineLimit -Path $idealLoadsInput -Limit 260 -Description "IdealLoads input boundary module"
 Assert-LineLimit -Path $idealLoadsMeters -Limit 120 -Description "IdealLoads meter binding module"
@@ -514,6 +582,10 @@ Assert-LineLimit -Path $runPurchasedAirCoolingOaMaxFlowBodySerialization -Limit 
 Assert-LineLimit -Path $runPurchasedAirCoolingEconomizerGuard -Limit 420 -Description "ep_run PurchasedAir cooling economizer guard pipeline module"
 Assert-LineLimit -Path $runPurchasedAirCoolingEconomizerCondition -Limit 400 -Description "ep_run PurchasedAir cooling economizer condition pipeline module"
 Assert-LineLimit -Path $runPurchasedAirCoolingEconomizerConditionSerialization -Limit 220 -Description "ep_run PurchasedAir cooling economizer condition JSON serializer"
+Assert-LineLimit -Path $runPurchasedAirCoolingEconomizerBody -Limit 460 -Description "ep_run PurchasedAir cooling economizer true-body pipeline module"
+Assert-LineLimit -Path $runPurchasedAirCoolingEconomizerBodySerialization -Limit 260 -Description "ep_run PurchasedAir cooling economizer true-body JSON serializer"
+Assert-LineLimit -Path $runPurchasedAirCoolingEconomizerBodySnapshotSerialization -Limit 220 -Description "ep_run PurchasedAir cooling economizer true-body snapshot JSON serializer"
+Assert-LineLimit -Path $runPurchasedAirCoolingEconomizerBodyValidation -Limit 320 -Description "ep_run PurchasedAir cooling economizer true-body exact release validator"
 
 Assert-Contains -Path $calcRoot -Pattern 'mod humidity;' -Description "IdealLoads calc humidity submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod cooling_entry_gate;' -Description "PurchasedAir Calc cooling-entry gate submodule declaration"
@@ -975,7 +1047,7 @@ Assert-Contains -Path $calcCoolingEconomizerGuard -Pattern 'pub economizer_type:
 Assert-Contains -Path $calcCoolingEconomizerGuard -Pattern 'pub economizer_not_no_economizer: Option<bool>' -Description "Calc cooling economizer comparison-result evidence"
 Assert-Contains -Path $calcCoolingEconomizerGuard -Pattern 'pub economizer_body_entry_count: usize' -Description "Calc cooling economizer excluded-body entry counter"
 Assert-Contains -Path $calcCoolingEconomizerGuard -Pattern 'pub no_economizer_fallthrough_count: usize' -Description "Calc cooling economizer false-result continuation counter"
-Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)#\[derive\(Clone, Debug, Default, PartialEq\)\]\s*pub struct PurchasedAirRuntimeState\s*\{.*?cooling_economizer_condition_latest_witnesses:\s*BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingEconomizerConditionSnapshot>,\s*\}' -Description "runtime-root default-empty per-system CP316 witness map"
+Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)#\[derive\(Clone, Debug, Default, PartialEq\)\]\s*pub struct PurchasedAirRuntimeState\s*\{.*?cooling_economizer_condition_latest_witnesses:\s*BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingEconomizerConditionSnapshot>,' -Description "runtime-root default-empty per-system CP316 witness map"
 Assert-NotContains -Path $idealLoadsInitState -Pattern '(?m)^\s*pub(?:\([^)]*\))?\s+cooling_economizer_condition_latest_witnesses:' -Description "public runtime-root CP316 witness map"
 Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)pub\(in crate::ideal_loads\) fn cooling_economizer_condition_latest_witness\s*\(\s*&self,\s*system:\s*IdealLoadsAirSystemId,\s*\)\s*->\s*Option<PurchasedAirCalcCoolingEconomizerConditionSnapshot>\s*\{\s*self\.cooling_economizer_condition_latest_witnesses\s*\.get\(&system\)\s*\.copied\(\)\s*\}' -Description "ideal_loads-scoped runtime-root CP316 witness getter"
 Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)pub\(in crate::ideal_loads\) fn set_cooling_economizer_condition_latest_witness\s*\(\s*&mut self,\s*system:\s*IdealLoadsAirSystemId,\s*snapshot:\s*PurchasedAirCalcCoolingEconomizerConditionSnapshot,\s*\)\s*\{\s*self\.cooling_economizer_condition_latest_witnesses\s*\.insert\(system, snapshot\);\s*\}' -Description "ideal_loads-scoped runtime-root CP316 witness setter"
@@ -1328,6 +1400,7 @@ foreach ($coolingEconomizerConditionBoundaryFile in @(
     $calcCoolingEconomizerConditionTransition,
     $calcCoolingEconomizerConditionRelease,
     $calcCoolingEconomizerConditionEntryPrefixValidation,
+    $calcCoolingEconomizerConditionCompletedConditionValidation,
     $calcCoolingEconomizerConditionInitializationValidation,
     $calcCoolingEconomizerConditionPredecessorValidation,
     $calcCoolingEconomizerConditionRuntimeValidation
@@ -1346,6 +1419,161 @@ foreach ($coolingEconomizerConditionIntegrationEvidenceFile in @(
     }
 }
 Assert-NotContains -Path $calcCoolingEconomizerConditionTransition -Pattern '\.is_finite\(\)' -Description "finite validation in pure cooling economizer condition characterization"
+
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'pub const PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE' -Description "Calc cooling economizer true-body source provenance"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'pub const PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE' -Description "Calc cooling economizer true-body first excluded source"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'pub const PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE_ORDER' -Description "Calc cooling economizer true-body exact source order"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'EnergyPlus 26\.1 PurchasedAirManager\.cc:2089-2101' -Description "Calc cooling economizer exact true-body boundary"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'EnergyPlus 26\.1 PurchasedAirManager\.cc:2109' -Description "Calc cooling economizer true-body exact first excluded executable"
+Assert-ExactStringArray -Path $calcCoolingEconomizerBody -Name "PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE_ORDER" -Expected @(
+    "read-controlled-zone-humidity-ratio",
+    "evaluate-psy-cp-air-fn-w",
+    "assign-local-cp-air",
+    "read-outdoor-air-node-temperature",
+    "read-zone-node-temperature",
+    "subtract-zone-temperature-from-outdoor-air-temperature",
+    "assign-local-delta-temperature",
+    "read-delta-temperature-for-small-temperature-difference-gate",
+    "compare-strict-delta-temperature-below-negative-small-temperature-difference",
+    "enter-delta-temperature-body-if-satisfied",
+    "read-zone-cooling-setpoint-load-after-delta-temperature-match",
+    "read-local-cp-air-for-first-division",
+    "calculate-zone-cooling-setpoint-load-divided-by-cp-air",
+    "read-local-delta-temperature-for-second-division",
+    "calculate-first-division-intermediate-divided-by-delta-temperature",
+    "assign-initial-supply-mass-flow-rate",
+    "read-cooling-limit-for-flow-rate",
+    "compare-cooling-limit-equal-to-flow-rate",
+    "read-cooling-limit-for-flow-rate-and-capacity-after-short-circuit",
+    "compare-cooling-limit-equal-to-flow-rate-and-capacity",
+    "read-maximum-cooling-air-mass-flow-after-selector-match",
+    "compare-strict-maximum-cooling-air-mass-flow-above-zero",
+    "enter-maximum-flow-clamp-body-if-satisfied",
+    "read-supply-mass-flow-rate-for-inner-maximum",
+    "apply-source-shaped-maximum-with-zero",
+    "reread-maximum-cooling-air-mass-flow-as-clamp-upper-bound",
+    "apply-source-shaped-minimum-with-maximum-cooling-air-mass-flow",
+    "assign-clamped-supply-mass-flow-rate",
+    "read-resulting-supply-mass-flow-rate",
+    "read-current-outdoor-air-mass-flow-rate",
+    "compare-strict-supply-mass-flow-above-outdoor-air-mass-flow",
+    "enter-economizer-activation-body-if-satisfied",
+    "assign-economizer-on-true-after-mass-flow-match",
+    "reread-supply-mass-flow-for-outdoor-air-mass-flow-assignment",
+    "assign-outdoor-air-mass-flow-from-supply-mass-flow",
+    "read-system-time-step",
+    "assign-economizer-active-time"
+) -Description "Calc cooling economizer true-body exact thirty-seven-site source order"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'pub const PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SMALL_TEMP_DIFF_C: f64 = 1\.0e-5' -Description "Calc cooling economizer exact HVAC SmallTempDiff"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'mod release;' -Description "Calc cooling economizer true-body release submodule declaration"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'mod state;' -Description "Calc cooling economizer true-body state submodule declaration"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'mod transition;' -Description "Calc cooling economizer true-body transition submodule declaration"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'pub use release::\*;' -Description "Calc cooling economizer true-body release re-export"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'pub use state::PurchasedAirCalcCoolingEconomizerBodyRuntimeState;' -Description "Calc cooling economizer true-body state re-export"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'pub\(super\) use transition::advance_cooling_economizer_body_state;' -Description "Calc cooling economizer bounded internal true-body transition visibility"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'pub struct PurchasedAirCalcCoolingEconomizerBodySnapshot' -Description "Calc cooling economizer source-ordered true-body snapshot"
+Assert-Contains -Path $calcCoolingEconomizerBodyState -Pattern 'pub struct PurchasedAirCalcCoolingEconomizerBodyRuntimeState' -Description "Calc cooling economizer bounded true-body persistent state"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'pub struct PurchasedAirCalcCoolingEconomizerBodyLifecycleSummary' -Description "Calc cooling economizer true-body lifecycle summary"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'pub fn purchased_air_calc_cooling_economizer_body_lifecycle_summary\s*\(' -Description "Calc cooling economizer true-body lifecycle summary accessor"
+Assert-Contains -Path $calcCoolingEconomizerBodyState -Pattern 'pub body_execution_count: usize' -Description "Calc cooling economizer true-body execution counter"
+Assert-Contains -Path $calcCoolingEconomizerBody -Pattern 'pub economizer_calculation_body_executed: bool' -Description "Calc cooling economizer true-body execution evidence"
+Assert-Contains -Path $calcCoolingEconomizerBodyState -Pattern 'pub economizer_condition_fallthrough_skip_count: usize' -Description "Calc cooling economizer CP316-false complete-skip counter"
+Assert-Contains -Path $calcCoolingEconomizerBodyState -Pattern 'pub maximum_cooling_air_mass_flow_rate_clamp_upper_bound_read_count: usize' -Description "Calc cooling economizer repeated clamp-upper-bound read counter"
+Assert-Contains -Path $calcCoolingEconomizerBodyState -Pattern 'pub supply_mass_flow_rate_for_outdoor_air_assignment_read_count: usize' -Description "Calc cooling economizer repeated supply-assignment read counter"
+Assert-NotContains -Path $calcCoolingEconomizerBody -Pattern 'fn advance_cooling_economizer_body_state\s*\(' -Description "cooling economizer true-body transition implementation in module facade"
+Assert-NotContains -Path $calcCoolingEconomizerBody -Pattern '#\[test\]' -Description "unit test body in cooling economizer true-body facade"
+
+Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)#\[derive\(Clone, Debug, Default, PartialEq\)\]\s*pub struct PurchasedAirRuntimeState\s*\{.*?cooling_economizer_body_latest_witnesses:\s*BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingEconomizerBodySnapshot>,\s*\}' -Description "runtime-root default-empty per-system CP317 witness map"
+Assert-NotContains -Path $idealLoadsInitState -Pattern '(?m)^\s*pub(?:\([^)]*\))?\s+cooling_economizer_body_latest_witnesses:' -Description "public runtime-root CP317 witness map"
+Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)pub\(in crate::ideal_loads\) fn cooling_economizer_body_latest_witness\s*\(\s*&self,\s*system:\s*IdealLoadsAirSystemId,\s*\)\s*->\s*Option<PurchasedAirCalcCoolingEconomizerBodySnapshot>\s*\{\s*self\.cooling_economizer_body_latest_witnesses\s*\.get\(&system\)\s*\.copied\(\)\s*\}' -Description "ideal_loads-scoped runtime-root CP317 witness getter"
+Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)pub\(in crate::ideal_loads\) fn set_cooling_economizer_body_latest_witness\s*\(\s*&mut self,\s*system:\s*IdealLoadsAirSystemId,\s*snapshot:\s*PurchasedAirCalcCoolingEconomizerBodySnapshot,\s*\)\s*\{\s*self\.cooling_economizer_body_latest_witnesses\s*\.insert\(system, snapshot\);\s*\}' -Description "ideal_loads-scoped runtime-root CP317 witness setter"
+Assert-NotContains -Path $calcCoolingEconomizerCondition -Pattern '\b(?:cooling_economizer_body_latest_witness(?:es)?|body_consumer_latest_witness|PurchasedAirCalcCoolingEconomizerBodySnapshot)\b' -Description "CP317 witness ownership, accessor, setter, or snapshot import in CP316 condition state"
+Assert-NotContains -Path $calcCoolingEconomizerConditionTransition -Pattern '\b(?:cooling_economizer_body_latest_witness(?:es)?|body_consumer_latest_witness)\b' -Description "CP316 transition mutation of the runtime-root CP317 witness"
+
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern 'pub\(in crate::ideal_loads::calc\) fn advance_cooling_economizer_body_state\s*\(' -Description "Calc cooling economizer source-characterization true-body transition"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern 'predecessor\.economizer_calculation_body_entered' -Description "Calc cooling economizer exact CP316 body-entry gate"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern '(?:map\s*\(\s*energyplus_psy_cp_air_fn_w\s*\)|energyplus_psy_cp_air_fn_w\s*\()' -Description "Calc cooling economizer canonical PsyCpAirFnW implementation"
+Assert-NotContains -Path $calcCoolingEconomizerBodyTransition -Pattern 'energyplus_moist_air_specific_heat_j_per_kg_k' -Description "legacy NaN-normalizing moist-air specific-heat helper in CP317"
+Assert-NotContains -Path $calcCoolingEconomizerBodyTransition -Pattern '\.then_some\s*\(\s*input\.' -Description "eager conditional CP317 source input read"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern '\.map\(\|\(outdoor_air, zone\)\| outdoor_air - zone\)' -Description "Calc cooling economizer captured outdoor-minus-Zone delta"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern 'delta\s*<\s*-PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SMALL_TEMP_DIFF_C' -Description "Calc cooling economizer strict negative-small-difference gate"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern '\.map\(\|\(load, cp_air\)\| load / cp_air\)' -Description "Calc cooling economizer first source supply-flow division"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern '\.map\(\|\(load_over_cp, delta_temperature\)\| load_over_cp / delta_temperature\)' -Description "Calc cooling economizer left-associated second supply-flow division"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern '== IdealLoadsLimit::LimitFlowRate' -Description "Calc cooling economizer first flow-limit selector comparison"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern '== IdealLoadsLimit::LimitFlowRateAndCapacity' -Description "Calc cooling economizer second flow-limit selector comparison"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern 'maximum\s*>\s*0\.0' -Description "Calc cooling economizer strict positive maximum-flow comparison"
+Assert-PatternsInOrder -Path $calcCoolingEconomizerBodyTransition -Patterns @(
+    'let nonnegative = source_max\(supply_for_clamp, 0\.0\);',
+    'let clamp_upper_bound = input\.maximum_cooling_air_mass_flow_rate_kg_per_s;',
+    'let clamped = source_min\(nonnegative, clamp_upper_bound\);'
+) -Description "Calc cooling economizer source-ordered supply reread, inner maximum, maximum reread, and outer minimum"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern '(?s)fn source_min\s*\(\s*left:\s*f64,\s*right:\s*f64\s*\)\s*->\s*f64\s*\{\s*if left < right \{\s*left\s*\}\s*else\s*\{\s*right\s*\}\s*\}' -Description "Calc cooling economizer Objexx min NaN operand-order semantics"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern '(?s)fn source_max\s*\(\s*left:\s*f64,\s*right:\s*f64\s*\)\s*->\s*f64\s*\{\s*if left < right \{\s*right\s*\}\s*else\s*\{\s*left\s*\}\s*\}' -Description "Calc cooling economizer Objexx max NaN operand-order semantics"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern '\.map\(\|\(supply, outdoor_air\)\| supply > outdoor_air\)' -Description "Calc cooling economizer strict supply-above-outdoor-air comparison"
+Assert-PatternsInOrder -Path $calcCoolingEconomizerBodyTransition -Patterns @(
+    'let resulting_supply_mass_flow_rate_kg_per_s =',
+    'let outdoor_air_mass_flow_rate_kg_per_s =',
+    'let supply_mass_flow_above_outdoor_air_mass_flow =',
+    'let economizer_activation_body_entered =',
+    'let economizer_on =',
+    'let supply_mass_flow_rate_for_outdoor_air_assignment_kg_per_s =',
+    'let assigned_outdoor_air_mass_flow_rate_kg_per_s =',
+    'let system_time_step_hours =',
+    'let assigned_economizer_active_time_hours ='
+) -Description "Calc cooling economizer exact final comparison and conditional assignment read order"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern 'economizer_on_assigned' -Description "Calc cooling economizer conditional EconoOn assignment evidence"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern 'assigned_outdoor_air_mass_flow_rate_kg_per_s' -Description "Calc cooling economizer conditional outdoor-air flow assignment evidence"
+Assert-Contains -Path $calcCoolingEconomizerBodyTransition -Pattern 'assigned_economizer_active_time_hours' -Description "Calc cooling economizer conditional active-time assignment evidence"
+Assert-NotContains -Path $calcCoolingEconomizerBodyTransition -Pattern '\.(?:clamp|min|max)\s*\(' -Description "Rust f64 clamp/min/max substitution in CP317 Objexx-shaped clamp"
+Assert-NotContains -Path $calcCoolingEconomizerBodyTransition -Pattern '\.is_finite\(\)' -Description "finite validation in pure cooling economizer true-body characterization"
+
+Assert-Contains -Path $calcCoolingEconomizerBodyRelease -Pattern 'pub enum PurchasedAirCalcCoolingEconomizerBodyError' -Description "Calc cooling economizer true-body fail-closed error"
+Assert-Contains -Path $calcCoolingEconomizerBodyRelease -Pattern '(?s)pub fn advance_direct_no_oa_calc_cooling_economizer_body\s*\(\s*runtime:\s*&mut PurchasedAirRuntimeState,\s*system:\s*&IdealLoadsAirSystem,\s*predecessor:\s*PurchasedAirCalcCoolingEconomizerConditionSnapshot,\s*\)\s*->\s*Result<\s*PurchasedAirCalcCoolingEconomizerBodySnapshot,\s*PurchasedAirCalcCoolingEconomizerBodyError,?\s*>\s*\{' -Description "Calc cooling economizer true-body exact public no-node release signature"
+Assert-NotContains -Path $calcCoolingEconomizerBodyRelease -Pattern '\b(?:NodeId|NodeStateStore|AirNodeState)\b' -Description "live Node dependency in public cooling economizer true-body release boundary"
+Assert-Contains -Path $calcCoolingEconomizerBodyRelease -Pattern 'PredecessorCallOrder' -Description "CP310-through-CP317 one-for-one source-order guard"
+Assert-Contains -Path $calcCoolingEconomizerBodyRelease -Pattern 'PredecessorOutsideDirectSubset' -Description "CP317 exact release predecessor-shape guard"
+Assert-Contains -Path $calcCoolingEconomizerBodyRelease -Pattern 'RuntimeStateInvariantViolation' -Description "CP317 retained release-state guard"
+Assert-Contains -Path $calcCoolingEconomizerBodyRelease -Pattern 'classify_no_oa_sensible_subset\(system\)\.is_supported\(\)' -Description "CP317 exact no-OA release subset validation"
+Assert-Contains -Path $calcCoolingEconomizerBodyRelease -Pattern 'cooling_economizer_body_latest_witness\(selected\)' -Description "CP317 runtime-root witness read"
+Assert-Contains -Path $calcCoolingEconomizerBodyRelease -Pattern 'set_cooling_economizer_body_latest_witness\(selected, snapshot\)' -Description "CP317 runtime-root witness publication"
+Assert-Contains -Path $calcCoolingEconomizerBodyRelease -Pattern 'debug_assert!\(!snapshot\.economizer_calculation_body_executed\)' -Description "CP317 exact release zero true-body executions"
+Assert-Contains -Path $calcCoolingEconomizerBodyRelease -Pattern 'debug_assert!\(!snapshot\.psychrometric_cp_air_evaluated\)' -Description "CP317 exact release zero psychrometric calls"
+Assert-Contains -Path $calcCoolingEconomizerBodyRelease -Pattern 'debug_assert!\(!snapshot\.economizer_on_assigned\)' -Description "CP317 exact release zero EconoOn assignments"
+
+Assert-Contains -Path $calcCoolingEconomizerBodySourceOrderTests -Pattern 'source_order_preserves_delta_limit_clamp_and_assignment_short_circuits' -Description "Calc cooling economizer true-body source-order characterization regression"
+Assert-Contains -Path $calcCoolingEconomizerBodyTests -Pattern 'mod gate_and_assignment_tests;' -Description "Calc cooling economizer gate and assignment test module declaration"
+Assert-Contains -Path $calcCoolingEconomizerBodyGateAndAssignmentTests -Pattern 'strict_delta_temperature_gate_preserves_boundary_nan_and_infinity_behavior' -Description "Calc cooling economizer strict delta-temperature gate characterization regression"
+Assert-Contains -Path $calcCoolingEconomizerBodyGateAndAssignmentTests -Pattern 'strict_final_comparison_controls_all_four_economizer_assignments' -Description "Calc cooling economizer strict final comparison and assignment characterization regression"
+Assert-Contains -Path $calcCoolingEconomizerBodyIeeeTests -Pattern 'objexx_min_max_preserve_nan_and_signed_zero_operand_order' -Description "Calc cooling economizer Objexx min/max edge-semantics regression"
+Assert-Contains -Path $calcCoolingEconomizerBodySkipTests -Pattern 'unit_off_non_cooling_outer_false_and_condition_false_are_complete_skips' -Description "Calc cooling economizer true-body complete parent-skip partition regression"
+Assert-Contains -Path $calcCoolingEconomizerBodyReleaseTests -Pattern 'public_no_oa_body_never_reads_or_mutates_calculation_sites' -Description "Calc cooling economizer public no-OA zero-site regression"
+Assert-Contains -Path $calcCoolingEconomizerBodyReleaseTests -Pattern 'exact_release_snapshot_rejects_impossible_skip_route_predecessor_flags' -Description "Calc cooling economizer impossible predecessor-route shape regression"
+Assert-Contains -Path $calcCoolingEconomizerBodyReleaseTests -Pattern 'public_body_rejects_forgery_replay_overflow_and_prefix_corruption_transactionally' -Description "Calc cooling economizer true-body forgery, replay, overflow, and prefix transaction regression"
+Assert-Contains -Path $calcCoolingEconomizerBodyReleaseProvenanceTests -Pattern 'public_body_rejects_alternate_history_condition_and_body_splice_transactionally' -Description "Calc cooling economizer true-body alternate-history splice rejection"
+Assert-Contains -Path $calcCoolingEconomizerBodyReleaseProvenanceTests -Pattern 'public_body_rejects_alternate_history_whole_unit_transplant_transactionally' -Description "Calc cooling economizer true-body whole-unit transplant rejection"
+Assert-Contains -Path $calcCoolingEconomizerBodyReleaseCorruptionTests -Pattern 'public_body_rejects_entry_prefix_and_initialization_corruption_transactionally' -Description "Calc cooling economizer true-body retained prefix corruption regression"
+
+$coolingEconomizerBodyForbiddenBehaviorPatterns = @(
+    [pscustomobject]@{ Pattern = 'PurchasedAirManager\.cc:(2110|2111|2348)'; Description = "later cooling or Heat/DeadBand provenance in cooling economizer true-body boundary" },
+    [pscustomobject]@{ Pattern = 'SupplyMassFlowRateForCool|MinCoolSuppAirTemp|CalcPurchAirMixedAir'; Description = "excluded common cooling-flow reset or mixed-air behavior in cooling economizer true-body boundary" },
+    [pscustomobject]@{ Pattern = 'PsyHFnTdbW|moist_air_enthalpy_j_per_kg|psychrometric_[A-Za-z0-9_]*enthalpy'; Description = "excluded enthalpy calculation in cooling economizer true-body boundary" },
+    [pscustomobject]@{ Pattern = 'calc_economizer_adjusted_outdoor_air_mass_flow_rate_kg_per_s'; Description = "separate outdoor-air economizer helper in cooling economizer true-body boundary" },
+    [pscustomobject]@{ Pattern = 'OutdoorAirEconomizerType::(?:DifferentialDryBulb|DifferentialEnthalpy)'; Description = "re-evaluation of CP316 economizer selectors in CP317" }
+)
+foreach ($coolingEconomizerBodyBoundaryFile in @(
+    $calcCoolingEconomizerBody,
+    $calcCoolingEconomizerBodyState,
+    $calcCoolingEconomizerBodyTransition,
+    $calcCoolingEconomizerBodyRelease,
+    $calcCoolingEconomizerBodyEntryPrefixValidation,
+    $calcCoolingEconomizerBodyInitializationValidation,
+    $calcCoolingEconomizerBodyPredecessorValidation,
+    $calcCoolingEconomizerBodyRuntimeValidation
+)) {
+    foreach ($forbiddenBehavior in $coolingEconomizerBodyForbiddenBehaviorPatterns) {
+        Assert-NotContains -Path $coolingEconomizerBodyBoundaryFile -Pattern $forbiddenBehavior.Pattern -Description $forbiddenBehavior.Description
+    }
+}
 
 Assert-Contains -Path $idealLoadsInit -Pattern 'pub struct IdealLoadsInitFlags' -Description "IdealLoads init flags type"
 Assert-Contains -Path $idealLoadsInit -Pattern 'mod manager_plan;' -Description "IdealLoads immutable manager-plan module"
@@ -1524,6 +1752,14 @@ Assert-Contains -Path $idealLoadsBindingCoolingEconomizerConditionIntegrityTests
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'CalculationCoolingEconomizerCondition\(PurchasedAirCalcCoolingEconomizerConditionError\)' -Description "Calc cooling economizer condition scheduled binding error boundary"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'pub calculation_cooling_economizer_condition:\s*[\r\n]+\s*PurchasedAirCalcCoolingEconomizerConditionSnapshot' -Description "Calc cooling economizer condition scheduled output evidence"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'advance_direct_no_oa_calc_cooling_economizer_condition\s*\(' -Description "Calc cooling economizer condition scheduled release call"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding_tests.rs" -Pattern '#\[path = "binding/cooling_economizer_body_tests\.rs"\]' -Description "Calc cooling economizer true-body binding test module path"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding_tests.rs" -Pattern '#\[path = "binding/cooling_economizer_body_integrity_tests\.rs"\]' -Description "Calc cooling economizer true-body retained-state integrity test module path"
+Assert-Contains -Path $idealLoadsBindingCoolingEconomizerBodyTests -Pattern 'scheduled_binding_orders_cooling_economizer_body_after_cp316_before_numerical_calc' -Description "Calc cooling economizer true-body scheduled binding order regression"
+Assert-Contains -Path $idealLoadsBindingCoolingEconomizerBodyTests -Pattern 'public_cooling_economizer_body_rejects_forgery_replay_and_overflow_without_mutation' -Description "Calc cooling economizer true-body forgery, replay, and overflow transaction regression"
+Assert-Contains -Path $idealLoadsBindingCoolingEconomizerBodyIntegrityTests -Pattern 'public_body_rejects_retained_identity_and_route_forgery_without_mutation' -Description "Calc cooling economizer true-body retained identity and route forgery regression"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'CalculationCoolingEconomizerBody\(PurchasedAirCalcCoolingEconomizerBodyError\)' -Description "Calc cooling economizer true-body scheduled binding error boundary"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'pub calculation_cooling_economizer_body:\s*PurchasedAirCalcCoolingEconomizerBodySnapshot' -Description "Calc cooling economizer true-body scheduled output evidence"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'advance_direct_no_oa_calc_cooling_economizer_body\s*\(' -Description "Calc cooling economizer true-body scheduled release call"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'zone_component_availability:\s*Some\(PurchasedAirAvailabilityStatus::NoAction\)' -Description "release allocated ZoneComp NoAction visit"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'PurchasedAirTemperatureControlType::DualHeatCool' -Description "release prevalidated DualHeatCool cooling-entry input"
 $bindingText = Read-RepoText -Path "crates\ep_runtime\src\ideal_loads\binding.rs"
@@ -1535,10 +1771,15 @@ $bindingCoolingOaMaxFlowIndex = $bindingText.IndexOf("let calculation_cooling_oa
 $bindingCoolingOaMaxFlowBodyIndex = $bindingText.IndexOf("let calculation_cooling_oa_max_flow_body = advance_direct_no_oa_calc_cooling_oa_max_flow_body(")
 $bindingCoolingEconomizerGuardIndex = $bindingText.IndexOf("let calculation_cooling_economizer_guard =")
 $bindingCoolingEconomizerConditionIndex = $bindingText.IndexOf("let calculation_cooling_economizer_condition =")
+$bindingCoolingEconomizerBodyIndex = $bindingText.IndexOf("let calculation_cooling_economizer_body =")
 $bindingCalcIndex = $bindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
 $bindingCoolingEconomizerConditionCall = [regex]::Match(
     $bindingText,
     '(?s)let calculation_cooling_economizer_condition =\s*advance_direct_no_oa_calc_cooling_economizer_condition\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_economizer_guard,\s*\)\s*\.map_err\(\s*DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingEconomizerCondition,\s*\)\?;'
+)
+$bindingCoolingEconomizerBodyCall = [regex]::Match(
+    $bindingText,
+    '(?s)let calculation_cooling_economizer_body =\s*advance_direct_no_oa_calc_cooling_economizer_body\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_economizer_condition,\s*\)\s*\.map_err\(\s*DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingEconomizerBody,?\s*\)\?;'
 )
 if (
     $bindingInitIndex -lt 0 -or
@@ -1549,33 +1790,58 @@ if (
     $bindingCoolingOaMaxFlowBodyIndex -le $bindingCoolingOaMaxFlowIndex -or
     $bindingCoolingEconomizerGuardIndex -le $bindingCoolingOaMaxFlowBodyIndex -or
     $bindingCoolingEconomizerConditionIndex -le $bindingCoolingEconomizerGuardIndex -or
-    $bindingCalcIndex -le $bindingCoolingEconomizerConditionIndex
+    $bindingCoolingEconomizerBodyIndex -le $bindingCoolingEconomizerConditionIndex -or
+    $bindingCalcIndex -le $bindingCoolingEconomizerBodyIndex
 ) {
-    throw "InitPurchasedAir must precede the Calc-entry prefix, minimum-OA prefix, cooling-entry gate, cooling OA maximum-flow gate, cooling OA maximum-flow true body, cooling economizer guard, cooling economizer condition, and bounded numerical Calc coupling"
+    throw "InitPurchasedAir must precede the Calc-entry prefix, minimum-OA prefix, cooling-entry gate, cooling OA maximum-flow gate, cooling OA maximum-flow true body, cooling economizer guard, cooling economizer condition, cooling economizer true body, and bounded numerical Calc coupling"
 }
 if (-not $bindingCoolingEconomizerConditionCall.Success) {
     throw "CP316 binding must call the exact no-node release wrapper with only runtime, system, and CP315 predecessor"
 }
+if (-not $bindingCoolingEconomizerBodyCall.Success) {
+    throw "CP317 binding must call the exact no-node release wrapper with only runtime, system, and CP316 predecessor"
+}
 $bindingCoolingEconomizerConditionCallEnd =
     $bindingCoolingEconomizerConditionCall.Index + $bindingCoolingEconomizerConditionCall.Length
-if ($bindingCalcIndex -le $bindingCoolingEconomizerConditionCallEnd) {
-    throw "CP316 exact release call must complete before the bounded numerical Calc coupling"
+if ($bindingCoolingEconomizerBodyIndex -lt $bindingCoolingEconomizerConditionCallEnd) {
+    throw "CP316 exact release call must complete before CP317"
 }
-$bindingCoolingEconomizerConditionToCalcWindow = $bindingText.Substring(
+$bindingCoolingEconomizerConditionToBodyWindow = $bindingText.Substring(
     $bindingCoolingEconomizerConditionCall.Index,
-    $bindingCalcIndex - $bindingCoolingEconomizerConditionCall.Index
+    $bindingCoolingEconomizerBodyIndex - $bindingCoolingEconomizerConditionCall.Index
 )
 foreach ($forbiddenBehavior in $coolingEconomizerConditionForbiddenBehaviorPatterns) {
-    if ($bindingCoolingEconomizerConditionToCalcWindow -match $forbiddenBehavior.Pattern) {
-        throw "$($forbiddenBehavior.Description) unexpectedly present between CP316 and bounded numerical Calc coupling"
+    if ($bindingCoolingEconomizerConditionToBodyWindow -match $forbiddenBehavior.Pattern) {
+        throw "$($forbiddenBehavior.Description) unexpectedly present between CP316 entry and CP317"
     }
 }
 $bindingPostCoolingEconomizerConditionWindow = $bindingText.Substring(
     $bindingCoolingEconomizerConditionCallEnd,
-    $bindingCalcIndex - $bindingCoolingEconomizerConditionCallEnd
+    $bindingCoolingEconomizerBodyIndex - $bindingCoolingEconomizerConditionCallEnd
 )
 if ($bindingPostCoolingEconomizerConditionWindow -match '(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)\s*\(') {
-    throw "No intermediary helper call may execute after CP316 and before the bounded numerical Calc coupling"
+    throw "No intermediary helper call may execute after CP316 and before CP317"
+}
+$bindingCoolingEconomizerBodyCallEnd =
+    $bindingCoolingEconomizerBodyCall.Index + $bindingCoolingEconomizerBodyCall.Length
+if ($bindingCalcIndex -le $bindingCoolingEconomizerBodyCallEnd) {
+    throw "CP317 exact release call must complete before the bounded numerical Calc coupling"
+}
+$bindingCoolingEconomizerBodyToCalcWindow = $bindingText.Substring(
+    $bindingCoolingEconomizerBodyCall.Index,
+    $bindingCalcIndex - $bindingCoolingEconomizerBodyCall.Index
+)
+foreach ($forbiddenBehavior in $coolingEconomizerBodyForbiddenBehaviorPatterns) {
+    if ($bindingCoolingEconomizerBodyToCalcWindow -match $forbiddenBehavior.Pattern) {
+        throw "$($forbiddenBehavior.Description) unexpectedly present between CP317 and bounded numerical Calc coupling"
+    }
+}
+$bindingPostCoolingEconomizerBodyWindow = $bindingText.Substring(
+    $bindingCoolingEconomizerBodyCallEnd,
+    $bindingCalcIndex - $bindingCoolingEconomizerBodyCallEnd
+)
+if ($bindingPostCoolingEconomizerBodyWindow -match '(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)\s*\(') {
+    throw "No intermediary helper call may execute after CP317 and before the bounded numerical Calc coupling"
 }
 Assert-Contains -Path $calcLimits -Pattern 'initialized_heating_air_mass_flow_limit_kg_per_s' -Description "initialized heating flow cache input"
 Assert-Contains -Path $calcLimits -Pattern 'initialized_cooling_air_mass_flow_limit_kg_per_s' -Description "initialized cooling flow cache input"
@@ -1827,6 +2093,104 @@ Assert-Contains -Path $runPipeline -Pattern '\.purchased_air_calc_cooling_econom
 Assert-Contains -Path $runPipeline -Pattern 'direct_release_cooling_economizer_condition_validation_rejects_malformed_evidence' -Description "pipeline cooling economizer condition malformed-evidence regression"
 Assert-Contains -Path $runPipeline -Pattern 'direct_release_cooling_economizer_condition_json_exposes_zero_evidence_skip' -Description "pipeline cooling economizer condition zero-evidence JSON regression"
 Assert-Contains -Path $runDirectZoneCoupledTests -Pattern 'purchased_air_calc_cooling_economizer_condition_lifecycle' -Description "direct run cooling economizer condition lifecycle JSON assertion"
+Assert-Contains -Path $idealLoadsInitState -Pattern 'pub calc_cooling_economizer_body: PurchasedAirCalcCoolingEconomizerBodyRuntimeState' -Description "persistent cooling economizer true-body lifecycle state"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'mod cooling_economizer_body_validation;' -Description "coupled runtime cooling economizer true-body validator submodule declaration"
+Assert-Contains -Path $idealLoadsCoupledCoolingEconomizerBodyValidation -Pattern '(?s)pub\(super\) fn snapshot_matches_release\s*\(\s*output:\s*&DirectZonePurchasedAirScheduledCouplingOutput,\s*call_ordinal:\s*usize,\s*binding:\s*&DirectZonePurchasedAirModelBinding<''_>,\s*\)\s*->\s*bool' -Description "exact evidence-only per-timestep cooling economizer true-body release validator"
+Assert-Contains -Path $idealLoadsCoupledCoolingEconomizerBodyValidation -Pattern '(?s)pub\(super\) fn validate_lifecycle\s*\(\s*lifecycle:\s*&PurchasedAirCalcCoolingEconomizerBodyLifecycleSummary,\s*predecessor_lifecycle:\s*&PurchasedAirCalcCoolingEconomizerConditionLifecycleSummary,\s*timestep_count:\s*usize,\s*latest_output:\s*&DirectZonePurchasedAirScheduledCouplingOutput,\s*binding:\s*&DirectZonePurchasedAirModelBinding<''_>,\s*\)\s*->\s*Result<\(\), Error>' -Description "exact evidence-only final cooling economizer true-body lifecycle validator"
+Assert-Contains -Path $idealLoadsCoupledCoolingEconomizerBodyValidation -Pattern 'source: PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE' -Description "coupled cooling economizer true-body snapshot provenance validation"
+Assert-Contains -Path $idealLoadsCoupledCoolingEconomizerBodyValidation -Pattern 'first_excluded_source:\s*PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE' -Description "coupled cooling economizer true-body first-excluded validation"
+Assert-Contains -Path $idealLoadsCoupledCoolingEconomizerBodyValidation -Pattern 'source_order: PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE_ORDER' -Description "coupled cooling economizer true-body exact source-order validation"
+Assert-Contains -Path $idealLoadsCoupledCoolingEconomizerBodyValidation -Pattern 'let skip_partition = checked_add\s*\(' -Description "coupled cooling economizer true-body checked complete-skip partition"
+Assert-Contains -Path $idealLoadsCoupledCoolingEconomizerBodyValidation -Pattern 'let transition_partition = checked_add\s*\(' -Description "coupled cooling economizer true-body checked transition partition"
+Assert-Contains -Path $idealLoadsCoupledCoolingEconomizerBodyValidation -Pattern 'body_execution_count,\s*[\r\n]+\s*predecessor\.economizer_calculation_body_entry_count' -Description "coupled cooling economizer true-body CP316-entry reconciliation"
+Assert-Contains -Path $idealLoadsCoupledCoolingEconomizerBodyValidation -Pattern 'count!\(body_execution_count, 0\)' -Description "coupled cooling economizer exact-release zero true-body executions"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern '(?s)cooling_economizer_body_validation::snapshot_matches_release\(\s*output,\s*timestep_index \+ 1,\s*&binding,\s*\)' -Description "coupled runtime exact evidence-only per-timestep cooling economizer true-body validation"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern '(?s)cooling_economizer_body_validation::validate_lifecycle\(\s*&calc_cooling_economizer_body_lifecycle,\s*&calc_cooling_economizer_condition_lifecycle,\s*timestep_outputs\.len\(\),\s*latest_output,\s*&binding,\s*\)' -Description "coupled runtime exact evidence-only final cooling economizer true-body validation"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'pub calc_cooling_economizer_body_lifecycle:\s*[\r\n]+\s*PurchasedAirCalcCoolingEconomizerBodyLifecycleSummary' -Description "coupled runtime cooling economizer true-body lifecycle summary"
+Assert-Contains -Path $runPipeline -Pattern 'mod purchased_air_cooling_economizer_body;' -Description "pipeline cooling economizer true-body evidence submodule declaration"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBody -Pattern 'mod serialization;' -Description "pipeline cooling economizer true-body serializer submodule declaration"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBody -Pattern 'mod validation;' -Description "pipeline cooling economizer true-body validator submodule declaration"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBody -Pattern 'pub\(super\) use serialization::lifecycle_json;' -Description "pipeline cooling economizer true-body serializer re-export"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBodySerialization -Pattern '(?s)pub\(in crate::pipeline\) fn lifecycle_json\s*\(\s*lifecycle:\s*&PurchasedAirCalcCoolingEconomizerBodyLifecycleSummary,\s*\)\s*->\s*Value' -Description "pipeline evidence-only cooling economizer true-body JSON ownership"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBodySerialization -Pattern 'mod snapshot;' -Description "pipeline cooling economizer true-body snapshot serializer submodule declaration"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBodySerialization -Pattern '"body_execution_count"' -Description "pipeline cooling economizer true-body execution-count JSON evidence"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBodySerialization -Pattern '"psychrometric_cp_air_evaluation_count"' -Description "pipeline cooling economizer true-body psychrometric-count JSON evidence"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBodySerialization -Pattern '"economizer_active_time_assignment_count"' -Description "pipeline cooling economizer true-body active-time JSON evidence"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBodySnapshotSerialization -Pattern 'pub\(super\) fn snapshot_json\s*\(' -Description "pipeline cooling economizer true-body snapshot JSON ownership"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBody -Pattern '(?s)pub\(super\) fn validate_direct_lifecycle\s*\(\s*lifecycle:\s*Option<&PurchasedAirCalcCoolingEconomizerBodyLifecycleSummary>,\s*predecessor_lifecycle:\s*Option<&PurchasedAirCalcCoolingEconomizerConditionLifecycleSummary>,\s*init_lifecycle:\s*Option<&PurchasedAirInitLifecycleSummary>,\s*coupling_call_count:\s*Option<usize>,\s*\)\s*->\s*Result<\(\), String>' -Description "pipeline exact evidence-only cooling economizer true-body firewall ownership"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBody -Pattern 'PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE_ORDER' -Description "pipeline cooling economizer true-body exact source-order validation"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBody -Pattern 'PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE' -Description "pipeline cooling economizer true-body first-excluded validation"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBody -Pattern '(?s)let skip_partition = \[.*?\.try_fold\(0usize,.*?checked_add\(partial, value, "skip partition"\)' -Description "pipeline cooling economizer true-body checked complete-skip partition"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBody -Pattern 'let transition_partition = checked_add\s*\(' -Description "pipeline cooling economizer true-body checked transition partition"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBody -Pattern '\(\s*"direct_body_execution_count",\s*0' -Description "pipeline cooling economizer true-body total execution zero guard"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBodyValidation -Pattern 'pub\(super\) fn skipped_shape\s*\(' -Description "pipeline cooling economizer true-body complete source-site skip firewall"
+Assert-Contains -Path $runPurchasedAirCoolingEconomizerBodyValidation -Pattern 'pub\(super\) fn validate_zero_source_counters\s*\(' -Description "pipeline cooling economizer true-body exhaustive zero-counter firewall"
+
+$coolingEconomizerBodyExpandedSnapshotFields = @(
+    "psychrometric_cp_air_result_j_per_kg_k",
+    "cp_air_assigned",
+    "delta_temperature_assigned",
+    "assigned_delta_temperature_c",
+    "delta_temperature_for_gate_read",
+    "delta_temperature_for_gate_c",
+    "delta_temperature_body_entered",
+    "cp_air_for_first_division_read",
+    "cp_air_for_first_division_j_per_kg_k",
+    "zone_cooling_setpoint_load_over_cp_air_calculated",
+    "zone_cooling_setpoint_load_over_cp_air_kg_k_per_s",
+    "delta_temperature_for_second_division_read",
+    "delta_temperature_for_second_division_c",
+    "initial_supply_mass_flow_rate_assigned",
+    "initial_supply_mass_flow_rate_kg_per_s",
+    "maximum_flow_clamp_body_entered",
+    "supply_mass_flow_rate_for_clamp_read",
+    "supply_mass_flow_rate_for_clamp_kg_per_s",
+    "inner_max_evaluated",
+    "maximum_cooling_air_mass_flow_rate_clamp_upper_bound_read",
+    "maximum_cooling_air_mass_flow_rate_clamp_upper_bound_kg_per_s",
+    "outer_min_evaluated",
+    "clamped_supply_mass_flow_rate_assigned",
+    "economizer_activation_body_entered",
+    "supply_mass_flow_rate_for_outdoor_air_assignment_read",
+    "supply_mass_flow_rate_for_outdoor_air_assignment_kg_per_s"
+)
+foreach ($field in $coolingEconomizerBodyExpandedSnapshotFields) {
+    $fieldPattern = [regex]::Escape($field)
+    Assert-Contains -Path $runPurchasedAirCoolingEconomizerBodyValidation -Pattern "\b$fieldPattern\b" -Description "pipeline cooling economizer expanded snapshot validation for $field"
+    Assert-Contains -Path $runPurchasedAirCoolingEconomizerBodySnapshotSerialization -Pattern "`"$fieldPattern`"" -Description "pipeline cooling economizer expanded snapshot JSON for $field"
+}
+
+$coolingEconomizerBodyExpandedCounterFields = @(
+    "cp_air_assignment_count",
+    "delta_temperature_assignment_count",
+    "delta_temperature_for_gate_read_count",
+    "delta_temperature_body_entry_count",
+    "cp_air_for_first_division_read_count",
+    "zone_cooling_setpoint_load_over_cp_air_calculation_count",
+    "delta_temperature_for_second_division_read_count",
+    "initial_supply_mass_flow_rate_assignment_count",
+    "cooling_limit_flow_rate_read_count",
+    "cooling_limit_flow_rate_and_capacity_read_count",
+    "maximum_flow_clamp_body_entry_count",
+    "supply_mass_flow_rate_for_clamp_read_count",
+    "inner_max_evaluation_count",
+    "maximum_cooling_air_mass_flow_rate_clamp_upper_bound_read_count",
+    "outer_min_evaluation_count",
+    "clamped_supply_mass_flow_rate_assignment_count",
+    "economizer_activation_body_entry_count",
+    "supply_mass_flow_rate_for_outdoor_air_assignment_read_count"
+)
+foreach ($field in $coolingEconomizerBodyExpandedCounterFields) {
+    $fieldPattern = [regex]::Escape($field)
+    Assert-Contains -Path $runPurchasedAirCoolingEconomizerBodyValidation -Pattern "\b$fieldPattern\b" -Description "pipeline cooling economizer expanded zero-counter validation for $field"
+    Assert-Contains -Path $runPurchasedAirCoolingEconomizerBodySerialization -Pattern "`"$fieldPattern`"" -Description "pipeline cooling economizer expanded counter JSON for $field"
+}
+Assert-Contains -Path $runPipeline -Pattern '"purchased_air_calc_cooling_economizer_body_lifecycle"' -Description "release cooling economizer true-body lifecycle JSON evidence"
+Assert-Contains -Path $runPipeline -Pattern '(?s)purchased_air_cooling_economizer_body::validate_direct_lifecycle\(\s*result\s*\.purchased_air_calc_cooling_economizer_body_lifecycle\s*\.as_ref\(\),\s*result\s*\.purchased_air_calc_cooling_economizer_condition_lifecycle\s*\.as_ref\(\),\s*init_lifecycle,\s*result\.purchased_air_coupling_call_count,\s*\)\?;' -Description "release exact evidence-only cooling economizer true-body pipeline firewall"
+Assert-Contains -Path $runPipeline -Pattern '\.purchased_air_calc_cooling_economizer_body_lifecycle\s*[\r\n]+\s*\.is_some\(\)' -Description "non-direct cooling economizer true-body evidence rejection"
+Assert-Contains -Path $runPipeline -Pattern 'direct_release_cooling_economizer_body_validation_rejects_malformed_evidence' -Description "pipeline cooling economizer true-body malformed-evidence regression"
+Assert-Contains -Path $runPipeline -Pattern 'direct_release_cooling_economizer_body_json_exposes_zero_evidence_skip' -Description "pipeline cooling economizer true-body zero-evidence JSON regression"
+Assert-Contains -Path $runDirectZoneCoupledTests -Pattern 'purchased_air_calc_cooling_economizer_body_lifecycle' -Description "direct run cooling economizer true-body lifecycle JSON assertion"
 Assert-Contains -Path $runPipeline -Pattern 'topology_ready' -Description "release topology-ready JSON and validation evidence"
 Assert-Contains -Path $runPipeline -Pattern 'topology_diagnostics' -Description "release ordered topology diagnostic evidence"
 Assert-Contains -Path $runPipeline -Pattern 'topology_failure' -Description "release retained topology failure evidence"

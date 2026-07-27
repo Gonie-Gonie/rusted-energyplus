@@ -3,6 +3,8 @@ use super::*;
 use crate::{
     ideal_loads::{
         DirectZonePurchasedAirBindingFeature, IdealLoadsSensibleLimitContext,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_FIRST_EXCLUDED_SOURCE,
@@ -46,6 +48,25 @@ const ZONE_KEY: &str = "ZONE ONE";
 const SUPPLY_NODE_KEY: &str = "SUPPLY";
 const RETURN_NODE_KEY: &str = "RETURN";
 const ABS_TOLERANCE: f64 = 1.0e-9;
+
+#[test]
+fn cooling_economizer_body_partition_overflow_fails_closed() {
+    let error = super::cooling_economizer_body_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingEconomizerBodyLifecycleInvariant {
+            field: "test_partition_overflow",
+            expected: 1,
+            actual: usize::MAX,
+        }
+    ));
+}
 
 #[test]
 fn cooling_economizer_condition_partition_overflow_fails_closed() {
@@ -584,6 +605,38 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
     assert_eq!(latest_condition.economizer_condition_satisfied, None);
     assert!(!latest_condition.economizer_calculation_body_entered);
     assert!(!latest_condition.economizer_condition_fallthrough);
+    let economizer_body = simulation.summary.calc_cooling_economizer_body_lifecycle;
+    assert_eq!(
+        economizer_body.source,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE
+    );
+    assert_eq!(
+        economizer_body.first_excluded_source,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE
+    );
+    let economizer_body_state = economizer_body.state;
+    assert_eq!(economizer_body_state.transition_count, required_steps);
+    assert_eq!(economizer_body_state.body_execution_count, 0);
+    assert_eq!(economizer_body_state.unit_off_skip_count, 0);
+    assert_eq!(economizer_body_state.non_cooling_skip_count, required_steps);
+    assert_eq!(
+        economizer_body_state.psychrometric_cp_air_evaluation_count,
+        0
+    );
+    assert_eq!(
+        economizer_body_state.maximum_cooling_air_mass_flow_rate_clamp_upper_bound_read_count,
+        0
+    );
+    assert_eq!(economizer_body_state.economizer_on_assignment_count, 0);
+    assert_eq!(
+        economizer_body_state.supply_mass_flow_rate_for_outdoor_air_assignment_read_count,
+        0
+    );
+    let latest_economizer_body = economizer_body_state.latest.expect("latest CP317 snapshot");
+    assert!(latest_economizer_body.non_cooling_skipped);
+    assert!(!latest_economizer_body.economizer_calculation_body_executed);
+    assert!(!latest_economizer_body.psychrometric_cp_air_evaluated);
+    assert!(!latest_economizer_body.economizer_on_assigned);
 
     let zone = simulation.state.zones.first().expect("bound Zone state");
     assert_eq!(simulation.state.timestep_index, required_steps);
@@ -1048,6 +1101,37 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
         assert_eq!(latest_condition.economizer_condition_satisfied, None);
         assert!(!latest_condition.economizer_calculation_body_entered);
         assert!(!latest_condition.economizer_condition_fallthrough);
+        let body_lifecycle = simulation.summary.calc_cooling_economizer_body_lifecycle;
+        assert_eq!(
+            body_lifecycle.source,
+            PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE
+        );
+        assert_eq!(
+            body_lifecycle.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE
+        );
+        let body_state = body_lifecycle.state;
+        assert_eq!(body_state.transition_count, 1, "{limit:?}");
+        assert_eq!(body_state.body_execution_count, 0, "{limit:?}");
+        assert_eq!(
+            body_state.no_economizer_outer_guard_fallthrough_skip_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(body_state.psychrometric_cp_air_evaluation_count, 0);
+        assert_eq!(
+            body_state.maximum_cooling_air_mass_flow_rate_clamp_upper_bound_read_count,
+            0
+        );
+        assert_eq!(body_state.economizer_on_assignment_count, 0);
+        assert_eq!(
+            body_state.supply_mass_flow_rate_for_outdoor_air_assignment_read_count,
+            0
+        );
+        let latest_body = body_state.latest.expect("latest CP317 skip snapshot");
+        assert!(latest_body.no_economizer_outer_guard_fallthrough_skipped);
+        assert!(!latest_body.economizer_calculation_body_executed);
+        assert!(!latest_body.psychrometric_cp_air_evaluated);
+        assert!(!latest_body.economizer_on_assigned);
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation
