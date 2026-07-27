@@ -17,9 +17,10 @@ pub(super) fn humidistat_dehumidification_mass_flow_rate_kg_per_s(
     system: &IdealLoadsAirSystem,
     zone_state: IdealLoadsZoneState,
     demand: ZoneSysEnergyDemand,
+    context: IdealLoadsSensibleLimitContext,
 ) -> f64 {
     if system.dehumidification_control_type != DehumidificationControlType::Humidistat
-        || cooling_capacity_limit_is_zero(system)
+        || cooling_capacity_limit_is_zero(system, context)
     {
         return 0.0;
     }
@@ -38,9 +39,10 @@ pub(super) fn humidistat_humidification_mass_flow_rate_kg_per_s(
     system: &IdealLoadsAirSystem,
     zone_state: IdealLoadsZoneState,
     demand: ZoneSysEnergyDemand,
+    context: IdealLoadsSensibleLimitContext,
 ) -> f64 {
     if system.humidification_control_type != HumidificationControlType::Humidistat
-        || heating_capacity_limit_is_zero(system)
+        || heating_capacity_limit_is_zero(system, context)
     {
         return 0.0;
     }

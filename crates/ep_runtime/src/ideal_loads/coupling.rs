@@ -695,8 +695,9 @@ mod tests {
             state.sum_sys_mcp_t_w = 53.0;
             let original = state.clone();
             let mut system = test_system();
-            let initialization = initialized_snapshot(&system);
             system.heating_limit = IdealLoadsLimit::LimitCapacity;
+            system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(1_000.0));
+            let initialization = initialized_snapshot(&system);
             system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(value));
 
             let error = couple_direct_zone_predicted_demand_to_purchased_air(
@@ -776,6 +777,35 @@ mod tests {
             output.feedback.sum_sys_mcp_w_per_k,
         );
         assert_close(state.sum_sys_mcp_t_w, output.feedback.sum_sys_mcp_t_w);
+    }
+
+    #[test]
+    fn calc_uses_the_persistent_sizing_overlay_after_model_values_change() {
+        let mut state = zone_state_for_temp_independent_load(0.0);
+        let mut system = test_system();
+        system.heating_limit = IdealLoadsLimit::LimitCapacity;
+        system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(1_000.0));
+        let initialization = initialized_snapshot(&system);
+        system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(5_000.0));
+
+        let output = couple_direct_zone_predicted_demand_to_purchased_air(
+            coupling_input_with_initialization(&mut state, &system, 1, 1, initialization),
+        )
+        .expect("Calc must consume the retained sizing overlay");
+
+        assert_close(
+            output
+                .purchased_air
+                .calculation
+                .zone_sensible_heating_rate_w,
+            1_000.0,
+        );
+        assert_eq!(
+            initialization
+                .sized_limits
+                .maximum_sensible_heating_capacity_w,
+            Some(AutosizeOrNumber::Value(1_000.0))
+        );
     }
 
     #[test]
@@ -1114,6 +1144,10 @@ mod tests {
             PurchasedAirInitCallContext {
                 zone_equipment_inputs_filled: true,
                 system_sizing_calculation: false,
+                sizing: crate::ideal_loads::PurchasedAirHardSizeLegacyContext {
+                    current_zone_equipment_index: 1,
+                    zone_sizing_run_done: false,
+                },
                 begin_environment: true,
                 standard_air_density_kg_per_m3: limit_context.standard_air_density_kg_per_m3,
                 heating_setpoint_c: 20.0,

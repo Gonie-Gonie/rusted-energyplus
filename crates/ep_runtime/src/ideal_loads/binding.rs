@@ -20,12 +20,12 @@ use ep_model::{
 use super::{
     DirectZonePurchasedAirCouplingError, DirectZonePurchasedAirCouplingInput,
     DirectZonePurchasedAirCouplingOutput, IdealLoadsPurchasedAirBranch,
-    IdealLoadsSensibleLimitContext, PurchasedAirInitCallContext, PurchasedAirInitError,
-    PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanError, PurchasedAirInitSnapshot,
-    PurchasedAirInitTopologyPlan, PurchasedAirInitTopologyPlanError, PurchasedAirRuntimeState,
-    classify_no_oa_sensible_subset, complete_direct_zone_purchased_air_coupling,
-    init_purchased_air_runtime, predict_direct_zone_demand_for_purchased_air,
-    select_purchased_air_branch,
+    IdealLoadsSensibleLimitContext, PurchasedAirHardSizeLegacyContext, PurchasedAirInitCallContext,
+    PurchasedAirInitError, PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanError,
+    PurchasedAirInitSnapshot, PurchasedAirInitTopologyPlan, PurchasedAirInitTopologyPlanError,
+    PurchasedAirRuntimeState, classify_no_oa_sensible_subset,
+    complete_direct_zone_purchased_air_coupling, init_purchased_air_runtime,
+    predict_direct_zone_demand_for_purchased_air, select_purchased_air_branch,
 };
 
 /// One-to-one relation required by the bounded direct-Zone binding.
@@ -736,6 +736,10 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         PurchasedAirInitCallContext {
             zone_equipment_inputs_filled: true,
             system_sizing_calculation: false,
+            sizing: PurchasedAirHardSizeLegacyContext {
+                current_zone_equipment_index: 1,
+                zone_sizing_run_done: false,
+            },
             begin_environment: input.begin_environment,
             standard_air_density_kg_per_m3: binding.limit_context.standard_air_density_kg_per_m3,
             heating_setpoint_c,

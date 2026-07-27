@@ -161,7 +161,7 @@ pub const IDEAL_LOADS_RUNTIME_STRING_LOOKUP_POLICY: &str =
     "PurchAirName string lookup is compile/report only; simulation loop uses prebound typed IDs";
 
 /// SizePurchasedAir policy for the current compatibility subset.
-pub const IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY: &str = "SizePurchasedAir autosizing is blocked for arbitrary-run compatibility; declared conformance cases use resolved numeric or no-limit sizing inputs before CalcPurchAirLoads";
+pub const IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY: &str = "the exact direct-Zone release lane executes the persistent direct hard-sized SizePurchasedAir legacy route before BeginEnvrn and CalcPurchAirLoads; Autosize, custom, Zone-sizing-run, and scalable sizing remain blocked";
 
 /// Inputs consumed by the source-order PurchasedAir wrapper.
 #[derive(Clone, Copy, Debug)]

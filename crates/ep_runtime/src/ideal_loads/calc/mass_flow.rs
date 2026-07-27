@@ -14,10 +14,11 @@ pub(super) fn limited_heating_mass_flow_rate_kg_per_s(
     cp_air_j_per_kg_k: f64,
     limit_context: IdealLoadsSensibleLimitContext,
 ) -> f64 {
+    let sized_limits = limit_context.sized_limits_or_system(system);
     if matches!(
         capacity_limit_w(
             system.heating_limit,
-            system.maximum_sensible_heating_capacity_w,
+            sized_limits.maximum_sensible_heating_capacity_w,
         ),
         Some(capacity_limit_w) if capacity_limit_w <= 0.0
     ) {
@@ -35,7 +36,7 @@ pub(super) fn limited_heating_mass_flow_rate_kg_per_s(
 
     if let Some(maximum_mass_flow_rate_kg_per_s) = flow_limit_kg_per_s(
         system.heating_limit,
-        system.maximum_heating_air_flow_rate_m3_per_s,
+        sized_limits.maximum_heating_air_flow_rate_m3_per_s,
         limit_context.initialized_heating_air_mass_flow_limit_kg_per_s,
         limit_context,
     ) && maximum_mass_flow_rate_kg_per_s > 0.0
@@ -53,8 +54,12 @@ pub(super) fn limited_cooling_mass_flow_rate_kg_per_s(
     cp_air_j_per_kg_k: f64,
     limit_context: IdealLoadsSensibleLimitContext,
 ) -> f64 {
+    let sized_limits = limit_context.sized_limits_or_system(system);
     if matches!(
-        capacity_limit_w(system.cooling_limit, system.maximum_total_cooling_capacity_w),
+        capacity_limit_w(
+            system.cooling_limit,
+            sized_limits.maximum_total_cooling_capacity_w,
+        ),
         Some(capacity_limit_w) if capacity_limit_w <= 0.0
     ) {
         return 0.0;
@@ -71,7 +76,7 @@ pub(super) fn limited_cooling_mass_flow_rate_kg_per_s(
 
     if let Some(maximum_mass_flow_rate_kg_per_s) = flow_limit_kg_per_s(
         system.cooling_limit,
-        system.maximum_cooling_air_flow_rate_m3_per_s,
+        sized_limits.maximum_cooling_air_flow_rate_m3_per_s,
         limit_context.initialized_cooling_air_mass_flow_limit_kg_per_s,
         limit_context,
     ) && maximum_mass_flow_rate_kg_per_s > 0.0

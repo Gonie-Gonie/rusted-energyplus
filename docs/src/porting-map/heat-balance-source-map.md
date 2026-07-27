@@ -33346,6 +33346,37 @@ FirstHVACIteration, and reset/concurrency remain out of scope. Parent/routine
 status, counts, capabilities,
 and the external full-lifecycle checkbox remain unchanged.
 
+## CP308 Direct Hard-Sized PurchasedAir Sizing Inside the Heat-Balance Loop
+
+The exact direct-Zone heat-balance loop now preserves predictor -> CP306
+manager sweep -> CP307 selected topology -> CP308 bounded sizing ->
+begin-environment cache -> `CalcPurchAirLoads` -> update/report -> same-step
+Zone-air corrector order. CP308 enters the EnergyPlus 26.1
+`InitPurchasedAir` sizing callsite at `PurchasedAirManager.cc` lines
+1194-1198 and maps only the direct hard-sized
+`SizePurchasedAir` route at lines 1326-1394 and 1697-1904. A custom sizing
+object, completed Zone sizing run, Autosize, invalid numeric value, or missing
+active limit returns before the environment, Calc, update/report, and
+corrector suffix with the size latch still armed.
+
+Successful topology seeds a per-unit four-field overlay. The sizing child
+visits heating flow, heating capacity, cooling flow, and cooling capacity in
+source order and stores the successful outcome before clearing the latch.
+Begin-environment derives its mass-flow caches from that overlay, and coupling
+passes the same overlay into Calc for flow and capacity limits. A later model
+view cannot split environment or Calc from the retained sized state. Pipeline
+evidence requires one attempt, one completion, the positive-index direct route,
+and exact source-ordered field outcomes. The source no-current-equipment
+suppression is tested but not admitted by the release binding.
+
+This adds lifecycle and state-order evidence only. It does not add predictor,
+surface, or Zone corrector numerics and does not widen the runtime class.
+Autosizing, custom/scalable sizing, Zone sizing arrays and design days,
+complete sizer calculations, emitted sizing reports/warnings, EMS/shared
+scratch, partial-error effects, broader topology, adaptive timestep behavior,
+and full Init/Size parity remain excluded. Parent/routine status, counts,
+capability evidence, conformance, and the Roadmap checkbox remain unchanged.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

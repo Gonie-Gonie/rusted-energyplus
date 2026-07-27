@@ -15,6 +15,7 @@ mod meters;
 mod outdoor_air;
 mod report;
 mod runtime;
+mod sizing;
 mod update;
 
 pub use binding::*;
@@ -35,4 +36,8 @@ pub use meters::*;
 pub use outdoor_air::*;
 pub use report::*;
 pub use runtime::*;
+pub use sizing::*;
 pub use update::*;
+
+#[cfg(test)]
+mod sizing_tests;

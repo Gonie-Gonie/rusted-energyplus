@@ -350,10 +350,12 @@ fn environment_validation_never_commits_half_cache() {
 
     assert_eq!(
         init_purchased_air_runtime(&mut state, &manager, &topology, &system, call),
-        Err(PurchasedAirInitError::InvalidHardSize {
-            system: SYSTEM,
-            field: "maximum_cooling_air_flow_rate_m3_per_s",
-        })
+        Err(PurchasedAirInitError::Sizing(
+            crate::ideal_loads::PurchasedAirHardSizeLegacyError::MissingRequiredHardSize {
+                system: SYSTEM,
+                field: crate::ideal_loads::PurchasedAirHardSizeField::MaximumCoolingAirFlowRate,
+            }
+        ))
     );
     let unit = &state.units[&SYSTEM];
     assert!(unit.one_time_latched);
@@ -362,6 +364,8 @@ fn environment_validation_never_commits_half_cache() {
     assert_eq!(unit.maximum_cooling_air_mass_flow_rate_kg_per_s, 0.0);
     assert_eq!(unit.standard_air_density_kg_per_m3, None);
     assert_eq!(unit.environment_initialization_count, 0);
+    assert_eq!(unit.sizing_attempt_count, 0);
+    assert!(unit.sizing_needed);
 }
 
 #[allow(clippy::too_many_arguments)]

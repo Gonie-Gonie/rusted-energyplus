@@ -184,6 +184,24 @@ parity. Plenum ownership, full sizing/autosizing, multi-unit execution,
 broader OA behavior, and reset/concurrency remain open; no parent, routine,
 inventory, capability, or Roadmap status is promoted.
 
+CP308 extends the bounded Init lane through the direct hard-sized
+`SizePurchasedAir` legacy route. After topology succeeds, Rust seeds a
+four-field per-unit overlay and retains the source order of heating flow,
+heating capacity, cooling flow, and cooling capacity. Positive values pass
+through the characterized clean-scratch identity children even when their
+limit is inactive; zero and blank values skip the child. The retained outcome
+also records the source writeback and local-design asymmetries. The size latch
+clears only after normal completion, while system-sizing deferral and rejected
+custom, Zone-sizing-run, Autosize, missing-active, or invalid hard-size paths
+leave it armed. Begin-environment flow caches and finite-limit Calc now consume
+the retained overlay instead of rereading the immutable model. The
+`CurZoneEqNum <= 0` suppression is directly tested but remains outside release
+admission. Autosizing, custom/scalable sizing, Zone sizing arrays,
+`FinalZoneSizing`, complete sizer internals, emitted sizing reports and
+warnings, EMS/shared-scratch behavior, partial child-error effects, and full
+`SizePurchasedAir` parity remain open. No parent, routine, inventory,
+capability, conformance, or Roadmap status is promoted.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

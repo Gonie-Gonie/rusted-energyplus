@@ -115,10 +115,10 @@ pub fn calc_no_oa_no_limit_sensible_with_recirculation_context_compat(
         };
     let heating_mass_flow_rate_kg_per_s = heating_mass_flow_rate_kg_per_s
         .max(humidistat_humidification_mass_flow_rate_kg_per_s(
-            system, zone_state, demand,
+            system, zone_state, demand, context,
         ))
         .max(heating_section_dehumidification_mass_flow_rate_kg_per_s(
-            system, zone_state, demand,
+            system, zone_state, demand, context,
         ));
 
     let cooling_delta_t =
@@ -130,7 +130,7 @@ pub fn calc_no_oa_no_limit_sensible_with_recirculation_context_compat(
             0.0
         };
     let cooling_mass_flow_rate_kg_per_s = cooling_sensible_mass_flow_rate_kg_per_s.max(
-        humidistat_dehumidification_mass_flow_rate_kg_per_s(system, zone_state, demand),
+        humidistat_dehumidification_mass_flow_rate_kg_per_s(system, zone_state, demand, context),
     );
 
     if cooling_threshold_selected {
@@ -263,16 +263,23 @@ pub fn calc_no_oa_sensible_with_limits_and_recirculation_compat(
         cp_air_j_per_kg_k,
         limit_context,
     );
+    let sized_limits = limit_context.sized_limits_or_system(system);
     let mut heating_mass_flow_rate_kg_per_s = heating_mass_flow_rate_kg_per_s
         .max(humidistat_humidification_mass_flow_rate_kg_per_s(
-            system, zone_state, demand,
+            system,
+            zone_state,
+            demand,
+            limit_context,
         ))
         .max(heating_section_dehumidification_mass_flow_rate_kg_per_s(
-            system, zone_state, demand,
+            system,
+            zone_state,
+            demand,
+            limit_context,
         ));
     if let Some(maximum_mass_flow_rate_kg_per_s) = flow_limit_kg_per_s(
         system.heating_limit,
-        system.maximum_heating_air_flow_rate_m3_per_s,
+        sized_limits.maximum_heating_air_flow_rate_m3_per_s,
         limit_context.initialized_heating_air_mass_flow_limit_kg_per_s,
         limit_context,
     ) && maximum_mass_flow_rate_kg_per_s > 0.0
@@ -280,7 +287,7 @@ pub fn calc_no_oa_sensible_with_limits_and_recirculation_compat(
         heating_mass_flow_rate_kg_per_s =
             heating_mass_flow_rate_kg_per_s.min(maximum_mass_flow_rate_kg_per_s);
     }
-    if heating_capacity_limit_is_zero(system) {
+    if heating_capacity_limit_is_zero(system, limit_context) {
         heating_mass_flow_rate_kg_per_s = 0.0;
     }
     let cooling_sensible_mass_flow_rate_kg_per_s = limited_cooling_mass_flow_rate_kg_per_s(
@@ -291,11 +298,16 @@ pub fn calc_no_oa_sensible_with_limits_and_recirculation_compat(
         limit_context,
     );
     let mut cooling_mass_flow_rate_kg_per_s = cooling_sensible_mass_flow_rate_kg_per_s.max(
-        humidistat_dehumidification_mass_flow_rate_kg_per_s(system, zone_state, demand),
+        humidistat_dehumidification_mass_flow_rate_kg_per_s(
+            system,
+            zone_state,
+            demand,
+            limit_context,
+        ),
     );
     if let Some(maximum_mass_flow_rate_kg_per_s) = flow_limit_kg_per_s(
         system.cooling_limit,
-        system.maximum_cooling_air_flow_rate_m3_per_s,
+        sized_limits.maximum_cooling_air_flow_rate_m3_per_s,
         limit_context.initialized_cooling_air_mass_flow_limit_kg_per_s,
         limit_context,
     ) && maximum_mass_flow_rate_kg_per_s > 0.0
@@ -303,7 +315,7 @@ pub fn calc_no_oa_sensible_with_limits_and_recirculation_compat(
         cooling_mass_flow_rate_kg_per_s =
             cooling_mass_flow_rate_kg_per_s.min(maximum_mass_flow_rate_kg_per_s);
     }
-    if cooling_capacity_limit_is_zero(system) {
+    if cooling_capacity_limit_is_zero(system, limit_context) {
         cooling_mass_flow_rate_kg_per_s = 0.0;
     }
 
@@ -385,6 +397,7 @@ fn heating_result_with_limits(
     demand: ZoneSysEnergyDemand,
     context: IdealLoadsSensibleLimitContext,
 ) -> IdealLoadsSensibleResult {
+    let sized_limits = context.sized_limits_or_system(system);
     let mut supply_temperature_c = zone_state.air_temperature_c
         + heating_load_w / (cp_air_j_per_kg_k * heating_mass_flow_rate_kg_per_s);
     supply_temperature_c = supply_temperature_c
@@ -399,7 +412,7 @@ fn heating_result_with_limits(
 
     if let Some(maximum_heating_capacity_w) = capacity_limit_w(
         system.heating_limit,
-        system.maximum_sensible_heating_capacity_w,
+        sized_limits.maximum_sensible_heating_capacity_w,
     ) && heating_coil_output_w > maximum_heating_capacity_w
     {
         heating_coil_output_w = maximum_heating_capacity_w;
@@ -483,12 +496,13 @@ fn heating_section_dehumidification_mass_flow_rate_kg_per_s(
     system: &IdealLoadsAirSystem,
     zone_state: IdealLoadsZoneState,
     demand: ZoneSysEnergyDemand,
+    context: IdealLoadsSensibleLimitContext,
 ) -> f64 {
     if matches!(
         system.humidification_control_type,
         HumidificationControlType::Humidistat | HumidificationControlType::None
     ) {
-        humidistat_dehumidification_mass_flow_rate_kg_per_s(system, zone_state, demand)
+        humidistat_dehumidification_mass_flow_rate_kg_per_s(system, zone_state, demand, context)
     } else {
         0.0
     }
@@ -505,6 +519,7 @@ fn cooling_result_with_limits(
     demand: ZoneSysEnergyDemand,
     context: IdealLoadsSensibleLimitContext,
 ) -> IdealLoadsSensibleResult {
+    let sized_limits = context.sized_limits_or_system(system);
     let mut supply_temperature_c = zone_state.air_temperature_c
         - cooling_load_w / (cp_air_j_per_kg_k * cooling_mass_flow_rate_kg_per_s);
     supply_temperature_c = supply_temperature_c
@@ -519,7 +534,7 @@ fn cooling_result_with_limits(
 
     if let Some(maximum_cooling_capacity_w) = capacity_limit_w(
         system.cooling_limit,
-        system.maximum_total_cooling_capacity_w,
+        sized_limits.maximum_total_cooling_capacity_w,
     ) && cooling_coil_output_w >= maximum_cooling_capacity_w
     {
         cooling_coil_output_w = maximum_cooling_capacity_w;

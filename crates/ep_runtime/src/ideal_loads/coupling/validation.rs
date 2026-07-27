@@ -1,12 +1,17 @@
 //! Fail-closed release-coupling and initialization-cache validation.
 
-use ep_model::{DehumidificationControlType, HumidificationControlType, IdealLoadsAirSystem};
+use ep_model::{
+    AutosizeOrNumber, DehumidificationControlType, HumidificationControlType, IdealLoadsAirSystem,
+    IdealLoadsLimit,
+};
 
 use super::{
     DirectZonePurchasedAirCouplingError, DirectZonePurchasedAirCouplingInput,
     DirectZonePurchasedAirInitializationRelation,
 };
-use crate::ideal_loads::{IdealLoadsSensibleLimitContext, select_purchased_air_branch};
+use crate::ideal_loads::{
+    IdealLoadsSensibleLimitContext, PurchasedAirHardSizeLegacyRoute, select_purchased_air_branch,
+};
 
 pub(super) fn validate_supported_branch(
     system: &IdealLoadsAirSystem,
@@ -68,6 +73,33 @@ pub(super) fn initialized_limit_context(
     {
         return Err(DirectZonePurchasedAirCouplingError::InitializationNotReady);
     }
+    if !matches!(
+        initialization.sizing_outcome.map(|outcome| outcome.route),
+        Some(PurchasedAirHardSizeLegacyRoute::DirectHardSizedNoSizingRun)
+    ) {
+        return Err(DirectZonePurchasedAirCouplingError::InitializationNotReady);
+    }
+    let sized_limits = initialization.sized_limits;
+    require_sized_limit(
+        sized_limits.maximum_heating_air_flow_rate_m3_per_s,
+        limit_includes_flow(input.system.heating_limit),
+        "sized_limits.maximum_heating_air_flow_rate_m3_per_s",
+    )?;
+    require_sized_limit(
+        sized_limits.maximum_sensible_heating_capacity_w,
+        limit_includes_capacity(input.system.heating_limit),
+        "sized_limits.maximum_sensible_heating_capacity_w",
+    )?;
+    require_sized_limit(
+        sized_limits.maximum_cooling_air_flow_rate_m3_per_s,
+        limit_includes_flow(input.system.cooling_limit),
+        "sized_limits.maximum_cooling_air_flow_rate_m3_per_s",
+    )?;
+    require_sized_limit(
+        sized_limits.maximum_total_cooling_capacity_w,
+        limit_includes_capacity(input.system.cooling_limit),
+        "sized_limits.maximum_total_cooling_capacity_w",
+    )?;
     let density = initialization.standard_air_density_kg_per_m3.ok_or(
         DirectZonePurchasedAirCouplingError::InitializationCacheInvalid {
             field: "standard_air_density_kg_per_m3",
@@ -83,11 +115,14 @@ pub(super) fn initialized_limit_context(
         initialization.maximum_cooling_air_mass_flow_rate_kg_per_s,
         "maximum_cooling_air_mass_flow_rate_kg_per_s",
     )?;
-    Ok(input.limit_context.with_initialized_flow_limits(
-        density,
-        initialization.maximum_heating_air_mass_flow_rate_kg_per_s,
-        initialization.maximum_cooling_air_mass_flow_rate_kg_per_s,
-    ))
+    Ok(input
+        .limit_context
+        .with_initialized_flow_limits(
+            density,
+            initialization.maximum_heating_air_mass_flow_rate_kg_per_s,
+            initialization.maximum_cooling_air_mass_flow_rate_kg_per_s,
+        )
+        .with_purchased_air_sized_limits(sized_limits))
 }
 
 pub(super) fn validate_coupling_inputs(
@@ -146,6 +181,40 @@ fn require_initialization_cache_nonnegative(
     } else {
         Err(DirectZonePurchasedAirCouplingError::InitializationCacheInvalid { field, value })
     }
+}
+
+fn require_sized_limit(
+    value: Option<AutosizeOrNumber>,
+    required: bool,
+    field: &'static str,
+) -> Result<(), DirectZonePurchasedAirCouplingError> {
+    match value {
+        Some(AutosizeOrNumber::Value(value)) if value.is_finite() && value >= 0.0 => Ok(()),
+        None if !required => Ok(()),
+        Some(AutosizeOrNumber::Autosize) | Some(AutosizeOrNumber::Value(_)) | None => Err(
+            DirectZonePurchasedAirCouplingError::InitializationCacheInvalid {
+                field,
+                value: match value {
+                    Some(AutosizeOrNumber::Value(value)) => value,
+                    Some(AutosizeOrNumber::Autosize) | None => f64::NAN,
+                },
+            },
+        ),
+    }
+}
+
+fn limit_includes_flow(limit: IdealLoadsLimit) -> bool {
+    matches!(
+        limit,
+        IdealLoadsLimit::LimitFlowRate | IdealLoadsLimit::LimitFlowRateAndCapacity
+    )
+}
+
+fn limit_includes_capacity(limit: IdealLoadsLimit) -> bool {
+    matches!(
+        limit,
+        IdealLoadsLimit::LimitCapacity | IdealLoadsLimit::LimitFlowRateAndCapacity
+    )
 }
 
 fn require_finite_input(

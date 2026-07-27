@@ -2,6 +2,8 @@
 
 use ep_model::{AutosizeOrNumber, IdealLoadsAirSystem, IdealLoadsLimit};
 
+use crate::ideal_loads::PurchasedAirSizedLimits;
+
 use super::psychrometrics::{
     DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3, STANDARD_PRESSURE_SEA_LEVEL_PA,
     energyplus_standard_air_density_kg_per_m3, standard_pressure_elevation_base,
@@ -18,6 +20,8 @@ pub struct IdealLoadsSensibleLimitContext {
     pub initialized_heating_air_mass_flow_limit_kg_per_s: Option<f64>,
     /// Begin-environment cached maximum cooling mass flow, when initialized.
     pub initialized_cooling_air_mass_flow_limit_kg_per_s: Option<f64>,
+    /// Runtime-owned four-field `SizePurchasedAir` overlay, when initialized.
+    pub purchased_air_sized_limits: Option<PurchasedAirSizedLimits>,
 }
 
 impl Default for IdealLoadsSensibleLimitContext {
@@ -27,6 +31,7 @@ impl Default for IdealLoadsSensibleLimitContext {
             barometric_pressure_pa: STANDARD_PRESSURE_SEA_LEVEL_PA,
             initialized_heating_air_mass_flow_limit_kg_per_s: None,
             initialized_cooling_air_mass_flow_limit_kg_per_s: None,
+            purchased_air_sized_limits: None,
         }
     }
 }
@@ -43,6 +48,7 @@ impl IdealLoadsSensibleLimitContext {
                 barometric_pressure_pa,
                 initialized_heating_air_mass_flow_limit_kg_per_s: None,
                 initialized_cooling_air_mass_flow_limit_kg_per_s: None,
+                purchased_air_sized_limits: None,
             },
         )
     }
@@ -66,6 +72,24 @@ impl IdealLoadsSensibleLimitContext {
         self.initialized_heating_air_mass_flow_limit_kg_per_s = Some(heating_kg_per_s);
         self.initialized_cooling_air_mass_flow_limit_kg_per_s = Some(cooling_kg_per_s);
         self
+    }
+
+    /// Returns a copy backed by the persistent four-field sizing overlay.
+    #[must_use]
+    pub fn with_purchased_air_sized_limits(
+        mut self,
+        sized_limits: PurchasedAirSizedLimits,
+    ) -> Self {
+        self.purchased_air_sized_limits = Some(sized_limits);
+        self
+    }
+
+    pub(super) fn sized_limits_or_system(
+        self,
+        system: &IdealLoadsAirSystem,
+    ) -> PurchasedAirSizedLimits {
+        self.purchased_air_sized_limits
+            .unwrap_or_else(|| PurchasedAirSizedLimits::from_system(system))
     }
 }
 
@@ -97,18 +121,29 @@ pub(super) fn capacity_limit_w(
     numeric_autosize_value(capacity_limit_w)
 }
 
-pub(super) fn cooling_capacity_limit_is_zero(system: &IdealLoadsAirSystem) -> bool {
+pub(super) fn cooling_capacity_limit_is_zero(
+    system: &IdealLoadsAirSystem,
+    context: IdealLoadsSensibleLimitContext,
+) -> bool {
+    let sized_limits = context.sized_limits_or_system(system);
     matches!(
-        capacity_limit_w(system.cooling_limit, system.maximum_total_cooling_capacity_w),
+        capacity_limit_w(
+            system.cooling_limit,
+            sized_limits.maximum_total_cooling_capacity_w,
+        ),
         Some(capacity_limit_w) if capacity_limit_w <= 0.0
     )
 }
 
-pub(super) fn heating_capacity_limit_is_zero(system: &IdealLoadsAirSystem) -> bool {
+pub(super) fn heating_capacity_limit_is_zero(
+    system: &IdealLoadsAirSystem,
+    context: IdealLoadsSensibleLimitContext,
+) -> bool {
+    let sized_limits = context.sized_limits_or_system(system);
     matches!(
         capacity_limit_w(
             system.heating_limit,
-            system.maximum_sensible_heating_capacity_w,
+            sized_limits.maximum_sensible_heating_capacity_w,
         ),
         Some(capacity_limit_w) if capacity_limit_w <= 0.0
     )

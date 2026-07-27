@@ -15346,6 +15346,72 @@ algorithms stay `scaffold`/`none`, `routine.init_purchased_air` stays
 `source_mapped`, all inventory/readiness counts stay unchanged, and the
 external Roadmap full-lifecycle checkbox remains open.
 
+## CP308 Direct Hard-Sized SizePurchasedAir Legacy-Route Slice
+
+CP308 maps the bounded sizing child called by EnergyPlus 26.1
+`InitPurchasedAir` at `PurchasedAirManager.cc` lines 1194-1198. The child
+entry and common setup span lines 1326-1394; this checkpoint then maps only
+the `HVACSizingIndex == 0` direct legacy branch at lines 1697-1902 and the
+normal function tail at lines 1903-1904. The release lane enters it with a
+positive current Zone-equipment index, no
+`DesignSpecification:ZoneHVAC:Sizing` binding, `ZoneSizingRunDone == false`,
+no `AutoSize` value, and finite nonnegative direct values. The custom branch
+at lines 1395-1696 and every Zone-sizing-run branch remain outside this
+checkpoint.
+
+After the CP307 topology transition returns normally,
+`PurchasedAirUnitRuntimeState` seeds `PurchasedAirSizedLimits` once from only
+the four PurchasedAir fields; it never clones the complete model. A sizing
+attempt then visits maximum heating air flow, maximum sensible heating
+capacity, maximum cooling air flow, and maximum total cooling capacity in
+source order. On the clean hard-size/no-design-run path each positive child
+sizer reduces to the original numeric value even if the corresponding limit is
+inactive, while zero and blank values skip that child. Rust retains typed
+field outcomes for this characterized behavior. Heating and cooling flow
+results write back to the overlay. The heating-capacity result remains local,
+is clamped to zero below the source 1 W small-load threshold, and leaves the
+object field unchanged. Cooling capacity writes back while its outer local
+design value stays zero. The trace records the source's `[m3/s]` child-label
+suffix on both capacity fields and the resulting child/outer report-record
+counts, but Rust does not emit or claim EIO, SQLite, or predefined-table
+sizing output.
+
+`init_purchased_air_runtime` increments the attempt count before calling the
+bounded child, stores the successful outcome, then clears `sizing_needed` and
+increments the completion count. `SysSizingCalc` defers the attempt entirely.
+Custom sizing, a completed Zone sizing run, Autosize, an invalid numeric
+value, or a missing active-limit value returns before environment
+initialization and leaves the size latch armed. The retained four-field
+overlay also survives a failed retry or a later immutable model view with
+different values. The source outer `CurZoneEqNum <= 0` suppression clears the
+fan-mode entry state, visits no fields, returns normally, and therefore lets
+the caller clear its latch; direct tests preserve that quirk, but coupling and
+release validation require the positive-index direct-hard-sized outcome.
+
+Begin-environment initialization derives its density-specific heating and
+cooling mass-flow caches from the retained overlay. The Init snapshot passes
+that same overlay through coupling validation into
+`IdealLoadsSensibleLimitContext`, and all finite-limit flow, capacity,
+capacity-zero, and humidity helper reads use it before falling back to model
+fields for diagnostic adapters. Regressions mutate the later model view after
+Init and prove both environment and Calc still use the original runtime-owned
+sizing values. Lifecycle summaries and run JSON expose attempts, completion,
+the four values, route, source-ordered field outcomes, and characterized
+report metadata.
+
+This is not an autosizing or full sizing implementation. Zone sizing arrays,
+design-day simulation, `FinalZoneSizing`, custom and scalable sizing,
+Heating/Cooling AirFlowSizer and CapacitySizer calculations beyond the clean
+hard-size identity characterization, EMS override, dirty shared sizing
+scratch and fan-flag ownership, exact reports and warnings, OA autosize
+warnings, ignored shared `ErrorsFound` and source partial-error effects,
+retry/reset/concurrency parity, and complete `SizePurchasedAir` or
+`InitPurchasedAir` behavior remain unclaimed. Both parent algorithms stay
+`scaffold`/`none`; `routine.init_purchased_air` and
+`routine.size_purchased_air` stay `source_mapped`; inventory/readiness,
+capability evidence, conformance, and the external Roadmap full-lifecycle
+checkbox remain unchanged.
+
 
 
 

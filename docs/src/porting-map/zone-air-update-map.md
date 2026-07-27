@@ -21049,6 +21049,30 @@ algorithms remain `scaffold`/`none`, `routine.init_purchased_air` remains
 `source_mapped`, and counts, capabilities, and the Roadmap checkbox are
 unchanged.
 
+## CP308 Hard-Size Sizing Order Before PurchasedAir Environment Initialization
+
+CP308 preserves one more barrier inside the existing direct-Zone update loop:
+predictor demand -> manager membership -> selected topology -> bounded
+hard-size sizing -> begin-environment cache -> Calc -> update/report ->
+same-step corrector. The sizing child is the EnergyPlus 26.1
+`InitPurchasedAir` call at lines 1194-1198 into only
+`SizePurchasedAir` lines 1326-1394 and 1697-1904. A rejected custom,
+Zone-sizing-run, Autosize, missing-active, or invalid-hard-size path therefore
+suppresses every later same-call stage and retains the size latch.
+
+On normal completion, the four-field per-unit overlay is committed in heating
+flow, heating capacity, cooling flow, cooling capacity source order before the
+latch clears. Begin-environment and Calc both consume that retained state, so
+the corrector sees feedback derived from one sizing owner rather than a later
+immutable-model reread. Release validation requires the positive-index direct
+route; the source no-current-equipment zero-visit return is test evidence only.
+
+No Zone-air equation or capability is promoted. Autosizing, custom/scalable
+sizing, design-day/Zone sizing state, exact sizing reports and warnings,
+shared scratch, partial-error parity, adaptive/FirstHVACIteration behavior,
+and full Init/Size parity remain outside this slice. Parent and routine status,
+counts, conformance evidence, and the Roadmap checkbox stay unchanged.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

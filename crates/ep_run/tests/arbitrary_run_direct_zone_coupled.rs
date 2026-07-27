@@ -364,7 +364,19 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
     assert_eq!(lifecycle["equipment_list_membership_found"], true);
     assert_eq!(lifecycle["init_call_count"], expected_calls);
     assert_eq!(lifecycle["one_time_initialization_count"], 1);
+    assert_eq!(lifecycle["sizing_attempt_count"], 1);
     assert_eq!(lifecycle["sizing_check_count"], 1);
+    assert_eq!(
+        lifecycle["sizing_outcome"]["route"],
+        "direct_hard_sized_no_sizing_run"
+    );
+    assert_eq!(
+        lifecycle["sizing_outcome"]["fields"]
+            .as_array()
+            .map(Vec::len),
+        Some(4)
+    );
+    assert!(lifecycle["sized_limits"].is_object());
     assert_eq!(lifecycle["environment_initialization_count"], 1);
     assert_eq!(
         lifecycle["environment_rearm_count"],

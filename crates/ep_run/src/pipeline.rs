@@ -11,14 +11,15 @@ use ep_compare::{
     load_eso_time_series,
 };
 use ep_compiler::{CompileReport, compile_raw_model};
-use ep_model::{SimulationModel, TypedModel};
+use ep_model::{AutosizeOrNumber, SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, load_epjson_file, load_epjson_file_with_idf_order};
 use ep_runtime::{
     DIRECT_ZONE_PURCHASED_AIR_DEMAND_SOURCE, DirectZonePurchasedAirCoupledOptions, ExecutionPlan,
     ExecutionStep, HeatBalanceSimulationOptions, IDEAL_LOADS_FIXTURE_DEMAND_DIAGNOSTIC_SOURCE,
     IdealLoadsCompatibilityOptions, NodeStateProjectionOptions,
-    PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirInitDiagnosticKind,
+    PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirHardSizeField,
+    PurchasedAirHardSizeLegacyRoute, PurchasedAirInitDiagnosticKind,
     PurchasedAirInitLifecycleSummary, PurchasedAirInitTopologyDiagnosticKind,
     PurchasedAirInitTopologyDiagnosticSeverity, PurchasedAirInitTopologyError,
     PurchasedAirRecirculationSource, ResultStore, RuntimePrecomputedData, ScheduleCacheProfile,
@@ -794,6 +795,70 @@ fn purchased_air_init_lifecycle_json(lifecycle: &PurchasedAirInitLifecycleSummar
         }
         PurchasedAirInitTopologyError::NoRecirculationNode { .. } => "no_recirculation_node",
     });
+    let sized_value_json = |value: Option<AutosizeOrNumber>| match value {
+        Some(AutosizeOrNumber::Value(value)) => json!(value),
+        Some(AutosizeOrNumber::Autosize) => json!("autosize"),
+        None => Value::Null,
+    };
+    let sized_limits = lifecycle.sized_limits.map(|limits| {
+        json!({
+            "maximum_heating_air_flow_rate_m3_per_s": sized_value_json(
+                limits.maximum_heating_air_flow_rate_m3_per_s
+            ),
+            "maximum_sensible_heating_capacity_w": sized_value_json(
+                limits.maximum_sensible_heating_capacity_w
+            ),
+            "maximum_cooling_air_flow_rate_m3_per_s": sized_value_json(
+                limits.maximum_cooling_air_flow_rate_m3_per_s
+            ),
+            "maximum_total_cooling_capacity_w": sized_value_json(
+                limits.maximum_total_cooling_capacity_w
+            ),
+        })
+    });
+    let sizing_outcome = lifecycle.sizing_outcome.map(|outcome| {
+        let route = match outcome.route {
+            PurchasedAirHardSizeLegacyRoute::NoCurrentZoneEquipment => "no_current_zone_equipment",
+            PurchasedAirHardSizeLegacyRoute::DirectHardSizedNoSizingRun => {
+                "direct_hard_sized_no_sizing_run"
+            }
+        };
+        let fields: Vec<_> = outcome
+            .fields
+            .iter()
+            .flatten()
+            .map(|field| {
+                let name = match field.field {
+                    PurchasedAirHardSizeField::MaximumHeatingAirFlowRate => {
+                        "maximum_heating_air_flow_rate_m3_per_s"
+                    }
+                    PurchasedAirHardSizeField::MaximumSensibleHeatingCapacity => {
+                        "maximum_sensible_heating_capacity_w"
+                    }
+                    PurchasedAirHardSizeField::MaximumCoolingAirFlowRate => {
+                        "maximum_cooling_air_flow_rate_m3_per_s"
+                    }
+                    PurchasedAirHardSizeField::MaximumTotalCoolingCapacity => {
+                        "maximum_total_cooling_capacity_w"
+                    }
+                };
+                json!({
+                    "field": name,
+                    "child_sizer_called": field.child_sizer_called,
+                    "object_writeback": field.object_writeback,
+                    "local_design_value": field.local_design_value,
+                    "child_user_report_records": field.child_user_report_records,
+                    "outer_report_records": field.outer_report_records,
+                    "child_sizing_label_unit": field.child_sizing_label_unit,
+                })
+            })
+            .collect();
+        json!({
+            "route": route,
+            "entry_fan_flags_cleared": outcome.entry_fan_flags_cleared,
+            "fields": fields,
+        })
+    });
     json!({
         "source": lifecycle.source,
         "flags": {
@@ -828,7 +893,10 @@ fn purchased_air_init_lifecycle_json(lifecycle: &PurchasedAirInitLifecycleSummar
         "init_call_count": lifecycle.init_call_count,
         "one_time_initialization_count": lifecycle.one_time_initialization_count,
         "topology_completion_count": lifecycle.topology_completion_count,
+        "sizing_attempt_count": lifecycle.sizing_attempt_count,
         "sizing_check_count": lifecycle.sizing_check_count,
+        "sized_limits": sized_limits,
+        "sizing_outcome": sizing_outcome,
         "environment_initialization_count": lifecycle.environment_initialization_count,
         "environment_rearm_count": lifecycle.environment_rearm_count,
         "maximum_heating_air_mass_flow_rate_kg_per_s": lifecycle.maximum_heating_air_mass_flow_rate_kg_per_s,
@@ -2052,6 +2120,7 @@ fn validate_direct_purchased_air_init_lifecycle(
             1,
             lifecycle.topology_completion_count,
         ),
+        ("sizing_attempt_count", 1, lifecycle.sizing_attempt_count),
         ("sizing_check_count", 1, lifecycle.sizing_check_count),
         (
             "environment_initialization_count",
@@ -2100,6 +2169,41 @@ fn validate_direct_purchased_air_init_lifecycle(
     if !topology_ready {
         return Err(
             "direct-zone IdealLoads selected-unit topology is not release-ready".to_string(),
+        );
+    }
+    let sized_limits = lifecycle
+        .sized_limits
+        .ok_or_else(|| "direct-zone IdealLoads sizing overlay is missing".to_string())?;
+    let sized_values_valid = [
+        sized_limits.maximum_heating_air_flow_rate_m3_per_s,
+        sized_limits.maximum_sensible_heating_capacity_w,
+        sized_limits.maximum_cooling_air_flow_rate_m3_per_s,
+        sized_limits.maximum_total_cooling_capacity_w,
+    ]
+    .into_iter()
+    .all(|value| match value {
+        Some(AutosizeOrNumber::Value(value)) => value.is_finite() && value >= 0.0,
+        None => true,
+        Some(AutosizeOrNumber::Autosize) => false,
+    });
+    let sizing_outcome_ready = lifecycle.sizing_outcome.is_some_and(|outcome| {
+        outcome.route == PurchasedAirHardSizeLegacyRoute::DirectHardSizedNoSizingRun
+            && outcome.sized_limits == sized_limits
+            && outcome.entry_fan_flags_cleared
+            && outcome
+                .fields
+                .iter()
+                .zip([
+                    PurchasedAirHardSizeField::MaximumHeatingAirFlowRate,
+                    PurchasedAirHardSizeField::MaximumSensibleHeatingCapacity,
+                    PurchasedAirHardSizeField::MaximumCoolingAirFlowRate,
+                    PurchasedAirHardSizeField::MaximumTotalCoolingCapacity,
+                ])
+                .all(|(field, expected)| field.is_some_and(|field| field.field == expected))
+    });
+    if !sized_values_valid || !sizing_outcome_ready {
+        return Err(
+            "direct-zone IdealLoads hard-size sizing state is not release-ready".to_string(),
         );
     }
     let density_valid = lifecycle
@@ -2447,8 +2551,10 @@ mod tests {
     use ep_runtime::{
         DayType, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
         ExecutionStep, IdealLoadsInitFlags, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
-        PurchasedAirInitLifecycleSummary, PurchasedAirRecirculationSource, ScheduleCacheProfile,
-        ScheduleSeriesIndexKind, build_hourly_time_axis,
+        PurchasedAirHardSizeField, PurchasedAirHardSizeFieldOutcome,
+        PurchasedAirHardSizeLegacyOutcome, PurchasedAirHardSizeLegacyRoute,
+        PurchasedAirInitLifecycleSummary, PurchasedAirRecirculationSource, PurchasedAirSizedLimits,
+        ScheduleCacheProfile, ScheduleSeriesIndexKind, build_hourly_time_axis,
     };
 
     use crate::{RunResultState, RuntimeClass, TraceLevel, TraceSelection};
@@ -2555,10 +2661,39 @@ mod tests {
         assert_eq!(value["topology_diagnostics"], serde_json::json!([]));
         assert!(value["topology_failure"].is_null());
         assert_eq!(value["topology_completion_count"], 1);
+        assert_eq!(value["sizing_attempt_count"], 1);
+        assert_eq!(
+            value["sizing_outcome"]["route"],
+            "direct_hard_sized_no_sizing_run"
+        );
+        assert_eq!(
+            value["sizing_outcome"]["fields"].as_array().map(Vec::len),
+            Some(4)
+        );
+        assert!(value["sized_limits"].is_object());
         assert_eq!(value["economizer_flow_limit_warning_count"], 0);
     }
 
     fn valid_init_lifecycle(call_count: usize) -> PurchasedAirInitLifecycleSummary {
+        let sized_limits = PurchasedAirSizedLimits {
+            maximum_heating_air_flow_rate_m3_per_s: None,
+            maximum_sensible_heating_capacity_w: None,
+            maximum_cooling_air_flow_rate_m3_per_s: None,
+            maximum_total_cooling_capacity_w: None,
+        };
+        let skipped_field = |field| {
+            Some(PurchasedAirHardSizeFieldOutcome {
+                field,
+                input_value: None,
+                child_sizer_called: false,
+                child_result: None,
+                object_writeback: false,
+                local_design_value: 0.0,
+                child_user_report_records: 0,
+                outer_report_records: 0,
+                child_sizing_label_unit: "m3/s",
+            })
+        };
         PurchasedAirInitLifecycleSummary {
             source: PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
             flags: IdealLoadsInitFlags {
@@ -2593,7 +2728,20 @@ mod tests {
             init_call_count: call_count,
             one_time_initialization_count: 1,
             topology_completion_count: 1,
+            sizing_attempt_count: 1,
             sizing_check_count: 1,
+            sized_limits: Some(sized_limits),
+            sizing_outcome: Some(PurchasedAirHardSizeLegacyOutcome {
+                route: PurchasedAirHardSizeLegacyRoute::DirectHardSizedNoSizingRun,
+                sized_limits,
+                fields: [
+                    skipped_field(PurchasedAirHardSizeField::MaximumHeatingAirFlowRate),
+                    skipped_field(PurchasedAirHardSizeField::MaximumSensibleHeatingCapacity),
+                    skipped_field(PurchasedAirHardSizeField::MaximumCoolingAirFlowRate),
+                    skipped_field(PurchasedAirHardSizeField::MaximumTotalCoolingCapacity),
+                ],
+                entry_fan_flags_cleared: true,
+            }),
             environment_initialization_count: 1,
             environment_rearm_count: usize::from(call_count > 1),
             maximum_heating_air_mass_flow_rate_kg_per_s: 0.0,

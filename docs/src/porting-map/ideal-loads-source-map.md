@@ -72,10 +72,11 @@ active inputs therefore return a typed `OutdoorAirCalculation` error rather
 than silently falling back to design flow; the conformance harness supplies
 the declared occupancy and CO2 proof signals to the wrapper directly.
 
-autosized IdealLoads flow/capacity conformance remains outside the current
-claim; `SizePurchasedAir` is represented by the runtime policy constant
-`IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY`, and arbitrary-run compatibility blocks
-unresolved autosized flow/capacity fields before `CalcPurchAirLoads`.
+Autosized IdealLoads flow/capacity conformance remains outside the current
+claim. CP308 now executes only the direct hard-sized/no-Zone-sizing-run
+`SizePurchasedAir` legacy slice and retains its four-field outcome before
+`CalcPurchAirLoads`; `IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` continues to
+block unresolved autosized flow/capacity fields.
 
 ## Initial Claim Boundary
 
@@ -111,9 +112,9 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 |---|---|---|
 | `PurchasedAirManager::SimPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `ep_runtime::ideal_loads::sim_purchased_air_compat`; `ep_runtime::ideal_loads::sim_purchased_air_outdoor_air_compat`; CP300 `crates/ep_runtime/src/ideal_loads/coupling.rs::couple_direct_zone_predicted_demand_to_purchased_air` calls the generic no-OA wrapper with state-backed demand; CP302 `simulate_direct_zone_purchased_air_coupled_heat_balance` release-calls that bounded composition from `ep_run` for the exact CP301 topology |
 | `PurchasedAirManager::GetPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `ep_compiler::objects::ideal_loads`; `ep_model::objects::ideal_loads` |
-| `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP305-CP307 bounded release slice: `crates/ep_runtime/src/ideal_loads/init/manager_plan.rs::PurchasedAirInitManagerPlan` eagerly resolves the immutable declaration-order membership plan; `topology_plan.rs::PurchasedAirInitTopologyPlan` resolves selected-unit topology; `state.rs::PurchasedAirRuntimeState` retains manager and per-unit lifecycle state; `topology_transition.rs::advance_selected_unit_topology` and `transition.rs::init_purchased_air_runtime` execute the ordered persistent transitions; and `summary.rs::PurchasedAirInitLifecycleSummary` plus `transition.rs::purchased_air_init_lifecycle_summary` report the selected-unit and manager evidence. Diagnostic adapters retain `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` only. |
+| `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP305-CP308 bounded release slice: `crates/ep_runtime/src/ideal_loads/init/manager_plan.rs::PurchasedAirInitManagerPlan` eagerly resolves the immutable declaration-order membership plan; `topology_plan.rs::PurchasedAirInitTopologyPlan` resolves selected-unit topology; `state.rs::PurchasedAirRuntimeState` retains manager, per-unit lifecycle, and the four-field sizing overlay; `topology_transition.rs::advance_selected_unit_topology` and `transition.rs::init_purchased_air_runtime` execute the ordered persistent transitions through the bounded hard-size child; and `summary.rs::PurchasedAirInitLifecycleSummary` plus `transition.rs::purchased_air_init_lifecycle_summary` report the selected-unit, sizing, and manager evidence. Diagnostic adapters retain `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` only. |
 | `DataZoneEquipment::CheckZoneEquipmentList` | `src/EnergyPlus/DataZoneEquipment.cc` | CP306 `PurchasedAirInitManagerPlan::from_model` eagerly resolves bounded membership in retained Zone order through each Zone's EquipmentConnection and referenced list entries, ignoring unreferenced lists. The matched-list ID is Rust diagnostic evidence; this `InitPurchasedAir` call observes only the Boolean return and does not request optional `CtrlZoneNum`. Runtime Init defers only latch and outcome recording. |
-| `PurchasedAirManager::SizePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/dispatch.rs::IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` |
+| `PurchasedAirManager::SizePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP308 `crates/ep_runtime/src/ideal_loads/sizing.rs::size_purchased_air_direct_hard_sized_legacy_route` and `PurchasedAirHardSizeLegacyOutcome` map only the direct hard-sized/no-Zone-sizing-run legacy route; `crates/ep_runtime/src/ideal_loads/dispatch.rs::IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` continues to block Autosize and broader sizing. |
 | `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` |
 | `PurchasedAirManager::CalcPurchAirMinOAMassFlow` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air/minimum_flow.rs::resolve_minimum_outdoor_air_compat`, orchestrated by `sim_purchased_air_outdoor_air_compat` |
 | `PurchasedAirManager::UpdatePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/update.rs::supply_node_update_from_result`; CP300 `DirectZonePurchasedAirSystemFeedback` consumes that immutable payload for a bounded one-inlet correction projection, not the full source node/plenum lifecycle |
@@ -18353,6 +18354,52 @@ sentinels/counts, wrong-ControlledZone replay, full sizing/autosizing, multi-uni
 release execution, broader OA behavior, warmup/adaptive/FirstHVACIteration, and
 reset/concurrency remain excluded. Parent/routine status, inventory/readiness
 counts, capabilities, and the full-lifecycle Roadmap checkbox do not change.
+
+## CP308 Direct Hard-Sized SizePurchasedAir Legacy-Route Slice
+
+CP308 maps the `InitPurchasedAir` sizing callsite at
+`PurchasedAirManager.cc` lines 1194-1198 and only the
+`SizePurchasedAir` entry/common setup at lines 1326-1394 plus the
+`HVACSizingIndex == 0` direct route at lines 1697-1904. The exact release lane
+requires a positive current Zone-equipment index, no custom ZoneHVAC sizing
+object, no completed Zone sizing run, no Autosize field, and finite
+nonnegative direct fields.
+
+`PurchasedAirSizedLimits` copies only heating flow, heating capacity, cooling
+flow, and cooling capacity into per-unit runtime state after topology
+completes. `size_purchased_air_direct_hard_sized_legacy_route` visits those
+fields in exact source order. Positive fields execute the clean-scratch
+hard-size identity characterization independent of whether the associated
+limit is active; zero and blank fields skip the child. Its retained field
+outcomes preserve the heating-flow writeback and zeroed design local, the
+heating-capacity local-only result and 1 W outer-report threshold, the
+cooling-flow writeback, and the cooling-capacity writeback with a zero design
+local. They also expose the source capacity-label `[m3/s]` quirks and
+characterized child/outer report-record counts without emitting those reports.
+The source `CurZoneEqNum <= 0` outer suppression is retained as a zero-visit
+normal outcome for direct lifecycle tests, while release coupling requires the
+positive-index route.
+
+The Init gate records attempts and clears `sizing_needed` only after the child
+returns normally. `SysSizingCalc` defers it; custom sizing,
+`ZoneSizingRunDone`, Autosize, invalid hard sizes, and missing active-limit
+values return before environment initialization with the latch still armed.
+Begin-environment mass-flow caches read the retained overlay. The Init snapshot
+then threads the same overlay through coupling into
+`IdealLoadsSensibleLimitContext`, so finite-limit Calc flow, capacity,
+capacity-zero, and humidity-helper reads no longer split from the sized state.
+Lifecycle summaries and run JSON retain the route, four values, field order,
+attempt/completion counts, and characterized trace.
+
+The custom branch at lines 1395-1696, Zone sizing arrays,
+`FinalZoneSizing`, scalable and autosizing formulas, complete child-sizer
+internals, EMS and dirty shared sizing scratch, exact EIO/SQLite/predefined
+table output, hard/design mismatch warnings, OA sizing warnings, ignored
+shared `ErrorsFound` and partial-error side effects, reset/concurrency, and
+full `SizePurchasedAir`/`InitPurchasedAir` parity remain excluded. The two
+parents remain `scaffold`/`none`; Init and Size remain `source_mapped`;
+inventory/readiness, capability evidence, conformance, and the full-lifecycle
+Roadmap checkbox do not change.
 
 ## Claim Requirements
 

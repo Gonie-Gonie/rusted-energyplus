@@ -5,6 +5,10 @@ use ep_model::{
     ZoneEquipmentListId, ZoneId,
 };
 
+use super::super::{
+    PurchasedAirHardSizeLegacyContext, PurchasedAirHardSizeLegacyError,
+    PurchasedAirHardSizeLegacyRoute,
+};
 use super::*;
 
 pub(super) const SYSTEM: IdealLoadsAirSystemId = IdealLoadsAirSystemId(0);
@@ -70,7 +74,13 @@ fn first_call_runs_source_order_and_caches_environment_limits() {
     assert_eq!(summary.init_call_count, 1);
     assert_eq!(summary.one_time_initialization_count, 1);
     assert_eq!(summary.topology_completion_count, 1);
+    assert_eq!(summary.sizing_attempt_count, 1);
     assert_eq!(summary.sizing_check_count, 1);
+    assert_eq!(
+        summary.sizing_outcome.map(|outcome| outcome.route),
+        Some(PurchasedAirHardSizeLegacyRoute::DirectHardSizedNoSizingRun)
+    );
+    assert_eq!(summary.sized_limits, Some(snapshot.sized_limits));
     assert_eq!(summary.environment_initialization_count, 1);
     assert_eq!(summary.environment_rearm_count, 0);
 }
@@ -107,6 +117,45 @@ fn environment_latch_rearms_and_recomputes_on_the_next_environment() {
     assert_eq!(summary.init_call_count, 4);
     assert_eq!(summary.environment_initialization_count, 2);
     assert_eq!(summary.environment_rearm_count, 1);
+}
+
+#[test]
+fn environment_reinitialization_uses_the_persistent_sizing_overlay() {
+    let system = finite_flow_system();
+    let plan = single_manager_plan();
+    let mut state = PurchasedAirRuntimeState::default();
+    init_purchased_air_runtime(&mut state, &plan, &topology(), &system, context(true))
+        .expect("initial hard-size and environment pass");
+    init_purchased_air_runtime(&mut state, &plan, &topology(), &system, context(false))
+        .expect("environment latch rearm");
+
+    let mut changed_model_view = system.clone();
+    changed_model_view.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.9));
+    changed_model_view.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.8));
+    let mut next_environment = context(true);
+    next_environment.standard_air_density_kg_per_m3 = 1.0;
+    let snapshot = init_purchased_air_runtime(
+        &mut state,
+        &plan,
+        &topology(),
+        &changed_model_view,
+        next_environment,
+    )
+    .expect("retained sizing overlay drives the next environment");
+
+    assert_close(snapshot.maximum_heating_air_mass_flow_rate_kg_per_s, 0.5);
+    assert_close(snapshot.maximum_cooling_air_mass_flow_rate_kg_per_s, 0.4);
+    assert_eq!(
+        snapshot.sized_limits.maximum_heating_air_flow_rate_m3_per_s,
+        Some(AutosizeOrNumber::Value(0.5))
+    );
+    assert_eq!(
+        snapshot.sized_limits.maximum_cooling_air_flow_rate_m3_per_s,
+        Some(AutosizeOrNumber::Value(0.4))
+    );
+    let summary = purchased_air_init_lifecycle_summary(&state, SYSTEM).expect("lifecycle summary");
+    assert_eq!(summary.sizing_attempt_count, 1);
+    assert_eq!(summary.sizing_check_count, 1);
 }
 
 #[test]
@@ -169,6 +218,78 @@ fn deferred_gates_replay_topology_and_invalid_density_fail_closed() {
     assert_eq!(unit.standard_air_density_kg_per_m3, Some(1.2));
 }
 
+#[test]
+fn unported_sizing_routes_leave_the_size_latch_armed() {
+    let plan = single_manager_plan();
+
+    let mut custom_system = finite_flow_system();
+    custom_system.design_specification_zonehvac_sizing_object_name =
+        Some(NormalizedName::new("CUSTOM SIZING"));
+    let mut custom_state = PurchasedAirRuntimeState::default();
+    assert_eq!(
+        init_purchased_air_runtime(
+            &mut custom_state,
+            &plan,
+            &topology(),
+            &custom_system,
+            context(true),
+        ),
+        Err(PurchasedAirInitError::Sizing(
+            PurchasedAirHardSizeLegacyError::CustomZoneHvacSizingNotImplemented { system: SYSTEM }
+        ))
+    );
+    let custom_unit = &custom_state.units[&SYSTEM];
+    assert!(custom_unit.sizing_needed);
+    assert_eq!(custom_unit.sizing_attempt_count, 1);
+    assert_eq!(custom_unit.sizing_check_count, 0);
+    assert_eq!(custom_unit.environment_initialization_count, 0);
+
+    let system = finite_flow_system();
+    let mut zone_sizing_state = PurchasedAirRuntimeState::default();
+    let mut zone_sizing_context = context(true);
+    zone_sizing_context.sizing.zone_sizing_run_done = true;
+    assert_eq!(
+        init_purchased_air_runtime(
+            &mut zone_sizing_state,
+            &plan,
+            &topology(),
+            &system,
+            zone_sizing_context,
+        ),
+        Err(PurchasedAirInitError::Sizing(
+            PurchasedAirHardSizeLegacyError::ZoneSizingRunNotImplemented { system: SYSTEM }
+        ))
+    );
+    let zone_sizing_unit = &zone_sizing_state.units[&SYSTEM];
+    assert!(zone_sizing_unit.sizing_needed);
+    assert_eq!(zone_sizing_unit.sizing_attempt_count, 1);
+    assert_eq!(zone_sizing_unit.sizing_check_count, 0);
+    assert_eq!(zone_sizing_unit.environment_initialization_count, 0);
+}
+
+#[test]
+fn absent_current_zone_equipment_completes_the_source_suppression_path() {
+    let system = finite_flow_system();
+    let plan = single_manager_plan();
+    let mut state = PurchasedAirRuntimeState::default();
+    let mut call = context(true);
+    call.sizing.current_zone_equipment_index = 0;
+
+    let snapshot = init_purchased_air_runtime(&mut state, &plan, &topology(), &system, call)
+        .expect("source outer condition returns normally");
+
+    assert!(snapshot.transition.sizing_checked);
+    assert!(snapshot.transition.environment_initialized);
+    assert_eq!(
+        snapshot.sizing_outcome.map(|outcome| outcome.route),
+        Some(PurchasedAirHardSizeLegacyRoute::NoCurrentZoneEquipment)
+    );
+    let unit = &state.units[&SYSTEM];
+    assert!(!unit.sizing_needed);
+    assert_eq!(unit.sizing_attempt_count, 1);
+    assert_eq!(unit.sizing_check_count, 1);
+}
+
 pub(super) fn single_manager_plan() -> PurchasedAirInitManagerPlan {
     PurchasedAirInitManagerPlan::try_from_rows(vec![PurchasedAirInitManagerPlanRow {
         system: SYSTEM,
@@ -200,6 +321,10 @@ pub(super) fn context(begin_environment: bool) -> PurchasedAirInitCallContext {
     PurchasedAirInitCallContext {
         zone_equipment_inputs_filled: true,
         system_sizing_calculation: false,
+        sizing: PurchasedAirHardSizeLegacyContext {
+            current_zone_equipment_index: 1,
+            zone_sizing_run_done: false,
+        },
         begin_environment,
         standard_air_density_kg_per_m3: 1.2,
         heating_setpoint_c: 20.0,

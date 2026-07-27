@@ -2,6 +2,7 @@
 
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
+use super::super::{PurchasedAirHardSizeLegacyOutcome, PurchasedAirSizedLimits};
 use super::{
     IdealLoadsInitFlags, PurchasedAirInitDiagnostic, PurchasedAirInitTopologyDiagnostic,
     PurchasedAirInitTopologyError, PurchasedAirRecirculationSource,
@@ -60,6 +61,12 @@ pub struct PurchasedAirInitLifecycleSummary {
     pub topology_completion_count: usize,
     /// Per-unit hard-size gate count.
     pub sizing_check_count: usize,
+    /// Per-unit hard-size child attempt count.
+    pub sizing_attempt_count: usize,
+    /// Runtime-owned four-field sizing overlay.
+    pub sized_limits: Option<PurchasedAirSizedLimits>,
+    /// Retained source-ordered direct hard-size outcome.
+    pub sizing_outcome: Option<PurchasedAirHardSizeLegacyOutcome>,
     /// Per-unit begin-environment initialization count.
     pub environment_initialization_count: usize,
     /// Per-unit environment rearm count.

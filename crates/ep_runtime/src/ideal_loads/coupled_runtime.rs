@@ -2,7 +2,7 @@
 
 use std::fmt::{Display, Formatter};
 
-use ep_model::SimulationModel;
+use ep_model::{AutosizeOrNumber, IdealLoadsLimit, SimulationModel};
 
 use crate::error::RuntimeError;
 use crate::heat_balance::air_manager::seed_zone_air_humidity_ratios_from_weather_series;
@@ -34,10 +34,10 @@ use crate::{ResultStore, ZoneSensibleDemandInputKind};
 use super::{
     DirectZonePurchasedAirBindingError, DirectZonePurchasedAirHourlyOutputError,
     DirectZonePurchasedAirModelBinding, DirectZonePurchasedAirRuntimeStepError,
-    IdealLoadsPurchasedAirBranch, PurchasedAirInitError, PurchasedAirInitLifecycleSummary,
-    PurchasedAirRecirculationSource, PurchasedAirRuntimeState,
-    append_direct_zone_purchased_air_hourly_output_series, bind_direct_zone_purchased_air_model,
-    purchased_air_init_lifecycle_summary,
+    IdealLoadsPurchasedAirBranch, PurchasedAirHardSizeLegacyRoute, PurchasedAirInitError,
+    PurchasedAirInitLifecycleSummary, PurchasedAirRecirculationSource, PurchasedAirRuntimeState,
+    PurchasedAirSizedLimits, append_direct_zone_purchased_air_hourly_output_series,
+    bind_direct_zone_purchased_air_model, purchased_air_init_lifecycle_summary,
 };
 
 const SECONDS_PER_HOUR: f64 = 3_600.0;
@@ -548,6 +548,7 @@ fn validate_init_lifecycle(
             1,
             lifecycle.topology_completion_count,
         ),
+        ("sizing_attempt_count", 1, lifecycle.sizing_attempt_count),
         ("sizing_check_count", 1, lifecycle.sizing_check_count),
         (
             "environment_initialization_count",
@@ -604,9 +605,23 @@ fn validate_init_lifecycle(
             },
         );
     }
-    let density_valid = lifecycle
-        .standard_air_density_kg_per_m3
-        .is_some_and(|value| value.is_finite() && value > 0.0);
+    let expected_sized_limits = PurchasedAirSizedLimits::from_system(binding.system);
+    let sizing_ready = lifecycle.sized_limits == Some(expected_sized_limits)
+        && lifecycle.sizing_outcome.is_some_and(|outcome| {
+            outcome.route == PurchasedAirHardSizeLegacyRoute::DirectHardSizedNoSizingRun
+                && outcome.sized_limits == expected_sized_limits
+        });
+    if !sizing_ready {
+        return Err(
+            DirectZonePurchasedAirCoupledRuntimeError::InitLifecycleInvariant {
+                field: "sizing_overlay_ready",
+                expected: 1,
+                actual: 0,
+            },
+        );
+    }
+    let density = lifecycle.standard_air_density_kg_per_m3;
+    let density_valid = density.is_some_and(|value| value.is_finite() && value > 0.0);
     let caches_valid = lifecycle
         .maximum_heating_air_mass_flow_rate_kg_per_s
         .is_finite()
@@ -615,7 +630,35 @@ fn validate_init_lifecycle(
             .maximum_cooling_air_mass_flow_rate_kg_per_s
             .is_finite()
         && lifecycle.maximum_cooling_air_mass_flow_rate_kg_per_s >= 0.0;
-    if !density_valid || !caches_valid {
+    let expected_mass_flow = |limit: IdealLoadsLimit, volume_flow: Option<AutosizeOrNumber>| {
+        if matches!(
+            limit,
+            IdealLoadsLimit::LimitFlowRate | IdealLoadsLimit::LimitFlowRateAndCapacity
+        ) {
+            match (volume_flow, density) {
+                (Some(AutosizeOrNumber::Value(volume_flow)), Some(density)) => {
+                    Some(volume_flow * density)
+                }
+                _ => None,
+            }
+        } else {
+            Some(0.0)
+        }
+    };
+    let flow_caches_match_sizing = expected_mass_flow(
+        binding.system.heating_limit,
+        expected_sized_limits.maximum_heating_air_flow_rate_m3_per_s,
+    )
+    .is_some_and(|expected| {
+        (lifecycle.maximum_heating_air_mass_flow_rate_kg_per_s - expected).abs() <= 1.0e-12
+    }) && expected_mass_flow(
+        binding.system.cooling_limit,
+        expected_sized_limits.maximum_cooling_air_flow_rate_m3_per_s,
+    )
+    .is_some_and(|expected| {
+        (lifecycle.maximum_cooling_air_mass_flow_rate_kg_per_s - expected).abs() <= 1.0e-12
+    });
+    if !density_valid || !caches_valid || !flow_caches_match_sizing {
         return Err(
             DirectZonePurchasedAirCoupledRuntimeError::InitLifecycleInvariant {
                 field: "environment_cache_valid",

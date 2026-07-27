@@ -4,6 +4,7 @@ use std::collections::BTreeMap;
 
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
+use super::super::{PurchasedAirHardSizeLegacyOutcome, PurchasedAirSizedLimits};
 use super::{
     IdealLoadsInitFlags, PurchasedAirInitTopologyDiagnostic, PurchasedAirInitTopologyError,
     PurchasedAirInitTopologyPlan, PurchasedAirRecirculationSource,
@@ -63,6 +64,10 @@ pub struct PurchasedAirUnitRuntimeState {
     pub topology_completed: bool,
     /// Source `MySizeFlag`; true means the hard-size/sizing gate is pending.
     pub sizing_needed: bool,
+    /// Four-field PurchasedAir object overlay seeded after topology succeeds.
+    pub sized_limits: Option<PurchasedAirSizedLimits>,
+    /// Successful direct hard-size child outcome retained for downstream stages.
+    pub sizing_outcome: Option<PurchasedAirHardSizeLegacyOutcome>,
     /// Source `MyEnvrnFlag`; true means a begin-environment write is pending.
     pub environment_initialization_needed: bool,
     /// Controlled Zone captured by the one-time topology pass.
@@ -107,6 +112,8 @@ pub struct PurchasedAirUnitRuntimeState {
     pub topology_completion_count: usize,
     /// Completed hard-size/sizing gates.
     pub sizing_check_count: usize,
+    /// Hard-size/sizing child attempts, including fail-closed returns.
+    pub sizing_attempt_count: usize,
     /// Completed begin-environment writes.
     pub environment_initialization_count: usize,
     /// False-begin-environment calls that rearmed the environment latch.
@@ -129,6 +136,8 @@ impl PurchasedAirUnitRuntimeState {
             one_time_latched: false,
             topology_completed: false,
             sizing_needed: true,
+            sized_limits: None,
+            sizing_outcome: None,
             environment_initialization_needed: true,
             controlled_zone: None,
             equipment_list: None,
@@ -151,6 +160,7 @@ impl PurchasedAirUnitRuntimeState {
             one_time_initialization_count: 0,
             topology_completion_count: 0,
             sizing_check_count: 0,
+            sizing_attempt_count: 0,
             environment_initialization_count: 0,
             environment_rearm_count: 0,
             cooling_supply_temperature_warning_count: 0,

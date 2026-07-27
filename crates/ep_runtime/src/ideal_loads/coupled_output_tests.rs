@@ -445,6 +445,16 @@ fn scaled_output(
 }
 
 fn initialized_snapshot(system: &IdealLoadsAirSystem) -> PurchasedAirInitSnapshot {
+    let mut sized_limits = crate::ideal_loads::PurchasedAirSizedLimits::from_system(system);
+    let sizing_outcome = crate::ideal_loads::size_purchased_air_direct_hard_sized_legacy_route(
+        system,
+        &mut sized_limits,
+        crate::ideal_loads::PurchasedAirHardSizeLegacyContext {
+            current_zone_equipment_index: 1,
+            zone_sizing_run_done: false,
+        },
+    )
+    .expect("test hard-size route");
     PurchasedAirInitSnapshot {
         system: system.id,
         controlled_zone: ZoneId(0),
@@ -467,6 +477,8 @@ fn initialized_snapshot(system: &IdealLoadsAirSystem) -> PurchasedAirInitSnapsho
         transition: PurchasedAirInitTransition::default(),
         maximum_heating_air_mass_flow_rate_kg_per_s: 0.0,
         maximum_cooling_air_mass_flow_rate_kg_per_s: 0.0,
+        sized_limits,
+        sizing_outcome: Some(sizing_outcome),
         standard_air_density_kg_per_m3: Some(
             IdealLoadsSensibleLimitContext::default().standard_air_density_kg_per_m3,
         ),

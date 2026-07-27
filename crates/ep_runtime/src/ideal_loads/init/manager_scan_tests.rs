@@ -269,7 +269,7 @@ fn selected_system_missing_from_plan_is_rejected_before_allocation() {
 }
 
 #[test]
-fn completed_manager_scan_survives_autosize_retry_and_topology_error() {
+fn completed_manager_scan_and_sizing_overlay_survive_failed_retry() {
     let plan = manager_plan(&[
         (SYSTEM_SEVEN, Some(LIST_SEVEN)),
         (SYSTEM_TWO, Some(LIST_TWO)),
@@ -283,10 +283,12 @@ fn completed_manager_scan_survives_autosize_retry_and_topology_error() {
         .expect_err("autosize remains beyond the bounded manager-sweep slice");
     assert_eq!(
         error,
-        PurchasedAirInitError::AutosizingNotImplemented {
-            system: SYSTEM_SEVEN,
-            field: "maximum_heating_air_flow_rate_m3_per_s",
-        }
+        PurchasedAirInitError::Sizing(
+            crate::ideal_loads::PurchasedAirHardSizeLegacyError::AutosizingNotImplemented {
+                system: SYSTEM_SEVEN,
+                field: crate::ideal_loads::PurchasedAirHardSizeField::MaximumHeatingAirFlowRate,
+            }
+        )
     );
     assert!(state.equipment_list_checked);
     assert_eq!(
@@ -296,6 +298,7 @@ fn completed_manager_scan_survives_autosize_retry_and_topology_error() {
     assert_eq!(state.equipment_list_check_count, 1);
     assert_eq!(state.equipment_list_scanned_unit_count, 2);
     assert!(state.units[&SYSTEM_SEVEN].sizing_needed);
+    assert_eq!(state.units[&SYSTEM_SEVEN].sizing_attempt_count, 1);
     assert_eq!(
         state.units[&SYSTEM_SEVEN].environment_initialization_count,
         0
@@ -303,9 +306,11 @@ fn completed_manager_scan_survives_autosize_retry_and_topology_error() {
 
     let hard_sized = finite_flow_system_for(SYSTEM_SEVEN);
     let retry = init_purchased_air_runtime(&mut state, &plan, &bound, &hard_sized, context(true))
-        .expect("hard-size retry reuses the completed manager scan");
-    assert!(!retry.transition.equipment_list_checked);
-    assert!(retry.transition.sizing_checked);
+        .expect_err("retry must reuse the retained autosize overlay");
+    assert_eq!(retry, error);
+    assert_eq!(state.units[&SYSTEM_SEVEN].sizing_attempt_count, 2);
+    assert_eq!(state.units[&SYSTEM_SEVEN].sizing_check_count, 0);
+    assert_eq!(state.units[&SYSTEM_SEVEN].sizing_outcome, None);
     assert_eq!(state.equipment_list_check_count, 1);
 
     let changed = topology_for_supply(SYSTEM_SEVEN, LIST_SEVEN, NodeId(99));

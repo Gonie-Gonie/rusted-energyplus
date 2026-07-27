@@ -1,10 +1,15 @@
 //! Source-ordered transitions for the bounded PurchasedAir initialization path.
 
 use ep_model::{
-    AutosizeOrNumber, IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsLimit, NodeId,
-    ZoneEquipmentListId, ZoneId,
+    IdealLoadsAirSystem, IdealLoadsAirSystemId, IdealLoadsLimit, NodeId, ZoneEquipmentListId,
+    ZoneId,
 };
 
+use super::super::{
+    PurchasedAirHardSizeField, PurchasedAirHardSizeLegacyContext, PurchasedAirHardSizeLegacyError,
+    PurchasedAirHardSizeLegacyOutcome, PurchasedAirSizedLimits,
+    size_purchased_air_direct_hard_sized_legacy_route,
+};
 use super::topology_transition::advance_selected_unit_topology;
 use super::{
     PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirInitDiagnostic,
@@ -20,6 +25,8 @@ pub struct PurchasedAirInitCallContext {
     pub zone_equipment_inputs_filled: bool,
     /// Whether the simulation is currently inside the system sizing calculation.
     pub system_sizing_calculation: bool,
+    /// Dynamic inputs to the bounded `SizePurchasedAir` legacy route.
+    pub sizing: PurchasedAirHardSizeLegacyContext,
     /// Current begin-environment flag.
     pub begin_environment: bool,
     /// Standard air density used by begin-environment mass-flow conversion.
@@ -94,6 +101,10 @@ pub struct PurchasedAirInitSnapshot {
     pub maximum_heating_air_mass_flow_rate_kg_per_s: f64,
     /// Cached maximum cooling air mass flow.
     pub maximum_cooling_air_mass_flow_rate_kg_per_s: f64,
+    /// Runtime-owned four-field sizing overlay.
+    pub sized_limits: PurchasedAirSizedLimits,
+    /// Retained direct hard-size child outcome, once completed.
+    pub sizing_outcome: Option<PurchasedAirHardSizeLegacyOutcome>,
     /// Standard density owning the cached values, once environment init ran.
     pub standard_air_density_kg_per_m3: Option<f64>,
 }
@@ -144,19 +155,12 @@ pub enum PurchasedAirInitError {
         /// System whose topology changed.
         system: IdealLoadsAirSystemId,
     },
-    /// Autosizing reached the still-unported `SizePurchasedAir` boundary.
-    AutosizingNotImplemented {
-        /// System requiring autosizing.
+    /// The bounded `SizePurchasedAir` child rejected its route or values.
+    Sizing(PurchasedAirHardSizeLegacyError),
+    /// Begin-environment initialization ran before a sizing child completed.
+    SizingStateUnavailable {
+        /// Selected system.
         system: IdealLoadsAirSystemId,
-        /// Autosized source field.
-        field: &'static str,
-    },
-    /// A required hard-sized value is missing, negative, NaN, or infinite.
-    InvalidHardSize {
-        /// System with an invalid hard size.
-        system: IdealLoadsAirSystemId,
-        /// Invalid source field.
-        field: &'static str,
     },
     /// Begin-environment standard air density is not finite and positive.
     InvalidStandardAirDensity {
@@ -235,9 +239,20 @@ pub fn init_purchased_air_runtime(
         .get_mut(&system.id)
         .ok_or(PurchasedAirInitError::UnknownSystem { system: system.id })?;
     advance_selected_unit_topology(unit, topology, system, &mut transition)?;
+    if unit.sized_limits.is_none() {
+        unit.sized_limits = Some(PurchasedAirSizedLimits::from_system(system));
+    }
 
     if !context.system_sizing_calculation && unit.sizing_needed {
-        validate_hard_sizes(system)?;
+        unit.sizing_attempt_count += 1;
+        let sized_limits = unit
+            .sized_limits
+            .as_mut()
+            .ok_or(PurchasedAirInitError::SizingStateUnavailable { system: system.id })?;
+        let sizing_outcome =
+            size_purchased_air_direct_hard_sized_legacy_route(system, sized_limits, context.sizing)
+                .map_err(PurchasedAirInitError::Sizing)?;
+        unit.sizing_outcome = Some(sizing_outcome);
         unit.sizing_needed = false;
         unit.sizing_check_count += 1;
         transition.sizing_checked = true;
@@ -279,6 +294,10 @@ pub fn init_purchased_air_runtime(
             .maximum_heating_air_mass_flow_rate_kg_per_s,
         maximum_cooling_air_mass_flow_rate_kg_per_s: unit
             .maximum_cooling_air_mass_flow_rate_kg_per_s,
+        sized_limits: unit
+            .sized_limits
+            .ok_or(PurchasedAirInitError::SizingStateUnavailable { system: system.id })?,
+        sizing_outcome: unit.sizing_outcome,
         standard_air_density_kg_per_m3: unit.standard_air_density_kg_per_m3,
     })
 }
@@ -318,6 +337,9 @@ pub fn purchased_air_init_lifecycle_summary(
         one_time_initialization_count: unit.one_time_initialization_count,
         topology_completion_count: unit.topology_completion_count,
         sizing_check_count: unit.sizing_check_count,
+        sizing_attempt_count: unit.sizing_attempt_count,
+        sized_limits: unit.sized_limits,
+        sizing_outcome: unit.sizing_outcome,
         environment_initialization_count: unit.environment_initialization_count,
         environment_rearm_count: unit.environment_rearm_count,
         maximum_heating_air_mass_flow_rate_kg_per_s: unit
@@ -386,64 +408,6 @@ fn validate_manager_arena_complete(
     Ok(())
 }
 
-fn validate_hard_sizes(system: &IdealLoadsAirSystem) -> Result<(), PurchasedAirInitError> {
-    validate_limit_value(
-        system.id,
-        system.heating_limit,
-        system.maximum_heating_air_flow_rate_m3_per_s,
-        system.maximum_sensible_heating_capacity_w,
-        "maximum_heating_air_flow_rate_m3_per_s",
-        "maximum_sensible_heating_capacity_w",
-    )?;
-    validate_limit_value(
-        system.id,
-        system.cooling_limit,
-        system.maximum_cooling_air_flow_rate_m3_per_s,
-        system.maximum_total_cooling_capacity_w,
-        "maximum_cooling_air_flow_rate_m3_per_s",
-        "maximum_total_cooling_capacity_w",
-    )
-}
-
-fn validate_limit_value(
-    system: IdealLoadsAirSystemId,
-    limit: IdealLoadsLimit,
-    flow: Option<AutosizeOrNumber>,
-    capacity: Option<AutosizeOrNumber>,
-    flow_field: &'static str,
-    capacity_field: &'static str,
-) -> Result<(), PurchasedAirInitError> {
-    if matches!(
-        limit,
-        IdealLoadsLimit::LimitFlowRate | IdealLoadsLimit::LimitFlowRateAndCapacity
-    ) {
-        require_hard_size(system, flow, flow_field)?;
-    }
-    if matches!(
-        limit,
-        IdealLoadsLimit::LimitCapacity | IdealLoadsLimit::LimitFlowRateAndCapacity
-    ) {
-        require_hard_size(system, capacity, capacity_field)?;
-    }
-    Ok(())
-}
-
-fn require_hard_size(
-    system: IdealLoadsAirSystemId,
-    value: Option<AutosizeOrNumber>,
-    field: &'static str,
-) -> Result<f64, PurchasedAirInitError> {
-    match value {
-        Some(AutosizeOrNumber::Value(value)) if value.is_finite() && value >= 0.0 => Ok(value),
-        Some(AutosizeOrNumber::Autosize) => {
-            Err(PurchasedAirInitError::AutosizingNotImplemented { system, field })
-        }
-        Some(AutosizeOrNumber::Value(_)) | None => {
-            Err(PurchasedAirInitError::InvalidHardSize { system, field })
-        }
-    }
-}
-
 fn initialize_environment(
     unit: &mut PurchasedAirUnitRuntimeState,
     system: &IdealLoadsAirSystem,
@@ -454,19 +418,22 @@ fn initialize_environment(
             value: standard_air_density_kg_per_m3,
         });
     }
+    let sized_limits = unit
+        .sized_limits
+        .ok_or(PurchasedAirInitError::SizingStateUnavailable { system: system.id })?;
     let maximum_heating_air_mass_flow_rate_kg_per_s = initialized_mass_flow(
         system.id,
         system.heating_limit,
-        system.maximum_heating_air_flow_rate_m3_per_s,
+        sized_limits.maximum_heating_air_flow_rate_m3_per_s,
         standard_air_density_kg_per_m3,
-        "maximum_heating_air_flow_rate_m3_per_s",
+        PurchasedAirHardSizeField::MaximumHeatingAirFlowRate,
     )?;
     let maximum_cooling_air_mass_flow_rate_kg_per_s = initialized_mass_flow(
         system.id,
         system.cooling_limit,
-        system.maximum_cooling_air_flow_rate_m3_per_s,
+        sized_limits.maximum_cooling_air_flow_rate_m3_per_s,
         standard_air_density_kg_per_m3,
-        "maximum_cooling_air_flow_rate_m3_per_s",
+        PurchasedAirHardSizeField::MaximumCoolingAirFlowRate,
     )?;
     unit.maximum_heating_air_mass_flow_rate_kg_per_s = maximum_heating_air_mass_flow_rate_kg_per_s;
     unit.maximum_cooling_air_mass_flow_rate_kg_per_s = maximum_cooling_air_mass_flow_rate_kg_per_s;
@@ -477,9 +444,9 @@ fn initialize_environment(
 fn initialized_mass_flow(
     system: IdealLoadsAirSystemId,
     limit: IdealLoadsLimit,
-    volume_flow: Option<AutosizeOrNumber>,
+    volume_flow: Option<ep_model::AutosizeOrNumber>,
     density: f64,
-    field: &'static str,
+    field: PurchasedAirHardSizeField,
 ) -> Result<f64, PurchasedAirInitError> {
     if !matches!(
         limit,
@@ -487,7 +454,22 @@ fn initialized_mass_flow(
     ) {
         return Ok(0.0);
     }
-    Ok(require_hard_size(system, volume_flow, field)? * density)
+    match volume_flow {
+        Some(ep_model::AutosizeOrNumber::Value(volume_flow))
+            if volume_flow.is_finite() && volume_flow >= 0.0 =>
+        {
+            Ok(volume_flow * density)
+        }
+        Some(ep_model::AutosizeOrNumber::Autosize) => Err(PurchasedAirInitError::Sizing(
+            PurchasedAirHardSizeLegacyError::AutosizingNotImplemented { system, field },
+        )),
+        Some(ep_model::AutosizeOrNumber::Value(_)) => Err(PurchasedAirInitError::Sizing(
+            PurchasedAirHardSizeLegacyError::InvalidHardSize { system, field },
+        )),
+        None => Err(PurchasedAirInitError::Sizing(
+            PurchasedAirHardSizeLegacyError::MissingRequiredHardSize { system, field },
+        )),
+    }
 }
 
 fn cooling_supply_temperature_warning_active(
