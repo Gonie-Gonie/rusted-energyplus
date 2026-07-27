@@ -21476,6 +21476,41 @@ or feedback term, finite-limit or Autosize support, numerical support, or
 capability support. Parent/routine status, inventory/readiness, evidence,
 conformance, and Roadmap state remain unchanged.
 
+## CP322 Cooling Supply Mass-Flow Maximum Placement
+
+CP322 maps only executable line 2155 between CP321 and the unchanged numerical
+DTO and Zone-air correction. Its six lexical sites read retained outdoor-air,
+cooling, dehumidification, and humidification mass flows; apply the
+source-shaped five-argument maximum with a positive-zero floor; and assign
+`SupplyMassFlowRate`. These operand sites do not claim a C++ function-argument
+evaluation order. UnitOff and non-cooling paths skip the entire slice.
+
+The active-Cooling operation follows ObjexxFCL's strict-`<` pair tree:
+positive zero versus outdoor air, cooling versus dehumidification, the pair
+winners, and finally the selected leading winner versus humidification. Ties
+and unordered comparisons keep the left operand at each step, retaining exact
+signed-zero, NaN, and infinity behavior without Rust floating-point maximum
+helpers, total ordering, finite checks, normalization, or clamps.
+
+Direct release consumes post-CP321 candidate results and retained same-call
+CP311 pre-EMS outdoor-air state. The no-OA route validates that state as
+bitwise positive zero, accepts no duplicate scalar, and introduces no live
+Zone-air demand, OA, Node, moisture, psychrometric, EMS, sizing, schedule, or
+diagnostic service. Per-step, final, coupled-runtime, and pipeline validation
+reconcile direct-only lifecycle evidence before the numerical and corrector
+paths, without reconciling the selected value to the numerical DTO. Pipeline
+JSON also emits a sibling hexadecimal `_ieee_bits` field for every optional
+floating field so nonfinite values, signed zero, and absence remain distinct.
+
+Line 2155 completes CP322. Line 2157 is the first excluded executable, the EMS
+mass-flow override guard, while line 2156 is non-executable. EMS and later
+clamps, mixed-air and final supply-state behavior, Heat/DeadBand selection,
+node/report writes, residuals, and adaptive iteration remain outside the
+slice. CP322 adds no Zone-air equation, demand or feedback term, finite-limit
+or Autosize support, numerical support, or capability support.
+Parent/routine status, inventory/readiness counts, evidence, conformance, and
+Roadmap state remain unchanged.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

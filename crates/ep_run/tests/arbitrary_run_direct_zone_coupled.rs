@@ -18,6 +18,11 @@ mod fixtures;
 
 use fixtures::ONE_DAY_EPW;
 
+#[path = "arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_maximum_assertions.rs"]
+mod cooling_supply_mass_flow_maximum_assertions;
+
+use cooling_supply_mass_flow_maximum_assertions::assert_cooling_supply_mass_flow_maximum;
+
 const DIRECT_ZONE_COUPLED_RUNTIME_CLASS: &str = "ideal-loads-direct-zone-coupled-compatibility";
 const ZONE_DEMAND_SOURCE: &str = "rust-predictor-source-setpoint-thresholds";
 const RECIRCULATION_SOURCE: &str = "rust-direct-zone-return-projection";
@@ -859,6 +864,7 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
         None,
         false,
     );
+    assert_cooling_supply_mass_flow_maximum(runtime, expected_calls, 0, expected_calls, 0);
 }
 
 fn assert_zero_effect_cooling_oa_max_flow_body(
@@ -2677,6 +2683,7 @@ fn all_hard_sized_finite_limit_branches_limit_live_cooling()
             },
             false,
         );
+        assert_cooling_supply_mass_flow_maximum(&summary["rust_runtime"], 2, 0, 0, 2);
 
         let results = read_json(&output_dir.join("results").join("result-store.json"))?;
         let cooling_rate = find_series(
@@ -2752,6 +2759,7 @@ fn zero_capacity_finite_limit_run_resets_all_three_cooling_candidates()
             Some(-0.0),
             true,
         );
+        assert_cooling_supply_mass_flow_maximum(&summary["rust_runtime"], 2, 0, 0, 2);
     }
     Ok(())
 }

@@ -1,59 +1,58 @@
 //! IdealLoads `CalcPurchAirLoads` compatibility calculations.
-
 mod cooling_capacity_zero_flow_reset;
 mod cooling_dehumidification_flow;
-mod cooling_economizer_body;
-mod cooling_economizer_condition;
-mod cooling_economizer_guard;
-mod cooling_entry_gate;
-mod cooling_humidification_flow;
-mod cooling_oa_max_flow_body;
-mod cooling_oa_max_flow_gate;
-mod cooling_sensible_flow;
-mod humidity;
-mod lifecycle;
-mod limits;
-mod mass_flow;
-mod minimum_oa_prefix;
-mod moisture_demand;
-mod no_oa;
-mod psychrometrics;
-mod types;
-
 #[cfg(test)]
 mod cooling_dehumidification_flow_release_tests;
 #[cfg(test)]
 mod cooling_dehumidification_flow_tests;
+mod cooling_economizer_body;
 #[cfg(test)]
 mod cooling_economizer_body_release_tests;
 #[cfg(test)]
 mod cooling_economizer_body_tests;
+mod cooling_economizer_condition;
 #[cfg(test)]
 mod cooling_economizer_condition_release_tests;
 #[cfg(test)]
 mod cooling_economizer_condition_tests;
+mod cooling_economizer_guard;
 #[cfg(test)]
 mod cooling_economizer_guard_tests;
+mod cooling_entry_gate;
 #[cfg(test)]
 mod cooling_entry_gate_tests;
+mod cooling_humidification_flow;
 #[cfg(test)]
 mod cooling_humidification_flow_tests;
+mod cooling_oa_max_flow_body;
 #[cfg(test)]
 mod cooling_oa_max_flow_body_tests;
+mod cooling_oa_max_flow_gate;
 #[cfg(test)]
 mod cooling_oa_max_flow_gate_tests;
+mod cooling_sensible_flow;
 #[cfg(test)]
 mod cooling_sensible_flow_release_tests;
 #[cfg(test)]
 mod cooling_sensible_flow_tests;
+mod cooling_supply_mass_flow_maximum;
+mod humidity;
+mod lifecycle;
 #[cfg(test)]
 mod lifecycle_tests;
+mod limits;
+mod mass_flow;
+mod minimum_oa_prefix;
 #[cfg(test)]
 mod minimum_oa_prefix_tests;
+mod moisture_demand;
 #[cfg(test)]
 mod moisture_demand_tests;
+mod no_oa;
 #[cfg(test)]
 mod no_oa_tests;
+mod psychrometrics;
+mod types;
 
 pub use cooling_capacity_zero_flow_reset::*;
 pub use cooling_dehumidification_flow::*;
@@ -66,6 +65,7 @@ pub use cooling_humidification_flow::*;
 pub use cooling_oa_max_flow_body::*;
 pub use cooling_oa_max_flow_gate::*;
 pub use cooling_sensible_flow::*;
+pub use cooling_supply_mass_flow_maximum::*;
 pub use lifecycle::*;
 pub use limits::IdealLoadsSensibleLimitContext;
 pub use minimum_oa_prefix::*;

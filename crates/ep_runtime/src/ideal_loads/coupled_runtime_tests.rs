@@ -23,6 +23,8 @@ use crate::{
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_MAXIMUM_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_MAXIMUM_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE, PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
         PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirTemperatureControlType,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO, ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE,
@@ -70,6 +72,26 @@ fn cooling_capacity_zero_flow_reset_partition_overflow_fails_closed() {
         error,
         DirectZonePurchasedAirCoupledRuntimeError::
             CalcCoolingCapacityZeroFlowResetLifecycleInvariant {
+                field: "test_partition_overflow",
+                expected: 1,
+                actual: usize::MAX,
+            }
+    ));
+}
+
+#[test]
+fn cooling_supply_mass_flow_maximum_partition_overflow_fails_closed() {
+    let error = super::cooling_supply_mass_flow_maximum_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::
+            CalcCoolingSupplyMassFlowMaximumLifecycleInvariant {
                 field: "test_partition_overflow",
                 expected: 1,
                 actual: usize::MAX,
@@ -1600,6 +1622,78 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
             capacity_selected
         );
         assert!(!latest_capacity_reset.zero_cooling_capacity_body_entered);
+        let supply_maximum = simulation
+            .summary
+            .calc_cooling_supply_mass_flow_maximum_lifecycle;
+        assert_eq!(
+            supply_maximum.source,
+            PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_MAXIMUM_SOURCE
+        );
+        assert_eq!(
+            supply_maximum.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_MAXIMUM_FIRST_EXCLUDED_SOURCE
+        );
+        let supply_maximum_state = supply_maximum.state;
+        assert_eq!(supply_maximum_state.transition_count, 1, "{limit:?}");
+        assert_eq!(
+            supply_maximum_state.cooling_body_entry_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_maximum_state.outdoor_air_mass_flow_rate_read_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_maximum_state.maximum_evaluation_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_maximum_state.supply_mass_flow_rate_assignment_count, 1,
+            "{limit:?}"
+        );
+        let latest_supply_maximum = supply_maximum_state
+            .latest
+            .expect("latest CP322 cooling snapshot");
+        assert!(latest_supply_maximum.cooling_body_entered);
+        assert_eq!(
+            latest_supply_maximum
+                .outdoor_air_mass_flow_rate_kg_per_s
+                .expect("no-OA operand")
+                .to_bits(),
+            0.0_f64.to_bits()
+        );
+        assert_eq!(
+            latest_supply_maximum
+                .supply_mass_flow_rate_for_cool_kg_per_s
+                .map(f64::to_bits),
+            latest_capacity_reset
+                .resulting_supply_mass_flow_rate_for_cool_kg_per_s
+                .map(f64::to_bits)
+        );
+        assert_eq!(
+            latest_supply_maximum
+                .supply_mass_flow_rate_for_dehumidification_kg_per_s
+                .map(f64::to_bits),
+            latest_capacity_reset
+                .resulting_supply_mass_flow_rate_for_dehumidification_kg_per_s
+                .map(f64::to_bits)
+        );
+        assert_eq!(
+            latest_supply_maximum
+                .supply_mass_flow_rate_for_humidification_kg_per_s
+                .map(f64::to_bits),
+            latest_capacity_reset
+                .resulting_supply_mass_flow_rate_for_humidification_kg_per_s
+                .map(f64::to_bits)
+        );
+        assert_eq!(
+            latest_supply_maximum
+                .assigned_supply_mass_flow_rate_kg_per_s
+                .map(f64::to_bits),
+            latest_supply_maximum
+                .maximum_supply_mass_flow_rate_kg_per_s
+                .map(f64::to_bits)
+        );
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation

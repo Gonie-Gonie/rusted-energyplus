@@ -669,6 +669,41 @@ limit or autosizing support, numerical conformance, capability level, parent
 and routine statuses, inventory counts, evidence cases, and Roadmap state
 remain unchanged.
 
+CP322 maps only executable line 2155, the Cooling supply mass-flow maximum,
+as six lexical source sites: read retained outdoor-air mass flow, read the
+CP321 cooling candidate, read the CP321 dehumidification candidate, read the
+CP321 humidification candidate, apply the source-shaped five-argument maximum
+with a positive-zero floor, and assign `SupplyMassFlowRate`. These read sites
+record the source operands without claiming a C++ function-argument evaluation
+order. UnitOff and non-cooling predecessors skip all six sites.
+
+The maximum reproduces ObjexxFCL rather than Rust's floating-point maximum
+helpers. It first chooses between positive zero and outdoor-air flow and
+between cooling and dehumidification, compares those pair winners, then
+compares the selected leading winner with humidification. Every comparison
+uses strict `<`; equality or an unordered comparison retains the left operand
+at that comparison. This preserves source-specific signed-zero, NaN, and
+infinity behavior without finite checks, normalization, sorting, or clamps.
+
+The exact direct lane consumes the three post-CP321 candidate results and the
+retained same-call CP311 pre-EMS outdoor-air value, which is bitwise positive
+zero for the no-OA route. The binder orders CP322 immediately after CP321 and
+before the unchanged numerical DTO. Direct-only lifecycle evidence is exposed
+as `purchased_air_calc_cooling_supply_mass_flow_maximum_lifecycle`; it does
+not reconcile the selected flow with that DTO or request live OA, Node,
+moisture, psychrometric, EMS, sizing, schedule, or diagnostic services. Each
+optional floating value also has a sibling hexadecimal `_ieee_bits` field, so
+JSON retains `Some(NaN)`, `Some(+/-infinity)`, and signed-zero identity even
+when its numeric field is `null`.
+
+Line 2155 is the complete CP322 boundary. The first excluded executable is the
+line-2157 EMS mass-flow override guard. EMS override, subsequent flow clamps,
+mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection remain
+open. CP322 adds lifecycle evidence and target inventory only: support and
+readiness, finite-limit or autosizing support, numerical conformance,
+capability level, parent and routine statuses, inventory counts, evidence
+cases, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

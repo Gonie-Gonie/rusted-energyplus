@@ -22,8 +22,10 @@ use super::super::{
     PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState,
     PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState,
     PurchasedAirCalcCoolingSensibleFlowRuntimeState, PurchasedAirCalcCoolingSensibleFlowSnapshot,
-    PurchasedAirCalcEntryRuntimeState, PurchasedAirCalcMinimumOaPrefixRuntimeState,
-    PurchasedAirHardSizeLegacyOutcome, PurchasedAirSizedLimits,
+    PurchasedAirCalcCoolingSupplyMassFlowMaximumRuntimeState,
+    PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot, PurchasedAirCalcEntryRuntimeState,
+    PurchasedAirCalcMinimumOaPrefixRuntimeState, PurchasedAirHardSizeLegacyOutcome,
+    PurchasedAirSizedLimits,
 };
 use super::{
     IdealLoadsInitFlags, PurchasedAirInitTopologyDiagnostic, PurchasedAirInitTopologyError,
@@ -86,6 +88,8 @@ pub struct PurchasedAirRuntimeState {
         BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidificationFlowSnapshot>,
     cooling_capacity_zero_flow_reset_latest_witnesses:
         BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot>,
+    cooling_supply_mass_flow_maximum_latest_witnesses:
+        BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot>,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -140,6 +144,9 @@ pub struct PurchasedAirUnitRuntimeState {
     /// Persistent bounded cooling capacity-zero candidate-reset state.
     pub calc_cooling_capacity_zero_flow_reset:
         PurchasedAirCalcCoolingCapacityZeroFlowResetRuntimeState,
+    /// Persistent bounded cooling supply-mass-flow maximum state.
+    pub calc_cooling_supply_mass_flow_maximum:
+        PurchasedAirCalcCoolingSupplyMassFlowMaximumRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -238,6 +245,8 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingHumidificationFlowRuntimeState::new(system),
             calc_cooling_capacity_zero_flow_reset:
                 PurchasedAirCalcCoolingCapacityZeroFlowResetRuntimeState::new(system),
+            calc_cooling_supply_mass_flow_maximum:
+                PurchasedAirCalcCoolingSupplyMassFlowMaximumRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

@@ -6,6 +6,8 @@ mod assertions;
 mod cooling_capacity_zero_flow_reset_fixture;
 #[path = "coupled_output_tests/cooling_humidification_flow_fixture.rs"]
 mod cooling_humidification_flow_fixture;
+#[path = "coupled_output_tests/cooling_supply_mass_flow_maximum_fixture.rs"]
+mod cooling_supply_mass_flow_maximum_fixture;
 
 use crate::{
     heat_balance::state::{ZoneAirTemperatureCoefficients, ZoneHeatBalanceState},
@@ -54,9 +56,10 @@ use crate::{
         PurchasedAirTemperatureControlType, couple_direct_zone_predicted_demand_to_purchased_air,
     },
 };
-use assertions::assert_values;
+use assertions::{assert_values, sentinel_results};
 use cooling_capacity_zero_flow_reset_fixture::calculation_cooling_capacity_zero_flow_reset_snapshot;
 use cooling_humidification_flow_fixture::calculation_cooling_humidification_flow_snapshot;
+use cooling_supply_mass_flow_maximum_fixture::calculation_cooling_supply_mass_flow_maximum_snapshot;
 use ep_model::{
     DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
@@ -426,18 +429,6 @@ fn assert_rejected_without_mutation(
     assert_eq!(results, original);
 }
 
-fn sentinel_results(handle: OutputHandle) -> ResultStore {
-    let mut results = ResultStore::new();
-    results.add_series(OutputSeries {
-        handle,
-        key: "EXISTING".to_string(),
-        variable_name: "Existing Variable".to_string(),
-        units: "W".to_string(),
-        values: vec![1.0],
-    });
-    results
-}
-
 fn scaled_output(
     system: &IdealLoadsAirSystem,
     sample_index: usize,
@@ -488,6 +479,13 @@ fn scaled_output(
             calculation_cooling_dehumidification_flow,
             calculation_cooling_humidification_flow,
         );
+    let calculation_minimum_outdoor_air =
+        calculation_minimum_oa_snapshot(system, sample_index, coupling);
+    let calculation_cooling_supply_mass_flow_maximum =
+        calculation_cooling_supply_mass_flow_maximum_snapshot(
+            calculation_minimum_outdoor_air,
+            calculation_cooling_capacity_zero_flow_reset,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -499,11 +497,7 @@ fn scaled_output(
         },
         initialization: initialized_snapshot(system),
         calculation_entry: calculation_entry_snapshot(system, sample_index, coupling),
-        calculation_minimum_outdoor_air: calculation_minimum_oa_snapshot(
-            system,
-            sample_index,
-            coupling,
-        ),
+        calculation_minimum_outdoor_air,
         calculation_cooling_entry_gate: calculation_cooling_entry_gate_snapshot(
             system,
             sample_index,
@@ -526,6 +520,7 @@ fn scaled_output(
         calculation_cooling_dehumidification_flow,
         calculation_cooling_humidification_flow,
         calculation_cooling_capacity_zero_flow_reset,
+        calculation_cooling_supply_mass_flow_maximum,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

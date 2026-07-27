@@ -9,6 +9,7 @@ use crate::ideal_loads::{
     PurchasedAirCalcCoolingEconomizerBodySnapshot,
     PurchasedAirCalcCoolingEconomizerConditionSnapshot,
     PurchasedAirCalcCoolingHumidificationFlowSnapshot, PurchasedAirCalcCoolingSensibleFlowSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot,
 };
 
 impl PurchasedAirRuntimeState {
@@ -117,6 +118,24 @@ impl PurchasedAirRuntimeState {
         snapshot: PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot,
     ) {
         self.cooling_capacity_zero_flow_reset_latest_witnesses
+            .insert(system, snapshot);
+    }
+
+    pub(in crate::ideal_loads) fn cooling_supply_mass_flow_maximum_latest_witness(
+        &self,
+        system: IdealLoadsAirSystemId,
+    ) -> Option<PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot> {
+        self.cooling_supply_mass_flow_maximum_latest_witnesses
+            .get(&system)
+            .copied()
+    }
+
+    pub(in crate::ideal_loads) fn set_cooling_supply_mass_flow_maximum_latest_witness(
+        &mut self,
+        system: IdealLoadsAirSystemId,
+        snapshot: PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot,
+    ) {
+        self.cooling_supply_mass_flow_maximum_latest_witnesses
             .insert(system, snapshot);
     }
 }

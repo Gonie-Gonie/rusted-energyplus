@@ -33776,6 +33776,41 @@ Autosize support, numerical conformance, or capability promotion. Parent and
 routine statuses, inventory/readiness, evidence, and Roadmap state remain
 unchanged.
 
+## CP322 Cooling Supply Mass-Flow Maximum Inside the Heat-Balance Loop
+
+CP322 executes immediately after CP321 and before the unchanged bounded
+PurchasedAir numerical calculation. It maps only executable line 2155 as six
+lexical sites: retained outdoor-air, cooling, dehumidification, and
+humidification reads; application of the source-shaped five-argument maximum
+with a positive-zero floor; and the `SupplyMassFlowRate` assignment. The four
+operand sites do not assert a C++ function-argument evaluation order. UnitOff
+and non-cooling predecessors skip the complete slice.
+
+For active Cooling the maximum reproduces ObjexxFCL's strict-`<` pair tree:
+positive zero versus outdoor air, cooling versus dehumidification, the pair
+winners, then the selected leading winner versus humidification. Each tie or
+unordered comparison keeps its left operand, preserving exact signed-zero,
+NaN, and infinity behavior without Rust floating-point maximum helpers,
+normalization, finite guards, total ordering, or clamps.
+
+The direct lane consumes the three post-CP321 candidate results plus retained
+same-call CP311 pre-EMS outdoor-air state; exact no-OA release validates that
+outdoor-air value as bitwise positive zero. It adds no live heat-balance, OA,
+Node, moisture, psychrometric, EMS, sizing, schedule, or diagnostic read.
+Per-step, final, coupled-runtime, and pipeline validators place CP322 between
+CP321 and the existing numerical DTO and same-step Zone-air corrector, without
+reconciling the selected flow with the DTO. Pipeline JSON pairs every optional
+floating field with a hexadecimal `_ieee_bits` field so nonfinite values,
+absence, and signed zeros remain distinguishable.
+
+Line 2155 completes CP322; line 2157 is the first excluded executable and
+starts the EMS mass-flow override guard. Line 2156 is non-executable. EMS,
+later clamps, mixed-air/capacity/supply-state behavior, Heat/DeadBand
+selection, and all later feedback remain excluded. CP322 adds no heat-balance
+or predictor equation, live service, finite-limit or Autosize support,
+numerical conformance, or capability promotion. Parent and routine statuses,
+inventory/readiness counts, evidence, and Roadmap state remain unchanged.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

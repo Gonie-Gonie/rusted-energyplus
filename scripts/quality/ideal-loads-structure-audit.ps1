@@ -2444,6 +2444,7 @@ $bindingCoolingSensibleFlowIndex = $bindingText.IndexOf("let calculation_cooling
 $bindingCoolingDehumidificationFlowIndex = $bindingText.IndexOf("let calculation_cooling_dehumidification_flow =")
 $bindingCoolingHumidificationFlowIndex = $bindingText.IndexOf("let calculation_cooling_humidification_flow =")
 $bindingCoolingCapacityZeroFlowResetIndex = $bindingText.IndexOf("let calculation_cooling_capacity_zero_flow_reset =")
+$bindingCoolingSupplyMassFlowMaximumIndex = $bindingText.IndexOf("let calculation_cooling_supply_mass_flow_maximum =")
 $bindingCalcIndex = $bindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
 $bindingCoolingEconomizerConditionCall = [regex]::Match(
     $bindingText,
@@ -2483,9 +2484,10 @@ if (
     $bindingCoolingDehumidificationFlowIndex -le $bindingCoolingSensibleFlowIndex -or
     $bindingCoolingHumidificationFlowIndex -le $bindingCoolingDehumidificationFlowIndex -or
     $bindingCoolingCapacityZeroFlowResetIndex -le $bindingCoolingHumidificationFlowIndex -or
-    $bindingCalcIndex -le $bindingCoolingCapacityZeroFlowResetIndex
+    $bindingCoolingSupplyMassFlowMaximumIndex -le $bindingCoolingCapacityZeroFlowResetIndex -or
+    $bindingCalcIndex -le $bindingCoolingSupplyMassFlowMaximumIndex
 ) {
-    throw "InitPurchasedAir must precede the Calc-entry prefix, minimum-OA prefix, cooling-entry gate, cooling OA maximum-flow gate, cooling OA maximum-flow true body, cooling economizer guard, cooling economizer condition, cooling economizer true body, cooling sensible flow, cooling dehumidification flow, cooling humidification flow, cooling capacity-zero flow reset, and bounded numerical Calc coupling"
+    throw "InitPurchasedAir must precede the Calc-entry prefix, minimum-OA prefix, cooling-entry gate, cooling OA maximum-flow gate, cooling OA maximum-flow true body, cooling economizer guard, cooling economizer condition, cooling economizer true body, cooling sensible flow, cooling dehumidification flow, cooling humidification flow, cooling capacity-zero flow reset, cooling supply-mass-flow maximum, and bounded numerical Calc coupling"
 }
 if (-not $bindingCoolingEconomizerConditionCall.Success) {
     throw "CP316 binding must call the exact no-node release wrapper with only runtime, system, and CP315 predecessor"
@@ -2615,15 +2617,15 @@ if ($bindingPostCoolingHumidificationFlowWindow -match '(?:\b[A-Za-z_][A-Za-z0-9
 $bindingCoolingCapacityZeroFlowResetCallEnd =
     $bindingCoolingCapacityZeroFlowResetCall.Index +
     $bindingCoolingCapacityZeroFlowResetCall.Length
-if ($bindingCalcIndex -le $bindingCoolingCapacityZeroFlowResetCallEnd) {
-    throw "CP321 exact release call must complete before the bounded numerical Calc coupling"
+if ($bindingCoolingSupplyMassFlowMaximumIndex -le $bindingCoolingCapacityZeroFlowResetCallEnd) {
+    throw "CP321 exact release call must complete before CP322"
 }
 $bindingPostCoolingCapacityZeroFlowResetWindow = $bindingText.Substring(
     $bindingCoolingCapacityZeroFlowResetCallEnd,
-    $bindingCalcIndex - $bindingCoolingCapacityZeroFlowResetCallEnd
+    $bindingCoolingSupplyMassFlowMaximumIndex - $bindingCoolingCapacityZeroFlowResetCallEnd
 )
 if ($bindingPostCoolingCapacityZeroFlowResetWindow -match '(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)\s*\(') {
-    throw "No intermediary helper call may execute after CP321 and before the bounded numerical Calc coupling"
+    throw "No intermediary helper call may execute after CP321 and before CP322"
 }
 Assert-Contains -Path $calcLimits -Pattern 'initialized_heating_air_mass_flow_limit_kg_per_s' -Description "initialized heating flow cache input"
 Assert-Contains -Path $calcLimits -Pattern 'initialized_cooling_air_mass_flow_limit_kg_per_s' -Description "initialized cooling flow cache input"
@@ -4081,5 +4083,7 @@ foreach ($cp321Doc in @(
     Assert-Contains -Path $cp321Doc -Pattern 'CP321' -Description "CP321 documentation boundary"
     Assert-Contains -Path $cp321Doc -Pattern '2155' -Description "CP321 first excluded executable documentation"
 }
+
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp322-cooling-supply-mass-flow-maximum.ps1")
 
 Write-Host "IdealLoads structure audit complete."

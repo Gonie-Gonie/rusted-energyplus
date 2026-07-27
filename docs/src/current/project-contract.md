@@ -16408,6 +16408,63 @@ promotes no finite-limit or autosizing route, broad humidity control, live
 service, numerical result, capability, status, inventory/readiness count,
 evidence case, conformance claim, or Roadmap item.
 
+## CP322 Source-Ordered Cooling Supply Mass-Flow Maximum
+
+CP322 supersedes only CP321's line-2155 exclusion for the single EnergyPlus
+26.1 `PurchasedAirManager.cc` executable statement at line 2155. Its exact six
+lexical source sites are:
+
+1. read retained `OAMassFlowRate`;
+2. read retained `SupplyMassFlowRateForCool`;
+3. read retained `SupplyMassFlowRateForDehum`;
+4. read retained `SupplyMassFlowRateForHumid`;
+5. apply the source-shaped five-argument maximum with a positive-zero floor;
+   and
+6. assign the result to `SupplyMassFlowRate`.
+
+The four read sites describe the source operands and do not claim a C++
+function-argument evaluation order. UnitOff and non-cooling predecessors skip
+all six sites. Active Cooling evaluates the ObjexxFCL maximum semantics: a
+strict-`<` choice between positive zero and outdoor-air flow, a strict-`<`
+choice between cooling and dehumidification, a comparison of those pair
+winners, and a final comparison of the selected leading winner with
+humidification. Each equality or unordered comparison keeps the left operand
+at that comparison. The implementation therefore preserves the source's
+signed-zero, NaN, and infinity behavior and must not substitute Rust
+`f64::max`, an iterator maximum, total ordering, a finite check,
+normalization, or a clamp.
+
+`calc/cooling_supply_mass_flow_maximum.rs` and its split modules own the
+snapshot, persistent state, transition, release validation, and tests. The
+public exact-direct wrapper
+`advance_direct_no_oa_calc_cooling_supply_mass_flow_maximum` consumes the
+completed same-call CP321 results for the cooling, dehumidification, and
+humidification candidates. It also consumes the retained CP311 pre-EMS
+outdoor-air value rather than accepting a duplicate caller scalar; exact no-OA
+release validates that value as bitwise positive zero. It requests no live OA,
+Node, moisture, psychrometric, EMS, sizing, schedule, or diagnostic service.
+
+The binder executes CP322 immediately after CP321 and before the unchanged
+numerical Calc DTO. Per-step, lifecycle, coupled-runtime, and pipeline
+validation reconcile one CP322 transition per CP321 transition, immediate
+predecessor identity, CP311 outdoor-air lineage, all six sites, the strict-`<`
+comparison tree, left-first tie/unordered choices, and bitwise output.
+Direct-only JSON uses
+`purchased_air_calc_cooling_supply_mass_flow_maximum_lifecycle`; non-direct or
+disconnected evidence is rejected, and the selected flow is not reconciled
+with the older numerical DTO. Every optional floating field has a sibling
+hexadecimal `_ieee_bits` field; this distinguishes absence from JSON's `null`
+encoding of NaN and positive or negative infinity and preserves signed-zero
+identity.
+
+Line 2155 completes CP322 and line 2157 is the first excluded executable, the
+EMS mass-flow override guard. The intervening line 2156 is non-executable.
+EMS override, subsequent flow limiting, mixed-air and final supply-state
+behavior, and Heat/DeadBand work remain excluded. CP322 promotes no OA, EMS,
+finite-limit or autosizing route, broad humidity control, live service,
+numerical result, capability, status, inventory/readiness count, evidence
+case, conformance claim, or Roadmap item.
+
 
 
 

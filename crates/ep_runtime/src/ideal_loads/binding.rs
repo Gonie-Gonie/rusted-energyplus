@@ -34,7 +34,8 @@ use super::{
     PurchasedAirCalcCoolingHumidificationFlowSnapshot, PurchasedAirCalcCoolingOaMaxFlowBodyError,
     PurchasedAirCalcCoolingOaMaxFlowBodySnapshot, PurchasedAirCalcCoolingOaMaxFlowGateError,
     PurchasedAirCalcCoolingOaMaxFlowGateSnapshot, PurchasedAirCalcCoolingSensibleFlowError,
-    PurchasedAirCalcCoolingSensibleFlowSnapshot, PurchasedAirCalcEntryContext,
+    PurchasedAirCalcCoolingSensibleFlowSnapshot, PurchasedAirCalcCoolingSupplyMassFlowMaximumError,
+    PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot, PurchasedAirCalcEntryContext,
     PurchasedAirCalcEntryError, PurchasedAirCalcEntrySnapshot,
     PurchasedAirCalcMinimumOaPrefixError, PurchasedAirCalcMinimumOaPrefixSnapshot,
     PurchasedAirHardSizeLegacyContext, PurchasedAirInitCallContext, PurchasedAirInitError,
@@ -49,10 +50,12 @@ use super::{
     advance_direct_no_oa_calc_cooling_humidification_flow,
     advance_direct_no_oa_calc_cooling_oa_max_flow_body,
     advance_direct_no_oa_calc_cooling_oa_max_flow_gate,
-    advance_direct_no_oa_calc_cooling_sensible_flow, advance_direct_no_oa_calc_minimum_oa_prefix,
-    advance_purchased_air_calc_entry, classify_no_oa_sensible_subset,
-    complete_direct_zone_purchased_air_coupling, init_purchased_air_runtime,
-    predict_direct_zone_demand_for_purchased_air, select_purchased_air_branch,
+    advance_direct_no_oa_calc_cooling_sensible_flow,
+    advance_direct_no_oa_calc_cooling_supply_mass_flow_maximum,
+    advance_direct_no_oa_calc_minimum_oa_prefix, advance_purchased_air_calc_entry,
+    classify_no_oa_sensible_subset, complete_direct_zone_purchased_air_coupling,
+    init_purchased_air_runtime, predict_direct_zone_demand_for_purchased_air,
+    select_purchased_air_branch,
 };
 
 /// One-to-one relation required by the bounded direct-Zone binding.
@@ -612,6 +615,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingHumidificationFlow(PurchasedAirCalcCoolingHumidificationFlowError),
     /// The bounded cooling capacity-zero candidate reset rejected its release state.
     CalculationCoolingCapacityZeroFlowReset(PurchasedAirCalcCoolingCapacityZeroFlowResetError),
+    /// The bounded cooling supply mass-flow maximum rejected its release state.
+    CalculationCoolingSupplyMassFlowMaximum(PurchasedAirCalcCoolingSupplyMassFlowMaximumError),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -708,6 +713,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered cooling capacity-zero candidate-reset snapshot.
     pub calculation_cooling_capacity_zero_flow_reset:
         PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot,
+    /// Source-ordered pre-EMS cooling supply mass-flow maximum snapshot.
+    pub calculation_cooling_supply_mass_flow_maximum:
+        PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
@@ -920,6 +928,15 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         .map_err(
             DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingCapacityZeroFlowReset,
         )?;
+    let calculation_cooling_supply_mass_flow_maximum =
+        advance_direct_no_oa_calc_cooling_supply_mass_flow_maximum(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_capacity_zero_flow_reset,
+        )
+        .map_err(
+            DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingSupplyMassFlowMaximum,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -969,6 +986,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_dehumidification_flow,
         calculation_cooling_humidification_flow,
         calculation_cooling_capacity_zero_flow_reset,
+        calculation_cooling_supply_mass_flow_maximum,
         coupling,
     })
 }

@@ -18955,6 +18955,46 @@ excluded. Finite-limit and Autosize support remain unchanged. Both parents and
 the Calc routine retain their status; inventory, readiness, capability,
 evidence, numerical conformance, and Roadmap state do not change.
 
+## CP322 Cooling Supply Mass-Flow Maximum
+
+CP322 maps only executable line 2155 after CP321. Its exact six lexical sites
+read retained outdoor-air mass flow, read the CP321 cooling candidate, read
+the CP321 dehumidification candidate, read the CP321 humidification candidate,
+apply the source-shaped five-argument maximum with a positive-zero floor, and
+assign `SupplyMassFlowRate`. The operand read sites do not claim a C++
+function-argument evaluation order. UnitOff and non-cooling paths skip all six
+sites.
+
+Active Cooling preserves ObjexxFCL's strict-`<` comparison tree. It chooses
+between positive zero and outdoor air, chooses between cooling and
+dehumidification, compares the two pair winners, and then compares the selected
+leading winner with humidification. Equality and unordered comparisons retain
+the left operand at each comparison. Signed zeros, NaNs, and infinities
+therefore follow that exact tree; Rust `f64::max`, iterator maximum, total
+ordering, finite checks, normalization, and clamps are not equivalent.
+
+The exact direct wrapper
+`advance_direct_no_oa_calc_cooling_supply_mass_flow_maximum` consumes the three
+post-CP321 candidate results and the retained same-call CP311 pre-EMS
+outdoor-air value. The no-OA release requires that retained value to be
+bitwise positive zero and accepts no duplicate caller scalar. The binder
+places CP322 immediately after CP321 and before the unchanged numerical DTO.
+Direct-only
+`purchased_air_calc_cooling_supply_mass_flow_maximum_lifecycle` evidence
+reconciles predecessor identities, all six sites, the comparison tree, and the
+assigned bits without numerical-DTO reconciliation or live-service ownership.
+Every optional floating field has a sibling hexadecimal `_ieee_bits` JSON
+field, preserving NaN, positive or negative infinity, signed zero, and absence
+as distinct evidence states.
+
+Line 2155 completes CP322. Line 2157 is the first excluded executable and
+begins the EMS mass-flow override guard; line 2156 is only a comment. EMS,
+subsequent flow clamps, mixed-air/capacity/supply-state behavior, and
+Heat/DeadBand selection remain excluded. CP322 changes target inventory and
+lifecycle evidence only. Finite-limit and Autosize support, both parent and
+Calc routine statuses, inventory/readiness counts, capability, evidence,
+numerical conformance, and Roadmap state remain unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:
