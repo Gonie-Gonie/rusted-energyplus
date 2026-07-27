@@ -21015,6 +21015,40 @@ still excluded. Both parents remain `scaffold`/`none`,
 `routine.init_purchased_air` remains `source_mapped`, and the external Roadmap
 full-lifecycle checkbox stays open.
 
+## CP307 Selected-Unit PurchasedAir Topology Ordering
+
+CP307 preserves the existing predictor -> bounded Init -> Calc -> update/report
+-> same-step Zone corrector barriers while expanding only the selected-unit Init
+interior. `PurchasedAirInitTopologyPlan::from_model` pre-resolves the selected
+controlled-Zone connection and ordered node lists. After the CP306 global sweep,
+`advance_selected_unit_topology` commits the source one-time latch and immutable
+plan before evaluating EnergyPlus 26.1 `PurchasedAirManager.cc` lines 1114-1192
+in supply, exhaust/fallback, return, and conditional OA/economizer-advisory
+order. A fatal topology result therefore suppresses the later sizing,
+environment, Calc, update/report, and corrector suffix for that Rust call.
+
+The transition retains structured diagnostic order and topology completion in
+`PurchasedAirRuntimeState`; `PurchasedAirInitLifecycleSummary` and the pipeline
+JSON expose the selected outcome. Release coupling requires
+`topology_ready=true`, an exact initialized recirculation identity, and the
+existing topology with a blank IdealLoads exhaust field, no Zone exhaust
+topology, exactly one Zone return, and no OA. Valid or invalid exhaust, multiple
+or zero returns, and the economizer advisory are direct lifecycle evidence only.
+Multiple returns intentionally warn while leaving recirculation unassigned,
+matching the source branch quirk. Same-plan fatal replay is a Rust fail-closed
+poison state that re-returns the retained failure without advancing to sizing,
+not source retry parity. The C++ zero-supply bypass is outside the typed
+required-supply subset because Rust `NodeId(0)` remains a valid identity, not a
+sentinel.
+
+This adds no new predictor or corrector computation and does not widen the
+runtime class. Plenum ownership, full sizing/autosizing, multi-unit release
+execution, broader OA behavior, warmup/adaptive/FirstHVACIteration, wrong-
+ControlledZone replay, and reset/concurrency remain excluded. Both parent
+algorithms remain `scaffold`/`none`, `routine.init_purchased_air` remains
+`source_mapped`, and counts, capabilities, and the Roadmap checkbox are
+unchanged.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

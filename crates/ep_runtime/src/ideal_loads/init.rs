@@ -2,10 +2,15 @@
 
 mod manager_plan;
 mod state;
+mod summary;
+mod topology_plan;
+mod topology_transition;
 mod transition;
 
 pub use manager_plan::*;
 pub use state::*;
+pub use summary::*;
+pub use topology_plan::*;
 pub use transition::*;
 
 #[cfg(test)]
@@ -14,6 +19,10 @@ mod lifecycle_tests;
 mod manager_plan_tests;
 #[cfg(test)]
 mod manager_scan_tests;
+#[cfg(test)]
+mod topology_plan_tests;
+#[cfg(test)]
+mod topology_transition_tests;
 #[cfg(test)]
 mod warning_tests;
 
@@ -27,6 +36,8 @@ pub struct IdealLoadsInitFlags {
     pub state_machine_used: bool,
     /// One-time input and object lookup checks have run.
     pub one_time_checked: bool,
+    /// Selected-unit topology reached a release-usable recirculation result.
+    pub topology_ready: bool,
     /// Begin-environment initialization has run.
     pub environment_initialized: bool,
     /// Source `MyEnvrnFlag`; a later begin-environment write is pending.
@@ -49,6 +60,7 @@ impl IdealLoadsInitFlags {
         Self {
             state_machine_used: false,
             one_time_checked: true,
+            topology_ready: true,
             environment_initialized: true,
             environment_initialization_needed: false,
             sizing_checked: true,

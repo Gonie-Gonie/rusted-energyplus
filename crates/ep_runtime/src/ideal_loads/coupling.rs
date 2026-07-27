@@ -21,7 +21,7 @@ use validation::{initialized_limit_context, validate_coupling_inputs, validate_s
 
 /// Inputs for one bounded direct-Zone predictor-to-PurchasedAir coupling step.
 ///
-/// The caller owns the prebound proof that `system`, `supply_node`, and
+/// The caller owns the prebound proof that `system`, both component nodes, and
 /// `zone_state` describe the same single, fully mixed controlled Zone. This
 /// production boundary accepts the no-outdoor-air sensible PurchasedAir
 /// branches with either no limit or resolved numeric flow/capacity limits.
@@ -48,6 +48,8 @@ pub struct DirectZonePurchasedAirCouplingInput<'a> {
     pub system: &'a IdealLoadsAirSystem,
     /// Prebound supply node updated by PurchasedAir.
     pub supply_node: NodeId,
+    /// Prebound exhaust-or-return node supplying recirculation state.
+    pub recirculation_node: NodeId,
     /// Availability-schedule result for the current system timestep.
     pub unit_available: bool,
     /// Psychrometric and standard-density context for PurchasedAir.
@@ -65,6 +67,8 @@ pub enum DirectZonePurchasedAirInitializationRelation {
     ControlledZone,
     /// Initialized supply-node identity.
     SupplyNode,
+    /// Initialized recirculation-node identity.
+    RecirculationNode,
 }
 
 /// Source-ordered system-air correction feedback derived from PurchasedAir.
@@ -338,9 +342,9 @@ mod tests {
         energyplus_moist_air_specific_heat_j_per_kg_k,
         heat_balance::state::ZoneAirTemperatureCoefficients,
         ideal_loads::{
-            IdealLoadsSensibleMode, IdealLoadsUnsupportedFeature, PurchasedAirInitBoundTopology,
-            PurchasedAirInitCallContext, PurchasedAirInitManagerPlan,
-            PurchasedAirInitManagerPlanRow, PurchasedAirRuntimeState, init_purchased_air_runtime,
+            IdealLoadsSensibleMode, IdealLoadsUnsupportedFeature, PurchasedAirInitCallContext,
+            PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanRow,
+            PurchasedAirInitTopologyPlan, PurchasedAirRuntimeState, init_purchased_air_runtime,
             select_purchased_air_branch,
         },
     };
@@ -410,6 +414,49 @@ mod tests {
             output.feedback.sum_sys_mcp_t_w,
             output.feedback.sum_sys_mcp_w_per_k * system.minimum_cooling_supply_air_temperature_c,
         );
+    }
+
+    #[test]
+    fn coupling_rejects_recirculation_node_identity_mismatch() {
+        let mut state = zone_state_for_temp_independent_load(0.0);
+        state.sum_sys_mcp_w_per_k = 41.0;
+        state.sum_sys_mcp_t_w = 43.0;
+        let original = state.clone();
+        let system = test_system();
+        let mut input = coupling_input(&mut state, &system, 1, 1);
+        input.recirculation_node = NodeId(99);
+
+        let error = couple_direct_zone_predicted_demand_to_purchased_air(input)
+            .expect_err("mismatched recirculation identity must fail closed");
+
+        assert_eq!(
+            error,
+            DirectZonePurchasedAirCouplingError::InitializationIdentityMismatch {
+                relation: DirectZonePurchasedAirInitializationRelation::RecirculationNode,
+            }
+        );
+        assert_eq!(state, original);
+    }
+
+    #[test]
+    fn coupling_classifies_unassigned_recirculation_as_not_ready() {
+        let mut state = zone_state_for_temp_independent_load(0.0);
+        state.sum_sys_mcp_w_per_k = 47.0;
+        state.sum_sys_mcp_t_w = 53.0;
+        let original = state.clone();
+        let system = test_system();
+        let mut input = coupling_input(&mut state, &system, 1, 1);
+        input.initialization.recirculation_node = None;
+        input.initialization.flags.topology_ready = false;
+
+        let error = couple_direct_zone_predicted_demand_to_purchased_air(input)
+            .expect_err("unassigned recirculation must be classified as not ready");
+
+        assert_eq!(
+            error,
+            DirectZonePurchasedAirCouplingError::InitializationNotReady
+        );
+        assert_eq!(state, original);
     }
 
     #[test]
@@ -1031,6 +1078,7 @@ mod tests {
             system_timestep_seconds: 600.0,
             system,
             supply_node: NodeId(3),
+            recirculation_node: NodeId(4),
             unit_available: true,
             limit_context: IdealLoadsSensibleLimitContext::default(),
             initialization,
@@ -1047,16 +1095,21 @@ mod tests {
                 return_plenum_active: false,
             }])
             .expect("test manager plan must be valid");
+        let topology_plan = PurchasedAirInitTopologyPlan::from_resolved_nodes(
+            system.id,
+            ZoneId(0),
+            ZoneEquipmentListId(0),
+            NodeId(3),
+            vec![NodeId(3)],
+            None,
+            Vec::new(),
+            vec![NodeId(4)],
+            false,
+        );
         init_purchased_air_runtime(
             &mut state,
             &manager_plan,
-            PurchasedAirInitBoundTopology {
-                system: system.id,
-                controlled_zone: ZoneId(0),
-                equipment_list: ZoneEquipmentListId(0),
-                supply_node: NodeId(3),
-                recirculation_node: NodeId(4),
-            },
+            &topology_plan,
             system,
             PurchasedAirInitCallContext {
                 zone_equipment_inputs_filled: true,

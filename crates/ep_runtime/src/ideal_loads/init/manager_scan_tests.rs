@@ -28,7 +28,7 @@ fn manager_sweep_preserves_declaration_order_and_initializes_only_selected_unit(
     let snapshot = init_purchased_air_runtime(
         &mut state,
         &plan,
-        topology_for(SYSTEM_NINE, LIST_NINE),
+        &topology_for(SYSTEM_NINE, LIST_NINE),
         &system,
         context(true),
     )
@@ -73,9 +73,9 @@ fn manager_sweep_preserves_declaration_order_and_initializes_only_selected_unit(
     assert_eq!(state.units[&SYSTEM_SEVEN].init_call_count, 0);
     assert_eq!(state.units[&SYSTEM_TWO].init_call_count, 0);
     assert_eq!(state.units[&SYSTEM_NINE].init_call_count, 1);
-    assert!(!state.units[&SYSTEM_SEVEN].one_time_initialized);
-    assert!(!state.units[&SYSTEM_TWO].one_time_initialized);
-    assert!(state.units[&SYSTEM_NINE].one_time_initialized);
+    assert!(!state.units[&SYSTEM_SEVEN].one_time_latched);
+    assert!(!state.units[&SYSTEM_TWO].one_time_latched);
+    assert!(state.units[&SYSTEM_NINE].one_time_latched);
 }
 
 #[test]
@@ -93,7 +93,7 @@ fn deferred_sweep_runs_once_and_is_not_repeated_across_selected_units() {
     let first = init_purchased_air_runtime(
         &mut state,
         &plan,
-        topology_for(SYSTEM_SEVEN, LIST_SEVEN),
+        &topology_for(SYSTEM_SEVEN, LIST_SEVEN),
         &system_seven,
         deferred,
     )
@@ -108,7 +108,7 @@ fn deferred_sweep_runs_once_and_is_not_repeated_across_selected_units() {
     let ready = init_purchased_air_runtime(
         &mut state,
         &plan,
-        topology_for(SYSTEM_TWO, LIST_TWO),
+        &topology_for(SYSTEM_TWO, LIST_TWO),
         &system_two,
         context(true),
     )
@@ -124,7 +124,7 @@ fn deferred_sweep_runs_once_and_is_not_repeated_across_selected_units() {
     let replay = init_purchased_air_runtime(
         &mut state,
         &plan,
-        topology_for(SYSTEM_SEVEN, LIST_SEVEN),
+        &topology_for(SYSTEM_SEVEN, LIST_SEVEN),
         &system_seven,
         context(true),
     )
@@ -153,7 +153,7 @@ fn missing_equipment_memberships_emit_ordered_diagnostics_without_fail_fast() {
     let snapshot = init_purchased_air_runtime(
         &mut state,
         &plan,
-        topology_for(SYSTEM_NINE, LIST_NINE),
+        &topology_for(SYSTEM_NINE, LIST_NINE),
         &system,
         context(true),
     )
@@ -207,7 +207,7 @@ fn changed_manager_plan_is_rejected_before_selected_unit_mutation() {
     let system = finite_flow_system_for(SYSTEM_SEVEN);
     let bound = topology_for(SYSTEM_SEVEN, LIST_SEVEN);
     let mut state = PurchasedAirRuntimeState::default();
-    init_purchased_air_runtime(&mut state, &plan, bound, &system, context(true))
+    init_purchased_air_runtime(&mut state, &plan, &bound, &system, context(true))
         .expect("seed immutable manager plan");
 
     let changed_order = manager_plan(&[
@@ -216,7 +216,7 @@ fn changed_manager_plan_is_rejected_before_selected_unit_mutation() {
     ]);
     let before_order_error = state.clone();
     assert_eq!(
-        init_purchased_air_runtime(&mut state, &changed_order, bound, &system, context(true),),
+        init_purchased_air_runtime(&mut state, &changed_order, &bound, &system, context(true),),
         Err(PurchasedAirInitError::DeclaredSystemOrderChanged {
             expected: vec![SYSTEM_SEVEN, SYSTEM_TWO],
             actual: vec![SYSTEM_TWO, SYSTEM_SEVEN],
@@ -233,7 +233,7 @@ fn changed_manager_plan_is_rejected_before_selected_unit_mutation() {
         init_purchased_air_runtime(
             &mut state,
             &changed_membership,
-            bound,
+            &bound,
             &system,
             context(true),
         ),
@@ -255,7 +255,7 @@ fn selected_system_missing_from_plan_is_rejected_before_allocation() {
         init_purchased_air_runtime(
             &mut state,
             &plan,
-            topology_for(SYSTEM_NINE, LIST_NINE),
+            &topology_for(SYSTEM_NINE, LIST_NINE),
             &system,
             context(true),
         ),
@@ -279,7 +279,7 @@ fn completed_manager_scan_survives_autosize_retry_and_topology_error() {
     let bound = topology_for(SYSTEM_SEVEN, LIST_SEVEN);
     let mut state = PurchasedAirRuntimeState::default();
 
-    let error = init_purchased_air_runtime(&mut state, &plan, bound, &system, context(true))
+    let error = init_purchased_air_runtime(&mut state, &plan, &bound, &system, context(true))
         .expect_err("autosize remains beyond the bounded manager-sweep slice");
     assert_eq!(
         error,
@@ -302,16 +302,15 @@ fn completed_manager_scan_survives_autosize_retry_and_topology_error() {
     );
 
     let hard_sized = finite_flow_system_for(SYSTEM_SEVEN);
-    let retry = init_purchased_air_runtime(&mut state, &plan, bound, &hard_sized, context(true))
+    let retry = init_purchased_air_runtime(&mut state, &plan, &bound, &hard_sized, context(true))
         .expect("hard-size retry reuses the completed manager scan");
     assert!(!retry.transition.equipment_list_checked);
     assert!(retry.transition.sizing_checked);
     assert_eq!(state.equipment_list_check_count, 1);
 
-    let mut changed = bound;
-    changed.supply_node = NodeId(99);
+    let changed = topology_for_supply(SYSTEM_SEVEN, LIST_SEVEN, NodeId(99));
     assert_eq!(
-        init_purchased_air_runtime(&mut state, &plan, changed, &hard_sized, context(true),),
+        init_purchased_air_runtime(&mut state, &plan, &changed, &hard_sized, context(true),),
         Err(PurchasedAirInitError::LatchedTopologyChanged {
             system: SYSTEM_SEVEN,
         })
@@ -344,14 +343,26 @@ fn manager_plan(
 fn topology_for(
     system: IdealLoadsAirSystemId,
     equipment_list: ZoneEquipmentListId,
-) -> PurchasedAirInitBoundTopology {
-    PurchasedAirInitBoundTopology {
+) -> PurchasedAirInitTopologyPlan {
+    topology_for_supply(system, equipment_list, NodeId(1))
+}
+
+fn topology_for_supply(
+    system: IdealLoadsAirSystemId,
+    equipment_list: ZoneEquipmentListId,
+    supply_node: NodeId,
+) -> PurchasedAirInitTopologyPlan {
+    PurchasedAirInitTopologyPlan::from_resolved_nodes(
         system,
-        controlled_zone: ZoneId(0),
+        ZoneId(0),
         equipment_list,
-        supply_node: NodeId(1),
-        recirculation_node: NodeId(2),
-    }
+        supply_node,
+        vec![supply_node],
+        None,
+        Vec::new(),
+        vec![NodeId(2)],
+        false,
+    )
 }
 
 fn finite_flow_system_for(system: IdealLoadsAirSystemId) -> IdealLoadsAirSystem {

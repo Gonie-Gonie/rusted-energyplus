@@ -47,9 +47,20 @@ pub(super) fn initialized_limit_context(
             },
         );
     }
+    let initialized_recirculation_node = initialization
+        .recirculation_node
+        .ok_or(DirectZonePurchasedAirCouplingError::InitializationNotReady)?;
+    if initialized_recirculation_node != input.recirculation_node {
+        return Err(
+            DirectZonePurchasedAirCouplingError::InitializationIdentityMismatch {
+                relation: DirectZonePurchasedAirInitializationRelation::RecirculationNode,
+            },
+        );
+    }
     let flags = initialization.flags;
     if !flags.state_machine_used
         || !flags.one_time_checked
+        || !flags.topology_ready
         || !flags.environment_initialized
         || !flags.sizing_checked
         || !flags.equipment_list_checked

@@ -33,8 +33,9 @@ use crate::{ResultStore, ZoneSensibleDemandInputKind};
 
 use super::{
     DirectZonePurchasedAirBindingError, DirectZonePurchasedAirHourlyOutputError,
-    DirectZonePurchasedAirRuntimeStepError, IdealLoadsPurchasedAirBranch, PurchasedAirInitError,
-    PurchasedAirInitLifecycleSummary, PurchasedAirRuntimeState,
+    DirectZonePurchasedAirModelBinding, DirectZonePurchasedAirRuntimeStepError,
+    IdealLoadsPurchasedAirBranch, PurchasedAirInitError, PurchasedAirInitLifecycleSummary,
+    PurchasedAirRecirculationSource, PurchasedAirRuntimeState,
     append_direct_zone_purchased_air_hourly_output_series, bind_direct_zone_purchased_air_model,
     purchased_air_init_lifecycle_summary,
 };
@@ -430,7 +431,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         binding.ideal_loads_air_system,
     )
     .map_err(DirectZonePurchasedAirCoupledRuntimeError::InitLifecycle)?;
-    validate_init_lifecycle(&init_lifecycle, timestep_outputs.len())?;
+    validate_init_lifecycle(&init_lifecycle, timestep_outputs.len(), &binding)?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -503,6 +504,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
 fn validate_init_lifecycle(
     lifecycle: &PurchasedAirInitLifecycleSummary,
     timestep_count: usize,
+    binding: &DirectZonePurchasedAirModelBinding<'_>,
 ) -> Result<(), DirectZonePurchasedAirCoupledRuntimeError> {
     for (field, expected, actual) in [
         ("init_call_count", timestep_count, lifecycle.init_call_count),
@@ -541,6 +543,11 @@ fn validate_init_lifecycle(
             1,
             lifecycle.one_time_initialization_count,
         ),
+        (
+            "topology_completion_count",
+            1,
+            lifecycle.topology_completion_count,
+        ),
         ("sizing_check_count", 1, lifecycle.sizing_check_count),
         (
             "environment_initialization_count",
@@ -566,14 +573,27 @@ fn validate_init_lifecycle(
     let flags = lifecycle.flags;
     let ready = flags.state_machine_used
         && flags.one_time_checked
+        && flags.topology_ready
         && flags.environment_initialized
         && flags.sizing_checked
         && flags.equipment_list_checked
         && flags.return_plenum_inactive
         && lifecycle.equipment_list_scan_order == lifecycle.declared_system_order
+        && lifecycle.declared_system_order == vec![binding.system.id]
         && lifecycle.equipment_list_scan_ordinal == Some(1)
-        && lifecycle.first_matching_equipment_list.is_some()
+        && lifecycle.first_matching_equipment_list == Some(binding.equipment_list)
         && lifecycle.equipment_list_membership_found == Some(true)
+        && lifecycle.controlled_zone == Some(binding.zone)
+        && lifecycle.equipment_list == Some(binding.equipment_list)
+        && lifecycle.supply_node == Some(binding.supply_node)
+        && lifecycle.recirculation_node == Some(binding.return_node)
+        && lifecycle.recirculation_source
+            == Some(PurchasedAirRecirculationSource::SingleZoneReturn)
+        && lifecycle.rejected_exhaust_node.is_none()
+        && lifecycle.reported_first_return_node.is_none()
+        && lifecycle.topology_diagnostics.is_empty()
+        && lifecycle.topology_failure.is_none()
+        && lifecycle.economizer_flow_limit_warning_count == 0
         && flags.environment_initialization_needed == (timestep_count > 1);
     if !ready {
         return Err(

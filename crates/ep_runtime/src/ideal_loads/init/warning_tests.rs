@@ -11,7 +11,7 @@ fn warning_predicates_preserve_strict_setpoint_limit_and_availability_gates() {
     let evaluate = |system: &IdealLoadsAirSystem, context: PurchasedAirInitCallContext| {
         let mut state = PurchasedAirRuntimeState::default();
         let plan = single_manager_plan();
-        let snapshot = init_purchased_air_runtime(&mut state, &plan, topology(), system, context)
+        let snapshot = init_purchased_air_runtime(&mut state, &plan, &topology(), system, context)
             .expect("warning predicate initialization");
         let summary = purchased_air_init_lifecycle_summary(&state, SYSTEM)
             .expect("warning predicate lifecycle");
@@ -72,7 +72,7 @@ fn warning_predicates_preserve_strict_setpoint_limit_and_availability_gates() {
         init_purchased_air_runtime(
             &mut repeated_state,
             &repeated_plan,
-            topology(),
+            &topology(),
             &warning_system,
             context(true),
         )

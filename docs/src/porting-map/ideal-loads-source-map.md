@@ -111,7 +111,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 |---|---|---|
 | `PurchasedAirManager::SimPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `ep_runtime::ideal_loads::sim_purchased_air_compat`; `ep_runtime::ideal_loads::sim_purchased_air_outdoor_air_compat`; CP300 `crates/ep_runtime/src/ideal_loads/coupling.rs::couple_direct_zone_predicted_demand_to_purchased_air` calls the generic no-OA wrapper with state-backed demand; CP302 `simulate_direct_zone_purchased_air_coupled_heat_balance` release-calls that bounded composition from `ep_run` for the exact CP301 topology |
 | `PurchasedAirManager::GetPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `ep_compiler::objects::ideal_loads`; `ep_model::objects::ideal_loads` |
-| `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP305-CP306 bounded release slice: `crates/ep_runtime/src/ideal_loads/init/manager_plan.rs::PurchasedAirInitManagerPlan` eagerly resolves the immutable declaration-order membership plan, `crates/ep_runtime/src/ideal_loads/init/state.rs::PurchasedAirRuntimeState` retains manager and per-unit lifecycle state, and `crates/ep_runtime/src/ideal_loads/init/transition.rs::init_purchased_air_runtime` plus `purchased_air_init_lifecycle_summary` execute/report the deferred latch and outcome replay before selected-unit work; diagnostic adapters retain `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` only |
+| `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP305-CP307 bounded release slice: `crates/ep_runtime/src/ideal_loads/init/manager_plan.rs::PurchasedAirInitManagerPlan` eagerly resolves the immutable declaration-order membership plan; `topology_plan.rs::PurchasedAirInitTopologyPlan` resolves selected-unit topology; `state.rs::PurchasedAirRuntimeState` retains manager and per-unit lifecycle state; `topology_transition.rs::advance_selected_unit_topology` and `transition.rs::init_purchased_air_runtime` execute the ordered persistent transitions; and `summary.rs::PurchasedAirInitLifecycleSummary` plus `transition.rs::purchased_air_init_lifecycle_summary` report the selected-unit and manager evidence. Diagnostic adapters retain `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` only. |
 | `DataZoneEquipment::CheckZoneEquipmentList` | `src/EnergyPlus/DataZoneEquipment.cc` | CP306 `PurchasedAirInitManagerPlan::from_model` eagerly resolves bounded membership in retained Zone order through each Zone's EquipmentConnection and referenced list entries, ignoring unreferenced lists. The matched-list ID is Rust diagnostic evidence; this `InitPurchasedAir` call observes only the Boolean return and does not request optional `CtrlZoneNum`. Runtime Init defers only latch and outcome recording. |
 | `PurchasedAirManager::SizePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/dispatch.rs::IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` |
 | `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` |
@@ -18298,6 +18298,61 @@ full `SizePurchasedAir`/Autosize, multi-unit dispatch/residual/results, exact
 message registry/text, and reset/concurrency remain outside CP306. The parent
 stays `scaffold`/`none`, `routine.init_purchased_air` stays `source_mapped`,
 and the external Roadmap full-lifecycle checkbox remains open.
+
+## CP307 Selected-Unit One-Time Topology Resolution and Economizer Advisory
+
+CP307 maps the EnergyPlus 26.1 selected-unit alias and one-time block at
+`PurchasedAirManager.cc` lines 1114-1192. The source commits its one-time latch
+at lines 1116-1117, validates the supply inlet at lines 1121-1135, resolves
+configured exhaust and invalid-exhaust fallback at lines 1140-1161, handles
+returns at lines 1162-1180, and emits the conditional outdoor-air/economizer
+advisory at lines 1181-1190. `SizePurchasedAir` work starts after this slice at
+line 1194.
+
+`crates/ep_runtime/src/ideal_loads/init/topology_plan.rs::PurchasedAirInitTopologyPlan::from_model`
+resolves the selected controlled-Zone equipment connection, exact supply,
+optional exact configured exhaust, ordered Zone inlet/exhaust/return nodes, and
+the existence of the referenced outdoor-air specification before mutation.
+Structural lookup/cardinality errors remain plan-construction failures.
+`PurchasedAirInitTopologyPlan::evaluate` then preserves the source branch order:
+supply failure is fatal; valid exhaust is assigned immediately; invalid exhaust
+emits Severe before fallback; one return is assigned; multiple returns warn but
+preserve the source's unassigned recirculation quirk; zero returns are fatal;
+and only a nonfatal topology outcome, including multiple-return unassigned, can
+reach the nonfatal OA/economizer-without-flow-limit advisory.
+`PurchasedAirInitTopologyEvaluation` retains ordered structured
+severity/kind diagnostics and the typed outcome or failure.
+This plan is a typed required-supply subset: the C++ `SupplyNodeNum == 0`
+membership-check bypass is not represented because Rust always retains a typed
+`NodeId`, including valid `NodeId(0)`.
+
+After the CP306 global sweep,
+`init/topology_transition.rs::advance_selected_unit_topology` commits
+`one_time_latched`, the immutable plan, selected identities, and latch count
+before evaluation. It retains nonfatal outcome fields and completion count, or
+the fatal diagnostic prefix and typed failure before returning ahead of sizing,
+environment, and recurring-warning work.
+`init/summary.rs::PurchasedAirInitLifecycleSummary` reports the selected unit's
+topology fields, counts, diagnostics, and failure beside the manager-wide
+summary; the complete per-unit arena remains runtime state. Direct plan and
+transition tests cover blank exhaust/single return, valid and invalid exhaust,
+multiple and zero returns, source diagnostic order, advisory gating/one-time
+behavior, the pre-fatal latch, and survival of the completed manager sweep.
+
+Binding and coupling consume the immutable plan and require the initialized
+recirculation identity. Run-summary validation still admits only the exact
+blank IdealLoads exhaust, no Zone exhaust topology, one-return, no-OA direct
+release lane with
+`topology_ready=true`, `SingleZoneReturn`, one completion, exact selected
+identities, no rejected/reported alternate node, no diagnostic/failure, and no
+economizer advisory. The other topology branches are lifecycle evidence only.
+Same-plan fatal replay is a Rust fail-closed poison state: it skips evaluation
+but re-returns the retained failure instead of advancing to sizing, so it is not
+source retry parity. Return-plenum ownership, exact messages and malformed
+sentinels/counts, wrong-ControlledZone replay, full sizing/autosizing, multi-unit
+release execution, broader OA behavior, warmup/adaptive/FirstHVACIteration, and
+reset/concurrency remain excluded. Parent/routine status, inventory/readiness
+counts, capabilities, and the full-lifecycle Roadmap checkbox do not change.
 
 ## Claim Requirements
 

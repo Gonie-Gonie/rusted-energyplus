@@ -19,7 +19,9 @@ use ep_runtime::{
     ExecutionStep, HeatBalanceSimulationOptions, IDEAL_LOADS_FIXTURE_DEMAND_DIAGNOSTIC_SOURCE,
     IdealLoadsCompatibilityOptions, NodeStateProjectionOptions,
     PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirInitDiagnosticKind,
-    PurchasedAirInitLifecycleSummary, ResultStore, RuntimePrecomputedData, ScheduleCacheProfile,
+    PurchasedAirInitLifecycleSummary, PurchasedAirInitTopologyDiagnosticKind,
+    PurchasedAirInitTopologyDiagnosticSeverity, PurchasedAirInitTopologyError,
+    PurchasedAirRecirculationSource, ResultStore, RuntimePrecomputedData, ScheduleCacheProfile,
     ScheduleSeriesCache, ScheduleSeriesIndexKind, TimeAxis, WeatherTimestepSeries,
     build_environment_time_axes_with_weather_metadata, build_hourly_time_axis,
     build_hourly_time_axis_with_weather_metadata, load_epw_weather_file, precompute_runtime_data,
@@ -745,11 +747,59 @@ fn purchased_air_init_lifecycle_json(lifecycle: &PurchasedAirInitLifecycleSummar
             })
         })
         .collect();
+    let topology_diagnostics: Vec<_> = lifecycle
+        .topology_diagnostics
+        .iter()
+        .map(|diagnostic| {
+            let severity = match diagnostic.severity {
+                PurchasedAirInitTopologyDiagnosticSeverity::Severe => "severe",
+                PurchasedAirInitTopologyDiagnosticSeverity::Warning => "warning",
+                PurchasedAirInitTopologyDiagnosticSeverity::Fatal => "fatal",
+            };
+            let kind = match diagnostic.kind {
+                PurchasedAirInitTopologyDiagnosticKind::SupplyNodeNotZoneInlet => {
+                    "supply_node_not_zone_inlet"
+                }
+                PurchasedAirInitTopologyDiagnosticKind::ExhaustNodeNotZoneExhaust => {
+                    "exhaust_node_not_zone_exhaust"
+                }
+                PurchasedAirInitTopologyDiagnosticKind::MultipleReturnNodesUnassigned => {
+                    "multiple_return_nodes_unassigned"
+                }
+                PurchasedAirInitTopologyDiagnosticKind::NoRecirculationNode => {
+                    "no_recirculation_node"
+                }
+                PurchasedAirInitTopologyDiagnosticKind::EconomizerWithoutCoolingFlowLimit => {
+                    "economizer_without_cooling_flow_limit"
+                }
+            };
+            json!({
+                "system": diagnostic.system.0,
+                "ordinal": diagnostic.ordinal,
+                "severity": severity,
+                "kind": kind,
+            })
+        })
+        .collect();
+    let recirculation_source = lifecycle.recirculation_source.map(|source| match source {
+        PurchasedAirRecirculationSource::ConfiguredZoneExhaust => "configured_zone_exhaust",
+        PurchasedAirRecirculationSource::SingleZoneReturn => "single_zone_return",
+        PurchasedAirRecirculationSource::MultipleZoneReturnsUnassigned => {
+            "multiple_zone_returns_unassigned"
+        }
+    });
+    let topology_failure = lifecycle.topology_failure.map(|failure| match failure {
+        PurchasedAirInitTopologyError::SupplyNodeNotZoneInlet { .. } => {
+            "supply_node_not_zone_inlet"
+        }
+        PurchasedAirInitTopologyError::NoRecirculationNode { .. } => "no_recirculation_node",
+    });
     json!({
         "source": lifecycle.source,
         "flags": {
             "state_machine_used": lifecycle.flags.state_machine_used,
             "one_time_checked": lifecycle.flags.one_time_checked,
+            "topology_ready": lifecycle.flags.topology_ready,
             "environment_initialized": lifecycle.flags.environment_initialized,
             "environment_initialization_needed": lifecycle.flags.environment_initialization_needed,
             "sizing_checked": lifecycle.flags.sizing_checked,
@@ -766,8 +816,18 @@ fn purchased_air_init_lifecycle_json(lifecycle: &PurchasedAirInitLifecycleSummar
         "equipment_list_scan_ordinal": lifecycle.equipment_list_scan_ordinal,
         "first_matching_equipment_list": lifecycle.first_matching_equipment_list.map(|list| list.0),
         "equipment_list_membership_found": lifecycle.equipment_list_membership_found,
+        "controlled_zone": lifecycle.controlled_zone.map(|zone| zone.0),
+        "equipment_list": lifecycle.equipment_list.map(|list| list.0),
+        "supply_node": lifecycle.supply_node.map(|node| node.0),
+        "recirculation_node": lifecycle.recirculation_node.map(|node| node.0),
+        "recirculation_source": recirculation_source,
+        "rejected_exhaust_node": lifecycle.rejected_exhaust_node.map(|node| node.0),
+        "reported_first_return_node": lifecycle.reported_first_return_node.map(|node| node.0),
+        "topology_diagnostics": topology_diagnostics,
+        "topology_failure": topology_failure,
         "init_call_count": lifecycle.init_call_count,
         "one_time_initialization_count": lifecycle.one_time_initialization_count,
+        "topology_completion_count": lifecycle.topology_completion_count,
         "sizing_check_count": lifecycle.sizing_check_count,
         "environment_initialization_count": lifecycle.environment_initialization_count,
         "environment_rearm_count": lifecycle.environment_rearm_count,
@@ -776,6 +836,7 @@ fn purchased_air_init_lifecycle_json(lifecycle: &PurchasedAirInitLifecycleSummar
         "standard_air_density_kg_per_m3": lifecycle.standard_air_density_kg_per_m3,
         "cooling_supply_temperature_warning_count": lifecycle.cooling_supply_temperature_warning_count,
         "heating_supply_temperature_warning_count": lifecycle.heating_supply_temperature_warning_count,
+        "economizer_flow_limit_warning_count": lifecycle.economizer_flow_limit_warning_count,
     })
 }
 
@@ -1986,6 +2047,11 @@ fn validate_direct_purchased_air_init_lifecycle(
             1,
             lifecycle.one_time_initialization_count,
         ),
+        (
+            "topology_completion_count",
+            1,
+            lifecycle.topology_completion_count,
+        ),
         ("sizing_check_count", 1, lifecycle.sizing_check_count),
         (
             "environment_initialization_count",
@@ -2007,6 +2073,7 @@ fn validate_direct_purchased_air_init_lifecycle(
     let flags = lifecycle.flags;
     if !flags.state_machine_used
         || !flags.one_time_checked
+        || !flags.topology_ready
         || !flags.environment_initialized
         || !flags.sizing_checked
         || !flags.equipment_list_checked
@@ -2016,6 +2083,23 @@ fn validate_direct_purchased_air_init_lifecycle(
         return Err(
             "direct-zone IdealLoads persistent initialization flags are not release-ready"
                 .to_string(),
+        );
+    }
+    let topology_ready = lifecycle.controlled_zone.is_some()
+        && lifecycle.equipment_list.is_some()
+        && lifecycle.equipment_list == lifecycle.first_matching_equipment_list
+        && lifecycle.supply_node.is_some()
+        && lifecycle.recirculation_node.is_some()
+        && lifecycle.recirculation_source
+            == Some(PurchasedAirRecirculationSource::SingleZoneReturn)
+        && lifecycle.rejected_exhaust_node.is_none()
+        && lifecycle.reported_first_return_node.is_none()
+        && lifecycle.topology_diagnostics.is_empty()
+        && lifecycle.topology_failure.is_none()
+        && lifecycle.economizer_flow_limit_warning_count == 0;
+    if !topology_ready {
+        return Err(
+            "direct-zone IdealLoads selected-unit topology is not release-ready".to_string(),
         );
     }
     let density_valid = lifecycle
@@ -2347,9 +2431,10 @@ mod tests {
 
     use super::{
         artifact_map, ctf_split_trace_enabled, execution_stage_snapshots,
-        full_surface_trace_opt_in, input_error_diagnostic_code, runtime_class_requires_weather,
-        schedule_cache_json, selected_trace_enabled, source_order_gate_summary,
-        source_order_stage_state_snapshots, trace_level_enables_stage_snapshots, typed_counts,
+        full_surface_trace_opt_in, input_error_diagnostic_code, purchased_air_init_lifecycle_json,
+        runtime_class_requires_weather, schedule_cache_json, selected_trace_enabled,
+        source_order_gate_summary, source_order_stage_state_snapshots,
+        trace_level_enables_stage_snapshots, typed_counts,
         validate_direct_purchased_air_init_lifecycle, validate_runtime_selection,
     };
     use ep_compiler::compile_raw_model;
@@ -2362,8 +2447,8 @@ mod tests {
     use ep_runtime::{
         DayType, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
         ExecutionStep, IdealLoadsInitFlags, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
-        PurchasedAirInitLifecycleSummary, ScheduleCacheProfile, ScheduleSeriesIndexKind,
-        build_hourly_time_axis,
+        PurchasedAirInitLifecycleSummary, PurchasedAirRecirculationSource, ScheduleCacheProfile,
+        ScheduleSeriesIndexKind, build_hourly_time_axis,
     };
 
     use crate::{RunResultState, RuntimeClass, TraceLevel, TraceSelection};
@@ -2422,6 +2507,55 @@ mod tests {
         assert!(
             validate_direct_purchased_air_init_lifecycle(Some(&disconnected), Some(2)).is_err()
         );
+
+        let valid = valid_init_lifecycle(2);
+        let mut latched_but_unusable = valid.clone();
+        latched_but_unusable.flags.topology_ready = false;
+        assert!(
+            validate_direct_purchased_air_init_lifecycle(Some(&latched_but_unusable), Some(2))
+                .is_err()
+        );
+        let mut wrong_branch = valid.clone();
+        wrong_branch.recirculation_source =
+            Some(PurchasedAirRecirculationSource::ConfiguredZoneExhaust);
+        assert!(
+            validate_direct_purchased_air_init_lifecycle(Some(&wrong_branch), Some(2)).is_err()
+        );
+        let mut missing_recirculation = valid.clone();
+        missing_recirculation.recirculation_node = None;
+        assert!(
+            validate_direct_purchased_air_init_lifecycle(Some(&missing_recirculation), Some(2))
+                .is_err()
+        );
+        let mut incomplete = valid.clone();
+        incomplete.topology_completion_count = 0;
+        assert!(validate_direct_purchased_air_init_lifecycle(Some(&incomplete), Some(2)).is_err());
+        let mut advisory = valid.clone();
+        advisory.economizer_flow_limit_warning_count = 1;
+        assert!(validate_direct_purchased_air_init_lifecycle(Some(&advisory), Some(2)).is_err());
+        let mut equipment_mismatch = valid;
+        equipment_mismatch.equipment_list = Some(ZoneEquipmentListId(1));
+        assert!(
+            validate_direct_purchased_air_init_lifecycle(Some(&equipment_mismatch), Some(2))
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn direct_release_lifecycle_json_exposes_selected_topology_evidence() {
+        let lifecycle = valid_init_lifecycle(2);
+        let value = purchased_air_init_lifecycle_json(&lifecycle);
+
+        assert_eq!(value["flags"]["topology_ready"], true);
+        assert_eq!(value["controlled_zone"], 0);
+        assert_eq!(value["equipment_list"], 0);
+        assert_eq!(value["supply_node"], 3);
+        assert_eq!(value["recirculation_node"], 4);
+        assert_eq!(value["recirculation_source"], "single_zone_return");
+        assert_eq!(value["topology_diagnostics"], serde_json::json!([]));
+        assert!(value["topology_failure"].is_null());
+        assert_eq!(value["topology_completion_count"], 1);
+        assert_eq!(value["economizer_flow_limit_warning_count"], 0);
     }
 
     fn valid_init_lifecycle(call_count: usize) -> PurchasedAirInitLifecycleSummary {
@@ -2430,6 +2564,7 @@ mod tests {
             flags: IdealLoadsInitFlags {
                 state_machine_used: true,
                 one_time_checked: true,
+                topology_ready: true,
                 environment_initialized: true,
                 environment_initialization_needed: call_count > 1,
                 sizing_checked: true,
@@ -2446,8 +2581,18 @@ mod tests {
             equipment_list_scan_ordinal: Some(1),
             first_matching_equipment_list: Some(ZoneEquipmentListId(0)),
             equipment_list_membership_found: Some(true),
+            controlled_zone: Some(ep_model::ZoneId(0)),
+            equipment_list: Some(ZoneEquipmentListId(0)),
+            supply_node: Some(ep_model::NodeId(3)),
+            recirculation_node: Some(ep_model::NodeId(4)),
+            recirculation_source: Some(PurchasedAirRecirculationSource::SingleZoneReturn),
+            rejected_exhaust_node: None,
+            reported_first_return_node: None,
+            topology_diagnostics: Vec::new(),
+            topology_failure: None,
             init_call_count: call_count,
             one_time_initialization_count: 1,
+            topology_completion_count: 1,
             sizing_check_count: 1,
             environment_initialization_count: 1,
             environment_rearm_count: usize::from(call_count > 1),
@@ -2456,6 +2601,7 @@ mod tests {
             standard_air_density_kg_per_m3: Some(1.2),
             cooling_supply_temperature_warning_count: 0,
             heating_supply_temperature_warning_count: 0,
+            economizer_flow_limit_warning_count: 0,
         }
     }
 

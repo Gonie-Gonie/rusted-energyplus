@@ -1,7 +1,9 @@
 use super::*;
 use crate::{
     heat_balance::state::ZoneAirTemperatureCoefficients,
-    ideal_loads::{IdealLoadsSensibleMode, IdealLoadsZoneState},
+    ideal_loads::{
+        IdealLoadsSensibleMode, IdealLoadsZoneState, purchased_air_init_lifecycle_summary,
+    },
     schedules::{ScheduleSeriesCache, precompute_schedule_cache},
 };
 use ep_model::{
@@ -671,6 +673,50 @@ fn initialization_failure_precedes_calc_only_input_validation() {
             }
         )
     );
+}
+
+#[test]
+fn post_init_calc_failure_retains_init_but_preserves_zone_state() {
+    let (model, cache) = fixture(|_| {});
+    let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
+    let mut state = zone_state_for_temp_independent_load(0.0);
+    state.air_humidity_ratio = -0.001;
+    let original = state.clone();
+    let mut purchased_air_runtime_state = PurchasedAirRuntimeState::default();
+
+    let error = couple_model_bound_direct_zone_purchased_air(
+        DirectZonePurchasedAirScheduledCouplingInput {
+            binding: &binding,
+            schedule_cache: &cache,
+            schedule_sample_index: 0,
+            zone_state: &mut state,
+            purchased_air_runtime_state: &mut purchased_air_runtime_state,
+            begin_environment: true,
+            barometric_pressure_pa: binding.limit_context.barometric_pressure_pa,
+            system_timestep_seconds: binding.nominal_system_timestep_seconds,
+        },
+    )
+    .expect_err("Calc-only humidity validation must run after successful Init");
+
+    assert_eq!(
+        error,
+        DirectZonePurchasedAirScheduledCouplingError::Coupling(
+            DirectZonePurchasedAirCouplingError::InputNegative {
+                field: "recirculation_state.air_humidity_ratio",
+                value: -0.001,
+            }
+        )
+    );
+    assert_eq!(state, original);
+    let lifecycle = purchased_air_init_lifecycle_summary(
+        &purchased_air_runtime_state,
+        binding.ideal_loads_air_system,
+    )
+    .expect("successful Init prefix must remain reportable");
+    assert_eq!(lifecycle.init_call_count, 1);
+    assert_eq!(lifecycle.topology_completion_count, 1);
+    assert!(lifecycle.flags.topology_ready);
+    assert_eq!(lifecycle.environment_initialization_count, 1);
 }
 
 #[test]

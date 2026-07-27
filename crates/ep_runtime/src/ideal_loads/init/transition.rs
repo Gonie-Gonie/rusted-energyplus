@@ -5,26 +5,13 @@ use ep_model::{
     ZoneEquipmentListId, ZoneId,
 };
 
+use super::topology_transition::advance_selected_unit_topology;
 use super::{
     PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirInitDiagnostic,
     PurchasedAirInitDiagnosticKind, PurchasedAirInitLifecycleSummary, PurchasedAirInitManagerPlan,
+    PurchasedAirInitTopologyError, PurchasedAirInitTopologyPlan, PurchasedAirRecirculationSource,
     PurchasedAirRuntimeState, PurchasedAirUnitRuntimeState,
 };
-
-/// Prevalidated topology consumed by the persistent initialization state.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct PurchasedAirInitBoundTopology {
-    /// IdealLoads system being initialized.
-    pub system: IdealLoadsAirSystemId,
-    /// Controlled Zone selected by the caller.
-    pub controlled_zone: ZoneId,
-    /// Equipment list proven to contain the system.
-    pub equipment_list: ZoneEquipmentListId,
-    /// Supply node proven to be a controlled-Zone inlet.
-    pub supply_node: NodeId,
-    /// Exhaust-or-return node selected for recirculation.
-    pub recirculation_node: NodeId,
-}
 
 /// Dynamic values visible to one `InitPurchasedAir` call.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -62,6 +49,12 @@ pub struct PurchasedAirInitTransition {
     pub equipment_list_membership_missing: usize,
     /// Per-unit topology latched on this call.
     pub one_time_initialized: bool,
+    /// Per-unit topology reached the normal one-time tail on this call.
+    pub topology_completed: bool,
+    /// Ordered topology diagnostics emitted on this call.
+    pub topology_diagnostics_emitted: usize,
+    /// OA/economizer flow-limit advisory emitted on this call.
+    pub economizer_flow_limit_warning: bool,
     /// Hard-size/sizing gate completed on this call.
     pub sizing_checked: bool,
     /// Begin-environment values were written on this call.
@@ -84,7 +77,15 @@ pub struct PurchasedAirInitSnapshot {
     /// Supply-node identity.
     pub supply_node: NodeId,
     /// Recirculation-node identity.
-    pub recirculation_node: NodeId,
+    pub recirculation_node: Option<NodeId>,
+    /// Source branch that selected or left recirculation unassigned.
+    pub recirculation_source: Option<PurchasedAirRecirculationSource>,
+    /// Configured exhaust rejected before return fallback.
+    pub rejected_exhaust_node: Option<NodeId>,
+    /// First return named by the multiple-return warning.
+    pub reported_first_return_node: Option<NodeId>,
+    /// Number of retained one-time topology diagnostics.
+    pub topology_diagnostic_count: usize,
     /// Source-shaped flag state after the call.
     pub flags: super::IdealLoadsInitFlags,
     /// Transitions performed by this call.
@@ -162,21 +163,23 @@ pub enum PurchasedAirInitError {
         /// Rejected density.
         value: f64,
     },
+    /// Source semantic topology failure after the one-time latch committed.
+    Topology(PurchasedAirInitTopologyError),
 }
 
 /// Advances the persistent source-order initialization lifecycle for one unit.
 pub fn init_purchased_air_runtime(
     state: &mut PurchasedAirRuntimeState,
     manager_plan: &PurchasedAirInitManagerPlan,
-    topology: PurchasedAirInitBoundTopology,
+    topology: &PurchasedAirInitTopologyPlan,
     system: &IdealLoadsAirSystem,
     context: PurchasedAirInitCallContext,
 ) -> Result<PurchasedAirInitSnapshot, PurchasedAirInitError> {
     let mut transition = PurchasedAirInitTransition::default();
-    if topology.system != system.id {
+    if topology.system() != system.id {
         return Err(PurchasedAirInitError::SystemIdentityMismatch {
             expected: system.id,
-            actual: topology.system,
+            actual: topology.system(),
         });
     }
     if !manager_plan
@@ -227,32 +230,11 @@ pub fn init_purchased_air_runtime(
         }
     }
 
-    let existing_unit = state
-        .units
-        .get(&system.id)
-        .ok_or(PurchasedAirInitError::UnknownSystem { system: system.id })?;
-    if existing_unit.one_time_initialized
-        && (existing_unit.controlled_zone != Some(topology.controlled_zone)
-            || existing_unit.equipment_list != Some(topology.equipment_list)
-            || existing_unit.supply_node != Some(topology.supply_node)
-            || existing_unit.recirculation_node != Some(topology.recirculation_node))
-    {
-        return Err(PurchasedAirInitError::LatchedTopologyChanged { system: system.id });
-    }
     let unit = state
         .units
         .get_mut(&system.id)
         .ok_or(PurchasedAirInitError::UnknownSystem { system: system.id })?;
-    unit.init_call_count += 1;
-    if !unit.one_time_initialized {
-        unit.controlled_zone = Some(topology.controlled_zone);
-        unit.equipment_list = Some(topology.equipment_list);
-        unit.supply_node = Some(topology.supply_node);
-        unit.recirculation_node = Some(topology.recirculation_node);
-        unit.one_time_initialized = true;
-        unit.one_time_initialization_count += 1;
-        transition.one_time_initialized = true;
-    }
+    advance_selected_unit_topology(unit, topology, system, &mut transition)?;
 
     if !context.system_sizing_calculation && unit.sizing_needed {
         validate_hard_sizes(system)?;
@@ -284,9 +266,13 @@ pub fn init_purchased_air_runtime(
 
     Ok(PurchasedAirInitSnapshot {
         system: system.id,
-        controlled_zone: topology.controlled_zone,
-        supply_node: topology.supply_node,
-        recirculation_node: topology.recirculation_node,
+        controlled_zone: topology.controlled_zone(),
+        supply_node: topology.supply_node(),
+        recirculation_node: unit.recirculation_node,
+        recirculation_source: unit.recirculation_source,
+        rejected_exhaust_node: unit.rejected_exhaust_node,
+        reported_first_return_node: unit.reported_first_return_node,
+        topology_diagnostic_count: unit.topology_diagnostics.len(),
         flags: unit.flags(state.equipment_list_checked),
         transition,
         maximum_heating_air_mass_flow_rate_kg_per_s: unit
@@ -319,8 +305,18 @@ pub fn purchased_air_init_lifecycle_summary(
         equipment_list_scan_ordinal: unit.equipment_list_scan_ordinal,
         first_matching_equipment_list: unit.first_matching_equipment_list,
         equipment_list_membership_found: unit.equipment_list_membership_found,
+        controlled_zone: unit.controlled_zone,
+        equipment_list: unit.equipment_list,
+        supply_node: unit.supply_node,
+        recirculation_node: unit.recirculation_node,
+        recirculation_source: unit.recirculation_source,
+        rejected_exhaust_node: unit.rejected_exhaust_node,
+        reported_first_return_node: unit.reported_first_return_node,
+        topology_diagnostics: unit.topology_diagnostics.clone(),
+        topology_failure: unit.topology_failure,
         init_call_count: unit.init_call_count,
         one_time_initialization_count: unit.one_time_initialization_count,
+        topology_completion_count: unit.topology_completion_count,
         sizing_check_count: unit.sizing_check_count,
         environment_initialization_count: unit.environment_initialization_count,
         environment_rearm_count: unit.environment_rearm_count,
@@ -331,6 +327,7 @@ pub fn purchased_air_init_lifecycle_summary(
         standard_air_density_kg_per_m3: unit.standard_air_density_kg_per_m3,
         cooling_supply_temperature_warning_count: unit.cooling_supply_temperature_warning_count,
         heating_supply_temperature_warning_count: unit.heating_supply_temperature_warning_count,
+        economizer_flow_limit_warning_count: unit.economizer_flow_limit_warning_count,
     })
 }
 
@@ -457,20 +454,22 @@ fn initialize_environment(
             value: standard_air_density_kg_per_m3,
         });
     }
-    unit.maximum_heating_air_mass_flow_rate_kg_per_s = initialized_mass_flow(
+    let maximum_heating_air_mass_flow_rate_kg_per_s = initialized_mass_flow(
         system.id,
         system.heating_limit,
         system.maximum_heating_air_flow_rate_m3_per_s,
         standard_air_density_kg_per_m3,
         "maximum_heating_air_flow_rate_m3_per_s",
     )?;
-    unit.maximum_cooling_air_mass_flow_rate_kg_per_s = initialized_mass_flow(
+    let maximum_cooling_air_mass_flow_rate_kg_per_s = initialized_mass_flow(
         system.id,
         system.cooling_limit,
         system.maximum_cooling_air_flow_rate_m3_per_s,
         standard_air_density_kg_per_m3,
         "maximum_cooling_air_flow_rate_m3_per_s",
     )?;
+    unit.maximum_heating_air_mass_flow_rate_kg_per_s = maximum_heating_air_mass_flow_rate_kg_per_s;
+    unit.maximum_cooling_air_mass_flow_rate_kg_per_s = maximum_cooling_air_mass_flow_rate_kg_per_s;
     unit.standard_air_density_kg_per_m3 = Some(standard_air_density_kg_per_m3);
     Ok(())
 }

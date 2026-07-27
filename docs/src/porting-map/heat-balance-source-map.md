@@ -33309,6 +33309,43 @@ release dispatch/residual/results, exact diagnostic registry/text, and
 reset/concurrency remain unimplemented. Parent and routine statuses, plus the
 external Roadmap full-lifecycle checkbox, remain unchanged.
 
+## CP307 Selected-Unit PurchasedAir Topology Inside the Heat-Balance Loop
+
+The heat-balance-owned direct loop now also carries an immutable
+`PurchasedAirInitTopologyPlan` built from the same typed model. After the CP306
+manager sweep and before `CalcPurchAirLoads`,
+`init/topology_transition.rs::advance_selected_unit_topology` commits the
+selected-unit source latch and plan, then evaluates the EnergyPlus 26.1
+`InitPurchasedAir` lines 1114-1192 supply -> exhaust/fallback -> return ->
+conditional OA/economizer-advisory sequence. Fatal supply or zero-recirculation
+outcomes return before sizing, environment, Calc, update/report, and the
+same-step Zone-air corrector. Successful exact-release execution carries the
+assigned single-return identity through coupling.
+
+The mapped Rust evidence is
+`init/topology_plan.rs::PurchasedAirInitTopologyPlan` and
+`PurchasedAirInitTopologyEvaluation`,
+`init/topology_transition.rs::advance_selected_unit_topology`,
+`init/state.rs::PurchasedAirUnitRuntimeState`, and
+`init/summary.rs::PurchasedAirInitLifecycleSummary`. Ordered structured
+diagnostics preserve invalid-exhaust Severe before return fallback, the
+multiple-return Warning with source-unassigned recirculation, fatal prefixes,
+and the nonfatal-outcome-only economizer advisory. Pipeline evidence exposes
+the selected summary and verifies one topology completion, exact binding
+identities, `SingleZoneReturn`, and an empty diagnostic/failure/advisory state.
+
+Only blank IdealLoads exhaust, no Zone exhaust topology, exactly one return,
+and no OA remain release-supported. The C++ zero-supply bypass is outside the
+typed required-supply subset because a Rust `NodeId(0)` is valid, not a sentinel.
+Exhaust, multiple/zero-return, and economizer paths are direct lifecycle tests,
+not a runtime-class expansion. Rust fatal replay is an intentional fail-closed
+poison state that re-returns the retained failure without re-evaluation or
+advancing to sizing; it is not source retry parity. Plenum ownership, full
+sizing/autosizing, multi-unit execution, broader OA behavior, warmup/adaptive/
+FirstHVACIteration, and reset/concurrency remain out of scope. Parent/routine
+status, counts, capabilities,
+and the external full-lifecycle checkbox remain unchanged.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

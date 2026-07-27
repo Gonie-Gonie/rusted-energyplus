@@ -15279,6 +15279,73 @@ reset/concurrency remain outside CP306. The external Roadmap full-lifecycle
 checkbox remains open, both parent algorithms stay `scaffold`/`none`, and
 `routine.init_purchased_air` stays `source_mapped`.
 
+## CP307 Selected-Unit One-Time Topology Resolution and Economizer Advisory
+
+CP307 maps only the selected-unit one-time block inside EnergyPlus 26.1
+`InitPurchasedAir`: the selected alias is retained at
+`PurchasedAirManager.cc` line 1114, the source latch commits at lines 1116-1117,
+supply validation occupies lines 1121-1135, exhaust selection and invalid-
+exhaust fallback lines 1140-1161, return fallback lines 1162-1180, and the
+outdoor-air/economizer advisory lines 1181-1190. The block ends at line 1192;
+the sizing branch starts separately at line 1194.
+
+`PurchasedAirInitTopologyPlan::from_model` resolves the selected system's one
+controlled-Zone `ZoneEquipmentConnection`, exact supply node, optional exact
+configured exhaust node, ordered inlet/exhaust/return node lists, equipment-list
+identity, and whether its DesignSpecification:OutdoorAir reference resolves.
+Missing systems or invalid required cardinality return
+`PurchasedAirInitTopologyPlanError` before mutable runtime state is entered.
+The direct binding owns this immutable plan and passes it through the existing
+predictor -> Init -> Calc -> update/report -> same-step Zone-air corrector path.
+This is a typed required-supply subset. The C++ `SupplyNodeNum == 0` bypass is
+not represented: every retained Rust supply is a typed `NodeId`, and
+`NodeId(0)` is a valid identity rather than the C++ zero sentinel.
+
+After the CP306 manager-wide recording pass,
+`topology_transition.rs::advance_selected_unit_topology` rejects a changed
+latched plan, increments the selected-unit call count, and on the first pass
+commits `one_time_latched`, its count, the plan, controlled Zone, equipment
+list, and supply node before calling the pure plan evaluation. Evaluation keeps
+the source branch order: a supply node outside the Zone inlet arena is fatal;
+a valid configured exhaust becomes recirculation and bypasses returns; an
+invalid configured exhaust emits Severe before return fallback; exactly one
+return is assigned; multiple returns emit Warning but preserve the source
+quirk of no assignment; and zero returns are fatal. Only a nonfatal topology
+outcome, including the multiple-return unassigned outcome, can then emit the
+nonfatal Severe advisory when outdoor air resolved, an
+economizer is active, and the cooling limit is `NoLimit` or `LimitCapacity`.
+Structured diagnostics retain one-based emission order, severity, and kind.
+
+A nonfatal outcome stores the recirculation branch and optional node plus any
+rejected exhaust or reported first return, marks topology complete, and allows
+sizing/environment/recurring-warning work to continue. Failure retains the
+diagnostic prefix and
+typed topology failure after the source latch and returns before those later
+stages. `summary.rs::PurchasedAirInitLifecycleSummary` reports the selected
+unit's final topology fields and counts in addition to the CP306 manager-wide
+evidence; the full per-unit arena remains in `PurchasedAirRuntimeState`.
+`ep_run` serializes the selected summary and requires the exact release unit to
+be topology-ready, `SingleZoneReturn`, assigned, diagnostic-free, failure-free,
+and advisory-free. Coupling also checks that the initialized recirculation node
+matches the immutable release binding.
+
+The supported release lane remains one blank IdealLoads exhaust field, no Zone
+exhaust topology, exactly one Zone return, and no outdoor air for the direct
+Zone/unit. Valid or invalid exhaust, multiple or zero
+returns, and the economizer advisory are source-shaped direct lifecycle tests
+only. Rust deliberately treats a retained fatal as a fail-closed poison state:
+same-plan replay skips evaluation and re-returns that failure instead of
+advancing to sizing. It does not claim the source's post-latch same-state
+continuation, wrong-ControlledZone replay behavior, or complete retry parity.
+Return-plenum lookup,
+arrays, and barriers; exact message registry/text; malformed count/sentinel
+behavior; full `SizePurchasedAir`/Autosize; multi-unit release dispatch,
+residuals, and results; broader outdoor-air execution; warmup/adaptive/
+`FirstHVACIteration`; and reset/concurrency remain outside CP307. Both parent
+algorithms stay `scaffold`/`none`, `routine.init_purchased_air` stays
+`source_mapped`, all inventory/readiness counts stay unchanged, and the
+external Roadmap full-lifecycle checkbox remains open.
+
 
 
 

@@ -161,6 +161,29 @@ Plenum arrays/barriers, exhaust/multiple-return behavior,
 exact message-registry parity, and reset/concurrency remain open; no parent,
 routine, or external Roadmap status is promoted.
 
+CP307 extends only the selected unit's source one-time topology block.
+`PurchasedAirInitTopologyPlan::from_model` snapshots the controlled-Zone
+equipment connection, supply, optional exhaust, ordered inlet/exhaust/return
+nodes, and whether outdoor air resolved before mutable Init state is entered.
+After the CP306 manager sweep, `advance_selected_unit_topology` commits the
+source latch and immutable plan before evaluating supply, exhaust fallback,
+return selection, and the OA/economizer advisory in source order. Structured
+diagnostics retain ordinals and severity, including the source quirk where
+multiple returns warn but leave recirculation unassigned. The lifecycle summary
+and run JSON expose the selected unit's topology outcome, while release
+validation still accepts only a blank IdealLoads exhaust field, no Zone exhaust
+topology, exactly one return, no OA, no diagnostics, and no topology failure.
+Exhaust, multiple-return, zero-return, and economizer branches are direct
+lifecycle evidence only, not broader release support. The C++ zero-supply
+bypass is outside the typed required-supply subset because Rust retains a typed
+`NodeId`, where
+`NodeId(0)` is a valid identity rather than a sentinel. Fatal replay is a
+deliberate fail-closed poison state in Rust: it skips re-evaluation but
+re-returns the retained failure instead of claiming source continuation or retry
+parity. Plenum ownership, full sizing/autosizing, multi-unit execution,
+broader OA behavior, and reset/concurrency remain open; no parent, routine,
+inventory, capability, or Roadmap status is promoted.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

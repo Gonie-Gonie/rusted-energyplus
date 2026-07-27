@@ -4,7 +4,10 @@ use std::collections::BTreeMap;
 
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
-use super::IdealLoadsInitFlags;
+use super::{
+    IdealLoadsInitFlags, PurchasedAirInitTopologyDiagnostic, PurchasedAirInitTopologyError,
+    PurchasedAirInitTopologyPlan, PurchasedAirRecirculationSource,
+};
 
 /// Structured diagnostic emitted by the manager-wide equipment-list sweep.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -54,8 +57,10 @@ pub struct PurchasedAirRuntimeState {
 pub struct PurchasedAirUnitRuntimeState {
     /// Typed system identity.
     pub system: IdealLoadsAirSystemId,
-    /// Whether one-time topology binding has been latched.
-    pub one_time_initialized: bool,
+    /// Source one-time latch, committed before semantic topology validation.
+    pub one_time_latched: bool,
+    /// Whether the selected-unit topology pass reached its normal tail.
+    pub topology_completed: bool,
     /// Source `MySizeFlag`; true means the hard-size/sizing gate is pending.
     pub sizing_needed: bool,
     /// Source `MyEnvrnFlag`; true means a begin-environment write is pending.
@@ -68,6 +73,18 @@ pub struct PurchasedAirUnitRuntimeState {
     pub supply_node: Option<NodeId>,
     /// Exhaust-or-return recirculation node captured by the one-time pass.
     pub recirculation_node: Option<NodeId>,
+    /// Source branch that selected or left recirculation unassigned.
+    pub recirculation_source: Option<PurchasedAirRecirculationSource>,
+    /// Configured exhaust rejected before return fallback.
+    pub rejected_exhaust_node: Option<NodeId>,
+    /// First return node named by the source multiple-return warning.
+    pub reported_first_return_node: Option<NodeId>,
+    /// Immutable selected-unit topology retained by the first call.
+    pub topology_plan: Option<PurchasedAirInitTopologyPlan>,
+    /// Ordered diagnostics retained from the one-time topology block.
+    pub topology_diagnostics: Vec<PurchasedAirInitTopologyDiagnostic>,
+    /// Fatal topology result retained after the source latch is committed.
+    pub topology_failure: Option<PurchasedAirInitTopologyError>,
     /// Immutable first-match result captured when the manager arena is allocated.
     pub planned_first_matching_equipment_list: Option<ZoneEquipmentListId>,
     /// One-based manager sweep ordinal, once Zone equipment input is ready.
@@ -84,8 +101,10 @@ pub struct PurchasedAirUnitRuntimeState {
     pub standard_air_density_kg_per_m3: Option<f64>,
     /// Total calls for this unit.
     pub init_call_count: usize,
-    /// Completed per-unit topology passes.
+    /// Source one-time latch transitions.
     pub one_time_initialization_count: usize,
+    /// One-time topology blocks that reached their normal tail.
+    pub topology_completion_count: usize,
     /// Completed hard-size/sizing gates.
     pub sizing_check_count: usize,
     /// Completed begin-environment writes.
@@ -96,6 +115,8 @@ pub struct PurchasedAirUnitRuntimeState {
     pub cooling_supply_temperature_warning_count: usize,
     /// Active heating supply-temperature recurring diagnostic count.
     pub heating_supply_temperature_warning_count: usize,
+    /// Nonfatal OA/economizer flow-limit advisories emitted once.
+    pub economizer_flow_limit_warning_count: usize,
 }
 
 impl PurchasedAirUnitRuntimeState {
@@ -105,13 +126,20 @@ impl PurchasedAirUnitRuntimeState {
     ) -> Self {
         Self {
             system,
-            one_time_initialized: false,
+            one_time_latched: false,
+            topology_completed: false,
             sizing_needed: true,
             environment_initialization_needed: true,
             controlled_zone: None,
             equipment_list: None,
             supply_node: None,
             recirculation_node: None,
+            recirculation_source: None,
+            rejected_exhaust_node: None,
+            reported_first_return_node: None,
+            topology_plan: None,
+            topology_diagnostics: Vec::new(),
+            topology_failure: None,
             planned_first_matching_equipment_list,
             equipment_list_scan_ordinal: None,
             first_matching_equipment_list: None,
@@ -121,11 +149,13 @@ impl PurchasedAirUnitRuntimeState {
             standard_air_density_kg_per_m3: None,
             init_call_count: 0,
             one_time_initialization_count: 0,
+            topology_completion_count: 0,
             sizing_check_count: 0,
             environment_initialization_count: 0,
             environment_rearm_count: 0,
             cooling_supply_temperature_warning_count: 0,
             heating_supply_temperature_warning_count: 0,
+            economizer_flow_limit_warning_count: 0,
         }
     }
 
@@ -134,7 +164,8 @@ impl PurchasedAirUnitRuntimeState {
     pub fn flags(&self, equipment_list_checked: bool) -> IdealLoadsInitFlags {
         IdealLoadsInitFlags {
             state_machine_used: true,
-            one_time_checked: self.one_time_initialized,
+            one_time_checked: self.one_time_latched,
+            topology_ready: self.topology_completed && self.recirculation_node.is_some(),
             environment_initialized: self.environment_initialization_count > 0,
             environment_initialization_needed: self.environment_initialization_needed,
             sizing_checked: !self.sizing_needed,
@@ -142,53 +173,4 @@ impl PurchasedAirUnitRuntimeState {
             return_plenum_inactive: true,
         }
     }
-}
-
-/// Final lifecycle counters reported by the direct release runtime.
-#[derive(Clone, Debug, PartialEq)]
-pub struct PurchasedAirInitLifecycleSummary {
-    /// Persistent state-machine provenance.
-    pub source: &'static str,
-    /// Final flag state.
-    pub flags: IdealLoadsInitFlags,
-    /// Module arena initialization count.
-    pub module_initialization_count: usize,
-    /// Global equipment-list check count.
-    pub equipment_list_check_count: usize,
-    /// IdealLoads systems in immutable typed declaration order.
-    pub declared_system_order: Vec<IdealLoadsAirSystemId>,
-    /// Systems visited by the manager-wide equipment-list sweep.
-    pub equipment_list_scan_order: Vec<IdealLoadsAirSystemId>,
-    /// Total units visited by the manager-wide equipment-list sweep.
-    pub equipment_list_scanned_unit_count: usize,
-    /// Units missing from every equipment list.
-    pub equipment_list_missing_unit_count: usize,
-    /// Ordered diagnostics retained from the sweep.
-    pub equipment_list_diagnostics: Vec<PurchasedAirInitDiagnostic>,
-    /// Selected unit's one-based manager sweep ordinal.
-    pub equipment_list_scan_ordinal: Option<usize>,
-    /// First controlled-Zone-referenced equipment list containing the selected unit.
-    pub first_matching_equipment_list: Option<ZoneEquipmentListId>,
-    /// Whether the selected unit was found in an equipment list.
-    pub equipment_list_membership_found: Option<bool>,
-    /// Per-unit call count.
-    pub init_call_count: usize,
-    /// Per-unit one-time topology count.
-    pub one_time_initialization_count: usize,
-    /// Per-unit hard-size gate count.
-    pub sizing_check_count: usize,
-    /// Per-unit begin-environment initialization count.
-    pub environment_initialization_count: usize,
-    /// Per-unit environment rearm count.
-    pub environment_rearm_count: usize,
-    /// Cached maximum heating mass flow.
-    pub maximum_heating_air_mass_flow_rate_kg_per_s: f64,
-    /// Cached maximum cooling mass flow.
-    pub maximum_cooling_air_mass_flow_rate_kg_per_s: f64,
-    /// Standard density owning the cached begin-environment values.
-    pub standard_air_density_kg_per_m3: Option<f64>,
-    /// Cooling recurring diagnostic count.
-    pub cooling_supply_temperature_warning_count: usize,
-    /// Heating recurring diagnostic count.
-    pub heating_supply_temperature_warning_count: usize,
 }

@@ -85,6 +85,7 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
     assert_eq!(lifecycle.source, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE);
     assert!(lifecycle.flags.state_machine_used);
     assert!(lifecycle.flags.one_time_checked);
+    assert!(lifecycle.flags.topology_ready);
     assert!(lifecycle.flags.environment_initialized);
     assert!(lifecycle.flags.environment_initialization_needed);
     assert!(lifecycle.flags.sizing_checked);
@@ -94,6 +95,18 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
     assert_eq!(lifecycle.equipment_list_check_count, 1);
     assert_eq!(lifecycle.init_call_count, required_steps);
     assert_eq!(lifecycle.one_time_initialization_count, 1);
+    assert_eq!(lifecycle.topology_completion_count, 1);
+    assert_eq!(lifecycle.controlled_zone, Some(ZoneId(0)));
+    assert_eq!(lifecycle.equipment_list, Some(ZoneEquipmentListId(0)));
+    assert_eq!(lifecycle.supply_node, Some(NodeId(0)));
+    assert_eq!(lifecycle.recirculation_node, Some(NodeId(2)));
+    assert_eq!(
+        lifecycle.recirculation_source,
+        Some(PurchasedAirRecirculationSource::SingleZoneReturn)
+    );
+    assert!(lifecycle.topology_diagnostics.is_empty());
+    assert_eq!(lifecycle.topology_failure, None);
+    assert_eq!(lifecycle.economizer_flow_limit_warning_count, 0);
     assert_eq!(lifecycle.sizing_check_count, 1);
     assert_eq!(lifecycle.environment_initialization_count, 1);
     assert_eq!(lifecycle.environment_rearm_count, 1);

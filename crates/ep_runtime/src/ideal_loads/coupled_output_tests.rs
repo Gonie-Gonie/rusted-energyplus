@@ -5,7 +5,8 @@ use crate::{
     ideal_loads::{
         DirectZonePurchasedAirCouplingInput, DirectZonePurchasedAirScheduleSnapshot,
         IdealLoadsInitFlags, IdealLoadsZoneState, PurchasedAirInitSnapshot,
-        PurchasedAirInitTransition, couple_direct_zone_predicted_demand_to_purchased_air,
+        PurchasedAirInitTransition, PurchasedAirRecirculationSource,
+        couple_direct_zone_predicted_demand_to_purchased_air,
     },
 };
 use ep_model::{
@@ -397,6 +398,7 @@ fn scaled_output(
             system_timestep_seconds: 900.0,
             system,
             supply_node: SUPPLY_NODE,
+            recirculation_node: NodeId(4),
             unit_available: true,
             limit_context: IdealLoadsSensibleLimitContext::default(),
             initialization: initialized_snapshot(system),
@@ -447,10 +449,15 @@ fn initialized_snapshot(system: &IdealLoadsAirSystem) -> PurchasedAirInitSnapsho
         system: system.id,
         controlled_zone: ZoneId(0),
         supply_node: SUPPLY_NODE,
-        recirculation_node: NodeId(4),
+        recirculation_node: Some(NodeId(4)),
+        recirculation_source: Some(PurchasedAirRecirculationSource::SingleZoneReturn),
+        rejected_exhaust_node: None,
+        reported_first_return_node: None,
+        topology_diagnostic_count: 0,
         flags: IdealLoadsInitFlags {
             state_machine_used: true,
             one_time_checked: true,
+            topology_ready: true,
             environment_initialized: true,
             environment_initialization_needed: false,
             sizing_checked: true,

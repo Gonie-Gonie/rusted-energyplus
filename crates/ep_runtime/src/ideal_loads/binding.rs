@@ -20,11 +20,12 @@ use ep_model::{
 use super::{
     DirectZonePurchasedAirCouplingError, DirectZonePurchasedAirCouplingInput,
     DirectZonePurchasedAirCouplingOutput, IdealLoadsPurchasedAirBranch,
-    IdealLoadsSensibleLimitContext, PurchasedAirInitBoundTopology, PurchasedAirInitCallContext,
-    PurchasedAirInitError, PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanError,
-    PurchasedAirInitSnapshot, PurchasedAirRuntimeState, classify_no_oa_sensible_subset,
-    complete_direct_zone_purchased_air_coupling, init_purchased_air_runtime,
-    predict_direct_zone_demand_for_purchased_air, select_purchased_air_branch,
+    IdealLoadsSensibleLimitContext, PurchasedAirInitCallContext, PurchasedAirInitError,
+    PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanError, PurchasedAirInitSnapshot,
+    PurchasedAirInitTopologyPlan, PurchasedAirInitTopologyPlanError, PurchasedAirRuntimeState,
+    classify_no_oa_sensible_subset, complete_direct_zone_purchased_air_coupling,
+    init_purchased_air_runtime, predict_direct_zone_demand_for_purchased_air,
+    select_purchased_air_branch,
 };
 
 /// One-to-one relation required by the bounded direct-Zone binding.
@@ -153,6 +154,11 @@ pub enum DirectZonePurchasedAirBindingError {
         /// Invalid source-order manager plan.
         error: PurchasedAirInitManagerPlanError,
     },
+    /// The selected-unit initialization topology plan could not be built.
+    InitTopologyPlan {
+        /// Invalid resolved topology relation.
+        error: PurchasedAirInitTopologyPlanError,
+    },
 }
 
 /// Immutable production binding for one direct fully mixed Zone.
@@ -200,6 +206,8 @@ pub struct DirectZonePurchasedAirModelBinding<'model> {
     pub system: &'model IdealLoadsAirSystem,
     /// Immutable source-declaration-order manager initialization plan.
     pub init_manager_plan: PurchasedAirInitManagerPlan,
+    /// Immutable selected-unit one-time topology plan.
+    pub init_topology_plan: PurchasedAirInitTopologyPlan,
 }
 
 /// Resolves and validates the static model topology used by CP300.
@@ -453,6 +461,8 @@ pub fn bind_direct_zone_purchased_air_model(
         .unwrap_or_default();
     let init_manager_plan = PurchasedAirInitManagerPlan::from_model(typed)
         .map_err(|error| DirectZonePurchasedAirBindingError::InitManagerPlan { error })?;
+    let init_topology_plan = PurchasedAirInitTopologyPlan::from_model(typed, system.id, zone.id)
+        .map_err(|error| DirectZonePurchasedAirBindingError::InitTopologyPlan { error })?;
 
     Ok(DirectZonePurchasedAirModelBinding {
         zone: zone.id,
@@ -474,6 +484,7 @@ pub fn bind_direct_zone_purchased_air_model(
         limit_context,
         system,
         init_manager_plan,
+        init_topology_plan,
     })
 }
 
@@ -720,13 +731,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
     let initialization = init_purchased_air_runtime(
         input.purchased_air_runtime_state,
         &binding.init_manager_plan,
-        PurchasedAirInitBoundTopology {
-            system: binding.ideal_loads_air_system,
-            controlled_zone: binding.zone,
-            equipment_list: binding.equipment_list,
-            supply_node: binding.supply_node,
-            recirculation_node: binding.return_node,
-        },
+        &binding.init_topology_plan,
         binding.system,
         PurchasedAirInitCallContext {
             zone_equipment_inputs_filled: true,
@@ -755,6 +760,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             system_timestep_seconds: input.system_timestep_seconds,
             system: binding.system,
             supply_node: binding.supply_node,
+            recirculation_node: binding.return_node,
             unit_available,
             limit_context: binding
                 .limit_context
