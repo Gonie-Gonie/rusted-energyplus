@@ -3,6 +3,7 @@
 #![allow(clippy::if_same_then_else, clippy::too_many_arguments)]
 
 mod calc;
+mod coupling;
 mod dispatch;
 mod humidistat;
 mod init;
@@ -14,6 +15,7 @@ mod runtime;
 mod update;
 
 pub use calc::*;
+pub use coupling::*;
 pub use dispatch::*;
 pub use humidistat::*;
 pub use init::*;

@@ -167,7 +167,7 @@ claim.
 | Zone temperature inverse hybrid model | `InverseModelTemperature`, declared at `ZoneTempPredictorCorrector.hh` lines 313-325, implemented at `ZoneTempPredictorCorrector.cc` lines 4737-4951, and called only by `ZoneSpaceHeatBalanceData::correctAirTemp` lines 4103-4114 | CP217 adds required `routine.inverse_model_temperature` as source-mapped only. The measured-temperature override, three ordered inverse branches, unconditional history shift, adaptive repeat effects, hybrid outputs, and exact failure/retry/reset behavior remain source-only; Rust has no typed `HybridModel:Zone`, inverse state, output identities, runtime consumer, or focused test. |
 | HybridModel thermal-mass multiplier postprocessor | `processInverseModelMultpHM`, declared at `ZoneTempPredictorCorrector.hh` lines 327-333, implemented at `ZoneTempPredictorCorrector.cc` lines 4953-4991, and called only by `InverseModelTemperature` lines 4879-4880 | CP218 adds required `routine.process_inverse_model_multp_hm` as source-mapped only. The strict lower clamp, uncapped high warning/recurring diagnostic, persistent aggregate/average state, IEEE/alias behavior, output/report ownership, and retry/reset transaction remain source-only; Rust has no HybridModel state, recurring index, exact output, runtime path, or focused test. |
 | HybridModel humidity inverse inference | `InverseModelHumidity`, declared at `ZoneTempPredictorCorrector.hh` lines 335-343, implemented at `ZoneTempPredictorCorrector.cc` lines 4993-5131, and called only by `ZoneSpaceHeatBalanceData::correctHumRat` line 4589 | CP219 adds required `routine.inverse_model_humidity` as source-mapped only. Unconditional measured sampling/history shift, date/history-gated infiltration and People equations, the local activity-130 anomaly, transient humidity write, output ownership, and failure/retry/reset behavior remain source-only; Rust has no typed HybridModel object, inverse state, exact output, runtime path, or focused test. |
-| Zone/Space heat-balance sum assembly | `ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums`, declared at `ZoneTempPredictorCorrector.hh` lines 226-230, implemented at `ZoneTempPredictorCorrector.cc` lines 5133-5281, and called by record-level prediction line 3175 and correction line 3918 | CP220 adds required `routine.zone_space_heat_balance_calc_zone_or_space_sums` as source-mapped only. Internal/non-system/system assembly, parent-Zone AFN/equipment/plenum/PIU context, uncontrolled-Space system allocation, virtual surface dispatch, and failure/retry/reset behavior remain source-only; Rust has no exact routine, Space record, airflow writer, topology, or focused test. |
+| Zone/Space heat-balance sum assembly | `ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums`, declared at `ZoneTempPredictorCorrector.hh` lines 226-230, implemented at `ZoneTempPredictorCorrector.cc` lines 5133-5281, and called by record-level prediction line 3175 and correction line 3918 | CP220 keeps the exact routine required/source-mapped. CP300 adds only a bounded one-controlled-Zone/one-inlet projection from final PurchasedAir supply mass flow and temperature into `sum_sys_mcp_w_per_k` and `sum_sys_mcp_t_w`, including source-order Zone/ZoneList multiplier removal and transactional overwrite. Full internal/non-system/system assembly, node-store lifecycle, multi-inlet topology, Space/AFN/equipment/plenum/PIU context, uncontrolled-Space allocation, virtual-surface dispatch, and failure/retry/reset behavior remain source-only. |
 | Zone/Space heat-balance surface result family | `ZoneHeatBalanceData::calcSumHAT` at `ZoneTempPredictorCorrector.cc` lines 5283-5298 plus `SpaceHeatBalanceData::calcSumHAT` at lines 5300-5413, both reached through CP220 virtual dispatch line 5276 | CP221 adds required logical `routine.zone_heat_balance_calc_sum_hat` for the Zone fold; CP222 expands the same source-mapped routine to the independent Space override. Stored-Space ordering, Window/reference-air work, four-field results, side effects, and failure remain source-only; Rust has only a direct Zone opaque-Surface fold. |
 | Zone/Space component-load reporting | `CalcZoneComponentLoadSums`, declared at `ZoneTempPredictorCorrector.hh` lines 345-348, implemented at `ZoneTempPredictorCorrector.cc` lines 5414-5677, and called only at the correction wrapper lines 3853 and 3856 | CP223 adds required `routine.calc_zone_component_load_sums` as source-mapped only. The ten-field report reset and assembly, parent-Zone airflow/equipment and whole-Zone Surface topology, repeated Space-report traversal, ADU and imbalance-warning side effects, output ownership, and failure/retry behavior remain source-only; Rust has only separate bounded Zone report helpers. |
 | thermostat presence verification | `VerifyThermostatInZone`, declared at `ZoneTempPredictorCorrector.hh` line 350, implemented at `ZoneTempPredictorCorrector.cc` lines 5679-5700, and called only by `SetUpZoneSizingArrays` line 812 | CP224 adds required `routine.verify_thermostat_in_zone` as source-mapped only. Lazy CP196 acquisition, the shared latch, exact full-arena name lookup, sizing cadence, caller warning, and failure/retry behavior remain source-only; Rust has only normalized typed thermostat edges, an IdealLoads check, and planning metadata. |
@@ -182,7 +182,7 @@ claim.
 | thermostat-setpoint predefined LEED table | `FillPredefinedTableOnThermostatSetpoints`, declared at `ZoneTempPredictorCorrector.hh` line 376, implemented at `ZoneTempPredictorCorrector.cc` lines 6558-6672, and called only by `FillRemainingPredefinedEntries` line 6998 | CP233 adds required `routine.fill_predefined_table_on_thermostat_setpoints` as source-mapped only. Global schedule-ID first-wins traversal, seasonal Wednesday value/count queries, split synthetic rows, append-only table mutation, final-report cadence, and failure/retry remain source-only; Rust has no four-family arena, exact seasonal query, predefined table store, helper, caller, or focused test. |
 | thermostat-schedule predefined System Summary table | `FillPredefinedTableOnThermostatSchedules`, declared at `ZoneTempPredictorCorrector.hh` line 378, implemented at `ZoneTempPredictorCorrector.cc` lines 6674-6766, and called only by `FillRemainingPredefinedEntries` line 6999 | CP234 adds required `routine.fill_predefined_table_on_thermostat_schedules` as source-mapped only. Stored ordinary-Zone traversal, fixed-slot inclusion, tuple sort, independently filtered joins, append-only table mutation, final-report cadence, and failure/retry/reset remain source-only; Rust has no complete control arena, predefined System Summary store, helper, caller, serializer, or focused table comparator. |
 | Zone/Space predictor temperature-history preparation | `ZoneSpaceHeatBalanceData::updateTemperatures`, declared at `ZoneTempPredictorCorrector.hh` lines 233-234, implemented at `ZoneTempPredictorCorrector.cc` lines 6768-6833, and called only as the first child of `predictSystemLoad` line 3155 | CP235 adds required `routine.zone_space_heat_balance_update_temperatures` as source-mapped only. Unconditional four-slot working-history selection, shortened Zone/Space node rollback, count-change helper order, RoomAir topology, partial failure, cadence, replay, and reset remain source-only; Rust has only Zone three-slot adaptive history without the exact wrapper or topology. |
-| Zone/Space predicted sensible system load | `ZoneSpaceHeatBalanceData::calcPredictedSystemLoad`, declared at `ZoneTempPredictorCorrector.hh` line 224, implemented at `ZoneTempPredictorCorrector.cc` lines 6835-7243, and called only by `predictSystemLoad` line 3253 | CP236 remains required/source-mapped. CP296 and CP298 provide pure direct-Zone DualSetpoint/ThirdOrder load stages. CP299 adds a public state-backed producer that reads non-system predictor sums, the selected three-slot history, air capacitance, and owned `SysDepZoneLoadsLagged`, then projects finalized thresholds into `ZoneSysEnergyDemand`. Thermostat/node/timestep and scaling values remain caller-owned, the lagged field has no runtime writer, and no heat-balance or IdealLoads release path calls the producer. Five-way control, other algorithms, RAFN/ITE/Space/staged branches, shared source-state writes, sequenced demand, live PurchasedAir coupling, failure/replay, and reset remain unsupported. |
+| Zone/Space predicted sensible system load | `ZoneSpaceHeatBalanceData::calcPredictedSystemLoad`, declared at `ZoneTempPredictorCorrector.hh` line 224, implemented at `ZoneTempPredictorCorrector.cc` lines 6835-7243, and called only by `predictSystemLoad` line 3253 | CP236 remains required/source-mapped. CP296 and CP298 provide pure direct-Zone DualSetpoint/ThirdOrder load stages; CP299 produces state-backed `ZoneSysEnergyDemand`. CP300's callable `couple_direct_zone_predicted_demand_to_purchased_air` composes that producer with the generic PurchasedAir wrapper and a bounded correction-feedback snapshot. Thermostat/node/timestep and scaling values remain caller-owned, the lagged field has no runtime writer, and no heat-balance or IdealLoads release loop calls the composition. Five-way control, other algorithms, RAFN/ITE/Space/staged branches, equipment sequencing/residuals, full node lifecycle, failure/replay, and reset remain unsupported. |
 | internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
 | space internal convective gains | `spaceSumAllInternalConvectionGains` | mapped-not-ported |
 
@@ -32995,6 +32995,71 @@ The `zone_temp_predictor_corrector_source_order` and
 `scaffold` at claim level `none`. `predictSystemLoad`,
 `calcPredictedSystemLoad`, `initOutputRequired`, and `CalcPurchAirLoads` remain
 `source_mapped`; CP299 promotes no routine. Algorithm/routine counts, required
+counts, readiness, capabilities, outputs, manifests, comparators, performance,
+and conformance claims do not change. Roadmap Section 12's first checkbox
+remains open.
+
+## CP300 Direct-Zone Demand, PurchasedAir, and System-Air Feedback Coupling
+
+CP300 adds the public, production-compiled
+`couple_direct_zone_predicted_demand_to_purchased_air` composition in
+`crates/ep_runtime/src/ideal_loads/coupling.rs`. It advances Roadmap Section
+12's first item from an isolated state-backed demand producer to a callable
+state-to-state arithmetic seam; it does not add a heat-balance timestep or
+release caller and does not remove oracle/default demand. The bounded source
+order spans direct-Zone prediction at
+`ZoneTempPredictorCorrector.cc` lines 3146-3256 and 7034-7126,
+PurchasedAir demand consumption and supply-node finalization at
+`PurchasedAirManager.cc` lines 1992-1993 and 2706-2709, and correction-time
+system-air assembly at `ZoneTempPredictorCorrector.cc` lines 5160-5164,
+5197-5211, and 5263-5264.
+
+`DirectZonePurchasedAirCouplingInput` borrows a mutable
+`ZoneHeatBalanceState` and accepts the still caller-owned active DualSetpoint
+values, direct Zone-node temperature, load-correction factor, Zone and
+ZoneList multipliers, system-timestep seconds, prebound IdealLoads system and
+supply node, availability result, and psychrometric context. The first bounded
+family accepts one fully mixed controlled Zone, one inlet, ThirdOrder
+prediction, and the no-outdoor-air/no-limit/sensible-only PurchasedAir branch.
+The composition calls CP299 first, forwards its
+`SourceSetpointThresholds` demand to generic `sim_purchased_air_compat`, and
+retains the prediction, PurchasedAir output, and
+`DirectZonePurchasedAirSystemFeedback` snapshots in its result. PurchasedAir
+reads the explicit Zone-node temperature; the Zone heat-balance humidity ratio
+supplies `PsyCpAirFnW`.
+
+After PurchasedAir succeeds, CP300 reproduces the controlled-inlet correction
+order in a local buffer: final supply mass flow is multiplied by Zone-air
+specific heat, that result is multiplied by final supply temperature, and both
+system-air sums are divided once by the checked Zone/ZoneList multiplier
+product. The two buffered values then overwrite
+`sum_sys_mcp_w_per_k` and `sum_sys_mcp_t_w` together. Final zero flow therefore
+clears stale sums to exact zero. The composition never writes
+`system_dependent_zone_loads_lagged_w`, demand, histories, mean air
+temperature, or non-air response; PurchasedAir output is not misrouted into
+`SysDepZoneLoads`.
+
+Focused heating, cooling, distinct Zone-node/mean-air temperature, deadband
+zero-flow, and multiplier tests prove demand and supply feedback are composed
+and scaled exactly once. Failure tests cover predictor rejection, nonfinite
+Zone-node state, generic PurchasedAir rejection, nonfinite feedback, and
+unsupported branch selection; every error leaves the complete Zone state
+unchanged. The returned supply-node payload and every committed feedback
+scalar are validated before the two-field commit.
+
+This remains a callable seam rather than a release simulation path. Thermostat
+schedule resolution, topology proof, NodeStateStore writes and reads, a
+combined heat-balance/IdealLoads timestep loop, corrector iteration, equipment
+sequencing and residual updates, current/lagged system-dependent-load
+ownership, Space/RAFN/ITE/plenum/PIU branches, adaptive system timesteps, and
+oracle/default-demand removal remain unsupported.
+
+The `zone_temp_predictor_corrector_source_order` and
+`ideal_loads_zone_equipment_purchased_air_source_order` parents remain
+`scaffold` at claim level `none`. `predictSystemLoad`,
+`calcPredictedSystemLoad`, `initOutputRequired`, `CalcPurchAirLoads`,
+`UpdatePurchasedAir`, `calcZoneOrSpaceSums`, and `correctAirTemp` remain
+`source_mapped`; CP300 promotes no routine. Algorithm/routine and required
 counts, readiness, capabilities, outputs, manifests, comparators, performance,
 and conformance claims do not change. Roadmap Section 12's first checkbox
 remains open.
