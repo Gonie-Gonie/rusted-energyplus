@@ -20,12 +20,14 @@ use ep_model::{
 use super::{
     DirectZonePurchasedAirCouplingError, DirectZonePurchasedAirCouplingInput,
     DirectZonePurchasedAirCouplingOutput, IdealLoadsPurchasedAirBranch,
-    IdealLoadsSensibleLimitContext, PurchasedAirAvailabilityStatus, PurchasedAirCalcEntryContext,
-    PurchasedAirCalcEntryError, PurchasedAirCalcEntrySnapshot,
+    IdealLoadsSensibleLimitContext, PurchasedAirAvailabilityStatus,
+    PurchasedAirCalcCoolingEntryGateError, PurchasedAirCalcCoolingEntryGateSnapshot,
+    PurchasedAirCalcEntryContext, PurchasedAirCalcEntryError, PurchasedAirCalcEntrySnapshot,
     PurchasedAirCalcMinimumOaPrefixError, PurchasedAirCalcMinimumOaPrefixSnapshot,
     PurchasedAirHardSizeLegacyContext, PurchasedAirInitCallContext, PurchasedAirInitError,
     PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanError, PurchasedAirInitSnapshot,
     PurchasedAirInitTopologyPlan, PurchasedAirInitTopologyPlanError, PurchasedAirRuntimeState,
+    PurchasedAirTemperatureControlType, advance_direct_no_oa_calc_cooling_entry_gate,
     advance_direct_no_oa_calc_minimum_oa_prefix, advance_purchased_air_calc_entry,
     classify_no_oa_sensible_subset, complete_direct_zone_purchased_air_coupling,
     init_purchased_air_runtime, predict_direct_zone_demand_for_purchased_air,
@@ -569,6 +571,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationEntry(PurchasedAirCalcEntryError),
     /// The bounded minimum-outdoor-air prefix rejected its release state.
     CalculationMinimumOutdoorAir(PurchasedAirCalcMinimumOaPrefixError),
+    /// The bounded cooling-entry gate rejected its release state.
+    CalculationCoolingEntryGate(PurchasedAirCalcCoolingEntryGateError),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -642,6 +646,8 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     pub calculation_entry: PurchasedAirCalcEntrySnapshot,
     /// Source-ordered minimum-outdoor-air prefix snapshot.
     pub calculation_minimum_outdoor_air: PurchasedAirCalcMinimumOaPrefixSnapshot,
+    /// Source-ordered cooling-entry gate snapshot.
+    pub calculation_cooling_entry_gate: PurchasedAirCalcCoolingEntryGateSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
@@ -776,6 +782,14 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_entry,
     )
     .map_err(DirectZonePurchasedAirScheduledCouplingError::CalculationMinimumOutdoorAir)?;
+    let calculation_cooling_entry_gate = advance_direct_no_oa_calc_cooling_entry_gate(
+        input.purchased_air_runtime_state,
+        binding.system,
+        calculation_entry,
+        calculation_minimum_outdoor_air,
+        PurchasedAirTemperatureControlType::DualHeatCool,
+    )
+    .map_err(DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingEntryGate)?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -815,6 +829,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         initialization,
         calculation_entry,
         calculation_minimum_outdoor_air,
+        calculation_cooling_entry_gate,
         coupling,
     })
 }

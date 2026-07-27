@@ -22,6 +22,8 @@ use ep_model::{
 
 type ModelMutationCase = (fn(&mut TypedModel), DirectZonePurchasedAirBindingFeature);
 
+#[path = "binding/cooling_entry_gate_tests.rs"]
+mod cooling_entry_gate_tests;
 #[path = "binding/minimum_oa_prefix_tests.rs"]
 mod minimum_oa_prefix_tests;
 

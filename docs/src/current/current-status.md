@@ -275,11 +275,40 @@ identity and zero values, and direct-only
 `purchased_air_calc_minimum_oa_prefix_lifecycle` JSON evidence. This remains a
 no-OA/no-EMS lifecycle extension: the full child DSOA, DCV, schedule, density,
 CO2, cutoff, and diagnostic work; OA-true psychrometrics and load equations;
-EMS override behavior; the operating-mode branch beginning at line 2046; and
-all later Calc behavior remain open. Both parents stay `scaffold`/`none`,
+EMS override behavior; and all later Calc behavior remain open at the CP311
+boundary. Both parents stay `scaffold`/`none`,
 `routine.calc_purch_air_loads` and
 `routine.calc_purch_air_min_oa_mass_flow` stay `source_mapped`, and inventory,
 readiness, support, evidence, conformance, and Roadmap state do not change.
+
+CP312 maps only the next `CalcPurchAirLoads` cooling-entry gate at lines
+2046-2047. On an entered CP311 body it compares minimum-OA sensible output
+against cooling-setpoint demand first, reaches the controlled Zone's
+temperature-control-type read only when that inclusive `>=` comparison is
+true, lets exact `SingleHeat` alone block cooling, and otherwise records the
+local `OperatingMode=Cool` assignment. UnitOff skips the comparison and every
+later site. HeatOn and CoolOn do not gate this decision.
+
+The exact release transition consumes retained CP310 and CP311 snapshots in
+one-for-one order, requires the existing no-OA/no-EMS CP311 shape,
+`DualHeatCool`, and finite active cooling demand, then reconciles its result
+with the existing no-OA numerical DTO. With release minimum-OA sensible output
+fixed at zero, negative and either signed-zero cooling demand enter cooling;
+positive demand short-circuits before the temperature-control read. Direct
+source-characterization tests separately retain NaN comparison fallthrough and
+the exact-`SingleHeat` block without admitting those paths to release.
+
+Per-step and final validators reconcile transition, active/UnitOff,
+comparison, conditional control-read, cooling-entry/fallthrough, and local-mode
+assignment counts; require zero release `SingleHeat` blocks; match numerical
+Cooling results to cooling-body entries; expose
+`purchased_air_calc_cooling_entry_gate_lifecycle` in direct-runtime JSON; and
+reject disconnected or non-direct evidence. This is gate lifecycle evidence,
+not a new numerical or thermostat-family claim. The cooling body beginning at
+line 2056, the dynamically reached Heat/DeadBand decision at line 2348, full
+temperature-control-array ownership, and all later Calc behavior remain open.
+Parent/routine status, inventory/readiness counts, support level, forbidden
+features, evidence cases, conformance, and Roadmap state remain unchanged.
 
 ## Current Launcher State
 

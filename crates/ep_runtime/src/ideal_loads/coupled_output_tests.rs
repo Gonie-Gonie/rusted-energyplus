@@ -4,14 +4,18 @@ use crate::{
     heat_balance::state::{ZoneAirTemperatureCoefficients, ZoneHeatBalanceState},
     ideal_loads::{
         DirectZonePurchasedAirCouplingInput, DirectZonePurchasedAirCouplingOutput,
-        DirectZonePurchasedAirScheduleSnapshot, IdealLoadsInitFlags, IdealLoadsZoneState,
-        PURCHASED_AIR_CALC_ENTRY_SOURCE, PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER,
-        PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE, PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
+        DirectZonePurchasedAirScheduleSnapshot, IdealLoadsInitFlags, IdealLoadsSensibleMode,
+        IdealLoadsZoneState, PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE_ORDER, PURCHASED_AIR_CALC_ENTRY_SOURCE,
+        PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE,
+        PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER, PurchasedAirAvailabilityStatus,
-        PurchasedAirCalcEntryDemandSnapshot, PurchasedAirCalcEntryResetSnapshot,
-        PurchasedAirCalcEntrySnapshot, PurchasedAirCalcMinimumOaPrefixSnapshot,
-        PurchasedAirInitSnapshot, PurchasedAirInitTransition, PurchasedAirRecirculationSource,
-        couple_direct_zone_predicted_demand_to_purchased_air,
+        PurchasedAirCalcCoolingEntryGateSnapshot, PurchasedAirCalcEntryDemandSnapshot,
+        PurchasedAirCalcEntryResetSnapshot, PurchasedAirCalcEntrySnapshot,
+        PurchasedAirCalcMinimumOaPrefixSnapshot, PurchasedAirInitSnapshot,
+        PurchasedAirInitTransition, PurchasedAirRecirculationSource,
+        PurchasedAirTemperatureControlType, couple_direct_zone_predicted_demand_to_purchased_air,
     },
 };
 use ep_model::{
@@ -425,6 +429,11 @@ fn scaled_output(
             sample_index,
             coupling,
         ),
+        calculation_cooling_entry_gate: calculation_cooling_entry_gate_snapshot(
+            system,
+            sample_index,
+            coupling,
+        ),
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;
@@ -453,6 +462,35 @@ fn scaled_output(
     demand.remaining_output_req_to_heat_sp_w = 19.0 * scale;
     demand.remaining_output_req_to_cool_sp_w = -20.0 * scale;
     output
+}
+
+fn calculation_cooling_entry_gate_snapshot(
+    system: &IdealLoadsAirSystem,
+    sample_index: usize,
+    coupling: DirectZonePurchasedAirCouplingOutput,
+) -> PurchasedAirCalcCoolingEntryGateSnapshot {
+    let entry = calculation_entry_snapshot(system, sample_index, coupling);
+    let cooling = 0.0 >= entry.demand.remaining_output_req_to_cool_sp_w;
+    PurchasedAirCalcCoolingEntryGateSnapshot {
+        source: PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE,
+        first_excluded_source: PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
+        system: system.id,
+        parent_call_ordinal: sample_index + 1,
+        source_order: PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE_ORDER,
+        controlled_zone: ZoneId(0),
+        unit_body_entered: true,
+        minimum_outdoor_air_sensible_output_w: Some(0.0),
+        cooling_setpoint_demand_w: Some(entry.demand.remaining_output_req_to_cool_sp_w),
+        sensible_comparison_evaluated: true,
+        sensible_comparison_satisfied: Some(cooling),
+        temperature_control_type_read: cooling,
+        temperature_control_type: cooling
+            .then_some(PurchasedAirTemperatureControlType::DualHeatCool),
+        temperature_control_type_permits_cooling: cooling.then_some(true),
+        single_heat_blocked: false,
+        cooling_body_entered: cooling,
+        assigned_operating_mode: cooling.then_some(IdealLoadsSensibleMode::Cooling),
+    }
 }
 
 fn calculation_minimum_oa_snapshot(

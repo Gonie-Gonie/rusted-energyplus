@@ -15591,13 +15591,85 @@ active services, override operations, psychrometric calls, or formulas.
 Output-reference aliasing, source NaN/infinity propagation, child partial
 effects and failure order, operating-mode selection at line 2046 and later,
 economizer, mixed-air, limit, humidity, node/report, UnitOff-tail, reset, and
-concurrency behavior remain excluded.
+concurrency behavior remain excluded at the CP311 boundary.
 
 The deferred custom `SizePurchasedAir` branch at lines 1395-1696 remains a
 separate earlier physical gap. Both parents stay `scaffold`/`none`;
 `routine.calc_purch_air_loads` and
 `routine.calc_purch_air_min_oa_mass_flow` stay `source_mapped`; no inventory,
 readiness, support level, evidence case, conformance, or Roadmap state is
+promoted.
+
+## CP312 Source-Ordered `CalcPurchAirLoads` Cooling-Entry Gate
+
+CP312 maps only EnergyPlus 26.1 `PurchasedAirManager.cc` lines 2046-2047.
+The line-2046 condition first evaluates
+`MinOASensOutput >= QZnCoolSP`. C++ `&&` short-circuiting reaches
+`TempControlType(ControlledZoneNum)` only when that comparison succeeds.
+Exact `SingleHeat` then blocks entry; every other source enum value admits the
+line-2047 local `OperatingMode=Cool` assignment. The lexical next executable is
+the cooling OA-flow-limit condition at line 2056 because lines 2048-2055 are
+comments. When the cooling gate is false, the dynamically next executable is
+the separately deferred Heat/DeadBand decision at line 2348.
+
+The bounded transition preserves this exact six-site order:
+
+1. read the CP311 minimum-OA sensible output;
+2. read CP310 cooling-setpoint demand;
+3. apply the inclusive greater-than-or-equal comparison;
+4. conditionally read the Zone temperature-control type after short-circuit;
+5. exclude exact `SingleHeat`; and
+6. conditionally record the local Cooling operating-mode assignment.
+
+An enclosing UnitOff result reaches none of those sites. HeatOn and CoolOn are
+not consulted. On a failed numeric comparison the temperature-control value is
+absent from the snapshot rather than recorded as an unconditional read. On a
+satisfied comparison, the internal source-characterization transition admits
+Invalid, Uncontrolled, SingleCool, SingleHeatCool, and DualHeatCool and blocks
+only SingleHeat, matching the source predicate. IEEE comparison behavior makes
+either NaN operand fall through before that conditional read and treats signed
+zero as equal.
+
+`calc/cooling_entry_gate.rs` owns
+`PurchasedAirTemperatureControlType`,
+`PurchasedAirCalcCoolingEntryGateSnapshot`,
+`PurchasedAirCalcCoolingEntryGateRuntimeState`, and
+`PurchasedAirCalcCoolingEntryGateLifecycleSummary`.
+`calc/cooling_entry_gate/release.rs` owns the fail-closed error and
+`advance_direct_no_oa_calc_cooling_entry_gate`; the parent module owns the
+lifecycle-summary accessor. The release transition requires exact retained
+CP310 and CP311 snapshots, matching system/Zone/call ordinals, the no-OA/no-EMS
+CP311 result shape, prevalidated `DualHeatCool`, and finite cooling demand on
+an active body before mutation.
+
+The direct release binder executes CP312 after CP311 and before the existing
+bounded calculation. It supplies `DualHeatCool` from the exact already
+validated binding; CP312 does not own or query the EnergyPlus
+`TempControlType` array service. Per-step validation checks the source and
+first-excluded provenance, predecessor linkage, conditional read sites, local
+mode, and that the existing numerical DTO returns Cooling exactly when the
+gate enters. Final lifecycle validation reconciles transition,
+active/UnitOff, satisfied-comparison/read, cooling-entry/fallthrough, local-mode
+assignment, and numerical-Cooling counts. After that numerical reconciliation,
+`ep_run` repeats the provenance, predecessor, lifecycle-count, and latest-state
+firewall, publishes `purchased_air_calc_cooling_entry_gate_lifecycle`, and
+rejects evidence on non-direct runtime lanes.
+
+The existing no-OA numerical DTO already used the inclusive line-2046
+threshold for `SourceSetpointThresholds`; CP312 adds persistent source-order
+coupling and lifecycle evidence, not a new numerical implementation or
+conformance claim. Public release rejects active nonfinite cooling demand,
+while internal direct characterization retains source NaN fallthrough.
+SingleHeat and the other non-Dual thermostat families remain outside release.
+The cooling branch at lines 2056-2345, OA-flow warnings and clamp, economizer,
+mass-flow/humidity/capacity and mixed-air calculations, the Heat/DeadBand
+selector at lines 2348-2352, every later branch, local-to-persistent
+operating-mode ownership, partial effects, failure, reset, and concurrency
+remain excluded.
+
+Both parents stay `scaffold`/`none`; `routine.calc_purch_air_loads` stays
+`source_mapped`; no routine row, inventory/readiness count, support level,
+forbidden feature, evidence case, numerical conformance, or Roadmap state is
 promoted.
 
 

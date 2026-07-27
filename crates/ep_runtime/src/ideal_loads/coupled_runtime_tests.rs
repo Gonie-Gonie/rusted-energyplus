@@ -3,8 +3,10 @@ use super::*;
 use crate::{
     ideal_loads::{
         DirectZonePurchasedAirBindingFeature, IdealLoadsSensibleLimitContext,
-        PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE, PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
-        PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO,
+        PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE, PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE,
+        PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
+        PurchasedAirTemperatureControlType, ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
         ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
         ZONE_SYSTEM_PREDICTED_SENSIBLE_LOAD_TO_COOLING_SETPOINT_RATE,
@@ -35,6 +37,72 @@ const ZONE_KEY: &str = "ZONE ONE";
 const SUPPLY_NODE_KEY: &str = "SUPPLY";
 const RETURN_NODE_KEY: &str = "RETURN";
 const ABS_TOLERANCE: f64 = 1.0e-9;
+
+#[test]
+fn cooling_entry_mode_reconciliation_rejects_forged_numerical_modes() {
+    use IdealLoadsSensibleMode::{Cooling, Deadband, Heating, Off};
+
+    for (unit_body_entered, expected_cooling, actual, expected) in [
+        (false, false, Off, true),
+        (true, true, Cooling, true),
+        (true, false, Heating, true),
+        (true, false, Deadband, true),
+        (true, false, Cooling, false),
+        (true, false, Off, false),
+        (true, true, Heating, false),
+        (false, false, Heating, false),
+    ] {
+        assert_eq!(
+            super::cooling_entry_validation::numerical_mode_matches_release(
+                unit_body_entered,
+                expected_cooling,
+                actual,
+            ),
+            expected,
+            "unit_body_entered={unit_body_entered}, expected_cooling={expected_cooling}, actual={actual:?}"
+        );
+    }
+}
+
+#[test]
+fn cooling_entry_wrapper_requires_dual_heat_cool_and_finite_active_demand() {
+    for (control_type, unit_body_entered, cooling_demand_w, expected) in [
+        (4.0, true, -1.0, true),
+        (4.0, false, 0.0, true),
+        (3.0, true, -1.0, false),
+        (3.0, false, 0.0, false),
+        (4.0, true, f64::NAN, false),
+        (4.0, true, f64::INFINITY, false),
+    ] {
+        assert_eq!(
+            super::cooling_entry_validation::release_wrapper_inputs_match(
+                control_type,
+                unit_body_entered,
+                cooling_demand_w,
+            ),
+            expected
+        );
+    }
+}
+
+#[test]
+fn cooling_entry_count_partitions_reject_both_overflow_routes() {
+    for field in [
+        "source_skip_partition_overflow",
+        "cooling_fallthrough_partition_overflow",
+    ] {
+        assert!(matches!(
+            super::cooling_entry_validation::checked_partition(usize::MAX, 1, field, 7),
+            Err(
+                DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingEntryGateLifecycleInvariant {
+                    field: actual_field,
+                    expected: 7,
+                    actual: usize::MAX,
+                }
+            ) if actual_field == field
+        ));
+    }
+}
 
 #[test]
 fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
@@ -210,6 +278,62 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
         latest_minimum_oa.minimum_outdoor_air_moisture_output_kg_per_s,
         Some(0.0)
     );
+    let cooling_entry_lifecycle = simulation.summary.calc_cooling_entry_gate_lifecycle;
+    assert_eq!(
+        cooling_entry_lifecycle.source,
+        PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE
+    );
+    assert_eq!(
+        cooling_entry_lifecycle.first_excluded_source,
+        PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(
+        cooling_entry_lifecycle.state.transition_count,
+        required_steps
+    );
+    assert_eq!(
+        cooling_entry_lifecycle.state.source_execution_count,
+        required_steps
+    );
+    assert_eq!(cooling_entry_lifecycle.state.unit_off_skip_count, 0);
+    assert_eq!(
+        cooling_entry_lifecycle.state.sensible_comparison_count,
+        required_steps
+    );
+    assert_eq!(
+        cooling_entry_lifecycle
+            .state
+            .sensible_comparison_satisfied_count,
+        0
+    );
+    assert_eq!(
+        cooling_entry_lifecycle
+            .state
+            .temperature_control_type_read_count,
+        0
+    );
+    assert_eq!(cooling_entry_lifecycle.state.single_heat_block_count, 0);
+    assert_eq!(cooling_entry_lifecycle.state.cooling_body_entry_count, 0);
+    assert_eq!(
+        cooling_entry_lifecycle.state.active_fallthrough_count,
+        required_steps
+    );
+    let latest_cooling_entry = cooling_entry_lifecycle
+        .state
+        .latest
+        .expect("latest cooling-entry gate snapshot");
+    assert_eq!(latest_cooling_entry.parent_call_ordinal, required_steps);
+    assert_eq!(
+        latest_cooling_entry.minimum_outdoor_air_sensible_output_w,
+        Some(0.0)
+    );
+    assert_eq!(
+        latest_cooling_entry.sensible_comparison_satisfied,
+        Some(false)
+    );
+    assert!(!latest_cooling_entry.temperature_control_type_read);
+    assert!(!latest_cooling_entry.cooling_body_entered);
+    assert_eq!(latest_cooling_entry.assigned_operating_mode, None);
 
     let zone = simulation.state.zones.first().expect("bound Zone state");
     assert_eq!(simulation.state.timestep_index, required_steps);
@@ -337,6 +461,25 @@ fn all_hard_sized_finite_limit_branches_run_with_source_threshold_demand() {
         );
         assert_eq!(minimum_oa_lifecycle.state.ems_override_apply_count, 0);
         assert_eq!(minimum_oa_lifecycle.state.outdoor_air_effect_count, 0);
+        let cooling_entry_lifecycle = simulation.summary.calc_cooling_entry_gate_lifecycle;
+        assert_eq!(
+            cooling_entry_lifecycle.state.transition_count,
+            required_steps
+        );
+        assert_eq!(
+            cooling_entry_lifecycle.state.source_execution_count,
+            required_steps
+        );
+        assert_eq!(
+            cooling_entry_lifecycle.state.sensible_comparison_count,
+            required_steps
+        );
+        assert_eq!(cooling_entry_lifecycle.state.single_heat_block_count, 0);
+        assert_eq!(cooling_entry_lifecycle.state.cooling_body_entry_count, 0);
+        assert_eq!(
+            cooling_entry_lifecycle.state.active_fallthrough_count,
+            required_steps
+        );
         let density = lifecycle
             .standard_air_density_kg_per_m3
             .expect("initialized standard density");
@@ -413,6 +556,28 @@ fn live_coupling_uses_weather_pressure_for_supply_saturation() {
         options,
     )
     .expect("live finite cooling with weather-derived saturation pressure");
+
+    let cooling_entry = &simulation.summary.calc_cooling_entry_gate_lifecycle;
+    assert_eq!(cooling_entry.state.transition_count, 1);
+    assert_eq!(cooling_entry.state.sensible_comparison_satisfied_count, 1);
+    assert_eq!(cooling_entry.state.temperature_control_type_read_count, 1);
+    assert_eq!(cooling_entry.state.single_heat_block_count, 0);
+    assert_eq!(cooling_entry.state.cooling_body_entry_count, 1);
+    assert_eq!(cooling_entry.state.operating_mode_assignment_count, 1);
+    assert_eq!(cooling_entry.state.active_fallthrough_count, 0);
+    let latest_cooling_entry = cooling_entry
+        .state
+        .latest
+        .expect("live cooling-entry snapshot");
+    assert_eq!(
+        latest_cooling_entry.temperature_control_type,
+        Some(PurchasedAirTemperatureControlType::DualHeatCool)
+    );
+    assert!(latest_cooling_entry.cooling_body_entered);
+    assert_eq!(
+        latest_cooling_entry.assigned_operating_mode,
+        Some(IdealLoadsSensibleMode::Cooling)
+    );
 
     let supply_temperature_c = simulation
         .results

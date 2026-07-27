@@ -32829,8 +32829,12 @@ split sentinel. Neither constructor adds a live `ep_run` or `ep_cli` caller.
 `MinOASensOutput` is zero; source cooling is selected by inclusive
 `0 >= QCoolSP` at line 2046 before the later heating test at line 2348. The
 bounded DualSetpoint assumption fixes the companion not-SingleHeat and
-not-SingleCool guards true; the Rust DTO does not carry or validate them. Both
-Rust no-OA calculation paths compute cooling magnitude as
+not-SingleCool guards true. The standalone Rust numerical DTO still does not
+carry or validate those thermostat guards. CP312 separately records the
+line-2046 conditional control-type read, validates prebound DualHeatCool on the
+exact release lane, and reconciles Cooling results without changing that DTO
+or claiming `TempControlType` array ownership. Both Rust no-OA calculation
+paths compute cooling magnitude as
 `(-QCoolSP).max(0.0)` instead of `abs(QCoolSP)`. For
 `SourceSetpointThresholds`, they also retain the inclusive zero branch priority:
 `QCoolSP == 0` returns Cooling with zero flow and zero sensible output and
@@ -33458,10 +33462,35 @@ No heat-balance alias ownership or equation, predictor input, surface value,
 or corrector calculation is added: the Zone heat-balance reference is
 reachability evidence only. The full minimum-OA child and its
 DSOA/DCV/schedule/density/CO2 behavior, OA-true psychrometrics and load
-formulas, EMS local-flow override, operating-mode work at line 2046 and later,
-and full PurchasedAir feedback lifecycle remain excluded. Parent/routine
-status, counts, support, evidence, conformance, and Roadmap state remain
-unchanged.
+formulas, EMS local-flow override, and full PurchasedAir feedback lifecycle
+remain excluded at the CP311 boundary. Parent/routine status, counts, support,
+evidence, conformance, and Roadmap state remain unchanged.
+
+## CP312 PurchasedAir Cooling-Entry Gate Inside the Heat-Balance Loop
+
+The direct-Zone order is now predictor -> persistent Init -> CP310 Calc entry
+-> CP311 minimum-OA prefix -> CP312 cooling-entry gate -> existing bounded
+Calc -> update/report -> same-step Zone-air corrector. CP312 covers only
+`CalcPurchAirLoads` lines 2046-2047. It consumes the retained CP310 demand and
+CP311 minimum-OA output, applies the inclusive comparison, conditionally
+records the Zone temperature-control-type read, excludes exact SingleHeat, and
+records the local Cooling-mode assignment when admitted.
+
+The exact release lane supplies prevalidated DualHeatCool and finite active
+cooling demand. Its no-OA minimum sensible effect is zero, so negative and
+signed-zero cooling demand enter cooling and positive demand short-circuits
+before the control read. UnitOff reaches none of the CP312 sites. Lifecycle
+validation reconciles predecessor order, active/UnitOff and
+cooling/fallthrough partitions, conditional reads, local assignments, and the
+existing numerical DTO's Cooling count, then publishes direct-only JSON
+evidence.
+
+This adds no heat-balance or predictor equation, `TempControlType` array
+ownership, Zone-air feedback term, or numerical claim. The cooling body at
+line 2056 through 2345, Heat/DeadBand selection beginning at line 2348, and
+all later PurchasedAir behavior remain excluded. Parent/routine status,
+inventory/readiness counts, support, forbidden features, evidence,
+conformance, and Roadmap state remain unchanged.
 
 ## Data Structure Map
 

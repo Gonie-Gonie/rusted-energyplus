@@ -26,6 +26,9 @@ const INIT_LIFECYCLE_SOURCE: &str = "rust-persistent-init-purchased-air";
 const CALC_ENTRY_LIFECYCLE_SOURCE: &str = "EnergyPlus 26.1 PurchasedAirManager.cc:1967,1971-2022";
 const CALC_MINIMUM_OA_PREFIX_SOURCE: &str = "EnergyPlus 26.1 PurchasedAirManager.cc:2023-2040";
 const CALC_MINIMUM_OA_CHILD_SOURCE: &str = "EnergyPlus 26.1 PurchasedAirManager.cc:2762-2810; bounded no-OA route 2781,2783,2785,2806-2809";
+const CALC_COOLING_ENTRY_GATE_SOURCE: &str = "EnergyPlus 26.1 PurchasedAirManager.cc:2046-2047";
+const CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE: &str =
+    "EnergyPlus 26.1 PurchasedAirManager.cc:2056";
 const COUPLED_SOURCE_ORDER: [&str; 6] = [
     "predict-system-loads",
     "init-purchased-air",
@@ -552,6 +555,48 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
         latest_minimum_oa["minimum_outdoor_air_moisture_output_kg_per_s"],
         0.0
     );
+
+    let cooling_entry = &runtime["purchased_air_calc_cooling_entry_gate_lifecycle"];
+    assert_eq!(cooling_entry["source"], CALC_COOLING_ENTRY_GATE_SOURCE);
+    assert_eq!(
+        cooling_entry["first_excluded_source"],
+        CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(cooling_entry["transition_count"], expected_calls);
+    assert_eq!(cooling_entry["source_execution_count"], expected_calls);
+    assert_eq!(cooling_entry["unit_off_skip_count"], 0);
+    assert_eq!(cooling_entry["sensible_comparison_count"], expected_calls);
+    assert_eq!(cooling_entry["sensible_comparison_satisfied_count"], 0);
+    assert_eq!(cooling_entry["temperature_control_type_read_count"], 0);
+    assert_eq!(cooling_entry["single_heat_block_count"], 0);
+    assert_eq!(cooling_entry["cooling_body_entry_count"], 0);
+    assert_eq!(cooling_entry["operating_mode_assignment_count"], 0);
+    assert_eq!(cooling_entry["active_fallthrough_count"], expected_calls);
+    let latest_cooling_entry = &cooling_entry["latest"];
+    assert_eq!(
+        latest_cooling_entry["source"],
+        CALC_COOLING_ENTRY_GATE_SOURCE
+    );
+    assert_eq!(
+        latest_cooling_entry["first_excluded_source"],
+        CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(latest_cooling_entry["parent_call_ordinal"], expected_calls);
+    assert_eq!(
+        latest_cooling_entry["controlled_zone"],
+        lifecycle["controlled_zone"]
+    );
+    assert_eq!(
+        latest_cooling_entry["minimum_outdoor_air_sensible_output_w"],
+        0.0
+    );
+    assert_eq!(latest_cooling_entry["sensible_comparison_evaluated"], true);
+    assert_eq!(latest_cooling_entry["sensible_comparison_satisfied"], false);
+    assert_eq!(latest_cooling_entry["temperature_control_type_read"], false);
+    assert!(latest_cooling_entry["temperature_control_type"].is_null());
+    assert_eq!(latest_cooling_entry["single_heat_blocked"], false);
+    assert_eq!(latest_cooling_entry["cooling_body_entered"], false);
+    assert!(latest_cooling_entry["assigned_operating_mode"].is_null());
 }
 
 #[test]
@@ -589,6 +634,25 @@ fn all_hard_sized_finite_limit_branches_limit_live_cooling()
         assert_eq!(
             summary["rust_runtime"]["zone_demand_source"],
             ZONE_DEMAND_SOURCE
+        );
+        let cooling_entry =
+            &summary["rust_runtime"]["purchased_air_calc_cooling_entry_gate_lifecycle"];
+        assert_eq!(cooling_entry["source"], CALC_COOLING_ENTRY_GATE_SOURCE);
+        assert_eq!(cooling_entry["transition_count"], 2);
+        assert_eq!(cooling_entry["sensible_comparison_satisfied_count"], 2);
+        assert_eq!(cooling_entry["temperature_control_type_read_count"], 2);
+        assert_eq!(cooling_entry["single_heat_block_count"], 0);
+        assert_eq!(cooling_entry["cooling_body_entry_count"], 2);
+        assert_eq!(cooling_entry["operating_mode_assignment_count"], 2);
+        assert_eq!(cooling_entry["active_fallthrough_count"], 0);
+        assert_eq!(
+            cooling_entry["latest"]["temperature_control_type"],
+            "DualHeatCool"
+        );
+        assert_eq!(cooling_entry["latest"]["cooling_body_entered"], true);
+        assert_eq!(
+            cooling_entry["latest"]["assigned_operating_mode"],
+            "Cooling"
         );
 
         let results = read_json(&output_dir.join("results").join("result-store.json"))?;

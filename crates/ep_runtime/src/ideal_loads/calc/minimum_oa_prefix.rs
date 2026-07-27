@@ -321,7 +321,7 @@ pub(super) fn advance_minimum_oa_prefix_state(
     snapshot
 }
 
-fn calculation_entry_snapshots_bitwise_equal(
+pub(super) fn calculation_entry_snapshots_bitwise_equal(
     retained: PurchasedAirCalcEntrySnapshot,
     supplied: PurchasedAirCalcEntrySnapshot,
 ) -> bool {
