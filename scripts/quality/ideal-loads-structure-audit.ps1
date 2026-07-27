@@ -185,6 +185,7 @@ $calcCoolingDehumidificationFlow = "crates\ep_runtime\src\ideal_loads\calc\cooli
 $calcCoolingDehumidificationFlowState = "crates\ep_runtime\src\ideal_loads\calc\cooling_dehumidification_flow\state.rs"
 $calcCoolingDehumidificationFlowTransition = "crates\ep_runtime\src\ideal_loads\calc\cooling_dehumidification_flow\transition.rs"
 $calcCoolingDehumidificationFlowRelease = "crates\ep_runtime\src\ideal_loads\calc\cooling_dehumidification_flow\release.rs"
+$calcCoolingDehumidificationFlowCompletedStateValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_dehumidification_flow\release\completed_state_validation.rs"
 $calcCoolingDehumidificationFlowPredecessorValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_dehumidification_flow\release\predecessor_validation.rs"
 $calcCoolingDehumidificationFlowRuntimeValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_dehumidification_flow\release\runtime_validation.rs"
 $calcCoolingDehumidificationFlowSnapshotValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_dehumidification_flow\release\snapshot_validation.rs"
@@ -194,6 +195,15 @@ $calcCoolingDehumidificationFlowSkipTests = "crates\ep_runtime\src\ideal_loads\c
 $calcCoolingDehumidificationFlowGateTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_dehumidification_flow_tests\gate_tests.rs"
 $calcCoolingDehumidificationFlowReleaseTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_dehumidification_flow_release_tests.rs"
 $calcCoolingDehumidificationFlowReleaseCorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_dehumidification_flow_release_tests\corruption_tests.rs"
+$calcCoolingHumidificationFlow = "crates\ep_runtime\src\ideal_loads\calc\cooling_humidification_flow.rs"
+$calcCoolingHumidificationFlowState = "crates\ep_runtime\src\ideal_loads\calc\cooling_humidification_flow\state.rs"
+$calcCoolingHumidificationFlowTransition = "crates\ep_runtime\src\ideal_loads\calc\cooling_humidification_flow\transition.rs"
+$calcCoolingHumidificationFlowRelease = "crates\ep_runtime\src\ideal_loads\calc\cooling_humidification_flow\release.rs"
+$calcCoolingHumidificationFlowPredecessorValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_humidification_flow\release\predecessor_validation.rs"
+$calcCoolingHumidificationFlowRuntimeValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_humidification_flow\release\runtime_validation.rs"
+$calcCoolingHumidificationFlowSnapshotValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_humidification_flow\release\snapshot_validation.rs"
+$calcCoolingHumidificationFlowTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_humidification_flow_tests.rs"
+$calcCoolingHumidificationFlowReleaseTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_humidification_flow_release_tests.rs"
 $calcHumidity = "crates\ep_runtime\src\ideal_loads\calc\humidity.rs"
 $calcLimits = "crates\ep_runtime\src\ideal_loads\calc\limits.rs"
 $calcMassFlow = "crates\ep_runtime\src\ideal_loads\calc\mass_flow.rs"
@@ -235,6 +245,7 @@ $idealLoadsBindingCoolingEconomizerBodyTests = "crates\ep_runtime\src\ideal_load
 $idealLoadsBindingCoolingEconomizerBodyIntegrityTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_economizer_body_integrity_tests.rs"
 $idealLoadsBindingCoolingSensibleFlowTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_sensible_flow_tests.rs"
 $idealLoadsBindingCoolingDehumidificationFlowTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_dehumidification_flow_tests.rs"
+$idealLoadsBindingCoolingHumidificationFlowTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_humidification_flow_tests.rs"
 $idealLoadsCoupledRuntime = "crates\ep_runtime\src\ideal_loads\coupled_runtime.rs"
 $idealLoadsCoupledMinimumOaValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\minimum_oa_validation.rs"
 $idealLoadsCoupledCoolingEntryValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_entry_validation.rs"
@@ -245,6 +256,8 @@ $idealLoadsCoupledCoolingEconomizerConditionValidation = "crates\ep_runtime\src\
 $idealLoadsCoupledCoolingEconomizerBodyValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_economizer_body_validation.rs"
 $idealLoadsCoupledCoolingSensibleFlowValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_sensible_flow_validation.rs"
 $idealLoadsCoupledCoolingDehumidificationFlowValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_dehumidification_flow_validation.rs"
+$idealLoadsCoupledCoolingHumidificationFlowValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_humidification_flow_validation.rs"
+$idealLoadsCoupledOutputCoolingHumidificationFixture = "crates\ep_runtime\src\ideal_loads\coupled_output_tests\cooling_humidification_flow_fixture.rs"
 $idealLoadsCouplingValidation = "crates\ep_runtime\src\ideal_loads\coupling\validation.rs"
 $idealLoadsInput = "crates\ep_runtime\src\ideal_loads\input.rs"
 $idealLoadsMeters = "crates\ep_runtime\src\ideal_loads\meters.rs"
@@ -308,6 +321,11 @@ $runPurchasedAirCoolingDehumidificationFlowSerialization = "crates\ep_run\src\pi
 $runPurchasedAirCoolingDehumidificationFlowSnapshotSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_dehumidification_flow\serialization\snapshot.rs"
 $runPurchasedAirCoolingDehumidificationFlowValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_dehumidification_flow\validation.rs"
 $runPurchasedAirCoolingDehumidificationFlowSnapshotValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_dehumidification_flow\validation\snapshot.rs"
+$runPurchasedAirCoolingHumidificationFlow = "crates\ep_run\src\pipeline\purchased_air_cooling_humidification_flow.rs"
+$runPurchasedAirCoolingHumidificationFlowSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_humidification_flow\serialization.rs"
+$runPurchasedAirCoolingHumidificationFlowSnapshotSerialization = "crates\ep_run\src\pipeline\purchased_air_cooling_humidification_flow\serialization\snapshot.rs"
+$runPurchasedAirCoolingHumidificationFlowValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_humidification_flow\validation.rs"
+$runPurchasedAirCoolingHumidificationFlowSnapshotValidation = "crates\ep_run\src\pipeline\purchased_air_cooling_humidification_flow\validation\snapshot.rs"
 $runDirectZoneCoupledTests = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled.rs"
 $runRuntimeBoundaries = "crates\ep_run\src\support\runtime_boundaries.rs"
 $runtimeOutputTests = "crates\ep_runtime\src\runtime\tests\part08.rs"
@@ -393,6 +411,7 @@ Assert-FileExists -Path $calcCoolingDehumidificationFlow -Description "Purchased
 Assert-FileExists -Path $calcCoolingDehumidificationFlowState -Description "PurchasedAir Calc cooling dehumidification-flow persistent state"
 Assert-FileExists -Path $calcCoolingDehumidificationFlowTransition -Description "PurchasedAir Calc cooling dehumidification-flow transition"
 Assert-FileExists -Path $calcCoolingDehumidificationFlowRelease -Description "PurchasedAir Calc cooling dehumidification-flow release boundary"
+Assert-FileExists -Path $calcCoolingDehumidificationFlowCompletedStateValidation -Description "PurchasedAir Calc completed cooling dehumidification-flow validator for CP320"
 Assert-FileExists -Path $calcCoolingDehumidificationFlowPredecessorValidation -Description "PurchasedAir Calc cooling dehumidification-flow predecessor validation"
 Assert-FileExists -Path $calcCoolingDehumidificationFlowRuntimeValidation -Description "PurchasedAir Calc cooling dehumidification-flow runtime validation"
 Assert-FileExists -Path $calcCoolingDehumidificationFlowSnapshotValidation -Description "PurchasedAir Calc cooling dehumidification-flow exact snapshot validation"
@@ -402,6 +421,15 @@ Assert-FileExists -Path $calcCoolingDehumidificationFlowSkipTests -Description "
 Assert-FileExists -Path $calcCoolingDehumidificationFlowGateTests -Description "PurchasedAir Calc cooling dehumidification-flow gate and IEEE tests"
 Assert-FileExists -Path $calcCoolingDehumidificationFlowReleaseTests -Description "PurchasedAir Calc cooling dehumidification-flow public release tests"
 Assert-FileExists -Path $calcCoolingDehumidificationFlowReleaseCorruptionTests -Description "PurchasedAir Calc cooling dehumidification-flow corruption tests"
+Assert-FileExists -Path $calcCoolingHumidificationFlow -Description "PurchasedAir Calc cooling humidification-flow module"
+Assert-FileExists -Path $calcCoolingHumidificationFlowState -Description "PurchasedAir Calc cooling humidification-flow persistent state"
+Assert-FileExists -Path $calcCoolingHumidificationFlowTransition -Description "PurchasedAir Calc cooling humidification-flow transition"
+Assert-FileExists -Path $calcCoolingHumidificationFlowRelease -Description "PurchasedAir Calc cooling humidification-flow release boundary"
+Assert-FileExists -Path $calcCoolingHumidificationFlowPredecessorValidation -Description "PurchasedAir Calc cooling humidification-flow predecessor validation"
+Assert-FileExists -Path $calcCoolingHumidificationFlowRuntimeValidation -Description "PurchasedAir Calc cooling humidification-flow runtime validation"
+Assert-FileExists -Path $calcCoolingHumidificationFlowSnapshotValidation -Description "PurchasedAir Calc cooling humidification-flow exact snapshot validation"
+Assert-FileExists -Path $calcCoolingHumidificationFlowTests -Description "PurchasedAir Calc cooling humidification-flow characterization tests"
+Assert-FileExists -Path $calcCoolingHumidificationFlowReleaseTests -Description "PurchasedAir Calc cooling humidification-flow public release tests"
 Assert-FileExists -Path $calcHumidity -Description "IdealLoads calc humidity module"
 Assert-FileExists -Path $calcLimits -Description "IdealLoads calc limits module"
 Assert-FileExists -Path $calcMassFlow -Description "IdealLoads calc mass-flow module"
@@ -443,6 +471,7 @@ Assert-FileExists -Path $idealLoadsBindingCoolingEconomizerBodyTests -Descriptio
 Assert-FileExists -Path $idealLoadsBindingCoolingEconomizerBodyIntegrityTests -Description "IdealLoads binding cooling economizer true-body retained-state integrity tests"
 Assert-FileExists -Path $idealLoadsBindingCoolingSensibleFlowTests -Description "IdealLoads binding cooling sensible-flow transaction tests"
 Assert-FileExists -Path $idealLoadsBindingCoolingDehumidificationFlowTests -Description "IdealLoads binding cooling dehumidification-flow transaction tests"
+Assert-FileExists -Path $idealLoadsBindingCoolingHumidificationFlowTests -Description "IdealLoads binding cooling humidification-flow transaction tests"
 Assert-FileExists -Path $idealLoadsCoupledRuntime -Description "IdealLoads coupled release runtime"
 Assert-FileExists -Path $idealLoadsCoupledMinimumOaValidation -Description "IdealLoads minimum-OA release validator"
 Assert-FileExists -Path $idealLoadsCoupledCoolingEntryValidation -Description "IdealLoads cooling-entry release validator"
@@ -453,6 +482,8 @@ Assert-FileExists -Path $idealLoadsCoupledCoolingEconomizerConditionValidation -
 Assert-FileExists -Path $idealLoadsCoupledCoolingEconomizerBodyValidation -Description "IdealLoads cooling economizer true-body release validator"
 Assert-FileExists -Path $idealLoadsCoupledCoolingSensibleFlowValidation -Description "IdealLoads cooling sensible-flow release validator"
 Assert-FileExists -Path $idealLoadsCoupledCoolingDehumidificationFlowValidation -Description "IdealLoads cooling dehumidification-flow release validator"
+Assert-FileExists -Path $idealLoadsCoupledCoolingHumidificationFlowValidation -Description "IdealLoads cooling humidification-flow release validator"
+Assert-FileExists -Path $idealLoadsCoupledOutputCoolingHumidificationFixture -Description "IdealLoads coupled-output cooling humidification-flow fixture"
 Assert-FileExists -Path $idealLoadsCouplingValidation -Description "IdealLoads release coupling validation"
 Assert-FileExists -Path $idealLoadsInput -Description "IdealLoads input boundary module"
 Assert-FileExists -Path $idealLoadsMeters -Description "IdealLoads meter binding module"
@@ -511,6 +542,11 @@ Assert-FileExists -Path $runPurchasedAirCoolingDehumidificationFlowSerialization
 Assert-FileExists -Path $runPurchasedAirCoolingDehumidificationFlowSnapshotSerialization -Description "ep_run PurchasedAir cooling dehumidification-flow snapshot JSON serializer"
 Assert-FileExists -Path $runPurchasedAirCoolingDehumidificationFlowValidation -Description "ep_run PurchasedAir cooling dehumidification-flow exact release validator"
 Assert-FileExists -Path $runPurchasedAirCoolingDehumidificationFlowSnapshotValidation -Description "ep_run PurchasedAir cooling dehumidification-flow snapshot validator"
+Assert-FileExists -Path $runPurchasedAirCoolingHumidificationFlow -Description "ep_run PurchasedAir cooling humidification-flow pipeline module"
+Assert-FileExists -Path $runPurchasedAirCoolingHumidificationFlowSerialization -Description "ep_run PurchasedAir cooling humidification-flow JSON serializer"
+Assert-FileExists -Path $runPurchasedAirCoolingHumidificationFlowSnapshotSerialization -Description "ep_run PurchasedAir cooling humidification-flow snapshot JSON serializer"
+Assert-FileExists -Path $runPurchasedAirCoolingHumidificationFlowValidation -Description "ep_run PurchasedAir cooling humidification-flow exact release validator"
+Assert-FileExists -Path $runPurchasedAirCoolingHumidificationFlowSnapshotValidation -Description "ep_run PurchasedAir cooling humidification-flow snapshot validator"
 Assert-FileExists -Path $runDirectZoneCoupledTests -Description "ep_run direct-Zone coupled integration tests"
 Assert-FileExists -Path $runRuntimeBoundaries -Description "ep_run runtime boundary assessment"
 Assert-FileExists -Path $runtimeOutputTests -Description "Runtime output registry tests"
@@ -596,6 +632,7 @@ Assert-LineLimit -Path $calcCoolingDehumidificationFlow -Limit 460 -Description 
 Assert-LineLimit -Path $calcCoolingDehumidificationFlowState -Limit 240 -Description "PurchasedAir Calc cooling dehumidification-flow persistent state"
 Assert-LineLimit -Path $calcCoolingDehumidificationFlowTransition -Limit 400 -Description "PurchasedAir Calc cooling dehumidification-flow transition"
 Assert-LineLimit -Path $calcCoolingDehumidificationFlowRelease -Limit 360 -Description "PurchasedAir Calc cooling dehumidification-flow release boundary"
+Assert-LineLimit -Path $calcCoolingDehumidificationFlowCompletedStateValidation -Limit 200 -Description "PurchasedAir Calc completed cooling dehumidification-flow validator for CP320"
 Assert-LineLimit -Path $calcCoolingDehumidificationFlowPredecessorValidation -Limit 240 -Description "PurchasedAir Calc cooling dehumidification-flow predecessor validation"
 Assert-LineLimit -Path $calcCoolingDehumidificationFlowRuntimeValidation -Limit 600 -Description "PurchasedAir Calc cooling dehumidification-flow runtime validation"
 Assert-LineLimit -Path $calcCoolingDehumidificationFlowSnapshotValidation -Limit 500 -Description "PurchasedAir Calc cooling dehumidification-flow exact snapshot validation"
@@ -605,6 +642,15 @@ Assert-LineLimit -Path $calcCoolingDehumidificationFlowSkipTests -Limit 260 -Des
 Assert-LineLimit -Path $calcCoolingDehumidificationFlowGateTests -Limit 360 -Description "PurchasedAir Calc cooling dehumidification-flow gate and IEEE tests"
 Assert-LineLimit -Path $calcCoolingDehumidificationFlowReleaseTests -Limit 460 -Description "PurchasedAir Calc cooling dehumidification-flow public release tests"
 Assert-LineLimit -Path $calcCoolingDehumidificationFlowReleaseCorruptionTests -Limit 360 -Description "PurchasedAir Calc cooling dehumidification-flow corruption tests"
+Assert-LineLimit -Path $calcCoolingHumidificationFlow -Limit 500 -Description "PurchasedAir Calc cooling humidification-flow module"
+Assert-LineLimit -Path $calcCoolingHumidificationFlowState -Limit 280 -Description "PurchasedAir Calc cooling humidification-flow persistent state"
+Assert-LineLimit -Path $calcCoolingHumidificationFlowTransition -Limit 460 -Description "PurchasedAir Calc cooling humidification-flow transition"
+Assert-LineLimit -Path $calcCoolingHumidificationFlowRelease -Limit 380 -Description "PurchasedAir Calc cooling humidification-flow release boundary"
+Assert-LineLimit -Path $calcCoolingHumidificationFlowPredecessorValidation -Limit 260 -Description "PurchasedAir Calc cooling humidification-flow predecessor validation"
+Assert-LineLimit -Path $calcCoolingHumidificationFlowRuntimeValidation -Limit 650 -Description "PurchasedAir Calc cooling humidification-flow runtime validation"
+Assert-LineLimit -Path $calcCoolingHumidificationFlowSnapshotValidation -Limit 560 -Description "PurchasedAir Calc cooling humidification-flow exact snapshot validation"
+Assert-LineLimit -Path $calcCoolingHumidificationFlowTests -Limit 440 -Description "PurchasedAir Calc cooling humidification-flow characterization tests"
+Assert-LineLimit -Path $calcCoolingHumidificationFlowReleaseTests -Limit 500 -Description "PurchasedAir Calc cooling humidification-flow public release tests"
 Assert-LineLimit -Path $calcHumidity -Limit 220 -Description "IdealLoads calc humidity module"
 Assert-LineLimit -Path $calcLimits -Limit 180 -Description "IdealLoads calc limits module"
 Assert-LineLimit -Path $calcMassFlow -Limit 150 -Description "IdealLoads calc mass-flow module"
@@ -645,6 +691,7 @@ Assert-LineLimit -Path $idealLoadsBindingCoolingEconomizerBodyTests -Limit 280 -
 Assert-LineLimit -Path $idealLoadsBindingCoolingEconomizerBodyIntegrityTests -Limit 220 -Description "IdealLoads binding cooling economizer true-body retained-state integrity tests"
 Assert-LineLimit -Path $idealLoadsBindingCoolingSensibleFlowTests -Limit 320 -Description "IdealLoads binding cooling sensible-flow transaction tests"
 Assert-LineLimit -Path $idealLoadsBindingCoolingDehumidificationFlowTests -Limit 360 -Description "IdealLoads binding cooling dehumidification-flow transaction tests"
+Assert-LineLimit -Path $idealLoadsBindingCoolingHumidificationFlowTests -Limit 400 -Description "IdealLoads binding cooling humidification-flow transaction tests"
 Assert-LineLimit -Path $idealLoadsCoupledMinimumOaValidation -Limit 240 -Description "IdealLoads minimum-OA release validator"
 Assert-LineLimit -Path $idealLoadsCoupledCoolingEntryValidation -Limit 240 -Description "IdealLoads cooling-entry release validator"
 Assert-LineLimit -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Limit 280 -Description "IdealLoads cooling OA maximum-flow release validator"
@@ -654,6 +701,8 @@ Assert-LineLimit -Path $idealLoadsCoupledCoolingEconomizerConditionValidation -L
 Assert-LineLimit -Path $idealLoadsCoupledCoolingEconomizerBodyValidation -Limit 320 -Description "IdealLoads cooling economizer true-body release validator"
 Assert-LineLimit -Path $idealLoadsCoupledCoolingSensibleFlowValidation -Limit 360 -Description "IdealLoads cooling sensible-flow release validator"
 Assert-LineLimit -Path $idealLoadsCoupledCoolingDehumidificationFlowValidation -Limit 400 -Description "IdealLoads cooling dehumidification-flow release validator"
+Assert-LineLimit -Path $idealLoadsCoupledCoolingHumidificationFlowValidation -Limit 440 -Description "IdealLoads cooling humidification-flow release validator"
+Assert-LineLimit -Path $idealLoadsCoupledOutputCoolingHumidificationFixture -Limit 120 -Description "IdealLoads coupled-output cooling humidification-flow fixture"
 Assert-LineLimit -Path $idealLoadsCouplingValidation -Limit 260 -Description "IdealLoads release coupling validation"
 Assert-LineLimit -Path $idealLoadsInput -Limit 260 -Description "IdealLoads input boundary module"
 Assert-LineLimit -Path $idealLoadsMeters -Limit 120 -Description "IdealLoads meter binding module"
@@ -709,6 +758,11 @@ Assert-LineLimit -Path $runPurchasedAirCoolingDehumidificationFlowSerialization 
 Assert-LineLimit -Path $runPurchasedAirCoolingDehumidificationFlowSnapshotSerialization -Limit 320 -Description "ep_run PurchasedAir cooling dehumidification-flow snapshot JSON serializer"
 Assert-LineLimit -Path $runPurchasedAirCoolingDehumidificationFlowValidation -Limit 400 -Description "ep_run PurchasedAir cooling dehumidification-flow exact release validator"
 Assert-LineLimit -Path $runPurchasedAirCoolingDehumidificationFlowSnapshotValidation -Limit 360 -Description "ep_run PurchasedAir cooling dehumidification-flow snapshot validator"
+Assert-LineLimit -Path $runPurchasedAirCoolingHumidificationFlow -Limit 540 -Description "ep_run PurchasedAir cooling humidification-flow pipeline module"
+Assert-LineLimit -Path $runPurchasedAirCoolingHumidificationFlowSerialization -Limit 360 -Description "ep_run PurchasedAir cooling humidification-flow JSON serializer"
+Assert-LineLimit -Path $runPurchasedAirCoolingHumidificationFlowSnapshotSerialization -Limit 360 -Description "ep_run PurchasedAir cooling humidification-flow snapshot JSON serializer"
+Assert-LineLimit -Path $runPurchasedAirCoolingHumidificationFlowValidation -Limit 440 -Description "ep_run PurchasedAir cooling humidification-flow exact release validator"
+Assert-LineLimit -Path $runPurchasedAirCoolingHumidificationFlowSnapshotValidation -Limit 400 -Description "ep_run PurchasedAir cooling humidification-flow snapshot validator"
 
 Assert-Contains -Path $calcRoot -Pattern 'mod humidity;' -Description "IdealLoads calc humidity submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod cooling_entry_gate;' -Description "PurchasedAir Calc cooling-entry gate submodule declaration"
@@ -746,6 +800,11 @@ Assert-Contains -Path $calcRoot -Pattern 'mod cooling_dehumidification_flow_test
 Assert-Contains -Path $calcRoot -Pattern 'mod cooling_dehumidification_flow_release_tests;' -Description "PurchasedAir Calc cooling dehumidification-flow release test module declaration"
 Assert-Contains -Path $calcRoot -Pattern 'pub use cooling_dehumidification_flow::\*;' -Description "PurchasedAir Calc cooling dehumidification-flow public re-export"
 Assert-NotContains -Path $calcRoot -Pattern 'pub fn advance_direct_no_oa_calc_cooling_dehumidification_flow\s*\(' -Description "cooling dehumidification-flow transition implementation in calc module root"
+Assert-Contains -Path $calcRoot -Pattern 'mod cooling_humidification_flow;' -Description "PurchasedAir Calc cooling humidification-flow submodule declaration"
+Assert-Contains -Path $calcRoot -Pattern 'mod cooling_humidification_flow_tests;' -Description "PurchasedAir Calc cooling humidification-flow test module declaration"
+Assert-Contains -Path $calcCoolingHumidificationFlowTests -Pattern '#\[path = "cooling_humidification_flow_release_tests\.rs"\]\s*[\r\n]+\s*mod release_tests;' -Description "PurchasedAir Calc cooling humidification-flow nested release test module declaration"
+Assert-Contains -Path $calcRoot -Pattern 'pub use cooling_humidification_flow::\*;' -Description "PurchasedAir Calc cooling humidification-flow public re-export"
+Assert-NotContains -Path $calcRoot -Pattern 'pub fn advance_direct_no_oa_calc_cooling_humidification_flow\s*\(' -Description "cooling humidification-flow transition implementation in calc module root"
 Assert-Contains -Path $calcRoot -Pattern 'mod lifecycle;' -Description "PurchasedAir Calc-entry lifecycle submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod lifecycle_tests;' -Description "PurchasedAir Calc-entry lifecycle test module declaration"
 Assert-Contains -Path $calcRoot -Pattern 'pub use lifecycle::\*;' -Description "PurchasedAir Calc-entry lifecycle public re-export"
@@ -2002,6 +2061,175 @@ Assert-Contains -Path $idealLoadsBindingCoolingDehumidificationFlowTests -Patter
 Assert-Contains -Path $idealLoadsBindingCoolingDehumidificationFlowTests -Pattern 'scheduled_binding_records_unit_off_and_non_cooling_cp319_skips' -Description "CP319 scheduled skip binding regression"
 Assert-Contains -Path $idealLoadsBindingCoolingDehumidificationFlowTests -Pattern 'public_cooling_dehumidification_flow_replay_is_whole_state_transactional' -Description "CP319 scheduled replay transaction regression"
 
+Assert-Contains -Path $calcCoolingHumidificationFlow -Pattern 'pub const PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE' -Description "Calc cooling humidification-flow source provenance"
+Assert-Contains -Path $calcCoolingHumidificationFlow -Pattern 'pub const PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE' -Description "Calc cooling humidification-flow first excluded source"
+Assert-Contains -Path $calcCoolingHumidificationFlow -Pattern 'pub const PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER' -Description "Calc cooling humidification-flow exact source order"
+Assert-Contains -Path $calcCoolingHumidificationFlow -Pattern 'EnergyPlus 26\.1 PurchasedAirManager\.cc:2133-2144' -Description "Calc cooling humidification-flow exact CP320 boundary"
+Assert-Contains -Path $calcCoolingHumidificationFlow -Pattern 'EnergyPlus 26\.1 PurchasedAirManager\.cc:2147' -Description "Calc cooling humidification-flow exact first excluded executable"
+Assert-ExactStringArray -Path $calcCoolingHumidificationFlow -Name "PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER" -Expected @(
+    "assign-supply-mass-flow-rate-for-humidification-zero",
+    "read-heating-on",
+    "enter-heating-on-body-if-true",
+    "read-humidification-control-type",
+    "compare-humidification-control-type-equal-to-humidistat",
+    "enter-humidistat-control-body-if-matched",
+    "read-dehumidification-control-type-for-humidistat-comparison",
+    "compare-dehumidification-control-type-equal-to-humidistat",
+    "read-dehumidification-control-type-for-none-comparison-after-first-false",
+    "compare-dehumidification-control-type-equal-to-none",
+    "enter-admitted-humidification-body-if-control-condition-satisfied",
+    "read-zone-humidifying-setpoint-moisture-demand",
+    "assign-local-zone-humidifying-setpoint-moisture-demand",
+    "read-maximum-heating-supply-air-humidity-ratio",
+    "read-zone-node-humidity-ratio",
+    "subtract-zone-humidity-ratio-from-maximum-heating-supply-air-humidity-ratio",
+    "assign-local-delta-humidity-ratio",
+    "read-delta-humidity-ratio-for-small-difference-gate",
+    "compare-strict-delta-humidity-ratio-above-small-delta-humidity-ratio",
+    "read-zone-humidifying-setpoint-moisture-demand-after-delta-match",
+    "compare-strict-zone-humidifying-setpoint-moisture-demand-above-zero",
+    "enter-humidification-flow-body-if-compound-condition-satisfied",
+    "reread-zone-humidifying-setpoint-moisture-demand-for-division",
+    "reread-delta-humidity-ratio-for-division",
+    "calculate-zone-humidifying-setpoint-moisture-demand-divided-by-delta-humidity-ratio",
+    "assign-supply-mass-flow-rate-for-humidification"
+) -Description "Calc cooling humidification-flow exact twenty-six-site source order"
+Assert-Contains -Path $calcCoolingHumidificationFlow -Pattern 'PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SMALL_DELTA_HUMIDITY_RATIO: f64\s*=\s*0\.00025' -Description "Calc cooling humidification-flow exact SmallDeltaHumRat"
+Assert-Contains -Path $calcCoolingHumidificationFlow -Pattern 'pub\(in crate::ideal_loads::calc\) mod release;' -Description "Calc cooling humidification-flow bounded release submodule"
+Assert-Contains -Path $calcCoolingHumidificationFlow -Pattern 'mod state;' -Description "Calc cooling humidification-flow state submodule"
+Assert-Contains -Path $calcCoolingHumidificationFlow -Pattern 'mod transition;' -Description "Calc cooling humidification-flow transition submodule"
+Assert-Contains -Path $calcCoolingHumidificationFlow -Pattern 'pub use release::\*;' -Description "Calc cooling humidification-flow release re-export"
+Assert-Contains -Path $calcCoolingHumidificationFlow -Pattern 'pub use state::PurchasedAirCalcCoolingHumidificationFlowRuntimeState;' -Description "Calc cooling humidification-flow state re-export"
+Assert-Contains -Path $calcCoolingHumidificationFlow -Pattern 'pub struct PurchasedAirCalcCoolingHumidificationFlowSnapshot' -Description "Calc cooling humidification-flow source-ordered snapshot"
+Assert-Contains -Path $calcCoolingHumidificationFlowState -Pattern 'pub struct PurchasedAirCalcCoolingHumidificationFlowRuntimeState' -Description "Calc cooling humidification-flow persistent state"
+Assert-Contains -Path $calcCoolingHumidificationFlow -Pattern 'pub struct PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary' -Description "Calc cooling humidification-flow lifecycle summary"
+Assert-Contains -Path $calcCoolingHumidificationFlow -Pattern 'pub fn purchased_air_calc_cooling_humidification_flow_lifecycle_summary\s*\(' -Description "Calc cooling humidification-flow lifecycle summary accessor"
+Assert-Contains -Path $calcCoolingHumidificationFlowState -Pattern 'pub cooling_body_entry_count: usize' -Description "Calc cooling humidification-flow common Cooling reconvergence counter"
+Assert-Contains -Path $calcCoolingHumidificationFlowState -Pattern 'pub reset_assignment_count: usize' -Description "Calc cooling humidification-flow positive-zero reset counter"
+Assert-Contains -Path $calcCoolingHumidificationFlowState -Pattern 'pub heating_on_fallthrough_count: usize' -Description "Calc cooling humidification-flow HeatOn fallthrough counter"
+Assert-Contains -Path $calcCoolingHumidificationFlowState -Pattern 'pub dehumidification_control_type_second_read_count: usize' -Description "Calc cooling humidification-flow repeated selector read counter"
+Assert-Contains -Path $calcCoolingHumidificationFlowState -Pattern 'pub delta_fallthrough_count: usize' -Description "Calc cooling humidification-flow delta gate fallthrough counter"
+Assert-Contains -Path $calcCoolingHumidificationFlowState -Pattern 'pub moisture_demand_fallthrough_count: usize' -Description "Calc cooling humidification-flow moisture gate fallthrough counter"
+Assert-Contains -Path $calcCoolingHumidificationFlowState -Pattern 'pub\(super\) latest_route:' -Description "Calc cooling humidification-flow private retained route"
+Assert-Contains -Path $calcCoolingHumidificationFlowState -Pattern 'pub\(super\) latest_transition_ordinal:' -Description "Calc cooling humidification-flow private retained generation"
+Assert-NotContains -Path $calcCoolingHumidificationFlow -Pattern '#\[test\]' -Description "unit test body in cooling humidification-flow facade"
+
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern 'pub\(in crate::ideal_loads::calc\) fn advance_cooling_humidification_flow_state\s*\(' -Description "Calc cooling humidification-flow pure source transition"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern 'predecessor: PurchasedAirCalcCoolingDehumidificationFlowSnapshot' -Description "Calc cooling humidification-flow immediate CP319 predecessor type"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern 'let cooling = predecessor\.cooling_body_entered;' -Description "Calc cooling humidification-flow immediate CP319 Cooling reconvergence"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern 'let reset = cooling\.then_some\(0\.0_f64\);' -Description "Calc cooling humidification-flow positive-zero reset"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern '(?s)let heating_on = if cooling \{\s*Some\(input\.heating_on\)\s*\} else \{\s*None\s*\};' -Description "Calc cooling humidification-flow lazy retained HeatOn read"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern '(?s)let humid_control = if heating_body \{\s*Some\(input\.humidification_control_type\)\s*\} else \{\s*None\s*\};' -Description "Calc cooling humidification-flow lazy outer selector read"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern 'HumidificationControlType::Humidistat' -Description "Calc cooling humidification-flow outer Humidistat comparison"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern '(?s)let first_dehumid_control = if humid_body \{\s*Some\(input\.dehumidification_control_type\)\s*\} else \{\s*None\s*\};' -Description "Calc cooling humidification-flow lazy first nested selector read"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern '(?s)let second_dehumid_control = if dehumid_is_humidistat == Some\(false\) \{\s*Some\(input\.dehumidification_control_type\)\s*\} else \{\s*None\s*\};' -Description "Calc cooling humidification-flow repeated nested selector read after first false"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern 'second_dehumid_control\.map\(\|value\| value == DehumidificationControlType::None\)' -Description "Calc cooling humidification-flow second nested None comparison"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern 'dehumid_is_humidistat == Some\(true\) \|\| dehumid_is_none == Some\(true\)' -Description "Calc cooling humidification-flow left-to-right nested selector OR"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern '(?s)let demand = if controls_admitted \{\s*Some\(input\.zone_humidifying_setpoint_moisture_demand_kg_per_s\)\s*\} else \{\s*None\s*\};' -Description "Calc cooling humidification-flow lazy moisture-demand read"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern '(?s)let max_supply = if controls_admitted \{\s*Some\(input\.maximum_heating_supply_air_humidity_ratio_kg_water_per_kg_dry_air\)\s*\} else \{\s*None\s*\};' -Description "Calc cooling humidification-flow lazy maximum supply humidity read"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern '(?s)let zone = if controls_admitted \{\s*Some\(input\.zone_humidity_ratio_kg_water_per_kg_dry_air\)\s*\} else \{\s*None\s*\};' -Description "Calc cooling humidification-flow lazy Zone humidity read"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern 'max_supply\.zip\(zone\)\.map\(\|\(supply, zone\)\| supply - zone\)' -Description "Calc cooling humidification-flow source humidity subtraction"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern 'value > PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SMALL_DELTA_HUMIDITY_RATIO' -Description "Calc cooling humidification-flow strict positive SmallDeltaHumRat gate"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern '(?s)let demand_gate = if delta_above == Some\(true\) \{\s*demand\s*\} else \{\s*None\s*\};' -Description "Calc cooling humidification-flow left-to-right compound short circuit"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern 'demand_gate\.map\(\|value\| value > 0\.0\)' -Description "Calc cooling humidification-flow strict positive moisture-demand gate"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern '\.map\(\|\(demand, delta\)\| demand / delta\)' -Description "Calc cooling humidification-flow raw source division"
+Assert-Contains -Path $calcCoolingHumidificationFlowTransition -Pattern 'predecessor_cooling_body_entered: predecessor\.cooling_body_entered' -Description "Calc cooling humidification-flow immediate CP319 snapshot link"
+Assert-NotContains -Path $calcCoolingHumidificationFlowTransition -Pattern 'predecessor_cooling_body_entered: predecessor\.predecessor_cooling_body_entered' -Description "stale transitive CP318 link in CP320 snapshot"
+Assert-NotContains -Path $calcCoolingHumidificationFlowTransition -Pattern '\.then_some\s*\(\s*input\.' -Description "eager conditional CP320 source input read"
+Assert-NotContains -Path $calcCoolingHumidificationFlowTransition -Pattern '\.is_finite\(\)' -Description "finite normalization in pure CP320 characterization"
+Assert-NotContains -Path $calcCoolingHumidificationFlowTransition -Pattern '\.(?:abs|clamp|min|max)\s*\(' -Description "normalizing or limiting rewrite in CP320"
+Assert-NotContains -Path $calcCoolingHumidificationFlowTransition -Pattern 'input\.cooling_on|zone_dehumidifying_setpoint|minimum_cooling_supply|below_negative|demand < 0\.0' -Description "stale CP319 semantics in CP320 transition"
+
+Assert-Contains -Path $idealLoadsInitState -Pattern '(?s)cooling_humidification_flow_latest_witnesses:\s*BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidificationFlowSnapshot>' -Description "runtime-root default-empty per-system CP320 witness map"
+Assert-NotContains -Path $idealLoadsInitState -Pattern '(?m)^\s*pub(?:\([^)]*\))?\s+cooling_humidification_flow_latest_witnesses:' -Description "public runtime-root CP320 witness map"
+Assert-Contains -Path $idealLoadsInitState -Pattern 'pub\(in crate::ideal_loads\) fn cooling_humidification_flow_latest_witness\s*\(' -Description "ideal_loads-scoped runtime-root CP320 witness getter"
+Assert-Contains -Path $idealLoadsInitState -Pattern 'pub\(in crate::ideal_loads\) fn set_cooling_humidification_flow_latest_witness\s*\(' -Description "ideal_loads-scoped runtime-root CP320 witness setter"
+Assert-Contains -Path $idealLoadsInitState -Pattern 'pub calc_cooling_humidification_flow:\s*PurchasedAirCalcCoolingHumidificationFlowRuntimeState' -Description "per-unit CP320 persistent state"
+Assert-Contains -Path $calcCoolingDehumidificationFlowCompletedStateValidation -Pattern 'pub\(super\) fn completed_dehumidification_flow_state_is_consistent\s*\(' -Description "CP319 completed-state validator for CP320"
+Assert-Contains -Path $calcCoolingDehumidificationFlowCompletedStateValidation -Pattern 'consumer_witness' -Description "CP319 exact CP320 consumer-witness validation"
+Assert-Contains -Path $calcCoolingDehumidificationFlowRelease -Pattern 'pub\(in crate::ideal_loads::calc\) fn completed_direct_cooling_dehumidification_flow_is_consistent\s*\(' -Description "CP319 narrow completed-state export for CP320"
+
+Assert-Contains -Path $calcCoolingHumidificationFlowRelease -Pattern 'pub enum PurchasedAirCalcCoolingHumidificationFlowError' -Description "Calc cooling humidification-flow fail-closed error"
+Assert-Contains -Path $calcCoolingHumidificationFlowRelease -Pattern '(?s)pub fn advance_direct_no_oa_calc_cooling_humidification_flow\s*\(\s*runtime:\s*&mut PurchasedAirRuntimeState,\s*system:\s*&IdealLoadsAirSystem,\s*predecessor_cp319:\s*PurchasedAirCalcCoolingDehumidificationFlowSnapshot,\s*\)' -Description "Calc cooling humidification-flow exact no-service public release signature"
+Assert-NotContains -Path $calcCoolingHumidificationFlowRelease -Pattern 'ZoneHeatBalanceState' -Description "live Zone state argument in CP320 public release"
+Assert-Contains -Path $calcCoolingHumidificationFlowRelease -Pattern 'PredecessorCallOrder' -Description "CP310-through-CP320 one-for-one source-order guard"
+Assert-Contains -Path $calcCoolingHumidificationFlowRelease -Pattern 'PredecessorOutsideDirectSubset' -Description "CP320 exact predecessor-shape guard"
+Assert-Contains -Path $calcCoolingHumidificationFlowRelease -Pattern 'classify_no_oa_sensible_subset\(system\)\.is_supported\(\)' -Description "CP320 exact no-OA release subset validation"
+Assert-Contains -Path $calcCoolingHumidificationFlowRelease -Pattern 'system\.humidification_control_type != HumidificationControlType::None' -Description "CP320 explicit outer HumidificationControl None guard"
+Assert-Contains -Path $calcCoolingHumidificationFlowRelease -Pattern 'system\.dehumidification_control_type != DehumidificationControlType::None' -Description "CP320 explicit nested DehumidificationControl None guard"
+Assert-Contains -Path $calcCoolingHumidificationFlowRelease -Pattern '(?s)let heating_on = unit\s*\.calc_entry\s*\.latest.*?\.heating_on;' -Description "CP320 retained same-call HeatOn derivation"
+Assert-Contains -Path $calcCoolingHumidificationFlowRelease -Pattern 'zone_humidifying_setpoint_moisture_demand_kg_per_s: f64::NAN' -Description "CP320 poisoned skipped live moisture input"
+Assert-Contains -Path $calcCoolingHumidificationFlowRelease -Pattern 'maximum_heating_supply_air_humidity_ratio_kg_water_per_kg_dry_air: f64::NAN' -Description "CP320 poisoned skipped maximum supply humidity input"
+Assert-Contains -Path $calcCoolingHumidificationFlowRelease -Pattern 'zone_humidity_ratio_kg_water_per_kg_dry_air: f64::NAN' -Description "CP320 poisoned skipped live Zone humidity input"
+Assert-PatternsInOrder -Path $calcCoolingHumidificationFlowRelease -Patterns @(
+    'completed_direct_cooling_dehumidification_flow_is_consistent',
+    'pending_humidification_flow_state_is_consistent',
+    '\.get_mut\(&selected\)',
+    'advance_cooling_humidification_flow_state',
+    'set_cooling_humidification_flow_latest_witness\(selected, snapshot\)'
+) -Description "CP320 validation-before-mutation and witness publication order"
+Assert-Contains -Path $calcCoolingHumidificationFlowPredecessorValidation -Pattern 'pub\(super\) fn humidification_flow_links_to_dehumidification_flow\s*\(' -Description "CP320 immediate predecessor-link validator"
+Assert-Contains -Path $calcCoolingHumidificationFlowSnapshotValidation -Pattern 'pub\(in crate::ideal_loads\) fn cooling_humidification_flow_snapshot_is_exact_direct_release\s*\(' -Description "CP320 crate-private exact direct snapshot validator"
+Assert-Contains -Path $calcCoolingHumidificationFlowSnapshotValidation -Pattern 'snapshot\.humidification_control_type == Some\(HumidificationControlType::None\)' -Description "CP320 exact direct outer selector fallthrough"
+Assert-Contains -Path $calcCoolingHumidificationFlowSnapshotValidation -Pattern 'downstream_sites_are_skipped\(snapshot\)' -Description "CP320 exact direct no-live-service sites"
+Assert-Contains -Path $calcCoolingHumidificationFlowSnapshotValidation -Pattern 'value\.to_bits\(\) == expected\.to_bits\(\)' -Description "CP320 signed-zero bitwise validation"
+Assert-Contains -Path $calcCoolingHumidificationFlowRuntimeValidation -Pattern 'call_order_is_pending_humidification_flow' -Description "CP320 pending one-for-one call-order validator"
+Assert-Contains -Path $calcCoolingHumidificationFlowRuntimeValidation -Pattern 'humidification_control_type_humidistat_count == 0' -Description "CP320 direct outer selector-false lifecycle invariant"
+Assert-Contains -Path $calcCoolingHumidificationFlowRuntimeValidation -Pattern 'downstream_counts_are_zero' -Description "CP320 direct no-live-service counter invariant"
+Assert-Contains -Path $calcCoolingHumidificationFlowRuntimeValidation -Pattern 'cooling_humidification_flow_snapshot_route\(latest\) == Some\(route\)' -Description "CP320 private retained-route validation"
+
+$coolingHumidificationFlowForbiddenBehaviorPatterns = @(
+    [pscustomobject]@{ Pattern = 'SupplyMassFlowRateForCool|SupplyMassFlowRateForDehum'; Description = "prior cooling-flow assignment in CP320 boundary" },
+    [pscustomobject]@{ Pattern = 'CalcPurchAirMixedAir|VerySmallMassFlow'; Description = "excluded mixed-air or later flow cutoff in CP320 boundary" },
+    [pscustomobject]@{ Pattern = '\b(?:EMS|Ems)\b|ems_override'; Description = "excluded EMS behavior in CP320 boundary" },
+    [pscustomobject]@{ Pattern = 'humidistat_(?:humidification|dehumidification)_mass_flow_rate_kg_per_s'; Description = "later normalized humidity helper reuse in CP320 boundary" },
+    [pscustomobject]@{ Pattern = '\b(?:calc_no_oa|cooling_mass_flow_candidate|sensible_mass_flow)\b'; Description = "pre-existing numerical helper reuse in CP320 boundary" },
+    [pscustomobject]@{ Pattern = 'energyplus_psy_|psychrometric'; Description = "psychrometric work outside CP320 boundary" },
+    [pscustomobject]@{ Pattern = '\.max\s*\(\s*0\.0'; Description = "positive normalization in CP320 boundary" },
+    [pscustomobject]@{ Pattern = '\bstatic\s+mut\b|\bOnceLock\b'; Description = "mutable static cache ownership in CP320 boundary" }
+)
+foreach ($coolingHumidificationFlowBoundaryFile in @(
+    $calcCoolingHumidificationFlow,
+    $calcCoolingHumidificationFlowState,
+    $calcCoolingHumidificationFlowTransition,
+    $calcCoolingHumidificationFlowRelease,
+    $calcCoolingHumidificationFlowPredecessorValidation,
+    $calcCoolingHumidificationFlowRuntimeValidation,
+    $calcCoolingHumidificationFlowSnapshotValidation
+)) {
+    foreach ($forbiddenBehavior in $coolingHumidificationFlowForbiddenBehaviorPatterns) {
+        Assert-NotContains -Path $coolingHumidificationFlowBoundaryFile -Pattern $forbiddenBehavior.Pattern -Description $forbiddenBehavior.Description
+    }
+}
+foreach ($coolingHumidificationFlowPostBoundaryFile in @(
+    $calcCoolingHumidificationFlowState,
+    $calcCoolingHumidificationFlowTransition,
+    $calcCoolingHumidificationFlowRelease,
+    $calcCoolingHumidificationFlowPredecessorValidation,
+    $calcCoolingHumidificationFlowRuntimeValidation,
+    $calcCoolingHumidificationFlowSnapshotValidation
+)) {
+    Assert-NotContains -Path $coolingHumidificationFlowPostBoundaryFile -Pattern 'PurchasedAirManager\.cc:2147|PurchasedAirManager\.cc:2155|capacity.*zero' -Description "post-CP320 source behavior in CP320 implementation"
+}
+Assert-Contains -Path $calcCoolingHumidificationFlowTests -Pattern 'source_boundary_and_all_twenty_six_sites_are_stable' -Description "CP320 exact source-boundary regression"
+Assert-Contains -Path $calcCoolingHumidificationFlowTests -Pattern 'cp320_links_to_the_immediate_cp319_cooling_body' -Description "CP320 immediate-predecessor link regression"
+Assert-Contains -Path $calcCoolingHumidificationFlowTests -Pattern 'humidistat_dehumidification_short_circuits_second_or_read' -Description "CP320 nested Humidistat OR short-circuit regression"
+Assert-Contains -Path $calcCoolingHumidificationFlowTests -Pattern 'none_dehumidification_requires_the_second_repeated_read' -Description "CP320 repeated None selector read regression"
+Assert-Contains -Path $calcCoolingHumidificationFlowTests -Pattern 'non_humidistat_outer_control_skips_every_live_input' -Description "CP320 outer selector lazy-read regression"
+Assert-Contains -Path $calcCoolingHumidificationFlowTests -Pattern 'false_heating_availability_stops_before_control_reads' -Description "CP320 HeatOn-false lazy-read regression"
+Assert-Contains -Path $calcCoolingHumidificationFlowTests -Pattern 'other_dehumidification_control_repeats_read_then_rejects_body' -Description "CP320 nested selector reject regression"
+Assert-Contains -Path $calcCoolingHumidificationFlowTests -Pattern 'strict_positive_delta_gate_short_circuits_demand_gate_at_equality' -Description "CP320 strict delta threshold short-circuit regression"
+Assert-Contains -Path $calcCoolingHumidificationFlowTests -Pattern 'positive_zero_demand_falls_through_strict_second_gate' -Description "CP320 strict moisture threshold signed-zero regression"
+Assert-Contains -Path $calcCoolingHumidificationFlowTests -Pattern 'raw_ieee_division_is_not_normalized' -Description "CP320 raw IEEE division regression"
+Assert-Contains -Path $calcCoolingHumidificationFlowTests -Pattern 'unit_off_and_non_cooling_skip_all_sites' -Description "CP320 complete skip regression"
+Assert-Contains -Path $calcCoolingHumidificationFlowReleaseTests -Pattern 'active_direct_route_uses_retained_heating_on_and_skips_live_services' -Description "CP320 exact public active-release regression"
+Assert-Contains -Path $calcCoolingHumidificationFlowReleaseTests -Pattern 'non_cooling_release_skips_all_twenty_six_sites' -Description "CP320 public non-cooling skip regression"
+Assert-Contains -Path $calcCoolingHumidificationFlowReleaseTests -Pattern 'failure_is_transactional' -Description "CP320 unsupported-selector transaction regression"
+Assert-Contains -Path $calcCoolingHumidificationFlowReleaseTests -Pattern 'corrupted_pending_state_fails_without_partial_mutation' -Description "CP320 corrupted-state transaction regression"
+Assert-Contains -Path $idealLoadsBindingCoolingHumidificationFlowTests -Pattern 'scheduled_binding_executes_cooling_humidification_flow_before_numerical_coupling' -Description "CP320 scheduled active-cooling binding regression"
+Assert-Contains -Path $idealLoadsBindingCoolingHumidificationFlowTests -Pattern 'scheduled_binding_records_unit_off_and_non_cooling_cp320_skips' -Description "CP320 scheduled skip binding regression"
+Assert-Contains -Path $idealLoadsBindingCoolingHumidificationFlowTests -Pattern 'public_cooling_humidification_flow_replay_is_whole_state_transactional' -Description "CP320 scheduled replay transaction regression"
+
 Assert-Contains -Path $idealLoadsInit -Pattern 'pub struct IdealLoadsInitFlags' -Description "IdealLoads init flags type"
 Assert-Contains -Path $idealLoadsInit -Pattern 'mod manager_plan;' -Description "IdealLoads immutable manager-plan module"
 Assert-Contains -Path $idealLoadsInit -Pattern 'mod manager_plan_tests;' -Description "IdealLoads manager-plan test module"
@@ -2193,6 +2421,10 @@ Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'a
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'CalculationCoolingDehumidificationFlow\(PurchasedAirCalcCoolingDehumidificationFlowError\)' -Description "Calc cooling dehumidification-flow scheduled binding error boundary"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'pub calculation_cooling_dehumidification_flow:\s*[\r\n]+\s*PurchasedAirCalcCoolingDehumidificationFlowSnapshot' -Description "Calc cooling dehumidification-flow scheduled output evidence"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'advance_direct_no_oa_calc_cooling_dehumidification_flow\s*\(' -Description "Calc cooling dehumidification-flow scheduled release call"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding_tests.rs" -Pattern '#\[path = "binding/cooling_humidification_flow_tests\.rs"\]' -Description "Calc cooling humidification-flow binding test module path"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'CalculationCoolingHumidificationFlow\(PurchasedAirCalcCoolingHumidificationFlowError\)' -Description "Calc cooling humidification-flow scheduled binding error boundary"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'pub calculation_cooling_humidification_flow:\s*PurchasedAirCalcCoolingHumidificationFlowSnapshot' -Description "Calc cooling humidification-flow scheduled output evidence"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'advance_direct_no_oa_calc_cooling_humidification_flow\s*\(' -Description "Calc cooling humidification-flow scheduled release call"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'zone_component_availability:\s*Some\(PurchasedAirAvailabilityStatus::NoAction\)' -Description "release allocated ZoneComp NoAction visit"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'PurchasedAirTemperatureControlType::DualHeatCool' -Description "release prevalidated DualHeatCool cooling-entry input"
 $bindingText = Read-RepoText -Path "crates\ep_runtime\src\ideal_loads\binding.rs"
@@ -2207,6 +2439,7 @@ $bindingCoolingEconomizerConditionIndex = $bindingText.IndexOf("let calculation_
 $bindingCoolingEconomizerBodyIndex = $bindingText.IndexOf("let calculation_cooling_economizer_body =")
 $bindingCoolingSensibleFlowIndex = $bindingText.IndexOf("let calculation_cooling_sensible_flow =")
 $bindingCoolingDehumidificationFlowIndex = $bindingText.IndexOf("let calculation_cooling_dehumidification_flow =")
+$bindingCoolingHumidificationFlowIndex = $bindingText.IndexOf("let calculation_cooling_humidification_flow =")
 $bindingCalcIndex = $bindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
 $bindingCoolingEconomizerConditionCall = [regex]::Match(
     $bindingText,
@@ -2224,6 +2457,10 @@ $bindingCoolingDehumidificationFlowCall = [regex]::Match(
     $bindingText,
     '(?s)let calculation_cooling_dehumidification_flow =\s*advance_direct_no_oa_calc_cooling_dehumidification_flow\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_sensible_flow,\s*\)\s*\.map_err\(\s*DirectZonePurchasedAirScheduledCouplingError::\s*CalculationCoolingDehumidificationFlow,?\s*\)\?;'
 )
+$bindingCoolingHumidificationFlowCall = [regex]::Match(
+    $bindingText,
+    '(?s)let calculation_cooling_humidification_flow =\s*advance_direct_no_oa_calc_cooling_humidification_flow\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_dehumidification_flow,\s*\)\s*\.map_err\(\s*DirectZonePurchasedAirScheduledCouplingError::\s*CalculationCoolingHumidificationFlow,?\s*\)\?;'
+)
 if (
     $bindingInitIndex -lt 0 -or
     $bindingCalcEntryIndex -le $bindingInitIndex -or
@@ -2236,9 +2473,10 @@ if (
     $bindingCoolingEconomizerBodyIndex -le $bindingCoolingEconomizerConditionIndex -or
     $bindingCoolingSensibleFlowIndex -le $bindingCoolingEconomizerBodyIndex -or
     $bindingCoolingDehumidificationFlowIndex -le $bindingCoolingSensibleFlowIndex -or
-    $bindingCalcIndex -le $bindingCoolingDehumidificationFlowIndex
+    $bindingCoolingHumidificationFlowIndex -le $bindingCoolingDehumidificationFlowIndex -or
+    $bindingCalcIndex -le $bindingCoolingHumidificationFlowIndex
 ) {
-    throw "InitPurchasedAir must precede the Calc-entry prefix, minimum-OA prefix, cooling-entry gate, cooling OA maximum-flow gate, cooling OA maximum-flow true body, cooling economizer guard, cooling economizer condition, cooling economizer true body, cooling sensible flow, cooling dehumidification flow, and bounded numerical Calc coupling"
+    throw "InitPurchasedAir must precede the Calc-entry prefix, minimum-OA prefix, cooling-entry gate, cooling OA maximum-flow gate, cooling OA maximum-flow true body, cooling economizer guard, cooling economizer condition, cooling economizer true body, cooling sensible flow, cooling dehumidification flow, cooling humidification flow, and bounded numerical Calc coupling"
 }
 if (-not $bindingCoolingEconomizerConditionCall.Success) {
     throw "CP316 binding must call the exact no-node release wrapper with only runtime, system, and CP315 predecessor"
@@ -2251,6 +2489,9 @@ if (-not $bindingCoolingSensibleFlowCall.Success) {
 }
 if (-not $bindingCoolingDehumidificationFlowCall.Success) {
     throw "CP319 binding must call the exact no-service release wrapper with only runtime, system, and CP318 predecessor"
+}
+if (-not $bindingCoolingHumidificationFlowCall.Success) {
+    throw "CP320 binding must call the exact no-service release wrapper with only runtime, system, and CP319 predecessor"
 }
 $bindingCoolingEconomizerConditionCallEnd =
     $bindingCoolingEconomizerConditionCall.Index + $bindingCoolingEconomizerConditionCall.Length
@@ -2318,24 +2559,46 @@ if ($bindingPostCoolingSensibleFlowWindow -match '(?:\b[A-Za-z_][A-Za-z0-9_:]*|\
 $bindingCoolingDehumidificationFlowCallEnd =
     $bindingCoolingDehumidificationFlowCall.Index +
     $bindingCoolingDehumidificationFlowCall.Length
-if ($bindingCalcIndex -le $bindingCoolingDehumidificationFlowCallEnd) {
-    throw "CP319 exact release call must complete before the bounded numerical Calc coupling"
+if ($bindingCoolingHumidificationFlowIndex -lt $bindingCoolingDehumidificationFlowCallEnd) {
+    throw "CP319 exact release call must complete before CP320"
 }
-$bindingCoolingDehumidificationFlowToCalcWindow = $bindingText.Substring(
+$bindingCoolingDehumidificationFlowToHumidificationFlowWindow = $bindingText.Substring(
     $bindingCoolingDehumidificationFlowCall.Index,
-    $bindingCalcIndex - $bindingCoolingDehumidificationFlowCall.Index
+    $bindingCoolingHumidificationFlowIndex - $bindingCoolingDehumidificationFlowCall.Index
 )
 foreach ($forbiddenBehavior in $coolingDehumidificationFlowForbiddenBehaviorPatterns) {
-    if ($bindingCoolingDehumidificationFlowToCalcWindow -match $forbiddenBehavior.Pattern) {
-        throw "$($forbiddenBehavior.Description) unexpectedly present between CP319 and bounded numerical Calc coupling"
+    if ($bindingCoolingDehumidificationFlowToHumidificationFlowWindow -match $forbiddenBehavior.Pattern) {
+        throw "$($forbiddenBehavior.Description) unexpectedly present between CP319 and CP320"
     }
 }
 $bindingPostCoolingDehumidificationFlowWindow = $bindingText.Substring(
     $bindingCoolingDehumidificationFlowCallEnd,
-    $bindingCalcIndex - $bindingCoolingDehumidificationFlowCallEnd
+    $bindingCoolingHumidificationFlowIndex - $bindingCoolingDehumidificationFlowCallEnd
 )
 if ($bindingPostCoolingDehumidificationFlowWindow -match '(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)\s*\(') {
-    throw "No intermediary helper call may execute after CP319 and before the bounded numerical Calc coupling"
+    throw "No intermediary helper call may execute after CP319 and before CP320"
+}
+$bindingCoolingHumidificationFlowCallEnd =
+    $bindingCoolingHumidificationFlowCall.Index +
+    $bindingCoolingHumidificationFlowCall.Length
+if ($bindingCalcIndex -le $bindingCoolingHumidificationFlowCallEnd) {
+    throw "CP320 exact release call must complete before the bounded numerical Calc coupling"
+}
+$bindingCoolingHumidificationFlowToCalcWindow = $bindingText.Substring(
+    $bindingCoolingHumidificationFlowCall.Index,
+    $bindingCalcIndex - $bindingCoolingHumidificationFlowCall.Index
+)
+foreach ($forbiddenBehavior in $coolingHumidificationFlowForbiddenBehaviorPatterns) {
+    if ($bindingCoolingHumidificationFlowToCalcWindow -match $forbiddenBehavior.Pattern) {
+        throw "$($forbiddenBehavior.Description) unexpectedly present between CP320 and bounded numerical Calc coupling"
+    }
+}
+$bindingPostCoolingHumidificationFlowWindow = $bindingText.Substring(
+    $bindingCoolingHumidificationFlowCallEnd,
+    $bindingCalcIndex - $bindingCoolingHumidificationFlowCallEnd
+)
+if ($bindingPostCoolingHumidificationFlowWindow -match '(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)\s*\(') {
+    throw "No intermediary helper call may execute after CP320 and before the bounded numerical Calc coupling"
 }
 Assert-Contains -Path $calcLimits -Pattern 'initialized_heating_air_mass_flow_limit_kg_per_s' -Description "initialized heating flow cache input"
 Assert-Contains -Path $calcLimits -Pattern 'initialized_cooling_air_mass_flow_limit_kg_per_s' -Description "initialized cooling flow cache input"
@@ -3015,6 +3278,213 @@ foreach ($coolingDehumidificationFlowIntegrationFile in @(
     }
 }
 Assert-NotContains -Path $idealLoadsCoupledCoolingDehumidificationFlowValidation -Pattern '(?i)(?:resulting|assigned|calculated)_supply_mass_flow_rate_for_dehumidification.*\bcoupling\b|\bcoupling\b.*(?:resulting|assigned|calculated)_supply_mass_flow_rate_for_dehumidification' -Description "CP319 candidate bitwise reconciliation with unchanged numerical DTO"
+
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'mod cooling_humidification_flow_validation;' -Description "coupled runtime cooling humidification-flow validator submodule declaration"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'CalcCoolingHumidificationFlowLifecycle\(PurchasedAirCalcCoolingHumidificationFlowError\)' -Description "coupled runtime cooling humidification-flow summary error boundary"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'CalcCoolingHumidificationFlowLifecycleInvariant' -Description "coupled runtime cooling humidification-flow lifecycle invariant error"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'UnexpectedCalculationCoolingHumidificationFlow' -Description "coupled runtime cooling humidification-flow per-step error"
+Assert-Contains -Path $idealLoadsCoupledCoolingHumidificationFlowValidation -Pattern 'pub\(super\) fn snapshot_matches_release\s*\(' -Description "exact per-timestep cooling humidification-flow release validator"
+Assert-Contains -Path $idealLoadsCoupledCoolingHumidificationFlowValidation -Pattern 'pub\(super\) fn validate_lifecycle\s*\(' -Description "exact final cooling humidification-flow lifecycle validator"
+Assert-Contains -Path $idealLoadsCoupledCoolingHumidificationFlowValidation -Pattern 'pub\(super\) fn checked_add\s*\(' -Description "cooling humidification-flow checked counter arithmetic"
+Assert-Contains -Path $idealLoadsCoupledCoolingHumidificationFlowValidation -Pattern 'cooling_humidification_flow_snapshot_is_exact_direct_release\(flow\)' -Description "coupled cooling humidification-flow exact direct snapshot validator consumption"
+Assert-Contains -Path $idealLoadsCoupledCoolingHumidificationFlowValidation -Pattern 'flow\.predecessor_cooling_body_entered == predecessor\.cooling_body_entered' -Description "coupled cooling humidification-flow immediate CP319 predecessor link"
+Assert-Contains -Path $idealLoadsCoupledCoolingHumidificationFlowValidation -Pattern 'count!\(cooling_body_entry_count, numerical_cooling_count\)' -Description "coupled cooling humidification-flow mode-count reconciliation without value coupling"
+Assert-Contains -Path $idealLoadsCoupledCoolingHumidificationFlowValidation -Pattern 'count!\(humidification_control_type_humidistat_count, 0\)' -Description "coupled cooling humidification-flow exact direct outer selector invariant"
+Assert-Contains -Path $idealLoadsCoupledCoolingHumidificationFlowValidation -Pattern 'count!\(dehumidification_control_type_second_read_count, 0\)' -Description "coupled cooling humidification-flow exact direct nested selector no-read invariant"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern '(?s)cooling_humidification_flow_validation::snapshot_matches_release\(\s*output,\s*timestep_index \+ 1,\s*&binding,\s*\)' -Description "coupled runtime per-timestep CP320 validation"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern '(?s)cooling_humidification_flow_validation::validate_lifecycle\(\s*&calc_cooling_humidification_flow_lifecycle,\s*&calc_cooling_dehumidification_flow_lifecycle,\s*timestep_outputs\.len\(\),\s*numerical_cooling_count,\s*latest_output,\s*&binding,\s*\)' -Description "coupled runtime final CP320 validation"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'pub calc_cooling_humidification_flow_lifecycle:\s*[\r\n]+\s*PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary' -Description "coupled runtime cooling humidification-flow lifecycle summary"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs" -Pattern 'cooling_humidification_flow_partition_overflow_fails_closed' -Description "coupled cooling humidification-flow checked-arithmetic regression"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs" -Pattern '(?s)cooling_sensible_flow_lifecycle_records_unit_off_without_source_execution.*calc_cooling_humidification_flow_lifecycle' -Description "coupled cooling humidification-flow UnitOff skip regression"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\coupled_output_tests.rs" -Pattern 'calculation_cooling_humidification_flow' -Description "coupled output CP320 fixture ownership"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\coupled_output_tests.rs" -Pattern '#\[path = "coupled_output_tests/cooling_humidification_flow_fixture\.rs"\]' -Description "coupled output CP320 fixture module path"
+Assert-Contains -Path $idealLoadsCoupledOutputCoolingHumidificationFixture -Pattern 'pub\(super\) fn calculation_cooling_humidification_flow_snapshot\s*\(' -Description "coupled output CP320 snapshot fixture"
+
+Assert-Contains -Path $runPipeline -Pattern 'mod purchased_air_cooling_humidification_flow;' -Description "pipeline cooling humidification-flow evidence submodule declaration"
+Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlow -Pattern 'mod serialization;' -Description "pipeline cooling humidification-flow serializer submodule declaration"
+Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlow -Pattern 'mod validation;' -Description "pipeline cooling humidification-flow validator submodule declaration"
+Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlow -Pattern 'pub\(super\) use serialization::lifecycle_json;' -Description "pipeline cooling humidification-flow serializer re-export"
+Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlowSerialization -Pattern '(?s)pub\(in crate::pipeline\) fn lifecycle_json\s*\(\s*lifecycle:\s*&PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary,\s*\)\s*->\s*Value' -Description "pipeline cooling humidification-flow JSON ownership"
+Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlowSerialization -Pattern 'mod snapshot;' -Description "pipeline cooling humidification-flow snapshot serializer submodule declaration"
+Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlowSnapshotSerialization -Pattern 'pub\(super\) fn snapshot_json\s*\(' -Description "pipeline cooling humidification-flow snapshot JSON ownership"
+Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlowValidation -Pattern 'pub\(super\) fn validate_source_counters\s*\(' -Description "pipeline cooling humidification-flow exhaustive source-counter firewall"
+Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlowValidation -Pattern 'mod snapshot;' -Description "pipeline cooling humidification-flow snapshot validator submodule declaration"
+Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlowSnapshotValidation -Pattern 'pub\(in crate::pipeline\) fn snapshot_shape\s*\(' -Description "pipeline cooling humidification-flow exact snapshot firewall"
+Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlowSnapshotValidation -Pattern 'left\.to_bits\(\) == right\.to_bits\(\)' -Description "pipeline cooling humidification-flow signed-zero firewall"
+Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlow -Pattern '(?s)pub\(super\) fn validate_direct_lifecycle\s*\(\s*lifecycle:\s*Option<&PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary>,\s*predecessor_lifecycle:\s*Option<&PurchasedAirCalcCoolingDehumidificationFlowLifecycleSummary>,\s*init_lifecycle:\s*Option<&PurchasedAirInitLifecycleSummary>,\s*coupling_call_count:\s*Option<usize>,\s*\)\s*->\s*Result<\(\), String>' -Description "pipeline exact cooling humidification-flow firewall ownership"
+Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlow -Pattern 'PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER' -Description "pipeline cooling humidification-flow exact source-order validation"
+Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlow -Pattern 'PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE' -Description "pipeline cooling humidification-flow first-excluded validation"
+Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlow -Pattern 'let transition_partition = checked_add\s*\(' -Description "pipeline cooling humidification-flow checked transition partition"
+
+$coolingHumidificationFlowLinkFields = @(
+    "source",
+    "first_excluded_source",
+    "source_order",
+    "system",
+    "parent_call_ordinal",
+    "controlled_zone",
+    "unit_body_entered",
+    "predecessor_cooling_body_entered",
+    "unit_off_skipped",
+    "non_cooling_skipped",
+    "cooling_body_entered"
+)
+foreach ($field in $coolingHumidificationFlowLinkFields) {
+    $fieldPattern = [regex]::Escape($field)
+    Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlow -Pattern "flow\.$fieldPattern\b" -Description "pipeline cooling humidification-flow predecessor/provenance validation for $field"
+    Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlowSnapshotSerialization -Pattern "`"$fieldPattern`"" -Description "pipeline cooling humidification-flow snapshot JSON for $field"
+}
+
+$coolingHumidificationFlowSourceSnapshotFields = @(
+    "supply_mass_flow_rate_for_humidification_reset_assigned",
+    "reset_supply_mass_flow_rate_for_humidification_kg_per_s",
+    "heating_on_read",
+    "heating_on",
+    "heating_on_body_entered",
+    "humidification_control_type_read",
+    "humidification_control_type",
+    "humidification_control_type_humidistat",
+    "humidification_control_body_entered",
+    "dehumidification_control_type_first_read",
+    "first_dehumidification_control_type",
+    "dehumidification_control_type_humidistat",
+    "dehumidification_control_type_second_read",
+    "second_dehumidification_control_type",
+    "dehumidification_control_type_none",
+    "humidification_control_condition_admitted",
+    "zone_humidifying_setpoint_moisture_demand_read",
+    "zone_humidifying_setpoint_moisture_demand_kg_per_s",
+    "zone_humidifying_setpoint_moisture_demand_assigned",
+    "assigned_zone_humidifying_setpoint_moisture_demand_kg_per_s",
+    "maximum_heating_supply_air_humidity_ratio_read",
+    "maximum_heating_supply_air_humidity_ratio_kg_water_per_kg_dry_air",
+    "zone_humidity_ratio_read",
+    "zone_humidity_ratio_kg_water_per_kg_dry_air",
+    "delta_humidity_ratio_calculated",
+    "delta_humidity_ratio_kg_water_per_kg_dry_air",
+    "delta_humidity_ratio_assigned",
+    "assigned_delta_humidity_ratio_kg_water_per_kg_dry_air",
+    "delta_humidity_ratio_for_gate_read",
+    "delta_humidity_ratio_for_gate_kg_water_per_kg_dry_air",
+    "delta_humidity_ratio_comparison_evaluated",
+    "delta_humidity_ratio_above_small_delta",
+    "zone_humidifying_setpoint_moisture_demand_for_gate_read",
+    "zone_humidifying_setpoint_moisture_demand_for_gate_kg_per_s",
+    "zone_humidifying_setpoint_moisture_demand_comparison_evaluated",
+    "zone_humidifying_setpoint_moisture_demand_above_zero",
+    "humidification_flow_body_entered",
+    "zone_humidifying_setpoint_moisture_demand_for_division_read",
+    "zone_humidifying_setpoint_moisture_demand_for_division_kg_per_s",
+    "delta_humidity_ratio_for_division_read",
+    "delta_humidity_ratio_for_division_kg_water_per_kg_dry_air",
+    "supply_mass_flow_rate_for_humidification_calculated",
+    "calculated_supply_mass_flow_rate_for_humidification_kg_per_s",
+    "supply_mass_flow_rate_for_humidification_assigned",
+    "assigned_supply_mass_flow_rate_for_humidification_kg_per_s",
+    "resulting_supply_mass_flow_rate_for_humidification_kg_per_s"
+)
+if (
+    $coolingHumidificationFlowLinkFields.Count +
+    $coolingHumidificationFlowSourceSnapshotFields.Count -ne 57
+) {
+    throw "CP320 pipeline snapshot audit must enumerate all 57 public fields"
+}
+foreach ($field in $coolingHumidificationFlowSourceSnapshotFields) {
+    $fieldPattern = [regex]::Escape($field)
+    Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlowSnapshotValidation -Pattern "\b$fieldPattern\b" -Description "pipeline cooling humidification-flow snapshot validation for $field"
+    Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlowSnapshotSerialization -Pattern "`"$fieldPattern`"" -Description "pipeline cooling humidification-flow snapshot JSON for $field"
+}
+
+$coolingHumidificationFlowCommonLifecycleFields = @(
+    "system",
+    "transition_count",
+    "cooling_body_entry_count",
+    "unit_off_skip_count",
+    "non_cooling_skip_count",
+    "latest"
+)
+foreach ($field in $coolingHumidificationFlowCommonLifecycleFields) {
+    $fieldPattern = [regex]::Escape($field)
+    Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlow -Pattern "\b$fieldPattern\b" -Description "pipeline cooling humidification-flow lifecycle validation for $field"
+    Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlowSerialization -Pattern "`"$fieldPattern`"" -Description "pipeline cooling humidification-flow lifecycle JSON for $field"
+}
+
+$coolingHumidificationFlowCounterFields = @(
+    "reset_assignment_count",
+    "heating_on_read_count",
+    "heating_on_body_entry_count",
+    "heating_on_fallthrough_count",
+    "humidification_control_type_read_count",
+    "humidification_control_type_humidistat_count",
+    "humidification_control_type_fallthrough_count",
+    "humidification_control_body_entry_count",
+    "dehumidification_control_type_first_read_count",
+    "dehumidification_control_type_humidistat_count",
+    "dehumidification_control_type_second_read_count",
+    "dehumidification_control_type_none_count",
+    "dehumidification_control_type_rejected_count",
+    "admitted_control_body_entry_count",
+    "moisture_demand_read_count",
+    "moisture_demand_assignment_count",
+    "maximum_heating_supply_humidity_ratio_read_count",
+    "zone_humidity_ratio_read_count",
+    "delta_calculation_count",
+    "delta_assignment_count",
+    "delta_gate_read_count",
+    "delta_comparison_count",
+    "delta_comparison_satisfied_count",
+    "delta_fallthrough_count",
+    "moisture_demand_gate_read_count",
+    "moisture_demand_comparison_count",
+    "moisture_demand_comparison_satisfied_count",
+    "moisture_demand_fallthrough_count",
+    "humidification_flow_body_entry_count",
+    "moisture_demand_division_read_count",
+    "delta_division_read_count",
+    "calculation_count",
+    "assignment_count"
+)
+if (
+    $coolingHumidificationFlowCommonLifecycleFields.Count +
+    $coolingHumidificationFlowCounterFields.Count -ne 39
+) {
+    throw "CP320 pipeline lifecycle audit must enumerate all 39 public state fields"
+}
+foreach ($field in $coolingHumidificationFlowCounterFields) {
+    $fieldPattern = [regex]::Escape($field)
+    Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlowValidation -Pattern "\b$fieldPattern\b" -Description "pipeline cooling humidification-flow counter validation for $field"
+    Assert-Contains -Path $runPurchasedAirCoolingHumidificationFlowSerialization -Pattern "`"$fieldPattern`"" -Description "pipeline cooling humidification-flow counter JSON for $field"
+}
+
+Assert-Contains -Path $runPipeline -Pattern '"purchased_air_calc_cooling_humidification_flow_lifecycle"' -Description "release cooling humidification-flow lifecycle JSON evidence"
+Assert-Contains -Path $runPipeline -Pattern '(?s)purchased_air_cooling_humidification_flow::validate_direct_lifecycle\(\s*result\s*\.purchased_air_calc_cooling_humidification_flow_lifecycle\s*\.as_ref\(\),\s*result\s*\.purchased_air_calc_cooling_dehumidification_flow_lifecycle\s*\.as_ref\(\),\s*init_lifecycle,\s*result\.purchased_air_coupling_call_count,\s*\)\?;' -Description "release exact cooling humidification-flow pipeline firewall"
+Assert-Contains -Path $runPipeline -Pattern '\.purchased_air_calc_cooling_humidification_flow_lifecycle\s*[\r\n]+\s*\.is_some\(\)' -Description "non-direct cooling humidification-flow evidence rejection"
+Assert-Contains -Path $runPipeline -Pattern 'direct_release_cooling_humidification_flow_validation_rejects_malformed_evidence' -Description "pipeline cooling humidification-flow malformed-evidence regression"
+Assert-Contains -Path $runPipeline -Pattern 'direct_release_cooling_humidification_flow_json_exposes_all_source_sites' -Description "pipeline cooling humidification-flow all-site JSON regression"
+Assert-Contains -Path $runDirectZoneCoupledTests -Pattern 'fn assert_cooling_humidification_flow\s*\(' -Description "direct run cooling humidification-flow lifecycle JSON assertion helper"
+Assert-Contains -Path $runDirectZoneCoupledTests -Pattern 'purchased_air_calc_cooling_humidification_flow_lifecycle' -Description "direct run cooling humidification-flow lifecycle JSON assertion"
+Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads.rs" -Pattern 'purchased_air_calc_cooling_humidification_flow_lifecycle' -Description "diagnostic run cooling humidification-flow null-evidence assertion"
+Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern '"CP320 supersedes CP319' -Description "CP320 algorithm support-boundary addendum"
+Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_humidification_flow\.rs::PurchasedAirCalcCoolingHumidificationFlowRuntimeState' -Description "CP320 algorithm Rust state target"
+Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_humidification_flow\.rs::PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary' -Description "CP320 algorithm Rust lifecycle target"
+Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_humidification_flow\.rs::purchased_air_calc_cooling_humidification_flow_lifecycle_summary' -Description "CP320 algorithm Rust lifecycle accessor target"
+Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_humidification_flow/release\.rs::advance_direct_no_oa_calc_cooling_humidification_flow' -Description "CP320 algorithm Rust release target"
+Assert-Contains -Path "specs\capabilities.toml" -Pattern '"CP320 additionally requires' -Description "CP320 capability claim-boundary addendum"
+Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP320 supersedes CP319' -Description "generated CP320 algorithm boundary"
+Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP320 additionally requires' -Description "generated CP320 capability boundary"
+foreach ($coolingHumidificationFlowIntegrationFile in @(
+    $idealLoadsCoupledCoolingHumidificationFlowValidation,
+    $runPurchasedAirCoolingHumidificationFlow,
+    $runPurchasedAirCoolingHumidificationFlowSerialization,
+    $runPurchasedAirCoolingHumidificationFlowSnapshotSerialization,
+    $runPurchasedAirCoolingHumidificationFlowValidation,
+    $runPurchasedAirCoolingHumidificationFlowSnapshotValidation
+)) {
+    foreach ($forbiddenBehavior in $coolingHumidificationFlowForbiddenBehaviorPatterns) {
+        Assert-NotContains -Path $coolingHumidificationFlowIntegrationFile -Pattern $forbiddenBehavior.Pattern -Description $forbiddenBehavior.Description
+    }
+}
+Assert-NotContains -Path $idealLoadsCoupledCoolingHumidificationFlowValidation -Pattern '(?i)(?:resulting|assigned|calculated)_supply_mass_flow_rate_for_humidification.*\bcoupling\b|\bcoupling\b.*(?:resulting|assigned|calculated)_supply_mass_flow_rate_for_humidification' -Description "CP320 candidate bitwise reconciliation with unchanged numerical DTO"
 
 Assert-Contains -Path $runPipeline -Pattern 'topology_ready' -Description "release topology-ready JSON and validation evidence"
 Assert-Contains -Path $runPipeline -Pattern 'topology_diagnostics' -Description "release ordered topology diagnostic evidence"

@@ -18872,6 +18872,50 @@ unsupported. Both parents and the Calc routine retain their status; inventory,
 readiness, capability, evidence, numerical conformance, and Roadmap state do
 not change.
 
+## CP320 Cooling Humidification-Flow Continuation
+
+CP320 maps executable lines 2133-2144 and their exact 26 source sites after
+CP319 and before the cooling-capacity-zero override. UnitOff and non-cooling
+paths skip every site. Active Cooling assigns positive zero to the
+humidification candidate and reads retained same-call `HeatOn`. A false value
+stops. A true value reads and compares the humidification-control enum. Only
+`Humidistat` reaches the nested dehumidification-control disjunction, which
+reads once for `Humidistat` and lazily re-reads only after a false result to
+compare with `None`.
+
+An admitted nested-control route reads and assigns the Zone humidifying
+moisture load, reads maximum heating supply and Zone-node humidity ratios,
+subtracts and assigns `DeltaHumRat`, and evaluates strict
+`DeltaHumRat > 0.00025 && MdotZnHumidSP > 0.0` with left-to-right
+short-circuiting. Only a true result re-reads both locals, divides, and assigns
+the candidate. The first-disjunct Humidistat route skips the second selector
+read; the None route performs both reads.
+
+The exact direct binding requires both controls `None`, so active release
+records only the reset, true `HeatOn`, outer selector mismatch, and bitwise
+positive-zero result. It reads neither nested selector nor live moisture demand
+or Node humidity. Humidistat and disjunction paths are private pre-sampled
+characterization only. Strict equality, NaN, infinities, signed zero, repeated
+reads, and raw division behavior remain visible, with no finite guard,
+normalization, or clamp.
+
+`calc/cooling_humidification_flow.rs` and its split modules own CP320 state,
+transition, release, validation, and tests. The binder orders CP320 exactly
+between CP319 and the unchanged numerical DTO. Direct-only JSON publishes
+`purchased_air_calc_cooling_humidification_flow_lifecycle`; per-step,
+lifecycle, coupled, and pipeline firewalls reconcile the CP319 link, all source
+counters and lazy-read partitions, and the positive-zero result. The existing
+humidification helper is not reused or reconciled because it adds the later
+capacity-zero override and `.max(0.0)` behavior.
+
+Line 2144 closes CP320 and line 2147 is the first excluded executable.
+Capacity-zero override, candidate maximum, EMS and flow clamps,
+mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection remain
+excluded. Broad HumidityControl and live moisture/Node ownership remain
+unsupported. Both parents and the Calc routine retain their status; inventory,
+readiness, capability, evidence, numerical conformance, and Roadmap state do
+not change.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

@@ -25,6 +25,7 @@ use ep_runtime::{
     PurchasedAirCalcCoolingEconomizerConditionLifecycleSummary,
     PurchasedAirCalcCoolingEconomizerGuardLifecycleSummary,
     PurchasedAirCalcCoolingEntryGateLifecycleSummary,
+    PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary,
     PurchasedAirCalcCoolingOaMaxFlowBodyLifecycleSummary,
     PurchasedAirCalcCoolingOaMaxFlowGateLifecycleSummary,
     PurchasedAirCalcCoolingSensibleFlowLifecycleSummary, PurchasedAirCalcEntryLifecycleSummary,
@@ -66,6 +67,7 @@ mod purchased_air_cooling_economizer_body;
 mod purchased_air_cooling_economizer_condition;
 mod purchased_air_cooling_economizer_guard;
 mod purchased_air_cooling_entry_gate;
+mod purchased_air_cooling_humidification_flow;
 mod purchased_air_cooling_oa_max_flow;
 mod purchased_air_cooling_oa_max_flow_body;
 mod purchased_air_cooling_sensible_flow;
@@ -190,6 +192,8 @@ struct RustRuntimeResult {
         Option<PurchasedAirCalcCoolingSensibleFlowLifecycleSummary>,
     purchased_air_calc_cooling_dehumidification_flow_lifecycle:
         Option<PurchasedAirCalcCoolingDehumidificationFlowLifecycleSummary>,
+    purchased_air_calc_cooling_humidification_flow_lifecycle:
+        Option<PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary>,
 }
 
 struct PreparedRuntimeInputs {
@@ -1262,6 +1266,10 @@ fn finish_successful_summary(
                 .purchased_air_calc_cooling_dehumidification_flow_lifecycle
                 .as_ref()
                 .map(purchased_air_cooling_dehumidification_flow::lifecycle_json),
+            "purchased_air_calc_cooling_humidification_flow_lifecycle": result
+                .purchased_air_calc_cooling_humidification_flow_lifecycle
+                .as_ref()
+                .map(purchased_air_cooling_humidification_flow::lifecycle_json),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
@@ -2159,6 +2167,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_economizer_body_lifecycle: None,
                 purchased_air_calc_cooling_sensible_flow_lifecycle: None,
                 purchased_air_calc_cooling_dehumidification_flow_lifecycle: None,
+                purchased_air_calc_cooling_humidification_flow_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
@@ -2223,6 +2232,11 @@ fn execute_rust_runtime(
                     .summary
                     .calc_cooling_dehumidification_flow_lifecycle,
             );
+            let purchased_air_calc_cooling_humidification_flow_lifecycle = Some(
+                simulation
+                    .summary
+                    .calc_cooling_humidification_flow_lifecycle,
+            );
             Ok(RustRuntimeResult {
                 results: simulation.results,
                 runtime_class,
@@ -2248,6 +2262,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_economizer_body_lifecycle,
                 purchased_air_calc_cooling_sensible_flow_lifecycle,
                 purchased_air_calc_cooling_dehumidification_flow_lifecycle,
+                purchased_air_calc_cooling_humidification_flow_lifecycle,
             })
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
@@ -2283,6 +2298,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_economizer_body_lifecycle: None,
                 purchased_air_calc_cooling_sensible_flow_lifecycle: None,
                 purchased_air_calc_cooling_dehumidification_flow_lifecycle: None,
+                purchased_air_calc_cooling_humidification_flow_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
@@ -2316,6 +2332,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_economizer_body_lifecycle: None,
                 purchased_air_calc_cooling_sensible_flow_lifecycle: None,
                 purchased_air_calc_cooling_dehumidification_flow_lifecycle: None,
+                purchased_air_calc_cooling_humidification_flow_lifecycle: None,
             })
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
@@ -2435,6 +2452,16 @@ fn validate_runtime_demand_provenance(
             init_lifecycle,
             result.purchased_air_coupling_call_count,
         )?;
+        purchased_air_cooling_humidification_flow::validate_direct_lifecycle(
+            result
+                .purchased_air_calc_cooling_humidification_flow_lifecycle
+                .as_ref(),
+            result
+                .purchased_air_calc_cooling_dehumidification_flow_lifecycle
+                .as_ref(),
+            init_lifecycle,
+            result.purchased_air_coupling_call_count,
+        )?;
     } else if result.purchased_air_init_lifecycle.is_some()
         || result.purchased_air_calc_entry_lifecycle.is_some()
         || result
@@ -2463,6 +2490,9 @@ fn validate_runtime_demand_provenance(
             .is_some()
         || result
             .purchased_air_calc_cooling_dehumidification_flow_lifecycle
+            .is_some()
+        || result
+            .purchased_air_calc_cooling_humidification_flow_lifecycle
             .is_some()
         || result.purchased_air_coupling_call_count.is_some()
     {
@@ -3111,10 +3141,11 @@ mod tests {
         purchased_air_calc_entry_lifecycle_json, purchased_air_cooling_dehumidification_flow,
         purchased_air_cooling_economizer_body, purchased_air_cooling_economizer_condition,
         purchased_air_cooling_economizer_guard, purchased_air_cooling_entry_gate,
-        purchased_air_cooling_oa_max_flow, purchased_air_cooling_oa_max_flow_body,
-        purchased_air_cooling_sensible_flow, purchased_air_init_lifecycle_json,
-        purchased_air_minimum_oa, runtime_class_requires_weather, schedule_cache_json,
-        selected_trace_enabled, source_order_gate_summary, source_order_stage_state_snapshots,
+        purchased_air_cooling_humidification_flow, purchased_air_cooling_oa_max_flow,
+        purchased_air_cooling_oa_max_flow_body, purchased_air_cooling_sensible_flow,
+        purchased_air_init_lifecycle_json, purchased_air_minimum_oa,
+        runtime_class_requires_weather, schedule_cache_json, selected_trace_enabled,
+        source_order_gate_summary, source_order_stage_state_snapshots,
         trace_level_enables_stage_snapshots, typed_counts,
         validate_direct_purchased_air_calc_entry_lifecycle,
         validate_direct_purchased_air_init_lifecycle, validate_runtime_demand_provenance,
@@ -3123,9 +3154,10 @@ mod tests {
     use ep_compiler::compile_raw_model;
     use ep_model::{
         DehumidificationControlType, ExternalInterfaceFmuExportSchedule,
-        ExternalInterfaceFmuImportSchedule, ExternalInterfaceSchedule, IdealLoadsAirSystemId,
-        IdealLoadsLimit, NodeId, NormalizedName, OutdoorAirEconomizerType, ScheduleFileShading,
-        ScheduleFileShadingColumn, ScheduleId, TypedModel, ZoneEquipmentListId, ZoneId,
+        ExternalInterfaceFmuImportSchedule, ExternalInterfaceSchedule, HumidificationControlType,
+        IdealLoadsAirSystemId, IdealLoadsLimit, NodeId, NormalizedName, OutdoorAirEconomizerType,
+        ScheduleFileShading, ScheduleFileShadingColumn, ScheduleId, TypedModel,
+        ZoneEquipmentListId, ZoneId,
     };
     use ep_raw_model::parse_epjson_str_with_idf_order;
     use ep_runtime::{
@@ -3147,6 +3179,9 @@ mod tests {
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE_ORDER,
+        PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_RECURRING_WARNING_CHILD_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_SOURCE,
@@ -3175,6 +3210,9 @@ mod tests {
         PurchasedAirCalcCoolingEconomizerGuardSnapshot,
         PurchasedAirCalcCoolingEntryGateLifecycleSummary,
         PurchasedAirCalcCoolingEntryGateRuntimeState, PurchasedAirCalcCoolingEntryGateSnapshot,
+        PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary,
+        PurchasedAirCalcCoolingHumidificationFlowRuntimeState,
+        PurchasedAirCalcCoolingHumidificationFlowSnapshot,
         PurchasedAirCalcCoolingOaMaxFlowBodyLifecycleSummary,
         PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState,
         PurchasedAirCalcCoolingOaMaxFlowBodySnapshot,
@@ -4160,6 +4198,7 @@ mod tests {
             purchased_air_calc_cooling_economizer_body_lifecycle: None,
             purchased_air_calc_cooling_sensible_flow_lifecycle: None,
             purchased_air_calc_cooling_dehumidification_flow_lifecycle: None,
+            purchased_air_calc_cooling_humidification_flow_lifecycle: None,
         };
         assert!(
             validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result)
@@ -4201,6 +4240,17 @@ mod tests {
         result.purchased_air_calc_cooling_sensible_flow_lifecycle = None;
         result.purchased_air_calc_cooling_dehumidification_flow_lifecycle =
             Some(valid_cooling_dehumidification_flow_lifecycle(1));
+        assert_eq!(
+            validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result),
+            Err(
+                "persistent PurchasedAir lifecycle evidence was attached to a non-direct runtime"
+                    .to_string()
+            )
+        );
+
+        result.purchased_air_calc_cooling_dehumidification_flow_lifecycle = None;
+        result.purchased_air_calc_cooling_humidification_flow_lifecycle =
+            Some(valid_cooling_humidification_flow_lifecycle(1));
         assert_eq!(
             validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result),
             Err(
@@ -4930,6 +4980,175 @@ mod tests {
     }
 
     #[test]
+    fn direct_release_cooling_humidification_flow_validation_rejects_malformed_evidence() {
+        let init = valid_init_lifecycle(2);
+        let predecessor = valid_cooling_dehumidification_flow_lifecycle(2);
+        let valid = valid_cooling_humidification_flow_lifecycle(2);
+        assert!(
+            purchased_air_cooling_humidification_flow::validate_direct_lifecycle(
+                Some(&valid),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_ok()
+        );
+        assert!(
+            purchased_air_cooling_humidification_flow::validate_direct_lifecycle(
+                None,
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_provenance = valid.clone();
+        wrong_provenance.first_excluded_source =
+            PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE;
+        assert!(
+            purchased_air_cooling_humidification_flow::validate_direct_lifecycle(
+                Some(&wrong_provenance),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_count = valid.clone();
+        wrong_count
+            .state
+            .humidification_control_type_fallthrough_count = 1;
+        assert!(
+            purchased_air_cooling_humidification_flow::validate_direct_lifecycle(
+                Some(&wrong_count),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_zero = valid.clone();
+        wrong_zero
+            .state
+            .latest
+            .as_mut()
+            .expect("valid latest cooling humidification-flow snapshot")
+            .reset_supply_mass_flow_rate_for_humidification_kg_per_s = Some(-0.0);
+        assert!(
+            purchased_air_cooling_humidification_flow::validate_direct_lifecycle(
+                Some(&wrong_zero),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_selector = valid.clone();
+        wrong_selector
+            .state
+            .latest
+            .as_mut()
+            .expect("valid latest cooling humidification-flow snapshot")
+            .humidification_control_type = Some(HumidificationControlType::Humidistat);
+        assert!(
+            purchased_air_cooling_humidification_flow::validate_direct_lifecycle(
+                Some(&wrong_selector),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_predecessor_link = valid.clone();
+        wrong_predecessor_link
+            .state
+            .latest
+            .as_mut()
+            .expect("valid latest cooling humidification-flow snapshot")
+            .predecessor_cooling_body_entered = false;
+        assert!(
+            purchased_air_cooling_humidification_flow::validate_direct_lifecycle(
+                Some(&wrong_predecessor_link),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut overflowed_partition = valid;
+        overflowed_partition.state.unit_off_skip_count = usize::MAX;
+        overflowed_partition.state.non_cooling_skip_count = 1;
+        assert!(
+            purchased_air_cooling_humidification_flow::validate_direct_lifecycle(
+                Some(&overflowed_partition),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn direct_release_cooling_humidification_flow_json_exposes_all_source_sites() {
+        let lifecycle = valid_cooling_humidification_flow_lifecycle(2);
+        let value = purchased_air_cooling_humidification_flow::lifecycle_json(&lifecycle);
+        assert_eq!(
+            value["source"],
+            PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE
+        );
+        assert_eq!(
+            value["first_excluded_source"],
+            PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE
+        );
+        assert_eq!(value["transition_count"], 2);
+        assert_eq!(value["reset_assignment_count"], 2);
+        assert_eq!(value["heating_on_read_count"], 2);
+        assert_eq!(value["heating_on_body_entry_count"], 2);
+        assert_eq!(value["humidification_control_type_read_count"], 2);
+        assert_eq!(value["humidification_control_type_fallthrough_count"], 2);
+        assert_eq!(value["dehumidification_control_type_first_read_count"], 0);
+        assert_eq!(value["moisture_demand_read_count"], 0);
+        assert_eq!(value["assignment_count"], 0);
+        assert_eq!(value.as_object().map(serde_json::Map::len), Some(41));
+
+        let latest = &value["latest"];
+        assert_eq!(
+            latest["source_order"],
+            serde_json::json!(PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER)
+        );
+        assert_eq!(latest["source_order"].as_array().map(Vec::len), Some(26));
+        assert_eq!(latest["cooling_body_entered"], true);
+        assert_eq!(latest["heating_on"], true);
+        assert_eq!(latest["humidification_control_type"], "None");
+        assert_eq!(latest["humidification_control_type_humidistat"], false);
+        assert_eq!(latest["dehumidification_control_type_first_read"], false);
+        assert_eq!(
+            latest["zone_humidifying_setpoint_moisture_demand_read"],
+            false
+        );
+        assert_eq!(
+            latest["reset_supply_mass_flow_rate_for_humidification_kg_per_s"]
+                .as_f64()
+                .map(f64::to_bits),
+            Some(0.0_f64.to_bits())
+        );
+        assert_eq!(
+            latest["resulting_supply_mass_flow_rate_for_humidification_kg_per_s"]
+                .as_f64()
+                .map(f64::to_bits),
+            Some(0.0_f64.to_bits())
+        );
+        assert_eq!(latest.as_object().map(serde_json::Map::len), Some(57));
+    }
+
+    #[test]
     fn lifecycle_json_serializes_structured_supply_temperature_diagnostics() {
         let mut lifecycle = valid_init_lifecycle(1);
         lifecycle.supply_temperature_registered_recurring_diagnostic_count = 1;
@@ -5530,6 +5749,86 @@ mod tests {
             source: PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_SOURCE,
             first_excluded_source:
                 PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE,
+            state,
+        }
+    }
+
+    fn valid_cooling_humidification_flow_lifecycle(
+        call_count: usize,
+    ) -> PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary {
+        let system = IdealLoadsAirSystemId(0);
+        let mut state = PurchasedAirCalcCoolingHumidificationFlowRuntimeState::new(system);
+        state.transition_count = call_count;
+        state.cooling_body_entry_count = call_count;
+        state.reset_assignment_count = call_count;
+        state.heating_on_read_count = call_count;
+        state.heating_on_body_entry_count = call_count;
+        state.humidification_control_type_read_count = call_count;
+        state.humidification_control_type_fallthrough_count = call_count;
+        state.latest = Some(PurchasedAirCalcCoolingHumidificationFlowSnapshot {
+            source: PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE,
+            first_excluded_source:
+                PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE,
+            source_order: PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER,
+            system,
+            parent_call_ordinal: call_count,
+            controlled_zone: ZoneId(0),
+            unit_body_entered: true,
+            predecessor_cooling_body_entered: true,
+            unit_off_skipped: false,
+            non_cooling_skipped: false,
+            cooling_body_entered: true,
+            supply_mass_flow_rate_for_humidification_reset_assigned: true,
+            reset_supply_mass_flow_rate_for_humidification_kg_per_s: Some(0.0),
+            heating_on_read: true,
+            heating_on: Some(true),
+            heating_on_body_entered: true,
+            humidification_control_type_read: true,
+            humidification_control_type: Some(HumidificationControlType::None),
+            humidification_control_type_humidistat: Some(false),
+            humidification_control_body_entered: false,
+            dehumidification_control_type_first_read: false,
+            first_dehumidification_control_type: None,
+            dehumidification_control_type_humidistat: None,
+            dehumidification_control_type_second_read: false,
+            second_dehumidification_control_type: None,
+            dehumidification_control_type_none: None,
+            humidification_control_condition_admitted: false,
+            zone_humidifying_setpoint_moisture_demand_read: false,
+            zone_humidifying_setpoint_moisture_demand_kg_per_s: None,
+            zone_humidifying_setpoint_moisture_demand_assigned: false,
+            assigned_zone_humidifying_setpoint_moisture_demand_kg_per_s: None,
+            maximum_heating_supply_air_humidity_ratio_read: false,
+            maximum_heating_supply_air_humidity_ratio_kg_water_per_kg_dry_air: None,
+            zone_humidity_ratio_read: false,
+            zone_humidity_ratio_kg_water_per_kg_dry_air: None,
+            delta_humidity_ratio_calculated: false,
+            delta_humidity_ratio_kg_water_per_kg_dry_air: None,
+            delta_humidity_ratio_assigned: false,
+            assigned_delta_humidity_ratio_kg_water_per_kg_dry_air: None,
+            delta_humidity_ratio_for_gate_read: false,
+            delta_humidity_ratio_for_gate_kg_water_per_kg_dry_air: None,
+            delta_humidity_ratio_comparison_evaluated: false,
+            delta_humidity_ratio_above_small_delta: None,
+            zone_humidifying_setpoint_moisture_demand_for_gate_read: false,
+            zone_humidifying_setpoint_moisture_demand_for_gate_kg_per_s: None,
+            zone_humidifying_setpoint_moisture_demand_comparison_evaluated: false,
+            zone_humidifying_setpoint_moisture_demand_above_zero: None,
+            humidification_flow_body_entered: false,
+            zone_humidifying_setpoint_moisture_demand_for_division_read: false,
+            zone_humidifying_setpoint_moisture_demand_for_division_kg_per_s: None,
+            delta_humidity_ratio_for_division_read: false,
+            delta_humidity_ratio_for_division_kg_water_per_kg_dry_air: None,
+            supply_mass_flow_rate_for_humidification_calculated: false,
+            calculated_supply_mass_flow_rate_for_humidification_kg_per_s: None,
+            supply_mass_flow_rate_for_humidification_assigned: false,
+            assigned_supply_mass_flow_rate_for_humidification_kg_per_s: None,
+            resulting_supply_mass_flow_rate_for_humidification_kg_per_s: Some(0.0),
+        });
+        PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary {
+            source: PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE,
+            first_excluded_source:
+                PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE,
             state,
         }
     }

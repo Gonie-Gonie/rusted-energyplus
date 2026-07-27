@@ -15,16 +15,32 @@ use crate::ideal_loads::{
     classify_no_oa_sensible_subset,
 };
 
+mod completed_state_validation;
 mod predecessor_validation;
 mod runtime_validation;
 mod snapshot_validation;
 
+use completed_state_validation::completed_dehumidification_flow_state_is_consistent;
 use predecessor_validation::sensible_flow_links_to_economizer_body;
 use runtime_validation::{
     calc_state_identities_match, call_order_is_pending_dehumidification_flow,
     pending_dehumidification_flow_state_is_consistent,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_dehumidification_flow_snapshot_is_exact_direct_release;
+
+pub(in crate::ideal_loads::calc) fn completed_direct_cooling_dehumidification_flow_is_consistent(
+    unit: &crate::ideal_loads::PurchasedAirUnitRuntimeState,
+    predecessor: PurchasedAirCalcCoolingSensibleFlowSnapshot,
+    completed: PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
+    consumer_witness: Option<PurchasedAirCalcCoolingDehumidificationFlowSnapshot>,
+) -> bool {
+    completed_dehumidification_flow_state_is_consistent(
+        unit,
+        predecessor,
+        completed,
+        consumer_witness,
+    )
+}
 
 /// Fail-closed error before the bounded calculation mutates CP319 state.
 #[derive(Clone, Copy, Debug, PartialEq)]

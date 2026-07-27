@@ -1,0 +1,77 @@
+use ep_model::HumidificationControlType;
+
+use crate::ideal_loads::{
+    PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE,
+    PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE,
+    PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER,
+    PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
+    PurchasedAirCalcCoolingHumidificationFlowSnapshot,
+};
+
+pub(super) fn calculation_cooling_humidification_flow_snapshot(
+    predecessor: PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
+) -> PurchasedAirCalcCoolingHumidificationFlowSnapshot {
+    let cooling_body_entered = predecessor.cooling_body_entered;
+    PurchasedAirCalcCoolingHumidificationFlowSnapshot {
+        source: PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE,
+        first_excluded_source: PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE,
+        source_order: PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER,
+        system: predecessor.system,
+        parent_call_ordinal: predecessor.parent_call_ordinal,
+        controlled_zone: predecessor.controlled_zone,
+        unit_body_entered: predecessor.unit_body_entered,
+        predecessor_cooling_body_entered: predecessor.cooling_body_entered,
+        unit_off_skipped: predecessor.unit_off_skipped,
+        non_cooling_skipped: predecessor.non_cooling_skipped,
+        cooling_body_entered,
+        supply_mass_flow_rate_for_humidification_reset_assigned: cooling_body_entered,
+        reset_supply_mass_flow_rate_for_humidification_kg_per_s: cooling_body_entered
+            .then_some(0.0),
+        heating_on_read: cooling_body_entered,
+        heating_on: cooling_body_entered.then_some(true),
+        heating_on_body_entered: cooling_body_entered,
+        humidification_control_type_read: cooling_body_entered,
+        humidification_control_type: cooling_body_entered
+            .then_some(HumidificationControlType::None),
+        humidification_control_type_humidistat: cooling_body_entered.then_some(false),
+        humidification_control_body_entered: false,
+        dehumidification_control_type_first_read: false,
+        first_dehumidification_control_type: None,
+        dehumidification_control_type_humidistat: None,
+        dehumidification_control_type_second_read: false,
+        second_dehumidification_control_type: None,
+        dehumidification_control_type_none: None,
+        humidification_control_condition_admitted: false,
+        zone_humidifying_setpoint_moisture_demand_read: false,
+        zone_humidifying_setpoint_moisture_demand_kg_per_s: None,
+        zone_humidifying_setpoint_moisture_demand_assigned: false,
+        assigned_zone_humidifying_setpoint_moisture_demand_kg_per_s: None,
+        maximum_heating_supply_air_humidity_ratio_read: false,
+        maximum_heating_supply_air_humidity_ratio_kg_water_per_kg_dry_air: None,
+        zone_humidity_ratio_read: false,
+        zone_humidity_ratio_kg_water_per_kg_dry_air: None,
+        delta_humidity_ratio_calculated: false,
+        delta_humidity_ratio_kg_water_per_kg_dry_air: None,
+        delta_humidity_ratio_assigned: false,
+        assigned_delta_humidity_ratio_kg_water_per_kg_dry_air: None,
+        delta_humidity_ratio_for_gate_read: false,
+        delta_humidity_ratio_for_gate_kg_water_per_kg_dry_air: None,
+        delta_humidity_ratio_comparison_evaluated: false,
+        delta_humidity_ratio_above_small_delta: None,
+        zone_humidifying_setpoint_moisture_demand_for_gate_read: false,
+        zone_humidifying_setpoint_moisture_demand_for_gate_kg_per_s: None,
+        zone_humidifying_setpoint_moisture_demand_comparison_evaluated: false,
+        zone_humidifying_setpoint_moisture_demand_above_zero: None,
+        humidification_flow_body_entered: false,
+        zone_humidifying_setpoint_moisture_demand_for_division_read: false,
+        zone_humidifying_setpoint_moisture_demand_for_division_kg_per_s: None,
+        delta_humidity_ratio_for_division_read: false,
+        delta_humidity_ratio_for_division_kg_water_per_kg_dry_air: None,
+        supply_mass_flow_rate_for_humidification_calculated: false,
+        calculated_supply_mass_flow_rate_for_humidification_kg_per_s: None,
+        supply_mass_flow_rate_for_humidification_assigned: false,
+        assigned_supply_mass_flow_rate_for_humidification_kg_per_s: None,
+        resulting_supply_mass_flow_rate_for_humidification_kg_per_s: cooling_body_entered
+            .then_some(0.0),
+    }
+}

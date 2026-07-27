@@ -598,6 +598,47 @@ live moisture-demand/Node ownership, numerical conformance, capability level,
 both parent statuses, the Calc routine status, inventory/readiness counts,
 evidence cases, and Roadmap state remain unchanged.
 
+CP320 maps the complete Cooling-section humidification candidate at executable
+lines 2133-2144 and its exact 26 source sites. UnitOff and non-cooling
+predecessors skip the entire slice. Active Cooling resets the humidification
+candidate to positive zero, reads retained same-call `HeatOn`, and stops if it
+is false. A true value reads and compares `HumidificationControlType`; only
+`Humidistat` reaches the nested dehumidification-control disjunction. That
+disjunction reads `DehumidificationControlType` once for `Humidistat` and,
+only after a false result, reads it again for `None`. Either admitted route
+then reads and assigns the Zone humidifying-setpoint moisture demand, reads
+maximum heating supply and Zone-node humidity ratios, subtracts and assigns
+`DeltaHumRat`, and evaluates the strict left-to-right condition
+`DeltaHumRat > 0.00025 && MdotZnHumidSP > 0.0`. A true result alone re-reads
+both locals, performs the raw division, and assigns the candidate.
+
+The exact direct binding still requires both humidity controls to be `None`.
+Its active Cooling route therefore resets the candidate, proves retained
+`HeatOn=true`, records the outer humidification-selector mismatch, preserves
+bitwise positive zero, and does not read either dehumidification selector site
+or any live moisture-demand or Node-humidity value. Humidistat and nested
+disjunction behavior remains private characterization over pre-sampled
+scalars. It preserves repeated reads, `||` and `&&` short-circuit order, strict
+comparison boundaries, NaN, infinities, signed zero, and raw division without
+finite checks or normalization.
+
+The binder orders CP320 after CP319 and before the unchanged bounded numerical
+Calc DTO. Per-step, lifecycle, coupled-runtime, and pipeline firewalls expose
+`purchased_air_calc_cooling_humidification_flow_lifecycle` only for the direct
+release lane and reconcile every predecessor, source counter, lazy read, and
+positive-zero result. The older humidification numerical helper is neither
+reused nor reconciled because it includes the line-2147 capacity-zero behavior
+and a positive clamp.
+
+Line 2144 closes CP320. The first excluded executable is line 2147, the
+cooling-capacity-zero override. Capacity-zero rewriting, line-2155 candidate
+maximum, EMS override, later flow clamps, mixed-air/capacity/supply-state
+behavior, and Heat/DeadBand selection remain open. CP320 adds lifecycle
+evidence only: broad HumidityControl support, live moisture-demand/Node
+ownership, numerical conformance, capability level, both parent statuses, the
+Calc routine status, inventory/readiness counts, evidence cases, and Roadmap
+state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

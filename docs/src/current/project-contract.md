@@ -16272,6 +16272,88 @@ Heat/DeadBand work remain excluded. CP319 promotes no broad humidity control,
 live moisture-demand or Node service, numerical result, capability, status,
 inventory/readiness count, evidence case, conformance claim, or Roadmap item.
 
+## CP320 Source-Ordered Cooling Humidification Flow
+
+CP320 supersedes only CP319's line-2133 exclusion for EnergyPlus 26.1
+`PurchasedAirManager.cc` executable lines 2133-2144. Line 2144 closes the
+nested humidification branch and reconverges on one candidate; line 2147 starts
+the independent cooling-capacity-zero override. CP320's 26 exact source sites
+are:
+
+1. assign the humidification candidate to positive zero;
+2. read retained same-call `HeatOn`;
+3. enter the `HeatOn` body only after a true read;
+4. read `HumidCtrlType`;
+5. compare it with `Humidistat`;
+6. enter the Humidistat body only after a match;
+7. read `DehumidCtrlType` for the first disjunct;
+8. compare that read with `Humidistat`;
+9. only after a false first disjunct, re-read `DehumidCtrlType`;
+10. compare the second read with `None`;
+11. enter the admitted nested-control body only when the disjunction is true;
+12. read the Zone humidifying-setpoint moisture load;
+13. assign local `MdotZnHumidSP`;
+14. read maximum heating supply-air humidity ratio;
+15. read Zone-node humidity ratio;
+16. subtract Zone humidity ratio from maximum heating supply humidity ratio;
+17. assign local `DeltaHumRat`;
+18. re-read `DeltaHumRat` for the first predicate;
+19. compare `DeltaHumRat > 0.00025` using strict `>`;
+20. only after that match, re-read `MdotZnHumidSP`;
+21. compare `MdotZnHumidSP > 0.0` using strict `>`;
+22. enter the compound-condition body only when both predicates are true;
+23. re-read `MdotZnHumidSP` as the numerator;
+24. re-read `DeltaHumRat` as the denominator;
+25. calculate `MdotZnHumidSP / DeltaHumRat`; and
+26. assign the humidification candidate.
+
+UnitOff and active non-cooling predecessors skip all sites, including the
+reset. CP320 is another common Cooling continuation and does not depend on
+whether CP319 entered its private Humidistat body. Every active Cooling
+predecessor performs the positive-zero reset. `HeatOn=false` skips every
+selector and service. A non-Humidistat humidification selector skips both
+dehumidification-control reads. A first dehumidification read equal to
+`Humidistat` short-circuits the second read; a first `None` reads the same
+source field again and is admitted by the second comparison; every other value
+falls through after both reads. The demand predicate remains short-circuited
+when the delta predicate is false.
+
+`SmallDeltaHumRat` is the immutable source constant `0.00025`. Both numeric
+comparisons remain strict, so equality, NaN, and signed zero fall through.
+Positive infinity can satisfy the delta predicate, and the raw single division
+is retained without finite validation, algebraic rewriting, or clamping.
+Reset positive zero and an assigned zero result remain distinct lifecycle
+events. No psychrometric routine, schedule, EMS service, diagnostic sink, or
+mutable static cache belongs to this slice.
+
+`calc/cooling_humidification_flow.rs` and its split state, transition, release,
+validation, and test modules own the snapshot, persistent state, route, and
+exact release boundary. The public direct release consumes a retained exact
+CP319 snapshot and the selected system only. It derives `HeatOn` from the
+retained same-call CP310 entry rather than accepting a duplicate caller value.
+Because the direct binding requires `HumidificationControlType::None` and
+`DehumidificationControlType::None`, it proves the outer selector false before
+mutation and requests no live Zone moisture demand or Node humidity. Private
+Humidistat characterization uses pre-sampled scalars and grants no live-service
+or capability ownership.
+
+The binder executes CP320 after CP319 and before the existing numerical Calc
+DTO. Per-step, lifecycle, coupled-runtime, and pipeline validation reconcile
+one CP320 transition per CP319 transition, exact predecessor identity and
+route, all 26 source-site counters, repeated-read and short-circuit partitions,
+positive-zero reset/result bits, and direct-only JSON under
+`purchased_air_calc_cooling_humidification_flow_lifecycle`. Non-direct or
+disconnected evidence is rejected.
+
+The pre-existing `humidistat_humidification_mass_flow_rate_kg_per_s` numerical
+helper is not reused or bitwise reconciled: it owns the later capacity-zero
+override and applies `.max(0.0)`, neither of which occurs in lines 2133-2144.
+Line 2147 is the first excluded executable. Capacity-zero rewriting, candidate
+selection, EMS, flow limiting, mixed-air and final supply-state behavior, and
+Heat/DeadBand work remain excluded. CP320 promotes no broad humidity control,
+live moisture-demand or Node service, numerical result, capability, status,
+inventory/readiness count, evidence case, conformance claim, or Roadmap item.
+
 
 
 

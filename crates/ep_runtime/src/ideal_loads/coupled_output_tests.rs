@@ -1,5 +1,8 @@
 use super::*;
 
+#[path = "coupled_output_tests/cooling_humidification_flow_fixture.rs"]
+mod cooling_humidification_flow_fixture;
+
 use crate::{
     heat_balance::state::{ZoneAirTemperatureCoefficients, ZoneHeatBalanceState},
     ideal_loads::{
@@ -47,6 +50,7 @@ use crate::{
         PurchasedAirTemperatureControlType, couple_direct_zone_predicted_demand_to_purchased_air,
     },
 };
+use cooling_humidification_flow_fixture::calculation_cooling_humidification_flow_snapshot;
 use ep_model::{
     DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
     HumidificationControlType, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
@@ -73,6 +77,11 @@ fn appends_all_no_oa_and_predictor_series_with_hourly_semantics() {
         assert!(
             crate::ideal_loads::calc::cooling_sensible_flow_snapshot_is_exact_direct_release(
                 output.calculation_cooling_sensible_flow,
+            )
+        );
+        assert!(
+            crate::ideal_loads::calc::cooling_humidification_flow_snapshot_is_exact_direct_release(
+                output.calculation_cooling_humidification_flow,
             )
         );
         assert!(
@@ -466,6 +475,8 @@ fn scaled_output(
     );
     let calculation_cooling_dehumidification_flow =
         calculation_cooling_dehumidification_flow_snapshot(calculation_cooling_sensible_flow);
+    let calculation_cooling_humidification_flow =
+        calculation_cooling_humidification_flow_snapshot(calculation_cooling_dehumidification_flow);
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -502,6 +513,7 @@ fn scaled_output(
         calculation_cooling_economizer_body,
         calculation_cooling_sensible_flow,
         calculation_cooling_dehumidification_flow,
+        calculation_cooling_humidification_flow,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

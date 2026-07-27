@@ -21407,6 +21407,44 @@ equation, demand or feedback term, live moisture/Node ownership, numerical
 support, or capability support. Parent/routine status, inventory/readiness,
 evidence, conformance, and Roadmap state remain unchanged.
 
+## CP320 Cooling Humidification-Flow Placement
+
+CP320 maps the complete lines-2133-2144 humidification candidate after CP319
+and before the unchanged numerical DTO and Zone-air correction. UnitOff and
+non-cooling skip all 26 sites. Active Cooling resets the candidate to positive
+zero and reads retained same-call `HeatOn`. A true value reaches the
+humidification-control selector; only Humidistat then evaluates the nested
+dehumidification-control disjunction. A first Humidistat match short-circuits
+the second field read; otherwise the source field is re-read for the `None`
+comparison.
+
+An admitted route reads the live Zone humidifying moisture load, maximum
+heating supply humidity ratio, and Zone-node humidity ratio, assigns both
+locals, evaluates strict `DeltaHumRat > 0.00025` and short-circuited
+`MdotZnHumidSP > 0.0`, and conditionally divides and assigns. The direct binding
+requires `HumidificationControlType::None` and
+`DehumidificationControlType::None`. Its active release therefore records the
+reset and outer selector mismatch while preserving positive zero, without
+reading nested selectors, moisture-demand, or Node-humidity services. Private
+pre-sampled Humidistat characterization does not add those services to the
+direct lane. Raw strict-comparison, NaN, infinity, signed-zero, repeated-read,
+short-circuit, and division semantics are retained without clamping.
+
+Per-step, final, coupled-runtime, and pipeline validation reconcile the CP319
+predecessor, source-site partitions, and direct-only lifecycle before the
+existing numerical and corrector paths. CP320 neither reuses nor reconciles the
+older humidification helper because that helper includes the later
+capacity-zero and normalization behavior.
+
+Line 2144 closes CP320 and line 2147 is the first excluded executable.
+Capacity-zero rewriting, later candidate-maximum/EMS/clamp work, mixed-air and
+final supply-state behavior, Heat/DeadBand selection, node/report writes,
+residuals, and adaptive iteration remain outside the slice. CP320 adds no
+Zone-air equation, demand or feedback term, live moisture/Node ownership,
+numerical support, or capability support. Parent/routine status,
+inventory/readiness, evidence, conformance, and Roadmap state remain
+unchanged.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

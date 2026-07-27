@@ -33707,6 +33707,43 @@ equation, live moisture-demand/Node ownership, numerical conformance, or
 capability promotion. Parent and routine statuses, inventory/readiness,
 evidence, and Roadmap state remain unchanged.
 
+## CP320 Cooling Humidification Flow Inside the Heat-Balance Loop
+
+CP320 executes immediately after CP319 and before the unchanged bounded
+PurchasedAir numerical calculation. It maps lines 2133-2144 as a complete
+26-site candidate calculation. UnitOff and non-cooling skip the whole slice.
+Active Cooling resets the candidate to positive zero, reads retained same-call
+`HeatOn`, and, only when true, compares the humidification-control enum. A
+Humidistat match alone reaches a nested dehumidification-control disjunction:
+the first `Humidistat` comparison short-circuits a true route, while a false
+result lazily re-reads the enum for the `None` comparison.
+
+Only an admitted nested-control route reaches the live Zone moisture-load and
+humidity-ratio sites, assigns `MdotZnHumidSP` and `DeltaHumRat`, evaluates the
+source's strict left-to-right predicates, and conditionally performs the raw
+division and assignment. The exact direct lane still requires both controls
+`None`. Its active Cooling transition therefore stops at the outer
+humidification selector mismatch with bitwise positive zero and requests no
+moisture predictor value or Zone-node humidity read. Private pre-sampled
+characterization preserves strict boundaries, repeated reads, short-circuit
+order, NaN, infinity, signed zero, and division behavior without adding a
+heat-balance equation or service dependency.
+
+Per-step, final, coupled-runtime, and pipeline validators place CP320 after
+CP319 and before the existing numerical DTO and same-step Zone-air corrector.
+They reconcile every source counter, lazy-read partition, and direct-only
+lifecycle value. CP320 is not reconciled with the older humidification
+numerical helper, whose capacity-zero gate and positive clamp lie outside this
+source slice.
+
+Line 2144 closes CP320; line 2147 begins the excluded cooling-capacity-zero
+override. Candidate selection, EMS and later clamps,
+mixed-air/capacity/supply-state behavior, Heat/DeadBand selection, and all
+later feedback remain excluded. CP320 adds no heat-balance or predictor
+equation, live moisture-demand/Node ownership, numerical conformance, or
+capability promotion. Parent and routine statuses, inventory/readiness,
+evidence, and Roadmap state remain unchanged.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

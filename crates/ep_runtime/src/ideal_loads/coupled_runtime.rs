@@ -44,7 +44,10 @@ use super::{
     PurchasedAirCalcCoolingEconomizerConditionLifecycleSummary,
     PurchasedAirCalcCoolingEconomizerGuardError,
     PurchasedAirCalcCoolingEconomizerGuardLifecycleSummary, PurchasedAirCalcCoolingEntryGateError,
-    PurchasedAirCalcCoolingEntryGateLifecycleSummary, PurchasedAirCalcCoolingOaMaxFlowBodyError,
+    PurchasedAirCalcCoolingEntryGateLifecycleSummary,
+    PurchasedAirCalcCoolingHumidificationFlowError,
+    PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary,
+    PurchasedAirCalcCoolingOaMaxFlowBodyError,
     PurchasedAirCalcCoolingOaMaxFlowBodyLifecycleSummary,
     PurchasedAirCalcCoolingOaMaxFlowGateError,
     PurchasedAirCalcCoolingOaMaxFlowGateLifecycleSummary, PurchasedAirCalcCoolingSensibleFlowError,
@@ -59,6 +62,7 @@ use super::{
     purchased_air_calc_cooling_economizer_condition_lifecycle_summary,
     purchased_air_calc_cooling_economizer_guard_lifecycle_summary,
     purchased_air_calc_cooling_entry_gate_lifecycle_summary,
+    purchased_air_calc_cooling_humidification_flow_lifecycle_summary,
     purchased_air_calc_cooling_oa_max_flow_body_lifecycle_summary,
     purchased_air_calc_cooling_oa_max_flow_gate_lifecycle_summary,
     purchased_air_calc_cooling_sensible_flow_lifecycle_summary,
@@ -71,6 +75,7 @@ mod cooling_economizer_body_validation;
 mod cooling_economizer_condition_validation;
 mod cooling_economizer_guard_validation;
 mod cooling_entry_validation;
+mod cooling_humidification_flow_validation;
 mod cooling_oa_max_flow_body_validation;
 mod cooling_oa_max_flow_validation;
 mod cooling_sensible_flow_validation;
@@ -173,6 +178,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded cooling dehumidification-flow lifecycle report.
     pub calc_cooling_dehumidification_flow_lifecycle:
         PurchasedAirCalcCoolingDehumidificationFlowLifecycleSummary,
+    /// Persistent bounded cooling humidification-flow lifecycle report.
+    pub calc_cooling_humidification_flow_lifecycle:
+        PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -230,6 +238,8 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     CalcCoolingSensibleFlowLifecycle(PurchasedAirCalcCoolingSensibleFlowError),
     /// Final cooling dehumidification-flow summary could not resolve the bound unit.
     CalcCoolingDehumidificationFlowLifecycle(PurchasedAirCalcCoolingDehumidificationFlowError),
+    /// Final cooling humidification-flow summary could not resolve the bound unit.
+    CalcCoolingHumidificationFlowLifecycle(PurchasedAirCalcCoolingHumidificationFlowError),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
         /// Stable invariant field.
@@ -329,6 +339,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A cooling humidification-flow lifecycle invariant did not match the run.
+    CalcCoolingHumidificationFlowLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -381,6 +400,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     },
     /// A cooling dehumidification-flow snapshot did not match its bound release call.
     UnexpectedCalculationCoolingDehumidificationFlow {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
+    /// A cooling humidification-flow snapshot did not match its bound release call.
+    UnexpectedCalculationCoolingHumidificationFlow {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
@@ -477,6 +501,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir cooling dehumidification-flow lifecycle summary failed: {error:?}"
             ),
+            Self::CalcCoolingHumidificationFlowLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir cooling humidification-flow lifecycle summary failed: {error:?}"
+            ),
             Self::InitLifecycleInvariant {
                 field,
                 expected,
@@ -565,6 +593,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir cooling dehumidification-flow lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingHumidificationFlowLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir cooling humidification-flow lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -608,6 +644,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::UnexpectedCalculationCoolingDehumidificationFlow { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling dehumidification-flow calculation"
+            ),
+            Self::UnexpectedCalculationCoolingHumidificationFlow { timestep_index } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling humidification-flow calculation"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -870,6 +910,16 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
                     UnexpectedCalculationCoolingDehumidificationFlow { timestep_index },
             );
         }
+        if !cooling_humidification_flow_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingHumidificationFlow { timestep_index },
+            );
+        }
         if !output.initialization.flags.state_machine_used
             || output.coupling.purchased_air.init_flags != output.initialization.flags
         {
@@ -1059,6 +1109,22 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_humidification_flow_lifecycle =
+        purchased_air_calc_cooling_humidification_flow_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingHumidificationFlowLifecycle,
+        )?;
+    cooling_humidification_flow_validation::validate_lifecycle(
+        &calc_cooling_humidification_flow_lifecycle,
+        &calc_cooling_dehumidification_flow_lifecycle,
+        timestep_outputs.len(),
+        numerical_cooling_count,
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -1131,6 +1197,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_economizer_body_lifecycle,
             calc_cooling_sensible_flow_lifecycle,
             calc_cooling_dehumidification_flow_lifecycle,
+            calc_cooling_humidification_flow_lifecycle,
         },
         state,
         results,

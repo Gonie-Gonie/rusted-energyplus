@@ -20,8 +20,6 @@ use ep_model::{
     ZoneThermostatControl, ZoneThermostatId,
 };
 
-type ModelMutationCase = (fn(&mut TypedModel), DirectZonePurchasedAirBindingFeature);
-
 #[path = "binding/cooling_dehumidification_flow_tests.rs"]
 mod cooling_dehumidification_flow_tests;
 #[path = "binding/cooling_economizer_body_integrity_tests.rs"]
@@ -38,6 +36,8 @@ mod cooling_economizer_guard_integrity_tests;
 mod cooling_economizer_guard_tests;
 #[path = "binding/cooling_entry_gate_tests.rs"]
 mod cooling_entry_gate_tests;
+#[path = "binding/cooling_humidification_flow_tests.rs"]
+mod cooling_humidification_flow_tests;
 #[path = "binding/cooling_oa_max_flow_body_tests.rs"]
 mod cooling_oa_max_flow_body_tests;
 #[path = "binding/cooling_oa_max_flow_gate_tests.rs"]
@@ -255,7 +255,7 @@ fn binding_rejects_ambiguous_thermostat_topology() {
 
 #[test]
 fn binding_rejects_distribution_sequence_and_fraction_variants() {
-    let cases: [ModelMutationCase; 3] = [
+    let cases = [
         (
             (|typed: &mut TypedModel| {
                 typed.zone_equipment_lists[0].load_distribution_scheme =
@@ -355,7 +355,7 @@ fn binding_rejects_multi_inlet_return_and_mode_availability_topology() {
         }
     );
 
-    let cases: [ModelMutationCase; 6] = [
+    let cases = [
         (
             (|typed: &mut TypedModel| {
                 typed.zone_equipment_connections[0].zone_return_air_node_or_nodelist_name =
@@ -529,7 +529,7 @@ fn binding_still_rejects_non_sensible_purchased_air_branches() {
 
 #[test]
 fn binding_rejects_hysteresis_and_hidden_no_oa_feature_flags() {
-    let cases: [ModelMutationCase; 2] = [
+    let cases = [
         (
             (|typed: &mut TypedModel| {
                 typed.zone_thermostats[0]

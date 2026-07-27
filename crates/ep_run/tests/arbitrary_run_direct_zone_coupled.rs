@@ -101,6 +101,38 @@ const CALC_COOLING_DEHUMIDIFICATION_FLOW_SOURCE_ORDER: [&str; 21] = [
     "calculate-zone-dehumidifying-setpoint-moisture-demand-divided-by-delta-humidity-ratio",
     "assign-supply-mass-flow-rate-for-dehumidification",
 ];
+const CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE: &str =
+    "EnergyPlus 26.1 PurchasedAirManager.cc:2133-2144";
+const CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE: &str =
+    "EnergyPlus 26.1 PurchasedAirManager.cc:2147";
+const CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER: [&str; 26] = [
+    "assign-supply-mass-flow-rate-for-humidification-zero",
+    "read-heating-on",
+    "enter-heating-on-body-if-true",
+    "read-humidification-control-type",
+    "compare-humidification-control-type-equal-to-humidistat",
+    "enter-humidistat-control-body-if-matched",
+    "read-dehumidification-control-type-for-humidistat-comparison",
+    "compare-dehumidification-control-type-equal-to-humidistat",
+    "read-dehumidification-control-type-for-none-comparison-after-first-false",
+    "compare-dehumidification-control-type-equal-to-none",
+    "enter-admitted-humidification-body-if-control-condition-satisfied",
+    "read-zone-humidifying-setpoint-moisture-demand",
+    "assign-local-zone-humidifying-setpoint-moisture-demand",
+    "read-maximum-heating-supply-air-humidity-ratio",
+    "read-zone-node-humidity-ratio",
+    "subtract-zone-humidity-ratio-from-maximum-heating-supply-air-humidity-ratio",
+    "assign-local-delta-humidity-ratio",
+    "read-delta-humidity-ratio-for-small-difference-gate",
+    "compare-strict-delta-humidity-ratio-above-small-delta-humidity-ratio",
+    "read-zone-humidifying-setpoint-moisture-demand-after-delta-match",
+    "compare-strict-zone-humidifying-setpoint-moisture-demand-above-zero",
+    "enter-humidification-flow-body-if-compound-condition-satisfied",
+    "reread-zone-humidifying-setpoint-moisture-demand-for-division",
+    "reread-delta-humidity-ratio-for-division",
+    "calculate-zone-humidifying-setpoint-moisture-demand-divided-by-delta-humidity-ratio",
+    "assign-supply-mass-flow-rate-for-humidification",
+];
 const CALC_COOLING_ECONOMIZER_BODY_SOURCE_ORDER: [&str; 37] = [
     "read-controlled-zone-humidity-ratio",
     "evaluate-psy-cp-air-fn-w",
@@ -801,6 +833,7 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
     assert_cooling_economizer_body(runtime, expected_calls, expected_calls, 0);
     assert_cooling_sensible_flow(runtime, expected_calls, expected_calls, 0);
     assert_cooling_dehumidification_flow(runtime, expected_calls, expected_calls, 0);
+    assert_cooling_humidification_flow(runtime, expected_calls, expected_calls, 0);
 }
 
 fn assert_zero_effect_cooling_oa_max_flow_body(
@@ -1931,6 +1964,212 @@ fn assert_cooling_dehumidification_flow(
     assert_cp319_downstream_values_absent(latest);
 }
 
+fn assert_cooling_humidification_flow(
+    runtime: &Value,
+    expected_calls: u64,
+    expected_non_cooling_skips: u64,
+    expected_cooling_entries: u64,
+) {
+    let flow = &runtime["purchased_air_calc_cooling_humidification_flow_lifecycle"];
+    assert!(
+        flow.is_object(),
+        "direct runtime must publish the CP320 key"
+    );
+    assert_exact_object_keys(
+        flow,
+        &[
+            "source",
+            "first_excluded_source",
+            "system",
+            "transition_count",
+            "cooling_body_entry_count",
+            "unit_off_skip_count",
+            "non_cooling_skip_count",
+            "reset_assignment_count",
+            "heating_on_read_count",
+            "heating_on_body_entry_count",
+            "heating_on_fallthrough_count",
+            "humidification_control_type_read_count",
+            "humidification_control_type_humidistat_count",
+            "humidification_control_type_fallthrough_count",
+            "humidification_control_body_entry_count",
+            "dehumidification_control_type_first_read_count",
+            "dehumidification_control_type_humidistat_count",
+            "dehumidification_control_type_second_read_count",
+            "dehumidification_control_type_none_count",
+            "dehumidification_control_type_rejected_count",
+            "admitted_control_body_entry_count",
+            "moisture_demand_read_count",
+            "moisture_demand_assignment_count",
+            "maximum_heating_supply_humidity_ratio_read_count",
+            "zone_humidity_ratio_read_count",
+            "delta_calculation_count",
+            "delta_assignment_count",
+            "delta_gate_read_count",
+            "delta_comparison_count",
+            "delta_comparison_satisfied_count",
+            "delta_fallthrough_count",
+            "moisture_demand_gate_read_count",
+            "moisture_demand_comparison_count",
+            "moisture_demand_comparison_satisfied_count",
+            "moisture_demand_fallthrough_count",
+            "humidification_flow_body_entry_count",
+            "moisture_demand_division_read_count",
+            "delta_division_read_count",
+            "calculation_count",
+            "assignment_count",
+            "latest",
+        ],
+    );
+    assert_eq!(flow["source"], CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE);
+    assert_eq!(
+        flow["first_excluded_source"],
+        CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(flow["transition_count"], expected_calls);
+    assert_eq!(flow["cooling_body_entry_count"], expected_cooling_entries);
+    assert_eq!(flow["non_cooling_skip_count"], expected_non_cooling_skips);
+    for field in [
+        "reset_assignment_count",
+        "heating_on_read_count",
+        "heating_on_body_entry_count",
+        "humidification_control_type_read_count",
+        "humidification_control_type_fallthrough_count",
+    ] {
+        assert_eq!(flow[field], expected_cooling_entries, "{field}");
+    }
+    for field in [
+        "heating_on_fallthrough_count",
+        "humidification_control_type_humidistat_count",
+        "humidification_control_body_entry_count",
+        "dehumidification_control_type_first_read_count",
+        "dehumidification_control_type_humidistat_count",
+        "dehumidification_control_type_second_read_count",
+        "dehumidification_control_type_none_count",
+        "dehumidification_control_type_rejected_count",
+        "admitted_control_body_entry_count",
+        "moisture_demand_read_count",
+        "moisture_demand_assignment_count",
+        "maximum_heating_supply_humidity_ratio_read_count",
+        "zone_humidity_ratio_read_count",
+        "delta_calculation_count",
+        "delta_assignment_count",
+        "delta_gate_read_count",
+        "delta_comparison_count",
+        "delta_comparison_satisfied_count",
+        "delta_fallthrough_count",
+        "moisture_demand_gate_read_count",
+        "moisture_demand_comparison_count",
+        "moisture_demand_comparison_satisfied_count",
+        "moisture_demand_fallthrough_count",
+        "humidification_flow_body_entry_count",
+        "moisture_demand_division_read_count",
+        "delta_division_read_count",
+        "calculation_count",
+        "assignment_count",
+    ] {
+        assert_eq!(flow[field], 0, "{field}");
+    }
+
+    let latest = &flow["latest"];
+    assert_exact_object_keys(
+        latest,
+        &[
+            "source",
+            "first_excluded_source",
+            "source_order",
+            "system",
+            "parent_call_ordinal",
+            "controlled_zone",
+            "unit_body_entered",
+            "predecessor_cooling_body_entered",
+            "unit_off_skipped",
+            "non_cooling_skipped",
+            "cooling_body_entered",
+            "supply_mass_flow_rate_for_humidification_reset_assigned",
+            "reset_supply_mass_flow_rate_for_humidification_kg_per_s",
+            "heating_on_read",
+            "heating_on",
+            "heating_on_body_entered",
+            "humidification_control_type_read",
+            "humidification_control_type",
+            "humidification_control_type_humidistat",
+            "humidification_control_body_entered",
+            "dehumidification_control_type_first_read",
+            "first_dehumidification_control_type",
+            "dehumidification_control_type_humidistat",
+            "dehumidification_control_type_second_read",
+            "second_dehumidification_control_type",
+            "dehumidification_control_type_none",
+            "humidification_control_condition_admitted",
+            "zone_humidifying_setpoint_moisture_demand_read",
+            "zone_humidifying_setpoint_moisture_demand_kg_per_s",
+            "zone_humidifying_setpoint_moisture_demand_assigned",
+            "assigned_zone_humidifying_setpoint_moisture_demand_kg_per_s",
+            "maximum_heating_supply_air_humidity_ratio_read",
+            "maximum_heating_supply_air_humidity_ratio_kg_water_per_kg_dry_air",
+            "zone_humidity_ratio_read",
+            "zone_humidity_ratio_kg_water_per_kg_dry_air",
+            "delta_humidity_ratio_calculated",
+            "delta_humidity_ratio_kg_water_per_kg_dry_air",
+            "delta_humidity_ratio_assigned",
+            "assigned_delta_humidity_ratio_kg_water_per_kg_dry_air",
+            "delta_humidity_ratio_for_gate_read",
+            "delta_humidity_ratio_for_gate_kg_water_per_kg_dry_air",
+            "delta_humidity_ratio_comparison_evaluated",
+            "delta_humidity_ratio_above_small_delta",
+            "zone_humidifying_setpoint_moisture_demand_for_gate_read",
+            "zone_humidifying_setpoint_moisture_demand_for_gate_kg_per_s",
+            "zone_humidifying_setpoint_moisture_demand_comparison_evaluated",
+            "zone_humidifying_setpoint_moisture_demand_above_zero",
+            "humidification_flow_body_entered",
+            "zone_humidifying_setpoint_moisture_demand_for_division_read",
+            "zone_humidifying_setpoint_moisture_demand_for_division_kg_per_s",
+            "delta_humidity_ratio_for_division_read",
+            "delta_humidity_ratio_for_division_kg_water_per_kg_dry_air",
+            "supply_mass_flow_rate_for_humidification_calculated",
+            "calculated_supply_mass_flow_rate_for_humidification_kg_per_s",
+            "supply_mass_flow_rate_for_humidification_assigned",
+            "assigned_supply_mass_flow_rate_for_humidification_kg_per_s",
+            "resulting_supply_mass_flow_rate_for_humidification_kg_per_s",
+        ],
+    );
+    assert_eq!(
+        string_array(&latest["source_order"]),
+        CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER
+    );
+    let active = expected_cooling_entries > 0;
+    assert_eq!(latest["cooling_body_entered"], active);
+    assert_eq!(latest["predecessor_cooling_body_entered"], active);
+    assert_eq!(latest["non_cooling_skipped"], !active);
+    if active {
+        assert_eq!(latest["heating_on"], true);
+        assert_eq!(latest["humidification_control_type"], "None");
+        assert_eq!(latest["humidification_control_type_humidistat"], false);
+        for field in [
+            "reset_supply_mass_flow_rate_for_humidification_kg_per_s",
+            "resulting_supply_mass_flow_rate_for_humidification_kg_per_s",
+        ] {
+            assert_eq!(
+                latest[field].as_f64().map(f64::to_bits),
+                Some(0.0_f64.to_bits()),
+                "{field}"
+            );
+        }
+    } else {
+        assert!(latest["heating_on"].is_null());
+        assert!(latest["humidification_control_type"].is_null());
+        assert!(latest["resulting_supply_mass_flow_rate_for_humidification_kg_per_s"].is_null());
+    }
+    assert_eq!(latest["dehumidification_control_type_first_read"], false);
+    assert!(latest["first_dehumidification_control_type"].is_null());
+    assert_eq!(
+        latest["zone_humidifying_setpoint_moisture_demand_read"],
+        false
+    );
+    assert!(latest["zone_humidifying_setpoint_moisture_demand_kg_per_s"].is_null());
+}
+
 fn assert_cp319_source_values_absent(latest: &Value) {
     for field in [
         "reset_supply_mass_flow_rate_for_dehumidification_kg_per_s",
@@ -2120,6 +2359,7 @@ fn all_hard_sized_finite_limit_branches_limit_live_cooling()
         assert_cooling_economizer_body(&summary["rust_runtime"], 2, 0, 2);
         assert_cooling_sensible_flow(&summary["rust_runtime"], 2, 0, 2);
         assert_cooling_dehumidification_flow(&summary["rust_runtime"], 2, 0, 2);
+        assert_cooling_humidification_flow(&summary["rust_runtime"], 2, 0, 2);
 
         let results = read_json(&output_dir.join("results").join("result-store.json"))?;
         let cooling_rate = find_series(

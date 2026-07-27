@@ -5,6 +5,7 @@ mod cooling_economizer_body;
 mod cooling_economizer_condition;
 mod cooling_economizer_guard;
 mod cooling_entry_gate;
+mod cooling_humidification_flow;
 mod cooling_oa_max_flow_body;
 mod cooling_oa_max_flow_gate;
 mod cooling_sensible_flow;
@@ -35,6 +36,8 @@ mod cooling_economizer_guard_tests;
 #[cfg(test)]
 mod cooling_entry_gate_tests;
 #[cfg(test)]
+mod cooling_humidification_flow_tests;
+#[cfg(test)]
 mod cooling_oa_max_flow_body_tests;
 #[cfg(test)]
 mod cooling_oa_max_flow_gate_tests;
@@ -58,6 +61,7 @@ pub use cooling_economizer_body::*;
 pub use cooling_economizer_condition::*;
 pub use cooling_economizer_guard::*;
 pub use cooling_entry_gate::*;
+pub use cooling_humidification_flow::*;
 pub use cooling_oa_max_flow_body::*;
 pub use cooling_oa_max_flow_gate::*;
 pub(in crate::ideal_loads) use cooling_sensible_flow::release::cooling_sensible_flow_snapshot_is_exact_direct_release;

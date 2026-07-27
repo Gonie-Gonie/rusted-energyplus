@@ -13,6 +13,8 @@ use crate::{
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE,
@@ -104,6 +106,26 @@ fn cooling_dehumidification_flow_partition_overflow_fails_closed() {
         error,
         DirectZonePurchasedAirCoupledRuntimeError::
             CalcCoolingDehumidificationFlowLifecycleInvariant {
+                field: "test_partition_overflow",
+                expected: 1,
+                actual: usize::MAX,
+            }
+    ));
+}
+
+#[test]
+fn cooling_humidification_flow_partition_overflow_fails_closed() {
+    let error = super::cooling_humidification_flow_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::
+            CalcCoolingHumidificationFlowLifecycleInvariant {
                 field: "test_partition_overflow",
                 expected: 1,
                 actual: usize::MAX,
@@ -743,6 +765,32 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
         .expect("latest CP319 non-cooling snapshot");
     assert!(latest_dehumidification_flow.non_cooling_skipped);
     assert!(!latest_dehumidification_flow.cooling_body_entered);
+    let humidification_flow = simulation
+        .summary
+        .calc_cooling_humidification_flow_lifecycle;
+    assert_eq!(
+        humidification_flow.source,
+        PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE
+    );
+    assert_eq!(
+        humidification_flow.first_excluded_source,
+        PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(humidification_flow.state.transition_count, required_steps);
+    assert_eq!(humidification_flow.state.cooling_body_entry_count, 0);
+    assert_eq!(humidification_flow.state.unit_off_skip_count, 0);
+    assert_eq!(
+        humidification_flow.state.non_cooling_skip_count,
+        required_steps
+    );
+    assert_eq!(humidification_flow.state.reset_assignment_count, 0);
+    assert_eq!(humidification_flow.state.heating_on_read_count, 0);
+    let latest_humidification_flow = humidification_flow
+        .state
+        .latest
+        .expect("latest CP320 non-cooling snapshot");
+    assert!(latest_humidification_flow.non_cooling_skipped);
+    assert!(!latest_humidification_flow.cooling_body_entered);
 
     let zone = simulation.state.zones.first().expect("bound Zone state");
     assert_eq!(simulation.state.timestep_index, required_steps);
@@ -827,6 +875,23 @@ fn cooling_sensible_flow_lifecycle_records_unit_off_without_source_execution() {
     );
     assert_eq!(lifecycle.state.cooling_on_read_count, 0);
     let latest = lifecycle.state.latest.expect("latest CP318 off snapshot");
+    assert!(latest.unit_off_skipped);
+    assert!(!latest.non_cooling_skipped);
+    assert!(!latest.cooling_body_entered);
+    let lifecycle = simulation
+        .summary
+        .calc_cooling_humidification_flow_lifecycle;
+    assert_eq!(
+        lifecycle.source,
+        PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE
+    );
+    assert_eq!(lifecycle.state.transition_count, 1);
+    assert_eq!(lifecycle.state.unit_off_skip_count, 1);
+    assert_eq!(lifecycle.state.non_cooling_skip_count, 0);
+    assert_eq!(lifecycle.state.cooling_body_entry_count, 0);
+    assert_eq!(lifecycle.state.reset_assignment_count, 0);
+    assert_eq!(lifecycle.state.heating_on_read_count, 0);
+    let latest = lifecycle.state.latest.expect("latest CP320 off snapshot");
     assert!(latest.unit_off_skipped);
     assert!(!latest.non_cooling_skipped);
     assert!(!latest.cooling_body_entered);
@@ -1396,6 +1461,61 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
             Some(false)
         );
         assert!(!latest_dehumidification_flow.zone_dehumidifying_setpoint_moisture_demand_read);
+        let humidification_flow = simulation
+            .summary
+            .calc_cooling_humidification_flow_lifecycle;
+        assert_eq!(
+            humidification_flow.source,
+            PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE
+        );
+        assert_eq!(
+            humidification_flow.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE
+        );
+        let humidification_flow_state = humidification_flow.state;
+        assert_eq!(humidification_flow_state.transition_count, 1, "{limit:?}");
+        assert_eq!(
+            humidification_flow_state.cooling_body_entry_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(humidification_flow_state.reset_assignment_count, 1);
+        assert_eq!(humidification_flow_state.heating_on_read_count, 1);
+        assert_eq!(humidification_flow_state.heating_on_body_entry_count, 1);
+        assert_eq!(
+            humidification_flow_state.humidification_control_type_read_count,
+            1
+        );
+        assert_eq!(
+            humidification_flow_state.humidification_control_type_humidistat_count,
+            0
+        );
+        assert_eq!(
+            humidification_flow_state.humidification_control_type_fallthrough_count,
+            1
+        );
+        assert_eq!(
+            humidification_flow_state.dehumidification_control_type_first_read_count,
+            0
+        );
+        assert_eq!(humidification_flow_state.moisture_demand_read_count, 0);
+        assert_eq!(humidification_flow_state.assignment_count, 0);
+        let latest_humidification_flow = humidification_flow_state
+            .latest
+            .expect("latest CP320 cooling snapshot");
+        assert!(latest_humidification_flow.cooling_body_entered);
+        assert_eq!(latest_humidification_flow.heating_on, Some(true));
+        assert_eq!(
+            latest_humidification_flow.humidification_control_type,
+            Some(HumidificationControlType::None)
+        );
+        assert_eq!(
+            latest_humidification_flow
+                .resulting_supply_mass_flow_rate_for_humidification_kg_per_s
+                .expect("CP320 reset candidate")
+                .to_bits(),
+            0.0_f64.to_bits()
+        );
+        assert!(!latest_humidification_flow.zone_humidifying_setpoint_moisture_demand_read);
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation

@@ -12,7 +12,10 @@ use super::super::{
     PurchasedAirCalcCoolingEconomizerConditionRuntimeState,
     PurchasedAirCalcCoolingEconomizerConditionSnapshot,
     PurchasedAirCalcCoolingEconomizerGuardRuntimeState,
-    PurchasedAirCalcCoolingEntryGateRuntimeState, PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState,
+    PurchasedAirCalcCoolingEntryGateRuntimeState,
+    PurchasedAirCalcCoolingHumidificationFlowRuntimeState,
+    PurchasedAirCalcCoolingHumidificationFlowSnapshot,
+    PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState,
     PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState,
     PurchasedAirCalcCoolingSensibleFlowRuntimeState, PurchasedAirCalcCoolingSensibleFlowSnapshot,
     PurchasedAirCalcEntryRuntimeState, PurchasedAirCalcMinimumOaPrefixRuntimeState,
@@ -75,6 +78,8 @@ pub struct PurchasedAirRuntimeState {
         BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingSensibleFlowSnapshot>,
     cooling_dehumidification_flow_latest_witnesses:
         BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingDehumidificationFlowSnapshot>,
+    cooling_humidification_flow_latest_witnesses:
+        BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidificationFlowSnapshot>,
 }
 
 impl PurchasedAirRuntimeState {
@@ -149,6 +154,24 @@ impl PurchasedAirRuntimeState {
         self.cooling_dehumidification_flow_latest_witnesses
             .insert(system, snapshot);
     }
+
+    pub(in crate::ideal_loads) fn cooling_humidification_flow_latest_witness(
+        &self,
+        system: IdealLoadsAirSystemId,
+    ) -> Option<PurchasedAirCalcCoolingHumidificationFlowSnapshot> {
+        self.cooling_humidification_flow_latest_witnesses
+            .get(&system)
+            .copied()
+    }
+
+    pub(in crate::ideal_loads) fn set_cooling_humidification_flow_latest_witness(
+        &mut self,
+        system: IdealLoadsAirSystemId,
+        snapshot: PurchasedAirCalcCoolingHumidificationFlowSnapshot,
+    ) {
+        self.cooling_humidification_flow_latest_witnesses
+            .insert(system, snapshot);
+    }
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -198,6 +221,8 @@ pub struct PurchasedAirUnitRuntimeState {
     pub calc_cooling_sensible_flow: PurchasedAirCalcCoolingSensibleFlowRuntimeState,
     /// Persistent bounded cooling dehumidification-flow state.
     pub calc_cooling_dehumidification_flow: PurchasedAirCalcCoolingDehumidificationFlowRuntimeState,
+    /// Persistent bounded cooling humidification-flow state.
+    pub calc_cooling_humidification_flow: PurchasedAirCalcCoolingHumidificationFlowRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -292,6 +317,8 @@ impl PurchasedAirUnitRuntimeState {
             ),
             calc_cooling_dehumidification_flow:
                 PurchasedAirCalcCoolingDehumidificationFlowRuntimeState::new(system),
+            calc_cooling_humidification_flow:
+                PurchasedAirCalcCoolingHumidificationFlowRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,
