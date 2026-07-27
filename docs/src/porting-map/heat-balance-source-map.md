@@ -33377,6 +33377,33 @@ scratch, partial-error effects, broader topology, adaptive timestep behavior,
 and full Init/Size parity remain excluded. Parent/routine status, counts,
 capability evidence, conformance, and the Roadmap checkbox remain unchanged.
 
+## CP309 PurchasedAir Supply-Temperature Diagnostics Inside the Heat-Balance Loop
+
+The bounded direct-Zone loop now preserves predictor -> manager sweep ->
+selected topology -> hard-size sizing -> BeginEnvrn -> CP309 diagnostic suffix
+-> `CalcPurchAirLoads` -> update/report -> same-step Zone-air corrector order.
+CP309 maps only EnergyPlus 26.1 `InitPurchasedAir` lines 1221-1320, with
+cooling before heating and the commented fatal tail left inert. A topology,
+sizing, or environment error still suppresses this and every later stage.
+
+Each outer temperature/setpoint/`NoLimit` gate precedes the already sampled
+overall and mode availability values. The Rust transition records whether
+those source read sites were reached, including the mode site when overall
+availability is off. Active branches allocate or reuse a bounded
+PurchasedAir-runtime-global recurring identity, characterize the cooling
+`ShowSevereError` versus heating `ShowSevereMessage` first-detail asymmetry,
+and aggregate recurring count and reported supply-temperature extrema in `C`.
+The lifecycle summary and run JSON expose that evidence.
+
+No heat-balance equation, predictor, surface, or corrector numerical claim is
+added. Release validation requires the complete registry and all per-unit
+diagnostic state to remain zero. Actual error/report sinks, real schedule
+service effects, process-global registry numbering/deduplication, warmup and
+sizing counters, null schedules, broader multi-unit release execution,
+reset/concurrency, Autosizing, and full Init/Size parity remain excluded.
+Parent/routine status, counts, capabilities, conformance, and the Roadmap
+checkbox remain unchanged.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

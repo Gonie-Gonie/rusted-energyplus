@@ -397,6 +397,26 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
             .as_f64()
             .is_some_and(|value| value >= 0.0)
     );
+    assert_eq!(
+        lifecycle["supply_temperature_diagnostic_registry"]["registered_recurring_diagnostic_count"],
+        0
+    );
+    assert_eq!(
+        lifecycle["supply_temperature_diagnostic_registry"]["event_count"],
+        0
+    );
+    assert_eq!(
+        lifecycle["supply_temperature_diagnostic_registry"]["characterized_severe_error_count_increment"],
+        0
+    );
+    assert!(lifecycle["supply_temperature_diagnostic_registry"]["cooling_error_index"].is_null());
+    assert!(lifecycle["supply_temperature_diagnostic_registry"]["heating_error_index"].is_null());
+    assert_eq!(
+        lifecycle["supply_temperature_diagnostic_registry"]["identities"]
+            .as_array()
+            .map(Vec::len),
+        Some(0)
+    );
 }
 
 #[test]

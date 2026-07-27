@@ -6,6 +6,7 @@ use super::super::{PurchasedAirHardSizeLegacyOutcome, PurchasedAirSizedLimits};
 use super::{
     IdealLoadsInitFlags, PurchasedAirInitDiagnostic, PurchasedAirInitTopologyDiagnostic,
     PurchasedAirInitTopologyError, PurchasedAirRecirculationSource,
+    PurchasedAirSupplyTemperatureDiagnostic,
 };
 
 /// Final lifecycle counters reported by the direct release runtime.
@@ -77,6 +78,22 @@ pub struct PurchasedAirInitLifecycleSummary {
     pub maximum_cooling_air_mass_flow_rate_kg_per_s: f64,
     /// Standard density owning the cached begin-environment values.
     pub standard_air_density_kg_per_m3: Option<f64>,
+    /// Distinct identities allocated by the bounded recurring registry.
+    pub supply_temperature_registered_recurring_diagnostic_count: usize,
+    /// Active recurring events recorded across every declared unit.
+    pub supply_temperature_diagnostic_event_count: usize,
+    /// Characterized ordinary severe-counter increment across all events.
+    pub supply_temperature_characterized_severe_error_count_increment: usize,
+    /// Source `CoolErrIndex`; zero means no recurring cooling identity.
+    pub cooling_supply_temperature_error_index: usize,
+    /// Source `HeatErrIndex`; zero means no recurring heating identity.
+    pub heating_supply_temperature_error_index: usize,
+    /// First detailed cooling diagnostic groups emitted.
+    pub cooling_supply_temperature_first_diagnostic_count: usize,
+    /// First detailed heating diagnostic groups emitted.
+    pub heating_supply_temperature_first_diagnostic_count: usize,
+    /// Global recurring identities in relative allocation order.
+    pub supply_temperature_diagnostics: Vec<PurchasedAirSupplyTemperatureDiagnostic>,
     /// Cooling recurring diagnostic count.
     pub cooling_supply_temperature_warning_count: usize,
     /// Heating recurring diagnostic count.

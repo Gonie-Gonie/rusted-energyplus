@@ -202,6 +202,28 @@ warnings, EMS/shared-scratch behavior, partial child-error effects, and full
 `SizePurchasedAir` parity remain open. No parent, routine, inventory,
 capability, conformance, or Roadmap status is promoted.
 
+CP309 extends the same Init lane through the EnergyPlus 26.1
+`InitPurchasedAir` supply-temperature diagnostic suffix after
+BeginEnvrn. Cooling is evaluated before heating with the source's strict
+temperature, nonzero-setpoint, `NoLimit`, and sampled-availability gates.
+The persistent Rust registry allocates one-based cooling/heating identities
+across declared units, reuses each unit's zero-sentinel error index, and
+accumulates recurring calls and reported temperature extrema without retaining
+one event per timestep. It also characterizes the first-detail asymmetry:
+cooling uses `ShowSevereError`, heating uses `ShowSevereMessage`, both have one
+primary message, five Continue messages, and one timestamp, and every active
+branch makes one recurring-Severe call. Lifecycle JSON exposes the global
+identity registry plus selected-unit indices and counts.
+
+This remains bounded lifecycle evidence. Release admission requires every
+diagnostic identity, event, index, and count to stay clear. Rust receives
+already sampled availability values and does not claim schedule-service call
+effects, actual ERR/SQLite/callback output, exact text or timestamps,
+EnergyPlus process-global registry numbering/deduplication, warmup/sizing
+counters, null schedules, or reset/concurrency parity. Autosizing and the
+remaining Init/Size branches are still open, and no parent, routine,
+inventory, capability, conformance, or Roadmap status is promoted.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

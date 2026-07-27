@@ -164,7 +164,7 @@ Assert-SnapshotPresent -Snapshots @($stageStateSnapshots.snapshots) -StageName "
 Assert-SnapshotPresent -Snapshots @($stageStateSnapshots.snapshots) -StageName "manage-zone-air-updates" -Point "after" -Substage "ZoneTempPredictorCorrector::CorrectStep" -Description "CorrectStep after snapshot"
 
 $idealLoadsTraceOutputDir = ".runtime\arbitrary-run-ideal-loads-detailed-trace-smoke-script"
-$idealLoadsTraceInput = "data\conformance_cases\ideal_loads_no_oa_sensible_conformance_001\ideal_loads_no_oa_sensible_conformance.idf"
+$idealLoadsTraceInput = "data\conformance_cases\ideal_loads_flow_limit_diagnostic_001\ideal_loads_flow_limit_diagnostic.idf"
 Write-Host "Running IdealLoads detailed trace dry-run smoke: $idealLoadsTraceInput"
 $idealLoadsTraceOutput = & $exe run $idealLoadsTraceInput -d $idealLoadsTraceOutputDir --mode compatibility --partial deny --format rust-native --trace-level detailed --dry-run --overwrite 2>&1
 $idealLoadsTraceExitCode = $LASTEXITCODE

@@ -3,6 +3,7 @@
 mod manager_plan;
 mod state;
 mod summary;
+mod supply_temperature_diagnostic;
 mod topology_plan;
 mod topology_transition;
 mod transition;
@@ -10,6 +11,7 @@ mod transition;
 pub use manager_plan::*;
 pub use state::*;
 pub use summary::*;
+pub use supply_temperature_diagnostic::*;
 pub use topology_plan::*;
 pub use transition::*;
 
@@ -19,6 +21,8 @@ mod lifecycle_tests;
 mod manager_plan_tests;
 #[cfg(test)]
 mod manager_scan_tests;
+#[cfg(test)]
+mod supply_temperature_diagnostic_tests;
 #[cfg(test)]
 mod topology_plan_tests;
 #[cfg(test)]

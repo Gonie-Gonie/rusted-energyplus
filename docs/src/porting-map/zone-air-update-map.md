@@ -21073,6 +21073,32 @@ shared scratch, partial-error parity, adaptive/FirstHVACIteration behavior,
 and full Init/Size parity remain outside this slice. Parent and routine status,
 counts, conformance evidence, and the Roadmap checkbox stay unchanged.
 
+## CP309 Supply-Temperature Diagnostics After PurchasedAir Environment Initialization
+
+CP309 preserves the existing direct-Zone order while extending only the Init
+interior: predictor demand -> manager membership -> selected topology ->
+bounded sizing -> BeginEnvrn -> supply-temperature diagnostic suffix -> Calc
+-> update/report -> same-step corrector. The suffix maps EnergyPlus 26.1
+`PurchasedAirManager.cc` lines 1221-1320, cooling before heating. Its strict
+outer gates precede already sampled overall and mode availability reads; the
+mode read site remains source-reached when overall availability is off.
+
+Active calls allocate or reuse relative one-based identities in a bounded
+PurchasedAir-runtime-global registry. One identity accumulates recurring count
+and supply-temperature extrema instead of retaining one event per timestep.
+First activation also retains the source cooling `ShowSevereError` versus
+heating `ShowSevereMessage` count asymmetry, one primary plus five Continue
+messages and one timestamp, while lifecycle summary and JSON expose the
+registry, selected-unit indices, and characterized severe increments.
+
+No Zone-air equation or capability is promoted. The release lane requires all
+diagnostic identities, events, indices, and counts to remain zero. Actual
+message/report sinks, real schedule-service effects, exact process-global
+registry numbering/deduplication, warmup/sizing counters, null schedules,
+broader multi-unit release execution, reset/concurrency, Autosizing, and full
+Init/Size parity remain outside this slice. Parent/routine status, counts,
+conformance evidence, and the Roadmap checkbox stay unchanged.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

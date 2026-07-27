@@ -15,7 +15,9 @@ use super::{
     PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirInitDiagnostic,
     PurchasedAirInitDiagnosticKind, PurchasedAirInitLifecycleSummary, PurchasedAirInitManagerPlan,
     PurchasedAirInitTopologyError, PurchasedAirInitTopologyPlan, PurchasedAirRecirculationSource,
-    PurchasedAirRuntimeState, PurchasedAirUnitRuntimeState,
+    PurchasedAirRuntimeState, PurchasedAirSupplyTemperatureDiagnosticContext,
+    PurchasedAirSupplyTemperatureGateTrace, PurchasedAirUnitRuntimeState,
+    advance_supply_temperature_diagnostics,
 };
 
 /// Dynamic values visible to one `InitPurchasedAir` call.
@@ -72,6 +74,18 @@ pub struct PurchasedAirInitTransition {
     pub cooling_supply_temperature_warning: bool,
     /// Heating recurring diagnostic was active on this call.
     pub heating_supply_temperature_warning: bool,
+    /// Cooling outer-gate and caller-supplied availability trace.
+    pub cooling_supply_temperature_gate: PurchasedAirSupplyTemperatureGateTrace,
+    /// Heating outer-gate and caller-supplied availability trace.
+    pub heating_supply_temperature_gate: PurchasedAirSupplyTemperatureGateTrace,
+    /// First detailed cooling diagnostic group ran on this call.
+    pub cooling_supply_temperature_first_diagnostic: bool,
+    /// First detailed heating diagnostic group ran on this call.
+    pub heating_supply_temperature_first_diagnostic: bool,
+    /// Active recurring diagnostic events recorded on this call.
+    pub supply_temperature_diagnostics_emitted: usize,
+    /// Characterized ordinary severe-counter increment on this call.
+    pub supply_temperature_characterized_severe_error_count_increment: usize,
 }
 
 /// Snapshot returned after one source-ordered initialization call.
@@ -234,8 +248,12 @@ pub fn init_purchased_air_runtime(
         }
     }
 
-    let unit = state
-        .units
+    let equipment_list_checked = state.equipment_list_checked;
+    let (diagnostic_registry, units) = (
+        &mut state.supply_temperature_diagnostic_registry,
+        &mut state.units,
+    );
+    let unit = units
         .get_mut(&system.id)
         .ok_or(PurchasedAirInitError::UnknownSystem { system: system.id })?;
     advance_selected_unit_topology(unit, topology, system, &mut transition)?;
@@ -268,16 +286,29 @@ pub fn init_purchased_air_runtime(
         transition.environment_rearmed = true;
     }
 
-    transition.cooling_supply_temperature_warning =
-        cooling_supply_temperature_warning_active(system, context);
-    if transition.cooling_supply_temperature_warning {
-        unit.cooling_supply_temperature_warning_count += 1;
-    }
-    transition.heating_supply_temperature_warning =
-        heating_supply_temperature_warning_active(system, context);
-    if transition.heating_supply_temperature_warning {
-        unit.heating_supply_temperature_warning_count += 1;
-    }
+    let supply_temperature = advance_supply_temperature_diagnostics(
+        diagnostic_registry,
+        unit,
+        system,
+        PurchasedAirSupplyTemperatureDiagnosticContext {
+            cooling_setpoint_c: context.cooling_setpoint_c,
+            heating_setpoint_c: context.heating_setpoint_c,
+            overall_availability: context.overall_availability,
+            cooling_availability: context.cooling_availability,
+            heating_availability: context.heating_availability,
+        },
+    );
+    transition.cooling_supply_temperature_warning = supply_temperature.cooling_active;
+    transition.heating_supply_temperature_warning = supply_temperature.heating_active;
+    transition.cooling_supply_temperature_gate = supply_temperature.cooling_gate;
+    transition.heating_supply_temperature_gate = supply_temperature.heating_gate;
+    transition.cooling_supply_temperature_first_diagnostic =
+        supply_temperature.cooling_first_diagnostic;
+    transition.heating_supply_temperature_first_diagnostic =
+        supply_temperature.heating_first_diagnostic;
+    transition.supply_temperature_diagnostics_emitted = supply_temperature.diagnostics_emitted;
+    transition.supply_temperature_characterized_severe_error_count_increment =
+        supply_temperature.characterized_severe_error_count_increment;
 
     Ok(PurchasedAirInitSnapshot {
         system: system.id,
@@ -288,7 +319,7 @@ pub fn init_purchased_air_runtime(
         rejected_exhaust_node: unit.rejected_exhaust_node,
         reported_first_return_node: unit.reported_first_return_node,
         topology_diagnostic_count: unit.topology_diagnostics.len(),
-        flags: unit.flags(state.equipment_list_checked),
+        flags: unit.flags(equipment_list_checked),
         transition,
         maximum_heating_air_mass_flow_rate_kg_per_s: unit
             .maximum_heating_air_mass_flow_rate_kg_per_s,
@@ -347,6 +378,25 @@ pub fn purchased_air_init_lifecycle_summary(
         maximum_cooling_air_mass_flow_rate_kg_per_s: unit
             .maximum_cooling_air_mass_flow_rate_kg_per_s,
         standard_air_density_kg_per_m3: unit.standard_air_density_kg_per_m3,
+        supply_temperature_registered_recurring_diagnostic_count: state
+            .supply_temperature_diagnostic_registry
+            .registered_recurring_diagnostic_count,
+        supply_temperature_diagnostic_event_count: state
+            .supply_temperature_diagnostic_registry
+            .event_count,
+        supply_temperature_characterized_severe_error_count_increment: state
+            .supply_temperature_diagnostic_registry
+            .characterized_severe_error_count_increment,
+        cooling_supply_temperature_error_index: unit.cooling_supply_temperature_error_index,
+        heating_supply_temperature_error_index: unit.heating_supply_temperature_error_index,
+        cooling_supply_temperature_first_diagnostic_count: unit
+            .cooling_supply_temperature_first_diagnostic_count,
+        heating_supply_temperature_first_diagnostic_count: unit
+            .heating_supply_temperature_first_diagnostic_count,
+        supply_temperature_diagnostics: state
+            .supply_temperature_diagnostic_registry
+            .diagnostics
+            .clone(),
         cooling_supply_temperature_warning_count: unit.cooling_supply_temperature_warning_count,
         heating_supply_temperature_warning_count: unit.heating_supply_temperature_warning_count,
         economizer_flow_limit_warning_count: unit.economizer_flow_limit_warning_count,
@@ -470,30 +520,4 @@ fn initialized_mass_flow(
             PurchasedAirHardSizeLegacyError::MissingRequiredHardSize { system, field },
         )),
     }
-}
-
-fn cooling_supply_temperature_warning_active(
-    system: &IdealLoadsAirSystem,
-    context: PurchasedAirInitCallContext,
-) -> bool {
-    system.minimum_cooling_supply_air_temperature_c > context.cooling_setpoint_c
-        && context.cooling_setpoint_c != 0.0
-        && system.cooling_limit == IdealLoadsLimit::NoLimit
-        && nominally_on(context.overall_availability)
-        && nominally_on(context.cooling_availability)
-}
-
-fn heating_supply_temperature_warning_active(
-    system: &IdealLoadsAirSystem,
-    context: PurchasedAirInitCallContext,
-) -> bool {
-    system.maximum_heating_supply_air_temperature_c < context.heating_setpoint_c
-        && context.heating_setpoint_c != 0.0
-        && system.heating_limit == IdealLoadsLimit::NoLimit
-        && nominally_on(context.overall_availability)
-        && nominally_on(context.heating_availability)
-}
-
-fn nominally_on(value: f64) -> bool {
-    value > 0.0 || value.is_nan()
 }

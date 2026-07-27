@@ -595,6 +595,16 @@ fn validate_init_lifecycle(
         && lifecycle.topology_diagnostics.is_empty()
         && lifecycle.topology_failure.is_none()
         && lifecycle.economizer_flow_limit_warning_count == 0
+        && lifecycle.supply_temperature_registered_recurring_diagnostic_count == 0
+        && lifecycle.supply_temperature_diagnostic_event_count == 0
+        && lifecycle.supply_temperature_characterized_severe_error_count_increment == 0
+        && lifecycle.cooling_supply_temperature_error_index == 0
+        && lifecycle.heating_supply_temperature_error_index == 0
+        && lifecycle.cooling_supply_temperature_first_diagnostic_count == 0
+        && lifecycle.heating_supply_temperature_first_diagnostic_count == 0
+        && lifecycle.supply_temperature_diagnostics.is_empty()
+        && lifecycle.cooling_supply_temperature_warning_count == 0
+        && lifecycle.heating_supply_temperature_warning_count == 0
         && flags.environment_initialization_needed == (timestep_count > 1);
     if !ready {
         return Err(

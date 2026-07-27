@@ -78,6 +78,11 @@ claim. CP308 now executes only the direct hard-sized/no-Zone-sizing-run
 `CalcPurchAirLoads`; `IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` continues to
 block unresolved autosized flow/capacity fields.
 
+CP309 also executes the bounded post-BeginEnvrn `InitPurchasedAir`
+supply-temperature diagnostic suffix. Its relative identity registry and
+selected-unit indices are lifecycle evidence only; release validation requires
+the registry, events, indices, and counts to remain clear.
+
 ## Initial Claim Boundary
 
 The first promoted case is
@@ -112,7 +117,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 |---|---|---|
 | `PurchasedAirManager::SimPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `ep_runtime::ideal_loads::sim_purchased_air_compat`; `ep_runtime::ideal_loads::sim_purchased_air_outdoor_air_compat`; CP300 `crates/ep_runtime/src/ideal_loads/coupling.rs::couple_direct_zone_predicted_demand_to_purchased_air` calls the generic no-OA wrapper with state-backed demand; CP302 `simulate_direct_zone_purchased_air_coupled_heat_balance` release-calls that bounded composition from `ep_run` for the exact CP301 topology |
 | `PurchasedAirManager::GetPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `ep_compiler::objects::ideal_loads`; `ep_model::objects::ideal_loads` |
-| `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP305-CP308 bounded release slice: `crates/ep_runtime/src/ideal_loads/init/manager_plan.rs::PurchasedAirInitManagerPlan` eagerly resolves the immutable declaration-order membership plan; `topology_plan.rs::PurchasedAirInitTopologyPlan` resolves selected-unit topology; `state.rs::PurchasedAirRuntimeState` retains manager, per-unit lifecycle, and the four-field sizing overlay; `topology_transition.rs::advance_selected_unit_topology` and `transition.rs::init_purchased_air_runtime` execute the ordered persistent transitions through the bounded hard-size child; and `summary.rs::PurchasedAirInitLifecycleSummary` plus `transition.rs::purchased_air_init_lifecycle_summary` report the selected-unit, sizing, and manager evidence. Diagnostic adapters retain `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` only. |
+| `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP305-CP309 bounded release slice: `crates/ep_runtime/src/ideal_loads/init/manager_plan.rs::PurchasedAirInitManagerPlan` eagerly resolves the immutable declaration-order membership plan; `topology_plan.rs::PurchasedAirInitTopologyPlan` resolves selected-unit topology; `state.rs::PurchasedAirRuntimeState` retains manager, per-unit lifecycle, the four-field sizing overlay, and the bounded global diagnostic registry; `topology_transition.rs::advance_selected_unit_topology`, `transition.rs::init_purchased_air_runtime`, and `supply_temperature_diagnostic.rs::advance_supply_temperature_diagnostics` execute the ordered persistent transitions through the hard-size child, BeginEnvrn, and supply-temperature suffix; and `summary.rs::PurchasedAirInitLifecycleSummary` plus `transition.rs::purchased_air_init_lifecycle_summary` report manager, selected-unit, sizing, and diagnostic evidence for JSON projection. Diagnostic adapters retain `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` only. |
 | `DataZoneEquipment::CheckZoneEquipmentList` | `src/EnergyPlus/DataZoneEquipment.cc` | CP306 `PurchasedAirInitManagerPlan::from_model` eagerly resolves bounded membership in retained Zone order through each Zone's EquipmentConnection and referenced list entries, ignoring unreferenced lists. The matched-list ID is Rust diagnostic evidence; this `InitPurchasedAir` call observes only the Boolean return and does not request optional `CtrlZoneNum`. Runtime Init defers only latch and outcome recording. |
 | `PurchasedAirManager::SizePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP308 `crates/ep_runtime/src/ideal_loads/sizing.rs::size_purchased_air_direct_hard_sized_legacy_route` and `PurchasedAirHardSizeLegacyOutcome` map only the direct hard-sized/no-Zone-sizing-run legacy route; `crates/ep_runtime/src/ideal_loads/dispatch.rs::IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` continues to block Autosize and broader sizing. |
 | `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` |
@@ -18399,6 +18404,46 @@ shared `ErrorsFound` and partial-error side effects, reset/concurrency, and
 full `SizePurchasedAir`/`InitPurchasedAir` parity remain excluded. The two
 parents remain `scaffold`/`none`; Init and Size remain `source_mapped`;
 inventory/readiness, capability evidence, conformance, and the full-lifecycle
+Roadmap checkbox do not change.
+
+## CP309 `InitPurchasedAir` Supply-Temperature Recurring-Diagnostic Suffix
+
+CP309 maps only `PurchasedAirManager.cc` lines 1221-1320 after the existing
+sizing and BeginEnvrn transitions. Cooling lines 1225-1271 precede heating
+lines 1273-1320. Each strict outer gate combines supply temperature,
+nonzero thermostat setpoint, and `NoLimit`; an entered branch then reaches both
+the overall and mode availability read sites, including the mode site when
+overall availability is off. Supplied values `<= 0` are off, while NaN follows
+the source comparison behavior and is nominally on. Rust records these
+read-site/control-flow facts from already sampled values and does not claim
+actual schedule-service calls.
+
+`supply_temperature_diagnostic.rs` owns a PurchasedAir-runtime-global bounded
+identity registry and per-call transition. Cooling and heating allocate
+relative one-based identities in source and cross-unit activation order, then
+reuse each unit's retained zero-sentinel error index. The registry keeps one
+record per identity rather than one per timestep and accumulates recurring
+calls, first/latest Init ordinals, latest reported values, and minimum/maximum
+supply-temperature arguments in `C`. Inactive calls do not mutate it.
+
+First activation characterizes one primary detail, five Continue details, one
+timestamp, and one recurring-Severe call. Cooling's first API is
+`ShowSevereError`, adding one characterized severe increment before the
+recurring increment; heating uses `ShowSevereMessage` and adds none before its
+recurring increment. Thus first cooling contributes two, first heating one,
+and later events one each. Lifecycle summary and JSON expose the global
+identities, event/severe totals, selected-unit indices and first-detail counts,
+and retained active counts. The exact release lane requires all of those to
+remain zero.
+
+This is structured lifecycle evidence, not complete error-service parity.
+Actual ERR/SQLite/callback/message-search writes, exact text/timestamps,
+EnergyPlus process-global numeric IDs and cross-module deduplication, warmup
+and sizing counters, null schedules, malformed global state, broader
+multi-unit release execution, reset/concurrency, and full Init parity remain
+excluded. The commented fatal at lines 1321-1323 is inert. Autosizing and the
+remaining sizing routes remain open. Parent/routine status,
+inventory/readiness counts, capabilities, conformance, and the full-lifecycle
 Roadmap checkbox do not change.
 
 ## Claim Requirements

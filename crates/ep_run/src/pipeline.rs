@@ -22,13 +22,14 @@ use ep_runtime::{
     PurchasedAirHardSizeLegacyRoute, PurchasedAirInitDiagnosticKind,
     PurchasedAirInitLifecycleSummary, PurchasedAirInitTopologyDiagnosticKind,
     PurchasedAirInitTopologyDiagnosticSeverity, PurchasedAirInitTopologyError,
-    PurchasedAirRecirculationSource, ResultStore, RuntimePrecomputedData, ScheduleCacheProfile,
-    ScheduleSeriesCache, ScheduleSeriesIndexKind, TimeAxis, WeatherTimestepSeries,
-    build_environment_time_axes_with_weather_metadata, build_hourly_time_axis,
-    build_hourly_time_axis_with_weather_metadata, load_epw_weather_file, precompute_runtime_data,
-    precompute_schedule_cache_for_environment_time_axis, precompute_schedule_cache_for_time_axis,
-    precompute_weather_timestep_series, select_epw_environment_weather,
-    simulate_direct_zone_purchased_air_coupled_heat_balance,
+    PurchasedAirRecirculationSource, PurchasedAirSupplyTemperatureDiagnosticKind,
+    PurchasedAirSupplyTemperatureInitialMessageApi, ResultStore, RuntimePrecomputedData,
+    ScheduleCacheProfile, ScheduleSeriesCache, ScheduleSeriesIndexKind, TimeAxis,
+    WeatherTimestepSeries, build_environment_time_axes_with_weather_metadata,
+    build_hourly_time_axis, build_hourly_time_axis_with_weather_metadata, load_epw_weather_file,
+    precompute_runtime_data, precompute_schedule_cache_for_environment_time_axis,
+    precompute_schedule_cache_for_time_axis, precompute_weather_timestep_series,
+    select_epw_environment_weather, simulate_direct_zone_purchased_air_coupled_heat_balance,
     simulate_heat_balance_zone_air_temperatures_with_weather_series,
     simulate_ideal_loads_node_state_projection, simulate_ideal_loads_purchased_air_compat,
 };
@@ -795,6 +796,54 @@ fn purchased_air_init_lifecycle_json(lifecycle: &PurchasedAirInitLifecycleSummar
         }
         PurchasedAirInitTopologyError::NoRecirculationNode { .. } => "no_recirculation_node",
     });
+    let supply_temperature_diagnostics: Vec<_> = lifecycle
+        .supply_temperature_diagnostics
+        .iter()
+        .map(|diagnostic| {
+            let kind = match diagnostic.kind {
+                PurchasedAirSupplyTemperatureDiagnosticKind::CoolingMinimumAboveSetpoint => {
+                    "cooling_minimum_above_setpoint"
+                }
+                PurchasedAirSupplyTemperatureDiagnosticKind::HeatingMaximumBelowSetpoint => {
+                    "heating_maximum_below_setpoint"
+                }
+            };
+            let initial_message_api = match diagnostic.initial_message_api {
+                PurchasedAirSupplyTemperatureInitialMessageApi::ShowSevereError => {
+                    "show_severe_error"
+                }
+                PurchasedAirSupplyTemperatureInitialMessageApi::ShowSevereMessage => {
+                    "show_severe_message"
+                }
+            };
+            json!({
+                "system": diagnostic.system.0,
+                "registry_registration_ordinal": diagnostic.registry_registration_ordinal,
+                "first_init_call_ordinal": diagnostic.first_init_call_ordinal,
+                "last_init_call_ordinal": diagnostic.last_init_call_ordinal,
+                "source_order_ordinal": diagnostic.source_order_ordinal,
+                "kind": kind,
+                "recurring_index": diagnostic.recurring_index,
+                "first_detailed_diagnostic_count": diagnostic.first_detailed_diagnostic_count,
+                "initial_message_api": initial_message_api,
+                "first_detail_primary_message_count": diagnostic.first_detail_primary_message_count,
+                "first_detail_continue_message_count": diagnostic.first_detail_continue_message_count,
+                "first_detail_timestamp_count": diagnostic.first_detail_timestamp_count,
+                "recurring_severe_call_count": diagnostic.recurring_severe_call_count,
+                "characterized_severe_error_count_increment": diagnostic.characterized_severe_error_count_increment,
+                "latest_supply_temperature_c": diagnostic.latest_supply_temperature_c,
+                "latest_thermostat_setpoint_c": diagnostic.latest_thermostat_setpoint_c,
+                "recurring_minimum_c": diagnostic.recurring_minimum_c,
+                "recurring_maximum_c": diagnostic.recurring_maximum_c,
+                "temperature_unit": diagnostic.temperature_unit,
+            })
+        })
+        .collect();
+    let recurring_index_json = |index: usize| {
+        (index > 0)
+            .then_some(index)
+            .map_or(Value::Null, Value::from)
+    };
     let sized_value_json = |value: Option<AutosizeOrNumber>| match value {
         Some(AutosizeOrNumber::Value(value)) => json!(value),
         Some(AutosizeOrNumber::Autosize) => json!("autosize"),
@@ -859,7 +908,7 @@ fn purchased_air_init_lifecycle_json(lifecycle: &PurchasedAirInitLifecycleSummar
             "fields": fields,
         })
     });
-    json!({
+    let mut value = json!({
         "source": lifecycle.source,
         "flags": {
             "state_machine_used": lifecycle.flags.state_machine_used,
@@ -905,7 +954,23 @@ fn purchased_air_init_lifecycle_json(lifecycle: &PurchasedAirInitLifecycleSummar
         "cooling_supply_temperature_warning_count": lifecycle.cooling_supply_temperature_warning_count,
         "heating_supply_temperature_warning_count": lifecycle.heating_supply_temperature_warning_count,
         "economizer_flow_limit_warning_count": lifecycle.economizer_flow_limit_warning_count,
-    })
+    });
+    if let Value::Object(object) = &mut value {
+        object.insert(
+            "supply_temperature_diagnostic_registry".to_string(),
+            json!({
+                "registered_recurring_diagnostic_count": lifecycle.supply_temperature_registered_recurring_diagnostic_count,
+                "event_count": lifecycle.supply_temperature_diagnostic_event_count,
+                "characterized_severe_error_count_increment": lifecycle.supply_temperature_characterized_severe_error_count_increment,
+                "cooling_error_index": recurring_index_json(lifecycle.cooling_supply_temperature_error_index),
+                "heating_error_index": recurring_index_json(lifecycle.heating_supply_temperature_error_index),
+                "cooling_first_diagnostic_count": lifecycle.cooling_supply_temperature_first_diagnostic_count,
+                "heating_first_diagnostic_count": lifecycle.heating_supply_temperature_first_diagnostic_count,
+                "identities": supply_temperature_diagnostics,
+            }),
+        );
+    }
+    value
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -2171,6 +2236,23 @@ fn validate_direct_purchased_air_init_lifecycle(
             "direct-zone IdealLoads selected-unit topology is not release-ready".to_string(),
         );
     }
+    let supply_temperature_diagnostics_clear =
+        lifecycle.supply_temperature_registered_recurring_diagnostic_count == 0
+            && lifecycle.supply_temperature_diagnostic_event_count == 0
+            && lifecycle.supply_temperature_characterized_severe_error_count_increment == 0
+            && lifecycle.cooling_supply_temperature_error_index == 0
+            && lifecycle.heating_supply_temperature_error_index == 0
+            && lifecycle.cooling_supply_temperature_first_diagnostic_count == 0
+            && lifecycle.heating_supply_temperature_first_diagnostic_count == 0
+            && lifecycle.supply_temperature_diagnostics.is_empty()
+            && lifecycle.cooling_supply_temperature_warning_count == 0
+            && lifecycle.heating_supply_temperature_warning_count == 0;
+    if !supply_temperature_diagnostics_clear {
+        return Err(
+            "direct-zone IdealLoads supply-temperature diagnostic registry is not release-ready"
+                .to_string(),
+        );
+    }
     let sized_limits = lifecycle
         .sized_limits
         .ok_or_else(|| "direct-zone IdealLoads sizing overlay is missing".to_string())?;
@@ -2554,7 +2636,9 @@ mod tests {
         PurchasedAirHardSizeField, PurchasedAirHardSizeFieldOutcome,
         PurchasedAirHardSizeLegacyOutcome, PurchasedAirHardSizeLegacyRoute,
         PurchasedAirInitLifecycleSummary, PurchasedAirRecirculationSource, PurchasedAirSizedLimits,
-        ScheduleCacheProfile, ScheduleSeriesIndexKind, build_hourly_time_axis,
+        PurchasedAirSupplyTemperatureDiagnostic, PurchasedAirSupplyTemperatureDiagnosticKind,
+        PurchasedAirSupplyTemperatureInitialMessageApi, ScheduleCacheProfile,
+        ScheduleSeriesIndexKind, build_hourly_time_axis,
     };
 
     use crate::{RunResultState, RuntimeClass, TraceLevel, TraceSelection};
@@ -2639,6 +2723,15 @@ mod tests {
         let mut advisory = valid.clone();
         advisory.economizer_flow_limit_warning_count = 1;
         assert!(validate_direct_purchased_air_init_lifecycle(Some(&advisory), Some(2)).is_err());
+        let mut supply_temperature_diagnostic = valid.clone();
+        supply_temperature_diagnostic.supply_temperature_diagnostic_event_count = 1;
+        assert!(
+            validate_direct_purchased_air_init_lifecycle(
+                Some(&supply_temperature_diagnostic),
+                Some(2)
+            )
+            .is_err()
+        );
         let mut equipment_mismatch = valid;
         equipment_mismatch.equipment_list = Some(ZoneEquipmentListId(1));
         assert!(
@@ -2671,7 +2764,78 @@ mod tests {
             Some(4)
         );
         assert!(value["sized_limits"].is_object());
+        assert_eq!(
+            value["supply_temperature_diagnostic_registry"]["registered_recurring_diagnostic_count"],
+            0
+        );
+        assert_eq!(
+            value["supply_temperature_diagnostic_registry"]["event_count"],
+            0
+        );
+        assert_eq!(
+            value["supply_temperature_diagnostic_registry"]["identities"],
+            serde_json::json!([])
+        );
+        assert!(value["supply_temperature_diagnostic_registry"]["cooling_error_index"].is_null());
+        assert!(value["supply_temperature_diagnostic_registry"]["heating_error_index"].is_null());
         assert_eq!(value["economizer_flow_limit_warning_count"], 0);
+    }
+
+    #[test]
+    fn lifecycle_json_serializes_structured_supply_temperature_diagnostics() {
+        let mut lifecycle = valid_init_lifecycle(1);
+        lifecycle.supply_temperature_registered_recurring_diagnostic_count = 1;
+        lifecycle.supply_temperature_diagnostic_event_count = 1;
+        lifecycle.supply_temperature_characterized_severe_error_count_increment = 2;
+        lifecycle.cooling_supply_temperature_error_index = 1;
+        lifecycle.cooling_supply_temperature_first_diagnostic_count = 1;
+        lifecycle.cooling_supply_temperature_warning_count = 1;
+        lifecycle
+            .supply_temperature_diagnostics
+            .push(PurchasedAirSupplyTemperatureDiagnostic {
+                system: IdealLoadsAirSystemId(0),
+                registry_registration_ordinal: 1,
+                first_init_call_ordinal: 1,
+                last_init_call_ordinal: 1,
+                source_order_ordinal: 1,
+                kind: PurchasedAirSupplyTemperatureDiagnosticKind::CoolingMinimumAboveSetpoint,
+                recurring_index: 1,
+                first_detailed_diagnostic_count: 1,
+                initial_message_api:
+                    PurchasedAirSupplyTemperatureInitialMessageApi::ShowSevereError,
+                first_detail_primary_message_count: 1,
+                first_detail_continue_message_count: 5,
+                first_detail_timestamp_count: 1,
+                recurring_severe_call_count: 1,
+                characterized_severe_error_count_increment: 2,
+                latest_supply_temperature_c: 25.0,
+                latest_thermostat_setpoint_c: 24.0,
+                recurring_minimum_c: 25.0,
+                recurring_maximum_c: 25.0,
+                temperature_unit: "C",
+            });
+
+        let value = purchased_air_init_lifecycle_json(&lifecycle);
+        let registry = &value["supply_temperature_diagnostic_registry"];
+        assert_eq!(registry["registered_recurring_diagnostic_count"], 1);
+        assert_eq!(registry["event_count"], 1);
+        assert_eq!(registry["characterized_severe_error_count_increment"], 2);
+        assert_eq!(registry["cooling_error_index"], 1);
+        assert!(registry["heating_error_index"].is_null());
+        assert_eq!(registry["identities"][0]["source_order_ordinal"], 1);
+        assert_eq!(
+            registry["identities"][0]["kind"],
+            "cooling_minimum_above_setpoint"
+        );
+        assert_eq!(
+            registry["identities"][0]["initial_message_api"],
+            "show_severe_error"
+        );
+        assert_eq!(
+            registry["identities"][0]["first_detail_continue_message_count"],
+            5
+        );
+        assert_eq!(registry["identities"][0]["temperature_unit"], "C");
     }
 
     fn valid_init_lifecycle(call_count: usize) -> PurchasedAirInitLifecycleSummary {
@@ -2747,6 +2911,14 @@ mod tests {
             maximum_heating_air_mass_flow_rate_kg_per_s: 0.0,
             maximum_cooling_air_mass_flow_rate_kg_per_s: 0.0,
             standard_air_density_kg_per_m3: Some(1.2),
+            supply_temperature_registered_recurring_diagnostic_count: 0,
+            supply_temperature_diagnostic_event_count: 0,
+            supply_temperature_characterized_severe_error_count_increment: 0,
+            cooling_supply_temperature_error_index: 0,
+            heating_supply_temperature_error_index: 0,
+            cooling_supply_temperature_first_diagnostic_count: 0,
+            heating_supply_temperature_first_diagnostic_count: 0,
+            supply_temperature_diagnostics: Vec::new(),
             cooling_supply_temperature_warning_count: 0,
             heating_supply_temperature_warning_count: 0,
             economizer_flow_limit_warning_count: 0,

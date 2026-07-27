@@ -8,6 +8,7 @@ use super::super::{PurchasedAirHardSizeLegacyOutcome, PurchasedAirSizedLimits};
 use super::{
     IdealLoadsInitFlags, PurchasedAirInitTopologyDiagnostic, PurchasedAirInitTopologyError,
     PurchasedAirInitTopologyPlan, PurchasedAirRecirculationSource,
+    PurchasedAirSupplyTemperatureDiagnosticRegistry,
 };
 
 /// Structured diagnostic emitted by the manager-wide equipment-list sweep.
@@ -41,6 +42,8 @@ pub struct PurchasedAirRuntimeState {
     pub equipment_list_scan_order: Vec<IdealLoadsAirSystemId>,
     /// Ordered source-shaped severe diagnostics emitted by the sweep.
     pub equipment_list_diagnostics: Vec<PurchasedAirInitDiagnostic>,
+    /// Rust-owned bounded registry for supply-temperature recurring identities.
+    pub supply_temperature_diagnostic_registry: PurchasedAirSupplyTemperatureDiagnosticRegistry,
     /// Per-system lifecycle state in typed-ID order.
     pub units: BTreeMap<IdealLoadsAirSystemId, PurchasedAirUnitRuntimeState>,
     /// Number of module arena allocations.
@@ -118,6 +121,14 @@ pub struct PurchasedAirUnitRuntimeState {
     pub environment_initialization_count: usize,
     /// False-begin-environment calls that rearmed the environment latch.
     pub environment_rearm_count: usize,
+    /// Source `CoolErrIndex`; zero means no recurring identity is registered.
+    pub cooling_supply_temperature_error_index: usize,
+    /// Source `HeatErrIndex`; zero means no recurring identity is registered.
+    pub heating_supply_temperature_error_index: usize,
+    /// First detailed cooling diagnostic groups emitted.
+    pub cooling_supply_temperature_first_diagnostic_count: usize,
+    /// First detailed heating diagnostic groups emitted.
+    pub heating_supply_temperature_first_diagnostic_count: usize,
     /// Active cooling supply-temperature recurring diagnostic count.
     pub cooling_supply_temperature_warning_count: usize,
     /// Active heating supply-temperature recurring diagnostic count.
@@ -163,6 +174,10 @@ impl PurchasedAirUnitRuntimeState {
             sizing_attempt_count: 0,
             environment_initialization_count: 0,
             environment_rearm_count: 0,
+            cooling_supply_temperature_error_index: 0,
+            heating_supply_temperature_error_index: 0,
+            cooling_supply_temperature_first_diagnostic_count: 0,
+            heating_supply_temperature_first_diagnostic_count: 0,
             cooling_supply_temperature_warning_count: 0,
             heating_supply_temperature_warning_count: 0,
             economizer_flow_limit_warning_count: 0,

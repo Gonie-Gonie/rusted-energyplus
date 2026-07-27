@@ -15412,6 +15412,58 @@ retry/reset/concurrency parity, and complete `SizePurchasedAir` or
 capability evidence, conformance, and the external Roadmap full-lifecycle
 checkbox remain unchanged.
 
+## CP309 Source-Ordered `InitPurchasedAir` Supply-Temperature Diagnostics
+
+CP309 maps the EnergyPlus 26.1 `InitPurchasedAir` suffix at
+`PurchasedAirManager.cc` lines 1221-1320, after the sizing and
+BeginEnvrn blocks and before the routine returns to `CalcPurchAirLoads`.
+Cooling lines 1225-1271 execute before heating lines 1273-1320. The commented
+fatal tail at lines 1321-1323 remains inert.
+
+Each branch first evaluates its strict source outer condition. Cooling requires
+minimum cooling supply temperature above a nonzero cooling setpoint with
+`CoolingLimit == NoLimit`; heating requires maximum heating supply temperature
+below a nonzero heating setpoint with `HeatingLimit == NoLimit`. Only an entered
+outer branch reaches the overall-availability and mode-availability read sites,
+and both sites are reached even if overall availability is off. Rust receives
+those values already sampled, records read-site visitation rather than claiming
+schedule-service calls, treats `<= 0` as off, and retains the source consequence
+that NaN availability is nominally on.
+
+`PurchasedAirSupplyTemperatureDiagnosticRegistry` is global within one bounded
+PurchasedAir runtime state. It allocates relative one-based identities in
+cooling-before-heating and cross-unit activation order, while each unit retains
+source-shaped zero-sentinel cooling and heating indices for reuse. Each
+registered identity accumulates recurring call count, first and latest Init
+call ordinals, latest supply/setpoint values, and minimum/maximum reported
+supply temperature in `C`; inactive calls do not mutate it. This bounded
+aggregation avoids a per-timestep event log and preserves multi-unit counter
+reconciliation, but its numeric IDs are not EnergyPlus process-global error
+registry IDs.
+
+On first activation, both branches characterize one primary detail, five
+Continue details, and one timestamp before the recurring call. Cooling records
+`ShowSevereError`, so its first ordinary non-warmup/non-sizing activation
+characterizes two severe-count increments including the recurring call.
+Heating records `ShowSevereMessage`, so its first activation characterizes only
+the recurring increment. Later active calls characterize one increment each.
+When both first activate together, cooling receives the first identity and the
+combined increment is three. The lifecycle summary and run JSON expose the
+global registry, selected-unit indices and first-detail counts, per-unit active
+counts, and per-call gate/transition evidence.
+
+The exact release lane requires every registry identity, event, error index,
+first-detail count, severe increment, and historical active count to remain
+zero. Active CP309 branches are therefore direct lifecycle evidence only.
+Actual ERR/SQLite/callback/message-search output, exact text and timestamps,
+real schedule lookup effects, exact EnergyPlus process-wide identity and
+deduplication parity, warmup/sizing counters, null schedules, malformed global
+state, broader multi-unit release execution, reset/concurrency, and complete
+`InitPurchasedAir` parity remain excluded. Autosizing and the remaining
+`SizePurchasedAir` routes also remain open. Both parent algorithms stay
+`scaffold`/`none`; Init and Size remain `source_mapped`; inventory/readiness,
+capabilities, conformance, and the external Roadmap checkbox do not change.
+
 
 
 
