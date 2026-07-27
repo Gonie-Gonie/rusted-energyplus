@@ -440,6 +440,44 @@ fn heating_flow_limit_clamps_mass_flow_and_actual_output() {
 }
 
 #[test]
+fn initialized_mass_flow_caches_are_authoritative_over_live_density() {
+    let mut system = test_system();
+    system.heating_limit = IdealLoadsLimit::LimitFlowRate;
+    system.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.05));
+    system.cooling_limit = IdealLoadsLimit::LimitFlowRate;
+    system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.05));
+    let zone_state = IdealLoadsZoneState {
+        air_temperature_c: 20.0,
+        air_humidity_ratio: 0.008,
+    };
+    let initialized =
+        IdealLoadsSensibleLimitContext::default().with_initialized_flow_limits(1.2, 0.03, 0.04);
+    let context = IdealLoadsSensibleLimitContext {
+        standard_air_density_kg_per_m3: 99.0,
+        ..initialized
+    };
+
+    let heating = calc_no_oa_sensible_with_limits_compat(
+        &system,
+        zone_state,
+        ZoneSysEnergyDemand::sensible_only(ZoneId(0), 3000.0, 0.0),
+        true,
+        context,
+    );
+    let cooling = calc_no_oa_sensible_with_limits_compat(
+        &system,
+        zone_state,
+        ZoneSysEnergyDemand::sensible_only(ZoneId(0), 0.0, -3000.0),
+        true,
+        context,
+    );
+
+    assert_close(heating.supply_mass_flow_rate_kg_per_s, 0.03, 1.0e-12);
+    assert_close(cooling.supply_mass_flow_rate_kg_per_s, 0.04, 1.0e-12);
+    assert_close(context.standard_air_density_kg_per_m3, 99.0, 1.0e-12);
+}
+
+#[test]
 fn heating_capacity_limit_caps_output_and_adjusts_supply_temperature() {
     let mut system = test_system();
     system.heating_limit = IdealLoadsLimit::LimitCapacity;

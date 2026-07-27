@@ -37,7 +37,7 @@ use crate::heat_balance::{air_manager, manager, surface_manager, zone_predictor_
 use crate::ideal_loads::{
     DirectZonePurchasedAirModelBinding, DirectZonePurchasedAirRuntimeStepError,
     DirectZonePurchasedAirScheduledCouplingInput, DirectZonePurchasedAirScheduledCouplingOutput,
-    couple_model_bound_direct_zone_purchased_air,
+    PurchasedAirRuntimeState, couple_model_bound_direct_zone_purchased_air,
 };
 use crate::schedules::{
     InternalGainSchedulePhaseOperations, ScheduleSeriesCache, convective_internal_gain_w,
@@ -169,6 +169,8 @@ pub(crate) fn advance_heat_balance_state_one_timestep_with_direct_zone_purchased
     inside_hconv_reevaluation_interval: Option<u32>,
     surface_loop_zone_air_correction: HeatBalanceSurfaceLoopZoneAirCorrection,
     binding: &DirectZonePurchasedAirModelBinding<'_>,
+    purchased_air_runtime_state: &mut PurchasedAirRuntimeState,
+    begin_environment: bool,
     coupling_schedule_cache: &ScheduleSeriesCache,
     coupling_schedule_sample_index: usize,
 ) -> Result<DirectZonePurchasedAirScheduledCouplingOutput, DirectZonePurchasedAirRuntimeStepError> {
@@ -226,6 +228,8 @@ pub(crate) fn advance_heat_balance_state_one_timestep_with_direct_zone_purchased
                         schedule_cache: coupling_schedule_cache,
                         schedule_sample_index: coupling_schedule_sample_index,
                         zone_state,
+                        purchased_air_runtime_state,
+                        begin_environment,
                         barometric_pressure_pa: limit_context.barometric_pressure_pa,
                         system_timestep_seconds: input.timestep_seconds,
                     },

@@ -15217,6 +15217,34 @@ feedback, outdoor-air/weather/schedule/DCV coupling, all
 remaining lifecycle. Both parent algorithms remain `scaffold` at claim level
 `none`; no routine, inventory, performance, or conformance status is promoted.
 
+## CP305 Persistent `InitPurchasedAir` Direct-Zone Slice
+
+CP305 adds a bounded persistent initialization state only to the exact CP303
+one-manager/one-unit direct-Zone release topology. `PurchasedAirRuntimeState`
+survives every fixed timestep, and `init_purchased_air_runtime` runs between
+the Zone load predictor and `CalcPurchAirLoads`. It latches the sole equipment
+list membership, Controlled Zone, supply node, and single return/recirculation
+node; rejects Autosize; and completes the hard-size gate once.
+
+The first explicit BeginEnvrn transition caches heating and cooling maximum
+mass flow from Site `StdRhoAir`. A later non-BeginEnvrn call rearms the source
+`MyEnvrnFlag` once, and a future BeginEnvrn transition recomputes the cache.
+Finite-flow calculation consumes the cached kg/s limits, while live EPW
+barometric pressure remains the independent saturation context. Every release
+Calc result retains the exact state-machine flags from its Init snapshot, and
+the run summary requires Init-call/coupling-call equality plus exactly one
+manager, list, unit, sizing, and environment transition for this single
+environment runtime.
+
+Legacy diagnostic adapters retain an assumed-ready snapshot with
+`state_machine_used=false` and expose no release lifecycle summary. CP305 does
+not complete multi-unit scans, exhaust or multiple-return quirks, plenum
+arrays, full `SizePurchasedAir` or Autosize, exact warning registry/text,
+design or multiple environments, warmup/adaptive iteration,
+`FirstHVACIteration`, retry/reset/concurrency, or broader conformance. Roadmap
+Section 12's full lifecycle item remains open, both parent algorithms remain
+`scaffold`/`none`, and `routine.init_purchased_air` remains `source_mapped`.
+
 
 
 

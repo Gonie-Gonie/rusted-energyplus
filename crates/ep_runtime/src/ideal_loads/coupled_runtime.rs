@@ -33,8 +33,10 @@ use crate::{ResultStore, ZoneSensibleDemandInputKind};
 
 use super::{
     DirectZonePurchasedAirBindingError, DirectZonePurchasedAirHourlyOutputError,
-    DirectZonePurchasedAirRuntimeStepError, IdealLoadsPurchasedAirBranch,
+    DirectZonePurchasedAirRuntimeStepError, IdealLoadsPurchasedAirBranch, PurchasedAirInitError,
+    PurchasedAirInitLifecycleSummary, PurchasedAirRuntimeState,
     append_direct_zone_purchased_air_hourly_output_series, bind_direct_zone_purchased_air_model,
+    purchased_air_init_lifecycle_summary,
 };
 
 const SECONDS_PER_HOUR: f64 = 3_600.0;
@@ -50,7 +52,10 @@ pub const DIRECT_ZONE_PURCHASED_AIR_RECIRCULATION_SOURCE: &str =
 /// Actual coupled source-order stages executed once per nominal system step.
 pub const DIRECT_ZONE_PURCHASED_AIR_COUPLED_SOURCE_ORDER: &[&str] = &[
     "predict-system-loads",
-    "sim-purchased-air",
+    "init-purchased-air",
+    "calc-purch-air-loads",
+    "update-purchased-air",
+    "report-purchased-air",
     "correct-zone-air-temps",
 ];
 
@@ -103,6 +108,8 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     pub recirculation_state_source: &'static str,
     /// Actual nested predictor/HVAC/corrector order.
     pub actual_coupled_source_order: &'static [&'static str],
+    /// Persistent bounded `InitPurchasedAir` lifecycle report.
+    pub init_lifecycle: PurchasedAirInitLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -125,6 +132,8 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     Binding(DirectZonePurchasedAirBindingError),
     /// Heat-balance initialization or weather input failed.
     HeatBalance(RuntimeError),
+    /// A release run with no system timestep cannot execute initialization.
+    NoTimestepsRequested,
     /// The active zone-timestep cache cannot cover the requested prefix.
     ScheduleCacheCoverage {
         /// Required zone-timestep samples.
@@ -136,6 +145,22 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     TimestepCountOverflow,
     /// One live predictor-bound CP301 call failed.
     RuntimeStep(DirectZonePurchasedAirRuntimeStepError),
+    /// Final lifecycle summary could not resolve the bound unit.
+    InitLifecycle(PurchasedAirInitError),
+    /// A lifecycle transition count did not match the single-environment run.
+    InitLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
+    /// A Calc call did not retain the exact persistent initialization flags.
+    UnexpectedInitializationFlags {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
     /// A successful CP301 call did not retain source-setpoint demand provenance.
     UnexpectedDemandInputKind {
         /// Zero-based nominal system-step index.
@@ -166,6 +191,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 )
             }
             Self::HeatBalance(error) => Display::fmt(error, formatter),
+            Self::NoTimestepsRequested => write!(
+                formatter,
+                "direct-Zone PurchasedAir requires at least one system timestep"
+            ),
             Self::ScheduleCacheCoverage {
                 required,
                 available,
@@ -180,6 +209,22 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::RuntimeStep(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir predictor step failed: {error:?}"
+            ),
+            Self::InitLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir lifecycle summary failed: {error:?}"
+            ),
+            Self::InitLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
+            Self::UnexpectedInitializationFlags { timestep_index } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -225,6 +270,9 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         return Err(DirectZonePurchasedAirCoupledRuntimeError::HeatBalance(
             RuntimeError::NoWeatherData,
         ));
+    }
+    if options.sample_count == 0 {
+        return Err(DirectZonePurchasedAirCoupledRuntimeError::NoTimestepsRequested);
     }
     if options.sample_count > weather_dry_bulb_c.len() {
         return Err(DirectZonePurchasedAirCoupledRuntimeError::HeatBalance(
@@ -305,6 +353,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
                 schedule_cache_profile,
             ))
         })?;
+    let mut purchased_air_runtime_state = PurchasedAirRuntimeState::default();
 
     let (samples, timestep_outputs) = sample_heat_balance_run_period_with_step_driver(
         model,
@@ -332,6 +381,8 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
                 heat_balance_options.inside_hconv_reevaluation_interval,
                 heat_balance_options.surface_loop_zone_air_correction,
                 &binding,
+                &mut purchased_air_runtime_state,
+                sample_index == 0,
                 coupling_schedule_cache,
                 sample_index,
             )
@@ -340,6 +391,15 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
     )?;
 
     for (timestep_index, output) in timestep_outputs.iter().enumerate() {
+        if !output.initialization.flags.state_machine_used
+            || output.coupling.purchased_air.init_flags != output.initialization.flags
+        {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::UnexpectedInitializationFlags {
+                    timestep_index,
+                },
+            );
+        }
         let actual_branch = output.coupling.purchased_air.branch;
         if actual_branch != binding.branch {
             return Err(
@@ -365,6 +425,12 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             );
         }
     }
+    let init_lifecycle = purchased_air_init_lifecycle_summary(
+        &purchased_air_runtime_state,
+        binding.ideal_loads_air_system,
+    )
+    .map_err(DirectZonePurchasedAirCoupledRuntimeError::InitLifecycle)?;
+    validate_init_lifecycle(&init_lifecycle, timestep_outputs.len())?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -426,11 +492,95 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             fixture_demand_injection_used: false,
             recirculation_state_source: DIRECT_ZONE_PURCHASED_AIR_RECIRCULATION_SOURCE,
             actual_coupled_source_order: DIRECT_ZONE_PURCHASED_AIR_COUPLED_SOURCE_ORDER,
+            init_lifecycle,
         },
         state,
         results,
         internal_gain_schedule_cache_profile,
     })
+}
+
+fn validate_init_lifecycle(
+    lifecycle: &PurchasedAirInitLifecycleSummary,
+    timestep_count: usize,
+) -> Result<(), DirectZonePurchasedAirCoupledRuntimeError> {
+    for (field, expected, actual) in [
+        ("init_call_count", timestep_count, lifecycle.init_call_count),
+        (
+            "module_initialization_count",
+            1,
+            lifecycle.module_initialization_count,
+        ),
+        (
+            "equipment_list_check_count",
+            1,
+            lifecycle.equipment_list_check_count,
+        ),
+        (
+            "one_time_initialization_count",
+            1,
+            lifecycle.one_time_initialization_count,
+        ),
+        ("sizing_check_count", 1, lifecycle.sizing_check_count),
+        (
+            "environment_initialization_count",
+            1,
+            lifecycle.environment_initialization_count,
+        ),
+        (
+            "environment_rearm_count",
+            usize::from(timestep_count > 1),
+            lifecycle.environment_rearm_count,
+        ),
+    ] {
+        if actual != expected {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::InitLifecycleInvariant {
+                    field,
+                    expected,
+                    actual,
+                },
+            );
+        }
+    }
+    let flags = lifecycle.flags;
+    let ready = flags.state_machine_used
+        && flags.one_time_checked
+        && flags.environment_initialized
+        && flags.sizing_checked
+        && flags.equipment_list_checked
+        && flags.return_plenum_inactive
+        && flags.environment_initialization_needed == (timestep_count > 1);
+    if !ready {
+        return Err(
+            DirectZonePurchasedAirCoupledRuntimeError::InitLifecycleInvariant {
+                field: "final_flags_ready",
+                expected: 1,
+                actual: 0,
+            },
+        );
+    }
+    let density_valid = lifecycle
+        .standard_air_density_kg_per_m3
+        .is_some_and(|value| value.is_finite() && value > 0.0);
+    let caches_valid = lifecycle
+        .maximum_heating_air_mass_flow_rate_kg_per_s
+        .is_finite()
+        && lifecycle.maximum_heating_air_mass_flow_rate_kg_per_s >= 0.0
+        && lifecycle
+            .maximum_cooling_air_mass_flow_rate_kg_per_s
+            .is_finite()
+        && lifecycle.maximum_cooling_air_mass_flow_rate_kg_per_s >= 0.0;
+    if !density_valid || !caches_valid {
+        return Err(
+            DirectZonePurchasedAirCoupledRuntimeError::InitLifecycleInvariant {
+                field: "environment_cache_valid",
+                expected: 1,
+                actual: 0,
+            },
+        );
+    }
+    Ok(())
 }
 
 fn validate_fixed_runtime_config(runtime_config: HeatBalanceRuntimeConfig) {

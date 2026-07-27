@@ -135,6 +135,15 @@ compatibility even where separate case-level conformance evidence exists.
 IdealLoads outdoor-air, economizer, heat-recovery branches remain outside
 arbitrary-run compatibility.
 
+The exact direct-Zone release runtime now also owns the bounded CP305
+`InitPurchasedAir` state across timesteps. Its first BeginEnvrn call caches
+hard-sized heating/cooling mass-flow limits from Site `StdRhoAir`, finite-flow
+Calc consumes those cached limits, and each Calc output is checked against its
+Init snapshot. `rust_runtime.purchased_air_init_lifecycle` reports the bounded
+transition counts and cache; diagnostic adapters report no lifecycle and keep
+`state_machine_used=false`. Full multi-unit, plenum/exhaust, Autosize,
+multi-environment, warmup/adaptive, and retry/reset lifecycle remains open.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

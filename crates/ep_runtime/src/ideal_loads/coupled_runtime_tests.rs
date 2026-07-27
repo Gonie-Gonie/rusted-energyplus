@@ -3,8 +3,9 @@ use super::*;
 use crate::{
     ideal_loads::{
         DirectZonePurchasedAirBindingFeature, IdealLoadsSensibleLimitContext,
-        ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO, ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE,
-        ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
+        PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
+        ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
         ZONE_SYSTEM_PREDICTED_SENSIBLE_LOAD_TO_COOLING_SETPOINT_RATE,
         ZONE_SYSTEM_PREDICTED_SENSIBLE_LOAD_TO_HEATING_SETPOINT_RATE,
     },
@@ -80,6 +81,24 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
         simulation.summary.actual_coupled_source_order,
         DIRECT_ZONE_PURCHASED_AIR_COUPLED_SOURCE_ORDER
     );
+    let lifecycle = simulation.summary.init_lifecycle;
+    assert_eq!(lifecycle.source, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE);
+    assert!(lifecycle.flags.state_machine_used);
+    assert!(lifecycle.flags.one_time_checked);
+    assert!(lifecycle.flags.environment_initialized);
+    assert!(lifecycle.flags.environment_initialization_needed);
+    assert!(lifecycle.flags.sizing_checked);
+    assert!(lifecycle.flags.equipment_list_checked);
+    assert!(lifecycle.flags.return_plenum_inactive);
+    assert_eq!(lifecycle.module_initialization_count, 1);
+    assert_eq!(lifecycle.equipment_list_check_count, 1);
+    assert_eq!(lifecycle.init_call_count, required_steps);
+    assert_eq!(lifecycle.one_time_initialization_count, 1);
+    assert_eq!(lifecycle.sizing_check_count, 1);
+    assert_eq!(lifecycle.environment_initialization_count, 1);
+    assert_eq!(lifecycle.environment_rearm_count, 1);
+    assert_close(lifecycle.maximum_heating_air_mass_flow_rate_kg_per_s, 0.0);
+    assert_close(lifecycle.maximum_cooling_air_mass_flow_rate_kg_per_s, 0.0);
 
     let zone = simulation.state.zones.first().expect("bound Zone state");
     assert_eq!(simulation.state.timestep_index, required_steps);
@@ -182,6 +201,29 @@ fn all_hard_sized_finite_limit_branches_run_with_source_threshold_demand() {
             DIRECT_ZONE_PURCHASED_AIR_COUPLED_SOURCE_ORDER
         );
         assert_eq!(simulation.summary.return_node_name, RETURN_NODE_KEY);
+        let lifecycle = simulation.summary.init_lifecycle;
+        assert_eq!(lifecycle.init_call_count, required_steps);
+        assert_eq!(lifecycle.environment_initialization_count, 1);
+        assert_eq!(lifecycle.environment_rearm_count, 1);
+        let density = lifecycle
+            .standard_air_density_kg_per_m3
+            .expect("initialized standard density");
+        let expected_mass_flow = if matches!(
+            limit,
+            IdealLoadsLimit::LimitFlowRate | IdealLoadsLimit::LimitFlowRateAndCapacity
+        ) {
+            0.005 * density
+        } else {
+            0.0
+        };
+        assert_close(
+            lifecycle.maximum_heating_air_mass_flow_rate_kg_per_s,
+            expected_mass_flow,
+        );
+        assert_close(
+            lifecycle.maximum_cooling_air_mass_flow_rate_kg_per_s,
+            expected_mass_flow,
+        );
 
         let heating_rate = simulation
             .results

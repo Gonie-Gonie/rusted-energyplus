@@ -601,6 +601,78 @@ fn wrapped_cp300_failure_is_transactional() {
 }
 
 #[test]
+fn predictor_failure_precedes_and_preserves_purchased_air_initialization() {
+    let (model, cache) = fixture(|_| {});
+    let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
+    let mut state = zone_state_for_temp_independent_load(0.0);
+    state.convective_internal_gain_w = f64::INFINITY;
+    let original = state.clone();
+    let mut purchased_air_runtime_state = PurchasedAirRuntimeState {
+        module_initialized: true,
+        ..PurchasedAirRuntimeState::default()
+    };
+    let original_init_state = purchased_air_runtime_state.clone();
+
+    let error = couple_model_bound_direct_zone_purchased_air(
+        DirectZonePurchasedAirScheduledCouplingInput {
+            binding: &binding,
+            schedule_cache: &cache,
+            schedule_sample_index: 0,
+            zone_state: &mut state,
+            purchased_air_runtime_state: &mut purchased_air_runtime_state,
+            begin_environment: true,
+            barometric_pressure_pa: binding.limit_context.barometric_pressure_pa,
+            system_timestep_seconds: binding.nominal_system_timestep_seconds,
+        },
+    )
+    .expect_err("predictor must reject the nonfinite source term before Init");
+
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirScheduledCouplingError::Coupling(
+            DirectZonePurchasedAirCouplingError::Prediction(_)
+        )
+    ));
+    assert_eq!(purchased_air_runtime_state, original_init_state);
+    assert_eq!(state, original);
+}
+
+#[test]
+fn initialization_failure_precedes_calc_only_input_validation() {
+    let (model, cache) = fixture(|_| {});
+    let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
+    let mut state = zone_state_for_temp_independent_load(0.0);
+    state.air_humidity_ratio = -0.001;
+    let mut purchased_air_runtime_state = PurchasedAirRuntimeState {
+        module_initialized: true,
+        ..PurchasedAirRuntimeState::default()
+    };
+
+    let error = couple_model_bound_direct_zone_purchased_air(
+        DirectZonePurchasedAirScheduledCouplingInput {
+            binding: &binding,
+            schedule_cache: &cache,
+            schedule_sample_index: 0,
+            zone_state: &mut state,
+            purchased_air_runtime_state: &mut purchased_air_runtime_state,
+            begin_environment: true,
+            barometric_pressure_pa: binding.limit_context.barometric_pressure_pa,
+            system_timestep_seconds: binding.nominal_system_timestep_seconds,
+        },
+    )
+    .expect_err("Init failure must precede the Calc-only humidity rejection");
+
+    assert_eq!(
+        error,
+        DirectZonePurchasedAirScheduledCouplingError::Initialization(
+            PurchasedAirInitError::UnknownSystem {
+                system: binding.ideal_loads_air_system,
+            }
+        )
+    );
+}
+
+#[test]
 fn fixed_timestep_state_guards_are_transactional() {
     let (model, cache) = fixture(|_| {});
     let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
@@ -652,6 +724,7 @@ fn fixed_timestep_state_guards_are_transactional() {
     );
 
     let mut wrong_step = zone_state_for_temp_independent_load(0.0);
+    let mut purchased_air_runtime_state = PurchasedAirRuntimeState::default();
     let original = wrong_step.clone();
     assert_eq!(
         couple_model_bound_direct_zone_purchased_air(
@@ -660,6 +733,8 @@ fn fixed_timestep_state_guards_are_transactional() {
                 schedule_cache: &cache,
                 schedule_sample_index: 0,
                 zone_state: &mut wrong_step,
+                purchased_air_runtime_state: &mut purchased_air_runtime_state,
+                begin_environment: true,
                 barometric_pressure_pa: binding.limit_context.barometric_pressure_pa,
                 system_timestep_seconds: 300.0,
             }
@@ -897,11 +972,14 @@ fn couple(
     DirectZonePurchasedAirScheduledCouplingOutput,
     DirectZonePurchasedAirScheduledCouplingError,
 > {
+    let mut purchased_air_runtime_state = PurchasedAirRuntimeState::default();
     couple_model_bound_direct_zone_purchased_air(DirectZonePurchasedAirScheduledCouplingInput {
         binding,
         schedule_cache: cache,
         schedule_sample_index: sample_index,
         zone_state: state,
+        purchased_air_runtime_state: &mut purchased_air_runtime_state,
+        begin_environment: true,
         barometric_pressure_pa: binding.limit_context.barometric_pressure_pa,
         system_timestep_seconds: 600.0,
     })

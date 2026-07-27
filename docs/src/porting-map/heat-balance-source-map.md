@@ -33254,6 +33254,24 @@ multiple equipment, rollback, and broader conformance remain incomplete. Both
 parent algorithms stay `scaffold`/`none`, and no routine, inventory,
 performance, or conformance status changes.
 
+## CP305 Persistent `InitPurchasedAir` Direct-Zone Slice
+
+The exact CP303 release loop now threads one `PurchasedAirRuntimeState` through
+the heat-balance timestep owner. Its source order is predictor, bounded
+`InitPurchasedAir`, `CalcPurchAirLoads`, update, report, then the same-step Zone
+air corrector. Each scheduled coupling preserves its Init snapshot and rejects
+a Calc result whose state-machine flags differ.
+
+The first explicit BeginEnvrn transition caches hard-sized heating/cooling
+mass-flow limits from Site `StdRhoAir`; finite-flow Calc consumes those cached
+values while live weather pressure remains the saturation input. The fixed
+single-environment runner rearms the source environment latch on the first
+non-BeginEnvrn timestep and reports one environment initialization. Diagnostic
+adapters remain outside this lifecycle. Multi-unit/plenum/exhaust topology,
+Autosize, multiple/design environments, warmup/adaptive iteration,
+`FirstHVACIteration`, and retry/reset/concurrency remain unimplemented; parent
+and routine claim statuses do not change.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

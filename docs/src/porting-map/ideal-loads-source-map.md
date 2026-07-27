@@ -111,7 +111,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 |---|---|---|
 | `PurchasedAirManager::SimPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `ep_runtime::ideal_loads::sim_purchased_air_compat`; `ep_runtime::ideal_loads::sim_purchased_air_outdoor_air_compat`; CP300 `crates/ep_runtime/src/ideal_loads/coupling.rs::couple_direct_zone_predicted_demand_to_purchased_air` calls the generic no-OA wrapper with state-backed demand; CP302 `simulate_direct_zone_purchased_air_coupled_heat_balance` release-calls that bounded composition from `ep_run` for the exact CP301 topology |
 | `PurchasedAirManager::GetPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `ep_compiler::objects::ideal_loads`; `ep_model::objects::ideal_loads` |
-| `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` |
+| `PurchasedAirManager::InitPurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | CP305 bounded release slice: `crates/ep_runtime/src/ideal_loads/init/state.rs::PurchasedAirRuntimeState`, `crates/ep_runtime/src/ideal_loads/init/transition.rs::init_purchased_air_runtime`, and `purchased_air_init_lifecycle_summary`; diagnostic adapters retain `crates/ep_runtime/src/ideal_loads/init.rs::IdealLoadsInitFlags` only |
 | `PurchasedAirManager::SizePurchasedAir` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/dispatch.rs::IDEAL_LOADS_SIZE_PURCHASED_AIR_POLICY` |
 | `PurchasedAirManager::CalcPurchAirLoads` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/calc/no_oa.rs::calc_no_oa_no_limit_sensible_compat` |
 | `PurchasedAirManager::CalcPurchAirMinOAMassFlow` | `src/EnergyPlus/PurchasedAirManager.cc` | `crates/ep_runtime/src/ideal_loads/outdoor_air/minimum_flow.rs::resolve_minimum_outdoor_air_compat`, orchestrated by `sim_purchased_air_outdoor_air_compat` |
@@ -18232,6 +18232,34 @@ NodeStateStore lifecycle, adaptive/first-iteration behavior, multiple
 equipment, rollback, and broader conformance. Both parent algorithms remain
 `scaffold`/`none`; CP304 promotes no source routine, inventory, performance, or
 conformance claim.
+
+## CP305 Persistent `InitPurchasedAir` Direct-Zone Slice
+
+For the exact CP303 one-manager/one-unit direct-Zone release binding, CP305
+replaces the flags-only facade with a persistent `PurchasedAirRuntimeState`.
+`init_purchased_air_runtime` performs the bounded manager allocation,
+equipment-list membership check, Zone/supply/single-return topology latch, and
+hard-size/no-Autosize gate once, then evaluates the supported schedule-warning
+predicates on every call.
+
+The source-shaped environment latch starts armed. The first explicit
+BeginEnvrn call writes maximum heating/cooling mass flow as hard-sized m3/s
+times Site `StdRhoAir` and disarms it; a non-BeginEnvrn call rearms it once;
+the next BeginEnvrn call recomputes the cache. The four exact no-OA sensible
+release branches use the same state snapshot, and finite-flow selectors consume
+the cached kg/s values rather than recomputing density. Live EPW pressure stays
+separate for saturation calculations. Runtime provenance requires matching
+Init and Calc flags and a lifecycle call count equal to the coupled timestep
+count.
+
+Diagnostic no-OA and OA adapters remain assumed-ready with
+`state_machine_used=false`. CP305 does not claim the source's multi-unit global
+scan, exhaust/multiple-return quirks, plenum arrays and barriers, full
+`SizePurchasedAir`/Autosize, exact warning registry/text, design/sizing or
+multiple environments, warmup/adaptive/`FirstHVACIteration`, or coordinated
+reset/failure/retry/concurrency behavior. The parent stays `scaffold`/`none`,
+`routine.init_purchased_air` stays `source_mapped`, and the full lifecycle
+roadmap item remains open.
 
 ## Claim Requirements
 

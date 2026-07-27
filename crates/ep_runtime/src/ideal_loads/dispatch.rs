@@ -129,7 +129,7 @@ pub const fn purchased_air_source_order_stages() -> [IdealLoadsPurchasedAirStage
             stage_name: "init-purchased-air",
             source_file: "src/EnergyPlus/PurchasedAirManager.cc",
             source_routine: "InitPurchasedAir",
-            rust_equivalent: "IdealLoadsInitFlags",
+            rust_equivalent: "PurchasedAirRuntimeState transition or diagnostic IdealLoadsInitFlags",
         },
         IdealLoadsPurchasedAirStage {
             stage_name: "calc-purch-air-loads",
@@ -228,13 +228,39 @@ pub fn sim_purchased_air_compat(
     input: SimPurchasedAirCompatInput<'_>,
 ) -> Result<SimPurchasedAirCompatOutput, SimPurchasedAirCompatError> {
     let branch_flags = IdealLoadsCompiledBranchFlags::from_system(input.system);
-    sim_purchased_air_compat_with_branch_flags(input, branch_flags)
+    sim_purchased_air_compat_with_branch_flags_and_init_flags(
+        input,
+        branch_flags,
+        IdealLoadsInitFlags::diagnostic_adapter_assumed_ready(),
+    )
 }
 
 /// Executes `SimPurchasedAir` using compile-stage branch flags cached by the caller.
 pub fn sim_purchased_air_compat_with_branch_flags(
     input: SimPurchasedAirCompatInput<'_>,
     branch_flags: IdealLoadsCompiledBranchFlags,
+) -> Result<SimPurchasedAirCompatOutput, SimPurchasedAirCompatError> {
+    sim_purchased_air_compat_with_branch_flags_and_init_flags(
+        input,
+        branch_flags,
+        IdealLoadsInitFlags::diagnostic_adapter_assumed_ready(),
+    )
+}
+
+/// Executes `SimPurchasedAir` with a persistent initialization snapshot.
+pub fn sim_purchased_air_compat_with_init_flags(
+    input: SimPurchasedAirCompatInput<'_>,
+    init_flags: IdealLoadsInitFlags,
+) -> Result<SimPurchasedAirCompatOutput, SimPurchasedAirCompatError> {
+    let branch_flags = IdealLoadsCompiledBranchFlags::from_system(input.system);
+    sim_purchased_air_compat_with_branch_flags_and_init_flags(input, branch_flags, init_flags)
+}
+
+/// Executes `SimPurchasedAir` with cached branch and initialization state.
+pub fn sim_purchased_air_compat_with_branch_flags_and_init_flags(
+    input: SimPurchasedAirCompatInput<'_>,
+    branch_flags: IdealLoadsCompiledBranchFlags,
+    init_flags: IdealLoadsInitFlags,
 ) -> Result<SimPurchasedAirCompatOutput, SimPurchasedAirCompatError> {
     let boundary = classify_purchased_air_compat_subset_with_branch_flags(
         input.system,
@@ -248,7 +274,6 @@ pub fn sim_purchased_air_compat_with_branch_flags(
     }
 
     let branch = branch_flags.purchased_air_branch;
-    let init_flags = IdealLoadsInitFlags::source_order_candidate();
     let calculation = if branch.uses_finite_limit_calc() {
         calc_no_oa_sensible_with_limits_and_recirculation_compat(
             input.system,
@@ -627,6 +652,7 @@ mod tests {
             IdealLoadsPurchasedAirBranch::NoOaNoLimitSensible
         );
         assert!(output.init_flags.one_time_checked);
+        assert!(!output.init_flags.state_machine_used);
         assert_eq!(output.supply_node_update.node, NodeId(3));
         assert_eq!(
             output.supply_node_update.temperature_c,

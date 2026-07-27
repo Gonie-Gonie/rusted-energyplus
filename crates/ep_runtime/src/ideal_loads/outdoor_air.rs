@@ -164,7 +164,7 @@ pub struct IdealLoadsOutdoorAirPurchasedAirTrace {
 pub fn sim_purchased_air_outdoor_air_compat(
     input: SimPurchasedAirOutdoorAirCompatInput<'_>,
 ) -> Result<SimPurchasedAirOutdoorAirCompatOutput, SimPurchasedAirOutdoorAirCompatError> {
-    let init_flags = IdealLoadsInitFlags::source_order_candidate();
+    let init_flags = IdealLoadsInitFlags::diagnostic_adapter_assumed_ready();
     let minimum_outdoor_air = if input.unit_available {
         Some(resolve_minimum_outdoor_air_compat(
             input.system,

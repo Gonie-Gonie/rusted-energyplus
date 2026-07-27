@@ -17,7 +17,8 @@ use ep_raw_model::{RawModel, load_epjson_file, load_epjson_file_with_idf_order};
 use ep_runtime::{
     DIRECT_ZONE_PURCHASED_AIR_DEMAND_SOURCE, DirectZonePurchasedAirCoupledOptions, ExecutionPlan,
     ExecutionStep, HeatBalanceSimulationOptions, IDEAL_LOADS_FIXTURE_DEMAND_DIAGNOSTIC_SOURCE,
-    IdealLoadsCompatibilityOptions, NodeStateProjectionOptions, ResultStore,
+    IdealLoadsCompatibilityOptions, NodeStateProjectionOptions,
+    PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirInitLifecycleSummary, ResultStore,
     RuntimePrecomputedData, ScheduleCacheProfile, ScheduleSeriesCache, ScheduleSeriesIndexKind,
     TimeAxis, WeatherTimestepSeries, build_environment_time_axes_with_weather_metadata,
     build_hourly_time_axis, build_hourly_time_axis_with_weather_metadata, load_epw_weather_file,
@@ -142,6 +143,8 @@ struct RustRuntimeResult {
     recirculation_node: Option<String>,
     recirculation_state_source: Option<String>,
     actual_coupled_source_order: Option<Vec<String>>,
+    purchased_air_coupling_call_count: Option<usize>,
+    purchased_air_init_lifecycle: Option<PurchasedAirInitLifecycleSummary>,
 }
 
 struct PreparedRuntimeInputs {
@@ -714,6 +717,33 @@ fn schedule_cache_json(sample_count: usize, profile: ScheduleCacheProfile) -> Va
     })
 }
 
+fn purchased_air_init_lifecycle_json(lifecycle: &PurchasedAirInitLifecycleSummary) -> Value {
+    json!({
+        "source": lifecycle.source,
+        "flags": {
+            "state_machine_used": lifecycle.flags.state_machine_used,
+            "one_time_checked": lifecycle.flags.one_time_checked,
+            "environment_initialized": lifecycle.flags.environment_initialized,
+            "environment_initialization_needed": lifecycle.flags.environment_initialization_needed,
+            "sizing_checked": lifecycle.flags.sizing_checked,
+            "equipment_list_checked": lifecycle.flags.equipment_list_checked,
+            "return_plenum_inactive": lifecycle.flags.return_plenum_inactive,
+        },
+        "module_initialization_count": lifecycle.module_initialization_count,
+        "equipment_list_check_count": lifecycle.equipment_list_check_count,
+        "init_call_count": lifecycle.init_call_count,
+        "one_time_initialization_count": lifecycle.one_time_initialization_count,
+        "sizing_check_count": lifecycle.sizing_check_count,
+        "environment_initialization_count": lifecycle.environment_initialization_count,
+        "environment_rearm_count": lifecycle.environment_rearm_count,
+        "maximum_heating_air_mass_flow_rate_kg_per_s": lifecycle.maximum_heating_air_mass_flow_rate_kg_per_s,
+        "maximum_cooling_air_mass_flow_rate_kg_per_s": lifecycle.maximum_cooling_air_mass_flow_rate_kg_per_s,
+        "standard_air_density_kg_per_m3": lifecycle.standard_air_density_kg_per_m3,
+        "cooling_supply_temperature_warning_count": lifecycle.cooling_supply_temperature_warning_count,
+        "heating_supply_temperature_warning_count": lifecycle.heating_supply_temperature_warning_count,
+    })
+}
+
 #[allow(clippy::too_many_arguments)]
 fn finish_successful_summary(
     config: &RunConfig,
@@ -825,6 +855,10 @@ fn finish_successful_summary(
             "recirculation_node": result.recirculation_node.as_deref(),
             "recirculation_state_source": result.recirculation_state_source.as_deref(),
             "actual_coupled_source_order": result.actual_coupled_source_order.as_deref(),
+            "purchased_air_coupling_call_count": result.purchased_air_coupling_call_count,
+            "purchased_air_init_lifecycle": result.purchased_air_init_lifecycle
+                .as_ref()
+                .map(purchased_air_init_lifecycle_json),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
@@ -1710,6 +1744,8 @@ fn execute_rust_runtime(
                 recirculation_node: None,
                 recirculation_state_source: None,
                 actual_coupled_source_order: None,
+                purchased_air_coupling_call_count: None,
+                purchased_air_init_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
@@ -1747,6 +1783,8 @@ fn execute_rust_runtime(
                     .map(|stage| (*stage).to_string())
                     .collect(),
             );
+            let purchased_air_coupling_call_count = Some(simulation.summary.coupling_call_count);
+            let purchased_air_init_lifecycle = Some(simulation.summary.init_lifecycle);
             Ok(RustRuntimeResult {
                 results: simulation.results,
                 runtime_class,
@@ -1760,6 +1798,8 @@ fn execute_rust_runtime(
                 recirculation_node,
                 recirculation_state_source,
                 actual_coupled_source_order,
+                purchased_air_coupling_call_count,
+                purchased_air_init_lifecycle,
             })
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
@@ -1783,6 +1823,8 @@ fn execute_rust_runtime(
                 recirculation_node: None,
                 recirculation_state_source: None,
                 actual_coupled_source_order: None,
+                purchased_air_coupling_call_count: None,
+                purchased_air_init_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
@@ -1804,6 +1846,8 @@ fn execute_rust_runtime(
                 recirculation_node: None,
                 recirculation_state_source: None,
                 actual_coupled_source_order: None,
+                purchased_air_coupling_call_count: None,
+                purchased_air_init_lifecycle: None,
             })
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
@@ -1823,6 +1867,19 @@ fn validate_runtime_demand_provenance(
                 .to_string(),
         );
     }
+    if result.runtime_class == RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility {
+        validate_direct_purchased_air_init_lifecycle(
+            result.purchased_air_init_lifecycle.as_ref(),
+            result.purchased_air_coupling_call_count,
+        )?;
+    } else if result.purchased_air_init_lifecycle.is_some()
+        || result.purchased_air_coupling_call_count.is_some()
+    {
+        return Err(
+            "persistent PurchasedAir initialization evidence was attached to a non-direct runtime"
+                .to_string(),
+        );
+    }
     if result.runtime_class == RuntimeClass::IdealLoadsFixtureDemandDiagnostic
         && (result.zone_demand_source.as_deref()
             != Some(IDEAL_LOADS_FIXTURE_DEMAND_DIAGNOSTIC_SOURCE)
@@ -1839,6 +1896,93 @@ fn validate_runtime_demand_provenance(
         return Err(
             "fixture/default IdealLoads demand cannot execute in a release compatibility run"
                 .to_string(),
+        );
+    }
+    Ok(())
+}
+
+fn validate_direct_purchased_air_init_lifecycle(
+    lifecycle: Option<&PurchasedAirInitLifecycleSummary>,
+    coupling_call_count: Option<usize>,
+) -> Result<(), String> {
+    let lifecycle = lifecycle.ok_or_else(|| {
+        "direct-zone IdealLoads runtime did not expose persistent initialization evidence"
+            .to_string()
+    })?;
+    let coupling_call_count = coupling_call_count.ok_or_else(|| {
+        "direct-zone IdealLoads runtime did not expose its coupling call count".to_string()
+    })?;
+    if lifecycle.source != PURCHASED_AIR_INIT_LIFECYCLE_SOURCE {
+        return Err("direct-zone IdealLoads initialization provenance is invalid".to_string());
+    }
+    if coupling_call_count == 0 || lifecycle.init_call_count != coupling_call_count {
+        return Err(
+            "direct-zone IdealLoads initialization call count does not match coupling execution"
+                .to_string(),
+        );
+    }
+    for (field, expected, actual) in [
+        (
+            "module_initialization_count",
+            1,
+            lifecycle.module_initialization_count,
+        ),
+        (
+            "equipment_list_check_count",
+            1,
+            lifecycle.equipment_list_check_count,
+        ),
+        (
+            "one_time_initialization_count",
+            1,
+            lifecycle.one_time_initialization_count,
+        ),
+        ("sizing_check_count", 1, lifecycle.sizing_check_count),
+        (
+            "environment_initialization_count",
+            1,
+            lifecycle.environment_initialization_count,
+        ),
+        (
+            "environment_rearm_count",
+            usize::from(coupling_call_count > 1),
+            lifecycle.environment_rearm_count,
+        ),
+    ] {
+        if actual != expected {
+            return Err(format!(
+                "direct-zone IdealLoads initialization invariant {field} expected {expected}, got {actual}"
+            ));
+        }
+    }
+    let flags = lifecycle.flags;
+    if !flags.state_machine_used
+        || !flags.one_time_checked
+        || !flags.environment_initialized
+        || !flags.sizing_checked
+        || !flags.equipment_list_checked
+        || !flags.return_plenum_inactive
+        || flags.environment_initialization_needed != (coupling_call_count > 1)
+    {
+        return Err(
+            "direct-zone IdealLoads persistent initialization flags are not release-ready"
+                .to_string(),
+        );
+    }
+    let density_valid = lifecycle
+        .standard_air_density_kg_per_m3
+        .is_some_and(|value| value.is_finite() && value > 0.0);
+    let flow_caches_valid = lifecycle
+        .maximum_heating_air_mass_flow_rate_kg_per_s
+        .is_finite()
+        && lifecycle.maximum_heating_air_mass_flow_rate_kg_per_s >= 0.0
+        && lifecycle
+            .maximum_cooling_air_mass_flow_rate_kg_per_s
+            .is_finite()
+        && lifecycle.maximum_cooling_air_mass_flow_rate_kg_per_s >= 0.0;
+    if !density_valid || !flow_caches_valid {
+        return Err(
+            "direct-zone IdealLoads begin-environment initialization cache is invalid".to_string(),
         );
     }
     Ok(())
@@ -2157,7 +2301,7 @@ mod tests {
         full_surface_trace_opt_in, input_error_diagnostic_code, runtime_class_requires_weather,
         schedule_cache_json, selected_trace_enabled, source_order_gate_summary,
         source_order_stage_state_snapshots, trace_level_enables_stage_snapshots, typed_counts,
-        validate_runtime_selection,
+        validate_direct_purchased_air_init_lifecycle, validate_runtime_selection,
     };
     use ep_compiler::compile_raw_model;
     use ep_model::{
@@ -2168,7 +2312,9 @@ mod tests {
     use ep_raw_model::parse_epjson_str_with_idf_order;
     use ep_runtime::{
         DayType, EnergyPlusCompatibilityStage, ExecutionPlan, ExecutionStage, ExecutionStageKind,
-        ExecutionStep, ScheduleCacheProfile, ScheduleSeriesIndexKind, build_hourly_time_axis,
+        ExecutionStep, IdealLoadsInitFlags, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
+        PurchasedAirInitLifecycleSummary, ScheduleCacheProfile, ScheduleSeriesIndexKind,
+        build_hourly_time_axis,
     };
 
     use crate::{RunResultState, RuntimeClass, TraceLevel, TraceSelection};
@@ -2206,6 +2352,54 @@ mod tests {
             )
             .is_ok()
         );
+    }
+
+    #[test]
+    fn direct_release_lifecycle_validation_rejects_missing_or_disconnected_evidence() {
+        let valid = valid_init_lifecycle(2);
+        assert!(validate_direct_purchased_air_init_lifecycle(Some(&valid), Some(2)).is_ok());
+        assert!(validate_direct_purchased_air_init_lifecycle(None, Some(2)).is_err());
+        assert!(validate_direct_purchased_air_init_lifecycle(Some(&valid), None).is_err());
+        assert!(validate_direct_purchased_air_init_lifecycle(Some(&valid), Some(0)).is_err());
+        assert!(validate_direct_purchased_air_init_lifecycle(Some(&valid), Some(3)).is_err());
+
+        let mut wrong_source = valid;
+        wrong_source.source = "diagnostic-init-marker";
+        assert!(
+            validate_direct_purchased_air_init_lifecycle(Some(&wrong_source), Some(2)).is_err()
+        );
+        let mut disconnected = valid;
+        disconnected.flags.state_machine_used = false;
+        assert!(
+            validate_direct_purchased_air_init_lifecycle(Some(&disconnected), Some(2)).is_err()
+        );
+    }
+
+    fn valid_init_lifecycle(call_count: usize) -> PurchasedAirInitLifecycleSummary {
+        PurchasedAirInitLifecycleSummary {
+            source: PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
+            flags: IdealLoadsInitFlags {
+                state_machine_used: true,
+                one_time_checked: true,
+                environment_initialized: true,
+                environment_initialization_needed: call_count > 1,
+                sizing_checked: true,
+                equipment_list_checked: true,
+                return_plenum_inactive: true,
+            },
+            module_initialization_count: 1,
+            equipment_list_check_count: 1,
+            init_call_count: call_count,
+            one_time_initialization_count: 1,
+            sizing_check_count: 1,
+            environment_initialization_count: 1,
+            environment_rearm_count: usize::from(call_count > 1),
+            maximum_heating_air_mass_flow_rate_kg_per_s: 0.0,
+            maximum_cooling_air_mass_flow_rate_kg_per_s: 0.0,
+            standard_air_density_kg_per_m3: Some(1.2),
+            cooling_supply_temperature_warning_count: 0,
+            heating_supply_temperature_warning_count: 0,
+        }
     }
 
     #[test]

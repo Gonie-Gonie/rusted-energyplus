@@ -22,9 +22,13 @@ const DIRECT_ZONE_COUPLED_RUNTIME_CLASS: &str = "ideal-loads-direct-zone-coupled
 const ZONE_DEMAND_SOURCE: &str = "rust-predictor-source-setpoint-thresholds";
 const RECIRCULATION_SOURCE: &str = "rust-direct-zone-return-projection";
 const RECIRCULATION_NODE: &str = "ZONE ONE RETURN";
-const COUPLED_SOURCE_ORDER: [&str; 3] = [
+const INIT_LIFECYCLE_SOURCE: &str = "rust-persistent-init-purchased-air";
+const COUPLED_SOURCE_ORDER: [&str; 6] = [
     "predict-system-loads",
-    "sim-purchased-air",
+    "init-purchased-air",
+    "calc-purch-air-loads",
+    "update-purchased-air",
+    "report-purchased-air",
     "correct-zone-air-temps",
 ];
 
@@ -164,6 +168,7 @@ fn direct_zone_predictor_purchased_air_runs_in_release_order()
         string_array(&summary["rust_runtime"]["actual_coupled_source_order"]),
         COUPLED_SOURCE_ORDER
     );
+    assert_persistent_init_lifecycle(&summary, 2);
 
     let results = read_json(&output_dir.join("results").join("result-store.json"))?;
     assert_eq!(results["profile"]["sample_count"], 2);
@@ -277,6 +282,7 @@ fn all_hard_sized_finite_limit_branches_use_the_live_coupled_runtime()
             string_array(&summary["rust_runtime"]["actual_coupled_source_order"]),
             COUPLED_SOURCE_ORDER
         );
+        assert_persistent_init_lifecycle(&summary, 2);
 
         let results = read_json(&output_dir.join("results").join("result-store.json"))?;
         let heating_rate = find_series(
@@ -318,6 +324,48 @@ fn all_hard_sized_finite_limit_branches_use_the_live_coupled_runtime()
         );
     }
     Ok(())
+}
+
+fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
+    let runtime = &summary["rust_runtime"];
+    let lifecycle = &runtime["purchased_air_init_lifecycle"];
+    assert_eq!(runtime["purchased_air_coupling_call_count"], expected_calls);
+    assert_eq!(lifecycle["source"], INIT_LIFECYCLE_SOURCE);
+    assert_eq!(lifecycle["flags"]["state_machine_used"], true);
+    assert_eq!(lifecycle["flags"]["one_time_checked"], true);
+    assert_eq!(lifecycle["flags"]["environment_initialized"], true);
+    assert_eq!(
+        lifecycle["flags"]["environment_initialization_needed"],
+        expected_calls > 1
+    );
+    assert_eq!(lifecycle["flags"]["sizing_checked"], true);
+    assert_eq!(lifecycle["flags"]["equipment_list_checked"], true);
+    assert_eq!(lifecycle["flags"]["return_plenum_inactive"], true);
+    assert_eq!(lifecycle["module_initialization_count"], 1);
+    assert_eq!(lifecycle["equipment_list_check_count"], 1);
+    assert_eq!(lifecycle["init_call_count"], expected_calls);
+    assert_eq!(lifecycle["one_time_initialization_count"], 1);
+    assert_eq!(lifecycle["sizing_check_count"], 1);
+    assert_eq!(lifecycle["environment_initialization_count"], 1);
+    assert_eq!(
+        lifecycle["environment_rearm_count"],
+        u64::from(expected_calls > 1)
+    );
+    assert!(
+        lifecycle["standard_air_density_kg_per_m3"]
+            .as_f64()
+            .is_some_and(|value| value > 0.0)
+    );
+    assert!(
+        lifecycle["maximum_heating_air_mass_flow_rate_kg_per_s"]
+            .as_f64()
+            .is_some_and(|value| value >= 0.0)
+    );
+    assert!(
+        lifecycle["maximum_cooling_air_mass_flow_rate_kg_per_s"]
+            .as_f64()
+            .is_some_and(|value| value >= 0.0)
+    );
 }
 
 #[test]

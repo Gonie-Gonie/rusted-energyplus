@@ -273,6 +273,7 @@ pub fn calc_no_oa_sensible_with_limits_and_recirculation_compat(
     if let Some(maximum_mass_flow_rate_kg_per_s) = flow_limit_kg_per_s(
         system.heating_limit,
         system.maximum_heating_air_flow_rate_m3_per_s,
+        limit_context.initialized_heating_air_mass_flow_limit_kg_per_s,
         limit_context,
     ) && maximum_mass_flow_rate_kg_per_s > 0.0
     {
@@ -295,6 +296,7 @@ pub fn calc_no_oa_sensible_with_limits_and_recirculation_compat(
     if let Some(maximum_mass_flow_rate_kg_per_s) = flow_limit_kg_per_s(
         system.cooling_limit,
         system.maximum_cooling_air_flow_rate_m3_per_s,
+        limit_context.initialized_cooling_air_mass_flow_limit_kg_per_s,
         limit_context,
     ) && maximum_mass_flow_rate_kg_per_s > 0.0
     {

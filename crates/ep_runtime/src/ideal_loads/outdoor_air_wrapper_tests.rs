@@ -21,6 +21,7 @@ fn wrapper_resolves_design_flow_before_calc_update_and_trace() {
         IdealLoadsSensibleLimitContext {
             standard_air_density_kg_per_m3: 1.2,
             barometric_pressure_pa: 101_325.0,
+            ..IdealLoadsSensibleLimitContext::default()
         },
         true,
     )
@@ -44,7 +45,7 @@ fn wrapper_resolves_design_flow_before_calc_update_and_trace() {
     assert_eq!(output.selected_branch, "outdoor_air");
     assert_eq!(
         output.init_flags,
-        IdealLoadsInitFlags::source_order_candidate()
+        IdealLoadsInitFlags::diagnostic_adapter_assumed_ready()
     );
     assert_eq!(output.calculation, expected_calculation);
     assert_eq!(output.supply_node_update.node, NodeId(9));
@@ -83,6 +84,7 @@ fn wrapper_occupancy_dcv_recomputes_sum_before_schedule_and_density() {
         IdealLoadsSensibleLimitContext {
             standard_air_density_kg_per_m3: 1.2,
             barometric_pressure_pa: 101_325.0,
+            ..IdealLoadsSensibleLimitContext::default()
         },
         true,
     )
@@ -125,6 +127,7 @@ fn wrapper_co2_dcv_applies_max_then_explicit_nonfinite_guard() {
             IdealLoadsSensibleLimitContext {
                 standard_air_density_kg_per_m3: 1.2,
                 barometric_pressure_pa: 101_325.0,
+                ..IdealLoadsSensibleLimitContext::default()
             },
             true,
         )
@@ -168,6 +171,7 @@ fn wrapper_normalizes_schedule_at_the_runtime_boundary() {
             IdealLoadsSensibleLimitContext {
                 standard_air_density_kg_per_m3: 1.2,
                 barometric_pressure_pa: 101_325.0,
+                ..IdealLoadsSensibleLimitContext::default()
             },
             true,
         )
@@ -197,6 +201,7 @@ fn wrapper_applies_energyplus_very_small_mass_flow_cutoff() {
             IdealLoadsSensibleLimitContext {
                 standard_air_density_kg_per_m3: 1.0,
                 barometric_pressure_pa: 101_325.0,
+                ..IdealLoadsSensibleLimitContext::default()
             },
             true,
         )
@@ -258,6 +263,7 @@ fn wrapper_reports_missing_or_unsupported_minimum_flow_inputs() {
             IdealLoadsSensibleLimitContext {
                 standard_air_density_kg_per_m3: f64::NAN,
                 barometric_pressure_pa: 101_325.0,
+                ..IdealLoadsSensibleLimitContext::default()
             },
             true,
         ),

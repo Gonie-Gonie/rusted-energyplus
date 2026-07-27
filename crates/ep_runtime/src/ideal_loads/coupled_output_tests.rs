@@ -4,7 +4,8 @@ use crate::{
     heat_balance::state::{ZoneAirTemperatureCoefficients, ZoneHeatBalanceState},
     ideal_loads::{
         DirectZonePurchasedAirCouplingInput, DirectZonePurchasedAirScheduleSnapshot,
-        IdealLoadsZoneState, couple_direct_zone_predicted_demand_to_purchased_air,
+        IdealLoadsInitFlags, IdealLoadsZoneState, PurchasedAirInitSnapshot,
+        PurchasedAirInitTransition, couple_direct_zone_predicted_demand_to_purchased_air,
     },
 };
 use ep_model::{
@@ -43,6 +44,7 @@ fn appends_all_no_oa_and_predictor_series_with_hourly_semantics() {
     let limit_context = IdealLoadsSensibleLimitContext {
         standard_air_density_kg_per_m3: 2.0,
         barometric_pressure_pa: 101_325.0,
+        ..IdealLoadsSensibleLimitContext::default()
     };
 
     append_direct_zone_purchased_air_hourly_output_series(
@@ -262,6 +264,7 @@ fn validation_errors_leave_the_result_store_unchanged() {
         IdealLoadsSensibleLimitContext {
             standard_air_density_kg_per_m3: 0.0,
             barometric_pressure_pa: 101_325.0,
+            ..IdealLoadsSensibleLimitContext::default()
         },
         DirectZonePurchasedAirHourlyOutputError::InvalidStandardAirDensity { value: 0.0 },
     );
@@ -396,6 +399,7 @@ fn scaled_output(
             supply_node: SUPPLY_NODE,
             unit_available: true,
             limit_context: IdealLoadsSensibleLimitContext::default(),
+            initialization: initialized_snapshot(system),
         })
         .expect("valid bounded coupling fixture");
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
@@ -407,6 +411,7 @@ fn scaled_output(
             overall_availability: 1.0,
             unit_available: true,
         },
+        initialization: initialized_snapshot(system),
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;
@@ -435,6 +440,30 @@ fn scaled_output(
     demand.remaining_output_req_to_heat_sp_w = 19.0 * scale;
     demand.remaining_output_req_to_cool_sp_w = -20.0 * scale;
     output
+}
+
+fn initialized_snapshot(system: &IdealLoadsAirSystem) -> PurchasedAirInitSnapshot {
+    PurchasedAirInitSnapshot {
+        system: system.id,
+        controlled_zone: ZoneId(0),
+        supply_node: SUPPLY_NODE,
+        recirculation_node: NodeId(4),
+        flags: IdealLoadsInitFlags {
+            state_machine_used: true,
+            one_time_checked: true,
+            environment_initialized: true,
+            environment_initialization_needed: false,
+            sizing_checked: true,
+            equipment_list_checked: true,
+            return_plenum_inactive: true,
+        },
+        transition: PurchasedAirInitTransition::default(),
+        maximum_heating_air_mass_flow_rate_kg_per_s: 0.0,
+        maximum_cooling_air_mass_flow_rate_kg_per_s: 0.0,
+        standard_air_density_kg_per_m3: Some(
+            IdealLoadsSensibleLimitContext::default().standard_air_density_kg_per_m3,
+        ),
+    }
 }
 
 fn zone_state() -> ZoneHeatBalanceState {

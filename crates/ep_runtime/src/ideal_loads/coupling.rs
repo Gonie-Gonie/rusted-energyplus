@@ -1,5 +1,7 @@
 //! Direct-Zone predictor-to-PurchasedAir production coupling.
 
+mod validation;
+
 use crate::heat_balance::{
     state::ZoneHeatBalanceState,
     zone_predictor_corrector::predicted_system_load::{
@@ -8,15 +10,14 @@ use crate::heat_balance::{
         predict_direct_zone_dual_setpoint_third_order_demand,
     },
 };
-use ep_model::{
-    DehumidificationControlType, HumidificationControlType, IdealLoadsAirSystem, NodeId,
-};
+use ep_model::{IdealLoadsAirSystem, NodeId};
 
 use super::{
     IdealLoadsPurchasedAirBranch, IdealLoadsSensibleLimitContext, IdealLoadsZoneState,
-    SimPurchasedAirCompatError, SimPurchasedAirCompatInput, SimPurchasedAirCompatOutput,
-    select_purchased_air_branch, sim_purchased_air_compat,
+    PurchasedAirInitSnapshot, SimPurchasedAirCompatError, SimPurchasedAirCompatInput,
+    SimPurchasedAirCompatOutput, sim_purchased_air_compat_with_init_flags,
 };
+use validation::{initialized_limit_context, validate_coupling_inputs, validate_supported_branch};
 
 /// Inputs for one bounded direct-Zone predictor-to-PurchasedAir coupling step.
 ///
@@ -51,6 +52,19 @@ pub struct DirectZonePurchasedAirCouplingInput<'a> {
     pub unit_available: bool,
     /// Psychrometric and standard-density context for PurchasedAir.
     pub limit_context: IdealLoadsSensibleLimitContext,
+    /// Persistent `InitPurchasedAir` snapshot for this exact timestep.
+    pub initialization: PurchasedAirInitSnapshot,
+}
+
+/// Typed relation checked between initialization and direct coupling state.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum DirectZonePurchasedAirInitializationRelation {
+    /// Initialized IdealLoads system identity.
+    System,
+    /// Initialized controlled Zone identity.
+    ControlledZone,
+    /// Initialized supply-node identity.
+    SupplyNode,
 }
 
 /// Source-ordered system-air correction feedback derived from PurchasedAir.
@@ -90,6 +104,20 @@ pub enum DirectZonePurchasedAirCouplingError {
     UnsupportedBranch {
         /// Branch selected from the typed IdealLoads inputs.
         branch: IdealLoadsPurchasedAirBranch,
+    },
+    /// The persistent initialization snapshot belongs to another typed object.
+    InitializationIdentityMismatch {
+        /// Relation whose typed IDs did not agree.
+        relation: DirectZonePurchasedAirInitializationRelation,
+    },
+    /// The persistent lifecycle has not completed the bounded release gates.
+    InitializationNotReady,
+    /// A begin-environment cache value violated its physical invariant.
+    InitializationCacheInvalid {
+        /// Stable cache field name.
+        field: &'static str,
+        /// Rejected cache value, or NaN when the cache was absent.
+        value: f64,
     },
     /// A live air-state or PurchasedAir context input was NaN or infinite.
     InputNotFinite {
@@ -138,19 +166,12 @@ pub enum DirectZonePurchasedAirCouplingError {
 pub fn couple_direct_zone_predicted_demand_to_purchased_air(
     input: DirectZonePurchasedAirCouplingInput<'_>,
 ) -> Result<DirectZonePurchasedAirCouplingOutput, DirectZonePurchasedAirCouplingError> {
-    let branch = select_purchased_air_branch(input.system);
-    if !branch.is_no_oa_sensible_with_optional_limits()
-        || input.system.dehumidification_control_type != DehumidificationControlType::None
-        || input.system.humidification_control_type != HumidificationControlType::None
-    {
-        return Err(DirectZonePurchasedAirCouplingError::UnsupportedBranch { branch });
-    }
-
+    validate_supported_branch(input.system)?;
     validate_coupling_inputs(&input)?;
-
-    let prediction = predict_direct_zone_dual_setpoint_third_order_demand(
+    initialized_limit_context(&input)?;
+    let prediction = predict_direct_zone_demand_for_purchased_air(
         DirectZoneDualSetpointThirdOrderDemandInput {
-            zone_state: input.zone_state,
+            zone_state: &*input.zone_state,
             heating_setpoint_c: input.heating_setpoint_c,
             cooling_setpoint_c: input.cooling_setpoint_c,
             zone_node_temperature_c: input.zone_node_temperature_c,
@@ -159,22 +180,43 @@ pub fn couple_direct_zone_predicted_demand_to_purchased_air(
             zone_list_multiplier: input.zone_list_multiplier,
             system_timestep_seconds: input.system_timestep_seconds,
         },
-    )
-    .map_err(DirectZonePurchasedAirCouplingError::Prediction)?;
+    )?;
+    complete_direct_zone_purchased_air_coupling(input, prediction)
+}
+
+/// Runs the direct-Zone demand producer before the PurchasedAir Init stage.
+pub(super) fn predict_direct_zone_demand_for_purchased_air(
+    input: DirectZoneDualSetpointThirdOrderDemandInput<'_>,
+) -> Result<DirectZoneDualSetpointThirdOrderDemand, DirectZonePurchasedAirCouplingError> {
+    predict_direct_zone_dual_setpoint_third_order_demand(input)
+        .map_err(DirectZonePurchasedAirCouplingError::Prediction)
+}
+
+/// Completes Calc, Update, Report, and Zone feedback from an earlier prediction.
+pub(super) fn complete_direct_zone_purchased_air_coupling(
+    input: DirectZonePurchasedAirCouplingInput<'_>,
+    prediction: DirectZoneDualSetpointThirdOrderDemand,
+) -> Result<DirectZonePurchasedAirCouplingOutput, DirectZonePurchasedAirCouplingError> {
+    validate_supported_branch(input.system)?;
+    validate_coupling_inputs(&input)?;
+    let initialized_limit_context = initialized_limit_context(&input)?;
 
     let purchased_air_zone_state = IdealLoadsZoneState {
         air_temperature_c: input.zone_node_temperature_c,
         air_humidity_ratio: input.zone_state.air_humidity_ratio,
     };
-    let purchased_air = sim_purchased_air_compat(SimPurchasedAirCompatInput {
-        system: input.system,
-        supply_node: input.supply_node,
-        zone_state: purchased_air_zone_state,
-        recirculation_state: input.recirculation_state,
-        demand: prediction.zone_demand,
-        unit_available: input.unit_available,
-        limit_context: input.limit_context,
-    })
+    let purchased_air = sim_purchased_air_compat_with_init_flags(
+        SimPurchasedAirCompatInput {
+            system: input.system,
+            supply_node: input.supply_node,
+            zone_state: purchased_air_zone_state,
+            recirculation_state: input.recirculation_state,
+            demand: prediction.zone_demand,
+            unit_available: input.unit_available,
+            limit_context: initialized_limit_context,
+        },
+        input.initialization.flags,
+    )
     .map_err(DirectZonePurchasedAirCouplingError::PurchasedAir)?;
 
     let feedback = derive_system_air_feedback(
@@ -191,42 +233,6 @@ pub fn couple_direct_zone_predicted_demand_to_purchased_air(
         purchased_air,
         feedback,
     })
-}
-
-fn validate_coupling_inputs(
-    input: &DirectZonePurchasedAirCouplingInput<'_>,
-) -> Result<(), DirectZonePurchasedAirCouplingError> {
-    require_finite_input(input.zone_node_temperature_c, "zone_node_temperature_c")?;
-    require_finite_input(
-        input.recirculation_state.air_temperature_c,
-        "recirculation_state.air_temperature_c",
-    )?;
-    require_nonnegative_input(
-        input.recirculation_state.air_humidity_ratio,
-        "recirculation_state.air_humidity_ratio",
-    )?;
-    require_nonnegative_input(
-        input.zone_state.air_humidity_ratio,
-        "zone_state.air_humidity_ratio",
-    )?;
-    require_nonnegative_input(
-        input.zone_state.air_heat_capacity_j_per_k,
-        "zone_state.air_heat_capacity_j_per_k",
-    )?;
-    require_nonnegative_input(input.zone_state.sum_ha_w_per_k, "zone_state.sum_ha_w_per_k")?;
-    require_nonnegative_input(
-        input.zone_state.sum_mcp_w_per_k,
-        "zone_state.sum_mcp_w_per_k",
-    )?;
-    require_finite_input(
-        input.system.maximum_heating_supply_air_temperature_c,
-        "system.maximum_heating_supply_air_temperature_c",
-    )?;
-    require_finite_input(
-        input.system.minimum_cooling_supply_air_temperature_c,
-        "system.minimum_cooling_supply_air_temperature_c",
-    )?;
-    Ok(())
 }
 
 fn derive_system_air_feedback(
@@ -290,29 +296,6 @@ fn derive_system_air_feedback(
     })
 }
 
-fn require_finite_input(
-    value: f64,
-    field: &'static str,
-) -> Result<(), DirectZonePurchasedAirCouplingError> {
-    if value.is_finite() {
-        Ok(())
-    } else {
-        Err(DirectZonePurchasedAirCouplingError::InputNotFinite { field })
-    }
-}
-
-fn require_nonnegative_input(
-    value: f64,
-    field: &'static str,
-) -> Result<(), DirectZonePurchasedAirCouplingError> {
-    require_finite_input(value, field)?;
-    if value < 0.0 {
-        Err(DirectZonePurchasedAirCouplingError::InputNegative { field, value })
-    } else {
-        Ok(())
-    }
-}
-
 fn require_finite_result(
     value: f64,
     field: &'static str,
@@ -354,11 +337,16 @@ mod tests {
     use crate::{
         energyplus_moist_air_specific_heat_j_per_kg_k,
         heat_balance::state::ZoneAirTemperatureCoefficients,
-        ideal_loads::{IdealLoadsSensibleMode, IdealLoadsUnsupportedFeature},
+        ideal_loads::{
+            IdealLoadsSensibleMode, IdealLoadsUnsupportedFeature, PurchasedAirInitBoundTopology,
+            PurchasedAirInitCallContext, PurchasedAirRuntimeState, init_purchased_air_runtime,
+            select_purchased_air_branch,
+        },
     };
     use ep_model::{
-        AutosizeOrNumber, DemandControlledVentilationType, HeatRecoveryType, IdealLoadsAirSystemId,
-        IdealLoadsFuelType, IdealLoadsLimit, NormalizedName, OutdoorAirEconomizerType, ZoneId,
+        AutosizeOrNumber, DehumidificationControlType, DemandControlledVentilationType,
+        HeatRecoveryType, HumidificationControlType, IdealLoadsAirSystemId, IdealLoadsFuelType,
+        IdealLoadsLimit, NormalizedName, OutdoorAirEconomizerType, ZoneEquipmentListId, ZoneId,
     };
 
     const ABS_TOLERANCE: f64 = 1.0e-9;
@@ -659,12 +647,13 @@ mod tests {
             state.sum_sys_mcp_t_w = 53.0;
             let original = state.clone();
             let mut system = test_system();
+            let initialization = initialized_snapshot(&system);
             system.heating_limit = IdealLoadsLimit::LimitCapacity;
             system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(value));
 
-            let error = couple_direct_zone_predicted_demand_to_purchased_air(coupling_input(
-                &mut state, &system, 1, 1,
-            ))
+            let error = couple_direct_zone_predicted_demand_to_purchased_air(
+                coupling_input_with_initialization(&mut state, &system, 1, 1, initialization),
+            )
             .expect_err("invalid hard size must fail inside generic PurchasedAir");
 
             assert_eq!(
@@ -1008,6 +997,23 @@ mod tests {
         zone_multiplier: u32,
         zone_list_multiplier: u32,
     ) -> DirectZonePurchasedAirCouplingInput<'a> {
+        let initialization = initialized_snapshot(system);
+        coupling_input_with_initialization(
+            zone_state,
+            system,
+            zone_multiplier,
+            zone_list_multiplier,
+            initialization,
+        )
+    }
+
+    fn coupling_input_with_initialization<'a>(
+        zone_state: &'a mut ZoneHeatBalanceState,
+        system: &'a IdealLoadsAirSystem,
+        zone_multiplier: u32,
+        zone_list_multiplier: u32,
+        initialization: PurchasedAirInitSnapshot,
+    ) -> DirectZonePurchasedAirCouplingInput<'a> {
         let air_humidity_ratio = zone_state.air_humidity_ratio;
         DirectZonePurchasedAirCouplingInput {
             zone_state,
@@ -1026,7 +1032,39 @@ mod tests {
             supply_node: NodeId(3),
             unit_available: true,
             limit_context: IdealLoadsSensibleLimitContext::default(),
+            initialization,
         }
+    }
+
+    fn initialized_snapshot(system: &IdealLoadsAirSystem) -> PurchasedAirInitSnapshot {
+        let limit_context = IdealLoadsSensibleLimitContext::default();
+        let mut state = PurchasedAirRuntimeState::default();
+        init_purchased_air_runtime(
+            &mut state,
+            &[system.id],
+            PurchasedAirInitBoundTopology {
+                system: system.id,
+                controlled_zone: ZoneId(0),
+                equipment_list: ZoneEquipmentListId(0),
+                supply_node: NodeId(3),
+                recirculation_node: NodeId(4),
+                equipment_list_membership_verified: true,
+                return_plenum_active: false,
+            },
+            system,
+            PurchasedAirInitCallContext {
+                zone_equipment_inputs_filled: true,
+                system_sizing_calculation: false,
+                begin_environment: true,
+                standard_air_density_kg_per_m3: limit_context.standard_air_density_kg_per_m3,
+                heating_setpoint_c: 20.0,
+                cooling_setpoint_c: 24.0,
+                overall_availability: 1.0,
+                heating_availability: 1.0,
+                cooling_availability: 1.0,
+            },
+        )
+        .expect("test system must initialize")
     }
 
     fn zone_state_for_temp_independent_load(temp_independent_load_w: f64) -> ZoneHeatBalanceState {

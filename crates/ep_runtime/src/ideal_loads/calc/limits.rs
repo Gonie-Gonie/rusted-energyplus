@@ -14,6 +14,10 @@ pub struct IdealLoadsSensibleLimitContext {
     pub standard_air_density_kg_per_m3: f64,
     /// Barometric pressure in Pa used by supply-air saturation checks.
     pub barometric_pressure_pa: f64,
+    /// Begin-environment cached maximum heating mass flow, when initialized.
+    pub initialized_heating_air_mass_flow_limit_kg_per_s: Option<f64>,
+    /// Begin-environment cached maximum cooling mass flow, when initialized.
+    pub initialized_cooling_air_mass_flow_limit_kg_per_s: Option<f64>,
 }
 
 impl Default for IdealLoadsSensibleLimitContext {
@@ -21,6 +25,8 @@ impl Default for IdealLoadsSensibleLimitContext {
         Self {
             standard_air_density_kg_per_m3: DEFAULT_STANDARD_AIR_DENSITY_KG_PER_M3,
             barometric_pressure_pa: STANDARD_PRESSURE_SEA_LEVEL_PA,
+            initialized_heating_air_mass_flow_limit_kg_per_s: None,
+            initialized_cooling_air_mass_flow_limit_kg_per_s: None,
         }
     }
 }
@@ -35,6 +41,8 @@ impl IdealLoadsSensibleLimitContext {
             |standard_air_density_kg_per_m3| Self {
                 standard_air_density_kg_per_m3,
                 barometric_pressure_pa,
+                initialized_heating_air_mass_flow_limit_kg_per_s: None,
+                initialized_cooling_air_mass_flow_limit_kg_per_s: None,
             },
         )
     }
@@ -45,19 +53,36 @@ impl IdealLoadsSensibleLimitContext {
         self.barometric_pressure_pa = barometric_pressure_pa;
         self
     }
+
+    /// Returns a copy backed by `InitPurchasedAir` begin-environment flow caches.
+    #[must_use]
+    pub fn with_initialized_flow_limits(
+        mut self,
+        standard_air_density_kg_per_m3: f64,
+        heating_kg_per_s: f64,
+        cooling_kg_per_s: f64,
+    ) -> Self {
+        self.standard_air_density_kg_per_m3 = standard_air_density_kg_per_m3;
+        self.initialized_heating_air_mass_flow_limit_kg_per_s = Some(heating_kg_per_s);
+        self.initialized_cooling_air_mass_flow_limit_kg_per_s = Some(cooling_kg_per_s);
+        self
+    }
 }
 
 pub(super) fn flow_limit_kg_per_s(
     limit: IdealLoadsLimit,
     flow_limit_m3_per_s: Option<AutosizeOrNumber>,
+    initialized_mass_flow_limit_kg_per_s: Option<f64>,
     limit_context: IdealLoadsSensibleLimitContext,
 ) -> Option<f64> {
     if !limit_includes_flow_rate(limit) {
         return None;
     }
 
-    numeric_autosize_value(flow_limit_m3_per_s).map(|flow_limit_m3_per_s| {
-        flow_limit_m3_per_s * limit_context.standard_air_density_kg_per_m3
+    initialized_mass_flow_limit_kg_per_s.or_else(|| {
+        numeric_autosize_value(flow_limit_m3_per_s).map(|flow_limit_m3_per_s| {
+            flow_limit_m3_per_s * limit_context.standard_air_density_kg_per_m3
+        })
     })
 }
 

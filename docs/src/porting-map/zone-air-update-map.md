@@ -20957,6 +20957,26 @@ complete moisture demand, generic all-branch dispatch, `InitPurchasedAir`,
 full rollback, or broader conformance. Both parent algorithms remain
 `scaffold` at claim level `none`; no routine or inventory status is promoted.
 
+## CP305 Persistent `InitPurchasedAir` Direct-Zone Slice
+
+CP305 inserts a persistent bounded Init transition after Rust
+`SourceSetpointThresholds` prediction and before PurchasedAir Calc in the exact
+CP303 direct-Zone release loop. One runtime state latches the sole equipment
+membership and Zone/supply/return identities, completes the hard-size gate,
+and caches environment mass-flow limits from Site `StdRhoAir`. The timestep
+output carries the Init snapshot through update/report into the same-step Zone
+air correction, and runtime validation requires matching state-machine flags
+and Init/coupling call counts.
+
+The source environment latch follows true, true, false, true semantics: only
+the first true initializes, false rearms once, and the next true recomputes.
+Finite-flow branches consume the cache; live EPW pressure remains separate for
+saturation. Diagnostic adapters are explicitly `state_machine_used=false`.
+This slice excludes multi-unit, exhaust/multiple-return and plenum behavior,
+Autosize/full sizing, multiple/design environments, warmup/adaptive and
+`FirstHVACIteration`, and coordinated failure/retry/reset. The parent and
+routine statuses and full-lifecycle roadmap checkbox remain unchanged.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:
