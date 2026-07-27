@@ -5,7 +5,10 @@ use crate::{
     ideal_loads::{
         DirectZonePurchasedAirCouplingInput, DirectZonePurchasedAirCouplingOutput,
         DirectZonePurchasedAirScheduleSnapshot, IdealLoadsInitFlags, IdealLoadsSensibleMode,
-        IdealLoadsZoneState, PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
+        IdealLoadsZoneState, PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_SOURCE_ORDER,
+        PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE_ORDER,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_FIRST_EXCLUDED_SOURCE,
@@ -18,11 +21,11 @@ use crate::{
         PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER, PurchasedAirAvailabilityStatus,
-        PurchasedAirCalcCoolingEntryGateSnapshot, PurchasedAirCalcCoolingOaMaxFlowBodySnapshot,
-        PurchasedAirCalcCoolingOaMaxFlowGateSnapshot, PurchasedAirCalcEntryDemandSnapshot,
-        PurchasedAirCalcEntryResetSnapshot, PurchasedAirCalcEntrySnapshot,
-        PurchasedAirCalcMinimumOaPrefixSnapshot, PurchasedAirInitSnapshot,
-        PurchasedAirInitTransition, PurchasedAirRecirculationSource,
+        PurchasedAirCalcCoolingEconomizerGuardSnapshot, PurchasedAirCalcCoolingEntryGateSnapshot,
+        PurchasedAirCalcCoolingOaMaxFlowBodySnapshot, PurchasedAirCalcCoolingOaMaxFlowGateSnapshot,
+        PurchasedAirCalcEntryDemandSnapshot, PurchasedAirCalcEntryResetSnapshot,
+        PurchasedAirCalcEntrySnapshot, PurchasedAirCalcMinimumOaPrefixSnapshot,
+        PurchasedAirInitSnapshot, PurchasedAirInitTransition, PurchasedAirRecirculationSource,
         PurchasedAirTemperatureControlType, couple_direct_zone_predicted_demand_to_purchased_air,
     },
 };
@@ -452,6 +455,11 @@ fn scaled_output(
             sample_index,
             coupling,
         ),
+        calculation_cooling_economizer_guard: calculation_cooling_economizer_guard_snapshot(
+            system,
+            sample_index,
+            coupling,
+        ),
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;
@@ -585,6 +593,40 @@ fn calculation_cooling_oa_max_flow_body_snapshot(
         maximum_cooling_air_mass_flow_rate_kg_per_s: None,
         outdoor_air_mass_flow_clamp_assignment_performed: false,
         outdoor_air_mass_flow_rate_after_clamp_kg_per_s: None,
+    }
+}
+
+fn calculation_cooling_economizer_guard_snapshot(
+    system: &IdealLoadsAirSystem,
+    sample_index: usize,
+    coupling: DirectZonePurchasedAirCouplingOutput,
+) -> PurchasedAirCalcCoolingEconomizerGuardSnapshot {
+    let predecessor = calculation_cooling_oa_max_flow_body_snapshot(system, sample_index, coupling);
+    let guard_evaluated = predecessor.active_guard_false_economizer_fallthrough;
+    PurchasedAirCalcCoolingEconomizerGuardSnapshot {
+        source: PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_SOURCE,
+        first_excluded_source: PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_FIRST_EXCLUDED_SOURCE,
+        system: system.id,
+        parent_call_ordinal: sample_index + 1,
+        source_order: PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_SOURCE_ORDER,
+        controlled_zone: ZoneId(0),
+        unit_body_entered: predecessor.unit_body_entered,
+        predecessor_cooling_body_entered: predecessor.predecessor_cooling_body_entered,
+        predecessor_maximum_cooling_flow_body_entered: predecessor
+            .predecessor_maximum_cooling_flow_body_entered,
+        predecessor_active_guard_false_economizer_fallthrough: predecessor
+            .active_guard_false_economizer_fallthrough,
+        unit_off_skipped: predecessor.unit_off_skipped,
+        non_cooling_skipped: predecessor.non_cooling_skipped,
+        maximum_cooling_flow_body_sibling_skipped: predecessor
+            .predecessor_maximum_cooling_flow_body_entered,
+        economizer_guard_evaluated: guard_evaluated,
+        economizer_type_read: guard_evaluated,
+        economizer_type: guard_evaluated.then_some(OutdoorAirEconomizerType::NoEconomizer),
+        no_economizer_comparison_evaluated: guard_evaluated,
+        economizer_not_no_economizer: guard_evaluated.then_some(false),
+        economizer_body_entered: false,
+        no_economizer_fallthrough: guard_evaluated,
     }
 }
 

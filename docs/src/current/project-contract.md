@@ -15817,9 +15817,10 @@ nonnegative maximum and are false. Therefore CP314 executes no mapped site,
 reads no `StdRhoAir` or warning state, performs no division or clamp, allocates
 no index, and leaves every warning/body counter at zero.
 
-The binder executes CP314 after CP313 and before the pre-existing numerical
-Calc. Per-step validation checks source provenance, one-for-one predecessor
-order, the complete skipped shape on release, and zero warning/clamp effects.
+The binder executes CP314 after CP313 and before CP315 and the pre-existing
+numerical Calc. Per-step validation checks source provenance, one-for-one
+predecessor order, the complete skipped shape on release, and zero
+warning/clamp effects.
 Final lifecycle and `ep_run` validation reconcile one transition per CP313
 transition, parent-body versus skip partitions, first/recurring branch and
 call-site counts, retained warning identity/value state, and zero exact-release
@@ -15842,6 +15843,81 @@ remain excluded.
 
 Both parents remain `scaffold`/`none`; `routine.calc_purch_air_loads` remains
 `source_mapped`; no routine row, inventory/readiness count, support level,
+run state, required or forbidden feature, evidence case, numerical
+conformance, or Roadmap state is promoted.
+
+## CP315 Source-Ordered Cooling Economizer Outer Guard
+
+CP315 maps only EnergyPlus 26.1 `PurchasedAirManager.cc` executable line 2082,
+the outer `PurchAir.EconomizerType != Econ::NoEconomizer` guard inside the
+CP313 sibling `else`. Lines 2080-2081 are only that `else` delimiter and the
+`Model economizer` comment. CP315 therefore executes only when CP312 entered
+Cooling and CP313 was false. UnitOff, CP312 non-cooling, and a true CP313 whose
+CP314 body completed skip every CP315 site.
+
+Before any mapped site, the public wrapper validates the linked CP314 snapshot
+and its direct-release partition without adding a source effect. A reached
+line-2082 guard then preserves this mapped source order:
+
+1. read the selected unit's `EconomizerType`;
+2. compare it with `NoEconomizer` using source `!=`; and
+3. record whether control would enter the excluded inner economizer condition.
+
+The mapped slice does not read `OutdoorAir` again. EnergyPlus
+`GetPurchasedAir` reads the economizer field only on the outdoor-air path and
+forces `DCV::None`, `Econ::NoEconomizer`, and `HeatRecovery::None` when outdoor
+air is absent at `PurchasedAirManager.cc` lines 469-472. Rust already retains
+the corresponding typed `OutdoorAirEconomizerType`, and the exact direct-Zone
+release subset requires `NoEconomizer`. This is a prevalidated enum read, not
+new input parsing or outdoor-air service ownership.
+
+`calc/cooling_economizer_guard.rs` owns
+`PurchasedAirCalcCoolingEconomizerGuardSnapshot`,
+`PurchasedAirCalcCoolingEconomizerGuardRuntimeState`, and
+`PurchasedAirCalcCoolingEconomizerGuardLifecycleSummary`.
+`calc/cooling_economizer_guard/release.rs` owns
+`PurchasedAirCalcCoolingEconomizerGuardError` and
+`advance_direct_no_oa_calc_cooling_economizer_guard`; the parent module owns
+`purchased_air_calc_cooling_economizer_guard_lifecycle_summary`.
+
+The public exact release transition requires the retained CP314 snapshot,
+initialization and selected-unit identities, one-for-one CP310-through-CP315
+order, the exact direct no-OA subset, and one exact UnitOff, non-cooling, or
+active CP313-false predecessor partition before mutation. Only the active
+fallthrough evaluates line 2082: it reads `NoEconomizer` once, performs one
+`!=` comparison whose result is false, and enters no inner body. UnitOff and
+non-cooling public-release partitions retain a complete CP315 skip. The pure
+internal transition additionally characterizes the CP314-true sibling skip
+and may produce a true outer-guard result for typed DifferentialDryBulb or
+DifferentialEnthalpy, but it stops before line 2083 and makes neither route
+release-admissible.
+
+The binder executes CP315 after CP314 and before the pre-existing numerical
+Calc. Per-step validation checks source provenance, the linked predecessor and
+latest-state identity, the complete skip versus active-fallthrough partition,
+the one-read/one-comparison active shape, and the exact false release result.
+Final lifecycle and `ep_run` validation reconcile one transition per CP314
+transition, checked partitions and counts, retained latest enum/result state,
+zero release inner-body entries, and direct-only evidence. Direct JSON
+publishes `purchased_air_calc_cooling_economizer_guard_lifecycle`, while
+non-direct or disconnected evidence is rejected.
+
+The lexical first executable outside CP315 is line 2083, the first comparison
+of the inner DifferentialDryBulb/DifferentialEnthalpy condition spanning lines
+2083-2086. A true CP315 guard continues to line 2083. A false guard continues
+to the unconditional `SupplyMassFlowRateForCool = 0.0` at line 2109; a
+CP313-true/CP314-body route also skips the sibling `else` and reaches line
+2109. CP315 maps neither continuation. Outdoor and recirculation node
+temperature or enthalpy reads, `PsyCpAirFnW`, `DeltaT`, supply-flow limiting,
+outdoor-air flow mutation, `EconoOn`, `TimeEconoActive`, line 2109 and all
+later cooling/mixed-air/humidity/capacity work, Heat/DeadBand selection at line
+2348, partial effects, retry, reset, and concurrency remain excluded.
+
+This remains guard-only lifecycle evidence. It does not connect or promote the
+separate outdoor-air economizer compatibility helper, and does not remove
+`OutdoorAir` or `Economizer` from the exact direct release forbidden features.
+Both parents remain `scaffold`/`none`; `routine.calc_purch_air_loads` remains
+`source_mapped`; no routine row, inventory/readiness count, capability level,
 run state, required or forbidden feature, evidence case, numerical
 conformance, or Roadmap state is promoted.
 

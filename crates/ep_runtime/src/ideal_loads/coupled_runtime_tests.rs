@@ -3,6 +3,8 @@ use super::*;
 use crate::{
     ideal_loads::{
         DirectZonePurchasedAirBindingFeature, IdealLoadsSensibleLimitContext,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_FIRST_EXCLUDED_SOURCE,
@@ -42,6 +44,25 @@ const ZONE_KEY: &str = "ZONE ONE";
 const SUPPLY_NODE_KEY: &str = "SUPPLY";
 const RETURN_NODE_KEY: &str = "RETURN";
 const ABS_TOLERANCE: f64 = 1.0e-9;
+
+#[test]
+fn cooling_economizer_guard_partition_overflow_fails_closed() {
+    let error = super::cooling_economizer_guard_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingEconomizerGuardLifecycleInvariant {
+            field: "test_partition_overflow",
+            expected: 1,
+            actual: usize::MAX,
+        }
+    ));
+}
 
 #[test]
 fn cooling_oa_max_flow_body_partition_overflow_fails_closed() {
@@ -452,6 +473,40 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
     assert!(!latest_cooling_oa_body.active_guard_false_economizer_fallthrough);
     assert!(!latest_cooling_oa_body.warning_counter_read);
     assert!(!latest_cooling_oa_body.outdoor_air_mass_flow_clamp_assignment_performed);
+    let economizer_guard = simulation.summary.calc_cooling_economizer_guard_lifecycle;
+    assert_eq!(
+        economizer_guard.source,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_SOURCE
+    );
+    assert_eq!(
+        economizer_guard.first_excluded_source,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_GUARD_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(economizer_guard.state.transition_count, required_steps);
+    assert_eq!(economizer_guard.state.guard_evaluation_count, 0);
+    assert_eq!(economizer_guard.state.unit_off_skip_count, 0);
+    assert_eq!(
+        economizer_guard.state.non_cooling_skip_count,
+        required_steps
+    );
+    assert_eq!(
+        economizer_guard
+            .state
+            .maximum_cooling_flow_body_sibling_skip_count,
+        0
+    );
+    assert_eq!(economizer_guard.state.economizer_type_read_count, 0);
+    assert_eq!(economizer_guard.state.no_economizer_comparison_count, 0);
+    assert_eq!(economizer_guard.state.economizer_body_entry_count, 0);
+    assert_eq!(economizer_guard.state.no_economizer_fallthrough_count, 0);
+    let latest_economizer_guard = economizer_guard
+        .state
+        .latest
+        .expect("latest CP315 snapshot");
+    assert!(latest_economizer_guard.non_cooling_skipped);
+    assert!(!latest_economizer_guard.economizer_guard_evaluated);
+    assert_eq!(latest_economizer_guard.economizer_type, None);
+    assert!(!latest_economizer_guard.economizer_body_entered);
 
     let zone = simulation.state.zones.first().expect("bound Zone state");
     assert_eq!(simulation.state.timestep_index, required_steps);
@@ -812,6 +867,41 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
         assert!(!latest_body.non_cooling_skipped);
         assert!(!latest_body.warning_counter_read);
         assert!(!latest_body.outdoor_air_mass_flow_clamp_assignment_performed);
+        let economizer_guard = simulation.summary.calc_cooling_economizer_guard_lifecycle;
+        assert_eq!(economizer_guard.state.transition_count, 1, "{limit:?}");
+        assert_eq!(
+            economizer_guard.state.guard_evaluation_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(economizer_guard.state.unit_off_skip_count, 0, "{limit:?}");
+        assert_eq!(
+            economizer_guard.state.non_cooling_skip_count, 0,
+            "{limit:?}"
+        );
+        assert_eq!(
+            economizer_guard
+                .state
+                .maximum_cooling_flow_body_sibling_skip_count,
+            0,
+            "{limit:?}"
+        );
+        assert_eq!(economizer_guard.state.economizer_type_read_count, 1);
+        assert_eq!(economizer_guard.state.no_economizer_comparison_count, 1);
+        assert_eq!(economizer_guard.state.economizer_body_entry_count, 0);
+        assert_eq!(economizer_guard.state.no_economizer_fallthrough_count, 1);
+        let latest_guard = economizer_guard
+            .state
+            .latest
+            .expect("latest CP315 guard snapshot");
+        assert!(latest_guard.economizer_guard_evaluated);
+        assert!(latest_guard.economizer_type_read);
+        assert_eq!(
+            latest_guard.economizer_type,
+            Some(OutdoorAirEconomizerType::NoEconomizer)
+        );
+        assert_eq!(latest_guard.economizer_not_no_economizer, Some(false));
+        assert!(!latest_guard.economizer_body_entered);
+        assert!(latest_guard.no_economizer_fallthrough);
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation

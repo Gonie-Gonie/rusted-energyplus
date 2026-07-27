@@ -21215,14 +21215,14 @@ and Roadmap state stay unchanged.
 
 ## CP314 Cooling OA Maximum-Flow True-Body Placement
 
-CP314 executes after a true CP313 guard and before the existing bounded
-PurchasedAir numerical calculation. It maps only lines 2058-2078: convert the
-parent outdoor-air mass flow with `StdRhoAir`, characterize zero-initialized
-first/recurring warning state, and overwrite the local outdoor-air mass flow
-with the cached maximum after either warning route. The first route increments
-the counter and reaches primary Warning, Continue, and timestamp sites. The
-recurring route allocates or reuses a relative index and retains only maximum
-reported volume flow with empty units.
+CP314 executes after a true CP313 guard and before CP315 and the existing
+bounded PurchasedAir numerical calculation. It maps only lines 2058-2078:
+convert the parent outdoor-air mass flow with `StdRhoAir`, characterize
+zero-initialized first/recurring warning state, and overwrite the local
+outdoor-air mass flow with the cached maximum after either warning route. The
+first route increments the counter and reaches primary Warning, Continue, and
+timestamp sites. The recurring route allocates or reuses a relative index and
+retains only maximum reported volume flow with empty units.
 
 The exact no-OA runtime never enters CP314. `NoLimit` and `LimitCapacity`
 short-circuit at CP313's selector before the maximum-flow scalar read and
@@ -21242,6 +21242,39 @@ writes, equipment residuals, adaptive iteration, and full Calc/Init lifecycle
 parity remain outside the slice. Parent/routine status, counts, support,
 forbidden features, evidence, numerical conformance, and Roadmap state stay
 unchanged.
+
+## CP315 Cooling Economizer Outer-Guard Placement
+
+CP315 executes after CP314 and before the existing bounded PurchasedAir
+numerical calculation. It maps only executable line 2082. The CP313 sibling
+`else` delimiter and comment at lines 2080-2081 contain no executable site.
+Only a CP312 Cooling transition whose CP313 guard was false reaches CP315;
+UnitOff, non-cooling, and CP313-true/CP314-body transitions skip it. The
+CP313-true/CP314-body skip is pure/internal characterization only; the public
+direct transition admits exactly UnitOff, non-cooling, or active
+CP313-false fallthrough partitions.
+
+The mapped guard consumes the linked CP314 fallthrough, reads
+`EconomizerType` once, and compares it with `NoEconomizer` using source `!=`.
+The exact no-OA release binding requires typed `NoEconomizer`, so every active
+release evaluation is false and the inner economizer condition has zero
+entries. Per-step and final firewalls reconcile the predecessor partitions,
+one read and comparison per active fallthrough, false results, zero inner
+entries, and direct-only JSON before the unchanged numerical DTO and Zone-air
+corrector run.
+
+This adds no Zone-air equation, demand or feedback term, OA/economizer support,
+node-state read, or numerical capability. The lexical first excluded
+executable is line 2083: a true guard continues there, while a false guard and
+a CP314-true route continue at line 2109. The inner temperature/enthalpy
+condition and line 2109 are next-dynamic-site labels only and are not executed
+or owned by CP315. All inner node reads, `CpAir`, `DeltaT`, supply/OA flow
+calculation and mutation, `EconoOn`, `TimeEconoActive`, line 2109 and later cooling work,
+Heat/DeadBand selection at line 2348, node/report writes, equipment residuals,
+adaptive iteration, and full Calc/Init lifecycle parity remain outside the
+slice. The separate outdoor-air economizer helper is not connected or
+promoted. Parent/routine status, counts, forbidden features, evidence,
+numerical conformance, and Roadmap state stay unchanged.
 
 ## Promotion Requirements
 

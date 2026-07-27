@@ -5,6 +5,7 @@ use std::collections::BTreeMap;
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
 use super::super::{
+    PurchasedAirCalcCoolingEconomizerGuardRuntimeState,
     PurchasedAirCalcCoolingEntryGateRuntimeState, PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState,
     PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState, PurchasedAirCalcEntryRuntimeState,
     PurchasedAirCalcMinimumOaPrefixRuntimeState, PurchasedAirHardSizeLegacyOutcome,
@@ -98,6 +99,8 @@ pub struct PurchasedAirUnitRuntimeState {
     pub calc_cooling_oa_max_flow_gate: PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState,
     /// Persistent bounded cooling OA/max-flow warning-and-clamp body state.
     pub calc_cooling_oa_max_flow_body: PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState,
+    /// Persistent bounded cooling economizer outer-guard state.
+    pub calc_cooling_economizer_guard: PurchasedAirCalcCoolingEconomizerGuardRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -177,6 +180,9 @@ impl PurchasedAirUnitRuntimeState {
                 system,
             ),
             calc_cooling_oa_max_flow_body: PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState::new(
+                system,
+            ),
+            calc_cooling_economizer_guard: PurchasedAirCalcCoolingEconomizerGuardRuntimeState::new(
                 system,
             ),
             rejected_exhaust_node: None,

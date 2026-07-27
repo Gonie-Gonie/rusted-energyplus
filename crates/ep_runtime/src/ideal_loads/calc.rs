@@ -1,5 +1,6 @@
 //! IdealLoads `CalcPurchAirLoads` compatibility calculations.
 
+mod cooling_economizer_guard;
 mod cooling_entry_gate;
 mod cooling_oa_max_flow_body;
 mod cooling_oa_max_flow_gate;
@@ -13,6 +14,8 @@ mod no_oa;
 mod psychrometrics;
 mod types;
 
+#[cfg(test)]
+mod cooling_economizer_guard_tests;
 #[cfg(test)]
 mod cooling_entry_gate_tests;
 #[cfg(test)]
@@ -28,6 +31,7 @@ mod moisture_demand_tests;
 #[cfg(test)]
 mod no_oa_tests;
 
+pub use cooling_economizer_guard::*;
 pub use cooling_entry_gate::*;
 pub use cooling_oa_max_flow_body::*;
 pub use cooling_oa_max_flow_gate::*;

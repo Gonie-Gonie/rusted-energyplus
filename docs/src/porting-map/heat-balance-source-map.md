@@ -33470,8 +33470,9 @@ evidence, conformance, and Roadmap state remain unchanged.
 
 The direct-Zone order is now predictor -> persistent Init -> CP310 Calc entry
 -> CP311 minimum-OA prefix -> CP312 cooling-entry gate -> CP313 cooling OA
-maximum-flow guard -> CP314 true-body lifecycle -> existing bounded Calc ->
-update/report -> same-step Zone-air corrector. CP312 covers only
+maximum-flow guard -> CP314 true-body lifecycle -> CP315 economizer outer
+guard -> existing bounded Calc -> update/report -> same-step Zone-air
+corrector. CP312 covers only
 `CalcPurchAirLoads` lines 2046-2047. It consumes the retained CP310 demand and
 CP311 minimum-OA output, applies the inclusive comparison, conditionally
 records the Zone temperature-control-type read, excludes exact SingleHeat, and
@@ -33538,14 +33539,46 @@ therefore reconciles one complete CP314 skip per CP313 transition and zero
 density reads, conversions, warning calls/increments/indices, clamps, and body
 executions. The existing bounded numerical result remains a distinct DTO.
 
-The lexical first excluded executable is line 2082 in CP313's sibling
+The lexical first executable outside CP314 is line 2082 in CP313's sibling
 false-path economizer branch. It is dynamically reached only when CP312
-entered cooling and the CP313 guard was false. A true CP314 body instead skips
-that `else` and next reaches line 2109. Neither continuation is mapped. This
-adds no heat-balance or predictor equation, warning sink, OA/economizer state,
-flow-limit calculation, or conformance claim. Parent/routine status,
+entered cooling and the CP313 guard was false. CP315 now maps only that outer
+guard. A true CP314 body instead skips that `else` and next reaches line 2109.
+This adds no heat-balance or predictor equation, warning sink, OA/economizer
+state, flow-limit calculation, or conformance claim. Parent/routine status,
 inventory/readiness counts, support, forbidden features, evidence, numerical
 conformance, and Roadmap state remain unchanged.
+
+## CP315 Cooling Economizer Outer Guard Inside the Heat-Balance Loop
+
+CP315 maps only `CalcPurchAirLoads` executable line 2082 after CP314. Lines
+2080-2081 are the sibling `else` delimiter and comment. Only an entered CP312
+Cooling body with a false CP313 guard reaches the slice. It consumes the
+linked CP314 fallthrough, reads `EconomizerType` once, and compares it with
+`NoEconomizer` using source `!=`. UnitOff, non-cooling, and CP313-true/CP314
+body routes skip the complete CP315 guard. The CP313-true/CP314-body skip is
+pure/internal characterization only; the public heat-balance release loop
+admits exactly UnitOff, non-cooling, or active CP313-false fallthrough
+partitions.
+
+The exact heat-balance release loop remains no-OA. EnergyPlus forces
+`NoEconomizer` on that input path, and the direct Rust binding requires the
+same typed enum. Every active release fallthrough therefore records one enum
+read and one false comparison, while the excluded inner condition has zero
+entries. Per-step and lifecycle firewalls reconcile those counts and the
+predecessor partitions before the unchanged bounded numerical result and
+same-step Zone-air corrector run.
+
+The lexical first excluded executable is line 2083. A true outer guard reaches
+the inner DifferentialDryBulb/DifferentialEnthalpy condition there; a false
+guard reaches line 2109. A CP314-true route also skips directly to line 2109.
+Those are next-dynamic-site labels only; CP315 executes neither site. Node
+temperature/enthalpy reads, `CpAir`, `DeltaT`, supply and outdoor-air
+flow calculation or mutation, `EconoOn`, `TimeEconoActive`, line 2109 and all
+later cooling work remain excluded. This guard-only lifecycle does not connect
+the separate outdoor-air economizer helper, add a heat-balance or predictor
+equation, or promote OA/economizer, numerical, or conformance support.
+Parent/routine status, inventory/readiness counts, forbidden features,
+evidence, numerical conformance, and Roadmap state remain unchanged.
 
 ## Data Structure Map
 

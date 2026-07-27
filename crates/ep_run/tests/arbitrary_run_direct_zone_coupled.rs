@@ -39,6 +39,9 @@ const CALC_COOLING_OA_MAX_FLOW_BODY_FIRST_EXCLUDED_SOURCE: &str =
     "EnergyPlus 26.1 PurchasedAirManager.cc:2082";
 const CALC_COOLING_OA_MAX_FLOW_BODY_RECURRING_WARNING_CHILD_SOURCE: &str =
     "EnergyPlus 26.1 UtilityRoutines.cc:1146-1194,1293-1379; max-only optional argument";
+const CALC_COOLING_ECONOMIZER_GUARD_SOURCE: &str = "EnergyPlus 26.1 PurchasedAirManager.cc:2082";
+const CALC_COOLING_ECONOMIZER_GUARD_FIRST_EXCLUDED_SOURCE: &str =
+    "EnergyPlus 26.1 PurchasedAirManager.cc:2083";
 const COUPLED_SOURCE_ORDER: [&str; 6] = [
     "predict-system-loads",
     "init-purchased-air",
@@ -681,6 +684,7 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
         false
     );
     assert_zero_effect_cooling_oa_max_flow_body(runtime, expected_calls, expected_calls, 0);
+    assert_cooling_economizer_guard(runtime, expected_calls, expected_calls, 0);
 }
 
 fn assert_zero_effect_cooling_oa_max_flow_body(
@@ -806,6 +810,68 @@ fn assert_zero_effect_cooling_oa_max_flow_body(
         "outdoor_air_mass_flow_rate_after_clamp_kg_per_s",
     ] {
         assert!(latest[field].is_null(), "{field}");
+    }
+}
+
+fn assert_cooling_economizer_guard(
+    runtime: &Value,
+    expected_calls: u64,
+    expected_non_cooling_skips: u64,
+    expected_guard_evaluations: u64,
+) {
+    let guard = &runtime["purchased_air_calc_cooling_economizer_guard_lifecycle"];
+    assert!(
+        guard.is_object(),
+        "direct runtime must publish the CP315 key"
+    );
+    assert_eq!(guard["source"], CALC_COOLING_ECONOMIZER_GUARD_SOURCE);
+    assert_eq!(
+        guard["first_excluded_source"],
+        CALC_COOLING_ECONOMIZER_GUARD_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(guard["transition_count"], expected_calls);
+    assert_eq!(guard["guard_evaluation_count"], expected_guard_evaluations);
+    assert_eq!(guard["unit_off_skip_count"], 0);
+    assert_eq!(guard["non_cooling_skip_count"], expected_non_cooling_skips);
+    assert_eq!(guard["maximum_cooling_flow_body_sibling_skip_count"], 0);
+    assert_eq!(
+        guard["economizer_type_read_count"],
+        expected_guard_evaluations
+    );
+    assert_eq!(
+        guard["no_economizer_comparison_count"],
+        expected_guard_evaluations
+    );
+    assert_eq!(guard["economizer_body_entry_count"], 0);
+    assert_eq!(
+        guard["no_economizer_fallthrough_count"],
+        expected_guard_evaluations
+    );
+
+    let latest = &guard["latest"];
+    assert_eq!(latest["source"], CALC_COOLING_ECONOMIZER_GUARD_SOURCE);
+    assert_eq!(
+        latest["first_excluded_source"],
+        CALC_COOLING_ECONOMIZER_GUARD_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(latest["parent_call_ordinal"], expected_calls);
+    let evaluated = expected_guard_evaluations > 0;
+    assert_eq!(latest["economizer_guard_evaluated"], evaluated);
+    assert_eq!(latest["economizer_type_read"], evaluated);
+    assert_eq!(latest["no_economizer_comparison_evaluated"], evaluated);
+    assert_eq!(latest["economizer_body_entered"], false);
+    assert_eq!(latest["no_economizer_fallthrough"], evaluated);
+    if evaluated {
+        assert_eq!(latest["economizer_type"], "NoEconomizer");
+        assert_eq!(latest["economizer_not_no_economizer"], false);
+        assert_eq!(
+            latest["predecessor_active_guard_false_economizer_fallthrough"],
+            true
+        );
+    } else {
+        assert!(latest["economizer_type"].is_null());
+        assert!(latest["economizer_not_no_economizer"].is_null());
+        assert_eq!(latest["non_cooling_skipped"], true);
     }
 }
 
@@ -959,6 +1025,7 @@ fn all_hard_sized_finite_limit_branches_limit_live_cooling()
             assert!(cooling_oa_max_flow["latest"]["outdoor_air_mass_flow_above_maximum"].is_null());
         }
         assert_zero_effect_cooling_oa_max_flow_body(&summary["rust_runtime"], 2, 0, 2);
+        assert_cooling_economizer_guard(&summary["rust_runtime"], 2, 0, 2);
 
         let results = read_json(&output_dir.join("results").join("result-store.json"))?;
         let cooling_rate = find_series(
