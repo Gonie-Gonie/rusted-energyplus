@@ -304,11 +304,43 @@ assignment counts; require zero release `SingleHeat` blocks; match numerical
 Cooling results to cooling-body entries; expose
 `purchased_air_calc_cooling_entry_gate_lifecycle` in direct-runtime JSON; and
 reject disconnected or non-direct evidence. This is gate lifecycle evidence,
-not a new numerical or thermostat-family claim. The cooling body beginning at
-line 2056, the dynamically reached Heat/DeadBand decision at line 2348, full
-temperature-control-array ownership, and all later Calc behavior remain open.
-Parent/routine status, inventory/readiness counts, support level, forbidden
-features, evidence cases, conformance, and Roadmap state remain unchanged.
+not a new numerical or thermostat-family claim. At the CP312 boundary, the
+cooling body beginning at line 2056, the dynamically reached Heat/DeadBand
+decision at line 2348, full temperature-control-array ownership, and all later
+Calc behavior remain open. Parent/routine status, inventory/readiness counts,
+support level, forbidden features, evidence cases, conformance, and Roadmap
+state remain unchanged.
+
+CP313 maps only the nested cooling outdoor-air maximum-flow guard at
+`CalcPurchAirLoads` lines 2056-2057. It runs only after CP312 entered Cooling.
+The source first compares `CoolingLimit` with `FlowRate`; only a failed first
+comparison reaches `FlowRateAndCapacity`. When neither matches, `&&`
+short-circuiting skips both flow operands. A selected flow limit instead reads
+the current outdoor-air and cached maximum cooling mass flows and applies
+strict `OAMassFlowRate > MaxCoolMassFlowRate`. The guard itself writes no
+flow, warning, diagnostic index, economizer state, or other source state.
+
+On the exact no-OA release lane, NoLimit and Capacity short-circuit before the
+flow reads. FlowRate matches the first selector and skips the second;
+FlowRateAndCapacity matches the second. Both selected-flow routes compare the
+CP311 `+0.0` outdoor-air flow with a finite nonnegative BeginEnvironment
+cache, so the maximum-flow body is never entered. Internal characterization
+separately retains strict equality and signed-zero fallthrough, NaN
+fallthrough, and positive over-limit body selection without admitting those
+inputs or executing the excluded body in release.
+
+The binder now orders CP313 after CP312 and before the existing numerical
+Calc. Per-step, lifecycle, and pipeline firewalls reconcile CP312
+Cooling/UnitOff/non-cooling partitions, the two selector comparisons, their
+short-circuited flow reads, strict comparisons, and zero release body entries;
+publish `purchased_air_calc_cooling_oa_max_flow_gate_lifecycle`; and reject
+disconnected or non-direct evidence. This is guard-only lifecycle evidence.
+The line-2058 volume-flow calculation, warning and recurring-diagnostic state,
+line-2078 OA clamp, false-path economizer work beginning at line 2082,
+Heat/DeadBand selection at line 2348, and every later Calc behavior remain
+open. Parent/routine status, inventory/readiness counts, support level,
+forbidden features, evidence cases, numerical conformance, and Roadmap state
+remain unchanged.
 
 ## Current Launcher State
 

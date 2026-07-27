@@ -4,9 +4,12 @@ use crate::{
     ideal_loads::{
         DirectZonePurchasedAirBindingFeature, IdealLoadsSensibleLimitContext,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
-        PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE, PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE,
-        PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
-        PurchasedAirTemperatureControlType, ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO,
+        PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE,
+        PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE, PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
+        PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirTemperatureControlType,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO, ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
         ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
         ZONE_SYSTEM_PREDICTED_SENSIBLE_LOAD_TO_COOLING_SETPOINT_RATE,
@@ -102,6 +105,30 @@ fn cooling_entry_count_partitions_reject_both_overflow_routes() {
             ) if actual_field == field
         ));
     }
+}
+
+#[test]
+fn cooling_oa_max_flow_count_arithmetic_rejects_overflow_and_underflow() {
+    assert!(matches!(
+        super::cooling_oa_max_flow_validation::checked_add(usize::MAX, 1, "partition_overflow", 7,),
+        Err(
+            DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingOaMaxFlowGateLifecycleInvariant {
+                field: "partition_overflow",
+                expected: 7,
+                actual: usize::MAX,
+            }
+        )
+    ));
+    assert!(matches!(
+        super::cooling_oa_max_flow_validation::checked_sub(0, 1, "selector_underflow", 7,),
+        Err(
+            DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingOaMaxFlowGateLifecycleInvariant {
+                field: "selector_underflow",
+                expected: 7,
+                actual: usize::MAX,
+            }
+        )
+    ));
 }
 
 #[test]
@@ -334,6 +361,32 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
     assert!(!latest_cooling_entry.temperature_control_type_read);
     assert!(!latest_cooling_entry.cooling_body_entered);
     assert_eq!(latest_cooling_entry.assigned_operating_mode, None);
+    let cooling_oa_gate = simulation.summary.calc_cooling_oa_max_flow_gate_lifecycle;
+    assert_eq!(
+        cooling_oa_gate.source,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE
+    );
+    assert_eq!(
+        cooling_oa_gate.first_excluded_source,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(cooling_oa_gate.state.transition_count, required_steps);
+    assert_eq!(cooling_oa_gate.state.source_execution_count, 0);
+    assert_eq!(cooling_oa_gate.state.unit_off_skip_count, 0);
+    assert_eq!(cooling_oa_gate.state.non_cooling_skip_count, required_steps);
+    assert_eq!(
+        cooling_oa_gate
+            .state
+            .cooling_limit_flow_rate_comparison_count,
+        0
+    );
+    assert_eq!(
+        cooling_oa_gate.state.maximum_cooling_flow_body_entry_count,
+        0
+    );
+    let latest_cooling_oa = cooling_oa_gate.state.latest.expect("latest CP313 snapshot");
+    assert!(latest_cooling_oa.non_cooling_skipped);
+    assert!(!latest_cooling_oa.cooling_limit_flow_rate_read);
 
     let zone = simulation.state.zones.first().expect("bound Zone state");
     assert_eq!(simulation.state.timestep_index, required_steps);
@@ -480,6 +533,15 @@ fn all_hard_sized_finite_limit_branches_run_with_source_threshold_demand() {
             cooling_entry_lifecycle.state.active_fallthrough_count,
             required_steps
         );
+        let cooling_oa_gate = simulation.summary.calc_cooling_oa_max_flow_gate_lifecycle;
+        assert_eq!(cooling_oa_gate.state.transition_count, required_steps);
+        assert_eq!(cooling_oa_gate.state.source_execution_count, 0);
+        assert_eq!(cooling_oa_gate.state.non_cooling_skip_count, required_steps);
+        assert_eq!(cooling_oa_gate.state.strict_mass_flow_comparison_count, 0);
+        assert_eq!(
+            cooling_oa_gate.state.maximum_cooling_flow_body_entry_count,
+            0
+        );
         let density = lifecycle
             .standard_air_density_kg_per_m3
             .expect("initialized standard density");
@@ -521,6 +583,120 @@ fn all_hard_sized_finite_limit_branches_run_with_source_threshold_demand() {
             "the deliberately small hard-sized limit must constrain the live predicted demand"
         );
         assert_close(heating_energy.values[0], heating_rate.values[0] * 3_600.0);
+    }
+}
+
+#[test]
+fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
+    for (limit, flow_m3_per_s, capacity_w) in [
+        (IdealLoadsLimit::NoLimit, None, None),
+        (IdealLoadsLimit::LimitCapacity, None, Some(1.0e9)),
+        (IdealLoadsLimit::LimitFlowRate, Some(0.005), None),
+        (
+            IdealLoadsLimit::LimitFlowRateAndCapacity,
+            Some(0.005),
+            Some(1.0e9),
+        ),
+        (IdealLoadsLimit::LimitFlowRate, Some(0.0), None),
+    ] {
+        let mut typed = exact_model(1).typed;
+        typed.schedules[1].hourly_value = 0.0;
+        typed.schedules[2].hourly_value = 15.0;
+        let system = &mut typed.ideal_loads_air_systems[0];
+        system.cooling_limit = limit;
+        system.maximum_cooling_air_flow_rate_m3_per_s = flow_m3_per_s.map(AutosizeOrNumber::Value);
+        system.maximum_total_cooling_capacity_w = capacity_w.map(AutosizeOrNumber::Value);
+        let model = SimulationModel::from_typed(typed);
+        let schedule_cache =
+            precompute_schedule_cache(&model.typed, 1).expect("one cooling schedule sample");
+        let weather = weather_series_with_conditions(&model, 1, 30.0, 15.0, 30.0, 101_325.0);
+        let mut options = DirectZonePurchasedAirCoupledOptions::hourly_samples(1);
+        options.initial_zone_air_temperature_c = INITIAL_ZONE_TEMPERATURE_C;
+
+        let simulation = simulate_direct_zone_purchased_air_coupled_heat_balance(
+            &model,
+            &weather,
+            &schedule_cache,
+            options,
+        )
+        .expect("CP313 release limit shape");
+        let initialized_max = simulation
+            .summary
+            .init_lifecycle
+            .maximum_cooling_air_mass_flow_rate_kg_per_s;
+        let lifecycle = simulation.summary.calc_cooling_oa_max_flow_gate_lifecycle;
+        let state = lifecycle.state;
+        let flow_rate = limit == IdealLoadsLimit::LimitFlowRate;
+        let combined = limit == IdealLoadsLimit::LimitFlowRateAndCapacity;
+        let flow_active = flow_rate || combined;
+
+        assert_eq!(state.transition_count, 1, "{limit:?}");
+        assert_eq!(state.source_execution_count, 1, "{limit:?}");
+        assert_eq!(state.unit_off_skip_count, 0, "{limit:?}");
+        assert_eq!(state.non_cooling_skip_count, 0, "{limit:?}");
+        assert_eq!(state.cooling_limit_flow_rate_comparison_count, 1);
+        assert_eq!(
+            state.cooling_limit_flow_rate_match_count,
+            usize::from(flow_rate)
+        );
+        assert_eq!(
+            state.cooling_limit_flow_rate_and_capacity_comparison_count,
+            usize::from(!flow_rate)
+        );
+        assert_eq!(
+            state.cooling_limit_flow_rate_and_capacity_match_count,
+            usize::from(combined)
+        );
+        assert_eq!(
+            state.outdoor_air_mass_flow_rate_read_count,
+            usize::from(flow_active)
+        );
+        assert_eq!(
+            state.maximum_cooling_air_mass_flow_rate_read_count,
+            usize::from(flow_active)
+        );
+        assert_eq!(
+            state.strict_mass_flow_comparison_count,
+            usize::from(flow_active)
+        );
+        assert_eq!(state.strict_mass_flow_comparison_satisfied_count, 0);
+        assert_eq!(state.maximum_cooling_flow_body_entry_count, 0);
+        assert_eq!(state.active_fallthrough_count, 1);
+        let latest = state.latest.expect("latest CP313 snapshot");
+        assert!(latest.predecessor_cooling_body_entered);
+        assert_eq!(latest.cooling_flow_limit_active, Some(flow_active));
+        assert_eq!(latest.maximum_cooling_air_mass_flow_rate_read, flow_active);
+        if flow_active {
+            assert_eq!(
+                latest
+                    .maximum_cooling_air_mass_flow_rate_kg_per_s
+                    .expect("selected-flow cache")
+                    .to_bits(),
+                initialized_max.to_bits()
+            );
+            assert_eq!(
+                latest
+                    .outdoor_air_mass_flow_rate_kg_per_s
+                    .expect("selected-flow OA")
+                    .to_bits(),
+                0.0_f64.to_bits()
+            );
+        } else {
+            assert_eq!(latest.maximum_cooling_air_mass_flow_rate_kg_per_s, None);
+            assert_eq!(latest.outdoor_air_mass_flow_rate_kg_per_s, None);
+        }
+        assert!(!latest.maximum_cooling_flow_body_entered);
+
+        if flow_m3_per_s == Some(0.0) {
+            let mass_flow = simulation
+                .results
+                .find_series(SYSTEM_KEY, ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE)
+                .expect("zero-limit numerical mass flow");
+            assert!(
+                mass_flow.values[0] > 0.0,
+                "CP313 OA guard must not claim ownership of the later positive-only supply-flow clamp"
+            );
+        }
     }
 }
 

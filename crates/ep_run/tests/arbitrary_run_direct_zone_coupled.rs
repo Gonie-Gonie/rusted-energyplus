@@ -29,6 +29,10 @@ const CALC_MINIMUM_OA_CHILD_SOURCE: &str = "EnergyPlus 26.1 PurchasedAirManager.
 const CALC_COOLING_ENTRY_GATE_SOURCE: &str = "EnergyPlus 26.1 PurchasedAirManager.cc:2046-2047";
 const CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE: &str =
     "EnergyPlus 26.1 PurchasedAirManager.cc:2056";
+const CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE: &str =
+    "EnergyPlus 26.1 PurchasedAirManager.cc:2056-2057";
+const CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE: &str =
+    "EnergyPlus 26.1 PurchasedAirManager.cc:2058";
 const COUPLED_SOURCE_ORDER: [&str; 6] = [
     "predict-system-loads",
     "init-purchased-air",
@@ -597,15 +601,95 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
     assert_eq!(latest_cooling_entry["single_heat_blocked"], false);
     assert_eq!(latest_cooling_entry["cooling_body_entered"], false);
     assert!(latest_cooling_entry["assigned_operating_mode"].is_null());
+
+    let cooling_oa_max_flow = &runtime["purchased_air_calc_cooling_oa_max_flow_gate_lifecycle"];
+    assert_eq!(
+        cooling_oa_max_flow["source"],
+        CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE
+    );
+    assert_eq!(
+        cooling_oa_max_flow["first_excluded_source"],
+        CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(cooling_oa_max_flow["transition_count"], expected_calls);
+    assert_eq!(cooling_oa_max_flow["source_execution_count"], 0);
+    assert_eq!(cooling_oa_max_flow["unit_off_skip_count"], 0);
+    assert_eq!(
+        cooling_oa_max_flow["non_cooling_skip_count"],
+        expected_calls
+    );
+    assert_eq!(
+        cooling_oa_max_flow["cooling_limit_flow_rate_comparison_count"],
+        0
+    );
+    assert_eq!(
+        cooling_oa_max_flow["cooling_limit_flow_rate_and_capacity_comparison_count"],
+        0
+    );
+    assert_eq!(
+        cooling_oa_max_flow["outdoor_air_mass_flow_rate_read_count"],
+        0
+    );
+    assert_eq!(
+        cooling_oa_max_flow["maximum_cooling_air_mass_flow_rate_read_count"],
+        0
+    );
+    assert_eq!(cooling_oa_max_flow["strict_mass_flow_comparison_count"], 0);
+    assert_eq!(
+        cooling_oa_max_flow["maximum_cooling_flow_body_entry_count"],
+        0
+    );
+    let latest_cooling_oa_max_flow = &cooling_oa_max_flow["latest"];
+    assert_eq!(
+        latest_cooling_oa_max_flow["source"],
+        CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE
+    );
+    assert_eq!(
+        latest_cooling_oa_max_flow["first_excluded_source"],
+        CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(
+        latest_cooling_oa_max_flow["parent_call_ordinal"],
+        expected_calls
+    );
+    assert_eq!(
+        latest_cooling_oa_max_flow["controlled_zone"],
+        lifecycle["controlled_zone"]
+    );
+    assert_eq!(
+        latest_cooling_oa_max_flow["predecessor_cooling_body_entered"],
+        false
+    );
+    assert_eq!(latest_cooling_oa_max_flow["non_cooling_skipped"], true);
+    assert_eq!(
+        latest_cooling_oa_max_flow["cooling_limit_flow_rate_comparison_evaluated"],
+        false
+    );
+    assert!(latest_cooling_oa_max_flow["cooling_limit_flow_rate_value"].is_null());
+    assert_eq!(
+        latest_cooling_oa_max_flow["strict_mass_flow_comparison_evaluated"],
+        false
+    );
+    assert_eq!(
+        latest_cooling_oa_max_flow["maximum_cooling_flow_body_entered"],
+        false
+    );
 }
 
 #[test]
 fn all_hard_sized_finite_limit_branches_limit_live_cooling()
 -> Result<(), Box<dyn std::error::Error>> {
-    for (name, limit) in [
-        ("finite-capacity-cooling", "LimitCapacity"),
-        ("finite-flow-cooling", "LimitFlowRate"),
-        ("finite-flow-capacity-cooling", "LimitFlowRateAndCapacity"),
+    for (name, limit, first_matches, second_comparisons, second_matches, flow_reads) in [
+        ("finite-capacity-cooling", "LimitCapacity", 0, 2, 0, 0),
+        ("finite-flow-cooling", "LimitFlowRate", 2, 0, 0, 2),
+        (
+            "finite-flow-capacity-cooling",
+            "LimitFlowRateAndCapacity",
+            0,
+            2,
+            2,
+            2,
+        ),
     ] {
         let case_dir = unique_case_dir(name)?;
         let input_path = case_dir.join("direct-zone-finite-cooling.epJSON");
@@ -654,6 +738,93 @@ fn all_hard_sized_finite_limit_branches_limit_live_cooling()
             cooling_entry["latest"]["assigned_operating_mode"],
             "Cooling"
         );
+        let cooling_oa_max_flow =
+            &summary["rust_runtime"]["purchased_air_calc_cooling_oa_max_flow_gate_lifecycle"];
+        assert_eq!(
+            cooling_oa_max_flow["source"],
+            CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE
+        );
+        assert_eq!(cooling_oa_max_flow["transition_count"], 2);
+        assert_eq!(cooling_oa_max_flow["source_execution_count"], 2);
+        assert_eq!(
+            cooling_oa_max_flow["cooling_limit_flow_rate_comparison_count"],
+            2
+        );
+        assert_eq!(
+            cooling_oa_max_flow["cooling_limit_flow_rate_match_count"],
+            first_matches
+        );
+        assert_eq!(
+            cooling_oa_max_flow["cooling_limit_flow_rate_and_capacity_comparison_count"],
+            second_comparisons
+        );
+        assert_eq!(
+            cooling_oa_max_flow["cooling_limit_flow_rate_and_capacity_match_count"],
+            second_matches
+        );
+        assert_eq!(
+            cooling_oa_max_flow["outdoor_air_mass_flow_rate_read_count"],
+            flow_reads
+        );
+        assert_eq!(
+            cooling_oa_max_flow["maximum_cooling_air_mass_flow_rate_read_count"],
+            flow_reads
+        );
+        assert_eq!(
+            cooling_oa_max_flow["strict_mass_flow_comparison_count"],
+            flow_reads
+        );
+        assert_eq!(
+            cooling_oa_max_flow["strict_mass_flow_comparison_satisfied_count"],
+            0
+        );
+        assert_eq!(
+            cooling_oa_max_flow["maximum_cooling_flow_body_entry_count"],
+            0
+        );
+        assert_eq!(cooling_oa_max_flow["active_fallthrough_count"], 2);
+        assert_eq!(
+            cooling_oa_max_flow["latest"]["cooling_limit_flow_rate_value"],
+            limit
+        );
+        assert_eq!(
+            cooling_oa_max_flow["latest"]["cooling_flow_limit_active"],
+            flow_reads > 0
+        );
+        assert_eq!(
+            cooling_oa_max_flow["latest"]["outdoor_air_mass_flow_rate_read"],
+            flow_reads > 0
+        );
+        assert_eq!(
+            cooling_oa_max_flow["latest"]["strict_mass_flow_comparison_evaluated"],
+            flow_reads > 0
+        );
+        assert_eq!(
+            cooling_oa_max_flow["latest"]["maximum_cooling_flow_body_entered"],
+            false
+        );
+        if flow_reads > 0 {
+            assert_eq!(
+                cooling_oa_max_flow["latest"]["outdoor_air_mass_flow_rate_kg_per_s"],
+                0.0
+            );
+            assert!(
+                cooling_oa_max_flow["latest"]["maximum_cooling_air_mass_flow_rate_kg_per_s"]
+                    .as_f64()
+                    .is_some_and(|value| value >= 0.0)
+            );
+            assert_eq!(
+                cooling_oa_max_flow["latest"]["outdoor_air_mass_flow_above_maximum"],
+                false
+            );
+        } else {
+            assert!(cooling_oa_max_flow["latest"]["outdoor_air_mass_flow_rate_kg_per_s"].is_null());
+            assert!(
+                cooling_oa_max_flow["latest"]["maximum_cooling_air_mass_flow_rate_kg_per_s"]
+                    .is_null()
+            );
+            assert!(cooling_oa_max_flow["latest"]["outdoor_air_mass_flow_above_maximum"].is_null());
+        }
 
         let results = read_json(&output_dir.join("results").join("result-store.json"))?;
         let cooling_rate = find_series(

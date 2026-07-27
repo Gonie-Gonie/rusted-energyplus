@@ -21,8 +21,9 @@ use ep_runtime::{
     PURCHASED_AIR_CALC_ENTRY_RESET_TARGETS, PURCHASED_AIR_CALC_ENTRY_SOURCE,
     PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
     PurchasedAirAvailabilityStatus, PurchasedAirCalcCoolingEntryGateLifecycleSummary,
-    PurchasedAirCalcEntryLifecycleSummary, PurchasedAirCalcMinimumOaPrefixLifecycleSummary,
-    PurchasedAirHardSizeField, PurchasedAirHardSizeLegacyRoute, PurchasedAirInitDiagnosticKind,
+    PurchasedAirCalcCoolingOaMaxFlowGateLifecycleSummary, PurchasedAirCalcEntryLifecycleSummary,
+    PurchasedAirCalcMinimumOaPrefixLifecycleSummary, PurchasedAirHardSizeField,
+    PurchasedAirHardSizeLegacyRoute, PurchasedAirInitDiagnosticKind,
     PurchasedAirInitLifecycleSummary, PurchasedAirInitTopologyDiagnosticKind,
     PurchasedAirInitTopologyDiagnosticSeverity, PurchasedAirInitTopologyError,
     PurchasedAirRecirculationSource, PurchasedAirSupplyTemperatureDiagnosticKind,
@@ -55,6 +56,7 @@ use crate::{
 };
 
 mod purchased_air_cooling_entry_gate;
+mod purchased_air_cooling_oa_max_flow;
 mod purchased_air_minimum_oa;
 
 /// Completed arbitrary-run outcome.
@@ -162,6 +164,8 @@ struct RustRuntimeResult {
         Option<PurchasedAirCalcMinimumOaPrefixLifecycleSummary>,
     purchased_air_calc_cooling_entry_gate_lifecycle:
         Option<PurchasedAirCalcCoolingEntryGateLifecycleSummary>,
+    purchased_air_calc_cooling_oa_max_flow_gate_lifecycle:
+        Option<PurchasedAirCalcCoolingOaMaxFlowGateLifecycleSummary>,
 }
 
 struct PreparedRuntimeInputs {
@@ -1206,6 +1210,10 @@ fn finish_successful_summary(
                 .purchased_air_calc_cooling_entry_gate_lifecycle
                 .as_ref()
                 .map(purchased_air_cooling_entry_gate::lifecycle_json),
+            "purchased_air_calc_cooling_oa_max_flow_gate_lifecycle": result
+                .purchased_air_calc_cooling_oa_max_flow_gate_lifecycle
+                .as_ref()
+                .map(purchased_air_cooling_oa_max_flow::lifecycle_json),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
@@ -2096,6 +2104,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_entry_lifecycle: None,
                 purchased_air_calc_minimum_oa_prefix_lifecycle: None,
                 purchased_air_calc_cooling_entry_gate_lifecycle: None,
+                purchased_air_calc_cooling_oa_max_flow_gate_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
@@ -2140,6 +2149,8 @@ fn execute_rust_runtime(
                 Some(simulation.summary.calc_minimum_oa_prefix_lifecycle);
             let purchased_air_calc_cooling_entry_gate_lifecycle =
                 Some(simulation.summary.calc_cooling_entry_gate_lifecycle);
+            let purchased_air_calc_cooling_oa_max_flow_gate_lifecycle =
+                Some(simulation.summary.calc_cooling_oa_max_flow_gate_lifecycle);
             Ok(RustRuntimeResult {
                 results: simulation.results,
                 runtime_class,
@@ -2158,6 +2169,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_entry_lifecycle,
                 purchased_air_calc_minimum_oa_prefix_lifecycle,
                 purchased_air_calc_cooling_entry_gate_lifecycle,
+                purchased_air_calc_cooling_oa_max_flow_gate_lifecycle,
             })
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
@@ -2186,6 +2198,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_entry_lifecycle: None,
                 purchased_air_calc_minimum_oa_prefix_lifecycle: None,
                 purchased_air_calc_cooling_entry_gate_lifecycle: None,
+                purchased_air_calc_cooling_oa_max_flow_gate_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
@@ -2212,6 +2225,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_entry_lifecycle: None,
                 purchased_air_calc_minimum_oa_prefix_lifecycle: None,
                 purchased_air_calc_cooling_entry_gate_lifecycle: None,
+                purchased_air_calc_cooling_oa_max_flow_gate_lifecycle: None,
             })
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
@@ -2261,6 +2275,16 @@ fn validate_runtime_demand_provenance(
             init_lifecycle,
             result.purchased_air_coupling_call_count,
         )?;
+        purchased_air_cooling_oa_max_flow::validate_direct_lifecycle(
+            result
+                .purchased_air_calc_cooling_oa_max_flow_gate_lifecycle
+                .as_ref(),
+            result
+                .purchased_air_calc_cooling_entry_gate_lifecycle
+                .as_ref(),
+            init_lifecycle,
+            result.purchased_air_coupling_call_count,
+        )?;
     } else if result.purchased_air_init_lifecycle.is_some()
         || result.purchased_air_calc_entry_lifecycle.is_some()
         || result
@@ -2268,6 +2292,9 @@ fn validate_runtime_demand_provenance(
             .is_some()
         || result
             .purchased_air_calc_cooling_entry_gate_lifecycle
+            .is_some()
+        || result
+            .purchased_air_calc_cooling_oa_max_flow_gate_lifecycle
             .is_some()
         || result.purchased_air_coupling_call_count.is_some()
     {
@@ -2914,9 +2941,9 @@ mod tests {
         artifact_map, ctf_split_trace_enabled, execution_stage_snapshots,
         full_surface_trace_opt_in, input_error_diagnostic_code,
         purchased_air_calc_entry_lifecycle_json, purchased_air_cooling_entry_gate,
-        purchased_air_init_lifecycle_json, purchased_air_minimum_oa,
-        runtime_class_requires_weather, schedule_cache_json, selected_trace_enabled,
-        source_order_gate_summary, source_order_stage_state_snapshots,
+        purchased_air_cooling_oa_max_flow, purchased_air_init_lifecycle_json,
+        purchased_air_minimum_oa, runtime_class_requires_weather, schedule_cache_json,
+        selected_trace_enabled, source_order_gate_summary, source_order_stage_state_snapshots,
         trace_level_enables_stage_snapshots, typed_counts,
         validate_direct_purchased_air_calc_entry_lifecycle,
         validate_direct_purchased_air_init_lifecycle, validate_runtime_selection,
@@ -2924,7 +2951,7 @@ mod tests {
     use ep_compiler::compile_raw_model;
     use ep_model::{
         ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
-        ExternalInterfaceSchedule, IdealLoadsAirSystemId, NodeId, NormalizedName,
+        ExternalInterfaceSchedule, IdealLoadsAirSystemId, IdealLoadsLimit, NodeId, NormalizedName,
         ScheduleFileShading, ScheduleFileShadingColumn, ScheduleId, TypedModel,
         ZoneEquipmentListId, ZoneId,
     };
@@ -2934,15 +2961,21 @@ mod tests {
         ExecutionStep, IdealLoadsInitFlags, IdealLoadsSensibleMode,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE,
-        PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE_ORDER, PURCHASED_AIR_CALC_ENTRY_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE_ORDER,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE_ORDER, PURCHASED_AIR_CALC_ENTRY_SOURCE,
         PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
         PurchasedAirAvailabilityStatus, PurchasedAirCalcCoolingEntryGateLifecycleSummary,
         PurchasedAirCalcCoolingEntryGateRuntimeState, PurchasedAirCalcCoolingEntryGateSnapshot,
-        PurchasedAirCalcEntryDemandSnapshot, PurchasedAirCalcEntryLifecycleSummary,
-        PurchasedAirCalcEntryResetSnapshot, PurchasedAirCalcEntryRuntimeState,
-        PurchasedAirCalcEntrySnapshot, PurchasedAirCalcMinimumOaPrefixLifecycleSummary,
+        PurchasedAirCalcCoolingOaMaxFlowGateLifecycleSummary,
+        PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState,
+        PurchasedAirCalcCoolingOaMaxFlowGateSnapshot, PurchasedAirCalcEntryDemandSnapshot,
+        PurchasedAirCalcEntryLifecycleSummary, PurchasedAirCalcEntryResetSnapshot,
+        PurchasedAirCalcEntryRuntimeState, PurchasedAirCalcEntrySnapshot,
+        PurchasedAirCalcMinimumOaPrefixLifecycleSummary,
         PurchasedAirCalcMinimumOaPrefixRuntimeState, PurchasedAirCalcMinimumOaPrefixSnapshot,
         PurchasedAirHardSizeField, PurchasedAirHardSizeFieldOutcome,
         PurchasedAirHardSizeLegacyOutcome, PurchasedAirHardSizeLegacyRoute,
@@ -3383,6 +3416,154 @@ mod tests {
     }
 
     #[test]
+    fn direct_release_cooling_oa_max_flow_validation_rejects_disconnected_evidence() {
+        let init = valid_init_lifecycle(2);
+        let predecessor = valid_cooling_entry_gate_lifecycle(2);
+        let valid = valid_cooling_oa_max_flow_gate_lifecycle(2, IdealLoadsLimit::LimitFlowRate);
+        assert!(
+            purchased_air_cooling_oa_max_flow::validate_direct_lifecycle(
+                Some(&valid),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_ok()
+        );
+        assert!(
+            purchased_air_cooling_oa_max_flow::validate_direct_lifecycle(
+                None,
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_boundary = valid.clone();
+        wrong_boundary.first_excluded_source = "EnergyPlus 26.1 PurchasedAirManager.cc:2082";
+        assert!(
+            purchased_air_cooling_oa_max_flow::validate_direct_lifecycle(
+                Some(&wrong_boundary),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_source_order = valid.clone();
+        wrong_source_order
+            .state
+            .latest
+            .as_mut()
+            .expect("valid latest cooling OA maximum-flow gate")
+            .source_order = &["compare-cooling-limit-to-flow-rate"];
+        assert!(
+            purchased_air_cooling_oa_max_flow::validate_direct_lifecycle(
+                Some(&wrong_source_order),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut wrong_limit_shape = valid.clone();
+        wrong_limit_shape
+            .state
+            .latest
+            .as_mut()
+            .expect("valid latest cooling OA maximum-flow gate")
+            .cooling_limit_flow_rate_value = Some(IdealLoadsLimit::LimitCapacity);
+        assert!(
+            purchased_air_cooling_oa_max_flow::validate_direct_lifecycle(
+                Some(&wrong_limit_shape),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut overflowed_partition = valid.clone();
+        overflowed_partition.state.source_execution_count = usize::MAX;
+        overflowed_partition.state.unit_off_skip_count = 1;
+        assert!(
+            purchased_air_cooling_oa_max_flow::validate_direct_lifecycle(
+                Some(&overflowed_partition),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+
+        let mut entered_excluded_body = valid;
+        entered_excluded_body
+            .state
+            .maximum_cooling_flow_body_entry_count = 1;
+        entered_excluded_body
+            .state
+            .latest
+            .as_mut()
+            .expect("valid latest cooling OA maximum-flow gate")
+            .maximum_cooling_flow_body_entered = true;
+        assert!(
+            purchased_air_cooling_oa_max_flow::validate_direct_lifecycle(
+                Some(&entered_excluded_body),
+                Some(&predecessor),
+                Some(&init),
+                Some(2)
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn direct_release_cooling_oa_max_flow_json_exposes_limit_short_circuit_routes() {
+        for (limit, expected_name, second_evaluated, flow_selected) in [
+            (IdealLoadsLimit::NoLimit, "NoLimit", true, false),
+            (IdealLoadsLimit::LimitFlowRate, "LimitFlowRate", false, true),
+            (IdealLoadsLimit::LimitCapacity, "LimitCapacity", true, false),
+            (
+                IdealLoadsLimit::LimitFlowRateAndCapacity,
+                "LimitFlowRateAndCapacity",
+                true,
+                true,
+            ),
+        ] {
+            let lifecycle = valid_cooling_oa_max_flow_gate_lifecycle(2, limit);
+            let value = purchased_air_cooling_oa_max_flow::lifecycle_json(&lifecycle);
+
+            assert_eq!(
+                value["source"],
+                PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE
+            );
+            assert_eq!(
+                value["first_excluded_source"],
+                PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE
+            );
+            assert_eq!(value["transition_count"], 2);
+            assert_eq!(value["source_execution_count"], 2);
+            assert_eq!(value["maximum_cooling_flow_body_entry_count"], 0);
+            assert_eq!(
+                value["latest"]["cooling_limit_flow_rate_value"],
+                expected_name
+            );
+            assert_eq!(
+                value["latest"]["cooling_limit_flow_rate_and_capacity_comparison_evaluated"],
+                second_evaluated
+            );
+            assert_eq!(value["latest"]["cooling_flow_limit_active"], flow_selected);
+            assert_eq!(
+                value["latest"]["strict_mass_flow_comparison_evaluated"],
+                flow_selected
+            );
+            assert_eq!(value["latest"]["maximum_cooling_flow_body_entered"], false);
+        }
+    }
+
+    #[test]
     fn lifecycle_json_serializes_structured_supply_temperature_diagnostics() {
         let mut lifecycle = valid_init_lifecycle(1);
         lifecycle.supply_temperature_registered_recurring_diagnostic_count = 1;
@@ -3473,6 +3654,67 @@ mod tests {
         PurchasedAirCalcCoolingEntryGateLifecycleSummary {
             source: PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE,
             first_excluded_source: PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_FIRST_EXCLUDED_SOURCE,
+            state,
+        }
+    }
+
+    fn valid_cooling_oa_max_flow_gate_lifecycle(
+        call_count: usize,
+        limit: IdealLoadsLimit,
+    ) -> PurchasedAirCalcCoolingOaMaxFlowGateLifecycleSummary {
+        let system = IdealLoadsAirSystemId(0);
+        let first_match = limit == IdealLoadsLimit::LimitFlowRate;
+        let second_evaluated = !first_match;
+        let second_match = limit == IdealLoadsLimit::LimitFlowRateAndCapacity;
+        let flow_selected = first_match || second_match;
+        let mut state = PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState::new(system);
+        state.transition_count = call_count;
+        state.source_execution_count = call_count;
+        state.cooling_limit_flow_rate_comparison_count = call_count;
+        state.cooling_limit_flow_rate_match_count = usize::from(first_match) * call_count;
+        state.cooling_limit_flow_rate_and_capacity_comparison_count =
+            usize::from(second_evaluated) * call_count;
+        state.cooling_limit_flow_rate_and_capacity_match_count =
+            usize::from(second_match) * call_count;
+        state.outdoor_air_mass_flow_rate_read_count = usize::from(flow_selected) * call_count;
+        state.maximum_cooling_air_mass_flow_rate_read_count =
+            usize::from(flow_selected) * call_count;
+        state.strict_mass_flow_comparison_count = usize::from(flow_selected) * call_count;
+        state.active_fallthrough_count = call_count;
+        state.latest = Some(PurchasedAirCalcCoolingOaMaxFlowGateSnapshot {
+            source: PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE,
+            first_excluded_source:
+                PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE,
+            system,
+            parent_call_ordinal: call_count,
+            source_order: PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE_ORDER,
+            controlled_zone: ZoneId(0),
+            unit_body_entered: true,
+            predecessor_cooling_body_entered: true,
+            unit_off_skipped: false,
+            non_cooling_skipped: false,
+            cooling_limit_flow_rate_comparison_evaluated: true,
+            cooling_limit_flow_rate_read: true,
+            cooling_limit_flow_rate_value: Some(limit),
+            cooling_limit_flow_rate_comparison_satisfied: Some(first_match),
+            cooling_limit_flow_rate_and_capacity_comparison_evaluated: second_evaluated,
+            cooling_limit_flow_rate_and_capacity_read: second_evaluated,
+            cooling_limit_flow_rate_and_capacity_value: second_evaluated.then_some(limit),
+            cooling_limit_flow_rate_and_capacity_comparison_satisfied: second_evaluated
+                .then_some(second_match),
+            cooling_flow_limit_active: Some(flow_selected),
+            outdoor_air_mass_flow_rate_read: flow_selected,
+            outdoor_air_mass_flow_rate_kg_per_s: flow_selected.then_some(0.0),
+            maximum_cooling_air_mass_flow_rate_read: flow_selected,
+            maximum_cooling_air_mass_flow_rate_kg_per_s: flow_selected.then_some(0.0),
+            strict_mass_flow_comparison_evaluated: flow_selected,
+            outdoor_air_mass_flow_above_maximum: flow_selected.then_some(false),
+            maximum_cooling_flow_body_entered: false,
+        });
+        PurchasedAirCalcCoolingOaMaxFlowGateLifecycleSummary {
+            source: PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE,
+            first_excluded_source:
+                PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE,
             state,
         }
     }

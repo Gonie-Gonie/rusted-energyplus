@@ -15607,10 +15607,11 @@ The line-2046 condition first evaluates
 `MinOASensOutput >= QZnCoolSP`. C++ `&&` short-circuiting reaches
 `TempControlType(ControlledZoneNum)` only when that comparison succeeds.
 Exact `SingleHeat` then blocks entry; every other source enum value admits the
-line-2047 local `OperatingMode=Cool` assignment. The lexical next executable is
-the cooling OA-flow-limit condition at line 2056 because lines 2048-2055 are
-comments. When the cooling gate is false, the dynamically next executable is
-the separately deferred Heat/DeadBand decision at line 2348.
+line-2047 local `OperatingMode=Cool` assignment. At the CP312 boundary, the
+lexical next executable is the cooling OA-flow-limit condition at line 2056
+because lines 2048-2055 are comments. When the cooling gate is false, the
+dynamically next executable is the separately deferred Heat/DeadBand decision
+at line 2348.
 
 The bounded transition preserves this exact six-site order:
 
@@ -15642,8 +15643,8 @@ CP310 and CP311 snapshots, matching system/Zone/call ordinals, the no-OA/no-EMS
 CP311 result shape, prevalidated `DualHeatCool`, and finite cooling demand on
 an active body before mutation.
 
-The direct release binder executes CP312 after CP311 and before the existing
-bounded calculation. It supplies `DualHeatCool` from the exact already
+The direct release binder executes CP312 after CP311 and before CP313 and the
+existing bounded calculation. It supplies `DualHeatCool` from the exact already
 validated binding; CP312 does not own or query the EnergyPlus
 `TempControlType` array service. Per-step validation checks the source and
 first-excluded provenance, predecessor linkage, conditional read sites, local
@@ -15661,16 +15662,100 @@ coupling and lifecycle evidence, not a new numerical implementation or
 conformance claim. Public release rejects active nonfinite cooling demand,
 while internal direct characterization retains source NaN fallthrough.
 SingleHeat and the other non-Dual thermostat families remain outside release.
-The cooling branch at lines 2056-2345, OA-flow warnings and clamp, economizer,
-mass-flow/humidity/capacity and mixed-air calculations, the Heat/DeadBand
-selector at lines 2348-2352, every later branch, local-to-persistent
-operating-mode ownership, partial effects, failure, reset, and concurrency
-remain excluded.
+At the CP312 boundary, the cooling branch at lines 2056-2345, OA-flow warnings
+and clamp, economizer, mass-flow/humidity/capacity and mixed-air calculations,
+the Heat/DeadBand selector at lines 2348-2352, every later branch,
+local-to-persistent operating-mode ownership, partial effects, failure, reset,
+and concurrency remain excluded.
 
 Both parents stay `scaffold`/`none`; `routine.calc_purch_air_loads` stays
 `source_mapped`; no routine row, inventory/readiness count, support level,
 forbidden feature, evidence case, numerical conformance, or Roadmap state is
 promoted.
+
+## CP313 Source-Ordered Cooling OA Maximum-Flow Guard
+
+CP313 maps only EnergyPlus 26.1 `PurchasedAirManager.cc` lines 2056-2057.
+This condition is nested inside the CP312 Cooling body:
+
+`((CoolingLimit == FlowRate) || (CoolingLimit == FlowRateAndCapacity)) &&
+ (OAMassFlowRate > MaxCoolMassFlowRate)`.
+
+CP310 UnitOff and CP312 non-cooling fallthrough therefore skip every CP313
+site. On a CP312 Cooling entry, C++ `||` first compares the limit with
+`FlowRate`; only a failed first comparison evaluates
+`FlowRateAndCapacity`. If both comparisons fail, C++ `&&` skips the
+outdoor-air and maximum-flow operands. A matching flow selector instead
+evaluates their strict greater-than comparison. The condition has no source
+write, child call, diagnostic, or persistent effect.
+
+The bounded lifecycle records this exact six-site contract:
+
+1. compare the cooling limit with `FlowRate`;
+2. compare it with `FlowRateAndCapacity` only after first-comparison
+   short-circuiting;
+3. read outdoor-air mass flow only after limit-selection short-circuiting;
+4. read maximum cooling air mass flow under the same gate;
+5. apply strict outdoor-air-above-maximum comparison; and
+6. record whether control would enter the maximum-cooling-flow body.
+
+The two scalar operands are side-effect-free source reads. Their stable Rust
+capture order does not claim a C++ relative-evaluation guarantee beyond the
+sequenced `||` and `&&` gates. Strict equality, including every signed-zero
+pair, does not enter the body. Either NaN operand also makes the comparison
+false. Direct characterization may record a true condition for artificial
+over-limit values, but it executes none of the line-2058-and-later body.
+
+`calc/cooling_oa_max_flow_gate.rs` owns
+`PurchasedAirCalcCoolingOaMaxFlowGateSnapshot`,
+`PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState`, and
+`PurchasedAirCalcCoolingOaMaxFlowGateLifecycleSummary`.
+`calc/cooling_oa_max_flow_gate/release.rs` owns
+`PurchasedAirCalcCoolingOaMaxFlowGateError` and
+`advance_direct_no_oa_calc_cooling_oa_max_flow_gate`; the parent module owns
+`purchased_air_calc_cooling_oa_max_flow_gate_lifecycle_summary`.
+
+The public transition requires exact retained CP311 and CP312 snapshots,
+matching system, controlled Zone, parent ordinals, and one-for-one predecessor
+order before mutation. It also requires the existing no-OA/no-EMS shape,
+exact typed system cooling-limit identity, and an initialized finite
+nonnegative maximum cooling mass-flow cache before evaluating whether CP313 is
+skipped or which selector matches. The snapshot still records the scalar cache
+read only for a selected flow limit. NoLimit and Capacity execute both
+selector comparisons and then skip the scalar reads. FlowRate matches the
+first comparison and skips the second; FlowRateAndCapacity matches the second.
+The two selected-flow routes read CP311 `OAMassFlowRate=+0.0` and the
+initialized nonnegative maximum, so the strict comparison and
+maximum-flow body-entry count remain false and zero throughout exact release.
+
+The binder executes CP313 after CP312 and before the pre-existing numerical
+Calc. Per-step validation checks provenance, predecessor linkage, the
+limit-specific short-circuit shape, `+0.0` OA input, and zero body entry.
+Final lifecycle validation reconciles one transition per CP312 transition;
+source executions with CP312 Cooling and numerical Cooling counts;
+UnitOff/non-cooling skips; first and conditional second selector comparisons;
+selected-limit flow reads and strict comparisons; and zero satisfied/body
+entries. The coupled runtime owns the numerical-Cooling reconciliation.
+`ep_run` independently repeats provenance, predecessor/count/latest, and
+limit-shape firewalls, publishes
+`purchased_air_calc_cooling_oa_max_flow_gate_lifecycle`, and rejects
+disconnected or non-direct evidence.
+
+The lexical first executable outside CP313 is line 2058. A true condition
+would next calculate `OAVolFlowRate`, mutate first-or-recurring warning state,
+emit diagnostics, and clamp OA at line 2078. A false condition reaches the
+`else` delimiter at line 2080 and the next executable economizer test at line
+2082. None of those statements is implemented by this guard-only lifecycle.
+The warning text and registry, density/volume conversion, OA mutation,
+economizer and `TimeEconoActive`, all later cooling mass-flow, mixed-air,
+humidity and capacity work, Heat/DeadBand selection at line 2348, malformed
+source limit sentinels, partial effects, failure, retry, reset, and concurrency
+remain excluded.
+
+Both parents stay `scaffold`/`none`; `routine.calc_purch_air_loads` stays
+`source_mapped`; no routine row, inventory/readiness count, support level,
+required or forbidden feature, evidence case, numerical conformance, or
+Roadmap state is promoted.
 
 
 

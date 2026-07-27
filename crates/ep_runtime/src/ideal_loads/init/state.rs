@@ -5,9 +5,9 @@ use std::collections::BTreeMap;
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
 use super::super::{
-    PurchasedAirCalcCoolingEntryGateRuntimeState, PurchasedAirCalcEntryRuntimeState,
-    PurchasedAirCalcMinimumOaPrefixRuntimeState, PurchasedAirHardSizeLegacyOutcome,
-    PurchasedAirSizedLimits,
+    PurchasedAirCalcCoolingEntryGateRuntimeState, PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState,
+    PurchasedAirCalcEntryRuntimeState, PurchasedAirCalcMinimumOaPrefixRuntimeState,
+    PurchasedAirHardSizeLegacyOutcome, PurchasedAirSizedLimits,
 };
 use super::{
     IdealLoadsInitFlags, PurchasedAirInitTopologyDiagnostic, PurchasedAirInitTopologyError,
@@ -93,6 +93,8 @@ pub struct PurchasedAirUnitRuntimeState {
     pub calc_minimum_oa_prefix: PurchasedAirCalcMinimumOaPrefixRuntimeState,
     /// Persistent bounded cooling-entry gate state.
     pub calc_cooling_entry_gate: PurchasedAirCalcCoolingEntryGateRuntimeState,
+    /// Persistent bounded cooling OA/max-flow gate state.
+    pub calc_cooling_oa_max_flow_gate: PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -168,6 +170,9 @@ impl PurchasedAirUnitRuntimeState {
             calc_entry: PurchasedAirCalcEntryRuntimeState::new(system),
             calc_minimum_oa_prefix: PurchasedAirCalcMinimumOaPrefixRuntimeState::new(system),
             calc_cooling_entry_gate: PurchasedAirCalcCoolingEntryGateRuntimeState::new(system),
+            calc_cooling_oa_max_flow_gate: PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState::new(
+                system,
+            ),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

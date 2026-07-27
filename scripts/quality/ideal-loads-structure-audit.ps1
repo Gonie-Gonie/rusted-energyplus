@@ -105,6 +105,10 @@ $calcMinimumOaPrefixTests = "crates\ep_runtime\src\ideal_loads\calc\minimum_oa_p
 $calcCoolingEntryGate = "crates\ep_runtime\src\ideal_loads\calc\cooling_entry_gate.rs"
 $calcCoolingEntryGateRelease = "crates\ep_runtime\src\ideal_loads\calc\cooling_entry_gate\release.rs"
 $calcCoolingEntryGateTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_entry_gate_tests.rs"
+$calcCoolingOaMaxFlowGate = "crates\ep_runtime\src\ideal_loads\calc\cooling_oa_max_flow_gate.rs"
+$calcCoolingOaMaxFlowGateRelease = "crates\ep_runtime\src\ideal_loads\calc\cooling_oa_max_flow_gate\release.rs"
+$calcCoolingOaMaxFlowGateReleaseValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_oa_max_flow_gate\release\validation.rs"
+$calcCoolingOaMaxFlowGateTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_oa_max_flow_gate_tests.rs"
 $calcHumidity = "crates\ep_runtime\src\ideal_loads\calc\humidity.rs"
 $calcLimits = "crates\ep_runtime\src\ideal_loads\calc\limits.rs"
 $calcMassFlow = "crates\ep_runtime\src\ideal_loads\calc\mass_flow.rs"
@@ -136,9 +140,11 @@ $idealLoadsInitTests = "crates\ep_runtime\src\ideal_loads\init\lifecycle_tests.r
 $idealLoadsInitWarningTests = "crates\ep_runtime\src\ideal_loads\init\warning_tests.rs"
 $idealLoadsBindingMinimumOaTests = "crates\ep_runtime\src\ideal_loads\binding\minimum_oa_prefix_tests.rs"
 $idealLoadsBindingCoolingEntryGateTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_entry_gate_tests.rs"
+$idealLoadsBindingCoolingOaMaxFlowGateTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_oa_max_flow_gate_tests.rs"
 $idealLoadsCoupledRuntime = "crates\ep_runtime\src\ideal_loads\coupled_runtime.rs"
 $idealLoadsCoupledMinimumOaValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\minimum_oa_validation.rs"
 $idealLoadsCoupledCoolingEntryValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_entry_validation.rs"
+$idealLoadsCoupledCoolingOaMaxFlowValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_oa_max_flow_validation.rs"
 $idealLoadsCouplingValidation = "crates\ep_runtime\src\ideal_loads\coupling\validation.rs"
 $idealLoadsInput = "crates\ep_runtime\src\ideal_loads\input.rs"
 $idealLoadsMeters = "crates\ep_runtime\src\ideal_loads\meters.rs"
@@ -183,6 +189,7 @@ $runSupport = "crates\ep_run\src\support.rs"
 $runPipeline = "crates\ep_run\src\pipeline.rs"
 $runPurchasedAirMinimumOa = "crates\ep_run\src\pipeline\purchased_air_minimum_oa.rs"
 $runPurchasedAirCoolingEntryGate = "crates\ep_run\src\pipeline\purchased_air_cooling_entry_gate.rs"
+$runPurchasedAirCoolingOaMaxFlow = "crates\ep_run\src\pipeline\purchased_air_cooling_oa_max_flow.rs"
 $runDirectZoneCoupledTests = "crates\ep_run\tests\arbitrary_run_direct_zone_coupled.rs"
 $runRuntimeBoundaries = "crates\ep_run\src\support\runtime_boundaries.rs"
 $runtimeOutputTests = "crates\ep_runtime\src\runtime\tests\part08.rs"
@@ -207,6 +214,10 @@ Assert-FileExists -Path $calcMinimumOaPrefixTests -Description "PurchasedAir Cal
 Assert-FileExists -Path $calcCoolingEntryGate -Description "PurchasedAir Calc cooling-entry gate module"
 Assert-FileExists -Path $calcCoolingEntryGateRelease -Description "PurchasedAir Calc cooling-entry release boundary"
 Assert-FileExists -Path $calcCoolingEntryGateTests -Description "PurchasedAir Calc cooling-entry characterization tests"
+Assert-FileExists -Path $calcCoolingOaMaxFlowGate -Description "PurchasedAir Calc cooling OA maximum-flow gate module"
+Assert-FileExists -Path $calcCoolingOaMaxFlowGateRelease -Description "PurchasedAir Calc cooling OA maximum-flow release boundary"
+Assert-FileExists -Path $calcCoolingOaMaxFlowGateReleaseValidation -Description "PurchasedAir Calc cooling OA maximum-flow release validation helpers"
+Assert-FileExists -Path $calcCoolingOaMaxFlowGateTests -Description "PurchasedAir Calc cooling OA maximum-flow characterization tests"
 Assert-FileExists -Path $calcHumidity -Description "IdealLoads calc humidity module"
 Assert-FileExists -Path $calcLimits -Description "IdealLoads calc limits module"
 Assert-FileExists -Path $calcMassFlow -Description "IdealLoads calc mass-flow module"
@@ -238,9 +249,11 @@ Assert-FileExists -Path $idealLoadsInitTests -Description "IdealLoads initializa
 Assert-FileExists -Path $idealLoadsInitWarningTests -Description "IdealLoads initialization warning tests"
 Assert-FileExists -Path $idealLoadsBindingMinimumOaTests -Description "IdealLoads binding minimum-OA transaction tests"
 Assert-FileExists -Path $idealLoadsBindingCoolingEntryGateTests -Description "IdealLoads binding cooling-entry transaction tests"
+Assert-FileExists -Path $idealLoadsBindingCoolingOaMaxFlowGateTests -Description "IdealLoads binding cooling OA maximum-flow transaction tests"
 Assert-FileExists -Path $idealLoadsCoupledRuntime -Description "IdealLoads coupled release runtime"
 Assert-FileExists -Path $idealLoadsCoupledMinimumOaValidation -Description "IdealLoads minimum-OA release validator"
 Assert-FileExists -Path $idealLoadsCoupledCoolingEntryValidation -Description "IdealLoads cooling-entry release validator"
+Assert-FileExists -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Description "IdealLoads cooling OA maximum-flow release validator"
 Assert-FileExists -Path $idealLoadsCouplingValidation -Description "IdealLoads release coupling validation"
 Assert-FileExists -Path $idealLoadsInput -Description "IdealLoads input boundary module"
 Assert-FileExists -Path $idealLoadsMeters -Description "IdealLoads meter binding module"
@@ -280,6 +293,7 @@ Assert-FileExists -Path $runSupport -Description "ep_run support assessment"
 Assert-FileExists -Path $runPipeline -Description "ep_run pipeline"
 Assert-FileExists -Path $runPurchasedAirMinimumOa -Description "ep_run PurchasedAir minimum-OA pipeline module"
 Assert-FileExists -Path $runPurchasedAirCoolingEntryGate -Description "ep_run PurchasedAir cooling-entry pipeline module"
+Assert-FileExists -Path $runPurchasedAirCoolingOaMaxFlow -Description "ep_run PurchasedAir cooling OA maximum-flow pipeline module"
 Assert-FileExists -Path $runDirectZoneCoupledTests -Description "ep_run direct-Zone coupled integration tests"
 Assert-FileExists -Path $runRuntimeBoundaries -Description "ep_run runtime boundary assessment"
 Assert-FileExists -Path $runtimeOutputTests -Description "Runtime output registry tests"
@@ -304,6 +318,10 @@ Assert-LineLimit -Path $calcMinimumOaPrefixTests -Limit 220 -Description "Purcha
 Assert-LineLimit -Path $calcCoolingEntryGate -Limit 280 -Description "PurchasedAir Calc cooling-entry gate module"
 Assert-LineLimit -Path $calcCoolingEntryGateRelease -Limit 360 -Description "PurchasedAir Calc cooling-entry release boundary"
 Assert-LineLimit -Path $calcCoolingEntryGateTests -Limit 300 -Description "PurchasedAir Calc cooling-entry characterization tests"
+Assert-LineLimit -Path $calcCoolingOaMaxFlowGate -Limit 320 -Description "PurchasedAir Calc cooling OA maximum-flow gate module"
+Assert-LineLimit -Path $calcCoolingOaMaxFlowGateRelease -Limit 380 -Description "PurchasedAir Calc cooling OA maximum-flow release boundary"
+Assert-LineLimit -Path $calcCoolingOaMaxFlowGateReleaseValidation -Limit 240 -Description "PurchasedAir Calc cooling OA maximum-flow release validation helpers"
+Assert-LineLimit -Path $calcCoolingOaMaxFlowGateTests -Limit 320 -Description "PurchasedAir Calc cooling OA maximum-flow characterization tests"
 Assert-LineLimit -Path $calcHumidity -Limit 220 -Description "IdealLoads calc humidity module"
 Assert-LineLimit -Path $calcLimits -Limit 180 -Description "IdealLoads calc limits module"
 Assert-LineLimit -Path $calcMassFlow -Limit 150 -Description "IdealLoads calc mass-flow module"
@@ -334,8 +352,10 @@ Assert-LineLimit -Path $idealLoadsInitTests -Limit 380 -Description "IdealLoads 
 Assert-LineLimit -Path $idealLoadsInitWarningTests -Limit 100 -Description "IdealLoads initialization warning tests"
 Assert-LineLimit -Path $idealLoadsBindingMinimumOaTests -Limit 180 -Description "IdealLoads binding minimum-OA transaction tests"
 Assert-LineLimit -Path $idealLoadsBindingCoolingEntryGateTests -Limit 320 -Description "IdealLoads binding cooling-entry transaction tests"
+Assert-LineLimit -Path $idealLoadsBindingCoolingOaMaxFlowGateTests -Limit 320 -Description "IdealLoads binding cooling OA maximum-flow transaction tests"
 Assert-LineLimit -Path $idealLoadsCoupledMinimumOaValidation -Limit 240 -Description "IdealLoads minimum-OA release validator"
 Assert-LineLimit -Path $idealLoadsCoupledCoolingEntryValidation -Limit 240 -Description "IdealLoads cooling-entry release validator"
+Assert-LineLimit -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Limit 280 -Description "IdealLoads cooling OA maximum-flow release validator"
 Assert-LineLimit -Path $idealLoadsCouplingValidation -Limit 260 -Description "IdealLoads release coupling validation"
 Assert-LineLimit -Path $idealLoadsInput -Limit 260 -Description "IdealLoads input boundary module"
 Assert-LineLimit -Path $idealLoadsMeters -Limit 120 -Description "IdealLoads meter binding module"
@@ -372,12 +392,17 @@ Assert-LineLimit -Path $zoneEquipmentTests -Limit 320 -Description "Zone equipme
 Assert-LineLimit -Path $resultStore -Limit 220 -Description "Runtime result store"
 Assert-LineLimit -Path $runPurchasedAirMinimumOa -Limit 300 -Description "ep_run PurchasedAir minimum-OA pipeline module"
 Assert-LineLimit -Path $runPurchasedAirCoolingEntryGate -Limit 330 -Description "ep_run PurchasedAir cooling-entry pipeline module"
+Assert-LineLimit -Path $runPurchasedAirCoolingOaMaxFlow -Limit 440 -Description "ep_run PurchasedAir cooling OA maximum-flow pipeline module"
 
 Assert-Contains -Path $calcRoot -Pattern 'mod humidity;' -Description "IdealLoads calc humidity submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod cooling_entry_gate;' -Description "PurchasedAir Calc cooling-entry gate submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod cooling_entry_gate_tests;' -Description "PurchasedAir Calc cooling-entry gate test module declaration"
 Assert-Contains -Path $calcRoot -Pattern 'pub use cooling_entry_gate::\*;' -Description "PurchasedAir Calc cooling-entry gate public re-export"
 Assert-NotContains -Path $calcRoot -Pattern 'pub fn advance_direct_no_oa_calc_cooling_entry_gate\s*\(' -Description "cooling-entry transition implementation in calc module root"
+Assert-Contains -Path $calcRoot -Pattern 'mod cooling_oa_max_flow_gate;' -Description "PurchasedAir Calc cooling OA maximum-flow gate submodule declaration"
+Assert-Contains -Path $calcRoot -Pattern 'mod cooling_oa_max_flow_gate_tests;' -Description "PurchasedAir Calc cooling OA maximum-flow gate test module declaration"
+Assert-Contains -Path $calcRoot -Pattern 'pub use cooling_oa_max_flow_gate::\*;' -Description "PurchasedAir Calc cooling OA maximum-flow gate public re-export"
+Assert-NotContains -Path $calcRoot -Pattern 'pub fn advance_direct_no_oa_calc_cooling_oa_max_flow_gate\s*\(' -Description "cooling OA maximum-flow transition implementation in calc module root"
 Assert-Contains -Path $calcRoot -Pattern 'mod lifecycle;' -Description "PurchasedAir Calc-entry lifecycle submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod lifecycle_tests;' -Description "PurchasedAir Calc-entry lifecycle test module declaration"
 Assert-Contains -Path $calcRoot -Pattern 'pub use lifecycle::\*;' -Description "PurchasedAir Calc-entry lifecycle public re-export"
@@ -630,6 +655,79 @@ foreach ($coolingEntryBoundaryFile in @($calcCoolingEntryGate, $calcCoolingEntry
     }
 }
 
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'pub const PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE' -Description "Calc cooling OA maximum-flow source provenance"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'pub const PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE' -Description "Calc cooling OA maximum-flow first excluded source"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'pub const PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE_ORDER' -Description "Calc cooling OA maximum-flow exact source order"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'EnergyPlus 26\.1 PurchasedAirManager\.cc:2056-2057' -Description "Calc cooling OA maximum-flow exact guard boundary"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'EnergyPlus 26\.1 PurchasedAirManager\.cc:2058' -Description "Calc cooling OA maximum-flow exact first excluded executable"
+Assert-ExactStringArray -Path $calcCoolingOaMaxFlowGate -Name "PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE_ORDER" -Expected @(
+    "compare-cooling-limit-to-flow-rate",
+    "compare-cooling-limit-to-flow-rate-and-capacity-after-short-circuit",
+    "read-outdoor-air-mass-flow-after-limit-short-circuit",
+    "read-maximum-cooling-air-mass-flow-after-limit-short-circuit",
+    "compare-strict-outdoor-air-above-maximum-cooling-flow",
+    "enter-maximum-cooling-flow-body-if-satisfied"
+) -Description "Calc cooling OA maximum-flow exact six-step source order"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'pub struct PurchasedAirCalcCoolingOaMaxFlowGateSnapshot' -Description "Calc cooling OA maximum-flow source-ordered snapshot"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'pub struct PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState' -Description "Calc cooling OA maximum-flow bounded persistent state"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'pub struct PurchasedAirCalcCoolingOaMaxFlowGateLifecycleSummary' -Description "Calc cooling OA maximum-flow lifecycle summary"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'pub fn purchased_air_calc_cooling_oa_max_flow_gate_lifecycle_summary\s*\(' -Description "Calc cooling OA maximum-flow lifecycle summary accessor"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'pub\(super\) fn advance_cooling_oa_max_flow_gate_state\s*\(' -Description "Calc cooling OA maximum-flow source-characterization transition"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'cooling_limit == IdealLoadsLimit::LimitFlowRate' -Description "Calc cooling OA maximum-flow first selector comparison"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'cooling_limit_flow_rate_comparison_satisfied == Some\(false\)' -Description "Calc cooling OA maximum-flow OR short circuit"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'cooling_limit == IdealLoadsLimit::LimitFlowRateAndCapacity' -Description "Calc cooling OA maximum-flow second selector comparison"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'cooling_flow_limit_active == Some\(true\)' -Description "Calc cooling OA maximum-flow AND short circuit"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'outdoor_air_mass_flow_rate_kg_per_s\s*>\s*maximum_cooling_air_mass_flow_rate_kg_per_s' -Description "Calc cooling OA maximum-flow strict comparison"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'outdoor_air_mass_flow_above_maximum == Some\(true\)' -Description "Calc cooling OA maximum-flow excluded-body entry decision"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'strict_mass_flow_comparison_count' -Description "Calc cooling OA maximum-flow strict-comparison counter"
+Assert-Contains -Path $calcCoolingOaMaxFlowGate -Pattern 'strict_mass_flow_comparison_satisfied_count' -Description "Calc cooling OA maximum-flow satisfied-comparison counter"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'pub enum PurchasedAirCalcCoolingOaMaxFlowGateError' -Description "Calc cooling OA maximum-flow fail-closed error"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'pub fn advance_direct_no_oa_calc_cooling_oa_max_flow_gate\s*\(' -Description "Calc cooling OA maximum-flow release transition"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'mod validation;' -Description "Calc cooling OA maximum-flow release validation helper declaration"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'use validation::\*;' -Description "Calc cooling OA maximum-flow release validation helper ownership"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'InitializationMaximumCoolingMassFlowCacheMismatch' -Description "CP313 retained maximum cooling-flow cache identity guard"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'InvalidMaximumCoolingMassFlowCache' -Description "CP313 finite nonnegative maximum cooling-flow cache guard"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'MinimumOaPrefixSnapshotMismatch' -Description "CP311-to-CP313 retained minimum-OA snapshot guard"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'CoolingEntryGateSnapshotMismatch' -Description "CP312-to-CP313 retained cooling-entry snapshot guard"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'PredecessorLinkMismatch' -Description "CP311/CP312 predecessor-link guard"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'PredecessorCallOrder' -Description "CP310-through-CP313 one-for-one source-order guard"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'MinimumOaPrefixOutsideDirectSubset' -Description "CP313 no-OA predecessor-shape guard"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'CoolingEntryGateOutsideDirectSubset' -Description "CP313 cooling-parent predecessor-shape guard"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'RuntimeStateInvariantViolation' -Description "CP313 retained lifecycle-state guard"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'ExactReleaseReductionViolated' -Description "CP313 excluded-body release guard"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'calc_cooling_oa_max_flow_gate\s*[\r\n]+\s*\.transition_count\s*[\r\n]+\s*\.checked_add\(1\)' -Description "CP313 checked predecessor call-order increment"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern '!supplied_maximum\.is_finite\(\) \|\| supplied_maximum < 0\.0' -Description "CP313 supplied maximum cooling-flow validation"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern '!retained_maximum\.is_finite\(\) \|\| retained_maximum < 0\.0' -Description "CP313 retained maximum cooling-flow validation"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'working_outdoor_air_mass_flow_rate_kg_per_s' -Description "CP313 minimum-OA local mass-flow input"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'IdealLoadsLimit::LimitFlowRate \| IdealLoadsLimit::LimitFlowRateAndCapacity' -Description "CP313 exact release flow-limit selector"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'outdoor_air_mass_flow_rate_kg_per_s > retained_maximum' -Description "CP313 exact strict release comparison"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateRelease -Pattern 'debug_assert!\(!snapshot\.maximum_cooling_flow_body_entered\)' -Description "CP313 release never enters excluded line-2058 body"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateReleaseValidation -Pattern 'pub\(super\) fn minimum_oa_snapshot_is_direct_release\s*\(' -Description "CP313 minimum-OA retained-snapshot validator"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateReleaseValidation -Pattern 'pub\(super\) fn cooling_entry_snapshot_is_direct_release\s*\(' -Description "CP313 cooling-entry retained-snapshot validator"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateReleaseValidation -Pattern 'pub\(super\) fn cooling_oa_max_flow_runtime_state_is_consistent\s*\(' -Description "CP313 lifecycle-state consistency validator"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateReleaseValidation -Pattern 'IdealLoadsLimit::LimitFlowRateAndCapacity' -Description "CP313 combined-limit retained-history shape"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateReleaseValidation -Pattern 'IdealLoadsLimit::NoLimit \| IdealLoadsLimit::LimitCapacity' -Description "CP313 no-flow-selector retained-history shape"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateReleaseValidation -Pattern '\.checked_add\(state\.unit_off_skip_count\)' -Description "CP313 checked transition partition"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateReleaseValidation -Pattern '\.checked_add\(state\.cooling_limit_flow_rate_and_capacity_match_count\)' -Description "CP313 checked selected-flow partition"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateReleaseValidation -Pattern 'state\.strict_mass_flow_comparison_satisfied_count\s*[\r\n]+\s*== state\.maximum_cooling_flow_body_entry_count' -Description "CP313 satisfied-comparison/body-entry reconciliation"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateTests -Pattern 'strict_greater_than_characterizes_nan_signed_zero_and_infinity' -Description "Calc cooling OA maximum-flow strict-comparison edge-case regression"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateTests -Pattern 'selector_or_and_mass_flow_and_short_circuits_follow_source_order' -Description "Calc cooling OA maximum-flow OR/AND short-circuit regression"
+Assert-Contains -Path $calcCoolingOaMaxFlowGateTests -Pattern 'unit_off_and_active_non_cooling_skip_every_site_in_distinct_partitions' -Description "Calc cooling OA maximum-flow parent-skip partition regression"
+
+$coolingOaMaxFlowForbiddenBehaviorPatterns = @(
+    [pscustomobject]@{ Pattern = 'PurchasedAirManager\.cc:(2082|2348)'; Description = "later economizer or Heat/DeadBand provenance in cooling OA maximum-flow boundary" },
+    [pscustomobject]@{ Pattern = 'OAVolFlowRate\s*='; Description = "line-2058 outdoor-air volume-flow clamp in cooling OA maximum-flow boundary" },
+    [pscustomobject]@{ Pattern = 'OAFlowMaxCoolOutput(Error|Index)|ShowWarningError|ShowContinueError|ShowRecurringWarningErrorAtEnd'; Description = "line-2058-and-later warning behavior in cooling OA maximum-flow boundary" },
+    [pscustomobject]@{ Pattern = 'StdRhoAir|MaxCoolVolFlowRate'; Description = "line-2058-and-later volume-to-mass-flow behavior in cooling OA maximum-flow boundary" },
+    [pscustomobject]@{ Pattern = 'OAMassFlowRate\s*=\s*PurchAir\.MaxCoolMassFlowRate|outdoor_air_mass_flow_rate_kg_per_s\s*=\s*(retained_maximum|maximum_cooling_air_mass_flow_rate_kg_per_s)'; Description = "line-2078 outdoor-air mass-flow clamp in cooling OA maximum-flow boundary" },
+    [pscustomobject]@{ Pattern = 'EconomizerType|TimeEconoActive|CalcPurchAirMixedAir|SupplyMassFlowRate'; Description = "later economizer, mixed-air, or supply-flow behavior in cooling OA maximum-flow boundary" }
+)
+foreach ($coolingOaMaxFlowBoundaryFile in @($calcCoolingOaMaxFlowGate, $calcCoolingOaMaxFlowGateRelease, $calcCoolingOaMaxFlowGateReleaseValidation)) {
+    foreach ($forbiddenBehavior in $coolingOaMaxFlowForbiddenBehaviorPatterns) {
+        Assert-NotContains -Path $coolingOaMaxFlowBoundaryFile -Pattern $forbiddenBehavior.Pattern -Description $forbiddenBehavior.Description
+    }
+}
+
 Assert-Contains -Path $idealLoadsInit -Pattern 'pub struct IdealLoadsInitFlags' -Description "IdealLoads init flags type"
 Assert-Contains -Path $idealLoadsInit -Pattern 'mod manager_plan;' -Description "IdealLoads immutable manager-plan module"
 Assert-Contains -Path $idealLoadsInit -Pattern 'mod manager_plan_tests;' -Description "IdealLoads manager-plan test module"
@@ -783,6 +881,9 @@ Assert-Contains -Path $idealLoadsBindingMinimumOaTests -Pattern 'exact_nan_calc_
 Assert-Contains -Path $idealLoadsBindingMinimumOaTests -Pattern 'advance_direct_no_oa_calc_minimum_oa_prefix\s*\(' -Description "Calc minimum-OA replay transaction regression"
 Assert-Contains -Path $idealLoadsBindingCoolingEntryGateTests -Pattern 'public_cooling_entry_gate_rejects_forgery_subset_and_replay_without_mutation' -Description "Calc cooling-entry forgery, subset, and replay transaction regression"
 Assert-Contains -Path $idealLoadsBindingCoolingEntryGateTests -Pattern 'public_active_release_rejects_nonfinite_cooling_predicate_transactionally' -Description "Calc cooling-entry active nonfinite transaction regression"
+Assert-Contains -Path $idealLoadsBindingCoolingOaMaxFlowGateTests -Pattern 'scheduled_binding_orders_cooling_oa_max_flow_gate_before_numerical_calc' -Description "Calc cooling OA maximum-flow scheduled binding order regression"
+Assert-Contains -Path $idealLoadsBindingCoolingOaMaxFlowGateTests -Pattern 'public_cooling_oa_max_flow_gate_rejects_forgery_replay_and_overflow_without_mutation' -Description "Calc cooling OA maximum-flow forgery, replay, and overflow transaction regression"
+Assert-Contains -Path $idealLoadsBindingCoolingOaMaxFlowGateTests -Pattern 'public_cooling_oa_max_flow_gate_rejects_nonfinite_cache_while_unit_off' -Description "Calc cooling OA maximum-flow UnitOff cache-validation regression"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'zone_component_availability:\s*Some\(PurchasedAirAvailabilityStatus::NoAction\)' -Description "release allocated ZoneComp NoAction visit"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'PurchasedAirTemperatureControlType::DualHeatCool' -Description "release prevalidated DualHeatCool cooling-entry input"
 $bindingText = Read-RepoText -Path "crates\ep_runtime\src\ideal_loads\binding.rs"
@@ -790,15 +891,17 @@ $bindingInitIndex = $bindingText.IndexOf("let initialization = init_purchased_ai
 $bindingCalcEntryIndex = $bindingText.IndexOf("let calculation_entry = advance_purchased_air_calc_entry(")
 $bindingMinimumOaIndex = $bindingText.IndexOf("let calculation_minimum_outdoor_air = advance_direct_no_oa_calc_minimum_oa_prefix(")
 $bindingCoolingEntryIndex = $bindingText.IndexOf("let calculation_cooling_entry_gate = advance_direct_no_oa_calc_cooling_entry_gate(")
+$bindingCoolingOaMaxFlowIndex = $bindingText.IndexOf("let calculation_cooling_oa_max_flow_gate = advance_direct_no_oa_calc_cooling_oa_max_flow_gate(")
 $bindingCalcIndex = $bindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
 if (
     $bindingInitIndex -lt 0 -or
     $bindingCalcEntryIndex -le $bindingInitIndex -or
     $bindingMinimumOaIndex -le $bindingCalcEntryIndex -or
     $bindingCoolingEntryIndex -le $bindingMinimumOaIndex -or
-    $bindingCalcIndex -le $bindingCoolingEntryIndex
+    $bindingCoolingOaMaxFlowIndex -le $bindingCoolingEntryIndex -or
+    $bindingCalcIndex -le $bindingCoolingOaMaxFlowIndex
 ) {
-    throw "InitPurchasedAir must precede the Calc-entry prefix, minimum-OA prefix, cooling-entry gate, and bounded numerical Calc coupling"
+    throw "InitPurchasedAir must precede the Calc-entry prefix, minimum-OA prefix, cooling-entry gate, cooling OA maximum-flow gate, and bounded numerical Calc coupling"
 }
 Assert-Contains -Path $calcLimits -Pattern 'initialized_heating_air_mass_flow_limit_kg_per_s' -Description "initialized heating flow cache input"
 Assert-Contains -Path $calcLimits -Pattern 'initialized_cooling_air_mass_flow_limit_kg_per_s' -Description "initialized cooling flow cache input"
@@ -874,6 +977,44 @@ Assert-Contains -Path $runPipeline -Pattern '\.purchased_air_calc_cooling_entry_
 Assert-Contains -Path $runPipeline -Pattern 'direct_release_cooling_entry_gate_validation_rejects_disconnected_evidence' -Description "pipeline cooling-entry disconnected-evidence regression"
 Assert-Contains -Path $runPipeline -Pattern 'direct_release_cooling_entry_gate_json_exposes_inclusive_cooling_route' -Description "pipeline cooling-entry inclusive-route JSON regression"
 Assert-Contains -Path $runDirectZoneCoupledTests -Pattern 'purchased_air_calc_cooling_entry_gate_lifecycle' -Description "direct run cooling-entry lifecycle JSON assertion"
+Assert-Contains -Path $idealLoadsInitState -Pattern 'pub calc_cooling_oa_max_flow_gate: PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState' -Description "persistent cooling OA maximum-flow lifecycle state"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'mod cooling_oa_max_flow_validation;' -Description "coupled runtime cooling OA maximum-flow validator submodule declaration"
+Assert-Contains -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Pattern 'pub\(super\) fn snapshot_matches_release\s*\(' -Description "per-timestep cooling OA maximum-flow release validator"
+Assert-Contains -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Pattern 'pub\(super\) fn validate_lifecycle\s*\(' -Description "final cooling OA maximum-flow lifecycle validator"
+Assert-Contains -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Pattern 'source: PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE' -Description "coupled cooling OA maximum-flow snapshot provenance validation"
+Assert-Contains -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Pattern 'first_excluded_source: PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE' -Description "coupled cooling OA maximum-flow snapshot first-excluded validation"
+Assert-Contains -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Pattern 'source_order: PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE_ORDER' -Description "coupled cooling OA maximum-flow exact source-order validation"
+Assert-Contains -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Pattern 'p\.cooling_body_entry_count' -Description "coupled cooling OA maximum-flow predecessor body-entry reconciliation"
+Assert-Contains -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Pattern 'numerical_cooling_count' -Description "coupled cooling OA maximum-flow numerical Cooling reconciliation"
+Assert-Contains -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Pattern 'transition_partition' -Description "coupled cooling OA maximum-flow checked source/skip partition"
+Assert-Contains -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Pattern 'let first_matches = usize::from\(limit == IdealLoadsLimit::LimitFlowRate\)' -Description "coupled cooling OA maximum-flow FlowRate route reconciliation"
+Assert-Contains -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Pattern 'let second_matches = usize::from\(limit == IdealLoadsLimit::LimitFlowRateAndCapacity\)' -Description "coupled cooling OA maximum-flow combined-limit route reconciliation"
+Assert-Contains -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Pattern 'strict_mass_flow_comparison_count' -Description "coupled cooling OA maximum-flow strict-comparison reconciliation"
+Assert-Contains -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Pattern 'count!\(strict_mass_flow_comparison_satisfied_count, 0\)' -Description "coupled cooling OA maximum-flow release false-result guard"
+Assert-Contains -Path $idealLoadsCoupledCoolingOaMaxFlowValidation -Pattern 'count!\(maximum_cooling_flow_body_entry_count, 0\)' -Description "coupled cooling OA maximum-flow excluded-body zero-count guard"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'cooling_oa_max_flow_validation::snapshot_matches_release' -Description "coupled runtime per-timestep cooling OA maximum-flow validation"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'cooling_oa_max_flow_validation::validate_lifecycle' -Description "coupled runtime final cooling OA maximum-flow validation"
+Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'pub calc_cooling_oa_max_flow_gate_lifecycle:\s*[\r\n]+\s*PurchasedAirCalcCoolingOaMaxFlowGateLifecycleSummary' -Description "coupled runtime cooling OA maximum-flow lifecycle summary"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs" -Pattern 'cooling_oa_max_flow_count_arithmetic_rejects_overflow_and_underflow' -Description "coupled cooling OA maximum-flow checked-arithmetic regression"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\coupled_runtime_tests.rs" -Pattern 'cooling_oa_max_flow_gate_reconciles_every_release_limit_shape' -Description "coupled cooling OA maximum-flow four-limit release regression"
+Assert-Contains -Path $runPipeline -Pattern 'mod purchased_air_cooling_oa_max_flow;' -Description "pipeline cooling OA maximum-flow evidence submodule declaration"
+Assert-Contains -Path $runPurchasedAirCoolingOaMaxFlow -Pattern 'pub\(super\) fn lifecycle_json\s*\(' -Description "pipeline cooling OA maximum-flow JSON ownership"
+Assert-Contains -Path $runPurchasedAirCoolingOaMaxFlow -Pattern 'pub\(super\) fn validate_direct_lifecycle\s*\(' -Description "pipeline cooling OA maximum-flow firewall ownership"
+Assert-Contains -Path $runPurchasedAirCoolingOaMaxFlow -Pattern 'gate\.source_order == PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE_ORDER' -Description "pipeline cooling OA maximum-flow exact source-order validation"
+Assert-Contains -Path $runPurchasedAirCoolingOaMaxFlow -Pattern 'gate\.first_excluded_source\s*[\r\n]+\s*== PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE' -Description "pipeline cooling OA maximum-flow first-excluded validation"
+Assert-Contains -Path $runPurchasedAirCoolingOaMaxFlow -Pattern 'expected_second_comparisons' -Description "pipeline cooling OA maximum-flow OR short-circuit reconciliation"
+Assert-Contains -Path $runPurchasedAirCoolingOaMaxFlow -Pattern 'selected_flow_count' -Description "pipeline cooling OA maximum-flow AND short-circuit reconciliation"
+Assert-Contains -Path $runPurchasedAirCoolingOaMaxFlow -Pattern 'strict_mass_flow_comparison_satisfied_count' -Description "pipeline cooling OA maximum-flow false-result evidence"
+Assert-Contains -Path $runPurchasedAirCoolingOaMaxFlow -Pattern 'maximum_cooling_flow_body_entry_count' -Description "pipeline cooling OA maximum-flow excluded-body evidence"
+Assert-Contains -Path $runPurchasedAirCoolingOaMaxFlow -Pattern '!maximum_cooling_mass_flow\.is_finite\(\)' -Description "pipeline cooling OA maximum-flow finite maximum validation"
+Assert-Contains -Path $runPurchasedAirCoolingOaMaxFlow -Pattern 'maximum_cooling_mass_flow < 0\.0' -Description "pipeline cooling OA maximum-flow nonnegative maximum validation"
+Assert-Contains -Path $runPurchasedAirCoolingOaMaxFlow -Pattern 'active_shape_matches\s*\(' -Description "pipeline cooling OA maximum-flow four-limit latest-shape validation"
+Assert-Contains -Path $runPipeline -Pattern '"purchased_air_calc_cooling_oa_max_flow_gate_lifecycle"' -Description "release cooling OA maximum-flow lifecycle JSON evidence"
+Assert-Contains -Path $runPipeline -Pattern 'purchased_air_cooling_oa_max_flow::validate_direct_lifecycle' -Description "release cooling OA maximum-flow pipeline firewall"
+Assert-Contains -Path $runPipeline -Pattern '\.purchased_air_calc_cooling_oa_max_flow_gate_lifecycle\s*[\r\n]+\s*\.is_some\(\)' -Description "non-direct cooling OA maximum-flow evidence rejection"
+Assert-Contains -Path $runPipeline -Pattern 'direct_release_cooling_oa_max_flow_validation_rejects_disconnected_evidence' -Description "pipeline cooling OA maximum-flow disconnected-evidence regression"
+Assert-Contains -Path $runPipeline -Pattern 'direct_release_cooling_oa_max_flow_json_exposes_limit_short_circuit_routes' -Description "pipeline cooling OA maximum-flow four-limit JSON regression"
+Assert-Contains -Path $runDirectZoneCoupledTests -Pattern 'purchased_air_calc_cooling_oa_max_flow_gate_lifecycle' -Description "direct run cooling OA maximum-flow lifecycle JSON assertion"
 Assert-Contains -Path $runPipeline -Pattern 'topology_ready' -Description "release topology-ready JSON and validation evidence"
 Assert-Contains -Path $runPipeline -Pattern 'topology_diagnostics' -Description "release ordered topology diagnostic evidence"
 Assert-Contains -Path $runPipeline -Pattern 'topology_failure' -Description "release retained topology failure evidence"

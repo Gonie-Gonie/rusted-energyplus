@@ -21166,7 +21166,8 @@ unchanged.
 
 The fixed direct-Zone path now executes predictor demand -> persistent Init ->
 CP310 Calc entry -> CP311 minimum-OA prefix -> CP312 cooling-entry gate ->
-existing bounded Calc/update/report -> same-step Zone-air correction. CP312
+CP313 cooling OA maximum-flow guard -> existing bounded Calc/update/report ->
+same-step Zone-air correction. CP312
 maps only `CalcPurchAirLoads` lines 2046-2047 and consumes retained predecessor
 snapshots rather than re-sampling demand or minimum-OA effects.
 
@@ -21182,11 +21183,35 @@ evidence.
 This adds no Zone-air equation, thermostat-state service, demand producer,
 system-feedback term, or numerical capability. The existing numerical DTO
 already used the inclusive source threshold and remains separate from CP312's
-persistent evidence. Cooling work beginning at line 2056, Heat/DeadBand
-selection beginning at line 2348, node/report writes, equipment residuals,
-adaptive iteration, and full Calc/Init lifecycle parity remain outside the
-slice. Parent/routine status, counts, support, forbidden features, evidence,
-conformance, and Roadmap state stay unchanged.
+persistent evidence. At the CP312 boundary, cooling work beginning at line
+2056, Heat/DeadBand selection beginning at line 2348, node/report writes,
+equipment residuals, adaptive iteration, and full Calc/Init lifecycle parity
+remain outside the slice. Parent/routine status, counts, support, forbidden
+features, evidence, conformance, and Roadmap state stay unchanged.
+
+## CP313 Cooling OA Maximum-Flow Guard Placement
+
+CP313 runs after CP312 Cooling entry and before the existing bounded
+PurchasedAir numerical calculation. It maps only lines 2056-2057: compare the
+cooling limit with FlowRate, conditionally compare FlowRateAndCapacity, and
+only then compare outdoor-air mass flow with the maximum cooling mass flow
+using strict `>`. UnitOff and CP312 non-cooling results skip every CP313 site.
+
+Exact no-OA release makes the guard observational only. NoLimit and Capacity
+short-circuit before the flow reads; FlowRate and FlowRateAndCapacity compare
+retained `+0.0` OA flow with a finite nonnegative initialization cache and
+therefore never enter the maximum-flow body. Firewalls reconcile predecessor,
+selector/read, Cooling/UnitOff/non-cooling, strict-comparison, and zero-body
+counts and expose the lifecycle only on the direct runtime.
+
+This adds no Zone-air equation, demand or feedback term, OA support, warning
+sink, economizer, flow clamp, or numerical capability. Line 2058 and the true
+warning/clamp body, the false path's line-2082 economizer test, all later
+cooling calculations, Heat/DeadBand selection at line 2348, node/report
+writes, equipment residuals, adaptive iteration, and full Calc/Init lifecycle
+parity remain outside the slice. Parent/routine status, counts, support,
+forbidden features, evidence, numerical conformance, and Roadmap state stay
+unchanged.
 
 ## Promotion Requirements
 

@@ -239,3 +239,39 @@ pub(super) fn advance_cooling_entry_gate_state(
     state.latest = Some(snapshot);
     snapshot
 }
+
+pub(super) fn cooling_entry_gate_snapshots_bitwise_equal(
+    retained: PurchasedAirCalcCoolingEntryGateSnapshot,
+    supplied: PurchasedAirCalcCoolingEntryGateSnapshot,
+) -> bool {
+    let floats_match = [
+        (
+            retained.minimum_outdoor_air_sensible_output_w,
+            supplied.minimum_outdoor_air_sensible_output_w,
+        ),
+        (
+            retained.cooling_setpoint_demand_w,
+            supplied.cooling_setpoint_demand_w,
+        ),
+    ]
+    .into_iter()
+    .all(|(left, right)| option_f64_bits_equal(left, right));
+    if !floats_match {
+        return false;
+    }
+    let mut retained_without_floats = retained;
+    let mut supplied_without_floats = supplied;
+    retained_without_floats.minimum_outdoor_air_sensible_output_w = None;
+    retained_without_floats.cooling_setpoint_demand_w = None;
+    supplied_without_floats.minimum_outdoor_air_sensible_output_w = None;
+    supplied_without_floats.cooling_setpoint_demand_w = None;
+    retained_without_floats == supplied_without_floats
+}
+
+fn option_f64_bits_equal(left: Option<f64>, right: Option<f64>) -> bool {
+    match (left, right) {
+        (Some(left), Some(right)) => left.to_bits() == right.to_bits(),
+        (None, None) => true,
+        _ => false,
+    }
+}

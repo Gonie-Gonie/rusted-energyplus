@@ -33469,8 +33469,9 @@ evidence, conformance, and Roadmap state remain unchanged.
 ## CP312 PurchasedAir Cooling-Entry Gate Inside the Heat-Balance Loop
 
 The direct-Zone order is now predictor -> persistent Init -> CP310 Calc entry
--> CP311 minimum-OA prefix -> CP312 cooling-entry gate -> existing bounded
-Calc -> update/report -> same-step Zone-air corrector. CP312 covers only
+-> CP311 minimum-OA prefix -> CP312 cooling-entry gate -> CP313 cooling OA
+maximum-flow guard -> existing bounded Calc -> update/report -> same-step
+Zone-air corrector. CP312 covers only
 `CalcPurchAirLoads` lines 2046-2047. It consumes the retained CP310 demand and
 CP311 minimum-OA output, applies the inclusive comparison, conditionally
 records the Zone temperature-control-type read, excludes exact SingleHeat, and
@@ -33486,11 +33487,35 @@ existing numerical DTO's Cooling count, then publishes direct-only JSON
 evidence.
 
 This adds no heat-balance or predictor equation, `TempControlType` array
-ownership, Zone-air feedback term, or numerical claim. The cooling body at
-line 2056 through 2345, Heat/DeadBand selection beginning at line 2348, and
-all later PurchasedAir behavior remain excluded. Parent/routine status,
-inventory/readiness counts, support, forbidden features, evidence,
-conformance, and Roadmap state remain unchanged.
+ownership, Zone-air feedback term, or numerical claim. At the CP312 boundary,
+the cooling body at line 2056 through 2345, Heat/DeadBand selection beginning
+at line 2348, and all later PurchasedAir behavior remain excluded.
+Parent/routine status, inventory/readiness counts, support, forbidden features,
+evidence, conformance, and Roadmap state remain unchanged.
+
+## CP313 Cooling OA Maximum-Flow Guard Inside the Heat-Balance Loop
+
+CP313 maps only `CalcPurchAirLoads` lines 2056-2057 after a CP312 Cooling
+entry. It evaluates the FlowRate selector first, the FlowRateAndCapacity
+selector only after a failed first comparison, and the strict outdoor-air
+versus maximum cooling mass-flow comparison only after one selector matches.
+UnitOff and non-cooling CP312 results skip the complete guard.
+
+On the exact no-OA release lane, NoLimit and Capacity short-circuit before
+flow reads. FlowRate and FlowRateAndCapacity conditionally read retained
+outdoor-air flow `+0.0` and the finite nonnegative BeginEnvironment cache, so
+strict `>` is false and the line-2058 body is never entered. Lifecycle
+validation reconciles that selector-specific evaluation shape with CP312
+Cooling, numerical Cooling, UnitOff, and non-cooling counts and exposes
+direct-only JSON evidence.
+
+This adds no heat-balance or predictor equation, OA/economizer state,
+diagnostic sink, flow mutation, or numerical limit claim. Line 2058 is the
+first excluded executable; warning and OA-clamp work through line 2078,
+false-path economizer execution beginning at line 2082, all later cooling
+calculations, and Heat/DeadBand selection at line 2348 remain excluded.
+Parent/routine status, inventory/readiness counts, support, forbidden features,
+evidence, numerical conformance, and Roadmap state remain unchanged.
 
 ## Data Structure Map
 

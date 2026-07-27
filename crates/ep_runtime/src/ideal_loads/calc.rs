@@ -1,6 +1,7 @@
 //! IdealLoads `CalcPurchAirLoads` compatibility calculations.
 
 mod cooling_entry_gate;
+mod cooling_oa_max_flow_gate;
 mod humidity;
 mod lifecycle;
 mod limits;
@@ -14,6 +15,8 @@ mod types;
 #[cfg(test)]
 mod cooling_entry_gate_tests;
 #[cfg(test)]
+mod cooling_oa_max_flow_gate_tests;
+#[cfg(test)]
 mod lifecycle_tests;
 #[cfg(test)]
 mod minimum_oa_prefix_tests;
@@ -23,6 +26,7 @@ mod moisture_demand_tests;
 mod no_oa_tests;
 
 pub use cooling_entry_gate::*;
+pub use cooling_oa_max_flow_gate::*;
 pub use lifecycle::*;
 pub use limits::IdealLoadsSensibleLimitContext;
 pub use minimum_oa_prefix::*;
