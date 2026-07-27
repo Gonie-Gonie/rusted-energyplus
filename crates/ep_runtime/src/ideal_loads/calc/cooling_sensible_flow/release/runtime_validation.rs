@@ -64,7 +64,7 @@ pub(super) fn pending_sensible_flow_state_is_consistent(
         && source_counter_relationships_are_consistent(state)
 }
 
-fn transition_partition_is_consistent(
+pub(super) fn transition_partition_is_consistent(
     state: &PurchasedAirCalcCoolingSensibleFlowRuntimeState,
 ) -> bool {
     state
@@ -134,7 +134,7 @@ fn histories_link_to_predecessor(
             == Some(completed_cooling_count)
 }
 
-fn source_counter_relationships_are_consistent(
+pub(super) fn source_counter_relationships_are_consistent(
     state: &PurchasedAirCalcCoolingSensibleFlowRuntimeState,
 ) -> bool {
     let cooling_on_partition = state

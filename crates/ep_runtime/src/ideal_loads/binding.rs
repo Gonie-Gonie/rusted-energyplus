@@ -21,6 +21,8 @@ use super::{
     DirectZonePurchasedAirCouplingError, DirectZonePurchasedAirCouplingInput,
     DirectZonePurchasedAirCouplingOutput, IdealLoadsPurchasedAirBranch,
     IdealLoadsSensibleLimitContext, PurchasedAirAvailabilityStatus,
+    PurchasedAirCalcCoolingDehumidificationFlowError,
+    PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
     PurchasedAirCalcCoolingEconomizerBodyError, PurchasedAirCalcCoolingEconomizerBodySnapshot,
     PurchasedAirCalcCoolingEconomizerConditionError,
     PurchasedAirCalcCoolingEconomizerConditionSnapshot,
@@ -34,7 +36,8 @@ use super::{
     PurchasedAirHardSizeLegacyContext, PurchasedAirInitCallContext, PurchasedAirInitError,
     PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanError, PurchasedAirInitSnapshot,
     PurchasedAirInitTopologyPlan, PurchasedAirInitTopologyPlanError, PurchasedAirRuntimeState,
-    PurchasedAirTemperatureControlType, advance_direct_no_oa_calc_cooling_economizer_body,
+    PurchasedAirTemperatureControlType, advance_direct_no_oa_calc_cooling_dehumidification_flow,
+    advance_direct_no_oa_calc_cooling_economizer_body,
     advance_direct_no_oa_calc_cooling_economizer_condition,
     advance_direct_no_oa_calc_cooling_economizer_guard,
     advance_direct_no_oa_calc_cooling_entry_gate,
@@ -597,6 +600,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingEconomizerBody(PurchasedAirCalcCoolingEconomizerBodyError),
     /// The bounded cooling sensible-flow calculation rejected its release state.
     CalculationCoolingSensibleFlow(PurchasedAirCalcCoolingSensibleFlowError),
+    /// The bounded cooling dehumidification-flow calculation rejected its release state.
+    CalculationCoolingDehumidificationFlow(PurchasedAirCalcCoolingDehumidificationFlowError),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -685,6 +690,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     pub calculation_cooling_economizer_body: PurchasedAirCalcCoolingEconomizerBodySnapshot,
     /// Source-ordered cooling sensible-flow snapshot.
     pub calculation_cooling_sensible_flow: PurchasedAirCalcCoolingSensibleFlowSnapshot,
+    /// Source-ordered cooling dehumidification-flow snapshot.
+    pub calculation_cooling_dehumidification_flow:
+        PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
@@ -870,6 +878,15 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         &*input.zone_state,
     )
     .map_err(DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingSensibleFlow)?;
+    let calculation_cooling_dehumidification_flow =
+        advance_direct_no_oa_calc_cooling_dehumidification_flow(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_sensible_flow,
+        )
+        .map_err(
+            DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingDehumidificationFlow,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -916,6 +933,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_economizer_condition,
         calculation_cooling_economizer_body,
         calculation_cooling_sensible_flow,
+        calculation_cooling_dehumidification_flow,
         coupling,
     })
 }

@@ -559,6 +559,45 @@ Both parents remain `scaffold`/`none`, the Calc routine remains
 support level, required and forbidden features, evidence cases, numerical
 conformance, and Roadmap state remain unchanged.
 
+CP319 maps the next common Cooling continuation at executable lines 2119-2128:
+the complete dehumidification mass-flow candidate reset, `CoolOn` gate,
+Humidistat selector, moisture-load and humidity-ratio calculation, and
+reconvergence. UnitOff and non-cooling predecessors skip all 21 source sites,
+including the reset. Active Cooling first assigns positive zero. A false
+retained `CoolOn` stops there; a true value reads and compares
+`DehumidificationControlType`. Only `Humidistat` reads the live Zone
+dehumidifying-setpoint moisture load, minimum cooling supply humidity ratio,
+and Zone-node humidity ratio, assigns `MdotZnDehumidSP` and `DeltaHumRat`, and
+evaluates the left-to-right short-circuit condition
+`DeltaHumRat < -0.00025 && MdotZnDehumidSP < 0.0`. Only a true compound result
+re-reads both locals, divides them, and assigns the candidate.
+
+The exact direct binding still requires both humidity controls to be `None`.
+Its active Cooling release therefore executes the reset, proves retained
+`CoolOn=true`, records the selector mismatch, retains bitwise positive zero,
+and lazily skips every live moisture-demand and Zone-humidity service. Complete
+Humidistat behavior is private source characterization over pre-sampled
+scalars only. It preserves strict comparisons, signed zero, NaN, infinities,
+the exact `SmallDeltaHumRat` value, and raw division without a finite check,
+clamp, or normalization.
+
+The binder orders CP319 after CP318 and before the unchanged bounded numerical
+Calc DTO. Per-step, lifecycle, coupled-runtime, and pipeline firewalls expose
+`purchased_air_calc_cooling_dehumidification_flow_lifecycle` only for the
+direct release lane and reconcile every source-site counter, predecessor, and
+positive-zero result. The older humidity numerical helper is neither reused
+nor reconciled because it adds capacity-zero behavior and a positive clamp
+that are outside lines 2119-2128.
+
+Line 2128 closes CP319. The first excluded executable is line 2133,
+`SupplyMassFlowRateForHumid = 0.0`. Humidification, the line-2147
+capacity-zero override, line-2155 candidate maximum, EMS override, later flow
+clamps, mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection
+remain open. CP319 adds lifecycle evidence only: broad HumidityControl support,
+live moisture-demand/Node ownership, numerical conformance, capability level,
+both parent statuses, the Calc routine status, inventory/readiness counts,
+evidence cases, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

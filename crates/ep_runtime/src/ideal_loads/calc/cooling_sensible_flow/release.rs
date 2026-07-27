@@ -12,16 +12,32 @@ use crate::ideal_loads::{
     classify_no_oa_sensible_subset,
 };
 
+mod completed_state_validation;
 mod predecessor_validation;
 mod runtime_validation;
 mod snapshot_validation;
 
+use completed_state_validation::completed_sensible_flow_state_is_consistent;
 use predecessor_validation::economizer_body_links_to_condition;
 use runtime_validation::{
     calc_state_identities_match, call_order_is_pending_sensible_flow,
     pending_sensible_flow_state_is_consistent,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_sensible_flow_snapshot_is_exact_direct_release;
+
+pub(in crate::ideal_loads::calc) fn completed_direct_cooling_sensible_flow_is_consistent(
+    unit: &crate::ideal_loads::PurchasedAirUnitRuntimeState,
+    predecessor_body: PurchasedAirCalcCoolingEconomizerBodySnapshot,
+    predecessor_flow: PurchasedAirCalcCoolingSensibleFlowSnapshot,
+    flow_consumer_latest_witness: Option<PurchasedAirCalcCoolingSensibleFlowSnapshot>,
+) -> bool {
+    completed_sensible_flow_state_is_consistent(
+        unit,
+        predecessor_body,
+        predecessor_flow,
+        flow_consumer_latest_witness,
+    )
+}
 
 /// Active CP318 input rejected before mutation because it is not finite.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

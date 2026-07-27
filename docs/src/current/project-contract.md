@@ -16198,6 +16198,80 @@ The 32-algorithm and 293-routine inventory, readiness split, support levels,
 run state, required and forbidden features, evidence cases, numerical
 conformance, and Roadmap state remain unchanged.
 
+## CP319 Source-Ordered Cooling Dehumidification Flow
+
+CP319 supersedes only CP318's line-2119 exclusion for EnergyPlus 26.1
+`PurchasedAirManager.cc` executable lines 2119-2128. Line 2128 closes every
+nested branch and reconverges on one dehumidification mass-flow candidate;
+line 2133 starts the independent humidification candidate. CP319's 21 exact
+source sites are:
+
+1. assign the dehumidification candidate to positive zero;
+2. read retained `CoolOn`;
+3. enter the `CoolOn` body only after a true read;
+4. read `DehumidCtrlType`;
+5. compare it with `Humidistat`;
+6. enter the Humidistat body only after a match;
+7. read the Zone dehumidifying-setpoint moisture load;
+8. assign local `MdotZnDehumidSP`;
+9. read minimum cooling supply-air humidity ratio;
+10. read Zone-node humidity ratio;
+11. subtract Zone humidity ratio from minimum supply humidity ratio;
+12. assign local `DeltaHumRat`;
+13. re-read `DeltaHumRat` for the first predicate;
+14. compare `DeltaHumRat < -0.00025` using strict `<`;
+15. only after that match, re-read `MdotZnDehumidSP`;
+16. compare `MdotZnDehumidSP < 0.0` using strict `<`;
+17. enter the compound-condition body only when both predicates are true;
+18. re-read `MdotZnDehumidSP` as the numerator;
+19. re-read `DeltaHumRat` as the denominator;
+20. calculate `MdotZnDehumidSP / DeltaHumRat`; and
+21. assign the dehumidification candidate.
+
+UnitOff and active non-cooling predecessors skip all sites, including the
+reset. CP319 is another common Cooling continuation, not a child of CP318's
+delta-temperature true body. Every active Cooling predecessor performs the
+positive-zero reset. `CoolOn=false` skips the selector and every downstream
+service. A non-Humidistat selector skips all moisture and humidity-ratio reads.
+Within Humidistat, line 2122 reads and assigns the live moisture load before
+the compound gate, but the gate's second local read and comparison remain
+short-circuited when the delta-humidity predicate is false.
+
+`SmallDeltaHumRat` is the immutable source constant `0.00025`. Both
+comparisons remain strict, so equality, NaN, and signed zero fall through.
+Negative infinity can satisfy the delta predicate; the raw single division is
+retained without finite validation, algebraic rewriting, or clamping. Reset
+positive zero and an assigned zero result remain distinguishable lifecycle
+events. No psychrometric routine, schedule, EMS service, diagnostic sink, or
+mutable static cache belongs to this slice.
+
+`calc/cooling_dehumidification_flow.rs` and its split state, transition,
+release, validation, and test modules own the snapshot, persistent state,
+route, and exact release boundary. The public direct release consumes a
+retained exact CP318 snapshot and the selected system only. Because the direct
+binding requires `DehumidificationControlType::None`, it proves the selector
+false before mutation and does not request live Zone moisture demand or Node
+humidity. Private Humidistat characterization uses pre-sampled scalars and
+grants no live-service or capability ownership.
+
+The binder executes CP319 after CP318 and before the existing numerical Calc
+DTO. Per-step, lifecycle, coupled-runtime, and pipeline validation reconcile
+one CP319 transition per CP318 transition, exact predecessor identity and
+route, all 21 source-site counters, positive-zero reset/result bits, and
+direct-only JSON under
+`purchased_air_calc_cooling_dehumidification_flow_lifecycle`. Non-direct or
+disconnected evidence is rejected.
+
+The pre-existing
+`humidistat_dehumidification_mass_flow_rate_kg_per_s` numerical helper is not
+reused or bitwise reconciled: it owns capacity-zero behavior and applies
+`.max(0.0)`, neither of which occurs in lines 2119-2128. Line 2133 is the first
+excluded executable. Humidification, capacity-zero override, candidate
+selection, EMS, flow limiting, mixed-air and final supply-state behavior, and
+Heat/DeadBand work remain excluded. CP319 promotes no broad humidity control,
+live moisture-demand or Node service, numerical result, capability, status,
+inventory/readiness count, evidence case, conformance claim, or Roadmap item.
+
 
 
 

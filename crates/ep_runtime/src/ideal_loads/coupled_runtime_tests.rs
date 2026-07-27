@@ -3,6 +3,8 @@ use super::*;
 use crate::{
     ideal_loads::{
         DirectZonePurchasedAirBindingFeature, IdealLoadsSensibleLimitContext,
+        PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_FIRST_EXCLUDED_SOURCE,
@@ -86,6 +88,26 @@ fn cooling_sensible_flow_partition_overflow_fails_closed() {
             expected: 1,
             actual: usize::MAX,
         }
+    ));
+}
+
+#[test]
+fn cooling_dehumidification_flow_partition_overflow_fails_closed() {
+    let error = super::cooling_dehumidification_flow_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::
+            CalcCoolingDehumidificationFlowLifecycleInvariant {
+                field: "test_partition_overflow",
+                expected: 1,
+                actual: usize::MAX,
+            }
     ));
 }
 
@@ -687,6 +709,40 @@ fn exact_model_runs_one_source_threshold_coupling_per_fixed_timestep() {
         .expect("latest CP318 non-cooling snapshot");
     assert!(latest_sensible_flow.non_cooling_skipped);
     assert!(!latest_sensible_flow.cooling_body_entered);
+    let dehumidification_flow = simulation
+        .summary
+        .calc_cooling_dehumidification_flow_lifecycle;
+    assert_eq!(
+        dehumidification_flow.source,
+        PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_SOURCE
+    );
+    assert_eq!(
+        dehumidification_flow.first_excluded_source,
+        PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE
+    );
+    let dehumidification_flow_state = dehumidification_flow.state;
+    assert_eq!(dehumidification_flow_state.transition_count, required_steps);
+    assert_eq!(dehumidification_flow_state.cooling_body_entry_count, 0);
+    assert_eq!(dehumidification_flow_state.unit_off_skip_count, 0);
+    assert_eq!(
+        dehumidification_flow_state.non_cooling_skip_count,
+        required_steps
+    );
+    assert_eq!(
+        dehumidification_flow_state
+            .supply_mass_flow_rate_for_dehumidification_reset_assignment_count,
+        0
+    );
+    assert_eq!(dehumidification_flow_state.cooling_on_read_count, 0);
+    assert_eq!(
+        dehumidification_flow_state.dehumidification_control_type_read_count,
+        0
+    );
+    let latest_dehumidification_flow = dehumidification_flow_state
+        .latest
+        .expect("latest CP319 non-cooling snapshot");
+    assert!(latest_dehumidification_flow.non_cooling_skipped);
+    assert!(!latest_dehumidification_flow.cooling_body_entered);
 
     let zone = simulation.state.zones.first().expect("bound Zone state");
     assert_eq!(simulation.state.timestep_index, required_steps);
@@ -771,6 +827,30 @@ fn cooling_sensible_flow_lifecycle_records_unit_off_without_source_execution() {
     );
     assert_eq!(lifecycle.state.cooling_on_read_count, 0);
     let latest = lifecycle.state.latest.expect("latest CP318 off snapshot");
+    assert!(latest.unit_off_skipped);
+    assert!(!latest.non_cooling_skipped);
+    assert!(!latest.cooling_body_entered);
+
+    let lifecycle = simulation
+        .summary
+        .calc_cooling_dehumidification_flow_lifecycle;
+    assert_eq!(
+        lifecycle.source,
+        PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_SOURCE
+    );
+    assert_eq!(lifecycle.state.transition_count, 1);
+    assert_eq!(lifecycle.state.unit_off_skip_count, 1);
+    assert_eq!(lifecycle.state.non_cooling_skip_count, 0);
+    assert_eq!(lifecycle.state.cooling_body_entry_count, 0);
+    assert_eq!(
+        lifecycle
+            .state
+            .supply_mass_flow_rate_for_dehumidification_reset_assignment_count,
+        0
+    );
+    assert_eq!(lifecycle.state.cooling_on_read_count, 0);
+    assert_eq!(lifecycle.state.dehumidification_control_type_read_count, 0);
+    let latest = lifecycle.state.latest.expect("latest CP319 off snapshot");
     assert!(latest.unit_off_skipped);
     assert!(!latest.non_cooling_skipped);
     assert!(!latest.cooling_body_entered);
@@ -1264,6 +1344,58 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
         assert!(latest_sensible_flow.cooling_body_entered);
         assert!(!latest_sensible_flow.unit_off_skipped);
         assert!(!latest_sensible_flow.non_cooling_skipped);
+        let dehumidification_flow = simulation
+            .summary
+            .calc_cooling_dehumidification_flow_lifecycle;
+        assert_eq!(
+            dehumidification_flow.source,
+            PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_SOURCE
+        );
+        assert_eq!(
+            dehumidification_flow.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE
+        );
+        let dehumidification_flow_state = dehumidification_flow.state;
+        assert_eq!(dehumidification_flow_state.transition_count, 1, "{limit:?}");
+        assert_eq!(
+            dehumidification_flow_state.cooling_body_entry_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            dehumidification_flow_state
+                .supply_mass_flow_rate_for_dehumidification_reset_assignment_count,
+            1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            dehumidification_flow_state.dehumidification_control_type_read_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            dehumidification_flow_state.dehumidification_control_type_humidistat_count, 0,
+            "{limit:?}"
+        );
+        assert_eq!(
+            dehumidification_flow_state.dehumidification_control_type_fallthrough_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            dehumidification_flow_state.zone_dehumidifying_setpoint_moisture_demand_read_count, 0,
+            "{limit:?}"
+        );
+        let latest_dehumidification_flow = dehumidification_flow_state
+            .latest
+            .expect("latest CP319 cooling snapshot");
+        assert!(latest_dehumidification_flow.cooling_body_entered);
+        assert_eq!(
+            latest_dehumidification_flow.dehumidification_control_type,
+            Some(DehumidificationControlType::None)
+        );
+        assert_eq!(
+            latest_dehumidification_flow.dehumidification_control_type_humidistat,
+            Some(false)
+        );
+        assert!(!latest_dehumidification_flow.zone_dehumidifying_setpoint_moisture_demand_read);
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation

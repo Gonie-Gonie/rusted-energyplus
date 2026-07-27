@@ -1,16 +1,13 @@
 //! IdealLoads `CalcPurchAirLoads` compatibility calculations.
 
-mod cooling_economizer_guard;
-// CP316 follows the CP315 outer guard in source order.
-mod cooling_economizer_condition;
-// CP317 follows the CP316 condition in source order.
+mod cooling_dehumidification_flow;
 mod cooling_economizer_body;
-// CP318 follows the CP317 economizer body in source order.
-mod cooling_sensible_flow;
-// Earlier compatibility helpers remain grouped below the bounded source slices.
+mod cooling_economizer_condition;
+mod cooling_economizer_guard;
 mod cooling_entry_gate;
 mod cooling_oa_max_flow_body;
 mod cooling_oa_max_flow_gate;
+mod cooling_sensible_flow;
 mod humidity;
 mod lifecycle;
 mod limits;
@@ -22,29 +19,29 @@ mod psychrometrics;
 mod types;
 
 #[cfg(test)]
-mod cooling_economizer_guard_tests;
-// CP316 tests follow the CP315 characterization module in source order.
+mod cooling_dehumidification_flow_release_tests;
 #[cfg(test)]
-mod cooling_economizer_condition_release_tests;
-#[cfg(test)]
-mod cooling_economizer_condition_tests;
-// CP317 tests follow the CP316 characterization module in source order.
+mod cooling_dehumidification_flow_tests;
 #[cfg(test)]
 mod cooling_economizer_body_release_tests;
 #[cfg(test)]
 mod cooling_economizer_body_tests;
-// CP318 tests follow the CP317 characterization module in source order.
 #[cfg(test)]
-mod cooling_sensible_flow_release_tests;
+mod cooling_economizer_condition_release_tests;
 #[cfg(test)]
-mod cooling_sensible_flow_tests;
-// Earlier compatibility tests remain grouped below the bounded source slices.
+mod cooling_economizer_condition_tests;
+#[cfg(test)]
+mod cooling_economizer_guard_tests;
 #[cfg(test)]
 mod cooling_entry_gate_tests;
 #[cfg(test)]
 mod cooling_oa_max_flow_body_tests;
 #[cfg(test)]
 mod cooling_oa_max_flow_gate_tests;
+#[cfg(test)]
+mod cooling_sensible_flow_release_tests;
+#[cfg(test)]
+mod cooling_sensible_flow_tests;
 #[cfg(test)]
 mod lifecycle_tests;
 #[cfg(test)]
@@ -54,19 +51,17 @@ mod moisture_demand_tests;
 #[cfg(test)]
 mod no_oa_tests;
 
-pub use cooling_economizer_guard::*;
-// CP316 exports follow the CP315 guard contract in source order.
-pub use cooling_economizer_condition::*;
-// CP317 exports follow the CP316 condition contract in source order.
+pub(in crate::ideal_loads) use cooling_dehumidification_flow::release::cooling_dehumidification_flow_snapshot_is_exact_direct_release;
+pub use cooling_dehumidification_flow::*;
 pub(in crate::ideal_loads) use cooling_economizer_body::release::body_snapshot_is_exact_direct_release as cooling_economizer_body_snapshot_is_exact_direct_release;
 pub use cooling_economizer_body::*;
-// CP318 exports follow the CP317 body contract in source order.
-pub(in crate::ideal_loads) use cooling_sensible_flow::release::cooling_sensible_flow_snapshot_is_exact_direct_release;
-pub use cooling_sensible_flow::*;
-// Earlier compatibility exports remain grouped below the bounded source slices.
+pub use cooling_economizer_condition::*;
+pub use cooling_economizer_guard::*;
 pub use cooling_entry_gate::*;
 pub use cooling_oa_max_flow_body::*;
 pub use cooling_oa_max_flow_gate::*;
+pub(in crate::ideal_loads) use cooling_sensible_flow::release::cooling_sensible_flow_snapshot_is_exact_direct_release;
+pub use cooling_sensible_flow::*;
 pub use lifecycle::*;
 pub use limits::IdealLoadsSensibleLimitContext;
 pub use minimum_oa_prefix::*;

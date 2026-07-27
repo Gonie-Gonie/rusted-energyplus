@@ -33674,6 +33674,39 @@ remain `scaffold`/`none`, the Calc routine remains `source_mapped`, and the
 32-algorithm/293-routine inventory, readiness, evidence, numerical conformance,
 and Roadmap state remain unchanged.
 
+## CP319 Cooling Dehumidification Flow Inside the Heat-Balance Loop
+
+CP319 executes immediately after CP318 and before the unchanged bounded
+PurchasedAir numerical calculation. It maps lines 2119-2128 as a complete
+21-site candidate calculation. UnitOff and non-cooling skip the whole slice.
+Active Cooling resets the candidate to positive zero, reads retained `CoolOn`,
+and, only when true, compares the dehumidification-control enum. A Humidistat
+match alone reaches the live Zone moisture-load and humidity-ratio sites,
+assigns `MdotZnDehumidSP` and `DeltaHumRat`, evaluates the source's strict,
+left-to-right short-circuit predicates, and conditionally performs the raw
+division and assignment.
+
+The exact direct lane still requires humidity controls `None`. Its active
+Cooling transition therefore stops at the selector mismatch with bitwise
+positive zero and does not request a moisture predictor value or Zone-node
+humidity read. Private Humidistat tests over pre-sampled scalars characterize
+strict boundary, NaN, infinity, signed-zero, and division behavior without
+adding a heat-balance equation or service dependency.
+
+Per-step, final, coupled-runtime, and pipeline validators place CP319 after
+CP318 and before the existing numerical DTO and same-step Zone-air corrector.
+They reconcile every source counter and direct-only lifecycle value. CP319 is
+not reconciled with the older humidity numerical helper, whose capacity-zero
+gate and positive clamp lie outside this source slice.
+
+Line 2128 closes CP319; line 2133 begins the excluded humidification
+candidate. Capacity-zero override, candidate selection, EMS and later clamps,
+mixed-air/capacity/supply-state behavior, Heat/DeadBand selection, and all
+later feedback remain excluded. CP319 adds no heat-balance or predictor
+equation, live moisture-demand/Node ownership, numerical conformance, or
+capability promotion. Parent and routine statuses, inventory/readiness,
+evidence, and Roadmap state remain unchanged.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

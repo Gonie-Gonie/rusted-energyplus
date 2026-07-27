@@ -21374,6 +21374,39 @@ HumidityControl, and EMS remain unchanged. Both parents remain
 32-algorithm/293-routine inventory, readiness, evidence, numerical conformance,
 and Roadmap state stay unchanged.
 
+## CP319 Cooling Dehumidification-Flow Placement
+
+CP319 maps the complete lines-2119-2128 dehumidification candidate after
+CP318 and before the unchanged numerical DTO and Zone-air correction. UnitOff
+and non-cooling skip all 21 sites. Active Cooling resets the candidate to
+positive zero and reads retained `CoolOn`. A true value reaches the
+dehumidification-control selector; only Humidistat then reads the live Zone
+dehumidifying moisture load, minimum cooling supply humidity ratio, and
+Zone-node humidity ratio, assigns both locals, evaluates strict
+`DeltaHumRat < -0.00025` and short-circuited
+`MdotZnDehumidSP < 0.0`, and conditionally divides and assigns.
+
+The direct binding requires `DehumidificationControlType::None`. Its active
+release therefore records the reset and selector mismatch while preserving
+positive zero, without reading moisture-demand or Node-humidity services.
+Private pre-sampled Humidistat characterization does not add those services to
+the direct lane. Raw strict-comparison, NaN, infinity, signed-zero, and division
+semantics are retained without clamping.
+
+Per-step, final, coupled-runtime, and pipeline validation reconcile the CP318
+predecessor, source-site partitions, and direct-only lifecycle before the
+existing numerical and corrector paths. CP319 neither reuses nor reconciles the
+older humidity helper because that helper includes later capacity-zero and
+normalization behavior.
+
+Line 2128 closes CP319 and line 2133 is the first excluded executable.
+Humidification, later capacity/maximum/EMS/clamp work, mixed-air and final
+supply-state behavior, Heat/DeadBand selection, node/report writes, residuals,
+and adaptive iteration remain outside the slice. CP319 adds no Zone-air
+equation, demand or feedback term, live moisture/Node ownership, numerical
+support, or capability support. Parent/routine status, inventory/readiness,
+evidence, conformance, and Roadmap state remain unchanged.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

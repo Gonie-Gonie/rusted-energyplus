@@ -18835,6 +18835,43 @@ and EMS remain unsupported for the direct binding. Both parents remain
 32-algorithm/293-routine inventory, readiness, evidence, numerical conformance,
 capability support, and Roadmap state do not change.
 
+## CP319 Cooling Dehumidification-Flow Continuation
+
+CP319 maps executable lines 2119-2128 and their exact 21 source sites after
+CP318 and before the independent humidification candidate. UnitOff and
+non-cooling paths skip every site. Active Cooling assigns positive zero to the
+dehumidification candidate and reads retained `CoolOn`. A false value stops.
+A true value reads and compares the dehumidification-control enum. Only
+`Humidistat` reads and assigns the Zone dehumidifying moisture load, reads
+minimum cooling supply and Zone-node humidity ratios, subtracts and assigns
+`DeltaHumRat`, and evaluates strict
+`DeltaHumRat < -0.00025 && MdotZnDehumidSP < 0.0` with left-to-right
+short-circuiting. Only a true result re-reads both locals, divides, and assigns
+the candidate.
+
+The exact direct binding requires humidity controls `None`, so active release
+records only the reset, true `CoolOn`, selector mismatch, and bitwise
+positive-zero result. It does not read live moisture demand or Node humidity.
+Humidistat is private pre-sampled characterization only. Strict equality,
+NaN, infinities, signed zero, and raw division behavior remain visible, with
+no normalization or clamp.
+
+`calc/cooling_dehumidification_flow.rs` and its split modules own CP319 state,
+transition, release, validation, and tests. The binder orders CP319 exactly
+between CP318 and the unchanged numerical DTO. Direct-only JSON publishes
+`purchased_air_calc_cooling_dehumidification_flow_lifecycle`; per-step,
+lifecycle, coupled, and pipeline firewalls reconcile the CP318 link, all
+source counters, and positive-zero result. The existing humidity helper is not
+reused or reconciled because it adds capacity-zero and `.max(0.0)` behavior.
+
+Line 2128 closes CP319 and line 2133 is the first excluded executable.
+Humidification, capacity-zero override, candidate maximum, EMS and flow clamps,
+mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection remain
+excluded. Broad HumidityControl and live moisture/Node ownership remain
+unsupported. Both parents and the Calc routine retain their status; inventory,
+readiness, capability, evidence, numerical conformance, and Roadmap state do
+not change.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

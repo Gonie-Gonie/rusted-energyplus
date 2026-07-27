@@ -5,6 +5,8 @@ use std::collections::BTreeMap;
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
 use super::super::{
+    PurchasedAirCalcCoolingDehumidificationFlowRuntimeState,
+    PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
     PurchasedAirCalcCoolingEconomizerBodyRuntimeState,
     PurchasedAirCalcCoolingEconomizerBodySnapshot,
     PurchasedAirCalcCoolingEconomizerConditionRuntimeState,
@@ -71,6 +73,8 @@ pub struct PurchasedAirRuntimeState {
         BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingEconomizerBodySnapshot>,
     cooling_sensible_flow_latest_witnesses:
         BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingSensibleFlowSnapshot>,
+    cooling_dehumidification_flow_latest_witnesses:
+        BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingDehumidificationFlowSnapshot>,
 }
 
 impl PurchasedAirRuntimeState {
@@ -127,6 +131,24 @@ impl PurchasedAirRuntimeState {
         self.cooling_sensible_flow_latest_witnesses
             .insert(system, snapshot);
     }
+
+    pub(in crate::ideal_loads) fn cooling_dehumidification_flow_latest_witness(
+        &self,
+        system: IdealLoadsAirSystemId,
+    ) -> Option<PurchasedAirCalcCoolingDehumidificationFlowSnapshot> {
+        self.cooling_dehumidification_flow_latest_witnesses
+            .get(&system)
+            .copied()
+    }
+
+    pub(in crate::ideal_loads) fn set_cooling_dehumidification_flow_latest_witness(
+        &mut self,
+        system: IdealLoadsAirSystemId,
+        snapshot: PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
+    ) {
+        self.cooling_dehumidification_flow_latest_witnesses
+            .insert(system, snapshot);
+    }
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -174,6 +196,8 @@ pub struct PurchasedAirUnitRuntimeState {
     pub calc_cooling_economizer_body: PurchasedAirCalcCoolingEconomizerBodyRuntimeState,
     /// Persistent bounded cooling sensible-flow state.
     pub calc_cooling_sensible_flow: PurchasedAirCalcCoolingSensibleFlowRuntimeState,
+    /// Persistent bounded cooling dehumidification-flow state.
+    pub calc_cooling_dehumidification_flow: PurchasedAirCalcCoolingDehumidificationFlowRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -266,6 +290,8 @@ impl PurchasedAirUnitRuntimeState {
             calc_cooling_sensible_flow: PurchasedAirCalcCoolingSensibleFlowRuntimeState::new(
                 system,
             ),
+            calc_cooling_dehumidification_flow:
+                PurchasedAirCalcCoolingDehumidificationFlowRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

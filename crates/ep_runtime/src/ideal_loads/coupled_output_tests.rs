@@ -5,7 +5,11 @@ use crate::{
     ideal_loads::{
         DirectZonePurchasedAirCouplingInput, DirectZonePurchasedAirCouplingOutput,
         DirectZonePurchasedAirScheduleSnapshot, IdealLoadsInitFlags, IdealLoadsSensibleMode,
-        IdealLoadsZoneState, PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE,
+        IdealLoadsZoneState,
+        PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_SOURCE_ORDER,
+        PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_BODY_SOURCE_ORDER,
         PURCHASED_AIR_CALC_COOLING_ECONOMIZER_CONDITION_FIRST_EXCLUDED_SOURCE,
@@ -31,6 +35,7 @@ use crate::{
         PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE_ORDER, PurchasedAirAvailabilityStatus,
+        PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
         PurchasedAirCalcCoolingEconomizerBodySnapshot,
         PurchasedAirCalcCoolingEconomizerConditionSnapshot,
         PurchasedAirCalcCoolingEconomizerGuardSnapshot, PurchasedAirCalcCoolingEntryGateSnapshot,
@@ -69,6 +74,12 @@ fn appends_all_no_oa_and_predictor_series_with_hourly_semantics() {
             crate::ideal_loads::calc::cooling_sensible_flow_snapshot_is_exact_direct_release(
                 output.calculation_cooling_sensible_flow,
             )
+        );
+        assert!(
+            crate::ideal_loads::calc::
+                cooling_dehumidification_flow_snapshot_is_exact_direct_release(
+                    output.calculation_cooling_dehumidification_flow,
+                )
         );
     }
 
@@ -453,6 +464,8 @@ fn scaled_output(
         system,
         coupling,
     );
+    let calculation_cooling_dehumidification_flow =
+        calculation_cooling_dehumidification_flow_snapshot(calculation_cooling_sensible_flow);
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -488,6 +501,7 @@ fn scaled_output(
         calculation_cooling_economizer_condition,
         calculation_cooling_economizer_body,
         calculation_cooling_sensible_flow,
+        calculation_cooling_dehumidification_flow,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;
@@ -912,6 +926,73 @@ fn calculation_cooling_sensible_flow_snapshot(
             calculated_supply_mass_flow_rate_for_cool_kg_per_s,
         resulting_supply_mass_flow_rate_for_cool_kg_per_s: cooling_body_entered
             .then_some(calculated_supply_mass_flow_rate_for_cool_kg_per_s.unwrap_or(0.0)),
+    }
+}
+
+fn calculation_cooling_dehumidification_flow_snapshot(
+    predecessor: PurchasedAirCalcCoolingSensibleFlowSnapshot,
+) -> PurchasedAirCalcCoolingDehumidificationFlowSnapshot {
+    let cooling_body_entered = predecessor.cooling_body_entered;
+    let cooling_on_body_entered = predecessor.cooling_on_body_entered;
+    PurchasedAirCalcCoolingDehumidificationFlowSnapshot {
+        source: PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_SOURCE,
+        first_excluded_source:
+            PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE,
+        system: predecessor.system,
+        parent_call_ordinal: predecessor.parent_call_ordinal,
+        source_order: PURCHASED_AIR_CALC_COOLING_DEHUMIDIFICATION_FLOW_SOURCE_ORDER,
+        controlled_zone: predecessor.controlled_zone,
+        unit_body_entered: predecessor.unit_body_entered,
+        predecessor_cooling_body_entered: predecessor.cooling_body_entered,
+        predecessor_cooling_on_body_entered: predecessor.cooling_on_body_entered,
+        predecessor_delta_temperature_body_entered: predecessor.delta_temperature_body_entered,
+        predecessor_supply_mass_flow_rate_for_cool_assigned: predecessor
+            .supply_mass_flow_rate_for_cool_assigned,
+        unit_off_skipped: predecessor.unit_off_skipped,
+        non_cooling_skipped: predecessor.non_cooling_skipped,
+        cooling_body_entered,
+        supply_mass_flow_rate_for_dehumidification_reset_assigned: cooling_body_entered,
+        reset_supply_mass_flow_rate_for_dehumidification_kg_per_s: cooling_body_entered
+            .then_some(0.0),
+        cooling_on_read: cooling_body_entered,
+        cooling_on: cooling_body_entered.then_some(true),
+        cooling_on_body_entered,
+        dehumidification_control_type_read: cooling_body_entered,
+        dehumidification_control_type: cooling_body_entered
+            .then_some(DehumidificationControlType::None),
+        dehumidification_control_type_humidistat: cooling_body_entered.then_some(false),
+        dehumidification_control_body_entered: false,
+        zone_dehumidifying_setpoint_moisture_demand_read: false,
+        zone_dehumidifying_setpoint_moisture_demand_kg_per_s: None,
+        zone_dehumidifying_setpoint_moisture_demand_assigned: false,
+        assigned_zone_dehumidifying_setpoint_moisture_demand_kg_per_s: None,
+        minimum_cooling_supply_air_humidity_ratio_read: false,
+        minimum_cooling_supply_air_humidity_ratio_kg_water_per_kg_dry_air: None,
+        zone_humidity_ratio_read: false,
+        zone_humidity_ratio_kg_water_per_kg_dry_air: None,
+        delta_humidity_ratio_calculated: false,
+        delta_humidity_ratio_kg_water_per_kg_dry_air: None,
+        delta_humidity_ratio_assigned: false,
+        assigned_delta_humidity_ratio_kg_water_per_kg_dry_air: None,
+        delta_humidity_ratio_for_gate_read: false,
+        delta_humidity_ratio_for_gate_kg_water_per_kg_dry_air: None,
+        delta_humidity_ratio_comparison_evaluated: false,
+        delta_humidity_ratio_below_negative_small_delta: None,
+        zone_dehumidifying_setpoint_moisture_demand_for_gate_read: false,
+        zone_dehumidifying_setpoint_moisture_demand_for_gate_kg_per_s: None,
+        zone_dehumidifying_setpoint_moisture_demand_comparison_evaluated: false,
+        zone_dehumidifying_setpoint_moisture_demand_below_zero: None,
+        dehumidification_flow_body_entered: false,
+        zone_dehumidifying_setpoint_moisture_demand_for_division_read: false,
+        zone_dehumidifying_setpoint_moisture_demand_for_division_kg_per_s: None,
+        delta_humidity_ratio_for_division_read: false,
+        delta_humidity_ratio_for_division_kg_water_per_kg_dry_air: None,
+        supply_mass_flow_rate_for_dehumidification_calculated: false,
+        calculated_supply_mass_flow_rate_for_dehumidification_kg_per_s: None,
+        supply_mass_flow_rate_for_dehumidification_assigned: false,
+        assigned_supply_mass_flow_rate_for_dehumidification_kg_per_s: None,
+        resulting_supply_mass_flow_rate_for_dehumidification_kg_per_s: cooling_body_entered
+            .then_some(0.0),
     }
 }
 
