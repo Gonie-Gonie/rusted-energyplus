@@ -2,6 +2,7 @@
 
 #![allow(clippy::if_same_then_else, clippy::too_many_arguments)]
 
+mod binding;
 mod calc;
 mod coupling;
 mod dispatch;
@@ -14,6 +15,7 @@ mod report;
 mod runtime;
 mod update;
 
+pub use binding::*;
 pub use calc::*;
 pub use coupling::*;
 pub use dispatch::*;

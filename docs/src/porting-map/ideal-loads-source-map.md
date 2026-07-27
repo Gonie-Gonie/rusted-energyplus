@@ -135,7 +135,7 @@ their own source map, Rust state, oracle evidence, and blocking gate.
 | `ZoneEquipmentManager::updateZoneSizingEndDay` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; current-timestep demand, IdealLoads limits/OA mixing, warmup extrema, and sizing-name detection do not implement persistent Zone/Space daily peak and cross-period final reduction |
 | `ZoneEquipmentManager::updateZoneSizingEndZoneSizingCalc1` | `src/EnergyPlus/ZoneEquipmentManager.cc` | no exact Rust target; compile-time Zone/Space topology, demand snapshots, equipment load sequences, and sizing-name detection do not implement noncoincident calculated-final Space-to-Zone aggregation |
 | `ZoneEquipmentManager::SimZoneEquipment` | `src/EnergyPlus/ZoneEquipmentManager.cc` | `crates/ep_runtime/src/zone_equipment/dispatch.rs::ZoneEquipmentCompatibilityStage` |
-| `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | CP299 projects state-backed direct-Zone ThirdOrder thresholds into `ZoneSysEnergyDemand`; CP300 `crates/ep_runtime/src/ideal_loads/coupling.rs::couple_direct_zone_predicted_demand_to_purchased_air` composes that producer with generic PurchasedAir and bounded `SumSysMCp`/`SumSysMCpT` feedback, but has no release-loop caller |
+| `ZoneTempPredictorCorrector` predicted load state | `src/EnergyPlus/ZoneTempPredictorCorrector.cc` | CP299 projects state-backed direct-Zone ThirdOrder thresholds into `ZoneSysEnergyDemand`; CP300 composes that producer with generic PurchasedAir and bounded `SumSysMCp`/`SumSysMCpT` feedback; CP301 `binding.rs` resolves one exact typed Zone/thermostat/equipment/node topology plus bound schedule IDs and fixed timestep, then samples caller-selected cache values before calling CP300, but same-model cache provenance remains a caller precondition and there is still no release-loop caller |
 
 ## Runtime Order
 
@@ -18029,6 +18029,53 @@ The `zone_temp_predictor_corrector_source_order` and
 counts, readiness, capabilities, outputs, manifests, comparators, performance,
 and conformance claims do not change. Roadmap Section 12's first checkbox
 remains open.
+
+## CP301 Model-Bound Thermostat, Topology, and Schedule Caller
+
+CP301 adds `crates/ep_runtime/src/ideal_loads/binding.rs` with the public
+`bind_direct_zone_purchased_air_model` and
+`couple_model_bound_direct_zone_purchased_air` seams. A single
+`SimulationModel` supplies both typed objects and graph evidence. The binder
+requires exactly one standard nominally controlled Zone, one zero-hysteresis
+DualSetpoint thermostat, one SequentialLoad sequence-one equipment list and
+IdealLoads system, one direct supply/inlet node, and one distinct Zone-air
+node. It reuses the existing Zone-equipment conformance-candidate validator
+and additionally rejects ambiguous objects, non-one sequences, sequential
+fraction schedules, return/exhaust/system-inlet topology, heating/cooling
+availability schedules, and every branch except no-OA/no-limit sensible.
+
+The binding retains typed IDs and schedule IDs, the optional overall
+availability schedule, source multipliers, site-derived psychrometric context,
+the nominal model Zone timestep, and the prebound system. Per-sample execution
+requires an in-range cache sample with finite values, exact DualHeatCool
+control value `4`, source-ordered cooling-then-heating schedule reads, ordered
+setpoints, and fixed predictor state with system-timestep history selected.
+Overall availability `> 0` alone becomes CP300's unit-on input; current Zone
+MAT and fixed load correction `1.0` are the bounded fully mixed values. All
+validation precedes CP300's transactional call, so every binding, schedule,
+runtime, predictor, PurchasedAir, or feedback error preserves the complete
+Zone state.
+
+Tests cover successful heating, availability-off and deadband clearing,
+multiplier scale-once behavior, exact identity snapshots, ambiguous
+thermostats, equipment scheme/sequence/fraction variants, multi-inlet and
+return topology, mode-specific availability, unsupported PurchasedAir
+branches, missing/out-of-range/nonfinite schedules, cooling-before-heating
+failure precedence, reversed setpoints, and fixed-timestep state guards.
+
+This remains a callable production seam rather than an `ep_run` or
+heat-balance release path. ThirdOrder and fully mixed provenance are caller
+preconditions because those algorithm/room-air selectors are not yet typed.
+`ScheduleSeriesCache` retains no model identity, so a cache generated from the
+bound typed model is an explicit caller precondition. Environment
+schedule-cache construction and ownership, predict/HVAC/correct placement,
+warmup and adaptive iteration, NodeStateStore, equipment residuals, output
+aggregation, and oracle/default-demand removal remain open.
+
+Both parent algorithms remain `scaffold` at claim level `none`; CP301 promotes
+no source routine and changes no inventory, readiness, capability, output,
+manifest, comparator, performance, or conformance count. Roadmap Section 12's
+first checkbox remains open.
 
 ## Claim Requirements
 

@@ -182,7 +182,7 @@ claim.
 | thermostat-setpoint predefined LEED table | `FillPredefinedTableOnThermostatSetpoints`, declared at `ZoneTempPredictorCorrector.hh` line 376, implemented at `ZoneTempPredictorCorrector.cc` lines 6558-6672, and called only by `FillRemainingPredefinedEntries` line 6998 | CP233 adds required `routine.fill_predefined_table_on_thermostat_setpoints` as source-mapped only. Global schedule-ID first-wins traversal, seasonal Wednesday value/count queries, split synthetic rows, append-only table mutation, final-report cadence, and failure/retry remain source-only; Rust has no four-family arena, exact seasonal query, predefined table store, helper, caller, or focused test. |
 | thermostat-schedule predefined System Summary table | `FillPredefinedTableOnThermostatSchedules`, declared at `ZoneTempPredictorCorrector.hh` line 378, implemented at `ZoneTempPredictorCorrector.cc` lines 6674-6766, and called only by `FillRemainingPredefinedEntries` line 6999 | CP234 adds required `routine.fill_predefined_table_on_thermostat_schedules` as source-mapped only. Stored ordinary-Zone traversal, fixed-slot inclusion, tuple sort, independently filtered joins, append-only table mutation, final-report cadence, and failure/retry/reset remain source-only; Rust has no complete control arena, predefined System Summary store, helper, caller, serializer, or focused table comparator. |
 | Zone/Space predictor temperature-history preparation | `ZoneSpaceHeatBalanceData::updateTemperatures`, declared at `ZoneTempPredictorCorrector.hh` lines 233-234, implemented at `ZoneTempPredictorCorrector.cc` lines 6768-6833, and called only as the first child of `predictSystemLoad` line 3155 | CP235 adds required `routine.zone_space_heat_balance_update_temperatures` as source-mapped only. Unconditional four-slot working-history selection, shortened Zone/Space node rollback, count-change helper order, RoomAir topology, partial failure, cadence, replay, and reset remain source-only; Rust has only Zone three-slot adaptive history without the exact wrapper or topology. |
-| Zone/Space predicted sensible system load | `ZoneSpaceHeatBalanceData::calcPredictedSystemLoad`, declared at `ZoneTempPredictorCorrector.hh` line 224, implemented at `ZoneTempPredictorCorrector.cc` lines 6835-7243, and called only by `predictSystemLoad` line 3253 | CP236 remains required/source-mapped. CP296 and CP298 provide pure direct-Zone DualSetpoint/ThirdOrder load stages; CP299 produces state-backed `ZoneSysEnergyDemand`. CP300's callable `couple_direct_zone_predicted_demand_to_purchased_air` composes that producer with the generic PurchasedAir wrapper and a bounded correction-feedback snapshot. Thermostat/node/timestep and scaling values remain caller-owned, the lagged field has no runtime writer, and no heat-balance or IdealLoads release loop calls the composition. Five-way control, other algorithms, RAFN/ITE/Space/staged branches, equipment sequencing/residuals, full node lifecycle, failure/replay, and reset remain unsupported. |
+| Zone/Space predicted sensible system load | `ZoneSpaceHeatBalanceData::calcPredictedSystemLoad`, declared at `ZoneTempPredictorCorrector.hh` line 224, implemented at `ZoneTempPredictorCorrector.cc` lines 6835-7243, and called only by `predictSystemLoad` line 3253 | CP236 remains required/source-mapped. CP296 and CP298 provide pure direct-Zone DualSetpoint/ThirdOrder load stages; CP299 produces state-backed `ZoneSysEnergyDemand`; CP300 composes it with generic PurchasedAir and bounded correction feedback. CP301 `bind_direct_zone_purchased_air_model` and `couple_model_bound_direct_zone_purchased_air` now resolve the exact one-Zone thermostat/equipment/node identities, bound schedule IDs, multipliers, site context, and fixed model timestep, then sample caller-selected cache values before calling CP300. Same-model cache provenance, ThirdOrder/fully-mixed provenance, and the actual predictor/HVAC/corrector call position remain outer contracts, the lagged field has no runtime writer, and no heat-balance or IdealLoads release loop calls the composition. Five-way control, other algorithms, RAFN/ITE/Space/staged branches, equipment sequencing/residuals, full node lifecycle, failure/replay, and reset remain unsupported. |
 | internal convective gains | `zoneSumAllInternalConvectionGains` | conformance trace exists for `internal_gains_001` only |
 | space internal convective gains | `spaceSumAllInternalConvectionGains` | mapped-not-ported |
 
@@ -33063,6 +33063,64 @@ The `zone_temp_predictor_corrector_source_order` and
 counts, readiness, capabilities, outputs, manifests, comparators, performance,
 and conformance claims do not change. Roadmap Section 12's first checkbox
 remains open.
+
+## CP301 Model-Bound Thermostat, Topology, and Schedule Caller
+
+CP301 adds `crates/ep_runtime/src/ideal_loads/binding.rs` with the public
+`bind_direct_zone_purchased_air_model` and
+`couple_model_bound_direct_zone_purchased_air` production seams. The static
+binder consumes one `SimulationModel`, so typed payload and graph evidence
+cannot come from different models. It requires exactly one standard,
+nominally controlled Zone; one zero-hysteresis DualSetpoint thermostat and
+setpoint edge; one SequentialLoad, sequence-one equipment connection/list and
+IdealLoads system; one supply/inlet node; and one distinct Zone-air node.
+Sequential fraction schedules, return/exhaust/system-inlet topology,
+mode-specific availability schedules, dispatch warnings, and every
+PurchasedAir branch except no-OA/no-limit sensible fail closed.
+
+The immutable binding retains only typed IDs, thermostat schedule IDs, the
+optional overall availability schedule, Zone and ZoneList multipliers, the
+site-derived psychrometric context, the nominal `3600 / Timestep` seconds, and
+the prebound IdealLoads object. Per-sample execution verifies the cache
+boundary, resolves finite control then source-ordered cooling/heating
+setpoints and availability, requires exact DualHeatCool control value `4`,
+requires heating setpoint not above cooling setpoint, and maps only overall
+availability `> 0` to CP300's unit-on input. The fully mixed projection uses
+current Zone MAT as the Zone-node temperature and fixes the load-correction
+factor at `1.0`.
+
+The first scheduled caller admits only the fixed predictor boundary:
+system-timestep history active, no shortened system timestep, one previous
+system step, and current/prior step seconds equal to the model's nominal Zone
+timestep. All graph, schedule, and runtime-state checks finish before CP300
+borrows mutable Zone state. CP300 retains its buffered two-field commit, so
+missing/invalid schedules, reversed setpoints, topology errors, runtime-state
+errors, predictor failures, PurchasedAir failures, and feedback failures leave
+the complete Zone state unchanged. Focused tests cover identity resolution,
+heating, availability-off, deadband clearing, multiplier scale-once behavior,
+ambiguous topology, equipment scheme/sequence/fraction rejection, node and
+return topology, mode-availability rejection, unsupported branch selection,
+schedule error classes and cooling-before-heating failure precedence,
+setpoint validation, and fixed-timestep guards.
+
+This is a production-compiled model-bound caller, not a release-loop caller.
+The model has no typed `ZoneAirHeatBalanceAlgorithm` or general room-air model
+marker, so ThirdOrder and fully mixed execution remain documented caller
+preconditions until the heat-balance source-order loop owns this binding.
+`ScheduleSeriesCache` retains no model identity, so supplying a cache generated
+from this binding's typed model is also an explicit caller precondition.
+Schedule-cache construction and ownership for the active environment, the
+exact predict/HVAC/correct placement, warmup and adaptive iteration,
+NodeStateStore, equipment residual sequencing, output aggregation, and
+`ep_run` routing remain open. The legacy IdealLoads runtime and CLI
+oracle/default-demand paths are unchanged.
+
+The `zone_temp_predictor_corrector_source_order` and
+`ideal_loads_zone_equipment_purchased_air_source_order` parents remain
+`scaffold` at claim level `none`; no source routine is promoted. Algorithm and
+routine counts, required counts, readiness, capabilities, outputs, manifests,
+comparators, performance, and conformance claims do not change. Roadmap
+Section 12's first checkbox remains open.
 
 ## Data Structure Map
 

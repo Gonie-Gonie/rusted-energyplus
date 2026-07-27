@@ -1,0 +1,760 @@
+use super::*;
+use crate::{
+    heat_balance::state::ZoneAirTemperatureCoefficients,
+    ideal_loads::IdealLoadsSensibleMode,
+    schedules::{ScheduleSeriesCache, precompute_schedule_cache},
+};
+use ep_model::{
+    AutoOrNumber, DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
+    HumidificationControlType, IdealLoadsAirSystemId, IdealLoadsFuelType, IdealLoadsLimit,
+    LoadDistributionScheme, Node, NodeId, NodeList, NodeListId, NormalizedName,
+    OutdoorAirEconomizerType, Point3, ScheduleConstant, ScheduleId, SimulationModel,
+    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TypedModel, Zone,
+    ZoneConvectionAlgorithm, ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList,
+    ZoneEquipmentListEntry, ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneId, ZoneThermostat,
+    ZoneThermostatControl, ZoneThermostatId,
+};
+
+type ModelMutationCase = (fn(&mut TypedModel), DirectZonePurchasedAirBindingFeature);
+
+#[test]
+fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
+    let (model, _) = fixture(|_| {});
+
+    let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
+
+    assert_eq!(binding.zone, ZoneId(0));
+    assert_eq!(binding.thermostat, ZoneThermostatId(0));
+    assert_eq!(binding.dual_setpoint, ThermostatSetpointId(0));
+    assert_eq!(binding.control_type_schedule, ScheduleId(0));
+    assert_eq!(binding.heating_setpoint_schedule, ScheduleId(1));
+    assert_eq!(binding.cooling_setpoint_schedule, ScheduleId(2));
+    assert_eq!(binding.overall_availability_schedule, Some(ScheduleId(3)));
+    assert_eq!(binding.equipment_list, ZoneEquipmentListId(0));
+    assert_eq!(binding.ideal_loads_air_system, IdealLoadsAirSystemId(0));
+    assert_eq!(binding.supply_node, NodeId(0));
+    assert_eq!(binding.zone_air_node, NodeId(1));
+    assert_eq!(binding.nominal_system_timestep_seconds, 600.0);
+}
+
+#[test]
+fn binding_rejects_stale_public_model_graph() {
+    let (mut model, _) = fixture(|_| {});
+    model.typed.ideal_loads_air_systems[0].zone_supply_air_node_name =
+        NormalizedName::new("ZONE AIR");
+
+    assert_eq!(
+        bind_direct_zone_purchased_air_model(&model)
+            .expect_err("typed mutation must not reuse a stale graph"),
+        DirectZonePurchasedAirBindingError::UnsupportedFeature {
+            feature: DirectZonePurchasedAirBindingFeature::CoherentTypedModelGraph,
+        }
+    );
+}
+
+#[test]
+fn scheduled_binding_samples_thermostat_and_drives_heating_feedback() {
+    let (model, cache) = fixture(|_| {});
+    let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
+    let mut state = zone_state_for_temp_independent_load(0.0);
+    let original = state.clone();
+
+    let output = couple(&binding, &cache, &mut state, 0).expect("scheduled heating coupling");
+
+    assert_eq!(
+        output.schedules,
+        DirectZonePurchasedAirScheduleSnapshot {
+            sample_index: 0,
+            control_type: 4.0,
+            heating_setpoint_c: 20.0,
+            cooling_setpoint_c: 24.0,
+            overall_availability: 1.0,
+            unit_available: true,
+        }
+    );
+    assert_eq!(
+        output.coupling.purchased_air.calculation.mode,
+        IdealLoadsSensibleMode::Heating
+    );
+    assert_eq!(
+        output
+            .coupling
+            .purchased_air
+            .trace
+            .zone_state
+            .air_temperature_c,
+        original.mean_air_temperature_c
+    );
+    assert_eq!(
+        output.coupling.prediction.predicted_loads.predicted_rate_w,
+        output.coupling.prediction.predicted_loads.raw_total_load_w
+    );
+    assert!(state.sum_sys_mcp_w_per_k > 0.0);
+    assert_only_system_air_sums_changed(&original, &state);
+}
+
+#[test]
+fn scheduled_binding_preserves_negative_cooling_threshold() {
+    let (model, cache) = fixture(|_| {});
+    let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
+    let mut state = zone_state_for_temp_independent_load(3_000.0);
+
+    let output = couple(&binding, &cache, &mut state, 0).expect("scheduled cooling coupling");
+
+    assert_eq!(
+        output.coupling.purchased_air.calculation.mode,
+        IdealLoadsSensibleMode::Cooling
+    );
+    assert_eq!(
+        output
+            .coupling
+            .prediction
+            .zone_demand
+            .remaining_output_req_to_cool_sp_w,
+        -600.0
+    );
+    assert!(state.sum_sys_mcp_w_per_k > 0.0);
+}
+
+#[test]
+fn overall_availability_off_clears_stale_feedback_without_changing_other_state() {
+    let (model, cache) = fixture(|typed| schedule_mut(typed, ScheduleId(3)).hourly_value = 0.0);
+    let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
+    let mut state = zone_state_for_temp_independent_load(0.0);
+    let original = state.clone();
+
+    let output = couple(&binding, &cache, &mut state, 0).expect("scheduled off coupling");
+
+    assert!(!output.schedules.unit_available);
+    assert_eq!(
+        output.coupling.purchased_air.calculation.mode,
+        IdealLoadsSensibleMode::Off
+    );
+    assert_eq!(state.sum_sys_mcp_w_per_k, 0.0);
+    assert_eq!(state.sum_sys_mcp_t_w, 0.0);
+    assert_only_system_air_sums_changed(&original, &state);
+}
+
+#[test]
+fn deadband_sample_clears_stale_feedback_exactly() {
+    let (model, cache) = fixture(|_| {});
+    let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
+    let mut state = zone_state_for_temp_independent_load(2_200.0);
+
+    let output = couple(&binding, &cache, &mut state, 0).expect("scheduled deadband coupling");
+
+    assert_eq!(
+        output.coupling.purchased_air.calculation.mode,
+        IdealLoadsSensibleMode::Deadband
+    );
+    assert_eq!(state.sum_sys_mcp_w_per_k, 0.0);
+    assert_eq!(state.sum_sys_mcp_t_w, 0.0);
+}
+
+#[test]
+fn binding_rejects_ambiguous_thermostat_topology() {
+    let (model, _) = fixture(|typed| {
+        let mut thermostat = typed.zone_thermostats[0].clone();
+        thermostat.id = ZoneThermostatId(1);
+        typed.zone_thermostats.push(thermostat);
+    });
+
+    let error =
+        bind_direct_zone_purchased_air_model(&model).expect_err("two thermostat edges must fail");
+
+    assert_eq!(
+        error,
+        DirectZonePurchasedAirBindingError::Cardinality {
+            relation: DirectZonePurchasedAirBindingRelation::ZoneThermostatEdge,
+            expected: 1,
+            actual: 2,
+        }
+    );
+}
+
+#[test]
+fn binding_rejects_distribution_sequence_and_fraction_variants() {
+    let cases: [ModelMutationCase; 3] = [
+        (
+            (|typed: &mut TypedModel| {
+                typed.zone_equipment_lists[0].load_distribution_scheme =
+                    LoadDistributionScheme::UniformLoad;
+            }) as fn(&mut TypedModel),
+            DirectZonePurchasedAirBindingFeature::SequentialLoadDistribution,
+        ),
+        (
+            (|typed: &mut TypedModel| {
+                typed.zone_equipment_lists[0].equipment[0].cooling_sequence = 2;
+            }) as fn(&mut TypedModel),
+            DirectZonePurchasedAirBindingFeature::FirstEquipmentSequence,
+        ),
+        (
+            (|typed: &mut TypedModel| {
+                typed.zone_equipment_lists[0].equipment[0].sequential_heating_fraction_schedule =
+                    Some(ScheduleId(3));
+            }) as fn(&mut TypedModel),
+            DirectZonePurchasedAirBindingFeature::NoSequentialFractionSchedules,
+        ),
+    ];
+
+    for (mutate, expected_feature) in cases {
+        let (model, _) = fixture(mutate);
+        let error = bind_direct_zone_purchased_air_model(&model)
+            .expect_err("unsupported equipment topology must fail");
+        assert_eq!(
+            error,
+            DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                feature: expected_feature,
+            }
+        );
+    }
+}
+
+#[test]
+fn binding_rejects_multi_inlet_return_and_mode_availability_topology() {
+    let (multi_inlet, _) = fixture(|typed| {
+        typed.nodes.push(Node {
+            id: NodeId(2),
+            name: NormalizedName::new("SECOND SUPPLY"),
+        });
+        typed.node_names.insert("SECOND SUPPLY", NodeId(2));
+        typed.node_lists.push(NodeList {
+            id: NodeListId(0),
+            name: NormalizedName::new("INLETS"),
+            nodes: vec![NodeId(0), NodeId(2)],
+        });
+        typed.node_list_names.insert("INLETS", NodeListId(0));
+        typed.ideal_loads_air_systems[0].zone_supply_air_node_name = NormalizedName::new("INLETS");
+        typed.zone_equipment_connections[0].zone_air_inlet_node_or_nodelist_name =
+            Some(NormalizedName::new("INLETS"));
+    });
+    assert_eq!(
+        bind_direct_zone_purchased_air_model(&multi_inlet).expect_err("two supply edges must fail"),
+        DirectZonePurchasedAirBindingError::Cardinality {
+            relation: DirectZonePurchasedAirBindingRelation::IdealLoadsSupplyNode,
+            expected: 1,
+            actual: 2,
+        }
+    );
+
+    let cases: [ModelMutationCase; 3] = [
+        (
+            (|typed: &mut TypedModel| {
+                typed.zone_equipment_connections[0].zone_return_air_node_or_nodelist_name =
+                    Some(NormalizedName::new("ZONE AIR"));
+            }) as fn(&mut TypedModel),
+            DirectZonePurchasedAirBindingFeature::NoZoneReturnTopology,
+        ),
+        (
+            (|typed: &mut TypedModel| {
+                typed.ideal_loads_air_systems[0].heating_availability_schedule =
+                    Some(ScheduleId(3));
+            }) as fn(&mut TypedModel),
+            DirectZonePurchasedAirBindingFeature::NoHeatingAvailabilitySchedule,
+        ),
+        (
+            (|typed: &mut TypedModel| {
+                typed.ideal_loads_air_systems[0].cooling_availability_schedule =
+                    Some(ScheduleId(3));
+            }) as fn(&mut TypedModel),
+            DirectZonePurchasedAirBindingFeature::NoCoolingAvailabilitySchedule,
+        ),
+    ];
+    for (mutate, expected_feature) in cases {
+        let (model, _) = fixture(mutate);
+        assert_eq!(
+            bind_direct_zone_purchased_air_model(&model)
+                .expect_err("unsupported direct topology must fail"),
+            DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                feature: expected_feature,
+            }
+        );
+    }
+}
+
+#[test]
+fn binding_rejects_unsupported_purchased_air_branch() {
+    let (model, _) = fixture(|typed| {
+        typed.ideal_loads_air_systems[0].heating_limit = IdealLoadsLimit::LimitCapacity;
+        typed.ideal_loads_air_systems[0].maximum_sensible_heating_capacity_w =
+            Some(ep_model::AutosizeOrNumber::Value(1_000.0));
+    });
+
+    assert_eq!(
+        bind_direct_zone_purchased_air_model(&model)
+            .expect_err("finite-capacity branch is outside CP301"),
+        DirectZonePurchasedAirBindingError::UnsupportedBranch {
+            branch: IdealLoadsPurchasedAirBranch::NoOaFiniteCapacity,
+        }
+    );
+}
+
+#[test]
+fn binding_rejects_hysteresis_and_hidden_no_oa_feature_flags() {
+    let cases: [ModelMutationCase; 2] = [
+        (
+            (|typed: &mut TypedModel| {
+                typed.zone_thermostats[0]
+                    .temperature_difference_between_cutout_and_setpoint_delta_c = 0.5;
+            }) as fn(&mut TypedModel),
+            DirectZonePurchasedAirBindingFeature::ZeroCutoutDelta,
+        ),
+        (
+            (|typed: &mut TypedModel| {
+                typed.ideal_loads_air_systems[0].outdoor_air_economizer_type =
+                    OutdoorAirEconomizerType::DifferentialDryBulb;
+            }) as fn(&mut TypedModel),
+            DirectZonePurchasedAirBindingFeature::NoOaNoLimitSensibleSubset,
+        ),
+    ];
+
+    for (mutate, expected_feature) in cases {
+        let (model, _) = fixture(mutate);
+        assert_eq!(
+            bind_direct_zone_purchased_air_model(&model)
+                .expect_err("unsupported thermostat/system feature must fail"),
+            DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                feature: expected_feature,
+            }
+        );
+    }
+}
+
+#[test]
+fn schedule_errors_are_distinct_and_transactional() {
+    let (model, cache) = fixture(|typed| schedule_mut(typed, ScheduleId(0)).hourly_value = 3.0);
+    let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
+    let mut state = zone_state_for_temp_independent_load(0.0);
+    let original = state.clone();
+
+    assert_eq!(
+        couple(&binding, &cache, &mut state, 0).expect_err("control type three must fail"),
+        DirectZonePurchasedAirScheduledCouplingError::UnsupportedControlType { value: 3.0 }
+    );
+    assert_eq!(state, original);
+
+    assert_eq!(
+        couple(&binding, &cache, &mut state, 2).expect_err("sample two is out of range"),
+        DirectZonePurchasedAirScheduledCouplingError::SampleIndexOutOfRange {
+            sample_index: 2,
+            sample_count: 2,
+        }
+    );
+    assert_eq!(state, original);
+
+    let (missing_model, missing_cache) = fixture(|typed| {
+        typed.thermostat_dual_setpoints[0].heating_setpoint_schedule = ScheduleId(99);
+    });
+    let missing_binding =
+        bind_direct_zone_purchased_air_model(&missing_model).expect("topology still binds");
+    assert_eq!(
+        couple(&missing_binding, &missing_cache, &mut state, 0)
+            .expect_err("missing heating schedule must fail"),
+        DirectZonePurchasedAirScheduledCouplingError::MissingSchedule {
+            role: DirectZonePurchasedAirScheduleRole::HeatingSetpoint,
+            schedule: ScheduleId(99),
+        }
+    );
+    assert_eq!(state, original);
+}
+
+#[test]
+fn nonfinite_and_inverted_setpoints_are_transactional() {
+    let cases = [
+        (
+            f64::NAN,
+            24.0,
+            DirectZonePurchasedAirScheduledCouplingError::NonFiniteScheduleValue {
+                role: DirectZonePurchasedAirScheduleRole::HeatingSetpoint,
+                schedule: ScheduleId(1),
+            },
+        ),
+        (
+            25.0,
+            24.0,
+            DirectZonePurchasedAirScheduledCouplingError::HeatingSetpointAboveCoolingSetpoint {
+                heating_setpoint_c: 25.0,
+                cooling_setpoint_c: 24.0,
+            },
+        ),
+    ];
+
+    for (heating, cooling, expected) in cases {
+        let (model, cache) = fixture(|typed| {
+            schedule_mut(typed, ScheduleId(1)).hourly_value = heating;
+            schedule_mut(typed, ScheduleId(2)).hourly_value = cooling;
+        });
+        let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
+        let mut state = zone_state_for_temp_independent_load(0.0);
+        let original = state.clone();
+        let error = couple(&binding, &cache, &mut state, 0)
+            .expect_err("invalid current setpoints must fail");
+        assert_eq!(error, expected);
+        assert_eq!(state, original);
+    }
+}
+
+#[test]
+fn dual_setpoint_schedule_error_precedence_is_cooling_then_heating() {
+    let (model, cache) = fixture(|typed| {
+        schedule_mut(typed, ScheduleId(1)).hourly_value = f64::NAN;
+        schedule_mut(typed, ScheduleId(2)).hourly_value = f64::NAN;
+    });
+    let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
+    let mut state = zone_state_for_temp_independent_load(0.0);
+    let original = state.clone();
+
+    assert_eq!(
+        couple(&binding, &cache, &mut state, 0)
+            .expect_err("cooling schedule is sampled before heating"),
+        DirectZonePurchasedAirScheduledCouplingError::NonFiniteScheduleValue {
+            role: DirectZonePurchasedAirScheduleRole::CoolingSetpoint,
+            schedule: ScheduleId(2),
+        }
+    );
+    assert_eq!(state, original);
+}
+
+#[test]
+fn wrapped_cp300_failure_is_transactional() {
+    let (model, cache) = fixture(|_| {});
+    let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
+    let mut state = zone_state_for_temp_independent_load(0.0);
+    state.mean_air_temperature_c = f64::INFINITY;
+    let original = state.clone();
+
+    assert_eq!(
+        couple(&binding, &cache, &mut state, 0).expect_err("CP300 must reject infinite Zone MAT"),
+        DirectZonePurchasedAirScheduledCouplingError::Coupling(
+            DirectZonePurchasedAirCouplingError::InputNotFinite {
+                field: "zone_node_temperature_c",
+            }
+        )
+    );
+    assert_eq!(state, original);
+}
+
+#[test]
+fn fixed_timestep_state_guards_are_transactional() {
+    let (model, cache) = fixture(|_| {});
+    let binding = bind_direct_zone_purchased_air_model(&model).expect("bounded model binding");
+    let base = zone_state_for_temp_independent_load(0.0);
+
+    let mut zone_history = base.clone();
+    zone_history.use_zone_timestep_history = true;
+    assert_runtime_invariant(
+        &binding,
+        &cache,
+        zone_history,
+        DirectZonePurchasedAirRuntimeInvariant::SystemTimestepHistory,
+    );
+
+    let mut wrong_zone = base.clone();
+    wrong_zone.zone_id = ZoneId(7);
+    assert_runtime_invariant(
+        &binding,
+        &cache,
+        wrong_zone,
+        DirectZonePurchasedAirRuntimeInvariant::BoundZoneIdentity,
+    );
+
+    let mut shortened = base.clone();
+    shortened.shorten_timestep_sys = true;
+    assert_runtime_invariant(
+        &binding,
+        &cache,
+        shortened,
+        DirectZonePurchasedAirRuntimeInvariant::UnshortenedSystemTimestep,
+    );
+
+    let mut multiple_steps = base.clone();
+    multiple_steps.previous_system_timestep_count = 2;
+    assert_runtime_invariant(
+        &binding,
+        &cache,
+        multiple_steps,
+        DirectZonePurchasedAirRuntimeInvariant::SinglePreviousSystemTimestep,
+    );
+
+    let mut wrong_prior = base;
+    wrong_prior.prior_timestep_seconds = 300.0;
+    assert_runtime_invariant(
+        &binding,
+        &cache,
+        wrong_prior,
+        DirectZonePurchasedAirRuntimeInvariant::NominalPriorTimestep,
+    );
+
+    let mut wrong_step = zone_state_for_temp_independent_load(0.0);
+    let original = wrong_step.clone();
+    assert_eq!(
+        couple_model_bound_direct_zone_purchased_air(
+            DirectZonePurchasedAirScheduledCouplingInput {
+                binding: &binding,
+                schedule_cache: &cache,
+                schedule_sample_index: 0,
+                zone_state: &mut wrong_step,
+                system_timestep_seconds: 300.0,
+            }
+        )
+        .expect_err("non-nominal requested timestep must fail"),
+        DirectZonePurchasedAirScheduledCouplingError::RuntimeInvariant {
+            invariant: DirectZonePurchasedAirRuntimeInvariant::NominalSystemTimestep,
+        }
+    );
+    assert_eq!(wrong_step, original);
+}
+
+#[test]
+fn model_multipliers_are_forwarded_and_removed_once_from_feedback() {
+    let (model, cache) = fixture(|typed| {
+        typed.zones[0].multiplier = 2;
+        typed.zones[0].list_multiplier = 3;
+    });
+    let binding = bind_direct_zone_purchased_air_model(&model).expect("multiplied binding");
+    let mut state = zone_state_for_temp_independent_load(0.0);
+
+    let output = couple(&binding, &cache, &mut state, 0).expect("multiplied coupling");
+
+    assert_eq!(binding.zone_multiplier, 2);
+    assert_eq!(binding.zone_list_multiplier, 3);
+    assert_eq!(output.coupling.feedback.multiplier_product, 6.0);
+    assert_eq!(
+        output.coupling.feedback.zone_supply_mass_flow_rate_kg_per_s,
+        output
+            .coupling
+            .feedback
+            .multiplied_supply_mass_flow_rate_kg_per_s
+            / 6.0
+    );
+}
+
+fn fixture(mutate: impl FnOnce(&mut TypedModel)) -> (SimulationModel, ScheduleSeriesCache) {
+    let mut typed = base_typed_model();
+    mutate(&mut typed);
+    let cache = precompute_schedule_cache(&typed, 2).expect("test schedule cache");
+    (SimulationModel::from_typed(typed), cache)
+}
+
+fn base_typed_model() -> TypedModel {
+    let mut typed = TypedModel::default();
+    for (id, name, value) in [
+        (ScheduleId(0), "CONTROL TYPE", 4.0),
+        (ScheduleId(1), "HEATING SETPOINT", 20.0),
+        (ScheduleId(2), "COOLING SETPOINT", 24.0),
+        (ScheduleId(3), "IDEAL LOADS AVAILABILITY", 1.0),
+    ] {
+        typed.schedules.push(ScheduleConstant {
+            id,
+            name: NormalizedName::new(name),
+            schedule_type_limits: None,
+            hourly_value: value,
+        });
+        typed.schedule_names.insert(name, id);
+    }
+    typed.zones.push(Zone {
+        id: ZoneId(0),
+        name: NormalizedName::new("ZONE ONE"),
+        direction_of_relative_north_deg: 0.0,
+        origin: Point3 {
+            x_m: 0.0,
+            y_m: 0.0,
+            z_m: 0.0,
+        },
+        zone_type: 1,
+        multiplier: 1,
+        list_multiplier: 1,
+        list_group: None,
+        ceiling_height: AutoOrNumber::AutoCalculate,
+        volume: AutoOrNumber::Value(100.0),
+        floor_area: AutoOrNumber::AutoCalculate,
+        inside_convection_algorithm: ZoneConvectionAlgorithm::Inherited(
+            ep_model::InsideSurfaceConvectionAlgorithm::Tarp,
+        ),
+        outside_convection_algorithm: ZoneConvectionAlgorithm::Inherited(
+            ep_model::OutsideSurfaceConvectionAlgorithm::Doe2,
+        ),
+        is_part_of_total_floor_area: true,
+        is_nominal_controlled: true,
+        linked_outdoor_air_node: None,
+        spaces: Vec::new(),
+    });
+    typed
+        .thermostat_dual_setpoints
+        .push(ThermostatDualSetpoint {
+            id: ThermostatSetpointId(0),
+            name: NormalizedName::new("DUAL SETPOINT"),
+            heating_setpoint_schedule: ScheduleId(1),
+            cooling_setpoint_schedule: ScheduleId(2),
+        });
+    typed.zone_thermostats.push(ZoneThermostat {
+        id: ZoneThermostatId(0),
+        name: NormalizedName::new("ZONE THERMOSTAT"),
+        zone: ZoneId(0),
+        control_type_schedule: ScheduleId(0),
+        controls: vec![ZoneThermostatControl {
+            object_type: ThermostatControlObjectType::DualSetpoint,
+            dual_setpoint: ThermostatSetpointId(0),
+        }],
+        temperature_difference_between_cutout_and_setpoint_delta_c: 0.0,
+    });
+    for (id, name) in [(NodeId(0), "SUPPLY"), (NodeId(1), "ZONE AIR")] {
+        typed.nodes.push(Node {
+            id,
+            name: NormalizedName::new(name),
+        });
+        typed.node_names.insert(name, id);
+    }
+    typed.ideal_loads_air_systems.push(ideal_loads_system());
+    typed.zone_equipment_lists.push(ZoneEquipmentList {
+        id: ZoneEquipmentListId(0),
+        name: NormalizedName::new("ZONE EQUIPMENT"),
+        load_distribution_scheme: LoadDistributionScheme::SequentialLoad,
+        equipment: vec![ZoneEquipmentListEntry {
+            object_type: ZoneEquipmentObjectType::IdealLoadsAirSystem,
+            ideal_loads_air_system: IdealLoadsAirSystemId(0),
+            cooling_sequence: 1,
+            heating_or_no_load_sequence: 1,
+            sequential_cooling_fraction_schedule: None,
+            sequential_heating_fraction_schedule: None,
+        }],
+    });
+    typed
+        .zone_equipment_connections
+        .push(ZoneEquipmentConnection {
+            id: ZoneEquipmentConnectionId(0),
+            zone: ZoneId(0),
+            equipment_list: ZoneEquipmentListId(0),
+            zone_air_inlet_node_or_nodelist_name: Some(NormalizedName::new("SUPPLY")),
+            zone_air_exhaust_node_or_nodelist_name: None,
+            zone_air_node_name: NormalizedName::new("ZONE AIR"),
+            zone_return_air_node_or_nodelist_name: None,
+            zone_return_air_node_1_flow_rate_fraction_schedule: None,
+            zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name: None,
+        });
+    typed
+}
+
+fn ideal_loads_system() -> ep_model::IdealLoadsAirSystem {
+    ep_model::IdealLoadsAirSystem {
+        id: IdealLoadsAirSystemId(0),
+        name: NormalizedName::new("ZONE IDEAL LOADS"),
+        availability_schedule: Some(ScheduleId(3)),
+        zone_supply_air_node_name: NormalizedName::new("SUPPLY"),
+        zone_exhaust_air_node_name: None,
+        system_inlet_air_node_name: None,
+        maximum_heating_supply_air_temperature_c: 50.0,
+        minimum_cooling_supply_air_temperature_c: 13.0,
+        maximum_heating_supply_air_humidity_ratio: 0.0156,
+        minimum_cooling_supply_air_humidity_ratio: 0.0077,
+        heating_limit: IdealLoadsLimit::NoLimit,
+        maximum_heating_air_flow_rate_m3_per_s: None,
+        maximum_sensible_heating_capacity_w: None,
+        cooling_limit: IdealLoadsLimit::NoLimit,
+        maximum_cooling_air_flow_rate_m3_per_s: None,
+        maximum_total_cooling_capacity_w: None,
+        heating_availability_schedule: None,
+        cooling_availability_schedule: None,
+        dehumidification_control_type: DehumidificationControlType::None,
+        cooling_sensible_heat_ratio: 0.7,
+        humidification_control_type: HumidificationControlType::None,
+        design_specification_outdoor_air_object_name: None,
+        outdoor_air_inlet_node_name: None,
+        demand_controlled_ventilation_type: DemandControlledVentilationType::None,
+        outdoor_air_economizer_type: OutdoorAirEconomizerType::NoEconomizer,
+        heat_recovery_type: HeatRecoveryType::None,
+        sensible_heat_recovery_effectiveness: 0.7,
+        latent_heat_recovery_effectiveness: 0.65,
+        design_specification_zonehvac_sizing_object_name: None,
+        heating_fuel_efficiency_schedule: None,
+        heating_fuel_type: IdealLoadsFuelType::DistrictHeatingWater,
+        cooling_fuel_efficiency_schedule: None,
+        cooling_fuel_type: IdealLoadsFuelType::DistrictCooling,
+    }
+}
+
+fn zone_state_for_temp_independent_load(temp_independent_load_w: f64) -> ZoneHeatBalanceState {
+    ZoneHeatBalanceState {
+        zone_id: ZoneId(0),
+        zone_name: "ZONE ONE".to_string(),
+        mean_air_temperature_c: 22.0,
+        zone_timestep_average_air_temperature_c: 22.0,
+        previous_mean_air_temperatures_c: [0.0; 3],
+        previous_system_mean_air_temperatures_c: [0.0; 3],
+        previous_system_timestep_count: 1,
+        air_humidity_ratio: 0.008,
+        zone_timestep_average_air_humidity_ratio: 0.008,
+        previous_air_humidity_ratios: [0.008; 3],
+        previous_system_air_humidity_ratios: [0.008; 3],
+        use_zone_timestep_history: false,
+        shorten_timestep_sys: false,
+        prior_timestep_seconds: 600.0,
+        volume_m3: 100.0,
+        air_heat_capacity_j_per_k: 0.0,
+        convective_internal_gain_w: 0.0,
+        opaque_surface_conductance_w_per_k: 100.0,
+        opaque_surface_heat_gain_w: 0.0,
+        opaque_surface_outside_conduction_w: 0.0,
+        sum_ha_w_per_k: 100.0,
+        sum_hat_surf_w: temp_independent_load_w,
+        sum_hat_ref_w: 0.0,
+        sum_mcp_w_per_k: 0.0,
+        sum_mcp_t_w: 0.0,
+        sum_sys_mcp_w_per_k: 7.0,
+        sum_sys_mcp_t_w: 11.0,
+        system_dependent_zone_loads_lagged_w: 0.0,
+        zone_air_temperature_coefficients: ZoneAirTemperatureCoefficients::ZERO,
+        system_timestep_average_surface_convection_report_w: None,
+        system_timestep_average_air_storage_report_w: None,
+    }
+}
+
+fn schedule_mut(model: &mut TypedModel, schedule: ScheduleId) -> &mut ScheduleConstant {
+    model
+        .schedules
+        .iter_mut()
+        .find(|candidate| candidate.id == schedule)
+        .expect("fixture schedule")
+}
+
+fn couple(
+    binding: &DirectZonePurchasedAirModelBinding<'_>,
+    cache: &ScheduleSeriesCache,
+    state: &mut ZoneHeatBalanceState,
+    sample_index: usize,
+) -> Result<
+    DirectZonePurchasedAirScheduledCouplingOutput,
+    DirectZonePurchasedAirScheduledCouplingError,
+> {
+    couple_model_bound_direct_zone_purchased_air(DirectZonePurchasedAirScheduledCouplingInput {
+        binding,
+        schedule_cache: cache,
+        schedule_sample_index: sample_index,
+        zone_state: state,
+        system_timestep_seconds: 600.0,
+    })
+}
+
+fn assert_runtime_invariant(
+    binding: &DirectZonePurchasedAirModelBinding<'_>,
+    cache: &ScheduleSeriesCache,
+    mut state: ZoneHeatBalanceState,
+    invariant: DirectZonePurchasedAirRuntimeInvariant,
+) {
+    let original = state.clone();
+    assert_eq!(
+        couple(binding, cache, &mut state, 0).expect_err("runtime invariant must fail"),
+        DirectZonePurchasedAirScheduledCouplingError::RuntimeInvariant { invariant }
+    );
+    assert_eq!(state, original);
+}
+
+fn assert_only_system_air_sums_changed(
+    original: &ZoneHeatBalanceState,
+    actual: &ZoneHeatBalanceState,
+) {
+    let mut expected = original.clone();
+    expected.sum_sys_mcp_w_per_k = actual.sum_sys_mcp_w_per_k;
+    expected.sum_sys_mcp_t_w = actual.sum_sys_mcp_t_w;
+    assert_eq!(*actual, expected);
+}
