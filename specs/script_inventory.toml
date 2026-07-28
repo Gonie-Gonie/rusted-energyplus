@@ -3,7 +3,7 @@
 schema = "rusted-energyplus.script-inventory.v1"
 schema_version = 1
 generated_by = "tools/docs/generate_docs.py"
-script_count = 268
+script_count = 269
 dev_command_count = 238
 unused_script_count = 0
 unreachable_count = 0
@@ -3518,6 +3518,22 @@ reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"
 
 [[script]]
+path = "scripts/quality/ideal-loads-structure-audit/cp331-cooling-positive-supply-cp-air-assignment.ps1"
+kind = "ps1"
+category = "quality"
+classification = "internal"
+command = ""
+entrypoint = ""
+callers = ["scripts/quality/ideal-loads-structure-audit.ps1"]
+caller_evidence = ["scripts/quality/ideal-loads-structure-audit.ps1::dot_sources"]
+callees = []
+callee_evidence = []
+calls = []
+generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
+reachable_from_public_root = true
+exit_contract = "nonzero via PowerShell throw"
+
+[[script]]
 path = "scripts/quality/ideal-loads-structure-audit.ps1"
 kind = "ps1"
 category = "quality"
@@ -3526,9 +3542,9 @@ command = "ideal-loads-structure-audit"
 entrypoint = "dev:ideal-loads-structure-audit"
 callers = ["scripts/dev.ps1", "scripts/quality/check.ps1"]
 caller_evidence = ["scripts/dev.ps1::dev_catalog", "scripts/quality/check.ps1::invoke_dev_command"]
-callees = ["scripts/lib/common.ps1", "scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1", "scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp324-cooling-supply-mass-flow-ems-override-body.ps1", "scripts/quality/ideal-loads-structure-audit/cp325-cooling-supply-mass-flow-limit-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp326-cooling-supply-mass-flow-limit-body.ps1", "scripts/quality/ideal-loads-structure-audit/cp327-cooling-supply-mass-flow-very-small-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp328-cooling-supply-mass-flow-very-small-guard-body.ps1", "scripts/quality/ideal-loads-structure-audit/cp329-cooling-mixed-air-call.ps1", "scripts/quality/ideal-loads-structure-audit/cp330-cooling-supply-mass-flow-positive-guard.ps1"]
-callee_evidence = ["scripts/lib/common.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp324-cooling-supply-mass-flow-ems-override-body.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp325-cooling-supply-mass-flow-limit-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp326-cooling-supply-mass-flow-limit-body.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp327-cooling-supply-mass-flow-very-small-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp328-cooling-supply-mass-flow-very-small-guard-body.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp329-cooling-mixed-air-call.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp330-cooling-supply-mass-flow-positive-guard.ps1::dot_sources"]
-calls = ["script:scripts/lib/common.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp324-cooling-supply-mass-flow-ems-override-body.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp325-cooling-supply-mass-flow-limit-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp326-cooling-supply-mass-flow-limit-body.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp327-cooling-supply-mass-flow-very-small-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp328-cooling-supply-mass-flow-very-small-guard-body.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp329-cooling-mixed-air-call.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp330-cooling-supply-mass-flow-positive-guard.ps1", "tools/docs/generate_docs.py"]
+callees = ["scripts/lib/common.ps1", "scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1", "scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp324-cooling-supply-mass-flow-ems-override-body.ps1", "scripts/quality/ideal-loads-structure-audit/cp325-cooling-supply-mass-flow-limit-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp326-cooling-supply-mass-flow-limit-body.ps1", "scripts/quality/ideal-loads-structure-audit/cp327-cooling-supply-mass-flow-very-small-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp328-cooling-supply-mass-flow-very-small-guard-body.ps1", "scripts/quality/ideal-loads-structure-audit/cp329-cooling-mixed-air-call.ps1", "scripts/quality/ideal-loads-structure-audit/cp330-cooling-supply-mass-flow-positive-guard.ps1", "scripts/quality/ideal-loads-structure-audit/cp331-cooling-positive-supply-cp-air-assignment.ps1"]
+callee_evidence = ["scripts/lib/common.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp324-cooling-supply-mass-flow-ems-override-body.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp325-cooling-supply-mass-flow-limit-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp326-cooling-supply-mass-flow-limit-body.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp327-cooling-supply-mass-flow-very-small-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp328-cooling-supply-mass-flow-very-small-guard-body.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp329-cooling-mixed-air-call.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp330-cooling-supply-mass-flow-positive-guard.ps1::dot_sources", "scripts/quality/ideal-loads-structure-audit/cp331-cooling-positive-supply-cp-air-assignment.ps1::dot_sources"]
+calls = ["script:scripts/lib/common.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp324-cooling-supply-mass-flow-ems-override-body.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp325-cooling-supply-mass-flow-limit-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp326-cooling-supply-mass-flow-limit-body.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp327-cooling-supply-mass-flow-very-small-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp328-cooling-supply-mass-flow-very-small-guard-body.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp329-cooling-mixed-air-call.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp330-cooling-supply-mass-flow-positive-guard.ps1", "script:scripts/quality/ideal-loads-structure-audit/cp331-cooling-positive-supply-cp-air-assignment.ps1", "tools/docs/generate_docs.py"]
 generated_artifacts = ["docs/src/generated/algorithm-ledger.md", "docs/src/generated/capability-index.md"]
 reachable_from_public_root = true
 exit_contract = "nonzero via PowerShell throw"

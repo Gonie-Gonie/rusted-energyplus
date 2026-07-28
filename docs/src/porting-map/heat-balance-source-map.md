@@ -34078,6 +34078,55 @@ parents remain `scaffold`/`none`; both Calc routines remain `source_mapped`.
 CP330 adds no support, conformance, capability, status, count, readiness,
 evidence-case, numerical conformance, or Roadmap promotion.
 
+## CP331 Positive-Supply CpAir Assignment in the Heat-Balance Loop
+
+CP331 executes immediately after CP330 and before the unchanged bounded
+PurchasedAir numerical calculation. It maps only
+`PurchasedAirManager.cc` line 2185: controlled Zone heat-balance humidity read,
+canonical `PsyCpAirFnW` evaluation, and local `CpAir` assignment. CP330
+positive-body entries execute all three sites; UnitOff, non-cooling, and CP330
+active-false routes execute none. Dynamic CP331 site executions equal
+`3 * positive_supply_mass_flow_body_entries`.
+
+The exact release conditionally reads
+`ZoneHeatBalanceState::air_humidity_ratio` from the identity-checked controlled
+Zone and requires it to agree bit-for-bit with CP329's retained no-OA
+recirculation- and mixed-air humidity copies. Those copies prove same-call
+lineage but do not replace the live source operand. The scalar uses stateless
+`energyplus_psy_cp_air_fn_w`. Positive-route admission requires finite live
+humidity `>= 0.0`, admits both signed zeros, and requires the canonical
+`CpAir` result to be finite. No CP331 site changes Zone demand, heat-balance
+coefficients, correction, or feedback.
+
+The C++ helper's process-wide `dwSave`/`cpaSave` last-call cache, initial
+`-100.0` sentinel and raw-`-100.0` first-call anomaly, hit/miss history, reset,
+interleaving, and concurrency remain excluded. The normal non-concurrent
+source route ordinarily reaches line 2185 as a cache hit after CP318 used the
+same Zone humidity, but CP331 claims only the existing stateless canonical
+physical-domain result, not all-`f64` cache equivalence or full helper
+lifecycle parity.
+
+Direct-only
+`purchased_air_calc_cooling_positive_supply_cp_air_assignment_lifecycle`
+evidence is placed in CP330-to-CP331-to-numerical order. CP331 recursively
+validates CP330's completed latest/private witness and retained chain.
+Completed and pending CP331 histories exactly mirror its four route
+partitions, and the release applies a route-aware checked-arithmetic preflight
+to every conditional source and private-witness increment. Chain, live-Zone,
+history, witness, replay, or overflow errors fail before mutation and leave
+heat-balance state unchanged.
+CP331 does not consume, reconcile with, feed, or replace the numerical DTO.
+
+Line 2186 is the first excluded lexical executable on the true route. The
+remainder of lines 2186-2337, zero-flow `else` at 2339-2345 with dynamic first
+executable 2340, outer Heat/DeadBand sibling at 2347-2348, sibling mixed-air
+call at 2454-2461, and sibling guard at 2465 remain excluded. `OutdoorAir`,
+`Economizer`, `HeatRecovery`, `EMS`, Autosizing, broad humidity control, and
+supply-temperature/capacity behavior remain unpromoted. Both parents remain
+`scaffold`/`none`; both Calc routines remain `source_mapped`. CP331 adds no
+support, conformance, capability, status, count, readiness, evidence-case,
+numerical conformance, or Roadmap promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

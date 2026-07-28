@@ -16988,6 +16988,94 @@ remain forbidden. Both parents remain `scaffold`/`none`;
 level, run state, required or forbidden feature, output claim, evidence case,
 numerical conformance, capability, status, or Roadmap item.
 
+## CP331 Source-Ordered Cooling Positive-Supply CpAir Assignment
+
+CP331 supersedes only CP330's exclusion of the first true-body executable,
+EnergyPlus 26.1 `PurchasedAirManager.cc` line 2185:
+
+```text
+CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
+```
+
+The statement has exactly three lexical sites:
+
+1. read controlled Zone heat-balance `airHumRat`;
+2. evaluate `PsyCpAirFnW` with that value; and
+3. assign the returned scalar to local `CpAir`.
+
+UnitOff, non-cooling, and CP330 active guard-false predecessors skip all three
+sites. A CP330 positive-supply body entry executes all three exactly once, so
+dynamic CP331 source-site executions equal
+`3 * positive_supply_mass_flow_body_entries`. CP331 does not re-evaluate the
+line-2183 comparison, re-read supply mass flow, or create a separate
+function-argument evaluation-order claim for the single scalar argument.
+
+`calc/cooling_positive_supply_cp_air_assignment.rs` owns
+`PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentSnapshot`,
+`PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentRuntimeState`,
+`PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentLifecycleSummary`, and
+the pure transition and release validation. On a positive route,
+`advance_direct_no_oa_calc_cooling_positive_supply_cp_air_assignment` reads
+`ZoneHeatBalanceState::air_humidity_ratio` from the identity-checked live
+controlled Zone. It requires that source operand to agree bit-for-bit with
+CP329's retained no-OA recirculation- and mixed-air humidity copies. Those
+copies are same-call lineage evidence only and are not substituted as the
+source operand. False and skipped routes do not read the live humidity value.
+Positive-route admission requires that live humidity to be finite and
+`>= 0.0`, admits both signed zeros, and requires the canonical `CpAir` result
+to be finite.
+
+The pure transition calls canonical stateless
+`energyplus_psy_cp_air_fn_w` and assigns its result directly. That is the same
+bounded numerical projection already used by CP318, not a claim over the
+complete C++ helper lifecycle. `Psychrometrics.hh` lines 679-716 own
+process-wide function-local static `dwSave` and `cpaSave` values initialized to
+`-100.0`. In a normal non-concurrent C++ call, CP318 line 2111 has already
+called the helper with the same `thisZoneHB.airHumRat`, so line 2185 normally
+hits that cache. Rust does not model the cache, its initial sentinel, the
+raw-`-100.0` first-call anomaly, hit/miss history, reset, interleaving, or
+concurrency. CP331 therefore claims only the stateless canonical scalar on the
+admitted physical-domain direct route, not output-neutral cache behavior for
+all `f64` inputs and not full `PsyCpAirFnW` parity.
+
+The CP331 completed helper recursively invokes CP330's runtime-aware completed
+proof, including its latest/private witness and the complete retained CP329 and
+earlier chain. CP331 completed and pending predicates require exact CP330
+transition, UnitOff, non-cooling, positive-body, and active-false route-history
+parity. Before the transition, a route-aware checked-arithmetic preflight
+proves every transition, route, source-site, humidity-read, psychrometric-call,
+assignment, and private route-witness increment. A forged live-Zone identity,
+CP329 humidity lineage, predecessor, history, witness, replay, or overflow
+therefore fails transactionally before CP331 state or its private witness
+changes.
+
+The binder executes CP331 immediately after CP330 and before the unchanged
+numerical DTO. Per-step, final, coupled-runtime, and pipeline validators
+reconcile identity and ordinal; all four route partitions; the exact three-site
+inventory; `3 * positive_supply_mass_flow_body_entries`; conditional live
+humidity reads, canonical evaluations, and assignments; retained CP329
+recirculation- and mixed-air humidity bits; and the complete recursive
+predecessor chain. Direct-only JSON
+publishes
+`purchased_air_calc_cooling_positive_supply_cp_air_assignment_lifecycle`;
+non-direct or disconnected evidence is rejected. CP331 does not consume or
+reconcile with the numerical DTO and does not feed or replace it.
+
+Line 2186 is the first excluded lexical executable on CP330's true route.
+Supply-temperature arithmetic and assignment, minimum and mixed-air limiting,
+humidity and enthalpy assignment, capacity controls, and the remainder of the
+true body through line 2337 remain excluded. The zero-flow `else` at lines
+2339-2345 still begins dynamically at line 2340 for CP330 false. The outer
+Heat/DeadBand sibling begins at lines 2347-2348, its mixed-air call spans lines
+2454-2461, and its positive-supply guard is line 2465; all remain excluded.
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, Autosizing, broad humidity
+control, and supply-temperature/capacity behavior remain unpromoted. Both
+parents remain `scaffold`/`none`; `routine.calc_purch_air_loads` and
+`routine.calc_purch_air_mixed_air` remain `source_mapped`. CP331 changes no
+algorithm/routine count, readiness, support level, run state, required or
+forbidden feature, output claim, evidence case, numerical conformance,
+capability, status, or Roadmap item.
+
 
 
 

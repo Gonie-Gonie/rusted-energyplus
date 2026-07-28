@@ -985,6 +985,58 @@ continues at line 2340. The outer Heat/DeadBand sibling beginning at lines
 guard at line 2465 are also excluded. `OutdoorAir`, `Economizer`,
 `HeatRecovery`, `EMS`, and Autosizing remain forbidden. Both parent algorithms
 remain `scaffold`/`none`; both Calc routines remain `source_mapped`, and
+    counts, readiness, support, evidence cases, numerical conformance, capability,
+    and Roadmap state remain unchanged.
+
+CP331 maps only the single Cooling positive-supply `CpAir` assignment at
+EnergyPlus 26.1 `PurchasedAirManager.cc` executable line 2185. Its exactly
+three lexical sites read `thisZoneHB.airHumRat`, evaluate `PsyCpAirFnW`, and
+assign the returned scalar to local `CpAir`, in that order. UnitOff,
+non-cooling, and CP330 active guard-false predecessors skip every CP331 site;
+only a CP330 positive-body entry executes all three. Dynamic CP331 source-site
+executions are therefore `3 * positive_supply_mass_flow_body_entries`.
+
+The public release reads humidity from the identity-checked live controlled
+Zone state only on the positive route. It requires that live operand to agree
+bit-for-bit with CP329's retained no-OA recirculation- and mixed-air humidity
+copies, which serve only as same-call lineage evidence and are not substituted
+as the source operand. It evaluates the existing stateless
+`energyplus_psy_cp_air_fn_w` scalar and assigns that result directly.
+Positive-route admission requires the live humidity to be finite and
+`>= 0.0` (both signed zeros are admitted) and the canonical `CpAir` result to
+be finite. On
+the normal non-concurrent C++ path, CP318 has already called
+`PsyCpAirFnW` with the same `thisZoneHB.airHumRat`, so line 2185 ordinarily
+observes the function-local last-call cache.
+
+CP331 does not claim that cache. The process-wide static `dwSave`/`cpaSave`
+state, its `-100.0` initial sentinel and raw-`-100.0` first-call anomaly,
+hit/miss history, reset, interleaving, and concurrency remain excluded. The
+Rust result is only the previously bounded stateless canonical scalar for the
+admitted physical-domain direct route; CP331 does not claim all-`f64` cache
+equivalence or complete `PsyCpAirFnW` lifecycle parity.
+
+`advance_direct_no_oa_calc_cooling_positive_supply_cp_air_assignment`
+recursively validates the completed same-call CP330 latest snapshot, private
+witness, route history, and its retained predecessor chain before mutation.
+Completed and pending CP331 state preserve exact CP330 UnitOff, non-cooling,
+positive-body, and active-false partitions. A route-aware checked-arithmetic
+preflight covers the transition and all three conditional source counters, so
+chain, live-Zone, history, witness, or overflow failure leaves runtime and
+private-witness state unchanged.
+
+The binder places CP331 immediately after CP330 and before the unchanged
+numerical calculation. Direct-only lifecycle evidence is published as
+`purchased_air_calc_cooling_positive_supply_cp_air_assignment_lifecycle`;
+CP331 neither consumes nor reconciles with the numerical DTO and does not feed
+or replace it. Line 2186 is the first excluded lexical executable on the true
+route. The remainder of the true body at lines 2186-2337, the zero-flow `else`
+at lines 2339-2345 whose first dynamic executable remains line 2340, the outer
+Heat/DeadBand sibling at lines 2347-2348, its mixed-air call at lines
+2454-2461, and its guard at line 2465 remain excluded. `OutdoorAir`,
+`Economizer`, `HeatRecovery`, `EMS`, Autosizing, broad humidity control, and
+supply-temperature/capacity behavior remain unpromoted. Both parent algorithms
+remain `scaffold`/`none`; both Calc routines remain `source_mapped`, and
 counts, readiness, support, evidence cases, numerical conformance, capability,
 and Roadmap state remain unchanged.
 

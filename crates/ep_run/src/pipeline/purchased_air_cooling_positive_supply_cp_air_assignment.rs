@@ -1,0 +1,296 @@
+//! Run-summary evidence for the bounded Cooling positive-supply `CpAir` assignment.
+
+use ep_runtime::{
+    PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_CHILD_SOURCE,
+    PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_FIRST_EXCLUDED_SOURCE,
+    PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_NO_OA_CHILD_SOURCE_ORDER,
+    PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_SOURCE,
+    PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_SOURCE_ORDER,
+    PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_FIRST_EXCLUDED_SOURCE,
+    PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_SOURCE,
+    PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_SOURCE_ORDER,
+    PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_POSITIVE_GUARD_FIRST_EXCLUDED_SOURCE,
+    PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_POSITIVE_GUARD_SOURCE,
+    PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_POSITIVE_GUARD_SOURCE_ORDER,
+    PurchasedAirCalcCoolingMixedAirCallLifecycleSummary,
+    PurchasedAirCalcCoolingMixedAirCallSnapshot,
+    PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentLifecycleSummary,
+    PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardLifecycleSummary,
+    PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardSnapshot, PurchasedAirInitLifecycleSummary,
+};
+
+mod serialization;
+mod validation;
+
+pub(super) use serialization::lifecycle_json;
+use validation::{snapshot_shape, validate_source_counters};
+
+pub(super) fn validate_direct_lifecycle(
+    lifecycle: Option<&PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentLifecycleSummary>,
+    predecessor_cp330: Option<&PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardLifecycleSummary>,
+    predecessor_cp329: Option<&PurchasedAirCalcCoolingMixedAirCallLifecycleSummary>,
+    init_lifecycle: Option<&PurchasedAirInitLifecycleSummary>,
+    coupling_call_count: Option<usize>,
+) -> Result<(), String> {
+    let lifecycle = lifecycle.ok_or_else(|| {
+        "direct-zone IdealLoads runtime did not expose cooling positive-supply CpAir assignment evidence"
+            .to_string()
+    })?;
+    let predecessor = predecessor_cp330.ok_or_else(|| {
+        "direct-zone IdealLoads cooling positive-supply CpAir assignment has no CP330 evidence"
+            .to_string()
+    })?;
+    let mixed_air = predecessor_cp329.ok_or_else(|| {
+        "direct-zone IdealLoads cooling positive-supply CpAir assignment has no CP329 evidence"
+            .to_string()
+    })?;
+    let init = init_lifecycle.ok_or_else(|| {
+        "direct-zone IdealLoads cooling positive-supply CpAir assignment has no initialization evidence"
+            .to_string()
+    })?;
+    let calls = coupling_call_count.ok_or_else(|| {
+        "direct-zone IdealLoads cooling positive-supply CpAir assignment has no coupling call count"
+            .to_string()
+    })?;
+
+    if calls == 0
+        || lifecycle.source != PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_SOURCE
+        || lifecycle.first_excluded_source
+            != PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_FIRST_EXCLUDED_SOURCE
+        || predecessor.source != PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_POSITIVE_GUARD_SOURCE
+        || predecessor.first_excluded_source
+            != PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_POSITIVE_GUARD_FIRST_EXCLUDED_SOURCE
+        || mixed_air.source != PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_SOURCE
+        || mixed_air.child_source != PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_CHILD_SOURCE
+        || mixed_air.first_excluded_source
+            != PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_FIRST_EXCLUDED_SOURCE
+    {
+        return Err(
+            "direct-zone IdealLoads cooling positive-supply CpAir assignment provenance is invalid"
+                .to_string(),
+        );
+    }
+
+    let state = &lifecycle.state;
+    let predecessor_state = &predecessor.state;
+    let skipped = checked_add(
+        state.unit_off_skip_count,
+        state.non_cooling_skip_count,
+        "skip partition",
+    )?;
+    let skipped = checked_add(
+        skipped,
+        state.positive_guard_false_fallthrough_skip_count,
+        "guard-false partition",
+    )?;
+    let transition_partition = checked_add(
+        skipped,
+        state.cp_air_assignment_count,
+        "transition partition",
+    )?;
+    for (field, expected, actual) in [
+        ("transition_count", calls, state.transition_count),
+        (
+            "predecessor_transition_count",
+            predecessor_state.transition_count,
+            state.transition_count,
+        ),
+        (
+            "transition_partition",
+            state.transition_count,
+            transition_partition,
+        ),
+        (
+            "unit_off_skip_count",
+            predecessor_state.unit_off_skip_count,
+            state.unit_off_skip_count,
+        ),
+        (
+            "non_cooling_skip_count",
+            predecessor_state.non_cooling_skip_count,
+            state.non_cooling_skip_count,
+        ),
+        (
+            "positive_guard_false_fallthrough_skip_count",
+            predecessor_state.active_guard_false_fallthrough_count,
+            state.positive_guard_false_fallthrough_skip_count,
+        ),
+        (
+            "cp_air_assignment_count",
+            predecessor_state.positive_supply_mass_flow_body_entry_count,
+            state.cp_air_assignment_count,
+        ),
+    ] {
+        ensure_count(actual, expected, field)?;
+    }
+    validate_source_counters(state)?;
+
+    let latest = state.latest.as_ref().ok_or_else(|| {
+        "direct-zone IdealLoads cooling positive-supply CpAir assignment has no latest snapshot"
+            .to_string()
+    })?;
+    let predecessor_latest = predecessor_state.latest.as_ref().ok_or_else(|| {
+        "direct-zone IdealLoads cooling positive-supply CpAir assignment has no latest CP330 snapshot"
+            .to_string()
+    })?;
+    let mixed_air_latest = mixed_air.state.latest.as_ref().ok_or_else(|| {
+        "direct-zone IdealLoads cooling positive-supply CpAir assignment has no latest CP329 snapshot"
+            .to_string()
+    })?;
+    let expected_system = init.declared_system_order.first().copied().ok_or_else(|| {
+        "direct-zone IdealLoads cooling positive-supply CpAir assignment has no declared system"
+            .to_string()
+    })?;
+    let expected_zone = init.controlled_zone.ok_or_else(|| {
+        "direct-zone IdealLoads cooling positive-supply CpAir assignment has no controlled Zone"
+            .to_string()
+    })?;
+    if state.system != expected_system
+        || predecessor_state.system != expected_system
+        || mixed_air.state.system != expected_system
+        || !latest_matches_release(
+            latest,
+            predecessor_latest,
+            mixed_air_latest,
+            expected_system,
+            expected_zone,
+            calls,
+        )
+    {
+        return Err(
+            "direct-zone IdealLoads cooling positive-supply CpAir assignment latest state is not release-ready"
+                .to_string(),
+        );
+    }
+    Ok(())
+}
+
+fn latest_matches_release(
+    assignment: &PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentSnapshot,
+    predecessor: &PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardSnapshot,
+    mixed_air: &PurchasedAirCalcCoolingMixedAirCallSnapshot,
+    expected_system: ep_model::IdealLoadsAirSystemId,
+    expected_zone: ep_model::ZoneId,
+    call_count: usize,
+) -> bool {
+    assignment.source == PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_SOURCE
+        && assignment.first_excluded_source
+            == PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_FIRST_EXCLUDED_SOURCE
+        && assignment.source_order
+            == PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_SOURCE_ORDER
+        && predecessor.source == PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_POSITIVE_GUARD_SOURCE
+        && predecessor.first_excluded_source
+            == PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_POSITIVE_GUARD_FIRST_EXCLUDED_SOURCE
+        && predecessor.source_order
+            == PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_POSITIVE_GUARD_SOURCE_ORDER
+        && mixed_air.source == PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_SOURCE
+        && mixed_air.child_source == PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_CHILD_SOURCE
+        && mixed_air.first_excluded_source
+            == PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_FIRST_EXCLUDED_SOURCE
+        && mixed_air.source_order == PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_SOURCE_ORDER
+        && mixed_air.no_oa_child_source_order
+            == PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_NO_OA_CHILD_SOURCE_ORDER
+        && assignment.system == expected_system
+        && predecessor.system == expected_system
+        && mixed_air.system == expected_system
+        && assignment.parent_call_ordinal == call_count
+        && predecessor.parent_call_ordinal == call_count
+        && mixed_air.parent_call_ordinal == call_count
+        && assignment.controlled_zone == expected_zone
+        && predecessor.controlled_zone == expected_zone
+        && mixed_air.controlled_zone == expected_zone
+        && assignment.unit_body_entered == predecessor.unit_body_entered
+        && assignment.predecessor_cooling_body_entered == predecessor.cooling_body_entered
+        && assignment.predecessor_no_outdoor_air_fallback_entered
+            == predecessor.predecessor_no_outdoor_air_fallback_entered
+        && assignment.predecessor_positive_supply_mass_flow_body_entered
+            == predecessor.positive_supply_mass_flow_body_entered
+        && assignment.predecessor_active_guard_false_fallthrough
+            == predecessor.active_guard_false_fallthrough
+        && assignment.unit_off_skipped == predecessor.unit_off_skipped
+        && assignment.non_cooling_skipped == predecessor.non_cooling_skipped
+        && snapshot_shape(assignment, predecessor, mixed_air)
+}
+
+fn checked_add(left: usize, right: usize, label: &str) -> Result<usize, String> {
+    left.checked_add(right).ok_or_else(|| {
+        format!(
+            "direct-zone IdealLoads cooling positive-supply CpAir assignment {label} overflowed"
+        )
+    })
+}
+
+fn ensure_count(actual: usize, expected: usize, field: &str) -> Result<(), String> {
+    if actual == expected {
+        Ok(())
+    } else {
+        Err(format!(
+            "direct-zone IdealLoads cooling positive-supply CpAir assignment invariant {field} expected {expected}, got {actual}"
+        ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use ep_model::{IdealLoadsAirSystemId, ZoneId};
+    use ep_runtime::{
+        PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentRuntimeState,
+        psychrometrics::energyplus_psy_cp_air_fn_w,
+    };
+
+    use super::*;
+
+    #[test]
+    fn json_preserves_zone_humidity_and_cp_air_ieee_bits() {
+        let humidity_ratio = 0.008_f64;
+        let cp_air = energyplus_psy_cp_air_fn_w(humidity_ratio);
+        let snapshot = PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentSnapshot {
+            source: PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_SOURCE,
+            first_excluded_source:
+                PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_FIRST_EXCLUDED_SOURCE,
+            source_order: PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_SOURCE_ORDER,
+            system: IdealLoadsAirSystemId(0),
+            parent_call_ordinal: 1,
+            controlled_zone: ZoneId(0),
+            unit_body_entered: true,
+            predecessor_cooling_body_entered: true,
+            predecessor_no_outdoor_air_fallback_entered: true,
+            predecessor_positive_supply_mass_flow_body_entered: true,
+            predecessor_active_guard_false_fallthrough: false,
+            unit_off_skipped: false,
+            non_cooling_skipped: false,
+            positive_guard_false_fallthrough_skipped: false,
+            cp_air_assignment_executed: true,
+            zone_humidity_ratio_read: true,
+            zone_humidity_ratio: Some(humidity_ratio),
+            psychrometric_cp_air_evaluated: true,
+            psychrometric_cp_air_result_j_per_kg_k: Some(cp_air),
+            cp_air_assigned: true,
+            cp_air_j_per_kg_k: Some(cp_air),
+        };
+        let mut state =
+            PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentRuntimeState::new(snapshot.system);
+        state.latest = Some(snapshot);
+        let lifecycle = PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentLifecycleSummary {
+            source: PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_SOURCE,
+            first_excluded_source:
+                PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_FIRST_EXCLUDED_SOURCE,
+            state,
+        };
+
+        let value = lifecycle_json(&lifecycle);
+        assert_eq!(
+            value["latest"]["zone_humidity_ratio_ieee_bits"],
+            format!("0x{:016x}", humidity_ratio.to_bits())
+        );
+        assert_eq!(
+            value["latest"]["psychrometric_cp_air_result_j_per_kg_k_ieee_bits"],
+            format!("0x{:016x}", cp_air.to_bits())
+        );
+        assert_eq!(
+            value["latest"]["cp_air_j_per_kg_k_ieee_bits"],
+            format!("0x{:016x}", cp_air.to_bits())
+        );
+    }
+}

@@ -19,44 +19,27 @@ use ep_model::{
 
 use super::{
     DirectZonePurchasedAirCouplingError, DirectZonePurchasedAirCouplingInput,
-    DirectZonePurchasedAirCouplingOutput, IdealLoadsPurchasedAirBranch,
-    IdealLoadsSensibleLimitContext, PurchasedAirAvailabilityStatus,
+    IdealLoadsPurchasedAirBranch, IdealLoadsSensibleLimitContext, PurchasedAirAvailabilityStatus,
     PurchasedAirCalcCoolingCapacityZeroFlowResetError,
-    PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot,
-    PurchasedAirCalcCoolingDehumidificationFlowError,
-    PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
-    PurchasedAirCalcCoolingEconomizerBodyError, PurchasedAirCalcCoolingEconomizerBodySnapshot,
-    PurchasedAirCalcCoolingEconomizerConditionError,
-    PurchasedAirCalcCoolingEconomizerConditionSnapshot,
-    PurchasedAirCalcCoolingEconomizerGuardError, PurchasedAirCalcCoolingEconomizerGuardSnapshot,
-    PurchasedAirCalcCoolingEntryGateError, PurchasedAirCalcCoolingEntryGateSnapshot,
-    PurchasedAirCalcCoolingHumidificationFlowError,
-    PurchasedAirCalcCoolingHumidificationFlowSnapshot, PurchasedAirCalcCoolingMixedAirCallError,
-    PurchasedAirCalcCoolingMixedAirCallSnapshot, PurchasedAirCalcCoolingOaMaxFlowBodyError,
-    PurchasedAirCalcCoolingOaMaxFlowBodySnapshot, PurchasedAirCalcCoolingOaMaxFlowGateError,
-    PurchasedAirCalcCoolingOaMaxFlowGateSnapshot, PurchasedAirCalcCoolingSensibleFlowError,
-    PurchasedAirCalcCoolingSensibleFlowSnapshot,
+    PurchasedAirCalcCoolingDehumidificationFlowError, PurchasedAirCalcCoolingEconomizerBodyError,
+    PurchasedAirCalcCoolingEconomizerConditionError, PurchasedAirCalcCoolingEconomizerGuardError,
+    PurchasedAirCalcCoolingEntryGateError, PurchasedAirCalcCoolingHumidificationFlowError,
+    PurchasedAirCalcCoolingMixedAirCallError, PurchasedAirCalcCoolingOaMaxFlowBodyError,
+    PurchasedAirCalcCoolingOaMaxFlowGateError,
+    PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentError as CoolingCpAirAssignmentError,
+    PurchasedAirCalcCoolingSensibleFlowError,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyError,
-    PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardError,
-    PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowLimitBodyError,
-    PurchasedAirCalcCoolingSupplyMassFlowLimitBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowLimitGuardError,
-    PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumError,
-    PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardError as CoolingPositiveGuardError,
-    PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardSnapshot as CoolingPositiveGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodyError,
-    PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
-    PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardError,
-    PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardSnapshot, PurchasedAirCalcEntryContext,
-    PurchasedAirCalcEntryError, PurchasedAirCalcEntrySnapshot,
-    PurchasedAirCalcMinimumOaPrefixError, PurchasedAirCalcMinimumOaPrefixSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardError, PurchasedAirCalcEntryContext,
+    PurchasedAirCalcEntryError, PurchasedAirCalcMinimumOaPrefixError,
     PurchasedAirHardSizeLegacyContext, PurchasedAirInitCallContext, PurchasedAirInitError,
-    PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanError, PurchasedAirInitSnapshot,
-    PurchasedAirInitTopologyPlan, PurchasedAirInitTopologyPlanError, PurchasedAirRuntimeState,
+    PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanError, PurchasedAirInitTopologyPlan,
+    PurchasedAirInitTopologyPlanError, PurchasedAirRuntimeState,
     PurchasedAirTemperatureControlType, advance_direct_no_oa_calc_cooling_capacity_zero_flow_reset,
     advance_direct_no_oa_calc_cooling_dehumidification_flow,
     advance_direct_no_oa_calc_cooling_economizer_body,
@@ -81,9 +64,19 @@ use super::{
     select_purchased_air_branch,
 };
 
-mod cooling_supply_mass_flow_positive_guard;
+#[cfg(test)]
+use super::{
+    PurchasedAirCalcCoolingEconomizerConditionSnapshot, PurchasedAirCalcCoolingEntryGateSnapshot,
+    PurchasedAirCalcMinimumOaPrefixSnapshot, PurchasedAirInitSnapshot,
+};
 
+mod cooling_positive_supply_cp_air_assignment;
+mod cooling_supply_mass_flow_positive_guard;
+mod scheduled_output;
+
+use cooling_positive_supply_cp_air_assignment::advance_positive_supply_cp_air_assignment;
 use cooling_supply_mass_flow_positive_guard::advance_positive_guard;
+pub use scheduled_output::DirectZonePurchasedAirScheduledCouplingOutput;
 
 /// One-to-one relation required by the bounded direct-Zone binding.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -670,6 +663,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingMixedAirCall(PurchasedAirCalcCoolingMixedAirCallError),
     /// The bounded cooling positive supply-mass-flow guard rejected its release state.
     CalculationCoolingSupplyMassFlowPositiveGuard(CoolingPositiveGuardError),
+    /// The bounded cooling positive-supply Cp-air assignment rejected its release state.
+    CalculationCoolingPositiveSupplyCpAirAssignment(CoolingCpAirAssignmentError),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -730,69 +725,6 @@ pub struct DirectZonePurchasedAirScheduledCouplingInput<'a, 'model> {
     pub barometric_pressure_pa: f64,
     /// Active system timestep in seconds.
     pub system_timestep_seconds: f64,
-}
-
-/// Output from one successful model-bound schedule sample and CP300 call.
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct DirectZonePurchasedAirScheduledCouplingOutput {
-    /// Fully resolved current schedule values.
-    pub schedules: DirectZonePurchasedAirScheduleSnapshot,
-    /// Persistent initialization snapshot consumed by this Calc call.
-    pub initialization: PurchasedAirInitSnapshot,
-    /// Source-ordered `CalcPurchAirLoads` entry-prefix snapshot.
-    pub calculation_entry: PurchasedAirCalcEntrySnapshot,
-    /// Source-ordered minimum-outdoor-air prefix snapshot.
-    pub calculation_minimum_outdoor_air: PurchasedAirCalcMinimumOaPrefixSnapshot,
-    /// Source-ordered cooling-entry gate snapshot.
-    pub calculation_cooling_entry_gate: PurchasedAirCalcCoolingEntryGateSnapshot,
-    /// Source-ordered cooling OA maximum-flow gate snapshot.
-    pub calculation_cooling_oa_max_flow_gate: PurchasedAirCalcCoolingOaMaxFlowGateSnapshot,
-    /// Source-ordered cooling OA maximum-flow warning-and-clamp body snapshot.
-    pub calculation_cooling_oa_max_flow_body: PurchasedAirCalcCoolingOaMaxFlowBodySnapshot,
-    /// Source-ordered cooling economizer guard snapshot.
-    pub calculation_cooling_economizer_guard: PurchasedAirCalcCoolingEconomizerGuardSnapshot,
-    /// Source-ordered cooling economizer differential condition snapshot.
-    pub calculation_cooling_economizer_condition:
-        PurchasedAirCalcCoolingEconomizerConditionSnapshot,
-    /// Source-ordered cooling economizer true-body snapshot.
-    pub calculation_cooling_economizer_body: PurchasedAirCalcCoolingEconomizerBodySnapshot,
-    /// Source-ordered cooling sensible-flow snapshot.
-    pub calculation_cooling_sensible_flow: PurchasedAirCalcCoolingSensibleFlowSnapshot,
-    /// Source-ordered cooling dehumidification-flow snapshot.
-    pub calculation_cooling_dehumidification_flow:
-        PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
-    /// Source-ordered cooling humidification-flow snapshot.
-    pub calculation_cooling_humidification_flow: PurchasedAirCalcCoolingHumidificationFlowSnapshot,
-    /// Source-ordered cooling capacity-zero candidate-reset snapshot.
-    pub calculation_cooling_capacity_zero_flow_reset:
-        PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot,
-    /// Source-ordered pre-EMS cooling supply mass-flow maximum snapshot.
-    pub calculation_cooling_supply_mass_flow_maximum:
-        PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot,
-    /// Source-ordered cooling supply mass-flow EMS-override guard snapshot.
-    pub calculation_cooling_supply_mass_flow_ems_override_guard:
-        PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
-    /// Source-ordered cooling supply mass-flow EMS-override body snapshot.
-    pub calculation_cooling_supply_mass_flow_ems_override_body:
-        PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
-    /// Source-ordered cooling supply mass-flow limit-guard snapshot.
-    pub calculation_cooling_supply_mass_flow_limit_guard:
-        PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot,
-    /// Source-ordered cooling supply mass-flow limit-body snapshot.
-    pub calculation_cooling_supply_mass_flow_limit_body:
-        PurchasedAirCalcCoolingSupplyMassFlowLimitBodySnapshot,
-    /// Source-ordered cooling supply mass-flow very-small guard snapshot.
-    pub calculation_cooling_supply_mass_flow_very_small_guard:
-        PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardSnapshot,
-    /// Source-ordered cooling supply mass-flow positive-zero reset-body snapshot.
-    pub calculation_cooling_supply_mass_flow_very_small_guard_body:
-        PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
-    /// Source-ordered Cooling mixed-air call and bounded no-OA child snapshot.
-    pub calculation_cooling_mixed_air_call: PurchasedAirCalcCoolingMixedAirCallSnapshot,
-    /// Source-ordered cooling positive supply-mass-flow guard snapshot.
-    pub calculation_cooling_supply_mass_flow_positive_guard: CoolingPositiveGuardSnapshot,
-    /// Predictor, PurchasedAir, and feedback result from CP300.
-    pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
 
 /// Samples the bound schedules and calls CP300 transactionally.
@@ -1083,6 +1015,13 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         binding.system,
         calculation_cooling_mixed_air_call,
     )?;
+    let calculation_cooling_positive_supply_cp_air_assignment =
+        advance_positive_supply_cp_air_assignment(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_supply_mass_flow_positive_guard,
+            &*input.zone_state,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1141,6 +1080,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_supply_mass_flow_very_small_guard_body,
         calculation_cooling_mixed_air_call,
         calculation_cooling_supply_mass_flow_positive_guard,
+        calculation_cooling_positive_supply_cp_air_assignment,
         coupling,
     })
 }

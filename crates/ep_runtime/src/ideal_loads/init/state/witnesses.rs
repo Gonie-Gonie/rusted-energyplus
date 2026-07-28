@@ -1,6 +1,7 @@
 //! Private latest-witness access for source-ordered calculation stages.
 
 mod cooling_mixed_air_call;
+mod cooling_positive_supply_cp_air_assignment;
 mod cooling_supply_mass_flow_positive_guard;
 mod cooling_supply_mass_flow_very_small_guard_body;
 

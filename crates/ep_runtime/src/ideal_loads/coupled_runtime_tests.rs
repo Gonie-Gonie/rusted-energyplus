@@ -25,6 +25,8 @@ use crate::{
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_EMS_OVERRIDE_BODY_FIRST_EXCLUDED_SOURCE,
@@ -269,6 +271,26 @@ fn cooling_supply_mass_flow_positive_guard_partition_overflow_fails_closed() {
         error,
         DirectZonePurchasedAirCoupledRuntimeError::
             CalcCoolingSupplyMassFlowPositiveGuardLifecycleInvariant {
+                field: "test_partition_overflow",
+                expected: 1,
+                actual: usize::MAX,
+            }
+    ));
+}
+
+#[test]
+fn cooling_positive_supply_cp_air_assignment_partition_overflow_fails_closed() {
+    let error = super::cooling_positive_supply_cp_air_assignment_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::
+            CalcCoolingPositiveSupplyCpAirAssignmentLifecycleInvariant {
                 field: "test_partition_overflow",
                 expected: 1,
                 actual: usize::MAX,
@@ -1233,6 +1255,28 @@ fn cooling_sensible_flow_lifecycle_records_unit_off_without_source_execution() {
     assert_eq!(latest.mixed_air_enthalpy_projection_j_per_kg, None);
     assert_eq!(latest.heat_recovery_sensible_output_w, None);
     assert_eq!(latest.heat_recovery_latent_output_w, None);
+
+    let lifecycle = simulation
+        .summary
+        .calc_cooling_positive_supply_cp_air_assignment_lifecycle;
+    assert_eq!(
+        lifecycle.source,
+        PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_SOURCE
+    );
+    assert_eq!(lifecycle.state.transition_count, 1);
+    assert_eq!(lifecycle.state.unit_off_skip_count, 1);
+    assert_eq!(lifecycle.state.non_cooling_skip_count, 0);
+    assert_eq!(
+        lifecycle.state.positive_guard_false_fallthrough_skip_count,
+        0
+    );
+    assert_eq!(lifecycle.state.cp_air_assignment_count, 0);
+    assert_eq!(lifecycle.state.source_site_execution_count, 0);
+    let latest = lifecycle.state.latest.expect("latest CP331 off snapshot");
+    assert!(latest.unit_off_skipped);
+    assert!(!latest.cp_air_assignment_executed);
+    assert!(latest.zone_humidity_ratio.is_none());
+    assert!(latest.cp_air_j_per_kg_k.is_none());
 }
 
 #[test]
@@ -2678,6 +2722,77 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
             !latest_positive_guard.active_guard_false_fallthrough,
             "{limit:?}"
         );
+        let source_humidity_ratio = latest_mixed_air_call
+            .recirculation_humidity_ratio
+            .expect("active no-OA recirculation humidity");
+        let cp_air_assignment = simulation
+            .summary
+            .calc_cooling_positive_supply_cp_air_assignment_lifecycle;
+        assert_eq!(
+            cp_air_assignment.source,
+            PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_SOURCE
+        );
+        assert_eq!(
+            cp_air_assignment.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_FIRST_EXCLUDED_SOURCE
+        );
+        assert_eq!(cp_air_assignment.state.transition_count, 1, "{limit:?}");
+        assert_eq!(
+            cp_air_assignment.state.cp_air_assignment_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            cp_air_assignment.state.source_site_execution_count, 3,
+            "{limit:?}"
+        );
+        assert_eq!(
+            cp_air_assignment.state.zone_humidity_ratio_read_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            cp_air_assignment
+                .state
+                .psychrometric_cp_air_evaluation_count,
+            1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            cp_air_assignment.state.cp_air_assignment_write_count, 1,
+            "{limit:?}"
+        );
+        let latest_cp_air_assignment = cp_air_assignment
+            .state
+            .latest
+            .expect("latest CP331 snapshot");
+        assert!(
+            latest_cp_air_assignment.predecessor_positive_supply_mass_flow_body_entered,
+            "{limit:?}"
+        );
+        assert!(
+            latest_cp_air_assignment.cp_air_assignment_executed,
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_cp_air_assignment
+                .zone_humidity_ratio
+                .map(f64::to_bits),
+            Some(source_humidity_ratio.to_bits()),
+            "{limit:?}"
+        );
+        let expected_cp_air =
+            crate::psychrometrics::energyplus_psy_cp_air_fn_w(source_humidity_ratio);
+        assert_eq!(
+            latest_cp_air_assignment
+                .psychrometric_cp_air_result_j_per_kg_k
+                .map(f64::to_bits),
+            Some(expected_cp_air.to_bits()),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_cp_air_assignment.cp_air_j_per_kg_k.map(f64::to_bits),
+            Some(expected_cp_air.to_bits()),
+            "{limit:?}"
+        );
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation
@@ -2774,6 +2889,36 @@ fn cooling_mixed_air_call_executes_for_active_positive_zero_supply_flow() {
     );
     assert!(!latest_guard.positive_supply_mass_flow_body_entered);
     assert!(latest_guard.active_guard_false_fallthrough);
+
+    let cp_air_assignment = simulation
+        .summary
+        .calc_cooling_positive_supply_cp_air_assignment_lifecycle;
+    assert_eq!(cp_air_assignment.state.transition_count, 1);
+    assert_eq!(
+        cp_air_assignment
+            .state
+            .positive_guard_false_fallthrough_skip_count,
+        1
+    );
+    assert_eq!(cp_air_assignment.state.cp_air_assignment_count, 0);
+    assert_eq!(cp_air_assignment.state.source_site_execution_count, 0);
+    assert_eq!(cp_air_assignment.state.zone_humidity_ratio_read_count, 0);
+    assert_eq!(
+        cp_air_assignment
+            .state
+            .psychrometric_cp_air_evaluation_count,
+        0
+    );
+    assert_eq!(cp_air_assignment.state.cp_air_assignment_write_count, 0);
+    let latest_assignment = cp_air_assignment
+        .state
+        .latest
+        .expect("zero-flow CP331 snapshot");
+    assert!(latest_assignment.predecessor_active_guard_false_fallthrough);
+    assert!(latest_assignment.positive_guard_false_fallthrough_skipped);
+    assert!(!latest_assignment.cp_air_assignment_executed);
+    assert!(latest_assignment.zone_humidity_ratio.is_none());
+    assert!(latest_assignment.cp_air_j_per_kg_k.is_none());
 }
 
 #[test]

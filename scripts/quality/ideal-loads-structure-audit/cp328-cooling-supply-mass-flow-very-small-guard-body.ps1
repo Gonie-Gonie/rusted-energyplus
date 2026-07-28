@@ -13,6 +13,7 @@ $cp328SnapshotValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_suppl
 $cp328Tests = "crates\ep_runtime\src\ideal_loads\calc\cooling_supply_mass_flow_very_small_guard\body\tests\mod.rs"
 $cp328ReleaseCorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_supply_mass_flow_very_small_guard\body\tests\release_corruption.rs"
 $cp328Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
+$cp328ScheduledOutput = "crates\ep_runtime\src\ideal_loads\binding\scheduled_output.rs"
 $cp328BindingTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_supply_mass_flow_very_small_guard_body_tests.rs"
 $cp328InitState = "crates\ep_runtime\src\ideal_loads\init\state.rs"
 $cp328InitWitnesses = "crates\ep_runtime\src\ideal_loads\init\state\witnesses\cooling_supply_mass_flow_very_small_guard_body.rs"
@@ -38,6 +39,7 @@ foreach ($cp328RequiredFile in @(
         $cp328SnapshotValidation,
         $cp328Tests,
         $cp328ReleaseCorruptionTests,
+        $cp328ScheduledOutput,
         $cp328BindingTests,
         $cp328CoupledValidation,
         $cp328CoupledFixture,
@@ -172,7 +174,7 @@ if (
 }
 Assert-Contains -Path $cp328Binding -Pattern '(?s)let calculation_cooling_supply_mass_flow_very_small_guard_body =\s*advance_direct_no_oa_calc_cooling_supply_mass_flow_very_small_guard_body\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_supply_mass_flow_very_small_guard,\s*\)' -Description "binding exact CP327-to-CP328 wrapper call"
 Assert-Contains -Path $cp328Binding -Pattern 'CalculationCoolingSupplyMassFlowVerySmallGuardBody\(\s*PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodyError,?\s*\)' -Description "CP328 scheduled binding error boundary"
-Assert-Contains -Path $cp328Binding -Pattern 'pub calculation_cooling_supply_mass_flow_very_small_guard_body:\s*[\r\n]+\s*PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot' -Description "CP328 scheduled output evidence"
+Assert-Contains -Path $cp328ScheduledOutput -Pattern 'pub calculation_cooling_supply_mass_flow_very_small_guard_body:\s*[\r\n]+\s*PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot' -Description "CP328 scheduled output evidence"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding_tests.rs" -Pattern '#\[path = "binding/cooling_supply_mass_flow_very_small_guard_body_tests\.rs"\]' -Description "CP328 binding test module path"
 foreach ($cp328BindingTest in @(
         "scheduled_binding_consumes_cp327_body_entry_and_assigns_positive_zero",

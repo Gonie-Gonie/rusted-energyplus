@@ -12,6 +12,7 @@ $cp325RuntimeValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_supply
 $cp325SnapshotValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_supply_mass_flow_maximum\flow_limit_guard\release\snapshot_validation.rs"
 $cp325Tests = "crates\ep_runtime\src\ideal_loads\calc\cooling_supply_mass_flow_maximum\flow_limit_guard\tests\mod.rs"
 $cp325ReleaseCorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_supply_mass_flow_maximum\flow_limit_guard\tests\release_corruption.rs"
+$cp325ScheduledOutput = "crates\ep_runtime\src\ideal_loads\binding\scheduled_output.rs"
 $cp325BindingTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_supply_mass_flow_limit_guard_tests.rs"
 $cp325CoupledValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_supply_mass_flow_limit_guard_validation.rs"
 $cp325CoupledFixture = "crates\ep_runtime\src\ideal_loads\coupled_output_tests\cooling_supply_mass_flow_limit_guard_fixture.rs"
@@ -32,6 +33,7 @@ foreach ($cp325RequiredFile in @(
         $cp325SnapshotValidation,
         $cp325Tests,
         $cp325ReleaseCorruptionTests,
+        $cp325ScheduledOutput,
         $cp325BindingTests,
         $cp325CoupledValidation,
         $cp325CoupledFixture,
@@ -313,7 +315,7 @@ if (
 }
 
 Assert-Contains -Path $idealLoadsBinding -Pattern 'CalculationCoolingSupplyMassFlowLimitGuard\(\s*PurchasedAirCalcCoolingSupplyMassFlowLimitGuardError,?\s*\)' -Description "CP325 scheduled binding error boundary"
-Assert-Contains -Path $idealLoadsBinding -Pattern 'pub calculation_cooling_supply_mass_flow_limit_guard:\s*[\r\n]+\s*PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot' -Description "CP325 scheduled output evidence"
+Assert-Contains -Path $cp325ScheduledOutput -Pattern 'pub calculation_cooling_supply_mass_flow_limit_guard:\s*[\r\n]+\s*PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot' -Description "CP325 scheduled output evidence"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding_tests.rs" -Pattern '#\[path = "binding/cooling_supply_mass_flow_limit_guard_tests\.rs"\]' -Description "CP325 binding test module path"
 Assert-Contains -Path $cp325BindingTests -Pattern 'scheduled_binding_preserves_both_selector_reads_and_strict_positive_guard' -Description "CP325 all-selector binding regression"
 Assert-Contains -Path $cp325BindingTests -Pattern 'scheduled_binding_skips_all_cp325_sites_when_cooling_is_inactive' -Description "CP325 UnitOff/non-cooling binding regression"

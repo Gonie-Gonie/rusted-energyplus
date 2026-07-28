@@ -149,10 +149,26 @@ pub(super) fn release_fixture_with_cooling_demand(
     IdealLoadsAirSystem,
     PurchasedAirCalcCoolingEconomizerGuardSnapshot,
 ) {
+    release_fixture_with_cooling_demand_and_availability(cooling_demand_w, 1.0)
+}
+
+pub(super) fn release_fixture_with_cooling_demand_and_availability(
+    cooling_demand_w: f64,
+    overall_availability: f64,
+) -> (
+    PurchasedAirRuntimeState,
+    IdealLoadsAirSystem,
+    PurchasedAirCalcCoolingEconomizerGuardSnapshot,
+) {
     let system = test_system();
     let mut runtime = PurchasedAirRuntimeState::default();
-    initialize_fixture_call(&mut runtime, &system, true);
-    let guard = advance_fixture_prefix(&mut runtime, &system, cooling_demand_w);
+    initialize_fixture_call(&mut runtime, &system, true, overall_availability);
+    let guard = advance_fixture_prefix(
+        &mut runtime,
+        &system,
+        cooling_demand_w,
+        overall_availability,
+    );
     (runtime, system, guard)
 }
 
@@ -161,14 +177,15 @@ pub(super) fn advance_subsequent_fixture_call(
     system: &IdealLoadsAirSystem,
     cooling_demand_w: f64,
 ) -> PurchasedAirCalcCoolingEconomizerGuardSnapshot {
-    initialize_fixture_call(runtime, system, false);
-    advance_fixture_prefix(runtime, system, cooling_demand_w)
+    initialize_fixture_call(runtime, system, false, 1.0);
+    advance_fixture_prefix(runtime, system, cooling_demand_w, 1.0)
 }
 
 fn initialize_fixture_call(
     runtime: &mut PurchasedAirRuntimeState,
     system: &IdealLoadsAirSystem,
     begin_environment: bool,
+    overall_availability: f64,
 ) {
     init_purchased_air_runtime(
         runtime,
@@ -186,7 +203,7 @@ fn initialize_fixture_call(
             standard_air_density_kg_per_m3: 1.0,
             heating_setpoint_c: 20.0,
             cooling_setpoint_c: 22.0,
-            overall_availability: 1.0,
+            overall_availability,
             heating_availability: 1.0,
             cooling_availability: 1.0,
         },
@@ -221,6 +238,7 @@ fn advance_fixture_prefix(
     runtime: &mut PurchasedAirRuntimeState,
     system: &IdealLoadsAirSystem,
     cooling_demand_w: f64,
+    overall_availability: f64,
 ) -> PurchasedAirCalcCoolingEconomizerGuardSnapshot {
     let unit = runtime.units.get_mut(&SYSTEM).expect("selected unit");
     let entry = advance_entry_state(
@@ -237,7 +255,7 @@ fn advance_fixture_prefix(
                 cooling_demand_w,
             ),
             zone_component_availability: Some(PurchasedAirAvailabilityStatus::NoAction),
-            overall_availability: 1.0,
+            overall_availability,
             heating_availability: 1.0,
             cooling_availability: 1.0,
         },

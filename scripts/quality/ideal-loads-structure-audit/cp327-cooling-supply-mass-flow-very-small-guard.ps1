@@ -13,6 +13,7 @@ $cp327SnapshotValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_suppl
 $cp327Tests = "crates\ep_runtime\src\ideal_loads\calc\cooling_supply_mass_flow_very_small_guard\tests\mod.rs"
 $cp327ReleaseCorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_supply_mass_flow_very_small_guard\tests\release_corruption.rs"
 $cp327Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
+$cp327ScheduledOutput = "crates\ep_runtime\src\ideal_loads\binding\scheduled_output.rs"
 $cp327BindingTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_supply_mass_flow_very_small_guard_tests.rs"
 $cp327InitState = "crates\ep_runtime\src\ideal_loads\init\state.rs"
 $cp327InitWitnesses = "crates\ep_runtime\src\ideal_loads\init\state\witnesses.rs"
@@ -38,6 +39,7 @@ foreach ($cp327RequiredFile in @(
         $cp327SnapshotValidation,
         $cp327Tests,
         $cp327ReleaseCorruptionTests,
+        $cp327ScheduledOutput,
         $cp327BindingTests,
         $cp327CoupledValidation,
         $cp327CoupledFixture,
@@ -159,7 +161,7 @@ if (
 }
 Assert-Contains -Path $cp327Binding -Pattern '(?s)let calculation_cooling_supply_mass_flow_very_small_guard =\s*advance_direct_no_oa_calc_cooling_supply_mass_flow_very_small_guard\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_supply_mass_flow_limit_body,\s*\)' -Description "binding exact CP326-to-CP327 wrapper call"
 Assert-Contains -Path $cp327Binding -Pattern 'CalculationCoolingSupplyMassFlowVerySmallGuard\(\s*PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardError,?\s*\)' -Description "CP327 scheduled binding error boundary"
-Assert-Contains -Path $cp327Binding -Pattern 'pub calculation_cooling_supply_mass_flow_very_small_guard:\s*[\r\n]+\s*PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardSnapshot' -Description "CP327 scheduled output evidence"
+Assert-Contains -Path $cp327ScheduledOutput -Pattern 'pub calculation_cooling_supply_mass_flow_very_small_guard:\s*[\r\n]+\s*PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardSnapshot' -Description "CP327 scheduled output evidence"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding_tests.rs" -Pattern '#\[path = "binding/cooling_supply_mass_flow_very_small_guard_tests\.rs"\]' -Description "CP327 binding test module path"
 Assert-Contains -Path $cp327BindingTests -Pattern 'scheduled_binding_consumes_the_retained_cp326_supply_bits_for_the_guard' -Description "CP327 active binding regression"
 Assert-Contains -Path $cp327BindingTests -Pattern 'scheduled_binding_skips_all_cp327_sites_when_cooling_is_inactive' -Description "CP327 skip binding regression"
