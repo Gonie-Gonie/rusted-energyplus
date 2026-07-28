@@ -37,6 +37,7 @@ mod cooling_sensible_flow_release_tests;
 #[cfg(test)]
 mod cooling_sensible_flow_tests;
 mod cooling_supply_mass_flow_maximum;
+mod cooling_supply_mass_flow_positive_guard;
 mod cooling_supply_mass_flow_very_small_guard;
 mod humidity;
 mod lifecycle;
@@ -66,6 +67,7 @@ pub use cooling_humidification_flow::*;
 pub use cooling_mixed_air_call::*;
 pub use cooling_sensible_flow::*;
 pub use cooling_supply_mass_flow_maximum::*;
+pub use cooling_supply_mass_flow_positive_guard::*;
 pub use cooling_supply_mass_flow_very_small_guard::*;
 pub use lifecycle::*;
 pub use limits::IdealLoadsSensibleLimitContext;

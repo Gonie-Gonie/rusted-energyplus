@@ -34024,6 +34024,13 @@ failure/replay/concurrency parity. Validators publish direct-only
 before the numerical DTO. CP329 does not consume, reconcile with, feed, or
 replace that DTO and changes no Zone or heat-balance equation.
 
+The runtime-aware completed proof recursively validates CP328's completed
+direct state, private witness, and retained upstream prefix. Completed and
+pending CP329 route history must exactly match CP328, and a route-aware
+checked-arithmetic preflight covers every next CP329 counter and site product
+before mutation. Broken chain/history/witness state or overflow fails closed
+without changing heat-balance or private-witness state.
+
 The first excluded executable after the call is line 2183; lines 2180-2182 are
 comments. The separate Heat/DeadBand call at lines 2454-2461 and all later
 capacity, supply-state, Heat/DeadBand, and feedback work remain excluded.
@@ -34031,6 +34038,45 @@ capacity, supply-state, Heat/DeadBand, and feedback work remain excluded.
 forbidden. Both parents remain `scaffold`/`none`; Calc and mixed-air routines
 remain `source_mapped`. CP329 adds no support, conformance, capability, status,
 count, readiness, evidence-case, numerical conformance, or Roadmap promotion.
+
+## CP330 Cooling Positive-Supply Guard in the Heat-Balance Loop
+
+CP330 executes immediately after CP329 and before the unchanged bounded
+PurchasedAir numerical calculation. It maps only
+`PurchasedAirManager.cc` line 2183 as exactly three lexical sites: retained
+supply-flow read, strict `> +0.0` comparison, and conditional positive-body
+entry. The zero literal is not a separate site, and no C++ relational-operand
+evaluation order is claimed.
+
+UnitOff and non-cooling paths skip the sites; every active Cooling path that
+completed CP329 executes the read and comparison once and the conditional
+entry site only when true. Thus dynamic site executions equal
+`2 * active + positive_body_entries`. The pure comparison preserves raw IEEE
+semantics: positive finite values and positive infinity enter, while both
+signed zeros, negative values, negative infinity, and NaN do not. The exact
+direct CP327/CP328 lineage already maps ordered values at or below the
+very-small threshold to positive zero, but preserves an unordered NaN.
+
+Validators publish direct-only
+`purchased_air_calc_cooling_supply_mass_flow_positive_guard_lifecycle`
+evidence between CP329 and the numerical DTO. CP330 reads only CP329's retained
+supply result and does not consume, reconcile with, feed, or replace that DTO.
+It changes no Zone or heat-balance equation.
+
+CP330's completed and pending predicates require exact CP329 transition and
+UnitOff/non-cooling/active history parity and recursively retain CP329's
+runtime-aware CP328-chain proof. Coordinated CP329/CP330 corruption and
+route-specific checked-arithmetic overflow are rejected before transition or
+private-witness mutation, leaving heat-balance state unchanged.
+
+Line 2184 is commentary and line 2185 is the first excluded lexical executable.
+The true body at 2185-2337, false `else` at 2339-2345 with dynamic next
+executable 2340, outer Heat/DeadBand sibling at 2347-2348, sibling mixed-air
+call at 2454-2461, and sibling guard at 2465 remain excluded. `OutdoorAir`,
+`Economizer`, `HeatRecovery`, `EMS`, and Autosizing remain forbidden. Both
+parents remain `scaffold`/`none`; both Calc routines remain `source_mapped`.
+CP330 adds no support, conformance, capability, status, count, readiness,
+evidence-case, numerical conformance, or Roadmap promotion.
 
 ## Data Structure Map
 

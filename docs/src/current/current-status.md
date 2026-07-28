@@ -917,6 +917,16 @@ reads, output-reference aliases, or the active OA/heat-recovery,
 saturation-cache, diagnostic, partial-failure, replay, and concurrency
 behavior documented by CP285.
 
+CP329 release admission proves more than the supplied same-call snapshot. Its
+runtime-aware completed helper recursively validates the completed CP328
+direct state, CP328's private latest witness, and the retained upstream prefix.
+Both completed and pending CP329 validation require historical UnitOff,
+non-cooling, and active-route counts to match the retained CP328 history.
+Before any transition or witness write, a route-aware checked-arithmetic
+preflight proves that every counter increment and caller/child site product
+fits. Any chain, history, witness, or overflow corruption therefore fails
+closed with runtime state unchanged.
+
 The binder places
 `advance_direct_no_oa_calc_cooling_mixed_air_call` immediately after CP328
 and before the unchanged numerical calculation. Direct-only lifecycle
@@ -931,6 +941,52 @@ forbidden. Both parent algorithms remain `scaffold`/`none`;
 `routine.calc_purch_air_loads` and `routine.calc_purch_air_mixed_air` remain
 `source_mapped`, and counts, readiness, support, evidence cases, numerical
 conformance, and Roadmap state remain unchanged.
+
+CP330 maps only the complete Cooling positive-supply guard at EnergyPlus 26.1
+`PurchasedAirManager.cc` executable line 2183. Its exactly three lexical sites
+read retained `SupplyMassFlowRate`, apply the strict source comparison
+`> +0.0`, and record conditional positive-body entry. The `0.0` literal is
+part of the comparison rather than a fourth site, and the operands are
+side-effect-free, so CP330 makes no C++ relational-operand evaluation-order
+claim.
+
+UnitOff and non-cooling predecessors skip all three sites. Every active Cooling
+predecessor that completed CP329 executes the read and comparison once, and
+executes the third site only when true. Dynamic source-site executions are
+therefore `2 * active + positive_body_entries`. Raw IEEE comparison semantics
+are retained without a finite check, normalization, or clamp:
+positive finite values and positive infinity enter the body; positive zero,
+negative zero, negative finite values, negative infinity, and NaN do not.
+On the exact direct lineage, CP327/CP328 have already canonicalized values
+`<= HVAC::VerySmallMassFlow` to positive zero, while an unordered NaN may
+remain bit-exact on the prior guard-false route.
+
+`advance_direct_no_oa_calc_cooling_supply_mass_flow_positive_guard` consumes
+only the completed same-call CP329 direct no-OA predecessor and its retained
+supply result. The binder places CP330 immediately after CP329 and before the
+unchanged numerical calculation; direct-only lifecycle evidence is published
+as `purchased_air_calc_cooling_supply_mass_flow_positive_guard_lifecycle`.
+CP330 neither consumes nor reconciles with the numerical DTO and does not feed
+or replace it.
+
+CP330 completed and pending validation also require exact parity with CP329's
+retained UnitOff, non-cooling, and active route history. Its runtime-aware
+completed path recursively invokes CP329's completed helper, so a coordinated
+rewrite of local CP329 and CP330 counters or witnesses cannot bypass the
+retained CP328 chain. History corruption and checked-arithmetic overflow are
+rejected before the CP330 transition or private-witness commit, leaving runtime
+state unchanged.
+
+Line 2184 is a comment. Line 2185 is the first excluded lexical executable and
+the first executable in the true body; the body at lines 2185-2337 and the
+zero-flow `else` at lines 2339-2345 remain open. A false guard dynamically
+continues at line 2340. The outer Heat/DeadBand sibling beginning at lines
+2347-2348, its separate mixed-air call at lines 2454-2461, and its sibling
+guard at line 2465 are also excluded. `OutdoorAir`, `Economizer`,
+`HeatRecovery`, `EMS`, and Autosizing remain forbidden. Both parent algorithms
+remain `scaffold`/`none`; both Calc routines remain `source_mapped`, and
+counts, readiness, support, evidence cases, numerical conformance, capability,
+and Roadmap state remain unchanged.
 
 ## Current Launcher State
 

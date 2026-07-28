@@ -5,6 +5,7 @@ $cp329Module = "crates\ep_runtime\src\ideal_loads\calc\cooling_mixed_air_call.rs
 $cp329State = "crates\ep_runtime\src\ideal_loads\calc\cooling_mixed_air_call\state.rs"
 $cp329Transition = "crates\ep_runtime\src\ideal_loads\calc\cooling_mixed_air_call\transition.rs"
 $cp329Release = "crates\ep_runtime\src\ideal_loads\calc\cooling_mixed_air_call\release.rs"
+$cp329RuntimeValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_mixed_air_call\release\runtime_validation.rs"
 $cp329ReleaseTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_mixed_air_call\release_tests.rs"
 $cp329Tests = "crates\ep_runtime\src\ideal_loads\calc\cooling_mixed_air_call\tests.rs"
 $cp329Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
@@ -30,6 +31,7 @@ foreach ($cp329RequiredFile in @(
         $cp329State,
         $cp329Transition,
         $cp329Release,
+        $cp329RuntimeValidation,
         $cp329ReleaseTests,
         $cp329Tests,
         $cp329Binding,
@@ -52,6 +54,8 @@ foreach ($cp329RequiredFile in @(
     )) {
     Assert-FileExists -Path $cp329RequiredFile -Description "CP329 Cooling mixed-air-call structure"
 }
+Assert-LineLimit -Path $cp329Release -Limit 800 -Description "CP329 release root module"
+Assert-LineLimit -Path $cp329RuntimeValidation -Limit 800 -Description "CP329 runtime validation module"
 
 # The parent statement has nine textual sites. The child inventory is the
 # exact source-shaped direct no-OA route, not the complete CP285 child.
@@ -157,6 +161,72 @@ Assert-Contains -Path $cp329Release -Pattern 'cooling_supply_mass_flow_very_smal
 Assert-Contains -Path $cp329Release -Pattern 'unit[\r\n\s.]+calc_cooling_supply_mass_flow_very_small_guard_body[\r\n\s.]+latest' -Description "CP329 retained CP328 latest snapshot"
 Assert-Contains -Path $cp329Release -Pattern 'cooling_mixed_air_call_predecessors_match_bit_exact\s*\(' -Description "CP329 bit-exact CP328 validation"
 Assert-Contains -Path $cp329Release -Pattern 'cooling_supply_mass_flow_very_small_guard_body_snapshot_is_exact_direct_release\s*\(' -Description "CP329 completed CP328 validation"
+Assert-Contains -Path $cp329Release -Pattern 'mod runtime_validation;' -Description "CP329 split runtime hardening module"
+Assert-Contains -Path $cp329RuntimeValidation -Pattern '(?s)pub\(in crate::ideal_loads::calc\) fn completed_direct_cooling_mixed_air_call_is_consistent\(\s*runtime: &PurchasedAirRuntimeState,\s*unit: &PurchasedAirUnitRuntimeState,\s*system: &IdealLoadsAirSystem,\s*snapshot: PurchasedAirCalcCoolingMixedAirCallSnapshot,\s*witness: Option<PurchasedAirCalcCoolingMixedAirCallSnapshot>' -Description "CP329 runtime-aware completed helper"
+Assert-Contains -Path $cp329RuntimeValidation -Pattern '(?s)completed_direct_cooling_supply_mass_flow_very_small_guard_body_is_consistent\(\s*runtime,\s*unit,\s*system,\s*predecessor,\s*runtime\.cooling_supply_mass_flow_very_small_guard_body_latest_witness\(system\.id\),\s*\)' -Description "CP329 recursive CP328 completed/private-witness proof"
+Assert-Contains -Path $cp329RuntimeValidation -Pattern 'completed_mixed_air_history_links_to_predecessor\(unit\)' -Description "CP329 completed predecessor-history parity"
+Assert-Contains -Path $cp329RuntimeValidation -Pattern '(?s)fn completed_mixed_air_history_links_to_predecessor\(.*?state\.transition_count == predecessor\.transition_count.*?state\.unit_off_skip_count == predecessor\.unit_off_skip_count.*?state\.non_cooling_skip_count == predecessor\.non_cooling_skip_count.*?state\.cooling_call_count == predecessor\.cooling_body_entry_count' -Description "CP329 exact completed route-history equality"
+Assert-Contains -Path $cp329RuntimeValidation -Pattern '(?s)fn pending_mixed_air_history_links_to_predecessor\(.*?unit_off_skip_count.*?checked_add\(usize::from\(predecessor\.unit_off_skipped\)\).*?non_cooling_skip_count.*?checked_add\(usize::from\(predecessor\.non_cooling_skipped\)\).*?cooling_call_count.*?checked_add\(usize::from\(predecessor\.cooling_body_entered\)\)' -Description "CP329 pending route-history parity with current CP328 route"
+Assert-Contains -Path $cp329RuntimeValidation -Pattern 'pub\(in crate::ideal_loads::calc\) fn next_mixed_air_transition_fits\s*\(' -Description "CP329 route-aware next-transition preflight"
+foreach ($cp329PreflightCounter in @(
+        "transition_count",
+        "unit_off_skip_count",
+        "non_cooling_skip_count",
+        "cooling_call_count",
+        "caller_source_site_execution_count",
+        "child_source_site_execution_count",
+        "state_reference_bind_count",
+        "purchased_air_number_read_count",
+        "outdoor_air_mass_flow_rate_read_count",
+        "supply_mass_flow_rate_read_count",
+        "mixed_air_output_reference_bind_count",
+        "operating_mode_read_count",
+        "mixed_air_child_call_count",
+        "no_outdoor_air_fallback_count",
+        "recirculation_enthalpy_projection_count",
+        "mixed_air_output_assignment_count",
+        "heat_recovery_output_positive_zero_assignment_count"
+    )) {
+    Assert-Contains -Path $cp329RuntimeValidation -Pattern ($cp329PreflightCounter + '[\r\n\s.]+checked_add\(') -Description "CP329 checked preflight counter '$cp329PreflightCounter'"
+}
+$cp329ReleaseText = Read-RepoText -Path $cp329Release
+$cp329ReleaseWrapper = [regex]::Match(
+    $cp329ReleaseText,
+    '(?s)pub fn advance_direct_no_oa_calc_cooling_mixed_air_call\(.*?(?=\r?\nfn mixed_air_call_links_to_predecessor\()'
+)
+if (-not $cp329ReleaseWrapper.Success) {
+    throw "CP329 exact release wrapper must remain structurally bounded"
+}
+$cp329WrapperText = $cp329ReleaseWrapper.Value
+$cp329ActiveInputIndex = $cp329WrapperText.IndexOf("let active_input =")
+$cp329MutationIndex = $cp329WrapperText.IndexOf("let snapshot =")
+if ($cp329ActiveInputIndex -lt 0 -or $cp329MutationIndex -le $cp329ActiveInputIndex) {
+    throw "CP329 active-input construction and mutation boundary must remain ordered"
+}
+foreach ($cp329ValidationCall in @(
+        "pending_mixed_air_history_links_to_predecessor(",
+        "state_is_consistent(",
+        "next_mixed_air_transition_fits(",
+        "completed_mixed_air_predecessor_is_consistent("
+    )) {
+    $cp329ValidationIndex = $cp329WrapperText.IndexOf($cp329ValidationCall)
+    if ($cp329ValidationIndex -lt 0 -or $cp329ValidationIndex -ge $cp329ActiveInputIndex) {
+        throw "CP329 validation '$cp329ValidationCall' must complete before active-input construction and mutation"
+    }
+}
+$cp329NextFitIndex = $cp329WrapperText.IndexOf("next_mixed_air_transition_fits(")
+$cp329RecursivePredecessorIndex =
+    $cp329WrapperText.IndexOf("completed_mixed_air_predecessor_is_consistent(")
+if ($cp329RecursivePredecessorIndex -le $cp329NextFitIndex) {
+    throw "CP329 checked-overflow preflight must precede recursive predecessor validation in the release short-circuit"
+}
+Assert-PatternsInOrder -Path $cp329Release -Patterns @(
+    'let active_input = if predecessor_cp328\.cooling_body_entered',
+    'let snapshot = \{',
+    '\.get_mut\(&selected\)',
+    'advance_cooling_mixed_air_call_state\(',
+    'set_cooling_mixed_air_call_latest_witness\('
+) -Description "CP329 validated active-input, transition, and witness mutation order"
 Assert-Contains -Path $cp329Release -Pattern 'minimum_oa_links_to_predecessor\s*\(' -Description "CP329 retained same-call no-OA lineage"
 Assert-Contains -Path $cp329Release -Pattern 'option_is_positive_zero\(minimum_oa\.working_outdoor_air_mass_flow_rate_kg_per_s\)' -Description "CP329 retained OA positive zero"
 Assert-Contains -Path $cp329Release -Pattern 'minimum_oa\.psychrometric_call_count == 0' -Description "CP329 no-OA prefix psychrometric firewall"
@@ -186,6 +256,11 @@ Assert-Contains -Path $cp329Release -Pattern 'recirculation_enthalpy\.is_finite\
 Assert-Contains -Path $cp329Release -Pattern '(?s)recirculation_enthalpy\.to_bits\(\)\s*== moist_air_enthalpy_j_per_kg\(recirculation_temperature, recirculation_humidity\)[\r\n\s.]+to_bits\(\)' -Description "CP329 exact snapshot coherent enthalpy"
 Assert-Contains -Path $cp329ReleaseTests -Pattern 'active_nonfinite_recirculation_inputs_fail_before_any_cp329_mutation' -Description "CP329 nonfinite transactional regression"
 Assert-Contains -Path $cp329ReleaseTests -Pattern 'assert_eq!\(case_runtime, before\);' -Description "CP329 nonfinite no-mutation assertion"
+Assert-Contains -Path $cp329ReleaseTests -Pattern 'public_cp329_completed_and_pending_history_redistribution_is_rejected_without_mutation' -Description "CP329 completed/pending retained-route redistribution regression"
+Assert-Contains -Path $cp329ReleaseTests -Pattern '(?s)assert!\(\s*!super::release::completed_direct_cooling_mixed_air_call_is_consistent\(' -Description "CP329 completed retained-history predicate regression"
+Assert-Contains -Path $cp329ReleaseTests -Pattern 'active_cp329_child_site_increment_overflow_is_rejected_without_mutation' -Description "CP329 route-aware overflow transaction regression"
+Assert-Contains -Path $cp329ReleaseTests -Pattern '(?s)assert!\(\s*!super::release::next_mixed_air_transition_fits_for_test\(' -Description "CP329 direct next-transition overflow predicate regression"
+Assert-Contains -Path $cp329ReleaseTests -Pattern 'assert_eq!\(runtime, before\);' -Description "CP329 retained-history/overflow no-mutation assertions"
 Assert-Contains -Path $cp329Tests -Pattern 'release_predicate_rejects_nonfinite_or_incoherent_recirculation_projection' -Description "CP329 finite/coherent snapshot regression"
 Assert-NotContains -Path $cp329Release -Pattern '(?s)pub fn advance_direct_no_oa_calc_cooling_mixed_air_call\([^)]*(?:outdoor_air_mass_flow_rate|supply_mass_flow_rate|recirculation_enthalpy)_.*:' -Description "duplicate caller scalar in CP329 release"
 Assert-NotContains -Path $cp329Release -Pattern 'mixed_air_state|complete_direct_zone_purchased_air_coupling|latest_numerical|numerical_supply_mass_flow|final_supply_mass_flow|TimeHtRecActive|time_ht_rec_active' -Description "broader child, numerical DTO, or heat-recovery-time mutation in CP329 release"
@@ -197,17 +272,19 @@ Assert-Contains -Path $cp329InitWitnesses -Pattern 'pub\(in crate::ideal_loads\)
 Assert-Contains -Path $cp329InitWitnesses -Pattern 'pub\(in crate::ideal_loads\) fn set_cooling_mixed_air_call_latest_witness\s*\(' -Description "runtime-root CP329 witness setter"
 Assert-Contains -Path $cp329InitState -Pattern 'pub calc_cooling_mixed_air_call:\s*PurchasedAirCalcCoolingMixedAirCallRuntimeState' -Description "per-unit CP329 persistent state"
 
-# The scheduled binding is the only CP328 -> CP329 -> numerical placement.
+# The scheduled binding is the only CP328 -> CP329 -> CP330 -> numerical placement.
 $cp329BindingText = Read-RepoText -Path $cp329Binding
 $cp328BindingIndexForCp329 = $cp329BindingText.IndexOf("let calculation_cooling_supply_mass_flow_very_small_guard_body =")
 $cp329BindingIndex = $cp329BindingText.IndexOf("let calculation_cooling_mixed_air_call =")
+$cp330BindingIndexForCp329 = $cp329BindingText.IndexOf("let calculation_cooling_supply_mass_flow_positive_guard =")
 $numericalBindingIndexForCp329 = $cp329BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp328BindingIndexForCp329 -lt 0 -or
     $cp329BindingIndex -le $cp328BindingIndexForCp329 -or
-    $numericalBindingIndexForCp329 -le $cp329BindingIndex
+    $cp330BindingIndexForCp329 -le $cp329BindingIndex -or
+    $numericalBindingIndexForCp329 -le $cp330BindingIndexForCp329
 ) {
-    throw "Binding must retain exact CP328 -> CP329 -> numerical Calc order"
+    throw "Binding must retain exact CP328 -> CP329 -> CP330 -> numerical Calc order"
 }
 Assert-Contains -Path $cp329Binding -Pattern '(?s)let calculation_cooling_mixed_air_call =\s*advance_direct_no_oa_calc_cooling_mixed_air_call\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_supply_mass_flow_very_small_guard_body,\s*&\*input\.zone_state,\s*\)' -Description "binding exact CP328-to-CP329 wrapper call"
 Assert-Contains -Path $cp329Binding -Pattern 'CalculationCoolingMixedAirCall\(PurchasedAirCalcCoolingMixedAirCallError\)' -Description "CP329 scheduled binding error boundary"
@@ -228,16 +305,37 @@ if (-not $cp329BindingCall.Success) {
     throw "Binding must retain the complete CP329 exact release call"
 }
 $cp329BindingCallEnd = $cp329BindingCall.Index + $cp329BindingCall.Length
-if ($numericalBindingIndexForCp329 -lt $cp329BindingCallEnd) {
-    throw "CP329 exact release call must complete before numerical Calc"
-}
-$postCp329BeforeNumerical = $cp329BindingText.Substring(
-    $cp329BindingCallEnd,
-    $numericalBindingIndexForCp329 - $cp329BindingCallEnd
+$cp330BindingCallForCp329 = [regex]::Match(
+    $cp329BindingText,
+    '(?s)let calculation_cooling_supply_mass_flow_positive_guard =\s*advance_positive_guard\([^;]+?\)\?;'
 )
-$postCp329BeforeNumericalCode = [regex]::Replace($postCp329BeforeNumerical, '(?m)//.*$', '')
-if ($postCp329BeforeNumericalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No intermediary helper call may execute after CP329 and before numerical Calc"
+if (-not $cp330BindingCallForCp329.Success) {
+    throw "Binding must retain the complete CP330 exact release call after CP329"
+}
+$cp330BindingCallEndForCp329 =
+    $cp330BindingCallForCp329.Index + $cp330BindingCallForCp329.Length
+if (
+    $cp330BindingIndexForCp329 -lt $cp329BindingCallEnd -or
+    $numericalBindingIndexForCp329 -lt $cp330BindingCallEndForCp329
+) {
+    throw "CP329 and CP330 exact release calls must complete in source order before numerical Calc"
+}
+$postCp329BeforeCp330 = $cp329BindingText.Substring(
+    $cp329BindingCallEnd,
+    $cp330BindingIndexForCp329 - $cp329BindingCallEnd
+)
+$postCp329BeforeCp330Code = [regex]::Replace($postCp329BeforeCp330, '(?m)//.*$', '')
+if ($postCp329BeforeCp330Code -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No intermediary helper call may execute after CP329 and before CP330"
+}
+$postCp330BeforeNumericalForCp329 = $cp329BindingText.Substring(
+    $cp330BindingCallEndForCp329,
+    $numericalBindingIndexForCp329 - $cp330BindingCallEndForCp329
+)
+$postCp330BeforeNumericalCodeForCp329 =
+    [regex]::Replace($postCp330BeforeNumericalForCp329, '(?m)//.*$', '')
+if ($postCp330BeforeNumericalCodeForCp329 -match '(?i)(?:ems|psychrometric|diagnostic|node_service)\s*\(') {
+    throw "No post-CP330 live source service may execute before numerical Calc"
 }
 
 # Coupled validation reconstructs the projection from CP328 and the existing
@@ -428,6 +526,12 @@ foreach ($cp329Documentation in $cp329DocumentationSections) {
             '(?i)stored(?:-| )H|stored enthalpy|Node\.Enthalpy',
             '(?is)(?:no|the)\s+OA(?:-|\s+)node.{0,250}psychrometric|does\s+not\s+dereference.{0,120}psychrometric',
             'purchased_air_calc_cooling_mixed_air_call_lifecycle',
+            '(?i)runtime-aware',
+            '(?is)completed.{0,160}pending|pending.{0,160}completed',
+            '(?is)CP328.{0,160}private\s+(?:latest\s+)?witness|private\s+witness.{0,160}CP328',
+            '(?is)UnitOff.{0,100}non-cooling.{0,100}(?:active|route)',
+            '(?is)route-aware.{0,80}checked-arithmetic',
+            '(?is)(?:fail|rejected|returns an error).{0,180}(?:unchanged|before.{0,100}mutat|without.{0,100}(?:changing|mutat))',
             '(?i)line-?2183|line 2183',
             '2454-2461',
             '(?is)`OutdoorAir`.{0,100}`Economizer`.{0,100}`HeatRecovery`.{0,100}`EMS`.{0,100}Autosizing.{0,30}remain\s+forbidden',
@@ -446,13 +550,15 @@ foreach ($cp329Documentation in $cp329DocumentationSections) {
 $cp329MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp328DotSourceIndexForCp329 = $cp329MainAuditText.IndexOf('ideal-loads-structure-audit\cp328-cooling-supply-mass-flow-very-small-guard-body.ps1')
 $cp329DotSourceIndex = $cp329MainAuditText.IndexOf('ideal-loads-structure-audit\cp329-cooling-mixed-air-call.ps1')
+$cp330DotSourceIndexForCp329 = $cp329MainAuditText.IndexOf('ideal-loads-structure-audit\cp330-cooling-supply-mass-flow-positive-guard.ps1')
 $cp329AuditCompletionIndex = $cp329MainAuditText.IndexOf('Write-Host "IdealLoads structure audit complete."')
 if (
     $cp328DotSourceIndexForCp329 -lt 0 -or
     $cp329DotSourceIndex -le $cp328DotSourceIndexForCp329 -or
-    $cp329AuditCompletionIndex -le $cp329DotSourceIndex
+    $cp330DotSourceIndexForCp329 -le $cp329DotSourceIndex -or
+    $cp329AuditCompletionIndex -le $cp330DotSourceIndexForCp329
 ) {
-    throw "Main IdealLoads audit must dot-source CP329 after CP328 and before completion"
+    throw "Main IdealLoads audit must dot-source CP329 after CP328 and before CP330/completion"
 }
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp329-cooling-mixed-air-call\.ps1"' -Description "CP329 audit script inventory entry"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp329-cooling-mixed-air-call\.ps1::dot_sources' -Description "CP329 main-audit callee evidence"

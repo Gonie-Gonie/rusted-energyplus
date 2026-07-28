@@ -37,6 +37,8 @@ use crate::{
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_LIMIT_GUARD_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_MAXIMUM_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_MAXIMUM_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_POSITIVE_GUARD_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_POSITIVE_GUARD_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_VERY_SMALL_GUARD_BODY_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_VERY_SMALL_GUARD_BODY_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_VERY_SMALL_GUARD_FIRST_EXCLUDED_SOURCE,
@@ -251,6 +253,26 @@ fn cooling_mixed_air_call_partition_overflow_fails_closed() {
             expected: 1,
             actual: usize::MAX,
         }
+    ));
+}
+
+#[test]
+fn cooling_supply_mass_flow_positive_guard_partition_overflow_fails_closed() {
+    let error = super::cooling_supply_mass_flow_positive_guard_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::
+            CalcCoolingSupplyMassFlowPositiveGuardLifecycleInvariant {
+                field: "test_partition_overflow",
+                expected: 1,
+                actual: usize::MAX,
+            }
     ));
 }
 
@@ -2600,6 +2622,63 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
             "{limit:?}"
         );
 
+        let positive_guard = simulation
+            .summary
+            .calc_cooling_supply_mass_flow_positive_guard_lifecycle;
+        assert_eq!(
+            positive_guard.source,
+            PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_POSITIVE_GUARD_SOURCE
+        );
+        assert_eq!(
+            positive_guard.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_POSITIVE_GUARD_FIRST_EXCLUDED_SOURCE
+        );
+        assert_eq!(positive_guard.state.transition_count, 1, "{limit:?}");
+        assert_eq!(
+            positive_guard.state.cooling_body_entry_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            positive_guard.state.source_site_execution_count, 3,
+            "{limit:?}"
+        );
+        assert_eq!(
+            positive_guard
+                .state
+                .positive_supply_mass_flow_body_entry_count,
+            1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            positive_guard.state.active_guard_false_fallthrough_count, 0,
+            "{limit:?}"
+        );
+        let latest_positive_guard = positive_guard.state.latest.expect("latest CP330 snapshot");
+        assert!(latest_positive_guard.predecessor_cooling_call_executed);
+        assert!(latest_positive_guard.predecessor_no_outdoor_air_fallback_entered);
+        assert_eq!(
+            latest_positive_guard
+                .supply_mass_flow_rate_kg_per_s
+                .map(f64::to_bits),
+            latest_mixed_air_call
+                .supply_mass_flow_rate_kg_per_s
+                .map(f64::to_bits),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_positive_guard.supply_mass_flow_rate_strictly_positive,
+            Some(true),
+            "{limit:?}"
+        );
+        assert!(
+            latest_positive_guard.positive_supply_mass_flow_body_entered,
+            "{limit:?}"
+        );
+        assert!(
+            !latest_positive_guard.active_guard_false_fallthrough,
+            "{limit:?}"
+        );
+
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation
                 .results
@@ -2663,6 +2742,38 @@ fn cooling_mixed_air_call_executes_for_active_positive_zero_supply_flow() {
     assert!(latest.mixed_air_temperature_assigned);
     assert!(latest.mixed_air_humidity_ratio_assigned);
     assert!(latest.mixed_air_enthalpy_projection_assigned);
+
+    let positive_guard = simulation
+        .summary
+        .calc_cooling_supply_mass_flow_positive_guard_lifecycle;
+    assert_eq!(positive_guard.state.transition_count, 1);
+    assert_eq!(positive_guard.state.cooling_body_entry_count, 1);
+    assert_eq!(positive_guard.state.source_site_execution_count, 2);
+    assert_eq!(
+        positive_guard
+            .state
+            .positive_supply_mass_flow_body_entry_count,
+        0
+    );
+    assert_eq!(positive_guard.state.active_guard_false_fallthrough_count, 1);
+    let latest_guard = positive_guard
+        .state
+        .latest
+        .expect("zero-flow CP330 snapshot");
+    assert!(latest_guard.predecessor_cooling_call_executed);
+    assert!(latest_guard.predecessor_no_outdoor_air_fallback_entered);
+    assert_eq!(
+        latest_guard
+            .supply_mass_flow_rate_kg_per_s
+            .map(f64::to_bits),
+        Some(0.0_f64.to_bits())
+    );
+    assert_eq!(
+        latest_guard.supply_mass_flow_rate_strictly_positive,
+        Some(false)
+    );
+    assert!(!latest_guard.positive_supply_mass_flow_body_entered);
+    assert!(latest_guard.active_guard_false_fallthrough);
 }
 
 #[test]

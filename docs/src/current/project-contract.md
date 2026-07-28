@@ -16840,6 +16840,15 @@ no-OA `OAMassFlowRate=+0.0`, selected typed system identity, and CP312 Cooling
 mode. The separate Heat/DeadBand call at lines 2454-2461 is not an alternate
 CP329 route.
 
+This is a full retained-chain proof, not merely equality with a caller-owned
+CP328 value. The runtime-aware CP329 completed helper recursively invokes the
+completed-direct CP328 helper with the retained CP328 latest snapshot and
+private witness, thereby preserving its upstream private-witness chain. It
+then requires CP329's transition, UnitOff, non-cooling, and active-call
+history to equal the completed CP328 route history. Pending CP329 validation
+applies the same historical parity to all prior calls before the next
+transition.
+
 On the admitted child path, the source aliases `PurchAir`, retains its OA and
 recirculation node numbers, initializes dead local recirculation flow, and
 snapshots recirculation temperature, humidity ratio, and stored enthalpy.
@@ -16884,6 +16893,15 @@ and the heat-recovery-time non-write. Direct-only JSON publishes
 `purchased_air_calc_cooling_mixed_air_call_lifecycle`; non-direct or
 disconnected evidence is rejected.
 
+The release wrapper also performs a route-aware checked-arithmetic preflight
+before mutation. The incoming UnitOff, non-cooling, or active route must fit
+its transition and route counters; an active route must additionally fit all
+nine caller sites, all bounded child sites, individual reads/calls, three-way
+reference and output-assignment counts, and two recovery-zero writes. Any
+counter overflow, redistributed history, forged latest/private witness, or
+broken recursive predecessor link returns an error before either CP329 state
+or its private witness changes.
+
 CP329 is lifecycle evidence only. It neither consumes nor reconciles with the
 later numerical DTO and does not feed or replace it. Lines 2179-2182 contain
 only whitespace and comments; the first excluded executable after normal call
@@ -16893,6 +16911,80 @@ behavior remain excluded. `OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`,
 and Autosizing remain forbidden. Both parents remain `scaffold`/`none`;
 `routine.calc_purch_air_loads` and `routine.calc_purch_air_mixed_air` remain
 `source_mapped`. CP329 changes no algorithm/routine count, readiness, support
+level, run state, required or forbidden feature, output claim, evidence case,
+numerical conformance, capability, status, or Roadmap item.
+
+## CP330 Source-Ordered Cooling Positive-Supply Guard
+
+CP330 supersedes only CP329's exclusion of the complete Cooling
+positive-supply guard at EnergyPlus 26.1 `PurchasedAirManager.cc` executable
+line 2183. The line has exactly three lexical sites:
+
+1. read retained `SupplyMassFlowRate`;
+2. compare it strictly greater than source positive zero; and
+3. conditionally enter the positive-supply body.
+
+The source `0.0` literal belongs to the comparison and is not an additional
+site. Both relational operands are side-effect-free, so this inventory makes
+no claim about C++ built-in relational-operand evaluation order. The pure
+transition uses the raw binary64 `supply_mass_flow_rate > +0.0` result without a
+finite check, total ordering, normalization, minimum, maximum, or clamp.
+Positive finite values and positive infinity enter the body. Positive zero,
+negative zero, negative finite values, negative infinity, and every NaN
+payload take the false route.
+
+UnitOff and non-cooling predecessors skip all three sites. Every active Cooling
+predecessor that completed CP329 evaluates the guard exactly once. The exact
+direct path reaches CP330 only after CP327/CP328 have converted any ordered
+value `<= HVAC::VerySmallMassFlow` to exact positive zero; CP327's unordered
+NaN route remains unmodified through CP328 and CP329. CP330 nevertheless
+characterizes the source comparator over all raw IEEE classes rather than
+claiming that every class is admitted by the exact direct wrapper.
+
+`calc/cooling_supply_mass_flow_positive_guard.rs` owns
+`PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardSnapshot`,
+`PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardRuntimeState`,
+`PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardLifecycleSummary`, and the
+pure transition and release validation. Public
+`advance_direct_no_oa_calc_cooling_supply_mass_flow_positive_guard` validates
+the completed same-call CP329 latest snapshot and private witness before
+reading only its bit-exact resulting supply flow.
+`purchased_air_calc_cooling_supply_mass_flow_positive_guard_lifecycle_summary`
+exposes the selected-unit lifecycle.
+
+The CP330 completed helper is runtime-aware and recursively calls CP329's
+completed helper, including CP329-to-CP328 latest/private-witness and route-
+history validation. CP330's own completed and pending predicates require its
+transition, UnitOff, non-cooling, and active count history to match CP329
+exactly before accepting a current or next snapshot. Consequently, even a
+coordinated CP329/CP330 history rewrite cannot detach the pair from CP328.
+Route-specific checked increments are preflighted before transition and
+private-witness mutation; corruption or overflow fails transactionally with
+the runtime unchanged.
+
+The binder executes CP330 immediately after CP329 and before the unchanged
+numerical DTO. Per-step, final, coupled-runtime, and pipeline validators
+reconcile identity and ordinal; UnitOff/non-cooling/active partitions; the
+three-site lexical inventory; one read and comparison per active CP329
+predecessor; conditional body-entry execution; dynamic site count
+`2 * active + positive_body_entries`; exact retained-flow, comparison, and
+body-entry consistency; and raw IEEE result bits. Direct-only JSON publishes
+`purchased_air_calc_cooling_supply_mass_flow_positive_guard_lifecycle`;
+non-direct or disconnected evidence is rejected. CP330 does not consume or
+reconcile with the numerical DTO and does not feed or replace it.
+
+Line 2184 is non-executable commentary. Line 2185 is both the first excluded
+lexical executable and the first executable of the positive-supply body.
+CP330 records body entry but does not execute the psychrometric, capacity,
+humidity-control, or supply-state work at lines 2185-2337. The zero-flow
+`else` at lines 2339-2345 is excluded; a false guard dynamically reaches its
+first executable at line 2340. The outer Heat/DeadBand sibling begins at line
+2347 with its selector at line 2348, its separate mixed-air call spans lines
+2454-2461, and its sibling positive-supply guard is line 2465; all remain
+excluded. `OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, and Autosizing
+remain forbidden. Both parents remain `scaffold`/`none`;
+`routine.calc_purch_air_loads` and `routine.calc_purch_air_mixed_air` remain
+`source_mapped`. CP330 changes no algorithm/routine count, readiness, support
 level, run state, required or forbidden feature, output claim, evidence case,
 numerical conformance, capability, status, or Roadmap item.
 

@@ -10,6 +10,7 @@ mod state;
 mod tests;
 mod transition;
 
+pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_supply_mass_flow_very_small_guard_body_is_consistent;
 pub(in crate::ideal_loads) use release::cooling_supply_mass_flow_very_small_guard_body_snapshot_is_exact_direct_release;
 pub use release::{
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodyError,

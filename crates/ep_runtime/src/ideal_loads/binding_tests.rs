@@ -58,6 +58,8 @@ mod cooling_supply_mass_flow_limit_body_tests;
 mod cooling_supply_mass_flow_limit_guard_tests;
 #[path = "binding/cooling_supply_mass_flow_maximum_tests.rs"]
 mod cooling_supply_mass_flow_maximum_tests;
+#[path = "binding/cooling_supply_mass_flow_positive_guard_tests.rs"]
+mod cooling_supply_mass_flow_positive_guard_tests;
 #[path = "binding/cooling_supply_mass_flow_very_small_guard_body_tests.rs"]
 mod cooling_supply_mass_flow_very_small_guard_body_tests;
 #[path = "binding/cooling_supply_mass_flow_very_small_guard_tests.rs"]
@@ -82,9 +84,8 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
     assert_eq!(binding.overall_availability_schedule, Some(ScheduleId(3)));
     assert_eq!(binding.equipment_list, ZoneEquipmentListId(0));
     assert_eq!(binding.ideal_loads_air_system, IdealLoadsAirSystemId(0));
-    assert_eq!(binding.supply_node, NodeId(0));
+    assert_eq!([binding.supply_node.0, binding.return_node.0], [0, 2]);
     assert_eq!(binding.zone_air_node, NodeId(1));
-    assert_eq!(binding.return_node, NodeId(2));
     assert_eq!(binding.nominal_system_timestep_seconds, 600.0);
 }
 

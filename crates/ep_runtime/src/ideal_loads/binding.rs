@@ -46,6 +46,8 @@ use super::{
     PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumError,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardError as CoolingPositiveGuardError,
+    PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardSnapshot as CoolingPositiveGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodyError,
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardError,
@@ -78,6 +80,10 @@ use super::{
     init_purchased_air_runtime, predict_direct_zone_demand_for_purchased_air,
     select_purchased_air_branch,
 };
+
+mod cooling_supply_mass_flow_positive_guard;
+
+use cooling_supply_mass_flow_positive_guard::advance_positive_guard;
 
 /// One-to-one relation required by the bounded direct-Zone binding.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -662,6 +668,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     ),
     /// The bounded Cooling mixed-air call or no-OA child route rejected its release state.
     CalculationCoolingMixedAirCall(PurchasedAirCalcCoolingMixedAirCallError),
+    /// The bounded cooling positive supply-mass-flow guard rejected its release state.
+    CalculationCoolingSupplyMassFlowPositiveGuard(CoolingPositiveGuardError),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -781,6 +789,8 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
         PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
     /// Source-ordered Cooling mixed-air call and bounded no-OA child snapshot.
     pub calculation_cooling_mixed_air_call: PurchasedAirCalcCoolingMixedAirCallSnapshot,
+    /// Source-ordered cooling positive supply-mass-flow guard snapshot.
+    pub calculation_cooling_supply_mass_flow_positive_guard: CoolingPositiveGuardSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
@@ -1068,6 +1078,11 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         &*input.zone_state,
     )
     .map_err(DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingMixedAirCall)?;
+    let calculation_cooling_supply_mass_flow_positive_guard = advance_positive_guard(
+        input.purchased_air_runtime_state,
+        binding.system,
+        calculation_cooling_mixed_air_call,
+    )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1125,6 +1140,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_supply_mass_flow_very_small_guard,
         calculation_cooling_supply_mass_flow_very_small_guard_body,
         calculation_cooling_mixed_air_call,
+        calculation_cooling_supply_mass_flow_positive_guard,
         coupling,
     })
 }

@@ -8,7 +8,9 @@ use crate::ideal_loads::{
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot, moist_air_enthalpy_j_per_kg,
 };
 
-fn predecessor(route: Route) -> PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot {
+pub(in crate::ideal_loads::calc) fn predecessor(
+    route: Route,
+) -> PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot {
     let (unit_body_entered, unit_off, non_cooling, cooling, body, fallthrough, supply) = match route
     {
         Route::UnitOff => (false, true, false, false, false, false, None),
@@ -49,14 +51,16 @@ fn predecessor(route: Route) -> PurchasedAirCalcCoolingSupplyMassFlowVerySmallGu
 }
 
 #[derive(Clone, Copy)]
-enum Route {
+pub(in crate::ideal_loads::calc) enum Route {
     UnitOff,
     NonCooling,
     CoolingAssigned,
     CoolingFallthrough,
 }
 
-fn active_input(supply: f64) -> PurchasedAirCalcCoolingMixedAirCallActiveInput {
+pub(in crate::ideal_loads::calc) fn active_input(
+    supply: f64,
+) -> PurchasedAirCalcCoolingMixedAirCallActiveInput {
     let recirculation_temperature_c = 23.5;
     let recirculation_humidity_ratio = 0.008;
     PurchasedAirCalcCoolingMixedAirCallActiveInput {

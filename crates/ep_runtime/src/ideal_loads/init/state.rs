@@ -1,5 +1,6 @@
 //! Retained module and per-unit state for `InitPurchasedAir`.
 
+mod unit;
 mod witnesses;
 
 use std::collections::BTreeMap;
@@ -33,6 +34,8 @@ use super::super::{
     PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumRuntimeState,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardRuntimeState,
+    PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodyRuntimeState,
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardRuntimeState,
@@ -125,6 +128,8 @@ pub struct PurchasedAirRuntimeState {
     >,
     cooling_mixed_air_call_latest_witnesses:
         BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingMixedAirCallSnapshot>,
+    cooling_supply_mass_flow_positive_guard_latest_witnesses:
+        BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardSnapshot>,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -202,6 +207,9 @@ pub struct PurchasedAirUnitRuntimeState {
         PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodyRuntimeState,
     /// Persistent bounded Cooling mixed-air call and no-OA fallback state.
     pub calc_cooling_mixed_air_call: PurchasedAirCalcCoolingMixedAirCallRuntimeState,
+    /// Persistent bounded cooling positive supply-mass-flow guard state.
+    pub calc_cooling_supply_mass_flow_positive_guard:
+        PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -254,110 +262,4 @@ pub struct PurchasedAirUnitRuntimeState {
     pub heating_supply_temperature_warning_count: usize,
     /// Nonfatal OA/economizer flow-limit advisories emitted once.
     pub economizer_flow_limit_warning_count: usize,
-}
-
-impl PurchasedAirUnitRuntimeState {
-    pub(super) const fn new(
-        system: IdealLoadsAirSystemId,
-        planned_first_matching_equipment_list: Option<ZoneEquipmentListId>,
-    ) -> Self {
-        Self {
-            system,
-            one_time_latched: false,
-            topology_completed: false,
-            sizing_needed: true,
-            sized_limits: None,
-            sizing_outcome: None,
-            environment_initialization_needed: true,
-            controlled_zone: None,
-            equipment_list: None,
-            supply_node: None,
-            recirculation_node: None,
-            recirculation_source: None,
-            calc_entry: PurchasedAirCalcEntryRuntimeState::new(system),
-            calc_minimum_oa_prefix: PurchasedAirCalcMinimumOaPrefixRuntimeState::new(system),
-            calc_cooling_entry_gate: PurchasedAirCalcCoolingEntryGateRuntimeState::new(system),
-            calc_cooling_oa_max_flow_gate: PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState::new(
-                system,
-            ),
-            calc_cooling_oa_max_flow_body: PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState::new(
-                system,
-            ),
-            calc_cooling_economizer_guard: PurchasedAirCalcCoolingEconomizerGuardRuntimeState::new(
-                system,
-            ),
-            calc_cooling_economizer_condition:
-                PurchasedAirCalcCoolingEconomizerConditionRuntimeState::new(system),
-            calc_cooling_economizer_body: PurchasedAirCalcCoolingEconomizerBodyRuntimeState::new(
-                system,
-            ),
-            calc_cooling_sensible_flow: PurchasedAirCalcCoolingSensibleFlowRuntimeState::new(
-                system,
-            ),
-            calc_cooling_dehumidification_flow:
-                PurchasedAirCalcCoolingDehumidificationFlowRuntimeState::new(system),
-            calc_cooling_humidification_flow:
-                PurchasedAirCalcCoolingHumidificationFlowRuntimeState::new(system),
-            calc_cooling_capacity_zero_flow_reset:
-                PurchasedAirCalcCoolingCapacityZeroFlowResetRuntimeState::new(system),
-            calc_cooling_supply_mass_flow_maximum:
-                PurchasedAirCalcCoolingSupplyMassFlowMaximumRuntimeState::new(system),
-            calc_cooling_supply_mass_flow_ems_override_guard:
-                PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardRuntimeState::new(system),
-            calc_cooling_supply_mass_flow_ems_override_body:
-                PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyRuntimeState::new(system),
-            calc_cooling_supply_mass_flow_limit_guard:
-                PurchasedAirCalcCoolingSupplyMassFlowLimitGuardRuntimeState::new(system),
-            calc_cooling_supply_mass_flow_limit_body:
-                PurchasedAirCalcCoolingSupplyMassFlowLimitBodyRuntimeState::new(system),
-            calc_cooling_supply_mass_flow_very_small_guard:
-                PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardRuntimeState::new(system),
-            calc_cooling_supply_mass_flow_very_small_guard_body:
-                PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodyRuntimeState::new(system),
-            calc_cooling_mixed_air_call: PurchasedAirCalcCoolingMixedAirCallRuntimeState::new(
-                system,
-            ),
-            rejected_exhaust_node: None,
-            reported_first_return_node: None,
-            topology_plan: None,
-            topology_diagnostics: Vec::new(),
-            topology_failure: None,
-            planned_first_matching_equipment_list,
-            equipment_list_scan_ordinal: None,
-            first_matching_equipment_list: None,
-            equipment_list_membership_found: None,
-            maximum_heating_air_mass_flow_rate_kg_per_s: 0.0,
-            maximum_cooling_air_mass_flow_rate_kg_per_s: 0.0,
-            standard_air_density_kg_per_m3: None,
-            init_call_count: 0,
-            one_time_initialization_count: 0,
-            topology_completion_count: 0,
-            sizing_check_count: 0,
-            sizing_attempt_count: 0,
-            environment_initialization_count: 0,
-            environment_rearm_count: 0,
-            cooling_supply_temperature_error_index: 0,
-            heating_supply_temperature_error_index: 0,
-            cooling_supply_temperature_first_diagnostic_count: 0,
-            heating_supply_temperature_first_diagnostic_count: 0,
-            cooling_supply_temperature_warning_count: 0,
-            heating_supply_temperature_warning_count: 0,
-            economizer_flow_limit_warning_count: 0,
-        }
-    }
-
-    /// Source-shaped flag snapshot after the latest call.
-    #[must_use]
-    pub fn flags(&self, equipment_list_checked: bool) -> IdealLoadsInitFlags {
-        IdealLoadsInitFlags {
-            state_machine_used: true,
-            one_time_checked: self.one_time_latched,
-            topology_ready: self.topology_completed && self.recirculation_node.is_some(),
-            environment_initialized: self.environment_initialization_count > 0,
-            environment_initialization_needed: self.environment_initialization_needed,
-            sizing_checked: !self.sizing_needed,
-            equipment_list_checked,
-            return_plenum_inactive: true,
-        }
-    }
 }

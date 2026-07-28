@@ -6,17 +6,21 @@ use crate::ideal_loads::{IdealLoadsSensibleMode, PurchasedAirRuntimeState};
 
 mod release;
 #[cfg(test)]
-mod release_tests;
+pub(in crate::ideal_loads::calc) mod release_tests;
 mod state;
 #[cfg(test)]
-mod tests;
+pub(in crate::ideal_loads::calc) mod tests;
 mod transition;
 
-pub(in crate::ideal_loads) use release::cooling_mixed_air_call_snapshot_is_exact_direct_release;
+pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_mixed_air_call_is_consistent;
 pub use release::{
     PurchasedAirCalcCoolingMixedAirCallError,
     PurchasedAirCalcCoolingMixedAirCallRecirculationInput,
     advance_direct_no_oa_calc_cooling_mixed_air_call,
+};
+pub(in crate::ideal_loads) use release::{
+    cooling_mixed_air_call_snapshot_is_exact_direct_release,
+    cooling_mixed_air_call_snapshots_match_bit_exact,
 };
 pub(super) use state::PurchasedAirCalcCoolingMixedAirCallRetainedRoute;
 pub use state::PurchasedAirCalcCoolingMixedAirCallRuntimeState;

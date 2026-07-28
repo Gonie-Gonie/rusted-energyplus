@@ -8,9 +8,7 @@ use super::{
     PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_NO_OA_CHILD_SOURCE_ORDER,
     PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_SOURCE,
     PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_SOURCE_ORDER,
-    PurchasedAirCalcCoolingMixedAirCallActiveInput,
-    PurchasedAirCalcCoolingMixedAirCallRetainedRoute,
-    PurchasedAirCalcCoolingMixedAirCallRuntimeState, PurchasedAirCalcCoolingMixedAirCallSnapshot,
+    PurchasedAirCalcCoolingMixedAirCallActiveInput, PurchasedAirCalcCoolingMixedAirCallSnapshot,
     advance_cooling_mixed_air_call_state,
 };
 use crate::heat_balance::state::ZoneHeatBalanceState;
@@ -20,6 +18,22 @@ use crate::ideal_loads::{
     classify_no_oa_sensible_subset,
     cooling_supply_mass_flow_very_small_guard_body_snapshot_is_exact_direct_release,
     moist_air_enthalpy_j_per_kg,
+};
+
+mod runtime_validation;
+
+pub(in crate::ideal_loads::calc) use runtime_validation::completed_direct_cooling_mixed_air_call_is_consistent;
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use runtime_validation::counter_product_matches;
+use runtime_validation::{
+    call_order_is_pending, completed_mixed_air_predecessor_is_consistent,
+    next_mixed_air_transition_fits, pending_mixed_air_history_links_to_predecessor,
+    state_is_consistent,
+};
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use runtime_validation::{
+    next_mixed_air_transition_fits as next_mixed_air_transition_fits_for_test,
+    pending_mixed_air_history_links_to_predecessor as pending_mixed_air_history_links_to_predecessor_for_test,
 };
 
 /// Active CP329 recirculation input rejected because it is not finite.
@@ -181,11 +195,15 @@ pub fn advance_direct_no_oa_calc_cooling_mixed_air_call(
     {
         return Err(call_order_error(unit, selected));
     }
-    if !state_is_consistent(
-        &unit.calc_cooling_mixed_air_call,
-        mixed_air_witness,
-        selected,
-    ) {
+    if !pending_mixed_air_history_links_to_predecessor(unit, predecessor_cp328)
+        || !state_is_consistent(
+            &unit.calc_cooling_mixed_air_call,
+            mixed_air_witness,
+            selected,
+        )
+        || !next_mixed_air_transition_fits(&unit.calc_cooling_mixed_air_call, predecessor_cp328)
+        || !completed_mixed_air_predecessor_is_consistent(runtime, unit, system, predecessor_cp328)
+    {
         return Err(
             PurchasedAirCalcCoolingMixedAirCallError::RuntimeStateInvariantViolation {
                 system: selected,
@@ -244,13 +262,45 @@ pub fn advance_direct_no_oa_calc_cooling_mixed_air_call(
         snapshot
     ));
     debug_assert!(runtime.units.get(&selected).is_some_and(|unit| {
-        state_is_consistent(
-            &unit.calc_cooling_mixed_air_call,
+        completed_direct_cooling_mixed_air_call_is_consistent(
+            runtime,
+            unit,
+            system,
+            snapshot,
             runtime.cooling_mixed_air_call_latest_witness(selected),
-            selected,
         )
     }));
     Ok(snapshot)
+}
+
+fn mixed_air_call_links_to_predecessor(
+    call: PurchasedAirCalcCoolingMixedAirCallSnapshot,
+    predecessor: PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
+) -> bool {
+    let common = call.system == predecessor.system
+        && call.parent_call_ordinal == predecessor.parent_call_ordinal
+        && call.controlled_zone == predecessor.controlled_zone
+        && call.unit_body_entered == predecessor.unit_body_entered
+        && call.predecessor_cooling_body_entered == predecessor.cooling_body_entered
+        && call.predecessor_zero_flow_reset_body_entered
+            == predecessor.zero_flow_reset_body_entered
+        && call.predecessor_active_guard_false_fallthrough
+            == predecessor.active_guard_false_fallthrough
+        && call.unit_off_skipped == predecessor.unit_off_skipped
+        && call.non_cooling_skipped == predecessor.non_cooling_skipped
+        && call.cooling_call_executed == predecessor.cooling_body_entered;
+    common
+        && if predecessor.cooling_body_entered {
+            option_bits_match(
+                call.supply_mass_flow_rate_kg_per_s,
+                predecessor.resulting_supply_mass_flow_rate_kg_per_s,
+            )
+        } else {
+            call.supply_mass_flow_rate_kg_per_s.is_none()
+                && predecessor
+                    .resulting_supply_mass_flow_rate_kg_per_s
+                    .is_none()
+        }
 }
 
 fn validate_recirculation_state_and_project_enthalpy(
@@ -287,23 +337,6 @@ fn validate_recirculation_state_and_project_enthalpy(
         );
     }
     Ok(enthalpy_projection_j_per_kg)
-}
-
-fn call_order_is_pending(
-    unit: &crate::ideal_loads::PurchasedAirUnitRuntimeState,
-    predecessor: PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
-) -> bool {
-    let ordinal = predecessor.parent_call_ordinal;
-    unit.calc_cooling_mixed_air_call
-        .transition_count
-        .checked_add(1)
-        == Some(ordinal)
-        && unit.calc_entry.call_count == ordinal
-        && unit.calc_minimum_oa_prefix.transition_count == ordinal
-        && unit
-            .calc_cooling_supply_mass_flow_very_small_guard_body
-            .transition_count
-            == ordinal
 }
 
 fn call_order_error(
@@ -366,86 +399,6 @@ fn minimum_oa_links_to_predecessor(
             && !minimum_oa.no_outdoor_air_zero_branch_entered
             && minimum_oa.psychrometric_call_count == 0
     }
-}
-
-fn state_is_consistent(
-    state: &PurchasedAirCalcCoolingMixedAirCallRuntimeState,
-    witness: Option<PurchasedAirCalcCoolingMixedAirCallSnapshot>,
-    expected_system: IdealLoadsAirSystemId,
-) -> bool {
-    let Some(route_partition) = state
-        .unit_off_skip_count
-        .checked_add(state.non_cooling_skip_count)
-        .and_then(|count| count.checked_add(state.cooling_call_count))
-    else {
-        return false;
-    };
-    let counters_match = state.system == expected_system
-        && route_partition == state.transition_count
-        && counter_product_matches(
-            state.caller_source_site_execution_count,
-            state.cooling_call_count,
-            PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_SOURCE_ORDER.len(),
-        )
-        && counter_product_matches(
-            state.child_source_site_execution_count,
-            state.cooling_call_count,
-            PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_NO_OA_CHILD_SOURCE_ORDER.len(),
-        )
-        && state.state_reference_bind_count == state.cooling_call_count
-        && state.purchased_air_number_read_count == state.cooling_call_count
-        && state.outdoor_air_mass_flow_rate_read_count == state.cooling_call_count
-        && state.supply_mass_flow_rate_read_count == state.cooling_call_count
-        && counter_product_matches(
-            state.mixed_air_output_reference_bind_count,
-            state.cooling_call_count,
-            3,
-        )
-        && state.operating_mode_read_count == state.cooling_call_count
-        && state.mixed_air_child_call_count == state.cooling_call_count
-        && state.no_outdoor_air_fallback_count == state.cooling_call_count
-        && state.recirculation_enthalpy_projection_count == state.cooling_call_count
-        && counter_product_matches(
-            state.mixed_air_output_assignment_count,
-            state.cooling_call_count,
-            3,
-        )
-        && counter_product_matches(
-            state.heat_recovery_output_positive_zero_assignment_count,
-            state.cooling_call_count,
-            2,
-        );
-    if !counters_match {
-        return false;
-    }
-    match (state.transition_count, state.latest, witness) {
-        (0, None, None) => {
-            state.latest_route.is_none() && state.latest_transition_ordinal.is_none()
-        }
-        (count, Some(latest), Some(witness)) => {
-            let expected_route = if latest.unit_off_skipped {
-                PurchasedAirCalcCoolingMixedAirCallRetainedRoute::UnitOff
-            } else if latest.non_cooling_skipped {
-                PurchasedAirCalcCoolingMixedAirCallRetainedRoute::NonCooling
-            } else {
-                PurchasedAirCalcCoolingMixedAirCallRetainedRoute::NoOutdoorAirFallback
-            };
-            count > 0
-                && state.latest_transition_ordinal == Some(count)
-                && state.latest_route == Some(expected_route)
-                && latest.system == expected_system
-                && latest.parent_call_ordinal == count
-                && cooling_mixed_air_call_snapshot_is_exact_direct_release(latest)
-                && cooling_mixed_air_call_snapshots_match_bit_exact(latest, witness)
-        }
-        _ => false,
-    }
-}
-
-pub(super) fn counter_product_matches(actual: usize, count: usize, factor: usize) -> bool {
-    count
-        .checked_mul(factor)
-        .is_some_and(|expected| actual == expected)
 }
 
 pub(in crate::ideal_loads) fn cooling_mixed_air_call_snapshot_is_exact_direct_release(
