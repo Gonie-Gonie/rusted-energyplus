@@ -23,6 +23,11 @@ mod output_manifest;
 
 use output_manifest::{SUPPORTED_RUNTIME_MANIFEST, assert_output_manifest};
 
+#[path = "arbitrary_run_ideal_loads/cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_assertions.rs"]
+mod cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_assertions;
+
+use cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_assertions::assert_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment;
+
 #[test]
 fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
 -> Result<(), Box<dyn std::error::Error>> {
@@ -585,6 +590,9 @@ fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
     ] {
         assert_eq!(cp350[field], 0, "{field}");
     }
+    assert_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment(
+        &summary["rust_runtime"],
+    );
     Ok(())
 }
 
@@ -1017,6 +1025,14 @@ fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
     assert!(
         rust_runtime
             ["purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_lifecycle"]
+            .is_null()
+    );
+    assert!(rust_runtime.contains_key(
+        "purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_lifecycle"
+    ));
+    assert!(
+        rust_runtime
+            ["purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_lifecycle"]
             .is_null()
     );
     assert_eq!(summary["source_order_gate"]["matches"], true);

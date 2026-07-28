@@ -18734,6 +18734,88 @@ bootstrap exemption applies only while this marker changes from absent to
 present and only to the explicit governance and documentation file allowlist;
 after that transition, routine promotions use the normal Algorithm Port Ticket.
 
+## CP351 Source-Ordered Cooling Positive-Supply Constant-Sensible-Heat-Ratio Total-Output Assignment
+
+CP351 supersedes only CP350's physical-line-2218 exclusion by mapping the
+constant-sensible-heat-ratio local total-output assignment at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2218:
+
+```cpp
+CoolTotOutput = CoolSensOutput / PurchAir.CoolSHR;
+```
+
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The exact four-site order is
+`read-retained-cooling-sensible-output-for-constant-sensible-heat-ratio-total-output-numerator`,
+`read-purchased-air-cooling-sensible-heat-ratio-for-constant-sensible-heat-ratio-total-output-denominator`,
+`calculate-cooling-sensible-output-divided-by-cooling-sensible-heat-ratio-for-constant-sensible-heat-ratio-total-output`,
+and
+`assign-local-cooling-total-output-for-constant-sensible-heat-ratio-case`.
+Physical line 2219,
+`SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;`, is
+the first excluded executable. Its reads, division, subtraction, enthalpy
+assignment, overdrying limit, psychrometric work, and all later case-body
+behavior remain excluded.
+
+Routes remain inherited `U/N/P`, completed-`None` skip `C0`, private
+constant-SHR total-output assignment `Q`, and private `H/CSH` skips. For CP346
+dispatches `S`, CP345 assignments `R`, capacity provenance `G/F/L`, and CP340
+active evaluations `A`, checked state requires:
+
+```text
+T = U+N+P+C0+Q+H+CSH
+S = C0+Q+H+CSH = R = G+F+L
+A = F+L
+Q = CP350 sensible-output assignments
+source_site_execution_count = 4*Q
+```
+
+Every site count equals `Q`; every non-`Q` route executes no CP351 site. Exact
+direct release inherits CP350's completed `None` route and requires `C0=S`
+and `Q=H=CSH=0`, so all operands and results are null. The active
+constant-SHR route is private characterization only.
+
+Exact direct `C0` validates same-call CP350 supplied/latest/private bit
+parity, CP350's exact direct snapshot, and its completed recursive proof before
+mutation. Private `Q` is instead a restricted same-call counterfactual bridge
+from that recursively complete direct baseline. The bridge preserves
+system/call/zone identity and inherited route facts and admits as numerator
+only CP350's internally valid `cooling_sensible_output_w`; coordinated CP350
+or bridge corruption is rejected transactionally.
+
+The numerator is solely CP350 `cooling_sensible_output_w`. The denominator is
+solely the exact-bit selected-model field
+`IdealLoadsAirSystem.cooling_sensible_heat_ratio`. No duplicate caller scalar,
+earlier total-output result, model reread through another owner, helper
+evaluation, or `DirectZonePurchasedAirCouplingInput` value can substitute.
+CP351 evaluates `cooling_sensible_output / cooling_sensible_heat_ratio` and
+copies the result bits to the assigned local total output without a line-local
+finite, positivity, or zero-denominator gate. It performs no reciprocal
+replacement, clamp, normalization, defaulting, diagnostic, or coercion.
+Signed-zero, zero, NaN, and infinity private cases retain native IEEE division
+bits, and nonfinite values remain `Some`; JSON nulls only their numeric
+projection while retaining authoritative `_ieee_bits`.
+
+The Rust compiler currently accepts the selected field with `0.0..=1.0`.
+The pinned EnergyPlus IDD instead specifies `\minimum> 0.0` and
+`\maximum 1.0`. This known discrepancy is not a CP351 domain expansion or an
+excuse to add a source-line guard: exact direct execution remains `None`,
+private zero/nonfinite tests characterize raw source semantics only, and
+compiler-versus-IDD domain reconciliation remains excluded.
+
+Binding, coupled validation, and pipeline serialization preserve
+CP350-to-CP351-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_lifecycle`.
+CP351 neither consumes nor feeds the unchanged numerical DTO, and non-direct
+paths publish `None` and reject CP351 evidence. Both parent algorithms remain
+`scaffold`/`none`, both Calc routines remain `source_mapped`, and inventory
+stays 32 algorithms and 293 routines, split 58 state-mapped plus 235
+source-mapped with 170 required. CP351 changes no support, readiness,
+capability, feature/evidence, numerical-conformance, output-ownership, status,
+conformance, or Roadmap state.
+
 ## Run States
 
 Arbitrary runs return one of three support states:

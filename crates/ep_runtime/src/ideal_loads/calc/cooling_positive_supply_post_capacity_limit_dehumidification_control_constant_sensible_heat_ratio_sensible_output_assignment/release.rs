@@ -19,6 +19,7 @@ mod runtime_validation;
 mod snapshot_validation;
 
 use prefix_validation::{active_lineage_is_exact, assignment_links_to_predecessor};
+pub(in crate::ideal_loads::calc) use prefix_validation::private_active_counterfactual_links_to_direct_release;
 use runtime_validation::{
     calc_state_identities_match, call_order_is_pending, completed_state_is_consistent,
     next_transition_fits, pending_state_is_consistent,

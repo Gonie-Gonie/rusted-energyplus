@@ -22986,6 +22986,60 @@ remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
 readiness, support, capability, feature/evidence boundary, numerical
 conformance, output ownership, status, conformance, or Roadmap state.
 
+## CP351 Constant-Sensible-Heat-Ratio Total-Output Assignment Placement
+
+CP351 extends the exact direct-Zone update sequence through pinned
+`PurchasedAirManager.cc` physical executable line 2218:
+
+```cpp
+CoolTotOutput = CoolSensOutput / PurchAir.CoolSHR;
+```
+
+Commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`
+remain locked. The four ordered sites are
+`read-retained-cooling-sensible-output-for-constant-sensible-heat-ratio-total-output-numerator`,
+`read-purchased-air-cooling-sensible-heat-ratio-for-constant-sensible-heat-ratio-total-output-denominator`,
+`calculate-cooling-sensible-output-divided-by-cooling-sensible-heat-ratio-for-constant-sensible-heat-ratio-total-output`,
+and
+`assign-local-cooling-total-output-for-constant-sensible-heat-ratio-case`.
+Line 2219,
+`SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;`, is
+the first excluded executable.
+
+Routes stay `U/N/P/C0/Q/H/CSH`; checked state requires
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`, `A=F+L`, `Q` equal to CP350's
+sensible-output assignments, and `source_site_execution_count=4*Q`. Every
+site count equals `Q`. Direct execution requires `C0=S` and `Q=H=CSH=0`,
+publishing a complete null skip; active `Q` remains private.
+
+Direct `C0` proves CP350 supplied/latest/private parity plus exact and
+completed recursive validation. Private `Q` uses only the restricted CP350
+same-call counterfactual bridge. CP350 `cooling_sensible_output_w` solely owns
+the numerator, while exact-bit
+`IdealLoadsAirSystem.cooling_sensible_heat_ratio` solely owns the denominator.
+Coordinated predecessor or bridge corruption is rejected transactionally.
+
+The line performs unguarded IEEE division. CP351 adds no finite, positive,
+nonzero, reciprocal, clamp, normalization, or diagnostic rule. Private zero,
+signed-zero, NaN, and infinity cases preserve exact result bits; JSON nulls
+only nonfinite numeric projections. Rust compilation currently accepts
+`0.0..=1.0`, unlike the pinned IDD's `>0.0` through `1.0` constraint. This is
+a recorded input-domain discrepancy, not a CP351 support expansion or a reason
+to invent a source-line gate.
+
+Binding, coupled execution, and serialization preserve
+CP350-to-CP351-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_lifecycle`.
+No CP351 evidence enters `DirectZonePurchasedAirCouplingInput`; it consumes,
+reconciles with, feeds, and replaces no numerical DTO value. Non-direct paths
+publish `None` and reject attached evidence. Both parents remain
+`scaffold`/`none`, both Calc routines remain `source_mapped`, and counts remain
+32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and 170
+required. CP351 changes no readiness, support, capability, feature/evidence,
+numerical-conformance, output-ownership, status, conformance, or Roadmap
+state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

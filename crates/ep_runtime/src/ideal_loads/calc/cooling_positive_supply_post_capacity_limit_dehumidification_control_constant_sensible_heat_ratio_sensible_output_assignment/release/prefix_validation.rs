@@ -7,12 +7,13 @@ use super::super::{
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentRetainedRoute as Route,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentSnapshot as Snapshot,
 };
+use super::snapshot_validation::snapshot_route;
 use crate::ideal_loads::calc::{
     cooling_mixed_air_call::completed_direct_cooling_mixed_air_call_is_consistent,
     cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit::completed_direct_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_is_consistent,
     cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment::{
         completed_direct_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_is_consistent,
-        private_active_counterfactual_links_to_direct_release,
+        private_active_counterfactual_links_to_direct_release as cp349_private_active_counterfactual_links_to_direct_release,
     },
     cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment::completed_direct_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_is_consistent,
     cooling_positive_supply_temperature_mixed_air_limit::completed_direct_cooling_positive_supply_temperature_mixed_air_limit_is_consistent,
@@ -32,6 +33,7 @@ use crate::ideal_loads::{
     cooling_positive_supply_temperature_mixed_air_limit_snapshot_is_exact_direct_release,
     cooling_supply_mass_flow_positive_guard_snapshot_is_exact_direct_release,
 };
+use crate::psychrometrics::energyplus_psy_cp_air_fn_w;
 
 mod snapshot_matching;
 
@@ -198,7 +200,7 @@ pub(in crate::ideal_loads) fn active_input_from_retained_owners(
             mixed_owner,
             Some(mixed_witness),
         )
-        || !private_active_counterfactual_links_to_direct_release(
+        || !cp349_private_active_counterfactual_links_to_direct_release(
             retained_predecessor,
             predecessor,
             mixed_owner,
@@ -301,6 +303,93 @@ pub(in crate::ideal_loads) fn active_input_from_retained_owners(
         mixed_air_temperature_c: mixed,
         supply_temperature_c: supply,
     })
+}
+
+/// Proves that a private constant-SHR CP350 witness is the exact active
+/// counterfactual of the retained direct `None` release.
+///
+/// The retained CP350 release remains the public source of truth. The private
+/// witness is accepted only after the retained CP349-to-CP350 lineage is
+/// replayed from its canonical owners and every CP350 operand/result bit is
+/// rechecked.
+pub(in crate::ideal_loads::calc) fn private_active_counterfactual_links_to_direct_release(
+    runtime: &PurchasedAirRuntimeState,
+    unit: &PurchasedAirUnitRuntimeState,
+    system: &IdealLoadsAirSystem,
+    direct: Snapshot,
+    counterfactual: Snapshot,
+) -> bool {
+    if snapshot_route(direct) != Some(Route::DehumidificationControlNoneCaseCompletedSkip)
+        || snapshot_route(counterfactual)
+            != Some(Route::DehumidificationControlConstantSensibleHeatRatioSensibleOutputAssigned)
+        || !route_independent_identity_matches(direct, counterfactual)
+    {
+        return false;
+    }
+    let Some(retained_cp349) = unit
+        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment
+        .latest
+    else {
+        return false;
+    };
+    let Some(mixed_owner) = unit.calc_cooling_mixed_air_call.latest else {
+        return false;
+    };
+    let Some(humidity) = mixed_owner.mixed_air_humidity_ratio else {
+        return false;
+    };
+    let cp_air = energyplus_psy_cp_air_fn_w(humidity);
+    let mut private_cp349 = retained_cp349;
+    private_cp349.predecessor_dehumidification_control_type =
+        Some(ep_model::DehumidificationControlType::ConstantSensibleHeatRatio);
+    private_cp349.predecessor_dehumidification_control_none_case_completed = false;
+    private_cp349.predecessor_dehumidification_control_none_case_completed_skip = false;
+    private_cp349
+        .predecessor_dehumidification_control_constant_sensible_heat_ratio_case_entered = true;
+    private_cp349.dehumidification_control_none_case_completed_skip = false;
+    private_cp349
+        .dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_executed = true;
+    private_cp349.mixed_air_humidity_ratio_read = true;
+    private_cp349.mixed_air_humidity_ratio = Some(humidity);
+    private_cp349.psychrometric_cp_air_evaluated = true;
+    private_cp349.psychrometric_cp_air_result_j_per_kg_k = Some(cp_air);
+    private_cp349.cp_air_assigned = true;
+    private_cp349.cp_air_j_per_kg_k = Some(cp_air);
+
+    let Some(input) =
+        active_input_from_retained_owners(runtime, unit, system, private_cp349)
+    else {
+        return false;
+    };
+    option_matches(
+        counterfactual.supply_mass_flow_rate_kg_per_s,
+        input.supply_mass_flow_rate_kg_per_s,
+    ) && option_matches(counterfactual.cp_air_j_per_kg_k, cp_air)
+        && option_matches(
+            counterfactual.mixed_air_temperature_c,
+            input.mixed_air_temperature_c,
+        )
+        && option_matches(
+            counterfactual.supply_temperature_c,
+            input.supply_temperature_c,
+        )
+}
+
+fn route_independent_identity_matches(direct: Snapshot, counterfactual: Snapshot) -> bool {
+    direct.system == counterfactual.system
+        && direct.parent_call_ordinal == counterfactual.parent_call_ordinal
+        && direct.controlled_zone == counterfactual.controlled_zone
+        && direct.unit_body_entered == counterfactual.unit_body_entered
+        && direct.predecessor_cooling_body_entered
+            == counterfactual.predecessor_cooling_body_entered
+        && direct.predecessor_no_outdoor_air_fallback_entered
+            == counterfactual.predecessor_no_outdoor_air_fallback_entered
+        && direct.predecessor_positive_supply_mass_flow_body_entered
+            == counterfactual.predecessor_positive_supply_mass_flow_body_entered
+        && direct.unit_off_skipped == counterfactual.unit_off_skipped
+        && direct.non_cooling_skipped == counterfactual.non_cooling_skipped
+        && direct.positive_guard_false_fallthrough_skipped
+            == counterfactual.positive_guard_false_fallthrough_skipped
 }
 
 fn same_call(

@@ -35274,6 +35274,60 @@ source-mapped, and 170 required. CP350 causes no support, readiness,
 capability, feature/evidence, numerical-conformance, output, status,
 conformance, or Roadmap promotion.
 
+## CP351 Constant-Sensible-Heat-Ratio Total-Output Assignment in the Heat-Balance Loop
+
+CP351 advances the purchased-air heat-balance witness through pinned
+`PurchasedAirManager.cc` physical executable line 2218:
+
+```cpp
+CoolTotOutput = CoolSensOutput / PurchAir.CoolSHR;
+```
+
+The commit remains `6f2e40d10250a105b49966baa24d843711e61048`, and raw
+SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The four sites are
+`read-retained-cooling-sensible-output-for-constant-sensible-heat-ratio-total-output-numerator`,
+`read-purchased-air-cooling-sensible-heat-ratio-for-constant-sensible-heat-ratio-total-output-denominator`,
+`calculate-cooling-sensible-output-divided-by-cooling-sensible-heat-ratio-for-constant-sensible-heat-ratio-total-output`,
+and
+`assign-local-cooling-total-output-for-constant-sensible-heat-ratio-case`.
+Line 2219,
+`SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;`, is
+the first excluded executable.
+
+The route partition remains `U/N/P/C0/Q/H/CSH`. Exact state requires
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`, `A=F+L`, `Q` equal to the
+CP350 sensible-output assignment count, and `source_site_execution_count=4*Q`.
+Every site counter equals `Q`. Direct execution requires `C0=S` and
+`Q=H=CSH=0`, yielding a complete null skip; active `Q` is private.
+
+Direct `C0` validates CP350 supplied/latest/private parity, exact direct shape,
+and completed recursive proof. Private `Q` is admitted only through the
+restricted same-call CP350 counterfactual bridge. Its numerator is solely
+CP350 `cooling_sensible_output_w`; its denominator is solely exact-bit
+`IdealLoadsAirSystem.cooling_sensible_heat_ratio`. No numerical result or DTO
+can replace either owner.
+
+CP351 preserves raw IEEE division and adds no finite, positive, nonzero,
+clamp, normalization, reciprocal, or diagnostic gate. Private signed-zero,
+zero-denominator, NaN, and infinity cases retain exact bits. JSON keeps those
+bits even when the numeric projection is `null`. The compiler accepts
+`0.0..=1.0`, while the pinned IDD specifies `>0.0` through `1.0`; this
+checkpoint documents but neither resolves nor expands that input-domain
+discrepancy.
+
+Lifecycle evidence preserves CP350-to-CP351-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_lifecycle`.
+CP351 never enters `DirectZonePurchasedAirCouplingInput`, consumes no
+numerical DTO value, and does not feed or replace it. Non-direct execution
+publishes `None` and rejects attached evidence. Parent algorithms stay
+`scaffold`/`none`, parent Calc routines stay `source_mapped`, and inventory
+stays 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and 170
+required. No support, readiness, capability, feature/evidence,
+numerical-conformance, output, status, conformance, or Roadmap promotion
+occurs.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

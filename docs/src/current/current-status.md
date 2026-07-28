@@ -2352,6 +2352,91 @@ routines remain `source_mapped`, and support, readiness, run state,
 capability, feature/evidence boundaries, numerical conformance, output
 ownership, status, conformance, and Roadmap state remain unchanged.
 
+CP351 now maps only the Cooling positive-supply post-capacity-limit
+dehumidification-control constant-sensible-heat-ratio total-output assignment
+at pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2218:
+
+```cpp
+CoolTotOutput = CoolSensOutput / PurchAir.CoolSHR;
+```
+
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact four-site source order is
+`read-retained-cooling-sensible-output-for-constant-sensible-heat-ratio-total-output-numerator`,
+`read-purchased-air-cooling-sensible-heat-ratio-for-constant-sensible-heat-ratio-total-output-denominator`,
+`calculate-cooling-sensible-output-divided-by-cooling-sensible-heat-ratio-for-constant-sensible-heat-ratio-total-output`,
+then
+`assign-local-cooling-total-output-for-constant-sensible-heat-ratio-case`.
+Physical line 2219,
+`SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;`, is
+the first excluded executable. Its enthalpy and flow reads, division,
+subtraction, assignment, and all later overdrying and psychrometric work remain
+outside CP351.
+
+The seven routes remain inherited `UnitOff`, `NonCooling`, and
+`PositiveGuardFalseFallthrough`; completed-`None` skip `C0`; private
+constant-SHR total-output assignment `Q`; and private
+`Humidistat`/constant-supply-humidity skips `H/CSH`. With transitions `T`,
+CP346 switch dispatches `S`, CP345 assignments `R`, capacity provenance
+`G/F/L`, and CP340 active evaluations `A`, exact checked state requires:
+
+```text
+T = U+N+P+C0+Q+H+CSH
+S = C0+Q+H+CSH = R = G+F+L
+A = F+L
+Q = CP350 sensible-output assignments
+source_site_execution_count = 4*Q
+```
+
+Every per-site counter equals `Q`; all non-`Q` routes execute zero CP351
+sites. Exact direct release inherits the completed `None` route, requires
+`C0=S` and `Q=H=CSH=0`, and publishes a complete numerator, denominator, and
+result-null skip. Active `Q` remains private characterization rather than
+direct reachability.
+
+Exact direct `C0` release requires same-call supplied CP350, retained latest,
+and private witness bit parity, the exact direct CP350 snapshot shape, and
+CP350's completed recursive proof before mutation. Private `Q` cannot equal
+that direct null baseline. It therefore uses a restricted same-call
+counterfactual bridge whose system/call/zone identity and inherited route
+facts derive from the recursively complete direct CP350 evidence and whose
+active numerator must be CP350's validated `cooling_sensible_output_w`.
+Coordinated supplied/latest/witness or counterfactual corruption fails before
+CP351 state or witness mutation.
+
+CP350 `cooling_sensible_output_w` is the sole numerator owner.
+`IdealLoadsAirSystem.cooling_sensible_heat_ratio` is the sole denominator
+owner and is copied with exact IEEE bits; no caller scalar, earlier total
+output, humidity helper, or numerical DTO may replace either operand. CP351
+performs the source division directly and assigns the result bit-for-bit. It
+adds no finite, positivity, or nonzero gate for the numerator, denominator, or
+quotient, and no clamp, normalization, default substitution, diagnostic, or
+coercion. Defensive private characterization therefore preserves the native
+binary64 results for signed zero, zero denominators, NaN, and infinities,
+including nonfinite results as `Some` with authoritative IEEE bits. JSON maps
+only nonfinite numeric projections to `null`.
+
+The current Rust compiler admits `cooling_sensible_heat_ratio` through
+`0.0..=1.0`, while the pinned EnergyPlus IDD declares `\minimum> 0.0` and
+`\maximum 1.0`. CP351 neither hides that discrepancy nor treats it as a range
+promotion: exact direct release remains the `None` skip, the private edge
+cases characterize the unguarded source division only, and reconciliation of
+the compiler input domain with the IDD remains outside this checkpoint.
+
+Binding, coupled runtime, and pipeline evidence preserve
+CP350-to-CP351-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_lifecycle`.
+CP351 never enters, consumes, reconciles with, feeds, or replaces
+`DirectZonePurchasedAirCouplingInput` or the numerical DTO. Non-direct paths
+publish `None` and reject attached CP351 evidence. Counts remain 32 algorithms
+and 293 routines, split 58 `state_mapped` plus 235 `source_mapped`, with 170
+required. Both parent algorithms remain `scaffold`/`none`, both parent Calc
+routines remain `source_mapped`, and support, readiness, run state,
+capability, feature/evidence boundaries, numerical conformance, output
+ownership, status, conformance, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

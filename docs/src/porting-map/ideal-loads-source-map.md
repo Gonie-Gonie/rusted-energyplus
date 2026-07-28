@@ -20566,6 +20566,63 @@ remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
 readiness, capability, feature/evidence, numerical-conformance, output,
 status, conformance, or Roadmap promotion.
 
+## CP351 Constant-Sensible-Heat-Ratio Total-Output Assignment
+
+CP351 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2218 and locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`:
+
+```cpp
+CoolTotOutput = CoolSensOutput / PurchAir.CoolSHR;
+```
+
+Its exact source order is
+`read-retained-cooling-sensible-output-for-constant-sensible-heat-ratio-total-output-numerator`,
+`read-purchased-air-cooling-sensible-heat-ratio-for-constant-sensible-heat-ratio-total-output-denominator`,
+`calculate-cooling-sensible-output-divided-by-cooling-sensible-heat-ratio-for-constant-sensible-heat-ratio-total-output`,
+then
+`assign-local-cooling-total-output-for-constant-sensible-heat-ratio-case`.
+Line 2219,
+`SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;`, is
+the first excluded executable; CP351 claims none of its enthalpy/flow reads,
+arithmetic, assignment, or later psychrometric behavior.
+
+Routes remain `U/N/P`, completed-`None` skip `C0`, private constant-SHR
+assignment `Q`, and private `H/CSH`. Exact state requires
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`, `A=F+L`, `Q` equal to CP350's
+sensible-output assignment count, and `source_site_execution_count=4*Q`.
+Each site count equals `Q`. Direct execution requires `C0=S` and
+`Q=H=CSH=0`, recording a complete null skip; active `Q` stays private.
+
+Direct `C0` proves supplied/latest/private CP350 parity, exact direct shape,
+and completed recursive lineage. Private `Q` uses a restricted same-call CP350
+counterfactual bridge preserving identity and inherited route facts.
+CP350 `cooling_sensible_output_w` is the sole numerator owner; selected
+`IdealLoadsAirSystem.cooling_sensible_heat_ratio` is the exact-bit sole
+denominator owner. Coordinated CP350 or bridge corruption fails
+transactionally.
+
+The transition uses raw `numerator / denominator` and assigns its bits. It adds
+no finite, positivity, zero, clamp, normalization, reciprocal, or diagnostic
+gate. Zero, signed-zero, NaN, and infinity private cases therefore retain
+native IEEE division behavior and authoritative bits; JSON nulls only
+nonfinite numeric projections. The compiler's current `0.0..=1.0` acceptance
+differs from the pinned IDD's `>0.0` through `1.0` requirement. CP351 records
+that discrepancy without widening support or inserting a line-local guard.
+
+Binding, coupled runtime, and pipeline evidence preserve
+CP350-to-CP351-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_lifecycle`.
+No CP351 value enters `DirectZonePurchasedAirCouplingInput`; CP351 does not
+consume, reconcile with, feed, or replace the numerical DTO. Non-direct paths
+carry `None` and reject attached evidence. Both parent algorithms remain
+`scaffold`/`none`, both Calc routines remain `source_mapped`, and counts remain
+32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and 170
+required. CP351 adds target/lifecycle evidence only, with no support,
+readiness, capability, feature/evidence, numerical-conformance, output,
+status, conformance, or Roadmap promotion.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

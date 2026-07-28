@@ -148,9 +148,10 @@ function Assert-Cp350BindingContract {
     param([string]$Text)
     $cp349 = $Text.IndexOf("let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment =")
     $cp350 = $Text.IndexOf("let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment =")
+    $cp351 = $Text.IndexOf("let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment =")
     $numerical = $Text.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
-    if ($cp349 -lt 0 -or $cp350 -le $cp349 -or $numerical -le $cp350) {
-        throw "Binding must execute CP349 then CP350 before numerical coupling"
+    if ($cp349 -lt 0 -or $cp350 -le $cp349 -or $cp351 -le $cp350 -or $numerical -le $cp351) {
+        throw "Binding must execute CP349 then CP350 then CP351 before numerical coupling"
     }
     $dto = Get-Cp350RustBraceBlock -Text $Text.Substring($numerical) -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{' -Description "CP350 numerical DTO"
     if ($dto -match '(?i)cp350|sensible_output_assignment') {
@@ -181,7 +182,7 @@ function Assert-Cp350RecursiveOwnerContract {
             '(?s)system:\s*&IdealLoadsAirSystem,\s*predecessor:\s*Predecessor',
             '(?s)calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment\s*\.latest\?;.*?cp_air_assignment_latest_witness\(\s*system\.id,\s*\)\?;.*?predecessor_snapshots_match_bit_exact\(\s*retained_predecessor,\s*retained_predecessor_witness,\s*\).*?cp_air_assignment_snapshot_is_exact_direct_release\(\s*retained_predecessor,\s*\).*?\bcompleted_direct_.*?_cp_air_assignment_is_consistent\(\s*runtime,\s*unit,\s*system,\s*retained_predecessor,\s*Some\(retained_predecessor_witness\),\s*\)',
             '(?s)calc_cooling_supply_mass_flow_positive_guard\.latest\?;.*?positive_guard_latest_witness\(\s*system\.id\s*\)\?;.*?cp330_snapshots_match\(\s*flow_owner,\s*flow_witness\s*\).*?positive_guard_snapshot_is_exact_direct_release\(\s*flow_owner\s*\).*?\bcompleted_direct_cooling_supply_mass_flow_positive_guard_is_consistent\(\s*runtime,\s*unit,\s*system,\s*flow_owner,\s*Some\(flow_witness\),\s*\)',
-            '(?s)calc_cooling_mixed_air_call\.latest\?;.*?cooling_mixed_air_call_latest_witness\(\s*system\.id\s*\)\?;.*?cooling_mixed_air_call_snapshots_match_bit_exact\(\s*mixed_owner,\s*mixed_witness\s*\).*?cooling_mixed_air_call_snapshot_is_exact_direct_release\(\s*mixed_owner\s*\).*?\bcompleted_direct_cooling_mixed_air_call_is_consistent\(\s*runtime,\s*unit,\s*system,\s*mixed_owner,\s*Some\(mixed_witness\),\s*\).*?\bprivate_active_counterfactual_links_to_direct_release\(\s*retained_predecessor,\s*predecessor,\s*mixed_owner,\s*\)',
+            '(?s)calc_cooling_mixed_air_call\.latest\?;.*?cooling_mixed_air_call_latest_witness\(\s*system\.id\s*\)\?;.*?cooling_mixed_air_call_snapshots_match_bit_exact\(\s*mixed_owner,\s*mixed_witness\s*\).*?cooling_mixed_air_call_snapshot_is_exact_direct_release\(\s*mixed_owner\s*\).*?\bcompleted_direct_cooling_mixed_air_call_is_consistent\(\s*runtime,\s*unit,\s*system,\s*mixed_owner,\s*Some\(mixed_witness\),\s*\).*?\bcp349_private_active_counterfactual_links_to_direct_release\(\s*retained_predecessor,\s*predecessor,\s*mixed_owner,\s*\)',
             '(?s)calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment\s*\.latest\?;.*?humidity_ratio_mixed_air_assignment_latest_witness\(\s*system\.id,\s*\)\?;.*?cp345_snapshots_match\(\s*provenance,\s*provenance_witness\s*\).*?humidity_ratio_mixed_air_assignment_snapshot_is_exact_direct_release\(\s*provenance,\s*\).*?\bcompleted_direct_.*?_humidity_ratio_mixed_air_assignment_is_consistent\(\s*runtime,\s*unit,\s*system,\s*provenance,\s*Some\(provenance_witness\),\s*\)',
             '(?s)calc_cooling_positive_supply_temperature_mixed_air_limit\s*\.latest\?;.*?supply_temperature_mixed_air_limit_latest_witness\(\s*system\.id\s*\)\?;.*?cp334_snapshots_match\(\s*owner,\s*witness\s*\).*?supply_temperature_mixed_air_limit_snapshot_is_exact_direct_release\(\s*owner,\s*\).*?\bcompleted_direct_cooling_positive_supply_temperature_mixed_air_limit_is_consistent\(\s*runtime,\s*unit,\s*system,\s*owner,\s*Some\(witness\),\s*\)',
             '(?s)calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit\s*\.latest\?;.*?sensible_output_supply_temperature_mixed_air_limit_latest_witness\(\s*system\.id,\s*\)\?;.*?cp344_snapshots_match\(\s*owner,\s*witness\s*\).*?sensible_output_supply_temperature_mixed_air_limit_snapshot_is_exact_direct_release\(\s*owner,\s*\).*?\bcompleted_direct_.*?_sensible_output_supply_temperature_mixed_air_limit_is_consistent\(\s*runtime,\s*unit,\s*system,\s*owner,\s*Some\(witness\),\s*\)'
@@ -305,7 +306,7 @@ Assert-Contains -Path $cp350PipelineRoot -Pattern ('mod ' + [regex]::Escape($cp3
 Assert-Contains -Path $cp350PipelineRoot -Pattern ('"' + $cp350Lifecycle + '":\s*result\s*\.' + $cp350Lifecycle) -Description "CP350 lifecycle JSON"
 Assert-Contains -Path $cp350PipelineValidation -Pattern 'cp_air_assignment_cp349' -Description "pipeline CP349 predecessor"
 Assert-Contains -Path $cp350PipelineValidation -Pattern '(?s)assigned\s*\.checked_mul\(.*?SENSIBLE_OUTPUT_ASSIGNMENT_SOURCE_ORDER\s*\.len\(\)' -Description "pipeline checked 8Q"
-Assert-Contains -Path $cp350PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp350_lifecycle_evidence' -Description "cumulative firewall"
+Assert-Contains -Path $cp350PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp351_lifecycle_evidence' -Description "cumulative firewall"
 Assert-Contains -Path $cp350ArbitraryTests -Pattern $cp350Lifecycle -Description "arbitrary CP350 lifecycle"
 foreach ($field in @(
         "supply_mass_flow_rate_kg_per_s", "cp_air_j_per_kg_k",
@@ -402,7 +403,7 @@ foreach ($historical in @("cp326-cooling-supply-mass-flow-limit-body.ps1") + @(
 }
 foreach ($historical in 334..349) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp350_lifecycle_evidence' -Description "historical CP350 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp351_lifecycle_evidence' -Description "historical CP351 firewall"
 }
 $mainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp349AuditIndex = $mainAuditText.IndexOf("cp349-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1")
@@ -411,13 +412,13 @@ $completionIndex = $mainAuditText.IndexOf('Write-Host "IdealLoads structure audi
 if ($cp349AuditIndex -lt 0 -or $cp350AuditIndex -le $cp349AuditIndex -or $completionIndex -le $cp350AuditIndex) {
     throw "Master audit must dot-source CP350 after CP349 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 288' -Description "CP350 script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 289' -Description "CP350 script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP350 zero uncalled"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp350-' -Description "CP350 inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'cp350-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment\.ps1::dot_sources' -Description "CP350 caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 288 \|' -Description "generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 289 \|' -Description "generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 48 \|' -Description "generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 49 \|' -Description "generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated uncalled"
 
 # Audit self-tests reject arithmetic, algebra, DTO, firewall, and IEEE drift.

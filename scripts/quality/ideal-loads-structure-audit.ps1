@@ -671,7 +671,7 @@ Assert-LineLimit -Path $idealLoadsInitManagerPlan -Limit 140 -Description "Ideal
 Assert-LineLimit -Path $idealLoadsInitManagerPlanTests -Limit 250 -Description "IdealLoads initialization manager-plan tests"
 Assert-LineLimit -Path $idealLoadsInitManagerScanTests -Limit 420 -Description "IdealLoads manager-wide initialization sweep tests"
 Assert-LineLimit -Path $idealLoadsInitSummary -Limit 100 -Description "IdealLoads initialization lifecycle summary"
-Assert-LineLimit -Path $idealLoadsInitState -Limit 360 -Description "IdealLoads persistent initialization state"
+Assert-LineLimit -Path $idealLoadsInitState -Limit 380 -Description "IdealLoads persistent initialization state"
 Assert-LineLimit -Path $idealLoadsInitWitnesses -Limit 240 -Description "IdealLoads private calculation witness accessors"
 Assert-LineLimit -Path $idealLoadsInitSupplyTemperatureDiagnostic -Limit 340 -Description "IdealLoads supply-temperature diagnostic registry"
 Assert-LineLimit -Path $idealLoadsInitSupplyTemperatureDiagnosticTests -Limit 340 -Description "IdealLoads supply-temperature diagnostic tests"
@@ -4119,5 +4119,6 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp348-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-entry.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp349-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp350-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp351-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-total-output-assignment.ps1")
 
 Write-Host "IdealLoads structure audit complete."
