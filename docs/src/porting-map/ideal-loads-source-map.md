@@ -19529,6 +19529,60 @@ algorithms remain `scaffold`/`none`; both Calc routines remain
 support, conformance, statuses, counts, readiness, capability, evidence cases,
 numerical conformance, and Roadmap state remain unchanged.
 
+## CP335 Cooling Positive-Supply Humidity-Ratio Mixed-Air Assignment
+
+CP335 maps only locked EnergyPlus 26.1 `PurchasedAirManager.cc` physical
+executable line 2190:
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;`. The exact two-site textual
+source order is `read-purchased-air-mixed-air-humidity-ratio` followed by
+`assign-purchased-air-supply-humidity-ratio`. The first reads the same-call
+retained CP329 `mixed_air_humidity_ratio`; the second assigns those exact
+binary64 bits to the CP335 supply humidity ratio. The statement contains no
+arithmetic, psychrometric evaluation, minimum, maximum, clamp, normalization,
+or finite coercion.
+
+The pure transition copies signed zero, NaN payload, and infinity bits without
+modification. The exact direct release takes only the CP334 snapshot as its
+predecessor argument, recursively proves CP334's latest/private witness and
+complete retained chain, and reads the active RHS only from the same-call
+completed CP329 latest/private witness. CP335's local exact snapshot predicate
+admits only finite, `>= 0.0` CP329 humidity and preserves negative-zero bits.
+The complete public release chain cannot currently reach that negative-zero
+characterization because retained CP332 operand-lineage proof rejects it
+first. No duplicate caller scalar, Zone-state re-read, typed-model value, live
+service, psychrometric recomputation, or numerical-DTO input is allowed.
+
+UnitOff, non-cooling, and CP330 active guard-false routes execute zero CP335
+sites; every CP334 mixed-air temperature-limit execution performs both.
+Consequently dynamic source-site executions equal
+`2 * supply_humidity_ratio_mixed_air_assignment_count`,
+`2 * supply_temperature_mixed_air_limit_count`,
+`2 * supply_temperature_minimum_limit_count`,
+`2 * supply_temperature_assignment_count`, `2 * cp_air_assignment_count`, and
+`2 * positive_supply_mass_flow_body_entries`. Both per-site counters equal the
+active assignment count. Release validation preserves all four routes and
+uses checked arithmetic to preflight source-site and private-witness updates
+before mutation, making
+identity, ordinal, provenance, history, witness, replay, corruption, and
+overflow failures transactional.
+
+Binding and direct-only JSON place
+`purchased_air_calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment_lifecycle`
+in CP334-to-CP335-to-numerical order. CP335 does not consume, reconcile with,
+feed, or replace the unchanged numerical DTO and adds no numerical or output
+claim; non-direct paths retain no CP335 evidence. Physical line 2191 is the
+first excluded lexical executable and CP336 boundary. Its `PsyHFnTdbW`
+enthalpy calculation, capacity controls, and lines 2191-2337 remain open. The
+zero-flow `else` at 2339-2345 still starts at 2340; the Heat/DeadBand sibling
+at 2347-2348, call at 2454-2461, and guard at 2465 remain excluded.
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, Autosizing, broad humidity
+control, and broader supply-temperature, capacity, enthalpy, and output
+behavior remain unpromoted. Both parent algorithms remain `scaffold`/`none`;
+both Calc routines remain `source_mapped`. CP335 adds target inventory and
+lifecycle evidence only; support, conformance, statuses, counts, readiness,
+capability, evidence cases, numerical conformance, output claims, and Roadmap
+state remain unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

@@ -17318,6 +17318,67 @@ remain unpromoted. Both parent algorithms remain `scaffold`/`none`;
 required and forbidden features, output claims, evidence cases, numerical
 conformance, capability status, and Roadmap state remain unchanged.
 
+## CP335 Source-Ordered Cooling Positive-Supply Humidity-Ratio Mixed-Air Assignment
+
+CP335 supersedes only CP334's line-2190 exclusion for the single Cooling
+positive-supply mixed-air humidity-ratio assignment at locked EnergyPlus 26.1
+`PurchasedAirManager.cc` physical executable line 2190:
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;`. Its exactly two lexical
+sites are `read-purchased-air-mixed-air-humidity-ratio` and
+`assign-purchased-air-supply-humidity-ratio`, in that order. They read the
+same-call retained CP329 `mixed_air_humidity_ratio` and assign the identical
+binary64 payload to supply humidity ratio. The statement performs no
+arithmetic, psychrometric evaluation, minimum, maximum, clamp, normalization,
+or finite coercion.
+
+The pure transition is a raw bit copy and privately characterizes both signed
+zeros, NaN payloads, and infinities without changing them. Exact direct release
+accepts a CP334 snapshot as its only predecessor argument, recursively proves
+that completed latest/private witness and its full retained chain, and obtains
+the active value only from the same-call completed CP329 latest/private
+witness. CP335's local exact snapshot predicate requires CP329
+`mixed_air_humidity_ratio` finite and `>= 0.0` and preserves negative-zero
+bits. The complete public release chain cannot currently reach that
+negative-zero characterization because retained CP332 operand-lineage proof
+rejects it first. A Zone-state re-read, typed-model value, live service,
+duplicate scalar, psychrometric recomputation, or numerical-DTO input cannot
+replace the retained CP329 source field.
+
+UnitOff, non-cooling, and CP330 active guard-false predecessors skip both
+sites. Every completed CP334 mixed-air temperature limit executes both, so
+dynamic source-site executions equal
+`2 * supply_humidity_ratio_mixed_air_assignment_count`,
+`2 * supply_temperature_mixed_air_limit_count`,
+`2 * supply_temperature_minimum_limit_count`,
+`2 * supply_temperature_assignment_count`, `2 * cp_air_assignment_count`, and
+`2 * positive_supply_mass_flow_body_entries`. The read and assignment counters
+each equal the active count. Pending and completed state retain the four
+UnitOff, non-cooling, positive-guard-false, and
+`SupplyHumidityRatioMixedAirAssigned` routes one-for-one. Every conditional
+source-site and private-witness increment is checked before mutation, so
+identity, ordinal, source, provenance, history, witness, replay, corruption,
+and overflow failure is transactional.
+
+The scheduled binding, coupled runtime, and pipeline retain exact
+CP334-to-CP335-to-numerical order and publish direct-only
+`purchased_air_calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment_lifecycle`
+evidence. CP335 neither consumes nor reconciles with the unchanged numerical
+DTO and does not feed or replace it; non-direct paths publish `None` and reject
+attached evidence. Physical line 2191 is the first excluded lexical executable
+and CP336 boundary. Its `PsyHFnTdbW` enthalpy calculation, capacity controls,
+lines 2191-2337, the zero-flow `else` at 2339-2345 whose first dynamic
+executable is 2340, the outer Heat/DeadBand sibling at 2347-2348, its mixed-air
+call at 2454-2461, and its guard at 2465 remain excluded.
+
+CP335 adds target inventory and lifecycle evidence only. Broader humidity,
+enthalpy, capacity, supply-temperature, output, `OutdoorAir`, `Economizer`,
+`HeatRecovery`, `EMS`, and Autosizing behavior remain unpromoted. Both parent
+algorithms remain `scaffold`/`none`; `routine.calc_purch_air_loads` and
+`routine.calc_purch_air_mixed_air` remain `source_mapped`. Algorithm/routine
+counts, readiness, support level, run state, required and forbidden features,
+output claims, evidence cases, numerical conformance, capability status, and
+Roadmap state remain unchanged.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before

@@ -2,6 +2,7 @@
 
 mod cooling_mixed_air_call;
 mod cooling_positive_supply_cp_air_assignment;
+mod cooling_positive_supply_humidity_ratio_mixed_air_assignment;
 mod cooling_positive_supply_temperature_assignment;
 mod cooling_positive_supply_temperature_minimum_limit;
 mod cooling_positive_supply_temperature_mixed_air_limit;

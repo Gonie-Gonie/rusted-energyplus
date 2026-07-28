@@ -243,14 +243,16 @@ Assert-Contains -Path $cp331InitWitness -Pattern 'pub\(in crate::ideal_loads\) f
 Assert-Contains -Path $cp331InitState -Pattern 'pub calc_cooling_positive_supply_cp_air_assignment:\s*[\r\n]+\s*PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentRuntimeState' -Description "per-unit CP331 persistent state"
 Assert-Contains -Path $cp331InitUnit -Pattern '(?s)calc_cooling_positive_supply_cp_air_assignment:\s*PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentRuntimeState::new\(system\)' -Description "per-unit CP331 state initialization"
 
-# Binding order is CP330 -> CP331 -> CP332 -> CP333 -> CP334 -> unchanged numerical DTO. CP331's
-# adapter still passes the live Zone state without adding a duplicate scalar.
+# Binding order is CP330 -> CP331 -> CP332 -> CP333 -> CP334 -> CP335 ->
+# unchanged numerical DTO. CP331's adapter still passes the live Zone state
+# without adding a duplicate scalar.
 $cp331BindingText = Read-RepoText -Path $cp331Binding
 $cp330BindingIndexForCp331 = $cp331BindingText.IndexOf("let calculation_cooling_supply_mass_flow_positive_guard =")
 $cp331BindingIndex = $cp331BindingText.IndexOf("let calculation_cooling_positive_supply_cp_air_assignment =")
 $cp332BindingIndexForCp331 = $cp331BindingText.IndexOf("let calculation_cooling_positive_supply_temperature_assignment =")
 $cp333BindingIndexForCp331 = $cp331BindingText.IndexOf("let calculation_cooling_positive_supply_temperature_minimum_limit =")
 $cp334BindingIndexForCp331 = $cp331BindingText.IndexOf("let calculation_cooling_positive_supply_temperature_mixed_air_limit =")
+$cp335BindingIndexForCp331 = $cp331BindingText.IndexOf("let calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment =")
 $numericalBindingIndexForCp331 = $cp331BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp330BindingIndexForCp331 -lt 0 -or
@@ -258,9 +260,10 @@ if (
     $cp332BindingIndexForCp331 -le $cp331BindingIndex -or
     $cp333BindingIndexForCp331 -le $cp332BindingIndexForCp331 -or
     $cp334BindingIndexForCp331 -le $cp333BindingIndexForCp331 -or
-    $numericalBindingIndexForCp331 -le $cp334BindingIndexForCp331
+    $cp335BindingIndexForCp331 -le $cp334BindingIndexForCp331 -or
+    $numericalBindingIndexForCp331 -le $cp335BindingIndexForCp331
 ) {
-    throw "Binding must retain exact CP330 -> CP331 -> CP332 -> CP333 -> CP334 -> numerical Calc order"
+    throw "Binding must retain exact CP330 -> CP331 -> CP332 -> CP333 -> CP334 -> CP335 -> numerical Calc order"
 }
 Assert-Contains -Path $cp331Binding -Pattern '(?s)let calculation_cooling_positive_supply_cp_air_assignment =\s*advance_positive_supply_cp_air_assignment\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_supply_mass_flow_positive_guard,\s*&\*input\.zone_state,\s*\)\?;' -Description "binding exact CP330-to-CP331 adapter call"
 Assert-Contains -Path $cp331BindingAdapter -Pattern '(?s)pub\(super\) fn advance_positive_supply_cp_air_assignment\(\s*runtime: &mut PurchasedAirRuntimeState,\s*system: &IdealLoadsAirSystem,\s*predecessor: PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardSnapshot,\s*zone_state: &ZoneHeatBalanceState,' -Description "CP331 binding adapter arguments"
@@ -308,12 +311,22 @@ if (-not $cp334BindingCallForCp331.Success) {
 }
 $cp334BindingCallEndForCp331 =
     $cp334BindingCallForCp331.Index + $cp334BindingCallForCp331.Length
+$cp335BindingCallForCp331 = [regex]::Match(
+    $cp331BindingText,
+    '(?s)let calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment =\s*advance_positive_supply_humidity_ratio_mixed_air_assignment\([^;]+?\)\?;'
+)
+if (-not $cp335BindingCallForCp331.Success) {
+    throw "Binding must retain the complete CP335 exact release call after CP334"
+}
+$cp335BindingCallEndForCp331 =
+    $cp335BindingCallForCp331.Index + $cp335BindingCallForCp331.Length
 if (
     $cp333BindingIndexForCp331 -lt $cp332BindingCallEndForCp331 -or
     $cp334BindingIndexForCp331 -lt $cp333BindingCallEndForCp331 -or
-    $numericalBindingIndexForCp331 -lt $cp334BindingCallEndForCp331
+    $cp335BindingIndexForCp331 -lt $cp334BindingCallEndForCp331 -or
+    $numericalBindingIndexForCp331 -lt $cp335BindingCallEndForCp331
 ) {
-    throw "CP332, CP333, and CP334 exact release calls must complete in source order before numerical Calc"
+    throw "CP332, CP333, CP334, and CP335 exact release calls must complete in source order before numerical Calc"
 }
 $postCp332BeforeCp333ForCp331 = $cp331BindingText.Substring(
     $cp332BindingCallEndForCp331,
@@ -333,14 +346,23 @@ $postCp333BeforeCp334CodeForCp331 =
 if ($postCp333BeforeCp334CodeForCp331 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
     throw "No intermediary helper call may execute after CP333 and before CP334"
 }
-$postCp334BeforeNumericalForCp331 = $cp331BindingText.Substring(
+$postCp334BeforeCp335ForCp331 = $cp331BindingText.Substring(
     $cp334BindingCallEndForCp331,
-    $numericalBindingIndexForCp331 - $cp334BindingCallEndForCp331
+    $cp335BindingIndexForCp331 - $cp334BindingCallEndForCp331
 )
-$postCp334BeforeNumericalCodeForCp331 =
-    [regex]::Replace($postCp334BeforeNumericalForCp331, '(?m)//.*$', '')
-if ($postCp334BeforeNumericalCodeForCp331 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No later source helper call may execute after CP334 and before numerical Calc"
+$postCp334BeforeCp335CodeForCp331 =
+    [regex]::Replace($postCp334BeforeCp335ForCp331, '(?m)//.*$', '')
+if ($postCp334BeforeCp335CodeForCp331 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No intermediary helper call may execute after CP334 and before CP335"
+}
+$postCp335BeforeNumericalForCp331 = $cp331BindingText.Substring(
+    $cp335BindingCallEndForCp331,
+    $numericalBindingIndexForCp331 - $cp335BindingCallEndForCp331
+)
+$postCp335BeforeNumericalCodeForCp331 =
+    [regex]::Replace($postCp335BeforeNumericalForCp331, '(?m)//.*$', '')
+if ($postCp335BeforeNumericalCodeForCp331 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No later source helper call may execute after CP335 and before numerical Calc"
 }
 
 # Coupled validation independently reconstructs CP331 from the CP330 route and

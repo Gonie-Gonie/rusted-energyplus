@@ -9,6 +9,7 @@ use super::super::{
     PurchasedAirCalcCoolingHumidificationFlowSnapshot, PurchasedAirCalcCoolingMixedAirCallSnapshot,
     PurchasedAirCalcCoolingOaMaxFlowBodySnapshot, PurchasedAirCalcCoolingOaMaxFlowGateSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentSnapshot,
+    PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitSnapshot,
@@ -97,6 +98,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered cooling positive-supply mixed-air-temperature limit snapshot.
     pub calculation_cooling_positive_supply_temperature_mixed_air_limit:
         PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitSnapshot,
+    /// Source-ordered cooling positive-supply mixed-air humidity-ratio assignment snapshot.
+    pub calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment:
+        PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

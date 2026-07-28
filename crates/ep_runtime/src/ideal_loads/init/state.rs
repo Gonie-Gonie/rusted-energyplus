@@ -25,6 +25,8 @@ use super::super::{
     PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState,
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentRuntimeState,
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentSnapshot,
+    PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentRuntimeState,
+    PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentRuntimeState,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitRuntimeState,
@@ -154,6 +156,10 @@ pub struct PurchasedAirRuntimeState {
         IdealLoadsAirSystemId,
         PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitSnapshot,
     >,
+    cooling_positive_supply_humidity_ratio_mixed_air_assignment_latest_witnesses: BTreeMap<
+        IdealLoadsAirSystemId,
+        PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentSnapshot,
+    >,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -246,6 +252,9 @@ pub struct PurchasedAirUnitRuntimeState {
     /// Persistent bounded Cooling positive-supply mixed-air temperature limit state.
     pub calc_cooling_positive_supply_temperature_mixed_air_limit:
         PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitRuntimeState,
+    /// Persistent bounded Cooling positive-supply mixed-air humidity-ratio assignment state.
+    pub calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment:
+        PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.

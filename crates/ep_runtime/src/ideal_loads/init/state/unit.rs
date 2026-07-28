@@ -77,6 +77,10 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitRuntimeState::new(
                     system,
                 ),
+            calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment:
+                PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentRuntimeState::new(
+                    system,
+                ),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,
