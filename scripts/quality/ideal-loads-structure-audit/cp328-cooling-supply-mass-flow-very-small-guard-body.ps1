@@ -15,7 +15,7 @@ $cp328ReleaseCorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_s
 $cp328Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
 $cp328BindingTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_supply_mass_flow_very_small_guard_body_tests.rs"
 $cp328InitState = "crates\ep_runtime\src\ideal_loads\init\state.rs"
-$cp328InitWitnesses = "crates\ep_runtime\src\ideal_loads\init\state\witnesses.rs"
+$cp328InitWitnesses = "crates\ep_runtime\src\ideal_loads\init\state\witnesses\cooling_supply_mass_flow_very_small_guard_body.rs"
 $cp328CoupledRuntime = "crates\ep_runtime\src\ideal_loads\coupled_runtime.rs"
 $cp328CoupledValidation = "crates\ep_runtime\src\ideal_loads\coupled_runtime\cooling_supply_mass_flow_very_small_guard_body_validation.rs"
 $cp328CoupledFixture = "crates\ep_runtime\src\ideal_loads\coupled_output_tests\cooling_supply_mass_flow_very_small_guard_body_fixture.rs"
@@ -369,13 +369,15 @@ foreach ($cp328Documentation in $cp328DocumentationSections) {
 $cp328MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp327DotSourceIndexForCp328 = $cp328MainAuditText.IndexOf('ideal-loads-structure-audit\cp327-cooling-supply-mass-flow-very-small-guard.ps1')
 $cp328DotSourceIndex = $cp328MainAuditText.IndexOf('ideal-loads-structure-audit\cp328-cooling-supply-mass-flow-very-small-guard-body.ps1')
+$cp329DotSourceIndexForCp328 = $cp328MainAuditText.IndexOf('ideal-loads-structure-audit\cp329-cooling-mixed-air-call.ps1')
 $cp328AuditCompletionIndex = $cp328MainAuditText.IndexOf('Write-Host "IdealLoads structure audit complete."')
 if (
     $cp327DotSourceIndexForCp328 -lt 0 -or
     $cp328DotSourceIndex -le $cp327DotSourceIndexForCp328 -or
-    $cp328AuditCompletionIndex -le $cp328DotSourceIndex
+    $cp329DotSourceIndexForCp328 -le $cp328DotSourceIndex -or
+    $cp328AuditCompletionIndex -le $cp329DotSourceIndexForCp328
 ) {
-    throw "Main IdealLoads audit must dot-source CP328 after CP327 and before completion"
+    throw "Main IdealLoads audit must dot-source CP328 after CP327 and before CP329 and completion"
 }
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp328-cooling-supply-mass-flow-very-small-guard-body\.ps1"' -Description "CP328 audit script inventory entry"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp328-cooling-supply-mass-flow-very-small-guard-body\.ps1::dot_sources' -Description "CP328 main-audit callee evidence"

@@ -24,6 +24,7 @@ mod cooling_entry_gate_tests;
 mod cooling_humidification_flow;
 #[cfg(test)]
 mod cooling_humidification_flow_tests;
+mod cooling_mixed_air_call;
 mod cooling_oa_max_flow_body;
 #[cfg(test)]
 mod cooling_oa_max_flow_body_tests;
@@ -62,18 +63,14 @@ pub use cooling_economizer_condition::*;
 pub use cooling_economizer_guard::*;
 pub use cooling_entry_gate::*;
 pub use cooling_humidification_flow::*;
+pub use cooling_mixed_air_call::*;
 pub use cooling_sensible_flow::*;
 pub use cooling_supply_mass_flow_maximum::*;
 pub use cooling_supply_mass_flow_very_small_guard::*;
 pub use lifecycle::*;
 pub use limits::IdealLoadsSensibleLimitContext;
 pub use minimum_oa_prefix::*;
-pub use moisture_demand::{
-    NoOaThirdOrderHumidityCorrector, NoOaThirdOrderHumidityCorrectorInput,
-    NoOaThirdOrderMoistureDemand, NoOaThirdOrderMoistureDemandInput,
-    calc_no_oa_third_order_moisture_demand_compat, correct_no_oa_third_order_humidity_ratio_compat,
-    third_order_humidity_history_term,
-};
+pub use moisture_demand::*;
 pub use no_oa::*;
 pub use psychrometrics::{energyplus_standard_air_density_kg_per_m3, moist_air_enthalpy_j_per_kg};
 pub use types::*;

@@ -16799,6 +16799,103 @@ capacity/supply-state behavior, and Heat/DeadBand selection remain excluded.
 state, required or forbidden feature, numerical result, capability, status,
 inventory/readiness count, evidence case, conformance claim, or Roadmap item.
 
+## CP329 Source-Ordered Cooling `CalcPurchAirMixedAir` Call
+
+CP329 supersedes only CP328's exclusion of the complete Cooling call statement
+at EnergyPlus 26.1 `PurchasedAirManager.cc` lines 2171-2178. The already
+canonical required `source_mapped` child is declared at
+`PurchasedAirManager.hh` lines 357-365 and defined at
+`PurchasedAirManager.cc` lines 2812-2939. CP329 maps the caller plus only the
+direct no-OA child route at lines 2851, 2854-2861, 2869-2874, 2876, 2878, and
+2932-2937; it does not promote the complete CP285 child.
+
+The caller has one executable statement and this exact nine-site textual
+inventory:
+
+1. bind the mutable EnergyPlus state reference;
+2. read the selected `PurchAirNum`;
+3. read retained `OAMassFlowRate`;
+4. read CP328's resulting `SupplyMassFlowRate`;
+5. bind the distinct `PurchAir.MixedAirTemp` mutable output reference;
+6. bind the distinct `PurchAir.MixedAirHumRat` mutable output reference;
+7. bind the distinct stack-local `MixedAirEnthalpy` mutable output reference;
+8. read retained `OperatingMode`; and
+9. invoke `CalcPurchAirMixedAir` and return normally.
+
+The first eight argument/reference expressions are a textual inventory only.
+CP329 does not claim a C++ function-argument evaluation order. They are
+side-effect-free at this boundary, and the child begins after all arguments
+are evaluated. `OAMassFlowRate` and `SupplyMassFlowRate` are passed by value;
+the child cannot mutate those parent locals. The stack-local mixed enthalpy is
+an output destination whose pre-call value is uninitialized and must never be
+read or validated.
+
+UnitOff and non-cooling predecessors skip the complete Cooling call. Every
+active Cooling predecessor invokes it exactly once, including zero supply flow
+when CP328 assigned positive zero and when CP328 preserved a guard-false
+positive flow.
+Exact release requires the completed same-call CP328 latest snapshot and
+private witness, bit-exact CP328 resulting supply flow, retained same-call
+no-OA `OAMassFlowRate=+0.0`, selected typed system identity, and CP312 Cooling
+mode. The separate Heat/DeadBand call at lines 2454-2461 is not an alternate
+CP329 route.
+
+On the admitted child path, the source aliases `PurchAir`, retains its OA and
+recirculation node numbers, initializes dead local recirculation flow, and
+snapshots recirculation temperature, humidity ratio, and stored enthalpy.
+Both reads of `PurchAir.OutdoorAir` are false. The first false route
+zero-initializes six OA inlet/after-recovery locals, then `HeatRecOn` becomes
+false. The second false result short-circuits the
+`OAMassFlowRate > 0.0` comparison, so the OA node, pressure, timestep,
+effectiveness, and operating-mode-dependent recovery work are not read and no
+psychrometric routine is called. The fallback copies supply flow to a dead
+local, writes recirculation temperature, humidity ratio, and enthalpy to the
+three distinct outputs, and writes `HtRecSenOutput=+0.0` followed by
+`HtRecLatOutput=+0.0`. It does not write `TimeHtRecActive`; exact release
+retains the CP310 entry reset.
+
+Rust's exact direct topology has no independently mutable `Node.Enthalpy`
+store. The CP329 release wrapper therefore derives one coherent finite
+recirculation enthalpy from the already bound Zone temperature and humidity
+ratio and passes that provenance-controlled projection to the dedicated
+bounded child transition. The copied enthalpy is exact only inside this
+coherent direct subset. CP329 does not claim arbitrary stored enthalpy
+inconsistent with T/W, the source's late Node rereads, torn state, output or
+state aliases, active OA or heat recovery, saturation-cache and diagnostic
+semantics, partial-write failure prefixes, retry, reset, or concurrency.
+The broader `outdoor_air::mixed_air::mixed_air_state` helper is not the exact
+CP329 child and cannot establish those semantics.
+
+`calc/cooling_mixed_air_call.rs` owns
+`PurchasedAirCalcCoolingMixedAirCallSnapshot`,
+`PurchasedAirCalcCoolingMixedAirCallRuntimeState`,
+`PurchasedAirCalcCoolingMixedAirCallLifecycleSummary`, the pure bounded
+transition and release validation. Public
+`advance_direct_no_oa_calc_cooling_mixed_air_call` validates CP328 and the
+retained prefix before mutation, and
+`purchased_air_calc_cooling_mixed_air_call_lifecycle_summary` exposes the
+selected-unit lifecycle. The binder executes CP329 immediately after CP328
+and before the unchanged numerical DTO. Per-step, final, coupled-runtime, and
+pipeline validators reconcile identity and ordinal; UnitOff/non-cooling/
+active partitions; all nine caller sites; one call per active Cooling
+predecessor; exact OA and supply-flow provenance; the three child output
+writes; two positive-zero recovery writes; zero psychrometric/OA-node work;
+and the heat-recovery-time non-write. Direct-only JSON publishes
+`purchased_air_calc_cooling_mixed_air_call_lifecycle`; non-direct or
+disconnected evidence is rejected.
+
+CP329 is lifecycle evidence only. It neither consumes nor reconciles with the
+later numerical DTO and does not feed or replace it. Lines 2179-2182 contain
+only whitespace and comments; the first excluded executable after normal call
+return is `if (SupplyMassFlowRate > 0.0)` at line 2183. Its capacity and supply
+state body, the separate Heat/DeadBand call at lines 2454-2461, and all later
+behavior remain excluded. `OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`,
+and Autosizing remain forbidden. Both parents remain `scaffold`/`none`;
+`routine.calc_purch_air_loads` and `routine.calc_purch_air_mixed_air` remain
+`source_mapped`. CP329 changes no algorithm/routine count, readiness, support
+level, run state, required or forbidden feature, output claim, evidence case,
+numerical conformance, capability, status, or Roadmap item.
+
 
 
 

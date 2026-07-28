@@ -18,6 +18,9 @@ use crate::{
         PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE,
         PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_CHILD_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_BODY_SOURCE,
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_FIRST_EXCLUDED_SOURCE,
@@ -229,6 +232,25 @@ fn cooling_supply_mass_flow_very_small_guard_body_partition_overflow_fails_close
                 expected: 1,
                 actual: usize::MAX,
             }
+    ));
+}
+
+#[test]
+fn cooling_mixed_air_call_partition_overflow_fails_closed() {
+    let error = super::cooling_mixed_air_call_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingMixedAirCallLifecycleInvariant {
+            field: "test_partition_overflow",
+            expected: 1,
+            actual: usize::MAX,
+        }
     ));
 }
 
@@ -1158,6 +1180,37 @@ fn cooling_sensible_flow_lifecycle_records_unit_off_without_source_execution() {
     assert_eq!(latest.predecessor_supply_mass_flow_rate_kg_per_s, None);
     assert_eq!(latest.assigned_supply_mass_flow_rate_kg_per_s, None);
     assert_eq!(latest.resulting_supply_mass_flow_rate_kg_per_s, None);
+
+    let lifecycle = simulation.summary.calc_cooling_mixed_air_call_lifecycle;
+    assert_eq!(
+        lifecycle.source,
+        PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_SOURCE
+    );
+    assert_eq!(
+        lifecycle.child_source,
+        PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_CHILD_SOURCE
+    );
+    assert_eq!(
+        lifecycle.first_excluded_source,
+        PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(lifecycle.state.transition_count, 1);
+    assert_eq!(lifecycle.state.unit_off_skip_count, 1);
+    assert_eq!(lifecycle.state.non_cooling_skip_count, 0);
+    assert_eq!(lifecycle.state.cooling_call_count, 0);
+    assert_eq!(lifecycle.state.mixed_air_child_call_count, 0);
+    assert_eq!(lifecycle.state.mixed_air_output_assignment_count, 0);
+    let latest = lifecycle.state.latest.expect("latest CP329 off snapshot");
+    assert!(latest.unit_off_skipped);
+    assert!(!latest.non_cooling_skipped);
+    assert!(!latest.cooling_call_executed);
+    assert!(!latest.calc_purch_air_mixed_air_called);
+    assert_eq!(latest.supply_mass_flow_rate_kg_per_s, None);
+    assert_eq!(latest.mixed_air_temperature_c, None);
+    assert_eq!(latest.mixed_air_humidity_ratio, None);
+    assert_eq!(latest.mixed_air_enthalpy_projection_j_per_kg, None);
+    assert_eq!(latest.heat_recovery_sensible_output_w, None);
+    assert_eq!(latest.heat_recovery_latent_output_w, None);
 }
 
 #[test]
@@ -1343,6 +1396,26 @@ fn all_hard_sized_finite_limit_branches_run_with_source_threshold_demand() {
         assert!(latest_very_small_guard_body.body_skipped);
         assert_eq!(
             latest_very_small_guard_body.resulting_supply_mass_flow_rate_kg_per_s,
+            None
+        );
+        let mixed_air_call = simulation.summary.calc_cooling_mixed_air_call_lifecycle;
+        assert_eq!(mixed_air_call.state.transition_count, required_steps);
+        assert_eq!(mixed_air_call.state.unit_off_skip_count, 0);
+        assert_eq!(mixed_air_call.state.non_cooling_skip_count, required_steps);
+        assert_eq!(mixed_air_call.state.cooling_call_count, 0);
+        assert_eq!(mixed_air_call.state.mixed_air_child_call_count, 0);
+        assert_eq!(mixed_air_call.state.mixed_air_output_assignment_count, 0);
+        let latest_mixed_air_call = mixed_air_call
+            .state
+            .latest
+            .expect("latest finite CP329 snapshot");
+        assert!(latest_mixed_air_call.non_cooling_skipped);
+        assert!(!latest_mixed_air_call.cooling_call_executed);
+        assert!(!latest_mixed_air_call.calc_purch_air_mixed_air_called);
+        assert_eq!(latest_mixed_air_call.mixed_air_temperature_c, None);
+        assert_eq!(latest_mixed_air_call.mixed_air_humidity_ratio, None);
+        assert_eq!(
+            latest_mixed_air_call.mixed_air_enthalpy_projection_j_per_kg,
             None
         );
         let density = lifecycle
@@ -2438,6 +2511,95 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
             "{limit:?}"
         );
 
+        let mixed_air_call = simulation.summary.calc_cooling_mixed_air_call_lifecycle;
+        assert_eq!(
+            mixed_air_call.source,
+            PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_SOURCE
+        );
+        assert_eq!(
+            mixed_air_call.child_source,
+            PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_CHILD_SOURCE
+        );
+        assert_eq!(
+            mixed_air_call.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_FIRST_EXCLUDED_SOURCE
+        );
+        assert_eq!(mixed_air_call.state.transition_count, 1, "{limit:?}");
+        assert_eq!(mixed_air_call.state.cooling_call_count, 1, "{limit:?}");
+        assert_eq!(
+            mixed_air_call.state.mixed_air_child_call_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            mixed_air_call.state.no_outdoor_air_fallback_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            mixed_air_call.state.mixed_air_output_assignment_count, 3,
+            "{limit:?}"
+        );
+        assert_eq!(
+            mixed_air_call
+                .state
+                .heat_recovery_output_positive_zero_assignment_count,
+            2,
+            "{limit:?}"
+        );
+        let latest_mixed_air_call = mixed_air_call.state.latest.expect("latest CP329 snapshot");
+        assert!(latest_mixed_air_call.cooling_call_executed);
+        assert!(latest_mixed_air_call.calc_purch_air_mixed_air_called);
+        assert!(latest_mixed_air_call.no_outdoor_air_fallback_entered);
+        assert_eq!(
+            latest_mixed_air_call
+                .supply_mass_flow_rate_kg_per_s
+                .map(f64::to_bits),
+            latest_very_small_guard_body
+                .resulting_supply_mass_flow_rate_kg_per_s
+                .map(f64::to_bits),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_mixed_air_call
+                .mixed_air_temperature_c
+                .map(f64::to_bits),
+            latest_mixed_air_call
+                .recirculation_temperature_c
+                .map(f64::to_bits),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_mixed_air_call
+                .mixed_air_humidity_ratio
+                .map(f64::to_bits),
+            latest_mixed_air_call
+                .recirculation_humidity_ratio
+                .map(f64::to_bits),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_mixed_air_call
+                .mixed_air_enthalpy_projection_j_per_kg
+                .map(f64::to_bits),
+            latest_mixed_air_call
+                .recirculation_enthalpy_projection_j_per_kg
+                .map(f64::to_bits),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_mixed_air_call
+                .heat_recovery_sensible_output_w
+                .map(f64::to_bits),
+            Some(0.0_f64.to_bits()),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_mixed_air_call
+                .heat_recovery_latent_output_w
+                .map(f64::to_bits),
+            Some(0.0_f64.to_bits()),
+            "{limit:?}"
+        );
+
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation
                 .results
@@ -2449,6 +2611,58 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
             );
         }
     }
+}
+
+#[test]
+fn cooling_mixed_air_call_executes_for_active_positive_zero_supply_flow() {
+    let mut typed = exact_model(1).typed;
+    typed.schedules[1].hourly_value = 0.0;
+    typed.schedules[2].hourly_value = 15.0;
+    let system = &mut typed.ideal_loads_air_systems[0];
+    system.cooling_limit = IdealLoadsLimit::LimitCapacity;
+    system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(0.0));
+    let model = SimulationModel::from_typed(typed);
+    let schedule_cache =
+        precompute_schedule_cache(&model.typed, 1).expect("one zero-capacity cooling sample");
+    let weather = weather_series_with_conditions(&model, 1, 30.0, 15.0, 30.0, 101_325.0);
+    let mut options = DirectZonePurchasedAirCoupledOptions::hourly_samples(1);
+    options.initial_zone_air_temperature_c = INITIAL_ZONE_TEMPERATURE_C;
+
+    let simulation = simulate_direct_zone_purchased_air_coupled_heat_balance(
+        &model,
+        &weather,
+        &schedule_cache,
+        options,
+    )
+    .expect("active zero-flow CP329 call");
+    let lifecycle = simulation.summary.calc_cooling_mixed_air_call_lifecycle;
+    assert_eq!(lifecycle.state.transition_count, 1);
+    assert_eq!(lifecycle.state.cooling_call_count, 1);
+    assert_eq!(lifecycle.state.unit_off_skip_count, 0);
+    assert_eq!(lifecycle.state.non_cooling_skip_count, 0);
+    let latest = lifecycle.state.latest.expect("zero-flow CP329 snapshot");
+    assert!(latest.predecessor_zero_flow_reset_body_entered);
+    assert!(latest.cooling_call_executed);
+    assert!(latest.calc_purch_air_mixed_air_called);
+    assert_eq!(
+        latest.supply_mass_flow_rate_kg_per_s.map(f64::to_bits),
+        Some(0.0_f64.to_bits())
+    );
+    assert_eq!(
+        latest
+            .child_supply_mass_flow_rate_kg_per_s
+            .map(f64::to_bits),
+        Some(0.0_f64.to_bits())
+    );
+    assert_eq!(
+        latest
+            .resulting_recirculation_mass_flow_rate_kg_per_s
+            .map(f64::to_bits),
+        Some(0.0_f64.to_bits())
+    );
+    assert!(latest.mixed_air_temperature_assigned);
+    assert!(latest.mixed_air_humidity_ratio_assigned);
+    assert!(latest.mixed_air_enthalpy_projection_assigned);
 }
 
 #[test]

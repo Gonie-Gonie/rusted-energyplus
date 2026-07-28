@@ -31,7 +31,8 @@ use super::{
     PurchasedAirCalcCoolingEconomizerGuardError, PurchasedAirCalcCoolingEconomizerGuardSnapshot,
     PurchasedAirCalcCoolingEntryGateError, PurchasedAirCalcCoolingEntryGateSnapshot,
     PurchasedAirCalcCoolingHumidificationFlowError,
-    PurchasedAirCalcCoolingHumidificationFlowSnapshot, PurchasedAirCalcCoolingOaMaxFlowBodyError,
+    PurchasedAirCalcCoolingHumidificationFlowSnapshot, PurchasedAirCalcCoolingMixedAirCallError,
+    PurchasedAirCalcCoolingMixedAirCallSnapshot, PurchasedAirCalcCoolingOaMaxFlowBodyError,
     PurchasedAirCalcCoolingOaMaxFlowBodySnapshot, PurchasedAirCalcCoolingOaMaxFlowGateError,
     PurchasedAirCalcCoolingOaMaxFlowGateSnapshot, PurchasedAirCalcCoolingSensibleFlowError,
     PurchasedAirCalcCoolingSensibleFlowSnapshot,
@@ -61,6 +62,7 @@ use super::{
     advance_direct_no_oa_calc_cooling_economizer_guard,
     advance_direct_no_oa_calc_cooling_entry_gate,
     advance_direct_no_oa_calc_cooling_humidification_flow,
+    advance_direct_no_oa_calc_cooling_mixed_air_call,
     advance_direct_no_oa_calc_cooling_oa_max_flow_body,
     advance_direct_no_oa_calc_cooling_oa_max_flow_gate,
     advance_direct_no_oa_calc_cooling_sensible_flow,
@@ -658,6 +660,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingSupplyMassFlowVerySmallGuardBody(
         PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodyError,
     ),
+    /// The bounded Cooling mixed-air call or no-OA child route rejected its release state.
+    CalculationCoolingMixedAirCall(PurchasedAirCalcCoolingMixedAirCallError),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -775,6 +779,8 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered cooling supply mass-flow positive-zero reset-body snapshot.
     pub calculation_cooling_supply_mass_flow_very_small_guard_body:
         PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
+    /// Source-ordered Cooling mixed-air call and bounded no-OA child snapshot.
+    pub calculation_cooling_mixed_air_call: PurchasedAirCalcCoolingMixedAirCallSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
@@ -1055,6 +1061,13 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             DirectZonePurchasedAirScheduledCouplingError::
                 CalculationCoolingSupplyMassFlowVerySmallGuardBody,
         )?;
+    let calculation_cooling_mixed_air_call = advance_direct_no_oa_calc_cooling_mixed_air_call(
+        input.purchased_air_runtime_state,
+        binding.system,
+        calculation_cooling_supply_mass_flow_very_small_guard_body,
+        &*input.zone_state,
+    )
+    .map_err(DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingMixedAirCall)?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1111,6 +1124,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_supply_mass_flow_limit_body,
         calculation_cooling_supply_mass_flow_very_small_guard,
         calculation_cooling_supply_mass_flow_very_small_guard_body,
+        calculation_cooling_mixed_air_call,
         coupling,
     })
 }

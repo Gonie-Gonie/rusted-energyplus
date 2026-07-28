@@ -33999,6 +33999,39 @@ Autosizing remain forbidden. CP328 adds no support, conformance, capability,
 status, count, readiness, evidence-case, numerical conformance, or Roadmap
 promotion.
 
+## CP329 Cooling Mixed-Air Call in the Heat-Balance Loop
+
+CP329 executes immediately after CP328 and before the unchanged bounded
+PurchasedAir numerical calculation. It maps the complete
+`CalcPurchAirMixedAir` call at `PurchasedAirManager.cc` lines 2171-2178 as
+nine textual caller sites without claiming C++ argument evaluation order, and
+it executes only the direct no-OA child fallback from CP285.
+
+UnitOff and non-cooling paths skip this Cooling call. Every active Cooling path
+calls once, including zero supply flow and both CP328 active routes. Exact
+release consumes CP328's bit-exact supply result, retained no-OA positive-zero
+flow, system identity, Cooling mode, and coherent finite recirculation state.
+The child performs no OA-node or psychrometric work; it copies recirculation
+temperature, humidity ratio, and enthalpy into mixed state, zeros both
+heat-recovery outputs, and does not write heat-recovery active time.
+
+Because the direct Rust heat-balance state has no independent stored Node
+enthalpy, CP329 projects a coherent enthalpy from bound temperature and
+humidity ratio. This excludes arbitrary stored-H inconsistency, torn reads,
+aliases, active OA/heat-recovery and saturation/cache/diagnostic behavior, and
+failure/replay/concurrency parity. Validators publish direct-only
+`purchased_air_calc_cooling_mixed_air_call_lifecycle` evidence after CP328 and
+before the numerical DTO. CP329 does not consume, reconcile with, feed, or
+replace that DTO and changes no Zone or heat-balance equation.
+
+The first excluded executable after the call is line 2183; lines 2180-2182 are
+comments. The separate Heat/DeadBand call at lines 2454-2461 and all later
+capacity, supply-state, Heat/DeadBand, and feedback work remain excluded.
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, and Autosizing remain
+forbidden. Both parents remain `scaffold`/`none`; Calc and mixed-air routines
+remain `source_mapped`. CP329 adds no support, conformance, capability, status,
+count, readiness, evidence-case, numerical conformance, or Roadmap promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

@@ -49,6 +49,7 @@ use super::{
     PurchasedAirCalcCoolingEntryGateLifecycleSummary,
     PurchasedAirCalcCoolingHumidificationFlowError,
     PurchasedAirCalcCoolingHumidificationFlowLifecycleSummary,
+    PurchasedAirCalcCoolingMixedAirCallError, PurchasedAirCalcCoolingMixedAirCallLifecycleSummary,
     PurchasedAirCalcCoolingOaMaxFlowBodyError,
     PurchasedAirCalcCoolingOaMaxFlowBodyLifecycleSummary,
     PurchasedAirCalcCoolingOaMaxFlowGateError,
@@ -81,6 +82,7 @@ use super::{
     purchased_air_calc_cooling_economizer_guard_lifecycle_summary,
     purchased_air_calc_cooling_entry_gate_lifecycle_summary,
     purchased_air_calc_cooling_humidification_flow_lifecycle_summary,
+    purchased_air_calc_cooling_mixed_air_call_lifecycle_summary,
     purchased_air_calc_cooling_oa_max_flow_body_lifecycle_summary,
     purchased_air_calc_cooling_oa_max_flow_gate_lifecycle_summary,
     purchased_air_calc_cooling_sensible_flow_lifecycle_summary,
@@ -102,6 +104,7 @@ mod cooling_economizer_condition_validation;
 mod cooling_economizer_guard_validation;
 mod cooling_entry_validation;
 mod cooling_humidification_flow_validation;
+mod cooling_mixed_air_call_validation;
 mod cooling_oa_max_flow_body_validation;
 mod cooling_oa_max_flow_validation;
 mod cooling_sensible_flow_validation;
@@ -238,6 +241,8 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded cooling supply mass-flow positive-zero reset-body lifecycle report.
     pub calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle:
         PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodyLifecycleSummary,
+    /// Persistent bounded cooling mixed-air call lifecycle report.
+    pub calc_cooling_mixed_air_call_lifecycle: PurchasedAirCalcCoolingMixedAirCallLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -325,6 +330,8 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     CalcCoolingSupplyMassFlowVerySmallGuardBodyLifecycle(
         PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodyError,
     ),
+    /// Final cooling mixed-air call summary could not resolve the bound unit.
+    CalcCoolingMixedAirCallLifecycle(PurchasedAirCalcCoolingMixedAirCallError),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
         /// Stable invariant field.
@@ -505,6 +512,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A cooling mixed-air call lifecycle invariant did not match the run.
+    CalcCoolingMixedAirCallLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -602,6 +618,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     },
     /// A cooling supply mass-flow positive-zero reset-body snapshot did not match its bound release call.
     UnexpectedCalculationCoolingSupplyMassFlowVerySmallGuardBody {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
+    /// A cooling mixed-air call snapshot did not match its bound release call.
+    UnexpectedCalculationCoolingMixedAirCall {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
@@ -733,6 +754,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcCoolingSupplyMassFlowVerySmallGuardBodyLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir cooling supply mass-flow positive-zero reset-body lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcCoolingMixedAirCallLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir cooling mixed-air call lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -894,6 +919,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir cooling supply mass-flow positive-zero reset-body lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingMixedAirCallLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir cooling mixed-air call lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -986,6 +1019,12 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 write!(
                     formatter,
                     "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling supply mass-flow positive-zero reset body"
+                )
+            }
+            Self::UnexpectedCalculationCoolingMixedAirCall { timestep_index } => {
+                write!(
+                    formatter,
+                    "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling mixed-air call"
                 )
             }
             Self::UnexpectedDemandInputKind {
@@ -1350,6 +1389,16 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
                 },
             );
         }
+        if !cooling_mixed_air_call_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingMixedAirCall { timestep_index },
+            );
+        }
         let actual_branch = output.coupling.purchased_air.branch;
         if actual_branch != binding.branch {
             return Err(
@@ -1677,6 +1726,19 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_mixed_air_call_lifecycle =
+        purchased_air_calc_cooling_mixed_air_call_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingMixedAirCallLifecycle)?;
+    cooling_mixed_air_call_validation::validate_lifecycle(
+        &calc_cooling_mixed_air_call_lifecycle,
+        &calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -1758,6 +1820,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_supply_mass_flow_limit_body_lifecycle,
             calc_cooling_supply_mass_flow_very_small_guard_lifecycle,
             calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle,
+            calc_cooling_mixed_air_call_lifecycle,
         },
         state,
         results,

@@ -332,6 +332,8 @@ fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
         rust_runtime["purchased_air_calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle"]
             .is_null()
     );
+    assert!(rust_runtime.contains_key("purchased_air_calc_cooling_mixed_air_call_lifecycle"));
+    assert!(rust_runtime["purchased_air_calc_cooling_mixed_air_call_lifecycle"].is_null());
     assert_eq!(summary["source_order_gate"]["matches"], true);
     assert_output_manifest(&output_dir, SUPPORTED_RUNTIME_MANIFEST)?;
     assert!(

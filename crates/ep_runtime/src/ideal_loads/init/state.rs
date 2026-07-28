@@ -19,6 +19,7 @@ use super::super::{
     PurchasedAirCalcCoolingEntryGateRuntimeState,
     PurchasedAirCalcCoolingHumidificationFlowRuntimeState,
     PurchasedAirCalcCoolingHumidificationFlowSnapshot,
+    PurchasedAirCalcCoolingMixedAirCallRuntimeState, PurchasedAirCalcCoolingMixedAirCallSnapshot,
     PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState,
     PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState,
     PurchasedAirCalcCoolingSensibleFlowRuntimeState, PurchasedAirCalcCoolingSensibleFlowSnapshot,
@@ -122,6 +123,8 @@ pub struct PurchasedAirRuntimeState {
         IdealLoadsAirSystemId,
         PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
     >,
+    cooling_mixed_air_call_latest_witnesses:
+        BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingMixedAirCallSnapshot>,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -197,6 +200,8 @@ pub struct PurchasedAirUnitRuntimeState {
     /// Persistent bounded cooling supply-mass-flow positive-zero reset-body state.
     pub calc_cooling_supply_mass_flow_very_small_guard_body:
         PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodyRuntimeState,
+    /// Persistent bounded Cooling mixed-air call and no-OA fallback state.
+    pub calc_cooling_mixed_air_call: PurchasedAirCalcCoolingMixedAirCallRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -309,6 +314,9 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardRuntimeState::new(system),
             calc_cooling_supply_mass_flow_very_small_guard_body:
                 PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodyRuntimeState::new(system),
+            calc_cooling_mixed_air_call: PurchasedAirCalcCoolingMixedAirCallRuntimeState::new(
+                system,
+            ),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

@@ -21689,6 +21689,40 @@ changes no support level, conformance, capability, status,
 inventory/readiness count, evidence case, numerical conformance, or Roadmap
 state.
 
+## CP329 Cooling Mixed-Air Call Placement
+
+CP329 maps the complete `CalcPurchAirMixedAir` call at
+`PurchasedAirManager.cc` lines 2171-2178 between CP328 and the unchanged
+numerical PurchasedAir DTO. The nine caller sites are a textual inventory of
+eight argument/reference expressions plus invocation/normal completion; they
+do not claim a C++ function-argument evaluation order. The admitted child is
+only CP285's direct no-OA fallback.
+
+UnitOff and non-cooling paths skip this Cooling call. Every active Cooling path
+calls once even for zero supply flow, using CP328's exact result, retained
+no-OA `+0.0`, system identity, and Cooling mode. The child performs no OA-node
+or psychrometric work, copies recirculation temperature, humidity ratio, and
+enthalpy to mixed state, writes both heat-recovery outputs to positive zero,
+and leaves the reset heat-recovery active time unchanged.
+
+The direct Zone binding lacks an independently mutable stored Node enthalpy,
+so CP329 admits coherent finite recirculation state and projects enthalpy from
+bound temperature/humidity. Stored-H inconsistency, late/torn Node reads,
+aliases, active OA/recovery, saturation/cache/diagnostics, and failure/replay/
+concurrency remain excluded. Coupled and pipeline validation publish
+direct-only `purchased_air_calc_cooling_mixed_air_call_lifecycle` evidence.
+CP329 neither consumes nor reconciles with the later numerical DTO and does
+not feed or replace it.
+
+No CP329 site changes Zone demand, coefficients, correction, or feedback. The
+first excluded executable is line 2183 after comments at lines 2180-2182. The
+Heat/DeadBand call at lines 2454-2461 and later capacity, supply-state, and
+Zone-air work remain excluded. `OutdoorAir`, `Economizer`, `HeatRecovery`,
+`EMS`, and Autosizing remain forbidden. Both parents remain `scaffold`/`none`;
+Calc and mixed-air routines remain `source_mapped`. CP329 changes no support
+level, conformance, capability, status, inventory/readiness count, evidence
+case, numerical conformance, or Roadmap state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

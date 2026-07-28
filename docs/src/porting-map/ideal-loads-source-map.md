@@ -19212,6 +19212,51 @@ CP328 adds target inventory and lifecycle evidence only; support, conformance,
 statuses, counts, readiness, capability, evidence cases, numerical
 conformance, and Roadmap state remain unchanged.
 
+## CP329 Cooling `CalcPurchAirMixedAir` Call and No-OA Fallback
+
+CP329 maps the complete Cooling call statement at
+`PurchasedAirManager.cc` lines 2171-2178 and only the bounded CP285 no-OA
+child route at lines 2851, 2854-2861, 2869-2874, 2876, 2878, and 2932-2937.
+Its nine textual caller sites bind/read `state`, selected unit, retained OA
+flow, CP328's resulting supply flow, three distinct mixed-air output
+references, and Cooling mode, then invoke and normally return from
+`CalcPurchAirMixedAir`. This inventory does not claim a C++ argument
+evaluation order.
+
+UnitOff and non-cooling predecessors skip this call. Every active Cooling
+predecessor calls once even when supply flow is zero, so both CP328 active
+routes reach CP329. Exact direct release retains no-OA
+`OAMassFlowRate=+0.0`. The child reads both `OutdoorAir` predicates false,
+does not dereference the OA node or call a psychrometric routine, copies
+recirculation temperature, humidity ratio, and enthalpy to the mixed outputs,
+writes both recovery outputs to exact positive zero, and leaves the
+already-reset heat-recovery active time untouched.
+
+The direct Rust topology owns no independently mutable EnergyPlus stored
+`Node.Enthalpy`. CP329 admits only coherent finite recirculation state and
+projects enthalpy from the bound temperature/humidity ratio before the
+dedicated child copies it. Arbitrary stored-H inconsistency, late/torn Node
+reads, aliases, active OA/recovery and saturation behavior, psychrometric
+cache/diagnostics, failure prefixes, replay, and concurrency remain CP285
+nonclaims. The broader outdoor-air mixed-state helper is not substituted for
+this exact child.
+
+`advance_direct_no_oa_calc_cooling_mixed_air_call` validates the same-call
+CP328 snapshot and retained no-OA/Cooling provenance. The binder places it
+between CP328 and the unchanged numerical DTO; direct-only JSON exposes
+`purchased_air_calc_cooling_mixed_air_call_lifecycle`. CP329 neither consumes
+nor reconciles with that DTO and does not feed or replace it. The first
+excluded executable is the line-2183 positive-supply guard; lines 2180-2182
+are comments. The Heat/DeadBand call at lines 2454-2461 and all capacity,
+supply-state, and later behavior remain open.
+
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, and Autosizing remain
+forbidden. Both parent algorithms remain `scaffold`/`none`;
+`routine.calc_purch_air_loads` and `routine.calc_purch_air_mixed_air` remain
+`source_mapped`. CP329 adds target inventory and lifecycle evidence only;
+support, conformance, statuses, counts, readiness, capability, evidence
+cases, numerical conformance, and Roadmap state remain unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

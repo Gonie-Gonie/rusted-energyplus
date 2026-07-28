@@ -40,6 +40,8 @@ mod cooling_economizer_guard_tests;
 mod cooling_entry_gate_tests;
 #[path = "binding/cooling_humidification_flow_tests.rs"]
 mod cooling_humidification_flow_tests;
+#[path = "binding/cooling_mixed_air_call_tests.rs"]
+mod cooling_mixed_air_call_tests;
 #[path = "binding/cooling_oa_max_flow_body_tests.rs"]
 mod cooling_oa_max_flow_body_tests;
 #[path = "binding/cooling_oa_max_flow_gate_tests.rs"]

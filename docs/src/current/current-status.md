@@ -890,6 +890,48 @@ capacity and supply-state work, and Heat/DeadBand selection remain open.
 capability, status, inventory count, evidence cases, numerical conformance,
 and Roadmap state remain unchanged.
 
+CP329 maps the complete Cooling `CalcPurchAirMixedAir` call statement at
+EnergyPlus 26.1 `PurchasedAirManager.cc` lines 2171-2178 plus only the bounded
+direct no-OA child fallback. The call has nine textual source sites: eight
+argument/reference expressions and one invocation/normal-completion site.
+Their inventory does not claim a C++ function-argument evaluation order.
+The call reads CP328's bit-exact resulting supply flow, retained no-OA
+`OAMassFlowRate=+0.0`, selected-system identity, and Cooling mode; it binds
+distinct mixed-temperature, mixed-humidity, and stack-local mixed-enthalpy
+output destinations.
+
+UnitOff and non-cooling predecessors skip this Cooling call. Every active
+Cooling predecessor calls it exactly once, including zero supply flow and both
+the CP328 assignment and active guard-false routes. The admitted child path
+reads no OA node and performs no psychrometric call. It copies recirculation
+temperature, humidity ratio, and enthalpy into the three mixed-air outputs,
+writes both heat-recovery outputs to exact positive zero, and does not write
+the already-zero heat-recovery active time.
+
+The exact direct model has no independently mutable EnergyPlus
+`Node.Enthalpy` field. CP329 therefore admits only a coherent finite
+recirculation state and projects enthalpy from its bound temperature and
+humidity ratio before the bounded child copies it. This is not parity for an
+arbitrary stored enthalpy inconsistent with temperature/humidity, torn Node
+reads, output-reference aliases, or the active OA/heat-recovery,
+saturation-cache, diagnostic, partial-failure, replay, and concurrency
+behavior documented by CP285.
+
+The binder places
+`advance_direct_no_oa_calc_cooling_mixed_air_call` immediately after CP328
+and before the unchanged numerical calculation. Direct-only lifecycle
+evidence is published as
+`purchased_air_calc_cooling_mixed_air_call_lifecycle`. CP329 does not consume,
+reconcile with, feed, or replace the later numerical DTO. The first excluded
+executable after normal call return is the positive-supply guard at line 2183;
+lines 2180-2182 are comments. The separate Heat/DeadBand call at lines
+2454-2461 and all capacity, supply-state, and later work remain open.
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, and Autosizing remain
+forbidden. Both parent algorithms remain `scaffold`/`none`;
+`routine.calc_purch_air_loads` and `routine.calc_purch_air_mixed_air` remain
+`source_mapped`, and counts, readiness, support, evidence cases, numerical
+conformance, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It
