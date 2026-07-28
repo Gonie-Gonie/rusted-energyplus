@@ -9,6 +9,7 @@ use crate::ideal_loads::{
     PurchasedAirCalcCoolingEconomizerBodySnapshot,
     PurchasedAirCalcCoolingEconomizerConditionSnapshot,
     PurchasedAirCalcCoolingHumidificationFlowSnapshot, PurchasedAirCalcCoolingSensibleFlowSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot,
 };
@@ -155,6 +156,24 @@ impl PurchasedAirRuntimeState {
         snapshot: PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
     ) {
         self.cooling_supply_mass_flow_ems_override_guard_latest_witnesses
+            .insert(system, snapshot);
+    }
+
+    pub(in crate::ideal_loads) fn cooling_supply_mass_flow_ems_override_body_latest_witness(
+        &self,
+        system: IdealLoadsAirSystemId,
+    ) -> Option<PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot> {
+        self.cooling_supply_mass_flow_ems_override_body_latest_witnesses
+            .get(&system)
+            .copied()
+    }
+
+    pub(in crate::ideal_loads) fn set_cooling_supply_mass_flow_ems_override_body_latest_witness(
+        &mut self,
+        system: IdealLoadsAirSystemId,
+        snapshot: PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
+    ) {
+        self.cooling_supply_mass_flow_ems_override_body_latest_witnesses
             .insert(system, snapshot);
     }
 }

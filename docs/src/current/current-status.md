@@ -726,6 +726,33 @@ open. EMS remains forbidden, and CP323 changes no support, readiness,
 conformance, capability, status, inventory count, evidence case, or Roadmap
 state.
 
+CP324 maps the complete Cooling supply mass-flow EMS override body at
+executable lines 2158-2159 as six lexical source sites: read
+`EMSValueMassFlowRate`, assign `SupplyMassFlowRate`, read
+`OAMassFlowRate` and the overridden supply flow as the two minimum operands,
+apply the source-shaped two-argument minimum, and assign the result back to
+`OAMassFlowRate`. The lexical operand sites do not claim a C++ function
+argument evaluation order. Private true-body characterization preserves
+ObjexxFCL's strict-`<` minimum and its right-operand selection on a tie or
+unordered comparison.
+
+The exact direct release lane consumes the completed same-call CP323 latest
+snapshot and private witness and requires its false EMS-disabled result.
+UnitOff, non-cooling, and every active exact-direct transition therefore skip
+all six CP324 sites, execute no override body, read no EMS value, and mutate no
+supply or outdoor-air flow. The binder and lifecycle firewalls retain
+CP323-to-CP324-to-numerical ordering. Direct-only evidence is exposed as
+`purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle`;
+non-direct, disconnected, or true-EMS evidence is rejected.
+
+Line 2161 is the first excluded executable and begins the cooling flow-limit
+condition. Its selector reads, maximum-flow test, minimum and assignment, the
+line-2166 very-small-flow clamp, mixed-air/capacity/supply-state behavior, and
+Heat/DeadBand selection remain open. No EMS actuator field or service is
+introduced, `EMS` remains forbidden, and CP324 changes no support, readiness,
+conformance, capability, status, inventory count, evidence case, or Roadmap
+state.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

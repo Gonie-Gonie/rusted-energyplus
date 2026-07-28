@@ -33834,6 +33834,34 @@ work, Heat/DeadBand selection, and all later feedback remain excluded. `EMS`
 remains forbidden. CP323 adds no support, conformance, capability, status,
 count, readiness, evidence-case, or Roadmap promotion.
 
+## CP324 Cooling Supply Mass-Flow EMS Override Body in the Heat-Balance Loop
+
+CP324 executes immediately after CP323 and before the unchanged bounded
+PurchasedAir numerical calculation. It maps the complete true body at lines
+2158-2159 as six lexical sites: read the EMS override value, assign supply
+mass flow, read outdoor-air and overridden supply flow as minimum operands,
+apply the source-shaped minimum, and assign outdoor-air mass flow. The operand
+sites do not claim C++ function-argument evaluation order. Private true-body
+characterization preserves strict-`<` comparison and right-operand selection
+on a tie or unordered result.
+
+Exact direct release validates the same-call CP323 latest snapshot and private
+witness and requires its false EMS-disabled route. UnitOff, non-cooling, and
+active direct calls therefore complete-skip all six sites without reading an
+EMS value, executing a minimum, mutating either flow, or requesting an EMS
+actuator service. Per-step, final, coupled-runtime, and pipeline validators
+enforce CP323-to-CP324-to-numerical ordering and expose direct-only
+`purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle`
+evidence. No CP324 site changes a Zone or heat-balance equation or reconciles
+flow with the numerical DTO.
+
+Line 2161 is the first excluded executable. The cooling flow-limit condition
+and assignment, line-2166 very-small-flow clamp, later mixed-air, capacity,
+supply-state, Heat/DeadBand, and feedback work remain excluded. No EMS field
+or service is added, and `EMS` remains forbidden. CP324 adds no support,
+conformance, capability, status, count, readiness, evidence-case, or Roadmap
+promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

@@ -19021,6 +19021,39 @@ clamps, mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection.
 only; support, conformance, statuses, counts, readiness, capability, evidence
 cases, and Roadmap state remain unchanged.
 
+## CP324 Cooling Supply Mass-Flow EMS Override Body
+
+CP324 maps only the complete true body at executable lines 2158-2159 after the
+CP323 guard. Its six lexical source sites read `EMSValueMassFlowRate`, assign
+`SupplyMassFlowRate`, read `OAMassFlowRate` and the overridden supply flow as
+minimum operands, apply the source-shaped two-argument minimum, and assign the
+result to `OAMassFlowRate`. The operand sites do not claim a C++ function
+argument evaluation order. Private true-body characterization preserves
+ObjexxFCL's strict-`<` minimum and right-operand selection on a tie or
+unordered comparison.
+
+UnitOff and non-cooling predecessors skip all sites. Exact direct release
+validates the completed same-call CP323 latest snapshot and private witness and
+requires its false EMS-disabled route, so every active direct transition also
+complete-skips the body with zero EMS-value reads, flow reads or assignments,
+minimum evaluations, and body executions. It accepts no actuator value and
+requests no EMS or flow service.
+
+The binder places CP324 between CP323 and the unchanged numerical DTO.
+Direct-only
+`purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle`
+evidence reconciles predecessor identity, ordinal, route partitions, all six
+zero site counters, and the false-guard skip. Non-direct, disconnected, or
+true-EMS evidence is rejected.
+
+Line 2161 is the first excluded executable. Its cooling-limit selectors,
+positive maximum-flow test, supply-flow minimum and assignment, the line-2166
+very-small-flow clamp, mixed-air/capacity/supply-state behavior, and
+Heat/DeadBand selection remain outside CP324. No EMS model field or live
+service is introduced, and `EMS` remains forbidden. CP324 adds target
+inventory and lifecycle evidence only; support, conformance, statuses, counts,
+readiness, capability, evidence cases, and Roadmap state remain unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

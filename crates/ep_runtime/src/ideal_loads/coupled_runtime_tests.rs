@@ -23,6 +23,8 @@ use crate::{
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_EMS_OVERRIDE_BODY_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_EMS_OVERRIDE_BODY_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_EMS_OVERRIDE_GUARD_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_EMS_OVERRIDE_GUARD_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_MAXIMUM_FIRST_EXCLUDED_SOURCE,
@@ -114,6 +116,26 @@ fn cooling_supply_mass_flow_ems_override_guard_partition_overflow_fails_closed()
         error,
         DirectZonePurchasedAirCoupledRuntimeError::
             CalcCoolingSupplyMassFlowEmsOverrideGuardLifecycleInvariant {
+                field: "test_partition_overflow",
+                expected: 1,
+                actual: usize::MAX,
+            }
+    ));
+}
+
+#[test]
+fn cooling_supply_mass_flow_ems_override_body_partition_overflow_fails_closed() {
+    let error = super::cooling_supply_mass_flow_ems_override_body_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::
+            CalcCoolingSupplyMassFlowEmsOverrideBodyLifecycleInvariant {
                 field: "test_partition_overflow",
                 expected: 1,
                 actual: usize::MAX,
@@ -1761,6 +1783,110 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
         assert!(latest_ems_override_guard.ems_supply_mass_flow_override_guard_evaluated);
         assert!(!latest_ems_override_guard.ems_supply_mass_flow_override_body_entered);
         assert!(latest_ems_override_guard.ems_supply_mass_flow_override_guard_false_fallthrough);
+        let ems_override_body = simulation
+            .summary
+            .calc_cooling_supply_mass_flow_ems_override_body_lifecycle;
+        assert_eq!(
+            ems_override_body.source,
+            PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_EMS_OVERRIDE_BODY_SOURCE
+        );
+        assert_eq!(
+            ems_override_body.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_EMS_OVERRIDE_BODY_FIRST_EXCLUDED_SOURCE
+        );
+        let ems_override_body_state = ems_override_body.state;
+        assert_eq!(ems_override_body_state.transition_count, 1, "{limit:?}");
+        assert_eq!(
+            ems_override_body_state.cooling_body_entry_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(ems_override_body_state.body_entry_count, 0, "{limit:?}");
+        assert_eq!(ems_override_body_state.body_skip_count, 1, "{limit:?}");
+        assert_eq!(ems_override_body_state.unit_off_skip_count, 0, "{limit:?}");
+        assert_eq!(
+            ems_override_body_state.non_cooling_skip_count, 0,
+            "{limit:?}"
+        );
+        assert_eq!(
+            ems_override_body_state.ems_disabled_fallthrough_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            ems_override_body_state.ems_supply_mass_flow_override_value_read_count, 0,
+            "{limit:?}"
+        );
+        assert_eq!(
+            ems_override_body_state.supply_mass_flow_rate_override_assignment_count, 0,
+            "{limit:?}"
+        );
+        assert_eq!(
+            ems_override_body_state.outdoor_air_mass_flow_rate_for_minimum_read_count, 0,
+            "{limit:?}"
+        );
+        assert_eq!(
+            ems_override_body_state.supply_mass_flow_rate_for_minimum_read_count, 0,
+            "{limit:?}"
+        );
+        assert_eq!(
+            ems_override_body_state.source_shaped_two_argument_minimum_evaluation_count, 0,
+            "{limit:?}"
+        );
+        assert_eq!(
+            ems_override_body_state.outdoor_air_mass_flow_rate_assignment_count, 0,
+            "{limit:?}"
+        );
+        let latest_ems_override_body = ems_override_body_state
+            .latest
+            .expect("latest CP324 cooling snapshot");
+        assert_eq!(
+            latest_ems_override_body.system,
+            latest_ems_override_guard.system
+        );
+        assert_eq!(
+            latest_ems_override_body.parent_call_ordinal,
+            latest_ems_override_guard.parent_call_ordinal
+        );
+        assert_eq!(
+            latest_ems_override_body.controlled_zone,
+            latest_ems_override_guard.controlled_zone
+        );
+        assert!(
+            latest_ems_override_body
+                .predecessor_ems_supply_mass_flow_override_guard_false_fallthrough
+        );
+        assert!(!latest_ems_override_body.predecessor_ems_supply_mass_flow_override_body_entered);
+        assert!(latest_ems_override_body.body_skipped);
+        assert!(latest_ems_override_body.ems_disabled_fallthrough);
+        assert!(!latest_ems_override_body.ems_supply_mass_flow_override_value_read);
+        assert_eq!(
+            latest_ems_override_body.ems_supply_mass_flow_override_value_kg_per_s,
+            None
+        );
+        assert!(!latest_ems_override_body.supply_mass_flow_rate_override_assignment_performed);
+        assert_eq!(
+            latest_ems_override_body.assigned_supply_mass_flow_rate_kg_per_s,
+            None
+        );
+        assert!(!latest_ems_override_body.outdoor_air_mass_flow_rate_for_minimum_read);
+        assert_eq!(
+            latest_ems_override_body.outdoor_air_mass_flow_rate_before_override_kg_per_s,
+            None
+        );
+        assert!(!latest_ems_override_body.supply_mass_flow_rate_for_minimum_read);
+        assert_eq!(
+            latest_ems_override_body.supply_mass_flow_rate_for_minimum_kg_per_s,
+            None
+        );
+        assert!(!latest_ems_override_body.source_shaped_two_argument_minimum_evaluated);
+        assert_eq!(
+            latest_ems_override_body.minimum_outdoor_air_mass_flow_rate_kg_per_s,
+            None
+        );
+        assert!(!latest_ems_override_body.outdoor_air_mass_flow_rate_assignment_performed);
+        assert_eq!(
+            latest_ems_override_body.assigned_outdoor_air_mass_flow_rate_kg_per_s,
+            None
+        );
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation

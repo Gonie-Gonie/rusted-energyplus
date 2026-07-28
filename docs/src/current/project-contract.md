@@ -16503,6 +16503,56 @@ promotes no support level, run state, required or forbidden feature, numerical
 result, capability, status, inventory/readiness count, evidence case,
 conformance claim, or Roadmap item.
 
+## CP324 Source-Ordered Cooling Supply Mass-Flow EMS Override Body
+
+CP324 supersedes only CP323's line-2158 exclusion for the complete EnergyPlus
+26.1 `PurchasedAirManager.cc` true body at executable lines 2158-2159. Its
+exact six lexical source sites are:
+
+1. read `EMSValueMassFlowRate`;
+2. assign that value to `SupplyMassFlowRate`;
+3. read `OAMassFlowRate` as the first minimum operand;
+4. read the resulting `SupplyMassFlowRate` as the second minimum operand;
+5. apply the source-shaped two-argument minimum; and
+6. assign the result to `OAMassFlowRate`.
+
+The two operand sites are lexical and do not assert a C++ function-argument
+evaluation order. Private true-body characterization preserves ObjexxFCL's
+strict-`<` expression `a < b ? a : b`, including right-operand selection on a
+tie or unordered comparison, and retains the overridden supply flow before
+the outdoor-air minimum is evaluated.
+
+UnitOff and non-cooling predecessors skip the complete slice. Active exact
+direct release consumes the completed same-call CP323 latest snapshot and
+private runtime witness and requires its false EMS-disabled result, so it also
+complete-skips all six sites. Every direct transition records zero EMS-value
+reads, zero supply or outdoor-air reads and assignments, zero minimum
+evaluations, and zero body executions. The public wrapper does not accept an
+EMS actuator value or any substitute supply/outdoor-air scalar and requests no
+EMS, Node, psychrometric, or flow service.
+
+`calc/cooling_supply_mass_flow_maximum/ems_override_guard/body.rs` and its
+split modules own the CP324 snapshot, persistent state, pure transition,
+release validation, and tests. The public exact-direct wrapper
+`advance_direct_no_oa_calc_cooling_supply_mass_flow_ems_override_body`
+validates exact CP323 identity, ordinal, latest state, private witness, false
+route, and full source-prefix lineage before mutation. The binder executes
+CP324 immediately after CP323 and before the unchanged numerical Calc DTO.
+Per-step, final, coupled-runtime, and pipeline validators enforce the same
+ordering and skip-only route. Direct-only JSON uses
+`purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle`;
+non-direct, disconnected, or true-EMS evidence is rejected.
+
+Line 2161 is the first excluded executable and begins the cooling flow-limit
+condition. Its `CoolingLimit` selectors, `MaxCoolMassFlowRate` positivity test,
+supply-flow minimum and assignment, the line-2166 very-small-flow clamp,
+mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection remain
+excluded for CP325 or later work. No EMS actuator field, public input, or live
+service is added, and `EMS` remains forbidden. CP324 promotes no support level,
+run state, required or forbidden feature, numerical result, capability,
+status, inventory/readiness count, evidence case, conformance claim, or
+Roadmap item.
+
 
 
 

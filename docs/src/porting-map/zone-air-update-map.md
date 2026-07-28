@@ -21534,6 +21534,35 @@ selection, and all later Zone-air work remain excluded. `EMS` remains
 forbidden. CP323 changes no support level, conformance, capability, status,
 inventory/readiness count, evidence case, or Roadmap state.
 
+## CP324 Cooling Supply Mass-Flow EMS Override Body Placement
+
+CP324 maps the complete lines-2158-2159 true body between CP323 and the
+unchanged numerical PurchasedAir DTO. Its six lexical sites read the EMS
+override value, assign supply mass flow, read outdoor-air and resulting supply
+flow as the minimum operands, apply the source-shaped two-argument minimum,
+and assign outdoor-air mass flow. The operand sites do not assert a C++
+function-argument evaluation order. Private true-body characterization
+preserves strict-`<` comparison and right-operand selection on a tie or
+unordered result.
+
+Exact direct release validates the same-call CP323 latest snapshot and private
+witness and admits only its false EMS-disabled result. UnitOff, non-cooling,
+and active direct routes therefore complete-skip all six sites with zero body
+execution, EMS-value reads, minimum evaluations, or flow mutations. Coupled
+and pipeline validation enforce CP323-to-CP324-to-numerical ordering and
+publish direct-only
+`purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle`
+evidence. No CP324 site changes Zone state, demand, coefficients, correction,
+or feedback.
+
+Line 2161 is the first excluded executable. Its cooling flow-limit selectors,
+positive maximum-flow check, supply-flow minimum and assignment, line-2166
+very-small-flow clamp, mixed-air/capacity/supply-state behavior, Heat/DeadBand
+selection, and all later Zone-air work remain excluded. No EMS field or live
+service is added, and `EMS` remains forbidden. CP324 changes no support level,
+conformance, capability, status, inventory/readiness count, evidence case, or
+Roadmap state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

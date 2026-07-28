@@ -104,17 +104,19 @@ Assert-Contains -Path $idealLoadsInitWitnesses -Pattern 'pub\(in crate::ideal_lo
 Assert-Contains -Path $idealLoadsInitWitnesses -Pattern 'pub\(in crate::ideal_loads\) fn set_cooling_supply_mass_flow_ems_override_guard_latest_witness\s*\(' -Description "runtime-root CP323 witness setter"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub calc_cooling_supply_mass_flow_ems_override_guard:\s*[\r\n]+\s*PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardRuntimeState' -Description "per-unit CP323 persistent state"
 
-# Binding order is CP322 -> CP323 -> the pre-existing numerical DTO.
+# Binding order is CP322 -> CP323 -> CP324 -> the pre-existing numerical DTO.
 $cp323BindingText = Read-RepoText -Path $idealLoadsBinding
 $cp322BindingIndexForCp323 = $cp323BindingText.IndexOf("let calculation_cooling_supply_mass_flow_maximum =")
 $cp323BindingIndex = $cp323BindingText.IndexOf("let calculation_cooling_supply_mass_flow_ems_override_guard =")
+$cp324BindingIndexForCp323 = $cp323BindingText.IndexOf("let calculation_cooling_supply_mass_flow_ems_override_body =")
 $numericalBindingIndexForCp323 = $cp323BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp322BindingIndexForCp323 -lt 0 -or
     $cp323BindingIndex -le $cp322BindingIndexForCp323 -or
-    $numericalBindingIndexForCp323 -le $cp323BindingIndex
+    $cp324BindingIndexForCp323 -le $cp323BindingIndex -or
+    $numericalBindingIndexForCp323 -le $cp324BindingIndexForCp323
 ) {
-    throw "Binding must retain exact CP322 -> CP323 -> numerical Calc order"
+    throw "Binding must retain exact CP322 -> CP323 -> CP324 -> numerical Calc order"
 }
 Assert-Contains -Path $idealLoadsBinding -Pattern '(?s)let calculation_cooling_supply_mass_flow_ems_override_guard =\s*advance_direct_no_oa_calc_cooling_supply_mass_flow_ems_override_guard\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_supply_mass_flow_maximum,\s*\)' -Description "binding exact CP322-to-CP323 wrapper call"
 $cp322BindingCallForCp323 = [regex]::Match(
@@ -125,17 +127,28 @@ $cp323BindingCall = [regex]::Match(
     $cp323BindingText,
     '(?s)let calculation_cooling_supply_mass_flow_ems_override_guard =\s*advance_direct_no_oa_calc_cooling_supply_mass_flow_ems_override_guard\(.*?CalculationCoolingSupplyMassFlowEmsOverrideGuard,\s*\)\?;'
 )
-if (-not $cp322BindingCallForCp323.Success -or -not $cp323BindingCall.Success) {
-    throw "Binding must retain complete CP322 and CP323 exact release calls"
+$cp324BindingCallForCp323 = [regex]::Match(
+    $cp323BindingText,
+    '(?s)let calculation_cooling_supply_mass_flow_ems_override_body =\s*advance_direct_no_oa_calc_cooling_supply_mass_flow_ems_override_body\(.*?CalculationCoolingSupplyMassFlowEmsOverrideBody,\s*\)\?;'
+)
+if (
+    -not $cp322BindingCallForCp323.Success -or
+    -not $cp323BindingCall.Success -or
+    -not $cp324BindingCallForCp323.Success
+) {
+    throw "Binding must retain complete CP322, CP323, and CP324 exact release calls"
 }
 $cp322BindingCallEndForCp323 =
     $cp322BindingCallForCp323.Index + $cp322BindingCallForCp323.Length
 $cp323BindingCallEnd = $cp323BindingCall.Index + $cp323BindingCall.Length
+$cp324BindingCallEndForCp323 =
+    $cp324BindingCallForCp323.Index + $cp324BindingCallForCp323.Length
 if (
     $cp323BindingIndex -lt $cp322BindingCallEndForCp323 -or
-    $numericalBindingIndexForCp323 -lt $cp323BindingCallEnd
+    $cp324BindingIndexForCp323 -lt $cp323BindingCallEnd -or
+    $numericalBindingIndexForCp323 -lt $cp324BindingCallEndForCp323
 ) {
-    throw "CP322 and CP323 exact release calls must complete in source order before numerical Calc"
+    throw "CP322, CP323, and CP324 exact release calls must complete in source order before numerical Calc"
 }
 $postCp322BeforeCp323 = $cp323BindingText.Substring(
     $cp322BindingCallEndForCp323,
@@ -144,12 +157,19 @@ $postCp322BeforeCp323 = $cp323BindingText.Substring(
 if ($postCp322BeforeCp323 -match '(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)\s*\(') {
     throw "No intermediary helper call may execute after CP322 and before CP323"
 }
-$postCp323BeforeNumerical = $cp323BindingText.Substring(
+$postCp323BeforeCp324 = $cp323BindingText.Substring(
     $cp323BindingCallEnd,
-    $numericalBindingIndexForCp323 - $cp323BindingCallEnd
+    $cp324BindingIndexForCp323 - $cp323BindingCallEnd
 )
-if ($postCp323BeforeNumerical -match '(?i)(?:ems|psychrometric|diagnostic|node_service)\s*\(|EMSValueMassFlowRate|VerySmallMassFlow|CalcPurchAirMixedAir') {
-    throw "No excluded live EMS or later-source behavior may execute after CP323 and before numerical Calc"
+if ($postCp323BeforeCp324 -match '(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)\s*\(') {
+    throw "No intermediary helper call may execute after CP323 and before CP324"
+}
+$postCp324BeforeNumericalForCp323 = $cp323BindingText.Substring(
+    $cp324BindingCallEndForCp323,
+    $numericalBindingIndexForCp323 - $cp324BindingCallEndForCp323
+)
+if ($postCp324BeforeNumericalForCp323 -match '(?i)(?:ems|psychrometric|diagnostic|node_service)\s*\(|EMSValueMassFlowRate|VerySmallMassFlow|CalcPurchAirMixedAir') {
+    throw "No excluded live EMS or line-2161-or-later behavior may execute after CP324 and before numerical Calc"
 }
 
 Assert-Contains -Path $idealLoadsCoupledRuntime -Pattern 'mod cooling_supply_mass_flow_ems_override_guard_validation;' -Description "coupled CP323 validator declaration"

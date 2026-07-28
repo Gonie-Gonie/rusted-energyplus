@@ -11,11 +11,11 @@ Caller edges come from execution-shaped direct, variable-backed, dynamic-list, c
 
 | Check | Count |
 |---|---|
-| executable script records | 261 |
+| executable script records | 262 |
 | dev commands | 238 |
 | aliases | 5 |
 | public scripts | 240 |
-| internal scripts | 21 |
+| internal scripts | 22 |
 | removable scripts | 0 |
 | missing command targets | 0 |
 | duplicate command targets | 0 |
@@ -266,7 +266,8 @@ none
 | scripts/quality/ideal-loads-conformance-report-audit.ps1 | quality | public | dev:ideal-loads-conformance-report-audit | `scripts/dev.ps1` | `script:scripts/dev.cmd`<br>`script:scripts/lib/common.ps1` |  | nonzero when checked child process fails |
 | scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1 | quality | internal |  | `scripts/quality/ideal-loads-structure-audit.ps1` |  |  | nonzero via PowerShell throw |
 | scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1 | quality | internal |  | `scripts/quality/ideal-loads-structure-audit.ps1` |  | `docs/src/generated/algorithm-ledger.md`<br>`docs/src/generated/capability-index.md` | nonzero via PowerShell throw |
-| scripts/quality/ideal-loads-structure-audit.ps1 | quality | public | dev:ideal-loads-structure-audit | `scripts/dev.ps1`<br>`scripts/quality/check.ps1` | `script:scripts/lib/common.ps1`<br>`script:scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1`<br>`script:scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1`<br>`tools/docs/generate_docs.py` | `docs/src/generated/algorithm-ledger.md`<br>`docs/src/generated/capability-index.md` | nonzero via PowerShell throw |
+| scripts/quality/ideal-loads-structure-audit/cp324-cooling-supply-mass-flow-ems-override-body.ps1 | quality | internal |  | `scripts/quality/ideal-loads-structure-audit.ps1` |  | `docs/src/generated/algorithm-ledger.md`<br>`docs/src/generated/capability-index.md` | nonzero via PowerShell throw |
+| scripts/quality/ideal-loads-structure-audit.ps1 | quality | public | dev:ideal-loads-structure-audit | `scripts/dev.ps1`<br>`scripts/quality/check.ps1` | `script:scripts/lib/common.ps1`<br>`script:scripts/quality/ideal-loads-structure-audit/cp322-cooling-supply-mass-flow-maximum.ps1`<br>`script:scripts/quality/ideal-loads-structure-audit/cp323-cooling-supply-mass-flow-ems-override-guard.ps1`<br>`script:scripts/quality/ideal-loads-structure-audit/cp324-cooling-supply-mass-flow-ems-override-body.ps1`<br>`tools/docs/generate_docs.py` | `docs/src/generated/algorithm-ledger.md`<br>`docs/src/generated/capability-index.md` | nonzero via PowerShell throw |
 | scripts/quality/perf.ps1 | quality | public | dev:perf | `scripts/dev.ps1` | `dev:conformance-evidence-report`<br>`dev:performance-summary`<br>`script:scripts/lib/common.ps1`<br>`script:scripts/release/conformance-evidence-report.ps1`<br>`script:scripts/release/performance-summary.ps1` | `.runtime/release-evidence/v$Version` | nonzero via PowerShell throw |
 | scripts/quality/pr-port-ticket-check/changed-files.ps1 | quality | internal |  | `scripts/quality/pr-port-ticket-check.ps1` | `tools/docs/diagnostic_probe_ledger_self_tests.py`<br>`tools/docs/validate_diagnostic_probe_ledger.py` |  | nonzero when checked child process fails |
 | scripts/quality/pr-port-ticket-check/contract-diff.ps1 | quality | internal |  | `scripts/quality/pr-port-ticket-check.ps1` |  |  | nonzero when checked child process fails |
