@@ -774,11 +774,11 @@ Assert-Contains -Path $calcRoot -Pattern 'pub use cooling_entry_gate::\*;' -Desc
 Assert-NotContains -Path $calcRoot -Pattern 'pub fn advance_direct_no_oa_calc_cooling_entry_gate\s*\(' -Description "cooling-entry transition implementation in calc module root"
 Assert-Contains -Path $calcRoot -Pattern 'mod cooling_oa_max_flow_gate;' -Description "PurchasedAir Calc cooling OA maximum-flow gate submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod cooling_oa_max_flow_gate_tests;' -Description "PurchasedAir Calc cooling OA maximum-flow gate test module declaration"
-Assert-Contains -Path $calcRoot -Pattern 'pub use cooling_oa_max_flow_gate::\*;' -Description "PurchasedAir Calc cooling OA maximum-flow gate public re-export"
+Assert-Contains -Path $calcRoot -Pattern 'pub use (?:cooling_oa_max_flow_gate::\*;|\{[^}]*cooling_oa_max_flow_gate::\*)' -Description "PurchasedAir Calc cooling OA maximum-flow gate public re-export"
 Assert-NotContains -Path $calcRoot -Pattern 'pub fn advance_direct_no_oa_calc_cooling_oa_max_flow_gate\s*\(' -Description "cooling OA maximum-flow transition implementation in calc module root"
 Assert-Contains -Path $calcRoot -Pattern 'mod cooling_oa_max_flow_body;' -Description "PurchasedAir Calc cooling OA maximum-flow true-body submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod cooling_oa_max_flow_body_tests;' -Description "PurchasedAir Calc cooling OA maximum-flow true-body test module declaration"
-Assert-Contains -Path $calcRoot -Pattern 'pub use cooling_oa_max_flow_body::\*;' -Description "PurchasedAir Calc cooling OA maximum-flow true-body public re-export"
+Assert-Contains -Path $calcRoot -Pattern 'pub use (?:cooling_oa_max_flow_body::\*;|\{[^}]*cooling_oa_max_flow_body::\*)' -Description "PurchasedAir Calc cooling OA maximum-flow true-body public re-export"
 Assert-NotContains -Path $calcRoot -Pattern 'pub fn advance_direct_no_oa_calc_cooling_oa_max_flow_body\s*\(' -Description "cooling OA maximum-flow true-body transition implementation in calc module root"
 Assert-Contains -Path $calcRoot -Pattern 'mod cooling_economizer_guard;' -Description "PurchasedAir Calc cooling economizer guard submodule declaration"
 Assert-Contains -Path $calcRoot -Pattern 'mod cooling_economizer_guard_tests;' -Description "PurchasedAir Calc cooling economizer guard test module declaration"
@@ -4095,5 +4095,6 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp324-cooling-supply-mass-flow-ems-override-body.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp325-cooling-supply-mass-flow-limit-guard.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp326-cooling-supply-mass-flow-limit-body.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp327-cooling-supply-mass-flow-very-small-guard.ps1")
 
 Write-Host "IdealLoads structure audit complete."

@@ -33930,6 +33930,41 @@ excluded. `EMS` and Autosizing remain forbidden. CP326 adds no support,
 conformance, capability, status, count, readiness, evidence-case, numerical
 conformance, or Roadmap promotion.
 
+## CP327 Cooling Supply Mass-Flow Very-Small-Flow Guard in the Heat-Balance Loop
+
+CP327 executes immediately after CP326 and before the unchanged bounded
+PurchasedAir numerical calculation. It maps only executable line 2166: the
+retained `SupplyMassFlowRate` read, `HVAC::VerySmallMassFlow` read, source
+`<=` comparison, and body-entry decision form the exact four lexical sites.
+The threshold retains EnergyPlus 26.1 `DataHVACGlobals.hh:89`
+`Real64 constexpr VerySmallMassFlow(1.0E-30)` provenance and binary64 value
+with IEEE bits `0x39b4484bfeebc2a0`. The two reads are textual relational
+operands, not a claim about C++ built-in relational-operand evaluation order.
+Both are side-effect-free, so the observable source behavior is only the
+binary64 `<=` result.
+
+UnitOff and non-cooling paths skip every site. Every active Cooling path reads
+CP326's bit-exact retained resulting supply flow and evaluates the guard.
+Equality, both signed zeros, and negative infinity enter; positive infinity
+and a NaN/unordered supply comparison fall through. CP327 records the decision
+without performing the body assignment.
+
+Exact direct release validates CP326's completed same-call latest snapshot and
+private witness without a duplicate caller scalar or live service. Per-step,
+final, coupled-runtime, and pipeline validators enforce
+CP326-to-CP327-to-numerical ordering and publish direct-only lifecycle
+evidence as
+`purchased_air_calc_cooling_supply_mass_flow_very_small_guard_lifecycle`.
+CP327 changes no Zone or heat-balance equation, does not consume or reconcile
+with the later numerical DTO, and does not feed or replace that DTO.
+
+Line 2167 is the first excluded executable. Its positive-zero supply-flow
+assignment, the closing delimiter, mixed-air call and effects, capacity,
+supply-state, Heat/DeadBand, and feedback work remain excluded. `EMS` and
+Autosizing remain forbidden. CP327 adds no support, conformance, capability,
+status, count, readiness, evidence-case, numerical conformance, or Roadmap
+promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

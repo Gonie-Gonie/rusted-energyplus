@@ -19137,6 +19137,45 @@ lifecycle evidence only; support, conformance, statuses, counts, readiness,
 capability, evidence cases, numerical conformance, and Roadmap state remain
 unchanged.
 
+## CP327 Cooling Supply Mass-Flow Very-Small-Flow Guard
+
+CP327 maps only the complete executable line-2166 guard after CP326. Its exact
+four lexical sites read retained `SupplyMassFlowRate`, read
+`HVAC::VerySmallMassFlow`, evaluate source `<=`, and record entry into the
+deliberately excluded body. The threshold retains EnergyPlus 26.1
+`DataHVACGlobals.hh:89` provenance and the exact
+`Real64 constexpr VerySmallMassFlow(1.0E-30)` binary64 value with IEEE bits
+`0x39b4484bfeebc2a0`, not a project-selected epsilon. The two reads are
+textual relational operands, not a claim about C++ built-in
+relational-operand evaluation order. Both are side-effect-free, so the
+observable source behavior is only the binary64 `<=` result.
+
+UnitOff and non-cooling predecessors skip every site. Each active Cooling
+predecessor evaluates the guard using CP326's bit-exact retained resulting
+supply flow. Equality enters; both signed zeros and negative infinity enter;
+positive infinity falls through; and a NaN supply operand makes the unordered
+comparison false. No normalization, finite filter, clamp, or replacement
+comparison is permitted.
+
+The exact
+`advance_direct_no_oa_calc_cooling_supply_mass_flow_very_small_guard` wrapper
+validates the completed same-call CP326 latest snapshot and private witness and
+accepts no duplicate caller flow or threshold scalar and no live service. The
+binder places CP327 between CP326 and the
+unchanged numerical DTO. Direct-only lifecycle evidence reconciles identity,
+ordinal, skip/active partitions, both operand reads and bits, source comparison
+result, and body-entry decision and is serialized as
+`purchased_air_calc_cooling_supply_mass_flow_very_small_guard_lifecycle`.
+CP327 neither consumes nor reconciles with the later numerical DTO and does
+not feed or replace it; non-direct or disconnected evidence is rejected.
+
+Line 2167 is the first excluded executable. Its positive-zero supply-flow
+assignment, the closing delimiter, mixed-air/capacity/supply-state behavior,
+and Heat/DeadBand selection remain open. `EMS` and Autosizing remain
+forbidden. CP327 adds target inventory and lifecycle evidence only; support,
+conformance, statuses, counts, readiness, capability, evidence cases,
+numerical conformance, and Roadmap state remain unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

@@ -16674,6 +16674,74 @@ forbidden. CP326 promotes no support level, run state, required or forbidden
 feature, numerical result, capability, status, inventory/readiness count,
 evidence case, conformance claim, or Roadmap item.
 
+## CP327 Source-Ordered Cooling Supply Mass-Flow Very-Small-Flow Guard
+
+CP327 supersedes only CP326's line-2166 exclusion for the complete EnergyPlus
+26.1 `PurchasedAirManager.cc` Cooling very-small-flow guard. Its exact four
+lexical source sites are:
+
+1. read retained `SupplyMassFlowRate` as the left comparison operand;
+2. read `HVAC::VerySmallMassFlow` as the right comparison operand;
+3. evaluate the source `<=` comparison; and
+4. enter the deliberately excluded body when that comparison is true.
+
+The first two sites are textual relational operands, not a claim about C++
+built-in relational-operand evaluation order. Both operands are
+side-effect-free, so the observable source behavior is only the binary64
+`<=` result.
+
+The right operand is not a project-chosen tolerance. It retains the EnergyPlus
+26.1 `DataHVACGlobals.hh:89` module-parameter definition
+`Real64 constexpr VerySmallMassFlow(1.0E-30)`, including the binary64 value
+with IEEE bits `0x39b4484bfeebc2a0`. The pure transition uses source `<=`
+directly without absolute-value normalization, epsilon substitution, total
+ordering, finite filtering, clamping, or a Rust approximation helper.
+
+For the finite positive threshold, equality and every finite value below it
+produce true, including both `+0.0` and `-0.0`; negative infinity also
+produces true. A larger finite value and positive infinity produce false.
+When the retained supply operand is NaN, the comparison is unordered and
+therefore false. The comparison does not alter or canonicalize the operand
+bits.
+
+UnitOff and non-cooling CP326 predecessors skip all four sites. Every active
+Cooling predecessor evaluates all four, regardless of whether CP326 applied
+its limit or carried the prior value through its active guard-false route.
+CP327 records body entry on true and fallthrough on false but performs no
+supply-flow assignment.
+
+The split `calc/cooling_supply_mass_flow_very_small_guard.rs` module owns the
+snapshot, persistent state, pure transition, release validation, and tests.
+Its public
+`advance_direct_no_oa_calc_cooling_supply_mass_flow_very_small_guard` wrapper
+and
+`purchased_air_calc_cooling_supply_mass_flow_very_small_guard_lifecycle_summary`
+accessor validate the
+completed same-call CP326 latest snapshot, private witness, identity, ordinal,
+and retained prefix before mutation. The left operand comes only from
+CP326's bit-exact retained `resulting_supply_mass_flow_rate_kg_per_s`; the
+threshold comes from the pinned EnergyPlus constant provenance. The wrapper
+accepts no caller-supplied flow or threshold scalar and requests no live
+sizing, schedule, Node, psychrometric, EMS, or diagnostic service.
+
+The binder executes CP327 immediately after CP326 and before the unchanged
+numerical Calc DTO. Per-step, final, coupled-runtime, and pipeline validators
+reconcile predecessor identity, skip partitions, the two operand reads,
+source `<=` result, body-entry decision, and exact retained supply/threshold
+bits. Direct-only JSON publishes
+`purchased_air_calc_cooling_supply_mass_flow_very_small_guard_lifecycle`;
+non-direct or
+disconnected evidence is rejected. CP327 does not consume or reconcile with
+the later numerical DTO and does not feed or replace it.
+
+Line 2167 is the first excluded executable. Its positive-zero
+`SupplyMassFlowRate = 0.0` body assignment, the closing delimiter, mixed-air
+call and effects, capacity and supply-state behavior, and Heat/DeadBand
+selection remain excluded. `EMS` and Autosizing remain forbidden. CP327
+promotes no support level, run state, required or forbidden feature, numerical
+result, capability, status, inventory/readiness count, evidence case,
+conformance claim, or Roadmap item.
+
 
 
 

@@ -819,6 +819,43 @@ remain open. `EMS` and Autosizing remain forbidden, and support, readiness,
 conformance, capability, status, inventory count, evidence cases, numerical
 conformance, and Roadmap state remain unchanged.
 
+CP327 maps only the complete Cooling supply mass-flow very-small-flow guard at
+executable line 2166 as four lexical source sites: read the retained
+post-CP326 `SupplyMassFlowRate`, read `HVAC::VerySmallMassFlow`, evaluate the
+source `<=` comparison, and record entry into the deliberately excluded body.
+The two reads are textual relational operands, not a claim about C++ built-in
+relational-operand evaluation order. Both operands are side-effect-free, so
+the observable source behavior is only the binary64 `<=` result.
+The constant read retains EnergyPlus 26.1 `DataHVACGlobals.hh:89` provenance
+and the exact `Real64 constexpr VerySmallMassFlow(1.0E-30)` binary64 value
+with IEEE bits `0x39b4484bfeebc2a0`.
+
+UnitOff and non-cooling predecessors skip all four sites. Every active Cooling
+predecessor evaluates the guard, including CP326's applied and active
+guard-false routes. The source comparison is an ordinary binary64 `<=`:
+equality enters the body; both signed zeros and negative infinity enter;
+positive infinity falls through; and an unordered comparison caused by a NaN
+supply operand is false. CP327 records only the decision and never performs
+the body assignment.
+
+The exact direct release lane validates the completed same-call CP326 latest
+snapshot and private witness, then obtains the comparison operand from
+CP326's bit-exact retained resulting supply flow. It accepts no duplicate
+caller flow or threshold scalar and requests no live sizing, schedule, Node,
+psychrometric, EMS, or diagnostic service. The binder and lifecycle firewalls
+retain CP326-to-CP327-to-numerical ordering and expose direct-only lifecycle
+evidence through
+`purchased_air_calc_cooling_supply_mass_flow_very_small_guard_lifecycle`.
+CP327 neither consumes, reconciles with, feeds, nor replaces the later
+numerical DTO.
+
+Line 2167 is the first excluded executable. Its positive-zero
+`SupplyMassFlowRate` assignment, the closing delimiter, mixed-air call and
+effects, capacity and supply-state work, and Heat/DeadBand selection remain
+open. `EMS` and Autosizing remain forbidden, and support, readiness,
+conformance, capability, status, inventory count, evidence cases, numerical
+conformance, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

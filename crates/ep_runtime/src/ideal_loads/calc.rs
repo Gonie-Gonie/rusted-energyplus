@@ -36,6 +36,7 @@ mod cooling_sensible_flow_release_tests;
 #[cfg(test)]
 mod cooling_sensible_flow_tests;
 mod cooling_supply_mass_flow_maximum;
+mod cooling_supply_mass_flow_very_small_guard;
 mod humidity;
 mod lifecycle;
 #[cfg(test)]
@@ -53,7 +54,6 @@ mod no_oa;
 mod no_oa_tests;
 mod psychrometrics;
 mod types;
-
 pub use cooling_capacity_zero_flow_reset::*;
 pub use cooling_dehumidification_flow::*;
 pub(in crate::ideal_loads) use cooling_economizer_body::release::body_snapshot_is_exact_direct_release as cooling_economizer_body_snapshot_is_exact_direct_release;
@@ -62,10 +62,9 @@ pub use cooling_economizer_condition::*;
 pub use cooling_economizer_guard::*;
 pub use cooling_entry_gate::*;
 pub use cooling_humidification_flow::*;
-pub use cooling_oa_max_flow_body::*;
-pub use cooling_oa_max_flow_gate::*;
 pub use cooling_sensible_flow::*;
 pub use cooling_supply_mass_flow_maximum::*;
+pub use cooling_supply_mass_flow_very_small_guard::*;
 pub use lifecycle::*;
 pub use limits::IdealLoadsSensibleLimitContext;
 pub use minimum_oa_prefix::*;
@@ -78,3 +77,4 @@ pub use moisture_demand::{
 pub use no_oa::*;
 pub use psychrometrics::{energyplus_standard_air_density_kg_per_m3, moist_air_enthalpy_j_per_kg};
 pub use types::*;
+pub use {cooling_oa_max_flow_body::*, cooling_oa_max_flow_gate::*};

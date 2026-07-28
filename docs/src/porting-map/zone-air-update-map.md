@@ -21626,6 +21626,38 @@ CP326 changes no support level, conformance, capability, status,
 inventory/readiness count, evidence case, numerical conformance, or Roadmap
 state.
 
+## CP327 Cooling Supply Mass-Flow Very-Small-Flow Guard Placement
+
+CP327 maps only executable line 2166 between CP326 and the unchanged numerical
+PurchasedAir DTO. Its exact four lexical sites read the retained
+`SupplyMassFlowRate`, read `HVAC::VerySmallMassFlow`, evaluate source `<=`,
+and record entry into the deliberately excluded body. The threshold preserves
+the EnergyPlus 26.1 `DataHVACGlobals.hh:89`
+`Real64 constexpr VerySmallMassFlow(1.0E-30)` provenance and binary64 value
+with IEEE bits `0x39b4484bfeebc2a0`. The two reads are textual relational
+operands, not a claim about C++ built-in relational-operand evaluation order.
+Both are side-effect-free, so the observable source behavior is only the
+binary64 `<=` result.
+
+UnitOff and non-cooling paths skip all four sites. Every active Cooling path
+uses CP326's bit-exact retained resulting supply flow. Equality, both signed
+zeros, and negative infinity satisfy the guard; positive infinity and a
+NaN/unordered supply comparison do not. Exact direct release validates the
+same-call CP326 latest snapshot and private witness without a duplicate scalar
+or live service. Coupled and pipeline validation preserve
+CP326-to-CP327-to-numerical order and publish direct-only lifecycle evidence
+as `purchased_air_calc_cooling_supply_mass_flow_very_small_guard_lifecycle`.
+
+No CP327 site changes Zone state, demand, coefficients, correction, or
+feedback. CP327 neither consumes nor reconciles with the later numerical DTO
+and does not feed or replace it. Line 2167 is the first excluded executable.
+Its positive-zero supply-flow assignment, the closing delimiter,
+mixed-air/capacity/supply-state behavior, Heat/DeadBand selection, and all
+later Zone-air work remain excluded. `EMS` and Autosizing remain forbidden.
+CP327 changes no support level, conformance, capability, status,
+inventory/readiness count, evidence case, numerical conformance, or Roadmap
+state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

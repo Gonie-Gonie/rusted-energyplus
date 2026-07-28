@@ -10,7 +10,9 @@ mod state;
 mod tests;
 mod transition;
 
+pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_supply_mass_flow_limit_body_is_consistent;
 pub(in crate::ideal_loads) use release::cooling_supply_mass_flow_limit_body_snapshot_is_exact_direct_release;
+pub(in crate::ideal_loads::calc) use release::snapshots_match_bit_exact as cooling_supply_mass_flow_limit_body_snapshots_match_bit_exact;
 pub use release::{
     PurchasedAirCalcCoolingSupplyMassFlowLimitBodyError,
     advance_direct_no_oa_calc_cooling_supply_mass_flow_limit_body,

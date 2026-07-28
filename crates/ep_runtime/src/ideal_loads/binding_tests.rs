@@ -56,6 +56,8 @@ mod cooling_supply_mass_flow_limit_body_tests;
 mod cooling_supply_mass_flow_limit_guard_tests;
 #[path = "binding/cooling_supply_mass_flow_maximum_tests.rs"]
 mod cooling_supply_mass_flow_maximum_tests;
+#[path = "binding/cooling_supply_mass_flow_very_small_guard_tests.rs"]
+mod cooling_supply_mass_flow_very_small_guard_tests;
 #[path = "binding/minimum_oa_prefix_tests.rs"]
 mod minimum_oa_prefix_tests;
 #[path = "binding/model_multiplier_tests.rs"]
