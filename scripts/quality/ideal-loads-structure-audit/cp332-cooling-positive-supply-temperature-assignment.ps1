@@ -267,13 +267,15 @@ Assert-Contains -Path $cp332InitUnit -Pattern '(?s)calc_cooling_positive_supply_
 $cp332BindingText = Read-RepoText -Path $cp332Binding
 $cp331BindingIndexForCp332 = $cp332BindingText.IndexOf("let calculation_cooling_positive_supply_cp_air_assignment =")
 $cp332BindingIndex = $cp332BindingText.IndexOf("let calculation_cooling_positive_supply_temperature_assignment =")
+$cp333BindingIndexForCp332 = $cp332BindingText.IndexOf("let calculation_cooling_positive_supply_temperature_minimum_limit =")
 $numericalBindingIndexForCp332 = $cp332BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp331BindingIndexForCp332 -lt 0 -or
     $cp332BindingIndex -le $cp331BindingIndexForCp332 -or
-    $numericalBindingIndexForCp332 -le $cp332BindingIndex
+    $cp333BindingIndexForCp332 -le $cp332BindingIndex -or
+    $numericalBindingIndexForCp332 -le $cp333BindingIndexForCp332
 ) {
-    throw "Binding must retain exact CP331 -> CP332 -> numerical Calc order"
+    throw "Binding must retain exact CP331 -> CP332 -> CP333 -> numerical Calc order"
 }
 Assert-Contains -Path $cp332Binding -Pattern '(?s)let calculation_cooling_positive_supply_temperature_assignment =\s*advance_positive_supply_temperature_assignment\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_positive_supply_cp_air_assignment,\s*&\*input\.zone_state,\s*\)\?;' -Description "binding exact CP331-to-CP332 adapter call"
 Assert-Contains -Path $cp332BindingAdapter -Pattern '(?s)pub\(super\) fn advance_positive_supply_temperature_assignment\(\s*runtime: &mut PurchasedAirRuntimeState,\s*system: &IdealLoadsAirSystem,\s*predecessor: PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentSnapshot,\s*zone_state: &ZoneHeatBalanceState,' -Description "CP332 binding adapter arguments"
@@ -292,13 +294,37 @@ if (-not $cp332BindingCall.Success) {
     throw "Binding must retain the complete CP332 exact release call"
 }
 $cp332BindingCallEnd = $cp332BindingCall.Index + $cp332BindingCall.Length
-$postCp332BeforeNumerical = $cp332BindingText.Substring(
-    $cp332BindingCallEnd,
-    $numericalBindingIndexForCp332 - $cp332BindingCallEnd
+$cp333BindingCallForCp332 = [regex]::Match(
+    $cp332BindingText,
+    '(?s)let calculation_cooling_positive_supply_temperature_minimum_limit =\s*advance_positive_supply_temperature_minimum_limit\([^;]+?\)\?;'
 )
-$postCp332BeforeNumericalCode = [regex]::Replace($postCp332BeforeNumerical, '(?m)//.*$', '')
-if ($postCp332BeforeNumericalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No later source helper call may execute after CP332 and before numerical Calc"
+if (-not $cp333BindingCallForCp332.Success) {
+    throw "Binding must retain the complete CP333 exact release call after CP332"
+}
+$cp333BindingCallEndForCp332 =
+    $cp333BindingCallForCp332.Index + $cp333BindingCallForCp332.Length
+if (
+    $cp333BindingIndexForCp332 -lt $cp332BindingCallEnd -or
+    $numericalBindingIndexForCp332 -lt $cp333BindingCallEndForCp332
+) {
+    throw "CP332 and CP333 exact release calls must complete in source order before numerical Calc"
+}
+$postCp332BeforeCp333 = $cp332BindingText.Substring(
+    $cp332BindingCallEnd,
+    $cp333BindingIndexForCp332 - $cp332BindingCallEnd
+)
+$postCp332BeforeCp333Code = [regex]::Replace($postCp332BeforeCp333, '(?m)//.*$', '')
+if ($postCp332BeforeCp333Code -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No intermediary helper call may execute after CP332 and before CP333"
+}
+$postCp333BeforeNumericalForCp332 = $cp332BindingText.Substring(
+    $cp333BindingCallEndForCp332,
+    $numericalBindingIndexForCp332 - $cp333BindingCallEndForCp332
+)
+$postCp333BeforeNumericalCodeForCp332 =
+    [regex]::Replace($postCp333BeforeNumericalForCp332, '(?m)//.*$', '')
+if ($postCp333BeforeNumericalCodeForCp332 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No later source helper call may execute after CP333 and before numerical Calc"
 }
 
 # Coupled runtime and pipeline expose direct-only CP332 evidence and validate

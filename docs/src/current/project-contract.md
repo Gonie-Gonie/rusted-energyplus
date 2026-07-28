@@ -17188,6 +17188,67 @@ capability, status, or Roadmap item.
 
 
 
+## CP333 Source-Ordered Cooling Positive-Supply Temperature Minimum Limit
+
+CP333 supersedes only CP332's line-2187 exclusion for the single Cooling
+positive-supply minimum-temperature limit statement at locked EnergyPlus 26.1
+`PurchasedAirManager.cc` physical executable line 2187:
+`PurchAir.SupplyTemp = max(PurchAir.SupplyTemp, PurchAir.MinCoolSuppAirTemp);`.
+Its exactly four textual sites read retained CP332 `PurchAir.SupplyTemp`,
+re-read selected-system `PurchAir.MinCoolSuppAirTemp`, apply the source-shaped
+two-argument maximum, and assign the selected value back to
+`PurchAir.SupplyTemp`. This is a textual inventory, not a claim about C++
+function argument evaluation order; both operands are side-effect-free.
+
+`EnergyPlus.hh` imports ObjexxFCL `max`, and the selected two-`double`
+`Fmath.hh` overload is `a < b ? b : a`. The pure transition reproduces that
+strict comparison exactly: true selects the right minimum-temperature operand;
+tie or unordered comparison selects the left CP332 result. Private
+characterization therefore preserves first-operand signed-zero bits, a left
+NaN payload, ordinary left values when the right operand is NaN, and the
+source infinity behavior. It does not use `f64::max`, `total_cmp`,
+`partial_cmp`, a finite check, normalization, another clamp, or a minimum.
+
+UnitOff, non-cooling, and CP330 active guard-false predecessors skip every
+CP333 site. Every completed CP332 assignment executes all four, so dynamic
+source-site executions equal `4 * supply_temperature_assignment_count`,
+`4 * cp_air_assignment_count`, and
+`4 * positive_supply_mass_flow_body_entries`. Exact release consumes the first
+operand only from CP332's bit-exact assigned `supply_temperature_c`, re-reads
+the second operand from the identity-checked selected typed system's
+`minimum_cooling_supply_air_temperature_c`, and uses CP318's retained value
+only as same-call lineage evidence. It accepts no duplicate caller scalar,
+does not ask a live service for either operand, and does not accept the
+numerical DTO as input.
+
+The completed proof recursively validates the CP332 latest snapshot, private
+witness, and full retained predecessor chain. Pending and completed state
+preserve the four UnitOff, non-cooling, positive-guard-false, and assignment
+routes one-for-one. Checked arithmetic preflights each conditional source-site
+and private-witness increment before mutation, so identity, provenance,
+history, witness, replay, and overflow failures are transactional.
+
+The scheduled binding, coupled runtime, and pipeline retain exact
+CP332-to-CP333-to-numerical order and publish direct-only
+`purchased_air_calc_cooling_positive_supply_temperature_minimum_limit_lifecycle`
+evidence. CP333 neither consumes nor reconciles with the unchanged numerical
+DTO and does not feed or replace it. Physical line 2188 is commentary; physical
+line 2189 is the first excluded lexical executable and CP334 boundary. The
+line-2189 mixed-air minimum, line-2190 humidity assignment, line-2191 enthalpy
+calculation, capacity controls, lines 2189-2337, the zero-flow `else` at
+2339-2345 whose first dynamic executable is 2340, the outer Heat/DeadBand
+sibling at 2347-2348, its mixed-air call at 2454-2461, and its guard at 2465
+remain excluded.
+
+CP333 adds target inventory and lifecycle evidence only. Broader
+supply-temperature limiting, capacity, humidity, enthalpy, output,
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, and Autosizing behavior
+remain unpromoted. Both parent algorithms remain `scaffold`/`none`;
+`routine.calc_purch_air_loads` and `routine.calc_purch_air_mixed_air` remain
+`source_mapped`. Algorithm/routine counts, readiness, support level, run state,
+required and forbidden features, output claims, evidence cases, numerical
+conformance, capability status, and Roadmap state remain unchanged.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before

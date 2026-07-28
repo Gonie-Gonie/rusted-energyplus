@@ -29,6 +29,8 @@ use crate::{
         PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_SOURCE,
         PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_TEMPERATURE_ASSIGNMENT_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_TEMPERATURE_ASSIGNMENT_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_TEMPERATURE_MINIMUM_LIMIT_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_TEMPERATURE_MINIMUM_LIMIT_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_EMS_OVERRIDE_BODY_FIRST_EXCLUDED_SOURCE,
@@ -313,6 +315,26 @@ fn cooling_positive_supply_temperature_assignment_partition_overflow_fails_close
         error,
         DirectZonePurchasedAirCoupledRuntimeError::
             CalcCoolingPositiveSupplyTemperatureAssignmentLifecycleInvariant {
+                field: "test_partition_overflow",
+                expected: 1,
+                actual: usize::MAX,
+            }
+    ));
+}
+
+#[test]
+fn cooling_positive_supply_temperature_minimum_limit_partition_overflow_fails_closed() {
+    let error = super::cooling_positive_supply_temperature_minimum_limit_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::
+            CalcCoolingPositiveSupplyTemperatureMinimumLimitLifecycleInvariant {
                 field: "test_partition_overflow",
                 expected: 1,
                 actual: usize::MAX,
@@ -1328,6 +1350,34 @@ fn cooling_sensible_flow_lifecycle_records_unit_off_without_source_execution() {
     assert!(latest.supply_mass_flow_rate_kg_per_s.is_none());
     assert!(latest.zone_node_temperature_c.is_none());
     assert!(latest.supply_temperature_c.is_none());
+
+    let lifecycle = simulation
+        .summary
+        .calc_cooling_positive_supply_temperature_minimum_limit_lifecycle;
+    assert_eq!(
+        lifecycle.source,
+        PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_TEMPERATURE_MINIMUM_LIMIT_SOURCE
+    );
+    assert_eq!(
+        lifecycle.first_excluded_source,
+        PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_TEMPERATURE_MINIMUM_LIMIT_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(lifecycle.state.transition_count, 1);
+    assert_eq!(lifecycle.state.unit_off_skip_count, 1);
+    assert_eq!(lifecycle.state.non_cooling_skip_count, 0);
+    assert_eq!(
+        lifecycle.state.positive_guard_false_fallthrough_skip_count,
+        0
+    );
+    assert_eq!(lifecycle.state.supply_temperature_minimum_limit_count, 0);
+    assert_eq!(lifecycle.state.source_site_execution_count, 0);
+    let latest = lifecycle.state.latest.expect("latest CP333 off snapshot");
+    assert!(latest.unit_off_skipped);
+    assert!(!latest.supply_temperature_minimum_limit_executed);
+    assert!(latest.supply_temperature_before_minimum_limit_c.is_none());
+    assert!(latest.minimum_cooling_supply_air_temperature_c.is_none());
+    assert!(latest.maximum_supply_temperature_c.is_none());
+    assert!(latest.assigned_supply_temperature_c.is_none());
 }
 
 #[test]
@@ -2967,6 +3017,114 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
             Some(expected_supply_temperature.to_bits()),
             "{limit:?}"
         );
+        let supply_temperature_minimum_limit = simulation
+            .summary
+            .calc_cooling_positive_supply_temperature_minimum_limit_lifecycle;
+        assert_eq!(
+            supply_temperature_minimum_limit.source,
+            PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_TEMPERATURE_MINIMUM_LIMIT_SOURCE
+        );
+        assert_eq!(
+            supply_temperature_minimum_limit.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_TEMPERATURE_MINIMUM_LIMIT_FIRST_EXCLUDED_SOURCE
+        );
+        assert_eq!(
+            supply_temperature_minimum_limit.state.transition_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_temperature_minimum_limit
+                .state
+                .supply_temperature_minimum_limit_count,
+            1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_temperature_minimum_limit
+                .state
+                .source_site_execution_count,
+            4,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_temperature_minimum_limit
+                .state
+                .supply_temperature_for_maximum_read_count,
+            1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_temperature_minimum_limit
+                .state
+                .minimum_cooling_supply_air_temperature_for_maximum_read_count,
+            1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_temperature_minimum_limit
+                .state
+                .source_shaped_two_argument_maximum_evaluation_count,
+            1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_temperature_minimum_limit
+                .state
+                .supply_temperature_assignment_count,
+            1,
+            "{limit:?}"
+        );
+        let latest_supply_temperature_minimum_limit = supply_temperature_minimum_limit
+            .state
+            .latest
+            .expect("latest CP333 snapshot");
+        assert!(
+            latest_supply_temperature_minimum_limit.supply_temperature_minimum_limit_executed,
+            "{limit:?}"
+        );
+        let minimum_cooling_supply_air_temperature =
+            model.typed.ideal_loads_air_systems[0].minimum_cooling_supply_air_temperature_c;
+        assert_eq!(
+            latest_sensible_flow
+                .minimum_cooling_supply_air_temperature_c
+                .map(f64::to_bits),
+            Some(minimum_cooling_supply_air_temperature.to_bits()),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_supply_temperature_minimum_limit
+                .supply_temperature_before_minimum_limit_c
+                .map(f64::to_bits),
+            Some(expected_supply_temperature.to_bits()),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_supply_temperature_minimum_limit
+                .minimum_cooling_supply_air_temperature_c
+                .map(f64::to_bits),
+            Some(minimum_cooling_supply_air_temperature.to_bits()),
+            "{limit:?}"
+        );
+        let expected_limited_supply_temperature =
+            if expected_supply_temperature < minimum_cooling_supply_air_temperature {
+                minimum_cooling_supply_air_temperature
+            } else {
+                expected_supply_temperature
+            };
+        assert_eq!(
+            latest_supply_temperature_minimum_limit
+                .maximum_supply_temperature_c
+                .map(f64::to_bits),
+            Some(expected_limited_supply_temperature.to_bits()),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_supply_temperature_minimum_limit
+                .assigned_supply_temperature_c
+                .map(f64::to_bits),
+            Some(expected_limited_supply_temperature.to_bits()),
+            "{limit:?}"
+        );
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation
@@ -3141,6 +3299,50 @@ fn cooling_mixed_air_call_executes_for_active_positive_zero_supply_flow() {
     assert!(
         latest_supply_temperature_assignment
             .supply_temperature_c
+            .is_none()
+    );
+
+    let supply_temperature_minimum_limit = simulation
+        .summary
+        .calc_cooling_positive_supply_temperature_minimum_limit_lifecycle;
+    assert_eq!(supply_temperature_minimum_limit.state.transition_count, 1);
+    assert_eq!(
+        supply_temperature_minimum_limit
+            .state
+            .positive_guard_false_fallthrough_skip_count,
+        1
+    );
+    assert_eq!(
+        supply_temperature_minimum_limit
+            .state
+            .supply_temperature_minimum_limit_count,
+        0
+    );
+    assert_eq!(
+        supply_temperature_minimum_limit
+            .state
+            .source_site_execution_count,
+        0
+    );
+    let latest_supply_temperature_minimum_limit = supply_temperature_minimum_limit
+        .state
+        .latest
+        .expect("zero-flow CP333 snapshot");
+    assert!(latest_supply_temperature_minimum_limit.positive_guard_false_fallthrough_skipped);
+    assert!(!latest_supply_temperature_minimum_limit.supply_temperature_minimum_limit_executed);
+    assert!(
+        latest_supply_temperature_minimum_limit
+            .supply_temperature_before_minimum_limit_c
+            .is_none()
+    );
+    assert!(
+        latest_supply_temperature_minimum_limit
+            .minimum_cooling_supply_air_temperature_c
+            .is_none()
+    );
+    assert!(
+        latest_supply_temperature_minimum_limit
+            .assigned_supply_temperature_c
             .is_none()
     );
 }

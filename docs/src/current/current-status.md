@@ -1097,6 +1097,61 @@ capacity, and output behavior remain unpromoted. Both parent algorithms remain
 readiness, support, evidence cases, numerical conformance, capability, and
 Roadmap state remain unchanged.
 
+CP333 maps only the single Cooling positive-supply minimum-temperature limit
+statement at locked EnergyPlus 26.1 `PurchasedAirManager.cc` physical
+executable line 2187:
+`PurchAir.SupplyTemp = max(PurchAir.SupplyTemp, PurchAir.MinCoolSuppAirTemp);`.
+Its exactly four textual sites read retained CP332 `PurchAir.SupplyTemp`,
+re-read selected-system `PurchAir.MinCoolSuppAirTemp`, apply the source-shaped
+two-argument maximum, and assign the selected value back to
+`PurchAir.SupplyTemp`. This textual inventory does not claim C++ function
+argument evaluation order; both operands are side-effect-free.
+
+EnergyPlus imports ObjexxFCL `max`, whose two-`double` overload is exactly
+`a < b ? b : a`. The pure CP333 transition therefore uses strict `<`: only a
+true comparison selects the minimum-cooling-temperature operand, while ties
+and unordered comparisons retain the first CP332 operand bit-for-bit. Private
+characterization preserves operand-order-sensitive signed zero, NaN, and
+infinity behavior. It does not use Rust `f64::max`, total ordering, a finite
+check, normalization, an additional clamp, or a minimum.
+
+UnitOff, non-cooling, and CP330 active guard-false histories skip all four
+sites. Every CP332 supply-temperature assignment executes all four, so dynamic
+source-site executions equal `4 * supply_temperature_assignment_count`,
+`4 * cp_air_assignment_count`, and
+`4 * positive_supply_mass_flow_body_entries`. Exact direct release obtains the
+first operand only from the bit-exact completed CP332 assignment and re-reads
+the second operand from the identity-checked selected
+`IdealLoadsAirSystem::minimum_cooling_supply_air_temperature_c`. CP318's
+retained minimum-cooling-temperature value is same-call lineage evidence, not
+a substitute operand. No duplicate caller scalar, live service, or numerical
+DTO input is admitted.
+
+The direct proof recursively validates the completed CP332 latest snapshot,
+private witness, and full predecessor chain, preserves all four predecessor
+routes, and preflights every conditional source-site and private-witness
+increment with checked arithmetic before mutation. Any identity, provenance,
+history, witness, replay, or overflow failure leaves runtime and private
+witness state unchanged.
+
+The binder, coupled runtime, and pipeline place direct-only
+`purchased_air_calc_cooling_positive_supply_temperature_minimum_limit_lifecycle`
+evidence in CP332-to-CP333-to-numerical order. CP333 does not consume,
+reconcile with, feed, or replace the unchanged numerical DTO and does not
+promote an output claim. Physical line 2188 is commentary; physical line 2189
+is the first excluded lexical executable and CP334 boundary. Its mixed-air
+minimum, line-2190 humidity assignment, line-2191 enthalpy calculation,
+capacity controls, and the remainder of lines 2189-2337 remain excluded. The
+zero-flow `else` at 2339-2345 still first executes line 2340; the outer
+Heat/DeadBand sibling at 2347-2348, its mixed-air call at 2454-2461, and its
+guard at 2465 also remain excluded. `OutdoorAir`, `Economizer`,
+`HeatRecovery`, `EMS`, Autosizing, broad humidity control, and broader
+supply-temperature limiting, capacity, and output behavior remain
+unpromoted. Both parent algorithms remain `scaffold`/`none`; both Calc
+routines remain `source_mapped`, and algorithm/routine counts, readiness,
+support, run state, feature boundaries, evidence cases, numerical
+conformance, capability, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

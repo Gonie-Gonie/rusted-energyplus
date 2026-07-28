@@ -69,6 +69,10 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentRuntimeState::new(system),
             calc_cooling_positive_supply_temperature_assignment:
                 PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentRuntimeState::new(system),
+            calc_cooling_positive_supply_temperature_minimum_limit:
+                PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitRuntimeState::new(
+                    system,
+                ),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

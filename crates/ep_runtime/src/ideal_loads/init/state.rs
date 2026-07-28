@@ -27,6 +27,8 @@ use super::super::{
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentRuntimeState,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentSnapshot,
+    PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitRuntimeState,
+    PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitSnapshot,
     PurchasedAirCalcCoolingSensibleFlowRuntimeState, PurchasedAirCalcCoolingSensibleFlowSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyRuntimeState,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
@@ -142,6 +144,10 @@ pub struct PurchasedAirRuntimeState {
         IdealLoadsAirSystemId,
         PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentSnapshot,
     >,
+    cooling_positive_supply_temperature_minimum_limit_latest_witnesses: BTreeMap<
+        IdealLoadsAirSystemId,
+        PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitSnapshot,
+    >,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -228,6 +234,9 @@ pub struct PurchasedAirUnitRuntimeState {
     /// Persistent bounded Cooling positive-supply temperature-assignment state.
     pub calc_cooling_positive_supply_temperature_assignment:
         PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentRuntimeState,
+    /// Persistent bounded Cooling positive-supply minimum-temperature limit state.
+    pub calc_cooling_positive_supply_temperature_minimum_limit:
+        PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.

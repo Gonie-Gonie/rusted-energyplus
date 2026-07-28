@@ -28,6 +28,7 @@ use super::{
     PurchasedAirCalcCoolingOaMaxFlowGateError,
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentError as CoolingCpAirAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentError as CoolingSupplyTemperatureAssignmentError,
+    PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitError as CoolingSupplyTemperatureMinimumLimitError,
     PurchasedAirCalcCoolingSensibleFlowError,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyError,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardError,
@@ -73,11 +74,13 @@ use super::{
 
 mod cooling_positive_supply_cp_air_assignment;
 mod cooling_positive_supply_temperature_assignment;
+mod cooling_positive_supply_temperature_minimum_limit;
 mod cooling_supply_mass_flow_positive_guard;
 mod scheduled_output;
 
 use cooling_positive_supply_cp_air_assignment::advance_positive_supply_cp_air_assignment;
 use cooling_positive_supply_temperature_assignment::advance_positive_supply_temperature_assignment;
+use cooling_positive_supply_temperature_minimum_limit::advance_positive_supply_temperature_minimum_limit;
 use cooling_supply_mass_flow_positive_guard::advance_positive_guard;
 pub use scheduled_output::DirectZonePurchasedAirScheduledCouplingOutput;
 
@@ -670,6 +673,10 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingPositiveSupplyCpAirAssignment(CoolingCpAirAssignmentError),
     /// The bounded cooling positive-supply temperature assignment rejected its release state.
     CalculationCoolingPositiveSupplyTemperatureAssignment(CoolingSupplyTemperatureAssignmentError),
+    /// The bounded cooling positive-supply minimum-temperature limit rejected its release state.
+    CalculationCoolingPositiveSupplyTemperatureMinimumLimit(
+        CoolingSupplyTemperatureMinimumLimitError,
+    ),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -1034,6 +1041,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             calculation_cooling_positive_supply_cp_air_assignment,
             &*input.zone_state,
         )?;
+    let calculation_cooling_positive_supply_temperature_minimum_limit =
+        advance_positive_supply_temperature_minimum_limit(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_positive_supply_temperature_assignment,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1094,6 +1107,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_supply_mass_flow_positive_guard,
         calculation_cooling_positive_supply_cp_air_assignment,
         calculation_cooling_positive_supply_temperature_assignment,
+        calculation_cooling_positive_supply_temperature_minimum_limit,
         coupling,
     })
 }

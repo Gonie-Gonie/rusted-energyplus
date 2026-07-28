@@ -21871,6 +21871,57 @@ Calc routines remain `source_mapped`. CP332 changes no support, conformance,
 capability, status, inventory/readiness count, evidence case, numerical
 conformance, or Roadmap state.
 
+## CP333 Cooling Positive-Supply Temperature Minimum Limit Placement
+
+CP333 extends the exact direct-Zone update path only through locked EnergyPlus
+26.1 `PurchasedAirManager.cc` physical executable line 2187:
+`PurchAir.SupplyTemp = max(PurchAir.SupplyTemp, PurchAir.MinCoolSuppAirTemp);`.
+The exact four textual sites read retained CP332 supply temperature, re-read
+the selected system's minimum cooling supply-air temperature, apply the
+source-shaped two-argument maximum, and assign the selected result. They do not
+claim a C++ function-argument evaluation order; both operands are
+side-effect-free.
+
+The imported ObjexxFCL two-`double` maximum is `a < b ? b : a`. The CP333
+source transition uses that strict comparison exactly, selecting the right
+minimum-temperature operand only on true and retaining the first CP332 operand
+on ties or unordered comparisons. Private characterization preserves exact
+signed-zero, NaN, and infinity effects. Rust `f64::max`, total or partial
+ordering, finite checks, normalization, another clamp, and a minimum are not
+used.
+
+UnitOff, non-cooling, and CP330 active guard-false predecessors skip all sites.
+Every CP332 assignment executes all four, so dynamic executions equal
+`4 * supply_temperature_assignment_count`, `4 * cp_air_assignment_count`, and
+`4 * positive_supply_mass_flow_body_entries`. Exact release reads the first
+operand only from the bit-exact CP332 assignment and re-reads the second from
+the identity-checked selected typed system's
+`minimum_cooling_supply_air_temperature_c`. CP318's retained minimum is
+same-call lineage evidence rather than a substitute. No duplicate scalar, live
+service, or numerical DTO supplies either operand.
+
+The direct release recursively proves CP332's latest snapshot, private witness,
+and full predecessor chain. Four-route history and checked preflight make
+identity, provenance, corruption, replay, and overflow rejection
+transactional. Binding, coupled execution, and pipeline serialization preserve
+CP332-to-CP333-to-numerical order and publish direct-only
+`purchased_air_calc_cooling_positive_supply_temperature_minimum_limit_lifecycle`
+evidence without consuming, reconciling with, feeding, or replacing the
+numerical DTO.
+
+Physical line 2188 is commentary; physical line 2189 is the first excluded
+lexical executable and CP334 boundary. Its mixed-air minimum, line-2190
+humidity assignment, line-2191 enthalpy calculation, capacity controls, and
+lines 2189-2337 remain excluded. The zero-flow `else` at 2339-2345 still
+starts at 2340; the Heat/DeadBand sibling at 2347-2348, its mixed-air call at
+2454-2461, and guard at 2465 remain excluded. `OutdoorAir`, `Economizer`,
+`HeatRecovery`, `EMS`, Autosizing, broad humidity control, and broader
+supply-temperature limiting, capacity, and output behavior remain unpromoted.
+Both parents remain `scaffold`/`none`; both Calc routines remain
+`source_mapped`. CP333 adds target and lifecycle evidence only and changes no
+algorithm/routine count, readiness, support, conformance, capability, status,
+feature boundary, evidence case, numerical conformance, or Roadmap state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:
