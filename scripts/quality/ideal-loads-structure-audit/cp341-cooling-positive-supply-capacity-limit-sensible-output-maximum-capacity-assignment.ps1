@@ -229,6 +229,11 @@ foreach ($cp341BindingInterval in @(
     )
     $cp341BindingIntervalCode =
         [regex]::Replace($cp341BindingIntervalText, '(?m)//.*$', '')
+    $cp341BindingIntervalCode = [regex]::Replace(
+        $cp341BindingIntervalCode,
+        '(?s)let calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment =\s*advance_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment\([^;]+?\)\?;',
+        ''
+    )
     if ($cp341BindingIntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
         throw "No intermediary helper call may execute $($cp341BindingInterval.Description)"
     }
@@ -287,7 +292,7 @@ Assert-Contains -Path $cp341CoupledRuntimeTests -Pattern 'cp341_direct_coupled_r
 Assert-Contains -Path $cp341CoupledRuntimeTests -Pattern 'calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle' -Description "direct coupled CP340 predecessor evidence"
 Assert-Contains -Path $cp341CoupledRuntimeTests -Pattern 'calc_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment_lifecycle' -Description "direct coupled CP341 lifecycle evidence"
 Assert-Contains -Path $cp341PipelineRoot -Pattern '(?s)purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment_lifecycle:\s*None' -Description "non-direct CP341 null evidence"
-Assert-Contains -Path $cp341PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp341_lifecycle_evidence' -Description "non-direct CP341 evidence rejection"
+Assert-Contains -Path $cp341PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp342_lifecycle_evidence' -Description "non-direct CP341/CP342 evidence rejection"
 
 # Exactly two algorithm addenda, two capability addenda, and six targets
 # distributed 2+4 across the two parent algorithms.
@@ -448,7 +453,7 @@ foreach ($cp341Documentation in $cp341DocumentationSections) {
 }
 
 # Root reachability and generated inventory add exactly one internal script:
-# 279 executable records, 240 public, 39 internal, and zero uncalled.
+# 280 executable records, 240 public, 40 internal, and zero uncalled.
 $cp341MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp340DotSourceIndexForCp341 = $cp341MainAuditText.IndexOf('ideal-loads-structure-audit\cp340-cooling-positive-supply-capacity-limit-sensible-output-guard.ps1')
 $cp341DotSourceIndex = $cp341MainAuditText.IndexOf('ideal-loads-structure-audit\cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1')
@@ -460,10 +465,10 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP341 after CP340 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 279' -Description "CP341 cumulative inventory total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 280' -Description "CP341 cumulative inventory total through CP342"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment\.ps1"' -Description "CP341 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment\.ps1::dot_sources' -Description "CP341 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 279 \|' -Description "CP341 generated script count"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 280 \|' -Description "CP341 generated script count through CP342"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP341 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 39 \|' -Description "CP341 generated internal script count"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 40 \|' -Description "CP341 generated internal script count through CP342"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP341 generated uncalled script count"

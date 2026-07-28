@@ -85,6 +85,8 @@ const ABS_TOLERANCE: f64 = 1.0e-9;
 
 #[test]
 fn cp341_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
+    // Keep the CP341 cumulative regression identity while extending every
+    // route assertion through its new CP342 successor.
     for (
         availability,
         maximum_capacity_w,
@@ -105,7 +107,7 @@ fn cp341_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
         system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(maximum_capacity_w));
         let model = SimulationModel::from_typed(typed);
         let schedule_cache =
-            precompute_schedule_cache(&model.typed, 1).expect("one CP341 schedule sample");
+            precompute_schedule_cache(&model.typed, 1).expect("one CP342 schedule sample");
         let weather = weather_series_with_conditions(&model, 1, 30.0, 15.0, 30.0, 101_325.0);
         let mut options = DirectZonePurchasedAirCoupledOptions::hourly_samples(1);
         options.initial_zone_air_temperature_c = INITIAL_ZONE_TEMPERATURE_C;
@@ -116,7 +118,13 @@ fn cp341_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
             &schedule_cache,
             options,
         )
-        .expect("CP341 route must pass per-step and final coupled validation");
+        .expect("CP342 route must pass per-step and final coupled validation");
+        let retained = simulation
+            .summary
+            .calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle
+            .state
+            .latest
+            .expect("latest CP339 snapshot");
         let predecessor = simulation
             .summary
             .calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle;
@@ -183,6 +191,116 @@ fn cp341_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
                         .preexisting_cooling_sensible_output_w
                         .map(f64::to_bits)
                 );
+            }
+        }
+
+        let lifecycle = simulation
+            .summary
+            .calc_cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment_lifecycle;
+        let state = &lifecycle.state;
+        assert_eq!(state.transition_count, 1);
+        assert_eq!(state.unit_off_skip_count, usize::from(expected_unit_off));
+        assert_eq!(
+            state.capacity_limit_sensible_output_guard_false_fallthrough_count,
+            usize::from(expected_guard_false)
+        );
+        assert_eq!(
+            state.capacity_limit_sensible_output_supply_enthalpy_assignment_count,
+            usize::from(expected_assignment)
+        );
+        assert_eq!(
+            state.source_site_execution_count,
+            6 * usize::from(expected_assignment)
+        );
+        assert_eq!(
+            state.mixed_air_enthalpy_read_count,
+            usize::from(expected_assignment)
+        );
+        assert_eq!(
+            state.cooling_sensible_output_read_count,
+            usize::from(expected_assignment)
+        );
+        assert_eq!(
+            state.supply_mass_flow_rate_read_count,
+            usize::from(expected_assignment)
+        );
+        assert_eq!(
+            state.specific_cooling_output_calculation_count,
+            usize::from(expected_assignment)
+        );
+        assert_eq!(
+            state.supply_enthalpy_calculation_count,
+            usize::from(expected_assignment)
+        );
+        assert_eq!(
+            state.supply_enthalpy_assignment_write_count,
+            usize::from(expected_assignment)
+        );
+        let latest = state.latest.expect("latest CP342 snapshot");
+        assert_eq!(
+            latest.capacity_limit_sensible_output_guard_false_fallthrough,
+            expected_guard_false
+        );
+        assert_eq!(
+            latest.capacity_limit_sensible_output_supply_enthalpy_assignment_executed,
+            expected_assignment
+        );
+        if expected_unit_off {
+            for value in [
+                latest.preexisting_supply_enthalpy_j_per_kg,
+                latest.mixed_air_enthalpy_j_per_kg,
+                latest.cooling_sensible_output_w,
+                latest.supply_mass_flow_rate_kg_per_s,
+                latest.specific_cooling_output_j_per_kg,
+                latest.calculated_supply_enthalpy_j_per_kg,
+                latest.assigned_supply_enthalpy_j_per_kg,
+                latest.resulting_supply_enthalpy_j_per_kg,
+            ] {
+                assert!(value.is_none());
+            }
+        } else if expected_guard_false {
+            assert_eq!(
+                latest
+                    .preexisting_supply_enthalpy_j_per_kg
+                    .map(f64::to_bits),
+                retained.supply_enthalpy_j_per_kg.map(f64::to_bits)
+            );
+            assert_eq!(
+                latest.resulting_supply_enthalpy_j_per_kg.map(f64::to_bits),
+                retained.supply_enthalpy_j_per_kg.map(f64::to_bits)
+            );
+            for value in [
+                latest.mixed_air_enthalpy_j_per_kg,
+                latest.cooling_sensible_output_w,
+                latest.supply_mass_flow_rate_kg_per_s,
+                latest.specific_cooling_output_j_per_kg,
+                latest.calculated_supply_enthalpy_j_per_kg,
+                latest.assigned_supply_enthalpy_j_per_kg,
+            ] {
+                assert!(value.is_none());
+            }
+        } else {
+            let mixed = retained
+                .mixed_air_enthalpy_j_per_kg
+                .expect("active CP339 mixed-air enthalpy");
+            let flow = retained
+                .supply_mass_flow_rate_kg_per_s
+                .expect("active CP339 supply mass flow");
+            let sensible = latest
+                .cooling_sensible_output_w
+                .expect("active CP342 sensible output");
+            let specific = sensible / flow;
+            let expected_enthalpy = mixed - specific;
+            assert_eq!(
+                latest.specific_cooling_output_j_per_kg.map(f64::to_bits),
+                Some(specific.to_bits())
+            );
+            for value in [
+                latest.calculated_supply_enthalpy_j_per_kg,
+                latest.assigned_supply_enthalpy_j_per_kg,
+                latest.resulting_supply_enthalpy_j_per_kg,
+            ] {
+                assert_eq!(value.map(f64::to_bits), Some(expected_enthalpy.to_bits()));
             }
         }
 

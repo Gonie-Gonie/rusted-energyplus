@@ -34619,11 +34619,14 @@ The pure comparison is raw IEEE binary64 `>=`: NaN is false, `+infinity`
 true, and `-infinity` false against a finite nonnegative maximum, with
 signed-zero bits characterized exactly. CP321's zero reset prevents the
 complete public active chain from reaching either signed zero: an active zero
-forgery is rejected and the actual reset skip retains null capacity. Publicly
-reachable nonfinite CP339 outputs are NaN/false from `+infinity` flow times a
-zero difference and `+infinity`/true from `+infinity` flow times a positive
-difference; `-infinity` is a pure-transition characterization only. There is
-no total order, finite coercion, normalization, or clamp. Active Rust snapshots
+forgery is rejected and the actual reset skip retains null capacity. In the
+direct no-OA lineage, `+infinity` flow has an exact-zero enthalpy difference,
+so CP339 produces NaN and CP340 takes the false route. The publicly reachable
+true nonfinite case instead uses finite positive flow and finite enthalpy
+operands whose subtraction overflows to `+infinity`; CP339 produces
+`+infinity` and CP340 enters the body. `-infinity` is a pure-transition
+characterization only. There is no total order, finite coercion, normalization,
+or clamp. Active Rust snapshots
 keep a nonfinite CP339 operand as `Some(value)`. During Serde JSON
 serialization, the numeric field is
 projected as `null`, while its separate IEEE bit string remains non-null.
@@ -34709,6 +34712,89 @@ Maximum-capacity ownership, broader capacity adjustment, supply-state/output
 behavior, and live-service access remain unpromoted. Both parents remain
 `scaffold`/`none`; both Calc routines remain `source_mapped`. CP341 adds no
 support, conformance, capability, output claim or ownership, status,
+algorithm/routine count, readiness, feature-boundary, evidence-case,
+numerical-conformance, or Roadmap promotion.
+
+## CP342 Positive-Supply Capacity-Limit Supply-Enthalpy Assignment in the Heat-Balance Loop
+
+CP342 advances the direct-Zone IdealLoads heat-balance lifecycle only through
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`
+`PurchasedAirManager.cc` physical executable line 2200,
+`SupplyEnthalpy = MixedAirEnthalpy - CoolSensOutput / SupplyMassFlowRate;`.
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact six ordered sites are
+`read-retained-mixed-air-enthalpy-for-supply-enthalpy-difference`,
+`read-retained-cooling-sensible-output-for-specific-cooling-output-division`,
+`read-retained-supply-mass-flow-rate-for-specific-cooling-output-division`,
+`calculate-cooling-sensible-output-divided-by-supply-mass-flow-rate`,
+`calculate-mixed-air-enthalpy-minus-specific-cooling-output`, and
+`assign-local-supply-enthalpy`. This deterministic Rust/source-text and
+dependency witness makes no C++ built-in `/`, `-`, or `=`
+operand-evaluation-order claim because all three reads are side-effect-free.
+It preserves exact grouping as
+`MixedAirEnthalpy - (CoolSensOutput / SupplyMassFlowRate)`.
+
+Only CP341 `CapacityLimitSensibleOutputMaximumCapacityAssigned` executes all
+six sites. The routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`,
+`CapacityLimitSensibleOutputGuardFalseFallthrough`, and
+`CapacityLimitSensibleOutputSupplyEnthalpyAssigned`. For transitions `T`,
+inherited `U/N/P/G`, CP340 false fallthroughs `F`, CP342 assignments `H`,
+CP341 assignments `M`, and CP340 active evaluations `A`, exact state requires
+`T = U+N+P+G+F+H`, `A = F+H`, and
+`H = M = CP340 adjustment-body entries`. Three read, two calculation, and one
+write counters each equal `H`; `source_site_execution_count = 6*H`, and
+witnessed route counters match. There is no required equality between `H`
+and `A` or between `H` and CP321 aggregate maximum-capacity reads.
+
+Exact direct admission takes only `runtime`, the selected `system`, and CP341
+as the public predecessor. Supplied/latest/private CP341 evidence must match
+bit-exactly and pass recursive completion. The cooling-output operand is
+CP341 `resulting_cooling_sensible_output_w`, never CP339's pre-capacity value.
+The mixed-air enthalpy, supply flow, and preexisting supply enthalpy come only
+from the retained same-call CP339 latest/private witness after exact parity
+and recursive completion. No CP321, caller/model/sized-limit scalar, live
+service, Node or heat-balance re-read, or numerical DTO substitutes for those
+values. The CP340 false route preserves CP339 supply-enthalpy bits without a
+CP342 RHS read, calculation, or write; the true route executes all six sites.
+
+Complete public assignment lineage requires finite mixed-air and preexisting
+enthalpies, finite strictly positive CP341 cooling output, and finite strictly
+positive supply flow. Its publicly witnessed nonfinite predecessor uses
+finite flow: CP339 forms `+infinity`, CP341 caps it to a finite maximum, and
+CP342 divides that capped value by finite flow before subtracting. A
+`+infinity` supply flow instead makes the direct lineage CP339 product NaN and
+reaches the CP340/CP341 false route, so CP342 preserves CP339
+`SupplyEnthalpy` without RHS execution.
+
+The pure transition separately retains raw IEEE binary64 division and
+subtraction, including signed-zero, NaN, infinity, and overflow
+characterization without normalization, clamp, fused operation, or derived
+finite-result coercion. A `+infinity`-flow positive-zero quotient and an
+overflowing quotient that can yield `-infinity` are characterization only,
+not public assignment-reachability claims. Characterized active Rust fields
+retain nonfinite derived values as `Some(value)`. Serde JSON maps their
+numeric fields to `null` and preserves non-null IEEE bit strings. False-route
+preexisting/result supply enthalpy remain bit-identical `Some(value)` while
+unread RHS, intermediate, and assigned fields are null. Inherited skips
+remain Rust `None` and JSON null throughout.
+
+Binding and lifecycle JSON preserve CP341-to-CP342-to-numerical order under
+`purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment_lifecycle`.
+CP342 neither consumes nor reconciles with the numerical DTO and does not feed
+or replace it; non-direct execution publishes `None` and rejects attached
+CP342 evidence. Physical line 2201 is the first excluded lexical executable:
+`PurchAir.SupplyTemp = PsyTdbFnHW(SupplyEnthalpy, PurchAir.SupplyHumRat);`.
+That psychrometric conversion, the line-2203 limit, false continuation at line
+2208, and later behavior remain excluded.
+
+Broader capacity adjustment, purchased-air supply-temperature/output
+ownership, and live-service access remain unpromoted. Both parents remain
+`scaffold`/`none`; both Calc routines remain `source_mapped`. CP342 adds the
+bounded local supply-enthalpy assignment and target/lifecycle evidence, with
+no support, conformance, capability, output claim or ownership, status,
 algorithm/routine count, readiness, feature-boundary, evidence-case,
 numerical-conformance, or Roadmap promotion.
 

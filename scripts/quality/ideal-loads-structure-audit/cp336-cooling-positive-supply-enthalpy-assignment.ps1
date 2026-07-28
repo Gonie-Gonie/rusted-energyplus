@@ -339,6 +339,11 @@ foreach ($cp336Interval in @(
         '(?s)let calculation_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment =\s*advance_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment\([^;]+?\)\?;',
         ''
     )
+    $cp336IntervalCode = [regex]::Replace(
+        $cp336IntervalCode,
+        '(?s)let calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment =\s*advance_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment\([^;]+?\)\?;',
+        ''
+    )
     if ($cp336IntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
         throw "No intermediary helper call may execute $($cp336Interval.Description)"
     }
@@ -385,7 +390,7 @@ Assert-Contains -Path $cp336DirectAssertions -Pattern 'purchased_air_calc_coolin
 Assert-Contains -Path $cp336DirectAssertions -Pattern 'purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle' -Description "direct-run CP334 bit provenance"
 Assert-Contains -Path $cp336DirectAssertions -Pattern 'energyplus_psy_h_fn_tdb_w\(supply_temperature_c, supply_humidity_ratio\)' -Description "direct-run CP336 canonical result"
 Assert-Contains -Path $cp336NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle' -Description "non-direct CP336 null evidence"
-Assert-Contains -Path $cp336PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp341_lifecycle_evidence' -Description "non-direct CP336 through CP341 evidence rejection"
+Assert-Contains -Path $cp336PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp342_lifecycle_evidence' -Description "non-direct CP336 through CP342 evidence rejection"
 
 # Registries carry exactly two CP336 addenda and the two parent target arrays.
 $cp336AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
@@ -611,7 +616,7 @@ if (
     throw "Main IdealLoads audit must dot-source CP336 after CP335 and before completion"
 }
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp336-cooling-positive-supply-enthalpy-assignment\.ps1"' -Description "CP336 internal script inventory record"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 279 \|' -Description "CP336 cumulative generated script count through CP341"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 280 \|' -Description "CP336 cumulative generated script count through CP342"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP336 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 39 \|' -Description "CP336 cumulative generated internal script count through CP341"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 40 \|' -Description "CP336 cumulative generated internal script count through CP342"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP336 generated uncalled script count"

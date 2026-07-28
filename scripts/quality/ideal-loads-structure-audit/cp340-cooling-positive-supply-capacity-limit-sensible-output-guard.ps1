@@ -231,6 +231,11 @@ foreach ($cp340BindingInterval in @(
         '(?s)let calculation_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment =\s*advance_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment\([^;]+?\)\?;',
         ''
     )
+    $cp340BindingIntervalCode = [regex]::Replace(
+        $cp340BindingIntervalCode,
+        '(?s)let calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment =\s*advance_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment\([^;]+?\)\?;',
+        ''
+    )
     if ($cp340BindingIntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
         throw "No intermediary helper call may execute $($cp340BindingInterval.Description)"
     }
@@ -286,7 +291,7 @@ Assert-Contains -Path $cp340DirectAssertions -Pattern '3 \* evaluations \+ expec
 Assert-Contains -Path $cp340DirectAssertions -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle' -Description "direct-run CP339 evidence"
 Assert-Contains -Path $cp340DirectAssertions -Pattern 'purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle' -Description "direct-run CP321 evidence"
 Assert-Contains -Path $cp340NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle' -Description "non-direct CP340 null evidence"
-Assert-Contains -Path $cp340PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp341_lifecycle_evidence' -Description "non-direct CP340/CP341 evidence rejection"
+Assert-Contains -Path $cp340PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp342_lifecycle_evidence' -Description "non-direct CP340/CP341/CP342 evidence rejection"
 Assert-NotContains -Path $cp340Pipeline -Pattern 'latest_numerical|numerical_supply|final_supply|complete_direct_zone_purchased_air_coupling|sized_' -Description "CP340 pipeline excludes numerical and sized-limit operands"
 
 # Exactly two algorithm addenda, two capability addenda, and six targets.
@@ -330,6 +335,10 @@ $cp340CapabilityAddenda = [regex]::Matches(
 if ($cp340CapabilityAddenda.Count -ne 2) {
     throw "Capability registry must contain exactly two CP340 claim addenda"
 }
+$cp340ObsoletePositiveDifferencePattern =
+    '(?is)\+infinity`?\s+flow\s+times\s+(?:a\s+)?positive\s+(?:enthalpy\s+)?difference'
+Assert-NotContains -Path "specs\algorithm_ledger.toml" -Pattern $cp340ObsoletePositiveDifferencePattern -Description "obsolete CP340 infinite-flow positive-difference reachability claim"
+Assert-NotContains -Path "specs\capabilities.toml" -Pattern $cp340ObsoletePositiveDifferencePattern -Description "obsolete CP340 infinite-flow positive-difference capability claim"
 foreach ($cp340Claim in @($cp340AlgorithmAddenda) + @($cp340CapabilityAddenda)) {
     foreach ($cp340Pattern in @(
             '6f2e40d10250a105b49966baa24d843711e61048',
@@ -352,6 +361,8 @@ foreach ($cp340Claim in @($cp340AlgorithmAddenda) + @($cp340CapabilityAddenda)) 
             '-infinity',
             'zero reset',
             '(?i)public(?:ly reachable| active chain| reachability)',
+            '(?s)\+infinity`?\s+flow.*?exact-zero\s+enthalpy\s+difference.*?CP339.*?NaN.*?false\s+route',
+            '(?s)finite\s+positive\s+flow.*?finite\s+enthalpy\s+operands.*?subtraction\s+overflows\s+to\s+`\+infinity`.*?CP339.*?`\+infinity`.*?CP340.*?(?:true\s+route|enters\s+the\s+body)',
             'Some\(value\)',
             'serde JSON',
             'IEEE\s+bit\s+string',
@@ -368,6 +379,8 @@ foreach ($cp340Claim in @($cp340AlgorithmAddenda) + @($cp340CapabilityAddenda)) 
 }
 Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP340 supersedes only CP339' -Description "generated CP340 algorithm ledger"
 Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP340 additionally requires' -Description "generated CP340 capability index"
+Assert-NotContains -Path "docs\src\generated\algorithm-ledger.md" -Pattern $cp340ObsoletePositiveDifferencePattern -Description "obsolete generated CP340 algorithm reachability claim"
+Assert-NotContains -Path "docs\src\generated\capability-index.md" -Pattern $cp340ObsoletePositiveDifferencePattern -Description "obsolete generated CP340 capability reachability claim"
 
 # Five hand-authored contracts repeat the scoped CP340 source/lineage boundary.
 $cp340DocumentationSections = @(
@@ -426,6 +439,8 @@ foreach ($cp340Documentation in $cp340DocumentationSections) {
             '-infinity',
             'zero reset',
             'public.*?reach',
+            '(?s)\+infinity`?\s+flow.*?exact-zero\s+enthalpy\s+difference.*?CP339.*?NaN.*?false\s+route',
+            '(?s)finite\s+positive\s+flow.*?finite\s+enthalpy\s+operands.*?subtraction\s+overflows\s+to\s+`\+infinity`.*?CP339.*?`\+infinity`.*?CP340.*?(?:true\s+route|enters\s+the\s+body)',
             'Some\(value\)',
             'Serde\s+JSON',
             'IEEE\s+bit\s+string',
@@ -440,6 +455,7 @@ foreach ($cp340Documentation in $cp340DocumentationSections) {
             throw "CP340 documentation in $($cp340Documentation.Path) missing '$cp340Pattern'"
         }
     }
+    Assert-NotContains -Path $cp340Documentation.Path -Pattern $cp340ObsoletePositiveDifferencePattern -Description "obsolete CP340 infinite-flow positive-difference documentation claim"
 }
 
 # Root reachability and generated inventory add one internal audit script.
@@ -454,10 +470,10 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP340 after CP339 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 279' -Description "CP340 cumulative inventory total through CP341"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 280' -Description "CP340 cumulative inventory total through CP342"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp340-cooling-positive-supply-capacity-limit-sensible-output-guard\.ps1"' -Description "CP340 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp340-cooling-positive-supply-capacity-limit-sensible-output-guard\.ps1::dot_sources' -Description "CP340 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 279 \|' -Description "CP340 generated script count through CP341"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 280 \|' -Description "CP340 generated script count through CP342"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP340 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 39 \|' -Description "CP340 generated internal script count through CP341"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 40 \|' -Description "CP340 generated internal script count through CP342"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP340 generated uncalled script count"
