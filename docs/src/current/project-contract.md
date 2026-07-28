@@ -18046,6 +18046,93 @@ both parent algorithms stay `scaffold`/`none`, and
 boundaries, numerical conformance, capability, output claims, status,
 conformance, and Roadmap state remain unchanged.
 
+## CP344 Source-Ordered Cooling Positive-Supply Capacity-Limit Supply-Temperature Mixed-Air Limit
+
+CP344 supersedes only CP343's physical-line-2203 exclusion for the single
+Cooling positive-supply capacity-limit sensible-output supply-temperature
+mixed-air limit at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2203:
+`PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);`.
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact textual sites are:
+
+1. `read-purchased-air-supply-temperature-for-minimum`;
+2. `read-purchased-air-mixed-air-temperature-for-minimum`;
+3. `apply-source-shaped-two-argument-minimum`;
+4. `assign-purchased-air-supply-temperature`.
+
+Both reads are side-effect-free, so the deterministic Rust/source-text
+dependency order makes no C++ function-argument-evaluation-order claim.
+EnergyPlus imports ObjexxFCL's two-`double` minimum, exactly
+`a < b ? a : b`. Rust preserves the strict source comparison as
+`if left < right { left } else { right }`: true selects the CP343 left
+operand, while ties and unordered comparisons select the CP329 right operand
+bit-for-bit. `f64::min`, total or partial ordering, clamping, normalization,
+finite coercion, cache, diagnostic, and mutable service state are forbidden.
+
+Only CP343 `CapacityLimitSensibleOutputSupplyTemperatureAssigned` executes all
+four sites. The six routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`,
+`CapacityLimitSensibleOutputGuardFalseFallthrough`, and
+`CapacityLimitSensibleOutputSupplyTemperatureMixedAirLimitExecuted`. Let `T`
+be transitions; `U/N/P/G` inherited counts; `F` CP340 false fallthroughs; `L`
+CP344 limit executions; `D` CP343 assignments; `H` CP342 assignments; `M`
+CP341 assignments; and `A` CP340 active evaluations. Exact state requires
+`T = U+N+P+G+F+L`, `A = F+L`, and
+`L = D = H = M = CP340 adjustment-body entries`. Both reads, the minimum
+evaluation, and the write each equal `L`;
+`source_site_execution_count = 4*L`, with witnessed/public route parity. No
+invariant equates `L` with `A` or CP321 aggregate reads.
+
+The public direct wrapper accepts only `runtime`, the selected `system`, and
+the same-call CP343 predecessor. It requires supplied/latest/private CP343 bit
+parity and recursive completion. CP343
+`resulting_supply_temperature_c` solely owns the left/preexisting operand.
+The finite right operand comes only from same-call CP329 latest/private
+`mixed_air_temperature_c`; CP329 owns that source field. Retained CP334 and
+CP336 temperature evidence is recursive lineage/corroboration and substitutes
+for neither CP343 nor CP329. Caller operands, Zone/model/sizing re-reads, live
+services, and numerical-DTO inputs are forbidden.
+
+The CP340 false route preserves CP343 result bits, recursively preserving
+CP334 temperature bits, without a CP344 source site. The four inherited
+`U/N/P/G` routes retain no CP344 operand or result. CP344 requires only the
+CP329 right operand to be finite and deliberately imposes no new finite gate
+on the recursively exact CP343 left operand or selected result.
+
+The pure transition separately retains strict-`<` signed-zero, NaN, infinity,
+tie, and unordered characterization. Nonfinite behavior is pure/defensive
+characterization, not a new claim that a complete public chain reaches it.
+Characterized active Rust fields remain `Some(value)` even for nonfinite
+values. Serde JSON maps a nonfinite numeric field to `null` while preserving a
+non-null IEEE bit string. CP340-false preexisting/result temperature fields
+remain bit-identical `Some(value)` while unread minimum/assigned fields remain
+null; inherited skips retain Rust `None` and null numeric and bit fields.
+
+Scheduled binding, coupled runtime, and pipeline preserve exact
+CP343-to-CP344-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle`.
+CP344 neither consumes nor reconciles with the numerical DTO and does not feed
+or replace it. Non-direct execution publishes `None` and rejects attached
+CP344 evidence.
+
+Physical lines 2204-2207 are non-executable closing delimiters, blank, and
+commentary. Physical line 2208 is the first excluded lexical executable:
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;`. That humidity assignment
+and later supply-state behavior remain excluded. CP344 adds the bounded
+mixed-air temperature limit, target inventory, and lifecycle evidence only.
+Broader capacity adjustment, purchased-air supply-temperature/output
+ownership, `OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, Autosizing, and
+later behavior remain unpromoted. `routine.psy_tdb_fn_h_w` stays
+`state_mapped`; both parent algorithms stay `scaffold`/`none`, and
+`routine.calc_purch_air_loads` and `routine.calc_purch_air_mixed_air` stay
+`source_mapped`. Algorithm/routine counts, support, readiness, run state,
+feature and evidence boundaries, numerical conformance, capability, output
+claims, status, conformance, and Roadmap state remain unchanged.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before

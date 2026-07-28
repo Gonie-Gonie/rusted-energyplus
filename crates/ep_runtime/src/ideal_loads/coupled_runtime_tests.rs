@@ -84,9 +84,9 @@ const RETURN_NODE_KEY: &str = "RETURN";
 const ABS_TOLERANCE: f64 = 1.0e-9;
 
 #[test]
-fn cp343_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
+fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
     // Keep the cumulative capacity-limit regression identity while extending
-    // every route assertion through its CP343 successor.
+    // every route assertion through its CP344 successor.
     for (
         availability,
         maximum_capacity_w,
@@ -107,7 +107,7 @@ fn cp343_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
         system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(maximum_capacity_w));
         let model = SimulationModel::from_typed(typed);
         let schedule_cache =
-            precompute_schedule_cache(&model.typed, 1).expect("one CP342 schedule sample");
+            precompute_schedule_cache(&model.typed, 1).expect("one CP344 schedule sample");
         let weather = weather_series_with_conditions(&model, 1, 30.0, 15.0, 30.0, 101_325.0);
         let mut options = DirectZonePurchasedAirCoupledOptions::hourly_samples(1);
         options.initial_zone_air_temperature_c = INITIAL_ZONE_TEMPERATURE_C;
@@ -118,7 +118,7 @@ fn cp343_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
             &schedule_cache,
             options,
         )
-        .expect("CP342 route must pass per-step and final coupled validation");
+        .expect("CP344 route must pass per-step and final coupled validation");
         let retained = simulation
             .summary
             .calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle
@@ -431,6 +431,131 @@ fn cp343_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
                         value.map(f64::to_bits),
                         Some(expected_temperature.to_bits())
                     );
+                }
+            }
+        }
+
+        let mixed_air_owner = simulation
+            .summary
+            .calc_cooling_mixed_air_call_lifecycle
+            .state
+            .latest
+            .expect("latest CP329 mixed-air owner snapshot");
+        let lifecycle = simulation
+            .summary
+            .calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle;
+        let state = &lifecycle.state;
+        assert_eq!(state.transition_count, 1);
+        assert_eq!(state.unit_off_skip_count, usize::from(expected_unit_off));
+        assert_eq!(
+            state.capacity_limit_sensible_output_guard_false_fallthrough_count,
+            usize::from(expected_guard_false)
+        );
+        assert_eq!(
+            state.capacity_limit_sensible_output_supply_temperature_mixed_air_limit_count,
+            usize::from(expected_assignment)
+        );
+        assert_eq!(
+            state.source_site_execution_count,
+            4 * usize::from(expected_assignment)
+        );
+        for count in [
+            state.supply_temperature_for_minimum_read_count,
+            state.mixed_air_temperature_for_minimum_read_count,
+            state.source_shaped_two_argument_minimum_evaluation_count,
+            state.supply_temperature_assignment_write_count,
+        ] {
+            assert_eq!(count, usize::from(expected_assignment));
+        }
+
+        let latest_limit = state.latest.expect("latest CP344 snapshot");
+        assert_eq!(
+            latest_limit.capacity_limit_sensible_output_guard_false_fallthrough,
+            expected_guard_false
+        );
+        assert_eq!(
+            latest_limit.capacity_limit_sensible_output_supply_temperature_mixed_air_limit_executed,
+            expected_assignment
+        );
+        assert_eq!(
+            latest_limit
+                .predecessor_capacity_limit_sensible_output_supply_temperature_assignment_executed,
+            expected_assignment
+        );
+        if expected_unit_off {
+            assert!(!latest_limit.supply_temperature_for_minimum_read);
+            assert!(!latest_limit.mixed_air_temperature_for_minimum_read);
+            assert!(!latest_limit.source_shaped_two_argument_minimum_evaluated);
+            assert!(!latest_limit.supply_temperature_assignment_performed);
+            for value in [
+                latest_limit.preexisting_supply_temperature_c,
+                latest_limit.supply_temperature_before_mixed_air_limit_c,
+                latest_limit.mixed_air_temperature_c,
+                latest_limit.minimum_supply_temperature_c,
+                latest_limit.assigned_supply_temperature_c,
+                latest_limit.resulting_supply_temperature_c,
+            ] {
+                assert!(value.is_none());
+            }
+        } else {
+            let left = latest_temperature
+                .resulting_supply_temperature_c
+                .expect("CP343 owned resulting supply temperature");
+            assert_eq!(
+                latest_limit
+                    .preexisting_supply_temperature_c
+                    .map(f64::to_bits),
+                Some(left.to_bits())
+            );
+            if expected_guard_false {
+                assert!(!latest_limit.supply_temperature_for_minimum_read);
+                assert!(!latest_limit.mixed_air_temperature_for_minimum_read);
+                assert!(!latest_limit.source_shaped_two_argument_minimum_evaluated);
+                assert!(!latest_limit.supply_temperature_assignment_performed);
+                for value in [
+                    latest_limit.supply_temperature_before_mixed_air_limit_c,
+                    latest_limit.mixed_air_temperature_c,
+                    latest_limit.minimum_supply_temperature_c,
+                    latest_limit.assigned_supply_temperature_c,
+                ] {
+                    assert!(value.is_none());
+                }
+                assert_eq!(
+                    latest_limit
+                        .resulting_supply_temperature_c
+                        .map(f64::to_bits),
+                    Some(left.to_bits())
+                );
+            } else {
+                let right = mixed_air_owner
+                    .mixed_air_temperature_c
+                    .expect("CP329 owned mixed-air temperature");
+                let expected = if left < right { left } else { right };
+                assert_eq!(
+                    temperature_owner.mixed_air_temperature_c.map(f64::to_bits),
+                    Some(right.to_bits()),
+                    "CP334 must corroborate CP329 without replacing its ownership"
+                );
+                assert!(latest_limit.supply_temperature_for_minimum_read);
+                assert!(latest_limit.mixed_air_temperature_for_minimum_read);
+                assert!(latest_limit.source_shaped_two_argument_minimum_evaluated);
+                assert!(latest_limit.supply_temperature_assignment_performed);
+                assert_eq!(
+                    latest_limit
+                        .supply_temperature_before_mixed_air_limit_c
+                        .map(f64::to_bits),
+                    Some(left.to_bits())
+                );
+                assert_eq!(
+                    latest_limit.mixed_air_temperature_c.map(f64::to_bits),
+                    Some(right.to_bits())
+                );
+                for value in [
+                    latest_limit.minimum_supply_temperature_c,
+                    latest_limit.assigned_supply_temperature_c,
+                    latest_limit.resulting_supply_temperature_c,
+                ] {
+                    assert_eq!(value.map(f64::to_bits), Some(expected.to_bits()));
                 }
             }
         }

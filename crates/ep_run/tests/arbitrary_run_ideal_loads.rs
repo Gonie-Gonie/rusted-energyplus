@@ -63,6 +63,26 @@ fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
         "EnergyPlus 26.1 PurchasedAirManager.cc:2203"
     );
     assert!(cp343["latest"].is_object());
+    let cp344 = &summary["rust_runtime"]["purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle"];
+    assert_eq!(
+        cp344["source"],
+        "EnergyPlus 26.1 PurchasedAirManager.cc:2203"
+    );
+    assert_eq!(
+        cp344["first_excluded_source"],
+        "EnergyPlus 26.1 PurchasedAirManager.cc:2208"
+    );
+    assert_eq!(
+        cp344["latest"]["source_order"]
+            .as_array()
+            .expect("CP344 source order"),
+        &[
+            "read-purchased-air-supply-temperature-for-minimum",
+            "read-purchased-air-mixed-air-temperature-for-minimum",
+            "apply-source-shaped-two-argument-minimum",
+            "assign-purchased-air-supply-temperature",
+        ]
+    );
     Ok(())
 }
 
@@ -439,6 +459,14 @@ fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
     assert!(
         rust_runtime
             ["purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_lifecycle"]
+            .is_null()
+    );
+    assert!(rust_runtime.contains_key(
+        "purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle"
+    ));
+    assert!(
+        rust_runtime
+            ["purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle"]
             .is_null()
     );
     assert_eq!(summary["source_order_gate"]["matches"], true);

@@ -4112,5 +4112,6 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp342-cooling-positive-supply-capacity-limit-sensible-output-supply-enthalpy-assignment.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit.ps1")
 
 Write-Host "IdealLoads structure audit complete."

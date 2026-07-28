@@ -22585,6 +22585,82 @@ target/lifecycle evidence and changes no counts, readiness, support,
 conformance, capability, status, feature/evidence boundary, numerical
 conformance, output claim or ownership, or Roadmap state.
 
+## CP344 Cooling Positive-Supply Capacity-Limit Supply-Temperature Mixed-Air Limit Placement
+
+CP344 extends the exact direct-Zone update path only through pinned EnergyPlus
+commit `6f2e40d10250a105b49966baa24d843711e61048`
+`PurchasedAirManager.cc` physical executable line 2203,
+`PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);`.
+The locked raw SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The exact four source-text/dependency sites are
+`read-purchased-air-supply-temperature-for-minimum`,
+`read-purchased-air-mixed-air-temperature-for-minimum`,
+`apply-source-shaped-two-argument-minimum`, and
+`assign-purchased-air-supply-temperature`. Their deterministic Rust order
+makes no C++ function-argument-evaluation-order claim because both reads are
+side-effect-free.
+
+The imported ObjexxFCL two-`double` minimum is exactly
+`a < b ? a : b`. Rust preserves the source shape as
+`if left < right { left } else { right }`: strict true selects CP343 supply
+temperature, while ties and unordered comparisons select CP329 mixed-air
+temperature bit-for-bit. No `f64::min`, total or partial ordering, clamp,
+normalization, finite coercion, cache, diagnostic, or mutable service state is
+introduced.
+
+Only CP343 `CapacityLimitSensibleOutputSupplyTemperatureAssigned` executes the
+sites. Routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`,
+`CapacityLimitSensibleOutputGuardFalseFallthrough`, and
+`CapacityLimitSensibleOutputSupplyTemperatureMixedAirLimitExecuted`. Let `T`
+be transitions; `U/N/P/G` inherited routes; `F` CP340 false fallthroughs; `L`
+CP344 executions; `D` CP343 assignments; `H` CP342 assignments; `M` CP341
+assignments; and `A` CP340 active evaluations. Exact placement requires
+`T = U+N+P+G+F+L`, `A = F+L`, and
+`L = D = H = M = CP340 adjustment-body entries`. Each site counter equals
+`L`, `source_site_execution_count = 4*L`, and witnessed/public counts match.
+Neither `L = A` nor equality with CP321 aggregate reads is required.
+
+Direct execution takes only `runtime`, selected `system`, and same-call CP343.
+Supplied/latest/private CP343 evidence must match bit-exactly and pass
+recursive completion. CP343 `resulting_supply_temperature_c` owns the
+left/preexisting operand. Same-call CP329 latest/private
+`mixed_air_temperature_c` owns the finite right operand. CP334 and CP336
+temperature evidence remains recursive lineage/corroboration and replaces
+neither source owner. No caller, Zone, typed-model, sizing, Node, live-service,
+or numerical-DTO input is admitted.
+
+The CP340 false route preserves CP343 result bits, recursively preserving
+CP334 temperature, without any CP344 site; inherited `U/N/P/G` routes carry no
+CP344 operand or result. CP344 requires the CP329 right operand to be finite
+but adds no new finite gate to exact CP343 left or selected result. Pure
+strict-`<` signed-zero, NaN, infinity, tie, and unordered behavior is
+defensive characterization, not a new full-public-chain reachability claim.
+Nonfinite Rust values stay `Some`; JSON maps numeric fields to null while
+preserving IEEE bit strings. False-route preexisting/result temperatures
+remain bit-identical `Some` with unread fields null; inherited skips remain
+`None`/null.
+
+Binding, coupled execution, and pipeline serialization preserve
+CP343-to-CP344-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle`.
+CP344 does not consume, reconcile with, feed, or replace the numerical DTO.
+Non-direct paths publish `None` and reject CP344 evidence. Physical lines
+2204-2207 are non-executable closing delimiters, blank, and commentary.
+Physical line 2208 is the first excluded executable,
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;`. That humidity assignment
+and later behavior remain excluded.
+
+Broader capacity adjustment, purchased-air output ownership, and live-service
+access remain unpromoted. `routine.psy_tdb_fn_h_w` remains `state_mapped`;
+both parents remain `scaffold`/`none`, and both Calc routines remain
+`source_mapped`. CP344 adds only the bounded mixed-air temperature limit and
+target/lifecycle evidence and changes no algorithm/routine counts, readiness,
+support, conformance, capability, status, feature/evidence boundary,
+numerical conformance, output claim or ownership, or Roadmap state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

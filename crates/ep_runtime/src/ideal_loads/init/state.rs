@@ -135,6 +135,11 @@ pub struct PurchasedAirRuntimeState {
             IdealLoadsAirSystemId,
             PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyTemperatureAssignmentSnapshot,
         >,
+    cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_latest_witnesses:
+        BTreeMap<
+            IdealLoadsAirSystemId,
+            PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyTemperatureMixedAirLimitSnapshot,
+        >,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -254,6 +259,9 @@ pub struct PurchasedAirUnitRuntimeState {
     /// Persistent bounded Cooling capacity-limit supply-temperature assignment state.
     pub calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment:
         PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyTemperatureAssignmentRuntimeState,
+    /// Persistent bounded Cooling capacity-limit supply-temperature mixed-air-limit state.
+    pub calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit:
+        PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyTemperatureMixedAirLimitRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.

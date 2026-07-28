@@ -1856,6 +1856,89 @@ or Roadmap promotion. `routine.psy_tdb_fn_h_w` remains `state_mapped`, both
 parent Calc routines remain `source_mapped`, and both parent algorithms
 remain `scaffold`/`none`.
 
+CP344 now maps only the Cooling positive-supply capacity-limit sensible-output
+supply-temperature mixed-air limit at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2203:
+`PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);`.
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact four textual sites, in deterministic Rust/source-text and dependency
+order, are `read-purchased-air-supply-temperature-for-minimum`,
+`read-purchased-air-mixed-air-temperature-for-minimum`,
+`apply-source-shaped-two-argument-minimum`, and
+`assign-purchased-air-supply-temperature`. Both reads are side-effect-free, so
+the witness order makes no claim about C++ function-argument evaluation order.
+
+EnergyPlus imports the ObjexxFCL two-`double` minimum whose source-shaped
+selection is exactly `a < b ? a : b`. The Rust transition therefore evaluates
+`if left < right { left } else { right }`: a strict true comparison selects
+the CP343 left operand, while ties and unordered comparisons select the CP329
+right operand bit-for-bit. It introduces no `f64::min`, total or partial
+ordering, clamp, normalization, finite coercion, cache, diagnostic, or mutable
+service state.
+
+Only CP343 `CapacityLimitSensibleOutputSupplyTemperatureAssigned` executes all
+four sites. The retained routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`,
+`CapacityLimitSensibleOutputGuardFalseFallthrough`, and
+`CapacityLimitSensibleOutputSupplyTemperatureMixedAirLimitExecuted`. For
+transitions `T`, inherited counts `U/N/P/G`, CP340 false fallthroughs `F`,
+CP344 limit executions `L`, CP343 assignments `D`, CP342 assignments `H`,
+CP341 assignments `M`, and CP340 active evaluations `A`, exact state requires
+`T = U+N+P+G+F+L`, `A = F+L`, and
+`L = D = H = M = CP340 adjustment-body entries`. Each read, source-shaped
+minimum evaluation, and assignment write equals `L`;
+`source_site_execution_count = 4*L`, and private witnessed route counters
+match their public counterparts. No invariant equates `L` with `A` or CP321
+aggregate reads.
+
+Exact direct release accepts only `runtime`, the selected `system`, and the
+same-call CP343 predecessor. Supplied, retained-latest, and private CP343
+snapshots must match bit-exactly and pass recursive completion. The left
+operand is solely CP343 `resulting_supply_temperature_c`; the right operand is
+solely the finite same-call CP329 latest/private
+`mixed_air_temperature_c`. CP329 owns that mixed-air source field. CP334 and
+CP336 temperature evidence remains recursive lineage/corroboration and cannot
+replace either CP343 or CP329 as the source owner. No caller scalar,
+Zone/model/sizing re-read, live service, or numerical-DTO operand is admitted.
+
+The CP340 guard-false route preserves CP343's resulting temperature bits,
+which recursively preserve CP334 on that route, without any CP344 read,
+minimum evaluation, or write. `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`, and
+`ActiveCapacityLimitGuardFalseFallthrough` retain no CP344 operand or result.
+CP344 requires the CP329 right operand to be finite but adds no new finite gate
+to the recursively exact CP343 left operand or selected result.
+
+The pure transition separately characterizes strict-`<` signed-zero, NaN,
+infinity, tie, and unordered behavior. Nonfinite cases remain pure/defensive
+characterization, not new full-public-chain reachability claims. Characterized
+active Rust operands, selected minimum, assignment, and result remain
+`Some(value)` even when a value is nonfinite; serde JSON maps a nonfinite
+numeric field to `null` while preserving its non-null IEEE bit string. The
+CP340 false route retains bit-identical `Some(value)` preexisting/result
+temperatures with unread minimum/assigned fields null. The four inherited
+skips retain Rust `None` and JSON null numeric and bit fields.
+
+Binding, coupled runtime, and pipeline evidence preserve
+CP343-to-CP344-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle`.
+CP344 does not consume, reconcile with, feed, or replace the numerical DTO.
+Non-direct paths publish `None` and reject attached CP344 evidence.
+
+Physical lines 2204-2207 are non-executable closing delimiters, blank, and
+commentary. Physical line 2208 is the first excluded lexical executable:
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;`. That humidity assignment
+and later behavior remain excluded. CP344 adds only the bounded mixed-air
+temperature limit, target inventory, and direct-only lifecycle evidence. It
+makes no support, readiness, run-state, feature-boundary, evidence-case,
+numerical-conformance, capability, algorithm/routine-count, purchased-air
+output-ownership, status, conformance, or Roadmap promotion.
+`routine.psy_tdb_fn_h_w` remains `state_mapped`, both parent Calc routines
+remain `source_mapped`, and both parent algorithms remain `scaffold`/`none`.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

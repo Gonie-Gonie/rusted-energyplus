@@ -34875,6 +34875,82 @@ target/lifecycle evidence, with no support, conformance, capability, output,
 status, algorithm/routine-count, readiness, feature/evidence,
 numerical-conformance, or Roadmap promotion.
 
+## CP344 Positive-Supply Capacity-Limit Supply-Temperature Mixed-Air Limit in the Heat-Balance Loop
+
+CP344 advances the direct purchased-air heat-balance witness only through
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`
+`PurchasedAirManager.cc` physical executable line 2203:
+`PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);`.
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact source-text/dependency sites are
+`read-purchased-air-supply-temperature-for-minimum`,
+`read-purchased-air-mixed-air-temperature-for-minimum`,
+`apply-source-shaped-two-argument-minimum`, and
+`assign-purchased-air-supply-temperature`. Both reads are side-effect-free;
+their deterministic Rust order is not a C++ function-argument-evaluation-order
+claim.
+
+EnergyPlus imports ObjexxFCL's exact two-`double`
+`a < b ? a : b` minimum. The Rust transition uses
+`if left < right { left } else { right }`: a strict true comparison selects
+CP343 supply temperature, while ties and unordered comparisons select CP329
+mixed-air temperature bit-for-bit. No `f64::min`, total/partial ordering,
+clamp, normalization, finite coercion, cache, diagnostic, or mutable service
+state is admitted.
+
+Only CP343 `CapacityLimitSensibleOutputSupplyTemperatureAssigned` executes all
+four sites. Routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`,
+`CapacityLimitSensibleOutputGuardFalseFallthrough`, and
+`CapacityLimitSensibleOutputSupplyTemperatureMixedAirLimitExecuted`. For
+transitions `T`, inherited `U/N/P/G`, CP340 false fallthroughs `F`, CP344
+executions `L`, CP343 assignments `D`, CP342 assignments `H`, CP341
+assignments `M`, and CP340 active evaluations `A`, lifecycle algebra is
+`T = U+N+P+G+F+L`, `A = F+L`, and
+`L = D = H = M = CP340 adjustment-body entries`. Each read, minimum
+evaluation, and assignment write equals `L`;
+`source_site_execution_count = 4*L`, and witnessed/public route counts match.
+There is no `L = A` or CP321 aggregate-read identity.
+
+Exact release accepts only `runtime`, selected `system`, and same-call CP343.
+Supplied/latest/private CP343 snapshots require bit-exact parity and recursive
+completion. CP343 `resulting_supply_temperature_c` owns the left operand.
+Same-call CP329 latest/private `mixed_air_temperature_c` owns the finite right
+operand. Retained CP334 and CP336 temperature evidence remains recursive
+lineage/corroboration and replaces neither owner. No Node, heat-balance, Zone,
+model, sizing, caller, live-service, or numerical-DTO operand is admitted.
+
+The CP340 false route preserves CP343 result bits, recursively preserving
+CP334 temperature, without a CP344 read, evaluation, or write; inherited
+`U/N/P/G` routes carry no CP344 operands or result. CP344 requires the CP329
+right operand to be finite but applies no new finite gate to exact CP343 left
+or result. Pure strict-`<` signed-zero, NaN, infinity, tie, and unordered
+behavior remains defensive characterization rather than a new full-public
+reachability claim. Nonfinite Rust values stay `Some`; JSON emits null numeric
+values with retained IEEE bit strings. False-route temperature remains
+bit-identical `Some` with unread fields null, and inherited skips remain
+`None`/null.
+
+Binding and lifecycle JSON preserve
+CP343-to-CP344-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle`.
+CP344 neither consumes nor reconciles with the numerical DTO and does not feed
+or replace it; non-direct execution publishes `None` and rejects CP344
+evidence. Physical lines 2204-2207 are non-executable closing delimiters,
+blank, and commentary. Physical line 2208 is the first excluded executable:
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;`. That humidity assignment
+and later behavior remain excluded.
+
+Broader capacity adjustment and purchased-air output ownership remain
+unpromoted. `routine.psy_tdb_fn_h_w` remains `state_mapped`; both parent
+algorithms remain `scaffold`/`none`, and both parent Calc routines remain
+`source_mapped`. CP344 adds only the bounded temperature limit and
+target/lifecycle evidence, with no support, conformance, capability, output,
+status, algorithm/routine-count, readiness, feature/evidence,
+numerical-conformance, or Roadmap promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |
