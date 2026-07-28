@@ -5,6 +5,7 @@ use ep_model::{IdealLoadsAirSystemId, ZoneId};
 use super::super::PurchasedAirRuntimeState;
 
 mod ems_override_guard;
+mod flow_limit_guard;
 pub(in crate::ideal_loads::calc) mod release;
 mod state;
 #[cfg(test)]
@@ -12,6 +13,7 @@ mod tests;
 mod transition;
 
 pub use ems_override_guard::*;
+pub use flow_limit_guard::*;
 pub use release::*;
 pub(super) use state::PurchasedAirCalcCoolingSupplyMassFlowMaximumRetainedRoute;
 pub use state::PurchasedAirCalcCoolingSupplyMassFlowMaximumRuntimeState;

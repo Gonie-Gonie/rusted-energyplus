@@ -18,9 +18,49 @@ mod snapshot_validation;
 
 use prefix_validation::completed_direct_prefix_through_ems_override_guard_is_consistent;
 use runtime_validation::{
-    calc_state_identities_match, call_order_is_pending_body, pending_body_state_is_consistent,
+    calc_state_identities_match, call_order_is_pending_body, completed_body_state_is_consistent,
+    pending_body_state_is_consistent,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_supply_mass_flow_ems_override_body_snapshot_is_exact_direct_release;
+
+pub(in crate::ideal_loads::calc) fn completed_direct_cooling_supply_mass_flow_ems_override_body_is_consistent(
+    runtime: &PurchasedAirRuntimeState,
+    unit: &crate::ideal_loads::PurchasedAirUnitRuntimeState,
+    system: &IdealLoadsAirSystem,
+    body: PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
+    body_witness: Option<PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot>,
+) -> bool {
+    let Some(guard) = unit.calc_cooling_supply_mass_flow_ems_override_guard.latest else {
+        return false;
+    };
+
+    completed_direct_prefix_through_ems_override_guard_is_consistent(
+        runtime,
+        unit,
+        system,
+        guard,
+        runtime.cooling_supply_mass_flow_ems_override_guard_latest_witness(system.id),
+    ) && body_links_to_guard(body, guard)
+        && completed_body_state_is_consistent(unit, body, body_witness)
+}
+
+fn body_links_to_guard(
+    body: PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
+    guard: PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
+) -> bool {
+    body.system == guard.system
+        && body.parent_call_ordinal == guard.parent_call_ordinal
+        && body.controlled_zone == guard.controlled_zone
+        && body.unit_body_entered == guard.unit_body_entered
+        && body.predecessor_cooling_body_entered == guard.cooling_body_entered
+        && body.predecessor_ems_supply_mass_flow_override_body_entered
+            == guard.ems_supply_mass_flow_override_body_entered
+        && body.predecessor_ems_supply_mass_flow_override_guard_false_fallthrough
+            == guard.ems_supply_mass_flow_override_guard_false_fallthrough
+        && body.unit_off_skipped == guard.unit_off_skipped
+        && body.non_cooling_skipped == guard.non_cooling_skipped
+        && body.cooling_body_entered == guard.cooling_body_entered
+}
 
 /// Fail-closed CP324 public release error.
 #[allow(missing_docs)]

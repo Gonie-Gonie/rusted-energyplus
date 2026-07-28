@@ -128,22 +128,24 @@ foreach ($cp322ScopeFile in @(
     Assert-NotContains -Path $cp322ScopeFile -Pattern 'EMSOverrideMdotOn|EMSOverrideMdotValue|VerySmallMassFlow|CalcPurchAirMixedAir|mixed[_-]?air' -Description "line-2157-or-later scope creep in CP322"
 }
 
-# The scheduled binding must execute CP321, then CP322, then CP323, then CP324,
+# The scheduled binding must execute CP321, CP322, CP323, CP324, and CP325,
 # then the existing numerical coupling without a shadow maximum or service.
 $cp322BindingText = Read-RepoText -Path $idealLoadsBinding
 $cp321BindingIndexForCp322 = $cp322BindingText.IndexOf("let calculation_cooling_capacity_zero_flow_reset =")
 $cp322BindingIndex = $cp322BindingText.IndexOf("let calculation_cooling_supply_mass_flow_maximum =")
 $cp323BindingIndexForCp322 = $cp322BindingText.IndexOf("let calculation_cooling_supply_mass_flow_ems_override_guard =")
 $cp324BindingIndexForCp322 = $cp322BindingText.IndexOf("let calculation_cooling_supply_mass_flow_ems_override_body =")
+$cp325BindingIndexForCp322 = $cp322BindingText.IndexOf("let calculation_cooling_supply_mass_flow_limit_guard =")
 $numericalBindingIndexForCp322 = $cp322BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp321BindingIndexForCp322 -lt 0 -or
     $cp322BindingIndex -le $cp321BindingIndexForCp322 -or
     $cp323BindingIndexForCp322 -le $cp322BindingIndex -or
     $cp324BindingIndexForCp322 -le $cp323BindingIndexForCp322 -or
-    $numericalBindingIndexForCp322 -le $cp324BindingIndexForCp322
+    $cp325BindingIndexForCp322 -le $cp324BindingIndexForCp322 -or
+    $numericalBindingIndexForCp322 -le $cp325BindingIndexForCp322
 ) {
-    throw "Binding must retain exact CP321 -> CP322 -> CP323 -> CP324 -> numerical Calc order"
+    throw "Binding must retain exact CP321 -> CP322 -> CP323 -> CP324 -> CP325 -> numerical Calc order"
 }
 $betweenCp321AndCp322 = $cp322BindingText.Substring(
     $cp321BindingIndexForCp322,

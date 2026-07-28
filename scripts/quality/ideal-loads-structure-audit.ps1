@@ -2447,6 +2447,7 @@ $bindingCoolingCapacityZeroFlowResetIndex = $bindingText.IndexOf("let calculatio
 $bindingCoolingSupplyMassFlowMaximumIndex = $bindingText.IndexOf("let calculation_cooling_supply_mass_flow_maximum =")
 $bindingCoolingSupplyMassFlowEmsOverrideGuardIndex = $bindingText.IndexOf("let calculation_cooling_supply_mass_flow_ems_override_guard =")
 $bindingCoolingSupplyMassFlowEmsOverrideBodyIndex = $bindingText.IndexOf("let calculation_cooling_supply_mass_flow_ems_override_body =")
+$bindingCoolingSupplyMassFlowLimitGuardIndex = $bindingText.IndexOf("let calculation_cooling_supply_mass_flow_limit_guard =")
 $bindingCalcIndex = $bindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
 $bindingCoolingEconomizerConditionCall = [regex]::Match(
     $bindingText,
@@ -2489,9 +2490,10 @@ if (
     $bindingCoolingSupplyMassFlowMaximumIndex -le $bindingCoolingCapacityZeroFlowResetIndex -or
     $bindingCoolingSupplyMassFlowEmsOverrideGuardIndex -le $bindingCoolingSupplyMassFlowMaximumIndex -or
     $bindingCoolingSupplyMassFlowEmsOverrideBodyIndex -le $bindingCoolingSupplyMassFlowEmsOverrideGuardIndex -or
-    $bindingCalcIndex -le $bindingCoolingSupplyMassFlowEmsOverrideBodyIndex
+    $bindingCoolingSupplyMassFlowLimitGuardIndex -le $bindingCoolingSupplyMassFlowEmsOverrideBodyIndex -or
+    $bindingCalcIndex -le $bindingCoolingSupplyMassFlowLimitGuardIndex
 ) {
-    throw "InitPurchasedAir must precede the Calc-entry prefix, minimum-OA prefix, cooling-entry gate, cooling OA maximum-flow gate, cooling OA maximum-flow true body, cooling economizer guard, cooling economizer condition, cooling economizer true body, cooling sensible flow, cooling dehumidification flow, cooling humidification flow, cooling capacity-zero flow reset, cooling supply-mass-flow maximum, cooling supply-mass-flow EMS override guard, cooling supply-mass-flow EMS override body, and bounded numerical Calc coupling"
+    throw "InitPurchasedAir must precede the Calc-entry prefix, minimum-OA prefix, cooling-entry gate, cooling OA maximum-flow gate, cooling OA maximum-flow true body, cooling economizer guard, cooling economizer condition, cooling economizer true body, cooling sensible flow, cooling dehumidification flow, cooling humidification flow, cooling capacity-zero flow reset, cooling supply-mass-flow maximum, cooling supply-mass-flow EMS override guard, cooling supply-mass-flow EMS override body, cooling supply-mass-flow limit guard, and bounded numerical Calc coupling"
 }
 if (-not $bindingCoolingEconomizerConditionCall.Success) {
     throw "CP316 binding must call the exact no-node release wrapper with only runtime, system, and CP315 predecessor"
@@ -4091,5 +4093,6 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp322-cooling-supply-mass-flow-maximum.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp323-cooling-supply-mass-flow-ems-override-guard.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp324-cooling-supply-mass-flow-ems-override-body.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp325-cooling-supply-mass-flow-limit-guard.ps1")
 
 Write-Host "IdealLoads structure audit complete."

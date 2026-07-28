@@ -33862,6 +33862,35 @@ or service is added, and `EMS` remains forbidden. CP324 adds no support,
 conformance, capability, status, count, readiness, evidence-case, or Roadmap
 promotion.
 
+## CP325 Cooling Supply Mass-Flow Limit Guard in the Heat-Balance Loop
+
+CP325 executes immediately after CP324 and before the unchanged bounded
+PurchasedAir numerical calculation. It maps only executable lines 2161-2162:
+two lazy `CoolingLimit` reads and comparisons, one conditionally reached
+retained `MaxCoolMassFlowRate` read, its strict `> 0.0` comparison, and the
+resulting body-entry decision form the exact seven lexical sites. UnitOff and
+non-cooling paths skip every site. `FlowRate` short-circuits the second selector
+read, `FlowRateAndCapacity` reaches it, and non-flow selectors skip the maximum
+read.
+
+Exact direct release validates CP324's completed same-call latest snapshot,
+private witness, and EMS-disabled complete skip, then consumes the selected
+typed selector and bit-validated retained Init maximum without a duplicate
+caller scalar or live service. A positive selected maximum may enter the
+excluded body; CP325 records that decision but performs no supply-flow read,
+minimum, or assignment. Per-step, final, coupled-runtime, and pipeline
+validators enforce CP324-to-CP325-to-numerical ordering and expose direct-only
+`purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle` evidence.
+No CP325 site changes a Zone or heat-balance equation or reconciles with the
+numerical DTO.
+
+Line 2163 is the first excluded executable and owns the actual supply-flow
+clamp. Its two operands, minimum, and assignment, the line-2166 very-small-flow
+guard/reset, later mixed-air, capacity, supply-state, Heat/DeadBand, and
+feedback work remain excluded. `EMS` and Autosizing remain forbidden. CP325
+adds no support, conformance, capability, status, count, readiness,
+evidence-case, or Roadmap promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

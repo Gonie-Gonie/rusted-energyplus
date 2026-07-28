@@ -21563,6 +21563,33 @@ service is added, and `EMS` remains forbidden. CP324 changes no support level,
 conformance, capability, status, inventory/readiness count, evidence case, or
 Roadmap state.
 
+## CP325 Cooling Supply Mass-Flow Limit Guard Placement
+
+CP325 maps only executable lines 2161-2162 between CP324 and the unchanged
+numerical PurchasedAir DTO. Its seven lexical sites preserve the first
+`CoolingLimit == FlowRate` read and comparison, the second
+`CoolingLimit == FlowRateAndCapacity` read and comparison only after a false
+first result, the `MaxCoolMassFlowRate` read only after either selector matches,
+strict `> 0.0`, and the resulting clamp-body entry decision. UnitOff and
+non-cooling paths skip the complete guard.
+
+Exact direct release validates the same-call CP324 latest snapshot, private
+witness, and EMS-disabled complete skip. It reads the selector from the typed
+system and the maximum from the bit-validated retained Init cache, accepts no
+duplicate scalar, and requests no live service. A selected positive maximum
+may truthfully record body entry; the transition stops there without reading
+or assigning supply flow. Coupled and pipeline validation enforce
+CP324-to-CP325-to-numerical ordering and publish direct-only
+`purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle` evidence.
+No CP325 site changes Zone state, demand, coefficients, correction, or
+feedback.
+
+Line 2163 is the first excluded executable. The actual supply-flow clamp,
+line-2166 very-small-flow guard/reset, mixed-air/capacity/supply-state behavior,
+Heat/DeadBand selection, and all later Zone-air work remain excluded. `EMS` and
+Autosizing remain forbidden. CP325 changes no support level, conformance,
+capability, status, inventory/readiness count, evidence case, or Roadmap state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

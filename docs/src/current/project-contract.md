@@ -16553,6 +16553,60 @@ run state, required or forbidden feature, numerical result, capability,
 status, inventory/readiness count, evidence case, conformance claim, or
 Roadmap item.
 
+## CP325 Source-Ordered Cooling Supply Mass-Flow Limit Guard
+
+CP325 supersedes only CP324's line-2161 exclusion for the complete EnergyPlus
+26.1 `PurchasedAirManager.cc` guard at executable lines 2161-2162. Its exact
+seven lexical source sites are:
+
+1. read `CoolingLimit` for the `FlowRate` comparison;
+2. compare the read with `FlowRate`;
+3. only after a false first comparison, re-read `CoolingLimit` for
+   `FlowRateAndCapacity`;
+4. compare the second read with `FlowRateAndCapacity`;
+5. only after either selector matches, read retained `MaxCoolMassFlowRate`;
+6. compare that maximum with strict `> 0.0`; and
+7. enter the supply mass-flow limit body only when the complete condition is
+   satisfied.
+
+UnitOff and non-cooling predecessors skip all seven sites. Active Cooling
+preserves the source's left-to-right `||` then `&&` short-circuiting:
+`FlowRate` skips the second selector read, `FlowRateAndCapacity` reaches and
+matches it, and `NoLimit` or `Capacity` reaches and rejects it without reading
+the maximum. A selected flow limit reads the maximum exactly once for the
+strict positivity comparison. Private characterization preserves raw
+floating-point comparison behavior, including false results for positive or
+negative zero and NaN. It stops at body entry and performs no supply-flow read,
+minimum, or assignment.
+
+`calc/cooling_supply_mass_flow_maximum/flow_limit_guard.rs` and its split
+modules own the CP325 snapshot, persistent state, pure transition, release
+validation, and tests. The public exact-direct wrapper
+`advance_direct_no_oa_calc_cooling_supply_mass_flow_limit_guard` validates the
+completed same-call CP324 latest snapshot, private witness, EMS-disabled
+complete-skip route, identity, ordinal, and full retained prefix before
+mutation. It reads `CoolingLimit` from the selected typed system and
+`MaxCoolMassFlowRate` from the bit-validated retained BeginEnvrn cache; it
+accepts no duplicate caller maximum or supply-flow scalar and requests no live
+sizing, schedule, Node, psychrometric, EMS, or diagnostic service.
+
+The binder executes CP325 immediately after CP324 and before the unchanged
+numerical Calc DTO. Per-step, final, coupled-runtime, and pipeline validators
+reconcile predecessor identity, skip partitions, lazy selector and maximum
+reads, strict positivity, true body entry where applicable, and false
+fallthrough. Direct-only JSON uses
+`purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle`;
+non-direct or disconnected evidence is rejected. CP325 does not reuse or
+reconcile the older numerical flow-limit helper.
+
+Line 2163 is the first excluded executable. Its `SupplyMassFlowRate` read,
+`MaxCoolMassFlowRate` re-read, source minimum, and supply-flow assignment
+remain excluded, as do the line-2166 very-small-flow guard and zero reset,
+mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection. `EMS`
+and Autosizing remain forbidden. CP325 promotes no support level, run state,
+required or forbidden feature, numerical result, capability, status,
+inventory/readiness count, evidence case, conformance claim, or Roadmap item.
+
 
 
 

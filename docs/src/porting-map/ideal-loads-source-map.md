@@ -19054,6 +19054,42 @@ service is introduced, and `EMS` remains forbidden. CP324 adds target
 inventory and lifecycle evidence only; support, conformance, statuses, counts,
 readiness, capability, evidence cases, and Roadmap state remain unchanged.
 
+## CP325 Cooling Supply Mass-Flow Limit Guard
+
+CP325 maps only the complete guard at executable lines 2161-2162 after CP324.
+Its seven lexical sites read `CoolingLimit` for `FlowRate`, compare it, lazily
+re-read it for `FlowRateAndCapacity` after a false first comparison, compare
+again, read retained `MaxCoolMassFlowRate` only after either selector matches,
+compare that value with strict `> 0.0`, and record entry into the deliberately
+excluded clamp body. UnitOff and non-cooling predecessors skip every site.
+
+The exact direct wrapper
+`advance_direct_no_oa_calc_cooling_supply_mass_flow_limit_guard` validates the
+completed same-call CP324 latest snapshot and private witness and requires its
+EMS-disabled complete skip. It obtains `CoolingLimit` from the selected typed
+system and the maximum from the bit-validated retained Init cache, with no
+duplicate caller scalar or live sizing, schedule, Node, psychrometric, EMS, or
+diagnostic service. `FlowRate` and `FlowRateAndCapacity` with a positive
+maximum may record a true body entry; selector rejection or a nonpositive
+maximum records guard fallthrough. The pure transition stops at that decision
+and performs no supply-flow read, minimum, or assignment.
+
+The binder places CP325 between CP324 and the unchanged numerical DTO.
+Direct-only
+`purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle` evidence
+reconciles predecessor identity, ordinal, route partitions, lazy reads, strict
+positivity, body entry, and fallthrough. It neither invokes nor reconciles the
+older numerical flow-limit helper, and non-direct or disconnected evidence is
+rejected.
+
+Line 2163 is the first excluded executable. Its supply-flow and maximum-flow
+operand reads, source minimum, and `SupplyMassFlowRate` assignment remain
+outside CP325. The line-2166 very-small-flow guard and reset,
+mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection also
+remain open. `EMS` and Autosizing remain forbidden. CP325 adds target inventory
+and lifecycle evidence only; support, conformance, statuses, counts, readiness,
+capability, evidence cases, and Roadmap state remain unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

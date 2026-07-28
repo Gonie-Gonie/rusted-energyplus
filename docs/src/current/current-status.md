@@ -753,6 +753,34 @@ introduced, `EMS` remains forbidden, and CP324 changes no support, readiness,
 conformance, capability, status, inventory count, evidence case, or Roadmap
 state.
 
+CP325 maps only the complete Cooling supply mass-flow limit guard at executable
+lines 2161-2162 as seven lexical source sites. Active Cooling reads
+`CoolingLimit` and compares `FlowRate`; only a false result re-reads it and
+compares `FlowRateAndCapacity`. Only either selector match reads retained
+`MaxCoolMassFlowRate`, compares it with strict `> 0.0`, and records whether
+execution enters the deliberately excluded clamp body. UnitOff and non-cooling
+predecessors skip all seven sites.
+
+The exact direct release lane consumes the completed same-call CP324 latest
+snapshot and private witness and requires its EMS-disabled complete skip. It
+reads the selector from the selected typed system and the maximum from the
+bit-validated retained Init cache, without accepting a duplicate caller scalar
+or requesting live sizing, schedule, Node, psychrometric, EMS, or diagnostic
+services. `FlowRate` and `FlowRateAndCapacity` with a positive initialized
+maximum may truthfully record body entry; `NoLimit`, `Capacity`, and zero
+maximum routes fall through. The binder and lifecycle firewalls retain
+CP324-to-CP325-to-numerical ordering. Direct-only evidence is exposed as
+`purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle`.
+
+Line 2163 is the first excluded executable and owns the supply-flow read,
+maximum-flow re-read, source minimum, and `SupplyMassFlowRate` assignment.
+The line-2166 very-small-flow guard and reset, mixed-air/capacity/supply-state
+behavior, and Heat/DeadBand selection also remain open. CP325 neither reads nor
+mutates supply flow and does not reconcile its guard with the unchanged
+numerical DTO. `EMS` and Autosizing remain forbidden, and support, readiness,
+conformance, capability, status, inventory count, evidence cases, and Roadmap
+state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

@@ -167,6 +167,48 @@ pub(super) fn pending_body_state_is_consistent(
         && body_source_counters_are_consistent(state)
 }
 
+pub(super) fn completed_body_state_is_consistent(
+    unit: &PurchasedAirUnitRuntimeState,
+    predecessor: PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
+    witness: Option<PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot>,
+) -> bool {
+    let state = &unit.calc_cooling_supply_mass_flow_ems_override_body;
+    let guard = &unit.calc_cooling_supply_mass_flow_ems_override_guard;
+    partition_is_consistent(
+        state.transition_count,
+        state.unit_off_skip_count,
+        state.non_cooling_skip_count,
+        state.cooling_body_entry_count,
+    ) && state.transition_count == unit.calc_entry.call_count
+        && state.latest == Some(predecessor)
+        && witness == Some(predecessor)
+        && state.latest_transition_ordinal == Some(state.transition_count)
+        && snapshot_route(predecessor) == state.latest_route
+        && predecessor.parent_call_ordinal == state.transition_count
+        && predecessor.system == state.system
+        && unit.controlled_zone == Some(predecessor.controlled_zone)
+        && cooling_supply_mass_flow_ems_override_body_snapshot_is_exact_direct_release(predecessor)
+        && completed_body_history_links_to_guard(state, guard)
+        && body_source_counters_are_consistent(state)
+}
+
+fn completed_body_history_links_to_guard(
+    body: &PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyRuntimeState,
+    guard: &PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardRuntimeState,
+) -> bool {
+    body.transition_count == guard.transition_count
+        && body.unit_off_skip_count == guard.unit_off_skip_count
+        && body.non_cooling_skip_count == guard.non_cooling_skip_count
+        && body.cooling_body_entry_count == guard.cooling_body_entry_count
+        && body.body_entry_count == guard.ems_supply_mass_flow_override_body_entry_count
+        && body.ems_disabled_fallthrough_count
+            == guard.ems_supply_mass_flow_override_guard_false_fallthrough_count
+        && body
+            .body_entry_count
+            .checked_add(body.ems_disabled_fallthrough_count)
+            == Some(guard.cooling_body_entry_count)
+}
+
 fn body_latest_is_valid(
     state: &PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyRuntimeState,
     controlled_zone: Option<ZoneId>,

@@ -50,6 +50,8 @@ mod cooling_sensible_flow_tests;
 mod cooling_supply_mass_flow_ems_override_body_tests;
 #[path = "binding/cooling_supply_mass_flow_ems_override_guard_tests.rs"]
 mod cooling_supply_mass_flow_ems_override_guard_tests;
+#[path = "binding/cooling_supply_mass_flow_limit_guard_tests.rs"]
+mod cooling_supply_mass_flow_limit_guard_tests;
 #[path = "binding/cooling_supply_mass_flow_maximum_tests.rs"]
 mod cooling_supply_mass_flow_maximum_tests;
 #[path = "binding/minimum_oa_prefix_tests.rs"]
