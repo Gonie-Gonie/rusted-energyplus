@@ -81,6 +81,8 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentRuntimeState::new(
                     system,
                 ),
+            calc_cooling_positive_supply_enthalpy_assignment:
+                PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

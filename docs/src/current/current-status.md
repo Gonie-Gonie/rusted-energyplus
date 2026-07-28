@@ -1264,6 +1264,66 @@ both Calc routines remain `source_mapped`, and algorithm/routine counts,
 readiness, support, run state, feature boundaries, evidence cases, numerical
 conformance, capability, output claims, and Roadmap state remain unchanged.
 
+CP336 maps only the single Cooling positive-supply enthalpy assignment at
+locked EnergyPlus 26.1 `PurchasedAirManager.cc` physical executable line 2191:
+`SupplyEnthalpy = PsyHFnTdbW(PurchAir.SupplyTemp,
+PurchAir.SupplyHumRat);`. The locked source-file SHA-256 is
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact four-site textual order is
+`read-purchased-air-supply-temperature-for-enthalpy`,
+`read-purchased-air-supply-humidity-ratio-for-enthalpy`,
+`evaluate-psy-h-fn-tdb-w`, and `assign-local-supply-enthalpy`. The two
+side-effect-free argument reads are a textual inventory and do not claim C++
+function-argument evaluation order. The listed four-site order is the
+deterministic Rust witness contract.
+
+Only CP335's active `SupplyHumidityRatioMixedAirAssigned` route executes CP336.
+The temperature operand comes bit-exactly from the same-call completed CP334
+latest/private witness's `assigned_supply_temperature_c`; the humidity operand
+comes from CP335 `assigned_supply_humidity_ratio`. The transition evaluates
+only canonical `energyplus_psy_h_fn_tdb_w` with the source
+`max(W, 1.0e-5)` humidity floor and assigns its result to the local supply
+enthalpy. The legacy IdealLoads `moist_air_enthalpy_j_per_kg` helper is not an
+admitted substitute.
+
+The pure transition characterizes source-shaped IEEE behavior, including the
+humidity floor, signed zero, NaN, infinity, and arithmetic overflow. Exact
+direct admission is narrower: active temperature must be finite, humidity must
+be finite and `>= 0.0` including negative zero, and the calculated enthalpy
+must be finite. Values below `1.0e-5`, including either signed zero, therefore
+use the positive floor. CP335's complete public chain still cannot currently
+deliver negative zero because its retained CP332 lineage proof rejects that
+case first. UnitOff, non-cooling, and CP330 active guard-false histories carry
+no operands or result into CP336.
+
+Each active assignment executes all four sites, so dynamic source-site
+executions equal `4 * supply_enthalpy_assignment_count`,
+`4 * supply_humidity_ratio_mixed_air_assignment_count`,
+`4 * supply_temperature_mixed_air_limit_count`,
+`4 * supply_temperature_minimum_limit_count`,
+`4 * supply_temperature_assignment_count`, `4 * cp_air_assignment_count`, and
+`4 * positive_supply_mass_flow_body_entries`. Each per-site counter equals the
+active assignment count. Four-route parity and checked-arithmetic preflight
+make identity, ordinal, operand, provenance, history, witness, replay,
+corruption, nonfinite-result, and overflow rejection transactional.
+
+The binder, coupled runtime, and pipeline place direct-only
+`purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle`
+evidence in CP335-to-CP336-to-numerical order. CP336 does not consume,
+reconcile with, feed, or replace the unchanged numerical DTO; non-direct paths
+publish `None` and reject attached evidence. Physical line 2192 is blank and
+lines 2193-2194 are comments. Physical line 2195 is the first excluded lexical
+executable and CP337 boundary; its capacity-limit guard and lines 2195-2337
+remain excluded. The zero-flow `else` at 2339-2345 still first executes line
+2340; the outer Heat/DeadBand sibling at 2347-2348, its mixed-air call at
+2454-2461, and its guard at 2465 also remain excluded.
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, Autosizing, broad humidity
+control, broader capacity and enthalpy behavior, and output behavior remain
+unpromoted. Both parent algorithms remain `scaffold`/`none`; both Calc
+routines remain `source_mapped`, and algorithm/routine counts, readiness,
+support, run state, feature boundaries, evidence cases, numerical conformance,
+capability, status, output claims, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

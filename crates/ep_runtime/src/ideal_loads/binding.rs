@@ -27,6 +27,7 @@ use super::{
     PurchasedAirCalcCoolingMixedAirCallError, PurchasedAirCalcCoolingOaMaxFlowBodyError,
     PurchasedAirCalcCoolingOaMaxFlowGateError,
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentError as CoolingCpAirAssignmentError,
+    PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentError as CoolingSupplyEnthalpyAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentError as CoolingSupplyHumidityRatioMixedAirAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentError as CoolingSupplyTemperatureAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitError as CoolingSupplyTemperatureMinimumLimitError,
@@ -75,6 +76,7 @@ use super::{
 };
 
 mod cooling_positive_supply_cp_air_assignment;
+mod cooling_positive_supply_enthalpy_assignment;
 mod cooling_positive_supply_humidity_ratio_mixed_air_assignment;
 mod cooling_positive_supply_temperature_assignment;
 mod cooling_positive_supply_temperature_minimum_limit;
@@ -83,6 +85,7 @@ mod cooling_supply_mass_flow_positive_guard;
 mod scheduled_output;
 
 use cooling_positive_supply_cp_air_assignment::advance_positive_supply_cp_air_assignment;
+use cooling_positive_supply_enthalpy_assignment::advance_positive_supply_enthalpy_assignment;
 use cooling_positive_supply_humidity_ratio_mixed_air_assignment::advance_positive_supply_humidity_ratio_mixed_air_assignment;
 use cooling_positive_supply_temperature_assignment::advance_positive_supply_temperature_assignment;
 use cooling_positive_supply_temperature_minimum_limit::advance_positive_supply_temperature_minimum_limit;
@@ -691,6 +694,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingPositiveSupplyHumidityRatioMixedAirAssignment(
         CoolingSupplyHumidityRatioMixedAirAssignmentError,
     ),
+    /// The bounded cooling positive-supply enthalpy assignment rejected its release state.
+    CalculationCoolingPositiveSupplyEnthalpyAssignment(CoolingSupplyEnthalpyAssignmentError),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -1073,6 +1078,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_cooling_positive_supply_temperature_mixed_air_limit,
         )?;
+    let calculation_cooling_positive_supply_enthalpy_assignment =
+        advance_positive_supply_enthalpy_assignment(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1136,6 +1147,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_positive_supply_temperature_minimum_limit,
         calculation_cooling_positive_supply_temperature_mixed_air_limit,
         calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment,
+        calculation_cooling_positive_supply_enthalpy_assignment,
         coupling,
     })
 }

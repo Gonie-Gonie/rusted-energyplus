@@ -10,6 +10,8 @@ mod cooling_humidification_flow_fixture;
 mod cooling_mixed_air_call_fixture;
 #[path = "coupled_output_tests/cooling_positive_supply_cp_air_assignment_fixture.rs"]
 mod cooling_positive_supply_cp_air_assignment_fixture;
+#[path = "coupled_output_tests/cooling_positive_supply_enthalpy_assignment_fixture.rs"]
+mod cooling_positive_supply_enthalpy_assignment_fixture;
 #[path = "coupled_output_tests/cooling_positive_supply_humidity_ratio_mixed_air_assignment_fixture.rs"]
 mod cooling_positive_supply_humidity_ratio_mixed_air_assignment_fixture;
 #[path = "coupled_output_tests/cooling_positive_supply_temperature_assignment_fixture.rs"]
@@ -87,6 +89,7 @@ use cooling_capacity_zero_flow_reset_fixture::calculation_cooling_capacity_zero_
 use cooling_humidification_flow_fixture::calculation_cooling_humidification_flow_snapshot;
 use cooling_mixed_air_call_fixture::calculation_cooling_mixed_air_call_snapshot;
 use cooling_positive_supply_cp_air_assignment_fixture::calculation_cooling_positive_supply_cp_air_assignment_snapshot;
+use cooling_positive_supply_enthalpy_assignment_fixture::calculation_cooling_positive_supply_enthalpy_assignment_snapshot;
 use cooling_positive_supply_humidity_ratio_mixed_air_assignment_fixture::calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment_snapshot;
 use cooling_positive_supply_temperature_assignment_fixture::calculation_cooling_positive_supply_temperature_assignment_snapshot;
 use cooling_positive_supply_temperature_minimum_limit_fixture::calculation_cooling_positive_supply_temperature_minimum_limit_snapshot;
@@ -661,6 +664,11 @@ fn scaled_output(
             calculation_cooling_positive_supply_temperature_mixed_air_limit,
             calculation_cooling_mixed_air_call,
         );
+    let calculation_cooling_positive_supply_enthalpy_assignment =
+        calculation_cooling_positive_supply_enthalpy_assignment_snapshot(
+            calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment,
+            calculation_cooling_positive_supply_temperature_mixed_air_limit,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -709,6 +717,7 @@ fn scaled_output(
         calculation_cooling_positive_supply_temperature_minimum_limit,
         calculation_cooling_positive_supply_temperature_mixed_air_limit,
         calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment,
+        calculation_cooling_positive_supply_enthalpy_assignment,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

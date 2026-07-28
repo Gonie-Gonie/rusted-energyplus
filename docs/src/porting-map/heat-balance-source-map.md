@@ -34335,6 +34335,67 @@ remain `source_mapped`. CP335 adds no support, conformance, capability, output
 claim, status, algorithm/routine count, readiness, evidence-case,
 numerical-conformance, or Roadmap promotion.
 
+## CP336 Positive-Supply Enthalpy Assignment in the Heat-Balance Loop
+
+CP336 advances the direct-Zone IdealLoads heat-balance lifecycle only through
+locked EnergyPlus 26.1 `PurchasedAirManager.cc` physical executable line 2191:
+`SupplyEnthalpy = PsyHFnTdbW(PurchAir.SupplyTemp,
+PurchAir.SupplyHumRat);`. The locked source-file SHA-256 is
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exactly four lexical sites are
+`read-purchased-air-supply-temperature-for-enthalpy`,
+`read-purchased-air-supply-humidity-ratio-for-enthalpy`,
+`evaluate-psy-h-fn-tdb-w`, and `assign-local-supply-enthalpy`. The two
+side-effect-free argument reads form a textual inventory only and carry no C++
+evaluation-order claim. The listed four-site order is the deterministic Rust
+witness contract.
+
+Only the CP335 `SupplyHumidityRatioMixedAirAssigned` history executes those
+sites. Exact direct admission recursively proves CP335 and CP334
+latest/private witnesses and retained chains. It takes temperature only from
+same-call CP334 `assigned_supply_temperature_c`, humidity only from CP335
+`assigned_supply_humidity_ratio`, and evaluates canonical
+`energyplus_psy_h_fn_tdb_w`. The legacy
+`moist_air_enthalpy_j_per_kg` helper, duplicate scalar, Zone or typed-model
+re-read, service, and numerical DTO cannot replace those sources.
+
+The pure transition preserves source-shaped grouping, the
+`max(W, 1.0e-5)` floor, and IEEE edge behavior. Exact direct admission requires
+finite temperature, finite `>= 0.0` humidity including negative zero, and
+finite enthalpy. Both signed zeros use the positive floor. CP335's complete
+public chain still cannot deliver negative zero because retained CP332
+operand-lineage proof rejects it first.
+
+UnitOff, non-cooling, and CP330 active guard-false heat-balance histories skip
+all four sites with null operands and result. Every active CP335 assignment
+executes all four, so dynamic source-site executions equal
+`4 * supply_enthalpy_assignment_count`,
+`4 * supply_humidity_ratio_mixed_air_assignment_count`,
+`4 * supply_temperature_mixed_air_limit_count`,
+`4 * supply_temperature_minimum_limit_count`,
+`4 * supply_temperature_assignment_count`, `4 * cp_air_assignment_count`, and
+`4 * positive_supply_mass_flow_body_entries`. Each per-site counter equals the
+active count. Four-route parity and checked-arithmetic preflight make identity,
+ordinal, operand, provenance, history, replay, corruption, witness,
+nonfinite-result, or overflow rejection transactional.
+
+The binding and lifecycle JSON preserve CP335-to-CP336-to-numerical order under
+`purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle`.
+CP336 does not consume, reconcile with, feed, or replace the numerical DTO, and
+non-direct execution carries no CP336 lifecycle. Physical line 2192 is blank
+and lines 2193-2194 are comments. Physical line 2195 is the first excluded
+lexical executable and CP337 boundary. Its capacity-limit guard, lines
+2195-2337, the zero-flow branch at 2339-2345 whose first dynamic executable is
+2340, the Heat/DeadBand sibling at 2347-2348, its mixed-air call at 2454-2461,
+and guard at 2465 stay excluded.
+
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, Autosizing, broad humidity
+control, broader capacity and enthalpy behavior, and output behavior remain
+unpromoted. Both parents remain `scaffold`/`none`; both Calc routines remain
+`source_mapped`. CP336 adds no support, conformance, capability, output claim,
+status, algorithm/routine count, readiness, feature-boundary, evidence-case,
+numerical-conformance, or Roadmap promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |
