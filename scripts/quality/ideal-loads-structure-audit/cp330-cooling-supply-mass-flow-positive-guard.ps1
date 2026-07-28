@@ -210,19 +210,21 @@ Assert-Contains -Path $cp330InitWitness -Pattern 'pub\(in crate::ideal_loads\) f
 Assert-Contains -Path $cp330InitState -Pattern 'pub calc_cooling_supply_mass_flow_positive_guard:\s*[\r\n]+\s*PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardRuntimeState' -Description "per-unit CP330 persistent state"
 Assert-Contains -Path $cp330InitUnit -Pattern '(?s)calc_cooling_supply_mass_flow_positive_guard:\s*PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardRuntimeState::new\(system\)' -Description "per-unit CP330 state initialization"
 
-# Binding order is CP329 -> CP330 -> CP331 -> unchanged numerical DTO.
+# Binding order is CP329 -> CP330 -> CP331 -> CP332 -> unchanged numerical DTO.
 $cp330BindingText = Read-RepoText -Path $cp330Binding
 $cp329BindingIndexForCp330 = $cp330BindingText.IndexOf("let calculation_cooling_mixed_air_call =")
 $cp330BindingIndex = $cp330BindingText.IndexOf("let calculation_cooling_supply_mass_flow_positive_guard =")
 $cp331BindingIndexForCp330 = $cp330BindingText.IndexOf("let calculation_cooling_positive_supply_cp_air_assignment =")
+$cp332BindingIndexForCp330 = $cp330BindingText.IndexOf("let calculation_cooling_positive_supply_temperature_assignment =")
 $numericalBindingIndexForCp330 = $cp330BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp329BindingIndexForCp330 -lt 0 -or
     $cp330BindingIndex -le $cp329BindingIndexForCp330 -or
     $cp331BindingIndexForCp330 -le $cp330BindingIndex -or
-    $numericalBindingIndexForCp330 -le $cp331BindingIndexForCp330
+    $cp332BindingIndexForCp330 -le $cp331BindingIndexForCp330 -or
+    $numericalBindingIndexForCp330 -le $cp332BindingIndexForCp330
 ) {
-    throw "Binding must retain exact CP329 -> CP330 -> CP331 -> numerical Calc order"
+    throw "Binding must retain exact CP329 -> CP330 -> CP331 -> CP332 -> numerical Calc order"
 }
 Assert-Contains -Path $cp330Binding -Pattern '(?s)let calculation_cooling_supply_mass_flow_positive_guard =\s*advance_positive_guard\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_mixed_air_call,\s*\)\?;' -Description "binding exact CP329-to-CP330 adapter call"
 Assert-Contains -Path $cp330BindingAdapter -Pattern '(?s)pub\(super\) fn advance_positive_guard\(\s*runtime: &mut PurchasedAirRuntimeState,\s*system: &IdealLoadsAirSystem,\s*predecessor: PurchasedAirCalcCoolingMixedAirCallSnapshot,\s*\)' -Description "CP330 binding adapter arguments"
@@ -262,17 +264,38 @@ if (-not $cp331BindingCallForCp330.Success) {
 }
 $cp331BindingCallEndForCp330 =
     $cp331BindingCallForCp330.Index + $cp331BindingCallForCp330.Length
-if ($numericalBindingIndexForCp330 -lt $cp331BindingCallEndForCp330) {
-    throw "CP331 exact release call must complete before numerical Calc"
+if ($cp332BindingIndexForCp330 -lt $cp331BindingCallEndForCp330) {
+    throw "CP331 exact release call must complete before CP332"
 }
-$postCp331BeforeNumericalForCp330 = $cp330BindingText.Substring(
+$postCp331BeforeCp332ForCp330 = $cp330BindingText.Substring(
     $cp331BindingCallEndForCp330,
-    $numericalBindingIndexForCp330 - $cp331BindingCallEndForCp330
+    $cp332BindingIndexForCp330 - $cp331BindingCallEndForCp330
 )
-$postCp331BeforeNumericalCodeForCp330 =
-    [regex]::Replace($postCp331BeforeNumericalForCp330, '(?m)//.*$', '')
-if ($postCp331BeforeNumericalCodeForCp330 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No later source helper call may execute after CP331 and before numerical Calc"
+$postCp331BeforeCp332CodeForCp330 =
+    [regex]::Replace($postCp331BeforeCp332ForCp330, '(?m)//.*$', '')
+if ($postCp331BeforeCp332CodeForCp330 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No intermediary helper call may execute after CP331 and before CP332"
+}
+$cp332BindingCallForCp330 = [regex]::Match(
+    $cp330BindingText,
+    '(?s)let calculation_cooling_positive_supply_temperature_assignment =\s*advance_positive_supply_temperature_assignment\([^;]+?\)\?;'
+)
+if (-not $cp332BindingCallForCp330.Success) {
+    throw "Binding must retain the complete CP332 exact release call after CP331"
+}
+$cp332BindingCallEndForCp330 =
+    $cp332BindingCallForCp330.Index + $cp332BindingCallForCp330.Length
+if ($numericalBindingIndexForCp330 -lt $cp332BindingCallEndForCp330) {
+    throw "CP332 exact release call must complete before numerical Calc"
+}
+$postCp332BeforeNumericalForCp330 = $cp330BindingText.Substring(
+    $cp332BindingCallEndForCp330,
+    $numericalBindingIndexForCp330 - $cp332BindingCallEndForCp330
+)
+$postCp332BeforeNumericalCodeForCp330 =
+    [regex]::Replace($postCp332BeforeNumericalForCp330, '(?m)//.*$', '')
+if ($postCp332BeforeNumericalCodeForCp330 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No later source helper call may execute after CP332 and before numerical Calc"
 }
 
 # Coupled validation reconstructs CP330 only from CP329 and retains exact bits.

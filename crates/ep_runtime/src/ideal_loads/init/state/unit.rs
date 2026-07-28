@@ -67,6 +67,8 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardRuntimeState::new(system),
             calc_cooling_positive_supply_cp_air_assignment:
                 PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentRuntimeState::new(system),
+            calc_cooling_positive_supply_temperature_assignment:
+                PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

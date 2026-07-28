@@ -1,10 +1,8 @@
 //! IdealLoads `CalcPurchAirLoads` compatibility calculations.
 mod cooling_capacity_zero_flow_reset;
 mod cooling_dehumidification_flow;
-#[cfg(test)]
-mod cooling_dehumidification_flow_release_tests;
-#[cfg(test)]
-mod cooling_dehumidification_flow_tests;
+#[rustfmt::skip] #[cfg(test)] mod cooling_dehumidification_flow_release_tests;
+#[rustfmt::skip] #[cfg(test)] mod cooling_dehumidification_flow_tests;
 mod cooling_economizer_body;
 #[cfg(test)]
 mod cooling_economizer_body_release_tests;
@@ -32,6 +30,7 @@ mod cooling_oa_max_flow_gate;
 #[cfg(test)]
 mod cooling_oa_max_flow_gate_tests;
 mod cooling_positive_supply_cp_air_assignment;
+mod cooling_positive_supply_temperature_assignment;
 mod cooling_sensible_flow;
 #[cfg(test)]
 mod cooling_sensible_flow_release_tests;
@@ -66,6 +65,7 @@ pub use cooling_economizer_guard::*;
 pub use cooling_entry_gate::*;
 pub use cooling_humidification_flow::*;
 pub use cooling_mixed_air_call::*;
+pub use cooling_positive_supply_temperature_assignment::*;
 pub use cooling_sensible_flow::*;
 pub use cooling_supply_mass_flow_maximum::*;
 pub use cooling_supply_mass_flow_positive_guard::*;

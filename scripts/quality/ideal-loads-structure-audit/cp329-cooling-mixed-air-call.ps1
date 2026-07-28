@@ -275,21 +275,23 @@ Assert-Contains -Path $cp329InitWitnesses -Pattern 'pub\(in crate::ideal_loads\)
 Assert-Contains -Path $cp329InitState -Pattern 'pub calc_cooling_mixed_air_call:\s*PurchasedAirCalcCoolingMixedAirCallRuntimeState' -Description "per-unit CP329 persistent state"
 
 # The scheduled binding is the only
-# CP328 -> CP329 -> CP330 -> CP331 -> numerical placement.
+# CP328 -> CP329 -> CP330 -> CP331 -> CP332 -> numerical placement.
 $cp329BindingText = Read-RepoText -Path $cp329Binding
 $cp328BindingIndexForCp329 = $cp329BindingText.IndexOf("let calculation_cooling_supply_mass_flow_very_small_guard_body =")
 $cp329BindingIndex = $cp329BindingText.IndexOf("let calculation_cooling_mixed_air_call =")
 $cp330BindingIndexForCp329 = $cp329BindingText.IndexOf("let calculation_cooling_supply_mass_flow_positive_guard =")
 $cp331BindingIndexForCp329 = $cp329BindingText.IndexOf("let calculation_cooling_positive_supply_cp_air_assignment =")
+$cp332BindingIndexForCp329 = $cp329BindingText.IndexOf("let calculation_cooling_positive_supply_temperature_assignment =")
 $numericalBindingIndexForCp329 = $cp329BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp328BindingIndexForCp329 -lt 0 -or
     $cp329BindingIndex -le $cp328BindingIndexForCp329 -or
     $cp330BindingIndexForCp329 -le $cp329BindingIndex -or
     $cp331BindingIndexForCp329 -le $cp330BindingIndexForCp329 -or
-    $numericalBindingIndexForCp329 -le $cp331BindingIndexForCp329
+    $cp332BindingIndexForCp329 -le $cp331BindingIndexForCp329 -or
+    $numericalBindingIndexForCp329 -le $cp332BindingIndexForCp329
 ) {
-    throw "Binding must retain exact CP328 -> CP329 -> CP330 -> CP331 -> numerical Calc order"
+    throw "Binding must retain exact CP328 -> CP329 -> CP330 -> CP331 -> CP332 -> numerical Calc order"
 }
 Assert-Contains -Path $cp329Binding -Pattern '(?s)let calculation_cooling_mixed_air_call =\s*advance_direct_no_oa_calc_cooling_mixed_air_call\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_supply_mass_flow_very_small_guard_body,\s*&\*input\.zone_state,\s*\)' -Description "binding exact CP328-to-CP329 wrapper call"
 Assert-Contains -Path $cp329Binding -Pattern 'CalculationCoolingMixedAirCall\(PurchasedAirCalcCoolingMixedAirCallError\)' -Description "CP329 scheduled binding error boundary"
@@ -328,12 +330,22 @@ if (-not $cp331BindingCallForCp329.Success) {
 }
 $cp331BindingCallEndForCp329 =
     $cp331BindingCallForCp329.Index + $cp331BindingCallForCp329.Length
+$cp332BindingCallForCp329 = [regex]::Match(
+    $cp329BindingText,
+    '(?s)let calculation_cooling_positive_supply_temperature_assignment =\s*advance_positive_supply_temperature_assignment\([^;]+?\)\?;'
+)
+if (-not $cp332BindingCallForCp329.Success) {
+    throw "Binding must retain the complete CP332 exact release call after CP331"
+}
+$cp332BindingCallEndForCp329 =
+    $cp332BindingCallForCp329.Index + $cp332BindingCallForCp329.Length
 if (
     $cp330BindingIndexForCp329 -lt $cp329BindingCallEnd -or
     $cp331BindingIndexForCp329 -lt $cp330BindingCallEndForCp329 -or
-    $numericalBindingIndexForCp329 -lt $cp331BindingCallEndForCp329
+    $cp332BindingIndexForCp329 -lt $cp331BindingCallEndForCp329 -or
+    $numericalBindingIndexForCp329 -lt $cp332BindingCallEndForCp329
 ) {
-    throw "CP329, CP330, and CP331 exact release calls must complete in source order before numerical Calc"
+    throw "CP329, CP330, CP331, and CP332 exact release calls must complete in source order before numerical Calc"
 }
 $postCp329BeforeCp330 = $cp329BindingText.Substring(
     $cp329BindingCallEnd,
@@ -352,14 +364,23 @@ $postCp330BeforeCp331CodeForCp329 =
 if ($postCp330BeforeCp331CodeForCp329 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
     throw "No intermediary helper call may execute after CP330 and before CP331"
 }
-$postCp331BeforeNumericalForCp329 = $cp329BindingText.Substring(
+$postCp331BeforeCp332ForCp329 = $cp329BindingText.Substring(
     $cp331BindingCallEndForCp329,
-    $numericalBindingIndexForCp329 - $cp331BindingCallEndForCp329
+    $cp332BindingIndexForCp329 - $cp331BindingCallEndForCp329
 )
-$postCp331BeforeNumericalCodeForCp329 =
-    [regex]::Replace($postCp331BeforeNumericalForCp329, '(?m)//.*$', '')
-if ($postCp331BeforeNumericalCodeForCp329 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No later source helper call may execute after CP331 and before numerical Calc"
+$postCp331BeforeCp332CodeForCp329 =
+    [regex]::Replace($postCp331BeforeCp332ForCp329, '(?m)//.*$', '')
+if ($postCp331BeforeCp332CodeForCp329 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No intermediary helper call may execute after CP331 and before CP332"
+}
+$postCp332BeforeNumericalForCp329 = $cp329BindingText.Substring(
+    $cp332BindingCallEndForCp329,
+    $numericalBindingIndexForCp329 - $cp332BindingCallEndForCp329
+)
+$postCp332BeforeNumericalCodeForCp329 =
+    [regex]::Replace($postCp332BeforeNumericalForCp329, '(?m)//.*$', '')
+if ($postCp332BeforeNumericalCodeForCp329 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No later source helper call may execute after CP332 and before numerical Calc"
 }
 
 # Coupled validation reconstructs the projection from CP328 and the existing

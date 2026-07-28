@@ -17076,6 +17076,113 @@ algorithm/routine count, readiness, support level, run state, required or
 forbidden feature, output claim, evidence case, numerical conformance,
 capability, status, or Roadmap item.
 
+## CP332 Source-Ordered Cooling Positive-Supply Temperature Assignment
+
+CP332 supersedes only CP331's exclusion of the next true-body executable at
+the locked EnergyPlus 26.1 source's physical
+`PurchasedAirManager.cc` line 2186:
+
+```text
+PurchAir.SupplyTemp = QZnCoolSP / (CpAir * SupplyMassFlowRate) + state.dataLoopNodes->Node(ZoneNodeNum).Temp;
+```
+
+The statement has exactly eight lexical sites:
+
+1. read retained `QZnCoolSP`;
+2. read local `CpAir` for the denominator product;
+3. re-read retained `SupplyMassFlowRate` for that product;
+4. calculate `CpAir * SupplyMassFlowRate`;
+5. calculate `QZnCoolSP` divided by that denominator product;
+6. read `Node(ZoneNodeNum).Temp`;
+7. add the Zone Node temperature to the load-derived temperature; and
+8. assign the result to `PurchAir.SupplyTemp`.
+
+This list records textual sites rather than a C++ built-in operand-evaluation
+sequence. The admitted direct operands are side-effect-free. The pure
+transition nevertheless preserves the source expression tree and each raw
+binary64 intermediate: it forms `CpAir * SupplyMassFlowRate` before division,
+then performs the Zone-temperature addition and assignment. It does not
+replace the denominator with two left-associated divisions, take a reciprocal,
+use `mul_add`, apply a floating-point minimum or maximum, clamp, normalize, or
+otherwise fold the line-2187 and line-2189 limits into CP332.
+
+UnitOff, non-cooling, and CP330 active guard-false routes skipped the CP331
+assignment and skip every CP332 site. A CP331 assignment route executes all
+eight sites once. Dynamic CP332 source-site executions therefore equal
+`8 * cp_air_assignment_count`, which must also equal
+`8 * positive_supply_mass_flow_body_entries`. The snapshot and retained state
+separately record each read, denominator product, division, addition, and final
+assignment with bit-exact values.
+
+`calc/cooling_positive_supply_temperature_assignment.rs` owns
+`PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentSnapshot`,
+`PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentRuntimeState`,
+`PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentLifecycleSummary`,
+the pure transition, and release validation.
+`advance_direct_no_oa_calc_cooling_positive_supply_temperature_assignment`
+accepts only the CP331 snapshot plus the selected typed system and live
+identity-checked Zone state. It obtains the source operands from their retained
+owners: CP310 owns `QZnCoolSP`, CP331 owns the assigned `CpAir`, and CP330 owns
+the supply mass flow. It conditionally reads
+`ZoneHeatBalanceState::mean_air_temperature_c` as the bounded direct mapping
+of source `Node(ZoneNodeNum).Temp`. CP318's retained Zone-temperature bits and
+CP329's retained no-OA recirculation- and mixed-air temperature bits prove
+same-call lineage but are not substituted for the live source operand.
+Skipped routes do not read or validate the live temperature.
+
+The public wrapper adds no duplicate load, `CpAir`, flow, or temperature
+scalar, does not call `PsyCpAirFnW` again, and does not consume the existing
+numerical DTO as input. Its admitted positive route inherits finite CP310
+demand, finite CP331 `CpAir`, the raw CP330 strictly positive supply-flow
+result, and finite CP329-coherent Zone temperature. The calculation and
+snapshot preserve source raw IEEE results without a post-calculation finite
+gate or normalization; internal characterization includes signed-zero,
+infinity, NaN, overflow, and grouping-sensitive cases even though the public
+route remains bounded by its predecessor contracts.
+
+The CP332 completed helper recursively invokes CP331's runtime-aware completed
+proof, including its latest/private witness and the full retained CP330 and
+earlier chain. Completed and pending CP332 predicates require exact CP331
+transition, UnitOff, non-cooling, active guard-false, and assignment history.
+Before mutation, route-aware checked arithmetic preflights every transition,
+route, source-site, operand-read, operation, assignment, and private
+route-witness increment. A forged identity, live-Zone temperature, CP318/CP329
+temperature lineage, CP310/CP330/CP331 operand, predecessor, history, witness,
+replay, or overflow therefore fails transactionally.
+
+The binder executes CP332 immediately after CP331 and before the unchanged
+numerical DTO. Per-step, final, coupled-runtime, and pipeline validators
+reconcile identity and ordinal; all four route partitions; the exact eight-site
+inventory; both dynamic-count equalities; retained operand and same-call
+temperature provenance; source denominator grouping; bit-exact product,
+division, addition, and assignment; and the complete recursive predecessor
+chain. Direct-only JSON publishes
+`purchased_air_calc_cooling_positive_supply_temperature_assignment_lifecycle`;
+non-direct or disconnected evidence is rejected. CP332 neither consumes nor
+reconciles with the numerical DTO and does not feed or replace it.
+
+Physical line 2187 is the first excluded lexical executable and is the next
+CP333 boundary:
+
+```text
+PurchAir.SupplyTemp = max(PurchAir.SupplyTemp, PurchAir.MinCoolSuppAirTemp);
+```
+
+That minimum-cooling-temperature limit, the line-2189 mixed-air limit, humidity
+and enthalpy assignments, capacity controls, and the remaining true body
+through line 2337 stay excluded. The zero-flow `else` at lines 2339-2345 still
+begins dynamically at line 2340. The outer Heat/DeadBand sibling begins at
+lines 2347-2348, its mixed-air call spans lines 2454-2461, and its
+positive-supply guard is line 2465; all remain excluded. CP332 maps only the
+raw line-2186 assignment and does not promote broader supply-temperature
+limiting, capacity, output, `OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`,
+Autosizing, or humidity-control behavior. Both parents remain
+`scaffold`/`none`; `routine.calc_purch_air_loads` and
+`routine.calc_purch_air_mixed_air` remain `source_mapped`. CP332 changes no
+algorithm/routine count, readiness, support level, run state, required or
+forbidden feature, output claim, evidence case, numerical conformance,
+capability, status, or Roadmap item.
+
 
 
 

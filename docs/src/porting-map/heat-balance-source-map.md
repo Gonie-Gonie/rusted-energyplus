@@ -34127,6 +34127,57 @@ supply-temperature/capacity behavior remain unpromoted. Both parents remain
 support, conformance, capability, status, count, readiness, evidence-case,
 numerical conformance, or Roadmap promotion.
 
+## CP332 Positive-Supply Temperature Assignment in the Heat-Balance Loop
+
+CP332 executes immediately after CP331 and before the unchanged bounded
+PurchasedAir numerical calculation. It maps only locked EnergyPlus 26.1
+`PurchasedAirManager.cc` physical line 2186 as eight lexical sites: read
+retained `QZnCoolSP`, read CP331 local `CpAir`, re-read retained
+`SupplyMassFlowRate`, multiply the denominator, divide the load, read the
+controlled Zone Node temperature, add it, and assign
+`PurchAir.SupplyTemp`. The inventory is textual and makes no C++ built-in
+operand-evaluation-order claim. It preserves the raw binary64
+`QZnCoolSP / (CpAir * SupplyMassFlowRate) + ZoneTemp` tree without
+reassociation, reciprocal conversion, `mul_add`, normalization, or an early
+minimum/maximum.
+
+CP331 assignment entries execute all eight sites; UnitOff, non-cooling, and
+active-false entries execute none. Dynamic site executions equal both
+`8 * cp_air_assignment_count` and
+`8 * positive_supply_mass_flow_body_entries`.
+
+Exact release consumes retained CP310 demand, CP331 `CpAir`, and CP330 supply
+flow. It conditionally reads the identity-checked live
+`ZoneHeatBalanceState::mean_air_temperature_c` for the bounded direct source
+Node temperature and requires bit-exact same-call agreement with retained
+CP318 Zone-temperature and CP329 no-OA recirculation- and mixed-air
+temperature evidence. Those retained values prove lineage and do not replace
+the live operand. No CP332 site mutates Zone demand, heat-balance coefficients,
+correction, or feedback; no duplicate scalar or numerical DTO supplies an
+operand, and CP332 does not re-evaluate the CP331 psychrometric scalar.
+
+Direct-only
+`purchased_air_calc_cooling_positive_supply_temperature_assignment_lifecycle`
+evidence is placed in CP331-to-CP332-to-numerical order. Completed and pending
+CP332 histories mirror CP331's four routes, recursively validate its
+latest/private witness and chain, and use route-aware checked arithmetic to
+preflight every conditional source and private-witness increment. Identity,
+operand, live-Zone, lineage, history, witness, replay, or overflow failure
+precedes mutation and leaves heat-balance state unchanged. CP332 does not
+consume, reconcile with, feed, or replace the numerical DTO.
+
+Physical line 2187 is the first excluded lexical executable and next CP333
+boundary. The line-2187 minimum cooling limit, line-2189 mixed-air limit,
+humidity and enthalpy assignments, capacity controls, and remainder through
+2337 stay excluded. The zero-flow `else` at 2339-2345 still first executes
+2340; the Heat/DeadBand sibling at 2347-2348, its mixed-air call at 2454-2461,
+and guard at 2465 remain excluded. `OutdoorAir`, `Economizer`, `HeatRecovery`,
+`EMS`, Autosizing, broad humidity control, and broader supply-temperature
+limiting, capacity, and output behavior remain unpromoted. Both parents remain
+`scaffold`/`none`; both Calc routines remain `source_mapped`. CP332 adds no
+support, conformance, capability, status, count, readiness, evidence-case,
+numerical conformance, or Roadmap promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

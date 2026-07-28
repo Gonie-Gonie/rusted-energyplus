@@ -1040,6 +1040,63 @@ remain `scaffold`/`none`; both Calc routines remain `source_mapped`, and
 counts, readiness, support, evidence cases, numerical conformance, capability,
 and Roadmap state remain unchanged.
 
+CP332 maps only the single Cooling positive-supply supply-temperature
+arithmetic and assignment at EnergyPlus 26.1 `PurchasedAirManager.cc`
+physical executable line 2186:
+`PurchAir.SupplyTemp = QZnCoolSP / (CpAir * SupplyMassFlowRate) +
+state.dataLoopNodes->Node(ZoneNodeNum).Temp`. Its exactly eight lexical sites
+read retained `QZnCoolSP`, read local `CpAir`, re-read retained
+`SupplyMassFlowRate`, calculate the denominator product, divide the load by
+that product, read the controlled Zone Node temperature, add that temperature,
+and assign `PurchAir.SupplyTemp`. This is a textual inventory, not a claim
+about C++ built-in operand evaluation order. The admitted operands are
+side-effect-free, while the parenthesized denominator and binary64 operation
+tree remain exact.
+
+UnitOff, non-cooling, and CP330 active guard-false routes that already skipped
+CP331 execute zero CP332 sites. Each CP331 `CpAir` assignment route executes all
+eight, so dynamic CP332 source-site executions equal
+`8 * cp_air_assignment_count`, equivalently
+`8 * positive_supply_mass_flow_body_entries`. The calculation preserves
+`QZnCoolSP / (CpAir * SupplyMassFlowRate)` and the following addition. It does
+not reassociate the denominator as `(QZnCoolSP / CpAir) /
+SupplyMassFlowRate`, use a reciprocal or `mul_add`, normalize raw IEEE values,
+or apply the line-2187 or line-2189 limits.
+
+Exact release obtains `QZnCoolSP` from retained CP310 demand, `CpAir` from the
+bit-exact CP331 assignment, and `SupplyMassFlowRate` from retained CP330. It
+conditionally reads the identity-checked live
+`ZoneHeatBalanceState::mean_air_temperature_c` as the bounded direct mapping
+of `Node(ZoneNodeNum).Temp`. Retained CP318 Zone-temperature and CP329 no-OA
+recirculation- and mixed-air temperature bits are same-call lineage evidence,
+not substitute source operands. No duplicate caller scalar, psychrometric
+re-evaluation, or numerical-DTO input is used.
+
+Completed and pending CP332 state preserve CP331's exact UnitOff, non-cooling,
+active guard-false, and assignment partitions and recursively validate the
+CP331 latest/private witness and complete retained chain. Route-aware checked
+arithmetic preflights every conditional source and private-witness increment.
+Identity, live-Zone temperature, lineage, predecessor, history, witness,
+replay, or overflow failure therefore precedes mutation and leaves runtime and
+private-witness state unchanged.
+
+The binder, coupled runtime, and pipeline place direct-only
+`purchased_air_calc_cooling_positive_supply_temperature_assignment_lifecycle`
+evidence in CP331-to-CP332-to-numerical order. CP332 does not consume,
+reconcile with, feed, or replace the unchanged numerical DTO and does not
+promote an output claim. Physical line 2187 is the first excluded lexical
+executable and the CP333 boundary. Its minimum-cooling-temperature maximum,
+the line-2189 mixed-air minimum, humidity and enthalpy assignments, capacity
+controls, and the remainder of lines 2187-2337 remain excluded. The zero-flow
+`else` at 2339-2345 still first executes line 2340; the outer Heat/DeadBand
+sibling at 2347-2348, its mixed-air call at 2454-2461, and its guard at 2465
+also remain excluded. `OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`,
+Autosizing, broad humidity control, and broader supply-temperature limiting,
+capacity, and output behavior remain unpromoted. Both parent algorithms remain
+`scaffold`/`none`; both Calc routines remain `source_mapped`, and counts,
+readiness, support, evidence cases, numerical conformance, capability, and
+Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

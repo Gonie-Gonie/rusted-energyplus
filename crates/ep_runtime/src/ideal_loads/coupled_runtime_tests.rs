@@ -27,6 +27,8 @@ use crate::{
         PURCHASED_AIR_CALC_COOLING_OA_MAX_FLOW_GATE_SOURCE,
         PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_CP_AIR_ASSIGNMENT_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_TEMPERATURE_ASSIGNMENT_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_TEMPERATURE_ASSIGNMENT_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SENSIBLE_FLOW_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_EMS_OVERRIDE_BODY_FIRST_EXCLUDED_SOURCE,
@@ -291,6 +293,26 @@ fn cooling_positive_supply_cp_air_assignment_partition_overflow_fails_closed() {
         error,
         DirectZonePurchasedAirCoupledRuntimeError::
             CalcCoolingPositiveSupplyCpAirAssignmentLifecycleInvariant {
+                field: "test_partition_overflow",
+                expected: 1,
+                actual: usize::MAX,
+            }
+    ));
+}
+
+#[test]
+fn cooling_positive_supply_temperature_assignment_partition_overflow_fails_closed() {
+    let error = super::cooling_positive_supply_temperature_assignment_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::
+            CalcCoolingPositiveSupplyTemperatureAssignmentLifecycleInvariant {
                 field: "test_partition_overflow",
                 expected: 1,
                 actual: usize::MAX,
@@ -1277,6 +1299,35 @@ fn cooling_sensible_flow_lifecycle_records_unit_off_without_source_execution() {
     assert!(!latest.cp_air_assignment_executed);
     assert!(latest.zone_humidity_ratio.is_none());
     assert!(latest.cp_air_j_per_kg_k.is_none());
+
+    let lifecycle = simulation
+        .summary
+        .calc_cooling_positive_supply_temperature_assignment_lifecycle;
+    assert_eq!(
+        lifecycle.source,
+        PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_TEMPERATURE_ASSIGNMENT_SOURCE
+    );
+    assert_eq!(
+        lifecycle.first_excluded_source,
+        PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_TEMPERATURE_ASSIGNMENT_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(lifecycle.state.transition_count, 1);
+    assert_eq!(lifecycle.state.unit_off_skip_count, 1);
+    assert_eq!(lifecycle.state.non_cooling_skip_count, 0);
+    assert_eq!(
+        lifecycle.state.positive_guard_false_fallthrough_skip_count,
+        0
+    );
+    assert_eq!(lifecycle.state.supply_temperature_assignment_count, 0);
+    assert_eq!(lifecycle.state.source_site_execution_count, 0);
+    let latest = lifecycle.state.latest.expect("latest CP332 off snapshot");
+    assert!(latest.unit_off_skipped);
+    assert!(!latest.supply_temperature_assignment_executed);
+    assert!(latest.zone_cooling_setpoint_load_w.is_none());
+    assert!(latest.cp_air_j_per_kg_k.is_none());
+    assert!(latest.supply_mass_flow_rate_kg_per_s.is_none());
+    assert!(latest.zone_node_temperature_c.is_none());
+    assert!(latest.supply_temperature_c.is_none());
 }
 
 #[test]
@@ -2793,6 +2844,129 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
             Some(expected_cp_air.to_bits()),
             "{limit:?}"
         );
+        let supply_temperature_assignment = simulation
+            .summary
+            .calc_cooling_positive_supply_temperature_assignment_lifecycle;
+        assert_eq!(
+            supply_temperature_assignment.source,
+            PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_TEMPERATURE_ASSIGNMENT_SOURCE
+        );
+        assert_eq!(
+            supply_temperature_assignment.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_TEMPERATURE_ASSIGNMENT_FIRST_EXCLUDED_SOURCE
+        );
+        assert_eq!(
+            supply_temperature_assignment.state.transition_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_temperature_assignment
+                .state
+                .supply_temperature_assignment_count,
+            1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_temperature_assignment
+                .state
+                .source_site_execution_count,
+            8,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_temperature_assignment
+                .state
+                .zone_cooling_setpoint_load_read_count,
+            1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_temperature_assignment.state.cp_air_read_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_temperature_assignment
+                .state
+                .supply_mass_flow_rate_read_count,
+            1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            supply_temperature_assignment
+                .state
+                .zone_node_temperature_read_count,
+            1,
+            "{limit:?}"
+        );
+        let latest_supply_temperature_assignment = supply_temperature_assignment
+            .state
+            .latest
+            .expect("latest CP332 snapshot");
+        assert!(
+            latest_supply_temperature_assignment.supply_temperature_assignment_executed,
+            "{limit:?}"
+        );
+        let zone_cooling_setpoint_load = latest_sensible_flow
+            .zone_cooling_setpoint_load_w
+            .expect("CP318 retained cooling load");
+        let supply_mass_flow_rate = latest_positive_guard
+            .supply_mass_flow_rate_kg_per_s
+            .expect("CP330 retained positive supply mass flow");
+        let zone_node_temperature = latest_mixed_air_call
+            .recirculation_temperature_c
+            .expect("CP329 retained Zone temperature");
+        let denominator = expected_cp_air * supply_mass_flow_rate;
+        let quotient = zone_cooling_setpoint_load / denominator;
+        let expected_supply_temperature = quotient + zone_node_temperature;
+        assert_eq!(
+            latest_supply_temperature_assignment
+                .zone_cooling_setpoint_load_w
+                .map(f64::to_bits),
+            Some(zone_cooling_setpoint_load.to_bits()),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_supply_temperature_assignment
+                .cp_air_j_per_kg_k
+                .map(f64::to_bits),
+            Some(expected_cp_air.to_bits()),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_supply_temperature_assignment
+                .supply_mass_flow_rate_kg_per_s
+                .map(f64::to_bits),
+            Some(supply_mass_flow_rate.to_bits()),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_supply_temperature_assignment
+                .cp_air_times_supply_mass_flow_rate_w_per_k
+                .map(f64::to_bits),
+            Some(denominator.to_bits()),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_supply_temperature_assignment
+                .zone_cooling_setpoint_load_over_denominator_c
+                .map(f64::to_bits),
+            Some(quotient.to_bits()),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_supply_temperature_assignment
+                .zone_node_temperature_c
+                .map(f64::to_bits),
+            Some(zone_node_temperature.to_bits()),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_supply_temperature_assignment
+                .supply_temperature_c
+                .map(f64::to_bits),
+            Some(expected_supply_temperature.to_bits()),
+            "{limit:?}"
+        );
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation
@@ -2919,6 +3093,56 @@ fn cooling_mixed_air_call_executes_for_active_positive_zero_supply_flow() {
     assert!(!latest_assignment.cp_air_assignment_executed);
     assert!(latest_assignment.zone_humidity_ratio.is_none());
     assert!(latest_assignment.cp_air_j_per_kg_k.is_none());
+
+    let supply_temperature_assignment = simulation
+        .summary
+        .calc_cooling_positive_supply_temperature_assignment_lifecycle;
+    assert_eq!(supply_temperature_assignment.state.transition_count, 1);
+    assert_eq!(
+        supply_temperature_assignment
+            .state
+            .positive_guard_false_fallthrough_skip_count,
+        1
+    );
+    assert_eq!(
+        supply_temperature_assignment
+            .state
+            .supply_temperature_assignment_count,
+        0
+    );
+    assert_eq!(
+        supply_temperature_assignment
+            .state
+            .source_site_execution_count,
+        0
+    );
+    assert_eq!(
+        supply_temperature_assignment
+            .state
+            .zone_node_temperature_read_count,
+        0
+    );
+    let latest_supply_temperature_assignment = supply_temperature_assignment
+        .state
+        .latest
+        .expect("zero-flow CP332 snapshot");
+    assert!(latest_supply_temperature_assignment.positive_guard_false_fallthrough_skipped);
+    assert!(!latest_supply_temperature_assignment.supply_temperature_assignment_executed);
+    assert!(
+        latest_supply_temperature_assignment
+            .zone_cooling_setpoint_load_w
+            .is_none()
+    );
+    assert!(
+        latest_supply_temperature_assignment
+            .zone_node_temperature_c
+            .is_none()
+    );
+    assert!(
+        latest_supply_temperature_assignment
+            .supply_temperature_c
+            .is_none()
+    );
 }
 
 #[test]

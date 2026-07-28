@@ -47,6 +47,7 @@ mod cooling_oa_max_flow_body_tests;
 #[path = "binding/cooling_oa_max_flow_gate_tests.rs"]
 mod cooling_oa_max_flow_gate_tests;
 #[rustfmt::skip] #[path = "binding/cooling_positive_supply_cp_air_assignment_tests.rs"] mod cooling_positive_supply_cp_air_assignment_tests;
+#[rustfmt::skip] #[path = "binding/cooling_positive_supply_temperature_assignment_tests.rs"] mod cooling_positive_supply_temperature_assignment_tests;
 #[path = "binding/cooling_sensible_flow_tests.rs"]
 mod cooling_sensible_flow_tests;
 #[path = "binding/cooling_supply_mass_flow_ems_override_body_tests.rs"]
