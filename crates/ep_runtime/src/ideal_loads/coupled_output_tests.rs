@@ -6,6 +6,8 @@ mod assertions;
 mod cooling_capacity_zero_flow_reset_fixture;
 #[path = "coupled_output_tests/cooling_humidification_flow_fixture.rs"]
 mod cooling_humidification_flow_fixture;
+#[path = "coupled_output_tests/cooling_supply_mass_flow_ems_override_guard_fixture.rs"]
+mod cooling_supply_mass_flow_ems_override_guard_fixture;
 #[path = "coupled_output_tests/cooling_supply_mass_flow_maximum_fixture.rs"]
 mod cooling_supply_mass_flow_maximum_fixture;
 
@@ -59,6 +61,7 @@ use crate::{
 use assertions::{assert_values, sentinel_results};
 use cooling_capacity_zero_flow_reset_fixture::calculation_cooling_capacity_zero_flow_reset_snapshot;
 use cooling_humidification_flow_fixture::calculation_cooling_humidification_flow_snapshot;
+use cooling_supply_mass_flow_ems_override_guard_fixture::calculation_cooling_supply_mass_flow_ems_override_guard_snapshot;
 use cooling_supply_mass_flow_maximum_fixture::calculation_cooling_supply_mass_flow_maximum_snapshot;
 use ep_model::{
     DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
@@ -486,6 +489,10 @@ fn scaled_output(
             calculation_minimum_outdoor_air,
             calculation_cooling_capacity_zero_flow_reset,
         );
+    let calculation_cooling_supply_mass_flow_ems_override_guard =
+        calculation_cooling_supply_mass_flow_ems_override_guard_snapshot(
+            calculation_cooling_supply_mass_flow_maximum,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -521,6 +528,7 @@ fn scaled_output(
         calculation_cooling_humidification_flow,
         calculation_cooling_capacity_zero_flow_reset,
         calculation_cooling_supply_mass_flow_maximum,
+        calculation_cooling_supply_mass_flow_ems_override_guard,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

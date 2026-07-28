@@ -33811,6 +33811,29 @@ or predictor equation, live service, finite-limit or Autosize support,
 numerical conformance, or capability promotion. Parent and routine statuses,
 inventory/readiness counts, evidence, and Roadmap state remain unchanged.
 
+## CP323 Cooling Supply Mass-Flow EMS Override Guard in the Heat-Balance Loop
+
+CP323 executes immediately after CP322 and before the unchanged bounded
+PurchasedAir numerical calculation. It maps only line 2157 as three sites:
+read `EMSOverrideMdotOn`, evaluate the guard, and enter the body when enabled.
+UnitOff and non-cooling predecessors skip all sites. Exact direct release
+validates the same-call CP322 latest snapshot and private witness and requires
+the false, EMS-disabled route, so active direct calls read and evaluate once
+without entering the body or requesting an EMS actuator service.
+
+Per-step, final, coupled-runtime, and pipeline validators enforce
+CP322-to-CP323-to-numerical ordering and expose direct-only
+`purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle`
+evidence. CP323 does not alter a Zone or heat-balance equation and does not
+reconcile a mass-flow result with the numerical DTO.
+
+Line 2158 is the first excluded executable. The true EMS body at lines
+2158-2159, its value read, supply/outdoor-air assignments and `min`, the
+line-2161 flow-limit condition, later clamps, mixed-air/capacity/supply-state
+work, Heat/DeadBand selection, and all later feedback remain excluded. `EMS`
+remains forbidden. CP323 adds no support, conformance, capability, status,
+count, readiness, evidence-case, or Roadmap promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

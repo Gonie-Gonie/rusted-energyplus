@@ -18995,6 +18995,32 @@ lifecycle evidence only. Finite-limit and Autosize support, both parent and
 Calc routine statuses, inventory/readiness counts, capability, evidence,
 numerical conformance, and Roadmap state remain unchanged.
 
+## CP323 Cooling Supply Mass-Flow EMS Override Guard
+
+CP323 maps only executable line 2157 after CP322. Its three source sites read
+`EMSOverrideMdotOn`, evaluate the Boolean guard, and enter the override body
+when enabled. UnitOff and non-cooling predecessors skip the complete slice.
+The private transition characterizes both Boolean outcomes; exact direct
+release validates the completed same-call CP322 latest snapshot and private
+witness, then requires the EMS-disabled false route. Thus every active direct
+transition reads and evaluates the guard once, enters no body, and records the
+dynamic no-EMS fallthrough.
+
+The binder places CP323 between CP322 and the unchanged numerical DTO.
+Direct-only
+`purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle`
+evidence reconciles predecessor identity, ordinal, route partitions, the three
+sites, false results, and zero body entries. No EMS actuator service or value
+is introduced, and non-direct evidence is rejected.
+
+Line 2158 is the first excluded executable. The true body at lines 2158-2159,
+including `EMSValueMassFlowRate`, both mass-flow assignments, and the `min`,
+remains outside CP323, as do the flow-limit condition at line 2161 and later
+clamps, mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection.
+`EMS` remains forbidden. CP323 adds target inventory and lifecycle evidence
+only; support, conformance, statuses, counts, readiness, capability, evidence
+cases, and Roadmap state remain unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

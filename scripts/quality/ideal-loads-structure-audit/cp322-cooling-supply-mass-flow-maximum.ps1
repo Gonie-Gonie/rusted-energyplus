@@ -128,26 +128,28 @@ foreach ($cp322ScopeFile in @(
     Assert-NotContains -Path $cp322ScopeFile -Pattern 'EMSOverrideMdotOn|EMSOverrideMdotValue|VerySmallMassFlow|CalcPurchAirMixedAir|mixed[_-]?air' -Description "line-2157-or-later scope creep in CP322"
 }
 
-# The scheduled binding must execute CP321, then CP322, then the existing
-# numerical coupling without any shadow maximum or excluded live service.
+# The scheduled binding must execute CP321, then CP322, then CP323, then the
+# existing numerical coupling without any shadow maximum or excluded service.
 $cp322BindingText = Read-RepoText -Path $idealLoadsBinding
 $cp321BindingIndexForCp322 = $cp322BindingText.IndexOf("let calculation_cooling_capacity_zero_flow_reset =")
 $cp322BindingIndex = $cp322BindingText.IndexOf("let calculation_cooling_supply_mass_flow_maximum =")
+$cp323BindingIndexForCp322 = $cp322BindingText.IndexOf("let calculation_cooling_supply_mass_flow_ems_override_guard =")
 $numericalBindingIndexForCp322 = $cp322BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp321BindingIndexForCp322 -lt 0 -or
     $cp322BindingIndex -le $cp321BindingIndexForCp322 -or
-    $numericalBindingIndexForCp322 -le $cp322BindingIndex
+    $cp323BindingIndexForCp322 -le $cp322BindingIndex -or
+    $numericalBindingIndexForCp322 -le $cp323BindingIndexForCp322
 ) {
-    throw "Binding must retain exact CP321 -> CP322 -> numerical Calc order"
+    throw "Binding must retain exact CP321 -> CP322 -> CP323 -> numerical Calc order"
 }
 $betweenCp321AndCp322 = $cp322BindingText.Substring(
     $cp321BindingIndexForCp322,
     $cp322BindingIndex - $cp321BindingIndexForCp322
 )
-$betweenCp322AndNumerical = $cp322BindingText.Substring(
+$betweenCp322AndCp323 = $cp322BindingText.Substring(
     $cp322BindingIndex,
-    $numericalBindingIndexForCp322 - $cp322BindingIndex
+    $cp323BindingIndexForCp322 - $cp322BindingIndex
 )
 foreach ($cp322Intermediary in @(
         [pscustomobject]@{ Pattern = '(?<![A-Za-z0-9_])f64::max\s*\(|\.max\s*\('; Description = "shadow floating maximum" },
@@ -158,8 +160,8 @@ foreach ($cp322Intermediary in @(
     if ($betweenCp321AndCp322 -match $cp322Intermediary.Pattern) {
         throw "$($cp322Intermediary.Description) unexpectedly present between CP321 and CP322"
     }
-    if ($betweenCp322AndNumerical -match $cp322Intermediary.Pattern) {
-        throw "$($cp322Intermediary.Description) unexpectedly present between CP322 and numerical Calc"
+    if ($betweenCp322AndCp323 -match $cp322Intermediary.Pattern) {
+        throw "$($cp322Intermediary.Description) unexpectedly present between CP322 and CP323"
     }
 }
 

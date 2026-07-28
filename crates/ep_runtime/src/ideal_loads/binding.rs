@@ -34,7 +34,10 @@ use super::{
     PurchasedAirCalcCoolingHumidificationFlowSnapshot, PurchasedAirCalcCoolingOaMaxFlowBodyError,
     PurchasedAirCalcCoolingOaMaxFlowBodySnapshot, PurchasedAirCalcCoolingOaMaxFlowGateError,
     PurchasedAirCalcCoolingOaMaxFlowGateSnapshot, PurchasedAirCalcCoolingSensibleFlowError,
-    PurchasedAirCalcCoolingSensibleFlowSnapshot, PurchasedAirCalcCoolingSupplyMassFlowMaximumError,
+    PurchasedAirCalcCoolingSensibleFlowSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardError,
+    PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowMaximumError,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot, PurchasedAirCalcEntryContext,
     PurchasedAirCalcEntryError, PurchasedAirCalcEntrySnapshot,
     PurchasedAirCalcMinimumOaPrefixError, PurchasedAirCalcMinimumOaPrefixSnapshot,
@@ -51,6 +54,7 @@ use super::{
     advance_direct_no_oa_calc_cooling_oa_max_flow_body,
     advance_direct_no_oa_calc_cooling_oa_max_flow_gate,
     advance_direct_no_oa_calc_cooling_sensible_flow,
+    advance_direct_no_oa_calc_cooling_supply_mass_flow_ems_override_guard,
     advance_direct_no_oa_calc_cooling_supply_mass_flow_maximum,
     advance_direct_no_oa_calc_minimum_oa_prefix, advance_purchased_air_calc_entry,
     classify_no_oa_sensible_subset, complete_direct_zone_purchased_air_coupling,
@@ -617,6 +621,10 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingCapacityZeroFlowReset(PurchasedAirCalcCoolingCapacityZeroFlowResetError),
     /// The bounded cooling supply mass-flow maximum rejected its release state.
     CalculationCoolingSupplyMassFlowMaximum(PurchasedAirCalcCoolingSupplyMassFlowMaximumError),
+    /// The bounded cooling supply mass-flow EMS-override guard rejected its release state.
+    CalculationCoolingSupplyMassFlowEmsOverrideGuard(
+        PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardError,
+    ),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -716,6 +724,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered pre-EMS cooling supply mass-flow maximum snapshot.
     pub calculation_cooling_supply_mass_flow_maximum:
         PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot,
+    /// Source-ordered cooling supply mass-flow EMS-override guard snapshot.
+    pub calculation_cooling_supply_mass_flow_ems_override_guard:
+        PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
@@ -937,6 +948,16 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         .map_err(
             DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingSupplyMassFlowMaximum,
         )?;
+    let calculation_cooling_supply_mass_flow_ems_override_guard =
+        advance_direct_no_oa_calc_cooling_supply_mass_flow_ems_override_guard(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_supply_mass_flow_maximum,
+        )
+        .map_err(
+            DirectZonePurchasedAirScheduledCouplingError::
+                CalculationCoolingSupplyMassFlowEmsOverrideGuard,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -987,6 +1008,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_humidification_flow,
         calculation_cooling_capacity_zero_flow_reset,
         calculation_cooling_supply_mass_flow_maximum,
+        calculation_cooling_supply_mass_flow_ems_override_guard,
         coupling,
     })
 }

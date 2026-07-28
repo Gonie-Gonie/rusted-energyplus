@@ -54,6 +54,8 @@ use super::{
     PurchasedAirCalcCoolingOaMaxFlowGateError,
     PurchasedAirCalcCoolingOaMaxFlowGateLifecycleSummary, PurchasedAirCalcCoolingSensibleFlowError,
     PurchasedAirCalcCoolingSensibleFlowLifecycleSummary,
+    PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardError,
+    PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumError,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumLifecycleSummary, PurchasedAirCalcEntryError,
     PurchasedAirCalcEntryLifecycleSummary, PurchasedAirCalcEntrySnapshot,
@@ -71,6 +73,7 @@ use super::{
     purchased_air_calc_cooling_oa_max_flow_body_lifecycle_summary,
     purchased_air_calc_cooling_oa_max_flow_gate_lifecycle_summary,
     purchased_air_calc_cooling_sensible_flow_lifecycle_summary,
+    purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle_summary,
     purchased_air_calc_cooling_supply_mass_flow_maximum_lifecycle_summary,
     purchased_air_calc_entry_lifecycle_summary,
     purchased_air_calc_minimum_oa_prefix_lifecycle_summary, purchased_air_init_lifecycle_summary,
@@ -86,6 +89,7 @@ mod cooling_humidification_flow_validation;
 mod cooling_oa_max_flow_body_validation;
 mod cooling_oa_max_flow_validation;
 mod cooling_sensible_flow_validation;
+mod cooling_supply_mass_flow_ems_override_guard_validation;
 mod cooling_supply_mass_flow_maximum_validation;
 mod minimum_oa_validation;
 
@@ -195,6 +199,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded pre-EMS cooling supply mass-flow maximum lifecycle report.
     pub calc_cooling_supply_mass_flow_maximum_lifecycle:
         PurchasedAirCalcCoolingSupplyMassFlowMaximumLifecycleSummary,
+    /// Persistent bounded cooling supply mass-flow EMS-override guard lifecycle report.
+    pub calc_cooling_supply_mass_flow_ems_override_guard_lifecycle:
+        PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -258,6 +265,10 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     CalcCoolingCapacityZeroFlowResetLifecycle(PurchasedAirCalcCoolingCapacityZeroFlowResetError),
     /// Final cooling supply mass-flow maximum summary could not resolve the bound unit.
     CalcCoolingSupplyMassFlowMaximumLifecycle(PurchasedAirCalcCoolingSupplyMassFlowMaximumError),
+    /// Final cooling supply mass-flow EMS-override guard summary could not resolve the bound unit.
+    CalcCoolingSupplyMassFlowEmsOverrideGuardLifecycle(
+        PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardError,
+    ),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
         /// Stable invariant field.
@@ -384,6 +395,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A cooling supply mass-flow EMS-override guard lifecycle invariant did not match the run.
+    CalcCoolingSupplyMassFlowEmsOverrideGuardLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -451,6 +471,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     },
     /// A cooling supply mass-flow maximum snapshot did not match its bound release call.
     UnexpectedCalculationCoolingSupplyMassFlowMaximum {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
+    /// A cooling supply mass-flow EMS-override guard snapshot did not match its bound release call.
+    UnexpectedCalculationCoolingSupplyMassFlowEmsOverrideGuard {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
@@ -558,6 +583,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcCoolingSupplyMassFlowMaximumLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir cooling supply mass-flow maximum lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcCoolingSupplyMassFlowEmsOverrideGuardLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir cooling supply mass-flow EMS-override guard lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -671,6 +700,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir cooling supply mass-flow maximum lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingSupplyMassFlowEmsOverrideGuardLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir cooling supply mass-flow EMS-override guard lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -727,6 +764,12 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling supply mass-flow maximum"
             ),
+            Self::UnexpectedCalculationCoolingSupplyMassFlowEmsOverrideGuard { timestep_index } => {
+                write!(
+                    formatter,
+                    "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling supply mass-flow EMS-override guard"
+                )
+            }
             Self::UnexpectedDemandInputKind {
                 timestep_index,
                 actual,
@@ -1018,6 +1061,16 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
                     UnexpectedCalculationCoolingSupplyMassFlowMaximum { timestep_index },
             );
         }
+        if !cooling_supply_mass_flow_ems_override_guard_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingSupplyMassFlowEmsOverrideGuard { timestep_index },
+            );
+        }
         if !output.initialization.flags.state_machine_used
             || output.coupling.purchased_air.init_flags != output.initialization.flags
         {
@@ -1256,6 +1309,23 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_supply_mass_flow_ems_override_guard_lifecycle =
+        purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::
+                CalcCoolingSupplyMassFlowEmsOverrideGuardLifecycle,
+        )?;
+    cooling_supply_mass_flow_ems_override_guard_validation::validate_lifecycle(
+        &calc_cooling_supply_mass_flow_ems_override_guard_lifecycle,
+        &calc_cooling_supply_mass_flow_maximum_lifecycle,
+        timestep_outputs.len(),
+        numerical_cooling_count,
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -1331,6 +1401,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_humidification_flow_lifecycle,
             calc_cooling_capacity_zero_flow_reset_lifecycle,
             calc_cooling_supply_mass_flow_maximum_lifecycle,
+            calc_cooling_supply_mass_flow_ems_override_guard_lifecycle,
         },
         state,
         results,

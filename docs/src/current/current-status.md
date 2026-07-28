@@ -704,6 +704,28 @@ readiness, finite-limit or autosizing support, numerical conformance,
 capability level, parent and routine statuses, inventory counts, evidence
 cases, and Roadmap state remain unchanged.
 
+CP323 maps only executable line 2157, the Cooling supply mass-flow EMS
+override guard, as three source sites: read `EMSOverrideMdotOn`, evaluate the
+guard, and enter the override body when enabled. UnitOff and non-cooling
+predecessors skip all three sites. The private source transition can
+characterize either Boolean result, but the exact direct release lane consumes
+the completed same-call CP322 snapshot and its private runtime witness and
+requires the EMS-disabled false result. Every active direct transition
+therefore reads and evaluates the flag once, records no override-body entry,
+and falls through without requesting an EMS actuator service.
+
+The binder and lifecycle firewalls order CP323 immediately after CP322 and
+before the unchanged numerical DTO. Direct-only evidence is exposed as
+`purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle`;
+non-direct or disconnected evidence is rejected. CP323 neither reads
+`EMSValueMassFlowRate` nor assigns `SupplyMassFlowRate` or `OAMassFlowRate`.
+The first excluded executable is line 2158, which begins the true override
+body. Lines 2158-2159, the line-2161 flow-limit condition, subsequent clamps,
+mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection remain
+open. EMS remains forbidden, and CP323 changes no support, readiness,
+conformance, capability, status, inventory count, evidence case, or Roadmap
+state.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

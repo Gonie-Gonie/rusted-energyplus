@@ -22,6 +22,8 @@ use super::super::{
     PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState,
     PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState,
     PurchasedAirCalcCoolingSensibleFlowRuntimeState, PurchasedAirCalcCoolingSensibleFlowSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardRuntimeState,
+    PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumRuntimeState,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot, PurchasedAirCalcEntryRuntimeState,
     PurchasedAirCalcMinimumOaPrefixRuntimeState, PurchasedAirHardSizeLegacyOutcome,
@@ -90,6 +92,10 @@ pub struct PurchasedAirRuntimeState {
         BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot>,
     cooling_supply_mass_flow_maximum_latest_witnesses:
         BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot>,
+    cooling_supply_mass_flow_ems_override_guard_latest_witnesses: BTreeMap<
+        IdealLoadsAirSystemId,
+        PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
+    >,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -147,6 +153,9 @@ pub struct PurchasedAirUnitRuntimeState {
     /// Persistent bounded cooling supply-mass-flow maximum state.
     pub calc_cooling_supply_mass_flow_maximum:
         PurchasedAirCalcCoolingSupplyMassFlowMaximumRuntimeState,
+    /// Persistent bounded cooling supply-mass-flow EMS-override guard state.
+    pub calc_cooling_supply_mass_flow_ems_override_guard:
+        PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -247,6 +256,8 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingCapacityZeroFlowResetRuntimeState::new(system),
             calc_cooling_supply_mass_flow_maximum:
                 PurchasedAirCalcCoolingSupplyMassFlowMaximumRuntimeState::new(system),
+            calc_cooling_supply_mass_flow_ems_override_guard:
+                PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

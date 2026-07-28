@@ -16465,6 +16465,44 @@ finite-limit or autosizing route, broad humidity control, live service,
 numerical result, capability, status, inventory/readiness count, evidence
 case, conformance claim, or Roadmap item.
 
+## CP323 Source-Ordered Cooling Supply Mass-Flow EMS Override Guard
+
+CP323 supersedes only CP322's line-2157 exclusion for the single EnergyPlus
+26.1 `PurchasedAirManager.cc` guard. Its exact three source sites are:
+
+1. read `EMSOverrideMdotOn`;
+2. evaluate the Boolean guard; and
+3. enter the override body when the guard is enabled.
+
+UnitOff and non-cooling predecessors skip all three sites. The pure source
+transition may characterize both Boolean outcomes, but public exact-direct
+release consumes the completed same-call CP322 snapshot and its private
+runtime witness and supplies only the EMS-disabled false result. Consequently,
+each active direct transition records one flag read, one guard evaluation, no
+body entry, and one no-EMS fallthrough. It does not read an actuator value,
+mutate either supply or outdoor-air mass flow, or claim an EMS service.
+
+`calc/cooling_supply_mass_flow_maximum/ems_override_guard.rs` and its split
+modules own the CP323 snapshot, persistent state, transition, release
+validation, and tests. The public exact-direct wrapper
+`advance_direct_no_oa_calc_cooling_supply_mass_flow_ems_override_guard`
+validates exact CP322 identity, ordinal, latest-state, private-witness, and
+source-route lineage before mutation. The binder executes CP323 immediately
+after CP322 and before the unchanged numerical Calc DTO. Per-step, final,
+coupled-runtime, and pipeline validators enforce the same ordering and the
+false direct route. Direct-only JSON uses
+`purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle`;
+non-direct or disconnected evidence is rejected.
+
+Line 2158 is the first excluded executable and begins the true EMS override
+body. Reading `EMSValueMassFlowRate`, assigning `SupplyMassFlowRate`, applying
+the line-2159 `min` and assigning `OAMassFlowRate`, the line-2161 flow-limit
+condition, and all later clamp, mixed-air, capacity, supply-state, and
+Heat/DeadBand behavior remain excluded. `EMS` remains forbidden. CP323
+promotes no support level, run state, required or forbidden feature, numerical
+result, capability, status, inventory/readiness count, evidence case,
+conformance claim, or Roadmap item.
+
 
 
 

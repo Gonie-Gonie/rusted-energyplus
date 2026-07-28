@@ -21511,6 +21511,29 @@ or Autosize support, numerical support, or capability support.
 Parent/routine status, inventory/readiness counts, evidence, conformance, and
 Roadmap state remain unchanged.
 
+## CP323 Cooling Supply Mass-Flow EMS Override Guard Placement
+
+CP323 maps only executable line 2157 between CP322 and the unchanged numerical
+PurchasedAir DTO. The three sites read `EMSOverrideMdotOn`, evaluate the
+Boolean guard, and enter its body when enabled. UnitOff and non-cooling routes
+skip the slice. Exact direct release validates the same-call CP322 latest
+snapshot and private witness and admits only the false EMS-disabled result;
+active direct routes therefore read and evaluate once, record zero body
+entries, and continue without an EMS actuator service.
+
+Coupled and pipeline validation enforce CP322-to-CP323-to-numerical ordering
+and publish direct-only
+`purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle`
+evidence. No CP323 site changes Zone state, demand, coefficients, correction,
+or feedback.
+
+Line 2158 is the first excluded executable. The EMS value read and mass-flow
+assignments at lines 2158-2159, the `min`, the line-2161 flow-limit condition,
+later clamps, mixed-air/capacity/supply-state behavior, Heat/DeadBand
+selection, and all later Zone-air work remain excluded. `EMS` remains
+forbidden. CP323 changes no support level, conformance, capability, status,
+inventory/readiness count, evidence case, or Roadmap state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:
