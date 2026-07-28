@@ -20,8 +20,37 @@ mod snapshot_validation;
 
 use prefix_validation::flow_limit_guard_links_to_ems_override_body;
 pub(in crate::ideal_loads::calc) use runtime_validation::pending_guard_state_is_consistent;
-use runtime_validation::{calc_state_identities_match, call_order_is_pending_guard};
+use runtime_validation::{
+    calc_state_identities_match, call_order_is_pending_guard, completed_guard_state_is_consistent,
+};
 pub(in crate::ideal_loads) use snapshot_validation::cooling_supply_mass_flow_limit_guard_snapshot_is_exact_direct_release;
+
+pub(in crate::ideal_loads::calc) fn completed_direct_cooling_supply_mass_flow_limit_guard_is_consistent(
+    runtime: &PurchasedAirRuntimeState,
+    unit: &crate::ideal_loads::PurchasedAirUnitRuntimeState,
+    system: &IdealLoadsAirSystem,
+    guard: PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot,
+    guard_witness: Option<PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot>,
+) -> bool {
+    let Some(body) = unit.calc_cooling_supply_mass_flow_ems_override_body.latest else {
+        return false;
+    };
+
+    completed_direct_cooling_supply_mass_flow_ems_override_body_is_consistent(
+        runtime,
+        unit,
+        system,
+        body,
+        runtime.cooling_supply_mass_flow_ems_override_body_latest_witness(system.id),
+    ) && flow_limit_guard_links_to_ems_override_body(guard, body)
+        && completed_guard_state_is_consistent(
+            unit,
+            system,
+            unit.maximum_cooling_air_mass_flow_rate_kg_per_s,
+            guard,
+            guard_witness,
+        )
+}
 
 /// Fail-closed CP325 public release error.
 #[allow(missing_docs)]

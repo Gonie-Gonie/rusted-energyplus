@@ -21590,6 +21590,42 @@ Heat/DeadBand selection, and all later Zone-air work remain excluded. `EMS` and
 Autosizing remain forbidden. CP325 changes no support level, conformance,
 capability, status, inventory/readiness count, evidence case, or Roadmap state.
 
+## CP326 Cooling Supply Mass-Flow Limit Body Placement
+
+CP326 maps only executable line 2163 between CP325 and the unchanged numerical
+PurchasedAir DTO. Its exact four lexical sites read `SupplyMassFlowRate` and
+retained `MaxCoolMassFlowRate` as the textual minimum operands, apply the
+source-shaped two-argument minimum, and assign the result back to supply flow.
+The operand sites do not claim a C++ function-argument evaluation order.
+EnergyPlus resolves the call to ObjexxFCL's exact `double`
+`a < b ? a : b` overload, so strict `<` selects the first supply operand and
+false, tie, or unordered selects the second maximum operand with its exact
+signed-zero or NaN bits.
+
+UnitOff, non-cooling, and active CP325 guard-false paths skip all four sites.
+Only a true CP325 body entry applies the minimum. Exact direct release
+validates the same-call CP325 latest snapshot and private witness, recovers the
+pre-clamp supply flow from the bit-validated retained CP322 result through the
+unchanged CP323-CP325 lineage, and re-reads the maximum from the retained Init
+cache. It accepts no duplicate scalar and requests no live service. Coupled and
+pipeline validation enforce CP325-to-CP326-to-numerical ordering and publish
+direct-only
+`purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle` evidence.
+No CP326 site changes Zone state, demand, coefficients, correction, or
+feedback. CP326 neither consumes the numerical DTO as an input nor feeds or
+replaces it. Coupled and pipeline validation require bit-exact CP322-result and
+Init-cache provenance plus internal CP326 minimum/assignment consistency. They
+do not reconcile the line-2163 checkpoint with the final numerical DTO because
+that DTO represents line-2166-and-later downstream work.
+
+Line 2166, not line 2167, is the first excluded executable. The
+very-small-flow guard, its line-2167 positive-zero reset,
+mixed-air/capacity/supply-state behavior, Heat/DeadBand selection, and all
+later Zone-air work remain excluded. `EMS` and Autosizing remain forbidden.
+CP326 changes no support level, conformance, capability, status,
+inventory/readiness count, evidence case, numerical conformance, or Roadmap
+state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

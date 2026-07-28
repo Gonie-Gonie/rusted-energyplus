@@ -27,6 +27,8 @@ use crate::{
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_EMS_OVERRIDE_BODY_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_EMS_OVERRIDE_GUARD_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_EMS_OVERRIDE_GUARD_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_LIMIT_BODY_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_LIMIT_BODY_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_LIMIT_GUARD_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_LIMIT_GUARD_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_MAXIMUM_FIRST_EXCLUDED_SOURCE,
@@ -158,6 +160,26 @@ fn cooling_supply_mass_flow_limit_guard_partition_overflow_fails_closed() {
         error,
         DirectZonePurchasedAirCoupledRuntimeError::
             CalcCoolingSupplyMassFlowLimitGuardLifecycleInvariant {
+                field: "test_partition_overflow",
+                expected: 1,
+                actual: usize::MAX,
+            }
+    ));
+}
+
+#[test]
+fn cooling_supply_mass_flow_limit_body_partition_overflow_fails_closed() {
+    let error = super::cooling_supply_mass_flow_limit_body_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::
+            CalcCoolingSupplyMassFlowLimitBodyLifecycleInvariant {
                 field: "test_partition_overflow",
                 expected: 1,
                 actual: usize::MAX,
@@ -2014,6 +2036,114 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
             positive
         );
         assert_eq!(latest_limit_guard.active_guard_false_fallthrough, !positive);
+        let limit_body = simulation
+            .summary
+            .calc_cooling_supply_mass_flow_limit_body_lifecycle;
+        assert_eq!(
+            limit_body.source,
+            PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_LIMIT_BODY_SOURCE
+        );
+        assert_eq!(
+            limit_body.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_LIMIT_BODY_FIRST_EXCLUDED_SOURCE
+        );
+        let limit_body_state = limit_body.state;
+        assert_eq!(limit_body_state.transition_count, 1, "{limit:?}");
+        assert_eq!(limit_body_state.cooling_body_entry_count, 1, "{limit:?}");
+        assert_eq!(
+            limit_body_state.supply_mass_flow_limit_body_entry_count,
+            usize::from(positive),
+            "{limit:?}"
+        );
+        assert_eq!(
+            limit_body_state.body_skip_count,
+            usize::from(!positive),
+            "{limit:?}"
+        );
+        assert_eq!(
+            limit_body_state.active_guard_false_fallthrough_count,
+            usize::from(!positive),
+            "{limit:?}"
+        );
+        for count in [
+            limit_body_state.supply_mass_flow_rate_for_minimum_read_count,
+            limit_body_state.maximum_cooling_air_mass_flow_rate_for_minimum_read_count,
+            limit_body_state.source_shaped_two_argument_minimum_evaluation_count,
+            limit_body_state.supply_mass_flow_rate_assignment_count,
+        ] {
+            assert_eq!(count, usize::from(positive), "{limit:?}");
+        }
+        let latest_limit_body = limit_body_state.latest.expect("latest CP326 snapshot");
+        assert_eq!(latest_limit_body.system, latest_limit_guard.system);
+        assert_eq!(
+            latest_limit_body.parent_call_ordinal,
+            latest_limit_guard.parent_call_ordinal
+        );
+        assert_eq!(
+            latest_limit_body.controlled_zone,
+            latest_limit_guard.controlled_zone
+        );
+        assert_eq!(
+            latest_limit_body.supply_mass_flow_limit_body_entered,
+            positive
+        );
+        assert_eq!(latest_limit_body.body_skipped, !positive);
+        assert_eq!(latest_limit_body.active_guard_false_fallthrough, !positive);
+        let source_supply = latest_supply_maximum
+            .resulting_supply_mass_flow_rate_kg_per_s
+            .expect("CP322 cooling result");
+        let expected_result = if positive {
+            if source_supply < initialized_max {
+                source_supply
+            } else {
+                initialized_max
+            }
+        } else {
+            source_supply
+        };
+        assert_eq!(
+            latest_limit_body
+                .resulting_supply_mass_flow_rate_kg_per_s
+                .map(f64::to_bits),
+            Some(expected_result.to_bits()),
+            "{limit:?}"
+        );
+        if positive {
+            assert_eq!(
+                latest_limit_body
+                    .supply_mass_flow_rate_before_limit_kg_per_s
+                    .map(f64::to_bits),
+                Some(source_supply.to_bits()),
+                "{limit:?}"
+            );
+            assert_eq!(
+                latest_limit_body
+                    .maximum_cooling_air_mass_flow_rate_kg_per_s
+                    .map(f64::to_bits),
+                Some(initialized_max.to_bits()),
+                "{limit:?}"
+            );
+            assert_eq!(
+                latest_limit_body
+                    .assigned_supply_mass_flow_rate_kg_per_s
+                    .map(f64::to_bits),
+                Some(expected_result.to_bits()),
+                "{limit:?}"
+            );
+        } else {
+            assert_eq!(
+                latest_limit_body.supply_mass_flow_rate_before_limit_kg_per_s,
+                None
+            );
+            assert_eq!(
+                latest_limit_body.maximum_cooling_air_mass_flow_rate_kg_per_s,
+                None
+            );
+            assert_eq!(
+                latest_limit_body.assigned_supply_mass_flow_rate_kg_per_s,
+                None
+            );
+        }
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation

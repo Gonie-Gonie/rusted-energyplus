@@ -781,6 +781,44 @@ numerical DTO. `EMS` and Autosizing remain forbidden, and support, readiness,
 conformance, capability, status, inventory count, evidence cases, and Roadmap
 state remain unchanged.
 
+CP326 maps only the Cooling supply mass-flow limit body at executable line
+2163 as four lexical source sites: read `SupplyMassFlowRate` as one minimum
+operand, re-read retained `MaxCoolMassFlowRate` as the other operand, apply the
+source-shaped two-argument minimum, and assign the result back to
+`SupplyMassFlowRate`. The two operand sites do not claim a C++ function
+argument evaluation order. The selected EnergyPlus `Real64` overload is
+ObjexxFCL's exact `double` minimum, `a < b ? a : b`, so a strict comparison
+selects the first supply-flow operand only when it is smaller and otherwise
+selects the second maximum-flow operand. Ties and unordered comparisons
+therefore select the second operand, preserving its signed-zero or NaN bits;
+infinities follow the same raw comparison.
+
+UnitOff, non-cooling, and active CP325 guard-false predecessors skip all four
+sites. A true CP325 body entry executes the complete body and retains the
+assigned source-local supply flow. The exact direct release lane validates the
+completed same-call CP325 latest snapshot and private witness, recovers the
+pre-clamp supply flow from the bit-validated retained CP322 result through the
+unchanged CP323-CP325 lineage, and re-reads the maximum from the retained Init
+cache. It accepts no duplicate caller supply-flow or maximum-flow scalar and
+requests no live sizing, schedule, Node, psychrometric, EMS, or diagnostic
+service.
+
+The binder and lifecycle firewalls now retain
+CP325-to-CP326-to-numerical ordering. Direct-only evidence is exposed as
+`purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle`; it records
+the skipped and applied partitions, both operand values and IEEE bits, the
+source minimum, and the assigned result. Coupled and pipeline validation
+require bit-exact CP322-result and retained-Init provenance plus internal
+minimum/assignment consistency. They do not reconcile this line-2163
+checkpoint with the final numerical DTO, which represents line-2166-and-later
+downstream work; CP326 neither consumes that DTO as an input nor feeds or
+replaces it. Line 2166, not line 2167, is the first excluded executable and
+begins the very-small-flow guard; its comparison and line-2167 positive-zero
+reset, mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection
+remain open. `EMS` and Autosizing remain forbidden, and support, readiness,
+conformance, capability, status, inventory count, evidence cases, numerical
+conformance, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

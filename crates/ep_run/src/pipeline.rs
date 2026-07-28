@@ -32,6 +32,7 @@ use ep_runtime::{
     PurchasedAirCalcCoolingSensibleFlowLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardLifecycleSummary,
+    PurchasedAirCalcCoolingSupplyMassFlowLimitBodyLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowLimitGuardLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumLifecycleSummary,
     PurchasedAirCalcEntryLifecycleSummary, PurchasedAirCalcMinimumOaPrefixLifecycleSummary,
@@ -79,6 +80,7 @@ mod purchased_air_cooling_oa_max_flow_body;
 mod purchased_air_cooling_sensible_flow;
 mod purchased_air_cooling_supply_mass_flow_ems_override_body;
 mod purchased_air_cooling_supply_mass_flow_ems_override_guard;
+mod purchased_air_cooling_supply_mass_flow_limit_body;
 mod purchased_air_cooling_supply_mass_flow_limit_guard;
 mod purchased_air_cooling_supply_mass_flow_maximum;
 mod purchased_air_minimum_oa;
@@ -214,6 +216,8 @@ struct RustRuntimeResult {
         Option<PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyLifecycleSummary>,
     purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle:
         Option<PurchasedAirCalcCoolingSupplyMassFlowLimitGuardLifecycleSummary>,
+    purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle:
+        Option<PurchasedAirCalcCoolingSupplyMassFlowLimitBodyLifecycleSummary>,
 }
 
 struct PreparedRuntimeInputs {
@@ -1314,6 +1318,10 @@ fn finish_successful_summary(
                 .purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle
                 .as_ref()
                 .map(purchased_air_cooling_supply_mass_flow_limit_guard::lifecycle_json),
+            "purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle": result
+                .purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle
+                .as_ref()
+                .map(purchased_air_cooling_supply_mass_flow_limit_body::lifecycle_json),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
@@ -2217,6 +2225,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle: None,
                 purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle: None,
                 purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle: None,
+                purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
@@ -2311,6 +2320,11 @@ fn execute_rust_runtime(
                     .summary
                     .calc_cooling_supply_mass_flow_limit_guard_lifecycle,
             );
+            let purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle = Some(
+                simulation
+                    .summary
+                    .calc_cooling_supply_mass_flow_limit_body_lifecycle,
+            );
             Ok(RustRuntimeResult {
                 results: simulation.results,
                 runtime_class,
@@ -2342,6 +2356,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle,
                 purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle,
                 purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle,
+                purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle,
             })
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
@@ -2383,6 +2398,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle: None,
                 purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle: None,
                 purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle: None,
+                purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
@@ -2422,6 +2438,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle: None,
                 purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle: None,
                 purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle: None,
+                purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle: None,
             })
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
@@ -2624,6 +2641,19 @@ fn validate_runtime_demand_provenance(
             model_cooling_limit,
             result.purchased_air_coupling_call_count,
         )?;
+        purchased_air_cooling_supply_mass_flow_limit_body::validate_direct_lifecycle(
+            result
+                .purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle
+                .as_ref(),
+            result
+                .purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle
+                .as_ref(),
+            result
+                .purchased_air_calc_cooling_supply_mass_flow_maximum_lifecycle
+                .as_ref(),
+            init_lifecycle,
+            result.purchased_air_coupling_call_count,
+        )?;
     } else if result.purchased_air_init_lifecycle.is_some()
         || result.purchased_air_calc_entry_lifecycle.is_some()
         || result
@@ -2670,6 +2700,9 @@ fn validate_runtime_demand_provenance(
             .is_some()
         || result
             .purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle
+            .is_some()
+        || result
+            .purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle
             .is_some()
         || result.purchased_air_coupling_call_count.is_some()
     {
@@ -4344,7 +4377,7 @@ mod tests {
     }
 
     #[test]
-    fn non_direct_runtime_rejects_cp316_through_cp325_lifecycle_evidence() {
+    fn non_direct_runtime_rejects_cp316_through_cp326_lifecycle_evidence() {
         let mut result = RustRuntimeResult {
             results: ResultStore::new(),
             runtime_class: RuntimeClass::IdealLoadsFixtureDemandDiagnostic,
@@ -4387,6 +4420,7 @@ mod tests {
             purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle: None,
             purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle: None,
             purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle: None,
+            purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle: None,
         };
         assert!(
             validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result, None)
@@ -4522,6 +4556,25 @@ mod tests {
                     ep_runtime::PurchasedAirCalcCoolingSupplyMassFlowLimitGuardRuntimeState::new(
                         IdealLoadsAirSystemId(0),
                     ),
+            },
+        );
+        assert_eq!(
+            validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result, None),
+            Err(
+                "persistent PurchasedAir lifecycle evidence was attached to a non-direct runtime"
+                    .to_string()
+            )
+        );
+
+        result.purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle = None;
+        result.purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle = Some(
+            ep_runtime::PurchasedAirCalcCoolingSupplyMassFlowLimitBodyLifecycleSummary {
+                source: ep_runtime::PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_LIMIT_BODY_SOURCE,
+                first_excluded_source: ep_runtime::
+                    PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_LIMIT_BODY_FIRST_EXCLUDED_SOURCE,
+                state: ep_runtime::PurchasedAirCalcCoolingSupplyMassFlowLimitBodyRuntimeState::new(
+                    IdealLoadsAirSystemId(0),
+                ),
             },
         );
         assert_eq!(

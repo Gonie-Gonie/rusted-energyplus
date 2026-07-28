@@ -107,6 +107,58 @@ pub(in crate::ideal_loads::calc) fn pending_guard_state_is_consistent(
         )
 }
 
+pub(super) fn completed_guard_state_is_consistent(
+    unit: &PurchasedAirUnitRuntimeState,
+    system: &IdealLoadsAirSystem,
+    maximum_cooling_air_mass_flow_rate_kg_per_s: f64,
+    predecessor: PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot,
+    witness: Option<PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot>,
+) -> bool {
+    let state = &unit.calc_cooling_supply_mass_flow_limit_guard;
+    partition_is_consistent(
+        state.transition_count,
+        state.unit_off_skip_count,
+        state.non_cooling_skip_count,
+        state.cooling_body_entry_count,
+    ) && state.transition_count == unit.calc_entry.call_count
+        && state.latest == Some(predecessor)
+        && witness == Some(predecessor)
+        && state.latest_transition_ordinal == Some(state.transition_count)
+        && snapshot_route(predecessor) == state.latest_route
+        && predecessor.parent_call_ordinal == state.transition_count
+        && predecessor.system == state.system
+        && unit.controlled_zone == Some(predecessor.controlled_zone)
+        && cooling_supply_mass_flow_limit_guard_snapshot_is_exact_direct_release(predecessor)
+        && latest_inputs_match(
+            predecessor,
+            system.cooling_limit,
+            maximum_cooling_air_mass_flow_rate_kg_per_s,
+        )
+        && completed_guard_history_links_to_body(
+            state,
+            &unit.calc_cooling_supply_mass_flow_ems_override_body,
+        )
+        && source_counters_are_consistent(
+            state,
+            system.cooling_limit,
+            maximum_cooling_air_mass_flow_rate_kg_per_s,
+        )
+}
+
+fn completed_guard_history_links_to_body(
+    guard: &PurchasedAirCalcCoolingSupplyMassFlowLimitGuardRuntimeState,
+    body: &crate::ideal_loads::PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyRuntimeState,
+) -> bool {
+    guard.transition_count == body.transition_count
+        && guard.unit_off_skip_count == body.unit_off_skip_count
+        && guard.non_cooling_skip_count == body.non_cooling_skip_count
+        && guard.cooling_body_entry_count == body.cooling_body_entry_count
+        && guard
+            .supply_mass_flow_limit_body_entry_count
+            .checked_add(guard.active_guard_false_fallthrough_count)
+            == Some(guard.cooling_body_entry_count)
+}
+
 fn latest_is_valid(
     state: &PurchasedAirCalcCoolingSupplyMassFlowLimitGuardRuntimeState,
     controlled_zone: Option<ZoneId>,

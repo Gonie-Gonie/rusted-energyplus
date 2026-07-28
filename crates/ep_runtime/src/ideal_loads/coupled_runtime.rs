@@ -58,6 +58,8 @@ use super::{
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardError,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardLifecycleSummary,
+    PurchasedAirCalcCoolingSupplyMassFlowLimitBodyError,
+    PurchasedAirCalcCoolingSupplyMassFlowLimitBodyLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowLimitGuardError,
     PurchasedAirCalcCoolingSupplyMassFlowLimitGuardLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumError,
@@ -79,6 +81,7 @@ use super::{
     purchased_air_calc_cooling_sensible_flow_lifecycle_summary,
     purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle_summary,
     purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle_summary,
+    purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle_summary,
     purchased_air_calc_cooling_supply_mass_flow_limit_guard_lifecycle_summary,
     purchased_air_calc_cooling_supply_mass_flow_maximum_lifecycle_summary,
     purchased_air_calc_entry_lifecycle_summary,
@@ -97,6 +100,7 @@ mod cooling_oa_max_flow_validation;
 mod cooling_sensible_flow_validation;
 mod cooling_supply_mass_flow_ems_override_body_validation;
 mod cooling_supply_mass_flow_ems_override_guard_validation;
+mod cooling_supply_mass_flow_limit_body_validation;
 mod cooling_supply_mass_flow_limit_guard_validation;
 mod cooling_supply_mass_flow_maximum_validation;
 mod minimum_oa_validation;
@@ -216,6 +220,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded cooling supply mass-flow limit-guard lifecycle report.
     pub calc_cooling_supply_mass_flow_limit_guard_lifecycle:
         PurchasedAirCalcCoolingSupplyMassFlowLimitGuardLifecycleSummary,
+    /// Persistent bounded cooling supply mass-flow limit-body lifecycle report.
+    pub calc_cooling_supply_mass_flow_limit_body_lifecycle:
+        PurchasedAirCalcCoolingSupplyMassFlowLimitBodyLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -290,6 +297,10 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     /// Final cooling supply mass-flow limit-guard summary could not resolve the bound unit.
     CalcCoolingSupplyMassFlowLimitGuardLifecycle(
         PurchasedAirCalcCoolingSupplyMassFlowLimitGuardError,
+    ),
+    /// Final cooling supply mass-flow limit-body summary could not resolve the bound unit.
+    CalcCoolingSupplyMassFlowLimitBodyLifecycle(
+        PurchasedAirCalcCoolingSupplyMassFlowLimitBodyError,
     ),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
@@ -444,6 +455,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A cooling supply mass-flow limit-body lifecycle invariant did not match the run.
+    CalcCoolingSupplyMassFlowLimitBodyLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -526,6 +546,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     },
     /// A cooling supply mass-flow limit-guard snapshot did not match its bound release call.
     UnexpectedCalculationCoolingSupplyMassFlowLimitGuard {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
+    /// A cooling supply mass-flow limit-body snapshot did not match its bound release call.
+    UnexpectedCalculationCoolingSupplyMassFlowLimitBody {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
@@ -645,6 +670,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcCoolingSupplyMassFlowLimitGuardLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir cooling supply mass-flow limit-guard lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcCoolingSupplyMassFlowLimitBodyLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir cooling supply mass-flow limit-body lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -782,6 +811,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir cooling supply mass-flow limit-guard lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingSupplyMassFlowLimitBodyLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir cooling supply mass-flow limit-body lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -854,6 +891,12 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 write!(
                     formatter,
                     "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling supply mass-flow limit guard"
+                )
+            }
+            Self::UnexpectedCalculationCoolingSupplyMassFlowLimitBody { timestep_index } => {
+                write!(
+                    formatter,
+                    "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling supply mass-flow limit body"
                 )
             }
             Self::UnexpectedDemandInputKind {
@@ -1177,6 +1220,16 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
                     UnexpectedCalculationCoolingSupplyMassFlowLimitGuard { timestep_index },
             );
         }
+        if !cooling_supply_mass_flow_limit_body_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingSupplyMassFlowLimitBody { timestep_index },
+            );
+        }
         if !output.initialization.flags.state_machine_used
             || output.coupling.purchased_air.init_flags != output.initialization.flags
         {
@@ -1465,6 +1518,22 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_supply_mass_flow_limit_body_lifecycle =
+        purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingSupplyMassFlowLimitBodyLifecycle,
+        )?;
+    cooling_supply_mass_flow_limit_body_validation::validate_lifecycle(
+        &calc_cooling_supply_mass_flow_limit_body_lifecycle,
+        &calc_cooling_supply_mass_flow_limit_guard_lifecycle,
+        timestep_outputs.len(),
+        numerical_cooling_count,
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -1543,6 +1612,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_supply_mass_flow_ems_override_guard_lifecycle,
             calc_cooling_supply_mass_flow_ems_override_body_lifecycle,
             calc_cooling_supply_mass_flow_limit_guard_lifecycle,
+            calc_cooling_supply_mass_flow_limit_body_lifecycle,
         },
         state,
         results,

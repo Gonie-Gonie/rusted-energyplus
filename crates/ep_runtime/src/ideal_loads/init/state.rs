@@ -26,6 +26,8 @@ use super::super::{
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardRuntimeState,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowLimitBodyRuntimeState,
+    PurchasedAirCalcCoolingSupplyMassFlowLimitBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowLimitGuardRuntimeState,
     PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumRuntimeState,
@@ -106,6 +108,8 @@ pub struct PurchasedAirRuntimeState {
     >,
     cooling_supply_mass_flow_limit_guard_latest_witnesses:
         BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot>,
+    cooling_supply_mass_flow_limit_body_latest_witnesses:
+        BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingSupplyMassFlowLimitBodySnapshot>,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -172,6 +176,9 @@ pub struct PurchasedAirUnitRuntimeState {
     /// Persistent bounded cooling supply-mass-flow limit-guard state.
     pub calc_cooling_supply_mass_flow_limit_guard:
         PurchasedAirCalcCoolingSupplyMassFlowLimitGuardRuntimeState,
+    /// Persistent bounded cooling supply-mass-flow limit-body state.
+    pub calc_cooling_supply_mass_flow_limit_body:
+        PurchasedAirCalcCoolingSupplyMassFlowLimitBodyRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -278,6 +285,8 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyRuntimeState::new(system),
             calc_cooling_supply_mass_flow_limit_guard:
                 PurchasedAirCalcCoolingSupplyMassFlowLimitGuardRuntimeState::new(system),
+            calc_cooling_supply_mass_flow_limit_body:
+                PurchasedAirCalcCoolingSupplyMassFlowLimitBodyRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

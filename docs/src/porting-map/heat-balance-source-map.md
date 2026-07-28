@@ -33891,6 +33891,45 @@ feedback work remain excluded. `EMS` and Autosizing remain forbidden. CP325
 adds no support, conformance, capability, status, count, readiness,
 evidence-case, or Roadmap promotion.
 
+## CP326 Cooling Supply Mass-Flow Limit Body in the Heat-Balance Loop
+
+CP326 executes immediately after CP325 and before the unchanged bounded
+PurchasedAir numerical calculation. It maps only executable line 2163: the
+`SupplyMassFlowRate` and retained `MaxCoolMassFlowRate` operand reads, one
+source-shaped two-argument minimum, and the supply-flow assignment form the
+exact four lexical sites. Their textual positions do not claim a C++ function
+argument evaluation order.
+
+The EnergyPlus `Real64` call selects ObjexxFCL's exact `double` overload
+`a < b ? a : b`. Its strict comparison selects the first supply operand only
+when smaller; equality or an unordered comparison selects the second maximum
+operand. Signed-zero and NaN bits therefore follow that right-operand choice,
+while infinities follow the raw `<` result. UnitOff, non-cooling, and active
+CP325 guard-false paths skip every CP326 site; only a true guard body entry
+executes the four-site assignment.
+
+Exact direct release validates CP325's completed same-call latest snapshot and
+private witness. It recovers the pre-clamp supply value from the bit-validated
+retained CP322 result through the unchanged CP323-CP325 lineage and re-reads
+the maximum from the retained Init cache, without duplicate caller scalars or
+live services. Per-step, final, coupled-runtime, and pipeline validators
+enforce CP325-to-CP326-to-numerical ordering and expose direct-only
+`purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle` evidence.
+CP326 changes only its retained source-local flow result; it does not change a
+Zone or heat-balance equation, consume the numerical DTO as an input, or feed
+or replace that DTO. Coupled and pipeline validation require bit-exact
+CP322-result and Init-cache provenance plus internal CP326
+minimum/assignment consistency. They do not reconcile the line-2163 checkpoint
+with the final numerical DTO because that DTO represents line-2166-and-later
+downstream work.
+
+Line 2166, not line 2167, is the first excluded executable and begins the
+very-small-flow guard. That guard and its line-2167 positive-zero body, later
+mixed-air, capacity, supply-state, Heat/DeadBand, and feedback work remain
+excluded. `EMS` and Autosizing remain forbidden. CP326 adds no support,
+conformance, capability, status, count, readiness, evidence-case, numerical
+conformance, or Roadmap promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

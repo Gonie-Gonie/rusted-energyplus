@@ -19090,6 +19090,53 @@ remain open. `EMS` and Autosizing remain forbidden. CP325 adds target inventory
 and lifecycle evidence only; support, conformance, statuses, counts, readiness,
 capability, evidence cases, and Roadmap state remain unchanged.
 
+## CP326 Cooling Supply Mass-Flow Limit Body
+
+CP326 maps only the executable line-2163 limit body after CP325. Its exact four
+lexical sites read `SupplyMassFlowRate` and retained `MaxCoolMassFlowRate` as
+the two textual minimum operands, apply the source-shaped two-argument minimum,
+and assign the result back to `SupplyMassFlowRate`. The operand sites do not
+claim a C++ function-argument evaluation order.
+
+The unqualified EnergyPlus call resolves to ObjexxFCL's exact `double`
+overload, `a < b ? a : b`, rather than `std::min`, `std::fmin`, or a Rust
+floating-point minimum helper. It uses strict `<`; a true result selects the
+first supply-flow operand and false, tie, or unordered selects the second
+maximum-flow operand. This preserves the second operand's signed-zero or NaN
+bits on ties and unordered comparisons. A NaN supply operand with a finite
+maximum returns the maximum, while a NaN maximum returns that NaN; infinities
+follow the raw comparison.
+
+UnitOff, non-cooling, and active guard-false CP325 predecessors skip every
+site. A true CP325 body entry executes all four. The exact direct wrapper
+`advance_direct_no_oa_calc_cooling_supply_mass_flow_limit_body` validates the
+completed same-call CP325 latest snapshot and private witness, obtains the
+pre-clamp supply value from the bit-validated retained CP322 result through
+the unchanged CP323-CP325 lineage, and re-reads the maximum from the retained
+Init cache with bitwise predecessor reconciliation. It accepts no duplicate
+caller scalar and requests no live sizing, schedule, Node, psychrometric, EMS,
+or diagnostic service.
+
+The binder places CP326 between CP325 and the unchanged numerical DTO.
+Direct-only
+`purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle` evidence
+reconciles predecessor identity, ordinal, skip/body partitions, operand values
+and IEEE bits, minimum selection, assignment, and retained result. CP326 does
+not invoke, consume, feed, or replace the older numerical flow-limit helper;
+coupled and pipeline validation require bit-exact CP322-result and Init-cache
+provenance plus internal CP326 minimum/assignment consistency. They do not
+reconcile the line-2163 checkpoint with the final numerical DTO because that
+DTO represents line-2166-and-later downstream work. Non-direct or disconnected
+evidence is rejected.
+
+Line 2166, not line 2167, is the first excluded executable. Its
+very-small-flow guard, the line-2167 positive-zero reset,
+mixed-air/capacity/supply-state behavior, and Heat/DeadBand selection remain
+open. `EMS` and Autosizing remain forbidden. CP326 adds target inventory and
+lifecycle evidence only; support, conformance, statuses, counts, readiness,
+capability, evidence cases, numerical conformance, and Roadmap state remain
+unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

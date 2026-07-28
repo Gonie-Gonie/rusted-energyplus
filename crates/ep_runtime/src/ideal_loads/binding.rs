@@ -39,6 +39,8 @@ use super::{
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardError,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowLimitBodyError,
+    PurchasedAirCalcCoolingSupplyMassFlowLimitBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowLimitGuardError,
     PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumError,
@@ -60,6 +62,7 @@ use super::{
     advance_direct_no_oa_calc_cooling_sensible_flow,
     advance_direct_no_oa_calc_cooling_supply_mass_flow_ems_override_body,
     advance_direct_no_oa_calc_cooling_supply_mass_flow_ems_override_guard,
+    advance_direct_no_oa_calc_cooling_supply_mass_flow_limit_body,
     advance_direct_no_oa_calc_cooling_supply_mass_flow_limit_guard,
     advance_direct_no_oa_calc_cooling_supply_mass_flow_maximum,
     advance_direct_no_oa_calc_minimum_oa_prefix, advance_purchased_air_calc_entry,
@@ -639,6 +642,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingSupplyMassFlowLimitGuard(
         PurchasedAirCalcCoolingSupplyMassFlowLimitGuardError,
     ),
+    /// The bounded cooling supply mass-flow limit body rejected its release state.
+    CalculationCoolingSupplyMassFlowLimitBody(PurchasedAirCalcCoolingSupplyMassFlowLimitBodyError),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -747,6 +752,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered cooling supply mass-flow limit-guard snapshot.
     pub calculation_cooling_supply_mass_flow_limit_guard:
         PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot,
+    /// Source-ordered cooling supply mass-flow limit-body snapshot.
+    pub calculation_cooling_supply_mass_flow_limit_body:
+        PurchasedAirCalcCoolingSupplyMassFlowLimitBodySnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
@@ -998,6 +1006,15 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             DirectZonePurchasedAirScheduledCouplingError::
                 CalculationCoolingSupplyMassFlowLimitGuard,
         )?;
+    let calculation_cooling_supply_mass_flow_limit_body =
+        advance_direct_no_oa_calc_cooling_supply_mass_flow_limit_body(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_supply_mass_flow_limit_guard,
+        )
+        .map_err(
+            DirectZonePurchasedAirScheduledCouplingError::CalculationCoolingSupplyMassFlowLimitBody,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1051,6 +1068,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_supply_mass_flow_ems_override_guard,
         calculation_cooling_supply_mass_flow_ems_override_body,
         calculation_cooling_supply_mass_flow_limit_guard,
+        calculation_cooling_supply_mass_flow_limit_body,
         coupling,
     })
 }

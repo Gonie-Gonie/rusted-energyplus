@@ -4,12 +4,15 @@ use ep_model::{IdealLoadsAirSystemId, IdealLoadsLimit, ZoneId};
 
 use crate::ideal_loads::PurchasedAirRuntimeState;
 
+mod body;
 mod release;
 mod state;
 #[cfg(test)]
 mod tests;
 mod transition;
 
+pub use body::*;
+pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_supply_mass_flow_limit_guard_is_consistent;
 pub(in crate::ideal_loads) use release::cooling_supply_mass_flow_limit_guard_snapshot_is_exact_direct_release;
 pub use release::{
     PurchasedAirCalcCoolingSupplyMassFlowLimitGuardError,

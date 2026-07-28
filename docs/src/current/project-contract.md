@@ -16607,6 +16607,73 @@ and Autosizing remain forbidden. CP325 promotes no support level, run state,
 required or forbidden feature, numerical result, capability, status,
 inventory/readiness count, evidence case, conformance claim, or Roadmap item.
 
+## CP326 Source-Ordered Cooling Supply Mass-Flow Limit Body
+
+CP326 supersedes only CP325's line-2163 exclusion for the single EnergyPlus
+26.1 `PurchasedAirManager.cc` Cooling limit-body statement. Its exact four
+lexical source sites are:
+
+1. read `SupplyMassFlowRate` as the first minimum operand;
+2. re-read retained `MaxCoolMassFlowRate` as the second minimum operand;
+3. apply the source-shaped two-argument minimum; and
+4. assign the selected result back to `SupplyMassFlowRate`.
+
+The operand sites identify their textual argument positions but do not claim a
+C++ function-argument evaluation order. EnergyPlus builds this source as C++20,
+where parameter initializations are indeterminately sequenced relative to one
+another. Both `Real64` arguments are `double`, and unqualified lookup reaches
+the exact ObjexxFCL overload imported by `EnergyPlus.hh`, not `std::min` or
+`std::fmin`. Its body is `a < b ? a : b`: it performs one strict `<`
+comparison, selects the first supply-flow operand only on true, and otherwise
+selects the second maximum-flow operand. Equal finite values therefore select
+the second operand. `+0.0` versus `-0.0` also selects the second operand and
+preserves its sign bit; a NaN first operand with a finite second selects the
+finite second, a finite first with a NaN second selects that NaN, two NaNs
+select the second NaN bits, and infinities follow the ordinary raw comparison.
+No Rust floating-point minimum helper, total ordering, finite filter,
+normalization, or clamp may replace this conditional.
+
+UnitOff and non-cooling CP325 predecessors skip all four sites. An active
+Cooling predecessor whose limit guard is false also skips the body completely.
+Only `supply_mass_flow_limit_body_entered=true` reads either operand, evaluates
+the minimum, and assigns the result. The pure characterization preserves raw
+IEEE values, both operand values, and the exact selected result bits.
+
+`calc/cooling_supply_mass_flow_maximum/flow_limit_guard/body.rs` and its split
+modules own the CP326 snapshot, persistent state, pure transition, release
+validation, and tests. The public exact-direct wrapper
+`advance_direct_no_oa_calc_cooling_supply_mass_flow_limit_body` validates the
+completed same-call CP325 latest snapshot, private witness, identity, ordinal,
+and full retained prefix before mutation. It obtains the pre-clamp
+`SupplyMassFlowRate` from the bit-validated retained CP322 assignment through
+the CP323 false guard, CP324 complete skip, and CP325 decision lineage, then
+re-reads `MaxCoolMassFlowRate` from the retained BeginEnvrn cache and reconciles
+its bits with CP325. It accepts no caller-supplied supply-flow or maximum-flow
+scalar and requests no live sizing, schedule, Node, psychrometric, EMS, or
+diagnostic service.
+
+The binder executes CP326 immediately after CP325 and before the unchanged
+numerical Calc DTO. Per-step, final, coupled-runtime, and pipeline validators
+reconcile predecessor identity, skip partitions, two operand reads, strict
+comparison/right-choice minimum semantics, assignment, and latest retained
+result. Direct-only JSON uses
+`purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle`;
+non-direct or disconnected evidence is rejected. CP326 does not consume the
+older numerical flow-limit helper as an input and does not feed or replace it.
+Coupled and pipeline validation instead require bit-exact retained CP322-result
+and Init-cache provenance plus internal minimum/assignment consistency. The
+line-2163 checkpoint is not reconciled with the final numerical DTO because
+that DTO represents line-2166-and-later downstream work.
+
+Line 2166 is the first excluded executable, not line 2167. It begins the
+`SupplyMassFlowRate <= HVAC::VerySmallMassFlow` guard; that supply-flow read,
+constant read, inclusive comparison and body-entry decision, the line-2167
+positive-zero assignment, mixed-air/capacity/supply-state behavior, and
+Heat/DeadBand selection remain excluded. `EMS` and Autosizing remain
+forbidden. CP326 promotes no support level, run state, required or forbidden
+feature, numerical result, capability, status, inventory/readiness count,
+evidence case, conformance claim, or Roadmap item.
+
 
 
 

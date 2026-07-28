@@ -11,6 +11,7 @@ use crate::ideal_loads::{
     PurchasedAirCalcCoolingHumidificationFlowSnapshot, PurchasedAirCalcCoolingSensibleFlowSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowLimitBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot,
 };
@@ -193,6 +194,24 @@ impl PurchasedAirRuntimeState {
         snapshot: PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot,
     ) {
         self.cooling_supply_mass_flow_limit_guard_latest_witnesses
+            .insert(system, snapshot);
+    }
+
+    pub(in crate::ideal_loads) fn cooling_supply_mass_flow_limit_body_latest_witness(
+        &self,
+        system: IdealLoadsAirSystemId,
+    ) -> Option<PurchasedAirCalcCoolingSupplyMassFlowLimitBodySnapshot> {
+        self.cooling_supply_mass_flow_limit_body_latest_witnesses
+            .get(&system)
+            .copied()
+    }
+
+    pub(in crate::ideal_loads) fn set_cooling_supply_mass_flow_limit_body_latest_witness(
+        &mut self,
+        system: IdealLoadsAirSystemId,
+        snapshot: PurchasedAirCalcCoolingSupplyMassFlowLimitBodySnapshot,
+    ) {
+        self.cooling_supply_mass_flow_limit_body_latest_witnesses
             .insert(system, snapshot);
     }
 }
