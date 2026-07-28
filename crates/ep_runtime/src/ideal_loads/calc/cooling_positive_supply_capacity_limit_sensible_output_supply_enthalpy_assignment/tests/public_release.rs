@@ -51,11 +51,8 @@ fn assert_rejected_transactionally(
 
 #[test]
 fn public_false_route_preserves_retained_cp339_supply_enthalpy_without_sites() {
-    let (mut runtime, system, predecessor) =
-        completed_cp341_case(-1_000.0, 1.0, true);
-    assert!(
-        predecessor.capacity_limit_sensible_output_guard_false_fallthrough
-    );
+    let (mut runtime, system, predecessor) = completed_cp341_case(-1_000.0, 1.0, true);
+    assert!(predecessor.capacity_limit_sensible_output_guard_false_fallthrough);
     let retained = runtime
         .units
         .get(&system.id)
@@ -72,11 +69,15 @@ fn public_false_route_preserves_retained_cp339_supply_enthalpy_without_sites() {
         )
         .expect("CP342 false route");
     assert_eq!(
-        snapshot.preexisting_supply_enthalpy_j_per_kg.map(f64::to_bits),
+        snapshot
+            .preexisting_supply_enthalpy_j_per_kg
+            .map(f64::to_bits),
         Some(retained.to_bits())
     );
     assert_eq!(
-        snapshot.resulting_supply_enthalpy_j_per_kg.map(f64::to_bits),
+        snapshot
+            .resulting_supply_enthalpy_j_per_kg
+            .map(f64::to_bits),
         Some(retained.to_bits())
     );
     assert!(!snapshot.mixed_air_enthalpy_read);
@@ -87,12 +88,8 @@ fn public_false_route_preserves_retained_cp339_supply_enthalpy_without_sites() {
 
 #[test]
 fn public_true_route_uses_only_retained_cp339_and_cp341_operands() {
-    let (mut runtime, system, predecessor) =
-        completed_cp341_case(-100_000.0, 1.0, true);
-    assert!(
-        predecessor
-            .capacity_limit_sensible_output_maximum_capacity_assignment_executed
-    );
+    let (mut runtime, system, predecessor) = completed_cp341_case(-100_000.0, 1.0, true);
+    assert!(predecessor.capacity_limit_sensible_output_maximum_capacity_assignment_executed);
     let cp339 = runtime
         .units
         .get(&system.id)
@@ -119,7 +116,9 @@ fn public_true_route_uses_only_retained_cp339_and_cp341_operands() {
         Some(expected_quotient.to_bits())
     );
     assert_eq!(
-        snapshot.resulting_supply_enthalpy_j_per_kg.map(f64::to_bits),
+        snapshot
+            .resulting_supply_enthalpy_j_per_kg
+            .map(f64::to_bits),
         Some(expected.to_bits())
     );
     assert_rejected_transactionally(&mut runtime, &system, predecessor);
@@ -128,21 +127,13 @@ fn public_true_route_uses_only_retained_cp339_and_cp341_operands() {
 #[test]
 fn full_public_cp339_nan_chain_skips_arithmetic_and_preserves_supply_enthalpy() {
     let (mut runtime, system, predecessor) =
-        completed_cp341_case_with_zone_temperature(
-            -f64::MAX,
-            1.0,
-            true,
-            0.008,
-            13.000_02,
-        );
+        completed_cp341_case_with_zone_temperature(-f64::MAX, 1.0, true, 0.008, 13.000_02);
     assert!(
         predecessor
             .resulting_cooling_sensible_output_w
             .is_some_and(f64::is_nan)
     );
-    assert!(
-        predecessor.capacity_limit_sensible_output_guard_false_fallthrough
-    );
+    assert!(predecessor.capacity_limit_sensible_output_guard_false_fallthrough);
     let retained = runtime
         .units
         .get(&system.id)
@@ -159,11 +150,15 @@ fn full_public_cp339_nan_chain_skips_arithmetic_and_preserves_supply_enthalpy() 
         )
         .expect("CP342 NaN false route");
     assert_eq!(
-        snapshot.preexisting_supply_enthalpy_j_per_kg.map(f64::to_bits),
+        snapshot
+            .preexisting_supply_enthalpy_j_per_kg
+            .map(f64::to_bits),
         Some(retained.to_bits())
     );
     assert_eq!(
-        snapshot.resulting_supply_enthalpy_j_per_kg.map(f64::to_bits),
+        snapshot
+            .resulting_supply_enthalpy_j_per_kg
+            .map(f64::to_bits),
         Some(retained.to_bits())
     );
     assert!(snapshot.cooling_sensible_output_w.is_none());
@@ -172,8 +167,7 @@ fn full_public_cp339_nan_chain_skips_arithmetic_and_preserves_supply_enthalpy() 
 
 #[test]
 fn full_public_cp339_positive_infinity_chain_uses_cp341_finite_maximum() {
-    let (mut runtime, system, predecessor) =
-        completed_cp341_case(-f64::MAX, 1.0, true);
+    let (mut runtime, system, predecessor) = completed_cp341_case(-f64::MAX, 1.0, true);
     let cp339 = runtime
         .units
         .get(&system.id)
@@ -181,10 +175,7 @@ fn full_public_cp339_positive_infinity_chain_uses_cp341_finite_maximum() {
         .calc_cooling_positive_supply_capacity_limit_sensible_output_assignment
         .latest
         .expect("CP339");
-    assert_eq!(
-        cp339.cooling_sensible_output_w,
-        Some(f64::INFINITY)
-    );
+    assert_eq!(cp339.cooling_sensible_output_w, Some(f64::INFINITY));
     assert!(
         cp339
             .supply_mass_flow_rate_kg_per_s
@@ -213,16 +204,15 @@ fn full_public_cp339_positive_infinity_chain_uses_cp341_finite_maximum() {
         snapshot.cooling_sensible_output_w.map(f64::to_bits),
         Some(retained_maximum.to_bits())
     );
-    assert_eq!(
-        snapshot.supply_mass_flow_rate_kg_per_s,
-        Some(flow)
-    );
+    assert_eq!(snapshot.supply_mass_flow_rate_kg_per_s, Some(flow));
     assert_eq!(
         snapshot.specific_cooling_output_j_per_kg.map(f64::to_bits),
         Some(expected_quotient.to_bits())
     );
     assert_eq!(
-        snapshot.resulting_supply_enthalpy_j_per_kg.map(f64::to_bits),
+        snapshot
+            .resulting_supply_enthalpy_j_per_kg
+            .map(f64::to_bits),
         Some(expected_supply_enthalpy.to_bits())
     );
 }
@@ -254,8 +244,7 @@ fn all_four_inherited_skips_have_no_cp342_values() {
 
 #[test]
 fn supplied_and_retained_cp341_and_cp339_drift_are_transactional() {
-    let (runtime, system, predecessor) =
-        completed_cp341_case(-100_000.0, 1.0, true);
+    let (runtime, system, predecessor) = completed_cp341_case(-100_000.0, 1.0, true);
     let mut supplied = runtime.clone();
     let mut forged = predecessor;
     forged.source = "forged-cp341";
@@ -301,15 +290,12 @@ fn supplied_and_retained_cp341_and_cp339_drift_are_transactional() {
 
     let mut cp339_private = runtime;
     let mut witness = cp339_private
-        .cooling_positive_supply_capacity_limit_sensible_output_assignment_latest_witness(
-            system.id,
-        )
+        .cooling_positive_supply_capacity_limit_sensible_output_assignment_latest_witness(system.id)
         .expect("CP339 witness");
     witness.supply_mass_flow_rate_kg_per_s = Some(123.0);
     cp339_private
         .set_cooling_positive_supply_capacity_limit_sensible_output_assignment_latest_witness(
-            system.id,
-            witness,
+            system.id, witness,
         );
     assert_rejected_transactionally(&mut cp339_private, &system, predecessor);
 }
@@ -317,8 +303,7 @@ fn supplied_and_retained_cp341_and_cp339_drift_are_transactional() {
 #[test]
 fn assignment_counter_overflow_is_preflighted_transactionally() {
     for counter in 0..10 {
-        let (mut runtime, system, predecessor) =
-            completed_cp341_case(-100_000.0, 1.0, true);
+        let (mut runtime, system, predecessor) = completed_cp341_case(-100_000.0, 1.0, true);
         let state = &mut runtime
             .units
             .get_mut(&system.id)
@@ -326,10 +311,7 @@ fn assignment_counter_overflow_is_preflighted_transactionally() {
             .calc_cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment;
         match counter {
             0 => state.transition_count = usize::MAX,
-            1 => {
-                state.capacity_limit_sensible_output_supply_enthalpy_assignment_count =
-                    usize::MAX
-            }
+            1 => state.capacity_limit_sensible_output_supply_enthalpy_assignment_count = usize::MAX,
             2 => state.source_site_execution_count = usize::MAX - 5,
             3 => state.mixed_air_enthalpy_read_count = usize::MAX,
             4 => state.cooling_sensible_output_read_count = usize::MAX,
@@ -338,8 +320,7 @@ fn assignment_counter_overflow_is_preflighted_transactionally() {
             7 => state.supply_enthalpy_calculation_count = usize::MAX,
             8 => state.supply_enthalpy_assignment_write_count = usize::MAX,
             9 => {
-                state
-                    .witnessed_capacity_limit_sensible_output_supply_enthalpy_assignment_count =
+                state.witnessed_capacity_limit_sensible_output_supply_enthalpy_assignment_count =
                     usize::MAX
             }
             _ => unreachable!(),
@@ -378,22 +359,12 @@ fn every_nonassignment_route_counter_increment_is_preflighted_transactionally() 
             0 => state.unit_off_skip_count = usize::MAX,
             1 => state.non_cooling_skip_count = usize::MAX,
             2 => state.positive_guard_false_fallthrough_skip_count = usize::MAX,
-            3 => {
-                state.witnessed_positive_guard_false_fallthrough_skip_count =
-                    usize::MAX
-            }
+            3 => state.witnessed_positive_guard_false_fallthrough_skip_count = usize::MAX,
             4 => state.capacity_limit_guard_false_fallthrough_skip_count = usize::MAX,
-            5 => {
-                state.witnessed_capacity_limit_guard_false_fallthrough_skip_count =
-                    usize::MAX
-            }
-            6 => {
-                state.capacity_limit_sensible_output_guard_false_fallthrough_count =
-                    usize::MAX
-            }
+            5 => state.witnessed_capacity_limit_guard_false_fallthrough_skip_count = usize::MAX,
+            6 => state.capacity_limit_sensible_output_guard_false_fallthrough_count = usize::MAX,
             7 => {
-                state
-                    .witnessed_capacity_limit_sensible_output_guard_false_fallthrough_count =
+                state.witnessed_capacity_limit_sensible_output_guard_false_fallthrough_count =
                     usize::MAX
             }
             _ => unreachable!(),

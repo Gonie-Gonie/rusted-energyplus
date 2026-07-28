@@ -53,6 +53,16 @@ fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
             .iter()
             .any(|stage| stage == "calc-purch-air-loads")
     );
+    let cp343 = &summary["rust_runtime"]["purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_lifecycle"];
+    assert_eq!(
+        cp343["source"],
+        "EnergyPlus 26.1 PurchasedAirManager.cc:2201"
+    );
+    assert_eq!(
+        cp343["first_excluded_source"],
+        "EnergyPlus 26.1 PurchasedAirManager.cc:2203"
+    );
+    assert!(cp343["latest"].is_object());
     Ok(())
 }
 
@@ -421,6 +431,14 @@ fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
     assert!(
         rust_runtime
             ["purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle"]
+            .is_null()
+    );
+    assert!(rust_runtime.contains_key(
+        "purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_lifecycle"
+    ));
+    assert!(
+        rust_runtime
+            ["purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_lifecycle"]
             .is_null()
     );
     assert_eq!(summary["source_order_gate"]["matches"], true);

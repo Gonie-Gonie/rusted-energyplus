@@ -1,4 +1,5 @@
 mod public_release;
+pub(in crate::ideal_loads::calc) mod release_fixture;
 
 use super::*;
 use crate::ideal_loads::{
@@ -88,7 +89,7 @@ fn retained_input(
         PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyEnthalpyAssignmentActiveOperands,
 ) -> Option<
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyEnthalpyAssignmentRetainedInput,
-> {
+>{
     if matches!(route, Route::SensibleGuardFalse | Route::Assigned) {
         Some(
             PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyEnthalpyAssignmentRetainedInput {
@@ -176,7 +177,10 @@ fn all_six_routes_have_exact_local_shapes() {
             )
         );
         if matches!(route, Route::SensibleGuardFalse) {
-            assert_eq!(snapshot.preexisting_supply_enthalpy_j_per_kg, Some(33_000.0));
+            assert_eq!(
+                snapshot.preexisting_supply_enthalpy_j_per_kg,
+                Some(33_000.0)
+            );
             assert_eq!(snapshot.resulting_supply_enthalpy_j_per_kg, Some(33_000.0));
             assert!(!snapshot.mixed_air_enthalpy_read);
             assert!(!snapshot.supply_enthalpy_assigned);
@@ -216,7 +220,9 @@ fn arithmetic_divides_then_subtracts_without_reassociation() {
         );
     let snapshot = advance(&mut state, Route::Assigned, 1, 3.0, operands);
     assert_eq!(
-        snapshot.calculated_supply_enthalpy_j_per_kg.map(f64::to_bits),
+        snapshot
+            .calculated_supply_enthalpy_j_per_kg
+            .map(f64::to_bits),
         Some(expected.to_bits())
     );
 }
@@ -261,11 +267,7 @@ fn pure_ieee_transition_keeps_positive_zero_and_negative_infinity() {
 
 #[test]
 fn guard_false_preserves_arbitrary_preexisting_bits_without_sites() {
-    for preexisting in [
-        f64::from_bits(0x7ff8_0000_0000_0342),
-        0.0,
-        -0.0,
-    ] {
+    for preexisting in [f64::from_bits(0x7ff8_0000_0000_0342), 0.0, -0.0] {
         let mut state =
             PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyEnthalpyAssignmentRuntimeState::new(
                 ep_model::IdealLoadsAirSystemId(3),
@@ -278,11 +280,15 @@ fn guard_false_preserves_arbitrary_preexisting_bits_without_sites() {
             ordinary_operands(),
         );
         assert_eq!(
-            snapshot.preexisting_supply_enthalpy_j_per_kg.map(f64::to_bits),
+            snapshot
+                .preexisting_supply_enthalpy_j_per_kg
+                .map(f64::to_bits),
             Some(preexisting.to_bits())
         );
         assert_eq!(
-            snapshot.resulting_supply_enthalpy_j_per_kg.map(f64::to_bits),
+            snapshot
+                .resulting_supply_enthalpy_j_per_kg
+                .map(f64::to_bits),
             Some(preexisting.to_bits())
         );
         assert_eq!(state.source_site_execution_count, 0);

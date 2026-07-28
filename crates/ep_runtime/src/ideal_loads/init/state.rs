@@ -10,66 +10,7 @@ use std::collections::BTreeMap;
 
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
-use super::super::{
-    PurchasedAirCalcCoolingCapacityZeroFlowResetRuntimeState,
-    PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot,
-    PurchasedAirCalcCoolingDehumidificationFlowRuntimeState,
-    PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
-    PurchasedAirCalcCoolingEconomizerBodyRuntimeState,
-    PurchasedAirCalcCoolingEconomizerBodySnapshot,
-    PurchasedAirCalcCoolingEconomizerConditionRuntimeState,
-    PurchasedAirCalcCoolingEconomizerConditionSnapshot,
-    PurchasedAirCalcCoolingEconomizerGuardRuntimeState,
-    PurchasedAirCalcCoolingEntryGateRuntimeState,
-    PurchasedAirCalcCoolingHumidificationFlowRuntimeState,
-    PurchasedAirCalcCoolingHumidificationFlowSnapshot,
-    PurchasedAirCalcCoolingMixedAirCallRuntimeState, PurchasedAirCalcCoolingMixedAirCallSnapshot,
-    PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState,
-    PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState,
-    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitCpAirAssignmentRuntimeState,
-    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitCpAirAssignmentSnapshot,
-    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardRuntimeState,
-    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardSnapshot,
-    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentRuntimeState,
-    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentSnapshot,
-    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardRuntimeState,
-    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardSnapshot,
-    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputMaximumCapacityAssignmentRuntimeState,
-    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputMaximumCapacityAssignmentSnapshot,
-    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyEnthalpyAssignmentRuntimeState,
-    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyEnthalpyAssignmentSnapshot,
-    PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentRuntimeState,
-    PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentSnapshot,
-    PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentRuntimeState,
-    PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentSnapshot,
-    PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentRuntimeState,
-    PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentSnapshot,
-    PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentRuntimeState,
-    PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentSnapshot,
-    PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitRuntimeState,
-    PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitSnapshot,
-    PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitRuntimeState,
-    PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitSnapshot,
-    PurchasedAirCalcCoolingSensibleFlowRuntimeState, PurchasedAirCalcCoolingSensibleFlowSnapshot,
-    PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyRuntimeState,
-    PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
-    PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardRuntimeState,
-    PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
-    PurchasedAirCalcCoolingSupplyMassFlowLimitBodyRuntimeState,
-    PurchasedAirCalcCoolingSupplyMassFlowLimitBodySnapshot,
-    PurchasedAirCalcCoolingSupplyMassFlowLimitGuardRuntimeState,
-    PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot,
-    PurchasedAirCalcCoolingSupplyMassFlowMaximumRuntimeState,
-    PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot,
-    PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardRuntimeState,
-    PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardSnapshot,
-    PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodyRuntimeState,
-    PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
-    PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardRuntimeState,
-    PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardSnapshot, PurchasedAirCalcEntryRuntimeState,
-    PurchasedAirCalcMinimumOaPrefixRuntimeState, PurchasedAirHardSizeLegacyOutcome,
-    PurchasedAirSizedLimits,
-};
+use super::super::*;
 use super::{
     IdealLoadsInitFlags, PurchasedAirInitTopologyDiagnostic, PurchasedAirInitTopologyError,
     PurchasedAirInitTopologyPlan, PurchasedAirRecirculationSource,
@@ -189,6 +130,11 @@ pub struct PurchasedAirRuntimeState {
             IdealLoadsAirSystemId,
             PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyEnthalpyAssignmentSnapshot,
         >,
+    cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_latest_witnesses:
+        BTreeMap<
+            IdealLoadsAirSystemId,
+            PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyTemperatureAssignmentSnapshot,
+        >,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -305,6 +251,9 @@ pub struct PurchasedAirUnitRuntimeState {
     /// Persistent bounded Cooling capacity-limit supply-enthalpy assignment state.
     pub calc_cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment:
         PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyEnthalpyAssignmentRuntimeState,
+    /// Persistent bounded Cooling capacity-limit supply-temperature assignment state.
+    pub calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment:
+        PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyTemperatureAssignmentRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.

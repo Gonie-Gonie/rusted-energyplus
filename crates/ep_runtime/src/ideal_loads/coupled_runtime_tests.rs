@@ -84,9 +84,9 @@ const RETURN_NODE_KEY: &str = "RETURN";
 const ABS_TOLERANCE: f64 = 1.0e-9;
 
 #[test]
-fn cp341_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
-    // Keep the CP341 cumulative regression identity while extending every
-    // route assertion through its new CP342 successor.
+fn cp343_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
+    // Keep the cumulative capacity-limit regression identity while extending
+    // every route assertion through its CP343 successor.
     for (
         availability,
         maximum_capacity_w,
@@ -301,6 +301,137 @@ fn cp341_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
                 latest.resulting_supply_enthalpy_j_per_kg,
             ] {
                 assert_eq!(value.map(f64::to_bits), Some(expected_enthalpy.to_bits()));
+            }
+        }
+
+        let temperature_owner = simulation
+            .summary
+            .calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle
+            .state
+            .latest
+            .expect("latest CP334 temperature-owner snapshot");
+        let humidity_owner = simulation
+            .summary
+            .calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment_lifecycle
+            .state
+            .latest
+            .expect("latest CP335 humidity-owner snapshot");
+        let corroborating = simulation
+            .summary
+            .calc_cooling_positive_supply_enthalpy_assignment_lifecycle
+            .state
+            .latest
+            .expect("latest CP336 corroborating snapshot");
+        let lifecycle = simulation
+            .summary
+            .calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_lifecycle;
+        let state = &lifecycle.state;
+        assert_eq!(state.transition_count, 1);
+        assert_eq!(state.unit_off_skip_count, usize::from(expected_unit_off));
+        assert_eq!(
+            state.capacity_limit_sensible_output_guard_false_fallthrough_count,
+            usize::from(expected_guard_false)
+        );
+        assert_eq!(
+            state.capacity_limit_sensible_output_supply_temperature_assignment_count,
+            usize::from(expected_assignment)
+        );
+        assert_eq!(
+            state.source_site_execution_count,
+            4 * usize::from(expected_assignment)
+        );
+        for count in [
+            state.supply_enthalpy_for_dry_bulb_inversion_read_count,
+            state.supply_humidity_ratio_for_dry_bulb_inversion_read_count,
+            state.psychrometric_supply_temperature_evaluation_count,
+            state.supply_temperature_assignment_write_count,
+        ] {
+            assert_eq!(count, usize::from(expected_assignment));
+        }
+
+        let latest_temperature = state.latest.expect("latest CP343 snapshot");
+        assert_eq!(
+            latest_temperature.capacity_limit_sensible_output_guard_false_fallthrough,
+            expected_guard_false
+        );
+        assert_eq!(
+            latest_temperature
+                .capacity_limit_sensible_output_supply_temperature_assignment_executed,
+            expected_assignment
+        );
+        if expected_unit_off {
+            for value in [
+                latest_temperature.preexisting_supply_temperature_c,
+                latest_temperature.supply_enthalpy_j_per_kg,
+                latest_temperature.supply_humidity_ratio,
+                latest_temperature.psychrometric_supply_temperature_result_c,
+                latest_temperature.assigned_supply_temperature_c,
+                latest_temperature.resulting_supply_temperature_c,
+            ] {
+                assert!(value.is_none());
+            }
+        } else {
+            let preexisting = temperature_owner
+                .assigned_supply_temperature_c
+                .expect("CP334 owned supply temperature");
+            assert_eq!(
+                latest_temperature
+                    .preexisting_supply_temperature_c
+                    .map(f64::to_bits),
+                Some(preexisting.to_bits())
+            );
+            assert_eq!(
+                corroborating.supply_temperature_c.map(f64::to_bits),
+                Some(preexisting.to_bits())
+            );
+            if expected_guard_false {
+                for value in [
+                    latest_temperature.supply_enthalpy_j_per_kg,
+                    latest_temperature.supply_humidity_ratio,
+                    latest_temperature.psychrometric_supply_temperature_result_c,
+                    latest_temperature.assigned_supply_temperature_c,
+                ] {
+                    assert!(value.is_none());
+                }
+                assert_eq!(
+                    latest_temperature
+                        .resulting_supply_temperature_c
+                        .map(f64::to_bits),
+                    Some(preexisting.to_bits())
+                );
+            } else {
+                let enthalpy = latest
+                    .resulting_supply_enthalpy_j_per_kg
+                    .expect("CP342 owned resulting supply enthalpy");
+                let humidity = humidity_owner
+                    .assigned_supply_humidity_ratio
+                    .expect("CP335 owned supply humidity ratio");
+                let expected_temperature =
+                    crate::psychrometrics::energyplus_psy_tdb_fn_h_w(enthalpy, humidity);
+                assert_eq!(
+                    corroborating.supply_humidity_ratio.map(f64::to_bits),
+                    Some(humidity.to_bits())
+                );
+                assert_eq!(
+                    latest_temperature
+                        .supply_enthalpy_j_per_kg
+                        .map(f64::to_bits),
+                    Some(enthalpy.to_bits())
+                );
+                assert_eq!(
+                    latest_temperature.supply_humidity_ratio.map(f64::to_bits),
+                    Some(humidity.to_bits())
+                );
+                for value in [
+                    latest_temperature.psychrometric_supply_temperature_result_c,
+                    latest_temperature.assigned_supply_temperature_c,
+                    latest_temperature.resulting_supply_temperature_c,
+                ] {
+                    assert_eq!(
+                        value.map(f64::to_bits),
+                        Some(expected_temperature.to_bits())
+                    );
+                }
             }
         }
 

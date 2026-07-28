@@ -421,16 +421,24 @@ parent algorithm's `status = "scaffold"` and `claim_level = "none"` boundary.
 
 The existing IdealLoads moist-air enthalpy inverse remains separate. Its
 arithmetic grouping and lack of the canonical `1.0e-5` humidity floor can
-produce different results, so replacing its downstream consumers is deferred
-until the paired enthalpy/inverse compatibility boundary is handled explicitly.
+produce different results. CP343 wires the canonical helper only into the
+bounded `PurchasedAirManager.cc` physical-line-2201 direct lifecycle after
+CP342; replacing any broader downstream consumer remains deferred.
 
 ### `PsyTdbFnHW` (`psy_tdb_fn_h_w`)
 
-The source at `Psychrometrics.hh:743-761` first assigns
+The source at `Psychrometrics.hh:743-762` first assigns
 `W = max(dW, 1.0e-5)` and then evaluates
 `(H - 2.50094e6 * W) / (1.00484e3 + 1.85895e3 * W)`. Rust computes the
 source-compatible humidity floor once and preserves the source numerator and
 denominator grouping. The routine has no cache, diagnostics, or mutable state.
+The locked raw `Psychrometrics.hh` SHA-256 is
+`30C9575BC5A8E73D33D111E0D54A4DA8916AF4534175E9B95071ACA2513AEF45`.
+CP343 supplies enthalpy only from recursively exact CP342, humidity from the
+same-call CP335 owner corroborated by retained CP336 lineage, and assigns the
+result to the bounded local purchased-air supply temperature. It adds no
+cache, diagnostic, state, external numerical parity claim, or broader
+IdealLoads inverse replacement.
 
 <!-- routine-state-contract:v1 begin psy_tdb_fn_h_w -->
 PsyTdbFnHW
@@ -454,7 +462,7 @@ unsupported_active_branches:
 - none; there is no stateful or compile-conditional active branch
 
 not_claimed_branches:
-- external EnergyPlus numerical parity, full IEEE-edge parity, and downstream IdealLoads inverse replacement
+- external EnergyPlus numerical parity, full IEEE-edge parity, and broader downstream IdealLoads inverse replacement beyond bounded CP343 physical line 2201
 <!-- routine-state-contract:v1 end psy_tdb_fn_h_w -->
 
 ### `PsyRhovFnTdbRhLBnd0C` (`psy_rhov_fn_tdb_rh_lbnd0c`)

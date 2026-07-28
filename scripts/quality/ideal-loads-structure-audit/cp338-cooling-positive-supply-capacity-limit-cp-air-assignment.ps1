@@ -281,6 +281,11 @@ foreach ($cp338Interval in @(
         '(?s)let calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment =\s*advance_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment\([^;]+?\)\?;',
         ''
     )
+    $cp338IntervalCode = [regex]::Replace(
+        $cp338IntervalCode,
+        '(?s)let calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment =\s*advance_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment\([^;]+?\)\?;',
+        ''
+    )
     if ($cp338IntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
         throw "No intermediary helper call may execute $($cp338Interval.Description)"
     }
@@ -342,7 +347,7 @@ Assert-Contains -Path $cp338DirectAssertions -Pattern 'source_site_execution_cou
 Assert-Contains -Path $cp338DirectAssertions -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_guard_lifecycle' -Description "direct-run CP337 predecessor evidence"
 Assert-Contains -Path $cp338DirectAssertions -Pattern 'purchased_air_calc_cooling_mixed_air_call_lifecycle' -Description "direct-run CP329 RHS evidence"
 Assert-Contains -Path $cp338NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_cp_air_assignment_lifecycle' -Description "non-direct CP338 null evidence"
-Assert-Contains -Path $cp338PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp342_lifecycle_evidence' -Description "non-direct CP338 through CP342 evidence rejection"
+Assert-Contains -Path $cp338PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp343_lifecycle_evidence' -Description "non-direct CP338 through CP343 evidence rejection"
 Assert-NotContains -Path $cp338Pipeline -Pattern 'latest_numerical|numerical_supply_mass_flow|final_supply_mass_flow|complete_direct_zone_purchased_air_coupling' -Description "numerical DTO reconciliation in CP338 pipeline"
 
 # Exactly two algorithm addenda, two capability addenda, and six target
@@ -484,7 +489,7 @@ foreach ($cp338Documentation in $cp338DocumentationSections) {
 }
 
 # Root reachability and generated inventory account for this one new internal
-# script: 280 executable records, 240 public, 40 internal, and zero uncalled.
+# script: 281 executable records, 240 public, 41 internal, and zero uncalled.
 $cp338MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp337DotSourceIndexForCp338 = $cp338MainAuditText.IndexOf('ideal-loads-structure-audit\cp337-cooling-positive-supply-capacity-limit-guard.ps1')
 $cp338DotSourceIndex = $cp338MainAuditText.IndexOf('ideal-loads-structure-audit\cp338-cooling-positive-supply-capacity-limit-cp-air-assignment.ps1')
@@ -498,12 +503,12 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP338 then CP339 after CP337 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 280' -Description "CP338 cumulative inventory total through CP342"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 281' -Description "CP338 cumulative inventory total through CP343"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment\.ps1"' -Description "CP338 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment\.ps1"' -Description "CP339 internal script inventory record after CP338"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment\.ps1::dot_sources' -Description "CP338 main-audit callee evidence"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment\.ps1::dot_sources' -Description "CP339 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 280 \|' -Description "CP338 generated script count through CP342"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 281 \|' -Description "CP338 generated script count through CP343"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP338 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 40 \|' -Description "CP338 generated internal script count through CP342"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 41 \|' -Description "CP338 generated internal script count through CP343"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP338 generated uncalled script count"

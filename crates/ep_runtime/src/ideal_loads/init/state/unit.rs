@@ -105,6 +105,10 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyEnthalpyAssignmentRuntimeState::new(
                     system,
                 ),
+            calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment:
+                PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyTemperatureAssignmentRuntimeState::new(
+                    system,
+                ),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

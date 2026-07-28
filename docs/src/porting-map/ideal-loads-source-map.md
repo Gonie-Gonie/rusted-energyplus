@@ -20050,6 +20050,84 @@ lifecycle evidence only; support, conformance, capability, status, counts,
 readiness, feature boundaries, evidence cases, numerical conformance, output
 claims, and Roadmap state remain unchanged.
 
+## CP343 Cooling Positive-Supply Capacity-Limit Supply-Temperature Assignment
+
+CP343 maps only pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`
+`PurchasedAirManager.cc` physical executable line 2201,
+`PurchAir.SupplyTemp = PsyTdbFnHW(SupplyEnthalpy, PurchAir.SupplyHumRat);`.
+The locked raw source SHA-256 is
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The exact ordered sites are
+`read-local-supply-enthalpy-for-dry-bulb-inversion`,
+`read-purchased-air-supply-humidity-ratio-for-dry-bulb-inversion`,
+`evaluate-psy-tdb-fn-h-w`, and
+`assign-purchased-air-supply-temperature`. The side-effect-free reads make
+this a deterministic Rust/source-text dependency witness, not a C++ function
+argument-evaluation-order claim.
+
+The canonical inline `PsyTdbFnHW` is locked to `Psychrometrics.hh` physical
+lines 743-762 and raw SHA-256
+`30C9575BC5A8E73D33D111E0D54A4DA8916AF4534175E9B95071ACA2513AEF45`.
+It computes `W = max(dW, 1.0e-5)`, retaining a NaN first argument, and returns
+exactly `(H - 2.50094e6 * W) / (1.00484e3 + 1.85895e3 * W)`.
+Canonical Rust helper `energyplus_psy_tdb_fn_h_w` preserves that grouping and
+has no cache, diagnostic, or mutable state.
+
+Only CP342 `CapacityLimitSensibleOutputSupplyEnthalpyAssigned` executes the
+four sites. Routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`,
+`CapacityLimitSensibleOutputGuardFalseFallthrough`, and
+`CapacityLimitSensibleOutputSupplyTemperatureAssigned`. With transitions
+`T`, inherited `U/N/P/G`, CP340 false fallthroughs `F`, CP343 assignments
+`D`, CP342 assignments `H`, CP341 assignments `M`, and CP340 active
+evaluations `A`, exact algebra is `T = U+N+P+G+F+D`, `A = F+D`, and
+`D = H = M = CP340 adjustment-body entries`. Both read counters, the
+evaluation counter, and the write counter equal `D`;
+`source_site_execution_count = 4*D`, with witnessed/public route parity.
+Neither `D = A` nor `D = CP321 aggregate reads` is required.
+
+Exact release takes only `runtime`, selected `system`, and the same-call CP342
+predecessor. Supplied/latest/private CP342 evidence must match bit-exactly and
+pass recursive completion. CP342 `resulting_supply_enthalpy_j_per_kg` solely
+owns the enthalpy operand; CP336's pre-capacity enthalpy is forbidden.
+Same-call CP335 `assigned_supply_humidity_ratio` owns humidity, while
+same-call CP334 `assigned_supply_temperature_c` owns preexisting temperature.
+The retained CP336 latest/private witness recursively corroborates the latter
+two values without replacing either owner. Caller/model/sizing/Zone re-reads,
+live services, and numerical-DTO operands are forbidden.
+
+The CP340 false route preserves CP334 temperature bits without any CP343
+site; inherited `U/N/P/G` routes expose no CP343 operands or result. Active
+humidity is finite and nonnegative and preexisting temperature is finite, but
+CP343 adds no new finite gate to the exact CP342 enthalpy or helper result.
+The pure transition retains source-shaped floor, signed-zero, first-argument
+NaN, infinity, overflow, numerator/denominator, and final-division behavior
+without normalization, clamp, reassociation, or fused operation. Nonfinite
+results remain pure/defensive characterization, not new full-public
+reachability claims. Characterized nonfinite Rust values remain `Some`;
+direct-only JSON emits null numeric fields plus non-null IEEE bit strings.
+False-route temperature values remain bit-identical `Some` with unread fields
+null; inherited skips remain `None` and null.
+
+Binding and pipeline evidence preserve
+CP342-to-CP343-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_lifecycle`.
+CP343 does not consume, reconcile with, feed, or replace the numerical DTO;
+non-direct paths carry no CP343 evidence. Physical line 2202 is commentary.
+Physical line 2203 is the first excluded lexical executable,
+`PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);`.
+That limit, line 2208, and later behavior remain excluded.
+
+Broader capacity adjustment, purchased-air output ownership, and live-service
+access remain unpromoted. `routine.psy_tdb_fn_h_w` remains `state_mapped`;
+both parent algorithms remain `scaffold`/`none`, and both parent Calc routines
+remain `source_mapped`. CP343 adds only the bounded local dry-bulb inverse,
+target inventory, and lifecycle evidence; support, conformance, capability,
+status, counts, readiness, feature/evidence boundaries, numerical
+conformance, output claims, and Roadmap state remain unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:
