@@ -37,6 +37,7 @@ use super::{
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentError as CoolingCpAirAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentError as CoolingSupplyEnthalpyAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentError as CoolingSupplyHumidityRatioMixedAirAssignmentError,
+    PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlSwitchError as CoolingSupplyPostCapacityLimitDehumidificationControlSwitchError,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentError as CoolingSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentError as CoolingSupplyTemperatureAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitError as CoolingSupplyTemperatureMinimumLimitError,
@@ -95,6 +96,7 @@ mod cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mi
 mod cooling_positive_supply_cp_air_assignment;
 mod cooling_positive_supply_enthalpy_assignment;
 mod cooling_positive_supply_humidity_ratio_mixed_air_assignment;
+mod cooling_positive_supply_post_capacity_limit_dehumidification_control_switch;
 mod cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment;
 mod cooling_positive_supply_temperature_assignment;
 mod cooling_positive_supply_temperature_minimum_limit;
@@ -113,6 +115,7 @@ use cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mi
 use cooling_positive_supply_cp_air_assignment::advance_positive_supply_cp_air_assignment;
 use cooling_positive_supply_enthalpy_assignment::advance_positive_supply_enthalpy_assignment;
 use cooling_positive_supply_humidity_ratio_mixed_air_assignment::advance_positive_supply_humidity_ratio_mixed_air_assignment;
+use cooling_positive_supply_post_capacity_limit_dehumidification_control_switch::advance_positive_supply_post_capacity_limit_dehumidification_control_switch;
 use cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment::advance_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment;
 use cooling_positive_supply_temperature_assignment::advance_positive_supply_temperature_assignment;
 use cooling_positive_supply_temperature_minimum_limit::advance_positive_supply_temperature_minimum_limit;
@@ -757,6 +760,10 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignment(
         CoolingSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentError,
     ),
+    /// The bounded post-capacity-limit dehumidification-control switch rejected its release state.
+    CalculationCoolingPositiveSupplyPostCapacityLimitDehumidificationControlSwitch(
+        CoolingSupplyPostCapacityLimitDehumidificationControlSwitchError,
+    ),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -1199,6 +1206,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit,
         )?;
+    let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch =
+        advance_positive_supply_post_capacity_limit_dehumidification_control_switch(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1272,6 +1285,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment,
         calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit,
         calculation_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment,
+        calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch,
         coupling,
     })
 }

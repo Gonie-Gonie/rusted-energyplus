@@ -18209,6 +18209,82 @@ stays 32 algorithms and 293 routines, 58 `state_mapped` plus 235
 run state, capability, feature/evidence boundaries, numerical conformance,
 output ownership, status, conformance, and Roadmap state remain unchanged.
 
+## CP346 Source-Ordered Cooling Positive-Supply Post-Capacity-Limit Dehumidification-Control Switch
+
+CP346 supersedes only CP345's physical-line-2209 exclusion for the Cooling
+positive-supply post-capacity-limit switch header at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical line 2209:
+`switch (PurchAir.DehumidCtrlType) {`. The locked raw source SHA-256 is
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The exact source order contains two sites:
+
+1. `read-purchased-air-dehumidification-control-type`
+2. `dispatch-dehumidification-control-switch`
+
+The checkpoint ends after symbolic dispatch. It claims no comparison,
+case-label execution, case-body assignment, psychrometric calculation,
+clamp, normalization, cache, diagnostic, or mutable service. Physical line
+2210, `case HumControl::None: {`, is the first excluded lexical construct.
+Physical line 2211,
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat; // Unnecessary line?`,
+is the first excluded executable.
+
+Private transition characterization covers the four typed variants `None`,
+`ConstantSensibleHeatRatio`, `Humidistat`, and
+`ConstantSupplyHumidityRatio`, yielding
+`DehumidificationControlNoneCaseSelected`,
+`DehumidificationControlConstantSensibleHeatRatioCaseSelected`,
+`DehumidificationControlHumidistatCaseSelected`, or
+`DehumidificationControlConstantSupplyHumidityRatioCaseSelected`. C++ orders
+the last two differently from Rust, so every transition, validator, and JSON
+projection uses the named variant/string and never `as usize`, an ordinal,
+or declaration position. The C++ invalid/default route has no typed Rust
+variant and remains outside the claim.
+
+UnitOff, non-cooling, and CP330 positive-guard-false paths skip both sites.
+All CP345 assignments reach the switch header. With transitions `T`, inherited
+skips `U/N/P`, switch executions `S`, the four selection counts
+`D0/DSHR/DH/DCSH`, CP345 assignments `R`, CP337/CP340/CP344 provenance
+`G/F/L`, and CP340 active evaluations `A`, exact checked state requires:
+
+```text
+T = U+N+P+S
+S = D0+DSHR+DH+DCSH = R = G+F+L
+A = F+L
+source_site_execution_count = 2*S
+```
+
+Each read/dispatch counter equals `S`, and private witnessed routes match all
+public route and selection counters. Exact direct release further requires
+`D0=S` and `DSHR=DH=DCSH=0`. The other three named cases are private typed
+characterization, not direct lifecycle reachability. Direct fixtures set
+`dehumidification_control_type` explicitly to `None`; they do not rely on the
+compiler default `ConstantSensibleHeatRatio`.
+
+The selected typed `IdealLoadsAirSystem.dehumidification_control_type` is the
+sole selector owner. Exact release accepts only runtime, the selected system,
+and same-call CP345. Before mutation it requires supplied/latest/private
+CP345 identity and recursive completion, plus, on CP346-active G/F/L routes,
+selected-system equality with same-call CP319 latest/private selector
+evidence. CP319 is corroboration, not a replacement owner or CP346
+source-site count. In particular, no aggregate
+equality between CP319 reads and `S` is valid because positive-guard-false
+route `P` performs the earlier CP319 read but skips line 2209.
+
+Binding and direct-only lifecycle evidence preserve
+CP345-to-CP346-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_lifecycle`.
+The enum is serialized by symbolic name. CP346 neither consumes nor
+reconciles with `DirectZonePurchasedAirCouplingInput`, and does not feed or
+replace the numerical DTO. Non-direct paths expose `None` and reject attached
+CP346 evidence. Counts remain 32 algorithms and 293 routines, 58
+`state_mapped` plus 235 `source_mapped`, with 170 required. Both parent
+algorithms remain `scaffold`/`none`; `routine.calc_purch_air_loads` and
+`routine.calc_purch_air_mixed_air` remain `source_mapped`. Support, readiness,
+run state, capability, feature/evidence boundaries, numerical conformance,
+output ownership, status, conformance, and Roadmap state remain unchanged.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before

@@ -368,6 +368,11 @@ foreach ($cp344BindingInterval in @(
         '(?s)let calculation_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment =\s*advance_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment\([^;]+?\)\?;',
         ''
     )
+    $cp344BindingIntervalCode = [regex]::Replace(
+        $cp344BindingIntervalCode,
+        '(?s)let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch =\s*advance_positive_supply_post_capacity_limit_dehumidification_control_switch\([^;]+?\)\?;',
+        ''
+    )
     if ($cp344BindingIntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
         throw "No intermediary helper call may execute $($cp344BindingInterval.Description)"
     }
@@ -574,7 +579,7 @@ if (
 ) {
     throw "Pipeline must expose CP344 lifecycle through one direct Some/result and all three non-direct None constructors"
 }
-Assert-Contains -Path $cp344PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp345_lifecycle_evidence' -Description "non-direct CP344/CP345 evidence rejection"
+Assert-Contains -Path $cp344PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp346_lifecycle_evidence' -Description "non-direct CP344 through CP346 evidence rejection"
 
 # Specs contain exactly two addenda and the 2+2+1+1 target distribution.
 $cp344AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
@@ -756,12 +761,12 @@ foreach ($cp344HistoricalFirewallAudit in @(
         "scripts\quality\ideal-loads-structure-audit\cp342-cooling-positive-supply-capacity-limit-sensible-output-supply-enthalpy-assignment.ps1",
         "scripts\quality\ideal-loads-structure-audit\cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1"
     )) {
-    Assert-Contains -Path $cp344HistoricalFirewallAudit -Pattern 'non_direct_runtime_rejects_cp316_through_cp345_lifecycle_evidence' -Description "historical non-direct firewall reaches CP345"
+    Assert-Contains -Path $cp344HistoricalFirewallAudit -Pattern 'non_direct_runtime_rejects_cp316_through_cp346_lifecycle_evidence' -Description "historical non-direct firewall reaches CP346"
 }
-Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1" -Pattern 'cp345_direct_coupled_runtime_accepts_post_capacity_join_and_inherited_skip_routes' -Description "cumulative coupled CP345 regression"
+Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1" -Pattern 'cp346_direct_coupled_runtime_dispatches_none_after_g_f_l_and_skips_unit_off' -Description "cumulative coupled CP346 regression"
 
 # Root reachability and generated inventory add one internal script:
-# 283 executable records, 240 public, 43 internal, and zero uncalled.
+# 284 executable records, 240 public, 44 internal, and zero uncalled.
 $cp344MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp343DotSourceIndexForCp344 = $cp344MainAuditText.IndexOf('ideal-loads-structure-audit\cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1')
 $cp344DotSourceIndex = $cp344MainAuditText.IndexOf('ideal-loads-structure-audit\cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit.ps1')
@@ -773,11 +778,11 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP344 after CP343 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 283' -Description "CP344 cumulative inventory total through CP345"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 284' -Description "CP344 cumulative inventory total through CP346"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP344 cumulative uncalled inventory"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit\.ps1"' -Description "CP344 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit\.ps1::dot_sources' -Description "CP344 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 283 \|' -Description "CP344 generated script count through CP345"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 284 \|' -Description "CP344 generated script count through CP346"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP344 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 43 \|' -Description "CP344 generated internal script count through CP345"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 44 \|' -Description "CP344 generated internal script count through CP346"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP344 generated uncalled script count"

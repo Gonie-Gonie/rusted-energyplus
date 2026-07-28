@@ -145,6 +145,11 @@ pub struct PurchasedAirRuntimeState {
             IdealLoadsAirSystemId,
             PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentSnapshot,
         >,
+    cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_latest_witnesses:
+        BTreeMap<
+            IdealLoadsAirSystemId,
+            PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlSwitchSnapshot,
+        >,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -270,6 +275,9 @@ pub struct PurchasedAirUnitRuntimeState {
     /// Persistent bounded post-capacity-limit mixed-air humidity-ratio assignment state.
     pub calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment:
         PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentRuntimeState,
+    /// Persistent bounded post-capacity-limit dehumidification-control switch state.
+    pub calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch:
+        PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlSwitchRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.

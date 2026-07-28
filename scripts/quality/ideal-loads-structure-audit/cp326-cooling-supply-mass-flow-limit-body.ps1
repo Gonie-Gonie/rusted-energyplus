@@ -574,8 +574,13 @@ $postCp339BeforeNumericalCodeForCp326 = [regex]::Replace(
     '(?s)let calculation_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment =\s*advance_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment\([^;]+?\)\?;',
     ''
 )
+$postCp339BeforeNumericalCodeForCp326 = [regex]::Replace(
+    $postCp339BeforeNumericalCodeForCp326,
+    '(?s)let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch =\s*advance_positive_supply_post_capacity_limit_dehumidification_control_switch\([^;]+?\)\?;',
+    ''
+)
 if ($postCp339BeforeNumericalCodeForCp326 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No helper other than the audited CP340 through CP345 releases may execute after CP339 and before numerical Calc"
+    throw "No helper other than the audited CP340 through CP346 releases may execute after CP339 and before numerical Calc"
 }
 
 Assert-Contains -Path $idealLoadsBinding -Pattern 'CalculationCoolingSupplyMassFlowLimitBody\(\s*PurchasedAirCalcCoolingSupplyMassFlowLimitBodyError,?\s*\)' -Description "CP326 scheduled binding error boundary"

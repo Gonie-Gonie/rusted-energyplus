@@ -1,4 +1,4 @@
-mod public_release;
+pub(in crate::ideal_loads::calc) mod public_release;
 mod release_corruption;
 
 use super::*;

@@ -84,7 +84,7 @@ const RETURN_NODE_KEY: &str = "RETURN";
 const ABS_TOLERANCE: f64 = 1.0e-9;
 
 #[test]
-fn cp345_direct_coupled_runtime_accepts_post_capacity_join_and_inherited_skip_routes() {
+fn cp346_direct_coupled_runtime_dispatches_none_after_g_f_l_and_skips_unit_off() {
     // Keep the cumulative capacity-limit regression identity while extending
     // every route assertion through its CP344 successor.
     for (
@@ -713,6 +713,76 @@ fn cp345_direct_coupled_runtime_accepts_post_capacity_join_and_inherited_skip_ro
             );
         }
 
+        let control_lifecycle = simulation
+            .summary
+            .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_lifecycle;
+        let control_state = &control_lifecycle.state;
+        assert_eq!(control_state.transition_count, 1);
+        assert_eq!(
+            control_state.unit_off_skip_count,
+            usize::from(expected_unit_off)
+        );
+        assert_eq!(
+            control_state.dehumidification_control_switch_count,
+            usize::from(expected_cp345_assignment)
+        );
+        assert_eq!(
+            control_state.source_site_execution_count,
+            2 * usize::from(expected_cp345_assignment)
+        );
+        assert_eq!(
+            control_state.dehumidification_control_type_read_count,
+            usize::from(expected_cp345_assignment)
+        );
+        assert_eq!(
+            control_state.dehumidification_control_switch_dispatch_count,
+            usize::from(expected_cp345_assignment)
+        );
+        assert_eq!(
+            control_state.dehumidification_control_none_case_selection_count,
+            usize::from(expected_cp345_assignment)
+        );
+        assert_eq!(
+            control_state
+                .dehumidification_control_constant_sensible_heat_ratio_case_selection_count,
+            0
+        );
+        assert_eq!(
+            control_state.dehumidification_control_humidistat_case_selection_count,
+            0
+        );
+        assert_eq!(
+            control_state
+                .dehumidification_control_constant_supply_humidity_ratio_case_selection_count,
+            0
+        );
+        let latest_control = control_state.latest.expect("latest CP346 snapshot");
+        assert_eq!(
+            latest_control
+                .predecessor_post_capacity_limit_supply_humidity_ratio_mixed_air_assignment_executed,
+            expected_cp345_assignment
+        );
+        assert_eq!(
+            latest_control
+                .predecessor_assigned_supply_humidity_ratio
+                .map(f64::to_bits),
+            latest_assignment
+                .assigned_supply_humidity_ratio
+                .map(f64::to_bits)
+        );
+        assert_eq!(
+            latest_control.dehumidification_control_type_read,
+            expected_cp345_assignment
+        );
+        assert_eq!(
+            latest_control.dehumidification_control_type,
+            expected_cp345_assignment.then_some(DehumidificationControlType::None)
+        );
+        assert_eq!(
+            latest_control.dehumidification_control_switch_dispatched,
+            expected_cp345_assignment
+        );
+
         assert_eq!(simulation.summary.coupling_call_count, 1);
         assert!(
             simulation
@@ -725,7 +795,7 @@ fn cp345_direct_coupled_runtime_accepts_post_capacity_join_and_inherited_skip_ro
 }
 
 #[test]
-fn cp345_direct_coupled_runtime_covers_non_cooling_and_positive_guard_false_skips() {
+fn cp346_direct_coupled_runtime_covers_non_cooling_and_positive_guard_false_skips() {
     for (
         cooling_setpoint_c,
         cooling_limit,
@@ -808,6 +878,52 @@ fn cp345_direct_coupled_runtime_covers_non_cooling_and_positive_guard_false_skip
         assert!(!latest.supply_humidity_ratio_assignment_performed);
         assert!(latest.mixed_air_humidity_ratio.is_none());
         assert!(latest.assigned_supply_humidity_ratio.is_none());
+
+        let control_state = &simulation
+            .summary
+            .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_lifecycle
+            .state;
+        assert_eq!(control_state.transition_count, 1);
+        assert_eq!(control_state.unit_off_skip_count, 0);
+        assert_eq!(
+            control_state.non_cooling_skip_count,
+            usize::from(expected_non_cooling)
+        );
+        assert_eq!(
+            control_state.positive_guard_false_fallthrough_skip_count,
+            usize::from(expected_positive_guard_false)
+        );
+        assert_eq!(control_state.dehumidification_control_switch_count, 0);
+        assert_eq!(control_state.source_site_execution_count, 0);
+        assert_eq!(control_state.dehumidification_control_type_read_count, 0);
+        assert_eq!(
+            control_state.dehumidification_control_switch_dispatch_count,
+            0
+        );
+        let latest_control = control_state.latest.expect("latest CP346 N/P snapshot");
+        assert_eq!(latest_control.non_cooling_skipped, expected_non_cooling);
+        assert_eq!(
+            latest_control.positive_guard_false_fallthrough_skipped,
+            expected_positive_guard_false
+        );
+        assert!(!latest_control.dehumidification_control_type_read);
+        assert!(latest_control.dehumidification_control_type.is_none());
+        assert!(!latest_control.dehumidification_control_switch_dispatched);
+
+        let cp319_latest = simulation
+            .summary
+            .calc_cooling_dehumidification_flow_lifecycle
+            .state
+            .latest
+            .expect("latest CP319 corroborating snapshot");
+        assert_eq!(
+            cp319_latest.dehumidification_control_type_read, expected_positive_guard_false,
+            "CP319 reads the selector on P while CP346 correctly skips it"
+        );
+        assert_eq!(
+            cp319_latest.dehumidification_control_type,
+            expected_positive_guard_false.then_some(DehumidificationControlType::None)
+        );
     }
 }
 

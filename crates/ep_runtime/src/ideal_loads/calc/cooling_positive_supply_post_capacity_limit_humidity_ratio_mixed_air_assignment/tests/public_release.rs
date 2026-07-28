@@ -8,7 +8,7 @@ use crate::ideal_loads::{
     purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle_summary,
 };
 
-pub(super) fn completed_cp344_case(
+pub(in crate::ideal_loads::calc) fn completed_cp344_case(
     cooling_demand_w: f64,
     overall_availability: f64,
     capacity_limit: bool,

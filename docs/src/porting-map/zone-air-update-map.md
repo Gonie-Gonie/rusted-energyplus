@@ -22717,6 +22717,63 @@ only target/lifecycle evidence and changes no readiness, support, capability,
 feature/evidence boundary, numerical conformance, output ownership, status,
 conformance, or Roadmap state.
 
+## CP346 Cooling Positive-Supply Dehumidification-Control Switch Placement
+
+CP346 extends the exact direct-Zone update sequence from CP345 through pinned
+`PurchasedAirManager.cc` physical line 2209:
+`switch (PurchAir.DehumidCtrlType) {`. Commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`
+remain locked. The source-site order is exactly
+`read-purchased-air-dehumidification-control-type` then
+`dispatch-dehumidification-control-switch`.
+
+The checkpoint witnesses only the selected-system enum read and symbolic
+dispatch. It performs no case comparison, label, body assignment, numerical
+operation, psychrometric call, clamp, normalization, or service access.
+Line 2210, `case HumControl::None: {`, is the first excluded lexical
+construct. Line 2211,
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat; // Unnecessary line?`,
+is the first excluded executable.
+
+The private routes are `DehumidificationControlNoneCaseSelected`,
+`DehumidificationControlConstantSensibleHeatRatioCaseSelected`,
+`DehumidificationControlHumidistatCaseSelected`, and
+`DehumidificationControlConstantSupplyHumidityRatioCaseSelected`. They are
+chosen by the named variants `None`, `ConstantSensibleHeatRatio`,
+`Humidistat`, and `ConstantSupplyHumidityRatio`. C++ and Rust reverse the
+declaration order of the last two, so ordinal casts and position-based
+mapping are forbidden; JSON also uses symbolic names. The C++ invalid/default
+path has no typed Rust representation and is not claimed.
+
+For transitions `T`, inherited skips `U/N/P`, switch executions `S`, four
+selection counts `D0/DSHR/DH/DCSH`, CP345 assignments `R`, predecessor
+provenance `G/F/L`, and CP340 active evaluations `A`, exact state requires
+`T=U+N+P+S`, `S=D0+DSHR+DH+DCSH=R=G+F+L`, and `A=F+L`.
+Each site counter equals `S` and source sites equal `2*S`. Direct execution
+additionally requires `D0=S` with `DSHR=DH=DCSH=0`; direct fixtures
+explicitly set `None`, while the remaining named modes stay private
+characterization.
+
+The selected typed system solely owns `dehumidification_control_type`. On
+CP346-active G/F/L routes, same-call CP319 latest/private selector evidence
+corroborates that value, and same-call CP345 supplied/latest/private evidence
+provides the recursively complete immediate predecessor. CP319 aggregate
+selector reads are not equal to `S`, because positive-guard-false route `P`
+reads in CP319 but skips line 2209.
+
+Binding, coupled execution, and pipeline serialization preserve
+CP345-to-CP346-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_lifecycle`.
+No CP346 evidence enters `DirectZonePurchasedAirCouplingInput`; CP346 does not
+consume, reconcile with, feed, or replace the numerical DTO. Non-direct paths
+publish `None` and reject attached evidence. Both parents remain
+`scaffold`/`none`, both Calc routines remain `source_mapped`, and counts
+remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
+170 required. CP346 adds only target/lifecycle evidence and changes no
+readiness, support, capability, feature/evidence boundary, numerical
+conformance, output ownership, status, conformance, or Roadmap state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

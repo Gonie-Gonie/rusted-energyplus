@@ -181,6 +181,71 @@ fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
             "{field} bits"
         );
     }
+    let cp346 = &summary["rust_runtime"]["purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_lifecycle"];
+    assert_eq!(
+        cp346["source"],
+        "EnergyPlus 26.1 PurchasedAirManager.cc:2209"
+    );
+    assert_eq!(
+        cp346["first_excluded_source"],
+        "EnergyPlus 26.1 PurchasedAirManager.cc:2211"
+    );
+    assert_eq!(
+        cp346["latest"]["source_order"]
+            .as_array()
+            .expect("CP346 source order"),
+        &[
+            "read-purchased-air-dehumidification-control-type",
+            "dispatch-dehumidification-control-switch",
+        ]
+    );
+    for (cp346_field, cp345_field) in [
+        (
+            "predecessor_capacity_limit_guard_false_fallthrough",
+            "capacity_limit_guard_false_fallthrough_skipped",
+        ),
+        (
+            "predecessor_capacity_limit_sensible_output_guard_false_fallthrough",
+            "capacity_limit_sensible_output_guard_false_fallthrough",
+        ),
+        (
+            "predecessor_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_executed",
+            "capacity_limit_sensible_output_supply_temperature_mixed_air_limit_executed",
+        ),
+    ] {
+        assert_eq!(
+            cp346["latest"][cp346_field], cp345["latest"][cp345_field],
+            "CP346 must retain CP345 {cp345_field} provenance"
+        );
+    }
+    assert_eq!(
+        cp346["latest"]["predecessor_post_capacity_limit_supply_humidity_ratio_mixed_air_assignment_executed"],
+        true
+    );
+    assert_eq!(
+        cp346["latest"]["predecessor_assigned_supply_humidity_ratio"],
+        cp345["latest"]["assigned_supply_humidity_ratio"]
+    );
+    assert_eq!(cp346["latest"]["dehumidification_control_type_read"], true);
+    assert_eq!(cp346["latest"]["dehumidification_control_type"], "None");
+    assert_eq!(
+        cp346["latest"]["dehumidification_control_switch_dispatched"],
+        true
+    );
+    assert_eq!(
+        cp346["dehumidification_control_switch_count"],
+        cp345["post_capacity_limit_supply_humidity_ratio_mixed_air_assignment_count"]
+    );
+    assert_eq!(
+        cp346["dehumidification_control_none_case_selection_count"],
+        cp346["dehumidification_control_switch_count"]
+    );
+    let cp319 = &summary["rust_runtime"]["purchased_air_calc_cooling_dehumidification_flow_lifecycle"]
+        ["latest"];
+    assert_eq!(
+        cp319["dehumidification_control_type"], cp346["latest"]["dehumidification_control_type"],
+        "same-call CP319 None selector is corroboration, not CP346 operand ownership"
+    );
     Ok(())
 }
 
@@ -573,6 +638,14 @@ fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
     assert!(
         rust_runtime
             ["purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle"]
+            .is_null()
+    );
+    assert!(rust_runtime.contains_key(
+        "purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_lifecycle"
+    ));
+    assert!(
+        rust_runtime
+            ["purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_lifecycle"]
             .is_null()
     );
     assert_eq!(summary["source_order_gate"]["matches"], true);

@@ -8,6 +8,8 @@ mod release;
 mod state;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::public_release::completed_cp344_case;
 mod transition;
 
 #[allow(unused_imports)]
