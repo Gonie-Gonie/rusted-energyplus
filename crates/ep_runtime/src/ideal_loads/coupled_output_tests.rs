@@ -8,6 +8,8 @@ mod cooling_capacity_zero_flow_reset_fixture;
 mod cooling_humidification_flow_fixture;
 #[path = "coupled_output_tests/cooling_mixed_air_call_fixture.rs"]
 mod cooling_mixed_air_call_fixture;
+#[path = "coupled_output_tests/cooling_positive_supply_capacity_limit_guard_fixture.rs"]
+mod cooling_positive_supply_capacity_limit_guard_fixture;
 #[path = "coupled_output_tests/cooling_positive_supply_cp_air_assignment_fixture.rs"]
 mod cooling_positive_supply_cp_air_assignment_fixture;
 #[path = "coupled_output_tests/cooling_positive_supply_enthalpy_assignment_fixture.rs"]
@@ -88,6 +90,7 @@ use assertions::{assert_values, sentinel_results};
 use cooling_capacity_zero_flow_reset_fixture::calculation_cooling_capacity_zero_flow_reset_snapshot;
 use cooling_humidification_flow_fixture::calculation_cooling_humidification_flow_snapshot;
 use cooling_mixed_air_call_fixture::calculation_cooling_mixed_air_call_snapshot;
+use cooling_positive_supply_capacity_limit_guard_fixture::calculation_cooling_positive_supply_capacity_limit_guard_snapshot;
 use cooling_positive_supply_cp_air_assignment_fixture::calculation_cooling_positive_supply_cp_air_assignment_snapshot;
 use cooling_positive_supply_enthalpy_assignment_fixture::calculation_cooling_positive_supply_enthalpy_assignment_snapshot;
 use cooling_positive_supply_humidity_ratio_mixed_air_assignment_fixture::calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment_snapshot;
@@ -669,6 +672,11 @@ fn scaled_output(
             calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment,
             calculation_cooling_positive_supply_temperature_mixed_air_limit,
         );
+    let calculation_cooling_positive_supply_capacity_limit_guard =
+        calculation_cooling_positive_supply_capacity_limit_guard_snapshot(
+            calculation_cooling_positive_supply_enthalpy_assignment,
+            system.cooling_limit,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -718,6 +726,7 @@ fn scaled_output(
         calculation_cooling_positive_supply_temperature_mixed_air_limit,
         calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment,
         calculation_cooling_positive_supply_enthalpy_assignment,
+        calculation_cooling_positive_supply_capacity_limit_guard,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

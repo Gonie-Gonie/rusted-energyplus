@@ -83,6 +83,8 @@ impl PurchasedAirUnitRuntimeState {
                 ),
             calc_cooling_positive_supply_enthalpy_assignment:
                 PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentRuntimeState::new(system),
+            calc_cooling_positive_supply_capacity_limit_guard:
+                PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

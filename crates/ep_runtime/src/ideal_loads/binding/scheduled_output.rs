@@ -8,6 +8,7 @@ use super::super::{
     PurchasedAirCalcCoolingEconomizerGuardSnapshot, PurchasedAirCalcCoolingEntryGateSnapshot,
     PurchasedAirCalcCoolingHumidificationFlowSnapshot, PurchasedAirCalcCoolingMixedAirCallSnapshot,
     PurchasedAirCalcCoolingOaMaxFlowBodySnapshot, PurchasedAirCalcCoolingOaMaxFlowGateSnapshot,
+    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentSnapshot,
@@ -105,6 +106,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered cooling positive-supply enthalpy assignment snapshot.
     pub calculation_cooling_positive_supply_enthalpy_assignment:
         PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentSnapshot,
+    /// Source-ordered cooling positive-supply capacity-limit guard snapshot.
+    pub calculation_cooling_positive_supply_capacity_limit_guard:
+        PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

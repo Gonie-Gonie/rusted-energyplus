@@ -20,6 +20,8 @@ use fixtures::ONE_DAY_EPW;
 
 #[path = "arbitrary_run_direct_zone_coupled/cooling_mixed_air_call_assertions.rs"]
 mod cooling_mixed_air_call_assertions;
+#[path = "arbitrary_run_direct_zone_coupled/cooling_positive_supply_capacity_limit_guard_assertions.rs"]
+mod cooling_positive_supply_capacity_limit_guard_assertions;
 #[path = "arbitrary_run_direct_zone_coupled/cooling_positive_supply_cp_air_assignment_assertions.rs"]
 mod cooling_positive_supply_cp_air_assignment_assertions;
 #[path = "arbitrary_run_direct_zone_coupled/cooling_positive_supply_enthalpy_assignment_assertions.rs"]
@@ -50,6 +52,7 @@ mod cooling_supply_mass_flow_very_small_guard_assertions;
 mod cooling_supply_mass_flow_very_small_guard_body_assertions;
 
 use cooling_mixed_air_call_assertions::assert_cooling_mixed_air_call;
+use cooling_positive_supply_capacity_limit_guard_assertions::assert_cooling_positive_supply_capacity_limit_guard;
 use cooling_positive_supply_cp_air_assignment_assertions::assert_cooling_positive_supply_cp_air_assignment;
 use cooling_positive_supply_enthalpy_assignment_assertions::assert_cooling_positive_supply_enthalpy_assignment;
 use cooling_positive_supply_humidity_ratio_mixed_air_assignment_assertions::assert_cooling_positive_supply_humidity_ratio_mixed_air_assignment;
@@ -966,6 +969,13 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
         expected_calls,
     );
     assert_cooling_positive_supply_enthalpy_assignment(runtime, expected_calls, 0, expected_calls);
+    assert_cooling_positive_supply_capacity_limit_guard(
+        runtime,
+        expected_calls,
+        0,
+        expected_calls,
+        "NoLimit",
+    );
 }
 
 fn assert_zero_effect_cooling_oa_max_flow_body(
@@ -2816,6 +2826,13 @@ fn all_hard_sized_finite_limit_branches_limit_live_cooling()
             0,
         );
         assert_cooling_positive_supply_enthalpy_assignment(&summary["rust_runtime"], 2, 0, 0);
+        assert_cooling_positive_supply_capacity_limit_guard(
+            &summary["rust_runtime"],
+            2,
+            0,
+            0,
+            limit,
+        );
 
         let results = read_json(&output_dir.join("results").join("result-store.json"))?;
         let cooling_rate = find_series(
@@ -2890,6 +2907,7 @@ fn no_limit_cooling_publishes_active_cp331_and_cp332_json_lineage()
     assert_cooling_positive_supply_temperature_mixed_air_limit(runtime, 2, 0, 0);
     assert_cooling_positive_supply_humidity_ratio_mixed_air_assignment(runtime, 2, 0, 0);
     assert_cooling_positive_supply_enthalpy_assignment(runtime, 2, 0, 0);
+    assert_cooling_positive_supply_capacity_limit_guard(runtime, 2, 0, 0, "NoLimit");
     assert_eq!(
         runtime["purchased_air_calc_cooling_positive_supply_cp_air_assignment_lifecycle"]["cp_air_assignment_count"],
         2
@@ -2960,6 +2978,13 @@ fn zero_capacity_finite_limit_run_resets_all_three_cooling_candidates()
             0,
         );
         assert_cooling_positive_supply_enthalpy_assignment(&summary["rust_runtime"], 2, 0, 0);
+        assert_cooling_positive_supply_capacity_limit_guard(
+            &summary["rust_runtime"],
+            2,
+            0,
+            0,
+            limit,
+        );
     }
     Ok(())
 }

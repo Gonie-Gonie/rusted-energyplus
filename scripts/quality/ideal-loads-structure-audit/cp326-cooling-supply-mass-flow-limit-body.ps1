@@ -251,7 +251,8 @@ Assert-Contains -Path $idealLoadsInitWitnesses -Pattern 'pub\(in crate::ideal_lo
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub calc_cooling_supply_mass_flow_limit_body:\s*[\r\n]+\s*PurchasedAirCalcCoolingSupplyMassFlowLimitBodyRuntimeState' -Description "per-unit CP326 persistent state"
 
 # Binding order is CP325 -> CP326 -> CP327 -> CP328 -> CP329 -> CP330 ->
-# CP331 -> CP332 -> CP333 -> CP334 -> CP335 -> CP336 -> the unchanged numerical DTO.
+# CP331 -> CP332 -> CP333 -> CP334 -> CP335 -> CP336 -> CP337 -> the
+# unchanged numerical DTO.
 $cp326BindingText = Read-RepoText -Path $idealLoadsBinding
 $cp325BindingIndexForCp326 = $cp326BindingText.IndexOf("let calculation_cooling_supply_mass_flow_limit_guard =")
 $cp326BindingIndex = $cp326BindingText.IndexOf("let calculation_cooling_supply_mass_flow_limit_body =")
@@ -265,6 +266,7 @@ $cp333BindingIndexForCp326 = $cp326BindingText.IndexOf("let calculation_cooling_
 $cp334BindingIndexForCp326 = $cp326BindingText.IndexOf("let calculation_cooling_positive_supply_temperature_mixed_air_limit =")
 $cp335BindingIndexForCp326 = $cp326BindingText.IndexOf("let calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment =")
 $cp336BindingIndexForCp326 = $cp326BindingText.IndexOf("let calculation_cooling_positive_supply_enthalpy_assignment =")
+$cp337BindingIndexForCp326 = $cp326BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_guard =")
 $numericalBindingIndexForCp326 = $cp326BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp325BindingIndexForCp326 -lt 0 -or
@@ -279,9 +281,10 @@ if (
     $cp334BindingIndexForCp326 -le $cp333BindingIndexForCp326 -or
     $cp335BindingIndexForCp326 -le $cp334BindingIndexForCp326 -or
     $cp336BindingIndexForCp326 -le $cp335BindingIndexForCp326 -or
-    $numericalBindingIndexForCp326 -le $cp336BindingIndexForCp326
+    $cp337BindingIndexForCp326 -le $cp336BindingIndexForCp326 -or
+    $numericalBindingIndexForCp326 -le $cp337BindingIndexForCp326
 ) {
-    throw "Binding must retain exact CP325 -> CP326 -> CP327 -> CP328 -> CP329 -> CP330 -> CP331 -> CP332 -> CP333 -> CP334 -> CP335 -> CP336 -> numerical Calc order"
+    throw "Binding must retain exact CP325 -> CP326 -> CP327 -> CP328 -> CP329 -> CP330 -> CP331 -> CP332 -> CP333 -> CP334 -> CP335 -> CP336 -> CP337 -> numerical Calc order"
 }
 Assert-Contains -Path $idealLoadsBinding -Pattern '(?s)let calculation_cooling_supply_mass_flow_limit_body =\s*advance_direct_no_oa_calc_cooling_supply_mass_flow_limit_body\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_supply_mass_flow_limit_guard,\s*\)' -Description "binding exact CP325-to-CP326 wrapper call without flow scalar"
 $cp325BindingCallForCp326 = [regex]::Match(
@@ -332,6 +335,10 @@ $cp336BindingCallForCp326 = [regex]::Match(
     $cp326BindingText,
     '(?s)let calculation_cooling_positive_supply_enthalpy_assignment =\s*advance_positive_supply_enthalpy_assignment\([^;]+?\)\?;'
 )
+$cp337BindingCallForCp326 = [regex]::Match(
+    $cp326BindingText,
+    '(?s)let calculation_cooling_positive_supply_capacity_limit_guard =\s*advance_positive_supply_capacity_limit_guard\([^;]+?\)\?;'
+)
 if (
     -not $cp325BindingCallForCp326.Success -or
     -not $cp326BindingCall.Success -or
@@ -344,9 +351,10 @@ if (
     -not $cp333BindingCallForCp326.Success -or
     -not $cp334BindingCallForCp326.Success -or
     -not $cp335BindingCallForCp326.Success -or
-    -not $cp336BindingCallForCp326.Success
+    -not $cp336BindingCallForCp326.Success -or
+    -not $cp337BindingCallForCp326.Success
 ) {
-    throw "Binding must retain complete CP325, CP326, CP327, CP328, CP329, CP330, CP331, CP332, CP333, CP334, CP335, and CP336 exact release calls"
+    throw "Binding must retain complete CP325, CP326, CP327, CP328, CP329, CP330, CP331, CP332, CP333, CP334, CP335, CP336, and CP337 exact release calls"
 }
 $cp325BindingCallEndForCp326 =
     $cp325BindingCallForCp326.Index + $cp325BindingCallForCp326.Length
@@ -371,6 +379,8 @@ $cp335BindingCallEndForCp326 =
     $cp335BindingCallForCp326.Index + $cp335BindingCallForCp326.Length
 $cp336BindingCallEndForCp326 =
     $cp336BindingCallForCp326.Index + $cp336BindingCallForCp326.Length
+$cp337BindingCallEndForCp326 =
+    $cp337BindingCallForCp326.Index + $cp337BindingCallForCp326.Length
 if (
     $cp326BindingIndex -lt $cp325BindingCallEndForCp326 -or
     $cp327BindingIndexForCp326 -lt $cp326BindingCallEnd -or
@@ -383,9 +393,10 @@ if (
     $cp334BindingIndexForCp326 -lt $cp333BindingCallEndForCp326 -or
     $cp335BindingIndexForCp326 -lt $cp334BindingCallEndForCp326 -or
     $cp336BindingIndexForCp326 -lt $cp335BindingCallEndForCp326 -or
-    $numericalBindingIndexForCp326 -lt $cp336BindingCallEndForCp326
+    $cp337BindingIndexForCp326 -lt $cp336BindingCallEndForCp326 -or
+    $numericalBindingIndexForCp326 -lt $cp337BindingCallEndForCp326
 ) {
-    throw "CP325, CP326, CP327, CP328, CP329, CP330, CP331, CP332, CP333, CP334, CP335, and CP336 exact release calls must complete in source order before numerical Calc"
+    throw "CP325, CP326, CP327, CP328, CP329, CP330, CP331, CP332, CP333, CP334, CP335, CP336, and CP337 exact release calls must complete in source order before numerical Calc"
 }
 $postCp325BeforeCp326 = $cp326BindingText.Substring(
     $cp325BindingCallEndForCp326,
@@ -480,14 +491,23 @@ $postCp335BeforeCp336CodeForCp326 =
 if ($postCp335BeforeCp336CodeForCp326 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
     throw "No intermediary helper call may execute after CP335 and before CP336"
 }
-$postCp336BeforeNumericalForCp326 = $cp326BindingText.Substring(
+$postCp336BeforeCp337ForCp326 = $cp326BindingText.Substring(
     $cp336BindingCallEndForCp326,
-    $numericalBindingIndexForCp326 - $cp336BindingCallEndForCp326
+    $cp337BindingIndexForCp326 - $cp336BindingCallEndForCp326
 )
-$postCp336BeforeNumericalCodeForCp326 =
-    [regex]::Replace($postCp336BeforeNumericalForCp326, '(?m)//.*$', '')
-if ($postCp336BeforeNumericalCodeForCp326 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No later source helper call may execute after CP336 and before numerical Calc"
+$postCp336BeforeCp337CodeForCp326 =
+    [regex]::Replace($postCp336BeforeCp337ForCp326, '(?m)//.*$', '')
+if ($postCp336BeforeCp337CodeForCp326 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No intermediary helper call may execute after CP336 and before CP337"
+}
+$postCp337BeforeNumericalForCp326 = $cp326BindingText.Substring(
+    $cp337BindingCallEndForCp326,
+    $numericalBindingIndexForCp326 - $cp337BindingCallEndForCp326
+)
+$postCp337BeforeNumericalCodeForCp326 =
+    [regex]::Replace($postCp337BeforeNumericalForCp326, '(?m)//.*$', '')
+if ($postCp337BeforeNumericalCodeForCp326 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No later source helper call may execute after CP337 and before numerical Calc"
 }
 
 Assert-Contains -Path $idealLoadsBinding -Pattern 'CalculationCoolingSupplyMassFlowLimitBody\(\s*PurchasedAirCalcCoolingSupplyMassFlowLimitBodyError,?\s*\)' -Description "CP326 scheduled binding error boundary"

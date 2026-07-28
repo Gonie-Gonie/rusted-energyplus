@@ -218,18 +218,20 @@ Assert-Contains -Path $cp336InitWitness -Pattern 'pub\(in crate::ideal_loads\) f
 Assert-Contains -Path $cp336InitState -Pattern 'pub calc_cooling_positive_supply_enthalpy_assignment:\s*[\r\n]+\s*PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentRuntimeState' -Description "per-unit CP336 persistent state"
 Assert-Contains -Path $cp336InitUnit -Pattern '(?s)calc_cooling_positive_supply_enthalpy_assignment:\s*PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentRuntimeState::new\(\s*system\s*,?\s*\)' -Description "per-unit CP336 state initialization"
 
-# Binding order is exact CP335 -> CP336 -> the unchanged numerical DTO, with
-# no hidden helper in either source-order interval.
+# Binding order is exact CP335 -> CP336 -> CP337 -> the unchanged numerical
+# DTO, with no hidden helper in any source-order interval.
 $cp336BindingText = Read-RepoText -Path $cp336Binding
 $cp335BindingIndexForCp336 = $cp336BindingText.IndexOf("let calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment =")
 $cp336BindingIndex = $cp336BindingText.IndexOf("let calculation_cooling_positive_supply_enthalpy_assignment =")
+$cp337BindingIndexForCp336 = $cp336BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_guard =")
 $numericalBindingIndexForCp336 = $cp336BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp335BindingIndexForCp336 -lt 0 -or
     $cp336BindingIndex -le $cp335BindingIndexForCp336 -or
-    $numericalBindingIndexForCp336 -le $cp336BindingIndex
+    $cp337BindingIndexForCp336 -le $cp336BindingIndex -or
+    $numericalBindingIndexForCp336 -le $cp337BindingIndexForCp336
 ) {
-    throw "Binding must retain exact CP335 -> CP336 -> numerical Calc order"
+    throw "Binding must retain exact CP335 -> CP336 -> CP337 -> numerical Calc order"
 }
 Assert-Contains -Path $cp336Binding -Pattern '(?s)let calculation_cooling_positive_supply_enthalpy_assignment =\s*advance_positive_supply_enthalpy_assignment\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment,\s*\)\?;' -Description "binding exact CP335-to-CP336 adapter call"
 Assert-Contains -Path $cp336BindingAdapter -Pattern '(?s)pub\(super\) fn advance_positive_supply_enthalpy_assignment\(\s*runtime: &mut PurchasedAirRuntimeState,\s*system: &IdealLoadsAirSystem,\s*predecessor: PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentSnapshot,' -Description "CP336 binding adapter arguments"
@@ -252,17 +254,28 @@ $cp336BindingCall = [regex]::Match(
     $cp336BindingText,
     '(?s)let calculation_cooling_positive_supply_enthalpy_assignment =\s*advance_positive_supply_enthalpy_assignment\([^;]+?\)\?;'
 )
-if (-not $cp335BindingCallForCp336.Success -or -not $cp336BindingCall.Success) {
-    throw "Binding must retain complete CP335 and CP336 exact release calls"
+$cp337BindingCallForCp336 = [regex]::Match(
+    $cp336BindingText,
+    '(?s)let calculation_cooling_positive_supply_capacity_limit_guard =\s*advance_positive_supply_capacity_limit_guard\([^;]+?\)\?;'
+)
+if (
+    -not $cp335BindingCallForCp336.Success -or
+    -not $cp336BindingCall.Success -or
+    -not $cp337BindingCallForCp336.Success
+) {
+    throw "Binding must retain complete CP335, CP336, and CP337 exact release calls"
 }
 $cp335BindingCallEndForCp336 =
     $cp335BindingCallForCp336.Index + $cp335BindingCallForCp336.Length
 $cp336BindingCallEnd = $cp336BindingCall.Index + $cp336BindingCall.Length
+$cp337BindingCallEndForCp336 =
+    $cp337BindingCallForCp336.Index + $cp337BindingCallForCp336.Length
 if (
     $cp336BindingIndex -lt $cp335BindingCallEndForCp336 -or
-    $numericalBindingIndexForCp336 -lt $cp336BindingCallEnd
+    $cp337BindingIndexForCp336 -lt $cp336BindingCallEnd -or
+    $numericalBindingIndexForCp336 -lt $cp337BindingCallEndForCp336
 ) {
-    throw "CP335 and CP336 exact release calls must complete in source order before numerical Calc"
+    throw "CP335, CP336, and CP337 exact release calls must complete in source order before numerical Calc"
 }
 foreach ($cp336Interval in @(
         [PSCustomObject]@{
@@ -272,8 +285,13 @@ foreach ($cp336Interval in @(
         },
         [PSCustomObject]@{
             Start = $cp336BindingCallEnd
+            End = $cp337BindingIndexForCp336
+            Description = "after CP336 and before CP337"
+        },
+        [PSCustomObject]@{
+            Start = $cp337BindingCallEndForCp336
             End = $numericalBindingIndexForCp336
-            Description = "after CP336 and before numerical Calc"
+            Description = "after CP337 and before numerical Calc"
         }
     )) {
     $cp336IntervalText = $cp336BindingText.Substring(
@@ -327,7 +345,7 @@ Assert-Contains -Path $cp336DirectAssertions -Pattern 'purchased_air_calc_coolin
 Assert-Contains -Path $cp336DirectAssertions -Pattern 'purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle' -Description "direct-run CP334 bit provenance"
 Assert-Contains -Path $cp336DirectAssertions -Pattern 'energyplus_psy_h_fn_tdb_w\(supply_temperature_c, supply_humidity_ratio\)' -Description "direct-run CP336 canonical result"
 Assert-Contains -Path $cp336NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle' -Description "non-direct CP336 null evidence"
-Assert-Contains -Path $cp336PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp336_lifecycle_evidence' -Description "non-direct CP336 evidence rejection"
+Assert-Contains -Path $cp336PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp337_lifecycle_evidence' -Description "non-direct CP336/CP337 evidence rejection"
 
 # Registries carry exactly two CP336 addenda and the two parent target arrays.
 $cp336AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
@@ -553,7 +571,7 @@ if (
     throw "Main IdealLoads audit must dot-source CP336 after CP335 and before completion"
 }
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp336-cooling-positive-supply-enthalpy-assignment\.ps1"' -Description "CP336 internal script inventory record"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 274 \|' -Description "CP336 generated script count"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 275 \|' -Description "CP336 generated script count"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP336 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 34 \|' -Description "CP336 generated internal script count"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 35 \|' -Description "CP336 generated internal script count"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP336 generated uncalled script count"

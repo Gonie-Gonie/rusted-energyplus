@@ -23,6 +23,8 @@ use super::super::{
     PurchasedAirCalcCoolingMixedAirCallRuntimeState, PurchasedAirCalcCoolingMixedAirCallSnapshot,
     PurchasedAirCalcCoolingOaMaxFlowBodyRuntimeState,
     PurchasedAirCalcCoolingOaMaxFlowGateRuntimeState,
+    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardRuntimeState,
+    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentRuntimeState,
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentRuntimeState,
@@ -166,6 +168,10 @@ pub struct PurchasedAirRuntimeState {
         IdealLoadsAirSystemId,
         PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentSnapshot,
     >,
+    cooling_positive_supply_capacity_limit_guard_latest_witnesses: BTreeMap<
+        IdealLoadsAirSystemId,
+        PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardSnapshot,
+    >,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -264,6 +270,9 @@ pub struct PurchasedAirUnitRuntimeState {
     /// Persistent bounded Cooling positive-supply enthalpy-assignment state.
     pub calc_cooling_positive_supply_enthalpy_assignment:
         PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentRuntimeState,
+    /// Persistent bounded Cooling positive-supply capacity-limit guard state.
+    pub calc_cooling_positive_supply_capacity_limit_guard:
+        PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.

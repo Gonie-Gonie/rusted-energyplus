@@ -17453,6 +17453,84 @@ counts, readiness, support level, run state, required and forbidden features,
 output claims, evidence cases, numerical conformance, capability status, and
 Roadmap state remain unchanged.
 
+## CP337 Source-Ordered Cooling Positive-Supply Capacity-Limit Guard
+
+CP337 supersedes only CP336's physical-line-2195 exclusion for the complete
+Cooling positive-supply capacity-limit guard at locked EnergyPlus 26.1
+`PurchasedAirManager.cc` physical executable line 2195:
+`if ((PurchAir.CoolingLimit == LimitType::Capacity) ||
+(PurchAir.CoolingLimit == LimitType::FlowRateAndCapacity)) {`. The locked
+source-file SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exactly five textual witness sites are:
+
+1. `read-cooling-limit-for-capacity-comparison`;
+2. `compare-cooling-limit-equal-to-capacity`;
+3. `read-cooling-limit-for-flow-rate-and-capacity-comparison-after-first-false`;
+4. `compare-cooling-limit-equal-to-flow-rate-and-capacity`;
+5. `enter-capacity-limit-body-if-compound-condition-satisfied`.
+
+This list is the deterministic Rust witness inventory. The enum literals are
+not additional sites, and the list makes no C++ built-in `==`
+operand-evaluation-order claim. The source `||` short circuit remains
+observable: the second textual `CoolingLimit` occurrence is evaluated only
+after a false Capacity comparison.
+
+CP337 evaluates the guard exactly when CP336 retained
+`SupplyEnthalpyAssigned`. UnitOff, non-cooling, and CP330
+`PositiveGuardFalseFallthrough` histories skip every CP337 site and retain null
+selector/comparison evidence. Exact direct release accepts the same-call CP336
+snapshot as its only predecessor argument, recursively proves its
+latest/private witness and full retained chain, and re-reads `CoolingLimit`
+only from the identity-checked selected typed system's `cooling_limit`.
+Retained initialization and earlier same-call selector snapshots remain
+lineage checks, not substitute source operands. The wrapper admits no duplicate
+caller selector, maximum total cooling capacity, sized value, live service,
+body scalar, or numerical-DTO input.
+
+An active `LimitCapacity` route reads and compares the first occurrence,
+short-circuits the second, and enters the body: three dynamic sites.
+`LimitFlowRateAndCapacity` evaluates both occurrences and enters the body: five
+sites. `NoLimit` and `LimitFlowRate` evaluate both occurrences and fall
+through: four sites. With active guard evaluations `A`, Capacity matches `C`,
+second reads/comparisons `S = A - C`, combined matches `F`, and body entries
+`B = C + F`, retained state requires active false fallthroughs `A - B` and
+`source_site_execution_count = 2*A + 2*S + B`. Pending and completed state
+partition every CP336 transition into UnitOff, non-cooling,
+positive-guard-false skip, `CapacityLimitBodyEntered`, or
+`ActiveCapacityLimitGuardFalseFallthrough`. Checked arithmetic preflights every public and
+private counter increment, so identity, ordinal, selector, provenance,
+history, replay, corruption, witness, and overflow failures are transactional.
+
+Scheduled binding, coupled runtime, and pipeline preserve exact
+CP336-to-CP337-to-numerical order and expose direct-only
+`purchased_air_calc_cooling_positive_supply_capacity_limit_guard_lifecycle`
+evidence. CP337 neither consumes nor reconciles with the unchanged numerical
+DTO and does not feed or replace it; non-direct execution publishes `None` and
+rejects CP337 evidence.
+
+Physical line 2196 is the first excluded lexical executable, the first true
+capacity-body statement, and the CP338 boundary:
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`. If the CP337 guard is false,
+the next dynamic executable is physical line 2208,
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;`, after the non-executable
+closing delimiters, blank, and comment at lines 2204-2207. CP337 excludes the
+line-2196 `CpAir` operand/evaluation, the capacity-body arithmetic and
+assignments through line 2203, the false continuation at line 2208 and later
+work through line 2337, the zero-flow `else` at 2339-2345 whose first
+executable is 2340, the outer Heat/DeadBand sibling at 2347-2348, its mixed-air
+call at 2454-2461, and sibling guard at 2465.
+
+CP337 adds target inventory and lifecycle evidence only. Maximum-capacity
+reads/comparisons, capacity-body psychrometrics and arithmetic, broader
+humidity, enthalpy, supply-state, output, `OutdoorAir`, `Economizer`,
+`HeatRecovery`, `EMS`, and Autosizing behavior remain unpromoted. Both parent
+algorithms remain `scaffold`/`none`; `routine.calc_purch_air_loads` and
+`routine.calc_purch_air_mixed_air` remain `source_mapped`. Algorithm/routine
+counts, readiness, support level, run state, required and forbidden features,
+output claims, evidence cases, numerical conformance, capability status, and
+Roadmap state remain unchanged.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before

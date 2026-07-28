@@ -34396,6 +34396,62 @@ unpromoted. Both parents remain `scaffold`/`none`; both Calc routines remain
 status, algorithm/routine count, readiness, feature-boundary, evidence-case,
 numerical-conformance, or Roadmap promotion.
 
+## CP337 Positive-Supply Capacity-Limit Guard in the Heat-Balance Loop
+
+CP337 advances the direct-Zone IdealLoads heat-balance lifecycle only through
+locked EnergyPlus 26.1 `PurchasedAirManager.cc` physical executable line 2195,
+the complete Cooling positive-supply Capacity-or-FlowRateAndCapacity guard. The
+locked source-file SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact textual Rust witness contains five sites:
+`read-cooling-limit-for-capacity-comparison`,
+`compare-cooling-limit-equal-to-capacity`,
+`read-cooling-limit-for-flow-rate-and-capacity-comparison-after-first-false`,
+`compare-cooling-limit-equal-to-flow-rate-and-capacity`, and
+`enter-capacity-limit-body-if-compound-condition-satisfied`. Enum literals are
+not additional sites. The list makes no C++ built-in `==`
+operand-evaluation-order claim while retaining specified `||` short-circuiting
+of the second textual selector occurrence.
+
+Only a completed CP336 `SupplyEnthalpyAssigned` route evaluates the guard.
+UnitOff, non-cooling, and CP330 positive-guard-false routes skip every CP337
+site and retain null selector/result evidence. Exact direct admission accepts
+only the same-call CP336 snapshot, recursively proves its latest/private
+witness and retained chain, and re-reads the selector only from the
+identity-checked selected typed system's `cooling_limit`. Retained
+initialization and earlier same-call selector values remain lineage checks;
+they are not substitute operands. CP337 requests no maximum capacity, sized
+value, heat-balance or Node scalar, psychrometric, schedule, EMS or other live
+service, body operand, or numerical-DTO input.
+
+Dynamic source sites are exactly three for `LimitCapacity`, five for
+`LimitFlowRateAndCapacity`, and four for `NoLimit` or `LimitFlowRate`. With
+active evaluations `A`, Capacity matches `C`, second comparisons `S=A-C`,
+combined matches `F`, and body entries `B=C+F`, exact state requires false
+fallthroughs `A-B` and `source_site_execution_count=2*A+2*S+B`. Five-route
+history, latest/private witnesses, and checked-arithmetic preflight make
+identity, ordinal, selector, provenance, replay, corruption, history, and
+overflow failures transactional.
+
+The binding and lifecycle JSON preserve CP336-to-CP337-to-numerical order under
+`purchased_air_calc_cooling_positive_supply_capacity_limit_guard_lifecycle`.
+CP337 neither consumes nor reconciles with the numerical DTO and does not feed
+or replace it; non-direct execution carries no CP337 lifecycle. Physical line
+2196 is the first excluded lexical executable, the first true-body statement,
+and the CP338 boundary. A false guard next dynamically executes physical line
+2208 after non-executable lines 2204-2207. Body lines 2196-2203 and their
+psychrometric/capacity/supply-state effects, false-path line 2208 and later
+behavior through 2337, the zero-flow branch at 2339-2345, the Heat/DeadBand
+sibling at 2347-2348, its mixed-air call at 2454-2461, and guard at 2465 stay
+excluded.
+
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, Autosizing, broad humidity
+control, capacity-body arithmetic, broader enthalpy, supply-state, and output
+behavior remain unpromoted. Both parents remain `scaffold`/`none`; both Calc
+routines remain `source_mapped`. CP337 adds no support, conformance, capability,
+output claim, status, algorithm/routine count, readiness, feature-boundary,
+evidence-case, numerical-conformance, or Roadmap promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |
