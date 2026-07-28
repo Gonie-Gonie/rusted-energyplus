@@ -34646,6 +34646,72 @@ adds no support, conformance, capability, output claim or ownership, status,
 algorithm/routine count, readiness, feature-boundary, evidence-case,
 numerical-conformance, or Roadmap promotion.
 
+## CP341 Positive-Supply Maximum-Capacity Assignment in the Heat-Balance Loop
+
+CP341 advances the direct-Zone IdealLoads heat-balance lifecycle only through
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`
+`PurchasedAirManager.cc` physical executable line 2199,
+`CoolSensOutput = PurchAir.MaxCoolTotCap;`. The locked raw source SHA-256
+remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact ordered witness sites are
+`read-retained-maximum-total-cooling-capacity-for-sensible-output-assignment`
+and
+`assign-local-cooling-sensible-output-from-maximum-total-cooling-capacity`.
+This deterministic Rust RHS-read-to-LHS-write witness makes no general C++
+built-in `=` evaluation-order claim.
+
+Only CP340 `CapacityLimitSensibleOutputAdjustmentBodyEntered` executes both
+sites. The exact six routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`,
+`CapacityLimitSensibleOutputGuardFalseFallthrough`, and
+`CapacityLimitSensibleOutputMaximumCapacityAssigned`. With transitions `T`,
+inherited counts `U`, `N`, `P`, and `G`, CP340 false fallthroughs `F`, CP341
+assignments `M`, and CP340 active guard evaluations `A`, exact state requires
+`T = U+N+P+G+F+M`, `A = F+M`, and
+`M = CP340 adjustment-body entries`. Both site counters equal `M`,
+`source_site_execution_count = 2*M`, and witnessed route counters match.
+There is no required equality between `M` and `A` or between `M` and CP321
+aggregate maximum-capacity reads.
+
+Exact direct admission takes only `runtime`, the selected `system`, and CP340
+as the public predecessor. It reads the preexisting cooling sensible output
+and, only on the true route, the maximum-capacity RHS from the retained
+same-call CP340 latest snapshot after bit-exact validation against the
+supplied predecessor and private witness plus recursive lineage validation.
+No CP321, caller/model/sized-limit scalar, live service, Node or heat-balance
+value, or numerical DTO substitutes for those retained CP340 values. The
+false route preserves the predecessor output bits without an RHS read or LHS
+write; the true route assigns the retained maximum bit-exactly.
+
+Complete public active lineage requires that maximum finite and strictly
+positive. Arbitrary IEEE payload copying in the pure transition is
+characterization only, with no arithmetic, normalization, clamp, finite
+coercion, or expanded public reachability. A publicly reachable false-route
+NaN remains `Some(value)` for both preexisting and resulting Rust values.
+Serde JSON maps both numeric fields to `null`, retains their identical
+non-null IEEE bit strings, and leaves the unread maximum numeric and bit
+fields null. For a publicly reachable true route with a `+infinity`
+predecessor, the preexisting numeric value is null with non-null bits, while
+the finite positive maximum becomes a non-null result with matching bits.
+
+Binding and lifecycle JSON preserve CP340-to-CP341-to-numerical order under
+`purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment_lifecycle`.
+CP341 neither consumes nor reconciles with the numerical DTO and does not feed
+or replace it; non-direct execution publishes `None` and rejects attached
+CP341 evidence. Physical line 2200 is the first excluded lexical executable:
+`SupplyEnthalpy = MixedAirEnthalpy - CoolSensOutput / SupplyMassFlowRate;`.
+That calculation, the remainder of the adjustment through line 2203, false
+continuation at line 2208, and later behavior remain excluded.
+
+Maximum-capacity ownership, broader capacity adjustment, supply-state/output
+behavior, and live-service access remain unpromoted. Both parents remain
+`scaffold`/`none`; both Calc routines remain `source_mapped`. CP341 adds no
+support, conformance, capability, output claim or ownership, status,
+algorithm/routine count, readiness, feature-boundary, evidence-case,
+numerical-conformance, or Roadmap promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

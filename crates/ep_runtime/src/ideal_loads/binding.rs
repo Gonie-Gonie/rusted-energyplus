@@ -30,6 +30,7 @@ use super::{
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardError as CoolingSupplyCapacityLimitGuardError,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentError as CoolingSupplyCapacityLimitSensibleOutputAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardError as CoolingSupplyCapacityLimitSensibleOutputGuardError,
+    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputMaximumCapacityAssignmentError as CoolingSupplyCapacityLimitSensibleOutputMaximumCapacityAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentError as CoolingCpAirAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentError as CoolingSupplyEnthalpyAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentError as CoolingSupplyHumidityRatioMixedAirAssignmentError,
@@ -83,6 +84,7 @@ mod cooling_positive_supply_capacity_limit_cp_air_assignment;
 mod cooling_positive_supply_capacity_limit_guard;
 mod cooling_positive_supply_capacity_limit_sensible_output_assignment;
 mod cooling_positive_supply_capacity_limit_sensible_output_guard;
+mod cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment;
 mod cooling_positive_supply_cp_air_assignment;
 mod cooling_positive_supply_enthalpy_assignment;
 mod cooling_positive_supply_humidity_ratio_mixed_air_assignment;
@@ -96,6 +98,7 @@ use cooling_positive_supply_capacity_limit_cp_air_assignment::advance_positive_s
 use cooling_positive_supply_capacity_limit_guard::advance_positive_supply_capacity_limit_guard;
 use cooling_positive_supply_capacity_limit_sensible_output_assignment::advance_positive_supply_capacity_limit_sensible_output_assignment;
 use cooling_positive_supply_capacity_limit_sensible_output_guard::advance_positive_supply_capacity_limit_sensible_output_guard;
+use cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment::advance_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment;
 use cooling_positive_supply_cp_air_assignment::advance_positive_supply_cp_air_assignment;
 use cooling_positive_supply_enthalpy_assignment::advance_positive_supply_enthalpy_assignment;
 use cooling_positive_supply_humidity_ratio_mixed_air_assignment::advance_positive_supply_humidity_ratio_mixed_air_assignment;
@@ -722,6 +725,10 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingPositiveSupplyCapacityLimitSensibleOutputGuard(
         CoolingSupplyCapacityLimitSensibleOutputGuardError,
     ),
+    /// The bounded cooling positive-supply capacity-limit maximum-capacity assignment rejected its release state.
+    CalculationCoolingPositiveSupplyCapacityLimitSensibleOutputMaximumCapacityAssignment(
+        CoolingSupplyCapacityLimitSensibleOutputMaximumCapacityAssignmentError,
+    ),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -1134,6 +1141,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_cooling_positive_supply_capacity_limit_sensible_output_assignment,
         )?;
+    let calculation_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment =
+        advance_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_positive_supply_capacity_limit_sensible_output_guard,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1202,6 +1215,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_positive_supply_capacity_limit_cp_air_assignment,
         calculation_cooling_positive_supply_capacity_limit_sensible_output_assignment,
         calculation_cooling_positive_supply_capacity_limit_sensible_output_guard,
+        calculation_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment,
         coupling,
     })
 }

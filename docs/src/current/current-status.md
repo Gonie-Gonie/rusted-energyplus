@@ -1600,6 +1600,75 @@ algorithm/routine counts, readiness, support, run state, feature boundaries,
 evidence cases, numerical conformance, capability, status, conformance,
 output claims, and Roadmap state remain unchanged.
 
+CP341 now maps only the Cooling positive-supply maximum-capacity assignment at
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2199:
+`CoolSensOutput = PurchAir.MaxCoolTotCap;`. The locked raw source SHA-256
+remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact two textual sites, in source-text order, are
+`read-retained-maximum-total-cooling-capacity-for-sensible-output-assignment`
+and
+`assign-local-cooling-sensible-output-from-maximum-total-cooling-capacity`.
+This is a deterministic Rust right-hand-side read followed by left-hand-side
+write witness, not a general claim about C++ built-in `=` evaluation order.
+
+Only CP340 `CapacityLimitSensibleOutputAdjustmentBodyEntered` executes both
+sites. The exact six retained routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`,
+`CapacityLimitSensibleOutputGuardFalseFallthrough`, and
+`CapacityLimitSensibleOutputMaximumCapacityAssigned`. If `T` is total
+transitions; `U`, `N`, `P`, and `G` are inherited route counts; `F` is CP340
+guard-false fallthroughs; `M` is CP341 maximum-capacity assignments; and `A`
+is CP340 active guard evaluations, exact state requires
+`T = U+N+P+G+F+M`, `A = F+M`, and
+`M = CP340 adjustment-body entries`. Both source-site counters equal `M`,
+`source_site_execution_count = 2*M`, and private witnessed route counters
+match their public counterparts. No invariant equates `M` with `A` or with
+CP321 aggregate maximum-capacity reads.
+
+Exact direct release accepts only `runtime`, the selected `system`, and the
+same-call CP340 predecessor. It obtains both the preexisting cooling sensible
+output and, on the true route, the maximum-capacity RHS solely from the
+retained same-call CP340 latest snapshot after bit-exact parity with the
+supplied predecessor and private witness plus recursive lineage validation.
+It does not reach through to CP321 or re-read a caller scalar, typed-model or
+sizing value, live service, or numerical DTO. The false CP340 route preserves
+the predecessor output bits without an RHS read or LHS write; the true route
+reads the retained maximum and assigns that exact binary64 payload.
+
+Complete public active lineage requires the maximum finite and strictly
+greater than zero. The pure transition's arbitrary IEEE payload copy is
+characterization only: the statement performs no arithmetic, normalization,
+clamp, finite coercion, or broader public-reachability promotion. On the
+publicly reachable false route, a NaN preexisting output remains `Some(value)`
+as the resulting Rust value. Serde JSON projects both numeric fields to
+`null`, preserves their identical non-null IEEE bit strings, and keeps the
+unread maximum numeric and bit fields null. On a publicly reachable true route
+with a `+infinity` predecessor, JSON keeps the preexisting numeric field null
+and its IEEE bits non-null, while the finite positive retained maximum becomes
+the non-null resulting numeric value with matching result bits.
+
+Binding, coupled runtime, and pipeline evidence preserve
+CP340-to-CP341-to-numerical order under
+`purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment_lifecycle`.
+CP341 neither consumes nor reconciles with the unchanged numerical DTO and
+does not feed or replace it. Non-direct paths publish `None` and reject
+attached CP341 evidence.
+
+Physical line 2200 is the first excluded lexical executable:
+`SupplyEnthalpy = MixedAirEnthalpy - CoolSensOutput / SupplyMassFlowRate;`.
+That calculation and the remaining capacity adjustment through line 2203,
+false continuation at line 2208, and later behavior remain excluded. CP341
+adds target inventory and direct-only lifecycle evidence, not
+maximum-capacity ownership, broader capacity adjustment, supply-state
+mutation, output ownership, or numerical-result ownership. Both parent
+algorithms remain `scaffold`/`none`; both Calc routines remain
+`source_mapped`, and algorithm/routine counts, readiness, support, run state,
+feature boundaries, evidence cases, numerical conformance, capability,
+status, conformance, output claims, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

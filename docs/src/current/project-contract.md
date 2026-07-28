@@ -17778,6 +17778,80 @@ counts, readiness, support level, run state, required and forbidden features,
 output claims or ownership, evidence cases, numerical conformance, capability
 status, conformance, and Roadmap state remain unchanged.
 
+## CP341 Source-Ordered Cooling Positive-Supply Maximum-Capacity Assignment
+
+CP341 supersedes only CP340's physical-line-2199 exclusion for the single
+Cooling positive-supply maximum-capacity assignment at pinned EnergyPlus
+commit `6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2199:
+`CoolSensOutput = PurchAir.MaxCoolTotCap;`. The locked raw source SHA-256
+remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact two textual sites, in source-text order, are:
+
+1. `read-retained-maximum-total-cooling-capacity-for-sensible-output-assignment`;
+2. `assign-local-cooling-sensible-output-from-maximum-total-cooling-capacity`.
+
+This is a deterministic Rust right-hand-side read followed by left-hand-side
+write witness, not a general claim about C++ built-in `=` evaluation order.
+
+Only CP340 `CapacityLimitSensibleOutputAdjustmentBodyEntered` executes both
+sites. The six retained routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`,
+`CapacityLimitSensibleOutputGuardFalseFallthrough`, and
+`CapacityLimitSensibleOutputMaximumCapacityAssigned`. For total transitions
+`T`, inherited route counts `U`, `N`, `P`, and `G`, CP340 false fallthroughs
+`F`, CP341 maximum-capacity assignments `M`, and CP340 active guard
+evaluations `A`, exact state requires `T = U+N+P+G+F+M`,
+`A = F+M`, and `M = CP340 adjustment-body entries`. Both source-site
+counters equal `M`, `source_site_execution_count = 2*M`, and private
+witnessed route counters equal their public counterparts. No invariant
+equates `M` with `A` or with CP321 aggregate maximum-capacity reads.
+
+The public direct wrapper accepts only `runtime`, the selected `system`, and
+the same-call CP340 predecessor. It takes the preexisting cooling sensible
+output and, only for an entered body, the assignment RHS from the retained
+same-call CP340 latest snapshot after bit-exact parity with the supplied
+predecessor and private witness plus recursive lineage validation. It does not
+reach through to CP321 or re-read any caller scalar, typed-model or sizing
+value, live service, or numerical-DTO input. The CP340 false route preserves
+the predecessor output bits without an RHS read or LHS write; the true route
+reads the retained maximum and assigns that exact binary64 payload.
+
+Complete public active lineage requires the maximum finite and strictly
+greater than zero. The pure transition's arbitrary IEEE payload copy is
+characterization only; the source statement performs no arithmetic,
+normalization, clamp, finite coercion, or broader public-reachability
+promotion. A publicly reachable false-route NaN remains `Some(value)` in both
+the preexisting and resulting Rust fields. Serde JSON projects both numeric
+fields to `null`, preserves identical non-null IEEE bit strings, and keeps the
+unread maximum numeric and bit fields null. On a publicly reachable true route
+with a `+infinity` predecessor, the preexisting numeric field remains null
+with non-null IEEE bits, while the finite positive retained maximum becomes
+the non-null resulting numeric value with matching result bits.
+
+Scheduled binding, coupled runtime, and pipeline preserve exact
+CP340-to-CP341-to-numerical order and expose direct-only
+`purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment_lifecycle`
+evidence without consuming, reconciling with, feeding, or replacing the
+unchanged numerical DTO. Non-direct execution publishes `None` and rejects
+attached CP341 evidence.
+
+Physical line 2200 is the first excluded lexical executable:
+`SupplyEnthalpy = MixedAirEnthalpy - CoolSensOutput / SupplyMassFlowRate;`.
+That calculation, the rest of the adjustment through line 2203, false
+continuation at line 2208, and later work remain excluded. CP341 adds target
+inventory and lifecycle evidence only. Maximum-capacity ownership, broader
+capacity adjustment, supply-state mutation, output behavior, `OutdoorAir`,
+`Economizer`, `HeatRecovery`, `EMS`, and Autosizing remain unpromoted. Both
+parent algorithms remain `scaffold`/`none`; `routine.calc_purch_air_loads`
+and `routine.calc_purch_air_mixed_air` remain `source_mapped`.
+Algorithm/routine counts, readiness, support level, run state, required and
+forbidden features, output claims or ownership, evidence cases, numerical
+conformance, capability status, conformance, and Roadmap state remain
+unchanged.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before

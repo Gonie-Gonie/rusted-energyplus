@@ -52,8 +52,8 @@ use crate::{
         PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE, PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
         PURCHASED_AIR_INIT_LIFECYCLE_SOURCE, PurchasedAirTemperatureControlType,
         ZONE_IDEAL_LOADS_SUPPLY_AIR_HUMIDITY_RATIO, ZONE_IDEAL_LOADS_SUPPLY_AIR_MASS_FLOW_RATE,
-        ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY,
-        ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
+        ZONE_IDEAL_LOADS_SUPPLY_AIR_TEMPERATURE, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE,
+        ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_ENERGY, ZONE_IDEAL_LOADS_ZONE_TOTAL_HEATING_RATE,
         ZONE_SYSTEM_PREDICTED_SENSIBLE_LOAD_TO_COOLING_SETPOINT_RATE,
         ZONE_SYSTEM_PREDICTED_SENSIBLE_LOAD_TO_HEATING_SETPOINT_RATE,
     },
@@ -82,6 +82,120 @@ const ZONE_KEY: &str = "ZONE ONE";
 const SUPPLY_NODE_KEY: &str = "SUPPLY";
 const RETURN_NODE_KEY: &str = "RETURN";
 const ABS_TOLERANCE: f64 = 1.0e-9;
+
+#[test]
+fn cp341_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
+    for (
+        availability,
+        maximum_capacity_w,
+        expected_unit_off,
+        expected_guard_false,
+        expected_assignment,
+    ) in [
+        (1.0, 1.0e9, false, true, false),
+        (1.0, 1.0, false, false, true),
+        (0.0, 1.0, true, false, false),
+    ] {
+        let mut typed = exact_model(1).typed;
+        typed.schedules[1].hourly_value = 0.0;
+        typed.schedules[2].hourly_value = 15.0;
+        typed.schedules[3].hourly_value = availability;
+        let system = &mut typed.ideal_loads_air_systems[0];
+        system.cooling_limit = IdealLoadsLimit::LimitCapacity;
+        system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(maximum_capacity_w));
+        let model = SimulationModel::from_typed(typed);
+        let schedule_cache =
+            precompute_schedule_cache(&model.typed, 1).expect("one CP341 schedule sample");
+        let weather = weather_series_with_conditions(&model, 1, 30.0, 15.0, 30.0, 101_325.0);
+        let mut options = DirectZonePurchasedAirCoupledOptions::hourly_samples(1);
+        options.initial_zone_air_temperature_c = INITIAL_ZONE_TEMPERATURE_C;
+
+        let simulation = simulate_direct_zone_purchased_air_coupled_heat_balance(
+            &model,
+            &weather,
+            &schedule_cache,
+            options,
+        )
+        .expect("CP341 route must pass per-step and final coupled validation");
+        let predecessor = simulation
+            .summary
+            .calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle;
+        let lifecycle = simulation
+            .summary
+            .calc_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment_lifecycle;
+        let state = &lifecycle.state;
+        assert_eq!(state.transition_count, 1);
+        assert_eq!(state.unit_off_skip_count, usize::from(expected_unit_off));
+        assert_eq!(
+            state.capacity_limit_sensible_output_guard_false_fallthrough_count,
+            usize::from(expected_guard_false)
+        );
+        assert_eq!(
+            state.capacity_limit_sensible_output_maximum_capacity_assignment_count,
+            usize::from(expected_assignment)
+        );
+        assert_eq!(
+            state.source_site_execution_count,
+            2 * usize::from(expected_assignment)
+        );
+
+        let predecessor_latest = predecessor.state.latest.expect("latest CP340 snapshot");
+        let latest = state.latest.expect("latest CP341 snapshot");
+        assert_eq!(
+            latest.capacity_limit_sensible_output_guard_false_fallthrough,
+            expected_guard_false
+        );
+        assert_eq!(
+            latest.capacity_limit_sensible_output_maximum_capacity_assignment_executed,
+            expected_assignment
+        );
+        if expected_unit_off {
+            assert!(latest.preexisting_cooling_sensible_output_w.is_none());
+            assert!(latest.maximum_total_cooling_capacity_w.is_none());
+            assert!(latest.assigned_cooling_sensible_output_w.is_none());
+            assert!(latest.resulting_cooling_sensible_output_w.is_none());
+        } else {
+            assert_eq!(
+                latest
+                    .preexisting_cooling_sensible_output_w
+                    .map(f64::to_bits),
+                predecessor_latest
+                    .cooling_sensible_output_w
+                    .map(f64::to_bits)
+            );
+            if expected_assignment {
+                assert_eq!(
+                    latest.maximum_total_cooling_capacity_w.map(f64::to_bits),
+                    predecessor_latest
+                        .maximum_total_cooling_capacity_w
+                        .map(f64::to_bits)
+                );
+                assert_eq!(
+                    latest.assigned_cooling_sensible_output_w.map(f64::to_bits),
+                    latest.resulting_cooling_sensible_output_w.map(f64::to_bits)
+                );
+            } else {
+                assert!(latest.maximum_total_cooling_capacity_w.is_none());
+                assert!(latest.assigned_cooling_sensible_output_w.is_none());
+                assert_eq!(
+                    latest.resulting_cooling_sensible_output_w.map(f64::to_bits),
+                    latest
+                        .preexisting_cooling_sensible_output_w
+                        .map(f64::to_bits)
+                );
+            }
+        }
+
+        assert_eq!(simulation.summary.coupling_call_count, 1);
+        assert!(
+            simulation
+                .results
+                .find_series(SYSTEM_KEY, ZONE_IDEAL_LOADS_ZONE_TOTAL_COOLING_RATE)
+                .is_some(),
+            "the unchanged numerical coupling/reporting stage must still complete"
+        );
+    }
+}
 
 #[test]
 fn cooling_capacity_zero_flow_reset_partition_overflow_fails_closed() {

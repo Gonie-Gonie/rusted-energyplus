@@ -22354,6 +22354,73 @@ readiness, support, conformance, capability, status, feature boundary,
 evidence case, numerical conformance, output claim or ownership, or Roadmap
 state.
 
+## CP341 Cooling Positive-Supply Maximum-Capacity Assignment Placement
+
+CP341 extends the exact direct-Zone update path only through pinned EnergyPlus
+commit `6f2e40d10250a105b49966baa24d843711e61048`
+`PurchasedAirManager.cc` physical executable line 2199,
+`CoolSensOutput = PurchAir.MaxCoolTotCap;`. The locked raw source SHA-256
+remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The two exact source-text sites, in order, are
+`read-retained-maximum-total-cooling-capacity-for-sensible-output-assignment`
+and
+`assign-local-cooling-sensible-output-from-maximum-total-cooling-capacity`.
+This deterministic Rust right-hand-side-read-to-left-hand-side-write witness
+makes no general C++ built-in `=` evaluation-order claim.
+
+Only CP340 `CapacityLimitSensibleOutputAdjustmentBodyEntered` executes both
+sites. The six retained routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`,
+`CapacityLimitSensibleOutputGuardFalseFallthrough`, and
+`CapacityLimitSensibleOutputMaximumCapacityAssigned`. Let `T` be transitions;
+`U`, `N`, `P`, and `G` inherited counts; `F` CP340 false fallthroughs; `M`
+CP341 assignments; and `A` CP340 active guard evaluations. Exact placement
+requires `T = U+N+P+G+F+M`, `A = F+M`, and
+`M = CP340 adjustment-body entries`. Both source-site counters equal `M`,
+`source_site_execution_count = 2*M`, and witnessed route counters retain
+public parity. No invariant requires `M = A` or `M = CP321 aggregate reads`.
+
+Direct execution accepts only `runtime`, the selected `system`, and the
+same-call CP340 predecessor. The preexisting cooling sensible output and,
+only on an entered body, the maximum-capacity RHS come from the retained
+same-call CP340 latest snapshot after bit-exact parity with the supplied
+predecessor and private witness plus recursive lineage validation. No CP321,
+caller scalar, Zone or typed-model/sized-limit re-read, live service, or
+numerical DTO value is admitted. The guard-false route preserves predecessor
+output bits without an RHS read or LHS write; the true route copies the
+retained maximum into the resulting output bit-exactly.
+
+Complete public active lineage requires a finite, strictly positive maximum.
+The pure transition's arbitrary IEEE copy is characterization only and
+introduces no arithmetic, normalization, clamp, finite coercion, or broader
+public reachability. A publicly reachable false-route NaN stays `Some(value)`
+in both preexisting and resulting Rust fields. Serde JSON maps both numeric
+fields to `null`, preserves their identical non-null IEEE bit strings, and
+keeps the unread maximum numeric and bit fields null. A publicly reachable
+true route may start from `+infinity`; its preexisting numeric field is null
+with non-null bits, while the finite positive retained maximum becomes the
+non-null resulting numeric value with matching bits.
+
+Binding, coupled execution, and pipeline serialization preserve
+CP340-to-CP341-to-numerical order and publish direct-only
+`purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment_lifecycle`
+evidence without consuming, reconciling with, feeding, or replacing the
+numerical DTO. Non-direct execution publishes `None` and rejects attached
+CP341 evidence. Physical line 2200 is the first excluded lexical executable:
+`SupplyEnthalpy = MixedAirEnthalpy - CoolSensOutput / SupplyMassFlowRate;`.
+That calculation, the remaining body through line 2203, false continuation at
+line 2208, and later behavior remain excluded.
+
+Maximum-capacity ownership, broader capacity adjustment, supply-state/output
+behavior, and live-service access remain unpromoted. Both parents remain
+`scaffold`/`none`; both Calc routines remain `source_mapped`. CP341 adds
+target and lifecycle evidence only and changes no algorithm/routine count,
+readiness, support, conformance, capability, status, feature boundary,
+evidence case, numerical conformance, output claim or ownership, or Roadmap
+state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

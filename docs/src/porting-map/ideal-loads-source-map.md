@@ -19900,6 +19900,71 @@ adds target inventory and lifecycle evidence only; support, conformance,
 capability, status, counts, readiness, feature boundaries, evidence cases,
 numerical conformance, output claims, and Roadmap state remain unchanged.
 
+## CP341 Cooling Positive-Supply Maximum-Capacity Assignment
+
+CP341 maps only pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`
+`PurchasedAirManager.cc` physical executable line 2199,
+`CoolSensOutput = PurchAir.MaxCoolTotCap;`. The locked raw source SHA-256
+remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact source-text Rust witness sites, in order, are
+`read-retained-maximum-total-cooling-capacity-for-sensible-output-assignment`
+and
+`assign-local-cooling-sensible-output-from-maximum-total-cooling-capacity`.
+This deterministic Rust right-hand-side-read-to-left-hand-side-write order
+makes no general claim about C++ built-in `=` evaluation order.
+
+Only CP340 `CapacityLimitSensibleOutputAdjustmentBodyEntered` executes both
+sites. The exact six routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`,
+`CapacityLimitSensibleOutputGuardFalseFallthrough`, and
+`CapacityLimitSensibleOutputMaximumCapacityAssigned`. For transitions `T`,
+inherited counts `U`, `N`, `P`, and `G`, CP340 false fallthroughs `F`, CP341
+assignments `M`, and CP340 active guard evaluations `A`, exact lifecycle
+algebra is `T = U+N+P+G+F+M`, `A = F+M`, and
+`M = CP340 adjustment-body entries`. Both textual-site counters equal `M`,
+`source_site_execution_count = 2*M`, and witnessed route counters retain
+public parity. Neither `M = A` nor `M = CP321 aggregate reads` is a required
+invariant.
+
+Exact release accepts only `runtime`, the selected `system`, and the same-call
+CP340 predecessor. The preexisting output and, when the body was entered, the
+maximum-capacity RHS come only from the retained same-call CP340 latest
+snapshot after bit-exact validation against the supplied predecessor and
+private witness plus recursive lineage validation. CP321, caller/model/sizing
+scalars, live services, and the numerical DTO are not re-read as operands. The
+guard-false route preserves predecessor output bits without an RHS read or LHS
+write; the true route assigns the exact retained-maximum binary64 payload.
+
+Complete public active lineage requires a finite, strictly positive maximum.
+The pure transition's arbitrary IEEE payload copy is characterization only
+and adds no arithmetic, normalization, clamp, finite coercion, or wider public
+reachability. A publicly reachable false-route NaN stays `Some(value)` in the
+preexisting and resulting Rust fields. Serde JSON projects both numeric fields
+to `null`, preserves identical non-null IEEE bit strings, and keeps the
+unread-maximum numeric and bit fields null. For a publicly reachable true
+route with a `+infinity` predecessor, the preexisting numeric field remains
+null with non-null IEEE bits; the retained finite positive maximum becomes
+the non-null result with matching result bits.
+
+Binding and direct-only JSON preserve CP340-to-CP341-to-numerical order under
+`purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment_lifecycle`.
+CP341 does not consume, reconcile with, feed, or replace the numerical DTO;
+non-direct paths publish `None` and reject attached evidence. Physical line
+2200 is the first excluded lexical executable:
+`SupplyEnthalpy = MixedAirEnthalpy - CoolSensOutput / SupplyMassFlowRate;`.
+That calculation, the remaining body through line 2203, false continuation at
+line 2208, and later behavior remain excluded.
+
+Maximum-capacity ownership, broader capacity adjustment, supply-state/output
+behavior, and live-service access remain unpromoted. Both parent algorithms
+remain `scaffold`/`none`; both Calc routines remain `source_mapped`. CP341
+adds target inventory and lifecycle evidence only; support, conformance,
+capability, status, counts, readiness, feature boundaries, evidence cases,
+numerical conformance, output claims, and Roadmap state remain unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:
