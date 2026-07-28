@@ -1,7 +1,7 @@
 mod ieee;
 mod release_corruption;
 mod release_edge_cases;
-mod release_fixture;
+pub(in crate::ideal_loads::calc) mod release_fixture;
 
 use super::*;
 use crate::ideal_loads::{

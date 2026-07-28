@@ -527,8 +527,13 @@ $postCp339BeforeNumericalForCp329 = $cp329BindingText.Substring(
 )
 $postCp339BeforeNumericalCodeForCp329 =
     [regex]::Replace($postCp339BeforeNumericalForCp329, '(?m)//.*$', '')
+$postCp339BeforeNumericalCodeForCp329 = [regex]::Replace(
+    $postCp339BeforeNumericalCodeForCp329,
+    '(?s)let calculation_cooling_positive_supply_capacity_limit_sensible_output_guard =\s*advance_positive_supply_capacity_limit_sensible_output_guard\([^;]+?\)\?;',
+    ''
+)
 if ($postCp339BeforeNumericalCodeForCp329 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No later source helper call may execute after CP339 and before numerical Calc"
+    throw "No helper other than the audited CP340 release may execute after CP339 and before numerical Calc"
 }
 
 # Coupled validation reconstructs the projection from CP328 and the existing

@@ -60,6 +60,8 @@ use super::{
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardLifecycleSummary,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentLifecycleSummary,
+    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardError,
+    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardLifecycleSummary,
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentError,
@@ -108,6 +110,7 @@ use super::{
     purchased_air_calc_cooling_positive_supply_capacity_limit_cp_air_assignment_lifecycle_summary,
     purchased_air_calc_cooling_positive_supply_capacity_limit_guard_lifecycle_summary,
     purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle_summary,
+    purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle_summary,
     purchased_air_calc_cooling_positive_supply_cp_air_assignment_lifecycle_summary,
     purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle_summary,
     purchased_air_calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment_lifecycle_summary,
@@ -140,6 +143,7 @@ mod cooling_oa_max_flow_validation;
 mod cooling_positive_supply_capacity_limit_cp_air_assignment_validation;
 mod cooling_positive_supply_capacity_limit_guard_validation;
 mod cooling_positive_supply_capacity_limit_sensible_output_assignment_validation;
+mod cooling_positive_supply_capacity_limit_sensible_output_guard_validation;
 mod cooling_positive_supply_cp_air_assignment_validation;
 mod cooling_positive_supply_enthalpy_assignment_validation;
 mod cooling_positive_supply_humidity_ratio_mixed_air_assignment_validation;
@@ -313,6 +317,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded cooling positive-supply capacity-limit sensible-output assignment lifecycle report.
     pub calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle:
         PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentLifecycleSummary,
+    /// Persistent bounded cooling positive-supply capacity-limit sensible-output guard lifecycle report.
+    pub calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle:
+        PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -441,6 +448,10 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     /// Final cooling positive-supply capacity-limit sensible-output assignment summary could not resolve the bound unit.
     CalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentLifecycle(
         PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentError,
+    ),
+    /// Final cooling positive-supply capacity-limit sensible-output guard summary could not resolve the bound unit.
+    CalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardLifecycle(
+        PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardError,
     ),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
@@ -721,6 +732,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A cooling positive-supply capacity-limit sensible-output guard lifecycle invariant did not match the run.
+    CalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -873,6 +893,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     },
     /// A cooling positive-supply capacity-limit sensible-output assignment snapshot did not match its release call.
     UnexpectedCalculationCoolingPositiveSupplyCapacityLimitSensibleOutputAssignment {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
+    /// A cooling positive-supply capacity-limit sensible-output guard snapshot did not match its release call.
+    UnexpectedCalculationCoolingPositiveSupplyCapacityLimitSensibleOutputGuard {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
@@ -1050,6 +1075,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir cooling positive-supply capacity-limit sensible-output assignment lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir cooling positive-supply capacity-limit sensible-output guard lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -1299,6 +1328,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir cooling positive-supply capacity-limit sensible-output assignment lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir cooling positive-supply capacity-limit sensible-output guard lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -1466,6 +1503,12 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling positive-supply capacity-limit sensible-output assignment"
+            ),
+            Self::UnexpectedCalculationCoolingPositiveSupplyCapacityLimitSensibleOutputGuard {
+                timestep_index,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling positive-supply capacity-limit sensible-output guard"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -1979,6 +2022,18 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
                 },
             );
         }
+        if !cooling_positive_supply_capacity_limit_sensible_output_guard_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingPositiveSupplyCapacityLimitSensibleOutputGuard {
+                        timestep_index,
+                    },
+            );
+        }
     }
     let init_lifecycle = purchased_air_init_lifecycle_summary(
         &purchased_air_runtime_state,
@@ -2463,6 +2518,23 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle =
+        purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::
+                CalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardLifecycle,
+        )?;
+    cooling_positive_supply_capacity_limit_sensible_output_guard_validation::validate_lifecycle(
+        &calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle,
+        &calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle,
+        &calc_cooling_capacity_zero_flow_reset_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -2555,6 +2627,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_positive_supply_capacity_limit_guard_lifecycle,
             calc_cooling_positive_supply_capacity_limit_cp_air_assignment_lifecycle,
             calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle,
+            calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle,
         },
         state,
         results,

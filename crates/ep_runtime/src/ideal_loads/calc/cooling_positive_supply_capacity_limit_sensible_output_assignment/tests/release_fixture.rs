@@ -29,7 +29,7 @@ use crate::ideal_loads::{
     advance_direct_no_oa_calc_cooling_supply_mass_flow_very_small_guard_body,
 };
 
-pub(super) fn completed_cp338_case(
+pub(in crate::ideal_loads::calc) fn completed_cp338_case(
     cooling_demand_w: f64,
     overall_availability: f64,
     capacity_limit: bool,
@@ -48,7 +48,7 @@ pub(super) fn completed_cp338_case(
     )
 }
 
-pub(super) fn completed_cp338_case_with_zone_temperature(
+pub(in crate::ideal_loads::calc) fn completed_cp338_case_with_zone_temperature(
     cooling_demand_w: f64,
     overall_availability: f64,
     capacity_limit: bool,
@@ -221,7 +221,7 @@ pub(super) fn completed_cp338_case_with_zone_temperature(
     (runtime, system, cp_air_capacity_assignment)
 }
 
-pub(super) fn active_case() -> (
+pub(in crate::ideal_loads::calc) fn active_case() -> (
     PurchasedAirRuntimeState,
     ep_model::IdealLoadsAirSystem,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitCpAirAssignmentSnapshot,

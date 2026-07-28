@@ -29,6 +29,7 @@ use super::{
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitCpAirAssignmentError as CoolingSupplyCapacityLimitCpAirAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardError as CoolingSupplyCapacityLimitGuardError,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentError as CoolingSupplyCapacityLimitSensibleOutputAssignmentError,
+    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardError as CoolingSupplyCapacityLimitSensibleOutputGuardError,
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentError as CoolingCpAirAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentError as CoolingSupplyEnthalpyAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentError as CoolingSupplyHumidityRatioMixedAirAssignmentError,
@@ -81,6 +82,7 @@ use super::{
 mod cooling_positive_supply_capacity_limit_cp_air_assignment;
 mod cooling_positive_supply_capacity_limit_guard;
 mod cooling_positive_supply_capacity_limit_sensible_output_assignment;
+mod cooling_positive_supply_capacity_limit_sensible_output_guard;
 mod cooling_positive_supply_cp_air_assignment;
 mod cooling_positive_supply_enthalpy_assignment;
 mod cooling_positive_supply_humidity_ratio_mixed_air_assignment;
@@ -93,6 +95,7 @@ mod scheduled_output;
 use cooling_positive_supply_capacity_limit_cp_air_assignment::advance_positive_supply_capacity_limit_cp_air_assignment;
 use cooling_positive_supply_capacity_limit_guard::advance_positive_supply_capacity_limit_guard;
 use cooling_positive_supply_capacity_limit_sensible_output_assignment::advance_positive_supply_capacity_limit_sensible_output_assignment;
+use cooling_positive_supply_capacity_limit_sensible_output_guard::advance_positive_supply_capacity_limit_sensible_output_guard;
 use cooling_positive_supply_cp_air_assignment::advance_positive_supply_cp_air_assignment;
 use cooling_positive_supply_enthalpy_assignment::advance_positive_supply_enthalpy_assignment;
 use cooling_positive_supply_humidity_ratio_mixed_air_assignment::advance_positive_supply_humidity_ratio_mixed_air_assignment;
@@ -715,6 +718,10 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingPositiveSupplyCapacityLimitSensibleOutputAssignment(
         CoolingSupplyCapacityLimitSensibleOutputAssignmentError,
     ),
+    /// The bounded cooling positive-supply capacity-limit sensible-output guard rejected its release state.
+    CalculationCoolingPositiveSupplyCapacityLimitSensibleOutputGuard(
+        CoolingSupplyCapacityLimitSensibleOutputGuardError,
+    ),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -1121,6 +1128,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_cooling_positive_supply_capacity_limit_cp_air_assignment,
         )?;
+    let calculation_cooling_positive_supply_capacity_limit_sensible_output_guard =
+        advance_positive_supply_capacity_limit_sensible_output_guard(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_positive_supply_capacity_limit_sensible_output_assignment,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1188,6 +1201,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_positive_supply_capacity_limit_guard,
         calculation_cooling_positive_supply_capacity_limit_cp_air_assignment,
         calculation_cooling_positive_supply_capacity_limit_sensible_output_assignment,
+        calculation_cooling_positive_supply_capacity_limit_sensible_output_guard,
         coupling,
     })
 }

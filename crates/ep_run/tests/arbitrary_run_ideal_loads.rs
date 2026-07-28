@@ -415,6 +415,14 @@ fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
             ["purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle"]
             .is_null()
     );
+    assert!(rust_runtime.contains_key(
+        "purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle"
+    ));
+    assert!(
+        rust_runtime
+            ["purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle"]
+            .is_null()
+    );
     assert_eq!(summary["source_order_gate"]["matches"], true);
     assert_output_manifest(&output_dir, SUPPORTED_RUNTIME_MANIFEST)?;
     assert!(

@@ -22281,6 +22281,79 @@ count, readiness, support, conformance, capability, status, feature boundary,
 evidence case, numerical conformance, output claim or ownership, or Roadmap
 state.
 
+## CP340 Cooling Positive-Supply Capacity-Limit Sensible-Output Guard Placement
+
+CP340 extends the exact direct-Zone update path only through pinned EnergyPlus
+commit `6f2e40d10250a105b49966baa24d843711e61048`
+`PurchasedAirManager.cc` physical executable line 2198,
+`if (CoolSensOutput >= PurchAir.MaxCoolTotCap) {`. The locked raw source
+SHA-256 is
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The four exact source-text sites, in order, are
+`read-retained-cooling-sensible-output-for-maximum-capacity-comparison`,
+`read-retained-maximum-total-cooling-capacity-for-sensible-output-comparison`,
+`compare-cooling-sensible-output-greater-than-or-equal-to-maximum-total-cooling-capacity`,
+and `enter-cooling-capacity-adjustment-body-if-comparison-satisfied`.
+This deterministic Rust/source-text witness order makes no C++ built-in `>=`
+operand-evaluation-order claim; both source reads are side-effect-free.
+
+Only CP339 `CapacityLimitSensibleOutputAssigned` executes CP340. The six
+retained routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`,
+`CapacityLimitSensibleOutputGuardFalseFallthrough`, and
+`CapacityLimitSensibleOutputAdjustmentBodyEntered`. Let `T` be transitions;
+`U`, `N`, `P`, and `G` inherited route counts; `A` active assignments; `F`
+false comparisons; and `E` body entries. Exact placement requires
+`T = U+N+P+G+F+E = U+N+P+G+A`,
+`A = F+E = CP338 assignments = CP337 body entries`, both reads and the
+comparison equal `A`, the body counter equals `E`, and
+`source_site_execution_count = 3*A+E`. Witnessed `F` and `E` counts retain
+parity with their public counters.
+
+Direct execution accepts only `runtime`, the selected `system`, and the
+same-call CP339 predecessor. The final `cooling_sensible_output_w` operand
+comes only from the retained CP339 latest snapshot after bit-exact validation
+against the public predecessor and private witness plus recursive lineage
+validation. The `maximum_total_cooling_capacity_w` operand comes only from the
+retained same-call CP321 latest snapshot after bit-exact private-witness parity
+and recursive validation; CP321 aggregate reads may exceed `A`. Caller
+scalars, Zone or typed-model/sized-limit re-reads, live services, and numerical
+DTO values are excluded.
+
+The pure guard performs raw IEEE binary64 `>=`: NaN follows the false route,
+`+infinity` enters the body, and `-infinity` follows the false route against
+a finite nonnegative maximum, preserving signed-zero characterization.
+CP321's zero reset prevents complete public active reachability for either
+signed zero: active zero forgery is rejected and the actual reset skip retains
+null capacity. Publicly reachable nonfinite CP339 outputs are NaN/false from
+`+infinity` flow times a zero difference and `+infinity`/true from
+`+infinity` flow times a positive difference; `-infinity` is a pure-transition
+characterization only. No total ordering, finite coercion, normalization, or
+clamp is introduced. Active Rust snapshots retain a possibly nonfinite CP339
+operand as `Some(value)`. During Serde JSON serialization its nonfinite
+numeric field becomes `null`, while a
+separate IEEE bit string remains non-null. Skipped Rust snapshots keep
+`None`; both serialized fields are null.
+
+Binding, coupled execution, and pipeline serialization preserve
+CP339-to-CP340-to-numerical order and publish direct-only
+`purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle`
+evidence without consuming, reconciling with, feeding, or replacing the
+numerical DTO. Non-direct execution publishes `None` and rejects attached
+CP340 evidence. Physical line 2199 is the first excluded lexical executable:
+`CoolSensOutput = PurchAir.MaxCoolTotCap;`. That assignment, the remaining
+body through line 2203, false continuation at line 2208, and later behavior
+remain excluded.
+
+Maximum-capacity ownership, capacity adjustment, broader supply-state/output
+behavior, and live-service access remain unpromoted. Both parents remain
+`scaffold`/`none`; both Calc routines remain `source_mapped`. CP340 adds
+target and lifecycle evidence only and changes no algorithm/routine count,
+readiness, support, conformance, capability, status, feature boundary,
+evidence case, numerical conformance, output claim or ownership, or Roadmap
+state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

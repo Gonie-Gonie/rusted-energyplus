@@ -29,6 +29,8 @@ use super::super::{
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentRuntimeState,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentSnapshot,
+    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardRuntimeState,
+    PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentRuntimeState,
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentRuntimeState,
@@ -184,6 +186,10 @@ pub struct PurchasedAirRuntimeState {
         IdealLoadsAirSystemId,
         PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentSnapshot,
     >,
+    cooling_positive_supply_capacity_limit_sensible_output_guard_latest_witnesses: BTreeMap<
+        IdealLoadsAirSystemId,
+        PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardSnapshot,
+    >,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -291,6 +297,9 @@ pub struct PurchasedAirUnitRuntimeState {
     /// Persistent bounded Cooling capacity-limit sensible-output assignment state.
     pub calc_cooling_positive_supply_capacity_limit_sensible_output_assignment:
         PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentRuntimeState,
+    /// Persistent bounded Cooling capacity-limit sensible-output guard state.
+    pub calc_cooling_positive_supply_capacity_limit_sensible_output_guard:
+        PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
