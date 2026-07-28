@@ -34,6 +34,7 @@ const ZONE_NODE: NodeId = NodeId(11);
 const RECIRCULATION_NODE: NodeId = NodeId(12);
 
 mod corruption_tests;
+pub(super) mod cp338_fixture;
 mod provenance_tests;
 
 #[test]

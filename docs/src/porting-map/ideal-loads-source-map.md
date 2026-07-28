@@ -19704,6 +19704,63 @@ CP337 adds target inventory and lifecycle evidence only; support, conformance,
 capability, status, counts, readiness, feature boundaries, evidence cases,
 numerical conformance, output claims, and Roadmap state remain unchanged.
 
+## CP338 Cooling Positive-Supply Capacity-Limit CpAir Assignment
+
+CP338 maps only locked EnergyPlus 26.1 `PurchasedAirManager.cc` physical
+executable line 2196,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`. The locked source-file
+SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The exact three textual Rust witness sites are
+`read-purchased-air-mixed-air-humidity-ratio`,
+`evaluate-psy-cp-air-fn-w`, and `assign-local-cp-air`.
+
+Only CP337 `CapacityLimitBodyEntered` executes the statement:
+`LimitCapacity` and `LimitFlowRateAndCapacity` each execute all three sites.
+UnitOff, non-cooling, CP330 positive-guard-false, and CP337
+`ActiveCapacityLimitGuardFalseFallthrough` histories skip all three and retain
+null operand/result fields. The exact five routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`, and
+`CapacityLimitCpAirAssigned`. For CP338 active assignments `A`, equal to CP337
+body entries `B`, lifecycle state requires
+`source_site_execution_count = 3*A = 3*B`; each of the three site counters
+equals `A`.
+
+Exact release takes only the same-call CP337 predecessor and recursively proves
+its latest/private witness and retained chain. The active
+`PurchAir.MixedAirHumRat` source operand comes only from the same-call
+completed CP329 latest/private witness's `mixed_air_humidity_ratio`. CP329 owns
+that field; equal no-OA Zone humidity is only lineage evidence. No caller
+scalar, Zone-state or typed-model re-read, maximum-capacity or sizing value,
+live service, subsequent body operand, or numerical DTO is admitted. The
+transition evaluates only canonical `energyplus_psy_cp_air_fn_w`, including
+the source humidity floor, before assigning its bit-exact result to local
+`CpAir`; mutable C++ cache behavior and broader psychrometric parity remain
+deferred.
+
+Binding and direct-only JSON place
+`purchased_air_calc_cooling_positive_supply_capacity_limit_cp_air_assignment_lifecycle`
+in CP337-to-CP338-to-numerical order. CP338 does not consume, reconcile with,
+feed, or replace the numerical DTO; non-direct paths retain no CP338 evidence.
+Physical line 2197 is the first excluded lexical executable and CP339
+boundary:
+`CoolSensOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);`.
+Its operands and arithmetic, the maximum-capacity comparison and adjustment at
+2198-2203, false-path line 2208 and all later lines through 2337, the zero-flow
+`else` at 2339-2345, Heat/DeadBand sibling at 2347-2348, mixed-air call at
+2454-2461, and guard at 2465 remain excluded. A CP337 false guard skips CP338
+and next dynamically executes physical line 2208.
+
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, Autosizing, broad humidity
+control, sensible-output/capacity arithmetic, maximum-capacity ownership,
+broader psychrometrics, enthalpy/supply-state/output behavior, and
+numerical-result ownership remain unpromoted. Both parent algorithms remain
+`scaffold`/`none`; both Calc routines remain `source_mapped`. CP338 adds target
+inventory and lifecycle evidence only; support, conformance, capability,
+status, counts, readiness, feature boundaries, evidence cases, numerical
+conformance, output claims, and Roadmap state remain unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

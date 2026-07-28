@@ -217,18 +217,20 @@ Assert-Contains -Path $cp337InitWitness -Pattern 'pub\(in crate::ideal_loads\) f
 Assert-Contains -Path $cp337InitState -Pattern 'pub calc_cooling_positive_supply_capacity_limit_guard:\s*[\r\n]+\s*PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardRuntimeState' -Description "per-unit CP337 persistent state"
 Assert-Contains -Path $cp337InitUnit -Pattern '(?s)calc_cooling_positive_supply_capacity_limit_guard:\s*PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardRuntimeState::new\(\s*system\s*,?\s*\)' -Description "per-unit CP337 state initialization"
 
-# Binding order is exact CP336 -> CP337 -> unchanged numerical DTO, without a
-# helper call in either source-order interval.
+# Binding order is exact CP336 -> CP337 -> CP338 -> unchanged numerical DTO,
+# without a helper call in any source-order interval.
 $cp337BindingText = Read-RepoText -Path $cp337Binding
 $cp336BindingIndexForCp337 = $cp337BindingText.IndexOf("let calculation_cooling_positive_supply_enthalpy_assignment =")
 $cp337BindingIndex = $cp337BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_guard =")
+$cp338BindingIndexForCp337 = $cp337BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_cp_air_assignment =")
 $numericalBindingIndexForCp337 = $cp337BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp336BindingIndexForCp337 -lt 0 -or
     $cp337BindingIndex -le $cp336BindingIndexForCp337 -or
-    $numericalBindingIndexForCp337 -le $cp337BindingIndex
+    $cp338BindingIndexForCp337 -le $cp337BindingIndex -or
+    $numericalBindingIndexForCp337 -le $cp338BindingIndexForCp337
 ) {
-    throw "Binding must retain exact CP336 -> CP337 -> numerical Calc order"
+    throw "Binding must retain exact CP336 -> CP337 -> CP338 -> numerical Calc order"
 }
 $cp336BindingCallForCp337 = [regex]::Match(
     $cp337BindingText,
@@ -238,17 +240,28 @@ $cp337BindingCall = [regex]::Match(
     $cp337BindingText,
     '(?s)let calculation_cooling_positive_supply_capacity_limit_guard =\s*advance_positive_supply_capacity_limit_guard\([^;]+?\)\?;'
 )
-if (-not $cp336BindingCallForCp337.Success -or -not $cp337BindingCall.Success) {
-    throw "Binding must retain complete CP336 and CP337 exact release calls"
+$cp338BindingCallForCp337 = [regex]::Match(
+    $cp337BindingText,
+    '(?s)let calculation_cooling_positive_supply_capacity_limit_cp_air_assignment =\s*advance_positive_supply_capacity_limit_cp_air_assignment\([^;]+?\)\?;'
+)
+if (
+    -not $cp336BindingCallForCp337.Success -or
+    -not $cp337BindingCall.Success -or
+    -not $cp338BindingCallForCp337.Success
+) {
+    throw "Binding must retain complete CP336, CP337, and CP338 exact release calls"
 }
 $cp336BindingCallEndForCp337 =
     $cp336BindingCallForCp337.Index + $cp336BindingCallForCp337.Length
 $cp337BindingCallEnd = $cp337BindingCall.Index + $cp337BindingCall.Length
+$cp338BindingCallEndForCp337 =
+    $cp338BindingCallForCp337.Index + $cp338BindingCallForCp337.Length
 if (
     $cp337BindingIndex -lt $cp336BindingCallEndForCp337 -or
-    $numericalBindingIndexForCp337 -lt $cp337BindingCallEnd
+    $cp338BindingIndexForCp337 -lt $cp337BindingCallEnd -or
+    $numericalBindingIndexForCp337 -lt $cp338BindingCallEndForCp337
 ) {
-    throw "CP336 and CP337 exact release calls must complete in source order before numerical Calc"
+    throw "CP336, CP337, and CP338 exact release calls must complete in source order before numerical Calc"
 }
 foreach ($cp337Interval in @(
         [PSCustomObject]@{
@@ -258,8 +271,13 @@ foreach ($cp337Interval in @(
         },
         [PSCustomObject]@{
             Start = $cp337BindingCallEnd
+            End = $cp338BindingIndexForCp337
+            Description = "after CP337 and before CP338"
+        },
+        [PSCustomObject]@{
+            Start = $cp338BindingCallEndForCp337
             End = $numericalBindingIndexForCp337
-            Description = "after CP337 and before numerical Calc"
+            Description = "after CP338 and before numerical Calc"
         }
     )) {
     $cp337IntervalText = $cp337BindingText.Substring(
@@ -323,7 +341,7 @@ Assert-Contains -Path $cp337DirectAssertions -Pattern 'const SOURCE_ORDER:\s*\[&
 Assert-Contains -Path $cp337DirectAssertions -Pattern 'let source_sites = 2 \* active \+ 2 \* second_comparisons \+ body_entries;' -Description "direct-run CP337 dynamic source formula"
 Assert-Contains -Path $cp337DirectAssertions -Pattern 'purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle' -Description "direct-run CP336 predecessor evidence"
 Assert-Contains -Path $cp337NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_guard_lifecycle' -Description "non-direct CP337 null evidence"
-Assert-Contains -Path $cp337PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp337_lifecycle_evidence' -Description "non-direct CP337 evidence rejection"
+Assert-Contains -Path $cp337PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp338_lifecycle_evidence' -Description "non-direct CP337/CP338 evidence rejection"
 Assert-NotContains -Path $cp337Pipeline -Pattern 'latest_numerical|numerical_supply_mass_flow|final_supply_mass_flow|complete_direct_zone_purchased_air_coupling' -Description "numerical DTO reconciliation in CP337 pipeline"
 
 # Exactly two algorithm addenda, two capability addenda, and six target
@@ -462,22 +480,26 @@ foreach ($cp337Documentation in $cp337DocumentationSections) {
     }
 }
 
-# Root audit and inventory make the new internal script reachable. Generated
-# script totals are 275 executable, 240 public, 35 internal, and zero uncalled.
+# Root audit and inventory keep CP337 reachable while placing CP338 after it.
+# Generated script totals are 276 executable, 240 public, 36 internal, and zero
+# uncalled.
 $cp337MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp336DotSourceIndexForCp337 = $cp337MainAuditText.IndexOf('ideal-loads-structure-audit\cp336-cooling-positive-supply-enthalpy-assignment.ps1')
 $cp337DotSourceIndex = $cp337MainAuditText.IndexOf('ideal-loads-structure-audit\cp337-cooling-positive-supply-capacity-limit-guard.ps1')
+$cp338DotSourceIndexForCp337 = $cp337MainAuditText.IndexOf('ideal-loads-structure-audit\cp338-cooling-positive-supply-capacity-limit-cp-air-assignment.ps1')
 $cp337AuditCompletionIndex = $cp337MainAuditText.IndexOf('Write-Host "IdealLoads structure audit complete."')
 if (
     $cp336DotSourceIndexForCp337 -lt 0 -or
     $cp337DotSourceIndex -le $cp336DotSourceIndexForCp337 -or
-    $cp337AuditCompletionIndex -le $cp337DotSourceIndex
+    $cp338DotSourceIndexForCp337 -le $cp337DotSourceIndex -or
+    $cp337AuditCompletionIndex -le $cp338DotSourceIndexForCp337
 ) {
-    throw "Main IdealLoads audit must dot-source CP337 after CP336 and before completion"
+    throw "Main IdealLoads audit must dot-source CP337 after CP336 and CP338 after CP337 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 275' -Description "CP337 inventory total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 276' -Description "CP337 cumulative inventory total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp337-cooling-positive-supply-capacity-limit-guard\.ps1"' -Description "CP337 internal script inventory record"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 275 \|' -Description "CP337 generated script count"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment\.ps1"' -Description "CP338 internal script inventory record after CP337"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 276 \|' -Description "CP337 cumulative generated script count"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP337 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 35 \|' -Description "CP337 generated internal script count"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 36 \|' -Description "CP337 cumulative generated internal script count"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP337 generated uncalled script count"

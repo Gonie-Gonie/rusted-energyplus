@@ -17531,6 +17531,83 @@ counts, readiness, support level, run state, required and forbidden features,
 output claims, evidence cases, numerical conformance, capability status, and
 Roadmap state remain unchanged.
 
+## CP338 Source-Ordered Cooling Positive-Supply Capacity-Limit CpAir Assignment
+
+CP338 supersedes only CP337's physical-line-2196 exclusion for the single
+Cooling positive-supply capacity-limit `CpAir` assignment at locked EnergyPlus
+26.1 `PurchasedAirManager.cc` physical executable line 2196:
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`. The locked source-file
+SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exactly three textual witness sites are:
+
+1. `read-purchased-air-mixed-air-humidity-ratio`;
+2. `evaluate-psy-cp-air-fn-w`;
+3. `assign-local-cp-air`.
+
+Only CP337's `CapacityLimitBodyEntered` route executes CP338. Therefore both
+`LimitCapacity` and `LimitFlowRateAndCapacity` execute all three sites, while
+UnitOff, non-cooling, CP330 `PositiveGuardFalseFallthrough`, and CP337
+`ActiveCapacityLimitGuardFalseFallthrough` skip the statement and retain null
+operand/result evidence. Pending and completed state partition every CP337
+transition into the five CP338 routes `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`, or
+`CapacityLimitCpAirAssigned`. If `A` denotes CP338 active assignments, then
+`A` equals CP337 capacity-limit body entries `B`,
+`source_site_execution_count = 3*A = 3*B`, and every per-site counter equals
+`A`.
+
+Exact direct release accepts the same-call CP337 snapshot as its only
+predecessor argument, recursively proves its latest/private witness and full
+retained chain, and reads `PurchAir.MixedAirHumRat` only from the same-call
+completed CP329 latest/private witness's `mixed_air_humidity_ratio`. CP329 owns
+the retained source field. Equal no-OA controlled-Zone humidity remains
+same-call lineage evidence and cannot replace that operand. The wrapper admits
+no duplicate caller humidity scalar, Zone-state or selected-system re-read,
+live service, maximum total cooling capacity or sizing value, line-2197 body
+operand, or numerical-DTO input.
+
+The pure transition evaluates canonical
+`crate::psychrometrics::energyplus_psy_cp_air_fn_w`, including the EnergyPlus
+humidity floor, and assigns its returned binary64 result unchanged to local
+`CpAir`. Exact direct admission requires the CP329 humidity and result to be
+finite and the humidity to be `>= 0.0`; both signed-zero inputs use the positive
+floor. The C++ function's mutable last-call cache, cache identity and
+hit/miss/reset/interleaving behavior, and broader psychrometric parity remain
+deferred. Latest/private witness parity and checked-arithmetic preflight make
+identity, ordinal, operand, provenance, history, replay, corruption,
+nonfinite-result, and overflow failures transactional.
+
+Scheduled binding, coupled runtime, and pipeline preserve exact
+CP337-to-CP338-to-numerical order and expose direct-only
+`purchased_air_calc_cooling_positive_supply_capacity_limit_cp_air_assignment_lifecycle`
+evidence. CP338 neither consumes nor reconciles with the unchanged numerical
+DTO and does not feed or replace it; non-direct execution publishes `None` and
+rejects CP338 evidence.
+
+Physical line 2197 is the first excluded lexical executable and CP339
+boundary:
+`CoolSensOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);`.
+CP338 excludes every line-2197 read, subtraction, multiplication, and
+assignment; the maximum-capacity comparison and adjustment at lines 2198-2203;
+the false continuation at line 2208 and later work through line 2337; the
+zero-flow `else` at 2339-2345 whose first executable is 2340; the outer
+Heat/DeadBand sibling at 2347-2348; its mixed-air call at 2454-2461; and the
+sibling guard at 2465. A CP337 false guard still skips CP338 and next
+dynamically executes physical line 2208 after the non-executable lines
+2204-2207.
+
+CP338 adds target inventory and lifecycle evidence only. Sensible-output and
+capacity arithmetic, maximum-capacity ownership, supply-state mutation,
+broader psychrometrics, humidity, enthalpy, output, `OutdoorAir`, `Economizer`,
+`HeatRecovery`, `EMS`, and Autosizing behavior remain unpromoted. Both parent
+algorithms remain `scaffold`/`none`; `routine.calc_purch_air_loads` and
+`routine.calc_purch_air_mixed_air` remain `source_mapped`. Algorithm/routine
+counts, readiness, support level, run state, required and forbidden features,
+output claims, evidence cases, numerical conformance, capability status, and
+Roadmap state remain unchanged.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before

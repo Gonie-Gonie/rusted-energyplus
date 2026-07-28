@@ -34452,6 +34452,60 @@ routines remain `source_mapped`. CP337 adds no support, conformance, capability,
 output claim, status, algorithm/routine count, readiness, feature-boundary,
 evidence-case, numerical-conformance, or Roadmap promotion.
 
+## CP338 Positive-Supply Capacity-Limit CpAir Assignment in the Heat-Balance Loop
+
+CP338 advances the direct-Zone IdealLoads heat-balance lifecycle only through
+locked EnergyPlus 26.1 `PurchasedAirManager.cc` physical executable line 2196,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`. The locked source-file
+SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact textual Rust witness contains three sites:
+`read-purchased-air-mixed-air-humidity-ratio`,
+`evaluate-psy-cp-air-fn-w`, and `assign-local-cp-air`.
+
+Only the CP337 `CapacityLimitBodyEntered` route executes CP338, so
+`LimitCapacity` and `LimitFlowRateAndCapacity` each execute all three sites.
+UnitOff, non-cooling, CP330 positive-guard-false, and CP337
+`ActiveCapacityLimitGuardFalseFallthrough` routes skip the statement and
+retain null operand/result evidence. The five routes are `UnitOff`,
+`NonCooling`, `PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`, and
+`CapacityLimitCpAirAssigned`. With active CP338 assignments `A`, equal to
+CP337 body entries `B`, exact state requires
+`source_site_execution_count=3*A=3*B`, and every per-site counter equals `A`.
+
+Exact direct admission accepts only the same-call CP337 predecessor,
+recursively proves its latest/private witness and retained chain, and reads
+`PurchAir.MixedAirHumRat` only from the same-call completed CP329
+latest/private witness's `mixed_air_humidity_ratio`. The equal no-OA Zone
+humidity is lineage evidence rather than a replacement operand. CP338 requests
+no duplicate humidity scalar, Zone-state or typed-system re-read,
+maximum-capacity or sizing value, heat-balance or Node scalar, schedule, EMS or
+other live service, later body operand, or numerical-DTO input. The pure
+transition evaluates canonical `energyplus_psy_cp_air_fn_w`, including the
+source humidity floor, and assigns the returned bits to local `CpAir`; mutable
+C++ cache behavior and broader psychrometric parity stay deferred.
+
+The binding and lifecycle JSON preserve CP337-to-CP338-to-numerical order under
+`purchased_air_calc_cooling_positive_supply_capacity_limit_cp_air_assignment_lifecycle`.
+CP338 neither consumes nor reconciles with the numerical DTO and does not feed
+or replace it; non-direct execution carries no CP338 lifecycle. Physical line
+2197 is the first excluded lexical executable and CP339 boundary:
+`CoolSensOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);`.
+Its operand reads and arithmetic, maximum-capacity comparison and adjustment
+at lines 2198-2203, false-path line 2208 and later behavior through 2337, the
+zero-flow branch at 2339-2345, the Heat/DeadBand sibling at 2347-2348, its
+mixed-air call at 2454-2461, and guard at 2465 stay excluded. A CP337 false
+guard skips CP338 and next dynamically executes physical line 2208.
+
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, Autosizing, broad humidity
+control, sensible-output and capacity arithmetic, maximum-capacity ownership,
+broader psychrometrics, enthalpy, supply-state, and output behavior remain
+unpromoted. Both parents remain `scaffold`/`none`; both Calc routines remain
+`source_mapped`. CP338 adds no support, conformance, capability, output claim,
+status, algorithm/routine count, readiness, feature-boundary, evidence-case,
+numerical-conformance, or Roadmap promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

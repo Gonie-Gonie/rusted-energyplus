@@ -214,14 +214,15 @@ Assert-Contains -Path $cp334InitWitness -Pattern 'pub\(in crate::ideal_loads\) f
 Assert-Contains -Path $cp334InitState -Pattern 'pub calc_cooling_positive_supply_temperature_mixed_air_limit:\s*[\r\n]+\s*PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitRuntimeState' -Description "per-unit CP334 persistent state"
 Assert-Contains -Path $cp334InitUnit -Pattern '(?s)calc_cooling_positive_supply_temperature_mixed_air_limit:\s*PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitRuntimeState::new\(\s*system\s*,?\s*\)' -Description "per-unit CP334 state initialization"
 
-# Binding must be CP333 -> CP334 -> CP335 -> CP336 -> CP337 -> the unchanged
-# numerical DTO with no hidden source helper between any boundary.
+# Binding must be CP333 -> CP334 -> CP335 -> CP336 -> CP337 -> CP338 -> the
+# unchanged numerical DTO with no hidden source helper between any boundary.
 $cp334BindingText = Read-RepoText -Path $cp334Binding
 $cp333BindingIndexForCp334 = $cp334BindingText.IndexOf("let calculation_cooling_positive_supply_temperature_minimum_limit =")
 $cp334BindingIndex = $cp334BindingText.IndexOf("let calculation_cooling_positive_supply_temperature_mixed_air_limit =")
 $cp335BindingIndexForCp334 = $cp334BindingText.IndexOf("let calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment =")
 $cp336BindingIndexForCp334 = $cp334BindingText.IndexOf("let calculation_cooling_positive_supply_enthalpy_assignment =")
 $cp337BindingIndexForCp334 = $cp334BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_guard =")
+$cp338BindingIndexForCp334 = $cp334BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_cp_air_assignment =")
 $numericalBindingIndexForCp334 = $cp334BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp333BindingIndexForCp334 -lt 0 -or
@@ -229,9 +230,10 @@ if (
     $cp335BindingIndexForCp334 -le $cp334BindingIndex -or
     $cp336BindingIndexForCp334 -le $cp335BindingIndexForCp334 -or
     $cp337BindingIndexForCp334 -le $cp336BindingIndexForCp334 -or
-    $numericalBindingIndexForCp334 -le $cp337BindingIndexForCp334
+    $cp338BindingIndexForCp334 -le $cp337BindingIndexForCp334 -or
+    $numericalBindingIndexForCp334 -le $cp338BindingIndexForCp334
 ) {
-    throw "Binding must retain exact CP333 -> CP334 -> CP335 -> CP336 -> CP337 -> numerical Calc order"
+    throw "Binding must retain exact CP333 -> CP334 -> CP335 -> CP336 -> CP337 -> CP338 -> numerical Calc order"
 }
 Assert-Contains -Path $cp334Binding -Pattern '(?s)let calculation_cooling_positive_supply_temperature_mixed_air_limit =\s*advance_positive_supply_temperature_mixed_air_limit\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_positive_supply_temperature_minimum_limit,\s*\)\?;' -Description "binding exact CP333-to-CP334 adapter call"
 Assert-Contains -Path $cp334BindingAdapter -Pattern '(?s)pub\(super\) fn advance_positive_supply_temperature_mixed_air_limit\(\s*runtime: &mut PurchasedAirRuntimeState,\s*system: &IdealLoadsAirSystem,\s*predecessor: PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitSnapshot,' -Description "CP334 binding adapter arguments"
@@ -262,14 +264,19 @@ $cp337BindingCallForCp334 = [regex]::Match(
     $cp334BindingText,
     '(?s)let calculation_cooling_positive_supply_capacity_limit_guard =\s*advance_positive_supply_capacity_limit_guard\([^;]+?\)\?;'
 )
+$cp338BindingCallForCp334 = [regex]::Match(
+    $cp334BindingText,
+    '(?s)let calculation_cooling_positive_supply_capacity_limit_cp_air_assignment =\s*advance_positive_supply_capacity_limit_cp_air_assignment\([^;]+?\)\?;'
+)
 if (
     -not $cp333BindingCallForCp334.Success -or
     -not $cp334BindingCall.Success -or
     -not $cp335BindingCallForCp334.Success -or
     -not $cp336BindingCallForCp334.Success -or
-    -not $cp337BindingCallForCp334.Success
+    -not $cp337BindingCallForCp334.Success -or
+    -not $cp338BindingCallForCp334.Success
 ) {
-    throw "Binding must retain complete CP333, CP334, CP335, CP336, and CP337 exact release calls"
+    throw "Binding must retain complete CP333, CP334, CP335, CP336, CP337, and CP338 exact release calls"
 }
 $cp333BindingCallEndForCp334 =
     $cp333BindingCallForCp334.Index + $cp333BindingCallForCp334.Length
@@ -280,14 +287,17 @@ $cp336BindingCallEndForCp334 =
     $cp336BindingCallForCp334.Index + $cp336BindingCallForCp334.Length
 $cp337BindingCallEndForCp334 =
     $cp337BindingCallForCp334.Index + $cp337BindingCallForCp334.Length
+$cp338BindingCallEndForCp334 =
+    $cp338BindingCallForCp334.Index + $cp338BindingCallForCp334.Length
 if (
     $cp334BindingIndex -lt $cp333BindingCallEndForCp334 -or
     $cp335BindingIndexForCp334 -lt $cp334BindingCallEnd -or
     $cp336BindingIndexForCp334 -lt $cp335BindingCallEndForCp334 -or
     $cp337BindingIndexForCp334 -lt $cp336BindingCallEndForCp334 -or
-    $numericalBindingIndexForCp334 -lt $cp337BindingCallEndForCp334
+    $cp338BindingIndexForCp334 -lt $cp337BindingCallEndForCp334 -or
+    $numericalBindingIndexForCp334 -lt $cp338BindingCallEndForCp334
 ) {
-    throw "CP333, CP334, CP335, CP336, and CP337 exact release calls must complete in source order before numerical Calc"
+    throw "CP333, CP334, CP335, CP336, CP337, and CP338 exact release calls must complete in source order before numerical Calc"
 }
 $postCp333BeforeCp334ForCp334 = $cp334BindingText.Substring(
     $cp333BindingCallEndForCp334,
@@ -325,14 +335,23 @@ $postCp336BeforeCp337CodeForCp334 =
 if ($postCp336BeforeCp337CodeForCp334 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
     throw "No intermediary helper call may execute after CP336 and before CP337"
 }
-$postCp337BeforeNumericalForCp334 = $cp334BindingText.Substring(
+$postCp337BeforeCp338ForCp334 = $cp334BindingText.Substring(
     $cp337BindingCallEndForCp334,
-    $numericalBindingIndexForCp334 - $cp337BindingCallEndForCp334
+    $cp338BindingIndexForCp334 - $cp337BindingCallEndForCp334
 )
-$postCp337BeforeNumericalCodeForCp334 =
-    [regex]::Replace($postCp337BeforeNumericalForCp334, '(?m)//.*$', '')
-if ($postCp337BeforeNumericalCodeForCp334 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No later source helper call may execute after CP337 and before numerical Calc"
+$postCp337BeforeCp338CodeForCp334 =
+    [regex]::Replace($postCp337BeforeCp338ForCp334, '(?m)//.*$', '')
+if ($postCp337BeforeCp338CodeForCp334 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No intermediary helper call may execute after CP337 and before CP338"
+}
+$postCp338BeforeNumericalForCp334 = $cp334BindingText.Substring(
+    $cp338BindingCallEndForCp334,
+    $numericalBindingIndexForCp334 - $cp338BindingCallEndForCp334
+)
+$postCp338BeforeNumericalCodeForCp334 =
+    [regex]::Replace($postCp338BeforeNumericalForCp334, '(?m)//.*$', '')
+if ($postCp338BeforeNumericalCodeForCp334 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No later source helper call may execute after CP338 and before numerical Calc"
 }
 
 # Coupled runtime independently reconstructs CP334 from exact CP333 and CP329
@@ -372,7 +391,7 @@ Assert-Contains -Path $cp334DirectAssertions -Pattern 'const SOURCE_ORDER:\s*\[&
 Assert-Contains -Path $cp334DirectAssertions -Pattern 'executions \* SOURCE_ORDER\.len\(\) as u64' -Description "direct-run CP334 dynamic source-site count"
 Assert-Contains -Path $cp334DirectAssertions -Pattern 'purchased_air_calc_cooling_mixed_air_call_lifecycle' -Description "direct-run CP329 bit provenance"
 Assert-Contains -Path $cp334NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle' -Description "non-direct CP334 null evidence"
-Assert-Contains -Path $cp334PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp337_lifecycle_evidence' -Description "non-direct CP334 through CP337 evidence rejection"
+Assert-Contains -Path $cp334PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp338_lifecycle_evidence' -Description "non-direct CP334 through CP338 evidence rejection"
 
 # Registries repeat the boundary exactly twice and add target inventory only.
 $cp334AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"

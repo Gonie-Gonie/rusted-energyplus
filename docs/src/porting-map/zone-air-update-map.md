@@ -22150,6 +22150,64 @@ and lifecycle evidence only and changes no algorithm/routine count, readiness,
 support, conformance, capability, status, feature boundary, evidence case,
 numerical conformance, output claim, or Roadmap state.
 
+## CP338 Cooling Positive-Supply Capacity-Limit CpAir Assignment Placement
+
+CP338 extends the exact direct-Zone update path only through locked EnergyPlus
+26.1 `PurchasedAirManager.cc` physical executable line 2196,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`. The locked source-file
+SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The exact three-site textual Rust witness inventory is
+`read-purchased-air-mixed-air-humidity-ratio`,
+`evaluate-psy-cp-air-fn-w`, and `assign-local-cp-air`.
+
+Only CP337 `CapacityLimitBodyEntered` executes CP338. Thus `LimitCapacity` and
+`LimitFlowRateAndCapacity` execute all three sites, while UnitOff, non-cooling,
+CP330 positive-guard-false, and CP337
+`ActiveCapacityLimitGuardFalseFallthrough` skip them and retain null
+operand/result evidence. The five routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`, and
+`CapacityLimitCpAirAssigned`. If `A` is the CP338 active-assignment count and
+`B` the CP337 body-entry count, `A=B`,
+`source_site_execution_count=3*A=3*B`, and all three per-site counters equal
+`A`.
+
+Exact direct execution takes only the same-call CP337 predecessor, recursively
+validates its latest/private witness and retained chain, and obtains
+`PurchAir.MixedAirHumRat` solely from the same-call completed CP329
+latest/private witness's `mixed_air_humidity_ratio`. CP329 owns the retained
+source field; the equal no-OA Zone humidity remains lineage evidence rather
+than a substitute operand. No caller humidity scalar, Zone-state or
+typed-system re-read, maximum-capacity or sizing value, Zone/Node scalar,
+schedule/EMS or other live service, subsequent body operand, or numerical DTO
+is admitted. Canonical `energyplus_psy_cp_air_fn_w` applies the source humidity
+floor and its returned binary64 value is assigned to local `CpAir`; mutable C++
+cache behavior and broader psychrometric parity remain deferred.
+
+Binding, coupled execution, and pipeline serialization preserve
+CP337-to-CP338-to-numerical order and publish direct-only
+`purchased_air_calc_cooling_positive_supply_capacity_limit_cp_air_assignment_lifecycle`
+evidence without consuming, reconciling with, feeding, or replacing the
+numerical DTO. Non-direct execution publishes `None` and rejects CP338
+evidence. Physical line 2197 is the first excluded lexical executable and
+CP339 boundary:
+`CoolSensOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);`.
+Its reads and arithmetic, lines 2198-2203, false-path line 2208 and later
+behavior through 2337, the zero-flow `else` at 2339-2345, the Heat/DeadBand
+sibling at 2347-2348, its mixed-air call at 2454-2461, and guard at 2465 remain
+excluded. A CP337 false guard skips CP338 and next dynamically executes line
+2208 after non-executable lines 2204-2207.
+
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, Autosizing, broad humidity
+control, sensible-output and capacity arithmetic, maximum-capacity ownership,
+broader psychrometrics, enthalpy, supply-state, and output behavior remain
+unpromoted. Both parents remain `scaffold`/`none`; both Calc routines remain
+`source_mapped`. CP338 adds target and lifecycle evidence only and changes no
+algorithm/routine count, readiness, support, conformance, capability, status,
+feature boundary, evidence case, numerical conformance, output claim, or
+Roadmap state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

@@ -1381,6 +1381,68 @@ routines remain `source_mapped`, and algorithm/routine counts, readiness,
 support, run state, feature boundaries, evidence cases, numerical conformance,
 capability, status, output claims, and Roadmap state remain unchanged.
 
+CP338 now maps only the Cooling positive-supply capacity-limit `CpAir`
+assignment at locked EnergyPlus 26.1 `PurchasedAirManager.cc` physical
+executable line 2196,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`. The locked source-file
+SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact three textual sites are
+`read-purchased-air-mixed-air-humidity-ratio`,
+`evaluate-psy-cp-air-fn-w`, and `assign-local-cp-air`, in that order.
+
+Only CP337 `CapacityLimitBodyEntered` executes CP338, so both
+`LimitCapacity` and `LimitFlowRateAndCapacity` execute all three sites.
+UnitOff, non-cooling, CP330 `PositiveGuardFalseFallthrough`, and CP337
+`ActiveCapacityLimitGuardFalseFallthrough` skip the complete statement and
+retain null operand/result evidence. The five retained CP338 routes are
+`UnitOff`, `NonCooling`, `PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`, and
+`CapacityLimitCpAirAssigned`. If `A` is the CP338 active-assignment count,
+which equals the CP337 capacity-limit body-entry count `B`, exact lifecycle
+state requires `source_site_execution_count = 3*A = 3*B`; the mixed-air
+humidity read, psychrometric evaluation, and local assignment counters each
+equal `A`.
+
+Exact direct release accepts only the same-call CP337 predecessor, recursively
+validates its latest/private witness and retained chain, and obtains the active
+`PurchAir.MixedAirHumRat` operand only from the same-call completed CP329
+latest/private witness's `mixed_air_humidity_ratio`. CP329 owns that retained
+source field; the equal no-OA Zone humidity is lineage evidence, not a
+substitute operand. No duplicate caller scalar, Zone-state or typed-model
+re-read, live service, maximum-capacity or sizing value, later body operand, or
+numerical-DTO input is admitted. The transition evaluates only canonical
+`energyplus_psy_cp_air_fn_w`, including its source humidity floor, and assigns
+the returned binary64 value to local `CpAir`; mutable last-call cache behavior
+and broader psychrometric parity remain deferred. Five-route parity,
+latest/private witnesses, and checked-arithmetic preflight make identity,
+ordinal, operand, provenance, history, replay, corruption, nonfinite-result,
+and overflow rejection transactional.
+
+Binding, coupled runtime, and pipeline evidence preserve
+CP337-to-CP338-to-numerical order under
+`purchased_air_calc_cooling_positive_supply_capacity_limit_cp_air_assignment_lifecycle`.
+CP338 does not consume, reconcile with, feed, or replace the unchanged
+numerical DTO; non-direct paths publish `None` and reject attached evidence.
+Physical line 2197 is the first excluded lexical executable and CP339
+boundary:
+`CoolSensOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);`.
+Its reads, subtraction, multiplication, and assignment, the capacity
+comparison and adjustment at lines 2198-2203, false-path line 2208 and later
+work through 2337, the zero-flow `else` at 2339-2345, the Heat/DeadBand sibling
+at 2347-2348, its mixed-air call at 2454-2461, and guard at 2465 remain
+excluded.
+
+CP338 adds target inventory and direct-only lifecycle evidence, not sensible
+output or capacity arithmetic, maximum-capacity ownership, supply-state
+mutation, broader psychrometrics, live services, or numerical-result
+promotion. `OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, Autosizing,
+broad humidity control, broader capacity, enthalpy, and output behavior remain
+unpromoted. Both parent algorithms remain `scaffold`/`none`; both Calc
+routines remain `source_mapped`, and algorithm/routine counts, readiness,
+support, run state, feature boundaries, evidence cases, numerical conformance,
+capability, status, output claims, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It
