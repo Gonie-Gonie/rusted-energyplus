@@ -20,6 +20,7 @@ mod prefix_validation;
 mod runtime_validation;
 mod snapshot_validation;
 
+pub(in crate::ideal_loads::calc) use prefix_validation::private_active_counterfactual_links_to_direct_release;
 use prefix_validation::{
     active_operand_links_to_retained_owner, cp_air_assignment_links_to_predecessor,
 };

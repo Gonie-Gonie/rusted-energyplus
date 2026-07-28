@@ -473,6 +473,118 @@ fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
     ] {
         assert_eq!(cp349[field], 0, "{field}");
     }
+    let cp350 = &summary["rust_runtime"]["purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_lifecycle"];
+    assert_eq!(
+        cp350["source"],
+        "EnergyPlus 26.1 PurchasedAirManager.cc:2217"
+    );
+    assert_eq!(
+        cp350["first_excluded_source"],
+        "EnergyPlus 26.1 PurchasedAirManager.cc:2218"
+    );
+    assert_eq!(
+        cp350["latest"]["source_order"]
+            .as_array()
+            .expect("CP350 source order"),
+        &[
+            "read-retained-supply-mass-flow-rate-for-constant-sensible-heat-ratio-sensible-output-first-product",
+            "read-local-cp-air-for-constant-sensible-heat-ratio-sensible-output-first-product",
+            "calculate-supply-mass-flow-rate-times-cp-air-for-constant-sensible-heat-ratio-sensible-output",
+            "read-purchased-air-mixed-air-temperature-for-constant-sensible-heat-ratio-sensible-output-difference",
+            "read-purchased-air-supply-temperature-for-constant-sensible-heat-ratio-sensible-output-difference",
+            "calculate-mixed-air-temperature-minus-supply-temperature-for-constant-sensible-heat-ratio-sensible-output",
+            "calculate-mass-flow-cp-air-product-times-temperature-difference-for-constant-sensible-heat-ratio-sensible-output",
+            "assign-local-cooling-sensible-output-for-constant-sensible-heat-ratio-case",
+        ]
+    );
+    for (cp350_field, cp349_field) in [
+        (
+            "predecessor_dehumidification_control_type",
+            "predecessor_dehumidification_control_type",
+        ),
+        (
+            "predecessor_dehumidification_control_none_case_completed_skip",
+            "dehumidification_control_none_case_completed_skip",
+        ),
+        (
+            "predecessor_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_executed",
+            "dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_executed",
+        ),
+        (
+            "predecessor_dehumidification_control_humidistat_case_selected_skip",
+            "dehumidification_control_humidistat_case_selected_skip",
+        ),
+        (
+            "predecessor_dehumidification_control_constant_supply_humidity_ratio_case_selected_skip",
+            "dehumidification_control_constant_supply_humidity_ratio_case_selected_skip",
+        ),
+    ] {
+        assert_eq!(
+            cp350["latest"][cp350_field], cp349["latest"][cp349_field],
+            "CP350 must retain immediate CP349 {cp349_field} lineage"
+        );
+    }
+    assert_eq!(
+        cp350["latest"]["dehumidification_control_none_case_completed_skip"],
+        true
+    );
+    assert_eq!(
+        cp350["latest"]["dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_executed"],
+        false
+    );
+    for field in [
+        "supply_mass_flow_rate_read",
+        "cp_air_read",
+        "supply_mass_flow_rate_times_cp_air_calculated",
+        "mixed_air_temperature_read",
+        "supply_temperature_read",
+        "mixed_air_minus_supply_temperature_calculated",
+        "cooling_sensible_output_calculated",
+        "cooling_sensible_output_assigned",
+    ] {
+        assert_eq!(cp350["latest"][field], false, "{field}");
+    }
+    for field in [
+        "supply_mass_flow_rate_kg_per_s",
+        "supply_mass_flow_rate_kg_per_s_ieee_bits",
+        "cp_air_j_per_kg_k",
+        "cp_air_j_per_kg_k_ieee_bits",
+        "supply_mass_flow_rate_times_cp_air_w_per_k",
+        "supply_mass_flow_rate_times_cp_air_w_per_k_ieee_bits",
+        "mixed_air_temperature_c",
+        "mixed_air_temperature_c_ieee_bits",
+        "supply_temperature_c",
+        "supply_temperature_c_ieee_bits",
+        "mixed_air_minus_supply_temperature_k",
+        "mixed_air_minus_supply_temperature_k_ieee_bits",
+        "calculated_cooling_sensible_output_w",
+        "calculated_cooling_sensible_output_w_ieee_bits",
+        "cooling_sensible_output_w",
+        "cooling_sensible_output_w_ieee_bits",
+    ] {
+        assert!(cp350["latest"][field].is_null(), "{field}");
+    }
+    assert_eq!(
+        cp350["dehumidification_control_none_case_completed_skip_count"],
+        cp349["dehumidification_control_none_case_completed_skip_count"]
+    );
+    assert_eq!(
+        cp350["dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_count"],
+        0
+    );
+    for field in [
+        "source_site_execution_count",
+        "supply_mass_flow_rate_read_count",
+        "cp_air_read_count",
+        "supply_mass_flow_rate_times_cp_air_calculation_count",
+        "mixed_air_temperature_read_count",
+        "supply_temperature_read_count",
+        "mixed_air_minus_supply_temperature_calculation_count",
+        "cooling_sensible_output_calculation_count",
+        "cooling_sensible_output_assignment_write_count",
+    ] {
+        assert_eq!(cp350[field], 0, "{field}");
+    }
     Ok(())
 }
 
@@ -897,6 +1009,14 @@ fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
     assert!(
         rust_runtime
             ["purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_lifecycle"]
+            .is_null()
+    );
+    assert!(rust_runtime.contains_key(
+        "purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_lifecycle"
+    ));
+    assert!(
+        rust_runtime
+            ["purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_lifecycle"]
             .is_null()
     );
     assert_eq!(summary["source_order_gate"]["matches"], true);

@@ -18496,6 +18496,97 @@ required. Both parent algorithms remain `scaffold`/`none`;
 boundaries, numerical conformance, output ownership, status, conformance, and
 Roadmap state remain unchanged.
 
+## CP350 Source-Ordered Cooling Positive-Supply Constant-Sensible-Heat-Ratio Sensible-Output Assignment
+
+CP350 supersedes only CP349's physical-line-2217 exclusion by mapping the
+constant-sensible-heat-ratio local sensible-output assignment at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2217:
+
+```cpp
+CoolSensOutput = SupplyMassFlowRate * CpAir * (PurchAir.MixedAirTemp - PurchAir.SupplyTemp);
+```
+
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The exact eight-site order is
+`read-retained-supply-mass-flow-rate-for-constant-sensible-heat-ratio-sensible-output-first-product`,
+`read-local-cp-air-for-constant-sensible-heat-ratio-sensible-output-first-product`,
+`calculate-supply-mass-flow-rate-times-cp-air-for-constant-sensible-heat-ratio-sensible-output`,
+`read-purchased-air-mixed-air-temperature-for-constant-sensible-heat-ratio-sensible-output-difference`,
+`read-purchased-air-supply-temperature-for-constant-sensible-heat-ratio-sensible-output-difference`,
+`calculate-mixed-air-temperature-minus-supply-temperature-for-constant-sensible-heat-ratio-sensible-output`,
+`calculate-mass-flow-cp-air-product-times-temperature-difference-for-constant-sensible-heat-ratio-sensible-output`,
+and
+`assign-local-cooling-sensible-output-for-constant-sensible-heat-ratio-case`.
+Physical line 2218,
+`CoolTotOutput = CoolSensOutput / PurchAir.CoolSHR;`, is the first excluded
+executable. The `CoolSHR` read, division, total-output assignment, and every
+later constant-SHR/dehumidification operation remain excluded.
+
+Routes are inherited `U/N/P`, completed-`None` skip `C0`, private
+constant-SHR sensible-output assignment `Q`, and private `H/CSH` skips. For
+CP346 dispatches `S`, CP345 assignments `R`, capacity provenance `G/F/L`,
+CP340 active evaluations `A`, and CP349 assignments `K`, checked state
+requires:
+
+```text
+T = U+N+P+C0+Q+H+CSH
+S = C0+Q+H+CSH = R = G+F+L
+A = F+L
+Q = K
+source_site_execution_count = 8*Q
+```
+
+Every per-site count equals `Q`; every non-`Q` route executes no CP350 site.
+Exact direct release inherits CP349's completed `None` route and requires
+`C0=S` and `Q=H=CSH=0`, so all operands, intermediates, and results are null.
+The active constant-SHR route is private characterization only.
+
+Exact direct `C0` release validates same-call CP349 supplied/latest/private
+bit parity and invokes CP349's completed recursive proof before mutation.
+Private `Q` cannot equal that direct null snapshot; it is accepted only as a
+restricted same-call counterfactual derivation from the recursively complete
+direct CP349 baseline. Only the dehumidification selector, `C0`-to-`K` route
+facts, CP329-owned humidity, and canonical local-`CpAir` evidence may differ.
+
+Same-call retained CP330 solely owns `supply_mass_flow_rate_kg_per_s`, CP349
+solely owns `cp_air_j_per_kg_k`, and CP329 solely owns
+`mixed_air_temperature_c`. CP345's retained `G/F/L` provenance chooses the
+fourth owner: CP334 `assigned_supply_temperature_c` for `G/F`, or CP344
+`resulting_supply_temperature_c` for `L`. Active construction requires the
+retained CP330, CP329, CP345, and selected CP334-or-CP344 latest/private
+witness pair to pass its own runtime-aware completed recursive validator.
+Coordinated latest/witness, owner, or provenance corruption is rejected
+transactionally before CP350 state or witness mutation. CP343 only supplies
+recursive lineage to CP344. CP331/CP338 `CpAir` values, caller/model scalar
+rereads, and psychrometric helper reevaluation cannot satisfy CP350.
+
+The transition evaluates the exact source grouping
+`(flow * cp_air) * (mixed_temperature - supply_temperature)` and assigns its
+binary64 result without reassociation, fused arithmetic, clamp, normalization,
+or finite coercion. Its deterministic Rust order does not claim a C++
+built-in operand evaluation order because the reads are side-effect-free.
+CP350 only reasserts the inherited CP330 positive-flow and CP349
+finite-`CpAir` owner contracts; it adds no mixed-temperature,
+supply-temperature, or derived-result finite gate. Any nonfinite intermediate
+or result allowed by inherited operand contracts stays present in Rust and
+keeps authoritative IEEE bits; JSON represents only its numeric projection as
+`null`. Skipped snapshots keep both numeric and bit projections absent.
+
+Binding and direct-only lifecycle evidence preserve
+CP349-to-CP350-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_lifecycle`.
+CP350 neither enters nor consumes `DirectZonePurchasedAirCouplingInput` and
+does not reconcile with, feed, or replace the numerical DTO. Non-direct paths
+expose `None` and reject attached CP350 evidence. Counts remain 32 algorithms
+and 293 routines, 58 `state_mapped` plus 235 `source_mapped`, with 170
+required. Both parent algorithms remain `scaffold`/`none`;
+`routine.calc_purch_air_loads` and `routine.calc_purch_air_mixed_air` remain
+`source_mapped`. Support, readiness, run state, capability, feature/evidence
+boundaries, numerical conformance, output ownership, status, conformance, and
+Roadmap state remain unchanged.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before

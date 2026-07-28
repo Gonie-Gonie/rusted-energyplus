@@ -20495,6 +20495,77 @@ remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
 readiness, capability, feature/evidence, numerical-conformance, output,
 status, conformance, or Roadmap promotion.
 
+## CP350 Constant-Sensible-Heat-Ratio Sensible-Output Assignment
+
+CP350 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2217 and locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`:
+
+```cpp
+CoolSensOutput = SupplyMassFlowRate * CpAir * (PurchAir.MixedAirTemp - PurchAir.SupplyTemp);
+```
+
+Its exact site order is
+`read-retained-supply-mass-flow-rate-for-constant-sensible-heat-ratio-sensible-output-first-product`,
+`read-local-cp-air-for-constant-sensible-heat-ratio-sensible-output-first-product`,
+`calculate-supply-mass-flow-rate-times-cp-air-for-constant-sensible-heat-ratio-sensible-output`,
+`read-purchased-air-mixed-air-temperature-for-constant-sensible-heat-ratio-sensible-output-difference`,
+`read-purchased-air-supply-temperature-for-constant-sensible-heat-ratio-sensible-output-difference`,
+`calculate-mixed-air-temperature-minus-supply-temperature-for-constant-sensible-heat-ratio-sensible-output`,
+`calculate-mass-flow-cp-air-product-times-temperature-difference-for-constant-sensible-heat-ratio-sensible-output`,
+then
+`assign-local-cooling-sensible-output-for-constant-sensible-heat-ratio-case`.
+Line 2218, `CoolTotOutput = CoolSensOutput / PurchAir.CoolSHR;`, is the first
+excluded executable. CP350 claims none of that statement's selector read,
+division, assignment, or later case-body work.
+
+Routes are inherited `U/N/P`, completed-`None` skip `C0`, private
+constant-SHR assignment `Q`, and private `H/CSH` skips. For transitions `T`,
+CP346 dispatches `S`, CP345 assignments `R`, capacity provenance `G/F/L`,
+CP340 active evaluations `A`, and CP349 assignments `K`, checked state
+requires `T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`, `A=F+L`,
+`Q=K`, and `source_site_execution_count=8*Q`. Each per-site counter equals
+`Q`; every other route executes zero CP350 sites. Exact direct execution
+requires `C0=S` and `Q=H=CSH=0`, recording a complete null skip. Active `Q`
+remains private characterization.
+
+Direct `C0` proves exact CP349 supplied/latest/private parity and completed
+recursive lineage before mutation. Private `Q` instead uses a restricted
+same-call counterfactual CP349 derivation from that recursively complete
+direct baseline; only selector, `C0`-to-`K`, CP329 humidity, and canonical
+local-`CpAir` evidence may differ. CP330 `supply_mass_flow_rate_kg_per_s`,
+CP349 `cp_air_j_per_kg_k`, and CP329 `mixed_air_temperature_c` are the first
+three sole owners. CP345 `G/F/L` provenance selects supply temperature from
+CP334 `assigned_supply_temperature_c` on `G/F` or CP344
+`resulting_supply_temperature_c` on `L`. Retained CP330, CP329, CP345, and
+the selected CP334-or-CP344 owner must each pair exact latest/private witness
+evidence with its completed recursive validator; coordinated corruption fails
+transactionally before CP350 mutation. CP343 only contributes recursive
+lineage to CP344. CP331/CP338 `CpAir` values are not reusable, and CP350 never
+calls `energyplus_psy_cp_air_fn_w`.
+
+The transition preserves the left-associated source AST as
+`(flow * cp_air) * (mixed_temperature - supply_temperature)`, then copies the
+calculated bits to the assigned local result. It does not reassociate, fuse,
+clamp, normalize, or add a finite gate. Because all operand reads are
+side-effect-free, deterministic Rust site order does not claim a C++ built-in
+operand-evaluation order. Defensive nonfinite intermediates or results remain
+`Some` with authoritative IEEE bits; their JSON numeric projections alone
+become `null`.
+
+Binding, coupled runtime, and pipeline evidence preserve
+CP349-to-CP350-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_lifecycle`.
+No CP350 value enters `DirectZonePurchasedAirCouplingInput`; CP350 does not
+consume, reconcile with, feed, or replace the numerical DTO. Non-direct paths
+carry `None` and reject attached evidence. Both parent algorithms remain
+`scaffold`/`none`; both parent Calc routines remain `source_mapped`. Counts
+remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
+170 required. CP350 adds target/lifecycle evidence only, with no support,
+readiness, capability, feature/evidence, numerical-conformance, output,
+status, conformance, or Roadmap promotion.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

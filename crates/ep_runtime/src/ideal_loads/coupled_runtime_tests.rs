@@ -4982,3 +4982,117 @@ fn cp349_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed(
         "signed-zero operand corruption must fail exact-bit validation"
     );
 }
+
+#[test]
+fn cp350_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed() {
+    let mut typed = exact_model(1).typed;
+    typed.schedules[1].hourly_value = 0.0;
+    typed.schedules[2].hourly_value = 15.0;
+    typed.schedules[3].hourly_value = 1.0;
+    let model = SimulationModel::from_typed(typed);
+    let schedule_cache =
+        precompute_schedule_cache(&model.typed, 1).expect("one CP350 schedule sample");
+    let weather = weather_series_with_conditions(&model, 1, 30.0, 15.0, 30.0, 101_325.0);
+    let mut options = DirectZonePurchasedAirCoupledOptions::hourly_samples(1);
+    options.initial_zone_air_temperature_c = INITIAL_ZONE_TEMPERATURE_C;
+    let simulation = simulate_direct_zone_purchased_air_coupled_heat_balance(
+        &model,
+        &weather,
+        &schedule_cache,
+        options,
+    )
+    .expect("valid CP350 direct simulation");
+    let summary = &simulation.summary;
+    let state = &summary
+        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_lifecycle
+        .state;
+    let snapshot = state.latest.expect("latest CP350 snapshot");
+    let predecessor = summary
+        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_lifecycle
+        .state
+        .latest
+        .expect("latest CP349 predecessor");
+
+    assert_eq!(state.transition_count, 1);
+    assert_eq!(
+        state.dehumidification_control_none_case_completed_skip_count,
+        1
+    );
+    assert_eq!(
+        state
+            .dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_count,
+        0
+    );
+    assert_eq!(state.source_site_execution_count, 0);
+    assert_eq!(state.supply_mass_flow_rate_read_count, 0);
+    assert_eq!(state.cp_air_read_count, 0);
+    assert_eq!(
+        state.supply_mass_flow_rate_times_cp_air_calculation_count,
+        0
+    );
+    assert_eq!(state.mixed_air_temperature_read_count, 0);
+    assert_eq!(state.supply_temperature_read_count, 0);
+    assert_eq!(
+        state.mixed_air_minus_supply_temperature_calculation_count,
+        0
+    );
+    assert_eq!(state.cooling_sensible_output_calculation_count, 0);
+    assert_eq!(state.cooling_sensible_output_assignment_write_count, 0);
+    assert!(snapshot.dehumidification_control_none_case_completed_skip);
+    assert!(
+        !snapshot.dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_executed
+    );
+    assert!(!snapshot.supply_mass_flow_rate_read);
+    assert!(snapshot.supply_mass_flow_rate_kg_per_s.is_none());
+    assert!(!snapshot.cp_air_read);
+    assert!(snapshot.cp_air_j_per_kg_k.is_none());
+    assert!(!snapshot.supply_mass_flow_rate_times_cp_air_calculated);
+    assert!(
+        snapshot
+            .supply_mass_flow_rate_times_cp_air_w_per_k
+            .is_none()
+    );
+    assert!(!snapshot.mixed_air_temperature_read);
+    assert!(snapshot.mixed_air_temperature_c.is_none());
+    assert!(!snapshot.supply_temperature_read);
+    assert!(snapshot.supply_temperature_c.is_none());
+    assert!(!snapshot.mixed_air_minus_supply_temperature_calculated);
+    assert!(snapshot.mixed_air_minus_supply_temperature_k.is_none());
+    assert!(!snapshot.cooling_sensible_output_calculated);
+    assert!(snapshot.calculated_cooling_sensible_output_w.is_none());
+    assert!(!snapshot.cooling_sensible_output_assigned);
+    assert!(snapshot.cooling_sensible_output_w.is_none());
+
+    let expected =
+        super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_validation::expected_snapshot(
+            predecessor,
+        );
+    assert!(
+        super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_validation::snapshots_match_exact_bits(
+            &snapshot,
+            &expected,
+        )
+    );
+
+    let mut corrupted = snapshot;
+    corrupted.source_order = &["forged-constant-sensible-heat-ratio-sensible-output-assignment"];
+    assert!(
+        !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_validation::snapshots_match_exact_bits(
+            &corrupted,
+            &expected,
+        )
+    );
+
+    let mut negative_zero = snapshot;
+    negative_zero.supply_mass_flow_rate_kg_per_s = Some(-0.0);
+    let mut positive_zero = negative_zero;
+    positive_zero.supply_mass_flow_rate_kg_per_s = Some(0.0);
+    assert_eq!(negative_zero, positive_zero);
+    assert!(
+        !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_validation::snapshots_match_exact_bits(
+            &negative_zero,
+            &positive_zero,
+        ),
+        "signed-zero operand corruption must fail exact-bit validation"
+    );
+}

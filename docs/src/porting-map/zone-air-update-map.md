@@ -22919,6 +22919,73 @@ remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
 readiness, support, capability, feature/evidence boundary, numerical
 conformance, output ownership, status, conformance, or Roadmap state.
 
+## CP350 Constant-Sensible-Heat-Ratio Sensible-Output Assignment Placement
+
+CP350 extends the exact direct-Zone update sequence through pinned
+`PurchasedAirManager.cc` physical executable line 2217:
+
+```cpp
+CoolSensOutput = SupplyMassFlowRate * CpAir * (PurchAir.MixedAirTemp - PurchAir.SupplyTemp);
+```
+
+Commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`
+remain locked. The exact source order is
+`read-retained-supply-mass-flow-rate-for-constant-sensible-heat-ratio-sensible-output-first-product`,
+`read-local-cp-air-for-constant-sensible-heat-ratio-sensible-output-first-product`,
+`calculate-supply-mass-flow-rate-times-cp-air-for-constant-sensible-heat-ratio-sensible-output`,
+`read-purchased-air-mixed-air-temperature-for-constant-sensible-heat-ratio-sensible-output-difference`,
+`read-purchased-air-supply-temperature-for-constant-sensible-heat-ratio-sensible-output-difference`,
+`calculate-mixed-air-temperature-minus-supply-temperature-for-constant-sensible-heat-ratio-sensible-output`,
+`calculate-mass-flow-cp-air-product-times-temperature-difference-for-constant-sensible-heat-ratio-sensible-output`,
+and
+`assign-local-cooling-sensible-output-for-constant-sensible-heat-ratio-case`.
+Line 2218, `CoolTotOutput = CoolSensOutput / PurchAir.CoolSHR;`, is the first
+excluded executable; its division, result, and later case-body behavior remain
+outside CP350.
+
+Routes are inherited `U/N/P`, completed-`None` skip `C0`, private
+constant-SHR assignment `Q`, and private `H/CSH` skips. For transitions `T`,
+CP346 dispatches `S`, CP345 assignments `R`, capacity provenance `G/F/L`,
+CP340 active evaluations `A`, and CP349 assignments `K`, exact state requires
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`, `A=F+L`, `Q=K`, and
+`source_site_execution_count=8*Q`. Each per-site counter equals `Q`.
+Direct execution requires `C0=S` and `Q=H=CSH=0`, publishing a complete
+operand/intermediate/result-null skip. Active `Q` remains private
+characterization.
+
+Direct `C0` requires exact CP349 supplied/latest/private parity and the
+completed recursive CP349 proof before mutation. Private `Q` is instead a
+restricted same-call counterfactual derivation from that direct baseline.
+CP330 owns flow, CP349 owns local `CpAir`, and CP329 owns mixed-air
+temperature. CP345's `G/F/L` provenance selects supply temperature from CP334
+on `G/F` or CP344 on `L`. CP330, CP329, CP345, and the selected
+CP334-or-CP344 latest/private witness pair each pass their completed recursive
+validator; coordinated owner, witness, or provenance corruption fails
+transactionally before CP350 mutation. CP343 is only recursive lineage for
+the CP344 value. CP331/CP338 `CpAir` results cannot replace the immediate
+CP349 owner, and the helper is not reevaluated.
+
+The exact arithmetic is
+`(flow * cp_air) * (mixed_temperature - supply_temperature)`, without
+reassociation, fused operations, clamp, normalization, or a new finite gate.
+All reads are side-effect-free, so deterministic Rust witness order makes no
+C++ operand-evaluation-order claim. Any nonfinite value admitted by inherited
+contracts stays present with exact IEEE bits; JSON maps only a nonfinite
+numeric projection to `null`.
+
+Binding, coupled execution, and pipeline serialization preserve
+CP349-to-CP350-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_lifecycle`.
+No CP350 evidence enters `DirectZonePurchasedAirCouplingInput`; CP350 does not
+consume, reconcile with, feed, or replace the numerical DTO. Non-direct paths
+publish `None` and reject attached evidence. Both parents remain
+`scaffold`/`none`, both Calc routines remain `source_mapped`, and counts
+remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
+170 required. CP350 adds target/lifecycle evidence only and changes no
+readiness, support, capability, feature/evidence boundary, numerical
+conformance, output ownership, status, conformance, or Roadmap state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:
