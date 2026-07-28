@@ -30,6 +30,8 @@ mod cooling_supply_mass_flow_limit_guard_assertions;
 mod cooling_supply_mass_flow_maximum_assertions;
 #[path = "arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_very_small_guard_assertions.rs"]
 mod cooling_supply_mass_flow_very_small_guard_assertions;
+#[path = "arbitrary_run_direct_zone_coupled/cooling_supply_mass_flow_very_small_guard_body_assertions.rs"]
+mod cooling_supply_mass_flow_very_small_guard_body_assertions;
 
 use cooling_supply_mass_flow_ems_override_body_assertions::assert_cooling_supply_mass_flow_ems_override_body;
 use cooling_supply_mass_flow_ems_override_guard_assertions::assert_cooling_supply_mass_flow_ems_override_guard;
@@ -37,6 +39,7 @@ use cooling_supply_mass_flow_limit_body_assertions::assert_cooling_supply_mass_f
 use cooling_supply_mass_flow_limit_guard_assertions::assert_cooling_supply_mass_flow_limit_guard;
 use cooling_supply_mass_flow_maximum_assertions::assert_cooling_supply_mass_flow_maximum;
 use cooling_supply_mass_flow_very_small_guard_assertions::assert_cooling_supply_mass_flow_very_small_guard;
+use cooling_supply_mass_flow_very_small_guard_body_assertions::assert_cooling_supply_mass_flow_very_small_guard_body;
 
 const DIRECT_ZONE_COUPLED_RUNTIME_CLASS: &str = "ideal-loads-direct-zone-coupled-compatibility";
 const ZONE_DEMAND_SOURCE: &str = "rust-predictor-source-setpoint-thresholds";
@@ -904,6 +907,13 @@ fn assert_persistent_init_lifecycle(summary: &Value, expected_calls: u64) {
     );
     assert_cooling_supply_mass_flow_limit_body(runtime, expected_calls, 0, expected_calls, 0);
     assert_cooling_supply_mass_flow_very_small_guard(runtime, expected_calls, 0, expected_calls, 0);
+    assert_cooling_supply_mass_flow_very_small_guard_body(
+        runtime,
+        expected_calls,
+        0,
+        expected_calls,
+        0,
+    );
 }
 
 fn assert_zero_effect_cooling_oa_max_flow_body(
@@ -2735,6 +2745,7 @@ fn all_hard_sized_finite_limit_branches_limit_live_cooling()
         );
         assert_cooling_supply_mass_flow_limit_body(&summary["rust_runtime"], 2, 0, 0, 2);
         assert_cooling_supply_mass_flow_very_small_guard(&summary["rust_runtime"], 2, 0, 0, 2);
+        assert_cooling_supply_mass_flow_very_small_guard_body(&summary["rust_runtime"], 2, 0, 0, 2);
 
         let results = read_json(&output_dir.join("results").join("result-store.json"))?;
         let cooling_rate = find_series(
@@ -2823,6 +2834,7 @@ fn zero_capacity_finite_limit_run_resets_all_three_cooling_candidates()
         );
         assert_cooling_supply_mass_flow_limit_body(&summary["rust_runtime"], 2, 0, 0, 2);
         assert_cooling_supply_mass_flow_very_small_guard(&summary["rust_runtime"], 2, 0, 0, 2);
+        assert_cooling_supply_mass_flow_very_small_guard_body(&summary["rust_runtime"], 2, 0, 0, 2);
     }
     Ok(())
 }

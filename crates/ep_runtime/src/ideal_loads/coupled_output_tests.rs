@@ -16,6 +16,8 @@ mod cooling_supply_mass_flow_limit_body_fixture;
 mod cooling_supply_mass_flow_limit_guard_fixture;
 #[path = "coupled_output_tests/cooling_supply_mass_flow_maximum_fixture.rs"]
 mod cooling_supply_mass_flow_maximum_fixture;
+#[path = "coupled_output_tests/cooling_supply_mass_flow_very_small_guard_body_fixture.rs"]
+mod cooling_supply_mass_flow_very_small_guard_body_fixture;
 #[path = "coupled_output_tests/cooling_supply_mass_flow_very_small_guard_fixture.rs"]
 mod cooling_supply_mass_flow_very_small_guard_fixture;
 
@@ -74,6 +76,7 @@ use cooling_supply_mass_flow_ems_override_guard_fixture::calculation_cooling_sup
 use cooling_supply_mass_flow_limit_body_fixture::calculation_cooling_supply_mass_flow_limit_body_snapshot;
 use cooling_supply_mass_flow_limit_guard_fixture::calculation_cooling_supply_mass_flow_limit_guard_snapshot;
 use cooling_supply_mass_flow_maximum_fixture::calculation_cooling_supply_mass_flow_maximum_snapshot;
+use cooling_supply_mass_flow_very_small_guard_body_fixture::calculation_cooling_supply_mass_flow_very_small_guard_body_snapshot;
 use cooling_supply_mass_flow_very_small_guard_fixture::calculation_cooling_supply_mass_flow_very_small_guard_snapshot;
 use ep_model::{
     DehumidificationControlType, DemandControlledVentilationType, HeatRecoveryType,
@@ -135,6 +138,12 @@ fn appends_all_no_oa_and_predictor_series_with_hourly_semantics() {
             crate::ideal_loads::calc::
                 cooling_supply_mass_flow_very_small_guard_snapshot_is_exact_direct_release(
                     output.calculation_cooling_supply_mass_flow_very_small_guard,
+                )
+        );
+        assert!(
+            crate::ideal_loads::calc::
+                cooling_supply_mass_flow_very_small_guard_body_snapshot_is_exact_direct_release(
+                    output.calculation_cooling_supply_mass_flow_very_small_guard_body,
                 )
         );
     }
@@ -549,6 +558,10 @@ fn scaled_output(
         calculation_cooling_supply_mass_flow_very_small_guard_snapshot(
             calculation_cooling_supply_mass_flow_limit_body,
         );
+    let calculation_cooling_supply_mass_flow_very_small_guard_body =
+        calculation_cooling_supply_mass_flow_very_small_guard_body_snapshot(
+            calculation_cooling_supply_mass_flow_very_small_guard,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -589,6 +602,7 @@ fn scaled_output(
         calculation_cooling_supply_mass_flow_limit_guard,
         calculation_cooling_supply_mass_flow_limit_body,
         calculation_cooling_supply_mass_flow_very_small_guard,
+        calculation_cooling_supply_mass_flow_very_small_guard_body,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

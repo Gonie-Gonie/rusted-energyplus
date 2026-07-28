@@ -248,19 +248,21 @@ Assert-Contains -Path $idealLoadsInitWitnesses -Pattern 'pub\(in crate::ideal_lo
 Assert-Contains -Path $idealLoadsInitWitnesses -Pattern 'pub\(in crate::ideal_loads\) fn set_cooling_supply_mass_flow_limit_body_latest_witness\s*\(' -Description "runtime-root CP326 witness setter"
 Assert-Contains -Path $idealLoadsInitState -Pattern 'pub calc_cooling_supply_mass_flow_limit_body:\s*[\r\n]+\s*PurchasedAirCalcCoolingSupplyMassFlowLimitBodyRuntimeState' -Description "per-unit CP326 persistent state"
 
-# Binding order is CP325 -> CP326 -> CP327 -> the unchanged numerical DTO.
+# Binding order is CP325 -> CP326 -> CP327 -> CP328 -> the unchanged numerical DTO.
 $cp326BindingText = Read-RepoText -Path $idealLoadsBinding
 $cp325BindingIndexForCp326 = $cp326BindingText.IndexOf("let calculation_cooling_supply_mass_flow_limit_guard =")
 $cp326BindingIndex = $cp326BindingText.IndexOf("let calculation_cooling_supply_mass_flow_limit_body =")
 $cp327BindingIndexForCp326 = $cp326BindingText.IndexOf("let calculation_cooling_supply_mass_flow_very_small_guard =")
+$cp328BindingIndexForCp326 = $cp326BindingText.IndexOf("let calculation_cooling_supply_mass_flow_very_small_guard_body =")
 $numericalBindingIndexForCp326 = $cp326BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp325BindingIndexForCp326 -lt 0 -or
     $cp326BindingIndex -le $cp325BindingIndexForCp326 -or
     $cp327BindingIndexForCp326 -le $cp326BindingIndex -or
-    $numericalBindingIndexForCp326 -le $cp327BindingIndexForCp326
+    $cp328BindingIndexForCp326 -le $cp327BindingIndexForCp326 -or
+    $numericalBindingIndexForCp326 -le $cp328BindingIndexForCp326
 ) {
-    throw "Binding must retain exact CP325 -> CP326 -> CP327 -> numerical Calc order"
+    throw "Binding must retain exact CP325 -> CP326 -> CP327 -> CP328 -> numerical Calc order"
 }
 Assert-Contains -Path $idealLoadsBinding -Pattern '(?s)let calculation_cooling_supply_mass_flow_limit_body =\s*advance_direct_no_oa_calc_cooling_supply_mass_flow_limit_body\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_supply_mass_flow_limit_guard,\s*\)' -Description "binding exact CP325-to-CP326 wrapper call without flow scalar"
 $cp325BindingCallForCp326 = [regex]::Match(
@@ -275,24 +277,32 @@ $cp327BindingCallForCp326 = [regex]::Match(
     $cp326BindingText,
     '(?s)let calculation_cooling_supply_mass_flow_very_small_guard =\s*advance_direct_no_oa_calc_cooling_supply_mass_flow_very_small_guard\(.*?CalculationCoolingSupplyMassFlowVerySmallGuard,\s*\)\?;'
 )
+$cp328BindingCallForCp326 = [regex]::Match(
+    $cp326BindingText,
+    '(?s)let calculation_cooling_supply_mass_flow_very_small_guard_body =\s*advance_direct_no_oa_calc_cooling_supply_mass_flow_very_small_guard_body\(.*?CalculationCoolingSupplyMassFlowVerySmallGuardBody,\s*\)\?;'
+)
 if (
     -not $cp325BindingCallForCp326.Success -or
     -not $cp326BindingCall.Success -or
-    -not $cp327BindingCallForCp326.Success
+    -not $cp327BindingCallForCp326.Success -or
+    -not $cp328BindingCallForCp326.Success
 ) {
-    throw "Binding must retain complete CP325, CP326, and CP327 exact release calls"
+    throw "Binding must retain complete CP325, CP326, CP327, and CP328 exact release calls"
 }
 $cp325BindingCallEndForCp326 =
     $cp325BindingCallForCp326.Index + $cp325BindingCallForCp326.Length
 $cp326BindingCallEnd = $cp326BindingCall.Index + $cp326BindingCall.Length
 $cp327BindingCallEndForCp326 =
     $cp327BindingCallForCp326.Index + $cp327BindingCallForCp326.Length
+$cp328BindingCallEndForCp326 =
+    $cp328BindingCallForCp326.Index + $cp328BindingCallForCp326.Length
 if (
     $cp326BindingIndex -lt $cp325BindingCallEndForCp326 -or
     $cp327BindingIndexForCp326 -lt $cp326BindingCallEnd -or
-    $numericalBindingIndexForCp326 -lt $cp327BindingCallEndForCp326
+    $cp328BindingIndexForCp326 -lt $cp327BindingCallEndForCp326 -or
+    $numericalBindingIndexForCp326 -lt $cp328BindingCallEndForCp326
 ) {
-    throw "CP325, CP326, and CP327 exact release calls must complete in source order before numerical Calc"
+    throw "CP325, CP326, CP327, and CP328 exact release calls must complete in source order before numerical Calc"
 }
 $postCp325BeforeCp326 = $cp326BindingText.Substring(
     $cp325BindingCallEndForCp326,
@@ -309,16 +319,24 @@ $postCp326BeforeCp327Code = [regex]::Replace($postCp326BeforeCp327, '(?m)//.*$',
 if ($postCp326BeforeCp327Code -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
     throw "No intermediary helper call may execute after CP326 and before CP327"
 }
-$postCp327BeforeNumerical = $cp326BindingText.Substring(
+$postCp327BeforeCp328 = $cp326BindingText.Substring(
     $cp327BindingCallEndForCp326,
-    $numericalBindingIndexForCp326 - $cp327BindingCallEndForCp326
+    $cp328BindingIndexForCp326 - $cp327BindingCallEndForCp326
 )
-$postCp327BeforeNumericalCode = [regex]::Replace($postCp327BeforeNumerical, '(?m)//.*$', '')
-if ($postCp327BeforeNumericalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No intermediary helper call may execute after CP327 and before numerical Calc"
+$postCp327BeforeCp328Code = [regex]::Replace($postCp327BeforeCp328, '(?m)//.*$', '')
+if ($postCp327BeforeCp328Code -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No intermediary helper call may execute after CP327 and before CP328"
 }
-if ($postCp327BeforeNumericalCode -match 'SupplyMassFlowRate\s*=\s*0|supply_mass_flow_rate[^;\r\n]*=\s*0(?:\.0)?|CalcPurchAirMixedAir|(?i)(?:ems|psychrometric|diagnostic|node_service)\s*\(') {
-    throw "No line-2167-or-later or live service may execute after CP327 and before numerical Calc"
+$postCp328BeforeNumerical = $cp326BindingText.Substring(
+    $cp328BindingCallEndForCp326,
+    $numericalBindingIndexForCp326 - $cp328BindingCallEndForCp326
+)
+$postCp328BeforeNumericalCode = [regex]::Replace($postCp328BeforeNumerical, '(?m)//.*$', '')
+if ($postCp328BeforeNumericalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No intermediary helper call may execute after CP328 and before numerical Calc"
+}
+if ($postCp328BeforeNumericalCode -match 'CalcPurchAirMixedAir|(?i)(?:ems|psychrometric|diagnostic|node_service)\s*\(') {
+    throw "No line-2171-or-later or live service may execute after CP328 and before numerical Calc"
 }
 
 Assert-Contains -Path $idealLoadsBinding -Pattern 'CalculationCoolingSupplyMassFlowLimitBody\(\s*PurchasedAirCalcCoolingSupplyMassFlowLimitBodyError,?\s*\)' -Description "CP326 scheduled binding error boundary"

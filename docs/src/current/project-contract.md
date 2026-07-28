@@ -16742,6 +16742,63 @@ promotes no support level, run state, required or forbidden feature, numerical
 result, capability, status, inventory/readiness count, evidence case,
 conformance claim, or Roadmap item.
 
+## CP328 Source-Ordered Cooling Supply Mass-Flow Positive-Zero Reset Body
+
+CP328 supersedes only CP327's line-2167 exclusion for the complete EnergyPlus
+26.1 `PurchasedAirManager.cc` Cooling very-small-flow true body. Its exact
+single lexical source site is:
+
+1. assign the binary64 positive-zero literal to retained
+   `SupplyMassFlowRate`.
+
+The source `0.0` literal has IEEE binary64 bits `0x0000000000000000`. CP328
+does not reinterpret it as a tolerance, normalize the predecessor, invoke a
+minimum or maximum helper, or perform another clamp. It also does not re-read
+the line-2166 operands or repeat CP327's `<=` comparison; body entry is
+inherited from the validated CP327 predecessor.
+
+UnitOff and non-cooling predecessors skip the assignment and expose no
+resulting local supply flow. An active true predecessor executes the one site
+and produces positive zero. This canonicalizes a true-route `-0.0` predecessor
+to `+0.0`; equality, finite-below-threshold, and negative-infinity inputs also
+produce the same assigned bits because CP327 already selected the body. An
+active guard-false predecessor skips the assignment and preserves its
+predecessor supply-flow bits exactly, including a larger finite value,
+positive infinity, or any NaN payload.
+
+The split
+`calc/cooling_supply_mass_flow_very_small_guard/body.rs` module owns the
+snapshot, persistent state, pure transition, release validation, and tests.
+Its public
+`advance_direct_no_oa_calc_cooling_supply_mass_flow_very_small_guard_body`
+wrapper and
+`purchased_air_calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle_summary`
+accessor validate the completed same-call CP327 latest snapshot, private
+witness, identity, ordinal, and retained prefix before mutation. The
+pre-assignment flow and guard decision come only from that bit-exact CP327
+snapshot. The wrapper accepts exactly runtime, selected system, and
+predecessor CP327 snapshot; it accepts no caller-supplied flow or threshold
+scalar and requests no live sizing, schedule, Node, psychrometric, EMS, or
+diagnostic service.
+
+The binder executes CP328 immediately after CP327 and before the unchanged
+numerical Calc DTO. Per-step, final, coupled-runtime, and pipeline validators
+reconcile predecessor identity, UnitOff/non-cooling/active partitions, body
+entry and skip, assignment count, predecessor flow bits, exact positive-zero
+assignment bits, and retained or assigned result bits. Direct-only JSON
+publishes
+`purchased_air_calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle`;
+non-direct or disconnected evidence is rejected. CP328 does not consume or
+reconcile with the later numerical DTO and does not feed or replace it.
+
+Line 2168 is an excluded non-executable closing delimiter. The
+`CalcPurchAirMixedAir` call beginning at line 2171, not that delimiter, is the
+first excluded executable. The complete mixed-air call and effects,
+capacity/supply-state behavior, and Heat/DeadBand selection remain excluded.
+`EMS` and Autosizing remain forbidden. CP328 promotes no support level, run
+state, required or forbidden feature, numerical result, capability, status,
+inventory/readiness count, evidence case, conformance claim, or Roadmap item.
+
 
 
 

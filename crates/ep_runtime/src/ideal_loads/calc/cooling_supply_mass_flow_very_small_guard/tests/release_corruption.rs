@@ -14,7 +14,7 @@ use crate::ideal_loads::{
     cooling_supply_mass_flow_very_small_guard_snapshot_is_exact_direct_release,
 };
 
-fn release_case(
+pub(in crate::ideal_loads::calc::cooling_supply_mass_flow_very_small_guard) fn release_case(
     cooling_demand_w: f64,
 ) -> (
     crate::ideal_loads::PurchasedAirRuntimeState,

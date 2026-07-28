@@ -4,16 +4,22 @@ use ep_model::{IdealLoadsAirSystemId, ZoneId};
 
 use crate::ideal_loads::PurchasedAirRuntimeState;
 
+mod body;
 mod release;
 mod state;
 #[cfg(test)]
 mod tests;
 mod transition;
 
+pub use body::*;
 pub(in crate::ideal_loads) use release::cooling_supply_mass_flow_very_small_guard_snapshot_is_exact_direct_release;
 pub use release::{
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardError,
     advance_direct_no_oa_calc_cooling_supply_mass_flow_very_small_guard,
+};
+pub(in crate::ideal_loads::calc) use release::{
+    completed_direct_cooling_supply_mass_flow_very_small_guard_is_consistent,
+    snapshots_match_bit_exact as cooling_supply_mass_flow_very_small_guard_snapshots_match_bit_exact,
 };
 pub(super) use state::PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardRetainedRoute;
 pub use state::PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardRuntimeState;

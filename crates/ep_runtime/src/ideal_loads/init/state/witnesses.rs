@@ -14,6 +14,7 @@ use crate::ideal_loads::{
     PurchasedAirCalcCoolingSupplyMassFlowLimitBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardSnapshot,
 };
 
@@ -231,6 +232,24 @@ impl PurchasedAirRuntimeState {
         snapshot: PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardSnapshot,
     ) {
         self.cooling_supply_mass_flow_very_small_guard_latest_witnesses
+            .insert(system, snapshot);
+    }
+
+    pub(in crate::ideal_loads) fn cooling_supply_mass_flow_very_small_guard_body_latest_witness(
+        &self,
+        system: IdealLoadsAirSystemId,
+    ) -> Option<PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot> {
+        self.cooling_supply_mass_flow_very_small_guard_body_latest_witnesses
+            .get(&system)
+            .copied()
+    }
+
+    pub(in crate::ideal_loads) fn set_cooling_supply_mass_flow_very_small_guard_body_latest_witness(
+        &mut self,
+        system: IdealLoadsAirSystemId,
+        snapshot: PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
+    ) {
+        self.cooling_supply_mass_flow_very_small_guard_body_latest_witnesses
             .insert(system, snapshot);
     }
 }

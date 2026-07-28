@@ -34,6 +34,8 @@ use crate::{
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_LIMIT_GUARD_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_MAXIMUM_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_MAXIMUM_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_VERY_SMALL_GUARD_BODY_FIRST_EXCLUDED_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_VERY_SMALL_GUARD_BODY_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_VERY_SMALL_GUARD_FIRST_EXCLUDED_SOURCE,
         PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_VERY_SMALL_GUARD_SOURCE,
         PURCHASED_AIR_CALC_MINIMUM_OA_CHILD_SOURCE, PURCHASED_AIR_CALC_MINIMUM_OA_PREFIX_SOURCE,
@@ -203,6 +205,26 @@ fn cooling_supply_mass_flow_very_small_guard_partition_overflow_fails_closed() {
         error,
         DirectZonePurchasedAirCoupledRuntimeError::
             CalcCoolingSupplyMassFlowVerySmallGuardLifecycleInvariant {
+                field: "test_partition_overflow",
+                expected: 1,
+                actual: usize::MAX,
+            }
+    ));
+}
+
+#[test]
+fn cooling_supply_mass_flow_very_small_guard_body_partition_overflow_fails_closed() {
+    let error = super::cooling_supply_mass_flow_very_small_guard_body_validation::checked_add(
+        usize::MAX,
+        1,
+        "test_partition_overflow",
+        1,
+    )
+    .expect_err("overflow must fail closed");
+    assert!(matches!(
+        error,
+        DirectZonePurchasedAirCoupledRuntimeError::
+            CalcCoolingSupplyMassFlowVerySmallGuardBodyLifecycleInvariant {
                 field: "test_partition_overflow",
                 expected: 1,
                 actual: usize::MAX,
@@ -1105,6 +1127,37 @@ fn cooling_sensible_flow_lifecycle_records_unit_off_without_source_execution() {
     assert_eq!(latest.supply_mass_flow_rate_kg_per_s, None);
     assert_eq!(latest.hvac_very_small_mass_flow_source, None);
     assert_eq!(latest.hvac_very_small_mass_flow_kg_per_s, None);
+
+    let lifecycle = simulation
+        .summary
+        .calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle;
+    assert_eq!(
+        lifecycle.source,
+        PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_VERY_SMALL_GUARD_BODY_SOURCE
+    );
+    assert_eq!(
+        lifecycle.first_excluded_source,
+        PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_VERY_SMALL_GUARD_BODY_FIRST_EXCLUDED_SOURCE
+    );
+    assert_eq!(lifecycle.state.transition_count, 1);
+    assert_eq!(lifecycle.state.unit_off_skip_count, 1);
+    assert_eq!(lifecycle.state.non_cooling_skip_count, 0);
+    assert_eq!(lifecycle.state.cooling_body_entry_count, 0);
+    assert_eq!(lifecycle.state.zero_flow_reset_body_entry_count, 0);
+    assert_eq!(
+        lifecycle
+            .state
+            .supply_mass_flow_rate_positive_zero_assignment_count,
+        0
+    );
+    let latest = lifecycle.state.latest.expect("latest CP328 off snapshot");
+    assert!(latest.unit_off_skipped);
+    assert!(!latest.non_cooling_skipped);
+    assert!(!latest.cooling_body_entered);
+    assert!(latest.body_skipped);
+    assert_eq!(latest.predecessor_supply_mass_flow_rate_kg_per_s, None);
+    assert_eq!(latest.assigned_supply_mass_flow_rate_kg_per_s, None);
+    assert_eq!(latest.resulting_supply_mass_flow_rate_kg_per_s, None);
 }
 
 #[test]
@@ -1265,6 +1318,33 @@ fn all_hard_sized_finite_limit_branches_run_with_source_threshold_demand() {
         assert!(latest_very_small_guard.non_cooling_skipped);
         assert!(!latest_very_small_guard.cooling_body_entered);
         assert_eq!(latest_very_small_guard.supply_mass_flow_rate_kg_per_s, None);
+        let very_small_guard_body = simulation
+            .summary
+            .calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle;
+        assert_eq!(very_small_guard_body.state.transition_count, required_steps);
+        assert_eq!(very_small_guard_body.state.unit_off_skip_count, 0);
+        assert_eq!(
+            very_small_guard_body.state.non_cooling_skip_count,
+            required_steps
+        );
+        assert_eq!(very_small_guard_body.state.cooling_body_entry_count, 0);
+        assert_eq!(
+            very_small_guard_body
+                .state
+                .supply_mass_flow_rate_positive_zero_assignment_count,
+            0
+        );
+        let latest_very_small_guard_body = very_small_guard_body
+            .state
+            .latest
+            .expect("latest finite CP328 snapshot");
+        assert!(latest_very_small_guard_body.non_cooling_skipped);
+        assert!(!latest_very_small_guard_body.cooling_body_entered);
+        assert!(latest_very_small_guard_body.body_skipped);
+        assert_eq!(
+            latest_very_small_guard_body.resulting_supply_mass_flow_rate_kg_per_s,
+            None
+        );
         let density = lifecycle
             .standard_air_density_kg_per_m3
             .expect("initialized standard density");
@@ -2297,6 +2377,66 @@ fn cooling_oa_max_flow_gate_reconciles_every_release_limit_shape() {
         );
         assert!(!latest_very_small_guard.zero_flow_reset_body_entered);
         assert!(latest_very_small_guard.active_guard_false_fallthrough);
+
+        let very_small_guard_body = simulation
+            .summary
+            .calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle;
+        assert_eq!(
+            very_small_guard_body.source,
+            PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_VERY_SMALL_GUARD_BODY_SOURCE
+        );
+        assert_eq!(
+            very_small_guard_body.first_excluded_source,
+            PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_VERY_SMALL_GUARD_BODY_FIRST_EXCLUDED_SOURCE
+        );
+        let very_small_guard_body_state = very_small_guard_body.state;
+        assert_eq!(very_small_guard_body_state.transition_count, 1, "{limit:?}");
+        assert_eq!(
+            very_small_guard_body_state.cooling_body_entry_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            very_small_guard_body_state.zero_flow_reset_body_entry_count, 0,
+            "{limit:?}"
+        );
+        assert_eq!(
+            very_small_guard_body_state.active_guard_false_fallthrough_count, 1,
+            "{limit:?}"
+        );
+        assert_eq!(
+            very_small_guard_body_state.supply_mass_flow_rate_positive_zero_assignment_count, 0,
+            "{limit:?}"
+        );
+        let latest_very_small_guard_body = very_small_guard_body_state
+            .latest
+            .expect("latest CP328 snapshot");
+        assert!(latest_very_small_guard_body.body_skipped);
+        assert!(latest_very_small_guard_body.active_guard_false_fallthrough);
+        assert!(
+            !latest_very_small_guard_body.supply_mass_flow_rate_positive_zero_assignment_performed
+        );
+        assert_eq!(
+            latest_very_small_guard_body
+                .predecessor_supply_mass_flow_rate_kg_per_s
+                .map(f64::to_bits),
+            latest_very_small_guard
+                .supply_mass_flow_rate_kg_per_s
+                .map(f64::to_bits),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_very_small_guard_body
+                .resulting_supply_mass_flow_rate_kg_per_s
+                .map(f64::to_bits),
+            latest_very_small_guard
+                .supply_mass_flow_rate_kg_per_s
+                .map(f64::to_bits),
+            "{limit:?}"
+        );
+        assert_eq!(
+            latest_very_small_guard_body.assigned_supply_mass_flow_rate_kg_per_s, None,
+            "{limit:?}"
+        );
 
         if flow_m3_per_s == Some(0.0) {
             let mass_flow = simulation

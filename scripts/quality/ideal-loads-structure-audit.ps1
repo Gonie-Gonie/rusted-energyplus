@@ -4096,5 +4096,6 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp325-cooling-supply-mass-flow-limit-guard.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp326-cooling-supply-mass-flow-limit-body.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp327-cooling-supply-mass-flow-very-small-guard.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp328-cooling-supply-mass-flow-very-small-guard-body.ps1")
 
 Write-Host "IdealLoads structure audit complete."

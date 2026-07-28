@@ -856,6 +856,40 @@ open. `EMS` and Autosizing remain forbidden, and support, readiness,
 conformance, capability, status, inventory count, evidence cases, numerical
 conformance, and Roadmap state remain unchanged.
 
+CP328 maps only the executable line-2167 Cooling supply mass-flow reset body
+as one lexical source site:
+`assign-supply-mass-flow-rate-positive-zero`. The source `0.0` is the exact
+binary64 positive zero with IEEE bits `0x0000000000000000`; it is not a
+project-selected epsilon, normalization, or clamp. CP328 consumes CP327's
+already evaluated body-entry decision and does not read
+`HVAC::VerySmallMassFlow` or repeat the line-2166 `<=` comparison.
+
+UnitOff and non-cooling predecessors skip the assignment and retain no local
+supply-flow result. An active CP327 true route performs the assignment and
+produces positive zero even when the predecessor flow was `-0.0`, negative
+infinity, or another value at or below the threshold. An active guard-false
+route skips the assignment and preserves the predecessor supply-flow bits
+exactly, including positive infinity or a NaN payload.
+
+The exact direct release lane validates the completed same-call CP327 latest
+snapshot and private witness before mutation. Its wrapper accepts exactly the
+runtime, selected system, and CP327 predecessor, with no duplicate flow or
+threshold scalar and no live sizing, schedule, Node, psychrometric, EMS, or
+diagnostic service. The binder and lifecycle firewalls retain
+CP327-to-CP328-to-numerical ordering and expose direct-only lifecycle evidence
+through
+`purchased_air_calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle`.
+CP328 neither consumes, reconciles with, feeds, nor replaces the later
+numerical DTO.
+
+Line 2168 is an excluded non-executable closing delimiter, not the first
+excluded executable. The `CalcPurchAirMixedAir` call beginning at line 2171 is
+the first excluded executable; that complete call and its effects, later
+capacity and supply-state work, and Heat/DeadBand selection remain open.
+`EMS` and Autosizing remain forbidden, and support, readiness, conformance,
+capability, status, inventory count, evidence cases, numerical conformance,
+and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

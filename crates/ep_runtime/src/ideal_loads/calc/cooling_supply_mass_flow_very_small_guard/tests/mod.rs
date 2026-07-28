@@ -18,7 +18,7 @@ use crate::ideal_loads::{
     PurchasedAirCalcCoolingSupplyMassFlowLimitBodySnapshot,
 };
 
-mod release_corruption;
+pub(super) mod release_corruption;
 
 fn active_predecessor(
     supply_mass_flow_rate_kg_per_s: f64,

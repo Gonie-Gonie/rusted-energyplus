@@ -21658,6 +21658,37 @@ CP327 changes no support level, conformance, capability, status,
 inventory/readiness count, evidence case, numerical conformance, or Roadmap
 state.
 
+## CP328 Cooling Supply Mass-Flow Positive-Zero Reset Body Placement
+
+CP328 maps only executable line 2167 between CP327 and the unchanged numerical
+PurchasedAir DTO. Its exact single lexical site assigns source `0.0` to
+retained `SupplyMassFlowRate`, producing binary64 positive zero with IEEE bits
+`0x0000000000000000`. It consumes CP327's already evaluated body-entry
+decision and predecessor flow bits without re-reading the threshold or
+repeating the line-2166 `<=` comparison.
+
+UnitOff and non-cooling paths skip the site and expose no local supply result.
+Every active CP327 true route performs the assignment, converting even a
+`-0.0`, negative-infinity, equality, or finite below-threshold predecessor to
+exact positive zero. Every active guard-false route skips the assignment and
+preserves the predecessor bits, including positive infinity or a NaN payload.
+Exact direct release validates the same-call CP327 latest snapshot and private
+witness without a duplicate scalar or live service. Coupled and pipeline
+validation preserve CP327-to-CP328-to-numerical order and publish direct-only
+lifecycle evidence as
+`purchased_air_calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle`.
+
+No CP328 site changes Zone state, demand, coefficients, correction, or
+feedback. CP328 neither consumes nor reconciles with the later numerical DTO
+and does not feed or replace it. Line 2168 is an excluded non-executable
+closing delimiter; the `CalcPurchAirMixedAir` call beginning at line 2171 is
+the first excluded executable. Its complete mixed-air effects,
+capacity/supply-state behavior, Heat/DeadBand selection, and all later
+Zone-air work remain excluded. `EMS` and Autosizing remain forbidden. CP328
+changes no support level, conformance, capability, status,
+inventory/readiness count, evidence case, numerical conformance, or Roadmap
+state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

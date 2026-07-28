@@ -33965,6 +33965,40 @@ Autosizing remain forbidden. CP327 adds no support, conformance, capability,
 status, count, readiness, evidence-case, numerical conformance, or Roadmap
 promotion.
 
+## CP328 Cooling Supply Mass-Flow Positive-Zero Reset in the Heat-Balance Loop
+
+CP328 executes immediately after CP327 and before the unchanged bounded
+PurchasedAir numerical calculation. It maps only executable line 2167 as one
+lexical source site: assign `SupplyMassFlowRate = 0.0`. The assigned value is
+binary64 positive zero with IEEE bits `0x0000000000000000`. The transition
+uses CP327's retained body-entry decision and predecessor supply bits; it does
+not read the very-small-flow threshold or repeat the line-2166 `<=`
+comparison.
+
+UnitOff and non-cooling paths skip the assignment and expose no resulting
+local supply flow. Every active CP327 true route executes the assignment and
+produces exact positive zero, including a predecessor `-0.0`, negative
+infinity, equality, or another below-threshold value. Every active guard-false
+route skips the assignment and preserves the predecessor bits exactly,
+including positive infinity or a NaN payload.
+
+Exact direct release validates CP327's completed same-call latest snapshot and
+private witness without a duplicate caller scalar or live service. Per-step,
+final, coupled-runtime, and pipeline validators enforce
+CP327-to-CP328-to-numerical ordering and publish direct-only lifecycle evidence
+as
+`purchased_air_calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle`.
+CP328 changes no Zone or heat-balance equation, does not consume or reconcile
+with the later numerical DTO, and does not feed or replace that DTO.
+
+Line 2168 is an excluded non-executable closing delimiter. The
+`CalcPurchAirMixedAir` call beginning at line 2171 is the first excluded
+executable; its complete mixed-air effects and all later capacity,
+supply-state, Heat/DeadBand, and feedback work remain excluded. `EMS` and
+Autosizing remain forbidden. CP328 adds no support, conformance, capability,
+status, count, readiness, evidence-case, numerical conformance, or Roadmap
+promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

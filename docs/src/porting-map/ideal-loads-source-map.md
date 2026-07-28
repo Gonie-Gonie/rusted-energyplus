@@ -19176,6 +19176,42 @@ forbidden. CP327 adds target inventory and lifecycle evidence only; support,
 conformance, statuses, counts, readiness, capability, evidence cases,
 numerical conformance, and Roadmap state remain unchanged.
 
+## CP328 Cooling Supply Mass-Flow Positive-Zero Reset Body
+
+CP328 maps only executable line 2167 after CP327. Its exact single lexical
+site assigns the source `0.0` literal to retained `SupplyMassFlowRate`. That
+literal is binary64 positive zero with IEEE bits `0x0000000000000000`, not a
+project-selected epsilon, normalization, minimum, maximum, or clamp. CP328
+uses the already evaluated CP327 body-entry decision and does not re-read
+`HVAC::VerySmallMassFlow` or repeat the line-2166 `<=` comparison.
+
+UnitOff and non-cooling predecessors skip the assignment and retain no local
+supply result. An active true predecessor assigns positive zero, including
+when its retained flow has `-0.0`, equality, a finite below-threshold value, or
+negative-infinity bits. An active guard-false predecessor skips the assignment
+and preserves the retained flow bits exactly, including positive infinity or
+a NaN payload.
+
+The exact
+`advance_direct_no_oa_calc_cooling_supply_mass_flow_very_small_guard_body`
+wrapper validates the completed same-call CP327 latest snapshot and private
+witness and accepts no duplicate caller flow or threshold scalar and no live
+service. The binder places CP328 between CP327 and the unchanged numerical
+DTO. Direct-only lifecycle evidence reconciles identity, ordinal,
+skip/body/false-route partitions, assignment count, predecessor bits,
+positive-zero assignment bits, and resulting bits and is serialized as
+`purchased_air_calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle`.
+CP328 neither consumes nor reconciles with the later numerical DTO and does
+not feed or replace it; non-direct or disconnected evidence is rejected.
+
+Line 2168 is an excluded non-executable closing delimiter. The
+`CalcPurchAirMixedAir` call beginning at line 2171 is the first excluded
+executable. That complete call, mixed-air/capacity/supply-state behavior, and
+Heat/DeadBand selection remain open. `EMS` and Autosizing remain forbidden.
+CP328 adds target inventory and lifecycle evidence only; support, conformance,
+statuses, counts, readiness, capability, evidence cases, numerical
+conformance, and Roadmap state remain unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

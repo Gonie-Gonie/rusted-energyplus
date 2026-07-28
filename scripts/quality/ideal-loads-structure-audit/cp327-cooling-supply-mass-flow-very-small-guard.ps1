@@ -325,13 +325,15 @@ foreach ($cp327Documentation in $cp327DocumentationSections) {
 $cp327MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp326DotSourceIndexForCp327 = $cp327MainAuditText.IndexOf('ideal-loads-structure-audit\cp326-cooling-supply-mass-flow-limit-body.ps1')
 $cp327DotSourceIndex = $cp327MainAuditText.IndexOf('ideal-loads-structure-audit\cp327-cooling-supply-mass-flow-very-small-guard.ps1')
+$cp328DotSourceIndexForCp327 = $cp327MainAuditText.IndexOf('ideal-loads-structure-audit\cp328-cooling-supply-mass-flow-very-small-guard-body.ps1')
 $cp327AuditCompletionIndex = $cp327MainAuditText.IndexOf('Write-Host "IdealLoads structure audit complete."')
 if (
     $cp326DotSourceIndexForCp327 -lt 0 -or
     $cp327DotSourceIndex -le $cp326DotSourceIndexForCp327 -or
-    $cp327AuditCompletionIndex -le $cp327DotSourceIndex
+    $cp328DotSourceIndexForCp327 -le $cp327DotSourceIndex -or
+    $cp327AuditCompletionIndex -le $cp328DotSourceIndexForCp327
 ) {
-    throw "Main IdealLoads audit must dot-source CP327 after CP326 and before completion"
+    throw "Main IdealLoads audit must dot-source CP327 after CP326 and before CP328/completion"
 }
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp327-cooling-supply-mass-flow-very-small-guard\.ps1"' -Description "CP327 audit script inventory entry"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp327-cooling-supply-mass-flow-very-small-guard\.ps1::dot_sources' -Description "CP327 main-audit callee evidence"
