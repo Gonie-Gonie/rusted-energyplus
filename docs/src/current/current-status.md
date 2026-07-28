@@ -2137,6 +2137,59 @@ routines remain `source_mapped`, and there is no support, readiness,
 run-state, capability, feature/evidence, numerical-conformance,
 output-ownership, status, conformance, or Roadmap promotion.
 
+CP348 now maps only the Cooling positive-supply post-capacity-limit
+dehumidification-control constant-sensible-heat-ratio case entry at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical line 2213:
+
+```cpp
+case HumControl::ConstantSensibleHeatRatio: {
+```
+
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The sole site is
+`enter-purchased-air-dehumidification-control-constant-sensible-heat-ratio-case`.
+Physical lines 2214-2215 are comments. Physical line 2216,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`, is the first excluded
+executable; its operands, psychrometric evaluation, assignment, and all later
+constant-SHR case behavior remain outside CP348.
+
+The seven routes are inherited `UnitOff`, `NonCooling`, and
+`PositiveGuardFalseFallthrough`; completed-`None` skip `C0`; private
+constant-SHR entry `E`; and private `Humidistat`/constant-supply-humidity skips
+`H/CSH`. With transitions `T`, CP346 switch dispatches `S`, CP345 assignments
+`R`, provenance `G/F/L`, and CP340 active evaluations `A`, exact checked state
+requires:
+
+```text
+T = U+N+P+C0+E+H+CSH
+S = C0+E+H+CSH = R = G+F+L
+A = F+L
+source_site_execution_count = E
+```
+
+The sole site counter equals `E`; every other route executes zero CP348 sites.
+Exact direct release inherits CP347's completed `None` route, requires `C0=S`
+and `E=H=CSH=0`, and publishes only a complete skip. The constant-SHR entry is
+private characterization and is not direct reachability.
+
+Same-call CP347 supplied/latest/private evidence is CP348's recursively
+complete immediate predecessor. CP348 introduces no operand, arithmetic,
+psychrometric call, comparison, assignment, clamp, finite coercion, cache,
+diagnostic, mutable service, or new numerical state. Binding, coupled runtime,
+and pipeline evidence preserve CP347-to-CP348-to-unchanged-numerical order
+under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle`.
+No CP348 evidence enters `DirectZonePurchasedAirCouplingInput` or feeds,
+consumes, reconciles with, or replaces the numerical DTO. Non-direct paths
+publish `None` and reject attached CP348 evidence. Counts remain 32 algorithms
+and 293 routines, split 58 `state_mapped` plus 235 `source_mapped`, with 170
+required. Both parent algorithms remain `scaffold`/`none`, both parent Calc
+routines remain `source_mapped`, and there is no support, readiness, run-state,
+capability, feature/evidence, numerical-conformance, output-ownership, status,
+conformance, or Roadmap promotion.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

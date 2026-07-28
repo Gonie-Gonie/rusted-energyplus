@@ -328,6 +328,60 @@ fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
             "{field}"
         );
     }
+    let cp348 = &summary["rust_runtime"]["purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle"];
+    assert_eq!(
+        cp348["source"],
+        "EnergyPlus 26.1 PurchasedAirManager.cc:2213"
+    );
+    assert_eq!(
+        cp348["first_excluded_source"],
+        "EnergyPlus 26.1 PurchasedAirManager.cc:2216"
+    );
+    assert_eq!(
+        cp348["latest"]["source_order"]
+            .as_array()
+            .expect("CP348 source order"),
+        &["enter-purchased-air-dehumidification-control-constant-sensible-heat-ratio-case"]
+    );
+    assert_eq!(
+        cp348["latest"]["predecessor_dehumidification_control_type"],
+        cp347["latest"]["predecessor_dehumidification_control_type"],
+        "CP348 must retain the immediate CP347 selector lineage"
+    );
+    assert_eq!(
+        cp348["latest"]["predecessor_dehumidification_control_none_case_completed"],
+        cp347["latest"]["dehumidification_control_none_case_exited_via_break"],
+        "CP348 must retain the completed CP347 None-case route"
+    );
+    assert_eq!(
+        cp348["latest"]["dehumidification_control_none_case_completed_skip"],
+        true
+    );
+    assert_eq!(
+        cp348["latest"]["dehumidification_control_constant_sensible_heat_ratio_case_entered"],
+        false
+    );
+    assert_eq!(
+        cp348["latest"]["dehumidification_control_humidistat_case_selected_skip"],
+        false
+    );
+    assert_eq!(
+        cp348["latest"]["dehumidification_control_constant_supply_humidity_ratio_case_selected_skip"],
+        false
+    );
+    assert_eq!(
+        cp348["dehumidification_control_none_case_completed_skip_count"],
+        cp347["dehumidification_control_none_case_completion_count"]
+    );
+    assert_eq!(
+        cp348["dehumidification_control_constant_sensible_heat_ratio_case_entry_count"],
+        0
+    );
+    assert_eq!(cp348["source_site_execution_count"], 0);
+    assert_eq!(
+        cp348["dehumidification_control_constant_sensible_heat_ratio_case_entry_site_count"],
+        0
+    );
     Ok(())
 }
 
@@ -736,6 +790,14 @@ fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
     assert!(
         rust_runtime
             ["purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle"]
+            .is_null()
+    );
+    assert!(rust_runtime.contains_key(
+        "purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle"
+    ));
+    assert!(
+        rust_runtime
+            ["purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle"]
             .is_null()
     );
     assert_eq!(summary["source_order_gate"]["matches"], true);

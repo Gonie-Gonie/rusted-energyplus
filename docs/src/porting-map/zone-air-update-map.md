@@ -22827,6 +22827,46 @@ remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
 readiness, support, capability, feature/evidence boundary, numerical
 conformance, output ownership, status, conformance, or Roadmap state.
 
+## CP348 Constant-Sensible-Heat-Ratio Case-Entry Placement
+
+CP348 extends the exact direct-Zone update sequence from CP347 through the
+constant-sensible-heat-ratio case entry at pinned
+`PurchasedAirManager.cc` physical line 2213. Commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`
+remain locked. The exact one-site order is
+`enter-purchased-air-dehumidification-control-constant-sensible-heat-ratio-case`.
+Lines 2214-2215 are comments; line 2216,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`, is the first excluded
+executable. Its inputs, psychrometric evaluation, result, and later case-body
+behavior remain outside CP348.
+
+Routes are inherited `U/N/P`, completed-`None` skip `C0`, private constant-SHR
+entry `E`, and private `H/CSH` skips. For transitions `T`, CP346 dispatches
+`S`, CP345 assignments `R`, predecessor provenance `G/F/L`, and CP340 active
+evaluations `A`, exact state requires `T=U+N+P+C0+E+H+CSH`,
+`S=C0+E+H+CSH=R=G+F+L`, `A=F+L`, and
+`source_site_execution_count=E`. The site counter equals `E`, and every other
+route executes zero CP348 sites. Direct execution inherits CP347's completed
+`None`, requires `C0=S` and `E=H=CSH=0`, and publishes a complete skip.
+Constant-SHR case entry remains private characterization.
+
+Same-call CP347 supplied/latest/private evidence is the immediate recursively
+complete predecessor. CP348 adds no operand, numerical state, arithmetic,
+comparison, psychrometric call, assignment, clamp, normalization, finite
+coercion, cache, diagnostic, service, or DTO feed. Binding, coupled execution,
+and pipeline serialization preserve CP347-to-CP348-to-unchanged-numerical
+order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle`.
+No CP348 evidence enters `DirectZonePurchasedAirCouplingInput`; CP348 does not
+consume, reconcile with, feed, or replace the numerical DTO. Non-direct paths
+publish `None` and reject attached evidence. Both parents remain
+`scaffold`/`none`, both Calc routines remain `source_mapped`, and counts
+remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
+170 required. CP348 adds target/lifecycle evidence only and changes no
+readiness, support, capability, feature/evidence boundary, numerical
+conformance, output ownership, status, conformance, or Roadmap state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

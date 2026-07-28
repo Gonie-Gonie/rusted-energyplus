@@ -4797,3 +4797,83 @@ fn assert_close(actual: f64, expected: f64) {
         "expected {expected}, got {actual}"
     );
 }
+
+#[test]
+fn cp348_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed() {
+    let mut typed = exact_model(1).typed;
+    typed.schedules[1].hourly_value = 0.0;
+    typed.schedules[2].hourly_value = 15.0;
+    typed.schedules[3].hourly_value = 1.0;
+    let model = SimulationModel::from_typed(typed);
+    let schedule_cache =
+        precompute_schedule_cache(&model.typed, 1).expect("one CP348 schedule sample");
+    let weather = weather_series_with_conditions(&model, 1, 30.0, 15.0, 30.0, 101_325.0);
+    let mut options = DirectZonePurchasedAirCoupledOptions::hourly_samples(1);
+    options.initial_zone_air_temperature_c = INITIAL_ZONE_TEMPERATURE_C;
+    let summary = simulate_direct_zone_purchased_air_coupled_heat_balance(
+        &model,
+        &weather,
+        &schedule_cache,
+        options,
+    )
+    .expect("valid CP348 direct simulation")
+    .summary;
+    let state = &summary
+        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle
+        .state;
+    let snapshot = state.latest.expect("latest CP348 snapshot");
+    let predecessor = summary
+        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle
+        .state
+        .latest
+        .expect("latest CP347 predecessor");
+
+    assert_eq!(state.transition_count, 1);
+    assert_eq!(
+        state.dehumidification_control_none_case_completed_skip_count,
+        1
+    );
+    assert_eq!(
+        state.dehumidification_control_constant_sensible_heat_ratio_case_entry_count,
+        0
+    );
+    assert_eq!(state.source_site_execution_count, 0);
+    assert_eq!(
+        state.dehumidification_control_constant_sensible_heat_ratio_case_entry_site_count,
+        0
+    );
+    assert!(
+        super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_validation::snapshot_shape(
+            &snapshot,
+            &predecessor,
+        )
+    );
+
+    let mut corrupted = snapshot;
+    corrupted.source_order = &["forged-constant-sensible-heat-ratio-case-entry"];
+    assert!(
+        !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_validation::snapshot_shape(
+            &corrupted,
+            &predecessor,
+        )
+    );
+
+    let mut corrupted = snapshot;
+    corrupted.predecessor_dehumidification_control_type =
+        Some(DehumidificationControlType::ConstantSensibleHeatRatio);
+    assert!(
+        !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_validation::snapshot_shape(
+            &corrupted,
+            &predecessor,
+        )
+    );
+
+    let mut corrupted = snapshot;
+    corrupted.dehumidification_control_constant_sensible_heat_ratio_case_entered = true;
+    assert!(
+        !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_validation::snapshot_shape(
+            &corrupted,
+            &predecessor,
+        )
+    );
+}

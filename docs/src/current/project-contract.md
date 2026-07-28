@@ -18366,6 +18366,65 @@ required. Both parent algorithms remain `scaffold`/`none`;
 boundaries, numerical conformance, output ownership, status, conformance, and
 Roadmap state remain unchanged.
 
+## CP348 Source-Ordered Cooling Positive-Supply Constant-Sensible-Heat-Ratio Case Entry
+
+CP348 supersedes only CP347's physical-line-2213 exclusion by mapping the
+constant-sensible-heat-ratio case entry at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical line 2213:
+
+```cpp
+case HumControl::ConstantSensibleHeatRatio: {
+```
+
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact one-site source order is
+`enter-purchased-air-dehumidification-control-constant-sensible-heat-ratio-case`.
+Lines 2214-2215 are comments. Physical line 2216,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`, is the first excluded
+executable. CP348 claims neither that statement nor any operand, psychrometric
+evaluation, assignment, or later case-body behavior.
+
+The exact routes are inherited `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`, completed-`None` skip, private constant-SHR
+entry, and private Humidistat and constant-supply-humidity skips. For
+transitions `T`, route counts `U/N/P/C0/E/H/CSH`, CP346 switch dispatches `S`,
+CP345 assignments `R`, predecessor provenance `G/F/L`, and CP340 active
+evaluations `A`, checked state requires:
+
+```text
+T = U+N+P+C0+E+H+CSH
+S = C0+E+H+CSH = R = G+F+L
+A = F+L
+source_site_execution_count = E
+```
+
+The one site counter equals `E`; all other routes execute no CP348 site.
+Exact direct release inherits the completed CP347 `None` route and strengthens
+the partition to `C0=S` and `E=H=CSH=0`. Thus direct CP348 evidence is a
+complete skip. The constant-SHR entry remains private characterization.
+
+Exact release validates same-call CP347 supplied/latest/private parity and
+recursive completion before mutation. CP347 is the immediate predecessor.
+CP348 accepts and creates no numerical operand or DTO feed, performs no
+arithmetic, comparison, psychrometric call, assignment, clamp, normalization,
+finite coercion, cache, diagnostic, or mutable service work, and claims no
+supporting numerical state.
+
+Binding and direct-only lifecycle evidence preserve
+CP347-to-CP348-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle`.
+CP348 neither enters nor consumes `DirectZonePurchasedAirCouplingInput` and
+does not reconcile with, feed, or replace the numerical DTO. Non-direct paths
+expose `None` and reject attached CP348 evidence. Counts remain 32 algorithms
+and 293 routines, 58 `state_mapped` plus 235 `source_mapped`, with 170
+required. Both parent algorithms remain `scaffold`/`none`;
+`routine.calc_purch_air_loads` and `routine.calc_purch_air_mixed_air` remain
+`source_mapped`. Support, readiness, run state, capability, feature/evidence
+boundaries, numerical conformance, output ownership, status, conformance, and
+Roadmap state remain unchanged.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before

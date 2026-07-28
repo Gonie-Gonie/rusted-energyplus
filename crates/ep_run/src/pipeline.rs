@@ -41,6 +41,7 @@ use ep_runtime::{
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentLifecycleSummary,
+    PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseEntryLifecycleSummary,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlNoneCaseLifecycleSummary,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlSwitchLifecycleSummary,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentLifecycleSummary,
@@ -110,6 +111,7 @@ mod purchased_air_cooling_positive_supply_capacity_limit_sensible_output_supply_
 mod purchased_air_cooling_positive_supply_cp_air_assignment;
 mod purchased_air_cooling_positive_supply_enthalpy_assignment;
 mod purchased_air_cooling_positive_supply_humidity_ratio_mixed_air_assignment;
+mod purchased_air_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry;
 mod purchased_air_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case;
 mod purchased_air_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch;
 mod purchased_air_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment;
@@ -321,6 +323,10 @@ struct RustRuntimeResult {
     purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle:
         Option<
             PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlNoneCaseLifecycleSummary,
+        >,
+    purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle:
+        Option<
+            PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseEntryLifecycleSummary,
         >,
 }
 
@@ -1510,6 +1516,10 @@ fn finish_successful_summary(
                 .purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle
                 .as_ref()
                 .map(purchased_air_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case::lifecycle_json),
+            "purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle": result
+                .purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle
+                .as_ref()
+                .map(purchased_air_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry::lifecycle_json),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
@@ -2448,6 +2458,8 @@ fn execute_rust_runtime(
                     None,
                 purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle:
                     None,
+                purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle:
+                    None,
             })
         }
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
@@ -2662,6 +2674,12 @@ fn execute_rust_runtime(
                         .summary
                         .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle,
                 );
+            let purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle =
+                Some(
+                    simulation
+                        .summary
+                        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle,
+                );
             Ok(RustRuntimeResult {
                 results: simulation.results,
                 runtime_class,
@@ -2715,6 +2733,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle,
                 purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_lifecycle,
                 purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle,
+                purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle,
             })
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
@@ -2791,6 +2810,8 @@ fn execute_rust_runtime(
                     None,
                 purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle:
                     None,
+                purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle:
+                    None,
             })
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
@@ -2864,6 +2885,8 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_lifecycle:
                     None,
                 purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle:
+                    None,
+                purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle:
                     None,
             })
         }
@@ -3396,6 +3419,18 @@ fn validate_runtime_demand_provenance(
             init_lifecycle,
             result.purchased_air_coupling_call_count,
         )?;
+        purchased_air_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry::validate_direct_lifecycle(
+            result
+                .purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle
+                .as_ref(),
+            purchased_air_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry::DirectLifecyclePredecessors {
+                none_case_cp347: result
+                    .purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle
+                    .as_ref(),
+            },
+            init_lifecycle,
+            result.purchased_air_coupling_call_count,
+        )?;
     } else if result.purchased_air_init_lifecycle.is_some()
         || result.purchased_air_calc_entry_lifecycle.is_some()
         || result
@@ -3508,6 +3543,9 @@ fn validate_runtime_demand_provenance(
             .is_some()
         || result
             .purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle
+            .is_some()
+        || result
+            .purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle
             .is_some()
         || result.purchased_air_coupling_call_count.is_some()
     {
@@ -5182,7 +5220,7 @@ mod tests {
     }
 
     #[test]
-    fn non_direct_runtime_rejects_cp316_through_cp347_lifecycle_evidence() {
+    fn non_direct_runtime_rejects_cp316_through_cp348_lifecycle_evidence() {
         let mut result = RustRuntimeResult {
             results: ResultStore::new(),
             runtime_class: RuntimeClass::IdealLoadsFixtureDemandDiagnostic,
@@ -5257,6 +5295,8 @@ mod tests {
             purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_lifecycle:
                 None,
             purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle:
+                None,
+            purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle:
                 None,
         };
         assert!(
@@ -5897,6 +5937,31 @@ mod tests {
                         PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_POST_CAPACITY_LIMIT_DEHUMIDIFICATION_CONTROL_NONE_CASE_FIRST_EXCLUDED_SOURCE,
                     state: ep_runtime::
                         PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlNoneCaseRuntimeState::new(
+                            IdealLoadsAirSystemId(0),
+                        ),
+                },
+            );
+        assert_eq!(
+            validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result, None),
+            Err(
+                "persistent PurchasedAir lifecycle evidence was attached to a non-direct runtime"
+                    .to_string()
+            )
+        );
+
+        result
+            .purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle =
+            None;
+        result
+            .purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle =
+            Some(
+                ep_runtime::PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseEntryLifecycleSummary {
+                    source: ep_runtime::
+                        PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_POST_CAPACITY_LIMIT_DEHUMIDIFICATION_CONTROL_CONSTANT_SENSIBLE_HEAT_RATIO_CASE_ENTRY_SOURCE,
+                    first_excluded_source: ep_runtime::
+                        PURCHASED_AIR_CALC_COOLING_POSITIVE_SUPPLY_POST_CAPACITY_LIMIT_DEHUMIDIFICATION_CONTROL_CONSTANT_SENSIBLE_HEAT_RATIO_CASE_ENTRY_FIRST_EXCLUDED_SOURCE,
+                    state: ep_runtime::
+                        PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseEntryRuntimeState::new(
                             IdealLoadsAirSystemId(0),
                         ),
                 },

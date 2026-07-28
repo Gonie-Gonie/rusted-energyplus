@@ -567,8 +567,13 @@ $postCp339BeforeNumericalCodeForCp329 = [regex]::Replace(
     '(?s)let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case =\s*advance_positive_supply_post_capacity_limit_dehumidification_control_none_case\([^;]+?\)\?;',
     ''
 )
+$postCp339BeforeNumericalCodeForCp329 = [regex]::Replace(
+    $postCp339BeforeNumericalCodeForCp329,
+    '(?s)let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry =\s*advance_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry\([^;]+?\)\?;',
+    ''
+)
 if ($postCp339BeforeNumericalCodeForCp329 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No helper other than the audited CP340 through CP347 releases may execute after CP339 and before numerical Calc"
+    throw "No helper other than the audited CP340 through CP348 releases may execute after CP339 and before numerical Calc"
 }
 
 # Coupled validation reconstructs the projection from CP328 and the existing

@@ -37,6 +37,7 @@ use super::{
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentError as CoolingCpAirAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentError as CoolingSupplyEnthalpyAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentError as CoolingSupplyHumidityRatioMixedAirAssignmentError,
+    PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseEntryError as CoolingSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseEntryError,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlNoneCaseError as CoolingSupplyPostCapacityLimitDehumidificationControlNoneCaseError,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlSwitchError as CoolingSupplyPostCapacityLimitDehumidificationControlSwitchError,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentError as CoolingSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentError,
@@ -97,6 +98,7 @@ mod cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mi
 mod cooling_positive_supply_cp_air_assignment;
 mod cooling_positive_supply_enthalpy_assignment;
 mod cooling_positive_supply_humidity_ratio_mixed_air_assignment;
+mod cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry;
 mod cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case;
 mod cooling_positive_supply_post_capacity_limit_dehumidification_control_switch;
 mod cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment;
@@ -117,6 +119,7 @@ use cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mi
 use cooling_positive_supply_cp_air_assignment::advance_positive_supply_cp_air_assignment;
 use cooling_positive_supply_enthalpy_assignment::advance_positive_supply_enthalpy_assignment;
 use cooling_positive_supply_humidity_ratio_mixed_air_assignment::advance_positive_supply_humidity_ratio_mixed_air_assignment;
+use cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry::advance_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry;
 use cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case::advance_positive_supply_post_capacity_limit_dehumidification_control_none_case;
 use cooling_positive_supply_post_capacity_limit_dehumidification_control_switch::advance_positive_supply_post_capacity_limit_dehumidification_control_switch;
 use cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment::advance_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment;
@@ -771,6 +774,10 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingPositiveSupplyPostCapacityLimitDehumidificationControlNoneCase(
         CoolingSupplyPostCapacityLimitDehumidificationControlNoneCaseError,
     ),
+    /// The bounded constant-sensible-heat-ratio case entry rejected its release state.
+    CalculationCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseEntry(
+        CoolingSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseEntryError,
+    ),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -1225,6 +1232,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch,
         )?;
+    let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry =
+        advance_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1300,6 +1313,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment,
         calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch,
         calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case,
+        calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry,
         coupling,
     })
 }

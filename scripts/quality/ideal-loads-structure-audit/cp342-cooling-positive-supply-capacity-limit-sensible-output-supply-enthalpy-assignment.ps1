@@ -257,6 +257,11 @@ foreach ($cp342BindingInterval in @(
         '(?s)let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case =\s*advance_positive_supply_post_capacity_limit_dehumidification_control_none_case\([^;]+?\)\?;',
         ''
     )
+    $cp342BindingIntervalCode = [regex]::Replace(
+        $cp342BindingIntervalCode,
+        '(?s)let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry =\s*advance_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry\([^;]+?\)\?;',
+        ''
+    )
     if ($cp342BindingIntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
         throw "No intermediary helper call may execute $($cp342BindingInterval.Description)"
     }
@@ -299,7 +304,7 @@ foreach ($cp342JsonField in @(
 Assert-Contains -Path $cp342PipelineSnapshotSerialization -Pattern '(?s)fn json_number\(value: Option<f64>\) -> Value.*?filter\(\|value\| value\.is_finite\(\)\).*?map_or\(Value::Null' -Description "CP342 nonfinite numeric null projection"
 Assert-Contains -Path $cp342PipelineSnapshotSerialization -Pattern 'value\.map\(\|value\| format!\("0x\{:016x\}", value\.to_bits\(\)\)\)' -Description "CP342 authoritative IEEE bits"
 Assert-Contains -Path $cp342PipelineRoot -Pattern '(?s)purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment_lifecycle:\s*None' -Description "non-direct CP342 null evidence"
-Assert-Contains -Path $cp342PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp347_lifecycle_evidence' -Description "non-direct CP342 through CP347 evidence rejection"
+Assert-Contains -Path $cp342PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp348_lifecycle_evidence' -Description "non-direct CP342 through CP348 evidence rejection"
 
 # Exactly two algorithm addenda, two capability addenda, and a 2+4 target
 # distribution carry the same source/provenance/IEEE/exclusion contract.
@@ -491,7 +496,7 @@ foreach ($cp342HistoricalFirewallAudit in @(
         "scripts\quality\ideal-loads-structure-audit\cp340-cooling-positive-supply-capacity-limit-sensible-output-guard.ps1",
         "scripts\quality\ideal-loads-structure-audit\cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1"
     )) {
-    Assert-Contains -Path $cp342HistoricalFirewallAudit -Pattern 'non_direct_runtime_rejects_cp316_through_cp347_lifecycle_evidence' -Description "historical non-direct firewall reaches CP346"
+    Assert-Contains -Path $cp342HistoricalFirewallAudit -Pattern 'non_direct_runtime_rejects_cp316_through_cp348_lifecycle_evidence' -Description "historical non-direct firewall reaches CP348"
 }
 
 # Root reachability and generated inventory add exactly one internal script:
@@ -507,10 +512,10 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP342 after CP341 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 285' -Description "CP342 cumulative inventory total through CP347"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 286' -Description "CP342 cumulative inventory total through CP348"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp342-cooling-positive-supply-capacity-limit-sensible-output-supply-enthalpy-assignment\.ps1"' -Description "CP342 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp342-cooling-positive-supply-capacity-limit-sensible-output-supply-enthalpy-assignment\.ps1::dot_sources' -Description "CP342 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 285 \|' -Description "CP342 generated script count through CP347"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 286 \|' -Description "CP342 generated script count through CP348"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP342 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 45 \|' -Description "CP342 generated internal script count through CP347"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 46 \|' -Description "CP342 generated internal script count through CP348"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP342 generated uncalled script count"
