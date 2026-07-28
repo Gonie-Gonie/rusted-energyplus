@@ -18133,6 +18133,82 @@ later behavior remain unpromoted. `routine.psy_tdb_fn_h_w` stays
 feature and evidence boundaries, numerical conformance, capability, output
 claims, status, conformance, and Roadmap state remain unchanged.
 
+## CP345 Source-Ordered Cooling Positive-Supply Post-Capacity-Limit Humidity-Ratio Mixed-Air Assignment
+
+CP345 supersedes only CP344's physical-line-2208 exclusion for the single
+Cooling positive-supply post-capacity-limit humidity-ratio assignment at
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2208:
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;`. The locked raw source
+SHA-256 is
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The exact source order contains two sites:
+
+1. `read-purchased-air-mixed-air-humidity-ratio`
+2. `assign-purchased-air-supply-humidity-ratio`
+
+The statement copies the binary64 value without arithmetic, a psychrometric
+call, minimum, maximum, clamp, normalization, finite coercion, cache,
+diagnostic, or mutable service. The same-call retained CP329 latest/private
+`mixed_air_humidity_ratio` is the sole RHS owner. Same-call exact CP335
+`assigned_supply_humidity_ratio` is required as bit-exact corroboration and
+never substitutes for CP329. CP344 is the immediate predecessor and proves
+the source-order branch join; it owns no CP345 operand.
+
+The pure CP345 transition characterizes signed zero, NaN payloads, and
+infinities by bit-copy. The complete direct release, however, recursively
+requires the exact CP329 owner to be finite and `>= 0.0`, so nonfinite values
+are unreachable and forged evidence is rejected. CP345 adds no finite gate or
+coercion of its own. JSON nonfinite-null projection with authoritative IEEE
+bits is defensive serializer characterization only.
+
+UnitOff, non-cooling, and CP330 positive-guard-false routes skip both sites.
+All positive-supply routes execute the assignment after capacity handling:
+CP337 capacity-limit guard false (`G`), CP340 sensible-output guard false
+(`F`), and CP344 mixed-air-limit execution (`L`). With transitions `T`,
+inherited skips `U/N/P`, CP345 assignments `R`, and CP340 active evaluations
+`A`, exact checked state requires:
+
+CP345's retained route itself collapses to `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`, or
+`SupplyHumidityRatioMixedAirAssigned`. Separate public
+`G/F/L` provenance counters and private witnessed parity retain the three-way
+join provenance without expanding that route enum.
+
+```text
+T = U+N+P+R
+R = G+F+L
+A = F+L
+source_site_execution_count = 2*R
+```
+
+Both per-site counters equal `R`; `R` equals positive-supply body entries and
+the CP335, CP336, and CP337 active counts. No invariant equates `R` with `L`
+or with CP340 active evaluations. Checked preflight covers every conditional
+site and private-witness increment before state or witness mutation.
+
+The public release accepts only runtime, selected system, and same-call CP344;
+it validates supplied/latest/private CP344 identity and recursive completion,
+then proves CP329 ownership plus exact CP335 corroboration. Caller/model/Zone
+re-reads, duplicate humidity scalars, psychrometric services, and numerical
+DTO inputs are forbidden. Binding and direct-only lifecycle evidence preserve
+CP344-to-CP345-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle`.
+CP345 neither consumes nor reconciles with
+`DirectZonePurchasedAirCouplingInput`, and does not feed or replace the
+numerical DTO. Non-direct paths expose `None` and reject CP345 evidence.
+
+Physical line 2209 is the first excluded lexical executable:
+`switch (PurchAir.DehumidCtrlType) {`. Every dehumidification-control case and
+all later humidity, enthalpy, capacity, saturation, and reporting behavior
+remain excluded. CP345 changes no algorithm or routine row: the inventory
+stays 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Both parent algorithms remain
+`scaffold`/`none`; `routine.calc_purch_air_loads` and
+`routine.calc_purch_air_mixed_air` remain `source_mapped`. Support, readiness,
+run state, capability, feature/evidence boundaries, numerical conformance,
+output ownership, status, conformance, and Roadmap state remain unchanged.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before

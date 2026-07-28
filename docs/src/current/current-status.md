@@ -1939,6 +1939,71 @@ output-ownership, status, conformance, or Roadmap promotion.
 `routine.psy_tdb_fn_h_w` remains `state_mapped`, both parent Calc routines
 remain `source_mapped`, and both parent algorithms remain `scaffold`/`none`.
 
+CP345 now maps only the Cooling positive-supply post-capacity-limit
+humidity-ratio mixed-air assignment at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2208:
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;`. The locked raw source
+SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact two textual sites are
+`read-purchased-air-mixed-air-humidity-ratio` followed by
+`assign-purchased-air-supply-humidity-ratio`. The transition performs no
+arithmetic, psychrometric evaluation, minimum, maximum, clamp, normalization,
+or finite coercion; it copies the selected binary64 payload bit-for-bit.
+The pure transition therefore characterizes signed zero, NaN payloads, and
+infinities, but the complete direct release recursively requires the exact
+CP329 owner to be finite and `>= 0.0`; nonfinite values are unreachable there
+and forged evidence is rejected. CP345 adds no new finite gate or coercion.
+JSON nonfinite-null projection plus authoritative IEEE bits is defensive
+serializer characterization only.
+
+The same-call retained CP329 latest/private
+`mixed_air_humidity_ratio` is the sole RHS owner. Same-call exact CP335
+`assigned_supply_humidity_ratio` must corroborate those bits, but CP335 does
+not replace CP329 ownership. CP344 is the immediate source-order predecessor
+and supplies the branch join, not the humidity operand. UnitOff, non-cooling,
+and CP330 positive-guard-false routes skip both sites. Every positive-supply
+route executes both sites after the capacity-limit region, including CP337
+capacity-limit guard false, CP340 sensible-output guard false, and CP344
+mixed-air-limit execution.
+
+CP345's own retained route collapses to `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`, or
+`SupplyHumidityRatioMixedAirAssigned`. Separate public
+CP337-guard-false `G`, CP340-sensible-output-false `F`, and CP344-execution
+`L` provenance counters, plus private witnessed parity, preserve the join
+provenance without adding those predecessor branches to the CP345 route enum.
+
+For transitions `T`, inherited skips `U/N/P`, CP345 assignments `R`, CP337
+capacity-limit guard-false routes `G`, CP340 sensible-output guard-false routes
+`F`, CP344 mixed-air-limit executions `L`, and CP340 active evaluations `A`,
+exact state requires `T=U+N+P+R`, `R=G+F+L`, and `A=F+L`.
+`R` also equals positive-supply body entries and the CP335, CP336, and CP337
+active counts. Each site counter equals `R` and
+`source_site_execution_count=2*R`. No invariant equates `R` with `L` or with
+CP340 active evaluations.
+
+Binding, coupled runtime, and pipeline evidence preserve
+CP344-to-CP345-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle`.
+CP345 does not consume, reconcile with, feed, or replace
+`DirectZonePurchasedAirCouplingInput` or the numerical DTO. Non-direct paths
+publish `None` and reject attached CP345 evidence. Physical line 2209 is the
+first excluded lexical executable:
+`switch (PurchAir.DehumidCtrlType) {`. The complete dehumidification-control
+switch and later humidity, enthalpy, capacity, and output behavior remain
+excluded.
+
+CP345 adds only the bounded post-capacity humidity assignment, target
+inventory, and direct-only lifecycle evidence. The inventory remains 32
+algorithms and 293 routines, split 58 `state_mapped` plus 235 `source_mapped`,
+with 170 required. Both parent algorithms remain `scaffold`/`none`, and
+`routine.calc_purch_air_loads` and `routine.calc_purch_air_mixed_air` remain
+`source_mapped`. There is no support, readiness, run-state, capability,
+feature/evidence, numerical-conformance, purchased-air output-ownership,
+status, conformance, or Roadmap promotion.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

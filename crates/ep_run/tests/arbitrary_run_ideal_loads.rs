@@ -26,9 +26,10 @@ use output_manifest::{SUPPORTED_RUNTIME_MANIFEST, assert_output_manifest};
 #[test]
 fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
 -> Result<(), Box<dyn std::error::Error>> {
+    let fixture = active_cooling_ideal_loads_fixture();
     let summary = assert_direct_ideal_loads_fixture_runs(
         "ideal-loads-no-oa",
-        IDEAL_LOADS_EPJSON,
+        &fixture,
         "ideal-loads-direct-zone-coupled-compatibility",
         "ideal_loads_no_oa_sensible",
     )?;
@@ -83,6 +84,103 @@ fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
             "assign-purchased-air-supply-temperature",
         ]
     );
+    let cp345 = &summary["rust_runtime"]["purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle"];
+    assert_eq!(
+        cp345["source"],
+        "EnergyPlus 26.1 PurchasedAirManager.cc:2208"
+    );
+    assert_eq!(
+        cp345["first_excluded_source"],
+        "EnergyPlus 26.1 PurchasedAirManager.cc:2209"
+    );
+    assert_eq!(
+        cp345["latest"]["source_order"]
+            .as_array()
+            .expect("CP345 source order"),
+        &[
+            "read-purchased-air-mixed-air-humidity-ratio",
+            "assign-purchased-air-supply-humidity-ratio",
+        ]
+    );
+    for field in [
+        "capacity_limit_guard_false_fallthrough_skipped",
+        "capacity_limit_sensible_output_guard_false_fallthrough",
+        "capacity_limit_sensible_output_supply_temperature_mixed_air_limit_executed",
+    ] {
+        assert_eq!(
+            cp345["latest"][field], cp344["latest"][field],
+            "CP345 must retain CP344 {field} provenance"
+        );
+    }
+    let cp329 =
+        &summary["rust_runtime"]["purchased_air_calc_cooling_mixed_air_call_lifecycle"]["latest"];
+    let cp335 = &summary["rust_runtime"]["purchased_air_calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment_lifecycle"]
+        ["latest"];
+    let cp345_mixed_air_bits = cp345["latest"]["mixed_air_humidity_ratio_ieee_bits"]
+        .as_str()
+        .expect("active CP345 mixed-air humidity-ratio bits");
+    let cp329_mixed_air_bits = cp329["mixed_air_humidity_ratio_ieee_bits"]
+        .as_str()
+        .expect("active CP329 mixed-air humidity-ratio bits");
+    assert_eq!(
+        cp345_mixed_air_bits, cp329_mixed_air_bits,
+        "CP345 must read the CP329-owned mixed-air humidity-ratio bits"
+    );
+    let cp345_assigned_bits = cp345["latest"]["assigned_supply_humidity_ratio_ieee_bits"]
+        .as_str()
+        .expect("active CP345 assigned humidity-ratio bits");
+    let cp335_assigned_bits = cp335["assigned_supply_humidity_ratio_ieee_bits"]
+        .as_str()
+        .expect("active CP335 assigned humidity-ratio bits");
+    assert_eq!(
+        cp345_assigned_bits, cp335_assigned_bits,
+        "CP335 must corroborate the CP345 assigned humidity-ratio bits"
+    );
+    let cp345_assignment_route_count = [
+        "capacity_limit_guard_false_fallthrough_skipped",
+        "capacity_limit_sensible_output_guard_false_fallthrough",
+        "capacity_limit_sensible_output_supply_temperature_mixed_air_limit_executed",
+    ]
+    .into_iter()
+    .filter(|field| cp345["latest"][field].as_bool() == Some(true))
+    .count();
+    let cp345_skip_route_count = [
+        "unit_off_skipped",
+        "non_cooling_skipped",
+        "positive_guard_false_fallthrough_skipped",
+    ]
+    .into_iter()
+    .filter(|field| cp345["latest"][field].as_bool() == Some(true))
+    .count();
+    assert_eq!(
+        cp345_assignment_route_count, 1,
+        "fixture must execute one active CP345 G/F/L assignment route"
+    );
+    assert_eq!(
+        cp345_skip_route_count, 0,
+        "active CP345 fixture must not take an inherited skip route"
+    );
+    assert_eq!(
+        cp345["latest"]["capacity_limit_guard_false_fallthrough_skipped"], true,
+        "no-limit fixture must exercise the CP345 G assignment route"
+    );
+    let cp345_assignment_executed = cp345_assignment_route_count == 1;
+    assert_eq!(
+        cp345["latest"]["post_capacity_limit_supply_humidity_ratio_mixed_air_assignment_executed"],
+        cp345_assignment_executed
+    );
+    for field in ["mixed_air_humidity_ratio", "assigned_supply_humidity_ratio"] {
+        assert_eq!(
+            cp345["latest"][field].is_number(),
+            cp345_assignment_executed,
+            "{field}"
+        );
+        assert_eq!(
+            cp345["latest"][format!("{field}_ieee_bits")].is_string(),
+            cp345_assignment_executed,
+            "{field} bits"
+        );
+    }
     Ok(())
 }
 
@@ -469,6 +567,14 @@ fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
             ["purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle"]
             .is_null()
     );
+    assert!(rust_runtime.contains_key(
+        "purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle"
+    ));
+    assert!(
+        rust_runtime
+            ["purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle"]
+            .is_null()
+    );
     assert_eq!(summary["source_order_gate"]["matches"], true);
     assert_output_manifest(&output_dir, SUPPORTED_RUNTIME_MANIFEST)?;
     assert!(
@@ -517,6 +623,23 @@ fn finite_limit_hysteresis_fixture() -> String {
       "cooling_limit": "LimitFlowRateAndCapacity",
       "maximum_cooling_air_flow_rate": 0.01,
       "maximum_total_cooling_capacity": 300.0,"#,
+        )
+}
+
+fn active_cooling_ideal_loads_fixture() -> String {
+    IDEAL_LOADS_EPJSON
+        .replace(
+            r#""Version": {"Version 1": {"version_identifier": "26.1"}},"#,
+            r#""Version": {"Version 1": {"version_identifier": "26.1"}},
+  "Timestep": {"Timestep 1": {"number_of_timesteps_per_hour": 1}},"#,
+        )
+        .replace(
+            r#""Heating Setpoint": {"hourly_value": 21}"#,
+            r#""Heating Setpoint": {"hourly_value": 0}"#,
+        )
+        .replace(
+            r#""Cooling Setpoint": {"hourly_value": 24}"#,
+            r#""Cooling Setpoint": {"hourly_value": 15}"#,
         )
 }
 

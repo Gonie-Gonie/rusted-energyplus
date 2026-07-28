@@ -76,6 +76,8 @@ use super::{
     PurchasedAirCalcCoolingPositiveSupplyEnthalpyAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentLifecycleSummary,
+    PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentError,
+    PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitError,
@@ -126,6 +128,7 @@ use super::{
     purchased_air_calc_cooling_positive_supply_cp_air_assignment_lifecycle_summary,
     purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle_summary,
     purchased_air_calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment_lifecycle_summary,
+    purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle_summary,
     purchased_air_calc_cooling_positive_supply_temperature_assignment_lifecycle_summary,
     purchased_air_calc_cooling_positive_supply_temperature_minimum_limit_lifecycle_summary,
     purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle_summary,
@@ -163,6 +166,7 @@ mod cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mi
 mod cooling_positive_supply_cp_air_assignment_validation;
 mod cooling_positive_supply_enthalpy_assignment_validation;
 mod cooling_positive_supply_humidity_ratio_mixed_air_assignment_validation;
+mod cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_validation;
 mod cooling_positive_supply_temperature_assignment_validation;
 mod cooling_positive_supply_temperature_minimum_limit_validation;
 mod cooling_positive_supply_temperature_mixed_air_limit_validation;
@@ -348,6 +352,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded cooling positive-supply capacity-limit supply-temperature mixed-air-limit lifecycle report.
     pub calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle:
         PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyTemperatureMixedAirLimitLifecycleSummary,
+    /// Persistent bounded post-capacity-limit mixed-air humidity-ratio assignment lifecycle report.
+    pub calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle:
+        PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -496,6 +503,10 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     /// Final cooling positive-supply capacity-limit supply-temperature mixed-air-limit summary could not resolve the bound unit.
     CalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyTemperatureMixedAirLimitLifecycle(
         PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyTemperatureMixedAirLimitError,
+    ),
+    /// Final post-capacity-limit mixed-air humidity-ratio assignment summary could not resolve the bound unit.
+    CalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentLifecycle(
+        PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentError,
     ),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
@@ -821,6 +832,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A post-capacity-limit mixed-air humidity-ratio assignment lifecycle invariant did not match the run.
+    CalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -998,6 +1018,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     },
     /// A cooling positive-supply capacity-limit supply-temperature mixed-air-limit snapshot did not match its release call.
     UnexpectedCalculationCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyTemperatureMixedAirLimit {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
+    /// A post-capacity-limit mixed-air humidity-ratio assignment snapshot did not match its release call.
+    UnexpectedCalculationCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignment {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
@@ -1195,6 +1220,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyTemperatureMixedAirLimitLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir cooling positive-supply capacity-limit supply-temperature mixed-air-limit lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir post-capacity-limit mixed-air humidity-ratio assignment lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -1484,6 +1513,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir cooling positive-supply capacity-limit supply-temperature mixed-air-limit lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir post-capacity-limit mixed-air humidity-ratio assignment lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -1681,6 +1718,12 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its cooling positive-supply capacity-limit supply-temperature mixed-air limit"
+            ),
+            Self::UnexpectedCalculationCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignment {
+                timestep_index,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its post-capacity-limit mixed-air humidity-ratio assignment"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -2250,6 +2293,18 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             return Err(
                 DirectZonePurchasedAirCoupledRuntimeError::
                     UnexpectedCalculationCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyTemperatureMixedAirLimit {
+                        timestep_index,
+                    },
+            );
+        }
+        if !cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignment {
                         timestep_index,
                     },
             );
@@ -2826,6 +2881,27 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle =
+        purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::
+                CalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentLifecycle,
+        )?;
+    cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_validation::validate_lifecycle(
+        &calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle,
+        &calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle,
+        &calc_cooling_mixed_air_call_lifecycle,
+        &calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment_lifecycle,
+        &calc_cooling_supply_mass_flow_positive_guard_lifecycle,
+        &calc_cooling_positive_supply_enthalpy_assignment_lifecycle,
+        &calc_cooling_positive_supply_capacity_limit_guard_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -2923,6 +2999,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment_lifecycle,
             calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_lifecycle,
             calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle,
+            calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle,
         },
         state,
         results,

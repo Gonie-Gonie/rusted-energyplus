@@ -30,6 +30,8 @@ mod cooling_positive_supply_cp_air_assignment_fixture;
 mod cooling_positive_supply_enthalpy_assignment_fixture;
 #[path = "coupled_output_tests/cooling_positive_supply_humidity_ratio_mixed_air_assignment_fixture.rs"]
 mod cooling_positive_supply_humidity_ratio_mixed_air_assignment_fixture;
+#[path = "coupled_output_tests/cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_fixture.rs"]
+mod cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_fixture;
 #[path = "coupled_output_tests/cooling_positive_supply_temperature_assignment_fixture.rs"]
 mod cooling_positive_supply_temperature_assignment_fixture;
 #[path = "coupled_output_tests/cooling_positive_supply_temperature_minimum_limit_fixture.rs"]
@@ -112,6 +114,7 @@ use cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assi
 use cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment_fixture::calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment_snapshot;
 use cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_fixture::calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_snapshot;
 use cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_fixture::calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_snapshot;
+use cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_fixture::calculation_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_snapshot;
 use cooling_positive_supply_cp_air_assignment_fixture::calculation_cooling_positive_supply_cp_air_assignment_snapshot;
 use cooling_positive_supply_enthalpy_assignment_fixture::calculation_cooling_positive_supply_enthalpy_assignment_snapshot;
 use cooling_positive_supply_humidity_ratio_mixed_air_assignment_fixture::calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment_snapshot;
@@ -763,6 +766,11 @@ fn scaled_output(
             calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment,
             calculation_cooling_mixed_air_call,
         );
+    let calculation_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment =
+        calculation_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_snapshot(
+            calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit,
+            calculation_cooling_mixed_air_call,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -820,6 +828,7 @@ fn scaled_output(
         calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_enthalpy_assignment,
         calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment,
         calculation_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit,
+        calculation_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

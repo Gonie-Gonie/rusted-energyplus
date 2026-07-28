@@ -84,27 +84,62 @@ const RETURN_NODE_KEY: &str = "RETURN";
 const ABS_TOLERANCE: f64 = 1.0e-9;
 
 #[test]
-fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
+fn cp345_direct_coupled_runtime_accepts_post_capacity_join_and_inherited_skip_routes() {
     // Keep the cumulative capacity-limit regression identity while extending
     // every route assertion through its CP344 successor.
     for (
+        cooling_limit,
         availability,
         maximum_capacity_w,
         expected_unit_off,
+        expected_capacity_guard_false,
         expected_guard_false,
         expected_assignment,
     ) in [
-        (1.0, 1.0e9, false, true, false),
-        (1.0, 1.0, false, false, true),
-        (0.0, 1.0, true, false, false),
+        (
+            IdealLoadsLimit::NoLimit,
+            1.0,
+            None,
+            false,
+            true,
+            false,
+            false,
+        ),
+        (
+            IdealLoadsLimit::LimitCapacity,
+            1.0,
+            Some(1.0e9),
+            false,
+            false,
+            true,
+            false,
+        ),
+        (
+            IdealLoadsLimit::LimitCapacity,
+            1.0,
+            Some(1.0),
+            false,
+            false,
+            false,
+            true,
+        ),
+        (
+            IdealLoadsLimit::LimitCapacity,
+            0.0,
+            Some(1.0),
+            true,
+            false,
+            false,
+            false,
+        ),
     ] {
         let mut typed = exact_model(1).typed;
         typed.schedules[1].hourly_value = 0.0;
         typed.schedules[2].hourly_value = 15.0;
         typed.schedules[3].hourly_value = availability;
         let system = &mut typed.ideal_loads_air_systems[0];
-        system.cooling_limit = IdealLoadsLimit::LimitCapacity;
-        system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(maximum_capacity_w));
+        system.cooling_limit = cooling_limit;
+        system.maximum_total_cooling_capacity_w = maximum_capacity_w.map(AutosizeOrNumber::Value);
         let model = SimulationModel::from_typed(typed);
         let schedule_cache =
             precompute_schedule_cache(&model.typed, 1).expect("one CP344 schedule sample");
@@ -135,6 +170,10 @@ fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
         assert_eq!(state.transition_count, 1);
         assert_eq!(state.unit_off_skip_count, usize::from(expected_unit_off));
         assert_eq!(
+            state.capacity_limit_guard_false_fallthrough_skip_count,
+            usize::from(expected_capacity_guard_false)
+        );
+        assert_eq!(
             state.capacity_limit_sensible_output_guard_false_fallthrough_count,
             usize::from(expected_guard_false)
         );
@@ -150,6 +189,10 @@ fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
         let predecessor_latest = predecessor.state.latest.expect("latest CP340 snapshot");
         let latest = state.latest.expect("latest CP341 snapshot");
         assert_eq!(
+            latest.capacity_limit_guard_false_fallthrough_skipped,
+            expected_capacity_guard_false
+        );
+        assert_eq!(
             latest.capacity_limit_sensible_output_guard_false_fallthrough,
             expected_guard_false
         );
@@ -157,7 +200,7 @@ fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
             latest.capacity_limit_sensible_output_maximum_capacity_assignment_executed,
             expected_assignment
         );
-        if expected_unit_off {
+        if expected_unit_off || expected_capacity_guard_false {
             assert!(latest.preexisting_cooling_sensible_output_w.is_none());
             assert!(latest.maximum_total_cooling_capacity_w.is_none());
             assert!(latest.assigned_cooling_sensible_output_w.is_none());
@@ -201,6 +244,10 @@ fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
         assert_eq!(state.transition_count, 1);
         assert_eq!(state.unit_off_skip_count, usize::from(expected_unit_off));
         assert_eq!(
+            state.capacity_limit_guard_false_fallthrough_skip_count,
+            usize::from(expected_capacity_guard_false)
+        );
+        assert_eq!(
             state.capacity_limit_sensible_output_guard_false_fallthrough_count,
             usize::from(expected_guard_false)
         );
@@ -238,6 +285,10 @@ fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
         );
         let latest = state.latest.expect("latest CP342 snapshot");
         assert_eq!(
+            latest.capacity_limit_guard_false_fallthrough_skipped,
+            expected_capacity_guard_false
+        );
+        assert_eq!(
             latest.capacity_limit_sensible_output_guard_false_fallthrough,
             expected_guard_false
         );
@@ -245,7 +296,7 @@ fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
             latest.capacity_limit_sensible_output_supply_enthalpy_assignment_executed,
             expected_assignment
         );
-        if expected_unit_off {
+        if expected_unit_off || expected_capacity_guard_false {
             for value in [
                 latest.preexisting_supply_enthalpy_j_per_kg,
                 latest.mixed_air_enthalpy_j_per_kg,
@@ -329,6 +380,10 @@ fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
         assert_eq!(state.transition_count, 1);
         assert_eq!(state.unit_off_skip_count, usize::from(expected_unit_off));
         assert_eq!(
+            state.capacity_limit_guard_false_fallthrough_skip_count,
+            usize::from(expected_capacity_guard_false)
+        );
+        assert_eq!(
             state.capacity_limit_sensible_output_guard_false_fallthrough_count,
             usize::from(expected_guard_false)
         );
@@ -351,6 +406,10 @@ fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
 
         let latest_temperature = state.latest.expect("latest CP343 snapshot");
         assert_eq!(
+            latest_temperature.capacity_limit_guard_false_fallthrough_skipped,
+            expected_capacity_guard_false
+        );
+        assert_eq!(
             latest_temperature.capacity_limit_sensible_output_guard_false_fallthrough,
             expected_guard_false
         );
@@ -359,7 +418,7 @@ fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
                 .capacity_limit_sensible_output_supply_temperature_assignment_executed,
             expected_assignment
         );
-        if expected_unit_off {
+        if expected_unit_off || expected_capacity_guard_false {
             for value in [
                 latest_temperature.preexisting_supply_temperature_c,
                 latest_temperature.supply_enthalpy_j_per_kg,
@@ -448,6 +507,10 @@ fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
         assert_eq!(state.transition_count, 1);
         assert_eq!(state.unit_off_skip_count, usize::from(expected_unit_off));
         assert_eq!(
+            state.capacity_limit_guard_false_fallthrough_skip_count,
+            usize::from(expected_capacity_guard_false)
+        );
+        assert_eq!(
             state.capacity_limit_sensible_output_guard_false_fallthrough_count,
             usize::from(expected_guard_false)
         );
@@ -470,6 +533,10 @@ fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
 
         let latest_limit = state.latest.expect("latest CP344 snapshot");
         assert_eq!(
+            latest_limit.capacity_limit_guard_false_fallthrough_skipped,
+            expected_capacity_guard_false
+        );
+        assert_eq!(
             latest_limit.capacity_limit_sensible_output_guard_false_fallthrough,
             expected_guard_false
         );
@@ -482,7 +549,7 @@ fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
                 .predecessor_capacity_limit_sensible_output_supply_temperature_assignment_executed,
             expected_assignment
         );
-        if expected_unit_off {
+        if expected_unit_off || expected_capacity_guard_false {
             assert!(!latest_limit.supply_temperature_for_minimum_read);
             assert!(!latest_limit.mixed_air_temperature_for_minimum_read);
             assert!(!latest_limit.source_shaped_two_argument_minimum_evaluated);
@@ -560,6 +627,92 @@ fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
             }
         }
 
+        let lifecycle = simulation
+            .summary
+            .calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle;
+        let state = &lifecycle.state;
+        let expected_cp345_assignment = !expected_unit_off;
+        assert_eq!(state.transition_count, 1);
+        assert_eq!(state.unit_off_skip_count, usize::from(expected_unit_off));
+        assert_eq!(
+            state.assignment_after_capacity_limit_guard_false_fallthrough_count,
+            usize::from(expected_capacity_guard_false)
+        );
+        assert_eq!(
+            state.assignment_after_capacity_limit_sensible_output_guard_false_fallthrough_count,
+            usize::from(expected_guard_false)
+        );
+        assert_eq!(
+            state
+                .assignment_after_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_count,
+            usize::from(expected_assignment)
+        );
+        assert_eq!(
+            state.post_capacity_limit_supply_humidity_ratio_mixed_air_assignment_count,
+            usize::from(expected_cp345_assignment)
+        );
+        assert_eq!(
+            state.source_site_execution_count,
+            2 * usize::from(expected_cp345_assignment)
+        );
+        assert_eq!(
+            state.mixed_air_humidity_ratio_read_count,
+            usize::from(expected_cp345_assignment)
+        );
+        assert_eq!(
+            state.supply_humidity_ratio_assignment_count,
+            usize::from(expected_cp345_assignment)
+        );
+
+        let latest_assignment = state.latest.expect("latest CP345 snapshot");
+        assert_eq!(
+            latest_assignment.capacity_limit_guard_false_fallthrough_skipped,
+            expected_capacity_guard_false
+        );
+        assert_eq!(
+            latest_assignment.capacity_limit_sensible_output_guard_false_fallthrough,
+            expected_guard_false
+        );
+        assert_eq!(
+            latest_assignment
+                .capacity_limit_sensible_output_supply_temperature_mixed_air_limit_executed,
+            expected_assignment
+        );
+        assert_eq!(
+            latest_assignment
+                .post_capacity_limit_supply_humidity_ratio_mixed_air_assignment_executed,
+            expected_cp345_assignment
+        );
+        if expected_unit_off {
+            assert!(!latest_assignment.mixed_air_humidity_ratio_read);
+            assert!(!latest_assignment.supply_humidity_ratio_assignment_performed);
+            assert!(latest_assignment.mixed_air_humidity_ratio.is_none());
+            assert!(latest_assignment.assigned_supply_humidity_ratio.is_none());
+        } else {
+            let mixed_air_humidity_ratio = mixed_air_owner
+                .mixed_air_humidity_ratio
+                .expect("CP329 owned mixed-air humidity ratio");
+            assert_eq!(
+                humidity_owner
+                    .assigned_supply_humidity_ratio
+                    .map(f64::to_bits),
+                Some(mixed_air_humidity_ratio.to_bits()),
+                "CP335 must corroborate CP329 without replacing its ownership"
+            );
+            assert!(latest_assignment.mixed_air_humidity_ratio_read);
+            assert!(latest_assignment.supply_humidity_ratio_assignment_performed);
+            assert_eq!(
+                latest_assignment.mixed_air_humidity_ratio.map(f64::to_bits),
+                Some(mixed_air_humidity_ratio.to_bits())
+            );
+            assert_eq!(
+                latest_assignment
+                    .assigned_supply_humidity_ratio
+                    .map(f64::to_bits),
+                Some(mixed_air_humidity_ratio.to_bits())
+            );
+        }
+
         assert_eq!(simulation.summary.coupling_call_count, 1);
         assert!(
             simulation
@@ -568,6 +721,93 @@ fn cp344_direct_coupled_runtime_accepts_true_false_and_inherited_skip_routes() {
                 .is_some(),
             "the unchanged numerical coupling/reporting stage must still complete"
         );
+    }
+}
+
+#[test]
+fn cp345_direct_coupled_runtime_covers_non_cooling_and_positive_guard_false_skips() {
+    for (
+        cooling_setpoint_c,
+        cooling_limit,
+        maximum_capacity_w,
+        expected_non_cooling,
+        expected_positive_guard_false,
+    ) in [
+        (30.0, IdealLoadsLimit::NoLimit, None, true, false),
+        (15.0, IdealLoadsLimit::LimitCapacity, Some(0.0), false, true),
+    ] {
+        let mut typed = exact_model(1).typed;
+        typed.schedules[1].hourly_value = 0.0;
+        typed.schedules[2].hourly_value = cooling_setpoint_c;
+        typed.schedules[3].hourly_value = 1.0;
+        let system = &mut typed.ideal_loads_air_systems[0];
+        system.cooling_limit = cooling_limit;
+        system.maximum_total_cooling_capacity_w = maximum_capacity_w.map(AutosizeOrNumber::Value);
+        let model = SimulationModel::from_typed(typed);
+        let schedule_cache =
+            precompute_schedule_cache(&model.typed, 1).expect("one CP345 schedule sample");
+        let weather = weather_series_with_conditions(&model, 1, 30.0, 15.0, 30.0, 101_325.0);
+        let mut options = DirectZonePurchasedAirCoupledOptions::hourly_samples(1);
+        options.initial_zone_air_temperature_c = INITIAL_ZONE_TEMPERATURE_C;
+
+        let simulation = simulate_direct_zone_purchased_air_coupled_heat_balance(
+            &model,
+            &weather,
+            &schedule_cache,
+            options,
+        )
+        .expect("CP345 N/P route must pass per-step and final coupled validation");
+        let state = &simulation
+            .summary
+            .calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle
+            .state;
+
+        assert_eq!(state.transition_count, 1);
+        assert_eq!(state.unit_off_skip_count, 0);
+        assert_eq!(
+            state.non_cooling_skip_count,
+            usize::from(expected_non_cooling)
+        );
+        assert_eq!(
+            state.positive_guard_false_fallthrough_skip_count,
+            usize::from(expected_positive_guard_false)
+        );
+        assert_eq!(
+            state.assignment_after_capacity_limit_guard_false_fallthrough_count,
+            0
+        );
+        assert_eq!(
+            state.assignment_after_capacity_limit_sensible_output_guard_false_fallthrough_count,
+            0
+        );
+        assert_eq!(
+            state
+                .assignment_after_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_count,
+            0
+        );
+        assert_eq!(
+            state.post_capacity_limit_supply_humidity_ratio_mixed_air_assignment_count,
+            0
+        );
+        assert_eq!(state.source_site_execution_count, 0);
+        assert_eq!(state.mixed_air_humidity_ratio_read_count, 0);
+        assert_eq!(state.supply_humidity_ratio_assignment_count, 0);
+
+        let latest = state.latest.expect("latest CP345 N/P snapshot");
+        assert_eq!(latest.non_cooling_skipped, expected_non_cooling);
+        assert_eq!(
+            latest.positive_guard_false_fallthrough_skipped,
+            expected_positive_guard_false
+        );
+        assert_eq!(
+            latest.predecessor_cooling_body_entered,
+            !expected_non_cooling
+        );
+        assert!(!latest.post_capacity_limit_supply_humidity_ratio_mixed_air_assignment_executed);
+        assert!(!latest.mixed_air_humidity_ratio_read);
+        assert!(!latest.supply_humidity_ratio_assignment_performed);
+        assert!(latest.mixed_air_humidity_ratio.is_none());
+        assert!(latest.assigned_supply_humidity_ratio.is_none());
     }
 }
 

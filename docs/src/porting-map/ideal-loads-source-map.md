@@ -20207,6 +20207,71 @@ capability, status, algorithm/routine counts, readiness, feature/evidence
 boundaries, numerical conformance, output claims, and Roadmap state remain
 unchanged.
 
+## CP345 Cooling Positive-Supply Post-Capacity-Limit Humidity-Ratio Mixed-Air Assignment
+
+CP345 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical line 2208 and locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`:
+
+```cpp
+PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;
+```
+
+The exact two textual sites are
+`read-purchased-air-mixed-air-humidity-ratio` and
+`assign-purchased-air-supply-humidity-ratio`, in that order. No arithmetic,
+psychrometric evaluation, minimum, maximum, clamp, normalization, finite
+coercion, cache, diagnostic, or mutable service is added. The transition is
+pure and copies signed zero, finite values, NaN payloads, and infinities
+bit-for-bit as defensive private characterization; that characterization is not a new
+full-public-chain reachability claim.
+The complete direct release recursively requires the exact CP329 owner to be
+finite and `>= 0.0`, so nonfinite payloads are unreachable there and forged
+evidence is rejected. CP345 adds no new finite gate or coercion. JSON
+nonfinite-null projection plus authoritative IEEE bits is defensive serializer
+characterization only.
+
+The same-call retained CP329 latest/private `mixed_air_humidity_ratio` solely
+owns the RHS. Exact same-call CP335 `assigned_supply_humidity_ratio`
+corroborates the bits but never replaces CP329. CP344 is the immediate
+source-order predecessor and proves the post-capacity branch join, not an
+operand. UnitOff, non-cooling, and positive-guard-false routes skip both sites.
+Every positive-supply route executes both sites, whether CP337's capacity
+guard falls through (`G`), CP340's sensible-output guard falls through (`F`),
+or CP344 executes its mixed-air limit (`L`).
+
+CP345's retained route is deliberately collapsed to `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`, or
+`SupplyHumidityRatioMixedAirAssigned`. Separate public
+`G/F/L` provenance counters and private witnessed parity preserve the
+three-way post-capacity join without adding predecessor routes to that enum.
+
+For transitions `T`, skips `U/N/P`, CP345 assignments `R`, and CP340 active
+evaluations `A`, exact checked state is `T=U+N+P+R`, `R=G+F+L`, and
+`A=F+L`. `R` equals positive-supply body entries and the CP335, CP336, and
+CP337 active counts. Each per-site counter equals `R`, and source-site
+executions equal `2*R`. CP345 deliberately adds no `R=L` or
+`R=CP340 active evaluations` invariant.
+
+The exact release takes only runtime, selected system, and same-call CP344,
+then recursively validates CP344, CP329 ownership, and CP335 corroboration
+before mutation. Binding, coupled runtime, and pipeline evidence preserve
+CP344-to-CP345-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle`.
+No CP345 value enters `DirectZonePurchasedAirCouplingInput`; CP345 does not
+consume, reconcile with, feed, or replace the numerical DTO. Non-direct paths
+carry `None` and reject attached evidence.
+
+Physical line 2209 is the first excluded executable:
+`switch (PurchAir.DehumidCtrlType) {`. The complete humidity-control switch
+and all later behavior remain excluded. Both parent algorithms remain
+`scaffold`/`none`; both parent Calc routines remain `source_mapped`. Counts
+remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
+170 required. CP345 adds target/lifecycle evidence only, with no support,
+readiness, capability, feature/evidence, numerical-conformance, output,
+status, conformance, or Roadmap promotion.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:
