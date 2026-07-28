@@ -198,18 +198,20 @@ Assert-Contains -Path $cp338InitWitness -Pattern 'pub\(in crate::ideal_loads\) f
 Assert-Contains -Path $cp338InitState -Pattern 'pub calc_cooling_positive_supply_capacity_limit_cp_air_assignment:\s*[\r\n]+\s*PurchasedAirCalcCoolingPositiveSupplyCapacityLimitCpAirAssignmentRuntimeState' -Description "per-unit CP338 persistent state"
 Assert-Contains -Path $cp338InitUnit -Pattern '(?s)calc_cooling_positive_supply_capacity_limit_cp_air_assignment:\s*PurchasedAirCalcCoolingPositiveSupplyCapacityLimitCpAirAssignmentRuntimeState::new\(\s*system\s*,?\s*\)' -Description "per-unit CP338 state initialization"
 
-# Binding preserves exact CP337 -> CP338 -> unchanged numerical order and
+# Binding preserves exact CP337 -> CP338 -> CP339 -> unchanged numerical order and
 # allows no intermediary helper execution.
 $cp338BindingText = Read-RepoText -Path $cp338Binding
 $cp337BindingIndexForCp338 = $cp338BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_guard =")
 $cp338BindingIndex = $cp338BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_cp_air_assignment =")
+$cp339BindingIndexForCp338 = $cp338BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_sensible_output_assignment =")
 $numericalBindingIndexForCp338 = $cp338BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp337BindingIndexForCp338 -lt 0 -or
     $cp338BindingIndex -le $cp337BindingIndexForCp338 -or
-    $numericalBindingIndexForCp338 -le $cp338BindingIndex
+    $cp339BindingIndexForCp338 -le $cp338BindingIndex -or
+    $numericalBindingIndexForCp338 -le $cp339BindingIndexForCp338
 ) {
-    throw "Binding must retain exact CP337 -> CP338 -> numerical Calc order"
+    throw "Binding must retain exact CP337 -> CP338 -> CP339 -> numerical Calc order"
 }
 $cp337BindingCallForCp338 = [regex]::Match(
     $cp338BindingText,
@@ -219,17 +221,28 @@ $cp338BindingCall = [regex]::Match(
     $cp338BindingText,
     '(?s)let calculation_cooling_positive_supply_capacity_limit_cp_air_assignment =\s*advance_positive_supply_capacity_limit_cp_air_assignment\([^;]+?\)\?;'
 )
-if (-not $cp337BindingCallForCp338.Success -or -not $cp338BindingCall.Success) {
-    throw "Binding must retain complete CP337 and CP338 exact release calls"
+$cp339BindingCallForCp338 = [regex]::Match(
+    $cp338BindingText,
+    '(?s)let calculation_cooling_positive_supply_capacity_limit_sensible_output_assignment =\s*advance_positive_supply_capacity_limit_sensible_output_assignment\([^;]+?\)\?;'
+)
+if (
+    -not $cp337BindingCallForCp338.Success -or
+    -not $cp338BindingCall.Success -or
+    -not $cp339BindingCallForCp338.Success
+) {
+    throw "Binding must retain complete CP337, CP338, and CP339 exact release calls"
 }
 $cp337BindingCallEndForCp338 =
     $cp337BindingCallForCp338.Index + $cp337BindingCallForCp338.Length
 $cp338BindingCallEnd = $cp338BindingCall.Index + $cp338BindingCall.Length
+$cp339BindingCallEndForCp338 =
+    $cp339BindingCallForCp338.Index + $cp339BindingCallForCp338.Length
 if (
     $cp338BindingIndex -lt $cp337BindingCallEndForCp338 -or
-    $numericalBindingIndexForCp338 -lt $cp338BindingCallEnd
+    $cp339BindingIndexForCp338 -lt $cp338BindingCallEnd -or
+    $numericalBindingIndexForCp338 -lt $cp339BindingCallEndForCp338
 ) {
-    throw "CP337 and CP338 exact release calls must complete before numerical Calc"
+    throw "CP337, CP338, and CP339 exact release calls must complete before numerical Calc"
 }
 foreach ($cp338Interval in @(
         [PSCustomObject]@{
@@ -239,8 +252,13 @@ foreach ($cp338Interval in @(
         },
         [PSCustomObject]@{
             Start = $cp338BindingCallEnd
+            End = $cp339BindingIndexForCp338
+            Description = "after CP338 and before CP339"
+        },
+        [PSCustomObject]@{
+            Start = $cp339BindingCallEndForCp338
             End = $numericalBindingIndexForCp338
-            Description = "after CP338 and before numerical Calc"
+            Description = "after CP339 and before numerical Calc"
         }
     )) {
     $cp338IntervalText = $cp338BindingText.Substring(
@@ -309,7 +327,7 @@ Assert-Contains -Path $cp338DirectAssertions -Pattern 'source_site_execution_cou
 Assert-Contains -Path $cp338DirectAssertions -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_guard_lifecycle' -Description "direct-run CP337 predecessor evidence"
 Assert-Contains -Path $cp338DirectAssertions -Pattern 'purchased_air_calc_cooling_mixed_air_call_lifecycle' -Description "direct-run CP329 RHS evidence"
 Assert-Contains -Path $cp338NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_cp_air_assignment_lifecycle' -Description "non-direct CP338 null evidence"
-Assert-Contains -Path $cp338PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp338_lifecycle_evidence' -Description "non-direct CP338 evidence rejection"
+Assert-Contains -Path $cp338PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp339_lifecycle_evidence' -Description "non-direct CP338/CP339 evidence rejection"
 Assert-NotContains -Path $cp338Pipeline -Pattern 'latest_numerical|numerical_supply_mass_flow|final_supply_mass_flow|complete_direct_zone_purchased_air_coupling' -Description "numerical DTO reconciliation in CP338 pipeline"
 
 # Exactly two algorithm addenda, two capability addenda, and six target
@@ -451,22 +469,26 @@ foreach ($cp338Documentation in $cp338DocumentationSections) {
 }
 
 # Root reachability and generated inventory account for this one new internal
-# script: 276 executable records, 240 public, 36 internal, and zero uncalled.
+# script: 277 executable records, 240 public, 37 internal, and zero uncalled.
 $cp338MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp337DotSourceIndexForCp338 = $cp338MainAuditText.IndexOf('ideal-loads-structure-audit\cp337-cooling-positive-supply-capacity-limit-guard.ps1')
 $cp338DotSourceIndex = $cp338MainAuditText.IndexOf('ideal-loads-structure-audit\cp338-cooling-positive-supply-capacity-limit-cp-air-assignment.ps1')
+$cp339DotSourceIndexForCp338 = $cp338MainAuditText.IndexOf('ideal-loads-structure-audit\cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment.ps1')
 $cp338AuditCompletionIndex = $cp338MainAuditText.IndexOf('Write-Host "IdealLoads structure audit complete."')
 if (
     $cp337DotSourceIndexForCp338 -lt 0 -or
     $cp338DotSourceIndex -le $cp337DotSourceIndexForCp338 -or
-    $cp338AuditCompletionIndex -le $cp338DotSourceIndex
+    $cp339DotSourceIndexForCp338 -le $cp338DotSourceIndex -or
+    $cp338AuditCompletionIndex -le $cp339DotSourceIndexForCp338
 ) {
-    throw "Main IdealLoads audit must dot-source CP338 after CP337 before completion"
+    throw "Main IdealLoads audit must dot-source CP338 then CP339 after CP337 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 276' -Description "CP338 cumulative inventory total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 277' -Description "CP338 cumulative inventory total through CP339"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment\.ps1"' -Description "CP338 internal script inventory record"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment\.ps1"' -Description "CP339 internal script inventory record after CP338"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment\.ps1::dot_sources' -Description "CP338 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 276 \|' -Description "CP338 generated script count"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment\.ps1::dot_sources' -Description "CP339 main-audit callee evidence"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 277 \|' -Description "CP338 generated script count through CP339"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP338 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 36 \|' -Description "CP338 generated internal script count"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 37 \|' -Description "CP338 generated internal script count through CP339"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP338 generated uncalled script count"

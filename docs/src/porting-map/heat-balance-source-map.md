@@ -34506,6 +34506,76 @@ unpromoted. Both parents remain `scaffold`/`none`; both Calc routines remain
 status, algorithm/routine count, readiness, feature-boundary, evidence-case,
 numerical-conformance, or Roadmap promotion.
 
+## CP339 Positive-Supply Capacity-Limit Sensible-Output Assignment in the Heat-Balance Loop
+
+CP339 advances the direct-Zone IdealLoads heat-balance lifecycle only through
+locked EnergyPlus 26.1 `PurchasedAirManager.cc` physical executable line 2197,
+`CoolSensOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);`.
+The locked source-file SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact textual Rust witness contains six source-text sites:
+`read-retained-supply-mass-flow-rate-for-sensible-output-product`,
+`read-retained-mixed-air-enthalpy-for-sensible-output-difference`,
+`read-retained-supply-enthalpy-for-sensible-output-difference`,
+`calculate-mixed-air-enthalpy-minus-supply-enthalpy`,
+`calculate-supply-mass-flow-rate-times-enthalpy-difference`, and
+`assign-local-cooling-sensible-output`. The deterministic Rust order makes no
+C++ built-in operand-evaluation-order claim because all reads are
+side-effect-free.
+
+Only the CP338 `CapacityLimitCpAirAssigned` route executes CP339, so
+`LimitCapacity` and `LimitFlowRateAndCapacity` each execute all six sites.
+UnitOff, non-cooling, CP330 `PositiveGuardFalseFallthrough`, and CP337
+`ActiveCapacityLimitGuardFalseFallthrough` routes skip the statement and
+retain null operand, intermediate, and result evidence. The five routes are
+`UnitOff`, `NonCooling`, `PositiveGuardFalseFallthrough`,
+`ActiveCapacityLimitGuardFalseFallthrough`, and
+`CapacityLimitSensibleOutputAssigned`. With active CP339 assignments `A`,
+equal to CP338 `capacity_limit_cp_air_assignment_count` and CP337 body entries
+`B`, exact state requires `source_site_execution_count = 6*A = 6*B`, and
+every per-site counter equals `A`.
+
+Exact direct admission accepts only the same-call CP338 predecessor,
+recursively proves its latest/private witness and retained chain, and takes
+the three operands solely from the same-call CP330 latest/private witness's
+`supply_mass_flow_rate_kg_per_s`, CP329 latest/private witness's
+`mixed_air_enthalpy_projection_j_per_kg`, and CP336 latest/private witness's
+`supply_enthalpy_j_per_kg`. CP338 `CpAir`, `MaxCoolTotCap`, duplicate caller
+scalars, model/sizing re-reads, heat-balance or Node scalars, schedules, EMS or
+other live services, and numerical-DTO inputs are not operands.
+
+The pure transition preserves source grouping as
+`SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy)`, subtracting before
+multiplying in deterministic Rust order. It retains raw IEEE binary64
+behavior and performs no derived finite-result rejection. CP329 and CP336
+enthalpy operands stay finite; CP330 may retain a permitted `+infinity` flow.
+The active Rust snapshot keeps that possible nonfinite operand and any
+nonfinite derived difference or product as `Some(value)`. During Serde JSON
+serialization, each such nonfinite numeric field is projected as `null`, while
+a separate IEEE bit string derived from the retained value remains non-null.
+Skipped Rust snapshots keep the corresponding values as `None`; serialized
+JSON keeps both numeric and bit-string fields null.
+
+The binding and lifecycle JSON preserve CP338-to-CP339-to-numerical order
+under
+`purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle`.
+CP339 neither consumes nor reconciles with the numerical DTO and does not feed
+or replace it; non-direct execution carries no CP339 lifecycle. Physical line
+2198 is the first excluded lexical executable and CP340 boundary:
+`if (CoolSensOutput >= PurchAir.MaxCoolTotCap) {`. Its comparison and lines
+2199-2203 adjustment, false-path line 2208 and later behavior through 2337,
+the zero-flow branch at 2339-2345, Heat/DeadBand sibling at 2347-2348,
+mixed-air call at 2454-2461, and guard at 2465 stay excluded. A CP337 false
+guard skips CP338 and CP339 and next dynamically executes physical line 2208.
+
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, Autosizing, broad humidity
+control, maximum-capacity ownership, capacity adjustment, broader
+psychrometrics, supply-state, and output behavior remain unpromoted. Both
+parents remain `scaffold`/`none`; both Calc routines remain `source_mapped`.
+CP339 adds no support, conformance, capability, output claim or ownership,
+status, algorithm/routine count, readiness, feature-boundary, evidence-case,
+numerical-conformance, or Roadmap promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

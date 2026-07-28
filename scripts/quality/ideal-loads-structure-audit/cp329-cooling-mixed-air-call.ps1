@@ -276,7 +276,7 @@ Assert-Contains -Path $cp329InitState -Pattern 'pub calc_cooling_mixed_air_call:
 
 # The scheduled binding is the only
 # CP328 -> CP329 -> CP330 -> CP331 -> CP332 -> CP333 -> CP334 -> CP335 ->
-# CP336 -> CP337 -> CP338 -> numerical placement.
+# CP336 -> CP337 -> CP338 -> CP339 -> numerical placement.
 $cp329BindingText = Read-RepoText -Path $cp329Binding
 $cp328BindingIndexForCp329 = $cp329BindingText.IndexOf("let calculation_cooling_supply_mass_flow_very_small_guard_body =")
 $cp329BindingIndex = $cp329BindingText.IndexOf("let calculation_cooling_mixed_air_call =")
@@ -289,6 +289,7 @@ $cp335BindingIndexForCp329 = $cp329BindingText.IndexOf("let calculation_cooling_
 $cp336BindingIndexForCp329 = $cp329BindingText.IndexOf("let calculation_cooling_positive_supply_enthalpy_assignment =")
 $cp337BindingIndexForCp329 = $cp329BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_guard =")
 $cp338BindingIndexForCp329 = $cp329BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_cp_air_assignment =")
+$cp339BindingIndexForCp329 = $cp329BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_sensible_output_assignment =")
 $numericalBindingIndexForCp329 = $cp329BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp328BindingIndexForCp329 -lt 0 -or
@@ -302,9 +303,10 @@ if (
     $cp336BindingIndexForCp329 -le $cp335BindingIndexForCp329 -or
     $cp337BindingIndexForCp329 -le $cp336BindingIndexForCp329 -or
     $cp338BindingIndexForCp329 -le $cp337BindingIndexForCp329 -or
-    $numericalBindingIndexForCp329 -le $cp338BindingIndexForCp329
+    $cp339BindingIndexForCp329 -le $cp338BindingIndexForCp329 -or
+    $numericalBindingIndexForCp329 -le $cp339BindingIndexForCp329
 ) {
-    throw "Binding must retain exact CP328 -> CP329 -> CP330 -> CP331 -> CP332 -> CP333 -> CP334 -> CP335 -> CP336 -> CP337 -> CP338 -> numerical Calc order"
+    throw "Binding must retain exact CP328 -> CP329 -> CP330 -> CP331 -> CP332 -> CP333 -> CP334 -> CP335 -> CP336 -> CP337 -> CP338 -> CP339 -> numerical Calc order"
 }
 Assert-Contains -Path $cp329Binding -Pattern '(?s)let calculation_cooling_mixed_air_call =\s*advance_direct_no_oa_calc_cooling_mixed_air_call\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_supply_mass_flow_very_small_guard_body,\s*&\*input\.zone_state,\s*\)' -Description "binding exact CP328-to-CP329 wrapper call"
 Assert-Contains -Path $cp329Binding -Pattern 'CalculationCoolingMixedAirCall\(PurchasedAirCalcCoolingMixedAirCallError\)' -Description "CP329 scheduled binding error boundary"
@@ -406,6 +408,15 @@ if (-not $cp338BindingCallForCp329.Success) {
 }
 $cp338BindingCallEndForCp329 =
     $cp338BindingCallForCp329.Index + $cp338BindingCallForCp329.Length
+$cp339BindingCallForCp329 = [regex]::Match(
+    $cp329BindingText,
+    '(?s)let calculation_cooling_positive_supply_capacity_limit_sensible_output_assignment =\s*advance_positive_supply_capacity_limit_sensible_output_assignment\([^;]+?\)\?;'
+)
+if (-not $cp339BindingCallForCp329.Success) {
+    throw "Binding must retain the complete CP339 exact release call after CP338"
+}
+$cp339BindingCallEndForCp329 =
+    $cp339BindingCallForCp329.Index + $cp339BindingCallForCp329.Length
 if (
     $cp330BindingIndexForCp329 -lt $cp329BindingCallEnd -or
     $cp331BindingIndexForCp329 -lt $cp330BindingCallEndForCp329 -or
@@ -416,9 +427,10 @@ if (
     $cp336BindingIndexForCp329 -lt $cp335BindingCallEndForCp329 -or
     $cp337BindingIndexForCp329 -lt $cp336BindingCallEndForCp329 -or
     $cp338BindingIndexForCp329 -lt $cp337BindingCallEndForCp329 -or
-    $numericalBindingIndexForCp329 -lt $cp338BindingCallEndForCp329
+    $cp339BindingIndexForCp329 -lt $cp338BindingCallEndForCp329 -or
+    $numericalBindingIndexForCp329 -lt $cp339BindingCallEndForCp329
 ) {
-    throw "CP329, CP330, CP331, CP332, CP333, CP334, CP335, CP336, CP337, and CP338 exact release calls must complete in source order before numerical Calc"
+    throw "CP329, CP330, CP331, CP332, CP333, CP334, CP335, CP336, CP337, CP338, and CP339 exact release calls must complete in source order before numerical Calc"
 }
 $postCp329BeforeCp330 = $cp329BindingText.Substring(
     $cp329BindingCallEnd,
@@ -500,14 +512,23 @@ $postCp337BeforeCp338CodeForCp329 =
 if ($postCp337BeforeCp338CodeForCp329 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
     throw "No intermediary helper call may execute after CP337 and before CP338"
 }
-$postCp338BeforeNumericalForCp329 = $cp329BindingText.Substring(
+$postCp338BeforeCp339ForCp329 = $cp329BindingText.Substring(
     $cp338BindingCallEndForCp329,
-    $numericalBindingIndexForCp329 - $cp338BindingCallEndForCp329
+    $cp339BindingIndexForCp329 - $cp338BindingCallEndForCp329
 )
-$postCp338BeforeNumericalCodeForCp329 =
-    [regex]::Replace($postCp338BeforeNumericalForCp329, '(?m)//.*$', '')
-if ($postCp338BeforeNumericalCodeForCp329 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No later source helper call may execute after CP338 and before numerical Calc"
+$postCp338BeforeCp339CodeForCp329 =
+    [regex]::Replace($postCp338BeforeCp339ForCp329, '(?m)//.*$', '')
+if ($postCp338BeforeCp339CodeForCp329 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No intermediary helper call may execute after CP338 and before CP339"
+}
+$postCp339BeforeNumericalForCp329 = $cp329BindingText.Substring(
+    $cp339BindingCallEndForCp329,
+    $numericalBindingIndexForCp329 - $cp339BindingCallEndForCp329
+)
+$postCp339BeforeNumericalCodeForCp329 =
+    [regex]::Replace($postCp339BeforeNumericalForCp329, '(?m)//.*$', '')
+if ($postCp339BeforeNumericalCodeForCp329 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No later source helper call may execute after CP339 and before numerical Calc"
 }
 
 # Coupled validation reconstructs the projection from CP328 and the existing

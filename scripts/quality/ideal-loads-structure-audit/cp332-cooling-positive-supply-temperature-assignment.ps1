@@ -273,6 +273,7 @@ $cp335BindingIndexForCp332 = $cp332BindingText.IndexOf("let calculation_cooling_
 $cp336BindingIndexForCp332 = $cp332BindingText.IndexOf("let calculation_cooling_positive_supply_enthalpy_assignment =")
 $cp337BindingIndexForCp332 = $cp332BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_guard =")
 $cp338BindingIndexForCp332 = $cp332BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_cp_air_assignment =")
+$cp339BindingIndexForCp332 = $cp332BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_sensible_output_assignment =")
 $numericalBindingIndexForCp332 = $cp332BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp331BindingIndexForCp332 -lt 0 -or
@@ -283,9 +284,10 @@ if (
     $cp336BindingIndexForCp332 -le $cp335BindingIndexForCp332 -or
     $cp337BindingIndexForCp332 -le $cp336BindingIndexForCp332 -or
     $cp338BindingIndexForCp332 -le $cp337BindingIndexForCp332 -or
-    $numericalBindingIndexForCp332 -le $cp338BindingIndexForCp332
+    $cp339BindingIndexForCp332 -le $cp338BindingIndexForCp332 -or
+    $numericalBindingIndexForCp332 -le $cp339BindingIndexForCp332
 ) {
-    throw "Binding must retain exact CP331 -> CP332 -> CP333 -> CP334 -> CP335 -> CP336 -> CP337 -> CP338 -> numerical Calc order"
+    throw "Binding must retain exact CP331 -> CP332 -> CP333 -> CP334 -> CP335 -> CP336 -> CP337 -> CP338 -> CP339 -> numerical Calc order"
 }
 Assert-Contains -Path $cp332Binding -Pattern '(?s)let calculation_cooling_positive_supply_temperature_assignment =\s*advance_positive_supply_temperature_assignment\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_positive_supply_cp_air_assignment,\s*&\*input\.zone_state,\s*\)\?;' -Description "binding exact CP331-to-CP332 adapter call"
 Assert-Contains -Path $cp332BindingAdapter -Pattern '(?s)pub\(super\) fn advance_positive_supply_temperature_assignment\(\s*runtime: &mut PurchasedAirRuntimeState,\s*system: &IdealLoadsAirSystem,\s*predecessor: PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentSnapshot,\s*zone_state: &ZoneHeatBalanceState,' -Description "CP332 binding adapter arguments"
@@ -358,6 +360,15 @@ if (-not $cp338BindingCallForCp332.Success) {
 }
 $cp338BindingCallEndForCp332 =
     $cp338BindingCallForCp332.Index + $cp338BindingCallForCp332.Length
+$cp339BindingCallForCp332 = [regex]::Match(
+    $cp332BindingText,
+    '(?s)let calculation_cooling_positive_supply_capacity_limit_sensible_output_assignment =\s*advance_positive_supply_capacity_limit_sensible_output_assignment\([^;]+?\)\?;'
+)
+if (-not $cp339BindingCallForCp332.Success) {
+    throw "Binding must retain the complete CP339 exact release call after CP338"
+}
+$cp339BindingCallEndForCp332 =
+    $cp339BindingCallForCp332.Index + $cp339BindingCallForCp332.Length
 if (
     $cp333BindingIndexForCp332 -lt $cp332BindingCallEnd -or
     $cp334BindingIndexForCp332 -lt $cp333BindingCallEndForCp332 -or
@@ -365,9 +376,10 @@ if (
     $cp336BindingIndexForCp332 -lt $cp335BindingCallEndForCp332 -or
     $cp337BindingIndexForCp332 -lt $cp336BindingCallEndForCp332 -or
     $cp338BindingIndexForCp332 -lt $cp337BindingCallEndForCp332 -or
-    $numericalBindingIndexForCp332 -lt $cp338BindingCallEndForCp332
+    $cp339BindingIndexForCp332 -lt $cp338BindingCallEndForCp332 -or
+    $numericalBindingIndexForCp332 -lt $cp339BindingCallEndForCp332
 ) {
-    throw "CP332, CP333, CP334, CP335, CP336, CP337, and CP338 exact release calls must complete in source order before numerical Calc"
+    throw "CP332, CP333, CP334, CP335, CP336, CP337, CP338, and CP339 exact release calls must complete in source order before numerical Calc"
 }
 $postCp332BeforeCp333 = $cp332BindingText.Substring(
     $cp332BindingCallEnd,
@@ -422,14 +434,23 @@ $postCp337BeforeCp338CodeForCp332 =
 if ($postCp337BeforeCp338CodeForCp332 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
     throw "No intermediary helper call may execute after CP337 and before CP338"
 }
-$postCp338BeforeNumericalForCp332 = $cp332BindingText.Substring(
+$postCp338BeforeCp339ForCp332 = $cp332BindingText.Substring(
     $cp338BindingCallEndForCp332,
-    $numericalBindingIndexForCp332 - $cp338BindingCallEndForCp332
+    $cp339BindingIndexForCp332 - $cp338BindingCallEndForCp332
 )
-$postCp338BeforeNumericalCodeForCp332 =
-    [regex]::Replace($postCp338BeforeNumericalForCp332, '(?m)//.*$', '')
-if ($postCp338BeforeNumericalCodeForCp332 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No later source helper call may execute after CP338 and before numerical Calc"
+$postCp338BeforeCp339CodeForCp332 =
+    [regex]::Replace($postCp338BeforeCp339ForCp332, '(?m)//.*$', '')
+if ($postCp338BeforeCp339CodeForCp332 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No intermediary helper call may execute after CP338 and before CP339"
+}
+$postCp339BeforeNumericalForCp332 = $cp332BindingText.Substring(
+    $cp339BindingCallEndForCp332,
+    $numericalBindingIndexForCp332 - $cp339BindingCallEndForCp332
+)
+$postCp339BeforeNumericalCodeForCp332 =
+    [regex]::Replace($postCp339BeforeNumericalForCp332, '(?m)//.*$', '')
+if ($postCp339BeforeNumericalCodeForCp332 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
+    throw "No later source helper call may execute after CP339 and before numerical Calc"
 }
 
 # Coupled runtime and pipeline expose direct-only CP332 evidence and validate

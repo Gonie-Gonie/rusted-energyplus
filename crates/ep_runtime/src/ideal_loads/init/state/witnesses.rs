@@ -3,6 +3,7 @@
 mod cooling_mixed_air_call;
 mod cooling_positive_supply_capacity_limit_cp_air_assignment;
 mod cooling_positive_supply_capacity_limit_guard;
+mod cooling_positive_supply_capacity_limit_sensible_output_assignment;
 mod cooling_positive_supply_cp_air_assignment;
 mod cooling_positive_supply_enthalpy_assignment;
 mod cooling_positive_supply_humidity_ratio_mixed_air_assignment;

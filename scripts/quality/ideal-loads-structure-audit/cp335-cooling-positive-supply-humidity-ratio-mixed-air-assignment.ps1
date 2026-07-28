@@ -191,13 +191,14 @@ Assert-Contains -Path $cp335InitWitness -Pattern 'pub\(in crate::ideal_loads\) f
 Assert-Contains -Path $cp335InitState -Pattern 'pub calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment:\s*[\r\n]+\s*PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentRuntimeState' -Description "per-unit CP335 persistent state"
 Assert-Contains -Path $cp335InitUnit -Pattern '(?s)calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment:\s*PurchasedAirCalcCoolingPositiveSupplyHumidityRatioMixedAirAssignmentRuntimeState::new\(\s*system\s*,?\s*\)' -Description "per-unit CP335 state initialization"
 
-# Binding order is exact CP334 -> CP335 -> CP336 -> CP337 -> CP338 -> unchanged numerical DTO.
+# Binding order is exact CP334 -> CP335 -> CP336 -> CP337 -> CP338 -> CP339 -> unchanged numerical DTO.
 $cp335BindingText = Read-RepoText -Path $cp335Binding
 $cp334BindingIndexForCp335 = $cp335BindingText.IndexOf("let calculation_cooling_positive_supply_temperature_mixed_air_limit =")
 $cp335BindingIndex = $cp335BindingText.IndexOf("let calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment =")
 $cp336BindingIndexForCp335 = $cp335BindingText.IndexOf("let calculation_cooling_positive_supply_enthalpy_assignment =")
 $cp337BindingIndexForCp335 = $cp335BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_guard =")
 $cp338BindingIndexForCp335 = $cp335BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_cp_air_assignment =")
+$cp339BindingIndexForCp335 = $cp335BindingText.IndexOf("let calculation_cooling_positive_supply_capacity_limit_sensible_output_assignment =")
 $numericalBindingIndexForCp335 = $cp335BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling")
 if (
     $cp334BindingIndexForCp335 -lt 0 -or
@@ -205,9 +206,10 @@ if (
     $cp336BindingIndexForCp335 -le $cp335BindingIndex -or
     $cp337BindingIndexForCp335 -le $cp336BindingIndexForCp335 -or
     $cp338BindingIndexForCp335 -le $cp337BindingIndexForCp335 -or
-    $numericalBindingIndexForCp335 -le $cp338BindingIndexForCp335
+    $cp339BindingIndexForCp335 -le $cp338BindingIndexForCp335 -or
+    $numericalBindingIndexForCp335 -le $cp339BindingIndexForCp335
 ) {
-    throw "Binding must retain exact CP334 -> CP335 -> CP336 -> CP337 -> CP338 -> numerical Calc order"
+    throw "Binding must retain exact CP334 -> CP335 -> CP336 -> CP337 -> CP338 -> CP339 -> numerical Calc order"
 }
 Assert-Contains -Path $cp335Binding -Pattern '(?s)let calculation_cooling_positive_supply_humidity_ratio_mixed_air_assignment =\s*advance_positive_supply_humidity_ratio_mixed_air_assignment\(\s*input\.purchased_air_runtime_state,\s*binding\.system,\s*calculation_cooling_positive_supply_temperature_mixed_air_limit,\s*\)\?;' -Description "binding exact CP334-to-CP335 adapter call"
 Assert-Contains -Path $cp335BindingAdapter -Pattern '(?s)pub\(super\) fn advance_positive_supply_humidity_ratio_mixed_air_assignment\(\s*runtime: &mut PurchasedAirRuntimeState,\s*system: &IdealLoadsAirSystem,\s*predecessor: PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitSnapshot,' -Description "CP335 binding adapter arguments"
@@ -242,14 +244,19 @@ $cp338BindingCallForCp335 = [regex]::Match(
     $cp335BindingText,
     '(?s)let calculation_cooling_positive_supply_capacity_limit_cp_air_assignment =\s*advance_positive_supply_capacity_limit_cp_air_assignment\([^;]+?\)\?;'
 )
+$cp339BindingCallForCp335 = [regex]::Match(
+    $cp335BindingText,
+    '(?s)let calculation_cooling_positive_supply_capacity_limit_sensible_output_assignment =\s*advance_positive_supply_capacity_limit_sensible_output_assignment\([^;]+?\)\?;'
+)
 if (
     -not $cp334BindingCallForCp335.Success -or
     -not $cp335BindingCall.Success -or
     -not $cp336BindingCallForCp335.Success -or
     -not $cp337BindingCallForCp335.Success -or
-    -not $cp338BindingCallForCp335.Success
+    -not $cp338BindingCallForCp335.Success -or
+    -not $cp339BindingCallForCp335.Success
 ) {
-    throw "Binding must retain complete CP334, CP335, CP336, CP337, and CP338 exact release calls"
+    throw "Binding must retain complete CP334, CP335, CP336, CP337, CP338, and CP339 exact release calls"
 }
 $cp334BindingCallEndForCp335 =
     $cp334BindingCallForCp335.Index + $cp334BindingCallForCp335.Length
@@ -260,14 +267,17 @@ $cp337BindingCallEndForCp335 =
     $cp337BindingCallForCp335.Index + $cp337BindingCallForCp335.Length
 $cp338BindingCallEndForCp335 =
     $cp338BindingCallForCp335.Index + $cp338BindingCallForCp335.Length
+$cp339BindingCallEndForCp335 =
+    $cp339BindingCallForCp335.Index + $cp339BindingCallForCp335.Length
 if (
     $cp335BindingIndex -lt $cp334BindingCallEndForCp335 -or
     $cp336BindingIndexForCp335 -lt $cp335BindingCallEnd -or
     $cp337BindingIndexForCp335 -lt $cp336BindingCallEndForCp335 -or
     $cp338BindingIndexForCp335 -lt $cp337BindingCallEndForCp335 -or
-    $numericalBindingIndexForCp335 -lt $cp338BindingCallEndForCp335
+    $cp339BindingIndexForCp335 -lt $cp338BindingCallEndForCp335 -or
+    $numericalBindingIndexForCp335 -lt $cp339BindingCallEndForCp335
 ) {
-    throw "CP334, CP335, CP336, CP337, and CP338 exact release calls must complete in source order before numerical Calc"
+    throw "CP334, CP335, CP336, CP337, CP338, and CP339 exact release calls must complete in source order before numerical Calc"
 }
 foreach ($cp335Interval in @(
         [PSCustomObject]@{
@@ -292,8 +302,13 @@ foreach ($cp335Interval in @(
         },
         [PSCustomObject]@{
             Start = $cp338BindingCallEndForCp335
+            End = $cp339BindingIndexForCp335
+            Description = "after CP338 and before CP339"
+        },
+        [PSCustomObject]@{
+            Start = $cp339BindingCallEndForCp335
             End = $numericalBindingIndexForCp335
-            Description = "after CP338 and before numerical Calc"
+            Description = "after CP339 and before numerical Calc"
         }
     )) {
     $cp335IntervalText = $cp335BindingText.Substring(
@@ -342,7 +357,7 @@ Assert-Contains -Path $cp335DirectAssertions -Pattern 'const SOURCE_ORDER:\s*\[&
 Assert-Contains -Path $cp335DirectAssertions -Pattern 'executions \* SOURCE_ORDER\.len\(\) as u64' -Description "direct-run CP335 dynamic source count"
 Assert-Contains -Path $cp335DirectAssertions -Pattern 'purchased_air_calc_cooling_mixed_air_call_lifecycle' -Description "direct-run CP329 bit provenance"
 Assert-Contains -Path $cp335NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment_lifecycle' -Description "non-direct CP335 null evidence"
-Assert-Contains -Path $cp335PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp338_lifecycle_evidence' -Description "non-direct CP335 through CP338 evidence rejection"
+Assert-Contains -Path $cp335PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp339_lifecycle_evidence' -Description "non-direct CP335 through CP339 evidence rejection"
 
 # Registries repeat the boundary exactly twice and add target inventory only.
 $cp335AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
@@ -509,6 +524,6 @@ if (
     throw "Main IdealLoads audit must dot-source CP335 after CP334 and before completion"
 }
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp335-cooling-positive-supply-humidity-ratio-mixed-air-assignment\.ps1"' -Description "CP335 internal script inventory record"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 276 \|' -Description "CP335 cumulative generated script count through CP338"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 36 \|' -Description "CP335 cumulative generated internal script count through CP338"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 277 \|' -Description "CP335 cumulative generated script count through CP339"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 37 \|' -Description "CP335 cumulative generated internal script count through CP339"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP335 generated uncalled script count"
