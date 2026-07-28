@@ -34229,6 +34229,63 @@ remain `source_mapped`. CP333 adds no support, conformance, capability, status,
 algorithm/routine count, readiness, evidence-case, numerical-conformance, or
 Roadmap promotion.
 
+## CP334 Positive-Supply Temperature Mixed-Air Limit in the Heat-Balance Loop
+
+CP334 advances only the exact direct-Zone IdealLoads lifecycle boundary at
+locked EnergyPlus 26.1 `PurchasedAirManager.cc` physical executable line 2189:
+`PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);`.
+Its exactly four textual sites read retained CP333 supply temperature, read
+retained CP329 mixed-air temperature, apply the source-shaped two-argument
+minimum, and assign the selected result back to supply temperature. The
+inventory makes no C++ function-argument evaluation-order claim; both reads
+are side-effect-free.
+
+EnergyPlus imports the ObjexxFCL two-`double` minimum
+`a < b ? a : b`. CP334 preserves that strict-`<` selection, including the
+second operand on a tie or unordered comparison and the resulting signed-zero,
+NaN, and infinity behavior in private characterization. It does not substitute
+Rust `f64::min`, total or partial ordering, a clamp, normalization, or a finite
+coercion. CP329's exact direct mixed-air operand is finite. Together with the
+exact CP333 maximum, that proves the completed direct CP334 result finite
+without changing the source helper.
+
+UnitOff, non-cooling, and CP330 active guard-false heat-balance histories skip
+all four sites. Every CP333 minimum-limit assignment executes all four, so
+dynamic site executions equal `4 * supply_temperature_mixed_air_limit_count`,
+`4 * supply_temperature_minimum_limit_count`,
+`4 * supply_temperature_assignment_count`,
+`4 * cp_air_assignment_count`, and
+`4 * positive_supply_mass_flow_body_entries`. The release lane uses CP333's
+bit-exact assigned result as the first operand and the same-call retained
+CP329 `mixed_air_temperature_c` as the second. Both latest snapshots and
+private witnesses are required, and the CP329 value must be finite. The equal
+direct no-OA Zone temperature is lineage evidence, not an alternate operand.
+The wrapper accepts no duplicate scalar, Zone-state re-read, typed-model value,
+live service, or numerical DTO.
+
+The direct proof recursively validates CP333 and CP329 latest/private witnesses
+and full predecessor state, preserves the four predecessor routes, and uses
+checked-arithmetic preflight for conditional source-site and witness
+increments. Every identity, ordinal, operand, provenance, history, replay,
+corruption, or overflow rejection is transactional and precedes mutation.
+
+The binding and lifecycle JSON preserve CP333-to-CP334-to-numerical order under
+`purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle`.
+CP334 does not consume, reconcile with, feed, or replace the numerical DTO,
+and non-direct execution carries no CP334 lifecycle. Physical line 2190 is the
+first excluded lexical executable and CP335 boundary. The line-2190 mixed-air
+humidity assignment, line-2191 enthalpy calculation, lines 2190-2337, capacity
+controls, the zero-flow branch at 2339-2345 whose first dynamic executable is
+2340, the Heat/DeadBand sibling at 2347-2348, its mixed-air call at 2454-2461,
+and guard at 2465 stay excluded.
+
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, Autosizing, broad humidity
+control, broader supply-temperature limiting, capacity, enthalpy, and output
+behavior remain unpromoted. Both parents remain `scaffold`/`none`; both Calc
+routines remain `source_mapped`. CP334 adds no support, conformance,
+capability, status, algorithm/routine count, readiness, evidence-case,
+numerical-conformance, or Roadmap promotion.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

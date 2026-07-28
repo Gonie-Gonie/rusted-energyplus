@@ -19466,6 +19466,69 @@ Both parent algorithms remain `scaffold`/`none`; both Calc routines remain
 support, conformance, statuses, counts, readiness, capability, evidence cases,
 numerical conformance, and Roadmap state remain unchanged.
 
+## CP334 Cooling Positive-Supply Temperature Mixed-Air Limit
+
+CP334 maps only locked EnergyPlus 26.1 `PurchasedAirManager.cc` physical
+executable line 2189:
+`PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);`.
+The exact four-site textual source order is: read retained CP333
+`PurchAir.SupplyTemp`; read retained CP329 `PurchAir.MixedAirTemp`; apply the
+source-shaped two-argument minimum; assign the selected result back to
+`PurchAir.SupplyTemp`. This textual inventory does not claim C++ function
+argument evaluation order, and both operands are side-effect-free.
+
+EnergyPlus imports ObjexxFCL `min`; its two-`double` overload is exactly
+`a < b ? a : b`. CP334 therefore selects the left CP333 supply temperature
+only when it is strictly less. Tie and unordered comparisons select the right
+CP329 mixed-air value bit-for-bit. Pure/private tests characterize
+operand-order-sensitive signed zero, NaN payloads, and infinities. The source
+transition does not use Rust `f64::min`, total or partial ordering, a clamp,
+normalization, or a finite coercion. CP329 direct evidence requires the right
+operand finite, and the exact CP333 maximum cannot produce negative infinity,
+so the valid completed direct chain produces a finite result without adding a
+finite gate to the pure source operation.
+
+UnitOff, non-cooling, and CP330 active guard-false routes execute zero CP334
+sites; each CP333 minimum-limit assignment executes all four. Consequently
+dynamic source-site executions equal
+`4 * supply_temperature_mixed_air_limit_count`,
+`4 * supply_temperature_minimum_limit_count`,
+`4 * supply_temperature_assignment_count`,
+`4 * cp_air_assignment_count`, and
+`4 * positive_supply_mass_flow_body_entries`. The exact direct release gets
+the first operand only from the completed bit-exact CP333 latest/private
+witness and gets the second only from the same-call completed CP329
+latest/private witness's finite `mixed_air_temperature_c`. CP329 owns the
+retained mixed-air source field. The equal no-OA Zone temperature is same-call
+lineage evidence rather than a substitute operand. No duplicate caller scalar,
+Zone-state re-read, typed-model value, live service, or numerical-DTO input is
+allowed.
+
+Release validation recursively retains the CP333 and CP329 latest/private
+witnesses and full predecessor proofs. Pending and completed histories
+partition UnitOff, non-cooling, positive-guard-false, and mixed-air-limit
+routes exactly, and every conditional source-site and private-witness increment
+is checked before mutation. Identity, ordinal, operand, provenance,
+predecessor, history, witness, replay, and overflow failures are
+transactional.
+
+Binding and direct-only JSON place
+`purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle`
+in CP333-to-CP334-to-numerical order. CP334 does not consume, reconcile with,
+feed, or replace the unchanged numerical DTO and adds no numerical or output
+claim; non-direct paths retain no CP334 evidence. Physical line 2190 is the
+first excluded lexical executable and CP335 boundary. Its mixed-air humidity
+assignment, line-2191 enthalpy calculation, capacity controls, and lines
+2190-2337 remain open. The zero-flow `else` at 2339-2345 still starts at 2340;
+the Heat/DeadBand sibling at 2347-2348, call at 2454-2461, and guard at 2465
+remain excluded. `OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`,
+Autosizing, broad humidity control, and broader supply-temperature limiting,
+capacity, enthalpy, and output behavior remain unpromoted. Both parent
+algorithms remain `scaffold`/`none`; both Calc routines remain
+`source_mapped`. CP334 adds target inventory and lifecycle evidence only;
+support, conformance, statuses, counts, readiness, capability, evidence cases,
+numerical conformance, and Roadmap state remain unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

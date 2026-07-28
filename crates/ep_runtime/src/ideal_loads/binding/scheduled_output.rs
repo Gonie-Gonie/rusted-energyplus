@@ -11,6 +11,7 @@ use super::super::{
     PurchasedAirCalcCoolingPositiveSupplyCpAirAssignmentSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitSnapshot,
+    PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitSnapshot,
     PurchasedAirCalcCoolingSensibleFlowSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
@@ -93,6 +94,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered cooling positive-supply minimum-temperature limit snapshot.
     pub calculation_cooling_positive_supply_temperature_minimum_limit:
         PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitSnapshot,
+    /// Source-ordered cooling positive-supply mixed-air-temperature limit snapshot.
+    pub calculation_cooling_positive_supply_temperature_mixed_air_limit:
+        PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

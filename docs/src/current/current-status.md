@@ -1152,6 +1152,67 @@ routines remain `source_mapped`, and algorithm/routine counts, readiness,
 support, run state, feature boundaries, evidence cases, numerical
 conformance, capability, and Roadmap state remain unchanged.
 
+CP334 maps only the single Cooling positive-supply mixed-air temperature limit
+statement at locked EnergyPlus 26.1 `PurchasedAirManager.cc` physical
+executable line 2189:
+`PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);`.
+Its exactly four textual sites read retained CP333 `PurchAir.SupplyTemp`, read
+retained CP329 `PurchAir.MixedAirTemp`, apply the source-shaped two-argument
+minimum, and assign the selected value back to `PurchAir.SupplyTemp`. This
+textual inventory does not claim C++ function argument evaluation order; both
+operands are side-effect-free.
+
+EnergyPlus imports ObjexxFCL `min`, whose two-`double` overload is exactly
+`a < b ? a : b`. The pure CP334 transition therefore uses strict `<`: only a
+true comparison selects the first CP333 operand, while ties and unordered
+comparisons select the retained CP329 mixed-air operand bit-for-bit. Private
+characterization preserves operand-order-sensitive signed zero, NaN, and
+infinity behavior. It does not use Rust `f64::min`, total or partial ordering,
+a clamp, normalization, or a finite coercion. Exact CP329 direct evidence
+requires the right operand to be finite; combined with the exact CP333
+maximum, the completed direct CP334 result is finite without changing the pure
+source operation.
+
+UnitOff, non-cooling, and CP330 active guard-false histories skip all four
+sites. Every CP333 minimum-limit assignment executes all four, so dynamic
+source-site executions equal `4 * supply_temperature_mixed_air_limit_count`,
+`4 * supply_temperature_minimum_limit_count`,
+`4 * supply_temperature_assignment_count`,
+`4 * cp_air_assignment_count`, and
+`4 * positive_supply_mass_flow_body_entries`. Exact direct release obtains the
+first operand only from the bit-exact completed CP333 latest/private witness
+and the second only from the same-call completed CP329 latest/private witness's
+finite `mixed_air_temperature_c`. The CP329 result is the retained source
+field owner; the equal direct no-OA Zone temperature is lineage evidence, not
+a substitute operand. No duplicate caller scalar, `ZoneHeatBalanceState`
+re-read, typed-model value, live service, or numerical DTO input is admitted.
+
+The direct proof recursively validates the completed CP333 and CP329 latest
+snapshots, private witnesses, and retained predecessor chains, preserves the
+UnitOff, non-cooling, positive-guard-false, and mixed-air-limit routes
+one-for-one, and preflights every conditional source-site and private-witness
+increment with checked arithmetic before mutation. Any identity, ordinal,
+operand, provenance, history, witness, replay, or overflow failure is
+transactional and leaves runtime and private-witness state unchanged.
+
+The binder, coupled runtime, and pipeline place direct-only
+`purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle`
+evidence in CP333-to-CP334-to-numerical order. CP334 does not consume,
+reconcile with, feed, or replace the unchanged numerical DTO and does not
+promote an output claim; non-direct paths carry no CP334 evidence. Physical
+line 2190 is the first excluded lexical executable and CP335 boundary. Its
+mixed-air humidity assignment, line-2191 enthalpy calculation, capacity
+controls, and the remainder of lines 2190-2337 remain excluded. The zero-flow
+`else` at 2339-2345 still first executes line 2340; the outer Heat/DeadBand
+sibling at 2347-2348, its mixed-air call at 2454-2461, and its guard at 2465
+also remain excluded. `OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`,
+Autosizing, broad humidity control, and broader supply-temperature limiting,
+capacity, enthalpy, and output behavior remain unpromoted. Both parent
+algorithms remain `scaffold`/`none`; both Calc routines remain
+`source_mapped`, and algorithm/routine counts, readiness, support, run state,
+feature boundaries, evidence cases, numerical conformance, capability, and
+Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

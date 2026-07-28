@@ -3,8 +3,11 @@ use crate::ideal_loads::{
     PurchasedAirCalcCoolingMixedAirCallRecirculationInput,
     advance_direct_no_oa_calc_cooling_capacity_zero_flow_reset,
     advance_direct_no_oa_calc_cooling_dehumidification_flow,
+    advance_direct_no_oa_calc_cooling_economizer_body,
+    advance_direct_no_oa_calc_cooling_economizer_condition,
     advance_direct_no_oa_calc_cooling_humidification_flow,
     advance_direct_no_oa_calc_cooling_mixed_air_call,
+    advance_direct_no_oa_calc_cooling_sensible_flow,
     advance_direct_no_oa_calc_cooling_supply_mass_flow_ems_override_body,
     advance_direct_no_oa_calc_cooling_supply_mass_flow_ems_override_guard,
     advance_direct_no_oa_calc_cooling_supply_mass_flow_limit_body,
@@ -317,8 +320,34 @@ pub(in crate::ideal_loads::calc) fn release_case_with_demand(
     crate::ideal_loads::PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
     crate::heat_balance::state::ZoneHeatBalanceState,
 ) {
-    let (mut runtime, system, sensible) =
-        super::super::cooling_dehumidification_flow_release_tests::release_case(cooling_demand_w);
+    release_case_with_demand_and_availability(cooling_demand_w, 1.0)
+}
+
+pub(in crate::ideal_loads::calc) fn release_case_with_demand_and_availability(
+    cooling_demand_w: f64,
+    overall_availability: f64,
+) -> (
+    crate::ideal_loads::PurchasedAirRuntimeState,
+    ep_model::IdealLoadsAirSystem,
+    crate::ideal_loads::PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
+    crate::heat_balance::state::ZoneHeatBalanceState,
+) {
+    let (mut runtime, system, guard) =
+        super::super::cooling_economizer_condition_release_tests::
+            release_fixture_with_cooling_demand_and_availability(
+                cooling_demand_w,
+                overall_availability,
+            );
+    let condition =
+        advance_direct_no_oa_calc_cooling_economizer_condition(&mut runtime, &system, guard)
+            .expect("CP316");
+    let body = advance_direct_no_oa_calc_cooling_economizer_body(&mut runtime, &system, condition)
+        .expect("CP317");
+    let zone_state =
+        super::super::cooling_sensible_flow_release_tests::zone_state(body.controlled_zone);
+    let sensible =
+        advance_direct_no_oa_calc_cooling_sensible_flow(&mut runtime, &system, body, &zone_state)
+            .expect("CP318");
     let dehumidification =
         advance_direct_no_oa_calc_cooling_dehumidification_flow(&mut runtime, &system, sensible)
             .expect("CP319");
@@ -373,9 +402,6 @@ pub(in crate::ideal_loads::calc) fn release_case_with_demand(
         very_small_guard,
     )
     .expect("CP328");
-    let zone_state = super::super::cooling_sensible_flow_release_tests::zone_state(
-        very_small_body.controlled_zone,
-    );
     (runtime, system, very_small_body, zone_state)
 }
 

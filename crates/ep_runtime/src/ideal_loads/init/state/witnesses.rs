@@ -4,6 +4,7 @@ mod cooling_mixed_air_call;
 mod cooling_positive_supply_cp_air_assignment;
 mod cooling_positive_supply_temperature_assignment;
 mod cooling_positive_supply_temperature_minimum_limit;
+mod cooling_positive_supply_temperature_mixed_air_limit;
 mod cooling_supply_mass_flow_positive_guard;
 mod cooling_supply_mass_flow_very_small_guard_body;
 

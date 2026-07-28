@@ -17249,6 +17249,75 @@ remain unpromoted. Both parent algorithms remain `scaffold`/`none`;
 required and forbidden features, output claims, evidence cases, numerical
 conformance, capability status, and Roadmap state remain unchanged.
 
+## CP334 Source-Ordered Cooling Positive-Supply Temperature Mixed-Air Limit
+
+CP334 supersedes only CP333's line-2189 exclusion for the single Cooling
+positive-supply mixed-air temperature limit statement at locked EnergyPlus
+26.1 `PurchasedAirManager.cc` physical executable line 2189:
+`PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);`.
+Its exactly four textual sites read retained CP333 `PurchAir.SupplyTemp`, read
+retained CP329 `PurchAir.MixedAirTemp`, apply the source-shaped two-argument
+minimum, and assign the selected value back to `PurchAir.SupplyTemp`. This is a
+textual inventory, not a claim about C++ function argument evaluation order;
+both operands are side-effect-free.
+
+`EnergyPlus.hh` imports ObjexxFCL `min`, and the selected two-`double`
+`Fmath.hh` overload is `a < b ? a : b`. The pure transition reproduces that
+strict comparison exactly: true selects the first CP333 operand; tie or
+unordered comparison selects the second CP329 operand. Private
+characterization therefore preserves the right operand's signed-zero bits and
+NaN payload on equality or unordered comparison, discards a left NaN in favor
+of a finite right, and retains the source infinity behavior. It does not use
+`f64::min`, `total_cmp`, `partial_cmp`, a clamp, normalization, or a finite
+coercion. The exact CP329 right operand is finite, and an exact CP333 result
+cannot be negative infinity, so the completed direct chain yields a finite
+assigned CP334 result without changing the pure operation.
+
+UnitOff, non-cooling, and CP330 active guard-false predecessors skip every
+CP334 site. Every completed CP333 minimum-limit assignment executes all four,
+so dynamic source-site executions equal
+`4 * supply_temperature_mixed_air_limit_count`,
+`4 * supply_temperature_minimum_limit_count`,
+`4 * supply_temperature_assignment_count`,
+`4 * cp_air_assignment_count`, and
+`4 * positive_supply_mass_flow_body_entries`. Exact release consumes the first
+operand only from CP333's bit-exact assigned
+`assigned_supply_temperature_c` and the second only from the same-call CP329
+latest/private witness's finite `mixed_air_temperature_c`. CP329 owns the
+retained `PurchAir.MixedAirTemp` source field. Its no-OA equality with the Zone
+temperature is lineage evidence rather than an alternate operand. The wrapper
+accepts no duplicate caller scalar or `ZoneHeatBalanceState`, typed-model, live
+service, or numerical DTO input.
+
+The completed proof recursively validates the CP333 and CP329 latest
+snapshots, private witnesses, and retained predecessor chains. Pending and
+completed state preserve the four UnitOff, non-cooling,
+positive-guard-false, and mixed-air-limit routes one-for-one. Checked
+arithmetic preflights each conditional source-site and private-witness
+increment before mutation, so identity, ordinal, operand, provenance, history,
+witness, replay, and overflow failures are transactional.
+
+The scheduled binding, coupled runtime, and pipeline retain exact
+CP333-to-CP334-to-numerical order and publish direct-only
+`purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle`
+evidence. CP334 neither consumes nor reconciles with the unchanged numerical
+DTO and does not feed or replace it; non-direct paths publish `None` and reject
+attached evidence. Physical line 2190 is the first excluded lexical executable
+and CP335 boundary. The line-2190 mixed-air humidity assignment, line-2191
+enthalpy calculation, capacity controls, lines 2190-2337, the zero-flow `else`
+at 2339-2345 whose first dynamic executable is 2340, the outer Heat/DeadBand
+sibling at 2347-2348, its mixed-air call at 2454-2461, and its guard at 2465
+remain excluded.
+
+CP334 adds target inventory and lifecycle evidence only. Broader
+supply-temperature limiting, capacity, humidity, enthalpy, output,
+`OutdoorAir`, `Economizer`, `HeatRecovery`, `EMS`, and Autosizing behavior
+remain unpromoted. Both parent algorithms remain `scaffold`/`none`;
+`routine.calc_purch_air_loads` and `routine.calc_purch_air_mixed_air` remain
+`source_mapped`. Algorithm/routine counts, readiness, support level, run state,
+required and forbidden features, output claims, evidence cases, numerical
+conformance, capability status, and Roadmap state remain unchanged.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before
