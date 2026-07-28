@@ -18285,6 +18285,87 @@ algorithms remain `scaffold`/`none`; `routine.calc_purch_air_loads` and
 run state, capability, feature/evidence boundaries, numerical conformance,
 output ownership, status, conformance, and Roadmap state remain unchanged.
 
+## CP347 Source-Ordered Cooling Positive-Supply Post-Capacity-Limit Dehumidification-Control None Case
+
+CP347 supersedes CP346's line-2210 exclusion only by completing the `None`
+case at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical lines 2210-2212:
+
+```cpp
+case HumControl::None: {
+    PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat; // Unnecessary line?
+} break;
+```
+
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The exact source order contains four sites:
+
+1. `enter-purchased-air-dehumidification-control-none-case`
+2. `read-purchased-air-mixed-air-humidity-ratio-for-none-case`
+3. `assign-purchased-air-supply-humidity-ratio-in-none-case`
+4. `exit-purchased-air-dehumidification-control-none-case-via-break`
+
+Physical line 2213, `case HumControl::ConstantSensibleHeatRatio: {`, is the
+first excluded lexical construct. Physical line 2216,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`, is the first lexically
+subsequent executable. It is not the direct `None` continuation: the source
+`break` exits the switch, so that lane first reaches physical line 2245,
+`if (HeatOn) {`.
+
+The exact routes are `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`, `DehumidificationControlNoneCaseCompleted`,
+and private `DehumidificationControlConstantSensibleHeatRatioCaseSelected`,
+`DehumidificationControlHumidistatCaseSelected`, and
+`DehumidificationControlConstantSupplyHumidityRatioCaseSelected`. The three
+selected non-`None` routes are complete skips of CP347 sites; only completed
+`None` enters them. For transitions `T`, route counts
+`U/N/P/C0/CSHR/H/CSH`, CP346 switch dispatches `S`, CP345 assignments `R`,
+predecessor provenance `G/F/L`, and CP340 active evaluations `A`, checked
+state requires:
+
+```text
+T = U+N+P+C0+CSHR+H+CSH
+S = C0+CSHR+H+CSH = R = G+F+L
+A = F+L
+source_site_execution_count = 4*C0
+```
+
+Each site counter equals `C0`; skips execute zero sites, and witnessed routes
+match public route counts. Exact direct release additionally requires
+`C0=S` and `CSHR=H=CSH=0`. The three non-`None` routes are private typed
+complete-skip characterization only.
+
+Exact release accepts runtime, selected system, and same-call CP346 only.
+It validates supplied/latest/private CP346 parity and recursive completion
+before mutation. CP346 is the immediate selection/dispatch predecessor.
+The same-call retained CP329 `mixed_air_humidity_ratio` is the sole
+right-hand-side owner. Same-call CP345
+`assigned_supply_humidity_ratio` and CP346
+`predecessor_assigned_supply_humidity_ratio` corroborate the exact bits and
+never replace CP329 ownership. No duplicate caller scalar, model or sizing
+re-read, Node or psychrometric service, or numerical-DTO input is accepted.
+
+The assignment is a binary64 bit copy with no arithmetic, psychrometric call,
+minimum, maximum, clamp, normalization, finite coercion, cache, diagnostic,
+or mutable service. Complete direct lineage inherits CP329's finite and
+`>=0.0` constraint. Any pure-transition signed-zero, NaN, or infinity
+characterization remains defensive and does not widen public reachability.
+
+Binding and direct-only lifecycle evidence preserve
+CP346-to-CP347-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle`.
+CP347 neither enters nor consumes `DirectZonePurchasedAirCouplingInput`, and
+does not reconcile with, feed, or replace the numerical DTO. Non-direct paths
+expose `None` and reject attached CP347 evidence. Counts remain 32 algorithms
+and 293 routines, 58 `state_mapped` plus 235 `source_mapped`, with 170
+required. Both parent algorithms remain `scaffold`/`none`;
+`routine.calc_purch_air_loads` and `routine.calc_purch_air_mixed_air` remain
+`source_mapped`. Support, readiness, run state, capability, feature/evidence
+boundaries, numerical conformance, output ownership, status, conformance, and
+Roadmap state remain unchanged.
+
 The inventory now also includes `update_final_surface_heat_balance` after
 `zone_space_heat_balance_calc_predicted_system_load`,
 preserving the completed predictor/corrector definition slice before

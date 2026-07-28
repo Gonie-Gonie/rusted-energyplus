@@ -246,6 +246,88 @@ fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
         cp319["dehumidification_control_type"], cp346["latest"]["dehumidification_control_type"],
         "same-call CP319 None selector is corroboration, not CP346 operand ownership"
     );
+    let cp347 = &summary["rust_runtime"]["purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle"];
+    assert_eq!(
+        cp347["source"],
+        "EnergyPlus 26.1 PurchasedAirManager.cc:2210-2212"
+    );
+    assert_eq!(
+        cp347["first_excluded_source"],
+        "EnergyPlus 26.1 PurchasedAirManager.cc:2216"
+    );
+    assert_eq!(
+        cp347["latest"]["source_order"]
+            .as_array()
+            .expect("CP347 source order"),
+        &[
+            "enter-purchased-air-dehumidification-control-none-case",
+            "read-purchased-air-mixed-air-humidity-ratio-for-none-case",
+            "assign-purchased-air-supply-humidity-ratio-in-none-case",
+            "exit-purchased-air-dehumidification-control-none-case-via-break",
+        ]
+    );
+    assert_eq!(
+        cp347["latest"]["predecessor_dehumidification_control_type_read"],
+        cp346["latest"]["dehumidification_control_type_read"]
+    );
+    assert_eq!(
+        cp347["latest"]["predecessor_dehumidification_control_type"],
+        "None"
+    );
+    assert_eq!(
+        cp347["latest"]["predecessor_dehumidification_control_switch_dispatched"],
+        cp346["latest"]["dehumidification_control_switch_dispatched"]
+    );
+    for field in [
+        "dehumidification_control_none_case_entered",
+        "mixed_air_humidity_ratio_read",
+        "supply_humidity_ratio_assignment_performed",
+        "dehumidification_control_none_case_exited_via_break",
+    ] {
+        assert_eq!(cp347["latest"][field], true, "{field}");
+    }
+    assert_eq!(
+        cp347["latest"]["predecessor_assigned_supply_humidity_ratio"],
+        cp346["latest"]["predecessor_assigned_supply_humidity_ratio"],
+        "CP347 must retain its immediate CP346 humidity-ratio lineage"
+    );
+    assert_eq!(
+        cp347["latest"]["predecessor_assigned_supply_humidity_ratio_ieee_bits"],
+        cp345["latest"]["assigned_supply_humidity_ratio_ieee_bits"],
+        "CP347 must preserve the CP345/CP346 predecessor value's exact bits"
+    );
+    for field in [
+        "mixed_air_humidity_ratio_ieee_bits",
+        "assigned_supply_humidity_ratio_ieee_bits",
+        "resulting_supply_humidity_ratio_ieee_bits",
+    ] {
+        assert_eq!(
+            cp347["latest"][field], cp329["mixed_air_humidity_ratio_ieee_bits"],
+            "CP347 {field} must retain the CP329-owned humidity-ratio bits"
+        );
+    }
+    assert_eq!(
+        cp347["dehumidification_control_none_case_completion_count"],
+        cp346["dehumidification_control_none_case_selection_count"]
+    );
+    assert_eq!(
+        cp347["source_site_execution_count"],
+        cp347["dehumidification_control_none_case_completion_count"]
+            .as_u64()
+            .expect("CP347 completion count")
+            * 4
+    );
+    for field in [
+        "dehumidification_control_none_case_entry_count",
+        "mixed_air_humidity_ratio_read_count",
+        "supply_humidity_ratio_assignment_count",
+        "dehumidification_control_none_case_break_count",
+    ] {
+        assert_eq!(
+            cp347[field], cp347["dehumidification_control_none_case_completion_count"],
+            "{field}"
+        );
+    }
     Ok(())
 }
 
@@ -646,6 +728,14 @@ fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
     assert!(
         rust_runtime
             ["purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_lifecycle"]
+            .is_null()
+    );
+    assert!(rust_runtime.contains_key(
+        "purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle"
+    ));
+    assert!(
+        rust_runtime
+            ["purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle"]
             .is_null()
     );
     assert_eq!(summary["source_order_gate"]["matches"], true);

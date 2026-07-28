@@ -2069,6 +2069,74 @@ remain `source_mapped`, and there is no support, readiness, run-state,
 capability, feature/evidence, numerical-conformance, output-ownership, status,
 conformance, or Roadmap promotion.
 
+CP347 now maps only the complete Cooling positive-supply post-capacity-limit
+dehumidification-control `None` case at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical lines 2210-2212:
+
+```cpp
+case HumControl::None: {
+    PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat; // Unnecessary line?
+} break;
+```
+
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The exact sites are
+`enter-purchased-air-dehumidification-control-none-case`,
+`read-purchased-air-mixed-air-humidity-ratio-for-none-case`,
+`assign-purchased-air-supply-humidity-ratio-in-none-case`, and
+`exit-purchased-air-dehumidification-control-none-case-via-break`, in that
+order. Physical line 2213, the constant-SHR case label, is the first excluded
+lexical construct. Physical line 2216,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`, is the first lexically
+subsequent executable, but the `break` means the direct `None` lane first
+continues dynamically at physical line 2245, `if (HeatOn) {`.
+
+The seven routes are inherited `UnitOff`, `NonCooling`, and
+`PositiveGuardFalseFallthrough`; executed `None`; and private skipped
+characterizations for `ConstantSensibleHeatRatio`, `Humidistat`, and
+`ConstantSupplyHumidityRatio`. With transitions `T`, those route counts
+`U/N/P/C0/CSHR/H/CSH`, CP346 switch dispatches `S`, CP345 assignments `R`,
+CP337/CP340/CP344 provenance `G/F/L`, and CP340 active evaluations `A`, exact
+checked state requires:
+
+```text
+T = U+N+P+C0+CSHR+H+CSH
+S = C0+CSHR+H+CSH = R = G+F+L
+A = F+L
+source_site_execution_count = 4*C0
+```
+
+All four site counters equal `C0`; every other route executes zero CP347
+sites. Exact direct release strengthens this to `C0=S` and
+`CSHR=H=CSH=0`. Non-`None` routes remain private complete-skip
+characterization and cannot publish direct lifecycle evidence.
+
+Same-call CP346 supplied/latest/private evidence is the recursively complete
+immediate predecessor and proves the `None` selection. The same-call retained
+CP329 `mixed_air_humidity_ratio` is the sole right-hand-side owner. CP345
+`assigned_supply_humidity_ratio` and CP346
+`predecessor_assigned_supply_humidity_ratio` must corroborate its exact
+binary64 bits, but neither replaces CP329 ownership. CP347 performs only that
+bit copy: no arithmetic, psychrometric call, minimum, maximum, clamp,
+normalization, finite coercion, cache, diagnostic, or mutable service is
+claimed. Complete direct lineage inherits CP329's finite, nonnegative
+constraint; defensive pure-transition nonfinite characterization is not
+direct reachability.
+
+Binding, coupled runtime, and pipeline evidence preserve
+CP346-to-CP347-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle`.
+CP347 does not enter, consume, reconcile with, feed, or replace
+`DirectZonePurchasedAirCouplingInput` or the numerical DTO. Non-direct paths
+publish `None` and reject attached CP347 evidence. Counts remain 32 algorithms
+and 293 routines, split 58 `state_mapped` plus 235 `source_mapped`, with 170
+required. Both parent algorithms remain `scaffold`/`none`, both parent Calc
+routines remain `source_mapped`, and there is no support, readiness,
+run-state, capability, feature/evidence, numerical-conformance,
+output-ownership, status, conformance, or Roadmap promotion.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

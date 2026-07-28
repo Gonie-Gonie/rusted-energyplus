@@ -84,7 +84,7 @@ const RETURN_NODE_KEY: &str = "RETURN";
 const ABS_TOLERANCE: f64 = 1.0e-9;
 
 #[test]
-fn cp346_direct_coupled_runtime_dispatches_none_after_g_f_l_and_skips_unit_off() {
+fn cp347_direct_coupled_runtime_completes_none_case_after_g_f_l_and_skips_unit_off() {
     // Keep the cumulative capacity-limit regression identity while extending
     // every route assertion through its CP344 successor.
     for (
@@ -783,6 +783,83 @@ fn cp346_direct_coupled_runtime_dispatches_none_after_g_f_l_and_skips_unit_off()
             expected_cp345_assignment
         );
 
+        let none_case_state = &simulation
+            .summary
+            .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle
+            .state;
+        let expected_none_completion = usize::from(expected_cp345_assignment);
+        assert_eq!(none_case_state.transition_count, 1);
+        assert_eq!(
+            none_case_state.unit_off_skip_count,
+            usize::from(expected_unit_off)
+        );
+        assert_eq!(
+            none_case_state.dehumidification_control_none_case_completion_count,
+            expected_none_completion
+        );
+        assert_eq!(
+            none_case_state.source_site_execution_count,
+            4 * expected_none_completion
+        );
+        for count in [
+            none_case_state.dehumidification_control_none_case_entry_count,
+            none_case_state.mixed_air_humidity_ratio_read_count,
+            none_case_state.supply_humidity_ratio_assignment_count,
+            none_case_state.dehumidification_control_none_case_break_count,
+        ] {
+            assert_eq!(count, expected_none_completion);
+        }
+        for count in [
+            none_case_state
+                .dehumidification_control_constant_sensible_heat_ratio_case_selection_count,
+            none_case_state.dehumidification_control_humidistat_case_selection_count,
+            none_case_state
+                .dehumidification_control_constant_supply_humidity_ratio_case_selection_count,
+        ] {
+            assert_eq!(count, 0);
+        }
+        let latest_none_case = none_case_state.latest.expect("latest CP347 snapshot");
+        assert_eq!(
+            latest_none_case.predecessor_dehumidification_control_type_read,
+            latest_control.dehumidification_control_type_read
+        );
+        assert_eq!(
+            latest_none_case.predecessor_dehumidification_control_type,
+            latest_control.dehumidification_control_type
+        );
+        assert_eq!(
+            latest_none_case.predecessor_dehumidification_control_switch_dispatched,
+            latest_control.dehumidification_control_switch_dispatched
+        );
+        assert_eq!(
+            latest_none_case.dehumidification_control_none_case_entered,
+            expected_cp345_assignment
+        );
+        assert_eq!(
+            latest_none_case.mixed_air_humidity_ratio_read,
+            expected_cp345_assignment
+        );
+        assert_eq!(
+            latest_none_case.supply_humidity_ratio_assignment_performed,
+            expected_cp345_assignment
+        );
+        assert_eq!(
+            latest_none_case.dehumidification_control_none_case_exited_via_break,
+            expected_cp345_assignment
+        );
+        let owner_bits = mixed_air_owner.mixed_air_humidity_ratio.map(f64::to_bits);
+        for value in [
+            latest_none_case.predecessor_assigned_supply_humidity_ratio,
+            latest_none_case.mixed_air_humidity_ratio,
+            latest_none_case.assigned_supply_humidity_ratio,
+            latest_none_case.resulting_supply_humidity_ratio,
+        ] {
+            assert_eq!(
+                value.map(f64::to_bits),
+                expected_cp345_assignment.then_some(owner_bits).flatten()
+            );
+        }
+
         assert_eq!(simulation.summary.coupling_call_count, 1);
         assert!(
             simulation
@@ -795,7 +872,7 @@ fn cp346_direct_coupled_runtime_dispatches_none_after_g_f_l_and_skips_unit_off()
 }
 
 #[test]
-fn cp346_direct_coupled_runtime_covers_non_cooling_and_positive_guard_false_skips() {
+fn cp347_direct_coupled_runtime_covers_non_cooling_and_positive_guard_false_skips() {
     for (
         cooling_setpoint_c,
         cooling_limit,
@@ -910,6 +987,52 @@ fn cp346_direct_coupled_runtime_covers_non_cooling_and_positive_guard_false_skip
         assert!(latest_control.dehumidification_control_type.is_none());
         assert!(!latest_control.dehumidification_control_switch_dispatched);
 
+        let none_case_state = &simulation
+            .summary
+            .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle
+            .state;
+        assert_eq!(none_case_state.transition_count, 1);
+        assert_eq!(none_case_state.unit_off_skip_count, 0);
+        assert_eq!(
+            none_case_state.non_cooling_skip_count,
+            usize::from(expected_non_cooling)
+        );
+        assert_eq!(
+            none_case_state.positive_guard_false_fallthrough_skip_count,
+            usize::from(expected_positive_guard_false)
+        );
+        assert_eq!(
+            none_case_state.dehumidification_control_none_case_completion_count,
+            0
+        );
+        assert_eq!(none_case_state.source_site_execution_count, 0);
+        for count in [
+            none_case_state.dehumidification_control_none_case_entry_count,
+            none_case_state.mixed_air_humidity_ratio_read_count,
+            none_case_state.supply_humidity_ratio_assignment_count,
+            none_case_state.dehumidification_control_none_case_break_count,
+        ] {
+            assert_eq!(count, 0);
+        }
+        let latest_none_case = none_case_state.latest.expect("latest CP347 N/P snapshot");
+        assert_eq!(latest_none_case.non_cooling_skipped, expected_non_cooling);
+        assert_eq!(
+            latest_none_case.positive_guard_false_fallthrough_skipped,
+            expected_positive_guard_false
+        );
+        assert!(!latest_none_case.dehumidification_control_none_case_entered);
+        assert!(!latest_none_case.mixed_air_humidity_ratio_read);
+        assert!(!latest_none_case.supply_humidity_ratio_assignment_performed);
+        assert!(!latest_none_case.dehumidification_control_none_case_exited_via_break);
+        for value in [
+            latest_none_case.predecessor_assigned_supply_humidity_ratio,
+            latest_none_case.mixed_air_humidity_ratio,
+            latest_none_case.assigned_supply_humidity_ratio,
+            latest_none_case.resulting_supply_humidity_ratio,
+        ] {
+            assert!(value.is_none());
+        }
+
         let cp319_latest = simulation
             .summary
             .calc_cooling_dehumidification_flow_lifecycle
@@ -925,6 +1048,113 @@ fn cp346_direct_coupled_runtime_covers_non_cooling_and_positive_guard_false_skip
             expected_positive_guard_false.then_some(DehumidificationControlType::None)
         );
     }
+}
+
+#[test]
+fn cp347_coupled_snapshot_validator_rejects_lineage_bit_and_source_order_corruption() {
+    let mut typed = exact_model(1).typed;
+    typed.schedules[1].hourly_value = 0.0;
+    typed.schedules[2].hourly_value = 15.0;
+    typed.schedules[3].hourly_value = 1.0;
+    let model = SimulationModel::from_typed(typed);
+    let schedule_cache = precompute_schedule_cache(&model.typed, 1)
+        .expect("one CP347 validator-hardening schedule sample");
+    let weather = weather_series_with_conditions(&model, 1, 30.0, 15.0, 30.0, 101_325.0);
+    let mut options = DirectZonePurchasedAirCoupledOptions::hourly_samples(1);
+    options.initial_zone_air_temperature_c = INITIAL_ZONE_TEMPERATURE_C;
+    let summary = simulate_direct_zone_purchased_air_coupled_heat_balance(
+        &model,
+        &weather,
+        &schedule_cache,
+        options,
+    )
+    .expect("valid CP347 direct simulation")
+    .summary;
+    let snapshot = summary
+        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle
+        .state
+        .latest
+        .expect("latest CP347 snapshot");
+    let predecessor = summary
+        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_lifecycle
+        .state
+        .latest
+        .expect("latest CP346 snapshot");
+    let owner = summary
+        .calc_cooling_mixed_air_call_lifecycle
+        .state
+        .latest
+        .expect("latest CP329 owner");
+    assert!(
+        super::cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_validation::snapshot_shape(
+            &snapshot,
+            &predecessor,
+            &owner,
+        )
+    );
+
+    let flip = |value: Option<f64>| value.map(|value| f64::from_bits(value.to_bits() ^ 1));
+    let mut predecessor_value_drift = snapshot;
+    predecessor_value_drift.predecessor_assigned_supply_humidity_ratio =
+        flip(predecessor_value_drift.predecessor_assigned_supply_humidity_ratio);
+    let mut mixed_air_value_drift = snapshot;
+    mixed_air_value_drift.mixed_air_humidity_ratio =
+        flip(mixed_air_value_drift.mixed_air_humidity_ratio);
+    let mut assigned_value_drift = snapshot;
+    assigned_value_drift.assigned_supply_humidity_ratio =
+        flip(assigned_value_drift.assigned_supply_humidity_ratio);
+    let mut resulting_value_drift = snapshot;
+    resulting_value_drift.resulting_supply_humidity_ratio =
+        flip(resulting_value_drift.resulting_supply_humidity_ratio);
+    for (field, drift) in [
+        (
+            "predecessor_assigned_supply_humidity_ratio",
+            predecessor_value_drift,
+        ),
+        ("mixed_air_humidity_ratio", mixed_air_value_drift),
+        ("assigned_supply_humidity_ratio", assigned_value_drift),
+        ("resulting_supply_humidity_ratio", resulting_value_drift),
+    ] {
+        assert!(
+            !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_validation::snapshot_shape(
+                &drift,
+                &predecessor,
+                &owner,
+            ),
+            "{field} one-bit drift must fail closed"
+        );
+    }
+
+    const CORRUPT_SOURCE_ORDER: &[&str] = &["corrupt-cp347-source-order"];
+    let mut source_order_drift = snapshot;
+    source_order_drift.source_order = CORRUPT_SOURCE_ORDER;
+    assert!(
+        !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_validation::snapshot_shape(
+            &source_order_drift,
+            &predecessor,
+            &owner,
+        )
+    );
+
+    let mut predecessor_drift = predecessor;
+    predecessor_drift.parent_call_ordinal += 1;
+    assert!(
+        !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_validation::snapshot_shape(
+            &snapshot,
+            &predecessor_drift,
+            &owner,
+        )
+    );
+
+    let mut owner_drift = owner;
+    owner_drift.mixed_air_humidity_ratio = flip(owner_drift.mixed_air_humidity_ratio);
+    assert!(
+        !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_validation::snapshot_shape(
+            &snapshot,
+            &predecessor,
+            &owner_drift,
+        )
+    );
 }
 
 #[test]

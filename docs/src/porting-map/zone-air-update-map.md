@@ -22774,6 +22774,59 @@ remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
 readiness, support, capability, feature/evidence boundary, numerical
 conformance, output ownership, status, conformance, or Roadmap state.
 
+## CP347 Cooling Positive-Supply Dehumidification-Control None-Case Placement
+
+CP347 extends the exact direct-Zone update sequence from CP346 through the
+complete `None` case at pinned `PurchasedAirManager.cc` physical lines
+2210-2212. Commit `6f2e40d10250a105b49966baa24d843711e61048` and raw
+SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`
+remain locked. Its source-site order is exactly enter `None`, read
+`MixedAirHumRat`, assign `SupplyHumRat`, and exit via `break`, named:
+
+1. `enter-purchased-air-dehumidification-control-none-case`
+2. `read-purchased-air-mixed-air-humidity-ratio-for-none-case`
+3. `assign-purchased-air-supply-humidity-ratio-in-none-case`
+4. `exit-purchased-air-dehumidification-control-none-case-via-break`
+
+Line 2213, the constant-SHR case label, is the first excluded lexical
+construct. Line 2216, `CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`, is the
+first lexically subsequent executable but not the direct continuation.
+Because the `None` case breaks out of the switch, that lane first continues
+dynamically at line 2245, `if (HeatOn) {`.
+
+The routes are inherited `U/N/P`, executed `C0`, and private skipped
+`CSHR/H/CSH`. For transitions `T`, CP346 dispatches `S`, CP345 assignments
+`R`, predecessor provenance `G/F/L`, and CP340 active evaluations `A`, exact
+state requires `T=U+N+P+C0+CSHR+H+CSH`,
+`S=C0+CSHR+H+CSH=R=G+F+L`, `A=F+L`, and
+`source_site_execution_count=4*C0`. Every site counter equals `C0`, and no
+other route executes a CP347 site. Direct execution further requires `C0=S`
+and `CSHR=H=CSH=0`; non-`None` modes stay private complete-skip
+characterization.
+
+CP346 supplied/latest/private evidence is the same-call immediate predecessor
+and proves selection before mutation. The retained same-call CP329
+`mixed_air_humidity_ratio` is the only RHS owner. CP345
+`assigned_supply_humidity_ratio` and CP346
+`predecessor_assigned_supply_humidity_ratio` corroborate that owner's exact
+bits without replacing it. CP347 performs a bit copy only, with no
+arithmetic, psychrometric call, clamp, normalization, finite coercion, cache,
+diagnostic, service, or numerical-DTO input. Complete direct lineage inherits
+CP329's finite and nonnegative requirement.
+
+Binding, coupled execution, and pipeline serialization preserve
+CP346-to-CP347-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle`.
+No CP347 evidence enters `DirectZonePurchasedAirCouplingInput`; CP347 does not
+consume, reconcile with, feed, or replace the numerical DTO. Non-direct paths
+publish `None` and reject attached evidence. Both parents remain
+`scaffold`/`none`, both Calc routines remain `source_mapped`, and counts
+remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
+170 required. CP347 adds only target/lifecycle evidence and changes no
+readiness, support, capability, feature/evidence boundary, numerical
+conformance, output ownership, status, conformance, or Roadmap state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

@@ -62,6 +62,7 @@ mod cooling_oa_max_flow_gate_tests;
 #[rustfmt::skip] #[path = "binding/cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_tests.rs"] mod cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_tests;
 #[rustfmt::skip] #[path = "binding/cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_tests.rs"] mod cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_tests;
 #[rustfmt::skip] #[path = "binding/cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_tests.rs"] mod cooling_positive_supply_post_capacity_limit_dehumidification_control_switch_tests;
+#[rustfmt::skip] #[path = "binding/cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_tests.rs"] mod cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_tests;
 #[path = "binding/cooling_sensible_flow_tests.rs"]
 mod cooling_sensible_flow_tests;
 #[path = "binding/cooling_supply_mass_flow_ems_override_body_tests.rs"]
