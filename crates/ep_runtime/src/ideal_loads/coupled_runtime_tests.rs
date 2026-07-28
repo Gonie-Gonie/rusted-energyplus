@@ -4877,3 +4877,108 @@ fn cp348_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed(
         )
     );
 }
+
+#[test]
+fn cp349_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed() {
+    let mut typed = exact_model(1).typed;
+    typed.schedules[1].hourly_value = 0.0;
+    typed.schedules[2].hourly_value = 15.0;
+    typed.schedules[3].hourly_value = 1.0;
+    let model = SimulationModel::from_typed(typed);
+    let schedule_cache =
+        precompute_schedule_cache(&model.typed, 1).expect("one CP349 schedule sample");
+    let weather = weather_series_with_conditions(&model, 1, 30.0, 15.0, 30.0, 101_325.0);
+    let mut options = DirectZonePurchasedAirCoupledOptions::hourly_samples(1);
+    options.initial_zone_air_temperature_c = INITIAL_ZONE_TEMPERATURE_C;
+    let simulation = simulate_direct_zone_purchased_air_coupled_heat_balance(
+        &model,
+        &weather,
+        &schedule_cache,
+        options,
+    )
+    .expect("valid CP349 direct simulation");
+    let summary = &simulation.summary;
+    let state = &summary
+        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_lifecycle
+        .state;
+    let snapshot = state.latest.expect("latest CP349 snapshot");
+    let predecessor = summary
+        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_lifecycle
+        .state
+        .latest
+        .expect("latest CP348 predecessor");
+    let mixed_air = summary
+        .calc_cooling_mixed_air_call_lifecycle
+        .state
+        .latest
+        .expect("latest CP329 retained owner");
+
+    assert_eq!(state.transition_count, 1);
+    assert_eq!(
+        state.dehumidification_control_none_case_completed_skip_count,
+        1
+    );
+    assert_eq!(
+        state.dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_count,
+        0
+    );
+    assert_eq!(state.source_site_execution_count, 0);
+    assert_eq!(state.mixed_air_humidity_ratio_read_count, 0);
+    assert_eq!(state.psychrometric_cp_air_evaluation_count, 0);
+    assert_eq!(state.cp_air_assignment_write_count, 0);
+    assert!(snapshot.dehumidification_control_none_case_completed_skip);
+    assert!(
+        !snapshot.dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_executed
+    );
+    assert!(!snapshot.mixed_air_humidity_ratio_read);
+    assert!(snapshot.mixed_air_humidity_ratio.is_none());
+    assert!(!snapshot.psychrometric_cp_air_evaluated);
+    assert!(snapshot.psychrometric_cp_air_result_j_per_kg_k.is_none());
+    assert!(!snapshot.cp_air_assigned);
+    assert!(snapshot.cp_air_j_per_kg_k.is_none());
+
+    let expected =
+        super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_validation::expected_snapshot(
+            predecessor,
+            mixed_air,
+        );
+    assert!(
+        super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_validation::snapshots_match_exact_bits(
+            &snapshot,
+            &expected,
+        )
+    );
+
+    let mut corrupted = snapshot;
+    corrupted.source_order = &["forged-constant-sensible-heat-ratio-cp-air-assignment"];
+    assert!(
+        !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_validation::snapshots_match_exact_bits(
+            &corrupted,
+            &expected,
+        )
+    );
+
+    let mut active_predecessor = predecessor;
+    active_predecessor.predecessor_dehumidification_control_type =
+        Some(DehumidificationControlType::ConstantSensibleHeatRatio);
+    active_predecessor.predecessor_dehumidification_control_none_case_completed = false;
+    active_predecessor.dehumidification_control_none_case_completed_skip = false;
+    active_predecessor.dehumidification_control_constant_sensible_heat_ratio_case_entered = true;
+    let mut negative_zero_owner = mixed_air;
+    negative_zero_owner.mixed_air_humidity_ratio = Some(-0.0);
+    let negative_zero =
+        super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_validation::expected_snapshot(
+            active_predecessor,
+            negative_zero_owner,
+        );
+    let mut positive_zero = negative_zero;
+    positive_zero.mixed_air_humidity_ratio = Some(0.0);
+    assert_eq!(negative_zero, positive_zero);
+    assert!(
+        !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_validation::snapshots_match_exact_bits(
+            &negative_zero,
+            &positive_zero,
+        ),
+        "signed-zero operand corruption must fail exact-bit validation"
+    );
+}

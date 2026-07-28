@@ -20439,6 +20439,62 @@ remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
 readiness, capability, feature/evidence, numerical-conformance, output,
 status, conformance, or Roadmap promotion.
 
+## CP349 Constant-Sensible-Heat-Ratio CpAir Assignment
+
+CP349 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2216 and locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`:
+
+```cpp
+CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);
+```
+
+The exact source order is
+`read-purchased-air-mixed-air-humidity-ratio-for-constant-sensible-heat-ratio-cp-air`,
+`evaluate-psy-cp-air-fn-w-for-constant-sensible-heat-ratio-cp-air`, then
+`assign-local-cp-air-for-constant-sensible-heat-ratio-case`. Line 2217,
+`CoolSensOutput = SupplyMassFlowRate * CpAir * (PurchAir.MixedAirTemp - PurchAir.SupplyTemp);`,
+is the first excluded executable. CP349 claims none of that statement's
+reads, subtraction, multiplications, assignment, or later case-body work.
+
+Routes are inherited `U/N/P`, completed-`None` skip `C0`, private
+constant-SHR assignment `K`, and private `H/CSH` skips. For transitions `T`,
+CP346 dispatches `S`, CP345 assignments `R`, provenance `G/F/L`, and CP340
+active evaluations `A`, checked state requires
+`T=U+N+P+C0+K+H+CSH`, `S=C0+K+H+CSH=R=G+F+L`, `A=F+L`, and
+`source_site_execution_count=3*K`. Each of the three per-site counters equals
+`K`; every other route executes zero CP349 sites. Exact direct execution
+inherits the completed `None` route, requires `C0=S` and `K=H=CSH=0`, and
+records a complete null-operand/result skip. The active constant-SHR
+assignment remains private characterization.
+
+Same-call CP348 supplied/latest/private evidence is the recursively complete
+immediate predecessor. Same-call retained CP329
+`mixed_air_humidity_ratio` solely owns the private active operand, while CP345
+`assigned_supply_humidity_ratio` only corroborates its exact bits. CP331's
+Zone operand and the earlier CP331/CP338 `CpAir` results are neither operands
+nor reusable results for CP349. The transition calls only canonical stateless
+`energyplus_psy_cp_air_fn_w` and assigns the resulting binary64 bits directly.
+Private `K` admits only a finite CP329-owned humidity `>=0.0` (including both
+signed zeros) whose canonical result is finite; rejection is transactional,
+and skipped routes do not validate the absent operand. The C++ function-local
+`dwSave`/`cpaSave` cache, `-100.0` sentinel and
+first-call anomaly, cache hit/miss history, reset, interleaving, concurrency,
+mutable service state, and broader psychrometric parity remain excluded.
+
+Binding, coupled runtime, and pipeline evidence preserve
+CP348-to-CP349-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_lifecycle`.
+No CP349 value enters `DirectZonePurchasedAirCouplingInput`; CP349 does not
+consume, reconcile with, feed, or replace the numerical DTO. Non-direct paths
+carry `None` and reject attached evidence. Both parent algorithms remain
+`scaffold`/`none`; both parent Calc routines remain `source_mapped`. Counts
+remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
+170 required. CP349 adds target/lifecycle evidence only, with no support,
+readiness, capability, feature/evidence, numerical-conformance, output,
+status, conformance, or Roadmap promotion.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

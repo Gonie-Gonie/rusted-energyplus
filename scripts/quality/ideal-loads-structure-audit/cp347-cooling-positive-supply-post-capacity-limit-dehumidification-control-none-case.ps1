@@ -166,11 +166,14 @@ function Assert-Cp347BindingContract {
     $cp348 = $Text.IndexOf(
         "let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry ="
     )
+    $cp349 = $Text.IndexOf(
+        "let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment ="
+    )
     $numerical = $Text.IndexOf(
         "let coupling = complete_direct_zone_purchased_air_coupling("
     )
-    if ($cp346 -lt 0 -or $cp347 -le $cp346 -or $cp348 -le $cp347 -or $numerical -le $cp348) {
-        throw "Binding must execute CP346 then CP347 then CP348 before numerical coupling"
+    if ($cp346 -lt 0 -or $cp347 -le $cp346 -or $cp348 -le $cp347 -or $cp349 -le $cp348 -or $numerical -le $cp349) {
+        throw "Binding must execute CP346 then CP347 then CP348 then CP349 before numerical coupling"
     }
     $dto = Get-Cp347RustBraceBlock `
         -Text $Text.Substring($numerical) `
@@ -333,7 +336,7 @@ Assert-Contains -Path $cp347CorruptionTests -Pattern 'every_none_case_counter_in
 Assert-Contains -Path $cp347BindingTests -Pattern 'scheduled_binding_completes_cp347_none_case_after_every_cp346_active_route' -Description "CP347 binding G/F/L"
 Assert-Contains -Path $cp347CoupledTests -Pattern 'cp347_direct_coupled_runtime_completes_none_case_after_g_f_l_and_skips_unit_off' -Description "CP347 coupled G/F/L/U"
 Assert-Contains -Path $cp347CoupledTests -Pattern 'cp347_direct_coupled_runtime_covers_non_cooling_and_positive_guard_false_skips' -Description "CP347 coupled N/P"
-Assert-Contains -Path $cp347PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp348_lifecycle_evidence' -Description "CP347 cumulative non-direct firewall"
+Assert-Contains -Path $cp347PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp349_lifecycle_evidence' -Description "CP347 cumulative non-direct firewall"
 Assert-Contains -Path $cp347PipelineRoot -Pattern ('"' + $cp347Lifecycle + '":\s*result\s*\.' + $cp347Lifecycle) -Description "CP347 lifecycle JSON"
 Assert-Contains -Path $cp347PipelineValidation -Pattern 'control_switch_cp346' -Description "pipeline CP346 predecessor"
 Assert-Contains -Path $cp347PipelineValidation -Pattern 'mixed_air_cp329' -Description "pipeline CP329 owner"
@@ -518,8 +521,8 @@ foreach ($historical in @(
     )) {
     Assert-Contains `
         -Path "scripts\quality\ideal-loads-structure-audit\$historical" `
-        -Pattern 'non_direct_runtime_rejects_cp316_through_cp348_lifecycle_evidence' `
-        -Description "historical cumulative non-direct firewall through CP348"
+        -Pattern 'non_direct_runtime_rejects_cp316_through_cp349_lifecycle_evidence' `
+        -Description "historical cumulative non-direct firewall through CP349"
 }
 $mainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp346AuditIndex = $mainAuditText.IndexOf(
@@ -534,13 +537,13 @@ $completionIndex = $mainAuditText.IndexOf(
 if ($cp346AuditIndex -lt 0 -or $cp347AuditIndex -le $cp346AuditIndex -or $completionIndex -le $cp347AuditIndex) {
     throw "Main IdealLoads audit must dot-source CP347 after CP346 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 286' -Description "CP347 script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 287' -Description "CP347 script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP347 zero uncalled scripts"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp347-cooling-positive-supply-post-capacity-limit-dehumidification-control-none-case\.ps1"' -Description "CP347 internal record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp347-cooling-positive-supply-post-capacity-limit-dehumidification-control-none-case\.ps1::dot_sources' -Description "CP347 caller/callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 286 \|' -Description "generated CP347 script total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 287 \|' -Description "generated CP347 script total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public total"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 46 \|' -Description "generated internal total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 47 \|' -Description "generated internal total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated zero uncalled"
 
 # Mutation self-tests prove the audit rejects boundary, ownership, algebra,
