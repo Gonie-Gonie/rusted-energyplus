@@ -11,6 +11,7 @@ use super::super::{
     PurchasedAirCalcCoolingEconomizerConditionSnapshot,
     PurchasedAirCalcCoolingEconomizerGuardSnapshot, PurchasedAirCalcCoolingEntryGateSnapshot,
     PurchasedAirCalcCoolingHumidificationFlowSnapshot,
+    PurchasedAirCalcCoolingHumidistatCaseBreakSnapshot,
     PurchasedAirCalcCoolingHumidistatCaseEntrySnapshot,
     PurchasedAirCalcCoolingHumidistatMoistureDemandAssignmentSnapshot,
     PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationAssignmentSnapshot,
@@ -210,6 +211,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered Humidistat purchased-air supply-humidity-ratio mixed-air-limit snapshot.
     pub calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit:
         PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitSnapshot,
+    /// Source-ordered Humidistat case-break snapshot.
+    pub calculation_cooling_humidistat_case_break:
+        PurchasedAirCalcCoolingHumidistatCaseBreakSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

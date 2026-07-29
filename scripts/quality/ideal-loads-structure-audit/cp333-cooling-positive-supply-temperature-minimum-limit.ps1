@@ -14,7 +14,7 @@ $cp333Tests = "crates\ep_runtime\src\ideal_loads\calc\cooling_positive_supply_te
 $cp333ReleaseCorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_positive_supply_temperature_minimum_limit\tests\release_corruption.rs"
 $cp333CalcRoot = "crates\ep_runtime\src\ideal_loads\calc.rs"
 $cp333Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
-Assert-Contains -Path $cp333Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361-to-CP362 binding order"
+Assert-Contains -Path $cp333Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =.*?let calculation_cooling_humidistat_case_break =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361-to-CP362-to-CP363 binding order"
 $cp333ScheduledOutput = "crates\ep_runtime\src\ideal_loads\binding\scheduled_output.rs"
 $cp333BindingAdapter = "crates\ep_runtime\src\ideal_loads\binding\cooling_positive_supply_temperature_minimum_limit.rs"
 $cp333BindingTestsRoot = "crates\ep_runtime\src\ideal_loads\binding_tests.rs"
@@ -476,6 +476,11 @@ $postCp339BeforeNumericalCodeForCp333 = [regex]::Replace(
 $postCp339BeforeNumericalCodeForCp333 = [regex]::Replace(
     $postCp339BeforeNumericalCodeForCp333,
     '(?s)let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =\s*advance_cooling_humidistat_supply_humidity_ratio_mixed_air_limit\([^;]+?\)\?;',
+    ''
+)
+$postCp339BeforeNumericalCodeForCp333 = [regex]::Replace(
+    $postCp339BeforeNumericalCodeForCp333,
+    '(?s)let calculation_cooling_humidistat_case_break =\s*advance_cooling_humidistat_case_break\([^;]+?\)\?;',
     ''
 )
 if ($postCp339BeforeNumericalCodeForCp333 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {

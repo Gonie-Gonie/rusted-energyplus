@@ -3123,6 +3123,58 @@ support, readiness, run-state, capability, feature/evidence, numerical
 conformance, output ownership, status, conformance, and Roadmap claims remain
 unchanged.
 
+## CP363 Cooling Humidistat Case Break
+
+CP363 supersedes only CP362's physical-line-2233 exclusion at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`, locked raw
+SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps `PurchasedAirManager.cc` physical executable line 2233, `} break;`,
+and the sole site
+`exit-purchased-air-dehumidification-control-humidistat-case-via-break`.
+Physical line 2234 is the `ConstantSupplyHumidityRatio` label and CP364
+case-entry candidate. Physical executable line 2235,
+`PurchAir.SupplyHumRat = PurchAir.MinCoolSuppAirHumRat;`, is first excluded;
+the private active-`H` continuation at line 2245 is also still excluded.
+
+Routes stay `U/N/P/C0/Q/H/CSH`. Exact checked state requires
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`, `A = F+L`, `H` equal
+to CP362 Humidistat mixed-air-limit executions, and
+`source_site_execution_count=humidistat_case_break_count=H`. Exact direct
+release is `C0 = S`, `Q = H = CSH = 0`: it records a false break and a
+complete control-flow skip. Private active `H` records one true break and
+cannot fall through to `ConstantSupplyHumidityRatio`; private `Q` is a
+completed skip and private `CSH` is a selected skip.
+
+Same-call bit-exact CP362 lifecycle, snapshot, latest, witness, and recursive
+completion evidence is the sole predecessor owner. CP363's pure transition
+and snapshot read, copy, branch on, and publish no CP362 numeric payload and
+add no break-local numeric operand/result, arithmetic, comparison,
+finite/range gate, clamp, normalization, default, diagnostic, psychrometric
+call, or coercion. Its private `H` lineage proof may forward only CP362's two
+explicit pre-sampled characterization scalars to CP362's canonical bridge
+without inspecting, copying, branching on, or publishing them. Pure route
+classification remains independent of predecessor numeric values, while
+exact public/private release rejects corrupt CP362 lineage transactionally.
+A canonical private `ConstantSupplyHumidityRatio`
+selected-skip bridge exists only for CP364 and implements neither line 2234
+nor line 2235.
+
+Evidence order is CP362-to-CP363-to-unchanged-numerical under
+`purchased_air_calc_cooling_humidistat_case_break_lifecycle`. CP363 cannot
+enter, consume, reconcile with, feed, or replace
+`DirectZonePurchasedAirCouplingInput`, `prediction.zone_demand`, any
+numerical DTO, or result state. CP345 continues to own actual result-store
+first/last supply-humidity bits. Non-direct paths publish `None` and reject
+CP363 evidence.
+
+Counts remain exactly 32 algorithms and 293 routines, split 58
+`state_mapped` plus 235 `source_mapped`, with 170 required. Script inventory
+becomes 301 total, 240 public, 61 internal, and zero unused. Parent/Calc
+states and all support, readiness, run-state, capability, feature/evidence,
+numerical conformance, output ownership, status, conformance, and Roadmap
+claims remain unchanged.
+
 ## CP362 Cooling Humidistat Supply-Humidity-Ratio Mixed-Air Limit
 
 CP362 supersedes only CP361's physical-line-2232 exclusion. At pinned

@@ -16,7 +16,7 @@ $cp341Tests = "crates\ep_runtime\src\ideal_loads\calc\$cp341Stem\tests\mod.rs"
 $cp341PublicReleaseTests = "crates\ep_runtime\src\ideal_loads\calc\$cp341Stem\tests\public_release.rs"
 $cp341CalcRoot = "crates\ep_runtime\src\ideal_loads\calc.rs"
 $cp341Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
-Assert-Contains -Path $cp341Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361-to-CP362 binding order"
+Assert-Contains -Path $cp341Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =.*?let calculation_cooling_humidistat_case_break =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361-to-CP362-to-CP363 binding order"
 $cp341ScheduledOutput = "crates\ep_runtime\src\ideal_loads\binding\scheduled_output.rs"
 $cp341BindingAdapter = "crates\ep_runtime\src\ideal_loads\binding\$cp341Stem.rs"
 $cp341BindingTestsRoot = "crates\ep_runtime\src\ideal_loads\binding_tests.rs"
@@ -335,6 +335,11 @@ $cp341BindingIntervalCode = [regex]::Replace(
     '(?s)let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =\s*advance_cooling_humidistat_supply_humidity_ratio_mixed_air_limit\([^;]+?\)\?;',
     ''
 )
+$cp341BindingIntervalCode = [regex]::Replace(
+    $cp341BindingIntervalCode,
+    '(?s)let calculation_cooling_humidistat_case_break =\s*advance_cooling_humidistat_case_break\([^;]+?\)\?;',
+    ''
+)
     if ($cp341BindingIntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
         throw "No intermediary helper call may execute $($cp341BindingInterval.Description)"
     }
@@ -393,7 +398,7 @@ Assert-Contains -Path $cp341CoupledRuntimeTests -Pattern 'cp347_direct_coupled_r
 Assert-Contains -Path $cp341CoupledRuntimeTests -Pattern 'calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle' -Description "direct coupled CP340 predecessor evidence"
 Assert-Contains -Path $cp341CoupledRuntimeTests -Pattern 'calc_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment_lifecycle' -Description "direct coupled CP341 lifecycle evidence"
 Assert-Contains -Path $cp341PipelineRoot -Pattern '(?s)purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_maximum_capacity_assignment_lifecycle:\s*None' -Description "non-direct CP341 null evidence"
-Assert-Contains -Path $cp341PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp362_lifecycle_evidence' -Description "non-direct CP341 through CP362 evidence rejection"
+Assert-Contains -Path $cp341PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp363_lifecycle_evidence' -Description "non-direct CP341 through CP363 evidence rejection"
 
 # Exactly two algorithm addenda, two capability addenda, and six targets
 # distributed 2+4 across the two parent algorithms.
@@ -566,10 +571,10 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP341 after CP340 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 300' -Description "CP341 cumulative inventory total through CP358"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 301' -Description "CP341 cumulative inventory total through CP358"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment\.ps1"' -Description "CP341 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment\.ps1::dot_sources' -Description "CP341 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 300 \|' -Description "CP341 generated script count through CP358"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 301 \|' -Description "CP341 generated script count through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP341 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 60 \|' -Description "CP341 generated internal script count through CP358"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 61 \|' -Description "CP341 generated internal script count through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP341 generated uncalled script count"
