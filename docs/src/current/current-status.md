@@ -2789,7 +2789,46 @@ CP356 never enters, consumes, reconciles with, feeds, or replaces the numerical
 DTO. Non-direct paths publish `None` and reject attached CP356 evidence.
 Counts remain exactly 32 algorithms and 293 routines, split 58 `state_mapped`
 plus 235 `source_mapped`, with 170 required. The added internal audit changes
-only the script inventory to 294 total, 240 public, 54 internal, and zero
+only the script inventory to 295 total, 240 public, 55 internal, and zero
+unused. Both parents remain `scaffold`/`none`, both Calc routines remain
+`source_mapped`, and support, readiness, run state, capability,
+feature/evidence, numerical conformance, output ownership, status,
+conformance, and Roadmap state remain unchanged.
+
+CP357 now maps only the constant-sensible-heat-ratio case exit at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2227, `break;`. The locked
+raw SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its sole source site is
+`exit-purchased-air-dehumidification-control-constant-sensible-heat-ratio-case-via-break`.
+Physical line 2228 is the `Humidistat` case label and the next CP358 case-entry
+candidate; physical executable line 2229 is the first excluded executable.
+The private `Q` continuation after the break at line 2245 remains unimplemented.
+
+Routes remain `U/N/P/C0/Q/H/CSH`, with
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`, and
+`A = F+L`. `Q` equals CP356 mixed-air-limit executions, while
+`source_site_execution_count = constant_sensible_heat_ratio_case_break_count = Q`.
+Exact direct release remains the completed `None` route: `C0 = S`,
+`Q = H = CSH = 0`, its break flag is false, and it publishes a complete
+skip. Private active `Q` executes the break once, records a true break flag,
+and cannot fall through into the `Humidistat` case.
+
+Recursively validated, bit-exact CP356 lifecycle/snapshot evidence is the sole
+predecessor owner. CP357 owns no numeric operand, arithmetic, comparison,
+finite/range check, clamp, normalization, default, diagnostic, or coercion
+gate. Binding and direct-only evidence preserve
+CP356-to-CP357-to-unchanged-numerical order under
+`purchased_air_calc_cooling_constant_shr_case_break_lifecycle`; CP357 neither
+enters nor feeds `DirectZonePurchasedAirCouplingInput` or any numerical DTO.
+Actual result-store first/last supply-humidity-ratio bits remain owned by the
+unchanged CP345 numerical path. Non-direct paths publish `None` and reject
+CP357 evidence.
+
+Counts remain exactly 32 algorithms and 293 routines, split 58 `state_mapped`
+plus 235 `source_mapped`, with 170 required. The added internal audit changes
+only the script inventory to 295 total, 240 public, 55 internal, and zero
 unused. Both parents remain `scaffold`/`none`, both Calc routines remain
 `source_mapped`, and support, readiness, run state, capability,
 feature/evidence, numerical conformance, output ownership, status,

@@ -447,6 +447,11 @@ $postCp339BeforeNumericalCodeForCp333 = [regex]::Replace(
     '(?s)let calculation_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit =\s*advance_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit\([^;]+?\)\?;',
     ''
 )
+$postCp339BeforeNumericalCodeForCp333 = [regex]::Replace(
+    $postCp339BeforeNumericalCodeForCp333,
+    '(?s)let calculation_cooling_constant_shr_case_break =\s*advance_cooling_constant_shr_case_break\([^;]+?\)\?;',
+    ''
+)
 if ($postCp339BeforeNumericalCodeForCp333 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
     throw "No helper other than the audited CP340 through CP348 releases may execute after CP339 and before numerical Calc"
 }

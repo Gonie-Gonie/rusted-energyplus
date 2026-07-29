@@ -38,7 +38,7 @@ const Q: Route =
 const H: Route = Route::DehumidificationControlHumidistatCaseSelectedSkip;
 const CSH: Route = Route::DehumidificationControlConstantSupplyHumidityRatioCaseSelectedSkip;
 
-pub(super) fn completed_cp355_case(
+pub(in crate::ideal_loads::calc) fn completed_cp355_case(
     cooling_demand_w: f64,
     overall_availability: f64,
     capacity_limit: bool,

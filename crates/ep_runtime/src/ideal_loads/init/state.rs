@@ -175,6 +175,7 @@ pub struct PurchasedAirRuntimeState {
     #[rustfmt::skip] cooling_constant_shr_supply_humidity_ratio_overdrying_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, Cp354Snapshot>,
     #[rustfmt::skip] cooling_constant_shr_supply_humidity_ratio_minimum_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitSnapshot>,
     #[rustfmt::skip] cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitSnapshot>,
+    #[rustfmt::skip] cooling_constant_shr_case_break_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingConstantShrCaseBreakSnapshot>,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -325,6 +326,7 @@ pub struct PurchasedAirUnitRuntimeState {
     #[doc = "Persistent bounded constant-SHR supply-humidity-ratio overdrying-limit state."] #[rustfmt::skip] pub calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit: PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitRuntimeState,
     #[doc = "Persistent bounded constant-SHR supply-humidity-ratio minimum-limit state."] #[rustfmt::skip] pub calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit: PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitRuntimeState,
     #[doc = "Persistent bounded constant-SHR supply-humidity-ratio mixed-air-limit state."] #[rustfmt::skip] pub calc_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit: PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitRuntimeState,
+    #[doc = "Persistent bounded constant-SHR case-break state."] #[rustfmt::skip] pub calc_cooling_constant_shr_case_break: PurchasedAirCalcCoolingConstantShrCaseBreakRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
@@ -343,10 +345,8 @@ pub struct PurchasedAirUnitRuntimeState {
     pub first_matching_equipment_list: Option<ZoneEquipmentListId>,
     /// Whether the manager sweep found this unit in any equipment list.
     pub equipment_list_membership_found: Option<bool>,
-    /// Cached maximum heating air mass flow from begin-environment initialization.
-    pub maximum_heating_air_mass_flow_rate_kg_per_s: f64,
-    /// Cached maximum cooling air mass flow from begin-environment initialization.
-    pub maximum_cooling_air_mass_flow_rate_kg_per_s: f64,
+    #[doc = "Cached maximum heating air mass flow from begin-environment initialization."] #[rustfmt::skip] pub maximum_heating_air_mass_flow_rate_kg_per_s: f64,
+    #[doc = "Cached maximum cooling air mass flow from begin-environment initialization."] #[rustfmt::skip] pub maximum_cooling_air_mass_flow_rate_kg_per_s: f64,
     /// Standard air density used for the cached environment values.
     pub standard_air_density_kg_per_m3: Option<f64>,
     /// Total calls for this unit.

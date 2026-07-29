@@ -35621,9 +35621,43 @@ CP355-to-CP356-to-unchanged-numerical under
 CP356 neither consumes nor feeds the numerical DTO. Non-direct execution
 publishes `None` and rejects evidence. Inventory remains exactly 32 algorithms,
 293 routines, 58 state-mapped, 235 source-mapped, and 170 required; script
-inventory becomes 294 total, 240 public, 54 internal, and zero unused.
+inventory becomes 295 total, 240 public, 55 internal, and zero unused.
 Parent/Calc states and all support, readiness, capability, evidence, numerical,
 output, status, conformance, and Roadmap claims remain unchanged.
+
+## CP357 Constant-SHR Case Break in the Heat-Balance Loop
+
+CP357 retains only pinned EnergyPlus
+`6f2e40d10250a105b49966baa24d843711e61048`
+`PurchasedAirManager.cc` line 2227, `break;`; the locked raw SHA-256 is
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its sole site is
+`exit-purchased-air-dehumidification-control-constant-sensible-heat-ratio-case-via-break`.
+Line 2228 is the next `Humidistat` case label/CP358 entry candidate, while line
+2229 is the first excluded executable. The `Q` continuation at line 2245 is
+not part of this slice.
+
+The heat-balance loop preserves routes `U/N/P/C0/Q/H/CSH` and validates
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`,
+`A = F+L`, `Q` equal to CP356 mixed-air-limit count, and
+`source_site_execution_count = constant_sensible_heat_ratio_case_break_count = Q`.
+Direct `C0 = S` has `Q = H = CSH = 0`, a false break flag, and a complete
+skip. Private active `Q` produces one true break and cannot enter the
+`Humidistat` case.
+
+CP356's recursively complete bit-exact lifecycle and snapshot are the sole
+predecessor evidence. CP357 adds no numeric/arithmetic/comparison/gate behavior
+and cannot feed heat-balance numerical state. Coupled execution preserves
+CP356-to-CP357-to-unchanged-numerical order under
+`purchased_air_calc_cooling_constant_shr_case_break_lifecycle`, with actual
+result-store first/last supply-humidity bits unchanged. Non-direct execution
+publishes `None` and rejects CP357 evidence.
+
+Inventory remains 32 algorithms, 293 routines, 58 state-mapped,
+235 source-mapped, and 170 required; script inventory becomes 295 total,
+240 public, 55 internal, and zero unused. Parent/Calc states and all support,
+readiness, capability, evidence, numerical, output, status, conformance, and
+Roadmap claims remain unchanged.
 
 ## Data Structure Map
 

@@ -46,6 +46,7 @@ mod cooling_mixed_air_call_tests;
 mod cooling_oa_max_flow_body_tests;
 #[path = "binding/cooling_oa_max_flow_gate_tests.rs"]
 mod cooling_oa_max_flow_gate_tests;
+#[rustfmt::skip] #[path = "binding/cooling_constant_shr_case_break_tests.rs"] mod cooling_constant_shr_case_break_tests;
 #[rustfmt::skip] #[path = "binding/cooling_constant_shr_supply_humidity_ratio_minimum_limit_tests.rs"] mod cooling_constant_shr_supply_humidity_ratio_minimum_limit_tests;
 #[rustfmt::skip] #[path = "binding/cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_tests.rs"] mod cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_tests;
 #[rustfmt::skip] #[path = "binding/cooling_constant_shr_supply_humidity_ratio_overdrying_limit_tests.rs"] mod cooling_constant_shr_supply_humidity_ratio_overdrying_limit_tests;

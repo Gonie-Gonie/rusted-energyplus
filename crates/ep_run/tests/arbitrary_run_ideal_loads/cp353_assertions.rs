@@ -1,6 +1,9 @@
-//! CP353-to-CP356 run-summary assertions.
+//! CP353-to-CP357 run-summary assertions.
 
 use serde_json::{Map, Value};
+
+#[path = "cp357_assertions.rs"]
+mod cp357_assertions;
 
 const KEY: &str = "purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle";
 const CP354_KEY: &str =
@@ -37,8 +40,6 @@ const CP356_ORDER: [&str; 4] = [
     "apply-source-shaped-two-argument-minimum-for-constant-sensible-heat-ratio-mixed-air-limit",
     "assign-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-mixed-air-limit",
 ];
-
-const DIRECT_FIXTURE_SUPPLY_HUMIDITY_RATIO_BITS: u64 = 0x3f5d_aac3_b48c_9d41;
 
 pub(super) fn assert_direct(runtime: &Value, results: &Value) {
     let cp352 = &runtime[CP352_KEY];
@@ -141,7 +142,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         "CP353 evidence must not replace numerical supply enthalpy"
     );
     assert_cp354(runtime, cp353);
-    assert_cp356_numerical_nonfeed(runtime, results);
+    cp357_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -165,6 +166,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP356_KEY].is_null(),
         "non-direct runtime must not publish CP356 evidence"
     );
+    cp357_assertions::assert_non_direct(runtime);
 }
 
 fn assert_cp354(runtime: &Value, cp353: &Value) {
@@ -459,39 +461,5 @@ fn assert_cp356(runtime: &Value, cp355: &Value) {
         "supply_humidity_ratio_assignment_write_count",
     ] {
         assert_eq!(cp356[field], 0, "{field}");
-    }
-}
-
-fn assert_cp356_numerical_nonfeed(runtime: &Value, results: &Value) {
-    let cp345_bits = runtime["purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle"]
-        ["latest"]["assigned_supply_humidity_ratio_ieee_bits"]
-        .as_str()
-        .expect("CP345 numerical humidity-owner bits");
-    let cp345_bits = cp345_bits
-        .strip_prefix("0x")
-        .and_then(|bits| u64::from_str_radix(bits, 16).ok())
-        .expect("CP345 bits must be canonical 0x-prefixed hexadecimal");
-    assert_eq!(
-        cp345_bits, DIRECT_FIXTURE_SUPPLY_HUMIDITY_RATIO_BITS,
-        "direct fixture numerical humidity baseline changed"
-    );
-    let supply_humidity = results["series"]
-        .as_array()
-        .expect("result series")
-        .iter()
-        .find(|series| {
-            series["key"] == "ZONE ONE INLET"
-                && series["variable_name"] == "System Node Humidity Ratio"
-        })
-        .expect("supply-node humidity result series");
-    for endpoint in ["first", "last"] {
-        assert_eq!(
-            supply_humidity[endpoint]
-                .as_f64()
-                .expect("supply-node humidity endpoint")
-                .to_bits(),
-            cp345_bits,
-            "CP356 evidence must not replace the {endpoint} numerical supply humidity"
-        );
     }
 }

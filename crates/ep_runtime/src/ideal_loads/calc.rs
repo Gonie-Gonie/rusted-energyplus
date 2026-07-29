@@ -1,5 +1,5 @@
 //! IdealLoads `CalcPurchAirLoads` compatibility calculations.
-mod cooling_capacity_zero_flow_reset;
+#[rustfmt::skip] mod cooling_capacity_zero_flow_reset; #[rustfmt::skip] mod cooling_constant_shr_case_break;#[rustfmt::skip] pub use cooling_constant_shr_case_break::*;
 mod cooling_dehumidification_flow;
 #[rustfmt::skip] #[cfg(test)] mod cooling_dehumidification_flow_release_tests;
 #[rustfmt::skip] #[cfg(test)] mod cooling_dehumidification_flow_tests;

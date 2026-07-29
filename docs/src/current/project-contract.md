@@ -19176,11 +19176,49 @@ CP355-to-CP356-to-unchanged-numerical order under
 CP356 consumes no numerical DTO value and does not feed or replace it.
 Non-direct paths publish `None` and reject evidence. Inventory stays exactly
 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and 170
-required; the script inventory becomes 294 total, 240 public, 54 internal,
+required; the script inventory becomes 295 total, 240 public, 55 internal,
 and zero unused. Both parents remain `scaffold`/`none`, both Calc routines
 remain `source_mapped`, and support, readiness, run state, capability,
 feature/evidence, numerical conformance, output ownership, status,
 conformance, and Roadmap state remain unchanged.
+
+## CP357 Source-Ordered Cooling Constant-SHR Case Break
+
+CP357 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2227, `break;`, with locked
+raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The exact one-site source order is
+`exit-purchased-air-dehumidification-control-constant-sensible-heat-ratio-case-via-break`.
+Line 2228 is the `Humidistat` case label and next CP358 case-entry candidate;
+line 2229 is the first excluded executable. The dynamic `Q` continuation at
+line 2245 after the switch remains outside CP357.
+
+The seven routes remain `U/N/P/C0/Q/H/CSH`. Exact checked algebra is
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`, and
+`A = F+L`; `Q` equals CP356 mixed-air-limit executions and
+`source_site_execution_count = constant_sensible_heat_ratio_case_break_count = Q`.
+Direct release is `C0 = S`, `Q = H = CSH = 0`, a false break flag, and a
+complete skip. A private active `Q` performs exactly one break, records the
+true break flag, and proves there is no fallthrough to `Humidistat`.
+
+The sole predecessor-evidence owner is recursively validated, same-call,
+bit-exact CP356. CP357 introduces no scalar owner, numeric field, arithmetic,
+comparison, finite/range gate, clamp, normalization, default, diagnostic, or
+coercion. Binding remains CP356-to-CP357-to-unchanged-numerical under
+`purchased_air_calc_cooling_constant_shr_case_break_lifecycle`. CP357 never
+enters, consumes, reconciles with, feeds, or replaces
+`DirectZonePurchasedAirCouplingInput` or the numerical DTO; result-store
+first/last supply-humidity bits remain unchanged. Non-direct paths publish
+`None` and reject evidence.
+
+Inventory stays exactly 32 algorithms, 293 routines, 58 state-mapped,
+235 source-mapped, and 170 required; the script inventory becomes 295 total,
+240 public, 55 internal, and zero unused. Both parents remain
+`scaffold`/`none`, both Calc routines remain `source_mapped`, and support,
+readiness, run state, capability, feature/evidence, numerical conformance,
+output ownership, status, conformance, and Roadmap state remain unchanged.
 
 ## Run States
 

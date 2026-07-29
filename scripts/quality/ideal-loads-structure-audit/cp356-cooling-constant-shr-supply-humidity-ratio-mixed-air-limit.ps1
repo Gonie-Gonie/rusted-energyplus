@@ -73,13 +73,14 @@ function Assert-Cp356BindingContract {
     param([string]$Text)
     $cp355 = $Text.IndexOf("let calculation_$cp355StemForCp356 =")
     $cp356 = $Text.IndexOf("let calculation_$cp356Stem =")
+    $cp357 = $Text.IndexOf("let calculation_cooling_constant_shr_case_break =")
     $numerical = $Text.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
-    if ($cp355 -lt 0 -or $cp356 -le $cp355 -or $numerical -le $cp356) {
-        throw "Binding must execute CP355 then CP356 before numerical coupling"
+    if ($cp355 -lt 0 -or $cp356 -le $cp355 -or $cp357 -le $cp356 -or $numerical -le $cp357) {
+        throw "Binding must execute CP355 then CP356 then CP357 before numerical coupling"
     }
     $dto = Get-Cp356RustBraceBlock -Text $Text.Substring($numerical) -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{' -Description "CP356 numerical DTO"
-    if ($dto -match '(?i)cp35[56]|minimum_limit|mixed_air_limit') {
-        throw "CP355/CP356 evidence must not enter DirectZonePurchasedAirCouplingInput"
+    if ($dto -match '(?i)cp35[5-7]|minimum_limit|mixed_air_limit|case_break') {
+        throw "CP355/CP356/CP357 evidence must not enter DirectZonePurchasedAirCouplingInput"
     }
 }
 
@@ -215,7 +216,7 @@ Assert-Contains -Path $cp356PipelineRoot -Pattern ('mod ' + [regex]::Escape($cp3
 Assert-Contains -Path $cp356PipelineRoot -Pattern ('"' + $cp356Lifecycle + '":\s*result\s*\.' + $cp356Lifecycle) -Description "CP356 lifecycle JSON"
 Assert-Contains -Path $cp356PipelineValidation -Pattern 'minimum_limit_cp355' -Description "pipeline CP355 predecessor"
 Assert-Contains -Path $cp356PipelineValidation -Pattern '(?s)executed\s*\.checked_mul\(.*?MIXED_AIR_LIMIT_SOURCE_ORDER\s*\.len\(\)' -Description "pipeline checked 4Q"
-Assert-Contains -Path $cp356PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp356_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp356PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp357_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp356ArbitraryTests -Pattern 'cp353_assertions' -Description "arbitrary cumulative module"
 Assert-Contains -Path $cp356ArbitraryAssertions -Pattern 'CP356_KEY' -Description "arbitrary CP356 lifecycle"
 Assert-Contains -Path $cp356ArbitraryAssertions -Pattern 'assert_cp356\(runtime, cp355\)' -Description "arbitrary CP355-to-CP356 lineage"
@@ -286,8 +287,8 @@ foreach ($doc in $cp356Documentation) {
             'adds?\s+no(?:\s+line-local)?\s+finite',
             'CP345', 'CP319', 'numerical DTO', 'if left < right \{ left \} else \{ right \}',
             'f64::min', 'CP355-to-CP356-to-unchanged-numerical', $cp356Lifecycle,
-            '32\s+algorithms', '293\s+routines', '294\s+total', '240\s+public',
-            '54\s+internal', 'zero\s+unused', 'Roadmap'
+            '32\s+algorithms', '293\s+routines', '295\s+total', '240\s+public',
+            '55\s+internal', 'zero\s+unused', 'Roadmap'
         )) {
         if ($sections[0].Value -notmatch $pattern) {
             throw "CP356 documentation in $($doc.Path) missing '$pattern'"
@@ -299,15 +300,15 @@ Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP356 a
 
 # Historical order/firewall audits, master order, and generated inventory.
 foreach ($historical in @("cp326-cooling-supply-mass-flow-limit-body.ps1") + @(
-        329..355 | ForEach-Object {
+        329..356 | ForEach-Object {
             (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$($_)-*.ps1").Name
         }
     )) {
     Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$historical" -Pattern 'calculation_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit' -Description "historical CP356 binding order"
 }
-foreach ($historical in 334..355) {
+foreach ($historical in 334..356) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp356_lifecycle_evidence' -Description "historical CP356 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp357_lifecycle_evidence' -Description "historical CP357 firewall"
 }
 $cp356MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp355AuditIndexForCp356 = $cp356MainAuditText.IndexOf("cp355-cooling-constant-shr-supply-humidity-ratio-minimum-limit.ps1")
@@ -316,13 +317,13 @@ $cp356CompletionIndex = $cp356MainAuditText.IndexOf('Write-Host "IdealLoads stru
 if ($cp355AuditIndexForCp356 -lt 0 -or $cp356AuditIndex -le $cp355AuditIndexForCp356 -or $cp356CompletionIndex -le $cp356AuditIndex) {
     throw "Master audit must dot-source CP356 after CP355 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 294' -Description "CP356 script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 295' -Description "CP356 script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP356 zero uncalled"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp356-' -Description "CP356 inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'cp356-cooling-constant-shr-supply-humidity-ratio-mixed-air-limit\.ps1::dot_sources' -Description "CP356 caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 294 \|' -Description "generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 295 \|' -Description "generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 54 \|' -Description "generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 55 \|' -Description "generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated uncalled"
 
 Write-Host "CP356 supply-humidity-ratio mixed-air-limit structure audit passed."

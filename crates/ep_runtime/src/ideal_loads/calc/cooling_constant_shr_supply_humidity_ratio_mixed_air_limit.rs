@@ -10,15 +10,22 @@ mod state;
 mod tests;
 mod transition;
 
-#[allow(unused_imports)]
-pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_is_consistent;
 pub(in crate::ideal_loads) use release::cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_snapshot_is_exact_direct_release;
 pub use release::{
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitError,
     advance_direct_no_oa_calc_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit,
 };
+#[allow(unused_imports)]
+pub(in crate::ideal_loads::calc) use release::{
+    completed_direct_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_is_consistent,
+    private_active_counterfactual_from_direct_release,
+    private_active_counterfactual_links_to_direct_release,
+    snapshots_match_bit_exact as cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_snapshots_match_bit_exact,
+};
 pub(super) use state::PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitRetainedRoute;
 pub use state::PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitRuntimeState;
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::completed_cp355_case;
 pub(in crate::ideal_loads::calc) use transition::{
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitActiveOperands,
     advance_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_state,

@@ -23344,9 +23344,44 @@ is CP355-to-CP356-to-unchanged-numerical under
 CP356 does not consume, reconcile with, feed, or replace numerical DTO state.
 Non-direct paths publish `None` and reject evidence. Counts stay exactly 32
 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and 170 required;
-scripts become 294 total, 240 public, 54 internal, and zero unused.
+scripts become 295 total, 240 public, 55 internal, and zero unused.
 Parent/Calc states and all readiness, support, capability, feature/evidence,
 numerical, output, status, conformance, and Roadmap claims remain unchanged.
+
+## CP357 Constant-SHR Case Break Placement
+
+CP357 sits immediately after CP356 and before unchanged numerical coupling. It
+maps pinned commit `6f2e40d10250a105b49966baa24d843711e61048`,
+locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+and only `PurchasedAirManager.cc` physical executable line 2227, `break;`.
+The exact site is
+`exit-purchased-air-dehumidification-control-constant-sensible-heat-ratio-case-via-break`.
+Line 2228 is the `Humidistat` case label and next CP358 case-entry candidate;
+line 2229 is first excluded. The post-switch private-`Q` continuation at line
+2245 remains unimplemented.
+
+Routes remain `U/N/P/C0/Q/H/CSH`, with
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`,
+`A = F+L`, `Q` equal to CP356 executions, and
+`source_site_execution_count = constant_sensible_heat_ratio_case_break_count = Q`.
+Direct `C0 = S` and `Q = H = CSH = 0` is a complete false-break skip. Private
+`Q` records one true break and cannot fall through to `Humidistat`.
+
+CP356 is the sole recursively validated bit-exact predecessor owner. CP357 has
+no numeric operand/result, arithmetic, comparison, finite/range gate, clamp,
+normalization, default, diagnostic, or coercion. Evidence preserves
+CP356-to-CP357-to-unchanged-numerical order under
+`purchased_air_calc_cooling_constant_shr_case_break_lifecycle`; CP357 does not
+consume, reconcile with, feed, or replace numerical DTO state, and actual
+result-store first/last supply-humidity bits remain unchanged. Non-direct paths
+publish `None` and reject evidence.
+
+Counts stay 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped,
+and 170 required; scripts become 295 total, 240 public, 55 internal, and zero
+unused. Parent/Calc states and all readiness, support, capability,
+feature/evidence, numerical, output, status, conformance, and Roadmap claims
+remain unchanged.
 
 ## Current Boundary
 

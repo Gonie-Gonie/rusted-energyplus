@@ -38,6 +38,8 @@ use super::{
     PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PurchasedAirAvailabilityStatus,
     PurchasedAirCalcCoolingCapacityZeroFlowResetError,
     PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary,
+    PurchasedAirCalcCoolingConstantShrCaseBreakError,
+    PurchasedAirCalcCoolingConstantShrCaseBreakLifecycleSummary,
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitError,
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitLifecycleSummary,
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitError,
@@ -130,6 +132,7 @@ use super::{
     PurchasedAirRuntimeState, PurchasedAirSizedLimits,
     append_direct_zone_purchased_air_hourly_output_series, bind_direct_zone_purchased_air_model,
     purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle_summary,
+    purchased_air_calc_cooling_constant_shr_case_break_lifecycle_summary,
     purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit_lifecycle_summary,
     purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_lifecycle_summary,
     purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle_summary,
@@ -179,6 +182,7 @@ use super::{
 };
 
 mod cooling_capacity_zero_flow_reset_validation;
+mod cooling_constant_shr_case_break_validation;
 mod cooling_constant_shr_supply_humidity_ratio_minimum_limit_validation;
 mod cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_validation;
 mod cooling_constant_shr_supply_humidity_ratio_overdrying_limit_validation;
@@ -432,6 +436,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded constant-SHR supply-humidity-ratio mixed-air-limit lifecycle report.
     pub calc_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_lifecycle:
         PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitLifecycleSummary,
+    /// Persistent bounded constant-SHR case-break lifecycle report.
+    pub calc_cooling_constant_shr_case_break_lifecycle:
+        PurchasedAirCalcCoolingConstantShrCaseBreakLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -629,6 +636,8 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     CalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitLifecycle(
         PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitError,
     ),
+    /// Final constant-SHR case-break summary could not resolve the bound unit.
+    CalcCoolingConstantShrCaseBreakLifecycle(PurchasedAirCalcCoolingConstantShrCaseBreakError),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
         /// Stable invariant field.
@@ -1061,6 +1070,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A constant-SHR case-break lifecycle invariant did not match the run.
+    CalcCoolingConstantShrCaseBreakLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -1298,6 +1316,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     },
     /// A constant-SHR supply-humidity-ratio mixed-air-limit snapshot did not match its release call.
     UnexpectedCalculationCoolingConstantShrSupplyHumidityRatioMixedAirLimit {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
+    /// A constant-SHR case-break snapshot did not match its release call.
+    UnexpectedCalculationCoolingConstantShrCaseBreak {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
@@ -1543,6 +1566,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir constant-SHR supply-humidity-ratio mixed-air-limit lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcCoolingConstantShrCaseBreakLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir constant-SHR case-break lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -1928,6 +1955,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir constant-SHR supply-humidity-ratio mixed-air-limit lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingConstantShrCaseBreakLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir constant-SHR case-break lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -2197,6 +2232,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its constant-SHR supply-humidity-ratio mixed-air limit"
+            ),
+            Self::UnexpectedCalculationCoolingConstantShrCaseBreak { timestep_index } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its constant-SHR case break"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -2910,6 +2949,18 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             return Err(
                 DirectZonePurchasedAirCoupledRuntimeError::
                     UnexpectedCalculationCoolingConstantShrSupplyHumidityRatioMixedAirLimit {
+                        timestep_index,
+                    },
+            );
+        }
+        if !cooling_constant_shr_case_break_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingConstantShrCaseBreak {
                         timestep_index,
                     },
             );
@@ -3686,6 +3737,21 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_constant_shr_case_break_lifecycle =
+        purchased_air_calc_cooling_constant_shr_case_break_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::CalcCoolingConstantShrCaseBreakLifecycle,
+        )?;
+    cooling_constant_shr_case_break_validation::validate_lifecycle(
+        &calc_cooling_constant_shr_case_break_lifecycle,
+        &calc_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -3795,6 +3861,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle,
             calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit_lifecycle,
             calc_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_lifecycle,
+            calc_cooling_constant_shr_case_break_lifecycle,
         },
         state,
         results,

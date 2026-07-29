@@ -4,6 +4,8 @@ use super::*;
 mod coupled_runtime_tests_cp355;
 #[path = "coupled_runtime_tests_cp356.rs"]
 mod coupled_runtime_tests_cp356;
+#[path = "coupled_runtime_tests_cp357.rs"]
+mod coupled_runtime_tests_cp357;
 
 use crate::{
     ideal_loads::{

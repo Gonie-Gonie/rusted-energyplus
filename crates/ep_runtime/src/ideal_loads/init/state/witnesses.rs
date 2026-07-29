@@ -1,5 +1,6 @@
 //! Private latest-witness access for source-ordered calculation stages.
 
+mod cooling_constant_shr_case_break;
 mod cooling_constant_shr_supply_humidity_ratio_minimum_limit;
 mod cooling_constant_shr_supply_humidity_ratio_mixed_air_limit;
 mod cooling_constant_shr_supply_humidity_ratio_overdrying_limit;
