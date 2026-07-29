@@ -17,7 +17,7 @@ $cp345PublicReleaseTests = "crates\ep_runtime\src\ideal_loads\calc\$cp345Stem\te
 $cp345ReleaseCorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\$cp345Stem\tests\release_corruption.rs"
 $cp345CalcRoot = "crates\ep_runtime\src\ideal_loads\calc.rs"
 $cp345Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
-Assert-Contains -Path $cp345Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361 binding order"
+Assert-Contains -Path $cp345Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361-to-CP362 binding order"
 $cp345ScheduledOutput = "crates\ep_runtime\src\ideal_loads\binding\scheduled_output.rs"
 $cp345BindingAdapter = "crates\ep_runtime\src\ideal_loads\binding\$cp345Stem.rs"
 $cp345BindingTestsRoot = "crates\ep_runtime\src\ideal_loads\binding_tests.rs"
@@ -267,6 +267,10 @@ function Assert-Cp345BindingContract {
         $body,
         '(?s)let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =\s*advance_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit\([^;]+?\)\?;'
     )
+    $cp362Call = [regex]::Match(
+        $body,
+        '(?s)let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =\s*advance_cooling_humidistat_supply_humidity_ratio_mixed_air_limit\([^;]+?\)\?;'
+    )
     $numerical = [regex]::Match(
         $body,
         '(?s)let\s+coupling\s*=\s*complete_direct_zone_purchased_air_coupling\s*\(\s*DirectZonePurchasedAirCouplingInput\s*\{'
@@ -290,6 +294,7 @@ function Assert-Cp345BindingContract {
         -not $cp359Call.Success -or
         -not $cp360Call.Success -or
         -not $cp361Call.Success -or
+        -not $cp362Call.Success -or
         -not $numerical.Success -or
         $cp345Call.Index -lt ($cp344Call.Index + $cp344Call.Length) -or
         $cp346Call.Index -lt ($cp345Call.Index + $cp345Call.Length) -or
@@ -308,7 +313,8 @@ function Assert-Cp345BindingContract {
         $cp359Call.Index -lt ($cp358Call.Index + $cp358Call.Length) -or
         $cp360Call.Index -lt ($cp359Call.Index + $cp359Call.Length) -or
         $cp361Call.Index -lt ($cp360Call.Index + $cp360Call.Length) -or
-        $numerical.Index -lt ($cp361Call.Index + $cp361Call.Length)
+        $cp362Call.Index -lt ($cp361Call.Index + $cp361Call.Length) -or
+        $numerical.Index -lt ($cp362Call.Index + $cp362Call.Length)
     ) {
         throw "Binding must execute CP344 then CP345 then CP346 then CP347 then CP348 then CP349 then CP350 then CP351 then CP352 then CP353 then CP354 then CP355 then CP356 then CP357 then CP358 then CP359 then CP360 then CP361 before unchanged numerical coupling"
     }
@@ -400,8 +406,13 @@ function Assert-Cp345BindingContract {
             },
             [PSCustomObject]@{
                 Start = $cp361Call.Index + $cp361Call.Length
+                End = $cp362Call.Index
+                Description = "CP361-to-CP362"
+            },
+            [PSCustomObject]@{
+                Start = $cp362Call.Index + $cp362Call.Length
                 End = $numerical.Index
-                Description = "CP361-to-numerical"
+                Description = "CP362-to-numerical"
             }
         )) {
         $code = $body.Substring($interval.Start, $interval.End - $interval.Start)
@@ -773,7 +784,7 @@ $cp345PipelineRootText = Read-RepoText -Path $cp345PipelineRoot
 Assert-Cp345PipelineRootContract -Text $cp345PipelineRootText
 Assert-Contains -Path $cp345PipelineRoot -Pattern ('"' + $cp345LifecycleField + '":\s*result\s*\.' + $cp345LifecycleField + '\s*\.as_ref\(\)\s*\.map\(') -Description "pipeline CP345 lifecycle JSON field"
 Assert-Contains -Path $cp345PipelineRoot -Pattern 'purchased_air_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment::validate_direct_lifecycle\s*\(' -Description "pipeline CP345 direct validator wiring"
-Assert-Contains -Path $cp345PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp361_lifecycle_evidence' -Description "pipeline cumulative non-direct CP357 firewall regression"
+Assert-Contains -Path $cp345PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp362_lifecycle_evidence' -Description "pipeline cumulative non-direct CP362 firewall regression"
 $cp345ArbitraryIdealLoadsText = Read-RepoText -Path $cp345ArbitraryIdealLoadsTests
 $cp345ArbitraryDirectJsonTest = Get-Cp345RustBraceBlock `
     -Text $cp345ArbitraryIdealLoadsText `
@@ -980,7 +991,7 @@ foreach ($audit in @(
         "scripts\quality\ideal-loads-structure-audit\cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1",
         "scripts\quality\ideal-loads-structure-audit\cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit.ps1"
     )) {
-    Assert-Contains -Path $audit -Pattern 'non_direct_runtime_rejects_cp316_through_cp361_lifecycle_evidence' -Description "historical non-direct firewall reaches CP357"
+    Assert-Contains -Path $audit -Pattern 'non_direct_runtime_rejects_cp316_through_cp362_lifecycle_evidence' -Description "historical non-direct firewall reaches CP362"
 }
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1" -Pattern 'cp347_direct_coupled_runtime_completes_none_case_after_g_f_l_and_skips_unit_off' -Description "historical coupled audit reaches CP347"
 
@@ -996,13 +1007,13 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP345 after CP344 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 299' -Description "CP345 cumulative inventory total through CP358"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 300' -Description "CP345 cumulative inventory total through CP358"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP345 cumulative uncalled inventory"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment\.ps1"' -Description "CP345 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment\.ps1::dot_sources' -Description "CP345 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 299 \|' -Description "CP345 generated script total through CP358"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 300 \|' -Description "CP345 generated script total through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP345 generated public script total"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 59 \|' -Description "CP345 generated internal script total through CP358"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 60 \|' -Description "CP345 generated internal script total through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP345 generated uncalled script total"
 
 # The audit itself proves its scoped negative checks reject representative

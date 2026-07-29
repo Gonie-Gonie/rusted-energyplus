@@ -65,6 +65,8 @@ use super::{
     PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitError,
     PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitLifecycleSummary,
+    PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitError,
+    PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitLifecycleSummary,
     PurchasedAirCalcCoolingMixedAirCallError, PurchasedAirCalcCoolingMixedAirCallLifecycleSummary,
     PurchasedAirCalcCoolingOaMaxFlowBodyError,
     PurchasedAirCalcCoolingOaMaxFlowBodyLifecycleSummary,
@@ -154,6 +156,7 @@ use super::{
     purchased_air_calc_cooling_humidistat_moisture_demand_assignment_lifecycle_summary,
     purchased_air_calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment_lifecycle_summary,
     purchased_air_calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit_lifecycle_summary,
+    purchased_air_calc_cooling_humidistat_supply_humidity_ratio_mixed_air_limit_lifecycle_summary,
     purchased_air_calc_cooling_mixed_air_call_lifecycle_summary,
     purchased_air_calc_cooling_oa_max_flow_body_lifecycle_summary,
     purchased_air_calc_cooling_oa_max_flow_gate_lifecycle_summary,
@@ -208,6 +211,7 @@ mod cooling_humidistat_case_entry_validation;
 mod cooling_humidistat_moisture_demand_assignment_validation;
 mod cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment_validation;
 mod cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit_validation;
+mod cooling_humidistat_supply_humidity_ratio_mixed_air_limit_validation;
 mod cooling_mixed_air_call_validation;
 mod cooling_oa_max_flow_body_validation;
 mod cooling_oa_max_flow_validation;
@@ -467,6 +471,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded Humidistat supply-humidity-ratio-for-dehumidification minimum-limit lifecycle report.
     pub calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit_lifecycle:
         PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitLifecycleSummary,
+    /// Persistent bounded Humidistat purchased-air supply-humidity-ratio mixed-air-limit lifecycle report.
+    pub calc_cooling_humidistat_supply_humidity_ratio_mixed_air_limit_lifecycle:
+        PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -679,6 +686,10 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     /// Final Humidistat supply-humidity-ratio-for-dehumidification minimum-limit summary could not resolve the bound unit.
     CalcCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitLifecycle(
         PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitError,
+    ),
+    /// Final Humidistat purchased-air supply-humidity-ratio mixed-air-limit summary could not resolve the bound unit.
+    CalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitLifecycle(
+        PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitError,
     ),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
@@ -1157,6 +1168,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A Humidistat purchased-air supply-humidity-ratio mixed-air-limit lifecycle invariant did not match the run.
+    CalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -1422,6 +1442,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
+    /// A Humidistat purchased-air supply-humidity-ratio mixed-air-limit snapshot did not match its release call.
+    UnexpectedCalculationCoolingHumidistatSupplyHumidityRatioMixedAirLimit {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
     /// A successful CP301 call did not retain source-setpoint demand provenance.
     UnexpectedDemandInputKind {
         /// Zero-based nominal system-step index.
@@ -1684,6 +1709,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir Humidistat supply-humidity-ratio-for-dehumidification minimum-limit lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir Humidistat purchased-air supply-humidity-ratio mixed-air-limit lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -2109,6 +2138,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir Humidistat supply-humidity-ratio-for-dehumidification minimum-limit lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir Humidistat purchased-air supply-humidity-ratio mixed-air-limit lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -2404,6 +2441,12 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its Humidistat supply-humidity-ratio-for-dehumidification minimum limit"
+            ),
+            Self::UnexpectedCalculationCoolingHumidistatSupplyHumidityRatioMixedAirLimit {
+                timestep_index,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its Humidistat purchased-air supply-humidity-ratio mixed-air limit"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -3173,6 +3216,16 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             return Err(
                 DirectZonePurchasedAirCoupledRuntimeError::
                     UnexpectedCalculationCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimit {
+                        timestep_index,
+                    },
+            );
+        }
+        if !cooling_humidistat_supply_humidity_ratio_mixed_air_limit_validation::
+            snapshot_matches_release(output, timestep_index + 1, &binding)
+        {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingHumidistatSupplyHumidityRatioMixedAirLimit {
                         timestep_index,
                     },
             );
@@ -4030,6 +4083,23 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             &binding,
         )?;
 
+    let calc_cooling_humidistat_supply_humidity_ratio_mixed_air_limit_lifecycle =
+        purchased_air_calc_cooling_humidistat_supply_humidity_ratio_mixed_air_limit_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::
+                CalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitLifecycle,
+        )?;
+    cooling_humidistat_supply_humidity_ratio_mixed_air_limit_validation::validate_lifecycle(
+        &calc_cooling_humidistat_supply_humidity_ratio_mixed_air_limit_lifecycle,
+        &calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
+
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
         zone_humidity_ratios,
@@ -4143,6 +4213,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_humidistat_moisture_demand_assignment_lifecycle,
             calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment_lifecycle,
             calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit_lifecycle,
+            calc_cooling_humidistat_supply_humidity_ratio_mixed_air_limit_lifecycle,
         },
         state,
         results,

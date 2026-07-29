@@ -14,7 +14,7 @@ $cp332Tests = "crates\ep_runtime\src\ideal_loads\calc\cooling_positive_supply_te
 $cp332ReleaseCorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_positive_supply_temperature_assignment\tests\release_corruption.rs"
 $cp332CalcRoot = "crates\ep_runtime\src\ideal_loads\calc.rs"
 $cp332Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
-Assert-Contains -Path $cp332Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361 binding order"
+Assert-Contains -Path $cp332Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361-to-CP362 binding order"
 $cp332ScheduledOutput = "crates\ep_runtime\src\ideal_loads\binding\scheduled_output.rs"
 $cp332BindingAdapter = "crates\ep_runtime\src\ideal_loads\binding\cooling_positive_supply_temperature_assignment.rs"
 $cp332BindingTestsRoot = "crates\ep_runtime\src\ideal_loads\binding_tests.rs"
@@ -558,6 +558,11 @@ $postCp339BeforeNumericalCodeForCp332 = [regex]::Replace(
 $postCp339BeforeNumericalCodeForCp332 = [regex]::Replace(
     $postCp339BeforeNumericalCodeForCp332,
     '(?s)let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =\s*advance_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit\([^;]+?\)\?;',
+    ''
+)
+$postCp339BeforeNumericalCodeForCp332 = [regex]::Replace(
+    $postCp339BeforeNumericalCodeForCp332,
+    '(?s)let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =\s*advance_cooling_humidistat_supply_humidity_ratio_mixed_air_limit\([^;]+?\)\?;',
     ''
 )
 if ($postCp339BeforeNumericalCodeForCp332 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {

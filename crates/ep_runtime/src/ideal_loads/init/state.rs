@@ -1,10 +1,8 @@
 //! Retained module and per-unit state for `InitPurchasedAir`.
 
-mod diagnostic;
-mod unit;
-mod witnesses;
+#[rustfmt::skip] mod diagnostic; #[rustfmt::skip] mod unit; #[rustfmt::skip] mod witnesses;
 
-pub use diagnostic::*;
+pub use self::diagnostic::*;
 
 use std::collections::BTreeMap;
 
@@ -179,6 +177,7 @@ pub struct PurchasedAirRuntimeState {
     #[rustfmt::skip] cooling_humidistat_moisture_demand_assignment_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidistatMoistureDemandAssignmentSnapshot>,
     #[rustfmt::skip] cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationAssignmentSnapshot>,
     #[rustfmt::skip] cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitSnapshot>,
+    #[rustfmt::skip] cooling_humidistat_supply_humidity_ratio_mixed_air_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitSnapshot>,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -334,6 +333,7 @@ pub struct PurchasedAirUnitRuntimeState {
     #[doc = "Persistent bounded Humidistat moisture-demand assignment state."] #[rustfmt::skip] pub calc_cooling_humidistat_moisture_demand_assignment: PurchasedAirCalcCoolingHumidistatMoistureDemandAssignmentRuntimeState,
     #[doc = "Persistent bounded Humidistat supply-humidity-ratio-for-dehumidification assignment state."] #[rustfmt::skip] pub calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment: PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationAssignmentRuntimeState,
     #[doc = "Persistent bounded Humidistat supply-humidity-ratio-for-dehumidification minimum-limit state."] #[rustfmt::skip] pub calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit: PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitRuntimeState,
+    #[doc = "Persistent bounded Humidistat purchased-air supply-humidity-ratio mixed-air-limit state."] #[rustfmt::skip] pub calc_cooling_humidistat_supply_humidity_ratio_mixed_air_limit: PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.

@@ -32,6 +32,7 @@ use super::{
     PurchasedAirCalcCoolingHumidistatMoistureDemandAssignmentError as CoolingHumidistatMoistureDemandAssignmentError,
     PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationAssignmentError as CoolingHumidistatSupplyHumidityRatioForDehumidificationAssignmentError,
     PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitError as CoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitError,
+    PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitError as CoolingHumidistatSupplyHumidityRatioMixedAirLimitError,
     PurchasedAirCalcCoolingMixedAirCallError, PurchasedAirCalcCoolingOaMaxFlowBodyError,
     PurchasedAirCalcCoolingOaMaxFlowGateError,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitCpAirAssignmentError as CoolingSupplyCapacityLimitCpAirAssignmentError,
@@ -108,6 +109,7 @@ mod cooling_humidistat_case_entry;
 mod cooling_humidistat_moisture_demand_assignment;
 mod cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment;
 mod cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit;
+mod cooling_humidistat_supply_humidity_ratio_mixed_air_limit;
 mod cooling_positive_supply_capacity_limit_cp_air_assignment;
 mod cooling_positive_supply_capacity_limit_guard;
 mod cooling_positive_supply_capacity_limit_sensible_output_assignment;
@@ -141,6 +143,7 @@ use cooling_humidistat_case_entry::advance_cooling_humidistat_case_entry;
 use cooling_humidistat_moisture_demand_assignment::advance_cooling_humidistat_moisture_demand_assignment;
 use cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment::advance_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment;
 use cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit::advance_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit;
+use cooling_humidistat_supply_humidity_ratio_mixed_air_limit::advance_cooling_humidistat_supply_humidity_ratio_mixed_air_limit;
 use cooling_positive_supply_capacity_limit_cp_air_assignment::advance_positive_supply_capacity_limit_cp_air_assignment;
 use cooling_constant_shr_supply_humidity_ratio_overdrying_limit::advance_cooling_constant_shr_supply_humidity_ratio_overdrying_limit;
 use cooling_positive_supply_capacity_limit_guard::advance_positive_supply_capacity_limit_guard;
@@ -865,6 +868,10 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimit(
         CoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitError,
     ),
+    /// The bounded Humidistat purchased-air supply-humidity-ratio mixed-air limit rejected its release state.
+    CalculationCoolingHumidistatSupplyHumidityRatioMixedAirLimit(
+        CoolingHumidistatSupplyHumidityRatioMixedAirLimitError,
+    ),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -1401,6 +1408,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment,
         )?;
+    let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =
+        advance_cooling_humidistat_supply_humidity_ratio_mixed_air_limit(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1490,6 +1503,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_humidistat_moisture_demand_assignment,
         calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment,
         calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit,
+        calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit,
         coupling,
     })
 }

@@ -127,7 +127,7 @@ fn assert_numerical_nonfeed(runtime: &Value, results: &Value) {
                 .expect("supply-node humidity endpoint")
                 .to_bits(),
             cp345_bits,
-            "CP357 evidence must not replace the {endpoint} numerical supply humidity"
+            "source-order evidence must not replace the {endpoint} numerical supply humidity"
         );
     }
 }

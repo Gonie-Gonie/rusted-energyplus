@@ -51,6 +51,7 @@ mod cooling_oa_max_flow_gate_tests;
 #[rustfmt::skip] #[path = "binding/cooling_humidistat_moisture_demand_assignment_tests.rs"] mod cooling_humidistat_moisture_demand_assignment_tests;
 #[rustfmt::skip] #[path = "binding/cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment_tests.rs"] mod cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment_tests;
 #[rustfmt::skip] #[path = "binding/cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit_tests.rs"] mod cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit_tests;
+#[rustfmt::skip] #[path = "binding/cooling_humidistat_supply_humidity_ratio_mixed_air_limit_tests.rs"] mod cooling_humidistat_supply_humidity_ratio_mixed_air_limit_tests;
 #[rustfmt::skip] #[path = "binding/cooling_constant_shr_supply_humidity_ratio_minimum_limit_tests.rs"] mod cooling_constant_shr_supply_humidity_ratio_minimum_limit_tests;
 #[rustfmt::skip] #[path = "binding/cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_tests.rs"] mod cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_tests;
 #[rustfmt::skip] #[path = "binding/cooling_constant_shr_supply_humidity_ratio_overdrying_limit_tests.rs"] mod cooling_constant_shr_supply_humidity_ratio_overdrying_limit_tests;

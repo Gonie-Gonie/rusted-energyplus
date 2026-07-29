@@ -15,6 +15,7 @@ use super::super::{
     PurchasedAirCalcCoolingHumidistatMoistureDemandAssignmentSnapshot,
     PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationAssignmentSnapshot,
     PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitSnapshot,
+    PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitSnapshot,
     PurchasedAirCalcCoolingMixedAirCallSnapshot, PurchasedAirCalcCoolingOaMaxFlowBodySnapshot,
     PurchasedAirCalcCoolingOaMaxFlowGateSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitCpAirAssignmentSnapshot,
@@ -206,6 +207,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered Humidistat supply-humidity-ratio-for-dehumidification minimum-limit snapshot.
     pub calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit:
         PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitSnapshot,
+    /// Source-ordered Humidistat purchased-air supply-humidity-ratio mixed-air-limit snapshot.
+    pub calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit:
+        PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioMixedAirLimitSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

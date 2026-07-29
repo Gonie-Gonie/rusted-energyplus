@@ -23805,3 +23805,65 @@ Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
 public, 59 internal, and zero unused. Parent/Calc states and all readiness,
 support, capability, feature/evidence, numerical, output, status, conformance,
 and Roadmap claims remain unchanged.
+
+## CP362 Humidistat Mixed-Air-Limit Placement
+
+CP362 sits immediately after CP361 and before unchanged numerical coupling.
+It maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2232:
+
+```cpp
+PurchAir.SupplyHumRat = min(PurchAir.MixedAirHumRat, SupplyHumRatForDehum);
+```
+
+The raw source remains locked by SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its dependency-ordered sites are:
+
+1. `read-purchased-air-mixed-air-humidity-ratio-for-humidistat-mixed-air-limit-minimum`
+2. `read-local-supply-humidity-ratio-for-dehumidification-for-humidistat-mixed-air-limit-minimum`
+3. `apply-source-shaped-two-argument-minimum-for-humidistat-mixed-air-limit`
+4. `assign-purchased-air-supply-humidity-ratio-for-humidistat-mixed-air-limit`
+
+This witness order does not claim C++ operand-evaluation order. Physical line
+2233, the Humidistat-case `break;`, is first excluded and the next CP363
+candidate. The line-2234 `ConstantSupplyHumidityRatio` label, line-2235 body,
+line-2245 continuation, and later behavior remain excluded.
+
+For routes `U/N/P/C0/Q/H/CSH`, exact state remains
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`, and `A=F+L`. Every
+CP362 site counter equals CP361's `H`, and
+`source_site_execution_count=4H`; only private `H` executes. Direct release
+is `C0=S`, `Q=H=CSH=0`, reads no active operand, and publishes false site
+flags plus complete-null numeric evidence.
+
+The same-call recursively completed bit-exact CP329 latest/private
+`mixed_air_humidity_ratio` is the sole left owner. The same-call recursively
+completed bit-exact CP361
+`resulting_supply_humidity_ratio_for_dehumidification` is the sole right
+owner. CP329 already proves finite no-OA mixed-air state. CP362 adds no
+finite/range gate, clamp, normalization, default, diagnostic, psychrometric
+call, or coercion. CP345, CP319, typed-model or sizing rereads, caller copies,
+Node services, and the numerical DTO cannot replace these owners.
+
+Minimum selection reuses CP334 exactly as
+`if left < right { left } else { right }`, not `f64::min` and not with
+reversed operands. Ties, signed-zero ties, and unordered comparisons retain
+the right CP361 bits. `(-0,+0)` therefore yields `+0`, `(+0,-0)` yields
+`-0`, and a right quiet-NaN payload remains authoritative.
+
+Evidence preserves CP361-to-CP362-to-unchanged-numerical order under
+`purchased_air_calc_cooling_humidistat_supply_humidity_ratio_mixed_air_limit_lifecycle`.
+CP362's assignment to `PurchAir.SupplyHumRat` is private characterization;
+it cannot consume, reconcile with, feed, or replace
+`DirectZonePurchasedAirCouplingInput`, `prediction.zone_demand`, numerical DTO
+state, or result state. CP345 still owns actual result-store first/last
+supply-humidity bits. Non-direct paths publish `None` and reject CP362
+evidence.
+
+Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Script inventory becomes 300 total, 240
+public, 60 internal, and zero unused. Parent/Calc states and all readiness,
+support, capability, feature/evidence, numerical, output, status, conformance,
+and Roadmap claims remain unchanged.
