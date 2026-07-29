@@ -2789,7 +2789,7 @@ CP356 never enters, consumes, reconciles with, feeds, or replaces the numerical
 DTO. Non-direct paths publish `None` and reject attached CP356 evidence.
 Counts remain exactly 32 algorithms and 293 routines, split 58 `state_mapped`
 plus 235 `source_mapped`, with 170 required. The added internal audit changes
-only the script inventory to 295 total, 240 public, 55 internal, and zero
+only the script inventory to 296 total, 240 public, 56 internal, and zero
 unused. Both parents remain `scaffold`/`none`, both Calc routines remain
 `source_mapped`, and support, readiness, run state, capability,
 feature/evidence, numerical conformance, output ownership, status,
@@ -2828,7 +2828,56 @@ CP357 evidence.
 
 Counts remain exactly 32 algorithms and 293 routines, split 58 `state_mapped`
 plus 235 `source_mapped`, with 170 required. The added internal audit changes
-only the script inventory to 295 total, 240 public, 55 internal, and zero
+only the script inventory to 296 total, 240 public, 56 internal, and zero
+unused. Both parents remain `scaffold`/`none`, both Calc routines remain
+`source_mapped`, and support, readiness, run state, capability,
+feature/evidence, numerical conformance, output ownership, status,
+conformance, and Roadmap state remain unchanged.
+
+CP358 now maps only the Cooling dehumidification-control `Humidistat` case
+entry at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical line 2228:
+
+```cpp
+case HumControl::Humidistat: {
+```
+
+The locked raw SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its sole source site is
+`enter-purchased-air-dehumidification-control-humidistat-case`. Physical
+executable line 2229,
+`MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToDehumidSP;`,
+is first excluded; its Zone moisture-demand lookup, read, assignment, and all
+later Humidistat-body behavior remain unimplemented. Private constant-SHR
+route `Q` has already broken from the switch and continues dynamically at line
+2245, so it cannot enter line 2228 or execute line 2229.
+
+Routes remain `U/N/P/C0/Q/H/CSH`, with
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`, and
+`A = F+L`. `Q` equals CP357 constant-SHR case-break executions, while `H`
+equals CP357 Humidistat-selected skips and
+`source_site_execution_count = humidistat_case_entry_count = H`. Exact direct
+release remains the completed `None` route: `C0 = S`, `Q = H = CSH = 0`, the
+Humidistat-entry flag is false, and CP358 is a complete skip. Private active
+`H` enters the case exactly once; private `Q` records a completed skip and
+cannot fall through into the Humidistat case.
+
+Recursively validated, same-call, bit-exact CP357 lifecycle/snapshot evidence
+is the sole predecessor owner. CP358 owns no numeric operand or result,
+arithmetic, comparison, finite/range gate, clamp, normalization, default,
+diagnostic, or coercion. Binding and direct-only evidence preserve
+CP357-to-CP358-to-unchanged-numerical order under
+`purchased_air_calc_cooling_humidistat_case_entry_lifecycle`; CP358 neither
+enters nor feeds `DirectZonePurchasedAirCouplingInput` or any numerical DTO.
+Actual result-store first/last supply-humidity-ratio bits remain owned by the
+unchanged CP345 numerical path. Non-direct paths publish `None` and reject
+CP358 evidence.
+
+Counts remain exactly 32 algorithms and 293 routines, split 58 `state_mapped`
+plus 235 `source_mapped`, with 170 required. The added internal audit changes
+only the script inventory to 296 total, 240 public, 56 internal, and zero
 unused. Both parents remain `scaffold`/`none`, both Calc routines remain
 `source_mapped`, and support, readiness, run state, capability,
 feature/evidence, numerical conformance, output ownership, status,

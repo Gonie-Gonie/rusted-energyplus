@@ -155,9 +155,10 @@ function Assert-Cp350BindingContract {
     $cp355 = $Text.IndexOf("let calculation_cooling_constant_shr_supply_humidity_ratio_minimum_limit =")
     $cp356 = $Text.IndexOf("let calculation_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit =")
     $cp357 = $Text.IndexOf("let calculation_cooling_constant_shr_case_break =")
+    $cp358 = $Text.IndexOf("let calculation_cooling_humidistat_case_entry =")
     $numerical = $Text.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
-    if ($cp349 -lt 0 -or $cp350 -le $cp349 -or $cp351 -le $cp350 -or $cp352 -le $cp351 -or $cp353 -le $cp352 -or $cp354 -le $cp353 -or $cp355 -le $cp354 -or $cp356 -le $cp355 -or $cp357 -le $cp356 -or $numerical -le $cp357) {
-        throw "Binding must execute CP349 then CP350 then CP351 then CP352 then CP353 then CP354 then CP355 then CP356 then CP357 before numerical coupling"
+    if ($cp349 -lt 0 -or $cp350 -le $cp349 -or $cp351 -le $cp350 -or $cp352 -le $cp351 -or $cp353 -le $cp352 -or $cp354 -le $cp353 -or $cp355 -le $cp354 -or $cp356 -le $cp355 -or $cp357 -le $cp356 -or $cp358 -le $cp357 -or $numerical -le $cp358) {
+        throw "Binding must execute CP349 then CP350 then CP351 then CP352 then CP353 then CP354 then CP355 then CP356 then CP357 then CP358 before numerical coupling"
     }
     $dto = Get-Cp350RustBraceBlock -Text $Text.Substring($numerical) -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{' -Description "CP350 numerical DTO"
     if ($dto -match '(?i)cp350|sensible_output_assignment') {
@@ -312,7 +313,7 @@ Assert-Contains -Path $cp350PipelineRoot -Pattern ('mod ' + [regex]::Escape($cp3
 Assert-Contains -Path $cp350PipelineRoot -Pattern ('"' + $cp350Lifecycle + '":\s*result\s*\.' + $cp350Lifecycle) -Description "CP350 lifecycle JSON"
 Assert-Contains -Path $cp350PipelineValidation -Pattern 'cp_air_assignment_cp349' -Description "pipeline CP349 predecessor"
 Assert-Contains -Path $cp350PipelineValidation -Pattern '(?s)assigned\s*\.checked_mul\(.*?SENSIBLE_OUTPUT_ASSIGNMENT_SOURCE_ORDER\s*\.len\(\)' -Description "pipeline checked 8Q"
-Assert-Contains -Path $cp350PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp357_lifecycle_evidence' -Description "cumulative firewall"
+Assert-Contains -Path $cp350PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp358_lifecycle_evidence' -Description "cumulative firewall"
 Assert-Contains -Path $cp350ArbitraryTests -Pattern $cp350Lifecycle -Description "arbitrary CP350 lifecycle"
 foreach ($field in @(
         "supply_mass_flow_rate_kg_per_s", "cp_air_j_per_kg_k",
@@ -409,7 +410,7 @@ foreach ($historical in @("cp326-cooling-supply-mass-flow-limit-body.ps1") + @(
 }
 foreach ($historical in 334..349) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp357_lifecycle_evidence' -Description "historical CP357 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp358_lifecycle_evidence' -Description "historical CP357 firewall"
 }
 $mainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp349AuditIndex = $mainAuditText.IndexOf("cp349-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1")
@@ -418,13 +419,13 @@ $completionIndex = $mainAuditText.IndexOf('Write-Host "IdealLoads structure audi
 if ($cp349AuditIndex -lt 0 -or $cp350AuditIndex -le $cp349AuditIndex -or $completionIndex -le $cp350AuditIndex) {
     throw "Master audit must dot-source CP350 after CP349 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 295' -Description "CP350 script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 296' -Description "CP350 script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP350 zero uncalled"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp350-' -Description "CP350 inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'cp350-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment\.ps1::dot_sources' -Description "CP350 caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 295 \|' -Description "generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 296 \|' -Description "generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 55 \|' -Description "generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 56 \|' -Description "generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated uncalled"
 
 # Audit self-tests reject arithmetic, algebra, DTO, firewall, and IEEE drift.

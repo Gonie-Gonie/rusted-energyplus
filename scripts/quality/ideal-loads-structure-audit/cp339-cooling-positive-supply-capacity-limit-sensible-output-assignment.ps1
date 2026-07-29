@@ -405,6 +405,11 @@ $cp339IntervalCode = [regex]::Replace(
     '(?s)let calculation_cooling_constant_shr_case_break =\s*advance_cooling_constant_shr_case_break\([^;]+?\)\?;',
     ''
 )
+$cp339IntervalCode = [regex]::Replace(
+    $cp339IntervalCode,
+    '(?s)let calculation_cooling_humidistat_case_entry =\s*advance_cooling_humidistat_case_entry\([^;]+?\)\?;',
+    ''
+)
     if ($cp339IntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
         throw "No intermediary helper call may execute $($cp339Interval.Description)"
     }
@@ -480,7 +485,7 @@ Assert-Contains -Path $cp339DirectAssertions -Pattern 'purchased_air_calc_coolin
 Assert-Contains -Path $cp339DirectAssertions -Pattern 'purchased_air_calc_cooling_mixed_air_call_lifecycle' -Description "direct-run CP329 operand evidence"
 Assert-Contains -Path $cp339DirectAssertions -Pattern 'purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle' -Description "direct-run CP336 operand evidence"
 Assert-Contains -Path $cp339NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle' -Description "non-direct CP339 null evidence"
-Assert-Contains -Path $cp339PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp357_lifecycle_evidence' -Description "non-direct CP339 through CP357 evidence rejection"
+Assert-Contains -Path $cp339PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp358_lifecycle_evidence' -Description "non-direct CP339 through CP358 evidence rejection"
 Assert-NotContains -Path $cp339Pipeline -Pattern 'latest_numerical|numerical_supply_mass_flow|final_supply_mass_flow|complete_direct_zone_purchased_air_coupling|cp_air_j_per_kg_k|MaxCoolTotCap|maximum_total_cooling|sizing' -Description "numerical DTO, CpAir, capacity, or sizing feed in CP339 pipeline"
 
 # Exactly two algorithm addenda, two capability addenda, and six target
@@ -642,10 +647,10 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP339 after CP338 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 295' -Description "CP339 cumulative inventory total through CP357"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 296' -Description "CP339 cumulative inventory total through CP358"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment\.ps1"' -Description "CP339 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment\.ps1::dot_sources' -Description "CP339 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 295 \|' -Description "CP339 generated script count through CP357"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 296 \|' -Description "CP339 generated script count through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP339 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 55 \|' -Description "CP339 generated internal script count through CP357"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 56 \|' -Description "CP339 generated internal script count through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP339 generated uncalled script count"

@@ -13,6 +13,8 @@ use super::{
     advance_direct_no_oa_calc_cooling_constant_shr_case_break,
     completed_direct_cooling_constant_shr_case_break_is_consistent,
     cooling_constant_shr_case_break_snapshot_is_exact_direct_release,
+    private_humidistat_counterfactual_from_direct_release,
+    private_humidistat_counterfactual_links_to_direct_release,
     purchased_air_calc_cooling_constant_shr_case_break_lifecycle_summary,
 };
 use crate::ideal_loads::calc::cooling_constant_shr_supply_humidity_ratio_mixed_air_limit::{
@@ -149,8 +151,7 @@ fn public_direct_routes_skip_break_and_private_q_uses_only_cp356_bridge() {
         (-1_000.0, 1.0, false, (false, false, false, true)),
     ] {
         let (mut runtime, system, predecessor) =
-            completed_cp356_case(demand, availability, capacity)
-                .expect("completed CP356 case");
+            completed_cp356_case(demand, availability, capacity).expect("completed CP356 case");
         let snapshot = advance_direct_no_oa_calc_cooling_constant_shr_case_break(
             &mut runtime,
             &system,
@@ -196,6 +197,39 @@ fn public_direct_routes_skip_break_and_private_q_uses_only_cp356_bridge() {
         state.dehumidification_control_constant_sensible_heat_ratio_case_break_count,
         1
     );
+}
+
+#[test]
+fn canonical_private_humidistat_bridge_is_exact_and_fail_closed() {
+    let (mut runtime, system, predecessor) =
+        completed_cp356_case(-100_000.0, 1.0, true).expect("active direct CP356");
+    let direct = advance_direct_no_oa_calc_cooling_constant_shr_case_break(
+        &mut runtime,
+        &system,
+        predecessor,
+    )
+    .expect("direct CP357");
+    let unit = runtime.units.get(&system.id).expect("selected unit");
+    let private_h =
+        private_humidistat_counterfactual_from_direct_release(&runtime, unit, &system, direct)
+            .expect("canonical private-H CP357");
+    assert_eq!(
+        private_h.predecessor_dehumidification_control_type,
+        Some(DehumidificationControlType::Humidistat)
+    );
+    assert!(private_h.predecessor_dehumidification_control_humidistat_case_selected_skip);
+    assert!(private_h.dehumidification_control_humidistat_case_selected_skip);
+    assert!(!private_h.dehumidification_control_none_case_completed_skip);
+    assert!(!private_h.dehumidification_control_constant_sensible_heat_ratio_case_exited_via_break);
+    assert!(private_humidistat_counterfactual_links_to_direct_release(
+        &runtime, unit, &system, direct, private_h
+    ));
+
+    let mut forged = private_h;
+    forged.parent_call_ordinal = forged.parent_call_ordinal.wrapping_add(1);
+    assert!(!private_humidistat_counterfactual_links_to_direct_release(
+        &runtime, unit, &system, direct, forged
+    ));
 }
 
 #[test]

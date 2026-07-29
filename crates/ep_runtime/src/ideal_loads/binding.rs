@@ -28,6 +28,7 @@ use super::{
     PurchasedAirCalcCoolingDehumidificationFlowError, PurchasedAirCalcCoolingEconomizerBodyError,
     PurchasedAirCalcCoolingEconomizerConditionError, PurchasedAirCalcCoolingEconomizerGuardError,
     PurchasedAirCalcCoolingEntryGateError, PurchasedAirCalcCoolingHumidificationFlowError,
+    PurchasedAirCalcCoolingHumidistatCaseEntryError as CoolingHumidistatCaseEntryError,
     PurchasedAirCalcCoolingMixedAirCallError, PurchasedAirCalcCoolingOaMaxFlowBodyError,
     PurchasedAirCalcCoolingOaMaxFlowGateError,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitCpAirAssignmentError as CoolingSupplyCapacityLimitCpAirAssignmentError,
@@ -100,6 +101,7 @@ mod cooling_constant_shr_case_break;
 mod cooling_constant_shr_supply_humidity_ratio_minimum_limit;
 mod cooling_constant_shr_supply_humidity_ratio_mixed_air_limit;
 mod cooling_constant_shr_supply_humidity_ratio_overdrying_limit;
+mod cooling_humidistat_case_entry;
 mod cooling_positive_supply_capacity_limit_cp_air_assignment;
 mod cooling_positive_supply_capacity_limit_guard;
 mod cooling_positive_supply_capacity_limit_sensible_output_assignment;
@@ -129,6 +131,7 @@ mod scheduled_output;
 use cooling_constant_shr_supply_humidity_ratio_minimum_limit::advance_cooling_constant_shr_supply_humidity_ratio_minimum_limit;
 use cooling_constant_shr_supply_humidity_ratio_mixed_air_limit::advance_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit;
 use cooling_constant_shr_case_break::advance_cooling_constant_shr_case_break;
+use cooling_humidistat_case_entry::advance_cooling_humidistat_case_entry;
 use cooling_positive_supply_capacity_limit_cp_air_assignment::advance_positive_supply_capacity_limit_cp_air_assignment;
 use cooling_constant_shr_supply_humidity_ratio_overdrying_limit::advance_cooling_constant_shr_supply_humidity_ratio_overdrying_limit;
 use cooling_positive_supply_capacity_limit_guard::advance_positive_supply_capacity_limit_guard;
@@ -839,6 +842,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     ),
     /// The bounded constant-SHR case break rejected its release state.
     CalculationCoolingConstantShrCaseBreak(CoolingConstantShrCaseBreakError),
+    /// The bounded Humidistat case entry rejected its release state.
+    CalculationCoolingHumidistatCaseEntry(CoolingHumidistatCaseEntryError),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -1352,6 +1357,11 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         binding.system,
         calculation_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit,
     )?;
+    let calculation_cooling_humidistat_case_entry = advance_cooling_humidistat_case_entry(
+        input.purchased_air_runtime_state,
+        binding.system,
+        calculation_cooling_constant_shr_case_break,
+    )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1437,6 +1447,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_constant_shr_supply_humidity_ratio_minimum_limit,
         calculation_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit,
         calculation_cooling_constant_shr_case_break,
+        calculation_cooling_humidistat_case_entry,
         coupling,
     })
 }

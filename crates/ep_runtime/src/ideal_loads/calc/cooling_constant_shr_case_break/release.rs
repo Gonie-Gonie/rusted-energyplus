@@ -17,17 +17,23 @@ use crate::ideal_loads::{
 };
 
 mod prefix_validation;
+mod private_counterfactual;
 mod runtime_validation;
 mod snapshot_validation;
 
 #[cfg(test)]
 pub(in crate::ideal_loads::calc) use prefix_validation::private_active_predecessor_links_to_direct_release;
 use prefix_validation::{active_lineage_is_exact, case_break_links_to_predecessor};
+pub(in crate::ideal_loads::calc) use private_counterfactual::{
+    private_humidistat_counterfactual_from_direct_release,
+    private_humidistat_counterfactual_links_to_direct_release,
+};
 use runtime_validation::{
     calc_state_identities_match, call_order_is_pending, completed_state_is_consistent,
     next_transition_fits, pending_state_is_consistent,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_constant_shr_case_break_snapshot_is_exact_direct_release;
+pub(in crate::ideal_loads::calc) use snapshot_validation::snapshots_match_exact as cooling_constant_shr_case_break_snapshots_match_bit_exact;
 #[cfg(test)]
 pub(in crate::ideal_loads::calc) use snapshot_validation::snapshots_match_exact as snapshots_match_exact_for_test;
 

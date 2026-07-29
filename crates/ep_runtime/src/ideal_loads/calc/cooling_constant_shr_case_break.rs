@@ -10,12 +10,19 @@ mod state;
 mod tests;
 mod transition;
 
-#[allow(unused_imports)]
-pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_constant_shr_case_break_is_consistent;
 pub(in crate::ideal_loads) use release::cooling_constant_shr_case_break_snapshot_is_exact_direct_release;
 pub use release::{
     PurchasedAirCalcCoolingConstantShrCaseBreakError,
     advance_direct_no_oa_calc_cooling_constant_shr_case_break,
+};
+#[allow(unused_imports)]
+pub(in crate::ideal_loads::calc) use release::{
+    completed_direct_cooling_constant_shr_case_break_is_consistent,
+    cooling_constant_shr_case_break_snapshots_match_bit_exact,
+};
+pub(in crate::ideal_loads::calc) use release::{
+    private_humidistat_counterfactual_from_direct_release,
+    private_humidistat_counterfactual_links_to_direct_release,
 };
 pub(super) use state::PurchasedAirCalcCoolingConstantShrCaseBreakRetainedRoute;
 pub use state::PurchasedAirCalcCoolingConstantShrCaseBreakRuntimeState;

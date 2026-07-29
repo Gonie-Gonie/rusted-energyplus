@@ -406,6 +406,11 @@ $cp335IntervalCode = [regex]::Replace(
     '(?s)let calculation_cooling_constant_shr_case_break =\s*advance_cooling_constant_shr_case_break\([^;]+?\)\?;',
     ''
 )
+$cp335IntervalCode = [regex]::Replace(
+    $cp335IntervalCode,
+    '(?s)let calculation_cooling_humidistat_case_entry =\s*advance_cooling_humidistat_case_entry\([^;]+?\)\?;',
+    ''
+)
     if ($cp335IntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
         throw "No intermediary helper call may execute $($cp335Interval.Description)"
     }
@@ -447,7 +452,7 @@ Assert-Contains -Path $cp335DirectAssertions -Pattern 'const SOURCE_ORDER:\s*\[&
 Assert-Contains -Path $cp335DirectAssertions -Pattern 'executions \* SOURCE_ORDER\.len\(\) as u64' -Description "direct-run CP335 dynamic source count"
 Assert-Contains -Path $cp335DirectAssertions -Pattern 'purchased_air_calc_cooling_mixed_air_call_lifecycle' -Description "direct-run CP329 bit provenance"
 Assert-Contains -Path $cp335NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_humidity_ratio_mixed_air_assignment_lifecycle' -Description "non-direct CP335 null evidence"
-Assert-Contains -Path $cp335PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp357_lifecycle_evidence' -Description "non-direct CP335 through CP357 evidence rejection"
+Assert-Contains -Path $cp335PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp358_lifecycle_evidence' -Description "non-direct CP335 through CP358 evidence rejection"
 
 # Registries repeat the boundary exactly twice and add target inventory only.
 $cp335AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
@@ -614,6 +619,6 @@ if (
     throw "Main IdealLoads audit must dot-source CP335 after CP334 and before completion"
 }
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp335-cooling-positive-supply-humidity-ratio-mixed-air-assignment\.ps1"' -Description "CP335 internal script inventory record"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 295 \|' -Description "CP335 cumulative generated script count through CP357"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 55 \|' -Description "CP335 cumulative generated internal script count through CP357"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 296 \|' -Description "CP335 cumulative generated script count through CP358"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 56 \|' -Description "CP335 cumulative generated internal script count through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP335 generated uncalled script count"

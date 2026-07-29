@@ -163,6 +163,8 @@ impl PurchasedAirUnitRuntimeState {
                 ),
             calc_cooling_constant_shr_case_break:
                 PurchasedAirCalcCoolingConstantShrCaseBreakRuntimeState::new(system),
+            calc_cooling_humidistat_case_entry:
+                PurchasedAirCalcCoolingHumidistatCaseEntryRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

@@ -2,6 +2,9 @@
 
 use serde_json::{Map, Value};
 
+#[path = "cp358_assertions.rs"]
+mod cp358_assertions;
+
 const CP356_KEY: &str =
     "purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_lifecycle";
 const CP357_KEY: &str = "purchased_air_calc_cooling_constant_shr_case_break_lifecycle";
@@ -83,6 +86,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
     );
     assert_eq!(cp357["source_site_execution_count"], 0);
     assert_numerical_nonfeed(runtime, results);
+    cp358_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -91,6 +95,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP357_KEY].is_null(),
         "non-direct runtime must not publish CP357 evidence"
     );
+    cp358_assertions::assert_non_direct(runtime);
 }
 
 fn assert_numerical_nonfeed(runtime: &Value, results: &Value) {

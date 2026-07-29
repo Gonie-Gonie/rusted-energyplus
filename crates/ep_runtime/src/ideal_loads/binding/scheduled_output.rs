@@ -10,8 +10,10 @@ use super::super::{
     PurchasedAirCalcCoolingEconomizerBodySnapshot,
     PurchasedAirCalcCoolingEconomizerConditionSnapshot,
     PurchasedAirCalcCoolingEconomizerGuardSnapshot, PurchasedAirCalcCoolingEntryGateSnapshot,
-    PurchasedAirCalcCoolingHumidificationFlowSnapshot, PurchasedAirCalcCoolingMixedAirCallSnapshot,
-    PurchasedAirCalcCoolingOaMaxFlowBodySnapshot, PurchasedAirCalcCoolingOaMaxFlowGateSnapshot,
+    PurchasedAirCalcCoolingHumidificationFlowSnapshot,
+    PurchasedAirCalcCoolingHumidistatCaseEntrySnapshot,
+    PurchasedAirCalcCoolingMixedAirCallSnapshot, PurchasedAirCalcCoolingOaMaxFlowBodySnapshot,
+    PurchasedAirCalcCoolingOaMaxFlowGateSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitCpAirAssignmentSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputAssignmentSnapshot,
@@ -189,6 +191,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered constant-SHR case-break snapshot.
     pub calculation_cooling_constant_shr_case_break:
         PurchasedAirCalcCoolingConstantShrCaseBreakSnapshot,
+    /// Source-ordered Humidistat case-entry snapshot.
+    pub calculation_cooling_humidistat_case_entry:
+        PurchasedAirCalcCoolingHumidistatCaseEntrySnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
