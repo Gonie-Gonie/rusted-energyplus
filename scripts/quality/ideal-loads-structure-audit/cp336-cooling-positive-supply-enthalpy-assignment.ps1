@@ -16,6 +16,7 @@ $cp336ReleaseCorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_p
 $cp336CalcRoot = "crates\ep_runtime\src\ideal_loads\calc.rs"
 $cp336Psychrometrics = "crates\ep_runtime\src\psychrometrics.rs"
 $cp336Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
+Assert-Contains -Path $cp336Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360 binding order"
 $cp336ScheduledOutput = "crates\ep_runtime\src\ideal_loads\binding\scheduled_output.rs"
 $cp336BindingAdapter = "crates\ep_runtime\src\ideal_loads\binding\cooling_positive_supply_enthalpy_assignment.rs"
 $cp336BindingTestsRoot = "crates\ep_runtime\src\ideal_loads\binding_tests.rs"
@@ -429,6 +430,11 @@ $cp336IntervalCode = [regex]::Replace(
     '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =\s*advance_cooling_humidistat_moisture_demand_assignment\([^;]+?\)\?;',
     ''
 )
+$cp336IntervalCode = [regex]::Replace(
+    $cp336IntervalCode,
+    '(?s)let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =\s*advance_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment\([^;]+?\)\?;',
+    ''
+)
     if ($cp336IntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
         throw "No intermediary helper call may execute $($cp336Interval.Description)"
     }
@@ -475,7 +481,7 @@ Assert-Contains -Path $cp336DirectAssertions -Pattern 'purchased_air_calc_coolin
 Assert-Contains -Path $cp336DirectAssertions -Pattern 'purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle' -Description "direct-run CP334 bit provenance"
 Assert-Contains -Path $cp336DirectAssertions -Pattern 'energyplus_psy_h_fn_tdb_w\(supply_temperature_c, supply_humidity_ratio\)' -Description "direct-run CP336 canonical result"
 Assert-Contains -Path $cp336NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle' -Description "non-direct CP336 null evidence"
-Assert-Contains -Path $cp336PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp359_lifecycle_evidence' -Description "non-direct CP336 through CP358 evidence rejection"
+Assert-Contains -Path $cp336PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp360_lifecycle_evidence' -Description "non-direct CP336 through CP358 evidence rejection"
 
 # Registries carry exactly two CP336 addenda and the two parent target arrays.
 $cp336AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
@@ -701,7 +707,7 @@ if (
     throw "Main IdealLoads audit must dot-source CP336 after CP335 and before completion"
 }
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp336-cooling-positive-supply-enthalpy-assignment\.ps1"' -Description "CP336 internal script inventory record"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 297 \|' -Description "CP336 cumulative generated script count through CP358"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 298 \|' -Description "CP336 cumulative generated script count through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP336 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 57 \|' -Description "CP336 cumulative generated internal script count through CP358"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 58 \|' -Description "CP336 cumulative generated internal script count through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP336 generated uncalled script count"

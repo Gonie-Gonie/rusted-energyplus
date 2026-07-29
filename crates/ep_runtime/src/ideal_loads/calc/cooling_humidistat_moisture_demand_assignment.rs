@@ -10,14 +10,13 @@ mod state;
 mod tests;
 mod transition;
 
-#[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_humidistat_moisture_demand_assignment_is_consistent;
 pub(in crate::ideal_loads) use release::cooling_humidistat_moisture_demand_assignment_snapshot_is_exact_direct_release;
+pub(in crate::ideal_loads::calc) use release::cooling_humidistat_moisture_demand_assignment_snapshots_match_bit_exact;
 pub use release::{
     PurchasedAirCalcCoolingHumidistatMoistureDemandAssignmentError,
     advance_direct_no_oa_calc_cooling_humidistat_moisture_demand_assignment,
 };
-#[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
     private_humidistat_counterfactual_from_direct_release,
     private_humidistat_counterfactual_links_to_direct_release,

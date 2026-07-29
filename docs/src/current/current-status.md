@@ -2941,6 +2941,79 @@ unused. Both parents remain `scaffold`/`none`, both Calc routines remain
 feature/evidence, numerical conformance, output ownership, status,
 conformance, and Roadmap state remain unchanged.
 
+## CP360 Cooling Humidistat Supply-Humidity-Ratio-for-Dehumidification Assignment
+
+CP360 supersedes only CP359's physical-line-2230 exclusion. At pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`, locked raw
+SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+it maps `PurchasedAirManager.cc` physical executable line 2230:
+
+```cpp
+SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;
+```
+
+The exact grouping is
+`(MdotZnDehumidSP / SupplyMassFlowRate) + ZoneNodeHumRat`. Its six-site source
+order is
+`read-local-zone-dehumidifying-setpoint-moisture-demand-for-supply-humidity-ratio-division`,
+`read-retained-supply-mass-flow-rate-for-supply-humidity-ratio-division`,
+`calculate-zone-dehumidifying-setpoint-moisture-demand-divided-by-supply-mass-flow-rate`,
+`read-zone-node-humidity-ratio-for-dehumidification-supply-humidity-ratio`,
+`add-zone-node-humidity-ratio-to-moisture-demand-derived-supply-humidity-ratio`,
+then
+`assign-local-supply-humidity-ratio-for-dehumidification`. Physical executable
+line 2231,
+`SupplyHumRatForDehum = max(SupplyHumRatForDehum, PurchAir.MinCoolSuppAirHumRat);`,
+is first excluded. The line-2232 mixed-air minimum, line-2233 break, line-2245
+continuation, and all later behavior remain excluded.
+
+Routes remain `U/N/P/C0/Q/H/CSH`, with
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`, and
+`A = F+L`. `Q` equals CP359 completed constant-SHR skips, `H` equals CP359
+Humidistat moisture-demand assignments, each CP360 site counter equals `H`,
+and `source_site_execution_count = 6H`. Exact direct release remains
+`C0 = S` and `Q = H = CSH = 0`: all six site flags are false and all operand,
+intermediate, assigned, and resulting numeric fields are `None`. Direct CP360
+is therefore a complete skip. Private execution is restricted to `H`.
+
+Recursively validated same-call bit-exact CP359 evidence is the sole immediate
+predecessor. Within explicit private parametric characterization only, CP359's
+`resulting_zone_dehumidifying_setpoint_moisture_demand_kg_per_s` owns the
+numerator; it still has no retained authoritative owner or live Zone
+moisture-demand service. Exact same-call CP330 positive-flow evidence owns the
+denominator. CP329 flow parity may corroborate that value but does not own it.
+The Zone-node humidity ratio is a second explicit pre-sampled `f64`
+characterization scalar with no retained authoritative owner or live Node
+service. In particular, CP329's recirculation node is not `ZoneNodeNum` and is
+not a humidity owner. Broad `calc::humidity` behavior and CP319 are neither
+owners, predecessors, bridges, nor feeds.
+
+The CP360 pure transition performs raw IEEE-754 division followed by addition
+with the source grouping. It adds no reassociation, reciprocal multiplication,
+`mul_add`, finite/range/nonzero gate, clamp, normalization, default,
+diagnostic, psychrometric call, or coercion. Its private exact bridge inherits
+CP330's positive denominator; isolated parametric characterization may still
+exercise zero, negative, or NaN denominators and preserves resulting bits.
+
+Binding and direct-only evidence preserve
+CP359-to-CP360-to-unchanged-numerical order under
+`purchased_air_calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment_lifecycle`.
+CP360 owns only the local `SupplyHumRatForDehum` numerator result and does not
+assign `PurchAir.SupplyHumRat`. It neither enters nor feeds
+`DirectZonePurchasedAirCouplingInput`, `prediction.zone_demand`, CP319,
+`calc::humidity`, any numerical DTO, or result state. Actual result-store
+first/last supply-humidity-ratio bits remain unchanged and owned by CP345.
+Non-direct paths publish `None` and reject CP360 evidence.
+
+Counts remain exactly 32 algorithms and 293 routines, split 58 `state_mapped`
+plus 235 `source_mapped`, with 170 required. The added internal audit changes
+only the script inventory to 298 total, 240 public, 58 internal, and zero
+unused. Both parents remain `scaffold`/`none`, both Calc routines remain
+`source_mapped`, and support, readiness, run state, capability,
+feature/evidence, numerical conformance, output ownership, status,
+conformance, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

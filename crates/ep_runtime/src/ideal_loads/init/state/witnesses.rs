@@ -2,7 +2,7 @@ mod cooling_constant_shr_case_break;
 mod cooling_constant_shr_supply_humidity_ratio_minimum_limit;
 mod cooling_constant_shr_supply_humidity_ratio_mixed_air_limit;
 mod cooling_constant_shr_supply_humidity_ratio_overdrying_limit;
-#[rustfmt::skip] mod cooling_humidistat_case_entry; #[rustfmt::skip] mod cooling_humidistat_moisture_demand_assignment;
+#[rustfmt::skip] mod cooling_humidistat_case_entry; #[rustfmt::skip] mod cooling_humidistat_moisture_demand_assignment; #[rustfmt::skip] mod cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment;
 mod cooling_mixed_air_call;
 mod cooling_positive_supply_capacity_limit_cp_air_assignment;
 mod cooling_positive_supply_capacity_limit_guard;

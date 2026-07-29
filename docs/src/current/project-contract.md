@@ -19363,6 +19363,87 @@ public, 57 internal, and zero unused. Both parent algorithms remain
 run state, capability, feature/evidence boundaries, numerical conformance,
 output ownership, status, conformance, and Roadmap state remain unchanged.
 
+## CP360 Source-Ordered Cooling Humidistat Supply-Humidity-Ratio Assignment
+
+CP360 supersedes only CP359's physical-line-2230 exclusion by mapping pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`, locked raw
+SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+and `PurchasedAirManager.cc` physical executable line 2230:
+
+```cpp
+SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;
+```
+
+The source grouping is
+`(MdotZnDehumidSP / SupplyMassFlowRate) + ZoneNodeHumRat`. The exact ordered
+sites are
+`read-local-zone-dehumidifying-setpoint-moisture-demand-for-supply-humidity-ratio-division`,
+`read-retained-supply-mass-flow-rate-for-supply-humidity-ratio-division`,
+`calculate-zone-dehumidifying-setpoint-moisture-demand-divided-by-supply-mass-flow-rate`,
+`read-zone-node-humidity-ratio-for-dehumidification-supply-humidity-ratio`,
+`add-zone-node-humidity-ratio-to-moisture-demand-derived-supply-humidity-ratio`,
+and
+`assign-local-supply-humidity-ratio-for-dehumidification`. Physical executable
+line 2231,
+`SupplyHumRatForDehum = max(SupplyHumRatForDehum, PurchAir.MinCoolSuppAirHumRat);`,
+is first excluded; lines 2232, 2233, 2245, and all later behavior remain
+excluded.
+
+For inherited route counts `U/N/P/C0/Q/H/CSH`, transitions `T`, switch
+dispatches `S`, CP345 assignments `R`, predecessor provenance `G/F/L`, and
+CP340 active evaluations `A`, checked state requires:
+
+```text
+T = U+N+P+C0+Q+H+CSH
+S = C0+Q+H+CSH = R = G+F+L
+A = F+L
+each CP360 per-site counter = H
+source_site_execution_count = 6H
+```
+
+`Q` equals CP359 completed constant-SHR skips and `H` equals CP359 Humidistat
+moisture-demand assignments. Exact direct release requires `C0=S` and
+`Q=H=CSH=0`; every site flag is false and every numeric operand,
+intermediate, assigned, and resulting field is `None`. Private execution is
+available only on `H`.
+
+CP359 is the sole immediate predecessor. Inside explicit private parametric
+characterization only, its resulting local moisture-demand scalar owns the
+numerator, without acquiring a retained authoritative owner or live Zone
+moisture-demand service. Recursively validated exact same-call CP330
+positive-flow evidence owns the denominator; CP329 flow parity corroborates
+only. The Zone-node humidity ratio is a second explicit pre-sampled `f64`
+scalar with no retained authoritative owner or live Node service. CP329's
+recirculation node is not `ZoneNodeNum` and cannot own Zone-node humidity.
+CP319 and broad `calc::humidity` helpers are not owners, predecessors,
+bridges, or feeds.
+
+CP360 evaluates raw IEEE-754 division and then addition with the exact source
+grouping. It adds no reassociation, reciprocal, `mul_add`, finite/range/nonzero
+gate, clamp, normalization, default, diagnostic, psychrometric call, or
+coercion. The private exact bridge inherits CP330's positive denominator,
+while the pure transition can characterize zero, negative, and NaN
+denominators.
+
+Binding and direct-only lifecycle evidence preserve
+CP359-to-CP360-to-unchanged-numerical order under
+`purchased_air_calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment_lifecycle`.
+The resulting local owns only `SupplyHumRatForDehum`; CP360 does not assign
+`PurchAir.SupplyHumRat` and does not consume, reconcile with, feed, or replace
+`DirectZonePurchasedAirCouplingInput`, `prediction.zone_demand`, CP319,
+`calc::humidity`, any numerical DTO, or result state. CP345 continues to own
+actual result-store first/last supply-humidity-ratio bits. Non-direct paths
+expose `None` and reject attached CP360 evidence.
+
+Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Script inventory becomes 298 total, 240
+public, 58 internal, and zero unused. Both parent algorithms remain
+`scaffold`/`none`; both Calc routines remain `source_mapped`. Support,
+readiness, run state, capability, feature/evidence boundaries, numerical
+conformance, output ownership, status, conformance, and Roadmap state remain
+unchanged.
+
 ## Run States
 
 Arbitrary runs return one of three support states:

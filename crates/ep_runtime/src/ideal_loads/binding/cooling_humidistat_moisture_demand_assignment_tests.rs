@@ -4,7 +4,7 @@ use crate::ideal_loads::{
     purchased_air_calc_cooling_humidistat_moisture_demand_assignment_lifecycle_summary,
 };
 
-fn run_case(
+pub(super) fn run_case(
     cooling_limit: IdealLoadsLimit,
     maximum_capacity_w: Option<f64>,
     independent_load_w: f64,

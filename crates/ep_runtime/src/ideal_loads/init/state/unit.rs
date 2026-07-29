@@ -167,6 +167,10 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingHumidistatCaseEntryRuntimeState::new(system),
             calc_cooling_humidistat_moisture_demand_assignment:
                 PurchasedAirCalcCoolingHumidistatMoistureDemandAssignmentRuntimeState::new(system),
+            calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment:
+                PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationAssignmentRuntimeState::new(
+                    system,
+                ),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

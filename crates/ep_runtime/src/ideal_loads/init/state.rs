@@ -13,7 +13,6 @@ use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 use super::super::{
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitSnapshot as Cp354Snapshot,
     PurchasedAirCalcCoolingHumidistatCaseEntrySnapshot as Cp358Snapshot,
-    PurchasedAirCalcCoolingHumidistatMoistureDemandAssignmentSnapshot as Cp359Snapshot,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseEntrySnapshot as Cp348Snapshot,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCpAirAssignmentSnapshot as Cp349Snapshot,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitSnapshot as Cp353Snapshot,
@@ -179,7 +178,8 @@ pub struct PurchasedAirRuntimeState {
     #[rustfmt::skip] cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitSnapshot>,
     #[rustfmt::skip] cooling_constant_shr_case_break_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingConstantShrCaseBreakSnapshot>,
     #[rustfmt::skip] cooling_humidistat_case_entry_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, Cp358Snapshot>,
-    #[rustfmt::skip] cooling_humidistat_moisture_demand_assignment_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, Cp359Snapshot>,
+    #[rustfmt::skip] cooling_humidistat_moisture_demand_assignment_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidistatMoistureDemandAssignmentSnapshot>,
+    #[rustfmt::skip] cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationAssignmentSnapshot>,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -333,6 +333,7 @@ pub struct PurchasedAirUnitRuntimeState {
     #[doc = "Persistent bounded constant-SHR case-break state."] #[rustfmt::skip] pub calc_cooling_constant_shr_case_break: PurchasedAirCalcCoolingConstantShrCaseBreakRuntimeState,
     #[doc = "Persistent bounded Humidistat case-entry state."] #[rustfmt::skip] pub calc_cooling_humidistat_case_entry: PurchasedAirCalcCoolingHumidistatCaseEntryRuntimeState,
     #[doc = "Persistent bounded Humidistat moisture-demand assignment state."] #[rustfmt::skip] pub calc_cooling_humidistat_moisture_demand_assignment: PurchasedAirCalcCoolingHumidistatMoistureDemandAssignmentRuntimeState,
+    #[doc = "Persistent bounded Humidistat supply-humidity-ratio-for-dehumidification assignment state."] #[rustfmt::skip] pub calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment: PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationAssignmentRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.

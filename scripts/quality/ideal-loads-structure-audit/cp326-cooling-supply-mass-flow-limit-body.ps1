@@ -254,6 +254,9 @@ Assert-Contains -Path $idealLoadsInitState -Pattern 'pub calc_cooling_supply_mas
 # CP331 -> CP332 -> CP333 -> CP334 -> CP335 -> CP336 -> CP337 -> CP338 -> CP339 ->
 # the unchanged numerical DTO.
 $cp326BindingText = Read-RepoText -Path $idealLoadsBinding
+if ($cp326BindingText -notmatch '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let coupling = complete_direct_zone_purchased_air_coupling\(') {
+    throw "Historical binding audit must retain CP359 then CP360 before numerical coupling"
+}
 $cp325BindingIndexForCp326 = $cp326BindingText.IndexOf("let calculation_cooling_supply_mass_flow_limit_guard =")
 $cp326BindingIndex = $cp326BindingText.IndexOf("let calculation_cooling_supply_mass_flow_limit_body =")
 $cp327BindingIndexForCp326 = $cp326BindingText.IndexOf("let calculation_cooling_supply_mass_flow_very_small_guard =")
@@ -642,6 +645,11 @@ $postCp339BeforeNumericalCodeForCp326 = [regex]::Replace(
 $postCp339BeforeNumericalCodeForCp326 = [regex]::Replace(
     $postCp339BeforeNumericalCodeForCp326,
     '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =\s*advance_cooling_humidistat_moisture_demand_assignment\([^;]+?\)\?;',
+    ''
+)
+$postCp339BeforeNumericalCodeForCp326 = [regex]::Replace(
+    $postCp339BeforeNumericalCodeForCp326,
+    '(?s)let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =\s*advance_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment\([^;]+?\)\?;',
     ''
 )
 if ($postCp339BeforeNumericalCodeForCp326 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {

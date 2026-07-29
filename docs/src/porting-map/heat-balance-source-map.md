@@ -35746,6 +35746,67 @@ Inventory remains 32 algorithms, 293 routines, 58 state-mapped,
 readiness, capability, evidence, numerical, output, status, conformance, and
 Roadmap claims remain unchanged.
 
+## CP360 Humidistat Supply-Humidity-Ratio Assignment in the Heat-Balance Loop
+
+CP360 retains only pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`
+`PurchasedAirManager.cc` physical executable line 2230,
+`SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;`;
+the locked raw SHA-256 is
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact grouping is
+`(MdotZnDehumidSP / SupplyMassFlowRate) + ZoneNodeHumRat`, witnessed in order
+by
+`read-local-zone-dehumidifying-setpoint-moisture-demand-for-supply-humidity-ratio-division`,
+`read-retained-supply-mass-flow-rate-for-supply-humidity-ratio-division`,
+`calculate-zone-dehumidifying-setpoint-moisture-demand-divided-by-supply-mass-flow-rate`,
+`read-zone-node-humidity-ratio-for-dehumidification-supply-humidity-ratio`,
+`add-zone-node-humidity-ratio-to-moisture-demand-derived-supply-humidity-ratio`,
+and
+`assign-local-supply-humidity-ratio-for-dehumidification`. Physical executable
+line 2231 is first excluded; lines 2232, 2233, 2245, and all later behavior
+remain excluded.
+
+The heat-balance loop preserves `U/N/P/C0/Q/H/CSH` and validates
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`,
+`A=F+L`, `Q` equal to CP359 completed constant-SHR skips, `H` equal to CP359
+Humidistat moisture-demand assignments, every site counter equal to `H`, and
+`source_site_execution_count=6H`. Direct `C0=S` has
+`Q=H=CSH=0`, false site flags, null numeric evidence, and a complete skip.
+Only private `H` executes CP360.
+
+The recursively complete same-call bit-exact CP359 lifecycle is the sole
+predecessor. Within explicit characterization only, its resulting local
+moisture-demand scalar owns the numerator but still has no retained
+authoritative owner or live Zone demand service. Same-call CP330
+positive-flow evidence owns the denominator; CP329 flow parity is
+corroboration only. Zone-node humidity is a second explicit pre-sampled `f64`
+with no retained owner or live Node service. CP329's recirculation node is not
+`ZoneNodeNum` and cannot own humidity. CP319 and broad `calc::humidity`
+behavior are not owners, predecessors, bridges, or feeds.
+
+CP360 performs raw IEEE-754 division followed by addition without
+reassociation, reciprocal multiplication, `mul_add`, finite/range/nonzero
+gate, clamp, normalization, default, diagnostic, psychrometric call, or
+coercion. Its private exact bridge inherits CP330's positive denominator;
+isolated pure-transition characterization may use zero, negative, or NaN.
+
+Coupled execution preserves CP359-to-CP360-to-unchanged-numerical order under
+`purchased_air_calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment_lifecycle`.
+CP360 owns only local `SupplyHumRatForDehum`, never assigns
+`PurchAir.SupplyHumRat`, and cannot feed heat-balance demand, Node, coupling,
+numerical DTO, or result state. It neither enters nor replaces
+`DirectZonePurchasedAirCouplingInput`, `prediction.zone_demand`, CP319, or
+`calc::humidity`. Actual result-store first/last supply-humidity bits remain
+unchanged and owned by CP345. Non-direct execution publishes `None` and
+rejects CP360 evidence.
+
+Inventory remains 32 algorithms, 293 routines, 58 state-mapped,
+235 source-mapped, and 170 required; script inventory becomes 298 total,
+240 public, 58 internal, and zero unused. Parent/Calc states and all support,
+readiness, capability, evidence, numerical, output, status, conformance, and
+Roadmap claims remain unchanged.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

@@ -21035,6 +21035,64 @@ and 170 required; scripts become 297 total, 240 public, 57 internal, and zero
 unused. Parent/Calc states and all support, readiness, capability, evidence,
 numerical, output, conformance, status, and Roadmap claims remain unchanged.
 
+## CP360 Humidistat Supply-Humidity-Ratio-for-Dehumidification Assignment
+
+CP360 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+and only `PurchasedAirManager.cc` physical executable line 2230,
+`SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;`.
+Its exact grouping is
+`(MdotZnDehumidSP / SupplyMassFlowRate) + ZoneNodeHumRat`. The six sites are
+`read-local-zone-dehumidifying-setpoint-moisture-demand-for-supply-humidity-ratio-division`,
+`read-retained-supply-mass-flow-rate-for-supply-humidity-ratio-division`,
+`calculate-zone-dehumidifying-setpoint-moisture-demand-divided-by-supply-mass-flow-rate`,
+`read-zone-node-humidity-ratio-for-dehumidification-supply-humidity-ratio`,
+`add-zone-node-humidity-ratio-to-moisture-demand-derived-supply-humidity-ratio`,
+then
+`assign-local-supply-humidity-ratio-for-dehumidification`. Physical executable
+line 2231, the local maximum against
+`PurchAir.MinCoolSuppAirHumRat`, is first excluded; lines 2232, 2233, 2245,
+and later behavior remain excluded.
+
+Routes remain `U/N/P/C0/Q/H/CSH`; exact state requires
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`,
+`A=F+L`, `Q` equal to CP359 completed constant-SHR skips, `H` equal to CP359
+Humidistat moisture-demand assignments, every CP360 site count equal to `H`,
+and `source_site_execution_count=6H`. Direct `None` has `C0=S`,
+`Q=H=CSH=0`, false site flags, null numeric evidence, and a complete skip.
+Only private `H` executes the mapped statement.
+
+Same-call bit-exact CP359 evidence solely owns the predecessor and, inside
+explicit parametric characterization only, its resulting local scalar owns the
+numerator. That scalar still has no retained authoritative owner or live Zone
+moisture-demand service. Same-call CP330 positive-flow evidence owns the
+denominator; CP329 flow parity only corroborates. A second explicit
+pre-sampled `f64` supplies Zone-node humidity and grants no retained owner or
+live Node service. CP329's recirculation node is not `ZoneNodeNum` and is not a
+humidity owner. CP319 and broad `calc::humidity` behavior are not owners,
+predecessors, bridges, or feeds.
+
+The pure transition preserves raw IEEE-754 division-then-addition grouping
+without reassociation, reciprocal multiplication, `mul_add`, finite/range or
+nonzero checks, clamp, normalization, default, diagnostic, psychrometric
+helper, or coercion. The private exact bridge inherits CP330's positive
+denominator; isolated characterization can use zero, negative, or NaN.
+
+Binding order is CP359-to-CP360-to-unchanged-numerical under
+`purchased_air_calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment_lifecycle`.
+CP360 owns only the local `SupplyHumRatForDehum` result and does not assign
+`PurchAir.SupplyHumRat`. It does not enter, consume, reconcile with, feed, or
+replace `DirectZonePurchasedAirCouplingInput`, `prediction.zone_demand`,
+CP319, `calc::humidity`, any numerical DTO, or result state. Actual
+result-store first/last supply-humidity bits remain unchanged and owned by
+CP345. Non-direct paths publish `None` and reject evidence.
+
+Counts remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped,
+and 170 required; scripts become 298 total, 240 public, 58 internal, and zero
+unused. Parent/Calc states and all support, readiness, capability, evidence,
+numerical, output, conformance, status, and Roadmap claims remain unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

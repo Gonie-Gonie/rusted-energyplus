@@ -13,9 +13,6 @@ use crate::ideal_loads::{
 };
 
 mod prefix_validation;
-// CP360 may consume this explicitly parameterized bridge. Keep it available
-// while CP359 is the source-order frontier.
-#[allow(dead_code)]
 mod private_counterfactual;
 mod runtime_validation;
 mod snapshot_validation;
@@ -30,6 +27,7 @@ use runtime_validation::{
     next_transition_fits, pending_state_is_consistent,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_humidistat_moisture_demand_assignment_snapshot_is_exact_direct_release;
+pub(in crate::ideal_loads::calc) use snapshot_validation::snapshots_match_bit_exact as cooling_humidistat_moisture_demand_assignment_snapshots_match_bit_exact;
 #[cfg(test)]
 pub(in crate::ideal_loads::calc) use snapshot_validation::snapshots_match_bit_exact as snapshots_match_bit_exact_for_test;
 
