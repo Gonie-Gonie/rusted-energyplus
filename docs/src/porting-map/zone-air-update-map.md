@@ -23806,6 +23806,55 @@ public, 59 internal, and zero unused. Parent/Calc states and all readiness,
 support, capability, feature/evidence, numerical, output, status, conformance,
 and Roadmap claims remain unchanged.
 
+## CP364 Constant-Supply-Humidity-Ratio Case-Entry Placement
+
+CP364 sits immediately after CP363 and before unchanged numerical coupling.
+It maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical line 2234,
+`case HumControl::ConstantSupplyHumidityRatio: {`; the locked raw SHA-256 is
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The exact sole site is
+`enter-purchased-air-dehumidification-control-constant-supply-humidity-ratio-case`.
+Line 2235, `PurchAir.SupplyHumRat = PurchAir.MinCoolSuppAirHumRat;`, is the
+first excluded executable and CP365 assignment candidate. The line-2236
+break, line-2237 untyped/default path, line-2245 post-switch continuation,
+and later Zone work remain excluded.
+
+Routes remain `U/N/P/C0/Q/H/CSH`. Checked state requires
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`, `A = F+L`, and
+`source_site_execution_count = constant_supply_humidity_ratio_case_entry_count = CSH`,
+with each selected-control count equal to its CP363 predecessor. Exact
+direct release is `C0 = S`, `Q = H = CSH = 0`, a false entry, and complete
+skip. Private `CSH` enters once with a true flag; `C0/Q/H` are completed
+skips, and earlier breaks prevent `Q/H` fallthrough.
+
+The sole predecessor is recursively validated same-call bit-exact CP363
+lifecycle/snapshot/latest/witness evidence. CP363's canonical private
+`ConstantSupplyHumidityRatio` selected-skip bridge is the only private CSH
+path. CP364 matches named `DehumidificationControlType` variants rather than
+enum ordinals or discriminants and does not claim the untyped default or
+humidification-control selector.
+
+The checkpoint is control-only: no numeric operand/result, read of
+`MinCoolSuppAirHumRat`, assignment to `SupplyHumRat`, IEEE-bit payload,
+arithmetic, comparison, finite/range gate, clamp, normalization, default,
+diagnostic, psychrometric call, numerical DTO, or coercion is represented.
+
+Evidence preserves CP363-to-CP364-to-unchanged-numerical order under
+`purchased_air_calc_cooling_constant_supply_humidity_ratio_case_entry_lifecycle`.
+CP364 cannot consume, reconcile with, feed, or replace
+`DirectZonePurchasedAirCouplingInput`, `prediction.zone_demand`, any
+numerical DTO, or result state. CP345 remains the actual result-store
+first/last supply-humidity owner. Non-direct paths publish `None` and reject
+CP364 evidence.
+
+Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Script inventory becomes 302 total, 240
+public, 62 internal, and zero unused. Parent/Calc states and all readiness,
+support, capability, feature/evidence, numerical, output, status,
+conformance, and Roadmap claims remain unchanged.
+
 ## CP363 Humidistat Case-Break Placement
 
 CP363 maps pinned EnergyPlus commit

@@ -85,7 +85,6 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         0
     );
     assert_eq!(cp357["source_site_execution_count"], 0);
-    assert_numerical_nonfeed(runtime, results);
     cp358_assertions::assert_direct(runtime, results);
 }
 
