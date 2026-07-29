@@ -17,10 +17,6 @@ use crate::ideal_loads::{
 };
 
 mod prefix_validation;
-// CP359 will consume this bridge. Keep the completed next-checkpoint contract
-// available while CP358 is the source-order frontier without warning on the
-// intentionally not-yet-reachable implementation.
-#[allow(dead_code)]
 mod private_counterfactual;
 mod runtime_validation;
 mod snapshot_validation;

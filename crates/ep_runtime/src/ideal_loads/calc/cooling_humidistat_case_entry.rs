@@ -10,14 +10,12 @@ mod state;
 mod tests;
 mod transition;
 
-#[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_humidistat_case_entry_is_consistent;
 pub(in crate::ideal_loads) use release::cooling_humidistat_case_entry_snapshot_is_exact_direct_release;
 pub use release::{
     PurchasedAirCalcCoolingHumidistatCaseEntryError,
     advance_direct_no_oa_calc_cooling_humidistat_case_entry,
 };
-#[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
     private_humidistat_counterfactual_from_direct_release,
     private_humidistat_counterfactual_links_to_direct_release,

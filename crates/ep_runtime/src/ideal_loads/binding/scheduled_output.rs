@@ -12,6 +12,7 @@ use super::super::{
     PurchasedAirCalcCoolingEconomizerGuardSnapshot, PurchasedAirCalcCoolingEntryGateSnapshot,
     PurchasedAirCalcCoolingHumidificationFlowSnapshot,
     PurchasedAirCalcCoolingHumidistatCaseEntrySnapshot,
+    PurchasedAirCalcCoolingHumidistatMoistureDemandAssignmentSnapshot,
     PurchasedAirCalcCoolingMixedAirCallSnapshot, PurchasedAirCalcCoolingOaMaxFlowBodySnapshot,
     PurchasedAirCalcCoolingOaMaxFlowGateSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitCpAirAssignmentSnapshot,
@@ -194,6 +195,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered Humidistat case-entry snapshot.
     pub calculation_cooling_humidistat_case_entry:
         PurchasedAirCalcCoolingHumidistatCaseEntrySnapshot,
+    /// Source-ordered Humidistat moisture-demand assignment snapshot.
+    pub calculation_cooling_humidistat_moisture_demand_assignment:
+        PurchasedAirCalcCoolingHumidistatMoistureDemandAssignmentSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

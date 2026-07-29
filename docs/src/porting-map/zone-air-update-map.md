@@ -23423,6 +23423,54 @@ unused. Parent/Calc states and all readiness, support, capability,
 feature/evidence, numerical, output, status, conformance, and Roadmap claims
 remain unchanged.
 
+## CP359 Humidistat Moisture-Demand Assignment Placement
+
+CP359 sits immediately after CP358 and before unchanged numerical coupling. It
+maps pinned commit `6f2e40d10250a105b49966baa24d843711e61048`,
+locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+and only `PurchasedAirManager.cc` physical executable line 2229,
+`MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToDehumidSP;`.
+The two exact sites are
+`read-zone-dehumidifying-setpoint-moisture-demand` then
+`assign-local-zone-dehumidifying-setpoint-moisture-demand`. Physical
+executable line 2230,
+`SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;`,
+is first excluded with all of its operand reads and arithmetic. Private `Q`
+already broke at line 2227 and resumes at line 2245.
+
+Routes remain `U/N/P/C0/Q/H/CSH`, with
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`,
+`A = F+L`, `Q` equal to CP358 completed constant-SHR skips, `H` equal to
+CP358 Humidistat entries, each moisture-demand site count equal to `H`, and
+`source_site_execution_count = 2H`. Direct `C0 = S` and
+`Q = H = CSH = 0` is a complete skip with false site flags and null
+raw/assigned/resulting scalar values.
+
+CP358 is the sole recursively validated same-call bit-exact predecessor owner.
+Private `H` uses CP358's canonical private-Humidistat bridge plus an
+explicit pre-sampled `f64` scalar, copying the scalar bits exactly into read, assigned,
+and resulting evidence. The scalar is parametric characterization only: it has
+no retained authoritative owner and grants
+no live Zone moisture-demand service. CP319 is corroborating precedent, not a predecessor, canonical
+bridge, owner, or feed. CP359 performs no arithmetic, comparison, finite/range
+gate, clamp, normalization, default, psychrometric call, diagnostic, or
+coercion.
+
+Evidence preserves CP358-to-CP359-to-unchanged-numerical order under
+`purchased_air_calc_cooling_humidistat_moisture_demand_assignment_lifecycle`.
+CP359 does not consume, reconcile with, feed, or replace
+`DirectZonePurchasedAirCouplingInput`, `prediction.zone_demand`, CP319, or
+numerical DTO state. Actual result-store first/last supply-humidity bits remain
+unchanged and owned by CP345. Non-direct paths publish `None` and reject
+evidence.
+
+Counts stay 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped,
+and 170 required; scripts become 297 total, 240 public, 57 internal, and zero
+unused. Parent/Calc states and all readiness, support, capability,
+feature/evidence, numerical, output, status, conformance, and Roadmap claims
+remain unchanged.
+
 ## Current Boundary
 
 `Zone Mean Air Temperature`, `Zone Air Heat Balance Surface Convection Rate`,

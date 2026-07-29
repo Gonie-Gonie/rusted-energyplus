@@ -2883,6 +2883,64 @@ unused. Both parents remain `scaffold`/`none`, both Calc routines remain
 feature/evidence, numerical conformance, output ownership, status,
 conformance, and Roadmap state remain unchanged.
 
+CP359 now maps only the Cooling Humidistat moisture-demand lookup/read and
+local assignment at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2229:
+
+```cpp
+MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToDehumidSP;
+```
+
+The locked raw SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact two-site source order is
+`read-zone-dehumidifying-setpoint-moisture-demand` followed by
+`assign-local-zone-dehumidifying-setpoint-moisture-demand`. Physical
+executable line 2230,
+`SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;`,
+is first excluded together with its mass-flow and Zone-node-humidity reads,
+division, addition, and supply-humidity-ratio assignment. Private `Q` has
+already broken from the switch and resumes dynamically at line 2245.
+
+Routes remain `U/N/P/C0/Q/H/CSH`, with
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`, and
+`A = F+L`. `Q` equals CP358 completed constant-SHR skips, `H` equals CP358
+Humidistat entries, both moisture-demand site counters equal `H`, and
+`source_site_execution_count = 2H`. Exact direct release remains the completed
+`None` route: `C0 = S`, `Q = H = CSH = 0`, both site flags are false, all
+three raw/assigned/resulting scalar fields are `None`, and CP359 is a complete
+skip.
+
+CP358 is the sole immediate predecessor owner. Private active `H` requires
+the canonical CP358 Humidistat predecessor plus an explicit pre-sampled
+`f64` characterization parameter. The read, assigned, and
+resulting local values preserve that parameter's binary64 bits exactly,
+including signed zero, nonfinite values, and quiet-NaN payloads. CP359 performs
+no arithmetic, comparison, finite/range gate, clamp, normalization, default,
+diagnostic, psychrometric call, or coercion. The parameter grants no live
+Zone moisture-demand service and has no retained authoritative owner. CP319's
+older private pre-sampled Humidistat characterization only corroborates those
+semantics; it is not a CP359 predecessor, bridge, live-service owner, or
+numerical feed.
+
+Binding and direct-only evidence preserve
+CP358-to-CP359-to-unchanged-numerical order under
+`purchased_air_calc_cooling_humidistat_moisture_demand_assignment_lifecycle`.
+CP359 neither enters nor feeds `DirectZonePurchasedAirCouplingInput`,
+`prediction.zone_demand`, any numerical DTO, or CP319 state. Actual
+result-store first/last supply-humidity-ratio bits remain owned by the
+unchanged CP345 numerical path. Non-direct paths publish `None` and reject
+CP359 evidence.
+
+Counts remain exactly 32 algorithms and 293 routines, split 58 `state_mapped`
+plus 235 `source_mapped`, with 170 required. The added internal audit changes
+only the script inventory to 297 total, 240 public, 57 internal, and zero
+unused. Both parents remain `scaffold`/`none`, both Calc routines remain
+`source_mapped`, and support, readiness, run state, capability,
+feature/evidence, numerical conformance, output ownership, status,
+conformance, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

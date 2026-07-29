@@ -19288,6 +19288,81 @@ public, 56 internal, and zero unused. Both parent algorithms remain
 run state, capability, feature/evidence boundaries, numerical conformance,
 output ownership, status, conformance, and Roadmap state remain unchanged.
 
+## CP359 Source-Ordered Cooling Humidistat Moisture-Demand Assignment
+
+CP359 supersedes only CP358's physical-line-2229 exclusion by mapping the
+Humidistat Zone moisture-demand lookup/read and local assignment at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2229:
+
+```cpp
+MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToDehumidSP;
+```
+
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The exact two-site source order is
+`read-zone-dehumidifying-setpoint-moisture-demand` then
+`assign-local-zone-dehumidifying-setpoint-moisture-demand`. Physical
+executable line 2230,
+`SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;`,
+is first excluded. CP359 claims no mass-flow or Zone-node-humidity read,
+division, addition, supply-humidity-ratio assignment, or later Humidistat-body
+behavior. Private `Q` already executed line 2227 `break;` and continues at line
+2245 after the switch.
+
+The exact routes remain inherited `UnitOff`, `NonCooling`,
+`PositiveGuardFalseFallthrough`, completed-`None` skip, completed constant-SHR
+skip, private Humidistat moisture-demand assignment, and private
+constant-supply-humidity skip. For transitions `T`, route counts
+`U/N/P/C0/Q/H/CSH`, CP346 switch dispatches `S`, CP345 assignments `R`,
+predecessor provenance `G/F/L`, and CP340 active evaluations `A`, checked
+state requires:
+
+```text
+T = U+N+P+C0+Q+H+CSH
+S = C0+Q+H+CSH = R = G+F+L
+A = F+L
+zone_dehumidifying_setpoint_moisture_demand_read_count = H
+zone_dehumidifying_setpoint_moisture_demand_assignment_count = H
+source_site_execution_count = 2H
+```
+
+`Q` equals CP358 completed constant-SHR skips and `H` equals CP358 Humidistat
+entries. Exact direct release remains CP358's completed `None` route and
+strengthens the partition to `C0=S` and `Q=H=CSH=0`. Both source-site flags
+are false and the raw, assigned, and resulting scalar fields are all `None`;
+direct CP359 evidence is a complete skip.
+
+Exact release validates same-call CP358 supplied/latest/private parity and
+recursive completion before mutation. CP358 is the sole immediate predecessor
+owner. Private active `H` is a parametric characterization that requires the
+canonical CP358 private-Humidistat predecessor and an explicit pre-sampled
+`f64`; it copies that scalar into the raw, assigned, and resulting local fields
+with exact binary64-bit preservation. It performs no arithmetic, comparison,
+psychrometric call, finite/range gate, clamp, normalization, default,
+diagnostic, or coercion. The explicit scalar has no retained authoritative
+owner and grants no live Zone moisture-demand service or capability. CP319's
+private pre-sampled Humidistat path is corroborating precedent only, not a
+predecessor, canonical bridge, owner, or feed.
+
+Binding and direct-only lifecycle evidence preserve
+CP358-to-CP359-to-unchanged-numerical order under
+`purchased_air_calc_cooling_humidistat_moisture_demand_assignment_lifecycle`.
+CP359 neither enters nor consumes `DirectZonePurchasedAirCouplingInput`,
+`prediction.zone_demand`, the CP319 lifecycle, or any numerical DTO, and does
+not reconcile with, feed, or replace numerical state. Actual result-store
+first/last supply-humidity-ratio bits remain unchanged and owned by CP345.
+Non-direct paths expose `None` and reject attached CP359 evidence.
+
+Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Script inventory becomes 297 total, 240
+public, 57 internal, and zero unused. Both parent algorithms remain
+`scaffold`/`none`; `routine.calc_purch_air_loads` and
+`routine.calc_purch_air_mixed_air` remain `source_mapped`. Support, readiness,
+run state, capability, feature/evidence boundaries, numerical conformance,
+output ownership, status, conformance, and Roadmap state remain unchanged.
+
 ## Run States
 
 Arbitrary runs return one of three support states:

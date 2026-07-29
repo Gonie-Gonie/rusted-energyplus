@@ -20989,6 +20989,52 @@ and 170 required; scripts become 296 total, 240 public, 56 internal, and zero
 unused. Parent/Calc states and all support, readiness, capability, evidence,
 numerical, output, conformance, status, and Roadmap claims remain unchanged.
 
+## CP359 Humidistat Moisture-Demand Assignment
+
+CP359 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+and only `PurchasedAirManager.cc` physical executable line 2229,
+`MdotZnDehumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToDehumidSP;`.
+Its source order is
+`read-zone-dehumidifying-setpoint-moisture-demand` then
+`assign-local-zone-dehumidifying-setpoint-moisture-demand`. Physical
+executable line 2230,
+`SupplyHumRatForDehum = MdotZnDehumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;`,
+is first excluded with its operand reads, division, addition, assignment, and
+all later Humidistat behavior. Private `Q` resumes at line 2245 after its
+earlier break.
+
+Routes remain `U/N/P/C0/Q/H/CSH`; exact state requires
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`,
+`A = F+L`, `Q` equal to CP358 completed constant-SHR skips, `H` equal to
+CP358 Humidistat entries, both source-site counters equal `H`, and
+`source_site_execution_count = 2H`. Direct `None` has `C0 = S`,
+`Q = H = CSH = 0`, false read/assignment flags, three null scalar fields, and
+a complete skip.
+
+Recursively validated same-call bit-exact CP358 evidence solely owns CP359's
+predecessor. Private active `H` also accepts an explicit pre-sampled `f64`
+parameter and preserves its bits identically across raw, assigned, and
+resulting local fields. That parametric characterization has no retained
+authoritative scalar owner and grants no live Zone moisture-demand service.
+CP319 is semantic precedent only, not a predecessor, bridge, owner, or feed.
+CP359 adds no arithmetic, comparison, finite/range gate, clamp, normalization,
+default, diagnostic, psychrometric call, or coercion.
+
+Binding order is CP358-to-CP359-to-unchanged-numerical under
+`purchased_air_calc_cooling_humidistat_moisture_demand_assignment_lifecycle`.
+CP359 does not enter, consume, reconcile with, feed, or replace
+`DirectZonePurchasedAirCouplingInput`, `prediction.zone_demand`, the CP319
+lifecycle, or the numerical DTO. Actual result-store first/last
+supply-humidity bits remain unchanged and owned by CP345. Non-direct paths
+publish `None` and reject evidence.
+
+Counts remain 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped,
+and 170 required; scripts become 297 total, 240 public, 57 internal, and zero
+unused. Parent/Calc states and all support, readiness, capability, evidence,
+numerical, output, conformance, status, and Roadmap claims remain unchanged.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

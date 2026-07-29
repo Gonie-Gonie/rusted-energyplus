@@ -464,6 +464,11 @@ $postCp339BeforeNumericalCodeForCp334 = [regex]::Replace(
     '(?s)let calculation_cooling_humidistat_case_entry =\s*advance_cooling_humidistat_case_entry\([^;]+?\)\?;',
     ''
 )
+$postCp339BeforeNumericalCodeForCp334 = [regex]::Replace(
+    $postCp339BeforeNumericalCodeForCp334,
+    '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =\s*advance_cooling_humidistat_moisture_demand_assignment\([^;]+?\)\?;',
+    ''
+)
 if ($postCp339BeforeNumericalCodeForCp334 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
     throw "No helper other than the audited CP340 through CP348 releases may execute after CP339 and before numerical Calc"
 }
@@ -505,7 +510,7 @@ Assert-Contains -Path $cp334DirectAssertions -Pattern 'const SOURCE_ORDER:\s*\[&
 Assert-Contains -Path $cp334DirectAssertions -Pattern 'executions \* SOURCE_ORDER\.len\(\) as u64' -Description "direct-run CP334 dynamic source-site count"
 Assert-Contains -Path $cp334DirectAssertions -Pattern 'purchased_air_calc_cooling_mixed_air_call_lifecycle' -Description "direct-run CP329 bit provenance"
 Assert-Contains -Path $cp334NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle' -Description "non-direct CP334 null evidence"
-Assert-Contains -Path $cp334PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp358_lifecycle_evidence' -Description "non-direct CP334 through CP357 evidence rejection"
+Assert-Contains -Path $cp334PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp359_lifecycle_evidence' -Description "non-direct CP334 through CP357 evidence rejection"
 
 # Registries repeat the boundary exactly twice and add target inventory only.
 $cp334AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
