@@ -23176,6 +23176,77 @@ An official ExampleFile zone-air series may become conformance only after:
 - failure deltas are below declared max absolute and RMSE tolerances.
 - the case has a blocking gate and `conformance_claim=true`.
 
+## CP354 Constant-SHR Supply-Humidity-Ratio Overdrying Limit Placement
+
+CP354 places pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2222 immediately after
+CP353:
+`PurchAir.SupplyHumRat = min(PurchAir.SupplyHumRat, PsyWFnTdbH(state, PurchAir.SupplyTemp, SupplyEnthalpy, RoutineName));`.
+The raw SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its six exact sites are
+`read-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-overdrying-limit-minimum`,
+`read-purchased-air-supply-temperature-for-constant-sensible-heat-ratio-humidity-ratio-inversion`,
+`read-local-supply-enthalpy-for-constant-sensible-heat-ratio-humidity-ratio-inversion`,
+`evaluate-psy-w-fn-tdb-h-for-constant-sensible-heat-ratio-overdrying-limit`,
+`apply-source-shaped-two-argument-minimum-for-constant-sensible-heat-ratio-overdrying-limit`,
+and
+`assign-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-overdrying-limit`.
+Their deterministic dependency order makes no C++ minimum-argument evaluation
+order claim.
+
+Routes are `U/N/P/C0/Q/H/CSH`; exact algebra requires
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`,
+`A = F+L`, `Q` equal to CP353 supply-enthalpy assignments, every site counter
+equal to `Q`, and `source_site_execution_count = 6*Q`. Direct evidence has
+`C0 = S` and `Q = H = CSH = 0` and remains a complete-null skip. Private `Q`
+uses a restricted same-call CP353 counterfactual bridge rooted in recursively
+complete direct evidence.
+
+CP345 `assigned_supply_humidity_ratio` is the sole left-operand owner, while
+CP353 `resulting_supply_enthalpy_j_per_kg` owns inversion enthalpy. CP345
+one-hot `G/F/L` provenance selects supply temperature from CP334
+`assigned_supply_temperature_c` on `G/F`, or CP344
+`resulting_supply_temperature_c` on `L`. CP353, CP345, and the selected
+CP334-or-CP344 latest/private witnesses pass exact same-call recursive proof;
+the CP353 bridge reconstructs its restricted active owner chain. Coordinated
+owner, witness, bridge, or provenance corruption fails transactionally. CP336
+enthalpy, CP350's prior read, CP352's earlier enthalpy, caller/model duplicate
+scalars, and numerical DTO state cannot substitute.
+
+Canonical `energyplus_psy_w_fn_tdb_h` retains
+`(H - 1.00484e3*T) / (2.50094e6 + 1.85895e3*T)` grouping. Reassociation,
+simplification, `mul_add`, and alternate helper substitution are excluded.
+The strict `raw < 0.0` test maps only ordered negatives to `1.0e-5`
+(`0x3ee4f8b588e368f1`); negative zero and NaN survive unchanged. Optional
+psychrometric statistics and mutable `CalledFrom`/`SuppressWarnings`
+diagnostic state behind source `state` and `RoutineName` remain excluded.
+
+ObjexxFCL two-`double` minimum is `a < b ? a : b`, so Rust must use
+`if left < right { left } else { right }`, not `f64::min`. Strict less-than
+selects CP345's left operand. Ties, signed-zero ties, and unordered comparisons
+preserve the right bits; a finite right survives a left NaN, a right NaN
+survives a finite left, and two NaNs retain the right payload. There is no
+CP354 finite, clamp, normalization, diagnostic, default, or coercion gate.
+Pure-transition IEEE characterization does not assert wider private-release
+reachability.
+
+Physical line 2223 is comment-only. Physical executable line 2224,
+`PurchAir.SupplyHumRat = max(PurchAir.SupplyHumRat, PurchAir.MinCoolSuppAirHumRat);`,
+is the first excluded executable and CP355 boundary. CP354 result is CP355's
+retained supply-humidity-ratio owner candidate only. Lifecycle order is
+CP353-to-CP354-to-unchanged-numerical under
+`purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle`.
+No CP354 evidence enters `DirectZonePurchasedAirCouplingInput`; it consumes,
+reconciles with, feeds, and replaces no numerical DTO value. Non-direct paths
+publish `None` and reject evidence. Both parents remain `scaffold`/`none`,
+both Calc routines remain `source_mapped`, and counts remain 32 algorithms,
+293 routines, 58 state-mapped, 235 source-mapped, and 170 required. CP354
+changes no readiness, support, capability, feature/evidence,
+numerical-conformance, output-ownership, status, conformance, or Roadmap
+state.
+
 ## Current Boundary
 
 `Zone Mean Air Temperature`, `Zone Air Heat Balance Surface Convection Rate`,

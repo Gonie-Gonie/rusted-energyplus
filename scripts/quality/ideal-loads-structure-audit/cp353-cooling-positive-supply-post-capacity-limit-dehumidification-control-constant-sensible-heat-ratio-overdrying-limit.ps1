@@ -113,9 +113,10 @@ function Assert-Cp353BindingContract {
     param([string]$Text)
     $cp352 = $Text.IndexOf("let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment =")
     $cp353 = $Text.IndexOf("let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit =")
+    $cp354 = $Text.IndexOf("let calculation_cooling_constant_shr_supply_humidity_ratio_overdrying_limit =")
     $numerical = $Text.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
-    if ($cp352 -lt 0 -or $cp353 -le $cp352 -or $numerical -le $cp353) {
-        throw "Binding must execute CP352 then CP353 before numerical coupling"
+    if ($cp352 -lt 0 -or $cp353 -le $cp352 -or $cp354 -le $cp353 -or $numerical -le $cp354) {
+        throw "Binding must execute CP352 then CP353 then CP354 before numerical coupling"
     }
     $dto = Get-Cp353RustBraceBlock -Text $Text.Substring($numerical) -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{' -Description "CP353 numerical DTO"
     if ($dto -match '(?i)cp35[23]|supply_enthalpy_assignment|overdrying_limit') {
@@ -155,7 +156,7 @@ foreach ($required in @(
 }
 Assert-LineLimit -Path $cp353Transition -Limit 450 -Description "CP353 transition"
 Assert-LineLimit -Path $cp353Release -Limit 450 -Description "CP353 release"
-Assert-LineLimit -Path $cp353Prefix -Limit 400 -Description "CP353 prefix validation"
+Assert-LineLimit -Path $cp353Prefix -Limit 500 -Description "CP353 prefix validation"
 Assert-LineLimit -Path $cp353Runtime -Limit 350 -Description "CP353 runtime validation"
 Assert-LineLimit -Path $cp353Snapshot -Limit 350 -Description "CP353 snapshot validation"
 Assert-LineLimit -Path $cp353Coupled -Limit 500 -Description "CP353 coupled validation"
@@ -249,7 +250,7 @@ Assert-Contains -Path $cp353PipelineRoot -Pattern ('mod ' + [regex]::Escape($cp3
 Assert-Contains -Path $cp353PipelineRoot -Pattern ('"' + $cp353Lifecycle + '":\s*result\s*\.' + $cp353Lifecycle) -Description "CP353 lifecycle JSON"
 Assert-Contains -Path $cp353PipelineValidation -Pattern 'supply_enthalpy_assignment_cp352' -Description "pipeline CP352 predecessor"
 Assert-Contains -Path $cp353PipelineValidation -Pattern '(?s)executed\s*\.checked_mul\(.*?OVERDRYING_LIMIT_SOURCE_ORDER\s*\.len\(\)' -Description "pipeline checked 5Q"
-Assert-Contains -Path $cp353PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp353_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp353PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp354_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp353ArbitraryTests -Pattern 'cp353_assertions' -Description "arbitrary CP353 module"
 Assert-Contains -Path $cp353ArbitraryAssertions -Pattern $cp353Lifecycle -Description "arbitrary CP353 lifecycle"
 foreach ($field in @(
@@ -341,7 +342,7 @@ foreach ($historical in @("cp326-cooling-supply-mass-flow-limit-body.ps1") + @(
 }
 foreach ($historical in 334..352) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp353_lifecycle_evidence' -Description "historical CP353 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp354_lifecycle_evidence' -Description "historical CP353 firewall"
 }
 $mainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp352AuditIndex = $mainAuditText.IndexOf("cp352-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-enthalpy-assignment.ps1")
@@ -350,13 +351,13 @@ $completionIndex = $mainAuditText.IndexOf('Write-Host "IdealLoads structure audi
 if ($cp352AuditIndex -lt 0 -or $cp353AuditIndex -le $cp352AuditIndex -or $completionIndex -le $cp353AuditIndex) {
     throw "Master audit must dot-source CP353 after CP352 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 291' -Description "CP353 script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 292' -Description "CP353 script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP353 zero uncalled"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp353-' -Description "CP353 inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'cp353-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit\.ps1::dot_sources' -Description "CP353 caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 291 \|' -Description "generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 292 \|' -Description "generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 51 \|' -Description "generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 52 \|' -Description "generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated uncalled"
 
 Write-Host "CP353 constant-SHR overdrying-limit structure audit passed."

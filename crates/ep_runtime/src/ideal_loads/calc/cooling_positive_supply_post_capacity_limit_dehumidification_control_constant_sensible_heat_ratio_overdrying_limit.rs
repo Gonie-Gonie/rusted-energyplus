@@ -10,15 +10,24 @@ mod state;
 mod tests;
 mod transition;
 
+#[cfg(test)]
 #[allow(unused_imports)]
-pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_is_consistent;
+pub(in crate::ideal_loads::calc) use release::active_operands_from_retained_owners_for_test;
 pub(in crate::ideal_loads) use release::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_snapshot_is_exact_direct_release;
 pub use release::{
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitError,
     advance_direct_no_oa_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit,
 };
+#[allow(unused_imports)]
+pub(in crate::ideal_loads::calc) use release::{
+    completed_direct_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_is_consistent,
+    private_active_counterfactual_links_to_direct_release,
+};
 pub(super) use state::PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitRetainedRoute;
 pub use state::PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitRuntimeState;
+#[cfg(test)]
+#[allow(unused_imports)]
+pub(in crate::ideal_loads::calc) use tests::{completed_cp352_case, private_active_predecessor};
 pub(in crate::ideal_loads::calc) use transition::{
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitActiveOperands,
     advance_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_state,
@@ -66,8 +75,7 @@ pub struct PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificatio
     pub predecessor_dehumidification_control_constant_supply_humidity_ratio_case_selected_skip:
         bool,
     pub dehumidification_control_none_case_completed_skip: bool,
-    pub dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_executed:
-        bool,
+    pub dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_executed: bool,
     pub dehumidification_control_humidistat_case_selected_skip: bool,
     pub dehumidification_control_constant_supply_humidity_ratio_case_selected_skip: bool,
     pub supply_enthalpy_for_overdrying_limit_maximum_read: bool,
@@ -103,7 +111,7 @@ pub fn purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidifi
 ) -> Result<
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitLifecycleSummary,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitError,
-> {
+>{
     let unit = runtime.units.get(&system).ok_or(
         PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitError::UnknownSystem {
             system,

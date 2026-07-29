@@ -21,6 +21,7 @@ use ep_runtime::{
     PURCHASED_AIR_CALC_ENTRY_RESET_TARGETS, PURCHASED_AIR_CALC_ENTRY_SOURCE,
     PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PURCHASED_AIR_INIT_LIFECYCLE_SOURCE,
     PurchasedAirAvailabilityStatus, PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary,
+    PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitLifecycleSummary,
     PurchasedAirCalcCoolingDehumidificationFlowLifecycleSummary,
     PurchasedAirCalcCoolingEconomizerBodyLifecycleSummary,
     PurchasedAirCalcCoolingEconomizerConditionLifecycleSummary,
@@ -96,6 +97,7 @@ use crate::{
 };
 
 mod purchased_air_cooling_capacity_zero_flow_reset;
+mod purchased_air_cooling_constant_shr_supply_humidity_ratio_overdrying_limit;
 mod purchased_air_cooling_dehumidification_flow;
 mod purchased_air_cooling_economizer_body;
 mod purchased_air_cooling_economizer_condition;
@@ -358,6 +360,8 @@ struct RustRuntimeResult {
         Option<
             PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitLifecycleSummary,
         >,
+    purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle:
+        Option<PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitLifecycleSummary>,
 }
 
 struct PreparedRuntimeInputs {
@@ -1570,6 +1574,10 @@ fn finish_successful_summary(
                 .purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle
                 .as_ref()
                 .map(purchased_air_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit::lifecycle_json),
+            "purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle": result
+                .purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle
+                .as_ref()
+                .map(purchased_air_cooling_constant_shr_supply_humidity_ratio_overdrying_limit::lifecycle_json),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
@@ -2520,6 +2528,8 @@ fn execute_rust_runtime(
                     None,
                 purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle:
                     None,
+                purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle:
+                    None,
             })
         }
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
@@ -2770,6 +2780,12 @@ fn execute_rust_runtime(
                         .summary
                         .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle,
                 );
+            let purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle =
+                Some(
+                    simulation
+                        .summary
+                        .calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle,
+                );
             Ok(RustRuntimeResult {
                 results: simulation.results,
                 runtime_class,
@@ -2829,6 +2845,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_lifecycle,
                 purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_lifecycle,
                 purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle,
+                purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle,
             })
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
@@ -2917,6 +2934,8 @@ fn execute_rust_runtime(
                     None,
                 purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle:
                     None,
+                purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle:
+                    None,
             })
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
@@ -3002,6 +3021,8 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_lifecycle:
                     None,
                 purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle:
+                    None,
+                purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle:
                     None,
             })
         }
@@ -3609,6 +3630,18 @@ fn validate_runtime_demand_provenance(
             init_lifecycle,
             result.purchased_air_coupling_call_count,
         )?;
+        purchased_air_cooling_constant_shr_supply_humidity_ratio_overdrying_limit::validate_direct_lifecycle(
+            result
+                .purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle
+                .as_ref(),
+            purchased_air_cooling_constant_shr_supply_humidity_ratio_overdrying_limit::DirectLifecyclePredecessors {
+                enthalpy_overdrying_limit_cp353: result
+                    .purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle
+                    .as_ref(),
+            },
+            init_lifecycle,
+            result.purchased_air_coupling_call_count,
+        )?;
     } else if result.purchased_air_init_lifecycle.is_some()
         || result.purchased_air_calc_entry_lifecycle.is_some()
         || result
@@ -3739,6 +3772,9 @@ fn validate_runtime_demand_provenance(
             .is_some()
         || result
             .purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle
+            .is_some()
+        || result
+            .purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle
             .is_some()
         || result.purchased_air_coupling_call_count.is_some()
     {
@@ -5413,7 +5449,7 @@ mod tests {
     }
 
     #[test]
-    fn non_direct_runtime_rejects_cp316_through_cp353_lifecycle_evidence() {
+    fn non_direct_runtime_rejects_cp316_through_cp354_lifecycle_evidence() {
         let mut result = RustRuntimeResult {
             results: ResultStore::new(),
             runtime_class: RuntimeClass::IdealLoadsFixtureDemandDiagnostic,
@@ -5500,6 +5536,8 @@ mod tests {
             purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_lifecycle:
                 None,
             purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle:
+                None,
+            purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle:
                 None,
         };
         assert!(
@@ -6299,6 +6337,30 @@ mod tests {
         );
         result
             .purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle =
+            None;
+        result
+            .purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle =
+            Some(
+                ep_runtime::PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitLifecycleSummary {
+                    source: ep_runtime::
+                        PURCHASED_AIR_CALC_COOLING_CONSTANT_SHR_SUPPLY_HUMIDITY_RATIO_OVERDRYING_LIMIT_SOURCE,
+                    first_excluded_source: ep_runtime::
+                        PURCHASED_AIR_CALC_COOLING_CONSTANT_SHR_SUPPLY_HUMIDITY_RATIO_OVERDRYING_LIMIT_FIRST_EXCLUDED_SOURCE,
+                    state: ep_runtime::
+                        PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitRuntimeState::new(
+                            IdealLoadsAirSystemId(0),
+                        ),
+                },
+            );
+        assert_eq!(
+            validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result, None),
+            Err(
+                "persistent PurchasedAir lifecycle evidence was attached to a non-direct runtime"
+                    .to_string()
+            )
+        );
+        result
+            .purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle =
             None;
     }
 

@@ -21,6 +21,7 @@ use super::{
     DirectZonePurchasedAirCouplingError, DirectZonePurchasedAirCouplingInput,
     IdealLoadsPurchasedAirBranch, IdealLoadsSensibleLimitContext, PurchasedAirAvailabilityStatus,
     PurchasedAirCalcCoolingCapacityZeroFlowResetError,
+    PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitError as CoolingConstantShrSupplyHumidityRatioOverdryingLimitError,
     PurchasedAirCalcCoolingDehumidificationFlowError, PurchasedAirCalcCoolingEconomizerBodyError,
     PurchasedAirCalcCoolingEconomizerConditionError, PurchasedAirCalcCoolingEconomizerGuardError,
     PurchasedAirCalcCoolingEntryGateError, PurchasedAirCalcCoolingHumidificationFlowError,
@@ -92,6 +93,7 @@ use super::{
     PurchasedAirCalcMinimumOaPrefixSnapshot, PurchasedAirInitSnapshot,
 };
 
+mod cooling_constant_shr_supply_humidity_ratio_overdrying_limit;
 mod cooling_positive_supply_capacity_limit_cp_air_assignment;
 mod cooling_positive_supply_capacity_limit_guard;
 mod cooling_positive_supply_capacity_limit_sensible_output_assignment;
@@ -119,6 +121,7 @@ mod cooling_supply_mass_flow_positive_guard;
 mod scheduled_output;
 
 use cooling_positive_supply_capacity_limit_cp_air_assignment::advance_positive_supply_capacity_limit_cp_air_assignment;
+use cooling_constant_shr_supply_humidity_ratio_overdrying_limit::advance_cooling_constant_shr_supply_humidity_ratio_overdrying_limit;
 use cooling_positive_supply_capacity_limit_guard::advance_positive_supply_capacity_limit_guard;
 use cooling_positive_supply_capacity_limit_sensible_output_assignment::advance_positive_supply_capacity_limit_sensible_output_assignment;
 use cooling_positive_supply_capacity_limit_sensible_output_guard::advance_positive_supply_capacity_limit_sensible_output_guard;
@@ -813,6 +816,10 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimit(
         CoolingSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitError,
     ),
+    /// The bounded constant-SHR supply-humidity-ratio overdrying limit rejected its release state.
+    CalculationCoolingConstantShrSupplyHumidityRatioOverdryingLimit(
+        CoolingConstantShrSupplyHumidityRatioOverdryingLimitError,
+    ),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -1303,6 +1310,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment,
         )?;
+    let calculation_cooling_constant_shr_supply_humidity_ratio_overdrying_limit =
+        advance_cooling_constant_shr_supply_humidity_ratio_overdrying_limit(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1384,6 +1397,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment,
         calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment,
         calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit,
+        calculation_cooling_constant_shr_supply_humidity_ratio_overdrying_limit,
         coupling,
     })
 }

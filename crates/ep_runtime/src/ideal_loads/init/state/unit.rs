@@ -149,6 +149,10 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitRuntimeState::new(
                     system,
                 ),
+            calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit:
+                PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitRuntimeState::new(
+                    system,
+                ),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

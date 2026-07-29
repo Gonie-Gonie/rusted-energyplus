@@ -18,6 +18,7 @@ mod prefix_validation;
 mod runtime_validation;
 mod snapshot_validation;
 
+pub(in crate::ideal_loads::calc) use prefix_validation::private_active_counterfactual_links_to_direct_release;
 use prefix_validation::{active_lineage_is_exact, assignment_links_to_predecessor};
 use runtime_validation::{
     calc_state_identities_match, call_order_is_pending, completed_state_is_consistent,
@@ -145,7 +146,7 @@ pub fn advance_direct_no_oa_calc_cooling_positive_supply_post_capacity_limit_deh
 ) -> Result<
     Snapshot,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitError,
-> {
+>{
     let selected = predecessor_cp352.system;
     let unit = runtime.units.get(&selected).ok_or(
         PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitError::UnknownSystem {

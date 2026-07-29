@@ -18968,6 +18968,97 @@ required. CP353 changes no support, readiness, run state, capability,
 feature/evidence, numerical-conformance, output-ownership, status,
 conformance, or Roadmap state.
 
+## CP354 Source-Ordered Cooling Constant-SHR Supply-Humidity-Ratio Overdrying Limit
+
+CP354 supersedes only CP353's physical-line-2222 exclusion. At pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`, whose
+`PurchasedAirManager.cc` raw SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+physical executable line 2222 is:
+
+```cpp
+PurchAir.SupplyHumRat = min(PurchAir.SupplyHumRat, PsyWFnTdbH(state, PurchAir.SupplyTemp, SupplyEnthalpy, RoutineName));
+```
+
+The exact six source/dependency sites are
+`read-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-overdrying-limit-minimum`,
+`read-purchased-air-supply-temperature-for-constant-sensible-heat-ratio-humidity-ratio-inversion`,
+`read-local-supply-enthalpy-for-constant-sensible-heat-ratio-humidity-ratio-inversion`,
+`evaluate-psy-w-fn-tdb-h-for-constant-sensible-heat-ratio-overdrying-limit`,
+`apply-source-shaped-two-argument-minimum-for-constant-sensible-heat-ratio-overdrying-limit`,
+and
+`assign-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-overdrying-limit`.
+Their deterministic Rust dependency order does not claim C++ function-argument
+evaluation order because both minimum arguments are side-effect free after the
+canonical psychrometric evaluation.
+
+The inherited routes are `U/N/P/C0/Q/H/CSH`. For transitions `T`, CP346
+dispatches `S`, CP345 assignments `R`, capacity provenance `G/F/L`, and CP340
+active evaluations `A`, exact state requires
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`, `A = F+L`, `Q`
+equal to CP353 supply-enthalpy assignments, all six site counters equal to
+`Q`, and `source_site_execution_count = 6*Q`. Every other route executes zero
+CP354 sites. Exact direct release inherits CP353's completed `None` route,
+requires `C0 = S` and `Q = H = CSH = 0`, and publishes a complete
+operand/intermediate/result-null skip. Active `Q` remains a restricted private
+counterfactual rooted in bit-exact, recursively completed same-call direct
+CP353 evidence.
+
+CP345 `assigned_supply_humidity_ratio` is the sole first-argument owner.
+CP353 `resulting_supply_enthalpy_j_per_kg` owns the inversion enthalpy.
+CP345's one-hot `G/F/L` provenance selects CP334
+`assigned_supply_temperature_c` on `G/F`, or CP344
+`resulting_supply_temperature_c` on `L`. CP353, CP345, and the selected
+CP334-or-CP344 latest/private witness pairs pass same-call identity, exact
+snapshot, and runtime-aware recursive completion before mutation. Restricted
+CP353 counterfactual reconstruction replays its recursively validated owner
+chain. Coordinated owner, witness, predecessor, bridge, or provenance
+corruption therefore fails transactionally. CP336's overwritten enthalpy,
+CP350's earlier temperature read, CP352's earlier enthalpy, duplicate
+caller/model scalars, psychrometric substitutes, and
+`DirectZonePurchasedAirCouplingInput` cannot replace an owner.
+
+CP354 calls only canonical
+`energyplus_psy_w_fn_tdb_h(supply_temperature, supply_enthalpy)`. The retained
+formula grouping is
+`(H - 1.00484e3*T) / (2.50094e6 + 1.85895e3*T)`. Algebraic simplification,
+reassociation, `mul_add`, and alternate psychrometric helpers are forbidden
+substitutions. The raw result uses the strict test `raw < 0.0`; only an ordered
+negative becomes `1.0e-5`, whose binary64 bits are
+`0x3ee4f8b588e368f1`. Negative zero and NaN survive unchanged. Optional
+psychrometric statistics and mutable `CalledFrom`/`SuppressWarnings`
+diagnostic state represented by the source `state` and `RoutineName`
+arguments remain excluded from this pure numerical helper.
+
+ObjexxFCL's two-`double` minimum is exactly `a < b ? a : b`; Rust mirrors it
+as `if left < right { left } else { right }`, not `f64::min`. Strict ordered
+less-than selects CP345's left humidity ratio. Ties, signed-zero ties, and
+unordered comparisons retain the psychrometric right operand bit-for-bit.
+Thus a finite right survives a left NaN, a right NaN survives a finite left,
+and two NaNs retain the right payload. CP354 adds no line-local finite, range,
+clamp, normalization, cache, diagnostic, default, or coercion gate. Pure
+transition tests characterize raw IEEE cases without widening private-release
+reachability. Nonfinite values remain present with authoritative bits while
+JSON nulls only their numeric projection; skipped values remain `None`.
+
+Physical line 2223 is comment-only. Physical executable line 2224,
+`PurchAir.SupplyHumRat = max(PurchAir.SupplyHumRat, PurchAir.MinCoolSuppAirHumRat);`,
+is the first excluded executable and CP355 boundary. Its
+minimum-cooling-humidity-ratio read, maximum, assignment, and later case body
+remain excluded. CP354 resulting supply humidity ratio is CP355's
+retained-input owner candidate, not an implementation of CP355. Binding,
+coupled validation, and serialization preserve
+CP353-to-CP354-to-unchanged-numerical order under
+`purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle`.
+CP354 never enters, consumes, reconciles with, feeds, or replaces
+`DirectZonePurchasedAirCouplingInput` or the numerical DTO. Non-direct paths
+publish `None` and reject evidence. Both parents remain `scaffold`/`none`,
+both Calc routines remain `source_mapped`, and inventory remains 32 algorithms
+and 293 routines, split 58 state-mapped plus 235 source-mapped with 170
+required. CP354 changes no support, readiness, run state, capability,
+feature/evidence, numerical-conformance, output-ownership, status,
+conformance, or Roadmap state.
+
 ## Run States
 
 Arbitrary runs return one of three support states:

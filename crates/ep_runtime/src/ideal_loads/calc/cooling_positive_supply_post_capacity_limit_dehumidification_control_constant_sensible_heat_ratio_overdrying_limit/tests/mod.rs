@@ -31,7 +31,7 @@ mod ieee;
 mod public_release;
 mod release_corruption;
 
-pub(super) fn completed_cp352_case(
+pub(in crate::ideal_loads::calc) fn completed_cp352_case(
     cooling_demand_w: f64,
     overall_availability: f64,
     capacity_limit: bool,
@@ -211,7 +211,7 @@ pub(super) fn retained_supply_temperature(
     }
 }
 
-pub(super) fn private_active_predecessor(
+pub(in crate::ideal_loads::calc) fn private_active_predecessor(
     mut direct: Predecessor,
     runtime: &PurchasedAirRuntimeState,
     system: &ep_model::IdealLoadsAirSystem,
