@@ -15,7 +15,7 @@ $cp337Tests = "crates\ep_runtime\src\ideal_loads\calc\cooling_positive_supply_ca
 $cp337ReleaseCorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_positive_supply_capacity_limit_guard\tests\release_corruption.rs"
 $cp337CalcRoot = "crates\ep_runtime\src\ideal_loads\calc.rs"
 $cp337Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
-Assert-Contains -Path $cp337Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360 binding order"
+Assert-Contains -Path $cp337Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361 binding order"
 $cp337ScheduledOutput = "crates\ep_runtime\src\ideal_loads\binding\scheduled_output.rs"
 $cp337BindingAdapter = "crates\ep_runtime\src\ideal_loads\binding\cooling_positive_supply_capacity_limit_guard.rs"
 $cp337BindingTestsRoot = "crates\ep_runtime\src\ideal_loads\binding_tests.rs"
@@ -406,6 +406,11 @@ $cp337IntervalCode = [regex]::Replace(
     '(?s)let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =\s*advance_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment\([^;]+?\)\?;',
     ''
 )
+$cp337IntervalCode = [regex]::Replace(
+    $cp337IntervalCode,
+    '(?s)let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =\s*advance_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit\([^;]+?\)\?;',
+    ''
+)
     if ($cp337IntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
         throw "No intermediary helper call may execute $($cp337Interval.Description)"
     }
@@ -462,7 +467,7 @@ Assert-Contains -Path $cp337DirectAssertions -Pattern 'const SOURCE_ORDER:\s*\[&
 Assert-Contains -Path $cp337DirectAssertions -Pattern 'let source_sites = 2 \* active \+ 2 \* second_comparisons \+ body_entries;' -Description "direct-run CP337 dynamic source formula"
 Assert-Contains -Path $cp337DirectAssertions -Pattern 'purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle' -Description "direct-run CP336 predecessor evidence"
 Assert-Contains -Path $cp337NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_guard_lifecycle' -Description "non-direct CP337 null evidence"
-Assert-Contains -Path $cp337PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp360_lifecycle_evidence' -Description "non-direct CP337 through CP358 evidence rejection"
+Assert-Contains -Path $cp337PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp361_lifecycle_evidence' -Description "non-direct CP337 through CP358 evidence rejection"
 Assert-NotContains -Path $cp337Pipeline -Pattern 'latest_numerical|numerical_supply_mass_flow|final_supply_mass_flow|complete_direct_zone_purchased_air_coupling' -Description "numerical DTO reconciliation in CP337 pipeline"
 
 # Exactly two algorithm addenda, two capability addenda, and six target
@@ -619,11 +624,11 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP337, CP338, and CP339 in order before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 298' -Description "CP337 cumulative inventory total through CP358"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 299' -Description "CP337 cumulative inventory total through CP358"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp337-cooling-positive-supply-capacity-limit-guard\.ps1"' -Description "CP337 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment\.ps1"' -Description "CP338 internal script inventory record after CP337"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment\.ps1"' -Description "CP339 internal script inventory record after CP338"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 298 \|' -Description "CP337 cumulative generated script count through CP358"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 299 \|' -Description "CP337 cumulative generated script count through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP337 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 58 \|' -Description "CP337 cumulative generated internal script count through CP358"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 59 \|' -Description "CP337 cumulative generated internal script count through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP337 generated uncalled script count"

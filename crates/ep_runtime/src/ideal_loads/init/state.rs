@@ -11,8 +11,6 @@ use std::collections::BTreeMap;
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
 use super::super::{
-    PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitSnapshot as Cp354Snapshot,
-    PurchasedAirCalcCoolingHumidistatCaseEntrySnapshot as Cp358Snapshot,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseEntrySnapshot as Cp348Snapshot,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCpAirAssignmentSnapshot as Cp349Snapshot,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitSnapshot as Cp353Snapshot,
@@ -173,13 +171,14 @@ pub struct PurchasedAirRuntimeState {
     #[rustfmt::skip] cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, Cp351Snapshot>,
     #[rustfmt::skip] cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, Cp352Snapshot>,
     #[rustfmt::skip] cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, Cp353Snapshot>,
-    #[rustfmt::skip] cooling_constant_shr_supply_humidity_ratio_overdrying_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, Cp354Snapshot>,
+    #[rustfmt::skip] cooling_constant_shr_supply_humidity_ratio_overdrying_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitSnapshot>,
     #[rustfmt::skip] cooling_constant_shr_supply_humidity_ratio_minimum_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitSnapshot>,
     #[rustfmt::skip] cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitSnapshot>,
     #[rustfmt::skip] cooling_constant_shr_case_break_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingConstantShrCaseBreakSnapshot>,
-    #[rustfmt::skip] cooling_humidistat_case_entry_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, Cp358Snapshot>,
+    #[rustfmt::skip] cooling_humidistat_case_entry_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidistatCaseEntrySnapshot>,
     #[rustfmt::skip] cooling_humidistat_moisture_demand_assignment_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidistatMoistureDemandAssignmentSnapshot>,
     #[rustfmt::skip] cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationAssignmentSnapshot>,
+    #[rustfmt::skip] cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitSnapshot>,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -334,6 +333,7 @@ pub struct PurchasedAirUnitRuntimeState {
     #[doc = "Persistent bounded Humidistat case-entry state."] #[rustfmt::skip] pub calc_cooling_humidistat_case_entry: PurchasedAirCalcCoolingHumidistatCaseEntryRuntimeState,
     #[doc = "Persistent bounded Humidistat moisture-demand assignment state."] #[rustfmt::skip] pub calc_cooling_humidistat_moisture_demand_assignment: PurchasedAirCalcCoolingHumidistatMoistureDemandAssignmentRuntimeState,
     #[doc = "Persistent bounded Humidistat supply-humidity-ratio-for-dehumidification assignment state."] #[rustfmt::skip] pub calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment: PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationAssignmentRuntimeState,
+    #[doc = "Persistent bounded Humidistat supply-humidity-ratio-for-dehumidification minimum-limit state."] #[rustfmt::skip] pub calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit: PurchasedAirCalcCoolingHumidistatSupplyHumidityRatioForDehumidificationMinimumLimitRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.

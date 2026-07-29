@@ -23751,3 +23751,57 @@ floor inside hconv (`0.025744` to `0.037803 W/m2-K`), and floor inside
 convection (`13.602803 W` to `17.038813 W`). Keep future promotion work on the
 official 30-pass cadence and target the remaining `SurfTempInTmp`/hconv state
 ownership mismatch directly.
+
+## CP361 Humidistat Minimum-Limit Placement
+
+CP361 sits immediately after CP360 and before unchanged numerical coupling. It
+maps pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`,
+locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+and only `PurchasedAirManager.cc` physical executable line 2231,
+`SupplyHumRatForDehum = max(SupplyHumRatForDehum, PurchAir.MinCoolSuppAirHumRat);`.
+Its four dependency-ordered sites are
+`read-local-supply-humidity-ratio-for-dehumidification-for-humidistat-minimum-limit-maximum`,
+`read-purchased-air-minimum-cooling-supply-air-humidity-ratio-for-humidistat-minimum-limit-maximum`,
+`apply-source-shaped-two-argument-maximum-for-humidistat-minimum-limit`, then
+`assign-local-supply-humidity-ratio-for-dehumidification-for-humidistat-minimum-limit`.
+This deterministic witness does not assert C++ evaluation order for the
+side-effect-free reads. Physical executable line 2232,
+`PurchAir.SupplyHumRat = min(PurchAir.MixedAirHumRat, SupplyHumRatForDehum);`,
+is first excluded; line 2233, line 2245, and later behavior stay excluded.
+
+Routes remain `U/N/P/C0/Q/H/CSH`, with `T=U+N+P+C0+Q+H+CSH`,
+`S=C0+Q+H+CSH=R=G+F+L`, `A=F+L`, every site count equal to CP360 `H`,
+and `source_site_execution_count=4H`. Only private `H` executes. Direct
+`C0=S`, `Q=H=CSH=0` performs no right read and publishes false site flags
+plus complete-null numeric evidence.
+
+Recursively validated same-call bit-exact CP360
+`resulting_supply_humidity_ratio_for_dehumidification` is the left owner.
+Selected immutable typed
+`IdealLoadsAirSystem.minimum_cooling_supply_air_humidity_ratio` is the finite
+right owner. Private retained-owner admission explicitly requires that typed
+right owner to satisfy `.is_finite()`. CP361 does not duplicate upstream
+default/range work; the pure transition/source statement adds no additional
+finite/range gate, clamp, normalization, default, diagnostic, psychrometric
+call, or coercion. Sizing, `PurchasedAirSizedLimits`, CP319, CP329, caller
+copies, and the numerical DTO cannot replace these owners.
+
+Maximum selection is exactly `if left < right { right } else { left }`, not
+`f64::max`. Ties, signed-zero ties, and unordered comparisons retain the left
+CP360 bits, including a quiet-NaN payload against a finite right operand.
+
+Evidence preserves CP360-to-CP361-to-unchanged-numerical order under
+`purchased_air_calc_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit_lifecycle`.
+CP361 changes only local `SupplyHumRatForDehum`, does not assign
+`PurchAir.SupplyHumRat`, and cannot consume, reconcile with, feed, or replace
+`DirectZonePurchasedAirCouplingInput`, `prediction.zone_demand`, numerical DTO
+state, or result state. CP345 still owns actual result-store first/last
+supply-humidity bits. Non-direct paths publish `None` and reject CP361
+evidence.
+
+Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Script inventory becomes 299 total, 240
+public, 59 internal, and zero unused. Parent/Calc states and all readiness,
+support, capability, feature/evidence, numerical, output, status, conformance,
+and Roadmap claims remain unchanged.

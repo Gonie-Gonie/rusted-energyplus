@@ -9,7 +9,7 @@ $cp329RuntimeValidation = "crates\ep_runtime\src\ideal_loads\calc\cooling_mixed_
 $cp329ReleaseTests = "crates\ep_runtime\src\ideal_loads\calc\cooling_mixed_air_call\release_tests.rs"
 $cp329Tests = "crates\ep_runtime\src\ideal_loads\calc\cooling_mixed_air_call\tests.rs"
 $cp329Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
-Assert-Contains -Path $cp329Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360 binding order"
+Assert-Contains -Path $cp329Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361 binding order"
 $cp329ScheduledOutput = "crates\ep_runtime\src\ideal_loads\binding\scheduled_output.rs"
 $cp329BindingTestsRoot = "crates\ep_runtime\src\ideal_loads\binding_tests.rs"
 $cp329BindingTests = "crates\ep_runtime\src\ideal_loads\binding\cooling_mixed_air_call_tests.rs"
@@ -631,6 +631,11 @@ $postCp339BeforeNumericalCodeForCp329 = [regex]::Replace(
 $postCp339BeforeNumericalCodeForCp329 = [regex]::Replace(
     $postCp339BeforeNumericalCodeForCp329,
     '(?s)let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =\s*advance_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment\([^;]+?\)\?;',
+    ''
+)
+$postCp339BeforeNumericalCodeForCp329 = [regex]::Replace(
+    $postCp339BeforeNumericalCodeForCp329,
+    '(?s)let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =\s*advance_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit\([^;]+?\)\?;',
     ''
 )
 if ($postCp339BeforeNumericalCodeForCp329 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
