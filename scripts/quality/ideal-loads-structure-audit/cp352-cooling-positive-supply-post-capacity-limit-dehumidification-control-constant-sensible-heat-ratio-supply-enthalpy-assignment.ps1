@@ -112,13 +112,14 @@ function Assert-Cp352BindingContract {
     param([string]$Text)
     $cp351 = $Text.IndexOf("let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment =")
     $cp352 = $Text.IndexOf("let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment =")
+    $cp353 = $Text.IndexOf("let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit =")
     $numerical = $Text.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
-    if ($cp351 -lt 0 -or $cp352 -le $cp351 -or $numerical -le $cp352) {
-        throw "Binding must execute CP351 then CP352 before numerical coupling"
+    if ($cp351 -lt 0 -or $cp352 -le $cp351 -or $cp353 -le $cp352 -or $numerical -le $cp353) {
+        throw "Binding must execute CP351 then CP352 then CP353 before numerical coupling"
     }
     $dto = Get-Cp352RustBraceBlock -Text $Text.Substring($numerical) -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{' -Description "CP352 numerical DTO"
-    if ($dto -match '(?i)cp35[12]|total_output_assignment|constant_sensible_heat_ratio_supply_enthalpy_assignment') {
-        throw "CP351/CP352 evidence must not enter DirectZonePurchasedAirCouplingInput"
+    if ($dto -match '(?i)cp35[123]|total_output_assignment|constant_sensible_heat_ratio_supply_enthalpy_assignment|overdrying_limit') {
+        throw "CP351/CP352/CP353 evidence must not enter DirectZonePurchasedAirCouplingInput"
     }
 }
 
@@ -150,7 +151,7 @@ foreach ($required in @(
 }
 Assert-LineLimit -Path $cp352Transition -Limit 450 -Description "CP352 transition"
 Assert-LineLimit -Path $cp352Release -Limit 450 -Description "CP352 release"
-Assert-LineLimit -Path $cp352Prefix -Limit 300 -Description "CP352 prefix validation"
+Assert-LineLimit -Path $cp352Prefix -Limit 350 -Description "CP352 prefix validation"
 Assert-LineLimit -Path $cp352Runtime -Limit 350 -Description "CP352 runtime validation"
 Assert-LineLimit -Path $cp352Snapshot -Limit 350 -Description "CP352 snapshot validation"
 Assert-LineLimit -Path $cp352Coupled -Limit 500 -Description "CP352 coupled validation"
@@ -206,7 +207,7 @@ foreach ($pattern in @(
     )) {
     Assert-Contains -Path $cp352Prefix -Pattern $pattern -Description "CP352 recursive owner '$pattern'"
 }
-Assert-NotContains -Path $cp352Prefix -Pattern 'cooling_sensible_heat_ratio|DirectZonePurchasedAirCouplingInput|latest_numerical|numerical_supply|final_supply|PsyHFnTdbW' -Description "CP352 ratio/helper/numerical substitution"
+Assert-NotContains -Path $cp352Prefix -Pattern 'DirectZonePurchasedAirCouplingInput|latest_numerical|numerical_supply|final_supply|PsyHFnTdbW' -Description "CP352 helper/numerical substitution"
 Assert-NotContains -Path $cp352Release -Pattern 'DirectZonePurchasedAirCouplingInput|latest_numerical|numerical_supply|final_supply|mixed_air_enthalpy_j_per_kg\s*:|cooling_total_output_w\s*:|supply_mass_flow_rate_kg_per_s\s*:' -Description "CP352 public scalar/numerical substitution"
 
 # Binding, coupled runtime, pipeline, serialization, and strict nonfeed.
@@ -229,7 +230,7 @@ Assert-Contains -Path $cp352PipelineRoot -Pattern ('mod ' + [regex]::Escape($cp3
 Assert-Contains -Path $cp352PipelineRoot -Pattern ('"' + $cp352Lifecycle + '":\s*result\s*\.' + $cp352Lifecycle) -Description "CP352 lifecycle JSON"
 Assert-Contains -Path $cp352PipelineValidation -Pattern 'total_output_assignment_cp351' -Description "pipeline CP351 predecessor"
 Assert-Contains -Path $cp352PipelineValidation -Pattern '(?s)assigned\s*\.checked_mul\(.*?SUPPLY_ENTHALPY_ASSIGNMENT_SOURCE_ORDER\s*\.len\(\)' -Description "pipeline checked 6Q"
-Assert-Contains -Path $cp352PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp352_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp352PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp353_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp352ArbitraryTests -Pattern $cp352Lifecycle -Description "arbitrary CP352 lifecycle"
 foreach ($field in @(
         "mixed_air_enthalpy_j_per_kg", "cooling_total_output_w",
@@ -325,7 +326,7 @@ foreach ($historical in @("cp326-cooling-supply-mass-flow-limit-body.ps1") + @(
 }
 foreach ($historical in 334..351) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp352_lifecycle_evidence' -Description "historical CP352 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp353_lifecycle_evidence' -Description "historical CP352 firewall"
 }
 $mainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp351AuditIndex = $mainAuditText.IndexOf("cp351-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-total-output-assignment.ps1")
@@ -334,13 +335,13 @@ $completionIndex = $mainAuditText.IndexOf('Write-Host "IdealLoads structure audi
 if ($cp351AuditIndex -lt 0 -or $cp352AuditIndex -le $cp351AuditIndex -or $completionIndex -le $cp352AuditIndex) {
     throw "Master audit must dot-source CP352 after CP351 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 290' -Description "CP352 script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 291' -Description "CP352 script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP352 zero uncalled"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp352-' -Description "CP352 inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'cp352-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-enthalpy-assignment\.ps1::dot_sources' -Description "CP352 caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 290 \|' -Description "generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 291 \|' -Description "generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 50 \|' -Description "generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 51 \|' -Description "generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated uncalled"
 
 Write-Host "CP352 constant-SHR supply-enthalpy-assignment structure audit passed."

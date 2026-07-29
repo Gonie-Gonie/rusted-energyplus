@@ -331,6 +331,11 @@ $cp338IntervalCode = [regex]::Replace(
     '(?s)let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment =\s*advance_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment\([^;]+?\)\?;',
     ''
 )
+$cp338IntervalCode = [regex]::Replace(
+    $cp338IntervalCode,
+    '(?s)let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit =\s*advance_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit\([^;]+?\)\?;',
+    ''
+)
     if ($cp338IntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
         throw "No intermediary helper call may execute $($cp338Interval.Description)"
     }
@@ -392,7 +397,7 @@ Assert-Contains -Path $cp338DirectAssertions -Pattern 'source_site_execution_cou
 Assert-Contains -Path $cp338DirectAssertions -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_guard_lifecycle' -Description "direct-run CP337 predecessor evidence"
 Assert-Contains -Path $cp338DirectAssertions -Pattern 'purchased_air_calc_cooling_mixed_air_call_lifecycle' -Description "direct-run CP329 RHS evidence"
 Assert-Contains -Path $cp338NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_cp_air_assignment_lifecycle' -Description "non-direct CP338 null evidence"
-Assert-Contains -Path $cp338PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp352_lifecycle_evidence' -Description "non-direct CP338 through CP352 evidence rejection"
+Assert-Contains -Path $cp338PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp353_lifecycle_evidence' -Description "non-direct CP338 through CP352 evidence rejection"
 Assert-NotContains -Path $cp338Pipeline -Pattern 'latest_numerical|numerical_supply_mass_flow|final_supply_mass_flow|complete_direct_zone_purchased_air_coupling' -Description "numerical DTO reconciliation in CP338 pipeline"
 
 # Exactly two algorithm addenda, two capability addenda, and six target
@@ -548,12 +553,12 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP338 then CP339 after CP337 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 290' -Description "CP338 cumulative inventory total through CP352"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 291' -Description "CP338 cumulative inventory total through CP353"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment\.ps1"' -Description "CP338 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment\.ps1"' -Description "CP339 internal script inventory record after CP338"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment\.ps1::dot_sources' -Description "CP338 main-audit callee evidence"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment\.ps1::dot_sources' -Description "CP339 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 290 \|' -Description "CP338 generated script count through CP352"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 291 \|' -Description "CP338 generated script count through CP353"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP338 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 50 \|' -Description "CP338 generated internal script count through CP352"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 51 \|' -Description "CP338 generated internal script count through CP353"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP338 generated uncalled script count"

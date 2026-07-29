@@ -35386,6 +35386,71 @@ required. No support, readiness, capability, feature/evidence,
 numerical-conformance, output, status, conformance, or Roadmap promotion
 occurs.
 
+## CP353 Constant-Sensible-Heat-Ratio Overdrying Limit in the Heat-Balance Loop
+
+CP353 extends the purchased-air heat-balance witness through pinned EnergyPlus
+commit `6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2221:
+`SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir.SupplyTemp, 0.00001));`.
+The locked raw SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact five sites are
+`read-local-supply-enthalpy-for-constant-sensible-heat-ratio-overdrying-limit-maximum`,
+`read-purchased-air-supply-temperature-for-constant-sensible-heat-ratio-overdrying-limit-enthalpy`,
+`evaluate-psy-h-fn-tdb-w-at-minimum-humidity-ratio-for-constant-sensible-heat-ratio-overdrying-limit`,
+`apply-source-shaped-two-argument-maximum-for-constant-sensible-heat-ratio-overdrying-limit`,
+and
+`assign-local-supply-enthalpy-for-constant-sensible-heat-ratio-overdrying-limit`.
+The Rust witness uses that dependency order without claiming a C++ function
+argument evaluation order for the side-effect-free inputs.
+
+Routes remain `U/N/P/C0/Q/H/CSH`. Exact checked state requires
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`,
+`A = F+L`, `Q` equal to CP352 supply-enthalpy assignments, all five site
+counters equal to `Q`, and `source_site_execution_count = 5*Q`. Direct release
+has `C0 = S` and `Q = H = CSH = 0` and is a complete-null skip. Active
+constant-SHR work remains a private CP352 counterfactual rooted in recursively
+complete same-call direct evidence.
+
+CP352 `resulting_supply_enthalpy_j_per_kg` owns the maximum's left operand.
+CP345 one-hot `G/F/L` provenance selects the persistent supply-temperature
+owner from CP334 `assigned_supply_temperature_c` on `G/F`, or CP344
+`resulting_supply_temperature_c` on `L`. CP352, CP345, and the selected
+CP334-or-CP344 latest/private witness pairs pass exact same-call recursive
+validation; CP352's active bridge also reconstructs its CP351/CP329/CP330
+lineage. Coordinated owner, witness, bridge, or provenance corruption is
+rejected before mutation. CP336 enthalpy, CP350's earlier temperature read,
+caller/model duplicates, and the numerical DTO cannot substitute.
+
+The right operand uses canonical
+`energyplus_psy_h_fn_tdb_w(supply_temperature, 0.00001)`. Source literal
+`0.00001` and the canonical `1.0e-5` floor share bits
+`0x3ee4f8b588e368f1`. Exact source grouping remains
+`1.00484e3*T + max(W, 1.0e-5) * (2.50094e6 + 1.85895e3*T)`; the legacy
+kJ-regrouped helper, reassociation, simplification, and `mul_add` are excluded.
+ObjexxFCL maximum semantics are `a < b ? b : a`, implemented as
+`if left < right { right } else { left }`, never `f64::max`. Ordered strict
+less-than selects the psychrometric result; ties, signed-zero ties, and
+unordered comparisons retain CP352's left bits. A left NaN therefore survives,
+while a finite left also survives a right NaN. There is no CP353 finite,
+clamp, normalization, diagnostic, default, or coercion gate. Pure-transition
+IEEE characterization is not a private-release reachability expansion.
+
+Physical line 2222,
+`PurchAir.SupplyHumRat = min(PurchAir.SupplyHumRat, PsyWFnTdbH(state, PurchAir.SupplyTemp, SupplyEnthalpy, RoutineName));`,
+is the first excluded executable and CP354 boundary. CP353 result is only its
+retained enthalpy owner candidate. Lifecycle evidence preserves
+CP352-to-CP353-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle`.
+CP353 never enters `DirectZonePurchasedAirCouplingInput`, consumes no
+numerical DTO value, and does not feed or replace it. Non-direct execution
+publishes `None` and rejects evidence. Parent algorithms remain
+`scaffold`/`none`, parent Calc routines remain `source_mapped`, and inventory
+remains 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and
+170 required. Support, readiness, capability, feature/evidence,
+numerical-conformance, output, status, conformance, and Roadmap state remain
+unchanged.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

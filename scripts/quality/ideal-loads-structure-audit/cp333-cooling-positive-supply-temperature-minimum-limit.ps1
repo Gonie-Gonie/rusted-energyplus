@@ -427,6 +427,11 @@ $postCp339BeforeNumericalCodeForCp333 = [regex]::Replace(
     '(?s)let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment =\s*advance_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment\([^;]+?\)\?;',
     ''
 )
+$postCp339BeforeNumericalCodeForCp333 = [regex]::Replace(
+    $postCp339BeforeNumericalCodeForCp333,
+    '(?s)let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit =\s*advance_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit\([^;]+?\)\?;',
+    ''
+)
 if ($postCp339BeforeNumericalCodeForCp333 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
     throw "No helper other than the audited CP340 through CP348 releases may execute after CP339 and before numerical Calc"
 }

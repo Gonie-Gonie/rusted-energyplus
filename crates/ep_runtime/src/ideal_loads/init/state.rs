@@ -10,7 +10,15 @@ use std::collections::BTreeMap;
 
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
-use super::super::*;
+use super::super::{
+    PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseEntrySnapshot as Cp348Snapshot,
+    PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCpAirAssignmentSnapshot as Cp349Snapshot,
+    PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitSnapshot as Cp353Snapshot,
+    PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentSnapshot as Cp350Snapshot,
+    PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyEnthalpyAssignmentSnapshot as Cp352Snapshot,
+    PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioTotalOutputAssignmentSnapshot as Cp351Snapshot,
+    *,
+};
 use super::{
     IdealLoadsInitFlags, PurchasedAirInitTopologyDiagnostic, PurchasedAirInitTopologyError,
     PurchasedAirInitTopologyPlan, PurchasedAirRecirculationSource,
@@ -156,30 +164,17 @@ pub struct PurchasedAirRuntimeState {
             PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlNoneCaseSnapshot,
         >,
     cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_entry_latest_witnesses:
-        BTreeMap<
-            IdealLoadsAirSystemId,
-            PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseEntrySnapshot,
-        >,
+        BTreeMap<IdealLoadsAirSystemId, Cp348Snapshot>,
     cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_latest_witnesses:
-        BTreeMap<
-            IdealLoadsAirSystemId,
-            PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCpAirAssignmentSnapshot,
-        >,
+        BTreeMap<IdealLoadsAirSystemId, Cp349Snapshot>,
     cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_latest_witnesses:
-        BTreeMap<
-            IdealLoadsAirSystemId,
-            PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentSnapshot,
-        >,
+        BTreeMap<IdealLoadsAirSystemId, Cp350Snapshot>,
     cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_latest_witnesses:
-        BTreeMap<
-            IdealLoadsAirSystemId,
-            PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioTotalOutputAssignmentSnapshot,
-        >,
+        BTreeMap<IdealLoadsAirSystemId, Cp351Snapshot>,
     cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_latest_witnesses:
-        BTreeMap<
-            IdealLoadsAirSystemId,
-            PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyEnthalpyAssignmentSnapshot,
-        >,
+        BTreeMap<IdealLoadsAirSystemId, Cp352Snapshot>,
+    cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_latest_witnesses:
+        BTreeMap<IdealLoadsAirSystemId, Cp353Snapshot>,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -326,6 +321,9 @@ pub struct PurchasedAirUnitRuntimeState {
     /// Persistent bounded constant-SHR dehumidification-control supply-enthalpy assignment state.
     pub calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment:
         PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyEnthalpyAssignmentRuntimeState,
+    /// Persistent bounded constant-SHR supply-enthalpy overdrying-limit state.
+    pub calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit:
+        PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.

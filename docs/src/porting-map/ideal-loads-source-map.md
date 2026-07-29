@@ -20679,6 +20679,72 @@ target/lifecycle evidence only, with no support, readiness, capability,
 feature/evidence, numerical-conformance, output, status, conformance, or
 Roadmap promotion.
 
+## CP353 Constant-Sensible-Heat-Ratio Overdrying Limit
+
+CP353 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2221:
+
+```cpp
+SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir.SupplyTemp, 0.00001));
+```
+
+The raw SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The five ordered sites are
+`read-local-supply-enthalpy-for-constant-sensible-heat-ratio-overdrying-limit-maximum`,
+`read-purchased-air-supply-temperature-for-constant-sensible-heat-ratio-overdrying-limit-enthalpy`,
+`evaluate-psy-h-fn-tdb-w-at-minimum-humidity-ratio-for-constant-sensible-heat-ratio-overdrying-limit`,
+`apply-source-shaped-two-argument-maximum-for-constant-sensible-heat-ratio-overdrying-limit`,
+and
+`assign-local-supply-enthalpy-for-constant-sensible-heat-ratio-overdrying-limit`.
+This is deterministic Rust dependency order, not a claim about C++ function
+argument order.
+
+Routes remain `U/N/P/C0/Q/H/CSH`; exact state is
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`,
+`A = F+L`, `Q` equal to CP352 supply-enthalpy assignments, and
+`source_site_execution_count = 5*Q`, with every site counter equal to `Q`.
+Direct evidence requires `C0 = S` and `Q = H = CSH = 0` and exposes a
+complete-null skip. Active `Q` is a restricted CP352 private counterfactual
+rooted in recursively complete direct evidence.
+
+CP352 `resulting_supply_enthalpy_j_per_kg` solely owns the left operand.
+CP345 one-hot `G/F/L` provenance selects CP334
+`assigned_supply_temperature_c` for `G/F`, or CP344
+`resulting_supply_temperature_c` for `L`. Each latest/private witness pair is
+same-call, bit-exact, and recursively complete; CP352 also reconstructs its
+CP351/CP329/CP330 active lineage. Coordinated owner, witness, bridge, or
+provenance forgery fails transactionally. CP336 enthalpy, CP350's earlier
+temperature read, caller/model duplicates, and the numerical DTO are not
+replacement operands.
+
+Canonical `energyplus_psy_h_fn_tdb_w` evaluates the right operand with literal
+`0.00001`, which has the same binary64 bits `0x3ee4f8b588e368f1` as its
+`1.0e-5` floor. It retains
+`1.00484e3*T + max(W, 1.0e-5) * (2.50094e6 + 1.85895e3*T)` grouping and
+does not use the legacy kJ-regrouped helper, reassociation, or `mul_add`.
+ObjexxFCL maximum is `a < b ? b : a`; Rust uses
+`if left < right { right } else { left }`, not `f64::max`. Ties, signed-zero
+ties, and unordered comparisons retain the CP352 left bits. A left NaN
+survives, while a finite left survives a psychrometric right NaN. CP353 adds no
+finite, clamp, normalization, diagnostic, default, or coercion gate. Defensive
+pure-transition IEEE characterization does not expand private reachability.
+
+Line 2222,
+`PurchAir.SupplyHumRat = min(PurchAir.SupplyHumRat, PsyWFnTdbH(state, PurchAir.SupplyTemp, SupplyEnthalpy, RoutineName));`,
+is the first excluded executable and CP354 boundary. CP353's resulting supply
+enthalpy is only CP354's retained owner candidate. Evidence preserves
+CP352-to-CP353-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle`.
+No CP353 value enters `DirectZonePurchasedAirCouplingInput` or consumes,
+reconciles with, feeds, or replaces the numerical DTO. Non-direct paths carry
+`None` and reject evidence. Both parents remain `scaffold`/`none`, both Calc
+routines remain `source_mapped`, and counts remain 32 algorithms, 293
+routines, 58 state-mapped, 235 source-mapped, and 170 required. CP353 changes
+no support, readiness, capability, feature/evidence, numerical-conformance,
+output, status, conformance, or Roadmap state.
+
 ## Claim Requirements
 
 The claim remains valid only while all of these exist:

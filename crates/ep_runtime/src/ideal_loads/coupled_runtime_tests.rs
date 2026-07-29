@@ -5311,3 +5311,121 @@ fn cp352_coupled_direct_none_route_is_complete_skip_and_numerical_enthalpy_remai
         "CP352 complete-null evidence must not replace numerical supply enthalpy"
     );
 }
+
+#[test]
+fn cp353_coupled_direct_none_route_is_complete_skip_and_numerical_enthalpy_remains_unfed() {
+    let mut typed = exact_model(1).typed;
+    typed.schedules[1].hourly_value = 0.0;
+    typed.schedules[2].hourly_value = 15.0;
+    typed.schedules[3].hourly_value = 1.0;
+    let model = SimulationModel::from_typed(typed);
+    let schedule_cache =
+        precompute_schedule_cache(&model.typed, 1).expect("one CP353 schedule sample");
+    let weather = weather_series_with_conditions(&model, 1, 30.0, 15.0, 30.0, 101_325.0);
+    let mut options = DirectZonePurchasedAirCoupledOptions::hourly_samples(1);
+    options.initial_zone_air_temperature_c = INITIAL_ZONE_TEMPERATURE_C;
+    let simulation = simulate_direct_zone_purchased_air_coupled_heat_balance(
+        &model,
+        &weather,
+        &schedule_cache,
+        options,
+    )
+    .expect("valid CP353 direct simulation");
+    let summary = &simulation.summary;
+    let state = &summary
+        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle
+        .state;
+    let snapshot = state.latest.expect("latest CP353 snapshot");
+    let predecessor = summary
+        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_lifecycle
+        .state
+        .latest
+        .expect("latest CP352 predecessor");
+
+    assert_eq!(state.transition_count, 1);
+    assert_eq!(
+        state.dehumidification_control_none_case_completed_skip_count,
+        1
+    );
+    assert_eq!(
+        state.dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_count,
+        0
+    );
+    assert_eq!(state.source_site_execution_count, 0);
+    assert_eq!(
+        state.supply_enthalpy_for_overdrying_limit_maximum_read_count,
+        0
+    );
+    assert_eq!(
+        state.supply_temperature_for_minimum_humidity_ratio_enthalpy_read_count,
+        0
+    );
+    assert_eq!(
+        state.psychrometric_minimum_supply_enthalpy_evaluation_count,
+        0
+    );
+    assert_eq!(state.source_shaped_two_argument_maximum_evaluation_count, 0);
+    assert_eq!(state.supply_enthalpy_assignment_write_count, 0);
+    assert!(snapshot.dehumidification_control_none_case_completed_skip);
+    assert!(
+        !snapshot.dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_executed
+    );
+    assert!(!snapshot.supply_enthalpy_for_overdrying_limit_maximum_read);
+    assert!(!snapshot.supply_temperature_for_minimum_humidity_ratio_enthalpy_read);
+    assert!(!snapshot.psychrometric_minimum_supply_enthalpy_evaluated);
+    assert!(!snapshot.source_shaped_two_argument_maximum_evaluated);
+    assert!(!snapshot.supply_enthalpy_assignment_performed);
+    assert_eq!(
+        [
+            snapshot.supply_enthalpy_before_overdrying_limit_j_per_kg,
+            snapshot.supply_temperature_c,
+            snapshot.psychrometric_minimum_supply_enthalpy_j_per_kg,
+            snapshot.maximum_supply_enthalpy_j_per_kg,
+            snapshot.assigned_supply_enthalpy_j_per_kg,
+            snapshot.resulting_supply_enthalpy_j_per_kg,
+        ],
+        [None; 6]
+    );
+
+    let expected =
+        super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_validation::expected_snapshot(
+            predecessor,
+        );
+    assert!(
+        super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_validation::snapshots_match_exact_bits(
+            &snapshot,
+            &expected,
+        )
+    );
+    let mut corrupted = snapshot;
+    corrupted.source_order = &["forged-overdrying-limit"];
+    assert!(
+        !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_validation::snapshots_match_exact_bits(
+            &corrupted,
+            &expected,
+        )
+    );
+    let mut negative_zero = snapshot;
+    negative_zero.resulting_supply_enthalpy_j_per_kg = Some(-0.0);
+    let mut positive_zero = negative_zero;
+    positive_zero.resulting_supply_enthalpy_j_per_kg = Some(0.0);
+    assert_eq!(negative_zero, positive_zero);
+    assert!(
+        !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_validation::snapshots_match_exact_bits(
+            &negative_zero,
+            &positive_zero,
+        )
+    );
+
+    let numerical_enthalpy = summary
+        .calc_cooling_positive_supply_enthalpy_assignment_lifecycle
+        .state
+        .latest
+        .expect("unchanged numerical supply-enthalpy snapshot")
+        .supply_enthalpy_j_per_kg
+        .expect("unchanged numerical supply enthalpy");
+    assert!(
+        numerical_enthalpy.is_finite(),
+        "CP353 complete-null evidence must not replace numerical supply enthalpy"
+    );
+}

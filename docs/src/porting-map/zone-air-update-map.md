@@ -23097,6 +23097,74 @@ changes no readiness, support, capability, feature/evidence,
 numerical-conformance, output-ownership, status, conformance, or Roadmap
 state.
 
+## CP353 Constant-Sensible-Heat-Ratio Overdrying Limit Placement
+
+CP353 places pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2221 immediately after
+CP352:
+`SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir.SupplyTemp, 0.00001));`.
+The raw SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its five exact sites are
+`read-local-supply-enthalpy-for-constant-sensible-heat-ratio-overdrying-limit-maximum`,
+`read-purchased-air-supply-temperature-for-constant-sensible-heat-ratio-overdrying-limit-enthalpy`,
+`evaluate-psy-h-fn-tdb-w-at-minimum-humidity-ratio-for-constant-sensible-heat-ratio-overdrying-limit`,
+`apply-source-shaped-two-argument-maximum-for-constant-sensible-heat-ratio-overdrying-limit`,
+and
+`assign-local-supply-enthalpy-for-constant-sensible-heat-ratio-overdrying-limit`.
+Their deterministic dependency order makes no C++ maximum-argument evaluation
+order claim.
+
+Routes are `U/N/P/C0/Q/H/CSH`; exact algebra requires
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`,
+`A = F+L`, `Q` equal to CP352 supply-enthalpy assignments, every site counter
+equal to `Q`, and `source_site_execution_count = 5*Q`. Direct evidence has
+`C0 = S` and `Q = H = CSH = 0` and remains a complete-null skip. Private `Q`
+uses a restricted same-call CP352 counterfactual bridge rooted in recursively
+complete direct evidence.
+
+CP352 `resulting_supply_enthalpy_j_per_kg` is the sole left-operand owner.
+CP345 one-hot `G/F/L` provenance selects supply temperature from CP334
+`assigned_supply_temperature_c` on `G/F`, or CP344
+`resulting_supply_temperature_c` on `L`. CP352, CP345, and the selected
+CP334-or-CP344 latest/private witnesses pass exact same-call recursive proof;
+the CP352 bridge reconstructs its CP351/CP329/CP330 lineage. Coordinated owner,
+witness, bridge, or provenance corruption fails transactionally. CP336
+enthalpy, CP350's prior read, caller/model duplicate scalars, and numerical DTO
+state cannot substitute.
+
+The RHS is canonical
+`energyplus_psy_h_fn_tdb_w(supply_temperature, 0.00001)`. The literal and
+canonical `1.0e-5` floor share bits `0x3ee4f8b588e368f1`. Source formula
+grouping stays
+`1.00484e3*T + max(W, 1.0e-5) * (2.50094e6 + 1.85895e3*T)`; the legacy
+kJ-regrouped helper, reassociation, simplification, and `mul_add` are excluded.
+ObjexxFCL two-`double` maximum is `a < b ? b : a`, so Rust must use
+`if left < right { right } else { left }`, not `f64::max`. Strict less-than
+selects the RHS. Ties, signed-zero ties, and unordered comparisons preserve the
+CP352 left bits; a left NaN survives, and a finite left survives a right NaN.
+There is no CP353 finite, clamp, normalization, diagnostic, default, or
+coercion gate. Pure-transition IEEE characterization does not assert wider
+private-release reachability.
+
+Physical line 2222,
+`PurchAir.SupplyHumRat = min(PurchAir.SupplyHumRat, PsyWFnTdbH(state, PurchAir.SupplyTemp, SupplyEnthalpy, RoutineName));`,
+is the first excluded executable and CP354 boundary. Its humidity read,
+psychrometric inversion, minimum, assignment, diagnostic behavior, and later
+case body remain excluded. CP353 result is CP354's retained supply-enthalpy
+owner candidate only. Lifecycle order is
+CP352-to-CP353-to-unchanged-numerical under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle`.
+No CP353 evidence enters `DirectZonePurchasedAirCouplingInput`; it consumes,
+reconciles with, feeds, and replaces no numerical DTO value. Non-direct paths
+publish `None` and reject evidence. Both parents remain `scaffold`/`none`,
+both Calc routines remain `source_mapped`, and counts remain 32 algorithms,
+293 routines, 58 state-mapped, 235 source-mapped, and 170 required. CP353
+changes no readiness, support, capability, feature/evidence,
+numerical-conformance, output-ownership, status, conformance, or Roadmap
+state.
+
 ## Promotion Requirements
 
 An official ExampleFile zone-air series may become conformance only after:

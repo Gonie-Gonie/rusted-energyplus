@@ -32,6 +32,8 @@ use cooling_positive_supply_post_capacity_limit_dehumidification_control_constan
 mod cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_assertions;
 
 use cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_assertions::assert_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment;
+#[path = "arbitrary_run_ideal_loads/cp353_assertions.rs"]
+mod cp353_assertions;
 
 #[test]
 fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
@@ -601,6 +603,7 @@ fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
     assert_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment(
         &summary["rust_runtime"],
     );
+    cp353_assertions::assert_direct(&summary["rust_runtime"]);
     Ok(())
 }
 
@@ -1051,6 +1054,7 @@ fn ideal_loads_fixture_demand_runs_only_as_explicit_diagnostic_with_provenance()
             ["purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_lifecycle"]
             .is_null()
     );
+    cp353_assertions::assert_non_direct(rust_runtime);
     assert_eq!(summary["source_order_gate"]["matches"], true);
     assert_output_manifest(&output_dir, SUPPORTED_RUNTIME_MANIFEST)?;
     assert!(
