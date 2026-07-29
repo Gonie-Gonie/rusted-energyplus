@@ -23247,6 +23247,57 @@ changes no readiness, support, capability, feature/evidence,
 numerical-conformance, output-ownership, status, conformance, or Roadmap
 state.
 
+## CP355 Constant-SHR Supply-Humidity-Ratio Minimum Limit Placement
+
+CP355 places pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+locked `PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+physical executable line 2224 immediately after CP354:
+`PurchAir.SupplyHumRat = max(PurchAir.SupplyHumRat, PurchAir.MinCoolSuppAirHumRat);`.
+The exact sites are
+`read-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-minimum-limit-maximum`,
+`read-purchased-air-minimum-cooling-supply-air-humidity-ratio-for-constant-sensible-heat-ratio-minimum-limit-maximum`,
+`apply-source-shaped-two-argument-maximum-for-constant-sensible-heat-ratio-minimum-limit`,
+and
+`assign-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-minimum-limit`.
+That deterministic Rust textual sequence makes no C++ argument evaluation
+order claim because both reads are side-effect free.
+
+Routes remain `U/N/P/C0/Q/H/CSH`; exact state requires
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH`,
+`source_site_execution_count = 4*Q`, and all four site counters equal `Q`.
+`Q` equals CP354 executions. Direct `None` is `C0 = S`,
+`Q = H = CSH = 0`, reads no RHS, and exposes a complete-null skip.
+
+CP354 `resulting_supply_humidity_ratio` is the recursively validated,
+bit-exact sole left owner. The selected immutable typed
+`IdealLoadsAirSystem.minimum_cooling_supply_air_humidity_ratio` is the sole
+RHS owner. Compiler default `0.0077` and range `0.0..=1.0` stay upstream.
+The pure transition has no gate; active release trusts only a finite RHS;
+direct `C0` neither reads nor validates it. `PurchasedAirSizedLimits`, CP319,
+sizing output, caller duplicates, and the numerical DTO cannot substitute.
+There is no retained prior same-call RHS fingerprint, so immutable typed-model
+state is assumed and concurrent mutation is excluded.
+
+CP355 reuses CP333 `source_shaped_two_argument_maximum`, the exact ObjexxFCL
+`a < b ? b : a`, as `if left < right { right } else { left }`.
+`f64::max` and operand reversal are forbidden. Ties, signed-zero ties, and
+unordered comparisons retain left bits: `(-0,+0)` remains `-0`,
+`(+0,-0)` remains `+0`, a left quiet NaN retains its payload, and a finite
+left survives a right quiet NaN.
+
+Physical line 2225 is comment-only. Physical executable line 2226, the next
+mixed-air humidity-ratio `min`, is first excluded. Binding order is
+CP354-to-CP355-to-unchanged-numerical under
+`purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit_lifecycle`.
+CP355 does not consume, reconcile with, feed, or replace numerical DTO state.
+Non-direct paths publish `None` and reject evidence. Counts stay exactly 32
+algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and 170
+required. Parent/Calc states and all readiness, support, capability,
+feature/evidence, numerical, output, status, conformance, and Roadmap claims
+remain unchanged.
+
 ## Current Boundary
 
 `Zone Mean Air Temperature`, `Zone Air Heat Balance Surface Convection Rate`,

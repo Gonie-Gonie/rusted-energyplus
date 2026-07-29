@@ -11,6 +11,7 @@ use std::collections::BTreeMap;
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
 use super::super::{
+    PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitSnapshot as Cp355Snapshot,
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitSnapshot as Cp354Snapshot,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseEntrySnapshot as Cp348Snapshot,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCpAirAssignmentSnapshot as Cp349Snapshot,
@@ -173,6 +174,7 @@ pub struct PurchasedAirRuntimeState {
     #[rustfmt::skip] cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, Cp352Snapshot>,
     #[rustfmt::skip] cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, Cp353Snapshot>,
     #[rustfmt::skip] cooling_constant_shr_supply_humidity_ratio_overdrying_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, Cp354Snapshot>,
+    #[rustfmt::skip] cooling_constant_shr_supply_humidity_ratio_minimum_limit_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, Cp355Snapshot>,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -319,12 +321,9 @@ pub struct PurchasedAirUnitRuntimeState {
     /// Persistent bounded constant-SHR dehumidification-control supply-enthalpy assignment state.
     pub calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment:
         PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyEnthalpyAssignmentRuntimeState,
-    /// Persistent bounded constant-SHR supply-enthalpy overdrying-limit state.
-    pub calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit:
-        PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitRuntimeState,
-    /// Persistent bounded constant-SHR supply-humidity-ratio overdrying-limit state.
-    pub calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit:
-        PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitRuntimeState,
+    #[doc = "Persistent bounded constant-SHR supply-enthalpy overdrying-limit state."] #[rustfmt::skip] pub calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit: PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitRuntimeState,
+    #[doc = "Persistent bounded constant-SHR supply-humidity-ratio overdrying-limit state."] #[rustfmt::skip] pub calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit: PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitRuntimeState,
+    #[doc = "Persistent bounded constant-SHR supply-humidity-ratio minimum-limit state."] #[rustfmt::skip] pub calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit: PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.

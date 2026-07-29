@@ -7,7 +7,6 @@ use super::super::{
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitRetainedRoute as Route,
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitSnapshot as Snapshot,
 };
-use super::snapshot_validation::snapshot_route;
 use crate::ideal_loads::calc::{
     cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit::completed_direct_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_is_consistent,
     cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment::{
@@ -17,7 +16,6 @@ use crate::ideal_loads::calc::{
     cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment::completed_direct_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_is_consistent,
     cooling_positive_supply_temperature_mixed_air_limit::completed_direct_cooling_positive_supply_temperature_mixed_air_limit_is_consistent,
 };
-use crate::psychrometrics::energyplus_psy_cp_air_fn_w;
 use crate::ideal_loads::calc::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit::transition::{
     predecessor_route, predecessor_snapshots_match_bit_exact,
 };
@@ -250,130 +248,6 @@ pub(in crate::ideal_loads::calc) fn active_operands_from_retained_owners(
             .resulting_supply_enthalpy_j_per_kg?,
         supply_temperature_c,
     })
-}
-
-/// Proves that a private constant-SHR CP353 witness is the exact active
-/// counterfactual of the retained direct `None` release.
-///
-/// The retained CP353 release remains authoritative. The private witness is
-/// accepted only after a CP352 active predecessor is rebuilt from same-call
-/// canonical owners and recursively validated.
-pub(in crate::ideal_loads::calc) fn private_active_counterfactual_links_to_direct_release(
-    runtime: &PurchasedAirRuntimeState,
-    unit: &PurchasedAirUnitRuntimeState,
-    system: &IdealLoadsAirSystem,
-    direct: Snapshot,
-    counterfactual: Snapshot,
-) -> bool {
-    if snapshot_route(direct) != Some(Route::DehumidificationControlNoneCaseCompletedSkip)
-        || snapshot_route(counterfactual)
-            != Some(Route::DehumidificationControlConstantSensibleHeatRatioOverdryingLimitExecuted)
-        || !route_independent_identity_matches(direct, counterfactual)
-    {
-        return false;
-    }
-
-    let Some(mut private_cp352) = unit
-        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment
-        .latest
-    else {
-        return false;
-    };
-    let Some(flow) = unit
-        .calc_cooling_supply_mass_flow_positive_guard
-        .latest
-        .and_then(|snapshot| snapshot.supply_mass_flow_rate_kg_per_s)
-    else {
-        return false;
-    };
-    let Some(mixed_owner) = unit.calc_cooling_mixed_air_call.latest else {
-        return false;
-    };
-    let (Some(humidity), Some(mixed_temperature), Some(mixed_enthalpy)) = (
-        mixed_owner.mixed_air_humidity_ratio,
-        mixed_owner.mixed_air_temperature_c,
-        mixed_owner.mixed_air_enthalpy_projection_j_per_kg,
-    ) else {
-        return false;
-    };
-    let Some(provenance) = unit
-        .calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment
-        .latest
-    else {
-        return false;
-    };
-    let supply_temperature = if provenance
-        .capacity_limit_sensible_output_supply_temperature_mixed_air_limit_executed
-    {
-        unit.calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit
-            .latest
-            .and_then(|snapshot| snapshot.resulting_supply_temperature_c)
-    } else {
-        unit.calc_cooling_positive_supply_temperature_mixed_air_limit
-            .latest
-            .and_then(|snapshot| snapshot.assigned_supply_temperature_c)
-    };
-    let Some(supply_temperature) = supply_temperature else {
-        return false;
-    };
-    let cp_air = energyplus_psy_cp_air_fn_w(humidity);
-    let sensible = (flow * cp_air) * (mixed_temperature - supply_temperature);
-    let total = sensible / system.cooling_sensible_heat_ratio;
-    let specific = total / flow;
-    let supply_enthalpy = mixed_enthalpy - specific;
-
-    private_cp352.predecessor_dehumidification_control_type =
-        Some(ep_model::DehumidificationControlType::ConstantSensibleHeatRatio);
-    private_cp352.predecessor_dehumidification_control_none_case_completed_skip = false;
-    private_cp352
-        .predecessor_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_executed =
-        true;
-    private_cp352.dehumidification_control_none_case_completed_skip = false;
-    private_cp352
-        .dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_executed =
-        true;
-    private_cp352.mixed_air_enthalpy_read = true;
-    private_cp352.mixed_air_enthalpy_j_per_kg = Some(mixed_enthalpy);
-    private_cp352.cooling_total_output_read = true;
-    private_cp352.cooling_total_output_w = Some(total);
-    private_cp352.supply_mass_flow_rate_read = true;
-    private_cp352.supply_mass_flow_rate_kg_per_s = Some(flow);
-    private_cp352.specific_cooling_output_calculated = true;
-    private_cp352.specific_cooling_output_j_per_kg = Some(specific);
-    private_cp352.supply_enthalpy_calculated = true;
-    private_cp352.calculated_supply_enthalpy_j_per_kg = Some(supply_enthalpy);
-    private_cp352.supply_enthalpy_assigned = true;
-    private_cp352.assigned_supply_enthalpy_j_per_kg = Some(supply_enthalpy);
-    private_cp352.resulting_supply_enthalpy_j_per_kg = Some(supply_enthalpy);
-
-    let Some(operands) = active_operands_from_retained_owners(runtime, unit, system, private_cp352)
-    else {
-        return false;
-    };
-    option_matches(
-        counterfactual.supply_enthalpy_before_overdrying_limit_j_per_kg,
-        operands.supply_enthalpy_before_overdrying_limit_j_per_kg,
-    ) && option_matches(
-        counterfactual.supply_temperature_c,
-        operands.supply_temperature_c,
-    )
-}
-
-fn route_independent_identity_matches(direct: Snapshot, counterfactual: Snapshot) -> bool {
-    direct.system == counterfactual.system
-        && direct.parent_call_ordinal == counterfactual.parent_call_ordinal
-        && direct.controlled_zone == counterfactual.controlled_zone
-        && direct.unit_body_entered == counterfactual.unit_body_entered
-        && direct.predecessor_cooling_body_entered
-            == counterfactual.predecessor_cooling_body_entered
-        && direct.predecessor_no_outdoor_air_fallback_entered
-            == counterfactual.predecessor_no_outdoor_air_fallback_entered
-        && direct.predecessor_positive_supply_mass_flow_body_entered
-            == counterfactual.predecessor_positive_supply_mass_flow_body_entered
-        && direct.unit_off_skipped == counterfactual.unit_off_skipped
-        && direct.non_cooling_skipped == counterfactual.non_cooling_skipped
-        && direct.positive_guard_false_fallthrough_skipped
-            == counterfactual.positive_guard_false_fallthrough_skipped
 }
 
 fn same_call(

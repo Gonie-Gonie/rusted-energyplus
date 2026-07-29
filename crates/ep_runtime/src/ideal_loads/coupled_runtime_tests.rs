@@ -1,5 +1,8 @@
 use super::*;
 
+#[path = "coupled_runtime_tests_cp355.rs"]
+mod coupled_runtime_tests_cp355;
+
 use crate::{
     ideal_loads::{
         DirectZonePurchasedAirBindingFeature, ENERGYPLUS_HVAC_VERY_SMALL_MASS_FLOW_KG_PER_S,

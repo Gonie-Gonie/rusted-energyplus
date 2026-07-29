@@ -148,9 +148,10 @@ function Assert-Cp349BindingContract {
     $cp352 = $Text.IndexOf("let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment =")
     $cp353 = $Text.IndexOf("let calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit =")
     $cp354 = $Text.IndexOf("let calculation_cooling_constant_shr_supply_humidity_ratio_overdrying_limit =")
+    $cp355 = $Text.IndexOf("let calculation_cooling_constant_shr_supply_humidity_ratio_minimum_limit =")
     $numerical = $Text.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
-    if ($cp348 -lt 0 -or $cp349 -le $cp348 -or $cp350 -le $cp349 -or $cp351 -le $cp350 -or $cp352 -le $cp351 -or $cp353 -le $cp352 -or $cp354 -le $cp353 -or $numerical -le $cp354) {
-        throw "Binding must execute CP348 then CP349 then CP350 then CP351 then CP352 then CP353 then CP354 before numerical coupling"
+    if ($cp348 -lt 0 -or $cp349 -le $cp348 -or $cp350 -le $cp349 -or $cp351 -le $cp350 -or $cp352 -le $cp351 -or $cp353 -le $cp352 -or $cp354 -le $cp353 -or $cp355 -le $cp354 -or $numerical -le $cp355) {
+        throw "Binding must execute CP348 then CP349 then CP350 then CP351 then CP352 then CP353 then CP354 then CP355 before numerical coupling"
     }
     $dto = Get-Cp349RustBraceBlock `
         -Text $Text.Substring($numerical) `
@@ -274,7 +275,6 @@ Assert-Contains -Path $cp349Snapshot -Pattern '(?s)humidity\.is_finite\(\).*?hum
 Assert-NotContains -Path $cp349Release -Pattern 'cooling_positive_supply_cp_air_assignment_latest|cooling_positive_supply_capacity_limit_cp_air_assignment_latest' -Description "CP331/CP338 result reuse"
 Assert-NotContains -Path $cp349Prefix -Pattern 'dwSave|cpaSave|-100\.0|Mutex|OnceLock|thread_local' -Description "C++ last-call cache lifecycle"
 
-# Public direct release is a complete skip; private K remains characterized.
 Assert-Contains -Path $cp349Tests -Pattern 'pure_transition_partitions_all_seven_routes_and_only_k_executes_three_sites' -Description "private K-only regression"
 Assert-Contains -Path $cp349Tests -Pattern 'pure_transition_rejects_route_input_and_identity_mismatch_before_mutation' -Description "private finite/input rejection"
 Assert-Contains -Path $cp349Tests -Pattern 'private_owner_input_requires_exact_same_call_cp329_bits' -Description "CP329 owner regression"
@@ -283,7 +283,6 @@ Assert-Contains -Path $cp349PublicTests -Pattern 'public_u_n_p_routes_also_skip_
 Assert-Contains -Path $cp349CorruptionTests -Pattern 'supplied_retained_and_private_cp348_drift_are_rejected_transactionally' -Description "CP348 predecessor corruption"
 Assert-Contains -Path $cp349CorruptionTests -Pattern 'private_numeric_snapshot_and_witness_matching_is_bit_exact' -Description "private numeric bit identity"
 Assert-Contains -Path $cp349CorruptionTests -Pattern 'every_private_k_counter_increment_is_preflighted' -Description "private K overflow preflight"
-# Binding, coupled runtime, pipeline, and direct/non-direct exposure.
 Assert-Contains -Path $cp349CalcRoot -Pattern ('mod ' + [regex]::Escape($cp349Stem) + ';') -Description "CP349 calc module"
 Assert-Contains -Path $cp349BindingAdapter -Pattern ('advance_direct_no_oa_calc_' + [regex]::Escape($cp349Stem)) -Description "CP349 binding adapter"
 Assert-NotContains -Path $cp349BindingAdapter -Pattern 'humidity_ratio\s*:|DirectZonePurchasedAirCouplingInput|latest_numerical|numerical_supply|final_supply' -Description "binding scalar/DTO firewall"
@@ -307,7 +306,7 @@ Assert-Contains -Path $cp349PipelineValidation -Pattern '(?s)assignments\s*\.che
 Assert-Contains -Path $cp349Serialization -Pattern 'lifecycle_serializes_cp349_direct_none_complete_skip_and_zero_source_counters' -Description "pipeline lifecycle skip JSON"
 Assert-Contains -Path $cp349SnapshotSerialization -Pattern 'direct_none_skip_serializes_null_numeric_values_and_bits' -Description "pipeline null numeric JSON"
 Assert-Contains -Path $cp349SnapshotSerialization -Pattern 'finite_and_nonfinite_numeric_serialization_preserves_authoritative_bits' -Description "defensive serializer bits"
-Assert-Contains -Path $cp349PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp354_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp349PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp355_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp349ArbitraryTests -Pattern 'ideal_loads_no_oa_branch_runs_declared_compatibility_runtime' -Description "arbitrary direct evidence"
 Assert-Contains -Path $cp349ArbitraryTests -Pattern $cp349Lifecycle -Description "arbitrary CP349 lifecycle"
 Assert-NotContains -Path $cp349PipelineValidation -Pattern 'DirectZonePurchasedAirCouplingInput|complete_direct_zone_purchased_air_coupling|latest_numerical|numerical_supply|final_supply' -Description "pipeline numerical firewall"
@@ -430,7 +429,7 @@ foreach ($historical in @(
     )) {
     Assert-Contains `
         -Path "scripts\quality\ideal-loads-structure-audit\$historical" `
-        -Pattern 'non_direct_runtime_rejects_cp316_through_cp354_lifecycle_evidence' `
+        -Pattern 'non_direct_runtime_rejects_cp316_through_cp355_lifecycle_evidence' `
         -Description "historical cumulative non-direct firewall"
 }
 $mainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
@@ -440,13 +439,13 @@ $completionIndex = $mainAuditText.IndexOf('Write-Host "IdealLoads structure audi
 if ($cp348AuditIndex -lt 0 -or $cp349AuditIndex -le $cp348AuditIndex -or $completionIndex -le $cp349AuditIndex) {
     throw "Main IdealLoads audit must dot-source CP349 after CP348 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 292' -Description "CP349 script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 293' -Description "CP349 script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP349 zero uncalled scripts"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern ('path = "scripts/quality/ideal-loads-structure-audit/' + [regex]::Escape((Split-Path $cp349Audit -Leaf)) + '"') -Description "CP349 internal inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern ([regex]::Escape(($cp349Audit -replace '\\', '/')) + '::dot_sources') -Description "CP349 caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 292 \|' -Description "generated CP349 script total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 293 \|' -Description "generated CP349 script total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public total"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 52 \|' -Description "generated internal total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 53 \|' -Description "generated internal total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated zero uncalled"
 # Mutation self-tests cover predecessor, helper, algebra, DTO, firewall, and JSON.
 Assert-Cp349MutationRejected `

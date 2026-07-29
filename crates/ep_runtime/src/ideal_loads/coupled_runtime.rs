@@ -38,6 +38,8 @@ use super::{
     PURCHASED_AIR_CALC_ENTRY_SOURCE_ORDER, PurchasedAirAvailabilityStatus,
     PurchasedAirCalcCoolingCapacityZeroFlowResetError,
     PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary,
+    PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitError,
+    PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitLifecycleSummary,
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitError,
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitLifecycleSummary,
     PurchasedAirCalcCoolingDehumidificationFlowError,
@@ -126,6 +128,7 @@ use super::{
     PurchasedAirRuntimeState, PurchasedAirSizedLimits,
     append_direct_zone_purchased_air_hourly_output_series, bind_direct_zone_purchased_air_model,
     purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle_summary,
+    purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit_lifecycle_summary,
     purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle_summary,
     purchased_air_calc_cooling_dehumidification_flow_lifecycle_summary,
     purchased_air_calc_cooling_economizer_body_lifecycle_summary,
@@ -173,6 +176,7 @@ use super::{
 };
 
 mod cooling_capacity_zero_flow_reset_validation;
+mod cooling_constant_shr_supply_humidity_ratio_minimum_limit_validation;
 mod cooling_constant_shr_supply_humidity_ratio_overdrying_limit_validation;
 mod cooling_dehumidification_flow_validation;
 mod cooling_economizer_body_validation;
@@ -418,6 +422,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded constant-SHR supply-humidity-ratio overdrying-limit lifecycle report.
     pub calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle:
         PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitLifecycleSummary,
+    /// Persistent bounded constant-SHR supply-humidity-ratio minimum-limit lifecycle report.
+    pub calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit_lifecycle:
+        PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -606,6 +613,10 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     /// Final constant-SHR supply-humidity-ratio overdrying-limit summary could not resolve the bound unit.
     CalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitLifecycle(
         PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitError,
+    ),
+    /// Final constant-SHR supply-humidity-ratio minimum-limit summary could not resolve the bound unit.
+    CalcCoolingConstantShrSupplyHumidityRatioMinimumLimitLifecycle(
+        PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitError,
     ),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
@@ -1021,6 +1032,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A constant-SHR supply-humidity-ratio minimum-limit lifecycle invariant did not match the run.
+    CalcCoolingConstantShrSupplyHumidityRatioMinimumLimitLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -1248,6 +1268,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     },
     /// A constant-SHR supply-humidity-ratio overdrying-limit snapshot did not match its release call.
     UnexpectedCalculationCoolingConstantShrSupplyHumidityRatioOverdryingLimit {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
+    /// A constant-SHR supply-humidity-ratio minimum-limit snapshot did not match its release call.
+    UnexpectedCalculationCoolingConstantShrSupplyHumidityRatioMinimumLimit {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
@@ -1485,6 +1510,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir constant-SHR supply-humidity-ratio overdrying-limit lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcCoolingConstantShrSupplyHumidityRatioMinimumLimitLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir constant-SHR supply-humidity-ratio minimum-limit lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -1854,6 +1883,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir constant-SHR supply-humidity-ratio overdrying-limit lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingConstantShrSupplyHumidityRatioMinimumLimitLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir constant-SHR supply-humidity-ratio minimum-limit lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -2111,6 +2148,12 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its constant-SHR supply-humidity-ratio overdrying limit"
+            ),
+            Self::UnexpectedCalculationCoolingConstantShrSupplyHumidityRatioMinimumLimit {
+                timestep_index,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its constant-SHR supply-humidity-ratio minimum limit"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -2800,6 +2843,18 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             return Err(
                 DirectZonePurchasedAirCoupledRuntimeError::
                     UnexpectedCalculationCoolingConstantShrSupplyHumidityRatioOverdryingLimit {
+                        timestep_index,
+                    },
+            );
+        }
+        if !cooling_constant_shr_supply_humidity_ratio_minimum_limit_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingConstantShrSupplyHumidityRatioMinimumLimit {
                         timestep_index,
                     },
             );
@@ -3544,6 +3599,22 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit_lifecycle =
+        purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::
+                CalcCoolingConstantShrSupplyHumidityRatioMinimumLimitLifecycle,
+        )?;
+    cooling_constant_shr_supply_humidity_ratio_minimum_limit_validation::validate_lifecycle(
+        &calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit_lifecycle,
+        &calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -3651,6 +3722,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_lifecycle,
             calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle,
             calc_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_lifecycle,
+            calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit_lifecycle,
         },
         state,
         results,

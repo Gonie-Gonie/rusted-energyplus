@@ -2670,6 +2670,69 @@ required. Both parents remain `scaffold`/`none`, both Calc routines remain
 feature/evidence boundaries, numerical conformance, output ownership, status,
 conformance, and Roadmap state remain unchanged.
 
+CP355 now maps only the Cooling constant-sensible-heat-ratio
+supply-humidity-ratio minimum limit at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, whose
+`PurchasedAirManager.cc` raw SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+physical executable line 2224:
+
+```cpp
+PurchAir.SupplyHumRat = max(PurchAir.SupplyHumRat, PurchAir.MinCoolSuppAirHumRat);
+```
+
+The exact four source sites are
+`read-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-minimum-limit-maximum`,
+`read-purchased-air-minimum-cooling-supply-air-humidity-ratio-for-constant-sensible-heat-ratio-minimum-limit-maximum`,
+`apply-source-shaped-two-argument-maximum-for-constant-sensible-heat-ratio-minimum-limit`,
+and
+`assign-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-minimum-limit`.
+Rust records this deterministic textual witness order; the two reads are
+side-effect free, so the order makes no claim about C++ function-argument
+evaluation order.
+
+Routes remain `U/N/P/C0/Q/H/CSH`. For transitions `T` and active selector
+count `S`, exact state requires `T = U+N+P+C0+Q+H+CSH`,
+`S = C0+Q+H+CSH`, every CP355 site counter equal to `Q`, and
+`source_site_execution_count = 4*Q`. `Q` equals CP354 constant-SHR
+overdrying-limit executions. Direct release inherits the completed `None`
+route with `C0 = S` and `Q = H = CSH = 0`; it performs no CP355 site, does
+not read the right-hand operand, and publishes a complete-null snapshot.
+
+CP354 `resulting_supply_humidity_ratio` is the sole left-operand owner. The
+selected immutable typed
+`IdealLoadsAirSystem.minimum_cooling_supply_air_humidity_ratio` is the sole
+right-operand owner. Its compiler default `0.0077` and compiler range
+`0.0..=1.0` remain upstream input contracts; CP355 does not duplicate that
+range. The pure transition adds no gate. Only active-owner release applies a
+finite-only trust gate, while direct `C0` does not read or validate the field.
+The field is not sized, is not owned by `PurchasedAirSizedLimits`, CP319, a
+caller scalar, or the numerical DTO. Because no retained same-call prior RHS
+exists, same-ID field drift is outside CP355's evidence model; selected-system
+immutability and concurrent mutation are excluded assumptions.
+
+ObjexxFCL two-`double` maximum is `a < b ? b : a`; Rust reuses the CP333
+strict-left-biased helper as `if left < right { right } else { left }`, never
+`f64::max` and never with reversed operands. Ordered greater right values
+replace the left; ties, signed-zero ties, and unordered comparisons retain the
+left bits. Thus `(-0,+0)` retains `-0`, `(+0,-0)` retains `+0`, a left quiet
+NaN retains its payload against a finite or NaN right, and a finite left
+survives a right quiet NaN. Signaling-NaN traps and floating-environment side
+effects remain excluded.
+
+Physical line 2225 is comment-only. Physical executable line 2226, the next
+mixed-air humidity-ratio `min`, is the first excluded executable. Lifecycle
+evidence preserves CP354-to-CP355-to-unchanged-numerical order under
+`purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit_lifecycle`.
+CP355 never enters, consumes, reconciles with, feeds, or replaces the
+numerical DTO. Non-direct paths publish `None` and reject attached CP355
+evidence. Counts remain exactly 32 algorithms and 293 routines, split 58
+`state_mapped` plus 235 `source_mapped`, with 170 required. Both parents
+remain `scaffold`/`none`, both Calc routines remain `source_mapped`, and
+support, readiness, run state, capability, feature/evidence, numerical
+conformance, output ownership, status, conformance, and Roadmap state remain
+unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

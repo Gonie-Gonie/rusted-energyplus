@@ -10,8 +10,15 @@ mod state;
 mod tests;
 mod transition;
 
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::completed_cp353_case;
+
 #[allow(unused_imports)]
-pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_is_consistent;
+pub(in crate::ideal_loads::calc) use release::{
+    completed_direct_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_is_consistent,
+    private_active_counterfactual_from_direct_release,
+    private_active_counterfactual_links_to_direct_release,
+};
 pub(in crate::ideal_loads) use release::cooling_constant_shr_supply_humidity_ratio_overdrying_limit_snapshot_is_exact_direct_release;
 pub use release::{
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitError,

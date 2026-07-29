@@ -42,7 +42,7 @@ const Q: Route =
 const H: Route = Route::DehumidificationControlHumidistatCaseSelectedSkip;
 const CSH: Route = Route::DehumidificationControlConstantSupplyHumidityRatioCaseSelectedSkip;
 
-pub(super) fn completed_cp353_case(
+pub(in crate::ideal_loads::calc) fn completed_cp353_case(
     cooling_demand_w: f64,
     overall_availability: f64,
     capacity_limit: bool,
@@ -64,7 +64,7 @@ pub(super) fn completed_cp353_case(
     Some((runtime, system, cp352, cp353))
 }
 
-pub(super) fn private_active_cp353_predecessor(
+pub(in crate::ideal_loads::calc) fn private_active_cp353_predecessor(
     direct_cp352: Cp352Snapshot,
     runtime: &PurchasedAirRuntimeState,
     system: &ep_model::IdealLoadsAirSystem,

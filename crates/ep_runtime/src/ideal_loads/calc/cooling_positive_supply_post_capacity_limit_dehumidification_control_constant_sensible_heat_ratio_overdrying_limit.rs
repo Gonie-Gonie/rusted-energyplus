@@ -21,6 +21,7 @@ pub use release::{
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
     completed_direct_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_is_consistent,
+    private_active_counterfactual_from_direct_release,
     private_active_counterfactual_links_to_direct_release,
 };
 pub(super) use state::PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitRetainedRoute;
