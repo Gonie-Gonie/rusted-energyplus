@@ -183,6 +183,10 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingHumidistatCaseBreakRuntimeState::new(system),
             calc_cooling_constant_supply_humidity_ratio_case_entry:
                 PurchasedAirCalcCoolingConstantSupplyHumidityRatioCaseEntryRuntimeState::new(system),
+            calc_cooling_constant_supply_humidity_ratio_assignment:
+                PurchasedAirCalcCoolingConstantSupplyHumidityRatioAssignmentRuntimeState::new(
+                    system,
+                ),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

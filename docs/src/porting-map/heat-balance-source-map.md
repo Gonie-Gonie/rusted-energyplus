@@ -37039,3 +37039,52 @@ Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
 internal, and zero unused. Parent/Calc status plus all support, readiness,
 capability, feature/evidence, numerical, output, status, conformance, and
 Roadmap claims remain unchanged.
+
+## CP365 Constant-Supply-Humidity-Ratio Assignment in the Heat-Balance Loop
+
+CP365 retains only pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+`PurchasedAirManager.cc` line 2235,
+`PurchAir.SupplyHumRat = PurchAir.MinCoolSuppAirHumRat;`. The two exact sites
+read the purchased-air minimum cooling supply humidity ratio and assign the
+purchased-air supply humidity ratio:
+
+1. `read-purchased-air-minimum-cooling-supply-air-humidity-ratio-for-constant-supply-humidity-ratio-assignment`
+2. `assign-purchased-air-supply-humidity-ratio-for-constant-supply-humidity-ratio-case`
+
+Line 2236's `break;` is first excluded and reserved for CP366. Line 2237's
+untyped/default path, line 2245, and later behavior remain outside CP365.
+
+The route algebra remains `U/N/P/C0/Q/H/CSH`,
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`, and `A=F+L`. CP365's
+`CSH` assignment count equals CP364's case-entry count; both site counters
+equal `CSH`, and `source_site_execution_count=2*CSH`. Direct `C0=S`,
+`Q=H=CSH=0` performs no owner read or validation and records false flags plus
+null numeric/IEEE evidence.
+
+Same-call bit-exact recursively completed CP364 evidence is the sole
+predecessor. Its canonical private `CSH` reconstruction alone activates
+CP365. The selected immutable typed
+`IdealLoadsAirSystem.minimum_cooling_supply_air_humidity_ratio` is the sole
+right owner, with finite-only private admission. Compiler default/range
+validation remains upstream; sizing, heat-balance demand, Node state, CP319,
+CP345, CP355, CP361, caller copies, and numerical DTO state are not owners.
+
+The pure transition bit-copies the owner without arithmetic, comparison,
+clamp, normalization, default, diagnostic, psychrometric call, or coercion.
+Signed-zero and defensive NaN/infinity bits are preserved; canonical private
+release rejects nonfinite typed ownership. The preexisting supply-humidity
+value is overwritten without a read.
+
+Coupled order remains CP364-to-CP365-to-unchanged-numerical under
+`purchased_air_calc_cooling_constant_supply_humidity_ratio_assignment_lifecycle`.
+CP365 cannot feed or replace coupling, prediction, heat-balance, numerical
+DTO, or result state. CP345 remains the numerical result-store owner.
+Non-direct paths expose `None` and reject evidence.
+
+Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, and 170 required. Scripts become 303 total, 240 public, 63
+internal, and zero unused. Parent/Calc status plus all support, readiness,
+capability, feature/evidence, numerical, output, status, conformance, and
+Roadmap claims remain unchanged.
