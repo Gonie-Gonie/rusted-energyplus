@@ -23298,6 +23298,56 @@ required. Parent/Calc states and all readiness, support, capability,
 feature/evidence, numerical, output, status, conformance, and Roadmap claims
 remain unchanged.
 
+## CP356 Constant-SHR Supply-Humidity-Ratio Mixed-Air Limit Placement
+
+CP356 places pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, locked
+`PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+physical executable line 2226 immediately after CP355:
+`PurchAir.SupplyHumRat = min(PurchAir.SupplyHumRat, PurchAir.MixedAirHumRat);`.
+The exact sites are
+`read-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-mixed-air-limit-minimum`,
+`read-purchased-air-mixed-air-humidity-ratio-for-constant-sensible-heat-ratio-mixed-air-limit-minimum`,
+`apply-source-shaped-two-argument-minimum-for-constant-sensible-heat-ratio-mixed-air-limit`,
+and
+`assign-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-mixed-air-limit`.
+That deterministic Rust textual sequence makes no C++ argument-evaluation
+order claim because both reads are side-effect free.
+
+Routes remain `U/N/P/C0/Q/H/CSH`; exact state requires
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`,
+`A = F+L`, `source_site_execution_count = 4*Q`, and all four site counters
+equal `Q`. `Q` equals CP355 executions. Direct `None` is `C0 = S`,
+`Q = H = CSH = 0`, executes no CP356 RHS site, and exposes a complete-null
+skip.
+
+CP355 `resulting_supply_humidity_ratio` is the recursively validated,
+bit-exact sole left owner. Same-call exact-direct, recursively complete CP329
+`mixed_air_humidity_ratio` is the sole RHS owner. CP329 already proves the
+no-OA value finite, so CP356 adds no finite, range, clamp, normalization,
+default, or coercion gate. CP345, zone or caller values, model rereads, CP319,
+and the numerical DTO cannot substitute.
+
+CP356 reuses CP334 `source_shaped_two_argument_minimum`, the exact ObjexxFCL
+`a < b ? a : b`, as `if left < right { left } else { right }`.
+`f64::min` and operand reversal are forbidden. Ties, signed-zero ties, and
+unordered comparisons retain right bits: `(-0,+0)` yields `+0`,
+`(+0,-0)` yields `-0`, a finite right survives a left quiet NaN, and a right
+quiet NaN retains its payload.
+
+Physical executable line 2227, the constant-SHR case `break;`, is first
+excluded and is the next CP357 case-exit candidate. Line 2228 is the
+`Humidistat` case label and line 2229 its first body executable. Binding order
+is CP355-to-CP356-to-unchanged-numerical under
+`purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_lifecycle`.
+CP356 does not consume, reconcile with, feed, or replace numerical DTO state.
+Non-direct paths publish `None` and reject evidence. Counts stay exactly 32
+algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and 170 required;
+scripts become 294 total, 240 public, 54 internal, and zero unused.
+Parent/Calc states and all readiness, support, capability, feature/evidence,
+numerical, output, status, conformance, and Roadmap claims remain unchanged.
+
 ## Current Boundary
 
 `Zone Mean Air Temperature`, `Zone Air Heat Balance Surface Convection Rate`,

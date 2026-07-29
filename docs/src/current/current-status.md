@@ -2733,6 +2733,68 @@ support, readiness, run state, capability, feature/evidence, numerical
 conformance, output ownership, status, conformance, and Roadmap state remain
 unchanged.
 
+CP356 now maps only the Cooling constant-sensible-heat-ratio
+supply-humidity-ratio mixed-air limit at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, whose
+`PurchasedAirManager.cc` raw SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+physical executable line 2226:
+
+```cpp
+PurchAir.SupplyHumRat = min(PurchAir.SupplyHumRat, PurchAir.MixedAirHumRat);
+```
+
+The exact four source sites are
+`read-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-mixed-air-limit-minimum`,
+`read-purchased-air-mixed-air-humidity-ratio-for-constant-sensible-heat-ratio-mixed-air-limit-minimum`,
+`apply-source-shaped-two-argument-minimum-for-constant-sensible-heat-ratio-mixed-air-limit`,
+and
+`assign-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-mixed-air-limit`.
+Rust records this deterministic textual witness order. Both reads are
+side-effect free, so this is not a claim about C++ function-argument
+evaluation order.
+
+Routes remain `U/N/P/C0/Q/H/CSH`. For transitions `T`, switch dispatches `S`,
+CP345 assignments `R`, capacity provenance `G/F/L`, and CP340 active
+evaluations `A`, exact state requires `T = U+N+P+C0+Q+H+CSH`,
+`S = C0+Q+H+CSH = R = G+F+L`, and `A = F+L`. Every CP356 site counter equals
+`Q`, `source_site_execution_count = 4*Q`, and `Q` equals CP355 minimum-limit
+executions. Direct release inherits the completed `None` route with `C0 = S`
+and `Q = H = CSH = 0`; it executes no CP356 site, performs no CP356 RHS read,
+and publishes a complete-null snapshot.
+
+Recursively validated, bit-exact CP355 `resulting_supply_humidity_ratio`
+solely owns the left operand. Same-call CP329 latest/private
+`mixed_air_humidity_ratio` solely owns the RHS and must pass exact-direct
+snapshot parity plus the completed recursive CP329 validator. That owner proof
+already establishes a finite no-OA mixed-air humidity ratio, so CP356 adds no
+finite, range, clamp, normalization, default, or coercion gate. CP345's earlier
+copy, zone or caller scalars, model rereads, CP319, and the numerical DTO
+cannot substitute for either operand.
+
+CP356 reuses CP334 `source_shaped_two_argument_minimum`, exactly ObjexxFCL
+`a < b ? a : b`, implemented as
+`if left < right { left } else { right }`, never `f64::min` and never with
+reversed operands. Ties and unordered comparisons retain the right bits:
+`(-0,+0)` yields `+0`, `(+0,-0)` yields `-0`, a finite right survives a left
+quiet NaN, and a right quiet NaN retains its payload against a finite or NaN
+left. Signaling-NaN/FENV behavior remains excluded.
+
+Physical line 2227, the constant-SHR case `break;`, is the first excluded
+executable and the CP357 case-exit candidate. Line 2228 is the subsequent
+`Humidistat` case label and line 2229 its first body executable. Lifecycle
+evidence preserves CP355-to-CP356-to-unchanged-numerical order under
+`purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_lifecycle`.
+CP356 never enters, consumes, reconciles with, feeds, or replaces the numerical
+DTO. Non-direct paths publish `None` and reject attached CP356 evidence.
+Counts remain exactly 32 algorithms and 293 routines, split 58 `state_mapped`
+plus 235 `source_mapped`, with 170 required. The added internal audit changes
+only the script inventory to 294 total, 240 public, 54 internal, and zero
+unused. Both parents remain `scaffold`/`none`, both Calc routines remain
+`source_mapped`, and support, readiness, run state, capability,
+feature/evidence, numerical conformance, output ownership, status,
+conformance, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

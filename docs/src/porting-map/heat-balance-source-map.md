@@ -35574,6 +35574,57 @@ required; parent/Calc states and all support, readiness, capability,
 evidence, numerical, output, status, conformance, and Roadmap claims remain
 unchanged.
 
+## CP356 Constant-SHR Supply-Humidity-Ratio Mixed-Air Limit in the Heat-Balance Loop
+
+CP356 extends the purchased-air heat-balance witness at pinned EnergyPlus
+commit `6f2e40d10250a105b49966baa24d843711e61048`, locked
+`PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+through physical executable line 2226:
+`PurchAir.SupplyHumRat = min(PurchAir.SupplyHumRat, PurchAir.MixedAirHumRat);`.
+The four exact sites are
+`read-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-mixed-air-limit-minimum`,
+`read-purchased-air-mixed-air-humidity-ratio-for-constant-sensible-heat-ratio-mixed-air-limit-minimum`,
+`apply-source-shaped-two-argument-minimum-for-constant-sensible-heat-ratio-mixed-air-limit`,
+and
+`assign-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-mixed-air-limit`.
+The Rust textual witness order is deterministic but makes no C++ function
+argument-evaluation-order claim; the reads are side-effect free.
+
+Routes remain `U/N/P/C0/Q/H/CSH`, with
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`,
+`A = F+L`, `source_site_execution_count = 4*Q`, and each site counter equal
+to `Q`. CP355 executions own `Q`. Direct release is `C0 = S`,
+`Q = H = CSH = 0`, performs no CP356 RHS site, and emits complete-null CP356
+evidence.
+
+Bit-exact recursively complete CP355 `resulting_supply_humidity_ratio` is the
+sole left owner. Same-call CP329 latest/private `mixed_air_humidity_ratio` is
+the sole RHS owner and must pass exact-direct snapshot and recursive completion
+checks. That CP329 proof already guarantees finite no-OA mixed-air state, so
+CP356 adds no finite, range, clamp, normalization, default, or coercion gate.
+CP345, zone/caller/model duplicates, CP319, and the numerical DTO are not
+owners.
+
+CP334 `source_shaped_two_argument_minimum` preserves ObjexxFCL
+`a < b ? a : b` exactly as
+`if left < right { left } else { right }`, not `f64::min`. Operand order is
+fixed. Ties, signed-zero ties, and unordered comparisons keep right bits:
+`(-0,+0)` yields `+0`, `(+0,-0)` yields `-0`, finite right values survive a
+left quiet NaN, and right quiet NaN payloads survive.
+
+Physical executable line 2227, the constant-SHR case `break;`, is first
+excluded and is the next CP357 case-exit candidate. Line 2228 is the next case
+label and line 2229 its first body executable. Lifecycle order is
+CP355-to-CP356-to-unchanged-numerical under
+`purchased_air_calc_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_lifecycle`.
+CP356 neither consumes nor feeds the numerical DTO. Non-direct execution
+publishes `None` and rejects evidence. Inventory remains exactly 32 algorithms,
+293 routines, 58 state-mapped, 235 source-mapped, and 170 required; script
+inventory becomes 294 total, 240 public, 54 internal, and zero unused.
+Parent/Calc states and all support, readiness, capability, evidence, numerical,
+output, status, conformance, and Roadmap claims remain unchanged.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

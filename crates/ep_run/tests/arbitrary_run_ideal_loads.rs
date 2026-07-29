@@ -39,13 +39,12 @@ mod cp353_assertions;
 fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
 -> Result<(), Box<dyn std::error::Error>> {
     let fixture = active_cooling_ideal_loads_fixture();
-    let summary = assert_direct_ideal_loads_fixture_runs(
+    let (summary, results) = assert_direct_ideal_loads_fixture_runs(
         "ideal-loads-no-oa",
         &fixture,
         "ideal-loads-direct-zone-coupled-compatibility",
         "ideal_loads_no_oa_sensible",
     )?;
-
     assert_eq!(summary["rust_runtime"]["samples"], 1);
     assert_eq!(
         summary["rust_runtime"]["zone_demand_source"],
@@ -603,7 +602,7 @@ fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
     assert_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment(
         &summary["rust_runtime"],
     );
-    cp353_assertions::assert_direct(&summary["rust_runtime"]);
+    cp353_assertions::assert_direct(&summary["rust_runtime"], &results);
     Ok(())
 }
 
@@ -1128,7 +1127,7 @@ fn assert_direct_ideal_loads_fixture_runs(
     fixture: &str,
     expected_runtime_class: &str,
     expected_capability_id: &str,
-) -> Result<Value, Box<dyn std::error::Error>> {
+) -> Result<(Value, Value), Box<dyn std::error::Error>> {
     let case_dir = unique_case_dir(name)?;
     let input_path = case_dir.join("ideal-loads.epJSON");
     let weather_path = case_dir.join("weather.epw");
@@ -1141,7 +1140,6 @@ fn assert_direct_ideal_loads_fixture_runs(
     } else {
         None
     };
-
     let outcome = run_arbitrary_idf(&RunConfig {
         input_path,
         weather_path,
@@ -1161,7 +1159,6 @@ fn assert_direct_ideal_loads_fixture_runs(
         oracle_root: None,
         hours: Some(1),
     })?;
-
     assert_eq!(outcome.exit_code, RunExitCode::Success);
     assert_eq!(
         outcome.support_status,
@@ -1190,7 +1187,8 @@ fn assert_direct_ideal_loads_fixture_runs(
         expected_runtime_class
     );
     assert_eq!(summary["source_order_gate"]["matches"], true);
-    Ok(summary)
+    let results = read_json(&output_dir.join("results").join("result-store.json"))?;
+    Ok((summary, results))
 }
 
 fn read_json(path: &Path) -> Result<Value, Box<dyn std::error::Error>> {

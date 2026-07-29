@@ -10,12 +10,19 @@ mod state;
 mod tests;
 mod transition;
 
-#[allow(unused_imports)]
-pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_constant_shr_supply_humidity_ratio_minimum_limit_is_consistent;
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::completed_cp354_case;
+
 pub(in crate::ideal_loads) use release::cooling_constant_shr_supply_humidity_ratio_minimum_limit_snapshot_is_exact_direct_release;
 pub use release::{
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitError,
     advance_direct_no_oa_calc_cooling_constant_shr_supply_humidity_ratio_minimum_limit,
+};
+#[allow(unused_imports)]
+pub(in crate::ideal_loads::calc) use release::{
+    completed_direct_cooling_constant_shr_supply_humidity_ratio_minimum_limit_is_consistent,
+    private_active_counterfactual_from_direct_release,
+    private_active_counterfactual_links_to_direct_release,
 };
 pub(super) use state::PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitRetainedRoute;
 pub use state::PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitRuntimeState;

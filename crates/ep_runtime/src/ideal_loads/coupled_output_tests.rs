@@ -6,6 +6,8 @@ mod assertions;
 mod cooling_capacity_zero_flow_reset_fixture;
 #[path = "coupled_output_tests/cooling_constant_shr_supply_humidity_ratio_minimum_limit_fixture.rs"]
 mod cooling_constant_shr_supply_humidity_ratio_minimum_limit_fixture;
+#[path = "coupled_output_tests/cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_fixture.rs"]
+mod cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_fixture;
 #[path = "coupled_output_tests/cooling_constant_shr_supply_humidity_ratio_overdrying_limit_fixture.rs"]
 mod cooling_constant_shr_supply_humidity_ratio_overdrying_limit_fixture;
 #[path = "coupled_output_tests/cooling_humidification_flow_fixture.rs"]
@@ -124,6 +126,7 @@ use crate::{
 };
 use assertions::{assert_values, sentinel_results};
 use cooling_constant_shr_supply_humidity_ratio_minimum_limit_fixture::calculation_cooling_constant_shr_supply_humidity_ratio_minimum_limit_snapshot;
+use cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_fixture::calculation_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_snapshot;
 use cooling_constant_shr_supply_humidity_ratio_overdrying_limit_fixture::calculation_cooling_constant_shr_supply_humidity_ratio_overdrying_limit_snapshot;
 use cooling_capacity_zero_flow_reset_fixture::calculation_cooling_capacity_zero_flow_reset_snapshot;
 use cooling_humidification_flow_fixture::calculation_cooling_humidification_flow_snapshot;
@@ -312,6 +315,12 @@ fn appends_all_no_oa_and_predictor_series_with_hourly_semantics() {
             crate::ideal_loads::calc::
                 cooling_constant_shr_supply_humidity_ratio_minimum_limit_snapshot_is_exact_direct_release(
                     output.calculation_cooling_constant_shr_supply_humidity_ratio_minimum_limit,
+                )
+        );
+        assert!(
+            crate::ideal_loads::calc::
+                cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_snapshot_is_exact_direct_release(
+                    output.calculation_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit,
                 )
         );
     }
@@ -862,6 +871,10 @@ fn scaled_output(
         calculation_cooling_constant_shr_supply_humidity_ratio_minimum_limit_snapshot(
             calculation_cooling_constant_shr_supply_humidity_ratio_overdrying_limit,
         );
+    let calculation_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit =
+        calculation_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_snapshot(
+            calculation_cooling_constant_shr_supply_humidity_ratio_minimum_limit,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -930,6 +943,7 @@ fn scaled_output(
         calculation_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit,
         calculation_cooling_constant_shr_supply_humidity_ratio_overdrying_limit,
         calculation_cooling_constant_shr_supply_humidity_ratio_minimum_limit,
+        calculation_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

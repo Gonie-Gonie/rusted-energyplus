@@ -3,6 +3,7 @@
 use super::super::{
     DirectZonePurchasedAirCouplingOutput, PurchasedAirCalcCoolingCapacityZeroFlowResetSnapshot,
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitSnapshot,
+    PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitSnapshot,
     PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioOverdryingLimitSnapshot,
     PurchasedAirCalcCoolingDehumidificationFlowSnapshot,
     PurchasedAirCalcCoolingEconomizerBodySnapshot,
@@ -181,6 +182,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered constant-SHR supply-humidity-ratio minimum-limit snapshot.
     pub calculation_cooling_constant_shr_supply_humidity_ratio_minimum_limit:
         PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMinimumLimitSnapshot,
+    /// Source-ordered constant-SHR supply-humidity-ratio mixed-air-limit snapshot.
+    pub calculation_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit:
+        PurchasedAirCalcCoolingConstantShrSupplyHumidityRatioMixedAirLimitSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
