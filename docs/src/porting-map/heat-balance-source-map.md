@@ -35328,6 +35328,64 @@ required. No support, readiness, capability, feature/evidence,
 numerical-conformance, output, status, conformance, or Roadmap promotion
 occurs.
 
+## CP352 Constant-Sensible-Heat-Ratio Supply-Enthalpy Assignment in the Heat-Balance Loop
+
+CP352 extends the purchased-air heat-balance witness through pinned EnergyPlus
+commit `6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2219:
+`SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;`.
+The source hash remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its six sites are
+`read-retained-mixed-air-enthalpy-for-constant-sensible-heat-ratio-supply-enthalpy-difference`,
+`read-retained-cooling-total-output-for-constant-sensible-heat-ratio-specific-cooling-output-division`,
+`read-retained-supply-mass-flow-rate-for-constant-sensible-heat-ratio-specific-cooling-output-division`,
+`calculate-cooling-total-output-divided-by-supply-mass-flow-rate-for-constant-sensible-heat-ratio-supply-enthalpy`,
+`calculate-mixed-air-enthalpy-minus-specific-cooling-output-for-constant-sensible-heat-ratio-supply-enthalpy`,
+and `assign-local-supply-enthalpy-for-constant-sensible-heat-ratio-case`.
+Their deterministic Rust order records source text and dependencies, not C++
+built-in operand-evaluation order.
+
+The retained route partition is `U/N/P/C0/Q/H/CSH`. Exact checked state has
+`T = U+N+P+C0+Q+H+CSH`, `S = C0+Q+H+CSH = R = G+F+L`,
+`A = F+L`, CP352 `Q` equal to CP351 total-output assignments, each source-site
+counter equal to `Q`, and `source_site_execution_count = 6*Q`.
+Direct `C0` requires `C0 = S` and `Q = H = CSH = 0`; private `Q` is a
+restricted CP351 counterfactual derived from a recursively complete direct
+baseline.
+
+The sole active owners are CP329 retained mixed-air enthalpy, CP351
+`cooling_total_output_w`, and CP330 retained supply mass flow. CP352 never
+re-reads `cooling_sensible_heat_ratio`; it consumes only CP351's total-output
+owner. Exact grouping is
+`mixed_air_enthalpy - (cooling_total_output / supply_mass_flow_rate)`.
+Raw IEEE binary64 signed-zero, zero-flow, NaN, infinity, and overflow behavior
+is preserved by the pure transition without a line-local finite, positive,
+nonzero, range, clamp, normalization, reciprocal, fused-operation, or coercion
+gate. Private release nevertheless inherits CP330's exact positive-guard
+owner and admits only flow `> 0.0`, including possible `+infinity`; nonfinite
+CP351 total-output propagation remains possible. Signed-zero and
+zero/negative-flow cases are pure-transition characterization, not
+private-release reachability claims. Rust keeps characterized values as
+`Some`; Serde JSON nulls only nonfinite numeric projections and retains
+authoritative IEEE bit strings. Skip evidence remains `None`.
+
+Line 2220 is comment-only. Line 2221,
+`SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir.SupplyTemp, 0.00001));`,
+is the first excluded executable and CP353 boundary. CP352 assigned/result
+supply enthalpy is the next retained-input sole-owner candidate; the
+psychrometric overdrying maximum and later body are excluded. Lifecycle
+evidence preserves CP351-to-CP352-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_lifecycle`.
+CP352 never enters `DirectZonePurchasedAirCouplingInput`, consumes no
+numerical DTO value, and does not feed or replace it. Non-direct execution
+publishes `None` and rejects evidence. Parent algorithms stay
+`scaffold`/`none`, parent Calc routines stay `source_mapped`, and inventory
+stays 32 algorithms, 293 routines, 58 state-mapped, 235 source-mapped, and 170
+required. No support, readiness, capability, feature/evidence,
+numerical-conformance, output, status, conformance, or Roadmap promotion
+occurs.
+
 ## Data Structure Map
 
 | EnergyPlus data | Rust target | Boundary |

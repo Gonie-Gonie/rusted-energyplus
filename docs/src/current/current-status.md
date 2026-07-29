@@ -2437,6 +2437,77 @@ routines remain `source_mapped`, and support, readiness, run state,
 capability, feature/evidence boundaries, numerical conformance, output
 ownership, status, conformance, and Roadmap state remain unchanged.
 
+CP352 now maps only the Cooling positive-supply post-capacity-limit
+dehumidification-control constant-sensible-heat-ratio supply-enthalpy
+assignment at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`,
+`PurchasedAirManager.cc` physical executable line 2219:
+
+```cpp
+SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;
+```
+
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its six exact source-text sites, in deterministic Rust order, are
+`read-retained-mixed-air-enthalpy-for-constant-sensible-heat-ratio-supply-enthalpy-difference`,
+`read-retained-cooling-total-output-for-constant-sensible-heat-ratio-specific-cooling-output-division`,
+`read-retained-supply-mass-flow-rate-for-constant-sensible-heat-ratio-specific-cooling-output-division`,
+`calculate-cooling-total-output-divided-by-supply-mass-flow-rate-for-constant-sensible-heat-ratio-supply-enthalpy`,
+`calculate-mixed-air-enthalpy-minus-specific-cooling-output-for-constant-sensible-heat-ratio-supply-enthalpy`,
+and `assign-local-supply-enthalpy-for-constant-sensible-heat-ratio-case`.
+The three reads are side-effect-free; this ordering records source text and
+dependencies without claiming C++ built-in `/`, `-`, or `=` operand-evaluation
+order.
+
+Routes remain inherited `U/N/P`, completed-`None` skip `C0`, private
+constant-SHR assignment `Q`, and private `H/CSH` skips. Checked state requires
+`T = U+N+P+C0+Q+H+CSH`,
+`S = C0+Q+H+CSH = R = G+F+L`, `A = F+L`, `Q` equal to CP351 total-output
+assignments, every site counter equal to `Q`, and
+`source_site_execution_count = 6*Q`. Exact direct release requires `C0 = S`
+and `Q = H = CSH = 0`, so it publishes a complete operand,
+intermediate, and result-null skip. Private `Q` is a restricted same-call
+counterfactual bridge from the recursively complete CP351 direct baseline.
+
+Same-call retained CP329 `mixed_air_enthalpy_projection_j_per_kg`, CP351
+`cooling_total_output_w`, and CP330 `supply_mass_flow_rate_kg_per_s` solely
+own the active operands. CP352 does not re-read
+`IdealLoadsAirSystem.cooling_sensible_heat_ratio`; that ratio is already
+encapsulated in CP351's total-output owner. Caller scalars, earlier output
+values, helpers, and the numerical DTO cannot replace these owners, and
+coordinated owner/witness corruption is rejected transactionally.
+
+CP352 preserves exact grouping as
+`mixed_air_enthalpy - (cooling_total_output / supply_mass_flow_rate)`, division
+before subtraction and then assignment. It adds no line-local finite,
+positivity, nonzero, range, clamp, normalization, reciprocal, fused-operation,
+diagnostic, or coercion gate. Private release inherits CP330's exact
+positive-guard owner and admits only `supply_mass_flow_rate > 0.0`, including
+possible `+infinity`; nonfinite CP351 total-output IEEE propagation remains
+possible. The pure transition separately characterizes signed-zero,
+zero/negative-flow, NaN, infinity, and overflow without making private-release
+reachability claims for those flow cases. Characterized values remain `Some`;
+Serde JSON projects only nonfinite numeric fields to null while retaining
+authoritative IEEE bit strings. Inherited skips retain `None` and null bits.
+
+Physical line 2220 is an excluded comment. Physical executable line 2221,
+`SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir.SupplyTemp, 0.00001));`,
+is the first excluded executable and CP353 boundary. CP352's assigned/result
+supply enthalpy is the sole-owner candidate for that next retained input, but
+the CP353 maximum, psychrometric evaluation, overdrying limit, and all later
+case-body behavior remain excluded. Lifecycle evidence preserves
+CP351-to-CP352-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_lifecycle`.
+CP352 never enters, consumes, reconciles with, feeds, or replaces
+`DirectZonePurchasedAirCouplingInput` or the numerical DTO. Non-direct paths
+publish `None` and reject attached CP352 evidence. Counts remain 32 algorithms
+and 293 routines, split 58 `state_mapped` plus 235 `source_mapped`, with 170
+required. Both parent algorithms remain `scaffold`/`none`, both parent Calc
+routines remain `source_mapped`, and support, readiness, run state,
+capability, feature/evidence boundaries, numerical conformance, output
+ownership, status, conformance, and Roadmap state remain unchanged.
+
 ## Current Launcher State
 
 The current Windows launcher script invokes `eplus-rs run` as a CLI process. It

@@ -28,7 +28,6 @@ use runtime_validation::{
     pending_positive_guard_state_is_consistent,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_supply_mass_flow_positive_guard_snapshot_is_exact_direct_release;
-#[cfg(test)]
 pub(in crate::ideal_loads::calc) use snapshot_validation::snapshots_match_bit_exact;
 
 pub(in crate::ideal_loads::calc) fn completed_direct_cooling_supply_mass_flow_positive_guard_is_consistent(

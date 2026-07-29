@@ -12,6 +12,7 @@ mod transition;
 
 pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_supply_mass_flow_positive_guard_is_consistent;
 pub(in crate::ideal_loads) use release::cooling_supply_mass_flow_positive_guard_snapshot_is_exact_direct_release;
+pub(in crate::ideal_loads::calc) use release::snapshots_match_bit_exact as cooling_supply_mass_flow_positive_guard_snapshots_match_bit_exact;
 pub use release::{
     PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardError,
     advance_direct_no_oa_calc_cooling_supply_mass_flow_positive_guard,

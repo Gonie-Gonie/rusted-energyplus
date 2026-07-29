@@ -18816,6 +18816,76 @@ source-mapped with 170 required. CP351 changes no support, readiness,
 capability, feature/evidence, numerical-conformance, output-ownership, status,
 conformance, or Roadmap state.
 
+## CP352 Source-Ordered Cooling Positive-Supply Constant-Sensible-Heat-Ratio Supply-Enthalpy Assignment
+
+CP352 supersedes only CP351's physical-line-2219 exclusion. At pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`, locked raw
+source SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+`PurchasedAirManager.cc` physical executable line 2219 is:
+
+```cpp
+SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;
+```
+
+The exact six sites are
+`read-retained-mixed-air-enthalpy-for-constant-sensible-heat-ratio-supply-enthalpy-difference`,
+`read-retained-cooling-total-output-for-constant-sensible-heat-ratio-specific-cooling-output-division`,
+`read-retained-supply-mass-flow-rate-for-constant-sensible-heat-ratio-specific-cooling-output-division`,
+`calculate-cooling-total-output-divided-by-supply-mass-flow-rate-for-constant-sensible-heat-ratio-supply-enthalpy`,
+`calculate-mixed-air-enthalpy-minus-specific-cooling-output-for-constant-sensible-heat-ratio-supply-enthalpy`,
+and `assign-local-supply-enthalpy-for-constant-sensible-heat-ratio-case`.
+The side-effect-free reads make this a deterministic source/dependency witness,
+not a claim about C++ built-in operand-evaluation order.
+
+The seven routes are `U/N/P/C0/Q/H/CSH`. For CP346 dispatches `S`, CP345
+assignments `R`, capacity provenance `G/F/L`, and CP340 active evaluations
+`A`, exact checked algebra is `T = U+N+P+C0+Q+H+CSH`,
+`S = C0+Q+H+CSH = R = G+F+L`, `A = F+L`, and `Q` equals CP351
+total-output assignments. All six site counters equal `Q` and
+`source_site_execution_count = 6*Q`. Direct release requires `C0 = S` and
+`Q = H = CSH = 0`, preserving a complete null skip. Private `Q` uses only the
+restricted same-call CP351 counterfactual bridge rooted in the recursively
+complete direct `C0` baseline.
+
+The active operands are solely retained CP329
+`mixed_air_enthalpy_projection_j_per_kg`, CP351
+`cooling_total_output_w`, and CP330 `supply_mass_flow_rate_kg_per_s`, with
+latest/private recursive owner proofs. CP352 never re-reads the selected
+system's `cooling_sensible_heat_ratio`; only CP351's validated total-output
+owner carries that prior division. Duplicate caller scalars, earlier outputs,
+helper results, and numerical-DTO inputs are forbidden.
+
+The source AST is exactly
+`mixed_air_enthalpy - (cooling_total_output / supply_mass_flow_rate)`.
+Division precedes subtraction and assignment without reassociation,
+`mul_add`, reciprocal substitution, finite/positive/nonzero/range gates,
+clamp, normalization, diagnostic, default, or coercion. Private release
+inherits the exact CP330 positive-guard owner, so `flow > 0.0` is required
+and may be `+infinity`; nonfinite CP351 total-output propagation remains
+possible. The pure transition separately characterizes signed-zero,
+zero/negative-flow, NaN, infinity, and overflow without making private-release
+reachability claims for those flow cases. Characterized values remain `Some`;
+Serde JSON nulls only nonfinite numeric projections and retains authoritative
+IEEE bit strings. Skips retain `None`.
+
+Line 2220 is comment-only. Physical executable line 2221,
+`SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir.SupplyTemp, 0.00001));`,
+is the first excluded executable and CP353 boundary. The CP352 assigned/result
+supply enthalpy is the retained-input sole-owner candidate for CP353, while
+the maximum, psychrometric call, overdrying limit, and all later behavior are
+excluded here. Binding, coupled validation, and serialization preserve
+CP351-to-CP352-to-unchanged-numerical order under
+`purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_lifecycle`.
+No CP352 value enters, consumes, reconciles with, feeds, or replaces
+`DirectZonePurchasedAirCouplingInput` or the unchanged numerical DTO.
+Non-direct paths publish `None` and reject evidence. Both parents remain
+`scaffold`/`none`, both Calc routines remain `source_mapped`, and inventory
+stays 32 algorithms and 293 routines, split 58 state-mapped plus 235
+source-mapped with 170 required. CP352 changes no support, readiness,
+capability, feature/evidence, numerical-conformance, output-ownership, status,
+conformance, or Roadmap state.
+
 ## Run States
 
 Arbitrary runs return one of three support states:

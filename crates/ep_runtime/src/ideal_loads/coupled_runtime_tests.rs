@@ -5199,3 +5199,115 @@ fn cp351_coupled_direct_none_route_is_complete_skip_and_numerical_output_remains
         "CP351 complete-null evidence must not replace numerical total cooling"
     );
 }
+
+#[test]
+fn cp352_coupled_direct_none_route_is_complete_skip_and_numerical_enthalpy_remains_unfed() {
+    let mut typed = exact_model(1).typed;
+    typed.schedules[1].hourly_value = 0.0;
+    typed.schedules[2].hourly_value = 15.0;
+    typed.schedules[3].hourly_value = 1.0;
+    let model = SimulationModel::from_typed(typed);
+    let schedule_cache =
+        precompute_schedule_cache(&model.typed, 1).expect("one CP352 schedule sample");
+    let weather = weather_series_with_conditions(&model, 1, 30.0, 15.0, 30.0, 101_325.0);
+    let mut options = DirectZonePurchasedAirCoupledOptions::hourly_samples(1);
+    options.initial_zone_air_temperature_c = INITIAL_ZONE_TEMPERATURE_C;
+    let simulation = simulate_direct_zone_purchased_air_coupled_heat_balance(
+        &model,
+        &weather,
+        &schedule_cache,
+        options,
+    )
+    .expect("valid CP352 direct simulation");
+    let summary = &simulation.summary;
+    let state = &summary
+        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_lifecycle
+        .state;
+    let snapshot = state.latest.expect("latest CP352 snapshot");
+    let predecessor = summary
+        .calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_total_output_assignment_lifecycle
+        .state
+        .latest
+        .expect("latest CP351 predecessor");
+
+    assert_eq!(state.transition_count, 1);
+    assert_eq!(
+        state.dehumidification_control_none_case_completed_skip_count,
+        1
+    );
+    assert_eq!(
+        state
+            .dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_count,
+        0
+    );
+    assert_eq!(state.source_site_execution_count, 0);
+    assert_eq!(state.mixed_air_enthalpy_read_count, 0);
+    assert_eq!(state.cooling_total_output_read_count, 0);
+    assert_eq!(state.supply_mass_flow_rate_read_count, 0);
+    assert_eq!(state.specific_cooling_output_calculation_count, 0);
+    assert_eq!(state.supply_enthalpy_calculation_count, 0);
+    assert_eq!(state.supply_enthalpy_assignment_write_count, 0);
+    assert!(snapshot.dehumidification_control_none_case_completed_skip);
+    assert!(
+        !snapshot
+            .dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_executed
+    );
+    assert!(!snapshot.mixed_air_enthalpy_read);
+    assert!(snapshot.mixed_air_enthalpy_j_per_kg.is_none());
+    assert!(!snapshot.cooling_total_output_read);
+    assert!(snapshot.cooling_total_output_w.is_none());
+    assert!(!snapshot.supply_mass_flow_rate_read);
+    assert!(snapshot.supply_mass_flow_rate_kg_per_s.is_none());
+    assert!(!snapshot.specific_cooling_output_calculated);
+    assert!(snapshot.specific_cooling_output_j_per_kg.is_none());
+    assert!(!snapshot.supply_enthalpy_calculated);
+    assert!(snapshot.calculated_supply_enthalpy_j_per_kg.is_none());
+    assert!(!snapshot.supply_enthalpy_assigned);
+    assert!(snapshot.assigned_supply_enthalpy_j_per_kg.is_none());
+    assert!(snapshot.resulting_supply_enthalpy_j_per_kg.is_none());
+
+    let expected =
+        super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_validation::expected_snapshot(
+            predecessor,
+        );
+    assert!(
+        super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_validation::snapshots_match_exact_bits(
+            &snapshot,
+            &expected,
+        )
+    );
+
+    let mut corrupted = snapshot;
+    corrupted.source_order = &["forged-constant-sensible-heat-ratio-supply-enthalpy-assignment"];
+    assert!(
+        !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_validation::snapshots_match_exact_bits(
+            &corrupted,
+            &expected,
+        )
+    );
+
+    let mut negative_zero = snapshot;
+    negative_zero.resulting_supply_enthalpy_j_per_kg = Some(-0.0);
+    let mut positive_zero = negative_zero;
+    positive_zero.resulting_supply_enthalpy_j_per_kg = Some(0.0);
+    assert_eq!(negative_zero, positive_zero);
+    assert!(
+        !super::cooling_positive_supply_post_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_enthalpy_assignment_validation::snapshots_match_exact_bits(
+            &negative_zero,
+            &positive_zero,
+        ),
+        "signed-zero enthalpy corruption must fail exact-bit validation"
+    );
+
+    let numerical_enthalpy = summary
+        .calc_cooling_positive_supply_enthalpy_assignment_lifecycle
+        .state
+        .latest
+        .expect("unchanged numerical supply-enthalpy snapshot")
+        .supply_enthalpy_j_per_kg
+        .expect("unchanged numerical supply enthalpy");
+    assert!(
+        numerical_enthalpy.is_finite(),
+        "CP352 complete-null evidence must not replace numerical supply enthalpy"
+    );
+}
