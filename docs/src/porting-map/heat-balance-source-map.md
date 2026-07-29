@@ -37088,3 +37088,35 @@ Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
 internal, and zero unused. Parent/Calc status plus all support, readiness,
 capability, feature/evidence, numerical, output, status, conformance, and
 Roadmap claims remain unchanged.
+
+## CP366 Constant-Supply-Humidity-Ratio Case Break in the Heat-Balance Loop
+
+CP366 retains only pinned `PurchasedAirManager.cc:2236` (`} break;`) and its
+single case-exit source site. The line-2237 `default` is a label, so line 2238
+is the first excluded executable statement. The default body, line 2245
+continuation, later PurchasedAir behavior, and heat-balance calculations are
+not claimed. An active typed constant-supply route exits before the default
+path.
+
+Its exact partition is `T=U+N+P+C0+Q+H+CSH`,
+`S=C0+Q+H+CSH=R=G+F+L`, and `A=F+L`. CP366 breaks equal CP365 assignments
+and CP364 entries, while the source-site count equals `CSH`. The direct
+release remains `C0=S`, `Q=H=CSH=0`, and never executes line 2236.
+
+CP366 requires same-call, bit-exact, recursively completed CP365 evidence.
+It accepts and publishes no numeric humidity value, reads no typed owner, and
+performs no arithmetic, comparison, finite/range gate, clamp, default, or
+psychrometric operation. Only the existing CP365 canonical private
+characterization can precede a private active break.
+
+Coupled order remains CP365-to-CP366-to-unchanged-numerical under
+`purchased_air_calc_cooling_constant_supply_humidity_ratio_case_break_lifecycle`.
+CP366 cannot feed or replace coupling, prediction, heat-balance, numerical
+DTO, or result state. CP345 remains the numerical result-store owner.
+Non-direct paths expose `None` and reject evidence.
+
+Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, and 170 required. Scripts become 304 total, 240 public, 64
+internal, and zero unused. Parent/Calc status plus all support, readiness,
+capability, numerical, output, conformance, and Roadmap claims remain
+unchanged.

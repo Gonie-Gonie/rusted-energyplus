@@ -21375,3 +21375,38 @@ Inventory remains 32 algorithms and 293 routines, 58 `state_mapped` plus 235
 internal, and zero unused. Parent/Calc state and support, readiness,
 capability, feature/evidence, numerical, output, status, conformance, and
 Roadmap claims remain unchanged.
+
+## CP366 Constant-Supply-Humidity-Ratio Case Break
+
+CP366 maps pinned `PurchasedAirManager.cc:2236` (`} break;`) and only the
+site
+`exit-purchased-air-dehumidification-control-constant-supply-humidity-ratio-case-via-break`.
+Line 2237 is the next control label; line 2238 is therefore the first excluded
+executable statement. The untyped default body, line 2245 continuation, and
+all later behavior remain outside the mapped boundary. The active typed
+constant-supply case exits through the break and does not fall through.
+
+For retained routes `U/N/P/C0/Q/H/CSH`,
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`, and `A=F+L`.
+The CP366 `CSH` break count equals CP365's assignment count and CP364's entry
+count; its sole source-site count also equals `CSH`. Direct `None` release
+has `C0=S`, zero `Q/H/CSH`, and no break.
+
+The immediate predecessor is same-call, bit-exact, recursively completed
+CP365 evidence. CP366 is strictly numeric-free: no numeric argument, humidity
+payload, IEEE sidecar, read, copy, arithmetic, comparison, finite/range gate,
+clamp, default, or psychrometric call is allowed. CP365's canonical private
+assignment bridge can characterize an active `CSH` break, but public direct
+release does not inspect the typed minimum-humidity owner.
+
+Binding remains CP365-to-CP366-to-unchanged-numerical under
+`purchased_air_calc_cooling_constant_supply_humidity_ratio_case_break_lifecycle`.
+CP366 does not feed coupling input, demand prediction, numerical DTO state,
+or result state. CP345 remains the actual result-store supply-humidity owner,
+and non-direct paths publish `None` and reject CP366 evidence.
+
+Inventory remains 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Scripts become 304 total, 240 public, 64
+internal, and zero unused. Parent/Calc state and support, readiness,
+capability, numerical, output, conformance, and Roadmap claims remain
+unchanged.

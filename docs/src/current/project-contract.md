@@ -19750,3 +19750,43 @@ public, 63 internal, and zero unused. Both parent algorithms remain
 readiness, run state, capability, feature/evidence boundaries, numerical
 conformance, output ownership, status, conformance, and Roadmap state remain
 unchanged.
+
+## CP366 Source-Ordered Cooling Constant-Supply-Humidity-Ratio Case Break
+
+CP366 maps only pinned `PurchasedAirManager.cc:2236` (`} break;`) at
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`. Its sole
+site is
+`exit-purchased-air-dehumidification-control-constant-supply-humidity-ratio-case-via-break`.
+The line-2237 `default` token is a control label, not the first excluded
+executable; that boundary is line 2238. The default body, line 2245
+continuation, and later behavior remain excluded, and an active typed
+constant-supply case cannot fall through to the untyped default path.
+
+The exact seven-route partition is `T=U+N+P+C0+Q+H+CSH`, with
+`S=C0+Q+H+CSH=R=G+F+L` and `A=F+L`. The CP366 break count equals the CP365
+assignment count and CP364 entry count, while
+`source_site_execution_count=CSH`. Direct release has `C0=S` and
+`Q=H=CSH=0`.
+
+CP365 retained/latest/witness evidence must be same-call, bit-exact, and
+recursively complete before CP366 can mutate. The public direct API has no
+numeric operand and must not inspect the selected typed minimum-humidity
+owner, including defensive NaN or infinity values that are irrelevant on the
+direct `None` route. The canonical private route delegates to CP365's
+existing finite-owner characterization and then records only the pure break.
+CP366 itself owns no `f64`, optional humidity value, IEEE sidecar, numeric
+branch, finite/range check, clamp, default, or psychrometric operation.
+
+Binding and direct-only evidence preserve
+CP365-to-CP366-to-unchanged-numerical order under
+`purchased_air_calc_cooling_constant_supply_humidity_ratio_case_break_lifecycle`.
+CP366 cannot enter, consume, reconcile with, feed, or replace coupling,
+demand prediction, numerical DTOs, or result state. CP345 remains the actual
+result-store supply-humidity owner. Non-direct paths expose `None` and reject
+attached CP366 evidence.
+
+Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Script inventory becomes 304 total, 240
+public, 64 internal, and zero unused. Parent/Calc status plus support,
+readiness, capability, numerical, output, conformance, and Roadmap state
+remain unchanged.

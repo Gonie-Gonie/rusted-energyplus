@@ -14,6 +14,8 @@ mod cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_fixture;
 mod cooling_constant_shr_supply_humidity_ratio_overdrying_limit_fixture;
 #[path = "coupled_output_tests/cooling_constant_supply_humidity_ratio_assignment_fixture.rs"]
 mod cooling_constant_supply_humidity_ratio_assignment_fixture;
+#[path = "coupled_output_tests/cooling_constant_supply_humidity_ratio_case_break_fixture.rs"]
+mod cooling_constant_supply_humidity_ratio_case_break_fixture;
 #[path = "coupled_output_tests/cooling_constant_supply_humidity_ratio_case_entry_fixture.rs"]
 mod cooling_constant_supply_humidity_ratio_case_entry_fixture;
 #[path = "coupled_output_tests/cooling_humidification_flow_fixture.rs"]
@@ -145,6 +147,7 @@ use crate::{
 use assertions::{assert_values, sentinel_results};
 use cooling_constant_shr_case_break_fixture::calculation_cooling_constant_shr_case_break_snapshot;
 use cooling_constant_supply_humidity_ratio_assignment_fixture::calculation_cooling_constant_supply_humidity_ratio_assignment_snapshot;
+use cooling_constant_supply_humidity_ratio_case_break_fixture::calculation_cooling_constant_supply_humidity_ratio_case_break_snapshot;
 use cooling_constant_supply_humidity_ratio_case_entry_fixture::calculation_cooling_constant_supply_humidity_ratio_case_entry_snapshot;
 use cooling_humidistat_case_break_fixture::calculation_cooling_humidistat_case_break_snapshot;
 use cooling_humidistat_case_entry_fixture::calculation_cooling_humidistat_case_entry_snapshot;
@@ -402,6 +405,12 @@ fn appends_all_no_oa_and_predictor_series_with_hourly_semantics() {
             crate::ideal_loads::calc::
                 cooling_constant_supply_humidity_ratio_assignment_snapshot_is_exact_direct_release(
                     output.calculation_cooling_constant_supply_humidity_ratio_assignment,
+                )
+        );
+        assert!(
+            crate::ideal_loads::calc::
+                cooling_constant_supply_humidity_ratio_case_break_snapshot_is_exact_direct_release(
+                    output.calculation_cooling_constant_supply_humidity_ratio_case_break,
                 )
         );
     }
@@ -992,6 +1001,10 @@ fn scaled_output(
         calculation_cooling_constant_supply_humidity_ratio_assignment_snapshot(
             calculation_cooling_constant_supply_humidity_ratio_case_entry,
         );
+    let calculation_cooling_constant_supply_humidity_ratio_case_break =
+        calculation_cooling_constant_supply_humidity_ratio_case_break_snapshot(
+            calculation_cooling_constant_supply_humidity_ratio_assignment,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -1070,6 +1083,7 @@ fn scaled_output(
         calculation_cooling_humidistat_case_break,
         calculation_cooling_constant_supply_humidity_ratio_case_entry,
         calculation_cooling_constant_supply_humidity_ratio_assignment,
+        calculation_cooling_constant_supply_humidity_ratio_case_break,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

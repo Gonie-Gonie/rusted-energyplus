@@ -24019,3 +24019,37 @@ Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
 public, 63 internal, and zero unused. Parent/Calc states and all readiness,
 support, capability, feature/evidence, numerical, output, status, conformance,
 and Roadmap claims remain unchanged.
+
+## CP366 Constant-Supply-Humidity-Ratio Case-Break Placement
+
+CP366 sits immediately after CP365 and maps only pinned
+`PurchasedAirManager.cc:2236` (`} break;`). Its sole source site exits the
+constant-supply-humidity-ratio case. Line 2237 is the following `default`
+label, while line 2238 is the first excluded executable statement; the
+default body, line 2245 continuation, zone-air update behavior, and all later
+logic remain outside CP366. The active typed route cannot fall through.
+
+For `U/N/P/C0/Q/H/CSH`, `T=U+N+P+C0+Q+H+CSH`,
+`S=C0+Q+H+CSH=R=G+F+L`, and `A=F+L`. CP366 `CSH` breaks equal CP365
+assignments and CP364 entries, and its source-site count equals the break
+count. Direct release has `C0=S`, zero `Q/H/CSH`, and a false break.
+
+Same-call bit-exact recursively completed CP365 is the sole predecessor.
+CP366 is a numeric-free classification checkpoint: it has no numeric input or
+humidity payload, reads no owner, and performs no copy, arithmetic,
+comparison, finite/range gate, clamp, default, or psychrometric work. The
+existing CP365 private characterization supplies the only private active
+route.
+
+Evidence preserves CP365-to-CP366-to-unchanged-numerical order under
+`purchased_air_calc_cooling_constant_supply_humidity_ratio_case_break_lifecycle`.
+CP366 cannot consume, reconcile with, feed, or replace coupling input,
+prediction, numerical DTO state, or result state. CP345 still owns actual
+result-store supply-humidity bits. Non-direct paths publish `None` and reject
+CP366 evidence.
+
+Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Script inventory becomes 304 total, 240
+public, 64 internal, and zero unused. Parent/Calc states and all readiness,
+support, capability, numerical, output, conformance, and Roadmap claims
+remain unchanged.

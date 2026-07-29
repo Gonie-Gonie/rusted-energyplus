@@ -1,6 +1,9 @@
-//! CP365 constant-supply-humidity-ratio assignment and terminal nonfeed assertions.
+//! CP365 constant-supply-humidity-ratio assignment assertions.
 
 use serde_json::{Map, Value, json};
+
+#[path = "cp366_assertions.rs"]
+mod cp366_assertions;
 
 const CP364_KEY: &str =
     "purchased_air_calc_cooling_constant_supply_humidity_ratio_case_entry_lifecycle";
@@ -113,9 +116,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
     ] {
         assert!(cp365["latest"][field].is_null(), "{field}");
     }
-    super::super::super::super::super::super::super::super::assert_numerical_nonfeed(
-        runtime, results,
-    );
+    cp366_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -124,4 +125,5 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP365_KEY].is_null(),
         "non-direct runtime must not publish CP365 evidence"
     );
+    cp366_assertions::assert_non_direct(runtime);
 }
