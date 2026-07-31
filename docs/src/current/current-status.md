@@ -3446,3 +3446,48 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 65 internal, and zero unused. Parent/Calc states and all support,
 readiness, run-state, capability, numerical, output-ownership, conformance,
 and Roadmap claims remain unchanged.
+
+
+## CP368 Cooling Default Supply-Humidity-Ratio Case Break
+
+CP368 supersedes only CP367's line-2239 exclusion at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps `PurchasedAirManager.cc:2239`, `} break;`, through exactly one source
+site:
+
+1. `exit-purchased-air-dehumidification-control-default-case-via-break`
+
+Physical line 2237 is the untyped `default` label and remains unclaimed;
+CP367 maps only line 2238's assignment. Line 2240 closes the switch and lines
+2241-2244 are blank or comments, so line 2245's `if (HeatOn)` is the first
+excluded executable statement and the next source-order candidate.
+
+The retained named-enum routes are exactly `U/N/P/C0/Q/H/CSH`; there is no
+invalid-enum or eighth default route. Their checked algebra is
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`, and `A=F+L`.
+Every typed route skips the untyped default case exit, so
+`B=default_break=source_site=0`; the default-case-break counter, aggregate
+source-site counter, break-executed flag, and every source-site execution
+remain zero.
+
+Same-call, bit-exact, recursively completed CP367 evidence is the sole
+predecessor. Its canonical private `CSH` bridge proves that the typed
+constant-supply route also skipped both the default assignment and default
+break; `C0/Q/H/CSH` therefore remain completed skips. CP368 accepts no
+numeric argument, carries no humidity or IEEE payload in snapshots or JSON,
+and performs no owner read, copy, arithmetic, comparison, finite/range gate,
+clamp, default behavior, diagnostic, or psychrometric operation.
+
+Evidence order is CP367-to-CP368-to-unchanged-numerical under
+`purchased_air_calc_cooling_default_supply_humidity_ratio_case_break_lifecycle`.
+CP368 cannot feed or replace `DirectZonePurchasedAirCouplingInput`,
+`prediction.zone_demand`, any numerical DTO, or result state. CP345 remains
+the actual result-store supply-humidity owner. Non-direct paths publish
+`None` and reject CP368 evidence.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 306 total,
+240 public, 66 internal, and zero unused. Parent/Calc states and all support,
+readiness, run-state, capability, numerical, output-ownership, conformance,
+and Roadmap claims remain unchanged.

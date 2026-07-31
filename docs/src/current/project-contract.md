@@ -19832,3 +19832,44 @@ Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
 public, 65 internal, and zero unused. Parent/Calc status plus support,
 readiness, capability, numerical, output, conformance, and Roadmap state
 remain unchanged.
+
+
+## CP368 Source-Ordered Cooling Default Supply-Humidity-Ratio Case Break
+
+CP368 maps only pinned `PurchasedAirManager.cc:2239`, `} break;`, at
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and locked
+raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its sole source site is
+`exit-purchased-air-dehumidification-control-default-case-via-break`.
+Line 2237's untyped `default` label remains unclaimed and CP367 owns only
+line 2238. Line 2240 closes the switch, lines 2241-2244 are non-executable,
+and physical executable line 2245, `if (HeatOn) {`, is first excluded.
+
+The exact partition is `T=U+N+P+C0+Q+H+CSH`, with
+`S=C0+Q+H+CSH=R=G+F+L` and `A=F+L`. Only the seven named-enum routes exist;
+there is no invalid discriminant, eighth route, or executable default route.
+Consequently `B=default_break=source_site=0` for every retained route: the
+sole source site, break counter, and break-executed flag all remain zero.
+
+CP367 retained/latest/witness evidence must be same-call, bit-exact, and
+recursively complete before CP368 can mutate. CP367 is the sole predecessor;
+its canonical private `CSH` bridge remains a completed default-assignment
+skip and CP368 records a completed default-break skip. CP368 owns no `f64`,
+optional humidity value, IEEE sidecar, numeric argument, owner read,
+arithmetic, comparison, finite/range check, clamp, default behavior, or
+psychrometric operation, and its lifecycle JSON stays control-only.
+
+Binding and direct-only evidence preserve
+CP367-to-CP368-to-unchanged-numerical order under
+`purchased_air_calc_cooling_default_supply_humidity_ratio_case_break_lifecycle`.
+CP368 cannot enter, consume, reconcile with, feed, or replace coupling,
+demand prediction, numerical DTOs, or result state. CP345 remains the actual
+result-store supply-humidity owner. Non-direct paths expose `None` and reject
+attached CP368 evidence.
+
+Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Script inventory becomes 306 total, 240
+public, 66 internal, and zero unused. Parent/Calc status plus support,
+readiness, capability, numerical, output, conformance, and Roadmap state
+remain unchanged.

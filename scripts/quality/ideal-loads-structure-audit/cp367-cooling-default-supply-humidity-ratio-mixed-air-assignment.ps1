@@ -247,7 +247,7 @@ foreach ($test in @(
         "latest_direct_route_requires_matching_current_and_predecessor_cumulative_evidence",
         "direct_none_release_serializes_typed_default_assignment_skip",
         "active_constant_supply_route_also_skips_default_assignment_without_numeric_payload",
-        "non_direct_runtime_rejects_cp316_through_cp367_lifecycle_evidence"
+        "non_direct_runtime_rejects_cp316_through_cp368_lifecycle_evidence"
     )) {
     Assert-Cp367TextContains -Text $cp367SemanticText -Pattern ('(?m)fn\s+' + $test + '\s*\(') -Description "semantic regression '$test'"
 }
@@ -257,16 +257,20 @@ Assert-Contains -Path $cp367PipelineValidation -Pattern 'latest_route_has_cumula
 $cp367BindingText = Read-RepoText -Path $cp367Binding
 $cp366BindingIndexForCp367 = $cp367BindingText.IndexOf("let calculation_${cp366StemForCp367} =")
 $cp367BindingIndex = $cp367BindingText.IndexOf("let calculation_${cp367Stem} =")
+$cp368BindingIndexForCp367 = $cp367BindingText.IndexOf("let calculation_cooling_default_supply_humidity_ratio_case_break =")
 $cp367NumericalIndex = $cp367BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
-if ($cp366BindingIndexForCp367 -lt 0 -or $cp367BindingIndex -le $cp366BindingIndexForCp367 -or $cp367NumericalIndex -le $cp367BindingIndex) {
-    throw "Binding must execute CP366 then CP367 before unchanged numerical coupling"
+if ($cp366BindingIndexForCp367 -lt 0 -or $cp367BindingIndex -le $cp366BindingIndexForCp367 -or $cp368BindingIndexForCp367 -le $cp367BindingIndex -or $cp367NumericalIndex -le $cp368BindingIndexForCp367) {
+    throw "Binding must execute CP366 then CP367 then CP368 before unchanged numerical coupling"
 }
 $cp367Dto = Get-Cp367RustBraceBlock -Text $cp367BindingText.Substring($cp367NumericalIndex) -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{' -Description "CP367 numerical DTO"
 if ($cp367Dto -match '(?i)cp367|default_supply_humidity_ratio_mixed_air_assignment') {
     throw "CP367 evidence must not enter DirectZonePurchasedAirCouplingInput"
 }
 Assert-Contains -Path $cp367CoupledTests -Pattern 'numerical_owner\.map\(f64::to_bits\)' -Description "CP345 numerical-owner bit identity"
-Assert-Contains -Path $cp367ArbitraryAssertions -Pattern 'assert_numerical_nonfeed' -Description "CP367 terminal numerical nonfeed"
+Assert-Contains -Path $cp367ArbitraryAssertions -Pattern 'mod cp368_assertions;' -Description "CP368 arbitrary delegation module"
+Assert-Contains -Path $cp367ArbitraryAssertions -Pattern 'cp368_assertions::assert_direct\(runtime, results\)' -Description "CP368 arbitrary direct delegation"
+Assert-Contains -Path $cp367ArbitraryAssertions -Pattern 'cp368_assertions::assert_non_direct\(runtime\)' -Description "CP368 arbitrary non-direct delegation"
+Assert-NotContains -Path $cp367ArbitraryAssertions -Pattern 'assert_numerical_nonfeed\(runtime, results\)' -Description "CP367 relinquishes terminal nonfeed"
 foreach ($registration in @(
         [PSCustomObject]@{ Path = $cp367CalcRoot; Pattern = $cp367Stem; Description = "calc registration" },
         [PSCustomObject]@{ Path = $cp367BindingAdapter; Pattern = "advance_direct_no_oa_calc_$cp367Stem"; Description = "binding adapter" },
@@ -383,29 +387,29 @@ foreach ($historical in @(327, 328) + @(346..366)) {
 }
 foreach ($historical in 334..366) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp367_lifecycle_evidence' -Description "historical CP367 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp368_lifecycle_evidence' -Description "historical CP367 firewall"
 }
 foreach ($historical in 326..333) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp367_lifecycle_evidence' -Description "out-of-range CP367 firewall token"
+    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp368_lifecycle_evidence' -Description "out-of-range CP367 firewall token"
 }
 foreach ($historical in 335..366) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 305 \|')) -Description "historical generated total"
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 65 \|')) -Description "historical generated internal"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 306 \|')) -Description "historical generated total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 66 \|')) -Description "historical generated internal"
 }
 foreach ($historical in 326..334) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 305 \|')) -Description "out-of-range generated-total token"
-    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 65 \|')) -Description "out-of-range generated-internal token"
+    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 306 \|')) -Description "out-of-range generated-total token"
+    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 66 \|')) -Description "out-of-range generated-internal token"
 }
 foreach ($historical in 337..366) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 305' -Description "historical inventory total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 306' -Description "historical inventory total"
 }
 foreach ($historical in 326..336) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 305' -Description "out-of-range inventory-total token"
+    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 306' -Description "out-of-range inventory-total token"
 }
 $cp367MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp366AuditIndexForCp367 = $cp367MainAuditText.IndexOf("cp366-cooling-constant-supply-humidity-ratio-case-break.ps1")
@@ -415,17 +419,17 @@ if ($cp366AuditIndexForCp367 -lt 0 -or $cp367AuditIndex -le $cp366AuditIndexForC
     throw "Master audit must dot-source CP367 after CP366 before completion"
 }
 $cp367InventoryText = Read-RepoText -Path "specs\script_inventory.toml"
-Assert-Cp367TextContains -Text $cp367InventoryText -Pattern 'script_count = 305' -Description "script total"
+Assert-Cp367TextContains -Text $cp367InventoryText -Pattern 'script_count = 306' -Description "script total"
 Assert-Cp367TextContains -Text $cp367InventoryText -Pattern 'unused_script_count = 0' -Description "zero uncalled"
 if ([regex]::Matches($cp367InventoryText, '(?m)^classification = "public"$').Count -ne 240 -or
-    [regex]::Matches($cp367InventoryText, '(?m)^classification = "internal"$').Count -ne 65) {
-    throw "CP367 inventory must be exactly 240 public and 65 internal scripts"
+    [regex]::Matches($cp367InventoryText, '(?m)^classification = "internal"$').Count -ne 66) {
+    throw "CP367 inventory must be exactly 240 public and 66 internal scripts"
 }
 Assert-Cp367TextContains -Text $cp367InventoryText -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp367-' -Description "inventory record"
 Assert-Cp367TextContains -Text $cp367InventoryText -Pattern 'cp367-cooling-default-supply-humidity-ratio-mixed-air-assignment\.ps1::dot_sources' -Description "caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 305 \|' -Description "CP367 generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 306 \|' -Description "CP367 generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP367 generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 65 \|' -Description "CP367 generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 66 \|' -Description "CP367 generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP367 generated uncalled"
 
 Write-Host "CP367 default supply-humidity-ratio mixed-air-assignment structure audit passed."

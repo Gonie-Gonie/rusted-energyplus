@@ -21452,3 +21452,46 @@ Inventory remains 32 algorithms and 293 routines, 58 `state_mapped` plus 235
 internal, and zero unused. Parent/Calc state and support, readiness,
 capability, numerical, output, conformance, and Roadmap claims remain
 unchanged.
+
+
+## CP368 Default Supply-Humidity-Ratio Case Break
+
+CP368 maps pinned `PurchasedAirManager.cc:2239`, `} break;`, as exactly one
+source site:
+
+1. `exit-purchased-air-dehumidification-control-default-case-via-break`
+
+Pinned commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`
+lock physical lines 2237-2245. The line-2237 untyped `default` label remains
+unclaimed and CP367 maps only line 2238. Line 2240 is the switch closing
+delimiter, lines 2241-2244 are non-executable, and line 2245 is the first
+excluded executable statement.
+
+For exactly seven named-enum routes `U/N/P/C0/Q/H/CSH`,
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`, and `A=F+L`.
+No invalid-enum or eighth default route exists. Every retained route skips
+the untyped default break, giving `B=default_break=source_site=0`; the
+default-case-break and source-site counters plus the break-executed flag
+remain zero.
+
+The immediate and sole predecessor is same-call, bit-exact, recursively
+completed CP367 evidence. CP367's canonical private `CSH` bridge proves the
+active typed route skipped the default assignment, and CP368 preserves it as
+a completed default-break skip. `C0/Q/H/CSH` all remain completed skips.
+CP368 is strictly numeric-free: no numeric argument, humidity payload, IEEE
+sidecar, owner read, copy, arithmetic, comparison, finite/range gate, clamp,
+default behavior, or psychrometric call is allowed, including in lifecycle
+JSON.
+
+Binding remains CP367-to-CP368-to-unchanged-numerical under
+`purchased_air_calc_cooling_default_supply_humidity_ratio_case_break_lifecycle`.
+CP368 does not feed coupling input, demand prediction, numerical DTO state,
+or result state. CP345 remains the actual result-store supply-humidity owner,
+and non-direct paths publish `None` and reject CP368 evidence.
+
+Inventory remains 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Scripts become 306 total, 240 public, 66
+internal, and zero unused. Parent/Calc state and support, readiness,
+capability, numerical, output, conformance, and Roadmap claims remain
+unchanged.

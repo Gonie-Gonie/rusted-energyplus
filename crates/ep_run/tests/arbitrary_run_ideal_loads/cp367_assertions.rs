@@ -1,6 +1,9 @@
-//! CP367 typed-default assignment skip and terminal nonfeed assertions.
+//! CP367 typed-default assignment skip assertions.
 
 use serde_json::{Map, Value, json};
+
+#[path = "cp368_assertions.rs"]
+mod cp368_assertions;
 
 const CP366_KEY: &str =
     "purchased_air_calc_cooling_constant_supply_humidity_ratio_case_break_lifecycle";
@@ -109,9 +112,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
     ] {
         assert!(!latest.contains_key(forbidden), "{forbidden}");
     }
-    super::super::super::super::super::super::super::super::super::super::assert_numerical_nonfeed(
-        runtime, results,
-    );
+    cp368_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -120,4 +121,5 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP367_KEY].is_null(),
         "non-direct runtime must not publish CP367 evidence"
     );
+    cp368_assertions::assert_non_direct(runtime);
 }
