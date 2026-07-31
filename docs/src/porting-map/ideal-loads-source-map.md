@@ -21410,3 +21410,45 @@ Inventory remains 32 algorithms and 293 routines, 58 `state_mapped` plus 235
 internal, and zero unused. Parent/Calc state and support, readiness,
 capability, numerical, output, conformance, and Roadmap claims remain
 unchanged.
+
+## CP367 Default Supply-Humidity-Ratio Mixed-Air Assignment
+
+CP367 maps pinned `PurchasedAirManager.cc:2238`,
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;`, as exactly two ordered
+sites:
+
+1. `read-purchased-air-mixed-air-humidity-ratio-for-dehumidification-control-default-assignment`
+2. `assign-purchased-air-supply-humidity-ratio-for-dehumidification-control-default-case`
+
+Pinned commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`
+lock physical lines 2237-2245. The line-2237 untyped `default` label is not
+claimed. Line 2239 is the first excluded executable, and lines 2240-2245 plus
+all later behavior remain outside the mapped boundary.
+
+For exactly seven named-enum routes `U/N/P/C0/Q/H/CSH`,
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`, and `A=F+L`.
+No invalid-enum or eighth default route exists. Every retained route skips
+the untyped default assignment, giving
+`D=read=assignment=source_site=0`; read, assignment, and both source-site
+counters remain zero.
+
+The immediate and sole predecessor is same-call, bit-exact, recursively
+completed CP366 evidence. CP366's canonical private bridge proves the active
+typed `CSH` case already exited through its break, so it cannot fall through;
+`C0/Q/H/CSH` are all completed CP367 skips. CP367 is strictly numeric-free:
+no numeric argument, humidity payload, IEEE sidecar, owner read, copy,
+arithmetic, comparison, finite/range gate, clamp, default, or psychrometric
+call is allowed, including in lifecycle JSON.
+
+Binding remains CP366-to-CP367-to-unchanged-numerical under
+`purchased_air_calc_cooling_default_supply_humidity_ratio_mixed_air_assignment_lifecycle`.
+CP367 does not feed coupling input, demand prediction, numerical DTO state,
+or result state. CP345 remains the actual result-store supply-humidity owner,
+and non-direct paths publish `None` and reject CP367 evidence.
+
+Inventory remains 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Scripts become 305 total, 240 public, 65
+internal, and zero unused. Parent/Calc state and support, readiness,
+capability, numerical, output, conformance, and Roadmap claims remain
+unchanged.

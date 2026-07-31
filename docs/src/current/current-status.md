@@ -3400,3 +3400,49 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 64 internal, and zero unused. Parent/Calc states and all support,
 readiness, run-state, capability, numerical, output-ownership, conformance,
 and Roadmap claims remain unchanged.
+
+## CP367 Cooling Default Supply-Humidity-Ratio Mixed-Air Assignment
+
+CP367 supersedes only CP366's line-2238 exclusion at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps `PurchasedAirManager.cc:2238`,
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;`, through exactly two
+dependency-ordered sites:
+
+1. `read-purchased-air-mixed-air-humidity-ratio-for-dehumidification-control-default-assignment`
+2. `assign-purchased-air-supply-humidity-ratio-for-dehumidification-control-default-case`
+
+Physical line 2237 is the untyped `default` label and is deliberately not
+claimed. Line 2239's `} break;` is the first excluded executable statement;
+lines 2240-2244 and the line-2245 `if (HeatOn)` continuation remain outside
+CP367.
+
+The retained named-enum routes are exactly `U/N/P/C0/Q/H/CSH`; there is no
+invalid-enum or eighth default route. Their checked algebra is
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`, and `A=F+L`.
+Every typed route skips the untyped default body, so
+`D=read=assignment=source_site=0`; the two operation counters plus the
+aggregate `source_site` counter, the assignment-executed flag, and all
+source-site executions stay zero.
+
+Same-call, bit-exact, recursively completed CP366 evidence is the sole
+predecessor and private bridge. Its canonical private `CSH` break proves that
+the typed constant-supply case cannot fall through to `default`; the
+`C0/Q/H/CSH` routes therefore remain completed skips. CP367 accepts no
+numeric argument, carries no humidity or IEEE payload in snapshots or JSON,
+and performs no owner read, copy, arithmetic, comparison, finite/range gate,
+clamp, default, diagnostic, or psychrometric operation.
+
+Evidence order is CP366-to-CP367-to-unchanged-numerical under
+`purchased_air_calc_cooling_default_supply_humidity_ratio_mixed_air_assignment_lifecycle`.
+CP367 cannot feed or replace `DirectZonePurchasedAirCouplingInput`,
+`prediction.zone_demand`, any numerical DTO, or result state. CP345 remains
+the actual result-store supply-humidity owner. Non-direct paths publish
+`None` and reject CP367 evidence.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 305 total,
+240 public, 65 internal, and zero unused. Parent/Calc states and all support,
+readiness, run-state, capability, numerical, output-ownership, conformance,
+and Roadmap claims remain unchanged.

@@ -24053,3 +24053,41 @@ Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
 public, 64 internal, and zero unused. Parent/Calc states and all readiness,
 support, capability, numerical, output, conformance, and Roadmap claims
 remain unchanged.
+
+## CP367 Default Supply-Humidity-Ratio Mixed-Air Assignment Placement
+
+CP367 sits immediately after CP366 and maps only pinned
+`PurchasedAirManager.cc:2238`,
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;`, through the ordered
+mixed-air-humidity read and supply-humidity assignment sites. Commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`
+lock physical lines 2237-2245. The untyped `default` label at line 2237 is not
+claimed; line 2239 is first excluded, and line 2245, zone-air updates, and
+later logic remain outside CP367.
+
+For the seven named-enum routes `U/N/P/C0/Q/H/CSH`,
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`, and `A=F+L`.
+There is no invalid-enum or eighth route. All typed routes skip the untyped
+default body, so `D=read=assignment=source_site=0`; the two operation
+counters plus the aggregate `source_site` counter stay zero.
+
+Same-call, bit-exact, recursively completed CP366 is the sole predecessor
+and private bridge. Its typed private `CSH` break prevents fallthrough, and
+all `C0/Q/H/CSH` routes are completed CP367 skips. CP367 is a numeric-free
+classification checkpoint with no numeric argument, humidity or IEEE
+payload, owner read, copy, arithmetic, comparison, finite/range gate, clamp,
+default behavior, psychrometric work, or numeric JSON.
+
+Evidence preserves CP366-to-CP367-to-unchanged-numerical order under
+`purchased_air_calc_cooling_default_supply_humidity_ratio_mixed_air_assignment_lifecycle`.
+CP367 cannot consume, reconcile with, feed, or replace coupling input,
+prediction, numerical DTO state, or result state. CP345 still owns actual
+result-store supply-humidity bits. Non-direct paths publish `None` and reject
+CP367 evidence.
+
+Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Script inventory becomes 305 total, 240
+public, 65 internal, and zero unused. Parent/Calc states and all readiness,
+support, capability, numerical, output, conformance, and Roadmap claims
+remain unchanged.

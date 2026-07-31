@@ -37120,3 +37120,40 @@ Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
 internal, and zero unused. Parent/Calc status plus all support, readiness,
 capability, numerical, output, conformance, and Roadmap claims remain
 unchanged.
+
+## CP367 Default Supply-Humidity-Ratio Mixed-Air Assignment in the Heat-Balance Loop
+
+CP367 retains pinned `PurchasedAirManager.cc:2238`,
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;`, and its two ordered read
+and assignment source sites. Pinned commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`
+lock lines 2237-2245. Line 2237's untyped `default` label is not claimed,
+line 2239 is the first excluded executable, and line 2245 plus later
+PurchasedAir and heat-balance behavior remain outside this checkpoint.
+
+Its exact named-route partition is `T=U+N+P+C0+Q+H+CSH`,
+`S=C0+Q+H+CSH=R=G+F+L`, and `A=F+L`, with no invalid-enum or eighth default
+route. Every route skips the default body, so
+`D=read=assignment=source_site=0`; neither mapped site nor any read or
+assignment counter executes.
+
+CP367 requires same-call, bit-exact, recursively completed CP366 evidence as
+its sole predecessor. CP366's canonical private bridge proves a typed `CSH`
+route exits before `default`; `C0/Q/H/CSH` therefore remain completed skips.
+CP367 accepts and publishes no numeric humidity value or IEEE payload, reads
+no owner, and performs no copy, arithmetic, comparison, finite/range gate,
+clamp, default, or psychrometric operation. Serialization remains
+control-only.
+
+Coupled order remains CP366-to-CP367-to-unchanged-numerical under
+`purchased_air_calc_cooling_default_supply_humidity_ratio_mixed_air_assignment_lifecycle`.
+CP367 cannot feed or replace coupling, prediction, heat-balance, numerical
+DTO, or result state. CP345 remains the numerical result-store owner.
+Non-direct paths expose `None` and reject evidence.
+
+Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, and 170 required. Scripts become 305 total, 240 public, 65
+internal, and zero unused. Parent/Calc status plus all support, readiness,
+capability, numerical, output, conformance, and Roadmap claims remain
+unchanged.

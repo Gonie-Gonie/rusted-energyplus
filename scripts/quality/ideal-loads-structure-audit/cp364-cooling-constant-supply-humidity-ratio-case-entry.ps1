@@ -244,9 +244,10 @@ $cp363BindingIndexForCp364 = $cp364BindingText.IndexOf("let calculation_${cp363S
 $cp364BindingIndex = $cp364BindingText.IndexOf("let calculation_${cp364Stem} =")
 $cp365BindingIndexForCp364 = $cp364BindingText.IndexOf("let calculation_cooling_constant_supply_humidity_ratio_assignment =")
 $cp366BindingIndexForCp364 = $cp364BindingText.IndexOf("let calculation_cooling_constant_supply_humidity_ratio_case_break =")
+$cp367BindingIndexForCp364 = $cp364BindingText.IndexOf("let calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment =")
 $cp364NumericalIndex = $cp364BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
-if ($cp363BindingIndexForCp364 -lt 0 -or $cp364BindingIndex -le $cp363BindingIndexForCp364 -or $cp365BindingIndexForCp364 -le $cp364BindingIndex -or $cp366BindingIndexForCp364 -le $cp365BindingIndexForCp364 -or $cp364NumericalIndex -le $cp366BindingIndexForCp364) {
-    throw "Binding must execute CP363 through CP366 before numerical coupling"
+if ($cp363BindingIndexForCp364 -lt 0 -or $cp364BindingIndex -le $cp363BindingIndexForCp364 -or $cp365BindingIndexForCp364 -le $cp364BindingIndex -or $cp366BindingIndexForCp364 -le $cp365BindingIndexForCp364 -or $cp367BindingIndexForCp364 -le $cp366BindingIndexForCp364 -or $cp364NumericalIndex -le $cp367BindingIndexForCp364) {
+    throw "Binding must execute CP363 through CP367 before numerical coupling"
 }
 $cp364Dto = Get-Cp364RustBraceBlock -Text $cp364BindingText.Substring($cp364NumericalIndex) -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{' -Description "CP364 numerical DTO"
 if ($cp364Dto -match '(?i)cp364|constant_supply_humidity_ratio_case_entry') {
@@ -266,7 +267,7 @@ Assert-Contains -Path $cp364Fixture -Pattern ('calculation_' + $cp364Stem + '_sn
 Assert-Contains -Path $cp364CoupledTestsRoot -Pattern 'coupled_runtime_tests_cp364' -Description "coupled-test registration"
 Assert-Contains -Path $cp364PipelineRoot -Pattern ('mod ' + $cp364PipelineStem + ';') -Description "pipeline module"
 Assert-Contains -Path $cp364PipelineRoot -Pattern ('"' + $cp364Lifecycle + '":\s*result\s*\.' + $cp364Lifecycle) -Description "lifecycle JSON"
-Assert-Contains -Path $cp364PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp366_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp364PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp367_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp364ParentAssertions -Pattern 'mod cp364_assertions;' -Description "arbitrary delegation module"
 Assert-Contains -Path $cp364ParentAssertions -Pattern 'cp364_assertions::assert_direct\(runtime, results\)' -Description "arbitrary direct delegation"
 Assert-Contains -Path $cp364ParentAssertions -Pattern 'cp364_assertions::assert_non_direct\(runtime\)' -Description "arbitrary non-direct delegation"
@@ -277,7 +278,8 @@ Assert-Contains -Path $cp364ArbitraryAssertions -Pattern 'cp365_assertions::asse
 Assert-NotContains -Path $cp364ArbitraryAssertions -Pattern 'assert_numerical_nonfeed\(runtime, results\)' -Description "CP364 relinquishes terminal numerical nonfeed to CP365"
 Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp365_assertions.rs" -Pattern 'mod cp366_assertions;' -Description "CP365 delegates terminal evidence to CP366"
 Assert-NotContains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp365_assertions.rs" -Pattern 'assert_numerical_nonfeed\(runtime, results\)' -Description "CP365 relinquishes terminal numerical nonfeed to CP366"
-Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp366_assertions.rs" -Pattern 'assert_numerical_nonfeed' -Description "CP366 terminal numerical nonfeed"
+Assert-NotContains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp366_assertions.rs" -Pattern 'assert_numerical_nonfeed\(runtime, results\)' -Description "CP366 relinquishes terminal numerical nonfeed to CP367"
+Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp367_assertions.rs" -Pattern 'assert_numerical_nonfeed' -Description "CP367 terminal numerical nonfeed"
 Assert-Contains -Path $cp364ArbitraryAssertions -Pattern 'runtime\.contains_key\(CP364_KEY\)' -Description "CP364 non-direct key"
 Assert-Contains -Path $cp364ArbitraryAssertions -Pattern 'runtime\[CP364_KEY\]\.is_null\(\)' -Description "CP364 non-direct null"
 
@@ -365,16 +367,16 @@ foreach ($historical in @("cp326-cooling-supply-mass-flow-limit-body.ps1") + @(
 }
 foreach ($historical in 334..363) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp366_lifecycle_evidence' -Description "historical CP364 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp367_lifecycle_evidence' -Description "historical CP364 firewall"
 }
 foreach ($historical in 335..363) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 304 \|')) -Description "historical generated total"
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 64 \|')) -Description "historical generated internal"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 305 \|')) -Description "historical generated total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 65 \|')) -Description "historical generated internal"
 }
 foreach ($historical in 337..363) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 304' -Description "historical inventory total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 305' -Description "historical inventory total"
 }
 $cp364MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp363AuditIndexForCp364 = $cp364MainAuditText.IndexOf("cp363-cooling-humidistat-case-break.ps1")
@@ -383,13 +385,13 @@ $cp364CompletionIndex = $cp364MainAuditText.IndexOf('Write-Host "IdealLoads stru
 if ($cp363AuditIndexForCp364 -lt 0 -or $cp364AuditIndex -le $cp363AuditIndexForCp364 -or $cp364CompletionIndex -le $cp364AuditIndex) {
     throw "Master audit must dot-source CP364 after CP363 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 304' -Description "script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 305' -Description "script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "zero uncalled"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp364-' -Description "inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'cp364-cooling-constant-supply-humidity-ratio-case-entry\.ps1::dot_sources' -Description "caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 304 \|' -Description "generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 305 \|' -Description "generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 64 \|' -Description "generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 65 \|' -Description "generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated uncalled"
 
 Write-Host "CP364 constant-supply-humidity-ratio case-entry structure audit passed."

@@ -18,6 +18,8 @@ mod cooling_constant_supply_humidity_ratio_assignment_fixture;
 mod cooling_constant_supply_humidity_ratio_case_break_fixture;
 #[path = "coupled_output_tests/cooling_constant_supply_humidity_ratio_case_entry_fixture.rs"]
 mod cooling_constant_supply_humidity_ratio_case_entry_fixture;
+#[path = "coupled_output_tests/cooling_default_supply_humidity_ratio_mixed_air_assignment_fixture.rs"]
+mod cooling_default_supply_humidity_ratio_mixed_air_assignment_fixture;
 #[path = "coupled_output_tests/cooling_humidification_flow_fixture.rs"]
 mod cooling_humidification_flow_fixture;
 #[path = "coupled_output_tests/cooling_humidistat_case_break_fixture.rs"]
@@ -149,6 +151,7 @@ use cooling_constant_shr_case_break_fixture::calculation_cooling_constant_shr_ca
 use cooling_constant_supply_humidity_ratio_assignment_fixture::calculation_cooling_constant_supply_humidity_ratio_assignment_snapshot;
 use cooling_constant_supply_humidity_ratio_case_break_fixture::calculation_cooling_constant_supply_humidity_ratio_case_break_snapshot;
 use cooling_constant_supply_humidity_ratio_case_entry_fixture::calculation_cooling_constant_supply_humidity_ratio_case_entry_snapshot;
+use cooling_default_supply_humidity_ratio_mixed_air_assignment_fixture::calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment_snapshot;
 use cooling_humidistat_case_break_fixture::calculation_cooling_humidistat_case_break_snapshot;
 use cooling_humidistat_case_entry_fixture::calculation_cooling_humidistat_case_entry_snapshot;
 use cooling_humidistat_moisture_demand_assignment_fixture::calculation_cooling_humidistat_moisture_demand_assignment_snapshot;
@@ -411,6 +414,12 @@ fn appends_all_no_oa_and_predictor_series_with_hourly_semantics() {
             crate::ideal_loads::calc::
                 cooling_constant_supply_humidity_ratio_case_break_snapshot_is_exact_direct_release(
                     output.calculation_cooling_constant_supply_humidity_ratio_case_break,
+                )
+        );
+        assert!(
+            crate::ideal_loads::calc::
+                cooling_default_supply_humidity_ratio_mixed_air_assignment_snapshot_is_exact_direct_release(
+                    output.calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment,
                 )
         );
     }
@@ -1005,6 +1014,10 @@ fn scaled_output(
         calculation_cooling_constant_supply_humidity_ratio_case_break_snapshot(
             calculation_cooling_constant_supply_humidity_ratio_assignment,
         );
+    let calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment =
+        calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment_snapshot(
+            calculation_cooling_constant_supply_humidity_ratio_case_break,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -1084,6 +1097,7 @@ fn scaled_output(
         calculation_cooling_constant_supply_humidity_ratio_case_entry,
         calculation_cooling_constant_supply_humidity_ratio_assignment,
         calculation_cooling_constant_supply_humidity_ratio_case_break,
+        calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

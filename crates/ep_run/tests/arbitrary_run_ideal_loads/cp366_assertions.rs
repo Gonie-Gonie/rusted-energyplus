@@ -1,6 +1,9 @@
-//! CP366 constant-supply-humidity-ratio case-break and terminal nonfeed assertions.
+//! CP366 constant-supply-humidity-ratio case-break assertions.
 
 use serde_json::{Map, Value, json};
+
+#[path = "cp367_assertions.rs"]
+mod cp367_assertions;
 
 const CP365_KEY: &str =
     "purchased_air_calc_cooling_constant_supply_humidity_ratio_assignment_lifecycle";
@@ -105,9 +108,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
     ] {
         assert!(!latest.contains_key(forbidden), "{forbidden}");
     }
-    super::super::super::super::super::super::super::super::super::assert_numerical_nonfeed(
-        runtime, results,
-    );
+    cp367_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -116,4 +117,5 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP366_KEY].is_null(),
         "non-direct runtime must not publish CP366 evidence"
     );
+    cp367_assertions::assert_non_direct(runtime);
 }

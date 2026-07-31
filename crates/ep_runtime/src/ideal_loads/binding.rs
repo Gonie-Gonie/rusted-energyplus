@@ -28,6 +28,7 @@ use super::{
     PurchasedAirCalcCoolingConstantSupplyHumidityRatioAssignmentError as CoolingConstantSupplyHumidityRatioAssignmentError,
     PurchasedAirCalcCoolingConstantSupplyHumidityRatioCaseBreakError as CoolingConstantSupplyHumidityRatioCaseBreakError,
     PurchasedAirCalcCoolingConstantSupplyHumidityRatioCaseEntryError as CoolingConstantSupplyHumidityRatioCaseEntryError,
+    PurchasedAirCalcCoolingDefaultSupplyHumidityRatioMixedAirAssignmentError as CoolingDefaultSupplyHumidityRatioMixedAirAssignmentError,
     PurchasedAirCalcCoolingDehumidificationFlowError, PurchasedAirCalcCoolingEconomizerBodyError,
     PurchasedAirCalcCoolingEconomizerConditionError, PurchasedAirCalcCoolingEconomizerGuardError,
     PurchasedAirCalcCoolingEntryGateError, PurchasedAirCalcCoolingHumidificationFlowError,
@@ -112,6 +113,7 @@ mod cooling_constant_shr_supply_humidity_ratio_overdrying_limit;
 mod cooling_constant_supply_humidity_ratio_assignment;
 mod cooling_constant_supply_humidity_ratio_case_break;
 mod cooling_constant_supply_humidity_ratio_case_entry;
+mod cooling_default_supply_humidity_ratio_mixed_air_assignment;
 mod cooling_humidistat_case_break;
 mod cooling_humidistat_case_entry;
 mod cooling_humidistat_moisture_demand_assignment;
@@ -158,6 +160,7 @@ use cooling_positive_supply_capacity_limit_cp_air_assignment::advance_positive_s
 use cooling_constant_shr_supply_humidity_ratio_overdrying_limit::advance_cooling_constant_shr_supply_humidity_ratio_overdrying_limit;
 use cooling_constant_supply_humidity_ratio_assignment::advance_cooling_constant_supply_humidity_ratio_assignment;
 use cooling_constant_supply_humidity_ratio_case_break::advance_cooling_constant_supply_humidity_ratio_case_break;
+use cooling_default_supply_humidity_ratio_mixed_air_assignment::advance_cooling_default_supply_humidity_ratio_mixed_air_assignment;
 use cooling_positive_supply_capacity_limit_guard::advance_positive_supply_capacity_limit_guard;
 use cooling_positive_supply_capacity_limit_sensible_output_assignment::advance_positive_supply_capacity_limit_sensible_output_assignment;
 use cooling_positive_supply_capacity_limit_sensible_output_guard::advance_positive_supply_capacity_limit_sensible_output_guard;
@@ -898,6 +901,10 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingConstantSupplyHumidityRatioCaseBreak(
         CoolingConstantSupplyHumidityRatioCaseBreakError,
     ),
+    /// The bounded default supply-humidity-ratio mixed-air assignment rejected its release state.
+    CalculationCoolingDefaultSupplyHumidityRatioMixedAirAssignment(
+        CoolingDefaultSupplyHumidityRatioMixedAirAssignmentError,
+    ),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -1463,6 +1470,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_cooling_constant_supply_humidity_ratio_assignment,
         )?;
+    let calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment =
+        advance_cooling_default_supply_humidity_ratio_mixed_air_assignment(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_constant_supply_humidity_ratio_case_break,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1557,6 +1570,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_constant_supply_humidity_ratio_case_entry,
         calculation_cooling_constant_supply_humidity_ratio_assignment,
         calculation_cooling_constant_supply_humidity_ratio_case_break,
+        calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment,
         coupling,
     })
 }
