@@ -21712,3 +21712,39 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 70 internal, and zero unused. Parent and Calc status plus support,
 readiness, run state, capability, numerical, output-ownership, conformance,
 and Roadmap claims remain unchanged.
+
+## CP373 Humidification Supply-Humidity-Ratio Assignment
+
+CP373 supersedes only CP372's physical-line-2249 exclusion at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`, locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+by mapping
+`SupplyHumRatForHumid = MdotZnHumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;`.
+Its six dependency-ordered sites read the CP372 local demand, read the
+CP330-owned supply flow, divide, read the pre-sampled Zone-node humidity
+ratio, add, and assign local `SupplyHumRatForHumid`.
+
+Line 2250's maximum-heating humidity-ratio clamp is first excluded. Active
+CP372 Humidistat and None routes continue there, while rejected guards
+dynamically continue at line 2258. If their CP372 assignment counts are `AH`
+and `AN`, `A=AH+AN`, and CP373 assignments are `R`, then `R=A`, every site
+counter equals `R`, and `source_site_execution_count=6*R`. The public direct
+route remains a zero-site, complete-null skip.
+
+Same-call bit-exact CP372 evidence is the sole predecessor and numerator
+owner. The denominator is accepted only from the recursively validated CP330
+positive-flow owner; Zone-node humidity is a pre-sampled characterization
+scalar without a live Node service claim. CP360 is arithmetic corroboration
+only, and CP329 does not own `Node(ZoneNodeNum).HumRat`.
+
+CP373 performs raw binary64 division followed by addition and records exact
+operand, quotient, and result bits. It performs no line-2250 clamp, finite
+gate, normalization, psychrometric call, or numerical feed. Binding orders
+CP372-to-CP373-to-unchanged-numerical under
+`purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment_lifecycle`;
+CP345 remains result-store supply-humidity owner.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 311 total,
+240 public, 71 internal, and zero unused. All support, readiness, numerical,
+capability, output, conformance, and Roadmap claims remain unchanged.

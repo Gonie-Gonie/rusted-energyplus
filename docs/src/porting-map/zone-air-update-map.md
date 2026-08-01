@@ -24343,3 +24343,37 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 70 internal, and zero unused. Parent and Calc status plus support,
 readiness, run state, capability, numerical, output-ownership, conformance,
 and Roadmap claims remain unchanged.
+
+## CP373 Humidification Supply-Humidity-Ratio Assignment Placement
+
+CP373 maps only pinned `PurchasedAirManager.cc` physical executable line 2249:
+`SupplyHumRatForHumid = MdotZnHumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;`.
+The source is locked to commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Six dependency-ordered sites read the CP372 local demand, read CP330-owned
+positive supply flow, divide, read pre-sampled Zone-node humidity, add, and
+assign local `SupplyHumRatForHumid`.
+
+CP372 is the only immediate predecessor and numerator owner. The CP330
+same-call retained guard is the only denominator owner. The Zone-node
+humidity scalar creates no live Node owner or `ZoneTempPredictorCorrector`
+claim; CP329's recirculation humidity is explicitly not substituted. Thus
+this checkpoint records local PurchasedAir arithmetic without changing zone
+air or moisture state ownership.
+
+For active CP372 Humidistat/None counts `AH`/`AN`, `A=AH+AN`; CP373 count `R`
+equals `A`, each site counter equals `R`, and source sites total `6*R`.
+Rejected routes have complete-null evidence. Raw binary64 division followed
+by addition is recorded with authoritative IEEE sidecars.
+
+Physical line 2250's maximum-heating clamp is first excluded, and the guard
+false dynamic continuation remains line 2258. No CP373 value enters the
+numerical coupling DTO, output node, or result state; CP345 remains the
+actual supply-humidity result owner. Binding orders CP372-to-CP373-to-
+unchanged-numerical and non-direct paths reject the lifecycle.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 311 total,
+240 public, 71 internal, and zero unused. Support, readiness, capability,
+numerical, output, conformance, and Roadmap claims remain unchanged.

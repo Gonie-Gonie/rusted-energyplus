@@ -239,7 +239,7 @@ $cp370SemanticText = (@(
 foreach ($pattern in @(
         'HumidificationControlType::None', 'HumidificationControlType::Humidistat',
         'source_site_execution_count',
-        'non_direct_runtime_rejects_cp316_through_cp372_lifecycle_evidence'
+        'non_direct_runtime_rejects_cp316_through_cp373_lifecycle_evidence'
     )) {
     Assert-Cp370TextContains -Text $cp370SemanticText -Pattern $pattern -Description "semantic regression '$pattern'"
 }
@@ -278,11 +278,13 @@ $cp369BindingIndexForCp370 = $cp370BindingText.IndexOf("let calculation_${cp369S
 $cp370BindingIndex = $cp370BindingText.IndexOf("let calculation_${cp370Stem} =")
 $cp371BindingIndexForCp370 = $cp370BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard =")
 $cp372BindingIndexForCp370 = $cp370BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment =")
+$cp373BindingIndexForCp370 = $cp370BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment =")
 $cp370NumericalIndex = $cp370BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
 if ($cp369BindingIndexForCp370 -lt 0 -or $cp370BindingIndex -le $cp369BindingIndexForCp370 -or
     $cp371BindingIndexForCp370 -le $cp370BindingIndex -or
     $cp372BindingIndexForCp370 -le $cp371BindingIndexForCp370 -or
-    $cp370NumericalIndex -le $cp372BindingIndexForCp370) {
+    $cp373BindingIndexForCp370 -le $cp372BindingIndexForCp370 -or
+    $cp370NumericalIndex -le $cp373BindingIndexForCp370) {
     throw "Binding must execute CP369 then CP370 before unchanged numerical coupling"
 }
 $cp370NumericalDto = Get-Cp370RustBraceBlock -Text $cp370BindingText.Substring($cp370NumericalIndex) -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{' -Description "CP370 numerical DTO"
@@ -391,16 +393,16 @@ foreach ($historical in @(327, 328) + @(346..369)) {
 }
 foreach ($historical in 334..369) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp372_lifecycle_evidence' -Description "historical CP370 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp373_lifecycle_evidence' -Description "historical CP370 firewall"
 }
 foreach ($historical in 335..369) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 310 \|')) -Description "historical generated total"
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 70 \|')) -Description "historical generated internal"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 311 \|')) -Description "historical generated total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 71 \|')) -Description "historical generated internal"
 }
 foreach ($historical in 337..369) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 310' -Description "historical inventory total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 311' -Description "historical inventory total"
 }
 
 $cp370MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
@@ -411,17 +413,17 @@ if ($cp369AuditIndexForCp370 -lt 0 -or $cp370AuditIndex -le $cp369AuditIndexForC
     throw "Master audit must dot-source CP370 after CP369 before completion"
 }
 $cp370InventoryText = Read-RepoText -Path "specs\script_inventory.toml"
-Assert-Cp370TextContains -Text $cp370InventoryText -Pattern 'script_count = 310' -Description "script total"
+Assert-Cp370TextContains -Text $cp370InventoryText -Pattern 'script_count = 311' -Description "script total"
 Assert-Cp370TextContains -Text $cp370InventoryText -Pattern 'unused_script_count = 0' -Description "zero uncalled"
 if ([regex]::Matches($cp370InventoryText, '(?m)^classification = "public"$').Count -ne 240 -or
-    [regex]::Matches($cp370InventoryText, '(?m)^classification = "internal"$').Count -ne 70) {
-    throw "CP370 inventory must be exactly 240 public and 70 internal scripts"
+    [regex]::Matches($cp370InventoryText, '(?m)^classification = "internal"$').Count -ne 71) {
+    throw "CP370 inventory must be exactly 240 public and 71 internal scripts"
 }
 Assert-Cp370TextContains -Text $cp370InventoryText -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp370-' -Description "inventory record"
 Assert-Cp370TextContains -Text $cp370InventoryText -Pattern 'ideal-loads-structure-audit\.ps1::dot_sources' -Description "caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 310 \|' -Description "CP370 generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 311 \|' -Description "CP370 generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP370 generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 70 \|' -Description "CP370 generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 71 \|' -Description "CP370 generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP370 generated uncalled"
 
 Write-Host "CP370 Cooling supply-humidity-ratio humidification-control Humidistat guard structure audit passed."

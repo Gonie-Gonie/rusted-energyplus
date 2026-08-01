@@ -3716,3 +3716,62 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 70 internal, and zero unused. Parent and Calc status plus support,
 readiness, run state, capability, numerical, output-ownership, conformance,
 and Roadmap claims remain unchanged.
+
+## CP373 Cooling Supply-Humidity-Ratio Humidification Supply-Humidity-Ratio Assignment
+
+CP373 supersedes only CP372's physical-line-2249 exclusion at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`, locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+by mapping the single executable statement
+`SupplyHumRatForHumid = MdotZnHumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;`
+in `PurchasedAirManager.cc`. Its exact dependency order is the local
+humidifying-demand read, retained supply-mass-flow read, raw division,
+Zone-node humidity-ratio read, addition, and local
+`SupplyHumRatForHumid` assignment. These are dependency-order sites and do
+not claim a C++ operand evaluation order.
+
+Physical executable line 2250,
+`SupplyHumRatForHumid = min(SupplyHumRatForHumid, PurchAir.MaxHeatSuppAirHumRat);`,
+is first excluded with its read, maximum-heating limit, comparison, clamp,
+and reassignment. An active CP372 route continues there; rejected nested
+guards still continue dynamically at physical executable line 2258,
+`SupplyHumRatOrig = PurchAir.SupplyHumRat;`. Neither continuation belongs to
+CP373.
+
+If CP372 Humidistat assignments are `AH`, None assignments are `AN`, all
+CP372 assignments are `A`, and CP373 assignments are `R`, exact state requires
+`R=A=AH+AN`. Every one of the six site counters equals `R`, and
+`source_site_execution_count=6*R`. Both active CP372 routes execute all six
+sites. Every upstream or rejected route executes zero; the direct
+humidification-control-false release publishes complete-null operand,
+intermediate, result, and IEEE evidence.
+
+Recursively validated same-call bit-exact CP372 lifecycle, snapshot, latest,
+witness, and completion evidence is the sole immediate predecessor and owns
+the numerator. The denominator comes only from the exact same-call retained
+CP330 positive-supply-flow owner; positive infinity remains admissible while
+zero, negative values, and NaN are rejected by that source guard. Zone-node
+humidity ratio is an explicit pre-sampled `f64` characterization scalar with
+no retained owner or live Node service claim. CP360 corroborates the same
+arithmetic shape only, and CP329 recirculation humidity is not a Zone-node
+owner.
+
+CP373 evaluates raw binary64 division and then addition without reordering,
+finite/range gates, clamp, normalization, default, diagnostic, psychrometric
+operation, or coercion. JSON keeps authoritative hexadecimal IEEE sidecars
+for operands, quotient, and result while nulling nonfinite numeric
+projections.
+
+Binding preserves CP372-to-CP373-to-unchanged-numerical order under
+`purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment_lifecycle`.
+CP373 owns only the local arithmetic assignment and never enters, feeds, or
+replaces `DirectZonePurchasedAirCouplingInput`, `prediction.zone_demand`, a
+numerical DTO, or result state. CP345 remains the actual result-store
+supply-humidity owner; non-direct paths publish `None` and reject CP373
+evidence.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 311 total,
+240 public, 71 internal, and zero unused. Parent and Calc status plus support,
+readiness, run state, capability, numerical, output-ownership, conformance,
+and Roadmap claims remain unchanged.

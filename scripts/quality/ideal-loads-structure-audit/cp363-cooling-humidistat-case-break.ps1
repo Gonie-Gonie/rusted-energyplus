@@ -265,6 +265,7 @@ $cp369BindingIndexForCp363 = $cp363BindingText.IndexOf("let calculation_cooling_
 $cp370BindingIndexForCp363 = $cp363BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_humidification_control_humidistat_guard =")
 $cp371BindingIndexForCp363 = $cp363BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard =")
 $cp372BindingIndexForCp363 = $cp363BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment =")
+$cp373BindingIndexForCp363 = $cp363BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment =")
 $cp363NumericalIndex = $cp363BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
 if ($cp362BindingIndexForCp363 -lt 0 -or $cp363BindingIndex -le $cp362BindingIndexForCp363 -or $cp364BindingIndexForCp363 -le $cp363BindingIndex -or $cp365BindingIndexForCp363 -le $cp364BindingIndexForCp363 -or $cp366BindingIndexForCp363 -le $cp365BindingIndexForCp363 -or $cp367BindingIndexForCp363 -le $cp366BindingIndexForCp363 -or $cp368BindingIndexForCp363 -le $cp367BindingIndexForCp363 -or
     $cp363NumericalIndex -le $cp368BindingIndexForCp363 -or
@@ -272,7 +273,8 @@ if ($cp362BindingIndexForCp363 -lt 0 -or $cp363BindingIndex -le $cp362BindingInd
     $cp370BindingIndexForCp363 -le $cp369BindingIndexForCp363 -or
     $cp371BindingIndexForCp363 -le $cp370BindingIndexForCp363 -or
     $cp372BindingIndexForCp363 -le $cp371BindingIndexForCp363 -or
-    $cp363NumericalIndex -le $cp372BindingIndexForCp363) {
+    $cp373BindingIndexForCp363 -le $cp372BindingIndexForCp363 -or
+    $cp363NumericalIndex -le $cp373BindingIndexForCp363) {
     throw "Binding must execute CP362 through CP370 before numerical coupling"
 }
 $cp363Dto = Get-Cp363RustBraceBlock -Text $cp363BindingText.Substring($cp363NumericalIndex) -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{' -Description "CP363 numerical DTO"
@@ -295,7 +297,7 @@ Assert-Contains -Path $cp363PipelineRoot -Pattern ('mod ' + $cp363PipelineStem +
 Assert-Contains -Path $cp363PipelineRoot -Pattern ('"' + $cp363Lifecycle + '":\s*result\s*\.' + $cp363Lifecycle) -Description "lifecycle JSON"
 Assert-Contains -Path $cp363PipelineValidation -Pattern 'mixed_air_limit_cp362' -Description "pipeline CP362 predecessor"
 Assert-Contains -Path $cp363PipelineValidation -Pattern 'source_site_execution_count' -Description "pipeline source validation"
-Assert-Contains -Path $cp363PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp372_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp363PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp373_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp363ParentAssertions -Pattern 'mod cp363_assertions;' -Description "arbitrary delegation module"
 Assert-Contains -Path $cp363ParentAssertions -Pattern 'cp363_assertions::assert_direct\(runtime, results\)' -Description "arbitrary direct delegation"
 Assert-Contains -Path $cp363ParentAssertions -Pattern 'cp363_assertions::assert_non_direct\(runtime\)' -Description "arbitrary non-direct delegation"
@@ -388,16 +390,16 @@ foreach ($historical in @("cp326-cooling-supply-mass-flow-limit-body.ps1") + @(
 }
 foreach ($historical in 334..362) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp372_lifecycle_evidence' -Description "historical CP363 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp373_lifecycle_evidence' -Description "historical CP363 firewall"
 }
 foreach ($historical in 335..362) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 310 \|')) -Description "historical generated total"
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 70 \|')) -Description "historical generated internal"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 311 \|')) -Description "historical generated total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 71 \|')) -Description "historical generated internal"
 }
 foreach ($historical in 337..362) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 310' -Description "historical inventory total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 311' -Description "historical inventory total"
 }
 $cp363MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp362AuditIndexForCp363 = $cp363MainAuditText.IndexOf("cp362-cooling-humidistat-supply-humidity-ratio-mixed-air-limit.ps1")
@@ -406,13 +408,13 @@ $cp363CompletionIndex = $cp363MainAuditText.IndexOf('Write-Host "IdealLoads stru
 if ($cp362AuditIndexForCp363 -lt 0 -or $cp363AuditIndex -le $cp362AuditIndexForCp363 -or $cp363CompletionIndex -le $cp363AuditIndex) {
     throw "Master audit must dot-source CP363 after CP362 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 310' -Description "script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 311' -Description "script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "zero uncalled"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp363-' -Description "inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'cp363-cooling-humidistat-case-break\.ps1::dot_sources' -Description "caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 310 \|' -Description "generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 311 \|' -Description "generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 70 \|' -Description "generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 71 \|' -Description "generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated uncalled"
 
 Write-Host "CP363 Humidistat case-break structure audit passed."

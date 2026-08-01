@@ -37409,3 +37409,34 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 70 internal, and zero unused. Parent and Calc status plus support,
 readiness, run state, capability, numerical, output-ownership, conformance,
 and Roadmap claims remain unchanged.
+
+## CP373 Humidification Supply-Humidity-Ratio Assignment in the Heat-Balance Loop
+
+CP373 maps only `PurchasedAirManager.cc` physical executable line 2249 at
+pinned commit `6f2e40d10250a105b49966baa24d843711e61048` and locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`:
+`SupplyHumRatForHumid = MdotZnHumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;`.
+The six sites are the local-demand read, retained-flow read, division,
+Zone-node humidity read, addition, and local assignment.
+
+CP372 is the sole same-call predecessor and numerator owner. CP330 is the
+sole retained positive-flow denominator owner, while Zone-node humidity is
+explicit pre-sampled characterization data with no live service claim. This
+does not promote Rust-owned zone moisture demand or node state; CP360 merely
+corroborates the arithmetic form and CP329 is not a Zone-node owner.
+
+For CP372 active counts `AH` and `AN`, `A=AH+AN`; CP373 assignment count `R`
+must satisfy `R=A`, all six site counters equal `R`, and total sites equal
+`6*R`. All rejected/upstream routes have null evidence. Raw binary64 division
+then addition is retained with IEEE sidecars, including nonfinite results.
+
+Line 2250's maximum-heating humidity-ratio clamp and line 2251's
+`PurchAir.SupplyHumRat` update are excluded. CP373 does not feed the numerical
+DTO or result state; CP345 remains the result-store supply-humidity owner.
+Binding orders CP372-to-CP373-to-unchanged-numerical under the CP373 lifecycle
+key, and non-direct paths reject the evidence.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 311 total,
+240 public, 71 internal, and zero unused. Support, readiness, capability,
+numerical, output, conformance, and Roadmap claims remain unchanged.

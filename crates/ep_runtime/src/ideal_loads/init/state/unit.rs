@@ -205,6 +205,8 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardRuntimeState::new(system),
             calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment:
                 PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentRuntimeState::new(system),
+            calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment:
+                PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationAssignmentRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,
