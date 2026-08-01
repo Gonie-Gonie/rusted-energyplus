@@ -17,6 +17,7 @@ pub use release::{
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
     completed_direct_cooling_supply_humidity_ratio_saturation_assignment_is_consistent,
+    cooling_supply_humidity_ratio_saturation_assignment_snapshot_route,
     cooling_supply_humidity_ratio_saturation_assignment_snapshots_match_bit_exact,
 };
 #[allow(unused_imports)]

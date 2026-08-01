@@ -24515,3 +24515,44 @@ stay 32 algorithms, 293 routines split 58 plus 235, and 170 required. Scripts
 become 315 total, 240 public, 75 internal, zero unused; development commands
 stay 238. Support, readiness, capability, conformance, and Roadmap claims are
 unchanged.
+
+## CP378 Saturation-Limit Humidity-Assignment Placement
+
+CP378 follows CP377 before the unchanged numerical coupling and maps only
+`PurchasedAirManager.cc` executable line 2260,
+`PurchAir.SupplyHumRat = min(SupplyHumRatOrig, SupplyHumRatSat);`. The source
+lock is commit `6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact four sites are
+`read-local-original-supply-humidity-ratio-for-saturation-limit-minimum`,
+`read-local-saturation-supply-humidity-ratio-for-saturation-limit-minimum`,
+`apply-source-shaped-two-argument-minimum-for-saturation-limit`, and
+`assign-purchased-air-supply-humidity-ratio-for-saturation-limit`; source
+text/dependency order makes no C++ operand-evaluation-order claim.
+
+Three of the inherited eight routes (`U/N/P`) are complete-null zero-site
+skips and five routes execute four sites. With assignments `M`, exact state is
+`T=U+N+P+M`; `M` equals CP377's saturation count and CP376's copy count, all
+site counters equal `M`, and total sites are `4*M`. Recursively complete
+same-call CP377 is the sole predecessor. Its retained CP376 value owns the
+left read and its saturation result owns the right read. Canonical
+`if left < right { left } else { right }` preserves raw right-biased tie,
+signed-zero, infinity, and unordered behavior for private characterization.
+
+CP378 imposes no new finite-left gate. The existing supported numerical lane
+already proves active left/final bits finite, and CP377 proves the right bits
+finite, positive, and at least `1e-5`. Canonical/guarded saturation and the two
+minimum forms therefore agree bit-exactly on that lane. CP378 is the terminal
+source owner and reconciles final humidity to the unchanged numerical result,
+supply node, and report; it does not feed or overwrite the coupling DTO,
+result state, node, or report. CP345 remains numerical implementation owner.
+Non-direct paths reject CP378 evidence.
+
+Line 2261, `SupplyEnthalpy = PsyHFnTdbW(PurchAir.SupplyTemp,
+PurchAir.SupplyHumRat);`, is first excluded and reserved for CP379. Enthalpy
+and every later capacity/load/node/output effect, new psychrometric work,
+pressure/weather ownership, cache, statistics, and diagnostics remain outside
+scope. Counts stay 32 algorithms, 293 routines split 58 plus 235, and 170
+required. Scripts become 316 total, 240 public, 76 internal, zero unused and
+zero unreachable; development commands stay 238. Support, readiness,
+capability, conformance, output, and Roadmap claims remain unchanged.

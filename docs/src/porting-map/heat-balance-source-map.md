@@ -37575,3 +37575,45 @@ supported numerical humidity owner. Counts stay 32 algorithms, 293 routines
 split 58 plus 235 with 170 required, and scripts become 315 total, 240 public,
 75 internal, zero unused, with 238 development commands. Support, readiness,
 capability, conformance, and Roadmap claims remain unchanged.
+
+## CP378 Saturation-Limit Humidity Assignment in the Heat-Balance Loop
+
+CP378 maps the next source-ordered PurchasedAir statement and nothing later:
+`PurchasedAirManager.cc` physical executable line 2260,
+`PurchAir.SupplyHumRat = min(SupplyHumRatOrig, SupplyHumRatSat);`, at commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its four ordered sites read the CP376-through-CP377 original, read CP377's
+saturation result, apply the source-shaped minimum, and assign purchased-air
+supply humidity under these exact labels:
+`read-local-original-supply-humidity-ratio-for-saturation-limit-minimum`,
+`read-local-saturation-supply-humidity-ratio-for-saturation-limit-minimum`,
+`apply-source-shaped-two-argument-minimum-for-saturation-limit`, and
+`assign-purchased-air-supply-humidity-ratio-for-saturation-limit`. This does
+not claim C++ operand-evaluation order.
+
+The inherited eight routes give three complete-null zero-site skips and five
+four-site executions. Exact state is `T=U+N+P+M`; `M` equals CP377's active
+saturation count and CP376's copy count, each site counter equals `M`, and
+source sites total `4*M`. Recursively complete same-call CP377 is the sole
+predecessor and owns both retained operands through its CP376 provenance.
+CP378 applies canonical `if left < right { left } else { right }`; raw tie,
+signed-zero, infinity, and unordered cases remain private characterization.
+
+There is no new CP378 finite-left gate. Existing supported numerical
+validation proves the active left/final bits finite; CP377 proves its right
+operand finite, positive, and at least `1e-5`. The admitted canonical and
+guarded saturation values match, so source-shaped minimum reconciles exactly
+with the unchanged numerical `f64::min`, node, and report. CP378 is terminal
+source owner, while CP345 remains numerical implementation owner. CP378 does
+not feed, overwrite, or replace any coupling DTO or numerical/result storage.
+Non-direct paths reject its evidence.
+
+Physical line 2261's `PsyHFnTdbW` enthalpy assignment is the first excluded
+executable and CP379 boundary. Its reads and every later capacity, load, node,
+or output effect remain excluded, as do psychrometric reevaluation, weather/
+pressure ownership, cache, statistics, and diagnostics. Counts stay 32
+algorithms, 293 routines split 58 plus 235 with 170 required, and scripts are
+316 total, 240 public, 76 internal, zero unused/unreachable, with 238 commands.
+Support, readiness, capability, conformance, output, and Roadmap claims remain
+unchanged.

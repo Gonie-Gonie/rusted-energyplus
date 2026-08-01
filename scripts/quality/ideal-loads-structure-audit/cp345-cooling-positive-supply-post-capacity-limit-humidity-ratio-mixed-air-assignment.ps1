@@ -1,7 +1,6 @@
 # CP345 maps only PurchasedAirManager.cc physical executable line 2208:
 # PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;
 # Physical line 2209 is the first excluded lexical executable.
-
 $cp345Stem = "cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment"
 $cp345PipelineStem = "purchased_air_$cp345Stem"
 $cp345TypeStem = "PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignment"
@@ -17,7 +16,7 @@ $cp345PublicReleaseTests = "crates\ep_runtime\src\ideal_loads\calc\$cp345Stem\te
 $cp345ReleaseCorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\$cp345Stem\tests\release_corruption.rs"
 $cp345CalcRoot = "crates\ep_runtime\src\ideal_loads\calc.rs"
 $cp345Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
-Assert-Contains -Path $cp345Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =.*?let calculation_cooling_humidistat_case_break =.*?let calculation_cooling_constant_supply_humidity_ratio_case_entry =.*?let calculation_cooling_constant_supply_humidity_ratio_assignment =.*?let calculation_cooling_constant_supply_humidity_ratio_case_break =.*?let calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment =.*?let calculation_cooling_default_supply_humidity_ratio_case_break =.*?let calculation_cooling_supply_humidity_ratio_humidification_heating_availability_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_control_humidistat_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment =.*?let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment =.*?let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit =.*?let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment =.*?let calculation_cooling_supply_humidity_ratio_pre_saturation_original_assignment =.*?let calculation_cooling_supply_humidity_ratio_saturation_assignment =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361-to-CP362-to-CP363-to-CP364 binding order"
+Assert-Contains -Path $cp345Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =.*?let calculation_cooling_humidistat_case_break =.*?let calculation_cooling_constant_supply_humidity_ratio_case_entry =.*?let calculation_cooling_constant_supply_humidity_ratio_assignment =.*?let calculation_cooling_constant_supply_humidity_ratio_case_break =.*?let calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment =.*?let calculation_cooling_default_supply_humidity_ratio_case_break =.*?let calculation_cooling_supply_humidity_ratio_humidification_heating_availability_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_control_humidistat_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment =.*?let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment =.*?let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit =.*?let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment =.*?let calculation_cooling_supply_humidity_ratio_pre_saturation_original_assignment =.*?let calculation_cooling_supply_humidity_ratio_saturation_assignment =.*?let calculation_cooling_supply_humidity_ratio_saturation_limit_assignment =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361-to-CP362-to-CP363-to-CP364 binding order"
 $cp345ScheduledOutput = "crates\ep_runtime\src\ideal_loads\binding\scheduled_output.rs"
 $cp345BindingAdapter = "crates\ep_runtime\src\ideal_loads\binding\$cp345Stem.rs"
 $cp345BindingTestsRoot = "crates\ep_runtime\src\ideal_loads\binding_tests.rs"
@@ -47,14 +46,12 @@ $cp345OrderedSitesPattern = '(?s)' +
     'assign-purchased-air-supply-humidity-ratio'
 $cp345LifecycleField =
     'purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle'
-
 function Get-Cp345RustBraceBlock {
     param(
         [Parameter(Mandatory = $true)][string]$Text,
         [Parameter(Mandatory = $true)][string]$AnchorPattern,
         [Parameter(Mandatory = $true)][string]$Description
     )
-
     $anchors = [regex]::Matches($Text, $AnchorPattern)
     if ($anchors.Count -ne 1) {
         throw "$Description expected exactly one anchor, found $($anchors.Count)"
@@ -79,14 +76,12 @@ function Get-Cp345RustBraceBlock {
     }
     throw "$Description closing brace is missing"
 }
-
 function Assert-Cp345PatternsInText {
     param(
         [Parameter(Mandatory = $true)][string]$Text,
         [Parameter(Mandatory = $true)][string[]]$Patterns,
         [Parameter(Mandatory = $true)][string]$Description
     )
-
     $cursor = 0
     for ($index = 0; $index -lt $Patterns.Count; $index += 1) {
         $match = [regex]::Match($Text.Substring($cursor), $Patterns[$index])
@@ -96,10 +91,8 @@ function Assert-Cp345PatternsInText {
         $cursor += $match.Index + $match.Length
     }
 }
-
 function Assert-Cp345ReleaseContract {
     param([Parameter(Mandatory = $true)][string]$Text)
-
     if ($Text -notmatch ('(?s)pub fn advance_direct_no_oa_calc_' +
             [regex]::Escape($cp345Stem) +
             '\(\s*runtime: &mut PurchasedAirRuntimeState,\s*system: &IdealLoadsAirSystem,\s*predecessor_cp344:\s*PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputSupplyTemperatureMixedAirLimitSnapshot,\s*\)')) {
@@ -159,10 +152,8 @@ function Assert-Cp345ReleaseContract {
         throw "CP345 public release admits a duplicate humidity scalar"
     }
 }
-
 function Assert-Cp345RuntimeAlgebraContract {
     param([Parameter(Mandatory = $true)][string]$Text)
-
     foreach ($pattern in @(
             '(?s)g\.checked_add\(f\).*?checked_add\(l\)\)\s*==\s*Some\(active\)',
             'let capacity_body = f\.checked_add\(l\);',
@@ -187,10 +178,8 @@ function Assert-Cp345RuntimeAlgebraContract {
         throw "CP345 must not collapse R to L"
     }
 }
-
 function Assert-Cp345BindingContract {
     param([Parameter(Mandatory = $true)][string]$Text)
-
     $body = Get-Cp345RustBraceBlock `
         -Text $Text `
         -AnchorPattern '(?m)^\s*pub fn couple_model_bound_direct_zone_purchased_air\s*\(' `
@@ -323,7 +312,7 @@ function Assert-Cp345BindingContract {
         $body,
         '(?s)let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment =\s*advance_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment\([^;]+?\)\?;'
     )
-    $cp376Call = [regex]::Match($body, '(?s)let calculation_cooling_supply_humidity_ratio_pre_saturation_original_assignment =\s*advance_cooling_supply_humidity_ratio_pre_saturation_original_assignment\([^;]+?\)\?;'); $cp377Call = [regex]::Match($body, '(?s)let calculation_cooling_supply_humidity_ratio_saturation_assignment =\s*advance_cooling_supply_humidity_ratio_saturation_assignment\([^;]+?\)\?;')
+    $cp376Call = [regex]::Match($body, '(?s)let calculation_cooling_supply_humidity_ratio_pre_saturation_original_assignment =\s*advance_cooling_supply_humidity_ratio_pre_saturation_original_assignment\([^;]+?\)\?;'); $cp377Call = [regex]::Match($body, '(?s)let calculation_cooling_supply_humidity_ratio_saturation_assignment =\s*advance_cooling_supply_humidity_ratio_saturation_assignment\([^;]+?\)\?;'); $cp378Call = [regex]::Match($body, '(?s)let calculation_cooling_supply_humidity_ratio_saturation_limit_assignment =\s*advance_cooling_supply_humidity_ratio_saturation_limit_assignment\([^;]+?\)\?;')
     $numerical = [regex]::Match(
         $body,
         '(?s)let\s+coupling\s*=\s*complete_direct_zone_purchased_air_coupling\s*\(\s*DirectZonePurchasedAirCouplingInput\s*\{'
@@ -361,7 +350,7 @@ function Assert-Cp345BindingContract {
         -not $cp373Call.Success -or
         -not $cp374Call.Success -or
         -not $cp375Call.Success -or
-        -not $cp376Call.Success -or -not $cp377Call.Success -or
+        -not $cp376Call.Success -or -not $cp377Call.Success -or -not $cp378Call.Success -or
         -not $numerical.Success -or
         $cp345Call.Index -lt ($cp344Call.Index + $cp344Call.Length) -or
         $cp346Call.Index -lt ($cp345Call.Index + $cp345Call.Length) -or
@@ -394,10 +383,10 @@ function Assert-Cp345BindingContract {
         $cp373Call.Index -lt ($cp372Call.Index + $cp372Call.Length) -or
         $cp374Call.Index -lt ($cp373Call.Index + $cp373Call.Length) -or
         $cp375Call.Index -lt ($cp374Call.Index + $cp374Call.Length) -or
-        $cp376Call.Index -lt ($cp375Call.Index + $cp375Call.Length) -or $cp377Call.Index -lt ($cp376Call.Index + $cp376Call.Length) -or
-        $numerical.Index -lt ($cp377Call.Index + $cp377Call.Length)
+        $cp376Call.Index -lt ($cp375Call.Index + $cp375Call.Length) -or $cp377Call.Index -lt ($cp376Call.Index + $cp376Call.Length) -or $cp378Call.Index -lt ($cp377Call.Index + $cp377Call.Length) -or
+        $numerical.Index -lt ($cp378Call.Index + $cp378Call.Length)
     ) {
-        throw "Binding must execute CP344 through CP377 in source order before unchanged numerical coupling"
+        throw "Binding must execute CP344 through CP378 in source order before unchanged numerical coupling"
     }
     foreach ($interval in @(
             [PSCustomObject]@{
@@ -552,7 +541,7 @@ function Assert-Cp345BindingContract {
             },
             [PSCustomObject]@{ Start = $cp374Call.Index + $cp374Call.Length; End = $cp375Call.Index; Description = "CP374-to-CP375" },
             [PSCustomObject]@{ Start = $cp375Call.Index + $cp375Call.Length; End = $cp376Call.Index; Description = "CP375-to-CP376" },
-            [PSCustomObject]@{ Start = $cp376Call.Index + $cp376Call.Length; End = $cp377Call.Index; Description = "CP376-to-CP377" }, [PSCustomObject]@{ Start = $cp377Call.Index + $cp377Call.Length; End = $numerical.Index; Description = "CP377-to-numerical" }
+            [PSCustomObject]@{ Start = $cp376Call.Index + $cp376Call.Length; End = $cp377Call.Index; Description = "CP376-to-CP377" }, [PSCustomObject]@{ Start = $cp377Call.Index + $cp377Call.Length; End = $cp378Call.Index; Description = "CP377-to-CP378" }, [PSCustomObject]@{ Start = $cp378Call.Index + $cp378Call.Length; End = $numerical.Index; Description = "CP378-to-numerical" }
         )) {
         $code = $body.Substring($interval.Start, $interval.End - $interval.Start)
         $code = [regex]::Replace($code, '(?s)/\*.*?\*/|(?m)//.*$', '')
@@ -570,10 +559,8 @@ function Assert-Cp345BindingContract {
         throw "CP345 evidence must not feed DirectZonePurchasedAirCouplingInput"
     }
 }
-
 function Assert-Cp345PipelineRootContract {
     param([Parameter(Mandatory = $true)][string]$Text)
-
     $productionBoundary = [regex]::Match($Text, '(?m)^\s*#\[cfg\(test\)\]\s*$')
     if (-not $productionBoundary.Success) {
         throw "Pipeline production/test boundary is missing"
@@ -619,10 +606,8 @@ function Assert-Cp345PipelineRootContract {
         throw "Pipeline non-direct rejection OR must include CP345 lifecycle is_some() exactly once"
     }
 }
-
 function Assert-Cp345SerializationContract {
     param([Parameter(Mandatory = $true)][string]$Text)
-
     $testBoundary = [regex]::Match($Text, '(?m)^\s*#\[cfg\(test\)\]\s*$')
     $production = if ($testBoundary.Success) {
         $Text.Substring(0, $testBoundary.Index)
@@ -646,7 +631,6 @@ function Assert-Cp345SerializationContract {
         throw "Production CP345 JSON helpers must use defensive null projection and authoritative IEEE bits"
     }
 }
-
 function Assert-Cp345MutationRejected {
     param(
         [Parameter(Mandatory = $true)][string]$Original,
@@ -654,7 +638,6 @@ function Assert-Cp345MutationRejected {
         [Parameter(Mandatory = $true)][scriptblock]$Validator,
         [Parameter(Mandatory = $true)][string]$Description
     )
-
     if ($Original -ceq $Mutated) {
         throw "CP345 audit self-test mutation was not applied: $Description"
     }
@@ -668,7 +651,6 @@ function Assert-Cp345MutationRejected {
         throw "CP345 audit failed to reject mutation: $Description"
     }
 }
-
 foreach ($cp345RequiredFile in @(
         $cp345Module,
         $cp345State,
@@ -698,7 +680,6 @@ Assert-LineLimit -Path $cp345Release -Limit 900 -Description "CP345 release modu
 Assert-LineLimit -Path $cp345RuntimeValidation -Limit 700 -Description "CP345 runtime validation module"
 Assert-LineLimit -Path $cp345CoupledValidation -Limit 800 -Description "CP345 coupled validation module"
 Assert-LineLimit -Path $cp345Pipeline -Limit 700 -Description "CP345 pipeline module"
-
 # Exact source boundary, public surface, snapshot, and collapsed retained route.
 Assert-Contains -Path $cp345Module -Pattern 'EnergyPlus 26\.1 PurchasedAirManager\.cc:2208' -Description "CP345 exact physical source boundary"
 Assert-Contains -Path $cp345Module -Pattern 'EnergyPlus 26\.1 PurchasedAirManager\.cc:2209' -Description "CP345 first excluded physical executable"
@@ -772,7 +753,6 @@ foreach ($counter in @(
     Assert-Contains -Path $cp345State -Pattern ('pub\(super\) ' + $counter + ':\s*usize') -Description "CP345 private witnessed counter '$counter'"
     Assert-NotContains -Path $cp345State -Pattern ('(?m)^\s*pub ' + $counter + ':') -Description "CP345 witnessed counter '$counter' must not be public"
 }
-
 # Pure transition is a raw two-site copy with G/F/L provenance and no new
 # numerical policy. Direct release recursively inherits CP329's finite gate.
 Assert-PatternsInOrder -Path $cp345Transition -Patterns @(
@@ -801,7 +781,6 @@ foreach ($test in @(
     Assert-Contains -Path $cp345Tests -Pattern $test -Description "CP345 pure regression '$test'"
 }
 Assert-Contains -Path $cp345ReleaseCorruptionTests -Pattern 'nonfinite_owner_and_matching_corroboration_cannot_bypass_recursive_release' -Description "CP345 inherited finite-owner firewall regression"
-
 $cp345RuntimeText = Read-RepoText -Path $cp345RuntimeValidation
 Assert-Cp345RuntimeAlgebraContract -Text $cp345RuntimeText
 $cp345ReleaseText = Read-RepoText -Path $cp345Release
@@ -833,7 +812,6 @@ foreach ($test in @(
     )) {
     Assert-Contains -Path $cp345ReleaseCorruptionTests -Pattern $test -Description "CP345 corruption regression '$test'"
 }
-
 # Runtime-root witness stays private and system-rooted.
 Assert-Contains -Path $cp345InitState -Pattern ('(?s)' + $cp345Stem + '_latest_witnesses:\s*BTreeMap<\s*IdealLoadsAirSystemId,\s*' + $cp345TypeStem + 'Snapshot') -Description "runtime-root private CP345 witness map"
 Assert-NotContains -Path $cp345InitState -Pattern ('(?m)^\s*pub(?:\([^)]*\))?\s+' + $cp345Stem + '_latest_witnesses:') -Description "CP345 witness map remains private"
@@ -842,7 +820,6 @@ Assert-Contains -Path $cp345InitWitness -Pattern ($cp345Stem + '_latest_witness\
 Assert-Contains -Path $cp345InitWitness -Pattern ('set_' + $cp345Stem + '_latest_witness\s*\(') -Description "CP345 private witness setter"
 Assert-Contains -Path $cp345InitState -Pattern ('pub calc_' + $cp345Stem + ':') -Description "per-unit CP345 state"
 Assert-Contains -Path $cp345InitUnit -Pattern ('(?s)calc_' + $cp345Stem + ':\s*' + $cp345TypeStem + 'RuntimeState::new\(\s*system') -Description "per-unit CP345 initialization"
-
 # Binding is exactly CP344 -> CP345 -> unchanged numerical DTO.
 $cp345BindingText = Read-RepoText -Path $cp345Binding
 Assert-Cp345BindingContract -Text $cp345BindingText
@@ -857,7 +834,6 @@ foreach ($test in @(
     )) {
     Assert-Contains -Path $cp345BindingTests -Pattern $test -Description "CP345 binding regression '$test'"
 }
-
 # Coupled lifecycle owns CP344 order, CP329 source, CP335 corroboration, and the
 # R=G+F+L/2R identities without introducing numerical coupling.
 Assert-Contains -Path $cp345CoupledRuntime -Pattern ('pub calc_' + $cp345Stem + '_lifecycle:\s*' + $cp345TypeStem + 'LifecycleSummary') -Description "coupled runtime CP345 lifecycle"
@@ -901,7 +877,6 @@ foreach ($pattern in @(
         throw "CP345 coupled N/P skip regression is missing '$pattern'"
     }
 }
-
 # Pipeline serialization is production-scoped, bit-authoritative, direct-only,
 # and rejected on every non-direct runtime constructor.
 Assert-Contains -Path $cp345Pipeline -Pattern '(?s)pub\(super\) struct DirectLifecyclePredecessors<.*?\{.*?capacity_limit_temperature_cp344:.*SupplyTemperatureMixedAirLimitLifecycleSummary.*?mixed_air_cp329:.*MixedAirCallLifecycleSummary.*?corroborating_cp335:.*HumidityRatioMixedAirAssignmentLifecycleSummary' -Description "pipeline CP344/CP329/CP335 exact lineage bundle"
@@ -923,7 +898,7 @@ $cp345PipelineRootText = Read-RepoText -Path $cp345PipelineRoot
 Assert-Cp345PipelineRootContract -Text $cp345PipelineRootText
 Assert-Contains -Path $cp345PipelineRoot -Pattern ('"' + $cp345LifecycleField + '":\s*result\s*\.' + $cp345LifecycleField + '\s*\.as_ref\(\)\s*\.map\(') -Description "pipeline CP345 lifecycle JSON field"
 Assert-Contains -Path $cp345PipelineRoot -Pattern 'purchased_air_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment::validate_direct_lifecycle\s*\(' -Description "pipeline CP345 direct validator wiring"
-Assert-Contains -Path $cp345PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp377_lifecycle_evidence' -Description "pipeline cumulative non-direct CP362 firewall regression"
+Assert-Contains -Path $cp345PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp378_lifecycle_evidence' -Description "pipeline cumulative non-direct CP362 firewall regression"
 $cp345ArbitraryIdealLoadsText = Read-RepoText -Path $cp345ArbitraryIdealLoadsTests
 $cp345ArbitraryDirectJsonTest = Get-Cp345RustBraceBlock `
     -Text $cp345ArbitraryIdealLoadsText `
@@ -953,7 +928,6 @@ foreach ($pattern in @(
         throw "Arbitrary direct CP345 active-route/non-null JSON cross-lifecycle regression is missing '$pattern'"
     }
 }
-
 # Specs have exactly two algorithm and two capability addenda with the 2+2+1+1
 # target distribution and no claim promotion.
 $cp345AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
@@ -1029,7 +1003,6 @@ foreach ($claim in @($cp345AlgorithmAddenda) + @($cp345CapabilityAddenda)) {
 }
 Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP345 supersedes only CP344' -Description "generated CP345 algorithm ledger"
 Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP345 additionally requires' -Description "generated CP345 capability index"
-
 # Exactly five hand-authored contract sections carry CP345. The psychrometrics
 # map remains unchanged.
 $cp345DocumentationSections = @(
@@ -1093,7 +1066,6 @@ foreach ($documentation in $cp345DocumentationSections) {
     }
 }
 Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP345\b' -Description "CP345 does not alter the psychrometrics source map"
-
 # Historical binding audits admit the CP345 call; cumulative non-direct audits
 # and coupled regression names reach CP345.
 foreach ($audit in @(
@@ -1130,10 +1102,9 @@ foreach ($audit in @(
         "scripts\quality\ideal-loads-structure-audit\cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1",
         "scripts\quality\ideal-loads-structure-audit\cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit.ps1"
     )) {
-    Assert-Contains -Path $audit -Pattern 'non_direct_runtime_rejects_cp316_through_cp377_lifecycle_evidence' -Description "historical non-direct firewall reaches CP362"
+    Assert-Contains -Path $audit -Pattern 'non_direct_runtime_rejects_cp316_through_cp378_lifecycle_evidence' -Description "historical non-direct firewall reaches CP362"
 }
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1" -Pattern 'cp347_direct_coupled_runtime_completes_none_case_after_g_f_l_and_skips_unit_off' -Description "historical coupled audit reaches CP347"
-
 # Root reachability and generated inventory add one internal script.
 $cp345MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp344DotSourceIndex = $cp345MainAuditText.IndexOf('ideal-loads-structure-audit\cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit.ps1')
@@ -1146,15 +1117,14 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP345 after CP344 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 315' -Description "CP345 cumulative inventory total through CP358"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 316' -Description "CP345 cumulative inventory total through CP358"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP345 cumulative uncalled inventory"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment\.ps1"' -Description "CP345 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment\.ps1::dot_sources' -Description "CP345 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 315 \|' -Description "CP345 generated script total through CP358"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 316 \|' -Description "CP345 generated script total through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP345 generated public script total"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 75 \|' -Description "CP345 generated internal script total through CP358"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 76 \|' -Description "CP345 generated internal script total through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP345 generated uncalled script total"
-
 # The audit itself proves its scoped negative checks reject representative
 # owner, corroboration, algebra, binding, JSON, and direct-only mutations.
 Assert-Cp345MutationRejected `

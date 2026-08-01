@@ -83,7 +83,7 @@ pub(super) fn snapshot_links_to_predecessor(snapshot: Snapshot, predecessor: Pre
     .is_some_and(|expected| snapshots_match_bit_exact(expected, snapshot))
 }
 
-pub(super) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
+pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
     if snapshot.source
         != PURCHASED_AIR_CALC_COOLING_SUPPLY_HUMIDITY_RATIO_SATURATION_ASSIGNMENT_SOURCE
         || snapshot.first_excluded_source

@@ -1,11 +1,13 @@
 //! CP377 saturation-assignment assertions.
 
+#[path = "cp378_assertions.rs"]
+mod cp378_assertions;
+
 use serde_json::{Map, Value, json};
 
 const CP334_KEY: &str =
     "purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle";
 const CP344_KEY: &str = "purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_mixed_air_limit_lifecycle";
-const CP345_KEY: &str = "purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle";
 const CP376_KEY: &str =
     "purchased_air_calc_cooling_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle";
 const CP377_KEY: &str =
@@ -137,7 +139,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
     } else {
         assert_active_values(cp334, cp344, &cp377["latest"]);
     }
-    assert_numerical_nonfeed(runtime, results);
+    cp378_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -146,6 +148,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP377_KEY].is_null(),
         "non-direct runtime must not publish CP377 evidence"
     );
+    cp378_assertions::assert_non_direct(runtime);
 }
 
 fn assert_complete_null(latest: &Value) {
@@ -228,30 +231,6 @@ fn assert_active_values(cp334: &Value, cp344: &Value, latest: &Value) {
             parse_bits(&latest[format!("{field}_ieee_bits")]),
             saturation_bits,
             "CP377 {field} sidecar"
-        );
-    }
-}
-
-fn assert_numerical_nonfeed(runtime: &Value, results: &Value) {
-    let owner_bits =
-        parse_bits(&runtime[CP345_KEY]["latest"]["assigned_supply_humidity_ratio_ieee_bits"]);
-    let series = results["series"]
-        .as_array()
-        .expect("result series")
-        .iter()
-        .find(|series| {
-            series["key"] == "ZONE ONE INLET"
-                && series["variable_name"] == "System Node Humidity Ratio"
-        })
-        .expect("supply-node humidity result series");
-    for endpoint in ["first", "last"] {
-        assert_eq!(
-            series[endpoint]
-                .as_f64()
-                .expect("humidity endpoint")
-                .to_bits(),
-            owner_bits,
-            "CP377 must not feed the {endpoint} numerical humidity"
         );
     }
 }

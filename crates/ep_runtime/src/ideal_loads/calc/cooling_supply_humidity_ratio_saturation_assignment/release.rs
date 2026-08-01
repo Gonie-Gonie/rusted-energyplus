@@ -37,6 +37,7 @@ use runtime_validation::{
     pending_state_is_consistent, prepare_next_transition,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_supply_humidity_ratio_saturation_assignment_snapshot_is_exact_direct_release;
+pub(in crate::ideal_loads::calc) use snapshot_validation::snapshot_route as cooling_supply_humidity_ratio_saturation_assignment_snapshot_route;
 use snapshot_validation::snapshot_temperature_owner;
 pub(in crate::ideal_loads::calc) use snapshot_validation::snapshots_match_bit_exact as cooling_supply_humidity_ratio_saturation_assignment_snapshots_match_bit_exact;
 

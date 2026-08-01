@@ -3992,3 +3992,54 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 75 internal, and zero unused; development commands remain 238.
 Support, readiness, capability, numerical, output, conformance, and Roadmap
 claims remain unchanged.
+
+## CP378 Cooling Supply-Humidity-Ratio Saturation-Limit Assignment
+
+CP378 maps only `PurchasedAirManager.cc` physical executable line 2260,
+`PurchAir.SupplyHumRat = min(SupplyHumRatOrig, SupplyHumRatSat);`, at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact dependency- and text-ordered sites are
+`read-local-original-supply-humidity-ratio-for-saturation-limit-minimum`,
+`read-local-saturation-supply-humidity-ratio-for-saturation-limit-minimum`,
+`apply-source-shaped-two-argument-minimum-for-saturation-limit`, and
+`assign-purchased-air-supply-humidity-ratio-for-saturation-limit`; this order
+does not claim C++ operand-evaluation order. Physical executable line 2261,
+`SupplyEnthalpy = PsyHFnTdbW(PurchAir.SupplyTemp, PurchAir.SupplyHumRat);`, is
+the first excluded executable and CP379 boundary.
+
+CP378 retains CP377's eight routes. UnitOff (`U`), non-cooling (`N`), and
+positive-guard-false (`P`) remain complete-null zero-site skips; the other
+five routes execute all four sites. For transitions `T` and line-2260
+assignments `M`, checked state requires `T=U+N+P+M`. `M` equals CP377's
+saturation-assignment count and CP376's original-copy count, every site
+counter equals `M`, and `source_site_execution_count=4*M`.
+
+Recursively complete same-call bit-exact CP377 lifecycle, snapshot, latest,
+private-witness, and completion evidence is the sole immediate predecessor.
+Its retained CP376 result owns the left operand and its CP377 saturation result
+owns the right operand. The transition reuses the canonical source-shaped
+minimum `if left < right { left } else { right }`; strict less-than is
+right-biased for raw ties, signed zeros, and unordered comparisons. Raw
+unordered and signed-zero behavior remains pure/private characterization.
+
+CP378 adds no finite-left gate. On the supported direct active lane, existing
+numerical validation already proves the original and final humidity bits are
+finite, while CP377 proves its saturation operand finite, positive, and at
+least `1e-5`. For those admitted bits the canonical CP377 projection equals
+the unchanged guarded-wrapper value, and the source-shaped minimum equals
+Rust `f64::min`. CP378 therefore becomes the terminal source owner and
+exact-bit reconciles final `SupplyHumRat` with the unchanged numerical result,
+supply node, and report. It does not feed, overwrite, or replace the coupling
+DTO or numerical state; CP345 remains the supported numerical implementation
+owner. Non-direct paths reject CP378 evidence.
+
+Line 2261's supply-temperature/result-humidity reads, `PsyHFnTdbW`, local
+enthalpy assignment, and all later capacity, load, node, and output effects
+remain excluded for CP379. CP378 adds no psychrometric reevaluation, pressure
+or weather ownership, cache/statistics/diagnostics, normalization, default,
+or new routine row. Counts remain 32 algorithms and 293 routines, split 58
+`state_mapped` plus 235 `source_mapped`, with 170 required. Script inventory
+becomes 316 total, 240 public, 76 internal, zero unused, and zero unreachable;
+development commands remain 238. Support, readiness, capability, output,
+conformance, status, and Roadmap claims remain unchanged.
