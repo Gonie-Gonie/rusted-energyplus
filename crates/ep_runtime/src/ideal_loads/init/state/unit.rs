@@ -197,6 +197,8 @@ impl PurchasedAirUnitRuntimeState {
                 ),
             calc_cooling_default_supply_humidity_ratio_case_break:
                 PurchasedAirCalcCoolingDefaultSupplyHumidityRatioCaseBreakRuntimeState::new(system),
+            calc_cooling_supply_humidity_ratio_humidification_heating_availability_guard:
+                PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationHeatingAvailabilityGuardRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

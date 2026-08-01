@@ -18,7 +18,7 @@ $cp349CorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\$cp349Stem\tests
 $cp349CalcRoot = "crates\ep_runtime\src\ideal_loads\calc.rs"
 $cp349Psychrometrics = "crates\ep_runtime\src\psychrometrics.rs"
 $cp349Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
-Assert-Contains -Path $cp349Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =.*?let calculation_cooling_humidistat_case_break =.*?let calculation_cooling_constant_supply_humidity_ratio_case_entry =.*?let calculation_cooling_constant_supply_humidity_ratio_assignment =.*?let calculation_cooling_constant_supply_humidity_ratio_case_break =.*?let calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment =.*?let calculation_cooling_default_supply_humidity_ratio_case_break =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361-to-CP362-to-CP363-to-CP364 binding order"
+Assert-Contains -Path $cp349Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =.*?let calculation_cooling_humidistat_case_break =.*?let calculation_cooling_constant_supply_humidity_ratio_case_entry =.*?let calculation_cooling_constant_supply_humidity_ratio_assignment =.*?let calculation_cooling_constant_supply_humidity_ratio_case_break =.*?let calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment =.*?let calculation_cooling_default_supply_humidity_ratio_case_break =.*?let calculation_cooling_supply_humidity_ratio_humidification_heating_availability_guard =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361-to-CP362-to-CP363-to-CP364 binding order"
 $cp349BindingAdapter = "crates\ep_runtime\src\ideal_loads\binding\$cp349Stem.rs"
 $cp349BindingTests = "crates\ep_runtime\src\ideal_loads\binding\${cp349Stem}_tests.rs"
 $cp349BindingTestsRoot = "crates\ep_runtime\src\ideal_loads\binding_tests.rs"
@@ -308,7 +308,7 @@ Assert-Contains -Path $cp349PipelineValidation -Pattern '(?s)assignments\s*\.che
 Assert-Contains -Path $cp349Serialization -Pattern 'lifecycle_serializes_cp349_direct_none_complete_skip_and_zero_source_counters' -Description "pipeline lifecycle skip JSON"
 Assert-Contains -Path $cp349SnapshotSerialization -Pattern 'direct_none_skip_serializes_null_numeric_values_and_bits' -Description "pipeline null numeric JSON"
 Assert-Contains -Path $cp349SnapshotSerialization -Pattern 'finite_and_nonfinite_numeric_serialization_preserves_authoritative_bits' -Description "defensive serializer bits"
-Assert-Contains -Path $cp349PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp368_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp349PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp369_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp349ArbitraryTests -Pattern 'ideal_loads_no_oa_branch_runs_declared_compatibility_runtime' -Description "arbitrary direct evidence"
 Assert-Contains -Path $cp349ArbitraryTests -Pattern $cp349Lifecycle -Description "arbitrary CP349 lifecycle"
 Assert-NotContains -Path $cp349PipelineValidation -Pattern 'DirectZonePurchasedAirCouplingInput|complete_direct_zone_purchased_air_coupling|latest_numerical|numerical_supply|final_supply' -Description "pipeline numerical firewall"
@@ -431,7 +431,7 @@ foreach ($historical in @(
     )) {
     Assert-Contains `
         -Path "scripts\quality\ideal-loads-structure-audit\$historical" `
-        -Pattern 'non_direct_runtime_rejects_cp316_through_cp368_lifecycle_evidence' `
+        -Pattern 'non_direct_runtime_rejects_cp316_through_cp369_lifecycle_evidence' `
         -Description "historical cumulative non-direct firewall"
 }
 $mainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
@@ -441,13 +441,13 @@ $completionIndex = $mainAuditText.IndexOf('Write-Host "IdealLoads structure audi
 if ($cp348AuditIndex -lt 0 -or $cp349AuditIndex -le $cp348AuditIndex -or $completionIndex -le $cp349AuditIndex) {
     throw "Main IdealLoads audit must dot-source CP349 after CP348 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 306' -Description "CP349 script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 307' -Description "CP349 script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP349 zero uncalled scripts"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern ('path = "scripts/quality/ideal-loads-structure-audit/' + [regex]::Escape((Split-Path $cp349Audit -Leaf)) + '"') -Description "CP349 internal inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern ([regex]::Escape(($cp349Audit -replace '\\', '/')) + '::dot_sources') -Description "CP349 caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 306 \|' -Description "generated CP349 script total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 307 \|' -Description "generated CP349 script total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public total"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 66 \|' -Description "generated internal total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 67 \|' -Description "generated internal total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated zero uncalled"
 Assert-Cp349MutationRejected `
     -Original $cp349ReleaseText `

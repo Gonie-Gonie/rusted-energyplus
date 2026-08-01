@@ -21495,3 +21495,52 @@ Inventory remains 32 algorithms and 293 routines, 58 `state_mapped` plus 235
 internal, and zero unused. Parent/Calc state and support, readiness,
 capability, numerical, output, conformance, and Roadmap claims remain
 unchanged.
+
+## CP369 Cooling Supply-Humidity-Ratio Humidification Heating-Availability Guard
+
+CP369 maps pinned `PurchasedAirManager.cc:2245`, `if (HeatOn) {`, as exactly
+two source sites:
+
+1. `read-local-heating-on-for-cooling-humidification-guard`
+2. `enter-cooling-supply-humidity-ratio-humidification-body-if-heating-on`
+
+Pinned commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`
+lock the source boundary. Physical executable line 2246 is first excluded,
+while a false `HeatOn` dynamically skips the guarded body and continues at
+physical executable line 2258. CP369 implements neither continuation.
+
+Routes stay `U/N/P/C0/Q/H/CSH`. With `E` current Boolean reads, `B` body
+entries, and `Z` false fallthroughs, checked algebra is
+`T=U+N+P+C0+Q+H+CSH`, `S=C0+Q+H+CSH=R=G+F+L`, `A=F+L`,
+`E=S=B+Z`, and `source_site_execution_count=E+B`. Retained exact release
+requires `HeatOn=true`, so `B=E`, `Z=0`, and exactly `2*E` sites execute.
+`U/N/P` remain complete site skips.
+
+The direct partition is `C0=S=E=B` with `Q=H=CSH=Z=0`; canonical
+private `CSH` also enters the true body, while false remains pure-transition
+characterization.
+
+The immediate and sole source-order predecessor is same-call, bit-exact,
+recursively completed CP368 evidence. CP310's retained
+`calc_entry.latest.heating_on` solely owns local `HeatOn`; recursively
+validated CP320 `heating_on` evidence
+corroborates that Boolean and is not a replacement owner. No model/schedule
+or live service is reread.
+
+CP369 is numeric-free control evidence: it carries no humidity, `f64`, or
+IEEE payload and performs no numeric calculation, comparison, finite/range
+gate, clamp, assignment, diagnostic, or psychrometric call, including in
+lifecycle JSON.
+
+Binding remains CP368-to-CP369-to-unchanged-numerical under
+`purchased_air_calc_cooling_supply_humidity_ratio_humidification_heating_availability_guard_lifecycle`.
+CP369 does not feed coupling input, demand prediction, numerical DTO state,
+or result state. CP345 remains the actual result-store supply-humidity owner,
+and non-direct paths publish `None` and reject CP369 evidence.
+
+Inventory remains 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Scripts become 307 total, 240 public, 67
+internal, and zero unused. Parent/Calc state and support, readiness,
+capability, numerical, output, conformance, and Roadmap claims remain
+unchanged.
