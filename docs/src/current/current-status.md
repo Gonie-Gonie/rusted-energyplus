@@ -3879,3 +3879,60 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 73 internal, and zero unused; development commands remain 238.
 Support, readiness, capability, numerical, output, conformance, and Roadmap
 claims remain unchanged.
+
+## CP376 Cooling Supply-Humidity-Ratio Pre-Saturation Original Assignment
+
+CP376 supersedes only CP375's physical-line-2258 exclusion at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`, locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+by mapping the single executable statement
+`SupplyHumRatOrig = PurchAir.SupplyHumRat;` in `PurchasedAirManager.cc`.
+Its exact two text- and dependency-ordered sites are
+`read-purchased-air-supply-humidity-ratio-before-saturation-limit` and
+`assign-local-original-supply-humidity-ratio-before-saturation-limit`.
+The assignment is a raw binary64 copy from the purchased-air result store to
+the local pre-saturation original.
+
+Physical executable line 2259,
+`SupplyHumRatSat = PsyWFnTdbRhPb(state, PurchAir.SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);`,
+is first excluded together with every temperature, relative-humidity,
+barometric-pressure, routine-name, psychrometric, and saturation effect.
+Line 2260's minimum and line 2261's enthalpy calculation also remain outside
+CP376.
+
+CP376 retains all eight CP375 routes. UnitOff (`U`), non-cooling (`N`), and
+positive-guard-false (`P`) execute zero sites and carry complete-null value
+evidence. The other five routes execute both sites. For total transitions
+`T` and copy assignments `C`, exact state requires `T=U+N+P+C`; `C` also
+equals the sum of the heating-availability-false, humidification-control-
+false, CP375 Humidistat-active, CP375 None-active, and nested
+dehumidification-control-false route counts. Both site counters equal `C`
+and `source_site_execution_count=2*C`.
+
+Same-call bit-exact CP375 lifecycle, snapshot, latest, witness, and recursive
+completion evidence is the sole immediate route predecessor. Each executing
+route proves exactly one last writer. CP375 owns its two active maximum-
+assignment routes; the other selected-control routes use CP347, CP356, CP362,
+or CP365. The five owner counters sum exactly to `C`. Public direct release
+uses same-call CP347 `resulting_supply_humidity_ratio` as the last-write RHS;
+CP329 is its recursively validated underlying mixed-air owner, while CP345
+and CP346 are bit-exact corroboration and do not replace CP347.
+
+CP376 preserves signed zero, subnormal, infinity, and NaN payload bits without
+arithmetic, comparison, finite/range gate, clamp, normalization, default,
+diagnostic, psychrometric or saturation call, or coercion. Nonfinite JSON
+numeric projections are null while hexadecimal IEEE sidecars remain
+authoritative.
+
+Binding preserves CP375-to-CP376-to-unchanged-numerical order under
+`purchased_air_calc_cooling_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle`.
+The local copy never enters or replaces `DirectZonePurchasedAirCouplingInput`,
+a numerical DTO, result state, or output node; the supported direct numerical
+supply-humidity result remains CP345-owned. Non-direct paths reject CP376
+evidence.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 314 total,
+240 public, 74 internal, and zero unused; development commands remain 238.
+Support, readiness, capability, numerical, output, conformance, and Roadmap
+claims remain unchanged.

@@ -145,6 +145,8 @@ use super::{
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationMaximumLimitLifecycleSummary,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioMaximumAssignmentError,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioMaximumAssignmentLifecycleSummary,
+    PurchasedAirCalcCoolingSupplyHumidityRatioPreSaturationOriginalAssignmentError,
+    PurchasedAirCalcCoolingSupplyHumidityRatioPreSaturationOriginalAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyError,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardError,
@@ -223,6 +225,7 @@ use super::{
     purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment_lifecycle_summary,
     purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_lifecycle_summary,
     purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_lifecycle_summary,
+    purchased_air_calc_cooling_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle_summary,
     purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle_summary,
     purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle_summary,
     purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle_summary,
@@ -291,6 +294,7 @@ mod cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_vali
 pub(in crate::ideal_loads) mod cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment_validation;
 pub(in crate::ideal_loads) mod cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_validation;
 pub(in crate::ideal_loads) mod cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_validation;
+pub(in crate::ideal_loads) mod cooling_supply_humidity_ratio_pre_saturation_original_assignment_validation;
 mod cooling_supply_mass_flow_ems_override_body_validation;
 mod cooling_supply_mass_flow_ems_override_guard_validation;
 mod cooling_supply_mass_flow_limit_body_validation;
@@ -565,6 +569,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded humidification supply-humidity-ratio maximum-assignment lifecycle report.
     pub calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_lifecycle:
         PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioMaximumAssignmentLifecycleSummary,
+    /// Persistent bounded pre-saturation original supply-humidity-ratio assignment lifecycle report.
+    pub calc_cooling_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle:
+        PurchasedAirCalcCoolingSupplyHumidityRatioPreSaturationOriginalAssignmentLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -831,6 +838,10 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     /// Final humidification supply-humidity-ratio maximum-assignment summary could not resolve the bound unit.
     CalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioMaximumAssignmentLifecycle(
         PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioMaximumAssignmentError,
+    ),
+    /// Final pre-saturation original supply-humidity-ratio assignment summary could not resolve the bound unit.
+    CalcCoolingSupplyHumidityRatioPreSaturationOriginalAssignmentLifecycle(
+        PurchasedAirCalcCoolingSupplyHumidityRatioPreSaturationOriginalAssignmentError,
     ),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
@@ -1435,6 +1446,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A pre-saturation original supply-humidity-ratio assignment lifecycle invariant did not match the run.
+    CalcCoolingSupplyHumidityRatioPreSaturationOriginalAssignmentLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -1770,6 +1790,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
+    /// A pre-saturation original supply-humidity-ratio assignment snapshot did not match its release call.
+    UnexpectedCalculationCoolingSupplyHumidityRatioPreSaturationOriginalAssignment {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
     /// A successful CP301 call did not retain source-setpoint demand provenance.
     UnexpectedDemandInputKind {
         /// Zero-based nominal system-step index.
@@ -2088,6 +2113,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioMaximumAssignmentLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir humidification supply-humidity-ratio maximum-assignment lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcCoolingSupplyHumidityRatioPreSaturationOriginalAssignmentLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir pre-saturation original supply-humidity-ratio assignment lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -2625,6 +2654,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir humidification supply-humidity-ratio maximum-assignment lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingSupplyHumidityRatioPreSaturationOriginalAssignmentLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir pre-saturation original supply-humidity-ratio assignment lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -3002,6 +3039,12 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its humidification supply-humidity-ratio maximum assignment"
+            ),
+            Self::UnexpectedCalculationCoolingSupplyHumidityRatioPreSaturationOriginalAssignment {
+                timestep_index,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its pre-saturation original supply-humidity-ratio assignment"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -3935,6 +3978,18 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             return Err(
                 DirectZonePurchasedAirCoupledRuntimeError::
                     UnexpectedCalculationCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioMaximumAssignment {
+                        timestep_index,
+                    },
+            );
+        }
+        if !cooling_supply_humidity_ratio_pre_saturation_original_assignment_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingSupplyHumidityRatioPreSaturationOriginalAssignment {
                         timestep_index,
                     },
             );
@@ -5015,6 +5070,23 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle =
+        purchased_air_calc_cooling_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::
+                CalcCoolingSupplyHumidityRatioPreSaturationOriginalAssignmentLifecycle,
+        )?;
+    cooling_supply_humidity_ratio_pre_saturation_original_assignment_validation::validate_lifecycle(
+        &calc_cooling_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle,
+        &calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_lifecycle,
+        &calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -5143,6 +5215,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment_lifecycle,
             calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_lifecycle,
             calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_lifecycle,
+            calc_cooling_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle,
         },
         state,
         results,

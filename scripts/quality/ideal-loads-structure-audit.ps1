@@ -565,7 +565,7 @@ Assert-FileExists -Path $zoneEquipmentDemand -Description "Zone equipment demand
 Assert-FileExists -Path $zoneEquipmentDispatch -Description "Zone equipment dispatch module"
 Assert-FileExists -Path $zoneEquipmentTests -Description "Zone equipment tests module"
 
-Assert-LineLimit -Path $calcRoot -Limit 80 -Description "IdealLoads calc module root"
+Assert-LineLimit -Path $calcRoot -Limit 82 -Description "IdealLoads calc module root"
 Assert-LineLimit -Path $calcLifecycle -Limit 520 -Description "PurchasedAir Calc-entry lifecycle module"
 Assert-LineLimit -Path $calcLifecycleTests -Limit 240 -Description "PurchasedAir Calc-entry lifecycle tests"
 Assert-LineLimit -Path $calcMinimumOaPrefix -Limit 380 -Description "PurchasedAir Calc minimum-OA prefix module"
@@ -672,7 +672,7 @@ Assert-LineLimit -Path $idealLoadsInitManagerPlanTests -Limit 250 -Description "
 Assert-LineLimit -Path $idealLoadsInitManagerScanTests -Limit 420 -Description "IdealLoads manager-wide initialization sweep tests"
 Assert-LineLimit -Path $idealLoadsInitSummary -Limit 100 -Description "IdealLoads initialization lifecycle summary"
 Assert-LineLimit -Path $idealLoadsInitState -Limit 380 -Description "IdealLoads persistent initialization state"
-Assert-LineLimit -Path $idealLoadsInitWitnesses -Limit 240 -Description "IdealLoads private calculation witness accessors"
+Assert-LineLimit -Path $idealLoadsInitWitnesses -Limit 241 -Description "IdealLoads private calculation witness accessors"
 Assert-LineLimit -Path $idealLoadsInitSupplyTemperatureDiagnostic -Limit 340 -Description "IdealLoads supply-temperature diagnostic registry"
 Assert-LineLimit -Path $idealLoadsInitSupplyTemperatureDiagnosticTests -Limit 340 -Description "IdealLoads supply-temperature diagnostic tests"
 Assert-LineLimit -Path $idealLoadsInitTopologyPlan -Limit 480 -Description "IdealLoads immutable selected-unit topology plan"
@@ -4144,5 +4144,6 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp373-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-assignment.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp374-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-maximum-limit.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp375-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-maximum-assignment.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp376-cooling-supply-humidity-ratio-pre-saturation-original-assignment.ps1")
 
 Write-Host "IdealLoads structure audit complete."

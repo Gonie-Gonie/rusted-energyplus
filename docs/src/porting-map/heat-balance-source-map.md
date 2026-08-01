@@ -37505,3 +37505,34 @@ CP345-owned. Counts stay 32 algorithms, 293 routines split 58 plus 235 with
 170 required, and scripts become 313 total, 240 public, 73 internal, zero
 unused, with 238 development commands. Support, readiness, conformance, and
 Roadmap claims remain unchanged.
+
+## CP376 Pre-Saturation Original Humidity Assignment in the Heat-Balance Loop
+
+CP376 maps only pinned `PurchasedAirManager.cc` physical executable line 2258,
+`SupplyHumRatOrig = PurchAir.SupplyHumRat;`, at commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The ordered sites
+`read-purchased-air-supply-humidity-ratio-before-saturation-limit` and
+`assign-local-original-supply-humidity-ratio-before-saturation-limit` read the
+current purchased-air supply humidity ratio and bit-copy it into the local
+pre-saturation original. Line 2259's saturation
+`PsyWFnTdbRhPb` call is first excluded, together with all psychrometric,
+saturation, minimum, and downstream enthalpy effects.
+
+CP376 retains eight CP375 routes: `U/N/P` skip with null evidence and the
+other five execute both copy sites. For transitions `T` and copies `C`, exact
+state is `T=U+N+P+C`; each site count is `C` and total sites are `2*C`.
+Same-call recursively complete bit-exact CP375 owns route lineage. The five
+last-writer counters select CP375, CP347, CP356, CP362, or CP365 exactly once
+per execution and sum to `C`. Public direct uses CP347's same-call result,
+rooted in CP329 and corroborated by CP345-CP346.
+
+The copy preserves raw IEEE bits without arithmetic, gate, clamp,
+normalization, psychrometrics, saturation, coercion, or numerical feed.
+Binding is CP375-to-CP376-to-unchanged-numerical under the CP376 lifecycle;
+the supported direct DTO remains unchanged and CP345-owned. Counts stay 32
+algorithms, 293 routines split 58 plus 235 with 170 required, and scripts
+become 314 total, 240 public, 74 internal, zero unused, with 238 development
+commands. Support, readiness, capability, conformance, and Roadmap claims
+remain unchanged.

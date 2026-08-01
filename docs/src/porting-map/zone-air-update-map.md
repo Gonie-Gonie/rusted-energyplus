@@ -24445,3 +24445,33 @@ coercion; the supported direct DTO remains unchanged and CP345-owned. Counts
 stay 32 algorithms, 293 routines split 58 plus 235, and 170 required. Scripts
 become 313 total, 240 public, 73 internal, zero unused; development commands
 stay 238. Support, readiness, conformance, and Roadmap claims are unchanged.
+
+## CP376 Pre-Saturation Original Humidity-Assignment Placement
+
+CP376 inserts pinned `PurchasedAirManager.cc` physical executable line 2258
+immediately after CP375:
+`SupplyHumRatOrig = PurchAir.SupplyHumRat;`. The source lock is commit
+`6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its ordered sites
+`read-purchased-air-supply-humidity-ratio-before-saturation-limit` and
+`assign-local-original-supply-humidity-ratio-before-saturation-limit` read the
+result store and bit-copy it to the local original. Physical line 2259's `PsyWFnTdbRhPb`
+saturation calculation is first excluded.
+
+The eight CP375 routes remain: UnitOff, non-cooling, and positive-guard-false
+skip; the other five execute both sites. Therefore `T=U+N+P+C`, each site
+count equals `C`, and total sites are `2*C`. Same-call recursively complete
+CP375 owns route lineage. CP375, CP347, CP356, CP362, and CP365 partition the
+last-writer owners, one per copy. Public direct takes the RHS from CP347;
+CP329 is the underlying owner and CP345-CP346 are corroboration only.
+
+The assignment preserves exact IEEE bits but changes no Zone air or moisture
+state. Placement is CP375-to-CP376-to-unchanged-numerical under
+`purchased_air_calc_cooling_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle`.
+CP376 adds no psychrometric/saturation call, arithmetic, gate, clamp,
+normalization, coercion, or numerical feed; the supported direct DTO stays
+CP345-owned. Counts stay 32 algorithms, 293 routines split 58 plus 235, and
+170 required. Scripts become 314 total, 240 public, 74 internal, zero unused;
+development commands stay 238. Support, readiness, capability, conformance,
+and Roadmap claims are unchanged.

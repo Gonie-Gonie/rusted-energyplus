@@ -21827,3 +21827,39 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 73 internal, and zero unused; development commands remain 238.
 All support, readiness, numerical, capability, output, conformance, and
 Roadmap claims remain unchanged.
+
+## CP376 Supply-Humidity-Ratio Pre-Saturation Original Assignment
+
+CP376 supersedes only CP375's line-2258 exclusion at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`, by
+mapping `SupplyHumRatOrig = PurchAir.SupplyHumRat;`. Its exact sites are
+`read-purchased-air-supply-humidity-ratio-before-saturation-limit` followed by
+`assign-local-original-supply-humidity-ratio-before-saturation-limit`; they
+read the purchased-air supply humidity ratio and bit-copy it to the local
+original. Line 2259's `PsyWFnTdbRhPb` saturation calculation
+is first excluded; CP376 claims no psychrometric or saturation behavior.
+
+All eight CP375 routes remain. UnitOff, non-cooling, and positive-guard-false
+are complete-null zero-site skips; heating-availability-false,
+humidification-control-false, both CP375 maximum-assignment routes, and the
+nested dehumidification-control-false route execute both sites. Thus
+`T=U+N+P+C`, both site counters equal `C`, and total sites equal `2*C`.
+
+Same-call bit-exact recursively complete CP375 is the sole route predecessor.
+Exactly one last writer owns every copy: CP375 on its two active routes, or
+CP347, CP356, CP362, or CP365 on the remaining selected-control routes. The
+public direct RHS is CP347's same-call result; CP329 is its underlying owner
+and CP345-CP346 only corroborate the bits and route.
+
+The raw copy retains exact IEEE payloads and adds no arithmetic, gate, clamp,
+normalization, psychrometrics, saturation, or coercion. Binding orders
+CP375-to-CP376-to-unchanged-numerical under
+`purchased_air_calc_cooling_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle`;
+CP376 does not feed the supported numerical result, which remains CP345-owned.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 314 total,
+240 public, 74 internal, and zero unused; development commands remain 238.
+All support, readiness, numerical, capability, output, conformance, and
+Roadmap claims remain unchanged.
