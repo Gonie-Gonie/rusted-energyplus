@@ -37959,3 +37959,38 @@ reject it. No routine, psychrometrics row, or promotion is added. Counts stay
 325 total, 240 public, 85 internal, zero unused/unreachable, with 238 commands.
 Support, readiness, capability, numerical, output, status, and Roadmap claims
 remain unchanged.
+
+## CP388 Post-Saturation Constant-SHR Sensible Output in the Heat-Balance Loop
+
+CP388 advances the direct purchased-air heat-balance witness through pinned
+`PurchasedAirManager.cc` physical executable line 2278 at commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It reads CP384-owned retained cooling total output, reads selected-system
+`CoolSHR`, evaluates native binary64 `CoolTotOutput * CoolSHR`, and assigns
+local `CoolSensOutput` through the four exact ordered sites documented in the
+IdealLoads source map. Physical line 2279's supply-temperature calculation is
+first excluded for CP389.
+
+The thirty CP387 histories remain distinct: three private constant-SHR routes
+execute all four sites and twenty-seven skip them. Exact direct execution has
+eleven public typed-`None` routes, all null skips. Exact accounting is
+`T388=T387`, `Q=K387`, each site counter `Q`, and
+`source_site_execution_count=4*Q`, with the eleven/nineteen public/private
+split unchanged.
+
+Same-call bit-exact recursively complete CP387 is the sole predecessor. CP384
+resulting total output is the sole first-factor owner through mandatory CP385
+bridge/corroboration; immutable selected-system
+`cooling_sensible_heat_ratio` is the sole second-factor owner. Native IEEE
+multiplication preserves signed zero, infinity, and NaN payload bits and
+sidecars without a finite gate. CP387 CpAir and CP385 enthalpy remain retained
+bit-exact but are not operands.
+
+Placement is CP387-to-CP388-to-unchanged numerical coupling. CP388 does not
+feed or mutate numerical, node, load, or report state, and non-direct paths
+reject it. It performs no line-2279 work and adds no routine, psychrometrics
+row, or promotion. Counts stay 32 algorithms, 293 routines split 58 plus 235
+with 170 required; scripts are 326 total, 240 public, 86 internal, zero
+unused/unreachable, with 238 commands. Support, readiness, capability,
+numerical, output, status, conformance, and Roadmap claims remain unchanged.

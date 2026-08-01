@@ -28,7 +28,10 @@ use runtime_validation::{
     pending_state_is_consistent, prepare_next_transition, prepared_completed_state_is_consistent,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment_snapshot_is_exact_direct_release;
-pub(in crate::ideal_loads::calc) use snapshot_validation::snapshots_match_bit_exact as cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment_snapshots_match_bit_exact;
+pub(in crate::ideal_loads::calc) use snapshot_validation::{
+    snapshot_is_exact as cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment_snapshot_is_exact,
+    snapshots_match_bit_exact as cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment_snapshots_match_bit_exact,
+};
 
 #[allow(dead_code)]
 pub(in crate::ideal_loads::calc) fn completed_direct_cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment_is_consistent(

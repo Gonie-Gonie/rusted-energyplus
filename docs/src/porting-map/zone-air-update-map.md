@@ -24891,3 +24891,37 @@ routines split 58 plus 235, and 170 required. Scripts become 325 total, 240
 public, 85 internal, zero unused and zero unreachable; development commands
 stay 238. Support, readiness, capability, numerical, output, conformance,
 status, and Roadmap claims remain unchanged.
+
+## CP388 Post-Saturation Constant-SHR Sensible-Output Placement
+
+CP388 extends the exact direct-Zone source-order witness through pinned
+`PurchasedAirManager.cc` physical executable line 2278 at commit
+`6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It witnesses CP384-owned retained total-output read, immutable selected-system
+`CoolSHR` read, native binary64 multiplication, and local sensible-output
+assignment. Line 2279's supply-temperature calculation is excluded for CP389.
+
+CP388 preserves all thirty CP387 routes: the three private constant-SHR
+selections execute four sites, while twenty-seven skip. Exact direct execution
+retains eleven public typed-`None` null routes. Accounting requires
+`T388=T387`, `Q=K387`, each site counter `Q`, and
+`source_site_execution_count=4*Q`; the public/private split remains
+eleven/nineteen.
+
+Same-call complete bit-exact CP387 is the sole predecessor. CP384 resulting
+cooling total output solely owns the first factor through mandatory CP385
+retained-read bridge/corroboration, and immutable selected-system
+`cooling_sensible_heat_ratio` solely owns the second. Native IEEE multiplication
+preserves signed-zero, infinity, and NaN payload bits and JSON sidecars without
+a finite gate. CP387 CpAir and CP385 enthalpy remain bit-exact retained evidence
+but are not operands.
+
+Placement is CP387-to-CP388-to-unchanged numerical coupling. CP388 performs no
+line-2279 calculation, numerical feed, zone-node update, load change, or report
+change. Non-direct paths reject its evidence. No routine, psychrometrics row,
+or promotion is added. Counts stay 32 algorithms, 293 routines split 58 plus
+235, and 170 required. Scripts become 326 total, 240 public, 86 internal, zero
+unused and zero unreachable; development commands stay 238. Support,
+readiness, capability, numerical, output, conformance, status, and Roadmap
+claims remain unchanged.

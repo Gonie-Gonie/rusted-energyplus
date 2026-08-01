@@ -13,6 +13,7 @@ mod transition;
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
     completed_direct_cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment_is_consistent,
+    cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment_snapshot_is_exact,
     cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment_snapshots_match_bit_exact,
 };
 pub use release::{

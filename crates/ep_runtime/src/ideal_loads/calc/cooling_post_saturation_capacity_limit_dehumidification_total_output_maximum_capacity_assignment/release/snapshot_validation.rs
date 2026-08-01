@@ -83,6 +83,10 @@ pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option
     }
 }
 
+pub(in crate::ideal_loads::calc) fn snapshot_is_exact(snapshot: Snapshot) -> bool {
+    snapshot_route(snapshot).is_some()
+}
+
 pub(in crate::ideal_loads::calc) fn cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_control_flow_shape_is_exact(
     snapshot: Snapshot,
 ) -> bool {

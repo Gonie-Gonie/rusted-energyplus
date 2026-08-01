@@ -18,6 +18,7 @@ pub use release::{
 pub(in crate::ideal_loads::calc) use release::{
     completed_direct_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_is_consistent,
     cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_control_flow_shape_is_exact,
+    cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_snapshot_is_exact,
     cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_snapshots_match_bit_exact,
 };
 #[allow(unused_imports)]

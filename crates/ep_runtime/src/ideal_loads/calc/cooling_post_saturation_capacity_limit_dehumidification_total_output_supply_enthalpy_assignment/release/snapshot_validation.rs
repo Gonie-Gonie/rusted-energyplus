@@ -76,6 +76,10 @@ pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option
     }
 }
 
+pub(in crate::ideal_loads::calc) fn snapshot_is_exact(snapshot: Snapshot) -> bool {
+    snapshot_route(snapshot).is_some()
+}
+
 fn predecessor_shape(snapshot: Snapshot) -> Predecessor {
     Predecessor {
         source: crate::ideal_loads::PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_TOTAL_OUTPUT_MAXIMUM_CAPACITY_ASSIGNMENT_SOURCE,

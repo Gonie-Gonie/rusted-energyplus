@@ -20869,3 +20869,63 @@ routines remain `source_mapped`. Counts remain 32 algorithms, 293 routines,
 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script inventory is
 325 total, 240 public, 85 internal, zero unused, zero unreachable, with 238
 development commands.
+
+## CP388 Source-Ordered Post-Saturation Constant-SHR Sensible Output
+
+CP388 supersedes only CP387's physical-line-2278 exclusion by mapping
+EnergyPlus 26.1 `PurchasedAirManager.cc` physical executable line 2278 at
+commit `6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`:
+
+```cpp
+CoolSensOutput = CoolTotOutput * PurchAir.CoolSHR;
+```
+
+The exact dependency order is CP384-owned retained cooling-total-output read,
+selected-system `CoolSHR` read, native binary64 multiplication, and local
+sensible-output assignment, named
+`read-retained-cooling-total-output-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-sensible-output-first-factor`,
+`read-purchased-air-cooling-sensible-heat-ratio-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-sensible-output-second-factor`,
+`calculate-cooling-total-output-times-cooling-sensible-heat-ratio-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-sensible-output`,
+and
+`assign-local-cooling-sensible-output-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-case`.
+Physical executable line 2279's supply-temperature calculation is first
+excluded and the CP389 boundary; CP388 claims no line-2279 read, division, or
+assignment.
+
+All thirty CP387 histories remain distinct. The three private active
+constant-SHR routes execute all four sites and twenty-seven routes execute
+none. With CP388 assignments `Q` and CP387 assignments `K`, checked state
+requires `T388=T387`, `Q=K`, every site counter `Q`,
+`source_site_execution_count=4*Q`, and exact predecessor-route parity. Exact
+direct execution retains eleven public typed-`None` null routes; the remaining
+nineteen routes, including every `Q`, are private characterization.
+
+Same-call recursively complete CP387 lifecycle/snapshot/latest/witness/
+completion evidence is the sole immediate predecessor. CP384 resulting
+`CoolTotOutput` solely owns the first factor, and CP385 must bridge and
+corroborate that retained value bit-exactly. The identity-checked selected
+typed system's immutable `cooling_sensible_heat_ratio` solely owns `CoolSHR`.
+CP382 pre-cap output, CP383 comparison operands, CP385 enthalpy, CP387 `CpAir`,
+caller/model/service values, and numerical DTO scalars are forbidden operand
+substitutes. CP387 `CpAir` and CP385 resulting supply enthalpy are nevertheless
+retained bit-exact for later source statements.
+
+The pure transition performs the source-native binary64 `total * shr` once,
+with no reciprocal, reassociation, `mul_add`, clamp, tolerance, normalization,
+finite gate, or psychrometric recalculation. Signed zero, infinity, NaN
+payloads, and nonfinite results remain exact in authoritative IEEE sidecars;
+skipped routes carry null operand/result evidence.
+
+Binding order is CP387, then CP388, then unchanged numerical coupling. CP388
+is absent from `DirectZonePurchasedAirCouplingInput` and cannot feed,
+reconcile with, overwrite, or replace numerical, node, load, or report state.
+Non-direct runtime evidence is rejected.
+
+No routine or psychrometrics row, support tier, readiness, feature/evidence,
+capability, numerical-conformance, output, status, conformance, or Roadmap
+promotion occurs. Both parent algorithms remain `scaffold`/`none`; both Calc
+routines remain `source_mapped`. Counts remain 32 algorithms, 293 routines,
+58 `state_mapped`, 235 `source_mapped`, and 170 required. Script inventory is
+326 total, 240 public, 86 internal, zero unused, zero unreachable, with 238
+development commands.

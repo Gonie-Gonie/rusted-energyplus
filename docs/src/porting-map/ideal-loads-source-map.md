@@ -22335,3 +22335,47 @@ psychrometrics row, support, numerical, or Roadmap promotion occurs. Counts
 stay 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and
 170 required. Scripts become 325 total, 240 public, 85 internal, zero
 unused/unreachable, with 238 development commands.
+
+## CP388 Post-Saturation Constant-SHR Sensible-Output Assignment
+
+CP388 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+and `PurchasedAirManager.cc` physical executable line 2278:
+
+```cpp
+CoolSensOutput = CoolTotOutput * PurchAir.CoolSHR;
+```
+
+The four exact sites are
+`read-retained-cooling-total-output-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-sensible-output-first-factor`,
+`read-purchased-air-cooling-sensible-heat-ratio-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-sensible-output-second-factor`,
+`calculate-cooling-total-output-times-cooling-sensible-heat-ratio-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-sensible-output`,
+and
+`assign-local-cooling-sensible-output-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-case`.
+Line 2279's supply-temperature expression is first excluded for CP389; none of
+its reads, division, or assignment belongs to CP388.
+
+All thirty CP387 routes remain distinct. Three private constant-SHR routes
+execute all four sites and twenty-seven skip them. Thus `T388=T387`, assignment
+count `Q=K387`, every site counter equals `Q`, and
+`source_site_execution_count=4*Q`, with exact thirty-route parity. The eleven
+exact-direct typed-`None` routes all remain null skips; nineteen routes remain
+private.
+
+Same-call recursively complete bit-exact CP387 is the sole immediate
+predecessor. CP384 resulting cooling total output solely owns the first factor,
+with mandatory CP385 retained-read bridge/corroboration, while immutable
+selected-system `cooling_sensible_heat_ratio` solely owns the second. The
+transition performs native binary64 multiplication exactly once and preserves
+signed zero, infinities, and NaN payloads through authoritative IEEE sidecars,
+without reassociation, FMA, clamp, normalization, or finite gate. CP387 CpAir
+and CP385 enthalpy remain bit-exact retained values but are not operands.
+
+Lifecycle placement is CP387, then CP388, then unchanged numerical coupling.
+CP388 never enters or feeds `DirectZonePurchasedAirCouplingInput`, numerical
+results, nodes, loads, or reports; non-direct paths reject it. No line-2279
+work, routine, psychrometrics row, support, numerical, or Roadmap promotion
+occurs. Counts stay 32 algorithms, 293 routines, 58 `state_mapped`, 235
+`source_mapped`, and 170 required. Scripts become 326 total, 240 public, 86
+internal, zero unused/unreachable, with 238 development commands.

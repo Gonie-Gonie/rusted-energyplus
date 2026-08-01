@@ -5,6 +5,7 @@
 & {
 $stem = "cooling_post_saturation_capacity_limit_dehumidification_control_switch"
 $successorStem = "cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment"
+$terminalStem = "cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment"
 $predecessorStem = "cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment"
 $pipelineStem = "purchased_air_$stem"
 $typeStem = "PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlSwitch"
@@ -28,6 +29,7 @@ $serialization = "crates\ep_run\src\pipeline\$pipelineStem\serialization\snapsho
 $cp385Assertions = "crates\ep_run\tests\arbitrary_run_ideal_loads\cp385_assertions.rs"
 $cp386Assertions = "crates\ep_run\tests\arbitrary_run_ideal_loads\cp386_assertions.rs"
 $cp387Assertions = "crates\ep_run\tests\arbitrary_run_ideal_loads\cp387_assertions.rs"
+$cp388Assertions = "crates\ep_run\tests\arbitrary_run_ideal_loads\cp388_assertions.rs"
 $audit = "scripts\quality\ideal-loads-structure-audit\cp386-cooling-post-saturation-capacity-limit-dehumidification-control-switch.ps1"
 $sites = @(
     "read-purchased-air-dehumidification-control-type",
@@ -66,7 +68,7 @@ $required = @(
     "crates\ep_runtime\src\ideal_loads\init\state\witnesses\$stem.rs",
     $coupled, "crates\ep_runtime\src\ideal_loads\coupled_output_tests\$($stem)_fixture.rs",
     $pipeline, "crates\ep_run\src\pipeline\$pipelineStem\validation.rs",
-    $serialization, $cp385Assertions, $cp386Assertions, $cp387Assertions, $audit
+    $serialization, $cp385Assertions, $cp386Assertions, $cp387Assertions, $cp388Assertions, $audit
 )
 foreach ($file in $required) {
     Assert-FileExists -Path $file -Description "CP386 implementation/audit file"
@@ -193,16 +195,17 @@ $bindingText = Read-RepoText -Path $binding
 $cp385Index = $bindingText.IndexOf("let calculation_$predecessorStem =")
 $cp386Index = $bindingText.IndexOf("let calculation_$stem =")
 $cp387Index = $bindingText.IndexOf("let calculation_$successorStem =")
+$cp388Index = $bindingText.IndexOf("let calculation_$terminalStem =")
 $numericalIndex = $bindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
-if ($cp385Index -lt 0 -or $cp386Index -le $cp385Index -or $cp387Index -le $cp386Index -or $numericalIndex -le $cp387Index) {
-    throw "Binding must execute CP385, CP386, CP387, then unchanged numerical coupling"
+if ($cp385Index -lt 0 -or $cp386Index -le $cp385Index -or $cp387Index -le $cp386Index -or $cp388Index -le $cp387Index -or $numericalIndex -le $cp388Index) {
+    throw "Binding must execute CP385, CP386, CP387, CP388, then unchanged numerical coupling"
 }
 $dto = Get-Cp386BraceBlock `
     -Text $bindingText.Substring($numericalIndex) `
     -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{' `
     -Description "numerical DTO"
-if ($dto -match 'cp386|cp387|dehumidification_control_switch|constant_sensible_heat_ratio_cp_air_assignment') {
-    throw "CP386/CP387 evidence unexpectedly feeds the numerical DTO"
+if ($dto -match 'cp386|cp387|cp388|dehumidification_control_switch|constant_sensible_heat_ratio_(?:cp_air|sensible_output)_assignment') {
+    throw "CP386-CP388 evidence unexpectedly feeds the numerical DTO"
 }
 Assert-NotContains -Path $adapter -Pattern 'DirectZonePurchasedAirCouplingInput|reconcile_|supply_node_update|report' -Description "adapter numerical feed"
 
@@ -218,7 +221,7 @@ foreach ($registration in @(
     )) {
     Assert-Contains -Path $registration.Path -Pattern $registration.Pattern -Description "registration"
 }
-Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp387_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp388_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $pipelineRoot -Pattern "purchased_air_calc_$($stem)_lifecycle" -Description "pipeline lifecycle key"
 $pipelineText = Read-RepoText -Path $pipelineRoot
 $nonDirectValidation = Get-Cp386BraceBlock `
@@ -231,7 +234,7 @@ Assert-Cp386Text `
     -Description "production lifecycle Some rejection"
 $nonDirectTest = Get-Cp386BraceBlock `
     -Text $pipelineText `
-    -AnchorPattern 'fn\s+non_direct_runtime_rejects_cp316_through_cp387_lifecycle_evidence\s*\(' `
+    -AnchorPattern 'fn\s+non_direct_runtime_rejects_cp316_through_cp388_lifecycle_evidence\s*\(' `
     -Description "cumulative non-direct regression"
 $lifecycleField = [regex]::Escape("purchased_air_calc_$($stem)_lifecycle")
 Assert-Cp386Text `
@@ -253,7 +256,10 @@ Assert-Contains -Path $cp385Assertions -Pattern 'cp386_assertions::assert_non_di
 Assert-Contains -Path $cp386Assertions -Pattern 'mod cp387_assertions;' -Description "CP387 arbitrary module"
 Assert-Contains -Path $cp386Assertions -Pattern 'cp387_assertions::assert_direct\(runtime, results\)' -Description "CP387 direct arbitrary delegation"
 Assert-Contains -Path $cp386Assertions -Pattern 'cp387_assertions::assert_non_direct\(runtime\)' -Description "CP387 non-direct arbitrary delegation"
-Assert-Contains -Path $cp387Assertions -Pattern 'CP387 lifecycle must remain outside numerical result state' -Description "CP387 terminal numerical nonfeed"
+Assert-Contains -Path $cp387Assertions -Pattern 'mod cp388_assertions;' -Description "CP388 arbitrary module"
+Assert-Contains -Path $cp387Assertions -Pattern 'cp388_assertions::assert_direct\(runtime, results\)' -Description "CP388 direct arbitrary delegation"
+Assert-Contains -Path $cp387Assertions -Pattern 'cp388_assertions::assert_non_direct\(runtime\)' -Description "CP388 non-direct arbitrary delegation"
+Assert-Contains -Path $cp388Assertions -Pattern 'CP388 lifecycle must remain outside numerical result state' -Description "CP388 terminal numerical nonfeed"
 Assert-Contains -Path $cp386Assertions -Pattern 'supply_node.*report.*reconciled.*numerical_dto' -Description "node/load/report nonfeed set"
 
 $algorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
@@ -299,12 +305,12 @@ Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP386 a
 
 foreach ($historical in 334..385) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp387_lifecycle_evidence' -Description "historical cumulative firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp388_lifecycle_evidence' -Description "historical cumulative firewall"
 }
 foreach ($historical in 335..385) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 325 \|')) -Description "historical generated total"
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 85 \|')) -Description "historical generated internal"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 326 \|')) -Description "historical generated total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 86 \|')) -Description "historical generated internal"
 }
 foreach ($historical in @('cp326-cooling-supply-mass-flow-limit-body.ps1') + @(329..344 | ForEach-Object {
             (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$($_)-*.ps1").Name
@@ -312,7 +318,7 @@ foreach ($historical in @('cp326-cooling-supply-mass-flow-limit-body.ps1') + @(3
     Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$historical" -Pattern "advance_$stem" -Description "historical CP386 helper whitelist"
 }
 $cp345Audit = "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1"
-foreach ($pattern in @('\$cp385Call\s*=', '\$cp386Call\s*=', '\$cp387Call\s*=', 'CP385-to-CP386', 'CP386-to-CP387', 'CP387-to-numerical')) {
+foreach ($pattern in @('\$cp385Call\s*=', '\$cp386Call\s*=', '\$cp387Call\s*=', '\$cp388Call\s*=', 'CP385-to-CP386', 'CP386-to-CP387', 'CP387-to-CP388', 'CP388-to-numerical')) {
     Assert-Contains -Path $cp345Audit -Pattern $pattern -Description "strict CP345 terminal ordering"
 }
 Assert-NotContains -Path $cp345Audit -Pattern '\$cp385Call\s*=.*?total_output_supply_enthalpy_assignment[^\r\n]+\|let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_switch' -Description "combined CP385/CP386 matcher"
@@ -321,22 +327,23 @@ $master = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp385AuditIndex = $master.IndexOf("cp385-cooling-post-saturation-capacity-limit-dehumidification-total-output-supply-enthalpy-assignment.ps1")
 $cp386AuditIndex = $master.IndexOf("cp386-cooling-post-saturation-capacity-limit-dehumidification-control-switch.ps1")
 $cp387AuditIndex = $master.IndexOf("cp387-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1")
+$cp388AuditIndex = $master.IndexOf("cp388-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-sensible-output-assignment.ps1")
 $completionIndex = $master.IndexOf('Write-Host "IdealLoads structure audit complete."')
-if ($cp385AuditIndex -lt 0 -or $cp386AuditIndex -le $cp385AuditIndex -or $cp387AuditIndex -le $cp386AuditIndex -or $completionIndex -le $cp387AuditIndex) {
-    throw "Master audit must dot-source CP386 and CP387 after CP385 before completion"
+if ($cp385AuditIndex -lt 0 -or $cp386AuditIndex -le $cp385AuditIndex -or $cp387AuditIndex -le $cp386AuditIndex -or $cp388AuditIndex -le $cp387AuditIndex -or $completionIndex -le $cp388AuditIndex) {
+    throw "Master audit must dot-source CP386 through CP388 after CP385 before completion"
 }
 $inventory = Read-RepoText -Path "specs\script_inventory.toml"
-foreach ($pattern in @('script_count = 325', 'dev_command_count = 238', 'unused_script_count = 0', 'unreachable_count = 0')) {
+foreach ($pattern in @('script_count = 326', 'dev_command_count = 238', 'unused_script_count = 0', 'unreachable_count = 0')) {
     Assert-Cp386Text -Text $inventory -Pattern $pattern -Description "inventory"
 }
 if ([regex]::Matches($inventory, '(?m)^classification = "public"$').Count -ne 240 -or
-    [regex]::Matches($inventory, '(?m)^classification = "internal"$').Count -ne 85) {
-    throw "CP386 inventory must be exactly 240 public and 85 internal scripts"
+    [regex]::Matches($inventory, '(?m)^classification = "internal"$').Count -ne 86) {
+    throw "CP386 inventory must be exactly 240 public and 86 internal scripts"
 }
 Assert-Cp386Text -Text $inventory -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp386-cooling-post-saturation-capacity-limit-dehumidification-control-switch\.ps1"' -Description "inventory record"
 foreach ($pattern in @(
-        '\| executable script records \| 325 \|', '\| public scripts \| 240 \|',
-        '\| internal scripts \| 85 \|', '\| scripts without callers \| 0 \|'
+        '\| executable script records \| 326 \|', '\| public scripts \| 240 \|',
+        '\| internal scripts \| 86 \|', '\| scripts without callers \| 0 \|'
     )) {
     Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern $pattern -Description "generated inventory"
 }

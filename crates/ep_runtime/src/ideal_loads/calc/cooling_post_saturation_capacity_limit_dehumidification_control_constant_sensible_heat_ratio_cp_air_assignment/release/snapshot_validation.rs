@@ -27,7 +27,7 @@ pub(in crate::ideal_loads) fn cooling_post_saturation_capacity_limit_dehumidific
     })
 }
 
-pub(super) fn snapshot_route(snapshot: Snapshot) -> Option<RetainedRoute> {
+pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option<RetainedRoute> {
     if snapshot.source
         != PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_CONTROL_CONSTANT_SENSIBLE_HEAT_RATIO_CP_AIR_ASSIGNMENT_SOURCE
         || snapshot.first_excluded_source
@@ -120,7 +120,10 @@ pub(super) fn predecessor_snapshot(snapshot: Snapshot) -> Predecessor {
     }
 }
 
-pub(super) fn snapshots_match_bit_exact(mut left: Snapshot, mut right: Snapshot) -> bool {
+pub(in crate::ideal_loads::calc) fn snapshots_match_bit_exact(
+    mut left: Snapshot,
+    mut right: Snapshot,
+) -> bool {
     let predecessor_enthalpy_matches = option_bits_match(
         left.predecessor_resulting_supply_enthalpy_j_per_kg,
         right.predecessor_resulting_supply_enthalpy_j_per_kg,
@@ -151,6 +154,10 @@ pub(super) fn snapshots_match_bit_exact(mut left: Snapshot, mut right: Snapshot)
         && assigned_matches
         && resulting_enthalpy_matches
         && left == right
+}
+
+pub(in crate::ideal_loads::calc) fn snapshot_is_exact(snapshot: Snapshot) -> bool {
+    snapshot_route(snapshot).is_some()
 }
 
 fn option_bits_match(left: Option<f64>, right: Option<f64>) -> bool {
