@@ -37440,3 +37440,34 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 235 `source_mapped`, with 170 required. Script inventory becomes 311 total,
 240 public, 71 internal, and zero unused. Support, readiness, capability,
 numerical, output, conformance, and Roadmap claims remain unchanged.
+
+## CP374 Humidification Supply-Humidity-Ratio Maximum Limit in the Heat-Balance Loop
+
+CP374 maps only pinned `PurchasedAirManager.cc` physical executable line 2250,
+`SupplyHumRatForHumid = min(SupplyHumRatForHumid, PurchAir.MaxHeatSuppAirHumRat);`,
+at commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Four dependency-ordered sites read the CP373 local, read the selected typed
+maximum-heating humidity ratio, apply the source-shaped minimum, and reassign
+the local without claiming C++ operand evaluation order.
+
+Line 2251's result-store maximum is first excluded; rejected guards continue
+at line 2258. Same-call bit-exact CP373 is the sole predecessor and left
+owner. The right value is identity-checked and finite in canonical private
+selected-None. CP320 is parameter corroboration only; CP334, CP354, CP356,
+and CP362 directly corroborate the minimum, while CP361 is a distinct
+left-biased maximum.
+
+The source shape `if left < right { left } else { right }` selects the right
+operand for ties, signed zeros, and unordered NaN comparisons. For active
+counts `AH` and `AN`, `L=R=AH+AN`, each of four sites equals `L`, and total
+sites equal `4*L`. Direct None is zero-site complete-null; private None and
+pure Humidistat cover the active routes.
+
+Binding is CP373-to-CP374-to-unchanged-numerical under
+`purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_lifecycle`.
+No extra clamp, normalization, psychrometrics, coercion, or feed is added;
+CP345 remains result-store supply-humidity owner. Counts remain 32 algorithms,
+293 routines split 58 plus 235 with 170 required, and scripts become 312 total,
+240 public, 72 internal, zero unused, with 238 development commands. Support,
+readiness, conformance, and Roadmap claims remain unchanged.

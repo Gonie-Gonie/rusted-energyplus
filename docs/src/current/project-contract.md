@@ -20165,3 +20165,45 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 71 internal, and zero unused. Parent and Calc status plus support,
 readiness, run state, capability, numerical, output-ownership, conformance,
 and Roadmap claims remain unchanged.
+
+## CP374 Source-Ordered Cooling Humidification Supply-Humidity-Ratio Maximum Limit
+
+CP374 supersedes only CP373's physical-line-2250 exclusion at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`, locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+by mapping
+`SupplyHumRatForHumid = min(SupplyHumRatForHumid, PurchAir.MaxHeatSuppAirHumRat);`.
+Its four dependency-ordered sites read the CP373 local result, read selected
+`PurchAir.MaxHeatSuppAirHumRat`, apply the source-shaped two-argument minimum,
+and reassign the local without claiming C++ operand evaluation order.
+
+Physical executable line 2251,
+`PurchAir.SupplyHumRat = max(PurchAir.SupplyHumRat, SupplyHumRatForHumid);`,
+is first excluded. Rejected nested guards still continue dynamically at line
+2258. For CP373 active counts `AH` and `AN`, assignments `R`, and CP374 limits
+`L`, exact state requires `L=R=AH+AN`, every one of four site counters equals
+`L`, and `source_site_execution_count=4*L`. Public direct None is zero-site
+complete-null; canonical private selected-None and pure Humidistat
+characterization cover the active routes.
+
+Same-call bit-exact CP373 evidence is the sole immediate predecessor and left
+owner. The right operand is the identity-checked selected typed
+`maximum_heating_supply_air_humidity_ratio`, finite at the canonical private
+gate. CP320 is parameter corroboration only. CP334, CP354, CP356, and CP362
+directly corroborate the minimum semantics; CP361 is a distinct left-biased
+maximum.
+
+The canonical ObjexxFCL source shape
+`if left < right { left } else { right }` uses strict-`<` and is right-biased
+for ties, signed zeros, and unordered NaN comparisons. Exact operand/result
+IEEE bits are retained. CP374 adds no clamp beyond the mapped minimum,
+normalization, psychrometric operation, coercion, or feed. Binding orders
+CP373-to-CP374-to-unchanged-numerical under
+`purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_lifecycle`;
+CP345 remains result-store supply-humidity owner.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 312 total,
+240 public, 72 internal, and zero unused; development commands remain 238.
+Support, readiness, capability, numerical, output, conformance, and Roadmap
+claims remain unchanged.

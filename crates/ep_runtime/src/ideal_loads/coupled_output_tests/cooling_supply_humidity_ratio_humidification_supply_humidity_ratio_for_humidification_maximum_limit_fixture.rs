@@ -1,0 +1,12 @@
+use crate::ideal_loads::{
+    PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationAssignmentSnapshot,
+    PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationMaximumLimitSnapshot,
+};
+
+pub(super) fn calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_snapshot(
+    predecessor: PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationAssignmentSnapshot,
+) -> PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationMaximumLimitSnapshot{
+    crate::ideal_loads::coupled_runtime::cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_validation::expected_snapshot(
+        predecessor,
+    )
+}

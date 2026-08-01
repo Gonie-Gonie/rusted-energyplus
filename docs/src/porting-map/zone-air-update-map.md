@@ -24377,3 +24377,36 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 235 `source_mapped`, with 170 required. Script inventory becomes 311 total,
 240 public, 71 internal, and zero unused. Support, readiness, capability,
 numerical, output, conformance, and Roadmap claims remain unchanged.
+
+## CP374 Humidification Supply-Humidity-Ratio Maximum-Limit Placement
+
+CP374 inserts pinned `PurchasedAirManager.cc` physical executable line 2250
+immediately after CP373:
+`SupplyHumRatForHumid = min(SupplyHumRatForHumid, PurchAir.MaxHeatSuppAirHumRat);`.
+The source lock is commit `6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Four dependency-ordered sites read the local, read the selected typed limit,
+apply the minimum, and reassign the local; no C++ operand evaluation order is
+claimed.
+
+Line 2251's result-store maximum is first excluded and rejected guards still
+continue at line 2258. CP373 is the sole bit-exact same-call predecessor and
+left owner. The right operand is identity-checked selected
+`maximum_heating_supply_air_humidity_ratio` and finite in the canonical
+private route. CP320 is parameter corroboration only; CP334, CP354, CP356,
+and CP362 corroborate the minimum, while CP361 is a distinct left-biased
+maximum.
+
+The source-shaped minimum is `if left < right { left } else { right }`, with
+right bias for ties, signed zeros, and unordered NaN comparisons. With CP373
+active counts `AH` and `AN`, `L=R=AH+AN`, each site equals `L`, and total
+sites are `4*L`. Direct None is complete-null and zero-site; canonical private
+None and pure Humidistat cover both active routes.
+
+Placement is CP373-to-CP374-to-unchanged-numerical under
+`purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_lifecycle`.
+CP374 adds no extra clamp, normalization, psychrometrics, coercion, or feed;
+CP345 remains result-store supply-humidity owner. Counts stay 32 algorithms,
+293 routines split 58 plus 235, and 170 required. Scripts become 312 total,
+240 public, 72 internal, zero unused; development commands stay 238. Support,
+readiness, conformance, and Roadmap claims are unchanged.
