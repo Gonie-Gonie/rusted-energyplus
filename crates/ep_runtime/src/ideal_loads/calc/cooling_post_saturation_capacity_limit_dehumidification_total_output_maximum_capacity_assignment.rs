@@ -10,14 +10,15 @@ mod state;
 mod tests;
 mod transition;
 
-#[allow(unused_imports)]
-pub(in crate::ideal_loads::calc) use release::{
-    completed_direct_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_is_consistent,
-    cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_snapshots_match_bit_exact,
-};
 pub use release::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputMaximumCapacityAssignmentError,
     advance_direct_no_oa_calc_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment,
+};
+#[allow(unused_imports)]
+pub(in crate::ideal_loads::calc) use release::{
+    completed_direct_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_is_consistent,
+    cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_control_flow_shape_is_exact,
+    cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_snapshots_match_bit_exact,
 };
 #[allow(unused_imports)]
 pub(in crate::ideal_loads) use release::{
@@ -100,7 +101,7 @@ pub fn purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidificatio
 ) -> Result<
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputMaximumCapacityAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputMaximumCapacityAssignmentError,
-> {
+>{
     let unit = runtime.units.get(&system).ok_or(
         PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputMaximumCapacityAssignmentError::UnknownSystem { system },
     )?;

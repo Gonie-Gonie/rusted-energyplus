@@ -37845,3 +37845,45 @@ algorithms, 293 routines split 58 plus 235 with 170 required, and scripts are
 322 total, 240 public, 82 internal, zero unused/unreachable, with 238 commands.
 Support, readiness, capability, numerical, output, status, and Roadmap claims
 remain unchanged.
+
+## CP385 Post-Saturation Capacity-Limit Dehumidification Total-Output Supply-Enthalpy Assignment in the Heat-Balance Loop
+
+CP385 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+and `PurchasedAirManager.cc` executable line 2270's
+`SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;`
+assignment.
+Its exact ordered sites are
+`read-retained-mixed-air-enthalpy-for-post-saturation-capacity-limited-dehumidification-supply-enthalpy-difference`,
+`read-retained-cooling-total-output-for-post-saturation-capacity-limited-dehumidification-specific-cooling-output-division`,
+`read-retained-supply-mass-flow-rate-for-post-saturation-capacity-limited-dehumidification-specific-cooling-output-division`,
+`calculate-cooling-total-output-divided-by-supply-mass-flow-rate-for-post-saturation-capacity-limited-dehumidification-supply-enthalpy`,
+`calculate-mixed-air-enthalpy-minus-specific-cooling-output-for-post-saturation-capacity-limited-dehumidification-supply-enthalpy`,
+and
+`assign-local-supply-enthalpy-after-post-saturation-capacity-limited-dehumidification-total-output-adjustment`.
+They read the three retained operands, perform division then subtraction, and
+assign local supply enthalpy. Line 2271 is a comment; executable line 2272's
+`switch` is excluded for CP386.
+
+All twenty-three CP384 routes remain distinct: thirteen null skips, five
+guard-false routes preserving CP379 enthalpy without a CP385 site, and five
+CP384 maximum assignments executing every CP385 site. For assignments `S`,
+exact state requires `T385=T384`, `S=M384=E383`, `A383=F+S`, each site
+counter `S`, and `source_site_execution_count=6*S`, with per-lineage parity.
+CP384 is the sole recursively complete predecessor and numerator owner; CP382
+compactly carries CP329 mixed-air enthalpy, CP330 positive flow, and CP379
+preexisting supply enthalpy without replacing their ownership.
+
+Raw binary64 division precedes raw subtraction. No reciprocal, FMA,
+reassociation, algebraic combination, clamp, tolerance, normalization,
+psychrometric recalculation, or finite gate is allowed; exact sidecars preserve
+private IEEE behavior. Heat-balance placement remains evidence-only after
+CP384 and before unchanged numerical coupling. CP385 does not feed or mutate
+coupling, nodes, loads, or reports, and non-direct paths reject its evidence.
+
+No routine, psychrometrics row, or promotion is added. Counts stay 32
+algorithms, 293 routines split 58 plus 235 with 170 required, and scripts are
+323 total, 240 public, 83 internal, zero unused/unreachable, with 238 commands.
+Support, readiness, capability, numerical, output, status, and Roadmap claims
+remain unchanged.

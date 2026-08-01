@@ -4367,3 +4367,61 @@ parent algorithms remain `scaffold`/`none`, and both Calc routines remain
 becomes 322 total, 240 public, 82 internal, zero unused, and zero unreachable;
 development commands remain 238. Support, readiness, capability, numerical,
 output, conformance, status, and Roadmap claims remain unchanged.
+
+## CP385 Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Supply-Enthalpy Assignment
+
+CP385 maps EnergyPlus 26.1 `PurchasedAirManager.cc` executable line 2270,
+`SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;`, at
+pinned commit `6f2e40d10250a105b49966baa24d843711e61048` and locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact ordered sites are
+`read-retained-mixed-air-enthalpy-for-post-saturation-capacity-limited-dehumidification-supply-enthalpy-difference`,
+`read-retained-cooling-total-output-for-post-saturation-capacity-limited-dehumidification-specific-cooling-output-division`,
+`read-retained-supply-mass-flow-rate-for-post-saturation-capacity-limited-dehumidification-specific-cooling-output-division`,
+`calculate-cooling-total-output-divided-by-supply-mass-flow-rate-for-post-saturation-capacity-limited-dehumidification-supply-enthalpy`,
+`calculate-mixed-air-enthalpy-minus-specific-cooling-output-for-post-saturation-capacity-limited-dehumidification-supply-enthalpy`,
+and
+`assign-local-supply-enthalpy-after-post-saturation-capacity-limited-dehumidification-total-output-adjustment`.
+They read the three retained operands, divide output by flow, subtract the
+quotient from mixed-air enthalpy, and assign local supply enthalpy. Source line 2271 is a
+comment; executable line 2272's dehumidification-control `switch` is first
+excluded and reserved for CP386.
+
+All twenty-three CP384 routes remain distinct. Thirteen ancestral `U/N/P/K/X`
+routes remain complete-null zero-site skips. Five CP383 guard-false `F` routes
+execute no CP385 site and preserve CP379 preexisting/resulting supply-enthalpy
+bits. Each of five CP384 maximum assignments executes all six CP385 sites and
+becomes a supply-enthalpy assignment `S`. Exact state requires `T385=T384`,
+`S=M384=E383`, `A383=F+S`, preexisting supply enthalpy on exactly `F+S`
+routes, every read/calculation/write counter equal `S`, and
+`source_site_execution_count=6*S`, including exact per-lineage parity. Eleven
+routes remain public and twelve remain private.
+
+Recursively complete same-call bit-exact CP384 evidence is the sole immediate
+predecessor and owns the numerator through its resulting `CoolTotOutput`.
+Recursively complete same-call CP382 is the compact retained operand bundle:
+CP329 owns mixed-air enthalpy, CP330 owns positive supply mass flow, and CP379
+owns preexisting supply enthalpy. CP382 corroborates those owners but does not
+replace them. CP321 capacity, CP382 pre-cap output, CP383 comparison operands,
+CP339/CP379 old enthalpy as a replacement calculation, and caller, model,
+service, sizing, or numerical-DTO scalars are forbidden substitutes.
+
+CP385 performs one binary64 division and then one binary64 subtraction exactly:
+`specific = cooling_total_output / supply_mass_flow_rate`, followed by
+`result = mixed_air_enthalpy - specific`. It forbids reciprocal
+multiplication, fused multiply-add, reassociation, distribution, the combined
+`(mixed*flow-output)/flow` form, clamps, epsilon logic, normalization,
+psychrometric recalculation, and a line-local finite/result gate. Private raw
+IEEE characterization preserves signed zero, NaN payloads, infinity, and
+nonfinite intermediates/results; JSON uses `null` numeric projections plus
+authoritative exact sidecars. This remains lifecycle evidence only: binding
+order is CP384, then CP385, then unchanged numerical coupling, and CP385 does
+not feed or alter `DirectZonePurchasedAirCouplingInput`, numerical results,
+nodes, loads, or reports.
+
+No routine or psychrometrics-map row and no support or Roadmap promotion are
+added. Both parent algorithms remain `scaffold`/`none`, and both Calc routines
+remain `source_mapped`. Counts remain 32 algorithms and 293 routines, split 58
+`state_mapped` plus 235 `source_mapped`, with 170 required. Script inventory is
+323 total, 240 public, 83 internal, zero unused, and zero unreachable;
+development commands remain 238.

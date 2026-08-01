@@ -22191,3 +22191,46 @@ psychrometrics row, or promotion is added. Counts stay 32 algorithms, 293
 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Scripts
 become 322 total, 240 public, 82 internal, zero unused/unreachable, with 238
 development commands; all support and Roadmap claims remain unchanged.
+
+## CP385 Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Supply-Enthalpy Assignment
+
+CP385 maps pinned `PurchasedAirManager.cc` executable line 2270,
+`SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;`, at
+commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact ordered sites are
+`read-retained-mixed-air-enthalpy-for-post-saturation-capacity-limited-dehumidification-supply-enthalpy-difference`,
+`read-retained-cooling-total-output-for-post-saturation-capacity-limited-dehumidification-specific-cooling-output-division`,
+`read-retained-supply-mass-flow-rate-for-post-saturation-capacity-limited-dehumidification-specific-cooling-output-division`,
+`calculate-cooling-total-output-divided-by-supply-mass-flow-rate-for-post-saturation-capacity-limited-dehumidification-supply-enthalpy`,
+`calculate-mixed-air-enthalpy-minus-specific-cooling-output-for-post-saturation-capacity-limited-dehumidification-supply-enthalpy`,
+and
+`assign-local-supply-enthalpy-after-post-saturation-capacity-limited-dehumidification-total-output-adjustment`.
+They read retained mixed-air enthalpy, cooling output, and supply flow, then
+divide, subtract, and assign. Line 2271 is a comment; executable
+line 2272's dehumidification-control `switch` is first excluded for CP386.
+
+CP384's twenty-three routes persist as thirteen complete-null skips, five
+guard-false routes preserving CP379 supply-enthalpy bits with no CP385 site,
+and five maximum-assignment routes executing all six sites. With CP385
+assignments `S`, exact accounting is `T385=T384`, `S=M384=E383`,
+`A383=F+S`, preexisting enthalpy presence `F+S`, every site counter `S`, and
+`source_site_execution_count=6*S`, including per-lineage parity. Public/private
+routes remain eleven/twelve.
+
+CP384 is the sole recursively complete predecessor and owns the numerator.
+Recursively complete CP382 compactly carries CP329-owned mixed-air enthalpy,
+CP330-owned positive flow, and CP379-owned preexisting supply enthalpy, without
+replacing those owners. Capacity, pre-cap output, comparison, old-enthalpy,
+caller/model/service/DTO substitutes are forbidden.
+
+The witness executes a distinct raw binary64 division and then subtraction,
+without reciprocal multiplication, FMA, reassociation, algebraic combination,
+clamp, tolerance, normalization, psychrometric recalculation, or finite gate.
+Raw IEEE private cases retain exact sidecars while nonfinite JSON numbers are
+`null`. CP385 remains lifecycle evidence between CP384 and unchanged numerical
+coupling; it does not feed/reconcile with numerical coupling, mutate nodes,
+loads, or reports, or promote support. Counts stay 32 algorithms, 293 routines,
+58 `state_mapped`, 235 `source_mapped`, and 170 required. Scripts become 323
+total, 240 public, 83 internal, zero unused/unreachable, with 238 development
+commands; all support and Roadmap claims remain unchanged.

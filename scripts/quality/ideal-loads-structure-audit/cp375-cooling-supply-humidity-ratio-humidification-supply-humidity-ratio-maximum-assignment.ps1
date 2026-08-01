@@ -199,10 +199,10 @@ foreach ($registration in @(
 $cp375BindingText = Read-RepoText -Path $cp375Binding
 $cp374BindingIndexForCp375 = $cp375BindingText.IndexOf("let calculation_${cp374StemForCp375} =")
 $cp375BindingIndex = $cp375BindingText.IndexOf("let calculation_${cp375Stem} =")
-$cp376BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_pre_saturation_original_assignment ="); $cp377BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_saturation_assignment ="); $cp378BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_saturation_limit_assignment ="); $cp379BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_supply_enthalpy_post_saturation_assignment ="); $cp380BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_guard ="); $cp381BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard ="); $cp382BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment ="); $cp383BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_guard ="); $cp384BindingIndexForCp375 = $cp375BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment =")
+$cp376BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_pre_saturation_original_assignment ="); $cp377BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_saturation_assignment ="); $cp378BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_saturation_limit_assignment ="); $cp379BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_supply_enthalpy_post_saturation_assignment ="); $cp380BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_guard ="); $cp381BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard ="); $cp382BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment ="); $cp383BindingIndex = $cp375BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_guard ="); $cp384BindingIndexForCp375 = $cp375BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment ="); $cp385BindingIndexForCp375 = $cp375BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment =")
 $cp375NumericalIndex = $cp375BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
 if ($cp374BindingIndexForCp375 -lt 0 -or $cp375BindingIndex -le $cp374BindingIndexForCp375 -or
-    $cp376BindingIndex -le $cp375BindingIndex -or $cp377BindingIndex -le $cp376BindingIndex -or $cp378BindingIndex -le $cp377BindingIndex -or $cp379BindingIndex -le $cp378BindingIndex -or $cp380BindingIndex -le $cp379BindingIndex -or $cp381BindingIndex -le $cp380BindingIndex -or $cp382BindingIndex -le $cp381BindingIndex -or $cp383BindingIndex -le $cp382BindingIndex -or $cp384BindingIndexForCp375 -le $cp383BindingIndex -or $cp375NumericalIndex -le $cp384BindingIndexForCp375) {
+    $cp376BindingIndex -le $cp375BindingIndex -or $cp377BindingIndex -le $cp376BindingIndex -or $cp378BindingIndex -le $cp377BindingIndex -or $cp379BindingIndex -le $cp378BindingIndex -or $cp380BindingIndex -le $cp379BindingIndex -or $cp381BindingIndex -le $cp380BindingIndex -or $cp382BindingIndex -le $cp381BindingIndex -or $cp383BindingIndex -le $cp382BindingIndex -or $cp384BindingIndexForCp375 -le $cp383BindingIndex -or $cp385BindingIndexForCp375 -le $cp384BindingIndexForCp375 -or $cp375NumericalIndex -le $cp385BindingIndexForCp375) {
     throw "Binding must execute CP374 then CP375 then CP376 before unchanged numerical coupling"
 }
 $cp375Dto = Get-Cp375RustBraceBlock -Text $cp375BindingText.Substring($cp375NumericalIndex) -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{' -Description "numerical DTO"
@@ -216,7 +216,7 @@ Assert-Contains -Path $cp375ArbitraryAssertions -Pattern 'mod cp376_assertions;'
 Assert-Contains -Path $cp375ArbitraryAssertions -Pattern 'cp376_assertions::assert_direct\(runtime, results\)' -Description "CP376 arbitrary direct delegation"
 Assert-Contains -Path $cp375ArbitraryAssertions -Pattern 'cp376_assertions::assert_non_direct\(runtime\)' -Description "CP376 arbitrary non-direct delegation"
 Assert-NotContains -Path $cp375ArbitraryAssertions -Pattern 'assert_numerical_nonfeed\(' -Description "CP375 relinquishes terminal nonfeed"
-Assert-Contains -Path $cp375PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp384_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp375PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp385_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp375PipelineRoot -Pattern $cp375Lifecycle -Description "pipeline lifecycle key"
 Assert-Contains -Path $cp375SnapshotSerialization -Pattern 'json_number|is_finite' -Description "finite JSON projection"
 Assert-Contains -Path $cp375SnapshotSerialization -Pattern '_ieee_bits' -Description "authoritative IEEE sidecars"
@@ -290,16 +290,16 @@ foreach ($historical in @("cp326-cooling-supply-mass-flow-limit-body.ps1") + @(
 }
 foreach ($historical in 334..374) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp384_lifecycle_evidence' -Description "historical CP375 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp385_lifecycle_evidence' -Description "historical CP375 firewall"
 }
 foreach ($historical in 335..374) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 322 \|')) -Description "historical generated total"
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 82 \|')) -Description "historical generated internal"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 323 \|')) -Description "historical generated total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 83 \|')) -Description "historical generated internal"
 }
 foreach ($historical in 337..374) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 322' -Description "historical inventory total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 323' -Description "historical inventory total"
 }
 $cp375MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp374AuditIndexForCp375 = $cp375MainAuditText.IndexOf("cp374-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-maximum-limit.ps1")
@@ -310,18 +310,18 @@ if ($cp374AuditIndexForCp375 -lt 0 -or $cp375AuditIndex -le $cp374AuditIndexForC
     throw "Master audit must dot-source CP375 after CP374 before completion"
 }
 $cp375InventoryText = Read-RepoText -Path "specs\script_inventory.toml"
-Assert-Cp375TextContains -Text $cp375InventoryText -Pattern 'script_count = 322' -Description "script total"
+Assert-Cp375TextContains -Text $cp375InventoryText -Pattern 'script_count = 323' -Description "script total"
 Assert-Cp375TextContains -Text $cp375InventoryText -Pattern 'dev_command_count = 238' -Description "stable dev-command total"
 Assert-Cp375TextContains -Text $cp375InventoryText -Pattern 'unused_script_count = 0' -Description "zero unused"
 if ([regex]::Matches($cp375InventoryText, '(?m)^classification = "public"$').Count -ne 240 -or
-    [regex]::Matches($cp375InventoryText, '(?m)^classification = "internal"$').Count -ne 82) {
-    throw "CP376 inventory must be exactly 240 public and 82 internal scripts"
+    [regex]::Matches($cp375InventoryText, '(?m)^classification = "internal"$').Count -ne 83) {
+    throw "CP376 inventory must be exactly 240 public and 83 internal scripts"
 }
 Assert-Cp375TextContains -Text $cp375InventoryText -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp375-' -Description "inventory record"
 Assert-Cp375TextContains -Text $cp375InventoryText -Pattern 'ideal-loads-structure-audit\.ps1::dot_sources' -Description "caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 322 \|' -Description "generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 323 \|' -Description "generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 82 \|' -Description "generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 83 \|' -Description "generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated unused"
 
 Write-Host "CP375 Cooling humidification supply-humidity-ratio maximum-assignment structure audit passed."

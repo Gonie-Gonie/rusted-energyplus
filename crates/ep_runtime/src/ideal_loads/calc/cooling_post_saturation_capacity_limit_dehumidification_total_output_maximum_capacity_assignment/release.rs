@@ -31,6 +31,7 @@ use runtime_validation::{
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_snapshot_is_exact_direct_release;
 pub(in crate::ideal_loads::calc) use snapshot_validation::{
+    cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_control_flow_shape_is_exact,
     snapshots_match_bit_exact as cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_snapshots_match_bit_exact,
 };
 

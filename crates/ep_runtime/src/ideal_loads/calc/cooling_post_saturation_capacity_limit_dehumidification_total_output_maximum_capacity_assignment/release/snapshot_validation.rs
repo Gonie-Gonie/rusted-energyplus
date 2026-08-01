@@ -51,7 +51,7 @@ pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option
             != PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_TOTAL_OUTPUT_MAXIMUM_CAPACITY_ASSIGNMENT_FIRST_EXCLUDED_SOURCE
         || snapshot.source_order
             != PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_TOTAL_OUTPUT_MAXIMUM_CAPACITY_ASSIGNMENT_SOURCE_ORDER
-        || base_flags(snapshot).into_iter().filter(|flag| *flag).count() != 1
+        || !cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_control_flow_shape_is_exact(snapshot)
     {
         return None;
     }
@@ -72,9 +72,6 @@ pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option
         return dehumidification_guard_false_is_exact(snapshot)
             .then(|| inactive_route(snapshot, InactiveKind::Dehumidification));
     }
-    if !active_prefix_is_exact(snapshot) {
-        return None;
-    }
     if snapshot.predecessor_dehumidification_total_output_capacity_guard_false_fallthrough {
         guard_false_is_exact(snapshot).then(|| active_route(snapshot, false))
     } else if snapshot
@@ -86,7 +83,40 @@ pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option
     }
 }
 
+pub(in crate::ideal_loads::calc) fn cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_control_flow_shape_is_exact(
+    snapshot: Snapshot,
+) -> bool {
+    if base_flags(snapshot)
+        .into_iter()
+        .filter(|flag| *flag)
+        .count()
+        != 1
+    {
+        return false;
+    }
+    if snapshot.unit_off_skipped
+        || snapshot.non_cooling_skipped
+        || snapshot.positive_guard_false_fallthrough_skipped
+    {
+        complete_skip_control_flow_is_exact(snapshot)
+    } else if snapshot.predecessor_active_capacity_limit_guard_false_fallthrough {
+        capacity_guard_false_control_flow_is_exact(snapshot)
+    } else if snapshot.predecessor_dehumidification_guard_false_fallthrough {
+        dehumidification_guard_false_control_flow_is_exact(snapshot)
+    } else if snapshot.predecessor_dehumidification_total_output_capacity_guard_false_fallthrough {
+        guard_false_control_flow_is_exact(snapshot)
+    } else if snapshot.predecessor_dehumidification_total_output_capacity_adjustment_body_entered {
+        assignment_control_flow_is_exact(snapshot)
+    } else {
+        false
+    }
+}
+
 fn complete_skip_is_exact(snapshot: Snapshot) -> bool {
+    complete_skip_control_flow_is_exact(snapshot) && line_fields_are_skipped(snapshot)
+}
+
+fn complete_skip_control_flow_is_exact(snapshot: Snapshot) -> bool {
     !snapshot.predecessor_capacity_limit_guard_evaluated
         && !snapshot.predecessor_capacity_limit_body_entered
         && !snapshot.predecessor_active_capacity_limit_guard_false_fallthrough
@@ -97,10 +127,15 @@ fn complete_skip_is_exact(snapshot: Snapshot) -> bool {
         && !snapshot.predecessor_dehumidification_total_output_capacity_guard_evaluated
         && !snapshot.predecessor_dehumidification_total_output_capacity_adjustment_body_entered
         && !snapshot.predecessor_dehumidification_total_output_capacity_guard_false_fallthrough
-        && line_fields_are_skipped(snapshot)
+        && !snapshot.dehumidification_total_output_capacity_guard_false_fallthrough
+        && !snapshot.dehumidification_total_output_maximum_capacity_assignment_executed
 }
 
 fn capacity_guard_false_is_exact(snapshot: Snapshot) -> bool {
+    capacity_guard_false_control_flow_is_exact(snapshot) && line_fields_are_skipped(snapshot)
+}
+
+fn capacity_guard_false_control_flow_is_exact(snapshot: Snapshot) -> bool {
     snapshot.predecessor_capacity_limit_guard_evaluated
         && !snapshot.predecessor_capacity_limit_body_entered
         && snapshot.predecessor_active_capacity_limit_guard_false_fallthrough
@@ -111,10 +146,16 @@ fn capacity_guard_false_is_exact(snapshot: Snapshot) -> bool {
         && !snapshot.predecessor_dehumidification_total_output_capacity_guard_evaluated
         && !snapshot.predecessor_dehumidification_total_output_capacity_adjustment_body_entered
         && !snapshot.predecessor_dehumidification_total_output_capacity_guard_false_fallthrough
-        && line_fields_are_skipped(snapshot)
+        && !snapshot.dehumidification_total_output_capacity_guard_false_fallthrough
+        && !snapshot.dehumidification_total_output_maximum_capacity_assignment_executed
 }
 
 fn dehumidification_guard_false_is_exact(snapshot: Snapshot) -> bool {
+    dehumidification_guard_false_control_flow_is_exact(snapshot)
+        && line_fields_are_skipped(snapshot)
+}
+
+fn dehumidification_guard_false_control_flow_is_exact(snapshot: Snapshot) -> bool {
     snapshot.predecessor_capacity_limit_guard_evaluated
         && snapshot.predecessor_capacity_limit_body_entered
         && !snapshot.predecessor_active_capacity_limit_guard_false_fallthrough
@@ -125,7 +166,8 @@ fn dehumidification_guard_false_is_exact(snapshot: Snapshot) -> bool {
         && !snapshot.predecessor_dehumidification_total_output_capacity_guard_evaluated
         && !snapshot.predecessor_dehumidification_total_output_capacity_adjustment_body_entered
         && !snapshot.predecessor_dehumidification_total_output_capacity_guard_false_fallthrough
-        && line_fields_are_skipped(snapshot)
+        && !snapshot.dehumidification_total_output_capacity_guard_false_fallthrough
+        && !snapshot.dehumidification_total_output_maximum_capacity_assignment_executed
 }
 
 fn active_prefix_is_exact(snapshot: Snapshot) -> bool {
@@ -158,16 +200,21 @@ fn guard_false_is_exact(snapshot: Snapshot) -> bool {
     ) else {
         return false;
     };
-    !snapshot
-        .predecessor_dehumidification_total_output_capacity_adjustment_body_entered
-        && snapshot.dehumidification_total_output_capacity_guard_false_fallthrough
-        && !snapshot.dehumidification_total_output_maximum_capacity_assignment_executed
+    guard_false_control_flow_is_exact(snapshot)
         && !snapshot.cp383_retained_maximum_total_cooling_capacity_owned_read
         && !snapshot.maximum_total_cooling_capacity_read
         && snapshot.maximum_total_cooling_capacity_w.is_none()
         && !snapshot.cooling_total_output_assigned
         && snapshot.assigned_cooling_total_output_w.is_none()
         && preexisting.to_bits() == resulting.to_bits()
+}
+
+fn guard_false_control_flow_is_exact(snapshot: Snapshot) -> bool {
+    active_prefix_is_exact(snapshot)
+        && !snapshot.predecessor_dehumidification_total_output_capacity_adjustment_body_entered
+        && snapshot.predecessor_dehumidification_total_output_capacity_guard_false_fallthrough
+        && snapshot.dehumidification_total_output_capacity_guard_false_fallthrough
+        && !snapshot.dehumidification_total_output_maximum_capacity_assignment_executed
 }
 
 fn assignment_is_exact(snapshot: Snapshot) -> bool {
@@ -179,15 +226,21 @@ fn assignment_is_exact(snapshot: Snapshot) -> bool {
     ) else {
         return false;
     };
-    !snapshot.predecessor_dehumidification_total_output_capacity_guard_false_fallthrough
-        && !snapshot.dehumidification_total_output_capacity_guard_false_fallthrough
-        && snapshot.dehumidification_total_output_maximum_capacity_assignment_executed
+    assignment_control_flow_is_exact(snapshot)
         && snapshot.cp383_retained_maximum_total_cooling_capacity_owned_read
         && snapshot.maximum_total_cooling_capacity_read
         && snapshot.cooling_total_output_assigned
         && preexisting > maximum
         && maximum.to_bits() == assigned.to_bits()
         && maximum.to_bits() == resulting.to_bits()
+}
+
+fn assignment_control_flow_is_exact(snapshot: Snapshot) -> bool {
+    active_prefix_is_exact(snapshot)
+        && snapshot.predecessor_dehumidification_total_output_capacity_adjustment_body_entered
+        && !snapshot.predecessor_dehumidification_total_output_capacity_guard_false_fallthrough
+        && !snapshot.dehumidification_total_output_capacity_guard_false_fallthrough
+        && snapshot.dehumidification_total_output_maximum_capacity_assignment_executed
 }
 
 enum InactiveKind {

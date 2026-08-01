@@ -24776,3 +24776,45 @@ algorithms, 293 routines split 58 plus 235, and 170 required. Scripts become
 322 total, 240 public, 82 internal, zero unused and zero unreachable;
 development commands stay 238. Support, readiness, capability, numerical,
 output, conformance, status, and Roadmap claims remain unchanged.
+
+## CP385 Post-Saturation Capacity-Limit Dehumidification Total-Output Supply-Enthalpy Assignment Placement
+
+CP385 maps `PurchasedAirManager.cc` executable line 2270,
+`SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput / SupplyMassFlowRate;`, at
+pinned commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact ordered sites are
+`read-retained-mixed-air-enthalpy-for-post-saturation-capacity-limited-dehumidification-supply-enthalpy-difference`,
+`read-retained-cooling-total-output-for-post-saturation-capacity-limited-dehumidification-specific-cooling-output-division`,
+`read-retained-supply-mass-flow-rate-for-post-saturation-capacity-limited-dehumidification-specific-cooling-output-division`,
+`calculate-cooling-total-output-divided-by-supply-mass-flow-rate-for-post-saturation-capacity-limited-dehumidification-supply-enthalpy`,
+`calculate-mixed-air-enthalpy-minus-specific-cooling-output-for-post-saturation-capacity-limited-dehumidification-supply-enthalpy`,
+and
+`assign-local-supply-enthalpy-after-post-saturation-capacity-limited-dehumidification-total-output-adjustment`.
+They read retained mixed-air enthalpy, CP384 cooling output, and supply flow,
+then divide, subtract, and assign. Line 2271 is a comment and executable line
+2272's dehumidification-control `switch` is first excluded for CP386.
+
+The twenty-three routes remain thirteen null skips, five guard-false routes
+preserving CP379 supply-enthalpy bits without a CP385 site, and five CP384
+maximum assignments executing all six sites. Exact state is `T385=T384`,
+`S=M384=E383`, `A383=F+S`, each site counter `S`, and
+`source_site_execution_count=6*S`, with exact lineage partitions and an
+unchanged eleven/twelve public/private split. CP384 is the sole recursively
+complete predecessor and numerator owner. CP382 compactly carries CP329-owned
+mixed-air enthalpy, CP330-owned positive flow, and CP379-owned preexisting
+supply enthalpy without replacing those owners.
+
+Separate raw binary64 division then subtraction preserves source grouping;
+reciprocal multiplication, FMA, reassociation, algebraic combination, clamp,
+tolerance, normalization, psychrometric recalculation, and finite gates are
+forbidden. Nonfinite JSON numbers use `null` with exact IEEE sidecars. CP385 is
+lifecycle evidence only, placed after CP384 and before unchanged numerical
+coupling. It does not update a zone node or mutate/feed/reconcile with
+numerical, supply, load, or report state.
+
+No routine, psychrometrics row, or promotion is added. Counts stay 32
+algorithms, 293 routines split 58 plus 235, and 170 required. Scripts become
+323 total, 240 public, 83 internal, zero unused and zero unreachable;
+development commands stay 238. Support, readiness, capability, numerical,
+output, conformance, status, and Roadmap claims remain unchanged.

@@ -226,7 +226,7 @@ $cp372BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_
 $cp373BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment =")
 $cp374BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit =")
 $cp375BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment =")
-$cp376BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_pre_saturation_original_assignment ="); $cp377BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_saturation_assignment ="); $cp378BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_saturation_limit_assignment ="); $cp379BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_supply_enthalpy_post_saturation_assignment ="); $cp380BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_guard ="); $cp381BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard ="); $cp382BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment ="); $cp383BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_guard ="); $cp384BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment =")
+$cp376BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_pre_saturation_original_assignment ="); $cp377BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_saturation_assignment ="); $cp378BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_supply_humidity_ratio_saturation_limit_assignment ="); $cp379BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_supply_enthalpy_post_saturation_assignment ="); $cp380BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_guard ="); $cp381BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard ="); $cp382BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment ="); $cp383BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_guard ="); $cp384BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment ="); $cp385BindingIndexForCp361 = $cp361BindingText.IndexOf("let calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment =")
 $cp361NumericalIndex = $cp361BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
 if ($cp360BindingIndexForCp361 -lt 0 -or $cp361BindingIndex -le $cp360BindingIndexForCp361 -or $cp362BindingIndexForCp361 -le $cp361BindingIndex -or $cp363BindingIndexForCp361 -le $cp362BindingIndexForCp361 -or $cp364BindingIndexForCp361 -le $cp363BindingIndexForCp361 -or $cp365BindingIndexForCp361 -le $cp364BindingIndexForCp361 -or $cp366BindingIndexForCp361 -le $cp365BindingIndexForCp361 -or $cp367BindingIndexForCp361 -le $cp366BindingIndexForCp361 -or $cp368BindingIndexForCp361 -le $cp367BindingIndexForCp361 -or
     $cp361NumericalIndex -le $cp368BindingIndexForCp361 -or
@@ -237,7 +237,7 @@ if ($cp360BindingIndexForCp361 -lt 0 -or $cp361BindingIndex -le $cp360BindingInd
     $cp373BindingIndexForCp361 -le $cp372BindingIndexForCp361 -or
     $cp374BindingIndexForCp361 -le $cp373BindingIndexForCp361 -or
     $cp375BindingIndexForCp361 -le $cp374BindingIndexForCp361 -or
-    $cp376BindingIndexForCp361 -le $cp375BindingIndexForCp361 -or $cp377BindingIndexForCp361 -le $cp376BindingIndexForCp361 -or $cp378BindingIndexForCp361 -le $cp377BindingIndexForCp361 -or $cp379BindingIndexForCp361 -le $cp378BindingIndexForCp361 -or $cp380BindingIndexForCp361 -le $cp379BindingIndexForCp361 -or $cp381BindingIndexForCp361 -le $cp380BindingIndexForCp361 -or $cp382BindingIndexForCp361 -le $cp381BindingIndexForCp361 -or $cp383BindingIndexForCp361 -le $cp382BindingIndexForCp361 -or $cp384BindingIndexForCp361 -le $cp383BindingIndexForCp361 -or $cp361NumericalIndex -le $cp384BindingIndexForCp361) {
+    $cp376BindingIndexForCp361 -le $cp375BindingIndexForCp361 -or $cp377BindingIndexForCp361 -le $cp376BindingIndexForCp361 -or $cp378BindingIndexForCp361 -le $cp377BindingIndexForCp361 -or $cp379BindingIndexForCp361 -le $cp378BindingIndexForCp361 -or $cp380BindingIndexForCp361 -le $cp379BindingIndexForCp361 -or $cp381BindingIndexForCp361 -le $cp380BindingIndexForCp361 -or $cp382BindingIndexForCp361 -le $cp381BindingIndexForCp361 -or $cp383BindingIndexForCp361 -le $cp382BindingIndexForCp361 -or $cp384BindingIndexForCp361 -le $cp383BindingIndexForCp361 -or $cp385BindingIndexForCp361 -le $cp384BindingIndexForCp361 -or $cp361NumericalIndex -le $cp385BindingIndexForCp361) {
     throw "Binding must execute CP360 through CP370 before numerical coupling"
 }
 $cp361Dto = Get-Cp361RustBraceBlock -Text $cp361BindingText.Substring($cp361NumericalIndex) -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{' -Description "CP361 numerical DTO"
@@ -261,7 +261,7 @@ Assert-Contains -Path $cp361Fixture -Pattern ('calculation_' + [regex]::Escape($
 Assert-Contains -Path $cp361PipelineRoot -Pattern ('mod ' + [regex]::Escape($cp361PipelineStem) + ';') -Description "CP361 pipeline module"
 Assert-Contains -Path $cp361PipelineRoot -Pattern ('"' + $cp361Lifecycle + '":\s*result\s*\.' + $cp361Lifecycle) -Description "CP361 lifecycle JSON"
 Assert-Contains -Path $cp361PipelineValidation -Pattern 'supply_humidity_ratio_assignment_cp360' -Description "pipeline CP360 predecessor"
-Assert-Contains -Path $cp361PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp384_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp361PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp385_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp361ParentAssertions -Pattern 'mod cp361_assertions;' -Description "arbitrary CP361 delegation"
 Assert-Contains -Path $cp361ParentAssertions -Pattern 'cp361_assertions::assert_direct\(runtime, results\)' -Description "arbitrary CP361 direct delegation"
 Assert-Contains -Path $cp361ParentAssertions -Pattern 'cp361_assertions::assert_non_direct\(runtime\)' -Description "arbitrary CP361 non-direct delegation"
@@ -357,16 +357,16 @@ foreach ($number in $cp361BindingHistory) {
 }
 foreach ($number in 334..360) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$number-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp384_lifecycle_evidence' -Description "historical CP363 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp385_lifecycle_evidence' -Description "historical CP363 firewall"
 }
 foreach ($number in 335..360) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$number-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 322 \|')) -Description "historical current generated total"
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 82 \|')) -Description "historical current generated internal"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 323 \|')) -Description "historical current generated total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 83 \|')) -Description "historical current generated internal"
 }
 foreach ($number in 337..360) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$number-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 322' -Description "historical current script inventory total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 323' -Description "historical current script inventory total"
 }
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp360-cooling-humidistat-supply-humidity-ratio-for-dehumidification-assignment.ps1" -Pattern '298 total' -Description "CP360 historical script claim"
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp360-cooling-humidistat-supply-humidity-ratio-for-dehumidification-assignment.ps1" -Pattern '58 internal' -Description "CP360 historical internal claim"
@@ -377,13 +377,13 @@ $cp361CompletionIndex = $cp361MainAuditText.IndexOf('Write-Host "IdealLoads stru
 if ($cp360AuditIndexForCp361 -lt 0 -or $cp361AuditIndex -le $cp360AuditIndexForCp361 -or $cp361CompletionIndex -le $cp361AuditIndex) {
     throw "Master audit must dot-source CP361 after CP360 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 322' -Description "CP361 script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 323' -Description "CP361 script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP361 zero uncalled"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp361-' -Description "CP361 inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'cp361-cooling-humidistat-supply-humidity-ratio-for-dehumidification-minimum-limit\.ps1::dot_sources' -Description "CP361 caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 322 \|' -Description "generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 323 \|' -Description "generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 82 \|' -Description "generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 83 \|' -Description "generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated uncalled"
 
 Write-Host "CP361 Humidistat supply-humidity-ratio-for-dehumidification minimum-limit structure audit passed."
