@@ -22,6 +22,8 @@ pub(in crate::ideal_loads) use release::{
 };
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_switch_is_consistent;
+pub(in crate::ideal_loads::calc) use release::cooling_post_saturation_capacity_limit_dehumidification_control_switch_snapshot_is_exact;
+pub(in crate::ideal_loads::calc) use release::cooling_post_saturation_capacity_limit_dehumidification_control_switch_snapshots_match_bit_exact;
 pub use state::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlSwitchRuntimeState;
 pub(in crate::ideal_loads) use transition::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlSwitchActiveInput;
 pub(in crate::ideal_loads::calc) use transition::advance_cooling_post_saturation_capacity_limit_dehumidification_control_switch_state;

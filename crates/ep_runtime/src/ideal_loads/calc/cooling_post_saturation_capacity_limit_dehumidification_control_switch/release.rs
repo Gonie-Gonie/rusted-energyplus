@@ -29,6 +29,8 @@ use runtime_validation::{
     pending_state_is_consistent, prepare_next_transition, prepared_completed_state_is_consistent,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_post_saturation_capacity_limit_dehumidification_control_switch_snapshot_is_exact_direct_release;
+pub(in crate::ideal_loads::calc) use snapshot_validation::cooling_post_saturation_capacity_limit_dehumidification_control_switch_snapshot_is_exact;
+pub(in crate::ideal_loads::calc) use snapshot_validation::cooling_post_saturation_capacity_limit_dehumidification_control_switch_snapshots_match_bit_exact;
 
 pub(in crate::ideal_loads::calc) fn completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_switch_is_consistent(
     runtime: &PurchasedAirRuntimeState,

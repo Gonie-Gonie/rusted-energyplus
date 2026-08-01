@@ -37927,3 +37927,35 @@ algorithms, 293 routines split 58 plus 235 with 170 required, and scripts are
 324 total, 240 public, 84 internal, zero unused/unreachable, with 238 commands.
 Support, readiness, capability, numerical, output, status, and Roadmap claims
 remain unchanged.
+
+## CP387 Post-Saturation Constant-SHR CpAir in the Heat-Balance Loop
+
+CP387 advances the direct purchased-air heat-balance witness through pinned
+`PurchasedAirManager.cc` physical lines 2273-2277 at commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It enters the constant-SHR case, reads CP329-owned mixed-air humidity,
+evaluates canonical stateless `energyplus_psy_cp_air_fn_w`, and assigns local
+`CpAir`. Physical line 2278's sensible-output multiplication is first excluded
+for CP388.
+
+The thirty CP386 histories remain distinct: three private constant-SHR routes
+execute all four sites and twenty-seven skip them. Exact direct execution has
+eleven public `None` routes, all null skips. Exact accounting is `T387=T386`,
+`K=DSHR386`, each site counter `K`, and
+`source_site_execution_count=4*K`, with the eleven/nineteen public/private
+split unchanged.
+
+Same-call bit-exact CP386 is the sole predecessor and same-call CP329 solely
+owns the private operand. Earlier CpAir values and caller/model/service/DTO
+substitutes are rejected. Private active admission is finite
+`MixedAirHumRat >= 0.0` plus a finite canonical result; C++ cache/sentinel and
+mutable service history are excluded. CP385 enthalpy is preserved bit-exact.
+
+Placement is CP386-to-CP387-to-unchanged numerical coupling. CP387 does not
+feed or mutate numerical, node, load, or report state, and non-direct paths
+reject it. No routine, psychrometrics row, or promotion is added. Counts stay
+32 algorithms, 293 routines split 58 plus 235 with 170 required; scripts are
+325 total, 240 public, 85 internal, zero unused/unreachable, with 238 commands.
+Support, readiness, capability, numerical, output, status, and Roadmap claims
+remain unchanged.

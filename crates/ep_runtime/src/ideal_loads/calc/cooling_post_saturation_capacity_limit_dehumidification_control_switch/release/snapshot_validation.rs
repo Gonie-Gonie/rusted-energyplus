@@ -34,6 +34,19 @@ pub(in crate::ideal_loads) fn cooling_post_saturation_capacity_limit_dehumidific
     ) && route.selected_case.is_none_or(|selector| selector == DehumidificationControlType::None)
 }
 
+pub(in crate::ideal_loads::calc) fn cooling_post_saturation_capacity_limit_dehumidification_control_switch_snapshot_is_exact(
+    snapshot: Snapshot,
+) -> bool {
+    snapshot_route(snapshot).is_some()
+}
+
+pub(in crate::ideal_loads::calc) fn cooling_post_saturation_capacity_limit_dehumidification_control_switch_snapshots_match_bit_exact(
+    left: Snapshot,
+    right: Snapshot,
+) -> bool {
+    snapshots_match_bit_exact(left, right)
+}
+
 pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option<RetainedRoute> {
     if snapshot.source
         != PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_CONTROL_SWITCH_SOURCE

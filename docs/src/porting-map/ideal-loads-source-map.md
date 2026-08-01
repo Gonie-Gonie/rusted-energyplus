@@ -22286,3 +22286,52 @@ algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
 required. Scripts become 324 total, 240 public, 84 internal, zero
 unused/unreachable, with 238 development commands; all support and Roadmap
 claims remain unchanged.
+
+## CP387 Post-Saturation Constant-SHR CpAir Assignment
+
+CP387 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+and `PurchasedAirManager.cc` physical lines 2273-2277:
+
+```cpp
+case HumControl::ConstantSensibleHeatRatio: {
+    // Adjust both supply temp and humidity ratio to maintain SHR
+    // SHR = CoolSensOutput/CoolTotOutput
+    // CoolSensOutput = SHR*CoolTotOutput
+    CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);
+```
+
+The four exact sites enter the case, read the retained mixed-air humidity
+ratio, evaluate canonical `PsyCpAirFnW`, and assign local `CpAir`:
+`enter-purchased-air-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case`,
+`read-purchased-air-mixed-air-humidity-ratio-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-cp-air`,
+`evaluate-psy-cp-air-fn-w-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-cp-air`,
+and
+`assign-local-cp-air-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-case`.
+Line 2278, `CoolSensOutput = CoolTotOutput * PurchAir.CoolSHR;`, is first
+excluded and is the CP388 boundary.
+
+All thirty CP386 routes remain distinct. Three private constant-SHR selections
+execute all four sites; twenty-seven routes skip them. Thus
+`T387=T386`, assignment count `K=DSHR386`, every site counter equals `K`, and
+`source_site_execution_count=4*K`, with exact thirty-route parity. The eleven
+exact-direct `None` routes all skip CP387 and retain null CpAir evidence;
+nineteen routes remain private.
+
+Same-call recursively complete, bit-exact CP386 is the sole immediate
+predecessor. Same-call CP329 mixed-air humidity solely owns the private
+operand; CP331/CP338 prior CpAir values and Zone/supply/caller/model/service/
+DTO substitutes are excluded. The private active transition calls stateless
+`energyplus_psy_cp_air_fn_w`, requires finite nonnegative humidity and a finite
+result, and assigns the exact result bits. C++ local cache/sentinel/first-call
+and mutable-service behavior remain outside the claim. CP385 enthalpy is
+carried bit-exact.
+
+Lifecycle placement is CP386, then CP387, then unchanged numerical coupling.
+CP387 never enters or feeds `DirectZonePurchasedAirCouplingInput`, numerical
+results, nodes, loads, or reports; non-direct paths reject it. No routine,
+psychrometrics row, support, numerical, or Roadmap promotion occurs. Counts
+stay 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and
+170 required. Scripts become 325 total, 240 public, 85 internal, zero
+unused/unreachable, with 238 development commands.

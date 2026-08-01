@@ -1,0 +1,92 @@
+//! JSON serialization for one CP387 case-entry and `CpAir` assignment snapshot.
+
+use ep_model::DehumidificationControlType;
+use ep_runtime::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCpAirAssignmentSnapshot;
+use serde_json::{Value, json};
+
+pub(super) fn snapshot_json(
+    snapshot: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCpAirAssignmentSnapshot,
+) -> Value {
+    json!({
+        "source": snapshot.source,
+        "first_excluded_source": snapshot.first_excluded_source,
+        "source_order": snapshot.source_order,
+        "system": snapshot.system.0,
+        "parent_call_ordinal": snapshot.parent_call_ordinal,
+        "controlled_zone": snapshot.controlled_zone.0,
+        "unit_off_skipped": snapshot.unit_off_skipped,
+        "non_cooling_skipped": snapshot.non_cooling_skipped,
+        "positive_guard_false_fallthrough_skipped": snapshot.positive_guard_false_fallthrough_skipped,
+        "heating_availability_guard_false_fallthrough": snapshot.heating_availability_guard_false_fallthrough,
+        "humidification_control_guard_false_fallthrough": snapshot.humidification_control_guard_false_fallthrough,
+        "dehumidification_control_humidistat_maximum_assignment_executed": snapshot.dehumidification_control_humidistat_maximum_assignment_executed,
+        "dehumidification_control_none_maximum_assignment_executed": snapshot.dehumidification_control_none_maximum_assignment_executed,
+        "dehumidification_control_guard_false_fallthrough": snapshot.dehumidification_control_guard_false_fallthrough,
+        "predecessor_capacity_limit_guard_evaluated": snapshot.predecessor_capacity_limit_guard_evaluated,
+        "predecessor_capacity_limit_body_entered": snapshot.predecessor_capacity_limit_body_entered,
+        "predecessor_active_capacity_limit_guard_false_fallthrough": snapshot.predecessor_active_capacity_limit_guard_false_fallthrough,
+        "predecessor_dehumidification_guard_evaluated": snapshot.predecessor_dehumidification_guard_evaluated,
+        "predecessor_dehumidification_body_entered": snapshot.predecessor_dehumidification_body_entered,
+        "predecessor_dehumidification_guard_false_fallthrough": snapshot.predecessor_dehumidification_guard_false_fallthrough,
+        "predecessor_dehumidification_total_output_assignment_executed": snapshot.predecessor_dehumidification_total_output_assignment_executed,
+        "predecessor_dehumidification_total_output_capacity_guard_evaluated": snapshot.predecessor_dehumidification_total_output_capacity_guard_evaluated,
+        "predecessor_dehumidification_total_output_capacity_adjustment_body_entered": snapshot.predecessor_dehumidification_total_output_capacity_adjustment_body_entered,
+        "predecessor_dehumidification_total_output_capacity_guard_false_fallthrough": snapshot.predecessor_dehumidification_total_output_capacity_guard_false_fallthrough,
+        "dehumidification_total_output_capacity_guard_false_fallthrough": snapshot.dehumidification_total_output_capacity_guard_false_fallthrough,
+        "dehumidification_total_output_maximum_capacity_assignment_executed": snapshot.dehumidification_total_output_maximum_capacity_assignment_executed,
+        "predecessor_supply_enthalpy_assignment_executed": snapshot.predecessor_supply_enthalpy_assignment_executed,
+        "predecessor_dehumidification_control_type_read": snapshot.predecessor_dehumidification_control_type_read,
+        "predecessor_dehumidification_control_type": snapshot.predecessor_dehumidification_control_type.map(control_type_name),
+        "predecessor_dehumidification_control_switch_dispatched": snapshot.predecessor_dehumidification_control_switch_dispatched,
+        "predecessor_resulting_supply_enthalpy_j_per_kg": json_number(snapshot.predecessor_resulting_supply_enthalpy_j_per_kg),
+        "predecessor_resulting_supply_enthalpy_j_per_kg_ieee_bits": ieee_bits(snapshot.predecessor_resulting_supply_enthalpy_j_per_kg),
+        "dehumidification_control_constant_sensible_heat_ratio_case_entered": snapshot.dehumidification_control_constant_sensible_heat_ratio_case_entered,
+        "dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_executed": snapshot.dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_executed,
+        "mixed_air_humidity_ratio_read": snapshot.mixed_air_humidity_ratio_read,
+        "mixed_air_humidity_ratio": json_number(snapshot.mixed_air_humidity_ratio),
+        "mixed_air_humidity_ratio_ieee_bits": ieee_bits(snapshot.mixed_air_humidity_ratio),
+        "psychrometric_cp_air_evaluated": snapshot.psychrometric_cp_air_evaluated,
+        "psychrometric_cp_air_result_j_per_kg_k": json_number(snapshot.psychrometric_cp_air_result_j_per_kg_k),
+        "psychrometric_cp_air_result_j_per_kg_k_ieee_bits": ieee_bits(snapshot.psychrometric_cp_air_result_j_per_kg_k),
+        "cp_air_assigned": snapshot.cp_air_assigned,
+        "cp_air_j_per_kg_k": json_number(snapshot.cp_air_j_per_kg_k),
+        "cp_air_j_per_kg_k_ieee_bits": ieee_bits(snapshot.cp_air_j_per_kg_k),
+        "resulting_supply_enthalpy_j_per_kg": json_number(snapshot.resulting_supply_enthalpy_j_per_kg),
+        "resulting_supply_enthalpy_j_per_kg_ieee_bits": ieee_bits(snapshot.resulting_supply_enthalpy_j_per_kg),
+    })
+}
+
+fn control_type_name(control: DehumidificationControlType) -> &'static str {
+    match control {
+        DehumidificationControlType::None => "None",
+        DehumidificationControlType::ConstantSensibleHeatRatio => "ConstantSensibleHeatRatio",
+        DehumidificationControlType::Humidistat => "Humidistat",
+        DehumidificationControlType::ConstantSupplyHumidityRatio => "ConstantSupplyHumidityRatio",
+    }
+}
+
+fn json_number(value: Option<f64>) -> Value {
+    value
+        .filter(|value| value.is_finite())
+        .map_or(Value::Null, |value| json!(value))
+}
+
+fn ieee_bits(value: Option<f64>) -> Option<String> {
+    value.map(|value| format!("0x{:016x}", value.to_bits()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn symbolic_selector_and_nonfinite_bit_sidecars_are_stable() {
+        assert_eq!(
+            control_type_name(DehumidificationControlType::ConstantSensibleHeatRatio),
+            "ConstantSensibleHeatRatio"
+        );
+        let value = Some(f64::from_bits(0x7ff8_0000_0000_0387));
+        assert!(json_number(value).is_null());
+        assert_eq!(ieee_bits(value), Some("0x7ff8000000000387".to_string()));
+    }
+}

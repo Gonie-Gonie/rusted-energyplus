@@ -24858,3 +24858,36 @@ algorithms, 293 routines split 58 plus 235, and 170 required. Scripts become
 324 total, 240 public, 84 internal, zero unused and zero unreachable;
 development commands stay 238. Support, readiness, capability, numerical,
 output, conformance, status, and Roadmap claims remain unchanged.
+
+## CP387 Post-Saturation Constant-SHR CpAir Placement
+
+CP387 extends the exact direct-Zone source-order witness through pinned
+`PurchasedAirManager.cc` physical lines 2273-2277 at commit
+`6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It witnesses constant-SHR case entry, CP329 mixed-air-humidity read, canonical
+stateless `energyplus_psy_cp_air_fn_w`, and local `CpAir` assignment. Line
+2278's sensible-output assignment is excluded for CP388.
+
+CP387 preserves all thirty CP386 routes: the three private constant-SHR
+selections execute four sites, while twenty-seven skip. Exact direct execution
+retains eleven public `None`-selected null routes. Accounting requires
+`T387=T386`, `K=DSHR386`, each site counter `K`, and
+`source_site_execution_count=4*K`; the public/private split remains
+eleven/nineteen.
+
+Same-call complete bit-exact CP386 is the sole predecessor, and same-call
+CP329 solely owns the private humidity operand. Earlier CpAir, Zone/supply,
+caller/model/service, and numerical-DTO substitutes are rejected. Private
+active evaluation requires finite nonnegative humidity and a finite canonical
+result; C++ local-cache/sentinel and mutable-service history remain excluded.
+CP385 enthalpy bits remain unchanged.
+
+Placement is CP386-to-CP387-to-unchanged numerical coupling. CP387 performs no
+line-2278 multiplication, numerical feed, zone-node update, load change, or
+report change. Non-direct paths reject its evidence. No routine,
+psychrometrics row, or promotion is added. Counts stay 32 algorithms, 293
+routines split 58 plus 235, and 170 required. Scripts become 325 total, 240
+public, 85 internal, zero unused and zero unreachable; development commands
+stay 238. Support, readiness, capability, numerical, output, conformance,
+status, and Roadmap claims remain unchanged.

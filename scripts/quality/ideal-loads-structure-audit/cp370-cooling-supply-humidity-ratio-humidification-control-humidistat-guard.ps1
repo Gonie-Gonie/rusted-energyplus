@@ -239,7 +239,7 @@ $cp370SemanticText = (@(
 foreach ($pattern in @(
         'HumidificationControlType::None', 'HumidificationControlType::Humidistat',
         'source_site_execution_count',
-        'non_direct_runtime_rejects_cp316_through_cp386_lifecycle_evidence'
+        'non_direct_runtime_rejects_cp316_through_cp387_lifecycle_evidence'
     )) {
     Assert-Cp370TextContains -Text $cp370SemanticText -Pattern $pattern -Description "semantic regression '$pattern'"
 }
@@ -398,16 +398,16 @@ foreach ($historical in @(327, 328) + @(346..369)) {
 }
 foreach ($historical in 334..369) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp386_lifecycle_evidence' -Description "historical CP370 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp387_lifecycle_evidence' -Description "historical CP370 firewall"
 }
 foreach ($historical in 335..369) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 324 \|')) -Description "historical generated total"
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 84 \|')) -Description "historical generated internal"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 325 \|')) -Description "historical generated total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 85 \|')) -Description "historical generated internal"
 }
 foreach ($historical in 337..369) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 324' -Description "historical inventory total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 325' -Description "historical inventory total"
 }
 
 $cp370MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
@@ -418,17 +418,17 @@ if ($cp369AuditIndexForCp370 -lt 0 -or $cp370AuditIndex -le $cp369AuditIndexForC
     throw "Master audit must dot-source CP370 after CP369 before completion"
 }
 $cp370InventoryText = Read-RepoText -Path "specs\script_inventory.toml"
-Assert-Cp370TextContains -Text $cp370InventoryText -Pattern 'script_count = 324' -Description "script total"
+Assert-Cp370TextContains -Text $cp370InventoryText -Pattern 'script_count = 325' -Description "script total"
 Assert-Cp370TextContains -Text $cp370InventoryText -Pattern 'unused_script_count = 0' -Description "zero uncalled"
 if ([regex]::Matches($cp370InventoryText, '(?m)^classification = "public"$').Count -ne 240 -or
-    [regex]::Matches($cp370InventoryText, '(?m)^classification = "internal"$').Count -ne 84) {
-    throw "CP370 inventory must be exactly 240 public and 84 internal scripts"
+    [regex]::Matches($cp370InventoryText, '(?m)^classification = "internal"$').Count -ne 85) {
+    throw "CP370 inventory must be exactly 240 public and 85 internal scripts"
 }
 Assert-Cp370TextContains -Text $cp370InventoryText -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp370-' -Description "inventory record"
 Assert-Cp370TextContains -Text $cp370InventoryText -Pattern 'ideal-loads-structure-audit\.ps1::dot_sources' -Description "caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 324 \|' -Description "CP370 generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 325 \|' -Description "CP370 generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP370 generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 84 \|' -Description "CP370 generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 85 \|' -Description "CP370 generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP370 generated uncalled"
 
 Write-Host "CP370 Cooling supply-humidity-ratio humidification-control Humidistat guard structure audit passed."
