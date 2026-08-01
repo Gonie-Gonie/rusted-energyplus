@@ -4425,3 +4425,56 @@ remain `source_mapped`. Counts remain 32 algorithms and 293 routines, split 58
 `state_mapped` plus 235 `source_mapped`, with 170 required. Script inventory is
 323 total, 240 public, 83 internal, zero unused, and zero unreachable;
 development commands remain 238.
+
+## CP386 Cooling Post-Saturation Capacity-Limit Dehumidification-Control Switch
+
+CP386 maps EnergyPlus 26.1 `PurchasedAirManager.cc` physical line 2272,
+`switch (PurchAir.DehumidCtrlType) {`, at pinned commit
+`6f2e40d10250a105b49966baa24d843711e61048` and locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact ordered sites are
+`read-purchased-air-dehumidification-control-type` and
+`dispatch-dehumidification-control-switch`. CP386 records only the selected
+typed enum read and symbolic dispatch. Physical line 2273,
+`case HumControl::ConstantSensibleHeatRatio: {`, is the first excluded lexical
+construct; physical executable line 2277,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`, is the first excluded
+executable and the CP387 boundary.
+
+CP385's twenty-three predecessor histories refine into thirty valid CP386
+routes. Eighteen inactive histories execute neither site: `U/N/P` and the
+three pre-assignment outcomes in each of five active lineages. The five CP385
+supply-enthalpy-assignment histories refine into twelve valid selector routes.
+The heating-availability-guard-false and humidification-control-guard-false
+lineages each admit all four named selector variants; the earlier Humidistat
+and None lineages admit only their matching selector; and the earlier
+dehumidification-control-guard-false lineage admits only
+`ConstantSensibleHeatRatio` or `ConstantSupplyHumidityRatio`. For dispatches
+`D` and CP385 assignments `S`, exact accounting requires `T386=T385`,
+`D=S`, each selector-read and dispatch counter equal `D`, exactly one of the
+four named selection counters per dispatch, and
+`source_site_execution_count=2*D`, with exact lineage partitions. Exact direct
+execution selects `None`; eleven routes are public and nineteen are private.
+
+Recursively complete same-call bit-exact CP385 lifecycle, snapshot, latest,
+private-witness, and completion evidence is the sole immediate predecessor.
+The identity-checked selected `IdealLoadsAirSystem.dehumidification_control_type`
+solely owns the selector. Matching and JSON use the named variants `None`,
+`ConstantSensibleHeatRatio`, `Humidistat`, and
+`ConstantSupplyHumidityRatio`; ordinal or discriminant mapping and the C++
+invalid/default path are excluded. CP385's resulting supply enthalpy and exact
+IEEE bits are retained unchanged wherever present.
+
+CP386 performs no comparison, case-label or case-body execution, arithmetic,
+psychrometric call, clamp, normalization, finite gate, or state mutation. It
+remains lifecycle evidence between CP385 and unchanged numerical coupling and
+does not consume, feed, reconcile with, overwrite, or replace
+`DirectZonePurchasedAirCouplingInput`, numerical DTO/results, nodes, loads, or
+reports. Non-direct paths reject CP386 evidence.
+
+No routine or psychrometrics-map row and no support or Roadmap promotion are
+added. Both parent algorithms remain `scaffold`/`none`, and both Calc routines
+remain `source_mapped`. Counts remain 32 algorithms and 293 routines, split 58
+`state_mapped` plus 235 `source_mapped`, with 170 required. Script inventory is
+324 total, 240 public, 84 internal, zero unused, and zero unreachable;
+development commands remain 238.

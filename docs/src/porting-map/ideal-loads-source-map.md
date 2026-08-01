@@ -22234,3 +22234,55 @@ loads, or reports, or promote support. Counts stay 32 algorithms, 293 routines,
 58 `state_mapped`, 235 `source_mapped`, and 170 required. Scripts become 323
 total, 240 public, 83 internal, zero unused/unreachable, with 238 development
 commands; all support and Roadmap claims remain unchanged.
+
+## CP386 Cooling Post-Saturation Capacity-Limit Dehumidification-Control Switch
+
+CP386 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+and `PurchasedAirManager.cc` physical line 2272:
+
+```cpp
+switch (PurchAir.DehumidCtrlType) {
+```
+
+The exact ordered sites are
+`read-purchased-air-dehumidification-control-type` and
+`dispatch-dehumidification-control-switch`. CP386 witnesses only the typed
+selector read and symbolic dispatch. Physical line 2273,
+`case HumControl::ConstantSensibleHeatRatio: {`, is the first excluded lexical
+construct; physical executable line 2277,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`, is the first excluded
+executable and the CP387 boundary.
+
+The twenty-three CP385 histories refine into thirty valid routes. Eighteen
+inactive histories (`U/N/P` and three non-assignment outcomes for each of five
+lineages) execute zero CP386 sites. Five CP385 enthalpy assignments refine into
+twelve active symbolic selections. Heating-availability-guard-false and
+humidification-control-guard-false each admit all four selectors; the earlier
+Humidistat and None lineages require their matching selector; and the earlier
+dehumidification-control-guard-false lineage permits only constant SHR or
+constant supply humidity ratio. For switch dispatches `D` and CP385
+assignments `S`, exact accounting is `T386=T385`, `D=S`,
+`D=D0+DSHR+DH+DCSH`, each source-site counter `D`, and
+`source_site_execution_count=2*D`, with exact route partitions. Exact direct
+execution selects `None`, leaving eleven public and nineteen private routes.
+
+Recursively complete same-call bit-exact CP385 is the sole immediate
+predecessor. The identity-checked selected typed system's immutable
+`dehumidification_control_type` solely owns the selector. Matching and JSON
+use only the named variants `None`, `ConstantSensibleHeatRatio`, `Humidistat`,
+and `ConstantSupplyHumidityRatio`; ordinal/discriminant mapping and the C++
+invalid/default path are forbidden. CP385 resulting supply enthalpy and exact
+IEEE sidecars are preserved bit-exactly wherever present.
+
+CP386 performs no comparison, case-label or case-body execution, arithmetic,
+psychrometric call, clamp, normalization, finite gate, or mutation. Lifecycle
+placement is CP385, then CP386, then unchanged numerical coupling. CP386 does
+not consume, feed, reconcile with, or replace numerical coupling, nodes,
+loads, or reports, and non-direct paths reject its evidence. No routine,
+psychrometrics row, support, or Roadmap promotion is added. Counts stay 32
+algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
+required. Scripts become 324 total, 240 public, 84 internal, zero
+unused/unreachable, with 238 development commands; all support and Roadmap
+claims remain unchanged.

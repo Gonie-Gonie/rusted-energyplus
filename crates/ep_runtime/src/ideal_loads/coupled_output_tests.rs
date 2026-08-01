@@ -84,6 +84,8 @@ mod cooling_positive_supply_temperature_assignment_fixture;
 mod cooling_positive_supply_temperature_minimum_limit_fixture;
 #[path = "coupled_output_tests/cooling_positive_supply_temperature_mixed_air_limit_fixture.rs"]
 mod cooling_positive_supply_temperature_mixed_air_limit_fixture;
+#[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_control_switch_fixture.rs"]
+mod cooling_post_saturation_capacity_limit_dehumidification_control_switch_fixture;
 #[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_guard_fixture.rs"]
 mod cooling_post_saturation_capacity_limit_dehumidification_guard_fixture;
 #[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment_fixture.rs"]
@@ -205,6 +207,7 @@ use cooling_post_saturation_capacity_limit_dehumidification_total_output_assignm
 use cooling_post_saturation_capacity_limit_dehumidification_total_output_guard_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_guard_snapshot;
 use cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_snapshot;
 use cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment_snapshot;
+use cooling_post_saturation_capacity_limit_dehumidification_control_switch_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_control_switch_snapshot;
 use cooling_default_supply_humidity_ratio_mixed_air_assignment_fixture::calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment_snapshot;
 use cooling_humidistat_case_break_fixture::calculation_cooling_humidistat_case_break_snapshot;
 use cooling_humidistat_case_entry_fixture::calculation_cooling_humidistat_case_entry_snapshot;
@@ -1184,6 +1187,11 @@ fn scaled_output(
             calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment,
             calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment,
         );
+    let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_switch =
+        calculation_cooling_post_saturation_capacity_limit_dehumidification_control_switch_snapshot(
+            calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment,
+            DehumidificationControlType::None,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -1282,6 +1290,7 @@ fn scaled_output(
         calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_guard,
         calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment,
         calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment,
+        calculation_cooling_post_saturation_capacity_limit_dehumidification_control_switch,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

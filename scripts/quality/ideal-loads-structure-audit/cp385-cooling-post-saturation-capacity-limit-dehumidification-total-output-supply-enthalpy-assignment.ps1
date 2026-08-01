@@ -218,7 +218,7 @@ foreach ($registration in @(
     Assert-Contains -Path $registration.Path -Pattern $registration.Pattern -Description "registration"
 }
 
-Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp385_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp386_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $pipelineRoot -Pattern $lifecycle -Description "pipeline lifecycle key"
 foreach ($pattern in @(
         'post_saturation_capacity_limited_dehumidification_supply_enthalpy_assignment_count',
@@ -245,8 +245,11 @@ foreach ($pattern in @(
 Assert-Contains -Path $cp384Assertions -Pattern 'mod cp385_assertions;' -Description "arbitrary module"
 Assert-Contains -Path $cp384Assertions -Pattern 'cp385_assertions::assert_direct\(runtime, results\)' -Description "direct delegation"
 Assert-Contains -Path $cp384Assertions -Pattern 'cp385_assertions::assert_non_direct\(runtime\)' -Description "non-direct delegation"
-Assert-Contains -Path $cp385Assertions -Pattern 'assert_numerical_nonfeed_and_local_enthalpy_only\(' -Description "terminal numerical nonfeed"
-Assert-NotContains -Path $cp385Assertions -Pattern 'mod cp386_assertions|(?:latest|cp385|results)\["(?:supply_node|report)' -Description "excluded line-2272/node/report assertion"
+Assert-Contains -Path $cp385Assertions -Pattern 'assert_numerical_nonfeed_and_local_enthalpy_only\(' -Description "CP385 numerical nonfeed"
+Assert-Contains -Path $cp385Assertions -Pattern 'mod cp386_assertions;' -Description "CP386 arbitrary module"
+Assert-Contains -Path $cp385Assertions -Pattern 'cp386_assertions::assert_direct\(runtime, results\)' -Description "CP386 direct delegation"
+Assert-Contains -Path $cp385Assertions -Pattern 'cp386_assertions::assert_non_direct\(runtime\)' -Description "CP386 non-direct delegation"
+Assert-NotContains -Path $cp385Assertions -Pattern '(?:latest|cp385|results)\["(?:supply_node|report)' -Description "CP385 node/report nonfeed"
 
 $algorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
 $capabilityText = Read-RepoText -Path "specs\capabilities.toml"
@@ -295,21 +298,21 @@ Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP385 a
 
 foreach ($historical in 334..384) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp385_lifecycle_evidence' -Description "historical firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp386_lifecycle_evidence' -Description "historical firewall"
 }
 foreach ($historical in 335..384) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 323 \|')) -Description "historical generated total"
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 83 \|')) -Description "historical generated internal"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 324 \|')) -Description "historical generated total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 84 \|')) -Description "historical generated internal"
 }
 foreach ($historical in 337..384) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 323' -Description "historical inventory total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 324' -Description "historical inventory total"
 }
 foreach ($historical in 367..384) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'Count -ne 83' -Description "historical internal classification count"
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern '240 public and 83 internal' -Description "historical classification diagnostic"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'Count -ne 84' -Description "historical internal classification count"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern '240 public and 84 internal' -Description "historical classification diagnostic"
 }
 foreach ($historical in @('cp326-cooling-supply-mass-flow-limit-body.ps1') + @(329..359 | ForEach-Object {
             (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$($_)-*.ps1").Name
@@ -327,7 +330,8 @@ foreach ($historical in 360..384) {
 }
 $cp345Audit = "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1"
 Assert-Contains -Path $cp345Audit -Pattern 'CP384-to-CP385' -Description "CP345 predecessor interval"
-Assert-Contains -Path $cp345Audit -Pattern 'CP385-to-numerical' -Description "CP345 terminal interval"
+Assert-Contains -Path $cp345Audit -Pattern 'CP385-to-CP386' -Description "CP345 CP386 predecessor interval"
+Assert-Contains -Path $cp345Audit -Pattern 'CP386-to-numerical' -Description "CP345 terminal interval"
 Assert-LineLimit -Path $cp345Audit -Limit 1200 -Description "CP345 historical audit"
 foreach ($historical in 364, 373, 374, 376, 377, 378, 379, 380, 381, 382, 383, 384) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
@@ -350,18 +354,18 @@ if ($cp384AuditIndex -lt 0 -or $cp385AuditIndex -le $cp384AuditIndex -or $comple
     throw "Master audit must dot-source CP385 after CP384 before completion"
 }
 $inventory = Read-RepoText -Path "specs\script_inventory.toml"
-foreach ($pattern in @('script_count = 323', 'dev_command_count = 238', 'unused_script_count = 0', 'unreachable_count = 0')) {
+foreach ($pattern in @('script_count = 324', 'dev_command_count = 238', 'unused_script_count = 0', 'unreachable_count = 0')) {
     Assert-Cp385Text -Text $inventory -Pattern $pattern -Description "inventory $pattern"
 }
 if ([regex]::Matches($inventory, '(?m)^classification = "public"$').Count -ne 240 -or
-    [regex]::Matches($inventory, '(?m)^classification = "internal"$').Count -ne 83) {
-    throw "CP385 inventory must be exactly 240 public and 83 internal scripts"
+    [regex]::Matches($inventory, '(?m)^classification = "internal"$').Count -ne 84) {
+    throw "CP385 inventory must be exactly 240 public and 84 internal scripts"
 }
 Assert-Cp385Text -Text $inventory -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp385-cooling-post-saturation-capacity-limit-dehumidification-total-output-supply-enthalpy-assignment\.ps1"' -Description "inventory record"
 foreach ($pattern in @(
-        '\| executable script records \| 323 \|',
+        '\| executable script records \| 324 \|',
         '\| public scripts \| 240 \|',
-        '\| internal scripts \| 83 \|',
+        '\| internal scripts \| 84 \|',
         '\| scripts without callers \| 0 \|'
     )) {
     Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern $pattern -Description "generated inventory $pattern"

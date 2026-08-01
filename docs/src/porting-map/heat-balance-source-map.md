@@ -37887,3 +37887,43 @@ algorithms, 293 routines split 58 plus 235 with 170 required, and scripts are
 323 total, 240 public, 83 internal, zero unused/unreachable, with 238 commands.
 Support, readiness, capability, numerical, output, status, and Roadmap claims
 remain unchanged.
+
+## CP386 Post-Saturation Capacity-Limit Dehumidification-Control Switch in the Heat-Balance Loop
+
+CP386 advances the direct purchased-air heat-balance witness through pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+and `PurchasedAirManager.cc` physical line 2272's
+`switch (PurchAir.DehumidCtrlType) {`. Its exact sites are
+`read-purchased-air-dehumidification-control-type` followed by
+`dispatch-dehumidification-control-switch`. Line 2273's constant-SHR case
+label is the first excluded lexical construct, and line 2277's
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);` is the first excluded
+executable and CP387 boundary.
+
+CP385's twenty-three histories refine into thirty valid routes. Eighteen
+inactive histories execute no site, while five CP385 enthalpy assignments
+refine into twelve valid named-selector routes. The heating-availability- and
+humidification-control-guard-false lineages admit all four selectors; the
+earlier Humidistat and None lineages admit only their matching values; and the
+earlier dehumidification-control-guard-false lineage admits only constant SHR
+or constant supply humidity ratio. With dispatches `D` and CP385 assignments
+`S`, exact state requires `T386=T385`, `D=S`, both site counters `D`,
+`D=D0+DSHR+DH+DCSH`, and `source_site_execution_count=2*D`, including exact
+lineage parity. Direct execution selects `None`; eleven routes are public and
+nineteen are private.
+
+Recursively complete same-call bit-exact CP385 is the sole predecessor. The
+identity-checked selected system's typed `dehumidification_control_type` owns
+the selector, with only named symbolic matching and JSON admitted. CP385's
+resulting supply enthalpy and IEEE bits remain unchanged. Heat-balance
+placement stays evidence-only after CP385 and before unchanged numerical
+coupling: CP386 performs no comparison, case or body execution, arithmetic,
+psychrometric call, numerical feed, node update, load change, or report change.
+Non-direct paths reject CP386 evidence.
+
+No routine, psychrometrics row, or promotion is added. Counts stay 32
+algorithms, 293 routines split 58 plus 235 with 170 required, and scripts are
+324 total, 240 public, 84 internal, zero unused/unreachable, with 238 commands.
+Support, readiness, capability, numerical, output, status, and Roadmap claims
+remain unchanged.
