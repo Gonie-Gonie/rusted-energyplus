@@ -3936,3 +3936,59 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 74 internal, and zero unused; development commands remain 238.
 Support, readiness, capability, numerical, output, conformance, and Roadmap
 claims remain unchanged.
+
+## CP377 Cooling Supply-Humidity-Ratio Saturation Assignment
+
+CP377 supersedes only CP376's physical-line-2259 exclusion at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`, locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+by mapping the single `PurchasedAirManager.cc` executable statement
+`SupplyHumRatSat = PsyWFnTdbRhPb(state, PurchAir.SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);`.
+Its exact text- and dependency-ordered sites are
+`read-purchased-air-supply-temperature-for-saturation-humidity-ratio`,
+`read-environment-outdoor-barometric-pressure-for-saturation-humidity-ratio`,
+`evaluate-psy-w-fn-tdb-rh-pb-at-unity-relative-humidity`, and
+`assign-local-saturation-supply-humidity-ratio`.
+
+Physical executable line 2260,
+`PurchAir.SupplyHumRat = min(SupplyHumRatOrig, SupplyHumRatSat);`, is first
+excluded and reserved for CP378. Its comparison, clamp, purchased-air result-
+store write, and every line-2261 enthalpy effect remain outside CP377.
+
+CP377 retains CP376's eight routes. UnitOff (`U`), non-cooling (`N`), and
+positive-guard-false (`P`) are complete-null zero-site skips; the other five
+routes execute all four sites. For transitions `T` and saturation assignments
+`S`, checked state requires `T=U+N+P+S`. `S` equals the CP376 copy count and
+the sum of the five active route counts, each site counter equals `S`, and
+`source_site_execution_count=4*S`.
+
+Recursively complete same-call CP376 lifecycle, snapshot, latest, and private-
+witness evidence is the sole immediate route predecessor. Each active route
+reads its supply temperature from CP344 when the capacity-limit supply-
+temperature mixed-air limit executed, otherwise from CP334; those two owner
+counts partition `S`. Barometric pressure is read separately from the current-
+timestep scheduled-coupling input and is not the earlier Site-density or
+`StdRhoAir` pressure proof. This checkpoint makes no full WeatherManager
+ownership or weather-lifecycle claim.
+
+The active calculation calls only the canonical pure
+`energyplus_psy_w_fn_tdb_rh_pb` projection with relative humidity exactly
+`1.0`. Public direct admission requires finite supply temperature, finite
+strictly-positive pressure, and a finite result. Raw IEEE behavior belongs
+only to pure/private characterization. The guarded
+`energyplus_psychrometric_humidity_ratio_from_rh` wrapper is not substituted:
+its `Option` and Rust `max` behavior differ for invalid and unordered inputs.
+EnergyPlus cache, statistics, diagnostics, `RoutineName`/error-helper effects,
+compile variants, and the history-dependent cache sentinel remain excluded.
+
+Binding preserves CP376-to-CP377-to-unchanged-numerical order under
+`purchased_air_calc_cooling_supply_humidity_ratio_saturation_assignment_lifecycle`.
+The local saturation value does not enter the coupling DTO, result state, or
+output node, and the supported numerical supply-humidity result remains
+CP345-owned. Non-direct paths reject CP377 evidence.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 315 total,
+240 public, 75 internal, and zero unused; development commands remain 238.
+Support, readiness, capability, numerical, output, conformance, and Roadmap
+claims remain unchanged.

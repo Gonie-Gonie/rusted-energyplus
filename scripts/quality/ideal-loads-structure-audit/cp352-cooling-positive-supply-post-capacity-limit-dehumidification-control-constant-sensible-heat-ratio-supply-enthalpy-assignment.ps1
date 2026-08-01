@@ -25,7 +25,7 @@ $cp352PublicTests = "crates\ep_runtime\src\ideal_loads\calc\$cp352Stem\tests\pub
 $cp352CorruptionTests = "crates\ep_runtime\src\ideal_loads\calc\$cp352Stem\tests\release_corruption.rs"
 $cp352CalcRoot = "crates\ep_runtime\src\ideal_loads\calc.rs"
 $cp352Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
-Assert-Contains -Path $cp352Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =.*?let calculation_cooling_humidistat_case_break =.*?let calculation_cooling_constant_supply_humidity_ratio_case_entry =.*?let calculation_cooling_constant_supply_humidity_ratio_assignment =.*?let calculation_cooling_constant_supply_humidity_ratio_case_break =.*?let calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment =.*?let calculation_cooling_default_supply_humidity_ratio_case_break =.*?let calculation_cooling_supply_humidity_ratio_humidification_heating_availability_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_control_humidistat_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment =.*?let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment =.*?let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit =.*?let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment =.*?let calculation_cooling_supply_humidity_ratio_pre_saturation_original_assignment =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361-to-CP362-to-CP363-to-CP364 binding order"
+Assert-Contains -Path $cp352Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =.*?let calculation_cooling_humidistat_case_break =.*?let calculation_cooling_constant_supply_humidity_ratio_case_entry =.*?let calculation_cooling_constant_supply_humidity_ratio_assignment =.*?let calculation_cooling_constant_supply_humidity_ratio_case_break =.*?let calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment =.*?let calculation_cooling_default_supply_humidity_ratio_case_break =.*?let calculation_cooling_supply_humidity_ratio_humidification_heating_availability_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_control_humidistat_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment =.*?let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment =.*?let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit =.*?let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment =.*?let calculation_cooling_supply_humidity_ratio_pre_saturation_original_assignment =.*?let calculation_cooling_supply_humidity_ratio_saturation_assignment =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361-to-CP362-to-CP363-to-CP364 binding order"
 $cp352BindingAdapter = "crates\ep_runtime\src\ideal_loads\binding\$cp352Stem.rs"
 $cp352BindingTests = "crates\ep_runtime\src\ideal_loads\binding\${cp352Stem}_tests.rs"
 $cp352BindingTestsRoot = "crates\ep_runtime\src\ideal_loads\binding_tests.rs"
@@ -237,7 +237,7 @@ Assert-Contains -Path $cp352PipelineRoot -Pattern ('mod ' + [regex]::Escape($cp3
 Assert-Contains -Path $cp352PipelineRoot -Pattern ('"' + $cp352Lifecycle + '":\s*result\s*\.' + $cp352Lifecycle) -Description "CP352 lifecycle JSON"
 Assert-Contains -Path $cp352PipelineValidation -Pattern 'total_output_assignment_cp351' -Description "pipeline CP351 predecessor"
 Assert-Contains -Path $cp352PipelineValidation -Pattern '(?s)assigned\s*\.checked_mul\(.*?SUPPLY_ENTHALPY_ASSIGNMENT_SOURCE_ORDER\s*\.len\(\)' -Description "pipeline checked 6Q"
-Assert-Contains -Path $cp352PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp376_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp352PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp377_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp352ArbitraryTests -Pattern $cp352Lifecycle -Description "arbitrary CP352 lifecycle"
 foreach ($field in @(
         "mixed_air_enthalpy_j_per_kg", "cooling_total_output_w",
@@ -333,7 +333,7 @@ foreach ($historical in @("cp326-cooling-supply-mass-flow-limit-body.ps1") + @(
 }
 foreach ($historical in 334..351) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp376_lifecycle_evidence' -Description "historical CP363 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp377_lifecycle_evidence' -Description "historical CP363 firewall"
 }
 $mainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp351AuditIndex = $mainAuditText.IndexOf("cp351-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-total-output-assignment.ps1")
@@ -342,13 +342,13 @@ $completionIndex = $mainAuditText.IndexOf('Write-Host "IdealLoads structure audi
 if ($cp351AuditIndex -lt 0 -or $cp352AuditIndex -le $cp351AuditIndex -or $completionIndex -le $cp352AuditIndex) {
     throw "Master audit must dot-source CP352 after CP351 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 314' -Description "CP352 script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 315' -Description "CP352 script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP352 zero uncalled"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp352-' -Description "CP352 inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'cp352-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-enthalpy-assignment\.ps1::dot_sources' -Description "CP352 caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 314 \|' -Description "generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 315 \|' -Description "generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 74 \|' -Description "generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 75 \|' -Description "generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated uncalled"
 
 Write-Host "CP352 constant-SHR supply-enthalpy-assignment structure audit passed."

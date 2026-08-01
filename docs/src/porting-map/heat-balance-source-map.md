@@ -37536,3 +37536,42 @@ algorithms, 293 routines split 58 plus 235 with 170 required, and scripts
 become 314 total, 240 public, 74 internal, zero unused, with 238 development
 commands. Support, readiness, capability, conformance, and Roadmap claims
 remain unchanged.
+
+## CP377 Saturation Humidity Assignment in the Heat-Balance Loop
+
+CP377 maps only pinned `PurchasedAirManager.cc` physical executable line 2259,
+`SupplyHumRatSat = PsyWFnTdbRhPb(state, PurchAir.SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);`,
+at commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its four ordered sites are
+`read-purchased-air-supply-temperature-for-saturation-humidity-ratio`,
+`read-environment-outdoor-barometric-pressure-for-saturation-humidity-ratio`,
+`evaluate-psy-w-fn-tdb-rh-pb-at-unity-relative-humidity`, and
+`assign-local-saturation-supply-humidity-ratio`.
+
+Line 2260's minimum assignment is the first excluded executable and CP378
+boundary; its clamp/result-store write and line 2261's enthalpy work remain
+unmapped. CP377 retains eight CP376 routes: `U/N/P` skip with null evidence
+and the other five execute four sites. Exact state is `T=U+N+P+S`; `S` equals
+the CP376 copy count and active-route sum, every site counter is `S`, and
+total sites are `4*S`.
+
+Recursively complete same-call CP376 owns route lineage. CP344 owns the
+temperature operand when its capacity-limit temperature mixed-air limit ran;
+CP334 owns it otherwise. The pressure operand comes from the current-timestep
+scheduled-coupling input, is distinct from Site-density/`StdRhoAir` pressure,
+and establishes no broad WeatherManager checkpoint.
+
+Only canonical pure `energyplus_psy_w_fn_tdb_rh_pb` is evaluated at
+`RH=1.0`. Public direct release requires finite temperature, finite positive
+pressure, and finite result; raw IEEE inputs remain private characterization.
+The guarded `Option`/Rust-`max` wrapper and all cache, statistics, diagnostics,
+caller/error-helper, compile-variant, and history-dependent sentinel effects
+remain excluded.
+
+Placement is CP376-to-CP377-to-unchanged-numerical under the CP377 lifecycle.
+There is no line-2260 clamp or numerical/result/output feed; CP345 remains the
+supported numerical humidity owner. Counts stay 32 algorithms, 293 routines
+split 58 plus 235 with 170 required, and scripts become 315 total, 240 public,
+75 internal, zero unused, with 238 development commands. Support, readiness,
+capability, conformance, and Roadmap claims remain unchanged.

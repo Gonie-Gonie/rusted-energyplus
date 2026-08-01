@@ -2,7 +2,9 @@
 
 use serde_json::{Map, Value, json};
 
-const CP345_KEY: &str = "purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle";
+#[path = "cp377_assertions.rs"]
+mod cp377_assertions;
+
 const CP347_KEY: &str = "purchased_air_calc_cooling_positive_supply_post_capacity_limit_dehumidification_control_none_case_lifecycle";
 const CP375_KEY: &str = "purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_lifecycle";
 const CP376_KEY: &str =
@@ -189,7 +191,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         }
     }
 
-    assert_numerical_nonfeed(runtime, results);
+    cp377_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -198,33 +200,5 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP376_KEY].is_null(),
         "non-direct runtime must not publish CP376 evidence"
     );
-}
-
-fn assert_numerical_nonfeed(runtime: &Value, results: &Value) {
-    let cp345_bits = runtime[CP345_KEY]["latest"]["assigned_supply_humidity_ratio_ieee_bits"]
-        .as_str()
-        .expect("CP345 numerical humidity-owner bits");
-    let cp345_bits = cp345_bits
-        .strip_prefix("0x")
-        .and_then(|bits| u64::from_str_radix(bits, 16).ok())
-        .expect("CP345 bits must be canonical 0x-prefixed hexadecimal");
-    let supply_humidity = results["series"]
-        .as_array()
-        .expect("result series")
-        .iter()
-        .find(|series| {
-            series["key"] == "ZONE ONE INLET"
-                && series["variable_name"] == "System Node Humidity Ratio"
-        })
-        .expect("supply-node humidity result series");
-    for endpoint in ["first", "last"] {
-        assert_eq!(
-            supply_humidity[endpoint]
-                .as_f64()
-                .expect("supply-node humidity endpoint")
-                .to_bits(),
-            cp345_bits,
-            "CP376 evidence must not feed the {endpoint} numerical supply humidity"
-        );
-    }
+    cp377_assertions::assert_non_direct(runtime);
 }

@@ -24475,3 +24475,43 @@ CP345-owned. Counts stay 32 algorithms, 293 routines split 58 plus 235, and
 170 required. Scripts become 314 total, 240 public, 74 internal, zero unused;
 development commands stay 238. Support, readiness, capability, conformance,
 and Roadmap claims are unchanged.
+
+## CP377 Saturation Humidity-Assignment Placement
+
+CP377 inserts pinned `PurchasedAirManager.cc` physical executable line 2259
+immediately after CP376:
+`SupplyHumRatSat = PsyWFnTdbRhPb(state, PurchAir.SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);`.
+The source lock is commit `6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its four ordered sites are
+`read-purchased-air-supply-temperature-for-saturation-humidity-ratio`,
+`read-environment-outdoor-barometric-pressure-for-saturation-humidity-ratio`,
+`evaluate-psy-w-fn-tdb-rh-pb-at-unity-relative-humidity`, and
+`assign-local-saturation-supply-humidity-ratio`.
+
+The inherited eight routes preserve three zero-site complete-null skips and
+five four-site executions. With transitions `T` and saturation assignments
+`S`, `T=U+N+P+S`; `S` equals CP376's copy count and the five active-route
+counts' sum, every site count equals `S`, and total sites are `4*S`.
+Recursively complete same-call CP376 is the sole predecessor. CP344 owns the
+temperature where its capacity-limit mixed-air limit executed, otherwise
+CP334 owns it. Current-timestep scheduled-coupling pressure is a distinct
+operand from Site-density/`StdRhoAir` pressure and does not claim the full
+WeatherManager lifecycle.
+
+The local calculation invokes canonical pure
+`energyplus_psy_w_fn_tdb_rh_pb` with `RH=1.0`. Public direct admission requires
+finite temperature, finite positive pressure, and finite result; raw IEEE
+behavior stays private. The guarded `Option`/Rust-`max` wrapper and EnergyPlus
+cache, statistics, diagnostics, `RoutineName`/error-helper, compile variants,
+and cache-sentinel history are excluded.
+
+Line 2260's minimum assignment is first excluded and reserved for CP378.
+Placement is CP376-to-CP377-to-unchanged-numerical under
+`purchased_air_calc_cooling_supply_humidity_ratio_saturation_assignment_lifecycle`.
+CP377 performs no clamp and changes no coupling DTO, numerical result, result
+state, or output; CP345 remains the supported numerical humidity owner. Counts
+stay 32 algorithms, 293 routines split 58 plus 235, and 170 required. Scripts
+become 315 total, 240 public, 75 internal, zero unused; development commands
+stay 238. Support, readiness, capability, conformance, and Roadmap claims are
+unchanged.

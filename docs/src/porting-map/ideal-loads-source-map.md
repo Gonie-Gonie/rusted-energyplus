@@ -21863,3 +21863,50 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 74 internal, and zero unused; development commands remain 238.
 All support, readiness, numerical, capability, output, conformance, and
 Roadmap claims remain unchanged.
+
+## CP377 Supply-Humidity-Ratio Saturation Assignment
+
+CP377 supersedes only CP376's line-2259 exclusion at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`, by
+mapping
+`SupplyHumRatSat = PsyWFnTdbRhPb(state, PurchAir.SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);`.
+Its four ordered sites read purchased-air supply temperature, read current-
+timestep environment outdoor barometric pressure, evaluate canonical
+`PsyWFnTdbRhPb` at relative humidity `1.0`, and assign the local saturation
+supply humidity ratio. Their stable labels are
+`read-purchased-air-supply-temperature-for-saturation-humidity-ratio`,
+`read-environment-outdoor-barometric-pressure-for-saturation-humidity-ratio`,
+`evaluate-psy-w-fn-tdb-rh-pb-at-unity-relative-humidity`, and
+`assign-local-saturation-supply-humidity-ratio`.
+
+Line 2260's saturation minimum is first excluded and reserved for CP378;
+CP377 performs no clamp, result-store write, enthalpy calculation, numerical
+feed, result-state write, or output change. UnitOff, non-cooling, and positive-
+guard-false are complete-null zero-site skips, while the other five inherited
+routes execute all four sites. Thus `T=U+N+P+S`, `S` equals CP376's copy count
+and the active-route sum, every site counter equals `S`, and total sites are
+`4*S`.
+
+Same-call recursively complete CP376 is the sole immediate predecessor.
+Supply temperature comes from CP344 if its capacity-limit mixed-air limit
+executed and otherwise from CP334. The pressure read is the scheduled-
+coupling input for the current timestep, not the earlier Site-density/
+`StdRhoAir` pressure proof, and adds no full WeatherManager claim.
+
+The implementation uses only canonical pure
+`energyplus_psy_w_fn_tdb_rh_pb` at `RH=1.0`. Public direct admission is finite
+temperature, finite positive pressure, and finite result; raw IEEE cases are
+private characterization. The guarded `Option`/Rust-`max` wrapper, cache,
+statistics, diagnostics, `RoutineName`/error-helper effects, compile variants,
+and cache-sentinel history remain excluded. Existing
+`routine.psy_w_fn_tdb_rh_pb` and its psychrometrics map own the routine-level
+contract; CP377 adds no routine row or separate psychrometrics-map section.
+
+Binding is CP376-to-CP377-to-unchanged-numerical under
+`purchased_air_calc_cooling_supply_humidity_ratio_saturation_assignment_lifecycle`;
+CP345 remains numerical supply-humidity owner. Counts remain 32 algorithms
+and 293 routines, split 58 `state_mapped` plus 235 `source_mapped`, with 170
+required. Scripts become 315 total, 240 public, 75 internal, zero unused, with
+238 development commands. All support, readiness, numerical, capability,
+output, conformance, and Roadmap claims remain unchanged.

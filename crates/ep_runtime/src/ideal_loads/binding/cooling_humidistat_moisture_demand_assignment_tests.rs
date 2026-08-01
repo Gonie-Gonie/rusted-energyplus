@@ -13,6 +13,25 @@ pub(super) fn run_case(
     PurchasedAirRuntimeState,
     DirectZonePurchasedAirScheduledCouplingOutput,
 )> {
+    run_case_with_pressure(
+        cooling_limit,
+        maximum_capacity_w,
+        independent_load_w,
+        availability,
+        None,
+    )
+}
+
+pub(super) fn run_case_with_pressure(
+    cooling_limit: IdealLoadsLimit,
+    maximum_capacity_w: Option<f64>,
+    independent_load_w: f64,
+    availability: f64,
+    barometric_pressure_pa: Option<f64>,
+) -> Option<(
+    PurchasedAirRuntimeState,
+    DirectZonePurchasedAirScheduledCouplingOutput,
+)> {
     let (model, cache) = fixture(|typed| {
         let system = &mut typed.ideal_loads_air_systems[0];
         system.cooling_limit = cooling_limit;
@@ -37,7 +56,8 @@ pub(super) fn run_case(
             zone_state: &mut zone_state,
             purchased_air_runtime_state: &mut runtime,
             begin_environment: true,
-            barometric_pressure_pa: binding.limit_context.barometric_pressure_pa,
+            barometric_pressure_pa: barometric_pressure_pa
+                .unwrap_or(binding.limit_context.barometric_pressure_pa),
             system_timestep_seconds: binding.nominal_system_timestep_seconds,
         },
     );

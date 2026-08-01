@@ -4145,5 +4145,6 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp374-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-for-humidification-maximum-limit.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp375-cooling-supply-humidity-ratio-humidification-supply-humidity-ratio-maximum-assignment.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp376-cooling-supply-humidity-ratio-pre-saturation-original-assignment.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp377-cooling-supply-humidity-ratio-saturation-assignment.ps1")
 
 Write-Host "IdealLoads structure audit complete."

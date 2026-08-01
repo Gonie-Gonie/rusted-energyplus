@@ -213,6 +213,8 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioMaximumAssignmentRuntimeState::new(system),
             calc_cooling_supply_humidity_ratio_pre_saturation_original_assignment:
                 PurchasedAirCalcCoolingSupplyHumidityRatioPreSaturationOriginalAssignmentRuntimeState::new(system),
+            calc_cooling_supply_humidity_ratio_saturation_assignment:
+                PurchasedAirCalcCoolingSupplyHumidityRatioSaturationAssignmentRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,
