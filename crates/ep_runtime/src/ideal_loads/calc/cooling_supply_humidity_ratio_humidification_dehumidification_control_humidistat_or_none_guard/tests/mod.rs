@@ -39,12 +39,8 @@ fn direct_cp370_outer_false_skips_every_cp371_site() {
         HumidificationControlType::None,
     );
     let mut state = State::new(IdealLoadsAirSystemId(0));
-    let snapshot = advance(
-        &mut state,
-        predecessor,
-        DehumidificationControlType::None,
-    )
-    .expect("outer-false route");
+    let snapshot = advance(&mut state, predecessor, DehumidificationControlType::None)
+        .expect("outer-false route");
 
     assert!(!snapshot.dehumidification_control_type_first_read);
     assert_eq!(snapshot.first_dehumidification_control_type, None);
@@ -66,19 +62,18 @@ fn none_uses_all_five_sites_and_enters_the_body() {
         HumidificationControlType::Humidistat,
     );
     let mut state = State::new(IdealLoadsAirSystemId(0));
-    let snapshot = advance(
-        &mut state,
-        predecessor,
-        DehumidificationControlType::None,
-    )
-    .expect("None second-disjunct route");
+    let snapshot = advance(&mut state, predecessor, DehumidificationControlType::None)
+        .expect("None second-disjunct route");
 
     assert!(snapshot.dehumidification_control_type_first_read);
     assert_eq!(
         snapshot.first_dehumidification_control_type,
         Some(DehumidificationControlType::None),
     );
-    assert_eq!(snapshot.dehumidification_control_type_humidistat, Some(false));
+    assert_eq!(
+        snapshot.dehumidification_control_type_humidistat,
+        Some(false)
+    );
     assert!(snapshot.dehumidification_control_type_second_read);
     assert_eq!(
         snapshot.second_dehumidification_control_type,
@@ -110,12 +105,18 @@ fn humidistat_short_circuits_after_three_sites() {
     )
     .expect("Humidistat first-disjunct route");
 
-    assert_eq!(snapshot.dehumidification_control_type_humidistat, Some(true));
+    assert_eq!(
+        snapshot.dehumidification_control_type_humidistat,
+        Some(true)
+    );
     assert!(!snapshot.dehumidification_control_type_second_read);
     assert_eq!(snapshot.second_dehumidification_control_type, None);
     assert_eq!(snapshot.dehumidification_control_type_none, None);
     assert!(snapshot.dehumidification_control_body_entered);
-    assert_eq!(state.dehumidification_control_type_humidistat_match_count, 1);
+    assert_eq!(
+        state.dehumidification_control_type_humidistat_match_count,
+        1
+    );
     assert_eq!(state.dehumidification_control_type_second_read_count, 0);
     assert_eq!(state.source_site_execution_count, 3);
 }
@@ -130,12 +131,18 @@ fn rejected_control_enums_use_four_sites_and_fall_through() {
         let mut state = State::new(IdealLoadsAirSystemId(0));
         let snapshot = advance(&mut state, predecessor, control).expect("rejected enum route");
 
-        assert_eq!(snapshot.dehumidification_control_type_humidistat, Some(false));
+        assert_eq!(
+            snapshot.dehumidification_control_type_humidistat,
+            Some(false)
+        );
         assert!(snapshot.dehumidification_control_type_second_read);
         assert_eq!(snapshot.dehumidification_control_type_none, Some(false));
         assert!(!snapshot.dehumidification_control_body_entered);
         assert!(snapshot.dehumidification_control_guard_false_fallthrough);
-        assert_eq!(state.dehumidification_control_guard_false_fallthrough_count, 1);
+        assert_eq!(
+            state.dehumidification_control_guard_false_fallthrough_count,
+            1
+        );
         assert_eq!(state.source_site_execution_count, 4);
     }
 }
@@ -151,12 +158,8 @@ fn upstream_skip_routes_skip_every_cp371_site() {
     for cp369 in predecessors {
         let predecessor = cp370_from(cp369, HumidificationControlType::Humidistat);
         let mut state = State::new(IdealLoadsAirSystemId(0));
-        let snapshot = advance(
-            &mut state,
-            predecessor,
-            DehumidificationControlType::None,
-        )
-        .expect("upstream skip route");
+        let snapshot = advance(&mut state, predecessor, DehumidificationControlType::None)
+            .expect("upstream skip route");
         assert!(!snapshot.dehumidification_control_type_first_read);
         assert!(!snapshot.dehumidification_control_type_second_read);
         assert!(!snapshot.dehumidification_control_body_entered);
@@ -176,14 +179,7 @@ fn malformed_cp370_lineage_is_rejected_without_mutation() {
     predecessor.humidification_control_type = None;
     let mut state = State::new(IdealLoadsAirSystemId(0));
     let before = state.clone();
-    assert!(
-        advance(
-            &mut state,
-            predecessor,
-            DehumidificationControlType::None,
-        )
-        .is_none()
-    );
+    assert!(advance(&mut state, predecessor, DehumidificationControlType::None,).is_none());
     assert_eq!(state, before);
 }
 

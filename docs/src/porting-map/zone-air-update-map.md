@@ -24641,3 +24641,44 @@ algorithms, 293 routines split 58 plus 235, and 170 required. Scripts become
 318 total, 240 public, 78 internal, zero unused and zero unreachable;
 development commands stay 238. Support, readiness, capability, numerical,
 output, conformance, status, and Roadmap claims remain unchanged.
+
+## CP381 Post-Saturation Capacity-Limit Dehumidification Guard Placement
+
+CP381 follows CP380 before the unchanged numerical coupling and maps only
+`PurchasedAirManager.cc` executable line 2266,
+`if (PurchAir.SupplyHumRat < PurchAir.MixedAirHumRat) { // Dehumidifying`.
+The source lock is commit `6f2e40d10250a105b49966baa24d843711e61048`, raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its four unique sites are
+`read-retained-purchased-air-supply-humidity-ratio-for-post-saturation-dehumidification-comparison`,
+`read-retained-purchased-air-mixed-air-humidity-ratio-for-post-saturation-dehumidification-comparison`,
+`compare-purchased-air-supply-humidity-ratio-strictly-less-than-mixed-air-humidity-ratio-for-post-saturation-dehumidification-guard`,
+and `enter-post-saturation-capacity-limit-dehumidification-body-if-comparison-satisfied`.
+Their witness order makes no C++ `<` operand-order claim. Line 2267 is first
+excluded and the CP382 boundary.
+
+CP380's `U/N/P` plus five capacity-guard-false routes complete-skip. The five
+capacity-body routes evaluate CP381 and each splits into body and false
+successors, producing eighteen retained routes. Let `E` be CP380 body entries,
+`L` less-than/body entries, `X=E-L` false outcomes, and `K` aggregate CP380
+false routes. Exact state requires `T=U+N+P+K+E`, total sites `3*E+L`, and a
+body/false partition for every active route.
+
+Same-call recursively complete bit-exact CP380 is the sole predecessor. CP378
+resulting supply humidity, corroborated bit-exactly by CP379's retained read,
+solely owns the left operand; same-call CP329 mixed-air humidity owns the right.
+CP380 changes neither. Caller/model/service/DTO substitutes are excluded. Raw
+IEEE `<` treats equality, signed-zero ties, and unordered values as false and
+adds no tolerance, total ordering, clamp, normalization, or coercion.
+
+CP381 records control flow only. Line 2267, mass-flow and enthalpy arithmetic,
+`CoolTotOutput`, capacity limiting, supply/load state changes, unchanged
+numerical coupling, node updates, and reports remain excluded. No CP381 value
+feeds, reconciles with, overwrites, or replaces coupling input or numerical
+result. Non-direct paths reject CP381 evidence.
+
+No routine or psychrometrics-map row or promotion is added. Counts stay 32
+algorithms, 293 routines split 58 plus 235, and 170 required. Scripts become
+319 total, 240 public, 79 internal, zero unused and zero unreachable;
+development commands stay 238. Support, readiness, capability, numerical,
+output, conformance, status, and Roadmap claims remain unchanged.

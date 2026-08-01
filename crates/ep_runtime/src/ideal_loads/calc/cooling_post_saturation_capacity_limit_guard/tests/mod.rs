@@ -9,7 +9,10 @@ use super::super::{
     PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_GUARD_SOURCE_ORDER,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitGuardActiveInput as ActiveInput,
 };
-use crate::ideal_loads::calc::cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard::completed_cp370_case_for_cp372_test;
+use crate::ideal_loads::calc::cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard::{
+    completed_cp370_case_for_cp372_test,
+    completed_cp370_case_with_capacity_limit_for_later_test,
+};
 use crate::ideal_loads::{
     PURCHASED_AIR_CALC_COOLING_SUPPLY_ENTHALPY_POST_SATURATION_ASSIGNMENT_FIRST_EXCLUDED_SOURCE,
     PURCHASED_AIR_CALC_COOLING_SUPPLY_ENTHALPY_POST_SATURATION_ASSIGNMENT_SOURCE,
@@ -53,14 +56,17 @@ fn cp380_source_boundary_and_order_are_exact() {
     );
 }
 
-pub(super) fn active_input(limit: IdealLoadsLimit) -> Option<ActiveInput> {
+pub(in crate::ideal_loads::calc) fn active_input(limit: IdealLoadsLimit) -> Option<ActiveInput> {
     Some(ActiveInput {
         cooling_limit: limit,
         cp337_same_call_selector_lineage_corroborated: true,
     })
 }
 
-pub(super) fn predecessor_for_route(route: usize, ordinal: usize) -> Cp379Snapshot {
+pub(in crate::ideal_loads::calc) fn predecessor_for_route(
+    route: usize,
+    ordinal: usize,
+) -> Cp379Snapshot {
     let active = route >= 3;
     let selector = match route {
         3 | 4 | 6 => Some(DehumidificationControlType::None),
@@ -166,4 +172,80 @@ pub(super) fn completed_cp379_case()
     )
     .expect("CP379 direct");
     (runtime, system, cp379)
+}
+
+pub(in crate::ideal_loads::calc) fn completed_cp380_case(
+    capacity_limit: bool,
+) -> Option<(
+    PurchasedAirRuntimeState,
+    IdealLoadsAirSystem,
+    super::super::PurchasedAirCalcCoolingPostSaturationCapacityLimitGuardSnapshot,
+)> {
+    let (mut runtime, system, cp370) =
+        completed_cp370_case_with_capacity_limit_for_later_test(capacity_limit)?;
+    let cp371 = advance_direct_no_oa_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard(
+        &mut runtime,
+        &system,
+        cp370,
+    )
+    .ok()?;
+    let cp372 = advance_direct_no_oa_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment(
+        &mut runtime,
+        &system,
+        cp371,
+    )
+    .ok()?;
+    let cp373 = advance_direct_no_oa_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment(
+        &mut runtime,
+        &system,
+        cp372,
+    )
+    .ok()?;
+    let cp374 = advance_direct_no_oa_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit(
+        &mut runtime,
+        &system,
+        cp373,
+    )
+    .ok()?;
+    let cp375 = advance_direct_no_oa_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment(
+        &mut runtime,
+        &system,
+        cp374,
+    )
+    .ok()?;
+    let cp376 =
+        advance_direct_no_oa_calc_cooling_supply_humidity_ratio_pre_saturation_original_assignment(
+            &mut runtime,
+            &system,
+            cp375,
+        )
+        .ok()?;
+    let cp377 = advance_direct_no_oa_calc_cooling_supply_humidity_ratio_saturation_assignment(
+        &mut runtime,
+        &system,
+        cp376,
+        101_325.0,
+    )
+    .ok()?;
+    let cp378 =
+        advance_direct_no_oa_calc_cooling_supply_humidity_ratio_saturation_limit_assignment(
+            &mut runtime,
+            &system,
+            cp377,
+        )
+        .ok()?;
+    let cp379 = advance_direct_no_oa_calc_cooling_supply_enthalpy_post_saturation_assignment(
+        &mut runtime,
+        &system,
+        cp378,
+    )
+    .ok()?;
+    let cp380 =
+        super::super::advance_direct_no_oa_calc_cooling_post_saturation_capacity_limit_guard(
+            &mut runtime,
+            &system,
+            cp379,
+        )
+        .ok()?;
+    Some((runtime, system, cp380))
 }

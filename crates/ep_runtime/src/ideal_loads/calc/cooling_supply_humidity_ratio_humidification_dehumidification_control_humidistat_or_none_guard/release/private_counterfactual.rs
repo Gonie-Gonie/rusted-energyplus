@@ -94,16 +94,27 @@ fn route_independent_identity_matches(direct: Snapshot, counterfactual: Snapshot
         && direct.parent_call_ordinal == counterfactual.parent_call_ordinal
         && direct.controlled_zone == counterfactual.controlled_zone
         && direct.unit_body_entered == counterfactual.unit_body_entered
-        && direct.predecessor_cooling_body_entered == counterfactual.predecessor_cooling_body_entered
-        && direct.predecessor_no_outdoor_air_fallback_entered == counterfactual.predecessor_no_outdoor_air_fallback_entered
-        && direct.predecessor_positive_supply_mass_flow_body_entered == counterfactual.predecessor_positive_supply_mass_flow_body_entered
+        && direct.predecessor_cooling_body_entered
+            == counterfactual.predecessor_cooling_body_entered
+        && direct.predecessor_no_outdoor_air_fallback_entered
+            == counterfactual.predecessor_no_outdoor_air_fallback_entered
+        && direct.predecessor_positive_supply_mass_flow_body_entered
+            == counterfactual.predecessor_positive_supply_mass_flow_body_entered
         && direct.unit_off_skipped == counterfactual.unit_off_skipped
         && direct.non_cooling_skipped == counterfactual.non_cooling_skipped
-        && direct.positive_guard_false_fallthrough_skipped == counterfactual.positive_guard_false_fallthrough_skipped
-        && direct.predecessor_dehumidification_control_type == counterfactual.predecessor_dehumidification_control_type
-        && direct.dehumidification_control_none_case_completed_skip == counterfactual.dehumidification_control_none_case_completed_skip
-        && direct.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip == counterfactual.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip
-        && direct.dehumidification_control_humidistat_case_completed_skip == counterfactual.dehumidification_control_humidistat_case_completed_skip
-        && direct.dehumidification_control_constant_supply_humidity_ratio_case_completed_skip == counterfactual.dehumidification_control_constant_supply_humidity_ratio_case_completed_skip
+        && direct.positive_guard_false_fallthrough_skipped
+            == counterfactual.positive_guard_false_fallthrough_skipped
+        && direct.predecessor_dehumidification_control_type
+            == counterfactual.predecessor_dehumidification_control_type
+        && direct.dehumidification_control_none_case_completed_skip
+            == counterfactual.dehumidification_control_none_case_completed_skip
+        && direct.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip
+            == counterfactual
+                .dehumidification_control_constant_sensible_heat_ratio_case_completed_skip
+        && direct.dehumidification_control_humidistat_case_completed_skip
+            == counterfactual.dehumidification_control_humidistat_case_completed_skip
+        && direct.dehumidification_control_constant_supply_humidity_ratio_case_completed_skip
+            == counterfactual
+                .dehumidification_control_constant_supply_humidity_ratio_case_completed_skip
         && direct.predecessor_heating_on == counterfactual.predecessor_heating_on
 }

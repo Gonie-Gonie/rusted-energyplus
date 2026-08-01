@@ -1,5 +1,8 @@
 //! CP380 post-saturation capacity-limit guard assertions.
 
+#[path = "cp381_assertions.rs"]
+mod cp381_assertions;
+
 use serde_json::{Map, Value, json};
 
 const CP337_KEY: &str = "purchased_air_calc_cooling_positive_supply_capacity_limit_guard_lifecycle";
@@ -92,6 +95,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
     }
     assert_route_partitions(cp380, active_routes);
     assert_numerical_nonfeed_and_unchanged_enthalpy(runtime, results);
+    cp381_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -100,6 +104,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP380_KEY].is_null(),
         "non-direct runtime must not publish CP380 evidence"
     );
+    cp381_assertions::assert_non_direct(runtime);
 }
 
 fn assert_complete_null(latest: &Value) {

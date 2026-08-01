@@ -59,8 +59,7 @@ pub(super) fn pending_state_is_consistent(
 ) -> bool {
     let state = &unit
         .calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard;
-    let prior = &unit
-        .calc_cooling_supply_humidity_ratio_humidification_control_humidistat_guard;
+    let prior = &unit.calc_cooling_supply_humidity_ratio_humidification_control_humidistat_guard;
     state_is_consistent(state, witness, predecessor.system)
         && state.transition_count.checked_add(1) == Some(predecessor.parent_call_ordinal)
         && pending_carried_counts_match(state, prior, predecessor)
@@ -87,12 +86,13 @@ pub(super) fn completed_state_is_consistent(
 ) -> bool {
     let state = &unit
         .calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard;
-    let prior = &unit
-        .calc_cooling_supply_humidity_ratio_humidification_control_humidistat_guard;
+    let prior = &unit.calc_cooling_supply_humidity_ratio_humidification_control_humidistat_guard;
     state_is_consistent(state, witness, snapshot.system)
         && state.transition_count == prior.transition_count
         && carried_counts_match(state, prior)
-        && state.latest.is_some_and(|latest| snapshots_match_exact(latest, snapshot))
+        && state
+            .latest
+            .is_some_and(|latest| snapshots_match_exact(latest, snapshot))
         && state.latest_transition_ordinal == Some(state.transition_count)
 }
 
@@ -256,20 +256,76 @@ fn pending_carried_counts_match(
     latest: Predecessor,
 ) -> bool {
     let pairs = [
-        (state.unit_off_skip_count, prior.unit_off_skip_count, latest.unit_off_skipped),
-        (state.non_cooling_skip_count, prior.non_cooling_skip_count, latest.non_cooling_skipped),
-        (state.positive_guard_false_fallthrough_skip_count, prior.positive_guard_false_fallthrough_skip_count, latest.positive_guard_false_fallthrough_skipped),
-        (state.dehumidification_control_none_case_completed_skip_count, prior.dehumidification_control_none_case_completed_skip_count, latest.dehumidification_control_none_case_completed_skip),
-        (state.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip_count, prior.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip_count, latest.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip),
-        (state.dehumidification_control_humidistat_case_completed_skip_count, prior.dehumidification_control_humidistat_case_completed_skip_count, latest.dehumidification_control_humidistat_case_completed_skip),
-        (state.dehumidification_control_constant_supply_humidity_ratio_case_completed_skip_count, prior.dehumidification_control_constant_supply_humidity_ratio_case_completed_skip_count, latest.dehumidification_control_constant_supply_humidity_ratio_case_completed_skip),
-        (state.heating_on_read_count, prior.heating_on_read_count, latest.predecessor_heating_on_read),
-        (state.heating_on_body_entry_count, prior.heating_on_body_entry_count, latest.predecessor_cooling_supply_humidity_ratio_humidification_body_entered),
-        (state.heating_on_guard_false_fallthrough_count, prior.heating_on_guard_false_fallthrough_count, latest.predecessor_heating_on_guard_false_fallthrough),
-        (state.humidification_control_type_read_count, prior.humidification_control_type_read_count, latest.humidification_control_type_read),
-        (state.humidification_control_type_humidistat_comparison_count, prior.humidification_control_type_humidistat_comparison_count, latest.humidification_control_type_humidistat.is_some()),
-        (state.humidification_control_body_entry_count, prior.humidification_control_body_entry_count, latest.humidification_control_body_entered),
-        (state.humidification_control_guard_false_fallthrough_count, prior.humidification_control_guard_false_fallthrough_count, latest.humidification_control_guard_false_fallthrough),
+        (
+            state.unit_off_skip_count,
+            prior.unit_off_skip_count,
+            latest.unit_off_skipped,
+        ),
+        (
+            state.non_cooling_skip_count,
+            prior.non_cooling_skip_count,
+            latest.non_cooling_skipped,
+        ),
+        (
+            state.positive_guard_false_fallthrough_skip_count,
+            prior.positive_guard_false_fallthrough_skip_count,
+            latest.positive_guard_false_fallthrough_skipped,
+        ),
+        (
+            state.dehumidification_control_none_case_completed_skip_count,
+            prior.dehumidification_control_none_case_completed_skip_count,
+            latest.dehumidification_control_none_case_completed_skip,
+        ),
+        (
+            state.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip_count,
+            prior.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip_count,
+            latest.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip,
+        ),
+        (
+            state.dehumidification_control_humidistat_case_completed_skip_count,
+            prior.dehumidification_control_humidistat_case_completed_skip_count,
+            latest.dehumidification_control_humidistat_case_completed_skip,
+        ),
+        (
+            state.dehumidification_control_constant_supply_humidity_ratio_case_completed_skip_count,
+            prior.dehumidification_control_constant_supply_humidity_ratio_case_completed_skip_count,
+            latest.dehumidification_control_constant_supply_humidity_ratio_case_completed_skip,
+        ),
+        (
+            state.heating_on_read_count,
+            prior.heating_on_read_count,
+            latest.predecessor_heating_on_read,
+        ),
+        (
+            state.heating_on_body_entry_count,
+            prior.heating_on_body_entry_count,
+            latest.predecessor_cooling_supply_humidity_ratio_humidification_body_entered,
+        ),
+        (
+            state.heating_on_guard_false_fallthrough_count,
+            prior.heating_on_guard_false_fallthrough_count,
+            latest.predecessor_heating_on_guard_false_fallthrough,
+        ),
+        (
+            state.humidification_control_type_read_count,
+            prior.humidification_control_type_read_count,
+            latest.humidification_control_type_read,
+        ),
+        (
+            state.humidification_control_type_humidistat_comparison_count,
+            prior.humidification_control_type_humidistat_comparison_count,
+            latest.humidification_control_type_humidistat.is_some(),
+        ),
+        (
+            state.humidification_control_body_entry_count,
+            prior.humidification_control_body_entry_count,
+            latest.humidification_control_body_entered,
+        ),
+        (
+            state.humidification_control_guard_false_fallthrough_count,
+            prior.humidification_control_guard_false_fallthrough_count,
+            latest.humidification_control_guard_false_fallthrough,
+        ),
     ];
     pairs.into_iter().all(|(current, expected, increment)| {
         current.checked_add(usize::from(increment)) == Some(expected)
@@ -279,18 +335,29 @@ fn pending_carried_counts_match(
 fn carried_counts_match(state: &State, prior: &PredecessorState) -> bool {
     state.unit_off_skip_count == prior.unit_off_skip_count
         && state.non_cooling_skip_count == prior.non_cooling_skip_count
-        && state.positive_guard_false_fallthrough_skip_count == prior.positive_guard_false_fallthrough_skip_count
-        && state.dehumidification_control_none_case_completed_skip_count == prior.dehumidification_control_none_case_completed_skip_count
-        && state.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip_count == prior.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip_count
-        && state.dehumidification_control_humidistat_case_completed_skip_count == prior.dehumidification_control_humidistat_case_completed_skip_count
-        && state.dehumidification_control_constant_supply_humidity_ratio_case_completed_skip_count == prior.dehumidification_control_constant_supply_humidity_ratio_case_completed_skip_count
+        && state.positive_guard_false_fallthrough_skip_count
+            == prior.positive_guard_false_fallthrough_skip_count
+        && state.dehumidification_control_none_case_completed_skip_count
+            == prior.dehumidification_control_none_case_completed_skip_count
+        && state.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip_count
+            == prior.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip_count
+        && state.dehumidification_control_humidistat_case_completed_skip_count
+            == prior.dehumidification_control_humidistat_case_completed_skip_count
+        && state.dehumidification_control_constant_supply_humidity_ratio_case_completed_skip_count
+            == prior
+                .dehumidification_control_constant_supply_humidity_ratio_case_completed_skip_count
         && state.heating_on_read_count == prior.heating_on_read_count
         && state.heating_on_body_entry_count == prior.heating_on_body_entry_count
-        && state.heating_on_guard_false_fallthrough_count == prior.heating_on_guard_false_fallthrough_count
-        && state.humidification_control_type_read_count == prior.humidification_control_type_read_count
-        && state.humidification_control_type_humidistat_comparison_count == prior.humidification_control_type_humidistat_comparison_count
-        && state.humidification_control_body_entry_count == prior.humidification_control_body_entry_count
-        && state.humidification_control_guard_false_fallthrough_count == prior.humidification_control_guard_false_fallthrough_count
+        && state.heating_on_guard_false_fallthrough_count
+            == prior.heating_on_guard_false_fallthrough_count
+        && state.humidification_control_type_read_count
+            == prior.humidification_control_type_read_count
+        && state.humidification_control_type_humidistat_comparison_count
+            == prior.humidification_control_type_humidistat_comparison_count
+        && state.humidification_control_body_entry_count
+            == prior.humidification_control_body_entry_count
+        && state.humidification_control_guard_false_fallthrough_count
+            == prior.humidification_control_guard_false_fallthrough_count
 }
 
 fn checked_sum(values: &[usize]) -> Option<usize> {

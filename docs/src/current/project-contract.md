@@ -20509,3 +20509,52 @@ algorithms remain `scaffold`/`none`, and both Calc routines remain
 235 `source_mapped`, and 170 required. Script inventory is 318 total, 240
 public, 78 internal, zero unused, zero unreachable, and 238 development
 commands.
+
+## CP381 Source-Ordered Cooling Post-Saturation Capacity-Limit Dehumidification Guard
+
+CP381 maps exactly EnergyPlus 26.1 `PurchasedAirManager.cc` executable line
+2266, `if (PurchAir.SupplyHumRat < PurchAir.MixedAirHumRat) { // Dehumidifying`,
+at commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its four ordered sites are
+`read-retained-purchased-air-supply-humidity-ratio-for-post-saturation-dehumidification-comparison`,
+`read-retained-purchased-air-mixed-air-humidity-ratio-for-post-saturation-dehumidification-comparison`,
+`compare-purchased-air-supply-humidity-ratio-strictly-less-than-mixed-air-humidity-ratio-for-post-saturation-dehumidification-guard`,
+and `enter-post-saturation-capacity-limit-dehumidification-body-if-comparison-satisfied`.
+The deterministic Rust witness order does not claim C++ built-in `<` operand
+evaluation order; both source reads are side-effect-free. Executable line 2267
+is first excluded and reserved for CP382.
+
+The thirteen CP380 routes become eighteen exact CP381 routes. `U/N/P` and the
+five CP380 capacity-guard-false successors are complete-null zero-site skips.
+The five CP380 capacity-body successors evaluate the comparison and split into
+body and false successors. Let `E` be CP380 body entries, `L` strict-less-than
+matches/body entries, `X=E-L` false fallthroughs, and `K` the aggregate CP380
+guard-false count. Checked lifecycle state requires `T=U+N+P+K+E`,
+`source_site_execution_count=3*E+L`, every read/comparison counter equal `E`,
+and each active predecessor route partitioned exactly between `L` and `X`.
+
+Same-call recursively complete and bit-exact CP380 lifecycle/snapshot/latest/
+witness/completion evidence is the sole immediate predecessor. CP378's
+resulting supply humidity ratio is the left operand owner and CP379's same-call
+read corroborates its exact bits. CP329's retained same-call mixed-air humidity
+ratio is the sole right operand owner. CP380 is value-neutral. Caller/model
+duplicates, live-service rereads, and numerical DTO values are forbidden.
+
+CP381 applies only raw IEEE binary64 `<`; it performs no subtraction, epsilon
+comparison, total ordering, clamp, normalization, default, diagnostic, or
+coercion. Equal values, both signed-zero orders, and unordered NaN comparisons
+are false, with nonfinite cases restricted to private characterization. Line
+2267's mass-flow/enthalpy arithmetic, `CoolTotOutput`, all capacity limiting,
+and all later supply/load/node/report effects remain outside this contract. No
+CP381 value enters, consumes, feeds, reconciles with, overwrites, or replaces
+`DirectZonePurchasedAirCouplingInput` or numerical DTO/result state. Non-direct
+execution rejects CP381 lifecycle evidence.
+
+No routine or psychrometrics-map row, support tier, readiness, capability,
+numerical-conformance, output, status, or Roadmap promotion occurs. Both parent
+algorithms remain `scaffold`/`none`, and both Calc routines remain
+`source_mapped`. Counts remain 32 algorithms, 293 routines, 58 `state_mapped`,
+235 `source_mapped`, and 170 required. Script inventory is 319 total, 240
+public, 79 internal, zero unused, zero unreachable, and 238 development
+commands.

@@ -72,10 +72,7 @@ pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option
     }
 }
 
-pub(in crate::ideal_loads::calc) fn snapshots_match_exact(
-    left: Snapshot,
-    right: Snapshot,
-) -> bool {
+pub(in crate::ideal_loads::calc) fn snapshots_match_exact(left: Snapshot, right: Snapshot) -> bool {
     left == right
 }
 

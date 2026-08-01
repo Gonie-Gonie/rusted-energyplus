@@ -54,7 +54,10 @@ fn direct_release_skips_sites_and_canonical_private_bridge_uses_five() {
         .expect("known unit")
         .calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard;
     assert_eq!(state.transition_count, 1);
-    assert_eq!(state.humidification_control_guard_false_fallthrough_count, 1);
+    assert_eq!(
+        state.humidification_control_guard_false_fallthrough_count,
+        1
+    );
     assert_eq!(state.dehumidification_control_type_first_read_count, 0);
     assert_eq!(state.source_site_execution_count, 0);
 
@@ -75,7 +78,10 @@ fn direct_release_skips_sites_and_canonical_private_bridge_uses_five() {
         private.first_dehumidification_control_type,
         Some(DehumidificationControlType::None),
     );
-    assert_eq!(private.dehumidification_control_type_humidistat, Some(false));
+    assert_eq!(
+        private.dehumidification_control_type_humidistat,
+        Some(false)
+    );
     assert!(private.dehumidification_control_type_second_read);
     assert_eq!(
         private.second_dehumidification_control_type,
@@ -127,10 +133,10 @@ fn cp370_private_witness_drift_is_rejected_transactionally() {
         )
         .expect("CP370 witness");
     witness.humidification_control_type_read = false;
-    runtime.set_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_latest_witness(
-        system.id,
-        witness,
-    );
+    runtime
+        .set_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_latest_witness(
+            system.id, witness,
+        );
 
     let before = runtime.clone();
     assert!(matches!(
@@ -200,7 +206,17 @@ pub(in crate::ideal_loads::calc) fn completed_cp370_case() -> Option<(
     ep_model::IdealLoadsAirSystem,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationControlHumidistatGuardSnapshot,
 )> {
-    let (mut runtime, mut system, cp355) = completed_cp355_case(-1_000.0, 1.0, false)?;
+    completed_cp370_case_with_capacity_limit(false)
+}
+
+pub(in crate::ideal_loads::calc) fn completed_cp370_case_with_capacity_limit(
+    capacity_limit: bool,
+) -> Option<(
+    PurchasedAirRuntimeState,
+    ep_model::IdealLoadsAirSystem,
+    PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationControlHumidistatGuardSnapshot,
+)> {
+    let (mut runtime, mut system, cp355) = completed_cp355_case(-1_000.0, 1.0, capacity_limit)?;
     system.minimum_cooling_supply_air_humidity_ratio = 0.0077;
     let cp356 =
         advance_direct_no_oa_calc_cooling_constant_shr_supply_humidity_ratio_mixed_air_limit(

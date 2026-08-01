@@ -10,6 +10,13 @@ mod state;
 mod tests;
 mod transition;
 
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::{
+    active_input as active_input_for_cp381_test,
+    completed_cp380_case as completed_cp380_case_for_cp381_test,
+    predecessor_for_route as predecessor_for_cp381_test,
+};
+
 pub use release::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitGuardError,
     advance_direct_no_oa_calc_cooling_post_saturation_capacity_limit_guard,

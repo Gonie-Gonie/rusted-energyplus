@@ -19,10 +19,10 @@ pub use release::{
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
     completed_direct_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_is_consistent,
+    cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_snapshot_route,
     cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_snapshots_match_exact,
     private_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_counterfactual_from_direct_release,
     private_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_counterfactual_links_to_direct_release,
-    cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_snapshot_route,
 };
 #[allow(unused_imports)]
 pub(in crate::ideal_loads) use release::{
@@ -31,9 +31,12 @@ pub(in crate::ideal_loads) use release::{
 };
 pub(super) use state::PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardRetainedRoute;
 pub use state::PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardRuntimeState;
-pub(in crate::ideal_loads::calc) use transition::advance_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_state;
 #[cfg(test)]
-pub(in crate::ideal_loads::calc) use tests::release::completed_cp370_case as completed_cp370_case_for_cp372_test;
+pub(in crate::ideal_loads::calc) use tests::release::{
+    completed_cp370_case as completed_cp370_case_for_cp372_test,
+    completed_cp370_case_with_capacity_limit as completed_cp370_case_with_capacity_limit_for_later_test,
+};
+pub(in crate::ideal_loads::calc) use transition::advance_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_state;
 
 /// EnergyPlus source statement represented by CP371.
 pub const PURCHASED_AIR_CALC_COOLING_SUPPLY_HUMIDITY_RATIO_HUMIDIFICATION_DEHUMIDIFICATION_CONTROL_HUMIDISTAT_OR_NONE_GUARD_SOURCE: &str =
@@ -53,7 +56,8 @@ pub const PURCHASED_AIR_CALC_COOLING_SUPPLY_HUMIDITY_RATIO_HUMIDIFICATION_DEHUMI
 /// One CP370-to-CP371 source-ordered, numeric-free nested-control witness.
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardSnapshot {
+pub struct PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardSnapshot
+{
     pub source: &'static str,
     pub first_excluded_source: &'static str,
     pub source_order: &'static [&'static str],
@@ -71,8 +75,10 @@ pub struct PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificat
     pub predecessor_dehumidification_control_none_case_completed_skip: bool,
     pub predecessor_dehumidification_control_constant_sensible_heat_ratio_case_completed_skip: bool,
     pub predecessor_dehumidification_control_humidistat_case_completed_skip: bool,
-    pub predecessor_dehumidification_control_constant_supply_humidity_ratio_case_completed_skip: bool,
-    pub predecessor_dehumidification_control_default_supply_humidity_ratio_case_exited_via_break: bool,
+    pub predecessor_dehumidification_control_constant_supply_humidity_ratio_case_completed_skip:
+        bool,
+    pub predecessor_dehumidification_control_default_supply_humidity_ratio_case_exited_via_break:
+        bool,
     pub dehumidification_control_none_case_completed_skip: bool,
     pub dehumidification_control_constant_sensible_heat_ratio_case_completed_skip: bool,
     pub dehumidification_control_humidistat_case_completed_skip: bool,
@@ -114,7 +120,7 @@ pub fn purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidif
 ) -> Result<
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardLifecycleSummary,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError,
-> {
+>{
     let unit = runtime.units.get(&system).ok_or(
         PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError::UnknownSystem { system },
     )?;

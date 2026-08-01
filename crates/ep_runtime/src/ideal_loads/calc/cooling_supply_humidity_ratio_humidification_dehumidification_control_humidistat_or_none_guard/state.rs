@@ -5,7 +5,8 @@ use ep_model::IdealLoadsAirSystemId;
 use super::PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardSnapshot;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(in crate::ideal_loads::calc) enum PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardRetainedRoute {
+pub(in crate::ideal_loads::calc) enum PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardRetainedRoute
+{
     UnitOff,
     NonCooling,
     PositiveGuardFalseFallthrough,

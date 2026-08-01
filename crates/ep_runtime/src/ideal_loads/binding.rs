@@ -64,6 +64,7 @@ use super::{
     PurchasedAirCalcCoolingPositiveSupplyTemperatureAssignmentError as CoolingSupplyTemperatureAssignmentError,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitError as CoolingSupplyTemperatureMinimumLimitError,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitError as CoolingSupplyTemperatureMixedAirLimitError,
+    PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardError as CoolingPostSaturationCapacityLimitDehumidificationGuardError,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitGuardError as CoolingPostSaturationCapacityLimitGuardError,
     PurchasedAirCalcCoolingSensibleFlowError,
     PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentError as CoolingSupplyEnthalpyPostSaturationAssignmentError,
@@ -157,6 +158,7 @@ mod cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignm
 mod cooling_positive_supply_temperature_assignment;
 mod cooling_positive_supply_temperature_minimum_limit;
 mod cooling_positive_supply_temperature_mixed_air_limit;
+mod cooling_post_saturation_capacity_limit_dehumidification_guard;
 mod cooling_post_saturation_capacity_limit_guard;
 mod cooling_supply_enthalpy_post_saturation_assignment;
 mod cooling_supply_humidity_ratio_humidification_control_humidistat_guard;
@@ -202,6 +204,7 @@ use cooling_supply_humidity_ratio_saturation_limit_assignment::{
 };
 use cooling_supply_enthalpy_post_saturation_assignment::advance_cooling_supply_enthalpy_post_saturation_assignment;
 use cooling_post_saturation_capacity_limit_guard::advance_cooling_post_saturation_capacity_limit_guard;
+use cooling_post_saturation_capacity_limit_dehumidification_guard::advance_cooling_post_saturation_capacity_limit_dehumidification_guard;
 use cooling_default_supply_humidity_ratio_mixed_air_assignment::advance_cooling_default_supply_humidity_ratio_mixed_air_assignment;
 use cooling_positive_supply_capacity_limit_guard::advance_positive_supply_capacity_limit_guard;
 use cooling_positive_supply_capacity_limit_sensible_output_assignment::advance_positive_supply_capacity_limit_sensible_output_assignment;
@@ -999,6 +1002,10 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingPostSaturationCapacityLimitGuard(
         CoolingPostSaturationCapacityLimitGuardError,
     ),
+    /// The bounded post-saturation capacity-limit dehumidification guard rejected its release state.
+    CalculationCoolingPostSaturationCapacityLimitDehumidificationGuard(
+        CoolingPostSaturationCapacityLimitDehumidificationGuardError,
+    ),
     /// CP378 did not reconcile with the unchanged numerical humidity projections.
     CalculationCoolingSupplyHumidityRatioSaturationLimitAssignmentNumericalInvariant {
         /// Stable CP378 or numerical projection field.
@@ -1654,6 +1661,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_cooling_supply_enthalpy_post_saturation_assignment,
         )?;
+    let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard =
+        advance_cooling_post_saturation_capacity_limit_dehumidification_guard(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_post_saturation_capacity_limit_guard,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1766,6 +1779,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_supply_humidity_ratio_saturation_limit_assignment,
         calculation_cooling_supply_enthalpy_post_saturation_assignment,
         calculation_cooling_post_saturation_capacity_limit_guard,
+        calculation_cooling_post_saturation_capacity_limit_dehumidification_guard,
         coupling,
     })
 }

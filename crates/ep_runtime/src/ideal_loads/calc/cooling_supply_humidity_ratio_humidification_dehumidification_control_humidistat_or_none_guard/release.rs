@@ -35,8 +35,8 @@ use runtime_validation::{
     next_transition_fits, pending_state_is_consistent,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_snapshot_is_exact_direct_release;
-pub(in crate::ideal_loads::calc) use snapshot_validation::snapshots_match_exact as cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_snapshots_match_exact;
 pub(in crate::ideal_loads::calc) use snapshot_validation::snapshot_route as cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_snapshot_route;
+pub(in crate::ideal_loads::calc) use snapshot_validation::snapshots_match_exact as cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_snapshots_match_exact;
 
 pub(in crate::ideal_loads::calc) fn completed_direct_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_is_consistent(
     runtime: &PurchasedAirRuntimeState,
@@ -80,14 +80,21 @@ pub(in crate::ideal_loads::calc) fn completed_direct_cooling_supply_humidity_rat
 /// Fail-closed CP371 public release error.
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError {
-    UnknownSystem { system: IdealLoadsAirSystemId },
-    InitializationNotReady { system: IdealLoadsAirSystemId },
+pub enum PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError
+{
+    UnknownSystem {
+        system: IdealLoadsAirSystemId,
+    },
+    InitializationNotReady {
+        system: IdealLoadsAirSystemId,
+    },
     SystemIdentityMismatch {
         expected: IdealLoadsAirSystemId,
         actual: IdealLoadsAirSystemId,
     },
-    SystemOutsideDirectSubset { system: IdealLoadsAirSystemId },
+    SystemOutsideDirectSubset {
+        system: IdealLoadsAirSystemId,
+    },
     DehumidificationControlTypeOutsideDirectSubset {
         system: IdealLoadsAirSystemId,
         actual: DehumidificationControlType,
@@ -99,7 +106,9 @@ pub enum PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificatio
     CoolingSupplyHumidityRatioHumidificationControlHumidistatGuardSnapshotMismatch {
         system: IdealLoadsAirSystemId,
     },
-    DehumidificationControlTypeProvenanceMismatch { system: IdealLoadsAirSystemId },
+    DehumidificationControlTypeProvenanceMismatch {
+        system: IdealLoadsAirSystemId,
+    },
     PredecessorCallOrder {
         system: IdealLoadsAirSystemId,
         init_call_count: usize,
@@ -109,8 +118,12 @@ pub enum PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificatio
         cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_transition_count:
             usize,
     },
-    PredecessorOutsideDirectSubset { system: IdealLoadsAirSystemId },
-    RuntimeStateInvariantViolation { system: IdealLoadsAirSystemId },
+    PredecessorOutsideDirectSubset {
+        system: IdealLoadsAirSystemId,
+    },
+    RuntimeStateInvariantViolation {
+        system: IdealLoadsAirSystemId,
+    },
 }
 
 impl std::fmt::Display
@@ -140,7 +153,7 @@ pub fn advance_direct_no_oa_calc_cooling_supply_humidity_ratio_humidification_de
 ) -> Result<
     Snapshot,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError,
-> {
+>{
     let selected = predecessor_cp370.system;
     let unit = runtime.units.get(&selected).ok_or(
         PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError::UnknownSystem { system: selected },
@@ -219,24 +232,15 @@ pub fn advance_direct_no_oa_calc_cooling_supply_humidity_ratio_humidification_de
         });
     }
     let dehumidification_control_type = system.dehumidification_control_type;
-    if !dehumidification_control_type_provenance_is_exact(
-        runtime,
-        unit,
-        system,
-        predecessor_cp370,
-    ) {
+    if !dehumidification_control_type_provenance_is_exact(runtime, unit, system, predecessor_cp370)
+    {
         return Err(PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError::DehumidificationControlTypeProvenanceMismatch {
             system: selected,
         });
     }
     if !calc_state_identities_match(unit, selected)
         || !pending_state_is_consistent(unit, retained_predecessor, guard_witness)
-        || !direct_predecessor_is_retained_and_complete(
-            runtime,
-            unit,
-            system,
-            retained_predecessor,
-        )
+        || !direct_predecessor_is_retained_and_complete(runtime, unit, system, retained_predecessor)
     {
         return Err(PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError::RuntimeStateInvariantViolation {
             system: selected,
@@ -293,7 +297,7 @@ pub fn advance_direct_no_oa_calc_cooling_supply_humidity_ratio_humidification_de
 
 fn predecessor_mismatch(
     system: IdealLoadsAirSystemId,
-) -> PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError {
+) -> PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError{
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError::CoolingSupplyHumidityRatioHumidificationControlHumidistatGuardSnapshotMismatch {
         system,
     }
@@ -302,7 +306,7 @@ fn predecessor_mismatch(
 fn call_order_error(
     unit: &crate::ideal_loads::PurchasedAirUnitRuntimeState,
     system: IdealLoadsAirSystemId,
-) -> PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError {
+) -> PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError{
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError::PredecessorCallOrder {
         system,
         init_call_count: unit.init_call_count,

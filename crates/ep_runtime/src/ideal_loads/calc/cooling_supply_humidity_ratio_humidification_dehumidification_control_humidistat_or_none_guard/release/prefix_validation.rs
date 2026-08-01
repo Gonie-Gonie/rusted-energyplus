@@ -99,9 +99,11 @@ pub(super) fn dehumidification_control_type_provenance_is_exact(
     let inherited_owner_matches = !active
         || (predecessor.predecessor_dehumidification_control_type == Some(owner)
             && predecessor.dehumidification_control_none_case_completed_skip
-            && !predecessor.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip
+            && !predecessor
+                .dehumidification_control_constant_sensible_heat_ratio_case_completed_skip
             && !predecessor.dehumidification_control_humidistat_case_completed_skip
-            && !predecessor.dehumidification_control_constant_supply_humidity_ratio_case_completed_skip);
+            && !predecessor
+                .dehumidification_control_constant_supply_humidity_ratio_case_completed_skip);
     owner == DehumidificationControlType::None
         && PURCHASED_AIR_CALC_COOLING_SUPPLY_HUMIDITY_RATIO_HUMIDIFICATION_DEHUMIDIFICATION_CONTROL_HUMIDISTAT_OR_NONE_GUARD_SOURCE_ORDER
             == &PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER[6..11]
