@@ -3825,3 +3825,57 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 72 internal, and zero unused; development commands remain 238.
 Support, readiness, capability, numerical, output, conformance, and Roadmap
 claims remain unchanged.
+
+## CP375 Cooling Humidification Supply-Humidity-Ratio Maximum Assignment
+
+CP375 supersedes only CP374's physical-line-2251 exclusion at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`, locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+by mapping the single executable statement
+`PurchAir.SupplyHumRat = max(PurchAir.SupplyHumRat, SupplyHumRatForHumid);`
+in `PurchasedAirManager.cc`. Its exact four dependency- and text-ordered sites
+are `read-purchased-air-supply-humidity-ratio-for-humidification-supply-maximum`,
+`read-local-supply-humidity-ratio-for-humidification-for-supply-maximum`,
+`apply-source-shaped-two-argument-maximum-for-humidification-supply-maximum`,
+and `assign-purchased-air-supply-humidity-ratio-for-humidification-supply-maximum`.
+They do not claim a C++ operand evaluation order.
+
+Physical lines 2252-2254 close scopes, line 2255 is blank, line 2256 is a
+comment, and line 2257 is blank. The first excluded executable statement is
+therefore line 2258, `SupplyHumRatOrig = PurchAir.SupplyHumRat;`; rejected
+guards also continue dynamically there.
+
+CP375 retains all eight CP374 routes, with only the dehumidification-control
+Humidistat and None routes active. If their CP374 maximum-limit counts are
+`LH` and `LN`, total CP374 limits are `L`, and CP375 assignments are `A`,
+exact state requires `A=L=LH+LN`. Every one of the four site counters equals
+`A`, and `source_site_execution_count=4*A`. Public direct humidification-
+control None is complete-null and zero-site, performs no owner reads, and
+does not write the result store.
+
+Same-call bit-exact CP374 lifecycle, snapshot, latest, witness, and completion
+evidence is the sole immediate predecessor and owns the right operand through
+its resulting local `SupplyHumRatForHumid`. The active left operand is
+route-specific: dehumidification-control None reads same-call CP345's assigned
+`SupplyHumRat`, with no intervening write, while Humidistat reads same-call
+CP362's resulting `SupplyHumRat`. Their branch-specific owner reads sum to
+`A`. No caller/model duplicate or live-service reread is admitted.
+
+CP375 reuses CP333's canonical source-shaped maximum,
+`if left < right { right } else { left }`. Strict-`<` makes it left-biased for
+equal values, signed-zero ties, and unordered NaN comparisons. Authoritative
+operand/result binary64 bits are retained and nonfinite JSON numeric
+projections are null with IEEE sidecars. CP375 adds no `f64::max`, finite or
+range gate, clamp, normalization, psychrometric operation, or coercion.
+
+Canonical private active routes map the line-2251 result-store write. Binding
+preserves CP374-to-CP375-to-unchanged-numerical order under
+`purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_lifecycle`.
+The supported direct numerical DTO remains unchanged and CP345-owned;
+non-direct paths reject CP375 evidence.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 313 total,
+240 public, 73 internal, and zero unused; development commands remain 238.
+Support, readiness, capability, numerical, output, conformance, and Roadmap
+claims remain unchanged.

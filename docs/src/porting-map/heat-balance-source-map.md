@@ -37471,3 +37471,37 @@ CP345 remains result-store supply-humidity owner. Counts remain 32 algorithms,
 293 routines split 58 plus 235 with 170 required, and scripts become 312 total,
 240 public, 72 internal, zero unused, with 238 development commands. Support,
 readiness, conformance, and Roadmap claims remain unchanged.
+
+## CP375 Humidification Supply-Humidity-Ratio Maximum Assignment in the Heat-Balance Loop
+
+CP375 maps only pinned `PurchasedAirManager.cc` physical executable line 2251,
+`PurchAir.SupplyHumRat = max(PurchAir.SupplyHumRat, SupplyHumRatForHumid);`,
+at commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Four dependency- and text-ordered sites read the current result store, read
+the CP374 local, apply the source-shaped maximum, and write the result store
+without claiming C++ operand evaluation order.
+
+Lines 2252-2257 are non-executable braces/comment spacing; line 2258's
+`SupplyHumRatOrig = PurchAir.SupplyHumRat;` is first excluded and remains the
+rejected-guard continuation. CP375 retains all eight CP374 routes, with only
+dehumidification-control Humidistat and None active. For CP374 active counts
+`LH` and `LN`, total `L`, and CP375 writes `A`, `A=L=LH+LN`, each of four
+sites equals `A`, and total sites equal `4*A`. Public direct humidification-
+control None remains complete-null, zero-site, and owner-read-free.
+
+Same-call bit-exact CP374 is the sole immediate predecessor and right owner.
+The None left owner is same-call CP345's assignment with no intervening
+result-store write; the Humidistat left owner is same-call CP362's result.
+CP333's strict source shape `if left < right { right } else { left }` selects
+the left operand for ties, signed zeros, and unordered NaN comparisons.
+
+Private active routes map the line-2251 write. Binding is
+CP374-to-CP375-to-unchanged-numerical under
+`purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_lifecycle`.
+No `f64::max`, extra finite/range gate, clamp, normalization, psychrometrics,
+or coercion is added; the supported direct DTO remains unchanged and
+CP345-owned. Counts stay 32 algorithms, 293 routines split 58 plus 235 with
+170 required, and scripts become 313 total, 240 public, 73 internal, zero
+unused, with 238 development commands. Support, readiness, conformance, and
+Roadmap claims remain unchanged.

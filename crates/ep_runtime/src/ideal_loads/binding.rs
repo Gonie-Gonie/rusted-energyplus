@@ -71,6 +71,7 @@ use super::{
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentError as CoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentError,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationAssignmentError as CoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationAssignmentError,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationMaximumLimitError as CoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationMaximumLimitError,
+    PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioMaximumAssignmentError as CoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioMaximumAssignmentError,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyError,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardError,
     PurchasedAirCalcCoolingSupplyMassFlowLimitBodyError,
@@ -157,6 +158,7 @@ mod cooling_supply_humidity_ratio_humidification_heating_availability_guard;
 mod cooling_supply_humidity_ratio_humidification_moisture_demand_assignment;
 mod cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment;
 mod cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit;
+mod cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment;
 mod cooling_supply_mass_flow_positive_guard;
 mod scheduled_output;
 
@@ -181,6 +183,7 @@ use cooling_supply_humidity_ratio_humidification_dehumidification_control_humidi
 use cooling_supply_humidity_ratio_humidification_moisture_demand_assignment::advance_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment;
 use cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment::advance_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment;
 use cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit::advance_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit;
+use cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment::advance_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment;
 use cooling_default_supply_humidity_ratio_mixed_air_assignment::advance_cooling_default_supply_humidity_ratio_mixed_air_assignment;
 use cooling_positive_supply_capacity_limit_guard::advance_positive_supply_capacity_limit_guard;
 use cooling_positive_supply_capacity_limit_sensible_output_assignment::advance_positive_supply_capacity_limit_sensible_output_assignment;
@@ -954,6 +957,10 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationMaximumLimit(
         CoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationMaximumLimitError,
     ),
+    /// The bounded humidification supply-humidity-ratio maximum assignment rejected its release state.
+    CalculationCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioMaximumAssignment(
+        CoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioMaximumAssignmentError,
+    ),
     /// CP300 rejected predictor, PurchasedAir, or feedback state.
     Coupling(DirectZonePurchasedAirCouplingError),
 }
@@ -1567,6 +1574,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment,
         )?;
+    let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment =
+        advance_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1669,6 +1682,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment,
         calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment,
         calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit,
+        calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment,
         coupling,
     })
 }

@@ -96,6 +96,8 @@ mod cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_fixt
 mod cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment_fixture;
 #[path = "coupled_output_tests/cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_fixture.rs"]
 mod cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_fixture;
+#[path = "coupled_output_tests/cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_fixture.rs"]
+mod cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_fixture;
 #[path = "coupled_output_tests/cooling_supply_mass_flow_ems_override_body_fixture.rs"]
 mod cooling_supply_mass_flow_ems_override_body_fixture;
 #[path = "coupled_output_tests/cooling_supply_mass_flow_ems_override_guard_fixture.rs"]
@@ -172,6 +174,7 @@ use cooling_supply_humidity_ratio_humidification_dehumidification_control_humidi
 use cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_fixture::calculation_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_snapshot;
 use cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment_fixture::calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment_snapshot;
 use cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_fixture::calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_snapshot;
+use cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_fixture::calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_snapshot;
 use cooling_default_supply_humidity_ratio_mixed_air_assignment_fixture::calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment_snapshot;
 use cooling_humidistat_case_break_fixture::calculation_cooling_humidistat_case_break_snapshot;
 use cooling_humidistat_case_entry_fixture::calculation_cooling_humidistat_case_entry_snapshot;
@@ -459,6 +462,12 @@ fn appends_all_no_oa_and_predictor_series_with_hourly_semantics() {
             crate::ideal_loads::calc::
                 cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_snapshot_is_exact_direct_release(
                     output.calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit,
+                )
+        );
+        assert!(
+            crate::ideal_loads::calc::
+                cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_snapshot_is_exact_direct_release(
+                    output.calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment,
                 )
         );
     }
@@ -1085,6 +1094,10 @@ fn scaled_output(
         calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_snapshot(
             calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment,
         );
+    let calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment =
+        calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_snapshot(
+            calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -1172,6 +1185,7 @@ fn scaled_output(
         calculation_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment,
         calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_assignment,
         calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit,
+        calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

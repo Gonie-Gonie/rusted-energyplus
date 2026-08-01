@@ -10,6 +10,7 @@ const CP356_KEY: &str =
 const CP357_KEY: &str = "purchased_air_calc_cooling_constant_shr_case_break_lifecycle";
 const ORDER: [&str; 1] =
     ["exit-purchased-air-dehumidification-control-constant-sensible-heat-ratio-case-via-break"];
+#[allow(dead_code)]
 const DIRECT_FIXTURE_SUPPLY_HUMIDITY_RATIO_BITS: u64 = 0x3f5d_aac3_b48c_9d41;
 
 pub(super) fn assert_direct(runtime: &Value, results: &Value) {
@@ -97,6 +98,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
     cp358_assertions::assert_non_direct(runtime);
 }
 
+#[allow(dead_code)]
 fn assert_numerical_nonfeed(runtime: &Value, results: &Value) {
     let cp345_bits = runtime["purchased_air_calc_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_lifecycle"]
         ["latest"]["assigned_supply_humidity_ratio_ieee_bits"]

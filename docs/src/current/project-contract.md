@@ -20207,3 +20207,46 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 72 internal, and zero unused; development commands remain 238.
 Support, readiness, capability, numerical, output, conformance, and Roadmap
 claims remain unchanged.
+
+## CP375 Source-Ordered Cooling Humidification Supply-Humidity-Ratio Maximum Assignment
+
+CP375 supersedes only CP374's physical-line-2251 exclusion at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`, locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+by mapping
+`PurchAir.SupplyHumRat = max(PurchAir.SupplyHumRat, SupplyHumRatForHumid);`.
+Its four dependency- and text-ordered sites read `PurchAir.SupplyHumRat`, read
+the CP374 local result, apply the source-shaped two-argument maximum, and
+assign `PurchAir.SupplyHumRat`; no C++ operand evaluation order is claimed.
+
+Lines 2252-2257 contain only closing braces, blanks, and a comment. Physical
+executable line 2258, `SupplyHumRatOrig = PurchAir.SupplyHumRat;`, is first
+excluded and is also the rejected-guard continuation. CP375 retains all eight
+CP374 routes, but only dehumidification-control Humidistat and None are active.
+For their CP374 counts `LH` and `LN`, total limits `L`, and CP375 assignments
+`A`, exact state requires `A=L=LH+LN`, each of four site counters equals `A`,
+and total sites equal `4*A`. Public direct humidification-control None is a
+complete-null zero-site route with no owner reads or result-store write.
+
+Same-call bit-exact CP374 evidence is the sole immediate predecessor and owns
+the right operand. On the active None route the left operand is same-call
+CP345's assigned supply humidity ratio, with no intervening write; on the
+active Humidistat route it is same-call CP362's resulting supply humidity
+ratio. The two owner-read counts sum to `A`.
+
+CP333 supplies the canonical source-shaped maximum
+`if left < right { right } else { left }`. Its strict-`<` comparison is
+left-biased for ties, signed zeros, and unordered NaN comparisons. Exact
+operand/result IEEE bits are retained. CP375 adds no `f64::max`, extra finite
+or range gate, clamp, normalization, psychrometric operation, or coercion.
+
+Private active characterization maps the result-store write. Binding orders
+CP374-to-CP375-to-unchanged-numerical under
+`purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_lifecycle`;
+the supported direct numerical DTO remains unchanged and CP345-owned.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 313 total,
+240 public, 73 internal, and zero unused; development commands remain 238.
+Support, readiness, capability, numerical, output, conformance, and Roadmap
+claims remain unchanged.

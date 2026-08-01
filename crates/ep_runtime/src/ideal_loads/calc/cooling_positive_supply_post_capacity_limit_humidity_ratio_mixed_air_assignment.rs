@@ -13,7 +13,10 @@ pub(in crate::ideal_loads::calc) use tests::public_release::completed_cp344_case
 mod transition;
 
 #[allow(unused_imports)]
-pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_is_consistent;
+pub(in crate::ideal_loads::calc) use release::{
+    completed_direct_cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_is_consistent,
+    cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_snapshots_match_bit_exact,
+};
 pub(in crate::ideal_loads) use release::cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_snapshot_is_exact_direct_release;
 pub use release::{
     PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitHumidityRatioMixedAirAssignmentError,

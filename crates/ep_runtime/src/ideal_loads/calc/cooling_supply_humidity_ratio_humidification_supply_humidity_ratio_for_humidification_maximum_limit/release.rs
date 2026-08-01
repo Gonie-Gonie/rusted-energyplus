@@ -44,7 +44,10 @@ use runtime_validation::{
     next_transition_fits, pending_state_is_consistent,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_snapshot_is_exact_direct_release;
-pub(in crate::ideal_loads::calc) use snapshot_validation::snapshots_match_bit_exact as cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_snapshots_match_bit_exact;
+pub(in crate::ideal_loads::calc) use snapshot_validation::{
+    snapshot_route as cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_snapshot_route,
+    snapshots_match_bit_exact as cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_snapshots_match_bit_exact,
+};
 
 pub(in crate::ideal_loads::calc) fn completed_direct_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit_is_consistent(
     runtime: &PurchasedAirRuntimeState,

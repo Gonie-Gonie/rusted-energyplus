@@ -24410,3 +24410,38 @@ CP345 remains result-store supply-humidity owner. Counts stay 32 algorithms,
 293 routines split 58 plus 235, and 170 required. Scripts become 312 total,
 240 public, 72 internal, zero unused; development commands stay 238. Support,
 readiness, conformance, and Roadmap claims are unchanged.
+
+## CP375 Humidification Supply-Humidity-Ratio Maximum-Assignment Placement
+
+CP375 inserts pinned `PurchasedAirManager.cc` physical executable line 2251
+immediately after CP374:
+`PurchAir.SupplyHumRat = max(PurchAir.SupplyHumRat, SupplyHumRatForHumid);`.
+The source lock is commit `6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Four dependency- and text-ordered sites read the result store, read the CP374
+local result, apply the maximum, and assign the result store; no C++ operand
+evaluation order is claimed.
+
+Physical lines 2252-2257 contain only scope closures, blanks, and a comment;
+line 2258's `SupplyHumRatOrig = PurchAir.SupplyHumRat;` is first excluded and
+is the rejected-guard continuation. All eight CP374 routes remain, with only
+dehumidification-control Humidistat and None active. Given CP374 counts `LH`
+and `LN`, total `L`, and CP375 assignments `A`, `A=L=LH+LN`, every site
+equals `A`, and total sites are `4*A`. Public direct humidification-control
+None is complete-null and zero-site with no operand-owner reads.
+
+Same-call bit-exact CP374 is the sole immediate predecessor and owns the right
+operand. None takes its left operand from same-call CP345's assignment, with
+no intervening result-store write; Humidistat takes it from same-call CP362's
+result. CP333's canonical maximum is
+`if left < right { right } else { left }`, left-biased for ties, signed zeros,
+and unordered NaN comparisons.
+
+Private active routes map the result-store write while retaining exact IEEE
+bits. Placement is CP374-to-CP375-to-unchanged-numerical under
+`purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_lifecycle`.
+CP375 adds no `f64::max`, extra gate, clamp, normalization, psychrometrics, or
+coercion; the supported direct DTO remains unchanged and CP345-owned. Counts
+stay 32 algorithms, 293 routines split 58 plus 235, and 170 required. Scripts
+become 313 total, 240 public, 73 internal, zero unused; development commands
+stay 238. Support, readiness, conformance, and Roadmap claims are unchanged.

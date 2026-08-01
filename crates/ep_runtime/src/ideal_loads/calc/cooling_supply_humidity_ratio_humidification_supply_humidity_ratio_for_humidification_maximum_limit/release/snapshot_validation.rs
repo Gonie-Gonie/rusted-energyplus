@@ -23,7 +23,7 @@ pub(in crate::ideal_loads) fn cooling_supply_humidity_ratio_humidification_suppl
     )
 }
 
-pub(super) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
+pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
     let route = route::structural_route(snapshot)?;
     values_fit_route(snapshot, route).then_some(route)
 }

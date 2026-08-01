@@ -28,6 +28,7 @@ use runtime_validation::{
     next_transition_fits, pending_state_is_consistent,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_snapshot_is_exact_direct_release;
+pub(in crate::ideal_loads::calc) use snapshot_validation::snapshots_match_bit_exact as cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignment_snapshots_match_bit_exact;
 
 #[cfg(test)]
 pub(in crate::ideal_loads::calc) use runtime_validation::next_transition_fits as next_transition_fits_for_test;

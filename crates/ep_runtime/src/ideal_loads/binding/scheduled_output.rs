@@ -54,6 +54,7 @@ use super::super::{
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentSnapshot,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationAssignmentSnapshot,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationMaximumLimitSnapshot,
+    PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioMaximumAssignmentSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowLimitBodySnapshot,
@@ -258,6 +259,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered humidification supply-humidity-ratio maximum-limit snapshot.
     pub calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_for_humidification_maximum_limit:
         PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioForHumidificationMaximumLimitSnapshot,
+    /// Source-ordered humidification supply-humidity-ratio maximum-assignment snapshot.
+    pub calculation_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment:
+        PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationSupplyHumidityRatioMaximumAssignmentSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

@@ -21786,3 +21786,44 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 72 internal, and zero unused; development commands remain 238.
 All support, readiness, numerical, capability, output, conformance, and
 Roadmap claims remain unchanged.
+
+## CP375 Humidification Supply-Humidity-Ratio Maximum Assignment
+
+CP375 supersedes only CP374's line-2251 exclusion at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`, by
+mapping
+`PurchAir.SupplyHumRat = max(PurchAir.SupplyHumRat, SupplyHumRatForHumid);`.
+Its exact four dependency- and text-ordered sites read the purchased-air
+supply humidity ratio, read the CP374 local result, apply the source-shaped
+maximum, and assign the purchased-air supply humidity ratio. They make no C++
+operand evaluation-order claim.
+
+Lines 2252-2257 are closing braces, blanks, and a comment, so line 2258's
+`SupplyHumRatOrig = PurchAir.SupplyHumRat;` is the first excluded executable
+statement and rejected-guard continuation. All eight CP374 routes remain;
+only dehumidification-control Humidistat and None are active. With CP374
+active counts `LH` and `LN`, total `L`, and CP375 assignments `A`,
+`A=L=LH+LN`, every site counter equals `A`, and total sites equal `4*A`.
+Public direct humidification-control None is complete-null, zero-site, and
+performs no owner reads.
+
+Same-call bit-exact CP374 is the sole immediate predecessor and right owner.
+The active None route reads CP345's same-call assigned `SupplyHumRat`, with no
+intervening write; the Humidistat route reads CP362's same-call resulting
+`SupplyHumRat`. CP333 corroborates the canonical maximum
+`if left < right { right } else { left }`, whose strict-`<` shape is
+left-biased for ties, signed zero, and unordered NaN comparisons.
+
+Private active routes map the result-store assignment and retain exact IEEE
+bits. CP375 adds no `f64::max`, extra gate, clamp, normalization,
+psychrometrics, or coercion. It is bound
+CP374-to-CP375-to-unchanged-numerical under
+`purchased_air_calc_cooling_supply_humidity_ratio_humidification_supply_humidity_ratio_maximum_assignment_lifecycle`.
+The supported direct numerical DTO stays unchanged and CP345-owned.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 313 total,
+240 public, 73 internal, and zero unused; development commands remain 238.
+All support, readiness, numerical, capability, output, conformance, and
+Roadmap claims remain unchanged.
