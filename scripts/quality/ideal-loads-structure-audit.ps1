@@ -1,6 +1,12 @@
 [CmdletBinding()]
 param()
 
+# Windows PowerShell 5.1 caps visible variables at 4096 by default. The
+# source-order checkpoint audits intentionally share a large master scope.
+if (Get-Variable -Name MaximumVariableCount -ErrorAction SilentlyContinue) {
+    $MaximumVariableCount = [Math]::Max([int]$MaximumVariableCount, 16384)
+}
+
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
@@ -4152,5 +4158,6 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp381-cooling-post-saturation-capacity-limit-dehumidification-guard.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp382-cooling-post-saturation-capacity-limit-dehumidification-total-output-assignment.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp383-cooling-post-saturation-capacity-limit-dehumidification-total-output-guard.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp384-cooling-post-saturation-capacity-limit-dehumidification-total-output-maximum-capacity-assignment.ps1")
 
 Write-Host "IdealLoads structure audit complete."

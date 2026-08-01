@@ -2,6 +2,9 @@
 
 use serde_json::{Map, Value, json};
 
+#[path = "cp384_assertions.rs"]
+mod cp384_assertions;
+
 const CP321_KEY: &str = "purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle";
 const CP340_KEY: &str =
     "purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_guard_lifecycle";
@@ -14,7 +17,7 @@ const ORDER: [&str; 4] = [
     "enter-post-saturation-dehumidification-total-output-capacity-adjustment-body-if-comparison-satisfied",
 ];
 
-pub(super) fn assert_direct(runtime: &Value, _results: &Value) {
+pub(super) fn assert_direct(runtime: &Value, results: &Value) {
     let cp382 = &runtime[CP382_KEY];
     let cp383 = &runtime[CP383_KEY];
     assert_eq!(
@@ -81,6 +84,7 @@ pub(super) fn assert_direct(runtime: &Value, _results: &Value) {
         assert_skipped_guard(latest);
     }
     assert_numerical_nonfeed_and_unchanged_enthalpy(cp383);
+    cp384_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -89,6 +93,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP383_KEY].is_null(),
         "non-direct runtime must not publish CP383 evidence"
     );
+    cp384_assertions::assert_non_direct(runtime);
 }
 
 fn assert_route_partitions(cp382: &Value, cp383: &Value) {

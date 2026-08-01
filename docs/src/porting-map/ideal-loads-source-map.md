@@ -22156,3 +22156,38 @@ row, or promotion is added. Counts stay 32 algorithms, 293 routines, 58
 `state_mapped`, 235 `source_mapped`, and 170 required. Scripts become 321
 total, 240 public, 81 internal, zero unused/unreachable, with 238 development
 commands; all support and Roadmap claims remain unchanged.
+
+## CP384 Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Maximum-Capacity Assignment
+
+CP384 maps pinned `PurchasedAirManager.cc` executable line 2269,
+`CoolTotOutput = PurchAir.MaxCoolTotCap;`, at commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its two sites are
+`read-retained-maximum-total-cooling-capacity-for-post-saturation-dehumidification-total-output-assignment`
+and `assign-local-cooling-total-output-from-maximum-total-cooling-capacity`.
+The deterministic read/write witness does not claim general C++ `=` evaluation
+order. Line 2270 is first excluded and the CP385 boundary.
+
+CP383's twenty-three routes persist. Thirteen inherited routes are complete-null
+skips, five guard-false routes preserve preexisting/resulting output bits with
+no source site, and five body entries become maximum-capacity assignments.
+Exact accounting is `T384=T383`, `M=E383`, `A383=F+M`, and
+`source_site_execution_count=2*M`, with both site counters and every per-lineage
+assignment count equal to `M`. Public/private shapes remain eleven/twelve.
+
+Recursively validated same-call CP383 is the sole predecessor and retained
+operand source. It carries CP382-owned output and CP321-owned maximum capacity
+after CP340 corroboration; CP384 performs no direct owner reach-through. The
+body route copies maximum bits to assigned/resulting output without arithmetic,
+while false routes retain output bits. Nonfinite JSON uses `null` plus exact
+sidecars.
+
+CP384 owns only the updated local `CoolTotOutput` witness for the CP385 boundary.
+It does not execute line 2270, read mixed-air enthalpy or flow, calculate or
+assign supply enthalpy, mutate state, or feed/reconcile with numerical coupling,
+node update, or reporting. Non-direct paths reject its evidence. No routine,
+psychrometrics row, or promotion is added. Counts stay 32 algorithms, 293
+routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Scripts
+become 322 total, 240 public, 82 internal, zero unused/unreachable, with 238
+development commands; all support and Roadmap claims remain unchanged.

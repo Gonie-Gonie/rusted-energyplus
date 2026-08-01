@@ -125,7 +125,7 @@ fn cp383_duplicate_public_release_is_rejected_transactionally() {
     assert_eq!(runtime, before);
 }
 
-fn completed_cp382_case(
+pub(in crate::ideal_loads::calc) fn completed_cp382_case(
     capacity_limit: bool,
 ) -> (
     PurchasedAirRuntimeState,

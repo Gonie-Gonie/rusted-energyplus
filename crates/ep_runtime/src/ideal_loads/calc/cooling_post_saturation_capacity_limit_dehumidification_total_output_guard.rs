@@ -8,11 +8,18 @@ mod release;
 mod state;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::{
+    active_input as active_input_for_cp384_test,
+    completed_cp382_case as completed_cp382_case_for_cp384_test,
+    predecessor_for_route as predecessor_for_cp384_test,
+};
 mod transition;
 
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
     completed_direct_cooling_post_saturation_capacity_limit_dehumidification_total_output_guard_is_consistent,
+    snapshot_route as cooling_post_saturation_capacity_limit_dehumidification_total_output_guard_snapshot_route,
     cooling_post_saturation_capacity_limit_dehumidification_total_output_guard_snapshots_match_bit_exact,
 };
 pub use release::{

@@ -37814,3 +37814,34 @@ algorithms, 293 routines split 58 plus 235 with 170 required, and scripts are
 321 total, 240 public, 81 internal, zero unused/unreachable, with 238 commands.
 Support, readiness, capability, numerical, output, status, and Roadmap claims
 remain unchanged.
+
+## CP384 Post-Saturation Capacity-Limit Dehumidification Total-Output Maximum-Capacity Assignment in the Heat-Balance Loop
+
+CP384 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+`PurchasedAirManager.cc` line 2269's
+`CoolTotOutput = PurchAir.MaxCoolTotCap;` assignment. Its two sites are
+`read-retained-maximum-total-cooling-capacity-for-post-saturation-dehumidification-total-output-assignment`
+and `assign-local-cooling-total-output-from-maximum-total-cooling-capacity`.
+Line 2270's supply-enthalpy calculation is excluded for CP385.
+
+All twenty-three CP383 routes remain distinct. Thirteen are complete-null
+skips, five guard-false routes preserve local output without a CP384 site, and
+five body-entry routes execute the read/write assignment. For assignments `M`,
+exact state requires `T384=T383`, `M=E383`, `A383=F+M`, and
+`source_site_execution_count=2*M`, with per-lineage parity. Recursively
+validated CP383 is the sole predecessor and retained operand source, carrying
+CP382 output plus CP321 maximum capacity after CP340 corroboration without a new
+owner re-read.
+
+The assignment copies raw binary64 bits and adds no arithmetic or finite gate.
+Heat-balance placement remains evidence-only before unchanged numerical
+coupling: CP384 neither executes line 2270 nor mutates or feeds enthalpy,
+supply/load/node/report state. Non-direct paths reject CP384 evidence.
+
+No routine, psychrometrics row, or promotion is added. Counts stay 32
+algorithms, 293 routines split 58 plus 235 with 170 required, and scripts are
+322 total, 240 public, 82 internal, zero unused/unreachable, with 238 commands.
+Support, readiness, capability, numerical, output, status, and Roadmap claims
+remain unchanged.

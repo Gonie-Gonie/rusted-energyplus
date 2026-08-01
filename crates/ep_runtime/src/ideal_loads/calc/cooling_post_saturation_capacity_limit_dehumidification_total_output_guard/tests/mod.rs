@@ -31,6 +31,8 @@ mod overflow;
 mod release;
 mod routes;
 
+pub(in crate::ideal_loads::calc) use release::completed_cp382_case;
+
 #[test]
 fn cp383_source_boundary_and_order_are_exact() {
     assert_eq!(
@@ -52,7 +54,7 @@ fn cp383_source_boundary_and_order_are_exact() {
     );
 }
 
-pub(super) fn predecessor_for_route(
+pub(in crate::ideal_loads::calc) fn predecessor_for_route(
     inherited_route: usize,
     outcome: usize,
     ordinal: usize,
@@ -110,7 +112,10 @@ pub(super) fn predecessor_for_route(
     advance_cp382(&mut cp382_state, cp381, cp382_input).expect("CP382")
 }
 
-pub(super) fn active_input(predecessor: Predecessor, capacity: f64) -> Option<ActiveInput> {
+pub(in crate::ideal_loads::calc) fn active_input(
+    predecessor: Predecessor,
+    capacity: f64,
+) -> Option<ActiveInput> {
     Some(ActiveInput {
         cooling_total_output_w: predecessor
             .cooling_total_output_w

@@ -20657,3 +20657,49 @@ algorithms remain `scaffold`/`none`, and both Calc routines remain
 235 `source_mapped`, and 170 required. Script inventory is 321 total, 240
 public, 81 internal, zero unused, zero unreachable, and 238 development
 commands.
+
+## CP384 Source-Ordered Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Maximum-Capacity Assignment
+
+CP384 maps exactly EnergyPlus 26.1 `PurchasedAirManager.cc` executable line
+2269, `CoolTotOutput = PurchAir.MaxCoolTotCap;`, at commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its two ordered sites are
+`read-retained-maximum-total-cooling-capacity-for-post-saturation-dehumidification-total-output-assignment`
+and `assign-local-cooling-total-output-from-maximum-total-cooling-capacity`.
+This RHS-read-to-LHS-write witness makes no general C++ `=` evaluation-order
+claim. Line 2270's supply-enthalpy calculation is first excluded and reserved
+for CP385.
+
+All twenty-three CP383 routes remain distinct. Thirteen ancestral skip routes
+remain complete-null; five CP383 guard-false routes preserve preexisting output
+without a CP384 read or write; and five CP383 body-entry routes execute both
+sites and become maximum-capacity assignments. For CP383 active comparisons
+`A`, false routes `F`, body entries and CP384 assignments `M`, exact state
+requires `T384=T383`, `M=E383`, `A=F+M`, both site counters equal `M`, and
+`source_site_execution_count=2*M`, including exact per-lineage parity. Eleven
+routes are public and twelve are private.
+
+Same-call bit-exact CP383 lifecycle/snapshot/latest/witness/completion evidence
+is the sole predecessor and sole retained operand source. Its recursively
+validated values preserve CP382 output ownership, CP321 maximum-capacity
+ownership, and CP340 corroboration. CP384 does not directly re-read CP321 or
+CP340 and rejects CP341, caller/model/sizing/service, and DTO substitutes.
+
+CP384 performs a bit-exact binary64 copy only. It does not repeat `>`, add
+arithmetic, normalize, clamp, or reject nonfinite payloads. Guard-false output
+bits are unchanged; assignment routes make maximum, assigned, and resulting
+bits identical. JSON uses finite numbers or `null` plus authoritative IEEE
+sidecars. CP384 does not execute line 2270, read enthalpy or flow operands,
+divide, subtract, write supply enthalpy, change supply/load/node/report state,
+or consume, feed, reconcile with, overwrite, or replace
+`DirectZonePurchasedAirCouplingInput` or numerical DTO/result state. Non-direct
+execution rejects CP384 evidence.
+
+No routine or psychrometrics-map row, support tier, readiness, capability,
+numerical-conformance, output, status, or Roadmap promotion occurs. Both parent
+algorithms remain `scaffold`/`none`, and both Calc routines remain
+`source_mapped`. Counts remain 32 algorithms, 293 routines, 58 `state_mapped`,
+235 `source_mapped`, and 170 required. Script inventory is 322 total, 240
+public, 82 internal, zero unused, zero unreachable, and 238 development
+commands.

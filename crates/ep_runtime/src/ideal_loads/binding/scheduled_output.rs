@@ -50,6 +50,7 @@ use super::super::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardSnapshot,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputAssignmentSnapshot,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputGuardSnapshot,
+    PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputMaximumCapacityAssignmentSnapshot,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitGuardSnapshot,
     PurchasedAirCalcCoolingSensibleFlowSnapshot,
     PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentSnapshot,
@@ -294,6 +295,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered post-saturation dehumidification total-output capacity guard snapshot.
     pub calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_guard:
         PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputGuardSnapshot,
+    /// Source-ordered post-saturation dehumidification total-output maximum-capacity assignment snapshot.
+    pub calculation_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment:
+        PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputMaximumCapacityAssignmentSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

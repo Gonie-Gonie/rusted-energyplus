@@ -1,0 +1,61 @@
+//! JSON serialization for CP384 lifecycle evidence.
+
+use ep_runtime::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputMaximumCapacityAssignmentLifecycleSummary;
+use serde_json::{Value, json};
+
+mod snapshot;
+
+use snapshot::snapshot_json;
+
+pub(in crate::pipeline) fn lifecycle_json(
+    lifecycle: &PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputMaximumCapacityAssignmentLifecycleSummary,
+) -> Value {
+    let state = &lifecycle.state;
+    json!({
+        "source": lifecycle.source,
+        "first_excluded_source": lifecycle.first_excluded_source,
+        "system": state.system.0,
+        "transition_count": state.transition_count,
+        "unit_off_skip_count": state.unit_off_skip_count,
+        "non_cooling_skip_count": state.non_cooling_skip_count,
+        "positive_guard_false_fallthrough_skip_count": state.positive_guard_false_fallthrough_skip_count,
+        "heating_availability_guard_false_fallthrough_count": state.heating_availability_guard_false_fallthrough_count,
+        "humidification_control_guard_false_fallthrough_count": state.humidification_control_guard_false_fallthrough_count,
+        "dehumidification_control_humidistat_supply_humidity_ratio_maximum_assignment_count": state.dehumidification_control_humidistat_supply_humidity_ratio_maximum_assignment_count,
+        "dehumidification_control_none_supply_humidity_ratio_maximum_assignment_count": state.dehumidification_control_none_supply_humidity_ratio_maximum_assignment_count,
+        "dehumidification_control_guard_false_fallthrough_count": state.dehumidification_control_guard_false_fallthrough_count,
+        "heating_availability_guard_false_fallthrough_capacity_guard_false_count": state.heating_availability_guard_false_fallthrough_capacity_guard_false_count,
+        "heating_availability_guard_false_fallthrough_dehumidification_guard_false_count": state.heating_availability_guard_false_fallthrough_dehumidification_guard_false_count,
+        "heating_availability_guard_false_fallthrough_dehumidification_total_output_assignment_count": state.heating_availability_guard_false_fallthrough_dehumidification_total_output_assignment_count,
+        "heating_availability_guard_false_fallthrough_dehumidification_total_output_capacity_guard_false_fallthrough_count": state.heating_availability_guard_false_fallthrough_dehumidification_total_output_capacity_guard_false_fallthrough_count,
+        "heating_availability_guard_false_fallthrough_dehumidification_total_output_maximum_capacity_assignment_count": state.heating_availability_guard_false_fallthrough_dehumidification_total_output_maximum_capacity_assignment_count,
+        "humidification_control_guard_false_fallthrough_capacity_guard_false_count": state.humidification_control_guard_false_fallthrough_capacity_guard_false_count,
+        "humidification_control_guard_false_fallthrough_dehumidification_guard_false_count": state.humidification_control_guard_false_fallthrough_dehumidification_guard_false_count,
+        "humidification_control_guard_false_fallthrough_dehumidification_total_output_assignment_count": state.humidification_control_guard_false_fallthrough_dehumidification_total_output_assignment_count,
+        "humidification_control_guard_false_fallthrough_dehumidification_total_output_capacity_guard_false_fallthrough_count": state.humidification_control_guard_false_fallthrough_dehumidification_total_output_capacity_guard_false_fallthrough_count,
+        "humidification_control_guard_false_fallthrough_dehumidification_total_output_maximum_capacity_assignment_count": state.humidification_control_guard_false_fallthrough_dehumidification_total_output_maximum_capacity_assignment_count,
+        "dehumidification_control_humidistat_maximum_assignment_capacity_guard_false_count": state.dehumidification_control_humidistat_maximum_assignment_capacity_guard_false_count,
+        "dehumidification_control_humidistat_maximum_assignment_dehumidification_guard_false_count": state.dehumidification_control_humidistat_maximum_assignment_dehumidification_guard_false_count,
+        "dehumidification_control_humidistat_maximum_assignment_dehumidification_total_output_assignment_count": state.dehumidification_control_humidistat_maximum_assignment_dehumidification_total_output_assignment_count,
+        "dehumidification_control_humidistat_maximum_assignment_dehumidification_total_output_capacity_guard_false_fallthrough_count": state.dehumidification_control_humidistat_maximum_assignment_dehumidification_total_output_capacity_guard_false_fallthrough_count,
+        "dehumidification_control_humidistat_maximum_assignment_dehumidification_total_output_maximum_capacity_assignment_count": state.dehumidification_control_humidistat_maximum_assignment_dehumidification_total_output_maximum_capacity_assignment_count,
+        "dehumidification_control_none_maximum_assignment_capacity_guard_false_count": state.dehumidification_control_none_maximum_assignment_capacity_guard_false_count,
+        "dehumidification_control_none_maximum_assignment_dehumidification_guard_false_count": state.dehumidification_control_none_maximum_assignment_dehumidification_guard_false_count,
+        "dehumidification_control_none_maximum_assignment_dehumidification_total_output_assignment_count": state.dehumidification_control_none_maximum_assignment_dehumidification_total_output_assignment_count,
+        "dehumidification_control_none_maximum_assignment_dehumidification_total_output_capacity_guard_false_fallthrough_count": state.dehumidification_control_none_maximum_assignment_dehumidification_total_output_capacity_guard_false_fallthrough_count,
+        "dehumidification_control_none_maximum_assignment_dehumidification_total_output_maximum_capacity_assignment_count": state.dehumidification_control_none_maximum_assignment_dehumidification_total_output_maximum_capacity_assignment_count,
+        "dehumidification_control_guard_false_fallthrough_capacity_guard_false_count": state.dehumidification_control_guard_false_fallthrough_capacity_guard_false_count,
+        "dehumidification_control_guard_false_fallthrough_dehumidification_guard_false_count": state.dehumidification_control_guard_false_fallthrough_dehumidification_guard_false_count,
+        "dehumidification_control_guard_false_fallthrough_dehumidification_total_output_assignment_count": state.dehumidification_control_guard_false_fallthrough_dehumidification_total_output_assignment_count,
+        "dehumidification_control_guard_false_fallthrough_dehumidification_total_output_capacity_guard_false_fallthrough_count": state.dehumidification_control_guard_false_fallthrough_dehumidification_total_output_capacity_guard_false_fallthrough_count,
+        "dehumidification_control_guard_false_fallthrough_dehumidification_total_output_maximum_capacity_assignment_count": state.dehumidification_control_guard_false_fallthrough_dehumidification_total_output_maximum_capacity_assignment_count,
+        "dehumidification_total_output_capacity_guard_evaluation_count": state.dehumidification_total_output_capacity_guard_evaluation_count,
+        "dehumidification_total_output_capacity_guard_false_fallthrough_count": state.dehumidification_total_output_capacity_guard_false_fallthrough_count,
+        "dehumidification_total_output_maximum_capacity_assignment_count": state.dehumidification_total_output_maximum_capacity_assignment_count,
+        "source_site_execution_count": state.source_site_execution_count,
+        "cp383_retained_maximum_total_cooling_capacity_owned_read_count": state.cp383_retained_maximum_total_cooling_capacity_owned_read_count,
+        "maximum_total_cooling_capacity_read_count": state.maximum_total_cooling_capacity_read_count,
+        "cooling_total_output_assignment_write_count": state.cooling_total_output_assignment_write_count,
+        "latest": state.latest.map(snapshot_json),
+    })
+}

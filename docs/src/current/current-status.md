@@ -4314,3 +4314,56 @@ parent algorithms remain `scaffold`/`none`, and both Calc routines remain
 becomes 321 total, 240 public, 81 internal, zero unused, and zero unreachable;
 development commands remain 238. Support, readiness, capability, numerical,
 output, conformance, status, and Roadmap claims remain unchanged.
+
+## CP384 Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Maximum-Capacity Assignment
+
+CP384 supersedes only CP383's first-excluded boundary by mapping EnergyPlus
+26.1 `PurchasedAirManager.cc` physical executable line 2269,
+`CoolTotOutput = PurchAir.MaxCoolTotCap;`, at pinned commit
+`6f2e40d10250a105b49966baa24d843711e61048` and locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact source-text sites are
+`read-retained-maximum-total-cooling-capacity-for-post-saturation-dehumidification-total-output-assignment`
+and `assign-local-cooling-total-output-from-maximum-total-cooling-capacity`.
+The retained right-hand-side read followed by the local write is a deterministic
+Rust witness, not a general C++ built-in `=` evaluation-order claim. Executable
+line 2270, `SupplyEnthalpy = MixedAirEnthalpy - CoolTotOutput /
+SupplyMassFlowRate;`, is first excluded and the CP385 boundary.
+
+CP384 preserves CP383's twenty-three routes without a new branch. The thirteen
+`U/N/P/K/X` routes remain complete-null zero-site skips. Five CP383 guard-false
+`F` routes execute no CP384 site and preserve the preexisting local
+`CoolTotOutput` bits. Each of five CP383 adjustment-body entries becomes a
+maximum-capacity-assigned route `M` and executes both sites. Exact checked state
+requires `T384=T383`, `M=E383`, `A383=F+M`, each read and write counter equal
+`M`, `source_site_execution_count=2*M`, and the `F/M` partition to hold for
+every lineage. Eleven routes remain public exact reachability and twelve remain
+private characterization.
+
+Recursively complete same-call bit-exact CP383 lifecycle, snapshot, latest,
+private-witness, and completion evidence is the sole immediate predecessor and
+the only retained operand source used by CP384. CP383 carries CP382-owned local
+output and CP321-owned maximum capacity after mandatory same-call CP340 bit
+corroboration. CP384 does not reach through to CP321 or CP340 and accepts no
+CP341, caller, model, sizing, live-service, or numerical-DTO substitute.
+
+The assignment performs no arithmetic, comparison, clamp, normalization, or
+finite coercion: the retained maximum-capacity binary64 payload is copied
+bit-exactly to assigned and resulting `CoolTotOutput`. Guard-false routes keep
+preexisting and resulting bits identical while leaving the RHS-read and
+assigned fields absent. Public body-entry lineage can cap a nonfinite
+preexisting output to finite positive capacity. JSON projects nonfinite numbers
+as `null` while retaining authoritative IEEE sidecars; inherited skips keep all
+values and sidecars null. CP384 does not execute line 2270, read mixed-air
+enthalpy or supply mass flow, divide or subtract, change supply enthalpy or any
+supply/load/node/report state, or feed, reconcile with, overwrite, or replace
+`DirectZonePurchasedAirCouplingInput` or the unchanged numerical DTO/result.
+Non-direct paths reject CP384 evidence.
+
+No routine or psychrometrics-map row and no support promotion are added. Both
+parent algorithms remain `scaffold`/`none`, and both Calc routines remain
+`source_mapped`. Counts remain 32 algorithms and 293 routines, split 58
+`state_mapped` plus 235 `source_mapped`, with 170 required. Script inventory
+becomes 322 total, 240 public, 82 internal, zero unused, and zero unreachable;
+development commands remain 238. Support, readiness, capability, numerical,
+output, conformance, status, and Roadmap claims remain unchanged.

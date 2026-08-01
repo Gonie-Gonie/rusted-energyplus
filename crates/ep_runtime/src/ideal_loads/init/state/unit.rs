@@ -227,6 +227,8 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputAssignmentRuntimeState::new(system),
             calc_cooling_post_saturation_capacity_limit_dehumidification_total_output_guard:
                 PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputGuardRuntimeState::new(system),
+            calc_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment:
+                PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputMaximumCapacityAssignmentRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

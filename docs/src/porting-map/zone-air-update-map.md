@@ -24746,3 +24746,33 @@ algorithms, 293 routines split 58 plus 235, and 170 required. Scripts become
 321 total, 240 public, 81 internal, zero unused and zero unreachable;
 development commands stay 238. Support, readiness, capability, numerical,
 output, conformance, status, and Roadmap claims remain unchanged.
+
+## CP384 Post-Saturation Capacity-Limit Dehumidification Total-Output Maximum-Capacity Assignment Placement
+
+CP384 maps `PurchasedAirManager.cc` executable line 2269,
+`CoolTotOutput = PurchAir.MaxCoolTotCap;`, at pinned commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The two ordered sites are
+`read-retained-maximum-total-cooling-capacity-for-post-saturation-dehumidification-total-output-assignment`
+and `assign-local-cooling-total-output-from-maximum-total-cooling-capacity`.
+Line 2270 is first excluded for CP385.
+
+CP383's twenty-three routes persist: thirteen inherited null skips, five
+guard-false output-preserving routes, and five maximum-capacity assignments.
+With assignments `M`, exact state is `T384=T383`, `M=E383`, `A383=F+M`, and
+`source_site_execution_count=2*M`, including exact per-lineage partitions.
+Public/private routes remain eleven/twelve. CP383 is the sole recursively
+complete predecessor and retained operand source; its CP382 output and
+CP321/CP340 capacity provenance are reused without direct reach-through.
+
+Raw binary64 capacity bits are copied exactly to assigned/resulting local
+output. CP384 does not execute line 2270, calculate supply enthalpy, update a
+zone node, or mutate/feed/reconcile with numerical, enthalpy, supply, load, or
+report state. Non-direct paths reject its evidence.
+
+No routine, psychrometrics row, or promotion is added. Counts stay 32
+algorithms, 293 routines split 58 plus 235, and 170 required. Scripts become
+322 total, 240 public, 82 internal, zero unused and zero unreachable;
+development commands stay 238. Support, readiness, capability, numerical,
+output, conformance, status, and Roadmap claims remain unchanged.
