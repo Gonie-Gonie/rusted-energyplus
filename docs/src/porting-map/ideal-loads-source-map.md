@@ -22086,3 +22086,39 @@ algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
 required. Scripts become 319 total, 240 public, 79 internal, zero unused, zero
 unreachable, with 238 development commands; support, readiness, capability,
 numerical, output, conformance, status, and Roadmap claims remain unchanged.
+
+## CP382 Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Assignment
+
+CP382 maps pinned `PurchasedAirManager.cc` executable line 2267,
+`CoolTotOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);`, at
+commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its six sites are
+`read-retained-supply-mass-flow-rate-for-post-saturation-dehumidification-total-output-product`,
+`read-retained-mixed-air-enthalpy-for-post-saturation-dehumidification-total-output-difference`,
+`read-retained-supply-enthalpy-for-post-saturation-dehumidification-total-output-difference`,
+`calculate-mixed-air-enthalpy-minus-supply-enthalpy-for-post-saturation-dehumidification-total-output`,
+`calculate-supply-mass-flow-rate-times-enthalpy-difference-for-post-saturation-dehumidification-total-output`,
+and `assign-local-cooling-total-output-for-post-saturation-dehumidification`.
+Side-effect-free reads are witnessed deterministically without claiming C++
+operand evaluation order. Line 2268 is first excluded and the CP383 boundary.
+
+The eighteen CP381 routes remain exact: thirteen `U/N/P/K/X` shapes skip with
+complete-null evidence, while five dehumidification-body shapes execute and
+assign. With `A=CP381.dehumidification_body_entry_count`, `T382=T381`, each site
+counter equals `A`, and `source_site_execution_count=6*A`.
+
+CP381 is the sole recursively complete predecessor. CP330 owns supply flow,
+CP329 owns mixed-air enthalpy, and CP379 owns final supply enthalpy; retained
+CP329/CP339/CP379 parity fields corroborate the exact owner bits. The transition
+uses raw binary64 `(mixed - supply)` followed by multiplication, with no
+reassociation, distribution, `mul_add`, clamp, epsilon, normalization, or
+finite-result gate. Nonfinite JSON values are `null` with IEEE sidecars.
+
+CP382 owns only local `CoolTotOutput` evidence. It does not enter line 2268,
+apply `MaxCoolTotCap`, mutate state, or feed/reconcile with unchanged numerical
+coupling, node update, or reporting. Non-direct paths reject its evidence. No
+routine, psychrometrics row, or promotion is added. Counts stay 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Scripts
+become 320 total, 240 public, 80 internal, zero unused/unreachable, with 238
+development commands; all support and Roadmap claims remain unchanged.

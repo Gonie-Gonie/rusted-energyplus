@@ -4206,3 +4206,56 @@ parent algorithms remain `scaffold`/`none`, and both Calc routines remain
 becomes 319 total, 240 public, 79 internal, zero unused, and zero unreachable;
 development commands remain 238. Support, readiness, capability, numerical,
 output, conformance, status, and Roadmap claims remain unchanged.
+
+## CP382 Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Assignment
+
+CP382 supersedes only CP381's first-excluded boundary by mapping EnergyPlus
+26.1 `PurchasedAirManager.cc` physical executable line 2267,
+`CoolTotOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);`, at
+pinned commit `6f2e40d10250a105b49966baa24d843711e61048` and locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact source-text sites are
+`read-retained-supply-mass-flow-rate-for-post-saturation-dehumidification-total-output-product`,
+`read-retained-mixed-air-enthalpy-for-post-saturation-dehumidification-total-output-difference`,
+`read-retained-supply-enthalpy-for-post-saturation-dehumidification-total-output-difference`,
+`calculate-mixed-air-enthalpy-minus-supply-enthalpy-for-post-saturation-dehumidification-total-output`,
+`calculate-supply-mass-flow-rate-times-enthalpy-difference-for-post-saturation-dehumidification-total-output`,
+and `assign-local-cooling-total-output-for-post-saturation-dehumidification`.
+The three reads are side-effect-free, so their deterministic Rust witness order
+does not claim a C++ operand-evaluation order. Executable line 2268's maximum-
+total-capacity guard is first excluded and the CP383 boundary.
+
+CP382 preserves CP381's eighteen retained routes without a new branch. UnitOff
+(`U`), non-cooling (`N`), positive-guard-false (`P`), five capacity-limit-
+guard-false (`K`), and five dehumidification-guard-false (`X`) successors are
+thirteen complete-null zero-site skips. The five CP381 dehumidification-body
+successors each become a total-output-assigned route. With assignment count
+`A=CP381.dehumidification_body_entry_count`, exact checked state requires
+`T382=T381`, every one of the six per-site counters equals `A`, and
+`source_site_execution_count=6*A`.
+
+Recursively complete same-call bit-exact CP381 is the sole predecessor. CP330
+owns positive `SupplyMassFlowRate`; CP329's three retained flow projections and
+CP339's retained flow read corroborate its bits. CP329's mixed-air enthalpy
+projection owns `MixedAirEnthalpy`, corroborated by its recirculation projection
+and CP339. CP379's resulting supply enthalpy owns `SupplyEnthalpy`, corroborated
+by its assigned and psychrometric fields. Caller, model, service, and numerical-
+DTO substitutes are forbidden.
+
+The transition evaluates raw binary64 `mixed - supply` and then
+`flow * difference` with exactly that grouping. It adds no reassociation,
+distribution, `mul_add`, clamp, normalization, epsilon, or finite-result gate;
+public `+infinity * +/-0` NaN and overflowed infinity remain valid derived
+evidence. JSON projects nonfinite values as `null` while preserving exact IEEE
+bit sidecars. CP382 owns only the local `CoolTotOutput` witness: it does not
+enter line 2268, apply `MaxCoolTotCap`, change supply/load/node/report state, or
+feed, reconcile with, overwrite, or replace `DirectZonePurchasedAirCouplingInput`
+or the unchanged numerical DTO/result. Non-direct paths reject CP382 evidence.
+
+No routine or psychrometrics-map row and no support promotion are added. Both
+parent algorithms remain `scaffold`/`none`, and both Calc routines remain
+`source_mapped`. Counts remain 32 algorithms and 293 routines, split 58
+`state_mapped` plus 235 `source_mapped`, with 170 required. Script inventory
+becomes 320 total, 240 public, 80 internal, zero unused, and zero unreachable;
+development commands remain 238. Support, readiness, capability, numerical,
+output, conformance, status, and Roadmap claims remain unchanged.

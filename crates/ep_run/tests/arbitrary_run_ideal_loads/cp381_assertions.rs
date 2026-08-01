@@ -1,5 +1,8 @@
 //! CP381 post-saturation capacity-limit dehumidification-guard assertions.
 
+#[path = "cp382_assertions.rs"]
+mod cp382_assertions;
+
 use serde_json::{Map, Value, json};
 
 const CP329_KEY: &str = "purchased_air_calc_cooling_mixed_air_call_lifecycle";
@@ -182,7 +185,8 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
             assert_eq!(cp381["dehumidification_guard_evaluation_count"], 0);
         }
     }
-    assert_numerical_nonfeed_and_unchanged_enthalpy(runtime, results);
+    assert_cp381_numerical_nonfeed_and_unchanged_enthalpy(runtime);
+    cp382_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -191,6 +195,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP381_KEY].is_null(),
         "non-direct runtime must not publish CP381 evidence"
     );
+    cp382_assertions::assert_non_direct(runtime);
 }
 
 fn assert_active_comparison(cp329: &Value, cp378: &Value, cp379: &Value, latest: &Value) {
@@ -267,7 +272,7 @@ fn count(value: &Value, field: &str) -> u64 {
     count.unwrap_or_default()
 }
 
-fn assert_numerical_nonfeed_and_unchanged_enthalpy(runtime: &Value, _results: &Value) {
+fn assert_cp381_numerical_nonfeed_and_unchanged_enthalpy(runtime: &Value) {
     assert!(
         runtime[CP379_KEY]["latest"]["resulting_supply_enthalpy_j_per_kg_ieee_bits"]
             .as_str()

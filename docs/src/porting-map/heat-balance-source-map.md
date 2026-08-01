@@ -37748,3 +37748,37 @@ algorithms, 293 routines split 58 plus 235 with 170 required, and scripts are
 319 total, 240 public, 79 internal, zero unused/unreachable, with 238 commands.
 Support, readiness, capability, numerical, output, conformance, status, and
 Roadmap claims remain unchanged.
+
+## CP382 Post-Saturation Capacity-Limit Dehumidification Total-Output Assignment in the Heat-Balance Loop
+
+CP382 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+`PurchasedAirManager.cc` line 2267's grouped local `CoolTotOutput` assignment.
+Its six sites are
+`read-retained-supply-mass-flow-rate-for-post-saturation-dehumidification-total-output-product`,
+`read-retained-mixed-air-enthalpy-for-post-saturation-dehumidification-total-output-difference`,
+`read-retained-supply-enthalpy-for-post-saturation-dehumidification-total-output-difference`,
+`calculate-mixed-air-enthalpy-minus-supply-enthalpy-for-post-saturation-dehumidification-total-output`,
+`calculate-supply-mass-flow-rate-times-enthalpy-difference-for-post-saturation-dehumidification-total-output`,
+and `assign-local-cooling-total-output-for-post-saturation-dehumidification`.
+Line 2268's total-capacity guard is excluded for CP383.
+
+CP382 retains all eighteen CP381 routes: thirteen skip all sites and five body
+routes execute all six. Thus `T382=T381`, every site counter equals CP381 body
+entries `A`, and the source count is `6*A`. Recursively validated CP381 is the
+sole predecessor. CP330, CP329, and CP379 respectively own supply flow,
+mixed-air enthalpy, and final supply enthalpy, with retained same-call bit
+corroboration; no live or numerical substitute is accepted.
+
+Raw binary64 subtraction then multiplication preserves source grouping and
+permits derived NaN/infinity. JSON uses `null` plus exact IEEE sidecars for
+nonfinite evidence. Heat-balance placement remains evidence-only before the
+unchanged numerical coupling: CP382 neither enters line 2268 nor mutates or
+feeds supply/load/node/report state. Non-direct paths reject CP382 evidence.
+
+No routine, psychrometrics row, or promotion is added. Counts stay 32
+algorithms, 293 routines split 58 plus 235 with 170 required, and scripts are
+320 total, 240 public, 80 internal, zero unused/unreachable, with 238 commands.
+Support, readiness, capability, numerical, output, status, and Roadmap claims
+remain unchanged.

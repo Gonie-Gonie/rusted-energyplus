@@ -24682,3 +24682,36 @@ algorithms, 293 routines split 58 plus 235, and 170 required. Scripts become
 319 total, 240 public, 79 internal, zero unused and zero unreachable;
 development commands stay 238. Support, readiness, capability, numerical,
 output, conformance, status, and Roadmap claims remain unchanged.
+
+## CP382 Post-Saturation Capacity-Limit Dehumidification Total-Output Assignment Placement
+
+CP382 maps `PurchasedAirManager.cc` executable line 2267 at pinned commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The six ordered sites are
+`read-retained-supply-mass-flow-rate-for-post-saturation-dehumidification-total-output-product`,
+`read-retained-mixed-air-enthalpy-for-post-saturation-dehumidification-total-output-difference`,
+`read-retained-supply-enthalpy-for-post-saturation-dehumidification-total-output-difference`,
+`calculate-mixed-air-enthalpy-minus-supply-enthalpy-for-post-saturation-dehumidification-total-output`,
+`calculate-supply-mass-flow-rate-times-enthalpy-difference-for-post-saturation-dehumidification-total-output`,
+and `assign-local-cooling-total-output-for-post-saturation-dehumidification`.
+Line 2268 is first excluded for CP383.
+
+All eighteen CP381 routes persist. Thirteen `U/N/P/K/X` routes are complete-null
+skips; five body routes execute all six sites. Exact checked accounting is
+`T382=T381` and `source_site_execution_count=6*A`, where every site count and
+`A` equal CP381 dehumidification-body entries. CP381 is the sole predecessor;
+CP330/CP329/CP379 own flow, mixed enthalpy, and final supply enthalpy with exact
+same-call corroboration.
+
+The local assignment uses raw `(mixed - supply)` then multiplication without
+reassociation or a finite-result gate; nonfinite JSON values retain IEEE
+sidecars. CP382 does not execute line 2268, apply capacity limits, update a zone
+node, or mutate/feed/reconcile with numerical, supply, load, or report state.
+Non-direct paths reject its evidence.
+
+No routine, psychrometrics row, or promotion is added. Counts stay 32
+algorithms, 293 routines split 58 plus 235, and 170 required. Scripts become
+320 total, 240 public, 80 internal, zero unused and zero unreachable;
+development commands stay 238. Support, readiness, capability, numerical,
+output, conformance, status, and Roadmap claims remain unchanged.

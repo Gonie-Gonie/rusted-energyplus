@@ -1,0 +1,400 @@
+# CP382 maps only PurchasedAirManager.cc executable line 2267's grouped local
+# cooling-total-output assignment and stops before line 2268's capacity guard.
+& {
+$cp382Stem = "cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment"
+$cp381StemForCp382 = "cooling_post_saturation_capacity_limit_dehumidification_guard"
+$cp382PipelineStem = "purchased_air_$cp382Stem"
+$cp382Lifecycle = "purchased_air_calc_$($cp382Stem)_lifecycle"
+$cp382SourceCommit = "6f2e40d10250a105b49966baa24d843711e61048"
+$cp382SourceHash = "54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005"
+$cp382Sites = @(
+    "read-retained-supply-mass-flow-rate-for-post-saturation-dehumidification-total-output-product",
+    "read-retained-mixed-air-enthalpy-for-post-saturation-dehumidification-total-output-difference",
+    "read-retained-supply-enthalpy-for-post-saturation-dehumidification-total-output-difference",
+    "calculate-mixed-air-enthalpy-minus-supply-enthalpy-for-post-saturation-dehumidification-total-output",
+    "calculate-supply-mass-flow-rate-times-enthalpy-difference-for-post-saturation-dehumidification-total-output",
+    "assign-local-cooling-total-output-for-post-saturation-dehumidification"
+)
+$cp382Source = ".reference\energyplus-src\26.1.0\src\EnergyPlus\PurchasedAirManager.cc"
+$cp382Module = "crates\ep_runtime\src\ideal_loads\calc\$cp382Stem.rs"
+$cp382Root = "crates\ep_runtime\src\ideal_loads\calc\$cp382Stem"
+$cp382State = "$cp382Root\state.rs"
+$cp382Transition = "$cp382Root\transition.rs"
+$cp382Release = "$cp382Root\release.rs"
+$cp382CalcRoot = "crates\ep_runtime\src\ideal_loads\calc.rs"
+$cp382Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
+$cp382Adapter = "crates\ep_runtime\src\ideal_loads\binding\$cp382Stem.rs"
+$cp382BindingTests = "crates\ep_runtime\src\ideal_loads\binding\$($cp382Stem)_tests.rs"
+$cp382ScheduledOutput = "crates\ep_runtime\src\ideal_loads\binding\scheduled_output.rs"
+$cp382InitState = "crates\ep_runtime\src\ideal_loads\init\state.rs"
+$cp382InitUnit = "crates\ep_runtime\src\ideal_loads\init\state\unit.rs"
+$cp382WitnessRoot = "crates\ep_runtime\src\ideal_loads\init\state\witnesses.rs"
+$cp382Witness = "crates\ep_runtime\src\ideal_loads\init\state\witnesses\$cp382Stem.rs"
+$cp382CoupledRoot = "crates\ep_runtime\src\ideal_loads\coupled_runtime.rs"
+$cp382Coupled = "crates\ep_runtime\src\ideal_loads\coupled_runtime\$($cp382Stem)_validation.rs"
+$cp382CoupledLifecycle = "crates\ep_runtime\src\ideal_loads\coupled_runtime\$($cp382Stem)_validation\lifecycle.rs"
+$cp382CoupledSnapshot = "crates\ep_runtime\src\ideal_loads\coupled_runtime\$($cp382Stem)_validation\snapshot.rs"
+$cp382FixtureRoot = "crates\ep_runtime\src\ideal_loads\coupled_output_tests.rs"
+$cp382Fixture = "crates\ep_runtime\src\ideal_loads\coupled_output_tests\$($cp382Stem)_fixture.rs"
+$cp382PipelineRoot = "crates\ep_run\src\pipeline.rs"
+$cp382Pipeline = "crates\ep_run\src\pipeline\$cp382PipelineStem.rs"
+$cp382PipelineValidation = "crates\ep_run\src\pipeline\$cp382PipelineStem\validation.rs"
+$cp382PipelineCounts = "crates\ep_run\src\pipeline\$cp382PipelineStem\validation\counts.rs"
+$cp382PipelineSnapshotValidation = "crates\ep_run\src\pipeline\$cp382PipelineStem\validation\snapshot.rs"
+$cp382Serialization = "crates\ep_run\src\pipeline\$cp382PipelineStem\serialization.rs"
+$cp382SnapshotSerialization = "crates\ep_run\src\pipeline\$cp382PipelineStem\serialization\snapshot.rs"
+$cp381Assertions = "crates\ep_run\tests\arbitrary_run_ideal_loads\cp381_assertions.rs"
+$cp382Assertions = "crates\ep_run\tests\arbitrary_run_ideal_loads\cp382_assertions.rs"
+$cp382Audit = "scripts\quality\ideal-loads-structure-audit\cp382-cooling-post-saturation-capacity-limit-dehumidification-total-output-assignment.ps1"
+
+function Assert-Cp382TextContains {
+    param([string]$Text, [string]$Pattern, [string]$Description)
+    if ($Text -notmatch $Pattern) { throw "CP382 $Description missing" }
+}
+
+function Assert-Cp382TextNotContains {
+    param([string]$Text, [string]$Pattern, [string]$Description)
+    if ($Text -match $Pattern) { throw "CP382 $Description unexpectedly present" }
+}
+
+function Get-Cp382RustBraceBlock {
+    param([string]$Text, [string]$AnchorPattern, [string]$Description)
+    $anchor = [regex]::Match($Text, $AnchorPattern)
+    if (-not $anchor.Success) { throw "CP382 $Description anchor missing" }
+    $open = $Text.IndexOf("{", $anchor.Index)
+    if ($open -lt 0) { throw "CP382 $Description opening brace missing" }
+    $depth = 0
+    for ($index = $open; $index -lt $Text.Length; $index += 1) {
+        if ($Text[$index] -eq "{") { $depth += 1 }
+        elseif ($Text[$index] -eq "}") {
+            $depth -= 1
+            if ($depth -eq 0) {
+                return $Text.Substring($anchor.Index, $index - $anchor.Index + 1)
+            }
+        }
+    }
+    throw "CP382 $Description closing brace missing"
+}
+
+$cp382Required = @(
+    $cp382Module, $cp382State, $cp382Transition, $cp382Release, $cp382Adapter,
+    $cp382BindingTests, $cp382Witness, $cp382Coupled, $cp382CoupledLifecycle,
+    $cp382CoupledSnapshot, $cp382Fixture, $cp382Pipeline, $cp382PipelineValidation,
+    $cp382PipelineCounts, $cp382PipelineSnapshotValidation, $cp382Serialization,
+    $cp382SnapshotSerialization, $cp381Assertions, $cp382Assertions, $cp382Audit
+)
+foreach ($file in $cp382Required) {
+    Assert-FileExists -Path $file -Description "CP382 implementation/audit file"
+    Assert-LineLimit -Path $file -Limit 500 -Description "CP382 bounded file"
+}
+$cp382CoreFiles = @(Get-ChildItem -LiteralPath $cp382Root -Recurse -File -Filter "*.rs")
+$cp382CoreText = ($cp382CoreFiles | ForEach-Object {
+        Assert-LineLimit -Path $_.FullName -Limit 500 -Description "CP382 bounded core file"
+        Read-RepoText -Path $_.FullName
+    }) -join [Environment]::NewLine
+
+# Exact line-2267 boundary and six read/arithmetic/assignment sites.
+if ((Get-FileHash -Algorithm SHA256 -LiteralPath $cp382Source).Hash -cne $cp382SourceHash) {
+    throw "CP382 PurchasedAirManager.cc SHA-256 drift"
+}
+$cp382Lines = Get-Content -Encoding UTF8 -LiteralPath $cp382Source
+if ($cp382Lines[2266].Trim() -cne 'CoolTotOutput = SupplyMassFlowRate * (MixedAirEnthalpy - SupplyEnthalpy);' -or
+    $cp382Lines[2267].Trim() -cne 'if ((CoolTotOutput) > PurchAir.MaxCoolTotCap) {') {
+    throw "CP382 line 2267 through first-excluded executable 2268 source boundary drift"
+}
+Assert-Contains -Path $cp382Module -Pattern 'PurchasedAirManager\.cc:2267' -Description "mapped source"
+Assert-Contains -Path $cp382Module -Pattern 'PurchasedAirManager\.cc:2268' -Description "first excluded source"
+Assert-ExactStringArray -Path $cp382Module -Name 'PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_TOTAL_OUTPUT_ASSIGNMENT_SOURCE_ORDER' -Expected $cp382Sites -Description "six-site source order"
+
+# Eighteen retained routes: thirteen skips and five assignment-completed routes.
+foreach ($route in @(
+        'UnitOff', 'NonCooling', 'PositiveGuardFalseFallthrough',
+        'HeatingAvailabilityGuardFalseFallthroughCapacityLimitGuardFalseFallthrough',
+        'HeatingAvailabilityGuardFalseFallthroughDehumidificationTotalOutputAssigned',
+        'HeatingAvailabilityGuardFalseFallthroughDehumidificationGuardFalseFallthrough',
+        'HumidificationControlGuardFalseFallthroughCapacityLimitGuardFalseFallthrough',
+        'HumidificationControlGuardFalseFallthroughDehumidificationTotalOutputAssigned',
+        'HumidificationControlGuardFalseFallthroughDehumidificationGuardFalseFallthrough',
+        'DehumidificationControlHumidistatMaximumAssignmentExecutedCapacityLimitGuardFalseFallthrough',
+        'DehumidificationControlHumidistatMaximumAssignmentExecutedDehumidificationTotalOutputAssigned',
+        'DehumidificationControlHumidistatMaximumAssignmentExecutedDehumidificationGuardFalseFallthrough',
+        'DehumidificationControlNoneMaximumAssignmentExecutedCapacityLimitGuardFalseFallthrough',
+        'DehumidificationControlNoneMaximumAssignmentExecutedDehumidificationTotalOutputAssigned',
+        'DehumidificationControlNoneMaximumAssignmentExecutedDehumidificationGuardFalseFallthrough',
+        'DehumidificationControlGuardFalseFallthroughCapacityLimitGuardFalseFallthrough',
+        'DehumidificationControlGuardFalseFallthroughDehumidificationTotalOutputAssigned',
+        'DehumidificationControlGuardFalseFallthroughDehumidificationGuardFalseFallthrough'
+    )) {
+    Assert-Contains -Path $cp382State -Pattern $route -Description "retained route $route"
+}
+foreach ($counter in @(
+        'dehumidification_total_output_assignment_count', 'source_site_execution_count',
+        'cp330_supply_mass_flow_rate_owned_read_count',
+        'cp329_same_call_supply_mass_flow_rate_bit_corroboration_count',
+        'cp339_same_call_supply_mass_flow_rate_bit_corroboration_count',
+        'supply_mass_flow_rate_read_count',
+        'cp329_mixed_air_enthalpy_owned_read_count',
+        'cp329_same_call_recirculation_enthalpy_bit_corroboration_count',
+        'cp339_same_call_mixed_air_enthalpy_bit_corroboration_count',
+        'mixed_air_enthalpy_read_count',
+        'cp379_post_saturation_supply_enthalpy_owned_read_count',
+        'cp379_same_call_supply_enthalpy_bits_corroboration_count',
+        'supply_enthalpy_read_count', 'enthalpy_difference_calculation_count',
+        'cooling_total_output_calculation_count',
+        'cooling_total_output_assignment_write_count'
+    )) {
+    Assert-Contains -Path $cp382State -Pattern "pub $counter\s*:\s*usize" -Description "state counter $counter"
+}
+foreach ($field in @(
+        'predecessor_dehumidification_body_entered',
+        'predecessor_dehumidification_guard_false_fallthrough',
+        'dehumidification_total_output_assignment_executed',
+        'cp330_supply_mass_flow_rate_owned_read',
+        'cp329_same_call_supply_mass_flow_rate_bit_corroborated',
+        'cp339_same_call_supply_mass_flow_rate_bit_corroborated',
+        'supply_mass_flow_rate_read', 'supply_mass_flow_rate_kg_per_s',
+        'cp329_mixed_air_enthalpy_owned_read',
+        'cp329_same_call_recirculation_enthalpy_bit_corroborated',
+        'cp339_same_call_mixed_air_enthalpy_bit_corroborated',
+        'mixed_air_enthalpy_read', 'mixed_air_enthalpy_j_per_kg',
+        'cp379_post_saturation_supply_enthalpy_owned_read',
+        'cp379_same_call_supply_enthalpy_bits_corroborated',
+        'supply_enthalpy_read', 'supply_enthalpy_j_per_kg',
+        'enthalpy_difference_calculated', 'mixed_air_minus_supply_enthalpy_j_per_kg',
+        'cooling_total_output_calculated', 'calculated_cooling_total_output_w',
+        'cooling_total_output_assigned', 'cooling_total_output_w'
+    )) {
+    Assert-Contains -Path $cp382Module -Pattern "pub $field\s*:" -Description "snapshot field $field"
+}
+
+# Raw source grouping, exact 6*A accounting, and owner/provenance enforcement.
+foreach ($pattern in @(
+        'input\.mixed_air_enthalpy_j_per_kg - input\.supply_enthalpy_j_per_kg',
+        'input\.supply_mass_flow_rate_kg_per_s \* enthalpy_difference_j_per_kg',
+        'SOURCE_ORDER\.len\(\)',
+        'predecessor_route_is_assignment',
+        'cp330_supply_mass_flow_rate_owned_read',
+        'cp329_same_call_supply_mass_flow_rate_bit_corroborated',
+        'cp339_same_call_supply_mass_flow_rate_bit_corroborated',
+        'cp329_mixed_air_enthalpy_owned_read',
+        'cp329_same_call_recirculation_enthalpy_bit_corroborated',
+        'cp339_same_call_mixed_air_enthalpy_bit_corroborated',
+        'cp379_post_saturation_supply_enthalpy_owned_read',
+        'cp379_same_call_supply_enthalpy_bits_corroborated',
+        'active_counters_mut'
+    )) {
+    Assert-Cp382TextContains -Text $cp382CoreText -Pattern $pattern -Description "core arithmetic/provenance $pattern"
+}
+foreach ($pattern in @(
+        'predecessor_cp381',
+        'completed_direct_cooling_post_saturation_capacity_limit_dehumidification_guard_is_consistent',
+        'completed_direct_cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment_is_consistent'
+    )) {
+    Assert-Cp382TextContains -Text $cp382CoreText -Pattern $pattern -Description "release predecessor proof $pattern"
+}
+foreach ($forbidden in @(
+        '\bmul_add\b', '\btotal_cmp\b', '\bf64::max\b', '\bf64::min\b',
+        '\bepsilon\b', '\bclamp\b', 'MaxCoolTotCap',
+        'DirectZonePurchasedAirCouplingInput', 'reconcile_'
+    )) {
+    Assert-NotContains -Path $cp382Transition -Pattern $forbidden -Description "forbidden arithmetic/feed $forbidden"
+}
+foreach ($path in @($cp382Transition, $cp382Release, $cp382Adapter, $cp382Coupled)) {
+    Assert-NotContains -Path $path -Pattern '\.unwrap\s*\(|\.expect\s*\(|\bpanic!\s*\(' -Description "production source-quality violation"
+}
+Assert-NotContains -Path $cp382Adapter -Pattern 'DirectZonePurchasedAirCouplingInput|reconcile_|supply_node_update|report|MaxCoolTotCap' -Description "adapter numerical/capacity reconciliation"
+
+# CP381 -> CP382 -> unchanged numerical placement, with no CP382 DTO field.
+$cp382BindingText = Read-RepoText -Path $cp382Binding
+$cp381BindingIndexForCp382 = $cp382BindingText.IndexOf("let calculation_$cp381StemForCp382 =")
+$cp382BindingIndex = $cp382BindingText.IndexOf("let calculation_$cp382Stem =")
+$cp382NumericalIndex = $cp382BindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
+if ($cp381BindingIndexForCp382 -lt 0 -or $cp382BindingIndex -le $cp381BindingIndexForCp382 -or
+    $cp382NumericalIndex -le $cp382BindingIndex) {
+    throw "Binding must execute CP381, CP382, then unchanged numerical coupling"
+}
+$cp382Dto = Get-Cp382RustBraceBlock -Text $cp382BindingText.Substring($cp382NumericalIndex) -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{' -Description "numerical DTO"
+Assert-Cp382TextNotContains -Text $cp382Dto -Pattern 'cp382|post_saturation_capacity_limit_dehumidification_total_output_assignment' -Description "numerical DTO feed"
+foreach ($registration in @(
+        [PSCustomObject]@{ Path = $cp382CalcRoot; Pattern = $cp382Stem },
+        [PSCustomObject]@{ Path = $cp382ScheduledOutput; Pattern = "pub calculation_$($cp382Stem):" },
+        [PSCustomObject]@{ Path = $cp382InitState; Pattern = $cp382Stem },
+        [PSCustomObject]@{ Path = $cp382InitUnit; Pattern = $cp382Stem },
+        [PSCustomObject]@{ Path = $cp382WitnessRoot; Pattern = $cp382Stem },
+        [PSCustomObject]@{ Path = $cp382CoupledRoot; Pattern = "mod $($cp382Stem)_validation;" },
+        [PSCustomObject]@{ Path = $cp382FixtureRoot; Pattern = $cp382Stem },
+        [PSCustomObject]@{ Path = $cp382PipelineRoot; Pattern = $cp382PipelineStem }
+    )) {
+    Assert-Contains -Path $registration.Path -Pattern $registration.Pattern -Description "registration"
+}
+
+# Direct-only lifecycle, IEEE JSON sidecars, and terminal nonfeed firewall.
+Assert-Contains -Path $cp382PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp382_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp382PipelineRoot -Pattern $cp382Lifecycle -Description "pipeline lifecycle key"
+foreach ($pattern in @(
+        'dehumidification_total_output_assignment_count', 'source_site_execution_count',
+        'supply_mass_flow_rate_read_count', 'mixed_air_enthalpy_read_count',
+        'supply_enthalpy_read_count', 'enthalpy_difference_calculation_count',
+        'cooling_total_output_calculation_count',
+        'cooling_total_output_assignment_write_count'
+    )) {
+    Assert-Contains -Path $cp382PipelineCounts -Pattern $pattern -Description "serialized checked count $pattern"
+}
+foreach ($pattern in @(
+        'json_number', 'ieee_bits', 'supply_mass_flow_rate_kg_per_s',
+        'mixed_air_enthalpy_j_per_kg', 'supply_enthalpy_j_per_kg',
+        'mixed_air_minus_supply_enthalpy_j_per_kg',
+        'calculated_cooling_total_output_w', 'cooling_total_output_w'
+    )) {
+    Assert-Contains -Path $cp382SnapshotSerialization -Pattern $pattern -Description "finite JSON/IEEE assignment evidence $pattern"
+}
+Assert-Contains -Path $cp381Assertions -Pattern 'mod cp382_assertions;' -Description "arbitrary CP382 module"
+Assert-Contains -Path $cp381Assertions -Pattern 'cp382_assertions::assert_direct\(runtime, results\)' -Description "arbitrary CP382 direct delegation"
+Assert-Contains -Path $cp381Assertions -Pattern 'cp382_assertions::assert_non_direct\(runtime\)' -Description "arbitrary CP382 non-direct delegation"
+Assert-Contains -Path $cp382Assertions -Pattern 'assert_numerical_nonfeed_and_unchanged_enthalpy\(' -Description "CP382 terminal numerical nonfeed"
+Assert-NotContains -Path $cp382Assertions -Pattern 'MaxCoolTotCap|(?:latest|cp382|results)\["(?:supply_node|report|capacity_w)' -Description "CP382 excluded capacity/node/report assertion"
+
+# Exactly two algorithm/capability addenda and five ordered handwritten sections.
+$cp382AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
+$cp382CapabilityText = Read-RepoText -Path "specs\capabilities.toml"
+$cp382AlgorithmAddenda = [regex]::Matches($cp382AlgorithmText, '(?m)^\s*"CP382 supersedes only [^"\r\n]+",\s*$')
+$cp382CapabilityAddenda = [regex]::Matches($cp382CapabilityText, '(?m)^\s*"CP382 additionally requires[^"\r\n]+",\s*$')
+if ($cp382AlgorithmAddenda.Count -ne 2 -or $cp382CapabilityAddenda.Count -ne 2) {
+    throw "CP382 must have exactly two algorithm and two capability addenda"
+}
+foreach ($claim in @($cp382AlgorithmAddenda + $cp382CapabilityAddenda)) {
+    foreach ($pattern in @(
+            $cp382SourceCommit, $cp382SourceHash, '2267', '2268', 'CP383',
+            $cp382Sites[0], $cp382Sites[1], $cp382Sites[2],
+            $cp382Sites[3], $cp382Sites[4], $cp382Sites[5],
+            'eighteen', 'thirteen', '6\*A', 'CP381',
+            'sole immediate predecessor', 'CP330', 'CP329', 'CP339', 'CP379',
+            'IEEE binary64|Raw IEEE', 'NaN', 'infinity', 'sidecar',
+            'DirectZonePurchasedAirCouplingInput', '320 total', '240 public',
+            '80 internal', 'zero unused', 'zero unreachable',
+            '238 development commands', 'Roadmap'
+        )) {
+        if ($claim.Value -notmatch $pattern) { throw "CP382 spec addendum missing '$pattern'" }
+    }
+}
+$cp382Docs = @(
+    [PSCustomObject]@{ Path = "docs\src\current\current-status.md"; Heading = 'CP382 Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Assignment' },
+    [PSCustomObject]@{ Path = "docs\src\current\project-contract.md"; Heading = 'CP382 Source-Ordered Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Assignment' },
+    [PSCustomObject]@{ Path = "docs\src\porting-map\ideal-loads-source-map.md"; Heading = 'CP382 Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Assignment' },
+    [PSCustomObject]@{ Path = "docs\src\porting-map\heat-balance-source-map.md"; Heading = 'CP382 Post-Saturation Capacity-Limit Dehumidification Total-Output Assignment in the Heat-Balance Loop' },
+    [PSCustomObject]@{ Path = "docs\src\porting-map\zone-air-update-map.md"; Heading = 'CP382 Post-Saturation Capacity-Limit Dehumidification Total-Output Assignment Placement' }
+)
+foreach ($doc in $cp382Docs) {
+    $text = Read-RepoText -Path $doc.Path
+    $sections = [regex]::Matches($text, '(?ms)^## ' + [regex]::Escape($doc.Heading) + '\r?\n.*?(?=^## |\z)')
+    if ($sections.Count -ne 1) { throw "CP382 documentation expected one section in $($doc.Path)" }
+    $previous = -1
+    foreach ($checkpoint in 370..382) {
+        $index = $text.LastIndexOf("## CP$checkpoint ")
+        if ($index -le $previous) { throw "CP370 through CP382 documentation order drift in $($doc.Path)" }
+        $previous = $index
+    }
+    foreach ($required in @(
+            $cp382SourceCommit, $cp382SourceHash, '2267', '2268', 'CP383',
+            $cp382Sites[0], $cp382Sites[1], $cp382Sites[2],
+            $cp382Sites[3], $cp382Sites[4], $cp382Sites[5],
+            'eighteen', '6\*A', 'CP381', 'CP330', 'CP329', 'CP379',
+            '320\s+total', '80\s+internal'
+        )) {
+        if ($sections[0].Value -notmatch $required) {
+            throw "CP382 documentation in $($doc.Path) missing '$required'"
+        }
+    }
+}
+Assert-NotContains -Path "docs\src\porting-map\psychrometrics-source-map.md" -Pattern '(?m)^## CP382\b' -Description "psychrometrics non-promotion"
+Assert-Contains -Path "docs\src\generated\algorithm-ledger.md" -Pattern 'CP382 supersedes only' -Description "generated algorithm addendum"
+Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP382 additionally requires' -Description "generated capability addendum"
+
+# Current-state propagation while the CP381 319/79 checkpoint stays historical.
+foreach ($historical in 334..381) {
+    $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp382_lifecycle_evidence' -Description "historical firewall"
+}
+foreach ($historical in 335..381) {
+    $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 320 \|')) -Description "historical generated total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 80 \|')) -Description "historical generated internal"
+}
+foreach ($historical in 337..381) {
+    $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 320' -Description "historical inventory total"
+}
+foreach ($historical in 367..381) {
+    $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'Count -ne 80' -Description "historical internal classification count"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern '240 public and 80 internal' -Description "historical classification diagnostic"
+}
+foreach ($historical in @('cp326-cooling-supply-mass-flow-limit-body.ps1') + @(329..359 | ForEach-Object {
+            (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$($_)-*.ps1").Name
+        })) {
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$historical" -Pattern "calculation_$cp382Stem" -Description "historical CP382 compact binding order"
+}
+foreach ($historical in 360..381) {
+    $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'cp382BindingIndex' -Description "historical CP382 binding index"
+}
+foreach ($historical in @('cp326-cooling-supply-mass-flow-limit-body.ps1') + @(329..344 | ForEach-Object {
+            (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$($_)-*.ps1").Name
+        })) {
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$historical" -Pattern "advance_$cp382Stem" -Description "historical CP382 helper whitelist"
+}
+$cp345Audit = "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1"
+Assert-Contains -Path $cp345Audit -Pattern 'CP381-to-CP382' -Description "CP345 predecessor interval"
+Assert-Contains -Path $cp345Audit -Pattern 'CP382-to-numerical' -Description "CP345 terminal interval"
+Assert-LineLimit -Path $cp345Audit -Limit 1200 -Description "CP345 historical audit"
+Assert-LineLimit -Path "scripts\quality\ideal-loads-structure-audit\cp347-cooling-positive-supply-post-capacity-limit-dehumidification-control-none-case.ps1" -Limit 600 -Description "CP347 historical audit"
+Assert-LineLimit -Path "scripts\quality\ideal-loads-structure-audit\cp349-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-cp-air-assignment.ps1" -Limit 500 -Description "CP349 historical audit"
+Assert-LineLimit -Path "scripts\quality\ideal-loads-structure-audit\cp362-cooling-humidistat-supply-humidity-ratio-mixed-air-limit.ps1" -Limit 500 -Description "CP362 historical audit"
+foreach ($historical in 364, 373, 374, 376, 377, 378, 379, 380, 381) {
+    $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'cp382_assertions\.rs' -Description "historical CP382 arbitrary terminal"
+}
+$cp381HistoricalAlgorithm = [regex]::Matches($cp382AlgorithmText, '(?m)^\s*"CP381 supersedes only CP380[^"\r\n]+",\s*$')
+$cp381HistoricalCapability = [regex]::Matches($cp382CapabilityText, '(?m)^\s*"CP381 additionally requires[^"\r\n]+",\s*$')
+if ($cp381HistoricalAlgorithm.Count -ne 2 -or $cp381HistoricalCapability.Count -ne 2) {
+    throw "CP381 historical addenda count drift"
+}
+foreach ($claim in @($cp381HistoricalAlgorithm + $cp381HistoricalCapability)) {
+    if ($claim.Value -notmatch '319 total' -or $claim.Value -notmatch '79 internal') {
+        throw "CP381 historical addendum inventory numbers must remain 319/79"
+    }
+}
+
+# Master order and current generated inventory.
+$cp382MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
+$cp381AuditIndexForCp382 = $cp382MainAuditText.IndexOf("cp381-cooling-post-saturation-capacity-limit-dehumidification-guard.ps1")
+$cp382AuditIndex = $cp382MainAuditText.IndexOf("cp382-cooling-post-saturation-capacity-limit-dehumidification-total-output-assignment.ps1")
+$cp382CompletionIndex = $cp382MainAuditText.IndexOf('Write-Host "IdealLoads structure audit complete."')
+if ($cp381AuditIndexForCp382 -lt 0 -or $cp382AuditIndex -le $cp381AuditIndexForCp382 -or
+    $cp382CompletionIndex -le $cp382AuditIndex) {
+    throw "Master audit must dot-source CP382 after CP381 before completion"
+}
+$cp382InventoryText = Read-RepoText -Path "specs\script_inventory.toml"
+foreach ($pattern in @(
+        'script_count = 320', 'dev_command_count = 238',
+        'unused_script_count = 0', 'unreachable_count = 0'
+    )) {
+    Assert-Cp382TextContains -Text $cp382InventoryText -Pattern $pattern -Description "inventory $pattern"
+}
+if ([regex]::Matches($cp382InventoryText, '(?m)^classification = "public"$').Count -ne 240 -or
+    [regex]::Matches($cp382InventoryText, '(?m)^classification = "internal"$').Count -ne 80) {
+    throw "CP382 inventory must be exactly 240 public and 80 internal scripts"
+}
+Assert-Cp382TextContains -Text $cp382InventoryText -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp382-cooling-post-saturation-capacity-limit-dehumidification-total-output-assignment\.ps1"' -Description "inventory record"
+Assert-Cp382TextContains -Text $cp382InventoryText -Pattern 'ideal-loads-structure-audit\.ps1::dot_sources' -Description "caller evidence"
+foreach ($pattern in @(
+        '\| executable script records \| 320 \|',
+        '\| public scripts \| 240 \|',
+        '\| internal scripts \| 80 \|',
+        '\| scripts without callers \| 0 \|'
+    )) {
+    Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern $pattern -Description "generated script inventory $pattern"
+}
+
+Write-Host "CP382 post-saturation dehumidification total-output assignment structure audit passed."
+}
