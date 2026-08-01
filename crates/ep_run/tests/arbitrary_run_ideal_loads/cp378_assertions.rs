@@ -1,5 +1,8 @@
 //! CP378 saturation-limit assignment assertions.
 
+#[path = "cp379_assertions.rs"]
+mod cp379_assertions;
+
 use serde_json::{Map, Value, json};
 
 const CP377_KEY: &str =
@@ -121,6 +124,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         assert_active_values(&cp378["latest"]);
         assert_numerical_nonfeed_and_exact_reconciliation(runtime, results, &cp378["latest"]);
     }
+    cp379_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -129,6 +133,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP378_KEY].is_null(),
         "non-direct runtime must not publish CP378 evidence"
     );
+    cp379_assertions::assert_non_direct(runtime);
 }
 
 fn assert_complete_null(latest: &Value) {

@@ -20402,3 +20402,58 @@ Roadmap claim is added. Counts remain 32 algorithms, 293 routines, 58
 `state_mapped`, 235 `source_mapped`, and 170 required. Script inventory is 316
 total, 240 public, 76 internal, zero unused, zero unreachable, and 238
 development commands.
+
+## CP379 Source-Ordered Cooling Supply-Enthalpy Post-Saturation Assignment
+
+CP379 maps exactly EnergyPlus 26.1 `PurchasedAirManager.cc` executable line
+2261, `SupplyEnthalpy = PsyHFnTdbW(PurchAir.SupplyTemp,
+PurchAir.SupplyHumRat);`, at commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its four dependency-ordered sites are
+`read-purchased-air-supply-temperature-for-post-saturation-enthalpy`,
+`read-purchased-air-supply-humidity-ratio-for-post-saturation-enthalpy`,
+`evaluate-psy-h-fn-tdb-w-for-post-saturation-enthalpy`, and
+`assign-local-supply-enthalpy-after-saturation-limit`. That deterministic
+dependency order makes no C++ function-argument evaluation-order claim for the
+side-effect-free reads. Line 2262 is blank, line 2263 is comment-only, and the
+line-2264 capacity-limit guard is first excluded and reserved for CP380.
+
+The inherited eight routes remain exact. UnitOff (`U`), non-cooling (`N`), and
+positive-guard-false (`P`) are complete-null zero-site skips; five active routes
+execute four sites. With transitions `T` and enthalpy assignments `E`,
+`T=U+N+P+E`; `E` equals CP378's minimum assignments, CP377's saturation
+assignments, and CP376's copies. Every site count equals `E`, and total
+source-site executions are `4*E`.
+
+Same-call recursively complete and bit-exact CP378 lifecycle/snapshot/latest/
+witness/completion evidence is the sole predecessor. CP378's resulting supply
+humidity ratio owns the humidity operand. CP377's retained same-call supply
+temperature used for saturation, with its CP334-or-CP344 provenance, owns the
+temperature operand. No caller/model duplicate, live service, numerical DTO,
+or earlier enthalpy checkpoint may replace either source owner.
+
+Only canonical pure `energyplus_psy_h_fn_tdb_w` may evaluate the source
+expression. It preserves EnergyPlus's ordered `max(W, 1.0e-5)` humidity floor
+and exact coefficient grouping. The legacy IdealLoads
+`moist_air_enthalpy_j_per_kg`, fast/raw variants, inline regrouping, and DTO
+inputs are forbidden. Exact direct release admits finite temperature, finite
+`>= 0.0` humidity, and finite enthalpy. Defensive IEEE signed-zero, NaN,
+infinity, floor, grouping, and overflow cases remain private characterization.
+
+CP379 owns the current local line-2261 assignment only. It is neither terminal
+source ownership nor final numerical ownership and does not feed, reconcile
+with, overwrite, or replace `DirectZonePurchasedAirCouplingInput`, the
+unchanged numerical DTO/result, node state, or report state. The legacy
+numerical enthalpy implementation remains owner; no bit-exact equivalence is
+claimed because its humidity-floor and grouping semantics differ. Non-direct
+execution rejects CP379 lifecycle evidence.
+
+Existing state-mapped `routine.psy_h_fn_tdb_w` remains the routine-level owner;
+no routine row or psychrometrics-map section is added. Line 2264 capacity
+control and later load/node/output behavior remain outside this contract. No
+support, readiness, capability, numerical-conformance, output, status, or
+Roadmap promotion occurs. Counts remain 32 algorithms, 293 routines, 58
+`state_mapped`, 235 `source_mapped`, and 170 required. Script inventory is 317
+total, 240 public, 77 internal, zero unused, zero unreachable, and 238
+development commands.

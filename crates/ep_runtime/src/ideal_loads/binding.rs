@@ -65,6 +65,7 @@ use super::{
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitError as CoolingSupplyTemperatureMinimumLimitError,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitError as CoolingSupplyTemperatureMixedAirLimitError,
     PurchasedAirCalcCoolingSensibleFlowError,
+    PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentError as CoolingSupplyEnthalpyPostSaturationAssignmentError,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationControlHumidistatGuardError as CoolingSupplyHumidityRatioHumidificationControlHumidistatGuardError,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError as CoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationHeatingAvailabilityGuardError as CoolingSupplyHumidityRatioHumidificationHeatingAvailabilityGuardError,
@@ -155,6 +156,7 @@ mod cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignm
 mod cooling_positive_supply_temperature_assignment;
 mod cooling_positive_supply_temperature_minimum_limit;
 mod cooling_positive_supply_temperature_mixed_air_limit;
+mod cooling_supply_enthalpy_post_saturation_assignment;
 mod cooling_supply_humidity_ratio_humidification_control_humidistat_guard;
 mod cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard;
 mod cooling_supply_humidity_ratio_humidification_heating_availability_guard;
@@ -196,6 +198,7 @@ use cooling_supply_humidity_ratio_saturation_limit_assignment::{
     advance_cooling_supply_humidity_ratio_saturation_limit_assignment,
     reconcile_cooling_supply_humidity_ratio_saturation_limit_assignment,
 };
+use cooling_supply_enthalpy_post_saturation_assignment::advance_cooling_supply_enthalpy_post_saturation_assignment;
 use cooling_default_supply_humidity_ratio_mixed_air_assignment::advance_cooling_default_supply_humidity_ratio_mixed_air_assignment;
 use cooling_positive_supply_capacity_limit_guard::advance_positive_supply_capacity_limit_guard;
 use cooling_positive_supply_capacity_limit_sensible_output_assignment::advance_positive_supply_capacity_limit_sensible_output_assignment;
@@ -985,6 +988,10 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingSupplyHumidityRatioSaturationLimitAssignment(
         CoolingSupplyHumidityRatioSaturationLimitAssignmentError,
     ),
+    /// The bounded post-saturation supply-enthalpy assignment rejected its release state.
+    CalculationCoolingSupplyEnthalpyPostSaturationAssignment(
+        CoolingSupplyEnthalpyPostSaturationAssignmentError,
+    ),
     /// CP378 did not reconcile with the unchanged numerical humidity projections.
     CalculationCoolingSupplyHumidityRatioSaturationLimitAssignmentNumericalInvariant {
         /// Stable CP378 or numerical projection field.
@@ -1628,6 +1635,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_cooling_supply_humidity_ratio_saturation_assignment,
         )?;
+    let calculation_cooling_supply_enthalpy_post_saturation_assignment =
+        advance_cooling_supply_enthalpy_post_saturation_assignment(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_cooling_supply_humidity_ratio_saturation_limit_assignment,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -1738,6 +1751,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_supply_humidity_ratio_pre_saturation_original_assignment,
         calculation_cooling_supply_humidity_ratio_saturation_assignment,
         calculation_cooling_supply_humidity_ratio_saturation_limit_assignment,
+        calculation_cooling_supply_enthalpy_post_saturation_assignment,
         coupling,
     })
 }

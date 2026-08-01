@@ -37617,3 +37617,50 @@ algorithms, 293 routines split 58 plus 235 with 170 required, and scripts are
 316 total, 240 public, 76 internal, zero unused/unreachable, with 238 commands.
 Support, readiness, capability, conformance, output, and Roadmap claims remain
 unchanged.
+
+## CP379 Post-Saturation Supply-Enthalpy Assignment in the Heat-Balance Loop
+
+CP379 maps the next source-ordered PurchasedAir statement and nothing later:
+`PurchasedAirManager.cc` physical executable line 2261,
+`SupplyEnthalpy = PsyHFnTdbW(PurchAir.SupplyTemp, PurchAir.SupplyHumRat);`, at
+commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact four labels are
+`read-purchased-air-supply-temperature-for-post-saturation-enthalpy`,
+`read-purchased-air-supply-humidity-ratio-for-post-saturation-enthalpy`,
+`evaluate-psy-h-fn-tdb-w-for-post-saturation-enthalpy`, and
+`assign-local-supply-enthalpy-after-saturation-limit`. Their dependency order
+does not claim C++ function-argument evaluation order. Blank line 2262 and
+comment line 2263 intervene before executable line 2264, whose capacity guard
+is first excluded and reserved for CP380.
+
+The inherited eight routes give three complete-null zero-site skips (`U/N/P`)
+and five four-site executions. Exact state is `T=U+N+P+E`; `E` equals the
+CP378 saturation-limit, CP377 saturation, and CP376 original-copy counts, each
+site counter equals `E`, and source sites total `4*E`.
+
+Recursively complete same-call CP378 is the sole predecessor. Its resulting
+supply humidity ratio solely owns the humidity operand. Retained same-call
+CP377 supplies the temperature used for saturation, including its validated
+CP334-or-CP344 provenance. No caller/model duplicate, service read, numerical
+DTO value, or earlier enthalpy checkpoint may replace these owners.
+
+Only canonical pure `energyplus_psy_h_fn_tdb_w` evaluates the assignment, with
+the source `max(W, 1.0e-5)` floor and exact coefficient grouping. Public direct
+release admits finite temperature, finite nonnegative humidity, and finite
+enthalpy. Signed-zero, NaN, infinity, floor, grouping, and overflow behavior is
+private characterization; legacy, fast, raw, and regrouped helpers are excluded.
+
+The result owns only the current local line-2261 `SupplyEnthalpy`. CP379 is not
+a terminal/final numerical owner and does not feed, reconcile with, overwrite,
+or replace the coupling DTO, numerical result, node, or report. The unchanged
+legacy numerical enthalpy implementation remains owner and no exact-bit
+equivalence is claimed. Non-direct paths reject CP379 evidence.
+
+The existing state-mapped `routine.psy_h_fn_tdb_w` contract remains unchanged;
+there is no routine row or psychrometrics-map section. Line 2264 capacity
+control and later load/node/output effects remain excluded. Counts stay 32
+algorithms, 293 routines split 58 plus 235 with 170 required, and scripts are
+317 total, 240 public, 77 internal, zero unused/unreachable, with 238 commands.
+Support, readiness, capability, numerical, output, conformance, and Roadmap
+claims remain unchanged.

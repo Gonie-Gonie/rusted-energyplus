@@ -21955,3 +21955,49 @@ Counts remain 32 algorithms, 293 routines, 58 `state_mapped`, 235
 internal, zero unused, zero unreachable, with 238 development commands; all
 support, readiness, capability, output, conformance, and Roadmap claims remain
 unchanged.
+
+## CP379 Supply-Enthalpy Post-Saturation Assignment
+
+CP379 supersedes only CP378's first-excluded boundary by mapping
+`PurchasedAirManager.cc` executable line 2261,
+`SupplyEnthalpy = PsyHFnTdbW(PurchAir.SupplyTemp, PurchAir.SupplyHumRat);`, at
+commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The four dependency-ordered sites are
+`read-purchased-air-supply-temperature-for-post-saturation-enthalpy`,
+`read-purchased-air-supply-humidity-ratio-for-post-saturation-enthalpy`,
+`evaluate-psy-h-fn-tdb-w-for-post-saturation-enthalpy`, and
+`assign-local-supply-enthalpy-after-saturation-limit`; no C++ function-argument
+evaluation order is claimed for the side-effect-free reads.
+
+Lines 2262-2263 are blank/comment-only. The capacity-limit guard at executable
+line 2264 is first excluded and the CP380 boundary. CP378's eight routes remain:
+`U/N/P` are complete-null zero-site skips and five active routes execute four
+sites. Thus `T=U+N+P+E`, `E` equals the CP378/CP377/CP376 active counts, every
+site count equals `E`, and total source sites are `4*E`.
+
+Recursively complete bit-exact same-call CP378 is the sole predecessor and owns
+the humidity operand through its resulting value. Retained same-call CP377 owns
+the saturation-temperature operand through its CP334-or-CP344 provenance.
+Caller/model duplicates, services, DTO state, and earlier enthalpy values are
+not substitute owners.
+
+The source expression uses only canonical pure `energyplus_psy_h_fn_tdb_w`
+with EnergyPlus's `max(W, 1.0e-5)` floor and grouping. Direct admission requires
+finite temperature, finite nonnegative humidity, and finite result; signed-zero,
+NaN, infinity, floor, grouping, and overflow are private characterization. The
+legacy IdealLoads helper and fast/raw/regrouped alternatives are excluded.
+
+CP379 owns only the current local line-2261 assignment. It is not terminal or
+final numerical ownership and never feeds, reconciles with, overwrites, or
+replaces the coupling input, numerical DTO/result, node, or report. The
+unchanged legacy numerical enthalpy implementation remains owner, with no
+bit-exact equivalence claim. Non-direct paths reject CP379 evidence.
+
+`routine.psy_h_fn_tdb_w` remains state-mapped and owns the routine-level
+contract; no routine row or psychrometrics-map section is added. Capacity and
+later load/node/output behavior remain excluded. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Scripts
+become 317 total, 240 public, 77 internal, zero unused, zero unreachable, with
+238 development commands; support, readiness, capability, numerical, output,
+conformance, and Roadmap claims remain unchanged.
