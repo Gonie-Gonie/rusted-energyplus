@@ -22,6 +22,7 @@ pub(in crate::ideal_loads::calc) use release::{
     cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_snapshots_match_exact,
     private_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_counterfactual_from_direct_release,
     private_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_counterfactual_links_to_direct_release,
+    cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_snapshot_route,
 };
 #[allow(unused_imports)]
 pub(in crate::ideal_loads) use release::{
@@ -31,6 +32,8 @@ pub(in crate::ideal_loads) use release::{
 pub(super) use state::PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardRetainedRoute;
 pub use state::PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardRuntimeState;
 pub(in crate::ideal_loads::calc) use transition::advance_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_state;
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::release::completed_cp370_case as completed_cp370_case_for_cp372_test;
 
 /// EnergyPlus source statement represented by CP371.
 pub const PURCHASED_AIR_CALC_COOLING_SUPPLY_HUMIDITY_RATIO_HUMIDIFICATION_DEHUMIDIFICATION_CONTROL_HUMIDISTAT_OR_NONE_GUARD_SOURCE: &str =

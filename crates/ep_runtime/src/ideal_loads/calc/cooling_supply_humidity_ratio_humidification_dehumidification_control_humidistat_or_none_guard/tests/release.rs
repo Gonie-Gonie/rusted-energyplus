@@ -195,7 +195,7 @@ fn pending_counter_overflow_is_rejected_transactionally() {
     assert_eq!(runtime, before);
 }
 
-fn completed_cp370_case() -> Option<(
+pub(in crate::ideal_loads::calc) fn completed_cp370_case() -> Option<(
     PurchasedAirRuntimeState,
     ep_model::IdealLoadsAirSystem,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationControlHumidistatGuardSnapshot,

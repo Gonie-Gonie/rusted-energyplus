@@ -90,6 +90,8 @@ mod cooling_supply_humidity_ratio_humidification_control_humidistat_guard_fixtur
 mod cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_fixture;
 #[path = "coupled_output_tests/cooling_supply_humidity_ratio_humidification_heating_availability_guard_fixture.rs"]
 mod cooling_supply_humidity_ratio_humidification_heating_availability_guard_fixture;
+#[path = "coupled_output_tests/cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_fixture.rs"]
+mod cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_fixture;
 #[path = "coupled_output_tests/cooling_supply_mass_flow_ems_override_body_fixture.rs"]
 mod cooling_supply_mass_flow_ems_override_body_fixture;
 #[path = "coupled_output_tests/cooling_supply_mass_flow_ems_override_guard_fixture.rs"]
@@ -163,6 +165,7 @@ use cooling_default_supply_humidity_ratio_case_break_fixture::calculation_coolin
 use cooling_supply_humidity_ratio_humidification_heating_availability_guard_fixture::calculation_cooling_supply_humidity_ratio_humidification_heating_availability_guard_snapshot;
 use cooling_supply_humidity_ratio_humidification_control_humidistat_guard_fixture::calculation_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_snapshot;
 use cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_fixture::calculation_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_snapshot;
+use cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_fixture::calculation_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_snapshot;
 use cooling_default_supply_humidity_ratio_mixed_air_assignment_fixture::calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment_snapshot;
 use cooling_humidistat_case_break_fixture::calculation_cooling_humidistat_case_break_snapshot;
 use cooling_humidistat_case_entry_fixture::calculation_cooling_humidistat_case_entry_snapshot;
@@ -1052,6 +1055,10 @@ fn scaled_output(
         calculation_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_snapshot(
             calculation_cooling_supply_humidity_ratio_humidification_control_humidistat_guard,
         );
+    let calculation_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment =
+        calculation_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_snapshot(
+            calculation_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -1136,6 +1143,7 @@ fn scaled_output(
         calculation_cooling_supply_humidity_ratio_humidification_heating_availability_guard,
         calculation_cooling_supply_humidity_ratio_humidification_control_humidistat_guard,
         calculation_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard,
+        calculation_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

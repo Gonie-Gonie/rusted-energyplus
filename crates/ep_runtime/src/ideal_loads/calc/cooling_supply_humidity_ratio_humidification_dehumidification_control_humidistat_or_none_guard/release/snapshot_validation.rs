@@ -39,7 +39,7 @@ pub(in crate::ideal_loads) fn cooling_supply_humidity_ratio_humidification_dehum
     )
 }
 
-pub(super) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
+pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
     if snapshot.source
         != PURCHASED_AIR_CALC_COOLING_SUPPLY_HUMIDITY_RATIO_HUMIDIFICATION_DEHUMIDIFICATION_CONTROL_HUMIDISTAT_OR_NONE_GUARD_SOURCE
         || snapshot.first_excluded_source

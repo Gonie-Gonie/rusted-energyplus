@@ -20,7 +20,7 @@ use crate::ideal_loads::{
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationHeatingAvailabilityGuardSnapshot as Cp369Snapshot,
 };
 
-mod release;
+pub(super) mod release;
 
 #[test]
 fn source_order_is_exact_cp320_short_circuit_slice() {

@@ -21651,3 +21651,64 @@ Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
 240 public, 69 internal, and zero unused. Parent and Calc status plus support,
 readiness, run state, capability, numerical, output-ownership, conformance,
 and Roadmap claims remain unchanged.
+
+## CP372 Cooling Supply-Humidity-Ratio Humidification Moisture-Demand Assignment
+
+CP372 supersedes only CP371's physical-line-2248 exclusion at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048`, locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+by mapping the single executable statement
+`MdotZnHumidSP = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToHumidSP;`
+in `PurchasedAirManager.cc`. Its exact source order is
+`read-zone-humidifying-setpoint-moisture-demand` followed by
+`assign-local-zone-humidifying-setpoint-moisture-demand`, matching CP320's
+structural slice
+`PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER[11..13]`.
+
+Physical executable line 2249,
+`SupplyHumRatForHumid = MdotZnHumidSP / SupplyMassFlowRate + state.dataLoopNodes->Node(ZoneNodeNum).HumRat;`,
+is first excluded together with all of its reads, division, addition, and
+assignment. An admitted CP371 body continues there; a CP371 guard false path
+dynamically continues at physical executable line 2258,
+`SupplyHumRatOrig = PurchAir.SupplyHumRat;`. Neither continuation belongs to
+CP372.
+
+For CP371 first-Humidistat matches `H`, second-None matches `N`, admitted body
+entries `B`, Humidistat assignments `AH`, None assignments `AN`, and all CP372
+assignments `A`, exact state requires `B=H+N`, `AH=H`, `AN=N`,
+`A=AH+AN=B`, both demand read and local assignment counters equal `A`, and
+`source_site_execution_count=2*A`. The direct CP371 outer-false release executes zero
+CP372 sites and publishes false flags plus null raw, assigned, resulting, and
+IEEE-bit fields. The canonical private selected-`None` route executes both
+sites once; a pure private `Humidistat` route also executes both, while the
+other named controls and every upstream skip execute zero.
+
+Recursively validated same-call bit-exact CP371 lifecycle, snapshot, latest,
+witness, and completion evidence is the sole immediate source-order predecessor.
+Its `controlled_zone: ZoneId` owns the indexed Zone identity. The active
+humidifying-demand value is an explicit pre-sampled `f64` characterization
+scalar with no retained authoritative owner and grants no live
+`ZoneSysMoistureDemand` service or capability. CP320 is structural and
+parametric corroboration only, not a predecessor, canonical bridge,
+live-service owner, or feed.
+
+CP372 bit-copies the scalar into local `MdotZnHumidSP`; raw, assigned, and
+resulting values preserve exact binary64 bits, including signed zero,
+subnormals, infinities, and quiet-NaN payloads. JSON nulls a nonfinite numeric
+projection while retaining its authoritative hexadecimal IEEE sidecar. CP372
+adds no arithmetic, comparison, finite/range gate, clamp, normalization,
+default, diagnostic, psychrometric operation, or coercion.
+
+Binding preserves CP371-to-CP372-to-unchanged-numerical order under
+`purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle`.
+CP372 owns only the local demand assignment and never enters, consumes,
+reconciles with, feeds, or replaces `DirectZonePurchasedAirCouplingInput`,
+`prediction.zone_demand`, `SupplyHumRatForHumid`, any numerical DTO, or result
+state. CP345 remains the actual result-store supply-humidity owner; non-direct
+paths publish `None` and reject CP372 evidence.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 310 total,
+240 public, 70 internal, and zero unused. Parent and Calc status plus support,
+readiness, run state, capability, numerical, output-ownership, conformance,
+and Roadmap claims remain unchanged.

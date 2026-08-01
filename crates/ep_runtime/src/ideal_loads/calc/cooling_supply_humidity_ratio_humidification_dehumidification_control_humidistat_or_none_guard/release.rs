@@ -36,6 +36,7 @@ use runtime_validation::{
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_snapshot_is_exact_direct_release;
 pub(in crate::ideal_loads::calc) use snapshot_validation::snapshots_match_exact as cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_snapshots_match_exact;
+pub(in crate::ideal_loads::calc) use snapshot_validation::snapshot_route as cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_snapshot_route;
 
 pub(in crate::ideal_loads::calc) fn completed_direct_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_is_consistent(
     runtime: &PurchasedAirRuntimeState,

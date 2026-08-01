@@ -72,6 +72,7 @@ use ep_runtime::{
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationControlHumidistatGuardLifecycleSummary,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardLifecycleSummary,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationHeatingAvailabilityGuardLifecycleSummary,
+    PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowLimitBodyLifecycleSummary,
@@ -165,6 +166,7 @@ mod purchased_air_cooling_sensible_flow;
 mod purchased_air_cooling_supply_humidity_ratio_humidification_control_humidistat_guard;
 mod purchased_air_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard;
 mod purchased_air_cooling_supply_humidity_ratio_humidification_heating_availability_guard;
+mod purchased_air_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment;
 mod purchased_air_cooling_supply_mass_flow_ems_override_body;
 mod purchased_air_cooling_supply_mass_flow_ems_override_guard;
 mod purchased_air_cooling_supply_mass_flow_limit_body;
@@ -441,6 +443,10 @@ struct RustRuntimeResult {
     purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle:
         Option<
             PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardLifecycleSummary,
+        >,
+    purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle:
+        Option<
+            PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentLifecycleSummary,
         >,
 }
 
@@ -1726,6 +1732,10 @@ fn finish_successful_summary(
                 .purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle
                 .as_ref()
                 .map(purchased_air_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard::lifecycle_json),
+            "purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle": result
+                .purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle
+                .as_ref()
+                .map(purchased_air_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment::lifecycle_json),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
@@ -2708,6 +2718,8 @@ fn execute_rust_runtime(
                     None,
                 purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle:
                     None,
+                purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle:
+                    None,
             })
         }
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
@@ -3062,6 +3074,12 @@ fn execute_rust_runtime(
                         .summary
                         .calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle,
                 );
+            let purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle =
+                Some(
+                    simulation
+                        .summary
+                        .calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle,
+                );
             Ok(RustRuntimeResult {
                 results: simulation.results,
                 runtime_class,
@@ -3139,6 +3157,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_supply_humidity_ratio_humidification_heating_availability_guard_lifecycle,
                 purchased_air_calc_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_lifecycle,
                 purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle,
+                purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle,
             })
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
@@ -3259,6 +3278,8 @@ fn execute_rust_runtime(
                     None,
                 purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle:
                     None,
+                purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle:
+                    None,
             })
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
@@ -3376,6 +3397,8 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_lifecycle:
                     None,
                 purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle:
+                    None,
+                purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle:
                     None,
             })
         }
@@ -4215,6 +4238,20 @@ fn validate_runtime_demand_provenance(
                 init_lifecycle,
                 result.purchased_air_coupling_call_count,
             )?;
+        purchased_air_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment::
+            validate_direct_lifecycle(
+                result
+                    .purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle
+                    .as_ref(),
+                purchased_air_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment::
+                    DirectLifecyclePredecessors {
+                        dehumidification_control_guard_cp371: result
+                            .purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle
+                            .as_ref(),
+                    },
+                init_lifecycle,
+                result.purchased_air_coupling_call_count,
+            )?;
     } else if result.purchased_air_init_lifecycle.is_some()
         || result.purchased_air_calc_entry_lifecycle.is_some()
         || result
@@ -4399,6 +4436,9 @@ fn validate_runtime_demand_provenance(
             .is_some()
         || result
             .purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle
+            .is_some()
+        || result
+            .purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle
             .is_some()
         || result.purchased_air_coupling_call_count.is_some()
     {
@@ -6073,7 +6113,7 @@ mod tests {
     }
 
     #[test]
-    fn non_direct_runtime_rejects_cp316_through_cp371_lifecycle_evidence() {
+    fn non_direct_runtime_rejects_cp316_through_cp372_lifecycle_evidence() {
         let mut result = RustRuntimeResult {
             results: ResultStore::new(),
             runtime_class: RuntimeClass::IdealLoadsFixtureDemandDiagnostic,
@@ -6189,6 +6229,8 @@ mod tests {
             purchased_air_calc_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_lifecycle:
                 None,
             purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle:
+                None,
+            purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle:
                 None,
         };
         assert!(
@@ -7389,6 +7431,27 @@ mod tests {
         );
         result
             .purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle =
+            None;
+        result
+            .purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle =
+            Some(
+                ep_runtime::PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentLifecycleSummary {
+                    source: ep_runtime::PURCHASED_AIR_CALC_COOLING_SUPPLY_HUMIDITY_RATIO_HUMIDIFICATION_MOISTURE_DEMAND_ASSIGNMENT_SOURCE,
+                    first_excluded_source: ep_runtime::PURCHASED_AIR_CALC_COOLING_SUPPLY_HUMIDITY_RATIO_HUMIDIFICATION_MOISTURE_DEMAND_ASSIGNMENT_FIRST_EXCLUDED_SOURCE,
+                    state: ep_runtime::PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentRuntimeState::new(
+                        IdealLoadsAirSystemId(0),
+                    ),
+                },
+            );
+        assert_eq!(
+            validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result, None),
+            Err(
+                "persistent PurchasedAir lifecycle evidence was attached to a non-direct runtime"
+                    .to_string()
+            )
+        );
+        result
+            .purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle =
             None;
     }
 

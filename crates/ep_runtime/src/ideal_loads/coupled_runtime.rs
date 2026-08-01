@@ -137,6 +137,8 @@ use super::{
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardLifecycleSummary,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationHeatingAvailabilityGuardError,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationHeatingAvailabilityGuardLifecycleSummary,
+    PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentError,
+    PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyError,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodyLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardError,
@@ -211,6 +213,7 @@ use super::{
     purchased_air_calc_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_lifecycle_summary,
     purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle_summary,
     purchased_air_calc_cooling_supply_humidity_ratio_humidification_heating_availability_guard_lifecycle_summary,
+    purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle_summary,
     purchased_air_calc_cooling_supply_mass_flow_ems_override_body_lifecycle_summary,
     purchased_air_calc_cooling_supply_mass_flow_ems_override_guard_lifecycle_summary,
     purchased_air_calc_cooling_supply_mass_flow_limit_body_lifecycle_summary,
@@ -275,6 +278,7 @@ mod cooling_sensible_flow_validation;
 mod cooling_supply_humidity_ratio_humidification_control_humidistat_guard_validation;
 mod cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_validation;
 mod cooling_supply_humidity_ratio_humidification_heating_availability_guard_validation;
+mod cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_validation;
 mod cooling_supply_mass_flow_ems_override_body_validation;
 mod cooling_supply_mass_flow_ems_override_guard_validation;
 mod cooling_supply_mass_flow_limit_body_validation;
@@ -537,6 +541,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded nested dehumidification-control Humidistat-or-None guard lifecycle report.
     pub calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle:
         PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardLifecycleSummary,
+    /// Persistent bounded humidifying-setpoint moisture-demand assignment lifecycle report.
+    pub calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle:
+        PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -787,6 +794,10 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     /// Final nested dehumidification-control Humidistat-or-None guard summary could not resolve the bound unit.
     CalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardLifecycle(
         PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardError,
+    ),
+    /// Final humidifying-setpoint moisture-demand assignment summary could not resolve the bound unit.
+    CalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentLifecycle(
+        PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentError,
     ),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
@@ -1355,6 +1366,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A humidifying-setpoint moisture-demand assignment lifecycle invariant did not match the run.
+    CalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -1670,6 +1690,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
+    /// A humidifying-setpoint moisture-demand assignment snapshot did not match its release call.
+    UnexpectedCalculationCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignment {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
     /// A successful CP301 call did not retain source-setpoint demand provenance.
     UnexpectedDemandInputKind {
         /// Zero-based nominal system-step index.
@@ -1972,6 +1997,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuardLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir nested dehumidification-control Humidistat-or-None guard lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir humidifying-setpoint moisture-demand assignment lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -2477,6 +2506,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir nested dehumidification-control Humidistat-or-None guard lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir humidifying-setpoint moisture-demand assignment lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -2830,6 +2867,12 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its nested dehumidification-control Humidistat-or-None guard"
+            ),
+            Self::UnexpectedCalculationCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignment {
+                timestep_index,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its humidifying-setpoint moisture-demand assignment"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -3715,6 +3758,18 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             return Err(
                 DirectZonePurchasedAirCoupledRuntimeError::
                     UnexpectedCalculationCoolingSupplyHumidityRatioHumidificationDehumidificationControlHumidistatOrNoneGuard {
+                        timestep_index,
+                    },
+            );
+        }
+        if !cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignment {
                         timestep_index,
                     },
             );
@@ -4731,6 +4786,22 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle =
+        purchased_air_calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::
+                CalcCoolingSupplyHumidityRatioHumidificationMoistureDemandAssignmentLifecycle,
+        )?;
+    cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_validation::validate_lifecycle(
+        &calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle,
+        &calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -4855,6 +4926,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_supply_humidity_ratio_humidification_heating_availability_guard_lifecycle,
             calc_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_lifecycle,
             calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle,
+            calc_cooling_supply_humidity_ratio_humidification_moisture_demand_assignment_lifecycle,
         },
         state,
         results,
