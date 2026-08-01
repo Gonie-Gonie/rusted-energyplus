@@ -5,7 +5,7 @@ use crate::ideal_loads::{
     purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_temperature_assignment_lifecycle_summary,
 };
 
-fn run_case(
+pub(super) fn run_case(
     cooling_limit: IdealLoadsLimit,
     air_humidity_ratio: f64,
     availability: f64,

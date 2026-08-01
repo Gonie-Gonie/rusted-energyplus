@@ -22439,3 +22439,67 @@ psychrometrics row, support, numerical, or Roadmap promotion occurs. Counts
 stay 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and
 170 required. Scripts become 327 total, 240 public, 87 internal, zero
 unused/unreachable, with 238 development commands.
+
+## CP390 Post-Saturation Constant-SHR Supply-Temperature Mixed-Air Limit
+
+CP390 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+and `PurchasedAirManager.cc` physical executable line 2281:
+
+```cpp
+PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);
+```
+
+The exact ordered sites are
+`read-purchased-air-supply-temperature-for-minimum`,
+`read-purchased-air-mixed-air-temperature-for-minimum`,
+`apply-source-shaped-two-argument-minimum`, and
+`assign-purchased-air-supply-temperature`. The side-effect-free reads make
+this a deterministic Rust/source-text dependency witness, not a C++
+argument-evaluation-order claim. Line 2282 is comment-only. Executable line
+2283's `SupplyEnthalpy = max(SupplyEnthalpy,
+PsyHFnTdbW(PurchAir.SupplyTemp, 0.00001));` is first excluded for CP391,
+including all reads, psychrometric evaluation, maximum, and assignment.
+
+All thirty CP389 routes remain distinct. Private routes 18, 22, and 28 execute
+four sites and twenty-seven execute none. Exact algebra is `T390=T389`,
+`L390=A389`, `inactive_transition_count=T390-L390`, every site counter
+`L390`, `source_site_execution_count=4*L390`, and exact route parity, yielding
+12 characterization site executions. Twenty-seven CP389 histories carry a
+resulting temperature: three are limited, twenty-four inactive later-prefix
+routes preserve the exact bits, and three early routes retain `None`. Eleven
+public direct routes are null only for CP390 source-local operands,
+intermediates, and assignment; nineteen routes remain private.
+
+Recursively complete bit-exact same-call CP389 is the sole predecessor and
+sole owner of the left `resulting_supply_temperature_c`. CP329
+`mixed_air_temperature_c`, carried and corroborated through CP389, solely
+owns the right operand. CP379 with CP334-or-CP344 provenance is recursive
+lineage only. CP388, CP387, CP330, CP385 enthalpy, CP384, system SHR,
+caller/model/service/DTO values are non-operands and forbidden substitutes.
+
+The snapshot keeps carried enthalpy in two distinct non-operand fields:
+`predecessor_resulting_supply_enthalpy_j_per_kg` records CP389 lineage, while
+local `resulting_supply_enthalpy_j_per_kg` preserves the unchanged CP390 result
+bit-for-bit; neither implements CP391. Each of its 25 `Option<f64>` fields has
+a finite-only JSON numeric projection and an authoritative `_ieee_bits`
+sidecar.
+
+The canonical ObjexxFCL minimum is `a < b ? a : b`; Rust uses
+`if left < right { left } else { right }`. Strict true selects CP389 left,
+while ties and unordered comparisons select CP329 right bit-for-bit. No
+`f64::min`, total/partial ordering, clamp, normalization, finite gate or
+coercion, tolerance, cache, diagnostic, or mutable service is added. Signed
+zero, NaN, infinity, tie, and unordered cases remain defensive private
+characterization with authoritative IEEE sidecars.
+
+Placement is CP389-to-CP390-to-unchanged numerical coupling. CP390 neither
+enters nor feeds `DirectZonePurchasedAirCouplingInput`, results, nodes, loads,
+or reports, and non-direct paths reject it. No routine or psychrometrics row,
+support, numerical, capability, output, conformance, status, or Roadmap
+promotion occurs. Both parents stay `scaffold`/`none`, both Calc routines stay
+`source_mapped`, and `routine.psy_h_fn_tdb_w` stays `state_mapped`. Counts
+remain 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`,
+and 170 required. Scripts become 328 total, 240 public, 88 internal, zero
+unused/unreachable, with 238 development commands.

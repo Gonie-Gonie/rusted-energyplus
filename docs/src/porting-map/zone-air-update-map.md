@@ -24978,3 +24978,70 @@ stay 32 algorithms, 293 routines split 58 plus 235, and 170 required. Scripts
 become 327 total, 240 public, 87 internal, zero unused and zero unreachable;
 development commands stay 238. Support, readiness, capability, numerical,
 output, conformance, status, and Roadmap claims remain unchanged.
+
+## CP390 Post-Saturation Constant-SHR Supply-Temperature Mixed-Air Limit Placement
+
+CP390 extends the exact direct-Zone source-order witness through pinned
+`PurchasedAirManager.cc` physical executable line 2281 at commit
+`6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`:
+
+```cpp
+PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);
+```
+
+Its four exact source sites are
+`read-purchased-air-supply-temperature-for-minimum`,
+`read-purchased-air-mixed-air-temperature-for-minimum`,
+`apply-source-shaped-two-argument-minimum`, and
+`assign-purchased-air-supply-temperature`. Both reads are side-effect-free;
+the deterministic dependency/source-text order makes no C++ argument
+evaluation-order claim.
+
+CP390 preserves all thirty CP389 routes. Private constant-SHR routes 18, 22,
+and 28 execute four sites and twenty-seven execute none. Accounting requires
+`T390=T389`, `L390=A389`,
+`inactive_transition_count=T390-L390`, every site counter `L390`, and
+`source_site_execution_count=4*L390`, with exact route parity and 12 private
+characterization site executions. CP389 supplies resulting temperature on 27
+histories: the active three are limited, 24 inactive later-prefix histories
+retain exact bits, and three early routes retain `None`. Eleven public exact
+direct routes are null only for CP390 source-local operand/minimum/assignment
+evidence; nineteen routes remain private.
+
+Same-call complete bit-exact CP389 is the sole predecessor. Its
+`resulting_supply_temperature_c` owns the left/preexisting operand. CP329
+`mixed_air_temperature_c`, carried and corroborated through CP389, owns the
+right operand. CP379 and CP334-or-CP344 temperature ownership are recursive
+lineage only. CP388, CP387, CP330, CP385 retained enthalpy, CP384, system SHR,
+caller, Zone, typed-model, sizing, Node, service, and numerical DTO values are
+non-operands and forbidden substitutes.
+
+The snapshot keeps carried enthalpy in two distinct non-operand fields:
+`predecessor_resulting_supply_enthalpy_j_per_kg` records CP389 lineage, while
+local `resulting_supply_enthalpy_j_per_kg` preserves the unchanged CP390 result
+bit-for-bit; neither implements CP391. Each of its 25 `Option<f64>` fields has
+a finite-only JSON numeric projection and an authoritative `_ieee_bits`
+sidecar.
+
+The source-shaped ObjexxFCL minimum `a < b ? a : b` is retained as
+`if left < right { left } else { right }`; strict true selects CP389 left,
+while ties and unordered comparisons select CP329 right bit-for-bit. No
+`f64::min`, total/partial ordering, clamp, finite gate/coercion,
+normalization, tolerance, cache, diagnostic, or mutable service is introduced.
+Signed-zero, NaN, infinity, tie, and unordered behavior is defensive private
+characterization with authoritative IEEE sidecars.
+
+Physical line 2282 is comment-only. Physical executable line 2283's
+`SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir.SupplyTemp, 0.00001));`
+is first excluded for CP391, including all reads, psychrometric evaluation,
+maximum, and assignment. Binding and serialization placement is
+CP389-to-CP390-to-unchanged numerical coupling. CP390 performs no DTO feed,
+zone-node update, load/report mutation, reconciliation, or overwrite;
+non-direct evidence is rejected. No routine, psychrometrics-map row, support,
+numerical, capability, output, conformance, status, or Roadmap promotion
+occurs. Both parents remain `scaffold`/`none`, both Calc routines remain
+`source_mapped`, and `routine.psy_h_fn_tdb_w` remains `state_mapped`. Counts
+stay 32 algorithms, 293 routines split 58 plus 235, and 170 required. Scripts
+become 328 total, 240 public, 88 internal, zero unused and zero unreachable;
+development commands stay 238.

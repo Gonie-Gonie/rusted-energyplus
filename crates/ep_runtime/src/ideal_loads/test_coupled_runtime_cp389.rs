@@ -243,7 +243,7 @@ fn different(value: f64) -> f64 {
     f64::from_bits(value.to_bits() ^ 1)
 }
 
-fn cooling_zone_state(
+pub(super) fn cooling_zone_state(
     system_timestep_seconds: f64,
     air_humidity_ratio: f64,
 ) -> ZoneHeatBalanceState {

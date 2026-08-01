@@ -4659,3 +4659,80 @@ added. Counts remain 32 algorithms and 293 routines, split 58 `state_mapped`
 plus 235 `source_mapped`, with 170 required. Script inventory becomes 327
 total, 240 public, 87 internal, zero unused, and zero unreachable; development
 commands remain 238.
+
+## CP390 Post-Saturation Constant-SHR Supply-Temperature Mixed-Air Limit
+
+CP390 supersedes only CP389's physical-line-2281 exclusion by mapping
+EnergyPlus 26.1 `PurchasedAirManager.cc` physical executable line 2281 at
+pinned commit `6f2e40d10250a105b49966baa24d843711e61048` and locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`:
+
+```cpp
+PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);
+```
+
+Its exact four dependency- and source-text-ordered sites are
+`read-purchased-air-supply-temperature-for-minimum`,
+`read-purchased-air-mixed-air-temperature-for-minimum`,
+`apply-source-shaped-two-argument-minimum`, and
+`assign-purchased-air-supply-temperature`. Both reads are side-effect-free;
+the deterministic Rust order makes no C++ function-argument-evaluation-order
+claim. Physical line 2282 is comment-only. Physical executable line 2283,
+`SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir.SupplyTemp, 0.00001));`,
+is first excluded and reserved for CP391. CP390 claims none of that line's
+enthalpy or temperature reads, psychrometric evaluation, maximum, or
+assignment.
+
+All thirty CP389 routes remain distinct. Private constant-SHR routes 18, 22,
+and 28 execute all four sites and twenty-seven routes execute none. With
+transitions `T390`, CP390 limit executions `L390`, and CP389 assignments
+`A389`, exact state requires `T390=T389`, `L390=A389`,
+`inactive_transition_count=T390-L390`, exact thirty-route parity, every site
+counter equal to `L390`, and `source_site_execution_count=4*L390`.
+Characterization therefore executes 12 sites. Twenty-seven predecessor
+histories carry a CP389 resulting temperature: the three active routes limit
+it, twenty-four inactive later-prefix routes preserve it bit-for-bit, and the
+three early UnitOff, NonCooling, or nonpositive-flow routes retain `None`.
+All eleven public exact-direct routes are null skips for CP390 source-local
+reads, minimum, and assignment only, not necessarily for retained/resulting
+temperature; nineteen routes remain private.
+
+Recursively complete same-call bit-exact CP389 lifecycle, snapshot, latest,
+private-witness, and completion evidence is the sole immediate predecessor.
+CP389 `resulting_supply_temperature_c` solely owns the left/preexisting
+operand. Same-call CP329 `mixed_air_temperature_c`, carried and corroborated
+through CP389, solely owns the right operand. CP379 and its transitive CP334-
+or-CP344 temperature provenance are recursive lineage rather than direct
+inputs. CP388, CP387, CP330, CP385 retained supply enthalpy, CP384, system SHR,
+caller/model/service values, and numerical-DTO scalars are non-operands and
+cannot substitute. Skipped routes do not validate absent source-local owners.
+
+The snapshot keeps carried enthalpy in two distinct non-operand fields:
+`predecessor_resulting_supply_enthalpy_j_per_kg` records CP389 lineage, while
+local `resulting_supply_enthalpy_j_per_kg` preserves the unchanged CP390 result
+bit-for-bit; neither implements CP391. Each of its 25 `Option<f64>` fields has
+a finite-only JSON numeric projection and an authoritative `_ieee_bits`
+sidecar.
+
+EnergyPlus imports ObjexxFCL's exact two-`double` minimum
+`a < b ? a : b`. CP390 reuses the source-shaped Rust expression
+`if left < right { left } else { right }`: strict true selects the CP389 left
+operand, while ties and unordered comparisons select the CP329 right operand
+bit-for-bit. It adds no `f64::min`, total/partial ordering, clamp,
+normalization, finite gate or coercion, tolerance, cache, diagnostic, or
+mutable service state. Signed zero, NaN payloads, infinities, ties, and
+unordered behavior remain defensive private characterization with
+authoritative IEEE sidecars and finite-only JSON numeric projection.
+
+Binding order is CP389-to-CP390-to-unchanged numerical coupling. CP390 does
+not enter, consume, feed, reconcile with, overwrite, or replace
+`DirectZonePurchasedAirCouplingInput`, numerical DTO/results, nodes, loads, or
+reports; non-direct paths reject attached evidence. No routine or
+psychrometrics-map row, support, readiness, run-state, feature, capability,
+numerical-conformance, output, status, conformance, or Roadmap promotion is
+added. Both parent algorithms remain `scaffold`/`none`; both Calc routines
+remain `source_mapped`, and `routine.psy_h_fn_tdb_w` remains `state_mapped`.
+Counts stay 32 algorithms and 293 routines, split 58 `state_mapped` plus 235
+`source_mapped`, with 170 required. Script inventory becomes 328 total, 240
+public, 88 internal, zero unused, and zero unreachable; development commands
+remain 238.

@@ -27,15 +27,15 @@ use crate::ideal_loads::{
 use crate::psychrometrics::energyplus_psy_h_fn_tdb_w;
 
 #[derive(Clone, Copy)]
-pub(super) struct Chain {
-    pub cp379: Cp379,
-    pub cp387: Cp387,
-    pub cp388: Cp388,
-    pub formula_owners: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyTemperatureAssignmentActiveOwners,
+pub(in crate::ideal_loads::calc) struct Chain {
+    pub(in crate::ideal_loads::calc) cp379: Cp379,
+    pub(in crate::ideal_loads::calc) cp387: Cp387,
+    pub(in crate::ideal_loads::calc) cp388: Cp388,
+    pub(in crate::ideal_loads::calc) formula_owners: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyTemperatureAssignmentActiveOwners,
 }
 
 impl Chain {
-    pub(super) const fn retained_input(
+    pub(in crate::ideal_loads::calc) const fn retained_input(
         self,
     ) -> PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyTemperatureAssignmentRetainedInput{
         PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyTemperatureAssignmentRetainedInput {
@@ -49,7 +49,7 @@ impl Chain {
     }
 }
 
-pub(super) fn chain(
+pub(in crate::ideal_loads::calc) fn chain(
     inherited: usize,
     outcome: usize,
     assignment: bool,

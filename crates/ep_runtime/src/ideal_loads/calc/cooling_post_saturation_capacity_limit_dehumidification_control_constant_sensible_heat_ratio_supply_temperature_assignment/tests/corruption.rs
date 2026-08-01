@@ -48,8 +48,7 @@ fn individually_exact_cp379_with_a_different_selector_is_rejected_atomically() {
     );
     assert!(chain.retained_input().active_owners.is_none());
     let mut wrong_selector = chain.cp379;
-    wrong_selector.predecessor_dehumidification_control_type =
-        Some(D::ConstantSensibleHeatRatio);
+    wrong_selector.predecessor_dehumidification_control_type = Some(D::ConstantSensibleHeatRatio);
     assert!(
         crate::ideal_loads::calc::cooling_supply_enthalpy_post_saturation_assignment::cooling_supply_enthalpy_post_saturation_assignment_snapshot_is_exact(wrong_selector)
     );
@@ -105,9 +104,11 @@ fn individually_exact_cp329_and_cp330_from_different_branches_are_rejected_atomi
     crossed
         .mixed_air_owner
         .predecessor_active_guard_false_fallthrough = false;
-    assert!(crate::ideal_loads::cooling_mixed_air_call_snapshot_is_exact_direct_release(
-        crossed.mixed_air_owner,
-    ));
+    assert!(
+        crate::ideal_loads::cooling_mixed_air_call_snapshot_is_exact_direct_release(
+            crossed.mixed_air_owner,
+        )
+    );
     assert!(
         crate::ideal_loads::cooling_supply_mass_flow_positive_guard_snapshot_is_exact_direct_release(
             crossed.supply_mass_flow_owner,

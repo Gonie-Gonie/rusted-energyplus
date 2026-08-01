@@ -38042,3 +38042,66 @@ reject it. No routine, psychrometrics row, or promotion is added. Counts stay
 327 total, 240 public, 87 internal, zero unused/unreachable, with 238 commands.
 Support, readiness, capability, numerical, output, status, conformance, and
 Roadmap claims remain unchanged.
+
+## CP390 Post-Saturation Constant-SHR Supply-Temperature Mixed-Air Limit in the Heat-Balance Loop
+
+CP390 advances the direct purchased-air heat-balance witness through pinned
+`PurchasedAirManager.cc` physical executable line 2281 at commit
+`6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`:
+`PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);`.
+The exact four ordered sites read purchased-air supply temperature, read
+mixed-air temperature, apply the source-shaped two-argument minimum, and
+assign supply temperature. Their generic labels are
+`read-purchased-air-supply-temperature-for-minimum`,
+`read-purchased-air-mixed-air-temperature-for-minimum`,
+`apply-source-shaped-two-argument-minimum`, and
+`assign-purchased-air-supply-temperature`. Both reads are side-effect-free,
+so no C++ argument-evaluation-order claim is made.
+
+The thirty CP389 histories remain distinct. Private routes 18, 22, and 28
+execute all four sites and twenty-seven skip them. Exact accounting is
+`T390=T389`, `L390=A389`,
+`inactive_transition_count=T390-L390`, each site counter `L390`, and
+`source_site_execution_count=4*L390`, with exact route parity and 12
+characterization site executions. Of twenty-seven CP389 histories carrying a
+resulting temperature, three execute the limit and twenty-four inactive ones
+preserve it; three early histories retain `None`. Eleven public exact-direct
+routes carry null CP390 source-local evidence and nineteen remain private,
+without requiring retained/resulting temperature to be null.
+
+Same-call recursively complete CP389 is the sole immediate predecessor and
+its `resulting_supply_temperature_c` owns the left operand. CP329 mixed-air
+temperature, carried and corroborated through CP389, owns the right. CP379 and
+CP334-or-CP344 are recursive temperature lineage; CP388, CP387, CP330, CP385
+enthalpy, CP384, system SHR, heat-balance/Zone/Node/model/service data, and
+numerical DTO values are non-operands and cannot substitute.
+
+The snapshot keeps carried enthalpy in two distinct non-operand fields:
+`predecessor_resulting_supply_enthalpy_j_per_kg` records CP389 lineage, while
+local `resulting_supply_enthalpy_j_per_kg` preserves the unchanged CP390 result
+bit-for-bit; neither implements CP391. Each of its 25 `Option<f64>` fields has
+a finite-only JSON numeric projection and an authoritative `_ieee_bits`
+sidecar.
+
+ObjexxFCL's exact `a < b ? a : b` is implemented as
+`if left < right { left } else { right }`: strict true selects CP389 left,
+whereas ties and unordered comparisons select CP329 right bit-for-bit. CP390
+introduces no `f64::min`, total/partial ordering, clamp, finite gate/coercion,
+normalization, tolerance, cache, diagnostic, or mutable service. Signed zero,
+NaN, infinity, tie, and unordered behavior remains private defensive
+characterization with authoritative IEEE sidecars.
+
+Physical line 2282 is comment-only. Physical executable line 2283,
+`SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir.SupplyTemp, 0.00001));`,
+is first excluded for CP391, so CP390 performs none of its reads,
+psychrometric evaluation, maximum, or assignment. Placement is
+CP389-to-CP390-to-unchanged numerical coupling; no CP390 evidence feeds or
+mutates numerical, node, load, or report state, and non-direct paths reject
+it. No routine or psychrometrics row or broader promotion is added. Both
+parents remain `scaffold`/`none`, both Calc routines remain `source_mapped`,
+and `routine.psy_h_fn_tdb_w` remains `state_mapped`. Counts stay 32
+algorithms, 293 routines split 58 plus 235 with 170 required; scripts are 328
+total, 240 public, 88 internal, zero unused/unreachable, with 238 commands.
+Support, readiness, capability, numerical, output, status, conformance, and
+Roadmap claims remain unchanged.

@@ -21006,3 +21006,77 @@ routines remain `source_mapped`. Counts remain 32 algorithms, 293 routines,
 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script inventory is
 327 total, 240 public, 87 internal, zero unused, zero unreachable, with 238
 development commands.
+
+## CP390 Source-Ordered Post-Saturation Constant-SHR Supply-Temperature Mixed-Air Limit
+
+CP390 supersedes only CP389's physical-line-2281 exclusion by mapping
+EnergyPlus 26.1 `PurchasedAirManager.cc` physical executable line 2281 at
+commit `6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`:
+
+```cpp
+PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);
+```
+
+The exact dependency/source-text order is
+`read-purchased-air-supply-temperature-for-minimum`,
+`read-purchased-air-mixed-air-temperature-for-minimum`,
+`apply-source-shaped-two-argument-minimum`, then
+`assign-purchased-air-supply-temperature`. Both reads are side-effect-free,
+so this deterministic Rust order makes no C++ argument-evaluation-order
+claim. Line 2282 is comment-only. Physical executable line 2283,
+`SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir.SupplyTemp, 0.00001));`,
+is the first excluded executable and CP391 boundary. Its reads,
+`PsyHFnTdbW` evaluation, source-shaped maximum, and enthalpy assignment remain
+outside CP390.
+
+CP390 preserves CP389's exact thirty-route topology. Private active routes
+18, 22, and 28 execute the four sites; twenty-seven routes complete-skip
+them. Exact checked state is `T390=T389`, CP390 limit count `L390=A389`,
+`inactive_transition_count=T390-L390`, each site counter `L390`,
+`source_site_execution_count=4*L390`, and exact route parity. The private
+characterization total is 12. CP389 carries resulting supply temperature on
+twenty-seven histories: CP390 limits the active three, preserves twenty-four
+inactive temperatures bit-exactly, and retains `None` on the three early
+UnitOff, NonCooling, or nonpositive-flow histories. Eleven public exact-direct
+routes have null CP390 source-local operands/intermediates, minimum, and
+assignment while nineteen routes remain private; this does not assert that
+retained/resulting supply temperature is null.
+
+Same-call recursively complete bit-exact CP389 lifecycle, snapshot, latest,
+private-witness, and completion evidence is the sole immediate predecessor.
+CP389 `resulting_supply_temperature_c` solely owns the left operand. Same-call
+CP329 `mixed_air_temperature_c`, carried and corroborated through CP389,
+solely owns the right operand. CP379 plus CP334-or-CP344 provenance is
+recursive left-operand lineage, not a direct input. CP388 sensible output,
+CP387 CpAir, CP330 flow, CP385 retained enthalpy, CP384 total output, system
+SHR, caller/model/service data, and numerical DTO scalars are non-operands and
+forbidden substitutes. Skips do not validate absent source-local owners.
+
+The snapshot keeps carried enthalpy in two distinct non-operand fields:
+`predecessor_resulting_supply_enthalpy_j_per_kg` records CP389 lineage, while
+local `resulting_supply_enthalpy_j_per_kg` preserves the unchanged CP390 result
+bit-for-bit; neither implements CP391. Each of its 25 `Option<f64>` fields has
+a finite-only JSON numeric projection and an authoritative `_ieee_bits`
+sidecar.
+
+ObjexxFCL's two-`double` minimum is exactly `a < b ? a : b`; CP390 therefore
+uses `if left < right { left } else { right }`. Strict true selects the CP389
+left operand, and ties or unordered comparisons select the CP329 right
+operand bit-for-bit. `f64::min`, total/partial ordering, clamp,
+normalization, finite gate/coercion, tolerance, cache, diagnostic, and mutable
+service state are forbidden. Signed-zero, NaN, infinity, tie, and unordered
+behavior remains defensive private characterization, with finite-only JSON
+numeric values and authoritative IEEE sidecars.
+
+Binding is CP389-to-CP390-to-unchanged numerical coupling. CP390 is absent
+from `DirectZonePurchasedAirCouplingInput` and cannot consume, feed,
+reconcile with, overwrite, or replace numerical DTO/results or node, load, or
+report state. Non-direct evidence is rejected. No routine, psychrometrics-map
+row, support, readiness, feature/evidence, capability, numerical, output,
+status, conformance, or Roadmap promotion occurs. Both parent algorithms stay
+`scaffold`/`none`, both Calc routines stay `source_mapped`, and
+`routine.psy_h_fn_tdb_w` stays `state_mapped`. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
+Script inventory is 328 total, 240 public, 88 internal, zero unused, zero
+unreachable, with 238 development commands.

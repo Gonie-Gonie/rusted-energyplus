@@ -81,7 +81,7 @@ fn source_local_fields() -> [&'static str; 8] {
     ]
 }
 
-fn snapshot(
+pub(in crate::pipeline) fn snapshot(
     value: Option<f64>,
     active: bool,
 ) -> PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyTemperatureAssignmentSnapshot{
