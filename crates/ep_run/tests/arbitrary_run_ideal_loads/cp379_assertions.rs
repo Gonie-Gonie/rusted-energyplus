@@ -1,5 +1,8 @@
 //! CP379 post-saturation supply-enthalpy assignment assertions.
 
+#[path = "cp380_assertions.rs"]
+mod cp380_assertions;
+
 use ep_runtime::psychrometrics::energyplus_psy_h_fn_tdb_w;
 use serde_json::{Map, Value, json};
 
@@ -137,6 +140,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         assert_active_values(cp377, cp378, &cp379["latest"]);
     }
     assert_numerical_nonfeed_and_unchanged_enthalpy(runtime, results);
+    cp380_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -145,6 +149,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP379_KEY].is_null(),
         "non-direct runtime must not publish CP379 evidence"
     );
+    cp380_assertions::assert_non_direct(runtime);
 }
 
 fn assert_complete_null(latest: &Value) {

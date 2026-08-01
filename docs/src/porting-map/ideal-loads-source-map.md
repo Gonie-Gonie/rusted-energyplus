@@ -22001,3 +22001,46 @@ later load/node/output behavior remain excluded. Counts remain 32 algorithms,
 become 317 total, 240 public, 77 internal, zero unused, zero unreachable, with
 238 development commands; support, readiness, capability, numerical, output,
 conformance, and Roadmap claims remain unchanged.
+
+## CP380 Cooling Post-Saturation Capacity-Limit Guard
+
+CP380 supersedes only CP379 by mapping `PurchasedAirManager.cc` executable
+line 2264, `if ((PurchAir.CoolingLimit == LimitType::Capacity) ||
+(PurchAir.CoolingLimit == LimitType::FlowRateAndCapacity)) {`, at pinned commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The exact five sites are
+`read-cooling-limit-for-post-saturation-capacity-comparison`,
+`compare-cooling-limit-equal-to-capacity-for-post-saturation-capacity-guard`,
+`read-cooling-limit-for-post-saturation-flow-rate-and-capacity-comparison-after-first-false`,
+`compare-cooling-limit-equal-to-flow-rate-and-capacity-for-post-saturation-capacity-guard`,
+and `enter-post-saturation-capacity-limit-body-if-compound-condition-satisfied`.
+Left-to-right `||` short-circuiting skips the second selector occurrence after
+a Capacity match. Line 2265 is comment-only; executable line 2266 is first
+excluded and the CP381 boundary.
+
+CP379's eight routes remain. `U/N/P` are complete-null zero-site skips;
+`H/Hu/DH/DN/DG` are active. With `G=H+Hu+DH+DN+DG`, Capacity matches `C`,
+second evaluations `S=G-C`, combined matches `F`, body entries `B=C+F`, and
+false fallthroughs `R=G-B`, exact state is `T=U+N+P+G` with total sites
+`2*G+2*S+B`. Each active predecessor route splits exactly into body and false
+successors. Selector modes execute 3/5/4/4 sites for Capacity,
+FlowRateAndCapacity, NoLimit, and FlowRate respectively.
+
+Recursively complete bit-exact same-call CP379 is the sole predecessor. The
+selected typed system's identity-checked `cooling_limit` solely owns the source
+operand. CP337's equivalent earlier compound guard corroborates structure and
+selector lineage only; no CP337 value replaces the live CP380 operand. Caller
+duplicates, services, capacity payloads, and numerical DTO values are excluded.
+
+CP380 stops before line 2266. It performs no mixed-air humidity comparison,
+capacity-body calculation, cooling/load/supply mutation, numerical coupling,
+node update, or reporting. It neither consumes nor feeds the unchanged DTO or
+result and makes no numerical equivalence claim. Non-direct paths reject CP380
+evidence.
+
+No routine or psychrometrics-map row or promotion is added. Counts remain 32
+algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
+required. Scripts become 318 total, 240 public, 78 internal, zero unused, zero
+unreachable, with 238 development commands; support, readiness, capability,
+numerical, output, conformance, status, and Roadmap claims remain unchanged.

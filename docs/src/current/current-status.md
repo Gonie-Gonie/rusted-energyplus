@@ -4099,3 +4099,58 @@ remain 32 algorithms and 293 routines, split 58 `state_mapped` plus 235
 public, 77 internal, zero unused, and zero unreachable; development commands
 remain 238. Support, readiness, capability, numerical, output, conformance,
 status, and Roadmap claims remain unchanged.
+
+## CP380 Cooling Post-Saturation Capacity-Limit Guard
+
+CP380 supersedes only CP379's first-excluded boundary by mapping EnergyPlus
+26.1 `PurchasedAirManager.cc` physical executable line 2264,
+`if ((PurchAir.CoolingLimit == LimitType::Capacity) ||
+(PurchAir.CoolingLimit == LimitType::FlowRateAndCapacity)) {`, at pinned
+commit `6f2e40d10250a105b49966baa24d843711e61048` and locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact source-ordered sites are
+`read-cooling-limit-for-post-saturation-capacity-comparison`,
+`compare-cooling-limit-equal-to-capacity-for-post-saturation-capacity-guard`,
+`read-cooling-limit-for-post-saturation-flow-rate-and-capacity-comparison-after-first-false`,
+`compare-cooling-limit-equal-to-flow-rate-and-capacity-for-post-saturation-capacity-guard`,
+and `enter-post-saturation-capacity-limit-body-if-compound-condition-satisfied`.
+The source `||` short-circuit reaches the second selector read only after the
+first comparison is false. Line 2265 is comment-only; executable line 2266's
+dehumidification guard is first excluded and the CP381 boundary.
+
+CP380 retains CP379's eight inherited routes. UnitOff (`U`), non-cooling
+(`N`), and positive-guard-false (`P`) complete-skip all five sites. The five
+active predecessor routes are heating-availability false (`H`), humidification-
+control false (`Hu`), dehumidification-control Humidistat (`DH`),
+dehumidification-control None (`DN`), and final dehumidification-guard false
+(`DG`). With guard evaluations `G=H+Hu+DH+DN+DG`, Capacity matches `C`, second
+evaluations `S=G-C`, FlowRateAndCapacity matches `F`, body entries `B=C+F`, and
+active false fallthroughs `R=G-B`, exact state requires `T=U+N+P+G` and
+`source_site_execution_count=2*G+2*S+B`. Each active predecessor route is
+partitioned exactly between its body-entry and false-fallthrough successors.
+
+Recursively complete same-call bit-exact CP379 lifecycle, snapshot, latest,
+private-witness, and completion evidence is the sole immediate predecessor.
+The identity-checked selected typed `IdealLoadsAirSystem.cooling_limit` is the
+sole source operand owner. CP337's earlier identical compound-guard shape and
+retained same-call selector evidence corroborate short-circuit structure and
+lineage only; CP337 is neither CP380's predecessor nor a substitute operand.
+Caller duplicates, live-service rereads, capacity values, and numerical DTO
+inputs are excluded.
+
+`LimitCapacity` executes three sites, `LimitFlowRateAndCapacity` five, and
+`NoLimit` or `LimitFlowRate` four. CP380 records selector, comparison, and
+branch evidence only. It never enters line 2266, reads mixed-air humidity,
+uses `MaxCoolTotCap`, calculates or limits cooling output, or changes supply
+temperature, humidity, enthalpy, mass flow, node state, or report state. It
+does not feed, reconcile with, overwrite, or replace
+`DirectZonePurchasedAirCouplingInput` or the unchanged numerical DTO/result.
+Non-direct paths reject CP380 lifecycle evidence.
+
+No routine or psychrometrics-map row and no support promotion are added. Both
+parent algorithms remain `scaffold`/`none`, and both Calc routines remain
+`source_mapped`. Counts remain 32 algorithms and 293 routines, split 58
+`state_mapped` plus 235 `source_mapped`, with 170 required. Script inventory
+becomes 318 total, 240 public, 78 internal, zero unused, and zero unreachable;
+development commands remain 238. Support, readiness, capability, numerical,
+output, conformance, status, and Roadmap claims remain unchanged.

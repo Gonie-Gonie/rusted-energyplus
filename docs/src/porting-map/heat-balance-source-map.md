@@ -37664,3 +37664,46 @@ algorithms, 293 routines split 58 plus 235 with 170 required, and scripts are
 317 total, 240 public, 77 internal, zero unused/unreachable, with 238 commands.
 Support, readiness, capability, numerical, output, conformance, and Roadmap
 claims remain unchanged.
+
+## CP380 Post-Saturation Capacity-Limit Guard in the Heat-Balance Loop
+
+CP380 maps only the next source-ordered PurchasedAir executable, physical line
+2264, `if ((PurchAir.CoolingLimit == LimitType::Capacity) ||
+(PurchAir.CoolingLimit == LimitType::FlowRateAndCapacity)) {`, at commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its five site labels are
+`read-cooling-limit-for-post-saturation-capacity-comparison`,
+`compare-cooling-limit-equal-to-capacity-for-post-saturation-capacity-guard`,
+`read-cooling-limit-for-post-saturation-flow-rate-and-capacity-comparison-after-first-false`,
+`compare-cooling-limit-equal-to-flow-rate-and-capacity-for-post-saturation-capacity-guard`,
+and `enter-post-saturation-capacity-limit-body-if-compound-condition-satisfied`.
+The second selector read is lazy after a false first comparison. Comment line
+2265 is non-executable; line 2266's dehumidification guard is first excluded
+and reserved for CP381.
+
+The eight CP379 routes remain: `U/N/P` complete-skip, and
+`H/Hu/DH/DN/DG` evaluate the guard. For `G=H+Hu+DH+DN+DG`, Capacity matches
+`C`, second evaluations `S=G-C`, combined matches `F`, body entries `B=C+F`,
+and false fallthroughs `R=G-B`, exact state requires `T=U+N+P+G` and
+`source_site_execution_count=2*G+2*S+B`. Every active predecessor route has an
+exact body/false partition; the four named selector modes execute 3/5/4/4
+dynamic sites.
+
+Recursively complete same-call CP379 is the sole predecessor. Only the
+identity-checked selected typed system's `cooling_limit` owns the source read.
+CP337 corroborates the identical earlier guard topology and selector lineage,
+but supplies neither predecessor nor operand state. Caller selectors, live
+services, capacity/sizing values, and numerical DTO fields are not substitutes.
+
+The heat-balance placement remains evidence-only before unchanged numerical
+coupling. CP380 excludes line 2266, mixed-air humidity, `MaxCoolTotCap`, every
+capacity body and later cooling/load/supply mutation, node update, and report.
+It does not feed, consume, reconcile with, overwrite, or replace numerical DTO
+or result state. Non-direct paths reject its evidence.
+
+There is no routine or psychrometrics-map row and no promotion. Counts stay 32
+algorithms, 293 routines split 58 plus 235 with 170 required, and scripts are
+318 total, 240 public, 78 internal, zero unused/unreachable, with 238 commands.
+Support, readiness, capability, numerical, output, conformance, status, and
+Roadmap claims remain unchanged.

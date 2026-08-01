@@ -130,6 +130,8 @@ use super::{
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitLifecycleSummary,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitError,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitLifecycleSummary,
+    PurchasedAirCalcCoolingPostSaturationCapacityLimitGuardError,
+    PurchasedAirCalcCoolingPostSaturationCapacityLimitGuardLifecycleSummary,
     PurchasedAirCalcCoolingSensibleFlowError, PurchasedAirCalcCoolingSensibleFlowLifecycleSummary,
     PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentError,
     PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentLifecycleSummary,
@@ -223,6 +225,7 @@ use super::{
     purchased_air_calc_cooling_positive_supply_temperature_assignment_lifecycle_summary,
     purchased_air_calc_cooling_positive_supply_temperature_minimum_limit_lifecycle_summary,
     purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle_summary,
+    purchased_air_calc_cooling_post_saturation_capacity_limit_guard_lifecycle_summary,
     purchased_air_calc_cooling_sensible_flow_lifecycle_summary,
     purchased_air_calc_cooling_supply_enthalpy_post_saturation_assignment_lifecycle_summary,
     purchased_air_calc_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_lifecycle_summary,
@@ -295,6 +298,7 @@ mod cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignm
 mod cooling_positive_supply_temperature_assignment_validation;
 mod cooling_positive_supply_temperature_minimum_limit_validation;
 mod cooling_positive_supply_temperature_mixed_air_limit_validation;
+pub(in crate::ideal_loads) mod cooling_post_saturation_capacity_limit_guard_validation;
 mod cooling_sensible_flow_validation;
 pub(in crate::ideal_loads) mod cooling_supply_enthalpy_post_saturation_assignment_validation;
 mod cooling_supply_humidity_ratio_humidification_control_humidistat_guard_validation;
@@ -593,6 +597,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded post-saturation purchased-air supply-enthalpy assignment lifecycle report.
     pub calc_cooling_supply_enthalpy_post_saturation_assignment_lifecycle:
         PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentLifecycleSummary,
+    /// Persistent bounded post-saturation cooling capacity-limit guard lifecycle report.
+    pub calc_cooling_post_saturation_capacity_limit_guard_lifecycle:
+        PurchasedAirCalcCoolingPostSaturationCapacityLimitGuardLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -875,6 +882,10 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     /// Final post-saturation supply-enthalpy assignment summary could not resolve the bound unit.
     CalcCoolingSupplyEnthalpyPostSaturationAssignmentLifecycle(
         PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentError,
+    ),
+    /// Final post-saturation cooling capacity-limit guard summary could not resolve the bound unit.
+    CalcCoolingPostSaturationCapacityLimitGuardLifecycle(
+        PurchasedAirCalcCoolingPostSaturationCapacityLimitGuardError,
     ),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
@@ -1515,6 +1526,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A post-saturation cooling capacity-limit guard lifecycle invariant did not match the run.
+    CalcCoolingPostSaturationCapacityLimitGuardLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -1870,6 +1890,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
+    /// A post-saturation cooling capacity-limit guard snapshot did not match its release call.
+    UnexpectedCalculationCoolingPostSaturationCapacityLimitGuard {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
     /// A successful CP301 call did not retain source-setpoint demand provenance.
     UnexpectedDemandInputKind {
         /// Zero-based nominal system-step index.
@@ -2204,6 +2229,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcCoolingSupplyEnthalpyPostSaturationAssignmentLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir post-saturation supply-enthalpy assignment lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcCoolingPostSaturationCapacityLimitGuardLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir post-saturation capacity-limit guard lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -2773,6 +2802,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir post-saturation supply-enthalpy assignment lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingPostSaturationCapacityLimitGuardLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir post-saturation capacity-limit guard lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -3174,6 +3211,12 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its post-saturation supply-enthalpy assignment"
+            ),
+            Self::UnexpectedCalculationCoolingPostSaturationCapacityLimitGuard {
+                timestep_index,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its post-saturation capacity-limit guard"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -4155,6 +4198,18 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             return Err(
                 DirectZonePurchasedAirCoupledRuntimeError::
                     UnexpectedCalculationCoolingSupplyEnthalpyPostSaturationAssignment {
+                        timestep_index,
+                    },
+            );
+        }
+        if !cooling_post_saturation_capacity_limit_guard_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingPostSaturationCapacityLimitGuard {
                         timestep_index,
                     },
             );
@@ -5303,6 +5358,22 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_post_saturation_capacity_limit_guard_lifecycle =
+        purchased_air_calc_cooling_post_saturation_capacity_limit_guard_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::
+                CalcCoolingPostSaturationCapacityLimitGuardLifecycle,
+        )?;
+    cooling_post_saturation_capacity_limit_guard_validation::validate_lifecycle(
+        &calc_cooling_post_saturation_capacity_limit_guard_lifecycle,
+        &calc_cooling_supply_enthalpy_post_saturation_assignment_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -5435,6 +5506,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_supply_humidity_ratio_saturation_assignment_lifecycle,
             calc_cooling_supply_humidity_ratio_saturation_limit_assignment_lifecycle,
             calc_cooling_supply_enthalpy_post_saturation_assignment_lifecycle,
+            calc_cooling_post_saturation_capacity_limit_guard_lifecycle,
         },
         state,
         results,

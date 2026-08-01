@@ -24599,3 +24599,45 @@ output behavior remain excluded. Counts stay 32 algorithms, 293 routines split
 internal, zero unused and zero unreachable; development commands stay 238.
 Support, readiness, capability, numerical, output, conformance, and Roadmap
 claims remain unchanged.
+
+## CP380 Post-Saturation Capacity-Limit Guard Placement
+
+CP380 follows CP379 before the unchanged numerical coupling and maps only
+`PurchasedAirManager.cc` executable line 2264,
+`if ((PurchAir.CoolingLimit == LimitType::Capacity) ||
+(PurchAir.CoolingLimit == LimitType::FlowRateAndCapacity)) {`. The source lock
+is commit `6f2e40d10250a105b49966baa24d843711e61048`, raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its five unique sites are
+`read-cooling-limit-for-post-saturation-capacity-comparison`,
+`compare-cooling-limit-equal-to-capacity-for-post-saturation-capacity-guard`,
+`read-cooling-limit-for-post-saturation-flow-rate-and-capacity-comparison-after-first-false`,
+`compare-cooling-limit-equal-to-flow-rate-and-capacity-for-post-saturation-capacity-guard`,
+and `enter-post-saturation-capacity-limit-body-if-compound-condition-satisfied`.
+The source `||` keeps the second read lazy. Line 2265 is comment-only and line
+2266 is the first excluded executable and CP381 boundary.
+
+The inherited `U/N/P` routes complete-skip, while `H/Hu/DH/DN/DG` evaluate
+the guard. Let `G=H+Hu+DH+DN+DG`, `C` be Capacity matches, `S=G-C` second
+evaluations, `F` combined matches, `B=C+F` body entries, and `R=G-B` false
+fallthroughs. Exact state requires `T=U+N+P+G`, total sites
+`2*G+2*S+B`, and a body/false partition for every active route. Capacity,
+FlowRateAndCapacity, NoLimit, and FlowRate execute 3/5/4/4 sites.
+
+Same-call recursively complete bit-exact CP379 is the sole predecessor. The
+selected typed system's identity-checked `cooling_limit` solely owns the
+operand. CP337 is identical-guard structural and lineage corroboration only,
+not a predecessor or substitute value. Caller/service/DTO selectors and
+capacity payloads are excluded.
+
+CP380 records control flow only. Line 2266, capacity-body arithmetic and
+psychrometrics, supply state changes, unchanged numerical coupling, node
+updates, and reports remain excluded. No CP380 value feeds, reconciles with,
+overwrites, or replaces coupling input or numerical result. Non-direct paths
+reject CP380 evidence.
+
+No routine or psychrometrics-map row or promotion is added. Counts stay 32
+algorithms, 293 routines split 58 plus 235, and 170 required. Scripts become
+318 total, 240 public, 78 internal, zero unused and zero unreachable;
+development commands stay 238. Support, readiness, capability, numerical,
+output, conformance, status, and Roadmap claims remain unchanged.
