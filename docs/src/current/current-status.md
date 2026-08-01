@@ -4259,3 +4259,58 @@ parent algorithms remain `scaffold`/`none`, and both Calc routines remain
 becomes 320 total, 240 public, 80 internal, zero unused, and zero unreachable;
 development commands remain 238. Support, readiness, capability, numerical,
 output, conformance, status, and Roadmap claims remain unchanged.
+
+## CP383 Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Guard
+
+CP383 supersedes only CP382's first-excluded boundary by mapping EnergyPlus
+26.1 `PurchasedAirManager.cc` physical executable line 2268,
+`if ((CoolTotOutput) > PurchAir.MaxCoolTotCap) {`, at pinned commit
+`6f2e40d10250a105b49966baa24d843711e61048` and locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact source-text sites are
+`read-retained-cooling-total-output-for-post-saturation-dehumidification-maximum-capacity-comparison`,
+`read-retained-maximum-total-cooling-capacity-for-post-saturation-dehumidification-total-output-comparison`,
+`compare-post-saturation-dehumidification-cooling-total-output-strictly-greater-than-maximum-total-cooling-capacity`,
+and `enter-post-saturation-dehumidification-total-output-capacity-adjustment-body-if-comparison-satisfied`.
+The two reads are side-effect-free, so their deterministic Rust witness order
+does not claim C++ built-in `>` operand-evaluation order. Executable line 2269's
+`CoolTotOutput = PurchAir.MaxCoolTotCap;` is first excluded and the CP384
+boundary.
+
+CP383 refines CP382's eighteen routes into twenty-three. `U/N/P`, five
+capacity-guard-false `K`, and five dehumidification-guard-false `X` successors
+remain thirteen complete-null zero-site skips. Each of the five CP382 assignment
+routes evaluates CP383 and splits into total-output-guard-false `F` and
+capacity-adjustment-body-entry `E` successors. With CP382 assignments `A`,
+exact checked state requires `T383=T382`, `A=F+E`, each operand-read and
+comparison counter equal `A`, the body-entry counter equal `E`, and
+`source_site_execution_count=3*A+E`, with the split proven per lineage. Public
+direct release admits eleven recursively reachable shapes; twelve additional
+shapes remain private characterization.
+
+Recursively complete same-call bit-exact CP382 lifecycle, snapshot, latest,
+private-witness, and completion evidence is the sole immediate predecessor.
+CP382's assigned local `CoolTotOutput` solely owns the left operand. CP321's
+retained maximum total cooling capacity solely owns the right operand, with
+CP340's same-call maximum-capacity read required as bit-exact corroboration.
+CP341 is conditional and is not an owner or required corroborator. Caller,
+model, sizing, live-service, and numerical-DTO substitutes are forbidden.
+
+The comparison is raw IEEE binary64 `>` without subtraction, epsilon, total
+ordering, clamp, normalization, or finite-result rejection. Equality and
+unordered NaN comparisons are false; a publicly derived positive infinity is
+greater than the finite positive capacity. JSON projects nonfinite numbers as
+`null` while preserving exact IEEE sidecars, and skip routes retain null values,
+sidecars, and comparison result. CP383 records guard evidence only: it does not
+execute line 2269, overwrite `CoolTotOutput`, change `SupplyEnthalpy` or any
+supply/load/node/report state, or feed, reconcile with, overwrite, or replace
+`DirectZonePurchasedAirCouplingInput` or the unchanged numerical DTO/result.
+Non-direct paths reject CP383 evidence.
+
+No routine or psychrometrics-map row and no support promotion are added. Both
+parent algorithms remain `scaffold`/`none`, and both Calc routines remain
+`source_mapped`. Counts remain 32 algorithms and 293 routines, split 58
+`state_mapped` plus 235 `source_mapped`, with 170 required. Script inventory
+becomes 321 total, 240 public, 81 internal, zero unused, and zero unreachable;
+development commands remain 238. Support, readiness, capability, numerical,
+output, conformance, status, and Roadmap claims remain unchanged.

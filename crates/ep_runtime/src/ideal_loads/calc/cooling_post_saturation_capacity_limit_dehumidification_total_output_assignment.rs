@@ -14,6 +14,7 @@ mod transition;
 pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment_is_consistent;
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment_snapshots_match_bit_exact;
+pub(in crate::ideal_loads::calc) use release::snapshot_route as cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment_snapshot_route;
 pub use release::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputAssignmentError,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputAssignmentInput,

@@ -2,6 +2,9 @@
 
 use serde_json::{Map, Value, json};
 
+#[path = "cp383_assertions.rs"]
+mod cp383_assertions;
+
 const CP329_KEY: &str = "purchased_air_calc_cooling_mixed_air_call_lifecycle";
 const CP330_KEY: &str = "purchased_air_calc_cooling_supply_mass_flow_positive_guard_lifecycle";
 const CP339_KEY: &str = "purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle";
@@ -77,6 +80,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         }
     }
     assert_numerical_nonfeed_and_unchanged_enthalpy(runtime, results);
+    cp383_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -85,6 +89,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP382_KEY].is_null(),
         "non-direct runtime must not publish CP382 evidence"
     );
+    cp383_assertions::assert_non_direct(runtime);
 }
 
 fn assert_route_partitions(cp381: &Value, cp382: &Value) {

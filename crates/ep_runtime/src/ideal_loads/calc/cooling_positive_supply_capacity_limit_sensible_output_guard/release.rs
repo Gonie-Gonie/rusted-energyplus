@@ -34,7 +34,6 @@ pub(in crate::ideal_loads::calc) use runtime_validation::{
     next_capacity_limit_sensible_output_guard_transition_fits as next_capacity_limit_sensible_output_guard_transition_fits_for_test,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_positive_supply_capacity_limit_sensible_output_guard_snapshot_is_exact_direct_release;
-#[cfg(test)]
 pub(in crate::ideal_loads::calc) use snapshot_validation::snapshots_match_bit_exact;
 
 pub(in crate::ideal_loads::calc) fn completed_direct_cooling_positive_supply_capacity_limit_sensible_output_guard_is_consistent(

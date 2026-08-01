@@ -4151,5 +4151,6 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp380-cooling-post-saturation-capacity-limit-guard.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp381-cooling-post-saturation-capacity-limit-dehumidification-guard.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp382-cooling-post-saturation-capacity-limit-dehumidification-total-output-assignment.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp383-cooling-post-saturation-capacity-limit-dehumidification-total-output-guard.ps1")
 
 Write-Host "IdealLoads structure audit complete."

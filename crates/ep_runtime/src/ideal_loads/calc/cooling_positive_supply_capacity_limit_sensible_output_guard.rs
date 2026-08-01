@@ -12,6 +12,7 @@ mod transition;
 
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_positive_supply_capacity_limit_sensible_output_guard_is_consistent;
+pub(in crate::ideal_loads::calc) use release::snapshots_match_bit_exact as cooling_positive_supply_capacity_limit_sensible_output_guard_snapshots_match_bit_exact;
 pub(in crate::ideal_loads) use release::cooling_positive_supply_capacity_limit_sensible_output_guard_snapshot_is_exact_direct_release;
 pub use release::{
     PurchasedAirCalcCoolingPositiveSupplyCapacityLimitSensibleOutputGuardError,

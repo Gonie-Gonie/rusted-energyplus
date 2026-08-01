@@ -22122,3 +22122,37 @@ routine, psychrometrics row, or promotion is added. Counts stay 32 algorithms,
 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Scripts
 become 320 total, 240 public, 80 internal, zero unused/unreachable, with 238
 development commands; all support and Roadmap claims remain unchanged.
+
+## CP383 Cooling Post-Saturation Capacity-Limit Dehumidification Total-Output Guard
+
+CP383 maps pinned `PurchasedAirManager.cc` executable line 2268,
+`if ((CoolTotOutput) > PurchAir.MaxCoolTotCap) {`, at commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its four sites are
+`read-retained-cooling-total-output-for-post-saturation-dehumidification-maximum-capacity-comparison`,
+`read-retained-maximum-total-cooling-capacity-for-post-saturation-dehumidification-total-output-comparison`,
+`compare-post-saturation-dehumidification-cooling-total-output-strictly-greater-than-maximum-total-cooling-capacity`,
+and `enter-post-saturation-dehumidification-total-output-capacity-adjustment-body-if-comparison-satisfied`.
+The side-effect-free reads have deterministic witness order without a C++
+operand-order claim. Line 2269 is first excluded and the CP384 boundary.
+
+CP382's thirteen skips persist, while five assignment routes each split into
+guard-false and body-entry routes. Thus twenty-three routes satisfy
+`T383=T382`, `A=F+E`, and `source_site_execution_count=3*A+E`, with exact
+per-lineage partitions. Eleven routes are public and twelve private.
+
+CP382 is the sole recursively complete predecessor and left-operand owner.
+CP321 owns retained maximum capacity and CP340 corroborates it bit-exactly in
+the same call. The raw binary64 `>` has no tolerance, total order, finite gate,
+or mutation; equality and NaN compare false, while positive infinity can enter
+the body against finite positive capacity. Nonfinite JSON is `null` with exact
+sidecars.
+
+CP383 owns guard evidence only. It does not execute line 2269, apply the cap,
+mutate state, or feed/reconcile with unchanged numerical coupling, node update,
+or reporting. Non-direct paths reject its evidence. No routine, psychrometrics
+row, or promotion is added. Counts stay 32 algorithms, 293 routines, 58
+`state_mapped`, 235 `source_mapped`, and 170 required. Scripts become 321
+total, 240 public, 81 internal, zero unused/unreachable, with 238 development
+commands; all support and Roadmap claims remain unchanged.

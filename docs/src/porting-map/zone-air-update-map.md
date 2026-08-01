@@ -24715,3 +24715,34 @@ algorithms, 293 routines split 58 plus 235, and 170 required. Scripts become
 320 total, 240 public, 80 internal, zero unused and zero unreachable;
 development commands stay 238. Support, readiness, capability, numerical,
 output, conformance, status, and Roadmap claims remain unchanged.
+
+## CP383 Post-Saturation Capacity-Limit Dehumidification Total-Output Guard Placement
+
+CP383 maps `PurchasedAirManager.cc` executable line 2268 at pinned commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The four ordered sites read retained CP382 output, read retained CP321 maximum
+capacity, compare them with raw strict `>`, and conditionally enter the
+capacity-adjustment body. Their exact labels are
+`read-retained-cooling-total-output-for-post-saturation-dehumidification-maximum-capacity-comparison`,
+`read-retained-maximum-total-cooling-capacity-for-post-saturation-dehumidification-total-output-comparison`,
+`compare-post-saturation-dehumidification-cooling-total-output-strictly-greater-than-maximum-total-cooling-capacity`,
+and `enter-post-saturation-dehumidification-total-output-capacity-adjustment-body-if-comparison-satisfied`.
+Line 2269 is first excluded for CP384.
+
+Thirteen CP382 skip routes remain complete-null. Five assignment routes split
+between false fallthrough and body entry, producing twenty-three routes with
+`T383=T382`, `A=F+E`, and `source_site_execution_count=3*A+E`. CP382 is the
+sole predecessor and output owner; CP321 owns maximum capacity, corroborated by
+same-call CP340.
+
+Raw IEEE `>` treats equality and NaN as false and adds no tolerance, clamp,
+normalization, finite gate, or state mutation. CP383 does not execute line 2269,
+update a zone node, or mutate/feed/reconcile with numerical, enthalpy, supply,
+load, or report state. Non-direct paths reject its evidence.
+
+No routine, psychrometrics row, or promotion is added. Counts stay 32
+algorithms, 293 routines split 58 plus 235, and 170 required. Scripts become
+321 total, 240 public, 81 internal, zero unused and zero unreachable;
+development commands stay 238. Support, readiness, capability, numerical,
+output, conformance, status, and Roadmap claims remain unchanged.
