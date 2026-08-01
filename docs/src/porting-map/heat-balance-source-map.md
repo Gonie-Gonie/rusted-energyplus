@@ -37240,3 +37240,58 @@ Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
 internal, and zero unused. Parent/Calc status plus all support, readiness,
 capability, numerical, output, conformance, and Roadmap claims remain
 unchanged.
+
+## CP370 Cooling Supply-Humidity-Ratio Humidification-Control Humidistat Guard in the Heat-Balance Loop
+
+CP370 retains pinned `PurchasedAirManager.cc:2246`,
+`if (PurchAir.HumidCtrlType == HumControl::Humidistat) {`, and its three
+ordered sites:
+
+1. `read-purchased-air-humidification-control-type-for-cooling-supply-humidity-ratio-humidification-guard`
+2. `compare-purchased-air-humidification-control-type-equal-to-humidistat`
+3. `enter-cooling-supply-humidity-ratio-humidification-control-body-if-humidistat`
+
+Pinned commit `6f2e40d10250a105b49966baa24d843711e61048` and raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`
+lock the boundary. Physical executable line 2247 is first excluded; the
+false-comparison dynamic continuation at physical executable line 2258 also
+remains outside CP370.
+
+The retained routes remain `U/N/P/C0/Q/H/CSH`. For current selector
+reads/comparisons `V`, Humidistat matches/body entries `M`, and false
+fallthroughs `Z`, exact state is `T=U+N+P+C0+Q+H+CSH`,
+`S=C0+Q+H+CSH=R=G+F+L`, `A=F+L`,
+`V=CP369 body entries=M+Z`, and
+`source_site_execution_count=2*V+M`. Inactive `U/N/P` and CP369
+`HeatOn=false` histories execute zero CP370 sites.
+
+Exact direct `C0` owns typed immutable
+`IdealLoadsAirSystem.humidification_control_type=None`; the comparison is
+false, `M=0`, `Z=V`, and the site total is `2*V`. Canonical private
+typed-enum `Humidistat` characterization instead has `M=V`, `Z=0`, and a
+`3*V` site total. It grants no selected-model, live-service, support, or
+capability claim.
+
+CP370 requires recursively completed same-call CP369 as its sole immediate
+source-order predecessor, with the CP369 heating-availability body entered.
+The selected typed system field solely owns the direct source operand;
+same-call recursively validated CP320 `humidification_control_type` evidence
+corroborates it and cannot replace it. Caller/model substitutes and live
+service rereads are excluded.
+
+This is named-enum control-only evidence: no discriminant/ordinal claim,
+humidity numeric, `f64`, IEEE sidecar, arithmetic, finite/range gate, clamp,
+assignment, diagnostic, psychrometric, coupling, prediction, or result-state
+payload is admitted.
+
+Coupled order remains CP369-to-CP370-to-unchanged-numerical under
+`purchased_air_calc_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_lifecycle`.
+CP370 cannot feed or replace heat-balance coupling, prediction, numerical DTO,
+or result state. CP345 remains the numerical result-store owner. Non-direct
+paths expose `None` and reject evidence.
+
+Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
+`source_mapped`, and 170 required. Scripts become 308 total, 240 public, 68
+internal, and zero unused. Parent/Calc status plus all support, readiness,
+capability, numerical, output, conformance, and Roadmap claims remain
+unchanged.

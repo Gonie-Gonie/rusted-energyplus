@@ -1,0 +1,45 @@
+//! JSON serialization for CP370 lifecycle evidence.
+
+use ep_runtime::PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationControlHumidistatGuardLifecycleSummary;
+use serde_json::{Value, json};
+
+mod snapshot;
+
+use snapshot::snapshot_json;
+
+pub(in crate::pipeline) fn lifecycle_json(
+    lifecycle: &PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationControlHumidistatGuardLifecycleSummary,
+) -> Value {
+    let state = &lifecycle.state;
+    json!({
+        "source": lifecycle.source,
+        "first_excluded_source": lifecycle.first_excluded_source,
+        "system": state.system.0,
+        "transition_count": state.transition_count,
+        "unit_off_skip_count": state.unit_off_skip_count,
+        "non_cooling_skip_count": state.non_cooling_skip_count,
+        "positive_guard_false_fallthrough_skip_count":
+            state.positive_guard_false_fallthrough_skip_count,
+        "dehumidification_control_none_case_completed_skip_count":
+            state.dehumidification_control_none_case_completed_skip_count,
+        "dehumidification_control_constant_sensible_heat_ratio_case_completed_skip_count":
+            state.dehumidification_control_constant_sensible_heat_ratio_case_completed_skip_count,
+        "dehumidification_control_humidistat_case_completed_skip_count":
+            state.dehumidification_control_humidistat_case_completed_skip_count,
+        "dehumidification_control_constant_supply_humidity_ratio_case_completed_skip_count":
+            state.dehumidification_control_constant_supply_humidity_ratio_case_completed_skip_count,
+        "heating_on_read_count": state.heating_on_read_count,
+        "heating_on_body_entry_count": state.heating_on_body_entry_count,
+        "heating_on_guard_false_fallthrough_count":
+            state.heating_on_guard_false_fallthrough_count,
+        "humidification_control_type_read_count": state.humidification_control_type_read_count,
+        "humidification_control_type_humidistat_comparison_count":
+            state.humidification_control_type_humidistat_comparison_count,
+        "humidification_control_body_entry_count":
+            state.humidification_control_body_entry_count,
+        "humidification_control_guard_false_fallthrough_count":
+            state.humidification_control_guard_false_fallthrough_count,
+        "source_site_execution_count": state.source_site_execution_count,
+        "latest": state.latest.map(snapshot_json),
+    })
+}

@@ -48,6 +48,7 @@ use super::super::{
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitSnapshot,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitSnapshot,
     PurchasedAirCalcCoolingSensibleFlowSnapshot,
+    PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationControlHumidistatGuardSnapshot,
     PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationHeatingAvailabilityGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowEmsOverrideGuardSnapshot,
@@ -238,6 +239,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered Cooling humidification heating-availability guard snapshot.
     pub calculation_cooling_supply_humidity_ratio_humidification_heating_availability_guard:
         PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationHeatingAvailabilityGuardSnapshot,
+    /// Source-ordered Cooling humidification-control Humidistat guard snapshot.
+    pub calculation_cooling_supply_humidity_ratio_humidification_control_humidistat_guard:
+        PurchasedAirCalcCoolingSupplyHumidityRatioHumidificationControlHumidistatGuardSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }
