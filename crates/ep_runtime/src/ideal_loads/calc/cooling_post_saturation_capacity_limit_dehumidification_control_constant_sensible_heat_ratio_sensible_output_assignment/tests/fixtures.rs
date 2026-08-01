@@ -37,13 +37,13 @@ use crate::ideal_loads::{
 };
 
 #[derive(Clone, Copy)]
-pub(super) struct Chain {
+pub(in crate::ideal_loads::calc) struct Chain {
     pub cp384: Cp384,
     pub cp385: Cp385,
     pub cp387: Cp387,
 }
 
-pub(super) fn chain(
+pub(in crate::ideal_loads::calc) fn chain(
     inherited: usize,
     outcome: usize,
     assignment: bool,
@@ -55,9 +55,8 @@ pub(super) fn chain(
 ) -> Chain {
     let cp382 = cp382_predecessor(inherited, outcome, ordinal);
     let mut cp383_state = Cp383State::new(cp382.system);
-    let cp383_input = (outcome == 1).then(|| {
-        cp383_active_input(cp382, maximum).expect("active CP383 input")
-    });
+    let cp383_input =
+        (outcome == 1).then(|| cp383_active_input(cp382, maximum).expect("active CP383 input"));
     let cp383 = advance_cp383(&mut cp383_state, cp382, cp383_input).expect("CP383");
     let mut cp384_state = Cp384State::new(cp383.system);
     let cp384 = advance_cp384(&mut cp384_state, cp383).expect("CP384");
@@ -87,10 +86,14 @@ pub(super) fn chain(
         mixed_air_humidity_ratio: humidity,
     });
     let cp387 = advance_cp387(&mut cp387_state, cp386, cp387_input).expect("CP387");
-    Chain { cp384, cp385, cp387 }
+    Chain {
+        cp384,
+        cp385,
+        cp387,
+    }
 }
 
-pub(super) const fn input(
+pub(in crate::ideal_loads::calc) const fn input(
     chain: Chain,
     ratio: f64,
 ) -> PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentActiveInput

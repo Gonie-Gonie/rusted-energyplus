@@ -39,7 +39,8 @@ pub(super) fn increment_counts(state: &mut State, route: RetainedRoute) {
         state.inactive_transition_count += 1;
         return;
     }
-    state.dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_count += 1;
+    state.dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_count +=
+        1;
     state.source_site_execution_count +=
         PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_CONTROL_CONSTANT_SENSIBLE_HEAT_RATIO_SENSIBLE_OUTPUT_ASSIGNMENT_SOURCE_ORDER.len();
     state.cooling_total_output_owned_read_count += 1;

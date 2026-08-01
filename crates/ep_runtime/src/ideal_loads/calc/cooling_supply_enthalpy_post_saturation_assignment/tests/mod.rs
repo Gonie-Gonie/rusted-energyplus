@@ -69,12 +69,7 @@ pub(super) struct PurePrefix {
 }
 
 pub(super) fn prefix_for_route(route: usize, humidity_ratio: f64) -> PurePrefix {
-    prefix_for_route_with_psychrometrics(
-        route,
-        humidity_ratio,
-        12.0 + route as f64,
-        101_325.0,
-    )
+    prefix_for_route_with_psychrometrics(route, humidity_ratio, 12.0 + route as f64, 101_325.0)
 }
 
 pub(super) fn prefix_for_route_with_psychrometrics(
@@ -177,11 +172,8 @@ fn original_snapshot_for_route(route: usize, value: f64) -> OriginalSnapshot {
     predecessor
 }
 
-pub(super) fn completed_cp378_case() -> (
-    PurchasedAirRuntimeState,
-    IdealLoadsAirSystem,
-    Cp378Snapshot,
-) {
+pub(super) fn completed_cp378_case()
+-> (PurchasedAirRuntimeState, IdealLoadsAirSystem, Cp378Snapshot) {
     let (mut runtime, system, cp370) =
         completed_cp370_case_for_cp372_test().expect("CP370 fixture");
     let cp371 = advance_direct_no_oa_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard(

@@ -5,7 +5,7 @@ use ep_model::DehumidificationControlType as D;
 use super::*;
 
 mod corruption;
-mod fixtures;
+pub(in crate::ideal_loads::calc) mod fixtures;
 mod ieee;
 mod routes;
 

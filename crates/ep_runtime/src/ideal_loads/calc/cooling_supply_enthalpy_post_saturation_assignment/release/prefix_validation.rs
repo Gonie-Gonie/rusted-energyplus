@@ -43,8 +43,8 @@ pub(super) fn direct_predecessor_is_retained_and_complete(
     else {
         return false;
     };
-    let Some(witness) = runtime
-        .cooling_supply_humidity_ratio_saturation_limit_assignment_latest_witness(system.id)
+    let Some(witness) =
+        runtime.cooling_supply_humidity_ratio_saturation_limit_assignment_latest_witness(system.id)
     else {
         return false;
     };
@@ -72,8 +72,8 @@ pub(super) fn direct_temperature_prefix_and_input(
     let retained = unit
         .calc_cooling_supply_humidity_ratio_saturation_assignment
         .latest?;
-    let witness = runtime
-        .cooling_supply_humidity_ratio_saturation_assignment_latest_witness(system.id)?;
+    let witness =
+        runtime.cooling_supply_humidity_ratio_saturation_assignment_latest_witness(system.id)?;
     if !same_call(
         retained.system,
         retained.parent_call_ordinal,
@@ -93,8 +93,8 @@ pub(super) fn direct_temperature_prefix_and_input(
     {
         return None;
     }
-    let active = predecessor
-        .purchased_air_supply_humidity_ratio_saturation_limit_assignment_performed;
+    let active =
+        predecessor.purchased_air_supply_humidity_ratio_saturation_limit_assignment_performed;
     if !active {
         return (!retained.purchased_air_supply_temperature_for_saturation_humidity_ratio_read
             && retained
@@ -109,8 +109,7 @@ pub(super) fn direct_temperature_prefix_and_input(
     Some((
         retained,
         Some(ActiveInput {
-            supply_temperature_c: retained
-                .supply_temperature_for_saturation_humidity_ratio_c?,
+            supply_temperature_c: retained.supply_temperature_for_saturation_humidity_ratio_c?,
             temperature_owner: temperature_owner(retained)?,
         }),
     ))

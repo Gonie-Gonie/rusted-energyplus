@@ -60,9 +60,7 @@ pub enum PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentError {
     },
 }
 
-impl std::fmt::Display
-    for PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentError
-{
+impl std::fmt::Display for PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             formatter,
@@ -71,10 +69,7 @@ impl std::fmt::Display
     }
 }
 
-impl std::error::Error
-    for PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentError
-{
-}
+impl std::error::Error for PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentError {}
 
 pub(super) fn predecessor_mismatch(
     system: IdealLoadsAirSystemId,

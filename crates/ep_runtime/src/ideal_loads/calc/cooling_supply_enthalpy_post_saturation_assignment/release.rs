@@ -27,11 +27,13 @@ pub(in crate::ideal_loads) use private_characterization::private_cooling_supply_
 pub(in crate::ideal_loads) use runtime_validation::cooling_supply_enthalpy_post_saturation_assignment_latest_metadata_is_consistent;
 use runtime_validation::{
     calc_state_identities_match, call_order_is_pending, completed_state_is_consistent,
-    pending_state_is_consistent, prepare_next_transition,
-    prepared_completed_state_is_consistent,
+    pending_state_is_consistent, prepare_next_transition, prepared_completed_state_is_consistent,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_supply_enthalpy_post_saturation_assignment_snapshot_is_exact_direct_release;
-pub(in crate::ideal_loads::calc) use snapshot_validation::snapshots_match_bit_exact as cooling_supply_enthalpy_post_saturation_assignment_snapshots_match_bit_exact;
+pub(in crate::ideal_loads::calc) use snapshot_validation::{
+    snapshot_is_exact as cooling_supply_enthalpy_post_saturation_assignment_snapshot_is_exact,
+    snapshots_match_bit_exact as cooling_supply_enthalpy_post_saturation_assignment_snapshots_match_bit_exact,
+};
 
 #[allow(dead_code)]
 pub(in crate::ideal_loads::calc) fn completed_direct_cooling_supply_enthalpy_post_saturation_assignment_is_consistent(
@@ -47,8 +49,8 @@ pub(in crate::ideal_loads::calc) fn completed_direct_cooling_supply_enthalpy_pos
     else {
         return false;
     };
-    let Some(predecessor_witness) = runtime
-        .cooling_supply_humidity_ratio_saturation_limit_assignment_latest_witness(system.id)
+    let Some(predecessor_witness) =
+        runtime.cooling_supply_humidity_ratio_saturation_limit_assignment_latest_witness(system.id)
     else {
         return false;
     };
@@ -91,8 +93,8 @@ pub fn advance_direct_no_oa_calc_cooling_supply_enthalpy_post_saturation_assignm
     let retained_predecessor = unit
         .calc_cooling_supply_humidity_ratio_saturation_limit_assignment
         .latest;
-    let predecessor_witness = runtime
-        .cooling_supply_humidity_ratio_saturation_limit_assignment_latest_witness(selected);
+    let predecessor_witness =
+        runtime.cooling_supply_humidity_ratio_saturation_limit_assignment_latest_witness(selected);
     let assignment_witness =
         runtime.cooling_supply_enthalpy_post_saturation_assignment_latest_witness(selected);
 
@@ -158,12 +160,7 @@ pub fn advance_direct_no_oa_calc_cooling_supply_enthalpy_post_saturation_assignm
             },
         );
     }
-    if !direct_predecessor_is_retained_and_complete(
-        runtime,
-        unit,
-        system,
-        retained_predecessor,
-    ) {
+    if !direct_predecessor_is_retained_and_complete(runtime, unit, system, retained_predecessor) {
         return Err(
             PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentError::RuntimeStateInvariantViolation {
                 system: selected,
@@ -248,9 +245,8 @@ pub fn advance_direct_no_oa_calc_cooling_supply_enthalpy_post_saturation_assignm
         );
     };
     unit.calc_cooling_supply_enthalpy_post_saturation_assignment = next_state;
-    runtime.set_cooling_supply_enthalpy_post_saturation_assignment_latest_witness(
-        selected, snapshot,
-    );
+    runtime
+        .set_cooling_supply_enthalpy_post_saturation_assignment_latest_witness(selected, snapshot);
     debug_assert!(runtime.units.get(&selected).is_some_and(|unit| {
         completed_direct_cooling_supply_enthalpy_post_saturation_assignment_is_consistent(
             runtime,

@@ -44,6 +44,12 @@ pub(in crate::ideal_loads) fn cooling_supply_enthalpy_post_saturation_assignment
             .is_some_and(f64::is_finite)
 }
 
+/// Accepts every exact CP379 route, including private active lineages.
+#[allow(dead_code)]
+pub(in crate::ideal_loads::calc) fn snapshot_is_exact(snapshot: Snapshot) -> bool {
+    snapshot_route(snapshot).is_some()
+}
+
 pub(super) fn snapshot_links_to_prefix(
     snapshot: Snapshot,
     predecessor: Predecessor,
@@ -55,8 +61,7 @@ pub(super) fn snapshot_links_to_prefix(
         || snapshot.predecessor_dehumidification_control_type
             != predecessor.predecessor_dehumidification_control_type
         || snapshot.predecessor_supply_humidity_ratio_saturation_limit_assignment_performed
-            != predecessor
-                .purchased_air_supply_humidity_ratio_saturation_limit_assignment_performed
+            != predecessor.purchased_air_supply_humidity_ratio_saturation_limit_assignment_performed
         || !option_bits_match(
             snapshot.predecessor_resulting_supply_humidity_ratio,
             predecessor.resulting_supply_humidity_ratio,
@@ -67,14 +72,14 @@ pub(super) fn snapshot_links_to_prefix(
     {
         return false;
     }
-    let active = predecessor
-        .purchased_air_supply_humidity_ratio_saturation_limit_assignment_performed;
+    let active =
+        predecessor.purchased_air_supply_humidity_ratio_saturation_limit_assignment_performed;
     let input = if active {
         let Some(owner) = temperature_owner(temperature_prefix) else {
             return false;
         };
-        let Some(supply_temperature_c) = temperature_prefix
-            .supply_temperature_for_saturation_humidity_ratio_c
+        let Some(supply_temperature_c) =
+            temperature_prefix.supply_temperature_for_saturation_humidity_ratio_c
         else {
             return false;
         };
@@ -86,12 +91,8 @@ pub(super) fn snapshot_links_to_prefix(
         None
     };
     let mut state = State::new(predecessor.system);
-    advance_cooling_supply_enthalpy_post_saturation_assignment_state(
-        &mut state,
-        predecessor,
-        input,
-    )
-    .is_some_and(|expected| snapshots_match_bit_exact(expected, snapshot))
+    advance_cooling_supply_enthalpy_post_saturation_assignment_state(&mut state, predecessor, input)
+        .is_some_and(|expected| snapshots_match_bit_exact(expected, snapshot))
 }
 
 pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
@@ -158,11 +159,11 @@ fn snapshot_shape_matches_route(snapshot: Snapshot, route: Route) -> bool {
         snapshot.assigned_supply_enthalpy_j_per_kg,
         snapshot.resulting_supply_enthalpy_j_per_kg,
     ];
-    let temperature_owner_count = usize::from(
-        snapshot.cp334_supply_temperature_mixed_air_limit_owned_read,
-    ) + usize::from(
-        snapshot.cp344_capacity_limit_supply_temperature_mixed_air_limit_owned_read,
-    );
+    let temperature_owner_count =
+        usize::from(snapshot.cp334_supply_temperature_mixed_air_limit_owned_read)
+            + usize::from(
+                snapshot.cp344_capacity_limit_supply_temperature_mixed_air_limit_owned_read,
+            );
     if !active {
         return snapshot.predecessor_dehumidification_control_type.is_none()
             && !snapshot.predecessor_supply_humidity_ratio_saturation_limit_assignment_performed

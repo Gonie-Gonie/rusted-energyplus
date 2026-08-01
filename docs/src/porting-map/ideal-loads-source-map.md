@@ -22379,3 +22379,63 @@ work, routine, psychrometrics row, support, numerical, or Roadmap promotion
 occurs. Counts stay 32 algorithms, 293 routines, 58 `state_mapped`, 235
 `source_mapped`, and 170 required. Scripts become 326 total, 240 public, 86
 internal, zero unused/unreachable, with 238 development commands.
+
+## CP389 Post-Saturation Constant-SHR Supply-Temperature Assignment
+
+CP389 maps pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+and `PurchasedAirManager.cc` physical executable line 2279:
+
+```cpp
+PurchAir.SupplyTemp = PurchAir.MixedAirTemp - CoolSensOutput / (CpAir * SupplyMassFlowRate);
+```
+
+The eight exact dependency-ordered sites are
+`read-purchased-air-mixed-air-temperature-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-supply-temperature-difference-minuend`,
+`read-local-cooling-sensible-output-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-supply-temperature-quotient-numerator`,
+`read-local-cp-air-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-supply-temperature-denominator-first-factor`,
+`read-retained-supply-mass-flow-rate-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-supply-temperature-denominator-second-factor`,
+`calculate-cp-air-times-supply-mass-flow-rate-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-supply-temperature-denominator`,
+`calculate-cooling-sensible-output-divided-by-air-capacity-rate-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-supply-temperature-drop`,
+`calculate-mixed-air-temperature-minus-sensible-temperature-drop-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-supply-temperature`,
+and
+`assign-purchased-air-supply-temperature-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-case`.
+Physical line 2280 is comment-only; executable line 2281's `min` assignment is
+first excluded for CP390, including all of its reads and assignment.
+
+All thirty CP388 routes remain distinct. Three private constant-SHR routes
+18, 22, and 28 execute eight sites and twenty-seven skip them, so `T389=T388`,
+CP389 assignment count `A389` equals CP388's sensible-output assignment count,
+`inactive_transition_count=T389-A389`, every site counter equals `A389`, and
+`source_site_execution_count=8*A389`, with exact route parity and a
+characterization total of 24. All eleven public exact-direct routes have null
+CP389 source-local operands/intermediates, not necessarily null retained or
+resulting temperature; nineteen routes remain private.
+
+Same-call recursively complete bit-exact CP388 is the sole predecessor.
+CP329 mixed-air temperature, CP388 sensible output, CP387 CpAir bridged through
+CP388, and CP330 positive retained supply mass flow solely own the four
+operands. CP379 is the latest exact carrier of the transitive CP334-or-CP344
+owned preexisting `SupplyTemp` flag/value: active routes overwrite it,
+later-prefix inactive routes preserve its bits, and early UnitOff, NonCooling,
+or nonpositive-flow routes retain `None`. CP334 and CP344 are not direct CP389
+inputs or operands. CP385 enthalpy remains bit-exact retained non-operand
+evidence. CP384 total output, system SHR, and caller/model/service/DTO values cannot serve as
+direct operands. Skips do not validate absent source-local owners.
+
+The transition computes native binary64
+`mixed - (sensible / (cp_air * flow))` exactly once in product/division/
+subtraction order. There is no reciprocal, reassociation, FMA/`mul_add`,
+clamp, finite gate, normalization, or tolerance. Deterministic Rust ordering
+makes no wider C++ built-in evaluation-order claim. Signed-zero, overflow,
+infinity, NaN-payload, and nonfinite-result bits remain authoritative in IEEE
+sidecars.
+
+Lifecycle placement is CP388, then CP389, then unchanged numerical coupling.
+CP389 never enters or feeds `DirectZonePurchasedAirCouplingInput`, numerical
+results, nodes, loads, or reports; non-direct paths reject it. No routine,
+psychrometrics row, support, numerical, or Roadmap promotion occurs. Counts
+stay 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and
+170 required. Scripts become 327 total, 240 public, 87 internal, zero
+unused/unreachable, with 238 development commands.

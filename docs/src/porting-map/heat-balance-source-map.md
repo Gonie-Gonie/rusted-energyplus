@@ -37994,3 +37994,51 @@ row, or promotion. Counts stay 32 algorithms, 293 routines split 58 plus 235
 with 170 required; scripts are 326 total, 240 public, 86 internal, zero
 unused/unreachable, with 238 commands. Support, readiness, capability,
 numerical, output, status, conformance, and Roadmap claims remain unchanged.
+
+## CP389 Post-Saturation Constant-SHR Supply Temperature in the Heat-Balance Loop
+
+CP389 advances the direct purchased-air heat-balance witness through pinned
+`PurchasedAirManager.cc` physical executable line 2279 at commit
+`6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It reads CP329-owned `MixedAirTemp`, CP388-owned `CoolSensOutput`, CP387-owned
+local `CpAir`, and CP330-owned positive retained `SupplyMassFlowRate`; then it
+evaluates native binary64 product, division, subtraction, and assigns
+`SupplyTemp` through the eight exact ordered sites documented in the
+IdealLoads source map. Physical line 2280 is comment-only. Physical executable
+line 2281's minimum-temperature assignment is first excluded for CP390.
+
+The thirty CP388 histories remain distinct: private routes 18, 22, and 28
+execute all eight sites and twenty-seven skip them. Exact accounting is
+`T389=T388`, CP389 assignment count `A389` equals CP388's sensible-output
+assignment count, `inactive_transition_count=T389-A389`, each site counter is
+`A389`, and `source_site_execution_count=8*A389`, with exact thirty-route parity and 24
+characterization site executions. Eleven public exact-direct routes carry
+null CP389 source-local operands/intermediates and nineteen routes remain
+private; the null statement does not cover retained/resulting temperature.
+
+Same-call recursively complete bit-exact CP388 is the sole predecessor. CP329,
+CP388, CP387 through CP388, and CP330 solely own the four operands. CP379 is
+the latest exact carrier of the transitive CP334-or-CP344-owned preexisting
+supply-temperature flag/value: the active three overwrite it, later-prefix
+inactive routes preserve its exact resulting bits, and early UnitOff,
+NonCooling, or nonpositive-flow routes retain `None`. CP334 and CP344 are not
+direct CP389 inputs or operands. CP385 enthalpy is retained bit-exact but is
+not an operand. CP384 total
+output, system SHR, caller/model/service values, and numerical DTO values are
+forbidden substitutes.
+
+The exact expression is
+`mixed - (sensible / (cp_air * flow))`, evaluated once as product, division,
+then subtraction without reciprocal, reassociation, FMA/`mul_add`, clamp,
+finite gate, normalization, or tolerance. Rust source/dependency order makes
+no broader C++ built-in operand-order claim. IEEE sidecars preserve signed
+zero, overflow, infinity, NaN payloads, and nonfinite results.
+
+Placement is CP388-to-CP389-to-unchanged numerical coupling. CP389 does not
+feed or mutate numerical, node, load, or report state, and non-direct paths
+reject it. No routine, psychrometrics row, or promotion is added. Counts stay
+32 algorithms, 293 routines split 58 plus 235 with 170 required; scripts are
+327 total, 240 public, 87 internal, zero unused/unreachable, with 238 commands.
+Support, readiness, capability, numerical, output, status, conformance, and
+Roadmap claims remain unchanged.

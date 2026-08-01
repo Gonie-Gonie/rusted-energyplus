@@ -133,15 +133,39 @@ pub(in crate::ideal_loads::calc) fn snapshots_match_bit_exact(
     mut right: Snapshot,
 ) -> bool {
     let values_match = [
-        (left.predecessor_resulting_supply_enthalpy_j_per_kg, right.predecessor_resulting_supply_enthalpy_j_per_kg),
-        (left.predecessor_mixed_air_humidity_ratio, right.predecessor_mixed_air_humidity_ratio),
-        (left.predecessor_psychrometric_cp_air_result_j_per_kg_k, right.predecessor_psychrometric_cp_air_result_j_per_kg_k),
-        (left.predecessor_cp_air_j_per_kg_k, right.predecessor_cp_air_j_per_kg_k),
+        (
+            left.predecessor_resulting_supply_enthalpy_j_per_kg,
+            right.predecessor_resulting_supply_enthalpy_j_per_kg,
+        ),
+        (
+            left.predecessor_mixed_air_humidity_ratio,
+            right.predecessor_mixed_air_humidity_ratio,
+        ),
+        (
+            left.predecessor_psychrometric_cp_air_result_j_per_kg_k,
+            right.predecessor_psychrometric_cp_air_result_j_per_kg_k,
+        ),
+        (
+            left.predecessor_cp_air_j_per_kg_k,
+            right.predecessor_cp_air_j_per_kg_k,
+        ),
         (left.cooling_total_output_w, right.cooling_total_output_w),
-        (left.cooling_sensible_heat_ratio, right.cooling_sensible_heat_ratio),
-        (left.calculated_cooling_sensible_output_w, right.calculated_cooling_sensible_output_w),
-        (left.cooling_sensible_output_w, right.cooling_sensible_output_w),
-        (left.resulting_supply_enthalpy_j_per_kg, right.resulting_supply_enthalpy_j_per_kg),
+        (
+            left.cooling_sensible_heat_ratio,
+            right.cooling_sensible_heat_ratio,
+        ),
+        (
+            left.calculated_cooling_sensible_output_w,
+            right.calculated_cooling_sensible_output_w,
+        ),
+        (
+            left.cooling_sensible_output_w,
+            right.cooling_sensible_output_w,
+        ),
+        (
+            left.resulting_supply_enthalpy_j_per_kg,
+            right.resulting_supply_enthalpy_j_per_kg,
+        ),
     ]
     .into_iter()
     .all(|(left, right)| option_bits_match(left, right));

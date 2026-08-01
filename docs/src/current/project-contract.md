@@ -20929,3 +20929,80 @@ routines remain `source_mapped`. Counts remain 32 algorithms, 293 routines,
 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script inventory is
 326 total, 240 public, 86 internal, zero unused, zero unreachable, with 238
 development commands.
+
+## CP389 Source-Ordered Post-Saturation Constant-SHR Supply-Temperature Assignment
+
+CP389 supersedes only CP388's physical-line-2279 exclusion by mapping
+EnergyPlus 26.1 `PurchasedAirManager.cc` physical executable line 2279 at
+commit `6f2e40d10250a105b49966baa24d843711e61048`, locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`:
+
+```cpp
+PurchAir.SupplyTemp = PurchAir.MixedAirTemp - CoolSensOutput / (CpAir * SupplyMassFlowRate);
+```
+
+The exact dependency order is the CP329-owned mixed-air-temperature read,
+CP388-owned sensible-output read, CP387-owned local-CpAir read, CP330-owned
+retained positive supply-mass-flow read, native binary64 denominator product,
+division, subtraction, and `SupplyTemp` assignment. The corresponding exact
+sites are
+`read-purchased-air-mixed-air-temperature-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-supply-temperature-difference-minuend`,
+`read-local-cooling-sensible-output-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-supply-temperature-quotient-numerator`,
+`read-local-cp-air-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-supply-temperature-denominator-first-factor`,
+`read-retained-supply-mass-flow-rate-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-supply-temperature-denominator-second-factor`,
+`calculate-cp-air-times-supply-mass-flow-rate-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-supply-temperature-denominator`,
+`calculate-cooling-sensible-output-divided-by-air-capacity-rate-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-supply-temperature-drop`,
+`calculate-mixed-air-temperature-minus-sensible-temperature-drop-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-supply-temperature`,
+and
+`assign-purchased-air-supply-temperature-for-post-saturation-capacity-limit-constant-sensible-heat-ratio-case`.
+Physical line 2280 is comment-only. Physical executable line 2281's
+`min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp)` assignment is the first
+excluded executable and CP390 boundary; CP389 claims none of its reads,
+minimum, or assignment.
+
+CP389 preserves CP388's exact thirty-route topology. Three private active
+constant-SHR routes 18, 22, and 28 execute all eight sites and twenty-seven
+routes execute none. Checked state is `T389=T388`, CP389 assignment count
+`A389` equals CP388's sensible-output assignment count,
+`inactive_transition_count=T389-A389`, each of the eight counters equals
+`A389`, `source_site_execution_count=8*A389`, and exact route parity. The private
+characterization total is 24. All eleven public exact-direct routes have null
+CP389 source-local operands/intermediates, while nineteen routes remain
+private; this does not assert that preexisting/resulting supply temperature is
+null.
+
+Same-call recursively complete bit-exact CP388 lifecycle, snapshot, latest,
+private-witness, and completion evidence is the sole immediate predecessor.
+Same-call CP329 `mixed_air_temperature_c`, CP388
+`cooling_sensible_output_w`, CP387 `cp_air_j_per_kg_k` carried and
+corroborated through CP388, and CP330 positive
+`supply_mass_flow_rate_kg_per_s` are the sole operand owners. CP379 is the
+latest exact carrier of line 2279's transitive CP334-or-CP344-owned preexisting
+`SupplyTemp` flag/value: active routes overwrite it, later-prefix inactive
+routes preserve its resulting bits, and early UnitOff, NonCooling, or
+nonpositive-flow routes retain `None`. CP334 and CP344 are not direct CP389
+inputs or operands. CP385 supply enthalpy is retained bit-exact but is a
+non-operand. CP384 total output and the system SHR are predecessor lineage
+rather than direct operands; caller/model/service values and numerical DTO scalars cannot
+substitute. Skipped routes do not validate unavailable source-local owners.
+
+The transition evaluates source-native binary64
+`mixed - (sensible / (cp_air * flow))` exactly once, performing product,
+division, then subtraction without reciprocal, reassociation, `mul_add`, FMA,
+clamp, finite gate, normalization, or tolerance. Rust dependency/text order
+is deterministic but makes no broader C++ built-in operand-evaluation-order
+claim. Signed zero, overflow, infinities, NaN payloads, and nonfinite results
+remain authoritative in IEEE sidecars.
+
+Binding order is CP388-to-CP389-to-unchanged numerical coupling. CP389 is
+absent from `DirectZonePurchasedAirCouplingInput` and cannot consume, feed,
+reconcile with, overwrite, or replace numerical DTO/results or mutate node,
+load, or report state. Non-direct runtime evidence is rejected.
+
+No routine or psychrometrics row, support tier, readiness, feature/evidence,
+capability, numerical-conformance, output, status, conformance, or Roadmap
+promotion occurs. Both parent algorithms remain `scaffold`/`none`; both Calc
+routines remain `source_mapped`. Counts remain 32 algorithms, 293 routines,
+58 `state_mapped`, 235 `source_mapped`, and 170 required. Script inventory is
+327 total, 240 public, 87 internal, zero unused, zero unreachable, with 238
+development commands.

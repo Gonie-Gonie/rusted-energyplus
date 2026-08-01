@@ -28,13 +28,12 @@ fn cp379_public_direct_uses_only_retained_cp377_and_cp378_operands() {
         .resulting_supply_humidity_ratio
         .expect("CP378 humidity ratio");
     let expected = energyplus_psy_h_fn_tdb_w(temperature, humidity_ratio);
-    let snapshot =
-        advance_direct_no_oa_calc_cooling_supply_enthalpy_post_saturation_assignment(
-            &mut runtime,
-            &system,
-            cp378,
-        )
-        .expect("CP379 direct release");
+    let snapshot = advance_direct_no_oa_calc_cooling_supply_enthalpy_post_saturation_assignment(
+        &mut runtime,
+        &system,
+        cp378,
+    )
+    .expect("CP379 direct release");
 
     assert!(
         cooling_supply_enthalpy_post_saturation_assignment_snapshot_is_exact_direct_release(
@@ -118,13 +117,12 @@ fn cp379_rejects_cp377_temperature_and_owner_drift_transactionally() {
 #[test]
 fn cp379_replay_and_every_release_corruption_preserve_state_and_witness() {
     let (mut runtime, system, cp378) = completed_cp378_case();
-    let snapshot =
-        advance_direct_no_oa_calc_cooling_supply_enthalpy_post_saturation_assignment(
-            &mut runtime,
-            &system,
-            cp378,
-        )
-        .expect("first CP379 release");
+    let snapshot = advance_direct_no_oa_calc_cooling_supply_enthalpy_post_saturation_assignment(
+        &mut runtime,
+        &system,
+        cp378,
+    )
+    .expect("first CP379 release");
     let before = runtime.clone();
     assert!(
         advance_direct_no_oa_calc_cooling_supply_enthalpy_post_saturation_assignment(
@@ -140,9 +138,8 @@ fn cp379_replay_and_every_release_corruption_preserve_state_and_witness() {
     forged.resulting_supply_enthalpy_j_per_kg = forged
         .resulting_supply_enthalpy_j_per_kg
         .map(|value| f64::from_bits(value.to_bits() ^ 1));
-    runtime.set_cooling_supply_enthalpy_post_saturation_assignment_latest_witness(
-        system.id, forged,
-    );
+    runtime
+        .set_cooling_supply_enthalpy_post_saturation_assignment_latest_witness(system.id, forged);
     let before = runtime.clone();
     assert!(matches!(
         advance_direct_no_oa_calc_cooling_supply_enthalpy_post_saturation_assignment(
@@ -150,8 +147,7 @@ fn cp379_replay_and_every_release_corruption_preserve_state_and_witness() {
             &system,
             cp378,
         ),
-        Err(Error::RuntimeStateInvariantViolation { .. })
-            | Err(Error::PredecessorCallOrder { .. })
+        Err(Error::RuntimeStateInvariantViolation { .. }) | Err(Error::PredecessorCallOrder { .. })
     ));
     assert_eq!(runtime, before);
 }

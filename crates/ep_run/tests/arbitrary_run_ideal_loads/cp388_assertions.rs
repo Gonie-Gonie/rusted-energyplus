@@ -2,6 +2,9 @@
 
 use serde_json::{Map, Value, json};
 
+#[path = "cp389_assertions.rs"]
+mod cp389_assertions;
+
 const CP387_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_lifecycle";
 const CP388_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_lifecycle";
 const ORDER: [&str; 4] = [
@@ -184,6 +187,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         !results.to_string().contains(CP388_KEY),
         "CP388 lifecycle must remain outside numerical result state"
     );
+    cp389_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -192,6 +196,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP388_KEY].is_null(),
         "non-direct runtime must not publish CP388 evidence"
     );
+    cp389_assertions::assert_non_direct(runtime);
 }
 
 fn inherited_flag_fields() -> [&'static str; 20] {

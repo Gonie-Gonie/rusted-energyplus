@@ -60,7 +60,11 @@ fn cp379_uses_the_canonical_humidity_floor_and_operation_order() {
 fn cp379_pure_transition_preserves_raw_ieee_and_public_gate_rejects_it() {
     let nan_temperature = f64::from_bits(0x7ff8_0000_0000_0379);
     let mut prefix = prefix_for_route(4, 0.008);
-    prefix.input.as_mut().expect("active input").supply_temperature_c = nan_temperature;
+    prefix
+        .input
+        .as_mut()
+        .expect("active input")
+        .supply_temperature_c = nan_temperature;
     let mut state = State::new(prefix.cp378.system);
     let snapshot = advance(&mut state, prefix.cp378, prefix.input).expect("raw NaN temperature");
     assert_eq!(
@@ -89,7 +93,11 @@ fn cp379_pure_transition_preserves_raw_ieee_and_public_gate_rejects_it() {
     );
 
     let mut prefix = prefix_for_route(4, 0.008);
-    prefix.input.as_mut().expect("active input").supply_temperature_c = f64::MAX;
+    prefix
+        .input
+        .as_mut()
+        .expect("active input")
+        .supply_temperature_c = f64::MAX;
     let mut state = State::new(prefix.cp378.system);
     let snapshot = advance(&mut state, prefix.cp378, prefix.input).expect("raw overflow");
     assert!(
@@ -107,8 +115,11 @@ fn cp379_pure_transition_preserves_raw_ieee_and_public_gate_rejects_it() {
 #[test]
 fn cp379_bit_matcher_rejects_nan_payload_and_one_bit_result_drift() {
     let mut prefix = prefix_for_route(4, 0.008);
-    prefix.input.as_mut().expect("active input").supply_temperature_c =
-        f64::from_bits(0x7ff8_0000_0000_0379);
+    prefix
+        .input
+        .as_mut()
+        .expect("active input")
+        .supply_temperature_c = f64::from_bits(0x7ff8_0000_0000_0379);
     let mut state = State::new(prefix.cp378.system);
     let exact = advance(&mut state, prefix.cp378, prefix.input).expect("raw exact snapshot");
 

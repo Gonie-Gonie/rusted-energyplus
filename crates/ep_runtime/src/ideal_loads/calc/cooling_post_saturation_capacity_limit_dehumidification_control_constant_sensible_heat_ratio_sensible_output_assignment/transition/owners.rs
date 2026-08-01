@@ -50,11 +50,7 @@ fn same_identity(predecessor: Predecessor, owner: Owner, corroborator: Corrobora
         && predecessor.controlled_zone == corroborator.controlled_zone
 }
 
-fn same_control_shape(
-    predecessor: Predecessor,
-    owner: Owner,
-    corroborator: Corroborator,
-) -> bool {
+fn same_control_shape(predecessor: Predecessor, owner: Owner, corroborator: Corroborator) -> bool {
     let predecessor_flags = [
         predecessor.unit_off_skipped,
         predecessor.non_cooling_skipped,

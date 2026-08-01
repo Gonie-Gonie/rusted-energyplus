@@ -287,8 +287,7 @@ fn pending_owner_counts_match(
 ) -> bool {
     let active = route_is_active(route);
     let cp334_pending = active
-        && input.map(|input| input.temperature_owner)
-            == Some(TemperatureOwner::Cp334MixedAirLimit);
+        && input.map(|input| input.temperature_owner) == Some(TemperatureOwner::Cp334MixedAirLimit);
     let cp344_pending = active
         && input.map(|input| input.temperature_owner)
             == Some(TemperatureOwner::Cp344CapacityMixedAirLimit);
@@ -299,9 +298,7 @@ fn pending_owner_counts_match(
         && state
             .cp344_capacity_limit_supply_temperature_mixed_air_limit_owner_count
             .checked_add(usize::from(cp344_pending))
-            == Some(
-                temperature.cp344_capacity_limit_supply_temperature_mixed_air_limit_owner_count,
-            )
+            == Some(temperature.cp344_capacity_limit_supply_temperature_mixed_air_limit_owner_count)
         && state
             .cp378_supply_humidity_ratio_saturation_limit_owner_count
             .checked_add(usize::from(active))

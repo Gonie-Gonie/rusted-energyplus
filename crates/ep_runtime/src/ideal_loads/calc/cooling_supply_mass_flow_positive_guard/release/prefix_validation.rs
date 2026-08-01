@@ -5,7 +5,7 @@ use crate::ideal_loads::{
     PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardSnapshot,
 };
 
-pub(super) fn positive_guard_links_to_mixed_air_call(
+pub(in crate::ideal_loads::calc) fn positive_guard_links_to_mixed_air_call(
     guard: PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardSnapshot,
     predecessor: PurchasedAirCalcCoolingMixedAirCallSnapshot,
 ) -> bool {

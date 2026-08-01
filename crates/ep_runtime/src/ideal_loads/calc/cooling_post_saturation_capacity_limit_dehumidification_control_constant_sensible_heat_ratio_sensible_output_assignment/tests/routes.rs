@@ -17,7 +17,9 @@ fn cp388_has_twenty_seven_inactive_and_three_constant_shr_assignment_routes() {
     for inherited in 3..8 {
         for (outcome, assignment) in [(0, false), (2, false), (1, false)] {
             let maximum = if assignment { 99.0 } else { 100.0 };
-            let chain = fixtures::chain(inherited, outcome, assignment, None, ordinal, maximum, 50_000.0, 0.008);
+            let chain = fixtures::chain(
+                inherited, outcome, assignment, None, ordinal, maximum, 50_000.0, 0.008,
+            );
             snapshots.push(advance(&mut state, chain, None));
             ordinal += 1;
         }
@@ -30,9 +32,18 @@ fn cp388_has_twenty_seven_inactive_and_three_constant_shr_assignment_routes() {
     ];
     for inherited in [3, 4] {
         for selector in selectors {
-            let chain = fixtures::chain(inherited, 1, true, Some(selector), ordinal, 99.0, 50_000.0, 0.008);
-            let input = (selector == D::ConstantSensibleHeatRatio)
-                .then(|| fixtures::input(chain, 0.7));
+            let chain = fixtures::chain(
+                inherited,
+                1,
+                true,
+                Some(selector),
+                ordinal,
+                99.0,
+                50_000.0,
+                0.008,
+            );
+            let input =
+                (selector == D::ConstantSensibleHeatRatio).then(|| fixtures::input(chain, 0.7));
             snapshots.push(advance(&mut state, chain, input));
             ordinal += 1;
         }
@@ -40,12 +51,24 @@ fn cp388_has_twenty_seven_inactive_and_three_constant_shr_assignment_routes() {
     for (inherited, selectors) in [
         (5, &[D::Humidistat][..]),
         (6, &[D::None][..]),
-        (7, &[D::ConstantSensibleHeatRatio, D::ConstantSupplyHumidityRatio][..]),
+        (
+            7,
+            &[D::ConstantSensibleHeatRatio, D::ConstantSupplyHumidityRatio][..],
+        ),
     ] {
         for selector in selectors {
-            let chain = fixtures::chain(inherited, 1, true, Some(*selector), ordinal, 99.0, 50_000.0, 0.012);
-            let input = (*selector == D::ConstantSensibleHeatRatio)
-                .then(|| fixtures::input(chain, 0.65));
+            let chain = fixtures::chain(
+                inherited,
+                1,
+                true,
+                Some(*selector),
+                ordinal,
+                99.0,
+                50_000.0,
+                0.012,
+            );
+            let input =
+                (*selector == D::ConstantSensibleHeatRatio).then(|| fixtures::input(chain, 0.65));
             snapshots.push(advance(&mut state, chain, input));
             ordinal += 1;
         }
@@ -55,7 +78,8 @@ fn cp388_has_twenty_seven_inactive_and_three_constant_shr_assignment_routes() {
     assert_eq!(state.transition_count, 30);
     assert_eq!(state.inactive_transition_count, 27);
     assert_eq!(
-        state.dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_count,
+        state
+            .dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_count,
         3,
     );
     assert_eq!(state.predecessor_route_counts, [1; 30]);
@@ -77,8 +101,12 @@ fn cp388_has_twenty_seven_inactive_and_three_constant_shr_assignment_routes() {
     for snapshot in snapshots {
         assert!(cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_snapshot_is_exact(snapshot));
         assert_eq!(
-            snapshot.predecessor_resulting_supply_enthalpy_j_per_kg.map(f64::to_bits),
-            snapshot.resulting_supply_enthalpy_j_per_kg.map(f64::to_bits),
+            snapshot
+                .predecessor_resulting_supply_enthalpy_j_per_kg
+                .map(f64::to_bits),
+            snapshot
+                .resulting_supply_enthalpy_j_per_kg
+                .map(f64::to_bits),
         );
         if snapshot.dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_executed {
             let total = snapshot.cooling_total_output_w.expect("total");
@@ -102,7 +130,16 @@ fn cp388_has_twenty_seven_inactive_and_three_constant_shr_assignment_routes() {
 
 #[test]
 fn every_active_counter_overflow_rejects_before_mutation() {
-    let chain = fixtures::chain(3, 1, true, Some(D::ConstantSensibleHeatRatio), 1, 99.0, 50_000.0, 0.008);
+    let chain = fixtures::chain(
+        3,
+        1,
+        true,
+        Some(D::ConstantSensibleHeatRatio),
+        1,
+        99.0,
+        50_000.0,
+        0.008,
+    );
     let setters: &[fn(&mut PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentRuntimeState)] = &[
         |state| state.transition_count = usize::MAX,
         |state| state.predecessor_route_counts[18] = usize::MAX,
@@ -131,7 +168,7 @@ fn advance(
     state: &mut PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentRuntimeState,
     chain: fixtures::Chain,
     input: Option<PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentActiveInput>,
-) -> PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentSnapshot {
+) -> PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentSnapshot{
     advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_state(
         state,
         chain.cp387,

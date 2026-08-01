@@ -16,15 +16,17 @@ mod snapshot_validation;
 
 pub use error::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentError;
 use error::{call_order_error, predecessor_mismatch};
-use prefix_validation::{assignment_links_to_predecessor, direct_predecessor_is_retained_and_complete};
-pub(in crate::ideal_loads) use private_characterization::private_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_characterization;
-pub(in crate::ideal_loads) use runtime_validation::{
-    cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_latest_metadata_is_consistent,
-    cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_predecessor_counts_match_exact_direct_cp_air_assignment,
+use prefix_validation::{
+    assignment_links_to_predecessor, direct_predecessor_is_retained_and_complete,
 };
+pub(in crate::ideal_loads) use private_characterization::private_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_characterization;
 use runtime_validation::{
     calc_state_identities_match, call_order_is_pending, completed_state_is_consistent,
     pending_state_is_consistent, prepare_next_transition, prepared_completed_state_is_consistent,
+};
+pub(in crate::ideal_loads) use runtime_validation::{
+    cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_latest_metadata_is_consistent,
+    cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_predecessor_counts_match_exact_direct_cp_air_assignment,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_snapshot_is_exact_direct_release;
 pub(in crate::ideal_loads::calc) use snapshot_validation::{
@@ -67,11 +69,17 @@ pub fn advance_direct_no_oa_calc_cooling_post_saturation_capacity_limit_dehumidi
     use PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentError as Error;
 
     let selected = predecessor_cp387.system;
-    let unit = runtime.units.get(&selected).ok_or(Error::UnknownSystem { system: selected })?;
+    let unit = runtime
+        .units
+        .get(&selected)
+        .ok_or(Error::UnknownSystem { system: selected })?;
     let witness = runtime
         .cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_latest_witness(selected);
     if system.id != selected {
-        return Err(Error::SystemIdentityMismatch { expected: selected, actual: system.id });
+        return Err(Error::SystemIdentityMismatch {
+            expected: selected,
+            actual: system.id,
+        });
     }
     if !classify_no_oa_sensible_subset(system).is_supported() {
         return Err(Error::SystemOutsideDirectSubset { system: selected });

@@ -4,7 +4,16 @@ use super::*;
 
 #[test]
 fn cp384_call_zone_value_and_inherited_flag_drift_are_rejected() {
-    let chain = fixtures::chain(3, 1, true, Some(D::ConstantSensibleHeatRatio), 1, 99.0, 50_000.0, 0.008);
+    let chain = fixtures::chain(
+        3,
+        1,
+        true,
+        Some(D::ConstantSensibleHeatRatio),
+        1,
+        99.0,
+        50_000.0,
+        0.008,
+    );
     let system = fixtures::selected_system(chain, 0.7);
 
     let mut wrong_call = chain.cp384;
@@ -32,7 +41,16 @@ fn cp384_call_zone_value_and_inherited_flag_drift_are_rejected() {
 
 #[test]
 fn cp385_bridge_and_cp387_predecessor_corruption_are_rejected_atomically() {
-    let chain = fixtures::chain(7, 1, true, Some(D::ConstantSensibleHeatRatio), 1, 99.0, 50_000.0, 0.012);
+    let chain = fixtures::chain(
+        7,
+        1,
+        true,
+        Some(D::ConstantSensibleHeatRatio),
+        1,
+        99.0,
+        50_000.0,
+        0.012,
+    );
     let system = fixtures::selected_system(chain, 0.65);
 
     let mut bridge = chain.cp385;
@@ -55,7 +73,16 @@ fn cp385_bridge_and_cp387_predecessor_corruption_are_rejected_atomically() {
 
 #[test]
 fn model_identity_selector_and_owner_absence_are_rejected() {
-    let chain = fixtures::chain(3, 1, true, Some(D::ConstantSensibleHeatRatio), 1, 99.0, 50_000.0, 0.008);
+    let chain = fixtures::chain(
+        3,
+        1,
+        true,
+        Some(D::ConstantSensibleHeatRatio),
+        1,
+        99.0,
+        50_000.0,
+        0.008,
+    );
     let mut system = fixtures::selected_system(chain, 0.7);
     system.id = ep_model::IdealLoadsAirSystemId(u32::MAX - 3);
     assert!(private_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_characterization(

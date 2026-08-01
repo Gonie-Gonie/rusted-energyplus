@@ -9,10 +9,19 @@ use crate::ideal_loads::PurchasedAirUnitRuntimeState;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentError
 {
-    UnknownSystem { system: IdealLoadsAirSystemId },
-    InitializationNotReady { system: IdealLoadsAirSystemId },
-    SystemIdentityMismatch { expected: IdealLoadsAirSystemId, actual: IdealLoadsAirSystemId },
-    SystemOutsideDirectSubset { system: IdealLoadsAirSystemId },
+    UnknownSystem {
+        system: IdealLoadsAirSystemId,
+    },
+    InitializationNotReady {
+        system: IdealLoadsAirSystemId,
+    },
+    SystemIdentityMismatch {
+        expected: IdealLoadsAirSystemId,
+        actual: IdealLoadsAirSystemId,
+    },
+    SystemOutsideDirectSubset {
+        system: IdealLoadsAirSystemId,
+    },
     DehumidificationControlTypeOutsideDirectSubset {
         system: IdealLoadsAirSystemId,
         actual: DehumidificationControlType,
@@ -21,7 +30,8 @@ pub enum PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationContr
         system: IdealLoadsAirSystemId,
         actual: HumidificationControlType,
     },
-    CoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCpAirAssignmentSnapshotMismatch {
+    CoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCpAirAssignmentSnapshotMismatch
+    {
         system: IdealLoadsAirSystemId,
     },
     PredecessorCallOrder {
@@ -31,20 +41,24 @@ pub enum PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationContr
         predecessor_transition_count: usize,
         transition_count: usize,
     },
-    PredecessorOutsideDirectSubset { system: IdealLoadsAirSystemId },
-    RuntimeStateInvariantViolation { system: IdealLoadsAirSystemId },
+    PredecessorOutsideDirectSubset {
+        system: IdealLoadsAirSystemId,
+    },
+    RuntimeStateInvariantViolation {
+        system: IdealLoadsAirSystemId,
+    },
 }
 
 pub(super) fn predecessor_mismatch(
     system: IdealLoadsAirSystemId,
-) -> PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentError {
+) -> PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentError{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentError::CoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCpAirAssignmentSnapshotMismatch { system }
 }
 
 pub(super) fn call_order_error(
     unit: &PurchasedAirUnitRuntimeState,
     system: IdealLoadsAirSystemId,
-) -> PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentError {
+) -> PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentError{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentError::PredecessorCallOrder {
         system,
         init_call_count: unit.init_call_count,

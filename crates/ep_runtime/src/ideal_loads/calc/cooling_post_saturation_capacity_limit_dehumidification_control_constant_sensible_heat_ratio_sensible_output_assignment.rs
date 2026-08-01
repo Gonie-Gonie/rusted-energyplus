@@ -7,7 +7,7 @@ use crate::ideal_loads::PurchasedAirRuntimeState;
 mod release;
 mod state;
 #[cfg(test)]
-mod tests;
+pub(in crate::ideal_loads::calc) mod tests;
 mod transition;
 
 pub use release::{
@@ -15,17 +15,17 @@ pub use release::{
     advance_direct_no_oa_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment,
 };
 #[allow(unused_imports)]
+pub(in crate::ideal_loads::calc) use release::{
+    completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_is_consistent,
+    cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_snapshot_is_exact,
+    cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_snapshots_match_bit_exact,
+};
+#[allow(unused_imports)]
 pub(in crate::ideal_loads) use release::{
     cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_latest_metadata_is_consistent,
     cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_predecessor_counts_match_exact_direct_cp_air_assignment,
     cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_snapshot_is_exact_direct_release,
     private_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_characterization,
-};
-#[allow(unused_imports)]
-pub(in crate::ideal_loads::calc) use release::{
-    completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_is_consistent,
-    cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_snapshot_is_exact,
-    cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_snapshots_match_bit_exact,
 };
 pub use state::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentRuntimeState;
 pub(in crate::ideal_loads::calc) use transition::{
@@ -128,7 +128,7 @@ pub fn purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidificatio
 ) -> Result<
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentError,
-> {
+>{
     let unit = runtime.units.get(&system).ok_or(
         PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentError::UnknownSystem {
             system,

@@ -8,12 +8,12 @@ use super::{
     PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentRuntimeState as State,
     PurchasedAirCalcCoolingSupplyEnthalpyPostSaturationAssignmentSnapshot as Snapshot,
 };
+use crate::ideal_loads::PurchasedAirCalcCoolingSupplyHumidityRatioSaturationLimitAssignmentSnapshot as Predecessor;
 use crate::ideal_loads::calc::cooling_supply_humidity_ratio_saturation_assignment::PurchasedAirCalcCoolingSupplyHumidityRatioSaturationAssignmentTemperatureOwner as TemperatureOwner;
 use crate::ideal_loads::calc::cooling_supply_humidity_ratio_saturation_limit_assignment::{
     PurchasedAirCalcCoolingSupplyHumidityRatioSaturationLimitAssignmentRetainedRoute as PredecessorRoute,
     cooling_supply_humidity_ratio_saturation_limit_assignment_snapshot_route,
 };
-use crate::ideal_loads::PurchasedAirCalcCoolingSupplyHumidityRatioSaturationLimitAssignmentSnapshot as Predecessor;
 use crate::psychrometrics::energyplus_psy_h_fn_tdb_w;
 
 /// Owner-resolved temperature input needed on every active route.
@@ -119,9 +119,7 @@ pub(in crate::ideal_loads::calc) fn advance_cooling_supply_enthalpy_post_saturat
     Some(snapshot)
 }
 
-pub(in crate::ideal_loads::calc) fn predecessor_route(
-    predecessor: Predecessor,
-) -> Option<Route> {
+pub(in crate::ideal_loads::calc) fn predecessor_route(predecessor: Predecessor) -> Option<Route> {
     Some(
         match cooling_supply_humidity_ratio_saturation_limit_assignment_snapshot_route(
             predecessor,

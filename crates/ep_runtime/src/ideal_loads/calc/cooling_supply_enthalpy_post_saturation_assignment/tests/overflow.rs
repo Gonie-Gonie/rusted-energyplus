@@ -27,7 +27,10 @@ fn cp379_every_active_counter_overflow_is_transactional() {
             6 => {
                 state.local_supply_enthalpy_after_saturation_limit_assignment_count = usize::MAX;
             }
-            7 => state.cp344_capacity_limit_supply_temperature_mixed_air_limit_owner_count = usize::MAX,
+            7 => {
+                state.cp344_capacity_limit_supply_temperature_mixed_air_limit_owner_count =
+                    usize::MAX
+            }
             8 => state.cp378_supply_humidity_ratio_saturation_limit_owner_count = usize::MAX,
             _ => unreachable!(),
         }

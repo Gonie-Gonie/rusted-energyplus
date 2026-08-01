@@ -15,9 +15,5 @@ pub(in crate::ideal_loads) fn private_cooling_supply_enthalpy_post_saturation_as
     input: Option<ActiveInput>,
 ) -> Option<Snapshot> {
     let mut state = State::new(predecessor.system);
-    advance_cooling_supply_enthalpy_post_saturation_assignment_state(
-        &mut state,
-        predecessor,
-        input,
-    )
+    advance_cooling_supply_enthalpy_post_saturation_assignment_state(&mut state, predecessor, input)
 }

@@ -115,14 +115,17 @@ pub(in crate::ideal_loads) fn cooling_post_saturation_capacity_limit_dehumidific
     state.predecessor_route_counts == predecessor.predecessor_route_counts
         && state.transition_count == predecessor.transition_count
         && state.inactive_transition_count == state.transition_count
-        && state.dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_count == 0
+        && state
+            .dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_count
+            == 0
         && state.source_site_execution_count == 0
         && state.cooling_total_output_owned_read_count == 0
         && state.cooling_total_output_bit_corroboration_count == 0
         && state.cooling_sensible_heat_ratio_read_count == 0
         && state.cooling_sensible_output_calculation_count == 0
         && state.cooling_sensible_output_assignment_write_count == 0
-        && predecessor.dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_count == 0
+        && predecessor.dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_count
+            == 0
 }
 
 fn state_is_consistent(
@@ -134,11 +137,12 @@ fn state_is_consistent(
         return false;
     };
     let route_total = state.inactive_transition_count.checked_add(
-        state.dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_count,
+        state
+            .dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_count,
     );
-    let active_total = [18, 22, 28]
-        .into_iter()
-        .try_fold(0usize, |sum, index| sum.checked_add(state.predecessor_route_counts[index]));
+    let active_total = [18, 22, 28].into_iter().try_fold(0usize, |sum, index| {
+        sum.checked_add(state.predecessor_route_counts[index])
+    });
     let assignments = state
         .dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_count;
     let expected_sites = assignments.checked_mul(
@@ -184,5 +188,7 @@ fn state_is_consistent(
 }
 
 fn checked_sum(values: &[usize]) -> Option<usize> {
-    values.iter().try_fold(0usize, |sum, value| sum.checked_add(*value))
+    values
+        .iter()
+        .try_fold(0usize, |sum, value| sum.checked_add(*value))
 }

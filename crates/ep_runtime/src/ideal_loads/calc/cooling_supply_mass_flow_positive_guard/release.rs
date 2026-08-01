@@ -17,7 +17,7 @@ mod prefix_validation;
 mod runtime_validation;
 mod snapshot_validation;
 
-use prefix_validation::positive_guard_links_to_mixed_air_call;
+pub(in crate::ideal_loads::calc) use prefix_validation::positive_guard_links_to_mixed_air_call;
 #[cfg(test)]
 pub(in crate::ideal_loads::calc) use runtime_validation::next_positive_guard_transition_fits as next_positive_guard_transition_fits_for_test;
 #[cfg(test)]
