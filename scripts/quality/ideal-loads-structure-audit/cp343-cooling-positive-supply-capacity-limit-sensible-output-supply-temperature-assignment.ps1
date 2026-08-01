@@ -18,7 +18,7 @@ $cp343CalcRoot = "crates\ep_runtime\src\ideal_loads\calc.rs"
 $cp343Psychrometrics = "crates\ep_runtime\src\psychrometrics.rs"
 $cp343PsychrometricsTests = "crates\ep_runtime\src\psychrometrics_inverse_density_tests.rs"
 $cp343Binding = "crates\ep_runtime\src\ideal_loads\binding.rs"
-Assert-Contains -Path $cp343Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =.*?let calculation_cooling_humidistat_case_break =.*?let calculation_cooling_constant_supply_humidity_ratio_case_entry =.*?let calculation_cooling_constant_supply_humidity_ratio_assignment =.*?let calculation_cooling_constant_supply_humidity_ratio_case_break =.*?let calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment =.*?let calculation_cooling_default_supply_humidity_ratio_case_break =.*?let calculation_cooling_supply_humidity_ratio_humidification_heating_availability_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_control_humidistat_guard =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361-to-CP362-to-CP363-to-CP364 binding order"
+Assert-Contains -Path $cp343Binding -Pattern '(?s)let calculation_cooling_humidistat_moisture_demand_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_assignment =.*?let calculation_cooling_humidistat_supply_humidity_ratio_for_dehumidification_minimum_limit =.*?let calculation_cooling_humidistat_supply_humidity_ratio_mixed_air_limit =.*?let calculation_cooling_humidistat_case_break =.*?let calculation_cooling_constant_supply_humidity_ratio_case_entry =.*?let calculation_cooling_constant_supply_humidity_ratio_assignment =.*?let calculation_cooling_constant_supply_humidity_ratio_case_break =.*?let calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment =.*?let calculation_cooling_default_supply_humidity_ratio_case_break =.*?let calculation_cooling_supply_humidity_ratio_humidification_heating_availability_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_control_humidistat_guard =.*?let calculation_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard =.*?let coupling = complete_direct_zone_purchased_air_coupling\(' -Description "historical CP359-to-CP360-to-CP361-to-CP362-to-CP363-to-CP364 binding order"
 $cp343ScheduledOutput = "crates\ep_runtime\src\ideal_loads\binding\scheduled_output.rs"
 $cp343BindingAdapter = "crates\ep_runtime\src\ideal_loads\binding\$cp343Stem.rs"
 $cp343BindingTestsRoot = "crates\ep_runtime\src\ideal_loads\binding_tests.rs"
@@ -324,7 +324,7 @@ $cp343BindingIntervalCode = [regex]::Replace(
 )
 $cp343BindingIntervalCode = [regex]::Replace(
     $cp343BindingIntervalCode,
-    '(?s)(?:let calculation_cooling_humidistat_case_break =\s*advance_cooling_humidistat_case_break\([^;]+?\)\?;|let calculation_cooling_constant_supply_humidity_ratio_case_entry =\s*advance_cooling_constant_supply_humidity_ratio_case_entry\([^;]+?\)\?;|let calculation_cooling_constant_supply_humidity_ratio_assignment =\s*advance_cooling_constant_supply_humidity_ratio_assignment\([^;]+?\)\?;|let calculation_cooling_constant_supply_humidity_ratio_case_break =\s*advance_cooling_constant_supply_humidity_ratio_case_break\([^;]+?\)\?;|let calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment =\s*advance_cooling_default_supply_humidity_ratio_mixed_air_assignment\([^;]+?\)\?;|let calculation_cooling_default_supply_humidity_ratio_case_break =\s*advance_cooling_default_supply_humidity_ratio_case_break\([^;]+?\)\?;|let calculation_cooling_supply_humidity_ratio_humidification_heating_availability_guard =\s*advance_cooling_supply_humidity_ratio_humidification_heating_availability_guard\([^;]+?\)\?;|let calculation_cooling_supply_humidity_ratio_humidification_control_humidistat_guard =\s*advance_cooling_supply_humidity_ratio_humidification_control_humidistat_guard\([^;]+?\)\?;)',
+    '(?s)(?:let calculation_cooling_humidistat_case_break =\s*advance_cooling_humidistat_case_break\([^;]+?\)\?;|let calculation_cooling_constant_supply_humidity_ratio_case_entry =\s*advance_cooling_constant_supply_humidity_ratio_case_entry\([^;]+?\)\?;|let calculation_cooling_constant_supply_humidity_ratio_assignment =\s*advance_cooling_constant_supply_humidity_ratio_assignment\([^;]+?\)\?;|let calculation_cooling_constant_supply_humidity_ratio_case_break =\s*advance_cooling_constant_supply_humidity_ratio_case_break\([^;]+?\)\?;|let calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment =\s*advance_cooling_default_supply_humidity_ratio_mixed_air_assignment\([^;]+?\)\?;|let calculation_cooling_default_supply_humidity_ratio_case_break =\s*advance_cooling_default_supply_humidity_ratio_case_break\([^;]+?\)\?;|let calculation_cooling_supply_humidity_ratio_humidification_heating_availability_guard =\s*advance_cooling_supply_humidity_ratio_humidification_heating_availability_guard\([^;]+?\)\?;|let calculation_cooling_supply_humidity_ratio_humidification_control_humidistat_guard =\s*advance_cooling_supply_humidity_ratio_humidification_control_humidistat_guard\([^;]+?\)\?;|let calculation_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard =\s*advance_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard\([^;]+?\)\?;)',
     ''
 )
     if ($cp343BindingIntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
@@ -367,7 +367,7 @@ foreach ($cp343JsonField in @(
 Assert-Contains -Path $cp343PipelineSnapshotSerialization -Pattern '(?s)fn json_number\(value: Option<f64>\) -> Value.*?filter\(\|value\| value\.is_finite\(\)\).*?map_or\(Value::Null' -Description "CP343 nonfinite numeric null projection"
 Assert-Contains -Path $cp343PipelineSnapshotSerialization -Pattern 'value\.map\(\|value\| format!\("0x\{:016x\}", value\.to_bits\(\)\)\)' -Description "CP343 authoritative IEEE bits"
 Assert-Contains -Path $cp343PipelineRoot -Pattern '(?s)purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_lifecycle:\s*None' -Description "non-direct CP343 null evidence"
-Assert-Contains -Path $cp343PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp370_lifecycle_evidence' -Description "non-direct CP343 through CP363 evidence rejection"
+Assert-Contains -Path $cp343PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp371_lifecycle_evidence' -Description "non-direct CP343 through CP363 evidence rejection"
 
 # Specs contain exactly two addenda and the 2+4 target distribution.
 $cp343AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
@@ -557,7 +557,7 @@ foreach ($cp343HistoricalFirewallAudit in @(
         "scripts\quality\ideal-loads-structure-audit\cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1",
         "scripts\quality\ideal-loads-structure-audit\cp342-cooling-positive-supply-capacity-limit-sensible-output-supply-enthalpy-assignment.ps1"
     )) {
-    Assert-Contains -Path $cp343HistoricalFirewallAudit -Pattern 'non_direct_runtime_rejects_cp316_through_cp370_lifecycle_evidence' -Description "historical non-direct firewall reaches CP362"
+    Assert-Contains -Path $cp343HistoricalFirewallAudit -Pattern 'non_direct_runtime_rejects_cp316_through_cp371_lifecycle_evidence' -Description "historical non-direct firewall reaches CP362"
 }
 
 # Root reachability and generated inventory add one internal script:
@@ -573,10 +573,10 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP343 after CP342 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 308' -Description "CP343 cumulative inventory total through CP358"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 309' -Description "CP343 cumulative inventory total through CP358"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment\.ps1"' -Description "CP343 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment\.ps1::dot_sources' -Description "CP343 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 308 \|' -Description "CP343 generated script count through CP358"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 309 \|' -Description "CP343 generated script count through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP343 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 68 \|' -Description "CP343 generated internal script count through CP358"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 69 \|' -Description "CP343 generated internal script count through CP358"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP343 generated uncalled script count"

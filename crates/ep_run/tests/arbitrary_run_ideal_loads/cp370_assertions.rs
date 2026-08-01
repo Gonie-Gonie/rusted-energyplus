@@ -2,6 +2,9 @@
 
 use serde_json::{Map, Value, json};
 
+#[path = "cp371_assertions.rs"]
+mod cp371_assertions;
+
 const CP369_KEY: &str = "purchased_air_calc_cooling_supply_humidity_ratio_humidification_heating_availability_guard_lifecycle";
 const CP370_KEY: &str = "purchased_air_calc_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_lifecycle";
 const ORDER: [&str; 3] = [
@@ -138,9 +141,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
     ] {
         assert!(!latest.contains_key(forbidden), "{forbidden}");
     }
-    super::super::super::super::super::super::super::super::super::super::super::super::super::assert_numerical_nonfeed(
-        runtime, results,
-    );
+    cp371_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -149,4 +150,5 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP370_KEY].is_null(),
         "non-direct runtime must not publish CP370 evidence"
     );
+    cp371_assertions::assert_non_direct(runtime);
 }

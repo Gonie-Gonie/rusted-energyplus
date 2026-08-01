@@ -24229,3 +24229,56 @@ Counts remain 32 algorithms and 293 routines, 58 `state_mapped` plus 235
 public, 68 internal, and zero unused. Parent/Calc states and all readiness,
 support, capability, numerical, output, conformance, and Roadmap claims remain
 unchanged.
+
+## CP371 Cooling Supply-Humidity-Ratio Humidification Dehumidification-Control Humidistat-or-None Guard Placement
+
+CP371 supersedes only CP370's physical-line-2247 exclusion at pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps `PurchasedAirManager.cc:2247`,
+`if ((PurchAir.DehumidCtrlType == HumControl::Humidistat) || (PurchAir.DehumidCtrlType == HumControl::None)) {`, through exactly five source sites:
+
+1. `read-dehumidification-control-type-for-humidistat-comparison`
+2. `compare-dehumidification-control-type-equal-to-humidistat`
+3. `read-dehumidification-control-type-for-none-comparison-after-first-false`
+4. `compare-dehumidification-control-type-equal-to-none`
+5. `enter-admitted-humidification-body-if-control-condition-satisfied`
+
+Physical executable line 2248, the humidifying-setpoint moisture-demand
+assignment, is first excluded. A false compound condition dynamically skips
+that body and continues at physical executable line 2258,
+`SupplyHumRatOrig = PurchAir.SupplyHumRat;`; CP371 maps neither continuation.
+
+Let `E` be CP370 Humidification-control body entries, `H` first-comparison
+Humidistat matches, `F` first-comparison false outcomes and therefore second
+reads/comparisons, `N` second-comparison None matches, `B` admitted body
+entries, and `Z` final false fallthroughs. Exact checked state requires
+`F=E-H`, `B=H+N`, `Z=F-N`, and
+`source_site_execution_count=2E+2F+B`. The direct CP370-false path executes zero
+CP371 sites. Private selected `None` executes all five sites, private
+`Humidistat` executes three through left-to-right `||` short circuit, and
+other named dehumidification-control values execute four and fall through.
+
+Recursively validated same-call bit-exact CP370 lifecycle, snapshot, latest,
+witness, and completion evidence makes CP370 the
+sole immediate source-order predecessor. The identity-checked selected immutable
+`IdealLoadsAirSystem.dehumidification_control_type` is the direct value
+owner. CP320 `PURCHASED_AIR_CALC_COOLING_HUMIDIFICATION_FLOW_SOURCE_ORDER[6..11]`
+is structural short-circuit corroboration only and is not direct value
+provenance; caller duplicates and live-service rereads remain excluded.
+
+CP371 is named-enum control-only evidence. It adds no humidity numeric, `f64`,
+IEEE sidecar, arithmetic, finite/range gate, assignment, psychrometric call,
+coercion, or numerical DTO feed. Binding preserves
+CP370-to-CP371-to-unchanged-numerical order under
+`purchased_air_calc_cooling_supply_humidity_ratio_humidification_dehumidification_control_humidistat_or_none_guard_lifecycle`.
+It does not enter, consume, reconcile with, feed, or replace
+`DirectZonePurchasedAirCouplingInput`, `prediction.zone_demand`, or result
+state. CP345 remains the actual result-store supply-humidity owner; non-direct
+paths publish `None` and reject CP371 evidence.
+
+Counts remain 32 algorithms and 293 routines, split 58 `state_mapped` plus
+235 `source_mapped`, with 170 required. Script inventory becomes 309 total,
+240 public, 69 internal, and zero unused. Parent and Calc status plus support,
+readiness, run state, capability, numerical, output-ownership, conformance,
+and Roadmap claims remain unchanged.

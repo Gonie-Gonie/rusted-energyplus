@@ -19,6 +19,7 @@ pub use release::{
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
     completed_direct_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_is_consistent,
+    cooling_supply_humidity_ratio_humidification_control_humidistat_guard_snapshot_route,
     cooling_supply_humidity_ratio_humidification_control_humidistat_guard_snapshots_match_exact,
     private_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_counterfactual_from_direct_release,
     private_cooling_supply_humidity_ratio_humidification_control_humidistat_guard_counterfactual_links_to_direct_release,
