@@ -4168,5 +4168,6 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp391-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp392-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-humidity-ratio-assignment.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp393-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-break.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp394-cooling-post-saturation-capacity-limit-dehumidification-control-humidistat-case-entry.ps1")
 
 Write-Host "IdealLoads structure audit complete."

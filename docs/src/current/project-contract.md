@@ -21163,6 +21163,7 @@ remain 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`,
 and 170 required. Script inventory becomes 329 total, 240 public, 89 internal,
 zero unused, zero unreachable, with 238 development commands.
 
+
 ## CP392 post-saturation constant-SHR supply-humidity-ratio assignment
 
 CP392 supersedes only CP391's physical-line-2284 exclusion. At pinned
@@ -21308,3 +21309,90 @@ algorithms remain `scaffold`/`none`, both Calc routines remain
 remain 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`,
 and 170 required. Script inventory becomes 331 total, 240 public, 91 internal,
 zero unused, zero unreachable, with 238 development commands.
+
+## CP394 post-saturation Humidistat case entry
+
+CP394 supersedes only CP393's physical-line-2286 control exclusion. At pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+it maps `PurchasedAirManager.cc` physical line 2286,
+`case HumControl::Humidistat: {`. The exact sole source site is
+`enter-purchased-air-post-saturation-capacity-limit-dehumidification-control-humidistat-case`.
+Physical line 2287 is comment-only. Physical executable line 2288,
+`PurchAir.SupplyHumRat = PsyWFnTdbH(state, PurchAir.SupplyTemp, SupplyEnthalpy, RoutineName);`,
+is CP394's first excluded executable and the CP395 boundary. An active
+Humidistat case later exits through physical executable line 2289's break and
+continues dynamically after the switch at physical executable line 2313.
+CP394 represents neither the line-2288 body, the line-2289 break, nor the
+line-2313 continuation.
+
+CP394 preserves CP393's exact thirty-route control shape. Routes 0 through 17
+complete before this nested switch label; constant-SHR routes 18, 22, and 28
+have already exited through CP393; private Humidistat routes 19, 23, and 26
+execute the sole case-entry site; and routes 20, 21, 24, 25, 27, and 29 select
+the later `None` or `ConstantSupplyHumidityRatio` sibling cases. Thus exactly
+three private routes are active and twenty-seven routes are inactive. The
+eleven public exact-direct routes 0 through 8, 20, and 24 are all inactive;
+the remaining nineteen routes are private, with sixteen private inactive
+routes.
+
+Let `R[i]` be CP393 predecessor-route counts, `T394` transitions, `H394`
+Humidistat entries, and `I394` inactive transitions. Exact checked state
+requires `T394=T393=sum(R[0..29])`,
+`H394=R[19]+R[23]+R[26]`, `I394+H394=T394`, exact thirty-route parity, and
+`source_site_execution_count=H394`. CP393's break count is instead
+`R[18]+R[22]+R[28]`; it is not interchangeable with `H394`. The predecessor
+break and current Humidistat-entry flags are mutually exclusive per snapshot.
+Exhaustive characterization therefore has 30 transitions, 27 inactive
+transitions, three Humidistat entries, and three source-site executions.
+
+Recursively complete same-call bit-exact CP393 lifecycle, snapshot, latest,
+private-witness, and completion evidence is the sole immediate predecessor.
+CP394 takes no scalar active input. Entry is derived only from exact CP393
+route identity 19, 23, or 26; a false CP393 break flag alone is insufficient.
+CP386 selector dispatch and CP358's earlier physical-line-2228 Humidistat
+entry are recursive or analogous lineage, never direct predecessor
+substitutes. CP394 performs no selector read or dispatch, numerical operand
+read, arithmetic, comparison, psychrometric evaluation, assignment, owner
+acquisition, diagnostic, cache, or mutable-service operation.
+
+The snapshot retains CP393's CP386-derived control shape through
+`predecessor_dehumidification_control_constant_sensible_heat_ratio_case_entered`,
+then exposes exactly six terminal `Option<f64>` carriers in this numeric
+subsequence:
+`predecessor_cp393_resulting_supply_humidity_ratio`,
+`predecessor_cp393_resulting_supply_enthalpy_j_per_kg`,
+`predecessor_cp393_resulting_supply_temperature_c`,
+`resulting_supply_humidity_ratio`,
+`resulting_supply_enthalpy_j_per_kg`, and
+`resulting_supply_temperature_c`. Every predecessor/result pair is
+bit-exact. Humidity is present only on routes 18, 22, and 28, enthalpy on
+routes 5, 8, 11, 14, and 17 through 29, and temperature on routes 3 through
+29. Active Humidistat routes 19, 23, and 26 therefore carry absent humidity
+and present enthalpy and temperature until CP395.
+
+The exact CP394-local boolean subsequence is
+`predecessor_dehumidification_control_constant_sensible_heat_ratio_case_exited_via_break`
+followed by `dehumidification_control_humidistat_case_entered`. Schema order
+is predecessor break boolean, predecessor CP393
+humidity/enthalpy/temperature, Humidistat-entry boolean, then resulting
+humidity/enthalpy/temperature; the boolean subsequence is ordered but not
+contiguous. CP393's predecessor CP392 terminal-assignment marker does not leak
+across this new control boundary. JSON exposes six finite-only projections
+paired in exact order with six authoritative IEEE sidecars.
+
+Binding order is CP393-to-CP394-to-unchanged-numerical. CP394 never enters,
+consumes, feeds, reconciles with, overwrites, or replaces
+`DirectZonePurchasedAirCouplingInput`, numerical DTO/results, prediction,
+feedback, nodes, loads, or reports; supported first/last supply-state bits
+remain unchanged, and non-direct paths reject CP394 evidence. CP394 contains
+no CP395 `PsyWFnTdbH` call, temperature/enthalpy operand read, humidity-ratio
+inversion, calculation, assignment, owner/read/evaluation/assignment counter,
+line-2288 assignment flag or value, line-2289 break, or line-2313
+saturation-continuation behavior. It adds no routine or psychrometrics-map row
+and no support or Roadmap promotion. Both parent algorithms remain
+`scaffold`/`none`, both Calc routines remain `source_mapped`, and
+`routine.psy_w_fn_tdb_h` remains `state_mapped`. Counts remain 32
+algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
+required. Script inventory becomes 332 total, 240 public, 92 internal, zero
+unused, zero unreachable, with 238 development commands.
