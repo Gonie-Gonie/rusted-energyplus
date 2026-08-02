@@ -38187,3 +38187,79 @@ Both parent algorithms remain `scaffold`/`none`, both Calc routines remain
 remain 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`,
 and 170 required. Script inventory becomes 329 total, 240 public, 89 internal,
 zero unused, zero unreachable, with 238 development commands.
+
+## CP392 post-saturation constant-SHR supply-humidity-ratio assignment
+
+CP392 supersedes only CP391's physical-line-2284 exclusion. At pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+it maps `PurchasedAirManager.cc` physical executable line 2284:
+`PurchAir.SupplyHumRat = PsyWFnTdbH(state, PurchAir.SupplyTemp,
+SupplyEnthalpy, RoutineName);`. Physical executable line 2285's `} break;`
+is the first excluded statement and CP393 boundary.
+
+The exact four dependency-ordered sites are
+`read-purchased-air-supply-temperature-for-constant-sensible-heat-ratio-humidity-ratio-inversion`,
+`read-local-supply-enthalpy-for-constant-sensible-heat-ratio-humidity-ratio-inversion`,
+`evaluate-psy-w-fn-tdb-h-for-constant-sensible-heat-ratio-overdrying-limit`,
+and
+`assign-purchased-air-supply-humidity-ratio-for-constant-sensible-heat-ratio-overdrying-limit`.
+The two reads are side-effect-free, so this deterministic witness order makes
+no C++ function-argument-evaluation-order claim.
+
+CP392 preserves CP391's thirty routes. Exactly private routes 18, 22, and 28
+execute all four sites; twenty-seven routes skip them. The eleven exact-direct
+routes 0 through 8, 20, and 24 are inactive and nineteen routes remain
+private. Exact state requires `T392=T391`, assignment count equal to CP391's
+three overdrying-limit executions, `inactive_transition_count=T392-A392`,
+exact thirty-route parity, every active read/evaluation/write counter equal to
+`A392`, and `source_site_execution_count=4*A392` (12 across exhaustive
+characterization).
+
+Recursively complete same-call bit-exact CP391 lifecycle, snapshot, latest,
+private-witness, and completion evidence is the sole immediate predecessor.
+CP391 `resulting_supply_temperature_c` and
+`resulting_supply_enthalpy_j_per_kg` solely own the two line-2284 operands;
+CP390, CP389, CP385, CP379, CP329, caller/model/service scalars, and the
+numerical DTO are recursive lineage or forbidden substitutes. CP392 retains
+temperature on 27 routes and enthalpy on 17 routes, preserving all such bits;
+only the three active routes read them and produce a supply humidity ratio.
+Inactive routes keep CP392 source-local temperature, enthalpy, psychrometric,
+assigned-humidity, and resulting-humidity values null.
+
+The transition calls canonical stateless
+`energyplus_psy_w_fn_tdb_h(temperature, enthalpy)` with exact grouping
+`(enthalpy_j_per_kg - 1.004_84e3 * dry_bulb_c) / (2.500_94e6 +
+1.858_95e3 * dry_bulb_c)`, then applies only
+`if humidity_ratio < 0.0 { 1.0e-5 } else { humidity_ratio }`.
+The floor bits are `0x3ee4f8b588e368f1`. Strictly negative finite or
+negative-infinite raw results floor; positive sub-floor values, negative zero,
+NaN/unordered results, positive infinity, and denominator-pole behavior retain
+the canonical helper semantics. There is no finite/NaN gate, min/max, clamp,
+normalization, regrouping, `mul_add`, coercion, cache, or mutable service.
+Optional `EP_psych_stats`, `EP_psych_errors`, `state`, `RoutineName` /
+`CalledFrom`, and `SuppressWarnings` diagnostics remain deferred.
+
+Serialization exposes exactly 40 finite-only numeric projections in snapshot
+order and 40 authoritative IEEE sidecars. Nine CP392-local booleans distinguish
+CP391 temperature/enthalpy state ownership from the active owned reads, the two
+source reads, psychrometric evaluation, and humidity assignment. CP391's
+colliding local temperature is
+`predecessor_cp391_supply_temperature_c`; its terminal carriers become
+`predecessor_cp391_resulting_supply_enthalpy_j_per_kg` and
+`predecessor_cp391_resulting_supply_temperature_c`. CP392 adds local
+`supply_temperature_c`, `supply_enthalpy_j_per_kg`, psychrometric,
+assigned/resulting humidity, and unchanged resulting enthalpy/temperature.
+
+Binding order is CP391-to-CP392-to-unchanged-numerical. CP392 never enters,
+consumes, feeds, reconciles with, overwrites, or replaces
+`DirectZonePurchasedAirCouplingInput`, numerical DTO/results, nodes, loads,
+or reports; non-direct paths reject CP392 evidence. It contains no CP393
+case-break site, flag, counter, or line-2285 behavior. It adds no routine or
+psychrometrics-map row and no support or Roadmap promotion. Both parent
+algorithms remain `scaffold`/`none`, both Calc routines remain
+`source_mapped`, and `routine.psy_w_fn_tdb_h` remains `state_mapped`.
+Counts remain 32 algorithms, 293 routines, 58 `state_mapped`, 235
+`source_mapped`, and 170 required. Script inventory becomes 330 total, 240
+public, 90 internal, zero unused, zero unreachable, with 238 development
+commands.

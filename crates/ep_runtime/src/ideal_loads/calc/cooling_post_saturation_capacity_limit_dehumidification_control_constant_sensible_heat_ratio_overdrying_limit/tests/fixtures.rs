@@ -10,11 +10,11 @@ use crate::ideal_loads::{
 };
 
 #[derive(Clone, Copy)]
-pub(super) struct Chain {
+pub(in crate::ideal_loads::calc) struct Chain {
     pub cp390: Cp390,
 }
 
-pub(super) fn chain(
+pub(in crate::ideal_loads::calc) fn chain(
     inherited: usize,
     outcome: usize,
     assignment: bool,
@@ -45,7 +45,7 @@ pub(super) fn chain(
     Chain { cp390 }
 }
 
-pub(super) fn all_chains() -> Vec<Chain> {
+pub(in crate::ideal_loads::calc) fn all_chains() -> Vec<Chain> {
     cp390_fixtures::all_chains()
         .into_iter()
         .map(|base| {

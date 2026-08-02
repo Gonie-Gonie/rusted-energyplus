@@ -2,6 +2,7 @@
 & {
 $stem = "cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit"
 $predecessorStem = "cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_temperature_mixed_air_limit"
+$successorStem = "cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_humidity_ratio_assignment"
 $pipelineStem = "purchased_air_$stem"
 $typeStem = "PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimit"
 $source = ".reference\energyplus-src\26.1.0\src\EnergyPlus\PurchasedAirManager.cc"
@@ -219,6 +220,7 @@ $coupledFiles = @($coupled) + @(Get-ChildItem -LiteralPath $coupledRoot -Recurse
 $productionFiles = @($module, $adapter, $pipeline, $pipelineValidation, $pipelineSerialization, $snapshotJson) + $coupledFiles
 $productionFiles += @(Get-ChildItem -LiteralPath $root -Recurse -File -Filter '*.rs' | Where-Object { $_.FullName -notmatch '[\\/]tests\.rs$' -and $_.FullName -notmatch '[\\/]tests[\\/]' } | ForEach-Object { $_.FullName })
 $humidityFirewallPattern = 'PsyWFnTdbH|energyplus_psy_w_fn_tdb_h|psy_w_fn_tdb_h|\bRoutineName\b|(?:\bSupplyHumRat\b|\b[A-Za-z0-9_]*supply_(?:hum(?:idity)?_ratio|hum_rat)\b)\s*(?:=|:)'
+$integrationHumidityWritePattern = 'PsyWFnTdbH|energyplus_psy_w_fn_tdb_h|psy_w_fn_tdb_h|\bRoutineName\b|(?:\bSupplyHumRat\b|\b[A-Za-z0-9_]*supply_(?:hum(?:idity)?_ratio|hum_rat)\b)\s*='
 foreach ($productionFile in $productionFiles | Select-Object -Unique) {
     Assert-NotContains -Path $productionFile -Pattern $humidityFirewallPattern -Description "CP392 humidity-ratio-assignment firewall"
 }
@@ -229,7 +231,7 @@ foreach ($integrationPath in @($binding, "crates\ep_runtime\src\ideal_loads\bind
     foreach ($anchor in $anchors) {
         $start = [Math]::Max(0, $anchor.Index - 4096)
         $end = [Math]::Min($integrationText.Length, $anchor.Index + $anchor.Length + 4096)
-        if ($integrationText.Substring($start, $end - $start) -match $humidityFirewallPattern) {
+        if ($integrationText.Substring($start, $end - $start) -match $integrationHumidityWritePattern) {
             throw "CP391 CP392 humidity-ratio-assignment firewall violated near integration anchor in '$integrationPath'"
         }
     }
@@ -258,24 +260,30 @@ foreach ($pattern in @(
 $bindingText = Read-RepoText -Path $binding
 $cp390BindingName = "calculation_$predecessorStem"
 $cp391BindingName = "calculation_$stem"
+$cp392BindingName = "calculation_$successorStem"
 $cp390Index = $bindingText.IndexOf("let $cp390BindingName =")
 $cp391Index = $bindingText.IndexOf("let $cp391BindingName =")
+$cp392Index = $bindingText.IndexOf("let $cp392BindingName =")
 $numericalIndex = $bindingText.IndexOf("let coupling = complete_direct_zone_purchased_air_coupling(")
-if ($cp390Index -lt 0 -or $cp391Index -le $cp390Index -or $numericalIndex -le $cp391Index) { throw "Binding must execute CP390, CP391, then unchanged numerical coupling" }
+if ($cp390Index -lt 0 -or $cp391Index -le $cp390Index -or $cp392Index -le $cp391Index -or $numericalIndex -le $cp392Index) { throw "Binding must execute CP390, CP391, CP392, then unchanged numerical coupling" }
 $cp391Call = [regex]::Match($bindingText, "(?s)let $([regex]::Escape($cp391BindingName)) =\s*advance_$([regex]::Escape($stem))\((?<args>.*?)\)\?;")
 if (-not $cp391Call.Success -or [regex]::Matches($cp391Call.Groups['args'].Value, [regex]::Escape($cp390BindingName)).Count -ne 1) { throw "CP391 must consume CP390 exactly once as sole immediate predecessor" }
+$cp392Call = [regex]::Match($bindingText, "(?s)let $([regex]::Escape($cp392BindingName)) =\s*advance_$([regex]::Escape($successorStem))\((?<args>.*?)\)\?;")
+if (-not $cp392Call.Success -or [regex]::Matches($cp392Call.Groups['args'].Value, [regex]::Escape($cp391BindingName)).Count -ne 1) { throw "CP392 must consume CP391 exactly once as sole immediate predecessor" }
 $cp390Matches = [regex]::Matches($bindingText, [regex]::Escape($cp390BindingName))
 $cp391Matches = [regex]::Matches($bindingText, [regex]::Escape($cp391BindingName))
-if ($cp390Matches.Count -ne 3 -or $cp391Matches.Count -ne 2 -or $cp390Matches[1].Index -lt $cp391Index -or $cp390Matches[1].Index -ge ($cp391Call.Index + $cp391Call.Length) -or $cp390Matches[2].Index -le $numericalIndex -or $cp391Matches[1].Index -le $numericalIndex) {
-    throw "Binding evidence references must be CP390=3 and CP391=2 with post-numerical storage only"
+$cp392Matches = [regex]::Matches($bindingText, [regex]::Escape($cp392BindingName))
+if ($cp390Matches.Count -ne 3 -or $cp391Matches.Count -ne 3 -or $cp392Matches.Count -ne 2 -or $cp390Matches[1].Index -lt $cp391Index -or $cp390Matches[1].Index -ge ($cp391Call.Index + $cp391Call.Length) -or $cp391Matches[1].Index -lt $cp392Index -or $cp391Matches[1].Index -ge ($cp392Call.Index + $cp392Call.Length) -or $cp390Matches[2].Index -le $numericalIndex -or $cp391Matches[2].Index -le $numericalIndex -or $cp392Matches[1].Index -le $numericalIndex) {
+    throw "Binding evidence references must be CP390=3, CP391=3, and CP392=2 with post-numerical storage only"
 }
 if ([regex]::Matches($bindingText.Substring($cp390Index, $cp391Index - $cp390Index), [regex]::Escape($cp390BindingName)).Count -ne 1 -or
-    [regex]::Matches($bindingText.Substring($cp391Index, $numericalIndex - $cp391Index), [regex]::Escape($cp391BindingName)).Count -ne 1) {
-    throw "Binding CP390-to-CP391-to-numerical intervals are not exact"
+    [regex]::Matches($bindingText.Substring($cp391Index, $cp392Index - $cp391Index), [regex]::Escape($cp391BindingName)).Count -ne 1 -or
+    [regex]::Matches($bindingText.Substring($cp392Index, $numericalIndex - $cp392Index), [regex]::Escape($cp392BindingName)).Count -ne 1) {
+    throw "Binding CP390-to-CP391-to-CP392-to-numerical intervals are not exact"
 }
 $dto = Get-Cp391BraceBlock -Text $bindingText.Substring($numericalIndex) -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{' -Description "numerical DTO"
-if ($dto -match [regex]::Escape($predecessorStem) -or $dto -match [regex]::Escape($stem) -or $dto -match 'cp39[01]|preexisting_supply_enthalpy|maximum_supply_enthalpy|assigned_supply_enthalpy|resulting_supply_enthalpy|resulting_supply_temperature') {
-    throw "CP390/CP391 evidence unexpectedly feeds the numerical DTO"
+if ($dto -match [regex]::Escape($predecessorStem) -or $dto -match [regex]::Escape($stem) -or $dto -match [regex]::Escape($successorStem) -or $dto -match 'cp39[012]|preexisting_supply_enthalpy|maximum_supply_enthalpy|assigned_supply_enthalpy|resulting_supply_enthalpy|resulting_supply_temperature|supply_humidity_ratio') {
+    throw "CP390/CP391/CP392 evidence unexpectedly feeds the numerical DTO"
 }
 Assert-NotContains -Path $adapter -Pattern 'DirectZonePurchasedAirCouplingInput|reconcile_|supply_node|prediction|feedback|\breport\b|ResultStore|numerical|supply_enthalpy_before_overdrying_limit_j_per_kg\s*:|supply_temperature_c\s*:' -Description "adapter numerical/scalar feed"
 $coupledText = ($coupledFiles | ForEach-Object { Read-RepoText -Path $_ }) -join [Environment]::NewLine
@@ -321,7 +329,7 @@ if ([regex]::Matches($execute, [regex]::Escape($lifecycleField) + '\s*:\s*None')
 }
 $firewall = Get-Cp391BraceBlock -Text $production -AnchorPattern '(?m)^\s*fn validate_runtime_demand_provenance\s*\(' -Description "pipeline firewall"
 if ([regex]::Matches($firewall, 'result\s*\.\s*' + [regex]::Escape($lifecycleField) + '\s*\.\s*is_some').Count -ne 1) { throw "Non-direct firewall must reject CP391 evidence exactly once" }
-Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp391_lifecycle_evidence' -Description "cumulative non-direct firewall test"
+Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp392_lifecycle_evidence' -Description "cumulative non-direct firewall test"
 Assert-Contains -Path $pipelineValidation -Pattern 'predecessor\.source_order\s*(?:==|!=)\s*PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_CONTROL_CONSTANT_SENSIBLE_HEAT_RATIO_SUPPLY_TEMPERATURE_MIXED_AIR_LIMIT_SOURCE_ORDER' -Description "pipeline CP390 source-order provenance"
 Assert-Cp391Text -Text $coupledText -Pattern 'predecessor\.source_order\s*(?:==|!=)\s*PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_CONTROL_CONSTANT_SENSIBLE_HEAT_RATIO_SUPPLY_TEMPERATURE_MIXED_AIR_LIMIT_SOURCE_ORDER' -Description "coupled CP390 source-order provenance"
 foreach ($path in @($pipelineValidation) + $coupledFiles) {
@@ -403,49 +411,53 @@ Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP391 a
 
 foreach ($historical in 334..390) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp391_lifecycle_evidence' -Description "historical cumulative firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp392_lifecycle_evidence' -Description "historical cumulative firewall"
 }
 foreach ($historical in 335..390) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 329 \|')) -Description "historical generated total"
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 89 \|')) -Description "historical generated internal"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| executable script records \| 330 \|')) -Description "historical generated total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| internal scripts \| 90 \|')) -Description "historical generated internal"
 }
 foreach ($historical in 337..390) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 329' -Description "historical inventory total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 330' -Description "historical inventory total"
 }
 foreach ($historical in 367..390) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'Count -ne 89' -Description "historical internal classification"
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern '240 public and 89 internal' -Description "historical classification diagnostic"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'Count -ne 90' -Description "historical internal classification"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern '240 public and 90 internal' -Description "historical classification diagnostic"
 }
 foreach ($historical in @('cp326-cooling-supply-mass-flow-limit-body.ps1') + @(329..344 | ForEach-Object { (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$($_)-*.ps1").Name })) {
     Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$historical" -Pattern "advance_$stem" -Description "historical CP391 helper whitelist"
 }
 $cp345Audit = "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1"
-foreach ($pattern in @('\$cp390Call\s*=', '\$cp391Call\s*=', 'CP390-to-CP391', 'CP391-to-numerical')) { Assert-Contains -Path $cp345Audit -Pattern $pattern -Description "strict CP345 terminal ordering" }
+foreach ($pattern in @('\$cp390Call\s*=', '\$cp391Call\s*=', '\$cp392Call\s*=', 'CP390-to-CP391', 'CP391-to-CP392', 'CP392-to-numerical')) { Assert-Contains -Path $cp345Audit -Pattern $pattern -Description "strict CP345 terminal ordering" }
 Assert-LineLimit -Path $cp345Audit -Limit 1200 -Description "CP345 fixed structural cap"
 foreach ($historical in 377..390) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
     Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'CP390-to-CP391' -Description "historical predecessor interval"
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'CP391-to-numerical' -Description "historical terminal interval"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'CP391-to-CP392' -Description "historical successor interval"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'CP392-to-numerical' -Description "historical terminal interval"
 }
 foreach ($historical in 385..390) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
     Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern '\$cp391Index\s*=' -Description "historical binding CP391 index"
     Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern '\$cp391AuditIndex\s*=' -Description "historical master CP391 index"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern '\$cp392Index\s*=' -Description "historical binding CP392 index"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern '\$cp392AuditIndex\s*=' -Description "historical master CP392 index"
 }
 
 $master = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp390AuditIndex = $master.IndexOf("cp390-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-temperature-mixed-air-limit.ps1")
 $cp391AuditIndex = $master.IndexOf("cp391-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-overdrying-limit.ps1")
+$cp392AuditIndex = $master.IndexOf("cp392-cooling-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-supply-humidity-ratio-assignment.ps1")
 $completionIndex = $master.IndexOf('Write-Host "IdealLoads structure audit complete."')
-if ($cp390AuditIndex -lt 0 -or $cp391AuditIndex -le $cp390AuditIndex -or $completionIndex -le $cp391AuditIndex) { throw "Master audit must dot-source CP391 after CP390 before completion" }
+if ($cp390AuditIndex -lt 0 -or $cp391AuditIndex -le $cp390AuditIndex -or $cp392AuditIndex -le $cp391AuditIndex -or $completionIndex -le $cp392AuditIndex) { throw "Master audit must dot-source CP390, CP391, then CP392 before completion" }
 $inventory = Read-RepoText -Path "specs\script_inventory.toml"
-foreach ($pattern in @('script_count = 329', 'dev_command_count = 238', 'unused_script_count = 0', 'unreachable_count = 0')) { Assert-Cp391Text -Text $inventory -Pattern $pattern -Description "inventory" }
-if ([regex]::Matches($inventory, '(?m)^classification = "public"$').Count -ne 240 -or [regex]::Matches($inventory, '(?m)^classification = "internal"$').Count -ne 89) { throw "CP391 inventory must be exactly 240 public and 89 internal scripts" }
+foreach ($pattern in @('script_count = 330', 'dev_command_count = 238', 'unused_script_count = 0', 'unreachable_count = 0')) { Assert-Cp391Text -Text $inventory -Pattern $pattern -Description "inventory" }
+if ([regex]::Matches($inventory, '(?m)^classification = "public"$').Count -ne 240 -or [regex]::Matches($inventory, '(?m)^classification = "internal"$').Count -ne 90) { throw "CP391 inventory must be exactly 240 public and 90 internal scripts" }
 Assert-Cp391Text -Text $inventory -Pattern ('path = "scripts/quality/ideal-loads-structure-audit/' + [regex]::Escape((Split-Path -Leaf $audit)) + '"') -Description "inventory record"
-foreach ($pattern in @('\| executable script records \| 329 \|', '\| public scripts \| 240 \|', '\| internal scripts \| 89 \|', '\| scripts without callers \| 0 \|')) {
+foreach ($pattern in @('\| executable script records \| 330 \|', '\| public scripts \| 240 \|', '\| internal scripts \| 90 \|', '\| scripts without callers \| 0 \|')) {
     Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern $pattern -Description "generated inventory"
 }
 

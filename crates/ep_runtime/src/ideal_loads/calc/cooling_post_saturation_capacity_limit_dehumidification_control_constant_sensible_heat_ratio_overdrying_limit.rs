@@ -7,7 +7,7 @@ use crate::ideal_loads::PurchasedAirRuntimeState;
 mod release;
 mod state;
 #[cfg(test)]
-mod tests;
+pub(in crate::ideal_loads::calc) mod tests;
 mod transition;
 
 pub use release::{
@@ -18,6 +18,7 @@ pub use release::{
 pub(in crate::ideal_loads::calc) use release::{
     completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_is_consistent,
     cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_snapshot_is_exact,
+    cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_snapshot_route,
     cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_snapshots_match_bit_exact,
 };
 #[allow(unused_imports)]
