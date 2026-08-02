@@ -38607,3 +38607,70 @@ parent algorithms remain `scaffold`/`none`, both Calc routines remain
 remain 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`,
 and 170 required. Script inventory becomes 334 total, 240 public, 94 internal,
 zero unused, zero unreachable, with 238 development commands.
+
+## CP397 post-saturation None case entry
+
+CP397 supersedes only CP396's physical-line-2290 control exclusion. At pinned
+EnergyPlus commit 6f2e40d10250a105b49966baa24d843711e61048 and locked raw
+SHA-256 54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005,
+it maps only PurchasedAirManager.cc physical source line 2290,
+`case HumControl::None:`. Physical line 2291,
+`case HumControl::ConstantSupplyHumidityRatio: {`, is the first excluded
+lexical and control boundary reserved for CP398. Comment-only lines 2292-2293
+precede physical executable line 2294,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`, the first lexically
+subsequent executable. Dynamic continuation at physical executable line 2313
+also remains excluded.
+
+The exact sole source site is
+`enter-purchased-air-post-saturation-capacity-limit-dehumidification-control-none-case`.
+This is a pure typed case-label checkpoint. It performs no selector reread,
+numeric operand read, arithmetic, comparison, psychrometric evaluation,
+assignment, owner acquisition, diagnostic, cache, or mutable-service
+operation, and claims neither the stacked line-2291 label nor its shared body.
+
+CP397 preserves CP396's exact thirty routes. Exactly None-selector routes 20,
+24, and 27 execute the sole entry site; twenty-seven routes skip it.
+Constant-SHR routes 18, 22, and 28 and Humidistat routes 19, 23, and 26 have
+already broken, while ConstantSupplyHumidityRatio routes 21, 25, and 29 wait
+at CP398. The eleven public exact-direct routes are 0 through 8, 20, and 24:
+routes 20 and 24 are active and the other nine are inactive. Nineteen routes
+remain private, with only route 27 active. For CP396 route counts R, exact
+state requires T397=T396=sum(R[0..29]), E397=R[20]+R[24]+R[27],
+I397=T397-E397, exact route parity, and
+source_site_execution_count=E397. Characterization is 30/27/3/3.
+
+Recursively complete same-call bit-exact CP396 lifecycle, snapshot, latest,
+runtime-witness, and completion evidence is the sole immediate predecessor.
+CP395 and older checkpoints, caller/model/service scalars, active-input DTOs,
+and numerical coupling values are recursive lineage or forbidden direct
+substitutes. Retained route identity activates CP397 without a selector reread.
+
+CP397 carries exactly six `Option<f64>` fields, in order:
+`predecessor_cp396_resulting_supply_humidity_ratio`,
+`predecessor_cp396_resulting_supply_enthalpy_j_per_kg`,
+`predecessor_cp396_resulting_supply_temperature_c`,
+`resulting_supply_humidity_ratio`,
+`resulting_supply_enthalpy_j_per_kg`, and
+`resulting_supply_temperature_c`. Every pair is bit-exact. Humidity remains
+present only on routes 18, 19, 22, 23, 26, and 28; enthalpy on routes 5, 8,
+11, 14, and 17 through 29; temperature on routes 3 through 29. JSON pairs the
+six finite-only values with six authoritative IEEE sidecars.
+
+The snapshot retains CP396 control markers, including its Humidistat break,
+and adds exactly one local boolean,
+`dehumidification_control_none_case_entered`, true exactly on routes 20, 24,
+and 27. No earlier numeric operation or counter leaks into this checkpoint.
+
+Binding order is CP396-to-CP397-to-unchanged-numerical. Public routes 20 and 24
+carry active CP397 evidence, but CP397 never feeds or replaces
+`DirectZonePurchasedAirCouplingInput`, numerical DTO/results, prediction,
+feedback, nodes, loads, or reports; non-direct paths reject CP397 evidence.
+It adds no routine or psychrometrics-map row and no support, capability,
+routine, algorithm, numerical-conformance, or Roadmap promotion. Both parent
+algorithms remain `scaffold`/`none`, both Calc routines remain
+`source_mapped`, and `routine.psy_w_fn_tdb_h` remains `state_mapped`.
+Counts remain 32 algorithms, 293 routines, 58 `state_mapped`, 235
+`source_mapped`, and 170 required. Script inventory becomes 335 total, 240
+public, 95 internal, zero unused, zero unreachable, with 238 development
+commands.

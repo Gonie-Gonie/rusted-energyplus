@@ -253,6 +253,8 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlHumidistatSupplyHumidityRatioAssignmentRuntimeState::new(system),
             calc_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_break:
                 PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlHumidistatCaseBreakRuntimeState::new(system),
+            calc_cooling_post_saturation_capacity_limit_dehumidification_control_none_case_entry:
+                PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlNoneCaseEntryRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

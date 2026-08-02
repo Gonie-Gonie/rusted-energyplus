@@ -603,6 +603,11 @@ fn ideal_loads_no_oa_branch_runs_declared_compatibility_runtime()
         &summary["rust_runtime"],
     );
     cp353_assertions::assert_direct(&summary["rust_runtime"], &results);
+    let cp397 = &summary["rust_runtime"]["purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_none_case_entry_lifecycle"];
+    assert!(
+        cp397.is_object(),
+        "direct runtime must publish CP397 lifecycle evidence"
+    );
     Ok(())
 }
 
