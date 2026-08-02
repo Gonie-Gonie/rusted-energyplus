@@ -313,7 +313,7 @@ Assert-Contains -Path $cp348CorruptionTests -Pattern 'every_private_entry_counte
 Assert-Contains -Path $cp348BindingTests -Pattern 'scheduled_binding_completes_cp348_direct_none_route_as_case_entry_skip' -Description "CP348 binding direct skip"
 Assert-Contains -Path $cp348BindingTests -Pattern 'scheduled_binding_skips_cp348_source_site_on_u_n_and_p_routes' -Description "CP348 binding U/N/P skips"
 Assert-Contains -Path $cp348CoupledTests -Pattern 'cp348_coupled_direct_none_route_is_complete_skip_and_corruption_fails_closed' -Description "CP348 coupled direct skip and corruption"
-Assert-Contains -Path $cp348PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp390_lifecycle_evidence' -Description "CP348 cumulative non-direct firewall"
+Assert-Contains -Path $cp348PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp391_lifecycle_evidence' -Description "CP348 cumulative non-direct firewall"
 Assert-Contains -Path $cp348PipelineRoot -Pattern ('"' + $cp348Lifecycle + '":\s*result\s*\.' + $cp348Lifecycle) -Description "CP348 lifecycle JSON"
 Assert-Contains -Path $cp348Coupled -Pattern 'direct_constant_sensible_heat_ratio_case_entry_count",\s*0' -Description "coupled direct E zero"
 Assert-Contains -Path $cp348PipelineValidation -Pattern 'lifecycle_route_partition_corruption_fails_closed' -Description "pipeline CP348 partition corruption"
@@ -494,7 +494,7 @@ foreach ($historical in @(
     )) {
     Assert-Contains `
         -Path "scripts\quality\ideal-loads-structure-audit\$historical" `
-        -Pattern 'non_direct_runtime_rejects_cp316_through_cp390_lifecycle_evidence' `
+        -Pattern 'non_direct_runtime_rejects_cp316_through_cp391_lifecycle_evidence' `
         -Description "historical cumulative non-direct firewall"
 }
 $mainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
@@ -510,13 +510,13 @@ $completionIndex = $mainAuditText.IndexOf(
 if ($cp347AuditIndex -lt 0 -or $cp348AuditIndex -le $cp347AuditIndex -or $completionIndex -le $cp348AuditIndex) {
     throw "Main IdealLoads audit must dot-source CP348 after CP347 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 328' -Description "CP348 script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 329' -Description "CP348 script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP348 zero uncalled scripts"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp348-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-entry\.ps1"' -Description "CP348 internal record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp348-cooling-positive-supply-post-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-entry\.ps1::dot_sources' -Description "CP348 caller/callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 328 \|' -Description "generated CP348 script total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 329 \|' -Description "generated CP348 script total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public total"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 88 \|' -Description "generated internal total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 89 \|' -Description "generated internal total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated zero uncalled"
 
 # Mutation self-tests prove predecessor, algebra, DTO, direct-only, and

@@ -22503,3 +22503,85 @@ promotion occurs. Both parents stay `scaffold`/`none`, both Calc routines stay
 remain 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`,
 and 170 required. Scripts become 328 total, 240 public, 88 internal, zero
 unused/unreachable, with 238 development commands.
+
+## CP391 Post-Saturation Constant-SHR Overdrying Enthalpy Limit
+
+The pinned boundary is EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048` and raw `PurchasedAirManager.cc`
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+CP391 maps only physical executable line 2283:
+`SupplyEnthalpy = max(SupplyEnthalpy, PsyHFnTdbW(PurchAir.SupplyTemp,
+0.00001));`. Its exact dependency- and source-text-ordered sites are
+`read-local-supply-enthalpy-for-constant-sensible-heat-ratio-overdrying-limit-maximum`,
+`read-purchased-air-supply-temperature-for-constant-sensible-heat-ratio-overdrying-limit-enthalpy`,
+`evaluate-psy-h-fn-tdb-w-at-minimum-humidity-ratio-for-constant-sensible-heat-ratio-overdrying-limit`,
+`apply-source-shaped-two-argument-maximum-for-constant-sensible-heat-ratio-overdrying-limit`,
+and
+`assign-local-supply-enthalpy-for-constant-sensible-heat-ratio-overdrying-limit`.
+The two reads are side-effect-free; their deterministic Rust dependency order
+does not claim a general C++ function-argument evaluation order.
+
+Physical executable line 2284,
+`PurchAir.SupplyHumRat = PsyWFnTdbH(state, PurchAir.SupplyTemp,
+SupplyEnthalpy, RoutineName);`, is the complete first excluded source and CP392
+boundary. CP391 includes no supply-humidity-ratio write, `PsyWFnTdbH`, state
+argument, `RoutineName`, or later case behavior.
+
+CP391 preserves CP390's 30 routes. Exactly three private
+`ConstantSensibleHeatRatio` routes 18, 22, and 28 execute all five sites;
+27 routes skip them. With execution count `O391`, exact checked algebra is
+`T391=T390`, `O391=L390`,
+`inactive_transition_count=T391-O391`, every source-site counter equals
+`O391`, and `source_site_execution_count=5*O391`; exhaustive characterization
+therefore executes 15 sites. Eleven routes are public and 19 private.
+
+Seventeen predecessor histories carry CP390 resulting supply enthalpy: three
+active routes limit it, 14 inactive owner routes preserve its exact bits, and
+13 routes retain `None`. Twenty-seven histories carry CP390 resulting supply
+temperature, but only the three active routes read it for line 2283. Public
+inactive routes null only CP391 source-local reads, psychrometric result,
+maximum, and assignment; their retained/resulting enthalpy is not necessarily
+null.
+
+Recursively complete same-call bit-exact CP390 lifecycle, snapshot, latest,
+private-witness, and completion evidence is the sole immediate predecessor.
+CP390 `resulting_supply_enthalpy_j_per_kg` solely owns the left/preexisting
+maximum operand, and CP390 `resulting_supply_temperature_c` solely owns the
+psychrometric temperature operand. CP385/CP379 enthalpy and CP389/CP329
+temperature are recursive lineage, not direct CP391 inputs. Caller, model,
+service, and numerical DTO scalars cannot substitute for either operand.
+
+The transition calls canonical stateless
+`energyplus_psy_h_fn_tdb_w(temperature, 1.0e-5)`. The humidity-ratio literal
+has bits `0x3ee4f8b588e368f1`; the canonical floor and grouping remain
+`1.004_84e3 * dry_bulb_c + humidity_ratio * (2.500_94e6 + 1.858_95e3 *
+dry_bulb_c)`. CP391 reuses
+`cooling_positive_supply_temperature_minimum_limit::source_shaped_two_argument_maximum`,
+whose ObjexxFCL behavior `a < b ? b : a` is
+`if left < right { right } else { left }`. Strict true selects the
+psychrometric right operand; ties and unordered comparisons retain CP390 left
+bits. Left NaN survives, finite left survives right NaN, and signed-zero ties
+retain left bits. There is no duplicate maximum, `f64::max`, method `.max`,
+total/partial ordering, `mul_add`, clamp, normalization, finite/NaN gate,
+coercion, tolerance, alternate enthalpy helper, cache, or mutable service.
+
+Serialization exposes exactly 33 finite-only numeric projections in snapshot
+order and one authoritative IEEE sidecar for each. The inherited CP390 local
+fields are named
+`predecessor_cp390_resulting_supply_enthalpy_j_per_kg` and
+`predecessor_cp390_resulting_supply_temperature_c`; CP391 adds preexisting
+enthalpy, enthalpy-before-maximum, supply-temperature, psychrometric-minimum,
+maximum, assigned-enthalpy, resulting-enthalpy, and unchanged
+`resulting_supply_temperature_c` fields.
+
+Binding order is CP390-to-CP391-to-unchanged-numerical. CP391 never enters,
+consumes, feeds, reconciles with, overwrites, or replaces
+`DirectZonePurchasedAirCouplingInput`, numerical DTO/results, nodes, loads, or
+reports; non-direct paths reject CP391 evidence. It adds no routine or
+psychrometrics-map row and no support, readiness, run-state, feature,
+capability, numerical, output, status, conformance, or Roadmap promotion.
+Both parent algorithms remain `scaffold`/`none`, both Calc routines remain
+`source_mapped`, and `routine.psy_h_fn_tdb_w` remains `state_mapped`. Counts
+remain 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`,
+and 170 required. Script inventory becomes 329 total, 240 public, 89 internal,
+zero unused, zero unreachable, with 238 development commands.

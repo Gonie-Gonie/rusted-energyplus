@@ -33,7 +33,7 @@ pub(in crate::ideal_loads::calc) fn snapshot_is_exact(snapshot: Snapshot) -> boo
     snapshot_route(snapshot).is_some()
 }
 
-pub(super) fn snapshot_route(snapshot: Snapshot) -> Option<RetainedRoute> {
+pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option<RetainedRoute> {
     if snapshot.source
         != PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_CONTROL_CONSTANT_SENSIBLE_HEAT_RATIO_SUPPLY_TEMPERATURE_MIXED_AIR_LIMIT_SOURCE
         || snapshot.first_excluded_source

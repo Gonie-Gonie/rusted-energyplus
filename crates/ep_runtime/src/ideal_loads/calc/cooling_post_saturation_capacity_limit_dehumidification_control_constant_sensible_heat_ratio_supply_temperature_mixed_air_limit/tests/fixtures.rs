@@ -19,12 +19,15 @@ use crate::ideal_loads::{
 };
 
 #[derive(Clone, Copy)]
-pub(super) struct Chain {
+pub(in crate::ideal_loads::calc) struct Chain {
     pub cp389: Cp389,
     pub mixed_air_owner: Cp329,
 }
 
-pub(super) fn alternate_exact_mixed_air_owner(chain: Chain, temperature: f64) -> Cp329 {
+pub(in crate::ideal_loads::calc) fn alternate_exact_mixed_air_owner(
+    chain: Chain,
+    temperature: f64,
+) -> Cp329 {
     let mut predecessor = mixed_air_predecessor(MixedAirRoute::CoolingFallthrough);
     predecessor.system = chain.cp389.system;
     predecessor.parent_call_ordinal = chain.cp389.parent_call_ordinal;
@@ -49,14 +52,14 @@ pub(super) fn alternate_exact_mixed_air_owner(chain: Chain, temperature: f64) ->
 }
 
 impl Chain {
-    pub(super) fn owner(self) -> Option<Cp329> {
+    pub(in crate::ideal_loads::calc) fn owner(self) -> Option<Cp329> {
         self.cp389
             .dehumidification_control_constant_sensible_heat_ratio_supply_temperature_assignment_executed
             .then_some(self.mixed_air_owner)
     }
 }
 
-pub(super) fn chain(
+pub(in crate::ideal_loads::calc) fn chain(
     inherited: usize,
     outcome: usize,
     assignment: bool,
@@ -89,7 +92,7 @@ pub(super) fn chain(
     }
 }
 
-pub(super) fn all_chains() -> Vec<Chain> {
+pub(in crate::ideal_loads::calc) fn all_chains() -> Vec<Chain> {
     let mut chains = Vec::new();
     let mut ordinal = 1;
     for inherited in 0..3 {

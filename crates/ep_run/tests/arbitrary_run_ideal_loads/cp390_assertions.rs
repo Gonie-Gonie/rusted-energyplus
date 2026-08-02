@@ -1,5 +1,8 @@
 //! CP390 supply-temperature mixed-air-limit assertions.
 
+#[path = "cp391_assertions.rs"]
+mod cp391_assertions;
+
 use serde_json::{Map, Value, json};
 
 const CP389_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_temperature_assignment_lifecycle";
@@ -165,6 +168,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         !results.to_string().contains(CP390_KEY),
         "CP390 lifecycle must remain outside numerical result state"
     );
+    cp391_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -173,6 +177,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP390_KEY].is_null(),
         "non-direct runtime must not publish CP390 evidence"
     );
+    cp391_assertions::assert_non_direct(runtime);
 }
 
 fn count(value: &Value, field: &str) -> u64 {
