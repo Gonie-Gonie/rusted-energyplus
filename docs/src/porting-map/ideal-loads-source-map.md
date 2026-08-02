@@ -22926,3 +22926,82 @@ routine.psy_w_fn_tdb_h remains state_mapped. Counts remain 32 algorithms, 293
 routines, 58 state_mapped, 235 source_mapped, and 170 required. Script
 inventory becomes 333 total, 240 public, 93 internal, zero unused, zero
 unreachable, with 238 development commands.
+
+## CP396 post-saturation Humidistat case break
+
+CP396 supersedes only CP395's physical-line-2289 executable exclusion. At
+pinned EnergyPlus commit 6f2e40d10250a105b49966baa24d843711e61048 and locked
+raw SHA-256 54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005,
+it maps PurchasedAirManager.cc physical executable line 2289, `} break;`.
+Physical lines 2290 and 2291 are the excluded `HumControl::None` and
+`HumControl::ConstantSupplyHumidityRatio` sibling labels, and physical
+executable line 2294 is the first lexically subsequent executable. An active
+Humidistat break continues dynamically at physical executable line 2313.
+CP396 represents none of those excluded labels, sibling-body behavior, or the
+line-2313 saturation continuation.
+
+The exact sole source site is
+`exit-purchased-air-post-saturation-capacity-limit-dehumidification-control-humidistat-case-via-break`.
+It is pure control-flow evidence: the CP395 Humidistat arm exits without
+falling through into either sibling label. CP396 performs no selector reread,
+numeric operand read, arithmetic, comparison, psychrometric evaluation,
+assignment, owner acquisition, diagnostic, cache, or mutable-service
+operation.
+
+CP396 preserves CP395's exact thirty routes. Exactly private Humidistat routes
+19, 23, and 26 execute the sole break site; twenty-seven routes skip it.
+Constant-SHR routes 18, 22, and 28 have already broken, while routes 20, 21,
+24, 25, 27, and 29 select later sibling cases. The eleven public exact-direct
+routes 0 through 8, 20, and 24 are inactive, and nineteen routes remain
+private. For CP395 predecessor-route counts R, exact checked state requires
+T396=T395=sum(R[0..29]), B396=A395=R[19]+R[23]+R[26],
+I396+B396=T396, exact thirty-route parity, and
+source_site_execution_count=B396. The CP396 break count also equals CP395's
+Humidistat supply-humidity-ratio assignment count, giving exhaustive
+characterization 30/27/3/3.
+
+Recursively complete same-call bit-exact CP395 lifecycle, snapshot, latest,
+private-witness, and completion evidence is the sole immediate predecessor.
+CP395's Humidistat supply-humidity-ratio-assignment marker is the immediate
+control witness for the break. CP394, CP393, older checkpoints,
+caller/model/service scalars, active-input DTOs, and numerical coupling values
+are recursive lineage or forbidden direct substitutes. Exact route identity
+19, 23, or 26 activates CP396 without rereading dehumidification control.
+
+At this branch boundary CP396 compresses CP395's thirteen numeric fields to
+exactly six `Option<f64>` carriers in this order:
+`predecessor_cp395_resulting_supply_humidity_ratio`,
+`predecessor_cp395_resulting_supply_enthalpy_j_per_kg`,
+`predecessor_cp395_resulting_supply_temperature_c`,
+`resulting_supply_humidity_ratio`,
+`resulting_supply_enthalpy_j_per_kg`, and
+`resulting_supply_temperature_c`. Every predecessor/result pair is bit-exact,
+including signed zero, NaN payloads, and infinities. Humidity is present only
+on routes 18, 19, 22, 23, 26, and 28; enthalpy is present on routes 5, 8, 11,
+14, and 17 through 29; temperature is present on routes 3 through 29. JSON
+pairs the six finite-only projections in exact order with six authoritative
+IEEE sidecars.
+
+The snapshot retains the predecessor constant-SHR case-entry and case-break,
+Humidistat case-entry, and CP395 Humidistat supply-humidity-ratio-assignment
+markers. CP396 adds exactly one local boolean,
+`dehumidification_control_humidistat_case_exited_via_break`. That marker is
+true exactly when the CP395 assignment marker is true and the route is 19,
+23, or 26. CP395's local temperature/enthalpy reads, psychrometric evaluation,
+assignment details, thirteen-field schema, and owner/read/evaluation/write
+counters do not leak across this branch boundary.
+
+Binding order is CP395-to-CP396-to-unchanged-numerical. Public direct release
+continues to select `Dehumidification=None`, so CP396 remains inactive there.
+CP396 never enters, consumes, feeds, reconciles with, overwrites, or replaces
+`DirectZonePurchasedAirCouplingInput`, numerical DTO/results, prediction,
+feedback, nodes, loads, or reports; supported first/last supply-state bits
+remain unchanged, and non-direct paths reject CP396 evidence. CP396 contains
+no line-2290/2291 sibling entry, line-2294 sibling-body operation, or line-2313
+saturation-continuation behavior. It adds no routine or psychrometrics-map row
+and no support, capability, routine, algorithm, or Roadmap promotion. Both
+parent algorithms remain `scaffold`/`none`, both Calc routines remain
+`source_mapped`, and `routine.psy_w_fn_tdb_h` remains `state_mapped`. Counts
+remain 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`,
+and 170 required. Script inventory becomes 334 total, 240 public, 94 internal,
+zero unused, zero unreachable, with 238 development commands.

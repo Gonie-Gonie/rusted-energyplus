@@ -2,6 +2,9 @@
 
 use serde_json::{Map, Value, json};
 
+#[path = "cp396_assertions.rs"]
+mod cp396_assertions;
+
 const CP394_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_entry_lifecycle";
 const CP395_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_supply_humidity_ratio_assignment_lifecycle";
 const ORDER: [&str; 4] = [
@@ -209,6 +212,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         !results.to_string().contains(CP395_KEY),
         "CP395 lifecycle must remain outside numerical result state"
     );
+    cp396_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -217,6 +221,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP395_KEY].is_null(),
         "non-direct runtime must not publish CP395 evidence"
     );
+    cp396_assertions::assert_non_direct(runtime);
 }
 
 fn count(value: &Value, field: &str) -> u64 {

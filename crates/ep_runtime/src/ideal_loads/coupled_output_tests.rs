@@ -98,6 +98,8 @@ mod cooling_post_saturation_capacity_limit_dehumidification_control_constant_sen
 mod cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_temperature_assignment_fixture;
 #[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_temperature_mixed_air_limit_fixture.rs"]
 mod cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_temperature_mixed_air_limit_fixture;
+#[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_break_fixture.rs"]
+mod cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_break_fixture;
 #[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_entry_fixture.rs"]
 mod cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_entry_fixture;
 #[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_supply_humidity_ratio_assignment_fixture.rs"]
@@ -233,6 +235,7 @@ use cooling_post_saturation_capacity_limit_dehumidification_control_constant_sen
 use cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_snapshot;
 use cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_break_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_break_snapshot;
 use cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_entry_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_entry_snapshot;
+use cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_break_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_break_snapshot;
 use cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_supply_humidity_ratio_assignment_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_supply_humidity_ratio_assignment_snapshot;
 use cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_humidity_ratio_assignment_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_humidity_ratio_assignment_snapshot;
 use cooling_default_supply_humidity_ratio_mixed_air_assignment_fixture::calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment_snapshot;
@@ -546,6 +549,12 @@ fn appends_all_no_oa_and_predictor_series_with_hourly_semantics() {
             crate::ideal_loads::calc::
                 cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_supply_humidity_ratio_assignment_snapshot_is_exact_direct_release(
                     output.calculation_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_supply_humidity_ratio_assignment,
+                )
+        );
+        assert!(
+            crate::ideal_loads::calc::
+                cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_break_snapshot_is_exact_direct_release(
+                    output.calculation_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_break,
                 )
         );
     }
@@ -1274,6 +1283,10 @@ fn scaled_output(
         calculation_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_supply_humidity_ratio_assignment_snapshot(
             calculation_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_entry,
         );
+    let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_break =
+        calculation_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_break_snapshot(
+            calculation_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_supply_humidity_ratio_assignment,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -1382,6 +1395,7 @@ fn scaled_output(
         calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_break,
         calculation_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_entry,
         calculation_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_supply_humidity_ratio_assignment,
+        calculation_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_break,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;
