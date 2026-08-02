@@ -173,7 +173,7 @@ Assert-PatternsInOrder -Path $binding -Patterns @(
     'let\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_cp_air_assignment\s*=',
     'let\s+unit_available\s*=',
     'let\s+coupling\s*='
-) -Description "CP398-to-CP399-to-numerical binding order"
+) -Description "CP398-to-CP399-to-CP400-to-numerical binding order"
 Assert-PatternsInOrder -Path $scheduledOutput -Patterns @(
     'pub\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_entry\s*:',
     'pub\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_cp_air_assignment\s*:',
@@ -181,8 +181,8 @@ Assert-PatternsInOrder -Path $scheduledOutput -Patterns @(
 ) -Description "scheduled output order"
 $bindingText = Read-RepoText -Path $binding
 $bindingEvidenceName = 'calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_cp_air_assignment'
-if ([regex]::Matches($bindingText, "\b$bindingEvidenceName\b").Count -ne 2) {
-    throw "CP399 binding evidence must be produced once and stored once without feeding numerical coupling"
+if ([regex]::Matches($bindingText, "\b$bindingEvidenceName\b").Count -ne 3) {
+    throw "CP399 binding evidence must be produced once, consumed by CP400 once, and stored once without feeding numerical coupling"
 }
 foreach ($path in @($transition, $release, $adapter, $coupled, $pipelineValidation)) {
     Assert-NotContains -Path $path -Pattern '\.unwrap\s*\(|\.expect\s*\(|\bpanic!\s*\(' -Description "production panic"
@@ -215,7 +215,7 @@ foreach ($pattern in @(
     )) { Assert-Contains -Path $pipelineValidation -Pattern $pattern -Description "pipeline predecessor/owner/public-route contract" }
 Assert-Contains -Path $pipelineLineage -Pattern 'energyplus_psy_cp_air_fn_w\(humidity_ratio\)' -Description "pipeline canonical CpAir corroboration"
 Assert-Contains -Path $pipelineLineage -Pattern 'owner\.mixed_air_humidity_ratio' -Description "pipeline CP329 operand ownership"
-Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp399_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp400_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-PatternsInOrder -Path $pipelineRoot -Patterns @(
     "$($predecessorStem)::\s*validate_direct_lifecycle",
     "$($stem)::\s*validate_direct_lifecycle"
@@ -243,15 +243,15 @@ if ($cp398Index -lt 0 -or $cp399Index -le $cp398Index -or $completionIndex -le $
     throw "Master CP399 registration order drift"
 }
 $inventory = Read-RepoText -Path 'specs\script_inventory.toml'
-foreach ($pattern in @('script_count = 337', 'dev_command_count = 238', 'unused_script_count = 0', 'unreachable_count = 0')) {
+foreach ($pattern in @('script_count = 338', 'dev_command_count = 238', 'unused_script_count = 0', 'unreachable_count = 0')) {
     Assert-Cp399Text -Text $inventory -Pattern $pattern -Description "inventory"
 }
 if ([regex]::Matches($inventory, '(?m)^classification = "public"$').Count -ne 240 -or
-    [regex]::Matches($inventory, '(?m)^classification = "internal"$').Count -ne 97) {
+    [regex]::Matches($inventory, '(?m)^classification = "internal"$').Count -ne 98) {
     throw "CP399 inventory classification drift"
 }
-Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| executable script records \| 337 \|' -Description "generated script total"
-Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| internal scripts \| 97 \|' -Description "generated internal total"
+Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| executable script records \| 338 \|' -Description "generated script total"
+Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| internal scripts \| 98 \|' -Description "generated internal total"
 
 Write-Host "CP399 post-saturation shared-case CpAir-assignment structure audit passed."
 }

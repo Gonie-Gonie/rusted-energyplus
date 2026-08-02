@@ -9,11 +9,7 @@ use std::collections::BTreeMap;
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneEquipmentListId, ZoneId};
 
 #[rustfmt::skip] use super::super::{PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseEntrySnapshot as Cp348Snapshot, PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioCpAirAssignmentSnapshot as Cp349Snapshot, PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitSnapshot as Cp353Snapshot, PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentSnapshot as Cp350Snapshot, PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyEnthalpyAssignmentSnapshot as Cp352Snapshot, PurchasedAirCalcCoolingPositiveSupplyPostCapacityLimitDehumidificationControlConstantSensibleHeatRatioTotalOutputAssignmentSnapshot as Cp351Snapshot, *};
-use super::{
-    IdealLoadsInitFlags, PurchasedAirInitTopologyDiagnostic, PurchasedAirInitTopologyError,
-    PurchasedAirInitTopologyPlan, PurchasedAirRecirculationSource,
-    PurchasedAirSupplyTemperatureDiagnosticRegistry,
-};
+#[rustfmt::skip] use super::{IdealLoadsInitFlags, PurchasedAirInitTopologyDiagnostic, PurchasedAirInitTopologyError, PurchasedAirInitTopologyPlan, PurchasedAirRecirculationSource, PurchasedAirSupplyTemperatureDiagnosticRegistry};
 
 /// Mutable state retained across PurchasedAir initialization calls.
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -170,6 +166,7 @@ pub struct PurchasedAirRuntimeState {
     #[rustfmt::skip] cooling_post_saturation_capacity_limit_dehumidification_control_none_case_entry_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlNoneCaseEntrySnapshot>,
     #[rustfmt::skip] cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_entry_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSupplyHumidityRatioCaseEntrySnapshot>,
     #[rustfmt::skip] cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_cp_air_assignment_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSupplyHumidityRatioCpAirAssignmentSnapshot>,
+    #[rustfmt::skip] cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_sensible_output_assignment_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSupplyHumidityRatioSensibleOutputAssignmentSnapshot>,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -333,6 +330,7 @@ pub struct PurchasedAirUnitRuntimeState {
     #[doc = "Persistent bounded post-saturation None case-entry state."] #[rustfmt::skip] pub calc_cooling_post_saturation_capacity_limit_dehumidification_control_none_case_entry: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlNoneCaseEntryRuntimeState,
     #[doc = "Persistent bounded post-saturation None/constant-supply shared case-entry state."] #[rustfmt::skip] pub calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_entry: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSupplyHumidityRatioCaseEntryRuntimeState,
     #[doc = "Persistent bounded post-saturation None/constant-supply shared CpAir assignment state."] #[rustfmt::skip] pub calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_cp_air_assignment: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSupplyHumidityRatioCpAirAssignmentRuntimeState,
+    #[doc = "Persistent bounded post-saturation None/constant-supply shared sensible-output assignment state."] #[rustfmt::skip] pub calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_sensible_output_assignment: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSupplyHumidityRatioSensibleOutputAssignmentRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.

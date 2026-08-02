@@ -23179,3 +23179,29 @@ acquire an owner. Binding remains CP398-to-CP399-to-unchanged-numerical, and
 CP399 does not feed numerical DTO/results, nodes, loads, or reports. Counts
 remain 32 algorithms and 293 routines; script inventory becomes 337 total,
 240 public, 97 internal, with 238 development commands.
+
+## CP400 post-saturation shared-case sensible-output assignment
+
+CP400 maps only pinned PurchasedAirManager.cc executable line 2295,
+`CoolSensOutput = SupplyMassFlowRate * CpAir * (PurchAir.MixedAirTemp -
+PurchAir.SupplyTemp);`; executable line 2296 is the first exclusion and CP401
+candidate. Its eight exact sites preserve the source AST as
+`(SupplyMassFlowRate * CpAir) * (MixedAirTemp - SupplyTemp)`, using CP330-owned
+flow, CP399-owned `CpAir` and retained supply temperature, and CP329-owned
+mixed-air temperature without reassociation or finite-result rejection.
+
+CP400 preserves all thirty CP399 routes. Routes 20, 21, 24, 25, 27, and 29
+execute all eight sites; twenty-four skip them. Public routes remain 0 through
+8, 20, and 24, with 20 and 24 active. Exact checked accounting is
+T400=T399, Q400=R20+R21+R24+R25+R27+R29, I400+Q400=T400, exact route parity,
+and eight site executions per active transition: 30/24/6/48.
+
+The lossless schema has twenty-three numeric values plus twenty-three
+authoritative IEEE sidecars: all twelve CP399 values under predecessor names,
+eight local operand/intermediate/result values, then resulting supply W/H/T.
+Inactive routes accept no CP329/CP330 active-operand owner and perform no
+active-operand read. Binding remains
+CP399-to-CP400-to-unchanged-numerical, and CP400 does not feed numerical
+DTO/results, nodes, loads, or reports. Counts remain 32 algorithms and 293
+routines; script inventory becomes 338 total, 240 public, 98 internal, with
+238 development commands.

@@ -5457,3 +5457,60 @@ Roadmap checklist promotion. Both parent algorithms remain
 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
 required. Script inventory becomes 337 total, 240 public, 97 internal, zero
 unused, zero unreachable, with 238 development commands.
+
+## CP400 post-saturation shared-case sensible-output assignment
+
+CP400 supersedes only CP399's physical-line-2295 executable exclusion. At
+pinned EnergyPlus commit 6f2e40d10250a105b49966baa24d843711e61048 and locked
+raw SHA-256 54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005,
+it maps only PurchasedAirManager.cc physical executable line 2295,
+`CoolSensOutput = SupplyMassFlowRate * CpAir *
+(PurchAir.MixedAirTemp - PurchAir.SupplyTemp);`. Physical executable line
+2296, `CoolLatOutput = CoolTotOutput - CoolSensOutput;`, is the first
+excluded executable and CP401 candidate.
+
+The exact eight dependency-ordered sites read retained supply mass flow and
+local CP399 `CpAir`, calculate their first product, read purchased-air
+mixed-air and supply temperatures, calculate the temperature difference,
+multiply the first product by that difference, and assign local
+`CoolSensOutput`. The transition preserves the source AST exactly as
+`(SupplyMassFlowRate * CpAir) * (MixedAirTemp - SupplyTemp)`. It performs no
+reassociation, `mul_add`, clamp, normalization, or finite-result rejection;
+nonfinite numeric JSON projections are null while authoritative IEEE
+sidecars preserve their bits.
+
+CP400 preserves CP399's exact thirty routes. Routes 20, 21, 24, 25, 27, and
+29 execute all eight sites and twenty-four routes skip them. The eleven
+public exact-direct routes remain 0 through 8, 20, and 24; public routes 20
+and 24 are active and the other nine are inactive. For CP399 route counts R,
+define Q400=R[20]+R[21]+R[24]+R[25]+R[27]+R[29]. Exact state requires
+T400=T399=sum(R[0..29]), I400+Q400=T400, exact route parity, every local
+site counter equal to Q400, and source_site_execution_count=8*Q400.
+Exhaustive characterization is 30/24/6/48.
+
+Same-call CP399 snapshot, latest, runtime witness, exact-direct metadata, and
+bounded completion evidence form the sole immediate predecessor. On active
+routes CP330 solely owns positive `SupplyMassFlowRate`, CP399 solely owns
+local `CpAir` and the retained `SupplyTemp` read, and CP329 solely owns
+`MixedAirTemp`; recursively complete same-call witnesses, system identity,
+call ordinal, controlled Zone, and exact operand bits must agree. CP399's
+retained supply temperature recursively carries its CP379 and CP334-or-CP344
+write provenance. Caller/model/service scalars, prior `CpAir` or sensible
+output assignments, and numerical-coupling DTO values are forbidden
+substitutes. Inactive routes acquire or validate no CP329/CP330 active-operand
+owner and perform no active-operand read.
+
+The lossless snapshot has exactly twenty-three `Option<f64>` fields and
+twenty-three authoritative IEEE sidecars: CP399's twelve numeric values under
+predecessor names, eight local read/intermediate/result values, and unchanged
+resulting supply humidity/enthalpy/temperature. Binding order is
+CP399-to-CP400-to-unchanged-numerical. CP400 lifecycle evidence never feeds
+or replaces `DirectZonePurchasedAirCouplingInput`, numerical DTO/results,
+prediction, feedback, nodes, loads, or reports; non-direct paths reject it.
+It adds no routine or psychrometrics-map row and no support, capability,
+routine, algorithm, numerical-conformance, or Roadmap checklist promotion.
+Both parent algorithms remain `scaffold`/`none`, both Calc routines remain
+`source_mapped`, and psychrometric routine status is unchanged. Counts remain
+32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
+required. Script inventory becomes 338 total, 240 public, 98 internal, zero
+unused, zero unreachable, with 238 development commands.
