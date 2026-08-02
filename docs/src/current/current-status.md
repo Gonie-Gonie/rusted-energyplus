@@ -5514,3 +5514,59 @@ Both parent algorithms remain `scaffold`/`none`, both Calc routines remain
 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
 required. Script inventory becomes 338 total, 240 public, 98 internal, zero
 unused, zero unreachable, with 238 development commands.
+
+## CP401 post-saturation shared-case latent-output assignment
+
+CP401 supersedes only CP400's physical-line-2296 executable exclusion. At
+pinned EnergyPlus commit 6f2e40d10250a105b49966baa24d843711e61048 and locked
+raw SHA-256 54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005,
+it maps only PurchasedAirManager.cc physical executable line 2296,
+`CoolLatOutput = CoolTotOutput - CoolSensOutput;`. Physical executable line
+2297, `if (CoolLatOutput >= PurchAir.MaxCoolTotCap) {`, is the first excluded
+executable and CP402 candidate.
+
+The exact four dependency-ordered sites read retained local
+`CoolTotOutput`, read CP400's local `CoolSensOutput`, calculate their raw
+difference, and assign local `CoolLatOutput`. Evaluation remains exactly
+`CoolTotOutput - CoolSensOutput`; CP401 performs no addition-by-negation,
+reassociation, clamp, absolute value, normalization, or finite/range gate.
+Negative values, signed zero, subnormals, overflow, infinity, and NaN remain
+source evidence; nonfinite numeric JSON projections are null while
+authoritative IEEE sidecars preserve their bits.
+
+CP401 preserves CP400's exact thirty routes. Routes 20, 21, 24, 25, 27, and
+29 execute all four sites and twenty-four routes skip them. The eleven
+public exact-direct routes remain 0 through 8, 20, and 24; public routes 20
+and 24 are active and the other nine are inactive. For CP400 route counts R,
+define Q401=R[20]+R[21]+R[24]+R[25]+R[27]+R[29]. Exact state requires
+T401=T400=sum(R[0..29]), I401+Q401=T401, exact route parity, every local
+site counter equal to Q401, and source_site_execution_count=4*Q401.
+Exhaustive characterization is 30/24/6/24.
+
+Same-call CP400 snapshot, latest, runtime witness, exact-direct metadata, and
+bounded completion evidence form the sole immediate predecessor. On active
+routes CP384 solely owns retained `CoolTotOutput`, CP385 provides the
+required same-call bit corroboration, and CP400 solely owns
+`CoolSensOutput`; system identity, call ordinal, controlled Zone, control
+shape, execution flags, and exact operand bits must agree. CP385's retained
+supply enthalpy must also agree with the enthalpy carried through CP400.
+Caller/model/service scalars, CP382 pre-capacity total output, earlier
+sensible-output assignments, and numerical-coupling DTO values are forbidden
+substitutes. Inactive routes accept no CP384/CP385 active-owner bundle and
+perform no active-operand read.
+
+The lossless snapshot has exactly thirty `Option<f64>` fields and thirty
+authoritative IEEE sidecars: CP400's twenty-three numeric values under
+predecessor names, four local total/sensible/calculated-latent/assigned-latent
+values, and unchanged resulting supply humidity/enthalpy/temperature.
+Binding order is CP400-to-CP401-to-unchanged-numerical. CP401 lifecycle
+evidence never feeds or replaces `DirectZonePurchasedAirCouplingInput`,
+numerical DTO/results, prediction, feedback, nodes, loads, or reports;
+non-direct paths reject it. It adds no routine or psychrometrics-map row and
+no support, capability, routine, algorithm, numerical-conformance, or
+Roadmap checklist promotion. Both parent algorithms remain
+`scaffold`/`none`, both Calc routines remain `source_mapped`, and
+psychrometric routine status is unchanged. Counts remain 32 algorithms, 293
+routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
+inventory becomes 339 total, 240 public, 99 internal, zero unused, zero
+unreachable, with 238 development commands.

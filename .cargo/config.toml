@@ -1,0 +1,5 @@
+# The source-order IdealLoads evidence chain is intentionally large in debug
+# builds. Give Cargo-spawned test threads enough stack while preserving any
+# explicit caller override.
+[env]
+RUST_MIN_STACK = { value = "8388608", force = false }

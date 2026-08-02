@@ -25747,3 +25747,29 @@ CP399-to-CP400-to-unchanged-numerical, and CP400 does not feed numerical
 DTO/results, nodes, loads, or reports. Counts remain 32 algorithms and 293
 routines; script inventory becomes 338 total, 240 public, 98 internal, with
 238 development commands.
+
+## CP401 post-saturation shared-case latent-output assignment
+
+CP401 maps only pinned PurchasedAirManager.cc executable line 2296,
+`CoolLatOutput = CoolTotOutput - CoolSensOutput;`; executable line 2297 is
+the first exclusion and CP402 candidate. Its four exact sites read the
+CP384-owned and CP385-corroborated retained total output, read CP400-owned
+sensible output, calculate the raw subtraction, and assign latent output.
+Evaluation is exactly `CoolTotOutput - CoolSensOutput` with no
+addition-by-negation, regrouping, clamp, normalization, or finite/range gate.
+
+CP401 preserves all thirty CP400 routes. Routes 20, 21, 24, 25, 27, and 29
+execute all four sites; twenty-four skip them. Public routes remain 0 through
+8, 20, and 24, with 20 and 24 active. Exact checked accounting is
+T401=T400, Q401=R20+R21+R24+R25+R27+R29, I401+Q401=T401, exact route parity,
+and four site executions per active transition: 30/24/6/24.
+
+The lossless schema has thirty numeric values plus thirty authoritative IEEE
+sidecars: all twenty-three CP400 values under predecessor names, four local
+total/sensible/calculated-latent/assigned-latent values, then resulting supply
+W/H/T. Inactive routes accept no CP384/CP385 active-owner bundle and perform
+no active-operand read. Binding remains
+CP400-to-CP401-to-unchanged-numerical, and CP401 does not feed numerical
+DTO/results, nodes, loads, or reports. Counts remain 32 algorithms and 293
+routines; script inventory becomes 339 total, 240 public, 99 internal, with
+238 development commands.
