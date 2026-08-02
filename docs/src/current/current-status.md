@@ -4896,6 +4896,7 @@ Counts remain 32 algorithms, 293 routines, 58 `state_mapped`, 235
 public, 90 internal, zero unused, zero unreachable, with 238 development
 commands.
 
+
 ## CP393 post-saturation constant-SHR case break
 
 CP393 supersedes only CP392's physical-line-2285 exclusion. At pinned
@@ -5304,4 +5305,85 @@ algorithms remain `scaffold`/`none`, both Calc routines remain
 Counts remain 32 algorithms, 293 routines, 58 `state_mapped`, 235
 `source_mapped`, and 170 required. Script inventory becomes 335 total, 240
 public, 95 internal, zero unused, zero unreachable, with 238 development
+commands.
+
+## CP398 post-saturation shared None/constant-supply-humidity-ratio case entry
+
+CP398 supersedes only CP397's physical-line-2291 control exclusion. At pinned
+EnergyPlus commit 6f2e40d10250a105b49966baa24d843711e61048 and locked raw
+SHA-256 54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005,
+it maps only PurchasedAirManager.cc physical source line 2291,
+`case HumControl::ConstantSupplyHumidityRatio: {`. Physical line 2290's
+`case HumControl::None:` label is already CP397: because it has no body or
+break before the stacked line-2291 label, None routes fall through into the
+same labeled compound statement that directly selected
+ConstantSupplyHumidityRatio routes enter. Comment-only lines 2292-2293 and
+physical executable line 2294,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`, remain excluded; line 2294 is
+the first lexically subsequent executable and the CP399 candidate. Dynamic
+continuation at physical executable line 2313 also remains excluded.
+
+The exact sole source site is
+`enter-purchased-air-post-saturation-capacity-limit-dehumidification-control-none-or-constant-supply-humidity-ratio-shared-case`.
+This is a pure typed stacked-case-label checkpoint. It performs no selector
+reread, numeric operand read, arithmetic, comparison, psychrometric
+evaluation, assignment, owner acquisition, diagnostic, cache, or
+mutable-service operation, and claims none of the shared body.
+
+CP398 preserves CP397's exact thirty routes. None-selector routes 20, 24, and
+27 reach the sole site by fallthrough, while directly selected
+ConstantSupplyHumidityRatio routes 21, 25, and 29 reach the same site. These
+six routes are active and twenty-four routes skip it. Constant-SHR routes 18,
+22, and 28 and Humidistat routes 19, 23, and 26 have already broken. The
+eleven public exact-direct routes remain 0 through 8, 20, and 24: public
+routes 20 and 24 are active by None fallthrough and the other nine are
+inactive. Nineteen routes remain private, with routes 21, 25, 27, and 29
+active and fifteen inactive.
+
+For CP397 route counts R, define
+N398=E397=R[20]+R[24]+R[27] for None fallthrough,
+C398=R[21]+R[25]+R[29] for direct ConstantSupplyHumidityRatio selection, and
+E398=N398+C398. Exact state requires T398=T397=sum(R[0..29]),
+I398=T398-E398, exact route parity, and
+source_site_execution_count=E398. Characterization is 30/24/6/6.
+
+Recursively complete same-call bit-exact CP397 lifecycle, snapshot, latest,
+runtime-witness, and completion evidence is the sole immediate predecessor.
+CP396 and older checkpoints, caller/model/service scalars, active-input DTOs,
+and numerical coupling values are recursive lineage or forbidden direct
+substitutes. Retained route identity plus CP397's None marker distinguishes
+fallthrough from direct selection without a selector reread.
+
+CP398 carries exactly six `Option<f64>` fields, in order:
+`predecessor_cp397_resulting_supply_humidity_ratio`,
+`predecessor_cp397_resulting_supply_enthalpy_j_per_kg`,
+`predecessor_cp397_resulting_supply_temperature_c`,
+`resulting_supply_humidity_ratio`,
+`resulting_supply_enthalpy_j_per_kg`, and
+`resulting_supply_temperature_c`. Every pair is bit-exact. Humidity remains
+present only on routes 18, 19, 22, 23, 26, and 28; enthalpy on routes 5, 8,
+11, 14, and 17 through 29; temperature on routes 3 through 29. JSON pairs the
+six finite-only values with six authoritative IEEE sidecars.
+
+The snapshot retains CP397 control markers, renames its local None entry as
+`predecessor_dehumidification_control_none_case_entered`, and adds exactly
+one local boolean,
+`dehumidification_control_none_or_constant_supply_humidity_ratio_shared_case_entered`,
+true exactly on routes 20, 21, 24, 25, 27, and 29. The persistent local count
+is
+`dehumidification_control_constant_supply_humidity_ratio_case_entry_count`;
+the retained None marker and route counters prove its fallthrough/direct
+partition without extra local flags or numeric counters.
+
+Binding order is CP397-to-CP398-to-unchanged-numerical. Public routes 20 and 24
+carry active CP398 shared-case evidence, but CP398 never feeds or replaces
+`DirectZonePurchasedAirCouplingInput`, numerical DTO/results, prediction,
+feedback, nodes, loads, or reports; non-direct paths reject CP398 evidence.
+It adds no routine or psychrometrics-map row and no support, capability,
+routine, algorithm, numerical-conformance, or Roadmap checklist promotion.
+Both parent algorithms remain `scaffold`/`none`, both Calc routines remain
+`source_mapped`, and `routine.psy_w_fn_tdb_h` remains `state_mapped`.
+Counts remain 32 algorithms, 293 routines, 58 `state_mapped`, 235
+`source_mapped`, and 170 required. Script inventory becomes 336 total, 240
+public, 96 internal, zero unused, zero unreachable, with 238 development
 commands.

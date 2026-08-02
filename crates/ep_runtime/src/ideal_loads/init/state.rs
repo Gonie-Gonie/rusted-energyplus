@@ -168,6 +168,7 @@ pub struct PurchasedAirRuntimeState {
     #[rustfmt::skip] cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_supply_humidity_ratio_assignment_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlHumidistatSupplyHumidityRatioAssignmentSnapshot>,
     #[rustfmt::skip] cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_break_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlHumidistatCaseBreakSnapshot>,
     #[rustfmt::skip] cooling_post_saturation_capacity_limit_dehumidification_control_none_case_entry_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlNoneCaseEntrySnapshot>,
+    #[rustfmt::skip] cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_entry_latest_witnesses: BTreeMap<IdealLoadsAirSystemId, PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSupplyHumidityRatioCaseEntrySnapshot>,
 }
 
 /// Persistent `InitPurchasedAir` state for one IdealLoads system.
@@ -329,6 +330,7 @@ pub struct PurchasedAirUnitRuntimeState {
     #[doc = "Persistent bounded post-saturation Humidistat supply-humidity-ratio assignment state."] #[rustfmt::skip] pub calc_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_supply_humidity_ratio_assignment: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlHumidistatSupplyHumidityRatioAssignmentRuntimeState,
     #[doc = "Persistent bounded post-saturation Humidistat case-break state."] #[rustfmt::skip] pub calc_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_break: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlHumidistatCaseBreakRuntimeState,
     #[doc = "Persistent bounded post-saturation None case-entry state."] #[rustfmt::skip] pub calc_cooling_post_saturation_capacity_limit_dehumidification_control_none_case_entry: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlNoneCaseEntryRuntimeState,
+    #[doc = "Persistent bounded post-saturation None/constant-supply shared case-entry state."] #[rustfmt::skip] pub calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_entry: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSupplyHumidityRatioCaseEntryRuntimeState,
     /// Configured exhaust rejected before return fallback.
     pub rejected_exhaust_node: Option<NodeId>,
     /// First return node named by the source multiple-return warning.
