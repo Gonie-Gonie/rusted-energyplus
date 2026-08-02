@@ -167,7 +167,8 @@ fn public_release_counter_overflow_preserves_cp391_state_and_witness() {
     });
 }
 
-fn completed_cp391_case() -> (PurchasedAirRuntimeState, IdealLoadsAirSystem, Cp391) {
+pub(in crate::ideal_loads::calc) fn completed_cp391_case()
+-> (PurchasedAirRuntimeState, IdealLoadsAirSystem, Cp391) {
     let (mut runtime, system, cp382) = completed_cp382_case_for_cp384_test(false);
     let cp383 = advance_direct_no_oa_calc_cooling_post_saturation_capacity_limit_dehumidification_total_output_guard(
         &mut runtime,

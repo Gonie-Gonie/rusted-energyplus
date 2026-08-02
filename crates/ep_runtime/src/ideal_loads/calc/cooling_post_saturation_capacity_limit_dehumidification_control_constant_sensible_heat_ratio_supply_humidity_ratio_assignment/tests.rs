@@ -7,7 +7,7 @@ use super::*;
 mod corruption;
 pub(in crate::ideal_loads::calc) mod fixtures;
 mod ieee;
-mod release_corruption;
+pub(in crate::ideal_loads::calc) mod release_corruption;
 mod routes;
 
 #[test]

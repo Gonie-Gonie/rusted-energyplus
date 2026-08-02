@@ -38263,3 +38263,73 @@ Counts remain 32 algorithms, 293 routines, 58 `state_mapped`, 235
 `source_mapped`, and 170 required. Script inventory becomes 330 total, 240
 public, 90 internal, zero unused, zero unreachable, with 238 development
 commands.
+
+## CP393 post-saturation constant-SHR case break
+
+CP393 supersedes only CP392's physical-line-2285 exclusion. At pinned
+EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and locked raw
+SHA-256 `54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`,
+it maps `PurchasedAirManager.cc` physical executable line 2285, `} break;`.
+The exact sole source site is
+`exit-purchased-air-post-saturation-capacity-limit-dehumidification-control-constant-sensible-heat-ratio-case-via-break`.
+Physical line 2286's `case HumControl::Humidistat: {` label is the CP394
+control checkpoint, line 2287 is comment-only, and physical executable line
+2288's Humidistat `PsyWFnTdbH` assignment is CP393's first excluded executable
+statement. An active constant-SHR break instead continues dynamically after
+the switch at physical executable line 2313. CP393 represents neither the
+lexical CP394 continuation nor that dynamic continuation.
+
+CP393 preserves CP392's exact thirty routes and control shape. Exactly private
+routes 18, 22, and 28 execute the break site; twenty-seven routes skip it. The
+eleven exact-direct routes 0 through 8, 20, and 24 are inactive, and the other
+nineteen routes remain private. With transition count `T393`, break count
+`B393`, and CP392 assignment count `A392`, exact checked state requires
+`T393=T392`, `B393=A392`, `inactive_transition_count=T393-B393`, exact
+thirty-route parity, and `source_site_execution_count=B393`. Exhaustive
+characterization therefore has 30 transitions, 27 inactive transitions, three
+breaks, and three source-site executions.
+
+Recursively complete same-call bit-exact CP392 lifecycle, snapshot, latest,
+private-witness, and completion evidence is the sole immediate predecessor.
+CP393 takes no scalar active input and performs no numerical operand read,
+arithmetic, comparison, psychrometric evaluation, assignment, or owner
+acquisition. CP391 and older checkpoints, caller/model/service scalars, and
+the numerical DTO are forbidden predecessor substitutes. The active flag is
+derived only from CP392's terminal constant-SHR supply-humidity-ratio
+assignment; the break ends this switch case rather than the parent function.
+
+At this branch boundary CP393 deliberately compresses CP392's forty numeric
+fields to exactly six terminal-carrier projections, in this order:
+`predecessor_cp392_resulting_supply_humidity_ratio`,
+`predecessor_cp392_resulting_supply_enthalpy_j_per_kg`,
+`predecessor_cp392_resulting_supply_temperature_c`,
+`resulting_supply_humidity_ratio`,
+`resulting_supply_enthalpy_j_per_kg`, and
+`resulting_supply_temperature_c`. Each predecessor/result pair is bit-exact.
+Humidity is present only on routes 18, 22, and 28, enthalpy on routes 5, 8,
+11, 14, and 17 through 29, and temperature on routes 3 through 29. JSON exposes
+six finite-only projections paired in that exact order with six authoritative
+IEEE sidecars. The CP393-local boolean subsequence is exactly
+`predecessor_dehumidification_control_constant_sensible_heat_ratio_supply_humidity_ratio_assignment_executed`
+followed by
+`dehumidification_control_constant_sensible_heat_ratio_case_exited_via_break`.
+Schema order is predecessor-terminal boolean, predecessor
+humidity/enthalpy/temperature, break boolean, then resulting
+humidity/enthalpy/temperature; the boolean subsequence is therefore ordered but
+not contiguous. The retained CP386-derived control shape still distinguishes all thirty routes;
+CP392's nine arithmetic/read/write booleans, numeric reads, owner flags, and
+numeric counters do not leak across this control boundary.
+
+Binding order is CP392-to-CP393-to-unchanged-numerical. CP393 never enters,
+consumes, feeds, reconciles with, overwrites, or replaces
+`DirectZonePurchasedAirCouplingInput`, numerical DTO/results, nodes, loads, or
+reports; supported first/last supply-state result bits remain unchanged, and
+non-direct paths reject CP393 evidence. CP393 contains no CP394 Humidistat
+case-entry site, flag, counter, line-2286 behavior, line-2288 assignment, or
+line-2313 saturation-continuation behavior. It adds no routine or
+psychrometrics-map row and no support or Roadmap promotion. Both parent
+algorithms remain `scaffold`/`none`, both Calc routines remain
+`source_mapped`, and `routine.psy_w_fn_tdb_h` remains `state_mapped`. Counts
+remain 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`,
+and 170 required. Script inventory becomes 331 total, 240 public, 91 internal,
+zero unused, zero unreachable, with 238 development commands.

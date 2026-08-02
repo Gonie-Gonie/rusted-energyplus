@@ -130,6 +130,8 @@ use super::{
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMinimumLimitLifecycleSummary,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitError,
     PurchasedAirCalcCoolingPositiveSupplyTemperatureMixedAirLimitLifecycleSummary,
+    PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseBreakError,
+    PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseBreakLifecycleSummary,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCpAirAssignmentError,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCpAirAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioOverdryingLimitError,
@@ -249,6 +251,7 @@ use super::{
     purchased_air_calc_cooling_positive_supply_temperature_assignment_lifecycle_summary,
     purchased_air_calc_cooling_positive_supply_temperature_minimum_limit_lifecycle_summary,
     purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle_summary,
+    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_break_lifecycle_summary,
     purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_lifecycle_summary,
     purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle_summary,
     purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_lifecycle_summary,
@@ -334,6 +337,7 @@ mod cooling_positive_supply_post_capacity_limit_humidity_ratio_mixed_air_assignm
 mod cooling_positive_supply_temperature_assignment_validation;
 mod cooling_positive_supply_temperature_minimum_limit_validation;
 mod cooling_positive_supply_temperature_mixed_air_limit_validation;
+pub(in crate::ideal_loads) mod cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_break_validation;
 pub(in crate::ideal_loads) mod cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_validation;
 pub(in crate::ideal_loads) mod cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_validation;
 pub(in crate::ideal_loads) mod cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_validation;
@@ -684,6 +688,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded post-saturation constant-SHR supply-humidity-ratio assignment lifecycle report.
     pub calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_humidity_ratio_assignment_lifecycle:
         PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyHumidityRatioAssignmentLifecycleSummary,
+    /// Persistent bounded post-saturation constant-SHR case-break lifecycle report.
+    pub calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_break_lifecycle:
+        PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseBreakLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -1018,6 +1025,10 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     /// Final post-saturation constant-SHR supply-humidity-ratio assignment summary could not resolve the bound unit.
     CalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyHumidityRatioAssignmentLifecycle(
         PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyHumidityRatioAssignmentError,
+    ),
+    /// Final post-saturation constant-SHR case-break summary could not resolve the bound unit.
+    CalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseBreakLifecycle(
+        PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseBreakError,
     ),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
@@ -1775,6 +1786,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A post-saturation constant-SHR case-break lifecycle invariant did not match the run.
+    CalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseBreakLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -2195,6 +2215,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
+    /// A post-saturation constant-SHR case-break snapshot did not match its release call.
+    UnexpectedCalculationCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseBreak {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
     /// A successful CP301 call did not retain source-setpoint demand provenance.
     UnexpectedDemandInputKind {
         /// Zero-based nominal system-step index.
@@ -2581,6 +2606,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyHumidityRatioAssignmentLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir post-saturation constant-SHR supply-humidity-ratio assignment lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseBreakLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir post-saturation constant-SHR case-break lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -3254,6 +3283,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir post-saturation constant-SHR supply-humidity-ratio assignment lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseBreakLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir post-saturation constant-SHR case-break lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -3733,6 +3770,12 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its post-saturation constant-SHR supply-humidity-ratio assignment"
+            ),
+            Self::UnexpectedCalculationCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseBreak {
+                timestep_index,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its post-saturation constant-SHR case break"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -4870,6 +4913,18 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             return Err(
                 DirectZonePurchasedAirCoupledRuntimeError::
                     UnexpectedCalculationCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSupplyHumidityRatioAssignment {
+                        timestep_index,
+                    },
+                );
+        }
+        if !cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_break_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseBreak {
                         timestep_index,
                     },
             );
@@ -6236,6 +6291,22 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_break_lifecycle =
+        purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_break_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::
+                CalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioCaseBreakLifecycle,
+        )?;
+    cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_break_validation::validate_lifecycle(
+        &calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_break_lifecycle,
+        &calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_humidity_ratio_assignment_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -6381,6 +6452,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_temperature_mixed_air_limit_lifecycle,
             calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_overdrying_limit_lifecycle,
             calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_humidity_ratio_assignment_lifecycle,
+            calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_case_break_lifecycle,
         },
         state,
         results,

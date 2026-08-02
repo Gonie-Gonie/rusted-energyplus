@@ -308,7 +308,7 @@ Assert-Contains -Path $cp349PipelineValidation -Pattern '(?s)assignments\s*\.che
 Assert-Contains -Path $cp349Serialization -Pattern 'lifecycle_serializes_cp349_direct_none_complete_skip_and_zero_source_counters' -Description "pipeline lifecycle skip JSON"
 Assert-Contains -Path $cp349SnapshotSerialization -Pattern 'direct_none_skip_serializes_null_numeric_values_and_bits' -Description "pipeline null numeric JSON"
 Assert-Contains -Path $cp349SnapshotSerialization -Pattern 'finite_and_nonfinite_numeric_serialization_preserves_authoritative_bits' -Description "defensive serializer bits"
-Assert-Contains -Path $cp349PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp392_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp349PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp393_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp349ArbitraryTests -Pattern 'ideal_loads_no_oa_branch_runs_declared_compatibility_runtime' -Description "arbitrary direct evidence"
 Assert-Contains -Path $cp349ArbitraryTests -Pattern $cp349Lifecycle -Description "arbitrary CP349 lifecycle"
 Assert-NotContains -Path $cp349PipelineValidation -Pattern 'DirectZonePurchasedAirCouplingInput|complete_direct_zone_purchased_air_coupling|latest_numerical|numerical_supply|final_supply' -Description "pipeline numerical firewall"
@@ -431,7 +431,7 @@ foreach ($historical in @(
     )) {
     Assert-Contains `
         -Path "scripts\quality\ideal-loads-structure-audit\$historical" `
-        -Pattern 'non_direct_runtime_rejects_cp316_through_cp392_lifecycle_evidence' `
+        -Pattern 'non_direct_runtime_rejects_cp316_through_cp393_lifecycle_evidence' `
         -Description "historical cumulative non-direct firewall"
 }
 $mainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
@@ -441,13 +441,13 @@ $completionIndex = $mainAuditText.IndexOf('Write-Host "IdealLoads structure audi
 if ($cp348AuditIndex -lt 0 -or $cp349AuditIndex -le $cp348AuditIndex -or $completionIndex -le $cp349AuditIndex) {
     throw "Main IdealLoads audit must dot-source CP349 after CP348 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 330' -Description "CP349 script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 331' -Description "CP349 script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP349 zero uncalled scripts"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern ('path = "scripts/quality/ideal-loads-structure-audit/' + [regex]::Escape((Split-Path $cp349Audit -Leaf)) + '"') -Description "CP349 internal inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern ([regex]::Escape(($cp349Audit -replace '\\', '/')) + '::dot_sources') -Description "CP349 caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 330 \|' -Description "generated CP349 script total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 331 \|' -Description "generated CP349 script total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public total"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 90 \|' -Description "generated internal total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 91 \|' -Description "generated internal total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated zero uncalled"
 Assert-Cp349MutationRejected `
     -Original $cp349ReleaseText `
