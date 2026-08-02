@@ -6,7 +6,7 @@
 //! run-summary/report artifact generation.
 
 #![cfg_attr(test, allow(clippy::expect_used, clippy::unwrap_used))]
-#![recursion_limit = "512"]
+#![recursion_limit = "1024"]
 
 mod config;
 mod diagnostics;

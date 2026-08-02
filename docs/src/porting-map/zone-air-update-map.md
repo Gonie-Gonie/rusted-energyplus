@@ -25801,3 +25801,32 @@ CP401-to-CP402-to-unchanged-numerical, and CP402 does not feed numerical
 DTO/results, nodes, loads, or reports or promote support or Roadmap status.
 Counts remain 32 algorithms and 293 routines; script inventory becomes 340
 total, 240 public, 100 internal, with 238 development commands.
+
+## CP403 post-saturation shared-case latent-output body supply-temperature mixed-air assignment
+
+CP403 maps only pinned PurchasedAirManager.cc executable line 2298,
+`PurchAir.SupplyTemp = PurchAir.MixedAirTemp;`; executable line 2299's
+`PsyWFnTdbH` supply-humidity-ratio assignment is the first exclusion and
+CP404 candidate. Its two exact sites read CP329-owned mixed-air temperature
+carried by CP402 and assign purchased-air supply temperature. CP402 body-entry
+evidence is the only execution authority; CP403 does not repeat the guard and
+copies raw IEEE bits without arithmetic, clamp, normalization, default, or
+finite gate.
+
+CP403 preserves CP402's thirty-six routes: twenty-four inherited inactive and
+six guard-false routes execute zero sites, while six body routes execute both
+sites. Public/private routes remain 13/23, with two public and four private
+assignments. Exact checked accounting is T403=T402, A403=B402,
+Q402=F402+A403, Z403=I402+F402, T403=Z403+A403, and
+source_site_execution_count=2*A403. Exhaustive characterization is
+36/24/6/6/6/30/12.
+
+The lossless schema has forty numeric values plus forty adjacent authoritative
+IEEE sidecars: all thirty-five CP402 values under predecessor names, local
+mixed-air and assigned supply temperatures, then resulting supply W/H/T.
+False and inactive routes preserve CP402 state; body routes replace only
+SupplyTemp with CP329 MixedAirTemp bits. Binding is
+CP402-to-CP403-to-unchanged-numerical, and CP403 does not feed numerical
+DTO/results, nodes, loads, or reports or promote support or Roadmap status.
+Counts remain 32 algorithms and 293 routines; script inventory becomes 341
+total, 240 public, 101 internal, with 238 development commands.

@@ -220,18 +220,20 @@ Assert-Contains -Path $privateCharacterization -Pattern 'private_cooling_post_sa
 Assert-PatternsInOrder -Path $binding -Patterns @(
     'let\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_assignment\s*=',
     'let\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard\s*=',
+    'let\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_assignment\s*=',
     'let\s+unit_available\s*=',
     'let\s+coupling\s*='
-) -Description "CP401-to-CP402-to-numerical binding order"
+) -Description "CP401-to-CP402-to-CP403-to-numerical binding order"
 Assert-PatternsInOrder -Path $scheduledOutput -Patterns @(
     'pub\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_assignment\s*:',
     'pub\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard\s*:',
+    'pub\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_assignment\s*:',
     'pub\s+coupling\s*:'
 ) -Description "scheduled output order"
 $bindingText = Read-RepoText -Path $binding
 $bindingEvidenceName = 'calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard'
-if ([regex]::Matches($bindingText, "\b$bindingEvidenceName\b").Count -ne 2) {
-    throw "CP402 binding evidence must be produced once and stored once without feeding numerical coupling"
+if ([regex]::Matches($bindingText, "\b$bindingEvidenceName\b").Count -ne 3) {
+    throw "CP402 binding evidence must be produced once, consumed once by CP403, and stored once without feeding numerical coupling"
 }
 foreach ($path in @($transition, $release, $adapter, $coupled, $pipelineValidation)) {
     Assert-NotContains -Path $path -Pattern '\.unwrap\s*\(|\.expect\s*\(|\bpanic!\s*\(' -Description "production panic"
@@ -259,7 +261,7 @@ foreach ($pattern in @(
         'CP340 latest corroborator is missing'
     )) { Assert-Contains -Path $pipelineValidation -Pattern $pattern -Description "pipeline owner contract" }
 Assert-Contains -Path $pipelineLineage -Pattern 'cooling_latent_output_w\s*>=\s*maximum_total_cooling_capacity_w' -Description "pipeline raw comparison"
-Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp402_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp403_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-PatternsInOrder -Path $pipelineRoot -Patterns @(
     "$($predecessorStem)::\s*validate_direct_lifecycle",
     "$($stem)::\s*validate_direct_lifecycle"
@@ -289,21 +291,21 @@ foreach ($file in @(Get-ChildItem -LiteralPath $auditRoot -Filter 'cp*.ps1' -Fil
     if ($file.BaseName -notmatch '^cp(?<number>\d+)-') { continue }
     $number = [int]$Matches['number']
     if ($number -ge 334 -and $number -le 401) {
-        Assert-Contains -Path $file.FullName -Pattern 'non_direct_runtime_rejects_cp316_through_cp402_lifecycle_evidence' -Description "historical CP402 non-direct firewall"
+        Assert-Contains -Path $file.FullName -Pattern 'non_direct_runtime_rejects_cp316_through_cp403_lifecycle_evidence' -Description "historical CP402 non-direct firewall"
     }
     if ($number -ge 337 -and $number -le 401) {
-        Assert-Contains -Path $file.FullName -Pattern 'script_count = 340' -Description "historical current script count"
+        Assert-Contains -Path $file.FullName -Pattern 'script_count = 341' -Description "historical current script count"
     }
     if ($number -ge 335 -and $number -le 401) {
-        Assert-Contains -Path $file.FullName -Pattern '\\\| executable script records \\\| 340 \\\|' -Description "historical generated script count"
-        Assert-Contains -Path $file.FullName -Pattern '\\\| internal scripts \\\| 100 \\\|' -Description "historical generated internal count"
+        Assert-Contains -Path $file.FullName -Pattern '\\\| executable script records \\\| 341 \\\|' -Description "historical generated script count"
+        Assert-Contains -Path $file.FullName -Pattern '\\\| internal scripts \\\| 101 \\\|' -Description "historical generated internal count"
     }
     if ($number -ge 367 -and $number -le 401) {
-        Assert-Contains -Path $file.FullName -Pattern 'Count -ne 100' -Description "historical internal classification count"
+        Assert-Contains -Path $file.FullName -Pattern 'Count -ne 101' -Description "historical internal classification count"
     }
 }
 $cp345Audit = "$auditRoot\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1"
-foreach ($pattern in @('\$cp402Call\s*=', 'CP401-to-CP402', 'CP402-to-numerical')) {
+foreach ($pattern in @('\$cp402Call\s*=', 'CP401-to-CP402', 'CP402-to-CP403', 'CP403-to-numerical')) {
     Assert-Contains -Path $cp345Audit -Pattern $pattern -Description "CP345 terminal CP402 order"
 }
 
@@ -315,16 +317,16 @@ if ($cp401Index -lt 0 -or $cp402Index -le $cp401Index -or $completionIndex -le $
     throw "Master CP402 registration order drift"
 }
 $inventory = Read-RepoText -Path 'specs\script_inventory.toml'
-foreach ($pattern in @('script_count = 340', 'dev_command_count = 238', 'unused_script_count = 0', 'unreachable_count = 0')) {
+foreach ($pattern in @('script_count = 341', 'dev_command_count = 238', 'unused_script_count = 0', 'unreachable_count = 0')) {
     Assert-Cp402Text -Text $inventory -Pattern $pattern -Description "inventory"
 }
 if ([regex]::Matches($inventory, '(?m)^classification = "public"$').Count -ne 240 -or
-    [regex]::Matches($inventory, '(?m)^classification = "internal"$').Count -ne 100) {
+    [regex]::Matches($inventory, '(?m)^classification = "internal"$').Count -ne 101) {
     throw "CP402 inventory classification drift"
 }
 Assert-Contains -Path 'specs\script_inventory.toml' -Pattern 'cp402-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-guard\.ps1' -Description "inventory record"
-Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| executable script records \| 340 \|' -Description "generated script total"
-Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| internal scripts \| 100 \|' -Description "generated internal total"
+Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| executable script records \| 341 \|' -Description "generated script total"
+Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| internal scripts \| 101 \|' -Description "generated internal total"
 
 Write-Host "CP402 post-saturation shared-case latent-output maximum-capacity guard structure audit passed."
 }

@@ -5628,3 +5628,71 @@ Both parent algorithms remain `scaffold`/`none`, both Calc routines remain
 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
 required. Script inventory becomes 340 total, 240 public, 100 internal, zero
 unused, zero unreachable, with 238 development commands.
+
+## CP403 post-saturation shared-case latent-output body supply-temperature mixed-air assignment
+
+CP403 supersedes only CP402's physical-line-2298 executable exclusion. At
+pinned EnergyPlus commit 6f2e40d10250a105b49966baa24d843711e61048 and locked
+raw SHA-256 54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005,
+it maps only PurchasedAirManager.cc physical executable line 2298,
+`PurchAir.SupplyTemp = PurchAir.MixedAirTemp;`. Physical executable line
+2299, `PurchAir.SupplyHumRat = PsyWFnTdbH(state, PurchAir.SupplyTemp,
+SupplyEnthalpy, RoutineName);`, is the first excluded executable and CP404
+candidate. Its temperature and enthalpy reads, psychrometric evaluation,
+humidity-ratio write, line-2300 latent-output overwrite, else branch, case
+break, and line-2313 continuation all remain excluded.
+
+The exact two dependency-ordered sites read retained purchased-air
+`MixedAirTemp` and assign its payload to purchased-air `SupplyTemp`. This
+deterministic right-hand-side-read-to-left-hand-side-write witness makes no
+general C++ built-in assignment-evaluation-order claim. CP403 does not reread
+or compare `CoolLatOutput` and `MaxCoolTotCap`; recursively complete CP402
+body-entry evidence is the sole execution authority. The assignment copies
+raw binary64 bits with no arithmetic, comparison, clamp, normalization,
+default, or finite gate. Signed zero, infinities, and NaN payloads remain
+bit-exact defensive characterization.
+
+CP403 preserves CP402's thirty-six logical routes without adding a branch.
+The twenty-four inherited inactive routes and six CP402 guard-false routes
+execute no CP403 site, while the six body-entry routes for predecessor indices
+20, 21, 24, 25, 27, and 29 execute both sites. Thirteen routes remain public
+and twenty-three private; body assignments for indices 20 and 24 are public
+and those for 21, 25, 27, and 29 are private. For assignments A403, CP402
+body entries B402, false fallthroughs F402, evaluations Q402, inherited
+inactive transitions I402, and CP403 zero-site transitions Z403, exact state
+requires T403=T402, A403=B402, Q402=F402+A403, Z403=I402+F402,
+T403=Z403+A403, both site counters equal A403, and
+source_site_execution_count=2*A403. Exhaustive characterization is
+36/24/6/6/6/30/12 for transitions, inherited inactive transitions, false
+fallthroughs, body entries, assignments, zero-site transitions, and site
+executions.
+
+Same-call CP402 snapshot, latest, runtime witness, exact-direct metadata, and
+bounded completion evidence form the sole immediate predecessor and branch
+authority. Same-call CP329 solely owns `MixedAirTemp`; its private witness and
+the value carried through CP400, CP401, and CP402 must agree in system, call
+ordinal, controlled Zone, no-OA shape, execution flags, and exact bits.
+Caller/model/service scalars, Zone or supply temperature substitutes,
+inferred values, and numerical-coupling DTO values are forbidden. On body
+routes assigned and resulting supply temperature equal CP329 mixed-air
+temperature bit-for-bit, and CP403 becomes the current supply-temperature
+owner. On zero-site routes CP402 resulting supply temperature is preserved;
+resulting supply humidity ratio and enthalpy remain unchanged on every route.
+
+The lossless snapshot has exactly forty `Option<f64>` fields and forty
+authoritative adjacent IEEE sidecars: all thirty-five CP402 numeric values
+under predecessor names, local mixed-air temperature and assigned supply
+temperature, then current resulting supply humidity/enthalpy/temperature.
+There is no local preexisting-supply-temperature source field because line
+2298 does not read its left-hand side; preservation uses the CP402 predecessor
+result. Binding order is CP402-to-CP403-to-unchanged-numerical. CP403 lifecycle
+evidence never feeds or replaces `DirectZonePurchasedAirCouplingInput`,
+numerical DTO/results, prediction, feedback, nodes, loads, or reports;
+non-direct paths reject it. It adds no routine or psychrometrics-map row and
+no support, capability, routine, algorithm, numerical-conformance, or
+Roadmap checklist promotion. Both parent algorithms remain `scaffold`/`none`,
+both Calc routines remain `source_mapped`, and psychrometric routine status is
+unchanged. Counts remain 32 algorithms, 293 routines, 58 `state_mapped`, 235
+`source_mapped`, and 170 required. Script inventory becomes 341 total, 240
+public, 101 internal, zero unused, zero unreachable, with 238 development
+commands.
