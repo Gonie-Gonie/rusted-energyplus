@@ -7,7 +7,7 @@ use crate::ideal_loads::PurchasedAirRuntimeState;
 mod release;
 mod state;
 #[cfg(test)]
-mod tests;
+pub(in crate::ideal_loads::calc) mod tests;
 mod transition;
 
 pub use release::{

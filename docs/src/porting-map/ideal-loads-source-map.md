@@ -22819,3 +22819,110 @@ and no support or Roadmap promotion. Both parent algorithms remain
 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
 required. Script inventory becomes 332 total, 240 public, 92 internal, zero
 unused, zero unreachable, with 238 development commands.
+
+## CP395 post-saturation Humidistat supply-humidity-ratio assignment
+
+CP395 supersedes only CP394's physical-line-2288 executable exclusion. At
+pinned EnergyPlus commit 6f2e40d10250a105b49966baa24d843711e61048 and locked
+raw SHA-256 54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005,
+it maps PurchasedAirManager.cc physical executable line 2288,
+PurchAir.SupplyHumRat = PsyWFnTdbH(state, PurchAir.SupplyTemp,
+SupplyEnthalpy, RoutineName);. Physical executable line 2289's } break; is
+the first excluded statement and CP396 boundary. That break sends an active
+Humidistat route dynamically to physical executable line 2313; CP395
+represents neither the break nor line-2313 saturation-continuation behavior.
+
+The exact four dependency-ordered sites are
+read-purchased-air-supply-temperature-for-humidistat-humidity-ratio-inversion,
+read-local-supply-enthalpy-for-humidistat-humidity-ratio-inversion,
+evaluate-psy-w-fn-tdb-h-for-humidistat-capacity-limit, and
+assign-purchased-air-supply-humidity-ratio-for-humidistat-capacity-limit.
+The two reads are side-effect-free, so this deterministic witness order makes
+no C++ function-argument-evaluation-order claim.
+
+CP395 preserves CP394's exact thirty routes. Exactly private Humidistat routes
+19, 23, and 26 execute all four sites; twenty-seven routes skip them.
+Constant-SHR routes 18, 22, and 28 have already broken, while routes 20, 21,
+24, 25, 27, and 29 select later sibling cases. The eleven public exact-direct
+routes 0 through 8, 20, and 24 are inactive, and nineteen routes remain
+private. For CP394 predecessor-route counts R, exact checked state requires
+T395=T394=sum(R[0..29]), A395=H394=R[19]+R[23]+R[26],
+I395+A395=T395, exact thirty-route parity, and every active read, evaluation,
+and write counter equal to A395. source_site_execution_count=4*A395, giving
+exhaustive characterization 30/27/3/12.
+
+Recursively complete same-call bit-exact CP394 lifecycle, snapshot, latest,
+private-witness, and completion evidence is the sole immediate predecessor.
+CP394 resulting_supply_temperature_c solely owns line 2288's
+PurchAir.SupplyTemp operand, and CP394 resulting_supply_enthalpy_j_per_kg
+solely owns local SupplyEnthalpy. CP393, CP392, CP385, CP379, CP329,
+caller/model/service scalars, active-input DTOs, and numerical coupling values
+are recursive lineage or forbidden direct substitutes. CP395 rereads no
+selector; exact route identity 19, 23, or 26 activates the operation.
+
+Across all thirty routes, CP394 owns predecessor humidity on routes 18, 22,
+and 28, enthalpy on routes 5, 8, 11, 14, and 17 through 29, and temperature
+on routes 3 through 29. CP395 records exhaustive CP394 owner counts 3/17/27
+and unchanged humidity/enthalpy/temperature preservation counts 3/17/27.
+Only routes 19, 23, and 26 read temperature and enthalpy and produce a new
+humidity ratio. Inactive constant-SHR routes 18, 22, and 28 preserve
+predecessor humidity bit-exactly without any CP395-local operation.
+
+The transition calls canonical stateless
+energyplus_psy_w_fn_tdb_h(temperature, enthalpy) with exact grouping
+(enthalpy_j_per_kg - 1.004_84e3 * dry_bulb_c) / (2.500_94e6 +
+1.858_95e3 * dry_bulb_c), then applies only the strict-negative
+if humidity_ratio < 0.0 { 1.0e-5 } else { humidity_ratio } floor.
+The floor bits are 0x3ee4f8b588e368f1. Strictly negative finite or
+negative-infinite raw results floor; positive sub-floor values, negative zero,
+NaN/unordered results, positive infinity, and denominator-pole behavior retain
+canonical helper semantics. There is no finite/NaN gate, min/max, clamp,
+normalization, regrouping, mul_add, coercion, cache, or mutable service.
+Optional EP_psych_stats, EP_psych_errors, state, RoutineName / CalledFrom, and
+SuppressWarnings diagnostics remain deferred.
+
+CP395 retains CP394's lossless compressed shape. Its numeric schema order
+is exactly predecessor_cp393_resulting_supply_humidity_ratio,
+predecessor_cp393_resulting_supply_enthalpy_j_per_kg,
+predecessor_cp393_resulting_supply_temperature_c,
+predecessor_cp394_resulting_supply_humidity_ratio,
+predecessor_cp394_resulting_supply_enthalpy_j_per_kg,
+predecessor_cp394_resulting_supply_temperature_c, supply_temperature_c,
+supply_enthalpy_j_per_kg, psychrometric_supply_humidity_ratio,
+assigned_supply_humidity_ratio, resulting_supply_humidity_ratio,
+resulting_supply_enthalpy_j_per_kg, and resulting_supply_temperature_c. This
+is exactly thirteen Option<f64> fields and thirteen authoritative IEEE
+sidecars in that order. Both predecessor triples have humidity only on routes
+18, 22, and 28,
+enthalpy on 5, 8, 11, 14, and 17 through 29, and temperature on 3 through 29.
+The four source-local values exist only on routes 19, 23, and 26. Resulting
+humidity exists on exactly routes 18, 19, 22, 23, 26, and 28; resulting
+enthalpy and temperature preserve predecessor presence and bits.
+
+The exact ten-field CP395-local boolean subsequence is
+dehumidification_control_humidistat_supply_humidity_ratio_assignment_executed,
+cp394_retained_supply_humidity_ratio_state_owned,
+cp394_retained_supply_temperature_state_owned,
+cp394_retained_supply_enthalpy_state_owned,
+cp394_retained_supply_temperature_owned_read,
+supply_temperature_for_humidity_ratio_inversion_read,
+cp394_retained_supply_enthalpy_owned_read,
+supply_enthalpy_for_humidity_ratio_inversion_read,
+psychrometric_supply_humidity_ratio_evaluated, and
+supply_humidity_ratio_assignment_performed. The snapshot retains CP394's
+predecessor constant-SHR break and predecessor Humidistat-entry evidence
+before the lossless numeric boundary. JSON pairs all thirteen finite-only
+projections in exact order with thirteen IEEE sidecars.
+
+Binding order is CP394-to-CP395-to-unchanged-numerical. CP395 never enters or
+feeds DirectZonePurchasedAirCouplingInput, numerical DTO/results, prediction,
+feedback, nodes, loads, or reports; supported first/last supply-state result
+bits remain unchanged, and non-direct paths reject CP395 evidence. CP395
+contains no CP396 case-break site, flag, counter, or line-2289 behavior and no
+line-2313 saturation-continuation operation. It adds no routine or
+psychrometrics-map row and no support or Roadmap promotion. Both parent
+algorithms remain scaffold/none, both Calc routines remain source_mapped, and
+routine.psy_w_fn_tdb_h remains state_mapped. Counts remain 32 algorithms, 293
+routines, 58 state_mapped, 235 source_mapped, and 170 required. Script
+inventory becomes 333 total, 240 public, 93 internal, zero unused, zero
+unreachable, with 238 development commands.
