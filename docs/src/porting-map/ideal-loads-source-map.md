@@ -22664,6 +22664,7 @@ public, 90 internal, zero unused, zero unreachable, with 238 development
 commands.
 
 
+
 ## CP393 post-saturation constant-SHR case break
 
 CP393 supersedes only CP392's physical-line-2285 exclusion. At pinned
@@ -23154,3 +23155,27 @@ Counts remain 32 algorithms, 293 routines, 58 `state_mapped`, 235
 `source_mapped`, and 170 required. Script inventory becomes 336 total, 240
 public, 96 internal, zero unused, zero unreachable, with 238 development
 commands.
+
+## CP399 post-saturation shared-case `CpAir` assignment
+
+CP399 maps only pinned PurchasedAirManager.cc executable line 2294,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`; executable line 2295 is the
+first exclusion and CP400 candidate. CP398 already owns the shared case entry.
+Its three exact sites read same-call CP329-owned mixed-air humidity, evaluate
+canonical stateless `energyplus_psy_cp_air_fn_w`, and assign local `CpAir`.
+
+CP399 preserves all thirty CP398 routes. Routes 20, 21, 24, 25, 27, and 29
+execute all three sites; twenty-four skip them. Public routes remain 0 through
+8, 20, and 24, with 20 and 24 active. Exact checked accounting is
+T399=T398, K399=R20+R21+R24+R25+R27+R29, I399+K399=T399, exact route parity,
+and three site executions per active transition: 30/24/6/18.
+
+The lossless schema has twelve numeric values plus twelve authoritative IEEE
+sidecars: retained predecessor-CP397 and predecessor-CP398 supply W/H/T
+triples, local mixed-air humidity and evaluated/assigned `CpAir`, then
+resulting supply W/H/T. Active operands require finite W>=0 and finite helper
+result; signed zeros and subnormals remain accepted. Inactive routes do not
+acquire an owner. Binding remains CP398-to-CP399-to-unchanged-numerical, and
+CP399 does not feed numerical DTO/results, nodes, loads, or reports. Counts
+remain 32 algorithms and 293 routines; script inventory becomes 337 total,
+240 public, 97 internal, with 238 development commands.

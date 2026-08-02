@@ -20511,6 +20511,7 @@ public, 78 internal, zero unused, zero unreachable, and 238 development
 commands.
 
 
+
 ## CP381 Source-Ordered Cooling Post-Saturation Capacity-Limit Dehumidification Guard
 
 CP381 maps exactly EnergyPlus 26.1 `PurchasedAirManager.cc` executable line
@@ -21731,3 +21732,72 @@ Counts remain 32 algorithms, 293 routines, 58 `state_mapped`, 235
 `source_mapped`, and 170 required. Script inventory becomes 336 total, 240
 public, 96 internal, zero unused, zero unreachable, with 238 development
 commands.
+
+## CP399 post-saturation shared-case `CpAir` assignment
+
+CP399 supersedes only CP398's physical-line-2294 executable exclusion. At
+pinned EnergyPlus commit 6f2e40d10250a105b49966baa24d843711e61048 and locked
+raw SHA-256 54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005,
+it maps only PurchasedAirManager.cc physical executable line 2294,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`. Physical executable line
+2295, `CoolSensOutput = SupplyMassFlowRate * CpAir *
+(PurchAir.MixedAirTemp - PurchAir.SupplyTemp);`, is the first excluded
+executable and CP400 candidate. CP398 already owns the stacked shared case
+entry, so CP399 does not repeat a case-entry site.
+
+The exact three dependency-ordered sites are
+`read-purchased-air-mixed-air-humidity-ratio-for-post-saturation-capacity-limit-none-or-constant-supply-humidity-ratio-cp-air`,
+`evaluate-psy-cp-air-fn-w-for-post-saturation-capacity-limit-none-or-constant-supply-humidity-ratio-cp-air`,
+and
+`assign-local-cp-air-for-post-saturation-capacity-limit-none-or-constant-supply-humidity-ratio-case`.
+CP399 preserves CP398's exact thirty routes. Routes 20, 21, 24, 25, 27, and
+29 execute all three sites and twenty-four routes skip them. The eleven
+public exact-direct routes remain 0 through 8, 20, and 24; public routes 20
+and 24 are active and the other nine are inactive. Four additional active
+routes and fifteen inactive routes remain private.
+
+For CP398 route counts R, define
+K399=R[20]+R[21]+R[24]+R[25]+R[27]+R[29]. Exact state requires
+T399=T398=sum(R[0..29]), I399+K399=T399, exact route parity, each local
+read/evaluation/write counter equal to K399, and
+source_site_execution_count=3*K399. Exhaustive characterization is
+30/24/6/18.
+
+Same-call CP398 snapshot, latest, runtime witness, exact-direct metadata, and
+bounded completion evidence form the sole immediate predecessor. On active
+routes, recursively complete same-call CP329 `cooling_mixed_air_call`
+latest plus private witness solely owns `PurchAir.MixedAirHumRat`; system,
+call ordinal, controlled Zone, no-OA execution flags, and operand bits must
+all agree. Supply or Zone humidity, caller/model/service values, prior CP331,
+CP338, or CP387 `CpAir`, and numerical-coupling values are forbidden
+substitutes. Inactive routes acquire or validate no numeric owner.
+
+The transition calls canonical stateless `energyplus_psy_cp_air_fn_w` once
+and assigns its binary64 result. Active input must be finite and greater than
+or equal to zero, accepting both signed zeros and subnormals, and the helper
+result must be finite. The C++ mutable `dwSave`/`cpaSave` cache, sentinel,
+first-call anomaly, reset, history, interleaving, and concurrency remain
+excluded. Validation and overflow preflight are transactional.
+
+CP399 carries exactly twelve `Option<f64>` fields and twelve authoritative
+IEEE sidecars. In order these are CP398's retained predecessor-CP397
+humidity/enthalpy/temperature triple, the renamed predecessor-CP398
+resulting humidity/enthalpy/temperature triple, local mixed-air humidity,
+evaluated `CpAir`, assigned `CpAir`, and resulting
+humidity/enthalpy/temperature. Both predecessor triples and the final triple
+preserve their carrier bits and presence exactly; local values exist only on
+the six active routes. Its local boolean sequence is the shared-body
+`CpAir`-assignment marker, mixed-air-humidity read, psychrometric evaluation,
+and local assignment, all true exactly on the active routes.
+
+Binding order is CP398-to-CP399-to-unchanged-numerical. CP399 lifecycle
+evidence never feeds or replaces `DirectZonePurchasedAirCouplingInput`,
+numerical DTO/results, prediction, feedback, nodes, loads, or reports;
+non-direct paths reject it. It adds no routine or psychrometrics-map row and
+no support, capability, routine, algorithm, numerical-conformance, or
+Roadmap checklist promotion. Both parent algorithms remain
+`scaffold`/`none`, both Calc routines remain `source_mapped`, and
+`routine.psy_cp_air_fn_w` remains `state_mapped`. Counts remain 32
+algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
+required. Script inventory becomes 337 total, 240 public, 97 internal, zero
+unused, zero unreachable, with 238 development commands.
