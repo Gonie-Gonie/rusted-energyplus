@@ -21914,3 +21914,61 @@ psychrometric routine status is unchanged. Counts remain 32 algorithms, 293
 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
 inventory becomes 339 total, 240 public, 99 internal, zero unused, zero
 unreachable, with 238 development commands.
+
+## CP402 post-saturation shared-case latent-output maximum-capacity guard
+
+CP402 supersedes only CP401's physical-line-2297 executable exclusion. At
+pinned EnergyPlus commit 6f2e40d10250a105b49966baa24d843711e61048 and locked
+raw SHA-256 54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005,
+it maps only PurchasedAirManager.cc physical executable line 2297,
+`if (CoolLatOutput >= PurchAir.MaxCoolTotCap) {`. Physical executable line
+2298, `PurchAir.SupplyTemp = PurchAir.MixedAirTemp;`, is the first excluded
+executable and CP403 candidate.
+
+The exact four dependency-ordered sites read retained local
+`CoolLatOutput`, read retained `MaxCoolTotCap`, compare the two operands with
+raw binary64 `>=`, and enter the conditional body when the comparison is
+satisfied. Equality enters the body, NaN falls through, positive infinity
+enters and negative infinity falls through against a finite nonnegative
+maximum. CP402 performs no subtraction, reassociation, tolerance, clamp,
+normalization, or finite-result gate and performs none of the line-2298 or
+later supply-state assignments.
+
+CP402 refines CP401's thirty predecessor routes into thirty-six logical
+successor routes. The twenty-four inactive routes remain one-to-one; each
+active predecessor index 20, 21, 24, 25, 27, and 29 splits into guard-false
+and body-entry outcomes. Thirteen successor routes are public exact-direct
+evidence: the nine inactive routes corresponding to predecessor indices 0
+through 8 plus both outcomes for indices 20 and 24. The other twenty-three
+routes are private characterization. Exact state requires T402=T401, exact
+predecessor/successor refinement, Q402=F402+B402, I402+Q402=T402, both operand
+reads and the comparison counter equal to Q402, the body-entry site counter
+equal to B402, and source_site_execution_count=3*Q402+B402. Exhaustive
+characterization is 36/24/12/6/6/42 for transitions, inactive transitions,
+guard evaluations, false fallthroughs, body entries, and site executions.
+
+Same-call CP401 snapshot, latest, runtime witness, exact-direct metadata, and
+bounded completion evidence form the sole immediate predecessor and
+left-operand owner. On active routes CP321 solely owns retained
+`MaxCoolTotCap` and CP340 supplies the required same-call bit corroboration;
+system identity, call ordinal, controlled Zone, control shape, execution
+flags, and exact operand bits must agree. Caller/model/service scalars,
+inferred capacity, earlier latent-output assignments, and numerical-coupling
+DTO values are forbidden substitutes. Inactive routes accept no CP321/CP340
+active-owner bundle and perform no active-operand read.
+
+The lossless snapshot has exactly thirty-five `Option<f64>` fields and
+thirty-five authoritative IEEE sidecars: CP401's thirty numeric values under
+predecessor names, local cooling-latent-output and
+maximum-total-cooling-capacity operands, and unchanged resulting supply
+humidity/enthalpy/temperature. Binding order is
+CP401-to-CP402-to-unchanged-numerical. CP402 lifecycle evidence never feeds
+or replaces `DirectZonePurchasedAirCouplingInput`, numerical DTO/results,
+prediction, feedback, nodes, loads, or reports; non-direct paths reject it.
+It adds no routine or psychrometrics-map row and no support, capability,
+routine, algorithm, numerical-conformance, or Roadmap checklist promotion.
+Both parent algorithms remain `scaffold`/`none`, both Calc routines remain
+`source_mapped`, and psychrometric routine status is unchanged. Counts remain
+32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
+required. Script inventory becomes 340 total, 240 public, 100 internal, zero
+unused, zero unreachable, with 238 development commands.

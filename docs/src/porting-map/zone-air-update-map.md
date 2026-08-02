@@ -25773,3 +25773,31 @@ CP400-to-CP401-to-unchanged-numerical, and CP401 does not feed numerical
 DTO/results, nodes, loads, or reports. Counts remain 32 algorithms and 293
 routines; script inventory becomes 339 total, 240 public, 99 internal, with
 238 development commands.
+
+## CP402 post-saturation shared-case latent-output maximum-capacity guard
+
+CP402 maps only pinned PurchasedAirManager.cc executable line 2297,
+`if (CoolLatOutput >= PurchAir.MaxCoolTotCap) {`; executable line 2298,
+`PurchAir.SupplyTemp = PurchAir.MixedAirTemp;`, is the first exclusion and
+CP403 candidate. Its four exact sites read CP401-owned latent output, read
+CP321-owned and CP340-corroborated maximum total cooling capacity, evaluate
+raw binary64 `>=`, and enter the body when satisfied. Equality enters, NaN
+falls through, and no tolerance, clamp, normalization, or finite-result gate
+is added.
+
+CP402 refines CP401's thirty predecessor routes into thirty-six successors:
+twenty-four inactive routes remain one-to-one, while predecessor indices 20,
+21, 24, 25, 27, and 29 each split into false and body-entry outcomes. Public
+successors number thirteen and private successors twenty-three. Exact checked
+accounting is T402=T401, Q402=F402+B402, I402+Q402=T402, exact route
+refinement, and source_site_execution_count=3*Q402+B402. Exhaustive
+characterization is 36/24/12/6/6/42.
+
+The lossless schema has thirty-five numeric values plus thirty-five
+authoritative IEEE sidecars: all thirty CP401 values under predecessor names,
+two local operands, then resulting supply W/H/T. Inactive routes accept no
+CP321/CP340 active-owner bundle and perform no active-operand read. Binding is
+CP401-to-CP402-to-unchanged-numerical, and CP402 does not feed numerical
+DTO/results, nodes, loads, or reports or promote support or Roadmap status.
+Counts remain 32 algorithms and 293 routines; script inventory becomes 340
+total, 240 public, 100 internal, with 238 development commands.

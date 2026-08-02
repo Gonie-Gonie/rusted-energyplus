@@ -2,6 +2,9 @@
 
 use serde_json::{Map, Value, json};
 
+#[path = "cp402_assertions.rs"]
+mod cp402_assertions;
+
 const CP384_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_total_output_maximum_capacity_assignment_lifecycle";
 const CP385_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment_lifecycle";
 const CP400_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_sensible_output_assignment_lifecycle";
@@ -267,6 +270,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         !results.to_string().contains(CP401_KEY),
         "CP401 lifecycle must remain outside numerical result state"
     );
+    cp402_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -275,6 +279,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP401_KEY].is_null(),
         "non-direct runtime must not publish CP401 evidence"
     );
+    cp402_assertions::assert_non_direct(runtime);
 }
 
 fn inherited_numeric_lineage() -> [(&'static str, &'static str); 23] {
