@@ -5762,3 +5762,53 @@ numerical-conformance, or Roadmap promotion. Both parent algorithms remain
 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
 Script inventory becomes 342 total, 240 public, 102 internal, zero unused,
 zero unreachable, with 238 development commands.
+
+
+## CP405 post-saturation shared-case latent-output body maximum-capacity assignment
+
+CP405 supersedes only CP404's physical-line-2300 executable exclusion by
+mapping `CoolLatOutput = PurchAir.MaxCoolTotCap;` at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048` and locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its two exact dependency-ordered sites are
+`read-retained-maximum-total-cooling-capacity-for-post-saturation-capacity-limit-none-or-constant-supply-humidity-ratio-latent-output-assignment`
+and
+`assign-local-cooling-latent-output-from-maximum-total-cooling-capacity`.
+Physical line 2301, `} else {`, is the first excluded lexical/control boundary
+and CP406 candidate. Physical executable line 2302,
+`PurchAir.SupplyTemp = PsyTdbFnHW(SupplyEnthalpy, PurchAir.SupplyHumRat);`,
+is the first excluded executable.
+
+CP405 preserves CP404's thirty-six logical routes without adding a branch.
+Twenty-four inherited inactive routes and six CP402 guard-false routes execute
+zero sites. Predecessor indices 20, 21, 24, 25, 27, and 29 execute both sites,
+so characterization is 36/30/6/12 for transitions, zero-site transitions,
+assignments, and site executions. Public/private routes remain 13/23; active
+public indices are 20 and 24, and active private indices are 21, 25, 27, and
+29. Exact accounting requires `T405=T404`, `A405=A404=B402`,
+`Z405=I402+F402`, `T405=Z405+A405`, each site counter equal to A405, and
+`source_site_execution_count=2*A405`.
+
+Recursively complete same-call bit-exact CP404 is the sole immediate
+predecessor and execution authority. On active routes, recursively carried
+CP321 ownership and CP340 same-call corroboration solely provide
+`MaxCoolTotCap`. CP405 reads that retained payload and copies its raw
+binary64 bits into assigned and resulting `CoolLatOutput`. It adds no
+arithmetic, comparison, tolerance, clamp, normalization, default,
+psychrometrics, or finite gate; zero-site routes read no operand. Resulting
+supply W/H/T remain bit-identical to CP404 on every route.
+
+The lossless snapshot has exactly 161 fields: all 147 CP404 fields under
+predecessor names followed by fourteen CP405-local fields. Exactly fifty-four
+fields are `Option<f64>` and each has one adjacent authoritative IEEE
+sidecar. The numeric tail is preexisting cooling latent output, maximum total
+cooling capacity, assigned cooling latent output, resulting cooling latent
+output, and resulting W/H/T. Binding is
+CP404-to-CP405-to-unchanged-numerical. CP405 never feeds or replaces
+`DirectZonePurchasedAirCouplingInput`, numerical DTO/results, prediction,
+feedback, nodes, loads, or reports; non-direct paths reject it. It adds no
+routine or source-map row and no support, capability, algorithm,
+numerical-conformance, psychrometrics-map, or Roadmap promotion. Counts remain
+32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and
+170 required. Script inventory becomes 343 total, 240 public, 103 internal,
+zero unused, zero unreachable, with 238 development commands.

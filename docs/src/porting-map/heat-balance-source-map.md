@@ -38921,3 +38921,34 @@ Binding is CP403-to-CP404-to-unchanged-numerical, and CP404 does not feed
 numerical DTO/results, nodes, loads, or reports or promote support or Roadmap
 status. Counts remain 32 algorithms and 293 routines; script inventory becomes
 342 total, 240 public, 102 internal, with 238 development commands.
+
+
+## CP405 post-saturation shared-case latent-output body maximum-capacity assignment
+
+CP405 maps pinned `PurchasedAirManager.cc` physical executable line 2300,
+`CoolLatOutput = PurchAir.MaxCoolTotCap;`, through the exact sites
+`read-retained-maximum-total-cooling-capacity-for-post-saturation-capacity-limit-none-or-constant-supply-humidity-ratio-latent-output-assignment`
+and
+`assign-local-cooling-latent-output-from-maximum-total-cooling-capacity`.
+Line 2301's `} else {` is the first excluded lexical/control boundary and
+CP406 candidate; line 2302's `PsyTdbFnHW` supply-temperature assignment is
+the first excluded executable.
+
+CP405 preserves all thirty-six CP404 routes. Active predecessor indices 20,
+21, 24, 25, 27, and 29 execute both sites; the other thirty routes execute
+none. Public/private routes remain 13/23, with active public indices 20 and
+24. Exact checked accounting is `T405=T404`, `A405=A404=B402`,
+`Z405=I402+F402`, `T405=Z405+A405`, and
+`source_site_execution_count=2*A405`; exhaustive characterization is
+36/30/6/12.
+
+Recursively complete CP404 is the sole predecessor. CP321 ownership and CP340
+same-call corroboration are carried recursively to provide `MaxCoolTotCap`;
+active routes copy its raw IEEE payload into local cooling latent output, and
+all routes preserve CP404 W/H/T bits. The lossless schema has 161 fields,
+including fifty-four numeric values with fifty-four adjacent authoritative
+IEEE sidecars. Binding is CP404-to-CP405-to-unchanged-numerical, and CP405
+does not feed numerical DTO/results, nodes, loads, or reports or promote
+support, psychrometrics-map, or Roadmap status. Counts remain 32 algorithms
+and 293 routines; script inventory becomes 343 total, 240 public, 103
+internal, with 238 development commands.

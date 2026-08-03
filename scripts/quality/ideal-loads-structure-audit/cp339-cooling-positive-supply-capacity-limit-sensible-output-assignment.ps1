@@ -64,7 +64,7 @@ foreach ($cp339RequiredFile in @(
     )) {
     Assert-FileExists -Path $cp339RequiredFile -Description "CP339 capacity-limit sensible-output assignment structure"
 }
-Assert-LineLimit -Path $cp339CalcRoot -Limit 84 -Description "IdealLoads calc root"
+Assert-LineLimit -Path $cp339CalcRoot -Limit 86 -Description "IdealLoads calc root"
 Assert-LineLimit -Path $cp339Release -Limit 520 -Description "CP339 release root module"
 Assert-LineLimit -Path $cp339ReleaseCorruptionTests -Limit 650 -Description "CP339 release corruption regressions"
 Assert-LineLimit -Path $cp339CoupledValidation -Limit 700 -Description "CP339 coupled validation module"
@@ -441,6 +441,11 @@ $cp339IntervalCode = [regex]::Replace(
         '(?s)let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_humidity_ratio_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_humidity_ratio_assignment\([^;]+?\)\?;',
         ''
     )
+        $cp339IntervalCode = [regex]::Replace(
+        $cp339IntervalCode,
+        '(?s)let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_maximum_capacity_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_maximum_capacity_assignment\([^;]+?\)\?;',
+        ''
+    )
     if ($cp339IntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
         throw "No intermediary helper call may execute $($cp339Interval.Description)"
     }
@@ -516,7 +521,7 @@ Assert-Contains -Path $cp339DirectAssertions -Pattern 'purchased_air_calc_coolin
 Assert-Contains -Path $cp339DirectAssertions -Pattern 'purchased_air_calc_cooling_mixed_air_call_lifecycle' -Description "direct-run CP329 operand evidence"
 Assert-Contains -Path $cp339DirectAssertions -Pattern 'purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle' -Description "direct-run CP336 operand evidence"
 Assert-Contains -Path $cp339NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_assignment_lifecycle' -Description "non-direct CP339 null evidence"
-Assert-Contains -Path $cp339PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp404_lifecycle_evidence' -Description "non-direct CP339 through CP363 evidence rejection"
+Assert-Contains -Path $cp339PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp405_lifecycle_evidence' -Description "non-direct CP339 through CP363 evidence rejection"
 Assert-NotContains -Path $cp339Pipeline -Pattern 'latest_numerical|numerical_supply_mass_flow|final_supply_mass_flow|complete_direct_zone_purchased_air_coupling|cp_air_j_per_kg_k|MaxCoolTotCap|maximum_total_cooling|sizing' -Description "numerical DTO, CpAir, capacity, or sizing feed in CP339 pipeline"
 
 # Exactly two algorithm addenda, two capability addenda, and six target
@@ -678,10 +683,10 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP339 after CP338 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 342' -Description "CP339 cumulative inventory total through CP403"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 343' -Description "CP339 cumulative inventory total through CP403"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment\.ps1"' -Description "CP339 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment\.ps1::dot_sources' -Description "CP339 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 342 \|' -Description "CP339 generated script count through CP403"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| executable script records \| 343 \|' -Description "CP339 generated script count through CP403"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP339 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 102 \|' -Description "CP339 generated internal script count through CP403"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| internal scripts \| 103 \|' -Description "CP339 generated internal script count through CP403"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP339 generated uncalled script count"
