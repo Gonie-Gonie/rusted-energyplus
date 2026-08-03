@@ -22716,6 +22716,85 @@ routines remain `source_mapped`, and their parent algorithms remain
 becomes 348 total, 240 public, 108 internal, zero unused, zero unreachable,
 with 238 development commands.
 
+## CP411 post-saturation pre-saturation-original supply-humidity-ratio assignment
+
+CP411 supersedes only CP410's physical-line-2313 executable exclusion at
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked raw source SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps `PurchasedAirManager.cc` physical executable line 2313 exactly:
+`SupplyHumRatOrig = PurchAir.SupplyHumRat;`. Its two exact
+dependency-ordered source sites are
+`read-purchased-air-supply-humidity-ratio-before-saturation-limit` and
+`assign-local-original-supply-humidity-ratio-before-saturation-limit`.
+Physical executable line 2314,
+`SupplyHumRatSat = PsyWFnTdbRhPb(state, PurchAir.SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);`,
+is first excluded and the CP412 candidate.
+
+CP411 preserves CP410's thirty-six logical routes and 13/23 public/private
+split. Flattened routes 18 through 35 are active and routes 0 through 17
+are inactive, for 18 active and 18 inactive transitions. Active public
+routes are exactly flattened indices 20, 21, 26, and 27; the other fourteen
+active routes are private. For transitions `T411`, assignments `A411`,
+inactive transitions `I411`, and CP410 transitions `T410`, exact checked
+state requires `T411=T410=36`, `A411=18`, `I411=18`,
+`T411=I411+A411`, both the source read and local assignment counters equal
+`A411`, and `source_site_execution_count=2*A411=36`.
+
+Three width-30 arrays preserve CP410's predecessor-route, guard-false, and
+maximum-capacity-assignment lineage, and one width-30 CP411 array records
+the assignment. Underlying predecessor routes 18 through 29 are active;
+underlying routes 20, 21, 24, 25, 27, and 29 each retain two flattened
+routes, while the other six active underlying routes each retain one. The
+CP411 assignment array exactly matches those active predecessor counts and
+is zero for underlying routes 0 through 17.
+
+Recursively complete same-call bit-exact CP410 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate route and
+execution authority. CP410 terminal supply humidity ratio, enthalpy, and
+temperature are present on exactly 18, 23, and 33 flattened routes,
+respectively. CP411's active set is exactly the 18 routes carrying terminal
+supply humidity ratio. Only CP410
+`resulting_supply_humidity_ratio` owns the source operand: it is read
+exactly 18 times. Terminal enthalpy and temperature are preserved but read
+zero times. Caller, model, service, selector, numerical DTO/result, node,
+load, and report scalars are forbidden substitutes.
+
+Each active transition copies the raw binary64 humidity-ratio payload
+bit-for-bit from the CP410 terminal value through the source read, assigned
+local original value, and resulting original value. CP411 performs no
+arithmetic, comparison, psychrometric evaluation, finite or range gate,
+clamp, normalization, coercion, cache, diagnostic, or mutable-service
+operation. Inactive routes perform neither source site and retain no
+original-value payload.
+
+The lossless snapshot has exactly 59 base fields, including twelve
+`Option<f64>` carriers and one
+`Option<DehumidificationControlType>` carrier. The twelve numeric carriers
+are ordered as the preserved CP409 terminal W/H/T triple, predecessor CP410
+terminal W/H/T, the source-read, assigned, and resulting-original humidity
+ratio triple, and terminal W/H/T. Twelve immediately adjacent authoritative
+IEEE-bit sidecars accompany those numeric fields, so JSON exposes exactly 71 unique
+keys.
+
+Binding is CP410-to-CP411-to-unchanged-numerical. CP411 never enters,
+consumes, reconciles with, feeds, overwrites, or replaces
+`DirectZonePurchasedAirCouplingInput`, prediction, any numerical
+DTO/result, feedback, node, load, or report state; non-direct paths reject
+its lifecycle evidence. Physical executable line 2314 remains excluded and
+is dynamically reached by the same flattened routes 18 through 35, split
+4 public and 14 private; flattened routes 0 through 17 do not reach it.
+
+CP411 adds no routine or source-map row and makes no support, readiness,
+feature/evidence, capability, numerical-conformance, psychrometrics-map,
+output-ownership, status, conformance, or Roadmap promotion. Existing Calc
+routines remain `source_mapped`, and their parent algorithms remain
+`scaffold`/`none`. Counts remain 32 algorithms, 293 routines, 58
+`state_mapped`, 235 `source_mapped`, and 170 required. Script inventory
+becomes 349 total, 240 public, 109 internal, zero unused, zero unreachable,
+with 238 development commands.
+
+
 
 ## CP392 post-saturation constant-SHR supply-humidity-ratio assignment
 

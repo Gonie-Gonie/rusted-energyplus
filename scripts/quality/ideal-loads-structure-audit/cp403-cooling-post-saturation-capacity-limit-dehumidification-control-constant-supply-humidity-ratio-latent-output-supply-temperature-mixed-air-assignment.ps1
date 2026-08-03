@@ -259,7 +259,7 @@ foreach ($pattern in @(
         'CP402 latest evidence is missing', 'CP329 owner is missing'
     )) { Assert-Contains -Path $pipelineValidation -Pattern $pattern -Description "pipeline owner contract" }
 Assert-Contains -Path $pipelineLineage -Pattern 'mixed_air_temperature_c' -Description "pipeline raw-copy lineage"
-Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp410_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp411_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-PatternsInOrder -Path $pipelineRoot -Patterns @(
     "$($predecessorStem)::\s*validate_direct_lifecycle",
     "$($stem)::\s*validate_direct_lifecycle",
@@ -301,17 +301,17 @@ foreach ($file in @(Get-ChildItem -LiteralPath $auditRoot -Filter 'cp*.ps1' -Fil
     if ($file.BaseName -notmatch '^cp(?<number>\d+)-') { continue }
     $number = [int]$Matches['number']
     if ($number -ge 334 -and $number -le 402) {
-        Assert-Contains -Path $file.FullName -Pattern 'non_direct_runtime_rejects_cp316_through_cp410_lifecycle_evidence' -Description "historical CP403 non-direct firewall"
+        Assert-Contains -Path $file.FullName -Pattern 'non_direct_runtime_rejects_cp316_through_cp411_lifecycle_evidence' -Description "historical CP403 non-direct firewall"
     }
     if ($number -ge 337 -and $number -le 402) {
-        Assert-Contains -Path $file.FullName -Pattern 'script_count = 348' -Description "historical current script count"
+        Assert-Contains -Path $file.FullName -Pattern 'script_count = 349' -Description "historical current script count"
     }
     if ($number -ge 335 -and $number -le 402) {
-        Assert-Contains -Path $file.FullName -Pattern '\\\| 348 \\\|' -Description "historical generated script count"
-        Assert-Contains -Path $file.FullName -Pattern '\\\| 108 \\\|' -Description "historical generated internal count"
+        Assert-Contains -Path $file.FullName -Pattern '\\\| 349 \\\|' -Description "historical generated script count"
+        Assert-Contains -Path $file.FullName -Pattern '\\\| 109 \\\|' -Description "historical generated internal count"
     }
     if ($number -ge 367 -and $number -le 402) {
-        Assert-Contains -Path $file.FullName -Pattern 'Count -ne 108' -Description "historical internal classification count"
+        Assert-Contains -Path $file.FullName -Pattern 'Count -ne 109' -Description "historical internal classification count"
     }
 }
 $cleanupAudits = @(
@@ -341,7 +341,7 @@ Assert-Contains -Path $cp345Audit -Pattern '\$cp403Call\s*=' -Description "CP345
 Assert-Contains -Path $cp345Audit -Pattern '\$cp404Call\s*=' -Description "CP345 CP404 call capture"
 Assert-Contains -Path $cp345Audit -Pattern '\$cp405Call\s*=' -Description "CP345 CP405 call capture"
 Assert-Contains -Path $cp345Audit -Pattern 'CP404-to-CP405' -Description "CP345 CP404-to-CP405 interval"
-Assert-Contains -Path $cp345Audit -Pattern 'CP408-to-CP409' -Description "CP345 CP408-to-CP409 interval"; Assert-Contains -Path $cp345Audit -Pattern 'CP410-to-numerical' -Description "CP345 CP409 terminal interval"
+Assert-Contains -Path $cp345Audit -Pattern 'CP408-to-CP409' -Description "CP345 CP408-to-CP409 interval"; Assert-Contains -Path $cp345Audit -Pattern 'CP411-to-numerical' -Description "CP345 CP409 terminal interval"
 $cp402Audit = "$auditRoot\cp402-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-guard.ps1"
 Assert-Contains -Path $cp402Audit -Pattern 'Count -ne 3' -Description "CP402 evidence consumed by CP403"
 foreach ($file in @(Get-ChildItem -LiteralPath $auditRoot -Filter 'cp*.ps1' -File | Where-Object { $_.BaseName -match '^cp(?<number>399|400|401|402)-' })) {
@@ -361,17 +361,17 @@ if ($cp402Index -lt 0 -or $cp403Index -le $cp402Index -or $cp404Index -le $cp403
     throw "Master CP403 registration order drift"
 }
 $inventory = Read-RepoText -Path 'specs\script_inventory.toml'
-foreach ($pattern in @('script_count = 348', 'dev_command_count = 238', 'unused_script_count = 0', 'unreachable_count = 0')) {
+foreach ($pattern in @('script_count = 349', 'dev_command_count = 238', 'unused_script_count = 0', 'unreachable_count = 0')) {
     Assert-Cp403Text -Text $inventory -Pattern $pattern -Description "inventory"
 }
 if ([regex]::Matches($inventory, '(?m)^classification = "public"$').Count -ne 240 -or
-    [regex]::Matches($inventory, '(?m)^classification = "internal"$').Count -ne 108) {
+    [regex]::Matches($inventory, '(?m)^classification = "internal"$').Count -ne 109) {
     throw "CP403 inventory classification drift; expected 240 public and 106 internal"
 }
 Assert-Contains -Path 'specs\script_inventory.toml' -Pattern 'cp403-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-mixed-air-assignment\.ps1' -Description "inventory record"
-Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| 348 \|' -Description "generated script total"
+Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| 349 \|' -Description "generated script total"
 Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| public scripts \| 240 \|' -Description "generated public total"
-Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| 108 \|' -Description "generated internal total"
+Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| 109 \|' -Description "generated internal total"
 
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1" -Pattern 'CP405-to-CP406' -Description "CP345 CP405-to-CP406 interval"
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1" -Pattern '\$cp406Call\s*=' -Description "CP345 CP406 call capture"
@@ -380,7 +380,10 @@ Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp345-cooling
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1" -Pattern '\$cp407Call\s*=' -Description "CP345 CP407 call capture"
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1" -Pattern '\$cp408Call\s*=' -Description "CP345 CP408 call capture"; Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1" -Pattern '\$cp409Call\s*=' -Description "CP345 CP409 call capture"
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1" -Pattern 'CP409-to-CP410' -Description "CP345 CP409-to-CP410 interval"
+Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1" -Pattern 'CP410-to-CP411' -Description "CP345 CP410-to-CP411 interval"
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1" -Pattern '\$cp410Call\s*=' -Description "CP345 CP410 call capture"
+Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1" -Pattern '\$cp411Call\s*=' -Description "CP345 CP411 call capture"
 Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'let\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break\s*=' -Description "CP410 historical binding order"
+Assert-Contains -Path "crates\ep_runtime\src\ideal_loads\binding.rs" -Pattern 'let\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment\s*=' -Description "CP411 historical binding order"
 Write-Host "CP403 post-saturation shared-case latent-output body supply-temperature mixed-air assignment structure audit passed."
 }
