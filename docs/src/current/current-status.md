@@ -4820,6 +4820,75 @@ and 170 required. Script inventory becomes 329 total, 240 public, 89 internal,
 zero unused, zero unreachable, with 238 development commands.
 
 
+## CP406 post-saturation shared-case latent-output capacity-guard else-branch entry
+
+CP406 supersedes only CP405's physical-line-2301 lexical/control exclusion by
+mapping `} else {` at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048` and locked raw SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact sole source site is
+`enter-post-saturation-capacity-limit-none-or-constant-supply-humidity-ratio-latent-output-capacity-guard-else-branch-after-guard-false-fallthrough`.
+Physical executable line 2302,
+`PurchAir.SupplyTemp = PsyTdbFnHW(SupplyEnthalpy, PurchAir.SupplyHumRat);`,
+is the first excluded executable and CP407 candidate. Line 2304's mixed-air
+temperature limit, line 2306's case break, and line 2313's dynamic
+post-switch continuation also remain excluded. CP406 represents only entry
+into the `else` branch after the CP402 guard evaluated false; it does not
+represent a true-body exit, the branch merge, or an unconditional entry.
+
+CP406 preserves CP405's thirty-six logical routes without adding a branch.
+The six CP402 guard-false routes enter the sole site: CP405 flattened indices
+20, 22, 26, 28, 31, and 34, derived from predecessor indices 20, 21, 24, 25,
+27, and 29. The twenty-four inherited inactive routes and six CP405
+maximum-capacity-assignment routes at flattened indices 21, 23, 27, 29, 32,
+and 35 execute no CP406 site. Public/private routes remain 13/23; public
+else-entry indices are 20 and 26, while 22, 28, 31, and 34 are private.
+
+For transitions `T406`, entries `E406`, inactive transitions `I406`, CP402
+guard-false transitions `F402`, CP405 assignments `A405`, inherited inactive
+transitions `I402`, and CP405 flattened route counts `R`, exact checked state
+requires `T406=T405`,
+`E406=F402=R[20]+R[22]+R[26]+R[28]+R[31]+R[34]`,
+`A405=R[21]+R[23]+R[27]+R[29]+R[32]+R[35]`,
+`I406=I402+A405`, `T406=I406+E406`, and
+`source_site_execution_count=E406`. Exhaustive characterization is
+36/30/6/6 for transitions, inactive transitions, else entries, and source
+sites. CP405 maximum-capacity assignment and CP406 else entry are mutually
+exclusive, and an absent CP405 assignment alone cannot activate CP406 because
+the twenty-four inherited inactive routes also lack that assignment.
+
+Recursively complete same-call bit-exact CP405 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate predecessor
+and execution authority. CP406 takes no scalar active input and performs no
+selector or owner read, comparison, arithmetic, assignment, psychrometric
+evaluation, finite gate, clamp, normalization, diagnostic, cache, or mutable
+service operation. In particular it implements none of line 2302's
+`PsyTdbFnHW`, line 2304's source-shaped minimum, or line 2306's break.
+
+The compressed snapshot has exactly 46 fields. Its CP398-derived common
+control prefix is followed, in order, by the predecessor CP402 guard-false
+marker, the predecessor CP405 maximum-capacity-assignment marker, predecessor
+CP405 W/H/T, the CP406 else-entry marker, and resulting W/H/T. Exactly six
+fields are `Option<f64>`: predecessor CP405 supply humidity ratio, enthalpy,
+and temperature followed by the three resulting values. Each predecessor and
+result pair is bit-exact, and JSON exposes 52 unique keys with six immediately
+adjacent authoritative IEEE sidecars. CP405's cooling-latent-output and
+maximum-capacity payloads and the CP399-through-CP404 arithmetic/read/write
+markers remain available only through recursively validated CP405 evidence;
+CP406 does not republish them across this control boundary.
+
+Binding is CP405-to-CP406-to-unchanged-numerical. CP406 never feeds or
+replaces `DirectZonePurchasedAirCouplingInput`, numerical DTO/results,
+prediction, feedback, nodes, loads, or reports; non-direct paths reject it.
+It adds no routine or source-map row and no support, capability, algorithm,
+numerical-conformance, psychrometrics-map, or Roadmap promotion.
+`routine.psy_tdb_fn_h_w` remains `state_mapped`; both Calc routines remain
+`source_mapped`, and both parent algorithms remain `scaffold`/`none`. Counts
+remain 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`,
+and 170 required. Script inventory becomes 344 total, 240 public, 104
+internal, zero unused, zero unreachable, with 238 development commands.
+
+
 ## CP392 post-saturation constant-SHR supply-humidity-ratio assignment
 
 CP392 supersedes only CP391's physical-line-2284 exclusion. At pinned
