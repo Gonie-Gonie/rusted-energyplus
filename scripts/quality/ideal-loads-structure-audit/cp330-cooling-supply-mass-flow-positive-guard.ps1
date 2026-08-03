@@ -587,11 +587,11 @@ $postCp339BeforeNumericalCodeForCp330 = [regex]::Replace(
 )
 $postCp339BeforeNumericalCodeForCp330 = [regex]::Replace(
     $postCp339BeforeNumericalCodeForCp330,
-    '(?s)let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit\([^;]+?\)\?;',
+    '(?s)(?:let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break\([^;]+?\)\?;)',
     ''
 )
 if ($postCp339BeforeNumericalCodeForCp330 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No helper other than the audited CP340 through CP408 releases may execute after CP339 and before numerical Calc"
+    throw "No helper other than the audited CP340 through CP409 releases may execute after CP339 and before numerical Calc"
 }
 
 # Coupled validation reconstructs CP330 only from CP329 and retains exact bits.

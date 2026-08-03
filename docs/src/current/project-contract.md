@@ -21166,6 +21166,69 @@ and 170 required. Script inventory becomes 329 total, 240 public, 89 internal,
 zero unused, zero unreachable, with 238 development commands.
 
 
+## CP409 post-saturation shared None/constant-supply-humidity-ratio case break
+
+CP409 maps only pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, `PurchasedAirManager.cc`
+physical line 2306: `} break;`. The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The leading `}` is non-executable syntax that closes the shared compound
+statement opened at physical line 2291. The sole executable source site is
+the following `break;`, named
+`exit-purchased-air-post-saturation-capacity-limit-dehumidification-control-none-or-constant-supply-humidity-ratio-shared-case-via-break`.
+It exits the nearest dehumidification-control switch; it does not exit the
+outer capacity-limit body or the Calc routine.
+
+Every retained `None` or `ConstantSupplyHumidityRatio` shared-case route
+executes the break once after either outcome of the line-2297 latent-output
+capacity guard. CP409 preserves CP408's thirty-six logical routes and
+13/23 public/private split. Flattened indices 20, 21, 22, 23, 26, 27, 28,
+29, 31, 32, 34, and 35 execute the sole site; the other twenty-four routes
+execute none. Active public indices are 20, 21, 26, and 27. For transitions
+`T409`, inactive transitions `I409`, break executions `B409`, CP408
+mixed-air limits `L408`, and CP405 retained maximum-capacity assignments
+`M405`, exact checked state requires `T409=T408=36`,
+`B409=L408+M405=6+6=12`, `I409=T409-B409=24`, and
+`source_site_execution_count=B409=12`. Three width-30 arrays preserve
+CP408's route, guard-false, and maximum-capacity-assignment lineage. Break
+counts are reconstructed exactly as the latter two arrays' checked sum at
+predecessor indices 20, 21, 24, 25, 27, and 29.
+
+Recursively complete same-call bit-exact CP408 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate route and
+execution authority. CP405 maximum-capacity evidence is retained only
+through CP408 and cannot bypass it. CP409 reads no scalar operand, selector,
+model, service, DTO, node, or report state. It performs no comparison,
+assignment, arithmetic, psychrometric evaluation, finite or range gate,
+clamp, normalization, diagnostic, or coercion. Every available supply
+humidity ratio, enthalpy, and temperature is preserved bit-exactly.
+
+The lossless snapshot has exactly 45 base fields, including six
+`Option<f64>` carriers and one
+`Option<DehumidificationControlType>` carrier. JSON exposes 51 unique keys
+with six immediately adjacent authoritative IEEE-bit sidecars. Binding is
+CP408-to-CP409-to-unchanged-numerical. CP409 never enters, consumes,
+reconciles with, feeds, overwrites, or replaces
+`DirectZonePurchasedAirCouplingInput`, prediction, any numerical
+DTO/result, feedback, node, load, or report state; non-direct paths reject
+its lifecycle evidence.
+
+Physical line 2307 is the non-executable `default:` label. Physical
+executable line 2308, `break;`, is the first excluded executable and the
+CP410 candidate. The switch-closing line 2309, comments and blank lines
+23010-23012, and the active shared-case break's dynamic continuation at
+physical executable line 2313 remain excluded.
+
+CP409 adds no routine or source-map row and makes no support, readiness,
+feature/evidence, capability, numerical-conformance, psychrometrics-map,
+output-ownership, status, conformance, or Roadmap promotion. Existing Calc
+routines remain `source_mapped`, and their parent algorithms remain
+`scaffold`/`none`. Counts remain 32 algorithms, 293 routines, 58
+`state_mapped`, 235 `source_mapped`, and 170 required. Script inventory
+becomes 347 total, 240 public, 107 internal, zero unused, zero unreachable,
+with 238 development commands.
+
+
 ## CP392 post-saturation constant-SHR supply-humidity-ratio assignment
 
 CP392 supersedes only CP391's physical-line-2284 exclusion. At pinned

@@ -1,5 +1,8 @@
 //! CP408 shared-case supply-temperature mixed-air-limit assertions.
 
+#[path = "cp409_assertions.rs"]
+mod cp409_assertions;
+
 use serde_json::{Map, Value, json};
 
 const CP329_KEY: &str = "purchased_air_calc_cooling_mixed_air_call_lifecycle";
@@ -136,6 +139,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         !results.to_string().contains(CP408_KEY),
         "CP408 lifecycle must remain outside numerical result state"
     );
+    cp409_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -144,6 +148,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP408_KEY].is_null(),
         "non-direct runtime must not publish CP408 evidence"
     );
+    cp409_assertions::assert_non_direct(runtime);
 }
 
 fn assert_latest_lineage(
