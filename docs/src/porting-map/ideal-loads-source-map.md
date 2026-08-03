@@ -22649,6 +22649,73 @@ routines remain `source_mapped`, and their parent algorithms remain
 becomes 347 total, 240 public, 107 internal, zero unused, zero unreachable,
 with 238 development commands.
 
+## CP410 post-saturation dehumidification-control default case break
+
+CP410 maps only pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, `PurchasedAirManager.cc`
+physical executable line 2308: `break;`. The locked raw source SHA-256
+remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Physical line 2307 is the non-executable `default:` label. The sole CP410
+source site is
+`exit-purchased-air-post-saturation-capacity-limit-dehumidification-control-default-case-via-break`.
+It would exit the nearest dehumidification-control switch, not the outer
+capacity-limit body or the Calc routine.
+
+The typed `DehumidificationControlType` domain has exactly the four named
+variants `None`, `ConstantSensibleHeatRatio`,
+`ConstantSupplyHumidityRatio`, and `Humidistat`; every variant is handled by
+an explicit source case. There is no invalid, unknown, or thirty-seventh
+default route. CP410 therefore preserves CP409's thirty-six logical routes
+and 13/23 public/private split, but every retained route skips the sole
+default-break site. There are no active public or private routes. For
+transitions `T410`, inactive transitions `I410`, default-break executions
+`B410`, and CP409 transitions `T409`, exact checked state requires
+`T410=T409=36`, `I410=T410=36`, `B410=0`, and
+`source_site_execution_count=B410=0`.
+
+Three width-30 arrays preserve CP409's predecessor-route, guard-false, and
+maximum-capacity-assignment lineage. Their checked guard-false and
+maximum-assignment totals still reconstruct CP409's twelve shared-case
+breaks as `B409=6+6=12`; that predecessor evidence cannot activate CP410's
+typed-unreachable default case.
+
+Recursively complete same-call bit-exact CP409 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate route and
+execution authority. CP410 reads no scalar operand, selector, model,
+service, DTO, node, or report state. It performs no comparison, assignment,
+arithmetic, psychrometric evaluation, finite or range gate, clamp,
+normalization, diagnostic, default behavior, or coercion.
+
+The lossless snapshot has exactly 46 base fields, including six
+`Option<f64>` carriers and one
+`Option<DehumidificationControlType>` carrier. CP409 terminal supply
+humidity ratio, enthalpy, and temperature are retained under predecessor
+names and copied to resulting fields bit-exactly without constituting a
+CP410 source operand read. JSON exposes 52 unique keys with six immediately
+adjacent authoritative IEEE-bit sidecars. Binding is
+CP409-to-CP410-to-unchanged-numerical. CP410 never enters, consumes,
+reconciles with, feeds, overwrites, or replaces
+`DirectZonePurchasedAirCouplingInput`, prediction, any numerical
+DTO/result, feedback, node, load, or report state; non-direct paths reject
+its lifecycle evidence.
+
+Physical line 2309 only closes the switch, lines 2310-2311 are comments,
+and line 2312 is blank. Physical executable line 2313,
+`SupplyHumRatOrig = PurchAir.SupplyHumRat;`, is the first excluded
+executable and the CP411 candidate. It is dynamically reached by flattened
+CP410 routes 18 through 35 (18 routes total), split 4 public and 14 private;
+flattened routes 0 through 17 do not reach it.
+
+CP410 adds no routine or source-map row and makes no support, readiness,
+feature/evidence, capability, numerical-conformance, psychrometrics-map,
+output-ownership, status, conformance, or Roadmap promotion. Existing Calc
+routines remain `source_mapped`, and their parent algorithms remain
+`scaffold`/`none`. Counts remain 32 algorithms, 293 routines, 58
+`state_mapped`, 235 `source_mapped`, and 170 required. Script inventory
+becomes 348 total, 240 public, 108 internal, zero unused, zero unreachable,
+with 238 development commands.
+
 
 ## CP392 post-saturation constant-SHR supply-humidity-ratio assignment
 
