@@ -201,9 +201,10 @@ Assert-PatternsInOrder -Path $binding -Patterns @(
     'let\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_humidity_ratio_assignment\s*=',
     'let\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_maximum_capacity_assignment\s*=',
     'let\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry\s*=',
+    'let\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment\s*=',
     'let\s+unit_available\s*=',
     'let\s+coupling\s*='
-) -Description "CP400-to-CP401-to-CP402-to-CP403-to-CP404-to-CP405-to-CP406 binding order"
+) -Description "CP400-to-CP401-to-CP402-to-CP403-to-CP404-to-CP405-to-CP406-to-CP407 binding order"
 Assert-PatternsInOrder -Path $scheduledOutput -Patterns @(
     'pub\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_sensible_output_assignment\s*:',
     'pub\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_assignment\s*:',
@@ -212,6 +213,7 @@ Assert-PatternsInOrder -Path $scheduledOutput -Patterns @(
     'pub\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_humidity_ratio_assignment\s*:',
     'pub\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_maximum_capacity_assignment\s*:',
     'pub\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry\s*:',
+    'pub\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment\s*:',
     'pub\s+coupling\s*:'
 ) -Description "scheduled output order"
 $bindingText = Read-RepoText -Path $binding
@@ -253,7 +255,7 @@ foreach ($pattern in @(
 Assert-Contains -Path $pipelineLineage -Pattern 'let\s+latent\s*=\s*total\s*-\s*sensible' -Description "pipeline exact subtraction"
 Assert-Contains -Path $pipelineLineage -Pattern 'owner\.resulting_cooling_total_output_w' -Description "pipeline CP384 total-output owner"
 Assert-Contains -Path $pipelineLineage -Pattern 'corroborator\.cooling_total_output_w' -Description "pipeline CP385 bit corroboration"
-Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp406_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp407_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-PatternsInOrder -Path $pipelineRoot -Patterns @(
     "$($predecessorStem)::\s*validate_direct_lifecycle",
     "$($stem)::\s*validate_direct_lifecycle"
@@ -285,17 +287,18 @@ if ($cp400Index -lt 0 -or $cp401Index -le $cp400Index -or $completionIndex -le $
     throw "Master CP401 registration order drift"
 }
 $inventory = Read-RepoText -Path 'specs\script_inventory.toml'
-foreach ($pattern in @('script_count = 344', 'dev_command_count = 238', 'unused_script_count = 0', 'unreachable_count = 0')) {
+foreach ($pattern in @('script_count = 345', 'dev_command_count = 238', 'unused_script_count = 0', 'unreachable_count = 0')) {
     Assert-Cp401Text -Text $inventory -Pattern $pattern -Description "inventory"
 }
 if ([regex]::Matches($inventory, '(?m)^classification = "public"$').Count -ne 240 -or
-    [regex]::Matches($inventory, '(?m)^classification = "internal"$').Count -ne 104) {
-    throw "CP401 inventory classification drift; expected 240 public and 104 internal"
+    [regex]::Matches($inventory, '(?m)^classification = "internal"$').Count -ne 105) {
+    throw "CP401 inventory classification drift; expected 240 public and 105 internal"
 }
-Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| executable script records \| 344 \|' -Description "generated script total"
-Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| internal scripts \| 104 \|' -Description "generated internal total"
+Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| 345 \|' -Description "generated script total"
+Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| 105 \|' -Description "generated internal total"
 
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1" -Pattern 'CP404-to-CP405' -Description "CP345 CP404-to-CP405 interval"
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1" -Pattern 'CP405-to-CP406' -Description "CP345 CP405-to-CP406 interval"
+Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1" -Pattern 'CP406-to-CP407' -Description "CP345 CP406-to-CP407 interval"
 Write-Host "CP401 post-saturation shared-case latent-output-assignment structure audit passed."
 }

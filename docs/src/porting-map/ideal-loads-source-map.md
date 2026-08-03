@@ -23419,3 +23419,99 @@ numerical-conformance, psychrometrics-map, or Roadmap promotion.
 remain 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`,
 and 170 required. Script inventory becomes 344 total, 240 public, 104
 internal, zero unused, zero unreachable, with 238 development commands.
+
+## CP407 post-saturation shared-case latent-output supply-temperature assignment
+
+CP407 maps only pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, `PurchasedAirManager.cc`
+physical executable line 2302:
+`PurchAir.SupplyTemp = PsyTdbFnHW(SupplyEnthalpy, PurchAir.SupplyHumRat);`.
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact four textual sites, in deterministic Rust/source-text and dependency
+order, are
+`read-cp385-retained-supply-enthalpy-for-post-saturation-capacity-limit-none-or-constant-supply-humidity-ratio-latent-output-supply-temperature-dry-bulb-inversion`,
+`read-cp378-retained-supply-humidity-ratio-for-post-saturation-capacity-limit-none-or-constant-supply-humidity-ratio-latent-output-supply-temperature-dry-bulb-inversion`,
+`evaluate-psy-tdb-fn-h-w-for-post-saturation-capacity-limit-none-or-constant-supply-humidity-ratio-latent-output-supply-temperature`,
+and
+`assign-purchased-air-supply-temperature-after-post-saturation-capacity-limit-none-or-constant-supply-humidity-ratio-latent-output-guard-else-branch`.
+The two source reads are side-effect-free, so this witness order makes no
+claim about C++ function-argument evaluation order.
+
+CP407 reuses the canonical CP343 `PsyTdbFnHW` semantics from
+`Psychrometrics.hh` physical lines 743-762, locked by raw SHA-256
+`30C9575BC5A8E73D33D111E0D54A4DA8916AF4534175E9B95071ACA2513AEF45`.
+The helper first forms `W = max(dW, 1.0e-5)` with source first-argument NaN
+semantics, then evaluates exactly
+`(H - 2.50094e6 * W) / (1.00484e3 + 1.85895e3 * W)`.
+The transition delegates exactly once to canonical
+`energyplus_psy_tdb_fn_h_w`; it does not inline or reassociate the constants,
+use a fused operation, add a finite gate, clamp or normalize the result, or
+introduce a psychrometric cache, diagnostic, or mutable service operation.
+
+CP407 preserves CP406's thirty-six logical routes without adding a branch.
+Only CP406 else-entry flattened indices 20, 22, 26, 28, 31, and 34 execute
+all four sites; they derive from predecessor indices 20, 21, 24, 25, 27, and
+29. The other thirty routes execute no CP407 site. Public/private routes
+remain 13/23; active public routes are 20 and 26, while 22, 28, 31, and 34
+are private. For transitions `T407`, dry-bulb assignments `D407`, inactive
+transitions `Z407`, CP406 else entries `E406`, inherited inactive transitions
+`I406`, and CP406 flattened route counts `R`, exact checked state requires
+`T407=T406`,
+`D407=E406=R[20]+R[22]+R[26]+R[28]+R[31]+R[34]`,
+`Z407=I406`, and `T407=Z407+D407`. Each read, evaluation, and assignment site
+equals `D407`, and `source_site_execution_count=4*D407`. Exhaustive
+characterization is 36/30/6/24 for transitions, inactive transitions,
+assignments, and source sites.
+
+Recursively complete same-call bit-exact CP406 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate route and
+execution authority. They are not calculation-operand authority. The
+enthalpy operand is owned only by same-call retained-latest/private CP385
+`resulting_supply_enthalpy_j_per_kg`; a CP406 enthalpy copy may corroborate
+its bits but cannot replace that owner. The humidity operand is owned only by
+same-call retained-latest/private CP378
+`resulting_supply_humidity_ratio`; active CP406 compressed humidity remains
+`None` and is explicitly rejected as an operand. CP406 retains the
+preexisting supply-temperature state until CP407 assigns the helper result.
+No caller scalar, model, sizing, Zone-state re-read, live psychrometric
+service, numerical DTO, or compressed CP406 H/W substitute is admitted.
+
+The snapshot has exactly 60 fields in its declared canonical order, including
+11 `Option<f64>` fields and one `Option<DehumidificationControlType>` field.
+The eleven numeric optionals are CP406 predecessor W/H/T, owned inversion H,
+owned inversion W, preexisting temperature, evaluated temperature, assigned
+temperature, and resulting W/H/T. JSON exposes 71 unique keys, with an
+immediately adjacent authoritative IEEE-bit sidecar for every numeric
+optional. Active Rust operands, evaluated value, assignment, and results
+remain `Some(value)` even when defensive pure characterization produces a
+nonfinite value; JSON projects such a numeric value to `null` while retaining
+its non-null bit string. Inactive routes leave owned inversion H/W, evaluated T, and assigned T as Rust
+`None` with JSON-null values and sidecars; their CP406 predecessor W/H/T and
+preexisting/result carriers follow exact route presence, with every resulting
+value bit-identical to its predecessor.
+
+The pure transition characterizes the exact binary64 humidity floor, signed
+zeros, source-first NaN retention, infinities, multiplication and subtraction
+overflow, denominator formation, and final division. Negative infinity,
+negative values, signed zero, and positive sub-floor humidity all use
+`1.0e-5`; NaN and positive infinity humidity are retained. Those nonfinite
+cases are defensive characterization rather than new public-chain
+reachability claims.
+
+Binding is CP406-to-CP407-to-unchanged-numerical. CP407 never feeds or
+replaces `DirectZonePurchasedAirCouplingInput`, numerical DTO/results,
+prediction, feedback, nodes, loads, or reports; non-direct paths reject it.
+Physical line 2303 is commentary. Physical executable line 2304,
+`PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);`, is
+the first excluded executable and CP408 candidate. Line 2306's case break and
+line 2313's dynamic post-switch continuation also remain excluded.
+
+CP407 adds no routine or source-map row and makes no support, capability,
+algorithm, numerical-conformance, psychrometrics-map, status, conformance, or
+Roadmap promotion. `routine.psy_tdb_fn_h_w` remains `state_mapped`; both Calc
+routines remain `source_mapped`, and both parent algorithms remain
+`scaffold`/`none`. Counts remain 32 algorithms, 293 routines, 58
+`state_mapped`, 235 `source_mapped`, and 170 required. Script inventory
+becomes 345 total, 240 public, 105 internal, zero unused, zero unreachable,
+with 238 development commands.
