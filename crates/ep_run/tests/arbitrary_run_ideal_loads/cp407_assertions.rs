@@ -1,5 +1,8 @@
 //! CP407 psychrometric supply-temperature assignment assertions.
 
+#[path = "cp408_assertions.rs"]
+mod cp408_assertions;
+
 use serde_json::{Map, Value, json};
 
 const CP378_KEY: &str =
@@ -115,6 +118,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         !results.to_string().contains(CP407_KEY),
         "CP407 lifecycle must remain outside numerical result state"
     );
+    cp408_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -123,6 +127,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP407_KEY].is_null(),
         "non-direct runtime must not publish CP407 evidence"
     );
+    cp408_assertions::assert_non_direct(runtime);
 }
 
 fn assert_latest_lineage(

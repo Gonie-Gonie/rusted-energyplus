@@ -586,8 +586,13 @@ $postCp339BeforeNumericalCodeForCp331 = [regex]::Replace(
     '(?s)let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment\([^;]+?\)\?;',
     ''
 )
+$postCp339BeforeNumericalCodeForCp331 = [regex]::Replace(
+    $postCp339BeforeNumericalCodeForCp331,
+    '(?s)let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit\([^;]+?\)\?;',
+    ''
+)
 if ($postCp339BeforeNumericalCodeForCp331 -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
-    throw "No helper other than the audited CP340 through CP404 releases may execute after CP339 and before numerical Calc"
+    throw "No helper other than the audited CP340 through CP408 releases may execute after CP339 and before numerical Calc"
 }
 
 # Coupled validation independently reconstructs CP331 from the CP330 route and

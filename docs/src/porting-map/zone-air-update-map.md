@@ -26057,3 +26057,75 @@ routines remain `source_mapped`, and both parent algorithms remain
 `state_mapped`, 235 `source_mapped`, and 170 required. Script inventory
 becomes 345 total, 240 public, 105 internal, zero unused, zero unreachable,
 with 238 development commands.
+
+## CP408 post-saturation shared-case latent-output supply-temperature mixed-air limit
+
+CP408 maps only pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, `PurchasedAirManager.cc`
+physical executable line 2304:
+`PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);`.
+The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Its exact four textual sites, in deterministic source order, are
+`read-purchased-air-supply-temperature-for-minimum`,
+`read-purchased-air-mixed-air-temperature-for-minimum`,
+`apply-source-shaped-two-argument-minimum`, and
+`assign-purchased-air-supply-temperature`.
+
+CP408 reuses the canonical CP334/CP344/CP390 source-shaped two-argument
+minimum. It returns the left operand only when `left < right`; equality and
+unordered comparisons select the right operand. This preserves exact
+binary64 behavior for signed zeros, infinities, and NaN payloads without
+using `f64::min`, adding a finite gate, normalizing either operand, or
+reassociating the source operation.
+
+CP408 preserves CP407's thirty-six logical routes without adding a branch.
+Only flattened indices 20, 22, 26, 28, 31, and 34 execute all four sites;
+the other thirty routes execute no CP408 site. Active public routes are 20
+and 26, while active private routes are 22, 28, 31, and 34. Public/private
+routes remain 13/23. For transitions `T408`, mixed-air-limit executions
+`L408`, inactive transitions `Z408`, CP407 supply-temperature assignments
+`D407`, inherited CP407 inactive transitions `I407`, and flattened route
+counts `R`, exact checked state requires `T408=T407`,
+`L408=D407=R[20]+R[22]+R[26]+R[28]+R[31]+R[34]`, `Z408=I407`, and
+`T408=Z408+L408`. Each read, minimum evaluation, and assignment site equals
+`L408`, and `source_site_execution_count=4*L408`. Exhaustive
+characterization is 36/30/6/24 for transitions, inactive transitions,
+limit executions, and source-site executions. State retains six exact
+width-30 route arrays: five CP407 lineage arrays plus the local limit array.
+
+Recursively complete same-call bit-exact CP407 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate route and
+execution authority. The supply-temperature operand is owned only by the
+same-call retained-latest/private CP407 `resulting_supply_temperature_c`.
+The mixed-air-temperature operand is owned only by the same-call
+retained-latest/private CP329 `mixed_air_temperature_c`. No caller scalar,
+model or sizing re-read, Zone-state re-read, numerical DTO, cached
+diagnostic, compressed predecessor copy, or later owner may substitute for
+either operand.
+
+The snapshot has exactly 76 fields in its declared canonical order,
+including 19 `Option<f64>` fields and one
+`Option<DehumidificationControlType>` field. JSON exposes 95 unique keys,
+with an immediately adjacent authoritative IEEE-bit sidecar for every
+numeric optional. Active local operands, minimum value, assignment, and
+resulting temperature remain `Some(value)` even for defensively
+characterized nonfinite values; JSON projects a nonfinite numeric value to
+`null` while retaining its non-null bit string. Inactive routes execute no
+local site and preserve CP407 W/H/T bit-exactly.
+
+Binding is CP407-to-CP408-to-unchanged-numerical. CP408 never feeds or
+replaces `DirectZonePurchasedAirCouplingInput`, numerical DTO/results,
+prediction, feedback, nodes, loads, or reports; non-direct paths reject its
+lifecycle evidence. Physical line 2305 is only the closing brace. Physical
+executable line 2306, `} break;`, is the first excluded executable and the
+CP409 candidate. Line 2313's dynamic post-switch continuation also remains
+excluded.
+
+CP408 adds no routine or source-map row and makes no support, capability,
+algorithm, numerical-conformance, psychrometrics-map, status, conformance,
+or Roadmap promotion. Existing Calc routines remain `source_mapped`, and
+their parent algorithms remain `scaffold`/`none`. Counts remain 32
+algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
+required. Script inventory becomes 346 total, 240 public, 106 internal,
+zero unused, zero unreachable, with 238 development commands.

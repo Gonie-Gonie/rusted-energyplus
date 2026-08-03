@@ -571,7 +571,7 @@ Assert-FileExists -Path $zoneEquipmentDemand -Description "Zone equipment demand
 Assert-FileExists -Path $zoneEquipmentDispatch -Description "Zone equipment dispatch module"
 Assert-FileExists -Path $zoneEquipmentTests -Description "Zone equipment tests module"
 
-Assert-LineLimit -Path $calcRoot -Limit 90 -Description "IdealLoads calc module root"
+Assert-LineLimit -Path $calcRoot -Limit 92 -Description "IdealLoads calc module root"
 Assert-LineLimit -Path $calcLifecycle -Limit 520 -Description "PurchasedAir Calc-entry lifecycle module"
 Assert-LineLimit -Path $calcLifecycleTests -Limit 240 -Description "PurchasedAir Calc-entry lifecycle tests"
 Assert-LineLimit -Path $calcMinimumOaPrefix -Limit 380 -Description "PurchasedAir Calc minimum-OA prefix module"
@@ -4182,5 +4182,6 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp405-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-maximum-capacity-assignment.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp406-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-capacity-guard-else-branch-entry.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp407-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-assignment.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp408-cooling-post-saturation-capacity-limit-dehumidification-control-constant-supply-humidity-ratio-latent-output-supply-temperature-mixed-air-limit.ps1")
 
 Write-Host "IdealLoads structure audit complete."
