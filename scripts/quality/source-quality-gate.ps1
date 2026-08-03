@@ -15,8 +15,8 @@ function Test-IsTestPath {
 
     $normalized = $RelativePath -replace '/', '\'
     return (
-        $normalized -match '(^|\\)tests\\' -or
-        $normalized -match '_tests\.rs$' -or
+        $normalized -match '(^|\\)tests(\\|\.rs$)' -or
+        $normalized -match '(^|\\)[^\\]+_tests(\\|(?:_[^\\]+)?\.rs$)' -or
         $normalized -match '(^|\\)test_[^\\]+\.rs$'
     )
 }

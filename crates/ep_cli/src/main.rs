@@ -146,6 +146,7 @@ use window_material_simple_glazing_system::run_compare_window_material_simple_gl
 const HEAT_BALANCE_BOTTLENECK_LIMIT: usize = 8;
 const HEAT_BALANCE_TOP_RMSE_LIMIT: usize = 10;
 const HEAT_BALANCE_MAX_SAMPLE_CONTEXT_LIMIT: usize = 8;
+const CLI_RUNTIME_STACK_SIZE_BYTES: usize = 8 * 1024 * 1024;
 const OFFICIAL_DYNAMIC_HEAT_BALANCE_CANDIDATE_CASE_ID: &str =
     "official_1zone_uncontrolled_dynamic_conformance_candidate_001";
 const HEAT_BALANCE_CTF_SEED_POLICY_ENV: &str = "RUSTED_ENERGYPLUS_HEAT_BALANCE_CTF_SEED_POLICY";
@@ -183,7 +184,22 @@ const ARBITRARY_RUN_USAGE: &str = "usage: eplus-rs run <input.idf|input.epJSON> 
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
-    let exit_code = run(&args);
+    // The source-order runtime retains large, value-shaped evidence aggregates. Run the CLI on a
+    // consistently sized stack instead of relying on the platform-specific main-thread default.
+    let exit_code = match std::thread::Builder::new()
+        .name("eplus-rs-cli".to_string())
+        .stack_size(CLI_RUNTIME_STACK_SIZE_BYTES)
+        .spawn(move || run(&args))
+    {
+        Ok(worker) => match worker.join() {
+            Ok(exit_code) => exit_code,
+            Err(payload) => std::panic::resume_unwind(payload),
+        },
+        Err(error) => {
+            eprintln!("failed to start eplus-rs CLI worker: {error}");
+            1
+        }
+    };
     std::process::exit(exit_code);
 }
 

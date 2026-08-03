@@ -114,6 +114,8 @@ mod coupled_runtime_tests_cp409;
 mod coupled_runtime_tests_cp410;
 #[path = "test_coupled_runtime_cp411.rs"]
 mod coupled_runtime_tests_cp411;
+#[path = "test_coupled_runtime_cp412.rs"]
+mod coupled_runtime_tests_cp412;
 
 use crate::{
     ideal_loads::{

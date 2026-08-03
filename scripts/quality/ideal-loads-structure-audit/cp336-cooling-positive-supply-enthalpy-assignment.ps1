@@ -472,7 +472,7 @@ $cp336IntervalCode = [regex]::Replace(
     )
         $cp336IntervalCode = [regex]::Replace(
         $cp336IntervalCode,
-        '(?s)(?:let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment\([^;]+?\)\?;)',
+        '(?s)(?:let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_assignment\([^;]+?\)\?;)',
         ''
     )
     if ($cp336IntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
@@ -521,7 +521,7 @@ Assert-Contains -Path $cp336DirectAssertions -Pattern 'purchased_air_calc_coolin
 Assert-Contains -Path $cp336DirectAssertions -Pattern 'purchased_air_calc_cooling_positive_supply_temperature_mixed_air_limit_lifecycle' -Description "direct-run CP334 bit provenance"
 Assert-Contains -Path $cp336DirectAssertions -Pattern 'energyplus_psy_h_fn_tdb_w\(supply_temperature_c, supply_humidity_ratio\)' -Description "direct-run CP336 canonical result"
 Assert-Contains -Path $cp336NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle' -Description "non-direct CP336 null evidence"
-Assert-Contains -Path $cp336PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp411_lifecycle_evidence' -Description "non-direct CP336 through CP363 evidence rejection"
+Assert-Contains -Path $cp336PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp412_lifecycle_evidence' -Description "non-direct CP336 through CP363 evidence rejection"
 
 # Registries carry exactly two CP336 addenda and the two parent target arrays.
 $cp336AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
@@ -747,7 +747,7 @@ if (
     throw "Main IdealLoads audit must dot-source CP336 after CP335 and before completion"
 }
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp336-cooling-positive-supply-enthalpy-assignment\.ps1"' -Description "CP336 internal script inventory record"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 349 \|' -Description "CP336 cumulative generated script count through CP403"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 350 \|' -Description "CP336 cumulative generated script count through CP403"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP336 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 109 \|' -Description "CP336 cumulative generated internal script count through CP403"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 110 \|' -Description "CP336 cumulative generated internal script count through CP403"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP336 generated uncalled script count"
