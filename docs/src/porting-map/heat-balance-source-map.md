@@ -38890,3 +38890,34 @@ CP402-to-CP403-to-unchanged-numerical, and CP403 does not feed numerical
 DTO/results, nodes, loads, or reports or promote support or Roadmap status.
 Counts remain 32 algorithms and 293 routines; script inventory becomes 341
 total, 240 public, 101 internal, with 238 development commands.
+
+## CP404 post-saturation shared-case latent-output body supply-humidity-ratio psychrometric assignment
+
+CP404 maps only pinned PurchasedAirManager.cc executable line 2299,
+`PurchAir.SupplyHumRat = PsyWFnTdbH(state, PurchAir.SupplyTemp,
+SupplyEnthalpy, RoutineName);`; executable line 2300's latent-output overwrite
+is the first exclusion and CP405 candidate. Its four exact sites read
+CP403-owned supply temperature, read CP385-owned and CP403-carried supply
+enthalpy, evaluate canonical `energyplus_psy_w_fn_tdb_h`, and assign purchased-
+air supply humidity ratio. The side-effect-free arguments permit a deterministic
+dependency witness without a C++ function-argument evaluation-order claim.
+The helper keeps exactly `(H - 1.00484e3*T)/(2.50094e6 + 1.85895e3*T)` and
+floors only a raw negative result to `1e-5` (`0x3ee4f8b588e368f1`); diagnostics,
+statistics, finite gates, regrouping, and normalization remain excluded.
+
+CP404 preserves all thirty-six CP403 routes. Active predecessor indices 20,
+21, 24, 25, 27, and 29 execute four sites; the other thirty routes execute
+none. Public/private routes remain 13/23, with active public indices 20 and
+24. Exact checked accounting is T404=T403, A404=A403=B402,
+Z404=I402+F402, T404=Z404+A404, and
+source_site_execution_count=4*A404; exhaustive characterization is
+36/30/6/24.
+
+The lossless schema has forty-seven numeric values and forty-seven adjacent
+authoritative IEEE sidecars: all forty CP403 values under predecessor names,
+local T/H/psychrometric-W/assigned-W, then resulting W/H/T. Active routes
+replace only humidity ratio and zero-site routes preserve every CP403 result.
+Binding is CP403-to-CP404-to-unchanged-numerical, and CP404 does not feed
+numerical DTO/results, nodes, loads, or reports or promote support or Roadmap
+status. Counts remain 32 algorithms and 293 routines; script inventory becomes
+342 total, 240 public, 102 internal, with 238 development commands.

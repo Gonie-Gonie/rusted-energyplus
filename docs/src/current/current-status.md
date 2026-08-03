@@ -5696,3 +5696,69 @@ unchanged. Counts remain 32 algorithms, 293 routines, 58 `state_mapped`, 235
 `source_mapped`, and 170 required. Script inventory becomes 341 total, 240
 public, 101 internal, zero unused, zero unreachable, with 238 development
 commands.
+
+## CP404 post-saturation shared-case latent-output body supply-humidity-ratio psychrometric assignment
+
+CP404 supersedes only CP403's physical-line-2299 executable exclusion. At
+pinned EnergyPlus commit 6f2e40d10250a105b49966baa24d843711e61048 and locked
+raw SHA-256 54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005,
+it maps only PurchasedAirManager.cc physical executable line 2299,
+`PurchAir.SupplyHumRat = PsyWFnTdbH(state, PurchAir.SupplyTemp,
+SupplyEnthalpy, RoutineName);`. Physical executable line 2300,
+`CoolLatOutput = PurchAir.MaxCoolTotCap;`, is the first excluded executable
+and CP405 candidate; that overwrite, the else branch, case break, and
+line-2313 continuation remain excluded.
+
+The exact four dependency-ordered sites are
+`read-purchased-air-supply-temperature-for-post-saturation-capacity-limit-none-or-constant-supply-humidity-ratio-latent-output-capacity-adjustment-humidity-ratio-inversion`,
+`read-local-supply-enthalpy-for-post-saturation-capacity-limit-none-or-constant-supply-humidity-ratio-latent-output-capacity-adjustment-humidity-ratio-inversion`,
+`evaluate-psy-w-fn-tdb-h-for-post-saturation-capacity-limit-none-or-constant-supply-humidity-ratio-latent-output-capacity-adjustment`,
+and
+`assign-purchased-air-supply-humidity-ratio-for-post-saturation-capacity-limit-none-or-constant-supply-humidity-ratio-latent-output-capacity-adjustment`.
+The two arguments are side-effect-free, so this deterministic Rust dependency
+witness makes no general claim about C++ function-argument evaluation order.
+The canonical `energyplus_psy_w_fn_tdb_h` evaluation preserves exactly
+`(H - 1.00484e3*T)/(2.50094e6 + 1.85895e3*T)` and replaces only a raw result
+strictly below zero with `1e-5` (`0x3ee4f8b588e368f1`). It adds no regrouping,
+finite gate, normalization, cache, diagnostic registry, warning counter, or
+psychrometric statistics state. Positive sub-floor values, negative zero,
+NaN, infinities, and denominator-pole behavior remain IEEE characterization.
+
+CP404 preserves CP403's thirty-six logical routes without adding a branch.
+The twenty-four inherited inactive routes and six CP402 guard-false routes
+execute no CP404 site; body routes for predecessor indices 20, 21, 24, 25,
+27, and 29 execute all four sites. Public/private routes remain 13/23, with
+public assignments at indices 20 and 24 and private assignments at 21, 25,
+27, and 29. For assignments A404, CP403 assignments A403, CP402 body entries
+B402, inherited inactive transitions I402, guard-false transitions F402, and
+zero-site transitions Z404, exact state requires T404=T403,
+A404=A403=B402, Z404=I402+F402, T404=Z404+A404, every site counter equals
+A404, and source_site_execution_count=4*A404. Exhaustive characterization is
+36/30/6/24 for transitions, zero-site transitions, assignments, and source
+site executions.
+
+Recursively complete same-call bit-exact CP403 is the sole immediate
+predecessor and execution authority. CP403 owns the active supply-temperature
+operand, ultimately copied from CP329 MixedAirTemp; CP385 owns the active
+supply-enthalpy operand and CP386 through CP403 carry its bits unchanged.
+Caller/model/service scalars and numerical-coupling DTO values are forbidden
+substitutes. Active routes assign the canonical result as the current
+supply-humidity-ratio owner while preserving enthalpy and temperature;
+zero-site routes preserve all CP403 W/H/T bits and read no local operand.
+
+The lossless snapshot has exactly forty-seven `Option<f64>` fields and
+forty-seven adjacent authoritative IEEE sidecars: all forty CP403 numeric
+values under predecessor names, local supply temperature, local supply
+enthalpy, psychrometric humidity ratio, assigned supply humidity ratio, and
+current resulting W/H/T. There is no local preexisting-humidity field because
+line 2299 does not read its left-hand side. Binding is
+CP403-to-CP404-to-unchanged-numerical. CP404 never feeds or replaces
+`DirectZonePurchasedAirCouplingInput`, numerical DTO/results, prediction,
+feedback, nodes, loads, or reports; non-direct paths reject it. It adds no
+routine or psychrometrics-map row and no support, capability, algorithm,
+numerical-conformance, or Roadmap promotion. Both parent algorithms remain
+`scaffold`/`none`, both Calc routines remain `source_mapped`, and
+`routine.psy_w_fn_tdb_h` remains `state_mapped`. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
+Script inventory becomes 342 total, 240 public, 102 internal, zero unused,
+zero unreachable, with 238 development commands.
