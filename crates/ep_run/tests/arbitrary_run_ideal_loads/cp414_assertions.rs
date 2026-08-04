@@ -3,6 +3,9 @@
 use ep_runtime::psychrometrics::energyplus_psy_tsat_fn_h_pb_raw;
 use serde_json::{Map, Value, json};
 
+#[path = "cp415_assertions.rs"]
+mod cp415_assertions;
+
 const CP413_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_guard_lifecycle";
 const CP414_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment_lifecycle";
 const ORDER: [&str; 4] = [
@@ -135,6 +138,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         !results.to_string().contains(CP414_KEY),
         "CP414 lifecycle must remain outside numerical result state",
     );
+    cp415_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -143,6 +147,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP414_KEY].is_null(),
         "non-direct runtime must not publish CP414 evidence",
     );
+    cp415_assertions::assert_non_direct(runtime);
 }
 
 fn assert_route_contract(lifecycle: &Value) {

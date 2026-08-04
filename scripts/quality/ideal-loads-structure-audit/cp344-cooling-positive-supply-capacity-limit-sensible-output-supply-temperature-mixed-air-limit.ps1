@@ -481,7 +481,7 @@ $cp344BindingIntervalCode = [regex]::Replace(
     )
         $cp344BindingIntervalCode = [regex]::Replace(
         $cp344BindingIntervalCode,
-        '(?s)(?:let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_guard =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_guard\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment\([^;]+?\)\?;)',
+        '(?s)(?:let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_guard =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_guard\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit\([^;]+?\)\?;)',
         ''
     )
     if ($cp344BindingIntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
@@ -690,7 +690,7 @@ if (
 ) {
     throw "Pipeline must expose CP344 lifecycle through one direct Some/result and all three non-direct None constructors"
 }
-Assert-Contains -Path $cp344PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp414_lifecycle_evidence' -Description "non-direct CP344 through CP363 evidence rejection"
+Assert-Contains -Path $cp344PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp415_lifecycle_evidence' -Description "non-direct CP344 through CP363 evidence rejection"
 
 # Specs contain exactly two addenda and the 2+2+1+1 target distribution.
 $cp344AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
@@ -872,7 +872,7 @@ foreach ($cp344HistoricalFirewallAudit in @(
         "scripts\quality\ideal-loads-structure-audit\cp342-cooling-positive-supply-capacity-limit-sensible-output-supply-enthalpy-assignment.ps1",
         "scripts\quality\ideal-loads-structure-audit\cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1"
     )) {
-    Assert-Contains -Path $cp344HistoricalFirewallAudit -Pattern 'non_direct_runtime_rejects_cp316_through_cp414_lifecycle_evidence' -Description "historical non-direct firewall reaches CP362"
+    Assert-Contains -Path $cp344HistoricalFirewallAudit -Pattern 'non_direct_runtime_rejects_cp316_through_cp415_lifecycle_evidence' -Description "historical non-direct firewall reaches CP362"
 }
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1" -Pattern 'cp347_direct_coupled_runtime_completes_none_case_after_g_f_l_and_skips_unit_off' -Description "cumulative coupled CP347 regression"
 
@@ -889,11 +889,11 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP344 after CP343 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 352' -Description "CP344 cumulative inventory total through CP403"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 353' -Description "CP344 cumulative inventory total through CP403"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP344 cumulative uncalled inventory"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit\.ps1"' -Description "CP344 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit\.ps1::dot_sources' -Description "CP344 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 352 \|' -Description "CP344 generated script count through CP403"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 353 \|' -Description "CP344 generated script count through CP403"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP344 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 112 \|' -Description "CP344 generated internal script count through CP403"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 113 \|' -Description "CP344 generated internal script count through CP403"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP344 generated uncalled script count"

@@ -25205,8 +25205,6 @@ Counts remain 32 algorithms, 293 routines, 58 `state_mapped`, 235
 public, 90 internal, zero unused, zero unreachable, with 238 development
 commands.
 
-
-
 ## CP393 post-saturation constant-SHR case break
 
 CP393 supersedes only CP392's physical-line-2285 exclusion. At pinned
@@ -26587,3 +26585,86 @@ promotion. Counts remain 32 algorithms, 293 routines, 58 `state_mapped`,
 235 `source_mapped`, and 170 required. Script inventory becomes 352 total,
 240 public, 112 internal, zero unused, zero unreachable, with 238 development
 commands.
+
+## CP415 post-saturation saturation supply-temperature mixed-air limit
+
+CP415 supersedes only CP414's executable exclusion at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048` and locked
+`PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps physical executable line 2319 exactly:
+
+```cpp
+PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);
+```
+
+Its four exact dependency-ordered source sites are
+`read-purchased-air-supply-temperature-for-minimum`,
+`read-purchased-air-mixed-air-temperature-for-minimum`,
+`apply-source-shaped-two-argument-minimum`, and
+`assign-purchased-air-supply-temperature`. Both source reads are
+side-effect-free, so this deterministic Rust dependency order makes no
+general C++ argument-evaluation-order claim. Physical executable line 2320,
+`PurchAir.SupplyHumRat = PsyWFnTdbH(state, PurchAir.SupplyTemp,
+SupplyEnthalpy, RoutineName);`, is first excluded and the CP416 candidate.
+
+CP415 preserves CP414's fifty-four flattened conceptual outcomes one-for-one.
+Thirty-six inactive outcomes execute no CP415 site, while eighteen CP414
+saturation-temperature assignment outcomes execute all four CP415 sites.
+Therefore `T415=54`, `Z415=36`, `L415=18`, and
+`S415=4*L415=72`. Public/private remains 17/37. Public flattened indices
+remain 0 through 8, 22 through 25, and 34 through 37; active public indices
+are exactly 23, 25, 35, and 37, with fourteen active private outcomes. Five
+width-36 arrays retain CP413 predecessor, guard-false, and guard-body
+lineage, CP414 saturation-temperature assignment counts, and CP415
+mixed-air-limit execution counts. Terminal W/H/T presence remains 36/41/51.
+
+Recursively complete same-call bit-exact CP414 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate predecessor.
+CP414 `resulting_supply_temperature_c` solely owns the left/preexisting
+operand. Recursively complete same-call CP329 `mixed_air_temperature_c`
+solely owns the retained right operand, with system, parent-call ordinal,
+controlled Zone, no-OA shape, execution flags, and raw bits matched. Caller,
+model, service, Zone, numerical-DTO, and inferred values cannot substitute
+for either owner. CP415 preserves CP414 humidity and enthalpy bit-exact and
+changes temperature only on the eighteen active outcomes.
+
+The operation reuses the canonical source-shaped two-argument minimum:
+
+```rust
+if left < right { left } else { right }
+```
+
+Strict true selects the CP414 left bits. Equality, signed-zero ties, NaN, and
+unordered comparisons select the CP329 right bits, matching the imported
+source-shaped conditional rather than Rust `f64::min`. CP415 adds no total
+ordering, tolerance, clamp, normalization, finite coercion, arithmetic,
+psychrometrics, cache, diagnostics, or mutable service. Raw IEEE edge
+behavior remains characterization without a broader public reachability
+claim.
+
+The full lossless snapshot carries CP414's first 109 fields verbatim, renames
+its terminal W/H/T triple to
+`predecessor_cp414_resulting_supply_humidity_ratio`,
+`predecessor_cp414_resulting_supply_enthalpy_j_per_kg`, and
+`predecessor_cp414_resulting_supply_temperature_c`, then appends exactly
+sixteen CP415 execution, owner, read, operation, assignment, and terminal
+fields. These include the CP415 executed flag; CP414 retained-temperature
+owner and read evidence; preexisting and minimum-input supply temperatures;
+CP329 retained mixed-air owner/read evidence and operand; minimum evaluation
+and result; assignment flag and value; and resulting W/H/T. The schema has
+exactly 128 base fields, forty `Option<f64>` carriers, one `Option<bool>`
+comparison carrier, and one optional control enum. Every numeric carrier has
+one immediately adjacent authoritative IEEE sidecar, so JSON exposes exactly
+168 unique keys with forty adjacent IEEE sidecars.
+
+Binding is CP414-to-CP415-to-unchanged-numerical, and the binding checkpoint
+count advances from 105 to 106. CP415 adds no numerical or coupling-input DTO
+field and no output DTO field. Its evidence never feeds or replaces
+prediction, numerical results, feedback, nodes, loads, reports, or outputs;
+non-direct paths reject CP415 lifecycle evidence. CP415 adds no support,
+readiness, capability, routine, algorithm, numerical-conformance, source-map,
+psychrometrics-map, output/status/conformance, or Roadmap promotion. Counts
+remain 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`,
+and 170 required. Script inventory becomes 353 total, 240 public, 113
+internal, zero unused, zero unreachable, with 238 development commands.
