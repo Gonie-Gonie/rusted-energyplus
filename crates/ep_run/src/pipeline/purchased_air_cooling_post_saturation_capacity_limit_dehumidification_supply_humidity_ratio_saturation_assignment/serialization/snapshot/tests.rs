@@ -130,7 +130,7 @@ fn cp411_inactive_local_numeric_fields() -> [&'static str; 3] {
     ]
 }
 
-fn snapshot(
+pub(in crate::pipeline) fn snapshot(
     value: Option<f64>,
     active: bool,
 ) -> PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyHumidityRatioSaturationAssignmentSnapshot

@@ -30,6 +30,8 @@ SCRIPT_INVENTORY_NOTICE = """<!-- DO NOT EDIT.
 
 """
 
+BARE_OPTION_F64_RE = re.compile(r"(?<!`)Option<f64>(?!`)")
+
 
 def load_toml(path: Path) -> dict[str, Any]:
     with path.open("rb") as handle:
@@ -45,6 +47,7 @@ def table(headers: list[str], rows: list[list[str]]) -> str:
 
 
 def markdown_cell(value: str) -> str:
+    value = BARE_OPTION_F64_RE.sub(r"`Option<f64>`", value)
     return value.replace("|", "\\|").replace("\n", "<br>")
 
 

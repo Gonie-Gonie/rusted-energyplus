@@ -5106,6 +5106,87 @@ routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
 inventory becomes 350 total, 240 public, 110 internal, zero unused, zero
 unreachable, with 238 development commands.
 
+## CP413 post-saturation saturation supply-humidity-ratio guard
+
+CP413 supersedes only CP412's physical-line-2315 executable exclusion at
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked raw source SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps `PurchasedAirManager.cc` physical executable line 2315 exactly:
+`if (SupplyHumRatSat < SupplyHumRatOrig) {`. Its four exact
+dependency-ordered source sites are
+`read-local-saturation-supply-humidity-ratio-for-saturation-guard`,
+`read-local-original-supply-humidity-ratio-for-saturation-guard`,
+`compare-local-saturation-supply-humidity-ratio-strictly-less-than-local-original-supply-humidity-ratio`,
+and `enter-saturation-supply-humidity-ratio-guard-body-if-comparison-satisfied`.
+Physical executable line 2316,
+`PurchAir.SupplyTemp = PsyTsatFnHPb(state, SupplyEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName);`,
+is first excluded and the CP414 candidate; its enthalpy and pressure reads,
+psychrometric evaluation, supply-temperature assignment, and every later
+effect remain excluded.
+
+CP413 expands CP412's thirty-six logical predecessor routes into fifty-four
+exhaustive outcomes. Predecessor routes 0 through 17 each retain one inactive
+outcome. Active predecessor routes 18 through 35 each produce one evaluated-
+false outcome and one body-entered outcome. The resulting public/private split
+is 17/37. Active public predecessor indices are exactly 20, 21, 26, and 27;
+each has both outcomes, while the other fourteen active predecessors are
+private and also have both outcomes. For transitions `T413`, inactive
+outcomes `I413`, evaluated-false outcomes `F413`, and body outcomes
+`B413`, exact checked state requires `T413=54`, `I413=18`, `F413=18`,
+`B413=18`, and `T413=I413+F413+B413`. Each evaluated-false outcome
+executes three sites and each body outcome four, so
+`source_site_execution_count=3*F413+4*B413=126`. Three width-36 arrays
+retain flattened logical predecessor, false, and body counts. Every inactive
+predecessor index counts once only in the predecessor array; every active
+predecessor index counts twice there and once in each outcome array.
+
+Recursively complete same-call bit-exact CP412 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate route and
+execution authority. CP412 `resulting_saturation_supply_humidity_ratio`
+solely owns the local `SupplyHumRatSat` operand. CP412's CP411-local
+`resulting_supply_humidity_ratio_original` solely owns `SupplyHumRatOrig`.
+The carried `predecessor_cp411_resulting_supply_humidity_ratio` terminal W
+is required only as same-call bit corroboration and cannot replace that local
+original operand. Caller, model, service, CP377, numerical-result, node, load,
+and report values cannot substitute for either operand. Terminal W/H/T
+presence across all fifty-four outcomes is exactly 36/41/51.
+
+Public active release admits only finite saturation and original operands;
+inactive routes execute zero sites and ignore those otherwise-unused operands.
+Pure/private characterization performs exactly the raw IEEE binary64
+`saturation < original` comparison. NaN and every unordered comparison are
+false, equality is false, and signed-zero equality is false. The pure/private
+transition has no arithmetic, psychrometric call, finite or range gate,
+epsilon, tolerance, clamp, normalization, coercion, cache, diagnostic, or
+mutable-service dependency. The strict result alone selects evaluated-false
+versus body-entered while all available predecessor W/H/T bits remain
+unchanged.
+
+The full lossless snapshot carries CP412's 77 fields verbatim except for the
+three terminal predecessor names and appends eighteen guard, owner,
+corroboration, comparison, outcome, and resulting fields, for exactly 95 base
+fields. It has twenty-five `Option<f64>` carriers, one `Option<bool>`
+comparison carrier, and one `Option<DehumidificationControlType>` carrier.
+Every numeric carrier has one immediately adjacent authoritative IEEE
+sidecar, so JSON exposes exactly 120 unique keys with twenty-five adjacent
+IEEE sidecars and retains nonfinite payload bits despite finite-only numeric
+projection.
+
+Binding is CP412-to-CP413-to-unchanged-numerical. CP413 has no `ActiveInput`,
+adds no coupling-input or numerical DTO field, and its guard result never
+feeds or replaces prediction, numerical results, feedback, nodes, loads, or
+reports; non-direct paths reject CP413 lifecycle evidence. Physical line
+2316 remains unmapped and no `PsyTsatFnHPb` capability or routine claim is
+promoted. CP413 adds no routine, algorithm, conformance, source-map,
+psychrometrics-map, support, readiness, capability, output, status, or
+Roadmap promotion. Existing Calc routines remain `source_mapped`, parent
+algorithms remain `scaffold`/`none`, and counts remain 32 algorithms, 293
+routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
+Script inventory becomes 351 total, 240 public, 111 internal, zero unused,
+zero unreachable, with 238 development commands.
+
+
 
 
 ## CP392 post-saturation constant-SHR supply-humidity-ratio assignment
@@ -5414,7 +5495,7 @@ predecessor_cp394_resulting_supply_temperature_c, supply_temperature_c,
 supply_enthalpy_j_per_kg, psychrometric_supply_humidity_ratio,
 assigned_supply_humidity_ratio, resulting_supply_humidity_ratio,
 resulting_supply_enthalpy_j_per_kg, and resulting_supply_temperature_c. This
-is exactly thirteen Option<f64> fields and thirteen authoritative IEEE
+is exactly thirteen `Option<f64>` fields and thirteen authoritative IEEE
 sidecars in that order. Both predecessor triples have humidity only on routes
 18, 22, and 28,
 enthalpy on 5, 8, 11, 14, and 17 through 29, and temperature on 3 through 29.

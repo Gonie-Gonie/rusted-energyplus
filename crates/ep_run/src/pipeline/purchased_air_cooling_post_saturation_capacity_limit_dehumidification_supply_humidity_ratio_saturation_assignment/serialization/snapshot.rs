@@ -129,3 +129,5 @@ fn ieee_bits(value: Option<f64>) -> Option<String> {
 
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+pub(in crate::pipeline) use tests::snapshot as test_snapshot;

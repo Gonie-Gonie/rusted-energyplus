@@ -2,6 +2,9 @@
 
 use serde_json::{Map, Value, json};
 
+#[path = "cp413_assertions.rs"]
+mod cp413_assertions;
+
 const CP411_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment_lifecycle";
 const CP412_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_assignment_lifecycle";
 const ORDER: [&str; 4] = [
@@ -142,6 +145,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         !results.to_string().contains(CP412_KEY),
         "CP412 lifecycle must remain outside numerical result state"
     );
+    cp413_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -150,6 +154,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP412_KEY].is_null(),
         "non-direct runtime must not publish CP412 evidence"
     );
+    cp413_assertions::assert_non_direct(runtime);
 }
 
 fn assert_route_contract(lifecycle: &Value) {

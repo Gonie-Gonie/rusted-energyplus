@@ -6,6 +6,8 @@ use serde_json::{Value, json};
 mod snapshot;
 
 use snapshot::snapshot_json;
+#[cfg(test)]
+pub(in crate::pipeline) use snapshot::test_snapshot;
 
 pub(in crate::pipeline) fn lifecycle_json(
     lifecycle: &PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyHumidityRatioSaturationAssignmentLifecycleSummary,
