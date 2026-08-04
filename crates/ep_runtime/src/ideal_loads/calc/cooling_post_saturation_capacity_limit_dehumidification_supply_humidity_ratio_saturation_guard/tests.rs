@@ -63,7 +63,7 @@ fn option_presence_cannot_forge_cp413_reachability() {
     assert!(snapshot.original_supply_humidity_ratio_for_guard.is_none());
 }
 
-pub(super) fn all_routes() -> Vec<RetainedRoute> {
+pub(in crate::ideal_loads::calc) fn all_routes() -> Vec<RetainedRoute> {
     let mut routes = Vec::new();
     for predecessor_index in 0..30 {
         let active = matches!(predecessor_index, 18..=29);
@@ -95,11 +95,11 @@ pub(super) fn all_routes() -> Vec<RetainedRoute> {
     routes
 }
 
-pub(super) fn predecessor_for_route(route: RetainedRoute, ordinal: usize) -> Predecessor {
+pub(in crate::ideal_loads::calc) fn predecessor_for_route(route: RetainedRoute, ordinal: usize) -> Predecessor {
     predecessor_with_original(route, ordinal, 0.001)
 }
 
-pub(super) fn predecessor_for_outcome(
+pub(in crate::ideal_loads::calc) fn predecessor_for_outcome(
     route: RetainedRoute,
     ordinal: usize,
     body_entered: bool,
@@ -110,7 +110,7 @@ pub(super) fn predecessor_for_outcome(
     predecessor_with_original(route, ordinal, if body_entered { 0.03 } else { 0.001 })
 }
 
-pub(super) fn predecessor_with_original(
+pub(in crate::ideal_loads::calc) fn predecessor_with_original(
     route: RetainedRoute,
     ordinal: usize,
     original: f64,
@@ -118,7 +118,7 @@ pub(super) fn predecessor_with_original(
     predecessor_with_operands(route, ordinal, original, 18.0, 101_325.0)
 }
 
-pub(super) fn predecessor_with_operands(
+pub(in crate::ideal_loads::calc) fn predecessor_with_operands(
     route: RetainedRoute,
     ordinal: usize,
     original: f64,
@@ -130,6 +130,35 @@ pub(super) fn predecessor_with_operands(
         let original = Some(original);
         cp410.predecessor_cp409_resulting_supply_humidity_ratio = original;
         cp410.resulting_supply_humidity_ratio = original;
+        let temperature = Some(temperature);
+        cp410.predecessor_cp409_resulting_supply_temperature_c = temperature;
+        cp410.resulting_supply_temperature_c = temperature;
+    }
+    let mut cp411_state = Cp411State::new(cp410.system);
+    let cp411 = advance_cp411(&mut cp411_state, cp410).expect("valid CP411 predecessor");
+    let mut cp412_state = Cp412State::new(cp411.system);
+    let input = route.active.then_some(Cp412ActiveInput {
+        outdoor_barometric_pressure_pa: pressure,
+    });
+    advance_cp412(&mut cp412_state, cp411, input).expect("valid CP412 predecessor")
+}
+
+pub(in crate::ideal_loads::calc) fn predecessor_with_enthalpy(
+    route: RetainedRoute,
+    ordinal: usize,
+    original: f64,
+    temperature: f64,
+    pressure: f64,
+    enthalpy: f64,
+) -> Predecessor {
+    let mut cp410 = cp410_predecessor_for_route(route, ordinal);
+    if route.active {
+        let original = Some(original);
+        cp410.predecessor_cp409_resulting_supply_humidity_ratio = original;
+        cp410.resulting_supply_humidity_ratio = original;
+        let enthalpy = Some(enthalpy);
+        cp410.predecessor_cp409_resulting_supply_enthalpy_j_per_kg = enthalpy;
+        cp410.resulting_supply_enthalpy_j_per_kg = enthalpy;
         let temperature = Some(temperature);
         cp410.predecessor_cp409_resulting_supply_temperature_c = temperature;
         cp410.resulting_supply_temperature_c = temperature;

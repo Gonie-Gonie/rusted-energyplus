@@ -21166,375 +21166,6 @@ and 170 required. Script inventory becomes 329 total, 240 public, 89 internal,
 zero unused, zero unreachable, with 238 development commands.
 
 
-## CP409 post-saturation shared None/constant-supply-humidity-ratio case break
-
-CP409 maps only pinned EnergyPlus commit
-`6f2e40d10250a105b49966baa24d843711e61048`, `PurchasedAirManager.cc`
-physical line 2306: `} break;`. The locked raw source SHA-256 remains
-`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
-The leading `}` is non-executable syntax that closes the shared compound
-statement opened at physical line 2291. The sole executable source site is
-the following `break;`, named
-`exit-purchased-air-post-saturation-capacity-limit-dehumidification-control-none-or-constant-supply-humidity-ratio-shared-case-via-break`.
-It exits the nearest dehumidification-control switch; it does not exit the
-outer capacity-limit body or the Calc routine.
-
-Every retained `None` or `ConstantSupplyHumidityRatio` shared-case route
-executes the break once after either outcome of the line-2297 latent-output
-capacity guard. CP409 preserves CP408's thirty-six logical routes and
-13/23 public/private split. Flattened indices 20, 21, 22, 23, 26, 27, 28,
-29, 31, 32, 34, and 35 execute the sole site; the other twenty-four routes
-execute none. Active public indices are 20, 21, 26, and 27. For transitions
-`T409`, inactive transitions `I409`, break executions `B409`, CP408
-mixed-air limits `L408`, and CP405 retained maximum-capacity assignments
-`M405`, exact checked state requires `T409=T408=36`,
-`B409=L408+M405=6+6=12`, `I409=T409-B409=24`, and
-`source_site_execution_count=B409=12`. Three width-30 arrays preserve
-CP408's route, guard-false, and maximum-capacity-assignment lineage. Break
-counts are reconstructed exactly as the latter two arrays' checked sum at
-predecessor indices 20, 21, 24, 25, 27, and 29.
-
-Recursively complete same-call bit-exact CP408 lifecycle, snapshot, latest,
-private witness, and completion evidence are the sole immediate route and
-execution authority. CP405 maximum-capacity evidence is retained only
-through CP408 and cannot bypass it. CP409 reads no scalar operand, selector,
-model, service, DTO, node, or report state. It performs no comparison,
-assignment, arithmetic, psychrometric evaluation, finite or range gate,
-clamp, normalization, diagnostic, or coercion. Every available supply
-humidity ratio, enthalpy, and temperature is preserved bit-exactly.
-
-The lossless snapshot has exactly 45 base fields, including six
-`Option<f64>` carriers and one
-`Option<DehumidificationControlType>` carrier. JSON exposes 51 unique keys
-with six immediately adjacent authoritative IEEE-bit sidecars. Binding is
-CP408-to-CP409-to-unchanged-numerical. CP409 never enters, consumes,
-reconciles with, feeds, overwrites, or replaces
-`DirectZonePurchasedAirCouplingInput`, prediction, any numerical
-DTO/result, feedback, node, load, or report state; non-direct paths reject
-its lifecycle evidence.
-
-Physical line 2307 is the non-executable `default:` label. Physical
-executable line 2308, `break;`, is the first excluded executable and the
-CP410 candidate. The switch-closing line 2309, comments and blank lines
-23010-23012, and the active shared-case break's dynamic continuation at
-physical executable line 2313 remain excluded.
-
-CP409 adds no routine or source-map row and makes no support, readiness,
-feature/evidence, capability, numerical-conformance, psychrometrics-map,
-output-ownership, status, conformance, or Roadmap promotion. Existing Calc
-routines remain `source_mapped`, and their parent algorithms remain
-`scaffold`/`none`. Counts remain 32 algorithms, 293 routines, 58
-`state_mapped`, 235 `source_mapped`, and 170 required. Script inventory
-becomes 347 total, 240 public, 107 internal, zero unused, zero unreachable,
-with 238 development commands.
-
-## CP410 post-saturation dehumidification-control default case break
-
-CP410 maps only pinned EnergyPlus commit
-`6f2e40d10250a105b49966baa24d843711e61048`, `PurchasedAirManager.cc`
-physical executable line 2308: `break;`. The locked raw source SHA-256
-remains
-`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
-Physical line 2307 is the non-executable `default:` label. The sole CP410
-source site is
-`exit-purchased-air-post-saturation-capacity-limit-dehumidification-control-default-case-via-break`.
-It would exit the nearest dehumidification-control switch, not the outer
-capacity-limit body or the Calc routine.
-
-The typed `DehumidificationControlType` domain has exactly the four named
-variants `None`, `ConstantSensibleHeatRatio`,
-`ConstantSupplyHumidityRatio`, and `Humidistat`; every variant is handled by
-an explicit source case. There is no invalid, unknown, or thirty-seventh
-default route. CP410 therefore preserves CP409's thirty-six logical routes
-and 13/23 public/private split, but every retained route skips the sole
-default-break site. There are no active public or private routes. For
-transitions `T410`, inactive transitions `I410`, default-break executions
-`B410`, and CP409 transitions `T409`, exact checked state requires
-`T410=T409=36`, `I410=T410=36`, `B410=0`, and
-`source_site_execution_count=B410=0`.
-
-Three width-30 arrays preserve CP409's predecessor-route, guard-false, and
-maximum-capacity-assignment lineage. Their checked guard-false and
-maximum-assignment totals still reconstruct CP409's twelve shared-case
-breaks as `B409=6+6=12`; that predecessor evidence cannot activate CP410's
-typed-unreachable default case.
-
-Recursively complete same-call bit-exact CP409 lifecycle, snapshot, latest,
-private witness, and completion evidence are the sole immediate route and
-execution authority. CP410 reads no scalar operand, selector, model,
-service, DTO, node, or report state. It performs no comparison, assignment,
-arithmetic, psychrometric evaluation, finite or range gate, clamp,
-normalization, diagnostic, default behavior, or coercion.
-
-The lossless snapshot has exactly 46 base fields, including six
-`Option<f64>` carriers and one
-`Option<DehumidificationControlType>` carrier. CP409 terminal supply
-humidity ratio, enthalpy, and temperature are retained under predecessor
-names and copied to resulting fields bit-exactly without constituting a
-CP410 source operand read. JSON exposes 52 unique keys with six immediately
-adjacent authoritative IEEE-bit sidecars. Binding is
-CP409-to-CP410-to-unchanged-numerical. CP410 never enters, consumes,
-reconciles with, feeds, overwrites, or replaces
-`DirectZonePurchasedAirCouplingInput`, prediction, any numerical
-DTO/result, feedback, node, load, or report state; non-direct paths reject
-its lifecycle evidence.
-
-Physical line 2309 only closes the switch, lines 2310-2311 are comments,
-and line 2312 is blank. Physical executable line 2313,
-`SupplyHumRatOrig = PurchAir.SupplyHumRat;`, is the first excluded
-executable and the CP411 candidate. It is dynamically reached by flattened
-CP410 routes 18 through 35 (18 routes total), split 4 public and 14 private;
-flattened routes 0 through 17 do not reach it.
-
-CP410 adds no routine or source-map row and makes no support, readiness,
-feature/evidence, capability, numerical-conformance, psychrometrics-map,
-output-ownership, status, conformance, or Roadmap promotion. Existing Calc
-routines remain `source_mapped`, and their parent algorithms remain
-`scaffold`/`none`. Counts remain 32 algorithms, 293 routines, 58
-`state_mapped`, 235 `source_mapped`, and 170 required. Script inventory
-becomes 348 total, 240 public, 108 internal, zero unused, zero unreachable,
-with 238 development commands.
-
-## CP411 post-saturation pre-saturation-original supply-humidity-ratio assignment
-
-CP411 supersedes only CP410's physical-line-2313 executable exclusion at
-pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
-locked raw source SHA-256
-`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
-It maps `PurchasedAirManager.cc` physical executable line 2313 exactly:
-`SupplyHumRatOrig = PurchAir.SupplyHumRat;`. Its two exact
-dependency-ordered source sites are
-`read-purchased-air-supply-humidity-ratio-before-saturation-limit` and
-`assign-local-original-supply-humidity-ratio-before-saturation-limit`.
-Physical executable line 2314,
-`SupplyHumRatSat = PsyWFnTdbRhPb(state, PurchAir.SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);`,
-is first excluded and the CP412 candidate.
-
-CP411 preserves CP410's thirty-six logical routes and 13/23 public/private
-split. Flattened routes 18 through 35 are active and routes 0 through 17
-are inactive, for 18 active and 18 inactive transitions. Active public
-routes are exactly flattened indices 20, 21, 26, and 27; the other fourteen
-active routes are private. For transitions `T411`, assignments `A411`,
-inactive transitions `I411`, and CP410 transitions `T410`, exact checked
-state requires `T411=T410=36`, `A411=18`, `I411=18`,
-`T411=I411+A411`, both the source read and local assignment counters equal
-`A411`, and `source_site_execution_count=2*A411=36`.
-
-Three width-30 arrays preserve CP410's predecessor-route, guard-false, and
-maximum-capacity-assignment lineage, and one width-30 CP411 array records
-the assignment. Underlying predecessor routes 18 through 29 are active;
-underlying routes 20, 21, 24, 25, 27, and 29 each retain two flattened
-routes, while the other six active underlying routes each retain one. The
-CP411 assignment array exactly matches those active predecessor counts and
-is zero for underlying routes 0 through 17.
-
-Recursively complete same-call bit-exact CP410 lifecycle, snapshot, latest,
-private witness, and completion evidence are the sole immediate route and
-execution authority. CP410 terminal supply humidity ratio, enthalpy, and
-temperature are present on exactly 18, 23, and 33 flattened routes,
-respectively. CP411's active set is exactly the 18 routes carrying terminal
-supply humidity ratio. Only CP410
-`resulting_supply_humidity_ratio` owns the source operand: it is read
-exactly 18 times. Terminal enthalpy and temperature are preserved but read
-zero times. Caller, model, service, selector, numerical DTO/result, node,
-load, and report scalars are forbidden substitutes.
-
-Each active transition copies the raw binary64 humidity-ratio payload
-bit-for-bit from the CP410 terminal value through the source read, assigned
-local original value, and resulting original value. CP411 performs no
-arithmetic, comparison, psychrometric evaluation, finite or range gate,
-clamp, normalization, coercion, cache, diagnostic, or mutable-service
-operation. Inactive routes perform neither source site and retain no
-original-value payload.
-
-The lossless snapshot has exactly 59 base fields, including twelve
-`Option<f64>` carriers and one
-`Option<DehumidificationControlType>` carrier. The twelve numeric carriers
-are ordered as the preserved CP409 terminal W/H/T triple, predecessor CP410
-terminal W/H/T, the source-read, assigned, and resulting-original humidity
-ratio triple, and terminal W/H/T. Twelve immediately adjacent authoritative
-IEEE-bit sidecars accompany those numeric fields, so JSON exposes exactly 71 unique
-keys.
-
-Binding is CP410-to-CP411-to-unchanged-numerical. CP411 never enters,
-consumes, reconciles with, feeds, overwrites, or replaces
-`DirectZonePurchasedAirCouplingInput`, prediction, any numerical
-DTO/result, feedback, node, load, or report state; non-direct paths reject
-its lifecycle evidence. Physical executable line 2314 remains excluded and
-is dynamically reached by the same flattened routes 18 through 35, split
-4 public and 14 private; flattened routes 0 through 17 do not reach it.
-
-CP411 adds no routine or source-map row and makes no support, readiness,
-feature/evidence, capability, numerical-conformance, psychrometrics-map,
-output-ownership, status, conformance, or Roadmap promotion. Existing Calc
-routines remain `source_mapped`, and their parent algorithms remain
-`scaffold`/`none`. Counts remain 32 algorithms, 293 routines, 58
-`state_mapped`, 235 `source_mapped`, and 170 required. Script inventory
-becomes 349 total, 240 public, 109 internal, zero unused, zero unreachable,
-with 238 development commands.
-
-## CP412 post-saturation saturation supply-humidity-ratio assignment
-
-CP412 supersedes only CP411's physical-line-2314 executable exclusion at
-pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
-locked raw source SHA-256
-`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
-It maps `PurchasedAirManager.cc` physical executable line 2314 exactly:
-`SupplyHumRatSat = PsyWFnTdbRhPb(state, PurchAir.SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);`.
-Its four exact dependency-ordered source sites are
-`read-purchased-air-supply-temperature-for-saturation-humidity-ratio`,
-`read-environment-outdoor-barometric-pressure-for-saturation-humidity-ratio`,
-`evaluate-psy-w-fn-tdb-rh-pb-at-unity-relative-humidity`, and
-`assign-local-saturation-supply-humidity-ratio`. Physical executable line
-2315, `if (SupplyHumRatSat < SupplyHumRatOrig) {`, is first excluded and the
-CP413 candidate; neither operand read, the strict comparison, branch entry,
-nor any line-2316-and-later effect is included.
-
-CP412 preserves CP411's thirty-six logical routes and 13/23 public/private
-split. Flattened routes 18 through 35 are active and routes 0 through 17 are
-inactive. Active public indices remain exactly 20, 21, 26, and 27; the other
-fourteen active routes are private. For transitions `T412`, saturation
-assignments `A412`, inactive transitions `I412`, and CP411 assignments
-`A411`, exact checked state requires `T412=T411=36`, `A412=A411=18`,
-`I412=18`, `T412=I412+A412`, every source-site counter equals `A412`, and
-`source_site_execution_count=4*A412=72`. Five width-30 arrays retain the
-predecessor route, guard-false, maximum-capacity-assignment, CP411 original-
-humidity assignment, and CP412 saturation-assignment counts. The final two
-arrays equal predecessor counts on underlying routes 18 through 29 and are
-zero on routes 0 through 17; the six inherited split indices remain 20, 21,
-24, 25, 27, and 29.
-
-Recursively complete same-call bit-exact CP411 lifecycle, snapshot, latest,
-private witness, and completion evidence are the sole immediate route and
-execution authority. CP411 `resulting_supply_temperature_c` is the sole
-temperature operand owner; caller, model, service, CP377, CP334, CP344,
-numerical-result, node, load, and report values cannot replace it. Outdoor
-barometric pressure is read separately from the current-timestep existing
-scheduled-coupling input and makes no broader WeatherManager, Site-density,
-or standard-air-density ownership claim. CP411's original humidity ratio and
-terminal W/H/T are carried bit-exactly but line 2314 reads none of W or H.
-Terminal W/H/T ownership and unchanged-preservation totals remain 18/23/33,
-while temperature and pressure owner/read, psychrometric evaluation, and
-local saturation-assignment counts are each exactly 18.
-
-Each active route calls only canonical stateless
-`energyplus_psy_w_fn_tdb_rh_pb(temperature, 1.0, pressure)`, preserving the
-unconditional saturation-pressure projection, ordered 1000 Pa denominator
-floor, and ordered `1.0e-5` humidity-ratio floor. Public active admission
-requires finite predecessor temperature, finite strictly-positive pressure,
-and a finite result; inactive routes execute zero sites and do not validate
-the unused pressure. Pure/private characterization preserves exact input and
-result IEEE bits for signed zero, subnormal, infinity, and NaN cases. The
-guarded RH wrapper, cache, statistics, diagnostics, `RoutineName` effects,
-error helpers, compile variants, comparison, clamp, normalization, and
-mutable psychrometric service remain excluded.
-
-The full lossless snapshot has exactly 77 base fields, twenty `Option<f64>`
-carriers, and one `Option<DehumidificationControlType>` carrier. Numeric order
-retains CP411's CP409 W/H/T, CP410 W/H/T, original source-read/assigned/result
-triple, then predecessor-CP411 terminal W/H/T; CP412 appends temperature,
-pressure, evaluated/assigned/resulting saturation humidity ratio, and final
-terminal W/H/T. Every numeric carrier has one immediately adjacent
-authoritative IEEE sidecar, so JSON exposes exactly 97 unique keys and uses
-finite-only numeric projections without losing nonfinite payload bits.
-
-Binding is CP411-to-CP412-to-unchanged-numerical. CP412 reads only the existing
-current-call barometric-pressure input, adds no coupling-input field, and its
-local saturation value never feeds or replaces prediction, numerical
-DTO/results, feedback, nodes, loads, or reports; non-direct paths reject its
-lifecycle evidence. The supported numerical supply-humidity result remains
-CP345-owned. CP412 adds no routine or source-map row and makes no support,
-readiness, capability, numerical-conformance, psychrometrics-map, output,
-status, conformance, or Roadmap promotion. Existing Calc routines remain
-`source_mapped`, `routine.psy_w_fn_tdb_rh_pb` remains `state_mapped`, and the
-parent algorithms remain `scaffold`/`none`. Counts remain 32 algorithms, 293
-routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
-inventory becomes 350 total, 240 public, 110 internal, zero unused, zero
-unreachable, with 238 development commands.
-
-## CP413 post-saturation saturation supply-humidity-ratio guard
-
-CP413 supersedes only CP412's physical-line-2315 executable exclusion at
-pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
-locked raw source SHA-256
-`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
-It maps `PurchasedAirManager.cc` physical executable line 2315 exactly:
-`if (SupplyHumRatSat < SupplyHumRatOrig) {`. Its four exact
-dependency-ordered source sites are
-`read-local-saturation-supply-humidity-ratio-for-saturation-guard`,
-`read-local-original-supply-humidity-ratio-for-saturation-guard`,
-`compare-local-saturation-supply-humidity-ratio-strictly-less-than-local-original-supply-humidity-ratio`,
-and `enter-saturation-supply-humidity-ratio-guard-body-if-comparison-satisfied`.
-Physical executable line 2316,
-`PurchAir.SupplyTemp = PsyTsatFnHPb(state, SupplyEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName);`,
-is first excluded and the CP414 candidate; its enthalpy and pressure reads,
-psychrometric evaluation, supply-temperature assignment, and every later
-effect remain excluded.
-
-CP413 expands CP412's thirty-six logical predecessor routes into fifty-four
-exhaustive outcomes. Predecessor routes 0 through 17 each retain one inactive
-outcome. Active predecessor routes 18 through 35 each produce one evaluated-
-false outcome and one body-entered outcome. The resulting public/private split
-is 17/37. Active public predecessor indices are exactly 20, 21, 26, and 27;
-each has both outcomes, while the other fourteen active predecessors are
-private and also have both outcomes. For transitions `T413`, inactive
-outcomes `I413`, evaluated-false outcomes `F413`, and body outcomes
-`B413`, exact checked state requires `T413=54`, `I413=18`, `F413=18`,
-`B413=18`, and `T413=I413+F413+B413`. Each evaluated-false outcome
-executes three sites and each body outcome four, so
-`source_site_execution_count=3*F413+4*B413=126`. Three width-36 arrays
-retain flattened logical predecessor, false, and body counts. Every inactive
-predecessor index counts once only in the predecessor array; every active
-predecessor index counts twice there and once in each outcome array.
-
-Recursively complete same-call bit-exact CP412 lifecycle, snapshot, latest,
-private witness, and completion evidence are the sole immediate route and
-execution authority. CP412 `resulting_saturation_supply_humidity_ratio`
-solely owns the local `SupplyHumRatSat` operand. CP412's CP411-local
-`resulting_supply_humidity_ratio_original` solely owns `SupplyHumRatOrig`.
-The carried `predecessor_cp411_resulting_supply_humidity_ratio` terminal W
-is required only as same-call bit corroboration and cannot replace that local
-original operand. Caller, model, service, CP377, numerical-result, node, load,
-and report values cannot substitute for either operand. Terminal W/H/T
-presence across all fifty-four outcomes is exactly 36/41/51.
-
-Public active release admits only finite saturation and original operands;
-inactive routes execute zero sites and ignore those otherwise-unused operands.
-Pure/private characterization performs exactly the raw IEEE binary64
-`saturation < original` comparison. NaN and every unordered comparison are
-false, equality is false, and signed-zero equality is false. The pure/private
-transition has no arithmetic, psychrometric call, finite or range gate,
-epsilon, tolerance, clamp, normalization, coercion, cache, diagnostic, or
-mutable-service dependency. The strict result alone selects evaluated-false
-versus body-entered while all available predecessor W/H/T bits remain
-unchanged.
-
-The full lossless snapshot carries CP412's 77 fields verbatim except for the
-three terminal predecessor names and appends eighteen guard, owner,
-corroboration, comparison, outcome, and resulting fields, for exactly 95 base
-fields. It has twenty-five `Option<f64>` carriers, one `Option<bool>`
-comparison carrier, and one `Option<DehumidificationControlType>` carrier.
-Every numeric carrier has one immediately adjacent authoritative IEEE
-sidecar, so JSON exposes exactly 120 unique keys with twenty-five adjacent
-IEEE sidecars and retains nonfinite payload bits despite finite-only numeric
-projection.
-
-Binding is CP412-to-CP413-to-unchanged-numerical. CP413 has no `ActiveInput`,
-adds no coupling-input or numerical DTO field, and its guard result never
-feeds or replaces prediction, numerical results, feedback, nodes, loads, or
-reports; non-direct paths reject CP413 lifecycle evidence. Physical line
-2316 remains unmapped and no `PsyTsatFnHPb` capability or routine claim is
-promoted. CP413 adds no routine, algorithm, conformance, source-map,
-psychrometrics-map, support, readiness, capability, output, status, or
-Roadmap promotion. Existing Calc routines remain `source_mapped`, parent
-algorithms remain `scaffold`/`none`, and counts remain 32 algorithms, 293
-routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
-Script inventory becomes 351 total, 240 public, 111 internal, zero unused,
-zero unreachable, with 238 development commands.
-
-
-
-
 ## CP392 post-saturation constant-SHR supply-humidity-ratio assignment
 
 CP392 supersedes only CP391's physical-line-2284 exclusion. At pinned
@@ -22761,3 +22392,461 @@ their parent algorithms remain `scaffold`/`none`. Counts remain 32
 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
 required. Script inventory becomes 346 total, 240 public, 106 internal,
 zero unused, zero unreachable, with 238 development commands.
+
+## CP409 post-saturation shared None/constant-supply-humidity-ratio case break
+
+CP409 maps only pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, `PurchasedAirManager.cc`
+physical line 2306: `} break;`. The locked raw source SHA-256 remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+The leading `}` is non-executable syntax that closes the shared compound
+statement opened at physical line 2291. The sole executable source site is
+the following `break;`, named
+`exit-purchased-air-post-saturation-capacity-limit-dehumidification-control-none-or-constant-supply-humidity-ratio-shared-case-via-break`.
+It exits the nearest dehumidification-control switch; it does not exit the
+outer capacity-limit body or the Calc routine.
+
+Every retained `None` or `ConstantSupplyHumidityRatio` shared-case route
+executes the break once after either outcome of the line-2297 latent-output
+capacity guard. CP409 preserves CP408's thirty-six logical routes and
+13/23 public/private split. Flattened indices 20, 21, 22, 23, 26, 27, 28,
+29, 31, 32, 34, and 35 execute the sole site; the other twenty-four routes
+execute none. Active public indices are 20, 21, 26, and 27. For transitions
+`T409`, inactive transitions `I409`, break executions `B409`, CP408
+mixed-air limits `L408`, and CP405 retained maximum-capacity assignments
+`M405`, exact checked state requires `T409=T408=36`,
+`B409=L408+M405=6+6=12`, `I409=T409-B409=24`, and
+`source_site_execution_count=B409=12`. Three width-30 arrays preserve
+CP408's route, guard-false, and maximum-capacity-assignment lineage. Break
+counts are reconstructed exactly as the latter two arrays' checked sum at
+predecessor indices 20, 21, 24, 25, 27, and 29.
+
+Recursively complete same-call bit-exact CP408 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate route and
+execution authority. CP405 maximum-capacity evidence is retained only
+through CP408 and cannot bypass it. CP409 reads no scalar operand, selector,
+model, service, DTO, node, or report state. It performs no comparison,
+assignment, arithmetic, psychrometric evaluation, finite or range gate,
+clamp, normalization, diagnostic, or coercion. Every available supply
+humidity ratio, enthalpy, and temperature is preserved bit-exactly.
+
+The lossless snapshot has exactly 45 base fields, including six
+`Option<f64>` carriers and one
+`Option<DehumidificationControlType>` carrier. JSON exposes 51 unique keys
+with six immediately adjacent authoritative IEEE-bit sidecars. Binding is
+CP408-to-CP409-to-unchanged-numerical. CP409 never enters, consumes,
+reconciles with, feeds, overwrites, or replaces
+`DirectZonePurchasedAirCouplingInput`, prediction, any numerical
+DTO/result, feedback, node, load, or report state; non-direct paths reject
+its lifecycle evidence.
+
+Physical line 2307 is the non-executable `default:` label. Physical
+executable line 2308, `break;`, is the first excluded executable and the
+CP410 candidate. The switch-closing line 2309, comments and blank lines
+23010-23012, and the active shared-case break's dynamic continuation at
+physical executable line 2313 remain excluded.
+
+CP409 adds no routine or source-map row and makes no support, readiness,
+feature/evidence, capability, numerical-conformance, psychrometrics-map,
+output-ownership, status, conformance, or Roadmap promotion. Existing Calc
+routines remain `source_mapped`, and their parent algorithms remain
+`scaffold`/`none`. Counts remain 32 algorithms, 293 routines, 58
+`state_mapped`, 235 `source_mapped`, and 170 required. Script inventory
+becomes 347 total, 240 public, 107 internal, zero unused, zero unreachable,
+with 238 development commands.
+
+## CP410 post-saturation dehumidification-control default case break
+
+CP410 maps only pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048`, `PurchasedAirManager.cc`
+physical executable line 2308: `break;`. The locked raw source SHA-256
+remains
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+Physical line 2307 is the non-executable `default:` label. The sole CP410
+source site is
+`exit-purchased-air-post-saturation-capacity-limit-dehumidification-control-default-case-via-break`.
+It would exit the nearest dehumidification-control switch, not the outer
+capacity-limit body or the Calc routine.
+
+The typed `DehumidificationControlType` domain has exactly the four named
+variants `None`, `ConstantSensibleHeatRatio`,
+`ConstantSupplyHumidityRatio`, and `Humidistat`; every variant is handled by
+an explicit source case. There is no invalid, unknown, or thirty-seventh
+default route. CP410 therefore preserves CP409's thirty-six logical routes
+and 13/23 public/private split, but every retained route skips the sole
+default-break site. There are no active public or private routes. For
+transitions `T410`, inactive transitions `I410`, default-break executions
+`B410`, and CP409 transitions `T409`, exact checked state requires
+`T410=T409=36`, `I410=T410=36`, `B410=0`, and
+`source_site_execution_count=B410=0`.
+
+Three width-30 arrays preserve CP409's predecessor-route, guard-false, and
+maximum-capacity-assignment lineage. Their checked guard-false and
+maximum-assignment totals still reconstruct CP409's twelve shared-case
+breaks as `B409=6+6=12`; that predecessor evidence cannot activate CP410's
+typed-unreachable default case.
+
+Recursively complete same-call bit-exact CP409 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate route and
+execution authority. CP410 reads no scalar operand, selector, model,
+service, DTO, node, or report state. It performs no comparison, assignment,
+arithmetic, psychrometric evaluation, finite or range gate, clamp,
+normalization, diagnostic, default behavior, or coercion.
+
+The lossless snapshot has exactly 46 base fields, including six
+`Option<f64>` carriers and one
+`Option<DehumidificationControlType>` carrier. CP409 terminal supply
+humidity ratio, enthalpy, and temperature are retained under predecessor
+names and copied to resulting fields bit-exactly without constituting a
+CP410 source operand read. JSON exposes 52 unique keys with six immediately
+adjacent authoritative IEEE-bit sidecars. Binding is
+CP409-to-CP410-to-unchanged-numerical. CP410 never enters, consumes,
+reconciles with, feeds, overwrites, or replaces
+`DirectZonePurchasedAirCouplingInput`, prediction, any numerical
+DTO/result, feedback, node, load, or report state; non-direct paths reject
+its lifecycle evidence.
+
+Physical line 2309 only closes the switch, lines 2310-2311 are comments,
+and line 2312 is blank. Physical executable line 2313,
+`SupplyHumRatOrig = PurchAir.SupplyHumRat;`, is the first excluded
+executable and the CP411 candidate. It is dynamically reached by flattened
+CP410 routes 18 through 35 (18 routes total), split 4 public and 14 private;
+flattened routes 0 through 17 do not reach it.
+
+CP410 adds no routine or source-map row and makes no support, readiness,
+feature/evidence, capability, numerical-conformance, psychrometrics-map,
+output-ownership, status, conformance, or Roadmap promotion. Existing Calc
+routines remain `source_mapped`, and their parent algorithms remain
+`scaffold`/`none`. Counts remain 32 algorithms, 293 routines, 58
+`state_mapped`, 235 `source_mapped`, and 170 required. Script inventory
+becomes 348 total, 240 public, 108 internal, zero unused, zero unreachable,
+with 238 development commands.
+
+## CP411 post-saturation pre-saturation-original supply-humidity-ratio assignment
+
+CP411 supersedes only CP410's physical-line-2313 executable exclusion at
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked raw source SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps `PurchasedAirManager.cc` physical executable line 2313 exactly:
+`SupplyHumRatOrig = PurchAir.SupplyHumRat;`. Its two exact
+dependency-ordered source sites are
+`read-purchased-air-supply-humidity-ratio-before-saturation-limit` and
+`assign-local-original-supply-humidity-ratio-before-saturation-limit`.
+Physical executable line 2314,
+`SupplyHumRatSat = PsyWFnTdbRhPb(state, PurchAir.SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);`,
+is first excluded and the CP412 candidate.
+
+CP411 preserves CP410's thirty-six logical routes and 13/23 public/private
+split. Flattened routes 18 through 35 are active and routes 0 through 17
+are inactive, for 18 active and 18 inactive transitions. Active public
+routes are exactly flattened indices 20, 21, 26, and 27; the other fourteen
+active routes are private. For transitions `T411`, assignments `A411`,
+inactive transitions `I411`, and CP410 transitions `T410`, exact checked
+state requires `T411=T410=36`, `A411=18`, `I411=18`,
+`T411=I411+A411`, both the source read and local assignment counters equal
+`A411`, and `source_site_execution_count=2*A411=36`.
+
+Three width-30 arrays preserve CP410's predecessor-route, guard-false, and
+maximum-capacity-assignment lineage, and one width-30 CP411 array records
+the assignment. Underlying predecessor routes 18 through 29 are active;
+underlying routes 20, 21, 24, 25, 27, and 29 each retain two flattened
+routes, while the other six active underlying routes each retain one. The
+CP411 assignment array exactly matches those active predecessor counts and
+is zero for underlying routes 0 through 17.
+
+Recursively complete same-call bit-exact CP410 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate route and
+execution authority. CP410 terminal supply humidity ratio, enthalpy, and
+temperature are present on exactly 18, 23, and 33 flattened routes,
+respectively. CP411's active set is exactly the 18 routes carrying terminal
+supply humidity ratio. Only CP410
+`resulting_supply_humidity_ratio` owns the source operand: it is read
+exactly 18 times. Terminal enthalpy and temperature are preserved but read
+zero times. Caller, model, service, selector, numerical DTO/result, node,
+load, and report scalars are forbidden substitutes.
+
+Each active transition copies the raw binary64 humidity-ratio payload
+bit-for-bit from the CP410 terminal value through the source read, assigned
+local original value, and resulting original value. CP411 performs no
+arithmetic, comparison, psychrometric evaluation, finite or range gate,
+clamp, normalization, coercion, cache, diagnostic, or mutable-service
+operation. Inactive routes perform neither source site and retain no
+original-value payload.
+
+The lossless snapshot has exactly 59 base fields, including twelve
+`Option<f64>` carriers and one
+`Option<DehumidificationControlType>` carrier. The twelve numeric carriers
+are ordered as the preserved CP409 terminal W/H/T triple, predecessor CP410
+terminal W/H/T, the source-read, assigned, and resulting-original humidity
+ratio triple, and terminal W/H/T. Twelve immediately adjacent authoritative
+IEEE-bit sidecars accompany those numeric fields, so JSON exposes exactly 71 unique
+keys.
+
+Binding is CP410-to-CP411-to-unchanged-numerical. CP411 never enters,
+consumes, reconciles with, feeds, overwrites, or replaces
+`DirectZonePurchasedAirCouplingInput`, prediction, any numerical
+DTO/result, feedback, node, load, or report state; non-direct paths reject
+its lifecycle evidence. Physical executable line 2314 remains excluded and
+is dynamically reached by the same flattened routes 18 through 35, split
+4 public and 14 private; flattened routes 0 through 17 do not reach it.
+
+CP411 adds no routine or source-map row and makes no support, readiness,
+feature/evidence, capability, numerical-conformance, psychrometrics-map,
+output-ownership, status, conformance, or Roadmap promotion. Existing Calc
+routines remain `source_mapped`, and their parent algorithms remain
+`scaffold`/`none`. Counts remain 32 algorithms, 293 routines, 58
+`state_mapped`, 235 `source_mapped`, and 170 required. Script inventory
+becomes 349 total, 240 public, 109 internal, zero unused, zero unreachable,
+with 238 development commands.
+
+## CP412 post-saturation saturation supply-humidity-ratio assignment
+
+CP412 supersedes only CP411's physical-line-2314 executable exclusion at
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked raw source SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps `PurchasedAirManager.cc` physical executable line 2314 exactly:
+`SupplyHumRatSat = PsyWFnTdbRhPb(state, PurchAir.SupplyTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);`.
+Its four exact dependency-ordered source sites are
+`read-purchased-air-supply-temperature-for-saturation-humidity-ratio`,
+`read-environment-outdoor-barometric-pressure-for-saturation-humidity-ratio`,
+`evaluate-psy-w-fn-tdb-rh-pb-at-unity-relative-humidity`, and
+`assign-local-saturation-supply-humidity-ratio`. Physical executable line
+2315, `if (SupplyHumRatSat < SupplyHumRatOrig) {`, is first excluded and the
+CP413 candidate; neither operand read, the strict comparison, branch entry,
+nor any line-2316-and-later effect is included.
+
+CP412 preserves CP411's thirty-six logical routes and 13/23 public/private
+split. Flattened routes 18 through 35 are active and routes 0 through 17 are
+inactive. Active public indices remain exactly 20, 21, 26, and 27; the other
+fourteen active routes are private. For transitions `T412`, saturation
+assignments `A412`, inactive transitions `I412`, and CP411 assignments
+`A411`, exact checked state requires `T412=T411=36`, `A412=A411=18`,
+`I412=18`, `T412=I412+A412`, every source-site counter equals `A412`, and
+`source_site_execution_count=4*A412=72`. Five width-30 arrays retain the
+predecessor route, guard-false, maximum-capacity-assignment, CP411 original-
+humidity assignment, and CP412 saturation-assignment counts. The final two
+arrays equal predecessor counts on underlying routes 18 through 29 and are
+zero on routes 0 through 17; the six inherited split indices remain 20, 21,
+24, 25, 27, and 29.
+
+Recursively complete same-call bit-exact CP411 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate route and
+execution authority. CP411 `resulting_supply_temperature_c` is the sole
+temperature operand owner; caller, model, service, CP377, CP334, CP344,
+numerical-result, node, load, and report values cannot replace it. Outdoor
+barometric pressure is read separately from the current-timestep existing
+scheduled-coupling input and makes no broader WeatherManager, Site-density,
+or standard-air-density ownership claim. CP411's original humidity ratio and
+terminal W/H/T are carried bit-exactly but line 2314 reads none of W or H.
+Terminal W/H/T ownership and unchanged-preservation totals remain 18/23/33,
+while temperature and pressure owner/read, psychrometric evaluation, and
+local saturation-assignment counts are each exactly 18.
+
+Each active route calls only canonical stateless
+`energyplus_psy_w_fn_tdb_rh_pb(temperature, 1.0, pressure)`, preserving the
+unconditional saturation-pressure projection, ordered 1000 Pa denominator
+floor, and ordered `1.0e-5` humidity-ratio floor. Public active admission
+requires finite predecessor temperature, finite strictly-positive pressure,
+and a finite result; inactive routes execute zero sites and do not validate
+the unused pressure. Pure/private characterization preserves exact input and
+result IEEE bits for signed zero, subnormal, infinity, and NaN cases. The
+guarded RH wrapper, cache, statistics, diagnostics, `RoutineName` effects,
+error helpers, compile variants, comparison, clamp, normalization, and
+mutable psychrometric service remain excluded.
+
+The full lossless snapshot has exactly 77 base fields, twenty `Option<f64>`
+carriers, and one `Option<DehumidificationControlType>` carrier. Numeric order
+retains CP411's CP409 W/H/T, CP410 W/H/T, original source-read/assigned/result
+triple, then predecessor-CP411 terminal W/H/T; CP412 appends temperature,
+pressure, evaluated/assigned/resulting saturation humidity ratio, and final
+terminal W/H/T. Every numeric carrier has one immediately adjacent
+authoritative IEEE sidecar, so JSON exposes exactly 97 unique keys and uses
+finite-only numeric projections without losing nonfinite payload bits.
+
+Binding is CP411-to-CP412-to-unchanged-numerical. CP412 reads only the existing
+current-call barometric-pressure input, adds no coupling-input field, and its
+local saturation value never feeds or replaces prediction, numerical
+DTO/results, feedback, nodes, loads, or reports; non-direct paths reject its
+lifecycle evidence. The supported numerical supply-humidity result remains
+CP345-owned. CP412 adds no routine or source-map row and makes no support,
+readiness, capability, numerical-conformance, psychrometrics-map, output,
+status, conformance, or Roadmap promotion. Existing Calc routines remain
+`source_mapped`, `routine.psy_w_fn_tdb_rh_pb` remains `state_mapped`, and the
+parent algorithms remain `scaffold`/`none`. Counts remain 32 algorithms, 293
+routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
+inventory becomes 350 total, 240 public, 110 internal, zero unused, zero
+unreachable, with 238 development commands.
+
+## CP413 post-saturation saturation supply-humidity-ratio guard
+
+CP413 supersedes only CP412's physical-line-2315 executable exclusion at
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked raw source SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps `PurchasedAirManager.cc` physical executable line 2315 exactly:
+`if (SupplyHumRatSat < SupplyHumRatOrig) {`. Its four exact
+dependency-ordered source sites are
+`read-local-saturation-supply-humidity-ratio-for-saturation-guard`,
+`read-local-original-supply-humidity-ratio-for-saturation-guard`,
+`compare-local-saturation-supply-humidity-ratio-strictly-less-than-local-original-supply-humidity-ratio`,
+and `enter-saturation-supply-humidity-ratio-guard-body-if-comparison-satisfied`.
+Physical executable line 2316,
+`PurchAir.SupplyTemp = PsyTsatFnHPb(state, SupplyEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName);`,
+is first excluded and the CP414 candidate; its enthalpy and pressure reads,
+psychrometric evaluation, supply-temperature assignment, and every later
+effect remain excluded.
+
+CP413 expands CP412's thirty-six logical predecessor routes into fifty-four
+exhaustive outcomes. Predecessor routes 0 through 17 each retain one inactive
+outcome. Active predecessor routes 18 through 35 each produce one evaluated-
+false outcome and one body-entered outcome. The resulting public/private split
+is 17/37. Active public predecessor indices are exactly 20, 21, 26, and 27;
+each has both outcomes, while the other fourteen active predecessors are
+private and also have both outcomes. For transitions `T413`, inactive
+outcomes `I413`, evaluated-false outcomes `F413`, and body outcomes
+`B413`, exact checked state requires `T413=54`, `I413=18`, `F413=18`,
+`B413=18`, and `T413=I413+F413+B413`. Each evaluated-false outcome
+executes three sites and each body outcome four, so
+`source_site_execution_count=3*F413+4*B413=126`. Three width-36 arrays
+retain flattened logical predecessor, false, and body counts. Every inactive
+predecessor index counts once only in the predecessor array; every active
+predecessor index counts twice there and once in each outcome array.
+
+Recursively complete same-call bit-exact CP412 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate route and
+execution authority. CP412 `resulting_saturation_supply_humidity_ratio`
+solely owns the local `SupplyHumRatSat` operand. CP412's CP411-local
+`resulting_supply_humidity_ratio_original` solely owns `SupplyHumRatOrig`.
+The carried `predecessor_cp411_resulting_supply_humidity_ratio` terminal W
+is required only as same-call bit corroboration and cannot replace that local
+original operand. Caller, model, service, CP377, numerical-result, node, load,
+and report values cannot substitute for either operand. Terminal W/H/T
+presence across all fifty-four outcomes is exactly 36/41/51.
+
+Public active release admits only finite saturation and original operands;
+inactive routes execute zero sites and ignore those otherwise-unused operands.
+Pure/private characterization performs exactly the raw IEEE binary64
+`saturation < original` comparison. NaN and every unordered comparison are
+false, equality is false, and signed-zero equality is false. The pure/private
+transition has no arithmetic, psychrometric call, finite or range gate,
+epsilon, tolerance, clamp, normalization, coercion, cache, diagnostic, or
+mutable-service dependency. The strict result alone selects evaluated-false
+versus body-entered while all available predecessor W/H/T bits remain
+unchanged.
+
+The full lossless snapshot carries CP412's 77 fields verbatim except for the
+three terminal predecessor names and appends eighteen guard, owner,
+corroboration, comparison, outcome, and resulting fields, for exactly 95 base
+fields. It has twenty-five `Option<f64>` carriers, one `Option<bool>`
+comparison carrier, and one `Option<DehumidificationControlType>` carrier.
+Every numeric carrier has one immediately adjacent authoritative IEEE
+sidecar, so JSON exposes exactly 120 unique keys with twenty-five adjacent
+IEEE sidecars and retains nonfinite payload bits despite finite-only numeric
+projection.
+
+Binding is CP412-to-CP413-to-unchanged-numerical. CP413 has no `ActiveInput`,
+adds no coupling-input or numerical DTO field, and its guard result never
+feeds or replaces prediction, numerical results, feedback, nodes, loads, or
+reports; non-direct paths reject CP413 lifecycle evidence. Physical line
+2316 remains unmapped and no `PsyTsatFnHPb` capability or routine claim is
+promoted. CP413 adds no routine, algorithm, conformance, source-map,
+psychrometrics-map, support, readiness, capability, output, status, or
+Roadmap promotion. Existing Calc routines remain `source_mapped`, parent
+algorithms remain `scaffold`/`none`, and counts remain 32 algorithms, 293
+routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
+Script inventory becomes 351 total, 240 public, 111 internal, zero unused,
+zero unreachable, with 238 development commands.
+
+
+
+
+## CP414 post-saturation saturation supply-temperature assignment
+
+CP414 supersedes only CP413's physical-line-2316 executable exclusion at
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked PurchasedAirManager.cc SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps physical executable line 2316 exactly:
+`PurchAir.SupplyTemp = PsyTsatFnHPb(state, SupplyEnthalpy, state.dataEnvrn->OutBaroPress, RoutineName);`.
+Its four exact dependency-ordered source sites are
+`read-cp413-retained-supply-enthalpy-for-saturation-temperature`,
+`read-environment-outdoor-barometric-pressure-for-saturation-temperature`,
+`evaluate-psy-tsat-fn-h-pb`, and
+`assign-purchased-air-supply-temperature-to-saturation-temperature`.
+Physical line 2317 is blank and line 2318 is comment-only. Physical
+executable line 2319,
+`PurchAir.SupplyTemp = min(PurchAir.SupplyTemp, PurchAir.MixedAirTemp);`,
+is first excluded and the CP415 candidate; the mixed-air-temperature read,
+minimum comparison, limiting assignment, and every later effect remain
+excluded.
+
+CP414 preserves CP413's fifty-four flattened conceptual outcomes one-for-one.
+The thirty-six CP413 inactive or evaluated-false outcomes execute no CP414
+site. The eighteen CP413 body-entered outcomes execute all four assignment
+sites. For transitions `T414`, zero-site outcomes `Z414`, assignments
+`A414`, and source-site executions `S414`, exact checked state requires
+`T414=54`, `Z414=36`, `A414=18`, and
+`S414=4*A414=72`. Public/private remains 17/37. Public flattened indices
+are exactly 0 through 8, 22 through 25, and 34 through 37; the four
+body-active public indices are 23, 25, 35, and 37, while the other fourteen
+body-active outcomes are private. Four width-36 arrays retain the CP413
+predecessor, guard-false, and guard-body counts and add CP414 saturation
+supply-temperature assignment counts.
+
+Recursively complete same-call bit-exact CP413 lifecycle, snapshot, latest,
+private-witness, and completion evidence are the sole immediate route and
+execution authority. CP413 `resulting_supply_enthalpy_j_per_kg` solely owns
+the local `SupplyEnthalpy` operand. The existing current-timestep scheduled
+coupling outdoor barometric pressure is the sole pressure owner and is read
+again for CP414. CP412's carried pressure is neither bit corroboration nor a
+substitute. Caller, model, service, older-checkpoint, numerical-result, node,
+load, and report values cannot replace either operand. CP413 terminal
+humidity ratio and enthalpy are preserved bit-for-bit. Active outcomes assign
+the psychrometric result as supply temperature; zero-site outcomes preserve
+the predecessor temperature. W/H/T presence remains exactly 36/41/51.
+
+The isolated canonical `energyplus_psy_tsat_fn_h_pb_raw` helper represents
+the EnergyPlus 26.1 default numerical-miss projection from enthalpy and
+pressure. It preserves `HH=H+1.78637e4`, the sign-selected Hloc floor to
+positive or negative `1.0e-5`, the exact ten CaseRange boundaries, nine
+F6/F7 seed branches, and the low/high HH endpoint clamps. It retains the
+ordered one-percent pressure-band test around 101330 Pa. Outside that band it
+uses the source-ordered saturated-enthalpy evaluations and pressure-correction
+secant sequence, including the 0.9 second-temperature seed and at most
+thirty-one loop iterations. Public active release admits only finite
+enthalpy, finite strictly-positive pressure, and a finite projected
+temperature. Zero-site routes ignore their otherwise-unused pressure.
+Cache hits and lifecycle, saved-value history, mutable psychrometric state,
+statistics, diagnostics, caller text, compile variants, and full
+`PsyTsatFnHPb` routine parity remain excluded.
+
+The full lossless snapshot carries CP413's first ninety-two fields verbatim,
+renames its terminal W/H/T triple to
+`predecessor_cp413_resulting_supply_humidity_ratio`,
+`predecessor_cp413_resulting_supply_enthalpy_j_per_kg`, and
+`predecessor_cp413_resulting_supply_temperature_c`, then appends exactly
+seventeen CP414 assignment, owner, read, evaluation, result, and terminal
+fields. Those additions include the CP414 executed flag; CP413 W/H/T owner
+flags; the retained-enthalpy owner/read pair and local enthalpy; the current
+pressure owner/read pair and local pressure; the psychrometric evaluation and
+result; the purchased-air assignment flag and assigned saturation
+temperature; and the resulting W/H/T triple. The schema therefore has
+exactly 112 base fields, thirty-two `Option<f64>` carriers, one
+`Option<bool>` comparison carrier, and one optional control enum. Every
+numeric carrier has one immediately adjacent authoritative IEEE sidecar, so
+JSON exposes exactly 144 unique keys with thirty-two adjacent IEEE sidecars.
+
+Binding is CP413-to-CP414-to-unchanged-numerical. It reuses the existing
+pressure input and adds no numerical or coupling-input DTO field. CP414
+evidence never feeds or replaces prediction, numerical results, feedback,
+nodes, loads, reports, or outputs; non-direct paths reject CP414 lifecycle
+evidence. The raw and public `psy_tsat_fn_h_pb_raw` and
+`psy_tsat_fn_h_pb` routine tickets remain `source_mapped`. CP414 adds no
+support, readiness, capability, routine, algorithm, numerical-conformance,
+source-map, psychrometrics-map, output/status/conformance, or Roadmap
+promotion. Counts remain 32 algorithms, 293 routines, 58 `state_mapped`,
+235 `source_mapped`, and 170 required. Script inventory becomes 352 total,
+240 public, 112 internal, zero unused, zero unreachable, with 238 development
+commands.

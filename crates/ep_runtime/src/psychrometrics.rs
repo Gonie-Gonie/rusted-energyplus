@@ -696,6 +696,186 @@ pub fn energyplus_psy_h_fn_tdb_rh_pb(
     energyplus_psy_h_fn_tdb_w(dry_bulb_c, humidity_ratio)
 }
 
+/// EnergyPlus 26.1 `PsyTsatFnHPb_raw` default-build numerical miss path.
+///
+/// This retains the source's signed enthalpy floor, binary-searched nine-piece
+/// polynomial seed, pressure-correction predicate, and bounded secant update
+/// order. The public two-input cache, statistics, diagnostics, caller context,
+/// and history-dependent nested cache effects remain outside this pure core.
+#[must_use]
+pub fn energyplus_psy_tsat_fn_h_pb_raw(enthalpy_j_per_kg: f64, barometric_pressure_pa: f64) -> f64 {
+    const CASE_RANGE: [f64; 10] = [
+        -4.24e4, -2.2138e4, -6.7012e2, 2.7297e4, 7.5222e4, 1.8379e5, 4.7577e5, 1.5445e6, 3.8353e6,
+        4.5866e7,
+    ];
+
+    let mut shifted_enthalpy = enthalpy_j_per_kg + 1.78637e4;
+    let local_enthalpy = if enthalpy_j_per_kg >= 0.0 {
+        if enthalpy_j_per_kg < 1.0e-5 {
+            1.0e-5
+        } else {
+            enthalpy_j_per_kg
+        }
+    } else if -1.0e-5 < enthalpy_j_per_kg {
+        -1.0e-5
+    } else {
+        enthalpy_j_per_kg
+    };
+
+    let mut begin = 0usize;
+    let mut end = 9usize;
+    while begin + 1 < end {
+        let middle = (begin + end) >> 1;
+        if shifted_enthalpy > CASE_RANGE[middle] {
+            begin = middle;
+        } else {
+            end = middle;
+        }
+    }
+    let case_index = begin + 1;
+    let seed = match case_index {
+        1 => {
+            if shifted_enthalpy < -4.24e4 {
+                shifted_enthalpy = -4.24e4;
+            }
+            energyplus_f6(
+                shifted_enthalpy,
+                -19.44,
+                8.53675e-4,
+                -5.12637e-9,
+                -9.85546e-14,
+                -1.00102e-18,
+                -4.2705e-24,
+            )
+        }
+        2 => energyplus_f6(
+            shifted_enthalpy,
+            -1.94224e1,
+            8.5892e-4,
+            -4.50709e-9,
+            -6.19492e-14,
+            8.71734e-20,
+            8.73051e-24,
+        ),
+        3 => energyplus_f6(
+            shifted_enthalpy,
+            -1.94224e1,
+            8.59061e-4,
+            -4.4875e-9,
+            -5.76696e-14,
+            7.72217e-19,
+            3.97894e-24,
+        ),
+        4 => energyplus_f6(
+            shifted_enthalpy,
+            -2.01147e1,
+            9.04936e-4,
+            -6.83305e-9,
+            2.3261e-14,
+            7.27237e-20,
+            -6.31939e-25,
+        ),
+        5 => energyplus_f6(
+            shifted_enthalpy,
+            -1.82124e1,
+            8.31683e-4,
+            -6.16461e-9,
+            3.06411e-14,
+            -8.60964e-20,
+            1.03003e-25,
+        ),
+        6 => energyplus_f6(
+            shifted_enthalpy,
+            -1.29419,
+            3.88538e-4,
+            -1.30237e-9,
+            2.78254e-15,
+            -3.27225e-21,
+            1.60969e-27,
+        ),
+        7 => energyplus_f6(
+            shifted_enthalpy,
+            2.39214e1,
+            1.27519e-4,
+            -1.52089e-10,
+            1.1043e-16,
+            -4.33919e-23,
+            7.05296e-30,
+        ),
+        8 => energyplus_f6(
+            shifted_enthalpy,
+            4.88446e1,
+            3.85534e-5,
+            -1.78805e-11,
+            4.87224e-18,
+            -7.15283e-25,
+            4.36246e-32,
+        ),
+        _ => {
+            if shifted_enthalpy > 4.5866e7 {
+                shifted_enthalpy = 4.5866e7;
+            }
+            energyplus_f7(
+                shifted_enthalpy,
+                7.60565e11,
+                5.80534e4,
+                -7.36433e-3,
+                5.11531e-10,
+                -1.93619e-17,
+                3.70511e-25,
+                -2.77313e-33,
+            )
+        }
+    };
+
+    let pressure_correction_required = (barometric_pressure_pa - 1.0133e5).abs() / 1.0133e5 > 0.01;
+    if !pressure_correction_required {
+        return seed;
+    }
+
+    let mut first_temperature_c = seed;
+    let first_enthalpy = energyplus_psy_h_fn_tdb_w(
+        first_temperature_c,
+        energyplus_psy_w_fn_tdb_twb_pb(
+            first_temperature_c,
+            first_temperature_c,
+            barometric_pressure_pa,
+        ),
+    );
+    let mut first_error = first_enthalpy - local_enthalpy;
+    if (first_error / local_enthalpy).abs() <= 0.1e-4 {
+        return first_temperature_c;
+    }
+
+    let mut second_temperature_c = first_temperature_c * 0.9;
+    let mut result = seed;
+    let mut iteration_count = 0;
+    while iteration_count <= 30 {
+        iteration_count += 1;
+        let second_enthalpy = energyplus_psy_h_fn_tdb_w(
+            second_temperature_c,
+            energyplus_psy_w_fn_tdb_twb_pb(
+                second_temperature_c,
+                second_temperature_c,
+                barometric_pressure_pa,
+            ),
+        );
+        let second_error = second_enthalpy - local_enthalpy;
+        if (second_error / local_enthalpy).abs() <= 0.1e-4 || second_error == first_error {
+            result = second_temperature_c;
+            break;
+        }
+
+        let next_temperature_c = second_temperature_c
+            - second_error / (second_error - first_error)
+                * (second_temperature_c - first_temperature_c);
+        first_temperature_c = second_temperature_c;
+        second_temperature_c = next_temperature_c;
+        first_error = second_error;
+    }
+    result
+}
+
 /// Canonical EnergyPlus 26.1 default cached-build `PsyTsatFnPb_raw`
 /// non-interpolation numerical path in Celsius.
 ///
@@ -993,6 +1173,10 @@ mod relative_humidity_enthalpy_tests;
 #[cfg(test)]
 #[path = "psychrometrics_saturation_temperature_pressure_tests.rs"]
 mod saturation_temperature_pressure_tests;
+
+#[cfg(test)]
+#[path = "psychrometrics_saturation_temperature_enthalpy_pressure_tests.rs"]
+mod saturation_temperature_enthalpy_pressure_tests;
 
 #[cfg(test)]
 #[path = "psychrometrics_dew_point_humidity_ratio_tests.rs"]
