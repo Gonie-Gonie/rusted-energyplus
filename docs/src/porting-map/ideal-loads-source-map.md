@@ -24126,3 +24126,92 @@ psychrometrics-map, output/status/conformance, or Roadmap promotion. Counts
 remain 32 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`,
 and 170 required. Script inventory becomes 353 total, 240 public, 113
 internal, zero unused, zero unreachable, with 238 development commands.
+
+
+## CP416 post-saturation capacity-limit dehumidification supply-humidity-ratio assignment
+
+CP416 supersedes only CP415's executable exclusion at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048` and locked
+`PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps physical executable line 2320 exactly:
+
+```cpp
+PurchAir.SupplyHumRat = PsyWFnTdbH(state, PurchAir.SupplyTemp, SupplyEnthalpy, RoutineName);
+```
+
+Its four exact dependency-ordered source sites are
+`read-purchased-air-supply-temperature-for-post-saturation-capacity-limit-dehumidification-humidity-ratio-inversion`,
+`read-local-supply-enthalpy-for-post-saturation-capacity-limit-dehumidification-humidity-ratio-inversion`,
+`evaluate-psy-w-fn-tdb-h-for-post-saturation-capacity-limit-dehumidification`,
+and
+`assign-purchased-air-supply-humidity-ratio-for-post-saturation-capacity-limit-dehumidification`.
+The two argument reads are side-effect-free, so this deterministic Rust
+dependency order makes no general claim about C++ function-argument evaluation
+order. Physical executable line 2321,
+`SupplyEnthalpy = PsyHFnTdbW(PurchAir.SupplyTemp, PurchAir.SupplyHumRat);`,
+is the first excluded executable and CP417 candidate. Its enthalpy evaluation,
+assignment, state, counters, and every subsequent effect remain excluded.
+
+CP416 preserves CP415's fifty-four flattened conceptual outcomes one-for-one.
+Thirty-six inactive outcomes execute no CP416 site, while eighteen CP415 active
+outcomes execute all four sites. Therefore `T416=54`, `Z416=36`,
+`A416=18`, and `S416=4*A416=72`. Public/private remains 17/37. Public
+flattened indices remain 0 through 8, 22 through 25, and 34 through 37; active
+public indices are exactly 23, 25, 35, and 37, with fourteen active private
+outcomes. Six width-36 arrays retain CP413 predecessor, guard-false, and
+guard-body lineage, CP414 saturation-temperature assignment counts, CP415
+mixed-air-limit execution counts, and CP416 humidity-ratio assignment counts.
+Terminal W/H/T presence remains 36/41/51.
+
+Recursively complete same-call bit-exact CP415 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate predecessor.
+CP415 `resulting_supply_temperature_c` solely owns the active dry-bulb
+operand, and CP415 `resulting_supply_enthalpy_j_per_kg` solely owns the
+active enthalpy operand. Earlier checkpoints, caller/model/service scalars,
+Zone state, numerical-coupling DTO values, and inferred values are forbidden
+substitutes. Active outcomes assign the canonical psychrometric humidity ratio
+while preserving CP415 enthalpy and temperature bit-exact. Inactive outcomes
+read neither operand and preserve all CP415 W/H/T bits. CP415 owns humidity on
+36 outcomes, of which 18 inactive humidity values remain unchanged; CP416 owns
+the eighteen active humidity results. CP415 enthalpy and temperature ownership
+and preservation remain 41 and 51 respectively.
+
+CP416 reuses canonical `energyplus_psy_w_fn_tdb_h` with exact grouping:
+
+```text
+(H - 1.00484e3*T) / (2.50094e6 + 1.85895e3*T)
+```
+
+Only a raw result strictly below zero is replaced with `1e-5`, whose
+binary64 bits are `0x3ee4f8b588e368f1`. Positive sub-floor values, negative
+zero, NaN/unordered results, positive infinity, and denominator-pole behavior
+remain IEEE characterization. CP416 adds no regrouping, `mul_add`, finite
+coercion, clamp, normalization, cache, diagnostic registry, warning counter,
+or mutable service. Optional psychrometric statistics and the source
+`state`/`RoutineName` diagnostic machinery remain outside this bounded
+stateless helper claim.
+
+The full lossless snapshot retains CP415's first 125 fields, renames its
+terminal W/H/T triple to
+`predecessor_cp415_resulting_supply_humidity_ratio`,
+`predecessor_cp415_resulting_supply_enthalpy_j_per_kg`, and
+`predecessor_cp415_resulting_supply_temperature_c`, then appends exactly
+seventeen CP416 execution, owner, read, evaluation, assignment, and terminal
+fields. The schema has exactly 145 base fields, forty-seven `Option<f64>`
+carriers, one `Option<bool>` comparison carrier, and one optional control
+enum. Every numeric carrier has one immediately adjacent authoritative IEEE
+sidecar, so JSON exposes exactly 192 unique keys with forty-seven adjacent
+IEEE sidecars.
+
+Binding is CP415-to-CP416-to-unchanged-numerical, and the binding checkpoint
+count advances from 106 to 107. CP416 adds no numerical or coupling-input DTO
+field and no output DTO field. Its evidence never feeds or replaces
+prediction, numerical results, feedback, nodes, loads, reports, or outputs;
+non-direct paths reject CP416 lifecycle evidence. CP416 adds no support,
+readiness, capability, routine, algorithm, numerical-conformance, source-map,
+psychrometrics-map, output/status/conformance, or Roadmap promotion.
+`routine.psy_w_fn_tdb_h` remains `state_mapped`. Counts remain 32
+algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
+required. Script inventory becomes 354 total, 240 public, 114 internal, zero
+unused, zero unreachable, with 238 development commands.

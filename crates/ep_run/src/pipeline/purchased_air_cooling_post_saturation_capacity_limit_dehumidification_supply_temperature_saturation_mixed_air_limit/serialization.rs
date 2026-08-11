@@ -3,7 +3,7 @@
 use ep_runtime::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyTemperatureSaturationMixedAirLimitLifecycleSummary;
 use serde_json::{Value, json};
 
-mod snapshot;
+pub(in crate::pipeline) mod snapshot;
 
 use snapshot::snapshot_json;
 

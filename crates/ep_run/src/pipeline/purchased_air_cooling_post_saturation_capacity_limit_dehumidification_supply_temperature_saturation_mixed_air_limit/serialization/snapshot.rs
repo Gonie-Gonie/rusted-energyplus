@@ -4,7 +4,7 @@ use ep_model::DehumidificationControlType;
 use ep_runtime::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyTemperatureSaturationMixedAirLimitSnapshot;
 use serde_json::{Value, json};
 
-pub(super) fn snapshot_json(
+pub(in crate::pipeline) fn snapshot_json(
     snapshot: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyTemperatureSaturationMixedAirLimitSnapshot,
 ) -> Value {
     json!({

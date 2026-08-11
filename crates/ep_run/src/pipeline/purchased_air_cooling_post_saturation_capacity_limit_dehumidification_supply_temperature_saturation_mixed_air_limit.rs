@@ -1,6 +1,6 @@
 //! CP415 direct-run validation and JSON serialization.
 
-mod serialization;
+pub(in crate::pipeline) mod serialization;
 mod validation;
 
 pub(in crate::pipeline) use serialization::lifecycle_json;
