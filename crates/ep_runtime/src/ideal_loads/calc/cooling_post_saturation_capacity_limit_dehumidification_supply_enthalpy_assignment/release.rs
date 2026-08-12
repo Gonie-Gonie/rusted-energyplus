@@ -27,6 +27,7 @@ mod error;
 mod runtime_validation;
 mod snapshot;
 pub use error::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyEnthalpyAssignmentError;
+pub(super) use runtime_validation::committed_route_counts_match;
 use runtime_validation::{
     completed_predecessor_counts_match, pending_predecessor_counts_match,
     state_counts_are_consistent,
@@ -212,12 +213,6 @@ pub(in crate::ideal_loads) fn cooling_post_saturation_capacity_limit_dehumidific
 }
 
 fn snapshot_is_exact(snapshot: Snapshot) -> bool {
-    if snapshot.source != SOURCE
-        || snapshot.first_excluded_source != EXCLUDED
-        || snapshot.source_order != ORDER
-    {
-        return false;
-    }
     let predecessor = cp416_shape(snapshot);
     if !cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_snapshot_is_exact(predecessor)
     {
@@ -226,6 +221,33 @@ fn snapshot_is_exact(snapshot: Snapshot) -> bool {
     let Some(route) = predecessor_route(predecessor) else {
         return false;
     };
+    snapshot_matches_validated_predecessor(snapshot, predecessor, route)
+}
+
+fn snapshot_matches_validated_predecessor(
+    snapshot: Snapshot,
+    predecessor: Predecessor,
+    route: RetainedRoute,
+) -> bool {
+    if snapshot.source != SOURCE
+        || snapshot.first_excluded_source != EXCLUDED
+        || snapshot.source_order != ORDER
+        || route.predecessor_guard_false_fallthrough
+            != predecessor.saturation_supply_humidity_ratio_guard_false_fallthrough
+        || route.predecessor_guard_body_entered
+            != predecessor.saturation_supply_humidity_ratio_guard_body_entered
+        || route.predecessor_saturation_temperature_assignment_executed
+            != predecessor
+                .post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment_executed
+        || route.predecessor_saturation_temperature_mixed_air_limit_executed
+            != predecessor
+                .post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit_executed
+        || route.predecessor_supply_humidity_ratio_assignment_executed
+            != predecessor
+                .post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_executed
+    {
+        return false;
+    }
     let terminal_prefix_matches = option_bits_match(
         snapshot.predecessor_cp416_resulting_supply_humidity_ratio,
         predecessor.resulting_supply_humidity_ratio,
@@ -332,6 +354,40 @@ pub(in crate::ideal_loads) fn cooling_post_saturation_capacity_limit_dehumidific
     right: Snapshot,
 ) -> bool {
     snapshots_match_bit_exact(left, right)
+}
+
+/// Returns the sealed route attached to the committed CP417 latest snapshot.
+///
+/// This is deliberately calc-private: CP418 may trust the route only after the CP417 public
+/// release committed the snapshot, counters, ordinal, and predecessor accounting together.
+pub(in crate::ideal_loads::calc) fn cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_committed_latest_route(
+    unit: &PurchasedAirUnitRuntimeState,
+    snapshot: Snapshot,
+) -> Option<RetainedRoute> {
+    let state = &unit
+        .calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment;
+    let route = state.latest_route?;
+    let predecessor = cp416_shape(snapshot);
+    (unit.system == snapshot.system
+        && state.system == unit.system
+        && state.transition_count == unit.init_call_count
+        && state.transition_count
+            == unit
+                .calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment
+                .transition_count
+        && snapshot.parent_call_ordinal == unit.init_call_count
+        && state.latest_transition_ordinal == Some(state.transition_count)
+        && state
+            .latest
+            .is_some_and(|latest| snapshots_match_bit_exact(latest, snapshot))
+        && state_counts_are_consistent(state)
+        && completed_predecessor_counts_match(
+            state,
+            &unit.calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment,
+        )
+        && committed_route_counts_match(state, route)
+        && snapshot_matches_validated_predecessor(snapshot, predecessor, route))
+    .then_some(route)
 }
 
 fn pending_state_is_consistent(

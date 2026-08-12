@@ -17,6 +17,7 @@ pub use release::{
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
     completed_direct_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_is_consistent,
+    cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_committed_latest_route,
     cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_snapshot_route,
 };
 #[allow(unused_imports)]
@@ -31,7 +32,10 @@ pub(in crate::ideal_loads) use release::{
     cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_snapshots_match_bit_exact,
 };
 pub use state::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyEnthalpyAssignmentRuntimeState;
-pub(in crate::ideal_loads::calc) use transition::advance_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_state;
+pub(in crate::ideal_loads::calc) use transition::{
+    RetainedRoute as PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyEnthalpyAssignmentCommittedRoute,
+    advance_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_state,
+};
 
 /// EnergyPlus source statement represented by CP417.
 pub const PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_SUPPLY_ENTHALPY_ASSIGNMENT_SOURCE: &str =

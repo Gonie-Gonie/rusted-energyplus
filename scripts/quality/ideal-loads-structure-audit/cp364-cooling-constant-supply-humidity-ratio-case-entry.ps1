@@ -285,7 +285,7 @@ Assert-Contains -Path $cp364Fixture -Pattern ('calculation_' + $cp364Stem + '_sn
 Assert-Contains -Path $cp364CoupledTestsRoot -Pattern 'coupled_runtime_tests_cp364' -Description "coupled-test registration"
 Assert-Contains -Path $cp364PipelineRoot -Pattern ('mod ' + $cp364PipelineStem + ';') -Description "pipeline module"
 Assert-Contains -Path $cp364PipelineRoot -Pattern ('"' + $cp364Lifecycle + '":\s*result\s*\.' + $cp364Lifecycle) -Description "lifecycle JSON"
-Assert-Contains -Path $cp364PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp417_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp364PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp418_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp364ParentAssertions -Pattern 'mod cp364_assertions;' -Description "arbitrary delegation module"
 Assert-Contains -Path $cp364ParentAssertions -Pattern 'cp364_assertions::assert_direct\(runtime, results\)' -Description "arbitrary direct delegation"
 Assert-Contains -Path $cp364ParentAssertions -Pattern 'cp364_assertions::assert_non_direct\(runtime\)' -Description "arbitrary non-direct delegation"
@@ -392,16 +392,16 @@ foreach ($historical in @("cp326-cooling-supply-mass-flow-limit-body.ps1") + @(
 }
 foreach ($historical in 334..363) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp417_lifecycle_evidence' -Description "historical CP364 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp418_lifecycle_evidence' -Description "historical CP364 firewall"
 }
 foreach ($historical in 335..363) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 355 \|')) -Description "historical generated total"
-Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 115 \|')) -Description "historical generated internal"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 356 \|')) -Description "historical generated total"
+Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 116 \|')) -Description "historical generated internal"
 }
 foreach ($historical in 337..363) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 355' -Description "historical inventory total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 356' -Description "historical inventory total"
 }
 $cp364MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
 $cp363AuditIndexForCp364 = $cp364MainAuditText.IndexOf("cp363-cooling-humidistat-case-break.ps1")
@@ -410,13 +410,13 @@ $cp364CompletionIndex = $cp364MainAuditText.IndexOf('Write-Host "IdealLoads stru
 if ($cp363AuditIndexForCp364 -lt 0 -or $cp364AuditIndex -le $cp363AuditIndexForCp364 -or $cp364CompletionIndex -le $cp364AuditIndex) {
     throw "Master audit must dot-source CP364 after CP363 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 355' -Description "script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 356' -Description "script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "zero uncalled"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp364-' -Description "inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'cp364-cooling-constant-supply-humidity-ratio-case-entry\.ps1::dot_sources' -Description "caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 355 \|' -Description "generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 356 \|' -Description "generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 115 \|' -Description "generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 116 \|' -Description "generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated uncalled"
 
 Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp385_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_local_enthalpy_only\(' -Description "CP385 terminal numerical nonfeed firewall"

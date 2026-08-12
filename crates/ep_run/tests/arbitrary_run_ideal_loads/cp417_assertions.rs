@@ -1,5 +1,8 @@
 //! CP417 psychrometric supply-enthalpy assignment assertions.
 
+#[path = "cp418_assertions.rs"]
+mod cp418_assertions;
+
 use ep_runtime::psychrometrics::energyplus_psy_h_fn_tdb_w;
 use serde_json::{Map, Value, json};
 
@@ -163,6 +166,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         !results.to_string().contains(CP417_KEY),
         "CP417 lifecycle must remain outside numerical result state",
     );
+    cp418_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -171,6 +175,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP417_KEY].is_null(),
         "non-direct runtime must not publish CP417 evidence",
     );
+    cp418_assertions::assert_non_direct(runtime);
 }
 
 fn assert_route_contract(lifecycle: &Value) {

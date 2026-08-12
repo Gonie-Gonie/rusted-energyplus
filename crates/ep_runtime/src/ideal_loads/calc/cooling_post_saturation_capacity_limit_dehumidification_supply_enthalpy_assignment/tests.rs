@@ -1,5 +1,6 @@
 //! CP417 boundary, route, IEEE, corruption, and overflow tests.
 
+use super::release::committed_route_counts_match;
 use super::transition::predecessor_route;
 use super::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyEnthalpyAssignmentRuntimeState as State,
@@ -297,6 +298,27 @@ fn snapshot_corruption_is_rejected() {
     let mut owner_corrupted = snapshot;
     owner_corrupted.cp416_retained_supply_humidity_ratio_owned_read = false;
     assert!(!cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_snapshot_is_exact(owner_corrupted));
+}
+
+#[test]
+fn sealed_committed_route_rejects_route_and_counter_forgery() {
+    let predecessor = active_fixture();
+    let mut state = State::new(predecessor.system);
+    advance(&mut state, predecessor).expect("committed CP417");
+    let route = state.latest_route.expect("sealed CP417 route");
+    assert!(committed_route_counts_match(&state, route));
+
+    let mut route_forged = route;
+    route_forged.logical_index = (route.logical_index + 1) % 36;
+    assert!(!committed_route_counts_match(&state, route_forged));
+
+    let mut flag_forged = route;
+    flag_forged.active = !route.active;
+    assert!(!committed_route_counts_match(&state, flag_forged));
+
+    let mut counter_forged = state;
+    counter_forged.predecessor_route_counts[route.logical_index] += 1;
+    assert!(!committed_route_counts_match(&counter_forged, route));
 }
 
 #[test]

@@ -39907,3 +39907,73 @@ remains `state_mapped`. Counts remain 32 algorithms, 293 routines, 58
 `state_mapped`, 235 `source_mapped`, and 170 required. Script inventory becomes
 355 total, 240 public, 115 internal, zero unused, zero unreachable, with 238
 development commands.
+
+## CP418 post-saturation capacity-limit dehumidification-guard else-branch entry
+
+CP418 supersedes only CP417's physical-line-2327 lexical/control exclusion at
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and locked
+`PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps physical control line 2327 exactly:
+
+```cpp
+} else { // Not dehumidifying
+```
+
+This is the sibling else entry of CP381's physical-line-2266
+`PurchAir.SupplyHumRat < PurchAir.MixedAirHumRat` dehumidification guard.
+Physical line 2325 closes CP413's saturation guard, and physical line 2326
+closes the line-2268 total-output capacity guard, before line 2327 reaches the
+outer CP381 guard's false fallthrough. CP418 therefore maps neither a CP413
+saturation-guard false result nor a CP417 true-body exit, branch merge, or
+unconditional entry. Its exact sole source site is
+`enter-post-saturation-capacity-limit-dehumidification-guard-else-branch-after-guard-false-fallthrough`.
+Lines 2328 and 2329 are comment-only. Physical executable line 2330,
+`CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`, is the first excluded
+executable and the CP419 candidate; every operand read, psychrometric
+evaluation, assignment, sensible-cooling calculation, and subsequent effect
+remains excluded.
+
+CP418 preserves CP417's fifty-four flattened conceptual outcomes one-for-one.
+Only CP381 dehumidification-guard-false flattened indices 4, 7, 10, 13, and 16
+enter the sole site; the other forty-nine outcomes execute no CP418 site.
+Therefore `T418=54`, `Z418=49`, `E418=5`, and `S418=E418=5`.
+Public/private remains 17/37. Public flattened indices remain 0 through 8,
+22 through 25, and 34 through 37; CP418 active public indices are exactly 4
+and 7, while active private indices are 10, 13, and 16. Every CP418 entry is
+mutually exclusive with the eighteen CP417 supply-enthalpy assignments.
+Eight width-36 arrays retain CP413 predecessor, guard-false, and guard-body
+lineage, CP414 saturation-temperature assignments, CP415 mixed-air-limit
+executions, CP416 humidity-ratio assignments, CP417 enthalpy assignments, and
+CP418 dehumidification-guard else entries.
+
+Recursively complete same-call bit-exact CP417 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate predecessor
+and route authority. CP418 takes no scalar active input and performs no
+selector or owner read, comparison, arithmetic, assignment, psychrometric
+evaluation, finite/range gate, clamp, normalization, diagnostic, cache, or
+mutable-service operation. It preserves CP417 terminal W/H/T bit-exact on
+every route, with presence and unchanged-preservation counts 36/41/51. The
+existing owner partition also remains unchanged: CP416 owns all 36 humidity
+values, CP416 owns 23 enthalpy values and CP417 owns 18 psychrometric enthalpy
+values, and CP416 owns all 51 temperature values. CP418 acquires no new owner.
+
+The full lossless snapshot retains CP417's exact first 162 fields, including
+the existing terminal W/H/T fields, then appends only the Boolean
+`post_saturation_capacity_limit_dehumidification_guard_else_branch_entered`.
+The schema therefore has exactly 163 base fields, fifty-four `Option<f64>`
+carriers, one `Option<bool>` comparison carrier, and one optional control
+enum. Every numeric carrier retains one immediately adjacent authoritative
+IEEE sidecar. JSON preserves CP417's first 216 keys and appends the new Boolean
+key, for exactly 217 unique keys and fifty-four adjacent IEEE sidecars.
+
+Binding is CP417-to-CP418-to-unchanged-numerical, and the binding checkpoint
+count advances from 108 to 109. CP418 adds no numerical or coupling-input DTO
+field and no output DTO field. Its evidence never feeds or replaces prediction,
+numerical results, feedback, nodes, loads, reports, or outputs; non-direct paths
+reject CP418 lifecycle evidence. CP418 adds no support, readiness, capability,
+routine, algorithm, numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
+inventory becomes 356 total, 240 public, 116 internal, zero unused, zero
+unreachable, with 238 development commands.

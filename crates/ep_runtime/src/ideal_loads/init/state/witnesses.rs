@@ -31,6 +31,8 @@ mod cooling_constant_shr_supply_humidity_ratio_overdrying_limit;
 
 #[rustfmt::skip]
 mod cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment;
+#[rustfmt::skip]
+mod cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry;
 
 use ep_model::IdealLoadsAirSystemId;
 

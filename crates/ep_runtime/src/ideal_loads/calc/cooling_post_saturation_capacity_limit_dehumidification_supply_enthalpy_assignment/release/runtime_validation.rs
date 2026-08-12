@@ -179,6 +179,31 @@ pub(super) fn completed_predecessor_counts_match(
             == predecessor.supply_humidity_ratio_assignment_route_counts
 }
 
+pub(in crate::ideal_loads::calc) fn committed_route_counts_match(
+    state: &State,
+    route: RetainedRoute,
+) -> bool {
+    let index = route.logical_index;
+    let Some(&route_count) = state.predecessor_route_counts.get(index) else {
+        return false;
+    };
+    route_count != 0
+        && state.predecessor_guard_false_fallthrough_route_counts[index]
+            == usize::from(route.predecessor_guard_false_fallthrough) * route_count
+        && state.predecessor_guard_body_entry_route_counts[index]
+            == usize::from(route.predecessor_guard_body_entered) * route_count
+        && state.predecessor_supply_temperature_saturation_assignment_route_counts[index]
+            == usize::from(route.predecessor_saturation_temperature_assignment_executed)
+                * route_count
+        && state.predecessor_supply_temperature_mixed_air_limit_route_counts[index]
+            == usize::from(route.predecessor_saturation_temperature_mixed_air_limit_executed)
+                * route_count
+        && state.predecessor_supply_humidity_ratio_assignment_route_counts[index]
+            == usize::from(route.predecessor_supply_humidity_ratio_assignment_executed) * route_count
+        && state.supply_enthalpy_assignment_route_counts[index]
+            == usize::from(route.active) * route_count
+}
+
 fn checked_sum(values: &[usize]) -> Option<usize> {
     values
         .iter()

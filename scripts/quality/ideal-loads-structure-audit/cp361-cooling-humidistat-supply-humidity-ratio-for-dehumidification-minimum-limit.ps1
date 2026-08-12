@@ -261,7 +261,7 @@ Assert-Contains -Path $cp361Fixture -Pattern ('calculation_' + [regex]::Escape($
 Assert-Contains -Path $cp361PipelineRoot -Pattern ('mod ' + [regex]::Escape($cp361PipelineStem) + ';') -Description "CP361 pipeline module"
 Assert-Contains -Path $cp361PipelineRoot -Pattern ('"' + $cp361Lifecycle + '":\s*result\s*\.' + $cp361Lifecycle) -Description "CP361 lifecycle JSON"
 Assert-Contains -Path $cp361PipelineValidation -Pattern 'supply_humidity_ratio_assignment_cp360' -Description "pipeline CP360 predecessor"
-Assert-Contains -Path $cp361PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp417_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp361PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp418_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp361ParentAssertions -Pattern 'mod cp361_assertions;' -Description "arbitrary CP361 delegation"
 Assert-Contains -Path $cp361ParentAssertions -Pattern 'cp361_assertions::assert_direct\(runtime, results\)' -Description "arbitrary CP361 direct delegation"
 Assert-Contains -Path $cp361ParentAssertions -Pattern 'cp361_assertions::assert_non_direct\(runtime\)' -Description "arbitrary CP361 non-direct delegation"
@@ -357,16 +357,16 @@ foreach ($number in $cp361BindingHistory) {
 }
 foreach ($number in 334..360) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$number-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp417_lifecycle_evidence' -Description "historical CP363 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp418_lifecycle_evidence' -Description "historical CP363 firewall"
 }
 foreach ($number in 335..360) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$number-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 355 \|')) -Description "historical current generated total"
-Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 115 \|')) -Description "historical current generated internal"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 356 \|')) -Description "historical current generated total"
+Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 116 \|')) -Description "historical current generated internal"
 }
 foreach ($number in 337..360) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$number-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 355' -Description "historical current script inventory total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 356' -Description "historical current script inventory total"
 }
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp360-cooling-humidistat-supply-humidity-ratio-for-dehumidification-assignment.ps1" -Pattern '298 total' -Description "CP360 historical script claim"
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp360-cooling-humidistat-supply-humidity-ratio-for-dehumidification-assignment.ps1" -Pattern '58 internal' -Description "CP360 historical internal claim"
@@ -377,13 +377,13 @@ $cp361CompletionIndex = $cp361MainAuditText.IndexOf('Write-Host "IdealLoads stru
 if ($cp360AuditIndexForCp361 -lt 0 -or $cp361AuditIndex -le $cp360AuditIndexForCp361 -or $cp361CompletionIndex -le $cp361AuditIndex) {
     throw "Master audit must dot-source CP361 after CP360 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 355' -Description "CP361 script total"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 356' -Description "CP361 script total"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP361 zero uncalled"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp361-' -Description "CP361 inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'cp361-cooling-humidistat-supply-humidity-ratio-for-dehumidification-minimum-limit\.ps1::dot_sources' -Description "CP361 caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 355 \|' -Description "generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 356 \|' -Description "generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 115 \|' -Description "generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 116 \|' -Description "generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated uncalled"
 
 Write-Host "CP361 Humidistat supply-humidity-ratio-for-dehumidification minimum-limit structure audit passed."
