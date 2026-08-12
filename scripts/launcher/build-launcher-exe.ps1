@@ -36,6 +36,33 @@ $sourceText = Get-Content -Raw -Encoding UTF8 -LiteralPath $sourcePath
 if ($sourceText -match 'powershell(\.exe)?') {
     throw "Direct launcher source must not start PowerShell at runtime: $sourcePath"
 }
+$candidateOrder = @(
+    'candidates.Add(Path.Combine(appRoot, "bin", "eplus-rs.exe"));',
+    'candidates.Add(Path.Combine(appRoot, "target", "release", "eplus-rs.exe"));',
+    'candidates.Add(Path.Combine(repoRoot, "target", "release", "eplus-rs.exe"));',
+    'candidates.Add(Path.Combine(appRoot, "target", "debug", "eplus-rs.exe"));',
+    'candidates.Add(Path.Combine(repoRoot, "target", "debug", "eplus-rs.exe"));'
+)
+$previousCandidateIndex = -1
+foreach ($candidate in $candidateOrder) {
+    $candidateIndex = $sourceText.IndexOf($candidate, [System.StringComparison]::Ordinal)
+    if ($candidateIndex -le $previousCandidateIndex) {
+        throw "Direct launcher executable candidate order must keep packaged bin first and release before debug: $sourcePath"
+    }
+    $previousCandidateIndex = $candidateIndex
+}
+$savedExecutableContract = @(
+    'ApplySavedEplusRsExe(savedExe, savedExeSelection);',
+    'File.Exists(savedExe) && TestEplusRsRunCli(savedExe)',
+    'IsKnownDebugCandidate(validSavedExe)',
+    'IsPreferredPackagedOrReleaseCandidate(eplusRsExe)',
+    'settings["eplus_rs_exe_selection"] = eplusRsExeSelection ?? "auto";'
+)
+foreach ($contractToken in $savedExecutableContract) {
+    if ($sourceText.IndexOf($contractToken, [System.StringComparison]::Ordinal) -lt 0) {
+        throw "Direct launcher saved executable validation or migration contract drift: $contractToken"
+    }
+}
 
 Add-Type `
     -Path $sourcePath `
@@ -61,6 +88,9 @@ if ($SelfTest) {
         output_type = "WindowsApplication"
         runtime = "direct-winforms"
         starts_powershell = $false
+        prefers_release_over_debug = $true
+        rejects_stale_saved_exe = $true
+        migrates_legacy_debug_to_release = $true
         source_path = "scripts\launcher\eplus-rs-launcher.cs"
         script_path = "not-used-at-runtime"
     } | ConvertTo-Json -Depth 3

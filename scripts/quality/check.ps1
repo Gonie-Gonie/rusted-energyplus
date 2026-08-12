@@ -17,10 +17,10 @@ if ($null -eq (Get-Command cargo -ErrorAction SilentlyContinue)) {
 cargo fmt --all -- --check
 if ($LASTEXITCODE -ne 0) { throw "cargo fmt failed" }
 
-cargo clippy --workspace --all-targets -- -D warnings
+cargo clippy --workspace --all-targets --jobs 12 -- -D warnings
 if ($LASTEXITCODE -ne 0) { throw "cargo clippy failed" }
 
-cargo test --workspace
+cargo test --workspace --jobs 12 -- --test-threads=12
 if ($LASTEXITCODE -ne 0) { throw "cargo test failed" }
 
 Invoke-DevCommand -Command "source-quality-gate"

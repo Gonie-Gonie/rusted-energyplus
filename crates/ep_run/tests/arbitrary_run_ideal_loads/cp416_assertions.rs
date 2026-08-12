@@ -1,5 +1,8 @@
 //! CP416 psychrometric supply-humidity-ratio assignment assertions.
 
+#[path = "cp417_assertions.rs"]
+mod cp417_assertions;
+
 use ep_runtime::psychrometrics::energyplus_psy_w_fn_tdb_h;
 use serde_json::{Map, Value, json};
 
@@ -163,6 +166,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         !results.to_string().contains(CP416_KEY),
         "CP416 lifecycle must remain outside numerical result state",
     );
+    cp417_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -171,6 +175,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP416_KEY].is_null(),
         "non-direct runtime must not publish CP416 evidence",
     );
+    cp417_assertions::assert_non_direct(runtime);
 }
 
 fn assert_route_contract(lifecycle: &Value) {

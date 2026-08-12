@@ -39817,3 +39817,93 @@ psychrometrics-map, output/status/conformance, or Roadmap promotion.
 algorithms, 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170
 required. Script inventory becomes 354 total, 240 public, 114 internal, zero
 unused, zero unreachable, with 238 development commands.
+
+## CP417 post-saturation capacity-limit dehumidification supply-enthalpy assignment
+
+CP417 supersedes only CP416's executable exclusion at pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048` and locked
+`PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps physical executable line 2321 exactly:
+
+```cpp
+SupplyEnthalpy = PsyHFnTdbW(PurchAir.SupplyTemp, PurchAir.SupplyHumRat);
+```
+
+Its four exact dependency-ordered source sites are
+`read-purchased-air-supply-temperature-for-post-saturation-capacity-limit-dehumidification-enthalpy`,
+`read-purchased-air-supply-humidity-ratio-for-post-saturation-capacity-limit-dehumidification-enthalpy`,
+`evaluate-psy-h-fn-tdb-w-for-post-saturation-capacity-limit-dehumidification`,
+and
+`assign-local-supply-enthalpy-after-post-saturation-capacity-limit-dehumidification-humidity-ratio-assignment`.
+The two argument reads are side-effect-free, so this deterministic Rust
+dependency order makes no general claim about C++ function-argument evaluation
+order. Physical lines 2322 through 2324 are comment-only, and lines 2325 and
+2326 are closing delimiters. Physical control line 2327,
+`} else { // Not dehumidifying`, is the first excluded lexical/control boundary
+and the CP418 candidate. Lines 2328 and 2329 are comment-only, and physical
+executable line 2330, `CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);`, is the
+first excluded executable. The else entry, sensible-cooling calculation, and
+every subsequent effect remain excluded.
+
+CP417 preserves CP416's fifty-four flattened conceptual outcomes one-for-one.
+Thirty-six inactive outcomes execute no CP417 site, while eighteen CP416
+active outcomes execute all four sites. Therefore `T417=54`, `Z417=36`,
+`A417=18`, and `S417=4*A417=72`. Public/private remains 17/37. Public
+flattened indices remain 0 through 8, 22 through 25, and 34 through 37; active
+public indices are exactly 23, 25, 35, and 37, with fourteen active private
+outcomes. Seven width-36 arrays retain CP413 predecessor, guard-false, and
+guard-body lineage, CP414 saturation-temperature assignment counts, CP415
+mixed-air-limit execution counts, CP416 humidity-ratio assignment counts, and
+CP417 enthalpy-assignment counts. Terminal W/H/T presence remains 36/41/51.
+
+Recursively complete same-call bit-exact CP416 lifecycle, snapshot, latest,
+private witness, and completion evidence are the sole immediate predecessor.
+CP416 `resulting_supply_temperature_c` solely owns the active dry-bulb
+operand, and CP416 `resulting_supply_humidity_ratio` solely owns the active
+humidity-ratio operand. Earlier checkpoints, caller/model/service scalars,
+Zone state, numerical-coupling DTO values, and inferred values are forbidden
+substitutes. Active outcomes assign canonical psychrometric enthalpy while
+preserving CP416 humidity and temperature bit-exact. Inactive outcomes read
+neither operand and preserve all CP416 W/H/T bits. CP416 W/H/T owner counts
+are 36/41/51, with unchanged preservation counts 36/23/51 respectively;
+CP417 owns the eighteen active enthalpy results.
+
+CP417 reuses canonical `energyplus_psy_h_fn_tdb_w` with exact grouping:
+
+```text
+1.00484e3*T + floor(W)*(2.50094e6 + 1.85895e3*T)
+```
+
+The source humidity floor replaces only `W < 1e-5` with `1e-5`, whose
+binary64 bits are `0x3ee4f8b588e368f1`. Negative values, both signed zeros,
+and positive sub-floor values therefore use the floor, while NaN/unordered
+humidity survives the comparison and propagates. Infinity, signed-zero,
+grouping, and overflow behavior remain IEEE characterization. CP417 adds no
+legacy IdealLoads enthalpy helper, fast/raw substitute, inline regrouping,
+`mul_add`, finite coercion, clamp, normalization, cache, diagnostics, warning
+counter, or mutable service.
+
+The full lossless snapshot retains CP416's first 142 fields, renames its
+terminal W/H/T triple to
+`predecessor_cp416_resulting_supply_humidity_ratio`,
+`predecessor_cp416_resulting_supply_enthalpy_j_per_kg`, and
+`predecessor_cp416_resulting_supply_temperature_c`, then appends exactly
+seventeen CP417 execution, owner, read, evaluation, assignment, and terminal
+fields. The schema has exactly 162 base fields, fifty-four `Option<f64>`
+carriers, one `Option<bool>` comparison carrier, and one optional control
+enum. Every numeric carrier has one immediately adjacent authoritative IEEE
+sidecar, so JSON exposes exactly 216 unique keys with fifty-four adjacent IEEE
+sidecars.
+
+Binding is CP416-to-CP417-to-unchanged-numerical, and the binding checkpoint
+count advances from 107 to 108. CP417 adds no numerical or coupling-input DTO
+field and no output DTO field. Its evidence never feeds or replaces prediction,
+numerical results, feedback, nodes, loads, reports, or outputs; non-direct paths
+reject CP417 lifecycle evidence. CP417 adds no support, readiness, capability,
+routine, algorithm, numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. `routine.psy_h_fn_tdb_w`
+remains `state_mapped`. Counts remain 32 algorithms, 293 routines, 58
+`state_mapped`, 235 `source_mapped`, and 170 required. Script inventory becomes
+355 total, 240 public, 115 internal, zero unused, zero unreachable, with 238
+development commands.

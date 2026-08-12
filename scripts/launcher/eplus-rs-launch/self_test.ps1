@@ -8,6 +8,27 @@ function Invoke-LauncherSelfTest {
         [string]$DefaultWeather,
         [string]$LauncherScriptPath
     )
+    $executableCandidates = @(Get-EplusRsExeCandidates -AppRoot $AppRoot)
+    $expectedExecutableCandidates = @(
+        (Join-Path $AppRoot "bin\eplus-rs.exe"),
+        (Join-Path $AppRoot "target\release\eplus-rs.exe"),
+        (Join-Path $AppRoot "target\debug\eplus-rs.exe")
+    )
+    for ($index = 0; $index -lt $expectedExecutableCandidates.Count; $index += 1) {
+        if ($executableCandidates[$index] -ne $expectedExecutableCandidates[$index]) {
+            throw "launcher self-test executable candidate order drift at index $index"
+        }
+    }
+    $staleExecutableSetting = Resolve-EplusRsExeSetting `
+        -SavedPath (Join-Path ([System.IO.Path]::GetTempPath()) ("missing-eplus-rs-{0}.exe" -f ([guid]::NewGuid()))) `
+        -SelectionSource "user" `
+        -AutoResolvedPath $expectedExecutableCandidates[1] `
+        -AppRoot $AppRoot
+    if ($staleExecutableSetting.path -ne $expectedExecutableCandidates[1] -or
+        $staleExecutableSetting.selection_source -ne "auto") {
+        throw "launcher self-test allowed a stale saved executable to override auto resolution"
+    }
+
     $diagnosticArgs = New-LauncherRunArguments `
         -InputPath "input.epJSON" `
         -WeatherPath "" `
@@ -224,6 +245,7 @@ function Invoke-LauncherSelfTest {
     $script:OutputDir = "remembered-output"
     $script:OracleRoot = "remembered-oracle"
     $script:EplusRsExe = "remembered-eplus-rs.exe"
+    $script:EplusRsExeSelection = "user"
     $script:Mode = "diagnostic"
     $script:PartialPolicy = "allow"
     $script:OutputFormat = "both"
@@ -239,6 +261,9 @@ function Invoke-LauncherSelfTest {
     }
     if (-not (Get-SettingBool -Settings $settings -Name "compare_oracle" -Fallback $false)) {
         throw "launcher self-test failed to save oracle compare option"
+    }
+    if ((Get-SettingValue -Settings $settings -Name "eplus_rs_exe_selection" -Fallback "") -ne "user") {
+        throw "launcher self-test failed to save executable selection provenance"
     }
     Remove-Item -LiteralPath $settingsPath -Force
     $evidenceRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("eplus-rs-launch-evidence-{0}" -f ([guid]::NewGuid()))
@@ -275,6 +300,8 @@ function Invoke-LauncherSelfTest {
         self_test = "passed"
         app_root = $AppRoot
         eplus_rs = Resolve-EplusRsExe
+        eplus_rs_candidate_paths = $executableCandidates
+        rejects_stale_saved_exe = $true
         oracle_root = $DefaultOracleRoot
         oracle_ready = Test-OracleRoot -Path $DefaultOracleRoot
         default_idf = $DefaultIdf

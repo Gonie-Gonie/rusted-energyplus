@@ -61,15 +61,24 @@ function Test-EplusRsRunCli {
     }
 }
 
-function Resolve-EplusRsExe {
+function Get-EplusRsExeCandidates {
+    param([Parameter(Mandatory = $true)][string]$AppRoot)
+
     $command = Get-Command eplus-rs -ErrorAction SilentlyContinue
     $commandPath = if ($null -ne $command) { $command.Source } else { $null }
-    foreach ($candidate in @(
+    $candidates = @(
         (Join-Path $AppRoot "bin\eplus-rs.exe"),
-        (Join-Path $AppRoot "target\debug\eplus-rs.exe"),
         (Join-Path $AppRoot "target\release\eplus-rs.exe"),
-        $commandPath
-    )) {
+        (Join-Path $AppRoot "target\debug\eplus-rs.exe")
+    )
+    if (-not [string]::IsNullOrWhiteSpace($commandPath)) {
+        $candidates += $commandPath
+    }
+    return $candidates
+}
+
+function Resolve-EplusRsExe {
+    foreach ($candidate in @(Get-EplusRsExeCandidates -AppRoot $AppRoot)) {
         if ([string]::IsNullOrWhiteSpace($candidate)) {
             continue
         }
@@ -83,6 +92,85 @@ function Resolve-EplusRsExe {
         }
     }
     return $null
+}
+
+function Test-LauncherPathEqual {
+    param(
+        [string]$Left,
+        [string]$Right
+    )
+    if ([string]::IsNullOrWhiteSpace($Left) -or [string]::IsNullOrWhiteSpace($Right)) {
+        return $false
+    }
+    try {
+        $leftFullPath = [System.IO.Path]::GetFullPath($Left).TrimEnd('\')
+        $rightFullPath = [System.IO.Path]::GetFullPath($Right).TrimEnd('\')
+        return [string]::Equals($leftFullPath, $rightFullPath, [System.StringComparison]::OrdinalIgnoreCase)
+    }
+    catch {
+        return $false
+    }
+}
+
+function Resolve-EplusRsExeSetting {
+    param(
+        [string]$SavedPath,
+        [string]$SelectionSource,
+        [string]$AutoResolvedPath,
+        [Parameter(Mandatory = $true)][string]$AppRoot
+    )
+
+    $autoSelection = [pscustomobject]@{
+        path = $AutoResolvedPath
+        selection_source = "auto"
+    }
+    if ([string]::IsNullOrWhiteSpace($SavedPath)) {
+        return $autoSelection
+    }
+
+    $resolvedSavedPath = Resolve-Path -LiteralPath $SavedPath -ErrorAction SilentlyContinue
+    if ($null -eq $resolvedSavedPath -or -not (Test-EplusRsRunCli -Path $resolvedSavedPath.Path)) {
+        return $autoSelection
+    }
+    $validSavedPath = $resolvedSavedPath.Path
+
+    if ([string]::Equals($SelectionSource, "user", [System.StringComparison]::OrdinalIgnoreCase)) {
+        return [pscustomobject]@{
+            path = $validSavedPath
+            selection_source = "user"
+        }
+    }
+    if ([string]::Equals($SelectionSource, "auto", [System.StringComparison]::OrdinalIgnoreCase)) {
+        if (-not [string]::IsNullOrWhiteSpace($AutoResolvedPath)) {
+            return $autoSelection
+        }
+        return [pscustomobject]@{
+            path = $validSavedPath
+            selection_source = "auto"
+        }
+    }
+
+    $legacyDebugPath = Join-Path $AppRoot "target\debug\eplus-rs.exe"
+    if (Test-LauncherPathEqual -Left $validSavedPath -Right $legacyDebugPath) {
+        $preferredAutoPaths = @(
+            (Join-Path $AppRoot "bin\eplus-rs.exe"),
+            (Join-Path $AppRoot "target\release\eplus-rs.exe")
+        )
+        foreach ($preferredPath in $preferredAutoPaths) {
+            if (Test-LauncherPathEqual -Left $AutoResolvedPath -Right $preferredPath) {
+                return $autoSelection
+            }
+        }
+        return [pscustomobject]@{
+            path = $validSavedPath
+            selection_source = "auto"
+        }
+    }
+
+    return [pscustomobject]@{
+        path = $validSavedPath
+        selection_source = "user"
+    }
 }
 
 function Resolve-OracleRoot {
@@ -445,6 +533,7 @@ function Save-LauncherSettings {
         output_dir = $script:OutputDir
         oracle_root = $script:OracleRoot
         eplus_rs_exe = if ($null -ne $script:EplusRsExe) { $script:EplusRsExe } else { "" }
+        eplus_rs_exe_selection = if ($null -ne $script:EplusRsExeSelection) { $script:EplusRsExeSelection } else { "auto" }
         mode = $script:Mode
         partial_policy = $script:PartialPolicy
         output_format = $script:OutputFormat

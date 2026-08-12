@@ -1,5 +1,8 @@
 [CmdletBinding()]
-param()
+param(
+    [ValidateRange(1, 3600)]
+    [int]$CliRunTimeoutSeconds = 120
+)
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
@@ -110,6 +113,45 @@ function Write-Utf8NoBomFile {
     [System.IO.File]::WriteAllText($Path, $Contents, $encoding)
 }
 
+function ConvertTo-ProcessArgument {
+    param(
+        [AllowEmptyString()]
+        [Parameter(Mandatory = $true)][string]$Argument
+    )
+
+    if ($Argument.Length -gt 0 -and $Argument -notmatch '[\s"]') {
+        return $Argument
+    }
+
+    $builder = New-Object System.Text.StringBuilder
+    [void]$builder.Append('"')
+    $backslashCount = 0
+    foreach ($character in $Argument.ToCharArray()) {
+        if ($character -eq '\') {
+            $backslashCount += 1
+            continue
+        }
+        if ($character -eq '"') {
+            for ($index = 0; $index -lt ((2 * $backslashCount) + 1); $index += 1) {
+                [void]$builder.Append('\')
+            }
+            [void]$builder.Append('"')
+            $backslashCount = 0
+            continue
+        }
+        for ($index = 0; $index -lt $backslashCount; $index += 1) {
+            [void]$builder.Append('\')
+        }
+        $backslashCount = 0
+        [void]$builder.Append($character)
+    }
+    for ($index = 0; $index -lt (2 * $backslashCount); $index += 1) {
+        [void]$builder.Append('\')
+    }
+    [void]$builder.Append('"')
+    return $builder.ToString()
+}
+
 function Invoke-LauncherCliRun {
     param(
         [Parameter(Mandatory = $true)][string]$Description,
@@ -123,8 +165,95 @@ function Invoke-LauncherCliRun {
     }
 
     Write-Host "Running launcher-equivalent CLI case: $Description"
-    $output = & $script:CliExe @Arguments 2>&1
-    $exitCode = $LASTEXITCODE
+    $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+    $startInfo.FileName = $script:CliExe
+    $startInfo.WorkingDirectory = $RepoRoot
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    if (@($startInfo.PSObject.Properties.Name) -contains "ArgumentList") {
+        foreach ($argument in $Arguments) {
+            [void]$startInfo.ArgumentList.Add($argument)
+        }
+    } else {
+        $startInfo.Arguments = (($Arguments | ForEach-Object {
+                    ConvertTo-ProcessArgument -Argument $_
+                }) -join " ")
+    }
+
+    $process = New-Object System.Diagnostics.Process
+    $process.StartInfo = $startInfo
+    $standardOutput = ""
+    $standardError = ""
+    $exitCode = $null
+    $timedOut = $false
+    try {
+        if (-not $process.Start()) {
+            throw "Failed to start launcher-equivalent CLI case: $Description"
+        }
+        $standardOutputTask = $process.StandardOutput.ReadToEndAsync()
+        $standardErrorTask = $process.StandardError.ReadToEndAsync()
+        $timeoutMilliseconds = [int]([Math]::Min(
+                [int]::MaxValue,
+                [int64]$CliRunTimeoutSeconds * 1000
+            ))
+        if (-not $process.WaitForExit($timeoutMilliseconds)) {
+            $timedOut = $true
+            $treeKillSucceeded = $false
+            $taskkill = Join-Path $env:SystemRoot "System32\taskkill.exe"
+            if (Test-Path -LiteralPath $taskkill -PathType Leaf) {
+                & $taskkill /PID $process.Id /T /F *> $null
+                $treeKillSucceeded = $LASTEXITCODE -eq 0
+            }
+            if (-not $treeKillSucceeded -and -not $process.HasExited) {
+                try {
+                    $process.Kill()
+                } catch {
+                    # A concurrent process exit is equivalent to a successful direct kill.
+                }
+            }
+            if (-not $process.WaitForExit(5000) -and -not $process.HasExited) {
+                try {
+                    $process.Kill()
+                    [void]$process.WaitForExit(1000)
+                } catch {
+                    # Output capture below is bounded even when final cleanup fails.
+                }
+            }
+        } else {
+            $process.WaitForExit()
+        }
+        if ($timedOut) {
+            foreach ($outputTask in @($standardOutputTask, $standardErrorTask)) {
+                try {
+                    [void]$outputTask.Wait(1000)
+                } catch {
+                    # Timeout diagnostics are best-effort and must not extend the timeout.
+                }
+            }
+            if ($standardOutputTask.Status -eq [System.Threading.Tasks.TaskStatus]::RanToCompletion) {
+                $standardOutput = $standardOutputTask.GetAwaiter().GetResult()
+            }
+            if ($standardErrorTask.Status -eq [System.Threading.Tasks.TaskStatus]::RanToCompletion) {
+                $standardError = $standardErrorTask.GetAwaiter().GetResult()
+            }
+        } else {
+            $standardOutput = $standardOutputTask.GetAwaiter().GetResult()
+            $standardError = $standardErrorTask.GetAwaiter().GetResult()
+            $exitCode = $process.ExitCode
+        }
+    } finally {
+        $process.Dispose()
+    }
+
+    $output = @($standardOutput, $standardError) | Where-Object {
+        -not [string]::IsNullOrWhiteSpace($_)
+    }
+    if ($timedOut) {
+        $output | ForEach-Object { Write-Host $_ }
+        throw "Timed out $Description after $CliRunTimeoutSeconds seconds"
+    }
     if ($exitCode -ne $ExpectedExitCode) {
         $output | ForEach-Object { Write-Host $_ }
         throw "Unexpected $Description exit code: expected $ExpectedExitCode, got $exitCode"
@@ -245,10 +374,14 @@ if (-not (Test-Path -LiteralPath $releasePackageScript -PathType Leaf)) {
     throw "Missing release package script: $releasePackageScript"
 }
 $launcherText = Get-Content -Encoding UTF8 -Raw -LiteralPath $launcherScript
+$launcherCorePath = Join-Path $RepoRoot "scripts\launcher\eplus-rs-launch\core.ps1"
+Assert-File -Path $launcherCorePath -Description "launcher PowerShell core"
+$launcherCoreText = Get-Content -Encoding UTF8 -Raw -LiteralPath $launcherCorePath
 $launcherCsPath = Join-Path $RepoRoot "scripts\launcher\eplus-rs-launcher.cs"
 Assert-File -Path $launcherCsPath -Description "direct C# launcher source"
 $launcherCsText = Get-Content -Encoding UTF8 -Raw -LiteralPath $launcherCsPath
 Assert-Matches -Text $launcherText -Pattern "Resolve-EplusRsExe" -Description "launcher binary resolver"
+Assert-Matches -Text $launcherCoreText -Pattern '(?s)bin\\eplus-rs\.exe.*?target\\release\\eplus-rs\.exe.*?target\\debug\\eplus-rs\.exe' -Description "PowerShell launcher packaged-bin then release-before-debug resolver order"
 Assert-Matches -Text $launcherText -Pattern "New-LauncherRunArguments" -Description "launcher run command builder"
 Assert-Matches -Text $launcherText -Pattern "Cancel-Run" -Description "launcher cancel command"
 Assert-Matches -Text $launcherText -Pattern "Read-RunSummaryStatus" -Description "launcher run-summary reader"
@@ -265,6 +398,8 @@ Assert-Matches -Text $launcherCsText -Pattern "FolderBrowserDialog" -Description
 Assert-Matches -Text $launcherCsText -Pattern "Claim Boundary" -Description "direct launcher claim boundary tab"
 Assert-Matches -Text $launcherCsText -Pattern "Fast and experimental modes are never release conformance evidence" -Description "direct launcher fast/experimental claim boundary"
 Assert-NotMatches -Text $launcherCsText -Pattern "full EnergyPlus compatible" -Description "direct launcher forbidden full compatibility wording"
+Assert-Matches -Text $launcherCsText -Pattern '(?s)Path\.Combine\(appRoot, "bin", "eplus-rs\.exe"\).*?Path\.Combine\(appRoot, "target", "release", "eplus-rs\.exe"\).*?Path\.Combine\(appRoot, "target", "debug", "eplus-rs\.exe"\)' -Description "direct launcher packaged-bin then release-before-debug app-root order"
+Assert-Matches -Text $launcherCsText -Pattern '(?s)Path\.Combine\(repoRoot, "target", "release", "eplus-rs\.exe"\).*?Path\.Combine\(repoRoot, "target", "debug", "eplus-rs\.exe"\)' -Description "direct launcher release-before-debug repo-root order"
 foreach ($workflowText in @(
         "IDF / epJSON",
         "Weather EPW",
@@ -301,6 +436,15 @@ if ($LASTEXITCODE -ne 0) {
 }
 $selfTest = ($selfTestOutput -join "`n") | ConvertFrom-Json
 Assert-Equal -Actual $selfTest.self_test -Expected "passed" -Description "launcher self-test status"
+$candidatePaths = @($selfTest.eplus_rs_candidate_paths)
+if ($candidatePaths.Count -lt 3) {
+    throw "Launcher executable candidate list was shorter than the required packaged/release/debug paths."
+}
+Write-Host "OK launcher executable candidate count: $($candidatePaths.Count)"
+Assert-Equal -Actual $candidatePaths[0] -Expected (Join-Path $RepoRoot "bin\eplus-rs.exe") -Description "launcher packaged binary priority"
+Assert-Equal -Actual $candidatePaths[1] -Expected (Join-Path $RepoRoot "target\release\eplus-rs.exe") -Description "launcher release binary priority"
+Assert-Equal -Actual $candidatePaths[2] -Expected (Join-Path $RepoRoot "target\debug\eplus-rs.exe") -Description "launcher debug binary fallback"
+Assert-Equal -Actual $selfTest.rejects_stale_saved_exe -Expected $true -Description "launcher stale saved executable rejection"
 
 $smokeRoot = Join-Path $RepoRoot ".runtime\launcher-smoke"
 New-Item -ItemType Directory -Force -Path $smokeRoot | Out-Null
@@ -395,6 +539,9 @@ if ($LASTEXITCODE -ne 0) {
 }
 $build = ($buildOutput -join "`n") | ConvertFrom-Json
 Assert-Equal -Actual $build.output_type -Expected "WindowsApplication" -Description "launcher executable output type"
+Assert-Equal -Actual $build.prefers_release_over_debug -Expected $true -Description "direct launcher release-before-debug self-test"
+Assert-Equal -Actual $build.rejects_stale_saved_exe -Expected $true -Description "direct launcher stale saved executable guard"
+Assert-Equal -Actual $build.migrates_legacy_debug_to_release -Expected $true -Description "direct launcher legacy debug migration guard"
 if ([int64]$build.bytes -le 0) {
     throw "Launcher executable was empty: $($build.output_path)"
 }
@@ -405,13 +552,13 @@ if ($null -eq $cargo) {
     throw "cargo was not found. Run .\scripts\dev.cmd setup -InstallRust first."
 }
 
-Write-Host "Building eplus-rs CLI for launcher run validation."
-& $cargo.Source build -p ep_cli --quiet
+Write-Host "Building release eplus-rs CLI for launcher run validation with at most 12 jobs."
+& $cargo.Source build -p ep_cli --release --jobs 12 --quiet
 if ($LASTEXITCODE -ne 0) {
     throw "Failed to build ep_cli."
 }
 
-$script:CliExe = Join-Path $RepoRoot "target\debug\eplus-rs.exe"
+$script:CliExe = Join-Path $RepoRoot "target\release\eplus-rs.exe"
 Assert-File -Path $script:CliExe -Description "launcher CLI binary"
 
 $fixtureRoot = Join-Path $smokeRoot "fixtures"
@@ -476,6 +623,7 @@ $idealLoadsPath = Join-Path $fixtureRoot "ideal-loads.epJSON"
 Write-Utf8NoBomFile -Path $idealLoadsPath -Contents @'
 {
   "Version": {"Version 1": {"version_identifier": "26.1"}},
+  "Timestep": {"Timestep 1": {"number_of_timesteps_per_hour": 1}},
   "Zone": {"Zone One": {"volume": 100}},
   "Schedule:Constant": {
     "Control Type": {"hourly_value": 4},

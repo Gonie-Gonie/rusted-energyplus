@@ -37,6 +37,7 @@ Add-Type -AssemblyName System.Drawing
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
 $script:EplusRsExe = Resolve-EplusRsExe
+$script:EplusRsExeSelection = "auto"
 $script:InputPath = if ($null -ne $DefaultIdf) { $DefaultIdf } else { "" }
 $script:WeatherPath = if ($null -ne $DefaultWeather) { $DefaultWeather } else { "" }
 $script:OutputDir = Join-Path $AppRoot ".runtime\ep-launch-output"
@@ -65,9 +66,14 @@ if ($null -ne $settings) {
     $script:OutputDir = Get-SettingValue -Settings $settings -Name "output_dir" -Fallback $script:OutputDir
     $script:OracleRoot = Get-SettingValue -Settings $settings -Name "oracle_root" -Fallback $script:OracleRoot
     $savedExe = Get-SettingValue -Settings $settings -Name "eplus_rs_exe" -Fallback ""
-    if (-not [string]::IsNullOrWhiteSpace($savedExe)) {
-        $script:EplusRsExe = $savedExe
-    }
+    $savedExeSelection = Get-SettingValue -Settings $settings -Name "eplus_rs_exe_selection" -Fallback ""
+    $resolvedExeSetting = Resolve-EplusRsExeSetting `
+        -SavedPath $savedExe `
+        -SelectionSource $savedExeSelection `
+        -AutoResolvedPath $script:EplusRsExe `
+        -AppRoot $AppRoot
+    $script:EplusRsExe = $resolvedExeSetting.path
+    $script:EplusRsExeSelection = $resolvedExeSetting.selection_source
     $script:Mode = Get-SettingValue -Settings $settings -Name "mode" -Fallback $script:Mode
     $script:PartialPolicy = Get-SettingValue -Settings $settings -Name "partial_policy" -Fallback $script:PartialPolicy
     $script:OutputFormat = Get-SettingValue -Settings $settings -Name "output_format" -Fallback $script:OutputFormat
@@ -614,6 +620,7 @@ $exeButton.Add_Click({
     $dialog.Filter = "eplus-rs.exe|eplus-rs.exe|Executables (*.exe)|*.exe|All files (*.*)|*.*"
     if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
         $script:EplusRsExe = $dialog.FileName
+        $script:EplusRsExeSelection = "user"
         Save-LauncherSettings -Path $script:LauncherSettingsPath
         Refresh-Ui
     }

@@ -94,6 +94,7 @@ use ep_runtime::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlNoneCaseEntryLifecycleSummary,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlSwitchLifecycleSummary,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardLifecycleSummary,
+    PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyEnthalpyAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyHumidityRatioAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyHumidityRatioPreSaturationOriginalAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyHumidityRatioSaturationAssignmentLifecycleSummary,
@@ -232,6 +233,7 @@ mod purchased_air_cooling_post_saturation_capacity_limit_dehumidification_contro
 mod purchased_air_cooling_post_saturation_capacity_limit_dehumidification_control_none_case_entry;
 mod purchased_air_cooling_post_saturation_capacity_limit_dehumidification_control_switch;
 mod purchased_air_cooling_post_saturation_capacity_limit_dehumidification_guard;
+mod purchased_air_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment;
 mod purchased_air_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment;
 mod purchased_air_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment;
 mod purchased_air_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_assignment;
@@ -705,6 +707,10 @@ struct RustRuntimeResult {
     purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_lifecycle:
         Option<
             PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyHumidityRatioAssignmentLifecycleSummary,
+        >,
+    purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle:
+        Option<
+            PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyEnthalpyAssignmentLifecycleSummary,
         >,
 }
 
@@ -2170,6 +2176,10 @@ fn finish_successful_summary(
                 .purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_lifecycle
                 .as_ref()
                 .map(purchased_air_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment::lifecycle_json),
+            "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle": result
+                .purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle
+                .as_ref()
+                .map(purchased_air_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment::lifecycle_json),
         })),
         "source_order_gate": rust_runtime_result.as_ref().map(|result| &result.source_order_gate),
         "oracle": oracle_summary,
@@ -3205,6 +3215,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment_lifecycle: None,
                 purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit_lifecycle: None,
                 purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_lifecycle: None,
+                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility => {
@@ -3792,6 +3803,11 @@ fn execute_rust_runtime(
                     .summary
                     .calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_lifecycle,
             );
+            let purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle = Some(
+                simulation
+                    .summary
+                    .calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle,
+            );
             Ok(RustRuntimeResult {
                 results: simulation.results,
                 runtime_class,
@@ -3914,6 +3930,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment_lifecycle,
                 purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit_lifecycle,
                 purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_lifecycle,
+                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle,
             })
         }
         RuntimeClass::IdealLoadsFixtureDemandDiagnostic => {
@@ -4087,6 +4104,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment_lifecycle: None,
                 purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit_lifecycle: None,
                 purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_lifecycle: None,
+                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle: None,
             })
         }
         RuntimeClass::IdealLoadsNodeStateProjection => {
@@ -4258,6 +4276,7 @@ fn execute_rust_runtime(
                 purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment_lifecycle: None,
                 purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit_lifecycle: None,
                 purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_lifecycle: None,
+                purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle: None,
             })
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
@@ -5681,6 +5700,17 @@ fn validate_runtime_demand_provenance(
                 init_lifecycle,
                 result.purchased_air_coupling_call_count,
             )?;
+        purchased_air_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment::
+            validate_direct_lifecycle(
+                result
+                    .purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle
+                    .as_ref(),
+                result
+                    .purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_lifecycle
+                    .as_ref(),
+                init_lifecycle,
+                result.purchased_air_coupling_call_count,
+            )?;
     } else if result.purchased_air_init_lifecycle.is_some()
         || result.purchased_air_calc_entry_lifecycle.is_some()
         || result
@@ -6000,6 +6030,9 @@ fn validate_runtime_demand_provenance(
             .is_some()
         || result
             .purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_lifecycle
+            .is_some()
+        || result
+            .purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle
             .is_some()
         || result.purchased_air_coupling_call_count.is_some()
     {
@@ -6870,6 +6903,49 @@ mod tests {
             ),
         };
         let evidence = super::purchased_air_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment::lifecycle_json(&lifecycle);
+
+        assert_eq!(results, before);
+        assert!(evidence.get("results").is_none());
+        assert!(evidence.get("prediction").is_none());
+        assert!(evidence.get("feedback").is_none());
+        assert!(evidence.get("nodes").is_none());
+        assert!(evidence.get("loads").is_none());
+        assert!(evidence.get("reports").is_none());
+    }
+
+    #[test]
+    fn arbitrary_run_cp417_registers_json_and_delegates_validation_to_cp416() {
+        type Cp417Validator = fn(
+            Option<
+                &ep_runtime::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyEnthalpyAssignmentLifecycleSummary,
+            >,
+            Option<
+                &ep_runtime::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyHumidityRatioAssignmentLifecycleSummary,
+            >,
+            Option<&ep_runtime::PurchasedAirInitLifecycleSummary>,
+            Option<usize>,
+        ) -> Result<(), String>;
+        type Cp417Serializer = fn(
+            &ep_runtime::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyEnthalpyAssignmentLifecycleSummary,
+        ) -> serde_json::Value;
+
+        let validator: Cp417Validator = super::purchased_air_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment::validate_direct_lifecycle;
+        let serializer: Cp417Serializer = super::purchased_air_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment::lifecycle_json;
+        let _ = (validator, serializer);
+    }
+
+    #[test]
+    fn arbitrary_run_cp417_lifecycle_evidence_does_not_feed_numerical_results() {
+        let results = ep_runtime::ResultStore::new();
+        let before = results.clone();
+        let lifecycle = ep_runtime::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyEnthalpyAssignmentLifecycleSummary {
+            source: ep_runtime::PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_SUPPLY_ENTHALPY_ASSIGNMENT_SOURCE,
+            first_excluded_source: ep_runtime::PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_SUPPLY_ENTHALPY_ASSIGNMENT_FIRST_EXCLUDED_SOURCE,
+            state: ep_runtime::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyEnthalpyAssignmentRuntimeState::new(
+                IdealLoadsAirSystemId(0),
+            ),
+        };
+        let evidence = super::purchased_air_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment::lifecycle_json(&lifecycle);
 
         assert_eq!(results, before);
         assert!(evidence.get("results").is_none());
@@ -7804,7 +7880,7 @@ mod tests {
     }
 
     #[test]
-    fn non_direct_runtime_rejects_cp316_through_cp416_lifecycle_evidence() {
+    fn non_direct_runtime_rejects_cp316_through_cp417_lifecycle_evidence() {
         let mut result = RustRuntimeResult {
             results: ResultStore::new(),
             runtime_class: RuntimeClass::IdealLoadsFixtureDemandDiagnostic,
@@ -8008,6 +8084,8 @@ mod tests {
             purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit_lifecycle:
                 None,
             purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_lifecycle:
+                None,
+            purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle:
                 None,
         };
         assert!(
@@ -10230,6 +10308,30 @@ mod tests {
         assert!(
             result
                 .purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_lifecycle
+                .is_none()
+        );
+        result
+            .purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle = Some(
+            ep_runtime::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyEnthalpyAssignmentLifecycleSummary {
+                source: ep_runtime::PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_SUPPLY_ENTHALPY_ASSIGNMENT_SOURCE,
+                first_excluded_source: ep_runtime::PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_SUPPLY_ENTHALPY_ASSIGNMENT_FIRST_EXCLUDED_SOURCE,
+                state: ep_runtime::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyEnthalpyAssignmentRuntimeState::new(
+                    IdealLoadsAirSystemId(0),
+                ),
+            },
+        );
+        assert_eq!(
+            validate_runtime_demand_provenance(RunResultState::PartialSupportedRun, &result, None),
+            Err(
+                "persistent PurchasedAir lifecycle evidence was attached to a non-direct runtime"
+                    .to_string()
+            )
+        );
+        result
+            .purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle = None;
+        assert!(
+            result
+                .purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle
                 .is_none()
         );
     }

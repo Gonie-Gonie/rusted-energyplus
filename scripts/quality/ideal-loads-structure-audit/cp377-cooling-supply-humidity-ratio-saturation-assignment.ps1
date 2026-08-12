@@ -208,7 +208,7 @@ Assert-Contains -Path $cp377BindingTests -Pattern 'orders_cp376_then_cp377_and_k
 Assert-Contains -Path $cp377CoupledTests -Pattern 'does_not_feed_numerical_result' -Description "coupled nonfeed regression"
 
 # Direct-only ep_run lifecycle, finite JSON, and terminal arbitrary ownership.
-Assert-Contains -Path $cp377PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp416_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp377PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp417_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp377PipelineRoot -Pattern $cp377Lifecycle -Description "pipeline lifecycle key"
 foreach ($pattern in @('json_number', 'ieee_bits', 'supply_temperature_for_saturation_humidity_ratio_c_ieee_bits', 'outdoor_barometric_pressure_pa_ieee_bits', 'saturation_supply_humidity_ratio_ieee_bits')) {
     Assert-Contains -Path $cp377SnapshotSerialization -Pattern $pattern -Description "finite JSON/IEEE sidecar $pattern"
@@ -271,16 +271,16 @@ Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP377 a
 # Historical terminal expectations, line caps, master order, and generated inventory.
 foreach ($historical in 334..376) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp416_lifecycle_evidence' -Description "historical firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp417_lifecycle_evidence' -Description "historical firewall"
 }
 foreach ($historical in 335..376) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 354 \|')) -Description "historical generated total"
-Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 114 \|')) -Description "historical generated internal"
+Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 355 \|')) -Description "historical generated total"
+Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 115 \|')) -Description "historical generated internal"
 }
 foreach ($historical in 337..376) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 354' -Description "historical inventory total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 355' -Description "historical inventory total"
 }
 foreach ($historical in @('cp326-cooling-supply-mass-flow-limit-body.ps1') + @(329..359 | ForEach-Object { (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$($_)-*.ps1").Name })) {
     Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$historical" -Pattern "calculation_$cp377Stem" -Description "historical CP377 binding order"
@@ -305,18 +305,18 @@ if ($cp376AuditIndexForCp377 -lt 0 -or $cp377AuditIndex -le $cp376AuditIndexForC
     throw "Master audit must dot-source CP377 after CP376 before completion"
 }
 $cp377InventoryText = Read-RepoText -Path "specs\script_inventory.toml"
-Assert-Cp377TextContains -Text $cp377InventoryText -Pattern 'script_count = 354' -Description "script total"
+Assert-Cp377TextContains -Text $cp377InventoryText -Pattern 'script_count = 355' -Description "script total"
 Assert-Cp377TextContains -Text $cp377InventoryText -Pattern 'dev_command_count = 238' -Description "development-command total"
 Assert-Cp377TextContains -Text $cp377InventoryText -Pattern 'unused_script_count = 0' -Description "zero unused"
 if ([regex]::Matches($cp377InventoryText, '(?m)^classification = "public"$').Count -ne 240 -or
-[regex]::Matches($cp377InventoryText, '(?m)^classification = "internal"$').Count -ne 114) {
+[regex]::Matches($cp377InventoryText, '(?m)^classification = "internal"$').Count -ne 115) {
 throw "CP377 inventory must be exactly 240 public and 113 internal scripts"
 }
 Assert-Cp377TextContains -Text $cp377InventoryText -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp377-' -Description "inventory record"
 Assert-Cp377TextContains -Text $cp377InventoryText -Pattern 'ideal-loads-structure-audit\.ps1::dot_sources' -Description "caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 354 \|' -Description "generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 355 \|' -Description "generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 114 \|' -Description "generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 115 \|' -Description "generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "generated unused"
 
 Assert-Contains -Path "crates\ep_run\tests\arbitrary_run_ideal_loads\cp385_assertions.rs" -Pattern 'assert_numerical_nonfeed_and_local_enthalpy_only\(' -Description "CP385 terminal numerical nonfeed firewall"
@@ -333,10 +333,10 @@ Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling
 Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'let\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit\s*=' -Description 'CP415 historical binding order'
 Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern '\$cp415Call' -Description 'CP415 terminal capture'
 Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP414-to-CP415' -Description 'CP414-to-CP415 interval'
-Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP416-to-numerical' -Description 'CP415 terminal interval'
 Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'let\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment\s*=' -Description 'CP416 historical binding order'
 Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern '\$cp416Call' -Description 'CP416 terminal capture'
 Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP415-to-CP416' -Description 'CP415-to-CP416 interval'
-Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP416-to-numerical' -Description 'CP416 terminal interval'
+Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP417-to-numerical' -Description 'CP417 terminal interval'
+Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern '\$cp417Call' -Description 'CP417 terminal capture'; Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP416-to-CP417' -Description 'CP416-to-CP417 interval'; Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP417-to-numerical' -Description 'CP417 terminal interval'
 Write-Host "CP377 saturation humidity-ratio assignment structure audit passed."
 }

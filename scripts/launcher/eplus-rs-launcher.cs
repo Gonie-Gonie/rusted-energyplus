@@ -65,6 +65,7 @@ internal sealed class LauncherApp
     private readonly JavaScriptSerializer json;
 
     private string eplusRsExe;
+    private string eplusRsExeSelection;
     private string inputPath;
     private string weatherPath;
     private string outputDir;
@@ -141,6 +142,7 @@ internal sealed class LauncherApp
 
         LauncherDefaults defaults = GetLauncherDefaultPaths();
         eplusRsExe = ResolveEplusRsExe();
+        eplusRsExeSelection = "auto";
         inputPath = defaults.Idf ?? "";
         weatherPath = defaults.Weather ?? "";
         outputDir = Path.Combine(appRoot, ".runtime", "ep-launch-output");
@@ -369,6 +371,7 @@ internal sealed class LauncherApp
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 eplusRsExe = dialog.FileName;
+                eplusRsExeSelection = "user";
                 SaveSettings();
                 RefreshUi();
             }
@@ -770,20 +773,7 @@ internal sealed class LauncherApp
 
     private string ResolveEplusRsExe()
     {
-        List<string> candidates = new List<string>();
-        candidates.Add(Path.Combine(appRoot, "bin", "eplus-rs.exe"));
-        candidates.Add(Path.Combine(appRoot, "target", "debug", "eplus-rs.exe"));
-        candidates.Add(Path.Combine(appRoot, "target", "release", "eplus-rs.exe"));
-        if (!String.IsNullOrWhiteSpace(repoRoot))
-        {
-            candidates.Add(Path.Combine(repoRoot, "target", "debug", "eplus-rs.exe"));
-            candidates.Add(Path.Combine(repoRoot, "target", "release", "eplus-rs.exe"));
-        }
-        string pathCandidate = ResolveCommandOnPath("eplus-rs.exe");
-        if (!String.IsNullOrWhiteSpace(pathCandidate))
-        {
-            candidates.Add(pathCandidate);
-        }
+        List<string> candidates = GetEplusRsExeCandidates();
         foreach (string candidate in candidates)
         {
             if (File.Exists(candidate) && TestEplusRsRunCli(candidate))
@@ -792,6 +782,123 @@ internal sealed class LauncherApp
             }
         }
         return null;
+    }
+
+    private List<string> GetEplusRsExeCandidates()
+    {
+        List<string> candidates = new List<string>();
+        candidates.Add(Path.Combine(appRoot, "bin", "eplus-rs.exe"));
+        candidates.Add(Path.Combine(appRoot, "target", "release", "eplus-rs.exe"));
+        if (!String.IsNullOrWhiteSpace(repoRoot))
+        {
+            candidates.Add(Path.Combine(repoRoot, "target", "release", "eplus-rs.exe"));
+        }
+        candidates.Add(Path.Combine(appRoot, "target", "debug", "eplus-rs.exe"));
+        if (!String.IsNullOrWhiteSpace(repoRoot))
+        {
+            candidates.Add(Path.Combine(repoRoot, "target", "debug", "eplus-rs.exe"));
+        }
+        string pathCandidate = ResolveCommandOnPath("eplus-rs.exe");
+        if (!String.IsNullOrWhiteSpace(pathCandidate))
+        {
+            candidates.Add(pathCandidate);
+        }
+        return candidates;
+    }
+
+    private static bool LauncherPathsEqual(string left, string right)
+    {
+        if (String.IsNullOrWhiteSpace(left) || String.IsNullOrWhiteSpace(right))
+        {
+            return false;
+        }
+        try
+        {
+            return String.Equals(
+                Path.GetFullPath(left).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                Path.GetFullPath(right).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private bool IsKnownDebugCandidate(string path)
+    {
+        if (LauncherPathsEqual(path, Path.Combine(appRoot, "target", "debug", "eplus-rs.exe")))
+        {
+            return true;
+        }
+        return !String.IsNullOrWhiteSpace(repoRoot) &&
+            LauncherPathsEqual(path, Path.Combine(repoRoot, "target", "debug", "eplus-rs.exe"));
+    }
+
+    private bool IsPreferredPackagedOrReleaseCandidate(string path)
+    {
+        if (LauncherPathsEqual(path, Path.Combine(appRoot, "bin", "eplus-rs.exe")) ||
+            LauncherPathsEqual(path, Path.Combine(appRoot, "target", "release", "eplus-rs.exe")))
+        {
+            return true;
+        }
+        return !String.IsNullOrWhiteSpace(repoRoot) &&
+            LauncherPathsEqual(path, Path.Combine(repoRoot, "target", "release", "eplus-rs.exe"));
+    }
+
+    private void ApplySavedEplusRsExe(string savedExe, string selectionSource)
+    {
+        if (String.IsNullOrWhiteSpace(savedExe))
+        {
+            return;
+        }
+
+        string validSavedExe = null;
+        try
+        {
+            if (File.Exists(savedExe) && TestEplusRsRunCli(savedExe))
+            {
+                validSavedExe = Path.GetFullPath(savedExe);
+            }
+        }
+        catch
+        {
+            validSavedExe = null;
+        }
+        if (String.IsNullOrWhiteSpace(validSavedExe))
+        {
+            eplusRsExeSelection = "auto";
+            return;
+        }
+
+        if (String.Equals(selectionSource, "user", StringComparison.OrdinalIgnoreCase))
+        {
+            eplusRsExe = validSavedExe;
+            eplusRsExeSelection = "user";
+            return;
+        }
+        if (String.Equals(selectionSource, "auto", StringComparison.OrdinalIgnoreCase))
+        {
+            if (String.IsNullOrWhiteSpace(eplusRsExe))
+            {
+                eplusRsExe = validSavedExe;
+            }
+            eplusRsExeSelection = "auto";
+            return;
+        }
+
+        if (IsKnownDebugCandidate(validSavedExe))
+        {
+            if (!IsPreferredPackagedOrReleaseCandidate(eplusRsExe))
+            {
+                eplusRsExe = validSavedExe;
+            }
+            eplusRsExeSelection = "auto";
+            return;
+        }
+
+        eplusRsExe = validSavedExe;
+        eplusRsExeSelection = "user";
     }
 
     private bool TestEplusRsRunCli(string path)
@@ -900,10 +1007,8 @@ internal sealed class LauncherApp
         outputDir = GetString(settings, "output_dir", outputDir);
         oracleRoot = GetString(settings, "oracle_root", oracleRoot);
         string savedExe = GetString(settings, "eplus_rs_exe", "");
-        if (!String.IsNullOrWhiteSpace(savedExe))
-        {
-            eplusRsExe = savedExe;
-        }
+        string savedExeSelection = GetString(settings, "eplus_rs_exe_selection", "");
+        ApplySavedEplusRsExe(savedExe, savedExeSelection);
         mode = GetString(settings, "mode", mode);
         partialPolicy = GetString(settings, "partial_policy", partialPolicy);
         outputFormat = GetString(settings, "output_format", outputFormat);
@@ -928,6 +1033,7 @@ internal sealed class LauncherApp
         settings["output_dir"] = outputDir;
         settings["oracle_root"] = oracleRoot;
         settings["eplus_rs_exe"] = eplusRsExe ?? "";
+        settings["eplus_rs_exe_selection"] = eplusRsExeSelection ?? "auto";
         settings["mode"] = mode;
         settings["partial_policy"] = partialPolicy;
         settings["output_format"] = outputFormat;
