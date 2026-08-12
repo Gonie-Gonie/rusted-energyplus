@@ -49,6 +49,76 @@ pub(in crate::ideal_loads::calc) fn completed_direct_cooling_mixed_air_call_is_c
         && state_is_consistent(&unit.calc_cooling_mixed_air_call, witness, snapshot.system)
 }
 
+pub(super) fn committed_no_oa_humidity_owner_state_is_consistent(
+    unit: &PurchasedAirUnitRuntimeState,
+    witness: PurchasedAirCalcCoolingMixedAirCallSnapshot,
+) -> bool {
+    let state = &unit.calc_cooling_mixed_air_call;
+    let predecessor = &unit.calc_cooling_supply_mass_flow_very_small_guard_body;
+    let Some(route_partition) = state
+        .unit_off_skip_count
+        .checked_add(state.non_cooling_skip_count)
+        .and_then(|count| count.checked_add(state.cooling_call_count))
+    else {
+        return false;
+    };
+    state.system == unit.system
+        && witness.system == unit.system
+        && unit.controlled_zone == Some(witness.controlled_zone)
+        && state.transition_count == unit.init_call_count
+        && state.transition_count == unit.calc_entry.call_count
+        && state.transition_count == predecessor.transition_count
+        && state.transition_count
+            == unit
+                .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry
+                .transition_count
+        && route_partition == state.transition_count
+        && state.unit_off_skip_count == predecessor.unit_off_skip_count
+        && state.non_cooling_skip_count == predecessor.non_cooling_skip_count
+        && state.cooling_call_count == predecessor.cooling_body_entry_count
+        && counter_product_matches(
+            state.caller_source_site_execution_count,
+            state.cooling_call_count,
+            PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_SOURCE_ORDER.len(),
+        )
+        && counter_product_matches(
+            state.child_source_site_execution_count,
+            state.cooling_call_count,
+            PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_NO_OA_CHILD_SOURCE_ORDER.len(),
+        )
+        && state.state_reference_bind_count == state.cooling_call_count
+        && state.purchased_air_number_read_count == state.cooling_call_count
+        && state.outdoor_air_mass_flow_rate_read_count == state.cooling_call_count
+        && state.supply_mass_flow_rate_read_count == state.cooling_call_count
+        && counter_product_matches(
+            state.mixed_air_output_reference_bind_count,
+            state.cooling_call_count,
+            3,
+        )
+        && state.operating_mode_read_count == state.cooling_call_count
+        && state.mixed_air_child_call_count == state.cooling_call_count
+        && state.no_outdoor_air_fallback_count == state.cooling_call_count
+        && state.recirculation_enthalpy_projection_count == state.cooling_call_count
+        && counter_product_matches(
+            state.mixed_air_output_assignment_count,
+            state.cooling_call_count,
+            3,
+        )
+        && counter_product_matches(
+            state.heat_recovery_output_positive_zero_assignment_count,
+            state.cooling_call_count,
+            2,
+        )
+        && state.latest_transition_ordinal == Some(state.transition_count)
+        && state.latest_route
+            == Some(PurchasedAirCalcCoolingMixedAirCallRetainedRoute::NoOutdoorAirFallback)
+        && state.latest.is_some_and(|latest| {
+            latest.system == unit.system
+                && latest.parent_call_ordinal == state.transition_count
+                && cooling_mixed_air_call_snapshots_match_bit_exact(latest, witness)
+        })
+}
+
 pub(super) fn completed_mixed_air_predecessor_is_consistent(
     runtime: &PurchasedAirRuntimeState,
     unit: &PurchasedAirUnitRuntimeState,

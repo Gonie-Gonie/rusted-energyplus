@@ -294,6 +294,24 @@ fn public_release_hot_path_has_no_recursive_exact_route_derivation() {
 }
 
 #[test]
+fn committed_route_accessor_is_nonrecursive_and_checks_committed_shape() {
+    let source = include_str!("release.rs");
+    let start = source
+        .find("fn cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_committed_latest_route")
+        .expect("CP418 committed route accessor");
+    let end = source[start..]
+        .find("fn pending_state_is_consistent")
+        .map(|offset| start + offset)
+        .expect("end of accessor");
+    let accessor = &source[start..end];
+    assert!(accessor.contains("snapshot_matches_validated_predecessor"));
+    assert!(accessor.contains("committed_route_counts_match"));
+    assert!(!accessor.contains("snapshot_is_exact"));
+    assert!(!accessor.contains("predecessor_route("));
+    assert!(!accessor.contains("completed_direct"));
+}
+
+#[test]
 fn marker_and_predecessor_forgery_are_rejected() {
     let predecessor = predecessor_fixture(4, false, false);
     let snapshot = advance(&mut State::new(predecessor.system), predecessor).expect("CP418 entry");

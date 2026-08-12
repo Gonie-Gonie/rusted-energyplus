@@ -1,5 +1,8 @@
 //! CP418 dehumidification-guard else-branch-entry assertions.
 
+#[path = "cp419_assertions.rs"]
+mod cp419_assertions;
+
 use serde_json::{Map, Value, json};
 
 const CP417_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_lifecycle";
@@ -160,6 +163,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         !results.to_string().contains(CP418_KEY),
         "CP418 lifecycle must remain outside numerical result state",
     );
+    cp419_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -168,6 +172,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP418_KEY].is_null(),
         "non-direct runtime must not publish CP418 evidence",
     );
+    cp419_assertions::assert_non_direct(runtime);
 }
 
 fn count(value: &Value, field: &str) -> u64 {

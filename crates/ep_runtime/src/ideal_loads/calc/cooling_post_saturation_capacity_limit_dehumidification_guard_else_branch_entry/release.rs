@@ -19,6 +19,7 @@ use super::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchEntrySnapshot as Snapshot,
     advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_state as advance,
 };
+use crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_committed_latest_route;
 use crate::ideal_loads::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationSupplyEnthalpyAssignmentSnapshot as Predecessor,
     PurchasedAirRuntimeState, PurchasedAirUnitRuntimeState, classify_no_oa_sensible_subset,
@@ -26,15 +27,14 @@ use crate::ideal_loads::{
     cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_snapshot_is_exact_direct_release,
     cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_snapshots_match_bit_exact,
 };
-use crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_committed_latest_route;
 
 mod error;
 mod runtime_validation;
 mod snapshot;
 pub use error::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchEntryError;
 use runtime_validation::{
-    completed_predecessor_counts_match, pending_predecessor_counts_match,
-    state_counts_are_consistent,
+    committed_route_counts_match, completed_predecessor_counts_match,
+    pending_predecessor_counts_match, state_counts_are_consistent,
 };
 use snapshot::{cp417_shape, snapshots_match_bit_exact};
 
@@ -252,6 +252,40 @@ pub(in crate::ideal_loads) fn cooling_post_saturation_capacity_limit_dehumidific
     right: Snapshot,
 ) -> bool {
     snapshots_match_bit_exact(left, right)
+}
+
+/// Returns the sealed route attached to the committed CP418 latest snapshot.
+///
+/// This calc-private capability lets CP419 reuse the route already committed by
+/// CP418 without recursively revalidating the complete CP417 predecessor chain.
+pub(in crate::ideal_loads::calc) fn cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_committed_latest_route(
+    unit: &PurchasedAirUnitRuntimeState,
+    snapshot: Snapshot,
+) -> Option<RetainedRoute> {
+    let state =
+        &unit.calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry;
+    let route = state.latest_route?;
+    let predecessor = cp417_shape(snapshot);
+    (unit.system == snapshot.system
+        && state.system == unit.system
+        && state.transition_count == unit.init_call_count
+        && state.transition_count
+            == unit
+                .calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment
+                .transition_count
+        && snapshot.parent_call_ordinal == unit.init_call_count
+        && state.latest_transition_ordinal == Some(state.transition_count)
+        && state
+            .latest
+            .is_some_and(|latest| snapshots_match_bit_exact(latest, snapshot))
+        && state_counts_are_consistent(state)
+        && completed_predecessor_counts_match(
+            state,
+            &unit.calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment,
+        )
+        && committed_route_counts_match(state, route)
+        && snapshot_matches_validated_predecessor(snapshot, predecessor, route))
+    .then_some(route)
 }
 
 fn pending_state_is_consistent(

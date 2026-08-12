@@ -8,6 +8,105 @@ use crate::ideal_loads::{
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot, moist_air_enthalpy_j_per_kg,
 };
 
+#[test]
+fn sealed_committed_humidity_owner_accepts_exact_witness_and_rejects_forgery() {
+    let (mut runtime, system, predecessor, zone_state) = super::release_tests::release_case();
+    let snapshot = advance_direct_no_oa_calc_cooling_mixed_air_call(
+        &mut runtime,
+        &system,
+        predecessor,
+        &zone_state,
+    )
+    .expect("committed CP329");
+    runtime
+        .units
+        .get_mut(&system.id)
+        .expect("selected unit")
+        .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry
+        .transition_count = snapshot.parent_call_ordinal;
+    let unit = runtime.units.get(&system.id).expect("selected unit");
+    let value = super::release::cooling_mixed_air_call_committed_latest_mixed_air_humidity_ratio(
+        unit, snapshot,
+    )
+    .expect("sealed humidity owner");
+    assert_eq!(
+        value.to_bits(),
+        snapshot
+            .mixed_air_humidity_ratio
+            .expect("mixed-air W")
+            .to_bits()
+    );
+
+    let mut forged = snapshot;
+    forged.mixed_air_humidity_ratio = forged
+        .mixed_air_humidity_ratio
+        .map(|value| f64::from_bits(value.to_bits() ^ 1));
+    assert!(
+        super::release::cooling_mixed_air_call_committed_latest_mixed_air_humidity_ratio(
+            unit, forged,
+        )
+        .is_none()
+    );
+
+    let mut zone_forged_runtime = runtime.clone();
+    let mut zone_forged = snapshot;
+    zone_forged.controlled_zone = ZoneId(999);
+    zone_forged_runtime
+        .units
+        .get_mut(&system.id)
+        .expect("selected unit")
+        .calc_cooling_mixed_air_call
+        .latest = Some(zone_forged);
+    assert!(
+        super::release::cooling_mixed_air_call_committed_latest_mixed_air_humidity_ratio(
+            zone_forged_runtime
+                .units
+                .get(&system.id)
+                .expect("selected unit"),
+            zone_forged,
+        )
+        .is_none()
+    );
+
+    let mut value_forged_runtime = runtime.clone();
+    let mut value_forged = snapshot;
+    value_forged.recirculation_temperature_c = Some(41.0);
+    value_forged.mixed_air_temperature_c = Some(41.0);
+    value_forged_runtime
+        .units
+        .get_mut(&system.id)
+        .expect("selected unit")
+        .calc_cooling_mixed_air_call
+        .latest = Some(value_forged);
+    assert!(
+        super::release::cooling_mixed_air_call_committed_latest_mixed_air_humidity_ratio(
+            value_forged_runtime
+                .units
+                .get(&system.id)
+                .expect("selected unit"),
+            value_forged,
+        )
+        .is_none()
+    );
+}
+
+#[test]
+fn sealed_humidity_owner_source_has_no_recursive_exact_validation() {
+    let source = include_str!("release.rs");
+    let start = source
+        .find("fn cooling_mixed_air_call_committed_latest_mixed_air_humidity_ratio")
+        .expect("sealed accessor");
+    let end = source[start..]
+        .find("#[cfg(test)]")
+        .map(|offset| start + offset)
+        .expect("end of sealed accessor helpers");
+    let hot = &source[start..end];
+    assert!(hot.contains("active_snapshot_is_exact"));
+    assert!(!hot.contains("cooling_mixed_air_call_snapshot_is_exact_direct_release"));
+    assert!(!hot.contains("completed_direct_cooling_mixed_air_call_is_consistent"));
+    assert!(!hot.contains("predecessor_route("));
+}
+
 pub(in crate::ideal_loads::calc) fn predecessor(
     route: Route,
 ) -> PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot {

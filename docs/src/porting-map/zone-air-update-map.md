@@ -26917,3 +26917,97 @@ output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
 inventory becomes 356 total, 240 public, 116 internal, zero unused, zero
 unreachable, with 238 development commands.
+
+## CP419 post-saturation capacity-limit dehumidification-guard else-branch `CpAir` assignment
+
+CP419 supersedes only CP418's physical-line-2330 executable exclusion at
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and locked
+`PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`.
+It maps physical executable line 2330 exactly:
+
+```cpp
+CpAir = PsyCpAirFnW(PurchAir.MixedAirHumRat);
+```
+
+CP418 already owns the physical-line-2327 not-dehumidifying else entry. The
+exact three dependency-ordered CP419 source sites are
+`read-purchased-air-mixed-air-humidity-ratio-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-cp-air`,
+`evaluate-psy-cp-air-fn-w-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-cp-air`,
+and
+`assign-local-cp-air-for-post-saturation-capacity-limit-dehumidification-guard-else-branch`.
+Physical executable line 2331,
+`CoolSensOutput = SupplyMassFlowRate * CpAir * (PurchAir.MixedAirTemp - PurchAir.SupplyTemp);`,
+is first excluded and the CP420 candidate. Every mass-flow, mixed-air-
+temperature, supply-temperature, subtraction, multiplication, comparison,
+capacity-limit, and later effect remains excluded.
+
+CP419 preserves CP418's fifty-four flattened conceptual outcomes one-for-one.
+Only CP418 else-entry indices 4, 7, 10, 13, and 16 execute all three sites;
+the other forty-nine outcomes execute no CP419 site. Therefore `T419=54`,
+`Z419=49`, `A419=5`, and `S419=3*A419=15`. Public/private remains 17/37.
+Active public indices are exactly 4 and 7, while active private indices are
+10, 13, and 16. CP419 activity is coextensive with CP418 else entry and remains
+mutually exclusive with the eighteen CP417 supply-enthalpy assignments. Nine
+width-36 arrays retain CP413 predecessor/false/body lineage, CP414 saturation-
+temperature assignments, CP415 mixed-air limits, CP416 humidity-ratio
+assignments, CP417 enthalpy assignments, CP418 else entries, and CP419 `CpAir`
+assignments.
+
+Recursively complete same-call bit-exact CP418 lifecycle, snapshot, latest,
+private witness, completion evidence, and committed route remain the sole
+immediate route predecessor. On active routes, the sealed same-call CP329
+committed mixed-air owner solely supplies `PurchAir.MixedAirHumRat`; system,
+parent-call ordinal, controlled Zone, no-OA route, retained counters, latest,
+witness, and operand bits must agree. Earlier checkpoints, caller, model,
+service, Zone, prior `CpAir` assignments, numerical DTO values, and inferred
+scalars are forbidden substitutes. Inactive routes acquire no numeric owner.
+
+The transition evaluates canonical stateless `energyplus_psy_cp_air_fn_w`
+once and assigns its binary64 result. Active public input must be finite and
+greater than or equal to zero, accepting both signed zeros and subnormals, and
+the result must be finite. The helper preserves strict `W < 1.0e-5` replacement
+by floor bits `0x3ee4f8b588e368f1` and exact expression
+`1.00484e3 + floor(W)*1.85895e3`. Pure/private characterization retains raw
+negative, signed-zero, sub-floor, NaN/unordered, and overflow behavior. The
+fast/raw helpers, C++ mutable `dwSave`/`cpaSave` cache, `-100.0` sentinel,
+first-call anomaly, hit/miss history, reset, interleaving, concurrency, clamp,
+normalization, diagnostic, and mutable-service behavior remain excluded.
+
+The public hot release must obtain CP418's sealed committed route and, only on
+active routes, CP329's sealed committed humidity-ratio owner before using the
+CP419 validated-route transition. Public and coupled/pipeline hot validation
+must use bounded CP418-predecessor/CP419-suffix checks and perform zero generic
+predecessor-route, private-characterization, or CP329/CP417/CP418/CP419
+recursive exact-route derivations. Cold recursive exact validation remains
+available only to private characterization and explicit cold regression tests.
+
+The full lossless snapshot has exactly 174 base fields. It preserves CP418's
+first 159 fields, renames CP418 terminal W/H/T as the predecessor-CP418 triple,
+then carries the predecessor CP418 else-entry marker. It appends exactly eight
+local fields: the CP419 execution marker, CP329 retained-owner read, local
+humidity read and value, psychrometric evaluation and result, and local `CpAir`
+assignment and value; final terminal W/H/T follow. The schema therefore has
+sixty `Option<f64>` carriers, one `Option<bool>` comparison carrier, and one
+optional control enum. Every numeric carrier has one immediately adjacent
+authoritative IEEE sidecar. JSON preserves CP418's first 210 keys before its
+terminal triple, then emits the exact twenty-four-key predecessor/local/final
+tail, for 234 unique keys and sixty adjacent IEEE sidecars.
+
+CP419 preserves terminal W/H/T bit-exact on every route, with unchanged
+presence and preservation counts 36/41/51. Existing ownership also remains
+unchanged: CP416 owns all 36 humidity values, CP416 owns 23 enthalpy values and
+CP417 owns 18 psychrometric enthalpy values, and CP416 owns all 51 temperature
+values. CP419 owns only five local `CpAir` values and adds no terminal owner.
+
+Binding is CP418-to-CP419-to-unchanged-numerical, and the binding checkpoint
+count advances from 109 to 110. CP419 adds no numerical, coupling-input, or
+output DTO field. Its evidence never feeds or replaces prediction, numerical
+results, feedback, nodes, loads, reports, or outputs; non-direct paths reject
+CP419 lifecycle evidence. CP419 adds no support, readiness, capability,
+routine, algorithm, numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. `routine.psy_cp_air_fn_w`
+remains `state_mapped`; counts remain 32 algorithms, 293 routines, 58
+`state_mapped`, 235 `source_mapped`, and 170 required. Script inventory becomes
+357 total, 240 public, 117 internal, zero unused, zero unreachable, with 238
+development commands.

@@ -134,6 +134,8 @@ mod cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_s
 mod cooling_post_saturation_capacity_limit_dehumidification_control_none_case_entry_fixture;
 #[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_control_switch_fixture.rs"]
 mod cooling_post_saturation_capacity_limit_dehumidification_control_switch_fixture;
+#[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_fixture.rs"]
+mod cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_fixture;
 #[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_fixture.rs"]
 mod cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_fixture;
 #[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_guard_fixture.rs"]
@@ -303,6 +305,7 @@ use cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_s
 use cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_snapshot;
 use cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_snapshot;
 use cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_snapshot;
+use crate::ideal_loads::private_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_characterization;
 use cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_humidity_ratio_assignment_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_supply_humidity_ratio_assignment_snapshot;
 use cooling_default_supply_humidity_ratio_mixed_air_assignment_fixture::calculation_cooling_default_supply_humidity_ratio_mixed_air_assignment_snapshot;
 use cooling_humidistat_case_break_fixture::calculation_cooling_humidistat_case_break_snapshot;
@@ -1550,6 +1553,12 @@ fn scaled_output(
         calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_snapshot(
             calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment,
         );
+    let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment =
+        private_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_characterization(
+            calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry,
+            calculation_cooling_mixed_air_call.mixed_air_humidity_ratio,
+        )
+        .expect("valid CP419 coupled-output fixture");
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -1681,6 +1690,7 @@ fn scaled_output(
         calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment,
         calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment,
         calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry,
+        calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

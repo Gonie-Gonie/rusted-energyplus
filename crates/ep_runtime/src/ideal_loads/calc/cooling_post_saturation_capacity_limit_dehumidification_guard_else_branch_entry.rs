@@ -17,6 +17,7 @@ pub use release::{
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
     completed_direct_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_is_consistent,
+    cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_committed_latest_route,
     cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_snapshot_route,
 };
 #[allow(unused_imports)]
@@ -34,6 +35,7 @@ pub(in crate::ideal_loads) use release::{
 pub use state::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchEntryRuntimeState;
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use transition::{
+    RetainedRoute as PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchEntryCommittedRoute,
     advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_state,
     advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_state_with_validated_route,
     cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_route_from_validated_predecessor,

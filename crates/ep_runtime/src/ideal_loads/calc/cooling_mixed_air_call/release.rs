@@ -26,10 +26,48 @@ pub(in crate::ideal_loads::calc) use runtime_validation::completed_direct_coolin
 #[cfg(test)]
 pub(in crate::ideal_loads::calc) use runtime_validation::counter_product_matches;
 use runtime_validation::{
-    call_order_is_pending, completed_mixed_air_predecessor_is_consistent,
-    next_mixed_air_transition_fits, pending_mixed_air_history_links_to_predecessor,
-    state_is_consistent,
+    call_order_is_pending, committed_no_oa_humidity_owner_state_is_consistent,
+    completed_mixed_air_predecessor_is_consistent, next_mixed_air_transition_fits,
+    pending_mixed_air_history_links_to_predecessor, state_is_consistent,
 };
+
+/// Returns CP329's sealed same-call `PurchAir.MixedAirHumRat` value.
+///
+/// The capability proves only committed route, state, witness, and bit-exact
+/// ownership. CP419 remains responsible for its own finite/range admission.
+pub(in crate::ideal_loads::calc) fn cooling_mixed_air_call_committed_latest_mixed_air_humidity_ratio(
+    unit: &crate::ideal_loads::PurchasedAirUnitRuntimeState,
+    witness: PurchasedAirCalcCoolingMixedAirCallSnapshot,
+) -> Option<f64> {
+    let state = &unit.calc_cooling_mixed_air_call;
+    let latest = state.latest?;
+    let retained = latest.mixed_air_humidity_ratio?;
+    let source = latest.recirculation_humidity_ratio?;
+    (committed_no_oa_humidity_owner_state_is_consistent(unit, witness)
+        && committed_no_oa_humidity_owner_snapshot_has_exact_shape(latest)
+        && retained.to_bits() == source.to_bits())
+    .then_some(retained)
+}
+
+fn committed_no_oa_humidity_owner_snapshot_has_exact_shape(
+    snapshot: PurchasedAirCalcCoolingMixedAirCallSnapshot,
+) -> bool {
+    snapshot.source == PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_SOURCE
+        && snapshot.child_source == PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_CHILD_SOURCE
+        && snapshot.first_excluded_source
+            == PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_FIRST_EXCLUDED_SOURCE
+        && snapshot.source_order == PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_SOURCE_ORDER
+        && snapshot.no_oa_child_source_order
+            == PURCHASED_AIR_CALC_COOLING_MIXED_AIR_CALL_NO_OA_CHILD_SOURCE_ORDER
+        && !snapshot.unit_off_skipped
+        && !snapshot.non_cooling_skipped
+        && snapshot.unit_body_entered
+        && snapshot.predecessor_cooling_body_entered
+        && (snapshot.predecessor_zero_flow_reset_body_entered
+            != snapshot.predecessor_active_guard_false_fallthrough)
+        && snapshot.cooling_call_executed
+        && active_snapshot_is_exact(snapshot)
+}
 #[cfg(test)]
 pub(in crate::ideal_loads::calc) use runtime_validation::{
     next_mixed_air_transition_fits as next_mixed_air_transition_fits_for_test,
