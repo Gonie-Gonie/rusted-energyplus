@@ -23274,3 +23274,83 @@ remains `state_mapped`; counts remain 32 algorithms, 293 routines, 58
 `state_mapped`, 235 `source_mapped`, and 170 required. Script inventory becomes
 357 total, 240 public, 117 internal, zero unused, zero unreachable, with 238
 development commands.
+
+## CP420 post-saturation capacity-limit dehumidification-guard else-branch sensible-output assignment
+
+CP420 supersedes only CP419's physical-line-2331 executable exclusion. At
+pinned EnergyPlus commit 6f2e40d10250a105b49966baa24d843711e61048 and locked
+PurchasedAirManager.cc SHA-256
+54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005, it maps
+physical executable line 2331 exactly:
+`CoolSensOutput = SupplyMassFlowRate * CpAir *
+(PurchAir.MixedAirTemp - PurchAir.SupplyTemp);`. Physical executable/control
+line 2332, `if (CoolSensOutput >= PurchAir.MaxCoolTotCap) {`, is first
+excluded and the CP421 candidate. Its comparison, capacity-adjustment body,
+closing delimiters, and all later behavior remain excluded.
+
+The exact eight dependency-ordered sites are
+`read-retained-supply-mass-flow-rate-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-first-product`,
+`read-local-cp-air-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-first-product`,
+`calculate-supply-mass-flow-rate-times-cp-air-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output`,
+`read-purchased-air-mixed-air-temperature-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-difference`,
+`read-purchased-air-supply-temperature-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-difference`,
+`calculate-mixed-air-temperature-minus-supply-temperature-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output`,
+`calculate-mass-flow-cp-air-product-times-temperature-difference-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output`,
+and
+`assign-local-cooling-sensible-output-for-post-saturation-capacity-limit-dehumidification-guard-else-branch`.
+The source AST remains exactly
+`(SupplyMassFlowRate * CpAir) * (MixedAirTemp - SupplyTemp)`. The
+side-effect-free reads make no C++ operand-evaluation-order claim, and the
+transition performs no reassociation, distribution, `mul_add`, clamp,
+normalization, or new finite-result rejection.
+
+CP420 preserves CP419's 54 flattened conceptual outcomes one-for-one.
+Indices 4, 7, 10, 13, and 16 execute all eight sites, while 49 outcomes
+execute none. Exact totals are T420=54, Z420=49, A420=5, and
+S420=8*A420=40. Public/private remains 17/37; active public indices are 4 and
+7 and active private indices are 10, 13, and 16. CP420 activity is
+coextensive with CP419 and mutually exclusive with the 18 CP417 enthalpy
+assignments. Ten width-36 arrays retain lineage through CP420.
+
+Same-call bit-exact CP419 lifecycle, snapshot, latest, private witness,
+completion evidence, and sealed committed route are the sole immediate route
+predecessor. On active routes CP330 solely owns positive
+`SupplyMassFlowRate`, CP419 solely owns local `CpAir` and the immediately
+retained `SupplyTemp`, and CP329 solely owns `MixedAirTemp`; CP329 also
+bit-corroborates the retained supply mass flow. System, ordinal, controlled
+Zone, no-OA route, latest, witness, counters, and operand bits must agree.
+Earlier checkpoints, caller/model/service/Zone scalars, prior `CpAir` or
+sensible-output assignments, inferred values, and numerical DTO values are
+forbidden substitutes. Inactive routes acquire no active owner and perform no
+active read.
+
+Public and coupled/pipeline hot validation uses sealed CP419, CP330, and CP329
+committed evidence, the CP420 validated-route transition, and bounded
+prefix/local checks. It performs zero generic predecessor-route,
+private-characterization, or CP329/CP330/CP418/CP419/CP420 recursive
+exact-route derivations; cold recursion remains private and test-only.
+Nonfinite raw arithmetic results remain authoritative Rust/IEEE evidence:
+their JSON numeric projection is null while the adjacent IEEE sidecar retains
+the exact bits.
+
+The lossless snapshot has exactly 202 base fields, seventy-one
+`Option<f64>` carriers, one optional comparison bool, one optional control
+enum, and 273 unique JSON keys with seventy-one immediately adjacent
+authoritative IEEE sidecars. It preserves CP419's exact first 171 fields,
+renames CP419 terminal W/H/T as the predecessor-CP419 triple, appends the
+25-field CP420 execution, terminal-owner, operand-owner/read,
+intermediate/calculation, and assignment block, and re-emits final W/H/T.
+JSON preserves CP419's exact first 228 keys and appends an exact 45-key tail.
+Terminal W/H/T presence, preservation, and ownership remain 36/41/51; CP420
+owns only five local `CoolSensOutput` values.
+
+Binding is CP419-to-CP420-to-unchanged-numerical and the binding checkpoint
+count advances from 110 to 111. CP420 adds no numerical, coupling-input, or
+output DTO field. Its evidence never feeds or replaces prediction, numerical
+results, feedback, nodes, loads, reports, or outputs; non-direct paths reject
+CP420 lifecycle evidence. CP420 adds no support, readiness, capability,
+routine, algorithm, numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
+Script inventory becomes 358 total, 240 public, 118 internal, zero unused,
+zero unreachable, with 238 development commands.

@@ -27,6 +27,9 @@ pub(in crate::ideal_loads::calc) struct RetainedRoute {
     pub active: bool,
 }
 
+/// Sealed committed CP419 route consumed by the immediately following checkpoint.
+pub(in crate::ideal_loads::calc) type PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchCpAirAssignmentCommittedRoute = RetainedRoute;
+
 /// Same-call CP329-owned `PurchAir.MixedAirHumRat`, consumed only when active.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(in crate::ideal_loads) struct PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchCpAirAssignmentActiveInput

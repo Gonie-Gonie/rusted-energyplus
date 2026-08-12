@@ -1,0 +1,353 @@
+//! CP419 predecessor reconstruction and bit-exact CP420 snapshot validation.
+
+use super::super::{
+    PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_GUARD_ELSE_BRANCH_SENSIBLE_OUTPUT_ASSIGNMENT_FIRST_EXCLUDED_SOURCE as EXCLUDED,
+    PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_GUARD_ELSE_BRANCH_SENSIBLE_OUTPUT_ASSIGNMENT_SOURCE as SOURCE,
+    PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_GUARD_ELSE_BRANCH_SENSIBLE_OUTPUT_ASSIGNMENT_SOURCE_ORDER as ORDER,
+    PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputAssignmentSnapshot as Snapshot,
+};
+use crate::ideal_loads::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchCpAirAssignmentSnapshot as Predecessor;
+
+pub(super) fn cp419_shape(snapshot: Snapshot) -> Predecessor {
+    use crate::ideal_loads::{
+        PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_GUARD_ELSE_BRANCH_CP_AIR_ASSIGNMENT_FIRST_EXCLUDED_SOURCE as PREDECESSOR_EXCLUDED,
+        PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_GUARD_ELSE_BRANCH_CP_AIR_ASSIGNMENT_SOURCE as PREDECESSOR_SOURCE,
+        PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_GUARD_ELSE_BRANCH_CP_AIR_ASSIGNMENT_SOURCE_ORDER as PREDECESSOR_ORDER,
+    };
+    Predecessor {
+        source: PREDECESSOR_SOURCE,
+        first_excluded_source: PREDECESSOR_EXCLUDED,
+        source_order: PREDECESSOR_ORDER,
+        system: snapshot.system,
+        parent_call_ordinal: snapshot.parent_call_ordinal,
+        controlled_zone: snapshot.controlled_zone,
+        unit_off_skipped: snapshot.unit_off_skipped,
+        non_cooling_skipped: snapshot.non_cooling_skipped,
+        positive_guard_false_fallthrough_skipped: snapshot.positive_guard_false_fallthrough_skipped,
+        heating_availability_guard_false_fallthrough: snapshot.heating_availability_guard_false_fallthrough,
+        humidification_control_guard_false_fallthrough: snapshot.humidification_control_guard_false_fallthrough,
+        dehumidification_control_humidistat_maximum_assignment_executed: snapshot.dehumidification_control_humidistat_maximum_assignment_executed,
+        dehumidification_control_none_maximum_assignment_executed: snapshot.dehumidification_control_none_maximum_assignment_executed,
+        dehumidification_control_guard_false_fallthrough: snapshot.dehumidification_control_guard_false_fallthrough,
+        predecessor_capacity_limit_guard_evaluated: snapshot.predecessor_capacity_limit_guard_evaluated,
+        predecessor_capacity_limit_body_entered: snapshot.predecessor_capacity_limit_body_entered,
+        predecessor_active_capacity_limit_guard_false_fallthrough: snapshot.predecessor_active_capacity_limit_guard_false_fallthrough,
+        predecessor_dehumidification_guard_evaluated: snapshot.predecessor_dehumidification_guard_evaluated,
+        predecessor_dehumidification_body_entered: snapshot.predecessor_dehumidification_body_entered,
+        predecessor_dehumidification_guard_false_fallthrough: snapshot.predecessor_dehumidification_guard_false_fallthrough,
+        predecessor_dehumidification_total_output_assignment_executed: snapshot.predecessor_dehumidification_total_output_assignment_executed,
+        predecessor_dehumidification_total_output_capacity_guard_evaluated: snapshot.predecessor_dehumidification_total_output_capacity_guard_evaluated,
+        predecessor_dehumidification_total_output_capacity_adjustment_body_entered: snapshot.predecessor_dehumidification_total_output_capacity_adjustment_body_entered,
+        predecessor_dehumidification_total_output_capacity_guard_false_fallthrough: snapshot.predecessor_dehumidification_total_output_capacity_guard_false_fallthrough,
+        dehumidification_total_output_capacity_guard_false_fallthrough: snapshot.dehumidification_total_output_capacity_guard_false_fallthrough,
+        dehumidification_total_output_maximum_capacity_assignment_executed: snapshot.dehumidification_total_output_maximum_capacity_assignment_executed,
+        predecessor_supply_enthalpy_assignment_executed: snapshot.predecessor_supply_enthalpy_assignment_executed,
+        predecessor_dehumidification_control_type_read: snapshot.predecessor_dehumidification_control_type_read,
+        predecessor_dehumidification_control_type: snapshot.predecessor_dehumidification_control_type,
+        predecessor_dehumidification_control_switch_dispatched: snapshot.predecessor_dehumidification_control_switch_dispatched,
+        predecessor_dehumidification_control_constant_sensible_heat_ratio_case_entered: snapshot.predecessor_dehumidification_control_constant_sensible_heat_ratio_case_entered,
+        predecessor_dehumidification_control_constant_sensible_heat_ratio_case_exited_via_break: snapshot.predecessor_dehumidification_control_constant_sensible_heat_ratio_case_exited_via_break,
+        predecessor_dehumidification_control_humidistat_case_entered: snapshot.predecessor_dehumidification_control_humidistat_case_entered,
+        predecessor_dehumidification_control_humidistat_supply_humidity_ratio_assignment_executed: snapshot.predecessor_dehumidification_control_humidistat_supply_humidity_ratio_assignment_executed,
+        predecessor_dehumidification_control_humidistat_case_exited_via_break: snapshot.predecessor_dehumidification_control_humidistat_case_exited_via_break,
+        predecessor_dehumidification_control_none_or_constant_supply_humidity_ratio_shared_case_entered: snapshot.predecessor_dehumidification_control_none_or_constant_supply_humidity_ratio_shared_case_entered,
+        predecessor_dehumidification_control_none_or_constant_supply_humidity_ratio_latent_output_capacity_guard_false_fallthrough: snapshot.predecessor_dehumidification_control_none_or_constant_supply_humidity_ratio_latent_output_capacity_guard_false_fallthrough,
+        predecessor_dehumidification_control_none_or_constant_supply_humidity_ratio_latent_output_maximum_capacity_assignment_executed: snapshot.predecessor_dehumidification_control_none_or_constant_supply_humidity_ratio_latent_output_maximum_capacity_assignment_executed,
+        predecessor_dehumidification_control_none_or_constant_supply_humidity_ratio_shared_case_exited_via_break: snapshot.predecessor_dehumidification_control_none_or_constant_supply_humidity_ratio_shared_case_exited_via_break,
+        predecessor_cp409_resulting_supply_humidity_ratio: snapshot.predecessor_cp409_resulting_supply_humidity_ratio,
+        predecessor_cp409_resulting_supply_enthalpy_j_per_kg: snapshot.predecessor_cp409_resulting_supply_enthalpy_j_per_kg,
+        predecessor_cp409_resulting_supply_temperature_c: snapshot.predecessor_cp409_resulting_supply_temperature_c,
+        predecessor_dehumidification_control_default_case_exited_via_break: snapshot.predecessor_dehumidification_control_default_case_exited_via_break,
+        predecessor_cp410_resulting_supply_humidity_ratio: snapshot.predecessor_cp410_resulting_supply_humidity_ratio,
+        predecessor_cp410_resulting_supply_enthalpy_j_per_kg: snapshot.predecessor_cp410_resulting_supply_enthalpy_j_per_kg,
+        predecessor_cp410_resulting_supply_temperature_c: snapshot.predecessor_cp410_resulting_supply_temperature_c,
+        post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment_executed: snapshot.post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_pre_saturation_original_assignment_executed,
+        cp410_retained_supply_humidity_ratio_state_owned: snapshot.cp410_retained_supply_humidity_ratio_state_owned,
+        cp410_retained_supply_enthalpy_state_owned: snapshot.cp410_retained_supply_enthalpy_state_owned,
+        cp410_retained_supply_temperature_state_owned: snapshot.cp410_retained_supply_temperature_state_owned,
+        cp410_retained_supply_humidity_ratio_owned_read: snapshot.cp410_retained_supply_humidity_ratio_owned_read,
+        purchased_air_supply_humidity_ratio_read: snapshot.purchased_air_supply_humidity_ratio_read,
+        purchased_air_supply_humidity_ratio_before_saturation_check: snapshot.purchased_air_supply_humidity_ratio_before_saturation_check,
+        local_supply_humidity_ratio_original_assignment_performed: snapshot.local_supply_humidity_ratio_original_assignment_performed,
+        assigned_supply_humidity_ratio_original: snapshot.assigned_supply_humidity_ratio_original,
+        resulting_supply_humidity_ratio_original: snapshot.resulting_supply_humidity_ratio_original,
+        predecessor_cp411_resulting_supply_humidity_ratio: snapshot.predecessor_cp411_resulting_supply_humidity_ratio,
+        predecessor_cp411_resulting_supply_enthalpy_j_per_kg: snapshot.predecessor_cp411_resulting_supply_enthalpy_j_per_kg,
+        predecessor_cp411_resulting_supply_temperature_c: snapshot.predecessor_cp411_resulting_supply_temperature_c,
+        post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_assignment_executed: snapshot.post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_assignment_executed,
+        cp411_retained_supply_humidity_ratio_state_owned: snapshot.cp411_retained_supply_humidity_ratio_state_owned,
+        cp411_retained_supply_enthalpy_state_owned: snapshot.cp411_retained_supply_enthalpy_state_owned,
+        cp411_retained_supply_temperature_state_owned: snapshot.cp411_retained_supply_temperature_state_owned,
+        cp411_retained_supply_temperature_owned_read: snapshot.cp411_retained_supply_temperature_owned_read,
+        purchased_air_supply_temperature_for_saturation_humidity_ratio_read: snapshot.purchased_air_supply_temperature_for_saturation_humidity_ratio_read,
+        supply_temperature_for_saturation_humidity_ratio_c: snapshot.supply_temperature_for_saturation_humidity_ratio_c,
+        environment_outdoor_barometric_pressure_owned_read: snapshot.environment_outdoor_barometric_pressure_owned_read,
+        environment_outdoor_barometric_pressure_for_saturation_humidity_ratio_read: snapshot.environment_outdoor_barometric_pressure_for_saturation_humidity_ratio_read,
+        outdoor_barometric_pressure_pa: snapshot.outdoor_barometric_pressure_pa,
+        psy_w_fn_tdb_rh_pb_at_unity_relative_humidity_evaluated: snapshot.psy_w_fn_tdb_rh_pb_at_unity_relative_humidity_evaluated,
+        saturation_supply_humidity_ratio: snapshot.saturation_supply_humidity_ratio,
+        local_saturation_supply_humidity_ratio_assignment_performed: snapshot.local_saturation_supply_humidity_ratio_assignment_performed,
+        assigned_saturation_supply_humidity_ratio: snapshot.assigned_saturation_supply_humidity_ratio,
+        resulting_saturation_supply_humidity_ratio: snapshot.resulting_saturation_supply_humidity_ratio,
+        predecessor_cp412_resulting_supply_humidity_ratio: snapshot.predecessor_cp412_resulting_supply_humidity_ratio,
+        predecessor_cp412_resulting_supply_enthalpy_j_per_kg: snapshot.predecessor_cp412_resulting_supply_enthalpy_j_per_kg,
+        predecessor_cp412_resulting_supply_temperature_c: snapshot.predecessor_cp412_resulting_supply_temperature_c,
+        post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_guard_evaluated: snapshot.post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_saturation_guard_evaluated,
+        cp412_saturation_supply_humidity_ratio_owned_read: snapshot.cp412_saturation_supply_humidity_ratio_owned_read,
+        saturation_supply_humidity_ratio_for_guard_read: snapshot.saturation_supply_humidity_ratio_for_guard_read,
+        saturation_supply_humidity_ratio_for_guard: snapshot.saturation_supply_humidity_ratio_for_guard,
+        cp411_original_supply_humidity_ratio_owned_read: snapshot.cp411_original_supply_humidity_ratio_owned_read,
+        cp412_same_call_original_supply_humidity_ratio_bit_corroborated: snapshot.cp412_same_call_original_supply_humidity_ratio_bit_corroborated,
+        original_supply_humidity_ratio_for_guard_read: snapshot.original_supply_humidity_ratio_for_guard_read,
+        original_supply_humidity_ratio_for_guard: snapshot.original_supply_humidity_ratio_for_guard,
+        saturation_original_supply_humidity_ratio_comparison_evaluated: snapshot.saturation_original_supply_humidity_ratio_comparison_evaluated,
+        saturation_supply_humidity_ratio_strictly_less_than_original_supply_humidity_ratio: snapshot.saturation_supply_humidity_ratio_strictly_less_than_original_supply_humidity_ratio,
+        saturation_supply_humidity_ratio_guard_body_entered: snapshot.saturation_supply_humidity_ratio_guard_body_entered,
+        saturation_supply_humidity_ratio_guard_false_fallthrough: snapshot.saturation_supply_humidity_ratio_guard_false_fallthrough,
+        cp412_retained_supply_humidity_ratio_state_owned: snapshot.cp412_retained_supply_humidity_ratio_state_owned,
+        cp412_retained_supply_enthalpy_state_owned: snapshot.cp412_retained_supply_enthalpy_state_owned,
+        cp412_retained_supply_temperature_state_owned: snapshot.cp412_retained_supply_temperature_state_owned,
+        predecessor_cp413_resulting_supply_humidity_ratio: snapshot.predecessor_cp413_resulting_supply_humidity_ratio,
+        predecessor_cp413_resulting_supply_enthalpy_j_per_kg: snapshot.predecessor_cp413_resulting_supply_enthalpy_j_per_kg,
+        predecessor_cp413_resulting_supply_temperature_c: snapshot.predecessor_cp413_resulting_supply_temperature_c,
+        post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment_executed: snapshot.post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment_executed,
+        cp413_retained_supply_humidity_ratio_state_owned: snapshot.cp413_retained_supply_humidity_ratio_state_owned,
+        cp413_retained_supply_enthalpy_state_owned: snapshot.cp413_retained_supply_enthalpy_state_owned,
+        cp413_retained_supply_temperature_state_owned: snapshot.cp413_retained_supply_temperature_state_owned,
+        cp413_retained_supply_enthalpy_owned_read: snapshot.cp413_retained_supply_enthalpy_owned_read,
+        supply_enthalpy_for_saturation_temperature_read: snapshot.supply_enthalpy_for_saturation_temperature_read,
+        supply_enthalpy_for_saturation_temperature_j_per_kg: snapshot.supply_enthalpy_for_saturation_temperature_j_per_kg,
+        environment_outdoor_barometric_pressure_for_saturation_temperature_owned_read: snapshot.environment_outdoor_barometric_pressure_for_saturation_temperature_owned_read,
+        environment_outdoor_barometric_pressure_for_saturation_temperature_read: snapshot.environment_outdoor_barometric_pressure_for_saturation_temperature_read,
+        outdoor_barometric_pressure_for_saturation_temperature_pa: snapshot.outdoor_barometric_pressure_for_saturation_temperature_pa,
+        psy_tsat_fn_h_pb_evaluated: snapshot.psy_tsat_fn_h_pb_evaluated,
+        psychrometric_saturation_supply_temperature_result_c: snapshot.psychrometric_saturation_supply_temperature_result_c,
+        purchased_air_supply_temperature_saturation_assignment_performed: snapshot.purchased_air_supply_temperature_saturation_assignment_performed,
+        assigned_saturation_supply_temperature_c: snapshot.assigned_saturation_supply_temperature_c,
+        predecessor_cp414_resulting_supply_humidity_ratio: snapshot.predecessor_cp414_resulting_supply_humidity_ratio,
+        predecessor_cp414_resulting_supply_enthalpy_j_per_kg: snapshot.predecessor_cp414_resulting_supply_enthalpy_j_per_kg,
+        predecessor_cp414_resulting_supply_temperature_c: snapshot.predecessor_cp414_resulting_supply_temperature_c,
+        post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit_executed: snapshot.post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit_executed,
+        cp414_retained_supply_temperature_state_owned: snapshot.cp414_retained_supply_temperature_state_owned,
+        preexisting_supply_temperature_c: snapshot.preexisting_supply_temperature_c,
+        cp414_retained_supply_temperature_owned_read: snapshot.cp414_retained_supply_temperature_owned_read,
+        supply_temperature_for_minimum_read: snapshot.supply_temperature_for_minimum_read,
+        supply_temperature_before_mixed_air_limit_c: snapshot.supply_temperature_before_mixed_air_limit_c,
+        cp329_retained_mixed_air_temperature_owned_read: snapshot.cp329_retained_mixed_air_temperature_owned_read,
+        mixed_air_temperature_for_minimum_read: snapshot.mixed_air_temperature_for_minimum_read,
+        mixed_air_temperature_c: snapshot.mixed_air_temperature_c,
+        source_shaped_two_argument_minimum_evaluated: snapshot.source_shaped_two_argument_minimum_evaluated,
+        minimum_supply_temperature_c: snapshot.minimum_supply_temperature_c,
+        supply_temperature_assignment_performed: snapshot.supply_temperature_assignment_performed,
+        assigned_supply_temperature_c: snapshot.assigned_supply_temperature_c,
+        predecessor_cp415_resulting_supply_humidity_ratio: snapshot.predecessor_cp415_resulting_supply_humidity_ratio,
+        predecessor_cp415_resulting_supply_enthalpy_j_per_kg: snapshot.predecessor_cp415_resulting_supply_enthalpy_j_per_kg,
+        predecessor_cp415_resulting_supply_temperature_c: snapshot.predecessor_cp415_resulting_supply_temperature_c,
+        post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_executed: snapshot.post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_executed,
+        cp415_retained_supply_humidity_ratio_state_owned: snapshot.cp415_retained_supply_humidity_ratio_state_owned,
+        cp415_retained_supply_enthalpy_state_owned: snapshot.cp415_retained_supply_enthalpy_state_owned,
+        cp415_retained_supply_temperature_state_owned: snapshot.cp415_retained_supply_temperature_state_owned,
+        cp415_retained_supply_temperature_owned_read: snapshot.cp415_retained_supply_temperature_owned_read,
+        supply_temperature_for_humidity_ratio_inversion_read: snapshot.supply_temperature_for_humidity_ratio_inversion_read,
+        supply_temperature_c: snapshot.supply_temperature_c,
+        cp415_retained_supply_enthalpy_owned_read: snapshot.cp415_retained_supply_enthalpy_owned_read,
+        supply_enthalpy_for_humidity_ratio_inversion_read: snapshot.supply_enthalpy_for_humidity_ratio_inversion_read,
+        supply_enthalpy_j_per_kg: snapshot.supply_enthalpy_j_per_kg,
+        psychrometric_supply_humidity_ratio_evaluated: snapshot.psychrometric_supply_humidity_ratio_evaluated,
+        psychrometric_supply_humidity_ratio: snapshot.psychrometric_supply_humidity_ratio,
+        supply_humidity_ratio_assignment_performed: snapshot.supply_humidity_ratio_assignment_performed,
+        assigned_supply_humidity_ratio: snapshot.assigned_supply_humidity_ratio,
+        predecessor_cp416_resulting_supply_humidity_ratio: snapshot.predecessor_cp416_resulting_supply_humidity_ratio,
+        predecessor_cp416_resulting_supply_enthalpy_j_per_kg: snapshot.predecessor_cp416_resulting_supply_enthalpy_j_per_kg,
+        predecessor_cp416_resulting_supply_temperature_c: snapshot.predecessor_cp416_resulting_supply_temperature_c,
+        post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_executed: snapshot.post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_executed,
+        cp416_retained_supply_humidity_ratio_state_owned: snapshot.cp416_retained_supply_humidity_ratio_state_owned,
+        cp416_retained_supply_enthalpy_state_owned: snapshot.cp416_retained_supply_enthalpy_state_owned,
+        cp416_retained_supply_temperature_state_owned: snapshot.cp416_retained_supply_temperature_state_owned,
+        cp416_retained_supply_temperature_owned_read: snapshot.cp416_retained_supply_temperature_owned_read,
+        supply_temperature_for_enthalpy_read: snapshot.supply_temperature_for_enthalpy_read,
+        supply_temperature_for_enthalpy_c: snapshot.supply_temperature_for_enthalpy_c,
+        cp416_retained_supply_humidity_ratio_owned_read: snapshot.cp416_retained_supply_humidity_ratio_owned_read,
+        supply_humidity_ratio_for_enthalpy_read: snapshot.supply_humidity_ratio_for_enthalpy_read,
+        supply_humidity_ratio_for_enthalpy: snapshot.supply_humidity_ratio_for_enthalpy,
+        psychrometric_supply_enthalpy_evaluated: snapshot.psychrometric_supply_enthalpy_evaluated,
+        psychrometric_supply_enthalpy_j_per_kg: snapshot.psychrometric_supply_enthalpy_j_per_kg,
+        supply_enthalpy_assignment_performed: snapshot.supply_enthalpy_assignment_performed,
+        assigned_supply_enthalpy_j_per_kg: snapshot.assigned_supply_enthalpy_j_per_kg,
+        predecessor_cp418_resulting_supply_humidity_ratio: snapshot.predecessor_cp418_resulting_supply_humidity_ratio,
+        predecessor_cp418_resulting_supply_enthalpy_j_per_kg: snapshot.predecessor_cp418_resulting_supply_enthalpy_j_per_kg,
+        predecessor_cp418_resulting_supply_temperature_c: snapshot.predecessor_cp418_resulting_supply_temperature_c,
+        predecessor_post_saturation_capacity_limit_dehumidification_guard_else_branch_entered: snapshot.predecessor_post_saturation_capacity_limit_dehumidification_guard_else_branch_entered,
+        post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_executed: snapshot.post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_executed,
+        cp329_retained_mixed_air_humidity_ratio_owned_read: snapshot.cp329_retained_mixed_air_humidity_ratio_owned_read,
+        mixed_air_humidity_ratio_for_cp_air_read: snapshot.mixed_air_humidity_ratio_for_cp_air_read,
+        mixed_air_humidity_ratio_for_cp_air: snapshot.mixed_air_humidity_ratio_for_cp_air,
+        psychrometric_cp_air_evaluated: snapshot.psychrometric_cp_air_evaluated,
+        psychrometric_cp_air_result_j_per_kg_k: snapshot.psychrometric_cp_air_result_j_per_kg_k,
+        cp_air_assigned: snapshot.cp_air_assigned,
+        cp_air_j_per_kg_k: snapshot.cp_air_j_per_kg_k,
+        resulting_supply_humidity_ratio: snapshot.predecessor_cp419_resulting_supply_humidity_ratio,
+        resulting_supply_enthalpy_j_per_kg: snapshot.predecessor_cp419_resulting_supply_enthalpy_j_per_kg,
+        resulting_supply_temperature_c: snapshot.predecessor_cp419_resulting_supply_temperature_c,
+    }
+}
+
+pub(super) fn snapshot_shape_is_exact(snapshot: Snapshot) -> bool {
+    let active = snapshot.post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_executed;
+    let values = match (
+        snapshot.supply_mass_flow_rate_kg_per_s,
+        snapshot.cp419_cp_air_for_sensible_output_j_per_kg_k,
+        snapshot.supply_mass_flow_rate_times_cp_air_w_per_k,
+        snapshot.mixed_air_temperature_for_sensible_output_c,
+        snapshot.supply_temperature_for_sensible_output_c,
+        snapshot.mixed_air_minus_supply_temperature_k,
+        snapshot.calculated_cooling_sensible_output_w,
+        snapshot.cooling_sensible_output_w,
+    ) {
+        (
+            Some(flow),
+            Some(cp_air),
+            Some(first),
+            Some(mixed),
+            Some(supply),
+            Some(difference),
+            Some(calculated),
+            Some(assigned),
+        ) if active => {
+            snapshot
+                .cp_air_j_per_kg_k
+                .is_some_and(|owner| owner.to_bits() == cp_air.to_bits())
+                && snapshot
+                    .predecessor_cp419_resulting_supply_temperature_c
+                    .is_some_and(|owner| owner.to_bits() == supply.to_bits())
+                && first.to_bits() == (flow * cp_air).to_bits()
+                && difference.to_bits() == (mixed - supply).to_bits()
+                && calculated.to_bits() == (first * difference).to_bits()
+                && assigned.to_bits() == calculated.to_bits()
+        }
+        (None, None, None, None, None, None, None, None) if !active => true,
+        _ => false,
+    };
+    snapshot.source == SOURCE
+        && snapshot.first_excluded_source == EXCLUDED
+        && snapshot.source_order == ORDER
+        && active == snapshot.post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_executed
+        && snapshot.cp419_retained_supply_humidity_ratio_state_owned
+            == snapshot.predecessor_cp419_resulting_supply_humidity_ratio.is_some()
+        && snapshot.cp419_retained_supply_enthalpy_state_owned
+            == snapshot.predecessor_cp419_resulting_supply_enthalpy_j_per_kg.is_some()
+        && snapshot.cp419_retained_supply_temperature_state_owned
+            == snapshot.predecessor_cp419_resulting_supply_temperature_c.is_some()
+        && [
+            snapshot.cp330_retained_supply_mass_flow_rate_owned_read,
+            snapshot.cp329_supply_mass_flow_rate_bit_corroborated,
+            snapshot.supply_mass_flow_rate_read,
+            snapshot.cp419_retained_cp_air_owned_read,
+            snapshot.cp_air_read,
+            snapshot.supply_mass_flow_rate_times_cp_air_calculated,
+            snapshot.cp329_retained_mixed_air_temperature_for_sensible_output_owned_read,
+            snapshot.mixed_air_temperature_read,
+            snapshot.cp419_retained_supply_temperature_owned_read,
+            snapshot.supply_temperature_read,
+            snapshot.mixed_air_minus_supply_temperature_calculated,
+            snapshot.cooling_sensible_output_calculated,
+            snapshot.cooling_sensible_output_assigned,
+        ]
+        .into_iter()
+        .all(|marker| marker == active)
+        && values
+        && option_bits_match(snapshot.predecessor_cp419_resulting_supply_humidity_ratio, snapshot.resulting_supply_humidity_ratio)
+        && option_bits_match(snapshot.predecessor_cp419_resulting_supply_enthalpy_j_per_kg, snapshot.resulting_supply_enthalpy_j_per_kg)
+        && option_bits_match(snapshot.predecessor_cp419_resulting_supply_temperature_c, snapshot.resulting_supply_temperature_c)
+}
+
+pub(super) fn snapshots_match_bit_exact(mut left: Snapshot, mut right: Snapshot) -> bool {
+    macro_rules! compare_clear {
+        ($field:ident) => {{
+            let matches = option_bits_match(left.$field, right.$field);
+            left.$field = None;
+            right.$field = None;
+            matches
+        }};
+    }
+    let values_match = compare_clear!(predecessor_cp409_resulting_supply_humidity_ratio)
+        && compare_clear!(predecessor_cp409_resulting_supply_enthalpy_j_per_kg)
+        && compare_clear!(predecessor_cp409_resulting_supply_temperature_c)
+        && compare_clear!(predecessor_cp410_resulting_supply_humidity_ratio)
+        && compare_clear!(predecessor_cp410_resulting_supply_enthalpy_j_per_kg)
+        && compare_clear!(predecessor_cp410_resulting_supply_temperature_c)
+        && compare_clear!(purchased_air_supply_humidity_ratio_before_saturation_check)
+        && compare_clear!(assigned_supply_humidity_ratio_original)
+        && compare_clear!(resulting_supply_humidity_ratio_original)
+        && compare_clear!(predecessor_cp411_resulting_supply_humidity_ratio)
+        && compare_clear!(predecessor_cp411_resulting_supply_enthalpy_j_per_kg)
+        && compare_clear!(predecessor_cp411_resulting_supply_temperature_c)
+        && compare_clear!(supply_temperature_for_saturation_humidity_ratio_c)
+        && compare_clear!(outdoor_barometric_pressure_pa)
+        && compare_clear!(saturation_supply_humidity_ratio)
+        && compare_clear!(assigned_saturation_supply_humidity_ratio)
+        && compare_clear!(resulting_saturation_supply_humidity_ratio)
+        && compare_clear!(predecessor_cp412_resulting_supply_humidity_ratio)
+        && compare_clear!(predecessor_cp412_resulting_supply_enthalpy_j_per_kg)
+        && compare_clear!(predecessor_cp412_resulting_supply_temperature_c)
+        && compare_clear!(saturation_supply_humidity_ratio_for_guard)
+        && compare_clear!(original_supply_humidity_ratio_for_guard)
+        && compare_clear!(predecessor_cp413_resulting_supply_humidity_ratio)
+        && compare_clear!(predecessor_cp413_resulting_supply_enthalpy_j_per_kg)
+        && compare_clear!(predecessor_cp413_resulting_supply_temperature_c)
+        && compare_clear!(supply_enthalpy_for_saturation_temperature_j_per_kg)
+        && compare_clear!(outdoor_barometric_pressure_for_saturation_temperature_pa)
+        && compare_clear!(psychrometric_saturation_supply_temperature_result_c)
+        && compare_clear!(assigned_saturation_supply_temperature_c)
+        && compare_clear!(predecessor_cp414_resulting_supply_humidity_ratio)
+        && compare_clear!(predecessor_cp414_resulting_supply_enthalpy_j_per_kg)
+        && compare_clear!(predecessor_cp414_resulting_supply_temperature_c)
+        && compare_clear!(preexisting_supply_temperature_c)
+        && compare_clear!(supply_temperature_before_mixed_air_limit_c)
+        && compare_clear!(mixed_air_temperature_c)
+        && compare_clear!(minimum_supply_temperature_c)
+        && compare_clear!(assigned_supply_temperature_c)
+        && compare_clear!(predecessor_cp415_resulting_supply_humidity_ratio)
+        && compare_clear!(predecessor_cp415_resulting_supply_enthalpy_j_per_kg)
+        && compare_clear!(predecessor_cp415_resulting_supply_temperature_c)
+        && compare_clear!(supply_temperature_c)
+        && compare_clear!(supply_enthalpy_j_per_kg)
+        && compare_clear!(psychrometric_supply_humidity_ratio)
+        && compare_clear!(assigned_supply_humidity_ratio)
+        && compare_clear!(predecessor_cp416_resulting_supply_humidity_ratio)
+        && compare_clear!(predecessor_cp416_resulting_supply_enthalpy_j_per_kg)
+        && compare_clear!(predecessor_cp416_resulting_supply_temperature_c)
+        && compare_clear!(supply_temperature_for_enthalpy_c)
+        && compare_clear!(supply_humidity_ratio_for_enthalpy)
+        && compare_clear!(psychrometric_supply_enthalpy_j_per_kg)
+        && compare_clear!(assigned_supply_enthalpy_j_per_kg)
+        && compare_clear!(predecessor_cp418_resulting_supply_humidity_ratio)
+        && compare_clear!(predecessor_cp418_resulting_supply_enthalpy_j_per_kg)
+        && compare_clear!(predecessor_cp418_resulting_supply_temperature_c)
+        && compare_clear!(mixed_air_humidity_ratio_for_cp_air)
+        && compare_clear!(psychrometric_cp_air_result_j_per_kg_k)
+        && compare_clear!(cp_air_j_per_kg_k)
+        && compare_clear!(predecessor_cp419_resulting_supply_humidity_ratio)
+        && compare_clear!(predecessor_cp419_resulting_supply_enthalpy_j_per_kg)
+        && compare_clear!(predecessor_cp419_resulting_supply_temperature_c)
+        && compare_clear!(supply_mass_flow_rate_kg_per_s)
+        && compare_clear!(cp419_cp_air_for_sensible_output_j_per_kg_k)
+        && compare_clear!(supply_mass_flow_rate_times_cp_air_w_per_k)
+        && compare_clear!(mixed_air_temperature_for_sensible_output_c)
+        && compare_clear!(supply_temperature_for_sensible_output_c)
+        && compare_clear!(mixed_air_minus_supply_temperature_k)
+        && compare_clear!(calculated_cooling_sensible_output_w)
+        && compare_clear!(cooling_sensible_output_w)
+        && compare_clear!(resulting_supply_humidity_ratio)
+        && compare_clear!(resulting_supply_enthalpy_j_per_kg)
+        && compare_clear!(resulting_supply_temperature_c);
+    values_match && left == right
+}
+
+pub(super) fn option_bits_match(left: Option<f64>, right: Option<f64>) -> bool {
+    match (left, right) {
+        (Some(left), Some(right)) => left.to_bits() == right.to_bits(),
+        (None, None) => true,
+        _ => false,
+    }
+}

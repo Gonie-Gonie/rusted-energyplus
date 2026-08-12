@@ -8,6 +8,8 @@ mod release;
 mod state;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::cp419_all_snapshots_for_successor_tests;
 mod transition;
 
 pub use release::{
@@ -17,6 +19,7 @@ pub use release::{
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
     completed_direct_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_is_consistent,
+    cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_committed_latest_route,
     cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_snapshot_route,
 };
 #[allow(unused_imports)]
@@ -35,6 +38,7 @@ pub use state::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificatio
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use transition::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchCpAirAssignmentActiveInput,
+    PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchCpAirAssignmentCommittedRoute,
     advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_state,
     advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_state_with_validated_route,
     cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_route_from_validated_predecessor,

@@ -14,6 +14,10 @@ mod transition;
 
 pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_mixed_air_call_is_consistent;
 pub(in crate::ideal_loads::calc) use release::cooling_mixed_air_call_committed_latest_mixed_air_humidity_ratio;
+pub(in crate::ideal_loads::calc) use release::{
+    PurchasedAirCalcCoolingMixedAirCallCommittedSensibleOutputInputs,
+    cooling_mixed_air_call_committed_latest_sensible_output_inputs,
+};
 pub use release::{
     PurchasedAirCalcCoolingMixedAirCallError,
     PurchasedAirCalcCoolingMixedAirCallRecirculationInput,

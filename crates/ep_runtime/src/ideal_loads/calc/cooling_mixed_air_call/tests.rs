@@ -1,5 +1,7 @@
 use ep_model::{IdealLoadsAirSystemId, NodeId, ZoneId};
 
+mod committed_sensible;
+
 use super::*;
 use crate::ideal_loads::{
     PURCHASED_AIR_CALC_COOLING_SUPPLY_MASS_FLOW_VERY_SMALL_GUARD_BODY_FIRST_EXCLUDED_SOURCE,

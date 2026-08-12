@@ -183,7 +183,7 @@ pub(super) fn pending_predecessor_counts_match(
         && predecessor_entries == predecessor.dehumidification_guard_else_branch_entry_route_counts
 }
 
-pub(super) fn completed_predecessor_counts_match(
+pub(super) fn committed_predecessor_counts_match(
     state: &State,
     predecessor: &PredecessorState,
 ) -> bool {

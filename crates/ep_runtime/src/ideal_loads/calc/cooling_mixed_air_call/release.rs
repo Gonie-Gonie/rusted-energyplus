@@ -20,7 +20,13 @@ use crate::ideal_loads::{
     moist_air_enthalpy_j_per_kg,
 };
 
+mod committed;
 mod runtime_validation;
+
+pub(in crate::ideal_loads::calc) use committed::{
+    PurchasedAirCalcCoolingMixedAirCallCommittedSensibleOutputInputs,
+    cooling_mixed_air_call_committed_latest_sensible_output_inputs,
+};
 
 pub(in crate::ideal_loads::calc) use runtime_validation::completed_direct_cooling_mixed_air_call_is_consistent;
 #[cfg(test)]

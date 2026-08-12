@@ -31,12 +31,14 @@ use ep_model::{
     DehumidificationControlType, HumidificationControlType, IdealLoadsAirSystem,
     IdealLoadsAirSystemId,
 };
+mod committed;
 mod error;
 mod runtime_validation;
 mod snapshot;
+pub(in crate::ideal_loads::calc) use committed::cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_committed_latest_route;
 pub use error::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchCpAirAssignmentError;
 use runtime_validation::{
-    completed_predecessor_counts_match, pending_predecessor_counts_match,
+    committed_predecessor_counts_match, pending_predecessor_counts_match,
     state_counts_are_consistent,
 };
 use snapshot::{
@@ -186,7 +188,7 @@ pub fn advance_direct_no_oa_calc_cooling_post_saturation_capacity_limit_dehumidi
     if !snapshot_matches_validated_predecessor(snapshot, predecessor_cp418, route)
         || !direct_subset_values_are_valid(snapshot)
         || !completed_state_matches_validated_snapshot(&next_state, snapshot, route)
-        || !completed_predecessor_counts_match(
+        || !committed_predecessor_counts_match(
             &next_state,
             &unit.calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry,
         )
@@ -400,7 +402,7 @@ pub(in crate::ideal_loads) fn cooling_post_saturation_capacity_limit_dehumidific
                     completed_state_matches_validated_snapshot(state, latest, route)
                 })
         })
-        && completed_predecessor_counts_match(
+        && committed_predecessor_counts_match(
             state,
             &unit.calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry,
         )
@@ -449,7 +451,7 @@ pub(in crate::ideal_loads::calc) fn completed_direct_cooling_post_saturation_cap
         &unit.calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment;
     if state.transition_count != unit.init_call_count
         || !completed_state_matches_validated_snapshot(state, snapshot, route)
-        || !completed_predecessor_counts_match(
+        || !committed_predecessor_counts_match(
             state,
             &unit.calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry,
         )

@@ -13,9 +13,12 @@ use crate::ideal_loads::{
     cooling_mixed_air_call_snapshots_match_bit_exact,
 };
 
+mod committed;
 mod prefix_validation;
 mod runtime_validation;
 mod snapshot_validation;
+
+pub(in crate::ideal_loads::calc) use committed::cooling_supply_mass_flow_positive_guard_committed_latest_supply_mass_flow_rate;
 
 pub(in crate::ideal_loads::calc) use prefix_validation::positive_guard_links_to_mixed_air_call;
 #[cfg(test)]

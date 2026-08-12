@@ -1,5 +1,6 @@
 //! CP419 boundary, exhaustive route, forgery, preservation, and overflow tests.
 
+mod committed;
 mod edge_cases;
 mod overflow;
 
@@ -404,6 +405,14 @@ fn predecessor_fixture(
     body_entered: bool,
     prefer_guard_false_route: bool,
 ) -> Predecessor {
+    predecessor_fixture_with_state(predecessor_index, body_entered, prefer_guard_false_route).1
+}
+
+fn predecessor_fixture_with_state(
+    predecessor_index: usize,
+    body_entered: bool,
+    prefer_guard_false_route: bool,
+) -> (Cp418State, Predecessor) {
     let route = all_routes()
         .into_iter()
         .find(|route| {
@@ -419,7 +428,9 @@ fn predecessor_fixture(
     let cp415 = advance_cp415(&mut Cp415State::new(cp414.system), cp414, owner).expect("CP415");
     let cp416 = advance_cp416(&mut Cp416State::new(cp415.system), cp415).expect("CP416");
     let cp417 = advance_cp417(&mut Cp417State::new(cp416.system), cp416).expect("CP417");
-    advance_cp418(&mut Cp418State::new(cp417.system), cp417).expect("CP418")
+    let mut state = Cp418State::new(cp417.system);
+    let snapshot = advance_cp418(&mut state, cp417).expect("CP418");
+    (state, snapshot)
 }
 
 fn matching_mixed_air_owner(
@@ -476,3 +487,7 @@ fn option_bits_equal(left: Option<f64>, right: Option<f64>) -> bool {
         _ => false,
     }
 }
+
+mod successor_fixture;
+
+pub(in crate::ideal_loads::calc) use successor_fixture::cp419_all_snapshots_for_successor_tests;

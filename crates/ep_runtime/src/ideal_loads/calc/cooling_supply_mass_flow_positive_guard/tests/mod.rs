@@ -1,3 +1,4 @@
+mod committed;
 mod release_corruption;
 
 use super::*;

@@ -1,5 +1,8 @@
 //! CP419 dehumidification-guard else-branch CpAir assignment assertions.
 
+#[path = "cp420_assertions.rs"]
+mod cp420_assertions;
+
 use ep_runtime::psychrometrics::energyplus_psy_cp_air_fn_w;
 use serde_json::{Map, Value, json};
 
@@ -210,6 +213,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         assert!(!serialized.contains(forbidden), "CP419 forbids {forbidden}");
     }
     assert!(!results.to_string().contains(CP419_KEY));
+    cp420_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -218,6 +222,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP419_KEY].is_null(),
         "non-direct runtime must not publish CP419 evidence"
     );
+    cp420_assertions::assert_non_direct(runtime);
 }
 
 fn bits(value: &Value, field: &str) -> u64 {
