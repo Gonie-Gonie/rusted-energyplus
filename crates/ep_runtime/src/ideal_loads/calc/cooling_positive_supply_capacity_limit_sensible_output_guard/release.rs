@@ -17,6 +17,9 @@ use crate::ideal_loads::{
 mod prefix_validation;
 mod runtime_validation;
 mod snapshot_validation;
+mod committed;
+
+pub(in crate::ideal_loads::calc) use committed::cooling_positive_supply_capacity_limit_sensible_output_guard_committed_latest_maximum_total_cooling_capacity;
 
 use prefix_validation::{
     active_operands_link_to_retained_prefix,

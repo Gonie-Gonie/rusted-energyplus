@@ -2,6 +2,7 @@
 
 mod overflow;
 mod schema_routes;
+mod committed;
 
 use super::transition::predecessor_route;
 use super::{

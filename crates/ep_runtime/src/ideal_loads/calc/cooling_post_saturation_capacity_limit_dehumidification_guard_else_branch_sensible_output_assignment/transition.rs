@@ -26,6 +26,8 @@ pub(in crate::ideal_loads::calc) struct RetainedRoute {
     pub active: bool,
 }
 
+pub(in crate::ideal_loads::calc) type PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputAssignmentCommittedRoute = RetainedRoute;
+
 /// CP330 flow and CP329 mixed-air temperature, consumed only when CP420 is active.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(in crate::ideal_loads) struct PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputAssignmentActiveInput

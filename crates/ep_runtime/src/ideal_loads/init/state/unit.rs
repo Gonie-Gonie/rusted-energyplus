@@ -285,6 +285,7 @@ impl PurchasedAirUnitRuntimeState {
             calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchEntryRuntimeState::new(system),
             calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchCpAirAssignmentRuntimeState::new(system),
             calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputAssignmentRuntimeState::new(system),
+            calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard: PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputGuardRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

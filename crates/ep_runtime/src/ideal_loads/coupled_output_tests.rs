@@ -140,6 +140,8 @@ mod cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp
 mod cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_fixture;
 #[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_fixture.rs"]
 mod cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_fixture;
+#[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_fixture.rs"]
+mod cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_fixture;
 #[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_guard_fixture.rs"]
 mod cooling_post_saturation_capacity_limit_dehumidification_guard_fixture;
 #[path = "coupled_output_tests/cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_fixture.rs"]
@@ -307,6 +309,7 @@ use cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_s
 use cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment_snapshot;
 use cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment_snapshot;
 use cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry_snapshot;
+use cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_snapshot;
 use crate::ideal_loads::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputAssignmentActiveInput,
     private_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_characterization,
@@ -1580,6 +1583,19 @@ fn scaled_output(
             }),
         )
         .expect("valid CP420 coupled-output fixture");
+    if system.cooling_limit == IdealLoadsLimit::NoLimit {
+        assert!(
+            !calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment
+                .post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_executed,
+            "NoLimit fixture must not forge CP420/CP421 capacity-guard reachability"
+        );
+    }
+    let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard =
+        calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_snapshot(
+            calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment,
+            calculation_cooling_capacity_zero_flow_reset,
+            calculation_cooling_positive_supply_capacity_limit_sensible_output_guard,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -1713,6 +1729,7 @@ fn scaled_output(
         calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry,
         calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment,
         calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment,
+        calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

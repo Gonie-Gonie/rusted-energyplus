@@ -15,6 +15,9 @@ use crate::ideal_loads::{
 mod predecessor_validation;
 mod runtime_validation;
 mod snapshot_validation;
+mod committed;
+
+pub(in crate::ideal_loads::calc) use committed::cooling_capacity_zero_flow_reset_committed_latest_maximum_total_cooling_capacity;
 
 use predecessor_validation::predecessor_chain_and_candidates_are_consistent;
 use runtime_validation::{

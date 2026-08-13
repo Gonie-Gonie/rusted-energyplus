@@ -10,6 +10,8 @@ use super::{
 };
 use crate::ideal_loads::PurchasedAirCalcCoolingHumidificationFlowSnapshot;
 
+mod committed;
+
 const SYSTEM: IdealLoadsAirSystemId = IdealLoadsAirSystemId(5);
 
 fn predecessor(

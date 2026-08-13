@@ -2,6 +2,9 @@
 
 use serde_json::{Map, Value, json};
 
+#[path = "cp421_assertions.rs"]
+mod cp421_assertions;
+
 const CP329_KEY: &str = "purchased_air_calc_cooling_mixed_air_call_lifecycle";
 const CP330_KEY: &str = "purchased_air_calc_cooling_supply_mass_flow_positive_guard_lifecycle";
 const CP419_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_lifecycle";
@@ -230,6 +233,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         );
     }
     assert!(!results.to_string().contains(CP420_KEY));
+    cp421_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -238,6 +242,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP420_KEY].is_null(),
         "non-direct runtime must not publish CP420 evidence"
     );
+    cp421_assertions::assert_non_direct(runtime);
 }
 
 fn bits(value: &Value, field: &str) -> u64 {

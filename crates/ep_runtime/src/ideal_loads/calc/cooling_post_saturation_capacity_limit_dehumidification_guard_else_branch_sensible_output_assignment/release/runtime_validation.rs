@@ -230,6 +230,13 @@ pub(super) fn completed_predecessor_counts_match(
             == predecessor.dehumidification_guard_else_branch_cp_air_assignment_route_counts
 }
 
+pub(super) fn committed_predecessor_counts_match(
+    state: &State,
+    predecessor: &PredecessorState,
+) -> bool {
+    completed_predecessor_counts_match(state, predecessor)
+}
+
 fn checked_increment(value: &mut usize) -> bool {
     let Some(next) = value.checked_add(1) else {
         return false;

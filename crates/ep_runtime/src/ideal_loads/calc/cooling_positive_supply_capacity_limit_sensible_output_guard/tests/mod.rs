@@ -1,4 +1,5 @@
 mod public_release;
+mod committed;
 pub(in crate::ideal_loads::calc) mod release_fixture;
 
 use super::*;

@@ -31,6 +31,10 @@ use crate::ideal_loads::{
 mod error;
 mod runtime_validation;
 mod snapshot;
+mod committed;
+mod route_commitment;
+pub(in crate::ideal_loads::calc) use committed::cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_committed_latest_route_and_cooling_sensible_output;
+pub(in crate::ideal_loads::calc) use route_commitment::cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_committed_route_matches_snapshot;
 pub use error::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputAssignmentError;
 use runtime_validation::{
     completed_predecessor_counts_match, pending_predecessor_counts_match,

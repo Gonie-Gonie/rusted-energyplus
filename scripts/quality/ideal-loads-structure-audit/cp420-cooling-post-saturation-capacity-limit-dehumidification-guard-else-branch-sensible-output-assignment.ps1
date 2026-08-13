@@ -84,7 +84,7 @@ foreach ($file in @($module,$state,$transition,$accounting,$release,$releaseErro
 foreach ($file in @(Get-ChildItem -LiteralPath $root -Recurse -File -Filter '*.rs')) {
     Assert-LineLimit -Path $file.FullName -Limit 500 -Description 'bounded CP420 core subtree file'
 }
-if (@(Get-ChildItem -LiteralPath $root -Recurse -File -Filter '*.rs').Count -ne 10) { throw 'CP420 exact ten-file bounded core subtree drift' }
+if (@(Get-ChildItem -LiteralPath $root -Recurse -File -Filter '*.rs').Count -ne 13) { throw 'CP420 exact thirteen-file bounded core subtree drift' }
 Assert-Contains -Path $tests -Pattern 'cp420_boundary_and_eight_sites_are_exact' -Description 'CP420 exact source-boundary/site test'
 Assert-Contains -Path $tests -Pattern 'exhaustive_54_outcomes_49_inactive_five_assignments_and_ten_arrays_are_exact' -Description 'CP420 exhaustive route/count test'
 Assert-Contains -Path $tests -Pattern 'release_hot_path_uses_only_committed_owners_and_validated_route' -Description 'CP420 public hot-path recursion-zero regression'
@@ -234,7 +234,7 @@ $recursiveForbidden = @(
 foreach ($pattern in $recursiveForbidden) { if ($hot -match $pattern) { throw "CP420 public hot release recursively validates through '$pattern'" } }
 Assert-Contains -Path "$root\tests.rs" -Pattern 'release_hot_path_uses_only_committed_owners_and_validated_route' -Description 'CP420 public hot-path recursion-zero regression'
 
-Assert-PatternsInOrder -Path $binding -Patterns @("let\s+calculation_$predecessorStem\s*=","let\s+calculation_$stem\s*=",'let\s+unit_available\s*=','let\s+coupling\s*=') -Description 'CP419-to-CP420-to-numerical binding order'
+Assert-PatternsInOrder -Path $binding -Patterns @("let\s+calculation_$predecessorStem\s*=","let\s+calculation_$stem\s*=",'let\s+calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard\s*=','let\s+unit_available\s*=','let\s+coupling\s*=') -Description 'CP419-to-CP420-to-CP421-to-numerical binding order'
 Assert-PatternsInOrder -Path $scheduledOutput -Patterns @("pub\s+calculation_$predecessorStem\s*:","pub\s+calculation_$stem\s*:",'pub\s+coupling\s*:') -Description 'CP419-to-CP420 scheduled output order'
 $bindingText = Read-RepoText -Path $binding
 $dto = Get-Cp420BraceBlock -Text $bindingText -AnchorPattern 'DirectZonePurchasedAirCouplingInput\s*\{\s*zone_state\s*:' -Description 'numerical DTO'
@@ -248,7 +248,7 @@ Assert-Contains -Path $coupledFixture -Pattern 'fn\s+cp420_owner_input\s*\(' -De
 Assert-Contains -Path $coupledFixture -Pattern "calculation_$predecessorStem" -Description 'coupled fixture CP419 activity gate'
 Assert-Contains -Path $witness -Pattern ("set_" + $stem + "_latest_witness") -Description 'private witness setter'
 Assert-PatternsInOrder -Path $pipelineRoot -Patterns @("$predecessorStem::\s*validate_direct_lifecycle","$stem::\s*validate_direct_lifecycle") -Description 'pipeline CP419-to-CP420 order'
-Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp420_lifecycle_evidence' -Description 'cumulative non-direct firewall'
+Assert-Contains -Path $pipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp421_lifecycle_evidence' -Description 'cumulative non-direct firewall'
 Assert-Contains -Path $pipelineValidation -Pattern 'predecessor_cp419\s*:\s*Option<&PredecessorLifecycle>' -Description 'pipeline CP419 predecessor'
 Assert-Contains -Path $arbitraryPredecessor -Pattern 'mod\s+cp420_assertions' -Description 'arbitrary delegation module'
 Assert-Contains -Path $arbitraryPredecessor -Pattern 'cp420_assertions::assert_direct\(runtime,\s*results\)' -Description 'direct arbitrary delegation'
@@ -325,17 +325,17 @@ $audits = @(Get-ChildItem -LiteralPath $auditRoot -Filter 'cp*.ps1' -File)
 foreach ($file in $audits) {
     if ($file.BaseName -notmatch '^cp(?<number>\d+)-') { continue }
     $number = [int]$Matches['number']
-    if ($number -ge 334 -and $number -le 420) { Assert-Contains -Path $file.FullName -Pattern 'non_direct_runtime_rejects_cp316_through_cp420_lifecycle_evidence' -Description 'historical non-direct firewall' }
-    if ($number -ge 337 -and $number -le 420) { Assert-Contains -Path $file.FullName -Pattern 'script_count = 358' -Description 'historical script count' }
-    if ($number -ge 367 -and $number -le 420) { Assert-Contains -Path $file.FullName -Pattern 'Count -ne 118' -Description 'historical classification count' }
-    if ($number -ge 335 -and $number -le 420) { Assert-Contains -Path $file.FullName -Pattern ([regex]::Escape('\| 358 \|')) -Description 'historical generated total'; Assert-Contains -Path $file.FullName -Pattern ([regex]::Escape('\| 118 \|')) -Description 'historical generated internal total' }
+    if ($number -ge 334 -and $number -le 420) { Assert-Contains -Path $file.FullName -Pattern 'non_direct_runtime_rejects_cp316_through_cp421_lifecycle_evidence' -Description 'historical non-direct firewall' }
+    if ($number -ge 337 -and $number -le 420) { Assert-Contains -Path $file.FullName -Pattern 'script_count = 359' -Description 'historical script count' }
+    if ($number -ge 367 -and $number -le 420) { Assert-Contains -Path $file.FullName -Pattern 'Count -ne 119' -Description 'historical classification count' }
+    if ($number -ge 335 -and $number -le 420) { Assert-Contains -Path $file.FullName -Pattern ([regex]::Escape('\| 359 \|')) -Description 'historical generated total'; Assert-Contains -Path $file.FullName -Pattern ([regex]::Escape('\| 119 \|')) -Description 'historical generated internal total' }
 }
 $cleanup = @((Get-ChildItem $auditRoot -Filter 'cp326-*.ps1' -File); Get-ChildItem $auditRoot -Filter 'cp3*.ps1' -File | Where-Object { $_.BaseName -match '^cp(?<number>\d+)-' -and [int]$Matches['number'] -ge 329 -and [int]$Matches['number'] -le 344 })
 if ($cleanup.Count -ne 17) { throw 'CP420 helper-cleanup propagation set drift' }
 foreach ($file in $cleanup) { Assert-Contains -Path $file.FullName -Pattern "advance_$stem" -Description 'historical helper whitelist' }
 $terminalAudits = @((Get-ChildItem $auditRoot -Filter 'cp345-*.ps1' -File); $audits | Where-Object { $_.BaseName -match '^cp(?<number>\d+)-' -and (([int]$Matches['number'] -ge 377 -and [int]$Matches['number'] -le 392) -or ([int]$Matches['number'] -ge 394 -and [int]$Matches['number'] -le 419)) })
 if ($terminalAudits.Count -ne 43) { throw 'CP420 terminal propagation set drift' }
-foreach ($file in $terminalAudits) { Assert-Contains -Path $file.FullName -Pattern '\$cp420Call' -Description 'CP420 terminal capture'; Assert-Contains -Path $file.FullName -Pattern 'CP419-to-CP420' -Description 'historical CP419-to-CP420 interval'; Assert-Contains -Path $file.FullName -Pattern 'CP420-to-numerical' -Description 'CP420 terminal-to-numerical interval' }
+foreach ($file in $terminalAudits) { Assert-Contains -Path $file.FullName -Pattern '\$cp420Call' -Description 'CP420 terminal capture'; Assert-Contains -Path $file.FullName -Pattern 'CP419-to-CP420' -Description 'historical CP419-to-CP420 interval'; Assert-Contains -Path $file.FullName -Pattern '\$cp421Call' -Description 'CP421 terminal capture'; Assert-Contains -Path $file.FullName -Pattern 'CP420-to-CP421' -Description 'historical CP420-to-CP421 interval'; Assert-Contains -Path $file.FullName -Pattern 'CP421-to-numerical' -Description 'CP421 terminal-to-numerical interval' }
 
 $master = Read-RepoText -Path 'scripts\quality\ideal-loads-structure-audit.ps1'
 $predecessorIndex = $master.IndexOf('cp419-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-cp-air-assignment.ps1')
@@ -347,12 +347,12 @@ Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit.ps1' -Pattern
 Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment.ps1' -Pattern 'Assert-LineLimit -Path \$cp339CalcRoot -Limit 99' -Description 'historical calc-root structural cap'
 
 $inventory = Read-RepoText -Path 'specs\script_inventory.toml'
-foreach ($pattern in @('script_count = 358','dev_command_count = 238','unused_script_count = 0','unreachable_count = 0')) { Assert-Cp420Text -Text $inventory -Pattern $pattern -Description 'inventory count' }
-if ([regex]::Matches($inventory,'(?m)^classification = "public"\r?$').Count -ne 240 -or [regex]::Matches($inventory,'(?m)^classification = "internal"\r?$').Count -ne 118) { throw 'CP420 inventory classification drift' }
+foreach ($pattern in @('script_count = 359','dev_command_count = 238','unused_script_count = 0','unreachable_count = 0')) { Assert-Cp420Text -Text $inventory -Pattern $pattern -Description 'inventory count' }
+if ([regex]::Matches($inventory,'(?m)^classification = "public"\r?$').Count -ne 240 -or [regex]::Matches($inventory,'(?m)^classification = "internal"\r?$').Count -ne 119) { throw 'CP420 inventory classification drift' }
 Assert-Contains -Path 'specs\script_inventory.toml' -Pattern 'cp420-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-assignment\.ps1' -Description 'inventory record'
-Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| 358 \|' -Description 'generated script total'
+Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| 359 \|' -Description 'generated script total'
 Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| public scripts \| 240 \|' -Description 'generated public total'
-Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| 118 \|' -Description 'generated internal total'
+Assert-Contains -Path 'docs\src\generated\script-index.md' -Pattern '\| 119 \|' -Description 'generated internal total'
 if ((Get-Content -LiteralPath 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1').Count -gt 1200) { throw 'CP345 line cap exceeded after CP420 terminal propagation' }
 Write-Host 'CP420 post-saturation dehumidification-guard else-branch sensible-output assignment structure audit passed.'
 }

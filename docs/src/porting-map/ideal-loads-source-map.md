@@ -24549,3 +24549,81 @@ output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
 Script inventory becomes 358 total, 240 public, 118 internal, zero unused,
 zero unreachable, with 238 development commands.
+
+## CP421 post-saturation capacity-limit dehumidification-guard else-branch sensible-output maximum-capacity guard
+
+CP421 supersedes only CP420's physical-line-2332 executable/control
+exclusion. At pinned EnergyPlus commit
+6f2e40d10250a105b49966baa24d843711e61048 and locked
+PurchasedAirManager.cc SHA-256
+54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005, it maps
+physical executable/control line 2332 exactly:
+`if (CoolSensOutput >= PurchAir.MaxCoolTotCap) {`. Physical executable line
+2333, `CoolSensOutput = PurchAir.MaxCoolTotCap;`, is first excluded and the
+CP422 candidate. That assignment, the following supply-temperature
+adjustment, closing delimiters, and all later behavior remain excluded.
+
+The exact four dependency-ordered sites are
+`read-retained-cooling-sensible-output-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-maximum-capacity-comparison`,
+`read-retained-maximum-total-cooling-capacity-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-comparison`,
+`compare-post-saturation-capacity-limit-dehumidification-guard-else-branch-cooling-sensible-output-greater-than-or-equal-to-maximum-total-cooling-capacity`,
+and
+`enter-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-capacity-adjustment-body-if-comparison-satisfied`.
+The two side-effect-free reads make no C++ operand-evaluation-order claim.
+The transition performs the raw IEEE binary64 `>=` comparison exactly once:
+equality enters the body and NaN/unordered falls through, without
+`total_cmp`, `partial_cmp`, tolerance, clamp, normalization, or a new
+finite-result gate.
+
+CP421 refines CP420's 54 flattened conceptual outcomes. The 49 inactive
+outcomes remain one-to-one, while active logical indices 4, 7, 10, 13, and
+16 each split into one guard-false and one body-entry outcome. Exact totals
+are T421=59, I421=49, Q421=10, F421=5, B421=5, and
+S421=3*Q421+B421=35. Public/private becomes 19/40: active public indices 4
+and 7 and active private indices 10, 13, and 16 each have both comparison
+outcomes. Three width-36 arrays retain predecessor, guard-false, and
+body-entry route counts; CP420's ten lineage arrays remain in its sealed
+predecessor state and are verified by parity instead of being duplicated.
+
+Same-call bit-exact CP420 lifecycle, snapshot, latest, private witness,
+completion evidence, and sealed committed route/output are the sole
+immediate predecessor and left-operand owner. On evaluated routes sealed
+same-call CP321 solely owns finite nonnegative `MaxCoolTotCap`, and sealed
+CP340 supplies the required same-call maximum-capacity bit corroboration.
+System, ordinal, controlled Zone, no-OA route, latest, witness, counters,
+and operand bits must agree. Earlier checkpoints, caller/model/service/Zone
+scalars, inferred capacity, prior sensible-output values, and numerical DTO
+values are forbidden substitutes. Inactive routes acquire no active owner
+and perform no active read.
+
+Public and coupled/pipeline hot validation uses the sealed CP420, CP321, and
+CP340 committed capabilities, the CP421 validated-route transition, and
+bounded prefix/local checks. The CP321/CP340/CP420 hot seals and CP421 hot
+path perform zero `completed_`, `snapshot_is_exact`, or generic
+`predecessor_route` derivation; cold recursive validation remains private
+and test-only. Nonfinite raw `CoolSensOutput` remains authoritative Rust/IEEE
+evidence: its JSON numeric projection is null while the adjacent IEEE
+sidecar retains the exact bits.
+
+The lossless snapshot has exactly 220 base fields, seventy-six `Option<f64>`
+carriers, two optional comparison bools, one optional control enum, and 296
+unique JSON keys with seventy-six immediately adjacent authoritative IEEE
+sidecars. It preserves CP420's exact first 199 fields, renames CP420 terminal
+W/H/T as the predecessor-CP420 triple, appends the 15-field CP421 guard,
+operand-owner/read, comparison, outcome, and terminal-owner block, and
+re-emits final W/H/T. JSON preserves CP420's exact first 267 keys and appends
+an exact 29-key tail. Terminal W/H/T presence, CP420 ownership, and
+bit-exact preservation become 36/41/56 because splitting the five active
+CP420 outcomes adds only five temperature-bearing outcomes. CP421 owns no
+terminal numerical value.
+
+Binding is CP420-to-CP421-to-unchanged-numerical and the binding checkpoint
+count advances from 111 to 112. CP421 adds no numerical, coupling-input, or
+output DTO field. Its evidence never feeds or replaces prediction, numerical
+results, feedback, nodes, loads, reports, or outputs; non-direct paths reject
+CP421 lifecycle evidence. CP421 adds no support, readiness, capability,
+routine, algorithm, numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
+Script inventory becomes 359 total, 240 public, 119 internal, zero unused,
+zero unreachable, with 238 development commands.
