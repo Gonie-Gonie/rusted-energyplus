@@ -8,6 +8,8 @@ mod release;
 mod state;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::cp421_all_snapshots_for_successor_tests;
 mod transition;
 
 pub use release::{
@@ -22,6 +24,11 @@ pub(in crate::ideal_loads) use release::{
     private_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_characterization,
 };
 pub use state::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputGuardRuntimeState;
+pub(in crate::ideal_loads::calc) use release::{
+    cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_committed_latest_route_and_assignment_values,
+    cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_retained_route_matches_snapshot_bounded,
+    cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_snapshot_route,
+};
 #[allow(unused_imports)]
 pub(in crate::ideal_loads) use transition::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputGuardActiveInput;
 #[allow(unused_imports)]

@@ -20,6 +20,7 @@ use crate::ideal_loads::calc::{
     cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_snapshot_route as cp420_route,
     cp419_all_snapshots_for_successor_tests,
 };
+use crate::ideal_loads::calc::cooling_positive_supply_capacity_limit_sensible_output_guard::tests::release_fixture::completed_cp340_case;
 use crate::ideal_loads::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputAssignmentSnapshot as Predecessor;
 
 #[test]
@@ -169,6 +170,177 @@ fn hot_release_and_pending_validation_have_no_recursive_lineage_calls() {
         .expect("latest helper");
     assert!(!latest.contains("snapshot_route("));
     assert!(latest.contains("retained_route_matches_snapshot_bounded"));
+}
+
+pub(in crate::ideal_loads::calc) fn cp421_all_snapshots_for_successor_tests() -> Vec<
+    super::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputGuardSnapshot,
+> {
+    let predecessors = cp420_predecessors();
+    let mut state = State::new(predecessors[0].system);
+    let mut snapshots = Vec::with_capacity(59);
+    for predecessor in predecessors {
+        let route = successor_route_for(predecessor);
+        let outcomes: &[bool] = if route.active { &[false, true] } else { &[false] };
+        for &body in outcomes {
+            snapshots.push(
+                advance_validated(&mut state, predecessor, route, active_input(predecessor, body))
+                    .expect("CP421 successor fixture"),
+            );
+        }
+    }
+    snapshots
+}
+
+#[test]
+fn committed_assignment_owner_uses_only_bounded_snapshot_validation() {
+    let committed = include_str!("release/committed.rs");
+    assert!(!committed.contains("snapshot_is_exact"));
+    assert!(committed.contains("retained_route_matches_snapshot_bounded"));
+}
+
+#[test]
+fn cp421_committed_assignment_owner_accepts_exact_states_and_rejects_forgeries() {
+    use crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_committed_latest_route_and_assignment_values as committed;
+
+    let predecessors = cp420_predecessors();
+    let (_, _, cp340) = completed_cp340_case(-1_000.0, 1.0, true);
+    let committed_capacity = cp340
+        .maximum_total_cooling_capacity_w
+        .expect("CP340 capacity");
+    for active_outcome in [false, true] {
+        let mut predecessor = predecessors
+            .iter()
+            .copied()
+            .find(|snapshot| {
+                snapshot.post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_executed
+                    == active_outcome
+            })
+            .expect("route");
+        predecessor.parent_call_ordinal = 1;
+        let route = successor_route_for(predecessor);
+        let input = active_outcome.then(|| ActiveInput {
+            cooling_sensible_output_w: predecessor
+                .cooling_sensible_output_w
+                .expect("active CP420 output"),
+            maximum_total_cooling_capacity_w: committed_capacity,
+            cp420_cooling_sensible_output_owned_read: true,
+            cp321_maximum_total_cooling_capacity_owned_read: true,
+            cp340_same_call_maximum_total_cooling_capacity_bit_corroborated: true,
+        });
+        let mut state = State::new(predecessor.system);
+        let snapshot = advance_validated(&mut state, predecessor, route, input).expect("CP421");
+        let unit = cp421_fixture_unit(state.clone(), snapshot);
+        let (committed_route, output, capacity) = committed(&unit, snapshot).expect("sealed CP421");
+        assert_eq!(committed_route, state.latest_route.expect("route"));
+        assert_eq!(output.is_some(), active_outcome);
+        assert_eq!(capacity.is_some(), active_outcome);
+
+        let mut cases = Vec::new();
+        let mut missing = unit.clone();
+        missing
+            .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard
+            .latest = None;
+        cases.push((missing, snapshot));
+
+        let mut forged_witness = snapshot;
+        forged_witness.parent_call_ordinal += 1;
+        cases.push((unit.clone(), forged_witness));
+
+        let mut count = unit.clone();
+        count
+            .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard
+            .transition_count += 1;
+        cases.push((count, snapshot));
+
+        let mut ordinal = unit.clone();
+        ordinal
+            .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard
+            .latest_transition_ordinal = Some(0);
+        cases.push((ordinal, snapshot));
+
+        let mut logical = unit.clone();
+        logical
+            .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard
+            .latest_route
+            .as_mut()
+            .expect("route")
+            .logical_index = (route.logical_index + 1) % 36;
+        cases.push((logical, snapshot));
+
+        let mut active = unit.clone();
+        active
+            .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard
+            .latest_route
+            .as_mut()
+            .expect("route")
+            .active = !route.active;
+        cases.push((active, snapshot));
+
+        let mut body = unit.clone();
+        body.calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard
+            .latest_route
+            .as_mut()
+            .expect("route")
+            .body_entered = !route.body_entered;
+        cases.push((body, snapshot));
+
+        if active_outcome {
+            let mut coordinated = unit.clone();
+            let latest = coordinated
+                .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard
+                .latest
+                .as_mut()
+                .expect("latest");
+            latest.maximum_total_cooling_capacity_w = latest
+                .maximum_total_cooling_capacity_w
+                .map(|value| f64::from_bits(value.to_bits() ^ 1));
+            let matching_witness = *latest;
+            cases.push((coordinated, matching_witness));
+        }
+
+        for (case_index, (forged, witness)) in cases.into_iter().enumerate() {
+            assert!(
+                committed(&forged, witness).is_none(),
+                "active {active_outcome} forgery case {case_index}"
+            );
+        }
+    }
+}
+
+fn cp421_fixture_unit(
+    state: State,
+    snapshot: super::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputGuardSnapshot,
+) -> crate::ideal_loads::PurchasedAirUnitRuntimeState {
+    let (runtime, system, _) = completed_cp340_case(-1_000.0, 1.0, true);
+    let mut unit = runtime.units.get(&system.id).expect("unit").clone();
+    unit.system = snapshot.system;
+    unit.controlled_zone = Some(snapshot.controlled_zone);
+    unit.init_call_count = snapshot.parent_call_ordinal;
+    unit.calc_entry.call_count = snapshot.parent_call_ordinal;
+    unit.calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard = state.clone();
+    {
+        let owner = &mut unit.calc_cooling_capacity_zero_flow_reset;
+        owner.system = snapshot.system;
+        let latest = owner.latest.as_mut().expect("CP321");
+        latest.system = snapshot.system;
+        latest.controlled_zone = snapshot.controlled_zone;
+        latest.parent_call_ordinal = snapshot.parent_call_ordinal;
+    }
+    {
+        let owner =
+            &mut unit.calc_cooling_positive_supply_capacity_limit_sensible_output_guard;
+        owner.system = snapshot.system;
+        let latest = owner.latest.as_mut().expect("CP340");
+        latest.system = snapshot.system;
+        latest.controlled_zone = snapshot.controlled_zone;
+        latest.parent_call_ordinal = snapshot.parent_call_ordinal;
+    }
+    let predecessor = &mut unit.calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment;
+    predecessor.system = snapshot.system;
+    predecessor.transition_count = state.transition_count;
+    predecessor.predecessor_route_counts = state.predecessor_route_counts;
+    predecessor.dehumidification_guard_else_branch_sensible_output_assignment_count = state.post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_capacity_guard_evaluation_count;
+    unit
 }
 
 pub(super) fn cp420_predecessors() -> Vec<Predecessor> {

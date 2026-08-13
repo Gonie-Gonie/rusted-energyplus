@@ -24,7 +24,7 @@ pub(super) fn snapshot_is_exact(snapshot: Snapshot) -> bool {
         )
 }
 
-pub(super) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
+pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
     let predecessor = predecessor_cp420_snapshot(snapshot);
     let predecessor_route = crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_snapshot_route(predecessor)?;
     let mut route = cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_route_from_committed_predecessor(
@@ -48,7 +48,7 @@ pub(super) fn prefix_and_local_shape_match(
     ) && local_shape_is_exact(snapshot, predecessor, route)
 }
 
-pub(super) fn retained_route_matches_snapshot_bounded(
+pub(in crate::ideal_loads::calc) fn retained_route_matches_snapshot_bounded(
     snapshot: Snapshot,
     route: Route,
 ) -> bool {

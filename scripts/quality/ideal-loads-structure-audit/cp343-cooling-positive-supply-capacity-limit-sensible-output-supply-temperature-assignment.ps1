@@ -354,7 +354,7 @@ $cp343BindingIntervalCode = [regex]::Replace(
     )
 $cp343BindingIntervalCode = [regex]::Replace(
     $cp343BindingIntervalCode,
-    '(?s)(?:let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard\([^;]+?\)\?;)',
+    '(?s)(?:let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment\([^;]+?\)\?;)',
     ''
 )
     if ($cp343BindingIntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
@@ -397,7 +397,7 @@ foreach ($cp343JsonField in @(
 Assert-Contains -Path $cp343PipelineSnapshotSerialization -Pattern '(?s)fn json_number\(value: Option<f64>\) -> Value.*?filter\(\|value\| value\.is_finite\(\)\).*?map_or\(Value::Null' -Description "CP343 nonfinite numeric null projection"
 Assert-Contains -Path $cp343PipelineSnapshotSerialization -Pattern 'value\.map\(\|value\| format!\("0x\{:016x\}", value\.to_bits\(\)\)\)' -Description "CP343 authoritative IEEE bits"
 Assert-Contains -Path $cp343PipelineRoot -Pattern '(?s)purchased_air_calc_cooling_positive_supply_capacity_limit_sensible_output_supply_temperature_assignment_lifecycle:\s*None' -Description "non-direct CP343 null evidence"
-Assert-Contains -Path $cp343PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp421_lifecycle_evidence' -Description "non-direct CP343 through CP363 evidence rejection"
+Assert-Contains -Path $cp343PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp422_lifecycle_evidence' -Description "non-direct CP343 through CP363 evidence rejection"
 
 # Specs contain exactly two addenda and the 2+4 target distribution.
 $cp343AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
@@ -587,7 +587,7 @@ foreach ($cp343HistoricalFirewallAudit in @(
         "scripts\quality\ideal-loads-structure-audit\cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1",
         "scripts\quality\ideal-loads-structure-audit\cp342-cooling-positive-supply-capacity-limit-sensible-output-supply-enthalpy-assignment.ps1"
     )) {
-    Assert-Contains -Path $cp343HistoricalFirewallAudit -Pattern 'non_direct_runtime_rejects_cp316_through_cp421_lifecycle_evidence' -Description "historical non-direct firewall reaches CP362"
+    Assert-Contains -Path $cp343HistoricalFirewallAudit -Pattern 'non_direct_runtime_rejects_cp316_through_cp422_lifecycle_evidence' -Description "historical non-direct firewall reaches CP362"
 }
 
 # Root reachability and generated inventory add one internal script:
@@ -603,10 +603,10 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP343 after CP342 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 359' -Description "CP343 cumulative inventory total through CP403"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 360' -Description "CP343 cumulative inventory total through CP403"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment\.ps1"' -Description "CP343 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment\.ps1::dot_sources' -Description "CP343 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 359 \|' -Description "CP343 generated script count through CP403"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 360 \|' -Description "CP343 generated script count through CP403"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP343 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 119 \|' -Description "CP343 generated internal script count through CP403"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 120 \|' -Description "CP343 generated internal script count through CP403"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP343 generated uncalled script count"

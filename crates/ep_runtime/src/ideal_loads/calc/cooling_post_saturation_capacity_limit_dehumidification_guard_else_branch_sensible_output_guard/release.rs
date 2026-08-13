@@ -25,10 +25,14 @@ use crate::ideal_loads::{
 };
 
 mod error;
+mod committed;
 mod prefix;
 mod runtime_validation;
 mod snapshot_validation;
 
+pub(in crate::ideal_loads::calc) use committed::cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_committed_latest_route_and_assignment_values;
+pub(in crate::ideal_loads::calc) use snapshot_validation::snapshot_route as cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_snapshot_route;
+pub(in crate::ideal_loads::calc) use snapshot_validation::retained_route_matches_snapshot_bounded as cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_retained_route_matches_snapshot_bounded;
 pub use error::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputGuardError;
 use runtime_validation::{
     pending_state_is_consistent, post_transition_state_is_consistent,

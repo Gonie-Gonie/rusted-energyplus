@@ -7088,3 +7088,72 @@ output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
 Script inventory becomes 359 total, 240 public, 119 internal, zero unused,
 zero unreachable, with 238 development commands.
+
+## CP422 post-saturation capacity-limit dehumidification-guard else-branch sensible-output maximum-capacity assignment
+
+CP422 supersedes only CP421's physical-line-2333 executable exclusion. At
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked PurchasedAirManager.cc SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`, it maps
+physical executable line 2333 exactly:
+`CoolSensOutput = PurchAir.MaxCoolTotCap;`. Physical executable line 2334,
+`PurchAir.SupplyTemp = PurchAir.MixedAirTemp - CoolSensOutput /
+(SupplyMassFlowRate * CpAir);`, is first excluded and the CP423 candidate.
+That expression's operand reads, multiplication, division, subtraction,
+supply-temperature assignment, closing delimiters, and all later behavior
+remain excluded.
+
+The exact two dependency-ordered sites are
+`read-retained-maximum-total-cooling-capacity-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-assignment`
+and
+`assign-local-cooling-sensible-output-from-maximum-total-cooling-capacity`.
+The retained right-hand-side read followed by the local write is a
+deterministic Rust witness, not a general C++ built-in `=` evaluation-order
+claim. The transition copies the retained maximum-capacity binary64 payload
+bit-exactly, without arithmetic, comparison, clamp, normalization, finite
+coercion, default, or diagnostic.
+
+CP422 preserves CP421's 59 outcomes without adding a branch. The 49 inherited
+inactive outcomes and five CP421 guard-false outcomes execute zero CP422 sites
+and preserve the preexisting local `CoolSensOutput` bits. Each of the five
+CP421 adjustment-body entries executes both sites and becomes a
+maximum-capacity-assigned outcome. Exact totals are T422=59, I422=49, F421=5,
+Z422=54, M422=5, and S422=2*M422=10. Public/private remains 19/40; the two
+public and three private body-entry outcomes become assignments. Exactly three
+width-36 arrays retain predecessor, predecessor guard-false, and assignment
+route counts; the active lineage partitions once between false preservation
+and assignment.
+
+Same-call bit-exact CP421 lifecycle, snapshot, latest, private witness,
+completion evidence, and sealed committed route/operands are the sole
+immediate predecessor and execution authority. On assignment outcomes CP421's
+retained maximum total cooling capacity is the sole right-hand-side operand,
+already backed by CP321 ownership and CP340 same-call bit corroboration in the
+sealed predecessor. CP422 does not reach through to CP321 or CP340 and accepts
+no CP341, caller, model, sizing, service, Zone, inferred, or numerical-DTO
+substitute. Zero-site outcomes perform no active operand read. A body-entry
+outcome may replace nonfinite preexisting output with finite nonnegative
+capacity; guard-false outcomes preserve even nonfinite bits. JSON projects
+nonfinite numbers as null while retaining authoritative adjacent IEEE
+sidecars.
+
+The lossless snapshot has exactly 234 base fields, eighty-three `Option<f64>`
+carriers, two optional comparison bools, one optional control enum, and 317
+unique JSON keys with eighty-three immediately adjacent authoritative IEEE
+sidecars. It preserves CP421's exact first 217 fields, renames CP421 terminal
+W/H/T as the predecessor-CP421 triple, appends the exact 11-field CP422
+execution, owner, read, assignment, result block, and re-emits final W/H/T.
+JSON preserves CP421's exact first 290 keys and appends an exact 27-key tail.
+Terminal W/H/T presence and bit-exact preservation remain 36/41/56. CP422
+owns five local `CoolSensOutput` results and no terminal W/H/T numerical value.
+
+Binding is CP421-to-CP422-to-unchanged-numerical and the binding checkpoint
+count advances from 112 to 113. CP422 adds no numerical, coupling-input, or
+output DTO field. Its evidence never feeds or replaces prediction, numerical
+results, feedback, nodes, loads, reports, or outputs; non-direct paths reject
+CP422 lifecycle evidence. CP422 adds no support, readiness, capability,
+routine, algorithm, numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
+Script inventory becomes 360 total, 240 public, 120 internal, zero unused,
+zero unreachable, with 238 development commands.
