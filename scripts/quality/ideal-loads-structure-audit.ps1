@@ -4076,7 +4076,6 @@ Assert-Contains -Path $runPipeline -Pattern 'purchased_air_cooling_capacity_zero
 Assert-Contains -Path $runPipeline -Pattern '\.purchased_air_calc_cooling_capacity_zero_flow_reset_lifecycle\s*[\r\n]+\s*\.is_some\(\)' -Description "non-direct CP321 evidence rejection"
 Assert-Contains -Path $runPipeline -Pattern 'direct_release_cooling_capacity_zero_reset_rejects_malformed_evidence' -Description "pipeline CP321 malformed-evidence regression"
 Assert-Contains -Path $runPipeline -Pattern 'direct_release_cooling_capacity_zero_reset_json_exposes_all_source_sites' -Description "pipeline CP321 all-site JSON regression"
-
 Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern '"CP321 supersedes CP320' -Description "CP321 algorithm support-boundary addendum"
 Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_capacity_zero_flow_reset\.rs::PurchasedAirCalcCoolingCapacityZeroFlowResetRuntimeState' -Description "CP321 algorithm Rust state target"
 Assert-Contains -Path "specs\algorithm_ledger.toml" -Pattern 'cooling_capacity_zero_flow_reset\.rs::PurchasedAirCalcCoolingCapacityZeroFlowResetLifecycleSummary' -Description "CP321 algorithm Rust lifecycle target"
@@ -4197,4 +4196,5 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp421-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-guard.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp422-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-maximum-capacity-assignment.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp423-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-assignment.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp424-cooling-supply-mass-flow-positive-guard-else-branch-entry.ps1")
 Write-Host "IdealLoads structure audit complete."

@@ -41,6 +41,8 @@ use runtime_validation::{
     state_counts_are_consistent,
 };
 use snapshot::{cp419_shape, snapshot_shape_is_exact, snapshots_match_bit_exact};
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use snapshot::cp419_shape as cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_predecessor_cp419_snapshot;
 
 /// Executes CP420 for the exact direct no-OA release route.
 pub fn advance_direct_no_oa_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment(

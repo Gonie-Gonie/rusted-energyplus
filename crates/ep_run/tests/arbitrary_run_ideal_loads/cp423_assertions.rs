@@ -1,5 +1,8 @@
 //! CP423 sensible-output supply-temperature assignment assertions.
 
+#[path = "cp424_assertions.rs"]
+mod cp424_assertions;
+
 use serde_json::{Map, Value, json};
 
 const CP422_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment_lifecycle";
@@ -232,6 +235,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         );
     }
     assert!(!results.to_string().contains(CP423_KEY));
+    cp424_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -240,6 +244,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP423_KEY].is_null(),
         "non-direct runtime must not publish CP423 evidence"
     );
+    cp424_assertions::assert_non_direct(runtime);
 }
 
 fn count(value: &Value, field: &str) -> u64 {

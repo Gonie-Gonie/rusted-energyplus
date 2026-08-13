@@ -2,6 +2,7 @@
 
 mod overflow;
 mod schema_ieee;
+mod committed_seal;
 
 use super::transition::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputSupplyTemperatureAssignmentRetainedRoute as Route,
@@ -191,4 +192,17 @@ fn flip(value: f64) -> f64 { f64::from_bits(value.to_bits() ^ 1) }
 
 fn nonzero_indices(values: &[usize; 36]) -> Vec<usize> {
     values.iter().enumerate().filter_map(|(index, count)| (*count != 0).then_some(index)).collect()
+}
+
+pub(in crate::ideal_loads::calc) fn cp423_all_snapshots_for_successor_tests() -> Vec<super::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputSupplyTemperatureAssignmentSnapshot> {
+    let predecessors = cp422_all_snapshots_for_successor_tests();
+    let mut state = State::new(predecessors[0].system);
+    predecessors
+        .into_iter()
+        .map(|predecessor| {
+            let route = successor_route_for(predecessor);
+            advance_validated(&mut state, predecessor, route, active_input(predecessor))
+                .expect("CP423 successor fixture")
+        })
+        .collect()
 }

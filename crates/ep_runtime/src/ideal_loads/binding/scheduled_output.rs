@@ -108,6 +108,7 @@ use super::super::{
     PurchasedAirCalcCoolingSupplyMassFlowLimitBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowLimitGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowMaximumSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardElseBranchEntrySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardSnapshot, PurchasedAirCalcEntrySnapshot,
@@ -454,6 +455,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered post-saturation sensible-output supply-temperature assignment snapshot.
     pub calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment:
         PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputSupplyTemperatureAssignmentSnapshot,
+    /// Source-ordered cooling positive-supply guard else-branch-entry snapshot.
+    pub calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry:
+        PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardElseBranchEntrySnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

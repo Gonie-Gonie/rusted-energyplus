@@ -8,7 +8,7 @@ use super::super::{
 };
 use crate::ideal_loads::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchCpAirAssignmentSnapshot as Predecessor;
 
-pub(super) fn cp419_shape(snapshot: Snapshot) -> Predecessor {
+pub(in crate::ideal_loads::calc) fn cp419_shape(snapshot: Snapshot) -> Predecessor {
     use crate::ideal_loads::{
         PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_GUARD_ELSE_BRANCH_CP_AIR_ASSIGNMENT_FIRST_EXCLUDED_SOURCE as PREDECESSOR_EXCLUDED,
         PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_GUARD_ELSE_BRANCH_CP_AIR_ASSIGNMENT_SOURCE as PREDECESSOR_SOURCE,

@@ -28,6 +28,7 @@ use crate::ideal_loads::{
 };
 
 mod error;
+mod committed;
 mod prefix;
 mod runtime_validation;
 mod snapshot_validation;
@@ -35,6 +36,20 @@ mod snapshot_validation;
 pub use error::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputSupplyTemperatureAssignmentError;
 use runtime_validation::{pending_state_is_consistent, post_transition_state_is_consistent};
 use snapshot_validation::{prefix_and_local_shape_match, snapshot_is_exact, snapshots_match_bit_exact};
+pub(in crate::ideal_loads::calc) use committed::cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment_committed_latest_route;
+
+pub(in crate::ideal_loads::calc) fn cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment_snapshot_route(
+    snapshot: Snapshot,
+) -> Option<super::transition::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputSupplyTemperatureAssignmentRetainedRoute> {
+    snapshot_validation::snapshot_route(snapshot)
+}
+
+pub(in crate::ideal_loads::calc) fn cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment_retained_route_matches_snapshot_bounded(
+    snapshot: Snapshot,
+    route: super::transition::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputSupplyTemperatureAssignmentRetainedRoute,
+) -> bool {
+    snapshot_validation::retained_route_matches_snapshot_bounded(snapshot, route)
+}
 
 /// Losslessly reconstructs the CP422 predecessor retained in CP423.
 #[must_use]

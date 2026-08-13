@@ -448,7 +448,7 @@ $cp337IntervalCode = [regex]::Replace(
     )
 $cp337IntervalCode = [regex]::Replace(
     $cp337IntervalCode,
-    '(?s)(?:let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment\([^;]+?\)\?;)',
+    '(?s)(?:let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment\([^;]+?\)\?;|let calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry =\s*advance_cooling_supply_mass_flow_positive_guard_else_branch_entry\([^;]+?\)\?;)',
     ''
 )
     if ($cp337IntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
@@ -507,7 +507,7 @@ Assert-Contains -Path $cp337DirectAssertions -Pattern 'const SOURCE_ORDER:\s*\[&
 Assert-Contains -Path $cp337DirectAssertions -Pattern 'let source_sites = 2 \* active \+ 2 \* second_comparisons \+ body_entries;' -Description "direct-run CP337 dynamic source formula"
 Assert-Contains -Path $cp337DirectAssertions -Pattern 'purchased_air_calc_cooling_positive_supply_enthalpy_assignment_lifecycle' -Description "direct-run CP336 predecessor evidence"
 Assert-Contains -Path $cp337NonDirectTests -Pattern 'purchased_air_calc_cooling_positive_supply_capacity_limit_guard_lifecycle' -Description "non-direct CP337 null evidence"
-Assert-Contains -Path $cp337PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp423_lifecycle_evidence' -Description "non-direct CP337 through CP363 evidence rejection"
+Assert-Contains -Path $cp337PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp424_lifecycle_evidence' -Description "non-direct CP337 through CP363 evidence rejection"
 Assert-NotContains -Path $cp337Pipeline -Pattern 'latest_numerical|numerical_supply_mass_flow|final_supply_mass_flow|complete_direct_zone_purchased_air_coupling' -Description "numerical DTO reconciliation in CP337 pipeline"
 
 # Exactly two algorithm addenda, two capability addenda, and six target
@@ -664,11 +664,11 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP337, CP338, and CP339 in order before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 361' -Description "CP337 cumulative inventory total through CP403"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 362' -Description "CP337 cumulative inventory total through CP403"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp337-cooling-positive-supply-capacity-limit-guard\.ps1"' -Description "CP337 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp338-cooling-positive-supply-capacity-limit-cp-air-assignment\.ps1"' -Description "CP338 internal script inventory record after CP337"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp339-cooling-positive-supply-capacity-limit-sensible-output-assignment\.ps1"' -Description "CP339 internal script inventory record after CP338"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 361 \|' -Description "CP337 cumulative generated script count through CP403"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 362 \|' -Description "CP337 cumulative generated script count through CP403"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP337 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 121 \|' -Description "CP337 cumulative generated internal script count through CP403"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 122 \|' -Description "CP337 cumulative generated internal script count through CP403"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP337 generated uncalled script count"

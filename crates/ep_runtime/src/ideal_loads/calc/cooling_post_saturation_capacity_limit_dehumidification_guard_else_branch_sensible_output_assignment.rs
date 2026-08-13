@@ -21,6 +21,8 @@ pub(in crate::ideal_loads::calc) use release::{
     cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_committed_route_matches_snapshot,
     cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_snapshot_route,
 };
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use release::cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_predecessor_cp419_snapshot;
 #[allow(unused_imports)]
 pub(in crate::ideal_loads) use release::{
     cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment_latest_metadata_is_consistent,

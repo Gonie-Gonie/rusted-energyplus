@@ -229,3 +229,35 @@ fn completed_case() -> (
         cp419_state;
     (runtime, system.id, snapshot)
 }
+
+pub(in crate::ideal_loads::calc) fn cp419_fixture_unit_for_successor_tests(
+    snapshot: Snapshot,
+) -> crate::ideal_loads::PurchasedAirUnitRuntimeState {
+    let (mut runtime, system, _) = crate::ideal_loads::calc::cooling_positive_supply_capacity_limit_sensible_output_guard::tests::release_fixture::completed_cp340_case(-1_000.0, 1.0, true);
+    let desired = crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_snapshot_route(snapshot).expect("CP419 route");
+    let (mut cp417_state, mut cp418_state, _) = predecessor_fixture_with_state(desired.logical_index, snapshot.predecessor_post_saturation_capacity_limit_dehumidification_guard_else_branch_entered, desired.predecessor_guard_false_fallthrough);
+    let predecessor = super::super::release::cp418_shape_for_test(snapshot);
+    cp418_state.latest = Some(predecessor);
+    let mut cp419_state = State::new(predecessor.system);
+    let rebuilt = advance(&mut cp419_state, predecessor, active_input(predecessor)).expect("CP419");
+    assert!(super::super::release::cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_snapshots_match_bit_exact(rebuilt, snapshot));
+    let unit = runtime.units.get_mut(&system.id).expect("unit");
+    cp417_state.latest.as_mut().expect("CP417").system = snapshot.system;
+    cp417_state.latest.as_mut().expect("CP417").controlled_zone = snapshot.controlled_zone;
+    cp417_state.latest.as_mut().expect("CP417").parent_call_ordinal = snapshot.parent_call_ordinal;
+    cp418_state.latest.as_mut().expect("CP418").system = snapshot.system;
+    cp418_state.latest.as_mut().expect("CP418").controlled_zone = snapshot.controlled_zone;
+    cp418_state.latest.as_mut().expect("CP418").parent_call_ordinal = snapshot.parent_call_ordinal;
+    cp417_state.system = snapshot.system;
+    cp418_state.system = snapshot.system;
+    cp419_state.system = snapshot.system;
+    cp419_state.latest = Some(snapshot);
+    unit.system = snapshot.system;
+    unit.controlled_zone = Some(snapshot.controlled_zone);
+    unit.init_call_count = snapshot.parent_call_ordinal;
+    unit.calc_entry.call_count = snapshot.parent_call_ordinal;
+    unit.calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry = cp418_state;
+    unit.calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment = cp417_state;
+    unit.calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment = cp419_state;
+    unit.clone()
+}

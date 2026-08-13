@@ -152,6 +152,8 @@ mod cooling_supply_enthalpy_post_saturation_assignment_tests;
 mod cooling_supply_humidity_ratio_saturation_assignment_tests;
 #[path = "binding/cooling_supply_humidity_ratio_saturation_limit_assignment_tests.rs"]
 mod cooling_supply_humidity_ratio_saturation_limit_assignment_tests;
+#[path = "binding/cooling_supply_mass_flow_positive_guard_else_branch_entry_tests.rs"]
+mod cooling_supply_mass_flow_positive_guard_else_branch_entry_tests;
 #[rustfmt::skip] #[path = "binding/cooling_constant_shr_supply_humidity_ratio_minimum_limit_tests.rs"] mod cooling_constant_shr_supply_humidity_ratio_minimum_limit_tests;
 #[rustfmt::skip] #[path = "binding/cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_tests.rs"] mod cooling_constant_shr_supply_humidity_ratio_mixed_air_limit_tests;
 #[rustfmt::skip] #[path = "binding/cooling_constant_shr_supply_humidity_ratio_overdrying_limit_tests.rs"] mod cooling_constant_shr_supply_humidity_ratio_overdrying_limit_tests;

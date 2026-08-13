@@ -9,7 +9,9 @@ mod state;
 #[cfg(test)]
 mod tests;
 #[cfg(test)]
-pub(in crate::ideal_loads::calc) use tests::cp419_all_snapshots_for_successor_tests;
+pub(in crate::ideal_loads::calc) use tests::{
+    cp419_all_snapshots_for_successor_tests, cp419_fixture_unit_for_successor_tests,
+};
 mod transition;
 
 pub use release::{

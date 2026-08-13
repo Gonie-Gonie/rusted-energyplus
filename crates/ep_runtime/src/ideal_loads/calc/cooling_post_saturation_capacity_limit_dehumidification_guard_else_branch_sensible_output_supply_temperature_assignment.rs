@@ -7,6 +7,8 @@ mod release;
 mod state;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::cp423_all_snapshots_for_successor_tests;
 mod transition;
 
 pub use release::{
@@ -29,6 +31,11 @@ pub(in crate::ideal_loads::calc) use transition::{
     advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment_state,
     advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment_state_with_validated_route,
     cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment_route_from_committed_predecessor,
+};
+pub(in crate::ideal_loads::calc) use release::{
+    cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment_committed_latest_route,
+    cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment_retained_route_matches_snapshot_bounded,
+    cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment_snapshot_route,
 };
 
 /// EnergyPlus source statement represented by CP423.

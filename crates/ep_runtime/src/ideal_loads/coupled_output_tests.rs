@@ -204,6 +204,8 @@ mod cooling_supply_mass_flow_limit_body_fixture;
 mod cooling_supply_mass_flow_limit_guard_fixture;
 #[path = "coupled_output_tests/cooling_supply_mass_flow_maximum_fixture.rs"]
 mod cooling_supply_mass_flow_maximum_fixture;
+#[path = "coupled_output_tests/cooling_supply_mass_flow_positive_guard_else_branch_entry_fixture.rs"]
+mod cooling_supply_mass_flow_positive_guard_else_branch_entry_fixture;
 #[path = "coupled_output_tests/cooling_supply_mass_flow_positive_guard_fixture.rs"]
 mod cooling_supply_mass_flow_positive_guard_fixture;
 #[path = "coupled_output_tests/cooling_supply_mass_flow_very_small_guard_body_fixture.rs"]
@@ -316,6 +318,7 @@ use cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_en
 use cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_snapshot;
 use cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment_snapshot;
 use cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment_fixture::calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment_snapshot;
+use cooling_supply_mass_flow_positive_guard_else_branch_entry_fixture::calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry_snapshot;
 use crate::ideal_loads::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputAssignmentActiveInput,
     private_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_characterization,
@@ -376,6 +379,21 @@ const SYSTEM_KEY: &str = "ZONE ONE IDEAL LOADS";
 const ZONE_KEY: &str = "ZONE ONE";
 const SUPPLY_NODE_NAME: &str = "ZONE ONE INLET";
 const SUPPLY_NODE: NodeId = NodeId(3);
+
+#[test]
+fn cp424_marker_mutation_cannot_change_the_unchanged_numerical_coupling_output() {
+    let system = test_system();
+    let original = scaled_output(&system, 0, 1.0);
+    let mut mutated = original;
+    mutated
+        .calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry
+        .cooling_supply_mass_flow_positive_guard_else_branch_entered ^= true;
+    assert_ne!(
+        mutated.calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry,
+        original.calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry,
+    );
+    assert_eq!(mutated.coupling, original.coupling);
+}
 
 #[test]
 fn appends_all_no_oa_and_predictor_series_with_hourly_semantics() {
@@ -1610,6 +1628,10 @@ fn scaled_output(
         calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment_snapshot(
             calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment,
         );
+    let calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry =
+        calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry_snapshot(
+            calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -1746,6 +1768,7 @@ fn scaled_output(
         calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard,
         calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment,
         calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment,
+        calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

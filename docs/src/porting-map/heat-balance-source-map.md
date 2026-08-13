@@ -40375,3 +40375,68 @@ output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
 Script inventory becomes 361 total, 240 public, 121 internal, zero unused,
 zero unreachable, with 238 development commands.
+
+## CP424 cooling supply-mass-flow positive-guard else-branch entry
+
+CP424 supersedes only CP423's physical-line-2339 structural exclusion. At
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked `PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`, it maps
+physical control line 2339 exactly:
+
+```cpp
+} else { // SupplyMassFlowRate is zero
+```
+
+Physical lines 2335 through 2337 close the nested positive-flow statements
+and physical line 2338 is blank. Line 2339 is the structural sibling else of
+CP330's physical-line-2183 strict `SupplyMassFlowRate > 0.0` guard. CP424 maps
+only that retained guard-false fallthrough: it is not a CP423 active-body exit,
+a closing delimiter, a branch merge, or unconditional entry. Its exact sole
+source site is
+`enter-cooling-supply-mass-flow-positive-guard-else-branch-after-guard-false-fallthrough`.
+Physical executable line 2340, `SupplyEnthalpy = MixedAirEnthalpy;`, is first
+excluded and the CP425 candidate. Its operand read and assignment, the
+humidity-ratio and temperature copies, the two positive-zero output
+assignments, the closing delimiter, and all later behavior remain excluded.
+
+CP424 preserves CP423's 59 flattened conceptual outcomes one-for-one. Only
+the retained positive-guard-false outcome at logical index 2 enters the sole
+site; the other 58 outcomes execute zero CP424 sites. Exact totals are
+`T424=59`, `Z424=58`, `E424=1`, and `S424=E424=1`. Public/private remains
+19/40, and logical index 2 is the sole active public outcome; there is no
+active private outcome. Exactly two width-36 arrays retain the predecessor
+route counts and the CP424 else-entry counts.
+
+Same-call bit-exact CP423 lifecycle, snapshot, latest, private witness, and
+completion evidence are the sole immediate predecessor and route authority.
+The retained CP423 positive-guard-false marker proves entry; absence of a
+CP423 supply-temperature assignment alone is insufficient because 58 other
+outcomes also skip CP423's active arithmetic. CP424 takes no active scalar
+input and does not re-read supply mass flow or re-evaluate CP330's comparison.
+It performs no selector or owner read, comparison, arithmetic, assignment,
+psychrometric evaluation, finite/range gate, clamp, normalization, default,
+diagnostic, cache, or mutable-service operation. CP330's raw strict-guard
+semantics and earlier exact-direct positive-zero lineage remain predecessor
+evidence rather than new CP424 behavior.
+
+The lossless snapshot preserves CP423's exact first 262 fields and appends
+only the Boolean
+`cooling_supply_mass_flow_positive_guard_else_branch_entered`, for exactly
+263 base fields, ninety-four `Option<f64>` carriers, two optional comparison
+bools, and one optional control enum. JSON preserves CP423's exact first 356
+keys and appends only the marker key, for 357 unique keys with the same
+ninety-four immediately adjacent authoritative IEEE sidecars. Terminal W/H/T
+presence and bit-exact preservation are 36/41/56. CP424 acquires no numerical
+owner, and the sole entry route carries no terminal W/H/T value.
+
+Binding is CP423-to-CP424-to-unchanged-numerical, and the binding checkpoint
+count advances from 114 to 115. CP424 adds no numerical, coupling-input, or
+output DTO field. Its evidence never feeds or replaces prediction, numerical
+results, feedback, nodes, loads, reports, or outputs; non-direct paths reject
+CP424 lifecycle evidence. CP424 adds no support, readiness, capability,
+routine, algorithm, numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
+inventory becomes 362 total, 240 public, 122 internal, zero unused, zero
+unreachable, with 238 development commands.

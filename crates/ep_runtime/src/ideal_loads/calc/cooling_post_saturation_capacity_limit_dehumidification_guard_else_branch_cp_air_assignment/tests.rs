@@ -492,3 +492,4 @@ fn option_bits_equal(left: Option<f64>, right: Option<f64>) -> bool {
 mod successor_fixture;
 
 pub(in crate::ideal_loads::calc) use successor_fixture::cp419_all_snapshots_for_successor_tests;
+pub(in crate::ideal_loads::calc) use committed::cp419_fixture_unit_for_successor_tests;
