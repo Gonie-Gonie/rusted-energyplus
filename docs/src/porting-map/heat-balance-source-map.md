@@ -40298,3 +40298,80 @@ output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
 Script inventory becomes 360 total, 240 public, 120 internal, zero unused,
 zero unreachable, with 238 development commands.
+
+## CP423 post-saturation capacity-limit dehumidification-guard else-branch sensible-output supply-temperature assignment
+
+CP423 supersedes only CP422's physical-line-2334 executable exclusion. At
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked PurchasedAirManager.cc SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`, it maps
+physical executable line 2334 exactly:
+`PurchAir.SupplyTemp = PurchAir.MixedAirTemp - CoolSensOutput /
+(SupplyMassFlowRate * CpAir);`. Lines 2335 through 2337 are closing delimiters
+and line 2338 is blank. Physical line 2339,
+`} else { // SupplyMassFlowRate is zero`, is the first excluded structural
+outer-zero-flow else entry and the CP424 candidate. Physical executable line
+2340, `SupplyEnthalpy = MixedAirEnthalpy;`, is the first excluded executable.
+
+The exact eight dependency-ordered sites are
+`read-purchased-air-mixed-air-temperature-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-difference-minuend`,
+`read-local-cooling-sensible-output-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-quotient-numerator`,
+`read-retained-supply-mass-flow-rate-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-denominator-first-factor`,
+`read-retained-cp-air-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-denominator-second-factor`,
+`calculate-supply-mass-flow-rate-times-cp-air-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-denominator`,
+`calculate-cooling-sensible-output-divided-by-air-capacity-rate-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-drop`,
+`calculate-mixed-air-temperature-minus-sensible-temperature-drop-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature`,
+and
+`assign-purchased-air-supply-temperature-for-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-case`.
+Deterministic Rust dependency and text order makes no broader C++ operand
+evaluation-order claim.
+
+CP423 preserves CP422's 59 outcomes without adding a branch. The 49 inherited
+inactive outcomes and five predecessor guard-false outcomes execute zero
+CP423 sites. Each of the five CP422 assignment outcomes executes all eight
+sites and becomes a supply-temperature assignment. Exact totals are T423=59,
+I423=49, F421=5, Z423=54, A423=5, and S423=8*A423=40. Public/private remains
+19/40; active logical indices are 4, 7, 10, 13, and 16, with public indices
+4 and 7. Exactly three width-36 arrays retain predecessor, predecessor
+guard-false, and supply-temperature-assignment route counts.
+
+Same-call bit-exact sealed CP422 is the sole immediate route predecessor and
+active `CoolSensOutput` owner. Sealed same-call CP329 solely owns
+`MixedAirTemp`; sealed CP330 solely owns positive `SupplyMassFlowRate`, with
+CP329 bit corroboration; and CP419 solely owns local `CpAir`, retained
+bit-exactly through CP422. Earlier maximum-capacity lineage, caller, model,
+sizing, service, Zone, inferred, and numerical-DTO values are forbidden
+substitutes. Inactive routes acquire no active formula owner.
+
+The source AST remains exactly `mixed_air_temperature -
+(cooling_sensible_output / (supply_mass_flow_rate * cp_air))`, preserving the
+denominator factor order, division, and subtraction. CP423 adds no reciprocal,
+reassociation, distribution, FMA, `mul_add`, clamp, normalization, tolerance,
+finite coercion, or new finite-result gate. Nonfinite numeric JSON projections
+are null while adjacent IEEE sidecars remain authoritative. Public,
+coupled-runtime, and pipeline hot validation uses sealed CP422, CP329, and
+CP330 evidence, the validated CP423 route, and bounded prefix/local checks,
+with zero recursive `completed_`, `snapshot_is_exact`, generic
+`predecessor_route`, or private-characterization calls; cold recursion remains
+private and test-only.
+
+The lossless snapshot has exactly 262 base fields, ninety-four `Option<f64>`
+carriers, two optional comparison bools, one optional control enum, and 356
+unique JSON keys with ninety-four immediately adjacent authoritative IEEE
+sidecars. It preserves CP422's exact first 231 fields, appends predecessor
+CP422 W/H/T, the exact 25-field CP423 execution, owner, read, arithmetic, and
+assignment block with no preexisting-SupplyTemp carrier, and re-emits final
+W/H/T. JSON preserves CP422's exact first 311 keys and appends an exact
+45-key tail. Terminal W/H/T presence is 36/41/56, unchanged preservation is
+36/41/51, and CP423 owns exactly five resulting supply-temperature values.
+
+Binding is CP422-to-CP423-to-unchanged-numerical and the binding checkpoint
+count advances from 113 to 114. CP423 adds no numerical, coupling-input, or
+output DTO field. Its evidence never feeds or replaces prediction, numerical
+results, feedback, nodes, loads, reports, or outputs; non-direct paths reject
+CP423 lifecycle evidence. CP423 adds no support, readiness, capability,
+routine, algorithm, numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
+Script inventory becomes 361 total, 240 public, 121 internal, zero unused,
+zero unreachable, with 238 development commands.

@@ -405,14 +405,14 @@ fn predecessor_fixture(
     body_entered: bool,
     prefer_guard_false_route: bool,
 ) -> Predecessor {
-    predecessor_fixture_with_state(predecessor_index, body_entered, prefer_guard_false_route).1
+    predecessor_fixture_with_state(predecessor_index, body_entered, prefer_guard_false_route).2
 }
 
 fn predecessor_fixture_with_state(
     predecessor_index: usize,
     body_entered: bool,
     prefer_guard_false_route: bool,
-) -> (Cp418State, Predecessor) {
+) -> (Cp417State, Cp418State, Predecessor) {
     let route = all_routes()
         .into_iter()
         .find(|route| {
@@ -427,10 +427,11 @@ fn predecessor_fixture_with_state(
     let owner = body_entered.then(|| matching_mixed_air_owner(cp414, 17.0));
     let cp415 = advance_cp415(&mut Cp415State::new(cp414.system), cp414, owner).expect("CP415");
     let cp416 = advance_cp416(&mut Cp416State::new(cp415.system), cp415).expect("CP416");
-    let cp417 = advance_cp417(&mut Cp417State::new(cp416.system), cp416).expect("CP417");
+    let mut cp417_state = Cp417State::new(cp416.system);
+    let cp417 = advance_cp417(&mut cp417_state, cp416).expect("CP417");
     let mut state = Cp418State::new(cp417.system);
     let snapshot = advance_cp418(&mut state, cp417).expect("CP418");
-    (state, snapshot)
+    (cp417_state, state, snapshot)
 }
 
 fn matching_mixed_air_owner(

@@ -2,6 +2,9 @@
 
 use serde_json::{Map, Value, json};
 
+#[path = "cp423_assertions.rs"]
+mod cp423_assertions;
+
 const CP421_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard_lifecycle";
 const CP422_KEY: &str = "purchased_air_calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment_lifecycle";
 const ORDER: [&str; 2] = [
@@ -192,6 +195,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         );
     }
     assert!(!results.to_string().contains(CP422_KEY));
+    cp423_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -200,6 +204,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP422_KEY].is_null(),
         "non-direct runtime must not publish CP422 evidence"
     );
+    cp423_assertions::assert_non_direct(runtime);
 }
 
 fn count(value: &Value, field: &str) -> u64 {

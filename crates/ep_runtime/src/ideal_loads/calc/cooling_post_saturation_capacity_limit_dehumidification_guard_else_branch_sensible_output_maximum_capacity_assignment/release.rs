@@ -23,17 +23,32 @@ use crate::ideal_loads::{
 };
 
 mod error;
+mod committed;
 mod prefix;
 mod runtime_validation;
 mod snapshot_validation;
 
 pub use error::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputMaximumCapacityAssignmentError;
+pub(in crate::ideal_loads::calc) use committed::cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment_committed_latest_route_and_assigned_cooling_sensible_output;
 use runtime_validation::{pending_state_is_consistent, post_transition_state_is_consistent};
 #[cfg(test)]
 pub(super) fn state_counts_are_consistent_for_test(state: &State) -> bool {
     runtime_validation::state_counts_are_consistent(state)
 }
 use snapshot_validation::{prefix_and_local_shape_match, snapshot_is_exact, snapshots_match_bit_exact};
+
+pub(in crate::ideal_loads::calc) fn cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment_snapshot_route(
+    snapshot: Snapshot,
+) -> Option<super::transition::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputMaximumCapacityAssignmentRetainedRoute> {
+    snapshot_validation::snapshot_route(snapshot)
+}
+
+pub(in crate::ideal_loads::calc) fn cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment_retained_route_matches_snapshot_bounded(
+    snapshot: Snapshot,
+    route: super::transition::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputMaximumCapacityAssignmentRetainedRoute,
+) -> bool {
+    snapshot_validation::retained_route_matches_snapshot_bounded(snapshot, route)
+}
 
 /// Losslessly reconstructs the CP421 predecessor retained in a CP422 snapshot.
 #[must_use]

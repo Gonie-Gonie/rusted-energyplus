@@ -4095,7 +4095,6 @@ foreach ($cp321Doc in @(
     Assert-Contains -Path $cp321Doc -Pattern 'CP321' -Description "CP321 documentation boundary"
     Assert-Contains -Path $cp321Doc -Pattern '2155' -Description "CP321 first excluded executable documentation"
 }
-
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp322-cooling-supply-mass-flow-maximum.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp323-cooling-supply-mass-flow-ems-override-guard.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp324-cooling-supply-mass-flow-ems-override-body.ps1")
@@ -4197,4 +4196,5 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp420-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-assignment.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp421-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-guard.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp422-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-maximum-capacity-assignment.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp423-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-assignment.ps1")
 Write-Host "IdealLoads structure audit complete."

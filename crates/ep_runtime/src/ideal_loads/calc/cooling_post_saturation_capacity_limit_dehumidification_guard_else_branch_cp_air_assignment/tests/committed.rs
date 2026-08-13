@@ -1,7 +1,10 @@
 use super::*;
 use crate::ideal_loads::PurchasedAirRuntimeState;
 use crate::ideal_loads::calc::cooling_mixed_air_call::release_tests::release_case;
-use crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_committed_latest_route;
+use crate::ideal_loads::calc::{
+    cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_committed_latest_route,
+    cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_committed_latest_route_and_cp_air,
+};
 
 #[test]
 fn cp419_route_owner_accepts_exact_latest_witness_count_route_ordinal_and_value() {
@@ -88,13 +91,128 @@ fn cp419_route_owner_rejects_latest_witness_count_route_ordinal_and_value_forger
     }
 }
 
+#[test]
+fn cp419_route_owner_rejects_each_retained_route_component_forgery() {
+    let (runtime, key, snapshot) = completed_case();
+    let mut cases = Vec::new();
+
+    let mut logical_index = runtime.clone();
+    logical_index
+        .units
+        .get_mut(&key)
+        .expect("unit")
+        .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment
+        .latest_route
+        .as_mut()
+        .expect("route")
+        .logical_index = 5;
+    cases.push(logical_index);
+
+    macro_rules! flip_route_marker {
+        ($field:ident) => {{
+            let mut case = runtime.clone();
+            let route = case
+                .units
+                .get_mut(&key)
+                .expect("unit")
+                .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment
+                .latest_route
+                .as_mut()
+                .expect("route");
+            route.$field = !route.$field;
+            cases.push(case);
+        }};
+    }
+    flip_route_marker!(predecessor_guard_false_fallthrough);
+    flip_route_marker!(predecessor_guard_body_entered);
+    flip_route_marker!(predecessor_saturation_temperature_assignment_executed);
+    flip_route_marker!(predecessor_saturation_temperature_mixed_air_limit_executed);
+    flip_route_marker!(predecessor_supply_humidity_ratio_assignment_executed);
+    flip_route_marker!(predecessor_supply_enthalpy_assignment_executed);
+    flip_route_marker!(active);
+
+    for case in cases {
+        assert!(
+            cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_committed_latest_route_and_cp_air(
+                case.units.get(&key).expect("unit"),
+                snapshot,
+            )
+            .is_none()
+        );
+    }
+}
+
+#[test]
+fn cp419_route_owner_rejects_coordinated_latest_and_witness_identity_forgery() {
+    let (runtime, key, snapshot) = completed_case();
+    let mut cases = Vec::new();
+
+    let mut system = runtime.clone();
+    let latest = system
+        .units
+        .get_mut(&key)
+        .expect("unit")
+        .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment
+        .latest
+        .as_mut()
+        .expect("latest");
+    latest.system = ep_model::IdealLoadsAirSystemId(latest.system.0.wrapping_add(1));
+    let witness = *latest;
+    cases.push((system, witness));
+
+    let mut zone = runtime.clone();
+    let latest = zone
+        .units
+        .get_mut(&key)
+        .expect("unit")
+        .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment
+        .latest
+        .as_mut()
+        .expect("latest");
+    latest.controlled_zone = ep_model::ZoneId(latest.controlled_zone.0.wrapping_add(1));
+    let witness = *latest;
+    cases.push((zone, witness));
+
+    let mut ordinal = runtime.clone();
+    let latest = ordinal
+        .units
+        .get_mut(&key)
+        .expect("unit")
+        .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment
+        .latest
+        .as_mut()
+        .expect("latest");
+    latest.parent_call_ordinal = latest.parent_call_ordinal.wrapping_add(1);
+    let witness = *latest;
+    cases.push((ordinal, witness));
+
+    for (case, witness) in cases {
+        assert!(
+            cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_committed_latest_route_and_cp_air(
+                case.units.get(&key).expect("unit"),
+                witness,
+            )
+            .is_none()
+        );
+    }
+
+    assert!(
+        cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_committed_latest_route_and_cp_air(
+            runtime.units.get(&key).expect("unit"),
+            snapshot,
+        )
+        .is_some()
+    );
+}
+
 fn completed_case() -> (
     PurchasedAirRuntimeState,
     ep_model::IdealLoadsAirSystemId,
     Snapshot,
 ) {
     let (mut runtime, system, _, _) = release_case();
-    let (cp418_state, predecessor) = predecessor_fixture_with_state(4, false, false);
+    let (cp417_state, cp418_state, predecessor) =
+        predecessor_fixture_with_state(4, false, false);
     let mut cp419_state = State::new(predecessor.system);
     let snapshot =
         advance(&mut cp419_state, predecessor, active_input(predecessor)).expect("CP419");
@@ -105,6 +223,8 @@ fn completed_case() -> (
     unit.calc_entry.call_count = snapshot.parent_call_ordinal;
     unit.calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry =
         cp418_state;
+    unit.calc_cooling_post_saturation_capacity_limit_dehumidification_supply_enthalpy_assignment =
+        cp417_state;
     unit.calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment =
         cp419_state;
     (runtime, system.id, snapshot)

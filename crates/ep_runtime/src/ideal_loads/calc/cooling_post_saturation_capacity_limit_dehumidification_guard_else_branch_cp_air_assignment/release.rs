@@ -35,7 +35,7 @@ mod committed;
 mod error;
 mod runtime_validation;
 mod snapshot;
-pub(in crate::ideal_loads::calc) use committed::cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_committed_latest_route;
+#[rustfmt::skip] pub(in crate::ideal_loads::calc) use committed::{cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_committed_latest_route, cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_committed_latest_route_and_cp_air};
 pub use error::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchCpAirAssignmentError;
 use runtime_validation::{
     committed_predecessor_counts_match, pending_predecessor_counts_match,

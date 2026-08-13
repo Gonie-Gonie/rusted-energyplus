@@ -31,7 +31,7 @@ fn cp422_adapter_accepts_only_the_cp421_snapshot() {
 }
 
 #[test]
-fn cp422_extends_scheduled_binding_from_112_to_exactly_113_snapshots() {
+fn cp422_remains_in_the_extended_114_snapshot_binding() {
     let source = include_str!("scheduled_output.rs");
-    assert_eq!(source.matches("    pub calculation_").count(), 113);
+    assert_eq!(source.matches("    pub calculation_").count(), 114);
 }

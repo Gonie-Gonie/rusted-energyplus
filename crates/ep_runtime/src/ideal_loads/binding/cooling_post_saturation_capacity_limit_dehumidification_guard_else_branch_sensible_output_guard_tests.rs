@@ -29,7 +29,7 @@ fn cp421_does_not_feed_the_numerical_coupling_input() {
 }
 
 #[test]
-fn cp421_prefix_is_followed_by_cp422_in_the_113_snapshot_binding() {
+fn cp421_prefix_is_followed_by_cp422_in_the_114_snapshot_binding() {
     let source = include_str!("scheduled_output.rs");
-    assert_eq!(source.matches("    pub calculation_").count(), 113);
+    assert_eq!(source.matches("    pub calculation_").count(), 114);
 }

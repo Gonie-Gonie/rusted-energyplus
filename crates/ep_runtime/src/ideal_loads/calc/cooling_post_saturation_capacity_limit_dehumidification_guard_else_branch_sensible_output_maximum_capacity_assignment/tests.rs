@@ -245,3 +245,16 @@ fn nonzero_indices(values: &[usize; 36]) -> Vec<usize> {
         .filter_map(|(index, count)| (*count != 0).then_some(index))
         .collect()
 }
+
+pub(in crate::ideal_loads::calc) fn cp422_all_snapshots_for_successor_tests() -> Vec<super::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputMaximumCapacityAssignmentSnapshot> {
+    let predecessors = cp421_all_snapshots_for_successor_tests();
+    let mut state = State::new(predecessors[0].system);
+    predecessors
+        .into_iter()
+        .map(|predecessor| {
+            let route = successor_route_for(predecessor);
+            advance_validated(&mut state, predecessor, route, active_input(predecessor))
+                .expect("CP422 successor fixture")
+        })
+        .collect()
+}
