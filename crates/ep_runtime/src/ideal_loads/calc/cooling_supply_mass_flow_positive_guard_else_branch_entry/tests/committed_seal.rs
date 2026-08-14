@@ -10,7 +10,7 @@ use crate::ideal_loads::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumi
 #[test]
 fn cp424_committed_route_seal_accepts_entry_inactive_guard_false_and_assignment_routes() {
     for predecessor in representative_predecessors() {
-        let (unit, snapshot, route) = fixture_unit(predecessor);
+        let (unit, snapshot, route) = cp424_fixture_unit_for_successor_tests(predecessor);
         assert_eq!(committed(&unit, snapshot), Some(route));
     }
 }
@@ -18,7 +18,7 @@ fn cp424_committed_route_seal_accepts_entry_inactive_guard_false_and_assignment_
 #[test]
 fn cp424_committed_route_seal_rejects_route_count_ordinal_latest_witness_and_identity_forgery() {
     for predecessor in representative_predecessors() {
-        let (unit, snapshot, route) = fixture_unit(predecessor);
+        let (unit, snapshot, route) = cp424_fixture_unit_for_successor_tests(predecessor);
         let mut cases = Vec::new();
 
         let mut logical = unit.clone();
@@ -141,7 +141,7 @@ fn cp424_committed_route_seal_rejects_route_count_ordinal_latest_witness_and_ide
 #[test]
 fn cp329_committed_enthalpy_seal_accepts_exact_owner_and_rejects_value_witness_and_count_drift() {
     let predecessor = representative_predecessors()[0];
-    let (unit, _, _) = fixture_unit(predecessor);
+    let (unit, _, _) = cp424_fixture_unit_for_successor_tests(predecessor);
     let witness = unit.calc_cooling_mixed_air_call.latest.expect("CP329");
     let expected = witness
         .mixed_air_enthalpy_projection_j_per_kg
@@ -249,7 +249,7 @@ fn representative_predecessors() -> [Cp422Predecessor; 4] {
     representatives
 }
 
-fn fixture_unit(
+pub(in crate::ideal_loads::calc) fn cp424_fixture_unit_for_successor_tests(
     predecessor: Cp422Predecessor,
 ) -> (
     crate::ideal_loads::PurchasedAirUnitRuntimeState,

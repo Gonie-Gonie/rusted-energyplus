@@ -10,7 +10,10 @@ mod tests;
 mod transition;
 
 #[cfg(test)]
-pub(in crate::ideal_loads::calc) use tests::cp424_all_snapshots_for_successor_tests;
+pub(in crate::ideal_loads::calc) use tests::{
+    cp424_all_snapshots_for_successor_tests,
+    cp424_fixture_unit_for_successor_tests,
+};
 
 pub use release::{
     PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardElseBranchEntryError,

@@ -4196,5 +4196,5 @@ foreach ($cp321Doc in @(
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp421-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-guard.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp422-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-maximum-capacity-assignment.ps1")
 . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp423-cooling-post-saturation-capacity-limit-dehumidification-guard-else-branch-sensible-output-supply-temperature-assignment.ps1")
-. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp424-cooling-supply-mass-flow-positive-guard-else-branch-entry.ps1"); . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp425-cooling-zero-supply-mass-flow-supply-enthalpy-mixed-air-assignment.ps1")
+. (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp424-cooling-supply-mass-flow-positive-guard-else-branch-entry.ps1"); . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp425-cooling-zero-supply-mass-flow-supply-enthalpy-mixed-air-assignment.ps1"); . (Join-Path $PSScriptRoot "ideal-loads-structure-audit\cp426-cooling-zero-supply-mass-flow-supply-humidity-ratio-mixed-air-assignment.ps1")
 Write-Host "IdealLoads structure audit complete."

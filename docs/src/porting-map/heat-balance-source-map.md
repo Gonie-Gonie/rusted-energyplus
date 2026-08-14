@@ -40518,3 +40518,83 @@ output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
 inventory becomes 363 total, 240 public, 123 internal, zero unused, zero
 unreachable, with 238 development commands.
+
+## CP426 cooling zero supply-mass-flow supply-humidity-ratio mixed-air assignment
+
+CP426 supersedes only CP425's physical-line-2341 executable exclusion. At
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked `PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`, it maps
+physical executable line 2341 exactly:
+
+```cpp
+PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;
+```
+
+CP425 already owns the first zero-flow-body assignment and its retained
+else-entry authority. CP426 maps only the following purchased-air humidity
+ratio copy. Its exact two dependency-ordered source sites are
+`read-retained-mixed-air-humidity-ratio-for-zero-supply-mass-flow-supply-humidity-ratio-assignment`
+and
+`assign-purchased-air-supply-humidity-ratio-from-mixed-air-humidity-ratio-for-zero-supply-mass-flow`.
+The retained right-hand-side read precedes the purchased-air write as Rust
+dependency evidence without making a general C++ built-in `=` evaluation-order
+claim. Physical executable line 2342,
+`PurchAir.SupplyTemp = PurchAir.MixedAirTemp;`, is first excluded and the CP427
+candidate. Its temperature copy, the two positive-zero output assignments,
+the closing delimiter, and all later behavior remain excluded.
+
+CP426 preserves CP425's 59 flattened conceptual outcomes one-for-one. Only
+the retained zero-flow assignment outcome at logical index 2 executes both
+sites and performs the assignment; the other 58 outcomes execute zero CP426
+sites. Exact totals are `T426=59`, `Z426=58`, `A426=1`, and
+`S426=2*A426=2`. Public/private remains 19/40, logical index 2 is the sole
+active public outcome, and there is no active private outcome. Exactly two
+width-36 arrays retain the predecessor route counts and CP426 assignment
+route counts.
+
+Same-call bit-exact sealed CP425 lifecycle, snapshot, latest, private witness,
+completion evidence, and committed route are the sole immediate predecessor
+and execution authority. The inherited CP424 else-entry marker and the CP425
+enthalpy assignment marker are both mandatory; mere absence of any unrelated
+assignment cannot activate CP426. The active right-hand side comes only from
+the sealed same-call CP329 committed `mixed_air_humidity_ratio` owner, with
+matching selected system, call ordinal, controlled Zone, exact no-OA shape,
+retained state, latest snapshot, witness, and raw bits. Caller, model, service,
+Zone, earlier humidity-ratio, inferred, and numerical-DTO values cannot
+substitute. Inactive routes acquire no CP329 humidity owner and perform no
+read.
+
+The assignment copies the CP329 binary64 payload bit-exactly into
+`PurchAir.SupplyHumRat`. There is deliberately no active preexisting-LHS
+operand because the unconditional source assignment overwrites that field
+before later use. CP426 adds no arithmetic, comparison, psychrometric
+evaluation, finite/range gate, clamp, normalization, default, diagnostic,
+cache, or mutable-service operation. Exact direct CP329 evidence already
+constrains the retained humidity ratio; defensive pure-transition bit
+characterization does not widen direct release reachability.
+
+The lossless snapshot preserves CP425 fields 0 through 271 exactly, renames
+CP425's terminal W/H/T as the predecessor-CP425 triple, appends an exact
+nine-field CP426 execution, owner, read, assignment, and result block, and
+re-emits final W/H/T. It therefore has exactly 287 base fields, 104
+`Option<f64>` carriers, two optional comparison bools, and one optional
+control enum. JSON preserves CP425's exact first 368 nonterminal keys and
+appends an exact 23-key tail comprising the renamed predecessor W/H/T with
+sidecars, the local block with two sidecars, and final W/H/T with sidecars,
+for 391 unique keys and 104 immediately adjacent authoritative IEEE
+sidecars. CP425 predecessor and unchanged W/H/T presence is 36/42/56. Final
+W/H/T presence is 37/42/56, and CP426 owns the one newly resulting
+supply-humidity-ratio value.
+
+Binding is CP425-to-CP426-to-unchanged-numerical, while preserving the
+CP424-to-CP425 interval, and the binding checkpoint count advances from 116
+to 117. CP426 adds no numerical, coupling-input, or output DTO field. Its
+evidence never feeds or replaces prediction, numerical results, feedback,
+nodes, loads, reports, or outputs; non-direct paths reject CP426 lifecycle
+evidence. CP426 adds no support, readiness, capability, routine, algorithm,
+numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
+inventory becomes 364 total, 240 public, 124 internal, zero unused, zero
+unreachable, with 238 development commands.

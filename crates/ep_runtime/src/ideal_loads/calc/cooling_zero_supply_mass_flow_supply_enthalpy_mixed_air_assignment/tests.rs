@@ -1,6 +1,7 @@
 //! CP425 boundary, exhaustive route, forgery, preservation, and overflow tests.
 
 mod schema_prefix;
+mod committed_seal;
 
 use super::transition::{
     PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyEnthalpyMixedAirAssignmentRetainedRoute as Route,
@@ -285,5 +286,18 @@ fn nonzero_indices(values: &[usize; 36]) -> Vec<usize> {
         .iter()
         .enumerate()
         .filter_map(|(index, count)| (*count != 0).then_some(index))
+        .collect()
+}
+
+pub(in crate::ideal_loads::calc) fn cp425_all_snapshots_for_successor_tests(
+) -> Vec<super::PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyEnthalpyMixedAirAssignmentSnapshot> {
+    cp424_all_snapshots_for_successor_tests()
+        .into_iter()
+        .map(|predecessor| {
+            let route = route_for(predecessor);
+            let rhs = route.assignment_executed.then_some(42_000.0);
+            advance_validated(&mut State::new(predecessor.system), predecessor, route, rhs)
+                .expect("CP425 successor snapshot")
+        })
         .collect()
 }

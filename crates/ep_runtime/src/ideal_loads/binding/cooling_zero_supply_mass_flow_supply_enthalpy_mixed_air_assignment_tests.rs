@@ -29,11 +29,16 @@ fn cp425_adapter_accepts_only_the_cp424_snapshot() {
 }
 
 #[test]
-fn cp425_extends_scheduled_binding_from_115_to_exactly_116_snapshots() {
-    assert_eq!(
-        include_str!("scheduled_output.rs")
-            .matches("    pub calculation_")
-            .count(),
-        116
-    );
+fn cp425_is_preserved_before_cp426_in_current_117_snapshot_binding() {
+    let source = include_str!("scheduled_output.rs");
+    assert_eq!(source.matches("    pub calculation_").count(), 117);
+    let cp425 = source
+        .find("calculation_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment")
+        .expect("CP425 output");
+    let cp426 = source
+        .find(
+            "calculation_cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment",
+        )
+        .expect("CP426 output");
+    assert!(cp425 < cp426);
 }

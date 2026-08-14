@@ -25,15 +25,30 @@ use crate::ideal_loads::{
 };
 
 mod error;
+mod committed;
 mod prefix;
 mod runtime_validation;
 mod snapshot_validation;
 
 pub use error::PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyEnthalpyMixedAirAssignmentError;
+pub(in crate::ideal_loads::calc) use committed::cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment_committed_latest_route;
 use runtime_validation::{pending_state_is_consistent, post_transition_state_is_consistent};
 use snapshot_validation::{
     prefix_and_local_shape_match, snapshot_is_exact, snapshots_match_bit_exact,
 };
+
+pub(in crate::ideal_loads::calc) fn cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment_snapshot_route(
+    snapshot: Snapshot,
+) -> Option<super::transition::PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyEnthalpyMixedAirAssignmentRetainedRoute> {
+    snapshot_validation::snapshot_route(snapshot)
+}
+
+pub(in crate::ideal_loads::calc) fn cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment_retained_route_matches_snapshot_bounded(
+    snapshot: Snapshot,
+    route: super::transition::PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyEnthalpyMixedAirAssignmentRetainedRoute,
+) -> bool {
+    snapshot_validation::retained_route_matches_snapshot_bounded(snapshot, route)
+}
 
 /// Losslessly reconstructs the CP424 predecessor retained in CP425.
 #[must_use]
