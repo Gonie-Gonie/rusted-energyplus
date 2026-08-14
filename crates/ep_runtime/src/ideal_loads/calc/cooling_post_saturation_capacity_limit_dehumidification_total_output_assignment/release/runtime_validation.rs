@@ -131,6 +131,24 @@ pub(in crate::ideal_loads::calc) fn completed_state_is_consistent(
     )
 }
 
+pub(in crate::ideal_loads::calc) fn committed_latest_snapshot_is_consistent(
+    unit: &PurchasedAirUnitRuntimeState,
+    system: IdealLoadsAirSystemId,
+    snapshot: Snapshot,
+    witness: Snapshot,
+) -> bool {
+    unit.system == system
+        && unit.calc_entry.system == system
+        && unit.init_call_count != 0
+        && unit.init_call_count == unit.calc_entry.call_count
+        && snapshot.system == system
+        && snapshot.parent_call_ordinal == unit.init_call_count
+        && unit.controlled_zone == Some(snapshot.controlled_zone)
+        && snapshots_match_bit_exact(snapshot, witness)
+        && completed_state_is_consistent(unit, snapshot, Some(witness))
+        && cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment_snapshot_is_exact_direct_release(snapshot)
+}
+
 fn completed_state_parts(
     unit: &PurchasedAirUnitRuntimeState,
     state: &State,

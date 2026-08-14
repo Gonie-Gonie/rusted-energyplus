@@ -56,6 +56,39 @@ fn cp380_source_boundary_and_order_are_exact() {
     );
 }
 
+#[test]
+fn cp380_lineage_validation_uses_only_bounded_committed_seals() {
+    let source = include_str!("../release/prefix_validation.rs");
+    let predecessor_validation = source
+        .split("pub(super) fn direct_predecessor_is_retained_and_complete")
+        .nth(1)
+        .expect("CP379 predecessor validator")
+        .split("pub(super) fn direct_selector_lineage_is_retained_and_complete")
+        .next()
+        .expect("bounded CP379 validator body");
+
+    assert!(predecessor_validation.contains(
+        "cooling_supply_enthalpy_post_saturation_assignment_committed_latest_snapshot_is_consistent"
+    ));
+    assert!(!predecessor_validation.contains(
+        "completed_direct_cooling_supply_enthalpy_post_saturation_assignment_is_consistent"
+    ));
+
+    let selector_validation = source
+        .split("pub(super) fn direct_selector_lineage_is_retained_and_complete")
+        .nth(1)
+        .expect("CP337 selector validator")
+        .split("fn selector_lineage_matches_predecessor")
+        .next()
+        .expect("bounded CP337 validator body");
+    assert!(selector_validation.contains(
+        "cooling_positive_supply_capacity_limit_guard_committed_latest_snapshot_is_consistent"
+    ));
+    assert!(!selector_validation.contains(
+        "completed_direct_cooling_positive_supply_capacity_limit_guard_is_consistent"
+    ));
+}
+
 pub(in crate::ideal_loads::calc) fn active_input(limit: IdealLoadsLimit) -> Option<ActiveInput> {
     Some(ActiveInput {
         cooling_limit: limit,

@@ -10,8 +10,8 @@ use super::super::{
 };
 use super::snapshot_validation::{option_bits_match, snapshots_match_bit_exact};
 use crate::ideal_loads::calc::{
-    completed_direct_cooling_positive_supply_capacity_limit_sensible_output_guard_is_consistent,
     completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_assignment_is_consistent,
+    cooling_positive_supply_capacity_limit_sensible_output_guard_committed_latest_maximum_total_cooling_capacity,
     cooling_positive_supply_capacity_limit_sensible_output_guard_snapshots_match_bit_exact as cp340_snapshots_match_bit_exact,
     cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_assignment_snapshots_match_bit_exact as cp401_snapshots_match_bit_exact,
 };
@@ -113,13 +113,12 @@ pub(super) fn retained_active_input(
         })
         && cooling_positive_supply_capacity_limit_sensible_output_guard_snapshot_is_exact_direct_release(cp340)
         && cp340_snapshots_match_bit_exact(cp340, cp340_witness)
-        && completed_direct_cooling_positive_supply_capacity_limit_sensible_output_guard_is_consistent(
-            runtime,
+        && cooling_positive_supply_capacity_limit_sensible_output_guard_committed_latest_maximum_total_cooling_capacity(
             unit,
-            system,
-            cp340,
-            Some(cp340_witness),
-        );
+            cp321,
+            cp340_witness,
+        )
+        .is_some_and(|value| value.to_bits() == maximum_total_cooling_capacity_w.to_bits());
     if !same_call || !cp321_is_owner || !cp340_corroborates {
         return None;
     }

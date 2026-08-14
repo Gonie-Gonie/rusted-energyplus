@@ -34,6 +34,7 @@ use runtime_validation::{
     next_capacity_limit_sensible_output_assignment_transition_fits,
     pending_capacity_limit_sensible_output_assignment_state_is_consistent,
 };
+pub(in crate::ideal_loads::calc) use runtime_validation::committed_latest_snapshot_is_consistent as cooling_positive_supply_capacity_limit_sensible_output_assignment_committed_latest_snapshot_is_consistent;
 #[cfg(test)]
 pub(in crate::ideal_loads::calc) use runtime_validation::{
     next_capacity_limit_sensible_output_assignment_transition_fits as next_capacity_limit_sensible_output_assignment_transition_fits_for_test,

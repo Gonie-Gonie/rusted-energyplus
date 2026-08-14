@@ -292,6 +292,10 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardElseBranchEntryRuntimeState::new(
                     system,
                 ),
+            calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment:
+                PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyEnthalpyMixedAirAssignmentRuntimeState::new(
+                    system,
+                ),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

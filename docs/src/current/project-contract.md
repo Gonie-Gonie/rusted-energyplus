@@ -23644,3 +23644,81 @@ output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
 inventory becomes 362 total, 240 public, 122 internal, zero unused, zero
 unreachable, with 238 development commands.
+
+## CP425 cooling zero supply-mass-flow supply-enthalpy mixed-air assignment
+
+CP425 supersedes only CP424's physical-line-2340 executable exclusion. At
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked `PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`, it maps
+physical executable line 2340 exactly:
+
+```cpp
+SupplyEnthalpy = MixedAirEnthalpy;
+```
+
+CP424 already owns the physical-line-2339 positive-supply-guard else entry.
+CP425 maps only the first assignment in that zero-flow body. Its exact two
+dependency-ordered source sites are
+`read-retained-mixed-air-enthalpy-for-zero-supply-mass-flow-supply-enthalpy-assignment`
+and
+`assign-local-supply-enthalpy-from-mixed-air-enthalpy-for-zero-supply-mass-flow`.
+The retained right-hand-side read precedes the local write as Rust dependency
+evidence without making a general C++ built-in `=` evaluation-order claim.
+Physical executable line 2341,
+`PurchAir.SupplyHumRat = PurchAir.MixedAirHumRat;`, is first excluded and the
+CP426 candidate. Its humidity-ratio copy, the following temperature copy, the
+two positive-zero output assignments, the closing delimiter, and all later
+behavior remain excluded.
+
+CP425 preserves CP424's 59 flattened conceptual outcomes one-for-one. Only
+the retained zero-flow else-entry outcome at logical index 2 executes both
+sites and performs the assignment; the other 58 outcomes execute zero CP425
+sites. Exact totals are `T425=59`, `Z425=58`, `A425=1`, and
+`S425=2*A425=2`. Public/private remains 19/40, logical index 2 is the sole
+active public outcome, and there is no active private outcome. Exactly two
+width-36 arrays retain the predecessor route counts and CP425 assignment
+route counts.
+
+Same-call bit-exact sealed CP424 lifecycle, snapshot, latest, private witness,
+completion evidence, and committed route are the sole immediate predecessor
+and execution authority. CP424's retained else-entry marker is mandatory;
+mere absence of any earlier assignment cannot activate CP425. The active
+right-hand side comes only from the sealed same-call CP329 committed
+`mixed_air_enthalpy_projection_j_per_kg` owner, with matching selected system,
+call ordinal, controlled Zone, exact no-OA shape, retained state, latest
+snapshot, witness, and raw bits. Caller, model, service, Zone, earlier
+enthalpy, inferred, and numerical-DTO values cannot substitute. Inactive
+routes acquire no CP329 owner and perform no read.
+
+The assignment copies the CP329 binary64 payload bit-exactly into local
+SupplyEnthalpy. There is deliberately no preexisting-LHS carrier because the
+unconditional source assignment overwrites that local value before any use.
+CP425 adds no arithmetic, comparison, psychrometric evaluation, finite/range
+gate, clamp, normalization, default, diagnostic, cache, or mutable-service
+operation. The exact direct CP329 owner is already finite; defensive pure
+transition bit characterization does not widen direct release reachability.
+
+The lossless snapshot preserves CP424 fields 0 through 258 exactly, renames
+CP424's terminal W/H/T as the predecessor-CP424 triple, carries the inherited
+CP424 else-entry marker, appends exactly nine CP425 execution, owner, read,
+assignment, and result fields, and re-emits final W/H/T. It therefore has
+exactly 275 base fields, ninety-nine `Option<f64>` carriers, two optional
+comparison bools, and one optional control enum. JSON preserves CP424's exact
+first 350 nonterminal keys and appends an exact 24-key tail comprising the
+renamed predecessor W/H/T with sidecars, inherited marker, local block with
+two sidecars, and final W/H/T with sidecars, for 374 unique keys and
+ninety-nine immediately adjacent authoritative IEEE sidecars. Terminal W/H/T
+presence is 36/42/56; unchanged preservation is 36/41/56, and CP425 owns the
+one newly resulting supply-enthalpy value.
+
+Binding is CP424-to-CP425-to-unchanged-numerical, and the binding checkpoint
+count advances from 115 to 116. CP425 adds no numerical, coupling-input, or
+output DTO field. Its evidence never feeds or replaces prediction, numerical
+results, feedback, nodes, loads, reports, or outputs; non-direct paths reject
+CP425 lifecycle evidence. CP425 adds no support, readiness, capability,
+routine, algorithm, numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
+inventory becomes 363 total, 240 public, 123 internal, zero unused, zero
+unreachable, with 238 development commands.

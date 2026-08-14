@@ -1,6 +1,6 @@
 //! Persistent CP407 runtime-state and latest-witness validation.
 
-use ep_model::IdealLoadsAirSystemId;
+use ep_model::{IdealLoadsAirSystem, IdealLoadsAirSystemId};
 
 use super::super::transition::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSupplyHumidityRatioLatentOutputSupplyTemperatureAssignmentActiveOwners as ActiveOwners;
 use super::super::{
@@ -109,6 +109,40 @@ pub(in crate::ideal_loads) fn cooling_post_saturation_capacity_limit_dehumidific
         && predecessor_counts_match(
             state,
             &unit.calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry,
+        )
+}
+
+/// Bounded committed snapshot/state proof for the immediate successor.
+pub(in crate::ideal_loads::calc) fn committed_latest_snapshot_is_consistent(
+    unit: &PurchasedAirUnitRuntimeState,
+    system: &IdealLoadsAirSystem,
+    latest: Snapshot,
+    witness: Snapshot,
+) -> bool {
+    let state = &unit
+        .calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment;
+    let Some(calc_entry_latest) = unit.calc_entry.latest else {
+        return false;
+    };
+    system.id == unit.system
+        && state.system == unit.system
+        && latest.system == system.id
+        && witness.system == system.id
+        && unit.calc_entry.system == system.id
+        && calc_entry_latest.system == system.id
+        && state.transition_count > 0
+        && state.transition_count == unit.init_call_count
+        && state.transition_count == unit.calc_entry.call_count
+        && latest.parent_call_ordinal == state.transition_count
+        && witness.parent_call_ordinal == state.transition_count
+        && calc_entry_latest.call_ordinal == state.transition_count
+        && unit.controlled_zone == Some(latest.controlled_zone)
+        && witness.controlled_zone == latest.controlled_zone
+        && calc_entry_latest.controlled_zone == latest.controlled_zone
+        && snapshot_route(latest).is_some()
+        && completed_state_is_consistent(unit, latest, Some(witness))
+        && super::snapshot_validation::cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment_snapshot_is_exact_direct_release(
+            latest,
         )
 }
 

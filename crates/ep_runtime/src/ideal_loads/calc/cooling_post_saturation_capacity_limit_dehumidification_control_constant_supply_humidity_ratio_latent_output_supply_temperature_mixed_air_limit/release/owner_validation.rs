@@ -8,8 +8,8 @@ use super::super::{
     advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_limit_state as advance,
 };
 use crate::ideal_loads::calc::{
-    completed_direct_cooling_mixed_air_call_is_consistent,
-    completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment_is_consistent,
+    cooling_mixed_air_call_committed_latest_sensible_output_inputs,
+    cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment_committed_latest_snapshot_is_consistent,
 };
 use crate::ideal_loads::{
     PurchasedAirCalcCoolingMixedAirCallSnapshot as MixedAirOwner,
@@ -37,13 +37,14 @@ pub(super) fn direct_predecessor_is_retained_and_complete(
             crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment_snapshots_match_bit_exact(witness, predecessor)
         })
         && cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment_snapshot_is_exact_direct_release(predecessor)
-        && completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment_is_consistent(
-            runtime,
-            unit,
-            system,
-            predecessor,
-            witness,
-        )
+        && witness.is_some_and(|witness| {
+            cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment_committed_latest_snapshot_is_consistent(
+                unit,
+                system,
+                predecessor,
+                witness,
+            )
+        })
 }
 
 pub(super) fn active_owner_from_retained_runtime(
@@ -54,17 +55,17 @@ pub(super) fn active_owner_from_retained_runtime(
 ) -> Option<MixedAirOwner> {
     let owner = unit.calc_cooling_mixed_air_call.latest?;
     let witness = runtime.cooling_mixed_air_call_latest_witness(system.id)?;
+    let committed =
+        cooling_mixed_air_call_committed_latest_sensible_output_inputs(unit, witness)?;
     if !same_identity(predecessor, owner)
         || !owner.mixed_air_temperature_assigned
         || !cooling_mixed_air_call_snapshot_is_exact_direct_release(owner)
         || !cooling_mixed_air_call_snapshots_match_bit_exact(owner, witness)
-        || !completed_direct_cooling_mixed_air_call_is_consistent(
-            runtime,
-            unit,
-            system,
-            owner,
-            Some(witness),
-        )
+        || owner
+            .mixed_air_temperature_c
+            .is_none_or(|temperature| {
+                temperature.to_bits() != committed.mixed_air_temperature_c.to_bits()
+            })
     {
         return None;
     }

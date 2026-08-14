@@ -3,6 +3,7 @@
 mod overflow;
 mod schema_ieee;
 mod committed_seal;
+pub(in crate::ideal_loads::calc) use committed_seal::cp423_fixture_unit_for_successor_tests;
 
 use super::transition::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputSupplyTemperatureAssignmentRetainedRoute as Route,

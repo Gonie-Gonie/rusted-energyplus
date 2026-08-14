@@ -4,9 +4,11 @@ use ep_model::IdealLoadsAirSystem;
 
 use super::super::PurchasedAirCalcCoolingPostSaturationCapacityLimitGuardSnapshot as Snapshot;
 use super::snapshot_validation::snapshot_links_to_predecessor;
-use crate::ideal_loads::calc::cooling_positive_supply_capacity_limit_guard::completed_direct_cooling_positive_supply_capacity_limit_guard_is_consistent;
+use crate::ideal_loads::calc::cooling_positive_supply_capacity_limit_guard::{
+    cooling_positive_supply_capacity_limit_guard_committed_latest_snapshot_is_consistent,
+};
 use crate::ideal_loads::calc::cooling_supply_enthalpy_post_saturation_assignment::{
-    completed_direct_cooling_supply_enthalpy_post_saturation_assignment_is_consistent,
+    cooling_supply_enthalpy_post_saturation_assignment_committed_latest_snapshot_is_consistent,
     cooling_supply_enthalpy_post_saturation_assignment_snapshots_match_bit_exact as cp379_snapshots_match_bit_exact,
 };
 use crate::ideal_loads::{
@@ -48,12 +50,8 @@ pub(super) fn direct_predecessor_is_retained_and_complete(
         && cooling_supply_enthalpy_post_saturation_assignment_snapshot_is_exact_direct_release(
             predecessor,
         )
-        && completed_direct_cooling_supply_enthalpy_post_saturation_assignment_is_consistent(
-            runtime,
-            unit,
-            system,
-            predecessor,
-            Some(witness),
+        && cooling_supply_enthalpy_post_saturation_assignment_committed_latest_snapshot_is_consistent(
+            unit, witness,
         )
 }
 
@@ -77,12 +75,8 @@ pub(super) fn direct_selector_lineage_is_retained_and_complete(
     retained == witness
         && selector_lineage_matches_predecessor(retained, predecessor, system)
         && cooling_positive_supply_capacity_limit_guard_snapshot_is_exact_direct_release(retained)
-        && completed_direct_cooling_positive_supply_capacity_limit_guard_is_consistent(
-            runtime,
-            unit,
-            system,
-            retained,
-            Some(witness),
+        && cooling_positive_supply_capacity_limit_guard_committed_latest_snapshot_is_consistent(
+            unit, system, witness,
         )
 }
 

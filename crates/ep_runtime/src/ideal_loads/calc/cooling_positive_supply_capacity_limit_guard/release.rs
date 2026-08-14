@@ -37,6 +37,7 @@ pub(in crate::ideal_loads::calc) use runtime_validation::{
     pending_capacity_limit_guard_state_is_consistent as pending_capacity_limit_guard_state_is_consistent_for_test,
 };
 pub(in crate::ideal_loads) use snapshot_validation::cooling_positive_supply_capacity_limit_guard_snapshot_is_exact_direct_release;
+pub(in crate::ideal_loads::calc) use runtime_validation::committed_latest_snapshot_is_consistent as cooling_positive_supply_capacity_limit_guard_committed_latest_snapshot_is_consistent;
 
 pub(in crate::ideal_loads::calc) fn completed_direct_cooling_positive_supply_capacity_limit_guard_is_consistent(
     runtime: &PurchasedAirRuntimeState,

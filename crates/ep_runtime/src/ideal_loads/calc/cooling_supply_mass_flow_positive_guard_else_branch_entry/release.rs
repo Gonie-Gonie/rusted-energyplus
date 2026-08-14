@@ -22,13 +22,28 @@ use crate::ideal_loads::{
 };
 
 mod error;
+mod committed;
 mod prefix;
 mod runtime_validation;
 mod snapshot_validation;
 
 pub use error::PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardElseBranchEntryError;
+pub(in crate::ideal_loads::calc) use committed::cooling_supply_mass_flow_positive_guard_else_branch_entry_committed_latest_route;
 use runtime_validation::{pending_state_is_consistent, post_transition_state_is_consistent};
 use snapshot_validation::{prefix_and_local_shape_match, snapshot_is_exact, snapshots_match_bit_exact};
+
+pub(in crate::ideal_loads::calc) fn cooling_supply_mass_flow_positive_guard_else_branch_entry_snapshot_route(
+    snapshot: Snapshot,
+) -> Option<super::transition::PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardElseBranchEntryRetainedRoute> {
+    snapshot_validation::snapshot_route(snapshot)
+}
+
+pub(in crate::ideal_loads::calc) fn cooling_supply_mass_flow_positive_guard_else_branch_entry_retained_route_matches_snapshot_bounded(
+    snapshot: Snapshot,
+    route: super::transition::PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardElseBranchEntryRetainedRoute,
+) -> bool {
+    snapshot_validation::retained_route_matches_snapshot_bounded(snapshot, route)
+}
 
 /// Losslessly reconstructs the CP423 predecessor retained in CP424.
 #[must_use]

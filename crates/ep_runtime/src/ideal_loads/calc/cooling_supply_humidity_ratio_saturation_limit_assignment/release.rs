@@ -27,6 +27,7 @@ use prefix_validation::{
 };
 pub(in crate::ideal_loads) use private_characterization::private_cooling_supply_humidity_ratio_saturation_limit_assignment_characterization;
 pub(in crate::ideal_loads) use runtime_validation::cooling_supply_humidity_ratio_saturation_limit_assignment_latest_metadata_is_consistent;
+pub(in crate::ideal_loads::calc) use runtime_validation::committed_latest_snapshot_is_consistent as cooling_supply_humidity_ratio_saturation_limit_assignment_committed_latest_snapshot_is_consistent;
 use runtime_validation::{
     calc_state_identities_match, call_order_is_pending, completed_state_is_consistent,
     pending_state_is_consistent, prepare_next_transition, prepared_completed_state_is_consistent,

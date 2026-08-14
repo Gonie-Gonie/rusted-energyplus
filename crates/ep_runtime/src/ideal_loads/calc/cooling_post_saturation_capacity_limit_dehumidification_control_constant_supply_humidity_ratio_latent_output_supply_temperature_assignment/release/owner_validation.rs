@@ -9,9 +9,9 @@ use super::super::{
     advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_assignment_state as advance,
 };
 use crate::ideal_loads::calc::{
-    completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_is_consistent,
     completed_direct_cooling_post_saturation_capacity_limit_dehumidification_total_output_supply_enthalpy_assignment_is_consistent,
     completed_direct_cooling_supply_humidity_ratio_saturation_limit_assignment_is_consistent,
+    cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_committed_latest_snapshot_is_consistent,
 };
 use crate::ideal_loads::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSupplyHumidityRatioLatentOutputCapacityGuardElseBranchEntrySnapshot as Predecessor,
@@ -27,28 +27,28 @@ pub(super) fn direct_predecessor_is_retained_and_complete(
     system: &IdealLoadsAirSystem,
     predecessor: Predecessor,
 ) -> bool {
-    let retained = unit
+    let Some(retained) = unit
         .calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry
-        .latest;
-    let witness = runtime.cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_latest_witness(system.id);
-    retained.is_some_and(|retained| {
-        crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_snapshots_match_bit_exact(
+        .latest
+    else {
+        return false;
+    };
+    let Some(witness) = runtime.cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_latest_witness(system.id) else {
+        return false;
+    };
+    crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_snapshots_match_bit_exact(
             retained,
             predecessor,
         )
-    })
-        && witness.is_some_and(|witness| {
-            crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_snapshots_match_bit_exact(
+        && crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_snapshots_match_bit_exact(
                 witness,
                 predecessor,
             )
-        })
         && cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_snapshot_is_exact_direct_release(predecessor)
-        && completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_is_consistent(
-            runtime,
+        && cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_committed_latest_snapshot_is_consistent(
             unit,
             system,
-            predecessor,
+            retained,
             witness,
         )
 }

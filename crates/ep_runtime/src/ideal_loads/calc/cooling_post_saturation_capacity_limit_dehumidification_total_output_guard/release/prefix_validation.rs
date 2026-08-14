@@ -12,7 +12,7 @@ use crate::ideal_loads::calc::cooling_positive_supply_capacity_limit_sensible_ou
     cooling_positive_supply_capacity_limit_sensible_output_guard_snapshots_match_bit_exact as cp340_snapshots_match_bit_exact,
 };
 use crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment::{
-    completed_direct_cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment_is_consistent,
+    cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment_committed_latest_snapshot_is_consistent,
     cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment_snapshots_match_bit_exact as cp382_snapshots_match_bit_exact,
 };
 use crate::ideal_loads::{
@@ -51,12 +51,11 @@ pub(super) fn direct_predecessor_is_retained_and_complete(
         && cp382_snapshots_match_bit_exact(retained, predecessor)
         && cp382_snapshots_match_bit_exact(witness, predecessor)
         && cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment_snapshot_is_exact_direct_release(predecessor)
-        && completed_direct_cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment_is_consistent(
-            runtime,
+        && cooling_post_saturation_capacity_limit_dehumidification_total_output_assignment_committed_latest_snapshot_is_consistent(
             unit,
-            system,
+            system.id,
             predecessor,
-            Some(witness),
+            witness,
         )
 }
 

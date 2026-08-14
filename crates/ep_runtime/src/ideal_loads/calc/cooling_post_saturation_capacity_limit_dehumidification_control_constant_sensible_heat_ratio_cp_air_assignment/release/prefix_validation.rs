@@ -9,6 +9,7 @@ use super::super::{
     advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_state,
 };
 use super::snapshot_validation::snapshots_match_bit_exact;
+use crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_control_switch::cooling_post_saturation_capacity_limit_dehumidification_control_switch_committed_latest_snapshot_is_consistent;
 use crate::ideal_loads::{
     PurchasedAirCalcCoolingMixedAirCallSnapshot,
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlSwitchSnapshot as Predecessor,
@@ -36,13 +37,13 @@ pub(super) fn direct_predecessor_is_retained_and_complete(
                 predecessor,
             )
         })
-        && crate::ideal_loads::calc::completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_switch_is_consistent(
-            runtime,
-            unit,
-            system,
-            predecessor,
-            witness,
-        )
+        && witness.is_some_and(|witness| {
+            cooling_post_saturation_capacity_limit_dehumidification_control_switch_committed_latest_snapshot_is_consistent(
+                unit,
+                system,
+                witness,
+            )
+        })
 }
 
 pub(super) fn assignment_links_to_predecessor(

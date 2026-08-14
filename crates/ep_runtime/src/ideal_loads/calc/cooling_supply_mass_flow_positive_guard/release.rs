@@ -19,6 +19,7 @@ mod runtime_validation;
 mod snapshot_validation;
 
 pub(in crate::ideal_loads::calc) use committed::cooling_supply_mass_flow_positive_guard_committed_latest_supply_mass_flow_rate;
+pub(in crate::ideal_loads::calc) use runtime_validation::committed_latest_snapshot_is_consistent as cooling_supply_mass_flow_positive_guard_committed_latest_snapshot_is_consistent;
 
 pub(in crate::ideal_loads::calc) use prefix_validation::positive_guard_links_to_mixed_air_call;
 #[cfg(test)]

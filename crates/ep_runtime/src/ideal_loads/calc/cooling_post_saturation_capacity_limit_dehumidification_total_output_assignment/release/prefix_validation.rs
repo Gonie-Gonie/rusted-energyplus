@@ -8,18 +8,21 @@ use super::super::{
 };
 use super::error::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationTotalOutputAssignmentInput as InvalidInput;
 use super::snapshot_validation::snapshot_links_to_predecessor;
-use crate::ideal_loads::calc::cooling_mixed_air_call::completed_direct_cooling_mixed_air_call_is_consistent;
-use crate::ideal_loads::calc::cooling_positive_supply_capacity_limit_sensible_output_assignment::completed_direct_cooling_positive_supply_capacity_limit_sensible_output_assignment_is_consistent;
+use crate::ideal_loads::calc::cooling_mixed_air_call::{
+    cooling_mixed_air_call_committed_latest_mixed_air_enthalpy,
+    cooling_mixed_air_call_committed_latest_sensible_output_inputs,
+};
+use crate::ideal_loads::calc::cooling_positive_supply_capacity_limit_sensible_output_assignment::cooling_positive_supply_capacity_limit_sensible_output_assignment_committed_latest_snapshot_is_consistent;
 use crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_guard::{
-    completed_direct_cooling_post_saturation_capacity_limit_dehumidification_guard_is_consistent,
+    cooling_post_saturation_capacity_limit_dehumidification_guard_committed_latest_snapshot_is_consistent,
     cooling_post_saturation_capacity_limit_dehumidification_guard_snapshots_match_bit_exact as cp381_snapshots_match_bit_exact,
 };
 use crate::ideal_loads::calc::cooling_supply_enthalpy_post_saturation_assignment::{
-    completed_direct_cooling_supply_enthalpy_post_saturation_assignment_is_consistent,
+    cooling_supply_enthalpy_post_saturation_assignment_committed_latest_snapshot_is_consistent,
     cooling_supply_enthalpy_post_saturation_assignment_snapshots_match_bit_exact as cp379_snapshots_match_bit_exact,
 };
 use crate::ideal_loads::calc::cooling_supply_mass_flow_positive_guard::{
-    completed_direct_cooling_supply_mass_flow_positive_guard_is_consistent,
+    cooling_supply_mass_flow_positive_guard_committed_latest_snapshot_is_consistent,
     cooling_supply_mass_flow_positive_guard_snapshots_match_bit_exact as cp330_snapshots_match_bit_exact,
 };
 use crate::ideal_loads::{
@@ -66,12 +69,10 @@ pub(super) fn direct_predecessor_is_retained_and_complete(
         && cp381_snapshots_match_bit_exact(retained, predecessor)
         && cp381_snapshots_match_bit_exact(witness, predecessor)
         && cooling_post_saturation_capacity_limit_dehumidification_guard_snapshot_is_exact_direct_release(predecessor)
-        && completed_direct_cooling_post_saturation_capacity_limit_dehumidification_guard_is_consistent(
-            runtime,
+        && cooling_post_saturation_capacity_limit_dehumidification_guard_committed_latest_snapshot_is_consistent(
             unit,
             system,
-            predecessor,
-            Some(witness),
+            witness,
         )
 }
 
@@ -113,6 +114,14 @@ pub(super) fn retained_active_input(
     let cp379_witness = runtime
         .cooling_supply_enthalpy_post_saturation_assignment_latest_witness(system.id)
         .ok_or(ActiveInputValidationError::Lineage)?;
+    let _cp329_inputs = cooling_mixed_air_call_committed_latest_sensible_output_inputs(
+        unit,
+        cp329_witness,
+    )
+    .ok_or(ActiveInputValidationError::Lineage)?;
+    let committed_mixed_air_enthalpy =
+        cooling_mixed_air_call_committed_latest_mixed_air_enthalpy(unit, cp329_witness)
+            .ok_or(ActiveInputValidationError::Lineage)?;
 
     if !same_call(predecessor, cp330.system, cp330.parent_call_ordinal, cp330.controlled_zone)
         || !same_call(predecessor, cp329.system, cp329.parent_call_ordinal, cp329.controlled_zone)
@@ -121,39 +130,29 @@ pub(super) fn retained_active_input(
         || !route_flags_match(predecessor, cp379)
         || !cp330_snapshots_match_bit_exact(cp330, cp330_witness)
         || !cooling_supply_mass_flow_positive_guard_snapshot_is_exact_direct_release(cp330)
-        || !completed_direct_cooling_supply_mass_flow_positive_guard_is_consistent(
-            runtime,
+        || !cooling_supply_mass_flow_positive_guard_committed_latest_snapshot_is_consistent(
             unit,
-            system,
+            system.id,
             cp330,
-            Some(cp330_witness),
+            cp330_witness,
         )
         || !cooling_mixed_air_call_snapshots_match_bit_exact(cp329, cp329_witness)
         || !cooling_mixed_air_call_snapshot_is_exact_direct_release(cp329)
-        || !completed_direct_cooling_mixed_air_call_is_consistent(
-            runtime,
-            unit,
-            system,
-            cp329,
-            Some(cp329_witness),
-        )
+        || cp329
+            .mixed_air_enthalpy_projection_j_per_kg
+            .is_none_or(|value| value.to_bits() != committed_mixed_air_enthalpy.to_bits())
         || !cp339.capacity_limit_sensible_output_assignment_executed
         || !cooling_positive_supply_capacity_limit_sensible_output_assignment_snapshot_is_exact_direct_release(cp339)
-        || !completed_direct_cooling_positive_supply_capacity_limit_sensible_output_assignment_is_consistent(
-            runtime,
+        || !cooling_positive_supply_capacity_limit_sensible_output_assignment_committed_latest_snapshot_is_consistent(
             unit,
-            system,
+            system.id,
             cp339,
-            Some(cp339_witness),
+            cp339_witness,
         )
         || !cp379_snapshots_match_bit_exact(cp379, cp379_witness)
         || !cooling_supply_enthalpy_post_saturation_assignment_snapshot_is_exact_direct_release(cp379)
-        || !completed_direct_cooling_supply_enthalpy_post_saturation_assignment_is_consistent(
-            runtime,
-            unit,
-            system,
-            cp379,
-            Some(cp379_witness),
+        || !cooling_supply_enthalpy_post_saturation_assignment_committed_latest_snapshot_is_consistent(
+            unit, cp379_witness,
         )
     {
         return Err(ActiveInputValidationError::Lineage);

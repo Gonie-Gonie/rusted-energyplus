@@ -11,6 +11,7 @@ mod tests;
 mod transition;
 
 pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_supply_mass_flow_positive_guard_is_consistent;
+pub(in crate::ideal_loads::calc) use release::cooling_supply_mass_flow_positive_guard_committed_latest_snapshot_is_consistent;
 pub(in crate::ideal_loads::calc) use release::cooling_supply_mass_flow_positive_guard_committed_latest_supply_mass_flow_rate;
 pub(in crate::ideal_loads) use release::cooling_supply_mass_flow_positive_guard_snapshot_is_exact_direct_release;
 pub(in crate::ideal_loads::calc) use release::positive_guard_links_to_mixed_air_call;

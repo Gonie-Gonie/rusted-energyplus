@@ -65,11 +65,12 @@ fn cp380_public_direct_uses_only_configured_selector_and_retained_lineages() {
 }
 
 #[test]
-fn cp380_rejects_cp379_bit_drift_transactionally() {
+fn cp380_rejects_cp379_witness_and_committed_state_drift_transactionally() {
     let (mut runtime, system, cp379) = completed_cp379_case();
-    let mut forged = runtime
+    let witness = runtime
         .cooling_supply_enthalpy_post_saturation_assignment_latest_witness(system.id)
         .expect("CP379 witness");
+    let mut forged = witness;
     forged.resulting_supply_enthalpy_j_per_kg = forged
         .resulting_supply_enthalpy_j_per_kg
         .map(|value| f64::from_bits(value.to_bits() ^ 1));
@@ -85,15 +86,35 @@ fn cp380_rejects_cp379_bit_drift_transactionally() {
         Err(Error::CoolingSupplyEnthalpyPostSaturationAssignmentSnapshotMismatch { .. })
     ));
     assert_eq!(runtime, before);
+
+    runtime
+        .set_cooling_supply_enthalpy_post_saturation_assignment_latest_witness(system.id, witness);
+    runtime
+        .units
+        .get_mut(&system.id)
+        .expect("known unit")
+        .calc_cooling_supply_enthalpy_post_saturation_assignment
+        .source_site_execution_count += 1;
+    let before = runtime.clone();
+    assert!(matches!(
+        advance_direct_no_oa_calc_cooling_post_saturation_capacity_limit_guard(
+            &mut runtime,
+            &system,
+            cp379,
+        ),
+        Err(Error::RuntimeStateInvariantViolation { .. })
+    ));
+    assert_eq!(runtime, before);
 }
 
 #[test]
-fn cp380_rejects_cp337_same_call_and_selector_lineage_drift_transactionally() {
+fn cp380_rejects_cp337_same_call_selector_and_committed_state_drift_transactionally() {
+    let (mut runtime, system, cp379) = completed_cp379_case();
+    let witness = runtime
+        .cooling_positive_supply_capacity_limit_guard_latest_witness(system.id)
+        .expect("CP337 witness");
     for ordinal_drift in [false, true] {
-        let (mut runtime, system, cp379) = completed_cp379_case();
-        let mut forged = runtime
-            .cooling_positive_supply_capacity_limit_guard_latest_witness(system.id)
-            .expect("CP337 witness");
+        let mut forged = witness;
         if ordinal_drift {
             forged.parent_call_ordinal += 1;
         } else {
@@ -110,7 +131,28 @@ fn cp380_rejects_cp337_same_call_and_selector_lineage_drift_transactionally() {
             Err(Error::CoolingLimitSelectorLineageMismatch { .. })
         ));
         assert_eq!(runtime, before);
+        runtime.set_cooling_positive_supply_capacity_limit_guard_latest_witness(
+            system.id,
+            witness,
+        );
     }
+
+    runtime
+        .units
+        .get_mut(&system.id)
+        .expect("known unit")
+        .calc_cooling_positive_supply_capacity_limit_guard
+        .source_site_execution_count += 1;
+    let before = runtime.clone();
+    assert!(matches!(
+        advance_direct_no_oa_calc_cooling_post_saturation_capacity_limit_guard(
+            &mut runtime,
+            &system,
+            cp379,
+        ),
+        Err(Error::CoolingLimitSelectorLineageMismatch { .. })
+    ));
+    assert_eq!(runtime, before);
 }
 
 #[test]

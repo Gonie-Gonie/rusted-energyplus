@@ -372,3 +372,14 @@ fn overflow_rejects_before_mutation() {
     );
     assert_eq!(state, before);
 }
+
+#[test]
+fn cp387_predecessor_validation_uses_bounded_cp386_committed_proof() {
+    let source = include_str!("release/prefix_validation.rs");
+    assert!(source.contains(
+        "cooling_post_saturation_capacity_limit_dehumidification_control_switch_committed_latest_snapshot_is_consistent",
+    ));
+    assert!(!source.contains(
+        "completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_switch_is_consistent",
+    ));
+}

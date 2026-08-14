@@ -21,6 +21,7 @@ use prefix_validation::{
 };
 pub(in crate::ideal_loads) use private_characterization::private_cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break_characterization;
 pub(in crate::ideal_loads) use runtime_validation::cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break_latest_metadata_is_consistent;
+pub(in crate::ideal_loads::calc) use runtime_validation::committed_latest_snapshot_is_consistent as cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break_committed_latest_snapshot_is_consistent;
 #[cfg(test)]
 pub(in crate::ideal_loads::calc) use runtime_validation::test_counts_are_exact;
 use runtime_validation::{

@@ -217,6 +217,18 @@ fn latest_metadata_is_consistent(state: &State, witness: Option<Snapshot>) -> bo
         && route_count(state, route) > 0
 }
 
+/// Bounded committed snapshot/state proof for the immediate successor.
+pub(in crate::ideal_loads::calc) fn committed_latest_snapshot_is_consistent(
+    unit: &PurchasedAirUnitRuntimeState,
+    witness: Snapshot,
+) -> bool {
+    let state = &unit.calc_cooling_supply_enthalpy_post_saturation_assignment;
+    state.transition_count == unit.init_call_count
+        && state.transition_count > 0
+        && unit.controlled_zone == Some(witness.controlled_zone)
+        && completed_state_is_consistent(unit, witness, Some(witness))
+}
+
 fn pending_route_counts_match(state: &State, prior: &PredecessorState, route: Route) -> bool {
     route_count_pairs(state, prior)
         .into_iter()

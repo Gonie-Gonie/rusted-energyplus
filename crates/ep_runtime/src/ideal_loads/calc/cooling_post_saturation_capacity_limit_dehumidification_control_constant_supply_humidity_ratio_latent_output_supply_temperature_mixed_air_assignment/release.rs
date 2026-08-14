@@ -6,7 +6,7 @@ use super::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSupplyHumidityRatioLatentOutputSupplyTemperatureMixedAirAssignmentSnapshot as Snapshot,
     advance_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_supply_temperature_mixed_air_assignment_state as advance,
 };
-use crate::ideal_loads::calc::completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard_is_consistent;
+use crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard_committed_latest_snapshot_is_consistent;
 use crate::ideal_loads::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSupplyHumidityRatioLatentOutputGuardSnapshot as Predecessor,
     PurchasedAirRuntimeState, classify_no_oa_sensible_subset,
@@ -46,13 +46,12 @@ pub(in crate::ideal_loads::calc) fn completed_direct_cooling_post_saturation_cap
     };
     let predecessor_witness = runtime.cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard_latest_witness(system.id);
     cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard_snapshot_is_exact_direct_release(predecessor)
-        && completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard_is_consistent(
-            runtime,
-            unit,
-            system,
-            predecessor,
-            predecessor_witness,
-        )
+        && predecessor_witness.is_some_and(|witness| {
+            cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard_committed_latest_snapshot_is_consistent(
+                unit,
+                witness,
+            )
+        })
         && crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard_snapshots_match_bit_exact(
             predecessor_snapshot(snapshot),
             predecessor,
@@ -148,13 +147,12 @@ pub fn advance_direct_no_oa_calc_cooling_post_saturation_capacity_limit_dehumidi
     }
     if !calc_state_identities_match(unit, selected)
         || !pending_state_is_consistent(unit, retained_predecessor, assignment_witness)
-        || !completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard_is_consistent(
-            runtime,
-            unit,
-            system,
-            retained_predecessor,
-            predecessor_witness,
-        )
+        || !predecessor_witness.is_some_and(|witness| {
+            cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard_committed_latest_snapshot_is_consistent(
+                unit,
+                witness,
+            )
+        })
     {
         return Err(Error::RuntimeStateInvariantViolation { system: selected });
     }

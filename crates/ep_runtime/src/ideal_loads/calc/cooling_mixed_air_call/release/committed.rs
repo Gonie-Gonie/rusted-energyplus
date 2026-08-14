@@ -45,6 +45,18 @@ pub(in crate::ideal_loads::calc) fn cooling_mixed_air_call_committed_latest_sens
     )
 }
 
+/// Returns CP329's committed same-call mixed-air enthalpy projection.
+pub(in crate::ideal_loads::calc) fn cooling_mixed_air_call_committed_latest_mixed_air_enthalpy(
+    unit: &PurchasedAirUnitRuntimeState,
+    witness: PurchasedAirCalcCoolingMixedAirCallSnapshot,
+) -> Option<f64> {
+    let latest = unit.calc_cooling_mixed_air_call.latest?;
+    let enthalpy = latest.mixed_air_enthalpy_projection_j_per_kg?;
+    (committed_no_oa_humidity_owner_state_is_consistent(unit, witness)
+        && committed_no_oa_sensible_snapshot_has_exact_shape(latest))
+    .then_some(enthalpy)
+}
+
 fn committed_no_oa_sensible_snapshot_has_exact_shape(
     snapshot: PurchasedAirCalcCoolingMixedAirCallSnapshot,
 ) -> bool {
@@ -152,6 +164,21 @@ fn option_bits_match(left: Option<f64>, right: Option<f64>) -> bool {
         (None, None) => true,
         _ => false,
     }
+}
+
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) fn cooling_mixed_air_call_forge_latest_ordinal_for_test(
+    unit: &mut PurchasedAirUnitRuntimeState,
+    ordinal: Option<usize>,
+) {
+    unit.calc_cooling_mixed_air_call.latest_transition_ordinal = ordinal;
+}
+
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) fn cooling_mixed_air_call_clear_latest_route_for_test(
+    unit: &mut PurchasedAirUnitRuntimeState,
+) {
+    unit.calc_cooling_mixed_air_call.latest_route = None;
 }
 
 #[cfg(test)]

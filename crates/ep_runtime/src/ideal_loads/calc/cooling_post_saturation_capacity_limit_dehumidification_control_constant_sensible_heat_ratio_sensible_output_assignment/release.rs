@@ -20,6 +20,7 @@ use prefix_validation::{
     assignment_links_to_predecessor, direct_predecessor_is_retained_and_complete,
 };
 pub(in crate::ideal_loads) use private_characterization::private_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_characterization;
+pub(in crate::ideal_loads::calc) use runtime_validation::committed_latest_snapshot_is_consistent as cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_committed_latest_snapshot_is_consistent;
 use runtime_validation::{
     calc_state_identities_match, call_order_is_pending, completed_state_is_consistent,
     pending_state_is_consistent, prepare_next_transition, prepared_completed_state_is_consistent,

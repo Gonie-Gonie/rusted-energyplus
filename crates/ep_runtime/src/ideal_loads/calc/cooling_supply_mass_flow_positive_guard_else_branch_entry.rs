@@ -9,10 +9,18 @@ mod state;
 mod tests;
 mod transition;
 
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::cp424_all_snapshots_for_successor_tests;
+
 pub use release::{
     PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardElseBranchEntryError,
     advance_direct_no_oa_calc_cooling_supply_mass_flow_positive_guard_else_branch_entry,
     cooling_supply_mass_flow_positive_guard_else_branch_entry_predecessor_cp423_snapshot,
+};
+pub(in crate::ideal_loads::calc) use release::{
+    cooling_supply_mass_flow_positive_guard_else_branch_entry_committed_latest_route,
+    cooling_supply_mass_flow_positive_guard_else_branch_entry_retained_route_matches_snapshot_bounded,
+    cooling_supply_mass_flow_positive_guard_else_branch_entry_snapshot_route,
 };
 #[allow(unused_imports)]
 pub(in crate::ideal_loads) use release::{

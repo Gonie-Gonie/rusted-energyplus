@@ -174,6 +174,29 @@ pub(super) fn completed_capacity_limit_guard_state_is_consistent(
         && state.latest == Some(snapshot)
 }
 
+/// Bounded committed CP337 snapshot/state proof for later selector corroboration.
+pub(in crate::ideal_loads::calc) fn committed_latest_snapshot_is_consistent(
+    unit: &PurchasedAirUnitRuntimeState,
+    system: &IdealLoadsAirSystem,
+    witness: PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardSnapshot,
+) -> bool {
+    let state = &unit.calc_cooling_positive_supply_capacity_limit_guard;
+    system.id == unit.system
+        && state.system == unit.system
+        && witness.system == system.id
+        && state.transition_count > 0
+        && state.transition_count == unit.init_call_count
+        && state.transition_count == unit.calc_entry.call_count
+        && witness.parent_call_ordinal == state.transition_count
+        && unit.controlled_zone == Some(witness.controlled_zone)
+        && completed_capacity_limit_guard_state_is_consistent(
+            unit,
+            system,
+            witness,
+            Some(witness),
+        )
+}
+
 fn state_is_consistent(
     state: &PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardRuntimeState,
     witness: Option<PurchasedAirCalcCoolingPositiveSupplyCapacityLimitGuardSnapshot>,

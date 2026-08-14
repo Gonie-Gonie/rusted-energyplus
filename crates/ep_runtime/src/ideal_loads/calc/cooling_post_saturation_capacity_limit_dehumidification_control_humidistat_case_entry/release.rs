@@ -19,6 +19,7 @@ use error::{call_order_error, predecessor_mismatch};
 use prefix_validation::{case_entry_links_to_prefix, direct_prefix_is_retained_and_complete};
 pub(in crate::ideal_loads) use private_characterization::private_cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_entry_characterization;
 pub(in crate::ideal_loads) use runtime_validation::cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_entry_latest_metadata_is_consistent;
+pub(in crate::ideal_loads::calc) use runtime_validation::committed_latest_snapshot_is_consistent as cooling_post_saturation_capacity_limit_dehumidification_control_humidistat_case_entry_committed_latest_snapshot_is_consistent;
 use runtime_validation::{
     calc_state_identities_match, call_order_is_pending, completed_state_is_consistent,
     pending_state_is_consistent, prepare_next_transition, prepared_completed_state_is_consistent,

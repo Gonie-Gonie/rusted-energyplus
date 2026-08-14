@@ -8,8 +8,10 @@ use super::super::{
 };
 use super::snapshot_validation::snapshots_match_bit_exact;
 use crate::ideal_loads::calc::{
-    completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_is_consistent,
-    completed_direct_cooling_supply_enthalpy_post_saturation_assignment_is_consistent,
+    cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_committed_latest_snapshot_is_consistent,
+    cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_snapshots_match_bit_exact,
+    cooling_supply_enthalpy_post_saturation_assignment_committed_latest_snapshot_is_consistent,
+    cooling_supply_enthalpy_post_saturation_assignment_snapshots_match_bit_exact,
 };
 use crate::ideal_loads::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSensibleHeatRatioSensibleOutputAssignmentSnapshot as Predecessor,
@@ -25,18 +27,47 @@ pub(super) fn direct_prefix_is_retained_and_complete(
     predecessor: Predecessor,
     owner: TemperatureOwner,
 ) -> bool {
-    completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_is_consistent(
-        runtime,
-        unit,
-        system,
+    let Some(retained_predecessor) = unit
+        .calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment
+        .latest
+    else {
+        return false;
+    };
+    let Some(predecessor_witness) = runtime
+        .cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_latest_witness(system.id)
+    else {
+        return false;
+    };
+    let Some(retained_owner) = unit
+        .calc_cooling_supply_enthalpy_post_saturation_assignment
+        .latest
+    else {
+        return false;
+    };
+    let Some(owner_witness) =
+        runtime.cooling_supply_enthalpy_post_saturation_assignment_latest_witness(system.id)
+    else {
+        return false;
+    };
+    cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_snapshots_match_bit_exact(
+        retained_predecessor,
         predecessor,
-        runtime.cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_latest_witness(system.id),
-    ) && completed_direct_cooling_supply_enthalpy_post_saturation_assignment_is_consistent(
-        runtime,
+    ) && cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_snapshots_match_bit_exact(
+        predecessor_witness,
+        predecessor,
+    ) && cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_sensible_output_assignment_committed_latest_snapshot_is_consistent(
         unit,
         system,
+        predecessor_witness,
+    ) && cooling_supply_enthalpy_post_saturation_assignment_snapshots_match_bit_exact(
+        retained_owner,
         owner,
-        runtime.cooling_supply_enthalpy_post_saturation_assignment_latest_witness(system.id),
+    ) && cooling_supply_enthalpy_post_saturation_assignment_snapshots_match_bit_exact(
+        owner_witness,
+        owner,
+    ) && cooling_supply_enthalpy_post_saturation_assignment_committed_latest_snapshot_is_consistent(
+        unit,
+        owner_witness,
     )
 }
 

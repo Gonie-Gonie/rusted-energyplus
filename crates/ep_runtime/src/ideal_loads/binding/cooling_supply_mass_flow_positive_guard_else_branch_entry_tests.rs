@@ -29,7 +29,14 @@ fn cp424_adapter_accepts_only_the_cp423_snapshot() {
 }
 
 #[test]
-fn cp424_extends_scheduled_binding_from_114_to_exactly_115_snapshots() {
+fn cp424_is_preserved_before_cp425_in_exactly_116_snapshots() {
     let source = include_str!("scheduled_output.rs");
-    assert_eq!(source.matches("    pub calculation_").count(), 115);
+    assert_eq!(source.matches("    pub calculation_").count(), 116);
+    let cp424 = source
+        .find("calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry")
+        .expect("CP424 scheduled binding field");
+    let cp425 = source
+        .find("calculation_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment")
+        .expect("CP425 scheduled binding field");
+    assert!(cp424 < cp425);
 }

@@ -28,6 +28,17 @@ fn cp407_boundary_and_four_source_sites_are_exact() {
     );
 }
 
+#[test]
+fn cp407_predecessor_validation_uses_bounded_cp406_committed_proof() {
+    let source = include_str!("release/owner_validation.rs");
+    assert!(source.contains(
+        "cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_committed_latest_snapshot_is_consistent",
+    ));
+    assert!(!source.contains(
+        "completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_capacity_guard_else_branch_entry_is_consistent",
+    ));
+}
+
 fn all_routes() -> Vec<RetainedRoute> {
     let mut routes = Vec::new();
     for predecessor_index in 0..30 {

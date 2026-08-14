@@ -115,6 +115,26 @@ pub(in crate::ideal_loads) fn cooling_post_saturation_capacity_limit_dehumidific
         )
 }
 
+/// Bounded committed snapshot/state proof for the immediate successor.
+pub(in crate::ideal_loads::calc) fn committed_latest_snapshot_is_consistent(
+    unit: &PurchasedAirUnitRuntimeState,
+    witness: Snapshot,
+) -> bool {
+    let state = &unit
+        .calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard;
+    state.system == unit.system
+        && witness.system == unit.system
+        && state.transition_count > 0
+        && state.transition_count == unit.init_call_count
+        && state.transition_count == unit.calc_entry.call_count
+        && witness.parent_call_ordinal == state.transition_count
+        && unit.controlled_zone == Some(witness.controlled_zone)
+        && completed_state_is_consistent(unit, witness, Some(witness))
+        && super::snapshot_validation::cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_latent_output_guard_snapshot_is_exact_direct_release(
+            witness,
+        )
+}
+
 fn predecessor_counts_match(state: &State, predecessor: &PredecessorState) -> bool {
     state.predecessor_route_counts == predecessor.predecessor_route_counts
         && state.transition_count == predecessor.transition_count

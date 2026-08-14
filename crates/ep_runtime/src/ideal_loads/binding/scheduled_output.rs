@@ -111,8 +111,10 @@ use super::super::{
     PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardElseBranchEntrySnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardSnapshot,
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodySnapshot,
-    PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardSnapshot, PurchasedAirCalcEntrySnapshot,
-    PurchasedAirCalcMinimumOaPrefixSnapshot, PurchasedAirInitSnapshot,
+    PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardSnapshot,
+    PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyEnthalpyMixedAirAssignmentSnapshot,
+    PurchasedAirCalcEntrySnapshot, PurchasedAirCalcMinimumOaPrefixSnapshot,
+    PurchasedAirInitSnapshot,
 };
 use super::DirectZonePurchasedAirScheduleSnapshot;
 
@@ -458,6 +460,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered cooling positive-supply guard else-branch-entry snapshot.
     pub calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry:
         PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardElseBranchEntrySnapshot,
+    /// Source-ordered zero-flow supply-enthalpy mixed-air assignment snapshot.
+    pub calculation_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment:
+        PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyEnthalpyMixedAirAssignmentSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

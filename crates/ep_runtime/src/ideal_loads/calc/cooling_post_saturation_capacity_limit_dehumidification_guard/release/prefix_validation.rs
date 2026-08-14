@@ -8,7 +8,7 @@ use super::super::{
 };
 use super::snapshot_validation::snapshot_links_to_predecessor;
 use crate::ideal_loads::calc::cooling_mixed_air_call::{
-    completed_direct_cooling_mixed_air_call_is_consistent,
+    cooling_mixed_air_call_committed_latest_mixed_air_humidity_ratio,
     cooling_mixed_air_call_snapshots_match_bit_exact,
 };
 use crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_guard::{
@@ -16,11 +16,11 @@ use crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_guard::{
     cooling_post_saturation_capacity_limit_guard_snapshots_match_exact as cp380_snapshots_match_exact,
 };
 use crate::ideal_loads::calc::cooling_supply_enthalpy_post_saturation_assignment::{
-    completed_direct_cooling_supply_enthalpy_post_saturation_assignment_is_consistent,
+    cooling_supply_enthalpy_post_saturation_assignment_committed_latest_snapshot_is_consistent,
     cooling_supply_enthalpy_post_saturation_assignment_snapshots_match_bit_exact as cp379_snapshots_match_bit_exact,
 };
 use crate::ideal_loads::calc::cooling_supply_humidity_ratio_saturation_limit_assignment::{
-    completed_direct_cooling_supply_humidity_ratio_saturation_limit_assignment_is_consistent,
+    cooling_supply_humidity_ratio_saturation_limit_assignment_committed_latest_snapshot_is_consistent,
     cooling_supply_humidity_ratio_saturation_limit_assignment_snapshots_match_bit_exact as cp378_snapshots_match_bit_exact,
 };
 use crate::ideal_loads::{
@@ -88,13 +88,12 @@ pub(super) fn retained_mixed_air_owner_is_valid(
         && cp329.mixed_air_humidity_ratio.is_some_and(f64::is_finite)
         && cooling_mixed_air_call_snapshots_match_bit_exact(cp329, witness)
         && cooling_mixed_air_call_snapshot_is_exact_direct_release(cp329)
-        && completed_direct_cooling_mixed_air_call_is_consistent(
-            runtime,
-            unit,
-            system,
-            cp329,
-            Some(witness),
-        )
+        && cooling_mixed_air_call_committed_latest_mixed_air_humidity_ratio(unit, witness)
+            .is_some_and(|committed| {
+                cp329
+                    .mixed_air_humidity_ratio
+                    .is_some_and(|retained| retained.to_bits() == committed.to_bits())
+            })
 }
 
 pub(super) fn retained_active_input(
@@ -164,27 +163,16 @@ pub(super) fn retained_active_input(
         || !cooling_supply_humidity_ratio_saturation_limit_assignment_snapshot_is_exact_direct_release(cp378)
         || !cooling_supply_enthalpy_post_saturation_assignment_snapshot_is_exact_direct_release(cp379)
         || !cooling_mixed_air_call_snapshot_is_exact_direct_release(cp329)
-        || !completed_direct_cooling_supply_humidity_ratio_saturation_limit_assignment_is_consistent(
-            runtime,
-            unit,
-            system,
-            cp378,
-            Some(cp378_witness),
+        || !cooling_supply_humidity_ratio_saturation_limit_assignment_committed_latest_snapshot_is_consistent(
+            unit, cp378_witness,
         )
-        || !completed_direct_cooling_supply_enthalpy_post_saturation_assignment_is_consistent(
-            runtime,
-            unit,
-            system,
-            cp379,
-            Some(cp379_witness),
+        || !cooling_supply_enthalpy_post_saturation_assignment_committed_latest_snapshot_is_consistent(
+            unit, cp379_witness,
         )
-        || !completed_direct_cooling_mixed_air_call_is_consistent(
-            runtime,
-            unit,
-            system,
-            cp329,
-            Some(cp329_witness),
+        || cooling_mixed_air_call_committed_latest_mixed_air_humidity_ratio(
+            unit, cp329_witness,
         )
+        .is_none_or(|committed| committed.to_bits() != mixed.to_bits())
     {
         return None;
     }

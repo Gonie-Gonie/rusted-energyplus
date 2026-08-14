@@ -22,7 +22,10 @@ pub(in crate::ideal_loads) use release::{
     private_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_characterization,
 };
 #[allow(unused_imports)]
-pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_is_consistent;
+pub(in crate::ideal_loads::calc) use release::{
+    completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_is_consistent,
+    cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_committed_latest_snapshot_is_consistent,
+};
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
     cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_snapshot_is_exact,

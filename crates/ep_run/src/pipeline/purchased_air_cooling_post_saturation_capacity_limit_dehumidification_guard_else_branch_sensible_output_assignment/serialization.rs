@@ -61,7 +61,11 @@ pub(in crate::pipeline) fn lifecycle_json(
 mod tests {
     #[test]
     fn serializer_source_carries_ten_route_arrays_and_no_numerical_dto() {
-        let source = include_str!("serialization.rs");
+        let source = include_str!("serialization.rs")
+            .split_once("#[cfg(test)]")
+            .map_or(include_str!("serialization.rs"), |(production, _)| {
+                production
+            });
         assert_eq!(source.matches("route_counts\":").count(), 10);
         for forbidden in [
             "zone_sensible_cooling_rate_w",

@@ -68,10 +68,6 @@ pub(super) fn committed_no_oa_humidity_owner_state_is_consistent(
         && state.transition_count == unit.init_call_count
         && state.transition_count == unit.calc_entry.call_count
         && state.transition_count == predecessor.transition_count
-        && state.transition_count
-            == unit
-                .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry
-                .transition_count
         && route_partition == state.transition_count
         && state.unit_off_skip_count == predecessor.unit_off_skip_count
         && state.non_cooling_skip_count == predecessor.non_cooling_skip_count
@@ -115,6 +111,9 @@ pub(super) fn committed_no_oa_humidity_owner_state_is_consistent(
         && state.latest.is_some_and(|latest| {
             latest.system == unit.system
                 && latest.parent_call_ordinal == state.transition_count
+                && latest.parent_call_ordinal == unit.init_call_count
+                && witness.parent_call_ordinal == state.transition_count
+                && witness.parent_call_ordinal == unit.init_call_count
                 && cooling_mixed_air_call_snapshots_match_bit_exact(latest, witness)
         })
 }

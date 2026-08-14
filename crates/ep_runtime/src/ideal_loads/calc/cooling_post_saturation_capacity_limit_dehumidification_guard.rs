@@ -17,6 +17,7 @@ pub use release::{
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use release::{
     completed_direct_cooling_post_saturation_capacity_limit_dehumidification_guard_is_consistent,
+    cooling_post_saturation_capacity_limit_dehumidification_guard_committed_latest_snapshot_is_consistent,
     cooling_post_saturation_capacity_limit_dehumidification_guard_snapshots_match_bit_exact,
 };
 #[allow(unused_imports)]

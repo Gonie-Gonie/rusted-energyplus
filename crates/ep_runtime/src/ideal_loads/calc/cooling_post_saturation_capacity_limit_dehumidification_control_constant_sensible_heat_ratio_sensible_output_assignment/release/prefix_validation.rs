@@ -22,23 +22,24 @@ pub(super) fn direct_predecessor_is_retained_and_complete(
     system: &IdealLoadsAirSystem,
     predecessor: Predecessor,
 ) -> bool {
-    let witness = runtime
-        .cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_latest_witness(system.id);
-    unit.calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment
-        .latest
-        .is_some_and(|retained| {
-            crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_snapshots_match_bit_exact(
-                retained,
-                predecessor,
-            )
-        })
-        && crate::ideal_loads::calc::completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_is_consistent(
-            runtime,
-            unit,
-            system,
-            predecessor,
-            witness,
-        )
+    let Some(retained) = unit.calc_cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment.latest else {
+        return false;
+    };
+    let Some(witness) = runtime
+        .cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_latest_witness(system.id) else {
+        return false;
+    };
+    crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_snapshots_match_bit_exact(
+        retained,
+        predecessor,
+    ) && crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_snapshots_match_bit_exact(
+        witness,
+        predecessor,
+    ) && crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_control_constant_sensible_heat_ratio_cp_air_assignment_committed_latest_snapshot_is_consistent(
+        unit,
+        system,
+        witness,
+    )
 }
 
 pub(super) fn assignment_links_to_predecessor(

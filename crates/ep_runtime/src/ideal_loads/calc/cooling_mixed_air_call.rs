@@ -16,12 +16,18 @@ pub(in crate::ideal_loads::calc) use release::completed_direct_cooling_mixed_air
 pub(in crate::ideal_loads::calc) use release::cooling_mixed_air_call_committed_latest_mixed_air_humidity_ratio;
 pub(in crate::ideal_loads::calc) use release::{
     PurchasedAirCalcCoolingMixedAirCallCommittedSensibleOutputInputs,
+    cooling_mixed_air_call_committed_latest_mixed_air_enthalpy,
     cooling_mixed_air_call_committed_latest_sensible_output_inputs,
 };
 pub use release::{
     PurchasedAirCalcCoolingMixedAirCallError,
     PurchasedAirCalcCoolingMixedAirCallRecirculationInput,
     advance_direct_no_oa_calc_cooling_mixed_air_call,
+};
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use release::{
+    cooling_mixed_air_call_clear_latest_route_for_test,
+    cooling_mixed_air_call_forge_latest_ordinal_for_test,
 };
 pub(in crate::ideal_loads) use release::{
     cooling_mixed_air_call_snapshot_is_exact_direct_release,

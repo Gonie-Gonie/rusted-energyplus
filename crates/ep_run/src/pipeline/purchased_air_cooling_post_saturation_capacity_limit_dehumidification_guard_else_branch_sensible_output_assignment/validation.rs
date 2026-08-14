@@ -261,7 +261,9 @@ include!("validation/counts.rs");
 mod tests {
     #[test]
     fn direct_validator_is_bounded_and_has_no_recursive_exact_route() {
-        let source = include_str!("validation.rs");
+        let source = include_str!("validation.rs")
+            .split_once("#[cfg(test)]")
+            .map_or(include_str!("validation.rs"), |(production, _)| production);
         assert!(source.contains("lineage_is_exact"));
         for forbidden in [
             "private_characterization",

@@ -25,7 +25,13 @@ mod runtime_validation;
 
 pub(in crate::ideal_loads::calc) use committed::{
     PurchasedAirCalcCoolingMixedAirCallCommittedSensibleOutputInputs,
+    cooling_mixed_air_call_committed_latest_mixed_air_enthalpy,
     cooling_mixed_air_call_committed_latest_sensible_output_inputs,
+};
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use committed::{
+    cooling_mixed_air_call_clear_latest_route_for_test,
+    cooling_mixed_air_call_forge_latest_ordinal_for_test,
 };
 
 pub(in crate::ideal_loads::calc) use runtime_validation::completed_direct_cooling_mixed_air_call_is_consistent;

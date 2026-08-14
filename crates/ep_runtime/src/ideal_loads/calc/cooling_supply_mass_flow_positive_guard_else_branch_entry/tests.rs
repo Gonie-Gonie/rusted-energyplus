@@ -1,6 +1,7 @@
 //! CP424 boundary, exhaustive route, forgery, preservation, and overflow tests.
 
 mod schema_prefix;
+mod committed_seal;
 
 use super::transition::{
     PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardElseBranchEntryRetainedRoute as Route,
@@ -208,4 +209,14 @@ fn flip(value: f64) -> f64 {
 
 fn nonzero_indices(values: &[usize; 36]) -> Vec<usize> {
     values.iter().enumerate().filter_map(|(index, count)| (*count != 0).then_some(index)).collect()
+}
+
+pub(in crate::ideal_loads::calc) fn cp424_all_snapshots_for_successor_tests(
+) -> Vec<super::PurchasedAirCalcCoolingSupplyMassFlowPositiveGuardElseBranchEntrySnapshot> {
+    cp423_all_snapshots_for_successor_tests()
+        .into_iter()
+        .map(|predecessor| {
+            advance(&mut State::new(predecessor.system), predecessor).expect("CP424 fixture")
+        })
+        .collect()
 }

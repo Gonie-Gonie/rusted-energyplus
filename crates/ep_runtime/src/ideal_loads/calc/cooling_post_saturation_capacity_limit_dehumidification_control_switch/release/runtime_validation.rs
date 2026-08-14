@@ -1,6 +1,9 @@
 //! Persistent CP386 runtime-state validation.
 
-use ep_model::IdealLoadsAirSystemId;
+use ep_model::{
+    DehumidificationControlType, HumidificationControlType, IdealLoadsAirSystem,
+    IdealLoadsAirSystemId,
+};
 
 use super::super::{
     PURCHASED_AIR_CALC_COOLING_POST_SATURATION_CAPACITY_LIMIT_DEHUMIDIFICATION_CONTROL_SWITCH_SOURCE_ORDER,
@@ -107,6 +110,29 @@ pub(in crate::ideal_loads) fn cooling_post_saturation_capacity_limit_dehumidific
     let state = &unit.calc_cooling_post_saturation_capacity_limit_dehumidification_control_switch;
     state.transition_count == expected_transition_count
         && state_is_consistent(state, state.latest, state.system)
+}
+
+/// Bounded committed snapshot/state proof for the immediate successor.
+pub(in crate::ideal_loads::calc) fn committed_latest_snapshot_is_consistent(
+    unit: &PurchasedAirUnitRuntimeState,
+    system: &IdealLoadsAirSystem,
+    witness: Snapshot,
+) -> bool {
+    let state = &unit.calc_cooling_post_saturation_capacity_limit_dehumidification_control_switch;
+    system.id == unit.system
+        && state.system == unit.system
+        && witness.system == system.id
+        && system.dehumidification_control_type == DehumidificationControlType::None
+        && system.humidification_control_type == HumidificationControlType::None
+        && state.transition_count > 0
+        && state.transition_count == unit.init_call_count
+        && state.transition_count == unit.calc_entry.call_count
+        && witness.parent_call_ordinal == state.transition_count
+        && unit.controlled_zone == Some(witness.controlled_zone)
+        && completed_state_is_consistent(unit, witness, Some(witness))
+        && super::snapshot_validation::cooling_post_saturation_capacity_limit_dehumidification_control_switch_snapshot_is_exact_direct_release(
+            witness,
+        )
 }
 
 fn state_is_consistent(

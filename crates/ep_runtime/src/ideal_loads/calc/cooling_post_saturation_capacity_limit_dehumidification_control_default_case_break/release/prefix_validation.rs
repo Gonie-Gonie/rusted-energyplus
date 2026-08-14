@@ -6,7 +6,7 @@ use super::super::{
     advance_cooling_post_saturation_capacity_limit_dehumidification_control_default_case_break_state,
 };
 use super::snapshot_validation::snapshots_match_bit_exact;
-use crate::ideal_loads::calc::completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break_is_consistent;
+use crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break_committed_latest_snapshot_is_consistent;
 use crate::ideal_loads::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationControlConstantSupplyHumidityRatioCaseBreakSnapshot as Predecessor,
     PurchasedAirRuntimeState, PurchasedAirUnitRuntimeState,
@@ -19,13 +19,16 @@ pub(super) fn direct_prefix_is_retained_and_complete(
     system: &IdealLoadsAirSystem,
     predecessor: Predecessor,
 ) -> bool {
-    completed_direct_cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break_is_consistent(
-        runtime,
-        unit,
-        system,
-        predecessor,
-        runtime.cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break_latest_witness(system.id),
-    )
+    runtime
+        .cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break_latest_witness(system.id)
+        .is_some_and(|witness| {
+            cooling_post_saturation_capacity_limit_dehumidification_control_constant_supply_humidity_ratio_case_break_committed_latest_snapshot_is_consistent(
+                unit,
+                system,
+                predecessor,
+                witness,
+            )
+        })
 }
 
 pub(super) fn default_case_break_links_to_prefix(

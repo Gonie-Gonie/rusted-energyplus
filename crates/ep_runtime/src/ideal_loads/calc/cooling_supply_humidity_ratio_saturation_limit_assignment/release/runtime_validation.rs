@@ -200,6 +200,19 @@ fn latest_metadata_is_consistent(state: &State, witness: Option<Snapshot>) -> bo
         && route_count(state, route) > 0
 }
 
+/// Bounded committed CP378 snapshot/state proof for downstream owners.
+pub(in crate::ideal_loads::calc) fn committed_latest_snapshot_is_consistent(
+    unit: &PurchasedAirUnitRuntimeState,
+    witness: Snapshot,
+) -> bool {
+    let state = &unit.calc_cooling_supply_humidity_ratio_saturation_limit_assignment;
+    state.transition_count == unit.init_call_count
+        && state.transition_count > 0
+        && witness.parent_call_ordinal == state.transition_count
+        && unit.controlled_zone == Some(witness.controlled_zone)
+        && completed_state_is_consistent(unit, witness, Some(witness))
+}
+
 fn pending_route_counts_match(state: &State, prior: &PredecessorState, route: Route) -> bool {
     route_count_pairs(state, prior)
         .into_iter()

@@ -6,7 +6,7 @@ use crate::ideal_loads::calc::cooling_post_saturation_capacity_limit_dehumidific
 #[test]
 fn cp423_committed_seal_accepts_entry_inactive_guard_false_and_assignment_routes() {
     for predecessor in representative_predecessors() {
-        let (unit, snapshot, route) = fixture_unit(predecessor);
+        let (unit, snapshot, route) = cp423_fixture_unit_for_successor_tests(predecessor);
         assert_eq!(committed(&unit, snapshot), Some(route));
     }
 }
@@ -14,7 +14,7 @@ fn cp423_committed_seal_accepts_entry_inactive_guard_false_and_assignment_routes
 #[test]
 fn cp423_committed_seal_rejects_each_route_component_and_state_accounting_forgery() {
     for predecessor in representative_predecessors() {
-        let (unit, snapshot, route) = fixture_unit(predecessor);
+        let (unit, snapshot, route) = cp423_fixture_unit_for_successor_tests(predecessor);
         let mut cases = Vec::new();
 
         let mut logical = unit.clone();
@@ -55,7 +55,7 @@ fn cp423_committed_seal_rejects_each_route_component_and_state_accounting_forger
 #[test]
 fn cp423_committed_seal_rejects_latest_witness_identity_and_assigned_owner_value_drift() {
     for predecessor in representative_predecessors() {
-        let (unit, snapshot, route) = fixture_unit(predecessor);
+        let (unit, snapshot, route) = cp423_fixture_unit_for_successor_tests(predecessor);
         let mut cases = Vec::new();
 
         let mut witness_system = snapshot;
@@ -129,7 +129,7 @@ fn representative_predecessors() -> [Predecessor; 4] {
     representatives
 }
 
-fn fixture_unit(predecessor: Predecessor) -> (
+pub(in crate::ideal_loads::calc) fn cp423_fixture_unit_for_successor_tests(predecessor: Predecessor) -> (
     crate::ideal_loads::PurchasedAirUnitRuntimeState,
     super::super::PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputSupplyTemperatureAssignmentSnapshot,
     Route,
