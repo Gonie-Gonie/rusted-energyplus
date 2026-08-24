@@ -40598,3 +40598,84 @@ output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
 inventory becomes 364 total, 240 public, 124 internal, zero unused, zero
 unreachable, with 238 development commands.
+
+## CP427 cooling zero supply-mass-flow supply-temperature mixed-air assignment
+
+CP427 supersedes only CP426's physical-line-2342 executable exclusion. At
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked `PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`, it maps
+physical executable line 2342 exactly:
+
+```cpp
+PurchAir.SupplyTemp = PurchAir.MixedAirTemp;
+```
+
+CP426 already owns the preceding zero-flow enthalpy and humidity-ratio
+assignments and their retained else-entry authority. CP427 maps only the
+following purchased-air temperature copy. Its exact two dependency-ordered
+source sites are
+`read-retained-mixed-air-temperature-for-zero-supply-mass-flow-supply-temperature-assignment`
+and
+`assign-purchased-air-supply-temperature-from-mixed-air-temperature-for-zero-supply-mass-flow`.
+The retained right-hand-side read precedes the purchased-air write as Rust
+dependency evidence without making a general C++ built-in `=` evaluation-order
+claim. Physical executable line 2343, `CoolSensOutput = 0.0;`, is first
+excluded and the CP428 candidate. Its sensible-output zero assignment, the
+following total-output zero assignment, the closing delimiter, and all later
+behavior remain excluded.
+
+CP427 preserves CP426's 59 flattened conceptual outcomes one-for-one. Only
+the retained zero-flow assignment outcome at logical index 2 executes both
+sites and performs the assignment; the other 58 outcomes execute zero CP427
+sites. Exact totals are `T427=59`, `Z427=58`, `A427=1`, and
+`S427=2*A427=2`. Public/private remains 19/40, logical index 2 is the sole
+active public outcome, and there is no active private outcome. Exactly two
+width-36 arrays retain the predecessor route counts and CP427 assignment
+route counts.
+
+Same-call bit-exact sealed CP426 lifecycle, snapshot, latest, private witness,
+completion evidence, and committed route are the sole immediate predecessor
+and execution authority. The inherited CP424 else-entry marker, CP425
+enthalpy-assignment marker, and CP426 humidity-ratio-assignment marker are all
+mandatory; mere absence of any unrelated assignment cannot activate CP427.
+The active right-hand side comes only from the sealed same-call CP329 committed
+`mixed_air_temperature_c` owner, with matching selected system, call ordinal,
+controlled Zone, exact no-OA shape, retained state, latest snapshot, witness,
+and raw bits. Caller, model, service, Zone, earlier temperature, inferred, and
+numerical-DTO values cannot substitute. Inactive routes acquire no CP329
+temperature owner and perform no read.
+
+The assignment copies the CP329 binary64 payload bit-exactly into
+`PurchAir.SupplyTemp`. There is deliberately no active preexisting-LHS operand
+because the unconditional source assignment overwrites that field before
+later use. CP427 adds no arithmetic, comparison, psychrometric evaluation,
+finite/range gate, clamp, normalization, default, diagnostic, cache, or
+mutable-service operation. Exact direct CP329 evidence already constrains the
+retained temperature; defensive pure-transition bit characterization does not
+widen direct release reachability.
+
+The lossless snapshot preserves CP426 fields 0 through 283 exactly, renames
+CP426's terminal W/H/T as the predecessor-CP426 triple, appends an exact
+nine-field CP427 execution, owner, read, assignment, and result block, and
+re-emits final W/H/T. It therefore has exactly 299 base fields, 109
+`Option<f64>` carriers, two optional comparison bools, and one optional
+control enum. JSON preserves CP426's exact first 385 nonterminal keys and
+appends an exact 23-key tail comprising the renamed predecessor W/H/T with
+sidecars, the local block with two sidecars, and final W/H/T with sidecars,
+for 408 unique keys and 109 immediately adjacent authoritative IEEE sidecars.
+CP426 predecessor and unchanged W/H/T presence is 37/42/56. Final W/H/T
+presence is 37/42/57, and CP427 owns the one newly resulting supply-temperature
+value.
+
+Binding is CP426-to-CP427-to-unchanged-numerical, while preserving the
+CP425-to-CP426 interval, and the binding checkpoint count advances from 117
+to 118. CP427 adds no numerical, coupling-input, or output DTO field. Its
+evidence never feeds or replaces prediction, numerical results, feedback,
+nodes, loads, reports, or outputs; non-direct paths reject CP427 lifecycle
+evidence. CP427 adds no support, readiness, capability, routine, algorithm,
+numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
+inventory becomes 365 total, 240 public, 125 internal, zero unused, zero
+unreachable, with 238 development commands.

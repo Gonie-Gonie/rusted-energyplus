@@ -1,5 +1,6 @@
 //! CP426 boundary, exhaustive route, forgery, preservation, and overflow tests.
 
+mod committed_seal;
 mod schema_prefix;
 
 use super::transition::{
@@ -285,5 +286,18 @@ fn nonzero_indices(values: &[usize; 36]) -> Vec<usize> {
         .iter()
         .enumerate()
         .filter_map(|(index, count)| (*count != 0).then_some(index))
+        .collect()
+}
+
+pub(in crate::ideal_loads::calc) fn cp426_all_snapshots_for_successor_tests(
+) -> Vec<super::PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyHumidityRatioMixedAirAssignmentSnapshot> {
+    cp425_all_snapshots_for_successor_tests()
+        .into_iter()
+        .map(|predecessor| {
+            let route = route_for(predecessor);
+            let rhs = route.assignment_executed.then_some(0.008_25);
+            advance_validated(&mut State::new(predecessor.system), predecessor, route, rhs)
+                .expect("CP426 successor snapshot")
+        })
         .collect()
 }

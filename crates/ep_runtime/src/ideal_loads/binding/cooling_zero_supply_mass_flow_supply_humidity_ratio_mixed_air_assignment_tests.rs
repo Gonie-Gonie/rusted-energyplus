@@ -29,11 +29,11 @@ fn cp426_adapter_accepts_only_the_cp425_snapshot() {
 }
 
 #[test]
-fn cp426_extends_scheduled_binding_from_116_to_exactly_117_snapshots() {
+fn cp426_is_preserved_in_current_118_snapshot_binding() {
     assert_eq!(
         include_str!("scheduled_output.rs")
             .matches("    pub calculation_")
             .count(),
-        117
+        118
     );
 }

@@ -26,6 +26,7 @@ mod runtime_validation;
 pub(in crate::ideal_loads::calc) use committed::{
     PurchasedAirCalcCoolingMixedAirCallCommittedSensibleOutputInputs,
     cooling_mixed_air_call_committed_latest_mixed_air_enthalpy,
+    cooling_mixed_air_call_committed_latest_mixed_air_temperature,
     cooling_mixed_air_call_committed_latest_sensible_output_inputs,
 };
 #[cfg(test)]

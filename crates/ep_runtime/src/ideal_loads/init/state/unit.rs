@@ -300,6 +300,10 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyHumidityRatioMixedAirAssignmentRuntimeState::new(
                     system,
                 ),
+            calc_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment:
+                PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyTemperatureMixedAirAssignmentRuntimeState::new(
+                    system,
+                ),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

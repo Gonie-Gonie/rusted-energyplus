@@ -17,6 +17,7 @@ pub(in crate::ideal_loads::calc) use release::cooling_mixed_air_call_committed_l
 pub(in crate::ideal_loads::calc) use release::{
     PurchasedAirCalcCoolingMixedAirCallCommittedSensibleOutputInputs,
     cooling_mixed_air_call_committed_latest_mixed_air_enthalpy,
+    cooling_mixed_air_call_committed_latest_mixed_air_temperature,
     cooling_mixed_air_call_committed_latest_sensible_output_inputs,
 };
 pub use release::{

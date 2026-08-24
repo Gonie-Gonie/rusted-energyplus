@@ -9,6 +9,9 @@ mod state;
 mod tests;
 mod transition;
 
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::cp426_all_snapshots_for_successor_tests;
+
 pub use release::{
     PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyHumidityRatioMixedAirAssignmentError,
     advance_direct_no_oa_calc_cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment,
@@ -19,6 +22,11 @@ pub(in crate::ideal_loads) use release::{
     cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_snapshot_is_exact,
     cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_snapshots_match_bit_exact,
     private_cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_characterization,
+};
+pub(in crate::ideal_loads::calc) use release::{
+    cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_committed_latest_route,
+    cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_retained_route_matches_snapshot_bounded,
+    cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_snapshot_route,
 };
 pub use state::PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyHumidityRatioMixedAirAssignmentRuntimeState;
 #[allow(unused_imports)]

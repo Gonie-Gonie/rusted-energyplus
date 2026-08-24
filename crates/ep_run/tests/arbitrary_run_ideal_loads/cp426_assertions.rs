@@ -4,6 +4,9 @@ use std::collections::BTreeSet;
 
 use serde_json::{Map, Value, json};
 
+#[path = "cp427_assertions.rs"]
+mod cp427_assertions;
+
 const CP425_KEY: &str = "purchased_air_calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment_lifecycle";
 const CP426_KEY: &str = "purchased_air_calc_cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_lifecycle";
 const ORDER: [&str; 2] = [
@@ -204,6 +207,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         );
     }
     assert!(!results.to_string().contains(CP426_KEY));
+    cp427_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -212,6 +216,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP426_KEY].is_null(),
         "non-direct runtime must not publish CP426 evidence"
     );
+    cp427_assertions::assert_non_direct(runtime);
 }
 
 fn assert_actual_json_key_set(
@@ -264,7 +269,7 @@ fn assert_schema_and_binding_cardinalities() {
     assert_eq!(snapshot.matches("Option<bool>").count(), 2);
     assert_eq!(snapshot.matches("Option<").count() - 104 - 2, 1);
     let binding = include_str!("../../../ep_runtime/src/ideal_loads/binding/scheduled_output.rs");
-    assert_eq!(binding.matches("    pub calculation_").count(), 117);
+    assert_eq!(binding.matches("    pub calculation_").count(), 118);
 }
 
 fn array<'a>(lifecycle: &'a Value, field: &str) -> &'a Vec<Value> {

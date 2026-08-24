@@ -215,7 +215,7 @@ fn assert_schema_and_binding_cardinalities() {
     assert_eq!(snapshot.matches("Option<bool>").count(), 2);
     assert_eq!(snapshot.matches("Option<").count() - 94 - 2, 1);
     let binding = include_str!("../../../ep_runtime/src/ideal_loads/binding/scheduled_output.rs");
-    assert_eq!(binding.matches("    pub calculation_").count(), 117);
+    assert_eq!(binding.matches("    pub calculation_").count(), 118);
     let core_tests = include_str!(
         "../../../ep_runtime/src/ideal_loads/calc/cooling_supply_mass_flow_positive_guard_else_branch_entry/tests.rs"
     );

@@ -45,6 +45,19 @@ pub(in crate::ideal_loads::calc) fn cooling_mixed_air_call_committed_latest_sens
     )
 }
 
+/// Returns CP329's committed same-call mixed-air temperature without exposing
+/// the separately owned supply-flow operand.
+pub(in crate::ideal_loads::calc) fn cooling_mixed_air_call_committed_latest_mixed_air_temperature(
+    unit: &PurchasedAirUnitRuntimeState,
+    witness: PurchasedAirCalcCoolingMixedAirCallSnapshot,
+) -> Option<f64> {
+    let latest = unit.calc_cooling_mixed_air_call.latest?;
+    let mixed_temperature = latest.mixed_air_temperature_c?;
+    (committed_no_oa_humidity_owner_state_is_consistent(unit, witness)
+        && committed_no_oa_sensible_snapshot_has_exact_shape(latest))
+    .then_some(mixed_temperature)
+}
+
 /// Returns CP329's committed same-call mixed-air enthalpy projection.
 pub(in crate::ideal_loads::calc) fn cooling_mixed_air_call_committed_latest_mixed_air_enthalpy(
     unit: &PurchasedAirUnitRuntimeState,

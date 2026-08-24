@@ -246,7 +246,7 @@ foreach ($registration in @(
 }
 
 # Direct-only lifecycle, IEEE JSON sidecars, and terminal nonfeed firewall.
-Assert-Contains -Path $cp382PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp426_lifecycle_evidence' -Description "cumulative non-direct firewall"
+Assert-Contains -Path $cp382PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp427_lifecycle_evidence' -Description "cumulative non-direct firewall"
 Assert-Contains -Path $cp382PipelineRoot -Pattern $cp382Lifecycle -Description "pipeline lifecycle key"
 foreach ($pattern in @(
         'dehumidification_total_output_assignment_count', 'source_site_execution_count',
@@ -334,20 +334,20 @@ Assert-Contains -Path "docs\src\generated\capability-index.md" -Pattern 'CP382 a
 # Current-state propagation while the CP381 319/79 checkpoint stays historical.
 foreach ($historical in 334..381) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp426_lifecycle_evidence' -Description "historical firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp427_lifecycle_evidence' -Description "historical firewall"
 }
 foreach ($historical in 335..381) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 364 \|')) -Description "historical generated total"
-Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 124 \|')) -Description "historical generated internal"
+Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 365 \|')) -Description "historical generated total"
+Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 125 \|')) -Description "historical generated internal"
 }
 foreach ($historical in 337..381) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 364' -Description "historical inventory total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 365' -Description "historical inventory total"
 }
 foreach ($historical in 367..381) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'Count -ne 124' -Description "historical internal classification count"
+Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'Count -ne 125' -Description "historical internal classification count"
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern '240 public and 122 internal' -Description "historical classification diagnostic"
 }
 foreach ($historical in @('cp326-cooling-supply-mass-flow-limit-body.ps1') + @(329..359 | ForEach-Object {
@@ -399,21 +399,21 @@ if ($cp381AuditIndexForCp382 -lt 0 -or $cp382AuditIndex -le $cp381AuditIndexForC
 }
 $cp382InventoryText = Read-RepoText -Path "specs\script_inventory.toml"
 foreach ($pattern in @(
-        'script_count = 364', 'dev_command_count = 238',
+        'script_count = 365', 'dev_command_count = 238',
         'unused_script_count = 0', 'unreachable_count = 0'
     )) {
     Assert-Cp382TextContains -Text $cp382InventoryText -Pattern $pattern -Description "inventory $pattern"
 }
 if ([regex]::Matches($cp382InventoryText, '(?m)^classification = "public"$').Count -ne 240 -or
-    [regex]::Matches($cp382InventoryText, '(?m)^classification = "internal"$').Count -ne 124) {
+    [regex]::Matches($cp382InventoryText, '(?m)^classification = "internal"$').Count -ne 125) {
     throw "CP382 inventory must be exactly 240 public and 122 internal scripts"
 }
 Assert-Cp382TextContains -Text $cp382InventoryText -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp382-cooling-post-saturation-capacity-limit-dehumidification-total-output-assignment\.ps1"' -Description "inventory record"
 Assert-Cp382TextContains -Text $cp382InventoryText -Pattern 'ideal-loads-structure-audit\.ps1::dot_sources' -Description "caller evidence"
 foreach ($pattern in @(
-        '\| 364 \|',
+        '\| 365 \|',
         '\| public scripts \| 240 \|',
-        '\| 124 \|',
+        '\| 125 \|',
         '\| scripts without callers \| 0 \|'
     )) {
     Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern $pattern -Description "generated script inventory $pattern"
@@ -442,4 +442,4 @@ Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling
 Write-Host "CP382 post-saturation dehumidification total-output assignment structure audit passed."
 }
 
-Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern '\$cp425Call' -Description 'CP425 terminal capture'; Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP424-to-CP425' -Description 'CP424-to-CP425 terminal interval'; Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP425-to-CP426' -Description 'CP425-to-CP426 terminal interval'; Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern '\$cp426Call' -Description 'CP426 terminal capture'; Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP426-to-numerical' -Description 'CP426-to-numerical terminal interval'
+Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern '\$cp425Call' -Description 'CP425 terminal capture'; Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP424-to-CP425' -Description 'CP424-to-CP425 terminal interval'; Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP425-to-CP426' -Description 'CP425-to-CP426 terminal interval'; Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern '\$cp426Call' -Description 'CP426 terminal capture'; Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP427-to-numerical' -Description 'CP427-to-numerical terminal interval'; Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern '\$cp427Call' -Description 'CP427 terminal capture'; Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP426-to-CP427' -Description 'CP426-to-CP427 terminal interval'; Assert-Contains -Path 'scripts\quality\ideal-loads-structure-audit\cp345-cooling-positive-supply-post-capacity-limit-humidity-ratio-mixed-air-assignment.ps1' -Pattern 'CP427-to-numerical' -Description 'CP427-to-numerical terminal interval'

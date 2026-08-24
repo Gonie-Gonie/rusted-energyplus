@@ -1,5 +1,6 @@
 use super::super::{
     PurchasedAirCalcCoolingMixedAirCallRetainedRoute,
+    cooling_mixed_air_call_committed_latest_mixed_air_temperature,
     cooling_mixed_air_call_committed_latest_sensible_output_inputs,
 };
 use crate::ideal_loads::calc::cooling_mixed_air_call::release_tests::release_case;
@@ -26,6 +27,54 @@ fn cp329_sensible_owner_accepts_exact_flow_and_temperature_bits() {
     assert_eq!(
         inputs.mixed_air_temperature_c.to_bits(),
         snapshot.mixed_air_temperature_c.expect("mixed T").to_bits(),
+    );
+}
+
+#[test]
+fn cp329_narrow_temperature_owner_accepts_exact_bits_without_returning_flow() {
+    let (runtime, system, snapshot) = completed_case();
+    let temperature = cooling_mixed_air_call_committed_latest_mixed_air_temperature(
+        runtime.units.get(&system).expect("unit"),
+        snapshot,
+    )
+    .expect("sealed CP329 mixed-air temperature");
+    assert_eq!(
+        temperature.to_bits(),
+        snapshot.mixed_air_temperature_c.expect("mixed T").to_bits(),
+    );
+}
+
+#[test]
+fn cp329_narrow_temperature_owner_rejects_latest_witness_and_state_forgeries() {
+    let (runtime, system, snapshot) = completed_case();
+
+    let mut forged_witness = snapshot;
+    forged_witness.mixed_air_temperature_c = forged_witness.mixed_air_temperature_c.map(flip);
+    assert!(
+        cooling_mixed_air_call_committed_latest_mixed_air_temperature(
+            runtime.units.get(&system).expect("unit"),
+            forged_witness,
+        )
+        .is_none()
+    );
+
+    let mut coordinated = runtime.clone();
+    let latest = coordinated
+        .units
+        .get_mut(&system)
+        .expect("unit")
+        .calc_cooling_mixed_air_call
+        .latest
+        .as_mut()
+        .expect("latest");
+    latest.recirculation_temperature_c = latest.recirculation_temperature_c.map(flip);
+    latest.mixed_air_temperature_c = latest.mixed_air_temperature_c.map(flip);
+    assert!(
+        cooling_mixed_air_call_committed_latest_mixed_air_temperature(
+            coordinated.units.get(&system).expect("unit"),
+            snapshot,
+        )
+        .is_none()
     );
 }
 
@@ -122,4 +171,8 @@ fn completed_case() -> (
         .calc_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_entry
         .transition_count = snapshot.parent_call_ordinal;
     (runtime, system.id, snapshot)
+}
+
+fn flip(value: f64) -> f64 {
+    f64::from_bits(value.to_bits() ^ 1)
 }

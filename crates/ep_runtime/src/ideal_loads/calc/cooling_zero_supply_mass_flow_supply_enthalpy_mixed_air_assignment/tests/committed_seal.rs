@@ -30,141 +30,177 @@ fn cp425_committed_seal_accepts_inactive_route_without_acquiring_cp329_owner() {
 fn cp425_committed_seal_rejects_route_witness_count_and_identity_forgeries() {
     let (unit, snapshot, route, cp329_witness) = active_fixture();
     let owner = Some(cp329_witness);
-    let mut cases = Vec::new();
+    enum Forgery {
+        LogicalIndex,
+        Active,
+        PredecessorAssignment,
+        PredecessorEntered,
+        Assignment,
+        WitnessValue,
+        LatestMissing,
+        RouteMissing,
+        TransitionCount,
+        InitCount,
+        TransitionOrdinal,
+        RouteCount,
+        AssignmentCount,
+        SiteCount,
+        PredecessorCount,
+        CoordinatedOrdinal,
+        CoordinatedSystem,
+        CoordinatedZone,
+        StateSystem,
+    }
+    let forgeries = [
+        Forgery::LogicalIndex,
+        Forgery::Active,
+        Forgery::PredecessorAssignment,
+        Forgery::PredecessorEntered,
+        Forgery::Assignment,
+        Forgery::WitnessValue,
+        Forgery::LatestMissing,
+        Forgery::RouteMissing,
+        Forgery::TransitionCount,
+        Forgery::InitCount,
+        Forgery::TransitionOrdinal,
+        Forgery::RouteCount,
+        Forgery::AssignmentCount,
+        Forgery::SiteCount,
+        Forgery::PredecessorCount,
+        Forgery::CoordinatedOrdinal,
+        Forgery::CoordinatedSystem,
+        Forgery::CoordinatedZone,
+        Forgery::StateSystem,
+    ];
 
-    let mut logical = unit.clone();
-    logical
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .latest_route
-        .as_mut()
-        .expect("route")
-        .logical_index = 3;
-    cases.push((logical, snapshot, owner));
-    let mut active = unit.clone();
-    active
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .latest_route
-        .as_mut()
-        .expect("route")
-        .active = false;
-    cases.push((active, snapshot, owner));
-    let mut predecessor_assignment = unit.clone();
-    predecessor_assignment
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .latest_route
-        .as_mut()
-        .expect("route")
-        .predecessor_assignment_executed ^= true;
-    cases.push((predecessor_assignment, snapshot, owner));
-    let mut predecessor_entered = unit.clone();
-    predecessor_entered
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .latest_route
-        .as_mut()
-        .expect("route")
-        .predecessor_entered = false;
-    cases.push((predecessor_entered, snapshot, owner));
-    let mut assignment = unit.clone();
-    assignment
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .latest_route
-        .as_mut()
-        .expect("route")
-        .assignment_executed = false;
-    cases.push((assignment, snapshot, owner));
-
-    let mut witness = snapshot;
-    witness.assigned_supply_enthalpy_from_mixed_air_j_per_kg =
-        witness.assigned_supply_enthalpy_from_mixed_air_j_per_kg.map(flip);
-    cases.push((unit.clone(), witness, owner));
-    let mut latest_missing = unit.clone();
-    latest_missing
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .latest = None;
-    cases.push((latest_missing, snapshot, owner));
-    let mut route_missing = unit.clone();
-    route_missing
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .latest_route = None;
-    cases.push((route_missing, snapshot, owner));
-    let mut transition = unit.clone();
-    transition
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .transition_count += 1;
-    cases.push((transition, snapshot, owner));
-    let mut init_count = unit.clone();
-    init_count.init_call_count += 1;
-    cases.push((init_count, snapshot, owner));
-    let mut ordinal = unit.clone();
-    ordinal
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .latest_transition_ordinal = Some(0);
-    cases.push((ordinal, snapshot, owner));
-    let mut route_count = unit.clone();
-    route_count
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .predecessor_route_counts[route.logical_index] += 1;
-    cases.push((route_count, snapshot, owner));
-    let mut assignment_count = unit.clone();
-    assignment_count
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment_count += 1;
-    cases.push((assignment_count, snapshot, owner));
-    let mut site_count = unit.clone();
-    site_count
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .source_site_execution_count += 1;
-    cases.push((site_count, snapshot, owner));
-    let mut predecessor_count = unit.clone();
-    predecessor_count
-        .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
-        .predecessor_route_counts[route.logical_index] += 1;
-    cases.push((predecessor_count, snapshot, owner));
-
-    let mut coordinated_ordinal = unit.clone();
-    let forged_ordinal = snapshot.parent_call_ordinal.wrapping_add(1);
-    coordinated_ordinal
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .latest
-        .as_mut()
-        .expect("latest")
-        .parent_call_ordinal = forged_ordinal;
-    let mut ordinal_witness = snapshot;
-    ordinal_witness.parent_call_ordinal = forged_ordinal;
-    cases.push((coordinated_ordinal, ordinal_witness, owner));
-
-    let mut coordinated_system = unit.clone();
-    let forged_system = ep_model::IdealLoadsAirSystemId(snapshot.system.0.wrapping_add(1));
-    coordinated_system
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .latest
-        .as_mut()
-        .expect("latest")
-        .system = forged_system;
-    let mut system_witness = snapshot;
-    system_witness.system = forged_system;
-    cases.push((coordinated_system, system_witness, owner));
-
-    let mut coordinated_zone = unit.clone();
-    let forged_zone = ep_model::ZoneId(snapshot.controlled_zone.0.wrapping_add(1));
-    coordinated_zone.controlled_zone = Some(forged_zone);
-    coordinated_zone
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .latest
-        .as_mut()
-        .expect("latest")
-        .controlled_zone = forged_zone;
-    let mut zone_witness = snapshot;
-    zone_witness.controlled_zone = forged_zone;
-    cases.push((coordinated_zone, zone_witness, owner));
-
-    let mut state_system = unit.clone();
-    state_system
-        .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
-        .system = forged_system;
-    cases.push((state_system, snapshot, owner));
-
-    for (index, (forged, witness, owner)) in cases.into_iter().enumerate() {
+    for (index, forgery) in forgeries.into_iter().enumerate() {
+        let mut forged = unit.clone();
+        let mut witness = snapshot;
+        match forgery {
+            Forgery::LogicalIndex => {
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .latest_route
+                    .as_mut()
+                    .expect("route")
+                    .logical_index = 3;
+            }
+            Forgery::Active => {
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .latest_route
+                    .as_mut()
+                    .expect("route")
+                    .active = false;
+            }
+            Forgery::PredecessorAssignment => {
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .latest_route
+                    .as_mut()
+                    .expect("route")
+                    .predecessor_assignment_executed ^= true;
+            }
+            Forgery::PredecessorEntered => {
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .latest_route
+                    .as_mut()
+                    .expect("route")
+                    .predecessor_entered = false;
+            }
+            Forgery::Assignment => {
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .latest_route
+                    .as_mut()
+                    .expect("route")
+                    .assignment_executed = false;
+            }
+            Forgery::WitnessValue => {
+                witness.assigned_supply_enthalpy_from_mixed_air_j_per_kg = witness
+                    .assigned_supply_enthalpy_from_mixed_air_j_per_kg
+                    .map(flip);
+            }
+            Forgery::LatestMissing => {
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .latest = None;
+            }
+            Forgery::RouteMissing => {
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .latest_route = None;
+            }
+            Forgery::TransitionCount => {
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .transition_count += 1;
+            }
+            Forgery::InitCount => forged.init_call_count += 1,
+            Forgery::TransitionOrdinal => {
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .latest_transition_ordinal = Some(0);
+            }
+            Forgery::RouteCount => {
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .predecessor_route_counts[route.logical_index] += 1;
+            }
+            Forgery::AssignmentCount => {
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment_count += 1;
+            }
+            Forgery::SiteCount => {
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .source_site_execution_count += 1;
+            }
+            Forgery::PredecessorCount => {
+                forged
+                    .calc_cooling_supply_mass_flow_positive_guard_else_branch_entry
+                    .predecessor_route_counts[route.logical_index] += 1;
+            }
+            Forgery::CoordinatedOrdinal => {
+                let forged_ordinal = snapshot.parent_call_ordinal.wrapping_add(1);
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .latest
+                    .as_mut()
+                    .expect("latest")
+                    .parent_call_ordinal = forged_ordinal;
+                witness.parent_call_ordinal = forged_ordinal;
+            }
+            Forgery::CoordinatedSystem => {
+                let forged_system =
+                    ep_model::IdealLoadsAirSystemId(snapshot.system.0.wrapping_add(1));
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .latest
+                    .as_mut()
+                    .expect("latest")
+                    .system = forged_system;
+                witness.system = forged_system;
+            }
+            Forgery::CoordinatedZone => {
+                let forged_zone = ep_model::ZoneId(snapshot.controlled_zone.0.wrapping_add(1));
+                forged.controlled_zone = Some(forged_zone);
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .latest
+                    .as_mut()
+                    .expect("latest")
+                    .controlled_zone = forged_zone;
+                witness.controlled_zone = forged_zone;
+            }
+            Forgery::StateSystem => {
+                forged
+                    .calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment
+                    .system = ep_model::IdealLoadsAirSystemId(snapshot.system.0.wrapping_add(1));
+            }
+        }
         assert!(
             committed(&forged, witness, owner).is_none(),
             "forgery {index}",
