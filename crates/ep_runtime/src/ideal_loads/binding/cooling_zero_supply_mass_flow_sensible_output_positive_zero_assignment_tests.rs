@@ -28,11 +28,14 @@ fn cp428_adapter_accepts_only_the_cp427_snapshot_and_no_scalar_input() {
 }
 
 #[test]
-fn cp428_extends_scheduled_binding_from_118_to_exactly_119_snapshots() {
-    assert_eq!(
-        include_str!("scheduled_output.rs")
-            .matches("    pub calculation_")
-            .count(),
-        119
-    );
+fn cp428_is_preserved_before_cp429_in_current_120_snapshot_binding() {
+    let source = include_str!("scheduled_output.rs");
+    assert_eq!(source.matches("    pub calculation_").count(), 120);
+    let cp428 = source
+        .find("calculation_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment")
+        .expect("CP428 output");
+    let cp429 = source
+        .find("calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment")
+        .expect("CP429 output");
+    assert!(cp428 < cp429);
 }

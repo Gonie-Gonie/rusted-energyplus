@@ -116,6 +116,7 @@ use super::super::{
     PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyEnthalpyMixedAirAssignmentSnapshot,
     PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyHumidityRatioMixedAirAssignmentSnapshot,
     PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyTemperatureMixedAirAssignmentSnapshot,
+    PurchasedAirCalcCoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentSnapshot,
     PurchasedAirCalcEntrySnapshot, PurchasedAirCalcMinimumOaPrefixSnapshot,
     PurchasedAirInitSnapshot,
 };
@@ -475,6 +476,9 @@ pub struct DirectZonePurchasedAirScheduledCouplingOutput {
     /// Source-ordered zero-flow sensible-output positive-zero assignment snapshot.
     pub calculation_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment:
         PurchasedAirCalcCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignmentSnapshot,
+    /// Source-ordered zero-flow total-output positive-zero assignment snapshot.
+    pub calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment:
+        PurchasedAirCalcCoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentSnapshot,
     /// Predictor, PurchasedAir, and feedback result from CP300.
     pub coupling: DirectZonePurchasedAirCouplingOutput,
 }

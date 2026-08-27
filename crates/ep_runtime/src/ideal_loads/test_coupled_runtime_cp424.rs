@@ -34,7 +34,7 @@ fn cp424_conceptual_contract_has_59_outcomes_58_inactive_one_entry_and_one_site(
 }
 
 #[test]
-fn cp424_snapshot_schema_is_exactly_263_94_2_1_and_current_binding_is_119() {
+fn cp424_snapshot_schema_is_exactly_263_94_2_1_and_current_binding_is_120() {
     let source = include_str!("calc/cooling_supply_mass_flow_positive_guard_else_branch_entry.rs");
     let snapshot = source
         .split_once(
@@ -57,7 +57,7 @@ fn cp424_snapshot_schema_is_exactly_263_94_2_1_and_current_binding_is_119() {
         include_str!("binding/scheduled_output.rs")
             .matches("    pub calculation_")
             .count(),
-        119
+        120
     );
 }
 

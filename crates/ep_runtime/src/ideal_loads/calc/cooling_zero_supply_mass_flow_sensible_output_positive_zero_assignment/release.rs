@@ -21,12 +21,18 @@ use crate::ideal_loads::{
     cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment_snapshots_match_bit_exact,
 };
 
+mod committed;
 mod error;
 mod prefix;
 mod runtime_validation;
 mod snapshot_validation;
 
 pub use error::PurchasedAirCalcCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignmentError;
+pub(in crate::ideal_loads::calc) use committed::cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_committed_latest_route;
+pub(in crate::ideal_loads::calc) use snapshot_validation::{
+    retained_route_matches_snapshot_bounded as cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_retained_route_matches_snapshot_bounded,
+    snapshot_route as cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_snapshot_route,
+};
 use runtime_validation::{pending_state_is_consistent, post_transition_state_is_consistent};
 use snapshot_validation::{prefix_and_local_shape_match, snapshot_is_exact, snapshots_match_bit_exact};
 
