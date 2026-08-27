@@ -1,5 +1,6 @@
 //! CP427 boundary, exhaustive route, forgery, preservation, and overflow tests.
 
+mod committed_seal;
 mod schema_prefix;
 
 use super::transition::{
@@ -263,6 +264,20 @@ pub(super) fn active_predecessor() -> Predecessor {
         .into_iter()
         .find(|snapshot| snapshot.cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_executed)
         .expect("CP427 active predecessor")
+}
+
+pub(in crate::ideal_loads::calc) fn cp427_all_snapshots_for_successor_tests() -> Vec<
+    crate::ideal_loads::PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyTemperatureMixedAirAssignmentSnapshot,
+> {
+    cp426_all_snapshots_for_successor_tests()
+        .into_iter()
+        .map(|predecessor| {
+            let route = route_for(predecessor);
+            let rhs = route.assignment_executed.then_some(1.0_f64);
+            advance_validated(&mut State::new(predecessor.system), predecessor, route, rhs)
+                .expect("CP427 successor fixture")
+        })
+        .collect()
 }
 
 pub(super) fn route_for(predecessor: Predecessor) -> Route {

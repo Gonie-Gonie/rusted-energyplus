@@ -27620,3 +27620,78 @@ output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
 inventory becomes 365 total, 240 public, 125 internal, zero unused, zero
 unreachable, with 238 development commands.
+
+## CP428 cooling zero supply-mass-flow sensible-output positive-zero assignment
+
+CP428 supersedes only CP427's physical-line-2343 executable exclusion. At
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked `PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`, it maps
+physical executable line 2343 exactly:
+
+```cpp
+CoolSensOutput = 0.0;
+```
+
+CP427 already owns the preceding zero-flow enthalpy, humidity-ratio, and
+temperature assignments together with their retained else-entry authority.
+Physical executable line 2344, `CoolTotOutput = 0.0;`, is first excluded and
+the CP429 candidate. Its total-output positive-zero assignment, physical line
+2345's closing delimiter, the Heating-or-no-load branch, and all later behavior
+remain excluded. CP428's exact sole lexical source site is
+`assign-local-cooling-sensible-output-positive-zero-for-zero-supply-mass-flow`.
+The source `0.0` literal is part of that assignment rather than a second site.
+
+CP428 preserves CP427's 59 flattened conceptual outcomes one-for-one. Only
+the retained zero-flow assignment outcome at logical index 2 executes the
+site and performs the assignment; the other 58 outcomes execute zero CP428
+sites. Exact totals are `T428=59`, `Z428=58`, `A428=1`, and
+`S428=A428=1`. Public/private remains 19/40, logical index 2 is the sole
+active public outcome, and there is no active private outcome. Exactly two
+width-36 arrays retain the predecessor route counts and CP428 positive-zero
+assignment route counts.
+
+Same-call bit-exact sealed CP427 lifecycle, snapshot, latest, private witness,
+completion evidence, and committed route are the sole immediate predecessor
+and execution authority. The inherited CP424 else-entry marker, CP425
+enthalpy-assignment marker, CP426 humidity-ratio-assignment marker, and CP427
+temperature-assignment marker are all mandatory; mere absence of an unrelated
+assignment cannot activate CP428. The CP427 terminal W/H/T owners remain the
+sole state authority for those three values. CP428 reads no right-hand-side
+scalar and acquires no operand owner. There is deliberately no active
+preexisting-`CoolSensOutput` operand because the unconditional source
+assignment overwrites that local before later use. Inactive routes perform no
+assignment and publish no CP428 local value.
+
+The assignment writes the source literal's exact binary64 positive-zero bits
+`0x0000000000000000` into local `CoolSensOutput`; negative zero is not an
+equivalent bit-exact result. CP428 adds no read, arithmetic, comparison,
+psychrometric evaluation, finite/range gate, clamp, normalization, default,
+diagnostic, cache, or mutable-service operation. Its assigned local value is
+branch-local lifecycle evidence only and does not widen direct release
+reachability.
+
+The lossless snapshot preserves CP427 fields 0 through 295 exactly, renames
+CP427's terminal W/H/T as the predecessor-CP427 triple, appends an exact
+six-field CP428 execution, retained-state-owner, assignment, and assigned-value
+block, and re-emits final W/H/T. It therefore has exactly 308 base fields, 113
+`Option<f64>` carriers, two optional comparison bools, and one optional
+control enum. JSON preserves CP427's exact first 402 nonterminal keys and
+appends an exact 19-key tail comprising the renamed predecessor W/H/T with
+sidecars, the local block with one sidecar, and final W/H/T with sidecars, for
+421 unique keys and 113 immediately adjacent authoritative IEEE sidecars.
+Predecessor and final W/H/T presence is 37/42/57 with bit-exact unchanged
+preservation, and CP428 owns one newly assigned local cooling-sensible-output
+positive-zero value.
+
+Binding is CP427-to-CP428-to-unchanged-numerical, while preserving the
+CP426-to-CP427 interval, and the binding checkpoint count advances from 118
+to 119. CP428 adds no numerical, coupling-input, or output DTO field. Its
+evidence never feeds or replaces prediction, numerical results, feedback,
+nodes, loads, reports, or outputs; non-direct paths reject CP428 lifecycle
+evidence. CP428 adds no support, readiness, capability, routine, algorithm,
+numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
+inventory becomes 366 total, 240 public, 126 internal, zero unused, zero
+unreachable, with 238 development commands.

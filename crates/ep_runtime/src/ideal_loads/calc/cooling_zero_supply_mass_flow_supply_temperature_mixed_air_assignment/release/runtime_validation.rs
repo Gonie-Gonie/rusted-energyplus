@@ -41,7 +41,7 @@ pub(super) fn post_transition_state_is_consistent(
         && predecessor_counts_match(state, predecessor)
 }
 
-fn predecessor_counts_match(state: &State, predecessor: &PredecessorState) -> bool {
+pub(super) fn predecessor_counts_match(state: &State, predecessor: &PredecessorState) -> bool {
     state.transition_count == predecessor.transition_count
         && state.predecessor_route_counts == predecessor.predecessor_route_counts
 }

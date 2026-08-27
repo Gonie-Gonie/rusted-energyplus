@@ -10,7 +10,10 @@ mod tests;
 mod transition;
 
 #[cfg(test)]
-pub(in crate::ideal_loads::calc) use tests::cp426_all_snapshots_for_successor_tests;
+pub(in crate::ideal_loads::calc) use tests::{
+    cp426_all_snapshots_for_successor_tests,
+    cp426_fixture_unit_for_successor_tests,
+};
 
 pub use release::{
     PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyHumidityRatioMixedAirAssignmentError,

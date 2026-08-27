@@ -3,6 +3,8 @@
 mod committed_seal;
 mod schema_prefix;
 
+pub(in crate::ideal_loads::calc) use committed_seal::cp426_fixture_unit_for_successor_tests;
+
 use super::transition::{
     PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyHumidityRatioMixedAirAssignmentRetainedRoute as Route,
     cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_route_from_committed_predecessor as successor_route,

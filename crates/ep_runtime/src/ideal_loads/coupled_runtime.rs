@@ -259,6 +259,8 @@ use super::{
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardBodyLifecycleSummary,
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardError,
     PurchasedAirCalcCoolingSupplyMassFlowVerySmallGuardLifecycleSummary,
+    PurchasedAirCalcCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignmentError,
+    PurchasedAirCalcCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyEnthalpyMixedAirAssignmentError,
     PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyEnthalpyMixedAirAssignmentLifecycleSummary,
     PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyHumidityRatioMixedAirAssignmentError,
@@ -384,6 +386,7 @@ use super::{
     purchased_air_calc_cooling_supply_mass_flow_positive_guard_lifecycle_summary,
     purchased_air_calc_cooling_supply_mass_flow_very_small_guard_body_lifecycle_summary,
     purchased_air_calc_cooling_supply_mass_flow_very_small_guard_lifecycle_summary,
+    purchased_air_calc_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_lifecycle_summary,
     purchased_air_calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment_lifecycle_summary,
     purchased_air_calc_cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_lifecycle_summary,
     purchased_air_calc_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment_lifecycle_summary,
@@ -504,6 +507,7 @@ pub(in crate::ideal_loads) mod cooling_supply_mass_flow_positive_guard_else_bran
 mod cooling_supply_mass_flow_positive_guard_validation;
 mod cooling_supply_mass_flow_very_small_guard_body_validation;
 mod cooling_supply_mass_flow_very_small_guard_validation;
+pub(in crate::ideal_loads) mod cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_validation;
 pub(in crate::ideal_loads) mod cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment_validation;
 pub(in crate::ideal_loads) mod cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_validation;
 pub(in crate::ideal_loads) mod cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment_validation;
@@ -929,6 +933,9 @@ pub struct DirectZonePurchasedAirCoupledSummary {
     /// Persistent bounded zero-flow supply-temperature mixed-air assignment lifecycle report.
     pub calc_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment_lifecycle:
         PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyTemperatureMixedAirAssignmentLifecycleSummary,
+    /// Persistent bounded zero-flow sensible-output positive-zero assignment lifecycle report.
+    pub calc_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_lifecycle:
+        PurchasedAirCalcCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignmentLifecycleSummary,
 }
 
 /// Result of the bounded coupled release runtime.
@@ -1403,6 +1410,10 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
     /// Final zero-flow supply-temperature assignment summary could not resolve the bound unit.
     CalcCoolingZeroSupplyMassFlowSupplyTemperatureMixedAirAssignmentLifecycle(
         PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyTemperatureMixedAirAssignmentError,
+    ),
+    /// Final zero-flow sensible-output positive-zero assignment summary could not resolve the bound unit.
+    CalcCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignmentLifecycle(
+        PurchasedAirCalcCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignmentError,
     ),
     /// A lifecycle transition count did not match the single-environment run.
     InitLifecycleInvariant {
@@ -2475,6 +2486,15 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Observed count or boolean-as-count.
         actual: usize,
     },
+    /// A zero-flow sensible-output positive-zero assignment lifecycle invariant did not match the run.
+    CalcCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignmentLifecycleInvariant {
+        /// Stable invariant field.
+        field: &'static str,
+        /// Required count or boolean-as-count.
+        expected: usize,
+        /// Observed count or boolean-as-count.
+        actual: usize,
+    },
     /// A Calc call did not retain the exact persistent initialization flags.
     UnexpectedInitializationFlags {
         /// Zero-based nominal system-step index.
@@ -3070,6 +3090,11 @@ pub enum DirectZonePurchasedAirCoupledRuntimeError {
         /// Zero-based nominal system-step index.
         timestep_index: usize,
     },
+    /// A zero-flow sensible-output positive-zero assignment snapshot did not match its release call.
+    UnexpectedCalculationCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignment {
+        /// Zero-based nominal system-step index.
+        timestep_index: usize,
+    },
     /// A successful CP301 call did not retain source-setpoint demand provenance.
     UnexpectedDemandInputKind {
         /// Zero-based nominal system-step index.
@@ -3596,6 +3621,10 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             Self::CalcCoolingZeroSupplyMassFlowSupplyTemperatureMixedAirAssignmentLifecycle(error) => write!(
                 formatter,
                 "direct-Zone PurchasedAir zero-flow supply-temperature mixed-air assignment lifecycle summary failed: {error:?}"
+            ),
+            Self::CalcCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignmentLifecycle(error) => write!(
+                formatter,
+                "direct-Zone PurchasedAir zero-flow sensible-output positive-zero assignment lifecycle summary failed: {error:?}"
             ),
             Self::InitLifecycleInvariant {
                 field,
@@ -4549,6 +4578,14 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
                 formatter,
                 "direct-Zone PurchasedAir zero-flow supply-temperature mixed-air assignment lifecycle invariant {field} expected {expected}, got {actual}"
             ),
+            Self::CalcCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignmentLifecycleInvariant {
+                field,
+                expected,
+                actual,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir zero-flow sensible-output positive-zero assignment lifecycle invariant {field} expected {expected}, got {actual}"
+            ),
             Self::UnexpectedInitializationFlags { timestep_index } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not consume its persistent initialization flags"
@@ -5238,6 +5275,12 @@ impl Display for DirectZonePurchasedAirCoupledRuntimeError {
             } => write!(
                 formatter,
                 "direct-Zone PurchasedAir timestep {timestep_index} did not retain its zero-flow supply-temperature mixed-air assignment"
+            ),
+            Self::UnexpectedCalculationCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignment {
+                timestep_index,
+            } => write!(
+                formatter,
+                "direct-Zone PurchasedAir timestep {timestep_index} did not retain its zero-flow sensible-output positive-zero assignment"
             ),
             Self::UnexpectedDemandInputKind {
                 timestep_index,
@@ -6795,6 +6838,18 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             return Err(
                 DirectZonePurchasedAirCoupledRuntimeError::
                     UnexpectedCalculationCoolingZeroSupplyMassFlowSupplyTemperatureMixedAirAssignment {
+                        timestep_index,
+                    },
+            );
+        }
+        if !cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_validation::snapshot_matches_release(
+            output,
+            timestep_index + 1,
+            &binding,
+        ) {
+            return Err(
+                DirectZonePurchasedAirCoupledRuntimeError::
+                    UnexpectedCalculationCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignment {
                         timestep_index,
                     },
             );
@@ -8739,6 +8794,22 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
         latest_output,
         &binding,
     )?;
+    let calc_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_lifecycle =
+        purchased_air_calc_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_lifecycle_summary(
+            &purchased_air_runtime_state,
+            binding.ideal_loads_air_system,
+        )
+        .map_err(
+            DirectZonePurchasedAirCoupledRuntimeError::
+                CalcCoolingZeroSupplyMassFlowSensibleOutputPositiveZeroAssignmentLifecycle,
+        )?;
+    cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_validation::validate_lifecycle(
+        &calc_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_lifecycle,
+        &calc_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment_lifecycle,
+        timestep_outputs.len(),
+        latest_output,
+        &binding,
+    )?;
 
     let HeatBalanceRunPeriodSamples {
         zone_temperatures,
@@ -8919,6 +8990,7 @@ pub fn simulate_direct_zone_purchased_air_coupled_heat_balance(
             calc_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment_lifecycle,
             calc_cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_lifecycle,
             calc_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment_lifecycle,
+            calc_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_lifecycle,
         },
         state,
         results,

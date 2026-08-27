@@ -19,7 +19,7 @@ pub(super) fn snapshot_is_exact(snapshot: Snapshot) -> bool {
         )
 }
 
-pub(super) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
+pub(in crate::ideal_loads::calc) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
     let predecessor = predecessor_cp426_snapshot(snapshot);
     let predecessor_route =
         crate::ideal_loads::calc::cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_snapshot_route(
@@ -33,7 +33,10 @@ pub(super) fn snapshot_route(snapshot: Snapshot) -> Option<Route> {
     prefix_and_local_shape_match(snapshot, predecessor, route).then_some(route)
 }
 
-pub(super) fn retained_route_matches_snapshot_bounded(snapshot: Snapshot, route: Route) -> bool {
+pub(in crate::ideal_loads::calc) fn retained_route_matches_snapshot_bounded(
+    snapshot: Snapshot,
+    route: Route,
+) -> bool {
     let predecessor = predecessor_cp426_snapshot(snapshot);
     let predecessor_route =
         crate::ideal_loads::calc::PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyHumidityRatioMixedAirAssignmentRetainedRoute {
