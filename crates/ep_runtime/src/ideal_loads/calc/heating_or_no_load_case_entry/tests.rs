@@ -1,5 +1,6 @@
 //! CP430 boundary, exhaustive route, forgery, preservation, and overflow tests.
 
+mod committed_seal;
 mod schema_prefix;
 
 use super::transition::{

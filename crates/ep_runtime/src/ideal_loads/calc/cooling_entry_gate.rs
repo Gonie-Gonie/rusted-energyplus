@@ -9,7 +9,15 @@ use super::types::IdealLoadsSensibleMode;
 
 mod release;
 
-pub use release::*;
+pub(in crate::ideal_loads) use release::PurchasedAirCalcCoolingEntryGateCommittedHeatingModeGuardNumericOperands;
+pub use release::{
+    PurchasedAirCalcCoolingEntryGateError, PurchasedAirCalcCoolingEntryGatePredicateInput,
+    advance_direct_no_oa_calc_cooling_entry_gate,
+};
+pub(in crate::ideal_loads::calc) use release::{
+    cooling_entry_gate_committed_latest_heating_mode_guard_numeric_operands,
+    cooling_entry_gate_committed_latest_heating_mode_guard_temperature_control_type,
+};
 
 /// EnergyPlus source slice represented by this bounded transition.
 pub const PURCHASED_AIR_CALC_COOLING_ENTRY_GATE_SOURCE: &str =
@@ -44,6 +52,16 @@ pub enum PurchasedAirTemperatureControlType {
     SingleHeatCool,
     /// Dual setpoint with deadband.
     DualHeatCool,
+}
+
+/// Opaque proof of one successful direct CP312 invocation. This deliberately
+/// stays out of the public snapshot and serializer schemas.
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct PurchasedAirCalcCoolingEntryGateDirectReleaseInvocationWitness {
+    calculation_entry: PurchasedAirCalcEntrySnapshot,
+    minimum_oa_prefix: PurchasedAirCalcMinimumOaPrefixSnapshot,
+    cooling_entry_gate: PurchasedAirCalcCoolingEntryGateSnapshot,
+    prevalidated_temperature_control_type: PurchasedAirTemperatureControlType,
 }
 
 /// One CP311-to-CP312 cooling-entry transition result.
@@ -112,6 +130,8 @@ pub struct PurchasedAirCalcCoolingEntryGateRuntimeState {
     pub active_fallthrough_count: usize,
     /// Latest transition snapshot; no timestep log is retained.
     pub latest: Option<PurchasedAirCalcCoolingEntryGateSnapshot>,
+    direct_release_invocation_witness:
+        Option<PurchasedAirCalcCoolingEntryGateDirectReleaseInvocationWitness>,
 }
 
 impl PurchasedAirCalcCoolingEntryGateRuntimeState {
@@ -131,6 +151,7 @@ impl PurchasedAirCalcCoolingEntryGateRuntimeState {
             operating_mode_assignment_count: 0,
             active_fallthrough_count: 0,
             latest: None,
+            direct_release_invocation_witness: None,
         }
     }
 }

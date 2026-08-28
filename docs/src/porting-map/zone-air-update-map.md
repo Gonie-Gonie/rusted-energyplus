@@ -27853,3 +27853,98 @@ output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
 inventory becomes 368 total, 240 public, 128 internal, zero unused, zero
 unreachable, with 238 development commands.
+
+## CP431 heating-mode guard
+
+CP431 supersedes only CP430's physical-line-2348 executable exclusion. At
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked `PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`, it maps
+physical executable line 2348 exactly:
+
+```cpp
+if ((MinOASensOutput < QZnHeatSP) && (state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != HVAC::SetptType::SingleCool)) {
+```
+
+CP430 already owns the physical-line-2347 Heating-or-no-load case entry.
+CP431 maps only the line-2348 predicate and opening brace, with exact
+left-to-right short-circuit semantics. Its six source sites, in order, are
+`read-minimum-outdoor-air-sensible-output`,
+`read-heating-setpoint-demand`, `compare-strict-less-than`,
+`read-zone-temperature-control-type-after-short-circuit`,
+`exclude-exact-single-cooling-control`, and
+`enter-heating-mode-body-if-admitted`. Physical executable line 2349 is the
+first excluded lexical and executable statement and the CP432 candidate:
+
+```cpp
+OperatingMode = OpMode::Heat;
+```
+
+Physical structural line 2350 and its DeadBand comment remain excluded, and
+physical executable line 2351, `OperatingMode = OpMode::DeadBand;`, is the
+first excluded executable on either false route. CP431 therefore owns no
+Heating or DeadBand operating-mode assignment.
+
+CP431 refines only CP430's sole entered public outcome at logical index 1.
+The other 58 CP430 outcomes remain inactive one-for-one. The entered outcome
+has three exact characterizations: a false first comparison executes three
+sites; a true first comparison followed by exact `SingleCool` executes five
+sites and is the sole new private counterfactual; and a true first comparison
+followed by exact direct `DualHeatCool` enters the body and executes all six
+sites. Exact totals are `T431=61`, `Z431=58`, `G431=3`, `F431=2`,
+`B431=1`, and `S431=3+5+6=14`. The first comparison is false once and true
+twice, the temperature-control accessor executes twice, exact `SingleCool`
+blocks once, and the Heating body is entered once. Public/private is 20/41:
+the numeric-false and `DualHeatCool` body variants are public, while the
+`SingleCool` variant is private. Exactly four width-36 arrays retain
+predecessor, guard-evaluation, body-entry, and combined false-fallthrough
+routes; every new nonzero route index is 1.
+
+Same-call bit-exact sealed CP430 lifecycle, snapshot, latest, private witness,
+completion evidence, and committed route are the sole immediate predecessor
+and route authority. CP431 executes the predicate only when CP430's
+`heating_or_no_load_case_entered` is true. A bounded numeric accessor
+separately seals the retained CP310 heating-setpoint demand, CP311 minimum-OA
+result, and CP312 same-call lineage. The line-2348 control read comes from a
+new private opaque CP312 direct-release invocation witness and is requested
+only after the strict `<` comparison is true; it is not CP312's optional
+earlier source-read field, a duplicate caller scalar, a mutable-service
+re-read, or numerical-DTO input. The snapshot retains the optional first
+comparison result and optional temperature-control permission separately,
+plus explicit `single_cool_blocked`, body-entry, and false-fallthrough
+evidence; it deliberately has no aggregate optional full-condition carrier.
+
+The pure predicate preserves source binary64 `<` behavior, including signed
+zero, infinity, and unordered comparison behavior, and exact enum `!=`
+behavior without a clamp, normalization, finite coercion, arithmetic,
+psychrometric evaluation, assignment, default, diagnostic, cache, or output
+operation. Exact direct release admits the retained finite numeric operands
+and `DualHeatCool`; the `SingleCool` route is bounded private
+characterization. CP431 does not consume, reconcile with, feed, or replace
+the unchanged numerical DTO.
+
+The lossless snapshot preserves CP430's exact first 314 nonterminal fields,
+renames terminal W/H/T as the predecessor-CP430 triple, carries the inherited
+`heating_or_no_load_case_entered` marker, appends an exact 21-field local
+predicate, witness, route, and retained-owner block, and re-emits final W/H/T.
+It therefore has exactly 342 base fields, 122 `Option<f64>` carriers, four
+optional comparison bools, and two optional control enums. JSON preserves
+CP430's exact first 428 nonterminal keys and appends an exact 36-key tail:
+predecessor W/H/T with sidecars, the inherited marker, the 21-field local
+block with two operand sidecars, and final W/H/T with sidecars. The result is
+464 unique keys with 122 immediately adjacent authoritative IEEE sidecars.
+Predecessor and final W/H/T presence and bit-exact unchanged preservation
+remain 37/42/57; none of the three logical-index-1 variants carries a
+terminal W/H/T value or CP429 cooling-total-output value.
+
+Binding is CP430-to-CP431-to-unchanged-numerical, while preserving the
+CP429-to-CP430 interval, and the binding checkpoint count advances from 121
+to 122. CP431 adds no numerical, coupling-input, or output DTO field. Its
+evidence never feeds or replaces prediction, numerical results, feedback,
+nodes, loads, reports, or outputs; non-direct paths reject CP431 lifecycle
+evidence. CP431 adds no support, readiness, capability, routine, algorithm,
+numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
+inventory becomes 369 total, 240 public, 129 internal, zero unused, zero
+unreachable, with 238 development commands.

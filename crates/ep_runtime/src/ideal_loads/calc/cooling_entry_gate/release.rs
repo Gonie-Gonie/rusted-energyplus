@@ -3,6 +3,7 @@
 use ep_model::{IdealLoadsAirSystem, IdealLoadsAirSystemId};
 
 use super::{
+    PurchasedAirCalcCoolingEntryGateDirectReleaseInvocationWitness,
     PurchasedAirCalcCoolingEntryGateSnapshot, PurchasedAirTemperatureControlType,
     advance_cooling_entry_gate_state,
 };
@@ -12,6 +13,14 @@ use crate::ideal_loads::{
 };
 
 use crate::ideal_loads::calc::minimum_oa_prefix::calculation_entry_snapshots_bitwise_equal;
+
+mod committed;
+
+pub(in crate::ideal_loads) use committed::PurchasedAirCalcCoolingEntryGateCommittedHeatingModeGuardNumericOperands;
+pub(in crate::ideal_loads::calc) use committed::{
+    cooling_entry_gate_committed_latest_heating_mode_guard_numeric_operands,
+    cooling_entry_gate_committed_latest_heating_mode_guard_temperature_control_type,
+};
 
 /// Predicate scalar rejected by the finite direct release boundary.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -203,12 +212,22 @@ pub fn advance_direct_no_oa_calc_cooling_entry_gate(
         );
     }
 
-    Ok(advance_cooling_entry_gate_state(
+    let snapshot = advance_cooling_entry_gate_state(
         &mut unit.calc_cooling_entry_gate,
         calculation_entry,
         minimum_oa_prefix,
         temperature_control_type,
-    ))
+    );
+    unit.calc_cooling_entry_gate
+        .direct_release_invocation_witness = Some(
+        PurchasedAirCalcCoolingEntryGateDirectReleaseInvocationWitness {
+            calculation_entry,
+            minimum_oa_prefix,
+            cooling_entry_gate: snapshot,
+            prevalidated_temperature_control_type: temperature_control_type,
+        },
+    );
+    Ok(snapshot)
 }
 
 fn minimum_oa_snapshot_is_direct_release(

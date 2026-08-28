@@ -237,7 +237,7 @@ foreach ($test in @(
         "direct_release_and_immediate_cp368_predecessor_are_strict",
         "latest_direct_route_requires_matching_current_and_predecessor_cumulative_evidence",
         "missing_direct_lifecycle_fails_closed",
-        "non_direct_runtime_rejects_cp316_through_cp430_lifecycle_evidence"
+        "non_direct_runtime_rejects_cp316_through_cp431_lifecycle_evidence"
     )) {
     Assert-Cp369TextContains -Text $cp369SemanticText -Pattern ('(?m)fn\s+' + $test + '\s*\(') -Description "semantic regression '$test'"
 }
@@ -380,29 +380,29 @@ foreach ($historical in @(327, 328) + @(346..368)) {
 }
 foreach ($historical in 334..368) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp430_lifecycle_evidence' -Description "historical CP369 firewall"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp431_lifecycle_evidence' -Description "historical CP369 firewall"
 }
 foreach ($historical in 326..333) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp430_lifecycle_evidence' -Description "out-of-range CP369 firewall token"
+    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'non_direct_runtime_rejects_cp316_through_cp431_lifecycle_evidence' -Description "out-of-range CP369 firewall token"
 }
 foreach ($historical in 335..368) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 368 \|')) -Description "historical generated total"
-Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 128 \|')) -Description "historical generated internal"
+Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 369 \|')) -Description "historical generated total"
+Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 129 \|')) -Description "historical generated internal"
 }
 foreach ($historical in 326..334) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 368 \|')) -Description "out-of-range generated-total token"
-    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 128 \|')) -Description "out-of-range generated-internal token"
+    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 369 \|')) -Description "out-of-range generated-total token"
+    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern ([regex]::Escape('\| 129 \|')) -Description "out-of-range generated-internal token"
 }
 foreach ($historical in 337..368) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 368' -Description "historical inventory total"
+    Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 369' -Description "historical inventory total"
 }
 foreach ($historical in 326..336) {
     $file = (Get-ChildItem -LiteralPath "scripts\quality\ideal-loads-structure-audit" -Filter "cp$historical-*.ps1").Name
-    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 368' -Description "out-of-range inventory-total token"
+    Assert-NotContains -Path "scripts\quality\ideal-loads-structure-audit\$file" -Pattern 'script_count = 369' -Description "out-of-range inventory-total token"
 }
 
 $cp369MainAuditText = Read-RepoText -Path "scripts\quality\ideal-loads-structure-audit.ps1"
@@ -413,17 +413,17 @@ if ($cp368AuditIndexForCp369 -lt 0 -or $cp369AuditIndex -le $cp368AuditIndexForC
     throw "Master audit must dot-source CP369 after CP368 before completion"
 }
 $cp369InventoryText = Read-RepoText -Path "specs\script_inventory.toml"
-Assert-Cp369TextContains -Text $cp369InventoryText -Pattern 'script_count = 368' -Description "script total"
+Assert-Cp369TextContains -Text $cp369InventoryText -Pattern 'script_count = 369' -Description "script total"
 Assert-Cp369TextContains -Text $cp369InventoryText -Pattern 'unused_script_count = 0' -Description "zero uncalled"
 if ([regex]::Matches($cp369InventoryText, '(?m)^classification = "public"$').Count -ne 240 -or
-[regex]::Matches($cp369InventoryText, '(?m)^classification = "internal"$').Count -ne 128) {
+[regex]::Matches($cp369InventoryText, '(?m)^classification = "internal"$').Count -ne 129) {
 throw "CP369 inventory must be exactly 240 public and 122 internal scripts"
 }
 Assert-Cp369TextContains -Text $cp369InventoryText -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp369-' -Description "inventory record"
 Assert-Cp369TextContains -Text $cp369InventoryText -Pattern 'ideal-loads-structure-audit\.ps1::dot_sources' -Description "caller evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 368 \|' -Description "CP369 generated total"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 369 \|' -Description "CP369 generated total"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP369 generated public"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 128 \|' -Description "CP369 generated internal"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 129 \|' -Description "CP369 generated internal"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP369 generated uncalled"
 
 Write-Host "CP369 Cooling supply-humidity-ratio humidification heating-availability guard structure audit passed."

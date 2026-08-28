@@ -256,7 +256,9 @@ fn checked_partition(left: usize, right: usize, label: &str) -> Result<usize, St
         .ok_or_else(|| format!("direct-zone IdealLoads cooling-entry {label} partition overflowed"))
 }
 
-fn temperature_control_type_name(value: PurchasedAirTemperatureControlType) -> &'static str {
+pub(in crate::pipeline) fn temperature_control_type_name(
+    value: PurchasedAirTemperatureControlType,
+) -> &'static str {
     match value {
         PurchasedAirTemperatureControlType::Invalid => "Invalid",
         PurchasedAirTemperatureControlType::Uncontrolled => "Uncontrolled",

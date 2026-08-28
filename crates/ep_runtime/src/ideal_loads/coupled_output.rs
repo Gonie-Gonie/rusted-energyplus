@@ -598,4 +598,4 @@ fn hourly_energy_series<'a>(
 
 #[cfg(test)]
 #[path = "coupled_output_tests.rs"]
-mod tests;
+pub(in crate::ideal_loads) mod tests;

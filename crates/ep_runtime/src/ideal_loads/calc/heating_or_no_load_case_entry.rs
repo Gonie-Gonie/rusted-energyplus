@@ -29,6 +29,7 @@ pub(in crate::ideal_loads::calc) use transition::{
     advance_heating_or_no_load_case_entry_state_with_validated_route,
     heating_or_no_load_case_entry_route_from_committed_predecessor,
 };
+pub(in crate::ideal_loads::calc) use release::heating_or_no_load_case_entry_committed_latest_route;
 
 /// EnergyPlus structural case entry represented by CP430.
 pub const PURCHASED_AIR_CALC_HEATING_OR_NO_LOAD_CASE_ENTRY_SOURCE: &str =
