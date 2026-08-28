@@ -4,6 +4,9 @@ use std::collections::BTreeSet;
 
 use serde_json::{Map, Value, json};
 
+#[path = "cp430_assertions.rs"]
+mod cp430_assertions;
+
 const CP428_KEY: &str = "purchased_air_calc_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_lifecycle";
 const CP429_KEY: &str = "purchased_air_calc_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_lifecycle";
 const ORDER: [&str; 1] =
@@ -186,6 +189,7 @@ pub(super) fn assert_direct(runtime: &Value, results: &Value) {
         );
     }
     assert!(!results.to_string().contains(CP429_KEY));
+    cp430_assertions::assert_direct(runtime, results);
 }
 
 pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
@@ -194,6 +198,7 @@ pub(super) fn assert_non_direct(runtime: &Map<String, Value>) {
         runtime[CP429_KEY].is_null(),
         "non-direct runtime must not publish CP429 evidence"
     );
+    cp430_assertions::assert_non_direct(runtime);
 }
 
 fn assert_actual_json_key_set(
@@ -246,7 +251,7 @@ fn assert_schema_and_binding_cardinalities() {
     assert_eq!(snapshot.matches("Option<bool>").count(), 2);
     assert_eq!(snapshot.matches("Option<").count() - 117 - 2, 1);
     let binding = include_str!("../../../ep_runtime/src/ideal_loads/binding/scheduled_output.rs");
-    assert_eq!(binding.matches("    pub calculation_").count(), 120);
+    assert_eq!(binding.matches("    pub calculation_").count(), 121);
 }
 
 fn array<'a>(lifecycle: &'a Value, field: &str) -> &'a Vec<Value> {

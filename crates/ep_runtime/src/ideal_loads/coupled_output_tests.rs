@@ -222,6 +222,8 @@ mod cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_fix
 mod cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment_fixture;
 #[path = "coupled_output_tests/cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_fixture.rs"]
 mod cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_fixture;
+#[path = "coupled_output_tests/heating_or_no_load_case_entry_fixture.rs"]
+mod heating_or_no_load_case_entry_fixture;
 
 use crate::{
     heat_balance::state::{ZoneAirTemperatureCoefficients, ZoneHeatBalanceState},
@@ -334,6 +336,7 @@ use cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_fix
 use cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment_fixture::calculation_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment_snapshot;
 use cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_fixture::calculation_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_snapshot;
 use cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_fixture::calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_snapshot;
+use heating_or_no_load_case_entry_fixture::calculation_heating_or_no_load_case_entry_snapshot;
 use crate::ideal_loads::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputAssignmentActiveInput,
     private_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment_characterization,
@@ -513,6 +516,21 @@ fn cp429_assignment_mutation_cannot_change_the_unchanged_numerical_coupling_outp
     assert_ne!(
         mutated.calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment,
         original.calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment,
+    );
+    assert_eq!(mutated.coupling, original.coupling);
+}
+
+#[test]
+fn cp430_case_entry_mutation_cannot_change_the_unchanged_numerical_coupling_output() {
+    let system = test_system();
+    let original = scaled_output(&system, 0, 1.0);
+    let mut mutated = original;
+    mutated
+        .calculation_heating_or_no_load_case_entry
+        .heating_or_no_load_case_entered ^= true;
+    assert_ne!(
+        mutated.calculation_heating_or_no_load_case_entry,
+        original.calculation_heating_or_no_load_case_entry,
     );
     assert_eq!(mutated.coupling, original.coupling);
 }
@@ -1774,6 +1792,10 @@ fn scaled_output(
         calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_snapshot(
             calculation_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment,
         );
+    let calculation_heating_or_no_load_case_entry =
+        calculation_heating_or_no_load_case_entry_snapshot(
+            calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -1916,6 +1938,7 @@ fn scaled_output(
         calculation_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment,
         calculation_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment,
         calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment,
+        calculation_heating_or_no_load_case_entry,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;

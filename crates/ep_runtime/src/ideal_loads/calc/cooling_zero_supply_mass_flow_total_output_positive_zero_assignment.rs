@@ -9,10 +9,18 @@ mod state;
 mod tests;
 mod transition;
 
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::cp429_all_snapshots_for_successor_tests;
+
 pub use release::{
     PurchasedAirCalcCoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentError,
     advance_direct_no_oa_calc_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment,
     cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_predecessor_cp428_snapshot,
+};
+pub(in crate::ideal_loads::calc) use release::{
+    cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_committed_latest_route,
+    cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_retained_route_matches_snapshot_bounded,
+    cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_snapshot_route,
 };
 #[allow(unused_imports)]
 pub(in crate::ideal_loads) use release::{

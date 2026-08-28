@@ -10,6 +10,9 @@ mod tests;
 mod transition;
 
 #[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::cp428_fixture_unit_for_successor_tests;
+
+#[cfg(test)]
 pub(in crate::ideal_loads::calc) use tests::cp428_all_snapshots_for_successor_tests;
 
 pub use release::{

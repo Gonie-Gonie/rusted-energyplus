@@ -12,7 +12,7 @@ fn cp428_conceptual_contract_has_59_outcomes_58_inactive_one_assignment_and_one_
 }
 
 #[test]
-fn cp428_snapshot_schema_is_exactly_308_113_2_1_and_binding_is_120() {
+fn cp428_snapshot_schema_is_exactly_308_113_2_1_and_binding_is_121() {
     let source = include_str!(
         "calc/cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment.rs"
     );
@@ -37,7 +37,7 @@ fn cp428_snapshot_schema_is_exactly_308_113_2_1_and_binding_is_120() {
         include_str!("binding/scheduled_output.rs")
             .matches("    pub calculation_")
             .count(),
-        120
+        121
     );
 }
 

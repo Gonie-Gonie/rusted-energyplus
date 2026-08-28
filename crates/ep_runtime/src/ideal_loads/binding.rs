@@ -134,9 +134,11 @@ use super::{
     PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyHumidityRatioMixedAirAssignmentError as CoolingZeroSupplyMassFlowSupplyHumidityRatioMixedAirAssignmentError,
     PurchasedAirCalcCoolingZeroSupplyMassFlowSupplyTemperatureMixedAirAssignmentError as CoolingZeroSupplyMassFlowSupplyTemperatureMixedAirAssignmentError,
     PurchasedAirCalcCoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentError as CoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentError,
-    PurchasedAirCalcEntryContext, PurchasedAirCalcEntryError, PurchasedAirCalcMinimumOaPrefixError,
-    PurchasedAirHardSizeLegacyContext, PurchasedAirInitCallContext, PurchasedAirInitError,
-    PurchasedAirInitManagerPlan, PurchasedAirInitManagerPlanError, PurchasedAirInitTopologyPlan,
+    PurchasedAirCalcEntryContext, PurchasedAirCalcEntryError,
+    PurchasedAirCalcHeatingOrNoLoadCaseEntryError as HeatingOrNoLoadCaseEntryError,
+    PurchasedAirCalcMinimumOaPrefixError, PurchasedAirHardSizeLegacyContext,
+    PurchasedAirInitCallContext, PurchasedAirInitError, PurchasedAirInitManagerPlan,
+    PurchasedAirInitManagerPlanError, PurchasedAirInitTopologyPlan,
     PurchasedAirInitTopologyPlanError, PurchasedAirRuntimeState,
     PurchasedAirTemperatureControlType, advance_direct_no_oa_calc_cooling_capacity_zero_flow_reset,
     advance_direct_no_oa_calc_cooling_dehumidification_flow,
@@ -268,6 +270,7 @@ mod cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment;
 mod cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment;
 mod cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment;
 mod cooling_zero_supply_mass_flow_total_output_positive_zero_assignment;
+mod heating_or_no_load_case_entry;
 mod scheduled_output;
 
 use cooling_constant_shr_supply_humidity_ratio_minimum_limit::advance_cooling_constant_shr_supply_humidity_ratio_minimum_limit;
@@ -340,6 +343,7 @@ use cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment::ad
 use cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment::advance_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment;
 use cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment::advance_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment;
 use cooling_zero_supply_mass_flow_total_output_positive_zero_assignment::advance_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment;
+use heating_or_no_load_case_entry::advance_heating_or_no_load_case_entry;
 use cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment::advance_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment;
 use cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment::advance_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment;
 use cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit::advance_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit;
@@ -1342,6 +1346,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationCoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignment(
         CoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentError,
     ),
+    /// The bounded Heating-or-no-load case entry rejected its release state.
+    CalculationHeatingOrNoLoadCaseEntry(HeatingOrNoLoadCaseEntryError),
     /// CP378 did not reconcile with the unchanged numerical humidity projections.
     CalculationCoolingSupplyHumidityRatioSaturationLimitAssignmentNumericalInvariant {
         /// Stable CP378 or numerical projection field.
@@ -2293,6 +2299,11 @@ pub fn couple_model_bound_direct_zone_purchased_air(
             binding.system,
             calculation_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment,
         )?;
+    let calculation_heating_or_no_load_case_entry = advance_heating_or_no_load_case_entry(
+        input.purchased_air_runtime_state,
+        binding.system,
+        calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment,
+    )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -2454,6 +2465,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment,
         calculation_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment,
         calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment,
+        calculation_heating_or_no_load_case_entry,
         coupling,
     })
 }

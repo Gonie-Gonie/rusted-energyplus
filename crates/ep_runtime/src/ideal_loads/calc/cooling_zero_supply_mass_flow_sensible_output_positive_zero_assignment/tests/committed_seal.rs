@@ -205,7 +205,7 @@ fn cp428_committed_seal_binds_markers_positive_zero_prefix_and_private_witness()
     assert!(committed(&unit, snapshot, owner).is_some());
 }
 
-fn cp428_fixture_unit_for_successor_tests(
+pub(in crate::ideal_loads::calc) fn cp428_fixture_unit_for_successor_tests(
     mut predecessor: Cp422Snapshot,
 ) -> (PurchasedAirUnitRuntimeState, Cp428Snapshot, Route) {
     predecessor.parent_call_ordinal = 1;

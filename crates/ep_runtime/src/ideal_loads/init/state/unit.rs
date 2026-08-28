@@ -312,6 +312,8 @@ impl PurchasedAirUnitRuntimeState {
                 PurchasedAirCalcCoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentRuntimeState::new(
                     system,
                 ),
+            calc_heating_or_no_load_case_entry:
+                PurchasedAirCalcHeatingOrNoLoadCaseEntryRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

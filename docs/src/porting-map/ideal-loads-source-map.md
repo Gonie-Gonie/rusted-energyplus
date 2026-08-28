@@ -25236,3 +25236,78 @@ output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
 inventory becomes 367 total, 240 public, 127 internal, zero unused, zero
 unreachable, with 238 development commands.
+
+## CP430 heating-or-no-load case entry
+
+CP430 supersedes only CP429's physical-line-2347 structural exclusion. At
+pinned EnergyPlus commit `6f2e40d10250a105b49966baa24d843711e61048` and
+locked `PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`, it maps
+physical control line 2347 exactly:
+
+```cpp
+} else { // Heating or no-load case
+```
+
+Physical structural line 2345 only closes the zero-supply-mass-flow branch,
+and physical line 2346 is comment-only; neither contributes a CP430 source
+site or behavior. Line 2347 is the structural sibling else of CP312's
+physical-lines-2046-2047 Cooling entry gate. CP430 maps only that retained
+gate-false fallthrough: it is not a CP429 active-assignment exit, a closing
+delimiter, a branch merge, or unconditional entry. Its exact sole source site
+is `enter-heating-or-no-load-case-after-cooling-entry-gate-false-fallthrough`.
+Physical executable line 2348 is the first excluded lexical and executable
+statement and the CP431 candidate:
+
+```cpp
+if ((MinOASensOutput < QZnHeatSP) && (state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != HVAC::SetptType::SingleCool)) {
+```
+
+That predicate's reads, comparisons, and short-circuit behavior, its
+Heating-mode assignment, the DeadBand sibling, and all later behavior remain
+excluded.
+
+CP430 preserves CP429's 59 flattened conceptual outcomes one-for-one. Only
+the retained non-Cooling outcome at logical index 1 enters the sole site; the
+other 58 outcomes, including the UnitOff outcome at index 0 and every Cooling
+outcome, execute zero CP430 sites. Exact totals are `T430=59`, `Z430=58`,
+`E430=1`, and `S430=E430=1`. Public/private remains 19/40, and logical index 1
+is the sole active public outcome; there is no active private outcome.
+Exactly two width-36 arrays retain the predecessor route counts and the CP430
+case-entry counts.
+
+Same-call bit-exact sealed CP429 lifecycle, snapshot, latest, private witness,
+completion evidence, and committed route are the sole immediate predecessor
+and route authority. The retained CP429 `non_cooling_skipped` marker proves
+entry, while `unit_off_skipped` must be false. Mere absence of CP429's
+total-output assignment is insufficient because 58 outcomes skip that
+assignment, and the CP429 assignment outcome at logical index 2 is disjoint
+from CP430 entry. CP430 takes no active scalar input and does not re-read
+`MinOASensOutput`, `QZnCoolSP`, or the Zone temperature-control type or
+re-evaluate CP312's comparison. It performs no selector or owner read,
+comparison, arithmetic, assignment, psychrometric evaluation, finite/range
+gate, clamp, normalization, default, diagnostic, cache, or mutable-service
+operation. CP312's short-circuit gate semantics remain predecessor evidence
+rather than new CP430 behavior.
+
+The lossless snapshot preserves CP429's exact first 317 fields and appends
+only the Boolean `heating_or_no_load_case_entered`, for exactly 318 base
+fields, 117 `Option<f64>` carriers, two optional comparison bools, and one
+optional control enum. JSON preserves CP429's exact first 434 keys and appends
+only the marker key, for 435 unique keys with the same 117 immediately
+adjacent authoritative IEEE sidecars. Predecessor and final W/H/T presence
+and bit-exact unchanged preservation are 37/42/57. CP430 acquires no numerical
+owner, and the sole entry route carries no terminal W/H/T value or CP429
+assigned cooling-total-output value.
+
+Binding is CP429-to-CP430-to-unchanged-numerical, while preserving the
+CP428-to-CP429 interval, and the binding checkpoint count advances from 120
+to 121. CP430 adds no numerical, coupling-input, or output DTO field. Its
+evidence never feeds or replaces prediction, numerical results, feedback,
+nodes, loads, reports, or outputs; non-direct paths reject CP430 lifecycle
+evidence. CP430 adds no support, readiness, capability, routine, algorithm,
+numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
+inventory becomes 368 total, 240 public, 128 internal, zero unused, zero
+unreachable, with 238 development commands.
