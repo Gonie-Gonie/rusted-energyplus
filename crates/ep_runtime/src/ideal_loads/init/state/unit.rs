@@ -315,6 +315,8 @@ impl PurchasedAirUnitRuntimeState {
             calc_heating_or_no_load_case_entry:
                 PurchasedAirCalcHeatingOrNoLoadCaseEntryRuntimeState::new(system),
             calc_heating_mode_guard: PurchasedAirCalcHeatingModeGuardRuntimeState::new(system),
+            calc_heating_operating_mode_heat_assignment:
+                PurchasedAirCalcHeatingOperatingModeHeatAssignmentRuntimeState::new(system),
             rejected_exhaust_node: None,
             reported_first_return_node: None,
             topology_plan: None,

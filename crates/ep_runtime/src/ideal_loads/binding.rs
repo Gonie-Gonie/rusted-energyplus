@@ -136,6 +136,7 @@ use super::{
     PurchasedAirCalcCoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentError as CoolingZeroSupplyMassFlowTotalOutputPositiveZeroAssignmentError,
     PurchasedAirCalcEntryContext, PurchasedAirCalcEntryError,
     PurchasedAirCalcHeatingModeGuardError as HeatingModeGuardError,
+    PurchasedAirCalcHeatingOperatingModeHeatAssignmentError as HeatingOperatingModeHeatAssignmentError,
     PurchasedAirCalcHeatingOrNoLoadCaseEntryError as HeatingOrNoLoadCaseEntryError,
     PurchasedAirCalcMinimumOaPrefixError, PurchasedAirHardSizeLegacyContext,
     PurchasedAirInitCallContext, PurchasedAirInitError, PurchasedAirInitManagerPlan,
@@ -272,6 +273,7 @@ mod cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment;
 mod cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment;
 mod cooling_zero_supply_mass_flow_total_output_positive_zero_assignment;
 mod heating_mode_guard;
+mod heating_operating_mode_heat_assignment;
 mod heating_or_no_load_case_entry;
 mod scheduled_output;
 
@@ -347,6 +349,7 @@ use cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment::adva
 use cooling_zero_supply_mass_flow_total_output_positive_zero_assignment::advance_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment;
 use heating_or_no_load_case_entry::advance_heating_or_no_load_case_entry;
 use heating_mode_guard::advance_heating_mode_guard;
+use heating_operating_mode_heat_assignment::advance_heating_operating_mode_heat_assignment;
 use cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment::advance_cooling_post_saturation_capacity_limit_dehumidification_supply_humidity_ratio_assignment;
 use cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment::advance_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_assignment;
 use cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit::advance_cooling_post_saturation_capacity_limit_dehumidification_supply_temperature_saturation_mixed_air_limit;
@@ -1353,6 +1356,8 @@ pub enum DirectZonePurchasedAirScheduledCouplingError {
     CalculationHeatingOrNoLoadCaseEntry(HeatingOrNoLoadCaseEntryError),
     /// The bounded heating-mode guard rejected its release state.
     CalculationHeatingModeGuard(HeatingModeGuardError),
+    /// The bounded heating operating-mode Heat assignment rejected its release state.
+    CalculationHeatingOperatingModeHeatAssignment(HeatingOperatingModeHeatAssignmentError),
     /// CP378 did not reconcile with the unchanged numerical humidity projections.
     CalculationCoolingSupplyHumidityRatioSaturationLimitAssignmentNumericalInvariant {
         /// Stable CP378 or numerical projection field.
@@ -2314,6 +2319,12 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         binding.system,
         calculation_heating_or_no_load_case_entry,
     )?;
+    let calculation_heating_operating_mode_heat_assignment =
+        advance_heating_operating_mode_heat_assignment(
+            input.purchased_air_runtime_state,
+            binding.system,
+            calculation_heating_mode_guard,
+        )?;
     let unit_available = calculation_entry.unit_on;
     let schedules = DirectZonePurchasedAirScheduleSnapshot {
         sample_index,
@@ -2477,6 +2488,7 @@ pub fn couple_model_bound_direct_zone_purchased_air(
         calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment,
         calculation_heating_or_no_load_case_entry,
         calculation_heating_mode_guard,
+        calculation_heating_operating_mode_heat_assignment,
         coupling,
     })
 }

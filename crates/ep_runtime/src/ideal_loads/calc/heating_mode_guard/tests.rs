@@ -1,6 +1,7 @@
 //! CP431 boundary, exhaustive route, short-circuit, and overflow tests.
 
 mod schema_prefix;
+mod committed_seal;
 
 use super::transition::{
     PurchasedAirCalcHeatingModeGuardActiveInput as ActiveInput,

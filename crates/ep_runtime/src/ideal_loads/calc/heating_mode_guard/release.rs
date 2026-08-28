@@ -27,6 +27,7 @@ use crate::ideal_loads::{
 };
 
 mod error;
+mod committed;
 mod prefix;
 mod runtime_validation;
 mod snapshot_validation;
@@ -35,6 +36,7 @@ pub use error::{
     PurchasedAirCalcHeatingModeGuardError,
     PurchasedAirCalcHeatingModeGuardPredicateInput,
 };
+pub(in crate::ideal_loads::calc) use committed::heating_mode_guard_committed_latest_route;
 use runtime_validation::{pending_state_is_consistent, post_transition_state_is_consistent};
 use snapshot_validation::{
     prefix_and_local_shape_match, snapshot_is_exact, snapshots_match_bit_exact,
@@ -227,6 +229,12 @@ pub(in crate::ideal_loads) fn heating_mode_guard_snapshots_match_bit_exact(
     right: Snapshot,
 ) -> bool {
     snapshots_match_bit_exact(left, right)
+}
+
+pub(in crate::ideal_loads::calc) fn heating_mode_guard_snapshot_route(
+    snapshot: Snapshot,
+) -> Option<super::transition::PurchasedAirCalcHeatingModeGuardRetainedRoute> {
+    snapshot_validation::snapshot_route(snapshot)
 }
 
 fn predecessor_mismatch(system: IdealLoadsAirSystemId) -> PurchasedAirCalcHeatingModeGuardError {

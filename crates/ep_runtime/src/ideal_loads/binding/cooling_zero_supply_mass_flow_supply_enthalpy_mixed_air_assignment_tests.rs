@@ -29,9 +29,9 @@ fn cp425_adapter_accepts_only_the_cp424_snapshot() {
 }
 
 #[test]
-fn cp425_is_preserved_before_cp426_in_current_122_snapshot_binding() {
+fn cp425_is_preserved_before_cp426_in_current_123_snapshot_binding() {
     let source = include_str!("scheduled_output.rs");
-    assert_eq!(source.matches("    pub calculation_").count(), 122);
+    assert_eq!(source.matches("    pub calculation_").count(), 123);
     let cp425 = source
         .find("calculation_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment")
         .expect("CP425 output");

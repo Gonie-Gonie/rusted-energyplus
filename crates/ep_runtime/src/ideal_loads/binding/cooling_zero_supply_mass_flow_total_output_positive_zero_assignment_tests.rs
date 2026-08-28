@@ -35,7 +35,7 @@ fn cp429_historical_119_to_120_transition_is_preserved_before_cp430_in_current_b
         .lines()
         .filter(|line| line.starts_with("    pub calculation_"))
         .collect::<Vec<_>>();
-    assert_eq!(fields.len(), 122);
+    assert_eq!(fields.len(), 123);
     assert!(fields[119].contains(
         "calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment"
     ));

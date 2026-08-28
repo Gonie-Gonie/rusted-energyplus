@@ -166,6 +166,8 @@ mod cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment_tests;
 mod cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_tests;
 #[path = "binding/heating_mode_guard_tests.rs"]
 mod heating_mode_guard_tests;
+#[path = "binding/heating_operating_mode_heat_assignment_tests.rs"]
+mod heating_operating_mode_heat_assignment_tests;
 #[path = "binding/heating_or_no_load_case_entry_tests.rs"]
 mod heating_or_no_load_case_entry_tests;
 #[rustfmt::skip] #[path = "binding/cooling_constant_shr_supply_humidity_ratio_minimum_limit_tests.rs"] mod cooling_constant_shr_supply_humidity_ratio_minimum_limit_tests;

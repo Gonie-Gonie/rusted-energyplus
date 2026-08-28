@@ -269,7 +269,7 @@ pub(in crate::pipeline) fn temperature_control_type_name(
     }
 }
 
-fn operating_mode_name(value: IdealLoadsSensibleMode) -> &'static str {
+pub(in crate::pipeline) fn operating_mode_name(value: IdealLoadsSensibleMode) -> &'static str {
     match value {
         IdealLoadsSensibleMode::Off => "Off",
         IdealLoadsSensibleMode::Deadband => "Deadband",

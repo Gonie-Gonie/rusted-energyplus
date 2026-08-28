@@ -69,6 +69,111 @@ pub(super) fn retained_route_matches_prior_snapshot_bounded(
     )
 }
 
+pub(super) fn committed_prefix_and_local_route_shape_match(
+    snapshot: Snapshot,
+    predecessor: crate::ideal_loads::PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot,
+    predecessor_route: PredecessorRoute,
+    route: Route,
+) -> bool {
+    let active = predecessor_route.entered;
+    let minimum = snapshot.minimum_outdoor_air_sensible_output_for_heating_mode_guard_w;
+    let heating = snapshot.heating_setpoint_demand_for_heating_mode_guard_w;
+    let finite_operands = match (active, minimum, heating) {
+        (false, None, None) => true,
+        (true, Some(minimum), Some(heating)) => minimum.is_finite() && heating.is_finite(),
+        _ => false,
+    };
+    let permits = snapshot.temperature_control_type_permits_heating;
+    let blocked = permits == Some(false);
+    let body = permits == Some(true);
+    let local_route_shape = route.guard_evaluated == active
+        && finite_operands
+        && route.sensible_comparison_satisfied
+            == snapshot
+                .minimum_outdoor_air_sensible_output_strictly_less_than_heating_setpoint_demand
+                .unwrap_or(false)
+        && snapshot.temperature_control_type.is_some()
+            == route.sensible_comparison_satisfied
+        && permits.is_some() == route.sensible_comparison_satisfied
+        && route.single_cool_blocked == blocked
+        && route.body_entered == body
+        && route.false_fallthrough == (active && !body);
+    let predecessor_route_shape = route.logical_index == predecessor_route.logical_index
+        && route.predecessor_active == predecessor_route.active
+        && route.predecessor_assignment_executed
+            == predecessor_route.predecessor_assignment_executed
+        && route.predecessor_entered == predecessor_route.predecessor_entered
+        && route.predecessor_total_output_assignment_executed
+            == predecessor_route.assignment_executed
+        && route.predecessor_heating_or_no_load_case_entered == predecessor_route.entered;
+    let local_snapshot_shape = snapshot.source == SOURCE
+        && snapshot.first_excluded_source == EXCLUDED
+        && snapshot.source_order == ORDER
+        && snapshot.system == predecessor.system
+        && snapshot.parent_call_ordinal == predecessor.parent_call_ordinal
+        && snapshot.controlled_zone == predecessor.controlled_zone
+        && snapshot.heating_or_no_load_case_entered
+            == predecessor.heating_or_no_load_case_entered
+        && snapshot.heating_mode_guard_evaluated == active
+        && snapshot.cp311_retained_minimum_outdoor_air_sensible_output_owned_read == active
+        && snapshot.cp312_same_call_minimum_outdoor_air_sensible_output_bit_corroborated == active
+        && snapshot.minimum_outdoor_air_sensible_output_for_heating_mode_guard_read == active
+        && snapshot.cp310_retained_heating_setpoint_demand_owned_read == active
+        && snapshot.heating_setpoint_demand_for_heating_mode_guard_read == active
+        && snapshot
+            .minimum_outdoor_air_sensible_output_heating_setpoint_demand_comparison_evaluated
+            == active
+        && snapshot
+            .minimum_outdoor_air_sensible_output_strictly_less_than_heating_setpoint_demand
+            == active.then_some(route.sensible_comparison_satisfied)
+        && snapshot.prevalidated_temperature_control_type_owned_read
+            == route.sensible_comparison_satisfied
+        && snapshot.temperature_control_type_read_after_sensible_comparison_short_circuit
+            == route.sensible_comparison_satisfied
+        && snapshot.temperature_control_type_single_cool_comparison_evaluated
+            == route.sensible_comparison_satisfied
+        && snapshot.single_cool_blocked == route.single_cool_blocked
+        && snapshot.heating_operating_mode_body_entered == route.body_entered
+        && snapshot.heating_mode_guard_false_fallthrough == route.false_fallthrough
+        && snapshot.cp430_retained_supply_humidity_ratio_state_owned
+            == predecessor.resulting_supply_humidity_ratio.is_some()
+        && snapshot.cp430_retained_supply_enthalpy_state_owned
+            == predecessor.resulting_supply_enthalpy_j_per_kg.is_some()
+        && snapshot.cp430_retained_supply_temperature_state_owned
+            == predecessor.resulting_supply_temperature_c.is_some()
+        && same(
+            snapshot.predecessor_cp430_resulting_supply_humidity_ratio,
+            predecessor.resulting_supply_humidity_ratio,
+        )
+        && same(
+            snapshot.predecessor_cp430_resulting_supply_enthalpy_j_per_kg,
+            predecessor.resulting_supply_enthalpy_j_per_kg,
+        )
+        && same(
+            snapshot.predecessor_cp430_resulting_supply_temperature_c,
+            predecessor.resulting_supply_temperature_c,
+        )
+        && same(
+            snapshot.resulting_supply_humidity_ratio,
+            predecessor.resulting_supply_humidity_ratio,
+        )
+        && same(
+            snapshot.resulting_supply_enthalpy_j_per_kg,
+            predecessor.resulting_supply_enthalpy_j_per_kg,
+        )
+        && same(
+            snapshot.resulting_supply_temperature_c,
+            predecessor.resulting_supply_temperature_c,
+        );
+    predecessor_route_shape
+        && local_route_shape
+        && crate::ideal_loads::heating_or_no_load_case_entry_snapshots_match_bit_exact(
+            predecessor_cp430_snapshot(snapshot),
+            predecessor,
+        )
+        && local_snapshot_shape
+}
+
 pub(super) fn prefix_and_local_shape_match(
     snapshot: Snapshot,
     predecessor: crate::ideal_loads::PurchasedAirCalcHeatingOrNoLoadCaseEntrySnapshot,
