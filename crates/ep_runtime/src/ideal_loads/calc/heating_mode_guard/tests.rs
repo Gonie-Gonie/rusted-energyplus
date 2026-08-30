@@ -3,6 +3,8 @@
 mod schema_prefix;
 mod committed_seal;
 
+pub(in crate::ideal_loads::calc) use committed_seal::cp431_committed_fixture_for_successor_tests;
+
 use super::transition::{
     PurchasedAirCalcHeatingModeGuardActiveInput as ActiveInput,
     advance_heating_mode_guard_state as advance,

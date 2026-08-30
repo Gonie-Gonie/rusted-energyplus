@@ -24306,3 +24306,91 @@ output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
 293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required.
 Script inventory becomes 370 total, 240 public, 130 internal, zero unused,
 zero unreachable, with 238 development commands.
+
+## CP433 heating-mode guard else-branch entry
+
+CP433 supersedes only CP432's physical-line-2350 structural/control
+exclusion. At pinned EnergyPlus commit
+`6f2e40d10250a105b49966baa24d843711e61048` and locked
+`PurchasedAirManager.cc` SHA-256
+`54D960BCBFDF4F424A84BA73BF62040677424AD93E2F9362584898B0B146C005`, it maps
+physical control line 2350 exactly:
+
+```cpp
+} else { // DeadBand mode shuts off heat recovery and economizer
+```
+
+CP431 already owns physical line 2348's predicate, short-circuit behavior,
+and combined false-fallthrough authority. CP432 already owns physical
+executable line 2349's Heat assignment. CP433 maps only entry into the sibling
+`else` after either retained CP431 false fallthrough; it does not map the
+line-2350 closing delimiter, comment-implied behavior, a CP432 true-body exit,
+a branch merge, or unconditional entry. Its exact sole source site is
+`enter-heating-mode-guard-else-branch-after-guard-false-fallthrough`.
+Physical executable line 2351 is the first excluded lexical and executable
+statement and the CP434 candidate:
+
+```cpp
+OperatingMode = OpMode::DeadBand;
+```
+
+Physical structural line 2352 and every later Heating calculation also remain
+excluded. CP433 owns no Heat or DeadBand operating-mode assignment and no
+heat-recovery or economizer effect.
+
+CP433 preserves CP432's 61 flattened conceptual outcomes one-for-one. The 58
+inherited outcomes that never evaluate the CP431 guard remain inactive, and
+the one direct-`DualHeatCool` public outcome that performed CP432's Heat
+assignment does not enter the sibling `else`. The numeric-false public variant
+and the numeric-true exact-`SingleCool` private variant are the two retained
+CP431 false fallthroughs and both enter the sole CP433 site. Exact accounting
+is `T433=61`, `Z433=58+1=59`, `E433=2`, and `S433=E433=2` for transitions,
+inactive transitions, else entries, and source-site executions. Public/private
+remains 20/41, with one active public outcome and one active private outcome;
+every relevant nonzero route count remains at logical index 1.
+
+Exactly two width-36 arrays retain predecessor routes and local
+Heating-mode-guard else-entry routes. The local entry array is exactly the
+sealed CP432 snapshot's combined false-fallthrough alias. The one predecessor
+Heat assignment and two local else entries are mutually exclusive and exactly
+partition the three retained guard evaluations. Absence of a CP432 Heat
+assignment alone cannot activate CP433 because the 58 inherited inactive
+outcomes also lack that assignment.
+
+Same-call bit-exact sealed CP432 lifecycle, snapshot, latest witness,
+completion evidence, and committed route are the sole immediate predecessor
+and route authority. The committed seal validates CP432's retained local route
+and accounting in bounded time. CP433 does not recursively derive a snapshot
+route, invoke private characterization, replay the line-2348 predicate, or
+reacquire CP310, CP311, or CP312 numeric or control owners. It takes no caller,
+model, service, Zone, operating-mode, or numerical-DTO scalar.
+
+The structural entry reads no preexisting `OperatingMode` value and performs
+no assignment, selector or owner read, comparison, arithmetic, psychrometric
+evaluation, finite or range gate, clamp, normalization, coercion, default,
+diagnostic, cache, mutable-service operation, or numerical output operation.
+In particular, the source comment does not make heat-recovery or economizer
+shutdown a CP433 effect, and the line-2351 DeadBand value remains excluded.
+
+The lossless snapshot preserves CP432's exact 351 fields and appends only the
+plain Boolean `heating_mode_guard_else_branch_entered`. It therefore has
+exactly 352 unique base fields, 125 `Option<f64>` carriers, four optional
+comparison bools, and three optional enums. JSON preserves CP432's exact first
+476 keys and appends only the marker key, for 477 unique keys with the same 125
+immediately adjacent authoritative IEEE sidecars. Terminal W/H/T presence and
+bit-exact unchanged preservation remain 37/42/57. CP433 acquires no numerical
+owner; both entry outcomes carry no terminal W/H/T value or assigned Heat enum,
+while the disjoint CP432 Heat outcome retains its predecessor evidence with the
+new entry marker false.
+
+Binding is CP432-to-CP433-to-unchanged-numerical, while preserving the
+CP431-to-CP432 interval, and the binding checkpoint count advances from 123 to
+124. CP433 adds no numerical, coupling-input, or output DTO field. Its evidence
+never feeds or replaces prediction, numerical results, feedback, nodes, loads,
+reports, or outputs; non-direct paths reject CP433 lifecycle evidence. CP433
+adds no support, readiness, capability, routine, algorithm,
+numerical-conformance, source-map, psychrometrics-map,
+output/status/conformance, or Roadmap promotion. Counts remain 32 algorithms,
+293 routines, 58 `state_mapped`, 235 `source_mapped`, and 170 required. Script
+inventory becomes 371 total, 240 public, 131 internal, zero unused, zero
+unreachable, with 238 development commands.

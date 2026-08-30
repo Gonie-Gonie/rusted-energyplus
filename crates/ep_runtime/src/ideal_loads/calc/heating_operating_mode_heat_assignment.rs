@@ -24,6 +24,12 @@ pub(in crate::ideal_loads) use release::{
     heating_operating_mode_heat_assignment_snapshots_match_bit_exact,
     private_heating_operating_mode_heat_assignment_characterization,
 };
+#[allow(unused_imports)]
+pub(in crate::ideal_loads::calc) use release::{
+    heating_operating_mode_heat_assignment_committed_latest_route,
+    heating_operating_mode_heat_assignment_retained_route_matches_snapshot_bounded,
+    heating_operating_mode_heat_assignment_snapshot_route,
+};
 pub use state::PurchasedAirCalcHeatingOperatingModeHeatAssignmentRuntimeState;
 #[allow(unused_imports)]
 pub(in crate::ideal_loads::calc) use transition::{
@@ -31,6 +37,10 @@ pub(in crate::ideal_loads::calc) use transition::{
     advance_heating_operating_mode_heat_assignment_state,
     advance_heating_operating_mode_heat_assignment_state_with_validated_route,
     heating_operating_mode_heat_assignment_route_from_committed_predecessor,
+};
+#[cfg(test)]
+pub(in crate::ideal_loads::calc) use tests::{
+    cp432_all_snapshots_for_successor_tests, cp432_fixture_unit_for_successor_tests,
 };
 /// EnergyPlus executable Heat-mode assignment represented by CP432.
 pub const PURCHASED_AIR_CALC_HEATING_OPERATING_MODE_HEAT_ASSIGNMENT_SOURCE: &str =

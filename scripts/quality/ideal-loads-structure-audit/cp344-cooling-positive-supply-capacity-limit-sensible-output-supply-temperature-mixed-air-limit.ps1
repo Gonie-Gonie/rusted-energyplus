@@ -489,6 +489,11 @@ $cp344BindingIntervalCode = [regex]::Replace(
     '(?s)(?:let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_cp_air_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_guard\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_maximum_capacity_assignment\([^;]+?\)\?;|let calculation_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment =\s*advance_cooling_post_saturation_capacity_limit_dehumidification_guard_else_branch_sensible_output_supply_temperature_assignment\([^;]+?\)\?;|let calculation_cooling_supply_mass_flow_positive_guard_else_branch_entry =\s*advance_cooling_supply_mass_flow_positive_guard_else_branch_entry\([^;]+?\)\?;|let calculation_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment =\s*advance_cooling_zero_supply_mass_flow_supply_enthalpy_mixed_air_assignment\([^;]+?\)\?;|let calculation_cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment =\s*advance_cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment\([^;]+?\)\?;|let calculation_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment =\s*advance_cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment\([^;]+?\)\?;|let calculation_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment =\s*advance_cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment\([^;]+?\)\?;|let calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment =\s*advance_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment\([^;]+?\)\?;|let calculation_heating_or_no_load_case_entry =\s*advance_heating_or_no_load_case_entry\([^;]+?\)\?;|let calculation_heating_mode_guard =\s*advance_heating_mode_guard\([^;]+?\)\?;|let calculation_heating_operating_mode_heat_assignment =\s*advance_heating_operating_mode_heat_assignment\([^;]+?\)\?;)',
     ''
 )
+    $cp344BindingIntervalCode = [regex]::Replace(
+        $cp344BindingIntervalCode,
+        '(?s)let calculation_heating_mode_guard_else_branch_entry =\s*advance_heating_mode_guard_else_branch_entry\([^;]+?\)\?;',
+        ''
+    )
     if ($cp344BindingIntervalCode -match '(?<![A-Za-z0-9_])(?:\b[A-Za-z_][A-Za-z0-9_:]*|\.[A-Za-z_][A-Za-z0-9_]*)!?\s*\(') {
         throw "No intermediary helper call may execute $($cp344BindingInterval.Description)"
     }
@@ -695,7 +700,7 @@ if (
 ) {
     throw "Pipeline must expose CP344 lifecycle through one direct Some/result and all three non-direct None constructors"
 }
-Assert-Contains -Path $cp344PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp432_lifecycle_evidence' -Description "non-direct CP344 through CP363 evidence rejection"
+Assert-Contains -Path $cp344PipelineRoot -Pattern 'non_direct_runtime_rejects_cp316_through_cp433_lifecycle_evidence' -Description "non-direct CP344 through CP363 evidence rejection"
 
 # Specs contain exactly two addenda and the 2+2+1+1 target distribution.
 $cp344AlgorithmText = Read-RepoText -Path "specs\algorithm_ledger.toml"
@@ -877,7 +882,7 @@ foreach ($cp344HistoricalFirewallAudit in @(
         "scripts\quality\ideal-loads-structure-audit\cp342-cooling-positive-supply-capacity-limit-sensible-output-supply-enthalpy-assignment.ps1",
         "scripts\quality\ideal-loads-structure-audit\cp343-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-assignment.ps1"
     )) {
-    Assert-Contains -Path $cp344HistoricalFirewallAudit -Pattern 'non_direct_runtime_rejects_cp316_through_cp432_lifecycle_evidence' -Description "historical non-direct firewall reaches CP362"
+    Assert-Contains -Path $cp344HistoricalFirewallAudit -Pattern 'non_direct_runtime_rejects_cp316_through_cp433_lifecycle_evidence' -Description "historical non-direct firewall reaches CP362"
 }
 Assert-Contains -Path "scripts\quality\ideal-loads-structure-audit\cp341-cooling-positive-supply-capacity-limit-sensible-output-maximum-capacity-assignment.ps1" -Pattern 'cp347_direct_coupled_runtime_completes_none_case_after_g_f_l_and_skips_unit_off' -Description "cumulative coupled CP347 regression"
 
@@ -894,11 +899,12 @@ if (
 ) {
     throw "Main IdealLoads audit must dot-source CP344 after CP343 before completion"
 }
-Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 370' -Description "CP344 cumulative inventory total through CP403"
+Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'script_count = 371' -Description "CP344 cumulative inventory total through CP403"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'unused_script_count = 0' -Description "CP344 cumulative uncalled inventory"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'path = "scripts/quality/ideal-loads-structure-audit/cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit\.ps1"' -Description "CP344 internal script inventory record"
 Assert-Contains -Path "specs\script_inventory.toml" -Pattern 'scripts/quality/ideal-loads-structure-audit/cp344-cooling-positive-supply-capacity-limit-sensible-output-supply-temperature-mixed-air-limit\.ps1::dot_sources' -Description "CP344 main-audit callee evidence"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 370 \|' -Description "CP344 generated script count through CP403"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 371 \|' -Description "CP344 generated script count through CP403"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| public scripts \| 240 \|' -Description "CP344 generated public script count"
-Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 130 \|' -Description "CP344 generated internal script count through CP403"
+Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| 131 \|' -Description "CP344 generated internal script count through CP403"
 Assert-Contains -Path "docs\src\generated\script-index.md" -Pattern '\| scripts without callers \| 0 \|' -Description "CP344 generated uncalled script count"
+Assert-Contains -Path 'crates\ep_runtime\src\ideal_loads\binding.rs' -Pattern 'advance_heating_mode_guard_else_branch_entry' -Description 'CP433 helper whitelist'

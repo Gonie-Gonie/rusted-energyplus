@@ -1,5 +1,6 @@
 //! CP432 boundary, exhaustive route, forgery, overflow, and bounded-path tests.
 
+mod committed_seal;
 mod schema_prefix;
 
 use super::transition::{
@@ -12,9 +13,15 @@ use super::PurchasedAirCalcHeatingOperatingModeHeatAssignmentRuntimeState as Sta
 use crate::ideal_loads::calc::{
     IdealLoadsSensibleMode,
     cp431_all_snapshots_for_successor_tests,
+    cp431_committed_fixture_for_successor_tests,
     heating_mode_guard_snapshot_route,
 };
-use crate::ideal_loads::PurchasedAirCalcHeatingModeGuardSnapshot as Predecessor;
+use crate::ideal_loads::{
+    PurchasedAirCalcCoolingMixedAirCallSnapshot as Cp329Snapshot,
+    PurchasedAirCalcHeatingModeGuardSnapshot as Predecessor,
+    PurchasedAirCalcHeatingOperatingModeHeatAssignmentSnapshot as Snapshot,
+    PurchasedAirUnitRuntimeState,
+};
 
 #[test]
 fn cp432_boundary_skips_structural_2350_and_constant_heat_site_is_exact() {
@@ -238,4 +245,43 @@ fn assert_no_recursive_route_replay(source: &str) {
     for forbidden in ["predecessor_route(", "_snapshot_route("] {
         assert!(!source.contains(forbidden), "{forbidden}");
     }
+}
+
+pub(in crate::ideal_loads::calc) fn cp432_all_snapshots_for_successor_tests() -> Vec<Snapshot> {
+    cp431_all_snapshots_for_successor_tests()
+        .into_iter()
+        .map(|predecessor| {
+            let predecessor_route =
+                heating_mode_guard_snapshot_route(predecessor).expect("CP431 route");
+            let route = successor_route(predecessor, predecessor_route).expect("CP432 route");
+            advance_validated(
+                &mut State::new(predecessor.system),
+                predecessor,
+                predecessor_route,
+                route,
+            )
+            .expect("CP432")
+        })
+        .collect()
+}
+
+pub(in crate::ideal_loads::calc) fn cp432_fixture_unit_for_successor_tests() -> (
+    PurchasedAirUnitRuntimeState,
+    Snapshot,
+    Route,
+    Option<Cp329Snapshot>,
+) {
+    let (mut unit, predecessor, predecessor_route, owner) =
+        cp431_committed_fixture_for_successor_tests();
+    let route = successor_route(predecessor, predecessor_route).expect("CP432 route");
+    let mut state = State::new(predecessor.system);
+    let snapshot = advance_validated(
+        &mut state,
+        predecessor,
+        predecessor_route,
+        route,
+    )
+    .expect("CP432");
+    unit.calc_heating_operating_mode_heat_assignment = state;
+    (unit, snapshot, route, owner)
 }

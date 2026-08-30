@@ -210,6 +210,15 @@ fn fixture() -> (
     unreachable!("active CP431 fixture")
 }
 
+pub(in crate::ideal_loads::calc) fn cp431_committed_fixture_for_successor_tests() -> (
+    PurchasedAirUnitRuntimeState,
+    Cp431Snapshot,
+    Route,
+    Option<Cp329Snapshot>,
+) {
+    fixture()
+}
+
 fn current(unit: &mut PurchasedAirUnitRuntimeState) -> &mut State {
     &mut unit.calc_heating_mode_guard
 }

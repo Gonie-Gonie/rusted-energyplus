@@ -40,7 +40,9 @@ pub(in crate::ideal_loads::calc) use transition::{
 #[allow(unused_imports)]
 pub(in crate::ideal_loads) use transition::PurchasedAirCalcHeatingModeGuardActiveInput;
 #[cfg(test)]
-pub(in crate::ideal_loads::calc) use tests::cp431_all_snapshots_for_successor_tests;
+pub(in crate::ideal_loads::calc) use tests::{
+    cp431_all_snapshots_for_successor_tests, cp431_committed_fixture_for_successor_tests,
+};
 
 /// EnergyPlus executable heating-mode guard represented by CP431.
 pub const PURCHASED_AIR_CALC_HEATING_MODE_GUARD_SOURCE: &str =

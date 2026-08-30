@@ -22,12 +22,14 @@ use crate::ideal_loads::{
     heating_mode_guard_snapshots_match_bit_exact,
 };
 
+mod committed;
 mod error;
 mod prefix;
 mod runtime_validation;
 mod snapshot_validation;
 
 pub use error::PurchasedAirCalcHeatingOperatingModeHeatAssignmentError;
+pub(in crate::ideal_loads::calc) use committed::heating_operating_mode_heat_assignment_committed_latest_route;
 use runtime_validation::{pending_state_is_consistent, post_transition_state_is_consistent};
 use snapshot_validation::{
     prefix_and_local_shape_match,
@@ -180,6 +182,19 @@ pub(in crate::ideal_loads) fn heating_operating_mode_heat_assignment_snapshots_m
     right: Snapshot,
 ) -> bool {
     snapshots_match_bit_exact(left, right)
+}
+
+pub(in crate::ideal_loads::calc) fn heating_operating_mode_heat_assignment_snapshot_route(
+    snapshot: Snapshot,
+) -> Option<super::transition::PurchasedAirCalcHeatingOperatingModeHeatAssignmentRetainedRoute> {
+    snapshot_validation::snapshot_route(snapshot)
+}
+
+pub(in crate::ideal_loads::calc) fn heating_operating_mode_heat_assignment_retained_route_matches_snapshot_bounded(
+    snapshot: Snapshot,
+    route: super::transition::PurchasedAirCalcHeatingOperatingModeHeatAssignmentRetainedRoute,
+) -> bool {
+    snapshot_validation::retained_route_matches_prior_snapshot_bounded(snapshot, route)
 }
 
 fn predecessor_mismatch(

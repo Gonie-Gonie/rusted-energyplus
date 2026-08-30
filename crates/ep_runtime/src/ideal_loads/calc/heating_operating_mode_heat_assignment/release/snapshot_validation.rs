@@ -73,6 +73,74 @@ pub(super) fn retained_route_matches_prior_snapshot_bounded(
     )
 }
 
+pub(super) fn committed_prefix_and_local_route_shape_match(
+    snapshot: Snapshot,
+    predecessor: Predecessor,
+    predecessor_route: PredecessorRoute,
+    route: Route,
+) -> bool {
+    let assignment = predecessor_route.body_entered;
+    let predecessor_route_shape = route.logical_index == predecessor_route.logical_index
+        && route.predecessor_active == predecessor_route.predecessor_active
+        && route.predecessor_assignment_executed
+            == predecessor_route.predecessor_assignment_executed
+        && route.predecessor_entered == predecessor_route.predecessor_entered
+        && route.predecessor_total_output_assignment_executed
+            == predecessor_route.predecessor_total_output_assignment_executed
+        && route.predecessor_heating_or_no_load_case_entered
+            == predecessor_route.predecessor_heating_or_no_load_case_entered
+        && route.predecessor_heating_mode_guard_evaluated == predecessor_route.guard_evaluated
+        && route.predecessor_sensible_comparison_satisfied
+            == predecessor_route.sensible_comparison_satisfied
+        && route.predecessor_single_cool_blocked == predecessor_route.single_cool_blocked
+        && route.predecessor_heating_operating_mode_body_entered
+            == predecessor_route.body_entered
+        && route.predecessor_heating_mode_guard_false_fallthrough
+            == predecessor_route.false_fallthrough
+        && route.assignment_executed == assignment;
+    predecessor_route_shape
+        && snapshot.source == SOURCE
+        && snapshot.first_excluded_source == EXCLUDED
+        && snapshot.source_order == ORDER
+        && snapshot.system == predecessor.system
+        && snapshot.parent_call_ordinal == predecessor.parent_call_ordinal
+        && snapshot.controlled_zone == predecessor.controlled_zone
+        && snapshot.heating_operating_mode_heat_assignment_executed == assignment
+        && snapshot.cp431_retained_supply_humidity_ratio_state_owned
+            == predecessor.resulting_supply_humidity_ratio.is_some()
+        && snapshot.cp431_retained_supply_enthalpy_state_owned
+            == predecessor.resulting_supply_enthalpy_j_per_kg.is_some()
+        && snapshot.cp431_retained_supply_temperature_state_owned
+            == predecessor.resulting_supply_temperature_c.is_some()
+        && snapshot.heating_operating_mode_heat_assignment_performed == assignment
+        && snapshot.assigned_heating_operating_mode
+            == assignment.then_some(IdealLoadsSensibleMode::Heating)
+        && same(
+            snapshot.predecessor_cp431_resulting_supply_humidity_ratio,
+            predecessor.resulting_supply_humidity_ratio,
+        )
+        && same(
+            snapshot.predecessor_cp431_resulting_supply_enthalpy_j_per_kg,
+            predecessor.resulting_supply_enthalpy_j_per_kg,
+        )
+        && same(
+            snapshot.predecessor_cp431_resulting_supply_temperature_c,
+            predecessor.resulting_supply_temperature_c,
+        )
+        && same(
+            snapshot.resulting_supply_humidity_ratio,
+            predecessor.resulting_supply_humidity_ratio,
+        )
+        && same(
+            snapshot.resulting_supply_enthalpy_j_per_kg,
+            predecessor.resulting_supply_enthalpy_j_per_kg,
+        )
+        && same(
+            snapshot.resulting_supply_temperature_c,
+            predecessor.resulting_supply_temperature_c,
+        )
+}
+
 pub(super) fn prefix_and_local_shape_match(
     snapshot: Snapshot,
     predecessor: Predecessor,

@@ -164,6 +164,8 @@ mod cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_tes
 mod cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment_tests;
 #[path = "binding/cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_tests.rs"]
 mod cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_tests;
+#[path = "binding/heating_mode_guard_else_branch_entry_tests.rs"]
+mod heating_mode_guard_else_branch_entry_tests;
 #[path = "binding/heating_mode_guard_tests.rs"]
 mod heating_mode_guard_tests;
 #[path = "binding/heating_operating_mode_heat_assignment_tests.rs"]

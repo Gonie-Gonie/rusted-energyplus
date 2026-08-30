@@ -222,6 +222,8 @@ mod cooling_zero_supply_mass_flow_supply_humidity_ratio_mixed_air_assignment_fix
 mod cooling_zero_supply_mass_flow_supply_temperature_mixed_air_assignment_fixture;
 #[path = "coupled_output_tests/cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_fixture.rs"]
 mod cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_fixture;
+#[path = "coupled_output_tests/heating_mode_guard_else_branch_entry_fixture.rs"]
+mod heating_mode_guard_else_branch_entry_fixture;
 #[path = "coupled_output_tests/heating_mode_guard_fixture.rs"]
 mod heating_mode_guard_fixture;
 #[path = "coupled_output_tests/heating_operating_mode_heat_assignment_fixture.rs"]
@@ -342,6 +344,7 @@ use cooling_zero_supply_mass_flow_sensible_output_positive_zero_assignment_fixtu
 use cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_fixture::calculation_cooling_zero_supply_mass_flow_total_output_positive_zero_assignment_snapshot;
 use heating_or_no_load_case_entry_fixture::calculation_heating_or_no_load_case_entry_snapshot;
 use heating_mode_guard_fixture::calculation_heating_mode_guard_snapshot;
+use heating_mode_guard_else_branch_entry_fixture::calculation_heating_mode_guard_else_branch_entry_snapshot;
 use heating_operating_mode_heat_assignment_fixture::calculation_heating_operating_mode_heat_assignment_snapshot;
 use crate::ideal_loads::{
     PurchasedAirCalcCoolingPostSaturationCapacityLimitDehumidificationGuardElseBranchSensibleOutputAssignmentActiveInput,
@@ -573,6 +576,21 @@ fn cp432_assignment_mutation_cannot_change_the_unchanged_numerical_coupling_outp
     assert_ne!(
         mutated.calculation_heating_operating_mode_heat_assignment,
         original.calculation_heating_operating_mode_heat_assignment,
+    );
+    assert_eq!(mutated.coupling, original.coupling);
+}
+
+#[test]
+fn cp433_else_entry_mutation_cannot_change_the_unchanged_numerical_coupling_output() {
+    let system = test_system();
+    let original = scaled_output(&system, 0, 1.0);
+    let mut mutated = original;
+    mutated
+        .calculation_heating_mode_guard_else_branch_entry
+        .heating_mode_guard_else_branch_entered ^= true;
+    assert_ne!(
+        mutated.calculation_heating_mode_guard_else_branch_entry,
+        original.calculation_heating_mode_guard_else_branch_entry,
     );
     assert_eq!(mutated.coupling, original.coupling);
 }
@@ -1847,6 +1865,10 @@ pub(in crate::ideal_loads) fn scaled_output(
     );
     let calculation_heating_operating_mode_heat_assignment =
         calculation_heating_operating_mode_heat_assignment_snapshot(calculation_heating_mode_guard);
+    let calculation_heating_mode_guard_else_branch_entry =
+        calculation_heating_mode_guard_else_branch_entry_snapshot(
+            calculation_heating_operating_mode_heat_assignment,
+        );
     let mut output = DirectZonePurchasedAirScheduledCouplingOutput {
         schedules: DirectZonePurchasedAirScheduleSnapshot {
             sample_index,
@@ -1992,6 +2014,7 @@ pub(in crate::ideal_loads) fn scaled_output(
         calculation_heating_or_no_load_case_entry,
         calculation_heating_mode_guard,
         calculation_heating_operating_mode_heat_assignment,
+        calculation_heating_mode_guard_else_branch_entry,
         coupling,
     };
     let report = &mut output.coupling.purchased_air.report;
